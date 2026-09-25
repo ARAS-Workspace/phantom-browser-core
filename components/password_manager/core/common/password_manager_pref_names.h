@@ -55,14 +55,7 @@ inline constexpr char kCredentialsEnableService[] =
 inline constexpr char kCredentialsEnablePasskeys[] =
     "credentials_enable_passkeys";
 
-#if BUILDFLAG(IS_IOS)
-// The value of this preference determines whether the user had enabled the
-// credential provider in their iOS settings at startup.
-inline constexpr char kCredentialProviderEnabledOnStartup[] =
-    "credential_provider_enabled_on_startup";
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Boolean pref controlled by the DeletingUndecryptablePasswordsEnabled policy.
 // If set to false it blocks deleting undecryptable passwords, otherwise the
 // deletion can happen.
@@ -151,14 +144,14 @@ inline constexpr char kWasAutoSignInFirstRunExperienceShown[] =
 inline constexpr char kWereOldGoogleLoginsRemoved[] =
     "profile.were_old_google_logins_removed";
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // Deprecated 01/2025.
 // A dictionary of account-storage-related settings that exist per Gaia account
 // (e.g. whether that user has opted in). It maps from hash of Gaia ID to
 // dictionary of key-value pairs.
 inline constexpr char kObsoleteAccountStoragePerAccountSettings[] =
     "profile.password_account_storage_settings";
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Indicates the time (in seconds) when last cleaning of obsolete HTTP
 // credentials was performed.
@@ -228,7 +221,7 @@ inline constexpr char kBiometricAuthenticationBeforeFilling[] =
     "password_manager.biometric_authentication_filling";
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)  // Desktop
+#if !BUILDFLAG(IS_ANDROID)  // Desktop
 // A list of available promo cards with related information which are displayed
 // in the Password Manager UI.
 inline constexpr char kPasswordManagerPromoCardsList[] =

@@ -232,11 +232,9 @@ class CommonControllerBuilder {
   std::unique_ptr<syncer::DataTypeController>
   CreateAutofillWalletOfferDataTypeController(
       syncer::SyncService* sync_service);
-#if !BUILDFLAG(IS_IOS)
   std::unique_ptr<syncer::DataTypeController>
   CreateAutofillWalletUsageDataTypeController(
       syncer::SyncService* sync_service);
-#endif
   std::unique_ptr<syncer::DataTypeController>
   CreateAutofillWalletCredentialDataTypeController(
       syncer::SyncService* sync_service);

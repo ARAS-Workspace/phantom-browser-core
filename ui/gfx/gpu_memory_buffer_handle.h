@@ -113,20 +113,6 @@ struct COMPONENT_EXPORT(GFX) GpuMemoryBufferHandle {
     type = EMPTY_BUFFER;
     return std::move(io_surface_);
   }
-#if BUILDFLAG(IS_IOS)
-  const base::UnsafeSharedMemoryRegion& io_surface_shared_memory_region()
-      const {
-    return io_surface_shared_memory_region_;
-  }
-  uint32_t io_surface_plane_stride(size_t plane) const {
-    CHECK_LT(plane, kMaxIOSurfacePlanes);
-    return io_surface_plane_strides_[plane];
-  }
-  uint32_t io_surface_plane_offset(size_t plane) const {
-    CHECK_LT(plane, kMaxIOSurfacePlanes);
-    return io_surface_plane_offsets_[plane];
-  }
-#endif  // BUILDFLAG(IS_IOS)
 #endif  // BUILDFLAG(IS_APPLE)
 
   GpuMemoryBufferType type = GpuMemoryBufferType::EMPTY_BUFFER;
@@ -152,19 +138,6 @@ struct COMPONENT_EXPORT(GFX) GpuMemoryBufferHandle {
 
 #if BUILDFLAG(IS_APPLE)
   ScopedIOSurface io_surface_;
-#if BUILDFLAG(IS_IOS)
-  // On iOS, we carry the mach port since we might not have a valid IOSurface to
-  // retrieve the port from like we do on macOS.
-  ScopedRefCountedIOSurfaceMachPort io_surface_mach_port_;
-  // On iOS, we can't use IOKit to access IOSurfaces in the renderer process, so
-  // we share the memory segment backing the IOSurface as shared memory which is
-  // then mapped in the renderer process.
-  base::UnsafeSharedMemoryRegion io_surface_shared_memory_region_;
-  // We have to pass the plane strides and offsets since we can't use IOSurface
-  // helper methods to get them.
-  std::array<uint32_t, kMaxIOSurfacePlanes> io_surface_plane_strides_;
-  std::array<uint32_t, kMaxIOSurfacePlanes> io_surface_plane_offsets_;
-#endif  // BUILDFLAG(IS_IOS)
 #endif  // BUILDFLAG(IS_APPLE)
 };
 

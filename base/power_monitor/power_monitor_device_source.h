@@ -23,10 +23,6 @@
 #include "base/power_monitor/thermal_state_observer_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_IOS)
-#include <objc/runtime.h>
-#endif  // BUILDFLAG(IS_IOS)
-
 namespace base {
 
 // A class used to monitor the power state change and notify the observers about
@@ -98,11 +94,6 @@ class BASE_EXPORT PowerMonitorDeviceSource : public PowerMonitorSource {
 
   PowerStateObserver::BatteryPowerStatus battery_power_status_ =
       PowerStateObserver::BatteryPowerStatus::kUnknown;
-#endif
-
-#if BUILDFLAG(IS_IOS)
-  // Holds pointers to system event notification observers.
-  std::vector<id> notification_observers_;
 #endif
 
 };

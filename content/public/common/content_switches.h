@@ -253,10 +253,6 @@ CONTENT_EXPORT extern const char kRendererWaitForJavaDebugger[];
 CONTENT_EXPORT extern const char kJavalessRenderers[];
 #endif
 
-#if BUILDFLAG(IS_IOS)
-CONTENT_EXPORT extern const char kPreventResizingContentsForTesting[];
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 CONTENT_EXPORT extern const char kEnableSpeechDispatcher[];
 #endif

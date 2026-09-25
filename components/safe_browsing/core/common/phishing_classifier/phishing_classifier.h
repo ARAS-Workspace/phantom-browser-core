@@ -67,12 +67,6 @@ class PhishingClassifier {
   // has had a scorer set via `set_scorer()` or `ScorerStorage`.
   bool is_ready() const;
 
-#if BUILDFLAG(IS_IOS)
-  // Sets the scorer. Required on iOS because `ScorerStorage` is a process-wide
-  // singleton and iOS runs in a multi-Profile browser process architecture.
-  void set_scorer(Scorer* scorer);
-#endif
-
   // Begins the phishing classification process for the given URL and image.
   // This method cancels any pending classifications before starting a new one.
   //
@@ -156,11 +150,6 @@ class PhishingClassifier {
   // The URL of the page being classified. Stored at the beginning of
   // classification to ensure consistency in the verdict.
   GURL classification_url_;
-
-#if BUILDFLAG(IS_IOS)
-  // An explicitly set scorer for platforms where ScorerStorage is not used.
-  raw_ptr<Scorer> scorer_ = nullptr;
-#endif
 
   SEQUENCE_CHECKER(sequence_checker_);
 

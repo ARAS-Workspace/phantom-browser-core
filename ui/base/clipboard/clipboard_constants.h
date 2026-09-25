@@ -159,10 +159,10 @@ extern NSString* const kUTTypeChromiumBookmarkDictionaryList;
 
 // ----- ANDROID MIME TYPES -----
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 inline constexpr char kMimeTypeImageUri[] = "image-uri";
 inline constexpr char16_t kMimeTypeImageUri16[] = u"image-uri";
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // ----- OTHER RELATED CONSTANTS -----
 

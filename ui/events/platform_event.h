@@ -28,8 +28,6 @@ namespace ui {
 using PlatformEvent = ui::Event*;
 #elif BUILDFLAG(IS_MAC)
 using PlatformEvent = base::apple::OwnedNSEvent;
-#elif BUILDFLAG(IS_IOS)
-using PlatformEvent = base::apple::OwnedUIEvent;
 #elif BUILDFLAG(IS_ANDROID)
 using PlatformEvent = ui::PlatformEventAndroid;
 #else

@@ -33,10 +33,6 @@ class ScopedDisableRunLoopTimeout;
 class MessagePumpAndroid;
 #endif
 
-#if BUILDFLAG(IS_IOS)
-class MessagePumpUIApplication;
-#endif
-
 class SingleThreadTaskRunner;
 
 // Helper class to run the RunLoop::Delegate associated with the current thread.
@@ -268,12 +264,6 @@ class BASE_EXPORT RunLoop {
   // Android doesn't support the blocking RunLoop::Run, so it calls
   // BeforeRun and AfterRun directly.
   friend class MessagePumpAndroid;
-#endif
-
-#if BUILDFLAG(IS_IOS)
-  // iOS doesn't support the blocking RunLoop::Run, so it calls
-  // BeforeRun directly.
-  friend class MessagePumpUIApplication;
 #endif
 
   // Support for //base/test/scoped_run_loop_timeout.h.

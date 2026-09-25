@@ -502,10 +502,7 @@ class BASE_EXPORT Time : public time_internal::TimeBase<Time> {
 //
 // WARNING: These are not the same limits for the inverse functionality,
 // UTCExplode() and LocalExplode(). See method comments for further details.
-#if BUILDFLAG(IS_IOS) && !__LP64__
-  static constexpr int kExplodedMinYear = std::numeric_limits<int>::min();
-  static constexpr int kExplodedMaxYear = std::numeric_limits<int>::max();
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   static constexpr int kExplodedMinYear = 1902;
   static constexpr int kExplodedMaxYear = std::numeric_limits<int>::max();
 #elif BUILDFLAG(IS_ANDROID)

@@ -20,10 +20,6 @@ class PrefService;
 class ProfileOAuth2TokenService;
 class SigninClient;
 
-#if BUILDFLAG(IS_IOS)
-class DeviceAccountsProvider;
-#endif
-
 namespace network {
 class NetworkConnectionTracker;
 }
@@ -46,8 +42,5 @@ std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
     scoped_refptr<TokenWebData> token_web_data,
     unexportable_keys::UnexportableKeyService* unexportable_key_service,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-#if BUILDFLAG(IS_IOS)
-    std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
-#endif
     SigninClient* signin_client);
 #endif  // COMPONENTS_SIGNIN_INTERNAL_IDENTITY_MANAGER_PROFILE_OAUTH2_TOKEN_SERVICE_BUILDER_H_

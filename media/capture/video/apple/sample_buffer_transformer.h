@@ -16,10 +16,6 @@
 
 namespace media {
 
-#if BUILDFLAG(IS_IOS)
-class PixelBufferRotator;
-#endif
-
 class PixelBufferPool;
 class PixelBufferTransferer;
 
@@ -70,12 +66,6 @@ class CAPTURE_EXPORT SampleBufferTransformer {
       CVPixelBufferRef pixel_buffer);
   base::apple::ScopedCFTypeRef<CVPixelBufferRef> Transform(
       CMSampleBufferRef sample_buffer);
-
-#if BUILDFLAG(IS_IOS)
-  // Rotates a source pixel buffer and returns rotated pixel buffer as a output.
-  base::apple::ScopedCFTypeRef<CVPixelBufferRef> Rotate(
-      CVPixelBufferRef source_pixel_buffer);
-#endif
 
  private:
   friend std::unique_ptr<SampleBufferTransformer>
@@ -128,10 +118,6 @@ class CAPTURE_EXPORT SampleBufferTransformer {
   std::vector<uint8_t> intermediate_nv12_buffer_;
 
   int rotation_angle_;
-#if BUILDFLAG(IS_IOS)
-  std::unique_ptr<PixelBufferPool> rotated_destination_pixel_buffer_pool_;
-  std::unique_ptr<PixelBufferRotator> pixel_buffer_rotator_;
-#endif
 };
 
 }  // namespace media

@@ -35,13 +35,6 @@ class DeviceAccountsSynchronizer {
       const std::optional<CoreAccountId>& primary_account_id) = 0;
 #endif
 
-#if BUILDFLAG(IS_IOS)
-  // Reloads the information of the device-level account with |account_id|. The
-  // account will be visible in IdentityManager::GetAccountsWithRefreshTokens()
-  // with any persistent error cleared after this method is called.
-  virtual void ReloadAccountFromSystem(const CoreAccountId& account_id) = 0;
-#endif
-
   // Class is non-copyable, non-moveable.
   DeviceAccountsSynchronizer(const DeviceAccountsSynchronizer&) = delete;
   DeviceAccountsSynchronizer& operator=(const DeviceAccountsSynchronizer&) =

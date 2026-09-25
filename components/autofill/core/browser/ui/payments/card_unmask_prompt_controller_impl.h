@@ -54,9 +54,6 @@ class CardUnmaskPromptControllerImpl : public CardUnmaskPromptController {
                               bool enable_fido_auth,
                               bool was_checkbox_visible) override;
   void NewCardLinkClicked() override;
-#if BUILDFLAG(IS_IOS)
-  std::u16string GetNavigationTitle() const override;
-#endif
   std::u16string GetWindowTitle() const override;
   std::u16string GetInstructionsMessage() const override;
   std::u16string GetOkButtonLabel() const override;
@@ -83,9 +80,7 @@ class CardUnmaskPromptControllerImpl : public CardUnmaskPromptController {
       const override;
   bool IsVirtualCard() const override;
   const CreditCard& GetCreditCard() const override;
-#if !BUILDFLAG(IS_IOS)
   int GetCvcTooltipResourceId() override;
-#endif
 
   PrefService* pref_service_for_testing() const { return &pref_service_.get(); }
   CreditCard card_for_testing() const { return card_; }

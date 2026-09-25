@@ -146,7 +146,7 @@ class SecurityInterstitialTabHelper
   void OpenWhitepaperInNewTab() override;
   void ReportPhishingErrorInNewTab() override;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   void ShowCertificateViewer() override;
 #endif
 

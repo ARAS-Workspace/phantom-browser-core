@@ -107,9 +107,6 @@ BASE_EXPORT void EnsureProcessGetsReaped(Process process);
 // calling thread for up to two seconds.
 BASE_EXPORT void EnsureProcessTerminated(Process process);
 
-// These are only sparingly used, and not needed on Fuchsia or iOS. They could
-// be implemented if necessary.
-#if !BUILDFLAG(IS_IOS)
 // Wait for all the processes based on the named executable to exit.  If filter
 // is non-null, then only processes selected by the filter are waited on.
 // Returns after all processes have exited or wait_milliseconds have expired.
@@ -129,13 +126,12 @@ BASE_EXPORT bool CleanupProcesses(const FilePath::StringType& executable_name,
                                   base::TimeDelta wait,
                                   int exit_code,
                                   const ProcessFilter* filter);
-#endif  // !BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && TARGET_OS_SIMULATOR)
+#if BUILDFLAG(IS_MAC)
 // This is common code used by kill_ios.cc when building with iOS simulator it
 // does not need to be exported.
 void WaitForChildToDie(pid_t child, int timeout_seconds);
-#endif  // BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && TARGET_OS_SIMULATOR)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace base
 

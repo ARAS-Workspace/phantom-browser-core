@@ -15,26 +15,17 @@
 #include "components/autofill/core/browser/payments/payments_autofill_client.h"
 #include "components/autofill/core/browser/payments/payments_request_details.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "components/autofill/core/browser/payments/credit_card_fido_authenticator.h"
-#endif
 
 namespace autofill {
 
 // Test class for requesting authentication from CreditCardCvcAuthenticator or
 // CreditCardFidoAuthenticator.
-#if BUILDFLAG(IS_IOS)
-class TestAuthenticationRequester
-    : public CreditCardCvcAuthenticator::Requester,
-      public CreditCardOtpAuthenticator::Requester,
-      public CreditCardRiskBasedAuthenticator::Requester {
-#else
 class TestAuthenticationRequester
     : public CreditCardCvcAuthenticator::Requester,
       public CreditCardFidoAuthenticator::Requester,
       public CreditCardOtpAuthenticator::Requester,
       public CreditCardRiskBasedAuthenticator::Requester {
-#endif
  public:
   TestAuthenticationRequester();
   ~TestAuthenticationRequester() override;
@@ -48,7 +39,6 @@ class TestAuthenticationRequester
   bool UserOptedInToFidoFromSettingsPageOnMobile() const override;
 #endif
 
-#if !BUILDFLAG(IS_IOS)
   // CreditCardFidoAuthenticator::Requester:
   void OnFIDOAuthenticationComplete(
       const CreditCardFidoAuthenticator::FidoAuthenticationResponse& response)
@@ -56,7 +46,6 @@ class TestAuthenticationRequester
   void OnFidoAuthorizationComplete(bool did_succeed) override;
 
   void IsUserVerifiableCallback(bool is_user_verifiable);
-#endif
 
   // CreditCardOtpAuthenticator::Requester:
   void OnOtpAuthenticationComplete(

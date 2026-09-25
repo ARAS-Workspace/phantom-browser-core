@@ -12,8 +12,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "base/base_paths_mac.h"
-#elif BUILDFLAG(IS_IOS)
-#include "base/base_paths_ios.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "base/base_paths_android.h"
 #endif
@@ -29,7 +27,6 @@ enum BasePathKey {
 
   // The following refer to the current application.
   FILE_EXE,  // Path and filename of the current executable.
-#if !BUILDFLAG(IS_IOS)
   // Prefer keys (e.g., DIR_ASSETS) that are specific to the use case as the
   // module location may not work as expected on some platforms. For this
   // reason, this key is not defined on Fuchsia. See crbug.com/1263691 for
@@ -38,25 +35,20 @@ enum BasePathKey {
                 // the PathService (which could differ from FILE_EXE if the
                 // PathService were compiled into a shared object, for
                 // example).
-#endif
-  DIR_EXE,  // Directory containing FILE_EXE.
-#if !BUILDFLAG(IS_IOS)
+  DIR_EXE,      // Directory containing FILE_EXE.
   // Prefer keys (e.g., DIR_ASSETS) that are specific to the use case as the
   // module location may not work as expected on some platforms. For this
   // reason, this key is not defined on Fuchsia. See crbug.com/1263691 for
   // details.
   DIR_MODULE,  // Directory containing FILE_MODULE.
-#endif
   DIR_ASSETS,  // Directory that contains application assets.
 
   // The following refer to system and system user directories.
-  DIR_TEMP,  // Temporary directory for the system and/or user.
-  DIR_HOME,  // User's root home directory. On Windows this will look
-             // like "C:\Users\<user>"  which isn't necessarily a great
-             // place to put files.
-#if !BUILDFLAG(IS_IOS)
+  DIR_TEMP,          // Temporary directory for the system and/or user.
+  DIR_HOME,          // User's root home directory. On Windows this will look
+                     // like "C:\Users\<user>"  which isn't necessarily a great
+                     // place to put files.
   DIR_USER_DESKTOP,  // The current user's Desktop.
-#endif
 
   // The following refer to the applications current environment.
   DIR_CURRENT,  // Current directory.

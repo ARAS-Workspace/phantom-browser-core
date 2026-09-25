@@ -99,10 +99,8 @@ class AutocompleteControllerMetrics {
   // '*.CrossInput' or '*.Async' depending on `controller_.in_start()`.
   void LogSuggestionChangeInAnyPositionMetrics(bool changed) const;
 
-#if !BUILDFLAG(IS_IOS)
   void LogInlineLocationSuggestionMetrics(
       const AutocompleteResult& result) const;
-#endif
 
   const raw_ref<const AutocompleteController> controller_;
 

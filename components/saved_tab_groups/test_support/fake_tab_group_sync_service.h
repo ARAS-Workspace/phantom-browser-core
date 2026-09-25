@@ -63,10 +63,10 @@ class FakeTabGroupSyncService : public TabGroupSyncService {
   void OnTabSelected(const std::optional<LocalTabGroupID>& group_id,
                      const LocalTabID& tab_id,
                      const std::u16string& tab_title) override;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   void SaveGroup(SavedTabGroup group) override;
   void UnsaveGroup(const LocalTabGroupID& local_id) override;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   void MakeTabGroupShared(const LocalTabGroupID& local_group_id,
                           const syncer::CollaborationId& collaboration_id,
                           TabGroupSharingCallback callback) override;

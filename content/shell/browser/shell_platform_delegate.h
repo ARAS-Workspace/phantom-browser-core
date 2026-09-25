@@ -144,7 +144,7 @@ class ShellPlatformDelegate {
                                    const input::NativeWebKeyboardEvent& event);
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void ToggleFullscreenModeForTab(Shell* shell,
                                   WebContents* web_contents,
                                   bool enter_fullscreen);

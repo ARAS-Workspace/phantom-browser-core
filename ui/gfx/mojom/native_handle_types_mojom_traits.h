@@ -105,11 +105,6 @@ struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
   ~IOSurfaceHandle();
 
   base::apple::ScopedMachSendRight mach_send_right;
-#if BUILDFLAG(IS_IOS)
-  base::UnsafeSharedMemoryRegion shared_memory_region;
-  std::array<uint32_t, gfx::kMaxIOSurfacePlanes> plane_strides;
-  std::array<uint32_t, gfx::kMaxIOSurfacePlanes> plane_offsets;
-#endif
 };
 
 template <>
@@ -118,23 +113,6 @@ struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
   static PlatformHandle mach_send_right(IOSurfaceHandle& handle) {
     return PlatformHandle(std::move(handle.mach_send_right));
   }
-
-#if BUILDFLAG(IS_IOS)
-  static base::UnsafeSharedMemoryRegion& shared_memory_handle(
-      IOSurfaceHandle& handle) {
-    return handle.shared_memory_region;
-  }
-
-  static std::array<uint32_t, gfx::kMaxIOSurfacePlanes>& plane_strides(
-      IOSurfaceHandle& handle) {
-    return handle.plane_strides;
-  }
-
-  static std::array<uint32_t, gfx::kMaxIOSurfacePlanes>& plane_offsets(
-      IOSurfaceHandle& handle) {
-    return handle.plane_offsets;
-  }
-#endif  // BUILDFLAG(IS_IOS)
 
   static bool Read(gfx::mojom::IOSurfaceHandleDataView data,
                    IOSurfaceHandle* handle);

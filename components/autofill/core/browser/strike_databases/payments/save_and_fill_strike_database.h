@@ -23,11 +23,7 @@ struct SaveAndFillStrikeDatabaseTraits {
   static constexpr std::string_view kName = "SaveAndFill";
   static constexpr size_t kMaxStrikeEntities = 50;
   static constexpr size_t kMaxStrikeEntitiesAfterCleanup = 30;
-#if BUILDFLAG(IS_IOS)
-  static constexpr size_t kMaxStrikeLimit = 2;
-#else
   static constexpr size_t kMaxStrikeLimit = 3;
-#endif
   static constexpr base::TimeDelta kExpiryTimeDelta = base::Days(180);
   static constexpr bool kUniqueIdRequired = false;
 };

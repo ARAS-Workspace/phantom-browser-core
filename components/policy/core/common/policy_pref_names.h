@@ -120,21 +120,12 @@ inline constexpr char kBackForwardCacheEnabled[] =
 inline constexpr char kReadAloudEnabled[] = "policy.read_aloud_enabled";
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // Last time that a check for cloud policy management was done. This time is
 // recorded on Android and iOS so that retries aren't attempted on every
 // startup. Instead the cloud policy registration is retried at least 1 or 3
 // days later.
 inline constexpr char kLastPolicyCheckTime[] = "policy.last_policy_check_time";
-#endif
-
-#if BUILDFLAG(IS_IOS)
-inline constexpr char kUserPolicyNotificationWasShown[] =
-    "policy.user_policy_notification_was_shown";
-
-// A bool for storing whether the user has seen the sync disabled alert since
-// sync was disabled.
-inline constexpr char kSyncDisabledAlertShown[] = "sync.disabled_alert_shown";
 #endif
 
 // Boolean controlling whether SafeSearch is mandatory for Google Web Searches.

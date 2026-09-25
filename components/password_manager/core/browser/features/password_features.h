@@ -36,10 +36,8 @@ BASE_DECLARE_FEATURE(kActorLoginPermissionsUi);
 // Enables syncing password permissions.
 BASE_DECLARE_FEATURE(kActorLoginSyncsPasswordPermissions);
 
-#if !BUILDFLAG(IS_IOS)
 // Enables logging quality for actor login.
 BASE_DECLARE_FEATURE(kActorLoginQualityLogs);
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_ANDROID)
 // Enables filling of OTPs received via SMS on Android.
@@ -53,7 +51,7 @@ BASE_DECLARE_FEATURE(kApplyClientsideModelPredictionsForPasswordTypes);
 // auto-approved.
 BASE_DECLARE_FEATURE(kAutoApproveSharedPasswordUpdatesFromSameSender);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)  // Desktop
+#if !BUILDFLAG(IS_ANDROID)  // Desktop
 // Feature flag to control the displaying of an ongoing hats survey that
 // measures users perception of autofilling password forms. Differently from
 // other surveys, the Autofill user perception surveys will not have a specific
@@ -67,7 +65,7 @@ BASE_DECLARE_FEATURE(kAutofillPasswordUserPerceptionSurvey);
 // actions.
 BASE_DECLARE_FEATURE(kAwaitPageStabilityForPasswordChange);
 extern const base::FeatureParam<base::TimeDelta> kAwaitPageStabilityTimeout;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables Biometrics for the Touch To Fill feature. This only effects Android.
 BASE_DECLARE_FEATURE(kBiometricTouchToFill);
@@ -87,10 +85,10 @@ BASE_DECLARE_FEATURE(kClearUndecryptablePasswords);
 // Delete undecryptable passwords from the store when Sync is active.
 BASE_DECLARE_FEATURE(kClearUndecryptablePasswordsOnSync);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)  // Desktop
+#if !BUILDFLAG(IS_ANDROID)  // Desktop
 // Enables the Unified UI for the Password Manager.
 BASE_DECLARE_FEATURE(kCredentialManagementUnifiedUi);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables debug data popups on OTP fields for manual testing of
 // one-time-passwords. Only for OTP detection testing, not intended to be
@@ -101,7 +99,7 @@ BASE_DECLARE_FEATURE(kDebugUiForOtps);
 // contains new password field.
 BASE_DECLARE_FEATURE(kDisablePasswordChangeFromNewPasswordFields);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)  // Desktop
+#if !BUILDFLAG(IS_ANDROID)  // Desktop
 // Enables the Mojo JavaScript API for the password manager, replacing the
 // legacy passwordsPrivate extension API.
 BASE_DECLARE_FEATURE(kEnablePasswordManagerMojoApi);
@@ -112,7 +110,7 @@ BASE_DECLARE_FEATURE(kEnablePasswordManagerMojoApiPhase2);
 
 // Enables the Desktop Trusted Vault unlock UI flow.
 BASE_DECLARE_FEATURE(kTrustedVaultDesktopUnlock);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Cross domain credential data is not previewed by the manual fallback
 // suggestion popup.
@@ -125,23 +123,6 @@ BASE_DECLARE_FEATURE(kFetchChangePasswordUrlForPasswordChange);
 // Enables the experiment for the password manager to only fill on account
 // selection, rather than autofilling on page load, with highlighting of fields.
 BASE_DECLARE_FEATURE(kFillOnAccountSelect);
-
-#if BUILDFLAG(IS_IOS)
-// Enables the clean up of hanging form extraction requests made by the
-// password suggestion helper. This is to fix the cases where the suggestions
-// pipeline is broken because the pipeline is waiting for password suggestions
-// that are never provided.
-BASE_DECLARE_FEATURE(kIosCleanupHangingPasswordFormExtractionRequests);
-
-// The feature parameter that determines the minimal period of time in
-// milliseconds before the form extraction request times out.
-extern const base::FeatureParam<int>
-    kIosPasswordFormExtractionRequestsTimeoutMs;
-
-// Enables password generation bottom sheet to be displayed (on iOS) when a user
-// is signed-in and taps on a new password field.
-BASE_DECLARE_FEATURE(kIOSProactivePasswordGenerationBottomSheet);
-#endif  // BUILDFLAG(IS_IOS)
 
 
 // Marks all submitted credentials as leaked, useful for testing of a password

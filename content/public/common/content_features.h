@@ -292,7 +292,7 @@ CONTENT_EXPORT extern const base::FeatureParam<double>
     kProcessPerSiteMainFrameSiteScalingFactor;
 CONTENT_EXPORT extern const base::FeatureParam<double>
     kProcessPerSiteMainFrameTotalMemoryLimit;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kRunVideoCaptureServiceInBrowserProcess);
 #endif
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kSchedQoSOnResourcedForChrome);

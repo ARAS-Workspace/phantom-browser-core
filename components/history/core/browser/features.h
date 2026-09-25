@@ -64,7 +64,6 @@ extern const base::FeatureParam<int> kMvtScoringParamDailyVisitCountCap;
 COMPONENT_EXPORT(HISTORY_FEATURES)
 BASE_DECLARE_FEATURE(kRazeOldHistoryDatabase);
 
-#if !BUILDFLAG(IS_IOS)
 COMPONENT_EXPORT(HISTORY_FEATURES)
 bool IsBrowsingHistoryActorIntegrationM3Enabled();
 
@@ -75,7 +74,6 @@ BASE_DECLARE_FEATURE(kBrowsingHistorySimilarVisitsGrouping);
 
 COMPONENT_EXPORT(HISTORY_FEATURES)
 BASE_DECLARE_FEATURE(kBrowsingHistoryActorIntegrationM3);
-#endif  // !BUILDFLAG(IS_IOS)
 
 
 COMPONENT_EXPORT(HISTORY_FEATURES)

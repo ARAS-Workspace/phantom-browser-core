@@ -191,9 +191,7 @@ class TestRenderWidgetHostView : public RenderWidgetHostViewBase,
   bool is_showing_;
   bool is_occluded_;
   PageVisibilityState page_visibility_ = PageVisibilityState::kHidden;
-#if !BUILDFLAG(IS_IOS)
   ui::DummyTextInputClient text_input_client_;
-#endif
   ui::Cursor last_cursor_;
 
   bool clear_fallback_surface_for_commit_pending_called_ = false;

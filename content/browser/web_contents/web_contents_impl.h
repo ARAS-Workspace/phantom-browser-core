@@ -602,7 +602,7 @@ class CONTENT_EXPORT WebContentsImpl
   RenderFrameHostImpl* GetOpener() override;
   bool HasLiveOriginalOpenerChain() override;
   WebContents* GetFirstWebContentsInLiveOriginalOpenerChain() override;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void DidChooseColorInColorChooser(SkColor color) override;
   void DidEndColorChooser() override;
 #endif
@@ -796,7 +796,7 @@ class CONTENT_EXPORT WebContentsImpl
   void UnrecoverableAccessibilityError() override;
   device::mojom::GeolocationContext* GetGeolocationContext() override;
   device::mojom::WakeLockContext* GetWakeLockContext() override;
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
   void GetNFC(RenderFrameHostImpl*,
               mojo::PendingReceiver<device::mojom::NFC>) override;
 #endif
@@ -809,7 +809,7 @@ class CONTENT_EXPORT WebContentsImpl
       RenderFrameHostImpl* rfh,
       bool is_fullscreen,
       blink::mojom::FullscreenOptionsPtr options) override;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   bool CanUseWindowingControls(RenderFrameHostImpl* requesting_frame) override;
   void Maximize() override;
   void Minimize() override;
@@ -1306,7 +1306,7 @@ class CONTENT_EXPORT WebContentsImpl
   // blink::mojom::ColorChooserFactory ---------------------------------------
   void OnColorChooserFactoryReceiver(
       mojo::PendingReceiver<blink::mojom::ColorChooserFactory> receiver);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void OpenColorChooser(
       mojo::PendingReceiver<blink::mojom::ColorChooser> chooser,
       mojo::PendingRemote<blink::mojom::ColorChooserClient> client,
@@ -2584,7 +2584,7 @@ class CONTENT_EXPORT WebContentsImpl
   gfx::Size device_emulation_size_;
   gfx::Size view_size_before_emulation_;
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Holds information about a current color chooser dialog, if one is visible.
   class ColorChooserHolder;
   std::unique_ptr<ColorChooserHolder> color_chooser_holder_;
@@ -2649,7 +2649,7 @@ class CONTENT_EXPORT WebContentsImpl
 
   bool updating_web_preferences_ = false;
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
   std::unique_ptr<NFCHost> nfc_host_;
 #endif
 

@@ -380,12 +380,10 @@ class SearchProvider : public BaseSearchProvider,
   // Finds image URLs in most relevant results and uses client to prefetch them.
   void PrefetchImages(SearchSuggestionParser::Results* results);
 
-#if !BUILDFLAG(IS_IOS)
   // Create a location-sending duplicate of `match` with subtype
   // `SUBTYPE_LOCATION_SUGGEST_TRIGGER`.
   std::unique_ptr<AutocompleteMatch> CreateLocationSignalingMatch(
       const AutocompleteMatch& match);
-#endif
 
   // Maintains the TemplateURLs used.
   Providers providers_;

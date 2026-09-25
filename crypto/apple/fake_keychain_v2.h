@@ -81,12 +81,10 @@ class CRYPTO_EXPORT FakeKeychainV2 : public KeychainV2 {
   // class to specify the result code.
   void set_item_update_result(OSStatus result) { item_update_result_ = result; }
 
-#if !BUILDFLAG(IS_IOS)
   base::apple::ScopedCFTypeRef<CFTypeRef> TaskCopyValueForEntitlement(
       SecTaskRef task,
       CFStringRef entitlement,
       CFErrorRef* error) override;
-#endif  // !BUILDFLAG(IS_IOS)
 #if !BUILDFLAG(IS_IOS_TVOS)
   BOOL LAContextCanEvaluatePolicy(LAPolicy policy,
                                   NSError* __autoreleasing* error) override;

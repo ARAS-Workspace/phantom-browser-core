@@ -96,7 +96,7 @@ class POLICY_EXPORT ComponentCloudPolicyService
       SchemaRegistry* schema_registry,
       CloudPolicyCore* core,
       CloudPolicyClient* client,
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
       std::unique_ptr<ResourceCache> cache,
 #endif
       scoped_refptr<base::SequencedTaskRunner> backend_task_runner);
@@ -152,7 +152,7 @@ class POLICY_EXPORT ComponentCloudPolicyService
   }
 
  private:
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
   class Backend;
 
   void UpdateFromSuperiorStore();
@@ -178,7 +178,7 @@ class POLICY_EXPORT ComponentCloudPolicyService
   // The currently registered components for each policy domain. Used for
   // filtering and validation of the component policies.
   scoped_refptr<SchemaMap> current_schema_map_;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 
   // Contains all the policies loaded from the store, before having been
   // filtered and validated by the |current_schema_map_|.

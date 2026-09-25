@@ -21,7 +21,7 @@
 #include "google_apis/gaia/gaia_id.h"
 
 #include "extensions/buildflags/buildflags.h"
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 #include "components/policy/proto/chrome_extension_policy.pb.h"
 #endif
 
@@ -223,7 +223,7 @@ using UserPolicyBuilder =
 using ExtensionInstallPoliciesBuilder =
     TypedPolicyBuilder<enterprise_management::ExtensionInstallPolicies>;
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 using ComponentCloudPolicyBuilder =
     TypedPolicyBuilder<enterprise_management::ExternalPolicyData>;
 #endif

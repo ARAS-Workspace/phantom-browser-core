@@ -155,10 +155,6 @@ StartupProfilePathInfo GetStartupProfilePath(
     const base::CommandLine& command_line,
     bool ignore_profile_picker);
 
-#if BUILDFLAG(IS_IOS)
-class ProfileIOSDirectoryBuilder;
-#endif
-
 Profile* GetLastProfileMac();
 bool HasWaylandDisplay(base::Environment* env);
 
@@ -230,9 +226,6 @@ class BrowserGpuChannelHostFactory;
 class BrowserMainLoop;
 class BrowserProcessIOThread;
 class BrowserTestBase;
-#if BUILDFLAG(IS_IOS)
-class ContentMainRunnerImpl;
-#endif  // BUILDFLAG(IS_IOS)
 class DesktopCaptureDevice;
 class DWriteFontCollectionProxy;
 class DWriteFontProxyImpl;
@@ -655,9 +648,6 @@ class BASE_EXPORT ScopedAllowBlocking {
 #if BUILDFLAG(IS_MAC)
   friend class printing::PrintBackendServiceImpl;
 #endif
-#if BUILDFLAG(IS_IOS)
-  friend class ::ProfileIOSDirectoryBuilder;
-#endif
 
   // Sorted by function name (with namespace), ignoring the return type.
   friend Profile* ::GetLastProfileMac();  // http://crbug.com/1176734
@@ -1014,9 +1004,6 @@ class BASE_EXPORT PermanentThreadAllowance {
   friend class base::TestCustomDisallow;
   friend class content::BrowserMainLoop;
   friend class content::BrowserTestBase;
-#if BUILDFLAG(IS_IOS)
-  friend class content::ContentMainRunnerImpl;
-#endif  // BUILDFLAG(IS_IOS)
   friend class web::WebMainLoop;
 
   static void AllowBlocking();

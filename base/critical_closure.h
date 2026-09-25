@@ -13,52 +13,9 @@
 #include "build/build_config.h"
 #include "build/ios_buildflags.h"
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
-#include <optional>
-
-#include "base/functional/bind.h"
-#include "base/ios/scoped_critical_action.h"
-#endif
-
 namespace base {
 
-namespace internal {
-
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
-// This class wraps a closure so it can continue to run for a period of time
-// when the application goes to the background by using
-// |ios::ScopedCriticalAction|.
-class ImmediateCriticalClosure {
- public:
-  ImmediateCriticalClosure(std::string_view task_name, OnceClosure closure);
-  ImmediateCriticalClosure(const ImmediateCriticalClosure&) = delete;
-  ImmediateCriticalClosure& operator=(const ImmediateCriticalClosure&) = delete;
-  ~ImmediateCriticalClosure();
-  void Run();
-
- private:
-  ios::ScopedCriticalAction critical_action_;
-  OnceClosure closure_;
-};
-
-// This class is identical to ImmediateCriticalClosure, but the critical action
-// is started when the action runs, not when the CriticalAction is created.
-class PendingCriticalClosure {
- public:
-  PendingCriticalClosure(std::string_view task_name, OnceClosure closure);
-  PendingCriticalClosure(const PendingCriticalClosure&) = delete;
-  PendingCriticalClosure& operator=(const PendingCriticalClosure&) = delete;
-  ~PendingCriticalClosure();
-  void Run();
-
- private:
-  std::optional<ios::ScopedCriticalAction> critical_action_;
-  std::string task_name_;
-  OnceClosure closure_;
-};
-#endif  // BUILDFLAG(IS_IOS)
-
-}  // namespace internal
+namespace internal {}  // namespace internal
 
 // Returns a closure that will continue to run for a period of time when the
 // application goes to the background if possible on platforms where
@@ -80,33 +37,6 @@ class PendingCriticalClosure {
 //
 // This function is used automatically for tasks posted to a sequence runner
 // using TaskShutdownBehavior::BLOCK_SHUTDOWN.
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
-inline OnceClosure MakeCriticalClosure(std::string_view task_name,
-                                       OnceClosure closure,
-                                       bool is_immediate) {
-  // Wrapping a null closure in a critical closure has unclear semantics and
-  // most likely indicates a bug. CHECK-ing early allows detecting and
-  // investigating these cases more easily.
-  CHECK(!closure.is_null());
-  if (is_immediate) {
-    return base::BindOnce(&internal::ImmediateCriticalClosure::Run,
-                          Owned(new internal::ImmediateCriticalClosure(
-                              task_name, std::move(closure))));
-  } else {
-    return base::BindOnce(&internal::PendingCriticalClosure::Run,
-                          Owned(new internal::PendingCriticalClosure(
-                              task_name, std::move(closure))));
-  }
-}
-
-inline OnceClosure MakeCriticalClosure(const Location& posted_from,
-                                       OnceClosure closure,
-                                       bool is_immediate) {
-  return MakeCriticalClosure(posted_from.ToString(), std::move(closure),
-                             is_immediate);
-}
-
-#else  // BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
 
 inline OnceClosure MakeCriticalClosure(std::string_view task_name,
                                        OnceClosure closure,
@@ -121,8 +51,6 @@ inline OnceClosure MakeCriticalClosure(const Location& posted_from,
                                        bool is_immediate) {
   return closure;
 }
-
-#endif  // BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
 
 }  // namespace base
 

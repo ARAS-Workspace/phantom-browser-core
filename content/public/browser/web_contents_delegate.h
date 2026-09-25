@@ -462,7 +462,7 @@ class CONTENT_EXPORT WebContentsDelegate {
   virtual JavaScriptDialogManager* GetJavaScriptDialogManager(
       WebContents* source);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Called when color chooser should open. Returns the opened color chooser.
   // Returns nullptr if we failed to open the color chooser. The color chooser
   // is supported/required for Android or iOS.
@@ -512,7 +512,7 @@ class CONTENT_EXPORT WebContentsDelegate {
   // both the value set by the AWC API and browser's "native" resizability.
   virtual bool GetCanResize();
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Returns whether the RFH can use Additional Windowing Controls (AWC) APIs.
   // https://github.com/explainers-by-googlers/additional-windowing-controls/blob/main/README.md
   virtual bool CanUseWindowingControls(RenderFrameHost* requesting_frame);
@@ -523,7 +523,7 @@ class CONTENT_EXPORT WebContentsDelegate {
   virtual void MaximizeFromWebAPI() {}
   virtual void RestoreFromWebAPI() {}
   virtual void SetResizableFromWebAPI(bool resizable) {}
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // This returns the current state of the window, mappable to display-state
   // values: normal/minimized/maximized/fullscreen.

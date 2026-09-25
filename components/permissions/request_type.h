@@ -21,13 +21,13 @@ namespace permissions {
 // defined on the platforms where they are used and should be kept alphabetized.
 enum class RequestType {
   kArSession,
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   kCameraPanTiltZoom,
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   kCameraStream,
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   kCapturedSurfaceControl,
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   kClipboard,
   kTopLevelStorageAccess,
   kDiskQuota,
@@ -36,34 +36,34 @@ enum class RequestType {
   kHandTracking,
   kIdentityProvider,
   kIdleDetection,
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   kLocalFonts,
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   kLocalNetwork,
   kLoopbackNetwork,
   kMicStream,
   kMidiSysex,
   kMultipleDownloads,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   kNfcDevice,
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
   kNotifications,
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   kKeyboardLock,
   kPointerLock,
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_ANDROID)
   kProtectedMediaIdentifier,
 #endif
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   kRegisterProtocolHandler,
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   kSensors,
   kStorageAccess,
   kVrSession,
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   kWebAppInstallation,
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   kWindowManagement,
   kMaxValue = kWindowManagement
 };
@@ -90,15 +90,13 @@ std::optional<ContentSettingsType> RequestTypeToContentSettingsType(
 // Returns whether confirmation chips can be displayed
 bool IsConfirmationChipSupported(RequestType for_request_type);
 
-#if !BUILDFLAG(IS_IOS)
 // Returns the icon to display.
 IconId GetIconId(RequestType type);
-#endif  // !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Returns the blocked icon to display.
 IconId GetBlockedIconId(RequestType type);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Returns a unique human-readable string that can be used in dictionaries that
 // are keyed by the RequestType.

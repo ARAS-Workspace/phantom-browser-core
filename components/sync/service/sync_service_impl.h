@@ -273,10 +273,10 @@ class SyncServiceImpl : public SyncService,
   // TODO(crbug.com/41451146): Inject this in the ctor instead. As it is, it's
   // possible that the real callback was already used before the test had a
   // chance to call this.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void OverrideNetworkForTest(const CreateHttpPostProviderFactory&
                                   create_http_post_provider_factory_cb);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   DataTypeSet GetRegisteredDataTypesForTest() const;
   bool HasAnyModelErrorForTest(DataTypeSet types) const;

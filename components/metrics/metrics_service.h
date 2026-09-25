@@ -156,7 +156,7 @@ class MetricsService {
   // to be interacting with the application.
   void OnApplicationNotIdle();
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Increments the global `fg_bg_id` for when OnAppEnterBackground() or
   // OnAppEnterForeground() below has closed the current log. In some cases,
   // this may be no-op; see implementation for details.
@@ -178,7 +178,7 @@ class MetricsService {
   void OnAppEnterForeground(bool force_open_new_log = false,
                             bool emit_uma_action = true);
 
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Called when a document first starts loading.
   void OnPageLoadStarted();
@@ -602,7 +602,7 @@ class MetricsService {
   // cloned.
   base::CallbackListSubscription cloned_install_subscription_;
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Indicates whether OnAppEnterForeground() (true) or OnAppEnterBackground
   // (false) was called.
   std::optional<bool> is_in_foreground_ = std::nullopt;

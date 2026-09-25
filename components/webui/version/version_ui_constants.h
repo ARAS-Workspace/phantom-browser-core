@@ -28,14 +28,10 @@ extern const char kCommandLine[];
 extern const char kCommandLineName[];
 extern const char kCompany[];
 extern const char kCopyright[];
-#if !BUILDFLAG(IS_IOS)
 extern const char kExecutablePath[];
 extern const char kExecutablePathName[];
-#endif
-#if !BUILDFLAG(IS_IOS)
 extern const char kJSEngine[];
 extern const char kJSVersion[];
-#endif
 extern const char kLogoAltText[];
 extern const char kOfficial[];
 extern const char kOSName[];
@@ -50,10 +46,8 @@ extern const char kTargetsU[];
 extern const char kGmsName[];
 extern const char kGmsVersion[];
 #endif
-#if !BUILDFLAG(IS_IOS)
 extern const char kProfilePath[];
 extern const char kProfilePathName[];
-#endif
 extern const char kCopyLabel[];
 extern const char kCopyNotice[];
 extern const char kRevision[];

@@ -27,7 +27,7 @@
 #include "components/policy/proto/device_management_backend.pb.h"
 #include "google_apis/gaia/gaia_id.h"
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 
 #include "components/policy/proto/chrome_extension_policy.pb.h"
 #endif
@@ -467,7 +467,7 @@ using UserCloudPolicyValidator =
 using ExtensionInstallCloudPolicyValidator =
     CloudPolicyValidator<enterprise_management::ExtensionInstallPolicies>;
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 using ComponentCloudPolicyValidator =
     CloudPolicyValidator<enterprise_management::ExternalPolicyData>;
 #endif

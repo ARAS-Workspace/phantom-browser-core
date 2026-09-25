@@ -16,10 +16,6 @@
 #include "base/android/scoped_java_ref.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS) && defined(__OBJC__)
-@class NSString;
-#endif  // BUILDFLAG(IS_IOS) && defined(__OBJC__)
-
 // A string-like object representing an obfuscated Gaia ID that allows
 // identifying a Google account. This value can be safely persisted to disk as
 // it remains stable over time, but for additional privacy it is generally
@@ -36,10 +32,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaId {
   GaiaId() = default;
   // Explicit construction from std::string.
   explicit GaiaId(std::string value);
-  // On iOS, allow direct construction from NSString, which is fairly common.
-#if BUILDFLAG(IS_IOS) && defined(__OBJC__)
-  explicit GaiaId(NSString* value);
-#endif  // BUILDFLAG(IS_IOS) && defined(__OBJC__)
   GaiaId(const GaiaId&) = default;
   GaiaId(GaiaId&&) noexcept = default;
   ~GaiaId() = default;
@@ -51,10 +43,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaId {
   bool empty() const;
 
   [[nodiscard]] const std::string& ToString() const;
-
-#if BUILDFLAG(IS_IOS) && defined(__OBJC__)
-  [[nodiscard]] NSString* ToNSString() const;
-#endif  // BUILDFLAG(IS_IOS) && defined(__OBJC__)
 
   // Default comparisons.
   friend bool operator==(const GaiaId&, const GaiaId&) = default;

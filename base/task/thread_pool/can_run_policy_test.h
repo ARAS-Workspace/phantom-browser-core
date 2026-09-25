@@ -160,12 +160,7 @@ void TestCanRunPolicyLoad(Target* target,
     const auto task_runner = create_task_runner(test_case.priority);
 
     // Post less tasks on iOS to avoid timeouts.
-    const size_t kLargeNumber =
-#if BUILDFLAG(IS_IOS)
-        16;
-#else
-        256;
-#endif
+    const size_t kLargeNumber = 256;
     for (size_t i = 0; i < kLargeNumber; ++i) {
       task_runner->PostTask(FROM_HERE, DoNothing());
     }

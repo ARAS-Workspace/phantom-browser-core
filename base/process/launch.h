@@ -143,7 +143,7 @@ struct BASE_EXPORT LaunchOptions {
   std::vector<int> fds_to_remove_cloexec;
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
+#if BUILDFLAG(IS_MAC)
 #if !BUILDFLAG(IS_IOS_TVOS)
   // Mach ports that will be accessible to the child process. These are not
   // directly inherited across process creation, but they are stored by a Mach
@@ -159,7 +159,7 @@ struct BASE_EXPORT LaunchOptions {
   // Apply a process scheduler policy to enable mitigations against CPU side-
   // channel attacks.
   bool enable_cpu_security_mitigations = false;
-#endif  // BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_MAC)
   // When a child process is launched, the system tracks the parent process

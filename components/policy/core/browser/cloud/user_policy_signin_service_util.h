@@ -33,7 +33,7 @@ POLICY_EXPORT bool CanApplyPoliciesForSignedInUser(
     signin::ConsentLevel consent_level,
     signin::IdentityManager* identity_manager);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 
 // Gets the timestamp representing the last time the registration was done.
 POLICY_EXPORT base::Time GetLastPolicyCheckTimeFromPrefs(PrefService* prefs);

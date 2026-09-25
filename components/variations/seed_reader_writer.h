@@ -33,8 +33,8 @@ class EntropyProviders;
 const char kSeedFileTrial[] = "SeedFileTrial";
 const char kDefaultGroup[] = "Default";
 const char kControlGroup[] = "Control_V12";
-// TODO(crbug.com/530049020): Launch on Android and iOS
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+// TODO(crbug.com/530049020): Launch on Android
+#if BUILDFLAG(IS_ANDROID)
 const char kSeedFilesGroup[] = "SeedFiles_V12";
 #else
 const char kSeedFilesGroup[] = "SeedFilesLaunched";

@@ -23,10 +23,6 @@
 #include "ui/display/types/display_constants.h"
 #endif
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-#include <BrowserEngineKit/BrowserEngineKit.h>
-#endif
-
 @class CAContext;
 @class CALayer;
 
@@ -111,10 +107,6 @@ class ImageTransportSurfaceOverlayMacEGL : public gl::Presenter {
   base::TimeTicks current_display_time_;
   base::TimeTicks next_display_time_;
   base::TimeDelta frame_interval_;
-#endif
-
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-  BELayerHierarchy* __strong layer_hierarchy_;
 #endif
 
   int cap_max_pending_swaps_ = 1;

@@ -73,10 +73,8 @@ class RLZTracker {
 
   // For the point parameter of RecordProductEvent.
   static rlz_lib::AccessPoint ChromeOmnibox();
-#if !BUILDFLAG(IS_IOS)
   static rlz_lib::AccessPoint ChromeHomePage();
   static rlz_lib::AccessPoint ChromeAppList();
-#endif  // !BUILDFLAG(IS_IOS)
 
   // Records enterprise-related events.
   static void RecordEnterpriseEnrollment();
@@ -106,7 +104,6 @@ class RLZTracker {
   // Enables zero delay for InitRlzDelayed. For testing only.
   static void EnableZeroDelayForTesting();
 
-#if !BUILDFLAG(IS_IOS)
   // Records that the app list search has been used.
   static void RecordAppListSearch();
 
@@ -121,7 +118,6 @@ class RLZTracker {
 
   // Manually sets if the search has been performed for testing only.
   static void SetRlzChromeHomePageSearchRecordedForTesting(bool recorded);
-#endif  // !BUILDFLAG(IS_IOS)
 
   // The following methods are made protected so that they can be used for
   // testing purposes. Production code should never need to call these.
@@ -214,11 +210,9 @@ class RLZTracker {
   // used but not reported.
   bool* GetAccessPointRecord(rlz_lib::AccessPoint point);
 
-#if !BUILDFLAG(IS_IOS)
   // Implementation called from SetRlzChromeHomePageSearchRecordedForTesting()
   // static method.
   void SetChromeHomePageSearchRecordedForTesting(bool recorded);
-#endif  // !BUILDFLAG(IS_IOS)
 
   // Tracker used for testing purposes only. If this value is non-NULL, it
   // will be returned from GetInstance() instead of the regular singleton.
@@ -254,7 +248,6 @@ class RLZTracker {
   bool enterprise_enrolled_activate_recorded_;
   bool enterprise_enrolled_first_search_recorded_;
 
-#if !BUILDFLAG(IS_IOS)
   // Sets to true when we have attempted to record that user has performed a
   // Google search from their Google homepage. This will be set to true
   // regardless whether the event is recorded successfully, so that new
@@ -262,7 +255,6 @@ class RLZTracker {
   // needed. On the contrast, |homepage_used_| is only set to true if the event
   // is not recorded successfully and needs another attempt.
   bool chrome_homepage_search_recorded_ = false;
-#endif  // !BUILDFLAG(IS_IOS)
 
   // Main and (optionally) reactivation brand codes, assigned on UI thread.
   std::string brand_;

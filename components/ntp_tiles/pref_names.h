@@ -45,14 +45,14 @@ inline constexpr char kPopularSitesVersionPref[] = "suggested_sites_version";
 inline constexpr char kCustomLinksList[] = "custom_links.list";
 inline constexpr char kCustomLinksInitialized[] = "custom_links.initialized";
 #else
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 inline constexpr char kCustomLinksList[] = "custom_links_mobile.list";
 inline constexpr char kCustomLinksInitialized[] =
     "custom_links_mobile.initialized";
 #else
 inline constexpr char kCustomLinksList[] = "custom_links.list";
 inline constexpr char kCustomLinksInitialized[] = "custom_links.initialized";
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(IS_DESKTOP_ANDROID)
 
 // Prefs used to cache enterprise shortcuts.

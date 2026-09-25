@@ -37,12 +37,10 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kGoogleServicesAccountId[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kGoogleServicesConsentedToSync[];
-#if !BUILDFLAG(IS_IOS)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kGoogleServicesLastSyncingGaiaId[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kGoogleServicesLastSyncingUsername[];
-#endif  // !BUILDFLAG(IS_IOS)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kGoogleServicesLastSignedInUsername[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -65,14 +63,6 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kHistoryPageHistorySyncPromoShownAfterDismissal[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kHistoryPageHistorySyncPromoShownCount[];
-#if BUILDFLAG(IS_IOS)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const char kRestrictAccountsToPatterns[];
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const char kSigninAllowedOnDevice[];
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const char kBrowserSigninPolicy[];
-#endif  // BUILDFLAG(IS_IOS)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kSignedInWithCredentialProvider[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)

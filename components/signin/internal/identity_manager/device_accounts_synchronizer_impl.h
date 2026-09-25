@@ -30,10 +30,6 @@ class DeviceAccountsSynchronizerImpl : public DeviceAccountsSynchronizer {
       const std::optional<CoreAccountId>& primary_account_id) override;
 #endif
 
-#if BUILDFLAG(IS_IOS)
-  void ReloadAccountFromSystem(const CoreAccountId& account_id) override;
-#endif
-
  private:
   raw_ptr<ProfileOAuth2TokenServiceDelegate> token_service_delegate_ = nullptr;
 };

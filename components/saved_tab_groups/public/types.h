@@ -22,9 +22,6 @@ namespace tab_groups {
 #if BUILDFLAG(IS_ANDROID)
 using LocalTabID = int;
 using LocalTabGroupID = base::Token;
-#elif BUILDFLAG(IS_IOS)
-using LocalTabID = int;
-using LocalTabGroupID = tab_groups::TabGroupId;
 #else
 using LocalTabID = int32_t;
 using LocalTabGroupID = tab_groups::TabGroupId;

@@ -126,11 +126,7 @@ class CONTENT_EXPORT FrameSinkVideoCaptureDevice
 
  protected:
   MouseCursorOverlayController* cursor_controller() const {
-#if !BUILDFLAG(IS_IOS)
     return cursor_controller_.get();
-#else
-    return nullptr;
-#endif
   }
 
   // Subclasses override these to perform additional start/stop tasks.
@@ -243,12 +239,10 @@ class CONTENT_EXPORT FrameSinkVideoCaptureDevice
 
   SEQUENCE_CHECKER(sequence_checker_);
 
-#if !BUILDFLAG(IS_IOS)
   // Controls the overlay that renders the mouse cursor onto each video frame.
   const std::unique_ptr<MouseCursorOverlayController,
                         BrowserThread::DeleteOnUIThread>
       cursor_controller_;
-#endif
 
   // Whenever the sub-capture-target of a stream changes, the associated
   // sub-capture-target-version is incremented. This value is used in frames'

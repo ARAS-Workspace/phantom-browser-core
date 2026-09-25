@@ -14,9 +14,8 @@
 #include "third_party/skia/include/core/SkSize.h"
 #include "third_party/skia/include/core/SkTypes.h"
 
-// We can build SSE2 optimized versions for all x86 CPUs
-// except when building for the IOS emulator.
-#if defined(ARCH_CPU_X86_FAMILY) && !BUILDFLAG(IS_IOS)
+// We can build SSE2 optimized versions for all x86 CPUs.
+#if defined(ARCH_CPU_X86_FAMILY)
 #define SIMD_SSE2 1
 #define SIMD_PADDING 8  // 8 * int16_t
 #endif

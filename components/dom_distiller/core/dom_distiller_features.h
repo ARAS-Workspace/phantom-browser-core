@@ -20,7 +20,7 @@ COMPONENT_EXPORT(DOM_DISTILLER_FEATURES) bool IsDomDistillerEnabled();
 COMPONENT_EXPORT(DOM_DISTILLER_FEATURES)
 bool ShouldStartDistillabilityService();
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 inline constexpr int kReadabilityHeuristicMinScore = 50;
 inline constexpr int kReadabilityHeuristicMinContentLength = 160;
 #else
@@ -28,7 +28,7 @@ inline constexpr int kReadabilityHeuristicMinScore = 100;
 inline constexpr int kReadabilityHeuristicMinContentLength = 200;
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(DOM_DISTILLER_FEATURES)
 BASE_DECLARE_FEATURE(kReaderModeSupportNewFonts);
 #endif

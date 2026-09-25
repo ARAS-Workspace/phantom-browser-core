@@ -28,29 +28,18 @@ class AccountCapabilitiesTestMutator {
   // Exposes setters for the supported capabilities.
   // keep-sorted start sticky_prefixes=#if,BUILDFLAG group_prefixes=#endif
   void set_can_fetch_family_member_info(bool value);
-#if !BUILDFLAG(IS_IOS)
   void set_can_have_email_address_displayed(bool value);
-#endif
 #if !BUILDFLAG(IS_ANDROID)
   void set_can_make_chrome_search_engine_choice_screen_choice(bool value);
 #endif
-#if !BUILDFLAG(IS_IOS)
   void set_can_run_chrome_privacy_sandbox_trials(bool value);
-#endif
   void set_can_show_history_sync_opt_ins_without_minor_mode_restrictions(
       bool value);
-#if BUILDFLAG(IS_IOS)
-  void set_can_sign_in_to_chrome(bool value);
-#endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   void set_can_submit_feedback(bool value);
 #endif
-#if !BUILDFLAG(IS_IOS)
   void set_can_use_devtools_generative_ai_features(bool value);
-#endif
-#if !BUILDFLAG(IS_IOS)
   void set_can_use_edu_features(bool value);
-#endif
   void set_can_use_gemini_in_chrome(bool value);
   void set_can_use_manta_service(bool value);
   void set_can_use_model_execution_features(bool value);
@@ -63,12 +52,6 @@ class AccountCapabilitiesTestMutator {
   void set_is_subject_to_enterprise_features(bool value);
   void set_is_subject_to_parental_controls(bool value);
   void set_is_subject_to_universal_opt_out(bool value);
-#if BUILDFLAG(IS_IOS)
-  void set_must_fetch_apple_age_range_in_chrome(bool value);
-#endif
-#if BUILDFLAG(IS_IOS)
-  void set_must_skip_apple_age_range_in_chrome(bool value);
-#endif
   void set_supports_wallet_private_passes_in_autofill(bool value);
   // keep-sorted end
 

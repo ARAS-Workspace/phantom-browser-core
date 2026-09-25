@@ -375,7 +375,7 @@ struct AutocompleteMatch {
   void UpdateJavaDescription();
 #endif
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
   // Converts omnibox::AnswerType to an answer vector icon.
   static const gfx::VectorIcon& AnswerTypeToAnswerIcon(
       omnibox::AnswerType type);

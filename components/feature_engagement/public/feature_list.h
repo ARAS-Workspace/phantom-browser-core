@@ -250,156 +250,10 @@ DEFINE_VARIATION_PARAM(kIPHTabTearingXR, "IPH_TabTearingXR");
 // DEFINE_VARIATION_PARAM_ANDROID_END
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 DEFINE_VARIATION_PARAM(kIPHBottomToolbarTipFeature, "IPH_BottomToolbarTip");
 DEFINE_VARIATION_PARAM(kIPHSendTabToSelfOmnibox, "IPH_SendTabToSelfOmnibox");
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-DEFINE_VARIATION_PARAM(kIPHiOSActiveDaysTrackingFeature,
-                       "IPH_iOSActiveDaysTrackingFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSLensOverlayEntrypointTipFeature,
-                       "IPH_iOSLensOverlayEntrypointTip");
-DEFINE_VARIATION_PARAM(kIPHiOSLensOverlayEscapeHatchTipFeature,
-                       "IPH_iOSLensOverlayEscapeHatchTip");
-DEFINE_VARIATION_PARAM(kIPHLongPressToolbarTipFeature,
-                       "IPH_LongPressToolbarTip");
-DEFINE_VARIATION_PARAM(kIPHBadgedReaderModeFeature, "IPH_BadgedReaderMode");
-DEFINE_VARIATION_PARAM(kIPHiOSReaderModeLargeOmniboxEntrypointFeature,
-                       "IPH_iOSReaderModeLargeOmniboxEntrypoint");
-DEFINE_VARIATION_PARAM(kIPHBadgedReadingListFeature, "IPH_BadgedReadingList");
-DEFINE_VARIATION_PARAM(kIPHWhatsNewUpdatedFeature, "IPH_WhatsNewUpdated");
-DEFINE_VARIATION_PARAM(kIPHWhatsNewFeature, "IPH_WhatsNew");
-DEFINE_VARIATION_PARAM(kIPHReadingListMessagesFeature,
-                       "IPH_ReadingListMessages");
-DEFINE_VARIATION_PARAM(kIPHBadgedTranslateManualTriggerFeature,
-                       "IPH_BadgedTranslateManualTrigger");
-DEFINE_VARIATION_PARAM(kIPHDiscoverFeedHeaderFeature,
-                       "IPH_DiscoverFeedHeaderMenu");
-DEFINE_VARIATION_PARAM(kIPHDefaultSiteViewFeature, "IPH_DefaultSiteView");
-DEFINE_VARIATION_PARAM(kIPHFollowWhileBrowsingFeature,
-                       "IPH_FollowWhileBrowsing");
-DEFINE_VARIATION_PARAM(kIPHPriceNotificationsWhileBrowsingFeature,
-                       "IPH_PriceNotificationsWhileBrowsing");
-DEFINE_VARIATION_PARAM(kIPHiOSDefaultBrowserOverflowMenuBadgeFeature,
-                       "IPH_iOSDefaultBrowserOverflowMenuBadge");
-DEFINE_VARIATION_PARAM(kIPHiOSFeedSwipeAnimatedFeature,
-                       "IPH_iOSFeedSwipeAnimatedFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSFeedSwipeStaticFeature,
-                       "IPH_iOSFeedSwipeStaticFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSBackendPromoFeature,
-                       "IPH_iOSBackendPromoFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoAppStoreFeature, "IPH_iOSPromoAppStore");
-DEFINE_VARIATION_PARAM(kIPHiOSLensKeyboardFeature, "IPH_iOSLensKeyboard");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoWhatsNewFeature, "IPH_iOSPromoWhatsNew");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoBackgroundCustomizationFeature,
-                       "IPH_iOSPromoBackgroundCustomization");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoSigninFullscreenFeature,
-                       "IPH_iOSPromoSigninFullscreen");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoPostRestoreFeature,
-                       "IPH_iOSPromoPostRestore");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoCredentialProviderExtensionFeature,
-                       "IPH_iOSPromoCredentialProviderExtension");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoDefaultBrowserReminderFeature,
-                       "IPH_iOSPromoDefaultBrowserReminder");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoNonModalSigninPasswordFeature,
-                       "IPH_iOSPromoNonModalSigninPassword");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoNonModalSigninBookmarkFeature,
-                       "IPH_iOSPromoNonModalSigninBookmark");
-DEFINE_VARIATION_PARAM(kIPHiOSHistoryOnOverflowMenuFeature,
-                       "IPH_iOSHistoryOnOverflowMenuFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoPostRestoreDefaultBrowserFeature,
-                       "IPH_iOSPromoPostRestoreDefaultBrowser");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoNonModalUrlPasteDefaultBrowserFeature,
-                       "IPH_iOSPromoNonModalUrlPasteDefaultBrowser");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoNonModalAppSwitcherDefaultBrowserFeature,
-                       "IPH_iOSPromoNonModalAppSwitcherDefaultBrowser");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoNonModalShareDefaultBrowserFeature,
-                       "IPH_iOSPromoNonModalShareDefaultBrowser");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoPasswordManagerWidgetFeature,
-                       "IPH_iOSPromoPasswordManagerWidget");
-DEFINE_VARIATION_PARAM(kIPHiOSPullToRefreshFeature,
-                       "IPH_iOSPullToRefreshFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSReplaceSyncPromosWithSignInPromos,
-                       "IPH_iOSReplaceSyncPromosWithSignInPromos");
-DEFINE_VARIATION_PARAM(kIPHiOSTabGridSwipeRightForIncognito,
-                       "IPH_iOSTabGridSwipeRightForIncognito");
-DEFINE_VARIATION_PARAM(kIPHiOSDockingPromoFeature, "IPH_iOSDockingPromo");
-DEFINE_VARIATION_PARAM(kIPHiOSDockingPromoEligibilityFeature,
-                       "IPH_iOSDockingPromoEligibility");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoAllTabsFeature, "IPH_iOSPromoAllTabs");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoMadeForIOSFeature, "IPH_iOSPromoMadeForIOS");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoStaySafeFeature, "IPH_iOSPromoStaySafe");
-DEFINE_VARIATION_PARAM(kIPHiOSSwipeBackForwardFeature,
-                       "IPH_iOSSwipeBackForward");
-DEFINE_VARIATION_PARAM(kIPHiOSSwipeToolbarToChangeTabFeature,
-                       "IPH_iOSSwipeToolbarToChangeTab");
-DEFINE_VARIATION_PARAM(kIPHiOSPostDefaultAbandonmentPromoFeature,
-                       "IPH_iOSPostDefaultAbandonmentPromo");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoGenericDefaultBrowserFeature,
-                       "IPH_iOSPromoGenericDefaultBrowser");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoSettingsCardDefaultBrowserFeature,
-                       "IPH_iOSPromoSettingsCardDefaultBrowser");
-DEFINE_VARIATION_PARAM(kIPHiOSPromoSettingsCellDefaultBrowserFeature,
-                       "IPH_iOSPromoSettingsCellDefaultBrowser");
-DEFINE_VARIATION_PARAM(kIPHiOSOverflowMenuCustomizationFeature,
-                       "IPH_iOSOverflowMenuCustomization");
-DEFINE_VARIATION_PARAM(kIPHiOSPageInfoRevampFeature, "IPH_iOSPageInfoRevamp");
-DEFINE_VARIATION_PARAM(kIPHiOSInlineEnhancedSafeBrowsingPromoFeature,
-                       "IPH_iOSInlineEnhancedSafeBrowsingPromo");
-DEFINE_VARIATION_PARAM(kIPHiOSSavedTabGroupClosed,
-                       "IPH_iOSSavedTabGroupClosed");
-DEFINE_VARIATION_PARAM(kIPHiOSContextualPanelSampleModelFeature,
-                       "IPH_iOSContextualPanelSampleModel");
-DEFINE_VARIATION_PARAM(kIPHiOSContextualPanelPriceInsightsFeature,
-                       "IPH_iOSContextualPanelPriceInsights");
-DEFINE_VARIATION_PARAM(kIPHHomeCustomizationMenuFeature,
-                       "IPH_HomeCustomizationMenu");
-DEFINE_VARIATION_PARAM(kIPHiOSSharedTabGroupForeground,
-                       "IPH_iOSSharedTabGroupForeground");
-DEFINE_VARIATION_PARAM(kIPHiOSDefaultBrowserBannerPromoFeature,
-                       "IPH_iOSDefaultBrowserBannerPromoFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSDefaultBrowserOffCyclePromoFeature,
-                       "IPH_iOSDefaultBrowserOffCyclePromo");
-DEFINE_VARIATION_PARAM(kIPHiOSOneTimeDefaultBrowserNotificationFeature,
-                       "IPH_iOSOneTimeDefaultBrowserNotification");
-DEFINE_VARIATION_PARAM(kIPHiOSReminderNotificationsOverflowMenuBubbleFeature,
-                       "IPH_iOSReminderNotificationsOverflowMenuBubbleFeature");
-DEFINE_VARIATION_PARAM(
-    kIPHiOSReminderNotificationsOverflowMenuNewBadgeFeature,
-    "IPH_iOSReminderNotificationsOverflowMenuNewBadgeFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSDownloadAutoDeletionFeature,
-                       "IPH_iOSDownloadAutoDeletion");
-DEFINE_VARIATION_PARAM(kIPHiOSSettingsInOverflowMenuBubbleFeature,
-                       "IPH_iOSSettingsInOverflowMenuBubbleFeature");
-DEFINE_VARIATION_PARAM(
-    kIPHiOSSwitchAccountsWithNTPAccountParticleDiscFeature,
-    "IPH_iOSSwitchAccountsWithNTPAccountParticleDiscFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSWelcomeBackFeature, "IPH_iOSWelcomeBack");
-DEFINE_VARIATION_PARAM(kIPHiOSSafariImportFeature,
-                       "IPH_iOSSafariImportFeature");
-DEFINE_VARIATION_PARAM(kIPHIOSPageActionMenu, "IPH_iOSPageActionMenu");
-DEFINE_VARIATION_PARAM(kIPHiOSHomepageLensNewBadge,
-                       "IPH_iOSHomepageLensNewBadge");
-DEFINE_VARIATION_PARAM(kIPHiOSHomepageCustomizationNewBadge,
-                       "IPH_iOSHomepageCustomizationNewBadge");
-DEFINE_VARIATION_PARAM(kIPHiOSAIHubNewBadge, "IPH_iOSAIHubNewBadge");
-DEFINE_VARIATION_PARAM(kIPHiOSGeminiLiveNewBadgeFeature,
-                       "IPHiOSGeminiLiveNewBadgeFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSGeminiLiveIPHFeature,
-                       "IPHiOSGeminiLiveIPHFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSGeminiExternalAppStoreEvent,
-                       "IPH_iOSGeminiExternalAppStoreEvent");
-DEFINE_VARIATION_PARAM(kIPHiOSGeminiFullscreenPromoFeature,
-                       "IPH_iOSGeminiFullscreenPromoFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSGeminiImageRemixFeature,
-                       "IPH_iOSGeminiImageRemixFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSGeminiWhatCanGeminiDo,
-                       "IPHiOSGeminiWhatCanGeminiDo");
-DEFINE_VARIATION_PARAM(kIPHiOSNewIAPromoFeature, "IPH_iOSNewIAPromoFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSPinMostVisitedSiteFeature,
-                       "IPH_iOSPinMostVisitedSiteFeature");
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -606,9 +460,7 @@ DEFINE_VARIATION_PARAM(kIPHiOSPriceTrackingDesktopFeature,
                        "IPH_iOSPriceTrackingDesktop");
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_IOS)
 DEFINE_VARIATION_PARAM(kIPHResumptionRailFeature, "IPH_ResumptionRail");
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Defines the array of which features should be listed in the chrome://flags
 // UI to be able to select them alone for demo-mode. The features listed here
@@ -746,78 +598,12 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
 // keep-sorted end
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
         VARIATION_ENTRY(kIPHBottomToolbarTipFeature),
         VARIATION_ENTRY(kIPHSendTabToSelfOmnibox),
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-// keep-sorted start case=no
-        VARIATION_ENTRY(kIPHBadgedReadingListFeature),
-        VARIATION_ENTRY(kIPHBadgedTranslateManualTriggerFeature),
-        VARIATION_ENTRY(kIPHDefaultSiteViewFeature),
-        VARIATION_ENTRY(kIPHDiscoverFeedHeaderFeature),
-        VARIATION_ENTRY(kIPHFollowWhileBrowsingFeature),
-        VARIATION_ENTRY(kIPHHomeCustomizationMenuFeature),
-        VARIATION_ENTRY(kIPHiOSAIHubNewBadge),
-        VARIATION_ENTRY(kIPHiOSBackendPromoFeature),
-        VARIATION_ENTRY(kIPHiOSContextualPanelPriceInsightsFeature),
-        VARIATION_ENTRY(kIPHiOSContextualPanelSampleModelFeature),
-        VARIATION_ENTRY(kIPHiOSDefaultBrowserBannerPromoFeature),
-        VARIATION_ENTRY(kIPHiOSDefaultBrowserOverflowMenuBadgeFeature),
-        VARIATION_ENTRY(kIPHiOSDockingPromoFeature),
-        VARIATION_ENTRY(kIPHiOSDownloadAutoDeletionFeature),
-        VARIATION_ENTRY(kIPHiOSGeminiExternalAppStoreEvent),
-        VARIATION_ENTRY(kIPHiOSGeminiFullscreenPromoFeature),
-        VARIATION_ENTRY(kIPHiOSGeminiImageRemixFeature),
-        VARIATION_ENTRY(kIPHiOSGeminiLiveIPHFeature),
-        VARIATION_ENTRY(kIPHiOSGeminiLiveNewBadgeFeature),
-        VARIATION_ENTRY(kIPHiOSGeminiWhatCanGeminiDo),
-        VARIATION_ENTRY(kIPHiOSHistoryOnOverflowMenuFeature),
-        VARIATION_ENTRY(kIPHiOSLensKeyboardFeature),
-        VARIATION_ENTRY(kIPHiOSLensOverlayEntrypointTipFeature),
-        VARIATION_ENTRY(kIPHiOSLensOverlayEscapeHatchTipFeature),
-        VARIATION_ENTRY(kIPHiOSNewIAPromoFeature),
-        VARIATION_ENTRY(kIPHiOSOverflowMenuCustomizationFeature),
-        VARIATION_ENTRY(kIPHIOSPageActionMenu),
-        VARIATION_ENTRY(kIPHiOSPinMostVisitedSiteFeature),
-        VARIATION_ENTRY(kIPHiOSPostDefaultAbandonmentPromoFeature),
-        VARIATION_ENTRY(kIPHiOSPromoAllTabsFeature),
-        VARIATION_ENTRY(kIPHiOSPromoAppStoreFeature),
-        VARIATION_ENTRY(kIPHiOSPromoBackgroundCustomizationFeature),
-        VARIATION_ENTRY(kIPHiOSPromoCredentialProviderExtensionFeature),
-        VARIATION_ENTRY(kIPHiOSPromoGenericDefaultBrowserFeature),
-        VARIATION_ENTRY(kIPHiOSPromoMadeForIOSFeature),
-        VARIATION_ENTRY(kIPHiOSPromoNonModalAppSwitcherDefaultBrowserFeature),
-        VARIATION_ENTRY(kIPHiOSPromoNonModalShareDefaultBrowserFeature),
-        VARIATION_ENTRY(kIPHiOSPromoNonModalSigninBookmarkFeature),
-        VARIATION_ENTRY(kIPHiOSPromoNonModalSigninPasswordFeature),
-        VARIATION_ENTRY(kIPHiOSPromoNonModalUrlPasteDefaultBrowserFeature),
-        VARIATION_ENTRY(kIPHiOSPromoPasswordManagerWidgetFeature),
-        VARIATION_ENTRY(kIPHiOSPromoPostRestoreDefaultBrowserFeature),
-        VARIATION_ENTRY(kIPHiOSPromoPostRestoreFeature),
-        VARIATION_ENTRY(kIPHiOSPromoSettingsCardDefaultBrowserFeature),
-        VARIATION_ENTRY(kIPHiOSPromoSettingsCellDefaultBrowserFeature),
-        VARIATION_ENTRY(kIPHiOSPromoStaySafeFeature),
-        VARIATION_ENTRY(kIPHiOSPromoWhatsNewFeature),
-        VARIATION_ENTRY(kIPHiOSPullToRefreshFeature),
-        VARIATION_ENTRY(kIPHiOSReminderNotificationsOverflowMenuBubbleFeature),
-        VARIATION_ENTRY(kIPHiOSReminderNotificationsOverflowMenuNewBadgeFeature),
-        VARIATION_ENTRY(kIPHiOSReplaceSyncPromosWithSignInPromos),
-        VARIATION_ENTRY(kIPHiOSSafariImportFeature),
-        VARIATION_ENTRY(kIPHiOSSavedTabGroupClosed),
-        VARIATION_ENTRY(kIPHiOSSharedTabGroupForeground),
-        VARIATION_ENTRY(kIPHiOSSwipeBackForwardFeature),
-        VARIATION_ENTRY(kIPHiOSSwipeToolbarToChangeTabFeature),
-        VARIATION_ENTRY(kIPHiOSTabGridSwipeRightForIncognito),
-        VARIATION_ENTRY(kIPHiOSWelcomeBackFeature),
-        VARIATION_ENTRY(kIPHLongPressToolbarTipFeature),
-        VARIATION_ENTRY(kIPHPriceNotificationsWhileBrowsingFeature),
-        VARIATION_ENTRY(kIPHReadingListMessagesFeature),
-        VARIATION_ENTRY(kIPHWhatsNewFeature),
-        VARIATION_ENTRY(kIPHWhatsNewUpdatedFeature),
-// keep-sorted end
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(ENABLE_EXTENSIONS)
         VARIATION_ENTRY(kIPHExtensionsMenuFeature),
         VARIATION_ENTRY(kIPHExtensionsRequestAccessButtonFeature),
@@ -885,7 +671,7 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHTabSearchComboButtonFeature),
         VARIATION_ENTRY(kIPHWebUiHelpBubbleTestFeature),
 // keep-sorted end
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // keep-sorted start case=no

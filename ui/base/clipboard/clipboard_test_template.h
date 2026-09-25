@@ -696,7 +696,6 @@ TYPED_TEST(ClipboardTest, MultiplePickleTest) {
   EXPECT_EQ(payload2, unpickled_string2);
 }
 
-#if !(BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
 TYPED_TEST(ClipboardTest, DataTest) {
   const std::string kFormatString = "web chromium/x-test-format";
   const std::u16string kFormatString16 = u"chromium/x-test-format";
@@ -899,7 +898,6 @@ TYPED_TEST(ClipboardTest, PlatformSpecificDataTest) {
                                     /* data_dst = */ nullptr);
   EXPECT_EQ(platform_specific_result, kPlatformSpecificText);
 }
-#endif
 
 #if !BUILDFLAG(IS_APPLE)
 TYPED_TEST(ClipboardTest, NonAsciiFormatTest) {

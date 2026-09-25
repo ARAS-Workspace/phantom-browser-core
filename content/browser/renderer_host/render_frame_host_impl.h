@@ -213,7 +213,7 @@
 #include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
 #include "services/device/public/mojom/nfc.mojom.h"
 #endif
 
@@ -2194,7 +2194,7 @@ class CONTENT_EXPORT RenderFrameHostImpl
       const net::NetworkIsolationKey& nik,
       const blink::StorageKey& storage_key);
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
   void BindNFCReceiver(mojo::PendingReceiver<device::mojom::NFC> receiver);
 #endif
 
@@ -2721,7 +2721,7 @@ class CONTENT_EXPORT RenderFrameHostImpl
   void DidChangeThemeColor(std::optional<SkColor> theme_color) override;
   void DidChangeBackgroundColor(const SkColor4f& background_color,
                                 bool color_adjust) override;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   void Minimize() override;
   void Maximize() override;
   void Restore() override;
@@ -4467,7 +4467,7 @@ class CONTENT_EXPORT RenderFrameHostImpl
   std::vector<RenderFrameHostImpl*> GetAncestorChainForStorageKeyCalculation(
       const url::Origin& new_rfh_origin);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Returns whether the `RenderFrameHost` can use Additional Windowing Controls
   // APIs.
   // https://github.com/explainers-by-googlers/additional-windowing-controls/blob/main/README.md

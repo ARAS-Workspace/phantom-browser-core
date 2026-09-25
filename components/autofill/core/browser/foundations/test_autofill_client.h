@@ -549,10 +549,6 @@ class TestAutofillClientTemplate : public T {
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   }
 
-#if BUILDFLAG(IS_IOS)
-  bool IsLastQueriedField(FieldGlobalId field_id) override { return true; }
-#endif
-
   OtpPhishGuardDelegate* GetOtpPhishGuardDelegate() override {
     return otp_phish_guard_delegate_.get();
   }

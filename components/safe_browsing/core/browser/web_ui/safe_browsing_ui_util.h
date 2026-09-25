@@ -108,7 +108,7 @@ struct ClientPhishingRequestAndToken {
   std::string token;
 };
 
-#if BUILDFLAG(SAFE_BROWSING_DB_LOCAL) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DB_LOCAL)
 
 std::string UserReadableTimeFromMillisSinceEpoch(int64_t time_in_milliseconds);
 void AddStoreInfo(

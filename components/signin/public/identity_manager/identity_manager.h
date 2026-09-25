@@ -160,19 +160,6 @@ class IdentityManager : public KeyedService,
     // Called after removing an account info.
     virtual void OnExtendedAccountInfoRemoved(const AccountInfo& info) {}
 
-#if BUILDFLAG(IS_IOS)
-    // Called after the list of accounts in `GetAccountsOnDevice` changes.
-    virtual void OnAccountsOnDeviceChanged() {}
-    // Called once the batch of primary account changes ended.
-    // This method is also called for each single primary account event, when
-    // there is no batch.
-    // UI code should prefer this event instead of `OnPrimaryAccountChanged()`,
-    // to avoid UI glitches when the user wants to switch from one primary
-    // account to another (by showing sign-out temporary state).
-    // See `StartBatchOfPrimaryAccountChanges()`.
-    virtual void OnEndBatchOfPrimaryAccountChanges() {}
-#endif  // BUILDFLAG(IS_IOS)
-
     // Called on Shutdown(), for observers that aren't KeyedServices to remove
     // their observers.
     virtual void OnIdentityManagerShutdown(IdentityManager* identity_manager) {}
@@ -181,21 +168,6 @@ class IdentityManager : public KeyedService,
   // Methods to register or remove observers.
   void AddObserver(Observer* observer);
   void RemoveObserver(Observer* observer);
-
-#if BUILDFLAG(IS_IOS)
-  // Whether a batch of primary account changes is in progress. See
-  // `OnEndBatchOfPrimaryAccountChanges()`.
-  bool IsBatchOfPrimaryAccountChangesInProgress();
-
-  // Starts a batch of primary account changes by setting
-  // `batch_of_primary_account_changes_in_progress_` to `true`. As long as the
-  // batch is running, `OnEndBatchOfPrimaryAccountChanges()` are not sent when
-  // `OnPrimaryAccountChanged()` occurs.
-  // The batch needs to be used when the primary account is switched from one
-  // account to another.
-  // See `OnEndBatchOfPrimaryAccountChanges()`.
-  base::ScopedClosureRunner StartBatchOfPrimaryAccountChanges();
-#endif  // BUILDFLAG(IS_IOS)
 
   // Provides access to the core information of the user's primary account.
   // The primary account may or may not be blessed with the sync consent.
@@ -290,11 +262,6 @@ class IdentityManager : public KeyedService,
 
   // Returns true if a refresh token exists for |account_id|.
   bool HasAccountWithRefreshToken(const CoreAccountId& account_id) const;
-
-#if BUILDFLAG(IS_IOS)
-  bool HasAccountWithRefreshTokenOnDevice(
-      const CoreAccountId& account_id) const;
-#endif
 
   // Returns true if all refresh tokens have been loaded from disk.
   bool AreRefreshTokensLoaded() const;
@@ -406,13 +373,6 @@ class IdentityManager : public KeyedService,
   // Returns pointer to the object used to seed accounts information from the
   // device-level accounts. May be null if the system has no such notion.
   DeviceAccountsSynchronizer* GetDeviceAccountsSynchronizer();
-
-#if BUILDFLAG(IS_IOS)
-  // Gets all accounts on the device, including the ones from other profiles, in
-  // the order provided by the system (usually the order in which the accounts
-  // were added).
-  [[nodiscard]] std::vector<AccountInfo> GetAccountsOnDevice() const;
-#endif
 
   // Overrides the value of the given account capability for the account.
   // Passing `std::nullopt` clears the override.
@@ -733,10 +693,6 @@ class IdentityManager : public KeyedService,
                           const GoogleServiceAuthError& auth_error,
                           signin_metrics::SourceForRefreshTokenOperation
                               token_operation_source) override;
-#if BUILDFLAG(IS_IOS)
-  void OnAccountsOnDeviceChanged() override;
-  void OnAccountOnDeviceUpdated(const AccountInfo& account_info) override;
-#endif
 
   // GaiaCookieManagerService callbacks:
   void OnGaiaAccountsInCookieUpdated(
@@ -766,16 +722,6 @@ class IdentityManager : public KeyedService,
   // AccountTrackerService callbacks:
   void OnAccountUpdated(const AccountInfo& info);
   void OnAccountRemoved(const AccountInfo& info);
-
-#if BUILDFLAG(IS_IOS)
-  // Starts and stops the account switching. Those method can only be called by
-  // `StartBatchOfPrimaryAccountChanges()`. Only one account switching can be
-  // started at the same time.
-  void BatchOfPrimaryAccountChangesDone();
-  // Triggers `OnEndBatchOfPrimaryAccountChanges()` events. A batch of primary
-  // account changes should not be in progress when calling this method.
-  void FireOnEndBatchOfPrimaryAccountChanges();
-#endif  // BUILDFLAG(IS_IOS)
 
   // Backing signin classes.
   std::unique_ptr<AccountTrackerService> account_tracker_service_;
@@ -814,11 +760,6 @@ class IdentityManager : public KeyedService,
   // Java-side IdentityManager object.
   base::android::ScopedJavaGlobalRef<jobject> java_identity_manager_;
 #endif
-#if BUILDFLAG(IS_IOS)
-  // `true` if there is an account switching back in progress.
-  // See `StartBatchOfPrimaryAccountChanges()`.
-  bool batch_of_primary_account_changes_in_progress_ = false;
-#endif  // BUILDFLAG(IS_IOS)
   base::WeakPtrFactory<IdentityManager> weak_pointer_factory_;
 };
 

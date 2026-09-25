@@ -21,7 +21,6 @@ class PrefService;
 
 namespace browser_sync {
 
-#if !BUILDFLAG(IS_IOS)
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
 // LINT.IfChange(SyncToSigninMigrationDataTypeDecision)
@@ -53,8 +52,6 @@ void MaybeMigrateSyncingUserToSignedIn(const base::FilePath& profile_path,
 void MaybeMigrateSyncingUserToSignedInAsync(const base::FilePath& profile_path,
                                             PrefService* pref_service,
                                             base::OnceClosure closure);
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Returns whether the current primary account was migrated from "syncing" to
 // "signed-in" via MaybeMigrateSyncingUserToSignedIn().

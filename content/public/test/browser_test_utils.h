@@ -131,9 +131,9 @@ class BlobUrlRegistry;
 
 namespace content {
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 class MockCapturedSurfaceController;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if defined(USE_AURA)
 class SelectionBoundsWaiter;
@@ -2667,7 +2667,7 @@ bool EnableNativeWindowActivation();
 void HandleMissingKeyWindow();
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Set the length of the window of opportunity for conditional focus.
 void SetConditionalFocusWindowForTesting(base::TimeDelta window);
 

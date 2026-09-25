@@ -110,10 +110,10 @@ class ReportingService {
     return upload_scheduler_.get();
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void OnAppEnterBackground();
   void OnAppEnterForeground();
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Registers local state prefs used by this class. This should only be called
   // once.
@@ -213,12 +213,12 @@ class ReportingService {
   // Info on current reporting state to send along with reports.
   ReportingInfo reporting_info_;
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Indicates whether the browser is currently in the foreground. Used to
   // determine whether |local_state_| should be flushed immediately after
   // uploading a log.
   bool is_in_foreground_ = false;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // The background task ID that will be posted to the JobScheduler to schedule
   // a log upload (see `metrics::BackgroundUploadTask`). Used only on Android

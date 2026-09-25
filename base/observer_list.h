@@ -113,13 +113,8 @@ enum class ObserverListReentrancyPolicy {
 
 // TODO(oshima): Change the default to non reentrant. https://crbug.com/812109
 namespace internal {
-#if BUILDFLAG(IS_IOS)
-inline constexpr ObserverListReentrancyPolicy kDefaultReentrancy =
-    ObserverListReentrancyPolicy::kAllowReentrancy;
-#else
 inline constexpr ObserverListReentrancyPolicy kDefaultReentrancy =
     ObserverListReentrancyPolicy::kDisallowReentrancy;
-#endif
 }  // namespace internal
 
 // When `check_empty` is true, assert that the list is empty on destruction.
@@ -496,9 +491,6 @@ class ObserverList {
     requires check_empty
   {
     std::string result("\n");
-#if BUILDFLAG(IS_IOS)
-    result += "Use go/observer-list-empty to interpret.\n";
-#endif
     for (const auto& observer : observers_) {
       result += observer.GetCreationStackString();
       result += "\n";

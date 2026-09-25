@@ -391,7 +391,7 @@ enum class PromoAction : int {
   kMaxValue = PROMO_ACTION_NEW_ACCOUNT_EXISTING_ACCOUNT,
 };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // This class is used to record user action that was taken after
 // receiving the header from Gaia in the web sign-in flow.
 // GENERATED_JAVA_ENUM_PACKAGE: org.chromium.components.signin.metrics
@@ -471,7 +471,7 @@ enum class AccountConsistencyPromoAction : int {
   SIGNIN_STARTED_WITH_NON_MANAGED_ACCOUNT = 27,
   kMaxValue = SIGNIN_STARTED_WITH_NON_MANAGED_ACCOUNT,
 };
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Enum values which enumerates all reasons to start sign in process.
 enum class Reason : int {
@@ -643,62 +643,6 @@ enum class SyncButtonsType : int {
   kMaxValue = kHistorySyncEqualWeightedFromCapability,
 };
 
-#if BUILDFLAG(IS_IOS)
-// The reason an alert dialog is shown when the user is about to sign out.
-enum class SignoutDataLossAlertReason : int {
-  // The user has unsynced data that will be lost on signout.
-  kSignoutWithUnsyncedData = 0,
-  // A managed user is signing out and the data will be cleared from the device.
-  kSignoutWithClearDataForManagedUser = 1,
-};
-
-// Values of Signin.AccountType histogram. This histogram records if the user
-// uses a gmail account or a managed account when signing in.
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused. Keep in sync with SigninAccountType in
-// tools/metrics/histograms/metadata/signin/enums.xml.
-enum class SigninAccountType {
-  // Gmail account.
-  kRegular = 0,
-  // Managed account.
-  kManaged = 1,
-  // Always the last enumerated type.
-  kMaxValue = kManaged,
-};
-
-// Event within the reauth flow.
-//
-// LINT.IfChange(ReauthFlowEvent)
-enum class ReauthFlowEvent : int {
-  // The reauth flow has started.
-  kStarted = 0,
-  // The reauth flow has completed successfully.
-  kCompleted = 1,
-  // There was an error during the reauth flow.
-  kError = 2,
-  // The reauth flow was cancelled by the user.
-  kCancelled = 3,
-  // The reauth flow was cancelled because the coordinator was stopped.
-  kInterrupted = 4,
-  kMaxValue = kInterrupted
-};
-// LINT.ThenChange(//tools/metrics/histograms/metadata/signin/histograms.xml:ReauthFlowEvent)
-
-// Identifies explicit reauthentication UI entry points.
-//
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused.
-// LINT.IfChange(ReauthAccessPoint)
-enum class ReauthAccessPoint : int {
-  // Error card in the account menu.
-  kAccountMenu = 0,
-  kAccountSettings = 1,
-  kRecentTabs = 2,
-  kMaxValue = kRecentTabs,
-};
-// LINT.ThenChange(//tools/metrics/histograms/metadata/signin/enums.xml:ReauthAccessPoint)
-#endif  // BUILDFLAG(IS_IOS)
-
 std::optional<AccessPoint> AccessPointFromInt(int access_point);
 
 // -----------------------------------------------------------------------------
@@ -726,11 +670,6 @@ void LogSignInStarted(AccessPoint access_point,
 
 // Logs that sign in was offered when the user is in SigninPending state.
 void LogSigninPendingOffered(AccessPoint access_point);
-
-#if BUILDFLAG(IS_IOS)
-// Records the account type when the user signs in.
-void LogSigninWithAccountType(SigninAccountType account_type);
-#endif  // BUILDFLAG(IS_IOS)
 
 // Logs sync opt-in start events and their associated access points. The
 // completion events are automatically logged when the primary account state
@@ -807,26 +746,6 @@ void RecordRefreshTokenUpdatedFromSource(bool refresh_token_is_valid,
 // Records the source that revoked a refresh token.
 void RecordRefreshTokenRevokedFromSource(SourceForRefreshTokenOperation source);
 
-#if BUILDFLAG(IS_IOS)
-// Records whether the user choose to "Sign Out" or "Cancel" when an alert for
-// data loss is displayed.
-void RecordSignoutConfirmationFromDataLossAlert(
-    SignoutDataLossAlertReason reason,
-    bool signout_confirmed);
-
-// Records the progression of the reauthentication flow that was started within
-// the sign-in flow designated by `access_point`. `event` is converted into a
-// suffix for `Signin.Reauth.InSigninFlow` histogram family.
-void RecordReauthFlowEventInSigninFlow(signin_metrics::AccessPoint access_point,
-                                       ReauthFlowEvent event);
-
-// Records the progression of the reauthentication flow that was started via an
-// explicit reauthentication UI. `event` is converted into a suffix for
-// `Signin.Reauth.InSigninFlow` histogram family.
-void RecordReauthFlowEventInExplicitFlow(ReauthAccessPoint access_point,
-                                         ReauthFlowEvent event);
-#endif  // BUILDFLAG(IS_IOS)
-
 // Records the total number of open tabs at the moment of signin or enabling
 // sync.
 void RecordOpenTabCountOnSignin(signin::ConsentLevel consent_level,
@@ -852,11 +771,11 @@ void RecordSigninUserActionForAccessPoint(AccessPoint access_point);
 // Records |Signin_Impression_From*| user action.
 void RecordSigninImpressionUserActionForAccessPoint(AccessPoint access_point);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // Records |Signin.AccountConsistencyPromoAction.{PromoEvent}| histogram.
 void RecordConsistencyPromoUserAction(AccountConsistencyPromoAction action,
                                       AccessPoint access_point);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace signin_metrics
 

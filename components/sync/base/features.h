@@ -95,7 +95,7 @@ bool IsReplaceSyncPromosWithSignInPromosEnabled();
 
 // AutofillAi is launched globally on desktop, but restricted to certain
 // countries on mobile.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #define DECLARE_SYNC_AUTOFILL_AI_FEATURE(feature_name) \
   BASE_DECLARE_FEATURE_WITH_COUNTRY_RESTRICTIONS(feature_name)
 #else
@@ -107,9 +107,6 @@ bool IsReplaceSyncPromosWithSignInPromosEnabled();
 DECLARE_SYNC_AUTOFILL_AI_FEATURE(kSyncAccountSettings);
 
 // Enables syncing of valuables from the user's account.
-#if BUILDFLAG(IS_IOS)
-DECLARE_SYNC_AUTOFILL_AI_FEATURE(kSyncAutofillValuable);
-#endif
 
 // Enables syncing of usage metadata from Google Wallet passes.
 DECLARE_SYNC_AUTOFILL_AI_FEATURE(kSyncAutofillValuableMetadata);
@@ -130,7 +127,7 @@ BASE_DECLARE_FEATURE(kSpellcheckSeparateLocalAndAccountDictionaries);
 
 // Feature flag used for enabling sync (transport mode) for signed-in users that
 // haven't turned on full sync.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 BASE_DECLARE_FEATURE(kReadingListEnableSyncTransportModeUponSignIn);
 // Returns whether reading list storage related UI can be enabled, by testing
 // `kReadingListEnableSyncTransportModeUponSignIn`.
@@ -139,7 +136,7 @@ bool IsReadingListAccountStorageEnabled();
 constexpr bool IsReadingListAccountStorageEnabled() {
   return true;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // If enabled, sync-the-transport will auto-start (avoid deferring startup) if
 // sync metadata isn't available (i.e. initial sync never completed).
@@ -186,13 +183,6 @@ inline constexpr base::FeatureParam<int>
 // If enabled, the error message to unlock passwords is shown for longer.
 BASE_DECLARE_FEATURE(kSyncTrustedVaultErrorMessageDuration);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-// Enables a message improvements to the existing trusted vault error infobar
-// (informing users that fixing the error will help them to start syncing their
-// passwords).
-BASE_DECLARE_FEATURE(kSyncTrustedVaultInfobarMessageImprovements);
-#endif  // BUILDFLAG(IS_IOS)
 
 // If enabled, the preferences sync service will use the selected types to
 // determine whether the pref values should be set in the account storage.

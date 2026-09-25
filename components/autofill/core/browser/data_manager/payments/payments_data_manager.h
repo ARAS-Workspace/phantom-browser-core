@@ -327,11 +327,6 @@ class PaymentsDataManager : public AutofillWebDataServiceObserverOnUISequence,
   // Method to clear all local CVCs from the local web database.
   virtual void ClearLocalCvcs();
 
-#if BUILDFLAG(IS_IOS)
-  // Method to clean up for crbug.com/445879524.
-  virtual void CleanupForCrbug445879524();
-#endif  // BUILDFLAG(IS_IOS)
-
   // Deletes all server cards (both masked and unmasked).
   void ClearAllServerDataForTesting();
 

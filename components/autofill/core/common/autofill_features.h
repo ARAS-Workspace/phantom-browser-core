@@ -16,7 +16,7 @@ namespace autofill::features {
 // Declares a country restricted feature flag on mobile platforms and a
 // non-country restricted one on desktop. This is useful for certain AutofillAi
 // features.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #define DECLARE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(feature_name) \
   BASE_DECLARE_FEATURE_WITH_COUNTRY_RESTRICTIONS(feature_name)
 #else
@@ -72,7 +72,7 @@ COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillAddressUserPerceptionSurvey);
 COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillAiAlwaysTriggerServerModel);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(AUTOFILL)
 DECLARE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(kAutofillAiAvailableByDefault);
 #endif

@@ -33,7 +33,7 @@ class SaveAndFillDialogController {
  public:
   virtual ~SaveAndFillDialogController() = default;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   virtual std::u16string GetWindowTitle() const = 0;
   virtual std::u16string GetExplanatoryMessage() const = 0;
   virtual std::u16string GetCardNumberLabel() const = 0;
@@ -52,7 +52,7 @@ class SaveAndFillDialogController {
       std::u16string_view input,
       size_t old_cursor_position,
       size_t& new_cursor_position) const = 0;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Returns the current state of the Save and Fill dialog. This state
   // can be a local card save, an upload card save, or a pending state while

@@ -24,13 +24,6 @@ enum TextInputFlags {
   TEXT_INPUT_FLAG_AUTOCAPITALIZE_CHARACTERS = 1 << 7,
   TEXT_INPUT_FLAG_AUTOCAPITALIZE_WORDS = 1 << 8,
   TEXT_INPUT_FLAG_AUTOCAPITALIZE_SENTENCES = 1 << 9,
-// Used to enable/disable the "Previous"/"Next" buttons in the iOS keyboard
-// input accessory toolbar. Android passes these bits as a raw integer to Java
-// and never decodes them via this enum; desktop has no such toolbar UI.
-#if BUILDFLAG(IS_IOS)
-  TEXT_INPUT_FLAG_HAVE_NEXT_FOCUSABLE_ELEMENT = 1 << 10,
-  TEXT_INPUT_FLAG_HAVE_PREVIOUS_FOCUSABLE_ELEMENT = 1 << 11,
-#endif
   TEXT_INPUT_FLAG_HAS_BEEN_PASSWORD = 1 << 12,
   TEXT_INPUT_FLAG_VERTICAL = 1 << 13,
   // Whether an input field is or has been a custom password field. This is a

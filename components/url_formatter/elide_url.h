@@ -128,11 +128,6 @@ std::u16string FormatUrlForDisplayOmitSchemePathAndTrivialSubdomains(
 //  - "http://www.xn--frgbolaget-q5a.se" -> "färgbolaget.se"
 //  - "http://www.m.google.com" -> "google.com"
 //  - "http://m.google.com" -> "google.com"
-#if BUILDFLAG(IS_IOS)
-std::u16string
-FormatUrlForDisplayOmitSchemePathTrivialSubdomainsAndMobilePrefix(
-    const GURL& url);
-#endif
 
 // Splits the hostname in the `url` into sub-strings for the full hostname,
 // the domain (TLD+1), and the subdomain (everything leading the domain).

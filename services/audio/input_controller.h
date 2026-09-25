@@ -43,7 +43,7 @@ class ReferenceSignalProvider;
 class VoiceIsolationHandler;
 
 // Only do power monitoring for non-mobile platforms to save resources.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #define AUDIO_POWER_MONITORING
 #endif
 

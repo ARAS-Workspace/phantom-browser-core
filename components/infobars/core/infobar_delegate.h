@@ -226,13 +226,6 @@ class InfoBarDelegate {
     bool did_replace_entry;
     bool is_reload;
     bool is_redirect;
-#if BUILDFLAG(IS_IOS)
-    // True if the navigation was caused by a form submission.
-    bool is_form_submission;
-    // True if the navigation was caused by a user gesture, e.g. reload or load
-    // new content from the omnibox.
-    bool has_user_gesture;
-#endif  // BUILDFLAG(IS_IOS)
   };
 
   // Value to use when the InfoBar has no icon to show.
@@ -323,9 +316,6 @@ class InfoBarDelegate {
   virtual ConfirmInfoBarDelegate* AsConfirmInfoBarDelegate();
   virtual const ConfirmInfoBarDelegate* AsConfirmInfoBarDelegate() const;
   virtual ThemeInstalledInfoBarDelegate* AsThemePreviewInfobarDelegate();
-#if BUILDFLAG(IS_IOS)
-  virtual translate::TranslateInfoBarDelegate* AsTranslateInfoBarDelegate();
-#endif
 
   void set_infobar(InfoBar* infobar) { infobar_ = infobar; }
   void set_nav_entry_id(int nav_entry_id) { nav_entry_id_ = nav_entry_id; }

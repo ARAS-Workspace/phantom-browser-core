@@ -39,20 +39,8 @@ inline constexpr char kDefaultListCountryOverride[] = "DEFAULT_EEA";
 // list of all EEA engines.
 inline constexpr char kEeaListCountryOverride[] = "EEA_ALL";
 
-#if BUILDFLAG(IS_IOS)
-// Enables the Taiyaki regional program on all surfaces, including post-FRE
-// surfaces. When disabled, Taiyaki is only enabled on the FRE.
-BASE_DECLARE_FEATURE(kTaiyakiAllSurfaces);
-
-// Feature flag for SearchEngineChoiceScreenSnackbar.
-BASE_DECLARE_FEATURE(kSearchEngineChoiceScreenSnackbar);
-
-// Returns true if SearchEngineChoiceScreenSnackbar is enabled.
-bool IsSearchEngineChoiceScreenSnackbarEnabled();
-#endif  // BUILDFLAG(IS_IOS)
-
 // Returns true if the dynamic profile country feature is enabled.
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 bool IsDynamicProfileCountryEnabled();
 #else
 // Always returns true on iOS and Android.
@@ -61,11 +49,11 @@ consteval bool IsDynamicProfileCountryEnabled() {
 }
 #endif
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // Updates profile country preference stored in preferences
 // dynamically when the current country does not match the stored value.
 BASE_DECLARE_FEATURE(kDynamicProfileCountry);
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Whether support for showing the current default in the choice screen should
 // be enabled. When enabled, the associated program settings will be read to

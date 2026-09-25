@@ -95,7 +95,7 @@ class EmbeddedPolicyTestServer {
   // Resets the server state.
   void ResetServerState();
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Updates policy selected by |type| and optional |entity_id|. The
   // |raw_policy| is served via an external endpoint. This does not trigger
   // policy invalidation, hence test authors must manually trigger a policy
@@ -103,7 +103,7 @@ class EmbeddedPolicyTestServer {
   void UpdateExternalPolicy(const std::string& type,
                             const std::string& entity_id,
                             const std::string& raw_policy);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
  protected:
   // Default request handler.

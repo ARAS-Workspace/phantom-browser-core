@@ -161,7 +161,7 @@ class TemplateURLService final : public WebDataServiceConsumer,
     TemplateURLVector inactive_feature_shortcuts;
   };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   struct PrepopulatedAndRecentlyVisitedTemplateUrls {
     PrepopulatedAndRecentlyVisitedTemplateUrls();
     ~PrepopulatedAndRecentlyVisitedTemplateUrls();
@@ -175,7 +175,7 @@ class TemplateURLService final : public WebDataServiceConsumer,
     // `SortAndFilterRecentlyVisitedURLs()`
     TemplateURLVector recently_visited_urls;
   };
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Values for an enumerated histogram used to track keyword conflicts between
   // search engines created by policy and search engines the user manually
@@ -457,7 +457,7 @@ class TemplateURLService final : public WebDataServiceConsumer,
           disabled_starter_pack_ids =
               template_url_starter_pack_data::StarterPackIdSet());
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Returns an object containing two lists. The first one contains engines that
   // are prepopulated (in the order defined by the prepopulate_data_resolver,
   // created by policy or the default search engine. The second one contains
@@ -468,7 +468,7 @@ class TemplateURLService final : public WebDataServiceConsumer,
   // function, there is no notion of "active" here.
   PrepopulatedAndRecentlyVisitedTemplateUrls
   GetPrepopulatedAndRecentlyVisitedTemplateURLs();
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Returns the Origin of the user's default search engine. If a default search
   // engine is set and its URL is valid, the Origin of that URL is returned.

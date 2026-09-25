@@ -78,7 +78,7 @@ class Origin;
 
 class GURL;
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 namespace safe_browsing {
 class PasswordProtectionService;
 }
@@ -456,7 +456,7 @@ class PasswordManagerClient {
   // Returns the current best guess as to the page's display language.
   virtual autofill::LanguageCode GetPageLanguage() const;
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   // Return the PasswordProtectionService associated with this instance.
   virtual safe_browsing::PasswordProtectionService*
   GetPasswordProtectionService() const = 0;
@@ -598,7 +598,6 @@ class PasswordManagerClient {
 
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_IOS)
   // Creates and show the cross domain confirmation popup.
   virtual std::unique_ptr<PasswordCrossDomainConfirmationPopupController>
   ShowCrossDomainConfirmationPopup(const gfx::RectF& element_bounds,
@@ -607,7 +606,6 @@ class PasswordManagerClient {
                                    const std::u16string& password_hostname,
                                    bool show_warning_text,
                                    base::OnceClosure confirmation_callback) = 0;
-#endif  // !BUILDFLAG(IS_IOS)
 
   virtual password_manager::LeakDetectionInitiator GetLeakDetectionInitiator();
 

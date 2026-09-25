@@ -27,11 +27,6 @@ BASE_DECLARE_FEATURE(kBrowserLaunchMetadataReporting);
 BASE_DECLARE_FEATURE(kCbcmAndroidPackageNameIdentifier);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-// Controls whether enterprise signal sharing is enabled on iOS.
-BASE_DECLARE_FEATURE(kIOSSignalSharingEnabled);
-#endif  // BUILDFLAG(IS_IOS)
-
 // Controls whether a report is uploaded when a profile is opened.
 BASE_DECLARE_FEATURE(kUploadReportOnProfileOpen);
 

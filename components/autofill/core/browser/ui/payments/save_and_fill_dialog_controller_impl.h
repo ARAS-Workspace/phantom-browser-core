@@ -50,7 +50,7 @@ class SaveAndFillDialogControllerImpl : public SaveAndFillDialogController {
       payments::PaymentsAutofillClient::CardSaveAndFillDialogCallback
           card_save_and_fill_dialog_callback);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   std::u16string GetWindowTitle() const override;
   std::u16string GetExplanatoryMessage() const override;
   std::u16string GetCardNumberLabel() const override;
@@ -66,7 +66,7 @@ class SaveAndFillDialogControllerImpl : public SaveAndFillDialogController {
       std::u16string_view input,
       size_t old_cursor_position,
       size_t& new_cursor_position) const override;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   SaveAndFillDialogState GetDialogState() const override;
   bool IsValidCreditCardNumber(std::u16string_view input_text) const override;
   bool IsValidCvc(std::u16string_view input_text) const override;

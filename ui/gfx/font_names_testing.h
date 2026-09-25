@@ -45,8 +45,6 @@ inline constexpr char kCJKFontName[] = "Noto Sans CJK JP";
 inline constexpr char kCJKFontName[] = "serif";
 #elif BUILDFLAG(IS_MAC)
 inline constexpr char kCJKFontName[] = "Heiti SC";
-#elif BUILDFLAG(IS_IOS)
-inline constexpr char kCJKFontName[] = "PingFang SC";
 #else
 inline constexpr char kCJKFontName[] = "SimSun";
 #endif

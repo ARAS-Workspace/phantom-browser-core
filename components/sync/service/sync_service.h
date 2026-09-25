@@ -223,7 +223,6 @@ class SyncService : public KeyedService {
     // encryptable datatypes.
     kTrustedVaultRecoverabilityDegradedForEverything = 6,
 // This enum is parsed by java_cpp_enum.py, which doesn't accept &&ing flags.
-#if !BUILDFLAG(IS_IOS)
 #if !BUILDFLAG(IS_ANDROID)
     // Sync settings dialog not confirmed yet.
     kNeedsSettingsConfirmation = 7,
@@ -233,7 +232,6 @@ class SyncService : public KeyedService {
     // be removed with "Sync The Feature" deprecation.
     kUnrecoverableError = 8,
 #endif  // !BUILDFLAG(IS_ANDROID)
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_ANDROID)
     // Indicates that the Google Play services need to be upgraded.
@@ -246,15 +244,7 @@ class SyncService : public KeyedService {
     // The number of bookmarks has exceeded the limit.
     kBookmarksLimitExceeded = 11,
 
-#if BUILDFLAG(IS_IOS)
-    // Sync has encountered a Device Management error. The user should be
-    // notified and depending on the type of error, may need to take action to
-    // resolve it.
-    kDeviceManagementError = 12,
-    kMaxValue = kDeviceManagementError,
-#else
     kMaxValue = kBookmarksLimitExceeded,
-#endif  // BUILDFLAG(IS_IOS)
   };
   // LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:UserActionableError)
 

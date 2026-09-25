@@ -96,7 +96,6 @@ class StubPasswordManagerClient : public PasswordManagerClient {
       const password_manager::PasswordForm& form) override;
   void MaybeShowSavePasswordPrimingPromo(const url::Origin& origin) override;
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#if !BUILDFLAG(IS_IOS)
   std::unique_ptr<
       password_manager::PasswordCrossDomainConfirmationPopupController>
   ShowCrossDomainConfirmationPopup(
@@ -106,9 +105,8 @@ class StubPasswordManagerClient : public PasswordManagerClient {
       const std::u16string& password_hostname,
       bool show_warning_text,
       base::OnceClosure confirmation_callback) override;
-#endif  // !BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   safe_browsing::PasswordProtectionService* GetPasswordProtectionService()
       const override;
 #endif

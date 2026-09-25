@@ -118,9 +118,7 @@ class StabilityMetricsHelper {
   void LogLoadStarted();
 
   // Records a renderer process crash.
-#if BUILDFLAG(IS_IOS)
-  void LogRendererCrash();
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   void LogRendererCrash(RendererHostedContentType hosted_content_type,
                         base::TerminationStatus status,
                         int exit_code);

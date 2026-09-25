@@ -259,14 +259,6 @@ class BASE_EXPORT CurrentUIThread : public CurrentThread {
                            MessagePumpForUI::FdWatcher* delegate);
 #endif
 
-#if BUILDFLAG(IS_IOS)
-  // Forwards to SequenceManager::Attach().
-  // TODO(crbug.com/40568517): Plumb the actual SequenceManager* to
-  // callers and remove ability to access this method from
-  // CurrentUIThread.
-  void Attach();
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
   // Forwards to MessagePumpAndroid::Abort().
   // TODO(crbug.com/40568517): Plumb the actual MessagePumpForUI* to
@@ -306,8 +298,7 @@ class BASE_EXPORT CurrentIOThread : public CurrentThread {
                            MessagePumpForIO::FdWatcher* delegate);
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_MAC) || \
-    (BUILDFLAG(IS_IOS) && !BUILDFLAG(CRONET_BUILD) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_MAC)
   bool WatchMachReceivePort(
       mach_port_t port,
       MessagePumpForIO::MachPortWatchController* controller,

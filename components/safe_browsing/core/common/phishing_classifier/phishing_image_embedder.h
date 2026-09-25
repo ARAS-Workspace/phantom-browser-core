@@ -46,12 +46,6 @@ class PhishingImageEmbedder {
   // has had a scorer set via `set_scorer()`.
   bool is_ready() const;
 
-#if BUILDFLAG(IS_IOS)
-  // Sets the scorer. Required on iOS because `ScorerStorage` is a process-wide
-  // singleton and iOS runs in a multi-Profile browser process architecture.
-  void set_scorer(Scorer* scorer);
-#endif
-
   // Begins the image embedding process for the given image.
   //
   // This begins the feature extraction used to ultimately produce a 1-D feature
@@ -116,11 +110,6 @@ class PhishingImageEmbedder {
   // State for any in-progress image embedding extraction.
   gfx::Image image_;
   DoneCallback done_callback_;
-
-#if BUILDFLAG(IS_IOS)
-  // An explicitly set scorer for platforms where ScorerStorage is not used.
-  raw_ptr<Scorer> scorer_ = nullptr;
-#endif
 
   SEQUENCE_CHECKER(sequence_checker_);
 

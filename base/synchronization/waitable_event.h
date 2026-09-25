@@ -177,7 +177,7 @@ class BASE_EXPORT WaitableEvent {
   bool TimedWaitImpl(TimeDelta wait_delta);
   static size_t WaitManyImpl(base::span<WaitableEvent*> waitables);
 
-#if BUILDFLAG(IS_APPLE) && (!BUILDFLAG(IS_IOS) || !BUILDFLAG(USE_BLINK))
+#if BUILDFLAG(IS_APPLE)
   // iOS which supports blink must use the posix variant since opening
   // mach_ports is prevented inside sandbox profiles.
   //

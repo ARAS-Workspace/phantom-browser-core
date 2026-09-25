@@ -115,7 +115,7 @@ class ControllerClient {
   // Reload the blocked page to see if it succeeds now.
   virtual void Reload() = 0;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Shows the platform-specific certificate viewer.
   virtual void ShowCertificateViewer() = 0;
 #endif

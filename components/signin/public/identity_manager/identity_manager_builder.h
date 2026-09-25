@@ -28,10 +28,6 @@ class UnexportableKeyService;
 }  // namespace unexportable_keys
 #endif
 
-#if BUILDFLAG(IS_IOS)
-class DeviceAccountsProvider;
-#endif
-
 namespace image_fetcher {
 class ImageDecoder;
 }  // namespace image_fetcher
@@ -69,10 +65,6 @@ struct IdentityManagerBuildParams {
   scoped_refptr<TokenWebData> token_web_data;
   raw_ptr<unexportable_keys::UnexportableKeyService> unexportable_key_service =
       nullptr;
-#endif
-
-#if BUILDFLAG(IS_IOS)
-  std::unique_ptr<DeviceAccountsProvider> device_accounts_provider;
 #endif
 
 };

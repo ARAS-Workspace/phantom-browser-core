@@ -138,20 +138,6 @@ class CleanExitBeacon {
   // CHECKs that Chrome exited cleanly.
   static void EnsureCleanShutdown(PrefService* local_state);
 
-#if BUILDFLAG(IS_IOS)
-  // Sets the NSUserDefaults beacon value.
-  static void SetUserDefaultsBeacon(bool exited_cleanly);
-
-  // Checks user default value of kUseUserDefaultsForExitedCleanlyBeacon.
-  // Because variations are not initialized early in startup, pair a user
-  // defaults value with the variations config.
-  static bool ShouldUseUserDefaultsBeacon();
-
-  // Syncs feature kUseUserDefaultsForExitedCleanlyBeacon to NSUserDefaults
-  // kUserDefaultsFeatureFlagForExitedCleanlyBeacon.
-  static void SyncUseUserDefaultsBeacon();
-#endif  // BUILDFLAG(IS_IOS)
-
   // Prevents a test browser from performing two clean shutdown steps. First, it
   // prevents the beacon value from being updated after this function is called.
   // This prevents the the test browser from signaling that Chrome is shutting
@@ -174,24 +160,6 @@ class CleanExitBeacon {
   // Writes |exited_cleanly| and the crash streak to the file located at
   // |beacon_file_path_|.
   void WriteBeaconFile(bool exited_cleanly) const;
-
-#if BUILDFLAG(IS_IOS)
-  // Returns whether Chrome exited cleanly in the previous session according to
-  // the platform-specific beacon (NSUserDefaults for iOS). Returns std::nullopt
-  // if the platform-specific location does not have beacon info.
-  std::optional<bool> ExitedCleanly();
-#endif  // BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)
-  // Returns true if the NSUserDefaults beacon value is set.
-  static bool HasUserDefaultsBeacon();
-
-  // Returns the NSUserDefaults beacon value.
-  static bool GetUserDefaultsBeacon();
-
-  // Clears the NSUserDefaults beacon value.
-  static void ResetUserDefaultsBeacon();
-#endif  // BUILDFLAG(IS_IOS)
 
   // Indicates whether the CleanExitBeacon has been initialized.
   bool initialized_ = false;

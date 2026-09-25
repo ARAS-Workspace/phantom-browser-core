@@ -70,7 +70,7 @@ class SecurityInterstitialPageController
   void OpenReportingPrivacyInNewTab();
   void OpenWhitepaperInNewTab();
   void ReportPhishingErrorInNewTab();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   void ShowCertificateViewer();
 #endif
 

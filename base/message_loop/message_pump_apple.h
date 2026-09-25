@@ -43,9 +43,6 @@
 #include "build/build_config.h"
 
 #if defined(__OBJC__)
-#if BUILDFLAG(IS_IOS)
-#import <Foundation/Foundation.h>
-#else
 #import <AppKit/AppKit.h>
 
 // Clients must subclass NSApplication and implement this protocol if they want
@@ -56,7 +53,6 @@
 // necessary.
 - (BOOL)isHandlingSendEvent;
 @end
-#endif  // BUILDFLAG(IS_IOS)
 #endif  // defined(__OBJC__)
 
 namespace base {
@@ -78,15 +74,6 @@ class BASE_EXPORT MessagePumpCFRunLoopBase : public MessagePump {
   TimeTicks AdjustDelayedRunTime(TimeTicks earliest_time,
                                  TimeTicks run_time,
                                  TimeTicks latest_time) override;
-
-#if BUILDFLAG(IS_IOS)
-  // Some iOS message pumps do not support calling |Run()| to spin the main
-  // message loop directly.  Instead, call |Attach()| to set up a delegate, then
-  // |Detach()| before destroying the message pump.  These methods do nothing if
-  // the message pump supports calling |Run()| and |Quit()|.
-  virtual void Attach(Delegate* delegate);
-  virtual void Detach();
-#endif  // BUILDFLAG(IS_IOS)
 
  protected:
   // Needs access to CreateAutoreleasePool.
@@ -116,11 +103,6 @@ class BASE_EXPORT MessagePumpCFRunLoopBase : public MessagePump {
   int nesting_level() const { return nesting_level_; }
   int run_nesting_level() const { return run_nesting_level_; }
   bool keep_running() const { return keep_running_; }
-
-#if BUILDFLAG(IS_IOS)
-  void OnAttach();
-  void OnDetach();
-#endif
 
   // Sets this pump's delegate.  Signals the appropriate sources if
   // |delegateless_work_| is true.  |delegate| can be NULL.
@@ -306,43 +288,6 @@ class BASE_EXPORT MessagePumpNSRunLoop : public MessagePumpCFRunLoopBase {
   apple::ScopedCFTypeRef<CFRunLoopSourceRef> quit_source_;
 };
 
-#if BUILDFLAG(IS_IOS)
-// This is a fake message pump.  It attaches sources to the main thread's
-// CFRunLoop, so PostTask() will work, but it is unable to drive the loop
-// directly, so calling Run() or Quit() are errors.
-class BASE_EXPORT MessagePumpUIApplication : public MessagePumpCFRunLoopBase {
- public:
-  MessagePumpUIApplication();
-
-  MessagePumpUIApplication(const MessagePumpUIApplication&) = delete;
-  MessagePumpUIApplication& operator=(const MessagePumpUIApplication&) = delete;
-
-  ~MessagePumpUIApplication() override;
-  void DoRun(Delegate* delegate) override;
-  bool DoQuit() override;
-
-  // Sets the initial run loop nesting `depth` for the current thread.
-  // This is a thread_local and one-shot configuration; it applies only to the
-  // next message pump initialized on this thread and is automatically reset to
-  // default immediately after being read.
-  static void SetNextInitialNestingLevelForCurrentThread(int depth);
-
-  // Resets the initial nesting level for the current thread. For testing only.
-  static void ResetNextInitialNestingLevelForTesting();
-
-  // MessagePumpCFRunLoopBase.
-  // MessagePumpUIApplication can not spin the main message loop directly.
-  // Instead, call |Attach()| to set up a delegate.  It is an error to call
-  // |Run()|.
-  void Attach(Delegate* delegate) override;
-  void Detach() override;
-
- private:
-  std::optional<RunLoop> run_loop_;
-};
-
-#else  // !BUILDFLAG(IS_IOS)
-
 class MessagePumpNSApplication : public MessagePumpCFRunLoopBase {
  public:
   MessagePumpNSApplication();
@@ -384,8 +329,6 @@ class MessagePumpCrApplication : public MessagePumpNSApplication {
   bool ShouldCreateAutoreleasePool() override;
 };
 
-#endif  // !BUILDFLAG(IS_IOS)
-
 namespace message_pump_apple {
 
 // If not on the main thread, returns a new instance of
@@ -398,7 +341,6 @@ namespace message_pump_apple {
 // default NSApplication.
 BASE_EXPORT std::unique_ptr<MessagePump> Create();
 
-#if !BUILDFLAG(IS_IOS)
 // If a pump is created before the required CrAppProtocol is
 // created, the wrong MessagePump subclass could be used.
 // UsingCrApp() returns false if the message pump was created before
@@ -409,7 +351,6 @@ BASE_EXPORT bool UsingCrApp();
 // Wrapper to query -[NSApp isHandlingSendEvent] from C++ code.
 // Requires NSApp to implement CrAppProtocol.
 BASE_EXPORT bool IsHandlingSendEvent();
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace message_pump_apple
 

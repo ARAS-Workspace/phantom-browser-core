@@ -46,9 +46,6 @@ typedef uint32_t CAContextID;
 - (void)setFencePort:(mach_port_t)port;
 - (void)setFencePort:(mach_port_t)port commitHandler:(void (^)(void))block;
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_IOS)
-+ (instancetype)remoteContextWithOptions:(NSDictionary*)optionsDict;
-#endif  // BUILDFLAG(IS_IOS)
 @property(readonly) CAContextID contextId;
 @property(retain) CALayer *layer;
 @end
@@ -61,13 +58,6 @@ typedef uint32_t CAContextID;
 @interface CALayerHost : CALayer
 @property CAContextID contextId;
 @end
-
-#if BUILDFLAG(IS_IOS)
-
-extern NSString* const kCAContextDisplayId;
-extern NSString* const kCAContextIgnoresHitTest;
-
-#endif  // BUILDFLAG(IS_IOS)
 
 #endif  // __OBJC__
 

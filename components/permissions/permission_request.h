@@ -93,7 +93,7 @@ class PermissionRequest {
   // need to be shown in the UI.
   virtual bool IsDuplicateOf(PermissionRequest* other_request) const;
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // A message text with formatting information.
   struct AnnotatedMessageText {
     // |text| specifies the text string itself.
@@ -121,12 +121,12 @@ class PermissionRequest {
       std::u16string requesting_origin_formatted_for_display,
       int message_id,
       bool format_origin_bold);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Returns a safe reference to this instance.
   base::SafeRef<PermissionRequest> GetSafeRef();
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Returns whether displaying a confirmation chip for the request is
   // supported.
   bool IsConfirmationChipSupported();
@@ -146,7 +146,7 @@ class PermissionRequest {
   // Returns prompt text appropriate for displaying under the dialog title
   // "[domain] wants to:".
   virtual std::u16string GetMessageTextFragment() const;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Returns the text to be used in the "allow always" button of the
   // permission prompt.

@@ -45,10 +45,6 @@
 namespace base {
 class CommandLine;
 
-#if BUILDFLAG(IS_IOS)
-class MachPortRendezvousServerIOS;
-class ScopedTempDir;
-#endif
 }
 
 namespace content {
@@ -69,16 +65,6 @@ namespace internal {
 using FileMappedForLaunch = PosixFileDescriptorInfo;
 #else
 using FileMappedForLaunch = base::HandlesToInheritVector;
-#endif
-
-#if BUILDFLAG(IS_IOS)
-class LaunchResult;
-
-class ProcessStorageBase {
- public:
-  virtual ~ProcessStorageBase() = default;
-  virtual void ReleaseProcess() = 0;
-};
 #endif
 
 // ChildProcessLauncherHelper is used by ChildProcessLauncher to start a
@@ -211,18 +197,6 @@ class ChildProcessLauncherHelper
   static void ForceNormalProcessTerminationAsync(
       ChildProcessLauncherHelper::Process process);
 
-#if BUILDFLAG(IS_IOS)
-  void OnChildProcessStarted(pid_t process_id,
-                             std::unique_ptr<LaunchResult> launch_result);
-  void ClearProcessStorage();
-  void SetExitCode(int exit_code);
-  std::optional<int> GetExitCode();
-
-#if defined(__OBJC__)
-  NSObject* GetProcess();
-#endif
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
   void OnChildProcessStarted(JNIEnv* env, int32_t handle);
 
@@ -304,11 +278,6 @@ class ChildProcessLauncherHelper
   std::string serialized_policy_;
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-  std::unique_ptr<base::MachPortRendezvousServerIOS> rendezvous_server_;
-  std::unique_ptr<ProcessStorageBase> process_storage_;
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
   base::android::ScopedJavaGlobalRef<jobject> java_peer_;
   bool java_peer_avaiable_on_client_thread_ = false;
@@ -319,11 +288,6 @@ class ChildProcessLauncherHelper
 #endif
 
 
-
-#if BUILDFLAG(IS_IOS)
-  std::unique_ptr<base::ScopedTempDir> scoped_temp_dir_;
-  std::optional<int> exit_code_;
-#endif
 
   // Histogram shared memory region. Ownership of the memory region object is
   // shared with the process host which runs, and is destroyed, asynchronously.

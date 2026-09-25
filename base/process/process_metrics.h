@@ -29,9 +29,7 @@
 
 #include "base/process/port_provider_mac.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include <mach/mach_vm.h>
-#endif
 #endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)

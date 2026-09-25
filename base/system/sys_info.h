@@ -289,19 +289,6 @@ class BASE_EXPORT SysInfo {
   static std::string GetAndroidBuildFingerprint();
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-  // Returns the iOS build number string which is normally an alphanumeric
-  // string like 12E456. This build number can differentiate between different
-  // versions of iOS that may have the same major/minor/bugfix version numbers.
-  // For example, iOS beta releases have the same version number but different
-  // build number strings.
-  static std::string GetIOSBuildNumber();
-
-  // Overrides the hardware model name. The overridden value is used instead of
-  // `StringSysctl({CTL_HW, HW_MACHINE})`. `name` should not be empty.
-  static void OverrideHardwareModelName(std::string name);
-#endif  // BUILDFLAG(IS_IOS)
-
   // Returns true for low-end devices that may require extreme tradeoffs,
   // including user-visible changes, for acceptable performance.
   // For general memory optimizations, consider |AmountOfTotalPhysicalMemory|.

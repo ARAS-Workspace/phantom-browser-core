@@ -37,7 +37,7 @@
 #include "third_party/blink/public/web/web_form_control_element.h"
 #include "third_party/blink/public/web/web_input_element.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/autofill/content/renderer/page_passwords_analyser.h"
 #endif
 
@@ -652,7 +652,7 @@ class PasswordAutofillAgent : public content::RenderFrameObserver,
 
   raw_ptr<PasswordGenerationAgent> password_generation_agent_ = nullptr;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   PagePasswordsAnalyser page_passwords_analyser_;
 #endif
 

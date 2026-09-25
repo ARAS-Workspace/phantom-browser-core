@@ -45,7 +45,7 @@ class DevToolsProtocolTestBindings : public WebContentsObserver,
   void HandleMessageFromTest(base::DictValue message);
 
   scoped_refptr<DevToolsAgentHost> agent_host_;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // DevToolsFrontendHost does not exist on Android and iOS, but we also don't
   // run web tests natively on Android.
   std::unique_ptr<DevToolsFrontendHost> frontend_host_;

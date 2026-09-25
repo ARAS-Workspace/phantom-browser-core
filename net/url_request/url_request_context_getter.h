@@ -15,12 +15,6 @@ namespace base {
 class SingleThreadTaskRunner;
 }  // namespace base
 
-#if BUILDFLAG(IS_IOS)
-namespace web {
-class NetworkContextOwner;
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 namespace net {
 class URLRequestContext;
 class URLRequestContextGetterObserver;
@@ -70,10 +64,6 @@ class NET_EXPORT URLRequestContextGetter
   // AddObserver and RemoveObserver are deprecated. Friend URLFetcherCore and
   // web::NetworkContextOwner to restrict visibility.
   friend class URLFetcherCore;
-
-#if BUILDFLAG(IS_IOS)
-  friend class web::NetworkContextOwner;
-#endif  // BUILDFLAG(IS_IOS)
 
   // Adds / removes an observer to watch for shutdown of |this|'s context. Must
   // only be called on network thread. May not be called once

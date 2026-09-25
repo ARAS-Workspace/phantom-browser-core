@@ -46,11 +46,6 @@ extern const char kFuzz[];
 extern const char kFuzzFor[];
 extern const char kListFuzzTests[];
 
-#if BUILDFLAG(IS_IOS)
-extern const char kEnableRunIOSUnittestsWithXCTest[];
-extern const char kWriteCompiledTestsJsonToWritablePath[];
-#endif
-
 }  // namespace switches
 
 #endif  // BASE_TEST_TEST_SWITCHES_H_

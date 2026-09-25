@@ -57,7 +57,7 @@
 #include "base/android/scoped_java_ref.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
 #include "services/device/public/mojom/nfc.mojom.h"
 #endif
 
@@ -346,7 +346,7 @@ class CONTENT_EXPORT RenderFrameHostDelegate {
   // Gets the GeolocationContext associated with this delegate.
   virtual device::mojom::GeolocationContext* GetGeolocationContext();
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
   // Gets an NFC implementation within the context of this delegate.
   virtual void GetNFC(RenderFrameHostImpl* render_frame_host,
                       mojo::PendingReceiver<device::mojom::NFC> receiver);
@@ -373,7 +373,7 @@ class CONTENT_EXPORT RenderFrameHostDelegate {
       bool is_fullscreen,
       blink::mojom::FullscreenOptionsPtr options);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Returns whether the RFH can use Additional Windowing Controls (AWC) APIs.
   // https://github.com/explainers-by-googlers/additional-windowing-controls/blob/main/README.md
   virtual bool CanUseWindowingControls(RenderFrameHostImpl* requesting_frame);
@@ -389,7 +389,7 @@ class CONTENT_EXPORT RenderFrameHostDelegate {
 
   // Request to set resizable.
   virtual void SetResizable(bool) {}
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
   // Updates information to determine whether a user gesture should carryover to

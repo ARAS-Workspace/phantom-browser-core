@@ -770,12 +770,6 @@ class AutofillClient {
   virtual void DismissAutofillAiLoadingDialog();
 #endif
 
-#if BUILDFLAG(IS_IOS)
-  // Checks whether `field_id` is the last field that for which
-  // AutofillAgent::queryAutofillForForm() was called. See crbug.com/1097015.
-  virtual bool IsLastQueriedField(FieldGlobalId field_id) = 0;
-#endif
-
   // Whether we can add more information to the contents of suggestions text due
   // to the use of a large keyboard accessory view. See b/40942168.
   virtual bool ShouldFormatForLargeKeyboardAccessory() const;

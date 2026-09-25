@@ -45,13 +45,6 @@ extern const char kForceFreFeatureShowcaseSteps[];
 // keep-sorted start allow_yaml_lists=yes case=no group_prefixes=["#if", "#else", "#endif", "extern const", "enum class", "};", "//", "bool", "base::", "BASE_DECLARE_FEATURE", "BASE_DECLARE_FEATURE_PARAM", "COMPONENT_EXPORT(SIGNIN_SWITCHES)"] by_regex=["BASE_DECLARE_FEATURE\\(.*\\);"] skip_lines=2
 // clang-format on
 
-#if BUILDFLAG(IS_IOS)
-// When enabled, the account retrieval waits for accounts to become available on
-// the first run after a restore operation.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kAccountRetrievalWaitsForRestoration);
-#endif
-
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kAvoidAutoTriggerListAccountsOnStale);
 
@@ -69,25 +62,6 @@ BASE_DECLARE_FEATURE(kBeforeFirstRunDesktopRefreshSurvey);
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kBoundSessionCredentialsKillSwitch);
 #endif  // BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
-
-#if BUILDFLAG(IS_IOS)
-// Feature flag to build the External Privacy Context, which is used to provide
-// the capability service with device signals.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kBuildExternalPrivacyContext);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const base::FeatureParam<std::string>
-    kBuildExternalPrivacyContextAgeMismatchLearnMoreUrl;
-#endif
-
-#if BUILDFLAG(IS_IOS)
-// Feature flag to enable caching identities in ios_internal.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kCacheIdentityListInChrome);
-// Feature flag to prefetch and cache account capabilities.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnableACPrefetch);
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -215,14 +189,14 @@ BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
                            kChromeIdentitySurveyLaunchWithDelayDuration);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // Feature flag to enable cross-device sign-in.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kCrossDeviceSignin);
 // Parameter containing the base URL for cross device sign-in.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const base::FeatureParam<std::string> kCrossDeviceSigninUrl;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Feature flag to enable cross-device sign-in promo.
@@ -256,14 +230,6 @@ BASE_DECLARE_FEATURE(kDiceLinkedAccounts);
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kDisableU18FeedbackDesktop);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_IOS)
-// Feature flag controlling whether Chrome should avoid adding SID/LSID cookies
-// in gaia auth fetcher requests.
-// Only used on iOS 27+.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kDontIncludeSIDUnsecureCookiesInGaiaAuthFetcher);
-#endif
 
 // Enables fetching and storing preview data for signed-in accounts.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -338,13 +304,6 @@ BASE_DECLARE_FEATURE(kEnableAddSessionRedirect);
 // Enables the AI subscription level decorative ring around the user's avatar.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kEnableAiSubscriptionAvatarRing);
-
-#if BUILDFLAG(IS_IOS)
-// Features to enable using the ASWebAuthenticationSession to add accounts to
-// device.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnableASWebAuthenticationSession);
-#endif
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -451,13 +410,6 @@ extern const base::FeatureParam<SeamlessSigninPromoType>
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kEnableWebSigninLoadingDialog);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-// Feature flag controlling whether the CanSignInToChrome account capability
-// should be used to determine whether an account is eligible for sign-in.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnforceCanSignInToChromeCapability);
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -594,12 +546,12 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kForceShowWebSigninLoadingDialog);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kForceStartupSigninPromo);
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/408962000): This feature is going to be used after clients
 // have the required information in local storage.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -616,16 +568,6 @@ BASE_DECLARE_FEATURE(kGaiaAccountIdEnforcement);
 // Feature to handle mdm errors on Enterprise and EDU accounts
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kHandleMdmErrorsForDasherAccounts);
-
-#if BUILDFLAG(IS_IOS)
-// Killswitch for ignoring X-Chrome-Manage-Accounts header in subframes.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kIgnoreChromeManageAccountsInSubframes);
-
-// Feature flag to ignore invalid grant errors in AuthenticationService.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kIgnoreInvalidGrantError);
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 // Controls the MagiChrome passkey sign-in experiment, enabling either the
@@ -662,11 +604,6 @@ BASE_DECLARE_FEATURE(kMakeIdentityManagerSourceOfAccountsPart2);
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kMigrateAccountManagerDelegate);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kNoAccountWebSignin);
-#endif
 
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kNonDefaultGaiaOriginCheck);
@@ -711,13 +648,6 @@ BASE_DECLARE_FEATURE(kProfileDiscOnAllPages);
 
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kProfilesReordering);
-
-#if BUILDFLAG(IS_IOS)
-// Feature flag controlling whether Chrome uses the contextual version of
-// relevant account capabilities on supported platforms.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kReadContextualAccountCapabilities);
-#endif
 
 // Enables fetching the capability of the same name on all platforms.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -795,13 +725,6 @@ BASE_DECLARE_FEATURE(kSkipRefreshTokenCheckInIdentityManager);
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kSmartEmailLineBreaking);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-// Killswitch for the feature to prefill the email of the account to add when
-// opening the "add account" flow for an ADDSESSION header.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSupportAddSessionEmailPrefill);
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Kill switch for displaying sign-in errors in the profile picker.

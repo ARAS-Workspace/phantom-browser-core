@@ -49,7 +49,7 @@ std::unique_ptr<SkBitmap> BlockMeanAverage(const SkBitmap& image,
 // level. For password protection, the safe browsing preference that allows the
 // extraction are extended reporting and enhanced safe browsing, whereas for
 // client side detection, it's just enhanced safe browsing.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 CanExtractVisualFeaturesResult CanExtractVisualFeatures(bool is_user_opted_in,
                                                         bool is_off_the_record,
                                                         gfx::Size size);

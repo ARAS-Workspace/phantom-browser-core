@@ -61,7 +61,6 @@ class CreditCardAccessManagerTestApi {
     return credit_card_access_manager_->can_fetch_unmask_details_;
   }
 
-#if !BUILDFLAG(IS_IOS)
   void OnFIDOAuthenticationComplete(
       const CreditCardFidoAuthenticator::FidoAuthenticationResponse& response) {
     credit_card_access_manager_->OnFIDOAuthenticationComplete(response);
@@ -71,7 +70,6 @@ class CreditCardAccessManagerTestApi {
     credit_card_access_manager_->fido_authenticator_ =
         std::move(fido_authenticator);
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   void OnVirtualCardUnmaskCancelled() {
     credit_card_access_manager_->OnVirtualCardUnmaskCancelled();

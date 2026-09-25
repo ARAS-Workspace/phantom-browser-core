@@ -238,10 +238,10 @@ class TabGroupSyncService : public KeyedService, public base::SupportsUserData {
 
   // SaveGroup / UnsaveGroup are temporary solutions used during desktop's
   // migration. Other clients should use AddGroup / RemoveGroup.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   virtual void SaveGroup(SavedTabGroup group) = 0;
   virtual void UnsaveGroup(const LocalTabGroupID& local_id) = 0;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Mutator methods for shared tab groups.
   // Converts the saved tab group to shared tab group and associates it with the

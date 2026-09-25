@@ -295,126 +295,10 @@ FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHVideoTutorialTryNowFeature);
 #endif  // BUILDFLAG(IS_ANDROID)
 // clang-format on
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHBottomToolbarTipFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHSendTabToSelfOmnibox);
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHLongPressToolbarTipFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHBadgedReaderModeFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHBadgedReadingListFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHWhatsNewFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHWhatsNewUpdatedFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHReadingListMessagesFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHBadgedTranslateManualTriggerFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHDiscoverFeedHeaderFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHDefaultSiteViewFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHFollowWhileBrowsingFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPriceNotificationsWhileBrowsingFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSDefaultBrowserBadgeEligibilityFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSDefaultBrowserOverflowMenuBadgeFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSDownloadAutoDeletionFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSLensKeyboardFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSBackendPromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoAppStoreFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoWhatsNewFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoBackgroundCustomizationFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoSigninFullscreenFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoPostRestoreFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSPromoCredentialProviderExtensionFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoDefaultBrowserReminderFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSReaderModeLargeOmniboxEntrypointFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSHistoryOnOverflowMenuFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoPostRestoreDefaultBrowserFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSPromoNonModalUrlPasteDefaultBrowserFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSPromoNonModalAppSwitcherDefaultBrowserFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSPromoNonModalShareDefaultBrowserFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoNonModalSigninPasswordFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoNonModalSigninBookmarkFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoPasswordManagerWidgetFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPullToRefreshFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSReplaceSyncPromosWithSignInPromos);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSTabGridSwipeRightForIncognito);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSDockingPromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSDockingPromoEligibilityFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoAllTabsFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoMadeForIOSFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoStaySafeFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSSwipeBackForwardFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSSwipeToolbarToChangeTabFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPostDefaultAbandonmentPromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPromoGenericDefaultBrowserFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSPromoSettingsCardDefaultBrowserFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSPromoSettingsCellDefaultBrowserFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSOverflowMenuCustomizationFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPageInfoRevampFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSInlineEnhancedSafeBrowsingPromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSSavedTabGroupClosed);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSContextualPanelSampleModelFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSContextualPanelPriceInsightsFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHHomeCustomizationMenuFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSLensOverlayEntrypointTipFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSLensOverlayEscapeHatchTipFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSSharedTabGroupForeground);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSDefaultBrowserBannerPromoFeature);
-// A feature flag to enable the Default Browser off-cycle promo and configure
-// its cooldown duration, in days.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSDefaultBrowserOffCyclePromoFeature);
-COMPONENT_EXPORT(FEATURE_ENGAGEMENT_FEATURE_CONSTANTS)
-extern const base::FeatureParam<int> kIPHiOSDefaultBrowserOffCyclePromoCooldown;
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSReminderNotificationsOverflowMenuBubbleFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSReminderNotificationsOverflowMenuNewBadgeFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSSettingsInOverflowMenuBubbleFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSSwitchAccountsWithNTPAccountParticleDiscFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSFeedSwipeStaticFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSFeedSwipeAnimatedFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSWelcomeBackFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSSafariImportFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHIOSPageActionMenu);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSReaderModeOptionsFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSHomepageLensNewBadge);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSHomepageCustomizationNewBadge);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHiOSOneTimeDefaultBrowserNotificationFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiImageRemixFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSNewIAPromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiExternalAppStoreEvent);
-
-// FET feature flag that enables AI Hub "New" badge.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSAIHubNewBadge);
-
-// FET feature flag that enables Gemini Live "New" badge.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiLiveNewBadgeFeature);
-
-// FET feature flag that enables Gemini Live IPH.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiLiveIPHFeature);
-
-// FET feature flag that enabled the Gemini fullscreen promo.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiFullscreenPromoFeature);
-
-// FET feature flag that enables "What can Gemini do" suggestion.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiWhatCanGeminiDo);
-
-// FET feature flag that enables customized sites in the most visited tile.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPinMostVisitedSiteFeature);
-
-// Tracking feature to count days with active sessions.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSActiveDaysTrackingFeature);
-
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHAutofillAtMemoryFeature);
@@ -462,9 +346,7 @@ FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSTabGroupsDesktopFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSPriceTrackingDesktopFeature);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_IOS)
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHResumptionRailFeature);
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace feature_engagement
 

@@ -88,7 +88,7 @@ class UkmService : public UkmRecorderImpl {
   void EnableReporting();
   void DisableReporting();
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void OnAppEnterBackground();
   void OnAppEnterForeground();
 #endif
