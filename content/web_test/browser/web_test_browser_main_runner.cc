@@ -53,62 +53,10 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include <sys/socket.h>
-#include <unistd.h>
-#endif
-
 
 namespace content {
 
 namespace {
-
-#if BUILDFLAG(IS_IOS)
-// Fuchsia doesn't support stdin stream for packaged apps, and stdout from
-// run-test-suite not only has extra emissions from the Fuchsia test
-// infrastructure, it also merges stderr and stdout together. Combined, these
-// mean that when running content_shell on Fuchsia it's not possible to use
-// stdin to pass list of tests or to reliably use stdout to emit results. To
-// workaround this issue for web tests we redirect stdin and stdout to a TCP
-// socket connected to the web test runner. The runner uses --stdio-redirect to
-// specify address and port for stdin and stdout redirection.
-//
-// iOS is in a similar situation where the simulator does not support the use of
-// the stdin stream for applications. Therefore, iOS also redirects stdin and
-// stdout to a TCP socket that is connected to the web test runner.
-constexpr char kStdioRedirectSwitch[] = "stdio-redirect";
-
-void ConnectStdioSocket(const std::string& host_and_port) {
-  std::string host;
-  int port;
-  net::IPAddress address;
-  if (!net::ParseHostAndPort(host_and_port, &host, &port) ||
-      !address.AssignFromIPLiteral(host)) {
-    LOG(FATAL) << "Invalid stdio address: " << host_and_port;
-  }
-
-  sockaddr_storage sockaddr_storage;
-  sockaddr* addr = reinterpret_cast<sockaddr*>(&sockaddr_storage);
-  socklen_t addr_len = sizeof(sockaddr_storage);
-  net::IPEndPoint endpoint(address, port);
-  bool converted = endpoint.ToSockAddr(addr, &addr_len);
-  CHECK(converted);
-
-  int fd = socket(addr->sa_family, SOCK_STREAM, 0);
-  PCHECK(fd >= 0);
-  int result = connect(fd, addr, addr_len);
-  PCHECK(result == 0) << "Failed to connect to " << host_and_port;
-
-  result = dup2(fd, STDIN_FILENO);
-  PCHECK(result == STDIN_FILENO) << "Failed to dup socket to stdin";
-
-  result = dup2(fd, STDOUT_FILENO);
-  PCHECK(result == STDOUT_FILENO) << "Failed to dup socket to stdout";
-
-  PCHECK(close(fd) == 0);
-}
-
-#endif  // BUILDFLAG(IS_IOS)
 
 void RunOneTest(const content::TestInfo& test_info,
                 content::WebTestControlHost* web_test_control_host,
@@ -124,12 +72,6 @@ void RunOneTest(const content::TestInfo& test_info,
 }
 
 void RunTests(content::BrowserMainRunner* main_runner) {
-#if BUILDFLAG(IS_IOS)
-  if (auto& cmd_line = *base::CommandLine::ForCurrentProcess();
-      cmd_line.HasSwitch(kStdioRedirectSwitch)) {
-    ConnectStdioSocket(cmd_line.GetSwitchValueASCII(kStdioRedirectSwitch));
-  }
-#endif  // BUILDFLAG(IS_IOS)
   TRACE_EVENT0("shell", "WebTestBrowserMainRunner::RunTests");
   content::WebTestControlHost test_controller;
   {
@@ -195,16 +137,12 @@ void WebTestBrowserMainRunner::Initialize() {
   command_line.AppendSwitch(switches::kEnableLogging);
   command_line.AppendSwitch(switches::kAllowFileAccessFromFiles);
 
-  // On IOS, we always use hardware GL for the web test as content_browsertests.
-  // See also https://crrev.com/c/4885954.
-  if constexpr (!BUILDFLAG(IS_IOS)) {
-    // only default to a software GL if the flag isn't already specified.
-    if (!command_line.HasSwitch(switches::kUseGpuInTests) &&
-        !command_line.HasSwitch(switches::kUseGL)) {
-      gl::SetGLImplementationCommandLineSwitches(
-          gl::GLImplementationParts(gl::ANGLEImplementation::kSwiftShader),
-          &command_line);
-    }
+  // only default to a software GL if the flag isn't already specified.
+  if (!command_line.HasSwitch(switches::kUseGpuInTests) &&
+      !command_line.HasSwitch(switches::kUseGL)) {
+    gl::SetGLImplementationCommandLineSwitches(
+        gl::GLImplementationParts(gl::ANGLEImplementation::kSwiftShader),
+        &command_line);
   }
   command_line.AppendSwitchASCII(switches::kTouchEventFeatureDetection,
                                  switches::kTouchEventFeatureDetectionEnabled);

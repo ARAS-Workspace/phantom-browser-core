@@ -33,10 +33,6 @@
 #include "third_party/blink/public/common/user_agent/user_agent_metadata.h"
 #include "third_party/re2/src/re2/re2.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "ui/base/device_form_factor.h"
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 #include <sys/utsname.h>
 #endif
@@ -155,27 +151,6 @@ void CheckUserAgentStringOrdering(bool mobile_device) {
       ASSERT_EQ("", model);
     }
   }
-#elif BUILDFLAG(IS_IOS)
-  // Post-UA Reduction there are two possible <unifiedPlatform> values for iOS,
-  // depending on whether this is an iPad or not:
-  // * iPad; CPU iPad OS 14_0 like Mac OS X
-  // * iPhone; CPU iPhone OS 14_0 like Mac OS X
-  static const char* const kIphoneOrIpad =
-      ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET ? "iPad"
-                                                                 : "iPhone";
-  ASSERT_EQ(2u, pieces.size());
-  ASSERT_EQ(kIphoneOrIpad, pieces[0]);
-  pieces = base::SplitStringUsingSubstr(pieces[1], " ", base::KEEP_WHITESPACE,
-                                        base::SPLIT_WANT_ALL);
-  ASSERT_EQ(8u, pieces.size());
-  ASSERT_EQ("CPU", pieces[0]);
-  ASSERT_EQ(kIphoneOrIpad, pieces[1]);
-  ASSERT_EQ("OS", pieces[2]);
-  ASSERT_EQ("14_0", pieces[3]);
-  ASSERT_EQ("like", pieces[4]);
-  ASSERT_EQ("Mac", pieces[5]);
-  ASSERT_EQ("OS", pieces[6]);
-  ASSERT_EQ("X", pieces[7]);
 #else
 #error Unsupported platform
 #endif
@@ -217,8 +192,6 @@ class UserAgentUtilsTest : public testing::Test,
 
   std::string GenerateExpectedUserAgent(
       const std::string& product_suffix = std::string()) {
-    // This cannot be constexpr because of the runtime checks for
-    // BUILDFLAG(IS_IOS).
     // This matches GetUnifiedPlatform().
     static const char* const kExpectedPlatform =
 #if BUILDFLAG(IS_LINUX)
@@ -227,10 +200,6 @@ class UserAgentUtilsTest : public testing::Test,
         "Macintosh; Intel Mac OS X 10_15_7";
 #elif BUILDFLAG(IS_ANDROID)
         "Linux; Android 10; K";
-#elif BUILDFLAG(IS_IOS)
-        ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET
-            ? "iPad; CPU iPad OS 14_0 like Mac OS X"
-            : "iPhone; CPU iPhone OS 14_0 like Mac OS X";
 #else
 #error Unsupported platform
 #endif
@@ -350,7 +319,7 @@ TEST_F(UserAgentUtilsTest, UserAgentStringReduced) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeature(
       blink::features::kReduceUserAgentMinorVersion);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Verify the correct user agent is returned when the UseMobileUserAgent
   // command line flag is present.
   base::test::ScopedCommandLine scoped_command_line;
@@ -432,15 +401,6 @@ TEST_F(UserAgentUtilsTest, ReduceUserAgentPlatformOsCpu) {
     EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent());
   }
 
-#if BUILDFLAG(IS_IOS)
-  // On iOS, also check the kUseMobileUserAgent flag with the features above.
-  // This is similar to the Android case above.
-  command_line->AppendSwitch(kUseMobileUserAgent);
-  ASSERT_TRUE(command_line->HasSwitch(kUseMobileUserAgent));
-  {
-    EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent(kMobileProductSuffix));
-  }
-#endif  // BUILDFLAG(IS_IOS)
 #endif
 
   // Verify we reduce platform and oscpu
@@ -528,9 +488,7 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   // If you're here because your change to GetOSType broke this test, it likely
   // means that GetPlatformForUAMetadata needs a new special case to prevent
   // breaking client hints. Check with the code owners for further guidance.
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(metadata.platform, "iOS");
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(metadata.platform, "macOS");
 #elif BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(metadata.platform, "Android");

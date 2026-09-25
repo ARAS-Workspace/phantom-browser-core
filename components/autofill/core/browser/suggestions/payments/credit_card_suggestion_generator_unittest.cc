@@ -92,13 +92,11 @@ using ::testing::UnorderedElementsAre;
 using ::testing::UnorderedElementsAreArray;
 
 bool ShouldSplitCardNameAndLastFourDigitsForMetadata() {
-  // Splitting card name and last four logic does not apply to iOS because iOS
-  // doesn't currently support it.
-  return !BUILDFLAG(IS_IOS);
+  return true;
 }
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return true;
@@ -108,7 +106,7 @@ bool ShouldUseNewFopDisplay() {
 // The number of obfuscation dots we use as a prefix when showing a credit
 // card's last four.
 int ObfuscationLengthForCreditCardLastFourDigits() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return 2;
 #else
   return ShouldUseNewFopDisplay() ? 2 : 4;
@@ -159,7 +157,7 @@ Suggestion GenerateSuggestionFromCardDetails(
             /*label=*/expiration_date_label, icon,
             SuggestionType::kCreditCardEntry);
       } else {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
         if (!ShouldUseNewFopDisplay()) {
           // We use a longer label on desktop platforms.
           expiration_date_label = u"Expires on " + expiration_date_label;
@@ -173,7 +171,7 @@ Suggestion GenerateSuggestionFromCardDetails(
       }
     } else if (type == CREDIT_CARD_NAME_FULL) {
       std::vector<std::vector<Suggestion::Text>> labels;
-      if constexpr (BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)) {
+      if constexpr (BUILDFLAG(IS_ANDROID)) {
         // The label is formatted as either "••••1234" or "••1234".
         labels.push_back({Suggestion::Text(obfuscated_card_digits)});
       } else if (ShouldUseNewFopDisplay()) {
@@ -240,12 +238,7 @@ Suggestion GenerateVirtualCardSuggestionFromCreditCardSuggestion(
   virtual_card_suggestion.type = SuggestionType::kVirtualCreditCardEntry;
   const std::u16string& virtual_card_label = l10n_util::GetStringUTF16(
       IDS_AUTOFILL_VIRTUAL_CARD_SUGGESTION_OPTION_VALUE);
-#if BUILDFLAG(IS_IOS)
-  virtual_card_suggestion.minor_texts = {};
-  virtual_card_suggestion.minor_texts.emplace_back(
-      virtual_card_suggestion.main_text.value);
-  virtual_card_suggestion.main_text.value = virtual_card_label;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (field_type == CREDIT_CARD_NUMBER) {
     virtual_card_suggestion.labels.clear();
   }
@@ -273,10 +266,10 @@ Suggestion GenerateVirtualCardSuggestionFromCreditCardSuggestion(
   return virtual_card_suggestion;
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // A dot ("•") separator.
 inline constexpr char16_t kEllipsisDotSeparator[] = u"\u2022";
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 Matcher<Suggestion> EqualLabels(
     const std::vector<std::vector<Suggestion::Text>>& suggestion_objects) {
@@ -309,7 +302,7 @@ Matcher<Suggestion> EqualsSuggestion(const Suggestion& suggestion) {
 }
 
 Matcher<Suggestion> EqualsManagePaymentsMethodsSuggestion(bool with_gpay_logo) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return EqualsSuggestion(
       SuggestionType::kManageCreditCard,
       l10n_util::GetStringUTF16(IDS_AUTOFILL_MANAGE_PAYMENT_METHODS),
@@ -525,17 +518,16 @@ class CreditCardSuggestionGeneratorTest
 };
 
 // The card benefits label generation currently varies across operating systems.
-// On iOS, the label is not displayed at present. For Desktop, the benefit is
-// shown along with a "terms apply" message (e.g., "5% cash back on all
-// purchases (terms apply)"). On Android(Clank), the benefits label is displayed
-// without the "(terms apply)" message (e.g., "5% cash back on all purchases").
+// For Desktop, the benefit is shown along with a "terms apply" message (e.g.,
+// "5% cash back on all purchases (terms apply)"). On Android(Clank), the
+// benefits label is displayed without the "(terms apply)" message (e.g., "5%
+// cash back on all purchases").
 // Therefore, it is necessary to separate the tests for these methods based on
 // the specific operating system.
 // Params:
 // 1. Function reference to call which creates the appropriate credit card
 // benefit for the unittest.
 // 2. Benefit source which is set for the credit card with benefits.
-#if !BUILDFLAG(IS_IOS)
 // TODO(crbug.com/325646493): Clean up
 // CreditCardSuggestionGeneratorTest.AutofillCreditCardBenefitsLabelTest setup
 // and parameters.
@@ -1034,7 +1026,6 @@ TEST_P(
 }
 
 #endif  // !BUILDFLAG(IS_ANDROID)
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        RemoveExpiredCreditCardsNotUsedSinceTimestamp) {
@@ -1254,7 +1245,7 @@ TEST_F(CreditCardSuggestionGeneratorTest,
               ContainsCreditCardFooterSuggestions(/*with_gpay_logo=*/true));
 }
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(CreditCardSuggestionGeneratorTest,
        GetVirtualCardStandaloneCvcFieldSuggestions_UndoAutofill) {
   // Set up a virtual card enrolled server card.
@@ -1662,7 +1653,7 @@ TEST_F(CreditCardSuggestionGeneratorTest, ScanCreditCardBasedOnIsFormSecure) {
       *http_form_bundle.form_structure->field(0), autofill_client()));
 }
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(CreditCardSuggestionGeneratorTest,
        FieldWasAutofilled_UndoAutofillOnCreditCardForm) {
   payments_data().AddCreditCard(test::GetCreditCard());
@@ -3558,16 +3549,11 @@ TEST_F(CreditCardSuggestionGeneratorTest,
       ShouldShowVirtualCardOptionForTest(local_card, autofill_client()));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(CreditCardSuggestionGeneratorTest,
        GenerateLocalSaveAndFillSuggestion_CreditCardUploadDisabled) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
   SetCreditCardUploadEnabledForTest(/*credit_card_upload_enabled=*/false);
 
   MockSaveAndFillManager& mock_save_and_fill_manager =
@@ -3599,32 +3585,23 @@ TEST_F(CreditCardSuggestionGeneratorTest,
   // `suggestions` should contain 3 suggestions which are save and fill
   // suggestion, separator, and manage cards footer.
   ASSERT_GE(suggestions.size(), 3ul);
-  EXPECT_THAT(suggestions[0],
-#if BUILDFLAG(IS_IOS)
-              EqualsSuggestion(SuggestionType::kSaveAndFillCreditCardEntry)
-#else
-              EqualsSuggestion(
-                  SuggestionType::kSaveAndFillCreditCardEntry,
-                  l10n_util::GetStringUTF16(
-                      IDS_AUTOFILL_SAVE_AND_FILL_SUGGESTION_TITLE),
-                  Suggestion::Icon::kSaveAndFill,
-                  {{Suggestion::Text(l10n_util::GetStringUTF16(
-                      IDS_AUTOFILL_LOCAL_SAVE_AND_FILL_SUGGESTION_DESCRIPTION))}})
-#endif  // BUILDFLAG(IS_IOS)
-  );
+  EXPECT_THAT(
+      suggestions[0],
+      EqualsSuggestion(
+          SuggestionType::kSaveAndFillCreditCardEntry,
+          l10n_util::GetStringUTF16(
+              IDS_AUTOFILL_SAVE_AND_FILL_SUGGESTION_TITLE),
+          Suggestion::Icon::kSaveAndFill,
+          {{Suggestion::Text(l10n_util::GetStringUTF16(
+              IDS_AUTOFILL_LOCAL_SAVE_AND_FILL_SUGGESTION_DESCRIPTION))}}));
   EXPECT_THAT(suggestions,
               ContainsCreditCardFooterSuggestions(/*with_gpay_logo=*/false));
 }
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        GenerateServerSaveAndFillSuggestion_CreditCardUploadEnabled) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
   SetCreditCardUploadEnabledForTest(/*credit_card_upload_enabled=*/true);
 
   MockSaveAndFillManager& mock_save_and_fill_manager =
@@ -3656,21 +3633,17 @@ TEST_F(CreditCardSuggestionGeneratorTest,
   // `suggestions` should contain 3 suggestions which are save and fill
   // suggestion, separator, and manage cards footer.
   ASSERT_GE(suggestions.size(), 3ul);
-  EXPECT_THAT(suggestions[0],
-#if BUILDFLAG(IS_IOS)
-              EqualsSuggestion(SuggestionType::kSaveAndFillCreditCardEntry)
-#else
-              EqualsSuggestion(
-                  SuggestionType::kSaveAndFillCreditCardEntry,
-                  l10n_util::GetStringUTF16(
-                      IDS_AUTOFILL_SAVE_AND_FILL_SUGGESTION_TITLE),
-                  Suggestion::Icon::kSaveAndFill,
-                  {{Suggestion::Text(l10n_util::GetStringUTF16(
-                      IDS_AUTOFILL_SERVER_SAVE_AND_FILL_SUGGESTION_DESCRIPTION))}})
-#endif  // BUILDFLAG(IS_IOS)
-  );
+  EXPECT_THAT(
+      suggestions[0],
+      EqualsSuggestion(
+          SuggestionType::kSaveAndFillCreditCardEntry,
+          l10n_util::GetStringUTF16(
+              IDS_AUTOFILL_SAVE_AND_FILL_SUGGESTION_TITLE),
+          Suggestion::Icon::kSaveAndFill,
+          {{Suggestion::Text(l10n_util::GetStringUTF16(
+              IDS_AUTOFILL_SERVER_SAVE_AND_FILL_SUGGESTION_DESCRIPTION))}}));
   EXPECT_THAT(suggestions, ContainsCreditCardFooterSuggestions(
-                               /*with_gpay_logo=*/!BUILDFLAG(IS_IOS)));
+                               /*with_gpay_logo=*/true));
 }
 
 TEST_F(CreditCardSuggestionGeneratorTest,
@@ -3698,13 +3671,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        SaveAndFillSuggestion_NotOfferedWhenCreditCardIsSavedInProfile) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
 
   MockSaveAndFillManager& mock_save_and_fill_manager =
       static_cast<MockSaveAndFillManager&>(
@@ -3743,13 +3711,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        SaveAndFillSuggestion_NotOfferedWhenCreditCardFormIsIncomplete) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
 
   MockSaveAndFillManager& mock_save_and_fill_manager =
       static_cast<MockSaveAndFillManager&>(
@@ -3780,13 +3743,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        SaveAndFillSuggestion_NotOfferedWhenIncognito) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
   autofill_client().set_is_off_the_record(true);
 
   MockSaveAndFillManager& mock_save_and_fill_manager =
@@ -3823,13 +3781,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        SaveAndFillSuggestion_NotOfferedWhenFieldHasMoreThanThreeChars) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
 
   FormBundle form_bundle = GetFormWithTypes(
       {.fields = {
@@ -3887,13 +3840,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        SaveAndFillSuggestion_NoOfferedWhenSaveAndFillFeatureIsBlocked) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
   SetCreditCardUploadEnabledForTest(/*credit_card_upload_enabled=*/true);
 
   MockSaveAndFillManager& mock_save_and_fill_manager =
@@ -3940,13 +3888,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
 // entered, and the strike database limit is not exceeded.
 TEST_F(CreditCardSuggestionGeneratorTest,
        SaveAndFillSuggestion_OfferedWhenCriteriaMet) {
-#if BUILDFLAG(IS_IOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
-#else
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableSaveAndFill);
-#endif  // BUILDFLAG(IS_IOS)
   SetCreditCardUploadEnabledForTest(/*credit_card_upload_enabled=*/true);
 
   MockSaveAndFillManager& mock_save_and_fill_manager =
@@ -3981,23 +3924,9 @@ TEST_F(CreditCardSuggestionGeneratorTest,
       ElementsAre(EqualsSuggestion(SuggestionType::kSaveAndFillCreditCardEntry),
                   EqualsSuggestion(SuggestionType::kSeparator),
                   EqualsManagePaymentsMethodsSuggestion(
-                      /*with_gpay_logo=*/!BUILDFLAG(IS_IOS))));
+                      /*with_gpay_logo=*/true)));
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)
-TEST_F(CreditCardSuggestionGeneratorTest, CreateSaveAndFillSuggestion_IOS) {
-  bool display_gpay_logo = false;
-  Suggestion suggestion =
-      CreateSaveAndFillSuggestion(autofill_client(), display_gpay_logo);
-
-  EXPECT_EQ(suggestion.type, SuggestionType::kSaveAndFillCreditCardEntry);
-  EXPECT_TRUE(suggestion.main_text.value.empty());
-  EXPECT_TRUE(suggestion.labels.empty());
-  EXPECT_EQ(suggestion.icon, Suggestion::Icon::kNoIcon);
-  EXPECT_FALSE(display_gpay_logo);
-}
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // This class helps test the credit card contents that are displayed in
 // Autofill suggestions. It covers suggestions on Desktop/Android dropdown,
@@ -4031,14 +3960,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_EQ(virtual_card_name_field_suggestion.main_text.value,
             u"Virtual card  Elvis Presley");
   EXPECT_TRUE(virtual_card_name_field_suggestion.minor_texts.empty());
-#elif BUILDFLAG(IS_IOS)
-  if (virtual_card_name_field_suggestion.IsAcceptable()) {
-    EXPECT_EQ(virtual_card_name_field_suggestion.main_text.value,
-              u"Virtual card");
-  } else {
-    EXPECT_EQ(virtual_card_name_field_suggestion.main_text.value,
-              u"Virtual disabled card");
-  }
 #else
   // On other platforms, the cardholder name is shown on the first line.
   EXPECT_EQ(virtual_card_name_field_suggestion.main_text.value,
@@ -4046,15 +3967,7 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_TRUE(virtual_card_name_field_suggestion.minor_texts.empty());
 #endif
 
-#if BUILDFLAG(IS_IOS)
-  // There should be 1 lines of label:
-  // 1. Obfuscated last 4 digits "..1111".
-  ASSERT_EQ(virtual_card_name_field_suggestion.labels.size(), 1U);
-  ASSERT_EQ(virtual_card_name_field_suggestion.labels[0].size(), 1U);
-  EXPECT_EQ(virtual_card_name_field_suggestion.labels[0][0].value,
-            CreditCard::GetObfuscatedStringForCardDigits(
-                /*obfuscation_length=*/2, u"1111"));
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // There should be only 1 line of label: obfuscated last 4 digits "..1111".
   EXPECT_THAT(virtual_card_name_field_suggestion,
               EqualLabels({{CreditCard::GetObfuscatedStringForCardDigits(
@@ -4084,16 +3997,7 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
                                         CREDIT_CARD_NUMBER,
                                         /*virtual_card_option=*/true);
 
-#if BUILDFLAG(IS_IOS)
-  // Only card number is displayed on the first line.
-  if (virtual_card_number_field_suggestion.IsAcceptable()) {
-    EXPECT_EQ(virtual_card_number_field_suggestion.main_text.value,
-              u"Virtual card");
-  } else {
-    EXPECT_EQ(virtual_card_number_field_suggestion.main_text.value,
-              u"Virtual card disabled");
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // For the keyboard accessory, the "Virtual card" label is added as a prefix
   // to the card number. The obfuscated last four digits are shown in a
   // separate view.
@@ -4137,12 +4041,7 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_EQ(real_card_name_field_suggestion.main_text.value, u"Elvis Presley");
   EXPECT_TRUE(real_card_name_field_suggestion.minor_texts.empty());
 
-#if BUILDFLAG(IS_IOS)
-  // For IOS, the label is "..1111".
-  EXPECT_THAT(real_card_name_field_suggestion,
-              EqualLabels({{CreditCard::GetObfuscatedStringForCardDigits(
-                  /*obfuscation_length=*/2, u"1111")}}));
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // For the keyboard accessory, the label is "..1111".
   EXPECT_THAT(real_card_name_field_suggestion,
               EqualLabels({{CreditCard::GetObfuscatedStringForCardDigits(
@@ -4171,20 +4070,7 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
                                         CREDIT_CARD_NUMBER,
                                         /*virtual_card_option=*/false);
 
-#if BUILDFLAG(IS_IOS)
-  // Only the card number is displayed on the first line.
-  EXPECT_EQ(
-      real_card_number_field_suggestion.main_text.value,
-      base::StrCat({u"Visa  ", CreditCard::GetObfuscatedStringForCardDigits(
-                                   /*obfuscation_length=*/2, u"1111")}));
-  EXPECT_TRUE(real_card_number_field_suggestion.minor_texts.empty());
-  // The label is the expiration date formatted as mm/yy.
-  EXPECT_THAT(
-      real_card_number_field_suggestion,
-      EqualLabels(
-          {{base::StrCat({base::UTF8ToUTF16(test::NextMonth()), u"/",
-                          base::UTF8ToUTF16(test::NextYear().substr(2))})}}));
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // For Android, split the first line and populate the card name and
   // the last 4 digits separately.
   EXPECT_EQ(real_card_number_field_suggestion.main_text.value, u"Visa");
@@ -4243,11 +4129,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_EQ(suggestions[1].main_text.value, u"CVC for Mastercard");
   EXPECT_TRUE(suggestions[0].minor_texts.empty());
   EXPECT_TRUE(suggestions[1].minor_texts.empty());
-#elif BUILDFLAG(IS_IOS)
-  EXPECT_EQ(suggestions[0].main_text.value, u"Security code");
-  EXPECT_EQ(suggestions[1].main_text.value, u"Security code");
-  EXPECT_TRUE(suggestions[0].minor_texts.empty());
-  EXPECT_TRUE(suggestions[1].minor_texts.empty());
 #else  // For all other platforms
   EXPECT_EQ(suggestions[0].main_text.value, u"CVC");
   EXPECT_EQ(suggestions[1].main_text.value, u"CVC");
@@ -4257,36 +4138,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_THAT(suggestions,
               ContainsCreditCardFooterSuggestions(/*with_gpay_logo=*/false));
 }
-
-#if BUILDFLAG(IS_IOS)
-// Verifies that no CVC suggestions are generated in an iOS WebView.
-TEST_F(AutofillCreditCardSuggestionContentTest,
-       GetCreditCardOrCvcFieldSuggestions_CvcField_UnsupportedClient) {
-  // Simulate the iOS WebView context.
-  autofill_client().set_is_cvc_saving_supported(false);
-
-  // Create one server card and one local card with CVC.
-  CreditCard local_card = CreateLocalCard();
-  local_card.SetNumber(u"5454545454545454");
-  payments_data().AddCreditCard(std::move(local_card));
-  payments_data().AddServerCreditCard(CreateServerCard());
-
-  FormBundle form_bundle =
-      GetFormWithTypes({.fields = {{.role = CREDIT_CARD_VERIFICATION_CODE}}});
-
-  const std::vector<Suggestion> suggestions = GetSuggestionsForCreditCards(
-      form_bundle.form, *form_bundle.form_structure, form_bundle.trigger_field,
-      *form_bundle.trigger_autofill_field, autofill_client(),
-      /*four_digit_combinations_in_dom=*/{},
-      /*amount_extraction_manager=*/nullptr, /*bnpl_manager=*/nullptr,
-      credit_card_form_event_logger(),
-      AutofillMetrics::PaymentsSigninState::kUnknown,
-      /*exclude_virtual_cards=*/false);
-
-  // No suggestions should be returned in an iOS WebView for a CVC field.
-  EXPECT_THAT(suggestions, IsEmpty());
-}
-#endif
 
 // Verify that the suggestion's texts are populated correctly for a duplicate
 // local and server card suggestion when the CVC field is focused.
@@ -4345,7 +4196,7 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_EQ(suggestions[1].main_text.value, u"CVC for Visa");
   EXPECT_TRUE(suggestions[0].minor_texts.empty());
   EXPECT_TRUE(suggestions[1].minor_texts.empty());
-#elif !BUILDFLAG(IS_IOS)
+#else
   EXPECT_EQ(suggestions[0].main_text.value, u"CVC");
   EXPECT_EQ(suggestions[1].main_text.value, u"CVC");
   EXPECT_TRUE(suggestions[0].minor_texts.empty());
@@ -4384,72 +4235,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_THAT(suggestions,
               ContainsCreditCardFooterSuggestions(/*with_gpay_logo=*/true));
 }
-
-#if BUILDFLAG(IS_IOS)
-TEST_F(AutofillCreditCardSuggestionContentTest,
-       GetCreditCardOrCvcFieldSuggestions_LargeKeyboardAccessoryFormat) {
-  // Enable formatting for large keyboard accessories.
-  autofill_client().set_format_for_large_keyboard_accessory(true);
-
-  CreditCard server_card = CreateServerCard();
-
-  const std::u16string obfuscated_number =
-      CreditCard::GetObfuscatedStringForCardDigits(/*obfuscation_length=*/2,
-                                                   u"1111");
-  const std::u16string name_full =
-      server_card.GetRawInfo(CREDIT_CARD_NAME_FULL);
-  const std::u16string exp_date =
-      server_card.GetRawInfo(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR);
-  const std::u16string card_type = server_card.GetRawInfo(CREDIT_CARD_TYPE);
-  const std::u16string type_and_number =
-      base::StrCat({card_type, u"  ", obfuscated_number});
-
-  Suggestion card_number_field_suggestion = CreateCreditCardSuggestionForTest(
-      server_card, autofill_client(), CREDIT_CARD_NUMBER,
-      /*virtual_card_option=*/false);
-
-  // From the credit card number field, the suggestion should show the card type
-  // and number and the label should show the expiration date.
-  EXPECT_EQ(card_number_field_suggestion.main_text.value, type_and_number);
-  EXPECT_THAT(card_number_field_suggestion, EqualLabels({{exp_date}}));
-
-  card_number_field_suggestion = CreateCreditCardSuggestionForTest(
-      server_card, autofill_client(), CREDIT_CARD_NAME_FULL,
-      /*virtual_card_option=*/false);
-
-  // From the credit card name field, the suggestion should show the full name
-  // and the label should show the card type and number.
-  EXPECT_EQ(card_number_field_suggestion.main_text.value,
-            base::StrCat({name_full}));
-  EXPECT_THAT(card_number_field_suggestion, EqualLabels({{type_and_number}}));
-
-  card_number_field_suggestion = CreateCreditCardSuggestionForTest(
-      server_card, autofill_client(), CREDIT_CARD_EXP_MONTH,
-      /*virtual_card_option=*/false);
-
-  // From a credit card expiry field, the suggestion should show the expiration
-  // date and the label should show the card type and number.
-  EXPECT_EQ(card_number_field_suggestion.main_text.value,
-            base::StrCat({exp_date}));
-  EXPECT_THAT(card_number_field_suggestion, EqualLabels({{type_and_number}}));
-
-  server_card.set_record_type(CreditCard::RecordType::kVirtualCard);
-  card_number_field_suggestion = CreateCreditCardSuggestionForTest(
-      server_card, autofill_client(), CREDIT_CARD_NUMBER,
-      /*virtual_card_option=*/true);
-
-  // From a virtual credit card, the suggestion should show the card name and
-  // the label should show the card's virtual status, type and number.
-  EXPECT_EQ(card_number_field_suggestion.main_text.value,
-            base::StrCat({server_card.CardNameForAutofillDisplay(
-                server_card.nickname())}));
-  EXPECT_THAT(
-      card_number_field_suggestion,
-      EqualLabels({{l10n_util::GetStringUTF16(
-                        IDS_AUTOFILL_VIRTUAL_CARD_SUGGESTION_OPTION_VALUE) +
-                    u" • " + card_type + u" " + obfuscated_number}}));
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 // The boolean param denotes if merchant has opted out of VCN.
 class AutofillCreditCardSuggestionContentVcnMerchantOptOutTest
@@ -4513,16 +4298,6 @@ TEST_P(
   EXPECT_THAT(virtual_card_name_field_suggestion,
               EqualLabels({{CreditCard::GetObfuscatedStringForCardDigits(
                   /*obfuscation_length=*/2, u"4444")}}));
-#elif BUILDFLAG(IS_IOS)
-  // iOS: In dropdown, there should be one line, with the value equal to
-  // obfuscated last four digits. And in AdjustVirtualCardSuggestionContent
-  // we would make minor text the value, and set main text as the virtual card
-  // label.
-  ASSERT_EQ(virtual_card_name_field_suggestion.labels.size(), 1U);
-  ASSERT_EQ(virtual_card_name_field_suggestion.labels[0].size(), 1U);
-  EXPECT_EQ(virtual_card_name_field_suggestion.labels[0][0].value,
-            CreditCard::GetObfuscatedStringForCardDigits(
-                /*obfuscation_length=*/2, u"4444"));
 #else
   // Desktop: There should be one line for network and last four, and one line
   // if merchant opt-out virtual card text.
@@ -4574,12 +4349,6 @@ TEST_P(
 #if BUILDFLAG(IS_ANDROID)
   // In Android, when filling card number, the labels are removed.
   ASSERT_TRUE(virtual_card_number_field_suggestion.labels.empty());
-#elif BUILDFLAG(IS_IOS)
-  // In iOS, when filling card number, only the expiration date will be shown.
-  ASSERT_EQ(virtual_card_number_field_suggestion.labels.size(), 1U);
-  EXPECT_EQ(virtual_card_number_field_suggestion.labels[0].size(), 1U);
-  EXPECT_NE(virtual_card_number_field_suggestion.labels[0][0].value,
-            l10n_util::GetStringUTF16(expected_message_id()));
 #else
   // Desktop, the label should be one-line message if it's merchant opt out.
   EXPECT_EQ(virtual_card_number_field_suggestion.labels.size(),
@@ -5171,12 +4940,7 @@ INSTANTIATE_TEST_SUITE_P(
     GetFilteredCardsToSuggestTest,
     testing::Combine(testing::Values(FieldType::CREDIT_CARD_VERIFICATION_CODE,
                                      FieldType::CREDIT_CARD_NUMBER),
-#if BUILDFLAG(IS_IOS)
-                     testing::Bool()
-#else
-                     testing::Values(false)
-#endif
-                         ));
+                     testing::Values(false)));
 
 // Verify that suggestions are filtered based on
 // `autofilled_last_four_digits_in_form_for_filtering` when flag is
@@ -5363,7 +5127,6 @@ class CvcStorageAndFillingStandaloneFormEnhancementTest
   void SetUp() override {
     CreditCardSuggestionGeneratorTest::SetUp();
     autofill_client().set_is_cvc_saving_supported(IsCvcSavingSupported());
-#if !BUILDFLAG(IS_IOS)
     if (IsCvcStorageStandaloneFormEnhancementEnabled()) {
       scoped_feature_list_.InitWithFeatures(
           /*enabled_features=*/
@@ -5378,7 +5141,6 @@ class CvcStorageAndFillingStandaloneFormEnhancementTest
           {features::
                kAutofillEnableCvcStorageAndFillingStandaloneFormEnhancement});
     }
-#endif
     // Create 2 local cards and 2 server cards.
     payments_data().ClearCreditCards();
     CreditCard local_card_1 =
@@ -5406,15 +5168,8 @@ class CvcStorageAndFillingStandaloneFormEnhancementTest
 
 INSTANTIATE_TEST_SUITE_P(CreditCardSuggestionGeneratorTest,
                          CvcStorageAndFillingStandaloneFormEnhancementTest,
-                         testing::Combine(
-#if BUILDFLAG(IS_IOS)
-                             testing::Values(true),
-                             testing::Bool()
-#else
-                             testing::Bool(),
-                             testing::Values(false)
-#endif
-                                 ));
+                         testing::Combine(testing::Bool(),
+                                          testing::Values(false)));
 
 // Tests that GetCreditCardSuggestions function correctly returns masked server
 // card suggestions when no VCN suggestions for a standalone cvc field.

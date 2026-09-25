@@ -1595,9 +1595,7 @@ TEST_F(PasswordAutofillManagerTest,
   // the "Use a *different* passkey" string since passkeys are being offered.
   EXPECT_EQ(
       open_args.suggestions[3].main_text.value,
-      l10n_util::GetStringUTF16(
-          BUILDFLAG(IS_IOS) ? IDS_PASSWORD_MANAGER_USE_DIFFERENT_PASSKEY
-                            : IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE));
+      l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE));
 #endif  // !BUILDFLAG(IS_ANDROID)
 
   EXPECT_CALL(*client.mock_driver(), CanShowAutofillUi)
@@ -1805,9 +1803,7 @@ TEST_F(PasswordAutofillManagerTest, ShowsWebAuthnSignInWithAnotherDevice) {
   // Check that the button shows the correct text.
   EXPECT_EQ(
       open_args.suggestions[2].main_text.value,
-      l10n_util::GetStringUTF16(
-          BUILDFLAG(IS_IOS) ? IDS_PASSWORD_MANAGER_USE_PASSKEY
-                            : IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE));
+      l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE));
 }
 
 TEST_F(PasswordAutofillManagerTest, DoesntShowWebAuthnSignInWithAnotherDevice) {
@@ -1967,9 +1963,7 @@ TEST_F(PasswordAutofillManagerTest, ShowsWebAuthnSignInWithoutPasswordData) {
   // Check that the button shows the correct text.
   EXPECT_EQ(
       open_args.suggestions[0].main_text.value,
-      l10n_util::GetStringUTF16(
-          BUILDFLAG(IS_IOS) ? IDS_PASSWORD_MANAGER_USE_PASSKEY
-                            : IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE));
+      l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE));
 }
 
 TEST_F(PasswordAutofillManagerTest, WebAuthnSignInLaunchesWebAuthnFlow) {

@@ -128,7 +128,7 @@ Matcher<Suggestion> EqualsIdentitySuggestion(
                Field("payload", &Suggestion::payload, payload));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 Matcher<Suggestion> EqualsManualFallbackSuggestion(
     SuggestionType id,
     const std::u16string& main_text,
@@ -149,7 +149,7 @@ Matcher<Suggestion> EqualsManualFallbackSuggestion(
       Field("custom_icon", &Suggestion::custom_icon, custom_icon),
       Field("payload", &Suggestion::payload, payload));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 Matcher<Suggestion> EqualsGeneratePasswordSuggestion() {
   return EqualsSuggestion(
@@ -486,7 +486,7 @@ TEST_F(PasswordSuggestionGeneratorTest, PasswordSuggestions_FromProfileStore) {
                           EqualsManagePasswordsSuggestion()));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Verify that the trailing icon is not set for the account store credential.
 TEST_F(PasswordSuggestionGeneratorTest, PasswordSuggestions_FromAccountStore) {
   PasswordFormFillData fill_data = password_form_fill_data();
@@ -506,7 +506,7 @@ TEST_F(PasswordSuggestionGeneratorTest, PasswordSuggestions_FromAccountStore) {
                           EqualsSuggestion(SuggestionType::kSeparator),
                           EqualsManagePasswordsSuggestion()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Verify the realm label for the credential saved on a different domain.
 TEST_F(PasswordSuggestionGeneratorTest,
@@ -856,7 +856,7 @@ TEST_F(PasswordSuggestionGeneratorTest, IdentitySuggestions_SingleAccount) {
 }
 
 // Manual fallback suggestions are only relevant for desktop platform.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 
 TEST_F(PasswordSuggestionGeneratorTest, ManualFallback_NoCredentials) {
   std::vector<Suggestion> suggestions = GenerateBothSections(
@@ -1551,7 +1551,7 @@ TEST_F(PasswordSuggestionGeneratorTest,
       suggestions[0].custom_icon));
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 TEST_F(PasswordSuggestionGeneratorTest,
@@ -1896,16 +1896,12 @@ TEST_F(PasswordSuggestionGeneratorTest,
   std::optional<Suggestion> suggestion =
       generator().GetWebauthnSignInWithAnotherDeviceSuggestion();
   ASSERT_TRUE(suggestion.has_value());
-  EXPECT_THAT(*suggestion,
-              EqualsSuggestion(
-                  SuggestionType::kWebauthnSignInWithAnotherDevice,
-#if BUILDFLAG(IS_IOS)
-                  l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_USE_PASSKEY),
-#else
-                  l10n_util::GetStringUTF16(
-                      IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE),
-#endif  // BUILDFLAG(IS_IOS)
-                  Suggestion::Icon::kDevice));
+  EXPECT_THAT(
+      *suggestion,
+      EqualsSuggestion(SuggestionType::kWebauthnSignInWithAnotherDevice,
+                       l10n_util::GetStringUTF16(
+                           IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE),
+                       Suggestion::Icon::kDevice));
 }
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
@@ -1962,11 +1958,7 @@ TEST_F(PasswordSuggestionGeneratorTest,
       generator().GetWebauthnSignInWithAnotherDeviceSuggestion();
   ASSERT_TRUE(suggestion.has_value());
   auto expected_message =
-#if BUILDFLAG(IS_IOS)
-      l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_USE_DIFFERENT_PASSKEY);
-#else
       l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE);
-#endif  // BUILDFLAG(IS_IOS)
   EXPECT_THAT(*suggestion,
               EqualsSuggestion(SuggestionType::kWebauthnSignInWithAnotherDevice,
                                expected_message, Suggestion::Icon::kDevice));
@@ -2023,13 +2015,10 @@ TEST_F(PasswordSuggestionGeneratorTest, WebAuthnSuggestionPosition) {
                                          u"username", password_label(8u),
                                          /*realm_label=*/u"", favicon()),
           EqualsSuggestion(SuggestionType::kSeparator),
-          EqualsSuggestion(
-              SuggestionType::kWebauthnSignInWithAnotherDevice,
-              l10n_util::GetStringUTF16(
-                  BUILDFLAG(IS_IOS)
-                      ? IDS_PASSWORD_MANAGER_USE_PASSKEY
-                      : IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE),
-              Suggestion::Icon::kDevice),
+          EqualsSuggestion(SuggestionType::kWebauthnSignInWithAnotherDevice,
+                           l10n_util::GetStringUTF16(
+                               IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE),
+                           Suggestion::Icon::kDevice),
           EqualsManagePasswordsSuggestion()));
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
@@ -2067,13 +2056,10 @@ TEST_F(PasswordSuggestionGeneratorTest,
           EqualsSuggestion(SuggestionType::kWebauthnPasskeyQrCode,
                            l10n_util::GetStringUTF16(
                                IDS_PASSWORD_MANAGER_PASSKEY_QR_CODE_TITLE)),
-          EqualsSuggestion(
-              SuggestionType::kWebauthnSignInWithAnotherDevice,
-              l10n_util::GetStringUTF16(
-                  BUILDFLAG(IS_IOS)
-                      ? IDS_PASSWORD_MANAGER_USE_PASSKEY
-                      : IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE),
-              Suggestion::Icon::kDevice),
+          EqualsSuggestion(SuggestionType::kWebauthnSignInWithAnotherDevice,
+                           l10n_util::GetStringUTF16(
+                               IDS_PASSWORD_MANAGER_USE_PASSKEY_OTHER_DEVICE),
+                           Suggestion::Icon::kDevice),
           EqualsManagePasswordsSuggestion()));
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)

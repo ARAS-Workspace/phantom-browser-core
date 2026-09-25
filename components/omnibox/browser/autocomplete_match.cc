@@ -60,7 +60,7 @@
 #include "url/third_party/mozilla/url_parse.h"
 #include "url/url_util.h"
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 #include "components/omnibox/browser/suggestion_answer.h"
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/vector_icons/vector_icons.h"     // nogncheck
@@ -68,8 +68,7 @@
 
 constexpr bool kIsAndroid = BUILDFLAG(IS_ANDROID);
 constexpr bool kIsDesktopAndroid = BUILDFLAG(IS_DESKTOP_ANDROID);
-constexpr bool kIsDesktop =
-    (!BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)) || kIsDesktopAndroid;
+constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) || kIsDesktopAndroid;
 
 namespace {
 
@@ -495,7 +494,7 @@ AutocompleteMatch& AutocompleteMatch::operator=(
   return *this;
 }
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 // static
 const gfx::VectorIcon& AutocompleteMatch::AnswerTypeToAnswerIcon(
     omnibox::AnswerType type) {
@@ -1418,11 +1417,6 @@ bool AutocompleteMatch::IsExplicitlyInvokedKeyword(
 std::u16string AutocompleteMatch::GetKeywordPlaceholder(
     const TemplateURL* template_url,
     bool is_history_embeddings_enabled) {
-#if BUILDFLAG(IS_IOS)
-  // `kOmniboxScoped` isn't defined on iOS and all history embedding subfeatures
-  // are disabled on iOS.
-  return std::u16string();
-#else
   if (!template_url) {
     return std::u16string();
   }
@@ -1458,7 +1452,6 @@ std::u16string AutocompleteMatch::GetKeywordPlaceholder(
       return std::u16string();
   }
   return l10n_util::GetStringUTF16(message_id);
-#endif
 }
 
 TemplateURL* AutocompleteMatch::GetTemplateURL(
@@ -1709,12 +1702,10 @@ int AutocompleteMatch::GetSortingOrder() const {
     }
   }
 
-#if !BUILDFLAG(IS_IOS)
   // Group history cluster suggestions with searches.
   if (type == AutocompleteMatchType::HISTORY_CLUSTER) {
     return 3;
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   switch (enterprise_search_aggregator_type) {
     case EnterpriseSearchAggregatorType::NONE:

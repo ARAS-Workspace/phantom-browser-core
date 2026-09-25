@@ -236,15 +236,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC) PartitionAddressSpace {
   PA_ALWAYS_INLINE static std::ptrdiff_t MetadataOffsetFromAddr(
       uintptr_t address);
 
-  // TODO(crbug.com/40238514): Confirm we can use kConfigurablePoolMaxSize/4
-  // for iOS and confirm iOS EarlyGrey tests pass when the external  metadata
-  // is enabled, since IIRC iOS limits virtual address space too.
-  static_assert(
-      !PA_BUILDFLAG(IS_IOS),
-      "kConfigurablePoolMaxSize is too large to run iOS EarlyGrey tests, "
-      "because the test process cannot use an extended virtual address space. "
-      "Temporarily disable ExternalMetadata feature on iOS");
-
 #if PA_BUILDFLAG(DCHECKS_ARE_ON)
   PA_ALWAYS_INLINE static bool IsInMetadataRegion(uintptr_t address);
 #endif  // PA_BUILDFLAG(DCHECKS_ARE_ON)

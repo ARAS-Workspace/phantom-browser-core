@@ -105,13 +105,11 @@
 #include "url/url_canon.h"
 #include "url/url_util.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "components/history_clusters/core/config.h"  // nogncheck
 #include "components/omnibox/browser/actions/history_clusters_action.h"
 #include "components/omnibox/browser/geolocation_header_service.h"
 #include "components/omnibox/browser/history_cluster_provider.h"
 #include "components/open_from_clipboard/clipboard_recent_content_generic.h"
-#endif
 
 #include "components/omnibox/browser/autocomplete_scoring_model_service.h"
 
@@ -122,8 +120,7 @@ using ProviderType = AutocompleteProvider::Type;
 using OEP = metrics::OmniboxEventProto;
 
 constexpr bool kIsDesktop =
-    !(BUILDFLAG(IS_IOS) ||
-      (BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)));
+    !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID));
 constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
 
 void RecordMlScoreCoverage(size_t matches_with_non_null_scores,
@@ -563,7 +560,6 @@ AutocompleteController::AutocompleteController(
   // `AutocompleteController`, so placing the check here instead has no behavior
   // change.
   // TODO(manukh): Move this to `InitializeAsyncProviders()`.
-#if !BUILDFLAG(IS_IOS)
   // HistoryClusters is not enabled on iOS.
   if (config_.provider_types &
           AutocompleteProvider::TYPE_HISTORY_CLUSTER_PROVIDER &&
@@ -574,7 +570,6 @@ AutocompleteController::AutocompleteController(
         provider_client_.get(), this, search_provider_, history_url_provider_,
         history_quick_provider_));
   }
-#endif
 
   // Create URL scoring signal annotators.
   if (OmniboxFieldTrial::IsPopulatingUrlScoringSignalsEnabled() &&
@@ -946,13 +941,11 @@ void AutocompleteController::ResetSession() {
 
 void AutocompleteController::MaybeProcessInlineLocationSuggestionMatch(
     const AutocompleteMatch& match) {
-#if !BUILDFLAG(IS_IOS)
   if (auto* geolocation_header_service =
           provider_client_->GetGeolocationHeaderService()) {
     geolocation_header_service->MaybeRecordInlineLocationSuggestionClicked(
         match);
   }
-#endif
 
   if (match.subtypes.contains(omnibox::SUBTYPE_LOCATION_SUGGEST_TRIGGER) &&
       match.extra_headers.contains(kXGeoHeader)) {
@@ -1002,19 +995,6 @@ void AutocompleteController::UpdateSearchTermsArgsWithAdditionalSearchboxStats(
   // the downstream consumers should migrate to using those fields before we
   // can stop logging this deprecated field.
   search_terms_args.searchbox_stats.set_experiment_stats(experiment_stats);
-
-#if BUILDFLAG(IS_IOS)
-  // Append the omnibox position when it's set to experiment_stats_v2.
-  if (steady_state_omnibox_position_ != OEP::UNKNOWN_POSITION) {
-    const auto omnibox_position_stat = GetOmniboxPositionExperimentStatsV2();
-    auto* reported_experiment_stats_v2 =
-        search_terms_args.searchbox_stats.add_experiment_stats_v2();
-    reported_experiment_stats_v2->set_type_int(
-        omnibox_position_stat.type_int());
-    reported_experiment_stats_v2->set_int_value(
-        omnibox_position_stat.int_value());
-  }
-#endif
 
   if (smart_compose_stats_.has_value()) {
     *search_terms_args.searchbox_stats.mutable_smart_compose_stats() =
@@ -1111,7 +1091,7 @@ bool AutocompleteController::ShouldRunProvider(
            provider->type() == AutocompleteProvider::TYPE_VERBATIM_MATCH;
   }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Should only be run for the composebox.
   if (provider->type() == AutocompleteProvider::TYPE_VERBATIM_MATCH) {
     return false;
@@ -1241,10 +1221,8 @@ bool AutocompleteController::ShouldRunProvider(
 
     case AutocompleteProvider::TYPE_OPEN_TAB:
       return config_.unscoped_open_tab_suggestions;
-#if !BUILDFLAG(IS_IOS)
     case AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS:
       return history_embeddings::GetFeatureParameters().omnibox_unscoped;
-#endif
     default:
       break;
   }
@@ -1316,12 +1294,10 @@ void AutocompleteController::InitializeAsyncProviders(int provider_types) {
     providers_.push_back(base::MakeRefCounted<CalculatorProvider>(
         provider_client_.get(), this, search_provider_));
   }
-#if !BUILDFLAG(IS_IOS)
   if (provider_types & AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS) {
     providers_.push_back(base::MakeRefCounted<HistoryEmbeddingsProvider>(
         provider_client_.get(), this));
   }
-#endif
   if (provider_types & AutocompleteProvider::TYPE_UNSCOPED_EXTENSION) {
     auto unscoped_extension_provider =
         base::MakeRefCounted<UnscopedExtensionProvider>(provider_client_.get(),
@@ -1378,7 +1354,6 @@ void AutocompleteController::InitializeSyncProviders(int provider_types) {
         provider_client_.get()));
   }
   if (provider_types & AutocompleteProvider::TYPE_CLIPBOARD) {
-#if !BUILDFLAG(IS_IOS)
     // On iOS, a global ClipboardRecentContent should've been created by now
     // (if enabled).  If none has been created (e.g., we're on a different
     // platform), use the generic implementation, which AutocompleteController
@@ -1389,7 +1364,6 @@ void AutocompleteController::InitializeSyncProviders(int provider_types) {
       ClipboardRecentContent::SetInstance(
           std::make_unique<ClipboardRecentContentGeneric>());
     }
-#endif
     // ClipboardRecentContent can be null in iOS tests.  For non-iOS, we
     // create a ClipboardRecentContent as above (for both Chrome and tests).
     if (ClipboardRecentContent::GetInstance()) {
@@ -1736,7 +1710,6 @@ void AutocompleteController::AttachActions() {
     return;
   }
 
-#if !BUILDFLAG(IS_IOS)
   if (omnibox_feature_configs::ContextualSearch::Get()
           .contextual_zero_suggest_lens_fulfillment &&
       input_.IsZeroSuggest()) {
@@ -1757,7 +1730,6 @@ void AutocompleteController::AttachActions() {
       return;
     }
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   // TabMatcher should run for ZPS for the Hub since open tab suggestions are
   // shown there.
@@ -1775,7 +1747,7 @@ void AutocompleteController::AttachActions() {
   }
 
   internal_result_.TrimOmniboxActions(input_.IsZeroSuggest());
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   internal_result_.SplitActionsToSuggestions();
 #endif
 
@@ -2314,13 +2286,6 @@ size_t AutocompleteController::InjectAdHocMatch(AutocompleteMatch match) {
   RequestNotifyChanged(false, false);
   return index;
 }
-
-#if BUILDFLAG(IS_IOS)
-void AutocompleteController::SetSteadyStateOmniboxPosition(
-    OEP::OmniboxPosition position) {
-  steady_state_omnibox_position_ = position;
-}
-#endif
 
 const omnibox::metrics::ChromeSearchboxStats::ExperimentStatsV2
 AutocompleteController::GetOmniboxPositionExperimentStatsV2() const {

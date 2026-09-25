@@ -17,7 +17,7 @@
 namespace omnibox {
 namespace {
 constexpr bool IS_ANDROID = !!BUILDFLAG(IS_ANDROID);
-constexpr bool IS_IOS = !!BUILDFLAG(IS_IOS);
+constexpr bool IS_IOS = false;
 
 constexpr base::FeatureState DISABLED = base::FEATURE_DISABLED_BY_DEFAULT;
 constexpr base::FeatureState ENABLED = base::FEATURE_ENABLED_BY_DEFAULT;

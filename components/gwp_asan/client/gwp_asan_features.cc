@@ -176,9 +176,6 @@ GWP_ASAN_EXPORT extern const base::FeatureParam<int>
                                              "GpuAllocationSamplingRange", 10};
 
 #endif
-// BUILDFLAG(IS_IOS) does not need process-specific parameters as it only has
-// one chrome-controlled process (the browser process).
-
 BASE_FEATURE(kExtremeLightweightUAFDetector, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<int> kExtremeLightweightUAFDetectorSamplingFrequency{
     &kExtremeLightweightUAFDetector, "sampling_frequency",

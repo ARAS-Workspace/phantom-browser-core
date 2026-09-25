@@ -120,7 +120,7 @@ std::vector<const CreditCard*> DeduplicateCreditCardsForSuggestions(
 }
 
 bool ShouldSplitCardNameAndLastFourDigits() {
-  return !BUILDFLAG(IS_IOS);
+  return true;
 }
 
 // Returns whether the `suggestion_canon` is a valid match given
@@ -284,7 +284,7 @@ void SetSuggestionLabelsForCard(
 
   // If the focused field is a card number field.
   if (trigger_field_type == CREDIT_CARD_NUMBER) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     suggestion.labels = {{Suggestion::Text(
         credit_card.GetInfo(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR, app_locale))}};
 #else
@@ -327,7 +327,7 @@ void SetSuggestionLabelsForCard(
               : credit_card.DescriptiveExpiration(app_locale))});
     }
     suggestion.labels = std::move(labels);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
     return;
   }
 
@@ -350,7 +350,7 @@ void SetSuggestionLabelsForCard(
   // If the focused field is not a card number field AND the card number is NOT
   // empty.
 
-  if constexpr (BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)) {
+  if constexpr (BUILDFLAG(IS_ANDROID)) {
     if (client.ShouldFormatForLargeKeyboardAccessory()) {
       suggestion.labels = {
           {Suggestion::Text(credit_card.CardNameAndLastFourDigits(
@@ -431,16 +431,7 @@ void AdjustVirtualCardSuggestionContent(Suggestion& suggestion,
       IDS_AUTOFILL_VIRTUAL_CARD_SUGGESTION_OPTION_VALUE);
   const std::u16string& virtual_card_disabled_label = l10n_util::GetStringUTF16(
       IDS_AUTOFILL_VIRTUAL_CARD_DISABLED_SUGGESTION_OPTION_VALUE);
-#if BUILDFLAG(IS_IOS)
-  suggestion.minor_texts = {};
-  suggestion.minor_texts.emplace_back(suggestion.main_text.value);
-  if (suggestion.IsAcceptable()) {
-    suggestion.main_text.value = virtual_card_label;
-  } else {
-    suggestion.main_text.value = virtual_card_disabled_label;
-  }
-
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // The keyboard accessory chips can only accommodate 2 strings which are
   // displayed on a single row. The minor_text and the labels are
   // concatenated, so we have: String 1 = main_text, String 2 = minor_text +
@@ -513,7 +504,7 @@ void AdjustVirtualCardSuggestionContent(Suggestion& suggestion,
     suggestion.labels.push_back(std::vector<Suggestion::Text>{
         Suggestion::Text(virtual_card_disabled_label)});
   }
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Returns display name based on `issuer_id` in a vector.
@@ -1007,7 +998,7 @@ Suggestion CreateManagePaymentMethodsEntry(SuggestionType suggestion_type,
   // On Android and Desktop, Google Pay branding is shown along with Settings.
   // So Google Pay Icon is just attached to an existing menu item.
   if (with_gpay_logo) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     suggestion.icon = Suggestion::Icon::kGooglePay;
 #else
     suggestion.icon = Suggestion::Icon::kSettings;
@@ -1026,9 +1017,6 @@ Suggestion CreateManageCreditCardsSuggestion(bool with_gpay_logo) {
 
 Suggestion CreateSaveAndFillSuggestion(const AutofillClient& client,
                                        bool& display_gpay_logo) {
-#if BUILDFLAG(IS_IOS)
-  Suggestion save_and_fill(SuggestionType::kSaveAndFillCreditCardEntry);
-#else
   Suggestion save_and_fill(
       l10n_util::GetStringUTF16(IDS_AUTOFILL_SAVE_AND_FILL_SUGGESTION_TITLE),
       SuggestionType::kSaveAndFillCreditCardEntry);
@@ -1041,7 +1029,6 @@ Suggestion CreateSaveAndFillSuggestion(const AutofillClient& client,
         IDS_AUTOFILL_LOCAL_SAVE_AND_FILL_SUGGESTION_DESCRIPTION))}};
   }
   save_and_fill.icon = Suggestion::Icon::kSaveAndFill;
-#endif  // !BUILDFLAG(IS_IOS)
   return save_and_fill;
 }
 
@@ -1269,7 +1256,7 @@ std::vector<CreditCard> GetOrderedCardsToSuggest(
 }
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return true;
@@ -1277,7 +1264,7 @@ bool ShouldUseNewFopDisplay() {
 }
 
 int GetCreditCardObfuscationLength() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // On Android and iOS, the obfuscation length is 2.
   return 2;
 #else

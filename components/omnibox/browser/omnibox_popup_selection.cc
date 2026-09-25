@@ -14,7 +14,7 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/search_engines/template_url_service.h"
 
-constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS);
+constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID);
 
 constexpr size_t OmniboxPopupSelection::kNoMatch = static_cast<size_t>(-1);
 
@@ -173,7 +173,7 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
     case kStateOrLine:
       all_states.push_back(NORMAL);
       all_states.push_back(KEYWORD_MODE);
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
       all_states.push_back(FOCUSED_BUTTON_ACTION);
 #endif
       all_states.push_back(FOCUSED_BUTTON_THUMBS_UP);

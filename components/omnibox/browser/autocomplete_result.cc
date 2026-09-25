@@ -79,7 +79,7 @@ namespace {
 constexpr bool is_android_any = !!BUILDFLAG(IS_ANDROID);
 constexpr bool is_android_desktop = !!BUILDFLAG(IS_DESKTOP_ANDROID);
 constexpr bool is_android_mobile = is_android_any && !is_android_desktop;
-constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
+constexpr bool is_ios = false;
 constexpr bool is_desktop = !(is_android_mobile || is_ios);
 
 // Rotates |it| to be in the front of |matches|.
@@ -136,7 +136,7 @@ size_t AutocompleteResult::GetMaxMatches(
       is_android_mobile ? 10 : (is_ios ? 10 : 8);
   constexpr size_t kDefaultMaxZeroSuggestMatches =
       is_android_mobile ? 15 : (is_ios ? 20 : 8);
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   constexpr size_t kMaxFeaturedKeywordAutocompleteMatches = 9;
 #endif
 
@@ -150,7 +150,7 @@ size_t AutocompleteResult::GetMaxMatches(
       kDefaultMaxZeroSuggestMatches > 0 &&
           kDefaultMaxZeroSuggestMatches < kMaxAutocompletePositionValue,
       "Bad kDefaultMaxZeroSuggestMatches.");
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   static_assert(kMaxFeaturedKeywordAutocompleteMatches > 0 &&
                     kMaxFeaturedKeywordAutocompleteMatches <
                         kMaxAutocompletePositionValue,
@@ -158,7 +158,7 @@ size_t AutocompleteResult::GetMaxMatches(
 #endif
 
 // When the user types '@', show 9, instead of the usual 8, matches on desktop.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (featured_keyword_mode == AutocompleteInput::FeaturedKeywordMode::kExact)
     return kMaxFeaturedKeywordAutocompleteMatches;
 #endif

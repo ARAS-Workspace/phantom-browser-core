@@ -64,7 +64,7 @@ using OIT = metrics::OmniboxInputType;
 namespace {
 
 using ResultType = ZeroSuggestProvider::ResultType;
-constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
+constexpr bool is_ios = false;
 
 // Represents whether ZeroSuggestProvider is allowed to display zero-prefix
 // suggestions, and if not, why not.
