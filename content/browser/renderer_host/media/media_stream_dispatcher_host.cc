@@ -653,7 +653,7 @@ void MediaStreamDispatcherHost::KeepDeviceAliveForTransfer(
       render_frame_host_id_, requester_id_, session_id, transfer_id));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void MediaStreamDispatcherHost::FocusCapturedSurface(const std::string& label,
                                                      bool focus) {
   CHECK_CURRENTLY_ON(BrowserThread::IO, base::NotFatalUntil::M152);
@@ -715,7 +715,7 @@ void MediaStreamDispatcherHost::RequestCapturedSurfaceControlPermission(
   media_stream_manager_->RequestCapturedSurfaceControlPermission(
       render_frame_host_id_, session_id, std::move(callback));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_SCREEN_CAPTURE)
 void MediaStreamDispatcherHost::ApplySubCaptureTarget(

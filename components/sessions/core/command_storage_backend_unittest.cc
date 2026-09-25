@@ -1376,13 +1376,10 @@ std::string TestParamNameGenerator(
 INSTANTIATE_TEST_SUITE_P(All,
                          CommandStorageBackendParamTest,
                          ::testing::Values(
-// On iOS, SessionRestore and AppRestore do not use CommandStorageBackend.
-#if !BUILDFLAG(IS_IOS)
                              TestParams(SessionType::kAppRestore, false),
                              TestParams(SessionType::kAppRestore, true),
                              TestParams(SessionType::kSessionRestore, false),
                              TestParams(SessionType::kSessionRestore, true),
-#endif  // !BUILDFLAG(IS_IOS)
                              TestParams(SessionType::kTabRestore, false),
                              TestParams(SessionType::kTabRestore, true)),
                          TestParamNameGenerator);

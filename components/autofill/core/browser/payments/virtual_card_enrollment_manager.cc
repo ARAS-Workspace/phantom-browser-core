@@ -571,7 +571,7 @@ void VirtualCardEnrollmentManager::SetInitialVirtualCardEnrollFields(
     const CreditCard& credit_card,
     VirtualCardEnrollmentSource virtual_card_enrollment_source) {
   DCHECK_NE(virtual_card_enrollment_source, VirtualCardEnrollmentSource::kNone);
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Hide the bubble and icon if it is already showing for a previous enrollment
   // bubble.
   DCHECK(autofill_client_);

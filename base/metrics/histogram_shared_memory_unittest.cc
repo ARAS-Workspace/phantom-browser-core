@@ -24,12 +24,10 @@ namespace {
 
 constexpr size_t kArbitrarySize = 64 << 10;
 
-#if !BUILDFLAG(IS_IOS)
 constexpr shared_memory::SharedMemorySwitch::RendezvousKey
     kArbitraryRendezvousKey = 'smsh';
 constexpr shared_memory::SharedMemorySwitch::DescriptorKey
     kArbitraryDescriptorKey = 42;
-#endif
 
 }  // namespace
 
@@ -113,7 +111,6 @@ MULTIPROCESS_TEST_MAIN(InitFromLaunchParameters) {
   return 0;
 }
 
-#if !BUILDFLAG(IS_IOS)
 using HistogramSharedMemoryTest = ::testing::TestWithParam<bool>;
 
 INSTANTIATE_TEST_SUITE_P(All,
@@ -179,6 +176,5 @@ TEST_P(HistogramSharedMemoryTest, PassSharedMemoryRegion_Enabled) {
       process, TestTimeouts::action_timeout(), &exit_code));
   EXPECT_EQ(0, exit_code);
 }
-#endif
 
 }  // namespace base

@@ -243,7 +243,7 @@ SyncService::TransportState TestSyncService::GetTransportState() const {
 
 SyncService::UserActionableError TestSyncService::GetUserActionableError()
     const {
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   if (HasSyncConsent()) {
     if (!user_settings_.IsInitialSyncFeatureSetupComplete()) {
       return UserActionableError::kNeedsSettingsConfirmation;
@@ -256,7 +256,7 @@ SyncService::UserActionableError TestSyncService::GetUserActionableError()
       return UserActionableError::kUnrecoverableError;
     }
   }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (GetAuthError().state() != GoogleServiceAuthError::NONE) {
     return UserActionableError::kSignInNeedsUpdate;

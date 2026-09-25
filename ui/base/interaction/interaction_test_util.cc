@@ -75,8 +75,6 @@ ActionResult InteractionTestUtil::Simulator::FocusElement(
   return ActionResult::kNotAttempted;
 }
 
-#if !BUILDFLAG(IS_IOS)
-
 ActionResult InteractionTestUtil::Simulator::SendAccelerator(
     TrackedElement* element,
     Accelerator accelerator) {
@@ -89,8 +87,6 @@ ActionResult InteractionTestUtil::Simulator::SendKeyPress(
     int flags) {
   return ActionResult::kNotAttempted;
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 ActionResult InteractionTestUtil::Simulator::Confirm(TrackedElement* element) {
   return ActionResult::kNotAttempted;
@@ -145,8 +141,6 @@ ActionResult InteractionTestUtil::FocusElement(TrackedElement* element) {
   return Simulate(simulators_, &Simulator::FocusElement, element);
 }
 
-#if !BUILDFLAG(IS_IOS)
-
 ActionResult InteractionTestUtil::SendAccelerator(TrackedElement* element,
                                                   Accelerator accelerator) {
   return Simulate(simulators_, &Simulator::SendAccelerator, element,
@@ -158,8 +152,6 @@ ActionResult InteractionTestUtil::SendKeyPress(TrackedElement* element,
                                                int flags) {
   return Simulate(simulators_, &Simulator::SendKeyPress, element, key, flags);
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 ActionResult InteractionTestUtil::Confirm(TrackedElement* element) {
   return Simulate(simulators_, &Simulator::Confirm, element);

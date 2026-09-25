@@ -55,28 +55,12 @@ class DateTimeFormatterTest : public testing::Test {
 
       for (const auto& expectation : entry.expectations) {
         std::string locale_str(expectation.locale);
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
         // iOS and some Android ICU data is missing some calendar-specific names
         // for Persian and Japanese calendars, leading to incorrect formatting
         // or empty era names.
         if (locale_str.find("fa") != std::string::npos ||
             locale_str.find("japanese") != std::string::npos) {
-          continue;
-        }
-#endif
-#if BUILDFLAG(IS_IOS)
-        // iOS ICU data is missing some locale-specific formatting for these
-        // locales.
-        static constexpr std::string_view kIosSkipLocales[] = {
-            "af", "bn", "et", "gu", "kn", "ml", "mr", "ms", "ta", "te", "ur"};
-        bool skip = false;
-        for (const auto& skip_locale : kIosSkipLocales) {
-          if (locale_str == skip_locale) {
-            skip = true;
-            break;
-          }
-        }
-        if (skip) {
           continue;
         }
 #endif

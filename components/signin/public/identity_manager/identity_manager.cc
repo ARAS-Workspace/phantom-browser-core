@@ -128,16 +128,6 @@ void IdentityManager::Shutdown() {
   account_tracker_service_.reset();
 }
 
-#if BUILDFLAG(IS_IOS)
-base::ScopedClosureRunner IdentityManager::StartBatchOfPrimaryAccountChanges() {
-  CHECK(!batch_of_primary_account_changes_in_progress_,
-        base::NotFatalUntil::M140);
-  batch_of_primary_account_changes_in_progress_ = true;
-  return base::ScopedClosureRunner(base::BindOnce(
-      &IdentityManager::BatchOfPrimaryAccountChangesDone, GetWeakPtr()));
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 void IdentityManager::AddObserver(Observer* observer) {
   observer_list_.AddObserver(observer);
 }
@@ -256,13 +246,6 @@ bool IdentityManager::HasAccountWithRefreshToken(
     const CoreAccountId& account_id) const {
   return token_service_->RefreshTokenIsAvailable(account_id);
 }
-
-#if BUILDFLAG(IS_IOS)
-bool IdentityManager::HasAccountWithRefreshTokenOnDevice(
-    const CoreAccountId& account_id) const {
-  return token_service_->RefreshTokenIsAvailableOnDevice(account_id);
-}
-#endif
 
 bool IdentityManager::AreRefreshTokensLoaded() const {
   return token_service_->AreAllCredentialsLoaded();
@@ -430,12 +413,6 @@ AccountsCookieMutator* IdentityManager::GetAccountsCookieMutator() {
 DeviceAccountsSynchronizer* IdentityManager::GetDeviceAccountsSynchronizer() {
   return identity_mutator_->GetDeviceAccountsSynchronizer();
 }
-
-#if BUILDFLAG(IS_IOS)
-std::vector<AccountInfo> IdentityManager::GetAccountsOnDevice() const {
-  return token_service_->GetAccountsOnDevice();
-}
-#endif
 
 void IdentityManager::SetCapabilityOverride(const CoreAccountId& account_id,
                                             std::string_view capability_name,
@@ -641,11 +618,6 @@ void IdentityManager::OnPrimaryAccountChanged(
     }
   }
 #endif
-#if BUILDFLAG(IS_IOS)
-  if (!batch_of_primary_account_changes_in_progress_) {
-    FireOnEndBatchOfPrimaryAccountChanges();
-  }
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 void IdentityManager::OnRefreshTokenAvailable(const CoreAccountId& account_id) {
@@ -709,21 +681,6 @@ void IdentityManager::OnAuthErrorChanged(
         account_info, auth_error, token_operation_source);
   }
 }
-
-#if BUILDFLAG(IS_IOS)
-void IdentityManager::OnAccountsOnDeviceChanged() {
-  for (auto& observer : observer_list_) {
-    observer.OnAccountsOnDeviceChanged();
-  }
-}
-
-void IdentityManager::OnAccountOnDeviceUpdated(
-    const AccountInfo& account_info) {
-  for (auto& observer : observer_list_) {
-    observer.OnExtendedAccountInfoUpdated(account_info);
-  }
-}
-#endif
 
 void IdentityManager::OnGaiaAccountsInCookieUpdated(
     const AccountsInCookieJarInfo& accounts_in_cookie_jar_info,
@@ -827,26 +784,6 @@ void IdentityManager::OnAccountRemoved(const AccountInfo& info) {
   }
 }
 
-#if BUILDFLAG(IS_IOS)
-bool IdentityManager::IsBatchOfPrimaryAccountChangesInProgress() {
-  return batch_of_primary_account_changes_in_progress_;
-}
-
-void IdentityManager::BatchOfPrimaryAccountChangesDone() {
-  CHECK(batch_of_primary_account_changes_in_progress_,
-        base::NotFatalUntil::M140);
-  batch_of_primary_account_changes_in_progress_ = false;
-  FireOnEndBatchOfPrimaryAccountChanges();
-}
-
-void IdentityManager::FireOnEndBatchOfPrimaryAccountChanges() {
-  CHECK(!batch_of_primary_account_changes_in_progress_,
-        base::NotFatalUntil::M140);
-  for (auto& observer : observer_list_) {
-    observer.OnEndBatchOfPrimaryAccountChanges();
-  }
-}
-#endif  // BUILDFLAG(IS_IOS)
 }  // namespace signin
 
 #if BUILDFLAG(IS_ANDROID)

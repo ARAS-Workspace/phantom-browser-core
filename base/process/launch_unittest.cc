@@ -18,7 +18,6 @@ TEST(LaunchTest, GetAppOutputWithInvalidExecutableShouldFail) {
   std::string output;
   ASSERT_FALSE(GetAppOutput(cl, &output));
 
-#if !BUILDFLAG(IS_IOS)
   // iOS does not support `GetAppOutputWithExitCode`.
   int exit_code = {};
   const bool succeeded = GetAppOutputWithExitCode(cl, &output, &exit_code);
@@ -30,7 +29,6 @@ TEST(LaunchTest, GetAppOutputWithInvalidExecutableShouldFail) {
   ASSERT_TRUE(succeeded);
   ASSERT_EQ(exit_code, 127);
 #endif  // BUILDFLAG(IS_MAC)
-#endif  // #if !BUILDFLAG(IS_IOS)
 }
 
 }  // namespace base

@@ -12,20 +12,10 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/image/image_skia_rep.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "ui/base/resource/resource_scale_factor.h"
-#endif  // BUILDFLAG(IS_IOS)
-
 namespace gfx {
 namespace {
 
 TEST(ImageSkiaOperationsTest, ResizeFailure) {
-#if BUILDFLAG(IS_IOS)
-  // Ensure we have supported scale factors. iOS may not support k100Percent
-  // like other platforms, so we force support for 100 and 200 percent here.
-  ui::test::ScopedSetSupportedResourceScaleFactors scoped_supported(
-      {ui::k100Percent, ui::k200Percent});
-#endif  // BUILDFLAG(IS_IOS)
 
   ImageSkia image(ImageSkiaRep(gfx::Size(10, 10), 1.f));
 

@@ -9,11 +9,11 @@
 
 namespace variations {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void RecordFirstRunSeedImportResult(FirstRunSeedImportResult result) {
   base::UmaHistogramEnumeration("Variations.FirstRunResult", result);
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void RecordLoadSeedResult(LoadSeedResult state) {
   base::UmaHistogramEnumeration("Variations.SeedLoadResult", state);

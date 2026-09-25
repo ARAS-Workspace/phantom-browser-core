@@ -41,11 +41,6 @@
 #include "content/browser/android/launcher_thread.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "base/apple/mach_port_rendezvous_ios.h"
-#include "base/files/scoped_temp_dir.h"
-#endif
-
 namespace content {
 namespace internal {
 
@@ -244,10 +239,6 @@ ChildProcessLauncherHelper::ChildProcessLauncherHelper(
 }
 
 ChildProcessLauncherHelper::~ChildProcessLauncherHelper() {
-#if BUILDFLAG(IS_IOS)
-  GetProcessLauncherTaskRunner()->DeleteSoon(FROM_HERE,
-                                             std::move(scoped_temp_dir_));
-#endif
 }
 
 void ChildProcessLauncherHelper::StartLaunchOnClientThread() {

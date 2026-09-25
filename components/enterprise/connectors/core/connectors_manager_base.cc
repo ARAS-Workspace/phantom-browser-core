@@ -237,7 +237,7 @@ void ConnectorsManagerBase::OnAnalysisPrefChanged(AnalysisConnector connector) {
 void ConnectorsManagerBase::StartObservingPrefs(PrefService* pref_service) {
   pref_change_registrar_.Init(pref_service);
   StartObservingAnalysisPref(AnalysisConnector::FILE_DOWNLOADED);
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   StartObservingAnalysisPref(AnalysisConnector::FILE_ATTACHED);
   StartObservingAnalysisPref(AnalysisConnector::BULK_DATA_ENTRY);
   StartObservingAnalysisPref(AnalysisConnector::PRINT);

@@ -5405,8 +5405,6 @@ TEST_F(HostResolverManagerDnsTest, FallbackBySource_Dns) {
   EXPECT_THAT(response1.result_error(), IsError(ERR_NAME_NOT_RESOLVED));
 }
 
-// Built-in client and config overrides not available on iOS.
-#if !BUILDFLAG(IS_IOS)
 TEST_F(HostResolverManagerDnsTest,
        ResolutionForTargetNetworkFailsOnInsecureDnsAndFallbackToSystem) {
   set_allow_fallback_to_systemtask(true);
@@ -5513,7 +5511,6 @@ TEST_F(HostResolverManagerDnsTest,
       GetIntegerValueFromParams(dns_task_events[1], "failure_result.error");
   EXPECT_THAT(error_code, IsError(ERR_INVALID_ARGUMENT));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Fallback to proc on DnsClient change allowed with ANY source.
 TEST_F(HostResolverManagerDnsTest, FallbackOnAbortBySource_Any) {
@@ -8990,8 +8987,6 @@ class TestDnsObserver : public NetworkChangeNotifier::DNSObserver {
   int dns_changed_calls_ = 0;
 };
 
-// Built-in client and config overrides not available on iOS.
-#if !BUILDFLAG(IS_IOS)
 TEST_F(HostResolverManagerDnsTest, SetDnsConfigOverrides) {
   test::ScopedMockNetworkChangeNotifier mock_network_change_notifier;
   TestDnsObserver config_observer;
@@ -9491,8 +9486,6 @@ TEST_F(HostResolverManagerDnsTest, DohMappingWithStrictDot) {
       *DnsOverHttpsConfig::FromString("https://dns.google/dns-query{?dns}");
   EXPECT_EQ(expected_doh_config, fetched_config.doh_config);
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(HostResolverManagerDnsTest, FlushCacheOnDnsConfigOverridesChange) {
   ChangeDnsConfig(CreateValidDnsConfig());

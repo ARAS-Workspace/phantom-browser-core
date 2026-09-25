@@ -11,7 +11,7 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/gfx/vector_icon_types.h"
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/color_palette.h"
 #endif
 
@@ -34,7 +34,7 @@ const gfx::VectorIcon& InfoBarDelegate::GetVectorIcon() const {
 }
 
 ui::ImageModel InfoBarDelegate::GetIcon() const {
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   const gfx::VectorIcon& vector_icon = GetVectorIcon();
   if (!vector_icon.is_empty()) {
     return ui::ImageModel::FromVectorIcon(vector_icon, ui::kColorInfoBarIcon,
@@ -110,13 +110,6 @@ ThemeInstalledInfoBarDelegate*
 InfoBarDelegate::AsThemePreviewInfobarDelegate() {
   return nullptr;
 }
-
-#if BUILDFLAG(IS_IOS)
-translate::TranslateInfoBarDelegate*
-InfoBarDelegate::AsTranslateInfoBarDelegate() {
-  return nullptr;
-}
-#endif
 
 InfoBarDelegate::InfoBarDelegate() = default;
 

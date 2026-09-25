@@ -26,35 +26,12 @@
 #include "base/android/jni_android.h"
 #endif
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-#include "gpu/ipc/common/ios/be_layer_hierarchy_transport.h"
-#endif
-
 namespace content {
 namespace {
 
 BASE_FEATURE(kInProcessGpuUseIOThread, base::FEATURE_DISABLED_BY_DEFAULT);
 
 }  // namespace
-
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-class InProcessGpuThread::BELayerHierarchyTransportImpl
-    : public gpu::BELayerHierarchyTransport {
- public:
-  BELayerHierarchyTransportImpl() {
-    gpu::BELayerHierarchyTransport::SetInstance(this);
-  }
-  ~BELayerHierarchyTransportImpl() override {
-    gpu::BELayerHierarchyTransport::SetInstance(nullptr);
-  }
-
-  void ForwardBELayerHierarchyToBrowser(
-      gpu::SurfaceHandle surface_handle,
-      xpc_object_t ipc_representation) override {
-    // Nothing to do.
-  }
-};
-#endif
 
 InProcessGpuThread::InProcessGpuThread(
     const InProcessChildThreadParams& params,
@@ -85,11 +62,6 @@ void InProcessGpuThread::Init() {
   base::android::AttachCurrentThreadWithName(thread_name());
   // Up the priority of the |io_thread_| on Android.
   io_thread_type = base::ThreadType::kPresentation;
-#endif
-
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-  be_layer_transport_ =
-      std::make_unique<InProcessGpuThread::BELayerHierarchyTransportImpl>();
 #endif
 
   if (base::FeatureList::IsEnabled(kInProcessGpuUseIOThread)) {

@@ -125,7 +125,7 @@ TEST(ContentSettingsUtilsTest, IsMorePermissive) {
   }
 }
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST(ContentSettingsUtilsTest, CanBeAutoRevokedAsUnusedPermission) {
   ContentSettingsRegistry::GetInstance();
   EXPECT_TRUE(
@@ -179,7 +179,7 @@ TEST(ContentSettingsUtilsTest, CanBeAutoRevokedAsUnusedPermission) {
       ContentSettingsType::USB_CHOOSER_DATA,
       PermissionSetting(CONTENT_SETTING_ALLOW)));
 }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 class ContentSettingsUtilsFlagTest : public testing::TestWithParam<bool> {
  public:

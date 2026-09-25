@@ -263,10 +263,6 @@ TEST_F(SharedMemoryMappingTest, TooBigAtomic) {
   EXPECT_EQ(nullptr, read_mapping_.GetMemoryAs<std::atomic<uint32_t>>());
 }
 
-// TODO(dcheng): This test is temporarily disabled on iOS. iOS devices allow
-// the creation of a 1GB shared memory region, but don't allow the region to be
-// mapped.
-#if !BUILDFLAG(IS_IOS)
 // TODO(crbug.com/40846204) Fix flakiness and re-enable on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_TotalMappedSizeLimit DISABLED_TotalMappedSizeLimit
@@ -291,6 +287,5 @@ TEST_F(SharedMemoryMappingTest, MAYBE_TotalMappedSizeLimit) {
   }
 #endif  // defined(ARCH_CPU_64_BITS)
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace base

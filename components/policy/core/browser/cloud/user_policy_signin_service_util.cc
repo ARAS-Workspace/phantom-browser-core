@@ -35,7 +35,7 @@ bool CanApplyPoliciesForSignedInUser(
           : identity_manager->HasPrimaryAccount(consent_level));
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 
 base::Time GetLastPolicyCheckTimeFromPrefs(PrefService* prefs) {
   return base::Time::FromInternalValue(

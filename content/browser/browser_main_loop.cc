@@ -801,8 +801,7 @@ int BrowserMainLoop::PreCreateThreads() {
   // while avoiding doing so in unit tests by making it explicitly enabled here.
   GpuDataManagerImpl::GetInstance()->StartUmaTimer();
 
-#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(IS_ANDROID)
   // Single-process is an unsupported and not fully tested mode, so
   // don't enable it for official Chrome builds (except on Android and iOS).
   if (parsed_command_line_->HasSwitch(switches::kSingleProcess))
@@ -889,11 +888,11 @@ void BrowserMainLoop::CreateStartupTasks() {
       &BrowserMainLoop::PreMainMessageLoopRun, base::Unretained(this));
   startup_task_runner_->AddTask(std::move(pre_main_message_loop_run));
 
-// On Android and iOS, the native message loop is already running when the app
-// is entered and startup tasks are run asynchronously from it.
+// On Android, the native message loop is already running when the app is
+// entered and startup tasks are run asynchronously from it.
 // InterceptMainMessageLoopRun() thus needs to be forced instead of happening
 // from MainMessageLoopRun().
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   StartupTask intercept_main_message_loop_run = base::BindOnce(
       [](BrowserMainLoop* self) {
         // Lambda to ignore the return value and always keep a clean exit code
@@ -1528,16 +1527,12 @@ bool BrowserMainLoop::InitializeToolkit() {
 }
 
 void BrowserMainLoop::InitializeMojo() {
-// iOS browser process does sync calls using mojo (mainly for in process
-// unzipper, so do not enable these checks right now).
-#if !BUILDFLAG(IS_IOS)
   if (!parsed_command_line_->HasSwitch(switches::kSingleProcess)) {
     // Disallow mojo sync calls in the browser process. Note that we allow sync
     // calls in single-process mode since renderer IPCs are made from a browser
     // thread.
     mojo::SyncCallRestrictions::DisallowSyncCall();
   }
-#endif
 
   // Start startup tracing through TracingController's interface. TraceLog has
   // been enabled in content_main_runner where threads are not available. Now We

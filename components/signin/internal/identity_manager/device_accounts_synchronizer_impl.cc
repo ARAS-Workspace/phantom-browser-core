@@ -36,11 +36,4 @@ void DeviceAccountsSynchronizerImpl::
 }
 #endif
 
-#if BUILDFLAG(IS_IOS)
-void DeviceAccountsSynchronizerImpl::ReloadAccountFromSystem(
-    const CoreAccountId& account_id) {
-  token_service_delegate_->ReloadAccountFromSystem(account_id);
-}
-#endif
-
 }  // namespace signin

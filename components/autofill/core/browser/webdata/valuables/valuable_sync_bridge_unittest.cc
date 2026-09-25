@@ -45,7 +45,6 @@ using testing::Return;
 using testing::ReturnRef;
 using testing::UnorderedElementsAre;
 
-#if !BUILDFLAG(IS_IOS)
 constexpr char kId1[] = "1";
 constexpr char kId2[] = "2";
 constexpr char kInvalidId[] = "";
@@ -60,7 +59,6 @@ std::vector<LoyaltyCard> ExtractLoyaltyCardsFromDataBatch(
   }
   return loyalty_cards;
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 std::unique_ptr<syncer::EntityData> CreateEntityDataFromSpecifics(
     sync_pb::AutofillValuableSpecifics specifics) {
@@ -121,7 +119,6 @@ class ValuableSyncBridgeTest : public testing::Test {
         mock_processor_.CreateForwardingProcessor(), &backend_);
   }
 
-#if !BUILDFLAG(IS_IOS)
   // Tells the processor to starts syncing with pre-existing `loyalty_cards`.
   // Triggers the `bridge()`'s `MergeFullSyncData()`.
   // Returns true if syncing started successfully.
@@ -149,7 +146,6 @@ class ValuableSyncBridgeTest : public testing::Test {
     return std::move(*CreateEntityDataFromLoyaltyCard(card,
                                                       /*base_specifics=*/{}));
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   // Tells the processor to starts syncing with pre-existing `entities`.
   // Triggers the `bridge()`'s `MergeFullSyncData()`.
@@ -250,7 +246,6 @@ TEST_F(ValuableSyncBridgeTest, IsEntityDataValid_ImportConstraints) {
   }
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(ValuableSyncBridgeTest, IsEntityDataValid_NonEmptyId) {
   // Valid case.
   std::unique_ptr<syncer::EntityData> entity =
@@ -488,8 +483,6 @@ TEST_F(ValuableSyncBridgeTest,
   // Metadata should be the preserved local metadata.
   EXPECT_EQ(cards_in_db[0].metadata(), local_metadata);
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(ValuableSyncBridgeTest, GetStorageKey) {
   EntityInstance vehicle = GetServerVehicleEntityInstance(
@@ -805,7 +798,6 @@ class ValuableSyncBridgeIncrementalUpdatesTest : public ValuableSyncBridgeTest {
   }
 };
 
-#if !BUILDFLAG(IS_IOS)
 // Tests that loyalty card changes passed to `ApplyIncrementalSyncChanges()`
 // are applied.
 TEST_F(ValuableSyncBridgeIncrementalUpdatesTest,
@@ -924,7 +916,6 @@ TEST_F(
   EXPECT_FALSE(bridge().ApplyIncrementalSyncChanges(
       bridge().CreateMetadataChangeList(), std::move(entity_change_list)));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Tests that entity instance changes passed to `ApplyIncrementalSyncChanges()`
 // are applied.

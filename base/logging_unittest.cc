@@ -299,7 +299,7 @@ TEST_F(LoggingTest, AlwaysLogErrorsToStderr) {
 #endif  // BUILDFLAG(IS_POSIX)
 
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && \
+#if BUILDFLAG(IS_POSIX) && \
     (defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY))
 
 int g_child_crash_pipe;

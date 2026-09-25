@@ -1522,20 +1522,6 @@ bool IOSurfaceImageBacking::IsPurgeable() const {
 
 void IOSurfaceImageBacking::Update(std::unique_ptr<gfx::GpuFence> in_fence) {
   AutoLock auto_lock(this);
-#if BUILDFLAG(IS_IOS)
-  {
-    // On iOS, we can't use IOKit to access IOSurfaces in the renderer process,
-    // so we share the memory segment backing the IOSurface as shared memory
-    // which is then mapped in the renderer process. We need to signal that the
-    // IOSurface was updated on the CPU so we do an IOSurfaceLock+Unlock here in
-    // case there are other consumers of the IOSurface that rely on its internal
-    // seed value to detect updates - the lock+unlock updates the seed value.
-    // TODO(crbug.com/40254930): Assert that we have CPU_WRITE_ONLY usage so
-    // that we never have the client's CPU-written data overwritten due to a
-    // shadow copy from the GPU - we can also use kIOSurfaceLockAvoidSync then.
-    ScopedIOSurfaceLock io_surface_lock(io_surface_.get(), /*options=*/0);
-  }
-#endif
   for (auto iter : egl_state_map_) {
     iter.second->set_bind_pending();
   }

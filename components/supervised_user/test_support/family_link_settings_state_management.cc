@@ -286,7 +286,6 @@ FamilyLinkSettingsState FamilyLinkSettingsState::SetAdvancedSettingsDefault() {
       {extensions_toggle, permissions_toggle, cookies_toggle});
 }
 
-#if !BUILDFLAG(IS_IOS)
 void FamilyLinkSettingsState::Seed(
     signin::IdentityManager& caller_identity_manager,
     scoped_refptr<network::SharedURLLoaderFactory> caller_url_loader_factory,
@@ -307,29 +306,6 @@ void FamilyLinkSettingsState::Seed(
       version_info::Channel::UNKNOWN);
   run_loop.Run();
 }
-#endif
-
-#if BUILDFLAG(IS_IOS)
-void FamilyLinkSettingsState::StartSeeding(
-    signin::IdentityManager& caller_identity_manager,
-    scoped_refptr<network::SharedURLLoaderFactory> caller_url_loader_factory,
-    std::string_view subject_account_id) {
-  // Do not override the current fetch.
-  CHECK(fetcher_ == nullptr);
-
-  // Start fetching.
-  fetcher_ = CreateFetcher<std::string>(
-      &caller_identity_manager, caller_url_loader_factory,
-      {.request_body = intent_->GetRequest()},
-      base::BindOnce([](const ProtoFetcherStatus& status,
-                        std::unique_ptr<std::string> response) {
-        CHECK(status.IsOk()) << "WaitForRequestToComplete failed with status: "
-                             << status.ToString();
-      }),
-      intent_->GetConfig(), {std::string(subject_account_id)},
-      version_info::Channel::UNKNOWN);
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 bool FamilyLinkSettingsState::Check(const Services& services) const {
   return intent_->Check(services);

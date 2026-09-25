@@ -35,12 +35,6 @@
     _hasPermission = NO;
   }
 
-#if BUILDFLAG(IS_IOS)
-  if (status == kCLAuthorizationStatusAuthorizedWhenInUse) {
-    _hasPermission = YES;
-  }
-#endif
-
   _manager->PermissionUpdated();
 }
 

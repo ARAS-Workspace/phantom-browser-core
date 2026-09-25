@@ -1102,13 +1102,6 @@ bool PaymentsAutofillTable::ClearLocalCvcs() {
   return db()->GetLastChangeCount() > 0;
 }
 
-#if BUILDFLAG(IS_IOS)
-bool PaymentsAutofillTable::CleanupForCrbug445879524() {
-  sql::DeleteAllRows(*db(), kCreditCardsTable);
-  return db()->GetLastChangeCount() > 0;
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 bool PaymentsAutofillTable::AddOrUpdateServerCardMetadata(
     const PaymentsMetadata& card_metadata) {
   // Do not check if there was a record that got deleted. Inserting a new one is

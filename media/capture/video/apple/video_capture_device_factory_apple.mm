@@ -242,9 +242,6 @@ void VideoCaptureDeviceFactoryApple::GetDevicesInfo(
   const bool debug_logging_enabled =
       base::FeatureList::IsEnabled(kVideoCaptureDeviceFactoryAppleLogging);
 
-#if BUILDFLAG(IS_IOS)
-  bool default_set = false;
-#endif
   // available() must be in it's own separate if statement.
   if (@available(macOS 14.0, *)) {
     if (debug_logging_enabled) {
@@ -307,13 +304,6 @@ void VideoCaptureDeviceFactoryApple::GetDevicesInfo(
                    << device_info.supported_formats.size();
       }
 
-#if BUILDFLAG(IS_IOS)
-      // Always place the first front facing camera as the default.
-      if (!default_set && [device position] == AVCaptureDevicePositionFront) {
-        devices_info.insert(devices_info.begin(), std::move(device_info));
-        default_set = true;
-      } else
-#endif
       {
         devices_info.push_back(std::move(device_info));
       }

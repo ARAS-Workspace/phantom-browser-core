@@ -45,28 +45,10 @@ FakeProfileOAuth2TokenServiceDelegate::CreateAccessTokenFetcher(
           consumer, url_loader_factory, it->second);
 }
 
-#if BUILDFLAG(IS_IOS)
-void FakeProfileOAuth2TokenServiceDelegate::GetRefreshTokenFromDevice(
-    const CoreAccountId& account_id,
-    const OAuth2AccessTokenManager::ScopeSet& scopes,
-    signin::AccessTokenFetcher::TokenCallback callback) {
-  std::move(callback).Run(GoogleServiceAuthError::AuthErrorNone(),
-                          signin::AccessTokenInfo(GetRefreshToken(account_id),
-                                                  base::Time(), std::string()));
-}
-#endif
-
 bool FakeProfileOAuth2TokenServiceDelegate::RefreshTokenIsAvailable(
     const CoreAccountId& account_id) const {
   return !GetRefreshToken(account_id).empty();
 }
-
-#if BUILDFLAG(IS_IOS)
-bool FakeProfileOAuth2TokenServiceDelegate::RefreshTokenIsAvailableOnDevice(
-    const CoreAccountId& account_id) const {
-  return RefreshTokenIsAvailable(account_id);
-}
-#endif  //  BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 bool FakeProfileOAuth2TokenServiceDelegate::GenerateBindingKeyRegistrationToken(
@@ -169,21 +151,6 @@ std::vector<CoreAccountId> FakeProfileOAuth2TokenServiceDelegate::GetAccounts()
   return account_ids;
 }
 
-#if BUILDFLAG(IS_IOS)
-std::vector<AccountInfo>
-FakeProfileOAuth2TokenServiceDelegate::GetAccountsOnDevice() const {
-  // TODO(crbug.com/368409110): Add the capability to set accounts-on-device
-  // separate from accounts-for-profile.
-  std::vector<AccountInfo> accounts;
-  for (const auto& account_id : account_ids_) {
-    accounts.emplace_back();
-    accounts.back().account_id = account_id;
-    accounts.back().gaia = GaiaId(account_id.ToString());
-  }
-  return accounts;
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 void FakeProfileOAuth2TokenServiceDelegate::RevokeAllCredentialsInternal(
     signin_metrics::SourceForRefreshTokenOperation source) {
   std::vector<CoreAccountId> account_ids = GetAccounts();
@@ -252,9 +219,6 @@ void FakeProfileOAuth2TokenServiceDelegate::IssueRefreshTokenForUser(
 
     FireRefreshTokenAvailable(account_id);
   }
-#if BUILDFLAG(IS_IOS)
-  FireAccountsOnDeviceChanged();
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 void FakeProfileOAuth2TokenServiceDelegate::RevokeCredentialsInternal(

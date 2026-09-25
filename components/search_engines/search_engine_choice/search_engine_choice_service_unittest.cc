@@ -105,7 +105,7 @@ void ExpectHistogramsSampleCount(const base::HistogramTester& histogram_tester,
 class SearchEngineChoiceServiceTest : public SearchEngineChoiceServiceTestBase {
 };
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(SearchEngineChoiceServiceTest, GuestSessionDsePropagation) {
   InitService({.force_reset = true,
                .is_profile_eligible_for_dse_guest_propagation = true});
@@ -545,7 +545,7 @@ TEST_F(SearchEngineChoiceServiceTest, RecordChoiceMade_ByLocation_Waffle) {
   }
 }
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(SearchEngineChoiceServiceTest, RecordChoiceMade_ByLocation_Taiyaki) {
   if (!regional_capabilities::IsClientCompatibleWithProgram(
           regional_capabilities::Program::kTaiyaki)) {
@@ -804,45 +804,6 @@ TEST_F(SearchEngineChoiceServiceDisplayStateRecordTest, Record) {
   EXPECT_FALSE(pref_service()->HasPrefPath(
       prefs::kDefaultSearchProviderPendingChoiceScreenDisplayState));
 }
-
-#if BUILDFLAG(IS_IOS)
-TEST_F(SearchEngineChoiceServiceDisplayStateRecordTest, Record_Taiyaki) {
-  if (!regional_capabilities::IsClientCompatibleWithProgram(
-          regional_capabilities::Program::kTaiyaki)) {
-    GTEST_SKIP();
-  }
-
-  InitService({.variation_country_id = kJapanCountryId,
-               .client_country_id = kJapanCountryId,
-               .force_reset = true});
-  ChoiceScreenData choice_screen_data(
-      OwnedTemplateURLVectorFromPrepopulatedEngines(
-          {&TemplateURLPrepopulateData::google,
-           &TemplateURLPrepopulateData::bing,
-           &TemplateURLPrepopulateData::yahoo}),
-      /*current_default_to_highlight=*/nullptr, kJapanCountryId,
-      SearchTermsData());
-  ChoiceScreenDisplayState display_state = choice_screen_data.display_state();
-  display_state.selected_engine_index = 2;
-
-  base::HistogramTester histogram_tester;
-  search_engine_choice_service().MaybeRecordChoiceScreenDisplayState(
-      display_state);
-
-  CheckExpectations(
-      histogram_tester,
-      {.country_mismatch = ExpectHistogramBucket(false),
-       .selected_index = ExpectHistogramBucket(2),
-       .display_state_status = ExpectHistogramNever(),
-       .impression_at_index = {ExpectHistogramBucket(SEARCH_ENGINE_GOOGLE),
-                               ExpectHistogramBucket(SEARCH_ENGINE_BING),
-                               ExpectHistogramBucket(SEARCH_ENGINE_YAHOO)}});
-
-  // We logged the display state, so we don't need to cache it.
-  EXPECT_FALSE(pref_service()->HasPrefPath(
-      prefs::kDefaultSearchProviderPendingChoiceScreenDisplayState));
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 TEST_F(SearchEngineChoiceServiceDisplayStateRecordTest,
        RecordNoop_UnsupportedCountry) {
@@ -1857,10 +1818,6 @@ TEST_P(SearchEngineChoiceServiceDeviceRestoreTest, RepromptOnRestoreDetection) {
           policy_service(), template_url_service());
   search_engine_choice_service().RecordProfileLoadEligibility(
       static_eligibility);
-#if BUILDFLAG(IS_IOS)
-  search_engine_choice_service().RecordLegacyStaticEligibility(
-      static_eligibility);
-#endif  // BUILDFLAG(IS_IOS)
 
   search_engine_choice_service().RecordTriggeringEligibility(
       search_engine_choice_service().GetDynamicChoiceScreenConditions(

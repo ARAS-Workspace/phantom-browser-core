@@ -7,9 +7,6 @@
 #include "build/buildflag.h"
 #include "components/autofill/core/browser/payments/virtual_card_enrollment_manager.h"
 
-#if !BUILDFLAG(IS_IOS)
-#endif  // !BUILDFLAG(IS_IOS)
-
 namespace autofill::payments {
 
 PaymentsAutofillClient::~PaymentsAutofillClient() = default;

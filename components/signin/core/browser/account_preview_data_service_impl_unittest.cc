@@ -423,7 +423,7 @@ TEST_F(AccountPreviewDataServiceTest, GetPreferredAccountForPromo) {
       identity_test_env_.MakeAccountAvailable("account1@gmail.com");
   AccountInfo account2 =
       identity_test_env_.MakeAccountAvailable("account2@gmail.com");
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   identity_test_env_.SetCookieAccounts(
       {{account1.email, account1.gaia}, {account2.email, account2.gaia}});
 #endif
@@ -451,7 +451,7 @@ TEST_F(AccountPreviewDataServiceTest,
       identity_test_env_.MakeAccountAvailable("account1@example.com");
   AccountInfo account2 =
       identity_test_env_.MakeAccountAvailable("account2@gmail.com");
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   identity_test_env_.SetCookieAccounts(
       {{account1.email, account1.gaia}, {account2.email, account2.gaia}});
 #endif
@@ -493,7 +493,7 @@ TEST_F(AccountPreviewDataServiceTest,
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(AccountPreviewDataServiceTest,
        GetPreferredAccountForPromoRespectsDefaultAccountOrderDeviceOrder) {
   AllDataAvailableWaiter waiter(service_.get());
@@ -1826,7 +1826,7 @@ TEST_F(AccountPreviewDataServiceTest,
       identity_test_env_.MakeAccountAvailable("user1@gmail.com");
   AccountInfo account2 =
       identity_test_env_.MakeAccountAvailable("user2@gmail.com");
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   identity_test_env_.SetCookieAccounts(
       {{account1.email, account1.gaia}, {account2.email, account2.gaia}});
 #endif
@@ -2308,7 +2308,7 @@ TEST_F(AccountPreviewDataServiceTest, RateLimitOn429PeriodicRefresh) {
   service_->SetFetchCompleteCallbackForTesting(run_loop.QuitClosure());
   AccountInfo account =
       identity_test_env_.MakeAccountAvailable("account@gmail.com");
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   identity_test_env_.SetCookieAccounts({{account.email, account.gaia}});
 #endif
   run_loop.Run();

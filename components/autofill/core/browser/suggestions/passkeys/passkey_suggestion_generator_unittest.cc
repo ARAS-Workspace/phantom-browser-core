@@ -55,7 +55,7 @@ class PasskeySuggestionGeneratorTest : public testing::Test {
   FormData form_;
 };
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Ensure the hybrid suggestion provided by the password delegate is fetched
 // and displayed on valid webauthn fields.
 TEST_F(PasskeySuggestionGeneratorTest, FetchCreatesValidSuggestionForGenerate) {
@@ -89,9 +89,9 @@ TEST_F(PasskeySuggestionGeneratorTest,
                                   /*trigger_autofill_field=*/nullptr, client(),
                                   generate_cb.Get());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Ensure the hybrid suggestion provided by the password delegate is fetched
 // and not displayed on fields without webauthn annotation.
 TEST_F(PasskeySuggestionGeneratorTest,
@@ -111,9 +111,9 @@ TEST_F(PasskeySuggestionGeneratorTest,
                                   /*trigger_autofill_field=*/nullptr, client(),
                                   generate_cb.Get());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Ensure if no hybrid suggestion is provided by the password delegate, no
 // no suggestion is fetched or generated.
 TEST_F(PasskeySuggestionGeneratorTest,
@@ -128,7 +128,7 @@ TEST_F(PasskeySuggestionGeneratorTest,
                                   /*trigger_autofill_field=*/nullptr, client(),
                                   generate_cb.Get());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 }  // namespace autofill

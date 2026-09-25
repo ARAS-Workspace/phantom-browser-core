@@ -372,7 +372,7 @@ class TestRenderFrameMetadataObserver : public RenderFrameMetadataObserver {
     }
     last_metadata_ = render_frame_metadata;
   }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void DidEndScroll() override {}
 #endif
 

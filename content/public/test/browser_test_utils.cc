@@ -4837,7 +4837,7 @@ base::CallbackListSubscription RegisterWebContentsCreationCallback(
   return WebContentsImpl::FriendWrapper::AddCreatedCallbackForTesting(callback);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void SetConditionalFocusWindowForTesting(base::TimeDelta window) {
   MediaStreamManager::GetInstance()->SetConditionalFocusWindowForTesting(
       window);
@@ -4871,7 +4871,7 @@ void SetCapturedSurfaceControllerFactoryForTesting(
   MediaStreamManager::GetInstance()
       ->SetCapturedSurfaceControllerFactoryForTesting(wrapped_factory);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::optional<int> GetDOMNodeId(RenderFrameHost& rfh,
                                 std::string_view query_selector) {

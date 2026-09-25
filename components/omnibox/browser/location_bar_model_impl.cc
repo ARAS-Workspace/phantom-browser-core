@@ -33,7 +33,7 @@
 #include "url/origin.h"
 #include "url/url_canon.h"
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #endif
 
@@ -59,14 +59,10 @@ std::u16string LocationBarModelImpl::GetURLForDisplay() const {
     format_types |= url_formatter::kFormatUrlTrimAfterHost;
   }
 
-#if BUILDFLAG(IS_IOS)
-  format_types |= url_formatter::kFormatUrlTrimAfterHost;
-#endif
-
   format_types |= url_formatter::kFormatUrlOmitHTTPS;
   format_types |= url_formatter::kFormatUrlOmitTrivialSubdomains;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // On desktop, the File chip makes the scheme redundant in the steady state.
   format_types |= url_formatter::kFormatUrlOmitFileScheme;
 #endif
@@ -97,18 +93,6 @@ std::u16string LocationBarModelImpl::GetFormattedURL(
   }
 
   GURL url(GetURL());
-
-#if BUILDFLAG(IS_IOS)
-  // On iOS, the blob: display URLs should be simply the domain name. However,
-  // url_formatter parses everything past blob: as path, not domain, so swap
-  // the url here to be just origin.
-  if (url.SchemeIsBlob()) {
-    url::Origin origin = url::Origin::Create(url);
-    if (!origin.host().empty()) {
-      url = origin.GetURL();
-    }
-  }
-#endif  // BUILDFLAG(IS_IOS)
 
   // Special handling for dom-distiller:. Instead of showing internal reader
   // mode URLs, show the original article URL in the omnibox.
@@ -229,7 +213,7 @@ LocationBarModelImpl::GetOmniboxComposeboxPageClassification() const {
 }
 
 const gfx::VectorIcon& LocationBarModelImpl::GetVectorIcon() const {
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
   auto* const icon_override = delegate_->GetVectorIconOverride();
   if (icon_override)
     return *icon_override;

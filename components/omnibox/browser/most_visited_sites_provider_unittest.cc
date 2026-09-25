@@ -334,7 +334,7 @@ void MostVisitedSitesProviderTest::OnProviderUpdate(
   provider_update_count_++;
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 
 constexpr const auto* SRP_URL = u"https://www.google.com/?q=flowers";
 constexpr const auto* FTP_URL = u"ftp://just.for.filtering.com";
@@ -549,9 +549,9 @@ TEST_F(MostVisitedSitesProviderTest,
   CheckMatchesEquivalentTo(test_data, ExpectedUiType::kIndividualTiles);
 }
 
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(MostVisitedSitesProviderTest, TestCreateMostVisitedTopSitesMatches) {
   omnibox_feature_configs::ScopedConfigForTesting<
       omnibox_feature_configs::OmniboxUrlSuggestionsOnFocus>
@@ -1029,4 +1029,4 @@ TEST_F(MostVisitedSitesProviderTest, DedupingOpenTabs) {
             provider_->matches().at(0).destination_url.spec());
 }
 
-#endif  // !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#endif  // !BUILDFLAG(IS_ANDROID)

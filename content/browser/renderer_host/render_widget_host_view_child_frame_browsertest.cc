@@ -260,8 +260,7 @@ IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewChildFrameBrowserTest,
 // Luckily this test is verifying interactions and behaviour of
 // RenderWidgetHostImpl - RenderWidget - `blink::RemoteFrame` -
 // CrossProcessFrameConnector, and this isn't Android-specific code.
-// For iOS, RenderWidgetHostViewIOS can't be resized, either.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   float scale_factor = root_rwh->GetDeviceScaleFactor();
 
   // Resize the top level widget to cause its |visible_viewport_size| to be

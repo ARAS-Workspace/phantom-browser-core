@@ -87,10 +87,6 @@ bool ShouldForwardSyncErrorToStore(
     case SyncError::kTrustedVaultRecoverabilityDegradedForPasswords:
     case SyncError::kTrustedVaultRecoverabilityDegradedForEverything:
     case SyncError::kBookmarksLimitExceeded:
-#if BUILDFLAG(IS_IOS)
-    case SyncError::kDeviceManagementError:
-      // TODO(crbug.com/539816393): Update this case if it needs to block saving
-#endif  // BUILDFLAG(IS_IOS)
 
       return false;  // These errors aren't directly actionable (yet).
     case SyncError::kNone:
@@ -98,10 +94,8 @@ bool ShouldForwardSyncErrorToStore(
     case SyncError::kSignInNeedsUpdate:
     case SyncError::kNeedsTrustedVaultKeyForPasswords:
     case SyncError::kNeedsTrustedVaultKeyForEverything:
-#if !BUILDFLAG(IS_IOS)
     case SyncError::kNeedsSettingsConfirmation:
     case SyncError::kUnrecoverableError:
-#endif  // !BUILDFLAG(IS_IOS)
 #if BUILDFLAG(IS_ANDROID)
     case SyncError::kNeedsUPMBackendUpgrade:
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -120,9 +114,6 @@ PasswordChangesOrError SyncErrorToBackendError(
     case SyncError::kBookmarksLimitExceeded:
     case SyncError::kTrustedVaultRecoverabilityDegradedForPasswords:
     case SyncError::kTrustedVaultRecoverabilityDegradedForEverything:
-#if BUILDFLAG(IS_IOS)
-    case SyncError::kDeviceManagementError:
-#endif  // BUILDFLAG(IS_IOS)
 
       return std::nullopt;  // These errors aren't directly actionable (yet).
     case SyncError::kNeedsPassphrase:
@@ -132,10 +123,8 @@ PasswordChangesOrError SyncErrorToBackendError(
     case SyncError::kNeedsTrustedVaultKeyForPasswords:
     case SyncError::kNeedsTrustedVaultKeyForEverything:
       return PasswordStoreBackendError(BackendError::kKeyRetrievalRequired);
-#if !BUILDFLAG(IS_IOS)
     case SyncError::kNeedsSettingsConfirmation:
     case SyncError::kUnrecoverableError:
-#endif  // !BUILDFLAG(IS_IOS)
 #if BUILDFLAG(IS_ANDROID)
     case SyncError::kNeedsUPMBackendUpgrade:
 #endif
@@ -161,18 +150,13 @@ ActionableError SyncErrorToActionableError(
     case SyncError::kTrustedVaultRecoverabilityDegradedForPasswords:
     case SyncError::kTrustedVaultRecoverabilityDegradedForEverything:
       return ActionableError::kNoError;
-#if !BUILDFLAG(IS_IOS)
     case SyncError::kNeedsSettingsConfirmation:
     case SyncError::kUnrecoverableError:
-#endif  // !BUILDFLAG(IS_IOS)
 #if BUILDFLAG(IS_ANDROID)
     case SyncError::kNeedsUPMBackendUpgrade:
 #endif
     case SyncError::kNeedsClientUpgrade:
     case SyncError::kBookmarksLimitExceeded:
-#if BUILDFLAG(IS_IOS)
-    case SyncError::kDeviceManagementError:
-#endif  // BUILDFLAG(IS_IOS)
       return ActionableError::kInactionable;
   }
 }
@@ -445,13 +429,6 @@ PasswordStoreBuiltInBackend::CreateSyncControllerDelegate() {
 void PasswordStoreBuiltInBackend::OnSyncServiceInitialized(
     syncer::SyncService* sync_service) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_IOS)
-  // On iOS, the profile store is local-only, so no need to observe sync.
-  // TODO(crbug.com/464228247): Expand this to other platforms.
-  if (!is_account_store_.value()) {
-    return;
-  }
-#endif
 
   sync_observation_.Reset();
   if (sync_service) {
@@ -461,12 +438,6 @@ void PasswordStoreBuiltInBackend::OnSyncServiceInitialized(
 
 void PasswordStoreBuiltInBackend::OnStateChanged(syncer::SyncService* sync) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_IOS)
-  // On iOS, sync is not observed for the profile store.
-  if (!is_account_store_.value()) {
-    return;
-  }
-#endif
 
   CHECK(sync_observation_.IsObservingSource(sync));
   if (remote_form_changes_received_callback_) {
@@ -482,12 +453,6 @@ void PasswordStoreBuiltInBackend::OnStateChanged(syncer::SyncService* sync) {
 
 void PasswordStoreBuiltInBackend::OnSyncShutdown(syncer::SyncService* sync) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_IOS)
-  // On iOS, sync is not observed for the profile store.
-  if (!is_account_store_.value()) {
-    return;
-  }
-#endif
 
   CHECK(sync_observation_.IsObservingSource(sync));
   sync_observation_.Reset();

@@ -9,16 +9,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_IOS)
-namespace {
-
-// The default time offset used to pre-populate the date/time picker when the
-// 'Set a Reminder' UI half-sheet is first shown.
-const base::TimeDelta kReminderNotificationsDefaultOffset = base::Hours(24);
-
-}  // namespace
-#endif  // BUILDFLAG(IS_IOS)
-
 namespace send_tab_to_self {
 
 BASE_FEATURE(kSendTabToSelfEnableNotificationTimeOut,
@@ -38,10 +28,10 @@ BASE_FEATURE(kSendTabToSelfPropagateNavigationHistory,
 
 BASE_FEATURE(kSendTabToSelfAutoOpen, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kSendTabToSelfSupportAutoOpenInTabGrid,
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kSendTabToSelfEnhancedDesktopUI,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -60,35 +50,10 @@ BASE_FEATURE(kSendTabToSelfGesture, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kSendTabToSelfOpenNativeApp, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kSendTabToSelfEnhancedBottomsheet,
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)
-
-BASE_FEATURE(kSendTabToSelfIOSShareSheetDeviceList,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kSendTabToSelfIOSLimitToRegularBrowsers,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIOSTabReminders, base::FEATURE_DISABLED_BY_DEFAULT);
-
-bool AreIOSTabRemindersEnabled() {
-  return base::FeatureList::IsEnabled(kIOSTabReminders);
-}
-
-const char kReminderNotificationsDefaultTimeOffset[] =
-    "ReminderNotificationsDefaultTimeOffset";
-
-const base::TimeDelta GetReminderNotificationsDefaultTimeOffset() {
-  // Default to 24 hours.
-  return base::GetFieldTrialParamByFeatureAsTimeDelta(
-      kIOSTabReminders, kReminderNotificationsDefaultTimeOffset,
-      kReminderNotificationsDefaultOffset);
-}
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kSendTabToSelfDynamicShortcuts, base::FEATURE_DISABLED_BY_DEFAULT);

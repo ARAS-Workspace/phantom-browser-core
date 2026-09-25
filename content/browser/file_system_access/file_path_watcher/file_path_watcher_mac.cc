@@ -11,9 +11,7 @@
 #include "content/browser/file_system_access/features.h"
 #include "content/browser/file_system_access/file_path_watcher/file_path_watcher_kqueue.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "content/browser/file_system_access/file_path_watcher/file_path_watcher_fsevents.h"
-#endif
 
 namespace content {
 
@@ -42,9 +40,7 @@ class FilePathWatcherImpl : public FilePathWatcher::PlatformDelegate {
       if (!FilePathWatcher::RecursiveWatchAvailable()) {
         return false;
       }
-#if !BUILDFLAG(IS_IOS)
       impl_ = std::make_unique<FilePathWatcherFSEvents>();
-#endif  // BUILDFLAG(IS_IOS)
     } else {
       impl_ = std::make_unique<FilePathWatcherKQueue>();
     }

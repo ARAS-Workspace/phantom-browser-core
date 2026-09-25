@@ -126,7 +126,7 @@ void SecurityInterstitialControllerClient::Reload() {
       content::ReloadType::NORMAL, true);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void SecurityInterstitialControllerClient::ShowCertificateViewer() {
   NOTREACHED();
 }

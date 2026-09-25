@@ -198,7 +198,6 @@ TEST_F(SupervisedUserLogRecordTest, SupervisionEnabledByUser) {
                            kSupervisionEnabledByFamilyLinkUser));
 }
 
-#if !BUILDFLAG(IS_IOS)
 class SupervisedUserLogRecordWithApproximateGeolocationTest
     : public base::test::WithFeatureOverride,
       public SupervisedUserLogRecordTest {
@@ -226,7 +225,6 @@ TEST_P(SupervisedUserLogRecordWithApproximateGeolocationTest,
   EXPECT_THAT(record->GetPermissionsToggleStateForPrimaryAccount(),
               Optional(ToggleState::kEnabled));
 }
-#endif  // BUILDFLAG(IS_IOS)
 
 TEST_F(SupervisedUserLogRecordTest, SupervisionEnabledByPolicy) {
   CreateSupervisedUser(/*is_subject_to_parental_controls=*/true,

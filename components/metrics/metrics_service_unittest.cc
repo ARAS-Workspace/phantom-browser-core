@@ -56,10 +56,10 @@ namespace {
 
 const char kTestPrefName[] = "TestPref";
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 const char kBeforeBackgroundHistogram[] = "Test.BeforeBackground";
 const char kBeforeForegroundHistogram[] = "Test.BeforeForeground";
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 class TestUnsentLogStore : public UnsentLogStore {
  public:
@@ -335,7 +335,7 @@ class MetricsServiceTest : public testing::Test {
     return log.user_action_event_size();
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Returns the value of `fg_bg_id` in the the currently staged log in
   // `test_log_store`.
   int GetFgBgId(MetricsLogStore* test_log_store) {
@@ -362,7 +362,7 @@ class MetricsServiceTest : public testing::Test {
     EXPECT_TRUE(DecodeLogDataToProto(test_log_store->staged_log(), &log));
     return GetHistogramSampleCount(log, kBeforeForegroundHistogram);
   }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   const base::FilePath user_data_dir_path() { return temp_dir_.GetPath(); }
 
@@ -778,7 +778,7 @@ TEST_F(MetricsServiceTest, ProvideHistogramsEarlyReturn) {
       kProvideHistogramsHistogramName);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // Verifies that logs contain a proper `fg_bg_id`, which changes upon
 // backgrounding or foregrounding.
 TEST_F(MetricsServiceTest, FgBgId) {
@@ -1049,7 +1049,7 @@ TEST_F(MetricsServiceTest, FgBgId_NoRecordingInBackground) {
   base::StatisticsRecorder::ForgetHistogramForTesting(
       kBeforeForegroundHistogram);
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 INSTANTIATE_TEST_SUITE_P(
     All,

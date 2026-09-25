@@ -50,7 +50,7 @@ class PersonalContextAutofillUtilTest : public testing::Test {
     std::vector<base::test::FeatureRefAndParams> enabled_features = {
         {features::kAutofillAiWithDataSchema, {}},
         {features::kAutofillAiServerModel, {}},
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
         {features::kAutofillAiAvailableByDefault, {}},
 #endif
         {features::kAutofillAmbientAutofill,

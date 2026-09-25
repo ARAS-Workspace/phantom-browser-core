@@ -31,10 +31,6 @@
 #include "ui/gfx/overlay_plane_data.h"
 #include "ui/gl/ca_renderer_layer_params.h"
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-#include "gpu/ipc/common/ios/be_layer_hierarchy_transport.h"
-#endif
-
 #if BUILDFLAG(SKIA_USE_DAWN)
 #include "gpu/command_buffer/service/dawn_context_provider.h"
 #endif
@@ -125,24 +121,6 @@ ImageTransportSurfaceOverlayMacEGL::ImageTransportSurfaceOverlayMacEGL(
       !av_disabled_at_command_line, std::move(buffer_presented_callback),
       std::move(gl_make_current_callback), GetMTLDevice(context_state));
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-  // The BELayerHierarchy needs to be created on a thread that supports
-  // libdispatch, so we proxy over to the main dispatch queue to do that.
-  CALayer* root_ca_layer = ca_layer_tree_coordinator_->root_ca_layer();
-  __block xpc_object_t ipc_representation;
-  dispatch_sync(dispatch_get_main_queue(), ^{
-    NSError* error = nullptr;
-    layer_hierarchy_ = [BELayerHierarchy layerHierarchyWithError:&error];
-    layer_hierarchy_.layer = root_ca_layer;
-    ipc_representation = [layer_hierarchy_.handle createXPCRepresentation];
-  });
-
-  BELayerHierarchyTransport* transport =
-      BELayerHierarchyTransport::GetInstance();
-  CHECK(transport);
-  transport->ForwardBELayerHierarchyToBrowser(surface_handle,
-                                              ipc_representation);
-#endif
 }
 
 // For testing
@@ -163,17 +141,6 @@ ImageTransportSurfaceOverlayMacEGL::ImageTransportSurfaceOverlayMacEGL(
 ImageTransportSurfaceOverlayMacEGL::~ImageTransportSurfaceOverlayMacEGL() {
   ca_layer_tree_coordinator_.reset();
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-  // Capture and retain the BELayerHierarchy in a local __block var before
-  // dropping the member var ref. Do this before dispatch_async() to avoid a
-  // dealloc race between the block and the member var releasing the last ref.
-  __block BELayerHierarchy* layer_hierarchy =
-      std::exchange(layer_hierarchy_, nil);
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [layer_hierarchy invalidate];
-    layer_hierarchy = nil;
-  });
-#endif
 }
 
 void ImageTransportSurfaceOverlayMacEGL::Present(

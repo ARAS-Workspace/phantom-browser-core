@@ -218,7 +218,6 @@ TEST(ImageModelTest, CheckEqual) {
   EXPECT_EQ(image_model_src, image_model_dest);
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST(ImageModelTest, ShouldRasterizeEmptyModel) {
   gfx::ImageSkia image_skia = ui::ImageModel().Rasterize(nullptr);
   EXPECT_TRUE(image_skia.isNull());
@@ -241,6 +240,5 @@ TEST(ImageModelTest, ShouldRasterizeImage) {
   EXPECT_FALSE(image_skia.isNull());
   EXPECT_TRUE(image_skia.BackedBySameObjectAs(image.AsImageSkia()));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace ui

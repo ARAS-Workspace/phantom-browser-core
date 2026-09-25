@@ -163,11 +163,9 @@ void WaitForChildToDie(pid_t child, int timeout) {
   }
 }
 
-#if !BUILDFLAG(IS_IOS)
 void EnsureProcessTerminated(Process process) {
   constexpr int kWaitBeforeKillSeconds = 2;
   WaitForChildToDie(process.Pid(), kWaitBeforeKillSeconds);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace base

@@ -9235,7 +9235,7 @@ class LayerTreeHostTestRequestForceSendMetadata
       target_->OnRenderFrameSubmission(render_frame_metadata,
                                        compositor_frame_metadata, force_send);
     }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     void DidEndScroll() override { target_->DidEndScroll(); }
 #endif
 
@@ -9290,7 +9290,7 @@ class LayerTreeHostTestRequestForceSendMetadata
     if (force_send)
       num_force_sends_++;
   }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void DidEndScroll() override {}
 #endif
 
@@ -9438,7 +9438,7 @@ class LayerTreeHostTestDelegatedInkMetadataBase
       target_->OnRenderFrameSubmission(render_frame_metadata,
                                        compositor_frame_metadata, force_send);
     }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     void DidEndScroll() override { target_->DidEndScroll(); }
 #endif
 
@@ -9515,7 +9515,7 @@ class LayerTreeHostTestDelegatedInkMetadataBase
     ExpectMetadata(render_frame_metadata.delegated_ink_metadata,
                    compositor_frame_metadata->delegated_ink_metadata.get());
   }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void DidEndScroll() override {}
 #endif
 
@@ -11749,7 +11749,7 @@ class LayerTreeHostTestDetachInputDelegateAndRenderFrameObserver
         const RenderFrameMetadata& render_frame_metadata,
         viz::CompositorFrameMetadata* compositor_frame_metadata,
         bool force_send) override {}
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     void DidEndScroll() override {}
 #endif
 
@@ -12009,7 +12009,7 @@ class LayerTreeHostTestTrackedElementRects
       target_->OnRenderFrameSubmission(render_frame_metadata,
                                        compositor_frame_metadata, force_send);
     }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     void DidEndScroll() override { target_->DidEndScroll(); }
 #endif
 
@@ -12102,7 +12102,7 @@ class LayerTreeHostTestTrackedElementRects
     ExpectRectsOnThread(render_frame_metadata.tracked_element_rects,
                         compositor_frame_metadata->tracked_element_rects);
   }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void DidEndScroll() override {}
 #endif
 };

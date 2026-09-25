@@ -43,23 +43,6 @@ std::string_view GetPromoActionHistogramSuffix(PromoAction promo_action) {
   }
 }
 
-#if BUILDFLAG(IS_IOS)
-std::string_view ReauthFlowEventToHistogramSuffix(ReauthFlowEvent event) {
-  switch (event) {
-    case ReauthFlowEvent::kStarted:
-      return ".Started";
-    case ReauthFlowEvent::kCompleted:
-      return ".Completed";
-    case ReauthFlowEvent::kError:
-      return ".Error";
-    case ReauthFlowEvent::kCancelled:
-      return ".Cancelled";
-    case ReauthFlowEvent::kInterrupted:
-      return ".Interrupted";
-  }
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 }  // namespace
 
 std::optional<AccessPoint> AccessPointFromInt(int value) {
@@ -279,13 +262,6 @@ void LogSigninPendingOffered(AccessPoint access_point) {
   base::UmaHistogramEnumeration("Signin.SigninPending.Offered", access_point);
 }
 
-#if BUILDFLAG(IS_IOS)
-void LogSigninWithAccountType(SigninAccountType account_type) {
-  base::UmaHistogramEnumeration("Signin.AccountType.SigninConsent",
-                                account_type);
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 void LogSyncOptInStarted(AccessPoint access_point) {
   base::UmaHistogramEnumeration("Signin.SyncOptIn.Started", access_point);
 }
@@ -427,39 +403,6 @@ void RecordRefreshTokenRevokedFromSource(
     SourceForRefreshTokenOperation source) {
   UMA_HISTOGRAM_ENUMERATION("Signin.RefreshTokenRevoked.Source", source);
 }
-
-#if BUILDFLAG(IS_IOS)
-void RecordSignoutConfirmationFromDataLossAlert(
-    SignoutDataLossAlertReason reason,
-    bool signout_confirmed) {
-  const char* histogram;
-  switch (reason) {
-    case SignoutDataLossAlertReason::kSignoutWithUnsyncedData:
-      histogram = "Sync.SignoutWithUnsyncedData";
-      break;
-    case SignoutDataLossAlertReason::kSignoutWithClearDataForManagedUser:
-      histogram = "Signin.SignoutAndClearDataFromManagedAccount";
-      break;
-  }
-  base::UmaHistogramBoolean(histogram, signout_confirmed);
-}
-
-void RecordReauthFlowEventInSigninFlow(signin_metrics::AccessPoint access_point,
-                                       ReauthFlowEvent event) {
-  base::UmaHistogramEnumeration(
-      base::StrCat({"Signin.Reauth.InSigninFlow",
-                    ReauthFlowEventToHistogramSuffix(event)}),
-      access_point);
-}
-
-void RecordReauthFlowEventInExplicitFlow(ReauthAccessPoint access_point,
-                                         ReauthFlowEvent event) {
-  base::UmaHistogramEnumeration(
-      base::StrCat({"Signin.Reauth.InExplicitFlow",
-                    ReauthFlowEventToHistogramSuffix(event)}),
-      access_point);
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 void RecordOpenTabCountOnSignin(signin::ConsentLevel consent_level,
                                 size_t tabs_count) {
@@ -971,7 +914,7 @@ void RecordSigninImpressionUserActionForAccessPoint(AccessPoint access_point) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void RecordConsistencyPromoUserAction(AccountConsistencyPromoAction action,
                                       AccessPoint access_point) {
   base::UmaHistogramEnumeration("Signin.AccountConsistencyPromoAction", action);
@@ -1084,6 +1027,6 @@ void RecordConsistencyPromoUserAction(AccountConsistencyPromoAction action,
 
   base::UmaHistogramEnumeration(histogram, access_point);
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace signin_metrics

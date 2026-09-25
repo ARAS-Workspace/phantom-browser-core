@@ -473,7 +473,6 @@ void SecurePaymentConfirmationAppFactory::DidDownloadAllIcons(
 
   std::unique_ptr<PasskeyBrowserBinder> passkey_browser_binder;
   bool device_supports_browser_bound_keys_in_hardware = false;
-#if !BUILDFLAG(IS_IOS)
   scoped_refptr key_store =
       browser_bound_key_store_for_testing_
           ? std::move(browser_bound_key_store_for_testing_)
@@ -488,7 +487,6 @@ void SecurePaymentConfirmationAppFactory::DidDownloadAllIcons(
       key_store->GetDeviceSupportsHardwareKeys();
   passkey_browser_binder = std::make_unique<PasskeyBrowserBinder>(
       std::move(key_store), request->web_data_service);
-#endif  // !BUILDFLAG(IS_IOS)
 
   auto app = std::make_unique<SecurePaymentConfirmationApp>(
       request->web_contents(), request->credential->relying_party_id,

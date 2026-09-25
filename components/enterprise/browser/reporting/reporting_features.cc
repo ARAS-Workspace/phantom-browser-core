@@ -20,10 +20,6 @@ BASE_FEATURE(kCbcmAndroidPackageNameIdentifier,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kIOSSignalSharingEnabled, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_IOS)
-
 BASE_FEATURE(kUploadReportOnProfileOpen, base::FEATURE_DISABLED_BY_DEFAULT);
 
 }  // namespace enterprise_reporting

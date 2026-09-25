@@ -44,25 +44,4 @@ TEST_F(SendTabNotificationPromoTest, TestComputeCardResult) {
   EXPECT_EQ(EphemeralHomeModuleRank::kTop, result.position);
 }
 
-#if BUILDFLAG(IS_IOS)
-// Validates that `IsEnabled()` returns true when under the impression limit
-// and false otherwise.
-//
-// Note: `kMaxSendTabNotificationCardImpressions` is 1.
-TEST_F(SendTabNotificationPromoTest,
-       IsEnabledReturnsFalseWhenImpressionLimitReached) {
-
-  auto card = std::make_unique<SendTabNotificationPromo>();
-
-  // 0 impressions.
-  EXPECT_TRUE(SendTabNotificationPromo::IsEnabled(&pref_service_));
-
-  // Simulate an impression.
-  card->OnShow(&pref_service_, nullptr);
-
-  // 1 impression (limit reached).
-  EXPECT_FALSE(SendTabNotificationPromo::IsEnabled(&pref_service_));
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 }  // namespace segmentation_platform::home_modules

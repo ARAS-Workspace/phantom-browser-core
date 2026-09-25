@@ -104,15 +104,6 @@ class WebDataServiceWrapperFeatureTest
 
 // Verifies that CreateWebDataServiceWrapper works with kSyncAutofillValuable
 // enabled and disabled.
-#if BUILDFLAG(IS_IOS)
-TEST_P(WebDataServiceWrapperFeatureTest, SyncAutofillValuable) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitWithFeatureState(syncer::kSyncAutofillValuable, GetParam());
-  auto web_data_service_wrapper = CreateWebDataServiceWrapper();
-  web_data_service_wrapper->Shutdown();
-  task_environment_.RunUntilIdle();
-}
-#endif
 
 // Verifies that CreateWebDataServiceWrapper works with
 // kSyncAutofillValuableMetadata enabled and disabled.

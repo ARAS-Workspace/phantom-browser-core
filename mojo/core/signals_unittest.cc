@@ -135,8 +135,6 @@ TEST_F(SignalsTest, LocalPeers) {
   EXPECT_EQ(MOJO_RESULT_OK, MojoClose(b));
 }
 
-#if !BUILDFLAG(IS_IOS)
-
 TEST_F(SignalsTest, RemotePeers) {
   if (IsMojoIpczEnabled()) {
     GTEST_SKIP() << "Peer remoteness tracking is not implemented by MojoIpcz.";
@@ -225,8 +223,6 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(RemotePeersClient, SignalsTest, h) {
   WriteMessageWithHandles(h, "O_O", &b, 1);
   EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace
 }  // namespace core

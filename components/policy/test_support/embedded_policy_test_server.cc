@@ -12,9 +12,9 @@
 #include "components/policy/core/common/cloud/cloud_policy_constants.h"
 #include "components/policy/test_support/remote_commands_state.h"
 #include "components/policy/test_support/request_handler_for_check_user_account.h"
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/policy/proto/chrome_extension_policy.pb.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 #include "components/policy/test_support/client_storage.h"
 #include "components/policy/test_support/policy_storage.h"
 #include "components/policy/test_support/request_handler_for_api_authorization.h"
@@ -167,7 +167,7 @@ void EmbeddedPolicyTestServer::ConfigureRequestError(
       std::pair<std::string, net::HttpStatusCode>(request_type, error_code));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void EmbeddedPolicyTestServer::UpdateExternalPolicy(
     const std::string& type,
     const std::string& entity_id,
@@ -188,7 +188,7 @@ void EmbeddedPolicyTestServer::UpdateExternalPolicy(
   policy_storage()->SetPolicyPayload(type, entity_id,
                                      external_policy_data.SerializeAsString());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::unique_ptr<HttpResponse> EmbeddedPolicyTestServer::HandleRequest(
     const HttpRequest& request) {

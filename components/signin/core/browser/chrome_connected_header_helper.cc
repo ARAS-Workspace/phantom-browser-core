@@ -221,7 +221,7 @@ std::string ChromeConnectedHeaderHelper::BuildRequestHeader(
           base::StringPrintf("%s=%s", kEligibleForConsistency, "true"));
       return base::JoinString(parts, is_header_request ? "," : ":");
     }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
     return std::string();
   }
 

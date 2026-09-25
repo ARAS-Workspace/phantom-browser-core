@@ -328,9 +328,7 @@ TEST(TextEliderTest, ElideTextLongStrings) {
   std::u16string long_string_middle(
       data_scheme + std::u16string(number_of_as - number_of_trailing_as, 'a') +
       u"…" + std::u16string(number_of_trailing_as, 'a'));
-#if !BUILDFLAG(IS_IOS)
   long_string_middle += u"…";
-#endif
 
   const auto cases_middle = std::to_array<StringMappingTestCase>({
       {data_scheme + ten_a, data_scheme + ten_a},
@@ -354,9 +352,7 @@ TEST(TextEliderTest, ElideTextLongStrings) {
 
   std::u16string long_string_beginning(u"…" +
                                        std::u16string(number_of_as, 'a'));
-#if !BUILDFLAG(IS_IOS)
   long_string_beginning += u"…";
-#endif
 
   const auto cases_beginning = std::to_array<StringMappingTestCase>({
       {data_scheme + ten_a, data_scheme + ten_a},

@@ -67,7 +67,7 @@ base::SafeRef<PermissionRequest> PermissionRequest::GetSafeRef() {
   return weak_factory_.GetSafeRef();
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 PermissionRequest::AnnotatedMessageText::AnnotatedMessageText(
     std::u16string text,
     std::vector<std::pair<size_t, size_t>> bolded_ranges)
@@ -218,7 +218,7 @@ PermissionRequest::GetDialogAnnotatedMessageText(
 
   return AnnotatedMessageText(text, bolded_ranges);
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 bool PermissionRequest::IsEmbeddedPermissionElementInitiated() const {
   return data_->IsEmbeddedPermissionElementInitiated();
@@ -236,7 +236,7 @@ std::optional<gfx::Rect> PermissionRequest::GetAnchorElementPosition() const {
   return data_->GetAnchorElementPosition();
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 
 bool PermissionRequest::IsConfirmationChipSupported() {
   return permissions::IsConfirmationChipSupported(request_type());
@@ -470,7 +470,7 @@ std::u16string PermissionRequest::GetMessageTextFragment() const {
   DCHECK_NE(0, message_id);
   return l10n_util::GetStringUTF16(message_id);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::optional<std::u16string> PermissionRequest::GetAllowAlwaysText() const {
   return std::nullopt;

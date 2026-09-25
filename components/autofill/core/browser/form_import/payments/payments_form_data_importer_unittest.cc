@@ -1282,7 +1282,6 @@ TEST_F(
   }
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(PaymentsFormDataImporterTest,
        ExtractFormData_ImportIbanRecordType_NoIban) {
   // Simulate a form submission with no IBAN.
@@ -1380,7 +1379,6 @@ TEST_F(PaymentsFormDataImporterTest,
       /*payment_methods_autofill_enabled=*/true);
   EXPECT_TRUE(extracted_data.extracted_iban);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(PaymentsFormDataImporterTest, DuplicateMaskedServerCard) {
   CreditCard server_card1(CreditCard::RecordType::kMaskedServerCard, "a123");
@@ -1623,7 +1621,6 @@ TEST_F(PaymentsFormDataImporterTest,
       AutofillMetrics::MASKED_SERVER_CARD_EXPIRATION_DATE_DID_NOT_MATCH, 1);
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(PaymentsFormDataImporterTest,
        ProcessIbanImportCandidate_ShouldOfferLocalSave_NewIban) {
   Iban extracted_iban = test::GetLocalIban();
@@ -1701,7 +1698,6 @@ TEST_F(PaymentsFormDataImporterTest,
       *form_structure, /*profile_autofill_enabled=*/true,
       /*payment_methods_autofill_enabled=*/true));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(PaymentsFormDataImporterTest,
        ProcessExtractedCreditCard_EmptyCreditCard) {
@@ -1725,7 +1721,6 @@ TEST_F(PaymentsFormDataImporterTest,
   personal_data_manager().SetSyncServiceForTest(nullptr);
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(PaymentsFormDataImporterTest,
        ProcessExtractedCreditCard_VirtualCardEligible) {
   CreditCard extracted_credit_card = test::GetMaskedServerCard();
@@ -1769,7 +1764,6 @@ TEST_F(PaymentsFormDataImporterTest,
 
   personal_data_manager().SetSyncServiceForTest(nullptr);
 }
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Test that in the case where the MandatoryReauthManager denotes we should not

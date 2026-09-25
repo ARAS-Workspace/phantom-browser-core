@@ -37,7 +37,6 @@
 
 namespace browser_sync {
 
-#if !BUILDFLAG(IS_IOS)
 namespace {
 
 // These values are persisted to logs. Entries should not be renumbered and
@@ -487,7 +486,7 @@ void MaybeMigrateSyncingUserToSignedInInternal(
       extensions_decision);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   const SyncToSigninMigrationDataTypeDecision themes_decision =
       GetSyncToSigninMigrationDataTypeDecision(
           pref_service, syncer::THEMES, syncer::prefs::internal::kSyncThemes);
@@ -496,7 +495,7 @@ void MaybeMigrateSyncingUserToSignedInInternal(
                     GetHistogramMigratingOrNotInfix(doing_migration),
                     syncer::DataTypeToHistogramSuffix(syncer::THEMES)}),
       themes_decision);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (!doing_migration) {
     return;
@@ -625,14 +624,14 @@ void MaybeMigrateSyncingUserToSignedInInternal(
   }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (themes_decision == SyncToSigninMigrationDataTypeDecision::kMigrate) {
     pref_service->SetBoolean(
         syncer::prefs::internal::kMigrateThemeFromLocalToAccount, true);
     syncer::RecordSyncToSigninMigrationThemeStep(
         syncer::SyncToSigninMigrationThemeStep::kMigrationRequested);
   }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (!is_blocking_allowed) {
     base::ThreadPool::PostTaskAndReplyWithResult(
@@ -737,7 +736,6 @@ void MaybeMigrateSyncingUserToSignedInAsync(const base::FilePath& profile_path,
   MaybeMigrateSyncingUserToSignedInInternal(profile_path, pref_service,
                                             std::move(closure));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 bool WasPrimaryAccountMigratedFromSyncingToSignedIn(
     const signin::IdentityManager* identity_manager,

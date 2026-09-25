@@ -352,7 +352,7 @@ void SecurityInterstitialTabHelper::ReportPhishingErrorInNewTab() {
                     CMD_REPORT_PHISHING_ERROR_IN_NEW_TAB);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void SecurityInterstitialTabHelper::ShowCertificateViewer() {
   HandleCommand(security_interstitials::SecurityInterstitialCommand::
                     CMD_SHOW_CERTIFICATE_VIEWER);

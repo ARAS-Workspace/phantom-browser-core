@@ -619,7 +619,6 @@ class OCSPErrorTestDelegate : public TestDelegate {
   SSLInfo ssl_info_;
 };
 
-#if !BUILDFLAG(IS_IOS)
 // Compute the root cert's SPKI hash on the fly, to avoid hardcoding it within
 // tests.
 std::array<uint8_t, crypto::hash::kSha256Size> GetTestRootCertSPKIHash() {
@@ -632,7 +631,6 @@ std::array<uint8_t, crypto::hash::kSha256Size> GetTestRootCertSPKIHash() {
       &root_spki));
   return crypto::hash::Sha256(root_spki);
 }
-#endif
 
 }  // namespace
 
@@ -6103,9 +6101,6 @@ TEST_F(URLRequestTestHTTP, ResponseHeadersTest) {
   EXPECT_EQ(headers->GetNormalizedHeader("x-multiple-entries"), "a, b");
 }
 
-// TODO(svaldez): iOS tests are flaky with EmbeddedTestServer and transport
-// security state. (see http://crbug.com/550977).
-#if !BUILDFLAG(IS_IOS)
 TEST_F(URLRequestTestHTTP, ProcessSTS) {
   EmbeddedTestServer https_test_server(net::EmbeddedTestServer::TYPE_HTTPS);
   std::string test_server_hostname = "a.test";
@@ -6309,8 +6304,6 @@ TEST_F(URLRequestTestHTTP, ProcessSTSOnce) {
   EXPECT_FALSE(sts_state.include_subdomains);
   EXPECT_FALSE(sts_state.include_subdomains);
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(ENABLE_REPORTING)
 
@@ -9561,9 +9554,6 @@ TEST_F(HTTPSRequestTest, SSLNetErrorReportedToDelegate) {
   EXPECT_EQ(net::ERR_CERT_DATE_INVALID, d.net_error());
 }
 
-// TODO(svaldez): iOS tests are flaky with EmbeddedTestServer and transport
-// security state. (see http://crbug.com/550977).
-#if !BUILDFLAG(IS_IOS)
 // This tests that a load of a domain with preloaded HSTS and HPKP with a
 // certificate error sets the |certificate_errors_are_fatal| flag correctly.
 // This flag will cause the interstitial to be fatal.
@@ -10490,8 +10480,6 @@ TEST_F(HTTPSSessionTest, DontResumeSessionsForInvalidCertificates) {
   }
 }
 
-#endif  // !BUILDFLAG(IS_IOS)
-
 // Interceptor to check that secure DNS has been disabled. Secure DNS should be
 // disabled for any network fetch triggered during certificate verification as
 // it could cause a deadlock.
@@ -10609,8 +10597,6 @@ class HTTPSCertNetFetchingTest : public HTTPSRequestTest {
   std::unique_ptr<URLRequestContext> context_;
   raw_ptr<CertVerifierWithUpdatableProc> updatable_cert_verifier_;
 };
-
-#if !BUILDFLAG(IS_IOS)
 
 // The test EV policy OID used for generated certs.
 static const char kEVTestCertPolicy[] = "1.3.6.1.4.1.11129.2.4.1";
@@ -11011,8 +10997,6 @@ TEST_F(HTTPSOCSPTest, OldStapledButValidAIA) {
   EXPECT_TRUE(cert_status & CERT_STATUS_REV_CHECKING_ENABLED);
 }
 
-#endif  // !BUILDFLAG(IS_IOS)
-
 class HTTPSAIATest : public HTTPSCertNetFetchingTest {};
 
 TEST_F(HTTPSAIATest, AIAFetching) {
@@ -11044,8 +11028,6 @@ TEST_F(HTTPSAIATest, AIAFetching) {
   ASSERT_TRUE(r->ssl_info().unverified_cert);
   EXPECT_EQ(0u, r->ssl_info().unverified_cert->intermediate_buffers().size());
 }
-
-#if !BUILDFLAG(IS_IOS)
 
 class HTTPSHardFailTest : public HTTPSOCSPTest {
  protected:
@@ -11668,7 +11650,6 @@ TEST_F(HTTPSLocalCRLSetTest, InterceptionBlockedAllowOverrideOnHSTS) {
                 CERT_STATUS_KNOWN_INTERCEPTION_BLOCKED);
   }
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(URLRequestTest, NetworkAccessedSetOnHostResolutionFailure) {
   auto context_builder = CreateTestURLRequestContextBuilder();

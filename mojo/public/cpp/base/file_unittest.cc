@@ -130,9 +130,8 @@ TEST(FileTest, ReadOnlyFileDeath) {
 #endif  // BUILDFLAG(IS_POSIX)
 
 // This should work on all platforms. This check might be relaxed in which case
-// this test can be removed. iOS without blink does not build SyncSocket, so do
-// not build this when blink isn't used.
-#if DCHECK_IS_ON() && (!BUILDFLAG(IS_IOS) || BUILDFLAG(MOJO_USE_APPLE_CHANNEL))
+// this test can be removed.
+#if DCHECK_IS_ON()
 TEST(FileTest, NonPhysicalFileDeath) {
 #if defined(OFFICIAL_BUILD)
   const char kPhysicalFileCheckFailedRegex[] = "";

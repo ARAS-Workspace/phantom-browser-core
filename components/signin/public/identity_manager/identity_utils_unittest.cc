@@ -236,28 +236,6 @@ TEST_F(IdentityUtilsTest, GetOrderedAccountsForDisplayPrimaryAccount) {
   EXPECT_EQ(accounts[0].account_id, primary_account.account_id);
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(IdentityUtilsTest, GetOrderedAccountsForDisplayDeviceOrderOnIOS) {
-  AccountInfo account1 =
-      identity_test_env()->MakeAccountAvailable("alpha@example.com");
-  AccountInfo account2 =
-      identity_test_env()->MakeAccountAvailable("beta@example.com");
-
-  std::vector<AccountInfo> accounts =
-      GetOrderedAccountsForDisplay(identity_manager());
-  ASSERT_EQ(accounts.size(), 2u);
-  EXPECT_EQ(accounts[0].account_id, account1.account_id);
-  EXPECT_EQ(accounts[1].account_id, account2.account_id);
-
-  // Filter by pattern so only beta is allowed.
-  pref_service()->SetString(prefs::kGoogleServicesUsernamePattern, "beta@.*");
-  std::vector<AccountInfo> filtered_accounts =
-      GetOrderedAccountsForDisplay(identity_manager(), pref_service());
-  ASSERT_EQ(filtered_accounts.size(), 1u);
-  EXPECT_EQ(filtered_accounts[0].account_id, account2.account_id);
-}
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 TEST_F(IdentityUtilsTest, GetOrderedAccountsForDisplayDeviceOrderOnAndroid) {
   AccountInfo account1 =

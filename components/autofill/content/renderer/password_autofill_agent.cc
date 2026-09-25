@@ -1554,7 +1554,7 @@ void PasswordAutofillAgent::SendPasswordForms(
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Provide warnings about the accessibility of password forms on the page.
   if (!password_forms_data.empty() &&
       (doc.Url().ProtocolIs(url::kHttpScheme) ||
@@ -1952,7 +1952,7 @@ void PasswordAutofillAgent::CleanupOnDocumentShutdown() {
   field_renderer_id_to_submit_ = FieldRendererId();
   suggestion_banned_fields_.clear();
   times_received_fill_data_.clear();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   page_passwords_analyser_.Reset();
 #endif
 }

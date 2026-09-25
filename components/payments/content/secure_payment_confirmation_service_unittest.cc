@@ -48,11 +48,8 @@ using payments::mojom::SecurePaymentConfirmationAvailabilityEnum;
 
 namespace {
 
-#if !BUILDFLAG(IS_IOS)
 static const int32_t kAlgorithmIdentifier = 1;
 static const int32_t kAnotherAlgorithmIdentifier = 2;
-
-#endif
 
 struct SecurePaymentConfirmationServiceDeleter {
   void operator()(SecurePaymentConfirmationService* spc_service) {
@@ -357,8 +354,6 @@ TEST_F(SecurePaymentConfirmationServiceFeatureDisabledTest,
       mock_secure_payment_confirmation_availability_callback_.Get());
 }
 
-#if !BUILDFLAG(IS_IOS)
-
 struct CredentialTestParams {
   // The algorithm identifier supported by the fake browser bound key store.
   FakeBrowserBoundKey fake_key;
@@ -604,7 +599,5 @@ TEST_P(SecurePaymentConfirmationServiceCredentialTest,
   ASSERT_FALSE(actual_payment_options.is_null());
   EXPECT_FALSE(actual_payment_options->browser_bound_public_key.has_value());
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace payments

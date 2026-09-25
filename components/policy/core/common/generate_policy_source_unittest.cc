@@ -53,7 +53,6 @@ TEST(GeneratePolicySource, ChromeSchemaData) {
     EXPECT_TRUE(GetChromePolicyDetails(it.key()));
   }
 
-#if !BUILDFLAG(IS_IOS)
   subschema = schema.GetProperty(key::kDefaultCookiesSetting);
   ASSERT_TRUE(subschema.valid());
   EXPECT_EQ(base::Value::Type::INTEGER, subschema.type());
@@ -99,9 +98,8 @@ TEST(GeneratePolicySource, ChromeSchemaData) {
   }
   EXPECT_TRUE(it.IsAtEnd());
   EXPECT_TRUE(next == kExpectedProperties.end());
-#endif  // !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   subschema = schema.GetProperty(key::kExtensionSettings);
   ASSERT_TRUE(subschema.valid());
   ASSERT_EQ(base::Value::Type::DICT, subschema.type());
@@ -137,11 +135,9 @@ TEST(GeneratePolicySource, ChromeSchemaData) {
 
 TEST(GeneratePolicySource, PolicyScope) {
   const PolicyDetails* details;
-#if !BUILDFLAG(IS_IOS)
   details = GetChromePolicyDetails(key::kCloudProfileReportingEnabled);
   ASSERT_TRUE(details);
   EXPECT_EQ(kSingleProfile, details->scope);
-#endif
 
   details = GetChromePolicyDetails(key::kDefaultSearchProviderEnabled);
   ASSERT_TRUE(details);
@@ -168,14 +164,12 @@ TEST(GeneratePolicySource, PolicyDetails) {
   EXPECT_EQ(6, details->id);
   EXPECT_EQ(0u, details->max_external_data_size);
 
-#if !BUILDFLAG(IS_IOS)
   details = GetChromePolicyDetails(key::kJavascriptEnabled);
   ASSERT_TRUE(details);
   EXPECT_TRUE(details->is_deprecated);
   EXPECT_EQ(kProfile, details->scope);
   EXPECT_EQ(9, details->id);
   EXPECT_EQ(0u, details->max_external_data_size);
-#endif
 
 }
 

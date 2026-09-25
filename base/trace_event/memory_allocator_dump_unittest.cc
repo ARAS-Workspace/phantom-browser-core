@@ -150,8 +150,8 @@ TEST(MemoryAllocatorDumpTest, MovingAnEntry) {
   EXPECT_EQ(expected_entry, to_entry);
 }
 
-// DEATH tests are not supported in Android/iOS/Fuchsia.
-#if !defined(NDEBUG) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+// DEATH tests are not supported in Android.
+#if !defined(NDEBUG) && !BUILDFLAG(IS_ANDROID)
 TEST(MemoryAllocatorDumpTest, ForbidDuplicatesDeathTest) {
   FakeMemoryAllocatorDumpProvider fmadp;
   MemoryDumpArgs dump_args = {MemoryDumpLevelOfDetail::kDetailed};

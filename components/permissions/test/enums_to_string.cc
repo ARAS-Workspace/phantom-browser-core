@@ -38,13 +38,13 @@ std::string_view ToString(permissions::RequestType request_type) {
   static constexpr auto map =
       base::MakeFixedFlatMap<RequestType, std::string_view>({
           {RequestType::kArSession, "ArSession"},
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
           {RequestType::kCameraPanTiltZoom, "CameraPanTiltZoom"},
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
           {RequestType::kCameraStream, "CameraStream"},
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
           {RequestType::kCapturedSurfaceControl, "CapturedSurfaceControl"},
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
           {RequestType::kClipboard, "Clipboard"},
           {RequestType::kTopLevelStorageAccess, "TopLevelStorageAccess"},
           {RequestType::kDiskQuota, "DiskQuota"},
@@ -53,31 +53,31 @@ std::string_view ToString(permissions::RequestType request_type) {
           {RequestType::kHandTracking, "HandTracking"},
           {RequestType::kIdentityProvider, "IdentityProvider"},
           {RequestType::kIdleDetection, "IdleDetection"},
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
           {RequestType::kLocalFonts, "LocalFonts"},
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
           {RequestType::kMicStream, "MicStream"},
           {RequestType::kMidiSysex, "MidiSysex"},
           {RequestType::kMultipleDownloads, "MultipleDownloads"},
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
           {RequestType::kNfcDevice, "NfcDevice"},
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
           {RequestType::kNotifications, "Notifications"},
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
           {RequestType::kKeyboardLock, "KeyboardLock"},
           {RequestType::kPointerLock, "PointerLock"},
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_ANDROID)
           {RequestType::kProtectedMediaIdentifier, "ProtectedMediaIdentifier"},
 #endif
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
           {RequestType::kRegisterProtocolHandler, "RegisterProtocolHandler"},
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
           {RequestType::kStorageAccess, "StorageAccess"},
           {RequestType::kVrSession, "VrSession"},
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
           {RequestType::kWebAppInstallation, "WebAppInstallation"},
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
           {RequestType::kWindowManagement, "WindowManagement"},
       });
 

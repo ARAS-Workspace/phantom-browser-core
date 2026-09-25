@@ -305,19 +305,6 @@ class MockAutofillClient : public TestAutofillClient {
   MOCK_METHOD(void, DismissAutofillAiLoadingDialog, (), (override));
 #endif
 
-#if BUILDFLAG(IS_IOS)
-  // Mock the client query ID check.
-  bool IsLastQueriedField(FieldGlobalId field_id) override {
-    return !last_queried_field_id_ || last_queried_field_id_ == field_id;
-  }
-
-  void set_last_queried_field(FieldGlobalId field_id) {
-    last_queried_field_id_ = field_id;
-  }
-
- private:
-  FieldGlobalId last_queried_field_id_;
-#endif
 };
 
 class TestCreditCardAccessManager : public CreditCardAccessManager {
@@ -2726,7 +2713,7 @@ TEST_F(AutofillExternalDelegateTest, FillAutofillAiFillsFullForm) {
                                           {.multi_index = {0}});
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Tests that when accepting a `kFillAutofillAi` suggestion that requires
 // re-authentication, the re-authentication flow is triggered and the form is
 // filled upon success.
@@ -2821,10 +2808,10 @@ TEST_F(AutofillExternalDelegateTest, AutofillAiReauthFlow_ReauthMessage) {
       .WillOnce(Return(true));
 
   std::u16string expected_message;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC)
   expected_message = l10n_util::GetStringFUTF16(IDS_AUTOFILL_AI_FILLING_REAUTH,
                                                 base::UTF8ToUTF16(kUrl.host()));
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC)
   EXPECT_CALL(*authenticator, AuthenticateWithMessage(expected_message, _))
       .WillOnce(RunOnceCallback<1>(true));
 
@@ -3230,7 +3217,7 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
                                           {.multi_index = {0}});
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Tests that when attempting to fill a masked server entity and re-auth fails,
 // no failure notification is displayed.
 TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
@@ -4100,7 +4087,6 @@ TEST_F(AutofillExternalDelegateTest,
       SuggestionPosition{.multi_index = {0}});
 }
 
-#if !BUILDFLAG(IS_IOS)
 // Test that the driver is directed to clear or undo the form after being
 // notified that the user accepted the suggestion to clear or undo the form.
 TEST_F(AutofillExternalDelegateTest, ExternalDelegateUndoForm) {
@@ -4118,7 +4104,6 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegateUndoPreviewForm) {
   EXPECT_CALL(autofill_manager(), UndoAutofill);
   external_delegate().DidSelectSuggestion(Suggestion(SuggestionType::kUndo));
 }
-#endif
 
 // Test that autofill client will scan a credit card after use accepted the
 // suggestion to scan a credit card.
@@ -4729,21 +4714,6 @@ TEST_F(AutofillExternalDelegateTest, UpdateSuggestions_ProductChanged) {
 // TODO(crbug.com/41483208): Add test case where 'Show cards from your Google
 // account' button is clicked. Encountered issues with test sync setup when
 // attempting to make it.
-
-#if BUILDFLAG(IS_IOS)
-// Tests that outdated returned suggestions are discarded.
-TEST_F(AutofillExternalDelegateTest, ShouldDiscardOutdatedSuggestions) {
-  FieldGlobalId old_field_id = test::MakeFieldGlobalId();
-  FormFieldData old_field;
-  old_field.set_host_frame(old_field_id.frame_token);
-  old_field.set_renderer_id(old_field_id.renderer_id);
-  FieldGlobalId new_field_id = test::MakeFieldGlobalId();
-  autofill_client().set_last_queried_field(new_field_id);
-  IssueOnQuery();
-  EXPECT_CALL(autofill_client(), ShowAutofillSuggestions).Times(0);
-  OnSuggestionsReturned(old_field, std::vector<Suggestion>());
-}
-#endif
 
 // Tests that @memory search results use the kReplaceSelectionForAtMemory
 // action.

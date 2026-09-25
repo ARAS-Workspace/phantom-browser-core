@@ -167,12 +167,6 @@ bool CurrentUIThread::WatchFileDescriptor(
 }
 #endif
 
-#if BUILDFLAG(IS_IOS)
-void CurrentUIThread::Attach() {
-  current_->AttachToMessagePump();
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 #if BUILDFLAG(IS_ANDROID)
 void CurrentUIThread::Abort() {
   GetMessagePumpForUI()->Abort();
@@ -214,8 +208,7 @@ bool CurrentIOThread::WatchFileDescriptor(
 }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_MAC) || \
-    (BUILDFLAG(IS_IOS) && !BUILDFLAG(CRONET_BUILD) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_MAC)
 bool CurrentIOThread::WatchMachReceivePort(
     mach_port_t port,
     MessagePumpForIO::MachPortWatchController* controller,

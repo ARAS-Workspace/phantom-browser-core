@@ -82,10 +82,6 @@ void MockConfigurationPolicyProvider::WaitForPoliciesUpdated(
     policy::PolicyDomain domain) {
   if (!policy_service_) {
     bool spin_run_loop = base::CurrentThread::IsSet();
-#if BUILDFLAG(IS_IOS)
-    // On iOS, the UI message loop does not support RunUntilIdle().
-    spin_run_loop &= !base::CurrentUIThread::IsSet();
-#endif  // BUILDFLAG(IS_IOS)
     if (spin_run_loop) {
       base::RunLoop().RunUntilIdle();
     }

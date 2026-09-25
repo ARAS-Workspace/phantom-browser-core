@@ -27,9 +27,7 @@ namespace {
 const test::TaskEnvironment::MainThreadType testing_main_threads[] = {
     test::TaskEnvironment::MainThreadType::DEFAULT,
     test::TaskEnvironment::MainThreadType::IO,
-#if !BUILDFLAG(IS_IOS)  // iOS does not allow direct running of the UI loop.
     test::TaskEnvironment::MainThreadType::UI,
-#endif
 };
 
 void QuitWhenSignaled(base::OnceClosure quit_closure, WaitableEvent* event) {

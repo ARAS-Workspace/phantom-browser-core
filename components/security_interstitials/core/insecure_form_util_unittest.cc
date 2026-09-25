@@ -13,19 +13,6 @@ using security_interstitials::IsInsecureFormActionOnSecureSource;
 
 class InsecureFormUtilTest : public ::testing::Test {
  public:
-#if BUILDFLAG(IS_IOS)
-  void SetUp() override {
-    security_interstitials::SetInsecureFormPortsForTesting(
-        /*port_treated_as_secure=*/123,
-        /*port_treated_as_insecure=*/456);
-  }
-
-  void TearDown() override {
-    security_interstitials::SetInsecureFormPortsForTesting(
-        /*port_treated_as_secure=*/0,
-        /*port_treated_as_insecure=*/0);
-  }
-#endif
 };
 
 TEST_F(InsecureFormUtilTest, IsInsecureFormActionOnSecureSource) {
@@ -42,18 +29,6 @@ TEST_F(InsecureFormUtilTest, IsInsecureFormActionOnSecureSource) {
   EXPECT_FALSE(IsInsecureFormActionOnSecureSource(
       url::Origin::Create(GURL("https://example.com")),
       GURL("https://example.com")));
-
-#if BUILDFLAG(IS_IOS)
-  EXPECT_TRUE(IsInsecureFormActionOnSecureSource(
-      url::Origin::Create(GURL("http://127.0.0.1:123")),
-      GURL("http://127.0.0.1:456")));
-  EXPECT_TRUE(IsInsecureFormActionOnSecureSource(
-      url::Origin::Create(GURL("https://example.com")),
-      GURL("http://127.0.0.1:456")));
-  EXPECT_TRUE(IsInsecureFormActionOnSecureSource(
-      url::Origin::Create(GURL("http://127.0.0.1:123")),
-      GURL("http://example.com")));
-#endif
 
   // Opaque https source with insecure action still counts.
   EXPECT_TRUE(IsInsecureFormActionOnSecureSource(

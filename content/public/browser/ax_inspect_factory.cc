@@ -22,8 +22,7 @@ AXInspectFactory::CreatePlatformFormatter() {
   return AXInspectFactory::CreateFormatter(DefaultPlatformFormatterType());
 }
 
-// TODO(crbug.com/336611337): Add iOS-specific AXInspectorFactory logic.
-#if !BUILDFLAG(HAS_PLATFORM_ACCESSIBILITY_SUPPORT) || BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(HAS_PLATFORM_ACCESSIBILITY_SUPPORT)
 
 // static
 ui::AXApiType::Type AXInspectFactory::DefaultPlatformFormatterType() {

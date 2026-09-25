@@ -364,9 +364,6 @@ int LaunchTestsInternal(TestLauncherDelegate* launcher_delegate,
   // java for child processes.
   if (command_line->HasSwitch(switches::kProcessType) ||
       command_line->HasSwitch(switches::kLaunchAsBrowser)) {
-#if BUILDFLAG(IS_IOS)
-    base::AtExitManager at_exit;
-#endif
     // The main test process has this initialized by the base::TestSuite. But
     // child processes don't have a TestSuite, and must initialize this
     // explicitly before ContentMain.
@@ -483,18 +480,6 @@ int LaunchTests(TestLauncherDelegate* launcher_delegate,
     PrintUsage();
     return 0;
   }
-
-#if BUILDFLAG(IS_IOS)
-  // We need to spawn the UIApplication up for testing, that is done via
-  // RunTestsFromIOSApp. We do not want to do this for subprocesses that
-  // do not require a UIApplication.
-  if (!command_line->HasSwitch(switches::kProcessType) &&
-      !command_line->HasSwitch(switches::kLaunchAsBrowser)) {
-    base::InitIOSRunHook(base::BindOnce(&LaunchTestsInternal, launcher_delegate,
-                                        parallel_jobs, argc, argv));
-    return base::RunTestsFromIOSApp();
-  }
-#endif
 
   return LaunchTestsInternal(launcher_delegate, parallel_jobs, argc, argv);
 }

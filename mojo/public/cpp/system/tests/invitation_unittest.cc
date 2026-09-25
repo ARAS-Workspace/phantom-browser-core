@@ -34,9 +34,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/multiprocess_func_list.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "mojo/public/cpp/platform/named_platform_channel.h"
-#endif
 
 namespace mojo {
 namespace {
@@ -48,22 +46,18 @@ enum class InvitationType {
 
 enum class TransportType {
   kChannel,
-#if !BUILDFLAG(IS_IOS)
   // Fuchsia has no named pipe support.
   kChannelServer,
   // Test the scenario of calling SendIsolated without providing remote process
   // handle.
   kChannelServerWithoutHandle,
-#endif
 };
 
 // Switches and values to tell clients of parameterized test runs what mode they
 // should be testing against.
 const char kTransportTypeSwitch[] = "test-transport-type";
 const char kTransportTypeChannel[] = "channel";
-#if !BUILDFLAG(IS_IOS)
 const char kTransportTypeChannelServer[] = "channel-server";
-#endif
 
 // TODO(crbug.com/40900578): Flaky on Tsan.
 #if defined(THREAD_SANITIZER)
@@ -105,7 +99,6 @@ class MAYBE_InvitationCppTest
         channel_endpoint = channel->TakeLocalEndpoint();
         break;
       }
-#if !BUILDFLAG(IS_IOS)
       case TransportType::kChannelServer:
       case TransportType::kChannelServerWithoutHandle: {
         command_line.AppendSwitchASCII(kTransportTypeSwitch,
@@ -118,7 +111,6 @@ class MAYBE_InvitationCppTest
         server_endpoint = named_channel.TakeServerEndpoint();
         break;
       }
-#endif  // !BUILDFLAG(IS_IOS)
     }
 
     std::string enable_features;
@@ -159,7 +151,6 @@ class MAYBE_InvitationCppTest
               std::move(channel_endpoint), {}, child_process_.Handle());
         }
         break;
-#if !BUILDFLAG(IS_IOS)
       case TransportType::kChannelServer:
         DCHECK(server_endpoint.is_valid());
         if (invitation_type != InvitationType::kIsolated) {
@@ -189,7 +180,6 @@ class MAYBE_InvitationCppTest
               OutgoingInvitation::SendIsolated(std::move(server_endpoint), {});
         }
         break;
-#endif  // !BUILDFLAG(IS_IOS)
     }
   }
 
@@ -230,14 +220,12 @@ class TestClientBase : public MAYBE_InvitationCppTest {
 
   static PlatformChannelEndpoint RecoverEndpointFromCommandLine() {
     const auto& command_line = *base::CommandLine::ForCurrentProcess();
-#if !BUILDFLAG(IS_IOS)
     std::string transport_type_string =
         command_line.GetSwitchValueASCII(kTransportTypeSwitch);
     CHECK(!transport_type_string.empty());
     if (transport_type_string != kTransportTypeChannel) {
       return NamedPlatformChannel::ConnectToServer(command_line);
     }
-#endif
     return PlatformChannel::RecoverPassedEndpointFromCommandLine(command_line);
   }
 
@@ -387,11 +375,9 @@ INSTANTIATE_TEST_SUITE_P(
     All,
     MAYBE_InvitationCppTest,
     testing::Values(TransportType::kChannel
-#if !BUILDFLAG(IS_IOS)
                     ,
                     TransportType::kChannelServer,
                     TransportType::kChannelServerWithoutHandle
-#endif
                     ));
 
 }  // namespace

@@ -97,9 +97,6 @@ TEST(MimeUtilTest, ExtensionTest) {
       {FILE_PATH_LITERAL("md"),
        {
            "text/markdown",
-#if BUILDFLAG(IS_IOS)
-           "text/x-markdown",  // System override for iOS.
-#endif
        }},
       {FILE_PATH_LITERAL("not an extension / for sure"), {}},
       {containsNullByte, {}}};

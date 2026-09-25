@@ -332,9 +332,6 @@ TEST_P(LayerTreeHostTilesTestRasterColorSpace, sRGB) {
 }
 
 TEST_P(LayerTreeHostTilesTestRasterColorSpace, GenericRGB) {
-#if BUILDFLAG(IS_IOS)
-  pixel_comparator_ = std::make_unique<FuzzyPixelOffByOneComparator>();
-#endif
   SetColorSpace(gfx::ColorSpace(gfx::ColorSpace::PrimaryID::APPLE_GENERIC_RGB,
                                 gfx::ColorSpace::TransferID::GAMMA18));
 

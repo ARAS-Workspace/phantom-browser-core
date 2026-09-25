@@ -317,7 +317,7 @@ TEST_F(SavedTabGroupConversionTest, VerifyLocalFieldsOnProtoToGroupConversion) {
   pb_local_group_data->set_is_group_hidden(true);
   pb_local_group_data->set_archival_time_windows_epoch_micros(time_in_micros);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   std::string serialized_local_id = base::Token::CreateRandom().ToString();
   pb_local_group_data->set_local_group_id(serialized_local_id);
 #endif

@@ -15,8 +15,6 @@
 #include "components/account_settings/account_settings.h"
 #include "components/account_settings/account_settings_features.h"
 #include "components/account_settings/mock_account_setting_service.h"
-#if !BUILDFLAG(IS_IOS)
-#endif
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/optimization_guide/core/model_execution/model_execution_prefs.h"
 #include "components/personal_context/core/personal_context_debug_features.h"
@@ -415,9 +413,6 @@ TEST_P(PersonalContextEligibilityServiceImplLocaleTest, CheckLocaleEnablement) {
         PersonalContextNonEligibilityReason::kNotLocaleEnUS, 1);
   }
 }
-
-#if !BUILDFLAG(IS_IOS)
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Tests that `PersonalContextEligibilityService` returns `kDisabledNotEligible`
 // when the `FindAndFillWithGeminiSettings` policy is disabled.

@@ -706,9 +706,6 @@ TEST_F(NetworkServiceTest, AuthEnableNegotiatePort) {
       auth_handler_factory->http_auth_preferences()->NegotiateEnablePort());
 }
 
-// DnsClient isn't supported on iOS.
-#if !BUILDFLAG(IS_IOS)
-
 TEST_F(NetworkServiceTest, DnsClientEnableDisable) {
   // Create valid DnsConfig.
   net::DnsConfig config;
@@ -1198,8 +1195,6 @@ TEST_F(NetworkServiceTest, DohProbe_ContextRemovedAfterTimeout) {
   task_environment()->RunUntilIdle();
   EXPECT_FALSE(dns_client_ptr->factory()->doh_probes_running());
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 // |ntlm_v2_enabled| is only supported on POSIX platforms.
 #if BUILDFLAG(IS_POSIX)
@@ -1871,9 +1866,6 @@ TEST_F(NetworkServiceTestWithService, GetNetworkList) {
   run_loop.Run();
 }
 
-// DnsClient isn't supported on iOS.
-#if !BUILDFLAG(IS_IOS)
-
 // Ensures that network requests succeed after enabling/disabling
 // HappyEyeballsV3.
 TEST_F(NetworkServiceTestWithService, EnableDisableHappyEyeballsV3AndLoad) {
@@ -1897,8 +1889,6 @@ TEST_F(NetworkServiceTestWithService, EnableDisableHappyEyeballsV3AndLoad) {
   LoadURL(test_server()->GetURL("/echo"));
   EXPECT_EQ(net::OK, client()->completion_status().error_code);
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 class TestNetworkChangeManagerClient
     : public mojom::NetworkChangeManagerClient {

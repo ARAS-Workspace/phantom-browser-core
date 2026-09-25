@@ -32,55 +32,55 @@ constexpr auto kCanonicalTags = std::to_array<LanguageTag>({
 
 constexpr auto kExcludedTags = base::MakeFixedFlatSet<LanguageTag>({
     GetKnownLanguageTag("ar-XB"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("as"),
 #endif
     GetKnownLanguageTag("ay"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("bho"),
     GetKnownLanguageTag("bm"),
     GetKnownLanguageTag("ceb"),
     GetKnownLanguageTag("chr"),
 #endif
     GetKnownLanguageTag("co"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("doi"),
 #endif
     GetKnownLanguageTag("dv"),
     GetKnownLanguageTag("en-001"),
     GetKnownLanguageTag("en-GB-oxendict"),
     GetKnownLanguageTag("en-XA"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("fy"),
     GetKnownLanguageTag("gd"),
 #endif
     GetKnownLanguageTag("gn"),
     GetKnownLanguageTag("hmn"),
     GetKnownLanguageTag("ht"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("ia"),
 #endif
     GetKnownLanguageTag("ilo"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("jv"),
     GetKnownLanguageTag("kok"),
 #endif
     GetKnownLanguageTag("kri"),
     GetKnownLanguageTag("la"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("lb"),
 #endif
     GetKnownLanguageTag("lus"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("mai"),
     GetKnownLanguageTag("mi"),
 #endif
     GetKnownLanguageTag("mni-Mtei"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("nso"),
 #endif
     GetKnownLanguageTag("ny"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("oc"),
     GetKnownLanguageTag("qu"),
     GetKnownLanguageTag("sa"),
@@ -88,19 +88,19 @@ constexpr auto kExcludedTags = base::MakeFixedFlatSet<LanguageTag>({
 #endif
     GetKnownLanguageTag("sh"),
     GetKnownLanguageTag("sm"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("st"),
     GetKnownLanguageTag("su"),
     GetKnownLanguageTag("tk"),
     GetKnownLanguageTag("tn"),
 #endif
     GetKnownLanguageTag("ts"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("tt"),
     GetKnownLanguageTag("ug"),
 #endif
     GetKnownLanguageTag("und"),
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     GetKnownLanguageTag("wo"),
     GetKnownLanguageTag("xh"),
     GetKnownLanguageTag("yi"),

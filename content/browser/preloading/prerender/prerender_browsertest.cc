@@ -12251,10 +12251,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderEagernessBrowserTest, kConservative) {
   EXPECT_TRUE(prerender_observer.was_activated());
 }
 
-// TODO(crbug.com/40275452): These tests are turned off on Fuchsia and iOS
-// tentatively because pointer simulation on them doesn't work properly on this
-// test.
-#if !BUILDFLAG(IS_IOS)
 // Tests the metrics
 // Prerender.Experimental.ReceivedPrerendersPerPrimaryPageChangedCount2
 // correctly records the number of prerenders by each category per primary page
@@ -12498,7 +12494,6 @@ IN_PROC_BROWSER_TEST_P(PrerenderTargetAgnosticBrowserTest,
   GTEST_SKIP();
 #endif  // BUILDFLAG(IS_ANDROID)
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 class PrerenderWithBackForwardCacheBrowserTest
     : public PrerenderBrowserTest,

@@ -224,7 +224,7 @@ TransportSecurityState::TransportSecurityState(
     std::vector<std::string> hsts_host_bypass_list) {
 // Static pinning is only enabled for official builds to make sure that
 // others don't end up with pins that cannot be easily updated.
-#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
   enable_static_pins_ = false;
 #endif
   // Check that there no invalid entries in the static HSTS bypass list.

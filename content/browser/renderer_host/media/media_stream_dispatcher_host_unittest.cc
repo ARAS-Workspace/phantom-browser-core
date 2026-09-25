@@ -1601,7 +1601,7 @@ TEST_F(MediaStreamDispatcherHostMultiCaptureTest,
   EXPECT_FALSE(future.Get<GenerateStreamsUIThreadCheckResult>().has_value());
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 class MediaStreamDispatcherHostCapturedSurfaceControlTest
     : public MediaStreamDispatcherHostTest {
  public:
@@ -1666,6 +1666,6 @@ TEST_F(MediaStreamDispatcherHostCapturedSurfaceControlTest,
                                                 future.GetCallback());
   EXPECT_EQ(future.Get(), CapturedSurfaceControlResult::kSuccess);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

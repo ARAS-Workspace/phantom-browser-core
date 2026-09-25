@@ -168,7 +168,7 @@ StubPasswordManagerClient::GetPasswordFeatureManager() {
   return &password_feature_manager_;
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 safe_browsing::PasswordProtectionService*
 StubPasswordManagerClient::GetPasswordProtectionService() const {
   return nullptr;
@@ -241,7 +241,6 @@ void StubPasswordManagerClient::MaybeShowSavePasswordPrimingPromo(
     const url::Origin& origin) {}
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_IOS)
 std::unique_ptr<
     password_manager::PasswordCrossDomainConfirmationPopupController>
 StubPasswordManagerClient::ShowCrossDomainConfirmationPopup(
@@ -253,7 +252,6 @@ StubPasswordManagerClient::ShowCrossDomainConfirmationPopup(
     base::OnceClosure confirmation_callback) {
   return nullptr;
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 password_manager::UndoPasswordChangeController*
 StubPasswordManagerClient::GetUndoPasswordChangeController() {

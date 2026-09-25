@@ -85,7 +85,7 @@ SurfaceEmbedConnector* RenderFrameHostDelegate::GetSurfaceEmbedConnector()
   return nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
 void RenderFrameHostDelegate::GetNFC(
     RenderFrameHostImpl* render_frame_host,
     mojo::PendingReceiver<device::mojom::NFC> receiver) {}
@@ -101,7 +101,7 @@ void RenderFrameHostDelegate::FullscreenStateChanged(
     bool is_fullscreen,
     blink::mojom::FullscreenOptionsPtr options) {}
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 bool RenderFrameHostDelegate::CanUseWindowingControls(RenderFrameHostImpl*) {
   return false;
 }

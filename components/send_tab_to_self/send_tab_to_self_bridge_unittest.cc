@@ -1602,34 +1602,6 @@ TEST_F(SendTabToSelfBridgeTest, NotifyRemoteSendTabToSelfEntryOpened) {
   EXPECT_EQ(2ul, bridge()->GetAllGuids().size());
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(SendTabToSelfBridgeTest, WriteToLastTabReceivedPref) {
-  InitializeBridge();
-
-  // Add two remote entries.
-  SendTabToSelfEntry entry("guid1", GURL("http://www.example.com/"), "title",
-                           AdvanceAndGetTime(), "device", kLocalDeviceCacheGuid,
-                           PageContext(), NavigationHistory());
-  SendTabToSelfEntry entry2(
-      "guid2", GURL("http://www.example2.com/"), "title", AdvanceAndGetTime(),
-      "device", kLocalDeviceCacheGuid, PageContext(), NavigationHistory());
-  syncer::EntityChangeList add_changes;
-  add_changes.push_back(
-      syncer::EntityChange::CreateAdd("guid1", MakeEntityData(entry)));
-  add_changes.push_back(
-      syncer::EntityChange::CreateAdd("guid2", MakeEntityData(entry2)));
-  auto metadata_change_list =
-      std::make_unique<syncer::InMemoryMetadataChangeList>();
-  bridge()->ApplyIncrementalSyncChanges(std::move(metadata_change_list),
-                                        std::move(add_changes));
-
-  // Assert that the URL for the latest entry is written to the pref.
-  EXPECT_TRUE(pref_service()->GetString(
-                  prefs::kIOSSendTabToSelfLastReceivedTabURLPref) ==
-              "http://www.example2.com/");
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 TEST_F(SendTabToSelfBridgeTest, SendTabToSelfEntryOpened_QueueUnknownGuid) {
   InitializeBridge();
   SetLocalDeviceCacheGuid("Device1");

@@ -55,14 +55,12 @@ MemoryConsumerRegistration::MemoryConsumerRegistration(
       check_unregister_(check_unregister),
       registry_(MemoryConsumerRegistry::MaybeGet()) {
   if (!registry_) {
-#if !BUILDFLAG(IS_IOS)
     // Enforce that the registry exists outside of tests to prevent components
     // from silently failing to respond to memory pressure.
     CHECK_IS_TEST()
         << ". The MemoryConsumerRegistry did not exist at the time the "
            "MemoryConsumerRegistration for "
         << consumer_name << " was created.";
-#endif
     return;
   }
 

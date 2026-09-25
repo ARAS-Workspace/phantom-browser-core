@@ -384,7 +384,7 @@ TEST_F(OrderTemplateUrlsByPrepopulatedAndManagedAndAlphabetically,
   EXPECT_FALSE((*comparator)(google_engine.get(), bing_engine.get()));
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 class SortAndFilterRecentlyVisitedURLsTest : public testing::Test {
  protected:
   std::unique_ptr<TemplateURL> CreateSearchEngineWithVisitTime(
@@ -475,7 +475,7 @@ TEST_F(SortAndFilterRecentlyVisitedURLsTest, HandlesFewerThanMaxEngines) {
   EXPECT_EQ(recently_visited[0], engine_newer.get());
   EXPECT_EQ(recently_visited[1], engine_older.get());
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 class GetDisabledStarterPackIdsTest : public testing::Test {};
 

@@ -263,7 +263,7 @@ std::ostream& operator<<(std::ostream& out,
   return out << v.major << "." << v.minor << "." << v.bugfix;
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_MAC)
 // static
 std::string SysInfo::OperatingSystemArchitecture() {
   struct utsname info;
@@ -280,7 +280,7 @@ std::string SysInfo::OperatingSystemArchitecture() {
   }
   return arch;
 }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_MAC)
 
 // static
 size_t SysInfo::VMAllocationGranularity() {

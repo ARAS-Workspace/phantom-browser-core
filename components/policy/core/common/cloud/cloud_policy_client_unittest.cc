@@ -590,10 +590,8 @@ class CloudPolicyClientTest : public testing::Test {
   }
 
   void VerifyQueryParameter() {
-#if !BUILDFLAG(IS_IOS)
     EXPECT_THAT(query_params_,
                 Contains(Pair(dm_protocol::kParamOAuthToken, kOAuthToken)));
-#endif
   }
 
   std::unique_ptr<base::test::TaskEnvironment> task_environment_;
@@ -2384,10 +2382,8 @@ TEST_F(CloudPolicyClientTest, UploadStatusWithOAuthToken) {
   EXPECT_EQ(DeviceManagementService::JobConfiguration::TYPE_UPLOAD_STATUS,
             job_type_);
   EXPECT_EQ(auth_data_, DMAuth::FromDMToken(kDMToken));
-#if !BUILDFLAG(IS_IOS)
   EXPECT_THAT(query_params_,
               Not(Contains(Pair(dm_protocol::kParamOAuthToken, kOAuthToken))));
-#endif
   EXPECT_EQ(job_request_.SerializePartialAsString(),
             GetUploadStatusRequest().SerializePartialAsString());
   EXPECT_EQ(DM_STATUS_SUCCESS, client_->last_dm_status());

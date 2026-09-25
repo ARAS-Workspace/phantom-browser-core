@@ -145,12 +145,3 @@ const char switches::kWithDeathTestStackTraces[] =
 const char switches::kFuzz[] = "fuzz";
 const char switches::kFuzzFor[] = "fuzz_for";
 const char switches::kListFuzzTests[] = "list_fuzz_tests";
-
-#if BUILDFLAG(IS_IOS)
-// If enabled, runs unittests using the XCTest test runner.
-const char switches::kEnableRunIOSUnittestsWithXCTest[] =
-    "enable-run-ios-unittests-with-xctest";
-// Write a compiled test json file to a location where writable.
-const char switches::kWriteCompiledTestsJsonToWritablePath[] =
-    "write-compiled-tests-json-to-writable-path";
-#endif

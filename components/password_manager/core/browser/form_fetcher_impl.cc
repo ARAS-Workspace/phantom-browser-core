@@ -140,7 +140,7 @@ void FormFetcherImpl::Fetch() {
 
 // The statistics isn't needed on mobile, only on desktop. Let's save some
 // processor cycles.
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // The statistics is needed for the "Save password?" bubble.
   password_manager::SmartBubbleStatsStore* stats_store =
       profile_password_store->GetSmartBubbleStatsStore();

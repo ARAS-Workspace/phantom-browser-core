@@ -104,7 +104,6 @@ TEST(SelectFaviconFramesTest, _16From16) {
   EXPECT_EQ(16, image.height());
   EXPECT_EQ(SK_ColorGREEN, GetColor1x(image));
 
-#if !BUILDFLAG(IS_IOS)
   const gfx::ImageSkiaRep& rep = image.GetRepresentation(1.5f);
   EXPECT_EQ(1.5f, rep.scale());
   EXPECT_EQ(16, rep.GetWidth());
@@ -112,7 +111,6 @@ TEST(SelectFaviconFramesTest, _16From16) {
   EXPECT_EQ(24, rep.pixel_width());
   EXPECT_EQ(24, rep.pixel_height());
   EXPECT_EQ(2u, image.image_reps().size());
-#endif
 }
 
 TEST(SelectFaviconFramesTest, _16From17) {
@@ -187,7 +185,6 @@ TEST(SelectFaviconFramesTest, _16From16_Scale2x_32_From_32) {
   EXPECT_EQ(SK_ColorGREEN, GetColor1x(image));
   EXPECT_EQ(SK_ColorBLUE, GetColor2x(image));
 
-#if !BUILDFLAG(IS_IOS)
   const gfx::ImageSkiaRep& rep = image.GetRepresentation(1.5f);
   EXPECT_EQ(1.5f, rep.scale());
   EXPECT_EQ(16, rep.GetWidth());
@@ -195,7 +192,6 @@ TEST(SelectFaviconFramesTest, _16From16_Scale2x_32_From_32) {
   EXPECT_EQ(24, rep.pixel_width());
   EXPECT_EQ(24, rep.pixel_height());
   EXPECT_EQ(3u, image.image_reps().size());
-#endif
 }
 
 TEST(SelectFaviconFramesTest, ExactMatchBetterThanLargeBitmap) {

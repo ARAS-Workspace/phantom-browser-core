@@ -766,7 +766,6 @@ std::unique_ptr<UnexportableKeyProviderApple> GetUnexportableKeyProviderApple(
   CHECK(!config.keychain_access_group.empty())
       << "A keychain access group must be set when using unexportable keys on "
          "Apple platforms";
-#if !BUILDFLAG(IS_IOS)
   // Secure Enclave on iOS is available since the iPhone 5s (A7 chip). This
   // redundant check causes crashes because of the synchronous initialization of
   // `TKTokenWatcher` on every call.
@@ -780,7 +779,6 @@ std::unique_ptr<UnexportableKeyProviderApple> GetUnexportableKeyProviderApple(
           config.keychain_access_group)) {
     return nullptr;
   }
-#endif  // !BUILDFLAG(IS_IOS)
   return std::make_unique<UnexportableKeyProviderApple>(std::move(config));
 }
 

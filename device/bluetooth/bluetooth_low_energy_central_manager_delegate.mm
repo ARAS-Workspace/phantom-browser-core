@@ -33,10 +33,6 @@ class BluetoothLowEnergyCentralManagerBridge {
   }
 
   void UpdatedState(bool powered) {
-#if BUILDFLAG(IS_IOS)
-    // On Mac, the Bluetooth classic code notifies the power changed.
-    adapter_->NotifyAdapterPoweredChanged(powered);
-#endif
     discovery_manager_->TryStartDiscovery();
     adapter_->LowEnergyCentralManagerUpdatedState();
   }

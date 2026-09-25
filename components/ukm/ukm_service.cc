@@ -364,7 +364,7 @@ void UkmService::DisableReporting() {
   Flush(metrics::MetricsLogsEventManager::CreateReason::kServiceShutdown);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void UkmService::OnAppEnterForeground() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DVLOG(DebuggingLogLevel::Medium) << "UkmService::OnAppEnterForeground";

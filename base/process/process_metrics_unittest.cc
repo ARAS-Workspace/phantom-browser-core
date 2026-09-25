@@ -782,10 +782,8 @@ TEST(SystemMetrics2Test, GetSystemMemoryInfo) {
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
   // All the values should be less than the total amount of memory.
-#if !BUILDFLAG(IS_IOS)
   // TODO(crbug.com/40515565): re-enable the following assertion on iOS.
   EXPECT_LT(info.free, info.total);
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   EXPECT_LT(info.buffers, info.total);
   EXPECT_LT(info.cached, info.total);

@@ -4851,7 +4851,6 @@ class TestSSLPrivateKey : public net::SSLPrivateKey {
   int sign_count_ = 0;
 };
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(URLLoaderTest, ClientAuthRespondTwice) {
   // This tests that one URLLoader can handle two client cert requests.
 
@@ -6035,8 +6034,6 @@ TEST_P(URLLoaderParameterTest, CredentialsModeOmitOptionalClientCert) {
   }
   EXPECT_EQ(net::OK, client()->completion_status().error_code);
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(URLLoaderTest, CookieReporting) {
   {

@@ -523,16 +523,6 @@ TEST_P(CommandStorageManagerTest, ShouldWriteEncryptedFiles) {
           kEncryptSessionStorageStageWriteBothReadPreferEncrypted ||
       rollout_stage ==
           kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted) {
-#if BUILDFLAG(IS_IOS)
-    if (session_type == SessionType::kAppRestore ||
-        session_type == SessionType::kSessionRestore) {
-      // On iOS, SessionRestore and AppRestore do not use CommandStorageBackend.
-      // As a practical matter, this scenario is not tested because it's not
-      // included in kTestParams.  But we include it here for completeness.
-      EXPECT_FALSE(test_helper.ShouldWriteEncryptedFiles());
-      return;
-    }
-#endif
     EXPECT_TRUE(test_helper.ShouldWriteEncryptedFiles());
     return;
   }
@@ -1142,8 +1132,6 @@ std::string TestParamNameGenerator(
 }
 
 const TestParams kTestParams[] = {
-// On iOS, SessionRestore and AppRestore do not use CommandStorageBackend.
-#if !BUILDFLAG(IS_IOS)
     {SessionType::kAppRestore, false, ""},
     {SessionType::kAppRestore, true, ""},
     {SessionType::kAppRestore, true,
@@ -1163,7 +1151,6 @@ const TestParams kTestParams[] = {
     {SessionType::kSessionRestore, true,
      kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted},
     {SessionType::kSessionRestore, true, "invalid_stage"},
-#endif  // !BUILDFLAG(IS_IOS)
 
     {SessionType::kTabRestore, false, ""},
     {SessionType::kTabRestore, true, ""},

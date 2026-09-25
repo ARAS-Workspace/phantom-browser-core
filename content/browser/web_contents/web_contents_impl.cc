@@ -262,7 +262,7 @@
 #include "ui/accessibility/accessibility_features.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #include "content/browser/date_time_chooser/date_time_chooser.h"
 #endif
 
@@ -273,10 +273,6 @@
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
 #include "ui/wm/core/window_util.h"
-#endif
-
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-#include "content/browser/ios/nfc_host.h"
 #endif
 
 namespace content {
@@ -946,7 +942,7 @@ class WebContentsImpl::WebContentsDestructionObserver
   raw_ptr<WebContentsImpl> owner_;
 };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // TODO(sreejakshetty): Make |WebContentsImpl::ColorChooserHolder| per-frame
 // instead of WebContents-owned.
 // WebContentsImpl::ColorChooserHolder -----------------------------------------
@@ -997,7 +993,7 @@ class WebContentsImpl::ColorChooserHolder : public blink::mojom::ColorChooser {
   // mojo renderer client.
   mojo::Remote<blink::mojom::ColorChooserClient> client_;
 };
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // WebContentsImpl::WebContentsTreeNode ----------------------------------------
 WebContentsImpl::WebContentsTreeNode::WebContentsTreeNode(
@@ -1465,7 +1461,7 @@ WebContentsImpl::~WebContentsImpl() {
   // Clear out any JavaScript state.
   CancelDialogManagerDialogs(/*reset_state=*/true);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   color_chooser_holder_.reset();
 #endif
   find_request_manager_.reset();
@@ -4435,7 +4431,7 @@ void WebContentsImpl::Init(const WebContents::CreateParams& params,
   screen_orientation_provider_ =
       std::make_unique<ScreenOrientationProvider>(this);
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
   DateTimeChooser::CreateDateTimeChooser(this);
 #endif
 
@@ -5043,7 +5039,7 @@ void WebContentsImpl::FullscreenStateChanged(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 bool WebContentsImpl::CanUseWindowingControls(
     RenderFrameHostImpl* requesting_frame) {
   return GetDelegate() &&
@@ -5077,7 +5073,7 @@ void WebContentsImpl::SetResizable(bool resizable) {
   }
   GetDelegate()->SetResizableFromWebAPI(resizable);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(laurila, crbug.com/1466855): Map into new `ui::DisplayState` enum
 // instead of `ui::mojom::WindowShowState`.
@@ -6467,7 +6463,7 @@ device::mojom::WakeLockContext* WebContentsImpl::GetWakeLockContext() {
   return wake_lock_context_host_->GetWakeLockContext();
 }
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
 void WebContentsImpl::GetNFC(
     RenderFrameHostImpl* render_frame_host,
     mojo::PendingReceiver<device::mojom::NFC> receiver) {
@@ -7497,7 +7493,7 @@ WebContents* WebContentsImpl::GetFirstWebContentsInLiveOriginalOpenerChain() {
                     : nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void WebContentsImpl::DidChooseColorInColorChooser(SkColor color) {
   OPTIONAL_TRACE_EVENT1("content",
                         "WebContentsImpl::DidChooseColorInColorChooser",
@@ -9001,7 +8997,7 @@ void WebContentsImpl::OnColorChooserFactoryReceiver(
   color_chooser_factory_receivers_.Add(this, std::move(receiver));
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void WebContentsImpl::OpenColorChooser(
     mojo::PendingReceiver<blink::mojom::ColorChooser> chooser_receiver,
     mojo::PendingRemote<blink::mojom::ColorChooserClient> client,
@@ -9028,7 +9024,7 @@ void WebContentsImpl::OpenColorChooser(
     color_chooser_holder_.reset();
   }
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void WebContentsImpl::UpdateFaviconURL(
     RenderFrameHostImpl* source,

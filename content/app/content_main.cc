@@ -247,21 +247,6 @@ NO_STACK_PROTECTOR int RunContentProcess(
     InitializeMac();
 #endif
 
-#if BUILDFLAG(IS_IOS)
-    base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-    command_line->AppendSwitch(switches::kEnableViewport);
-    command_line->AppendSwitch(embedder_support::kUseMobileUserAgent);
-
-#if BUILDFLAG(IS_IOS_TVOS)
-    // Set tvOS to single-process mode by default.
-    command_line->AppendSwitch(switches::kSingleProcess);
-
-    // Enable spatial navigation; we interpret remote control swipes as arrow
-    // keys.
-    command_line->AppendSwitch(switches::kEnableSpatialNavigation);
-#endif
-#endif
-
 #if BUILDFLAG(IS_LINUX) && !defined(COMPONENT_BUILD)
     base::subtle::EnableFDOwnershipEnforcement(true);
 #endif
@@ -280,7 +265,7 @@ NO_STACK_PROTECTOR int RunContentProcess(
     CommonSubprocessInit();
   exit_code = content_main_runner->Run();
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   content_main_runner->Shutdown();
 #endif
 

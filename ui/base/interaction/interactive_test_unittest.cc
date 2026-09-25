@@ -32,9 +32,7 @@
 #include "ui/base/interaction/interactive_test_internal.h"
 #include "ui/base/interaction/state_observer.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "ui/base/accelerators/accelerator.h"
-#endif
 
 namespace ui::test {
 
@@ -135,8 +133,6 @@ class TestSimulator : public InteractionTestUtil::Simulator {
     return result_;
   }
 
-#if !BUILDFLAG(IS_IOS)
-
   ActionResult SendAccelerator(TrackedElement* element,
                                Accelerator accel) override {
     DoAction(ActionType::kSendAccelerator, element, InputType::kKeyboard);
@@ -149,8 +145,6 @@ class TestSimulator : public InteractionTestUtil::Simulator {
     DoAction(ActionType::kSendKeyPress, element, InputType::kKeyboard);
     return result_;
   }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
   ActionResult Confirm(TrackedElement* element) override {
     DoAction(ActionType::kConfirm, element, InputType::kDontCare);
@@ -316,10 +310,8 @@ TEST_F(InteractiveTestTest, InteractionVerbs) {
       SelectDropdownItem(kTestId1, 2U, InputType::kDontCare),
       EnterText(kTestId2, u"The quick brown fox.", TextEntryMode::kAppend),
       ActivateSurface(kTestId3), FocusElement(kTestId1),
-#if !BUILDFLAG(IS_IOS)
       SendAccelerator(kTestId4, Accelerator()),
       SendKeyPress(kTestId2, KeyboardCode::VKEY_A, EF_NONE),
-#endif
       Confirm(kTestId1));
 
   EXPECT_THAT(simulator()->records(),
@@ -340,12 +332,10 @@ TEST_F(InteractiveTestTest, InteractionVerbs) {
                                kTestContext1, InputType::kMouse},
                   ActionRecord{ActionType::kFocusElement, kTestId1,
                                kTestContext1, InputType::kMouse},
-#if !BUILDFLAG(IS_IOS)
                   ActionRecord{ActionType::kSendAccelerator, kTestId4,
                                kTestContext1, InputType::kKeyboard},
                   ActionRecord{ActionType::kSendKeyPress, kTestId2,
                                kTestContext1, InputType::kKeyboard},
-#endif
                   ActionRecord{ActionType::kConfirm, kTestId1, kTestContext1,
                                InputType::kDontCare}));
 }
@@ -367,10 +357,8 @@ TEST_F(InteractiveTestTest, InteractionVerbsInAnyContext) {
                    SelectDropdownItem(kTestId1, 2U, InputType::kDontCare),
                    EnterText(kTestId2, u"The quick brown fox."),
                    ActivateSurface(kTestId3), FocusElement(kTestId1),
-#if !BUILDFLAG(IS_IOS)
                    SendAccelerator(kTestId4, Accelerator()),
                    SendKeyPress(kTestId2, VKEY_A, EF_NONE),
-#endif
                    Confirm(kTestId1)));
 
   EXPECT_THAT(simulator()->records(),
@@ -391,12 +379,10 @@ TEST_F(InteractiveTestTest, InteractionVerbsInAnyContext) {
                                kTestContext1, InputType::kMouse},
                   ActionRecord{ActionType::kFocusElement, kTestId1,
                                kTestContext1, InputType::kMouse},
-#if !BUILDFLAG(IS_IOS)
                   ActionRecord{ActionType::kSendAccelerator, kTestId4,
                                kTestContext1, InputType::kKeyboard},
                   ActionRecord{ActionType::kSendKeyPress, kTestId2,
                                kTestContext1, InputType::kKeyboard},
-#endif
                   ActionRecord{ActionType::kConfirm, kTestId1, kTestContext1,
                                InputType::kDontCare}));
 }
@@ -418,9 +404,7 @@ TEST_F(InteractiveTestTest, InteractionVerbsInSameContext) {
                     SelectDropdownItem(kTestId1, 2U, InputType::kDontCare),
                     EnterText(kTestId2, u"The quick brown fox."),
                     ActivateSurface(kTestId3),
-#if !BUILDFLAG(IS_IOS)
                     SendAccelerator(kTestId4, Accelerator()),
-#endif
                     Confirm(kTestId1)));
 
   EXPECT_THAT(simulator()->records(),
@@ -439,10 +423,8 @@ TEST_F(InteractiveTestTest, InteractionVerbsInSameContext) {
                                InputType::kKeyboard},
                   ActionRecord{ActionType::kActivateSurface, kTestId3,
                                kTestContext1, InputType::kMouse},
-#if !BUILDFLAG(IS_IOS)
                   ActionRecord{ActionType::kSendAccelerator, kTestId4,
                                kTestContext1, InputType::kKeyboard},
-#endif
                   ActionRecord{ActionType::kConfirm, kTestId1, kTestContext1,
                                InputType::kDontCare}));
 }
@@ -475,9 +457,7 @@ TEST_F(InteractiveTestTest, InteractionVerbsInSameContextAs) {
                 EnterText(kTestId2, u"The quick brown fox."))),
       // Ensure that we handle groups of steps with a unique element ID.
       InSameContextAs(kTestId1, Steps(ActivateSurface(kTestId3),
-#if !BUILDFLAG(IS_IOS)
                                       SendAccelerator(kTestId4, Accelerator()),
-#endif
                                       Confirm(kTestId1))));
 
   EXPECT_THAT(simulator()->records(),
@@ -494,10 +474,8 @@ TEST_F(InteractiveTestTest, InteractionVerbsInSameContextAs) {
                                InputType::kKeyboard},
                   ActionRecord{ActionType::kActivateSurface, kTestId3,
                                kTestContext1, InputType::kMouse},
-#if !BUILDFLAG(IS_IOS)
                   ActionRecord{ActionType::kSendAccelerator, kTestId4,
                                kTestContext1, InputType::kKeyboard},
-#endif
                   ActionRecord{ActionType::kConfirm, kTestId1, kTestContext1,
                                InputType::kDontCare}));
 }

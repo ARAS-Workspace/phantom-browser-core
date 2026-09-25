@@ -25,7 +25,6 @@ TEST(QRBitmapGeneratorTest, SquareDinoWithQuietMargins) {
   // tests at //chrome/browser/share/qr_code_generator_pixeltest.cc
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST(QRBitmapGeneratorTest, RoundPassKeyWithNoMargins) {
   auto bitmap =
       GenerateBitmap(base::as_byte_span(std::string_view("0123456789")),
@@ -72,6 +71,5 @@ TEST(QRBitmapGeneratorTest, CustomCenterImage) {
   EXPECT_EQ(bitmap->width(), 450);
   EXPECT_EQ(bitmap->getColor(225, 225), kRed);
 }
-#endif
 
 }  // namespace qr_code_generator

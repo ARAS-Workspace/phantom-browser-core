@@ -15,7 +15,7 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/vector_icon_types.h"
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/vector_icons/vector_icons.h"     // nogncheck
 #endif
@@ -25,7 +25,7 @@ namespace location_bar_model {
 const gfx::VectorIcon& GetSecurityVectorIcon(
     security_state::SecurityLevel security_level,
     security_state::VisibleSecurityState* visible_security_state) {
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
   security_state::MaliciousContentStatus malicious_content_status =
       visible_security_state->malicious_content_status;
 

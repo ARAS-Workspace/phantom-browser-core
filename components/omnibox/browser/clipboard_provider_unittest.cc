@@ -33,9 +33,7 @@
 #include "ui/gfx/image/image_unittest_util.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "ui/base/clipboard/test/test_clipboard.h"  // nogncheck
-#endif
 
 namespace {
 

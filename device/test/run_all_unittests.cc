@@ -28,7 +28,6 @@ class DeviceTestSuite : public base::TestSuite {
   void Initialize() override {
     base::TestSuite::Initialize();
 
-#if !BUILDFLAG(IS_IOS)
     ui::RegisterPathProvider();
 
     base::FilePath ui_test_pak_path;
@@ -50,13 +49,10 @@ class DeviceTestSuite : public base::TestSuite {
         path.Append(FILE_PATH_LITERAL("usb_ids_resources.pak"));
     ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
         usb_ids_resources, ui::kScaleFactorNone);
-#endif  // !BUILDFLAG(IS_IOS)
   }
 
   void Shutdown() override {
-#if !BUILDFLAG(IS_IOS)
     ui::ResourceBundle::CleanupSharedInstance();
-#endif
 
     base::TestSuite::Shutdown();
   }

@@ -261,30 +261,6 @@ TEST(VariationsHttpHeadersTest, ShouldAppendVariationsHeader) {
   }
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST(VariationsHttpHeadersTest, ShouldAppendVariationsHeaderLocalhost) {
-  base::test::ScopedCommandLine scoped_command_line;
-  scoped_command_line.GetProcessCommandLine()->AppendSwitch(
-      variations::kAppendVariationsHeadersToLocalhostForTesting);
-  struct {
-    const char* url;
-    bool should_append_headers;
-  } cases[] = {
-      {"https://127.0.0.1", true},
-      {"http://127.0.0.1", true},
-      {"https://127.0.0.1:12345", true},
-      {"http://127.0.0.1:12345", true},
-  };
-
-  for (const auto& c : cases) {
-    const GURL url(c.url);
-    EXPECT_EQ(c.should_append_headers,
-              ShouldAppendVariationsHeaderForTesting(url, InIncognito::kNo))
-        << url;
-  }
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 struct PopulateRequestContextHistogramData {
   const char* request_initiator_url;
   bool is_outermost_main_frame;

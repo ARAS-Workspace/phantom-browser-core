@@ -20,9 +20,7 @@
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match_type.h"
 #include "components/omnibox/browser/autocomplete_provider.h"
-#if !BUILDFLAG(IS_IOS)
 #include "components/omnibox/browser/geolocation_header_service.h"
-#endif  // !BUILDFLAG(IS_IOS)
 #include "base/metrics/histogram_functions.h"
 #include "components/omnibox/browser/history_fuzzy_provider.h"
 #include "components/omnibox/browser/history_url_provider.h"
@@ -243,14 +241,12 @@ void OpenMatch(
   client->OnURLOpenedFromOmnibox(&log);
   OmniboxEventGlobalTracker::GetInstance()->OnURLOpened(&log);
 
-#if !BUILDFLAG(IS_IOS)
   if (auto* geolocation_header_service =
           autocomplete_controller->autocomplete_provider_client()
               ->GetGeolocationHeaderService()) {
     geolocation_header_service->MaybeRecordInlineLocationSuggestionClicked(
         match);
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   TemplateURLService* template_url_service = client->GetTemplateURLService();
   TemplateURL* template_url = match.GetTemplateURL(template_url_service);

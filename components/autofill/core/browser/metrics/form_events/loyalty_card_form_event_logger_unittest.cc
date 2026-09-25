@@ -664,7 +664,6 @@ TEST_F(LoyaltyCardFormEventLoggerBaseKeyMetricsTest,
   VerifyInteractedWithFormUkmMetric();
 }
 
-#if !BUILDFLAG(IS_IOS)
 // Tests that acceptance metric for EMAIL_OR_LOYALTY_MEMBERSHIP_ID field is
 // reported when an email suggestion is selected.
 TEST_F(LoyaltyCardFormEventLoggerBaseKeyMetricsTest,
@@ -719,7 +718,6 @@ TEST_F(LoyaltyCardFormEventLoggerBaseKeyMetricsTest,
       "Autofill.LoyaltyCard.EmailOrLoyaltyCardAcceptance",
       AutofillEmailOrLoyaltyCardAcceptanceMetricValue::kLoyaltyCardSelected, 1);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Parameterized AffiliationTypeKeyMetricsEditTest that edits a field depending
 // on the parameter. This is used to test the correctness metric, which depends

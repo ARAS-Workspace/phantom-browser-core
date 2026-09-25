@@ -1154,7 +1154,7 @@ TEST_F(AutofillAiMqlsMetricsTest, KeyMetrics_OptOut) {
 // emitted, but UMA Key metrics are.
 TEST_F(AutofillAiMqlsMetricsTest,
        KeyMetrics_OptOut_AutofillAiAvailableByDefault) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList feature_list{
       features::kAutofillAiAvailableByDefault};
 #endif

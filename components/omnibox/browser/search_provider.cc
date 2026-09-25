@@ -71,9 +71,7 @@
 #include "url/url_constants.h"
 #include "url/url_util.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "components/omnibox/browser/geolocation_header_service.h"
-#endif
 
 using metrics::OmniboxEventProto;
 
@@ -103,23 +101,6 @@ bool HasMultipleWords(const std::u16string& text) {
 }
 
 bool ShouldOnlyShowVerbatimMatches(const AutocompleteInput& input) {
-#if BUILDFLAG(IS_IOS)
-  const bool has_lens_inputs_in_composebox =
-      omnibox::IsComposebox(input.current_page_classification()) &&
-      input.lens_overlay_suggest_inputs().has_value() &&
-      !base::FeatureList::IsEnabled(omnibox::kComposeboxAttachmentsTypedState);
-  const bool is_image_gen_mode =
-      input.input_state().active_tool ==
-          omnibox::ToolMode::TOOL_MODE_IMAGE_GEN_UPLOAD ||
-      input.input_state().active_tool == omnibox::ToolMode::TOOL_MODE_IMAGE_GEN;
-
-  // When contextual typed state suggestions are disabled for composebox, or
-  // when in image generation mode, do not query suggest and only show
-  // verbatim matches.
-  if (has_lens_inputs_in_composebox || is_image_gen_mode) {
-    return true;
-  }
-#endif
   // Nano banana and deep search typed suggestions should be disabled.
   const bool in_tool_mode = input.input_state().active_tool !=
                             omnibox::ToolMode::TOOL_MODE_UNSPECIFIED;
@@ -268,11 +249,9 @@ void SearchProvider::Start(const AutocompleteInput& input,
     return;
   }
 
-#if !BUILDFLAG(IS_IOS)
   if (auto* geo_service = client()->GetGeolocationHeaderService()) {
     geo_service->PrimeLocation();
   }
-#endif
 
   // At this point, we could exit early if the input is on-focus or empty,
   // because offering suggestions in those scenarios is handled by
@@ -1138,7 +1117,6 @@ void SearchProvider::ConvertResultsToAutocompleteMatches() {
   // answers after the first.
   RemoveExtraAnswers(&matches);
 
-#if !BUILDFLAG(IS_IOS)
   // Only allow adding a location signaling suggestion on non-iOS, when the
   // feature is enabled, and the `GeolocationHeaderService` has a cached
   // location.
@@ -1146,7 +1124,6 @@ void SearchProvider::ConvertResultsToAutocompleteMatches() {
       base::FeatureList::IsEnabled(omnibox::kInlineLocationSignaling) &&
       client()->GetGeolocationHeaderService() &&
       client()->GetGeolocationHeaderService()->HasCachedLocation();
-#endif
 
   matches_.clear();
   size_t num_suggestions = 0;
@@ -1174,7 +1151,6 @@ void SearchProvider::ConvertResultsToAutocompleteMatches() {
 
     matches_.push_back(std::move(*i));
 
-#if !BUILDFLAG(IS_IOS)
     // If this is the first `SUBTYPE_LOCATION_SUGGEST_TRIGGER` and there is
     // room, create a duplicate location signaling suggestion.
     if (can_add_location_signaling_suggestion &&
@@ -1191,7 +1167,6 @@ void SearchProvider::ConvertResultsToAutocompleteMatches() {
         ++num_suggestions;
       }
     }
-#endif
   }
 }
 
@@ -1684,7 +1659,6 @@ void SearchProvider::PrefetchImages(SearchSuggestionParser::Results* results) {
     client()->PrefetchImage(url);
 }
 
-#if !BUILDFLAG(IS_IOS)
 std::unique_ptr<AutocompleteMatch> SearchProvider::CreateLocationSignalingMatch(
     const AutocompleteMatch& match) {
   auto* geo_service = client()->GetGeolocationHeaderService();
@@ -1737,4 +1711,3 @@ std::unique_ptr<AutocompleteMatch> SearchProvider::CreateLocationSignalingMatch(
 
   return std::make_unique<AutocompleteMatch>(std::move(signaling_match));
 }
-#endif

@@ -22,7 +22,7 @@ namespace {
 
 using ::testing::UnorderedElementsAre;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 
 constexpr char kRpId[] = "gensokyo.com";
 
@@ -48,13 +48,13 @@ std::vector<uint8_t> ToUint8Vector(
   return std::vector<uint8_t>(byte_array.begin(), byte_array.end());
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
 class PasskeyCredentialTest : public testing::Test {};
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasskeyCredentialTest, FromCredentialSpecifics) {
   sync_pb::WebauthnCredentialSpecifics credential1;
   credential1.set_sync_id(base::RandBytesAsString(16));
@@ -205,7 +205,7 @@ TEST_F(PasskeyCredentialTest, FromCredentialSpecifics_EmptyOptionalFields) {
           PasskeyCredential::DisplayName(""))));
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(PasskeyCredentialTest, GetAuthenticatorLabel) {
   PasskeyCredential credential(PasskeyCredential::Source::kAndroidPhone,

@@ -891,7 +891,7 @@ TEST_F(TabGroupSyncServiceImplTest, RemoveTab) {
       "TabGroups.Sync.TabGroup.TabRemoved.GroupCreateOrigin", 2u);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(TabGroupSyncServiceImplTest, ForceRemoveClosedTabGroupsOnStartup) {
   feature_list_.InitWithFeatures(
       {tab_groups::kForceRemoveClosedTabGroupsOnStartup}, {});

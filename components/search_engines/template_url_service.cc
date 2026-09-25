@@ -552,7 +552,7 @@ TemplateURLService::CategorizedTemplateUrls::~CategorizedTemplateUrls() =
 TemplateURLService::CategorizedTemplateUrls::CategorizedTemplateUrls(
     const CategorizedTemplateUrls& other) = default;
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // TemplateURLService::PrepopulatedAndRecentlyVisitedTemplateUrls -------------
 
 TemplateURLService::PrepopulatedAndRecentlyVisitedTemplateUrls::
@@ -562,7 +562,7 @@ TemplateURLService::PrepopulatedAndRecentlyVisitedTemplateUrls::
 TemplateURLService::PrepopulatedAndRecentlyVisitedTemplateUrls::
     PrepopulatedAndRecentlyVisitedTemplateUrls(
         const PrepopulatedAndRecentlyVisitedTemplateUrls& other) = default;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // TemplateURLService ---------------------------------------------------------
 
@@ -1372,7 +1372,7 @@ TemplateURLService::GetCategorizedTemplateURLs(
   return data;
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 TemplateURLService::PrepopulatedAndRecentlyVisitedTemplateUrls
 TemplateURLService::GetPrepopulatedAndRecentlyVisitedTemplateURLs() {
   PrepopulatedAndRecentlyVisitedTemplateUrls data;
@@ -1407,7 +1407,7 @@ TemplateURLService::GetPrepopulatedAndRecentlyVisitedTemplateURLs() {
 
   return data;
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 url::Origin TemplateURLService::GetDefaultSearchProviderOrigin() const {
   const TemplateURL* template_url = GetDefaultSearchProvider();

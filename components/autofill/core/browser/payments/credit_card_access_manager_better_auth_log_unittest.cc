@@ -195,7 +195,7 @@ class CreditCardAccessManagerBetterAuthOptInLogTest
       "Autofill.BetterAuth.OptInPromoNotOfferedReason";
 };
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Ensures that the correct metrics are logged when the FIDO opt-in dialog is
 // not shown on Desktop.
 TEST_P(CreditCardAccessManagerBetterAuthOptInLogTest,
@@ -252,7 +252,7 @@ TEST_P(CreditCardAccessManagerBetterAuthOptInLogTest,
                                       /*expected_count=*/0);
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 // Ensures that the correct metrics are logged when the FIDO opt-in checkbox is

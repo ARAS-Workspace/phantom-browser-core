@@ -112,8 +112,8 @@ std::string SearchTermsData::GoogleBaseURLValue() const {
 std::string SearchTermsData::GoogleBaseSearchByImageURLValue() const {
   const std::string kGoogleHomepageURLPath = std::string("searchbyimage/");
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   return google_util::kGoogleHomepageURL + kGoogleHomepageURLPath;
 }

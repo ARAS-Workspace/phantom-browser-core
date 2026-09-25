@@ -637,17 +637,6 @@ std::optional<CoreAccountInfo> AddressDataManager::GetPrimaryAccountInfo()
   return std::nullopt;
 }
 
-#if BUILDFLAG(IS_IOS)
-void AddressDataManager::MaybeCreateAccountNameEmailProfile(
-    std::string account_name,
-    std::string email) {
-  if (account_name_email_store_) {
-    account_name_email_store_->MaybeUpdateOrCreateAccountNameEmail(account_name,
-                                                                   email);
-  }
-}
-#endif
-
 void AddressDataManager::CancelPendingQuery(
     WebDataServiceBase::Handle& handle) {
   if (!webdata_service_ || !handle) {

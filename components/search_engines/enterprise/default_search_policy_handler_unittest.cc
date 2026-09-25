@@ -41,7 +41,7 @@ class DefaultSearchPolicyHandlerTest
   static const char kImageParams[];
   static const char kFileSearchURL[];
   static const char kHostName[];
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   static const char kKeyword[];
   static const char kNewTabURL[];
 #endif
@@ -67,7 +67,7 @@ const char DefaultSearchPolicyHandlerTest::kImageParams[] =
 const char DefaultSearchPolicyHandlerTest::kFileSearchURL[] =
     "file:///c:/path/to/search?t={searchTerms}";
 const char DefaultSearchPolicyHandlerTest::kHostName[] = "test.com";
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 const char DefaultSearchPolicyHandlerTest::kKeyword[] = "MyKeyword";
 const char DefaultSearchPolicyHandlerTest::kNewTabURL[] =
     "http://test.com/newtab";
@@ -102,7 +102,7 @@ void DefaultSearchPolicyHandlerTest::
   policy->Set(key::kDefaultSearchProviderImageURLPostParams,
               POLICY_LEVEL_MANDATORY, POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
               base::Value(kImageParams), nullptr);
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   policy->Set(key::kDefaultSearchProviderKeyword, POLICY_LEVEL_MANDATORY,
               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD, base::Value(kKeyword),
               nullptr);
@@ -154,7 +154,7 @@ TEST_F(DefaultSearchPolicyHandlerTest, InvalidType) {
       key::kDefaultSearchProviderAlternateURLs,
       key::kDefaultSearchProviderImageURL,
       key::kDefaultSearchProviderImageURLPostParams,
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
       key::kDefaultSearchProviderKeyword,
       key::kDefaultSearchProviderNewTabURL,
 #endif
@@ -210,7 +210,7 @@ TEST_F(DefaultSearchPolicyHandlerTest, FullyDefined) {
   EXPECT_EQ(kSearchURL, *value);
   ASSERT_TRUE(value = dictionary->FindString(DefaultSearchManager::kShortName));
   EXPECT_EQ(kName, *value);
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   ASSERT_TRUE(value = dictionary->FindString(DefaultSearchManager::kKeyword));
   EXPECT_EQ(kKeyword, *value);
 #endif

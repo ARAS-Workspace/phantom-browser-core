@@ -175,12 +175,10 @@ FormDataImporter::ExtractedFormData FormDataImporter::ExtractFormData(
         GetPaymentsFormDataImporter().ExtractCreditCard(submitted_form);
   }
 
-#if !BUILDFLAG(IS_IOS)
   if (payment_methods_autofill_enabled) {
     extracted_form_data.extracted_iban =
         GetPaymentsFormDataImporter().ExtractIban(submitted_form);
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   if (profile_autofill_enabled &&
       !base::FeatureList::IsEnabled(features::kAutofillDisableAddressImport)) {

@@ -1387,7 +1387,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
 }
 
 // Only run this test on platforms where Blink expands and draws a popup.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, OpenSelectPopup) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
       <head><title>OpenSelectPopup</title></head>
@@ -1430,7 +1430,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, OpenSelectPopup) {
   EXPECT_FALSE(open_popup->HasState(ax::mojom::State::kInvisible));
   EXPECT_EQ(3U, open_popup->InternalChildCount());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !(BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, FocusPermissionElement) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(

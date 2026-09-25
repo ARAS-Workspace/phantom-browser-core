@@ -114,7 +114,6 @@ constexpr base::FeatureParam<int> kMvtScoringParamDailyVisitCountCap{
 BASE_FEATURE(kRazeOldHistoryDatabase,
              base::FeatureState::FEATURE_ENABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_IOS)
 // Whether Browsing History Actor Integration M3 is enabled.
 bool IsBrowsingHistoryActorIntegrationM3Enabled() {
   return base::FeatureList::IsEnabled(kBrowsingHistoryActorIntegrationM3);
@@ -132,7 +131,6 @@ BASE_FEATURE(kBrowsingHistorySimilarVisitsGrouping,
 // in history entry grouping and filtering.
 BASE_FEATURE(kBrowsingHistoryActorIntegrationM3,
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_IOS)
 
 
 // If enabled, the WebHistoryService will use a new API for querying browsing

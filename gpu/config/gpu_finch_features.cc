@@ -195,7 +195,7 @@ BASE_FEATURE(kEnableMSAAOnNewIntelGPUs,
 #endif
 );
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC)
 // If enabled, the TASK_CATEGORY_POLICY value of the GPU process will be
 // adjusted to match the one from the browser process every time it changes.
 BASE_FEATURE(kAdjustGpuProcessPriority, base::FEATURE_DISABLED_BY_DEFAULT);

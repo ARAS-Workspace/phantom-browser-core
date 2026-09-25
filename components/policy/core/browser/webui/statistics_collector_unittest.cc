@@ -16,10 +16,8 @@ constexpr char kReloadPoliciesHistogram[] =
     "Enterprise.PolicyUI.ButtonUsage.ReloadPolicies";
 constexpr char kCopyToJsonHistogram[] =
     "Enterprise.PolicyUI.ButtonUsage.CopyToJson";
-#if !BUILDFLAG(IS_IOS)
 constexpr char kExportToJsonHistogram[] =
     "Enterprise.PolicyUI.ButtonUsage.ExportToJson";
-#endif
 constexpr char kUploadReportHistogram[] =
     "Enterprise.PolicyUI.ButtonUsage.UploadReport";
 
@@ -41,10 +39,8 @@ TEST(PolicyWebUIStatisticsCollectorTest, RecordPolicyUIButtonUsage) {
                                       kReloadPoliciesCount, 1);
   histogram_tester.ExpectUniqueSample(kCopyToJsonHistogram, kCopyToJsonCount,
                                       1);
-#if !BUILDFLAG(IS_IOS)
   histogram_tester.ExpectUniqueSample(kExportToJsonHistogram,
                                       kExportToJsonCount, 1);
-#endif
   histogram_tester.ExpectUniqueSample(kUploadReportHistogram,
                                       kUploadReportCount, 1);
 }
@@ -56,9 +52,7 @@ TEST(PolicyWebUIStatisticsCollectorTest, RecordZeroCounts) {
 
   histogram_tester.ExpectUniqueSample(kReloadPoliciesHistogram, kZeroCount, 1);
   histogram_tester.ExpectUniqueSample(kCopyToJsonHistogram, kZeroCount, 1);
-#if !BUILDFLAG(IS_IOS)
   histogram_tester.ExpectUniqueSample(kExportToJsonHistogram, kZeroCount, 1);
-#endif
   histogram_tester.ExpectUniqueSample(kUploadReportHistogram, kZeroCount, 1);
 }
 
@@ -78,12 +72,10 @@ TEST(PolicyWebUIStatisticsCollectorTest, MultipleRecords) {
   histogram_tester.ExpectBucketCount(kCopyToJsonHistogram, kCopyToJsonCount, 1);
   histogram_tester.ExpectBucketCount(kCopyToJsonHistogram, kZeroCount, 1);
 
-#if !BUILDFLAG(IS_IOS)
   histogram_tester.ExpectTotalCount(kExportToJsonHistogram, 2);
   histogram_tester.ExpectBucketCount(kExportToJsonHistogram, kExportToJsonCount,
                                      1);
   histogram_tester.ExpectBucketCount(kExportToJsonHistogram, kZeroCount, 1);
-#endif
 
   histogram_tester.ExpectTotalCount(kUploadReportHistogram, 2);
   histogram_tester.ExpectBucketCount(kUploadReportHistogram, kUploadReportCount,

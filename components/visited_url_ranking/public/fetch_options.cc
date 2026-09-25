@@ -89,7 +89,7 @@ URLVisitAggregate::URLTypeSet FetchOptions::GetFetchResultURLTypes() {
                         base::SplitResult::SPLIT_WANT_NONEMPTY);
   if (url_type_entries.empty()) {
     return {
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
         URLVisitAggregate::URLType::kActiveLocalTab,
 #endif
         URLVisitAggregate::URLType::kActiveRemoteTab,

@@ -273,7 +273,7 @@ TEST_P(AutofillAiMayPerformActionTest, FeatureParamForModelCacheUseOff) {
 // enterprise policy.
 TEST_P(AutofillAiMayPerformActionTest,
        ActionsWhenAutofillAiEnterprisePolicyDisabled) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList feature_list{
       features::kAutofillAiAvailableByDefault};
 #endif
@@ -316,7 +316,7 @@ TEST_P(AutofillAiMayPerformActionTest,
 
 // Verifies that only MQLS logging and online model calls require an opt-in.
 TEST_P(AutofillAiMayPerformActionTest, ActionsWhenNotOptedIntoAutofillAi) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList feature_list{
       features::kAutofillAiAvailableByDefault};
 #endif
@@ -630,7 +630,7 @@ TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofill) {
       MayPerformAutofillAiAction(client(), AutofillAiAction::kAmbientAutofill));
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(AutofillAiPermissionUtilsTest, AmbientAutofillFillingRequiresOptIn) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndDisableFeature(features::kAutofillAiAvailableByDefault);

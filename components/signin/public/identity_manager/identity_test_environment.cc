@@ -46,15 +46,11 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "components/signin/internal/identity_manager/profile_oauth2_token_service_delegate_ios.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #include "components/signin/internal/identity_manager/device_accounts_synchronizer_impl.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/signin/internal/identity_manager/accounts_mutator_impl.h"
 #endif
 
@@ -265,7 +261,7 @@ IdentityTestEnvironment::FinishBuildIdentityManagerForTests(
                                                   primary_account_manager.get(),
                                                   pref_service, signin_client);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   init_params.accounts_mutator = std::make_unique<AccountsMutatorImpl>(
       token_service.get(), account_tracker_service.get(),
       primary_account_manager.get(), pref_service);
@@ -279,7 +275,7 @@ IdentityTestEnvironment::FinishBuildIdentityManagerForTests(
           signin_client, token_service.get(), gaia_cookie_manager_service.get(),
           account_tracker_service.get());
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   init_params.device_accounts_synchronizer =
       std::make_unique<DeviceAccountsSynchronizerImpl>(
           token_service->GetDelegate());

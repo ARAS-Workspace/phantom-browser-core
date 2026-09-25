@@ -31,7 +31,7 @@ void FakeTabGroupSyncService::SetTabGroupSyncDelegate(
   delegate_ = std::move(delegate);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void FakeTabGroupSyncService::SaveGroup(SavedTabGroup group) {
   const base::Uuid sync_id = group.saved_guid();
   const LocalTabGroupID local_id = group.local_group_id().value();
@@ -42,7 +42,7 @@ void FakeTabGroupSyncService::SaveGroup(SavedTabGroup group) {
 void FakeTabGroupSyncService::UnsaveGroup(const LocalTabGroupID& local_id) {
   RemoveGroup(local_id);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 void FakeTabGroupSyncService::AddGroup(SavedTabGroup group) {
   groups_.push_back(group);

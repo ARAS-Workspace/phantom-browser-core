@@ -1184,7 +1184,6 @@ std::unique_ptr<net::test_server::HttpResponse> ServePath(
   return std::move(http_response);
 }
 
-#if !BUILDFLAG(IS_IOS)
 void CorruptDatabase(const base::FilePath& idb_data_path) {
   int num_files = 0;
   int num_errors = 0;
@@ -1357,7 +1356,6 @@ std::unique_ptr<net::test_server::HttpResponse> CorruptDBRequestHandler(
 
   return ServePath(request_path);
 }
-#endif
 
 const char s_indexeddb_test_prefix[] = "/indexeddb/test/";
 
@@ -1373,9 +1371,6 @@ std::unique_ptr<net::test_server::HttpResponse> StaticFileRequestHandler(
 
 // TODO(crbug.com/419272072): Adapt this test suite to also work with the SQLite
 // backing store.
-// See TODO in CorruptDBRequestHandler.  iOS runs into difficulty with the
-// nested IO message loop, so run this test on other platforms.
-#if !BUILDFLAG(IS_IOS)
 class IndexedDBBrowserTestWithCorruption
     : public IndexedDBLevelDBOnlyTest,
       public ::testing::WithParamInterface<const char*> {};
@@ -1426,7 +1421,6 @@ IN_PROC_BROWSER_TEST_P(IndexedDBBrowserTestWithCorruption,
       std::string(s_corrupt_db_test_prefix) + "corrupted_open_db_recovery.html";
   SimpleTest(embedded_test_server()->GetURL(test_file));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 // TODO: http://crbug.com/510520, flaky on all platforms
 IN_PROC_BROWSER_TEST_F(IndexedDBLevelDBOnlyTest,

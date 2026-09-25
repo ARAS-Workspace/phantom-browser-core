@@ -8685,7 +8685,7 @@ void RenderFrameHostImpl::FullscreenStateChanged(
   delegate_->FullscreenStateChanged(this, is_fullscreen, std::move(options));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 bool RenderFrameHostImpl::CanUseWindowingControls(
     std::string_view js_api_name) {
   if (!base::FeatureList::IsEnabled(
@@ -8746,7 +8746,7 @@ void RenderFrameHostImpl::SetResizable(bool resizable) {
 
   delegate_->SetResizable(resizable);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 void RenderFrameHostImpl::DraggableRegionsChanged(
     std::vector<blink::mojom::DraggableRegionPtr> regions) {
@@ -15152,7 +15152,7 @@ void RenderFrameHostImpl::CreateDedicatedWorkerHostFactory(
       /*creator_coep_reporter=*/coep_reporter, GetNetworkRestrictionsID());
 }
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
 void RenderFrameHostImpl::BindNFCReceiver(
     mojo::PendingReceiver<device::mojom::NFC> receiver) {
   delegate_->GetNFC(this, std::move(receiver));
@@ -20366,7 +20366,7 @@ RenderFrameHostImpl::GetCachedPermissionStatuses() {
       std::to_array<std::pair<PermissionName, PermissionType>>(
           {{PermissionName::VIDEO_CAPTURE, PermissionType::VIDEO_CAPTURE},
            {PermissionName::AUDIO_CAPTURE, PermissionType::AUDIO_CAPTURE},
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
            // `WEB_APP_INSTALLATION` is only registered for desktop platforms
            // via `WebsiteSettingsRegistry::DESKTOP`.
            {PermissionName::WEB_APP_INSTALLATION,

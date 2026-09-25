@@ -932,7 +932,7 @@ TEST_F(BrowsingHistoryServiceTest, RemoveVisitsMetric) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BrowsingHistoryServiceTest, IncludeActorVisits) {
   AddHistory({
       {kUrl1, 1, kRemote},
@@ -1075,7 +1075,7 @@ TEST_F(BrowsingHistoryServiceTest, ShouldQueryActorVisitsOnly) {
   EXPECT_FALSE(result.second.sync_timed_out);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 

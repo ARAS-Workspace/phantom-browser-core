@@ -278,10 +278,6 @@ TEST(ProtoUtilTest, InfoCardTrackingStates) {
                                       .info_card_tracking_state(1)));
 }
 
-// ReadLater is enabled by default everywhere with the exception of iOS which
-// has a build-flag to enable it.
-#if !BUILDFLAG(IS_IOS)
-
 TEST(ProtoUtilTest, ReadLaterEnabled) {
   feedwire::FeedRequest request =
       CreateFeedQueryRefreshRequest(StreamType(StreamKind::kForYou),
@@ -296,8 +292,6 @@ TEST(ProtoUtilTest, ReadLaterEnabled) {
   ASSERT_THAT(request.client_capability(),
               Not(Contains((feedwire::Capability::DOWNLOAD_LINK))));
 }
-
-#endif
 
 TEST(ProtoUtilTest, FeedSignedOutViewDemotionEnablesCapability) {
   base::test::ScopedFeatureList scoped_feature_list;

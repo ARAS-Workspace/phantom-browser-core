@@ -2101,7 +2101,7 @@ TEST(AutocompleteGrouperSectionsTest,
   }
 }
 
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#if !BUILDFLAG(IS_ANDROID)
 // Tests the groups, limits, and rules for the Desktop SRP section with URL
 // suggestions enabled.
 TEST(AutocompleteGrouperSectionsTest, DesktopSRPZpsSectionWithUrls) {
@@ -2417,7 +2417,7 @@ TEST(AutocompleteGrouperSectionsTest, DesktopComposeboxZpsSection) {
         {96, 95, 93});
   }
 }
-#endif  // !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test that (on Android) sections are grouped by Search vs URL.
 #if BUILDFLAG(IS_ANDROID)

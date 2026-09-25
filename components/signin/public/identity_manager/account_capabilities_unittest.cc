@@ -71,7 +71,6 @@ TEST_F(AccountCapabilitiesTest, CanFetchFamilyMemberInfo) {
             signin::Tribool::kFalse);
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(AccountCapabilitiesTest, CanHaveEmailAddressDisplayed) {
   AccountCapabilities capabilities;
   EXPECT_EQ(capabilities.can_have_email_address_displayed(),
@@ -86,7 +85,6 @@ TEST_F(AccountCapabilitiesTest, CanHaveEmailAddressDisplayed) {
   EXPECT_EQ(capabilities.can_have_email_address_displayed(),
             signin::Tribool::kFalse);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 TEST_F(AccountCapabilitiesTest, CanMakeChromeSearchEngineChoiceScreenChoice) {
@@ -129,7 +127,7 @@ TEST_F(AccountCapabilitiesTest,
       signin::Tribool::kFalse);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(AccountCapabilitiesTest, CanSubmitFeedback) {
   AccountCapabilities capabilities;
   EXPECT_EQ(capabilities.can_submit_feedback(), signin::Tribool::kUnknown);
@@ -141,59 +139,8 @@ TEST_F(AccountCapabilitiesTest, CanSubmitFeedback) {
   mutator.set_can_submit_feedback(false);
   EXPECT_EQ(capabilities.can_submit_feedback(), signin::Tribool::kFalse);
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(AccountCapabilitiesTest, CanSignInToChrome) {
-  base::test::ScopedFeatureList feature_list{
-      switches::kEnforceCanSignInToChromeCapability};
-  AccountCapabilities capabilities;
-  EXPECT_EQ(capabilities.can_sign_in_to_chrome(), signin::Tribool::kUnknown);
-
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_can_sign_in_to_chrome(true);
-  EXPECT_EQ(capabilities.can_sign_in_to_chrome(), signin::Tribool::kTrue);
-
-  mutator.set_can_sign_in_to_chrome(false);
-  EXPECT_EQ(capabilities.can_sign_in_to_chrome(), signin::Tribool::kFalse);
-}
-
-TEST_F(AccountCapabilitiesTest, MustFetchAppleAgeRangeInChrome) {
-  base::test::ScopedFeatureList feature_list{
-      switches::kBuildExternalPrivacyContext};
-  AccountCapabilities capabilities;
-  EXPECT_EQ(capabilities.must_fetch_apple_age_range_in_chrome(),
-            signin::Tribool::kUnknown);
-
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_must_fetch_apple_age_range_in_chrome(true);
-  EXPECT_EQ(capabilities.must_fetch_apple_age_range_in_chrome(),
-            signin::Tribool::kTrue);
-
-  mutator.set_must_fetch_apple_age_range_in_chrome(false);
-  EXPECT_EQ(capabilities.must_fetch_apple_age_range_in_chrome(),
-            signin::Tribool::kFalse);
-}
-
-TEST_F(AccountCapabilitiesTest, MustSkipAppleAgeRangeInChrome) {
-  base::test::ScopedFeatureList feature_list{
-      switches::kBuildExternalPrivacyContext};
-  AccountCapabilities capabilities;
-  EXPECT_EQ(capabilities.must_skip_apple_age_range_in_chrome(),
-            signin::Tribool::kUnknown);
-
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_must_skip_apple_age_range_in_chrome(true);
-  EXPECT_EQ(capabilities.must_skip_apple_age_range_in_chrome(),
-            signin::Tribool::kTrue);
-
-  mutator.set_must_skip_apple_age_range_in_chrome(false);
-  EXPECT_EQ(capabilities.must_skip_apple_age_range_in_chrome(),
-            signin::Tribool::kFalse);
-}
-#endif  // BUILDFLAG(IS_IOS)
-
-#if !BUILDFLAG(IS_IOS)
 TEST_F(AccountCapabilitiesTest, CanRunChromePrivacySandboxTrials) {
   AccountCapabilities capabilities;
   EXPECT_EQ(capabilities.can_run_chrome_privacy_sandbox_trials(),
@@ -208,7 +155,6 @@ TEST_F(AccountCapabilitiesTest, CanRunChromePrivacySandboxTrials) {
   EXPECT_EQ(capabilities.can_run_chrome_privacy_sandbox_trials(),
             signin::Tribool::kFalse);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(AccountCapabilitiesTest, IsOptedInToParentalSupervision) {
   AccountCapabilities capabilities;
@@ -226,7 +172,6 @@ TEST_F(AccountCapabilitiesTest, IsOptedInToParentalSupervision) {
 }
 
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(AccountCapabilitiesTest, CanUseDevToolsGenerativeAiFeatures) {
   AccountCapabilities capabilities;
   EXPECT_EQ(capabilities.can_use_devtools_generative_ai_features(),
@@ -241,9 +186,7 @@ TEST_F(AccountCapabilitiesTest, CanUseDevToolsGenerativeAiFeatures) {
   EXPECT_EQ(capabilities.can_use_devtools_generative_ai_features(),
             signin::Tribool::kFalse);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(AccountCapabilitiesTest, CanUseEduFeatures) {
   AccountCapabilities capabilities;
   EXPECT_EQ(capabilities.can_use_edu_features(), signin::Tribool::kUnknown);
@@ -255,7 +198,6 @@ TEST_F(AccountCapabilitiesTest, CanUseEduFeatures) {
   mutator.set_can_use_edu_features(false);
   EXPECT_EQ(capabilities.can_use_edu_features(), signin::Tribool::kFalse);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(AccountCapabilitiesTest, CanUseMantaService) {
   AccountCapabilities capabilities;

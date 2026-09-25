@@ -373,22 +373,6 @@ TEST_F(AccountsCookieMutatorTest, TriggerCookieJarUpdate_OneListedAccounts) {
             GoogleServiceAuthError::NONE);
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(AccountsCookieMutatorTest, ForceTriggerOnCookieChange) {
-  PrepareURLLoaderResponsesForAction(
-      AccountsCookiesMutatorAction::kTriggerOnCookieChangeNoAccounts);
-
-  base::RunLoop run_loop;
-  identity_manager_observer()->SetOnAccountsInCookieUpdatedCallback(
-      run_loop.QuitClosure());
-
-  // Forces the processing of OnCookieChange and it calls
-  // OnGaiaAccountsInCookieUpdated.
-  accounts_cookie_mutator()->ForceTriggerOnCookieChange();
-  run_loop.Run();
-}
-#endif
-
 // Test that trying to log out all sessions generates the right network request.
 TEST_F(AccountsCookieMutatorTest, LogOutAllAccounts) {
   PrepareURLLoaderResponsesForAction(

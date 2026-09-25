@@ -1716,8 +1716,7 @@ TEST_F(BookmarkModelTest, NodeVisibility_AddBookmarkToNonVisibleFolder) {
   EXPECT_TRUE(permanent_folder->IsVisible());
 }
 
-#if !((BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)) || \
-      BUILDFLAG(IS_IOS))
+#if !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 TEST_F(BookmarkModelTest, NodeVisibility_AddFirstLocalBookmarkToOtherFolder) {
   model()->CreateAccountPermanentFolders();
 
@@ -1830,8 +1829,7 @@ TEST_F(BookmarkModelTest, NodeVisibility_AddFirstLocalBookmarkToMobileFolder) {
                   model()->mobile_node(), model()->account_bookmark_bar_node(),
                   model()->account_other_node()));
 }
-#endif  // !((BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)) ||
-        // BUILDFLAG(IS_IOS))
+#endif  // !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 
 TEST_F(BookmarkModelTest, NodeVisibility_RemoveLastBookmarkFromVisibleFolder) {
   const BookmarkPermanentNode* permanent_folder =
@@ -1869,8 +1867,7 @@ TEST_F(BookmarkModelTest, NodeVisibility_RemoveLastBookmarkFromVisibleFolder) {
   EXPECT_FALSE(permanent_folder->IsVisible());
 }
 
-#if !((BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)) || \
-      BUILDFLAG(IS_IOS))
+#if !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 TEST_F(BookmarkModelTest,
        NodeVisibility_MoveBookmarkChangesVisibilityOfSourceFolder) {
   const BookmarkPermanentNode* source_folder = model()->mobile_node();
@@ -2135,8 +2132,7 @@ TEST_F(BookmarkModelTest, NodeVisibility_RemoveAccountPermanentFolders) {
   model()->RemoveAccountPermanentFolders();
   EXPECT_THAT(GetVisiblePermanentNodes(), ElementsAre(local_bb, local_other));
 }
-#endif  // !((BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)) ||
-        // BUILDFLAG(IS_IOS))
+#endif  // !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 
 TEST_F(BookmarkModelTest, NodeVisibility_AllBookmarksPhase0) {
   base::test::ScopedFeatureList feature_list;

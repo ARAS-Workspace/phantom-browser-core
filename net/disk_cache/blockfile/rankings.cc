@@ -84,7 +84,7 @@ enum CrashLocation {
 // builds, according to the value of g_rankings_crash. This used by
 // crash_cache.exe to generate unit-test files.
 void GenerateCrash(CrashLocation location) {
-#if !defined(NDEBUG) && !BUILDFLAG(IS_IOS)
+#if !defined(NDEBUG)
   if (disk_cache::NO_CRASH == disk_cache::g_rankings_crash)
     return;
   switch (location) {

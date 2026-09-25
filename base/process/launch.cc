@@ -6,7 +6,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
+#if BUILDFLAG(IS_MAC)
 #include "base/apple/mach_port_rendezvous.h"
 #endif
 

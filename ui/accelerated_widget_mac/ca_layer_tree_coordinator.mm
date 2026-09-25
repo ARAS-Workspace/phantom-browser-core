@@ -174,7 +174,6 @@ void CALayerTreeCoordinator::EnsureCAContextAndRootLayer() {
     root_ca_layer_.opaque = YES;
   }
   if (!ca_context_) {
-#if !BUILDFLAG(IS_IOS) || BUILDFLAG(IS_IOS_TVOS)
     // Create the CAContext to send this to the GPU process, and the layer
     // for the context.
 #if BUILDFLAG(IS_MAC)
@@ -190,7 +189,6 @@ void CALayerTreeCoordinator::EnsureCAContextAndRootLayer() {
     }];
 #endif
     ca_context_.layer = root_ca_layer_;
-#endif  // !BUILDFLAG(IS_IOS) || BUILDFLAG(IS_IOS_TVOS)
   }
 }
 

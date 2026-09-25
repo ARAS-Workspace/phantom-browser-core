@@ -1154,9 +1154,7 @@ TEST_F(FieldTrialListTest, DumpAndFetchFromSharedMemory) {
 
 #if BUILDFLAG(USE_BLINK)
 
-#if !BUILDFLAG(IS_IOS)
 constexpr shared_memory::SharedMemorySwitch::DescriptorKey kFDKey = 42;
-#endif
 
 BASE_FEATURE(kTestFeatureA, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kTestFeatureB, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -1188,7 +1186,6 @@ MULTIPROCESS_TEST_MAIN(CreateTrialsInChildProcess) {
   return 0;
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(FieldTrialListTest, PassFieldTrialSharedMemoryOnCommandLine) {
   // Setup some field trial state.
   test::ScopedFeatureList scoped_feature_list1;
@@ -1232,7 +1229,6 @@ TEST_F(FieldTrialListTest, PassFieldTrialSharedMemoryOnCommandLine) {
       process, TestTimeouts::action_timeout(), &exit_code));
   EXPECT_EQ(0, exit_code);
 }
-#endif
 
 // Verify that the field trial shared memory handle is really read-only, and
 // does not allow writable mappings.

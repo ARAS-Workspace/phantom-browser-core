@@ -26,11 +26,6 @@
 #include "third_party/icu/source/common/unicode/uscript.h"
 #include "third_party/icu/source/i18n/unicode/coll.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "base/debug/crash_logging.h"
-#include "base/ios/ios_util.h"
-#endif
-
 namespace base::i18n {
 
 namespace {
@@ -145,12 +140,6 @@ std::string GetCanonicalLocale(std::string_view locale) {
 }
 
 void SetICUDefaultLocale(std::string_view locale_string) {
-#if BUILDFLAG(IS_IOS)
-  static base::debug::CrashKeyString* crash_key_locale =
-      base::debug::AllocateCrashKeyString("icu_locale_input",
-                                          base::debug::CrashKeySize::Size256);
-  base::debug::SetCrashKeyString(crash_key_locale, locale_string);
-#endif
   icu::Locale locale(ICULocaleName(locale_string).c_str());
   UErrorCode error_code = U_ZERO_ERROR;
   const char* lang = locale.getLanguage();
@@ -191,13 +180,6 @@ bool ICUIsRTL() {
 }
 
 TextDirection GetForcedTextDirection() {
-// On iOS, check for RTL forcing.
-#if BUILDFLAG(IS_IOS)
-  if (base::ios::IsInForcedRTL()) {
-    return base::i18n::RIGHT_TO_LEFT;
-  }
-#endif
-
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(switches::kForceUIDirection)) {
     std::string force_flag =

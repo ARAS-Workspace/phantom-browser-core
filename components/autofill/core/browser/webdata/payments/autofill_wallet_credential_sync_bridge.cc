@@ -310,15 +310,6 @@ void AutofillWalletCredentialSyncBridge::ActOnLocalChange(
   switch (change.type()) {
     case ServerCvcChange::ADD:
     case ServerCvcChange::UPDATE:
-#if BUILDFLAG(IS_IOS)
-      // TODO(crbug.com/542769367): Short-term fix for production crash spike
-      // until longer-term investigation of empty CVC entries completes.
-      if (base::FeatureList::IsEnabled(
-              features::kAutofillIgnoreEmptyCvcsInSyncBridge) &&
-          change.data_model().cvc.empty()) {
-        break;
-      }
-#endif
       data->name = base::NumberToString(change.data_model().instrument_id);
       *data->specifics.mutable_autofill_wallet_credential() =
           AutofillWalletCredentialSpecificsFromStructData(change.data_model());
@@ -358,15 +349,6 @@ AutofillWalletCredentialSyncBridge::ConvertToDataBatch(
   auto batch = std::make_unique<syncer::MutableDataBatch>();
   for (const std::unique_ptr<ServerCvc>& server_cvc_from_list :
        server_cvc_list) {
-#if BUILDFLAG(IS_IOS)
-    // TODO(crbug.com/542769367): Short-term fix for production crash spike
-    // until longer-term investigation of empty CVC entries completes.
-    if (base::FeatureList::IsEnabled(
-            features::kAutofillIgnoreEmptyCvcsInSyncBridge) &&
-        server_cvc_from_list->cvc.empty()) {
-      continue;
-    }
-#endif
     auto entity_data = std::make_unique<syncer::EntityData>();
     sync_pb::AutofillWalletCredentialSpecifics wallet_credential_specifics =
         AutofillWalletCredentialSpecificsFromStructData(*server_cvc_from_list);

@@ -140,12 +140,6 @@ bool AutofillDriverRouter::IsSafeToFill(
 // TriggerFormExtractionExcept(source).
 void AutofillDriverRouter::TriggerFormExtractionExcept(
     AutofillDriver& exception) {
-#if BUILDFLAG(IS_IOS)
-  if (!base::FeatureList::IsEnabled(
-          features::kAutofillAcrossIframesIosTriggerFormExtraction)) {
-    return;
-  }
-#endif
   // TODO(crbug.com/384874225): Cleanup that instrumentation once the feature is
   // launched on iOS.
   SCOPED_UMA_HISTOGRAM_TIMER_MICROS(

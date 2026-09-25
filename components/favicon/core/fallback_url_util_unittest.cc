@@ -38,10 +38,6 @@ TEST(FallbackURLUtilTest, GetFallbackIconText) {
       // Test IP URLs.
       {"http://192.168.0.1/", u"IP"},
       {"http://[2001:4860:4860::8888]/", u"IP"},
-#if BUILDFLAG(IS_IOS)
-      // Test Android app URLs.
-      {"android://abc@org.coursera.android//", u"A"},
-#endif
       // Miscellaneous edge cases.
       {"http://www..com/", u"."},
       {"http://ip.ip/", u"I"},

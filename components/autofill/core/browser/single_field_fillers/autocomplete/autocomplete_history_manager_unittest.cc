@@ -330,7 +330,6 @@ TEST_F(AutocompleteHistoryManagerTest, FieldWithAutocompleteOff) {
                                                     /*form=*/nullptr);
 }
 
-#if !BUILDFLAG(IS_IOS)
 // Tests that fields that are no longer focusable but still have user typed
 // input are sent to the WebDatabase to be saved. Will not work for iOS
 // because |properties_mask| is not set on iOS.
@@ -354,7 +353,6 @@ TEST_F(AutocompleteHistoryManagerTest, UserInputNotFocusable) {
   autocomplete_manager_->OnWillSubmitFormWithFields(form.fields(),
                                                     /*form=*/nullptr);
 }
-#endif
 
 // Tests that text entered into presentation fields is not sent to the
 // WebDatabase to be saved.

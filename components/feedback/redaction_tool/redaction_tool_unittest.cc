@@ -966,7 +966,6 @@ TEST_F(RedactionToolTest, DetectPII) {
   EXPECT_EQ(pii_in_data, redactor_.Detect(redaction_input));
 }
 
-#if !BUILDFLAG(IS_IOS)
 // TODO(xiangdongkong): Make the test work on IOS builds. Current issue: the
 // test files do not exist.
 //
@@ -987,8 +986,6 @@ TEST_F(RedactionToolTest, RedactTextFileContent) {
 
   EXPECT_EQ(text_redacted, redactor_.Redact(text_to_be_redacted));
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(RedactionToolTest, RedactBlockDevices) {
   // Test cases in the form {input, output}.

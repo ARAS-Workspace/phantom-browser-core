@@ -261,7 +261,6 @@ signin::Tribool AccountInfo::CanApplyAccountLevelEnterprisePolicies() const {
   return IsManaged();
 }
 
-#if !BUILDFLAG(IS_IOS)
 bool AccountInfo::IsEduAccount() const {
   return capabilities_.can_use_edu_features() == signin::Tribool::kTrue &&
          IsManaged() == signin::Tribool::kTrue;
@@ -273,7 +272,6 @@ bool AccountInfo::CanHaveEmailAddressDisplayed() const {
          capabilities_.can_have_email_address_displayed() ==
              signin::Tribool::kUnknown;
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 AccountInfo::Builder::Builder(const GaiaId& gaia_id, std::string_view email) {
   CHECK(!gaia_id.empty());

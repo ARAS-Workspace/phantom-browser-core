@@ -321,25 +321,6 @@ class PopularSitesFactoryForTest {
               "favicon_url": "http://news.google.com/favicon.ico"
             }
            ])");
-#if BUILDFLAG(IS_IOS)
-    test_url_loader_factory_.AddResponse(
-        "https://www.gstatic.com/chrome/ntp/ios/"
-        "suggested_sites_US_2023q1_mvt_experiment_with_popular_sites.json",
-        R"([{
-              "title": "ESPN",
-              "url": "http://www.espn.com",
-              "favicon_url": "http://www.espn.com/favicon.ico"
-            }, {
-              "title": "Mobile",
-              "url": "http://www.mobile.de",
-              "favicon_url": "http://www.mobile.de/favicon.ico"
-            }, {
-              "title": "Google News",
-              "url": "http://news.google.com",
-              "favicon_url": "http://news.google.com/favicon.ico"
-            }
-           ])");
-#endif
 
     test_url_loader_factory_.AddResponse(
         "https://www.gstatic.com/chrome/ntp/suggested_sites_IN_6.json",
@@ -1087,7 +1068,7 @@ TEST_F(MostVisitedSitesTest, MultipleObservers) {
                                      TileSource::TOP_SITES)))));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(MostVisitedSitesTest, MostVisitedRedesignEnforcesExpandedBoundsCleanly) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures(
@@ -1199,7 +1180,7 @@ TEST_F(MostVisitedSitesTest, CustomLinksCappedAtTenWhenRedesignDisabled) {
               testing::Contains(testing::Key(SectionType::PERSONALIZED)));
   EXPECT_EQ(10ul, sections.at(SectionType::PERSONALIZED).size());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Existing tests check the default 8-link mobile cap. This dedicated test
 // verifies the 10-link limit configured on WebUI NTP (AL) builds.

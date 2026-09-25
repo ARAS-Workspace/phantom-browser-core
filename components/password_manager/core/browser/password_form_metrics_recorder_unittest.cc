@@ -1559,7 +1559,6 @@ TEST_F(PasswordFormMetricsRecorderTest,
       PasswordFormMetricsRecorder::FillingAssistance::kAutomatic, 1);
 }
 
-#if !BUILDFLAG(IS_IOS)
 struct FillingSourceTestCase {
   std::vector<TestCaseFieldInfo> fields;
 
@@ -2017,7 +2016,6 @@ TEST_F(PasswordFormMetricsRecorderTest,
         PasswordFormMetricsRecorder::FillingSource::kNotFilled, 1);
   }
 }
-#endif
 
 // Verify that the difference between parsing during filling and saving is
 // calculated and recorded correctly when form parsing doesn't change.

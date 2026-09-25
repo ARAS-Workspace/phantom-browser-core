@@ -409,7 +409,6 @@ TEST_F(SecurePaymentConfirmationAppFactoryTest,
 }
 
 // Test that the browser bound key is retrieved.
-#if !BUILDFLAG(IS_IOS)
 TEST_F(SecurePaymentConfirmationAppFactoryTest,
        ProvidesBrowserBoundingToSecurePaymentConfirmationApp) {
   url::Origin caller_origin = url::Origin::Create(GURL("https://site.example"));
@@ -458,7 +457,6 @@ TEST_F(SecurePaymentConfirmationAppFactoryTest,
   EXPECT_EQ(mock_service_.get(),
             passkey_browser_binder->GetWebDataServiceForTesting());
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Test that the SecurePaymentConfirmationApp can be created even when there is
 // no user-verify platform authenticator available. This will ultimately create

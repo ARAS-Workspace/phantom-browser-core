@@ -9,11 +9,11 @@
 namespace reading_list {
 namespace prefs {
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Boolean to track if the first-use experience has been shown on desktop.
 const char kReadingListDesktopFirstUseExperienceShown[] =
     "reading_list.desktop_first_use_experience_shown";
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace prefs
 }  // namespace reading_list

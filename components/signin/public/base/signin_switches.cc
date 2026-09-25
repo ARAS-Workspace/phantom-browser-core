@@ -41,11 +41,6 @@ constexpr char kHatsSurveyProbabilityName[] = "probability";
 // keep-sorted start allow_yaml_lists=yes case=no group_prefixes=["#if", "#else", "#endif", "const", "};", "}", ");", "//", "bool", "base::", "BASE_FEATURE", "BASE_FEATURE_PARAM"] by_regex=["BASE_FEATURE\\(.*\\);"] skip_lines=2
 // clang-format on
 
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kAccountRetrievalWaitsForRestoration,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 BASE_FEATURE(kAvoidAutoTriggerListAccountsOnStale,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -59,20 +54,6 @@ BASE_FEATURE(kBeforeFirstRunDesktopRefreshSurvey,
 BASE_FEATURE(kBoundSessionCredentialsKillSwitch,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kBuildExternalPrivacyContext, base::FEATURE_ENABLED_BY_DEFAULT);
-const base::FeatureParam<std::string>
-    kBuildExternalPrivacyContextAgeMismatchLearnMoreUrl{
-        &kBuildExternalPrivacyContext, "AgeMismatchLearnMoreUrl",
-        "https://support.google.com/families/answer/"
-        "7087030#zippy=%2Ciphone-and-ipad"};
-#endif
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kCacheIdentityListInChrome, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kEnableACPrefetch, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kCctSignInPrompt, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -227,11 +208,11 @@ BASE_FEATURE_PARAM(base::TimeDelta,
                    base::Milliseconds(3000));
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kCrossDeviceSignin, base::FEATURE_ENABLED_BY_DEFAULT);
 const base::FeatureParam<std::string> kCrossDeviceSigninUrl{
     &kCrossDeviceSignin, "url", "https://www.google.com/chrome/go-mobile"};
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kCrossDeviceSigninFromDesktop, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -253,11 +234,6 @@ BASE_FEATURE(kDiceLinkedAccounts, base::FEATURE_DISABLED_BY_DEFAULT);
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kDisableU18FeedbackDesktop, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kDontIncludeSIDUnsecureCookiesInGaiaAuthFetcher,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 // Enables fetching sync preview data from the server for accounts with refresh
 // tokens.
@@ -369,11 +345,6 @@ BASE_FEATURE(kEnableAddSessionRedirect, base::FEATURE_ENABLED_BY_DEFAULT);
 // Enables the AI subscription level decorative ring around the user's avatar.
 BASE_FEATURE(kEnableAiSubscriptionAvatarRing,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kEnableASWebAuthenticationSession,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 // Enable experimental binding session credentials to the device.
@@ -538,11 +509,6 @@ constexpr base::FeatureParam<SeamlessSigninStringType>
 BASE_FEATURE(kEnableWebSigninLoadingDialog, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kEnforceCanSignInToChromeCapability,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 // Enables the management disclaimer for managed signed profiles. All signed in
 // profiles that never saw the management disclaimer will be shown the
@@ -621,12 +587,12 @@ BASE_FEATURE(kForceShowWebSigninLoadingDialog,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // Features to trigger the startup sign-in promo at boot.
 BASE_FEATURE(kForceStartupSigninPromo, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kFullscreenSignInPromoUseDate, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE_PARAM(int,
                    kFullscreenSignInPromoUseDateInterval,
@@ -639,14 +605,6 @@ BASE_FEATURE(kGaiaAccountIdEnforcement, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kHandleMdmErrorsForDasherAccounts,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kIgnoreChromeManageAccountsInSubframes,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Feature flag to ignore invalid grant errors in AuthenticationService.
-BASE_FEATURE(kIgnoreInvalidGrantError, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 BASE_FEATURE(kMagiChromePasskeySignIn, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -681,10 +639,6 @@ BASE_FEATURE(kMakeIdentityManagerSourceOfAccountsPart2,
 BASE_FEATURE(kMigrateAccountManagerDelegate, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kNoAccountWebSignin, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_IOS)
-
 BASE_FEATURE(kNonDefaultGaiaOriginCheck, base::FEATURE_ENABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_ANDROID)
@@ -712,11 +666,6 @@ BASE_FEATURE(kProfileDiscOnAllPages, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kProfilesReordering, base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kReadContextualAccountCapabilities,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kReadIsSubjectToUniversalOptOutCapability,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -788,10 +737,6 @@ BASE_FEATURE(kSkipRefreshTokenCheckInIdentityManager,
 #if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kSmartEmailLineBreaking, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kSupportAddSessionEmailPrefill, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Kill switch for displaying sign-in errors in the profile picker.

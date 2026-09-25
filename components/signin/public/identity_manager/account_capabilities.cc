@@ -142,11 +142,9 @@ signin::Tribool AccountCapabilities::can_fetch_family_member_info() const {
   return GetCapabilityByName(kCanFetchFamilyMemberInfoCapabilityName);
 }
 
-#if !BUILDFLAG(IS_IOS)
 signin::Tribool AccountCapabilities::can_have_email_address_displayed() const {
   return GetCapabilityByName(kCanHaveEmailAddressDisplayedCapabilityName);
 }
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 signin::Tribool
@@ -156,75 +154,33 @@ AccountCapabilities::can_make_chrome_search_engine_choice_screen_choice()
 }
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 signin::Tribool AccountCapabilities::can_run_chrome_privacy_sandbox_trials()
     const {
   return GetCapabilityByName(kCanRunChromePrivacySandboxTrialsCapabilityName);
 }
-#endif
 
 signin::Tribool AccountCapabilities::
     can_show_history_sync_opt_ins_without_minor_mode_restrictions() const {
-#if BUILDFLAG(IS_IOS)
-  // If the flag is enabled, read the contextual capability. If the contextual
-  // capability is unknown, fall back to the non-contextual capability - this
-  // is because when the flag is first enabled the new capability may not yet
-  // have been fetched.
-  // TODO(crbug.com/481654422): Remove the unknown fallback once contextual
-  // capabilities are fully rolled out.
-  if (base::FeatureList::IsEnabled(
-          switches::kReadContextualAccountCapabilities) &&
-      GetCapabilityByName(
-          kCanContextuallyShowHistorySyncOptInsWithoutMinorModeRestrictionsCapabilityName) !=
-          signin::Tribool::kUnknown) {
-    return GetCapabilityByName(
-        kCanContextuallyShowHistorySyncOptInsWithoutMinorModeRestrictionsCapabilityName);
-  }
-#endif
   return GetCapabilityByName(
       kCanShowHistorySyncOptInsWithoutMinorModeRestrictionsCapabilityName);
 }
 
-#if BUILDFLAG(IS_IOS)
-signin::Tribool AccountCapabilities::can_sign_in_to_chrome() const {
-  return GetCapabilityByName(kCanSignInToChromeCapabilityName);
-}
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 signin::Tribool AccountCapabilities::can_submit_feedback() const {
   return GetCapabilityByName(kCanSubmitFeedbackInChromeCapabilityName);
 }
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 signin::Tribool AccountCapabilities::can_use_devtools_generative_ai_features()
     const {
   return GetCapabilityByName(kCanUseDevToolsGenerativeAiFeaturesCapabilityName);
 }
-#endif
 
-#if !BUILDFLAG(IS_IOS)
 signin::Tribool AccountCapabilities::can_use_edu_features() const {
   return GetCapabilityByName(kCanUseEduFeaturesCapabilityName);
 }
-#endif
 
 signin::Tribool AccountCapabilities::can_use_gemini_in_chrome() const {
-#if BUILDFLAG(IS_IOS)
-  // If the flag is enabled, read the contextual capability. If the contextual
-  // capability is unknown, fall back to the non-contextual capability - this
-  // is because when the flag is first enabled the new capability may not yet
-  // have been fetched.
-  // TODO(crbug.com/489360851): Remove the unknown fallback once contextual
-  // capabilities are fully rolled out.
-  if (base::FeatureList::IsEnabled(
-          switches::kReadContextualAccountCapabilities) &&
-      GetCapabilityByName(kCanContextuallyUseGeminiInChromeCapabilityName) !=
-          signin::Tribool::kUnknown) {
-    return GetCapabilityByName(kCanContextuallyUseGeminiInChromeCapabilityName);
-  }
-#endif
   return GetCapabilityByName(kCanUseGeminiInChromeCapabilityName);
 }
 
@@ -233,20 +189,6 @@ signin::Tribool AccountCapabilities::can_use_manta_service() const {
 }
 
 signin::Tribool AccountCapabilities::can_use_model_execution_features() const {
-#if BUILDFLAG(IS_IOS)
-  // If the flag is enabled, read the contextual capability. If the contextual
-  // capability is unknown, fall back to the non-contextual capability - this
-  // is because when the flag is first enabled the new capability may not yet
-  // have been fetched.
-  // TODO(crbug.com/481654422): Remove the unknown fallback once contextual
-  // capabilities are fully rolled out.
-  if (base::FeatureList::IsEnabled(
-          switches::kReadContextualAccountCapabilities) &&
-      GetCapabilityByName(kCanContextuallyUseModelExecutionFeaturesName) !=
-          signin::Tribool::kUnknown) {
-    return GetCapabilityByName(kCanContextuallyUseModelExecutionFeaturesName);
-  }
-#endif
   return GetCapabilityByName(kCanUseModelExecutionFeaturesName);
 }
 
@@ -287,20 +229,6 @@ signin::Tribool AccountCapabilities::is_subject_to_parental_controls() const {
 signin::Tribool AccountCapabilities::is_subject_to_universal_opt_out() const {
   return GetCapabilityByName(kIsSubjectToUniversalOptOutCapabilityName);
 }
-
-#if BUILDFLAG(IS_IOS)
-signin::Tribool AccountCapabilities::must_fetch_apple_age_range_in_chrome()
-    const {
-  return GetCapabilityByName(kMustFetchAppleAgeRangeInChromeCapabilityName);
-}
-#endif
-
-#if BUILDFLAG(IS_IOS)
-signin::Tribool AccountCapabilities::must_skip_apple_age_range_in_chrome()
-    const {
-  return GetCapabilityByName(kMustSkipAppleAgeRangeInChromeCapabilityName);
-}
-#endif
 
 signin::Tribool
 AccountCapabilities::supports_wallet_private_passes_in_autofill() const {
@@ -395,13 +323,6 @@ AccountCapabilities::ConvertToJavaAccountCapabilities(JNIEnv* env) const {
 AccountCapabilities::AccountCapabilities(
     base::flat_map<std::string, bool> capabilities)
     : capabilities_map_(std::move(capabilities)) {}
-
-#if BUILDFLAG(IS_IOS)
-const base::flat_map<std::string, bool>&
-AccountCapabilities::ConvertToAccountCapabilitiesIOS() {
-  return capabilities_map_;
-}
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 DEFINE_JNI(AccountCapabilities)

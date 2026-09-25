@@ -145,7 +145,7 @@ void DumpAccessibilityTreeTest::ChooseFeatures(
 
 class DumpAccessibilityTreeTestExceptUIA : public DumpAccessibilityTreeTest {};
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Material Design accessibility tests use third_party components.
 class DumpAccessibilityTreeWithMaterialDesignTest
     : public DumpAccessibilityTreeTest {
@@ -216,7 +216,7 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(DumpAccessibilityTestBase::TreeTestPasses()),
     DumpAccessibilityTreeTestPassToString());
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 INSTANTIATE_TEST_SUITE_P(
     All,
     DumpAccessibilityTreeWithMaterialDesignTest,
@@ -4834,7 +4834,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
   RunCSSTest(FILE_PATH_LITERAL("interactivity-inert.html"));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeWithMaterialDesignTest,
                        MaterialDesignButtons) {
   RunMaterialDesignTest(FILE_PATH_LITERAL("buttons.html"));
@@ -4940,7 +4940,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeWithMaterialDesignTest,
   RunMaterialDesignTest(FILE_PATH_LITERAL("version-info.html"));
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 class DumpAccessibilityTreeWithCarouselTest : public DumpAccessibilityTreeTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     DumpAccessibilityTreeTest::SetUpCommandLine(command_line);

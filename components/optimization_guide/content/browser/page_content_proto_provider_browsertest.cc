@@ -141,9 +141,9 @@ FindFirstNodeWithAttributeTypeAndTextSubstring(
 }
 
 // This helper is only used by popup opener tests, and those tests are not
-// built on Android, Mac, or iOS. Keep the helper under the same guard to
+// built on Android or Mac. Keep the helper under the same guard to
 // avoid unused-function build failures on those bots.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 const optimization_guide::proto::ContentNode* FindFirstNodeWithDomNodeId(
     const optimization_guide::proto::ContentNode& root,
     int64_t dom_node_id) {
@@ -163,7 +163,7 @@ const optimization_guide::proto::ContentNode* FindFirstNodeWithDomNodeId(
   }
   return nullptr;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 void AssertRectsEqual(const optimization_guide::proto::BoundingRect& proto_rect,
                       gfx::Rect rect) {
@@ -2540,8 +2540,8 @@ IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest,
                       INTERACTION_DISABLED_REASON_CURSOR_NOT_ALLOWED));
 }
 
-// Popups may be rendered as native OS-level widgets on Android, MacOS, and iOS.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
+// Popups may be rendered as native OS-level widgets on Android and MacOS.
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 class PageContentProtoProviderPopupBrowserTest
     : public PageContentProtoProviderBrowserTest {
  public:

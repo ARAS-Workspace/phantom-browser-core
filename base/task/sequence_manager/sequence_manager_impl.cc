@@ -186,13 +186,6 @@ SequenceManagerImpl::~SequenceManagerImpl() {
     ScopedBestEffortExecutionFence::RemoveSequenceManager(this);
   }
 
-#if BUILDFLAG(IS_IOS)
-  if (settings_.message_loop_type == MessagePumpType::UI &&
-      associated_thread_->IsBound()) {
-    controller_->DetachFromMessagePump();
-  }
-#endif
-
   // ThreadControllerWithMessagePumpImpl does not support being destroyed from a
   // Task.
   DCHECK(main_thread_only().task_execution_stack.empty());
@@ -266,13 +259,6 @@ void SequenceManagerImpl::BindToMessagePump(std::unique_ptr<MessagePump> pump) {
 #if BUILDFLAG(IS_ANDROID)
   if (settings_.message_loop_type == MessagePumpType::UI ||
       settings_.message_loop_type == MessagePumpType::JAVA) {
-    controller_->AttachToMessagePump();
-  }
-#endif
-
-  // On iOS attach to the native loop when there is one.
-#if BUILDFLAG(IS_IOS)
-  if (settings_.message_loop_type == MessagePumpType::UI) {
     controller_->AttachToMessagePump();
   }
 #endif
@@ -986,12 +972,6 @@ void SequenceManagerImpl::SetTaskExecutionAllowedInNativeNestedLoop(
 bool SequenceManagerImpl::IsTaskExecutionAllowedInNativeNestedLoop() const {
   return controller_->IsTaskExecutionAllowed();
 }
-
-#if BUILDFLAG(IS_IOS)
-void SequenceManagerImpl::AttachToMessagePump() {
-  return controller_->AttachToMessagePump();
-}
-#endif
 
 bool SequenceManagerImpl::IsIdleForTesting() {
   ReloadEmptyWorkQueues();

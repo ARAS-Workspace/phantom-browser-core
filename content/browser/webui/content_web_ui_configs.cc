@@ -18,7 +18,7 @@
 #include "content/browser/webrtc/webrtc_internals_ui.h"
 #include "content/public/browser/webui_config_map.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/tracing/traces_internals/traces_internals_ui.h"
 #include "content/browser/tracing/tracing_ui.h"
 #endif
@@ -47,7 +47,7 @@ void RegisterContentWebUIConfigs() {
   map.AddWebUIConfig(std::make_unique<WebXrInternalsUIConfig>());
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   map.AddWebUIConfig(std::make_unique<TracesInternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<TracesInternalsLegacyUIConfig>());
   map.AddWebUIConfig(std::make_unique<TracingUIConfig>());

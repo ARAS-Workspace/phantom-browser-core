@@ -331,7 +331,7 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(DumpAccessibilityTestBase::EventTestPassesExceptUIA()),
     DumpAccessibilityEventsTestPassToString());
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 class DumpAccessibilityEventsWithMaterialDesignTest
     : public DumpAccessibilityEventsTest {
  public:
@@ -346,7 +346,7 @@ INSTANTIATE_TEST_SUITE_P(
     DumpAccessibilityEventsWithMaterialDesignTest,
     ::testing::ValuesIn(DumpAccessibilityTestBase::EventTestPassesWithBlink()),
     DumpAccessibilityEventsTestPassToString());
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 class DumpAccessibilityEventsWithExperimentalWebFeaturesTest
     : public DumpAccessibilityEventsTest {
@@ -1023,7 +1023,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
 }
 
 // The Material Design tests are not supported on Android.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsWithMaterialDesignTest,
                        MaterialDesignButtonEvents) {
   RunEventTest(FILE_PATH_LITERAL("material-design-button.html"));
@@ -1098,7 +1098,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsWithMaterialDesignTest,
                        MaterialDesignChipsEvents) {
   RunEventTest(FILE_PATH_LITERAL("material-design-chips.html"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/40841326): disabled on UIA
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTestExceptUIA,

@@ -2134,7 +2134,6 @@ TEST_F(CreditCardAccessManagerTest,
   // result.
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(
     CreditCardAccessManagerTest,
     RiskBasedVirtualCardUnmasking_CreditCardAccessManagerReset_TriggersOtpAuthenticatorResetOnFlowCancelled) {
@@ -2491,7 +2490,6 @@ TEST_F(
 }
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Ensures that the virtual card risk-based unmasking response is handled
 // correctly if there is no challenge option returned by the server.

@@ -37,12 +37,6 @@
 #include "url/url_constants.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_IOS)
-#include <string_view>
-
-#include "base/strings/string_util.h"
-#endif
-
 namespace policy {
 
 using url_matcher::URLMatcher;
@@ -70,13 +64,6 @@ constexpr const char* kBypassBlocklistWildcardForSchemes[] = {
 // TODO(crbug.com/487922969): Move this to the list above once the feature is
 // launched.
 constexpr char kChromeScheme[] = "chrome";
-
-#if BUILDFLAG(IS_IOS)
-// The two schemes used on iOS for the NTP.
-constexpr char kIosNtpAboutScheme[] = "about";
-// The host string used on iOS for the NTP.
-constexpr char kIosNtpHost[] = "newtab";
-#endif
 
 // Returns a blocklist based on the given |block| and |allow| pattern lists.
 std::unique_ptr<URLBlocklist> BuildBlocklist(const base::ListValue* block,
@@ -121,21 +108,6 @@ bool BypassBlocklistWildcardForURL(const GURL& url) {
       scheme == kChromeScheme) {
     return true;
   }
-#if BUILDFLAG(IS_IOS)
-  // Compare the chrome scheme and host against the chrome://newtab version of
-  // the NTP URL.
-  if (scheme == kChromeScheme && url.host() == kIosNtpHost) {
-    return true;
-  }
-  // Compare the URL scheme and path to the about:newtab version of the NTP URL.
-  // Leading and trailing slashes must be removed because the host name is
-  // parsed as the URL path (which may contain slashes).
-  const std::string_view trimmed_path =
-      base::TrimString(url.path(), "/", base::TrimPositions::TRIM_ALL);
-  if (scheme == kIosNtpAboutScheme && trimmed_path == kIosNtpHost) {
-    return true;
-  }
-#endif
   return false;
 }
 

@@ -527,16 +527,6 @@ TEST_F(URLBlocklistManagerTest, DefaultBlocklistExceptions) {
   EXPECT_FALSE(
       blocklist.IsURLBlocked(GURL("chrome-search://most-visited/title.html")));
   EXPECT_FALSE(blocklist.IsURLBlocked(GURL("chrome-native://ntp")));
-#if BUILDFLAG(IS_IOS)
-  // Ensure that the NTP is not blocked on iOS by "*".
-  // TODO(crbug.com/40686232): On iOS, the NTP can not be blocked even by
-  // explicitly listing it as a blocked URL. This is due to the usage of
-  // "about:newtab" as its URL which is not recognized and filtered by the
-  // URLBlocklist code.
-  EXPECT_FALSE(blocklist.IsURLBlocked(GURL("about:newtab")));
-  EXPECT_FALSE(blocklist.IsURLBlocked(GURL("chrome://newtab")));
-  EXPECT_TRUE(blocklist.IsURLBlocked(GURL("about://newtab/")));
-#endif
 
   // Unless they are explicitly on the blocklist:
   blocked.Append("chrome-extension://*");
@@ -609,12 +599,7 @@ TEST_F(URLBlocklistManagerTest,
   EXPECT_TRUE(blocklist.IsURLBlocked(GURL("chrome://settings/privacy")));
   EXPECT_TRUE(
       blocklist.IsURLBlocked(GURL("chrome://omnibox-popup.top-chrome")));
-  // The NTP on iOS was an exception to the wildcard blocklist before the
-  // feature flag was introduced. It remains an exception even when the
-  // flag is disabled.
-#if !BUILDFLAG(IS_IOS)
   EXPECT_TRUE(blocklist.IsURLBlocked(GURL("chrome://newtab")));
-#endif
 }
 
 TEST_F(URLBlocklistManagerTest, BlocklistBasicCoverage) {

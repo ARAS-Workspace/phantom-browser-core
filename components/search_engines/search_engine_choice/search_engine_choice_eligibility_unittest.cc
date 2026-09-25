@@ -133,11 +133,6 @@ class KeywordsDatabaseHolder {
   scoped_refptr<KeywordWebDataService> keyword_web_data;
 };
 
-#if BUILDFLAG(IS_IOS)
-const ui::DeviceFormFactorSet kPhoneFormFactors{
-    ui::DEVICE_FORM_FACTOR_PHONE, ui::DEVICE_FORM_FACTOR_FOLDABLE};
-#endif
-
 SearchEngineChoiceScreenConditions IfSupported(
     SearchEngineChoiceScreenConditions condition) {
 #if !BUILDFLAG(CHOICE_SCREEN_IN_CHROME)
@@ -444,43 +439,6 @@ TEST_F(SearchEngineChoiceEligibilityTest,
                 SearchEngineChoiceScreenConditions::kHasNonGoogleSearchEngine));
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(SearchEngineChoiceEligibilityTest,
-       ChoiceScreenConditions_PromptFor3p_Taiyaki) {
-  if (!kPhoneFormFactors.Has(ui::GetDeviceFormFactor())) {
-    GTEST_SKIP();
-  }
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      switches::kSearchEngineChoiceCountry, "JP");
-  static_cast<regional_capabilities::FakeRegionalCapabilitiesServiceClient&>(
-      regional_capabilities_service().GetClientForTesting())
-      .SetVariationsLatestCountryId(CountryId("JP"));
-
-  // First, check the state with Google as the default search engine
-  ASSERT_TRUE(
-      template_url_service().GetDefaultSearchProvider()->prepopulate_id() ==
-      TemplateURLPrepopulateData::google.id);
-
-  EXPECT_EQ(GetStaticConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-  EXPECT_EQ(GetDynamicConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-
-  // Second, check the state after changing the default search engine.
-
-  TemplateURL* template_url = template_url_service().GetTemplateURLForKeyword(
-      TemplateURLPrepopulateData::bing.keyword);
-  ASSERT_TRUE(template_url);
-  template_url_service().SetUserSelectedDefaultSearchProvider(template_url);
-
-  EXPECT_EQ(GetStaticConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-  EXPECT_EQ(GetDynamicConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 TEST_F(SearchEngineChoiceEligibilityTest,
        ChoiceScreenConditions_SkipForCustom_Waffle) {
   // A custom search engine will have a `prepopulate_id` of 0.
@@ -498,92 +456,6 @@ TEST_F(SearchEngineChoiceEligibilityTest,
       GetDynamicConditions(),
       IfSupported(SearchEngineChoiceScreenConditions::kHasCustomSearchEngine));
 }
-
-#if BUILDFLAG(IS_IOS)
-// Verifies that when `kSearchEngineChoiceScreenSnackbar` is disabled, having a
-// non-highlightable custom search engine prevents eligibility
-// (`kHasNonHighlightablePrepopulatedSearchEngine`).
-TEST_F(SearchEngineChoiceEligibilityTest,
-       ChoiceScreenConditions_PromptForCustom_Taiyaki) {
-  if (!kPhoneFormFactors.Has(ui::GetDeviceFormFactor())) {
-    GTEST_SKIP();
-  }
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      switches::kSearchEngineChoiceCountry, "JP");
-  static_cast<regional_capabilities::FakeRegionalCapabilitiesServiceClient&>(
-      regional_capabilities_service().GetClientForTesting())
-      .SetVariationsLatestCountryId(CountryId("JP"));
-
-  // A custom search engine will have a `prepopulate_id` of 0.
-  const int kCustomSearchEnginePrepopulateId = 0;
-  TemplateURLData template_url_data;
-  template_url_data.prepopulate_id = kCustomSearchEnginePrepopulateId;
-  template_url_data.SetURL("https://www.example.com/?q={searchTerms}");
-  template_url_service().SetUserSelectedDefaultSearchProvider(
-      template_url_service().Add(
-          std::make_unique<TemplateURL>(template_url_data)));
-
-  EXPECT_EQ(GetStaticConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-  EXPECT_EQ(GetDynamicConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::
-                            kHasNonHighlightablePrepopulatedSearchEngine));
-}
-
-// Verifies that when `kSearchEngineChoiceScreenSnackbar` is enabled, having a
-// non-highlightable custom search engine allows eligibility (`kEligible`).
-TEST_F(SearchEngineChoiceEligibilityTest,
-       ChoiceScreenConditions_PromptForCustom_SnackbarEnabled_Taiyaki) {
-  if (!kPhoneFormFactors.Has(ui::GetDeviceFormFactor())) {
-    GTEST_SKIP();
-  }
-
-  base::test::ScopedFeatureList scoped_feature_list{
-      switches::kSearchEngineChoiceScreenSnackbar};
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      switches::kSearchEngineChoiceCountry, "JP");
-  static_cast<regional_capabilities::FakeRegionalCapabilitiesServiceClient&>(
-      regional_capabilities_service().GetClientForTesting())
-      .SetVariationsLatestCountryId(CountryId("JP"));
-
-  // A custom search engine will have a `prepopulate_id` of 0.
-  const int kCustomSearchEnginePrepopulateId = 0;
-  TemplateURLData template_url_data;
-  template_url_data.prepopulate_id = kCustomSearchEnginePrepopulateId;
-  template_url_data.SetURL("https://www.example.com/?q={searchTerms}");
-  template_url_service().SetUserSelectedDefaultSearchProvider(
-      template_url_service().Add(
-          std::make_unique<TemplateURL>(template_url_data)));
-
-  EXPECT_EQ(GetStaticConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-  EXPECT_EQ(GetDynamicConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-}
-
-TEST_F(SearchEngineChoiceEligibilityTest,
-       ChoiceScreenConditions_UnknownCountryIneligible_Taiyaki) {
-  if (!kPhoneFormFactors.Has(ui::GetDeviceFormFactor())) {
-    GTEST_SKIP();
-  }
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      switches::kSearchEngineChoiceCountry, "JP");
-  // Variations country is not available
-  static_cast<regional_capabilities::FakeRegionalCapabilitiesServiceClient&>(
-      regional_capabilities_service().GetClientForTesting())
-      .SetVariationsLatestCountryId(CountryId());
-
-  EXPECT_EQ(GetStaticConditions(),
-            IfSupported(SearchEngineChoiceScreenConditions::kEligible));
-  EXPECT_EQ(
-      GetDynamicConditions(),
-      IfSupported(
-          SearchEngineChoiceScreenConditions::kUnavailableCurrentLocation));
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 TEST_F(SearchEngineChoiceEligibilityTest,
        ChoiceScreenConditions_UnknownCountryIneligible_LocalWaffleEnabled) {
@@ -709,31 +581,6 @@ TEST_F(SearchEngineChoiceEligibilityTest,
   EXPECT_EQ(GetDynamicConditions(),
             IfSupported(SearchEngineChoiceScreenConditions::kEligible));
 }
-
-#if BUILDFLAG(IS_IOS)
-TEST_F(SearchEngineChoiceEligibilityTest,
-       ChoiceScreenConditions_OutsideRegionIneligible_Taiyaki) {
-  if (!kPhoneFormFactors.Has(ui::GetDeviceFormFactor())) {
-    GTEST_SKIP();
-  }
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      switches::kSearchEngineChoiceCountry, "JP");
-  // Explicitly set the variations country to a non-Taiyaki country to ensure
-  // that the choice screen is not triggered due to the user's current
-  // location.
-  static_cast<regional_capabilities::FakeRegionalCapabilitiesServiceClient&>(
-      regional_capabilities_service().GetClientForTesting())
-      .SetVariationsLatestCountryId(CountryId("PL"));
-
-  EXPECT_EQ(
-      GetStaticConditions(),
-      IfSupported(
-          SearchEngineChoiceScreenConditions::kIncompatibleCurrentLocation));
-  // Do not check the dynamic conditions, as the choice screen would be
-  // suppressed before evaluating the dynamic conditions.
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 TEST_F(SearchEngineChoiceEligibilityTest,
        ChoiceScreenConditions_OutsideRegionIneligible_LocalWaffleByRegion) {
@@ -1363,58 +1210,6 @@ INSTANTIATE_TEST_SUITE_P(
                               ChoiceStatus::kFromRestoredDevice,
                       },
                   }},
-#if BUILDFLAG(IS_IOS)
-         Spec{.test_name = "1pTaiyaki",
-              .restore_feature_state =
-                  Spec::RestoreFeatureState::kEnableJustInTime,
-              .check_should_skip = base::BindRepeating([]() {
-                return !kPhoneFormFactors.Has(ui::GetDeviceFormFactor());
-              }),
-              .runs =
-                  {
-                      // Sets up Chrome as running in Japan, and having
-                      // selected Google on the choice screen
-                      {
-                          .update_device_state =
-                              Spec::DeviceStateChanges{
-                                  .device_country_id = CountryId("JP"),
-                              },
-                          .update_service_state =
-                              Spec::ServiceStateChanges{
-                                  .select_dse =
-                                      TemplateURLPrepopulateData::google.id,
-                                  .choice_location =
-                                      ChoiceMadeLocation::kChoiceScreen,
-                              },
-                          .expect_choice_status_after = ChoiceStatus::kValid,
-                      },
-                      // Simulates the device being restored, and its detection
-                      // in this run. For Taiyaki, the client stays in the
-                      // "already completed" state, the existing choice is
-                      // preserved.
-                      {
-                          .update_device_state =
-                              Spec::DeviceStateChanges{
-                                  .set_restored = true,
-                              },
-                          .expect_choice_status_before =
-                              ChoiceStatus::kValidAndImported,
-                          .expect_with_services =
-                              Spec::ExpectationsWithServices{
-                                  .static_condition =
-                                      SearchEngineChoiceScreenConditions::
-                                          kAlreadyCompletedImported,
-                                  .dynamic_condition =
-                                      SearchEngineChoiceScreenConditions::
-                                          kAlreadyCompletedImported,
-                                  .current_dse_prepopulate_id =
-                                      TemplateURLPrepopulateData::google.id,
-                              },
-                          .expect_choice_status_after =
-                              ChoiceStatus::kValidAndImported,
-                      },
-                  }},
-#endif  // BUILDFLAG(IS_IOS)
          Spec{
              .test_name = "1pNoRestoreDetection",
              .restore_feature_state = Spec::RestoreFeatureState::kDisabled,

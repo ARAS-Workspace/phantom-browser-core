@@ -20,9 +20,9 @@
 #include "base/android/device_info.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/autofill/core/browser/metrics/payments/omnibox_autofill_metrics.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace autofill::autofill_metrics {
 
@@ -2171,7 +2171,7 @@ TEST_F(CreditCardFormEventLoggerTest,
                                FORM_EVENT_NO_SUGGESTION_SUBMITTED_ONCE, 1);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 
 TEST_F(CreditCardFormEventLoggerTest, OnOmniboxAutofillChipShown) {
   base::HistogramTester histogram_tester;
@@ -2224,6 +2224,6 @@ TEST_F(CreditCardFormEventLoggerTest, OnOmniboxAutofillSuggestionAccepted) {
       OmniboxAutofillEvents::kSuggestionAcceptedOnce, 1);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace autofill::autofill_metrics

@@ -61,13 +61,6 @@ bool IsHashDetailRelevant(const V5::FullHash::FullHashDetail& detail) {
     }
   }
 
-#if BUILDFLAG(IS_IOS)
-    // iOS doesn't support CANARY threat attribute.
-    if (has_canary) {
-      return false;
-    }
-#endif
-
     // CANARY and FRAME_ONLY should not be set at the same time.
     if (has_canary && has_frame_only) {
       return false;

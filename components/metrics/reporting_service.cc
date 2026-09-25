@@ -32,10 +32,6 @@
 #include "components/background_task_scheduler/task_info.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
-#include "base/ios/scoped_critical_action.h"
-#endif
-
 namespace metrics {
 
 // static
@@ -129,7 +125,7 @@ bool ReportingService::reporting_active() const {
   return reporting_active_;
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void ReportingService::OnAppEnterBackground() {
   is_in_foreground_ = false;
 }
@@ -181,7 +177,7 @@ void ReportingService::OnAppEnterForeground() {
   }
 #endif  // BUILDFLAG(IS_ANDROID)
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 //------------------------------------------------------------------------------
 // private methods
@@ -243,24 +239,6 @@ void ReportingService::SendNextLogImpl(base::OnceClosure done_callback) {
   DVLOG(1) << "SendNextLogImpl";
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   CHECK(upload_scheduler_);
-
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
-  if (base::FeatureList::IsEnabled(features::kIOSBackgroundMetrics)) {
-    // Create a ScopedCriticalAction to indicate to the OS that a critical task
-    // is being run and that it should avoid shutting down Chrome in the
-    // background.
-    done_callback =
-        std::move(done_callback)
-            .Then(base::BindOnce(
-                [](std::unique_ptr<base::ios::ScopedCriticalAction>) {
-                  // This function does nothing but keep the
-                  // ScopedCriticalAction param alive until we have
-                  // finished the upload task.
-                },
-                std::make_unique<base::ios::ScopedCriticalAction>(
-                    "NetMetricsLogUploaderUpload")));
-  }
-#endif  // BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
 
   upload_scheduler_->SetDoneCallback(std::move(done_callback));
 
@@ -410,7 +388,7 @@ void ReportingService::OnLogUploadComplete(
 
       bool flush_local_state =
           base::FeatureList::IsEnabled(features::kReportingServiceAlwaysFlush);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
       // If Chrome is in the background, flush the discarded and trimmed logs
       // from |local_state_| immediately because the process may be killed at
       // any time from now without persisting the changes. Otherwise, we may end
@@ -419,7 +397,7 @@ void ReportingService::OnLogUploadComplete(
       // |local_state_| will be flushed when convenient, and we do not want to
       // do more work than necessary on the main thread while Chrome is visible.
       flush_local_state = flush_local_state || !is_in_foreground_;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
       if (flush_local_state) {
         local_state_->CommitPendingWrite();
       }

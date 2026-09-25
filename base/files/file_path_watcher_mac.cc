@@ -10,9 +10,7 @@
 #include "base/memory/ptr_util.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "base/files/file_path_watcher_fsevents.h"
-#endif
 
 namespace base {
 
@@ -34,9 +32,7 @@ class FilePathWatcherImpl : public FilePathWatcher::PlatformDelegate {
       if (!FilePathWatcher::RecursiveWatchAvailable()) {
         return false;
       }
-#if !BUILDFLAG(IS_IOS)
       impl_ = std::make_unique<FilePathWatcherFSEvents>();
-#endif  // BUILDFLAG(IS_IOS)
     } else {
       impl_ = std::make_unique<FilePathWatcherKQueue>();
     }

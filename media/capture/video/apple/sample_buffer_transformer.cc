@@ -17,10 +17,6 @@
 #include "third_party/libyuv/include/libyuv.h"
 #include "third_party/libyuv/include/libyuv/scale.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "media/capture/video/ios/pixel_buffer_rotator.h"
-#endif
-
 namespace media {
 
 namespace {
@@ -509,29 +505,7 @@ void SampleBufferTransformer::Reconfigure(
   if (transformer == Transformer::kPixelBufferTransfer) {
     pixel_buffer_transferer_ = std::make_unique<PixelBufferTransferer>();
     rotation_angle_ = rotation_angle;
-#if BUILDFLAG(IS_IOS)
-    int width, height;
-    switch (rotation_angle_) {
-      case 0:
-      case 180:
-        width = destination_size_.width();
-        height = destination_size_.height();
-        break;
-      case 90:
-      case 270:
-        width = destination_size_.height();
-        height = destination_size_.width();
-        break;
-    }
-
-    rotated_destination_pixel_buffer_pool_ = PixelBufferPool::Create(
-        destination_pixel_format_, width, height, buffer_pool_size);
-    pixel_buffer_rotator_ = std::make_unique<PixelBufferRotator>();
-#endif
   } else {
-#if BUILDFLAG(IS_IOS)
-    pixel_buffer_rotator_.reset();
-#endif
     pixel_buffer_transferer_.reset();
   }
   intermediate_i420_buffer_.resize(0);
@@ -592,32 +566,6 @@ SampleBufferTransformer::Transform(CMSampleBufferRef sample_buffer) {
   }
   return destination_pixel_buffer;
 }
-
-#if BUILDFLAG(IS_IOS)
-base::apple::ScopedCFTypeRef<CVPixelBufferRef> SampleBufferTransformer::Rotate(
-    CVPixelBufferRef source_pixel_buffer) {
-  DCHECK(source_pixel_buffer);
-  DCHECK(pixel_buffer_rotator_);
-
-  // Create destination buffer from pool.
-  base::apple::ScopedCFTypeRef<CVPixelBufferRef> rotated_pixel_buffer =
-      rotated_destination_pixel_buffer_pool_->CreateBuffer();
-  if (!rotated_pixel_buffer) {
-    // Most likely the buffer count was exceeded, but other errors are possible.
-    LOG(ERROR) << "Failed to create a destination buffer";
-    return base::apple::ScopedCFTypeRef<CVPixelBufferRef>();
-  }
-
-  // The rotated_pixel_buffer might not be the same size as source_pixel_buffer
-  // since source_pixel_buffer gets rotated by rotation_angle_.
-  if (pixel_buffer_rotator_->Rotate(
-          source_pixel_buffer, rotated_pixel_buffer.get(), rotation_angle_)) {
-    return base::apple::ScopedCFTypeRef<CVPixelBufferRef>(rotated_pixel_buffer);
-  } else {
-    return base::apple::ScopedCFTypeRef<CVPixelBufferRef>();
-  }
-}
-#endif
 
 void SampleBufferTransformer::TransformPixelBuffer(
     CVPixelBufferRef source_pixel_buffer,

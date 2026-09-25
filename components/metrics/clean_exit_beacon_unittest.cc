@@ -85,14 +85,6 @@ struct BeaconConsistencyTestParams {
   CleanExitBeaconConsistency expected_consistency;
 };
 
-#if BUILDFLAG(IS_IOS)
-// Used for testing the logic that emits to the UMA.CleanExitBeaconConsistency3
-// histogram.
-class BeaconFileAndPlatformBeaconConsistencyTest
-    : public testing::WithParamInterface<BeaconConsistencyTestParams>,
-      public CleanExitBeaconTest {};
-#endif  // BUILDFLAG(IS_IOS)
-
 // Verify that the crash streak metric is 0 when default pref values are used.
 TEST_F(CleanExitBeaconTest, CrashStreakMetricWithDefaultPrefs) {
   CleanExitBeacon::ResetStabilityExitedCleanlyForTesting(&prefs_);
@@ -395,86 +387,6 @@ TEST_F(CleanExitBeaconTest, InvalidWriteBeaconValueArgsTriggerDcheck) {
       clean_exit_beacon.WriteBeaconValue(/*exited_cleanly=*/true,
                                          /*is_extended_safe_mode=*/true));
 }
-
-#if BUILDFLAG(IS_IOS)
-// Verify the logic for recording UMA.CleanExitBeaconConsistency3.
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    BeaconFileAndPlatformBeaconConsistencyTest,
-    ::testing::Values(
-        BeaconConsistencyTestParams{
-            .test_name = "MissingMissing",
-            .expected_consistency =
-                CleanExitBeaconConsistency::kMissingMissing},
-        BeaconConsistencyTestParams{
-            .test_name = "MissingClean",
-            .platform_specific_beacon_value = true,
-            .expected_consistency = CleanExitBeaconConsistency::kMissingClean},
-        BeaconConsistencyTestParams{
-            .test_name = "MissingDirty",
-            .platform_specific_beacon_value = false,
-            .expected_consistency = CleanExitBeaconConsistency::kMissingDirty},
-        BeaconConsistencyTestParams{
-            .test_name = "CleanMissing",
-            .beacon_file_beacon_value = true,
-            .expected_consistency = CleanExitBeaconConsistency::kCleanMissing},
-        BeaconConsistencyTestParams{
-            .test_name = "DirtyMissing",
-            .beacon_file_beacon_value = false,
-            .expected_consistency = CleanExitBeaconConsistency::kDirtyMissing},
-        BeaconConsistencyTestParams{
-            .test_name = "CleanClean",
-            .beacon_file_beacon_value = true,
-            .platform_specific_beacon_value = true,
-            .expected_consistency = CleanExitBeaconConsistency::kCleanClean},
-        BeaconConsistencyTestParams{
-            .test_name = "CleanDirty",
-            .beacon_file_beacon_value = true,
-            .platform_specific_beacon_value = false,
-            .expected_consistency = CleanExitBeaconConsistency::kCleanDirty},
-        BeaconConsistencyTestParams{
-            .test_name = "DirtyClean",
-            .beacon_file_beacon_value = false,
-            .platform_specific_beacon_value = true,
-            .expected_consistency = CleanExitBeaconConsistency::kDirtyClean},
-        BeaconConsistencyTestParams{
-            .test_name = "DirtyDirty",
-            .beacon_file_beacon_value = false,
-            .platform_specific_beacon_value = false,
-            .expected_consistency = CleanExitBeaconConsistency::kDirtyDirty}),
-    [](const ::testing::TestParamInfo<BeaconConsistencyTestParams>& params) {
-      return params.param.test_name;
-    });
-
-TEST_P(BeaconFileAndPlatformBeaconConsistencyTest, BeaconConsistency) {
-  // Verify that the beacon file is not present. Unless set below, this beacon
-  // is considered missing.
-  const base::FilePath user_data_dir_path = user_data_dir_.GetPath();
-  const base::FilePath temp_beacon_file_path =
-      user_data_dir_path.Append(kCleanExitBeaconFilename);
-  ASSERT_FALSE(base::PathExists(temp_beacon_file_path));
-  // Clear the platform-specific beacon. Unless set below, this beacon is also
-  // considered missing.
-  CleanExitBeacon::ResetStabilityExitedCleanlyForTesting(&prefs_);
-
-  BeaconConsistencyTestParams params = GetParam();
-  if (params.beacon_file_beacon_value) {
-    ASSERT_TRUE(base::WriteFile(
-        temp_beacon_file_path,
-        CleanExitBeacon::CreateBeaconFileContentsForTesting(
-            /*exited_cleanly=*/params.beacon_file_beacon_value.value(),
-            /*crash_streak=*/0)));
-  }
-  if (params.platform_specific_beacon_value) {
-    CleanExitBeacon::SetUserDefaultsBeacon(
-        /*exited_cleanly=*/params.platform_specific_beacon_value.value());
-  }
-
-  TestCleanExitBeacon clean_exit_beacon(&prefs_, user_data_dir_path);
-  histogram_tester_.ExpectUniqueSample("UMA.CleanExitBeaconConsistency3",
-                                       params.expected_consistency, 1);
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 }  // namespace
 }  // namespace metrics

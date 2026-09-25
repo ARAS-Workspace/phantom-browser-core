@@ -36,14 +36,6 @@
 #include "base/strings/cstring_view.h"
 #include "build/build_config.h"
 
-// Controls whether `dladdr(...)` is used to print the callstack. This is
-// only used on iOS Official build where `backtrace_symbols(...)` prints
-// misleading symbols (as the binary is stripped).
-#if BUILDFLAG(IS_IOS) && defined(OFFICIAL_BUILD)
-#define HAVE_DLADDR
-#include <dlfcn.h>
-#endif
-
 // Surprisingly, uClibc defines __GLIBC__ in some build configs, but
 // execinfo.h and backtrace(3) are really only present in glibc and in macOS
 // libc.

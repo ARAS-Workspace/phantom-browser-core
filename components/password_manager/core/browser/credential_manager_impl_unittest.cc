@@ -1886,7 +1886,7 @@ TEST_P(CredentialManagerImplTest, StorePasswordCredentialStartsLeakDetection) {
 
 INSTANTIATE_TEST_SUITE_P(All, CredentialManagerImplTest, testing::Bool());
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 class CredentialManagerImplTestWithActorLoginPermissions
     : public CredentialManagerImplTest {
  public:
@@ -2037,7 +2037,7 @@ TEST_P(CredentialManagerImplTestWithActorLoginPermissions,
 INSTANTIATE_TEST_SUITE_P(All,
                          CredentialManagerImplTestWithActorLoginPermissions,
                          testing::Bool());
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_P(CredentialManagerImplTest, ReauthAfterAccountSelection) {
   ON_CALL(*client_, IsReauthBeforeFillingRequired).WillByDefault(Return(true));

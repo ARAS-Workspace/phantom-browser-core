@@ -6266,8 +6266,6 @@ TEST_F(NetworkContextCreateHostResolverTest, CloseContext) {
   EXPECT_TRUE(resolver_closed);
 }
 
-// Config overrides are not supported on iOS.
-#if !BUILDFLAG(IS_IOS)
 TEST_F(NetworkContextCreateHostResolverTest, WithConfigOverrides) {
   // Inject a factory to control and capture created net::HostResolvers.
   TestResolverFactory* factory =
@@ -6344,7 +6342,6 @@ TEST_F(NetworkContextCreateHostResolverTest, WithConfigOverrides) {
   EXPECT_THAT(response_client.result_addresses().endpoints(),
               ElementsAre(CreateExpectedEndPoint(kResult, 80)));
 }
-#endif  // BUILDFLAG(IS_IOS)
 
 using NetworkContextActivateDohProbesTest = NetworkContextTest;
 

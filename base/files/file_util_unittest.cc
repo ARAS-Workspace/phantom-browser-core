@@ -3065,7 +3065,6 @@ TEST_F(FileUtilTest, ReadFileToStringWithUnknownFileSize) {
   EXPECT_FALSE(ReadFileToStringWithMaxSize(file_path, nullptr, kLargeFileSize));
 }
 
-#if !BUILDFLAG(IS_IOS)
 #define ChildMain WriteToPipeChildMain
 #define ChildMainString "WriteToPipeChildMain"
 
@@ -3212,7 +3211,6 @@ TEST_F(FileUtilTest, ReadFileToStringWithNamedPipe) {
 
   ASSERT_EQ(0, unlink(pipe_path.value().c_str()));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
 TEST_F(FileUtilTest, ReadFileToStringWithProcFileSystem) {

@@ -39,40 +39,6 @@ using ::variations::prefs::kVariationsCrashStreak;
 // This may be modified by SkipCleanShutdownStepsForTesting().
 bool g_skip_clean_shutdown_steps = false;
 
-#if BUILDFLAG(IS_IOS)
-// Records the the combined state of two distinct beacons' values in a
-// histogram.
-void RecordBeaconConsistency(
-    std::optional<bool> beacon_file_beacon_value,
-    std::optional<bool> platform_specific_beacon_value) {
-  CleanExitBeaconConsistency consistency =
-      CleanExitBeaconConsistency::kDirtyDirty;
-
-  if (!beacon_file_beacon_value) {
-    if (!platform_specific_beacon_value) {
-      consistency = CleanExitBeaconConsistency::kMissingMissing;
-    } else {
-      consistency = platform_specific_beacon_value.value()
-                        ? CleanExitBeaconConsistency::kMissingClean
-                        : CleanExitBeaconConsistency::kMissingDirty;
-    }
-  } else if (!platform_specific_beacon_value) {
-    consistency = beacon_file_beacon_value.value()
-                      ? CleanExitBeaconConsistency::kCleanMissing
-                      : CleanExitBeaconConsistency::kDirtyMissing;
-  } else if (beacon_file_beacon_value.value()) {
-    consistency = platform_specific_beacon_value.value()
-                      ? CleanExitBeaconConsistency::kCleanClean
-                      : CleanExitBeaconConsistency::kCleanDirty;
-  } else {
-    consistency = platform_specific_beacon_value.value()
-                      ? CleanExitBeaconConsistency::kDirtyClean
-                      : CleanExitBeaconConsistency::kDirtyDirty;
-  }
-  base::UmaHistogramEnumeration("UMA.CleanExitBeaconConsistency3", consistency);
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 // Increments kVariationsCrashStreak if |did_previous_session_exit_cleanly| is
 // false. Also, emits the crash streak to a histogram.
 //
@@ -247,18 +213,6 @@ bool CleanExitBeacon::DidPreviousSessionExitCleanly(
                                  prefs::kStabilityExitedCleanly)
                            : std::nullopt;
 
-#if BUILDFLAG(IS_IOS)
-  std::optional<bool> backup_beacon_value = ExitedCleanly();
-  RecordBeaconConsistency(beacon_file_beacon_value, backup_beacon_value);
-#endif  // BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)
-  // TODO(crbug.com/40190558): For the time being, this is a no-op; i.e.,
-  // ShouldUseUserDefaultsBeacon() always returns false.
-  if (ShouldUseUserDefaultsBeacon())
-    return backup_beacon_value.value_or(true);
-#endif  // BUILDFLAG(IS_IOS)
-
   return beacon_file_beacon_value.value_or(true);
 }
 
@@ -309,22 +263,8 @@ void CleanExitBeacon::WriteBeaconValue(bool exited_cleanly,
     }
   }
 
-#if BUILDFLAG(IS_IOS)
-  SetUserDefaultsBeacon(exited_cleanly);
-#endif  // BUILDFLAG(IS_IOS)
-
   has_exited_cleanly_ = std::make_optional(exited_cleanly);
 }
-
-#if BUILDFLAG(IS_IOS)
-std::optional<bool> CleanExitBeacon::ExitedCleanly() {
-#if BUILDFLAG(IS_IOS)
-  if (HasUserDefaultsBeacon())
-    return GetUserDefaultsBeacon();
-  return std::nullopt;
-#endif  // BUILDFLAG(IS_IOS)
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 void CleanExitBeacon::UpdateLastLiveTimestamp() {
   local_state_->SetTime(prefs::kStabilityBrowserLastLiveTimeStamp,
@@ -365,9 +305,6 @@ void CleanExitBeacon::SetStabilityExitedCleanlyForTesting(
     PrefService* local_state,
     bool exited_cleanly) {
   local_state->SetBoolean(prefs::kStabilityExitedCleanly, exited_cleanly);
-#if BUILDFLAG(IS_IOS)
-  SetUserDefaultsBeacon(exited_cleanly);
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 // static
@@ -387,9 +324,6 @@ std::string CleanExitBeacon::CreateBeaconFileContentsForTesting(
 void CleanExitBeacon::ResetStabilityExitedCleanlyForTesting(
     PrefService* local_state) {
   local_state->ClearPref(prefs::kStabilityExitedCleanly);
-#if BUILDFLAG(IS_IOS)
-  ResetUserDefaultsBeacon();
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 // static

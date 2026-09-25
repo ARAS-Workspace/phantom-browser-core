@@ -9,9 +9,7 @@
 #include "content/public/browser/web_contents.h"
 #include "content/shell/browser/shell.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "content/public/browser/color_chooser.h"
-#endif
 
 namespace content {
 
@@ -40,7 +38,6 @@ bool ShellPlatformDelegate::ShouldAllowRunningInsecureContent(Shell* shell) {
   return false;
 }
 
-#if !BUILDFLAG(IS_IOS)
 std::unique_ptr<ColorChooser> ShellPlatformDelegate::OpenColorChooser(
     WebContents* web_contents,
     SkColor color,
@@ -54,6 +51,5 @@ void ShellPlatformDelegate::RunFileChooser(
     const blink::mojom::FileChooserParams& params) {
   listener->FileSelectionCanceled();
 }
-#endif
 
 }  // namespace content

@@ -2824,7 +2824,6 @@ TEST_F(PaymentsDataManagerTest,
                 category_benefit.benefit_category()));
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(PaymentsDataManagerTest,
        TestNoImageFetchingAttemptForCardsWithInvalidCardArtUrls) {
   base::HistogramTester histogram_tester;
@@ -2895,7 +2894,6 @@ TEST_P(PaymentsDataManagerStartupBenefitsTest,
       "Autofill.PaymentMethods.CardBenefitsIsEnabled.Startup",
       IsBenefitsPrefTurnedOn(), 1);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Tests that on startup if payment methods are disabled we don't log if
 // benefits are enabled/disabled.
@@ -2941,19 +2939,6 @@ class PaymentsDataManagerIsCardEligibleForBenefitsTest
   }
   void TearDown() override { TearDownTest(); }
 };
-
-#if BUILDFLAG(IS_IOS)
-
-// Tests that `IsCardEligibleForBenefits` returns `false` for iOS platforms.
-TEST_F(PaymentsDataManagerIsCardEligibleForBenefitsTest, UnsupportedPlatform) {
-  CreditCard card = test::GetMaskedServerCard();
-  card.set_benefit_source(kAmexCardBenefitSource);
-  EXPECT_FALSE(payments_data_manager().IsCardEligibleForBenefits(card));
-}
-
-#endif  // BUILDFLAG(IS_IOS)
-
-#if !BUILDFLAG(IS_IOS)
 
 // Tests that `IsCardEligibleForBenefits` returns `false` when the benefit
 // source is invalid.
@@ -3159,8 +3144,6 @@ TEST_F(PaymentsDataManagerIsCardEligibleForBenefitsTest,
 
   EXPECT_FALSE(payments_data_manager().IsCardEligibleForBenefits(card));
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 // Params:
 // 1. App Locale.

@@ -287,10 +287,8 @@ class MojoIpczTestDriver : public ipcz::test::TestDriver {
 ipcz::test::TestDriverRegistration<MojoIpczTestDriver> kRegisterInProcessDriver{
     MojoIpczTestDriver::kInProcess};
 
-#if !BUILDFLAG(IS_IOS)
 ipcz::test::TestDriverRegistration<MojoIpczTestDriver>
     kRegisterMultiprocessDriver{MojoIpczTestDriver::kMultiprocess};
-#endif
 
 }  // namespace
 }  // namespace mojo::core::ipcz_driver

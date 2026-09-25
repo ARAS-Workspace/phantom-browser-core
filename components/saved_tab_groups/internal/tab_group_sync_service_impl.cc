@@ -729,7 +729,7 @@ std::set<LocalTabID> TabGroupSyncServiceImpl::GetSelectedTabs() {
   return coordinator_->GetSelectedTabs();
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void TabGroupSyncServiceImpl::SaveGroup(SavedTabGroup group) {
   const base::Uuid sync_id = group.saved_guid();
   const LocalTabGroupID local_id = group.local_group_id().value();
@@ -743,7 +743,7 @@ void TabGroupSyncServiceImpl::UnsaveGroup(const LocalTabGroupID& local_id) {
   coordinator_->DisconnectLocalTabGroup(local_id);
   RemoveGroup(group->saved_guid());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 void TabGroupSyncServiceImpl::MakeTabGroupShared(
     const LocalTabGroupID& local_group_id,

@@ -29,10 +29,6 @@ base::FilePath GetCrashDumpLocationInternal() {
     return command_line->GetSwitchValuePath(switches::kCrashDumpsDir);
   }
   base::FilePath default_dir;
-#if BUILDFLAG(IS_IOS)
-  CHECK(base::PathService::Get(base::DIR_CACHE, &default_dir));
-  default_dir = default_dir.Append("Crashpad");
-#endif  // BUILDFLAG(IS_IOS)
   return default_dir;
 }
 

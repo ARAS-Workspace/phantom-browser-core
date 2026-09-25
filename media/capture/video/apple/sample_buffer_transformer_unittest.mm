@@ -382,35 +382,6 @@ class SampleBufferTransformerPixelTransferTest
     : public ::testing::Test,
       public ::testing::WithParamInterface<std::tuple<OSType, OSType>> {};
 
-#if BUILDFLAG(IS_IOS)
-TEST_P(SampleBufferTransformerPixelTransferTest,
-       CanRotateBy90DegreesClockwise) {
-  auto [input_pixel_format, output_pixel_format] = GetParam();
-
-  base::apple::ScopedCFTypeRef<CMSampleBufferRef> input_sample_buffer =
-      CreateSampleBuffer(input_pixel_format, kFullResolutionWidth,
-                         kFullResolutionHeight, kColorR, kColorG, kColorB,
-                         PixelBufferType::kIoSurfaceBacked);
-
-  std::unique_ptr<SampleBufferTransformer> transformer =
-      SampleBufferTransformer::Create();
-  transformer->Reconfigure(
-      SampleBufferTransformer::Transformer::kPixelBufferTransfer,
-      output_pixel_format,
-      gfx::Size(kFullResolutionWidth, kFullResolutionHeight),
-      /*rotation_angle*/ 90, 1);
-  base::apple::ScopedCFTypeRef<CVPixelBufferRef> output_pixel_buffer =
-      transformer->Transform(input_sample_buffer.get());
-  base::apple::ScopedCFTypeRef<CVPixelBufferRef> roatated_pixel_buffer =
-      transformer->Rotate(output_pixel_buffer.get());
-  EXPECT_TRUE(CVPixelBufferGetIOSurface(roatated_pixel_buffer.get()));
-  EXPECT_EQ(kFullResolutionWidth,
-            CVPixelBufferGetHeight(roatated_pixel_buffer.get()));
-  EXPECT_EQ(kFullResolutionHeight,
-            CVPixelBufferGetWidth(roatated_pixel_buffer.get()));
-}
-#endif
-
 TEST_P(SampleBufferTransformerPixelTransferTest, CanConvertFullScale) {
   auto [input_pixel_format, output_pixel_format] = GetParam();
 

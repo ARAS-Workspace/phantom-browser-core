@@ -16,11 +16,9 @@
 #include "components/omnibox/browser/autocomplete_result.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "base/feature_list.h"
 #include "components/omnibox/browser/geolocation_header_service.h"
 #include "components/omnibox/common/omnibox_features.h"
-#endif
 
 namespace {
 
@@ -270,13 +268,6 @@ void AutocompleteControllerMetrics::LogSuggestionFinalizationMetrics(
     const AutocompleteResult& result) {
   // Finalization metrics should be logged once only, either when all
   // async providers complete or they're interrupted before completion.
-#if BUILDFLAG(IS_IOS)
-  // iOS is weird in that it sometimes calls `InjectAdHocMatch()` when the user
-  // selects a suggestion, thus changing the results when autocompletion is done
-  // and suggestions should be stable.
-  if (logged_finalization_metrics_)
-    return;
-#endif
   DCHECK(!logged_finalization_metrics_)
       << "last_update_type: "
       << AutocompleteController::UpdateTypeToDebugString(
@@ -295,9 +286,7 @@ void AutocompleteControllerMetrics::LogSuggestionFinalizationMetrics(
                                     last_change_elapsed_time);
   LogAsyncAutocompletionTimeMetrics(kLastDefaultChange, is_completed,
                                     last_default_change_elapsed_time);
-#if !BUILDFLAG(IS_IOS)
   LogInlineLocationSuggestionMetrics(result);
-#endif  // !BUILDFLAG(IS_IOS)
 }
 
 void AutocompleteControllerMetrics::LogProviderTimeMetrics(
@@ -340,7 +329,6 @@ void AutocompleteControllerMetrics::LogSuggestionChangeInAnyPositionMetrics(
   }
 }
 
-#if !BUILDFLAG(IS_IOS)
 void AutocompleteControllerMetrics::LogInlineLocationSuggestionMetrics(
     const AutocompleteResult& result) const {
   if (!base::FeatureList::IsEnabled(omnibox::kInlineLocationSignaling)) {
@@ -371,4 +359,3 @@ void AutocompleteControllerMetrics::LogInlineLocationSuggestionMetrics(
 
   geolocation_service->RecordInlineLocationSuggestionShown(shown, position);
 }
-#endif

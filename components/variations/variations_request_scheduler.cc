@@ -109,13 +109,13 @@ base::RepeatingClosure VariationsRequestScheduler::task() const {
   return task_;
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // static
 VariationsRequestScheduler* VariationsRequestScheduler::Create(
     const base::RepeatingClosure& task,
     PrefService* local_state) {
   return new VariationsRequestScheduler(task);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace variations

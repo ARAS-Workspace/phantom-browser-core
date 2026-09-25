@@ -94,9 +94,3 @@ extern "C" int ContentTestMain(int argc, const char** argv) {
   return LaunchTests(&launcher_delegate, parallel_jobs, argc,
                      const_cast<char**>(argv));
 }
-
-#if BUILDFLAG(IS_IOS)
-extern "C" int ChildProcessMain(int argc, const char** argv) {
-  return ContentTestMain(argc, argv);
-}
-#endif

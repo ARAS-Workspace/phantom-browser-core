@@ -85,7 +85,6 @@ bool IsUserCloudMergingAllowed(const PolicyMap& policies) {
 }
 
 void AddPolicyMessages(PolicyMap& policies) {
-#if !BUILDFLAG(IS_IOS)
   // Add warning to inform users that these policies are ignored when the user
   // is unaffiliated.
   if (policies.IsUserAffiliated()) {
@@ -107,7 +106,6 @@ void AddPolicyMessages(PolicyMap& policies) {
         ->AddMessage(PolicyMap::MessageType::kError,
                      IDS_POLICY_IGNORED_UNAFFILIATED);
   }
-#endif  // !BUILDFLAG(IS_IOS)
 }
 
 // Returns the list of histogram names to record depending on scope and number

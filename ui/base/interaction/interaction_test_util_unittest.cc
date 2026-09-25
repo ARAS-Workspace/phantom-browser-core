@@ -12,9 +12,7 @@
 #include "ui/base/interaction/element_test_util.h"
 #include "ui/events/event_constants.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "ui/base/accelerators/accelerator.h"
-#endif
 
 namespace ui::test {
 
@@ -50,10 +48,8 @@ class MockInteractionSimulator : public InteractionTestUtil::Simulator {
                             std::u16string text,
                             TextEntryMode mode));
   MOCK_METHOD1(ActivateSurface, ActionResult(TrackedElement* element));
-#if !BUILDFLAG(IS_IOS)
   MOCK_METHOD2(SendAccelerator,
                ActionResult(TrackedElement* element, Accelerator accelerator));
-#endif
   MOCK_METHOD1(Confirm, ActionResult(TrackedElement* element));
 };
 
@@ -149,7 +145,6 @@ TEST(InteractionTestUtilTest, ActivateSurface) {
   EXPECT_EQ(ActionResult::kSucceeded, util.ActivateSurface(&element));
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST(InteractionTestUtilTest, SendAccelerator) {
   TestElement element(kTestElementIdentifier, kTestElementContext);
   InteractionTestUtil util;
@@ -161,7 +156,6 @@ TEST(InteractionTestUtilTest, SendAccelerator) {
       .WillOnce(testing::Return(ActionResult::kSucceeded));
   EXPECT_EQ(ActionResult::kSucceeded, util.SendAccelerator(&element, accel));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST(InteractionTestUtilTest, Confirm) {
   TestElement element(kTestElementIdentifier, kTestElementContext);

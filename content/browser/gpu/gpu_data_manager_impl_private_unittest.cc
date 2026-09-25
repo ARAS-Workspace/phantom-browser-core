@@ -682,7 +682,7 @@ TEST_F(GpuDataManagerImplPrivateTest,
 // No hardware mode is available: the UpdateGpuFeatureInfo loop walks past
 // every hardware mode in fallback_modes_ and lands on a non-hardware mode
 // (SOFTWARE_GL or DISPLAY_COMPOSITOR depending on which one is present).
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(GpuDataManagerImplPrivateTest,
        UpdateGpuFeatureInfo_NoHardwareModeAvailable) {
   base::CommandLine::ForCurrentProcess()->AppendSwitch(
@@ -713,12 +713,12 @@ TEST_F(GpuDataManagerImplPrivateTest,
               mode == gpu::GpuMode::DISPLAY_COMPOSITOR)
       << "gpu_mode_ = " << static_cast<int>(mode);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Android does not support software compositing, while Fuchsia does not support
 // falling back to software from Vulkan. Explicitly disable SkiaGraphite for
 // tests that run with Ganesh as some platforms have started shipping Graphite.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(GpuDataManagerImplPrivateTest, NoDefaultFallbackToSwiftShaderForGanesh) {
   base::test::ScopedCommandLine command_line;
   command_line.GetProcessCommandLine()->AppendSwitch(
@@ -910,7 +910,7 @@ TEST_F(GpuDataManagerImplPrivateTest, GpuStartsWithGpuDisabled) {
   ScopedGpuDataManagerImplPrivate manager;
   EXPECT_EQ(gpu::GpuMode::DISPLAY_COMPOSITOR, manager->GetGpuMode());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_VULKAN)
 TEST_F(GpuDataManagerImplPrivateTest, GpuStartsWithVulkanFeatureFlag) {
@@ -968,13 +968,13 @@ TEST_F(GpuDataManagerImplPrivateTest, VulkanInitializationFails) {
 
   // The first fallback should go to the display compositor on platforms where
   // fallback to software is allowed.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   manager->FallBackToNextGpuMode();
   EXPECT_EQ(gpu::GpuMode::DISPLAY_COMPOSITOR, manager->GetGpuMode());
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(GpuDataManagerImplPrivateTest, FallbackFromVulkanWithGLDisabled) {
   // Ensure --enable-unsafe-swiftshader is not in the command line. It is used
   // by some other tests in this suite.
@@ -1000,7 +1000,7 @@ TEST_F(GpuDataManagerImplPrivateTest, FallbackFromVulkanWithGLDisabled) {
   manager->FallBackToNextGpuMode();
   EXPECT_EQ(gpu::GpuMode::DISPLAY_COMPOSITOR, manager->GetGpuMode());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(ENABLE_VULKAN)
 
 }  // namespace content

@@ -71,9 +71,7 @@
 #include "base/os_compat_android.h"
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 #include <grp.h>
-#endif
 
 // We need to do this on AIX due to some inconsistencies in how AIX
 // handles XOPEN_SOURCE and ALL_SOURCE.

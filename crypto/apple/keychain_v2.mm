@@ -169,23 +169,6 @@ base::apple::ScopedCFTypeRef<CFDictionaryRef> MakeKeychainData(
       NSToCFOwnershipCast(keychain_data));
 }
 
-#if BUILDFLAG(IS_IOS)
-
-// Creates a dictionary that can be used to update a generic password. Only used
-// on iOS.
-base::apple::ScopedCFTypeRef<CFDictionaryRef> MakeGenericPasswordUpdateQuery(
-    std::string_view service_name,
-    std::string_view account_name) {
-  NSDictionary* query = @{
-    CFToNSPtrCast(kSecClass) : CFToNSPtrCast(kSecClassGenericPassword),
-    CFToNSPtrCast(kSecAttrService) : base::SysUTF8ToNSString(service_name),
-    CFToNSPtrCast(kSecAttrAccount) : base::SysUTF8ToNSString(account_name),
-  };
-  return base::apple::ScopedCFTypeRef<CFDictionaryRef>(
-      NSToCFOwnershipCast(query));
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 OSStatus KeychainV2::AddGenericPassword(std::string_view service_name,
                                         std::string_view account_name,
                                         base::span<const uint8_t> password) {
@@ -230,16 +213,9 @@ base::expected<std::vector<uint8_t>, OSStatus> KeychainV2::FindGenericPassword(
   CFDataRef password_data = base::apple::GetValueFromDictionary<CFDataRef>(
       result_dict, kSecValueData);
 
-#if BUILDFLAG(IS_IOS)
-  base::apple::ScopedCFTypeRef<CFDictionaryRef> update_query =
-      MakeGenericPasswordUpdateQuery(service_name, account_name);
-  MigrateKeychainItemAccessibilityIfNeeded(result_dict, update_query.get());
-#endif  // BUILDFLAG(IS_IOS)
-
   return base::ToVector(base::apple::CFDataToSpan(password_data));
 }
 
-#if !BUILDFLAG(IS_IOS)
 base::apple::ScopedCFTypeRef<CFTypeRef> KeychainV2::TaskCopyValueForEntitlement(
     SecTaskRef task,
     CFStringRef entitlement,
@@ -247,7 +223,6 @@ base::apple::ScopedCFTypeRef<CFTypeRef> KeychainV2::TaskCopyValueForEntitlement(
   return base::apple::ScopedCFTypeRef<CFTypeRef>(
       SecTaskCopyValueForEntitlement(task, entitlement, error));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if !BUILDFLAG(IS_IOS_TVOS)
 BOOL KeychainV2::LAContextCanEvaluatePolicy(LAPolicy policy, NSError** error) {

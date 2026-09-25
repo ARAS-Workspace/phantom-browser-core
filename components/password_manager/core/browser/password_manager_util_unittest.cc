@@ -843,7 +843,7 @@ TEST_F(PasswordManagerUtilTest, IsAbleToSavePasswords_NotSyncing) {
   EXPECT_FALSE(IsAbleToSavePasswords(&mock_client_));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 struct TrustedVaultErrorPreventsFromSavingTestCase {
   std::string name;
   // It might be that the credential is updated in both stores. In this case
@@ -983,9 +983,9 @@ TEST_F(PasswordManagerUtilTrustedVaultErrorPreventsFromSavingTest,
 
   EXPECT_FALSE(IsSavingBlockedByTrustedVaultError(&client_, &form_manager));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 class PasswordManagerUtilTrustedVaultErrorTest
     : public PasswordManagerUtilTest {
  protected:
@@ -1026,51 +1026,6 @@ TEST_F(PasswordManagerUtilTrustedVaultErrorTest,
   EXPECT_FALSE(
       IsSavingBlockedByTrustedVaultError(&mock_client_, &form_manager));
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)
-class PasswordManagerUtilRecoverableErrorTest : public PasswordManagerUtilTest {
- private:
-  base::test::ScopedFeatureList feature_list_{
-      password_manager::features::kPasswordSaveInContextErrorResolution};
-};
-
-TEST_F(PasswordManagerUtilRecoverableErrorTest,
-       IsSavingBlockedByRecoverableError) {
-  EnableSyncForTestAccount();
-
-  auto account_store =
-      base::MakeRefCounted<password_manager::MockPasswordStoreInterface>();
-  EXPECT_CALL(mock_client_, GetAccountPasswordStore)
-      .WillRepeatedly(Return(account_store.get()));
-
-  EXPECT_CALL(*account_store, GetError)
-      .WillOnce(Return(ActionableError::kTrustedVaultKeyNeeded));
-  EXPECT_TRUE(IsSavingBlockedByRecoverableError(&mock_client_, nullptr));
-
-  EXPECT_CALL(*account_store, GetError)
-      .WillOnce(Return(ActionableError::kSignInNeeded));
-  EXPECT_TRUE(IsSavingBlockedByRecoverableError(&mock_client_, nullptr));
-
-  EXPECT_CALL(*account_store, GetError)
-      .WillOnce(Return(ActionableError::kNeedsPassphrase));
-  EXPECT_TRUE(IsSavingBlockedByRecoverableError(&mock_client_, nullptr));
-
-  EXPECT_CALL(*account_store, GetError)
-      .WillOnce(Return(ActionableError::kKeychainError));
-  EXPECT_FALSE(IsSavingBlockedByRecoverableError(&mock_client_, nullptr));
-}
-
-TEST_F(PasswordManagerUtilRecoverableErrorTest,
-       IsSavingBlockedByRecoverableErrorForLocalPasswordUpdate) {
-  password_manager::MockPasswordFormManagerForUI form_manager;
-  EXPECT_CALL(form_manager, IsPasswordUpdate()).WillOnce(Return(true));
-  EXPECT_CALL(form_manager,
-              IsUpdateAffectingPasswordsStoredInTheGoogleAccount())
-      .WillOnce(Return(false));
-
-  EXPECT_FALSE(IsSavingBlockedByRecoverableError(&mock_client_, &form_manager));
-}
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager_util

@@ -159,7 +159,7 @@ void SecurityInterstitialPageController::ReportPhishingErrorInNewTab() {
                   CMD_REPORT_PHISHING_ERROR_IN_NEW_TAB);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void SecurityInterstitialPageController::ShowCertificateViewer() {
   SendCommand(security_interstitials::SecurityInterstitialCommand::
                   CMD_SHOW_CERTIFICATE_VIEWER);
@@ -240,7 +240,7 @@ void SecurityInterstitialPageController::SendCommand(
       interface->ReportPhishingErrorInNewTab();
       break;
     case security_interstitials::CMD_SHOW_CERTIFICATE_VIEWER:
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
       interface->ShowCertificateViewer();
 #endif
       break;
@@ -306,7 +306,7 @@ SecurityInterstitialPageController::GetObjectTemplateBuilder(
           .SetMethod(
               "reportPhishingErrorInNewTab",
               &SecurityInterstitialPageController::ReportPhishingErrorInNewTab)
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
           .SetMethod("showCertificateViewer",
                      &SecurityInterstitialPageController::ShowCertificateViewer)
 #endif

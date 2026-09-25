@@ -2516,8 +2516,6 @@ TEST_F(
 }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if !BUILDFLAG(IS_IOS)
-
 TEST_F(BnplManagerTest,
        OnUserDecisionToUseBnpl_AiBasedAmountExtractionPrefTurnedOn) {
   base::test::ScopedFeatureList scoped_feature_list;
@@ -2815,7 +2813,6 @@ TEST_F(
           IssuerId::kBnplAffirm,
           BnplIssuerEligibilityForPage::kNotEligibleCheckoutAmountTooLow)));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_ANDROID)
 
@@ -3346,7 +3343,6 @@ TEST_F(BnplManagerTest,
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_IOS)
 // Test that the `AiAmountExtraction.AmountInIssuerRange` histogram is logged
 // correctly when within range.
 TEST_F(BnplManagerTest, LogAiAmountExtractedInIssuerRange_WithinRange) {
@@ -3511,7 +3507,6 @@ TEST_F(BnplManagerTest,
   bnpl_manager_->OnAmountExtractionReturnedFromAi(
       base::unexpected(AiAmountExtractionResult::Error::kUnsupportedCurrency));
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class BnplManagerPayLaterTabTest : public BnplManagerTest {

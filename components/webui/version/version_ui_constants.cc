@@ -26,14 +26,10 @@ const char kCommandLine[] = "command_line";
 const char kCommandLineName[] = "command_line_name";
 const char kCompany[] = "company";
 const char kCopyright[] = "copyright";
-#if !BUILDFLAG(IS_IOS)
 const char kExecutablePath[] = "executable_path";
 const char kExecutablePathName[] = "executable_path_name";
-#endif
-#if !BUILDFLAG(IS_IOS)
 const char kJSEngine[] = "js_engine";
 const char kJSVersion[] = "js_version";
-#endif
 const char kLogoAltText[] = "logo_alt_text";
 const char kOfficial[] = "official";
 const char kOSName[] = "os_name";
@@ -46,10 +42,8 @@ const char kTargetSdkVersion[] = "target_sdk_version";
 const char kGmsName[] = "gms_name";
 const char kGmsVersion[] = "gms_version";
 #endif
-#if !BUILDFLAG(IS_IOS)
 const char kProfilePath[] = "profile_path";
 const char kProfilePathName[] = "profile_path_name";
-#endif
 const char kCopyLabel[] = "copy_label";
 const char kCopyNotice[] = "copy_notice";
 const char kRevision[] = "revision";

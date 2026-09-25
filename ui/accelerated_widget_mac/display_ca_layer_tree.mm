@@ -48,9 +48,6 @@ DisplayCALayerTree::DisplayCALayerTree(CALayer* root_layer)
   maybe_flipped_layer_.anchorPoint = CGPointZero;
   [root_layer_ addSublayer:maybe_flipped_layer_];
 
-#if BUILDFLAG(IS_IOS)
-  [root_layer_ setDrawsAsynchronously:YES];
-#endif
 }
 
 DisplayCALayerTree::~DisplayCALayerTree() {
@@ -69,16 +66,6 @@ void DisplayCALayerTree::UpdateCALayerTree(gfx::CALayerParams ca_layer_params) {
   // wants a floating point value.
   gfx::Size dip_size = gfx::ToFlooredSize(gfx::ConvertSizeToDips(
       ca_layer_params.pixel_size, ca_layer_params.scale_factor));
-
-  // iOS doesn't support autoresizing mask. Thus, adjust the bounds.
-#if BUILDFLAG(IS_IOS)
-  maybe_flipped_layer_.bounds =
-      CGRectMake(0, 0, dip_size.width(), dip_size.height());
-
-  if (maybe_flipped_layer_.contentsScale != ca_layer_params.scale_factor) {
-    maybe_flipped_layer_.contentsScale = ca_layer_params.scale_factor;
-  }
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // Remote layers are the most common case.
