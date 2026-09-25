@@ -174,13 +174,6 @@ declare_args() {
   # a reproducer file to be saved.
   save_reproducers_on_lld_crash = false
 
-  # Enable ShadowCallStack for compiled binaries. SCS stores a pointer to a
-  # shadow call stack in register x18. Hence, x18 must not be used by the OS
-  # or libraries. We assume that to be the case for high end Android
-  # configurations. For more details see
-  # https://clang.llvm.org/docs/ShadowCallStack.html
-  enable_shadow_call_stack = false
-
   # Use DWARF simple template names, with the following exceptions:
   #
   # * Apple platforms (e.g. MacOS) aren't supported because xcode
@@ -352,37 +345,19 @@ config("compiler") {
   # --------------------------------
   cflags += [ "-fno-strict-aliasing" ]  # See http://crbug.com/32204
 
-  # Stack protection. ShadowCallStack and Stack protector address the same
-  # problems. Therefore, we only enable one or the other. Clang advertises SCS
-  # as a stronger alternative to StackProtector, so we give SCS precedence
-  # over SP.
-  if (enable_shadow_call_stack) {
-    # On Aarch64, SCS requires the x18 register to be unused because it will
-    # hold a pointer to the shadow stack. For Android we know that Clang
-    # doesn't use x18 by default. On other OSs adding "-ffixed-x18" might be
-    # required.
-    assert(is_android)
-
-    scs_parameters = [
-      "-fsanitize=shadow-call-stack",
-      "-fno-stack-protector",
-    ]
-    cflags += scs_parameters
-    ldflags += scs_parameters
-  } else {
-    if (is_apple) {
-      # The strong variant of the stack protector significantly increases
-      # binary size, so only enable it in debug mode.
-      if (is_debug) {
-        cflags += [ "-fstack-protector-strong" ]
-      } else {
-        cflags += [ "-fstack-protector" ]
-      }
-    } else if (is_posix) {
-      if (current_os != "aix") {
-        # Not available on aix.
-        cflags += [ "-fstack-protector" ]
-      }
+  # Stack protection.
+  if (is_apple) {
+    # The strong variant of the stack protector significantly increases
+    # binary size, so only enable it in debug mode.
+    if (is_debug) {
+      cflags += [ "-fstack-protector-strong" ]
+    } else {
+      cflags += [ "-fstack-protector" ]
+    }
+  } else if (is_posix) {
+    if (current_os != "aix") {
+      # Not available on aix.
+      cflags += [ "-fstack-protector" ]
     }
   }
 
@@ -960,37 +935,6 @@ config("linker") {
     if (!is_wasm) {
       # Emscripten compiler does not support this linker flag.
       ldflags += [ "-Wl,--no-call-graph-profile-sort" ]
-    }
-  }
-
-  # MLGO specific flags. These flags enable an ML-based inliner trained on
-  # Chrome on Android (arm32) with ThinLTO enabled, optimizing for size.
-  # The "release" ML model is embedded into clang as part of its build.
-  # Currently, the ML inliner is only enabled when targeting Android due to:
-  # a) Android is where size matters the most.
-  # b) MLGO presently has the limitation of only being able to embed one model
-  #    at a time; It is unclear if the embedded model is beneficial for
-  #    non-Android targets.
-  # MLGO is only officially supported on linux.
-  if (use_ml_inliner && is_a_target_toolchain) {
-    assert(
-        is_android && host_os == "linux",
-        "MLGO is currently only supported for targeting Android on a linux host")
-    if (use_thin_lto) {
-      ldflags += [ "-Wl,-mllvm,-enable-ml-inliner=release" ]
-      if (is_high_end_android) {
-        # Besides using the arm64 - trained model, instruct the inline advisor
-        # to not use the ML policy (which will aim to reduce size) for any
-        # callsites where the caller is not cold. This avoids performance
-        # regressions while still bringing size benefits.
-        # Profile quality is essential here.
-        ldflags += [
-          "-Wl,-mllvm,-ml-inliner-model-selector=arm64-mixed",
-          "-Wl,-mllvm,-ml-inliner-skip-policy=if-caller-not-cold",
-        ]
-      } else {
-        ldflags += [ "-Wl,-mllvm,-ml-inliner-model-selector=arm32-size" ]
-      }
     }
   }
 

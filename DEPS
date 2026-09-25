@@ -4389,40 +4389,6 @@ hooks = [
     ],
   },
 
-  # Pull rc binaries using checked-in hashes.
-  {
-    'name': 'rc_win',
-    'pattern': '.',
-    'condition': 'checkout_win and host_os == "win"',
-    'action': [ 'python3',
-                'src/third_party/depot_tools/download_from_google_storage.py',
-                '--no_resume',
-                '--bucket', 'chromium-browser-clang/rc',
-                '-s', 'src/build/toolchain/win/rc/win/rc.exe.sha1',
-    ],
-  },
-  {
-    'name': 'rc_mac',
-    'pattern': '.',
-    'condition': 'checkout_win and host_os == "mac"',
-    'action': [ 'python3',
-                'src/third_party/depot_tools/download_from_google_storage.py',
-                '--no_resume',
-                '--bucket', 'chromium-browser-clang/rc',
-                '-s', 'src/build/toolchain/win/rc/mac/rc.sha1',
-    ],
-  },
-  {
-    'name': 'rc_linux',
-    'pattern': '.',
-    'condition': 'checkout_win and host_os == "linux"',
-    'action': [ 'python3',
-                'src/third_party/depot_tools/download_from_google_storage.py',
-                '--no_resume',
-                '--bucket', 'chromium-browser-clang/rc',
-                '-s', 'src/build/toolchain/win/rc/linux64/rc.sha1',
-    ]
-  },
   {
     'name': 'apache_win32',
     'pattern': '\\.sha1',
