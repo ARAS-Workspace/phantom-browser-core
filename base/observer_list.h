@@ -22,7 +22,6 @@
 #include "base/notreached.h"
 #include "base/observer_list_internal.h"
 #include "base/sequence_checker.h"
-#include "build/build_config.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //

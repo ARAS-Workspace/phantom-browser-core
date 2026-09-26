@@ -9,7 +9,6 @@
 
 #include "base/base_export.h"
 #include "base/logging.h"
-#include "build/build_config.h"
 
 #include <libkern/OSTypes.h>
 

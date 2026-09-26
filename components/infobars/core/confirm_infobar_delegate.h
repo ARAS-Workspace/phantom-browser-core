@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "base/observer_list.h"
-#include "build/build_config.h"
 #include "components/infobars/core/infobar_delegate.h"
 #include "components/infobars/core/infobar_manager.h"
 #include "ui/base/ui_base_types.h"

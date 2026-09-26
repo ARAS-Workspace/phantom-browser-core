@@ -10,7 +10,6 @@
 
 #include "base/functional/callback.h"
 #include "base/memory/weak_ptr.h"
-#include "build/buildflag.h"
 #include "components/autofill/core/browser/ui/payments/autofill_progress_dialog_controller.h"
 #include "components/autofill/core/browser/ui/payments/autofill_progress_dialog_view.h"
 #include "components/autofill/core/browser/ui/payments/autofill_progress_ui_type.h"

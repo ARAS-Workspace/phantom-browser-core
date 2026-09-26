@@ -49,7 +49,6 @@
 #include "base/time/default_tick_clock.h"
 #include "base/types/pass_key.h"
 #include "base/values.h"
-#include "build/build_config.h"
 
 namespace base {
 

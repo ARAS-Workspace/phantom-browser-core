@@ -21,7 +21,6 @@
 #include "base/test/bind.h"
 #include "base/test/rectify_callback.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/interaction/element_identifier.h"

@@ -6,8 +6,6 @@
 #define COMPONENTS_HANDOFF_HANDOFF_MANAGER_H_
 
 #import <Foundation/Foundation.h>
-
-#include "build/build_config.h"
 #include "components/handoff/handoff_utility.h"
 #include "url/gurl.h"
 

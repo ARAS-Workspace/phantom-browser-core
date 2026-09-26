@@ -5,8 +5,6 @@
 #ifndef COMPONENTS_BROWSING_DATA_CORE_PREF_NAMES_H_
 #define COMPONENTS_BROWSING_DATA_CORE_PREF_NAMES_H_
 
-#include "build/build_config.h"
-
 namespace user_prefs {
 class PrefRegistrySyncable;
 }

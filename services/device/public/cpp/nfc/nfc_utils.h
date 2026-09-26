@@ -6,7 +6,6 @@
 #define SERVICES_DEVICE_PUBLIC_CPP_NFC_NFC_UTILS_H_
 
 #include "base/component_export.h"
-#include "build/build_config.h"
 
 namespace device {}  // namespace device
 

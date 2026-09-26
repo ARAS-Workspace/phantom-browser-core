@@ -11,8 +11,6 @@
 #include <string_view>
 
 #include "base/apple/scoped_cftyperef.h"
-#include "build/build_config.h"
-#include "build/buildflag.h"
 #include "crypto/crypto_export.h"
 
 namespace crypto::apple {

@@ -9,7 +9,6 @@
 
 #include "base/memory/ref_counted.h"
 #include "base/values.h"
-#include "build/build_config.h"
 #include "components/enterprise/client_certificates/core/private_key.h"
 
 namespace crypto {

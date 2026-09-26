@@ -8,7 +8,6 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #include "base/memory/raw_ptr.h"
-#include "build/build_config.h"
 #include "device/bluetooth/bluetooth_device.h"
 
 #import <IOBluetooth/IOBluetooth.h>

@@ -19,7 +19,6 @@
 #include "base/supports_user_data.h"
 #include "base/task/sequenced_task_runner_helpers.h"
 #include "base/time/time.h"
-#include "build/buildflag.h"
 #include "components/autofill/core/browser/data_model/addresses/autofill_profile.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
 #include "components/autofill/core/browser/data_model/valuables/valuable_types.h"

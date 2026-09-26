@@ -12,7 +12,6 @@
 #include "base/task/current_thread.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/thread_annotations.h"
-#include "build/build_config.h"
 #include "mojo/core/channel.h"
 
 namespace mojo {

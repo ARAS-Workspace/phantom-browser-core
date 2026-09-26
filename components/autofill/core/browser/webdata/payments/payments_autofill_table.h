@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "base/containers/flat_set.h"
-#include "build/buildflag.h"
 #include "components/autofill/core/browser/data_model/payments/credit_card_benefit.h"
 #include "components/webdata/common/web_database_table.h"
 #include "url/origin.h"

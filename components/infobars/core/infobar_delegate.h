@@ -9,7 +9,6 @@
 #include <string>
 
 #include "base/memory/raw_ptr.h"
-#include "build/build_config.h"
 #include "ui/base/window_open_disposition.h"
 #include "url/gurl.h"
 

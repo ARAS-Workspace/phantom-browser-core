@@ -12,7 +12,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/time/time.h"
 #include "base/values.h"
-#include "build/build_config.h"
 
 class PrefRegistrySimple;
 class PrefService;

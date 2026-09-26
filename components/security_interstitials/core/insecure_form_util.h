@@ -5,8 +5,6 @@
 #ifndef COMPONENTS_SECURITY_INTERSTITIALS_CORE_INSECURE_FORM_UTIL_H_
 #define COMPONENTS_SECURITY_INTERSTITIALS_CORE_INSECURE_FORM_UTIL_H_
 
-#include "build/build_config.h"
-
 class GURL;
 
 namespace url {

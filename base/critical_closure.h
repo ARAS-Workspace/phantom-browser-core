@@ -10,7 +10,6 @@
 
 #include "base/functional/callback.h"
 #include "base/location.h"
-#include "build/build_config.h"
 #include "build/ios_buildflags.h"
 
 namespace base {

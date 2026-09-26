@@ -7,8 +7,6 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
-#include "build/build_config.h"
-
 #import <IOBluetooth/IOBluetooth.h>
 
 namespace device {

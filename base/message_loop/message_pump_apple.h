@@ -40,7 +40,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/message_loop/message_pump.h"
 #include "base/run_loop.h"
-#include "build/build_config.h"
 
 #if defined(__OBJC__)
 #import <AppKit/AppKit.h>

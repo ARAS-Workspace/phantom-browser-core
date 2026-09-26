@@ -8,7 +8,6 @@
 #include "base/memory/ref_counted.h"
 #include "base/observer_list.h"
 #include "base/task/sequenced_task_runner_helpers.h"
-#include "build/build_config.h"
 #include "net/base/net_export.h"
 
 namespace base {

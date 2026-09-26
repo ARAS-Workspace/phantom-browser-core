@@ -5,8 +5,6 @@
 #ifndef BASE_TEST_TEST_SWITCHES_H_
 #define BASE_TEST_TEST_SWITCHES_H_
 
-#include "build/build_config.h"
-
 namespace switches {
 
 // All switches in alphabetical order. The switches should be documented

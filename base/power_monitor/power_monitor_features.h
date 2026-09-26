@@ -7,7 +7,6 @@
 
 #include "base/base_export.h"
 #include "base/feature_list.h"
-#include "build/build_config.h"
 
 namespace base {}  // namespace base
 

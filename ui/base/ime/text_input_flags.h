@@ -5,8 +5,6 @@
 #ifndef UI_BASE_IME_TEXT_INPUT_FLAGS_H_
 #define UI_BASE_IME_TEXT_INPUT_FLAGS_H_
 
-#include "build/build_config.h"
-
 namespace ui {
 
 // Intentionally keep in sync with blink::WebTextInputFlags defined in:

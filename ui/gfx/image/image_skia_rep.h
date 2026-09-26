@@ -6,7 +6,6 @@
 #define UI_GFX_IMAGE_IMAGE_SKIA_REP_H_
 
 #include "build/blink_buildflags.h"
-#include "build/build_config.h"
 
 #include "ui/gfx/image/image_skia_rep_default.h"  // IWYU pragma: export
 

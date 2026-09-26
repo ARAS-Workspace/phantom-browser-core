@@ -5,8 +5,6 @@
 #ifndef COMPONENTS_SEARCH_ENGINES_SEARCH_ENGINES_PREF_NAMES_H_
 #define COMPONENTS_SEARCH_ENGINES_SEARCH_ENGINES_PREF_NAMES_H_
 
-#include "build/build_config.h"
-
 namespace prefs {
 
 // The GUID of the locally saved default search provider. Note that this acts

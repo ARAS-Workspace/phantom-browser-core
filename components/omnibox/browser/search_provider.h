@@ -22,7 +22,6 @@
 #include "base/scoped_observation.h"
 #include "base/time/time.h"
 #include "base/timer/timer.h"
-#include "build/build_config.h"
 #include "components/history/core/browser/history_types.h"
 #include "components/omnibox/browser/answers_cache.h"
 #include "components/omnibox/browser/autocomplete_enums.h"

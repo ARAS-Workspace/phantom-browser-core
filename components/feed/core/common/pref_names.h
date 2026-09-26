@@ -5,8 +5,6 @@
 #ifndef COMPONENTS_FEED_CORE_COMMON_PREF_NAMES_H_
 #define COMPONENTS_FEED_CORE_COMMON_PREF_NAMES_H_
 
-#include "build/build_config.h"
-
 class PrefRegistrySimple;
 class PrefService;
 

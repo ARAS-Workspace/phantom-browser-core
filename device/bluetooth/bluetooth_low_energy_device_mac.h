@@ -11,8 +11,6 @@
 #include <optional>
 #include <set>
 #include <string_view>
-
-#include "build/build_config.h"
 #include "device/bluetooth/bluetooth_device_mac.h"
 
 #import <IOBluetooth/IOBluetooth.h>

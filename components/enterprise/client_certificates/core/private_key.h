@@ -12,7 +12,6 @@
 #include "base/memory/ref_counted.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/values.h"
-#include "build/build_config.h"
 #include "components/enterprise/client_certificates/core/private_key_types.h"
 #include "components/enterprise/client_certificates/proto/client_certificates_database.pb.h"
 #include "crypto/signature_verifier.h"

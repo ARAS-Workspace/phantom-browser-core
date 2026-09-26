@@ -7,7 +7,6 @@
 
 #include "base/containers/span.h"
 #include "base/types/expected.h"
-#include "build/build_config.h"
 #include "components/qr_code_generator/error.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/gfx/geometry/size.h"

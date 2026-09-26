@@ -10,7 +10,6 @@
 
 #include "base/memory/raw_ref.h"
 #include "base/scoped_observation.h"
-#include "build/buildflag.h"
 #include "components/autofill/core/browser/data_manager/addresses/address_data_manager.h"
 #include "components/autofill/core/browser/webdata/autofill_change.h"
 #include "components/prefs/pref_change_registrar.h"

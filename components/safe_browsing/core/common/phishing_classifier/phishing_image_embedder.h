@@ -11,7 +11,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
-#include "build/build_config.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "ui/gfx/image/image.h"
 

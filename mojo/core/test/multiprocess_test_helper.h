@@ -11,7 +11,6 @@
 #include "base/process/process.h"
 #include "base/test/multiprocess_test.h"
 #include "base/test/test_timeouts.h"
-#include "build/build_config.h"
 #include "mojo/core/embedder/embedder.h"
 #include "mojo/public/cpp/system/message_pipe.h"
 #include "testing/multiprocess_func_list.h"

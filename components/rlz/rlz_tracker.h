@@ -15,7 +15,6 @@
 #include "base/sequence_checker.h"
 #include "base/thread_annotations.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "rlz/lib/rlz_lib.h"
 
 namespace base {

@@ -21,7 +21,6 @@
 #include "base/timer/elapsed_timer.h"
 #include "base/timer/timer.h"
 #include "base/trace_event/memory_dump_provider.h"
-#include "build/build_config.h"
 #include "components/omnibox/browser/autocomplete_controller_config.h"
 #include "components/omnibox/browser/autocomplete_controller_metrics.h"
 #include "components/omnibox/browser/autocomplete_enums.h"
