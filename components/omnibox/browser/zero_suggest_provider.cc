@@ -64,7 +64,6 @@ using OIT = metrics::OmniboxInputType;
 namespace {
 
 using ResultType = ZeroSuggestProvider::ResultType;
-constexpr bool is_ios = false;
 
 // Represents whether ZeroSuggestProvider is allowed to display zero-prefix
 // suggestions, and if not, why not.
@@ -317,13 +316,11 @@ ResultType ResultTypeForInput(const AutocompleteInput& input) {
   if (omnibox::IsOtherWebPage(page_class) ||
       omnibox::IsSearchResultsPage(page_class)) {
     if (input.type() == OIT::URL &&
-        (is_ios || base::FeatureList::IsEnabled(
-                       omnibox::kFocusTriggersWebAndSRPZeroSuggest))) {
+        base::FeatureList::IsEnabled(
+            omnibox::kFocusTriggersWebAndSRPZeroSuggest)) {
       return ResultType::kRemoteSendURL;
     }
-    if (input.type() == OIT::EMPTY &&
-        (!is_ios ||
-         base::FeatureList::IsEnabled(omnibox::kOnClobberSuggestIOS))) {
+    if (input.type() == OIT::EMPTY) {
       return ResultType::kRemoteSendURL;
     }
   }

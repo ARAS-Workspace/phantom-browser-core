@@ -84,8 +84,6 @@ using SaveCardOfferUserDecision =
 using SaveCardPromptOffer = autofill_metrics::SaveCardPromptOffer;
 using SaveCardPromptResult = autofill_metrics::SaveCardPromptResult;
 
-constexpr bool is_ios = false;
-
 // If |name| consists of three whitespace-separated parts and the second of the
 // three parts is a single character or a single character followed by a period,
 // returns the result of joining the first and third parts with a space.
@@ -599,23 +597,21 @@ void CreditCardSaveManager::AttemptToOfferCvcUploadSave(
   // This function also sets up the value of `save_card_prompt_offer_decision_`.
   show_save_prompt_ = !DetermineAndLogCvcSaveStrikeDatabaseBlockDecision();
 
-  if (!is_ios || show_save_prompt_.value_or(true)) {
-    payments::PaymentsAutofillClient::SaveCreditCardOptions options =
-        payments::PaymentsAutofillClient::SaveCreditCardOptions()
-            .with_show_prompt(show_save_prompt_.value())
-            .with_card_save_type(
-                payments::PaymentsAutofillClient::CardSaveType::kCvcSaveOnly);
-    if (save_card_prompt_offer_decision_.has_value()) {
-      options = options.with_save_card_prompt_offer_decision(
-          save_card_prompt_offer_decision_.value());
-    }
-    // TODO(crbug.com/40931101): Refactor ShowSaveCreditCardToCloud to change
-    // legal_message_lines_ to optional.
-    payments_autofill_client().ShowSaveCreditCardToCloud(
-        card_save_candidate_, legal_message_lines_, options,
-        base::BindOnce(&CreditCardSaveManager::OnUserDidDecideOnCvcUploadSave,
-                       weak_ptr_factory_.GetWeakPtr()));
+  payments::PaymentsAutofillClient::SaveCreditCardOptions options =
+      payments::PaymentsAutofillClient::SaveCreditCardOptions()
+          .with_show_prompt(show_save_prompt_.value())
+          .with_card_save_type(
+              payments::PaymentsAutofillClient::CardSaveType::kCvcSaveOnly);
+  if (save_card_prompt_offer_decision_.has_value()) {
+    options = options.with_save_card_prompt_offer_decision(
+        save_card_prompt_offer_decision_.value());
   }
+  // TODO(crbug.com/40931101): Refactor ShowSaveCreditCardToCloud to change
+  // legal_message_lines_ to optional.
+  payments_autofill_client().ShowSaveCreditCardToCloud(
+      card_save_candidate_, legal_message_lines_, options,
+      base::BindOnce(&CreditCardSaveManager::OnUserDidDecideOnCvcUploadSave,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
 bool CreditCardSaveManager::IsCreditCardUploadEnabled() {
@@ -919,21 +915,19 @@ void CreditCardSaveManager::OfferCardLocalSave() {
 }
 
 void CreditCardSaveManager::OfferCvcLocalSave() {
-  if (!is_ios || show_save_prompt_.value_or(true)) {
-    payments::PaymentsAutofillClient::SaveCreditCardOptions options =
-        payments::PaymentsAutofillClient::SaveCreditCardOptions()
-            .with_show_prompt(show_save_prompt_.value_or(false))
-            .with_card_save_type(
-                payments::PaymentsAutofillClient::CardSaveType::kCvcSaveOnly);
-    if (save_card_prompt_offer_decision_.has_value()) {
-      options = options.with_save_card_prompt_offer_decision(
-          save_card_prompt_offer_decision_.value());
-    }
-    payments_autofill_client().ShowSaveCreditCardLocally(
-        card_save_candidate_, options,
-        base::BindOnce(&CreditCardSaveManager::OnUserDidDecideOnCvcLocalSave,
-                       weak_ptr_factory_.GetWeakPtr()));
+  payments::PaymentsAutofillClient::SaveCreditCardOptions options =
+      payments::PaymentsAutofillClient::SaveCreditCardOptions()
+          .with_show_prompt(show_save_prompt_.value_or(false))
+          .with_card_save_type(
+              payments::PaymentsAutofillClient::CardSaveType::kCvcSaveOnly);
+  if (save_card_prompt_offer_decision_.has_value()) {
+    options = options.with_save_card_prompt_offer_decision(
+        save_card_prompt_offer_decision_.value());
   }
+  payments_autofill_client().ShowSaveCreditCardLocally(
+      card_save_candidate_, options,
+      base::BindOnce(&CreditCardSaveManager::OnUserDidDecideOnCvcLocalSave,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
 void CreditCardSaveManager::OfferCardUploadSave(ukm::SourceId ukm_source_id) {

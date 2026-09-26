@@ -112,8 +112,6 @@ using SaveCardOfferUserDecision =
 using UserProvidedCardDetails =
     payments::PaymentsAutofillClient::UserProvidedCardDetails;
 
-constexpr bool is_ios = false;
-
 base::TimeDelta kVeryLargeDelta = base::Days(365) * 75;
 
 std::string FiveMonthsFromNow() {
@@ -1064,11 +1062,10 @@ TEST_F(CreditCardSaveManagerTest,
   CvcStorageStrikeDatabase cvc_storage_strike_database =
       CvcStorageStrikeDatabase(&strike_database());
   CreditCard local_card = test::GetCreditCard();
-  // On iOS, the prompt is suppressed when the delay condition is not met,
-  // resulting in 2 calls. On other platforms (like Desktop), the client is
-  // called even when suppressed, resulting in 3 calls.
+  // The client is called even when the prompt is suppressed, resulting in 3
+  // calls.
   EXPECT_CALL(payments_autofill_client(), ShowSaveCreditCardLocally)
-      .Times(is_ios ? 2 : 3)
+      .Times(3)
       .WillRepeatedly(
           [](const CreditCard&, SaveCreditCardOptions,
              payments::PaymentsAutofillClient::LocalSaveCardPromptCallback

@@ -49,7 +49,6 @@
 
 using testing::_;
 using CacheEntry = ZeroSuggestCacheService::CacheEntry;
-constexpr bool is_ios = false;
 
 namespace {
 
@@ -203,8 +202,7 @@ class ZeroSuggestProviderTest : public testing::Test,
       const bool user_input_in_progress = false,
       const std::string& input_url = "https://example.com/",
       const std::u16string& input_title = u"Example / Page") {
-    // On IOS WEB/SRP, input text is not empty.
-    AutocompleteInput input(is_ios ? base::ASCIIToUTF16(input_url) : u"",
+    AutocompleteInput input(u"",
                             is_prefetch
                                 ? metrics::OmniboxEventProto::OTHER_ZPS_PREFETCH
                                 : metrics::OmniboxEventProto::OTHER,
@@ -234,8 +232,7 @@ class ZeroSuggestProviderTest : public testing::Test,
       const std::string& input_url = "https://www.google.com/search?q=foo",
       const std::u16string& input_title = u"foo - Google Search") {
     AutocompleteInput input(
-        // On IOS WEB/SRP, input text is not empty.
-        is_ios ? base::ASCIIToUTF16(input_url) : u"",
+        u"",
         is_prefetch ? metrics::OmniboxEventProto::SRP_ZPS_PREFETCH
                     : metrics::OmniboxEventProto::
                           SEARCH_RESULT_PAGE_NO_SEARCH_TERM_REPLACEMENT,

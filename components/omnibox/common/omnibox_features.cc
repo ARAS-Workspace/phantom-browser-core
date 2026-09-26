@@ -17,7 +17,6 @@
 namespace omnibox {
 namespace {
 constexpr bool IS_ANDROID = !!BUILDFLAG(IS_ANDROID);
-constexpr bool IS_IOS = false;
 
 constexpr base::FeatureState DISABLED = base::FEATURE_DISABLED_BY_DEFAULT;
 constexpr base::FeatureState ENABLED = base::FEATURE_ENABLED_BY_DEFAULT;
@@ -49,9 +48,7 @@ BASE_FEATURE(kUIExperimentMaxAutocompleteMatches,
 // Feature used to cap max suggestions to a dynamic limit based on how many URLs
 // would be shown. E.g., show up to 10 suggestions if doing so would display no
 // URLs; else show up to 8 suggestions if doing so would include 1 or more URLs.
-BASE_FEATURE(kDynamicMaxAutocomplete,
-             "OmniboxDynamicMaxAutocomplete",
-             enable_if(!IS_IOS));
+BASE_FEATURE(kDynamicMaxAutocomplete, "OmniboxDynamicMaxAutocomplete", ENABLED);
 
 // Enables omnibox focus as a trigger for zero-prefix suggestions on web and
 // SRP, subject to the same requirements and conditions as on-clobber
@@ -119,13 +116,13 @@ BASE_FEATURE(kOnDeviceHeadProviderNonIncognito,
              ENABLED);
 BASE_FEATURE(kOnDeviceTailModel,
              "OmniboxOnDeviceTailModel",
-             enable_if(IS_ANDROID || IS_IOS));
+             enable_if(IS_ANDROID));
 BASE_FEATURE(kOnDeviceTailEnableEnglishModel,
              "OmniboxOnDeviceTailEnableEnglishModel",
              ENABLED);
 
 // Feature used to fetch document suggestions.
-BASE_FEATURE(kDocumentProvider, "OmniboxDocumentProvider", enable_if(!IS_IOS));
+BASE_FEATURE(kDocumentProvider, "OmniboxDocumentProvider", ENABLED);
 
 // If enabled, the authentication requirement for Drive suggestions is based on
 // whether the primary account is available, i.e., the user is signed into
@@ -208,7 +205,7 @@ BASE_FEATURE(kWebUISearchboxWithoutModelController, DISABLED);
 // superseded by HTTPS-Upgrades and will be removed in the near future.
 BASE_FEATURE(kDefaultTypedNavigationsToHttps,
              "OmniboxDefaultTypedNavigationsToHttps",
-             enable_if(IS_IOS));
+             DISABLED);
 
 // Override the delay to create a spare renderer when the omnibox is focused
 // on Android.
@@ -265,7 +262,7 @@ BASE_FEATURE(kOmniboxSearchPrefetchOnEnterKeyDown, DISABLED);
 BASE_FEATURE(kOmniboxSiteSearch, DISABLED);
 
 // Enables additional site search providers for the Site search Starter Pack.
-BASE_FEATURE(kStarterPackExpansion, enable_if(!IS_IOS));
+BASE_FEATURE(kStarterPackExpansion, ENABLED);
 
 // Enables an informational IPH message at the bottom of the Omnibox directing
 // users to certain starter pack engines.
