@@ -6,7 +6,6 @@
 
 #include "base/test/task_environment.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 // This file contains a minimal unit test for LapTimer, used for benchmarking.

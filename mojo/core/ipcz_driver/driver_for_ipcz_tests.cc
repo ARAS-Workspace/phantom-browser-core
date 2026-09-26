@@ -19,7 +19,6 @@
 #include "base/test/multiprocess_test.h"
 #include "base/test/test_timeouts.h"
 #include "base/threading/simple_thread.h"
-#include "build/build_config.h"
 #include "mojo/core/ipcz_driver/driver.h"
 #include "mojo/core/ipcz_driver/transport.h"
 #include "mojo/public/cpp/platform/platform_channel.h"

@@ -5,7 +5,6 @@
 #include "components/qr_code_generator/bitmap_generator.h"
 
 #include "base/containers/span.h"
-#include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 

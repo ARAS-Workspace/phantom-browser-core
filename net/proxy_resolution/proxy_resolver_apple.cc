@@ -18,7 +18,6 @@
 #include "base/strings/sys_string_conversions.h"
 #include "base/synchronization/lock.h"
 #include "base/threading/thread_checker.h"
-#include "build/build_config.h"
 #include "net/base/net_errors.h"
 #include "net/base/url_util.h"
 #include "net/proxy_resolution/proxy_chain_util_apple.h"

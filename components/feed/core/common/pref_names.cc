@@ -7,7 +7,6 @@
 #include <string>
 
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 

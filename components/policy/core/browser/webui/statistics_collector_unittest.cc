@@ -5,7 +5,6 @@
 #include "components/policy/core/browser/webui/statistics_collector.h"
 
 #include "base/test/metrics/histogram_tester.h"
-#include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace policy {

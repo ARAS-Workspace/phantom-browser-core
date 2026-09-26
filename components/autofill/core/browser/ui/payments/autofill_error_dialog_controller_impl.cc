@@ -13,7 +13,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
 #include "base/strings/utf_string_conversions.h"
-#include "build/buildflag.h"
 #include "components/autofill/core/browser/payments/autofill_error_dialog_context.h"
 #include "components/autofill/core/browser/ui/payments/autofill_error_dialog_controller.h"
 #include "components/autofill/core/browser/ui/payments/autofill_error_dialog_view.h"

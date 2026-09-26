@@ -21,7 +21,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "base/task/thread_pool.h"
 #include "base/values.h"
-#include "build/build_config.h"
 #include "components/policy/core/browser/configuration_policy_handler.h"
 #include "components/policy/core/browser/url_list/url_blocklist_policy_handler.h"
 #include "components/policy/core/browser/url_list/url_list_policy_pref_names.h"

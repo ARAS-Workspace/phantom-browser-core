@@ -22,7 +22,6 @@
 #include "base/profiler/stack_sampling_profiler.h"
 #include "base/strings/string_view_util.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "components/metrics/call_stacks/call_stack_profile_encoding.h"
 #include "components/sampling_profiler/call_stack_profile_params.h"
 

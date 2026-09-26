@@ -8,7 +8,6 @@
 
 #include "base/containers/span.h"
 #include "base/types/expected.h"
-#include "build/build_config.h"
 #include "components/qr_code_generator/dino_image.h"
 #include "components/qr_code_generator/qr_code_generator.h"
 #include "components/vector_icons/vector_icons.h"

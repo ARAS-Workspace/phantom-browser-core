@@ -13,7 +13,6 @@
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/test/test_future.h"
-#include "build/build_config.h"
 #include "components/performance_manager/public/graph/graph.h"
 #include "components/performance_manager/public/resource_attribution/memory_measurement_delegate.h"
 #include "components/performance_manager/public/resource_attribution/query_results.h"

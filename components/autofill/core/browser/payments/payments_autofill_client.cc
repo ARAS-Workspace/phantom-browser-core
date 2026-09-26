@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 #include "components/autofill/core/browser/payments/payments_autofill_client.h"
-
-#include "build/buildflag.h"
 #include "components/autofill/core/browser/payments/virtual_card_enrollment_manager.h"
 
 namespace autofill::payments {

@@ -10,7 +10,6 @@
 
 #include "base/numerics/safe_conversions.h"
 #include "base/strings/string_view_util.h"
-#include "build/build_config.h"
 #include "mojo/core/embedder/embedder.h"
 #include "mojo/public/c/system/invitation.h"
 #include "mojo/public/c/system/platform_handle.h"

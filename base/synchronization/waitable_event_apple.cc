@@ -18,7 +18,6 @@
 #include "base/threading/scoped_blocking_call.h"
 #include "base/time/time.h"
 #include "base/time/time_override.h"
-#include "build/build_config.h"
 
 namespace base {
 

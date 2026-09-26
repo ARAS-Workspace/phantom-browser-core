@@ -20,7 +20,6 @@
 #include "base/no_destructor.h"
 #include "base/notreached.h"
 #include "base/process/process.h"
-#include "build/build_config.h"
 #include "services/on_device_model/ml/chrome_ml_api.h"
 #include "services/on_device_model/ml/chrome_ml_holder.h"
 #include "third_party/dawn/include/dawn/dawn_proc.h"

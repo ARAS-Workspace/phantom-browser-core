@@ -7,7 +7,6 @@
 #include <string>
 
 #include "base/strings/string_util.h"
-#include "build/build_config.h"
 #include "components/omnibox/browser/test_scheme_classifier.h"
 #include "third_party/metrics_proto/omnibox_input_type.pb.h"
 #include "url/url_constants.h"

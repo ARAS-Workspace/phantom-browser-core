@@ -5,7 +5,6 @@
 #include "components/policy/core/browser/webui/statistics_collector.h"
 
 #include "base/metrics/histogram_functions.h"
-#include "build/build_config.h"
 
 namespace policy {
 

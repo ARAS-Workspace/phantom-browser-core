@@ -12,7 +12,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/process/process.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "net/base/net_export.h"
 #include "net/disk_cache/blockfile/backend_impl.h"
 #include "net/disk_cache/blockfile/disk_format.h"

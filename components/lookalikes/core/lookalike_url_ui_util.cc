@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 #include "components/lookalikes/core/lookalike_url_ui_util.h"
-
-#include "build/build_config.h"
 #include "components/lookalikes/core/lookalike_url_util.h"
 #include "components/security_interstitials/core/common_string_util.h"
 #include "components/strings/grit/components_strings.h"

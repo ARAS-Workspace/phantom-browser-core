@@ -4,8 +4,6 @@
 
 #include "base/test/test_switches.h"
 
-#include "build/build_config.h"
-
 // Flag to show the help message.
 const char switches::kHelpFlag[] = "help";
 

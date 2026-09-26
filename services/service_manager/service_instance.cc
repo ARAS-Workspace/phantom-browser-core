@@ -12,7 +12,6 @@
 #include "base/logging.h"
 #include "base/strings/strcat.h"
 #include "base/strings/utf_string_conversions.h"
-#include "build/build_config.h"
 #include "mojo/public/cpp/bindings/callback_helpers.h"
 #include "services/service_manager/public/cpp/constants.h"
 #include "services/service_manager/public/mojom/constants.mojom.h"

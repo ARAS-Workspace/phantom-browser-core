@@ -7,7 +7,6 @@
 #include "base/check_is_test.h"
 #include "base/check_op.h"
 #include "base/memory_coordinator/memory_consumer_registry.h"
-#include "build/build_config.h"
 
 namespace base {
 

@@ -10,7 +10,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_command_line.h"
 #include "base/test/task_environment.h"
-#include "build/build_config.h"
 #include "components/variations/net/variations_flags.h"
 #include "components/variations/variations.mojom.h"
 #include "net/base/isolation_info.h"

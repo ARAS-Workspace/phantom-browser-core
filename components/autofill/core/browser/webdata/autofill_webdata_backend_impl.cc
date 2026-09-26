@@ -28,7 +28,6 @@
 #include "base/observer_list.h"
 #include "base/supports_user_data.h"
 #include "base/task/sequenced_task_runner.h"
-#include "build/buildflag.h"
 #include "components/autofill/core/browser/data_model/addresses/autofill_profile.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
 #include "components/autofill/core/browser/data_model/payments/autofill_offer_data.h"

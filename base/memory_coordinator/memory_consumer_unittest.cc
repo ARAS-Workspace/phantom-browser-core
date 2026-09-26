@@ -7,7 +7,6 @@
 #include "base/memory_coordinator/mock_memory_consumer.h"
 #include "base/memory_coordinator/test_memory_consumer_registry.h"
 #include "base/test/gtest_util.h"
-#include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace base {

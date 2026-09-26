@@ -6,7 +6,6 @@
 
 #include "base/functional/bind.h"
 #include "base/test/task_environment.h"
-#include "build/build_config.h"
 #include "components/password_manager/core/browser/mock_password_reuse_manager.h"
 #include "components/signin/public/identity_manager/accounts_mutator.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"

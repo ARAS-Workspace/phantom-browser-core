@@ -13,7 +13,6 @@
 #include "base/check_deref.h"
 #include "base/containers/flat_set.h"
 #include "base/feature_list.h"
-#include "build/build_config.h"
 #include "components/autofill/core/browser/data_manager/payments/payments_data_manager.h"
 #include "components/autofill/core/browser/data_manager/personal_data_manager.h"
 #include "components/autofill/core/browser/data_model/addresses/autofill_profile.h"

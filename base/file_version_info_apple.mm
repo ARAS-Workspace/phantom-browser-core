@@ -11,7 +11,6 @@
 #include "base/apple/foundation_util.h"
 #include "base/files/file_path.h"
 #include "base/strings/sys_string_conversions.h"
-#include "build/build_config.h"
 
 FileVersionInfoApple::FileVersionInfoApple(NSBundle* bundle)
     : bundle_(bundle) {}

@@ -7,7 +7,6 @@
 #include <optional>
 
 #include "base/no_destructor.h"
-#include "build/build_config.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/models/image_model.h"
 #include "ui/base/ui_base_types.h"

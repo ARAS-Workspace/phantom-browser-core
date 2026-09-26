@@ -8,7 +8,6 @@
 #include <string>
 
 #include "base/test/with_feature_override.h"
-#include "build/buildflag.h"
 #include "components/content_settings/core/browser/content_settings_mock_observer.h"
 #include "components/content_settings/core/browser/content_settings_registry.h"
 #include "components/content_settings/core/browser/content_settings_rule.h"

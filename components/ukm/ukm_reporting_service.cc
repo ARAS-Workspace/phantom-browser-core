@@ -13,7 +13,6 @@
 #include "base/metrics/field_trial_params.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
-#include "build/build_config.h"
 #include "components/background_task_scheduler/task_ids.h"
 #include "components/metrics/metrics_logs_event_manager.h"
 #include "components/metrics/metrics_service_client.h"

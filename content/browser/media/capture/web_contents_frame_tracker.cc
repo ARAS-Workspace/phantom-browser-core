@@ -17,7 +17,6 @@
 #include "base/strings/strcat.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/trace_event/trace_event.h"
-#include "build/build_config.h"
 #include "components/viz/common/surfaces/video_capture_target.h"
 #include "content/browser/gpu/gpu_data_manager_impl.h"
 #include "content/browser/media/capture/web_contents_auto_scaler.h"

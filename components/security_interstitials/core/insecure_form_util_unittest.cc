@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 #include "components/security_interstitials/core/insecure_form_util.h"
-
-#include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 #include "url/origin.h"

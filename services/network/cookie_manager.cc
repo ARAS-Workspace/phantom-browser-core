@@ -14,7 +14,6 @@
 #include "base/functional/callback_helpers.h"
 #include "base/process/process.h"
 #include "base/threading/platform_thread.h"
-#include "build/build_config.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"

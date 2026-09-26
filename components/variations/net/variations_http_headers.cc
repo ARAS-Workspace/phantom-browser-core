@@ -10,7 +10,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/string_util.h"
-#include "build/build_config.h"
 #include "components/google/core/common/google_util.h"
 #include "components/variations/variations_features.h"
 #include "components/variations/variations_ids_provider.h"

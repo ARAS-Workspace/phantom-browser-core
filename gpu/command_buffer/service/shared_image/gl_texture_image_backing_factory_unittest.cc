@@ -7,7 +7,6 @@
 #include <thread>
 
 #include "base/command_line.h"
-#include "build/build_config.h"
 #include "cc/test/pixel_comparator.h"
 #include "cc/test/pixel_test_utils.h"
 #include "components/viz/common/resources/shared_image_format.h"

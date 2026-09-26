@@ -8,7 +8,6 @@
 #include "base/test/launcher/unit_test_launcher.h"
 #include "base/test/test_io_thread.h"
 #include "base/test/test_suite.h"
-#include "build/build_config.h"
 
 #include "mojo/core/embedder/embedder.h"  // nogncheck
 

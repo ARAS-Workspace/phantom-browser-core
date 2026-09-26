@@ -9,7 +9,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "base/test/simple_test_tick_clock.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "net/base/ip_address.h"
 #include "net/socket/socket_performance_watcher_factory.h"
 #include "net/test/test_with_task_environment.h"

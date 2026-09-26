@@ -18,7 +18,6 @@
 #include "base/process/process_handle.h"
 #include "base/token.h"
 #include "base/trace_event/trace_event.h"
-#include "build/build_config.h"
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "services/service_manager/public/cpp/connector.h"
 #include "services/service_manager/public/cpp/constants.h"

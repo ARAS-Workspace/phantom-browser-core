@@ -6,8 +6,6 @@
 
 #include <utility>
 #include <vector>
-
-#include "build/build_config.h"
 #include "components/signin/internal/identity_manager/account_tracker_service.h"
 #include "components/signin/internal/identity_manager/gaia_cookie_manager_service.h"
 #include "components/signin/public/base/multilogin_parameters.h"

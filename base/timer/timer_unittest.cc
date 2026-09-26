@@ -20,7 +20,6 @@
 #include "base/test/test_simple_task_runner.h"
 #include "base/time/tick_clock.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace base {

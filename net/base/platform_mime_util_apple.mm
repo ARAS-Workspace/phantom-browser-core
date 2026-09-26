@@ -14,7 +14,6 @@
 #include "base/apple/scoped_cftyperef.h"
 #include "base/notreached.h"
 #include "base/strings/sys_string_conversions.h"
-#include "build/build_config.h"
 
 #include <CoreServices/CoreServices.h>
 

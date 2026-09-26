@@ -16,7 +16,6 @@
 #include "base/sampling_heap_profiler/poisson_allocation_sampler.h"
 #include "base/synchronization/lock.h"
 #include "build/build_config.h"
-#include "partition_alloc/buildflags.h"
 
 #if BUILDFLAG(IS_MAC) && defined(ARCH_CPU_X86_64)
 #include <pthread.h>

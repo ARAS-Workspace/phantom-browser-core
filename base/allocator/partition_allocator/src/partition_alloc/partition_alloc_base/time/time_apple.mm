@@ -14,8 +14,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <ctime>
-
-#include "partition_alloc/build_config.h"
 #include "partition_alloc/partition_alloc_base/check.h"
 #include "partition_alloc/partition_alloc_base/logging.h"
 #include "partition_alloc/partition_alloc_base/numerics/safe_conversions.h"

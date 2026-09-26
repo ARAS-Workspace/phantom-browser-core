@@ -8,8 +8,6 @@
 
 #include <bit>
 #include <string>
-
-#include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace optimization_guide {
