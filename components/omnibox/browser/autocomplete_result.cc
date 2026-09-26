@@ -91,11 +91,6 @@ void RotateMatchToFront(ACMatches::iterator it, ACMatches* matches) {
   std::rotate(matches->begin(), it, next);
 }
 
-// Maximum number of pedals to show.
-constexpr size_t kMaxPedalCount = std::numeric_limits<size_t>::max();
-// Maximum index of a match in a result for which the pedal should be displayed.
-constexpr size_t kMaxPedalMatchIndex = std::numeric_limits<size_t>::max();
-
 // Index cutoffs for actions in the suggestion list.
 constexpr size_t kActionsInSuggestCutoffThreshold = 1;
 constexpr size_t kPedalsCutoffThreshold = 3;
@@ -947,10 +942,9 @@ void AutocompleteResult::AttachPedalsToMatches(
   // Used to ensure we keep only one Pedal of each kind.
   std::unordered_set<OmniboxPedal*> pedals_found;
 
-  const size_t max_index = std::min(kMaxPedalMatchIndex, matches_.size());
+  const size_t max_index = matches_.size();
 
-  for (size_t i = 0; i < max_index && pedals_found.size() < kMaxPedalCount;
-       i++) {
+  for (size_t i = 0; i < max_index; i++) {
     AutocompleteMatch& match = matches_[i];
     // Skip matches that already have a pedal or are not suitable for actions.
     constexpr auto is_pedal = [](const auto& action) {
