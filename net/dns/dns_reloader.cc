@@ -22,10 +22,6 @@
 // changes which does not require use to do this kind of reloading. See
 // //net/dns/dns_config_watcher_mac.cc.
 //
-// It *also* is not used on Android, because Android handles nameserver changes
-// for us and has no /etc/resolv.conf. Despite that, Bionic does export these
-// interfaces, so we need to not use them.
-//
 // It is also also not used on Fuchsia. Regrettably, Fuchsia's resolv.h has
 // __RES set to 19991006, but does not actually provide res_ninit(3). This was
 // an old musl bug that was fixed by musl c8fdcfe5, but Fuchsia's SDK doesn't

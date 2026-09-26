@@ -1728,7 +1728,6 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationHttpPacBrowserTest, HttpPac) {
   TestProxyConfigured(/*expect_success=*/true);
 }
 
-// TODO(crbug.com/494643383): Fails on some desktop Android bots.
 // Make sure the system URLRequestContext can handle fetching PAC scripts from
 // file URLs.
 class NetworkContextConfigurationFilePacBrowserTest

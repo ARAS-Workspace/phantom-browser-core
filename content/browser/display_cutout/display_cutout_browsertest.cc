@@ -215,8 +215,6 @@ class DisplayCutoutBrowserTest : public ContentBrowserTest {
   base::ScopedTempDir temp_dir_;
 };
 
-// The viewport meta tag is only enabled on Android.
-
 IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, PublishSafeAreaVariables) {
   LoadTestPageWithData(kTestHTML);
 

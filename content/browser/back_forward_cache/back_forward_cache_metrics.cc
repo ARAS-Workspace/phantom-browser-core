@@ -97,7 +97,6 @@ BackForwardCacheMetrics::CreateOrReuseBackForwardCacheMetricsForNavigation(
     bool is_main_frame_navigation,
     int64_t committing_document_sequence_number,
     SiteInstanceImpl* committing_main_frame_site_instance) {
-  // TODO(https://crbug.com/445585641): Make this enforceable on Android.
   if (base::FeatureList::IsEnabled(kCheckDocumentSequenceNumber)) {
     CHECK_NE(committing_document_sequence_number, -1);
   }

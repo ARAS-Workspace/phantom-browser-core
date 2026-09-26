@@ -1187,9 +1187,6 @@ IN_PROC_BROWSER_TEST_F(MessagingSerializationInteropApiTest,
                                {}));
 }
 
-// Android builds can't use `ui_test_utils` navigation methods or
-// `ScopedTestNativeMessagingHost`.
-
 class WebPageMessagingSerializationInteropApiTest
     : public StructuredCloneMessageSerializationApiTest {
  protected:

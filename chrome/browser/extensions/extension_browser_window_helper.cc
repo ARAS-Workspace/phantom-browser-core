@@ -52,7 +52,6 @@ bool ShouldCloseTabOnExtensionUnload(const Extension* extension,
     }
   }
 
-  // NOTE: Android does not support hosted apps.
   // Case 2: Check if the page is a page associated with a hosted app, which
   // can have non-extension schemes. For example, the Gmail hosted app would
   // have a URL of https://mail.google.com.

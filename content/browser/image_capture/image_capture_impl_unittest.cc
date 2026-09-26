@@ -84,9 +84,6 @@ TEST_F(ImageCaptureImplTest, SetPhotoOptionsWithHiddenVisibility) {
   EXPECT_FALSE(future.Get());
 }
 
-// PTZ permission is always granted on Android (see
-// MediaDevicesPermissionChecker::HasPanTiltZoomPermissionGrantedOnUIThread),
-// overriding it will have no effect.
 TEST_F(ImageCaptureImplTest, SetPhotoOptionsWithPTZNoPermission) {
   SetPermissionForPTZ(blink::mojom::PermissionStatus::DENIED);
 

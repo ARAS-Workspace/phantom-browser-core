@@ -1038,8 +1038,8 @@ IN_PROC_BROWSER_TEST_P(CookieFileBrowserTest, SetAndGetCookie) {
   EXPECT_TRUE(NavigateToURL(shell(), file_url_));
   RenderFrameHost* frame = shell()->web_contents()->GetPrimaryMainFrame();
 
-  // File cookies always appear to be writable. On non-Android platforms a
-  // warning is printed when this occurs.
+  // File cookies always appear to be writable. A warning is printed when this
+  // occurs.
   WebContentsConsoleObserver console_observer(shell()->web_contents());
   console_observer.SetPattern(
       "While navigator.cookieEnabled does return true for this file:// "

@@ -10,7 +10,6 @@
 
 namespace enterprise_idle {
 
-// TODO(crbug.com/40222234): Enable this when Android supports >1 Action.
 TEST(IdleActionTest, Build) {
   auto* factory = ActionFactory::GetInstance();
 

@@ -392,8 +392,6 @@ TEST_F(MemoryProgramCacheTest, CacheLoadMatchesSave) {
       cache_->LoadLinkedProgram(kProgramId, vertex_shader_, fragment_shader_,
                                 nullptr, varyings_, GL_NONE, this));
 
-  // apparently the hash_map implementation on android doesn't have the
-  // equality operator
   EXPECT_EQ(vertex_attrib_map, vertex_shader_->attrib_map());
   EXPECT_EQ(vertex_uniform_map, vertex_shader_->uniform_map());
   EXPECT_EQ(vertex_varying_map, vertex_shader_->varying_map());
@@ -448,8 +446,6 @@ TEST_F(MemoryProgramCacheTest, LoadProgramMatchesSave) {
       cache_->LoadLinkedProgram(kProgramId, vertex_shader_, fragment_shader_,
                                 nullptr, varyings_, GL_NONE, this));
 
-  // apparently the hash_map implementation on android doesn't have the
-  // equality operator
   EXPECT_EQ(vertex_attrib_map, vertex_shader_->attrib_map());
   EXPECT_EQ(vertex_uniform_map, vertex_shader_->uniform_map());
   EXPECT_EQ(vertex_varying_map, vertex_shader_->varying_map());

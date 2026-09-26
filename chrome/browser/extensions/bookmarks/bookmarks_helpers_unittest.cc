@@ -114,13 +114,6 @@ class ExtensionBookmarksTest : public testing::Test {
   raw_ptr<const BookmarkNode> folder_ = nullptr;
 };
 
-// TODO(crbug.com/414844449): This test depends on which permanent folders are
-// visible when empty (e.g. the bookmarks bar). This behaviour is different on
-// Android Desktop vs. other Desktop platforms. It results in different node
-// counts when you count from the root. That's why only this test is affected,
-// the others count children from a different node. Once the behavior for
-// Android Desktop has been decided this test should be re-enabled. See also
-// bookmarks_apitest.cc.
 TEST_F(ExtensionBookmarksTest, GetFullTreeFromRoot) {
   BookmarkTreeNode tree =
       GetBookmarkTreeNode(model_, managed_, model_->root_node(),

@@ -2916,9 +2916,6 @@ IN_PROC_BROWSER_TEST_F(
       2);
 }
 
-// TODO(crbug.com/525397809): Currently this crashes because
-// SetInvalidRefreshTokenForAccount does not work on Android. We should fix this
-// and enable this test on Android.
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
                        MultiSecondaryInteractiveInvalidToken) {
   // Setup a secondary account with no valid refresh token, and try to get a

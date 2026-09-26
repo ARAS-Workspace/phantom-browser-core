@@ -5,10 +5,6 @@
 #include "build/build_config.h"
 #include "ui/message_center/message_center.h"
 
-// This file contains dummy implementation of MessageCenter and used to compile
-// and link with Android implementations of Chrome which do not have
-// notification systems yet. This is to avoid spreading compile-time flags
-// everywhere in the code.
 #error This file should only be used in Android and Fuchsia.
 
 namespace message_center {

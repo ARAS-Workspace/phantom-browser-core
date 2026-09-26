@@ -104,9 +104,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, EnabledByDefault) {
 
 // Ensures that offer data should get cleared from the database when sync is
 // (temporarily) stopped, e.g. due to a persistent auth error.
-//
-// Excluded on Android because SyncServiceImplHarness doesn't have the ability
-// to mimic sync-paused on Android due to https://crbug.com/40871747.
 IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, ClearOnSyncPaused) {
   SetOfferData(GetFakeServer(), {CreateDefaultSyncCardLinkedOffer()});
   ASSERT_TRUE(SetupSync());

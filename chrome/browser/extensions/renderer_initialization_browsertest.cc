@@ -54,7 +54,6 @@ IN_PROC_BROWSER_TEST_F(RendererInitializationTest,
   ASSERT_FALSE(web_contents->IsCrashed());
 }
 
-// Android does not support themes.
 // Tests that loading a file from a theme in a tab doesn't crash anything.
 // Another part of crbug.com/40434302 and related.
 IN_PROC_BROWSER_TEST_F(RendererInitializationTest,

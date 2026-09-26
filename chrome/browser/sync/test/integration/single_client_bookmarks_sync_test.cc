@@ -1305,7 +1305,6 @@ IN_PROC_BROWSER_TEST_P(
                    syncer::DataTypeEntityChange::kLocalDeletion));
 }
 
-// Android doesn't currently support PRE_ tests, see crbug.com/40145099.
 IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
                        PRE_PersistProgressMarkerOnRestart) {
   const std::u16string title = u"Title1";
@@ -2064,8 +2063,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
                 .value());
 }
 
-// Android doesn't currently support PRE_ tests, see crbug.com/40200835 or
-// crbug.com/40145099.
 IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
                        PRE_ShouldUploadUnsyncedEntityAfterRestart) {
   ASSERT_TRUE(SetupSync());
@@ -3232,7 +3229,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientBookmarksWithAccountStorageSyncTest,
               ElementsAre(IsUrlBookmark(kTitle2, kUrl2)));
 }
 
-// Android doesn't currently support PRE_ tests, see crbug.com/40145099.
 IN_PROC_BROWSER_TEST_F(SingleClientBookmarksWithAccountStorageSyncTest,
                        PRE_PersistAccountBookmarksAcrossRestarts) {
   const std::u16string kInitiallyLocalTitle = u"Initially Local";
@@ -3501,8 +3497,6 @@ IN_PROC_BROWSER_TEST_F(
               /*index=*/model->bookmark_bar_node()->children().size());
 }
 
-// Android doesn't currently support PRE_ tests, see crbug.com/40200835 or
-// crbug.com/40145099.
 class SingleClientBookmarksSyncTestWithEnabledMigrateSyncingUserToSignedIn
     : public SingleClientBookmarksWithAccountStorageSyncTest {
  protected:

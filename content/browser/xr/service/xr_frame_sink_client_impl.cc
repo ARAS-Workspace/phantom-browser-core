@@ -125,10 +125,6 @@ void XrFrameSinkClientImpl::ConfigureDOMOverlay() {
       render_frame_host->GetOutermostMainFrameOrEmbedder()->GetView());
   CHECK(!root_view || !root_view->IsRenderWidgetHostViewChildFrame());
 
-  // Since we don't have the ability to get updates to the surface id on non-
-  // Android OS's, we let it stay null, which callers can use to as a signal
-  // that DOMOverlay will not work.
-
   if (dom_surface_id_ && dom_surface_id_->is_valid()) {
     const viz::FrameSinkId dom_frame_sink_id = dom_surface_id_->frame_sink_id();
     if (GetHostFrameSinkManager()->RegisterFrameSinkHierarchy(

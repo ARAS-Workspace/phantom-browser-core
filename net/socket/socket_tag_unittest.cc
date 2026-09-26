@@ -27,7 +27,4 @@ TEST(SocketTagTest, Compares) {
   EXPECT_FALSE(unset1 < unset2);
 }
 
-// On Android, where socket tagging is supported, verify that SocketTag::Apply
-// works as expected.
-
 }  // namespace net

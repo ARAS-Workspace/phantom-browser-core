@@ -839,7 +839,7 @@ TEST_P(FeatureBindingsTest, RemoteSetDenied) {
 #endif  // !DCHECK_IS_ON()
 
 ////
-//  Death tests - these are flaky on Android.
+//  Death tests
 ////
 #if defined(GTEST_HAS_DEATH_TEST)
 using FeatureBindingsDeathTest = FeatureBindingsTest;

@@ -57,10 +57,7 @@ ImageFetcherServiceFactory* ImageFetcherServiceFactory::GetInstance() {
 
 ImageFetcherServiceFactory::ImageFetcherServiceFactory()
     : SimpleKeyedServiceFactory("ImageFetcherService",
-                                SimpleDependencyManager::GetInstance()) {
-  // In order to move the android code to components, we need to push
-  // |GetImageFetcherService| to image_fetcher_bridge.
-}
+                                SimpleDependencyManager::GetInstance()) {}
 
 ImageFetcherServiceFactory::~ImageFetcherServiceFactory() = default;
 

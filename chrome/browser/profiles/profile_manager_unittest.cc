@@ -1533,7 +1533,6 @@ TEST_P(ProfileManagerTest, ProfileDisplayNamePreservesSignedInName) {
             profiles::GetAvatarNameForProfile(profile1->GetPath()));
 }
 
-// GetAvatarNameForProfile() is not defined on Android.
 TEST_P(ProfileManagerTest, ProfileDisplayNameIsEmailIfDefaultName) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
   ProfileAttributesStorage& storage =

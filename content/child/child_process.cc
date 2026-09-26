@@ -114,7 +114,6 @@ ChildProcess::ChildProcess(base::ThreadType io_thread_type,
   // We can't recover from failing to start the IO thread.
   base::Thread::Options thread_options(base::MessagePumpType::IO, 0);
   thread_options.thread_type = io_thread_type;
-  // TODO(crbug.com/40226692): Figure out whether IS_ANDROID can be lifted here.
 
   if (base::FeatureList::IsEnabled(features::kIOThreadInteractiveThreadType)) {
     thread_options.thread_type = base::ThreadType::kAudioProcessing;

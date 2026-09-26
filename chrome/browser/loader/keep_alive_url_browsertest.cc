@@ -120,7 +120,6 @@ IN_PROC_BROWSER_TEST_P(ChromeKeepAliveURLBrowserTest,
   loaders_observer().WaitForTotalOnReceiveResponseProcessed(1);
 }
 
-// Shutdown delay is not supported on Android.
 // Mac browser shutdown is flaky: https://crbug.com/40201651
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ReceiveResponseAfterBrowserShutdown \

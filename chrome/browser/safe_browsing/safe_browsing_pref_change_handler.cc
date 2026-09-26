@@ -145,8 +145,6 @@ void SafeBrowsingPrefChangeHandler::
     }
   }
 #endif
-
-  // TODO(crbug.com/397966486): Add tests in the android test file.
 }
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

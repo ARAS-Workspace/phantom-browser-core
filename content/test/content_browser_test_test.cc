@@ -51,8 +51,6 @@ namespace content {
 
 // Disabled on official builds because symbolization in sandboxes processes
 // opens up security holes.
-// On Android symbolization happens in one step after all the tests ran, so this
-// test doesn't work there.
 // TODO(mac): figure out why symbolization doesn't happen in the renderer.
 // http://crbug.com/521456
 // TODO(win): send PDB files for component build. http://crbug.com/521459

@@ -45,9 +45,6 @@ void PrepareLanguageModels(Profile* const profile,
         std::make_unique<language::FluentLanguageModel>(profile->GetPrefs()));
     manager->SetPrimaryModel(language::LanguageModelManager::ModelType::FLUENT);
   }
-
-  // On Android, additionally create a ULPLanguageModel and populate it with
-  // ULP data if not disabled.
 }
 
 }  // namespace

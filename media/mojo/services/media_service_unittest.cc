@@ -206,7 +206,6 @@ class MediaServiceTest : public testing::Test {
 // - If you expect a callback on an InterfacePtr call or connection error, use
 //   base::RunLoop::Run() and QuitLoop().
 
-// TODO(crbug.com/40570244): Enable these tests on Android.
 #if BUILDFLAG(ENABLE_MOJO_CDM)
 TEST_F(MediaServiceTest, InitializeCdm_Success) {
   InitializeCdm(kClearKeyKeySystem, true);

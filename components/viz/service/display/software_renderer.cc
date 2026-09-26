@@ -169,9 +169,6 @@ void SoftwareRenderer::SetClipRect(const gfx::Rect& rect) {
   SkMatrix current_matrix = current_canvas_->getTotalMatrix();
   current_canvas_->resetMatrix();
 
-  // Checks below are incompatible with WebView as the canvas size and clip
-  // provided by Android or embedder app. And Chrome doesn't use
-  // SoftwareRenderer on Android.
   // SetClipRect is assumed to be applied temporarily, on an
   // otherwise-unclipped canvas.
   DCHECK_EQ(current_canvas_->getDeviceClipBounds().width(),

@@ -10,7 +10,6 @@
 #include "base/task/thread_pool.h"
 #include "content/public/browser/browser_thread.h"
 
-// TODO(crbug.com/371321982): port system.storage api on desktop android.
 #include "components/storage_monitor/storage_info.h"  // nogncheck crbug.com/40147906
 #include "components/storage_monitor/storage_monitor.h"  // nogncheck crbug.com/40147906
 #include "extensions/common/api/system_storage.h"
@@ -20,7 +19,6 @@ using storage_monitor::StorageMonitor;
 
 namespace extensions {
 
-// TODO(crbug.com/371321982): port system.storage api on desktop android.
 using api::system_storage::StorageUnitInfo;
 using api::system_storage::StorageUnitType;
 

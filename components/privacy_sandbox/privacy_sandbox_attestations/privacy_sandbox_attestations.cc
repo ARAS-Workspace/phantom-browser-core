@@ -393,13 +393,6 @@ void PrivacySandboxAttestations::OnAttestationsFileCheckComplete() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   attestations_file_checked_ = true;
   RunComponentRegistrationCallbackForTesting();  // IN-TEST
-
-  // On Android, if the parsing has not yet started at the end of component
-  // registration, this implies there is no attestations list available. The
-  // pre-installed attestations component in APK assets will be read to populate
-  // the in-memory attestations map.
-  // TODO(crbug.com/406020732): Consider also loading the attestations component
-  // from APK assets if the parsing has finished with error.
 }
 
 }  // namespace privacy_sandbox

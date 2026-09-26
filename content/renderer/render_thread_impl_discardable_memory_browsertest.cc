@@ -112,9 +112,6 @@ IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
 // Ensure that address space mapped by allocating discardable memory is unmapped
 // after discarding under memory pressure, by creating and discarding a large
 // amount of discardable memory.
-//
-// Disable the test for the Android asan build.
-// See http://crbug.com/667837 for detail.
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                        // TODO(crbug.com/40681859): Re-enable this test
                        DISABLED_DiscardableMemoryAddressSpace) {

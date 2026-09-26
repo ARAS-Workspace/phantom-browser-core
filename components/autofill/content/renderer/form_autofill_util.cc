@@ -2230,8 +2230,6 @@ std::optional<FormData> ExtractFormDataWithFieldsAndFrames(
   form.set_fields(std::move(fields));
   form.set_child_frames(std::move(child_frames));
   form.set_button_titles(GetButtonTitles(form_element, button_titles_cache));
-  // `likely_contains_captcha` is only needed for Android for the autosubmission
-  // after filling credentials from TTF bottom sheet.
   return form;
 }
 

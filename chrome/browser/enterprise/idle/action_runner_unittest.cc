@@ -73,7 +73,6 @@ class MockAction : public Action {
 
 }  // namespace
 
-// TODO(crbug.com/40222234): Enable this when Android supports >1 Action.
 // Tests that actions are run in sequence, in order of priority.
 TEST(IdleActionRunnerTest, RunsActionsInSequence) {
   content::BrowserTaskEnvironment task_environment;
@@ -188,7 +187,6 @@ TEST(IdleActionRunnerTest, DoNothingWithEmptyPref) {
   runner.Run();
 }
 
-// TODO(crbug.com/40222234): Enable this when Android supports >1 Action.
 // Tests that ActionRunner only runs the actions configured via the
 // "IdleTimeoutActions" pref.
 TEST(IdleActionRunnerTest, JustCloseBrowsers) {

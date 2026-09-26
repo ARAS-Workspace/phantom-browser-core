@@ -52,9 +52,6 @@ class SyncSessionsWebContentsRouterTest
   raw_ptr<SyncSessionsWebContentsRouter, DanglingUntriaged> router_ = nullptr;
 };
 
-// Disabled on android due to complexity of creating a full TabAndroid object
-// for a unit test. The logic being tested here isn't directly affected by
-// platform-specific peculiarities.
 TEST_F(SyncSessionsWebContentsRouterTest, FlareNotRun) {
   StartSyncFlareMock mock;
   router()->InjectStartSyncFlare(base::BindRepeating(

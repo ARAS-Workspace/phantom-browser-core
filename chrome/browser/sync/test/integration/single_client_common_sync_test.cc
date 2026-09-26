@@ -159,7 +159,6 @@ INSTANTIATE_TEST_SUITE_P(,
                          GetSyncTestModes(),
                          testing::PrintToStringParamName());
 
-// Android doesn't currently support PRE_ tests, see crbug.com/40145099.
 IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest,
                        PRE_ShouldNotIssueGetUpdatesOnBrowserRestart) {
   ASSERT_TRUE(SetupSync());
@@ -437,8 +436,7 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest,
                    .contains(syncer::BOOKMARKS));
 }
 
-// The following test uses THEMES for testing, however, THEMES data type is not
-// on Android.
+// The following test uses THEMES for testing.
 IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, HttpError) {
   ASSERT_TRUE(SetupSync());
 
@@ -475,8 +473,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, HttpError) {
                    .contains(syncer::THEMES));
 }
 
-// Android currently doesn't support some methods used in this test, see
-// crbug.com/40871747.
 IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, SignInPendingState) {
   base::HistogramTester histograms;
 
@@ -520,7 +516,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, SignInPendingState) {
       /*sample=*/1, /*expected_bucket_count=*/1);
 }
 
-// Android doesn't currently support PRE_ tests, see crbug.com/40145099.
 class SingleClientFeatureToTransportSyncTest : public SyncTest {
  public:
   SingleClientFeatureToTransportSyncTest() : SyncTest(SINGLE_CLIENT) {
@@ -756,7 +751,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPolicySyncTest,
 }
 
 // Regression test for crbug.com/415728693.
-// EnterSyncPausedStateForPrimaryAccount() is not supported on Android.
 IN_PROC_BROWSER_TEST_P(SingleClientPolicySyncTest,
                        ApplySyncDisabledPolicyWhileSyncPaused) {
   ASSERT_TRUE(SetupSync());
@@ -828,9 +822,6 @@ class SingleClientOldProgressMarkerSyncTest : public SyncTest {
   const GURL kReadingListUrl3 = GURL("https://readme3.com/");
 };
 
-// TODO(crbug.com/465115079): Enable on Android once PRE_ tests are fully
-// supported (currently flakily fails with "Installing ParallelExecutionFence is
-// slow", pointing to tasks posted from sync_scheduler_impl.cc).
 IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
                        PRE_OldProgressMarker) {
   ASSERT_TRUE(SetupSyncWithMode(SetupSyncMode::kSyncTransportOnly));

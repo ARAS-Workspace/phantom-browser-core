@@ -1188,9 +1188,6 @@ TEST_F(TracingScenarioSystemBackendTest, FeatureNotEnabled_1) {
   EXPECT_FALSE(custom_backend_consumer_conn_created_);
 }
 
-// EnablePerfettoSystemTracing doesn't have an effect on Android. In debugging
-// (which is always true in content_unittests) system tracing is always enabled.
-// Disable this test on Android.
 // The scenario is ignored if it requests to use the system backend, but the
 // system backend is unavailable (feature "EnablePerfettoSystemTracing" isn't
 // enabled).

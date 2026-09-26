@@ -260,7 +260,7 @@ bool VulkanDeviceQueue::Initialize(
   // Disable all physical device features by default.
   enabled_device_features_2_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
 
-  // Android, Fuchsia, Linux (VaapiVideoDecoder) need YCbCr sampler support.
+  // Fuchsia, Linux (VaapiVideoDecoder) need YCbCr sampler support.
 #if BUILDFLAG(IS_LINUX)
   if (!physical_device_info.feature_sampler_ycbcr_conversion) {
     LOG(ERROR) << "samplerYcbcrConversion is not supported.";

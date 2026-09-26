@@ -919,7 +919,7 @@ TEST_F(PasswordGenerationAgentTest, ChangePasswordFormDetectionTest) {
   ExpectGenerationElementLostFocus("confirmpassword");
 }
 
-// These tests are for the right-click menu and it is not applicable to Android.
+// These tests are for the right-click menu.
 TEST_F(PasswordGenerationAgentTest, DesktopContextMenuGenerationInFormTest) {
   LoadHTMLWithUserGesture(kSigninFormHTML);
   WebInputElement first_password_element = GetInputElementById("password");

@@ -191,8 +191,6 @@ class AutoscrollBrowserTest : public ContentBrowserTest {
   }
 };
 
-// We don't plan on supporting middle click autoscroll on Android.
-// See https://crbug.com/686223
 // TODO(crbug.com/419838337) Fix failing test on linux
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_AutoscrollFling DISABLED_AutoscrollFling

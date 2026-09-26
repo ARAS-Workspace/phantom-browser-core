@@ -46,7 +46,6 @@ std::string UIThreadSearchTermsData::GetApplicationLocale() const {
   return g_browser_process->GetApplicationLocale();
 }
 
-// Android implementations are in ui_thread_search_terms_data_android.cc.
 std::u16string UIThreadSearchTermsData::GetRlzParameterValue(
     bool from_app_list) const {
   DCHECK(!BrowserThread::IsThreadInitialized(BrowserThread::UI) ||

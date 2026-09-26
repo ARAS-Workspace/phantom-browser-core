@@ -1149,8 +1149,6 @@ sql::InitStatus HistoryDatabase::EnsureCurrentVersion() {
   }
 
   if (cur_version == 69) {
-    // The android_urls table's stopped being read in 91.0.4438.0. Delete it if
-    // it still exists.
     cur_version++;
     // TODO(crbug.com/40891923): Handle failure instead of ignoring it.
     std::ignore = meta_table_.SetVersionNumber(cur_version);

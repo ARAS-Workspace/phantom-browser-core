@@ -179,8 +179,6 @@ DesktopCaptureChooseDesktopMediaFunctionBase::Execute(
       suppress_local_audio_playback_intended;
   picker_params.includable_web_contents_filter =
       std::move(includable_web_contents_filter);
-  // TODO(crbug.com/405218400): Add more Android-specific parameters here, like
-  // Params::capture_this_tab and Params::exclude_monitor_type_surfaces.
   picker_controller_ =
       std::make_unique<DesktopMediaPickerController>(g_picker_factory);
   picker_params.restricted_by_policy =

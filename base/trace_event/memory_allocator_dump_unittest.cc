@@ -150,7 +150,6 @@ TEST(MemoryAllocatorDumpTest, MovingAnEntry) {
   EXPECT_EQ(expected_entry, to_entry);
 }
 
-// DEATH tests are not supported in Android.
 #if !defined(NDEBUG)
 TEST(MemoryAllocatorDumpTest, ForbidDuplicatesDeathTest) {
   FakeMemoryAllocatorDumpProvider fmadp;

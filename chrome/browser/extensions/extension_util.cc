@@ -149,8 +149,6 @@ void SetIsIncognitoEnabled(const std::string& extension_id,
       return;
     }
 
-    // TODO(crbug.com/356905053): Enable handling component extensions on
-    // desktop android.
     // TODO(treib,kalman): Should this be Manifest::IsComponentLocation(..)?
     // (which also checks for kExternalComponent).
     if (extension->location() == mojom::ManifestLocation::kComponent) {

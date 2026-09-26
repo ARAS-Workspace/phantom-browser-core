@@ -304,8 +304,6 @@ TEST_P(MostVisitedAutoRemovalTest, DoNotRemoveStaleShortcutsIfFeatureDisabled) {
   EXPECT_TRUE(profile_.GetPrefs()->GetBoolean(ntp_prefs::kNtpShortcutsVisible));
 }
 
-// TODO(b/514161985): Enable this test on Android once enterprise shortcuts are
-// supported.
 TEST_P(MostVisitedAutoRemovalTest,
        DoNotRemoveStaleShortcutsIfEnterpriseShortcutsEnabled) {
   InitFeature(true);

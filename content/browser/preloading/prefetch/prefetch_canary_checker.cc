@@ -78,9 +78,6 @@ std::string GenerateNetworkID(
           ? "cell"
           : base::NumberToString(std::to_underlying(connection_type));
 
-  // Further identify WiFi and cell connections. These calls are only supported
-  // for Android devices.
-
   return id;
 }
 

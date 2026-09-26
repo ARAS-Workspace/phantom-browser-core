@@ -111,8 +111,6 @@ void ContentStabilityMetricsProvider::OnRenderProcessHostCreationFailed(
 void ContentStabilityMetricsProvider::RenderProcessExited(
     content::RenderProcessHost* host,
     const content::ChildProcessTerminationInfo& info) {
-  // On Android, the renderer crashes are recorded in
-  // `OnCrashDumpProcessed`.
   helper_.LogRendererCrash(
       DetermineHostedContentType(host, extensions_helper_.get()), info.status,
       info.exit_code);

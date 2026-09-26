@@ -35,7 +35,6 @@ TEST_F(LocalWebApprovalsFeatureTest, LocalApprovalsDisabled) {
 
 void CheckIsLocalWebApprovalsEnabled() {
   bool is_local_web_approvals_enabled = true;
-  // On android require a Google-branded build is required.
 
   EXPECT_EQ(IsLocalWebApprovalsEnabled(), is_local_web_approvals_enabled);
 }

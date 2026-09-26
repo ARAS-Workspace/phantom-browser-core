@@ -136,8 +136,6 @@ void SetBrowserStartupIsComplete(StartupIsCompleteReason reason) {
 
 bool g_is_monitoring_started = false;
 
-// For Android, startup completion is signaled via AfterStartupTaskUtils.java.
-// We do not use the StartupObserver or startup refs on Android.
 // We initialize `g_ref_count` to 1 to represent the startup sequence itself.
 // This implicit reference is released in `BeginMonitoringStartupCompletion()`
 // when the startup sequence finishes registering its initial tasks. This

@@ -418,9 +418,6 @@ TEST_P(TCPClientSocketTest, MAYBE_TestSocketPerformanceWatcher) {
   EXPECT_EQ(kNumIPs - 1, watcher_ptr->connection_changed_count());
 }
 
-// On Android, where socket tagging is supported, verify that
-// TCPClientSocket::Tag works as expected.
-
 // TCP socket that hangs indefinitely when establishing a connection.
 class NeverConnectingTCPClientSocket : public TCPClientSocket {
  public:

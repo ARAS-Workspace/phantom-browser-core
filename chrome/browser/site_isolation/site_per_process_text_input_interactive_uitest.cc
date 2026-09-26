@@ -846,9 +846,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
   }
 }
 
-// TODO(ekaramad): Some of the following tests should be active on Android as
-// well. Enable them when the corresponding feature is implemented for Android
-// (https://crbug.com/40464731).
 // This test creates a page with multiple child frames and adds an <input> to
 // each frame. Then, sequentially, each <input> is focused by sending a tab key.
 // Then, after |TextInputState.type| for a view is changed to text, another key

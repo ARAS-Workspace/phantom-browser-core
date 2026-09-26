@@ -1577,7 +1577,6 @@ TEST_F(HistoryBackendTest, SetPageTitleFiresNotificationWithCorrectDetails) {
   EXPECT_EQ(stored_row2.id(), changed_urls[0].id());
 }
 
-// There's no importer on Android.
 TEST_F(HistoryBackendTest, ImportedFaviconsTest) {
   // Setup test data - two Urls in the history, one with favicon assigned and
   // one without.

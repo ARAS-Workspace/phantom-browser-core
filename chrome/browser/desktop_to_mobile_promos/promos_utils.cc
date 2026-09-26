@@ -204,9 +204,8 @@ bool VerifySyncingDatatypes(const syncer::SyncService& sync_service,
 
 // Checks whether promos in general can currently be shown.
 bool CanShowPromos() {
-  // Don't show the promo if the local state exists and `kPromotionsEnabled` is
-  // false (likely overridden by policy). `kPromotionsEnabled` does not exist on
-  // Android.
+  // Don't show the promo if the local state exists and `kPromotionsEnabled`
+  // is false (likely overridden by policy).
   PrefService* local_state = g_browser_process->local_state();
   if (local_state && !local_state->GetBoolean(prefs::kPromotionsEnabled)) {
     return false;

@@ -446,7 +446,7 @@ void SpellcheckHunspellDictionary::PlatformSupportsLanguageComplete(
   } else {
     // Either the platform spellchecker is unavailable / disabled, or it doesn't
     // support this language. In either case, we must use Hunspell for this
-    // language, unless we are on Android, which doesn't support Hunspell.
+    // language.
 #if BUILDFLAG(USE_RENDERER_SPELLCHECKER)
     task_runner_->PostTaskAndReplyWithResult(
         FROM_HERE,

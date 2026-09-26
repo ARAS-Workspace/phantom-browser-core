@@ -35,7 +35,6 @@ TabCloser::TabCloser(content::WebContents* web_contents)
 }
 
 void TabCloser::CloseTabImpl() {
-  // On Android, FindBrowserWithTab doesn't exist.
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           &GetWebContents());

@@ -427,9 +427,6 @@ IN_PROC_BROWSER_TEST_P(AccessibilityHitTestingBrowserTest, MAYBE_HitTest) {
   }
 }
 
-// Web popups don't exist on Android, so this test doesn't have to be run on
-// this platform.
-
 // crbug.com/1317505: Flaky on Linux Wayland
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_HitTestInPopup DISABLED_HitTestInPopup

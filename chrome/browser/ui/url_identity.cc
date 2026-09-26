@@ -16,8 +16,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "url/gurl.h"
 
-// Android does not support //chrome/browser/web_applications, see
-// chrome/browser/web_applications/BUILD.gn.
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_provider.h"

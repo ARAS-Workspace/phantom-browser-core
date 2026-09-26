@@ -208,8 +208,6 @@ IN_PROC_BROWSER_TEST_F(TabGroupsApiTest, TestGroupDetachedAndReInserted) {
                                              second_browser->GetSessionID(),
                                              /*destination_index=*/0));
 
-  // TODO(crbug.com/511186385): Android does not generate tab group removed
-  // notifications for tab moves across windows.
   event_observer.WaitForEventWithName(api::tab_groups::OnRemoved::kEventName);
   EXPECT_TRUE(
       event_observer.events().contains(api::tab_groups::OnRemoved::kEventName));

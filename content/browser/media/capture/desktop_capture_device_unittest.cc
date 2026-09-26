@@ -469,8 +469,6 @@ class DesktopCaptureDeviceTest : public testing::TestWithParam<bool> {
 };
 
 // Capturer implementation for Fuchsia is not fully functional.
-// TODO(crbug.com/445218901): Capturer implementation for Android needs user
-// input to work.
 TEST_P(DesktopCaptureDeviceTest, Capture) {
   std::unique_ptr<webrtc::DesktopCapturer> capturer(
       desktop_capture::CreateScreenCapturer(

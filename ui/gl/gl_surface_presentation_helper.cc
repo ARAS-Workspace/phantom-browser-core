@@ -213,8 +213,6 @@ void GLSurfacePresentationHelper::OnMakeCurrent(GLContext* context,
   if (!gpu_timing_client_->IsAvailable())
     gpu_timing_client_ = nullptr;
 
-  // https://crbug.com/854298 : disable GLFence on Android as they seem to cause
-  // issues on some devices.
   gl_fence_supported_ = GLFence::IsSupported();
 }
 

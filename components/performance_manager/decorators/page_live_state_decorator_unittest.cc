@@ -410,7 +410,6 @@ TEST_F(PageLiveStateDecoratorTest, OnIsPinnedTabChanged) {
       TestPageLiveStateObserver::ObserverFunction::kOnIsPinnedTabChanged);
 }
 
-// DevTools not supported on Android.
 TEST_F(PageLiveStateDecoratorTest, OnIsDevToolsOpenChanged) {
   EXPECT_FALSE(PageLiveStateDecorator::IsDevToolsOpen(web_contents()));
   auto setter = [](content::WebContents* contents, bool value) {

@@ -293,7 +293,7 @@ BrowserAccessibilityStateImpl* BrowserAccessibilityStateImpl::GetInstance() {
   return g_instance;
 }
 
-// On Android, Mac and Linux there are platform-specific subclasses.
+// On Mac and Linux there are platform-specific subclasses.
 #if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_LINUX)
 // static
 std::unique_ptr<BrowserAccessibilityStateImpl>

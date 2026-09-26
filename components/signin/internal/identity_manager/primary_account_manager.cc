@@ -883,8 +883,6 @@ void PrimaryAccountManager::FirePrimaryAccountChanged(
 void PrimaryAccountManager::OnRefreshTokensLoaded() {
   token_service_observation_.Reset();
 
-  // On Android, account seeding on Android is
-  // controlled by SigninManager, so don't remove any accounts here.
   // Remove account information from the account tracker service if needed.
   if (token_service_->HasLoadCredentialsFinishedWithNoErrors()) {
     std::vector<AccountInfo> accounts_in_tracker_service =

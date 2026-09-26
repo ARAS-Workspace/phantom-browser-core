@@ -211,8 +211,6 @@ NO_STACK_PROTECTOR int RunContentProcess(
 
     base::SetProcessTitleFromCommandLine(argv);
 
-// On Android setlocale() is not supported, and we don't override the signal
-// handlers so we can get a stack trace when crashing.
 #if BUILDFLAG(IS_POSIX)
     // Set C library locale to make sure CommandLine can parse
     // argument values in the correct encoding and to make sure

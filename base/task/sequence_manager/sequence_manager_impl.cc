@@ -252,8 +252,6 @@ void SequenceManagerImpl::InitializeFeatures() {
 void SequenceManagerImpl::BindToMessagePump(std::unique_ptr<MessagePump> pump) {
   controller_->BindToCurrentThread(std::move(pump));
   CompleteInitializationOnBoundThread();
-
-  // On Android attach to the native loop when there is one.
 }
 
 void SequenceManagerImpl::BindToCurrentThread() {

@@ -249,8 +249,6 @@ TEST_F(DataProtectionPasteIfAllowedByPolicyTest, CachedPasteSource) {
             "image");
 }
 
-// The DataTransferPolicyController is not relevant / supported by Clank, and
-// is thus disabled.
 TEST_F(DataProtectionPasteIfAllowedByPolicyTest,
        DataTransferPolicyController_Allowed) {
   PolicyControllerTest policy_controller;

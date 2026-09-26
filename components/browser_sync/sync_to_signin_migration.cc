@@ -554,9 +554,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
   bool migration_successful = true;
   std::vector<BlockingOperation> blocking_operations;
 
-  // On Android no password migration is required here, because other layers are
-  // responsible for migrating the user to the local+account model, e.g.
-  // SetUsesSplitStoresAndUPMForLocal(), PasswordStoreBackendMigrationDecorator.
   // Move passwords DB file, if password sync is enabled.
   if (passwords_decision == SyncToSigninMigrationDataTypeDecision::kMigrate) {
     base::FilePath from_path =

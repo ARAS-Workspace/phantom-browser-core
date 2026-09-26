@@ -760,8 +760,6 @@ INSTANTIATE_TEST_SUITE_P(/* no prefix */,
 
 #endif
 
-// Only Chrome Android performs a zoom when focusing an editable.
-
 // Tests scrollIntoView behaviors related to a fenced frame.
 class ScrollIntoViewFencedFrameBrowserTest
     : public ScrollIntoViewBrowserTestBase {

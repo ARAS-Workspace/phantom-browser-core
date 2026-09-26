@@ -5026,9 +5026,6 @@ TEST_F(HostResolverManagerDnsTest,
                   testing::ElementsAre(CreateExpected("192.168.2.47", 1212)))));
 }
 
-// InsecureDnsMode::{kEnabledPlatform, kEnabledPlatformNoSystem} are currently
-// only supported on Android.
-
 // RFC 6761 localhost names should always resolve to loopback.
 TEST_F(HostResolverManagerDnsTest, LocalhostLookup) {
   // Add a rule resolving localhost names to a non-loopback IP and test

@@ -70,9 +70,6 @@
 #include "ui/base/unowned_user_data/unowned_user_data_host.h"
 #include "ui/base/webui/web_ui_util.h"
 
-// Exclude desktop-only headers for WebuiOmniboxHandler and
-// OmniboxComposeboxHandler, which are dedicated to the desktop Omnibox Popup
-// and not compiled on Android.
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/test_tab_strip_model_delegate.h"
@@ -633,8 +630,7 @@ TEST_F(RealboxHandlerTest, ForceShowDescriptionNeverEnabledForRealbox) {
   EXPECT_FALSE(received_result->matches[0]->show_contextual_description);
 }
 
-// WebuiOmniboxHandler is dedicated to the desktop Omnibox Popup and out of
-// scope for Android WebUI NTP.
+// WebuiOmniboxHandler is dedicated to the desktop Omnibox Popup.
 namespace {
 class FakeOmniboxPopupView : public OmniboxPopupView {
  public:

@@ -120,8 +120,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest, AddingModes) {
 
 IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
                        FullAccessibilityHasInlineTextBoxes) {
-  // TODO(dmazzoni): On Android we use an ifdef to disable inline text boxes,
-  // we should do it with accessibility flags instead. http://crbug.com/672205
   EXPECT_TRUE(NavigateToURL(shell(), GURL(url::kAboutBlankURL)));
 
   AccessibilityNotificationWaiter waiter(shell()->web_contents(),
@@ -143,8 +141,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
 
 IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
                        MinimalAccessibilityModeHasNoInlineTextBoxes) {
-  // TODO(dmazzoni): On Android we use an ifdef to disable inline text boxes,
-  // we should do it with accessibility flags instead. http://crbug.com/672205
   EXPECT_TRUE(NavigateToURL(shell(), GURL(url::kAboutBlankURL)));
 
   AccessibilityNotificationWaiter waiter(

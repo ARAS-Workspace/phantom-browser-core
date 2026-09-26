@@ -276,7 +276,6 @@ void OfferNotificationBubbleControllerImpl::HideBubbleAndClearTimestamp(
 }
 
 void OfferNotificationBubbleControllerImpl::UpdatePageActionIcon() {
-  // Page action icons do not exist for Android.
   AutofillBubbleControllerBase::UpdatePageActionIcon();
 
   if (web_contents()->IsBeingDestroyed()) {

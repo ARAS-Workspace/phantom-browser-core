@@ -35,10 +35,6 @@ ContentTestSuite::ContentTestSuite(int argc, char** argv)
   // -EmbeddedFrameSinkProviderImplTest.*
   // TODO(40105939): Enable field trials on windows.
   // --------------------------------------------------
-  // On Android, `content_unittests` fails during `--gtest-list-tests` with
-  // no debug information.
-  // TODO(40105939): Enable field trials on android.
-  // --------------------------------------------------
   // Several memory safety issues were detected when using a sanitizer in
   // 16 different tests: Invalid downcast, type confusion and normal failure.
   // TODO(40105939): Investigate, and enable field trials with sanitizers.

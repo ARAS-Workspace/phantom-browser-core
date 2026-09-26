@@ -195,9 +195,6 @@ class SnapshotBrowserTest : public ContentBrowserTest {
   }
 };
 
-// Even the single-window test doesn't work on Android yet. It's expected
-// that the multi-window tests would never work on that platform.
-
 namespace {
 
 std::string SkColorToHtmlColor(SkColor k) {

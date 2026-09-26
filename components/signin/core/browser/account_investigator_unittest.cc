@@ -411,7 +411,6 @@ TEST_F(AccountInvestigatorTest, TryPeriodicReportWithPrimarySync) {
       /*expected_count=*/0);
 }
 
-// Android does not support unconsented primary accounts.
 TEST_F(AccountInvestigatorTest, TryPeriodicReportWithUnconsentedPrimary) {
   investigator()->Initialize();
 

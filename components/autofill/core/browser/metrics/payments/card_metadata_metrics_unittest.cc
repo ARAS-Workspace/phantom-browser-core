@@ -574,10 +574,6 @@ TEST_P(CardMetadataLatencyMetricsTest, LogMetrics) {
       2000, 1);
 }
 
-// Skip metrics test for card benefits on Android, since currently benefit is
-// only suppoerted on desktop.
-// TODO(crbug.com/332559112): Remove the platform check after Android is
-// supported.
 // TODO(crbug.com/346399130): Reduce the amount of '_ONCE' metric tests.
 // Params:
 // 1. Benefit source of the card with a benefit available.

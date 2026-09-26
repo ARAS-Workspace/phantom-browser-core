@@ -499,8 +499,6 @@ void PrefProvider::DiscardOrMigrateObsoletePreferences() {
     return;
   }
 
-  // These prefs were never stored on Android so they don't need to be
-  // deleted.
   prefs_->ClearPref(kObsoleteInstalledWebAppMetadataExceptionsPref);
   prefs_->ClearPref(kObsoletePpapiBrokerExceptionsPref);
   prefs_->ClearPref(

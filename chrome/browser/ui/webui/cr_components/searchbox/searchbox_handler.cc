@@ -783,7 +783,6 @@ SearchboxHandler::CreateAutocompleteMatch(
           AutocompleteMatch::EnterpriseSearchAggregatorType::PEOPLE;
   if (!match.from_keyword) {
     for (const auto& action : match.actions) {
-      // TODO(b/544764632): Implement Pedals for Android.
       std::string icon_path;
       if (action->GetIconImage().IsEmpty()) {
         icon_path = AutocompleteIconToResourceName(action->GetVectorIcon());

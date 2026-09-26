@@ -36,8 +36,6 @@
 
 namespace {
 
-// SearchBox is not supported on Android.
-
 using ChromeContentRendererClientSearchBoxTest = ChromeRenderViewTest;
 
 const char kHtmlWithIframe[] ="<iframe srcdoc=\"Nothing here\"></iframe>";

@@ -405,7 +405,6 @@ void CookiesGetFunction::GetCookieListCallback(
 }
 
 void CookiesGetFunction::NotifyExtensionTelemetry() {
-  // TODO(crbug.com/371423073): Support telemetry on Android.
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   auto* telemetry_service =
       safe_browsing::ExtensionTelemetryServiceFactory::GetForProfile(
@@ -514,7 +513,6 @@ void CookiesGetAllFunction::GetCookieListCallback(
 }
 
 void CookiesGetAllFunction::NotifyExtensionTelemetry() {
-  // TODO(crbug.com/371423073): Support telemetry on Android.
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   auto* telemetry_service =
       safe_browsing::ExtensionTelemetryServiceFactory::GetForProfile(

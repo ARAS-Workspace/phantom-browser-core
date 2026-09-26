@@ -69,9 +69,6 @@ void AddVoters(GraphImpl* graph, PrefService* pref_service) {
   if (auto* priority_voting_system =
           graph->GetRegisteredObjectAs<
               execution_context_priority::PriorityVotingSystem>()) {
-    // Disabled on Android because most of the prioritization logic still lives
-    // in ChildProcessLauncherHelperImpl.
-    // TODO(b/400850388): Enable voters on Android.
     const auto policy_settings =
         PerformanceManagerImpl::GetProcessPriorityPolicySettings();
     // When a frame is visible, casts either a USER_BLOCKING or USER_VISIBLE

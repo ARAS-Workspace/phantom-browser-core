@@ -1123,7 +1123,6 @@ IN_PROC_BROWSER_TEST_F(SurfaceEmbedBrowserTest,
                                         child_contents->GetPrimaryMainFrame());
   EXPECT_TRUE(content::ExecJs(child_contents.get(),
                               "document.querySelector('select').showPicker()"));
-  // Android sometimes times out when waiting for the popup.
   waiter.Wait();
 }
 

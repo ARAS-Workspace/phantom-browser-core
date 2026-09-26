@@ -935,8 +935,6 @@ TEST_F(OmniboxMetricsProviderTest, RecordMetrics_CrossDeviceTab) {
   }
 }
 
-// TODO(b/261895038): This test is flaky on android.  Currently scoring signals
-// logging is only enabled on desktop, so disable for mobile.
 TEST_F(OmniboxMetricsProviderTest, LogScoringSignals) {
   // Enable feature flag to log scoring signals.
   OmniboxFieldTrial::ScopedMLConfigForTesting scoped_ml_config;

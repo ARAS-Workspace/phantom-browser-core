@@ -49,7 +49,7 @@ TEST(PaintPreviewSubsetFontTest, TestBasicSubset) {
 }
 
 // TODO(crbug.com/40198064): Investigate removing the early exits for
-// unsupported variation fonts on at least Linux/Android.
+// unsupported variation fonts on at least Linux.
 #if BUILDFLAG(IS_LINUX)
 
 namespace {

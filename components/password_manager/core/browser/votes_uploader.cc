@@ -604,11 +604,6 @@ void VotesUploader::SetInitialHashValueOfUsernameField(
 }
 
 void VotesUploader::MaybeSendSingleUsernameVotes() {
-  // UFF votes are not sent on Android, since it wasn't possible to edit the
-  // username in prompt before UFF was launched. Later, password edit dialog
-  // was added, but Android votes were never evaluated.
-  // TODO(crbug.com/40279590): Verify if the votes are produced as expected on
-  // Android and enable UFF voting.
   bool should_send_votes =
       (should_send_username_first_flow_votes_ ||
        std::ranges::any_of(single_username_votes_data_,

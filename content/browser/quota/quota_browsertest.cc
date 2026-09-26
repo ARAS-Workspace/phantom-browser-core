@@ -41,7 +41,6 @@ class QuotaBrowserTest : public ContentBrowserTest {
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-// TODO(crbug.com/40488499): Android does not support PRE_ tests.
 IN_PROC_BROWSER_TEST_F(QuotaBrowserTest, PRE_QuotaDatabaseBootstrapTest) {
   base::ScopedAllowBlockingForTesting allow_blocking;
 

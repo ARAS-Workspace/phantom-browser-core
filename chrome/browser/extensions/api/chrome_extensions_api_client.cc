@@ -167,7 +167,6 @@ bool ChromeExtensionsAPIClient::ShouldHideBrowserNetworkRequest(
       request.initiator ==
           url::Origin::Create(chrome::ChromeUINewTabPageURLAsGURL());
 
-  // Android does not support instant.
   // Hide requests made by the NTP Instant renderer.
   auto* instant_service =
       context
@@ -398,7 +397,6 @@ MessagingDelegate* ChromeExtensionsAPIClient::GetMessagingDelegate() {
   return messaging_delegate_.get();
 }
 
-// The APIs that require these methods are not supported on Android.
 FileSystemDelegate* ChromeExtensionsAPIClient::GetFileSystemDelegate() {
   if (!file_system_delegate_) {
     file_system_delegate_ = std::make_unique<ChromeFileSystemDelegate>();

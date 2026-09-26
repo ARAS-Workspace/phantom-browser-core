@@ -729,8 +729,6 @@ TEST_F(RealTimeUrlLookupServiceTest, LocalIpAndDnsResolutionCompletes) {
   ASSERT_EQ(result->referrer_chain(0).ip_addresses_size(), 1);
   EXPECT_EQ(result->referrer_chain(0).ip_addresses(0), "192.168.1.1");
 
-  // TODO(crbug.com/394602691): Remove Android build exclusion once IP address
-  // support becomes a requirement for Android devices.
   EXPECT_FALSE(result->local_ips().empty());
 
   histogram_tester.ExpectUniqueSample(

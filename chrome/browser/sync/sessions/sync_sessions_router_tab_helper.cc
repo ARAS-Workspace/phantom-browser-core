@@ -40,12 +40,6 @@ SyncSessionsRouterTabHelper::SyncSessionsRouterTabHelper(
 }
 
 SyncSessionsRouterTabHelper::~SyncSessionsRouterTabHelper() {
-  // Android and desktop intentionally have divergent behavior. The core
-  // requirement is that NotifyTabClosed() is called when the list of tabs that
-  // will be synced has been updated to no longer include the close tab. On
-  // Desktop the TabFeatures are destroyed first. Thus NotifyTabClosed() must be
-  // called by another class (see BrowserListRouterHelper). On Android the list
-  // is updated first, thus it's safe to call NotifyTabClosed() here.
   if (favicon_driver_) {
     favicon_driver_->RemoveObserver(this);
   }

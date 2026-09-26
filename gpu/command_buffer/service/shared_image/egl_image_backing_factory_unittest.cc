@@ -434,8 +434,6 @@ TEST_P(EGLImageBackingFactoryThreadSafeTest, UploadReadback) {
 
 #if BUILDFLAG(USE_DAWN) && BUILDFLAG(DAWN_ENABLE_BACKEND_OPENGLES)
 
-// TODO(crbug.com/332947916): fix these tests to run on Android/GLES
-
 // Test to check interaction between Dawn and skia GL representations.
 TEST_P(EGLImageBackingFactoryThreadSafeTest, Dawn_SkiaGL) {
   // Find a Dawn GLES adapter

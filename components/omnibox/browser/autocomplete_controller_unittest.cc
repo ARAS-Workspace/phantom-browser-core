@@ -630,8 +630,6 @@ TEST_F(AutocompleteControllerTest, UpdateResult_Ranking) {
                   "800",
               }));
 
-  // Android doesn't use the same grouping logic as desktop
-
   // Searches should be grouped above non-shortcut-boosted URLs.
   EXPECT_THAT(controller_.SimulateCleanAutocompletePass({
                   CreateSearchMatch("search900", true, 900),
@@ -859,8 +857,6 @@ TEST_F(AutocompleteControllerTest, UpdateResult_ZPSEnabledAndShownInSession) {
   }
 }
 
-// Android isn't ready for ML and won't pass this test because it has its own
-// grouping code.
 TEST_F(AutocompleteControllerTest, MlRanking) {
   OmniboxFieldTrial::ScopedMLConfigForTesting scoped_ml_config;
   scoped_ml_config.GetMLConfig().ml_url_scoring = true;
@@ -2051,8 +2047,6 @@ TEST_F(AutocompleteControllerTest, UpdateResult_ForceAllowedToBeDefault) {
   }
 }
 
-// Feature not enabled on Android.
-
 TEST_F(AutocompleteControllerTest, ExtraHeaders) {
   // Populate TemplateURLService with a keyword.
   {
@@ -2451,7 +2445,6 @@ TEST_F(AutocompleteControllerTest,
 }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-// Android has different handling for pedals.
 TEST_F(AutocompleteControllerTest, NoActionsAttachedToLensSearchboxMatches) {
   std::unordered_map<OmniboxPedalId, scoped_refptr<OmniboxPedal>> pedals;
   const auto add = [&](OmniboxPedal* pedal) {
@@ -2509,7 +2502,6 @@ TEST_F(AutocompleteControllerTest, NoActionsAttachedToLensSearchboxMatches) {
       controller_.internal_result_.match_at(2)->has_tab_match.value_or(false));
 }
 
-// Android has different handling for pedals.
 TEST_F(AutocompleteControllerTest, NoActionsAttachedToNtpComposeboxMatches) {
   // Create input with lens searchbox page classification.
   controller_.input_ = AutocompleteInput(

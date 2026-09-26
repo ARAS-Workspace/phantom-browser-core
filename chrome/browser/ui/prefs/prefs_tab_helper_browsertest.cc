@@ -80,9 +80,7 @@ IN_PROC_BROWSER_TEST_F(PrefsTabHelperBrowserTest, WebPrefs) {
 }
 
 // Tests that changes in browser preferences are reflected in Blink's web
-// preferences. Note that these preferences are not handled on non-desktop
-// Android, see http://crbug.com/40337093, but can be modified by extension APIs
-// on desktop Android.
+// preferences.
 IN_PROC_BROWSER_TEST_F(PrefsTabHelperBrowserTest, GenericFontFamilies) {
   PrefService* prefs = chrome_test_utils::GetProfile(this)->GetPrefs();
   prefs->SetString(prefs::kWebKitStandardFontFamily, "CustomStandard");

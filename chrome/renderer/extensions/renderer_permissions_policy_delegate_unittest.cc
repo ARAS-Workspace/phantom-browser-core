@@ -76,7 +76,6 @@ TEST_F(RendererPermissionsPolicyDelegateTest, CannotScriptWebstore) {
   scoped_refptr<const Extension> extension(CreateTestExtension("a"));
   std::string error;
 
-  // Android does not support kInstantUsesSpareRenderer.
   if (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
     // If the feature is enabled, we use is_instant_process flag to check.
     // We need to set the process state to bypass the CHECK as the test code
@@ -103,7 +102,6 @@ TEST_F(RendererPermissionsPolicyDelegateTest, CannotScriptInInstantProcess) {
   scoped_refptr<const Extension> extension(CreateTestExtension("a"));
   std::string error;
 
-  // Android does not support kInstantUsesSpareRenderer.
   if (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
     // Pretend we are in the instant process by overriding the instant process
     // param. We should not be able to execute script.

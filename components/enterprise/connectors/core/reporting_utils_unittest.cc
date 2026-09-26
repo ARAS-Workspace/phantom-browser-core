@@ -506,8 +506,6 @@ TEST(ReportingUtilsTest, GetDataControlsSensitiveDataEvent) {
 
 TEST(ReportingUtilsTest, TestEventLocalIp) {
   std::vector<std::string> local_ips = GetLocalIpAddresses();
-  // TODO(crbug.com//394602691): Remove Android build exclusion once IP address
-  // support becomes a requirement for Android devices.
   EXPECT_FALSE(local_ips.empty());
   for (const auto& ip_address : local_ips) {
     std::optional<net::IPAddress> local_ip =

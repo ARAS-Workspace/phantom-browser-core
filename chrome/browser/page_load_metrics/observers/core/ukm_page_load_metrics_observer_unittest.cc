@@ -2710,7 +2710,6 @@ TEST_F(UkmPageLoadMetricsObserverTest, IsNewBookmark) {
       entry, PageLoad::kIsNewBookmarkName, 1);
 }
 
-// Android does not have NTP Custom Links.
 TEST_F(UkmPageLoadMetricsObserverTest, IsNTPCustomLink) {
   GURL url(kTestUrl1);
 

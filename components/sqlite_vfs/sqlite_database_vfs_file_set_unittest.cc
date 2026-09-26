@@ -123,8 +123,7 @@ TEST_P(SqliteVfsFileSetTest, FilesCanBeDeleted) {
   ASSERT_PRED1(base::IsDirectoryEmpty, GetTempDir());
 }
 
-// Multiprocess tests are not supported on non-blink platforms (i.e., iOS), and
-// they don't work from this test harness on Android.
+// Multiprocess tests are not supported on non-blink platforms (i.e., iOS).
 #if BUILDFLAG(USE_BLINK)
 
 static constexpr std::string_view kDirectorySwitch = "directory";

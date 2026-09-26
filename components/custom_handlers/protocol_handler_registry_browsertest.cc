@@ -121,7 +121,6 @@ IN_PROC_BROWSER_TEST_F(RegisterProtocolHandlerBrowserTest, CustomHandler) {
   ASSERT_EQ(handler_url, web_contents()->GetLastCommittedURL());
 }
 
-// https://crbug.com/178097: Implement registerProtocolHandler on Android
 IN_PROC_BROWSER_TEST_F(RegisterProtocolHandlerBrowserTest,
                        IgnoreRequestWithoutUserGesture) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -179,7 +178,6 @@ IN_PROC_BROWSER_TEST_F(RegisterProtocolHandlerBrowserTest, FencedFrame) {
   ASSERT_EQ(0u, registry->GetHandlersFor(url.GetScheme()).size());
 }
 
-// https://crbug.com/178097: Implement registerProtocolHandler on Android
 class RegisterProtocolHandlerAndServiceWorkerInterceptor
     : public RegisterProtocolHandlerBrowserTest {
  public:

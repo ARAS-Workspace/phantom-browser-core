@@ -2180,5 +2180,3 @@ TEST(AutocompleteGrouperSectionsTest, DesktopComposeboxZpsSection) {
         {96, 95, 93});
   }
 }
-
-// Test that (on Android) sections are grouped by Search vs URL.

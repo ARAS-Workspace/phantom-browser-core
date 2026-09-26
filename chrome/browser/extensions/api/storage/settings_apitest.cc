@@ -855,8 +855,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionCorruptLocalSettingsApiTest, ReadInvalidJSON) {
   ASSERT_TRUE(after_repair_result_listener.WaitUntilSatisfied());
 }
 
-// TODO(crbug.com/480952785): PRE_ tests with local state seem flaky on android.
-
 // Tests that setting data via chrome.storage.local, restarting the browser, and
 // then discovering data corruption upon the next read after restart results in
 // an error for the read request. The PRE_ test sets up the initial DB

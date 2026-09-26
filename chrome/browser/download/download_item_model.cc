@@ -169,7 +169,7 @@ DownloadItemModelData* DownloadItemModelData::GetOrCreate(
 DownloadItemModelData::DownloadItemModelData() = default;
 
 // This is for sending download reports from the download bubble UI on
-// desktop, so it is not needed on Android.
+// desktop.
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 void MaybeSendDownloadReport(bool did_proceed,
                              download::DownloadItem* download) {
@@ -966,9 +966,6 @@ bool DownloadItemModel::ShouldShowInBubble() const {
 }
 
 bool DownloadItemModel::IsEphemeralWarning() const {
-  // On Android, insecure downloads display a InsecureDownloadDialog prior to
-  // the download and do not display any warning in the UI, so there is no
-  // associated warning message to hide/cancel.
   switch (GetInsecureDownloadStatus()) {
     case download::DownloadItem::InsecureDownloadStatus::BLOCK:
     case download::DownloadItem::InsecureDownloadStatus::WARN:

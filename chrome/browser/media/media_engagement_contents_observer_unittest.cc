@@ -39,7 +39,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/features.h"
 
-// TODO(crbug.com/40099090) All these tests crash on Android
 class MediaEngagementContentsObserverTest
     : public ChromeRenderViewHostTestHarness {
  public:

@@ -208,7 +208,6 @@ std::string GetGooglePasswordManagerSubPageURLStr() {
                        chrome::kPasswordManagerSubPage});
 }
 
-// Navigation is handled differently on Android.
 void TriggerManagePasswordsPerceptionSurvey(BrowserWindowInterface* browser,
                                             ManagePasswordsReferrer referrer) {
   Profile* profile = browser->GetProfile();

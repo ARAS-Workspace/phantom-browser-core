@@ -53,17 +53,11 @@ void PrefMetricsService::RecordHomePageLaunchMetrics(bool show_home_button,
 }
 
 void PrefMetricsService::RecordLaunchPrefs() {
-  // On Android, determining whether the homepage is enabled requires waiting
-  // for a response from a third party provider installed on the device.  So,
-  // it will be logged later once all the dependent information is available.
-  // See DeferredStartupHandler.java.
   GURL homepage_url(prefs_->GetString(prefs::kHomePage));
   RecordHomePageLaunchMetrics(prefs_->GetBoolean(prefs::kShowHomeButton),
                               prefs_->GetBoolean(prefs::kHomePageIsNewTabPage),
                               homepage_url);
 
-  // Tab restoring is always done on Android, so these metrics are not
-  // applicable.  Also, startup pages are not supported on Android.
   int restore_on_startup = prefs_->GetInteger(prefs::kRestoreOnStartup);
   UMA_HISTOGRAM_ENUMERATION(
       "Settings.StartupPageLoadSettings2", restore_on_startup,

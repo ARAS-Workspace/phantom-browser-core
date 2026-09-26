@@ -157,10 +157,9 @@ SkiaOutputDeviceGL::SkiaOutputDeviceGL(
       kRGBA_F16_SkColorType;
 
   if (features::UseGpuVsync()) {
-    // Historically we never disabled vsync on Android and it's very rare
-    // use-case to have multiple active windows there. On other platforms we
-    // disable GLSurface's VSync if we're swapping multiple surfaces per frame
-    // to prevent SwapBuffers from blocking and slowing down other windows.
+    // We disable GLSurface's VSync if we're swapping multiple surfaces per
+    // frame to prevent SwapBuffers from blocking and slowing down other
+    // windows.
     multisurface_swapbuffers_tracker_ =
         std::make_unique<MultiSurfaceSwapBuffersTracker>();
   } else {

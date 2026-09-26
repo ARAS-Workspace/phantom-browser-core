@@ -2072,7 +2072,6 @@ TEST_F(BindUnretainedDanglingTest, UnretainedRefUnsafeDanglingUntriaged) {
   // the we marked the reference as `UnsafeDanglingUntriaged`.
 }
 
-// Death tests misbehave on Android, http://crbug.com/643760.
 #if defined(GTEST_HAS_DEATH_TEST)
 
 int FuncWithRefArgument(int& i_ptr) {

@@ -13,8 +13,6 @@
 // TODO(crbug.com/40267942): This code is not related to the metrics
 // infrastructure and should be moved to a new home.
 
-// ShutdownWatcherHelper is not available on Android.
-
 namespace {
 base::TimeDelta GetPerChannelTimeout(base::TimeDelta duration) {
   base::TimeDelta actual_duration = duration;

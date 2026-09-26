@@ -19,9 +19,6 @@
 #include "device/fido/virtual_fido_device_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-// Authenticator tests do not work on Android because there is not currently a
-// way to install a virtual authenticator.
-
 // TODO(crbug.com/40870879): Temporarily disable the tests on macOS since they
 // do not yet work with current WebAuthn UI.
 #if !BUILDFLAG(IS_MAC)

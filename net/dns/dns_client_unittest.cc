@@ -200,9 +200,6 @@ TEST_F(DnsClientTest, InsecureEnabledPlatformNoSystem) {
   EXPECT_TRUE(client_->CanQueryAdditionalTypesViaInsecureDns());
 }
 
-// InsecureDnsMode::{kEnabledPlatform, kEnabledPlatformNoSystem} are currently
-// only supported on Android.
-
 TEST_F(DnsClientTest, UnhandledOptions) {
   client_->SetInsecureEnabled(InsecureDnsMode::kEnabledBuiltIn,
                               /*additional_types_enabled=*/true);

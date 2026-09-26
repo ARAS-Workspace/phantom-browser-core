@@ -2054,8 +2054,6 @@ SANDBOX_TEST(SandboxBPF, DISABLE_ON_TSAN(SeccompRetTrace)) {
 #endif
 }
 
-// Android does not expose pread64 nor pwrite64.
-
 bool FullPwrite64(int fd, const char* buffer, size_t count, off64_t offset) {
   while (count > 0) {
     const ssize_t transfered =

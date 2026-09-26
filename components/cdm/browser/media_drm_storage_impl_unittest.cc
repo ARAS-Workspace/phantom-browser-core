@@ -220,8 +220,6 @@ class MediaDrmStorageImplTest : public content::RenderViewHostTestHarness {
   MediaDrmOriginId origin_id_;
 };
 
-// ClearMatchingLicenses is only available on Android
-
 // Two MediaDrmStorage call Initialize concurrently. The second MediaDrmStorage
 // will NOT wait for the first one to be initialized. Both instances should get
 // the same origin ID.
@@ -427,7 +425,5 @@ TEST_F(MediaDrmStorageImplTest, DisallowEmptyOriginId) {
 
   EXPECT_FALSE(origin_id);
 }
-
-// ClearMatchingLicenses is only available on Android
 
 }  // namespace cdm

@@ -478,10 +478,6 @@ GaiaCookieManagerService* IdentityManager::GetGaiaCookieManagerService() const {
 
 AccountInfo IdentityManager::GetAccountInfoForAccountWithRefreshToken(
     const CoreAccountId& account_id) const {
-  // TODO(crbug.com/41434401): This invariant is not currently possible to
-  // enforce on Android due to the underlying relationship between
-  // O2TS::GetAccounts(), O2TS::RefreshTokenIsAvailable(), and
-  // O2TS::Observer::OnRefreshTokenAvailable().
   DCHECK(HasAccountWithRefreshToken(account_id));
 
   AccountInfo account_info =

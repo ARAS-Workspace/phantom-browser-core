@@ -190,8 +190,6 @@ TEST_F(RenderWidgetTest, CompositorIdHitTestAPIWithImplicitRootScroller) {
                 .GetScrollableContainerId());
 }
 
-// Composition range isn't used on Android and we don't update the range through
-// ImeCompositionRangeChanged.
 TEST_F(RenderWidgetTest, GetCompositionRangeValidComposition) {
   LoadHTML(
       "<div contenteditable>EDITABLE</div>"

@@ -295,8 +295,7 @@ class RenderWidgetHostInputEventRouterTest : public testing::Test {
     browser_context_ = std::make_unique<TestBrowserContext>();
     delegate_ = std::make_unique<MockRenderWidgetHostDelegate>();
 
-    // ImageTransportFactory doesn't exist on Android. This is needed to create
-    // a RenderWidgetHostViewChildFrame in the test.
+    // This is needed to create a RenderWidgetHostViewChildFrame in the test.
     ImageTransportFactory::SetFactory(
         std::make_unique<TestImageTransportFactory>());
 

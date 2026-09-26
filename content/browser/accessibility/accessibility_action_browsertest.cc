@@ -648,10 +648,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, TextareaSetValue) {
 
   EXPECT_EQ(u"Line1\nLine2", target->GetValueForControl());
 
-  // TODO(dmazzoni): On Android we use an ifdef to disable inline text boxes,
-  // which contain all of the line break information.
-  //
-  // We should do it with accessibility flags instead. http://crbug.com/672205
   // Check that it really does contain two lines.
   ui::BrowserAccessibility::AXPosition start_position =
       target->CreateTextPositionAt(0);
@@ -681,10 +677,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
 
   EXPECT_EQ(u"Line1\nLine2", target->GetValueForControl());
 
-  // TODO(dmazzoni): On Android we use an ifdef to disable inline text boxes,
-  // which contain all of the line break information.
-  //
-  // We should do it with accessibility flags instead. http://crbug.com/672205
   // Check that it really does contain two lines.
   ui::BrowserAccessibility::AXPosition start_position =
       target->CreateTextPositionAt(0);
@@ -1087,8 +1079,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
   // The test passes if this didn't DCHECK.
 }
 
-// Action::kScrollToMakeVisible does not seem reliable on Android and we are
-// currently only using it for desktop screen readers.
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, ScrollIntoView) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
       <!DOCTYPE html>

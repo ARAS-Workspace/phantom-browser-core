@@ -110,10 +110,8 @@ IN_PROC_BROWSER_TEST_F(AccessibilityLineLayoutBrowserTest,
   ASSERT_GE(line_link_count, 2);
 }
 
-// http://crbug.com/868830 - the patch that enabled this test to pass caused a
-// performance regression.  (Android doesn't generate InlineTextBoxes
-// immediately; we can wait for them but without the aforementioned fix the
-// updated tree isn't processed to create the Next/PreviousOnLine links.)
+// http://crbug.com/868830 - the patch that enabled this test to pass caused
+// a performance regression.
 IN_PROC_BROWSER_TEST_F(AccessibilityLineLayoutBrowserTest,
                        NestedLayoutNGInlineFormattingContext) {
   ASSERT_TRUE(embedded_test_server()->Start());

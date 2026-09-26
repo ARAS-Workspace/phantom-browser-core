@@ -72,8 +72,6 @@ TEST_F(MediaToolbarButtonContextualMenuTest, ShowMenu) {
   EXPECT_TRUE(model->IsEnabledAt(0));
 }
 
-// The kMediaRouterShowCastSessionsStartedByOtherDevices pref is not registered
-// on Android.
 TEST_F(MediaToolbarButtonContextualMenuTest, ToggleOtherSessionsItem) {
   PrefService* pref_service = profile()->GetPrefs();
   pref_service->SetBoolean(

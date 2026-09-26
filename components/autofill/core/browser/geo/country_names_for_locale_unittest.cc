@@ -35,8 +35,6 @@ TEST(CountryNamesForLocaleTest, EmptyCountryCodeForInvalidLocale) {
   EXPECT_EQ("US", not_a_locale_names.GetCountryCode(u"United States"));
 }
 
-// The behavior depends on the platform. On Android the locale reverts back to
-// the standard locale.
 #define MAYBE_EmptyCountryCodeForEmptyLocale EmptyCountryCodeForEmptyLocale
 // Test that an empty string is returned for an empty locale.
 TEST(CountryNamesForLocaleTest, MAYBE_EmptyCountryCodeForEmptyLocale) {

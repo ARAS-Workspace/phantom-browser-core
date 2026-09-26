@@ -253,11 +253,6 @@ void TrustedVaultEncryptionKeysExtension::Install() {
   v8::Local<v8::Object> chrome =
       content::GetOrCreateChromeObject(isolate, context);
 
-  // On Android, there is no existing plumbing for setSyncEncryptionKeys() and
-  // setClientEncryptionKeys(), so let's not expose the Javascript function as
-  // available. Namely, TrustedVaultClientAndroid::StoreKeys() isn't implemented
-  // because there is no underlying Android API to invoke, given that sign in
-  // and reauth flows are handled outside the browser.
   chrome
       ->Set(context, gin::StringToSymbol(isolate, "setSyncEncryptionKeys"),
             gin::CreateFunctionTemplate(

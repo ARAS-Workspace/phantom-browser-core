@@ -141,8 +141,8 @@ FindFirstNodeWithAttributeTypeAndTextSubstring(
 }
 
 // This helper is only used by popup opener tests, and those tests are not
-// built on Android or Mac. Keep the helper under the same guard to
-// avoid unused-function build failures on those bots.
+// built on Mac. Keep the helper under the same guard to avoid
+// unused-function build failures on those bots.
 #if !BUILDFLAG(IS_MAC)
 const optimization_guide::proto::ContentNode* FindFirstNodeWithDomNodeId(
     const optimization_guide::proto::ContentNode& root,
@@ -1757,7 +1757,7 @@ IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestMultiProcess,
   EXPECT_EQ(0u, entries.size());
 }
 
-// Popups may be rendered as native OS-level widgets on Android and MacOS.
+// Popups may be rendered as native OS-level widgets on MacOS.
 //
 // TODO: b/450618828 - Enable on Fuchsia with proper geometry comparison.
 #if !BUILDFLAG(IS_MAC)
@@ -1868,7 +1868,7 @@ IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest, ScaleSizes) {
             window_bounds.height());
 }
 
-// Popups may be rendered as native OS-level widgets on Android and Apple OSs.
+// Popups may be rendered as native OS-level widgets on Apple OSs.
 //
 // TODO: b/450618828 - Enable on Fuchsia with proper geometry comparison.
 #if !BUILDFLAG(IS_APPLE)
@@ -2521,7 +2521,7 @@ IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest,
                       INTERACTION_DISABLED_REASON_CURSOR_NOT_ALLOWED));
 }
 
-// Popups may be rendered as native OS-level widgets on Android and MacOS.
+// Popups may be rendered as native OS-level widgets on MacOS.
 #if !BUILDFLAG(IS_MAC)
 class PageContentProtoProviderPopupBrowserTest
     : public PageContentProtoProviderBrowserTest {
@@ -3340,7 +3340,7 @@ IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest, NavigationMetrics) {
   tester.ExpectUniqueSample(kPerPageMetric, 3, 1);
 }
 
-// Popups may be rendered as native OS-level widgets on Android and Apple OSs.
+// Popups may be rendered as native OS-level widgets on Apple OSs.
 #if !BUILDFLAG(IS_APPLE)
 IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest,
                        HiddenPopupsIgnored) {

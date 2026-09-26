@@ -165,8 +165,6 @@ TEST_F(ImageDecoderImplTest, DecodeImageSizeLimit) {
     // Check that image has been shrunk appropriately
     EXPECT_LT(request.bitmap().computeByteSize() + base_msg_size,
               static_cast<uint64_t>(kTestMaxImageSize));
-    // Android does its own image shrinking for memory conservation deeper in
-    // the decode, so more specific tests here won't work.
     EXPECT_EQ(widths[i] >> i, request.bitmap().width());
     EXPECT_EQ(heights[i] >> i, request.bitmap().height());
 

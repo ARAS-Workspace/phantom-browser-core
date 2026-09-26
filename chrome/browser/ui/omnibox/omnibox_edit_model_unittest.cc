@@ -939,7 +939,6 @@ TEST_F(OmniboxEditModelPopupTest, PopupStepSelection) {
   EXPECT_EQ(Selection(5, Selection::NORMAL), model()->GetPopupSelection());
 }
 
-// Actions are not part of the selection stepping in Android at all.
 TEST_F(OmniboxEditModelPopupTest, PopupStepSelectionWithActions) {
   omnibox_feature_configs::ScopedConfigForTesting<
       omnibox_feature_configs::Toolbelt>
@@ -1188,7 +1187,6 @@ TEST_F(OmniboxEditModelPopupTest, ResetFocusOnResultChange) {
             OmniboxPopupSelection(0u, Selection::NORMAL));
 }
 
-// Android handles actions and metrics differently from other platforms.
 TEST_F(OmniboxEditModelPopupTest, OpenActionSelectionLogsOmniboxEvent) {
   base::HistogramTester histogram_tester;
   ACMatches matches;

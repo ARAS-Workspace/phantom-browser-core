@@ -912,10 +912,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
       GetPrefs(0)->GetBoolean(sync_preferences::kSyncablePrefForTesting));
 }
 
-// TODO(crbug.com/40200835): PRE_ tests are now supported on Android, however
-// ShouldClearAccountDataOnStartupIfSignInAllowedBitChanged and
-// ShouldClearAccountDataOnStartupIfAccountStateChanged fail on Android
-// and it is unclear as to why they are still failing.
 IN_PROC_BROWSER_TEST_P(
     SingleClientPreferencesWithAccountStorageSyncTest,
     PRE_ShouldClearAccountDataOnStartupIfSignInAllowedBitChanged) {
@@ -1282,8 +1278,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageMergeSyncTest,
                 sync_preferences::kSyncableMergeableListPrefForTesting),
             updated_value);
 }
-
-// Preference tracking is not required on android and chromeos.
 
 const char* kProtectedPrefName = prefs::kShowHomeButton;
 const char* kUnprotectedPrefName = prefs::kShowForwardButton;
@@ -1816,7 +1810,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientFeatureListEarlyAccessTest,
   ASSERT_TRUE(SetupClients());
 }
 
-// Sync-the-feature is no longer supported on Android.
 class
     SingleClientPreferencesWithoutShouldUseSelectedTypesAndWithoutAccountStorageSyncTest
     : public SingleClientPreferencesSyncTest {
@@ -1955,8 +1948,6 @@ IN_PROC_BROWSER_TEST_P(
                   .Wait());
 }
 
-// TODO(crbug.com/467211652): Investigate why these PRE_ test is not yet
-// supported on Android.
 class SingleClientPreferencesWithoutShouldUseSelectedTypesSyncTest
     : public SingleClientPreferencesWithAccountStorageSyncTest {
  public:

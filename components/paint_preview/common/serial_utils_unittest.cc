@@ -103,8 +103,6 @@ TEST(PaintPreviewSerialUtils, TestSerialPictureNotInMap) {
             nullptr);
 }
 
-// Skip this on Android as we only have system fonts in this test and Android
-// doesn't serialize those.
 TEST(PaintPreviewSerialUtils, TestSerialTypeface) {
   PictureSerializationContext picture_ctx;
 

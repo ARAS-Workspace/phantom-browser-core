@@ -494,8 +494,6 @@ void DumpAccessibilityTestBase::RunTest(
   // an object) because it makes test output change based on the mouse position.
   ui::BrowserAccessibility::ignore_hovered_state_for_testing_ = true;
 
-  // For Android, set a consistent user preference for how password display.
-
   // Normally some accessibility events that would be fired are suppressed or
   // delayed, depending on what has focus or the type of event. For testing,
   // we want all events to fire immediately to make tests predictable and not

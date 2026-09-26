@@ -74,9 +74,7 @@ AutoPictureInPictureTabHelper::AutoPictureInPictureTabHelper(
                 base::Unretained(this)));
   }
 
-  // On non-Android platforms, we observe the internal AudioFocusManager to
-  // track audio focus state. Android has a native system-wide AudioManager,
-  // so this observer is never notified and is not used.
+  // We observe the internal AudioFocusManager to track audio focus state.
   // Connect to receive audio focus events.
   mojo::Remote<media_session::mojom::AudioFocusManager> audio_focus_remote;
   content::GetMediaSessionService().BindAudioFocusManager(
@@ -484,9 +482,6 @@ void AutoPictureInPictureTabHelper::OnFocusLost(
 
 void AutoPictureInPictureTabHelper::MediaSessionInfoChanged(
     media_session::mojom::MediaSessionInfoPtr session_info) {
-  // On Android, audio focus is managed by the operating system. The
-  // MediaSession state is the source of truth as it reflects focus changes from
-  // the Android system's AudioManager.
   const bool is_playing =
       session_info && session_info->playback_state ==
                           media_session::mojom::MediaPlaybackState::kPlaying;

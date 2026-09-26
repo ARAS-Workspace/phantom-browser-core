@@ -201,7 +201,6 @@ class SecurePaymentConfirmationAppFactoryTest : public testing::Test {
 
  private:
   crypto::ScopedFakeUnexportableKeyProvider scoped_key_provider_;
-  // MockContentPaymentRequestDelegate is not available on Android.
   MockContentPaymentRequestDelegate mock_content_payment_request_delegate_;
 };
 

@@ -264,7 +264,6 @@ class RenderWidgetHostTouchEmulatorBrowserTest : public ContentBrowserTest {
   const base::TimeDelta simulated_event_time_delta_;
 };
 
-// Synthetic mouse events not allowed on Android.
 // This test makes sure that TouchEmulator doesn't emit a GestureScrollEnd
 // without a valid unique_touch_event_id when it sees a GestureFlingStart
 // terminating the underlying mouse scroll sequence. If the GestureScrollEnd is
@@ -571,9 +570,9 @@ IN_PROC_BROWSER_TEST_F(RenderWidgetHostSitePerProcessTest,
   EXPECT_TRUE(filter->allowed_touch_action().has_value());
 }
 
-// The plumbing that this test is verifying is not utilized on Mac/Android,
-// where popup menus don't create a popup RenderWidget, but rather they trigger
-// a FrameHostMsg_ShowPopup to ask the browser to build and display the actual
+// The plumbing that this test is verifying is not utilized on Mac, where
+// popup menus don't create a popup RenderWidget, but rather they trigger a
+// FrameHostMsg_ShowPopup to ask the browser to build and display the actual
 // popup using native controls.
 #if !BUILDFLAG(IS_MAC)
 

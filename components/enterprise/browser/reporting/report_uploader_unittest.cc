@@ -163,7 +163,6 @@ class ReportUploaderTestWithReportType
   ReportType GetReportType() override { return GetParam(); }
 };
 
-// TODO(crbug.com/40483507) This death test does not work on Android.
 #if defined(GTEST_HAS_DEATH_TEST)
 TEST_F(ReportUploaderTest, NotRegisteredCrashes) {
   CreateUploader(/* retry_count = */ 1);

@@ -37,7 +37,6 @@ TEST(PartitionAllocSupportTest,
 #endif
 }
 
-// - Death tests misbehave on Android, http://crbug.com/643760.
 #if PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS) && \
     defined(GTEST_HAS_DEATH_TEST)
 
@@ -105,8 +104,6 @@ TEST(PartitionAllocDanglingPtrChecks, FreeNotRecorded) {
             HasSubstr("[DanglingPtr](3/3) Later, the dangling raw_ptr was "
                       "released at:")));
 }
-
-// TODO(crbug.com/40260713): Check for leaked refcount on Android.
 
 // Getting the same allocation reported twice in a row, without matching
 // `DanglingRawPtrReleased` in between is unexpected. Make sure this kind of

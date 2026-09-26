@@ -65,7 +65,6 @@ GURL GetFaviconURL(const char* path) {
   return GURL(chrome::kChromeUIFaviconURL).ReplaceComponents(replace_path);
 }
 
-// Android does not support the socket API or its permission.
 bool CheckSocketPermission(scoped_refptr<Extension> extension,
                            SocketPermissionRequest::OperationType type,
                            const char* host,

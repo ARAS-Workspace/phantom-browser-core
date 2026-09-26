@@ -424,7 +424,6 @@ TEST_F(PrerenderHostTest, DontCancelPrerenderWhenTriggerGetsVisible) {
   ExpectFinalStatus(PrerenderFinalStatus::kActivated);
 }
 
-// Skip this test on Android as it doesn't support the OCCLUDED state.
 TEST_F(PrerenderHostTest, DontCancelPrerenderWhenTriggerGetsOcculded) {
   const GURL kPrerenderingUrl = GURL("https://example.com/empty.html");
   const PrerenderHostId prerender_host_id = registry().CreateAndStartHost(

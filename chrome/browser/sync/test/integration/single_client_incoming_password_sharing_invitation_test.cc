@@ -406,8 +406,6 @@ IN_PROC_BROWSER_TEST_P(
       /*expected_bucket_count=*/1);
 }
 
-// TODO(crbug.com/358053884): enable on Android once transport mode for
-// Passwords is supported.
 // This test verifies that Incoming Password Sharing Invitation data type is
 // stopped when the Password data type is opted out in the transport mode.
 IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,

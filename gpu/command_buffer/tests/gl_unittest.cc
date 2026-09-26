@@ -152,10 +152,6 @@ class GL3Test : public GLTest {
 // instead of the specific face target (e.g., GL_TEXTURE_CUBE_MAP_POSITIVE_X)
 // which would cause driver-side GL_INVALID_ENUM errors and result in a state
 // desynchronization between the decoder and the GPU driver.
-//
-// TODO(crbug.com/513543143): Goldfish GLES emulator driver on 32-bit x86
-// Android bots has a known driver bug where it incorrectly rejects
-// glCopyTexImage2D on cubemaps with GL_INVALID_ENUM.
 TEST_F(GL3Test, CopyTexImage2DCubeMapStateDesync) {
   GLuint tex = 0;
   glGenTextures(1, &tex);

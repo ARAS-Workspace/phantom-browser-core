@@ -276,7 +276,6 @@ void DisplayMediaAccessHandler::HandleRequest(
     }
   }
 
-  // Screen capture is not supported on Android.
   HostContentSettingsMap* content_settings =
       HostContentSettingsMapFactory::GetForProfile(
           web_contents->GetBrowserContext());

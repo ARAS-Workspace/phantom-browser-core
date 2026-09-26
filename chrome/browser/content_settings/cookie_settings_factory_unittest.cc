@@ -117,8 +117,6 @@ TEST_F(CookieSettingsFactoryTest, IncognitoBehaviorOfBlockingEverything) {
       net::CookieSettingOverrides(), /*cookie_partition_key=*/std::nullopt));
 }
 
-// Android does not have guest profiles.
-
 // Tests that cookie blocking is not enabled by default for guest profiles.
 TEST_F(CookieSettingsFactoryTest, GuestProfile) {
   TestingProfile::Builder guest_profile_builder;
