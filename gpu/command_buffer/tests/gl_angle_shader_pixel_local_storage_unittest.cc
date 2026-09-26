@@ -23,14 +23,6 @@ class ANGLEShaderPixelLocalStorageTest : public testing::Test {
 
  protected:
   void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    auto* command_line = base::CommandLine::ForCurrentProcess();
-    if (gles2::UsePassthroughCommandDecoder(command_line)) {
-      // TODO(crbug.com/40278644): fix the test for passthrough.
-      GTEST_SKIP();
-    }
-#endif
-
     GLManager::Options options;
     options.context_type = CONTEXT_TYPE_OPENGLES3;
     gl_.Initialize(options);

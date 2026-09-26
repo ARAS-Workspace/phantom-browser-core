@@ -67,159 +67,6 @@ base::SafeRef<PermissionRequest> PermissionRequest::GetSafeRef() {
   return weak_factory_.GetSafeRef();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-PermissionRequest::AnnotatedMessageText::AnnotatedMessageText(
-    std::u16string text,
-    std::vector<std::pair<size_t, size_t>> bolded_ranges)
-    : text(text), bolded_ranges(bolded_ranges) {}
-
-PermissionRequest::AnnotatedMessageText::~AnnotatedMessageText() = default;
-
-PermissionRequest::AnnotatedMessageText
-PermissionRequest::GetDialogAnnotatedMessageText(
-    const GURL& embedding_origin) const {
-  int message_id = 0;
-  std::u16string requesting_origin_string_formatted =
-      url_formatter::FormatUrlForSecurityDisplay(
-          requesting_origin(),
-          url_formatter::SchemeDisplay::OMIT_CRYPTOGRAPHIC);
-  std::u16string embedding_origin_string_formatted =
-      url_formatter::FormatUrlForSecurityDisplay(
-          embedding_origin, url_formatter::SchemeDisplay::OMIT_CRYPTOGRAPHIC);
-
-  switch (request_type()) {
-    case RequestType::kArSession:
-      message_id = IDS_AR_INFOBAR_TEXT;
-      break;
-    case RequestType::kCameraStream:
-      message_id = IDS_MEDIA_CAPTURE_VIDEO_ONLY_INFOBAR_TEXT;
-      break;
-    case RequestType::kClipboard:
-      message_id = IDS_CLIPBOARD_INFOBAR_TEXT;
-      break;
-    case RequestType::kDiskQuota:
-      // Handled by an override in `QuotaPermissionRequest`.
-      NOTREACHED();
-    case RequestType::kFileSystemAccess:
-      NOTREACHED();
-    case RequestType::kHandTracking:
-      message_id = IDS_HAND_TRACKING_INFOBAR_TEXT;
-      break;
-    case RequestType::kGeolocation: {
-      message_id = IDS_GEOLOCATION_INFOBAR_TEXT;
-      if (base::FeatureList::IsEnabled(
-              content_settings::features::kApproximateGeolocationPermission)) {
-        std::optional<GeolocationPromptType> type = GetGeolocationPromptType();
-        CHECK(type.has_value());
-        switch (*type) {
-          case GeolocationPromptType::kApproximateOrPrecise:
-            message_id = IDS_GEOLOCATION_INFOBAR_TEXT;
-            break;
-          case GeolocationPromptType::kApproximateOnly:
-            message_id = IDS_GEOLOCATION_APPROXIMATE_INFOBAR_TEXT;
-            break;
-          case GeolocationPromptType::kUpgradeToPrecise:
-            message_id = IDS_GEOLOCATION_UPGRADE_INFOBAR_TEXT;
-            break;
-          default:
-            NOTREACHED();
-        }
-      }
-      break;
-    }
-    case RequestType::kIdleDetection:
-      message_id = IDS_IDLE_DETECTION_INFOBAR_TEXT;
-      break;
-    case RequestType::kLocalNetwork:
-      message_id = IDS_LOCAL_NETWORK_INFOBAR_TEXT;
-      break;
-    case RequestType::kLoopbackNetwork:
-      message_id = IDS_LOOPBACK_NETWORK_INFOBAR_TEXT;
-      break;
-    case RequestType::kMicStream:
-      message_id = IDS_MEDIA_CAPTURE_AUDIO_ONLY_INFOBAR_TEXT;
-      break;
-    case RequestType::kMidiSysex:
-      message_id = IDS_MIDI_SYSEX_INFOBAR_TEXT;
-      break;
-    case RequestType::kMultipleDownloads:
-      message_id = IDS_MULTI_DOWNLOAD_WARNING;
-      break;
-    case RequestType::kNfcDevice:
-      message_id = IDS_NFC_INFOBAR_TEXT;
-      break;
-    case RequestType::kNotifications:
-      message_id = IDS_NOTIFICATIONS_INFOBAR_TEXT;
-      break;
-    case RequestType::kSensors:
-      message_id = AreGenericSensorExtraClassesEnabled()
-                       ? IDS_MOTION_AND_LIGHT_SENSORS_INFOBAR_TEXT
-                       : IDS_MOTION_SENSORS_INFOBAR_TEXT;
-      break;
-#if BUILDFLAG(IS_ANDROID)
-    case RequestType::kProtectedMediaIdentifier:
-      message_id =
-          IDS_PROTECTED_MEDIA_IDENTIFIER_PER_ORIGIN_PROVISIONING_INFOBAR_TEXT;
-      break;
-#endif  // BUILDFLAG(IS_ANDROID)
-    case RequestType::kStorageAccess:
-      // The SA prompt does not currently bold any part of its message.
-      return AnnotatedMessageText(
-          l10n_util::GetStringFUTF16(
-              IDS_CONCAT_TWO_STRINGS_WITH_PERIODS,
-              l10n_util::GetStringFUTF16(
-                  IDS_STORAGE_ACCESS_PERMISSION_TWO_ORIGIN_PROMPT_TITLE,
-                  requesting_origin_string_formatted),
-              l10n_util::GetStringFUTF16(
-                  IDS_STORAGE_ACCESS_PERMISSION_TWO_ORIGIN_EXPLANATION,
-                  requesting_origin_string_formatted,
-                  embedding_origin_string_formatted)),
-          /*bolded_ranges=*/{});
-    case RequestType::kTopLevelStorageAccess:
-      NOTREACHED();
-    case RequestType::kVrSession:
-      message_id = IDS_VR_INFOBAR_TEXT;
-      break;
-    case RequestType::kIdentityProvider:
-      message_id = IDS_IDENTITY_PROVIDER_INFOBAR_TEXT;
-      break;
-    case RequestType::kWindowManagement:
-      message_id = IDS_WINDOW_MANAGEMENT_INFOBAR_TEXT;
-      break;
-  }
-  DCHECK_NE(0, message_id);
-
-  // Only format origins bold if it's one time allowable or on tablet (which
-  // uses a new prompt design on Clank)
-  return GetDialogAnnotatedMessageText(
-      requesting_origin_string_formatted, message_id, /*format_origin_bold=*/
-      ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET ||
-          permissions::PermissionUtil::DoesSupportTemporaryGrants(
-              GetContentSettingsType()));
-}
-
-// static
-PermissionRequest::AnnotatedMessageText
-PermissionRequest::GetDialogAnnotatedMessageText(
-    std::u16string requesting_origin_formatted_for_display,
-    int message_id,
-    bool format_origin_bold) {
-  std::vector<size_t> offsets;
-  std::u16string text = l10n_util::GetStringFUTF16(
-      message_id, {requesting_origin_formatted_for_display}, &offsets);
-
-  std::vector<std::pair<size_t, size_t>> bolded_ranges;
-  if (format_origin_bold) {
-    for (auto offset : offsets) {
-      bolded_ranges.emplace_back(
-          offset, offset + requesting_origin_formatted_for_display.length());
-    }
-  }
-
-  return AnnotatedMessageText(text, bolded_ranges);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 bool PermissionRequest::IsEmbeddedPermissionElementInitiated() const {
   return data_->IsEmbeddedPermissionElementInitiated();
 }
@@ -235,8 +82,6 @@ bool PermissionRequest::IsEligibleForHeuristicAutoGrant() const {
 std::optional<gfx::Rect> PermissionRequest::GetAnchorElementPosition() const {
   return data_->GetAnchorElementPosition();
 }
-
-#if !BUILDFLAG(IS_ANDROID)
 
 bool PermissionRequest::IsConfirmationChipSupported() {
   return permissions::IsConfirmationChipSupported(request_type());
@@ -470,7 +315,6 @@ std::u16string PermissionRequest::GetMessageTextFragment() const {
   DCHECK_NE(0, message_id);
   return l10n_util::GetStringUTF16(message_id);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::optional<std::u16string> PermissionRequest::GetAllowAlwaysText() const {
   return std::nullopt;

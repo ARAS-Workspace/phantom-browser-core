@@ -15,9 +15,7 @@
 #include "components/supervised_user/core/browser/supervised_user_log_record.h"
 #include "components/supervised_user/core/browser/supervised_user_utils.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"  // nogncheck
-#endif
 
 FamilyLinkUserMetricsProvider::~FamilyLinkUserMetricsProvider() = default;
 
@@ -27,7 +25,6 @@ bool FamilyLinkUserMetricsProvider::ProvideHistograms() {
   std::vector<supervised_user::SupervisedUserLogRecord> records;
   for (Profile* const profile :
        g_browser_process->profile_manager()->GetLoadedProfiles()) {
-#if !BUILDFLAG(IS_ANDROID)
     auto* profile_browser_collection =
       ProfileBrowserCollection::GetForProfile(profile);
     if (!FamilyLinkUserMetricsProvider::
@@ -37,7 +34,6 @@ bool FamilyLinkUserMetricsProvider::ProvideHistograms() {
       // profile.
       continue;
     }
-#endif
     records.push_back(supervised_user::SupervisedUserLogRecord::Create(
         IdentityManagerFactory::GetForProfile(profile), *profile->GetPrefs(),
         *HostContentSettingsMapFactory::GetForProfile(profile),

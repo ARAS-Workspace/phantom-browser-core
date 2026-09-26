@@ -68,15 +68,6 @@ SupervisedUserInterstitial::~SupervisedUserInterstitial() {
   web_content_handler_->MaybeCloseLocalApproval();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// static
-std::string SupervisedUserInterstitial::GetHTMLContentsWithoutApprovals(
-    const GURL& url,
-    const std::string& application_locale) {
-  return BuildErrorPageHtmlWithoutApprovals(url, application_locale);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // static
 std::string SupervisedUserInterstitial::GetHTMLContentsWithApprovals(
     SupervisedUserService* supervised_user_service,
@@ -128,15 +119,6 @@ void SupervisedUserInterstitial::RequestUrlAccessLocal(
           filtering_result_),
       filtering_result_, supervised_user_name_, std::move(callback));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void SupervisedUserInterstitial::LearnMore(base::OnceClosure open_help_page) {
-  web_content_handler_->LearnMore(std::move(open_help_page));
-  UMA_HISTOGRAM_ENUMERATION(kInterstitialCommandHistogramName,
-                            Commands::LEARN_MORE,
-                            Commands::HISTOGRAM_BOUNDING_VALUE);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void SupervisedUserInterstitial::OutputRequestPermissionSourceMetric() {
   RequestPermissionSource source;

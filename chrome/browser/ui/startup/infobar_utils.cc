@@ -31,9 +31,7 @@
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/common/content_switches.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt.h"
-#endif
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
 #include "chrome/browser/infobars/browser_infobar_manager.h"
@@ -200,7 +198,6 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
 
   OSCryptAsyncAvailabilityInfoBarDelegate::MaybeCreate(browser);
 
-#if !BUILDFLAG(IS_ANDROID)
   if (is_web_app ||
       startup_command_line.HasSwitch(switches::kNoDefaultBrowserCheck) ||
       startup_command_line.HasSwitch(switches::kNoFirstRun)) {
@@ -258,5 +255,4 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
     ShowDefaultBrowserPrompt(profile, base::DoNothing());
 #endif  // BUILDFLAG(IS_MAC)
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

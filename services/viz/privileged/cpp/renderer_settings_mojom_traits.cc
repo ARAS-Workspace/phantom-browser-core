@@ -6,10 +6,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/gfx/mojom/color_space_mojom_traits.h"
-#endif
-
 namespace mojo {
 
 // static

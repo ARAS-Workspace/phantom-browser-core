@@ -57,26 +57,13 @@ NetErrorHelperCore::NetErrorHelperCore(Delegate* delegate)
     : delegate_(delegate),
       last_probe_status_(error_page::DNS_PROBE_POSSIBLE),
       can_show_network_diagnostics_dialog_(false),
-      navigation_from_button_(NO_BUTTON)
-#if BUILDFLAG(IS_ANDROID)
-      ,
-      page_auto_fetcher_helper_(
-          std::make_unique<PageAutoFetcherHelper>(delegate->GetRenderFrame()))
-#endif
-{
-}
+      navigation_from_button_(NO_BUTTON) {}
 
 NetErrorHelperCore::~NetErrorHelperCore() = default;
 
 void NetErrorHelperCore::OnCommitLoad(FrameType frame_type, const GURL& url) {
   if (frame_type != MAIN_FRAME)
     return;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Don't need this state. It will be refreshed if another error page is
-  // loaded.
-  page_auto_fetcher_helper_->OnCommitLoad();
-#endif
 
   // Track if an error occurred due to a page button press.
   // This isn't perfect; if (for instance), the server is slow responding
@@ -102,15 +89,6 @@ void NetErrorHelperCore::ErrorPageLoadedWithFinalErrorCode() {
 
   if (page_info->page_state.is_offline_error)
     RecordEvent(error_page::NETWORK_ERROR_PAGE_OFFLINE_ERROR_SHOWN);
-
-#if BUILDFLAG(IS_ANDROID)
-  // |TrySchedule()| shouldn't be called more than once per page.
-  if (page_info->page_state.auto_fetch_allowed) {
-    page_auto_fetcher_helper_->TrySchedule(
-        false, base::BindOnce(&Delegate::SetAutoFetchState,
-                              base::Unretained(delegate_)));
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   if (page_info->page_state.download_button_shown)
     RecordEvent(error_page::NETWORK_ERROR_PAGE_DOWNLOAD_BUTTON_SHOWN);
@@ -266,13 +244,6 @@ void NetErrorHelperCore::Reload() {
   delegate_->ReloadFrame();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void NetErrorHelperCore::SetPageAutoFetcherHelperForTesting(
-    std::unique_ptr<PageAutoFetcherHelper> page_auto_fetcher_helper) {
-  page_auto_fetcher_helper_ = std::move(page_auto_fetcher_helper);
-}
-#endif
-
 void NetErrorHelperCore::ExecuteButtonPress(Button button) {
   // If there's no committed error page, should not be invoked.
   DCHECK(committed_error_page_info_);
@@ -308,16 +279,6 @@ void NetErrorHelperCore::ExecuteButtonPress(Button button) {
   }
 }
 
-void NetErrorHelperCore::SavePageForLater() {
-#if BUILDFLAG(IS_ANDROID)
-  page_auto_fetcher_helper_->TrySchedule(
-      /*user_requested=*/true, base::BindOnce(&Delegate::SetAutoFetchState,
-                                              base::Unretained(delegate_)));
-#endif
-}
+void NetErrorHelperCore::SavePageForLater() {}
 
-void NetErrorHelperCore::CancelSavePage() {
-#if BUILDFLAG(IS_ANDROID)
-  page_auto_fetcher_helper_->CancelSchedule();
-#endif
-}
+void NetErrorHelperCore::CancelSavePage() {}

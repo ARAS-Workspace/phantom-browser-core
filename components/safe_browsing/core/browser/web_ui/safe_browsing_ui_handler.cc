@@ -459,7 +459,7 @@ void SafeBrowsingUIHandler::GetDeepScans(const base::ListValue& args) {
 
 base::DictValue SafeBrowsingUIHandler::GetFormattedTailoredVerdictOverride() {
   base::DictValue override_dict;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   const char kStatusKey[] = "status";
   const char kOverrideValueKey[] = "override_value";
   const web_ui::TailoredVerdictOverrideData& override_data =
@@ -476,15 +476,14 @@ base::DictValue SafeBrowsingUIHandler::GetFormattedTailoredVerdictOverride() {
     override_dict.Set(kOverrideValueKey,
                       ToValue(*override_data.override_value));
   }
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) &&
-        // !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   return override_dict;
 }
 
 void SafeBrowsingUIHandler::SetTailoredVerdictOverride(
     const base::ListValue& args) {
   DCHECK_GE(args.size(), 2U);
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   ClientDownloadResponse::TailoredVerdict tv;
   const base::DictValue& input = args[1].GetDict();
 
@@ -504,8 +503,7 @@ void SafeBrowsingUIHandler::SetTailoredVerdictOverride(
 
   web_ui_info_singleton()->SetTailoredVerdictOverride(std::move(tv),
                                                       event_observer());
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) &&
-        // !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
   ResolveTailoredVerdictOverrideCallback(args[0].GetString());
 }
@@ -517,7 +515,7 @@ void SafeBrowsingUIHandler::GetTailoredVerdictOverride(
 
 void SafeBrowsingUIHandler::ClearTailoredVerdictOverride(
     const base::ListValue& args) {
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   web_ui_info_singleton()->ClearTailoredVerdictOverride();
 #endif
 

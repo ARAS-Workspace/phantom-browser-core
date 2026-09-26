@@ -85,10 +85,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/android/safe_browsing_referring_app_bridge_android.h"
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/safe_browsing/content/browser/password_protection/password_protection_service.h"
 #endif
@@ -438,16 +434,6 @@ SafeBrowsingServiceImpl::GetReferrerChainProviderFromBrowserContext(
   return SafeBrowsingNavigationObserverManagerFactory::GetForBrowserContext(
       browser_context);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-internal::ReferringAppInfo SafeBrowsingServiceImpl::GetReferringAppInfo(
-    content::WebContents* web_contents) {
-  // This is currently only used for the chrome://safe-browsing UI, which does
-  // not need WebAPK info.
-  return safe_browsing::GetReferringAppInfo(web_contents,
-                                            /*get_webapk_info=*/false);
-}
-#endif
 
 TriggerManager* SafeBrowsingServiceImpl::trigger_manager() const {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);

@@ -204,12 +204,6 @@ void CompositorFrameSinkImpl::BindLayerContext(
   support_->BindLayerContext(*context, std::move(settings));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void CompositorFrameSinkImpl::SetThreads(const std::vector<Thread>& threads) {
-  support_->SetThreads(/*from_untrusted_client=*/true, threads);
-}
-#endif
-
 void CompositorFrameSinkImpl::OnClientConnectionLost() {
   // The client that owns this CompositorFrameSink is either shutting down or
   // has done something invalid and the connection to the client was terminated.

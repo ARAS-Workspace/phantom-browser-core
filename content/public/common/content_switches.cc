@@ -641,10 +641,8 @@ const char kSandboxIPCProcess[]             = "sandbox-ipc";
 
 // Enables shared array buffer on desktop, gated by an Enterprise Policy.
 // TODO(crbug.com/40155376) Remove when migration to COOP+COEP is complete.
-#if !BUILDFLAG(IS_ANDROID)
 const char kSharedArrayBufferUnrestrictedAccessAllowed[] =
     "shared-array-buffer-unrestricted-access-allowed";
-#endif
 
 // Describes the file descriptors passed to a child process in the following
 // list format:
@@ -757,13 +755,6 @@ const char kUseFakeUIForMediaStream[]     = "use-fake-ui-for-media-stream";
 // Texture target for CHROMIUM_image backed video frame textures.
 const char kVideoImageTextureTarget[] = "video-image-texture-target";
 
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(INCLUDE_BOTH_V8_SNAPSHOTS)
-// Switch supplied to the renderer if the feature `kUseContextSnapshot` is
-// enabled. A switch is used as at the time the renderer needs this information
-// features have not yet been loaded.
-const char kUseContextSnapshotSwitch[] = "use-context-snapshot";
-#endif
-
 // Use the MockCertVerifier. This only works in test code.
 const char kUseMockCertVerifierForTesting[] =
     "use-mock-cert-verifier-for-testing";
@@ -872,49 +863,6 @@ const char kWebXrRuntimeOrientationSensors[] = "orientation-sensors";
 const char kWebXrRuntimeArCore[] = "arcore";
 const char kWebXrRuntimeCardboard[] = "cardboard";
 const char kWebXrRuntimeOpenXr[] = "openxr";
-
-#if BUILDFLAG(IS_ANDROID)
-// Disable Media Session API
-const char kDisableMediaSessionAPI[] = "disable-media-session-api";
-
-// Disable the locking feature of the screen orientation API.
-const char kDisableScreenOrientationLock[]  = "disable-screen-orientation-lock";
-
-// Just like kDisableSiteIsolation, but doesn't show the "stability and security
-// will suffer" butter bar warning.
-const char kDisableSiteIsolationForPolicy[] =
-    "disable-site-isolation-for-policy";
-
-// Disable timeouts that may cause the browser to die when running slowly. This
-// is useful if running with profiling (such as debug malloc).
-const char kDisableTimeoutsForProfiling[] = "disable-timeouts-for-profiling";
-
-// Enable inverting of selection handles so that they are not clipped by the
-// viewport boundaries.
-const char kEnableAdaptiveSelectionHandleOrientation[] =
-    "enable-adaptive-selection-handle-orientation";
-
-// Enable drag manipulation of longpress-triggered text selections.
-const char kEnableLongpressDragSelection[]  = "enable-longpress-drag-selection";
-
-// Prevent the offline indicator from showing.
-const char kForceOnlineConnectionStateForIndicator[] =
-    "force-online-connection-state-for-indicator";
-
-// Enables remote debug over HTTP on the specified socket name.
-const char kRemoteDebuggingSocketName[]     = "remote-debugging-socket-name";
-
-// Block ChildProcessMain thread of the renderer's ChildProcessService until a
-// Java debugger is attached.
-const char kRendererWaitForJavaDebugger[] = "renderer-wait-for-java-debugger";
-
-// Disables debug crash dumps for OOPR.
-const char kDisableOoprDebugCrashDump[] = "disable-oopr-debug-crash-dump";
-
-// Enables/disables javaless renderers based on value given.
-// "enabled" or "disabled" are valid values.
-const char kJavalessRenderers[] = "javaless-renderers";
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Enable the aggressive flushing of DOM Storage to minimize data loss.
 const char kEnableAggressiveDOMStorageFlushing[] =

@@ -107,10 +107,6 @@
 #include "ui/gfx/hdr_metadata.h"
 #include "ui/gfx/swap_result.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/viz/service/display/overlay_processor_surface_control.h"
-#endif
-
 namespace viz {
 
 namespace {
@@ -2639,12 +2635,6 @@ void SkiaRenderer::DrawTextureQuad(const TextureDrawQuad* quad,
   // avoid color changes during promotion we use the same color space for
   // compositing.
   std::optional<gfx::ColorSpace> overlay_color_space;
-#if BUILDFLAG(IS_ANDROID)
-  if (resource_provider()->IsOverlayCandidate(quad->resource_id)) {
-    overlay_color_space =
-        OverlayProcessorSurfaceControl::GetOverrideColorSpace();
-  }
-#endif
 
   // We need only RGB portion of the color space, YUV conversion handled in
   // skia.

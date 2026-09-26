@@ -33,11 +33,6 @@
 #include "google_apis/gaia/gaia_constants.h"
 #include "google_apis/gaia/gaia_id.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/internal/identity_manager/profile_oauth2_token_service_delegate_android.h"
-#include "components/signin/public/android/test_support_jni_headers/AccountManagerFacadeUtil_jni.h"
-#endif
-
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "components/signin/internal/identity_manager/mutable_profile_oauth2_token_service_delegate.h"
 #endif
@@ -647,13 +642,6 @@ void DisableAccessTokenFetchRetries(IdentityManager* identity_manager) {
       ->set_max_authorization_token_fetch_retries_for_testing(0);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void SetUpFakeAccountManagerFacade() {
-  Java_AccountManagerFacadeUtil_setUpFakeFacade(
-      base::android::AttachCurrentThread());
-}
-#endif
-
 void CancelAllOngoingGaiaCookieOperations(IdentityManager* identity_manager) {
   identity_manager->GetGaiaCookieManagerService()->CancelAll();
 }
@@ -705,7 +693,3 @@ std::optional<base::AutoReset<bool>> SetIgnoreNonOfficialApiKeysForTesting() {
 }
 
 }  // namespace signin
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(AccountManagerFacadeUtil)
-#endif

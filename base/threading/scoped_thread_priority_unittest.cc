@@ -71,7 +71,7 @@ TEST_F(ScopedThreadPriorityTest, BasicTest) {
             {
               ScopedBoostPriority scoped_boost_priority(to);
               if (will_boost_priority) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
                 // Apple priority boost doesn't reflect in the effective
                 // ThreadType.
                 EXPECT_EQ(
@@ -120,14 +120,6 @@ void TestPriorityResultingFromBoost(ThreadType initial_thread_type,
           thread_ready.Signal();
           thread_boosted.Wait();
           scoped_boostable_priority_ptr = nullptr;
-
-#if BUILDFLAG(IS_ANDROID)
-          // Apple priority boost doesn't reflect in the effective ThreadType.
-          if (will_boost_priority) {
-            EXPECT_EQ(PlatformThread::GetCurrentEffectiveThreadTypeForTest(),
-                      target_thread_type);
-          }
-#endif
         }
         EXPECT_EQ(PlatformThread::GetCurrentThreadType(), initial_thread_type);
         EXPECT_EQ(PlatformThread::GetCurrentEffectiveThreadTypeForTest(),

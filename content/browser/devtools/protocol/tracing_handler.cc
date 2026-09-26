@@ -60,10 +60,6 @@
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
 #include "third_party/inspector_protocol/crdtp/json.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/compositor_impl_android.h"
-#endif
-
 namespace content::protocol {
 
 namespace {

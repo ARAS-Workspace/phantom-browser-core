@@ -47,10 +47,6 @@ void StubPasswordManagerDriver::FillSuggestionById(
     const std::u16string& password,
     autofill::AutofillSuggestionTriggerSource suggestion_source) {}
 
-#if BUILDFLAG(IS_ANDROID)
-void StubPasswordManagerDriver::TriggerFormSubmission() {}
-#endif
-
 void StubPasswordManagerDriver::PreviewSuggestion(
     const std::u16string& username,
     const std::u16string& password) {}

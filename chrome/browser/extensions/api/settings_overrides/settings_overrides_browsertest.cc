@@ -14,7 +14,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/command_line.h"
 #include "base/containers/to_vector.h"
 #include "base/run_loop.h"
@@ -49,7 +48,6 @@
 #include "extensions/common/feature_switch.h"
 #include "extensions/common/features/feature_channel.h"
 #include "extensions/common/switches.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 

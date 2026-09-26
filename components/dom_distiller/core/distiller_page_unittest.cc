@@ -266,42 +266,6 @@ TEST_F(DistillerPageTest, ReadabilityObjectIsExtracted_FailureWhenNotDict) {
                                        1);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(DistillerPageTest, DistillationFailsWhenMinContentLengthNotMet) {
-  base::DictValue readability_result;
-  const std::string title = "test_title";
-  readability_result.Set(kReadabilityTitle, title);
-  const std::string content = "test content";
-  readability_result.Set(kReadabilityContent, content);
-  const std::string dir = "ltr";
-  readability_result.Set(kReadabilityDir, dir);
-  const std::string text_content =
-      "one two; three. four!  fivefive six, seven, eight nine ten";
-  readability_result.Set(kReadabilityTextContent, text_content);
-  TestDistillerPage distiller_page;
-  distiller_page.SetMinimumAllowableDistilledContentLengthForTesting(1000);
-  distiller_page.SetNextResultValue(base::Value(std::move(readability_result)));
-
-  base::RunLoop run_loop;
-  DistillerPage::DistillerPageCallback cb =
-      base::BindOnce(
-          [](std::string title, std::string content, std::string dir,
-             int word_count,
-             std::unique_ptr<proto::DomDistillerResult> distilled_page,
-             DistillationParseResult result) {
-            EXPECT_EQ(DistillationParseResult::kContentTooShort, result);
-          },
-          title, content, dir, 10)
-          .Then(run_loop.QuitClosure());
-  distiller_page.DistillPage(GURL("http://example.com/success"),
-                             DistillerOptions(), std::move(cb));
-  run_loop.Run();
-  histogram_tester_.ExpectUniqueSample(
-      "DomDistiller.Distillation.Result",
-      DistillationParseResult::kContentTooShort, 1);
-}
-#endif
-
 // Test that the readability script options are injected correctly.
 TEST_F(DistillerPageTest, ReadabilityScriptOptionsHandling) {
   ReadabilityOptions custom_options;

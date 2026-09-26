@@ -22,10 +22,6 @@
 #include "base/feature_list.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) && __ANDROID_API__ < 21
-#define HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC 1
-#endif
-
 namespace base {
 
 ConditionVariable::ConditionVariable(Lock* user_lock)

@@ -83,11 +83,6 @@ void ExtensionsTestSuite::Initialize() {
 
   base::FilePath extensions_shell_and_test_pak_path;
   base::PathService::Get(base::DIR_ASSETS, &extensions_shell_and_test_pak_path);
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-  // On Android all pak files are inside the paks folder.
-  extensions_shell_and_test_pak_path =
-      extensions_shell_and_test_pak_path.Append(FILE_PATH_LITERAL("paks"));
-#endif
   ui::ResourceBundle::InitSharedInstanceWithPakPath(
       extensions_shell_and_test_pak_path.AppendASCII(
           "extensions_shell_and_test.pak"));

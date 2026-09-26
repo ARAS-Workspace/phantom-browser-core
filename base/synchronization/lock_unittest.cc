@@ -42,10 +42,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/background_thread_pool_field_trial.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using testing::UnorderedElementsAre;
 using testing::UnorderedElementsAreArray;
 

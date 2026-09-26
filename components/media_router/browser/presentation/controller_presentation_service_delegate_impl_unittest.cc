@@ -778,7 +778,6 @@ TEST_F(ControllerPresentationServiceDelegateImplTest, ConnectToPresentation) {
   delegate_impl_->Reset(main_frame_process_id_, main_frame_routing_id_);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ControllerPresentationServiceDelegateImplTest, AutoJoinRequest) {
   std::string origin(frame_origin_.Serialize());
   content::WebContentsTester::For(GetWebContents())
@@ -836,7 +835,5 @@ TEST_F(ControllerPresentationServiceDelegateImplTest,
           &MockCreatePresentationConnectionCallbacks::OnCreateConnectionError,
           base::Unretained(&mock_create_connection_callbacks)));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace media_router

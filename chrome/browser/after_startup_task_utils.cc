@@ -111,9 +111,7 @@ void SetBrowserStartupIsComplete(StartupIsCompleteReason reason) {
     return;
 
   size_t browser_count = 0;
-#if !BUILDFLAG(IS_ANDROID)
   browser_count = GlobalBrowserCollection::GetInstance()->GetSize();
-#endif  // !BUILDFLAG(IS_ANDROID)
   TRACE_EVENT_INSTANT1("startup", "Startup.StartupComplete",
                        TRACE_EVENT_SCOPE_GLOBAL, "BrowserCount", browser_count);
   GetStartupCompleteFlag().Set();
@@ -140,7 +138,6 @@ bool g_is_monitoring_started = false;
 
 // For Android, startup completion is signaled via AfterStartupTaskUtils.java.
 // We do not use the StartupObserver or startup refs on Android.
-#if !BUILDFLAG(IS_ANDROID)
 // We initialize `g_ref_count` to 1 to represent the startup sequence itself.
 // This implicit reference is released in `BeginMonitoringStartupCompletion()`
 // when the startup sequence finishes registering its initial tasks. This
@@ -307,7 +304,6 @@ void StartupObserver::Start(performance_manager::Graph* graph) {
   // notified when loading completes. The performance manager takes ownership.
   graph->PassToGraph(base::WrapUnique(new StartupObserver()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -316,11 +312,9 @@ void AfterStartupTaskUtils::BeginMonitoringStartupCompletion() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   CHECK(!g_is_monitoring_started);
   performance_manager::Graph* graph = nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   // StartupObserver isn't used on Android, so no need for PerformanceManager.
   CHECK(performance_manager::PerformanceManager::IsAvailable());
   graph = performance_manager::PerformanceManager::GetGraph();
-#endif  // !BUILDFLAG(IS_ANDROID)
   AfterStartupTaskUtils::FinishStartupRegistration(graph);
 }
 
@@ -340,14 +334,12 @@ void AfterStartupTaskUtils::FinishStartupRegistration(
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   g_is_monitoring_started = true;
 
-#if !BUILDFLAG(IS_ANDROID)
   StartupObserver::Start(graph);
 
   // Release the implicit reference representing the startup sequence. This
   // enables considering startup complete once all other registered references
   // (e.g., paint, idle, restore) are released.
   ReleaseRef(StartupIsCompleteReason::kStartupRegistrationDone);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Add failsafe timeout
   content::GetUIThreadTaskRunner({})->PostDelayedTask(
@@ -357,7 +349,6 @@ void AfterStartupTaskUtils::FinishStartupRegistration(
       GetFailsafeTimeout());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 AfterStartupTaskUtils::StartupInProgressRef::StartupInProgressRef(
     StartupIsCompleteReason reason)
     : reason_(reason) {}
@@ -377,7 +368,6 @@ AfterStartupTaskUtils::RegisterStartupInProgressRef(
   g_ref_count++;
   return std::make_unique<AfterStartupTaskUtils::StartupInProgressRef>(reason);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void AfterStartupTaskUtils::PostTask(
     const base::Location& from_here,
@@ -413,9 +403,7 @@ void AfterStartupTaskUtils::UnsafeResetForTesting() {
   if (!IsBrowserStartupComplete())
     return;
   GetStartupCompleteFlag().UnsafeResetForTesting();  // IN-TEST
-#if !BUILDFLAG(IS_ANDROID)
   g_ref_count = 1;
-#endif
   g_is_monitoring_started = false;
   DCHECK(!IsBrowserStartupComplete());
 }

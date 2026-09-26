@@ -125,14 +125,6 @@ class EGLImageBackingFactoryThreadSafeTest
       GTEST_SKIP();
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    auto* command_line = base::CommandLine::ForCurrentProcess();
-    if (gles2::UsePassthroughCommandDecoder(command_line)) {
-      // TODO(crbug.com/40278643): fix this tests to work with passthrough.
-      GTEST_SKIP();
-    }
-#endif
-
     GpuDriverBugWorkarounds workarounds;
 
     CreateSharedContext(workarounds, surface_, context_, context_state_);
@@ -443,7 +435,6 @@ TEST_P(EGLImageBackingFactoryThreadSafeTest, UploadReadback) {
 #if BUILDFLAG(USE_DAWN) && BUILDFLAG(DAWN_ENABLE_BACKEND_OPENGLES)
 
 // TODO(crbug.com/332947916): fix these tests to run on Android/GLES
-#if !BUILDFLAG(IS_ANDROID)
 
 // Test to check interaction between Dawn and skia GL representations.
 TEST_P(EGLImageBackingFactoryThreadSafeTest, Dawn_SkiaGL) {
@@ -692,7 +683,6 @@ return textureSample(tex, smp, tex_coord);
 
   dawnProcSetProcs(nullptr);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Verify that DawnEGLImageRepresentation::BeginAccess includes `internal_usage`
 // when computing the inner GL access mode.

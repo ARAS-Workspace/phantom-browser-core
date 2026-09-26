@@ -23,7 +23,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(USE_BLINK) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_BLINK)
 #include "base/check.h"
 #include "base/command_line.h"
 #include "base/process/launch.h"
@@ -125,7 +125,7 @@ TEST_P(SqliteVfsFileSetTest, FilesCanBeDeleted) {
 
 // Multiprocess tests are not supported on non-blink platforms (i.e., iOS), and
 // they don't work from this test harness on Android.
-#if BUILDFLAG(USE_BLINK) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_BLINK)
 
 static constexpr std::string_view kDirectorySwitch = "directory";
 static constexpr std::string_view kBaseNameSwitch = "base-name";
@@ -203,7 +203,7 @@ TEST_P(SqliteVfsFileSetTest, MultipleConnections) {
   db_file->Close();
 }
 
-#endif  // BUILDFLAG(USE_BLINK) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(USE_BLINK)
 
 TEST_P(SqliteVfsFileSetTest, AbandonAndReopen) {
   if (is_single_connection()) {

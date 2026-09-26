@@ -87,7 +87,6 @@ void SaveAndFillDialogControllerImpl::ShowPendingDialog(
   CHECK(dialog_view_);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::u16string SaveAndFillDialogControllerImpl::GetWindowTitle() const {
   return l10n_util::GetStringUTF16(IDS_AUTOFILL_SAVE_AND_FILL_DIALOG_TITLE);
 }
@@ -198,7 +197,6 @@ std::u16string SaveAndFillDialogControllerImpl::FormatExpirationDateInput(
 
   return formatted_input;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 SaveAndFillDialogState SaveAndFillDialogControllerImpl::GetDialogState() const {
   return dialog_state_;

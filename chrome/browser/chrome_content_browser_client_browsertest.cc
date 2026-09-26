@@ -829,7 +829,6 @@ IN_PROC_BROWSER_TEST_F(ProtocolHandlerTest, HandlersIgnoredWhenDisabled) {
   EXPECT_EQ(u"about:blank", tab_title);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class KeepaliveDurationOnShutdownTest : public InProcessBrowserTest,
                                         public InstantTestBase {
  public:
@@ -873,8 +872,6 @@ IN_PROC_BROWSER_TEST_F(KeepaliveDurationOnShutdownTest, DynamicUpdate) {
 
   EXPECT_EQ(client()->GetKeepaliveTimerTimeout(profile), base::Seconds(3));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class ChromeContentBrowserClientClipboardTest : public InProcessBrowserTest {
  public:

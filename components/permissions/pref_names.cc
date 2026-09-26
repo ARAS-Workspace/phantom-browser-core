@@ -15,27 +15,6 @@ namespace prefs {
 // types.
 const char kPermissionActions[] = "profile.content_settings.permission_actions";
 
-#if BUILDFLAG(IS_ANDROID)
-// The current level of backoff for showing the location settings dialog for the
-// default search engine.
-const char kLocationSettingsBackoffLevelDSE[] =
-    "location_settings_backoff_level_dse";
-
-// The current level of backoff for showing the location settings dialog for
-// sites other than the default search engine.
-const char kLocationSettingsBackoffLevelDefault[] =
-    "location_settings_backoff_level_default";
-
-// The next time the location settings dialog can be shown for the default
-// search engine.
-const char kLocationSettingsNextShowDSE[] = "location_settings_next_show_dse";
-
-// The next time the location settings dialog can be shown for sites other than
-// the default search engine.
-const char kLocationSettingsNextShowDefault[] =
-    "location_settings_next_show_default";
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // The number of one time permission prompts a user has seen.
 const char kOneTimePermissionPromptsDecidedCount[] =
     "profile.one_time_permission_prompts_decided_count";

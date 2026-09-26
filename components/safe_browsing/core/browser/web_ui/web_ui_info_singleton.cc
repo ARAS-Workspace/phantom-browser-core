@@ -439,7 +439,7 @@ void WebUIInfoSingleton::ClearDeepScans() {
 
 #endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 void WebUIInfoSingleton::SetTailoredVerdictOverride(
     ClientDownloadResponse::TailoredVerdict new_value,
     const WebUIInfoSingletonEventObserver* new_source) {
@@ -465,8 +465,7 @@ void WebUIInfoSingleton::ClearTailoredVerdictOverride() {
     }
   }
 }
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) &&
-        // !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 void WebUIInfoSingleton::RegisterWebUIInstance(
     WebUIInfoSingletonEventObserver* webui) {
@@ -477,7 +476,7 @@ void WebUIInfoSingleton::UnregisterWebUIInstance(
     WebUIInfoSingletonEventObserver* webui) {
   std::erase(webui_instances_, webui);
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   // Notify other WebUIs that the source of the tailored verdict override is
   // going away.
   if (tailored_verdict_override_.IsFromSource(webui)) {
@@ -527,10 +526,9 @@ void WebUIInfoSingleton::MaybeClearData() {
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
     ClearDeepScans();
 #endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
     ClearTailoredVerdictOverride();
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) &&
-        // !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   }
 }
 

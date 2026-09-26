@@ -22,10 +22,6 @@ EnumTraits<mojo_base::mojom::MessagePumpType, base::MessagePumpType>::ToMojom(
       return mojo_base::mojom::MessagePumpType::kCustom;
     case base::MessagePumpType::IO:
       return mojo_base::mojom::MessagePumpType::kIo;
-#if BUILDFLAG(IS_ANDROID)
-    case base::MessagePumpType::JAVA:
-      return mojo_base::mojom::MessagePumpType::kJava;
-#endif
 #if BUILDFLAG(IS_APPLE)
     case base::MessagePumpType::NS_RUNLOOP:
       return mojo_base::mojom::MessagePumpType::kNsRunloop;
@@ -47,10 +43,6 @@ EnumTraits<mojo_base::mojom::MessagePumpType, base::MessagePumpType>::FromMojom(
       return base::MessagePumpType::CUSTOM;
     case mojo_base::mojom::MessagePumpType::kIo:
       return base::MessagePumpType::IO;
-#if BUILDFLAG(IS_ANDROID)
-    case mojo_base::mojom::MessagePumpType::kJava:
-      return base::MessagePumpType::JAVA;
-#endif
 #if BUILDFLAG(IS_APPLE)
     case mojo_base::mojom::MessagePumpType::kNsRunloop:
       return base::MessagePumpType::NS_RUNLOOP;

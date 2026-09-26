@@ -730,33 +730,7 @@ void AdsPageLoadMetricsObserver::OnMainFrameAdRectsChanged(
 
 // TODO(crbug.com/40727873): Evaluate imposing width requirements
 // for ad density violations.
-void AdsPageLoadMetricsObserver::CheckForAdDensityViolation() {
-#if BUILDFLAG(IS_ANDROID)
-  const int kMaxMobileAdDensityByHeight = 30;
-  std::optional<int> max_page_ad_density_by_height =
-      page_ad_density_tracker_.MaxPageAdDensityByHeight();
-  if (max_page_ad_density_by_height &&
-      *max_page_ad_density_by_height > kMaxMobileAdDensityByHeight) {
-    // TODO(bokan): ContentSubresourceFilterThrottleManager is now associated
-    // with a FrameTree. When AdsPageLoadMetricsObserver becomes aware of MPArch
-    // this should use the associated page rather than the primary page.
-    auto* throttle_manager =
-        subresource_filter::ContentSubresourceFilterThrottleManager::FromPage(
-            GetDelegate().GetWebContents()->GetPrimaryPage());
-    // AdsPageLoadMetricsObserver is not created unless there is a
-    // throttle manager.
-    DCHECK(throttle_manager);
-
-    // Violations can be triggered multiple times for the same page as
-    // violations after the first are ignored. Ad frame violations are
-    // attributed to the main frame url.
-    throttle_manager->OnAdsViolationTriggered(
-        GetDelegate().GetWebContents()->GetPrimaryMainFrame(),
-        subresource_filter::mojom::AdsViolation::
-            kMobileAdDensityByHeightAbove30);
-  }
-#endif
-}
+void AdsPageLoadMetricsObserver::CheckForAdDensityViolation() {}
 
 void AdsPageLoadMetricsObserver::OnSubFrameDeleted(
     content::FrameTreeNodeId frame_tree_node_id) {

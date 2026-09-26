@@ -83,8 +83,6 @@ std::u16string GetApplicationTitle(WebContents* web_contents) {
   return url_identity.name;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 bool IsGlicWebUI(const WebContents* web_contents) {
   return false;
 }
@@ -128,8 +126,6 @@ DesktopMediaID GetMediaForSelectionDialogBypass(
   }
   return DesktopMediaID();
 }
-
-#endif
 
 }  // namespace
 
@@ -281,7 +277,6 @@ void DisplayMediaAccessHandler::HandleRequest(
   }
 
   // Screen capture is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
   HostContentSettingsMap* content_settings =
       HostContentSettingsMapFactory::GetForProfile(
           web_contents->GetBrowserContext());
@@ -293,7 +288,6 @@ void DisplayMediaAccessHandler::HandleRequest(
                                std::move(callback));
     return;
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Except for the case when DISPLAY_MEDIA_SYSTEM_AUDIO is allowed, all
   // requests should contain video stream.
@@ -600,17 +594,6 @@ void DisplayMediaAccessHandler::ProcessQueuedPickerRequest(
       base::FeatureList::IsEnabled(
           blink::features::kGetDisplayMediaAudioSelection) &&
       pending_request.request.audio_selection_preferred;
-#if BUILDFLAG(IS_ANDROID)
-  picker_params.capture_this_tab =
-      pending_request.request.video_type ==
-      blink::mojom::MediaStreamType::DISPLAY_VIDEO_CAPTURE_THIS_TAB;
-  picker_params.exclude_self_browser_surface =
-      pending_request.request.exclude_self_browser_surface;
-  picker_params.exclude_monitor_type_surfaces =
-      pending_request.request.exclude_monitor_type_surfaces;
-  picker_params.allowed_capture_level = capture_level;
-  picker_params.includable_web_contents_filter = includable_web_contents_filter;
-#endif
 
   pending_request.picker->Show(picker_params, std::move(source_lists),
                                std::move(done_callback));

@@ -129,20 +129,6 @@ void VideoCaptureManager::RegisterListener(
   DCHECK_CURRENTLY_ON(BrowserThread::IO);
   DCHECK(listener);
   listeners_.AddObserver(listener);
-#if BUILDFLAG(IS_ANDROID)
-  // When kAndroidEnableBackgroundMediaCapturing is enabled, video capture
-  // is allowed to continue even if the app is in the background.
-  // Therefore, we only need to register the ApplicationStatusListener and
-  // track foreground/background state if this feature is DISABLED,
-  // ensuring that capture is stopped when the app is no longer active.
-  if (!base::FeatureList::IsEnabled(
-          media::kAndroidEnableBackgroundMediaCapturing)) {
-    application_state_has_running_activities_ = true;
-    app_status_listener_ =
-        base::android::ApplicationStatusListener::New(base::BindRepeating(
-            &VideoCaptureManager::OnApplicationStateChange, this));
-  }
-#endif
 }
 
 void VideoCaptureManager::UnregisterListener(
@@ -1016,24 +1002,6 @@ VideoCaptureManager::GetOrCreateController(
   return new_controller;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void VideoCaptureManager::OnApplicationStateChange(
-    base::android::ApplicationState state) {
-  DCHECK_CURRENTLY_ON(BrowserThread::IO);
-
-  // Only release/resume devices when the Application state changes from
-  // RUNNING->STOPPED->RUNNING.
-  if (state == base::android::APPLICATION_STATE_HAS_RUNNING_ACTIVITIES &&
-      !application_state_has_running_activities_) {
-    ResumeDevices();
-    application_state_has_running_activities_ = true;
-  } else if (state == base::android::APPLICATION_STATE_HAS_STOPPED_ACTIVITIES) {
-    ReleaseDevices();
-    application_state_has_running_activities_ = false;
-  }
-}
-#endif
-
 void VideoCaptureManager::ReleaseDevices() {
   DCHECK_CURRENTLY_ON(BrowserThread::IO);
 
@@ -1077,7 +1045,6 @@ void VideoCaptureManager::ResumeDevices() {
 }
 
 void VideoCaptureManager::OnScreenLocked() {
-#if !BUILDFLAG(IS_ANDROID)
   // Stop screen sharing when screen is locked on desktop platforms only.
   DCHECK_CURRENTLY_ON(BrowserThread::IO);
   EmitLogMessage("VideoCaptureManager::OnScreenLocked", 1);
@@ -1101,7 +1068,6 @@ void VideoCaptureManager::OnScreenLocked() {
   for (auto session_id : desktopcapture_session_ids) {
     Close(session_id);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void VideoCaptureManager::OnScreenUnlocked() {

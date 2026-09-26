@@ -143,11 +143,9 @@ scoped_refptr<VideoFrame> CreateSharedImageI420Frame(
   // written to through WritePixelsYUV.
   auto usages = gpu::SHARED_IMAGE_USAGE_RASTER_READ |
                 gpu::SHARED_IMAGE_USAGE_RASTER_WRITE;
-#if !BUILDFLAG(IS_ANDROID)
   // These SharedImages may be read by the GLES2 interface for 1-copy upload to
   // WebGL (not supported on Android).
   usages |= gpu::SHARED_IMAGE_USAGE_GLES2_READ;
-#endif
 
   // Instead of creating shared image per plane, create a single multiplanar
   // shared image and upload pixels to it.
@@ -229,11 +227,9 @@ scoped_refptr<VideoFrame> CreateSharedImageNV12Frame(
   // written to through WritePixelsYUV.
   auto usages = gpu::SHARED_IMAGE_USAGE_RASTER_READ |
                 gpu::SHARED_IMAGE_USAGE_RASTER_WRITE;
-#if !BUILDFLAG(IS_ANDROID)
   // These SharedImages may be read by the GLES2 interface for 1-copy upload to
   // WebGL (not supported on Android).
   usages |= gpu::SHARED_IMAGE_USAGE_GLES2_READ;
-#endif
   // Instead of creating shared image per plane, create a single multiplanar
   // shared image and upload pixels to it.
   auto shared_image =

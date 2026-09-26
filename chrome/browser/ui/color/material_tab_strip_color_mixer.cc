@@ -54,10 +54,8 @@ void AddMaterialTabStripColorMixer(ui::ColorProvider* provider,
   mixer[kColorTabBackgroundSelectedHoverFrameInactive] = {
       ui::GetResultingPaintColor(ui::kColorSysStateHoverDimBlendProtection,
                                  kColorTabBackgroundSelectedFrameInactive)};
-#if !BUILDFLAG(IS_ANDROID)
   mixer[kColorTabDiscardRingFrameActive] = {ui::kColorSysStateInactiveRing};
   mixer[kColorTabDiscardRingFrameInactive] = {kColorTabDiscardRingFrameActive};
-#endif
   mixer[kColorTabForegroundActiveFrameActive] = {ui::kColorSysOnSurface};
   mixer[kColorTabForegroundActiveFrameInactive] = {
       kColorTabForegroundActiveFrameActive};

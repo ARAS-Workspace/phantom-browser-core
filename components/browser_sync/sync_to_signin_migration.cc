@@ -449,7 +449,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
                     syncer::DataTypeToHistogramSuffix(syncer::BOOKMARKS)}),
       bookmarks_decision);
 
-#if !BUILDFLAG(IS_ANDROID)
   // On Android no password migration is required here, because other layers
   // were responsible for migrating the user to the local+account model in the
   // past.
@@ -462,7 +461,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
                     GetHistogramMigratingOrNotInfix(doing_migration),
                     syncer::DataTypeToHistogramSuffix(syncer::PASSWORDS)}),
       passwords_decision);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   const SyncToSigninMigrationDataTypeDecision reading_list_decision =
       GetSyncToSigninMigrationDataTypeDecision(
@@ -486,7 +484,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
       extensions_decision);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
   const SyncToSigninMigrationDataTypeDecision themes_decision =
       GetSyncToSigninMigrationDataTypeDecision(
           pref_service, syncer::THEMES, syncer::prefs::internal::kSyncThemes);
@@ -495,7 +492,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
                     GetHistogramMigratingOrNotInfix(doing_migration),
                     syncer::DataTypeToHistogramSuffix(syncer::THEMES)}),
       themes_decision);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (!doing_migration) {
     return;
@@ -558,10 +554,9 @@ void MaybeMigrateSyncingUserToSignedInInternal(
   bool migration_successful = true;
   std::vector<BlockingOperation> blocking_operations;
 
-// On Android no password migration is required here, because other layers are
-// responsible for migrating the user to the local+account model, e.g.
-// SetUsesSplitStoresAndUPMForLocal(), PasswordStoreBackendMigrationDecorator.
-#if !BUILDFLAG(IS_ANDROID)
+  // On Android no password migration is required here, because other layers are
+  // responsible for migrating the user to the local+account model, e.g.
+  // SetUsesSplitStoresAndUPMForLocal(), PasswordStoreBackendMigrationDecorator.
   // Move passwords DB file, if password sync is enabled.
   if (passwords_decision == SyncToSigninMigrationDataTypeDecision::kMigrate) {
     base::FilePath from_path =
@@ -577,7 +572,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
     syncer::RecordSyncToSigninMigrationStatsTableCleanupStep(
         syncer::SyncToSigninMigrationStatsTableCleanupStep::kCleanupRequested);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Move bookmarks json file, if bookmark sync is enabled.
   if (bookmarks_decision == SyncToSigninMigrationDataTypeDecision::kMigrate) {
@@ -624,14 +618,12 @@ void MaybeMigrateSyncingUserToSignedInInternal(
   }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
   if (themes_decision == SyncToSigninMigrationDataTypeDecision::kMigrate) {
     pref_service->SetBoolean(
         syncer::prefs::internal::kMigrateThemeFromLocalToAccount, true);
     syncer::RecordSyncToSigninMigrationThemeStep(
         syncer::SyncToSigninMigrationThemeStep::kMigrationRequested);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (!is_blocking_allowed) {
     base::ThreadPool::PostTaskAndReplyWithResult(

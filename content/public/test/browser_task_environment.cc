@@ -27,10 +27,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/test/test_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/task_scheduler/post_task_android.h"
-#endif
-
 namespace content {
 
 class TestBrowserThread {

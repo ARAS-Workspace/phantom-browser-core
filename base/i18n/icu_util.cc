@@ -31,22 +31,11 @@
 #include "third_party/icu/source/common/unicode/udata.h"
 #include "third_party/icu/source/common/unicode/utrace.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_assets.h"
-#include "base/android/jni_android.h"
-#include "base/android/locale_utils.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "base/apple/foundation_util.h"
 #endif
 
-
-#if BUILDFLAG(IS_ANDROID)
-#include "third_party/icu/source/common/unicode/unistr.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "third_party/icu/source/i18n/unicode/timezone.h"
 #endif
 
@@ -77,10 +66,6 @@ const char kIcuDataFileName[] = "icudtl.dat";
 // For now, only Fuchsia has a meaningful use case for this feature, so it is
 // only implemented for OS_FUCHSIA.
 
-#if BUILDFLAG(IS_ANDROID)
-const char kAndroidAssetsIcuDataFileName[] = "assets/icudtl.dat";
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // File handle intentionally never closed. Not using File here because its
 // Windows implementation guards against two instances owning the same
 // PlatformFile (which we allow since we know it is never freed).
@@ -93,15 +78,6 @@ void LazyInitIcuDataFile() {
   if (g_icudtl_pf != kInvalidPlatformFile) {
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  int fd =
-      android::OpenApkAsset(kAndroidAssetsIcuDataFileName, &g_icudtl_region);
-  g_icudtl_pf = fd;
-  if (fd != -1) {
-    return;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-  // For unit tests, data file is located on disk, so try there as a fallback.
 #if !BUILDFLAG(IS_APPLE)
   FilePath data_path;
   if (!PathService::Get(DIR_ASSETS, &data_path)) {
@@ -214,7 +190,7 @@ bool InitializeICUFromDataFile() {
 // On some platforms, the time zone must be explicitly initialized zone rather
 // than relying on ICU's internal initialization.
 void InitializeIcuTimeZone() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // To respond to the time zone change properly, the default time zone
   // cache in ICU has to be populated on starting up.
   // See TimeZoneMonitorLinux::NotifyClientsFromImpl().
@@ -255,20 +231,6 @@ bool DoCommonInitialization() {
   // add a boolean argument to this function to init the default tz only
   // when requested.
   InitializeIcuTimeZone();
-
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, ICU's default locale ID comes from POSIX environment variables
-  // (LC_ALL, etc.), which are not set for Android apps, resulting in
-  // "en_US_POSIX". That is not a real locale and causes break iterators and
-  // other ICU operations to fail if called before SetICUDefaultLocale() is run
-  // in PostEarlyInitialization. Initialize the default ICU locale using the
-  // system default.
-  if (base::android::IsJavaAvailable()) {
-    SetICUDefaultLocale(base::android::GetDefaultLocaleString());
-  } else {
-    SetICUDefaultLocale("en-US");
-  }
-#endif
 
   utrace_setLevel(UTRACE_VERBOSE);
   return true;

@@ -37,10 +37,6 @@ class AudioOutputTest : public testing::TestWithParam<bool> {
         AudioManager::CreateForTesting(std::make_unique<TestAudioThread>());
     audio_manager_device_info_ =
         std::make_unique<AudioDeviceInfoAccessorForTests>(audio_manager_.get());
-#if BUILDFLAG(IS_ANDROID)
-    // The only parameter is used to enable/disable AAudio.
-    features_.InitWithFeatureState(features::kUseAAudioDriver, GetParam());
-#endif
     base::RunLoop().RunUntilIdle();
   }
   ~AudioOutputTest() override {
@@ -74,9 +70,6 @@ class AudioOutputTest : public testing::TestWithParam<bool> {
   std::unique_ptr<AudioDeviceInfoAccessorForTests> audio_manager_device_info_;
   AudioParameters stream_params_;
   raw_ptr<AudioOutputStream, DanglingUntriaged> stream_ = nullptr;
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList features_;
-#endif
 };
 
 // Test that can it be created and closed.
@@ -183,11 +176,5 @@ TEST_P(AudioOutputTest, VolumeControl) {
 // The test parameter is only relevant on Android. It controls whether or not we
 // allow the use of AAudio.
 INSTANTIATE_TEST_SUITE_P(Base, AudioOutputTest, testing::Values(false));
-
-#if BUILDFLAG(IS_ANDROID)
-// Run tests with AAudio enabled. On Android P and below, these tests should not
-// run, as we only use AAudio on Q+.
-INSTANTIATE_TEST_SUITE_P(AAudio, AudioOutputTest, testing::Values(true));
-#endif
 
 }  // namespace media

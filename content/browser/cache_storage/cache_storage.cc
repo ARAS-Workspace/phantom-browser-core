@@ -690,12 +690,6 @@ CacheStorage::CacheStorage(
       directory_path_, cache_task_runner_.get(),
       std::move(scheduler_task_runner), quota_manager_proxy_,
       blob_storage_context_, this, bucket_locator_, owner));
-
-#if BUILDFLAG(IS_ANDROID)
-  app_status_listener_ =
-      base::android::ApplicationStatusListener::New(base::BindRepeating(
-          &CacheStorage::OnApplicationStateChange, weak_factory_.GetWeakPtr()));
-#endif
 }
 
 CacheStorage::~CacheStorage() {
@@ -1497,18 +1491,5 @@ void CacheStorage::FlushIndexIfDirty() {
   index_write_task_.Cancel();
   cache_loader_->WriteIndex(*cache_index_, base::DoNothing());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void CacheStorage::OnApplicationStateChange(
-    base::android::ApplicationState state) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (state == base::android::APPLICATION_STATE_HAS_RUNNING_ACTIVITIES) {
-    app_on_background_ = false;
-  } else if (state == base::android::APPLICATION_STATE_HAS_STOPPED_ACTIVITIES) {
-    app_on_background_ = true;
-    FlushIndexIfDirty();
-  }
-}
-#endif
 
 }  // namespace content

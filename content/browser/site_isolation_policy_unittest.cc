@@ -41,33 +41,6 @@ TEST(SiteIsolationPolicyTest, DisableSiteIsolationSwitch) {
   EXPECT_TRUE(SiteIsolationPolicy::IsErrorPageIsolationEnabled(true));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Since https://crbug.com/910273, the kDisableSiteIsolationForPolicy switch is
-// only available/used on Android.
-TEST(SiteIsolationPolicyTest, DisableSiteIsolationForPolicySwitch) {
-  // Skip this test if the --site-per-process switch is present (e.g. on Site
-  // Isolation Android chromium.fyi bot).  The test is still valid if
-  // SitePerProcess is the default (e.g. via ContentBrowserClient's
-  // ShouldEnableStrictSiteIsolation method) - don't skip the test in such case.
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kSitePerProcess)) {
-    return;
-  }
-
-  SiteIsolationPolicy::DisableFlagCachingForTesting();
-  base::test::ScopedCommandLine scoped_command_line;
-  base::CommandLine* command_line = scoped_command_line.GetProcessCommandLine();
-  command_line->AppendSwitch(switches::kDisableSiteIsolationForPolicy);
-  EXPECT_FALSE(SiteIsolationPolicy::UseDedicatedProcessesForAllSites());
-  EXPECT_FALSE(SiteIsolationPolicy::AreIsolatedOriginsEnabled());
-  EXPECT_FALSE(SiteIsolationPolicy::AreDynamicIsolatedOriginsEnabled());
-
-  // Error page isolation should not be affected by --disable-site-isolation-...
-  // switches.
-  EXPECT_TRUE(SiteIsolationPolicy::IsErrorPageIsolationEnabled(true));
-}
-#endif
-
 class ApplicationIsolationEnablingBrowserClient : public ContentBrowserClient {
  public:
   bool ShouldUrlUseApplicationIsolationLevel(BrowserContext* browser_context,

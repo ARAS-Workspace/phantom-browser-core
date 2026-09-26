@@ -25,10 +25,6 @@
 #include "net/dns/public/dns_protocol.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/path_utils.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Required for inet_pton()
 #include <arpa/inet.h>
 

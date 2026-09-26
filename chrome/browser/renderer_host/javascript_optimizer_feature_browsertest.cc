@@ -20,7 +20,6 @@
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/policy_constants.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/test/bind.h"
 #include "base/test/run_until.h"
 #include "chrome/browser/ui/browser_actions.h"
@@ -39,7 +38,6 @@
 #include "ui/views/animation/test/ink_drop_host_test_api.h"
 #include "ui/views/bubble/bubble_dialog_model_host.h"
 #include "ui/views/interaction/element_tracker_views.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/chrome_test_utils.h"
@@ -1289,8 +1287,6 @@ IN_PROC_BROWSER_TEST_F(JavascriptOptimizerBrowserTest_DoNotUseSiteFamiliarity,
   NavigateToUnfamiliarSite(/*expect_v8_optimizations_enabled=*/false);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 constexpr char kSkipPixelTestsReason[] = "Should only run in pixel_tests.";
 // Baseline Gerrit CL number of the most recent CL that modified the UI.
 constexpr char kScreenshotBaselineCL[] = "7805312";
@@ -1737,5 +1733,3 @@ IN_PROC_BROWSER_TEST_F(JavascriptOptimizerUiTest, ReloadInfoBarPixelTest) {
                  /*screenshot_name=*/"js_no_opt_reload_infobar",
                  /*baseline_cl=*/kScreenshotBaselineCL));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)

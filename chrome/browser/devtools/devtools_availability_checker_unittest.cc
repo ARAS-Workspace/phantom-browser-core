@@ -24,10 +24,8 @@
 #include "extensions/common/mojom/manifest.mojom-shared.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/web_app.h"
 #include "components/webapps/common/web_app_id.h"
-#endif
 
 class DevToolsAvailabilityCheckerTest : public testing::Test {
  public:
@@ -140,7 +138,6 @@ TEST_F(DevToolsAvailabilityCheckerTest,
   EXPECT_TRUE(IsInspectionAllowed(profile_.get(), web_contents_.get()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(DevToolsAvailabilityCheckerTest,
        UrlBlockedWhenNotOnAllowlistAndBlocklistIsEmpty) {
   base::ListValue allowlist;
@@ -154,7 +151,6 @@ TEST_F(DevToolsAvailabilityCheckerTest,
       ->NavigateAndCommit(GURL("https://example.com/page"));
   EXPECT_FALSE(IsInspectionAllowed(profile_.get(), web_contents_.get()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(DevToolsAvailabilityCheckerTest, DeveloperToolsDisallowedByPolicy) {
   profile_->GetPrefs()->SetInteger(
@@ -495,8 +491,6 @@ TEST_F(DevToolsAvailabilityCheckerTest,
   EXPECT_FALSE(IsInspectionAllowed(profile_.get(), web_contents_.get()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 TEST_F(DevToolsAvailabilityCheckerTest, WebAppAllowedByPolicy) {
   base::ListValue allowlist;
   allowlist.Append("https://allowed-app.com");
@@ -542,4 +536,3 @@ TEST_F(DevToolsAvailabilityCheckerTest, IsInspectionAllowedNullWebApp) {
   EXPECT_TRUE(IsInspectionAllowed(profile_.get(),
                                   static_cast<web_app::WebApp*>(nullptr)));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

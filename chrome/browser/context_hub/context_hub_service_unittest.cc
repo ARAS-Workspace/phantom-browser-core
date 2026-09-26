@@ -45,10 +45,8 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/tab_list/tab_removed_reason.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
-#endif
 
 namespace context_hub {
 
@@ -1252,7 +1250,6 @@ TEST_F(ContextHubServiceTest, DeleteAutoTodoByTabId) {
   EXPECT_TRUE(get_future.Get().empty());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ContextHubServiceTest, OnTabStripModelChanged_DeletesTabTodoOnTabClose) {
   MockServiceObserver observer;
   base::ScopedObservation<ContextHubService, ContextHubService::Observer>
@@ -1377,7 +1374,6 @@ TEST_F(ContextHubServiceTest,
   service_.GetAutoTodos(get_future.GetCallback());
   EXPECT_EQ(1u, get_future.Get().size());
 }
-#endif
 
 TEST_F(ContextHubServiceTest, GetAutoTodos) {
   base::test::TestFuture<std::vector<AutoTodoEntry>> get_empty_future;

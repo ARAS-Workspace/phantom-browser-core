@@ -11,9 +11,7 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/gfx/vector_icon_types.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/color_palette.h"
-#endif
 
 namespace infobars {
 
@@ -34,13 +32,11 @@ const gfx::VectorIcon& InfoBarDelegate::GetVectorIcon() const {
 }
 
 ui::ImageModel InfoBarDelegate::GetIcon() const {
-#if !BUILDFLAG(IS_ANDROID)
   const gfx::VectorIcon& vector_icon = GetVectorIcon();
   if (!vector_icon.is_empty()) {
     return ui::ImageModel::FromVectorIcon(vector_icon, ui::kColorInfoBarIcon,
                                           20);
   }
-#endif
 
   int icon_id = GetIconId();
   return icon_id == kNoIconID

@@ -56,11 +56,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/messages/android/mock_message_dispatcher_bridge.h"
-#include "components/subresource_filter/content/browser/ads_blocked_message_delegate.h"
-#endif
-
 namespace subresource_filter {
 
 namespace proto = url_pattern_index::proto;
@@ -251,12 +246,6 @@ class ContentSubresourceFilterThrottleManagerTest
                 base::Unretained(this)));
 
     NavigateAndCommit(GURL("https://example.first"));
-
-#if BUILDFLAG(IS_ANDROID)
-    message_dispatcher_bridge_.SetMessagesEnabledForEmbedder(true);
-    messages::MessageDispatcherBridge::SetInstanceForTesting(
-        &message_dispatcher_bridge_);
-#endif
   }
 
   void TearDown() override {
@@ -267,9 +256,6 @@ class ContentSubresourceFilterThrottleManagerTest
     throttle_manager_test_support_.reset();
     base::RunLoop().RunUntilIdle();
     content::RenderViewHostTestHarness::TearDown();
-#if BUILDFLAG(IS_ANDROID)
-    messages::MessageDispatcherBridge::SetInstanceForTesting(nullptr);
-#endif
   }
 
   void ExpectActivationSignalForFrame(
@@ -332,15 +318,6 @@ class ContentSubresourceFilterThrottleManagerTest
   bool ManagerHasRulesetHandle() {
     return throttle_manager()->ruleset_handle_for_testing();
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  void SimulateMessageDismissal() {
-    throttle_manager()
-        ->profile_interaction_manager_for_testing()
-        ->ads_blocked_message_delegate_for_testing()
-        ->DismissMessageForTesting(messages::DismissReason::SCOPE_DESTROYED);
-  }
-#endif
 
   bool ads_blocked_in_content_settings() {
     auto* content_settings =
@@ -412,10 +389,6 @@ class ContentSubresourceFilterThrottleManagerTest
     return dealer_handle_.get();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  messages::MockMessageDispatcherBridge message_dispatcher_bridge_;
-#endif
-
  private:
   ContentSubresourceFilterWebContentsHelper* web_contents_helper() {
     return ContentSubresourceFilterWebContentsHelper::FromWebContents(
@@ -452,33 +425,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   // A disallowed subframe navigation should be successfully filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
-  CreateSubframeWithTestNavigation(
-      GURL("https://www.example.com/disallowed.html"), main_rfh());
-  EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
-            SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
-}
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(ContentSubresourceFilterThrottleManagerTest,
-       NoCrashWhenMessageDelegateIsNotPresent) {
-  auto* web_contents = RenderViewHostTestHarness::web_contents();
-  web_contents->RemoveUserData(
-      subresource_filter::AdsBlockedMessageDelegate::UserDataKey());
-
-  // Commit a navigation that triggers page level activation.
-  NavigateAndCommitMainFrame(GURL(kTestURLWithActivation));
-  ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
-
-  // A disallowed subframe navigation should be successfully filtered, and the
-  // lack of infobar manager should not cause a crash.
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
@@ -486,7 +432,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
 }
-#endif
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest, NoPageActivation) {
   // This test assumes that we're not in DryRun mode.
@@ -499,17 +444,11 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, NoPageActivation) {
   EXPECT_FALSE(ManagerHasRulesetHandle());
 
   // A disallowed subframe navigation should not be filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
             SimulateCommitAndGetResult(navigation_simulator()));
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -519,9 +458,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   // A disallowed subframe navigation should not be filtered in dry-run mode.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -535,9 +471,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
                                  true /* is_ad_frame */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -548,9 +481,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
 
   // A disallowed subframe navigation via redirect should be successfully
   // filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/before-redirect.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -560,9 +490,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
                 navigation_simulator(),
                 GURL("https://www.example.com/disallowed.html")));
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -572,9 +499,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   // An allowed subframe navigation should complete successfully.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/allowed1.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -590,9 +514,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(child, true /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // This should fail if the throttle manager notifies the delegate twice of a
@@ -604,9 +525,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   // A disallowed subframe navigation should be successfully filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/1/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
@@ -620,9 +538,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -632,43 +547,25 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   // A disallowed subframe navigation should be successfully filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/1/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 
   // Commit another navigation that triggers page level activation.
-#if BUILDFLAG(IS_ANDROID)
-  // Since the MessageDispatcherBridge is mocked, navigation events are not
-  // tracked by the messages system to automatically dismiss the message on
-  // navigation. The message dismissal is therefore simulated.
-  SimulateMessageDismissal();
-#endif
   NavigateAndCommitMainFrame(GURL(kTestURLWithActivation2));
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/2/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -681,9 +578,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(main_rfh(), false /* expect_activation */);
 
   // A subframe navigation should complete successfully.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(GURL("https://www.example.com/allowed.html"),
                                    main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -695,9 +589,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // Once there are no activated frames, the manager drops its ruleset handle. If
@@ -706,48 +597,30 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, RulesetHandleRegeneration) {
   NavigateAndCommitMainFrame(GURL(kTestURLWithActivation));
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 
   // Simulate a renderer crash which should delete the frame.
   EXPECT_TRUE(ManagerHasRulesetHandle());
   process()->SimulateCrash();
   EXPECT_FALSE(ManagerHasRulesetHandle());
 
-#if BUILDFLAG(IS_ANDROID)
-  // Since the MessageDispatcherBridge is mocked, navigation events are not
-  // tracked by the messages system to automatically dismiss the message on
-  // navigation. The message dismissal is therefore simulated.
-  SimulateMessageDismissal();
-#endif
   NavigateAndCommit(GURL("https://example.reset"));
   NavigateAndCommitMainFrame(GURL(kTestURLWithActivation));
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -774,9 +647,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   EXPECT_FALSE(ManagerHasRulesetHandle());
 
   // A subframe navigation should complete successfully.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -788,9 +658,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -813,18 +680,12 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
                                  false /* expect_activation_sent_to_agent */);
 
   // A subframe navigation fail.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -840,9 +701,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   SimulateFailedNavigation(navigation_simulator(), net::ERR_FAILED);
   ExpectActivationSignalForFrame(main_rfh(), false /* expect_activation */);
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -854,9 +712,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // Ensure activation propagates into great-grandchild frames, including cross
@@ -890,18 +745,12 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, ActivationPropagation) {
   ExpectActivationSignalForFrame(subframe2, true /* expect_activation */);
 
   // A final, nested subframe navigation is filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(GURL("https://www.c.com/disallowed.html"),
                                    subframe2);
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // Ensure activation propagates through allowlisted documents.
@@ -923,9 +772,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(subframe1, true /* expect_activation */);
 
   // Navigate a sub-subframe that is not filtered due to the allowlist.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), subframe1);
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -937,9 +783,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(subframe2, true /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 
   // An identical series of events that don't match allowlist rules cause
   // filtering.
@@ -953,18 +796,12 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(subframe3, true /* expect_activation */);
 
   // Navigate a sub-subframe that is not filtered due to the allowlist.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), subframe3);
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // Same-site navigations within a single RFH do not persist activation.
@@ -983,9 +820,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
       GURL(base::StringPrintf("%s/some_path/", kTestURLWithActivation)));
   ExpectActivationSignalForFrame(main_rfh(), false /* expect_activation */);
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -997,9 +831,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ExpectActivationSignalForFrame(child, false /* expect_activation */);
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -1056,18 +887,12 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
                                  false /* is_ad_frame */);
 
   // A disallowed subframe navigation should be successfully filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
 
   EXPECT_TRUE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // If the RenderFrame determines that the frame is an ad due to creation by ad
@@ -1240,9 +1065,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   EXPECT_TRUE(throttle_manager()->IsRenderFrameHostTaggedAsAd(grandchild));
 
   // Verify that a 2nd level nested frame should also be tagged.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/great_grandchild_allowed_by_ruleset.html"),
       child);
@@ -1258,9 +1080,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   EXPECT_TRUE(throttle_manager()->IsRenderFrameHostTaggedAsAd(greatGrandchild));
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -1283,9 +1102,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
 
   // Create a subframe which is allowed as per ruleset and should not be tagged
   // as ad because its parent is not tagged as well.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   CreateSubframeWithTestNavigation(
       GURL("https://www.example.com/also_allowed_by_ruleset.html"), child);
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -1300,9 +1116,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   EXPECT_FALSE(throttle_manager()->IsRenderFrameHostTaggedAsAd(grandchild));
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
@@ -1317,9 +1130,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   ASSERT_TRUE(remote.is_bound());
   ASSERT_TRUE(remote.is_connected());
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   NavigateAndCommitMainFrame(GURL(kTestURLWithNoActivation));
 
   // Simulate the previous navigation sending an IPC that a load was
@@ -1334,9 +1144,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   base::RunLoop().RunUntilIdle();
 
   EXPECT_FALSE(ads_blocked_in_content_settings());
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // Basic test of throttle manager lifetime and getter methods. Ensure a new
@@ -1473,16 +1280,10 @@ TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest,
   ExpectActivationSignalForFrame(main_rfh(), true /* expect_activation */);
 
   // A disallowed fenced frame navigation should be successfully filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateFencedFrameWithTestNavigation(
       GURL("https://www.example.com/disallowed.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest,
@@ -1493,9 +1294,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest,
 
   // A disallowed subframe navigation via redirect should be successfully
   // filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateFencedFrameWithTestNavigation(
       GURL("https://www.example.com/before-redirect.html"), main_rfh());
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
@@ -1504,9 +1302,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest,
             SimulateRedirectAndGetResult(
                 navigation_simulator(),
                 GURL("https://www.example.com/disallowed.html")));
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 }
 
 // Ensure activation propagates into great-grandchild fenced frames, including
@@ -1542,16 +1337,10 @@ TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest,
   ExpectActivationSignalForFrame(fenced_frame2, true /* expect_activation */);
 
   // A final, nested fenced frame navigation is filtered.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   CreateFencedFrameWithTestNavigation(GURL("https://www.c.com/disallowed.html"),
                                       fenced_frame2);
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-#if BUILDFLAG(IS_ANDROID)
-  ::testing::Mock::VerifyAndClearExpectations(&message_dispatcher_bridge_);
-#endif
 
   // A subframe navigation inside the nested fenced frame is filtered.
   CreateSubframeWithTestNavigation(GURL("https://www.c.com/disallowed.html"),

@@ -360,11 +360,6 @@ class TracingSessionCoordinator {
 
 base::FilePath StartupTracingController::BasenameToPath(
     std::string_view basename) {
-#if BUILDFLAG(IS_ANDROID)
-  if (android_path_generator_callback_) {
-    return android_path_generator_callback_.Run(basename);
-  }
-#endif
   // Default to saving the startup trace into the current dir.
   return base::FilePath().AppendASCII(basename);
 }
@@ -376,17 +371,8 @@ base::FilePath StartupTracingController::RebasePathIfNeeded(
 }
 
 StartupTracingController::StartupTracingController(
-#if BUILDFLAG(IS_ANDROID)
-    AndroidPathGeneratorCallback android_path_generator_callback,
-#endif
     scoped_refptr<base::SingleThreadTaskRunner> io_task_runner)
-    :
-#if BUILDFLAG(IS_ANDROID)
-      android_path_generator_callback_(
-          std::move(android_path_generator_callback)),
-#endif
-      io_task_runner_(std::move(io_task_runner)) {
-}
+    : io_task_runner_(std::move(io_task_runner)) {}
 
 StartupTracingController::~StartupTracingController() {
   CHECK_NE(state_, State::kRunning);

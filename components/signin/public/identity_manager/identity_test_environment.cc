@@ -46,13 +46,7 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/internal/identity_manager/device_accounts_synchronizer_impl.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/signin/internal/identity_manager/accounts_mutator_impl.h"
-#endif
 
 using TokenResponseBuilder = OAuth2AccessTokenConsumer::TokenResponse::Builder;
 
@@ -203,9 +197,6 @@ IdentityTestEnvironment::BuildIdentityManagerForTests(
     PrefService* pref_service,
     metrics::ProfileMetricsService* profile_metrics_service,
     base::FilePath user_data_dir) {
-#if BUILDFLAG(IS_ANDROID)
-  SetUpFakeAccountManagerFacade();
-#endif
   auto account_tracker_service =
       std::make_unique<AccountTrackerService>(pref_service, user_data_dir);
   auto token_service =
@@ -261,11 +252,9 @@ IdentityTestEnvironment::FinishBuildIdentityManagerForTests(
                                                   primary_account_manager.get(),
                                                   pref_service, signin_client);
 
-#if !BUILDFLAG(IS_ANDROID)
   init_params.accounts_mutator = std::make_unique<AccountsMutatorImpl>(
       token_service.get(), account_tracker_service.get(),
       primary_account_manager.get(), pref_service);
-#endif
 
   init_params.diagnostics_provider = std::make_unique<DiagnosticsProviderImpl>(
       token_service.get(), gaia_cookie_manager_service.get());
@@ -274,12 +263,6 @@ IdentityTestEnvironment::FinishBuildIdentityManagerForTests(
       std::make_unique<AccountsCookieMutatorImpl>(
           signin_client, token_service.get(), gaia_cookie_manager_service.get(),
           account_tracker_service.get());
-
-#if BUILDFLAG(IS_ANDROID)
-  init_params.device_accounts_synchronizer =
-      std::make_unique<DeviceAccountsSynchronizerImpl>(
-          token_service->GetDelegate());
-#endif
 
   init_params.account_fetcher_service = std::move(account_fetcher_service);
   init_params.account_tracker_service = std::move(account_tracker_service);

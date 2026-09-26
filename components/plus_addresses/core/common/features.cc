@@ -19,13 +19,6 @@ constexpr char kPlusAddressRequestTimeoutName[] = "request-timeout";
 
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID)
-// When enabled, the user is shown the GMS core plus address management activity
-// instead of the web page in a Chrome custom tab.
-BASE_FEATURE(kPlusAddressAndroidOpenGmsCoreManagementPage,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Controls the enabled/disabled state of the experimental feature.
 BASE_FEATURE(kPlusAddressesEnabled, base::FEATURE_DISABLED_BY_DEFAULT);
 

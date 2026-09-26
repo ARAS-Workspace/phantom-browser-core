@@ -35,10 +35,7 @@ TEST_F(LocalWebApprovalsFeatureTest, LocalApprovalsDisabled) {
 
 void CheckIsLocalWebApprovalsEnabled() {
   bool is_local_web_approvals_enabled = true;
-// On android require a Google-branded build is required.
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  is_local_web_approvals_enabled = false;
-#endif  // BUILDFLAG(IS_ANDROID) && !(BUILDFLAG(GOOGLE_CHROME_BRANDING)
+  // On android require a Google-branded build is required.
 
   EXPECT_EQ(IsLocalWebApprovalsEnabled(), is_local_web_approvals_enabled);
 }

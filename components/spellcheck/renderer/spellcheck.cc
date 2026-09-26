@@ -580,9 +580,6 @@ void SpellCheck::CreateTextCheckingResults(
 }
 
 bool SpellCheck::IsSpellcheckEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  if (!spellcheck::IsAndroidSpellCheckFeatureEnabled()) return false;
-#endif
   return spellcheck_enabled_;
 }
 

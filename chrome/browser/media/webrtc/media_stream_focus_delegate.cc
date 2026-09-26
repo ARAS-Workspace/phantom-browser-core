@@ -6,10 +6,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error "Unsupported on Android."
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #include "chrome/browser/bad_message.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"

@@ -238,7 +238,6 @@ class ExternalProviderImplTest : public ExtensionServiceTestBase {
 }  // namespace
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#if !BUILDFLAG(IS_ANDROID)
 // The in-app payments app is not bundled on Android, see crbug.com/409396604.
 TEST_F(ExternalProviderImplTest, InAppPayments) {
   InitServiceWithExternalProviders();
@@ -248,7 +247,6 @@ TEST_F(ExternalProviderImplTest, InAppPayments) {
   EXPECT_TRUE(registry()->GetInstalledExtension(kInAppPaymentsApp.app_id));
   EXPECT_TRUE(registrar()->IsExtensionEnabled(kInAppPaymentsApp.app_id));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ExternalProviderImplTest, DocsOfflineExtensionIsDefaultInstalled) {
   // No need to test the actual auto update, that's tested above and below.

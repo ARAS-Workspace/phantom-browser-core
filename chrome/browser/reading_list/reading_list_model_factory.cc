@@ -119,11 +119,9 @@ ReadingListModelFactory::BuildServiceInstanceForBrowserContext(
 
 void ReadingListModelFactory::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(
       reading_list::prefs::kReadingListDesktopFirstUseExperienceShown, false,
       PrefRegistry::NO_REGISTRATION_FLAGS);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 bool ReadingListModelFactory::ServiceIsNULLWhileTesting() const {

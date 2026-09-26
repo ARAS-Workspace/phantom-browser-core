@@ -12,9 +12,7 @@
 #include "ui/base/page_transition_types.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/themes/theme_service.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -57,7 +55,6 @@ IN_PROC_BROWSER_TEST_F(RendererInitializationTest,
 }
 
 // Android does not support themes.
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that loading a file from a theme in a tab doesn't crash anything.
 // Another part of crbug.com/40434302 and related.
 IN_PROC_BROWSER_TEST_F(RendererInitializationTest,
@@ -78,7 +75,6 @@ IN_PROC_BROWSER_TEST_F(RendererInitializationTest,
   EXPECT_EQ(url, web_contents->GetLastCommittedURL());
   ASSERT_FALSE(web_contents->IsCrashed());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 }  // namespace extensions

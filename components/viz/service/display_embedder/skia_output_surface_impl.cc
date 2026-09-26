@@ -1047,16 +1047,6 @@ void SkiaOutputSurfaceImpl::ScheduleOverlays(
                  /*make_current=*/false, /*need_framebuffer=*/false);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void SkiaOutputSurfaceImpl::SetFrameRate(
-    gfx::SurfaceControlFrameRate frame_rate) {
-  auto task = base::BindOnce(&SkiaOutputSurfaceImplOnGpu::SetFrameRate,
-                             base::Unretained(impl_on_gpu_.get()), frame_rate);
-  EnqueueGpuTask(std::move(task), {}, /*make_current=*/false,
-                 /*need_framebuffer=*/false);
-}
-#endif
-
 void SkiaOutputSurfaceImpl::SetCapabilitiesForTesting(
     gfx::SurfaceOrigin output_surface_origin) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -1545,13 +1535,6 @@ void SkiaOutputSurfaceImpl::SetNeedsSwapSizeNotifications(
     bool needs_swap_size_notifications) {
   needs_swap_size_notifications_ = needs_swap_size_notifications;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-base::ScopedClosureRunner SkiaOutputSurfaceImpl::GetCacheBackBufferCb() {
-  // Note, that we call it directly on viz thread to get the callback.
-  return impl_on_gpu_->GetCacheBackBufferCb();
-}
-#endif
 
 void SkiaOutputSurfaceImpl::AddContextLostObserver(
     ContextLostObserver* observer) {

@@ -26,10 +26,6 @@
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/view.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error This file should only be included on desktop.
-#endif
-
 namespace {
 
 content::WebContents* GetPickerWebContents() {

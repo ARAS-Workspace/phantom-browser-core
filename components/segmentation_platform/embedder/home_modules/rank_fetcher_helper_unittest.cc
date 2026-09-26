@@ -126,19 +126,6 @@ class RankFetcherHelperTest : public testing::Test {
   MockSegmentationPlatformService segmentation_service_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(RankFetcherHelperTest, GetHomeModulesRankDisabled) {
-  feature_list_.Reset();
-  feature_list_.InitWithFeatures(
-      {}, {features::kSegmentationPlatformAndroidHomeModuleRanker});
-  RankFetcherHelper rank_fetcher_helper;
-
-  ClassificationResult result = FetchRank(rank_fetcher_helper);
-
-  EXPECT_THAT(result.ordered_labels, SizeIs(4));  // Fixed modules size.
-}
-#endif
-
 TEST_F(RankFetcherHelperTest, GetHomeModulesRankEnabled) {
   feature_list_.Reset();
   feature_list_.InitWithFeatures(
@@ -181,13 +168,6 @@ TEST_F(RankFetcherHelperTest, MergeResultsAndRunCallback) {
 
   EXPECT_NEAR(input_context->GetMetadataArgument(kInput1)->float_val, 1, 0.01);
   EXPECT_NEAR(input_context->GetMetadataArgument(kInput3)->float_val, 3, 0.01);
-
-#if BUILDFLAG(IS_ANDROID)
-  // On Android the freshness inputs get backfilled if missing since modules can
-  // be disabled.
-  EXPECT_NEAR(input_context->GetMetadataArgument(kInput2)->float_val, -1, 0.01);
-  EXPECT_FALSE(input_context->GetMetadataArgument(kInput4));
-#endif
 }
 
 TEST_F(RankFetcherHelperTest, EphemeralCardsEmpty) {

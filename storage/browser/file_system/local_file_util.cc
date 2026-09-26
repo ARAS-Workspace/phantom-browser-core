@@ -58,12 +58,6 @@ class LocalFileUtil::LocalFileEnumerator
       }
       file_util_info_ = file_enum_.GetInfo();
 
-#if BUILDFLAG(IS_ANDROID)
-      if (next.IsContentUri()) {
-        return next;
-      }
-#endif
-
       base::FilePath path;
       platform_root_path_.AppendRelativePath(next, &path);
       return virtual_root_path_.Append(path);

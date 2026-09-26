@@ -115,7 +115,6 @@ IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
 //
 // Disable the test for the Android asan build.
 // See http://crbug.com/667837 for detail.
-#if !(BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER))
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                        // TODO(crbug.com/40681859): Re-enable this test
                        DISABLED_DiscardableMemoryAddressSpace) {
@@ -133,7 +132,6 @@ IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
     instances.push_back(std::move(memory));
   }
 }
-#endif
 
 // TODO(crbug.com/362120461): Flaky on many builders.
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,

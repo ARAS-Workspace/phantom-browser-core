@@ -82,7 +82,6 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterStringPref(kWatermarkStyleTimestampTimezonePref,
                                kWatermarkStyleTimestampTimezoneDefault);
 
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterListPref(kOnDataCopiedPref);
   registry->RegisterListPref(kOnFileAttachedPref);
   registry->RegisterListPref(kOnPrintPref);
@@ -91,7 +90,6 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterIntegerPref(kOnDataCopiedScopePref, 0);
 
   RegisterDeviceTrustConnectorProfilePrefs(registry);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
   client_certificates::RegisterProfilePrefs(registry);

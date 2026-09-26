@@ -1446,7 +1446,6 @@ TEST_F(PaintCanvasVideoRendererWithGLTest, PaintRGBA) {
 // TODO(crbug.com/343011436): Move these tests to be on
 // WebGLRenderingContextBase, where they can use the two-copy path and be
 // re-enabled on Android.
-#if !BUILDFLAG(IS_ANDROID)
 // Checks that we correctly copy an I420 shared image VideoFrame when using
 // CopyVideoFrameYUVDataToGLTexture, including correct cropping.
 TEST_F(PaintCanvasVideoRendererWithGLTest,
@@ -1459,7 +1458,6 @@ TEST_F(PaintCanvasVideoRendererWithGLTest,
   frame.reset();
   run_loop.Run();
 }
-#endif
 
 // Checks that we correctly paint a I420 shared image VideoFrame, including
 // correct cropping.
@@ -1492,7 +1490,6 @@ TEST_F(PaintCanvasVideoRendererWithGLTest, PaintI420NotSubset) {
 // TODO(crbug.com/343011436): Move these tests to be on
 // WebGLRenderingContextBase, where they can use the two-copy path and be
 // re-enabled on Android.
-#if !BUILDFLAG(IS_ANDROID)
 // Checks that we correctly copy a NV12 shared image VideoFrame when using
 // CopyVideoFrameYUVDataToGLTexture, including correct cropping.
 TEST_F(PaintCanvasVideoRendererWithGLTest,
@@ -1509,7 +1506,6 @@ TEST_F(PaintCanvasVideoRendererWithGLTest,
   frame.reset();
   run_loop.Run();
 }
-#endif
 
 // Checks that we correctly paint a NV12 shared image VideoFrame, including
 // correct cropping.

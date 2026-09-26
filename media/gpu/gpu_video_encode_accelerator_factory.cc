@@ -28,9 +28,6 @@
 #include "media/gpu/macros.h"
 #include "media/video/video_encode_accelerator.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "media/gpu/android/ndk_video_encode_accelerator.h"
-#endif
 #if BUILDFLAG(IS_MAC)
 #include "media/gpu/mac/vt_video_encode_accelerator_mac.h"
 #endif
@@ -59,14 +56,6 @@ std::unique_ptr<VideoEncodeAccelerator> CreateVaapiVEA() {
 #endif  // BUILDFLAG(IS_LINUX)
   return base::WrapUnique<VideoEncodeAccelerator>(
       new VaapiVideoEncodeAccelerator());
-}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<VideoEncodeAccelerator> CreateAndroidVEA(
-    const gpu::GpuDriverBugWorkarounds& gpu_workarounds) {
-  return base::WrapUnique<VideoEncodeAccelerator>(new NdkVideoEncodeAccelerator(
-      base::SequencedTaskRunner::GetCurrentDefault(), gpu_workarounds));
 }
 #endif
 
@@ -106,9 +95,6 @@ std::vector<VEAFactoryFunction> CreateVEAFactoryFunctions(
   }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  funcs.push_back(base::BindRepeating(&CreateAndroidVEA, gpu_workarounds));
-#endif
 #if BUILDFLAG(IS_MAC)
   funcs.push_back(base::BindRepeating(&CreateVTVEA));
 #endif

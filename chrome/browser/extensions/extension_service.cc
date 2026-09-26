@@ -123,9 +123,7 @@
 #include "chrome/browser/extensions/policy_dse_ntp_override_metrics_reporter.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -242,11 +240,9 @@ ExtensionService::ExtensionService(
     profile_manager_observation_.Observe(g_browser_process->profile_manager());
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/413455412): Find another way to report Chrome updates to
   // extensions on Android, which uses the Play Store for updates.
   UpgradeDetector::GetInstance()->AddObserver(this);
-#endif
 
   cws_info_service_observation_.Observe(
       CWSInfoServiceFactory::GetForProfile(profile_));
@@ -299,9 +295,7 @@ base::WeakPtr<ExtensionServiceInterface> ExtensionService::AsWeakPtr() {
 }
 
 ExtensionService::~ExtensionService() {
-#if !BUILDFLAG(IS_ANDROID)
   UpgradeDetector::GetInstance()->RemoveObserver(this);
-#endif
 }
 
 void ExtensionService::Shutdown() {

@@ -32,10 +32,6 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "services/network/public/mojom/network_service_test.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -52,14 +48,6 @@ class TransferableSocketBrowserTest : public ContentBrowserTest {
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    if (base::android::android_info::sdk_int() <
-        base::android::android_info::SdkVersion::SDK_VERSION_R) {
-      // Android below R does not support transfer of sockets.
-      GTEST_SKIP();
-    }
-#endif
-
     // These assertions need to precede ContentBrowserTest::SetUp to prevent the
     // test body from running when one of the assertions fails.
     ASSERT_TRUE(IsOutOfProcessNetworkService());

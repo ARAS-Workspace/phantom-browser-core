@@ -68,16 +68,12 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include <sys/socket.h>
 #endif
 
 #if BUILDFLAG(IS_LINUX)
 #include <linux/fs.h>
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/android/content_uri_test_utils.h"
 #endif
 
 
@@ -1088,224 +1084,6 @@ TEST_F(FileUtilTest, DeleteDeep) {
   EXPECT_FALSE(PathExists(dir_path));
 }
 #endif  // BUILDFLAG(IS_POSIX)
-
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(FileUtilTest, ContentUriPathExists) {
-  FilePath dir = temp_dir_.GetPath().Append("dir");
-  CreateDirectory(dir);
-  FilePath file = dir.Append("file.txt");
-  WriteFile(file, "file-content");
-  FilePath no_such_file = dir.Append("no-such-file.txt");
-
-  FilePath content_uri_document_dir =
-      *test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(dir);
-  FilePath content_uri_document_file =
-      *test::android::GetInMemoryContentDocumentUriFromCacheDirFilePath(file);
-  FilePath content_uri_document_no_such_file =
-      *test::android::GetInMemoryContentDocumentUriFromCacheDirFilePath(
-          no_such_file);
-
-  FilePath virtual_path_dir =
-      *test::android::GetVirtualDocumentPathFromCacheDirDirectory(dir);
-  FilePath virtual_path_file = virtual_path_dir.Append("file.txt");
-  FilePath virtual_path_no_such_file =
-      virtual_path_dir.Append("no-such-file.txt");
-
-  EXPECT_TRUE(PathExists(content_uri_document_dir));
-  EXPECT_TRUE(PathExists(content_uri_document_file));
-  EXPECT_FALSE(PathExists(content_uri_document_no_such_file));
-  EXPECT_TRUE(PathExists(virtual_path_dir));
-  EXPECT_TRUE(PathExists(virtual_path_file));
-  EXPECT_FALSE(PathExists(virtual_path_no_such_file));
-}
-
-TEST_F(FileUtilTest, ContentUriGetInfo) {
-  FilePath file = temp_dir_.GetPath().Append("file.txt");
-  FilePath dir = temp_dir_.GetPath().Append("dir");
-  WriteFile(file, "file-content");
-  CreateDirectory(dir);
-
-  FilePath content_uri_file =
-      *test::android::GetContentUriFromCacheDirFilePath(file);
-  FilePath content_uri_dir =
-      *test::android::GetContentUriFromCacheDirFilePath(dir);
-  FilePath content_uri_file_in_memory =
-      *test::android::GetInMemoryContentUriFromCacheDirFilePath(file);
-  FilePath content_uri_dir_in_memory =
-      *test::android::GetInMemoryContentUriFromCacheDirFilePath(dir);
-  FilePath content_uri_document =
-      *test::android::GetInMemoryContentDocumentUriFromCacheDirFilePath(file);
-  FilePath content_uri_document_tree =
-      *test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(dir);
-
-  // GetInfo() should work the same for files and content-URIs.
-  File::Info info;
-  File::Info content_uri_info;
-  File::Info content_uri_in_memory_info;
-  File::Info content_uri_document_info;
-  EXPECT_TRUE(GetFileInfo(file, &info));
-  EXPECT_TRUE(GetFileInfo(content_uri_file, &content_uri_info));
-  EXPECT_TRUE(GetFileInfo(content_uri_document, &content_uri_document_info));
-  EXPECT_TRUE(
-      GetFileInfo(content_uri_file_in_memory, &content_uri_in_memory_info));
-  EXPECT_EQ(12u, info.size);
-  EXPECT_EQ(12u, content_uri_info.size);
-  EXPECT_EQ(12u, content_uri_in_memory_info.size);
-  EXPECT_EQ(12u, content_uri_document_info.size);
-  EXPECT_EQ(info.last_modified, content_uri_info.last_modified);
-  // Java InMemory provider sets last-modified to unix epoch.
-  EXPECT_EQ(content_uri_in_memory_info.last_modified, Time::FromTimeT(0));
-  // Java DocumentProvider only does resolution to seconds.
-  EXPECT_EQ(info.last_modified.ToTimeT(),
-            content_uri_document_info.last_modified.ToTimeT());
-  EXPECT_FALSE(info.is_directory);
-  EXPECT_FALSE(content_uri_info.is_directory);
-  EXPECT_FALSE(content_uri_in_memory_info.is_directory);
-  EXPECT_FALSE(content_uri_document_info.is_directory);
-
-  // GetInfo() should work the same for dirs and content-URIs.
-  EXPECT_TRUE(GetFileInfo(dir, &info));
-  EXPECT_TRUE(GetFileInfo(content_uri_dir, &content_uri_info));
-  // GetInfo() is not supported for dirs by the in-memory content-provider.
-  EXPECT_FALSE(
-      GetFileInfo(content_uri_dir_in_memory, &content_uri_in_memory_info));
-  File::Info content_uri_tree_info;
-  EXPECT_TRUE(GetFileInfo(content_uri_document_tree, &content_uri_tree_info));
-  EXPECT_EQ(info.last_modified, content_uri_info.last_modified);
-  // Java uses FileEnumerator::FileInfo which only does resolution to seconds.
-  EXPECT_EQ(info.last_modified.ToTimeT(),
-            content_uri_tree_info.last_modified.ToTimeT());
-  EXPECT_TRUE(info.is_directory);
-  EXPECT_TRUE(content_uri_info.is_directory);
-  EXPECT_TRUE(content_uri_tree_info.is_directory);
-
-  // GetPosixFilePermissions() should fail for content URIs.
-  int mode = 0;
-  EXPECT_TRUE(GetPosixFilePermissions(file, &mode));
-  EXPECT_TRUE(GetPosixFilePermissions(dir, &mode));
-  EXPECT_FALSE(GetPosixFilePermissions(content_uri_file, &mode));
-  EXPECT_FALSE(GetPosixFilePermissions(content_uri_dir, &mode));
-}
-
-TEST_F(FileUtilTest, OpenFileContentUri) {
-  FilePath dir = temp_dir_.GetPath().Append("dir");
-  CreateDirectory(dir);
-  FilePath file = dir.Append("file.txt");
-  WriteFile(file, "abc");
-  FilePath no_such_file = dir.Append("no-such-file.txt");
-
-  FilePath content_uri_document_file =
-      *test::android::GetInMemoryContentDocumentUriFromCacheDirFilePath(file);
-  FilePath content_uri_document_no_such_file =
-      *test::android::GetInMemoryContentDocumentUriFromCacheDirFilePath(
-          no_such_file);
-
-  FilePath virtual_path_dir =
-      *test::android::GetVirtualDocumentPathFromCacheDirDirectory(dir);
-  FilePath virtual_path_file = virtual_path_dir.Append("file.txt");
-  FilePath virtual_path_no_such_file =
-      virtual_path_dir.Append("no-such-file.txt");
-
-  ScopedFILE cu_f(OpenFile(content_uri_document_file, "r"));
-  std::string cu_s;
-  EXPECT_TRUE(ReadStreamToStringWithMaxSize(cu_f.get(), 4, &cu_s));
-  EXPECT_EQ(cu_s, "abc");
-
-  EXPECT_FALSE(OpenFile(content_uri_document_no_such_file, "r"));
-
-  ScopedFILE vp_f(OpenFile(virtual_path_file, "r"));
-  std::string vp_s;
-  EXPECT_TRUE(ReadStreamToStringWithMaxSize(vp_f.get(), 4, &vp_s));
-  EXPECT_EQ(vp_s, "abc");
-
-  EXPECT_FALSE(OpenFile(virtual_path_no_such_file, "r"));
-}
-
-TEST_F(FileUtilTest, DeleteContentUri) {
-  // Get the path to the test file.
-  FilePath data_dir;
-  ASSERT_TRUE(PathService::Get(DIR_TEST_DATA, &data_dir));
-  data_dir = data_dir.Append(FPL("file_util"));
-  ASSERT_TRUE(PathExists(data_dir));
-  FilePath image_file = data_dir.Append(FPL("red.png"));
-  ASSERT_TRUE(PathExists(image_file));
-
-  // Make a copy (we don't want to delete the original red.png when deleting the
-  // content URI).
-  FilePath image_copy = data_dir.Append(FPL("redcopy.png"));
-  ASSERT_TRUE(CopyFile(image_file, image_copy));
-
-  // Insert the image into MediaStore and get a content URI.
-  FilePath uri_path = InsertImageIntoMediaStore(image_copy);
-  ASSERT_TRUE(uri_path.IsContentUri());
-  ASSERT_TRUE(PathExists(uri_path));
-
-  // Try deleting the content URI.
-  EXPECT_TRUE(DeleteFile(uri_path));
-  EXPECT_FALSE(PathExists(image_copy));
-  EXPECT_FALSE(PathExists(uri_path));
-}
-
-TEST_F(FileUtilTest, WriteFileContentUri) {
-  FilePath dir = temp_dir_.GetPath().Append("dir");
-  CreateDirectory(dir);
-
-  FilePath dir_vp =
-      *test::android::GetVirtualDocumentPathFromCacheDirDirectory(dir);
-  FilePath file_vp = dir_vp.Append("file.txt");
-  ASSERT_TRUE(file_vp.IsVirtualDocumentPath());
-
-  ASSERT_FALSE(PathExists(file_vp));
-  EXPECT_TRUE(WriteFile(file_vp, "x"));
-  ASSERT_TRUE(PathExists(file_vp));
-
-  FilePath file_content_uri = *ResolveToContentUri(file_vp);
-
-  EXPECT_TRUE(WriteFile(file_content_uri, "foo"));
-
-  File::Info info;
-  ASSERT_TRUE(GetFileInfo(file_content_uri, &info));
-  ASSERT_EQ(info.size, 3u);
-}
-
-TEST_F(FileUtilTest, ResolveToContentUri) {
-  FilePath dir = temp_dir_.GetPath().Append("dir");
-  CreateDirectory(dir);
-  FilePath file = dir.Append("file.txt");
-  WriteFile(file, "file-content");
-
-  FilePath dir_vp =
-      *test::android::GetVirtualDocumentPathFromCacheDirDirectory(dir);
-  FilePath file_vp = dir_vp.Append("file.txt");
-  ASSERT_TRUE(file_vp.IsVirtualDocumentPath());
-
-  FilePath file_content_uri = *ResolveToContentUri(file_vp);
-  ASSERT_TRUE(file_content_uri.IsContentUri());
-  File::Info info;
-  ASSERT_TRUE(GetFileInfo(file_content_uri, &info));
-  ASSERT_EQ(info.size, 12u);
-}
-
-TEST_F(FileUtilTest, ResolveToVirtualDocumentPath) {
-  FilePath dir = temp_dir_.GetPath().Append("dir");
-  CreateDirectory(dir);
-  FilePath file = dir.Append("file.txt");
-  WriteFile(file, "file-content");
-
-  FilePath dir_content_uri =
-      *test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(dir);
-  FilePath dir_vp = *ResolveToVirtualDocumentPath(dir_content_uri);
-  ASSERT_TRUE(dir_vp.IsVirtualDocumentPath());
-
-  FilePath file_vp = dir_vp.Append("file.txt");
-  File::Info info;
-  ASSERT_TRUE(GetFileInfo(file_vp, &info));
-  ASSERT_TRUE(!info.is_directory);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 
 // Tests non-recursive Delete() for a directory.
 TEST_F(FileUtilTest, DeleteDirNonRecursive) {
@@ -2719,14 +2497,12 @@ TEST_F(FileUtilTest, AllocateFileRegionTest_DontTruncate) {
 #endif
 
 TEST_F(FileUtilTest, GetHomeDirTest) {
-#if !BUILDFLAG(IS_ANDROID)  // Not implemented on Android.
   // We don't actually know what the home directory is supposed to be without
   // calling some OS functions which would just duplicate the implementation.
   // So here we just test that it returns something "reasonable".
   FilePath home = GetHomeDir();
   ASSERT_FALSE(home.empty());
   ASSERT_TRUE(home.IsAbsolute());
-#endif
 }
 
 TEST_F(FileUtilTest, CreateDirectoryTest) {
@@ -3716,83 +3492,6 @@ TEST_F(VerifyPathControlledByUserTest, WriteBitChecks) {
 
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(FileUtilTest, ValidContentUriTest) {
-  // Get the test image path.
-  FilePath data_dir;
-  ASSERT_TRUE(PathService::Get(DIR_TEST_DATA, &data_dir));
-  data_dir = data_dir.AppendASCII("file_util");
-  ASSERT_TRUE(PathExists(data_dir));
-  FilePath image_file = data_dir.Append(FILE_PATH_LITERAL("red.png"));
-  std::optional<int64_t> image_size = GetFileSize(image_file);
-  ASSERT_TRUE(image_size.has_value());
-  ASSERT_GT(image_size.value(), 0);
-
-  // Insert the image into MediaStore. MediaStore will do some conversions, and
-  // return the content URI.
-  FilePath path = InsertImageIntoMediaStore(image_file);
-  EXPECT_TRUE(path.IsContentUri());
-  EXPECT_TRUE(PathExists(path));
-  // The file size may not equal to the input image as MediaStore may convert
-  // the image.
-  std::optional<int64_t> content_uri_size = GetFileSize(path);
-  ASSERT_TRUE(content_uri_size.has_value());
-  EXPECT_EQ(image_size.value(), content_uri_size.value());
-
-  // We should be able to read the file.
-  File file(path, File::FLAG_OPEN | File::FLAG_READ);
-  EXPECT_TRUE(file.IsValid());
-  std::vector<uint8_t> buffer(image_size.value());
-  EXPECT_TRUE(file.ReadAtCurrentPos(buffer));
-}
-
-TEST_F(FileUtilTest, WriteContentUri) {
-  // `path` and `content_uri` are the same file.
-  FilePath path = temp_dir_.GetPath().Append("file.txt");
-  ASSERT_TRUE(WriteFile(path, "file-content"));
-  FilePath content_uri =
-      *test::android::GetContentUriFromCacheDirFilePath(path);
-
-  // We should be able to open the file as writable which truncates the file.
-  File file = File(content_uri, File::FLAG_CREATE_ALWAYS | File::FLAG_WRITE);
-  EXPECT_TRUE(file.IsValid());
-  std::optional<int64_t> size = GetFileSize(path);
-  ASSERT_TRUE(size.has_value());
-  EXPECT_EQ(size.value(), 0);
-
-  EXPECT_EQ(*file.WriteAtCurrentPos(byte_span_from_cstring("123")), 3u);
-  EXPECT_TRUE(file.Flush());
-  size = GetFileSize(path);
-  ASSERT_TRUE(size.has_value());
-  EXPECT_EQ(size.value(), 3);
-}
-
-TEST_F(FileUtilTest, NonExistentContentUriTest) {
-  FilePath path("content://foo.bar");
-  EXPECT_TRUE(path.IsContentUri());
-  EXPECT_FALSE(PathExists(path));
-  EXPECT_FALSE(GetFileSize(path).has_value());
-
-  // We should not be able to read the file.
-  File file(path, File::FLAG_OPEN | File::FLAG_READ);
-  EXPECT_FALSE(file.IsValid());
-}
-
-// Validate crbug.com/398066589 where CreateDirectory() fails when a user does
-// not have stat() access to all subpaths.
-TEST_F(FileUtilTest, CreateDirectoryOnlyCheckMissingSubpaths) {
-  // Apps have access to the android external-storage-dir (e.g.
-  // /storage/emulated/0), but for security will usually not have access such as
-  // stat() to its parent. In tests, DIR_ANDROID_APP_DATA is subdir
-  // chromium_tests_root. The directory should always exist before this test
-  // runs, but even if not it should create ok even though stat() would fail on
-  // some of the subpaths.
-  FilePath dir = PathService::CheckedGet(DIR_ANDROID_APP_DATA);
-  EXPECT_TRUE(CreateDirectory(dir));
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 
 #if defined(FLAKY_327582285)
 #define MAYBE_PreReadFileExistingFileNoSize \
@@ -4009,7 +3708,7 @@ TEST(ScopedFD, ScopedFDCrashesOnCloseFailure) {
 
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(FileUtilTest, CopyFileContentsWithSendfile) {
   // This test validates that sendfile(2) can be used to copy a file contents
   // and that it will honor the file offsets as CopyFileContents does.
@@ -4169,7 +3868,7 @@ TEST_F(FileUtilTest, CopyFileContentsWithSendfileSeqFile) {
   }
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Validates that a new file can be created with the same name as a recently
 // deleted one. This behavior became the default on Windows at some point during

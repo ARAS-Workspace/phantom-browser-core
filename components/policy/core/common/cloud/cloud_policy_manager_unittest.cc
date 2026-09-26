@@ -366,7 +366,6 @@ TEST_F(CloudPolicyManagerTest, RefreshSuccessful) {
   Mock::VerifyAndClearExpectations(&observer_);
 }
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 TEST_F(CloudPolicyManagerTest, ComponentPolicyInitWithPendingRefresh) {
   auto client_ptr = std::make_unique<MockCloudPolicyClient>();
   MockCloudPolicyClient* client = client_ptr.get();
@@ -415,7 +414,6 @@ TEST_F(CloudPolicyManagerTest, ComponentPolicyInitWithPendingRefresh) {
   manager_->OnComponentCloudPolicyUpdated();
   Mock::VerifyAndClearExpectations(&observer_);
 }
-#endif  // (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 
 TEST_F(CloudPolicyManagerTest, SignalOnError) {
   // Simulate a failed load and verify that it triggers OnUpdatePolicy().

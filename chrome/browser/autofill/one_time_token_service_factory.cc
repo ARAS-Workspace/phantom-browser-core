@@ -14,10 +14,6 @@
 #include "components/one_time_tokens/core/common/one_time_token_features.h"
 #include "content/public/browser/browser_context.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/autofill/android/android_sms_otp_backend_factory.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using ::one_time_tokens::GmailOtpBackend;
 using ::one_time_tokens::OneTimeTokenService;
 using ::one_time_tokens::OneTimeTokenServiceImpl;
@@ -28,9 +24,6 @@ namespace autofill {
 OneTimeTokenServiceFactory::OneTimeTokenServiceFactory()
     : ProfileKeyedServiceFactory("OneTimeTokenServiceFactory",
                                  ProfileSelections::BuildForRegularProfile()) {
-#if BUILDFLAG(IS_ANDROID)
-  DependsOn(AndroidSmsOtpBackendFactory::GetInstance());
-#endif  // BUILDFLAG(IS_ANDROID)
   DependsOn(GmailOtpBackendFactory::GetInstance());
 }
 OneTimeTokenServiceFactory::~OneTimeTokenServiceFactory() = default;
@@ -50,9 +43,6 @@ std::unique_ptr<KeyedService>
 OneTimeTokenServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   SmsOtpBackend* sms_otp_backend = nullptr;
-#if BUILDFLAG(IS_ANDROID)
-  sms_otp_backend = AndroidSmsOtpBackendFactory::GetForBrowserContext(context);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   one_time_tokens::GmailOtpBackend* gmail_otp_backend =
       base::FeatureList::IsEnabled(

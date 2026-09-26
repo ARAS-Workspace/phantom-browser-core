@@ -124,14 +124,10 @@ TEST_F(InstalledAppProviderImplTest, GetRelatedApps) {
   const std::vector<blink::mojom::RelatedApplicationPtr>& result = future.Get();
 
   std::size_t expected_number_of_matches = 0u;
-#if !BUILDFLAG(IS_ANDROID)
   expected_number_of_matches += 1u;
-#endif  // !BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(result.size(), expected_number_of_matches);
 
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(result, Contains(RelatedAppById(kInstalledWebAppId)));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Should not be in list.
   EXPECT_THAT(result, Not(Contains(RelatedAppById(unknown_web_app_id))));

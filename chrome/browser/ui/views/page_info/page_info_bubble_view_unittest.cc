@@ -1243,11 +1243,9 @@ namespace {
 
 class MockPageInfoUiDelegate : public PageInfoUiDelegate {
  public:
-#if !BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(bool, IsBlockAutoPlayEnabled, (), (override));
   MOCK_METHOD(bool, IsMultipleTabsOpen, (), (override));
   MOCK_METHOD(void, OpenSiteSettingsFileSystem, (), (override));
-#endif
   MOCK_METHOD(content::PermissionResult,
               GetPermissionResult,
               (blink::PermissionType permission),

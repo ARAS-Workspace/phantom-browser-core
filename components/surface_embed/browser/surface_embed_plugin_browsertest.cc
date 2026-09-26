@@ -378,9 +378,7 @@ class SurfaceEmbedBrowserTest : public content::ContentBrowserTest {
     // therefore query the actual scale factor from the view. On other
     // platforms, verify it matches the forced value.
     const float device_scale_factor = view->GetDeviceScaleFactor();
-#if !BUILDFLAG(IS_ANDROID)
     ASSERT_FLOAT_EQ(kTestDeviceScaleFactor, device_scale_factor);
-#endif
 
     *out_scaled_bounds =
         gfx::ScaleToRoundedRect(embed_bounds, device_scale_factor);
@@ -1126,9 +1124,7 @@ IN_PROC_BROWSER_TEST_F(SurfaceEmbedBrowserTest,
   EXPECT_TRUE(content::ExecJs(child_contents.get(),
                               "document.querySelector('select').showPicker()"));
   // Android sometimes times out when waiting for the popup.
-#if !BUILDFLAG(IS_ANDROID)
   waiter.Wait();
-#endif
 }
 
 // Runs the browser with renderer accessibility forced on so the plugin sends

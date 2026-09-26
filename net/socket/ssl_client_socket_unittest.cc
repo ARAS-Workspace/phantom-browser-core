@@ -5959,11 +5959,6 @@ TEST_F(SSLClientSocketTest, Tag) {
       std::move(tagging_sock), host_port_pair(), SSLConfig()));
 
   EXPECT_EQ(tagging_sock_ptr->tag(), SocketTag());
-#if BUILDFLAG(IS_ANDROID)
-  SocketTag tag(0x12345678, 0x87654321);
-  sock->ApplySocketTag(tag);
-  EXPECT_EQ(tagging_sock_ptr->tag(), tag);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(SSLClientSocketTest, ECH) {

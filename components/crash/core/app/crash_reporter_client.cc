@@ -37,7 +37,7 @@ CrashReporterClient* GetCrashReporterClient() {
 CrashReporterClient::CrashReporterClient() = default;
 CrashReporterClient::~CrashReporterClient() = default;
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
 void CrashReporterClient::SetCrashReporterClientIdFromGUID(
     const std::string& client_guid) {}
 #endif
@@ -86,22 +86,7 @@ bool CrashReporterClient::ReportingIsEnforcedByPolicy(bool* breakpad_enabled) {
   return false;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-unsigned int CrashReporterClient::GetCrashDumpPercentage() {
-  return 100;
-}
-
-bool CrashReporterClient::GetBrowserProcessType(std::string* ptype) {
-  return false;
-}
-
-bool CrashReporterClient::ShouldWriteMinidumpToLog() {
-  return false;
-}
-
-#endif
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 void CrashReporterClient::GetSanitizationInformation(
     const char* const** allowed_annotations,
     void** target_module,

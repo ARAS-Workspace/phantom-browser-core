@@ -313,15 +313,6 @@ void ResolvedFrameData::UpdateOffsetTags(OffsetTagLookupFn lookup_value_fn) {
   for (auto& tag_def : offset_tags_to_find) {
     auto offset = lookup_value_fn(tag_def);
     if (!tag_def.constraints.IsOffsetValid(offset)) {
-#if BUILDFLAG(IS_ANDROID)
-      if (base::FeatureList::IsEnabled(
-              features::kAndroidDumpForBadCompositedUiState)) {
-        SCOPED_CRASH_KEY_STRING32("BCIV", "offset", offset.ToString());
-        SCOPED_CRASH_KEY_STRING32("BCIV", "OffsetTagConstraints",
-                                  tag_def.constraints.ToString());
-        base::debug::DumpWithoutCrashing();
-      }
-#endif
       offset = tag_def.constraints.Clamp(offset);
     }
 

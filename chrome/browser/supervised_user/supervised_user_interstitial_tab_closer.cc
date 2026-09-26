@@ -9,10 +9,8 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#endif
 
 TabCloser::~TabCloser() = default;
 
@@ -22,12 +20,10 @@ void TabCloser::CheckIfInBrowserThenCloseTab(
   DCHECK(web_contents);
   // Close the tab only if there is a browser for it (which is not the case
   // for example in a <webview>).
-#if !BUILDFLAG(IS_ANDROID)
   if (!GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           web_contents)) {
     return;
   }
-#endif
   TabCloser::CreateForWebContents(web_contents);
 }
 
@@ -40,7 +36,6 @@ TabCloser::TabCloser(content::WebContents* web_contents)
 
 void TabCloser::CloseTabImpl() {
   // On Android, FindBrowserWithTab doesn't exist.
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           &GetWebContents());
@@ -50,7 +45,6 @@ void TabCloser::CloseTabImpl() {
     GetWebContents().RemoveUserData(UserDataKey());
     return;
   }
-#endif
   GetWebContents().Close();
 }
 

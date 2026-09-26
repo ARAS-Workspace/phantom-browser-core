@@ -42,9 +42,7 @@
 #include "url/url_constants.h"
 #include "url/url_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/public/browser/authenticator_request_client_delegate.h"
-#endif
 
 namespace content {
 
@@ -177,7 +175,6 @@ WebAuthRequestSecurityCheckerImpl::ValidateDomainAndRelyingPartyID(
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Extensions are not supported on Android.
   if (GetContentClient()
           ->browser()
@@ -188,7 +185,6 @@ WebAuthRequestSecurityCheckerImpl::ValidateDomainAndRelyingPartyID(
     std::move(callback).Run(blink::mojom::AuthenticatorStatus::SUCCESS);
     return nullptr;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   webauthn::ValidationStatus domain_validation =
       webauthn::OriginAllowedToMakeWebAuthnRequests(caller_origin);

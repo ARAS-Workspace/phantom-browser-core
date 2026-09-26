@@ -29,10 +29,6 @@
 #include "ui/base/ime/init/input_method_initializer.h"
 #include "ui/gfx/font_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/android/tracing_controller_android.h"
-#endif
-
 
 namespace content {
 namespace {

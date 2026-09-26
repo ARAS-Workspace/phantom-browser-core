@@ -37,14 +37,12 @@ TEST(CountryNamesForLocaleTest, EmptyCountryCodeForInvalidLocale) {
 
 // The behavior depends on the platform. On Android the locale reverts back to
 // the standard locale.
-#if !BUILDFLAG(IS_ANDROID)
 #define MAYBE_EmptyCountryCodeForEmptyLocale EmptyCountryCodeForEmptyLocale
 // Test that an empty string is returned for an empty locale.
 TEST(CountryNamesForLocaleTest, MAYBE_EmptyCountryCodeForEmptyLocale) {
   CountryNamesForLocale empty_locale_names("");
   EXPECT_EQ("", empty_locale_names.GetCountryCode(u"United States"));
 }
-#endif
 
 // Test that an empty string is returned for an empty country name.
 TEST(CountryNamesForLocaleTest, EmptyCountryCodeForEmptyCountryName) {

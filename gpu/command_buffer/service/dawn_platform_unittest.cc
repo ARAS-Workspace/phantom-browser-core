@@ -100,17 +100,6 @@ TEST_F(DawnPlatformTest, RecordsCacheHistogramsOnFramePresented) {
 }
 
 TEST_F(DawnPlatformTest, RecordsAbsoluteHistograms) {
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_VULKAN)
-  {
-    // Test Graphite path: uses custom unified names.
-    DawnPlatform platform(nullptr, nullptr, "GPU.GraphiteDawn.", false);
-    platform.HistogramCustomCounts("Vulkan.CreateGraphicsPipelines.CacheHit",
-                                   10, 1, 100, 50);
-    histogram_tester_.ExpectUniqueSample(
-        "GPU.Vulkan.SkiaContext.vkCreateGraphicsPipelinesUS", 10, 1);
-  }
-#endif
-
   {
     // Test WebGPU path: no changes to name.
     DawnPlatform platform(nullptr, nullptr, "GPU.WebGPU.", false);

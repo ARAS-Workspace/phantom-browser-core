@@ -17,11 +17,6 @@
 #include "content/public/browser/web_ui_data_source.h"
 #include "services/network/public/mojom/content_security_policy.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/common/sandbox_status_extension_android.mojom.h"
-#include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "content/public/browser/zygote_host/zygote_host_linux.h"
 #include "sandbox/policy/sandbox.h"
@@ -87,13 +82,6 @@ SandboxInternalsUI::SandboxInternalsUI(content::WebUI* web_ui)
 }
 
 void SandboxInternalsUI::WebUIRenderFrameCreated(
-    content::RenderFrameHost* render_frame_host) {
-#if BUILDFLAG(IS_ANDROID)
-  mojo::AssociatedRemote<chrome::mojom::SandboxStatusExtension> sandbox_status;
-  render_frame_host->GetRemoteAssociatedInterfaces()->GetInterface(
-      &sandbox_status);
-  sandbox_status->AddSandboxStatusExtension();
-#endif
-}
+    content::RenderFrameHost* render_frame_host) {}
 
 SandboxInternalsUI::~SandboxInternalsUI() = default;

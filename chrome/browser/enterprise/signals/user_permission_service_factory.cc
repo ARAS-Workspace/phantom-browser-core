@@ -20,10 +20,8 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "content/public/browser/browser_context.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/enterprise/connectors/device_trust/device_trust_connector_service_factory.h"
 #include "components/enterprise/device_trust/core/device_trust_connector_service.h"  // nogncheck
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace enterprise_signals {
 
@@ -51,10 +49,8 @@ UserPermissionServiceFactory::UserPermissionServiceFactory()
               .Build()) {
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(policy::ManagementServiceFactory::GetInstance());
-#if !BUILDFLAG(IS_ANDROID)
   DependsOn(
       enterprise_connectors::DeviceTrustConnectorServiceFactory::GetInstance());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 UserPermissionServiceFactory::~UserPermissionServiceFactory() = default;
@@ -66,7 +62,6 @@ UserPermissionServiceFactory::BuildServiceInstanceForBrowserContext(
 
   device_signals::UserDelegate::SignalsDependencyDelegate*
       signals_dependency_delegate = nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   signals_dependency_delegate =
       enterprise_connectors::DeviceTrustConnectorServiceFactory::GetForProfile(
           profile);
@@ -76,7 +71,6 @@ UserPermissionServiceFactory::BuildServiceInstanceForBrowserContext(
     // incognito).
     return nullptr;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   auto* management_service =
       policy::ManagementServiceFactory::GetForProfile(profile);

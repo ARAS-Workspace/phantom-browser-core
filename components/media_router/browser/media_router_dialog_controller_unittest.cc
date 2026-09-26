@@ -21,10 +21,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/media_router/browser/android/media_router_dialog_controller_android.h"
-#endif
-
 using ::testing::_;
 using ::testing::Return;
 
@@ -100,29 +96,6 @@ class MediaRouterDialogControllerTest
   std::unique_ptr<TestMediaRouterDialogController> dialog_controller_;
   std::unique_ptr<MockWebContentsDelegate> web_contents_delegate_;
 };
-
-#if BUILDFLAG(IS_ANDROID)
-// The non-Android implementation is tested in
-// MediaRouterDialogControllerViewsTest.
-TEST_F(MediaRouterDialogControllerTest, CreateForWebContents) {
-  MediaRouterDialogController::SetGetOrCreate(
-      base::BindRepeating([](content::WebContents* web_contents) {
-        DCHECK(web_contents);
-        MediaRouterDialogController* controller = nullptr;
-        MediaRouterDialogControllerAndroid::CreateForWebContents(web_contents);
-        controller =
-            MediaRouterDialogControllerAndroid::FromWebContents(web_contents);
-        return controller;
-      }));
-  MediaRouterDialogController* dialog_controller =
-      MediaRouterDialogController::GetOrCreateForWebContents(web_contents());
-  ASSERT_NE(dialog_controller, nullptr);
-  // Returns the same value the second time.
-  ASSERT_EQ(
-      dialog_controller,
-      MediaRouterDialogController::GetOrCreateForWebContents(web_contents()));
-}
-#endif
 
 TEST_F(MediaRouterDialogControllerTest, ShowAndHideDialog) {
   EXPECT_CALL(*web_contents_delegate_, ActivateContents(web_contents()));

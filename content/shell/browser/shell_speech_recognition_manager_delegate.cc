@@ -27,11 +27,9 @@ SpeechRecognitionEventListener*
   return nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ShellSpeechRecognitionManagerDelegate::BindSpeechRecognitionContext(
     mojo::PendingReceiver<media::mojom::SpeechRecognitionContext> receiver,
     const std::string& language,
     const GlobalRenderFrameHostId& render_frame_host_id) {}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

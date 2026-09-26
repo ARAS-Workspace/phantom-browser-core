@@ -312,7 +312,6 @@ TEST_F(LeakDetectionDelegateTest, LeakDetectionDoneWithTrueResult) {
       LeakDetectionUrlType::kHttp, 1);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // On Android, syncing passwords from the profile store is only possible
 // before login db deprecation.
 // TODO(crbug.com/40066949): Remove once kSync becomes unreachable or is
@@ -354,7 +353,6 @@ TEST_F(LeakDetectionDelegateTest, LeakDetectionDoneForSyncingUser) {
   EXPECT_CALL(*profile_store(), UpdateLogin);
   WaitForPasswordStore();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(LeakDetectionDelegateTest, LeakDetectionDoneForAccountStoreUser) {
   const PasswordForm form = CreateTestForm();
@@ -436,80 +434,6 @@ TEST_F(LeakDetectionDelegateTest,
   EXPECT_CALL(*profile_store(), UpdateLogin);
   WaitForPasswordStore();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(LeakDetectionDelegateTest, LeakDetectionDoneLocalStore) {
-  const PasswordForm form = CreateTestForm();
-
-  ON_CALL(client(), GetSyncService()).WillByDefault(Return(sync_service()));
-  ON_CALL(client(), GetAccountPasswordStore())
-      .WillByDefault(Return(account_store()));
-  ON_CALL(client(), GetProfilePasswordStore())
-      .WillByDefault(Return(profile_store()));
-
-  ASSERT_EQ(sync_util::GetPasswordSyncState(sync_service()),
-            sync_util::SyncState::kActiveWithNormalEncryption);
-
-  ExpectPasswords({}, /*store=*/account_store());
-  ExpectPasswords({form}, /*store=*/profile_store());
-  auto check_instance = std::make_unique<MockLeakDetectionCheck>();
-  LeakDetectionCheck::LeakDetectionCallback callback;
-  EXPECT_CALL(*check_instance,
-              Start(LeakDetectionInitiator::kSignInCheck, form, _))
-      .WillOnce(MoveArg<2>(&callback));
-
-  EXPECT_CALL(factory(), TryCreateLeakCheck)
-      .WillOnce(Return(ByMove(std::move(check_instance))));
-  delegate().StartLeakCheck(LeakDetectionInitiator::kSignInCheck, form,
-                            GetTestUrl());
-
-  EXPECT_CALL(client(),
-              NotifyUserCredentialsWereLeaked(LeakedPasswordDetails(
-                  password_manager::CreateLeakType(
-                      IsSaved(true), IsReused(false), IsSyncing(false)),
-                  form, /* in_account_store = */ false)));
-  std::move(callback).Run(IsLeaked(true));
-
-  EXPECT_CALL(*profile_store(), UpdateLogin);
-  WaitForPasswordStore();
-}
-
-TEST_F(LeakDetectionDelegateTest, LeakDetectionDoneAccountStore) {
-  const PasswordForm form = CreateTestForm();
-
-  ON_CALL(client(), GetSyncService()).WillByDefault(Return(sync_service()));
-  ON_CALL(client(), GetAccountPasswordStore())
-      .WillByDefault(Return(account_store()));
-  ON_CALL(client(), GetProfilePasswordStore())
-      .WillByDefault(Return(profile_store()));
-
-  ASSERT_EQ(sync_util::GetPasswordSyncState(sync_service()),
-            sync_util::SyncState::kActiveWithNormalEncryption);
-
-  ExpectPasswords({form}, /*store=*/account_store());
-  ExpectPasswords({}, /*store=*/profile_store());
-  auto check_instance = std::make_unique<MockLeakDetectionCheck>();
-  LeakDetectionCheck::LeakDetectionCallback callback;
-  EXPECT_CALL(*check_instance,
-              Start(LeakDetectionInitiator::kSignInCheck, form, _))
-      .WillOnce(MoveArg<2>(&callback));
-
-  EXPECT_CALL(factory(), TryCreateLeakCheck)
-      .WillOnce(Return(ByMove(std::move(check_instance))));
-  delegate().StartLeakCheck(LeakDetectionInitiator::kSignInCheck, form,
-                            GetTestUrl());
-
-  EXPECT_CALL(client(),
-              NotifyUserCredentialsWereLeaked(LeakedPasswordDetails(
-                  password_manager::CreateLeakType(
-                      IsSaved(true), IsReused(false), IsSyncing(true)),
-                  form, /* in_account_store = */ true)));
-  std::move(callback).Run(IsLeaked(true));
-
-  EXPECT_CALL(*account_store(), UpdateLogin);
-  WaitForPasswordStore();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(LeakDetectionDelegateTest, LeakHistoryAddCredentials) {
   PasswordForm form = CreateTestForm();

@@ -176,17 +176,6 @@ void DomDistillerViewerSource::RequestViewerHandle::DOMContentLoaded(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Reading mode should not be affected by the default zoom level. There is a
-  // JS font scaling applied based on distilled_page_prefs, so we want to set
-  // temporary zoom level of 0 so that the zoom settings do not stack on top of
-  // one another.
-  content::HostZoomMap* host_zoom_map =
-      content::HostZoomMap::GetForWebContents(web_contents());
-  host_zoom_map->SetTemporaryZoomLevel(
-      web_contents()->GetPrimaryMainFrame()->GetGlobalId(), 0.0);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Execute the scripts in buffer_ one-by-one, starting from the front of the
   // list.
   while (!buffers_.empty()) {
@@ -219,13 +208,11 @@ void DomDistillerViewerSource::StartDataRequest(
   content::WebContents* web_contents = wc_getter.Run();
   if (!web_contents)
     return;
-#if !BUILDFLAG(IS_ANDROID)
   // Don't allow loading of mixed content on Reader Mode pages.
   blink::web_pref::WebPreferences prefs =
       web_contents->GetOrCreateWebPreferences();
   prefs.strict_mixed_content_checking = true;
   web_contents->SetWebPreferences(prefs);
-#endif  // !BUILDFLAG(IS_ANDROID)
   if (kViewerCssPath == path) {
     std::string css = viewer::GetCss();
     std::move(callback).Run(

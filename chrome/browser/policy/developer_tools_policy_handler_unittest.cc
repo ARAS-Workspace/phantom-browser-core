@@ -30,7 +30,6 @@ class DeveloperToolsPolicyHandlerTest
   }
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android does not support the legacy kDeveloperToolsDisabled policy.
 TEST_F(DeveloperToolsPolicyHandlerTest, NewPolicyOverridesLegacyPolicy) {
   EXPECT_FALSE(store_->GetValue(prefs::kDevToolsAvailability, nullptr));
@@ -96,7 +95,6 @@ TEST_F(DeveloperToolsPolicyHandlerTest, NewPolicyAppliesIfLegacyPolicyInvalid) {
   ASSERT_TRUE(store_->GetValue(prefs::kDevToolsAvailability, &value));
   EXPECT_EQ(static_cast<int>(Availability::kAllowed), value->GetInt());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(DeveloperToolsPolicyHandlerTest, DisallowedForForceInstalledExtensions) {
   EXPECT_FALSE(store_->GetValue(prefs::kDevToolsAvailability, nullptr));

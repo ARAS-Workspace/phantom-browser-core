@@ -122,7 +122,6 @@ IN_PROC_BROWSER_TEST_F(RegisterProtocolHandlerBrowserTest, CustomHandler) {
 }
 
 // https://crbug.com/178097: Implement registerProtocolHandler on Android
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(RegisterProtocolHandlerBrowserTest,
                        IgnoreRequestWithoutUserGesture) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -179,10 +178,8 @@ IN_PROC_BROWSER_TEST_F(RegisterProtocolHandlerBrowserTest, FencedFrame) {
   // Ensure the registry is still empty.
   ASSERT_EQ(0u, registry->GetHandlersFor(url.GetScheme()).size());
 }
-#endif
 
 // https://crbug.com/178097: Implement registerProtocolHandler on Android
-#if !BUILDFLAG(IS_ANDROID)
 class RegisterProtocolHandlerAndServiceWorkerInterceptor
     : public RegisterProtocolHandlerBrowserTest {
  public:
@@ -222,6 +219,5 @@ IN_PROC_BROWSER_TEST_F(RegisterProtocolHandlerAndServiceWorkerInterceptor,
             content::EvalJs(shell(),
                             "pageWithCustomSchemeHandledByServiceWorker();"));
 }
-#endif
 
 }  // namespace custom_handlers

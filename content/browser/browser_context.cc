@@ -478,10 +478,4 @@ BrowserContext::TakeDefaultProtoDatabaseProvider() {
   return nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-std::string BrowserContext::GetExtraHeadersForUrl(const GURL& url) {
-  return std::string();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace content

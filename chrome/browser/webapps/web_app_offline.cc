@@ -15,9 +15,7 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/web_app_utils.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -101,7 +99,6 @@ class DefaultOfflineWebContentsObserver : public content::WebContentsObserver {
 
 namespace web_app {
 
-#if !BUILDFLAG(IS_ANDROID)
 content::mojom::AlternativeErrorPageOverrideInfoPtr GetOfflinePageInfo(
     const GURL& url,
     content::RenderFrameHost* render_frame_host,
@@ -111,7 +108,6 @@ content::mojom::AlternativeErrorPageOverrideInfoPtr GetOfflinePageInfo(
       l10n_util::GetStringUTF16(IDS_ERRORPAGES_HEADING_YOU_ARE_OFFLINE),
       error_page::kOfflineIconId);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void TrackOfflinePageVisibility(content::RenderFrameHost* render_frame_host) {
   if (render_frame_host == nullptr)

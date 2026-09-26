@@ -10,15 +10,11 @@
 
 namespace switches {
 
-#if !BUILDFLAG(IS_ANDROID)
 bool IsDynamicProfileCountryEnabled() {
   return base::FeatureList::IsEnabled(kDynamicProfileCountry);
 }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kDynamicProfileCountry, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kCurrentDseHighlightOnChoiceScreenSupport,
              base::FEATURE_ENABLED_BY_DEFAULT);

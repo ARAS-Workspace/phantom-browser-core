@@ -519,12 +519,10 @@ void PictureInPictureBrowserFrameView::Layout(PassKey) {
   gfx::Rect top_bar = content_area;
   top_bar.set_height(kTopControlsHeight);
   top_bar_container_view_->SetBoundsRect(top_bar);
-#if !BUILDFLAG(IS_ANDROID)
   if (auto_pip_setting_overlay_) {
     auto_pip_setting_overlay_->SetBoundsRect(
         gfx::SubtractRects(content_area, top_bar));
   }
-#endif
 
   LayoutSuperclass<BrowserFrameView>(this);
 }

@@ -114,7 +114,6 @@ FieldPrediction::Source ToSafeFieldPredictionSource(
   return result;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Merges manual and server type predictions.
 //
 // The logic to merge manual and server overrides (which may differ in length),
@@ -175,7 +174,6 @@ void InsertParsedOverrides(
                                       /*server_overrides=*/field_types[key]));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Helper for `EncodeUploadRequest()` that creates a bit field corresponding to
 // `available_field_types` and returns the hex representation as a string.
@@ -794,7 +792,6 @@ GetSuggestionsMapFromResponse(
       fields_suggestions[{form_signature, field_signature}].push_back(field);
     }
   }
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           features::debug::kAutofillOverridePredictions)) {
     if (std::string param =
@@ -812,7 +809,6 @@ GetSuggestionsMapFromResponse(
           fields_suggestions);
     }
   }
-#endif
   return fields_suggestions;
 }
 
@@ -864,12 +860,10 @@ void ClearSmallAddressFormPredictions(
     AutofillQueryResponse::FormSuggestion& form_suggestion) {
   // If predictions are overridden for debugging via the command line, skip the
   // clearing of small address form predictions.
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           features::debug::kAutofillOverridePredictions)) {
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Only forms with up to 2 fields are considered small forms.
   static constexpr int kSmallFormThreshold = 3;

@@ -22,10 +22,6 @@
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/permissions/android/android_permission_util.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 using content::RenderFrameHost;
 using content::WebContents;
@@ -76,18 +72,6 @@ void BluetoothInternalsHandler::CheckSystemPermissions(
   bool need_location_services = false;
   bool can_request_system_permissions = false;
 
-#if BUILDFLAG(IS_ANDROID)
-  WebContents* web_contents =
-      content::WebContents::FromRenderFrameHost(&render_frame_host_.get());
-  need_location_permission =
-      permissions::NeedsLocationPermissionForBluetooth(web_contents);
-  need_nearby_devices_permission =
-      permissions::NeedsNearbyDevicesPermissionForBluetooth(web_contents);
-  need_location_services = permissions::NeedsLocationServicesForBluetooth();
-  can_request_system_permissions =
-      permissions::CanRequestSystemPermissionsForBluetooth(web_contents);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   std::move(callback).Run(
       need_location_permission, need_nearby_devices_permission,
       need_location_services, can_request_system_permissions);
@@ -95,21 +79,11 @@ void BluetoothInternalsHandler::CheckSystemPermissions(
 
 void BluetoothInternalsHandler::RequestSystemPermissions(
     RequestSystemPermissionsCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  WebContents* web_contents =
-      content::WebContents::FromRenderFrameHost(&render_frame_host_.get());
-  permissions::RequestSystemPermissionsForBluetooth(web_contents);
-#endif  // BUILDFLAG(IS_ANDROID)
   std::move(callback).Run();
 }
 
 void BluetoothInternalsHandler::RequestLocationServices(
     RequestLocationServicesCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  WebContents* web_contents =
-      content::WebContents::FromRenderFrameHost(&render_frame_host_.get());
-  permissions::RequestLocationServices(web_contents);
-#endif  // BUILDFLAG(IS_ANDROID)
   std::move(callback).Run();
 }
 

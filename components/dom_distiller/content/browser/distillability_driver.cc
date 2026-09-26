@@ -102,7 +102,6 @@ void DistillabilityDriver::PrimaryPageChanged(content::Page& page) {
 
 void DistillabilityDriver::OnDistillability(
     const DistillabilityResult& result) {
-#if !BUILDFLAG(IS_ANDROID)
   if (result.is_distillable) {
     if (!is_secure_check_ || !is_secure_check_.Run(&GetWebContents())) {
       DistillabilityResult not_distillable;
@@ -116,7 +115,6 @@ void DistillabilityDriver::OnDistillability(
       return;
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   DistillabilityResultPageData::CreateForPage(
       GetWebContents().GetPrimaryPage());

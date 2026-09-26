@@ -31,23 +31,7 @@ namespace {
 class TrustedVaultEncryptionKeysTabHelperTest
     : public ChromeRenderViewHostTestHarness {
  public:
-  TrustedVaultEncryptionKeysTabHelperTest() {
-#if BUILDFLAG(IS_ANDROID)
-    // Avoid the disabling of site isolation due to memory constraints, required
-    // on Android so that ApplyGlobalIsolatedOrigins() takes effect regardless
-    // of available memory when running the test (otherwise low-memory bots may
-    // run into test failures).
-    feature_list_.InitWithFeaturesAndParameters(
-        {{site_isolation::features::kSiteIsolationMemoryThresholdsAndroid,
-          {{site_isolation::features::
-                kStrictSiteIsolationMemoryThresholdParamName,
-            "0"},
-           {site_isolation::features::
-                kPartialSiteIsolationMemoryThresholdParamName,
-            "0"}}}},
-        {});
-#endif  // BUILDFLAG(IS_ANDROID)
-  }
+  TrustedVaultEncryptionKeysTabHelperTest() {}
 
   ~TrustedVaultEncryptionKeysTabHelperTest() override = default;
 

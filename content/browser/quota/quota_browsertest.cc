@@ -42,7 +42,6 @@ class QuotaBrowserTest : public ContentBrowserTest {
 };
 
 // TODO(crbug.com/40488499): Android does not support PRE_ tests.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(QuotaBrowserTest, PRE_QuotaDatabaseBootstrapTest) {
   base::ScopedAllowBlockingForTesting allow_blocking;
 
@@ -170,7 +169,6 @@ IN_PROC_BROWSER_TEST_F(QuotaBrowserTest, QuotaDatabaseBootstrapTest) {
       storage::QuotaManagerImpl::kDatabaseName);
   EXPECT_TRUE(base::PathExists(db_path));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test for https://crbug.com/1370035 - when a CacheStorage index file without
 // bucket information is present on disk and the QuotaDatabase has't been

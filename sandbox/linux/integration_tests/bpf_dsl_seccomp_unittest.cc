@@ -2055,7 +2055,6 @@ SANDBOX_TEST(SandboxBPF, DISABLE_ON_TSAN(SeccompRetTrace)) {
 }
 
 // Android does not expose pread64 nor pwrite64.
-#if !BUILDFLAG(IS_ANDROID)
 
 bool FullPwrite64(int fd, const char* buffer, size_t count, off64_t offset) {
   while (count > 0) {
@@ -2136,8 +2135,6 @@ BPF_TEST_C(SandboxBPF, Pread64, TrapPread64Policy) {
       0, memcmp(kTestString, read_test_string, sizeof(kTestString))));
   BPF_ASSERT(pread_64_was_forwarded);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void* TsyncApplyToTwoThreadsFunc(void* cond_ptr) {
   base::WaitableEvent* event = static_cast<base::WaitableEvent*>(cond_ptr);

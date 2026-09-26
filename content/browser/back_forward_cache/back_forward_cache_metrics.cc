@@ -98,11 +98,9 @@ BackForwardCacheMetrics::CreateOrReuseBackForwardCacheMetricsForNavigation(
     int64_t committing_document_sequence_number,
     SiteInstanceImpl* committing_main_frame_site_instance) {
   // TODO(https://crbug.com/445585641): Make this enforceable on Android.
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(kCheckDocumentSequenceNumber)) {
     CHECK_NE(committing_document_sequence_number, -1);
   }
-#endif
   if (!previous_entry) {
     // There is no previous NavigationEntry, so we must create a new metrics
     // object.

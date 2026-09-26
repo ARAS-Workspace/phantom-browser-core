@@ -20,20 +20,12 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 class PrefetchBrowserTest : public PlatformBrowserTest {
  public:
   PrefetchBrowserTest() {
     std::vector<base::test::FeatureRef> enabled_features = {};
-
-#if BUILDFLAG(IS_ANDROID)
-    enabled_features.push_back(chrome::android::kCCTNavigationalPrefetch);
-#endif  // BUILDFLAG(IS_ANDROID)
 
     feature_list_.InitWithFeatures(enabled_features, {});
   }
@@ -102,97 +94,5 @@ class PrefetchBrowserTest : public PlatformBrowserTest {
   std::unique_ptr<content::test::PreloadingAttemptUkmEntryBuilder>
       attempt_entry_builder_;
 };
-
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(PrefetchBrowserTest, CCTPrefetch) {
-  content::test::TestPrefetchWatcher test_prefetch_watcher;
-
-  const GURL initial_url = GetURL("/empty.html");
-  const GURL prefetch_url = GetURL("/simple.html");
-  ASSERT_TRUE(NavigateToURL(initial_url));
-
-  auto* chrome_prefetch_manager =
-      ChromePrefetchManager::GetOrCreateForWebContents(GetActiveWebContents());
-  chrome_prefetch_manager->StartPrefetchFromCCT(prefetch_url, false,
-                                                std::nullopt);
-
-  content::test::PrefetchContainerIdForTesting prefetch_container_id =
-      test_prefetch_watcher.WaitUntilPrefetchResponseCompleted(std::nullopt,
-                                                               prefetch_url);
-
-  ASSERT_TRUE(NavigateToURL(prefetch_url));
-
-  EXPECT_TRUE(test_prefetch_watcher.PrefetchUsedInLastNavigation());
-  EXPECT_EQ(
-      test_prefetch_watcher.GetPrefetchContainerIdForTestingInLastNavigation(),
-      prefetch_container_id);
-
-  auto cct_attempt_entry_builder =
-      std::make_unique<content::test::PreloadingAttemptUkmEntryBuilder>(
-          chrome_preloading_predictor::kChromeCustomTabs);
-
-  ukm::SourceId ukm_source_id =
-      GetActiveWebContents()->GetPrimaryMainFrame()->GetPageUkmSourceId();
-  content::test::ExpectPreloadingAttemptUkm(
-      *test_ukm_recorder(),
-      {cct_attempt_entry_builder->BuildEntry(
-          ukm_source_id, content::PreloadingType::kPrefetch,
-          content::PreloadingEligibility::kEligible,
-          content::PreloadingHoldbackStatus::kAllowed,
-          content::PreloadingTriggeringOutcome::kSuccess,
-          content::PreloadingFailureReason::kUnspecified,
-          /*accurate=*/true,
-          /*ready_time=*/
-          base::ScopedMockElapsedTimersForTest::kMockElapsedTime)});
-}
-
-class CCTPrerenderBrowserTestWithHoldback : public PrefetchBrowserTest {
- public:
-  CCTPrerenderBrowserTestWithHoldback() {
-    feature_list_.InitAndEnableFeatureWithParameters(
-        chrome::android::kCCTNavigationalPrefetch, {{"holdback", "true"}});
-  }
-
- private:
-  // TODO(https://crbug.com/423465927): Explore a better approach to make the
-  // existing tests run with the prewarm feature enabled.
-  ::test::ScopedPrewarmFeatureList prewarm_feature_list_{
-      ::test::ScopedPrewarmFeatureList::PrewarmState::kDisabled};
-
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(CCTPrerenderBrowserTestWithHoldback,
-                       CCTPrefetchHoldback) {
-  const GURL initial_url = GetURL("/empty.html");
-  const GURL prefetch_url = GetURL("/simple.html");
-  ASSERT_TRUE(NavigateToURL(initial_url));
-
-  auto* chrome_prefetch_manager =
-      ChromePrefetchManager::GetOrCreateForWebContents(GetActiveWebContents());
-  chrome_prefetch_manager->StartPrefetchFromCCT(prefetch_url, false,
-                                                std::nullopt);
-
-  ASSERT_TRUE(NavigateToURL(prefetch_url));
-
-  auto cct_attempt_entry_builder =
-      std::make_unique<content::test::PreloadingAttemptUkmEntryBuilder>(
-          chrome_preloading_predictor::kChromeCustomTabs);
-
-  ukm::SourceId ukm_source_id =
-      GetActiveWebContents()->GetPrimaryMainFrame()->GetPageUkmSourceId();
-  content::test::ExpectPreloadingAttemptUkm(
-      *test_ukm_recorder(),
-      {cct_attempt_entry_builder->BuildEntry(
-          ukm_source_id, content::PreloadingType::kPrefetch,
-          content::PreloadingEligibility::kEligible,
-          content::PreloadingHoldbackStatus::kHoldback,
-          content::PreloadingTriggeringOutcome::kUnspecified,
-          content::PreloadingFailureReason::kUnspecified,
-          /*accurate=*/true,
-          /*ready_time=*/std::nullopt)});
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace

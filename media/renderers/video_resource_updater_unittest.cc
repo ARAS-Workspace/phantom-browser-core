@@ -732,33 +732,6 @@ TEST_F(VideoResourceUpdaterTest, CreateForHardwarePlanes_SharedImageFormat) {
       viz::TransferableResource::SynchronizationType::kGpuCommandsCompleted);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(VideoResourceUpdaterTest,
-       CreateForHardwarePlanes_StreamTexture_CopyToNewTexture) {
-  std::unique_ptr<VideoResourceUpdater> updater = CreateUpdaterForHardware();
-  EXPECT_EQ(0u, GetSharedImageCount());
-  scoped_refptr<VideoFrame> video_frame =
-      CreateTestStreamTextureHardwareVideoFrame(/*needs_copy=*/false);
-
-  VideoFrameExternalResource resource =
-      updater->CreateExternalResourceFromVideoFrame(video_frame);
-  EXPECT_EQ(VideoFrameResourceType::RGB, resource.type);
-  EXPECT_TRUE(resource.release_callback);
-  EXPECT_EQ((GLenum)GL_TEXTURE_EXTERNAL_OES,
-            resource.resource.texture_target());
-  EXPECT_EQ(0u, GetSharedImageCount());
-
-  // A copied stream texture should return an RGBA resource in a new
-  // GL_TEXTURE_2D texture.
-  video_frame = CreateTestStreamTextureHardwareVideoFrame(/*needs_copy=*/true);
-  resource = updater->CreateExternalResourceFromVideoFrame(video_frame);
-  EXPECT_EQ(VideoFrameResourceType::RGBA_PREMULTIPLIED, resource.type);
-  EXPECT_TRUE(resource.release_callback);
-  EXPECT_EQ((GLenum)GL_TEXTURE_2D, resource.resource.texture_target());
-  EXPECT_EQ(1u, GetSharedImageCount());
-}
-#endif
-
 TEST_F(VideoResourceUpdaterTest, CreateForHardwarePlanes_TextureQuad) {
   std::unique_ptr<VideoResourceUpdater> updater = CreateUpdaterForHardware();
   EXPECT_EQ(0u, GetSharedImageCount());

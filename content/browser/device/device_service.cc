@@ -21,13 +21,6 @@
 #include "services/network/public/mojom/network_service_test.mojom.h"
 #include "services/network/public/mojom/url_loader.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/android/scoped_java_ref.h"
-#include "content/browser/wake_lock/wake_lock_context_host.h"
-#include "content/public/android/content_jni_headers/ContentNfcDelegate_jni.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -112,17 +105,6 @@ void BindDeviceServiceReceiver(
   params->geolocation_system_permission_manager =
       GetContentClient()->browser()->GetGeolocationSystemPermissionManager();
 
-#if BUILDFLAG(IS_ANDROID)
-  JNIEnv* env = base::android::AttachCurrentThread();
-  params->java_nfc_delegate = Java_ContentNfcDelegate_create(env);
-  DCHECK(!params->java_nfc_delegate.is_null());
-
-  params->wake_lock_context_callback =
-      base::BindRepeating(&WakeLockContextHost::GetNativeViewForContext);
-  params->use_gms_core_location_provider =
-      GetContentClient()->browser()->ShouldUseGmsCoreGeolocationProvider();
-#endif
-
   service = device::CreateDeviceService(std::move(params), std::move(receiver));
 }
 
@@ -148,7 +130,3 @@ device::mojom::DeviceService& GetDeviceService() {
 }
 
 }  // namespace content
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(ContentNfcDelegate)
-#endif

@@ -49,10 +49,6 @@ const char kGlicOnboardingCompleted[] = "glic_onboarding_completed";
 
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-const char kPwaInstallMenuSelected[] = "pwa_install_menu_clicked";
-#endif  // BUILDFLAG(IS_ANDROID)
-
 const char kTabSearchComboButtonUsed[] = "tab_search_combo_button_used";
 
 }  // namespace events

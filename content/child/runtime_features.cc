@@ -51,11 +51,6 @@
 #include "ui/native_theme/features/native_theme_features.h"
 #include "ui/native_theme/native_theme.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "base/android/device_info.h"
-#endif
-
 #if BUILDFLAG(ENABLE_VR)
 #include "device/vr/public/cpp/features.h"
 #endif
@@ -176,15 +171,6 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
            raw_ref(features::kFractionalScrollOffsets)},
           {wf::EnableSensorExtraClasses,
            raw_ref(features::kGenericSensorExtraClasses)},
-#if BUILDFLAG(IS_ANDROID)
-          {wf::EnableGetDisplayMedia,
-           raw_ref(features::kUserMediaScreenCapturing)},
-          {wf::EnableRegionCapture,
-           raw_ref(features::kUserMediaScreenCapturing)},
-          {wf::EnableElementCapture,
-           raw_ref(features::kUserMediaScreenCapturing)},
-
-#endif
           {wf::EnableInstalledApp, raw_ref(features::kInstalledApp)},
           {wf::EnableIntegrityPolicyScript,
            raw_ref(network::features::kIntegrityPolicyScript)},
@@ -200,9 +186,6 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
           {wf::EnableSendBeaconThrowForBlobWithNonSimpleType,
            raw_ref(features::kSendBeaconThrowForBlobWithNonSimpleType)},
           {wf::EnableSharedArrayBuffer, raw_ref(features::kSharedArrayBuffer)},
-#if BUILDFLAG(IS_ANDROID)
-          {wf::EnableSmartZoom, raw_ref(features::kSmartZoom)},
-#endif
           {wf::EnableTouchDragAndDrop, raw_ref(features::kTouchDragAndDrop)},
           {wf::EnableTouchDragAndContextMenu,
            raw_ref(features::kTouchDragAndContextMenu)},
@@ -278,10 +261,6 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
                content_settings::features::kApproximateGeolocationPermission)},
           {"AndroidDownloadableFontsMatching",
            raw_ref(features::kAndroidDownloadableFontsMatching)},
-#if BUILDFLAG(IS_ANDROID)
-          {"CCTNewRFMPushBehavior",
-           raw_ref(blink::features::kCCTNewRFMPushBehavior)},
-#endif
           {"CompressionDictionaryTransport",
            raw_ref(network::features::kCompressionDictionaryTransport)},
           {"CookieStoreAPIMaxAge",
@@ -391,9 +370,6 @@ void SetRuntimeFeaturesFromCommandLine(const base::CommandLine& command_line) {
        true},
       {wrf::EnableWebAudioBypassOutputBufferingOptOut,
        blink::switches::kWebAudioBypassOutputBufferingOptOut, true},
-#if BUILDFLAG(IS_ANDROID)
-      {wrf::EnableMediaSession, switches::kDisableMediaSessionAPI, false},
-#endif
   };
 
   for (const auto& mapping : switchToFeatureMapping) {
@@ -430,29 +406,11 @@ void SetCustomizedRuntimeFeaturesFromCombinedArgs(
   // CAUTION: Only add custom enabling logic here if it cannot
   // be covered by the other functions.
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_P) {
-    WebRuntimeFeatures::EnableDisplayCutoutAPI(false);
-  }
-#endif
-
   // These checks are custom wrappers around base::FeatureList::IsEnabled
   // They're moved here to distinguish them from actual base checks
   WebRuntimeFeatures::EnableOverlayScrollbars(
       ui::NativeTheme::GetInstanceForWeb()->use_overlay_scrollbar());
   WebRuntimeFeatures::EnableFluentScrollbars(ui::IsFluentScrollbarEnabled());
-#if BUILDFLAG(IS_ANDROID)
-  WebRuntimeFeatures::EnableAudioOutputDevices(
-      base::FeatureList::IsEnabled(features::kAAudioPerStreamDeviceSelection) &&
-      base::android::device_info::is_desktop());
-  WebRuntimeFeatures::EnableDesktopAndroidScrollbars(
-      command_line.HasSwitch(
-          blink::switches::kEnableDesktopAndroidScrollbars) &&
-      // This feature is not ready for non-desktop devices. See
-      // crbug.com/522529331.
-      base::android::device_info::is_desktop());
-#endif
 
   // TODO(rodneyding): This is a rare case for a stable feature
   // Need to investigate more to determine whether to refactor it.

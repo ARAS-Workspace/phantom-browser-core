@@ -173,9 +173,6 @@ constexpr std::string_view kPlaceholder = "placeholder";
 constexpr std::string_view kRole = "role";
 constexpr std::string_view kScript = "script";
 constexpr std::string_view kSpan = "span";
-#if BUILDFLAG(IS_ANDROID)
-constexpr std::string_view kSrc = "src";
-#endif
 constexpr std::string_view kStrong = "strong";
 constexpr std::string_view kStyle = "style";
 constexpr std::string_view kSubmit = "submit";
@@ -2103,23 +2100,6 @@ void WebFormControlElementToFormField(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Checks whether an `element` looks like a captcha based on
-// heuristics. The heuristics cannot be perfect and therefore is a subject to
-// change, e.g. adding a list of domains of captcha providers to be compared
-// with 'src' attribute.
-bool IsLikelyCaptchaIframe(const WebElement& element) {
-  if (!IsWebElementVisible(element)) {
-    return false;
-  }
-  static constexpr std::string_view kCaptcha = "captcha";
-  return GetAttribute<kSrc>(element).Find(kCaptcha) != std::string::npos ||
-         GetAttribute<kTitle>(element).Find(kCaptcha) != std::string::npos ||
-         GetAttribute<kId>(element).Find(kCaptcha) != std::string::npos ||
-         GetAttribute<kName>(element).Find(kCaptcha) != std::string::npos;
-}
-#endif
-
 std::optional<FormData> ExtractFormDataWithFieldsAndFrames(
     const WebDocument& document,
     const WebFormElement& form_element,
@@ -2252,10 +2232,6 @@ std::optional<FormData> ExtractFormDataWithFieldsAndFrames(
   form.set_button_titles(GetButtonTitles(form_element, button_titles_cache));
   // `likely_contains_captcha` is only needed for Android for the autosubmission
   // after filling credentials from TTF bottom sheet.
-#if BUILDFLAG(IS_ANDROID)
-  form.set_likely_contains_captcha(
-      std::ranges::any_of(iframe_elements, IsLikelyCaptchaIframe));
-#endif
   return form;
 }
 

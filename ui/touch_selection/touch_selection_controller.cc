@@ -231,24 +231,6 @@ void TouchSelectionController::OnScrollBeginEvent() {
   response_pending_input_event_ = InputEventType::kNone;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void TouchSelectionController::OnUpdateNativeViewTree(
-    gfx::NativeView parent_native_view,
-    cc::slim::Layer* parent_layer) {
-  if (insertion_handle_) {
-    insertion_handle_->OnUpdateNativeViewTree(parent_native_view, parent_layer);
-  }
-  if (start_selection_handle_) {
-    start_selection_handle_->OnUpdateNativeViewTree(parent_native_view,
-                                                    parent_layer);
-  }
-  if (end_selection_handle_) {
-    end_selection_handle_->OnUpdateNativeViewTree(parent_native_view,
-                                                  parent_layer);
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void TouchSelectionController::HideHandles() {
   response_pending_input_event_ = InputEventType::kNone;
   DeactivateInsertion();
@@ -573,54 +555,6 @@ gfx::PointF TouchSelectionController::GetSelectionStart() const {
 gfx::PointF TouchSelectionController::GetSelectionEnd() const {
   return GetEndPosition();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void TouchSelectionController::HandleSwipeToMoveCursorGestureAck(
-    ui::EventType type,
-    const gfx::PointF& point,
-    const std::optional<bool>& cursor_control,
-    bool is_in_root_view) {
-  switch (type) {
-    case ui::EventType::kGestureScrollBegin: {
-      DCHECK(cursor_control.has_value());
-      if (!*cursor_control) {
-        break;
-      }
-      swipe_to_move_cursor_activated_ = true;
-      OnSwipeToMoveCursorBegin();
-      client_->OnSelectionEvent(ui::INSERTION_HANDLE_DRAG_STARTED);
-      break;
-    }
-    case ui::EventType::kGestureScrollUpdate: {
-      if (!is_in_root_view) {
-        break;
-      }
-      if (!swipe_to_move_cursor_activated_) {
-        break;
-      }
-      gfx::RectF rect = GetRectBetweenBounds();
-      // Suppress this when the input is not focused, in which case rect will be
-      // 0x0.
-      if (rect.width() != 0.f || rect.height() != 0.f) {
-        client_->OnDragUpdate(ui::TouchSelectionDraggable::Type::kNone,
-                              gfx::PointF(point.x(), rect.right_center().y()));
-      }
-      break;
-    }
-    case ui::EventType::kGestureScrollEnd: {
-      if (!swipe_to_move_cursor_activated_) {
-        break;
-      }
-      swipe_to_move_cursor_activated_ = false;
-      OnSwipeToMoveCursorEnd();
-      client_->OnSelectionEvent(ui::INSERTION_HANDLE_DRAG_STOPPED);
-      break;
-    }
-    default:
-      break;
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void TouchSelectionController::OnInsertionChanged() {
   DeactivateSelection();

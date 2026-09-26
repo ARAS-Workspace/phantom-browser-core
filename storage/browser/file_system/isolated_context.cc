@@ -26,11 +26,6 @@ namespace {
 
 // The given path should not contain any '..' and should be absolute.
 bool IsPathValid(const base::FilePath& path) {
-#if BUILDFLAG(IS_ANDROID)
-  if (path.IsContentUri()) {
-    return true;
-  }
-#endif
   return !path.ReferencesParent() && path.IsAbsolute();
 }
 

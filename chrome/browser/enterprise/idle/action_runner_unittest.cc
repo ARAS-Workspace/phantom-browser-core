@@ -22,9 +22,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/test/views/chrome_views_test_base.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace enterprise_idle {
 
@@ -76,7 +74,6 @@ class MockAction : public Action {
 }  // namespace
 
 // TODO(crbug.com/40222234): Enable this when Android supports >1 Action.
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that actions are run in sequence, in order of priority.
 TEST(IdleActionRunnerTest, RunsActionsInSequence) {
   content::BrowserTaskEnvironment task_environment;
@@ -167,7 +164,6 @@ TEST(IdleActionRunnerTest, OtherActionsDontRunOnFailure) {
                            std::move(show_profile_picker));
   runner.Run();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that it does nothing when the "IdleTimeoutActions" pref is empty.
 TEST(IdleActionRunnerTest, DoNothingWithEmptyPref) {
@@ -193,7 +189,6 @@ TEST(IdleActionRunnerTest, DoNothingWithEmptyPref) {
 }
 
 // TODO(crbug.com/40222234): Enable this when Android supports >1 Action.
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that ActionRunner only runs the actions configured via the
 // "IdleTimeoutActions" pref.
 TEST(IdleActionRunnerTest, JustCloseBrowsers) {
@@ -249,7 +244,6 @@ TEST(IdleActionRunnerTest, JustShowProfilePicker) {
                            std::move(show_profile_picker));
   runner.Run();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // A basic implementation of BrowsingDataRemover, that doesn't remove any data.
 //
@@ -340,7 +334,6 @@ class FakeBrowsingDataRemover : public BrowsingDataRemover {
   raw_ptr<Observer> observer_ = nullptr;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 class IdleActionRunnerClearDataTest : public ChromeViewsTestBase {
  protected:
   void SetUp() override {
@@ -574,6 +567,5 @@ TEST_F(IdleActionRunnerClearDataTest, MultipleTypesAndFailure) {
       "Enterprise.IdleTimeoutPolicies.ActionSuccess.ClearBrowsingData", false,
       1);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace enterprise_idle

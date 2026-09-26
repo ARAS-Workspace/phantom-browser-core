@@ -221,18 +221,6 @@ TEST(FileSystemURLTest, CreateSiblingPreservesBuckets) {
   EXPECT_EQ(without.bucket(), std::nullopt);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Android content-URIs do not support siblings.
-TEST(FileSystemURLTest, CreateSiblingNotSupportedForContentUri) {
-  FileSystemURL url = FileSystemURL::CreateForTest(
-      blink::StorageKey::CreateFromStringForTesting("http://foo"),
-      kFileSystemTypeTemporary,
-      base::FilePath::FromUTF8Unsafe("content://provider/a"));
-  FileSystemURL sibling = url.CreateSibling(*base::SafeBaseName::Create("b"));
-  EXPECT_FALSE(sibling.is_valid());
-}
-#endif
-
 TEST(FileSystemURLTest, EnsureFilePathIsRelative) {
   FileSystemURL url = CreateFileSystemURL(
       "filesystem:http://chromium.org/temporary/////directory/file");
@@ -470,24 +458,6 @@ TEST(FileSystemURLTest, IsInSameFileSystem) {
   // file system.
   EXPECT_EQ(url_invalid_a, url_invalid_b);
   EXPECT_FALSE(url_invalid_a.IsInSameFileSystem(url_invalid_b));
-
-#if BUILDFLAG(IS_ANDROID)
-  // Android content-URIs are never considered same-file-system.
-  url_foo_temp_a = FileSystemURL::CreateForTest(
-      blink::StorageKey::CreateFromStringForTesting("http://foo"),
-      kFileSystemTypeTemporary, base::FilePath::FromUTF8Unsafe("a"));
-  FileSystemURL url_foo_temp_cu_a = FileSystemURL::CreateForTest(
-      blink::StorageKey::CreateFromStringForTesting("http://foo"),
-      kFileSystemTypeTemporary,
-      base::FilePath::FromUTF8Unsafe("content://provider/a"));
-  FileSystemURL url_foo_temp_cu_b = FileSystemURL::CreateForTest(
-      blink::StorageKey::CreateFromStringForTesting("http://foo"),
-      kFileSystemTypeTemporary,
-      base::FilePath::FromUTF8Unsafe("content://provider/b"));
-  EXPECT_FALSE(url_foo_temp_cu_a.IsInSameFileSystem(url_foo_temp_cu_a));
-  EXPECT_FALSE(url_foo_temp_cu_a.IsInSameFileSystem(url_foo_temp_cu_b));
-  EXPECT_FALSE(url_foo_temp_cu_a.IsInSameFileSystem(url_foo_temp_a));
-#endif
 }
 
 TEST(FileSystemURLTest, ValidAfterMoves) {

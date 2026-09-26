@@ -72,11 +72,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "net/android/net_test_support_jni/AndroidNetworkLibraryTestUtil_jni.h"
-#endif
-
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
 #include "net/device_bound_sessions/mock_session_service.h"
 #include "net/device_bound_sessions/session_service.h"
@@ -2425,76 +2420,6 @@ TEST_F(URLRequestHttpJobWithBrotliSupportTest, DefaultAcceptEncodingOverriden) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-class URLRequestHttpJobWithCheckClearTextPermittedTest
-    : public TestWithTaskEnvironment {
- protected:
-  URLRequestHttpJobWithCheckClearTextPermittedTest() {
-    auto context_builder = CreateTestURLRequestContextBuilder();
-    context_builder->SetHttpTransactionFactoryForTesting(
-        std::make_unique<MockNetworkLayer>());
-    context_builder->set_check_cleartext_permitted(true);
-    context_builder->set_client_socket_factory_for_testing(&socket_factory_);
-    context_ = context_builder->Build();
-  }
-
-  MockClientSocketFactory socket_factory_;
-  std::unique_ptr<URLRequestContext> context_;
-};
-
-TEST_F(URLRequestHttpJobWithCheckClearTextPermittedTest,
-       AndroidCleartextPermittedTest) {
-  static constexpr struct TestCase {
-    const char* url;
-    bool cleartext_permitted;
-    bool should_block;
-    int expected_per_host_call_count;
-    int expected_default_call_count;
-  } kTestCases[] = {
-      {"http://unblocked.test/", true, false, 1, 0},
-      {"https://unblocked.test/", true, false, 0, 0},
-      {"http://blocked.test/", false, true, 1, 0},
-      {"https://blocked.test/", false, false, 0, 0},
-      // If determining the per-host cleartext policy causes an
-      // IllegalArgumentException (because the hostname is invalid),
-      // the default configuration should be applied, and the
-      // exception should not cause a JNI error.
-      {"http://./", false, true, 1, 1},
-      {"http://./", true, false, 1, 1},
-      // Even if the host name would be considered invalid, https
-      // schemes should not trigger cleartext policy checks.
-      {"https://./", false, false, 0, 0},
-  };
-
-  JNIEnv* env = base::android::AttachCurrentThread();
-  for (const TestCase& test : kTestCases) {
-    Java_AndroidNetworkLibraryTestUtil_setUpSecurityPolicyForTesting(
-        env, test.cleartext_permitted);
-
-    TestDelegate delegate;
-    std::unique_ptr<URLRequest> request = context_->CreateRequest(
-        GURL(test.url), DEFAULT_PRIORITY, &delegate,
-        TRAFFIC_ANNOTATION_FOR_TESTS, net::handles::kInvalidNetworkHandle);
-    request->Start();
-    delegate.RunUntilComplete();
-
-    if (test.should_block) {
-      EXPECT_THAT(delegate.request_status(),
-                  IsError(ERR_CLEARTEXT_NOT_PERMITTED));
-    } else {
-      // Should fail since there's no test server running
-      EXPECT_THAT(delegate.request_status(), IsError(ERR_FAILED));
-    }
-    EXPECT_EQ(
-        Java_AndroidNetworkLibraryTestUtil_getPerHostCleartextCheckCount(env),
-        test.expected_per_host_call_count);
-    EXPECT_EQ(
-        Java_AndroidNetworkLibraryTestUtil_getDefaultCleartextCheckCount(env),
-        test.expected_default_call_count);
-  }
-}
-#endif
-
 #if BUILDFLAG(ENABLE_WEBSOCKETS)
 
 class URLRequestHttpJobWebSocketTest : public TestWithTaskEnvironment {
@@ -3564,7 +3489,3 @@ TEST_F(URLRequestHttpJobWithMockSocketsTest,
 }
 
 }  // namespace net
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(AndroidNetworkLibraryTestUtil)
-#endif

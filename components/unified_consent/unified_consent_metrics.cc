@@ -65,14 +65,12 @@ bool RecordSyncSetupDataTypesImpl(syncer::SyncUserSettings* sync_settings) {
                           syncer::UserSelectableType::kAutofill);
   sync_types.emplace_back(SyncDataType::kPayments,
                           syncer::UserSelectableType::kPayments);
-#if !BUILDFLAG(IS_ANDROID)
   sync_types.emplace_back(SyncDataType::kApps,
                           syncer::UserSelectableType::kApps);
   sync_types.emplace_back(SyncDataType::kExtensions,
                           syncer::UserSelectableType::kExtensions);
   sync_types.emplace_back(SyncDataType::kThemes,
                           syncer::UserSelectableType::kThemes);
-#endif
 
   for (const auto& [bucket, type] : sync_types) {
     if (!sync_settings->GetSelectedTypes().Has(type)) {

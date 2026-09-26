@@ -141,10 +141,10 @@ network::mojom::HttpAuthStaticParamsPtr CreateHttpAuthStaticParams(
   network::mojom::HttpAuthStaticParamsPtr auth_static_params =
       network::mojom::HttpAuthStaticParams::New();
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   auth_static_params->gssapi_library_name =
       local_state->GetString(prefs::kGSSAPILibraryName);
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
   return auth_static_params;
 }
@@ -184,11 +184,6 @@ network::mojom::HttpAuthDynamicParamsPtr CreateHttpAuthDynamicParams(
   auth_dynamic_params->ntlm_v2_enabled =
       local_state->GetBoolean(prefs::kNtlmV2Enabled);
 #endif  // BUILDFLAG(IS_POSIX)
-
-#if BUILDFLAG(IS_ANDROID)
-  auth_dynamic_params->android_negotiate_account_type =
-      local_state->GetString(prefs::kAuthAndroidNegotiateAccountType);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX)
   auth_dynamic_params->allow_gssapi_library_load =
@@ -584,7 +579,6 @@ SystemNetworkContextManager::SystemNetworkContextManager(
       ssl_config_service_manager_(local_state_),
       proxy_config_monitor_(local_state_),
       stub_resolver_config_reader_(local_state_) {
-#if !BUILDFLAG(IS_ANDROID)
   // QuicAllowed was not part of Android policy.
   const base::Value* value =
       g_browser_process->policy_service()
@@ -594,7 +588,6 @@ SystemNetworkContextManager::SystemNetworkContextManager(
   if (value) {
     is_quic_allowed_ = value->GetBool();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   shared_url_loader_factory_ = new URLLoaderFactoryForSystem(this);
 
   pref_change_registrar_.Init(local_state_);
@@ -623,11 +616,6 @@ SystemNetworkContextManager::SystemNetworkContextManager(
 #if BUILDFLAG(IS_POSIX)
   pref_change_registrar_.Add(prefs::kNtlmV2Enabled, auth_pref_callback);
 #endif  // BUILDFLAG(IS_POSIX)
-
-#if BUILDFLAG(IS_ANDROID)
-  pref_change_registrar_.Add(prefs::kAuthAndroidNegotiateAccountType,
-                             auth_pref_callback);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX)
   pref_change_registrar_.Add(kGssapiDesiredPref, auth_pref_callback);
@@ -687,9 +675,9 @@ void SystemNetworkContextManager::RegisterPrefs(PrefRegistrySimple* registry) {
   // Static auth params
   registry->RegisterStringPref(prefs::kAuthSchemes,
                                "basic,digest,ntlm,negotiate");
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   registry->RegisterStringPref(prefs::kGSSAPILibraryName, std::string());
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
   // Dynamic auth params.
   registry->RegisterListPref(prefs::kAllHttpAuthSchemesAllowedForOrigins);
@@ -708,11 +696,6 @@ void SystemNetworkContextManager::RegisterPrefs(PrefRegistrySimple* registry) {
 #if BUILDFLAG(IS_POSIX)
   registry->RegisterBooleanPref(prefs::kNtlmV2Enabled, true);
 #endif  // BUILDFLAG(IS_POSIX)
-
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterStringPref(prefs::kAuthAndroidNegotiateAccountType,
-                               std::string());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Per-NetworkContext pref. The pref value from |local_state_| is used for
   // the system NetworkContext, and the per-profile pref values are used for

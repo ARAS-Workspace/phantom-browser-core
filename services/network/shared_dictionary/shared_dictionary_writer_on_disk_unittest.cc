@@ -46,12 +46,8 @@ class FakeSharedDictionaryDiskCache : public SharedDictionaryDiskCache {
       : create_backend_result_type_(create_backend_result_type) {}
   ~FakeSharedDictionaryDiskCache() override = default;
   void Initialize() {
-    SharedDictionaryDiskCache::Initialize(
-        base::FilePath(),
-#if BUILDFLAG(IS_ANDROID)
-        disk_cache::ApplicationStatusListenerGetter(),
-#endif  // BUILDFLAG(IS_ANDROID)
-        /*file_operations_factory=*/nullptr);
+    SharedDictionaryDiskCache::Initialize(base::FilePath(),
+                                          /*file_operations_factory=*/nullptr);
   }
 
   void RunCreateCacheBackendCallback() {
@@ -81,9 +77,6 @@ class FakeSharedDictionaryDiskCache : public SharedDictionaryDiskCache {
  protected:
   disk_cache::BackendResult CreateCacheBackend(
       const base::FilePath& cache_directory_path,
-#if BUILDFLAG(IS_ANDROID)
-      disk_cache::ApplicationStatusListenerGetter app_status_listener_getter,
-#endif  // BUILDFLAG(IS_ANDROID)
       scoped_refptr<disk_cache::BackendFileOperationsFactory>
           file_operations_factory,
       disk_cache::BackendResultCallback callback) override {

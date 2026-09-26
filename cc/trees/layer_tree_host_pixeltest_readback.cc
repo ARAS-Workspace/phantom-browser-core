@@ -19,8 +19,6 @@
 #include "gpu/command_buffer/client/client_shared_image.h"
 #include "gpu/command_buffer/client/raster_interface.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace cc {
 namespace {
 
@@ -625,5 +623,3 @@ INSTANTIATE_TEST_SUITE_P(All,
 
 }  // namespace
 }  // namespace cc
-
-#endif  // BUILDFLAG(IS_ANDROID)

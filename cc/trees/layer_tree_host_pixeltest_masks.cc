@@ -23,8 +23,6 @@
 #include "components/viz/test/buildflags.h"
 #include "third_party/skia/include/core/SkImage.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace cc {
 namespace {
 
@@ -1142,5 +1140,3 @@ TEST_P(LayerTreeHostMasksForBackdropFiltersAndBlendPixelTest, Test) {
 
 }  // namespace
 }  // namespace cc
-
-#endif  // !BUILDFLAG(IS_ANDROID)

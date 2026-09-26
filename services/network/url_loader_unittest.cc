@@ -8762,23 +8762,6 @@ TEST_F(URLLoaderFakeTransportInfoTest,
 }
 
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(URLLoaderTest, SocketTaggingWorks) {
-  if (!net::CanGetTaggedBytes()) {
-    GTEST_SKIP() << "Skipping test - GetTaggedBytes unsupported.";
-  }
-  GURL url = test_server()->GetURL("/empty.html");
-  ResourceRequest request = CreateResourceRequest("GET", url);
-  request.request_initiator = url::Origin::Create(url);
-  int32_t tag_val = 0x12345678;
-  uint64_t old_traffic = net::GetTaggedBytes(tag_val);
-  request.socket_tag = net::SocketTag(-1, tag_val);
-
-  EXPECT_EQ(net::OK, LoadRequest(request));
-  EXPECT_GT(net::GetTaggedBytes(tag_val), old_traffic);
-}
-#endif
-
 TEST_F(URLLoaderTest, ParseUnencodedDigest) {
   base::RunLoop delete_run_loop;
   ResourceRequest request = CreateResourceRequest(

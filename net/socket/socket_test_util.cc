@@ -66,10 +66,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 #define NET_TRACE(level, s) VLOG(level) << s << __FUNCTION__ << "() "
 
 namespace net {
@@ -2621,62 +2617,6 @@ base::ByteSize CountWriteByteSize(base::span<const MockWrite> writes) {
 int64_t CountWriteBytes(base::span<const MockWrite> writes) {
   return CountWriteByteSize(writes).InBytes();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool CanGetTaggedBytes() {
-  // In Android P, /proc/net/xt_qtaguid/stats is no longer guaranteed to be
-  // present, and has been replaced with eBPF Traffic Monitoring in netd. See:
-  // https://source.android.com/devices/tech/datausage/ebpf-traffic-monitor
-  //
-  // To read traffic statistics from netd, apps should use the API
-  // NetworkStatsManager.queryDetailsForUidTag(). But this API does not provide
-  // statistics for local traffic, only mobile and WiFi traffic, so it would not
-  // work in tests that spin up a local server. So for now, GetTaggedBytes is
-  // only supported on Android releases older than P.
-  return base::android::android_info::sdk_int() <
-         base::android::android_info::SDK_VERSION_P;
-}
-
-uint64_t GetTaggedBytes(int32_t expected_tag) {
-  EXPECT_TRUE(CanGetTaggedBytes());
-
-  // To determine how many bytes the system saw with a particular tag read
-  // the /proc/net/xt_qtaguid/stats file which contains the kernel's
-  // dump of all the UIDs and their tags sent and received bytes.
-  uint64_t bytes = 0;
-  std::string contents;
-  EXPECT_TRUE(base::ReadFileToString(
-      base::FilePath::FromUTF8Unsafe("/proc/net/xt_qtaguid/stats"), &contents));
-  base::StringTokenizer tokenizer(contents, "\n");
-  // Skip first line which is headers.
-  EXPECT_TRUE(tokenizer.GetNext());
-  while (tokenizer.GetNext()) {
-    uint64_t tag;
-    uid_t uid;
-    uint64_t rx_bytes;
-    // Parse out the numbers we care about. For reference here's the column
-    // headers. The ones we need are in parentheses:
-    // idx iface (acct_tag_hex) (uid_tag_int) cnt_set (rx_bytes) rx_packets
-    // tx_bytes tx_packets rx_tcp_bytes rx_tcp_packets rx_udp_bytes
-    // rx_udp_packets rx_other_bytes rx_other_packets tx_tcp_bytes
-    // tx_tcp_packets tx_udp_bytes tx_udp_packets tx_other_bytes
-    // tx_other_packets
-    std::vector<std::string_view> pieces = base::SplitStringPiece(
-        tokenizer.token_piece(), /*separators=*/" ", base::TRIM_WHITESPACE,
-        base::SPLIT_WANT_NONEMPTY);
-    EXPECT_EQ(pieces.size(), 21u);
-    EXPECT_TRUE(base::HexStringToUInt64(pieces[2], &tag));
-    EXPECT_TRUE(base::StringToUint(pieces[3], &uid));
-    EXPECT_TRUE(base::StringToUint64(pieces[5], &rx_bytes));
-
-    // If this line matches our UID and |expected_tag| then add it to the total.
-    if (uid == getuid() && (int32_t)(tag >> 32) == expected_tag) {
-      bytes += rx_bytes;
-    }
-  }
-  return bytes;
-}
-#endif
 
 void ValidateAdditionalCapacityForSocketPool(
     base::RepeatingCallback<SocketPoolExpandability()> request_socket,

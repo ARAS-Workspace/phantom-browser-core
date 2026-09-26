@@ -79,13 +79,6 @@ class MockUIDelegate : public FullCardRequest::UIDelegate {
               OnUnmaskVerificationResult,
               (PaymentsRpcResult),
               (override));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(bool, ShouldOfferFidoAuth, (), (const override));
-  MOCK_METHOD(bool,
-              UserOptedInToFidoFromSettingsPageOnMobile,
-              (),
-              (const override));
-#endif
 
   base::WeakPtr<MockUIDelegate> AsWeakPtr() {
     return weak_ptr_factory_.GetWeakPtr();

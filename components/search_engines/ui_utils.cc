@@ -16,18 +16,6 @@ namespace internal {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr size_t kMaxCustomSearchEngines = 3;
-
-base::TimeDelta GetMaxVisitAge() {
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kQuickenSiteSearchExpiryForTesting)) {
-    return base::Seconds(20);
-  }
-  return base::Days(2);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Helper function to create and configure an icu::Collator.
 std::unique_ptr<icu::Collator> CreateCollator() {
   UErrorCode error_code = U_ZERO_ERROR;
@@ -167,25 +155,6 @@ bool OrderTemplateUrlsByPrepopulatedAndManagedAndAlphabetically::operator()(
 
   return get_extended_sort_key(lhs) < get_extended_sort_key(rhs);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void SortAndFilterRecentlyVisitedURLs(
-    TemplateURL::TemplateURLVector& recently_visited) {
-  // Partially sort `recently_visited` by TemplateURL's last_visited time.
-  auto begin = recently_visited.begin();
-  auto end = recently_visited.end();
-  auto pivot =
-      begin + std::min(kMaxCustomSearchEngines, recently_visited.size());
-  std::ranges::partial_sort(recently_visited, pivot, std::ranges::greater(),
-                            &TemplateURL::last_visited);
-
-  // Keep the search engines visited within `GetMaxVisitAge()` and erase others.
-  auto cut_begin = std::ranges::lower_bound(
-      begin, pivot, base::Time::Now() - GetMaxVisitAge(),
-      std::ranges::greater_equal(), &TemplateURL::last_visited);
-  recently_visited.erase(cut_begin, end);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 template_url_starter_pack_data::StarterPackIdSet GetDisabledStarterPackIds(
     bool gemini_enabled) {

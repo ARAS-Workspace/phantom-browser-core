@@ -711,17 +711,6 @@ bool BackgroundTracingManager::HasTraceToUpload() {
   if (!trace_report_to_upload_) {
     return false;
   }
-#if BUILDFLAG(IS_ANDROID)
-  // Send the logs only when the trace size is within limits. If the connection
-  // type changes and we have a bigger than expected trace, then the next time
-  // service asks us when wifi is available, the trace will be sent.
-  auto type = net::NetworkChangeNotifier::GetConnectionType();
-  if (net::NetworkChangeNotifier::IsConnectionCellular(type) &&
-      trace_report_to_upload_->total_size > upload_limit_network_kb_ * 1000) {
-    RecordMetric(Metrics::LARGE_UPLOAD_WAITING_TO_RETRY);
-    return false;
-  }
-#endif
   return true;
 }
 

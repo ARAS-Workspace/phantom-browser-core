@@ -106,12 +106,6 @@ void HttpsOnlyModeBlockingPage::CommandReceived(const std::string& command) {
       break;
     }
     case security_interstitials::CMD_OPEN_ANDROID_ADVANCED_PROTECTION_SETTINGS:
-#if BUILDFLAG(IS_ANDROID)
-      controller()->metrics_helper()->RecordUserInteraction(
-          security_interstitials::MetricsHelper::
-              OPEN_ADVANCED_PROTECTION_SETTINGS);
-      controller()->OpenAdvancedProtectionSettings();
-#endif  // BUILDFLAG(IS_ANDROID)
       break;
     case security_interstitials::CMD_DO_REPORT:
     case security_interstitials::CMD_DONT_REPORT:

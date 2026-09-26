@@ -30,11 +30,11 @@
 #include "services/device/public/cpp/usb/usb_utils.h"
 #include "services/device/usb/usb_device_linux.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "base/metrics/histogram_macros.h"
 #include "services/device/public/cpp/device_features.h"
 #include "services/device/usb/usb_interface_detach_allowlist.h"
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace device {
 
@@ -47,7 +47,7 @@ using mojom::UsbTransferType;
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Outcome of detaching a kernel driver before ClaimInterface().
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -71,7 +71,7 @@ enum class DetachKernelDriverOutcome {
   kMaxValue = kDetachedFtdiSio
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/others/enums.xml:DetachKernelDriverOutcome)
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 uint8_t ConvertEndpointDirection(UsbTransferDirection direction) {
   switch (direction) {
@@ -298,7 +298,7 @@ bool UsbDeviceHandleUsbfs::BlockingTaskRunnerHelper::ReleaseInterface(
   return true;
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 bool UsbDeviceHandleUsbfs::BlockingTaskRunnerHelper::DetachInterface(
     int interface_number,
     const CombinedInterfaceInfo& interface_info) {
@@ -374,7 +374,7 @@ bool UsbDeviceHandleUsbfs::BlockingTaskRunnerHelper::ReattachInterface(
   }
   return true;
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 bool UsbDeviceHandleUsbfs::BlockingTaskRunnerHelper::SetInterface(
     int interface_number,
@@ -632,7 +632,7 @@ void UsbDeviceHandleUsbfs::ClaimInterface(int interface_number,
   // First detach the interface from a kernel driver that might be attached to
   // it, then claim the interface.
   // Note: |ClaimInterface| is invoked from |DetachInterfaceComplete|.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(features::kAutomaticUsbDetach)) {
     const mojom::UsbConfigurationInfo* config =
         device_->GetActiveConfiguration();
@@ -652,7 +652,7 @@ void UsbDeviceHandleUsbfs::ClaimInterface(int interface_number,
                              this, interface_number, std::move(callback)));
     return;
   }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
   DetachInterfaceComplete(interface_number, std::move(callback), true);
 }
 
@@ -978,7 +978,7 @@ void UsbDeviceHandleUsbfs::ReleaseInterfaceComplete(int interface_number,
     RefreshEndpointInfo();
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(features::kAutomaticUsbDetach)) {
     helper_.AsyncCall(&BlockingTaskRunnerHelper::ReattachInterface)
         .WithArgs(interface_number)

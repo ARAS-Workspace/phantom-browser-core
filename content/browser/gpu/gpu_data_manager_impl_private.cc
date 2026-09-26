@@ -78,9 +78,6 @@
 #include "ui/gl/gpu_preference.h"
 #include "ui/gl/gpu_switching_manager.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/application_status_listener.h"
-#endif
 #if BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #endif
@@ -91,23 +88,6 @@
 namespace content {
 
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-// NOINLINE to ensure this function is used in crash reports.
-NOINLINE void FatalGpuProcessLaunchFailureOnBackground() {
-  if (!base::android::ApplicationStatusListener::HasVisibleActivities()) {
-    // We expect the platform to aggressively kill services when the app is
-    // backgrounded. A FATAL error creates a dialog notifying users that the
-    // app has crashed which doesn't look good. So we use SIGKILL instead. But
-    // still do a crash dump for 1% cases to make sure we're not regressing this
-    // case.
-    if (base::RandIntInclusive(1, 100) == 1) {
-      base::debug::DumpWithoutCrashing();
-    }
-    kill(getpid(), SIGKILL);
-  }
-}
-#endif
 
 
 // These values are persistent to logs. Entries should not be renumbered and
@@ -352,18 +332,13 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
   // Android can't switch to software compositing. If the GPU process
   // initialization fails or GPU process is too unstable then crash the browser
   // process to reset everything.
-#if !BUILDFLAG(IS_ANDROID)
   fallback_modes_.push_back(gpu::GpuMode::DISPLAY_COMPOSITOR);
   if (SoftwareGLAllowed()) {
     fallback_modes_.push_back(gpu::GpuMode::SOFTWARE_GL);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(switches::kDisableGpu)) {
-#if BUILDFLAG(IS_ANDROID)
-    NOTREACHED() << "GPU acceleration is required on certain platforms!";
-#endif
   } else {
     // On Fuchsia Vulkan must be used when it's enabled by the WebEngine
     // embedder. Falling back to SW compositing in that case is not supported.
@@ -923,16 +898,6 @@ void GpuDataManagerImplPrivate::UpdateGpuPreferences(
   DCHECK(gpu_preferences);
 
   gpu_preferences->gpu_program_cache_size = gpu::GetDefaultGpuDiskCacheSize();
-#if BUILDFLAG(IS_ANDROID)
-  // Disable WebGPU if Android Advanced Protection is enabled.
-  // Directly toggling preferences instead of kWebGPUService to prevent
-  // bypass by enable_unsafe_webgpu.
-  if (GetContentClient()->browser()->IsAndroidAdvancedProtectionEnabled() &&
-      base::FeatureList::IsEnabled(features::kAAPMBlocksWebGPU)) {
-    gpu_preferences->enable_webgpu = false;
-    gpu_preferences->enable_unsafe_webgpu = false;
-  }
-#endif
 
   gpu_preferences->watchdog_starts_backgrounded = !application_is_visible_;
 
@@ -1273,9 +1238,6 @@ gpu::GpuMode GpuDataManagerImplPrivate::GetGpuMode() const {
 
 void GpuDataManagerImplPrivate::FallBackToNextGpuMode() {
   if (fallback_modes_.empty()) {
-#if BUILDFLAG(IS_ANDROID)
-    FatalGpuProcessLaunchFailureOnBackground();
-#endif
     IntentionallyCrashBrowserForUnusableGpuProcess();
   }
 

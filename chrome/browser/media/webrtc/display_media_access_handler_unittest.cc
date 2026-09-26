@@ -36,7 +36,6 @@
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/test/gmock_expected_support.h"
 #include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
@@ -49,7 +48,6 @@
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #include "services/network/public/cpp/permissions_policy/permissions_policy_declaration.h"
 #include "third_party/blink/public/common/permissions_policy/policy_helper_public.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class DisplayMediaAccessHandlerTest : public WebAppTest {
  public:
@@ -564,8 +562,6 @@ TEST_F(DisplayMediaAccessHandlerTest, CorrectHostAsksForPermissionsNormalURLs) {
   EXPECT_EQ(u"www.google.com", params.app_name);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 TEST_F(DisplayMediaAccessHandlerTest, IsolatedWebAppNameAsksForPermissions) {
   base::test::ScopedFeatureList scoped_feature_list{features::kIsolatedWebApps};
   data_decoder::test::InProcessDataDecoder in_process_data_decoder;
@@ -644,7 +640,6 @@ TEST_F(DisplayMediaAccessHandlerTest, IsolatedWebAppNameAsksForPermissions) {
       content::MEDIA_REQUEST_STATE_CLOSING);
   EXPECT_EQ(base::UTF8ToUTF16(app_name), params.app_name);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(DisplayMediaAccessHandlerTest, WebContentsDestroyed) {
   SetTestFlags({{true /* expect_screens */, true /* expect_windows*/,

@@ -221,12 +221,10 @@ LeakedPasswordDetails LeakDetectionDelegate::PrepareLeakDetails(
     is_syncing = IsSyncing{true};
   } else {
     // Credential saved to the local-or-syncable store.
-#if !BUILDFLAG(IS_ANDROID)
     // TODO(crbug.com/40066949): Remove this codepath once
     // IsSyncFeatureEnabled() is fully deprecated.
     is_syncing = IsSyncing(sync_util::IsSyncFeatureEnabledIncludingPasswords(
         client_->GetSyncService()));
-#endif
   }
 
   // Clear change password URL, to avoid reusing stale change password URL from

@@ -43,11 +43,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "ui/base/device_form_factor.h"
-#endif
-
 namespace {
 
 // Following definitions are equal to `content::PrerenderFinalStatus`.

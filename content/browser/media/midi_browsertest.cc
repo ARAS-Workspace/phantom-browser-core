@@ -18,10 +18,6 @@
 #include "third_party/blink/public/common/permissions/permission_utils.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "media/midi/midi_manager_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 namespace {
@@ -39,12 +35,6 @@ class MidiBrowserTest : public ContentBrowserTest {
   }
 
   void NavigateAndCheckResult(const std::string& path) {
-#if BUILDFLAG(IS_ANDROID)
-    if (!midi::HasSystemFeatureMidiForTesting()) {
-      GTEST_SKIP() << "MIDI service is not available on this device.";
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
-
     const std::u16string expected = u"pass";
     content::TitleWatcher watcher(shell()->web_contents(), expected);
     const std::u16string failed = u"fail";
@@ -172,12 +162,6 @@ class MidiBrowserTestWithPermissionOverride : public ContentBrowserTest {
 
 IN_PROC_BROWSER_TEST_F(MidiBrowserTestWithPermissionOverride,
                        RequestMIDIAccessWithSysexOverride) {
-#if BUILDFLAG(IS_ANDROID)
-  if (!midi::HasSystemFeatureMidiForTesting()) {
-    GTEST_SKIP() << "MIDI service is not available on this device.";
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   url::Origin origin =
       url::Origin::Create(https_test_server_->GetURL("/"));
 

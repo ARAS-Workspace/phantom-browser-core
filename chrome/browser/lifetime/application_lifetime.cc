@@ -21,9 +21,7 @@
 #include "components/language/core/common/locale_util.h"
 #include "components/prefs/pref_service.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace chrome {
 
@@ -37,9 +35,7 @@ void AttemptExitInternal(bool try_to_quit_application) {
   }
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID)
   OnClosingAllBrowsers(true);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   g_browser_process->platform_part()->AttemptExit(try_to_quit_application);
 }
@@ -49,9 +45,7 @@ void AttemptExitInternal(bool try_to_quit_application) {
 void AttemptUserExit() {
   // Reset the restart bit that might have been set in cancelled restart
   // request.
-#if !BUILDFLAG(IS_ANDROID)
   ProfilePicker::Hide();
-#endif  // !BUILDFLAG(IS_ANDROID)
   PrefService* pref_service = g_browser_process->local_state();
   pref_service->SetBoolean(prefs::kRestartLastSessionOnShutdown, false);
   AttemptExitInternal(false);
@@ -66,25 +60,21 @@ void AttemptExit() {
   // don't notify users of crashes beyond this point.
   // Note that MarkAsCleanShutdown() does not set UMA's exit cleanly bit
   // so crashes during shutdown are still reported in UMA.
-#if !BUILDFLAG(IS_ANDROID)
   // Android doesn't use Browser.
   if (AreAllBrowsersCloseable()) {
     MarkAsCleanShutdown();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   AttemptExitInternal(true);
 }
 
 void ExitIgnoreUnloadHandlers() {
   VLOG(1) << "ExitIgnoreUnloadHandlers";
-#if !BUILDFLAG(IS_ANDROID)
   // We always mark exit cleanly.
   MarkAsCleanShutdown();
 
   // For desktop browsers, always perform a silent exit.
   browser_shutdown::OnShutdownStarting(
       browser_shutdown::ShutdownType::kSilentExit);
-#endif  // !BUILDFLAG(IS_ANDROID)
   AttemptExitInternal(true);
 }
 

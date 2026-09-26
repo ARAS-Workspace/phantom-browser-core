@@ -64,14 +64,12 @@
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/test/gmock_expected_support.h"
 #include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using content::WebContentsTester;
 using content_settings::PageSpecificContentSettings;
@@ -909,7 +907,6 @@ TEST_F(ContentSettingBubbleModelTest, FileURL) {
   ASSERT_NE(std::u16string::npos, title.find(base::UTF8ToUTF16(file_url)));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class ContentSettingBubbleModelIsolatedWebAppTest
     : public ContentSettingBubbleModelTest {
  public:
@@ -947,7 +944,6 @@ TEST_F(ContentSettingBubbleModelIsolatedWebAppTest, IsolatedWebAppUrl) {
       content_setting_bubble_model->bubble_content().radio_group.radio_items[0];
   ASSERT_NE(std::u16string::npos, title.find(base::UTF8ToUTF16(app_name)));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ContentSettingBubbleModelTest, RegisterProtocolHandler) {
   const GURL page_url("https://toplevel.example/");

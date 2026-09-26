@@ -93,9 +93,6 @@ std::unique_ptr<content::NavigationUIData> ChromeNavigationUIData::Clone() {
 
   copy->is_no_state_prefetching_ = is_no_state_prefetching_;
   copy->bookmark_id_ = bookmark_id_;
-#if BUILDFLAG(IS_ANDROID)
-  copy->twa_launch_token_ = twa_launch_token_;
-#endif
   copy->navigation_initiated_from_sync_ = navigation_initiated_from_sync_;
 
   return std::move(copy);

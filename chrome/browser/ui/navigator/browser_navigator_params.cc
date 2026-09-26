@@ -18,11 +18,6 @@ using content::GlobalRequestID;
 using content::NavigationController;
 using content::WebContents;
 
-#if BUILDFLAG(IS_ANDROID)
-NavigateParams::NavigateParams(std::unique_ptr<WebContents> contents_to_insert)
-    : contents_to_insert(std::move(contents_to_insert)) {}
-#endif
-
 NavigateParams::NavigateParams(BrowserWindowInterface* a_browser,
                                const GURL& a_url,
                                ui::PageTransition a_transition)

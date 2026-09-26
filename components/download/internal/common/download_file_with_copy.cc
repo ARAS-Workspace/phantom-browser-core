@@ -96,10 +96,4 @@ void DownloadFileWithCopy::Pause() {}
 
 void DownloadFileWithCopy::Resume() {}
 
-#if BUILDFLAG(IS_ANDROID)
-void DownloadFileWithCopy::PublishDownload(RenameCompletionCallback callback) {
-  // This shouldn't get called.
-  DCHECK(false);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 }  //  namespace download

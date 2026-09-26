@@ -118,11 +118,4 @@ void TestPermissionsClient::SetIsPrivilegedInternalWebUI(
   is_privileged_internal_web_ui_ = is_privileged_internal_web_ui;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Gets the name of the embedder.
-const std::u16string TestPermissionsClient::GetClientApplicationName() const {
-  return u"Chrome";
-}
-#endif
-
 }  // namespace permissions

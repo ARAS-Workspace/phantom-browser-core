@@ -267,7 +267,6 @@ TEST_F(SamplingMallocShimsTest, CrashKey) {
 #endif  // !defined(COMPONENT_BUILD)
 
 // malloc_usable_size() is not currently used/shimmed on Android.
-#if !BUILDFLAG(IS_ANDROID)
 MULTIPROCESS_TEST_MAIN_WITH_SETUP(
     GetSizeEstimate,
     SamplingMallocShimsTest::multiprocessTestSetup) {
@@ -289,7 +288,6 @@ MULTIPROCESS_TEST_MAIN_WITH_SETUP(
 TEST_F(SamplingMallocShimsTest, GetSizeEstimate) {
   runTest("GetSizeEstimate");
 }
-#endif
 
 // PartitionAlloc-Everywhere does not support batch_malloc / batch_free.
 #if BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)

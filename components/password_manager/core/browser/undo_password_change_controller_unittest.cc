@@ -28,10 +28,6 @@
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "components/webauthn/android/cred_man_support.h"
-#include "components/webauthn/android/webauthn_cred_man_delegate.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 using base::test::RunOnceClosure;
 using testing::NiceMock;
@@ -95,11 +91,6 @@ class UndoPasswordChangeControllerTest : public testing::Test {
         .WillByDefault(Return(&password_form_cache_));
     // Called after `PasswordFormManager` parses a form.
     ON_CALL(client_, GetCurrentLogManager).WillByDefault(Return(nullptr));
-
-#if BUILDFLAG(IS_ANDROID)
-    webauthn::WebAuthnCredManDelegate::override_cred_man_support_for_testing(
-        webauthn::CredManSupport::DISABLED);
-#endif  // BUILDFLAG(IS_ANDROID)
 
     observed_form_.set_url(
         GURL("https://accounts.google.com/a/ServiceLoginAuth"));

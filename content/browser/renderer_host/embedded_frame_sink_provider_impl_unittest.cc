@@ -27,9 +27,7 @@
 #include "third_party/blink/public/mojom/frame_sinks/embedded_frame_sink.mojom.h"
 #include "ui/compositor/compositor.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/compositor/image_transport_factory.h"
-#endif
 
 using testing::ElementsAre;
 using testing::IsEmpty;

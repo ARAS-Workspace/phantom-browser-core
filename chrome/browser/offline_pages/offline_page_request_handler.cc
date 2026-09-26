@@ -436,11 +436,6 @@ void OfflinePageRequestHandler::OnTrustedOfflinePageFound() {
   if (IsProcessingFileUrlIntent()) {
     bool valid = net::FileURLToFilePath(offline_header_.intent_url, &file_path);
     DCHECK(valid);
-#if BUILDFLAG(IS_ANDROID)
-  } else if (IsProcessingContentUrlIntent()) {
-    file_path = base::FilePath(offline_header_.intent_url.spec());
-    DCHECK(file_path.IsContentUri());
-#endif  // BUILDFLAG(IS_ANDROID)
   } else {
     file_path = GetCurrentOfflinePage().file_path;
   }

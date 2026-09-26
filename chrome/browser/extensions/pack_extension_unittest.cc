@@ -61,12 +61,10 @@ TEST_F(PackExtensionTest, ExtensionWithManagedStorage) {
                                     .AppendASCII("managed_storage")));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android does not support packaged apps.
 TEST_F(PackExtensionTest, PackagedApp) {
   ASSERT_TRUE(TestPackExtension(test_data_dir_.AppendASCII("packaged_app")));
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
 TEST_F(PackExtensionTest, PlatformApp) {

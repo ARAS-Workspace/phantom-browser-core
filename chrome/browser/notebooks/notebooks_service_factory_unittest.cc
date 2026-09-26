@@ -74,14 +74,12 @@ TEST_F(NotebooksServiceFactoryTest, FeatureEnabledUsesEmptyServiceInIncognito) {
   EXPECT_TRUE(service->IsEmptyForTesting());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(NotebooksServiceFactoryTest, ReturnsNullForSystemProfile) {
   InitFeature(/*enable_feature=*/true);
   TestingProfile* profile = profile_manager()->CreateSystemProfile();
   NotebooksService* service = NotebooksServiceFactory::GetForProfile(profile);
   EXPECT_EQ(service, nullptr);
 }
-#endif
 
 TEST_F(NotebooksServiceFactoryTest, ReturnsNullForGuestProfile) {
   InitFeature(/*enable_feature=*/true);

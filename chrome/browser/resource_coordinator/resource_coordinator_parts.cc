@@ -9,9 +9,7 @@
 namespace resource_coordinator {
 
 ResourceCoordinatorParts::ResourceCoordinatorParts() {
-#if !BUILDFLAG(IS_ANDROID)
   tab_lifecycle_unit_source_.AddObserver(&tab_manager_);
-#endif
 }
 
 ResourceCoordinatorParts::~ResourceCoordinatorParts() = default;

@@ -56,9 +56,7 @@
 #include "chrome/browser/extensions/api/downloads/downloads_api.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/download_item_web_app_data.h"
-#endif
 
 using history::DownloadState;
 
@@ -169,12 +167,10 @@ history::DownloadRow GetDownloadRow(download::DownloadItem* item) {
   download.transient = item->IsTransient();
   download.by_ext_id = by_ext_id;
   download.by_ext_name = by_ext_name;
-#if !BUILDFLAG(IS_ANDROID)
   if (DownloadItemWebAppData* web_app_data = DownloadItemWebAppData::Get(item);
       web_app_data != nullptr) {
     download.by_web_app_id = web_app_data->id();
   }
-#endif
   download.download_slice_info = history::GetHistoryDownloadSliceInfos(*item);
   download::TruncateDataUrlAtTheEndIfNeeded(&download.url_chain);
   return download;
@@ -437,12 +433,10 @@ void DownloadHistory::LoadHistoryDownloads(
       should_update_observers = true;
     }
 #endif
-#if !BUILDFLAG(IS_ANDROID)
     if (!row.by_web_app_id.empty()) {
       DownloadItemWebAppData::CreateAndAttachToItem(item, row.by_web_app_id);
       should_update_observers = true;
     }
-#endif
     if (should_update_observers) {
       item->UpdateObservers();
     }

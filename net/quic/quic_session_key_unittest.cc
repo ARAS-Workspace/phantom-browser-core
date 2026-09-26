@@ -83,16 +83,6 @@ TEST(QuicSessionKeyTest, Equality) {
                      /*require_dns_https_alpn=*/false,
                      /*disable_cert_verification_network_fetches=*/false,
                      handles::kInvalidNetworkHandle));
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_NE(key,
-            QuicSessionKey(HostPortPair("www.example.org", 80),
-                           PRIVACY_MODE_DISABLED, ProxyChain::Direct(),
-                           SessionUsage::kDestination, SocketTag(999, 999),
-                           NetworkAnonymizationKey(), SecureDnsPolicy::kAllow,
-                           /*require_dns_https_alpn=*/false,
-                           /*disable_cert_verification_network_fetches=*/false,
-                           handles::kInvalidNetworkHandle));
-#endif  // BUILDFLAG(IS_ANDROID)
   if (NetworkAnonymizationKey::IsPartitioningEnabled()) {
     EXPECT_NE(
         key, QuicSessionKey(HostPortPair("www.example.org", 80),
@@ -215,15 +205,6 @@ TEST(QuicSessionKeyTest, Set) {
                      /*require_dns_https_alpn=*/false,
                      /*disable_cert_verification_network_fetches=*/false,
                      handles::kInvalidNetworkHandle),
-#if BUILDFLAG(IS_ANDROID)
-      QuicSessionKey(HostPortPair("www.example.org", 80), PRIVACY_MODE_DISABLED,
-                     ProxyChain::Direct(), SessionUsage::kDestination,
-                     SocketTag(999, 999), NetworkAnonymizationKey(),
-                     SecureDnsPolicy::kAllow,
-                     /*require_dns_https_alpn=*/false,
-                     /*disable_cert_verification_network_fetches=*/false,
-                     handles::kInvalidNetworkHandle),
-#endif  // BUILDFLAG(IS_ANDROID)
       QuicSessionKey(HostPortPair("www.example.org", 80), PRIVACY_MODE_DISABLED,
                      ProxyChain::Direct(), SessionUsage::kDestination,
                      SocketTag(), NetworkAnonymizationKey(),

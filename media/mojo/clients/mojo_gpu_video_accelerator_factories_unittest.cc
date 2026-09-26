@@ -291,13 +291,6 @@ class FakeInterfaceFactory : public media::mojom::InterfaceFactory {
   void CreateDefaultRenderer(
       const std::string& audio_device_id,
       mojo::PendingReceiver<media::mojom::Renderer> receiver) override {}
-#if BUILDFLAG(IS_ANDROID)
-  void CreateFlingingRenderer(
-      const std::string& presentation_id,
-      mojo::PendingRemote<media::mojom::FlingingRendererClientExtension>
-          client_extension,
-      mojo::PendingReceiver<media::mojom::Renderer> receiver) override {}
-#endif  // BUILDFLAG(IS_ANDROID)
   void CreateCdm(const media::CdmConfig& cdm_config,
                  CreateCdmCallback callback) override {}
 

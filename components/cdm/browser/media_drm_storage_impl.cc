@@ -30,14 +30,6 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/task/task_traits.h"
-#include "base/task/thread_pool.h"
-#include "base/threading/scoped_blocking_call.h"
-#include "media/base/android/media_drm_bridge.h"
-#include "third_party/widevine/cdm/widevine_cdm_common.h"  // nogncheck
-#endif
-
 // The storage will be managed by PrefService. All data will be stored in a
 // dictionary under the key "media.media_drm_storage". The dictionary is
 // structured as follows:
@@ -290,129 +282,6 @@ base::DictValue& CreateOriginDictAndReturnSessionsDict(
       ->GetDict();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Clear sessions whose creation time falls in [start, end] from
-// |sessions_dict|. This function also cleans corruption data and should never
-// fail.
-void ClearSessionDataForTimePeriod(base::DictValue& sessions_dict,
-                                   base::Time start,
-                                   base::Time end) {
-  std::vector<std::string> sessions_to_clear;
-  for (const auto key_value : sessions_dict) {
-    const std::string& session_id = key_value.first;
-
-    base::Value* session_dict = &key_value.second;
-    if (!session_dict->is_dict()) {
-      DLOG(WARNING) << "Session dict for " << session_id
-                    << " is corrupted, removing.";
-      sessions_to_clear.push_back(session_id);
-      continue;
-    }
-
-    std::unique_ptr<SessionData> session_data =
-        SessionData::FromDictValue(session_dict->GetDict());
-    if (!session_data) {
-      DLOG(WARNING) << "Session data for " << session_id
-                    << " is corrupted, removing.";
-      sessions_to_clear.push_back(session_id);
-      continue;
-    }
-
-    if (session_data->creation_time() >= start &&
-        session_data->creation_time() <= end) {
-      sessions_to_clear.push_back(session_id);
-      continue;
-    }
-  }
-
-  // Remove session data.
-  for (const auto& session_id : sessions_to_clear)
-    sessions_dict.Remove(session_id);
-}
-
-// 1. Removes the session data from origin dict if the session's creation time
-// falls in [|start|, |end|] and |filter| returns true on its origin.
-// 2. Removes the origin data if all of the sessions are removed.
-// 3. Returns a list of origin IDs to unprovision.
-std::vector<base::UnguessableToken> ClearMatchingLicenseData(
-    base::DictValue& storage_dict,
-    base::Time start,
-    base::Time end,
-    const MediaDrmStorageImpl::ClearMatchingLicensesFilterCB& filter) {
-  std::vector<std::string> origins_to_delete;
-  std::vector<base::UnguessableToken> origin_ids_to_unprovision;
-
-  for (const auto key_value : storage_dict) {
-    const std::string& origin_str = key_value.first;
-
-    if (filter && !filter.Run(GURL(origin_str)))
-      continue;
-
-    base::Value* origin_dict = &key_value.second;
-    if (!origin_dict->is_dict()) {
-      DLOG(WARNING) << "Origin dict for " << origin_str
-                    << " is corrupted, removing.";
-      origins_to_delete.push_back(origin_str);
-      continue;
-    }
-
-    std::unique_ptr<OriginData> origin_data =
-        OriginData::FromDictValue(origin_dict->GetDict());
-    if (!origin_data) {
-      DLOG(WARNING) << "Origin data for " << origin_str
-                    << " is corrupted, removing.";
-      origins_to_delete.push_back(origin_str);
-      continue;
-    }
-
-    if (origin_data->provision_time() > end)
-      continue;
-
-    base::DictValue* sessions = origin_dict->GetDict().FindDict(kSessions);
-    if (!sessions) {
-      // The origin is provisioned, but no persistent license is installed.
-      origins_to_delete.push_back(origin_str);
-      origin_ids_to_unprovision.push_back(origin_data->origin_id());
-      continue;
-    }
-
-    ClearSessionDataForTimePeriod(*sessions, start, end);
-
-    if (sessions->empty()) {
-      // Session data will be removed when removing origin data.
-      origins_to_delete.push_back(origin_str);
-      origin_ids_to_unprovision.push_back(origin_data->origin_id());
-    }
-  }
-
-  // Remove origin data.
-  for (const auto& origin_str : origins_to_delete)
-    storage_dict.Remove(origin_str);
-
-  return origin_ids_to_unprovision;
-}
-
-// Unprovision MediaDrm in IO thread.
-void ClearMediaDrmLicensesBlocking(
-    std::vector<base::UnguessableToken> origin_ids) {
-  base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
-                                                base::BlockingType::WILL_BLOCK);
-
-  for (const auto& origin_id : origin_ids) {
-    // MediaDrm will unprovision |origin_id| for all security level. Passing
-    // DEFAULT here is OK.
-    auto media_drm_bridge = media::MediaDrmBridge::CreateWithoutSessionSupport(
-        kWidevineKeySystem, origin_id.ToString(),
-        media::MediaDrmBridge::SECURITY_LEVEL_UNKNOWN, "ClearMediaLicenses",
-        base::NullCallback());
-
-    if (media_drm_bridge.has_value()) {
-      media_drm_bridge->Unprovision();
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Returns true if any session in |sessions_dict| has been modified more
 // recently than |start| and before |end|, and otherwise
 // returns false.
@@ -653,37 +522,6 @@ std::vector<GURL> MediaDrmStorageImpl::GetOriginsModifiedBetween(
 
   return matching_origins;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// static
-void MediaDrmStorageImpl::ClearMatchingLicenses(
-    PrefService* pref_service,
-    base::Time start,
-    base::Time end,
-    const MediaDrmStorageImpl::ClearMatchingLicensesFilterCB& filter,
-    base::OnceClosure complete_cb) {
-  DVLOG(1) << __func__ << ": Clear licenses [" << start << ", " << end << "]";
-
-  ScopedDictPrefUpdate update(pref_service, prefs::kMediaDrmStorage);
-
-  std::vector<base::UnguessableToken> no_license_origin_ids =
-      ClearMatchingLicenseData(update.Get(), start, end, filter);
-  if (no_license_origin_ids.empty()) {
-    std::move(complete_cb).Run();
-    return;
-  }
-
-  // Create a single thread task runner for MediaDrmBridge, for posting Java
-  // callbacks immediately to avoid rentrancy issues.
-  // TODO(yucliu): Remove task runner from MediaDrmBridge in this case.
-  base::ThreadPool::CreateSingleThreadTaskRunner(
-      {base::TaskPriority::USER_VISIBLE, base::MayBlock()})
-      ->PostTaskAndReply(FROM_HERE,
-                         base::BindOnce(&ClearMediaDrmLicensesBlocking,
-                                        std::move(no_license_origin_ids)),
-                         std::move(complete_cb));
-}
-#endif
 
 // MediaDrmStorageImpl
 

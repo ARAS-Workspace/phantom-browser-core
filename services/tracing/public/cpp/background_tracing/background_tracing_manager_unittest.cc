@@ -140,9 +140,6 @@ TEST_F(BackgroundTracingManagerTest, HasTraceToUpload) {
 
   MockNetworkChangeNotifier notifier;
   notifier.set_type(net::NetworkChangeNotifier::CONNECTION_2G);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(background_tracing_manager_->HasTraceToUpload());
-#endif
 
   notifier.set_type(net::NetworkChangeNotifier::CONNECTION_WIFI);
   EXPECT_TRUE(background_tracing_manager_->HasTraceToUpload());

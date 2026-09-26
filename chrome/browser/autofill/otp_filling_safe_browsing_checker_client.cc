@@ -45,11 +45,8 @@ OtpFillingSafeBrowsingCheckerClient::OtpFillingSafeBrowsingCheckerClient(
           {safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_PHISHING,
            safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_MALWARE,
            safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_UNWANTED,
-#if !BUILDFLAG(IS_ANDROID)
            safe_browsing::SBThreatType::SB_THREAT_TYPE_SUSPICIOUS_SITE,
-#endif  // !BUILDFLAG(IS_ANDROID)
-           safe_browsing::SBThreatType::SB_THREAT_TYPE_BILLING})) {
-}
+           safe_browsing::SBThreatType::SB_THREAT_TYPE_BILLING})) {}
 
 OtpFillingSafeBrowsingCheckerClient::~OtpFillingSafeBrowsingCheckerClient() {
   if (timer_.IsRunning()) {

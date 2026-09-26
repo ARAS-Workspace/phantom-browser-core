@@ -122,16 +122,6 @@ GpuRasterBufferProvider::GpuRasterBufferProvider(
     should_flush_tile_raster_commands_ =
         worker_context_provider->ContextCapabilities()
             .use_deferred_graphite_submit;
-
-#if BUILDFLAG(IS_ANDROID)
-    auto is_using_vulkan =
-        worker_context_provider->ContextCapabilities().using_vulkan_context;
-
-    // On Android, DMSAA on vulkan backend launch is controlled by
-    // kUseDMSAAForTiles.
-    is_using_dmsaa_ = !is_using_vulkan ||
-                      base::FeatureList::IsEnabled(features::kUseDMSAAForTiles);
-#endif
   }
 }
 

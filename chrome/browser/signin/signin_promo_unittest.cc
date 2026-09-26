@@ -388,7 +388,6 @@ class ShowPromoTest : public testing::Test {
   scoped_refptr<const extensions::Extension> extension_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ShowPromoTest, ShouldShowSigninPromoSyncDisabled) {
   DisableSync();
   EXPECT_FALSE(ShouldShowPasswordSignInPromo(*profile()));
@@ -403,7 +402,6 @@ TEST_F(ShowPromoTest, ShouldShowSigninPromoSyncEnabled) {
   EXPECT_TRUE(ShouldShowBookmarkSignInPromo(*profile()));
   EXPECT_TRUE(ShouldShowExtensionSignInPromo(*profile(), *CreateExtension()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 class ShowSigninPromoTestWithFeatureFlags : public ShowPromoTest {

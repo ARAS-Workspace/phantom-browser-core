@@ -16,13 +16,6 @@
 #include "components/sync_preferences/features.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-
-// Must come after all headers that specialize FromJniType() / ToJniType().
-#include "chrome/browser/sync/android/jni_headers/CrossDevicePrefTrackerFactory_jni.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 // Helper function to determine ProfileSelections based on the feature flag.
@@ -74,21 +67,3 @@ CrossDevicePrefTrackerFactory::BuildServiceInstanceForBrowserContext(
       DeviceInfoSyncServiceFactory::GetForProfile(profile),
       SyncServiceFactory::GetForProfile(profile), std::move(pref_provider));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-static base::android::ScopedJavaLocalRef<jobject>
-JNI_CrossDevicePrefTrackerFactory_GetForProfile(JNIEnv* env, Profile* profile) {
-  DCHECK(profile);
-
-  sync_preferences::CrossDevicePrefTracker* pref_tracker =
-      CrossDevicePrefTrackerFactory::GetForProfile(profile);
-  if (!pref_tracker) {
-    return base::android::ScopedJavaLocalRef<jobject>();
-  }
-  return pref_tracker->GetJavaObject();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(CrossDevicePrefTrackerFactory)
-#endif

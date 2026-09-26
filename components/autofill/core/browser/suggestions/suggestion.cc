@@ -29,14 +29,6 @@
 #include "components/autofill/core/common/dense_set.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/android/jni_string.h"
-#include "components/autofill/android/main_autofill_jni_headers/AutofillAiPayload_jni.h"
-#include "components/autofill/android/main_autofill_jni_headers/AutofillProfilePayload_jni.h"
-#include "components/autofill/android/main_autofill_jni_headers/PaymentsPayload_jni.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace autofill {
 
 namespace {
@@ -289,15 +281,6 @@ Suggestion::AutofillAiPayload& Suggestion::AutofillAiPayload::operator=(
 
 Suggestion::AutofillAiPayload::~AutofillAiPayload() = default;
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-Suggestion::AutofillAiPayload::CreateJavaObject() const {
-  JNIEnv* env = base::android::AttachCurrentThread();
-  return Java_AutofillAiPayload_Constructor(env, guid.value(),
-                                            requires_server_fetch);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 Suggestion::AutofillProfilePayload::AutofillProfilePayload() = default;
 Suggestion::AutofillProfilePayload::AutofillProfilePayload(Guid guid)
     : guid(std::move(guid)) {}
@@ -317,14 +300,6 @@ Suggestion::AutofillProfilePayload::operator=(AutofillProfilePayload&&) =
     default;
 
 Suggestion::AutofillProfilePayload::~AutofillProfilePayload() = default;
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-Suggestion::AutofillProfilePayload::CreateJavaObject() const {
-  JNIEnv* env = base::android::AttachCurrentThread();
-  return Java_AutofillProfilePayload_Constructor(env, guid.value());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 Suggestion::IdentityCredentialPayload::IdentityCredentialPayload() = default;
 Suggestion::IdentityCredentialPayload::IdentityCredentialPayload(
@@ -402,16 +377,6 @@ Suggestion::PaymentsPayload& Suggestion::PaymentsPayload::operator=(
     PaymentsPayload&&) = default;
 
 Suggestion::PaymentsPayload::~PaymentsPayload() = default;
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-Suggestion::PaymentsPayload::CreateJavaObject() const {
-  JNIEnv* env = base::android::AttachCurrentThread();
-  return Java_PaymentsPayload_Constructor(env, main_text_content_description,
-                                          should_display_terms_available,
-                                          guid.value());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 Suggestion::IPHMetadata::IPHMetadata() = default;
 
@@ -543,8 +508,3 @@ void PrintTo(const Suggestion& suggestion, std::ostream* os) {
 }
 
 }  // namespace autofill
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(AutofillProfilePayload)
-DEFINE_JNI(PaymentsPayload)
-#endif

@@ -89,16 +89,9 @@ URLVisitAggregate::URLTypeSet FetchOptions::GetFetchResultURLTypes() {
                         base::SplitResult::SPLIT_WANT_NONEMPTY);
   if (url_type_entries.empty()) {
     return {
-#if BUILDFLAG(IS_ANDROID)
-        URLVisitAggregate::URLType::kActiveLocalTab,
-#endif
         URLVisitAggregate::URLType::kActiveRemoteTab,
         URLVisitAggregate::URLType::kLocalVisit,
         URLVisitAggregate::URLType::kRemoteVisit,
-#if BUILDFLAG(IS_ANDROID)
-        // Available in Android only.
-        URLVisitAggregate::URLType::kCCTVisit,
-#endif
     };
   }
 
@@ -116,10 +109,6 @@ FetchOptions FetchOptions::CreateFetchOptionsForTabResumption(
   std::vector<URLVisitAggregatesTransformType> transforms{
       URLVisitAggregatesTransformType::kRecencyFilter,
       URLVisitAggregatesTransformType::kBookmarkData,
-#if BUILDFLAG(IS_ANDROID)
-      URLVisitAggregatesTransformType::kDefaultAppUrlFilter,
-      URLVisitAggregatesTransformType::kHistoryBrowserTypeFilter,
-#endif
   };
   if (base::FeatureList::IsEnabled(
           features::kVisitedURLRankingHistoryVisibilityScoreFilter)) {

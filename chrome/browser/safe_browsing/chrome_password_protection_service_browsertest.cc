@@ -1564,7 +1564,6 @@ IN_PROC_BROWSER_TEST_F(
   ASSERT_TRUE(prerender_manager.was_activated());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class ChromePasswordProtectionServiceTrustSafetySentimentServiceBrowserTest
     : public ChromePasswordProtectionServiceBrowserTest {
  public:
@@ -1652,6 +1651,5 @@ IN_PROC_BROWSER_TEST_F(
       WarningUIType::MODAL_DIALOG, WarningAction::CHANGE_PASSWORD);
   base::RunLoop().RunUntilIdle();
 }
-#endif
 
 }  // namespace safe_browsing

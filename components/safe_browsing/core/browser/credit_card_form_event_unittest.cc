@@ -12,10 +12,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/safe_browsing/core/browser/referring_app_info.h"
-#endif
-
 namespace safe_browsing::credit_card_form {
 
 std::string ToString(SiteVisit site_visit) {
@@ -164,49 +160,6 @@ TEST_P(GetCreditCardFormEventTest, GetExpectedEvent) {
       test_case.site_visit, test_case.referring_app, test_case.heuristic);
   ASSERT_EQ(event, test_case.expected_event);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-struct ReferringAppTestCase {
-  const char* name;
-  const char* referring_app_name;
-  ReferringApp referring_app;
-
-  static std::string GetTestName(
-      const testing::TestParamInfo<ReferringAppTestCase>& test_case) {
-    return test_case.param.name;
-  }
-};
-
-class ReferringAppTest : public testing::TestWithParam<ReferringAppTestCase> {};
-
-constexpr ReferringAppTestCase referring_app_test_cases[] = {
-    {"no_referring_app", nullptr, kNoReferringApp},
-    {"empty_referring_app_name", "", kNoReferringApp},
-    {"some_other_app", "com.bar.foo", kOtherApp},
-    {"some_other_app_uri", "android-app://com.bar.foo", kOtherApp},
-    {"chrome", "chrome", kChrome},
-    {"chrome_ui", "android-app://chrome", kChrome},
-    {"android_messages", "android.messages", kSmsApp},
-    {"android_messages_uri", "android-app://android.messages", kSmsApp},
-    {"samsung_messaging", "com.samsung.android.messaging", kSmsApp},
-    {"samsung_messaging_uri", "android-app://com.samsung.android.messaging",
-     kSmsApp},
-};
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         ReferringAppTest,
-                         testing::ValuesIn(referring_app_test_cases),
-                         ReferringAppTestCase::GetTestName);
-
-TEST_P(ReferringAppTest, FromReferrinugAppInfo) {
-  const ReferringAppTestCase& test_case = GetParam();
-  internal::ReferringAppInfo referring_app_info{};
-  if (test_case.referring_app_name) {
-    referring_app_info.referring_app_name = test_case.referring_app_name;
-  }
-  ASSERT_EQ(test_case.referring_app, FromReferringAppInfo(referring_app_info));
-}
-#endif
 
 struct LogEventTestCase {
   SiteVisit site_visit;

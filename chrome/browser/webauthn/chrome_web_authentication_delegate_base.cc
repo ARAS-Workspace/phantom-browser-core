@@ -32,12 +32,10 @@ bool IsCmdlineAllowedOrigin(const url::Origin& caller_origin) {
   return caller_origin == cmdline_allowed_origin;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool IsGoogleCorpCrdOrigin(content::BrowserContext* browser_context,
                            const url::Origin& caller_origin) {
   return false;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool RemoteDesktopClientOverrideAllowedByPolicy(
     content::BrowserContext* browser_context,
@@ -105,13 +103,11 @@ bool ChromeWebAuthenticationDelegateBase::
     return true;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Check if the origin is a Google Corp Chrome Remote Desktop origin and
   // allowed by policy, (or allowed by the command-line flag for testing).
   if (IsGoogleCorpCrdOrigin(browser_context, caller_origin)) {
     return true;
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   return false;
 }

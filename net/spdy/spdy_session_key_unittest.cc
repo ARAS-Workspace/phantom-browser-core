@@ -64,15 +64,6 @@ TEST(SpdySessionKeyTest, Equality) {
                      NetworkAnonymizationKey(), SecureDnsPolicy::kAllow,
                      /*disable_cert_verification_network_fetches=*/true,
                      handles::kInvalidNetworkHandle));
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_NE(key,
-            SpdySessionKey(HostPortPair("www.example.org", 80),
-                           PRIVACY_MODE_DISABLED, ProxyChain::Direct(),
-                           SessionUsage::kDestination, SocketTag(999, 999),
-                           NetworkAnonymizationKey(), SecureDnsPolicy::kAllow,
-                           /*disable_cert_verification_network_fetches=*/true,
-                           handles::kInvalidNetworkHandle));
-#endif  // BUILDFLAG(IS_ANDROID)
   if (NetworkAnonymizationKey::IsPartitioningEnabled()) {
     EXPECT_NE(key,
               SpdySessionKey(HostPortPair("www.example.org", 80),
@@ -163,14 +154,6 @@ TEST(SpdySessionKeyTest, Set) {
                      NetworkAnonymizationKey(), SecureDnsPolicy::kAllow,
                      /*disable_cert_verification_network_fetches=*/true,
                      handles::kInvalidNetworkHandle),
-#if BUILDFLAG(IS_ANDROID)
-      SpdySessionKey(HostPortPair("www.example.org", 80), PRIVACY_MODE_DISABLED,
-                     ProxyChain::Direct(), SessionUsage::kDestination,
-                     SocketTag(999, 999), NetworkAnonymizationKey(),
-                     SecureDnsPolicy::kAllow,
-                     /*disable_cert_verification_network_fetches=*/true,
-                     handles::kInvalidNetworkHandle),
-#endif  // BUILDFLAG(IS_ANDROID)
       SpdySessionKey(HostPortPair("www.example.org", 80), PRIVACY_MODE_DISABLED,
                      ProxyChain::Direct(), SessionUsage::kDestination,
                      SocketTag(), NetworkAnonymizationKey(),

@@ -137,7 +137,6 @@ TEST_F(RenderProcessHostUnitTest, RendererProcessLimitOverride) {
   RenderProcessHost::SetMaxRendererProcessCount(0);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Test that using more than half of the system's process limit will be
 // considered going over Chrome's process limit, on non-Android platforms.
 TEST_F(RenderProcessHostUnitTest, RendererProcessLimit) {
@@ -189,22 +188,6 @@ TEST_F(RenderProcessHostUnitTest, RendererProcessLimit) {
   // Verify that the renderer sharing will happen.
   EXPECT_TRUE(RenderProcessHostImpl::IsProcessLimitReached());
 }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// Test that Android does not use a renderer process limit.
-TEST_F(RenderProcessHostUnitTest, NoRendererProcessLimitOnAndroid) {
-  // Add a few dummy process hosts.
-  static constexpr size_t kMaxRendererProcessCountForTesting = 82;
-  std::vector<std::unique_ptr<MockRenderProcessHost>> hosts;
-  for (size_t i = 0; i < kMaxRendererProcessCountForTesting; ++i) {
-    hosts.push_back(std::make_unique<MockRenderProcessHost>(browser_context()));
-  }
-
-  // Verify that the renderer sharing still won't happen.
-  EXPECT_FALSE(RenderProcessHostImpl::IsProcessLimitReached());
-}
-#endif
 
 // Tests that RenderProcessHost reuse considers committed sites correctly.
 TEST_F(RenderProcessHostUnitTest, ReuseCommittedSite) {

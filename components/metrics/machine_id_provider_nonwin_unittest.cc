@@ -14,7 +14,7 @@ namespace {
 TEST(MachineIdProviderNonWinTest, GetId) {
   const bool has_machine_name = !base::SysInfo::HardwareModelName().empty();
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   DCHECK(has_machine_name);
 #endif
 

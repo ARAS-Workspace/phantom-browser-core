@@ -60,11 +60,6 @@ class PrimaryAccountManagerTest : public testing::Test,
                                   public PrimaryAccountManager::Observer {
  public:
   PrimaryAccountManagerTest() : test_signin_client_(&user_prefs_) {
-#if BUILDFLAG(IS_ANDROID)
-    // Mock AccountManagerFacade in java code for tests that require its
-    // initialization.
-    signin::SetUpFakeAccountManagerFacade();
-#endif
     AccountTrackerService::RegisterPrefs(user_prefs_.registry());
     ProfileOAuth2TokenService::RegisterProfilePrefs(user_prefs_.registry());
     PrimaryAccountManager::RegisterProfilePrefs(user_prefs_.registry());

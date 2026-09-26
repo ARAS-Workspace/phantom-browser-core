@@ -306,16 +306,6 @@ void ChromeProfileRequestGenerator::OnAggregatedSignalsReceived(
           os_signals.distribution_version.value());
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    os_report->set_has_potentially_harmful_apps(
-        os_signals.has_potentially_harmful_apps);
-    os_report->set_verified_apps_enabled(os_signals.verified_apps_enabled);
-
-    if (os_signals.security_patch_ms) {
-      os_report->set_security_patch_ms(os_signals.security_patch_ms.value());
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
-
     browser_report->set_browser_version(os_signals.browser_version);
   }
 

@@ -29,7 +29,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 // Channel override is not supported on Android platform
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "chrome/test/base/scoped_channel_override.h"
 #endif
 
@@ -58,7 +58,7 @@ void CreateCrashReport(crashpad::CrashReportDatabase* database,
             crashpad::CrashReportDatabase::kNoError);
 }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 // Duplicating the definition of these variables here to ensure that changes to
 // those values in the source file are deliberate and caught by tests otherwise.
 constexpr char kCrashpadPollingIntervalFlag[] = "crashpad-polling-interval";
@@ -154,7 +154,7 @@ TEST_F(CrashReportingContextTest, UploadToReportingServer) {
             GetLatestCrashReportTime(g_browser_process->local_state()));
 }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 struct PollingIntervalParams {
   PollingIntervalParams(chrome::ScopedChannelOverride::Channel channel,
@@ -195,6 +195,6 @@ INSTANTIATE_TEST_SUITE_P(
                               "10",
                               kDefaultCrashpadPollingIntervalSeconds)));
 
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 }  // namespace enterprise_connectors

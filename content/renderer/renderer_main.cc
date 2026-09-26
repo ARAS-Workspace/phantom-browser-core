@@ -61,10 +61,6 @@
 #include "third_party/webrtc_overrides/init_webrtc.h"  // nogncheck
 #include "ui/base/ui_base_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/library_loader/library_loader_hooks.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_MAC)
 #include <Carbon/Carbon.h>
 #include <signal.h>
@@ -272,12 +268,6 @@ int RendererMain(MainFunctionParams parameters) {
     }
 
     base::LockMetricsRecorder::EnableRecordingOnCurrentThread("CrRendererMain");
-
-#if BUILDFLAG(IS_ANDROID)
-    base::PlatformThreadPriorityMonitor::Get().RegisterCurrentThread(
-        "RendererMain");
-    base::PlatformThreadPriorityMonitor::Get().Start();
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(MOJO_RANDOM_DELAYS_ENABLED)
     mojo::BeginRandomMojoDelays();

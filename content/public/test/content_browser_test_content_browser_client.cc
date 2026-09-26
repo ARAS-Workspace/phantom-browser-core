@@ -10,9 +10,6 @@
 #include "content/public/common/content_client.h"
 #include "media/mojo/mojom/speech_recognizer.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 ContentBrowserTestContentBrowserClient::

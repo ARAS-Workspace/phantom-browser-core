@@ -116,7 +116,6 @@ IN_PROC_BROWSER_TEST_F(AddressBubblesControllerBrowserTest,
       AutofillClient::AddressPromptUserDecision::kDeclined, std::nullopt);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(AddressBubblesControllerBrowserTest,
                        DeclinedSaveTriggersSurvey) {
   MockHatsService* mock_hats_service = static_cast<MockHatsService*>(
@@ -186,7 +185,6 @@ IN_PROC_BROWSER_TEST_F(AddressBubblesControllerBrowserTest,
   tab_controller()->OnUserDecision(
       AutofillClient::AddressPromptUserDecision::kAccepted, std::nullopt);
 }
-#endif
 
 // This is testing that closing all tabs (which effectively destroys the web
 // contents) will trigger the save callback with kIgnored decions if the users

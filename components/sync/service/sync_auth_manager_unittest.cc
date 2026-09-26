@@ -186,7 +186,6 @@ TEST_P(SyncAuthManagerTest, NotifiesOfSignoutBeforeAccessTokenIsGone) {
 // TODO(crbug.com/40066949): Remove once kSync becomes unreachable or is
 // deleted from the codebase. See ConsentLevel::kSync documentation for
 // details.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(SyncAuthManagerTest, ForwardsUnconsentedAccountEvents) {
   EXPECT_CALL(delegate(), SyncAuthAccountStateChanged).Times(0);
   EXPECT_CALL(delegate(), SyncAuthCredentialsChanged).Times(0);
@@ -215,7 +214,6 @@ TEST_P(SyncAuthManagerTest, ForwardsUnconsentedAccountEvents) {
 
   EXPECT_TRUE(auth_manager->GetActiveAccountInfo().is_sync_consented);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_P(SyncAuthManagerTest, ClearsAuthErrorOnSignoutWithRefreshTokenRemoval) {
   // Start out already signed in before the SyncAuthManager is created.
@@ -892,7 +890,6 @@ TEST_P(SyncAuthManagerTest, DoesNotRequestAccessTokenIfSyncInactive) {
   base::RunLoop().RunUntilIdle();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Primary account with no sync consent is not supported on Android and iOS.
 TEST_P(SyncAuthManagerTest, PrimaryAccountWithNoSyncConsent) {
   std::unique_ptr<SyncAuthManager> auth_manager = CreateAuthManager();
@@ -910,9 +907,7 @@ TEST_P(SyncAuthManagerTest, PrimaryAccountWithNoSyncConsent) {
   EXPECT_EQ(auth_manager->GetActiveAccountInfo().account_info.account_id,
             account_info.account_id);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Primary account with no sync consent is not supported on Android and iOS.
 TEST_P(SyncAuthManagerTest, PicksNewPrimaryAccountWithSyncConsent) {
   std::unique_ptr<SyncAuthManager> auth_manager = CreateAuthManager();
@@ -952,7 +947,6 @@ TEST_P(SyncAuthManagerTest,
   EXPECT_TRUE(
       auth_manager->GetActiveAccountInfo().account_info.account_id.empty());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_P(SyncAuthManagerTest, DetectsInvalidRefreshTokenAtStartup) {
   // There is a primary account, but it has an invalid refresh token (with a

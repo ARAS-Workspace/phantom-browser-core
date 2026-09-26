@@ -77,17 +77,6 @@ class ChromeSiteIsolationPolicyTest : public testing::Test {
         SetDisallowMemoryThresholdCachingForTesting(false);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Note that this only sets the memory threshold for strict site isolation.
-  void SetMemoryThreshold(const std::string& threshold) {
-    threshold_feature_.InitAndEnableFeatureWithParameters(
-        site_isolation::features::kSiteIsolationMemoryThresholdsAndroid,
-        {{site_isolation::features::
-              kStrictSiteIsolationMemoryThresholdParamName,
-          threshold}});
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Note that this only sets the memory threshold for
   // kOriginKeyedProcessesByDefault isolation.
   void SetOriginMemoryThreshold(const std::string& threshold) {
@@ -103,29 +92,6 @@ class ChromeSiteIsolationPolicyTest : public testing::Test {
   base::test::ScopedFeatureList threshold_feature_;
   base::test::ScopedFeatureList origin_threshold_feature_;
 };
-
-#if BUILDFLAG(IS_ANDROID)
-// kSiteIsolationMemoryThresholdsAndroid only affects Android.
-// kOriginIsolationMemoryThreshold only affects Desktop.
-TEST_F(ChromeSiteIsolationPolicyTest, NoAndroidIsolationBelowMemoryThreshold) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  SetMemoryThreshold("768");
-  EXPECT_FALSE(
-      content::SiteIsolationPolicy::UseDedicatedProcessesForAllSites());
-}
-
-TEST_F(ChromeSiteIsolationPolicyTest, AndroidIsolationAboveMemoryThreshold) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  SetMemoryThreshold("128");
-  EXPECT_TRUE(content::SiteIsolationPolicy::UseDedicatedProcessesForAllSites());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeSiteIsolationPolicyTest, NoOriginIsolationBelowMemoryThreshold) {
   if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {

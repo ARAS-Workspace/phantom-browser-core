@@ -6,11 +6,9 @@
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
 #include "content/public/test/browser_test.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/browser_features.h"
 #include "components/history_clusters/core/features.h"
 #include "components/history_embeddings/core/history_embeddings_features.h"
-#endif
 
 typedef WebUIMochaBrowserTest CrComponentsTest;
 
@@ -19,7 +17,6 @@ IN_PROC_BROWSER_TEST_F(CrComponentsTest, ColorChangeListener) {
   RunTest("cr_components/color_change_listener_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(CrComponentsTest, CustomizeColorSchemeMode) {
   set_test_loader_host(chrome::kChromeUICustomizeChromeSidePanelHost);
   RunTest("cr_components/customize_color_scheme_mode_test.js", "mocha.run()");
@@ -72,13 +69,11 @@ IN_PROC_BROWSER_TEST_F(CrComponentsHistoryEmbeddingsTest,
 IN_PROC_BROWSER_TEST_F(CrComponentsTest, ManagedDialog) {
   RunTest("cr_components/managed_dialog_test.js", "mocha.run()");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(CrComponentsTest, LocalizedLink) {
   RunTest("cr_components/localized_link_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 typedef WebUIMochaBrowserTest CrComponentsSearchboxTest;
 IN_PROC_BROWSER_TEST_F(CrComponentsSearchboxTest, RealboxMatchTest) {
   set_test_loader_host(chrome::kChromeUINewTabPageHost);
@@ -277,4 +272,3 @@ class CrComponentsPreloadingTest : public CrComponentsMostVisitedTest {
 IN_PROC_BROWSER_TEST_F(CrComponentsPreloadingTest, Preloading) {
   RunTest("cr_components/most_visited_test.js", "runMochaSuite('Preloading');");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

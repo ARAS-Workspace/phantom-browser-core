@@ -80,12 +80,10 @@
 
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/api/feedback_private/chrome_feedback_private_delegate.h"
 #include "chrome/browser/extensions/api/file_system/chrome_file_system_delegate.h"
 #include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/search/instant_service_factory.h"
-#endif
 
 #if BUILDFLAG(ENABLE_PRINTING)
 #include "chrome/browser/printing/printing_init.h"
@@ -170,7 +168,6 @@ bool ChromeExtensionsAPIClient::ShouldHideBrowserNetworkRequest(
           url::Origin::Create(chrome::ChromeUINewTabPageURLAsGURL());
 
   // Android does not support instant.
-#if !BUILDFLAG(IS_ANDROID)
   // Hide requests made by the NTP Instant renderer.
   auto* instant_service =
       context
@@ -181,7 +178,6 @@ bool ChromeExtensionsAPIClient::ShouldHideBrowserNetworkRequest(
     is_sensitive_request |= instant_service->IsInstantProcess(
         request.global_id.child_id.GetUnsafeValue());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return is_sensitive_request;
 }
@@ -403,7 +399,6 @@ MessagingDelegate* ChromeExtensionsAPIClient::GetMessagingDelegate() {
 }
 
 // The APIs that require these methods are not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 FileSystemDelegate* ChromeExtensionsAPIClient::GetFileSystemDelegate() {
   if (!file_system_delegate_) {
     file_system_delegate_ = std::make_unique<ChromeFileSystemDelegate>();
@@ -428,14 +423,11 @@ ChromeExtensionsAPIClient::GetAutomationInternalApiDelegate() {
   }
   return extensions_automation_api_delegate_.get();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::vector<KeyedServiceBaseFactory*>
 ChromeExtensionsAPIClient::GetFactoryDependencies() {
   std::vector<KeyedServiceBaseFactory*> dependencies;
-#if !BUILDFLAG(IS_ANDROID)
   dependencies.push_back(InstantServiceFactory::GetInstance());
-#endif
   dependencies.push_back(supervised_user::SupervisedUserServiceFactory::GetInstance());
   return dependencies;
 }

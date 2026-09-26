@@ -200,25 +200,6 @@ std::unique_ptr<TemplateURLData> GetPrepopulatedEngine(
                                         /*use_first_as_fallback=*/false);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-std::vector<std::unique_ptr<TemplateURLData>> GetLocalPrepopulatedEngines(
-    const std::string& country_code,
-    PrefService& prefs) {
-  country_codes::CountryId country_id(country_code);
-  if (!country_id.IsValid()) {
-    LOG(ERROR) << "Unknown country code specified: " << country_code;
-    return std::vector<std::unique_ptr<TemplateURLData>>();
-  }
-
-  return base::ToVector(regional_capabilities::GetPrepopulatedEngines(
-                            country_id, prefs,
-                            regional_capabilities::SearchEngineListType::kTopN),
-                        &PrepopulatedEngineToTemplateURLData);
-}
-
-#endif
-
 const PrepopulatedEngine* GetPrepopulatedEngineFromBuiltInData(
     int prepopulated_id,
     const std::vector<raw_ptr<const PrepopulatedEngine>>&

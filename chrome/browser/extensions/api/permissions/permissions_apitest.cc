@@ -23,10 +23,6 @@
 #include "extensions/common/switches.h"
 #include "net/dns/mock_host_resolver.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/net/chrome_network_delegate.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -223,12 +219,6 @@ IN_PROC_BROWSER_TEST_F(PermissionsApiTest, OptionalPermissionsFileAccess) {
 // Tests loading of files or directory listings when an extension has file
 // access.
 IN_PROC_BROWSER_TEST_F(PermissionsApiTest, FileLoad) {
-#if BUILDFLAG(IS_ANDROID)
-  // Enable access to arbitrary files via file: schema. Ordinarily Chrome on
-  // Android blocks access to many directories, which affects the built-in
-  // web server this test extension accesses.
-  ChromeNetworkDelegate::EnableAccessToAllFilesForTesting(true);
-#endif
   base::ScopedTempDir temp_dir;
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
@@ -263,7 +253,6 @@ IN_PROC_BROWSER_TEST_F(PermissionsApiTest, HostSubsets) {
   EXPECT_TRUE(RunExtensionTest("permissions/host_subsets")) << message_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that requesting an optional permission from a background page, with
 // another window open, grants the permission and updates the bindings
 // (chrome.whatever, in this case chrome.alarms). Regression test for
@@ -277,7 +266,6 @@ IN_PROC_BROWSER_TEST_F(PermissionsApiTest, OptionalPermissionsUpdatesBindings) {
   ASSERT_TRUE(RunExtensionTest("permissions/optional_updates_bindings"))
       << message_;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(PermissionsApiTest, InvalidAddHostAccessRequests) {
   ASSERT_TRUE(StartEmbeddedTestServer());

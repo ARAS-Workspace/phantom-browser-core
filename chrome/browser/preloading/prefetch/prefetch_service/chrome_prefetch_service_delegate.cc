@@ -6,9 +6,6 @@
 
 #include "chrome/browser/battery/battery_saver.h"
 #include "chrome/browser/data_saver/data_saver.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/preloading/prefetch/prefetch_service/prefetch_origin_decider.h"
 #include "chrome/browser/preloading/preloading_features.h"
 #include "chrome/browser/preloading/preloading_prefs.h"

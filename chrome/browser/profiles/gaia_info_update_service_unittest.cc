@@ -54,9 +54,6 @@
 #include "ui/gfx/image/image.h"
 #include "ui/gfx/image/image_unittest_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif
-
 using ::testing::Return;
 
 namespace {
@@ -412,6 +409,3 @@ TEST_F(GAIAInfoUpdateServiceTest, SigninPrefsWithGaiaIdNotInChrome) {
   EXPECT_TRUE(HasAccountPrefs(gaia_id));
   EXPECT_FALSE(HasAccountPrefs(gaia_id_not_in_chrome));
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-#endif

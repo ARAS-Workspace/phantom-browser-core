@@ -47,9 +47,7 @@ scoped_refptr<RefcountedKeyedService> BuildPasswordStore(
   DCHECK(!profile->IsOffTheRecord());
 
   affiliations::AffiliationService* affiliation_service = nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   affiliation_service = AffiliationServiceFactory::GetForProfile(profile);
-#endif
 
   scoped_refptr<PasswordStore> ps =
       base::MakeRefCounted<password_manager::PasswordStore>(
@@ -63,14 +61,12 @@ scoped_refptr<RefcountedKeyedService> BuildPasswordStore(
       CredentialsCleanerRunnerFactory::GetForProfile(profile), ps,
       password_manager::kProfileStore, profile->GetPrefs(), base::Seconds(60),
       base::BindRepeating(&GetNetworkContext, profile));
-#if !BUILDFLAG(IS_ANDROID)
   // Android gets logins with affiliations directly from the backend.
   auto password_affiliation_adapter =
       std::make_unique<password_manager::PasswordAffiliationSourceAdapter>();
   password_affiliation_adapter->RegisterPasswordStore(ps.get());
   CHECK(affiliation_service);
   affiliation_service->RegisterSource(std::move(password_affiliation_adapter));
-#endif
   DelayReportingPasswordStoreMetrics(profile);
   return ps;
 }

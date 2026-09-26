@@ -21,11 +21,9 @@
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "services/metrics/public/cpp/ukm_recorder.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/picture_in_picture/auto_pip_setting_overlay_view.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
-#endif
 
 // static
 std::unique_ptr<AutoPipSettingHelper>
@@ -48,7 +46,6 @@ AutoPipSettingHelper::AutoPipSettingHelper(
 
 AutoPipSettingHelper::~AutoPipSettingHelper() = default;
 
-#if !BUILDFLAG(IS_ANDROID)
 void AutoPipSettingHelper::OnUserClosedWindow(
     media::PictureInPictureEventsInfo::AutoPipReason auto_pip_reason,
     std::optional<ukm::SourceId> source_id) {
@@ -71,7 +68,6 @@ void AutoPipSettingHelper::OnUserClosedWindow(
     }
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 ContentSetting AutoPipSettingHelper::GetEffectiveContentSetting() {
   auto setting = settings_map_->GetContentSetting(
@@ -109,7 +105,6 @@ void AutoPipSettingHelper::UpdateContentSetting(ContentSetting new_setting) {
       ContentSettingsType::AUTO_PICTURE_IN_PICTURE, new_setting, constraints);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 AutoPipSettingHelper::ResultCb AutoPipSettingHelper::CreateResultCb(
     base::OnceClosure close_pip_cb,
     media::PictureInPictureEventsInfo::AutoPipReason auto_pip_reason,
@@ -119,9 +114,7 @@ AutoPipSettingHelper::ResultCb AutoPipSettingHelper::CreateResultCb(
                         weak_factory_.GetWeakPtr(), std::move(close_pip_cb),
                         auto_pip_reason, std::move(source_id));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<AutoPipSettingOverlayView>
 AutoPipSettingHelper::CreateOverlayViewIfNeeded(
     base::OnceClosure close_pip_cb,
@@ -159,7 +152,6 @@ AutoPipSettingHelper::CreateOverlayViewIfNeeded(
       NOTREACHED() << " AutoPiP unknown effective content setting";
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void AutoPipSettingHelper::OnAutoPipBlockedByPermission(
     media::PictureInPictureEventsInfo::AutoPipReason auto_pip_reason,
@@ -173,7 +165,6 @@ void AutoPipSettingHelper::OnAutoPipBlockedByIncognito(
   RecordResult(PromptResult::kNotShownIncognito, auto_pip_reason, std::nullopt);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void AutoPipSettingHelper::OnUiResult(
     base::OnceClosure close_pip_cb,
     media::PictureInPictureEventsInfo::AutoPipReason auto_pip_reason,
@@ -203,13 +194,11 @@ void AutoPipSettingHelper::OnUiResult(
       break;
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void AutoPipSettingHelper::RecordResult(
     PromptResult result,
     media::PictureInPictureEventsInfo::AutoPipReason auto_pip_reason,
     std::optional<ukm::SourceId> source_id) {
-#if !BUILDFLAG(IS_ANDROID)
   if (web_contents_) {
     if (auto* hats_service =
             AutoPictureInPictureHatsServiceFactory::GetForProfile(
@@ -218,7 +207,6 @@ void AutoPipSettingHelper::RecordResult(
       hats_service->SetPromptResult(result);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::UmaHistogramEnumeration("Media.AutoPictureInPicture.PromptResultV2",
                                 result);

@@ -41,10 +41,6 @@ class ContentBrowserTestSuite : public ContentTestSuiteBase {
     base::TestSuite::DisableCheckForLeakedGlobals();
 
     ContentTestSuiteBase::Initialize();
-
-#if BUILDFLAG(IS_ANDROID)
-    RegisterInProcessThreads();
-#endif
   }
 };
 
@@ -67,11 +63,9 @@ class ContentTestLauncherDelegate : public TestLauncherDelegate {
   }
 
  protected:
-#if !BUILDFLAG(IS_ANDROID)
   ContentMainDelegate* CreateContentMainDelegate() override {
     return new ContentBrowserTestShellMainDelegate();
   }
-#endif
 };
 
 }  // namespace content

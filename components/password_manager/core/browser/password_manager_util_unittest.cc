@@ -139,12 +139,6 @@ class PasswordManagerUtilTest : public testing::Test {
         password_manager::prefs::kCredentialsEnableService, true);
     pref_service_.registry()->RegisterBooleanPref(
         password_manager::prefs::kCredentialsEnableAutosignin, true);
-#if BUILDFLAG(IS_ANDROID)
-    pref_service_.registry()->RegisterBooleanPref(
-        password_manager::prefs::kOfferToSavePasswordsEnabledGMS, true);
-    pref_service_.registry()->RegisterBooleanPref(
-        password_manager::prefs::kAutoSignInEnabledGMS, true);
-#endif
 #if BUILDFLAG(IS_MAC)
     pref_service_.registry()->RegisterBooleanPref(
         password_manager::prefs::kHadBiometricsAvailable, false);
@@ -801,12 +795,6 @@ TEST_F(PasswordManagerUtilTest, IsAbleToSavePasswords_Syncing) {
       profile_store.get();
   password_manager::MockPasswordStoreInterface* unused_store =
       account_store.get();
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, users with ConsentLevel::kSync save to the account store
-  // instead of the profile store. See go/upm-local-passwords for context
-  // (sorry, Googlers only).
-  std::swap(used_store, unused_store);
-#endif
   EXPECT_CALL(*used_store, GetError)
       .WillOnce(Return(password_manager::ActionableError::kNoError));
   EXPECT_CALL(*unused_store, GetError).Times(0);
@@ -843,7 +831,6 @@ TEST_F(PasswordManagerUtilTest, IsAbleToSavePasswords_NotSyncing) {
   EXPECT_FALSE(IsAbleToSavePasswords(&mock_client_));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 struct TrustedVaultErrorPreventsFromSavingTestCase {
   std::string name;
   // It might be that the credential is updated in both stores. In this case
@@ -983,49 +970,5 @@ TEST_F(PasswordManagerUtilTrustedVaultErrorPreventsFromSavingTest,
 
   EXPECT_FALSE(IsSavingBlockedByTrustedVaultError(&client_, &form_manager));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-class PasswordManagerUtilTrustedVaultErrorTest
-    : public PasswordManagerUtilTest {
- protected:
-  PasswordManagerUtilTrustedVaultErrorTest() {
-    feature_list_.InitAndEnableFeature(
-        password_manager::features::kPasswordSaveInContextErrorResolution);
-  }
-
-  base::test::ScopedFeatureList feature_list_;
-};
-
-TEST_F(PasswordManagerUtilTrustedVaultErrorTest,
-       IsSavingBlockedByTrustedVaultError) {
-  EnableSyncForTestAccount();
-
-  auto account_store =
-      base::MakeRefCounted<password_manager::MockPasswordStoreInterface>();
-  EXPECT_CALL(mock_client_, GetAccountPasswordStore)
-      .WillRepeatedly(Return(account_store.get()));
-
-  EXPECT_CALL(*account_store, GetError)
-      .WillOnce(Return(ActionableError::kTrustedVaultKeyNeeded));
-  EXPECT_TRUE(IsSavingBlockedByTrustedVaultError(&mock_client_, nullptr));
-
-  EXPECT_CALL(*account_store, GetError)
-      .WillOnce(Return(ActionableError::kSignInNeeded));
-  EXPECT_FALSE(IsSavingBlockedByTrustedVaultError(&mock_client_, nullptr));
-}
-
-TEST_F(PasswordManagerUtilTrustedVaultErrorTest,
-       IsSavingBlockedByTrustedVaultErrorForLocalPasswordUpdate) {
-  password_manager::MockPasswordFormManagerForUI form_manager;
-  EXPECT_CALL(form_manager, IsPasswordUpdate()).WillOnce(Return(true));
-  EXPECT_CALL(form_manager,
-              IsUpdateAffectingPasswordsStoredInTheGoogleAccount())
-      .WillOnce(Return(false));
-
-  EXPECT_FALSE(
-      IsSavingBlockedByTrustedVaultError(&mock_client_, &form_manager));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager_util

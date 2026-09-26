@@ -546,7 +546,6 @@ TypedPolicyBuilder<em::ExtensionInstallPolicies>::TypedPolicyBuilder() {
 
 template class TypedPolicyBuilder<em::ExtensionInstallPolicies>;
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 template <>
 TypedPolicyBuilder<em::ExternalPolicyData>::TypedPolicyBuilder() {
   CreatePayload();
@@ -554,6 +553,5 @@ TypedPolicyBuilder<em::ExternalPolicyData>::TypedPolicyBuilder() {
 }
 
 template class TypedPolicyBuilder<em::ExternalPolicyData>;
-#endif
 
 }  // namespace policy

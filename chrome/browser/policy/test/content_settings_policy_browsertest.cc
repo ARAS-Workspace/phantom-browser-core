@@ -728,7 +728,6 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessPolicyTest, SpecificPoliciesOverride) {
                                             GURL("https://bleep.com")));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class DirectSocketsPolicyTest : public PolicyTest {
  public:
   void SetUpOnMainThread() override {
@@ -806,9 +805,7 @@ IN_PROC_BROWSER_TEST_F(DirectSocketsPolicyTest, DirectSocketsBlockedForUrls) {
   EXPECT_EQ(CONTENT_SETTING_BLOCK,
             GetDirectSocketsContentSetting(GetTestingUrl()));
 }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 class ControlledFramePolicyTest : public PolicyTest {
  public:
   void SetUpOnMainThread() override {
@@ -888,9 +885,7 @@ IN_PROC_BROWSER_TEST_F(ControlledFramePolicyTest,
   EXPECT_EQ(CONTENT_SETTING_BLOCK,
             GetControlledFrameContentSetting(GetTestingUrl()));
 }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 class IdleDetectionPolicyTest : public PolicyTest {
  public:
   void VerifyPermission(const char* url, ContentSetting status) {
@@ -994,7 +989,6 @@ IN_PROC_BROWSER_TEST_F(IdleDetectionPolicyTest, DynamicRefresh) {
   VerifyPermission(kFooUrl, CONTENT_SETTING_ALLOW);
   VerifyPermission(kBarUrl, CONTENT_SETTING_ALLOW);
 }
-#endif
 
 class OnCanDownloadDecidedObserver {
  public:

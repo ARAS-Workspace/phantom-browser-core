@@ -28,9 +28,7 @@
 #include "device_management_backend.pb.h"
 
 #include "extensions/buildflags/buildflags.h"
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 #include "components/policy/core/common/cloud/resource_cache.h"
-#endif
 
 namespace policy {
 
@@ -291,7 +289,6 @@ void CloudPolicyManager::CreateComponentCloudPolicyService(
     const base::FilePath& policy_cache_path,
     CloudPolicyClient* client,
     SchemaRegistry* schema_registry) {
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
   // Init() must have been called.
   CHECK(schema_registry);
   // Called at most once.
@@ -316,16 +313,13 @@ void CloudPolicyManager::CreateComponentCloudPolicyService(
   component_policy_service_ = std::make_unique<ComponentCloudPolicyService>(
       policy_type, this, schema_registry, core(), client,
       std::move(resource_cache), task_runner);
-#endif  // (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 }
 
 void CloudPolicyManager::ClearAndDestroyComponentCloudPolicyService() {
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
   if (component_policy_service_) {
     component_policy_service_->ClearCache();
     component_policy_service_.reset();
   }
-#endif  // (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 }
 
 void CloudPolicyManager::OnRefreshComplete(bool success) {

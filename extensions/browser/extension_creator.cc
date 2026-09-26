@@ -32,15 +32,6 @@ namespace extensions {
 ExtensionCreator::ExtensionCreator() : error_type_(kOtherError) {}
 
 bool FileConflicts(const base::FilePath& file_path) {
-#if BUILDFLAG(IS_ANDROID)
-  // In Android, the GetOrCreateEmptyFilesUnderDownloads method returns either
-  // an existing file or a newly created empty file's content URI. Apply a size
-  // check here to determine if the file is a pre-existing, non-empty one.
-  if (file_path.IsContentUri()) {
-    std::optional<int64_t> file_size = base::GetFileSize(file_path);
-    return file_size.has_value() && file_size.value() > 0;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   return base::PathExists(file_path);
 }
 
@@ -50,12 +41,6 @@ bool ExtensionCreator::InitializeInput(
     const base::FilePath& private_key_path,
     const base::FilePath& private_key_output_path,
     int run_flags) {
-#if BUILDFLAG(IS_ANDROID)
-  // The path must be either normal path or a virtual document path to allow
-  // Append.
-  CHECK(!extension_dir.IsContentUri());
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Validate input |extension_dir|.
   if (extension_dir.value().empty() || !base::DirectoryExists(extension_dir)) {
     error_message_ =

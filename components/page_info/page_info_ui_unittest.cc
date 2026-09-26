@@ -16,11 +16,9 @@ namespace {
 
 class MockPageInfoUiDelegate : public PageInfoUiDelegate {
  public:
-#if !BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(bool, IsBlockAutoPlayEnabled, (), (override));
   MOCK_METHOD(bool, IsMultipleTabsOpen, (), (override));
   MOCK_METHOD(void, OpenSiteSettingsFileSystem, (), (override));
-#endif
   MOCK_METHOD(content::PermissionResult,
               GetPermissionResult,
               (blink::PermissionType permission),
@@ -37,7 +35,6 @@ class MockPageInfoUiDelegate : public PageInfoUiDelegate {
 
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST(PageInfoUITest, PermissionStateToUIString) {
   content_settings::ContentSettingsRegistry::GetInstance();
   MockPageInfoUiDelegate delegate;
@@ -54,7 +51,6 @@ TEST(PageInfoUITest, PermissionStateToUIString) {
       l10n_util::GetStringUTF16(IDS_PAGE_INFO_STATE_TEXT_POINTER_LOCK_ASK),
       PageInfoUI::PermissionStateToUIString(&delegate, permission_info));
 }
-#endif
 
 TEST(PageInfoUITest, GetSecurityDescriptionWarnableSuspiciousSite) {
   PageInfoUI::IdentityInfo identity_info;

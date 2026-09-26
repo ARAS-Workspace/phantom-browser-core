@@ -21,9 +21,7 @@
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/user_education/user_education_configuration_provider.h"
-#endif
 
 namespace feature_engagement {
 
@@ -80,10 +78,8 @@ TrackerFactory::BuildServiceInstanceForBrowserContext(
       profile->GetDefaultStoragePartition()->GetProtoDatabaseProvider();
   auto providers =
       feature_engagement::Tracker::GetDefaultConfigurationProviders();
-#if !BUILDFLAG(IS_ANDROID)
   providers.emplace_back(
       std::make_unique<UserEducationConfigurationProvider>());
-#endif
 
   return feature_engagement::Tracker::Create(
       storage_dir, device_storage_dir, profile->GetPrefs(),

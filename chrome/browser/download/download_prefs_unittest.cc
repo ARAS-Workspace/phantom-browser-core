@@ -24,10 +24,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif
-
 using safe_browsing::FileTypePolicies;
 
 namespace {
@@ -50,16 +46,6 @@ TEST(DownloadPrefsTest, RegisterPrefs) {
   // Download prefs are registered when creating the profile.
   TestingProfile profile;
   DownloadPrefs prefs(&profile);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Download prompt prefs should be registered correctly.
-  histogram_tester.ExpectBucketCount("MobileDownload.DownloadPromptStatus",
-                                     DownloadPromptStatus::SHOW_INITIAL, 1);
-  int prompt_status = profile.GetTestingPrefService()->GetInteger(
-      prefs::kPromptForDownloadAndroid);
-  EXPECT_EQ(prompt_status,
-            static_cast<int>(DownloadPromptStatus::SHOW_INITIAL));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST(DownloadPrefsTest, NoAutoOpenByUserForDisallowedFileTypes) {
@@ -483,26 +469,5 @@ TEST(DownloadPrefsTest, DefaultPathChangedToInvalidValue) {
   EXPECT_EQ(download_prefs.DownloadPath(),
             download_prefs.GetDefaultDownloadDirectory());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Verifies the returned value of PromptForDownload()
-// when prefs::kPromptForDownload is managed by enterprise policy,
-TEST(DownloadPrefsTest, ManagedPromptForDownload) {
-  content::BrowserTaskEnvironment task_environment_;
-  TestingProfile profile;
-  profile.GetTestingPrefService()->SetManagedPref(
-      prefs::kPromptForDownload, std::make_unique<base::Value>(true));
-  DownloadPrefs prefs(&profile);
-
-  profile.GetPrefs()->SetInteger(
-      prefs::kPromptForDownloadAndroid,
-      static_cast<int>(DownloadPromptStatus::DONT_SHOW));
-  EXPECT_TRUE(prefs.PromptForDownload());
-
-  profile.GetTestingPrefService()->SetManagedPref(
-      prefs::kPromptForDownload, std::make_unique<base::Value>(false));
-  EXPECT_FALSE(prefs.PromptForDownload());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace

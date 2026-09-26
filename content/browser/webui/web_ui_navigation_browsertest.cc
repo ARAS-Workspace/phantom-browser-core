@@ -1027,7 +1027,6 @@ IN_PROC_BROWSER_TEST_F(WebUINavigationBrowserTest, WebUIMainFrameToWebAllowed) {
             ProcessLock::FromSiteInfo(webui_site_instance->GetSiteInfo()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // The following tests rely on full site isolation behavior, which is not
 // present on Android.
 IN_PROC_BROWSER_TEST_F(WebUINavigationBrowserTest,
@@ -1046,7 +1045,6 @@ IN_PROC_BROWSER_TEST_F(WebUINavigationBrowserTest,
                        WebFrameInHybridWebUIProcessAllowed) {
   TestWebFrameInProcessWithWebUIBindings(kWebUIBindingsPolicySet);
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(WebUINavigationBrowserTest,
                        WebUISubframeNewWindowToWebAllowed) {

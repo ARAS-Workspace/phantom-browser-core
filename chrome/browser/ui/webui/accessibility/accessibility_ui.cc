@@ -59,7 +59,6 @@
 #include "ui/accessibility/platform/inspect/ax_tree_formatter.h"
 #include "ui/base/webui/web_ui_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/window_metadata/window_metadata_controller.h"  // nogncheck crbug.com/40147906
@@ -67,7 +66,6 @@
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
-#endif
 
 static const char kTargetsDataFile[] = "targets-data.json";
 
@@ -177,7 +175,6 @@ base::DictValue BuildTargetDescriptor(content::RenderViewHost* rvh) {
                                rvh->GetRoutingID(), accessibility_mode);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 base::DictValue BuildTargetDescriptor(BrowserWindowInterface* browser) {
   base::DictValue target_data;
   target_data.Set(kSessionIdField, browser->GetSessionID().id());
@@ -186,7 +183,6 @@ base::DictValue BuildTargetDescriptor(BrowserWindowInterface* browser) {
   target_data.Set(kTypeField, kBrowser);
   return target_data;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool ShouldHandleAccessibilityRequestCallback(const std::string& path) {
   return path == kTargetsDataFile;
@@ -351,13 +347,11 @@ void HandleAccessibilityRequestCallback(
   data.Set(kPagesField, std::move(page_list));
 
   base::ListValue browser_list;
-#if !BUILDFLAG(IS_ANDROID)
   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
       [&browser_list](BrowserWindowInterface* browser) {
         browser_list.Append(BuildTargetDescriptor(browser));
         return true;
       });
-#endif  // !BUILDFLAG(IS_ANDROID)
   data.Set(kBrowsersField, std::move(browser_list));
 
   SendAccessibilityData(std::move(data), std::move(callback));
@@ -933,7 +927,6 @@ void AccessibilityUIMessageHandler::HandleRequestNativeUITree(
 
   AllowJavascript();
 
-#if !BUILDFLAG(IS_ANDROID)
   std::vector<AXPropertyFilter> property_filters;
   AddPropertyFilters(property_filters, allow, AXPropertyFilter::ALLOW);
   AddPropertyFilters(property_filters, allow_empty,
@@ -960,8 +953,6 @@ void AccessibilityUIMessageHandler::HandleRequestNativeUITree(
   if (found) {
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
-  // No browser with the specified |session_id| was found.
   base::DictValue result;
   result.Set(kSessionIdField, session_id);
   result.Set(kTypeField, kBrowser);

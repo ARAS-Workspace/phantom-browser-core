@@ -39,10 +39,6 @@ const char kProfileModeAttrName[] = "mode";
 const char kServiceTypeAttrName[] = "action";
 const char kSupervisedAttrName[] = "supervised";
 const char kSourceAttrName[] = "source";
-#if BUILDFLAG(IS_ANDROID)
-const char kEligibleForConsistency[] = "eligible_for_consistency";
-const char kShowConsistencyPromo[] = "show_consistency_promo";
-#endif
 
 // Determines the service type that has been passed from Gaia in the header.
 GAIAServiceType GetGAIAServiceTypeFromHeader(const std::string& header_value) {
@@ -110,10 +106,6 @@ ManageAccountsParams ChromeConnectedHeaderHelper::BuildManageAccountsParams(
       params.continue_url = value;
     } else if (key_name == kIsSameTabAttrName) {
       params.is_same_tab = value == "true";
-#if BUILDFLAG(IS_ANDROID)
-    } else if (key_name == kShowConsistencyPromo) {
-      params.show_consistency_promo = value == "true";
-#endif
     } else {
       DLOG(WARNING) << "Unexpected Gaia header attribute '" << key_name << "'.";
     }
@@ -215,13 +207,6 @@ std::string ChromeConnectedHeaderHelper::BuildRequestHeader(
   }
 
   if (!force_account_consistency && gaia_id.empty()) {
-#if BUILDFLAG(IS_ANDROID)
-    if (gaia::HasGaiaSchemeHostPort(url)) {
-      parts.push_back(
-          base::StringPrintf("%s=%s", kEligibleForConsistency, "true"));
-      return base::JoinString(parts, is_header_request ? "," : ":");
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
     return std::string();
   }
 

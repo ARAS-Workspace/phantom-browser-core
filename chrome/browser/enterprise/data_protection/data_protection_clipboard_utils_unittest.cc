@@ -142,22 +142,6 @@ class DataProtectionClipboardTest : public testing::Test {
                                       *contents()->GetPrimaryMainFrame());
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  void EnableDataControls() {
-    scoped_features_.InitWithFeatures(
-        /* enabled_features */ {data_controls::
-                                    kEnableClipboardDataControlsAndroid},
-        /* disabled_features */ {});
-  }
-
-  void DisableDataControls() {
-    scoped_features_.InitWithFeatures(
-        /* enabled_features */ {},
-        /* disabled_features */ {
-            data_controls::kEnableClipboardDataControlsAndroid});
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
  protected:
   content::BrowserTaskEnvironment task_environment_;
   TestingProfileManager profile_manager_;
@@ -267,7 +251,6 @@ TEST_F(DataProtectionPasteIfAllowedByPolicyTest, CachedPasteSource) {
 
 // The DataTransferPolicyController is not relevant / supported by Clank, and
 // is thus disabled.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(DataProtectionPasteIfAllowedByPolicyTest,
        DataTransferPolicyController_Allowed) {
   PolicyControllerTest policy_controller;
@@ -323,7 +306,6 @@ TEST_F(DataProtectionPasteIfAllowedByPolicyTest,
   testing::Mock::VerifyAndClearExpectations(&policy_controller);
   EXPECT_FALSE(future.Get());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(DataProtectionPasteIfAllowedByPolicyTest,
        DataProtectionPaste_NoDestinationWebContents) {
@@ -346,9 +328,6 @@ TEST_F(DataProtectionPasteIfAllowedByPolicyTest,
 }
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, Default) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   auto source = CopyEndpoint(GURL("https://source.com"));
   auto metadata = CopyMetadata();
   EXPECT_FALSE(IsCopyPolicyCheckRequired(source, metadata));
@@ -368,9 +347,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, Default) {
 }
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, NoEndpoint) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   auto source = content::ClipboardEndpoint(std::nullopt);
   auto metadata = CopyMetadata();
   EXPECT_FALSE(IsCopyPolicyCheckRequired(source, metadata));
@@ -390,9 +366,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, NoEndpoint) {
 }
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, StringReplacement) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   data_controls::SetDataControls(profile_->GetPrefs(), {
                                                            R"({
                     "sources": {
@@ -485,9 +458,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, StringReplacement) {
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest,
        StringReplacement_NoBrowserContextSource) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   data_controls::SetDataControls(profile_->GetPrefs(), {
                                                            R"({
                     "sources": {
@@ -585,9 +555,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest,
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest,
        CustomDataReplacement) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   data_controls::SetDataControls(profile_->GetPrefs(), {
                                                            R"({
                     "sources": {
@@ -677,9 +644,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest,
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest,
        StringReplacement_MultiType) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   data_controls::SetDataControls(profile_->GetPrefs(), {
                                                            R"({
                     "sources": {
@@ -796,9 +760,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest,
 }
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, NoStringReplacement) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   data_controls::SetDataControls(profile_->GetPrefs(), {
                                                            R"({
                     "sources": {
@@ -836,9 +797,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, NoStringReplacement) {
 }
 
 TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, BitmapReplacement) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif  // BUILDFLAG(IS_ANDROID)
   data_controls::SetDataControls(profile_->GetPrefs(), {
                                                            R"({
                     "sources": {
@@ -941,76 +899,6 @@ TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest, BitmapReplacement) {
                                                 same_tab_data);
   EXPECT_TRUE(same_tab_data.empty());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(DataProtectionIsClipboardCopyAllowedByPolicyTest,
-       CopyAction_DataControlsDisabledOnAndroid) {
-  DisableDataControls();
-  data_controls::SetDataControls(profile_->GetPrefs(), {
-                                                           R"({
-                    "sources": {
-                      "urls": ["source.com"]
-                    },
-                    "destinations": {
-                      "os_clipboard": true
-                    },
-                    "restrictions": [
-                      {"class": "CLIPBOARD", "level": "BLOCK"}
-                    ]
-                  })"});
-
-  auto source = CopyEndpoint(GURL("https://source.com"));
-  ui::ClipboardMetadata metadata = CopyMetadata();
-  EXPECT_FALSE(IsCopyPolicyCheckRequired(source, metadata));
-
-  base::test::TestFuture<const ui::ClipboardFormatType&,
-                         const content::ClipboardPasteData&,
-                         std::optional<std::u16string>>
-      future;
-  IsClipboardCopyAllowedByPolicy(source, metadata,
-                                 MakeClipboardPasteData("foo", "", {}),
-                                 future.GetCallback());
-
-  auto data = future.Get<content::ClipboardPasteData>();
-  EXPECT_EQ(data.text, u"foo");
-
-  auto replacement = future.Get<std::optional<std::u16string>>();
-  EXPECT_FALSE(replacement);
-
-  content::ClipboardPasteData same_tab_data;
-  ReplaceSameTabClipboardDataIfRequiredByPolicy(metadata.seqno, same_tab_data);
-  EXPECT_TRUE(same_tab_data.empty());
-}
-
-TEST_F(DataProtectionPasteIfAllowedByPolicyTest,
-       PasteAction_DataControlsDisabledOnAndroid) {
-  DisableDataControls();
-  data_controls::SetDataControls(profile_->GetPrefs(), {
-                                                           R"({
-                    "destinations": {
-                      "urls": ["destination.com"]
-                    },
-                    "restrictions": [
-                      {"class": "CLIPBOARD", "level": "BLOCK"}
-                    ]
-                  })"});
-
-  // Without a controller set up, the paste should be allowed through.
-  base::test::TestFuture<std::optional<content::ClipboardPasteData>> future;
-  auto source = SourceEndpoint();
-  auto destination = DestinationEndpoint();
-  ui::ClipboardMetadata metadata = {.size = 1234};
-  EXPECT_FALSE(IsPastePolicyCheckRequired(source, destination, metadata));
-  PasteIfAllowedByPolicy(source, destination, metadata,
-                         MakeClipboardPasteData("text", "image", {}),
-                         future.GetCallback());
-  auto paste_data = future.Get();
-  EXPECT_TRUE(paste_data);
-  EXPECT_EQ(paste_data->text, u"text");
-  EXPECT_EQ(std::string(paste_data->png.begin(), paste_data->png.end()),
-            "image");
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(DataProtectionClipboardTest, DragAllowed_NoRule) {
   content::DropData drop_data;
@@ -1122,10 +1010,6 @@ TEST_F(DataProtectionClipboardDistilledURLTest, CopyTextToClipboard_Block) {
 }
 
 TEST_F(DataProtectionClipboardTest, PrepopulateFindBarTextAllowed) {
-#if BUILDFLAG(IS_ANDROID)
-  EnableDataControls();
-#endif
-
   data_controls::SetDataControls(profile_->GetPrefs(), {R"({
                     "sources": {
                       "urls": ["source.com"]

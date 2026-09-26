@@ -30,7 +30,6 @@ class OmniboxPopupSelectionTest : public testing::Test {
 };
 
 // Desktop has special selection handling for starter pack keyword mode.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(OmniboxPopupSelectionTest, SelectionWithKeywordMode) {
   bool aim_button_visible = false;
   const std::u16string test_keyword = u"@bookmarks";
@@ -312,5 +311,3 @@ TEST_F(OmniboxPopupSelectionTest, IsControlPresentOnMatch) {
   EXPECT_TRUE(OmniboxPopupSelection(3u, LineState::NORMAL)
                   .IsControlPresentOnMatch(result));
 }
-
-#endif

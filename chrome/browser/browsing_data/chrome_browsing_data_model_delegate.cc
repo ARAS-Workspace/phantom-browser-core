@@ -26,15 +26,12 @@
 #include "net/base/features.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/browsing_data/chrome_browsing_data_remover_constants.h"
 #include "chrome/browser/web_applications/isolated_web_apps/get_isolated_web_app_browsing_data.h"
 #include "chrome/browser/web_applications/isolated_web_apps/remove_isolated_web_app_data.h"
-#endif
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 std::vector<ChromeBrowsingDataModelDelegate::DelegateEntry>
 IsolatedWebAppBrowsingDataToDelegateEntries(
     base::flat_map<url::Origin, uint64_t> isolated_web_app_browsing_data) {
@@ -48,7 +45,6 @@ IsolatedWebAppBrowsingDataToDelegateEntries(
   }
   return entries;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::vector<ChromeBrowsingDataModelDelegate::DelegateEntry>
 PrivateVerificationTokenBrowsingDataToDelegateEntries(
@@ -117,13 +113,11 @@ void ChromeBrowsingDataModelDelegate::GetAllDataKeys(
 
   GetAllFederatedIdentityDataKeys(concurrent.CreateCallback(), {});
 
-#if !BUILDFLAG(IS_ANDROID)
   if (storage_partition_->GetConfig().is_default()) {
     web_app::GetIsolatedWebAppBrowsingData(
         profile_, base::BindOnce(&IsolatedWebAppBrowsingDataToDelegateEntries)
                       .Then(concurrent.CreateCallback()));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   GetAllMediaDeviceSaltDataKeys(concurrent.CreateCallback(), {});
 
@@ -169,7 +163,6 @@ void ChromeBrowsingDataModelDelegate::RemoveDataKey(
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (storage_types.Has(static_cast<BrowsingDataModel::StorageType>(
           StorageType::kIsolatedWebApp))) {
     CHECK(std::holds_alternative<url::Origin>(data_key));
@@ -178,7 +171,6 @@ void ChromeBrowsingDataModelDelegate::RemoveDataKey(
     web_app::RemoveIsolatedWebAppBrowsingData(profile_, origin,
                                               concurrent.CreateClosure());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (base::FeatureList::IsEnabled(
           net::features::kEnablePrivateVerificationTokens) &&

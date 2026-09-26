@@ -176,10 +176,6 @@ void AutofillMetricsBaseTest::SetUpHelper() {
 
   // Mandatory re-auth is required for credit card autofill on automotive, so
   // the authenticator response needs to be properly mocked.
-#if BUILDFLAG(IS_ANDROID)
-  payments_autofill_client()
-      .SetUpDeviceBiometricAuthenticatorSuccessOnAutomotive();
-#endif
 }
 
 void AutofillMetricsBaseTest::TearDownHelper() {

@@ -101,15 +101,6 @@ void HeadlessPrintManager::SetAccessibilityTree(
 }
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
 
-#if BUILDFLAG(IS_ANDROID)
-void HeadlessPrintManager::SetupScriptedPrintAndroid(
-    SetupScriptedPrintAndroidCallback callback) {
-  std::move(callback).Run();
-}
-
-void HeadlessPrintManager::PdfWritingDone(int page_count) {}
-#endif
-
 WEB_CONTENTS_USER_DATA_KEY_IMPL(HeadlessPrintManager);
 
 }  // namespace headless

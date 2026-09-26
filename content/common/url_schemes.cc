@@ -102,11 +102,6 @@ void RegisterContentSchemes(bool should_lock_registry) {
   for (auto& scheme : schemes.empty_document_schemes)
     url::AddEmptyDocumentScheme(scheme.c_str());
 
-#if BUILDFLAG(IS_ANDROID)
-  if (schemes.allow_non_standard_schemes_in_origins)
-    url::EnableNonStandardSchemesForAndroidWebView();
-#endif
-
   for (auto& [scheme, handler] : schemes.predefined_handler_schemes)
     url::AddPredefinedHandlerScheme(scheme.c_str(), handler.c_str());
 

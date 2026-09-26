@@ -14,9 +14,6 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/saved_tab_groups/public/saved_tab_group.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "components/browser_ui/util/android/url_constants.h"
-#endif
 #include "components/omnibox/browser/autocomplete_enums.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
@@ -67,13 +64,6 @@ std::pair<int, std::u16string> Score(
         // by saved_tab will include user queries for search result pages.
         bool has_url_match;
         for (auto& saved_tab : group.saved_tabs()) {
-#if BUILDFLAG(IS_ANDROID)
-          if (saved_tab.url().SchemeIs(browser_ui::kChromeUINativeScheme) ||
-              saved_tab.url().SchemeIs(content::kChromeUIScheme)) {
-            continue;
-          }
-#endif
-
           const std::u16string lower_url =
               base::i18n::ToLower(url_formatter::FormatUrl(
                   saved_tab.url(),
@@ -177,14 +167,6 @@ AutocompleteMatch TabGroupProvider::CreateTabGroupMatch(
 
   std::u16string url_list;
   for (auto& saved_tab : group.saved_tabs()) {
-#if BUILDFLAG(IS_ANDROID)
-    // Skip showing chrome-prefixed tabs.
-    if (saved_tab.url().SchemeIs(browser_ui::kChromeUINativeScheme) ||
-        saved_tab.url().SchemeIs(content::kChromeUIScheme)) {
-      continue;
-    }
-#endif
-
     const std::u16string url = url_formatter::FormatUrl(
         saved_tab.url(),
         AutocompleteMatch::GetFormatTypes(/*preserve_scheme=*/false,

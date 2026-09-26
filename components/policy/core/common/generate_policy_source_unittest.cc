@@ -99,7 +99,6 @@ TEST(GeneratePolicySource, ChromeSchemaData) {
   EXPECT_TRUE(it.IsAtEnd());
   EXPECT_TRUE(next == kExpectedProperties.end());
 
-#if !BUILDFLAG(IS_ANDROID)
   subschema = schema.GetProperty(key::kExtensionSettings);
   ASSERT_TRUE(subschema.valid());
   ASSERT_EQ(base::Value::Type::DICT, subschema.type());
@@ -129,7 +128,6 @@ TEST(GeneratePolicySource, ChromeSchemaData) {
   subschema = subschema.GetProperty("installation_mode");
   ASSERT_TRUE(subschema.valid());
   ASSERT_EQ(base::Value::Type::STRING, subschema.type());
-#endif
 
 }
 

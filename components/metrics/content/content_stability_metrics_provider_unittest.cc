@@ -31,10 +31,6 @@ namespace {
 
 const char kTestUtilityProcessName[] = "test_utility_process";
 const char kTestCdmServiceUtilityProcessName[] = "media.mojom.CdmServiceBroker";
-#if BUILDFLAG(IS_ANDROID)
-const char kTestMediaDrmSupportUtlityProcessName[] =
-    "media.mojom.MediaDrmSupport";
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class MockExtensionsHelper : public ExtensionsHelper {
  public:
@@ -159,35 +155,6 @@ TEST_F(ContentStabilityMetricsProviderTest,
       "Stability.Media.CdmServiceBroker.Launch.LaunchErrorCode", kExitCode, 1);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(ContentStabilityMetricsProviderTest,
-       MediaDrmSupportProcessObserverUtility) {
-  base::HistogramTester histogram_tester;
-  metrics::ContentStabilityMetricsProvider provider(prefs(), nullptr);
-
-  content::ChildProcessData child_process_data(content::PROCESS_TYPE_UTILITY,
-                                               content::ChildProcessId());
-  child_process_data.metrics_name = kTestMediaDrmSupportUtlityProcessName;
-  child_process_data.sandbox_type = sandbox::mojom::Sandbox::kNoSandbox;
-
-  provider.BrowserChildProcessLaunchedAndConnected(child_process_data);
-  const int kExitCode = 555;
-  content::ChildProcessTerminationInfo abnormal_termination_info;
-  abnormal_termination_info.status =
-      base::TERMINATION_STATUS_ABNORMAL_TERMINATION;
-  abnormal_termination_info.exit_code = kExitCode;
-  provider.BrowserChildProcessCrashed(child_process_data,
-                                      abnormal_termination_info);
-  provider.BrowserChildProcessCrashed(child_process_data,
-                                      abnormal_termination_info);
-
-  // Verify metrics.
-  histogram_tester.ExpectUniqueSample(
-      "Stability.Media.MediaDrmSupport.Crash.ExitCode", kExitCode, 2);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ContentStabilityMetricsProviderTest, RenderProcessObserver) {
   metrics::ContentStabilityMetricsProvider provider(prefs(), nullptr);
   content::TestBrowserContext browser_context;
@@ -254,8 +221,6 @@ TEST_F(ContentStabilityMetricsProviderTest,
                                      StabilityEventType::kPageLoad,
                                      expected_page_load_count);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Assertions for an extension related crash.
 // This test only works if extensions are enabled as there is a DCHECK in

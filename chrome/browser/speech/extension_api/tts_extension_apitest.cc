@@ -359,14 +359,12 @@ class TtsApiTest : public ExtensionApiTest,
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android only support MV3 / service worker.
 INSTANTIATE_TEST_SUITE_P(
     PersistentBackground,
     TtsApiTest,
     ::testing::Values(FeaturesTestParam{
         .context_type = ContextType::kPersistentBackground}));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 INSTANTIATE_TEST_SUITE_P(
     ServiceWorker,

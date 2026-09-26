@@ -1300,10 +1300,6 @@ std::string GetTerminationReason(base::TerminationStatus status) {
     case base::TERMINATION_STATUS_PROCESS_WAS_KILLED:
     case base::TERMINATION_STATUS_OOM:
       return "was killed";
-#if BUILDFLAG(IS_ANDROID)
-    case base::TERMINATION_STATUS_OOM_PROTECTED:
-      return "protected from oom";
-#endif
     case base::TERMINATION_STATUS_PROCESS_CRASHED:
       return "crashed";
     case base::TERMINATION_STATUS_LAUNCH_FAILED:

@@ -85,10 +85,6 @@ IN_PROC_BROWSER_TEST_F(WebRtcDisableEncryptionFlagBrowserTest,
       channel == version_info::Channel::DEV) {
     should_detect_encryption = false;
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (channel == version_info::Channel::BETA)
-    should_detect_encryption = false;
-#endif
 
   std::string expected_string = should_detect_encryption ?
     "crypto-seen" : "no-crypto-seen";

@@ -464,12 +464,6 @@ void RecordDownloadMimeType(const std::string& mime_type_string,
   DownloadContent download_content =
       DownloadContentFromMimeType(mime_type_string, true);
   base::UmaHistogramEnumeration("Download.Start.ContentType", download_content);
-#if BUILDFLAG(IS_ANDROID)
-  base::UmaHistogramEnumeration(
-      base::StrCat({"Download.Start.ContentType.",
-                    is_transient ? "Transient" : "NonTransient"}),
-      download_content);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void RecordDownloadMimeTypeForNormalProfile(const std::string& mime_type_string,
@@ -478,12 +472,6 @@ void RecordDownloadMimeTypeForNormalProfile(const std::string& mime_type_string,
       DownloadContentFromMimeType(mime_type_string, false);
   base::UmaHistogramEnumeration("Download.Start.ContentType.NormalProfile",
                                 download_content);
-#if BUILDFLAG(IS_ANDROID)
-  base::UmaHistogramEnumeration(
-      base::StrCat({"Download.Start.ContentType.NormalProfile.",
-                    is_transient ? "Transient" : "NonTransient"}),
-      download_content);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void RecordFileBandwidth(size_t length,
@@ -583,12 +571,5 @@ void RecordInputStreamReadError(MojoResult mojo_result) {
   }
   base::UmaHistogramEnumeration("Download.InputStreamReadError", error);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void RecordDuplicatePdfDownloadTriggered(bool open_inline) {
-  base::UmaHistogramBoolean("Download.DuplicatePdfDownloadTriggered",
-                            open_inline);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace download

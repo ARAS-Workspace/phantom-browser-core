@@ -23,10 +23,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/trace_event/trace_event.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/virtual_document_path.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "base/apple/scoped_cftyperef.h"
 #include "base/third_party/icu/icu_utf.h"
@@ -1534,16 +1530,5 @@ FilePath FilePath::NormalizePathSeparatorsTo(
   return *this;
 #endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool FilePath::IsContentUri() const {
-  return StartsWith(path_, "content://", base::CompareCase::INSENSITIVE_ASCII);
-}
-
-bool FilePath::IsVirtualDocumentPath() const {
-  return path_ == "/SAF" || path_.starts_with("/SAF/");
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace base

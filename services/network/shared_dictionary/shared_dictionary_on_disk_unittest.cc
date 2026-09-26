@@ -24,21 +24,14 @@ class FakeSharedDictionaryDiskCache : public SharedDictionaryDiskCache {
   explicit FakeSharedDictionaryDiskCache() = default;
   ~FakeSharedDictionaryDiskCache() override = default;
   void Initialize() {
-    SharedDictionaryDiskCache::Initialize(
-        base::FilePath(),
-#if BUILDFLAG(IS_ANDROID)
-        disk_cache::ApplicationStatusListenerGetter(),
-#endif  // BUILDFLAG(IS_ANDROID)
-        /*file_operations_factory=*/nullptr);
+    SharedDictionaryDiskCache::Initialize(base::FilePath(),
+                                          /*file_operations_factory=*/nullptr);
   }
   disk_cache::BackendMock* backend() { return mock_cache_ptr_; }
 
  protected:
   disk_cache::BackendResult CreateCacheBackend(
       const base::FilePath& cache_directory_path,
-#if BUILDFLAG(IS_ANDROID)
-      disk_cache::ApplicationStatusListenerGetter app_status_listener_getter,
-#endif  // BUILDFLAG(IS_ANDROID)
       scoped_refptr<disk_cache::BackendFileOperationsFactory>
           file_operations_factory,
       disk_cache::BackendResultCallback callback) override {

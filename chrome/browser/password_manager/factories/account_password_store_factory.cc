@@ -43,7 +43,6 @@ network::mojom::NetworkContext* GetNetworkContext(Profile* profile) {
              : nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void MaybeClearStatsTableForSyncToSigninMigration(
     scoped_refptr<PasswordStoreInterface> store,
     PrefService* prefs) {
@@ -71,16 +70,13 @@ void MaybeClearStatsTableForSyncToSigninMigration(
     std::move(callback).Run();
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 scoped_refptr<RefcountedKeyedService> BuildPasswordStore(
     content::BrowserContext* context) {
   Profile* profile = Profile::FromBrowserContext(context);
   DCHECK(!profile->IsOffTheRecord());
   affiliations::AffiliationService* affiliation_service = nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   affiliation_service = AffiliationServiceFactory::GetForProfile(profile);
-#endif
 
   scoped_refptr<PasswordStore> ps =
       base::MakeRefCounted<password_manager::PasswordStore>(
@@ -94,7 +90,6 @@ scoped_refptr<RefcountedKeyedService> BuildPasswordStore(
       CredentialsCleanerRunnerFactory::GetForProfile(profile), ps,
       password_manager::kAccountStore, profile->GetPrefs(), base::Seconds(60),
       base::BindRepeating(&GetNetworkContext, profile));
-#if !BUILDFLAG(IS_ANDROID)
   // Android gets logins with affiliations directly from the backend.
   auto password_affiliation_adapter =
       std::make_unique<password_manager::PasswordAffiliationSourceAdapter>();
@@ -103,7 +98,6 @@ scoped_refptr<RefcountedKeyedService> BuildPasswordStore(
   affiliation_service->RegisterSource(std::move(password_affiliation_adapter));
   // Clear the stats table from the account store, if marked.
   MaybeClearStatsTableForSyncToSigninMigration(ps, profile->GetPrefs());
-#endif  // !BUILDFLAG(IS_ANDROID)
   return ps;
 }
 

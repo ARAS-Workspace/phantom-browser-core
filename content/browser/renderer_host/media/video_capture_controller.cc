@@ -35,9 +35,7 @@
 #include "media/capture/video/video_capture_device_client.h"
 #include "media/capture/video/video_capture_metrics.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/compositor/image_transport_factory.h"
-#endif
 
 using media::VideoCaptureFormat;
 using media::VideoFrame;

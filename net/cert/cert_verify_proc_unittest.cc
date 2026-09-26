@@ -74,11 +74,6 @@
 #include "third_party/boringssl/src/pki/signature_algorithm.h"
 #include "third_party/boringssl/src/pki/trust_store.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "net/cert/cert_verify_proc_android.h"
-#endif
-
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
 #include "net/cert/internal/trust_store_chrome.h"
 #endif
@@ -211,11 +206,6 @@ scoped_refptr<CertVerifyProc> CreateCertVerifyProc(
   instance_params.additional_untrusted_authorities =
       net::x509_util::ParseAllValidCerts(additional_untrusted_authorities);
   switch (type) {
-#if BUILDFLAG(IS_ANDROID)
-    case CERT_VERIFY_PROC_ANDROID:
-      return base::MakeRefCounted<CertVerifyProcAndroid>(
-          std::move(cert_net_fetcher), std::move(crl_set));
-#endif
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
     case CERT_VERIFY_PROC_BUILTIN_CHROME_ROOTS:
       return CreateCertVerifyProcBuiltin(
@@ -235,9 +225,6 @@ scoped_refptr<CertVerifyProc> CreateCertVerifyProc(
 // This needs to be kept in sync with CertVerifyProc::CreateSystemVerifyProc()
 // and the platforms where CreateSslSystemTrustStore() is not a dummy store.
 constexpr CertVerifyProcType kAllCertVerifiers[] = {
-#if BUILDFLAG(IS_ANDROID)
-    CERT_VERIFY_PROC_ANDROID,
-#endif
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
     CERT_VERIFY_PROC_BUILTIN_CHROME_ROOTS,
 #endif
@@ -425,16 +412,7 @@ class CertVerifyProcInternalTest
     return false;
   }
 
-  bool VerifyProcTypeIsAndroidQOrLater() const {
-#if BUILDFLAG(IS_ANDROID)
-    if (verify_proc_type() == CERT_VERIFY_PROC_ANDROID &&
-        (base::android::android_info::sdk_int() >=
-         base::android::android_info::SDK_VERSION_Q)) {
-      return true;
-    }
-#endif
-    return false;
-  }
+  bool VerifyProcTypeIsAndroidQOrLater() const { return false; }
 
   CertVerifyProc* verify_proc() const { return verify_proc_.get(); }
 

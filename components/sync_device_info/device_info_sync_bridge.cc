@@ -260,17 +260,6 @@ std::unique_ptr<DeviceInfoSpecifics> MakeLocalDeviceSpecifics(
   specifics->set_manufacturer(info.manufacturer_name());
   specifics->set_model(info.model_name());
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(kSyncUploadAndroidBuildFingerprintPrefix)) {
-    const std::optional<std::string>& android_os_build_fingerprint_prefix =
-        info.android_os_build_fingerprint_prefix();
-    if (android_os_build_fingerprint_prefix.has_value()) {
-      specifics->set_android_os_build_fingerprint_prefix(
-          *android_os_build_fingerprint_prefix);
-    }
-  }
-#endif
-
   const std::string full_hardware_class = info.full_hardware_class();
   if (!full_hardware_class.empty()) {
     specifics->set_full_hardware_class(full_hardware_class);

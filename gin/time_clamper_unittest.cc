@@ -26,7 +26,6 @@ TEST(TimeClamperTest, CurrentClockTimeMilliseconds) {
   EXPECT_EQ(1u, clamper.ClampToMillis(time));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST(TimeClamperTest, CurrentClockTimeMillisecondsThreshold) {
   // This test assumes a time clamp of 5. If the clamp changes the time values
   // will need to be adjusted.
@@ -94,6 +93,5 @@ TEST(TimeClamperTest, CurrentClockTimeMillisecondsHighResolution) {
       base::Time::UnixEpoch() + base::Milliseconds(1) + base::Microseconds(1);
   EXPECT_EQ(1.005, clamper.ClampToMillisHighResolution(time));
 }
-#endif
 
 }  // namespace gin

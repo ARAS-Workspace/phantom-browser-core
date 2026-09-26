@@ -151,17 +151,6 @@ void CreditCardCvcAuthenticator::OnUnmaskVerificationResult(
   client_->GetPaymentsAutofillClient()->OnUnmaskVerificationResult(result);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool CreditCardCvcAuthenticator::ShouldOfferFidoAuth() const {
-  return requester_ && requester_->ShouldOfferFidoAuth();
-}
-
-bool CreditCardCvcAuthenticator::UserOptedInToFidoFromSettingsPageOnMobile()
-    const {
-  return requester_ && requester_->UserOptedInToFidoFromSettingsPageOnMobile();
-}
-#endif
-
 payments::FullCardRequest* CreditCardCvcAuthenticator::GetFullCardRequest() {
   // TODO(crbug.com/40622637): iOS and Android clients should use
   // CreditCardAccessManager to retrieve cards from payments instead of calling

@@ -51,11 +51,6 @@ GLDisplay* InitializeOneOffHelper(bool init_extensions) {
     use_software_gl = false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android and iOS we always use hardware GL.
-  use_software_gl = false;
-#endif
-
   std::vector<GLImplementationParts> allowed_impls =
       init::GetAllowedGLImplementations();
   DCHECK(!allowed_impls.empty());

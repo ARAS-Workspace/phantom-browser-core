@@ -239,50 +239,6 @@ TEST_F(VirtualCardEnrollmentManagerTest, OnRiskDataLoadedForVirtualCard) {
       /*sample=*/true, 1);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(VirtualCardEnrollmentManagerTest,
-       OnDidGetDetailsForEnrollResponse_NoAutofillClient) {
-  base::HistogramTester histogram_tester;
-  const TestLegalMessageLine google_legal_message =
-      TestLegalMessageLine("google_test_legal_message");
-  const TestLegalMessageLine issuer_legal_message =
-      TestLegalMessageLine("issuer_test_legal_message");
-  payments::GetDetailsForEnrollmentResponseDetails response =
-      std::move(SetUpOnDidGetDetailsForEnrollResponse(
-          google_legal_message, issuer_legal_message,
-          /*make_image_present=*/true));
-  virtual_card_enrollment_manager_->SetAutofillClient(nullptr);
-  base::MockCallback<TestVirtualCardEnrollmentManager::
-                         VirtualCardEnrollmentFieldsLoadedCallback>
-      virtual_card_enrollment_fields_loaded_callback;
-
-  EXPECT_CALL(virtual_card_enrollment_fields_loaded_callback, Run(_));
-  virtual_card_enrollment_manager_->InitVirtualCardEnroll(
-      *card_, VirtualCardEnrollmentSource::kSettingsPage,
-      virtual_card_enrollment_fields_loaded_callback.Get());
-  test_api(*virtual_card_enrollment_manager_)
-      .OnDidGetDetailsForEnrollResponse(
-          payments::PaymentsAutofillClient::PaymentsRpcResult::kSuccess,
-          response);
-
-  auto* state =
-      virtual_card_enrollment_manager_->GetVirtualCardEnrollmentProcessState();
-  EXPECT_TRUE(state->vcn_context_token.has_value());
-  EXPECT_EQ(state->vcn_context_token, response.vcn_context_token);
-  VirtualCardEnrollmentFields virtual_card_enrollment_fields =
-      state->virtual_card_enrollment_fields;
-  EXPECT_TRUE(virtual_card_enrollment_fields.google_legal_message[0].text() ==
-              google_legal_message.text());
-  EXPECT_TRUE(virtual_card_enrollment_fields.issuer_legal_message[0].text() ==
-              issuer_legal_message.text());
-  EXPECT_TRUE(virtual_card_enrollment_fields.card_art_image != nullptr);
-
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.VirtualCard.GetDetailsForEnrollment.Result.SettingsPage",
-      /*sample=*/true, 1);
-}
-#endif
-
 TEST_F(VirtualCardEnrollmentManagerTest,
        OnDidGetDetailsForEnrollResponse_Reset) {
   base::HistogramTester histogram_tester;
@@ -305,27 +261,6 @@ TEST_F(VirtualCardEnrollmentManagerTest,
   histogram_tester.ExpectUniqueSample(
       "Autofill.VirtualCard.GetDetailsForEnrollment.Result.Downstream",
       /*sample=*/false, 2);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Ensure the clank settings page use-case works as expected.
-  virtual_card_enrollment_manager_->SetAutofillClient(nullptr);
-  for (payments::PaymentsAutofillClient::PaymentsRpcResult result :
-       {payments::PaymentsAutofillClient::PaymentsRpcResult::
-            kVcnRetrievalTryAgainFailure,
-        payments::PaymentsAutofillClient::PaymentsRpcResult::
-            kVcnRetrievalPermanentFailure}) {
-    virtual_card_enrollment_manager_->InitVirtualCardEnroll(
-        *card_, VirtualCardEnrollmentSource::kSettingsPage, base::DoNothing());
-    virtual_card_enrollment_manager_->SetResetCalled(false);
-    test_api(*virtual_card_enrollment_manager_)
-        .OnDidGetDetailsForEnrollResponse(
-            result, payments::GetDetailsForEnrollmentResponseDetails());
-    EXPECT_TRUE(virtual_card_enrollment_manager_->GetResetCalled());
-  }
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.VirtualCard.GetDetailsForEnrollment.Result.SettingsPage",
-      /*sample=*/false, 2);
-#endif
 }
 
 TEST_F(VirtualCardEnrollmentManagerTest, Unenroll) {
@@ -779,9 +714,6 @@ TEST_P(VirtualCardEnrollmentManagerParamTest, InitVirtualCardEnroll) {
     if (make_image_present) {
       SetValidCardArtImageForCard(*card_);
     }
-#if BUILDFLAG(IS_ANDROID)
-    virtual_card_enrollment_manager_->SetAutofillClient(nullptr);
-#endif
 
     virtual_card_enrollment_manager_->InitVirtualCardEnroll(
         *card_, source(), base::DoNothing(), std::nullopt,

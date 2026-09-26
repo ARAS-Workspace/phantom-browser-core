@@ -17,7 +17,6 @@ KeyboardLockPermissionContext::KeyboardLockPermissionContext(
           ContentSettingsType::KEYBOARD_LOCK,
           network::mojom::PermissionsPolicyFeature::kNotFound) {}
 
-#if !BUILDFLAG(IS_ANDROID)
 ContentSetting KeyboardLockPermissionContext::GetContentSettingStatusInternal(
     content::RenderFrameHost* render_frame_host,
     const GURL& requesting_origin,
@@ -28,6 +27,5 @@ ContentSetting KeyboardLockPermissionContext::GetContentSettingStatusInternal(
   }
   return CONTENT_SETTING_ALLOW;
 }
-#endif
 
 }  // namespace permissions

@@ -9,14 +9,11 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/test/base/in_process_browser_test.h"
 #include "content/public/test/browser_test.h"
-#endif
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 using SyncUIUtilBrowserTest = InProcessBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(SyncUIUtilBrowserTest, ShowBookmarksLimitExceededHelp) {
@@ -30,6 +27,5 @@ IN_PROC_BROWSER_TEST_F(SyncUIUtilBrowserTest, ShowBookmarksLimitExceededHelp) {
       browser(), &service,
       syncer::SyncService::BookmarksLimitExceededHelpClickedSource::kSettings);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace

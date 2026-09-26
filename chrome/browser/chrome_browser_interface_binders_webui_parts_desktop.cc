@@ -135,11 +135,9 @@
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/default_browser/default_browser_features.h"
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal.mojom.h"
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal_ui.h"
-#endif
 
 namespace chrome::internal {
 
@@ -410,7 +408,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
                                          webapps::AppHomeUI>(map);
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   auto prompt_surface = default_browser::GetDefaultBrowserPromptSurface();
 
   if (prompt_surface == default_browser::DefaultBrowserPromptSurface::
@@ -421,7 +418,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
         default_browser_modal::mojom::PageHandlerFactory,
         DefaultBrowserModalUI>(map);
   }
-#endif
 
 }
 

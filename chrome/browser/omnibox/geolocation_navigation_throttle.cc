@@ -29,16 +29,14 @@ const char kXGeoHeaderName[] = "X-Geo";
 std::unique_ptr<content::NavigationThrottle>
 GeolocationNavigationThrottle::MaybeCreateThrottleFor(
     content::NavigationThrottleRegistry& registry) {
-// On Android builds, this throttle is also used to emit metrics when the header
-// is attached via the legacy mechanism and as such will be created regardless
-// of feature value. On Desktop there is no legacy mechanism to attach the
-// header so it would pointless to create the throttle when the feature is not
-// enabled.
-#if !BUILDFLAG(IS_ANDROID)
+  // On Android builds, this throttle is also used to emit metrics when the
+  // header is attached via the legacy mechanism and as such will be created
+  // regardless of feature value. On Desktop there is no legacy mechanism to
+  // attach the header so it would pointless to create the throttle when the
+  // feature is not enabled.
   if (!base::FeatureList::IsEnabled(omnibox::kPlatformAgnosticXGeo)) {
     return nullptr;
   }
-#endif
 
   // We only record metrics and add headers for main frame navigations.
   if (!registry.GetNavigationHandle().IsInOutermostMainFrame()) {

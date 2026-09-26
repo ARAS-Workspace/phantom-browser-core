@@ -220,7 +220,6 @@ TEST_F(SoftwareRendererTest, DebugBorderDrawQuad) {
       cc::ExactPixelComparator()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(SoftwareRendererTest, TileQuad) {
   gfx::Size outer_size(100, 100);
   gfx::Size inner_size(98, 98);
@@ -345,7 +344,6 @@ TEST_F(SoftwareRendererTest, TileQuadVisibleRect) {
           }),
       cc::ExactPixelComparator()));
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class SoftwareRendererTestShouldClearRootRenderPass
     : public SoftwareRendererTest {

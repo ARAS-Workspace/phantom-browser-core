@@ -68,10 +68,6 @@ bool ValidateLaunchUrlWebUnsafe(const GURL& url) {
 #endif
 
   bool url_scheme_is_content = false;
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, content:// URLs are used to open files.
-  url_scheme_is_content = url.SchemeIs(url::kContentScheme);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   auto* policy = content::ChildProcessSecurityPolicy::GetInstance();
   return policy->IsWebSafeScheme(url.GetScheme()) ||

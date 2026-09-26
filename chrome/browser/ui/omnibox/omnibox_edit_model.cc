@@ -110,7 +110,6 @@
 #include "url/url_canon.h"
 #include "url/url_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/hats/hats_service.h"
@@ -123,7 +122,6 @@
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/sessions/core/session_id.h"
 #include "components/tabs/public/tab_interface.h"
-#endif
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "components/vector_icons/vector_icons.h"  // nogncheck
@@ -1144,12 +1142,10 @@ bool OmniboxEditModel::OnEscapeKeyPressed() {
   if (controller_->IsPopupOpen()) {
     base::UmaHistogramEnumeration(kOmniboxEscapeHistogramName,
                                   OmniboxEscapeAction::kClosePopup);
-#if !BUILDFLAG(IS_ANDROID)
     if (auto* popup_closer = controller_->client()->GetOmniboxPopupCloser()) {
       popup_closer->CloseWithReason(
           omnibox::PopupCloseReason::kEscapeKeyPressed);
     }
-#endif
     return true;
   }
 

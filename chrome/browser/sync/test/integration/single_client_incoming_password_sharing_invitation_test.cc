@@ -408,7 +408,6 @@ IN_PROC_BROWSER_TEST_P(
 
 // TODO(crbug.com/358053884): enable on Android once transport mode for
 // Passwords is supported.
-#if !BUILDFLAG(IS_ANDROID)
 // This test verifies that Incoming Password Sharing Invitation data type is
 // stopped when the Password data type is opted out in the transport mode.
 IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
@@ -446,7 +445,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
       IncomingPasswordSharingInvitationInactiveChecker(GetSyncService(0))
           .Wait());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // This test verifies that Incoming Password Sharing Invitation data type is
 // stopped when the Password data type is encountered error.

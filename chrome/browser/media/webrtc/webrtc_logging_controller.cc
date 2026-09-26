@@ -30,10 +30,10 @@
 #include "net/base/schemeful_site.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include "content/public/browser/child_process_security_policy.h"
 #include "storage/browser/file_system/isolated_context.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 using webrtc_event_logging::WebRtcEventLogManager;
 
@@ -327,7 +327,7 @@ WebRtcLoggingController::GetLogMessageCallback() {
   return text_log_handler_->GetLogMessageCallback();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 void WebRtcLoggingController::GetLogsDirectory(
     LogsDirectoryCallback callback,
     LogsDirectoryErrorCallback error_callback) {
@@ -373,7 +373,7 @@ void WebRtcLoggingController::GrantLogsDirectoryAccess(
       FROM_HERE,
       base::BindOnce(std::move(callback), file_system.id(), registered_name));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 void WebRtcLoggingController::OnRtpPacket(
     base::HeapArray<uint8_t> packet_header,

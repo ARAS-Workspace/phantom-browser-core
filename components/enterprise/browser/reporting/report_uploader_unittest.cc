@@ -164,7 +164,7 @@ class ReportUploaderTestWithReportType
 };
 
 // TODO(crbug.com/40483507) This death test does not work on Android.
-#if defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#if defined(GTEST_HAS_DEATH_TEST)
 TEST_F(ReportUploaderTest, NotRegisteredCrashes) {
   CreateUploader(/* retry_count = */ 1);
   EXPECT_CALL(client_, UploadReport)
@@ -179,7 +179,7 @@ TEST_F(ReportUploaderTest, NotRegisteredCrashes) {
       std::move(requests), future.GetCallback());
   ASSERT_DEATH(std::ignore = future.Get(), "");
 }
-#endif  // defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#endif  // defined(GTEST_HAS_DEATH_TEST)
 
 TEST_F(ReportUploaderTest, PersistentError) {
   CreateUploader(/* retry_count = */ 1);

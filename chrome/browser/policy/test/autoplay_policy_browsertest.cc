@@ -35,9 +35,6 @@ const char kUnifiedAutoplayTestPageURL[] = "/media/unified_autoplay.html";
 class AutoplayPolicyTest : public PolicyTest {
  public:
   AutoplayPolicyTest() {
-#if BUILDFLAG(IS_ANDROID)
-    scoped_feature_list_.InitAndEnableFeature(media::kAutoplayPoliciesAndroid);
-#endif
     // Start two embedded test servers on different ports. This will ensure
     // the test works correctly with cross origin iframes and site-per-process.
     embedded_test_server2()->AddDefaultHandlers(GetChromeTestDataDir());

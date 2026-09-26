@@ -209,7 +209,6 @@ void ExtensionWebContentsObserver::RenderFrameDeleted(
 
 void ExtensionWebContentsObserver::ReadyToCommitNavigation(
     content::NavigationHandle* navigation_handle) {
-#if !BUILDFLAG(IS_ANDROID)
   // If the navigation is for the TopChrome WebUI, we can skip extension
   // initialization for optimization. Otherwise, we ensure the renderer process
   // is initialized including the non-TopChrome WebUI navigation.
@@ -223,7 +222,6 @@ void ExtensionWebContentsObserver::ReadyToCommitNavigation(
           ->InitializeProcess(process);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   SetUpRenderFrameHost(navigation_handle->GetRenderFrameHost());
 

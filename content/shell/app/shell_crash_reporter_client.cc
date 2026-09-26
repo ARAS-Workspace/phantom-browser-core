@@ -15,10 +15,6 @@
 #include "content/public/common/content_switches.h"
 #include "content/shell/common/shell_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/shell/android/shell_descriptors.h"
-#endif
-
 namespace content {
 
 namespace {

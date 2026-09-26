@@ -185,37 +185,9 @@ bool ShouldRecordMetric(std::string_view name) {
              : true;
 }
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_ANDROID)
-// A collection for which a unified metric is emitted for Ganesh/Graphite Vulkan
-// backends.
-constexpr auto kUnifiedSkiaMetrics =
-    base::MakeFixedFlatMap<std::string_view, void (*)(base::TimeDelta)>(
-        // Also emitted from CreateGraphicsPipelinesHook with same name.
-        {{"Vulkan.CreateGraphicsPipelines.CacheHit",
-          &gpu::EmitVkCreateGraphicsPipelinesUMA},
-         {"Vulkan.CreateGraphicsPipelines.CacheMiss",
-          &gpu::EmitVkCreateGraphicsPipelinesUMA},
-         {"Vulkan.VkQueueSubmitUS", &gpu::EmitVkQueueSubmitUMA}});
-
-bool ShouldEmitUnifiedHistogram(const std::string& uma_prefix,
-                                const char* name) {
-  if (uma_prefix == "GPU.GraphiteDawn." && kUnifiedSkiaMetrics.contains(name)) {
-    return true;
-  }
-  return false;
-}
-#endif  // BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_ANDROID)
-
 void EmitUnifiedHistogram(const std::string& uma_prefix,
                           const char* name,
-                          int sample) {
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_ANDROID)
-  if (!ShouldEmitUnifiedHistogram(uma_prefix, name)) {
-    return;
-  }
-  kUnifiedSkiaMetrics.at(name)(base::Microseconds(sample));
-#endif  // BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_ANDROID)
-}
+                          int sample) {}
 
 }  // anonymous namespace
 

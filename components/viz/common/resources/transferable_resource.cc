@@ -92,17 +92,6 @@ void TransferableResource::AsValueInto(
   value->SetBoolean("is_overlay_candidate", GetIsOverlayCandidate());
   value->SetInteger("synchronization_type",
                     static_cast<int>(synchronization_type));
-#if BUILDFLAG(IS_ANDROID)
-  if (ycbcr_info) {
-    value->BeginDictionary("ycbcr_info");
-    ycbcr_info->AsValueInto(value);
-    value->EndDictionary();
-  }
-  value->SetBoolean("is_backed_by_surface_view", is_backed_by_surface_view);
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  value->SetBoolean("wants_promotion_hint", wants_promotion_hint);
-#endif
   value->SetBoolean("needs_detiling", needs_detiling);
   value->SetInteger("origin", static_cast<int>(GetOrigin()));
   value->SetInteger("alpha_type", static_cast<int>(GetAlphaType()));

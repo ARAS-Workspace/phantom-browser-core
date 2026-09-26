@@ -13,10 +13,6 @@
 #include "components/safe_browsing/core/common/features.h"
 #include "components/url_formatter/url_formatter.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/safety_hub/notification_wrapper_android.h"
-#endif
-
 namespace {
 
 std::string GetFirstAffectedDomain(const std::set<GURL>& revoked_urls) {

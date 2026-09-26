@@ -11,11 +11,6 @@
 
 namespace device {
 
-#if BUILDFLAG(IS_ANDROID)
-OpenXrSwapchainInfo::OpenXrSwapchainInfo(uint32_t texture)
-    : openxr_texture(texture) {}
-#endif
-
 OpenXrSwapchainInfo::~OpenXrSwapchainInfo() {
   // If shared images are being used, the mailbox holder should have been
   // cleared before destruction, either due to the context provider being lost
@@ -31,11 +26,6 @@ OpenXrSwapchainInfo& OpenXrSwapchainInfo::operator=(OpenXrSwapchainInfo&&) =
 void OpenXrSwapchainInfo::Clear() {
   shared_image.reset();
   sync_token.Clear();
-#if BUILDFLAG(IS_ANDROID)
-  // Resetting the SharedBufferSize ensures that we will re-create the Shared
-  // Buffer if it is needed.
-  shared_buffer_size = {0, 0};
-#endif
 }
 
 }  // namespace device

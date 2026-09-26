@@ -114,7 +114,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityLineLayoutBrowserTest,
 // performance regression.  (Android doesn't generate InlineTextBoxes
 // immediately; we can wait for them but without the aforementioned fix the
 // updated tree isn't processed to create the Next/PreviousOnLine links.)
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(AccessibilityLineLayoutBrowserTest,
                        NestedLayoutNGInlineFormattingContext) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -143,6 +142,5 @@ IN_PROC_BROWSER_TEST_F(AccessibilityLineLayoutBrowserTest,
       manager->GetBrowserAccessibilityRoot(), true);
   ASSERT_EQ(line_link_count, 2);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

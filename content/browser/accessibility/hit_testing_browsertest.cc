@@ -429,7 +429,6 @@ IN_PROC_BROWSER_TEST_P(AccessibilityHitTestingBrowserTest, MAYBE_HitTest) {
 
 // Web popups don't exist on Android, so this test doesn't have to be run on
 // this platform.
-#if !BUILDFLAG(IS_ANDROID)
 
 // crbug.com/1317505: Flaky on Linux Wayland
 #if BUILDFLAG(IS_LINUX)
@@ -477,7 +476,6 @@ IN_PROC_BROWSER_TEST_P(AccessibilityHitTestingBrowserTest,
 
   ASSERT_EQ(hit_node, format_toggler);
 }
-#endif
 
 IN_PROC_BROWSER_TEST_P(AccessibilityHitTestingBrowserTest,
                        HitTestOutsideDocumentBoundsReturnsRoot) {
@@ -742,7 +740,7 @@ IN_PROC_BROWSER_TEST_P(AccessibilityHitTestingBrowserTest,
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 // Fails flakily with compared ID differences. TODO(crbug.com/40715277):
 // Re-enable this test.
 IN_PROC_BROWSER_TEST_P(AccessibilityHitTestingBrowserTest,
@@ -897,7 +895,7 @@ IN_PROC_BROWSER_TEST_P(
   }
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 // GetAXPlatformNode is currently only supported on windows and linux (excluding
 // Chrome OS)

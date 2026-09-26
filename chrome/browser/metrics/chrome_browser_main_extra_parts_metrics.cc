@@ -68,21 +68,11 @@
 #include "ui/base/ui_base_switches.h"
 #include "ui/display/screen.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/power_monitor/battery_state_sampler.h"
 #include "chrome/browser/metrics/first_web_contents_profiler.h"
 #include "chrome/browser/metrics/power/battery_discharge_reporter.h"
 #include "chrome/browser/metrics/power/power_metrics_reporter.h"
 #include "chrome/browser/metrics/power/process_monitor.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_info.h"
-#include "components/metrics/android_unconditional_persistent_histograms_field_trial.h"
-#if defined(__arm__)
-#include <cpu-features.h>
-#endif
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX)
 #if defined(__GLIBC__)
@@ -771,51 +761,6 @@ void RecordStartupMetrics() {
 
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID)
-bool IsBundleForMixedDeviceAccordingToVersionCode(
-    const std::string& version_code) {
-  // Primary bitness of the bundle is encoded in the last digit of the version
-  // code. And the variant (package name) is encoded in the second to last.
-  //
-  // From build/util/android_chrome_version.py:
-  //       'arm': {
-  //          '32': 0,
-  //          '32_64': 1,
-  //          '64_32': 2,
-  //          '64_32_high': 3,
-  //          '64': 4,
-  //      },
-  //      'intel': {
-  //          '32': 6,
-  //          '32_64': 7,
-  //          '64_32': 8,
-  //          '64': 9,
-  //      },
-  //
-  //      _PACKAGE_NAMES = {
-  //          'CHROME': 0,
-  //          'CHROME_MODERN': 10,
-  //          'MONOCHROME': 20,
-  //          'TRICHROME': 30,
-  //          [...]
-
-  if (version_code.length() < 2) {
-    return false;
-  }
-
-  // '32' and '64' bundles go on 32bit-only and 64bit-only devices, so exclude
-  // them.
-  std::set<char> arch_codes_mixed = {'1', '2', '3', '7', '8'};
-  char arch_code = version_code.back();
-
-  // Only 'TRICHROME' supports 64-bit.
-  constexpr char kTriChromeVariant = '3';
-  char variant = version_code[version_code.length() - 2];
-
-  return arch_codes_mixed.count(arch_code) > 0 && variant == kTriChromeVariant;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 ChromeBrowserMainExtraPartsMetrics::ChromeBrowserMainExtraPartsMetrics()
     : display_count_(0) {}
 
@@ -838,10 +783,8 @@ void ChromeBrowserMainExtraPartsMetrics::PreCreateThreads() {
 }
 
 void ChromeBrowserMainExtraPartsMetrics::PostCreateMainMessageLoop() {
-#if !BUILDFLAG(IS_ANDROID)
   // Must be initialized before any child processes are spawned.
   process_monitor_ = std::make_unique<ProcessMonitor>();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeBrowserMainExtraPartsMetrics::PreProfileInit() {
@@ -875,19 +818,6 @@ void ChromeBrowserMainExtraPartsMetrics::PreBrowserStart() {
     ChromeMetricsServiceAccessor::RegisterSyntheticFieldTrial(trial_name,
                                                               group_name);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  std::string_view unconditional_histograms_group =
-      metrics::android_unconditional_persistent_histograms_field_trial::
-          GetSyntheticTrialGroup();
-  if (!unconditional_histograms_group.empty()) {
-    ChromeMetricsServiceAccessor::RegisterSyntheticFieldTrial(
-        metrics::android_unconditional_persistent_histograms_field_trial::
-            kTrialName,
-        unconditional_histograms_group,
-        variations::SyntheticTrialAnnotationMode::kCurrentLog);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeBrowserMainExtraPartsMetrics::PostBrowserStart() {
@@ -922,10 +852,9 @@ void ChromeBrowserMainExtraPartsMetrics::PostBrowserStart() {
 
   display_observer_.emplace(this);
 
-#if !BUILDFLAG(IS_ANDROID)
-// Similarly, a restart after a crash (which has no login screen) requires the
-// user to click a notification prompt before browser windows are restored, so
-// the `BrowserList` is also empty in this case.
+  // Similarly, a restart after a crash (which has no login screen) requires the
+  // user to click a notification prompt before browser windows are restored, so
+  // the `BrowserList` is also empty in this case.
   metrics::BeginFirstWebContentsProfiling();
 
   // Instantiate the power-related metrics reporters.
@@ -956,7 +885,6 @@ void ChromeBrowserMainExtraPartsMetrics::PostBrowserStart() {
 
   web_app_metrics_provider_ =
       std::make_unique<web_app::SamplingMetricsProvider>();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX)
   pressure_metrics_reporter_ = std::make_unique<PressureMetricsReporter>();
@@ -994,12 +922,10 @@ void ChromeBrowserMainExtraPartsMetrics::PostDestroyThreads() {
     metrics::TabStatsTracker::ClearInstance();
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Reset the pointer to `performance_intervention_metrics_reporter_` to ensure
   // that PrefService outlives the metrics reporter to prevent the reporter from
   // holding a dangling pointer.
   performance_intervention_metrics_reporter_.reset();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeBrowserMainExtraPartsMetrics::RegisterPrefs(

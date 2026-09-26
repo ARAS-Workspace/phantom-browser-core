@@ -14,35 +14,12 @@
 #include "mojo/public/cpp/bindings/generic_pending_receiver.h"
 #include "services/service_manager/public/cpp/interface_provider.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/java_interfaces.h"
-#include "media/mojo/mojom/android_overlay.mojom.h"
-#endif
-
 namespace content {
 
-namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-void BindAndroidOverlayProvider(
-    mojo::PendingReceiver<media::mojom::AndroidOverlayProvider> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  content::GetGlobalJavaInterfaces()->GetInterface(std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-}  // namespace
+namespace {}  // namespace
 
 void GpuProcessHost::BindHostReceiver(
     mojo::GenericPendingReceiver generic_receiver) {
-#if BUILDFLAG(IS_ANDROID)
-  if (auto r = generic_receiver.As<media::mojom::AndroidOverlayProvider>()) {
-    GetUIThreadTaskRunner({})->PostTask(
-        FROM_HERE, base::BindOnce(&BindAndroidOverlayProvider, std::move(r)));
-    return;
-  }
-#endif
-
   GetContentClient()->browser()->BindGpuHostReceiver(
       std::move(generic_receiver));
 }

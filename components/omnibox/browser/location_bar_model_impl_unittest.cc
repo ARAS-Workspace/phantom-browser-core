@@ -23,10 +23,8 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/paint_vector_icon.h"
 #include "url/gurl.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/vector_icons/vector_icons.h"     // nogncheck
-#endif
 
 using metrics::OmniboxEventProto;
 using testing::_;
@@ -186,7 +184,6 @@ TEST_F(LocationBarModelImplTest, MAYBE_PreventElisionWorks) {
             model()->GetURLForDisplay());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests GetVectorIcon returns the correct security indicator icon.
 TEST_F(LocationBarModelImplTest, GetVectorIcon) {
   delegate()->SetSecurityLevel(security_state::SecurityLevel::WARNING);
@@ -202,7 +199,6 @@ TEST_F(LocationBarModelImplTest, GetVectorIcon) {
 
   EXPECT_EQ(icon.bitmap(), expected_icon.bitmap());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test that the expected page classification is returned.
 TEST_F(LocationBarModelImplTest, GetPageClassification) {

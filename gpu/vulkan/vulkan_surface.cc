@@ -87,9 +87,6 @@ VulkanSurface::VulkanSurface(VkInstance vk_instance,
                              uint64_t acquire_next_image_timeout_ns,
                              std::unique_ptr<gfx::VSyncProvider> vsync_provider)
     : vk_instance_(vk_instance),
-#if BUILDFLAG(IS_ANDROID)
-      a_native_window_(gl::ScopedANativeWindow::Wrap(accelerated_widget)),
-#endif
       accelerated_widget_(accelerated_widget),
       surface_(surface),
       acquire_next_image_timeout_ns_(acquire_next_image_timeout_ns),

@@ -33,10 +33,8 @@ void MaybeRecordDangerousDownloadWarningShown(DownloadUIModel& model) {
   base::UmaHistogramEnumeration("Download.ShowedDownloadWarning",
                                 model.GetDangerType(),
                                 download::DOWNLOAD_DANGER_TYPE_MAX);
-#if !BUILDFLAG(IS_ANDROID)
   base::UmaHistogramEnumeration("SBClientDownload.TailoredWarningType",
                                 model.GetTailoredWarningType());
-#endif  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   safe_browsing::RecordDangerousDownloadWarningShown(
       model.GetDangerType(), model.GetTargetFilePath(),
@@ -95,14 +93,6 @@ void RecordDownloadStartPerProfileType(Profile* profile) {
       "Download.Start.PerProfileType",
       profile_metrics::GetBrowserProfileType(profile));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Records whether the download dialog is shown to the user.
-void RecordDownloadPromptStatus(DownloadPromptStatus status) {
-  base::UmaHistogramEnumeration("MobileDownload.DownloadPromptStatus", status,
-                                DownloadPromptStatus::MAX_VALUE);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 DownloadUiContextMenuAction DownloadCommandToContextMenuAction(
     DownloadCommands::Command download_command,

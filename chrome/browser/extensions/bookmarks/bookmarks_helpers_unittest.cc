@@ -121,7 +121,6 @@ class ExtensionBookmarksTest : public testing::Test {
 // the others count children from a different node. Once the behavior for
 // Android Desktop has been decided this test should be re-enabled. See also
 // bookmarks_apitest.cc.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ExtensionBookmarksTest, GetFullTreeFromRoot) {
   BookmarkTreeNode tree =
       GetBookmarkTreeNode(model_, managed_, model_->root_node(),
@@ -129,7 +128,6 @@ TEST_F(ExtensionBookmarksTest, GetFullTreeFromRoot) {
                           /*only_folders=*/false);
   ASSERT_EQ(4U, tree.children->size());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ExtensionBookmarksTest, GetTreeFromOtherPermanentNode) {
   BookmarkTreeNode tree =

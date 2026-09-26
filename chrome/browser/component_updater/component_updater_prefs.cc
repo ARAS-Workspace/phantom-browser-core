@@ -11,9 +11,6 @@
 #include "chrome/common/buildflags.h"
 #include "components/component_updater/component_updater_service.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif
-
 namespace component_updater {
 
 void RegisterPrefs(PrefRegistrySimple* registry) {

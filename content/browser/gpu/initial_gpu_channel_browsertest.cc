@@ -290,8 +290,6 @@ IN_PROC_BROWSER_TEST_F(InitialGpuChannelDisabledBrowserTest,
   frame_observer.WaitForNextFrameSubmission();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace {
 class InitialWebUIOverrideContentBrowserClient
     : public ContentBrowserTestContentBrowserClient {
@@ -420,7 +418,5 @@ IN_PROC_BROWSER_TEST_F(InitialGpuChannelForTopChromeWebUIOnlyBrowserTest,
   EXPECT_EQ(rwhi->is_hidden_for_testing(),
             rwhi->has_initial_frame_sink_for_testing());
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

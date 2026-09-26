@@ -393,12 +393,6 @@ void ThreadGroupImpl::WorkerDelegate::OnMainEntry(WorkerThread* worker) {
         threadpool_histogram_suffix);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (outer_->monitor_worker_thread_priorities_) {
-    PlatformThreadPriorityMonitor::Get().RegisterCurrentThread(thread_name);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   outer_->BindToCurrentThread();
   worker_only().worker_thread_ = static_cast<WorkerThread*>(worker);
   SetBlockingObserverForCurrentThread(this);

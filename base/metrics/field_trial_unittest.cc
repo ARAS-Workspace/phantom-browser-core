@@ -1161,7 +1161,7 @@ BASE_FEATURE(kTestFeatureB, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kTestFeatureC, base::FEATURE_ENABLED_BY_DEFAULT);
 
 MULTIPROCESS_TEST_MAIN(CreateTrialsInChildProcess) {
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   // Since the fd value will be mapped from the global descriptors singleton,
   // set it there. We use the same value both for the key and the actual fd for
   // simplicity.

@@ -32,9 +32,7 @@
 #include "ui/actions/actions.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/page_action/page_action_controller.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace autofill {
 
@@ -211,7 +209,6 @@ void OfferNotificationBubbleControllerImpl::OnVisibilityChanged(
   UpdatePageActionIcon();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<actions::ActionId>
 OfferNotificationBubbleControllerImpl::GetActionIdForPageAction() {
   return kActionOffersAndRewardsForPage;
@@ -220,7 +217,6 @@ OfferNotificationBubbleControllerImpl::GetActionIdForPageAction() {
 bool OfferNotificationBubbleControllerImpl::ShouldShowPageAction() {
   return IsIconVisible();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void OfferNotificationBubbleControllerImpl::DoShowBubble() {
   bubble_state_ = BubbleState::kShowingIconAndBubble;
@@ -281,7 +277,6 @@ void OfferNotificationBubbleControllerImpl::HideBubbleAndClearTimestamp(
 
 void OfferNotificationBubbleControllerImpl::UpdatePageActionIcon() {
   // Page action icons do not exist for Android.
-#if !BUILDFLAG(IS_ANDROID)
   AutofillBubbleControllerBase::UpdatePageActionIcon();
 
   if (web_contents()->IsBeingDestroyed()) {
@@ -293,7 +288,6 @@ void OfferNotificationBubbleControllerImpl::UpdatePageActionIcon() {
       BrowserActions::From(tab_interface_->GetBrowserWindowInterface())
           ->root_action_item());
   action->SetEnabled(ShouldShowPageAction());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 AutofillBubbleHandler*

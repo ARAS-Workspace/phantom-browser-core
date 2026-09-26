@@ -77,10 +77,6 @@ AsyncLayerTreeFrameSink::AsyncLayerTreeFrameSink(
       use_direct_client_receiver_(params->use_direct_client_receiver),
       synthetic_begin_frame_source_(
           std::move(params->synthetic_begin_frame_source)),
-#if BUILDFLAG(IS_ANDROID)
-      io_thread_id_(params->io_thread_id),
-      main_thread_id_(params->main_thread_id),
-#endif
       pipes_(std::move(params->pipes)),
       wants_animate_only_begin_frames_(params->wants_animate_only_begin_frames),
       auto_needs_begin_frame_(params->auto_needs_begin_frame),
@@ -141,18 +137,6 @@ bool AsyncLayerTreeFrameSink::BindToClient(LayerTreeFrameSinkClient* client) {
     params->no_compositor_frame_acks = no_compositor_frame_acks_;
     compositor_frame_sink_ptr_->SetParams(std::move(params));
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  std::vector<viz::Thread> threads;
-  threads.push_back(
-      {base::PlatformThread::CurrentId(), viz::Thread::Type::kCompositor});
-  if (io_thread_id_ != base::kInvalidThreadId)
-    threads.push_back({io_thread_id_, viz::Thread::Type::kIO});
-  if (main_thread_id_ != base::kInvalidThreadId) {
-    threads.push_back({main_thread_id_, viz::Thread::Type::kMain});
-  }
-  compositor_frame_sink_ptr_->SetThreads(threads);
-#endif
 
   return true;
 }

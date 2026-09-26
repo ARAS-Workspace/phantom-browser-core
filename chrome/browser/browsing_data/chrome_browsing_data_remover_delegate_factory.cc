@@ -31,11 +31,6 @@
 #include "chrome/browser/sessions/session_service_factory.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/feed/feed_service_factory.h"
-#include "components/feed/feed_feature_list.h"
-#endif  // BUILDFLAG(IS_ANDROID
-
 // static
 ChromeBrowsingDataRemoverDelegateFactory*
 ChromeBrowsingDataRemoverDelegateFactory::GetInstance() {
@@ -64,9 +59,6 @@ ChromeBrowsingDataRemoverDelegateFactory::
               .WithAshInternals(ProfileSelection::kOwnInstance)
               .Build()) {
   DependsOn(autofill::PersonalDataManagerFactory::GetInstance());
-#if BUILDFLAG(IS_ANDROID)
-  DependsOn(feed::FeedServiceFactory::GetInstance());
-#endif  // BUILDFLAG(IS_ANDROID)
   DependsOn(HistoryServiceFactory::GetInstance());
   DependsOn(HostContentSettingsMapFactory::GetInstance());
   DependsOn(ProfilePasswordStoreFactory::GetInstance());

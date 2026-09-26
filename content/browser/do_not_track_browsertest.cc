@@ -21,10 +21,6 @@
 #include "net/test/embedded_test_server/http_response.h"
 #include "third_party/blink/public/common/renderer_preferences/renderer_preferences.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/system/sys_info.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -50,16 +46,6 @@ class MockContentBrowserClient final
 class DoNotTrackTest : public ContentBrowserTest {
  protected:
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(crbug.com/40585282): It seems that we call unsupported Android APIs
-    // on KitKat when we set a ContentBrowserClient. Don't call such APIs and
-    // make this test available on KitKat.
-    int32_t major_version = 0, minor_version = 0, bugfix_version = 0;
-    base::SysInfo::OperatingSystemVersionNumbers(&major_version, &minor_version,
-                                                 &bugfix_version);
-    if (major_version < 5)
-      return;
-#endif
 
     client_ = std::make_unique<MockContentBrowserClient>();
   }

@@ -14,20 +14,16 @@
 #include "components/reading_list/core/reading_list_pref_names.h"
 #include "components/ukm/ukm_pref_names.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/accessibility/animation_policy_prefs.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
 // List of keys that can be changed in the user prefs file by the incognito
 // profile.
 const char* const kPersistentPrefNames[] = {
-#if !BUILDFLAG(IS_ANDROID)
     kAnimationPolicyAllowed,
     kAnimationPolicyOnce,
     kAnimationPolicyNone,
-#endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     prefs::kAnimationPolicy,
 #endif
@@ -40,14 +36,6 @@ const char* const kPersistentPrefNames[] = {
     bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
     bookmarks::prefs::kShowManagedBookmarksInBookmarkBar,
     bookmarks::prefs::kShowBookmarkBar,
-#if BUILDFLAG(IS_ANDROID)
-    prefs::kPartnerBookmarkMappings,
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-    // Clipboard modification state is updated over all profiles.
-    prefs::kClipboardLastModifiedTime,
-#endif
 
     // Default browser bar's status is aggregated between regular and incognito
     // modes.

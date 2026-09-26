@@ -523,14 +523,6 @@ void TexturePassthrough::MarkContextLost() {
   have_context_ = false;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void TexturePassthrough::BindToServiceId(GLuint service_id) {
-  if (service_id != 0 && service_id != service_id_) {
-    service_id_ = service_id;
-  }
-}
-#endif
-
 void TexturePassthrough::SetEstimatedSize(size_t size) {
   estimated_size_ = size;
 }
@@ -1704,13 +1696,6 @@ bool Texture::ClearLevel(DecoderContext* decoder, GLenum target, GLint level) {
                    gfx::Rect(info.width, info.height));
   return true;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void Texture::BindToServiceId(GLuint service_id) {
-  SetStreamTextureServiceId(service_id);
-  UpdateCanRenderCondition();
-}
-#endif
 
 const Texture::LevelInfo* Texture::GetLevelInfo(GLint target,
                                                 GLint level) const {

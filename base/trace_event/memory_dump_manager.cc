@@ -43,12 +43,6 @@
 #include "third_party/abseil-cpp/absl/base/dynamic_annotations.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/trace_event/java_heap_dump_provider_android.h"
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
 #include "base/trace_event/address_space_dump_provider.h"
 #endif
@@ -145,13 +139,6 @@ void MemoryDumpManager::Initialize(
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
   RegisterDumpProvider(AddressSpaceDumpProvider::GetInstance(),
                        "PartitionAlloc.AddressSpace", nullptr);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::IsJavaAvailable()) {
-    RegisterDumpProvider(JavaHeapDumpProvider::GetInstance(), "JavaHeap",
-                         nullptr);
-  }
 #endif
 }
 

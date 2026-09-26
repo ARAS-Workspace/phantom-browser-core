@@ -46,13 +46,6 @@ void FindInPageClient::SetActiveMatch(
   HandleUpdateType(request_id, update_type);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void FindInPageClient::ActivateNearestFindResult(int request_id,
-                                                 const gfx::PointF& point) {
-  frame_->GetFindInPage()->ActivateNearestFindResult(request_id, point);
-}
-#endif
-
 void FindInPageClient::HandleUpdateType(
     int request_id,
     blink::mojom::FindMatchUpdateType update_type) {

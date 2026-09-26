@@ -39,9 +39,7 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/payments/content/mock_content_payment_request_delegate.h"
-#endif
 
 namespace payments {
 namespace {
@@ -115,11 +113,9 @@ class SecurePaymentConfirmationAppFactoryTest : public testing::Test {
         .WillOnce(Return(ByMove(std::move(mock_authenticator_))));
     EXPECT_CALL(*mock_delegate, GetWebPaymentsWebDataService())
         .WillRepeatedly(Return(mock_service_));
-#if !BUILDFLAG(IS_ANDROID)
     ON_CALL(*mock_delegate, GetPaymentRequestDelegate())
         .WillByDefault(testing::Return(
             mock_content_payment_request_delegate_.GetContentWeakPtr()));
-#endif
     ON_CALL(*mock_delegate, OnDoneCreatingPaymentApps())
         .WillByDefault(Invoke(this, &SecurePaymentConfirmationAppFactoryTest::
                                         OnDoneCreatingPaymentApps));
@@ -206,9 +202,7 @@ class SecurePaymentConfirmationAppFactoryTest : public testing::Test {
  private:
   crypto::ScopedFakeUnexportableKeyProvider scoped_key_provider_;
   // MockContentPaymentRequestDelegate is not available on Android.
-#if !BUILDFLAG(IS_ANDROID)
   MockContentPaymentRequestDelegate mock_content_payment_request_delegate_;
-#endif
 };
 
 // Test that parsing a valid SecureConfirmationPaymentRequest succeeds.

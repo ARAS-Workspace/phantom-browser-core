@@ -235,16 +235,6 @@ void SharedImageInterfaceProxy::CopyToGpuMemoryBuffer(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void SharedImageInterfaceProxy::CopyNativeGmbToSharedMemoryAsync(
-    gfx::GpuMemoryBufferHandle buffer_handle,
-    base::UnsafeSharedMemoryRegion memory_region,
-    base::OnceCallback<void(bool)> callback) {
-  host_->CopyNativeGmbToSharedMemoryAsync(
-      std::move(buffer_handle), std::move(memory_region), std::move(callback));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void SharedImageInterfaceProxy::UpdateSharedImage(const SyncToken& sync_token,
                                                   const Mailbox& mailbox) {
   UpdateSharedImage(sync_token, std::unique_ptr<gfx::GpuFence>(), mailbox);

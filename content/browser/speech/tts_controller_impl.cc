@@ -589,7 +589,6 @@ void TtsControllerImpl::SpeakNow(std::unique_ptr<TtsUtterance> utterance) {
   UMA_HISTOGRAM_BOOLEAN("TextToSpeech.Utterance.Native", voice.native);
 
   if (!voice.native) {
-#if !BUILDFLAG(IS_ANDROID)
     DCHECK(!voice.engine_id.empty());
     SetCurrentUtterance(std::move(utterance));
     current_utterance_->SetEngineId(voice.engine_id);
@@ -604,7 +603,6 @@ void TtsControllerImpl::SpeakNow(std::unique_ptr<TtsUtterance> utterance) {
       SetCurrentUtterance(nullptr);
       SpeakNextUtterance();
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
   } else {
     // It's possible for certain platforms to send start events immediately
     // during |speak|.

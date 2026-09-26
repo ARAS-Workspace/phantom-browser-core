@@ -398,7 +398,6 @@ bool FilledCardInformationBubbleControllerImpl::ShouldReshowOnTabVisible()
   return !bubble_has_been_shown_ && should_icon_be_visible_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool FilledCardInformationBubbleControllerImpl::ShouldShowPageAction() {
   return ShouldIconBeVisible();
 }
@@ -407,7 +406,6 @@ std::optional<actions::ActionId>
 FilledCardInformationBubbleControllerImpl::GetActionIdForPageAction() {
   return kActionFilledCardInformation;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void FilledCardInformationBubbleControllerImpl::DoShowBubble() {
   if (!IsWebContentsActive()) {

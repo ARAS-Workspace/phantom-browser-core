@@ -18,9 +18,7 @@
 #include "components/prefs/pref_service.h"
 #include "components/url_formatter/url_fixer.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/startup/startup_tab.h"
-#endif
 
 namespace {
 
@@ -190,7 +188,6 @@ bool SessionStartupPref::ShouldOpenUrls() const {
   return type == URLS || type == LAST_AND_URLS;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 StartupTabs SessionStartupPref::ToStartupTabs() const {
   StartupTabs startup_tabs;
   for (const GURL& url : urls) {
@@ -201,4 +198,3 @@ StartupTabs SessionStartupPref::ToStartupTabs() const {
   }
   return startup_tabs;
 }
-#endif

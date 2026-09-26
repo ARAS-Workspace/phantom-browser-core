@@ -53,11 +53,9 @@
 #include "ui/gfx/image/image_skia.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/window_feature_controller/window_feature_controller.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using content::WebContents;
 using extensions::browser_window_util::GetLastActiveBrowserWithProfile;
@@ -143,7 +141,6 @@ bool OpenPopupInBrowser(BrowserWindowInterface& browser,
                         const Extension& extension,
                         std::string* error,
                         ShowPopupCallback callback) {
-#if !BUILDFLAG(IS_ANDROID)
   // On Android, the extension toolbar exists if and only if ExtensionsContainer
   // exists, so the check below is sufficient.
   // On other platforms, ExtensionsContainer is always constructed except for
@@ -154,7 +151,6 @@ bool OpenPopupInBrowser(BrowserWindowInterface& browser,
     *error = "Browser window has no toolbar.";
     return false;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   ExtensionsContainer* extensions_container =
       ExtensionsContainer::From(browser);

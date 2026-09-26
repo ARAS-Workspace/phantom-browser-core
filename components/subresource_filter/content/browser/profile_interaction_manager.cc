@@ -21,10 +21,6 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/messages/android/message_dispatcher_bridge.h"
-#endif
-
 namespace subresource_filter {
 
 ProfileInteractionManager::ProfileInteractionManager(
@@ -137,18 +133,6 @@ void ProfileInteractionManager::MaybeShowNotification() {
   const GURL& top_level_url = page_->GetMainDocument().GetLastCommittedURL();
   if (profile_context_->settings_manager()->ShouldShowUIForSite(
           top_level_url)) {
-#if BUILDFLAG(IS_ANDROID)
-    if (messages::MessageDispatcherBridge::Get()
-            ->IsMessagesEnabledForEmbedder()) {
-      subresource_filter::AdsBlockedMessageDelegate::CreateForWebContents(
-          GetWebContents());
-      ads_blocked_message_delegate_ =
-          subresource_filter::AdsBlockedMessageDelegate::FromWebContents(
-              GetWebContents());
-      ads_blocked_message_delegate_->ShowMessage();
-    }
-#endif
-
     // TODO(crbug.com/40139135): Plumb the actual frame reference here
     // (it comes from
     // ContentSubresourceFilterThrottleManager::DidDisallowFirstSubresource,

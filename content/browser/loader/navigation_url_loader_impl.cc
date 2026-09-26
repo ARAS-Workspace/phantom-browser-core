@@ -123,10 +123,6 @@
 #include "third_party/blink/public/mojom/service_worker/service_worker_router_rule.mojom.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/android/content_url_loader_factory.h"
-#endif
-
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "content/public/browser/plugin_service.h"
 #endif
@@ -2246,12 +2242,6 @@ NavigationURLLoaderImpl::CreateTerminalNonNetworkLoaderFactory(
         browser_context->GetSharedCorsOriginAccessList(),
         file_factory_priority);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (url.GetScheme() == url::kContentScheme) {
-    return ContentURLLoaderFactory::Create();
-  }
-#endif
 
   return {};
 }

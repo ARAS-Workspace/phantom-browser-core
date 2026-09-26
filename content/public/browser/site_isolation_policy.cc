@@ -47,30 +47,10 @@ bool IsDisableSiteIsolationFlagPresent() {
   return site_isolation_disabled;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool IsDisableSiteIsolationForPolicyFlagPresent() {
-  static const bool site_isolation_disabled_by_policy =
-      base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kDisableSiteIsolationForPolicy);
-  if (g_disable_flag_caching_for_tests) {
-    return base::CommandLine::ForCurrentProcess()->HasSwitch(
-        switches::kDisableSiteIsolationForPolicy);
-  }
-  return site_isolation_disabled_by_policy;
-}
-#endif
-
 bool IsSiteIsolationDisabled(SiteIsolationMode site_isolation_mode) {
   if (IsDisableSiteIsolationFlagPresent()) {
     return true;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // Desktop platforms no longer support disabling Site Isolation by policy.
-  if (IsDisableSiteIsolationForPolicyFlagPresent()) {
-    return true;
-  }
-#endif
 
   // Check with the embedder.  In particular, chrome/ uses this to disable site
   // isolation when below a memory threshold.
@@ -128,13 +108,6 @@ SiteIsolationPolicy::GetSiteIsolationDisabledReason() {
   if (IsDisableSiteIsolationFlagPresent()) {
     return SiteIsolationDisabledReason::kDisabledBySwitch;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // Desktop platforms no longer support disabling Site Isolation by policy.
-  if (IsDisableSiteIsolationForPolicyFlagPresent()) {
-    return SiteIsolationDisabledReason::kDisabledByPolicy;
-  }
-#endif
 
   if (GetContentClient() &&
       GetContentClient()->browser()->ShouldDisableSiteIsolation(

@@ -660,9 +660,6 @@ bool ShouldSniffMimeType(const GURL& url,
                          const HttpResponseHeaders* http_response_headers,
                          std::string_view mime_type) {
   bool sniffable_scheme = url.is_empty() || url.SchemeIsHTTPOrHTTPS() ||
-#if BUILDFLAG(IS_ANDROID)
-                          url.SchemeIs("content") ||
-#endif
                           url.SchemeIsFile() || url.SchemeIsFileSystem();
   if (!sniffable_scheme) {
     return false;

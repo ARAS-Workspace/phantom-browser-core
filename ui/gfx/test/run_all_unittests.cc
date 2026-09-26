@@ -47,12 +47,6 @@ class GfxTestSuite : public base::TestSuite {
     ASSERT_TRUE(base::PathService::Get(ui::UI_TEST_PAK, &ui_test_pak_path));
     ui::ResourceBundle::InitSharedInstanceWithPakPath(ui_test_pak_path);
 
-#if BUILDFLAG(IS_ANDROID)
-    // Android needs a discardable memory allocator when loading fallback fonts.
-    base::DiscardableMemoryAllocator::SetInstance(
-        &discardable_memory_allocator);
-#endif
-
 
     gfx::InitializeFonts();
   }

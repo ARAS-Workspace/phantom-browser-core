@@ -28,7 +28,6 @@ MediaSink CreateWiredDisplaySink(const std::string& id,
                    mojom::MediaRouteProviderId::WIRED_DISPLAY};
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TestMediaSinkService::TestMediaSinkService()
     : TestMediaSinkService(base::DoNothing()) {}
 
@@ -39,6 +38,5 @@ TestMediaSinkService::TestMediaSinkService(
 }
 
 TestMediaSinkService::~TestMediaSinkService() = default;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace media_router

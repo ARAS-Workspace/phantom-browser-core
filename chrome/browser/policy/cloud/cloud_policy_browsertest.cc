@@ -63,9 +63,7 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using testing::_;
 using testing::AnyNumber;

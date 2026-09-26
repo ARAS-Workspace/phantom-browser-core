@@ -96,9 +96,6 @@ bool ShouldForwardSyncErrorToStore(
     case SyncError::kNeedsTrustedVaultKeyForEverything:
     case SyncError::kNeedsSettingsConfirmation:
     case SyncError::kUnrecoverableError:
-#if BUILDFLAG(IS_ANDROID)
-    case SyncError::kNeedsUPMBackendUpgrade:
-#endif  // BUILDFLAG(IS_ANDROID)
     case SyncError::kNeedsClientUpgrade:
       // Errors that aren't categorized will block saving.
       return true;
@@ -125,9 +122,6 @@ PasswordChangesOrError SyncErrorToBackendError(
       return PasswordStoreBackendError(BackendError::kKeyRetrievalRequired);
     case SyncError::kNeedsSettingsConfirmation:
     case SyncError::kUnrecoverableError:
-#if BUILDFLAG(IS_ANDROID)
-    case SyncError::kNeedsUPMBackendUpgrade:
-#endif
     case SyncError::kNeedsClientUpgrade:
       // Errors that aren't categorized will block saving.
       return PasswordStoreBackendError(BackendError::kUncategorized);
@@ -152,9 +146,6 @@ ActionableError SyncErrorToActionableError(
       return ActionableError::kNoError;
     case SyncError::kNeedsSettingsConfirmation:
     case SyncError::kUnrecoverableError:
-#if BUILDFLAG(IS_ANDROID)
-    case SyncError::kNeedsUPMBackendUpgrade:
-#endif
     case SyncError::kNeedsClientUpgrade:
     case SyncError::kBookmarksLimitExceeded:
       return ActionableError::kInactionable;

@@ -31,10 +31,9 @@ actions::ActionItem::InvokeActionCallback CreateToggleSidePanelActionCallback(
                 context.GetProperty(kSidePanelOpenTriggerKey));
         CHECK_GE(open_trigger, SidePanelOpenTrigger::kMinValue);
         CHECK_LE(open_trigger, SidePanelOpenTrigger::kMaxValue);
-// TODO(crbug.com/489780669): Temporarily disabled until a coordinator is made.
-#if !BUILDFLAG(IS_ANDROID)
+        // TODO(crbug.com/489780669): Temporarily disabled until a coordinator
+        // is made.
         bwi->GetFeatures().side_panel_ui()->Toggle(key, open_trigger);
-#endif
       },
       key, bwi);
 }

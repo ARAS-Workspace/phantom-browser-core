@@ -15,10 +15,6 @@
 #include "third_party/blink/public/platform/platform.h"
 #include "third_party/blink/public/platform/scheduler/web_thread_scheduler.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif
-
 namespace content {
 
 InProcessRendererThread::InProcessRendererThread(
@@ -78,12 +74,6 @@ void InProcessRendererThread::ThreadDelegate::BindToCurrentThread() {
   // calls. The latter causes Java VM to assign Thread-??? to the thread name.
   // Please note calls to AttachCurrentThreadWithName after AttachCurrentThread
   // will not change the thread name kept in Java VM.
-#if BUILDFLAG(IS_ANDROID)
-  base::android::AttachCurrentThreadWithName(outer_->thread_name());
-  // Make sure we aren't somehow reinitialising the inprocess renderer thread on
-  // Android. Temporary CHECK() to debug http://crbug.com/514141
-  CHECK(!outer_->render_process_);
-#endif
   blink::Platform::InitializeBlink();
   std::unique_ptr<blink::scheduler::WebThreadScheduler> main_thread_scheduler =
       blink::scheduler::WebThreadScheduler::CreateInProcessMainThreadScheduler(

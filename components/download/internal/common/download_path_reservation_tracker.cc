@@ -31,10 +31,6 @@
 #include "net/base/filename_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/download/internal/common/android/download_collection_bridge.h"
-#endif
-
 namespace download {
 
 namespace {
@@ -109,13 +105,6 @@ bool IsPathReservedInternal(const base::FilePath& path, ReservationKey item) {
 // and has a different key than |item|. Called on the task
 // runner returned by DownloadPathReservationTracker::GetTaskRunner().
 bool IsAdditionalPathReserved(const base::FilePath& path, ReservationKey item) {
-#if BUILDFLAG(IS_ANDROID)
-  // If download collection is used, only file name needs to be
-  // unique.
-  if (DownloadCollectionBridge::ShouldPublishDownload(path)) {
-    return IsPathReservedInternal(path.BaseName(), item);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)  // No reservation map => no reservations.
   return IsPathReservedInternal(path, item);
 }
 
@@ -136,12 +125,6 @@ bool IsPathInUse(const base::FilePath& path) {
   if (base::PathExists(path))
     return true;
 
-#if BUILDFLAG(IS_ANDROID)
-  // If download collection is used, only file name needs to be
-  // unique.
-  if (DownloadCollectionBridge::ShouldPublishDownload(path))
-    return DownloadCollectionBridge::FileNameExists(path.BaseName());
-#endif
   return false;
 }
 
@@ -251,7 +234,6 @@ PathValidationResult ValidatePathAndResolveConflicts(
   // Enforce that the suggested path does not escape the default download
   // directory via symlink/junction traversal on desktop platforms.
   bool path_escaped = false;
-#if !BUILDFLAG(IS_ANDROID)
   base::FilePath containment_dir = info.containment_directory.empty()
                                        ? info.default_download_path
                                        : info.containment_directory;
@@ -272,7 +254,6 @@ PathValidationResult ValidatePathAndResolveConflicts(
       }
     }
   }
-#endif
 
   // Check writability of the suggested path. If we can't write to it, use
   // |default_download_path| if it is not empty or |fallback_directory|.
@@ -351,29 +332,6 @@ PathValidationResult CreateReservation(const CreateReservationInfo& info,
   base::FilePath target_dir = target_path.DirName();
   base::FilePath filename = target_path.BaseName();
 
-#if BUILDFLAG(IS_ANDROID)
-  if (DownloadCollectionBridge::ShouldPublishDownload(target_path)) {
-    PathValidationResult result = PathValidationResult::SUCCESS;
-    // Disallow downloading a file onto itself. Assume that downloading a file
-    // onto another file that differs only by case is not enough of a legitimate
-    // edge case to justify determining the case sensitivity of the underlying
-    // filesystem.
-    if (base::FilePath::CompareEqualIgnoreCase(target_path.value(),
-                                               info.source_path.value())) {
-      result = PathValidationResult::SAME_AS_SOURCE;
-    } else if (IsPathInUse(target_path)) {
-      // If the download is written to a content URI, put file name in the
-      // reservation map as content URIs will always be different.
-      int max_path_component_length =
-          base::GetMaximumPathComponentLength(target_path.DirName());
-      result = ResolveReservationConflicts(info, max_path_component_length,
-                                           &target_path);
-    }
-    (*g_reservation_map)[info.key] = target_path.BaseName();
-    *reserved_path = target_path;
-    return result;
-  }
-#endif
   // Create target_dir if necessary and appropriate. target_dir may be the last
   // directory that the user selected in a FilePicker; if that directory has
   // since been removed, do NOT automatically re-create it. Only automatically
@@ -400,12 +358,6 @@ void UpdateReservation(ReservationKey key, const base::FilePath& new_path) {
   auto iter = g_reservation_map->find(key);
   if (iter != g_reservation_map->end()) {
     bool use_download_collection = false;
-#if BUILDFLAG(IS_ANDROID)
-    if (DownloadCollectionBridge::ShouldPublishDownload(new_path)) {
-      use_download_collection = true;
-      iter->second = new_path.BaseName();
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
     if (!use_download_collection) {
       iter->second = new_path;
     }
@@ -440,10 +392,6 @@ void RunGetReservedPathCallback(
 // Gets the path reserved in the global |g_reservation_map|. For content Uri,
 // file name instead of file path is used.
 base::FilePath GetReservationPath(DownloadItem* download_item) {
-#if BUILDFLAG(IS_ANDROID)
-  if (download_item->GetTargetFilePath().IsContentUri())
-    return download_item->GetFileNameToReportUser();
-#endif
   return download_item->GetTargetFilePath();
 }
 

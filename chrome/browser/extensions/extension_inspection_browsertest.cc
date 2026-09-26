@@ -35,9 +35,7 @@ class TestExtensionView : public ExtensionView {
   TestExtensionView() = default;
   ~TestExtensionView() override = default;
 
-#if !BUILDFLAG(IS_ANDROID)
   gfx::NativeView GetNativeView() override { return gfx::NativeView(); }
-#endif
   void ResizeDueToAutoResize(content::WebContents* web_contents,
                              const gfx::Size& new_size) override {}
   void RenderFrameCreated(

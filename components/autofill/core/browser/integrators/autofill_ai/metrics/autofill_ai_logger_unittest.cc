@@ -1154,10 +1154,6 @@ TEST_F(AutofillAiMqlsMetricsTest, KeyMetrics_OptOut) {
 // emitted, but UMA Key metrics are.
 TEST_F(AutofillAiMqlsMetricsTest,
        KeyMetrics_OptOut_AutofillAiAvailableByDefault) {
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList feature_list{
-      features::kAutofillAiAvailableByDefault};
-#endif
   SetAutofillAiOptInStatus(autofill_client(), AutofillAiOptInStatus::kOptedOut);
 
   std::unique_ptr<FormStructure> form = CreatePassportForm();

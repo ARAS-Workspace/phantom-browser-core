@@ -289,7 +289,6 @@
 #include "ui/base/menu_source_utils.h"
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/devtools/devtools_policy_dialog.h"
 #include "chrome/browser/ui/toasts/api/toast_id.h"
 #include "chrome/browser/ui/toasts/toast_controller.h"
@@ -299,7 +298,6 @@
 #include "components/tabs/public/split_tab_data.h"
 #include "components/tabs/public/tab_interface.h"
 #include "ui/base/page_transition_types.h"
-#endif
 
 using base::UserMetricsAction;
 using blink::ContextMenuData;
@@ -790,7 +788,6 @@ bool MaybePdfViewerHandlesSave(RenderFrameHost* frame_host) {
 }
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-#if !BUILDFLAG(IS_ANDROID)
 std::pair<int, const gfx::VectorIcon*> GetOpenLinkInSplitStringAndIcon(
     tabs::TabInterface* tab,
     Browser* const browser) {
@@ -829,7 +826,6 @@ std::pair<int, const gfx::VectorIcon*> GetOpenLinkInSplitStringAndIcon(
   }
   return {string_id, icon};
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }  // namespace
 
 // static
@@ -963,7 +959,6 @@ void RenderViewContextMenu::WriteURLToClipboard(const GURL& url, int id) {
   scw.SetDataSourceURL(main_frame_url_, current_url_);
   scw.WriteText(FormatURLForClipboard(url));
 
-#if !BUILDFLAG(IS_ANDROID)
   if (id == IDC_CONTENT_CONTEXT_COPYLINKLOCATION &&
       toast_features::IsEnabled(toast_features::kLinkCopiedToast)) {
     auto* const toast_controller = GetToastController();
@@ -971,7 +966,6 @@ void RenderViewContextMenu::WriteURLToClipboard(const GURL& url, int id) {
       toast_controller->MaybeShowToast(ToastParams(ToastId::kLinkCopied));
     }
   }
-#endif
 }
 
 void RenderViewContextMenu::IssuePreconnectionToUrl(
@@ -1524,7 +1518,6 @@ void RenderViewContextMenu::AppendLinkItems() {
                                   : kOpenInNewOldIcon);
     }
 
-#if !BUILDFLAG(IS_ANDROID)
     if (show_open_in_new_tab) {
       // Opening a link in split view should also go through the same
       // constraints as opening a link in a new tab since a split view tab is a
@@ -1560,7 +1553,6 @@ void RenderViewContextMenu::AppendLinkItems() {
                                            kOpenLinkInSplitMenuItem);
       }
     }
-#endif
 
     if (params_.link_url.is_valid()) {
       AppendProtocolHandlerSubMenu();
@@ -2802,9 +2794,7 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       break;
 
     case IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW:
-#if !BUILDFLAG(IS_ANDROID)
       OpenLinkInSplitView(split_tabs::SplitTabLayout::kSideBySide);
-#endif  // !BUILDFLAG(IS_ANDROID)
       break;
     case IDC_CONTENT_CONTEXT_SAVELINKAS:
       CheckSupervisedUserURLFilterAndSaveLinkAs();
@@ -2984,9 +2974,7 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       if (base::FeatureList::IsEnabled(features::kDevToolsShowPolicyDialog) &&
           !DevToolsWindow::AllowDevToolsFor(GetProfile(),
                                             source_web_contents_)) {
-#if !BUILDFLAG(IS_ANDROID)
         DevToolsPolicyDialog::Show(source_web_contents_);
-#endif
       } else {
         if (id == IDC_VIEW_SOURCE) {
           embedder_web_contents_->GetPrimaryMainFrame()->ViewSource();
@@ -3894,7 +3882,6 @@ void RenderViewContextMenu::ExecCopyImageAt() {
 
   frame_host->CopyImageAt(params_.x, params_.y);
 
-#if !BUILDFLAG(IS_ANDROID)
   if (enterprise_data_protection::IsClipboardCopyAllowedByPolicyForUI(
           GetWebContentsForDataControls()) &&
       toast_features::IsEnabled(toast_features::kImageCopiedToast)) {
@@ -3903,7 +3890,6 @@ void RenderViewContextMenu::ExecCopyImageAt() {
       toast_controller->MaybeShowToast(ToastParams(ToastId::kImageCopied));
     }
   }
-#endif
 }
 
 void RenderViewContextMenu::ExecSearchWebForImage() {
@@ -3957,7 +3943,6 @@ void RenderViewContextMenu::ExecCopyVideoFrame() {
   MediaPlayerAction(blink::mojom::MediaPlayerAction(
       blink::mojom::MediaPlayerActionType::kCopyVideoFrame,
       /*enable=*/true));
-#if !BUILDFLAG(IS_ANDROID)
   if (enterprise_data_protection::IsClipboardCopyAllowedByPolicyForUI(
           GetWebContentsForDataControls()) &&
       toast_features::IsEnabled(toast_features::kVideoFrameCopiedToast)) {
@@ -3966,7 +3951,6 @@ void RenderViewContextMenu::ExecCopyVideoFrame() {
       toast_controller->MaybeShowToast(ToastParams(ToastId::kVideoFrameCopied));
     }
   }
-#endif
 }
 
 void RenderViewContextMenu::ExecSearchForVideoFrame(int event_flags) {
@@ -4120,18 +4104,15 @@ ToastController* RenderViewContextMenu::GetToastController() const {
   // If the context menu is opened in a normal tab, get the browser directly.
   BrowserWindowInterface* browser = GetBrowser();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Otherwise, if the menu is opened in embedded WebUI, attempt to find the
   // related browser from its embedding context.
   if (!browser) {
     browser = webui::GetBrowserWindowInterface(embedder_web_contents_);
   }
-#endif
 
   return browser ? browser->GetFeatures().toast_controller() : nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void RenderViewContextMenu::OpenLinkInSplitView(
     split_tabs::SplitTabLayout layout) {
   BrowserWindowInterface* const browser = GetBrowser();
@@ -4183,7 +4164,6 @@ void RenderViewContextMenu::OpenLinkInSplitView(
         tab_strip_model->GetIndexOfWebContents(new_web_contents));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void RenderViewContextMenu::AddItemWithOptionalIcon(
     int command,

@@ -1600,35 +1600,6 @@ TEST_F(FilePathTest, AsEndingWithSeparator) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(FilePathTest, ContentUriTest) {
-  const struct UnaryBooleanTestData cases[] = {
-      {FPL("content://foo.bar"), true},
-      {FPL("content://foo.bar/"), true},
-      {FPL("content://foo/bar"), true},
-      {FPL("CoNTenT://foo.bar"), true},
-      {FPL("content://"), true},
-      {FPL("content:///foo.bar"), true},
-      {FPL("content://3foo/bar"), true},
-      {FPL("content://_foo/bar"), true},
-      {FPL(".. "), false},
-      {FPL("foo.bar"), false},
-      {FPL("content:foo.bar"), false},
-      {FPL("content:/foo.ba"), false},
-      {FPL("content:/dir/foo.bar"), false},
-      {FPL("content: //foo.bar"), false},
-      {FPL("content%2a%2f%2f"), false},
-  };
-
-  for (size_t i = 0; i < std::size(cases); ++i) {
-    FilePath input(UNSAFE_TODO(cases[i].input));
-    bool observed = input.IsContentUri();
-    EXPECT_EQ(UNSAFE_TODO(cases[i].expected), observed)
-        << "i: " << i << ", input: " << input.value();
-  }
-}
-#endif
-
 // Test the operator<<(ostream, FilePath).
 TEST_F(FilePathTest, PrintToOstream) {
   std::stringstream ss;

@@ -209,12 +209,6 @@ void TestSyncService::FireSyncCycleCompleted() {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject> TestSyncService::GetJavaObject() {
-  return base::android::ScopedJavaLocalRef<jobject>();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TestSyncUserSettings* TestSyncService::GetUserSettings() {
   return &user_settings_;
 }
@@ -243,7 +237,6 @@ SyncService::TransportState TestSyncService::GetTransportState() const {
 
 SyncService::UserActionableError TestSyncService::GetUserActionableError()
     const {
-#if !BUILDFLAG(IS_ANDROID)
   if (HasSyncConsent()) {
     if (!user_settings_.IsInitialSyncFeatureSetupComplete()) {
       return UserActionableError::kNeedsSettingsConfirmation;
@@ -256,7 +249,6 @@ SyncService::UserActionableError TestSyncService::GetUserActionableError()
       return UserActionableError::kUnrecoverableError;
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (GetAuthError().state() != GoogleServiceAuthError::NONE) {
     return UserActionableError::kSignInNeedsUpdate;

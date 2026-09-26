@@ -17,7 +17,7 @@
 #include "mojo/core/embedder/scoped_ipc_support.h"
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_POSIX))
 #include "chrome/test/base/scoped_channel_override.h"
 #endif
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
       mojo::core::ScopedIPCSupport::ShutdownPolicy::FAST);
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_POSIX))
   // Tests running in Google Chrome builds on Win/Mac/Lin should present
   // as stable channel by default.
   chrome::ScopedChannelOverride scoped_channel_override(

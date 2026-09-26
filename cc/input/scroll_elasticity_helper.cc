@@ -36,17 +36,6 @@ void ApplyDrawnStretchAmount(LayerTreeImpl& target_tree,
   if (scroll_node.transform_id != kInvalidPropertyNodeId) {
     TransformNode& transform_node =
         transform_tree.MutableNode(scroll_node.transform_id);
-#if BUILDFLAG(IS_ANDROID)
-    // We set this flag to prevent re-rastering based on constantly updating the
-    // transform. This is only applicable to Android, where we have a stretch
-    // that affects the raster scale.
-    const bool has_stretch = !stretch_amount.IsZero();
-    // TODO (crbug.com/41102897): Look into potential edge case where clearing
-    // this on a transform with an animation could result in this value being
-    // cleared to false un-intentionally. This would only be an issue for
-    // non-root scrollers.
-    transform_node.has_potential_animation = has_stretch;
-#endif
     transform_node.needs_local_transform_update = true;
     transform_node.SetTransformChanged(DamageReason::kCompositorScroll);
     transform_tree.set_needs_update(true);

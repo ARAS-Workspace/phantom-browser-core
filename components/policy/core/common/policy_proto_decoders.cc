@@ -135,11 +135,9 @@ bool UseExternalDataFetcher(const char* policy_name,
     return true;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (UNSAFE_TODO(strcmp(policy_name, key::kWebAppInstallForceList)) == 0) {
     return true;
   }
-#endif
   return false;
 }
 

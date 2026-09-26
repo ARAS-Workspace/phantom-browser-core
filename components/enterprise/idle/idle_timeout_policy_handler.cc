@@ -162,13 +162,11 @@ bool IdleTimeoutActionsPolicyHandler::CheckPolicySettings(
     return false;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   const base::Value* sync_disabled =
       policies.GetValue(policy::key::kSyncDisabled, base::Value::Type::BOOLEAN);
   if (sync_disabled && sync_disabled->GetBool()) {
     return true;
   }
-#endif  //! BUILDFLAG(IS_ANDROID)
 
   const auto* browser_signin_disabled = policies.GetValue(
       policy::key::kBrowserSignin, base::Value::Type::INTEGER);

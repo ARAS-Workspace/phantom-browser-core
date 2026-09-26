@@ -42,9 +42,7 @@
 #include "printing/buildflags/buildflags.h"
 #include "rlz/buildflags/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/first_run/upgrade_util.h"
-#endif
 
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 #include "chrome/browser/background/extensions/background_mode_manager.h"
@@ -159,7 +157,6 @@ ShutdownType GetShutdownType() {
   return g_shutdown_type;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 RestartMode ShutdownPreThreadsStop() {
 
   // WARNING: During logoff/shutdown (WM_ENDSESSION) we may not have enough
@@ -296,7 +293,6 @@ void ShutdownPostThreadsStop(RestartMode restart_mode) {
   }
 
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void SetTryingToQuit(bool quitting) {
   CheckAccessedOnCorrectThread();
@@ -311,9 +307,7 @@ void SetTryingToQuit(bool quitting) {
   // attempt is cancelled.
   PrefService* pref_service = g_browser_process->local_state();
   if (pref_service) {
-#if !BUILDFLAG(IS_ANDROID)
     pref_service->ClearPref(prefs::kWasRestarted);
-#endif  // !BUILDFLAG(IS_ANDROID)
     pref_service->ClearPref(prefs::kRestartLastSessionOnShutdown);
   }
 

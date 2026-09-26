@@ -204,15 +204,13 @@ bool VerifySyncingDatatypes(const syncer::SyncService& sync_service,
 
 // Checks whether promos in general can currently be shown.
 bool CanShowPromos() {
-// Don't show the promo if the local state exists and `kPromotionsEnabled` is
-// false (likely overridden by policy). `kPromotionsEnabled` does not exist on
-// Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // Don't show the promo if the local state exists and `kPromotionsEnabled` is
+  // false (likely overridden by policy). `kPromotionsEnabled` does not exist on
+  // Android.
   PrefService* local_state = g_browser_process->local_state();
   if (local_state && !local_state->GetBoolean(prefs::kPromotionsEnabled)) {
     return false;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   return true;
 }
 
@@ -249,9 +247,7 @@ IOSPromoPrefsConfig::~IOSPromoPrefsConfig() = default;
 IOSPromoPrefsConfig::IOSPromoPrefsConfig(PromoType promo_type) {
   switch (promo_type) {
     case PromoType::kPassword:
-#if !BUILDFLAG(IS_ANDROID)
       promo_feature = &feature_engagement::kIPHiOSPasswordPromoDesktopFeature;
-#endif  // !BUILDFLAG(IS_ANDROID)
       promo_impressions_counter_pref_name =
           promos_prefs::kDesktopToiOSPasswordPromoImpressionsCounter;
       promo_opt_out_pref_name = promos_prefs::kDesktopToiOSPasswordPromoOptOut;
@@ -259,9 +255,7 @@ IOSPromoPrefsConfig::IOSPromoPrefsConfig(PromoType promo_type) {
           promos_prefs::kDesktopToiOSPasswordPromoLastImpressionTimestamp;
       break;
     case PromoType::kAddress:
-#if !BUILDFLAG(IS_ANDROID)
       promo_feature = &feature_engagement::kIPHiOSAddressPromoDesktopFeature;
-#endif  // !BUILDFLAG(IS_ANDROID)
       promo_impressions_counter_pref_name =
           promos_prefs::kDesktopToiOSAddressPromoImpressionsCounter;
       promo_opt_out_pref_name = promos_prefs::kDesktopToiOSAddressPromoOptOut;
@@ -269,9 +263,7 @@ IOSPromoPrefsConfig::IOSPromoPrefsConfig(PromoType promo_type) {
           promos_prefs::kDesktopToiOSAddressPromoLastImpressionTimestamp;
       break;
     case PromoType::kPayment:
-#if !BUILDFLAG(IS_ANDROID)
       promo_feature = &feature_engagement::kIPHiOSPaymentPromoDesktopFeature;
-#endif  // !BUILDFLAG(IS_ANDROID)
       promo_impressions_counter_pref_name =
           promos_prefs::kDesktopToiOSPaymentPromoImpressionsCounter;
       promo_opt_out_pref_name = promos_prefs::kDesktopToiOSPaymentPromoOptOut;
@@ -279,10 +271,8 @@ IOSPromoPrefsConfig::IOSPromoPrefsConfig(PromoType promo_type) {
           promos_prefs::kDesktopToiOSPaymentPromoLastImpressionTimestamp;
       break;
     case PromoType::kEnhancedBrowsing:
-#if !BUILDFLAG(IS_ANDROID)
       promo_feature =
           &feature_engagement::kIPHiOSEnhancedBrowsingDesktopFeature;
-#endif  // !BUILDFLAG(IS_ANDROID)
       promo_impressions_counter_pref_name =
           promos_prefs::kDesktopToiOSEnhancedBrowsingPromoImpressionsCounter;
       promo_opt_out_pref_name =
@@ -291,9 +281,7 @@ IOSPromoPrefsConfig::IOSPromoPrefsConfig(PromoType promo_type) {
           kDesktopToiOSEnhancedBrowsingPromoLastImpressionTimestamp;
       break;
     case PromoType::kLens:
-#if !BUILDFLAG(IS_ANDROID)
       promo_feature = &feature_engagement::kIPHiOSLensPromoDesktopFeature;
-#endif  // !BUILDFLAG(IS_ANDROID)
       promo_impressions_counter_pref_name =
           promos_prefs::kDesktopToiOSLensPromoImpressionsCounter;
       promo_opt_out_pref_name = promos_prefs::kDesktopToiOSLensPromoOptOut;
@@ -301,9 +289,7 @@ IOSPromoPrefsConfig::IOSPromoPrefsConfig(PromoType promo_type) {
           promos_prefs::kDesktopToiOSLensPromoLastImpressionTimestamp;
       break;
     case PromoType::kTabGroups:
-#if !BUILDFLAG(IS_ANDROID)
       promo_feature = &feature_engagement::kIPHiOSTabGroupsDesktopFeature;
-#endif  // !BUILDFLAG(IS_ANDROID)
       promo_impressions_counter_pref_name =
           promos_prefs::kDesktopToiOSTabGroupsPromoImpressionsCounter;
       promo_opt_out_pref_name = promos_prefs::kDesktopToiOSTabGroupsPromoOptOut;
@@ -311,9 +297,7 @@ IOSPromoPrefsConfig::IOSPromoPrefsConfig(PromoType promo_type) {
           promos_prefs::kDesktopToiOSTabGroupsPromoLastImpressionTimestamp;
       break;
     case PromoType::kPriceTracking:
-#if !BUILDFLAG(IS_ANDROID)
       promo_feature = &feature_engagement::kIPHiOSPriceTrackingDesktopFeature;
-#endif  // !BUILDFLAG(IS_ANDROID)
       promo_impressions_counter_pref_name =
           promos_prefs::kDesktopToiOSPriceTrackingPromoImpressionsCounter;
       promo_opt_out_pref_name =

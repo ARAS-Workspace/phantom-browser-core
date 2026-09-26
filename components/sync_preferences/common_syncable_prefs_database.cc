@@ -204,7 +204,7 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {autofill::prefs::kAutofillAiTravelEntitiesEnabled,
          {syncable_prefs_ids::kAutofillAiTravelEntitiesEnabled,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
         {autofill::prefs::kAutofillAiReauthBeforeViewingSensitiveData,
          {syncable_prefs_ids::kAutofillAiReauthBeforeViewingSensitiveData,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
@@ -402,23 +402,6 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {prefs::kSafeBrowsingEnhanced,
          {syncable_prefs_ids::kSafeBrowsingEnhanced, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-#if BUILDFLAG(IS_ANDROID)
-        {autofill::prefs::kFacilitatedPaymentsPix,
-         {syncable_prefs_ids::kFacilitatedPaymentsPix, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {autofill::prefs::kFacilitatedPaymentsEwallet,
-         {syncable_prefs_ids::kFacilitatedPaymentsEwallet, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {autofill::prefs::kFacilitatedPaymentsPixAccountLinking,
-         {syncable_prefs_ids::kFacilitatedPaymentsPixAccountLinking,
-          syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {autofill::prefs::kFacilitatedPaymentsA2AEnabled,
-         {syncable_prefs_ids::kFacilitatedPaymentsA2AEnabled,
-          syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {autofill::prefs::kFacilitatedPaymentsA2ATriggeredOnce,
-         {syncable_prefs_ids::kFacilitatedPaymentsA2ATriggeredOnce,
-          syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-#endif  // BUILDFLAG(IS_ANDROID)
         {autofill::prefs::kAutofillBnplEnabled,
          {syncable_prefs_ids::kAutofillBnplEnabled, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},

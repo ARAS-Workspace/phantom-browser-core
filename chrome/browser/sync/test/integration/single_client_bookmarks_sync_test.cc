@@ -122,11 +122,9 @@ using testing::SizeIs;
 // SyncTest and using it in all single client tests.
 constexpr int kSingleProfileIndex = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
 // An arbitrary GUID, to be used for injecting the same bookmark entity to the
 // fake server across PRE_MyTest and MyTest.
 constexpr char kBookmarkGuid[] = "e397ed62-9532-4dbf-ae55-200236eba15c";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // A title and a URL which are used across PRE_MyTest and MyTest.
 constexpr char16_t kBookmarkTitle[] = u"Title";
@@ -1308,7 +1306,6 @@ IN_PROC_BROWSER_TEST_P(
 }
 
 // Android doesn't currently support PRE_ tests, see crbug.com/40145099.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
                        PRE_PersistProgressMarkerOnRestart) {
   const std::u16string title = u"Title1";
@@ -1366,7 +1363,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
                    "Sync.DataTypeEntityChange.BOOKMARK",
                    syncer::DataTypeEntityChange::kRemoteInitialUpdate));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
                        ApplyRemoteCreationWithValidUuid) {
@@ -2070,7 +2066,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
 
 // Android doesn't currently support PRE_ tests, see crbug.com/40200835 or
 // crbug.com/40145099.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientBookmarksSyncTest,
                        PRE_ShouldUploadUnsyncedEntityAfterRestart) {
   ASSERT_TRUE(SetupSync());
@@ -2185,7 +2180,6 @@ IN_PROC_BROWSER_TEST_P(
                    ->service()
                    ->HasAnyModelErrorForTest({syncer::BOOKMARKS}));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class SingleClientBookmarksSyncTestWithEnabledReuploadBookmarks
     : public SingleClientParameterizedBookmarksSyncTestBase {
@@ -3239,7 +3233,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientBookmarksWithAccountStorageSyncTest,
 }
 
 // Android doesn't currently support PRE_ tests, see crbug.com/40145099.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(SingleClientBookmarksWithAccountStorageSyncTest,
                        PRE_PersistAccountBookmarksAcrossRestarts) {
   const std::u16string kInitiallyLocalTitle = u"Initially Local";
@@ -3402,8 +3395,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientBookmarksWithAccountStorageSyncTest,
   ExcludeDataTypesFromCheckForDataTypeFailures({syncer::BOOKMARKS});
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 class
     SingleClientBookmarksWithAccountStorageSyncTestSyncToSignInDisabledOnDesktop
     : public SingleClientBookmarksWithAccountStorageSyncTest {
@@ -3512,7 +3503,6 @@ IN_PROC_BROWSER_TEST_F(
 
 // Android doesn't currently support PRE_ tests, see crbug.com/40200835 or
 // crbug.com/40145099.
-#if !BUILDFLAG(IS_ANDROID)
 class SingleClientBookmarksSyncTestWithEnabledMigrateSyncingUserToSignedIn
     : public SingleClientBookmarksWithAccountStorageSyncTest {
  protected:
@@ -4030,6 +4020,5 @@ IN_PROC_BROWSER_TEST_F(SingleClientBookmarksExplicitSigninTransitionTest,
   EXPECT_TRUE(GetSyncService(0)->GetUserSettings()->GetSelectedTypes().Has(
       syncer::UserSelectableType::kBookmarks));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace

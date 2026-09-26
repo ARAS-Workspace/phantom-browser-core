@@ -96,11 +96,9 @@ const std::string& GetPartialTranslateAPIKey() {
   return GetApiKeyCacheInstance().api_key_partial_translate();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 const std::string& GetHatsAPIKey() {
   return GetApiKeyCacheInstance().api_key_hats();
 }
-#endif
 
 #if BUILDFLAG(SUPPORT_CDM_SERVER_CERTIFICATE)
 const std::string& GetCdmServerCertificate() {

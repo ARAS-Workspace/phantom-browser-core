@@ -44,10 +44,6 @@ using blink::mojom::MHTMLLoadResult;
 
 namespace {
 bool SchemeIsForUntrustedOfflinePages(const GURL& url) {
-#if BUILDFLAG(IS_ANDROID)
-  if (url.SchemeIs(url::kContentScheme))
-    return true;
-#endif
   return url.SchemeIsFile();
 }
 }  // namespace

@@ -151,7 +151,7 @@ ResultExpr EvaluateSyscallImpl(int fs_denied_errno,
     return RestrictSockSendFlags(sysno);
   }
 
-#if defined(__NR_rseq) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_rseq)
   // See https://crbug.com/1104160. Rseq can only be disabled right before an
   // execve, because glibc registers it with the kernel and so far it's unclear
   // whether shared libraries (which, during initialization, may observe that

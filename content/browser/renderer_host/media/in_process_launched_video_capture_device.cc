@@ -19,7 +19,7 @@
 #include "media/capture/mojom/video_capture_types.mojom.h"
 #include "media/media_buildflags.h"
 
-#if BUILDFLAG(ENABLE_SCREEN_CAPTURE) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_SCREEN_CAPTURE)
 #include "content/browser/media/capture/desktop_capture_device.h"
 #endif
 
@@ -177,7 +177,7 @@ void InProcessLaunchedVideoCaptureDevice::
                                             base::OnceClosure done_cb) {
   CHECK(device_task_runner_->BelongsToCurrentThread(),
         base::NotFatalUntil::M154);
-#if defined(ENABLE_SCREEN_CAPTURE) && !BUILDFLAG(IS_ANDROID)
+#if defined(ENABLE_SCREEN_CAPTURE)
   auto* desktop_device = static_cast<DesktopCaptureDevice*>(device);
   desktop_device->SetNotificationWindowId(window_id);
   VLOG(2) << "Screen capture notification window passed on device thread.";

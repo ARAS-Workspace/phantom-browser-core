@@ -56,7 +56,7 @@ namespace content {
 // TODO(mac): figure out why symbolization doesn't happen in the renderer.
 // http://crbug.com/521456
 // TODO(win): send PDB files for component build. http://crbug.com/521459
-#if !defined(OFFICIAL_BUILD) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !defined(OFFICIAL_BUILD) && !BUILDFLAG(IS_MAC)
 
 namespace {
 

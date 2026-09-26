@@ -78,7 +78,6 @@ TEST_F(NotebooksEligibilityServiceFactoryTest,
   EXPECT_FALSE(service->IsEligible());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(NotebooksEligibilityServiceFactoryTest, ReturnsNullForSystemProfile) {
   InitFeature(/*enable_feature=*/true);
   TestingProfile* profile = profile_manager()->CreateSystemProfile();
@@ -86,7 +85,6 @@ TEST_F(NotebooksEligibilityServiceFactoryTest, ReturnsNullForSystemProfile) {
       NotebooksEligibilityServiceFactory::GetForProfile(profile);
   EXPECT_EQ(service, nullptr);
 }
-#endif
 
 TEST_F(NotebooksEligibilityServiceFactoryTest, ReturnsNullForGuestProfile) {
   InitFeature(/*enable_feature=*/true);

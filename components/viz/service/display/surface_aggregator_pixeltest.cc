@@ -22,8 +22,6 @@
 #include "components/viz/test/compositor_frame_helpers.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace viz {
 namespace {
 
@@ -403,5 +401,3 @@ TEST_P(SurfaceAggregatorPixelTest, DrawAndEraseDelegatedInkTrail) {
 
 }  // namespace
 }  // namespace viz
-
-#endif  // !BUILDFLAG(IS_ANDROID)

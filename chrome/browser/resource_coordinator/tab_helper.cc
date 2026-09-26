@@ -23,9 +23,7 @@
 #include "content/public/browser/render_process_host.h"
 #include "services/resource_coordinator/public/cpp/memory_instrumentation/memory_instrumentation.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/resource_coordinator/tab_manager.h"
-#endif
 
 namespace resource_coordinator {
 

@@ -55,7 +55,6 @@ base::MappedReadOnlyRegion Metafile::GetDataAsSharedMemoryRegion() const {
   return region_mapping;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool Metafile::SaveTo(base::File* file) const {
   if (!file->IsValid())
     return false;
@@ -70,6 +69,5 @@ bool Metafile::SaveTo(base::File* file) const {
   }
   return true;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace printing

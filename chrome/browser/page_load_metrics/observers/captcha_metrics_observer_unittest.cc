@@ -16,9 +16,7 @@
 #include "content/public/test/navigation_simulator.h"
 #include "content/public/test/test_devtools_protocol_client.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/tabs/public/tab_interface.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using content::NavigationSimulator;
 using content::RenderFrameHost;
@@ -210,9 +208,6 @@ TEST_F(CaptchaMetricsObserverTest, CaptchaProviderSpecificMetrics) {
       captcha_frame_activation_entries, CaptchaProvider::kCloudflareTurnstile));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 TEST_F(CaptchaMetricsObserverTest, CaptchaLoadWithDevToolsAgent) {
   // Attach a DevTools client to the WebContents.
   content::TestDevToolsProtocolClient devtools_client;
@@ -238,6 +233,3 @@ TEST_F(CaptchaMetricsObserverTest, CaptchaLoadWithDevToolsAgent) {
 
   devtools_host->DetachClient(&devtools_client);
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-#endif  // !BUILDFLAG(IS_ANDROID)

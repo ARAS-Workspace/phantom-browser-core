@@ -18,11 +18,9 @@
 #include "content/public/browser/browser_thread.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#endif
 
 namespace {
 
@@ -48,13 +46,11 @@ void ShowPrintErrorDialogTask(const std::u16string& title,
   }
 
   gfx::NativeWindow window = gfx::NativeWindow();
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->GetLastActiveBrowser();
   if (browser) {
     window = browser->GetWindow()->GetNativeWindow();
   }
-#endif
   chrome::ShowWarningMessageBoxAsync(window, title, message);
 }
 

@@ -46,10 +46,6 @@ const CommandLinePrefStore::SwitchToPreferenceMapEntry
         {switches::kSSLVersionMin, prefs::kSSLVersionMin},
         {switches::kSSLVersionMax, prefs::kSSLVersionMax},
         {switches::kWebRtcIPHandlingPolicy, prefs::kWebRTCIPHandlingPolicy},
-#if BUILDFLAG(IS_ANDROID)
-        {switches::kAuthAndroidNegotiateAccountType,
-         prefs::kAuthAndroidNegotiateAccountType},
-#endif
 };
 
 const CommandLinePrefStore::SwitchToPreferenceMapEntry
@@ -73,10 +69,8 @@ const CommandLinePrefStore::BooleanSwitchToPreferenceMapEntry
          prefs::kSafeBrowsingEnhanced, true},
         {switches::kEnableLocalSyncBackend,
          syncer::prefs::kEnableLocalSyncBackend, true},
-#if !BUILDFLAG(IS_ANDROID)
         {switches::kUseSystemDefaultPrinter,
          prefs::kPrintPreviewUseSystemDefaultPrinter, true},
-#endif
         {switches::kSitePerProcess, prefs::kSitePerProcess, true},
 };
 

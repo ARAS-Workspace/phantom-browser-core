@@ -77,16 +77,6 @@ void ChromeWebstorePrivateAPIDelegate::ShowExtensionInstallFrictionDialog(
                                                    std::move(callback));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void ChromeWebstorePrivateAPIDelegate::ShowExtensionInstallAskParentDialog(
-    content::WebContents* web_contents,
-    base::OnceClosure cancel_callback,
-    base::OnceClosure approve_callback) {
-  ::extensions::ShowExtensionInstallAskParentDialog(
-      web_contents, std::move(cancel_callback), std::move(approve_callback));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void ChromeWebstorePrivateAPIDelegate::ReportFrictionAcceptedEvent(
     content::BrowserContext* context) {
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)

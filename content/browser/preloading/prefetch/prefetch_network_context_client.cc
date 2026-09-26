@@ -33,17 +33,6 @@ void PrefetchNetworkContextClient::OnCanSendDomainReliabilityUpload(
   std::move(callback).Run(false);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void PrefetchNetworkContextClient::OnGenerateHttpNegotiateAuthToken(
-    const std::string& server_auth_token,
-    bool can_delegate,
-    const std::string& auth_negotiate_android_account_type,
-    const std::string& spn,
-    OnGenerateHttpNegotiateAuthTokenCallback callback) {
-  std::move(callback).Run(net::ERR_FAILED, server_auth_token);
-}
-#endif
-
 #if BUILDFLAG(IS_CT_SUPPORTED)
 void PrefetchNetworkContextClient::OnCanSendSCTAuditingReport(
     OnCanSendSCTAuditingReportCallback callback) {

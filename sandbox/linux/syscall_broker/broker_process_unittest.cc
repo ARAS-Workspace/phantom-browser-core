@@ -2048,52 +2048,52 @@ TEST(BrokerProcess, IsSyscallAllowed) {
   const base::flat_map<BrokerCommand, base::flat_set<int>> kSysnosForCommand = {
       {COMMAND_ACCESS,
        {__NR_faccessat, __NR_faccessat2,
-#if defined(__NR_access) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_access)
         __NR_access
 #endif
        }},
       {COMMAND_MKDIR,
        {__NR_mkdirat,
-#if defined(__NR_mkdir) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_mkdir)
         __NR_mkdir
 #endif
        }},
       {COMMAND_OPEN,
        {__NR_openat,
-#if defined(__NR_open) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_open)
         __NR_open
 #endif
        }},
       {COMMAND_READLINK,
        {__NR_readlinkat,
-#if defined(__NR_readlink) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_readlink)
         __NR_readlink
 #endif
        }},
       {COMMAND_RENAME,
        {__NR_renameat,
-#if defined(__NR_rename) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_rename)
         __NR_rename
 #endif
        }},
       {COMMAND_UNLINK,
        {__NR_unlinkat,
-#if defined(__NR_unlink) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_unlink)
         __NR_unlink
 #endif
        }},
       {COMMAND_RMDIR,
        {__NR_unlinkat,
-#if defined(__NR_rmdir) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_rmdir)
         __NR_rmdir
 #endif
        }},
       {COMMAND_STAT,
        {
-#if defined(__NR_stat) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_stat)
            __NR_stat,
 #endif
-#if defined(__NR_lstat) && !BUILDFLAG(IS_ANDROID)
+#if defined(__NR_lstat)
            __NR_lstat,
 #endif
 #if defined(__NR_fstatat)

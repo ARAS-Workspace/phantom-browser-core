@@ -357,24 +357,4 @@ TEST_F(NavigationEntryTest, SetPageStateWithDefaultSequenceNumbers) {
             entry2_->root_node()->frame_entry.get());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Failing test, see crbug/1050906.
-// Test that content URIs correctly show the file display name as the title.
-TEST_F(NavigationEntryTest, DISABLED_NavigationEntryContentUri) {
-  base::FilePath image_path;
-  EXPECT_TRUE(
-      base::PathService::Get(base::DIR_SRC_TEST_DATA_ROOT, &image_path));
-  image_path = image_path.Append(FILE_PATH_LITERAL("content"));
-  image_path = image_path.Append(FILE_PATH_LITERAL("test"));
-  image_path = image_path.Append(FILE_PATH_LITERAL("data"));
-  image_path = image_path.Append(FILE_PATH_LITERAL("blank.jpg"));
-  EXPECT_TRUE(base::PathExists(image_path));
-
-  base::FilePath content_uri = base::InsertImageIntoMediaStore(image_path);
-
-  entry1_->SetURL(GURL(content_uri.value()));
-  EXPECT_EQ(u"blank.jpg", entry1_->GetTitleForDisplay());
-}
-#endif
-
 }  // namespace content

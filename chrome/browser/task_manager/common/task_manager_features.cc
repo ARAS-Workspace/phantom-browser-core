@@ -8,11 +8,4 @@
 
 namespace features {
 
-#if BUILDFLAG(IS_ANDROID)
-// Enables the Task Manager on Clank.
-BASE_FEATURE(kTaskManagerClank,
-             base::FEATURE_DISABLED_BY_DEFAULT
-);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace features

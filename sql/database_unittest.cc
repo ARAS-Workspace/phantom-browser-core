@@ -1574,18 +1574,6 @@ TEST_P(SQLDatabaseTest, RazeTruncate) {
   EXPECT_THAT(base::GetFileSize(db_path_), Optional(expected_size));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(SQLDatabaseTest, SetTempDirForSQL) {
-  MetaTable meta_table;
-  // Below call needs a temporary directory in sqlite3
-  // On Android, it can pass only when the temporary directory is set.
-  // Otherwise, sqlite3 doesn't find the correct directory to store
-  // temporary files and will report the error 'unable to open
-  // database file'.
-  ASSERT_TRUE(meta_table.Init(db_.get(), 4, 4));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_P(SQLDatabaseTest, Delete) {
   EXPECT_TRUE(db_->Execute("CREATE TABLE x (x)"));
   db_->Close();

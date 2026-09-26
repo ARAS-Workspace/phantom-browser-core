@@ -185,11 +185,6 @@ base::expected<void, DeserializationError> StructTraits<
   if (!data.ReadResourceSource(&out->resource_source)) {
     return base::unexpected(DeserializationError());
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (!data.ReadYcbcrInfo(&out->ycbcr_info)) {
-    return base::unexpected(DeserializationError());
-  }
-#endif
 
   out->id = id;
   out->set_shared_image(
@@ -197,14 +192,6 @@ base::expected<void, DeserializationError> StructTraits<
   out->set_sync_token(sync_token);
   out->set_metadata_override(metadata_override);
   out->needs_detiling = data.needs_detiling();
-
-#if BUILDFLAG(IS_ANDROID)
-  out->is_backed_by_surface_view = data.is_backed_by_surface_view();
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  out->wants_promotion_hint = data.wants_promotion_hint();
-#endif
 
   return base::ok();
 }

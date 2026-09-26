@@ -118,7 +118,6 @@ TEST_F(CookieSettingsFactoryTest, IncognitoBehaviorOfBlockingEverything) {
 }
 
 // Android does not have guest profiles.
-#if !BUILDFLAG(IS_ANDROID)
 
 // Tests that cookie blocking is not enabled by default for guest profiles.
 TEST_F(CookieSettingsFactoryTest, GuestProfile) {
@@ -136,7 +135,5 @@ TEST_F(CookieSettingsFactoryTest, GuestProfile) {
                   profile_.GetPrimaryOTRProfile(/*create_if_needed=*/true))
                   ->ShouldBlockThirdPartyCookies());
 }
-
-#endif
 
 }  // namespace

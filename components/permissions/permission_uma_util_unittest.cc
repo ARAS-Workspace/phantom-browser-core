@@ -104,13 +104,11 @@ struct PermissionsDelegationTestConfig {
   std::optional<PermissionHeaderPolicyForUMA> expected_configuration;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 ContentSettingsForOneType GetRevokedUnusedPermissions(
     HostContentSettingsMap* hcsm) {
   return hcsm->GetSettingsForOneType(
       ContentSettingsType::REVOKED_UNUSED_SITE_PERMISSIONS);
 }
-#endif
 
 std::unique_ptr<permissions::PermissionRequest> CreateRequest(
     permissions::RequestType type,
@@ -593,7 +591,6 @@ TEST_F(PermissionUmaUtilTest, PageInfoPermissionReallowedTest) {
       1);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PermissionUmaUtilTest, RecordPermissionRegrantForUnusedSites) {
   const GURL origin = GURL("https://example1.com:443");
   content::TestBrowserContext browser_context;
@@ -722,7 +719,6 @@ TEST_F(PermissionUmaUtilTest, GetDaysSinceUnusedSitePermissionRevocation) {
   ASSERT_TRUE(days_since_revocation.has_value());
   EXPECT_EQ(days_since_revocation.value(), 5u);
 }
-#endif
 
 TEST_F(PermissionUmaUtilTest, RecordOnPermissionStatusChangedEventSubscribed) {
   base::HistogramTester histograms;

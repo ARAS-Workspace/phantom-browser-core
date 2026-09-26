@@ -333,15 +333,6 @@ void FrameSinkBundleImpl::Submit(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void FrameSinkBundleImpl::SetThreads(uint32_t sink_id,
-                                     const std::vector<Thread>& threads) {
-  if (auto* sink = GetFrameSink(sink_id)) {
-    sink->SetThreads(threads);
-  }
-}
-#endif
-
 void FrameSinkBundleImpl::EnqueueDidReceiveCompositorFrameAck(
     uint32_t sink_id,
     std::vector<ReturnedResource> resources) {

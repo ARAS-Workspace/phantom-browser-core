@@ -60,10 +60,5 @@ void BrowserUINativeEventObserver::PlatformEventSourceDestroying() {
 
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-void BrowserUINativeEventObserver::RegisterObserver() {}
-void BrowserUINativeEventObserver::UnregisterObserver() {}
-#endif
-
 }  // namespace responsiveness
 }  // namespace content

@@ -66,17 +66,6 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "ui/base/base_window.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/callback_android.h"
-#include "base/android/jni_android.h"
-#include "base/test/scoped_feature_list.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-
-// Must come after all headers that specialize FromJniType() / ToJniType().
-#include "chrome/test/test_support_jni_headers/TabWindowManagerNativeTestSupport_jni.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -190,32 +179,10 @@ syncer::ClientTagHash TagHashFromSpecifics(
 
 // Closes a browser window and waits for it to finish closing.
 void CloseWindowAndWait(BrowserWindowInterface* window) {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, headless TabModelSelector creation happens after
-  // OnBrowserClosed(), so grab the ID here to check later.
-  JNIEnv* env = base::android::AttachCurrentThread();
-  TabListInterface* tab_list = TabListInterface::From(window);
-  ASSERT_TRUE(tab_list);
-  TabModel* tab_model = static_cast<TabModel*>(tab_list);
-  int window_id = Java_TabWindowManagerNativeTestSupport_getWindowIdForModel(
-      env, tab_model->GetJavaObject());
-  ASSERT_NE(window_id, -1);
-#endif
-
   // Close the window and wait for OnBrowserClosed() notification.
   BrowserClosedWaiter waiter(window);
   window->GetWindow()->Close();
   waiter.Wait();
-
-#if BUILDFLAG(IS_ANDROID)
-  // On Android we have to wait for the headless TabModelSelector to be created.
-  base::RunLoop run_loop;
-  base::OnceClosure quit_closure = run_loop.QuitClosure();
-  Java_TabWindowManagerNativeTestSupport_waitForTabModelSelectorWithId(
-      env, window_id,
-      base::android::ToJniCallback(env, std::move(quit_closure)));
-  run_loop.Run();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace
@@ -241,20 +208,10 @@ class ExtensionSessionsTest : public ExtensionBrowserTest {
     return fn;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList feature_list_;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   scoped_refptr<const Extension> extension_;
 };
 
-ExtensionSessionsTest::ExtensionSessionsTest() {
-#if BUILDFLAG(IS_ANDROID)
-  // kLoadAllTabsAtStartup is required to force WebContents for tabs not to be
-  // null, see browser_extension_window_controller.cc.
-  feature_list_.InitWithFeatures({chrome::android::kLoadAllTabsAtStartup}, {});
-#endif  // BUILDFLAG(IS_ANDROID)
-}
+ExtensionSessionsTest::ExtensionSessionsTest() {}
 
 void ExtensionSessionsTest::SetUpCommandLine(base::CommandLine* command_line) {
   ExtensionBrowserTest::SetUpCommandLine(command_line);
@@ -422,14 +379,12 @@ IN_PROC_BROWSER_TEST_F(ExtensionSessionsTest, RestoreMostRecentlyClosedWindow) {
   const base::DictValue* tab1 = (*tabs)[1].GetIfDict();
   ASSERT_TRUE(tab0);
   ASSERT_TRUE(tab1);
-#if !BUILDFLAG(IS_ANDROID)
   // The tab URLs are chrome://version/ and chrome://credits/.
   // NOTE: On Android, the tabs are still navigating when the return value of
   // the API function is computed, so the "committed" URLs used by the API are
   // not available. However, we verify the loading URLs below in the test.
   EXPECT_EQ("chrome://version/", api_test_utils::GetString(*tab0, "url"));
   EXPECT_EQ("chrome://credits/", api_test_utils::GetString(*tab1, "url"));
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // The first tab is pinned and active.
   EXPECT_TRUE(api_test_utils::GetBoolean(*tab0, "pinned"));

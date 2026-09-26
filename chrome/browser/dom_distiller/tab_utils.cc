@@ -34,10 +34,6 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "mojo/public/cpp/bindings/callback_helpers.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#endif
-
 namespace {
 
 using dom_distiller::ArticleDistillationUpdate;

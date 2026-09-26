@@ -59,7 +59,7 @@ base::DictValue NetLogParamsForCreateAuth(
 // search because it can cheaply discard strings when the length doesn't match.
 constexpr auto kDefaultAuthSchemes =
     std::to_array<std::string_view>({kBasicAuthScheme, kDigestAuthScheme,
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_KERBEROS)
                                      kNegotiateAuthScheme,
 #endif
                                      kNtlmAuthScheme});
@@ -258,7 +258,7 @@ bool HttpAuthHandlerRegistryFactory::IsSchemeAllowed(
   return std::ranges::contains(kDefaultAuthSchemes, scheme);
 }
 
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID) && BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(USE_KERBEROS) && BUILDFLAG(IS_POSIX)
 std::optional<std::string>
 HttpAuthHandlerRegistryFactory::GetNegotiateLibraryNameForTesting() const {
   if (!IsSchemeAllowed(kNegotiateAuthScheme))

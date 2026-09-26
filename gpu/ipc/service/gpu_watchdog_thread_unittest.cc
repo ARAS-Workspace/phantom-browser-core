@@ -72,13 +72,6 @@ class GpuWatchdogTest : public testing::Test {
   void LongTaskWithReportProgress(base::TimeDelta duration,
                                   base::TimeDelta report_delta);
 
-#if BUILDFLAG(IS_ANDROID)
-  void LongTaskFromBackgroundToForeground(
-      base::TimeDelta duration,
-      base::TimeDelta extra_time,
-      base::TimeDelta time_to_switch_to_foreground);
-#endif
-
   // Implements testing::Test
   void SetUp() override;
 
@@ -121,20 +114,6 @@ void GpuWatchdogTest::SetUp() {
 
   TimeOutType timeout_type = kNormal;
 
-#if BUILDFLAG(IS_ANDROID)
-  int32_t major_version = 0;
-  int32_t minor_version = 0;
-  int32_t bugfix_version = 0;
-  base::SysInfo::OperatingSystemVersionNumbers(&major_version, &minor_version,
-                                               &bugfix_version);
-
-  // For Android version < Android Pie (Version 9)
-  if (major_version < 9) {
-    timeout_type = kSlow;
-  }
-
-#endif
-
   if (timeout_type == kSlow) {
     timeout_ = kGpuWatchdogTimeoutForTestingSlow;
     extra_gpu_job_time_ = kExtraGPUJobTimeForTestingSlow;
@@ -175,20 +154,6 @@ void GpuWatchdogTest::LongTaskWithReportProgress(base::TimeDelta duration,
     end = base::TimeTicks::Now();
   } while (end - start <= duration);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void GpuWatchdogTest::LongTaskFromBackgroundToForeground(
-    base::TimeDelta duration,
-    base::TimeDelta extra_time,
-    base::TimeDelta time_to_switch_to_foreground) {
-  // Chrome is running in the background first.
-  watchdog_thread_->OnBackgrounded();
-  SimpleTask(time_to_switch_to_foreground, /*extra_time=*/base::TimeDelta());
-  // Now switch Chrome to the foreground after the specified time
-  watchdog_thread_->OnForegrounded();
-  SimpleTask(duration, extra_time);
-}
-#endif
 
 void GpuWatchdogPowerTest::LongTaskOnResume(
     base::TimeDelta duration,
@@ -284,59 +249,6 @@ TEST_F(GpuWatchdogTest, GpuRunningATaskHang) {
   bool result = watchdog_thread_->IsGpuHangDetectedForTesting();
   EXPECT_TRUE(result);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(GpuWatchdogTest, ChromeInBackground) {
-  // Chrome starts in the background.
-  watchdog_thread_->OnBackgrounded();
-
-  // Gpu init takes longer than 6x watchdog |timeout_|. This is normal since
-  // Chrome is running in the background.
-  auto normal_long_task_time = timeout_ * 6;
-  SimpleTask(normal_long_task_time, /*extra_time=*/base::TimeDelta());
-
-  // Report GPU init complete.
-  watchdog_thread_->OnInitComplete();
-
-  // Run a task that takes 6x watchdog |timeout_| longer.This is normal since
-  // Chrome is running in the background.
-  task_environment_.GetMainThreadTaskRunner()->PostTask(
-      FROM_HERE, base::BindOnce(&SimpleTask, normal_long_task_time,
-                                /*extra_time=*/base::TimeDelta()));
-  task_environment_.GetMainThreadTaskRunner()->PostTask(FROM_HERE,
-                                                        run_loop.QuitClosure());
-  run_loop.Run();
-
-  // The gpu might be slow when running in the background. This is ok.
-  bool result = watchdog_thread_->IsGpuHangDetectedForTesting();
-  EXPECT_FALSE(result);
-}
-
-TEST_F(GpuWatchdogTest, GpuSwitchingToForegroundHang) {
-  // Report GPU init complete.
-  watchdog_thread_->OnInitComplete();
-
-  // A task stays in the background for watchdog |timeout_| then switches to the
-  // foreground and runs longer than the first-time foreground watchdog timeout
-  // allowed.
-  auto allowed_time = timeout_ * (kRestartFactor + 1);
-  task_environment_.GetMainThreadTaskRunner()->PostTask(
-      FROM_HERE,
-      base::BindOnce(&GpuWatchdogTest::LongTaskFromBackgroundToForeground,
-                     base::Unretained(this), /*duration*/ allowed_time,
-                     /*extra_time=*/extra_gpu_job_time_,
-                     /*time_to_switch_to_foreground*/ timeout_ / 4));
-
-  task_environment_.GetMainThreadTaskRunner()->PostTask(FROM_HERE,
-                                                        run_loop.QuitClosure());
-  run_loop.Run();
-
-  // It takes too long to finish a task after switching to the foreground.
-  // A GPU hang should be detected.
-  bool result = watchdog_thread_->IsGpuHangDetectedForTesting();
-  EXPECT_TRUE(result);
-}
-#endif
 
 TEST_F(GpuWatchdogTest, GpuInitializationPause) {
   // Running for watchdog |timeout_|/4 in the beginning of GPU init.

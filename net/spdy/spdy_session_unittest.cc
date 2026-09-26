@@ -1130,20 +1130,6 @@ TEST_F(SpdySessionTest, NetworkChangeWithActiveStreams) {
 
   // The SpdySessionPool behavior differs based on how the OSs reacts to
   // network changes; see comment in SpdySessionPool::OnIPAddressChanged().
-#if BUILDFLAG(IS_ANDROID)
-  // For OSs where the TCP connections will close upon relevant network
-  // changes, SpdySessionPool doesn't need to force them to close, so in these
-  // cases verify the session has become unavailable but remains open and the
-  // pre-existing stream is still active.
-  EXPECT_FALSE(HasSpdySession(spdy_session_pool_, key_));
-
-  EXPECT_TRUE(session_->IsGoingAway());
-
-  EXPECT_TRUE(session_->IsStreamActive(1));
-
-  // Should close the session.
-  spdy_stream->Close();
-#endif
   EXPECT_FALSE(spdy_stream);
 
   data.Resume();

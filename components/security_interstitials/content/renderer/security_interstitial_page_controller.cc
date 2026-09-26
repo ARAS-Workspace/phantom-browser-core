@@ -127,13 +127,6 @@ void SecurityInterstitialPageController::OpenEnhancedProtectionSettings() {
                   CMD_OPEN_ENHANCED_PROTECTION_SETTINGS);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void SecurityInterstitialPageController::OpenAdvancedProtectionSettings() {
-  SendCommand(security_interstitials::SecurityInterstitialCommand::
-                  CMD_OPEN_ANDROID_ADVANCED_PROTECTION_SETTINGS);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void SecurityInterstitialPageController::OpenHelpCenterInNewTab() {
   SendCommand(security_interstitials::SecurityInterstitialCommand::
                   CMD_OPEN_HELP_CENTER_IN_NEW_TAB);
@@ -159,12 +152,10 @@ void SecurityInterstitialPageController::ReportPhishingErrorInNewTab() {
                   CMD_REPORT_PHISHING_ERROR_IN_NEW_TAB);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void SecurityInterstitialPageController::ShowCertificateViewer() {
   SendCommand(security_interstitials::SecurityInterstitialCommand::
                   CMD_SHOW_CERTIFICATE_VIEWER);
 }
-#endif
 
 void SecurityInterstitialPageController::SendCommand(
     security_interstitials::SecurityInterstitialCommand command) {
@@ -220,9 +211,6 @@ void SecurityInterstitialPageController::SendCommand(
       interface->OpenEnhancedProtectionSettings();
       break;
     case security_interstitials::CMD_OPEN_ANDROID_ADVANCED_PROTECTION_SETTINGS:
-#if BUILDFLAG(IS_ANDROID)
-      interface->OpenAndroidAdvancedProtectionSettings();
-#endif  // BUILDFLAG(IS_ANDROID)
       break;
     case security_interstitials::CMD_OPEN_HELP_CENTER_IN_NEW_TAB:
       interface->OpenHelpCenterInNewTab();
@@ -240,9 +228,7 @@ void SecurityInterstitialPageController::SendCommand(
       interface->ReportPhishingErrorInNewTab();
       break;
     case security_interstitials::CMD_SHOW_CERTIFICATE_VIEWER:
-#if !BUILDFLAG(IS_ANDROID)
       interface->ShowCertificateViewer();
-#endif
       break;
     case security_interstitials::CMD_TEXT_FOUND:
     case security_interstitials::CMD_TEXT_NOT_FOUND:
@@ -286,11 +272,6 @@ SecurityInterstitialPageController::GetObjectTemplateBuilder(
           .SetMethod("openEnhancedProtectionSettings",
                      &SecurityInterstitialPageController::
                          OpenEnhancedProtectionSettings)
-#if BUILDFLAG(IS_ANDROID)
-          .SetMethod("openAndroidAdvancedProtectionSettings",
-                     &SecurityInterstitialPageController::
-                         OpenAdvancedProtectionSettings)
-#endif  // BUILDFLAG(IS_ANDROID)
           .SetMethod(
               "openHelpCenterInNewTab",
               &SecurityInterstitialPageController::OpenHelpCenterInNewTab)
@@ -306,11 +287,9 @@ SecurityInterstitialPageController::GetObjectTemplateBuilder(
           .SetMethod(
               "reportPhishingErrorInNewTab",
               &SecurityInterstitialPageController::ReportPhishingErrorInNewTab)
-#if !BUILDFLAG(IS_ANDROID)
-          .SetMethod("showCertificateViewer",
-                     &SecurityInterstitialPageController::ShowCertificateViewer)
-#endif
-      ;
+          .SetMethod(
+              "showCertificateViewer",
+              &SecurityInterstitialPageController::ShowCertificateViewer);
 }
 
 const gin::WrapperInfo* SecurityInterstitialPageController::wrapper_info() const {

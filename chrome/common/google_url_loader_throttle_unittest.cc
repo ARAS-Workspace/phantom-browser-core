@@ -196,9 +196,6 @@ class GoogleURLLoaderThrottleTest
     delegate_ = std::make_unique<MockThrottleDelegate>();
 
     throttle_ = std::make_unique<GoogleURLLoaderThrottle>(
-#if BUILDFLAG(IS_ANDROID)
-        "",
-#endif
         std::move(bound_session_handler), std::move(dynamic_params));
     throttle_->set_delegate(delegate_.get());
   }

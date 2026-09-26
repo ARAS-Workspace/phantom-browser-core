@@ -2073,7 +2073,7 @@ TEST_F(BindUnretainedDanglingTest, UnretainedRefUnsafeDanglingUntriaged) {
 }
 
 // Death tests misbehave on Android, http://crbug.com/643760.
-#if defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#if defined(GTEST_HAS_DEATH_TEST)
 
 int FuncWithRefArgument(int& i_ptr) {
   return i_ptr;
@@ -2112,7 +2112,7 @@ TEST_F(BindUnretainedDanglingDeathTest, UnretainedWeakReceiverDangling) {
   EXPECT_DEATH(std::move(callback).Run(), "");
 }
 
-#endif  // defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#endif  // defined(GTEST_HAS_DEATH_TEST)
 
 #endif  // PA_BUILDFLAG(ENABLE_BACKUP_REF_PTR_SUPPORT) &&
         // PA_BUILDFLAG(USE_RAW_PTR_BACKUP_REF_IMPL)

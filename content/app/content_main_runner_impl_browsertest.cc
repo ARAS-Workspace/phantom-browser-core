@@ -234,11 +234,9 @@ class ContentMainRunnerImplBrowserTest : public ContentBrowserTest {
         .WillOnce(DoAll(Invoke(this, &Self::TestPostEarlyInitialization),
                         Return(std::nullopt)));
     EXPECT_CALL(mock_delegate_, MockRunProcess(kBrowserProcessType, _));
-#if !BUILDFLAG(IS_ANDROID)
     // Android never calls ProcessExiting, since it leaks its ContentMainRunner
     // and ProcessExiting is called from the destructor.
     EXPECT_CALL(mock_delegate_, MockProcessExiting(kBrowserProcessType));
-#endif
 
     // This will call ContentMain(), which should satisfy the expectations
     // above.

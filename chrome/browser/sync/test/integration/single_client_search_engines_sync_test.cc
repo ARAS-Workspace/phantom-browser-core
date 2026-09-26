@@ -27,9 +27,6 @@
 #include "components/sync/service/sync_service_impl.h"
 #include "content/public/test/browser_test.h"
 #include "testing/gmock/include/gmock/gmock.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/base/device_form_factor.h"
-#endif
 
 using search_engines_helper::HasSearchEngine;
 using testing::IsNull;
@@ -57,17 +54,7 @@ class SingleClientSearchEnginesSyncTestBase : public SyncTest {
       : SyncTest(test_type) {}
   ~SingleClientSearchEnginesSyncTestBase() override = default;
 
-  void SetUpOnMainThread() override {
-    SyncTest::SetUpOnMainThread();
-#if BUILDFLAG(IS_ANDROID)
-    const ui::DeviceFormFactor form_factor = ui::GetDeviceFormFactor();
-    if (form_factor != ui::DEVICE_FORM_FACTOR_TABLET &&
-        form_factor != ui::DEVICE_FORM_FACTOR_DESKTOP) {
-      GTEST_SKIP() << "Search engines sync is only supported on Large Form "
-                      "Factor (LFF) Android devices.";
-    }
-#endif
-  }
+  void SetUpOnMainThread() override { SyncTest::SetUpOnMainThread(); }
 
   bool SetupClients() override {
     if (!SyncTest::SetupClients()) {
@@ -89,9 +76,6 @@ class SingleClientSearchEnginesSyncTest
   SingleClientSearchEnginesSyncTest()
       : SingleClientSearchEnginesSyncTestBase(SINGLE_CLIENT) {
     std::vector<base::test::FeatureRef> enabled_features;
-#if BUILDFLAG(IS_ANDROID)
-    enabled_features.push_back(syncer::kSyncSearchEnginesAndroidLFF);
-#endif
     if (GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTransportOnly) {
       enabled_features.push_back(syncer::kReplaceSyncPromosWithSignInPromos);
       enabled_features.push_back(syncer::kSeparateLocalAndAccountSearchEngines);
@@ -326,9 +310,6 @@ class
         switches::kEnablePreferencesAccountStorage,
         syncer::kReplaceSyncPromosWithSignInPromos,
     };
-#if BUILDFLAG(IS_ANDROID)
-    enabled_features.push_back(syncer::kSyncSearchEnginesAndroidLFF);
-#endif
     feature_list_.InitWithFeatures(enabled_features, {});
   }
 
@@ -584,7 +565,6 @@ IN_PROC_BROWSER_TEST_F(
       "key1", GetFakeServer()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(
     SingleClientSearchEnginesSyncTestWithSeparateLocalAndAccountSearchEnginesEnabled,
     PRE_ShouldClearAccountDataOnStartupIfSignInAllowedBitChanged) {
@@ -627,7 +607,6 @@ IN_PROC_BROWSER_TEST_F(
               testing::Pointee(
                   testing::Property(&TemplateURL::keyword, u"localkeyword")));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(
     SingleClientSearchEnginesSyncTestWithSeparateLocalAndAccountSearchEnginesEnabled,

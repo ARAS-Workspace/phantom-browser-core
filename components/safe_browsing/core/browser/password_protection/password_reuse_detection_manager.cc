@@ -50,13 +50,6 @@ void PasswordReuseDetectionManager::OnKeyPressedCommitted(
   OnKeyPressed(text, /*is_committed=*/true);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void PasswordReuseDetectionManager::OnKeyPressedUncommitted(
-    const std::u16string& text) {
-  OnKeyPressed(text, /*is_committed=*/false);
-}
-#endif
-
 void PasswordReuseDetectionManager::OnKeyPressed(const std::u16string& text,
                                                  bool is_committed) {
   // Do not check reuse if it was already found on this page.

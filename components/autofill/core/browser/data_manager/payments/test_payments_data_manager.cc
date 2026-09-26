@@ -281,11 +281,11 @@ bool TestPaymentsDataManager::IsAutofillBnplPrefEnabled() const {
   return PaymentsDataManager::IsAutofillBnplPrefEnabled();
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 bool TestPaymentsDataManager::IsAutofillHasSeenBnplPrefEnabled() const {
   return PaymentsDataManager::IsAutofillHasSeenBnplPrefEnabled();
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 CoreAccountInfo TestPaymentsDataManager::GetAccountInfoForPaymentsServer()
     const {

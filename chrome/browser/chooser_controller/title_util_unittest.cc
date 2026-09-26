@@ -22,14 +22,12 @@
 #include "extensions/common/extension_builder.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/test/gmock_expected_support.h"
 #include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -92,7 +90,6 @@ TEST_F(CreateChooserTitleTest, ExtensionsFrameTree) {
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(CreateChooserTitleTest, IsolatedWebAppFrameTree) {
   base::test::ScopedFeatureList scoped_feature_list{features::kIsolatedWebApps};
   data_decoder::test::InProcessDataDecoder in_process_data_decoder;
@@ -122,6 +119,5 @@ TEST_F(CreateChooserTitleTest, IsolatedWebAppFrameTree) {
   EXPECT_EQ(u"Chooser Title FrameTree IWA Name wants to connect",
             CreateChooserTitle(subframe, kTitleResourceId));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace

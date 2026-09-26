@@ -373,21 +373,6 @@ bool VulkanFunctionPointers::BindInstanceFunctionPointers(
   }
 #endif  // defined(USE_VULKAN_XCB)
 
-
-#if BUILDFLAG(IS_ANDROID)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_KHR_ANDROID_SURFACE_EXTENSION_NAME)) {
-    constexpr char kvkCreateAndroidSurfaceKHR[] = "vkCreateAndroidSurfaceKHR";
-    vkCreateAndroidSurfaceKHR = reinterpret_cast<PFN_vkCreateAndroidSurfaceKHR>(
-        vkGetInstanceProcAddr(vk_instance, kvkCreateAndroidSurfaceKHR));
-    if (!vkCreateAndroidSurfaceKHR) {
-      LogGetProcError(kvkCreateAndroidSurfaceKHR);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
-
   return true;
 }
 
@@ -1020,23 +1005,6 @@ bool VulkanFunctionPointers::BindDeviceFunctionPointers(
     return false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (gfx::HasExtension(
-          enabled_extensions,
-          VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME)) {
-    constexpr char kvkGetAndroidHardwareBufferPropertiesANDROID[] =
-        "vkGetAndroidHardwareBufferPropertiesANDROID";
-    vkGetAndroidHardwareBufferPropertiesANDROID =
-        reinterpret_cast<PFN_vkGetAndroidHardwareBufferPropertiesANDROID>(
-            vkGetDeviceProcAddr(vk_device,
-                                kvkGetAndroidHardwareBufferPropertiesANDROID));
-    if (!vkGetAndroidHardwareBufferPropertiesANDROID) {
-      LogGetProcError(kvkGetAndroidHardwareBufferPropertiesANDROID);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_POSIX)
   if (gfx::HasExtension(enabled_extensions,
                         VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME)) {
@@ -1192,12 +1160,6 @@ void VulkanFunctionPointers::ResetForTesting() {
   vkGetPhysicalDeviceXcbPresentationSupportKHR = nullptr;
 #endif  // defined(USE_VULKAN_XCB)
 
-
-#if BUILDFLAG(IS_ANDROID)
-  vkCreateAndroidSurfaceKHR = nullptr;
-#endif  // BUILDFLAG(IS_ANDROID)
-
-
   vkAllocateCommandBuffers = nullptr;
   vkAllocateDescriptorSets = nullptr;
   vkAllocateMemory = nullptr;
@@ -1274,10 +1236,6 @@ void VulkanFunctionPointers::ResetForTesting() {
   vkUnmapMemory = nullptr;
   vkUpdateDescriptorSets = nullptr;
   vkWaitForFences = nullptr;
-
-#if BUILDFLAG(IS_ANDROID)
-  vkGetAndroidHardwareBufferPropertiesANDROID = nullptr;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_POSIX)
   vkGetSemaphoreFdKHR = nullptr;

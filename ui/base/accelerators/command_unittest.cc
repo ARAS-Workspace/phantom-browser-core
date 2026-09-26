@@ -41,13 +41,11 @@ INSTANTIATE_TEST_SUITE_P(
 #endif
     }));
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(CommandTest, StringToAccelerator) {
   EXPECT_EQ(
       GetParam().expected_hotkey_accelerator,
       ui::Command::StringToAccelerator(GetParam().expected_hotkey_string));
 }
-#endif
 
 TEST_P(CommandTest, AcceleratorToString) {
   EXPECT_EQ(

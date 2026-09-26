@@ -812,8 +812,6 @@ CloudPolicyValidatorBase::GetSignatureType() {
 
 template class CloudPolicyValidator<em::CloudPolicySettings>;
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE))
 template class CloudPolicyValidator<em::ExternalPolicyData>;
-#endif
 
 }  // namespace policy

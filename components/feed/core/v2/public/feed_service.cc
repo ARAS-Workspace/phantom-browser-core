@@ -297,12 +297,6 @@ FeedService::FeedService(
   identity_manager->AddObserver(identity_manager_observer_.get());
 
   delegate_->RegisterExperiments(prefs::GetExperiments(*profile_prefs));
-
-#if BUILDFLAG(IS_ANDROID)
-  application_status_listener_ =
-      base::android::ApplicationStatusListener::New(base::BindRepeating(
-          &FeedService::OnApplicationStateChange, base::Unretained(this)));
-#endif
 }
 
 FeedService::FeedService() = default;
@@ -362,22 +356,6 @@ bool FeedService::IsSignedIn() {
   }
   return false;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void FeedService::OnApplicationStateChange(
-    base::android::ApplicationState state) {
-  if (state == base::android::APPLICATION_STATE_HAS_RUNNING_ACTIVITIES) {
-    // If we want to trigger an OnEnterForeground event, we'll need to be
-    // careful about the initial state of foregrounded_.
-    foregrounded_ = true;
-  }
-  if (foregrounded_ &&
-      state == base::android::APPLICATION_STATE_HAS_PAUSED_ACTIVITIES) {
-    foregrounded_ = false;
-    stream_->OnEnterBackground();
-  }
-}
-#endif
 
 void FeedService::Shutdown() {
   identity_manager_observer_.reset();

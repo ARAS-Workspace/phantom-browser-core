@@ -10,9 +10,7 @@
 #include "chrome/browser/offline_items_collection/offline_content_aggregator_factory.h"
 #include "chrome/browser/profiles/profile.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/bubble/download_bubble_update_service_factory.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // static
 DownloadCoreService* DownloadCoreServiceFactory::GetForBrowserContext(
@@ -39,9 +37,7 @@ DownloadCoreServiceFactory::DownloadCoreServiceFactory()
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kOwnInstance)
               .Build()) {
-#if !BUILDFLAG(IS_ANDROID)
   DependsOn(DownloadBubbleUpdateServiceFactory::GetInstance());
-#endif  // !BUILDFLAG(IS_ANDROID)
   DependsOn(HistoryServiceFactory::GetInstance());
   DependsOn(NotificationDisplayServiceFactory::GetInstance());
   DependsOn(OfflineContentAggregatorFactory::GetInstance());

@@ -22,10 +22,6 @@
 #include "content/public/common/process_type.h"
 #include "services/network/public/mojom/network_service.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif
-
 namespace content {
 
 BrowserProcessIOThread::BrowserProcessIOThread(
@@ -63,15 +59,6 @@ void BrowserProcessIOThread::Init() {
 
 void BrowserProcessIOThread::Run(base::RunLoop* run_loop) {
   DCHECK_CALLED_ON_VALID_THREAD(browser_thread_checker_);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Not to reset thread name to "Thread-???" by VM, attach VM with thread name.
-  // Though it may create unnecessary VM thread objects, keeping thread name
-  // gives more benefit in debugging in the platform.
-  if (!thread_name().empty()) {
-    base::android::AttachCurrentThreadWithName(thread_name());
-  }
-#endif
 
   IOThreadRun(run_loop);
 }

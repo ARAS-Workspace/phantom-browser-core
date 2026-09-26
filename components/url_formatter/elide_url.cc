@@ -23,15 +23,12 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_ROBOLECTRIC)
 #include "ui/gfx/text_constants.h"  // nogncheck
 #include "ui/gfx/text_elider.h"     // nogncheck
 #include "ui/gfx/text_utils.h"      // nogncheck
-#endif
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_ROBOLECTRIC)
 const char16_t kDot = '.';
 
 // Build a path from the first |num_components| elements in |path_elements|.
@@ -102,8 +99,6 @@ std::u16string ElideComponentizedPath(
                         available_pixel_width, gfx::ELIDE_TAIL);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_ROBOLECTRIC)
-
 bool ShouldShowScheme(std::string_view scheme,
                       const url_formatter::SchemeDisplay scheme_display) {
   switch (scheme_display) {
@@ -134,8 +129,6 @@ std::u16string HostForDisplay(std::string_view host_in_puny) {
 }  // namespace
 
 namespace url_formatter {
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_ROBOLECTRIC)
 
 // TODO(pkasting): http://crbug.com/77883 This whole function gets
 // kerning/ligatures/etc. issues potentially wrong by assuming that the width of
@@ -345,8 +338,6 @@ std::u16string ElideHost(const GURL& url,
   return gfx::ElideText(url_host, font_list, available_pixel_width,
                         gfx::ELIDE_HEAD);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_ROBOLECTRIC)
 
 std::u16string FormatUrlForSecurityDisplay(const GURL& url,
                                            const SchemeDisplay scheme_display) {

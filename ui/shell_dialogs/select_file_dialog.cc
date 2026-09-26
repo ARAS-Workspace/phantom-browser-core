@@ -104,13 +104,6 @@ base::FilePath SelectFileDialog::GetShortenedFilePath(
   return path.DirName().Append(file_string).AddExtension(extension);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// These are overridden by Android's SelectFileDialog subclass.
-void SelectFileDialog::SetAcceptTypes(std::vector<std::u16string> types) {}
-void SelectFileDialog::SetUseMediaCapture(bool use_media_capture) {}
-void SelectFileDialog::SetOpenWritable(bool open_writable) {}
-#endif
-
 void SelectFileDialog::SelectFile(
     Type type,
     const std::u16string& title,

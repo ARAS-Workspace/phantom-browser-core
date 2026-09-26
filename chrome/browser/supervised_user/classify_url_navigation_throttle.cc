@@ -243,19 +243,6 @@ std::string ClassifyUrlNavigationThrottle::GetInterstitialHTML(
     WebFilteringResult result,
     bool already_sent_request,
     bool is_main_frame) const {
-#if BUILDFLAG(IS_ANDROID)
-  switch (result.interstitial_mode) {
-    case InterstitialMode::kLearnMoreInterstitial:
-      return SupervisedUserInterstitial::GetHTMLContentsWithoutApprovals(
-          result.url, g_browser_process->GetApplicationLocale());
-    case InterstitialMode::kParentalReviewInterstitial:
-      return SupervisedUserInterstitial::GetHTMLContentsWithApprovals(
-          supervised_user_service(), result.reason, already_sent_request,
-          is_main_frame, g_browser_process->GetApplicationLocale());
-    default:
-      NOTREACHED();
-  }
-#endif
   SCOPED_CRASH_KEY_BOOL(
       "SupervisedUser", "dpc_web_filter_enabled",
       g_browser_process->device_parental_controls().IsWebFilteringEnabled());

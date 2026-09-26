@@ -234,10 +234,6 @@ void PasswordProtectionRequest::FillRequestProto(bool is_sampled_ping) {
   }
 #endif  // BUILDFLAG(FULL_SAFE_BROWSING)
 
-#if BUILDFLAG(IS_ANDROID)
-  SetReferringAppInfo();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   switch (trigger_type_) {
     case LoginReputationClientRequest::ONE_TIME_PASSWORD_FIELD_DETECTED: {
       // No additional fields need to be set.

@@ -175,22 +175,6 @@ class SupervisedUserUrlCheckerClientNoCredentialsTest
             CredentialsMode::kNoCredentials) {}
 };
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(SupervisedUserUrlCheckerClientNoCredentialsTest,
-       NoPrimaryAccount) {
-  ASSERT_FALSE(identity_test_env_.identity_manager()->HasPrimaryAccount(
-      signin::ConsentLevel::kSignin));
-
-  // Other access modes should succeed because they don't require credentials
-  // and api call is made.
-  EXPECT_CALL(*this,
-              OnCheckDone(GURL("http://example.com"),
-                          safe_search_api::ClientClassification::kAllowed));
-  CheckUrl("http://example.com");
-  SimulateKidsApiResponse(kidsmanagement::ClassifyUrlResponse::ALLOWED);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class SupervisedUserUrlCheckerClientFamilyLinkEnabledTest
     : public SupervisedUserUrlCheckerClientTestBase {
  protected:
@@ -198,17 +182,6 @@ class SupervisedUserUrlCheckerClientFamilyLinkEnabledTest
       : SupervisedUserUrlCheckerClientTestBase(
             CredentialsMode::kRequireCredentialsFromFamilyLink) {}
 };
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(SupervisedUserUrlCheckerClientFamilyLinkEnabledTest,
-       NoPrimaryAccount) {
-  ASSERT_FALSE(identity_test_env_.identity_manager()->HasPrimaryAccount(
-      signin::ConsentLevel::kSignin));
-  // On Android, uncredentialed access will hang on access token wait.
-  EXPECT_CALL(*this, OnCheckDone(GURL("http://example.com"), _)).Times(0);
-  CheckUrl("http://example.com");
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class SupervisedUserUrlCheckerClientTest
     : public SupervisedUserUrlCheckerClientTestBase {
@@ -341,10 +314,6 @@ TEST_P(SupervisedUserUrlCheckerClientTest,
 
 constexpr CredentialsMode kCredentialsModes[] = {
     CredentialsMode::kNoCredentials,
-#if BUILDFLAG(IS_ANDROID)
-    // Only Android supports dynamic non-family link mode.
-    CredentialsMode::kTryReadingCredentialsFromFamilyLink,
-#endif
     CredentialsMode::kRequireCredentialsFromFamilyLink};
 
 INSTANTIATE_TEST_SUITE_P(

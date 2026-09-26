@@ -415,24 +415,5 @@ TEST_F(RendererControllerTest, OnFrozen) {
   ExpectInLocalRendering();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(RendererControllerTest, RemotePlaybackHlsCompatibility) {
-  controller_ = FakeRemoterFactory::CreateController(true);
-  controller_->SetClient(this);
-
-  controller_->OnDataSourceInitialized(GURL("http://example.com/foo.m3u8"));
-
-  PipelineMetadata incompatible_metadata;
-  incompatible_metadata.has_video = false;
-  incompatible_metadata.has_audio = false;
-  controller_->OnMetadataChanged(incompatible_metadata);
-  EXPECT_FALSE(is_remote_playback_compatible_);
-
-  // HLS is compatible with RemotePlayback regardless of the metadata we have.
-  controller_->OnHlsManifestDetected();
-  EXPECT_TRUE(is_remote_playback_compatible_);
-}
-#endif
-
 }  // namespace remoting
 }  // namespace media

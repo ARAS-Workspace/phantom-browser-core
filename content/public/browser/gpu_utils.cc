@@ -86,11 +86,6 @@ const gpu::GpuPreferences GetGpuPreferencesFromCommandLine() {
   gpu_preferences.enable_native_gpu_memory_buffers =
       command_line->HasSwitch(switches::kEnableNativeGpuMemoryBuffers);
 
-#if BUILDFLAG(IS_ANDROID)
-  gpu_preferences.disable_oopr_debug_crash_dump =
-      command_line->HasSwitch(switches::kDisableOoprDebugCrashDump);
-#endif
-
   if (GetUintFromSwitch(command_line, switches::kVulkanHeapMemoryLimitMb,
                         &gpu_preferences.vulkan_heap_memory_limit)) {
     gpu_preferences.vulkan_heap_memory_limit *= 1024 * 1024;

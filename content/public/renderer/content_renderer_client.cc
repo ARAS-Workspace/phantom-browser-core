@@ -133,17 +133,6 @@ ContentRendererClient::GetProtocolHandlerSecurityLevel(
   return blink::ProtocolHandlerSecurityLevel::kStrict;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool ContentRendererClient::HandleNavigation(
-    RenderFrame* render_frame,
-    blink::WebFrame* frame,
-    const blink::WebURLRequest& request,
-    blink::WebNavigationType type,
-    blink::WebNavigationPolicy default_policy) {
-  return false;
-}
-#endif
-
 void ContentRendererClient::WillSendRequest(
     blink::WebLocalFrame* frame,
     ui::PageTransition transition_type,
@@ -246,13 +235,11 @@ ContentRendererClient::CreateWorkerContentSettingsClient(
   return nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<media::SpeechRecognitionClient>
 ContentRendererClient::CreateSpeechRecognitionClient(
     RenderFrame* render_frame) {
   return nullptr;
 }
-#endif
 
 bool ContentRendererClient::ShouldEnforceWebRTCRoutingPreferences() {
   return true;

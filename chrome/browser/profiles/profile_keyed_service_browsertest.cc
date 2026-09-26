@@ -183,10 +183,8 @@ class ProfileKeyedServiceBrowserTest : public InProcessBrowserTest {
     // clang-format off
     feature_list_.InitWithFeatures(
         {
-#if !BUILDFLAG(IS_ANDROID)
           features::kInitialWebUI,
           features::kWebUIReloadButton,
-#endif  // !BUILDFLAG(IS_ANDROID)
           features::kTrustSafetySentimentSurvey,
           network::features::kBrowsingTopics,
           extensions_features::kForceWebRequestProxyForTest,
@@ -366,9 +364,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 
     "CookieSettings",
     "ChromeEnterpriseRealTimeUrlLookupService",
-#if !BUILDFLAG(IS_ANDROID)
     "ChromePolicyBlocklistService",
-#endif  // !BUILDFLAG(IS_ANDROID)
     "DeveloperToolsPolicyChecker",
     "EnterpriseReportingPrivateEventRouter",
     "ExtensionKeybindingRegistryShutdownNotifierFactory",
@@ -427,9 +423,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "UkmBackgroundRecorderService",
     "UsbDeviceManager",
     "UsbDeviceResourceManager",
-#if !BUILDFLAG(IS_ANDROID)
     "WaapUIMetricsService",
-#endif  // !BUILDFLAG(IS_ANDROID)
     "sct_reporting::Factory",
 
     "BtmBrowserSigninDetector",
@@ -534,7 +528,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "BookmarkUndoService",
     "BookmarksAPI",
     "BrailleDisplayPrivateAPI",
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     "BrowserBoundKeyDeleterService",
 #endif
     "ChildAccountService",

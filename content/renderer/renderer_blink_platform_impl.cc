@@ -132,10 +132,6 @@
 #include "base/file_descriptor_posix.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/common/android/sync_compositor_statics.h"
-#endif
-
 using blink::Platform;
 using blink::WebAudioDevice;
 using blink::WebAudioLatencyHint;
@@ -448,24 +444,6 @@ bool RendererBlinkPlatformImpl::IsGpuCompositingDisabled() const {
 
   return thread->IsGpuCompositingDisabled();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool RendererBlinkPlatformImpl::
-    IsSynchronousCompositingEnabledForAndroidWebView() {
-  return GetContentClient()->UsingSynchronousCompositing();
-}
-
-bool RendererBlinkPlatformImpl::
-    IsZeroCopySynchronousSwDrawEnabledForAndroidWebView() {
-  return base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kSingleProcess);
-}
-
-SkCanvas*
-RendererBlinkPlatformImpl::SynchronousCompositorGetSkCanvasForAndroidWebView() {
-  return content::SynchronousCompositorGetSkCanvas();
-}
-#endif
 
 bool RendererBlinkPlatformImpl::IsLcdTextEnabled() {
   RenderThreadImpl* thread = RenderThreadImpl::current();
@@ -1154,20 +1132,6 @@ RendererBlinkPlatformImpl::VideoFrameCompositorTaskRunner() {
 
   return video_frame_compositor_thread_->task_runner();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void RendererBlinkPlatformImpl::SetPrivateMemoryFootprint(
-    uint64_t private_memory_footprint_bytes) {
-  auto* render_thread = RenderThreadImpl::current();
-  CHECK(render_thread);
-  render_thread->SetPrivateMemoryFootprint(private_memory_footprint_bytes);
-}
-
-bool RendererBlinkPlatformImpl::IsUserLevelMemoryPressureSignalEnabled() {
-  return base::SysInfo::Is4GbDevice() || base::SysInfo::Is6GbDevice();
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void RendererBlinkPlatformImpl::OnV8HeapLastResortGC() {
   if (auto* policy = LastResortGCPolicy::Get()) {

@@ -179,7 +179,7 @@ TEST_F(ThreadRestrictionsTest, DisallowUnresponsiveTasks) {
 }
 
 // thread_restriction_checks_and_has_death_tests
-#if !BUILDFLAG(IS_ANDROID) && DCHECK_IS_ON() && defined(GTEST_HAS_DEATH_TEST)
+#if DCHECK_IS_ON() && defined(GTEST_HAS_DEATH_TEST)
 
 TEST_F(ThreadRestrictionsTest, BlockingCheckEmitsStack) {
   debug::OverrideStackTraceOutputForTesting enable_stacks_in_death_tests(

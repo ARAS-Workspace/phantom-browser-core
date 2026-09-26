@@ -474,7 +474,6 @@ IbanBubbleControllerImpl::GetPageActionIconType() {
   return PageActionIconType::kSaveIban;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<actions::ActionId>
 IbanBubbleControllerImpl::GetActionIdForPageAction() {
   return kActionShowPaymentsBubbleOrPage;
@@ -484,7 +483,6 @@ std::optional<std::u16string>
 IbanBubbleControllerImpl::GetPageActionTooltipText() {
   return GetSavePaymentIconTooltipText();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void IbanBubbleControllerImpl::DoShowBubble() {
   AutofillBubbleHandler* autofill_bubble_handler = GetAutofillBubbleHandler();

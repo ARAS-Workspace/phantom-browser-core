@@ -604,12 +604,11 @@ void VotesUploader::SetInitialHashValueOfUsernameField(
 }
 
 void VotesUploader::MaybeSendSingleUsernameVotes() {
-// UFF votes are not sent on Android, since it wasn't possible to edit the
-// username in prompt before UFF was launched. Later, password edit dialog
-// was added, but Android votes were never evaluated.
-// TODO(crbug.com/40279590): Verify if the votes are produced as expected on
-// Android and enable UFF voting.
-#if !BUILDFLAG(IS_ANDROID)
+  // UFF votes are not sent on Android, since it wasn't possible to edit the
+  // username in prompt before UFF was launched. Later, password edit dialog
+  // was added, but Android votes were never evaluated.
+  // TODO(crbug.com/40279590): Verify if the votes are produced as expected on
+  // Android and enable UFF voting.
   bool should_send_votes =
       (should_send_username_first_flow_votes_ ||
        std::ranges::any_of(single_username_votes_data_,
@@ -639,7 +638,6 @@ void VotesUploader::MaybeSendSingleUsernameVotes() {
       }
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Don't set is_most_recent_single_username_candidate for FPF votes, since
   // this is unrelated to FPF.
@@ -649,7 +647,6 @@ void VotesUploader::MaybeSendSingleUsernameVotes() {
         IsMostRecentSingleUsernameCandidate::kNotPartOfUsernameFirstFlow,
         /*is_forgot_password_vote=*/true);
   }
-
 }
 
 void VotesUploader::CalculateUsernamePromptEditState(

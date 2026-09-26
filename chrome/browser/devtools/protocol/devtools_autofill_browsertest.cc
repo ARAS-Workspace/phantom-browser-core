@@ -128,12 +128,6 @@ class DevToolsAutofillTest : public DevToolsProtocolTestBase {
   DevToolsAutofillTest() = default;
   void SetUpCommandLine(base::CommandLine* command_line) override {
     DevToolsProtocolTestBase::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_ANDROID)
-    // Explicitly enable site isolation so that out-of-process iframe (OOPIF)
-    // targets are created on Android (where site isolation is disabled by
-    // default), matching desktop behavior for OOPIF tests.
-    command_line->AppendSwitch(::switches::kSitePerProcess);
-#endif
   }
 
   void SetUpOnMainThread() override {

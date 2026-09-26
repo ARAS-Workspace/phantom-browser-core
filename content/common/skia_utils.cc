@@ -77,7 +77,6 @@ void InitializeSkia() {
   SkGraphics::SetFontCacheLimit(kMB);
   skia::InitializeFontRendering();
 
-#if !BUILDFLAG(IS_ANDROID)
   size_t font_cache_limit;
   if (cmd.HasSwitch(switches::kSkiaFontCacheLimitMb)) {
     if (base::StringToSizeT(
@@ -95,7 +94,6 @@ void InitializeSkia() {
       SkGraphics::SetResourceCacheTotalByteLimit(resource_cache_limit * kMB);
     }
   }
-#endif
 
   InitSkiaEventTracer();
   base::trace_event::MemoryDumpManager::GetInstance()->RegisterDumpProvider(

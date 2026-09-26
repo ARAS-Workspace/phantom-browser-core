@@ -113,15 +113,6 @@ DataSharingNavigationThrottle::CheckIfShouldIntercept() {
     // crbug.com/411646000: Only enable this for Android because on Desktop if
     // user clicks an invite link to launch the browser, the browser will quit
     // when the current tab is closed due to no tab remains.
-#if BUILDFLAG(IS_ANDROID)
-    // Close the tab if the url interception ends with an empty page.
-    const GURL& last_committed_url =
-        navigation_handle()->GetWebContents()->GetLastCommittedURL();
-    if (!last_committed_url.is_valid() || last_committed_url.IsAboutBlank() ||
-        last_committed_url.is_empty()) {
-      navigation_handle()->GetWebContents()->ClosePage();
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
 
     return CANCEL;
   }

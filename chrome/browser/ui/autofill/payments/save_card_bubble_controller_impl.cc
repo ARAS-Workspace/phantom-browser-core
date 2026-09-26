@@ -807,7 +807,6 @@ SaveCardBubbleControllerImpl::GetPageActionIconType() {
   return PageActionIconType::kSaveCard;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<actions::ActionId>
 SaveCardBubbleControllerImpl::GetActionIdForPageAction() {
   return kActionShowPaymentsBubbleOrPage;
@@ -817,7 +816,6 @@ std::optional<std::u16string>
 SaveCardBubbleControllerImpl::GetPageActionTooltipText() {
   return GetSavePaymentIconTooltipText();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 AutofillBubbleHandler*
 SaveCardBubbleControllerImpl::GetAutofillBubbleHandler() {

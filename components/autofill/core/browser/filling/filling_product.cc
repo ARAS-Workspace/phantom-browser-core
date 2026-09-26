@@ -12,11 +12,6 @@
 #include "components/autofill/core/browser/suggestions/suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/suggestion_type.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#include "components/autofill/android/main_autofill_jni_headers/FillingProductBridge_jni.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace autofill {
 
 // LINT.IfChange(FillingProductToString)
@@ -186,16 +181,6 @@ FillingProduct GetFillingProductFromSuggestionDataSource(
   NOTREACHED();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-static int32_t JNI_FillingProductBridge_GetFillingProductFromSuggestionType(
-    JNIEnv* env,
-    int32_t type) {
-  SuggestionType suggestion_type = static_cast<SuggestionType>(type);
-  return static_cast<int32_t>(
-      GetFillingProductFromSuggestionType(suggestion_type));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 FillingProduct GetFillingProductFromFieldTypeGroup(
     FieldTypeGroup field_type_group) {
   using enum FieldTypeGroup;
@@ -229,7 +214,3 @@ FillingProduct GetFillingProductFromFieldTypeGroup(
 }
 
 }  // namespace autofill
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(FillingProductBridge)
-#endif

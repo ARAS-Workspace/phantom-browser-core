@@ -579,7 +579,6 @@ TEST_P(CardMetadataLatencyMetricsTest, LogMetrics) {
 // TODO(crbug.com/332559112): Remove the platform check after Android is
 // supported.
 // TODO(crbug.com/346399130): Reduce the amount of '_ONCE' metric tests.
-#if !BUILDFLAG(IS_ANDROID)
 // Params:
 // 1. Benefit source of the card with a benefit available.
 class CardBenefitFormEventMetricsTest
@@ -1823,8 +1822,6 @@ TEST_F(
                     GetCardBenefitSourceSuffix("UnknownSource")}),
       0);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 }  // namespace autofill::autofill_metrics

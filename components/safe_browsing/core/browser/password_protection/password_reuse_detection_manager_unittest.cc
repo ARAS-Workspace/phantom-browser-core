@@ -52,13 +52,6 @@ class MockPasswordReuseDetectionManagerClient
                uint64_t,
                const std::string&),
               (override));
-
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(void,
-              OnPasswordSelected,
-              (const std::u16string& text_str),
-              (override));
-#endif
 };
 
 class PasswordReuseDetectionManagerTest : public ::testing::Test {
@@ -255,35 +248,6 @@ TEST_F(PasswordReuseDetectionManagerTest,
                            /*domain=*/std::string(),
                            /*reused_password_hash=*/0);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PasswordReuseDetectionManagerTest,
-       CheckReusedCalledWithUncommittedText) {
-  EXPECT_CALL(client_, GetPasswordReuseManager())
-      .WillRepeatedly(testing::Return(&reuse_manager_));
-  PasswordReuseDetectionManager manager(&client_);
-  GURL test_url("https://www.example.com");
-  manager.DidNavigateMainFrame(test_url);
-
-  std::u16string init_text = u"init_text";
-  std::u16string uncommitted_text = u"uncommitted_text";
-  std::u16string committed_text = u"committed_text";
-
-  EXPECT_CALL(reuse_manager_,
-              CheckReuse(init_text, test_url.DeprecatedGetOriginAsURL().spec(),
-                         &manager));
-  manager.OnKeyPressedCommitted(init_text);
-  EXPECT_CALL(reuse_manager_,
-              CheckReuse(init_text + uncommitted_text,
-                         test_url.DeprecatedGetOriginAsURL().spec(), &manager));
-  manager.OnKeyPressedUncommitted(uncommitted_text);
-  // Uncommitted text should not be stored.
-  EXPECT_CALL(reuse_manager_,
-              CheckReuse(init_text + committed_text,
-                         test_url.DeprecatedGetOriginAsURL().spec(), &manager));
-  manager.OnKeyPressedCommitted(committed_text);
-}
-#endif
 
 TEST_F(PasswordReuseDetectionManagerTest, MultipleReuseChecks) {
   PasswordReuseDetectionManager manager(&client_);

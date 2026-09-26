@@ -73,10 +73,8 @@ base::Value GetProcessValueDict(const base::Process& process) {
 #if !BUILDFLAG(IS_APPLE)
     ret.Set("priority", base::ProcessPriorityToString(process.GetPriority()));
 #endif
-#if !BUILDFLAG(IS_ANDROID)
     ret.Set("creation_time",
             base::TimeFormatTimeOfDayWithMilliseconds(process.CreationTime()));
-#endif
   } else {
     ret.Set("is_valid", false);
   }

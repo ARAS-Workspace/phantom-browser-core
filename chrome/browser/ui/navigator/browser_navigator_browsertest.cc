@@ -1664,7 +1664,6 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
             browser()->tab_strip_model()->GetActiveWebContents()->GetURL());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
                        NavigateFromPageInfoToSiteSettingsInNewTab) {
   content::WebContents* web_contents =
@@ -1703,7 +1702,6 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
                 ->GetActiveWebContents()
                 ->GetLastCommittedURL());
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
                        NavigateFromOtherTabToSingletonOptions) {

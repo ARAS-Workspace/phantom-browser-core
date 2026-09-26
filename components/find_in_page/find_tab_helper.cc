@@ -143,19 +143,6 @@ std::u16string FindTabHelper::GetInitialSearchText() {
                    : std::u16string();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void FindTabHelper::ActivateNearestFindResult(float x, float y) {
-  if (!find_op_aborted_ && !find_text_.empty()) {
-    GetWebContents().ActivateNearestFindResult(x, y);
-  }
-}
-
-void FindTabHelper::RequestFindMatchRects(int current_version) {
-  if (!find_op_aborted_ && !find_text_.empty())
-    GetWebContents().RequestFindMatchRects(current_version);
-}
-#endif
-
 void FindTabHelper::HandleFindReply(int request_id,
                                     int number_of_matches,
                                     const gfx::Rect& selection_rect,

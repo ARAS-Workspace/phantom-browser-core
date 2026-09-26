@@ -16,7 +16,6 @@
 namespace policy {
 
 namespace {
-#if !BUILDFLAG(IS_ANDROID)
 // Duplicate the extension constants in order to avoid extension dependency.
 // However, those values below must be synced with files in extension folders.
 // In long term, we can refactor the code and create an interface for sensitive
@@ -37,14 +36,12 @@ const char kUpdateUrl[] = "update_url";
 
 // String to be prepended to each blocked entry.
 const char kBlockedExtensionPrefix[] = "[BLOCKED]";
-#endif
 
 void RecordInvalidPolicies(const std::string& policy_name) {
   const PolicyDetails* details = GetChromePolicyDetails(policy_name);
   base::UmaHistogramSparse("EnterpriseCheck.InvalidPolicies", details->id);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Marks the sensitive ExtensionInstallForceList policy entries, returns true if
 // there is any sensitive entries in the policy.
 bool FilterSensitiveExtensionsInstallForcelist(PolicyMap::Entry* map_entry) {
@@ -139,12 +136,10 @@ bool FilterSensitiveExtensionSettings(PolicyMap::Entry* map_entry) {
   }
   return !filtered_extensions.empty();
 }
-#endif
 }  // namespace
 
 void FilterSensitivePolicies(PolicyMap* policy) {
   int invalid_policies = 0;
-#if !BUILDFLAG(IS_ANDROID)
   if (FilterSensitiveExtensionsInstallForcelist(
           policy->GetMutable(key::kExtensionInstallForcelist))) {
     invalid_policies++;
@@ -153,7 +148,6 @@ void FilterSensitivePolicies(PolicyMap* policy) {
           policy->GetMutable(key::kExtensionSettings))) {
     invalid_policies++;
   }
-#endif
   for (const char* sensitive_policy : GetSensitivePolicies()) {
     if (policy->Get(sensitive_policy)) {
       policy->GetMutable(sensitive_policy)->SetBlocked();

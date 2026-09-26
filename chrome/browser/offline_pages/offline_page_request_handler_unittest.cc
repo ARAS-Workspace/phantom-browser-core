@@ -55,9 +55,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace offline_pages {
 
 namespace {
@@ -382,14 +379,6 @@ class OfflinePageRequestHandlerTest : public testing::Test {
   bool is_offline_page_set_in_navigation_data_;
   OfflinePageItem page_;
   OfflinePageHeader offline_page_header_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // OfflinePageTabHelper instantiates PrefetchService which in turn requests a
-  // fresh GCM token automatically. This causes the request to be done
-  // synchronously instead of with a posted task.
-  instance_id::InstanceIDAndroid::ScopedBlockOnAsyncTasksForTesting
-      block_async_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // These are not thread-safe. But they can be used in the pattern that
   // setting the state is done first from one thread and reading this state

@@ -130,15 +130,6 @@ bool FrameSinkImpl::BindToClient(FrameSinkImplClient* client) {
 
   frame_sink_ = frame_sink_remote_.get();
 
-#if BUILDFLAG(IS_ANDROID)
-  std::vector<viz::Thread> threads;
-  threads.push_back(
-      {base::PlatformThread::CurrentId(), viz::Thread::Type::kMain});
-  if (io_thread_id_ != base::kInvalidThreadId) {
-    threads.push_back({io_thread_id_, viz::Thread::Type::kIO});
-  }
-  frame_sink_->SetThreads(threads);
-#endif
   return true;
 }
 

@@ -42,23 +42,4 @@ IN_PROC_BROWSER_TEST_F(InteractionMediaQueriesDynamicTest,
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-// On Android, when the primary pointer is touchscreen/coarse, primary hover is
-// forced to "none" (see crbug.com/41445959). Validate this dynamic update path.
-IN_PROC_BROWSER_TEST_F(InteractionMediaQueriesDynamicTest,
-                       PointerMediaQueriesDynamicAndroid) {
-  std::optional<ui::ScopedSetPointerAndHoverTypesForTesting> scoper(
-      std::in_place, ui::POINTER_TYPE_NONE, ui::HOVER_TYPE_NONE);
-  SlowWebPreferenceCache::GetInstance()->OnInputDeviceConfigurationChanged(0);
-  EXPECT_TRUE(NavigateToURL(
-      shell(), GetTestUrl("", "interaction-mq-dynamic-android.html")));
-
-  static constexpr std::u16string_view kSuccessTitle = u"SUCCESS";
-  TitleWatcher title_watcher(shell()->web_contents(), kSuccessTitle);
-  scoper.emplace(ui::POINTER_TYPE_COARSE, ui::HOVER_TYPE_HOVER);
-  SlowWebPreferenceCache::GetInstance()->OnInputDeviceConfigurationChanged(0);
-  EXPECT_EQ(kSuccessTitle, title_watcher.WaitAndGetTitle());
-}
-#endif
-
 }  //  namespace content

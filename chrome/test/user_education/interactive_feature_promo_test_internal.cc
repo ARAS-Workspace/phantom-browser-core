@@ -246,11 +246,9 @@ InteractiveFeaturePromoTestPrivate::CreateMockTracker(
           });
   EXPECT_CALL(*mock_tracker, WouldTriggerHelpUI)
       .WillRepeatedly(testing::Return(true));
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(*mock_tracker, ListEvents)
       .WillRepeatedly(
           testing::Return(feature_engagement::Tracker::EventList()));
-#endif
 
   // Because some features are enabled by default, ensure that anything other
   // than the specific feature being tested is rejected.

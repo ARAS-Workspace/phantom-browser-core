@@ -30,10 +30,6 @@
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/cdm/browser/media_drm_storage_impl.h"  // nogncheck crbug.com/40147906
-#endif
-
 using content::BrowserThread;
 
 SiteDataCountingHelper::SiteDataCountingHelper(
@@ -87,13 +83,6 @@ void SiteDataCountingHelper::CountAndDestroySelfWhenFinished() {
     // TODO(crbug.com/41348517): Enable session storage counting when deletion
     // is fixed.
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // Count origins with media licenses on Android.
-  tasks_ += 1;
-  Done(cdm::MediaDrmStorageImpl::GetOriginsModifiedBetween(profile_->GetPrefs(),
-                                                           begin_, end_));
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
   tasks_ += 1;

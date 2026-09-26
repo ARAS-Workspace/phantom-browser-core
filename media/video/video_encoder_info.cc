@@ -63,15 +63,6 @@ bool operator==(const VideoEncoderInfo& lhs, const VideoEncoderInfo& rhs) {
 bool VideoEncoderInfo::DoesSupportGpuSharedImages(
     gpu::SharedImageUsageSet usage,
     VideoPixelFormat format) const {
-#if BUILDFLAG(IS_ANDROID)
-  // Temporarily enforce VEA usage for shared images only on Android,
-  // before we had a chance to audit shared image sources and types
-  // on other platforms.
-  if (!usage.Has(gpu::SHARED_IMAGE_USAGE_VIDEO_ENCODE_ACCELERATOR)) {
-    return false;
-  }
-#endif
-
   if (!supports_gpu_shared_images) {
     return false;
   }

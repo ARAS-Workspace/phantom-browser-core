@@ -43,7 +43,7 @@ MULTIPROCESS_TEST_MAIN(InitFromSwitchValue) {
   //  - This doesn't apply on Apple platforms (which use Rendezvous Keys)
   //  - On Android the global descriptor table is managed by the launcher
   //    service, so we don't have to manually update the mapping here.
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   GlobalDescriptors::GetInstance()->Set(
       kArbitraryDescriptorKey,
       kArbitraryDescriptorKey + GlobalDescriptors::kBaseDescriptor);
@@ -126,11 +126,9 @@ TEST_P(SharedMemorySwitchTest, PassViaSwitch) {
   launch_options.fds_to_remap.emplace_back(
       shared_memory_switch.out_descriptor_to_share.get(),
       kArbitraryDescriptorKey);
-#if !BUILDFLAG(IS_ANDROID)
   for (auto& pair : launch_options.fds_to_remap) {
     pair.second += base::GlobalDescriptors::kBaseDescriptor;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
 
   // Launch the child process.

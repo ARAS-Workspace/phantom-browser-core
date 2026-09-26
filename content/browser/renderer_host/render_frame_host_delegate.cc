@@ -85,12 +85,6 @@ SurfaceEmbedConnector* RenderFrameHostDelegate::GetSurfaceEmbedConnector()
   return nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameHostDelegate::GetNFC(
-    RenderFrameHostImpl* render_frame_host,
-    mojo::PendingReceiver<device::mojom::NFC> receiver) {}
-#endif
-
 bool RenderFrameHostDelegate::CanEnterFullscreenMode(
     RenderFrameHostImpl* requesting_frame) {
   return true;
@@ -101,11 +95,9 @@ void RenderFrameHostDelegate::FullscreenStateChanged(
     bool is_fullscreen,
     blink::mojom::FullscreenOptionsPtr options) {}
 
-#if !BUILDFLAG(IS_ANDROID)
 bool RenderFrameHostDelegate::CanUseWindowingControls(RenderFrameHostImpl*) {
   return false;
 }
-#endif
 
 bool RenderFrameHostDelegate::IsInnerWebContentsForGuest() {
   return false;
@@ -139,13 +131,6 @@ bool RenderFrameHostDelegate::ShouldAllowRunningInsecureContent(
     const GURL& resource_url) {
   return false;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-RenderFrameHostDelegate::GetJavaRenderFrameHostDelegate() {
-  return nullptr;
-}
-#endif
 
 Visibility RenderFrameHostDelegate::GetVisibility() {
   return Visibility::HIDDEN;

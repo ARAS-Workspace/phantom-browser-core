@@ -1578,7 +1578,6 @@ TEST_F(HistoryBackendTest, SetPageTitleFiresNotificationWithCorrectDetails) {
 }
 
 // There's no importer on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(HistoryBackendTest, ImportedFaviconsTest) {
   // Setup test data - two Urls in the history, one with favicon assigned and
   // one without.
@@ -1653,7 +1652,6 @@ TEST_F(HistoryBackendTest, ImportedFaviconsTest) {
   EXPECT_NE(0, backend_->db_->GetRowForURL(url3, &url_row3));
   EXPECT_EQ(0, url_row3.visit_count());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(HistoryBackendTest, StripUsernamePasswordTest) {
   ASSERT_TRUE(backend_.get());

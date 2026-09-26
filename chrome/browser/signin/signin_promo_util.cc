@@ -28,11 +28,9 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "net/base/network_change_notifier.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
 #include "components/sync/service/sync_prefs.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/sync/extension_sync_util.h"

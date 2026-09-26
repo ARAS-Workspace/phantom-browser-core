@@ -141,7 +141,6 @@ TEST_F(FakeFidoDiscoveryTest, AddDevice) {
   ::testing::Mock::VerifyAndClearExpectations(&observer);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(FakeFidoDiscoveryFactoryTest, ForgesUsbFactoryFunction) {
   auto* injected_fake_discovery =
       fake_fido_discovery_factory_.ForgeNextHidDiscovery();
@@ -153,7 +152,6 @@ TEST_F(FakeFidoDiscoveryFactoryTest, ForgesUsbFactoryFunction) {
   ASSERT_EQ(produced_discoveries.size(), 1u);
   EXPECT_EQ(injected_fake_discovery, produced_discoveries[0].get());
 }
-#endif
 
 }  // namespace test
 }  // namespace device

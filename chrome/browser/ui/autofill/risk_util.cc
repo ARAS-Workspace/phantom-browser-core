@@ -29,7 +29,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -37,7 +36,6 @@
 #include "extensions/browser/app_window/app_window.h"
 #include "extensions/browser/app_window/native_app_window.h"
 #include "ui/base/base_window.h"
-#endif
 
 namespace autofill::risk_util {
 
@@ -50,7 +48,6 @@ void PassRiskData(base::OnceCallback<void(const std::string&)> callback,
   std::move(callback).Run(base::Base64Encode(proto_data));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Returns the containing window for the given |web_contents|. The containing
 // window might be a browser window for a Chrome tab, or it might be an app
 // window for a platform app.
@@ -68,7 +65,6 @@ ui::BaseWindow* GetBaseWindowForWebContents(
           native_window);
   return app_window ? app_window->GetBaseWindow() : nullptr;
 }
-#endif
 
 }  // namespace
 
@@ -79,11 +75,9 @@ void LoadRiskData(uint64_t obfuscated_gaia_id,
   // useful anyway (given that we're also including the bounds of the web
   // contents).
   gfx::Rect window_bounds;
-#if !BUILDFLAG(IS_ANDROID)
   if (ui::BaseWindow* base_window = GetBaseWindowForWebContents(web_contents)) {
     window_bounds = base_window->GetBounds();
   }
-#endif
 
   PrefService* user_prefs =
       Profile::FromBrowserContext(web_contents->GetBrowserContext())

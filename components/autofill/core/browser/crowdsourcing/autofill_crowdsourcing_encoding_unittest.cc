@@ -265,7 +265,6 @@ void AddFieldOverrideToForm(
       form_suggestion);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Creates the override specification passed as a parameter to
 // `features::debug::kAutofillOverridePredictions`.
 std::string CreateManualOverridePrediction(
@@ -288,7 +287,6 @@ std::string CreateManualOverridePrediction(
   }
   return base::JoinString(override_specs, "-");
 }
-#endif
 
 void ParseRationalizeAndSection(FormStructure& form) {
   const RegexPredictions regex_predictions = DetermineRegexTypes(
@@ -3300,7 +3298,6 @@ TEST_F(AutofillCrowdsourcingEncoding,
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that manually specified (i.e. passed as a feature parameter) field type
 // predictions override server predictions.
 TEST_F(AutofillCrowdsourcingEncoding, ParseQueryResponse_WithManualOverrides) {
@@ -3735,7 +3732,6 @@ TEST_F(AutofillCrowdsourcingEncoding,
               ElementsAre(EqualsPrediction(PASSWORD,
                                            FieldPrediction::SOURCE_OVERRIDE)));
 }
-#endif
 
 // Tests parsing the server predictions when the payload cannot be parsed
 // to an AutofillQueryResponse where we expect an early return of the function.

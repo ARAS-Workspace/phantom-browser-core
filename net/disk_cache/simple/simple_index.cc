@@ -277,26 +277,6 @@ SimpleIndex::~SimpleIndex() {
 void SimpleIndex::Initialize(base::Time cache_mtime) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-#if BUILDFLAG(IS_ANDROID)
-  if (app_status_listener_getter_) {
-    base::android::ApplicationStatusListener* listener =
-        app_status_listener_getter_.Run();
-    if (listener) {
-      listener->SetCallback(
-          base::BindRepeating(&SimpleIndex::OnApplicationStateChange,
-                              weak_ptr_factory_.GetWeakPtr()));
-    }
-    // Not using the fallback on purpose here --- if the getter is set, we may
-    // be in a process where the base::android::ApplicationStatusListener::New
-    // impl is unavailable.
-    // (See https://crbug.com/881572)
-  } else if (base::android::IsJavaAvailable()) {
-    owned_app_status_listener_ = base::android::ApplicationStatusListener::New(
-        base::BindRepeating(&SimpleIndex::OnApplicationStateChange,
-                            weak_ptr_factory_.GetWeakPtr()));
-  }
-#endif
-
   auto load_result = std::make_unique<SimpleIndexLoadResult>();
   auto* load_result_ptr = load_result.get();
   index_file_->LoadIndexEntries(
@@ -698,22 +678,6 @@ void SimpleIndex::MergeInitializingSet(
   }
   to_run_when_initialized_.clear();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void SimpleIndex::OnApplicationStateChange(
-    base::android::ApplicationState state) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  // For more info about android activities, see:
-  // developer.android.com/training/basics/activity-lifecycle/pausing.html
-  if (state == base::android::APPLICATION_STATE_HAS_RUNNING_ACTIVITIES) {
-    app_on_background_ = false;
-  } else if (state ==
-      base::android::APPLICATION_STATE_HAS_STOPPED_ACTIVITIES) {
-    app_on_background_ = true;
-    WriteToDisk(INDEX_WRITE_REASON_ANDROID_STOPPED);
-  }
-}
-#endif
 
 void SimpleIndex::WriteToDisk(IndexWriteToDiskReason reason) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);

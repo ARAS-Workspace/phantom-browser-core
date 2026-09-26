@@ -37,11 +37,9 @@
 #include "ui/base/ui_base_features.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/extension_ui_util.h"
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/vector_icons/vector_icons.h"     // nogncheck
-#endif
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
 #include "chrome/browser/offline_pages/offline_page_utils.h"
@@ -177,7 +175,6 @@ ChromeLocationBarModelDelegate::GetCertificate() const {
 
 const gfx::VectorIcon* ChromeLocationBarModelDelegate::GetVectorIconOverride()
     const {
-#if !BUILDFLAG(IS_ANDROID)
   GURL url;
   GetURL(&url);
 
@@ -197,7 +194,6 @@ const gfx::VectorIcon* ChromeLocationBarModelDelegate::GetVectorIconOverride()
                  ? vector_icons::kChromeExtensionIcon
                  : vector_icons::kExtensionChromeRefreshOldIcon);
   }
-#endif
 
   return nullptr;
 }

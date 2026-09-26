@@ -38,13 +38,11 @@
 #include "ui/gfx/font_util.h"
 #include "ui/gl/test/gl_surface_test_support.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/auto_reset.h"
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
 #include "chrome/browser/apps/app_service/publishers/publisher_host_factory_impl.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_trust_checker.h"
 #include "components/web_package/signed_web_bundles/signed_web_bundle_id.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/common/initialize_extensions_client.h"
@@ -70,13 +68,11 @@ class ChromeUnitTestSuiteInitializer : public testing::EmptyTestEventListener {
 
   void OnTestStart(const testing::TestInfo& test_info) override {
     TestingBrowserProcess::CreateInstance();
-#if !BUILDFLAG(IS_ANDROID)
     // Injects global publisher factory for unit_tests.
     // TODO(crbug.com/441649482): Consider better testing approach.
     publisher_host_factory_resetter_ =
         apps::AppServiceProxyFactory::GetInstance()->SetPublisherHostFactory(
             std::make_unique<apps::PublisherHostFactoryImpl>());
-#endif
     // Make sure the loaded locale is "en-US".
     if (ui::ResourceBundle::GetSharedInstance().GetLoadedLocale() !=
         kDefaultLocale) {
@@ -102,19 +98,13 @@ class ChromeUnitTestSuiteInitializer : public testing::EmptyTestEventListener {
           << "Use content::ScopedAccessibilityModeOverride or otherwise ensure "
              "that accessibility is disabled at the end of your test.";
     }
-#if !BUILDFLAG(IS_ANDROID)
     web_app::SetTrustedWebBundleIdsForTesting({});
-#endif  // !BUILDFLAG(IS_ANDROID)
     browser_shutdown::ResetShutdownGlobalsForTesting();
-#if !BUILDFLAG(IS_ANDROID)
     publisher_host_factory_resetter_.reset();
-#endif
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   std::optional<base::AutoReset<std::unique_ptr<apps::PublisherHostFactory>>>
       publisher_host_factory_resetter_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace

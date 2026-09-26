@@ -33,11 +33,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "ui/gfx/range/range.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_observer.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -286,29 +281,6 @@ ExtensionFunction::ResponseAction TabGroupsUpdateFunction::Run() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if BUILDFLAG(IS_ANDROID)
-// Helper class to observe for tab group creation notifications. Used on Android
-// because cross-window tab group moves are asynchronous.
-class TabGroupsMoveFunction::ObserverHelper : public TabModelObserver {
- public:
-  ObserverHelper(TabGroupsMoveFunction* owner, TabModel* tab_model)
-      : owner_(owner), tab_model_(tab_model) {
-    tab_model_->AddObserver(this);
-  }
-
-  ~ObserverHelper() override { tab_model_->RemoveObserver(this); }
-
-  // TabModelObserver:
-  void OnTabGroupCreated(tab_groups::TabGroupId group_id) override {
-    owner_->OnTabGroupCreated(group_id);
-  }
-
- private:
-  raw_ptr<TabGroupsMoveFunction> owner_;
-  raw_ptr<TabModel> tab_model_;
-};
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TabGroupsMoveFunction::TabGroupsMoveFunction() = default;
 
 TabGroupsMoveFunction::~TabGroupsMoveFunction() = default;
@@ -330,15 +302,6 @@ ExtensionFunction::ResponseAction TabGroupsMoveFunction::Run() {
   if (!group_moved) {
     return RespondNow(Error(std::move(error)));
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (cross_window) {
-    // Cross window group moves are asynchronous on Android. OnTabGroupCreated()
-    // will be called later when the group is created in the new window.
-    AddRef();  // Balanced in OnTabGroupCreated().
-    return RespondLater();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   if (!has_callback()) {
     return RespondNow(NoArguments());
@@ -421,19 +384,6 @@ bool TabGroupsMoveFunction::MoveGroup(int group_id,
     // If windowId is different from the current window, move between windows.
     if (target_browser != source_browser) {
       *cross_window = true;
-#if BUILDFLAG(IS_ANDROID)
-      // Observe for OnTabGroupCreated() notifications, because cross-window
-      // moves are asynchronous on Android.
-      TabModel* target_tab_model =
-          TabModelList::FindTabModelWithWindowSessionId(
-              target_browser->GetSessionID());
-      if (!target_tab_model) {
-        *error = ExtensionTabUtil::kTabStripDoesNotSupportTabGroupsError;
-        return false;
-      }
-      observer_helper_ =
-          std::make_unique<ObserverHelper>(this, target_tab_model);
-#endif  // BUILDFLAG(IS_ANDROID)
       return MoveTabGroupBetweenBrowsers(source_browser, target_browser, *group,
                                          visual_data, tabs, new_index, error);
     }
@@ -515,17 +465,5 @@ bool TabGroupsMoveFunction::MoveTabGroupBetweenBrowsers(
 
   return true;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void TabGroupsMoveFunction::OnTabGroupCreated(tab_groups::TabGroupId group_id) {
-  observer_helper_.reset();
-
-  auto group_object = ExtensionTabUtil::CreateTabGroupObject(group_id);
-  CHECK(group_object);
-  Respond(ArgumentList(api::tab_groups::Get::Results::Create(*group_object)));
-
-  Release();  // Balanced in MoveGroup().
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions

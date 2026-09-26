@@ -58,10 +58,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/mojom/loader/referrer.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/messages/android/mock_message_dispatcher_bridge.h"
-#endif
-
 namespace subresource_filter {
 
 namespace {
@@ -221,12 +217,6 @@ class SafeBrowsingPageActivationThrottleTest
 
     observer_ = std::make_unique<TestSubresourceFilterObserver>(contents);
 
-#if BUILDFLAG(IS_ANDROID)
-    message_dispatcher_bridge_.SetMessagesEnabledForEmbedder(true);
-    messages::MessageDispatcherBridge::SetInstanceForTesting(
-        &message_dispatcher_bridge_);
-#endif
-
     throttle_inserter_ =
         std::make_unique<content::TestNavigationThrottleInserter>(
             content::RenderViewHostTestHarness::web_contents(),
@@ -255,10 +245,6 @@ class SafeBrowsingPageActivationThrottleTest
     fake_safe_browsing_database_ = nullptr;
 
     content::RenderViewHostTestHarness::TearDown();
-
-#if BUILDFLAG(IS_ANDROID)
-    messages::MessageDispatcherBridge::SetInstanceForTesting(nullptr);
-#endif
   }
 
   TestSubresourceFilterObserver* observer() { return observer_.get(); }
@@ -388,10 +374,6 @@ class SafeBrowsingPageActivationThrottleTest
   }
 
  protected:
-#if BUILDFLAG(IS_ANDROID)
-  messages::MockMessageDispatcherBridge message_dispatcher_bridge_;
-#endif
-
  private:
   testing::ScopedSubresourceFilterConfigurator scoped_configuration_;
 
@@ -603,9 +585,6 @@ TEST_F(SafeBrowsingPageActivationThrottleTest, NavigationFails_NoActivation) {
 TEST_F(SafeBrowsingPageActivationThrottleTest, NotificationVisibility) {
   GURL url(kURL);
   ConfigureForMatch(url);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   content::RenderFrameHost* rfh = SimulateNavigateAndCommit({url}, main_rfh());
 
   EXPECT_FALSE(CreateAndNavigateDisallowedSubframe(rfh));
@@ -736,9 +715,6 @@ TEST_F(SafeBrowsingPageActivationThrottleTest, ToggleForceActivation) {
   const GURL url("https://example.test/");
 
   // Navigate initially, should be no activation.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage).Times(0);
-#endif
   SimulateNavigateAndCommit({url}, main_rfh());
   EXPECT_TRUE(CreateAndNavigateDisallowedSubframe(main_rfh()));
 
@@ -748,9 +724,6 @@ TEST_F(SafeBrowsingPageActivationThrottleTest, ToggleForceActivation) {
       kSubresourceFilterActionsHistogram,
       subresource_filter::SubresourceFilterAction::kForcedActivationEnabled, 1);
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   SimulateNavigateAndCommit({url}, main_rfh());
   EXPECT_FALSE(CreateAndNavigateDisallowedSubframe(main_rfh()));
 
@@ -778,9 +751,6 @@ TEST_F(SafeBrowsingPageActivationThrottleTest,
   base::HistogramTester histogram_tester;
   devtools_interaction_tracker->ToggleForceActivation(true);
   const GURL url("https://example.test/");
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage);
-#endif
   SimulateNavigateAndCommit({url}, main_rfh());
   devtools_interaction_tracker->ToggleForceActivation(false);
 

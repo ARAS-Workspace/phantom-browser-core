@@ -45,10 +45,8 @@
 #include "components/prefs/pref_service.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/browser/reporting/report_generator.h"
 #include "components/enterprise/browser/reporting/report_scheduler.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace policy {
 

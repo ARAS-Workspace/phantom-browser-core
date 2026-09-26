@@ -27,110 +27,7 @@
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_string.h"
-#include "base/android/scoped_java_ref.h"
-#include "base/i18n/language_tag.h"
-#include "base/i18n/tag_converters.h"
-#include "chrome/browser/language/android/language_bridge.h"
-#include "components/language/core/common/language_experiments.h"
-
-using language::ULPMetricsLogger;
-#endif
-
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-// Records per-initialization ULP-related metrics.
-void RecordULPInitMetrics(
-    PrefService* pref_service,
-    const language::UrlLanguageHistogram& page_language_histogram,
-    const std::vector<base::i18n::LanguageTag>& ulp_languages) {
-  language::ULPMetricsLogger logger;
-
-  logger.RecordInitiationLanguageCount(ulp_languages.size());
-
-  const std::string app_locale = g_browser_process->GetApplicationLocale();
-  logger.RecordInitiationUILanguageInULP(
-      ULPMetricsLogger::DetermineLanguageStatus(app_locale, ulp_languages));
-
-  const std::string target_language =
-      language::LanguagePrefs(pref_service).GetRecentTargetLanguage();
-  logger.RecordInitiationTranslateTargetInULP(
-      ULPMetricsLogger::DetermineLanguageStatus(target_language,
-                                                ulp_languages));
-
-  std::vector<std::string> accept_languages;
-  language::LanguagePrefs(pref_service)
-      .GetAcceptLanguagesList(&accept_languages);
-
-  language::ULPLanguageStatus accept_language_status =
-      language::ULPLanguageStatus::kLanguageEmpty;
-  if (accept_languages.size() > 0) {
-    accept_language_status = ULPMetricsLogger::DetermineLanguageStatus(
-        accept_languages[0], ulp_languages);
-  }
-  logger.RecordInitiationTopAcceptLanguageInULP(accept_language_status);
-
-  logger.RecordInitiationAcceptLanguagesULPOverlap(
-      ULPMetricsLogger::LanguagesOverlapRatio(accept_languages, ulp_languages));
-
-  std::vector<std::string> never_languages_not_in_ulp =
-      ULPMetricsLogger::RemoveULPLanguages(
-          language::LanguagePrefs(pref_service).GetNeverTranslateLanguages(),
-          ulp_languages);
-  logger.RecordInitiationNeverLanguagesMissingFromULP(
-      never_languages_not_in_ulp);
-  logger.RecordInitiationNeverLanguagesMissingFromULPCount(
-      never_languages_not_in_ulp.size());
-
-  std::vector<std::string> page_languages;
-  for (const language::UrlLanguageHistogram::LanguageInfo& language_info :
-       page_language_histogram.GetTopLanguages()) {
-    page_languages.emplace_back(language_info.language_code);
-  }
-  logger.RecordInitiationAcceptLanguagesPageLanguageOverlap(
-      ULPMetricsLogger::LanguagesOverlapRatio(page_languages, ulp_languages));
-  std::vector<std::string> page_languages_not_in_ulp =
-      ULPMetricsLogger::RemoveULPLanguages(page_languages, ulp_languages);
-  logger.RecordInitiationPageLanguagesMissingFromULP(page_languages_not_in_ulp);
-  logger.RecordInitiationPageLanguagesMissingFromULPCount(
-      page_languages_not_in_ulp.size());
-}
-
-void CreateAndAddULPLanguageModel(
-    Profile* profile,
-    std::vector<base::i18n::LanguageTag> languages) {
-  PrefService* pref_service = profile->GetPrefs();
-  language::UrlLanguageHistogram* page_languages =
-      UrlLanguageHistogramFactory::GetForBrowserContext(profile);
-
-  std::vector<std::string> lang_strings;
-  lang_strings.reserve(languages.size());
-  for (const auto& tag : languages) {
-    lang_strings.push_back(std::string(tag.tag_string()));
-  }
-
-  RecordULPInitMetrics(pref_service, *page_languages, languages);
-  language::LanguagePrefs(pref_service).SetULPLanguages(languages);
-
-  std::unique_ptr<language::ULPLanguageModel> ulp_model =
-      std::make_unique<language::ULPLanguageModel>();
-
-  int score_divisor = 1;
-  for (const std::string& lang : lang_strings) {
-    // List of languages is already ordered by preference, generate scores
-    // accordingly.
-    ulp_model->AddULPLanguage(lang, 1.0f / score_divisor);
-    score_divisor++;
-  }
-
-  language::LanguageModelManager* manager =
-      LanguageModelManagerFactory::GetForBrowserContext(profile);
-  manager->AddModel(language::LanguageModelManager::ModelType::ULP,
-                    std::move(ulp_model));
-}
-#endif
 
 void PrepareLanguageModels(Profile* const profile,
                            language::LanguageModelManager* const manager) {
@@ -151,15 +48,6 @@ void PrepareLanguageModels(Profile* const profile,
 
   // On Android, additionally create a ULPLanguageModel and populate it with
   // ULP data if not disabled.
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(language::kGmsCoreUlp)) {
-    base::ThreadPool::PostTaskAndReplyWithResult(
-        FROM_HERE, {base::MayBlock()},
-        base::BindOnce(&language::LanguageBridge::GetULPLanguagesFromDevice,
-                       profile->GetProfileUserName()),
-        base::BindOnce(&CreateAndAddULPLanguageModel, profile));
-  }
-#endif
 }
 
 }  // namespace

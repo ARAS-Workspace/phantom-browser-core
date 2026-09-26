@@ -41,12 +41,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/java_handler_thread.h"
-#include "base/android/jni_android.h"
-#include "base/test/android/java_handler_thread_helpers.h"
-#endif
-
 using ::testing::IsNull;
 using ::testing::NotNull;
 
@@ -333,10 +327,6 @@ class SingleThreadTaskExecutorTypedTest
         return "UI_pump";
       case MessagePumpType::CUSTOM:
         break;
-#if BUILDFLAG(IS_ANDROID)
-      case MessagePumpType::JAVA:
-        break;
-#endif  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_APPLE)
       case MessagePumpType::NS_RUNLOOP:
         break;

@@ -26,23 +26,6 @@
 #include "third_party/blink/public/common/mediastream/media_stream_request.h"
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(ENABLE_ARCORE)
-#include "chrome/browser/android/vr/ar_jni_headers/ArCompositorDelegateProviderImpl_jni.h"
-#include "components/webxr/android/ar_compositor_delegate_provider.h"
-#include "components/webxr/android/arcore_device_provider.h"
-#include "components/webxr/android/arcore_install_helper.h"
-#endif  // BUILDFLAG(ENABLE_ARCORE)
-#if BUILDFLAG(ENABLE_CARDBOARD)
-#include "chrome/browser/android/vr/vr_jni_headers/VrCompositorDelegateProviderImpl_jni.h"
-#include "components/webxr/android/cardboard_device_provider.h"
-#include "components/webxr/android/vr_compositor_delegate_provider.h"
-#endif  // BUILDFLAG(ENABLE_CARDBOARD)
-#if BUILDFLAG(ENABLE_OPENXR)
-#include "components/webxr/android/openxr_device_provider.h"
-#endif  // BUILDFLAG(ENABLE_OPENXR)
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 constexpr char kWebXrVideoCaptureDeviceId[] = "WebXRVideoCaptureDevice:-1";
@@ -94,30 +77,6 @@ class CameraIndicationObserver : public content::BrowserXRRuntime::Observer {
   std::unique_ptr<content::MediaStreamUI> ui_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-bool HasForcedRuntime(const base::CommandLine* command_line) {
-  return command_line->HasSwitch(switches::kWebXrForceRuntime);
-}
-
-// Helper method to validate if a runtime is forced-enabled by the command line.
-// This can be used to override a feature check.
-bool IsForcedByCommandLine(const base::CommandLine* command_line,
-                           const std::string& name) {
-  if (command_line->HasSwitch(switches::kWebXrForceRuntime)) {
-    return (base::CompareCaseInsensitiveASCII(
-                command_line->GetSwitchValueASCII(switches::kWebXrForceRuntime),
-                name) == 0);
-  }
-
-  return false;
-}
-
-bool IsOtherRuntimeForced(const base::CommandLine* command_line,
-                          const std::string& name) {
-  return HasForcedRuntime(command_line) &&
-         !IsForcedByCommandLine(command_line, name);
-}
-#endif
 }  // namespace
 
 namespace vr {
@@ -138,44 +97,6 @@ ChromeXrIntegrationClient::GetInstallHelper(
 content::XRProviderList ChromeXrIntegrationClient::GetAdditionalProviders() {
   content::XRProviderList providers;
 
-#if BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(ENABLE_OPENXR)
-  if (IsForcedByCommandLine(base::CommandLine::ForCurrentProcess(),
-                            switches::kWebXrRuntimeOpenXr) ||
-      (device::features::IsOpenXrEnabled() &&
-       !IsOtherRuntimeForced(base::CommandLine::ForCurrentProcess(),
-                             switches::kWebXrRuntimeOpenXr))) {
-    providers.emplace_back(std::make_unique<webxr::OpenXrDeviceProvider>());
-  }
-#endif  // BUILDFLAG(ENABLE_OPENXR)
-#if BUILDFLAG(ENABLE_CARDBOARD)
-  if (!IsOtherRuntimeForced(base::CommandLine::ForCurrentProcess(),
-                            switches::kWebXrRuntimeCardboard)) {
-    base::android::ScopedJavaLocalRef<jobject>
-        j_vr_compositor_delegate_provider =
-            vr::Java_VrCompositorDelegateProviderImpl_Constructor(
-                base::android::AttachCurrentThread());
-
-    providers.emplace_back(std::make_unique<webxr::CardboardDeviceProvider>(
-        std::make_unique<webxr::VrCompositorDelegateProvider>(
-            std::move(j_vr_compositor_delegate_provider))));
-  }
-#endif  // BUILDFLAG(ENABLE_CARDBOARD)
-#if BUILDFLAG(ENABLE_ARCORE)
-  if (!IsOtherRuntimeForced(base::CommandLine::ForCurrentProcess(),
-                            switches::kWebXrRuntimeArCore)) {
-    base::android::ScopedJavaLocalRef<jobject>
-        j_ar_compositor_delegate_provider =
-            vr::Java_ArCompositorDelegateProviderImpl_Constructor(
-                base::android::AttachCurrentThread());
-
-    providers.push_back(std::make_unique<webxr::ArCoreDeviceProvider>(
-        std::make_unique<webxr::ArCompositorDelegateProvider>(
-            std::move(j_ar_compositor_delegate_provider))));
-  }
-#endif  // BUILDFLAG(ENABLE_ARCORE)
-#endif  // BUILDFLAG(IS_ANDROID)
-
   return providers;
 }
 
@@ -192,12 +113,3 @@ std::unique_ptr<content::VrUiHost> ChromeXrIntegrationClient::CreateVrUiHost(
   return std::make_unique<VRUiHostImpl>(contents, views, std::move(overlay));
 }
 }  // namespace vr
-
-#if BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(ENABLE_ARCORE)
-DEFINE_JNI(ArCompositorDelegateProviderImpl)
-#endif  // BUILDFLAG(ENABLE_ARCORE)
-#if BUILDFLAG(ENABLE_CARDBOARD)
-DEFINE_JNI(VrCompositorDelegateProviderImpl)
-#endif  // BUILDFLAG(ENABLE_CARDBOARD)
-#endif  // BUILDFLAG(IS_ANDROID)

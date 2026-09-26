@@ -18,14 +18,12 @@
 
 // Android does not support //chrome/browser/web_applications, see
 // chrome/browser/web_applications/BUILD.gn.
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "components/webapps/common/web_app_id.h"
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"  // nogncheck
@@ -90,7 +88,6 @@ UrlIdentity CreateChromeExtensionIdentityFromUrl(Profile* profile,
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 UrlIdentity CreateIsolatedWebAppIdentityFromUrl(Profile* profile,
                                                 const GURL& url,
                                                 const FormatOptions& options) {
@@ -124,7 +121,6 @@ UrlIdentity CreateIsolatedWebAppIdentityFromUrl(Profile* profile,
               provider->registrar_unsafe().GetAppShortName(app_id.value())),
           false)};
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 UrlIdentity CreateFileIdentityFromUrl(Profile* profile,
                                       const GURL& url,
@@ -149,12 +145,10 @@ UrlIdentity UrlIdentity::CreateFromUrl(Profile* profile,
   }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
   if (url.SchemeIs(webapps::kIsolatedAppScheme)) {
     DCHECK(allowed_types.Has(Type::kIsolatedWebApp));
     return CreateIsolatedWebAppIdentityFromUrl(profile, url, options);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (url.SchemeIsFile()) {
     DCHECK(allowed_types.Has(Type::kFile));

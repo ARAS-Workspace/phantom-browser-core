@@ -95,16 +95,8 @@
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/http/http_content_disposition.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 namespace {
-#if BUILDFLAG(IS_ANDROID)
-// PDF MIME type.
-constexpr char kPdfMimeType[] = "application/pdf";
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // A SharedURLLoaderFactory that accepts CreateLoaderAndStart calls on the UI
 // thread and forwards them to the IO thread, where the wrapped
@@ -525,9 +517,6 @@ download::DownloadItemImpl* DownloadManagerImpl::CreateActiveItem(
       WebContentsImpl::FromRenderFrameHostID(global_id), global_id);
   if (delegate_) {
     delegate_->AttachExtraInfo(download);
-#if BUILDFLAG(IS_ANDROID)
-    download->set_is_from_external_app(delegate_->IsFromExternalApp(download));
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   return download;
@@ -899,41 +888,6 @@ void DownloadManagerImpl::OnNewDownloadIdRetrieved(
     download::DownloadUrlParameters::OnStartedCallback on_started,
     download::InProgressDownloadManager::StartDownloadItemCallback callback,
     uint32_t id) {
-#if BUILDFLAG(IS_ANDROID)
-  if (info->transient && info->allow_auto_open_after_completion &&
-      delegate_->ShouldOpenPdfInline() &&
-      base::EqualsCaseInsensitiveASCII(info->mime_type, kPdfMimeType)) {
-    if (IsOffTheRecord()) {
-      info->save_info->use_in_memory_file = true;
-    } else {
-      for (const auto& iter : downloads_by_guid_) {
-        download::DownloadItem* item = iter.second;
-        if (item->GetFileExternallyRemoved() ||
-            item->GetState() != download::DownloadItem::COMPLETE) {
-          continue;
-        }
-
-        if (item->GetMimeType() != kPdfMimeType ||
-            item->GetUrlChain() != info->url_chain) {
-          continue;
-        }
-
-        if (!item->IsTransient() || !item->AllowAutoOpenAfterCompletion()) {
-          continue;
-        }
-
-        disk_access_task_runner_->PostTaskAndReplyWithResult(
-            FROM_HERE,
-            base::BindOnce(&base::PathExists, item->GetTargetFilePath()),
-            base::BindOnce(&DownloadManagerImpl::CreateNewDownloadItemToStart,
-                           weak_factory_.GetWeakPtr(), std::move(info),
-                           std::move(on_started), std::move(callback), id,
-                           item->GetTargetFilePath()));
-        return;
-      }
-    }
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   CreateNewDownloadItemToStart(std::move(info), std::move(on_started),
                                std::move(callback), id, base::FilePath(),
                                false);
@@ -1373,16 +1327,6 @@ download::DownloadItem* DownloadManagerImpl::CreateDownloadItem(
       item->SetDelegate(this);
     }
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (target_path.IsContentUri()) {
-    base::FilePath android_display_name =
-        in_progress_manager_->GetDownloadDisplayName(target_path);
-    if (!android_display_name.empty())
-      item->SetDisplayName(android_display_name);
-    else
-      return nullptr;
-  }
-#endif
   download::DownloadItemImpl* download = item.get();
   DownloadItemUtils::AttachInfo(download, GetBrowserContext(), nullptr,
                                 GlobalRenderFrameHostId());
@@ -1604,13 +1548,6 @@ void DownloadManagerImpl::InterceptNavigationOnChecksComplete(
   }
 
   bool is_transient = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (!download::IsContentDispositionAttachmentInHead(*response_head)) {
-    is_transient = delegate_->ShouldOpenPdfInline() &&
-                   base::EqualsCaseInsensitiveASCII(response_head->mime_type,
-                                                    kPdfMimeType);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   StoragePartitionImpl* storage_partition =
       GetStoragePartitionForConfig(browser_context_, storage_partition_config);

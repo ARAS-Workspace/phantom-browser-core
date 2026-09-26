@@ -170,12 +170,6 @@ void TestingSpellCheckProvider::FillSuggestionList(const std::u16string&,
 
 #endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
-#if BUILDFLAG(IS_ANDROID)
-void TestingSpellCheckProvider::DisconnectSessionBridge() {
-  NOTREACHED();
-}
-#endif
-
 void TestingSpellCheckProvider::SetLastResults(
     const std::u16string last_request,
     std::vector<blink::WebTextCheckingResult>& last_results) {

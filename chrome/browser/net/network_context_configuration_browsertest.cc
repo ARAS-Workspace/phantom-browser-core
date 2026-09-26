@@ -1729,7 +1729,6 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationHttpPacBrowserTest, HttpPac) {
 }
 
 // TODO(crbug.com/494643383): Fails on some desktop Android bots.
-#if !BUILDFLAG(IS_ANDROID)
 // Make sure the system URLRequestContext can handle fetching PAC scripts from
 // file URLs.
 class NetworkContextConfigurationFilePacBrowserTest
@@ -1767,7 +1766,6 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationFilePacBrowserTest, FilePac) {
     return;
   TestProxyConfigured(false);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Make sure the system URLRequestContext can handle fetching PAC scripts from
 // data URLs.
@@ -2325,10 +2323,8 @@ INSTANTIATE_TEST_CASES_FOR_TEST_FIXTURE(
     NetworkContextConfigurationProxyOnStartBrowserTest);
 INSTANTIATE_TEST_CASES_FOR_TEST_FIXTURE(
     NetworkContextConfigurationHttpPacBrowserTest);
-#if !BUILDFLAG(IS_ANDROID)
 INSTANTIATE_TEST_CASES_FOR_TEST_FIXTURE(
     NetworkContextConfigurationFilePacBrowserTest);
-#endif
 INSTANTIATE_TEST_CASES_FOR_TEST_FIXTURE(
     NetworkContextConfigurationDataPacBrowserTest);
 INSTANTIATE_TEST_CASES_FOR_TEST_FIXTURE(

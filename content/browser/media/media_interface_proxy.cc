@@ -65,11 +65,6 @@
 #include "media/base/media_switches.h"
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/media/flinging_renderer.h"
-#include "media/mojo/services/mojo_renderer_service.h"  // nogncheck
-#endif
-
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 #include "media/base/media_switches.h"
 #include "mojo/public/cpp/bindings/message.h"
@@ -273,29 +268,6 @@ void MediaInterfaceProxy::CreateDefaultRenderer(
   if (factory)
     factory->CreateDefaultRenderer(audio_device_id, std::move(receiver));
 }
-
-
-#if BUILDFLAG(IS_ANDROID)
-void MediaInterfaceProxy::CreateFlingingRenderer(
-    const std::string& presentation_id,
-    mojo::PendingRemote<media::mojom::FlingingRendererClientExtension>
-        client_extension,
-    mojo::PendingReceiver<media::mojom::Renderer> receiver) {
-  DCHECK(thread_checker_.CalledOnValidThread());
-
-  std::unique_ptr<FlingingRenderer> flinging_renderer =
-      FlingingRenderer::Create(&render_frame_host(), presentation_id,
-                               std::move(client_extension));
-
-  if (!flinging_renderer)
-    return;
-
-  media::MojoRendererService::Create(nullptr, std::move(flinging_renderer),
-                                     std::move(receiver));
-}
-
-#endif
-
 
 void MediaInterfaceProxy::CreateCdm(const media::CdmConfig& cdm_config,
                                     CreateCdmCallback create_cdm_cb) {

@@ -10,10 +10,6 @@
 #include "components/allocation_recorder/internal/internal.h"
 #include "third_party/crashpad/crashpad/client/annotation.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/crash/core/app/crashpad.h"  // nogncheck
-#endif
-
 using allocation_recorder::internal::kAnnotationName;
 using allocation_recorder::internal::kAnnotationType;
 using base::debug::tracer::AllocationTraceRecorder;
@@ -56,10 +52,6 @@ void RegisterRecorderWithCrashpad(AllocationTraceRecorder& trace_recorder) {
 
   g_recorder_address = reinterpret_cast<uintptr_t>(&trace_recorder);
   g_recorder_address_annotation.SetSize(sizeof(g_recorder_address));
-
-#if BUILDFLAG(IS_ANDROID)
-  crash_reporter::AllowMemoryRange(&trace_recorder, sizeof(trace_recorder));
-#endif
 }
 
 void UnregisterRecorderWithCrashpad() {

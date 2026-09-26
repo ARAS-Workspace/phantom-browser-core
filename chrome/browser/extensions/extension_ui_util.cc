@@ -30,9 +30,7 @@
 #include "extensions/common/manifest_handlers/app_display_info.h"
 #include "extensions/common/mojom/manifest.mojom-shared.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "extensions/browser/mime_handler/mime_handler_ui_util.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -90,14 +88,12 @@ std::u16string GetEnabledExtensionNameForUrl(
     auto* registry = ExtensionRegistry::Get(web_contents.GetBrowserContext());
     extension = registry ? registry->enabled_extensions().GetByID(url.GetHost())
                          : nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   } else if (web_contents.GetLastCommittedURL() == url) {
     // Only match when the location-bar URL equals the frame's last committed
     // URL: during navigation the location bar can show a pending URL that
     // doesn't yet reflect the committed content, so we skip the MIME-handler
     // check to avoid misidentifying the extension in that transient state.
     extension = mime_handler::GetTopLevelMimeHandlerExtension(web_contents);
-#endif
   }
   return extension ? base::CollapseWhitespace(
                          base::UTF8ToUTF16(extension->name()), false)

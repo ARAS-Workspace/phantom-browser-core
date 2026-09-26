@@ -32,17 +32,4 @@ TEST(ThreadDelegatePosixTest, MAYBE_CurrentThreadBase) {
   EXPECT_LE(base, ClampAdd(stack_addr, 4 * 1024 * 1024));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// On ChromeOS, this functionality is tested by
-// GetThreadStackBaseAddressTest.MainThread.
-TEST(ThreadDelegatePosixTest, MainThreadStackBase) {
-  // The delegate does not use pthread id for main thread.
-  auto delegate = ThreadDelegatePosix::Create(SamplingProfilerThreadToken{
-      PlatformThreadId(GetCurrentProcId()), pthread_t()});
-  ASSERT_TRUE(delegate);
-  uintptr_t base = delegate->GetStackBaseAddress();
-  EXPECT_GT(base, 0u);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 }  // namespace base

@@ -75,9 +75,7 @@
 #include "third_party/blink/public/mojom/script_source_location.mojom.h"
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/direct_sockets/direct_sockets_service_impl.h"
-#endif
 
 namespace content {
 
@@ -787,7 +785,6 @@ bool DedicatedWorkerHost::CheckCOEP() {
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void DedicatedWorkerHost::CreateDirectSocketsService(
     mojo::PendingReceiver<blink::mojom::DirectSocketsService> receiver) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -802,7 +799,6 @@ void DedicatedWorkerHost::CreateDirectSocketsService(
   DirectSocketsServiceImpl::CreateForFrame(ancestor_render_frame_host,
                                            std::move(receiver));
 }
-#endif
 
 void DedicatedWorkerHost::CreateWebUsbService(
     mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {
@@ -994,7 +990,6 @@ void DedicatedWorkerHost::BindSerialService(
   ancestor_render_frame_host->BindSerialService(std::move(receiver));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void DedicatedWorkerHost::BindHidService(
     mojo::PendingReceiver<blink::mojom::HidService> receiver) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -1008,7 +1003,6 @@ void DedicatedWorkerHost::BindHidService(
 
   ancestor_render_frame_host->GetHidService(std::move(receiver));
 }
-#endif
 
 void DedicatedWorkerHost::CreateBucketManagerHost(
     mojo::PendingReceiver<blink::mojom::BucketManagerHost> receiver) {

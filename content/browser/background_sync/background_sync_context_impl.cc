@@ -41,17 +41,6 @@ BackgroundSyncContextImpl::~BackgroundSyncContextImpl() {
 }
 
 // static
-#if BUILDFLAG(IS_ANDROID)
-void BackgroundSyncContext::FireBackgroundSyncEventsAcrossPartitions(
-    BrowserContext* browser_context,
-    blink::mojom::BackgroundSyncType sync_type,
-    const base::android::JavaRef<jobject>& j_runnable) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  DCHECK(browser_context);
-  BackgroundSyncLauncher::FireBackgroundSyncEvents(browser_context, sync_type,
-                                                   j_runnable);
-}
-#endif
 
 void BackgroundSyncContextImpl::Init(
     const scoped_refptr<ServiceWorkerContextWrapper>& service_worker_context,

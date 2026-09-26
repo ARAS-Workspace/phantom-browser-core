@@ -48,7 +48,6 @@ GraphCreatedCallback* GetAdditionalGraphCreatedCallback() {
   return additional_graph_created_callback.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Adds the ForceForegroundVoter to the graph if the corresponding feature or
 // policy is enabled.
 void AddForceForegroundVoter(
@@ -64,7 +63,6 @@ void AddForceForegroundVoter(
         execution_context_priority::ForceForegroundVoterForUrls>();
   }
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Adds the default set of execution context voters.
 void AddVoters(GraphImpl* graph, PrefService* pref_service) {
@@ -74,7 +72,6 @@ void AddVoters(GraphImpl* graph, PrefService* pref_service) {
     // Disabled on Android because most of the prioritization logic still lives
     // in ChildProcessLauncherHelperImpl.
     // TODO(b/400850388): Enable voters on Android.
-#if !BUILDFLAG(IS_ANDROID)
     const auto policy_settings =
         PerformanceManagerImpl::GetProcessPriorityPolicySettings();
     // When a frame is visible, casts either a USER_BLOCKING or USER_VISIBLE
@@ -110,7 +107,6 @@ void AddVoters(GraphImpl* graph, PrefService* pref_service) {
     }
 
     AddForceForegroundVoter(priority_voting_system, pref_service);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     // Casts a USER_BLOCKING vote for all frames in an active loading page,
     // or USER_VISIBLE for background loading pages.

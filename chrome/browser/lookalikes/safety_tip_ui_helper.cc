@@ -12,13 +12,6 @@
 #include "content/public/browser/web_contents.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "content/public/browser/navigation_controller.h"
-#endif
-
 namespace {
 
 // URL that the "leave site" button aborts to by default.
@@ -31,26 +24,6 @@ void LeaveSiteFromSafetyTip(content::WebContents* web_contents,
   auto navigated_to = safe_url;
   if (navigated_to.is_empty()) {
     navigated_to = GURL(kSafetyTipLeaveSiteUrl);
-
-#if BUILDFLAG(IS_ANDROID)
-    TabAndroid* tab = TabAndroid::FromWebContents(web_contents);
-    if (tab && tab->IsCustomTab()) {
-      auto& controller = web_contents->GetController();
-      // For CCTs, just go back if we can...
-      if (controller.CanGoBack()) {
-        controller.GoBack();
-        return;
-      }
-      // ... or close the CCT otherwise.
-      auto* tab_model = TabModelList::GetTabModelForWebContents(web_contents);
-      if (tab_model) {
-        tab_model->CloseTabAt(tab_model->GetActiveIndex());
-        return;
-      }
-      // (And if we don't have a tab model for some reason, just navigate away
-      //  someplace at least slightly. To my knowledge, this shouldn't happen.)
-    }
-#endif
   }
 
   content::OpenURLParams params(

@@ -135,9 +135,7 @@ void SiteProtectionMetricsObserver::PrimaryPageChanged(content::Page& page) {
   // Delay the history service call to avoid impacting side panel opening
   // animation performance.
   base::TimeDelta delay;
-#if !BUILDFLAG(IS_ANDROID)
   delay = base::Milliseconds(450);
-#endif
   base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
       FROM_HERE,
       base::BindOnce(&SiteProtectionMetricsObserver::FetchHistoryData,

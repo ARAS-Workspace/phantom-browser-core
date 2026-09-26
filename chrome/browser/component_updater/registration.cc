@@ -23,10 +23,6 @@
 #include "chrome/browser/component_updater/recovery_improved_component_installer.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/component_updater/real_time_url_checks_allowlist_component_installer.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)
 #include "chrome/browser/component_updater/widevine_cdm_component_installer.h"
 #endif  // BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)
@@ -71,10 +67,6 @@ void RegisterComponentsForUpdate() {
   component_updater::RegisterCRLSetComponent(cus);
 
   MaybeRegisterPKIMetadataComponent(cus);
-
-#if BUILDFLAG(IS_ANDROID)
-  RegisterRealTimeUrlChecksAllowlistComponent(cus);
-#endif  // BUIDLFLAG(IS_ANDROID)
 
   base::FilePath path;
   if (base::PathService::Get(chrome::DIR_USER_DATA, &path)) {

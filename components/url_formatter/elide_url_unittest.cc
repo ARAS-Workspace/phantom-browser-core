@@ -46,8 +46,6 @@ struct ParsingTestcase {
   const std::vector<UrlComponent> components;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
-
 // Returns the width of a utf8 or utf16 string using default UI font, or the
 // provided |font_list|.
 float GetWidth(const std::string& utf8,
@@ -379,8 +377,6 @@ TEST(TextEliderTest, TestHostEliding) {
   EXPECT_EQ(u"foo.bar", url_formatter::ElideHost(GURL("http://foo.bar"),
                                                  gfx::FontList(), 2));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 struct OriginTestData {
   const char* const description;

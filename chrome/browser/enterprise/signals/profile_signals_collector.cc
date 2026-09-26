@@ -23,10 +23,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/version_info/version_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace device_signals {
 
 namespace {
@@ -48,18 +44,8 @@ ProfileSignalsCollector::ProfileSignalsCollector(Profile* profile)
           ChromePolicyBlocklistServiceFactory::GetForProfile(profile)),
       profile_prefs_(profile->GetPrefs()),
       policy_manager_(profile->GetCloudPolicyManager()),
-#if BUILDFLAG(IS_ANDROID)
-      connectors_service_(
-          enterprise_connectors::ConnectorsServiceFactory::GetForBrowserContext(
-              profile)),
-#endif  // BUILDFLAG(IS_ANDROID)
       profile_id_service_(
           enterprise::ProfileIdServiceFactory::GetForProfile(profile)) {
-
-#if BUILDFLAG(IS_ANDROID)
-  CHECK(connectors_service_);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   CHECK(policy_blocklist_service_);
   CHECK(profile_id_service_);
 }
@@ -86,28 +72,6 @@ void ProfileSignalsCollector::GetProfileSignals(
   signal_response.site_isolation_enabled =
       device_signals::GetSiteIsolationEnabled();
   signal_response.profile_id = profile_id_service_->GetProfileId();
-
-#if BUILDFLAG(IS_ANDROID)
-  signal_response.realtime_url_check_mode =
-      connectors_service_->GetAppliedRealTimeUrlCheck();
-  signal_response.security_event_providers =
-      connectors_service_->GetReportingServiceProviderNames();
-
-#if !BUILDFLAG(IS_ANDROID)
-  signal_response.file_downloaded_providers =
-      connectors_service_->GetAnalysisServiceProviderNames(
-          enterprise_connectors::FILE_DOWNLOADED);
-  signal_response.file_attached_providers =
-      connectors_service_->GetAnalysisServiceProviderNames(
-          enterprise_connectors::FILE_ATTACHED);
-  signal_response.bulk_data_entry_providers =
-      connectors_service_->GetAnalysisServiceProviderNames(
-          enterprise_connectors::BULK_DATA_ENTRY);
-  signal_response.print_providers =
-      connectors_service_->GetAnalysisServiceProviderNames(
-          enterprise_connectors::PRINT);
-#endif  // !BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
 
   response.profile_signals_response = std::move(signal_response);
 

@@ -999,15 +999,6 @@ void PageSpecificContentSettings::OnContentAllowed(ContentSettingsType type) {
     must_reset_blocked_status = true;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // content_settings_status_[type].allowed is always set to true in
-  // OnContentBlocked, so we have to use
-  // content_settings_status_[type].blocked to detect whether the protected
-  // media setting has changed.
-  if (type == ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER)
-    must_reset_blocked_status = true;
-#endif
-
   if (must_reset_blocked_status && status.blocked) {
     status.blocked = false;
     access_changed = true;
@@ -1207,18 +1198,6 @@ void PageSpecificContentSettings::OnBrowsingDataAccessed(
                                originating_page->IsPrimary()};
   MaybeNotifySiteDataObservers(access_details);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void PageSpecificContentSettings::OnProtectedMediaIdentifierPermissionSet(
-    const GURL& requesting_origin,
-    bool allowed) {
-  if (allowed) {
-    OnContentAllowed(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER);
-  } else {
-    OnContentBlocked(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER);
-  }
-}
-#endif
 
 PageSpecificContentSettings::MicrophoneCameraState
 PageSpecificContentSettings::GetMicrophoneCameraState() const {

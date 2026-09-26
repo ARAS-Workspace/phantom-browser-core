@@ -841,7 +841,7 @@ TEST_P(FeatureBindingsTest, RemoteSetDenied) {
 ////
 //  Death tests - these are flaky on Android.
 ////
-#if defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#if defined(GTEST_HAS_DEATH_TEST)
 using FeatureBindingsDeathTest = FeatureBindingsTest;
 
 TEST_P(FeatureBindingsDeathTest, MethodsOnRemoteDenied) {
@@ -880,7 +880,7 @@ INSTANTIATE_TEST_SUITE_P(
     FeatureBindingsDeathTest,
     testing::Values(mojo::BindingsTestSerializationMode::kNeverSerialize));
 
-#endif  // defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#endif  // defined(GTEST_HAS_DEATH_TEST)
 
 INSTANTIATE_TEST_SUITE_P(
     ,

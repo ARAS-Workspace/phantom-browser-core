@@ -33,12 +33,10 @@
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/notifications/muted_notification_handler.h"
 #include "chrome/browser/notifications/screen_capture_notification_blocker.h"
 #include "chrome/browser/default_browser/default_browser_changed_notification_handler.h"
 #include "chrome/browser/default_browser/default_browser_features.h"
-#endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/tailored_security/notification_handler_desktop.h"
@@ -82,7 +80,6 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
         std::make_unique<extensions::ExtensionNotificationHandler>());
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
     AddNotificationHandler(NotificationHandler::Type::ANNOUNCEMENT,
                            std::make_unique<AnnouncementNotificationHandler>());
 
@@ -101,7 +98,6 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
           std::make_unique<
               default_browser::DefaultBrowserChangedNotificationHandler>());
     }
-#endif
 
   }
 

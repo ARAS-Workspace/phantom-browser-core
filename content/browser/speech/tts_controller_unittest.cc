@@ -206,11 +206,9 @@ class TtsControllerTest : public testing::Test {
     platform_impl_ = std::make_unique<MockTtsPlatformImpl>(controller_.get());
     browser_context_ = std::make_unique<TestBrowserContext>();
     controller()->SetTtsPlatform(platform_impl_.get());
-#if !BUILDFLAG(IS_ANDROID)
     // TtsEngineDelegate isn't set for Android in ChromeContentBrowserClient
     // since it has no extensions.
     controller()->SetTtsEngineDelegate(&engine_delegate_);
-#endif  // !BUILDFLAG(IS_ANDROID)
     controller()->AddVoicesChangedDelegate(&voices_changed_);
   }
 
@@ -949,7 +947,6 @@ TEST_F(TtsControllerTest, GetVoicesOnlineOffline) {
   EXPECT_EQ("offline", controller_voices[0].name);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(TtsControllerTest, SpeakWhenLoadingBuiltInEngine) {
   engine_delegate()->set_is_built_in_tts_engine_initialized(false);
 
@@ -990,6 +987,5 @@ TEST_F(TtsControllerTest, SpeakWhenLoadingBuiltInEngine) {
   EXPECT_FALSE(TtsControllerCurrentUtterance());
   EXPECT_FALSE(controller()->IsSpeaking());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

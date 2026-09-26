@@ -12,10 +12,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 using testing::Contains;
 using testing::Not;
@@ -30,7 +26,7 @@ TEST_F(AccountCapabilitiesTest, GetSupportedAccountCapabilityNames) {
   EXPECT_THAT(names, Contains(kCanUseModelExecutionFeaturesName));
 }
 
-#if !defined(NDEBUG) && !BUILDFLAG(IS_ANDROID)
+#if !defined(NDEBUG)
 TEST_F(AccountCapabilitiesTest,
        GetSupportedAccountCapabilityNames_FlagDisabled) {
   base::test::ScopedFeatureList feature_list;
@@ -54,7 +50,7 @@ TEST_F(AccountCapabilitiesTest,
   // Check one of the existing expected account capabilities.
   EXPECT_THAT(names, Contains(kFakeCapabilityForTestingName));
 }
-#endif  // !defined(NDEBUG) && !BUILDFLAG(IS_ANDROID)
+#endif  // !defined(NDEBUG)
 
 TEST_F(AccountCapabilitiesTest, CanFetchFamilyMemberInfo) {
   AccountCapabilities capabilities;
@@ -86,7 +82,6 @@ TEST_F(AccountCapabilitiesTest, CanHaveEmailAddressDisplayed) {
             signin::Tribool::kFalse);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AccountCapabilitiesTest, CanMakeChromeSearchEngineChoiceScreenChoice) {
   AccountCapabilities capabilities;
   EXPECT_EQ(capabilities.can_make_chrome_search_engine_choice_screen_choice(),
@@ -101,7 +96,6 @@ TEST_F(AccountCapabilitiesTest, CanMakeChromeSearchEngineChoiceScreenChoice) {
   EXPECT_EQ(capabilities.can_make_chrome_search_engine_choice_screen_choice(),
             signin::Tribool::kFalse);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AccountCapabilitiesTest,
        CanShowHistorySyncOptInsWithoutMinorModeRestrictions) {
@@ -550,53 +544,3 @@ TEST_F(AccountCapabilitiesTest, CapabilityOverridesPrecedence) {
   EXPECT_EQ(capabilities.can_fetch_family_member_info(),
             signin::Tribool::kTrue);
 }
-
-
-#if BUILDFLAG(IS_ANDROID)
-
-TEST_F(AccountCapabilitiesTest, ConversionWithJNI_TriboolTrue) {
-  AccountCapabilities capabilities;
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_can_show_history_sync_opt_ins_without_minor_mode_restrictions(
-      true);
-
-  JNIEnv* env = base::android::AttachCurrentThread();
-  base::android::ScopedJavaLocalRef<jobject> java_capabilities =
-      capabilities.ConvertToJavaAccountCapabilities(env);
-  AccountCapabilities converted_back =
-      AccountCapabilities::ConvertFromJavaAccountCapabilities(
-          env, java_capabilities);
-
-  EXPECT_EQ(capabilities, converted_back);
-}
-
-TEST_F(AccountCapabilitiesTest, ConversionWithJNI_TriboolFalse) {
-  AccountCapabilities capabilities;
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_can_show_history_sync_opt_ins_without_minor_mode_restrictions(
-      false);
-
-  JNIEnv* env = base::android::AttachCurrentThread();
-  base::android::ScopedJavaLocalRef<jobject> java_capabilities =
-      capabilities.ConvertToJavaAccountCapabilities(env);
-  AccountCapabilities converted_back =
-      AccountCapabilities::ConvertFromJavaAccountCapabilities(
-          env, java_capabilities);
-
-  EXPECT_EQ(capabilities, converted_back);
-}
-
-TEST_F(AccountCapabilitiesTest, ConversionWithJNI_TriboolUnknown) {
-  AccountCapabilities capabilities;
-
-  JNIEnv* env = base::android::AttachCurrentThread();
-  base::android::ScopedJavaLocalRef<jobject> java_capabilities =
-      capabilities.ConvertToJavaAccountCapabilities(env);
-  AccountCapabilities converted_back =
-      AccountCapabilities::ConvertFromJavaAccountCapabilities(
-          env, java_capabilities);
-
-  EXPECT_EQ(capabilities, converted_back);
-}
-
-#endif

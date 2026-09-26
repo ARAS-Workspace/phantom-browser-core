@@ -205,14 +205,6 @@ class PasswordReuseManagerImplTest : public testing::Test {
     std::unique_ptr<MockSharedPreferencesDelegateAndroid>
         mock_shared_pref_delegate_android;
     std::unique_ptr<MockPasswordReuseDetector> mock_password_reuse_detector;
-#if BUILDFLAG(IS_ANDROID)
-    mock_shared_pref_delegate_android =
-        std::make_unique<MockSharedPreferencesDelegateAndroid>();
-    shared_pref_delegate_android_ = mock_shared_pref_delegate_android.get();
-    mock_password_reuse_detector =
-        std::make_unique<MockPasswordReuseDetector>();
-    password_reuse_detector_ = mock_password_reuse_detector.get();
-#endif
     if (should_mock_password_reuse_detector) {
       reuse_manager_.Init(&prefs(), &local_prefs(), profile_store(),
                           account_store(),
@@ -701,101 +693,6 @@ TEST_F(PasswordReuseManagerImplTest,
       "PasswordManager.NonSyncPasswordHashChange",
       metrics_util::GaiaPasswordHashChange::SAVED_ON_CHROME_SIGNIN, 1);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PasswordReuseManagerImplTest, GaiaPasswordSavedFromSharedPref) {
-  Initialize(/*should_mock_password_reuse_detector=*/true);
-  ON_CALL(*shared_pref_delegate_android(), GetCredentials(_))
-      .WillByDefault(Return(
-          "[{\"Login.accountIdentifier\": \"test_user@gmail.com\", "
-          "\"Login.hashedPassword\": 23423423432, \"Login.salt\": \"salt\"}]"));
-  EXPECT_CALL(*shared_pref_delegate_android(), SetCredentials("[]"));
-  EXPECT_CALL(*password_reuse_detector(), UseGaiaPasswordHash(_));
-  identity_test_env().SetPrimaryAccount("test_user@gmail.com",
-                                        signin::ConsentLevel::kSignin);
-
-  RunUntilIdle();
-
-  PasswordHashData password_hash_data =
-      ConvertToPasswordHashData(
-          prefs().GetList(prefs::kPasswordHashDataList)[0])
-          .value();
-  EXPECT_EQ("test_user@gmail.com", password_hash_data.username);
-  EXPECT_EQ("salt", password_hash_data.salt);
-  EXPECT_EQ(23423423432u, password_hash_data.hash);
-  EXPECT_EQ(8u, password_hash_data.length);
-  EXPECT_EQ(1u, prefs().GetList(prefs::kPasswordHashDataList).size());
-}
-
-TEST_F(PasswordReuseManagerImplTest,
-       NoPasswordSavedFromEmptyJsonArraySharedPref) {
-  Initialize();
-  ON_CALL(*shared_pref_delegate_android(), GetCredentials(_))
-      .WillByDefault(Return("[]"));
-  identity_test_env().SetPrimaryAccount("test_user@gmail.com",
-                                        signin::ConsentLevel::kSignin);
-
-  RunUntilIdle();
-
-  EXPECT_EQ(0u, prefs().GetList(prefs::kPasswordHashDataList).size());
-}
-
-TEST_F(PasswordReuseManagerImplTest, NoPasswordSavedFromEmptySharedPref) {
-  Initialize();
-  ON_CALL(*shared_pref_delegate_android(), GetCredentials(_))
-      .WillByDefault(Return(""));
-  identity_test_env().SetPrimaryAccount("test_user@gmail.com",
-                                        signin::ConsentLevel::kSignin);
-
-  RunUntilIdle();
-
-  EXPECT_EQ(0u, prefs().GetList(prefs::kPasswordHashDataList).size());
-}
-
-TEST_F(PasswordReuseManagerImplTest, NoPasswordSavedFromDifferentUsernames) {
-  Initialize();
-  ON_CALL(*shared_pref_delegate_android(), GetCredentials(_))
-      .WillByDefault(Return(
-          "[{\"Login.accountIdentifier\": \"test_user@gmail.com\", "
-          "\"Login.hashedPassword\": 23423423432, \"Login.salt\": \"salt\"}]"));
-  identity_test_env().SetPrimaryAccount("different_test_user@gmail.com",
-                                        signin::ConsentLevel::kSignin);
-
-  RunUntilIdle();
-
-  EXPECT_EQ(0u, prefs().GetList(prefs::kPasswordHashDataList).size());
-}
-
-TEST_F(PasswordReuseManagerImplTest, OnLoginsRetainedCalledWithCorrectParams) {
-  Initialize(/*should_mock_password_reuse_detector=*/true);
-
-  const StoredCredential submitted_form_profile =
-      CreateStoredCredential("http://yahoo.com", u"user@yahoo.com", u"password",
-                             PasswordForm::Store::kProfileStore);
-  EXPECT_CALL(
-      *password_reuse_detector(),
-      OnLoginsRetained(PasswordForm::Store::kProfileStore,
-                       testing::UnorderedElementsAre(EqStoredCredentialRef(
-                           std::cref(submitted_form_profile)))));
-  std::vector<StoredCredential> profile_creds;
-  profile_creds.push_back(CloneStoredCredential(submitted_form_profile));
-  profile_store()->TriggerOnLoginsRetainedForAndroid(std::move(profile_creds));
-  RunUntilIdle();
-
-  const StoredCredential submitted_form_account =
-      CreateStoredCredential("http://google.com", u"user@google.com",
-                             u"password", PasswordForm::Store::kAccountStore);
-  EXPECT_CALL(
-      *password_reuse_detector(),
-      OnLoginsRetained(PasswordForm::Store::kAccountStore,
-                       testing::UnorderedElementsAre(EqStoredCredentialRef(
-                           std::cref(submitted_form_account)))));
-  std::vector<StoredCredential> account_creds;
-  account_creds.push_back(CloneStoredCredential(submitted_form_account));
-  account_store()->TriggerOnLoginsRetainedForAndroid(std::move(account_creds));
-  RunUntilIdle();
-}
-#endif
 
 }  // namespace
 

@@ -16,13 +16,6 @@
 #include "device/vr/openxr/openxr_spatial_framework_manager.h"
 #include "device/vr/openxr/openxr_stage_bounds_provider_basic.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "device/vr/openxr/android/openxr_depth_sensor_android.h"
-#include "device/vr/openxr/android/openxr_light_estimator_android.h"
-#include "device/vr/openxr/android/openxr_scene_understanding_manager_android.h"
-#include "device/vr/openxr/android/openxr_unbounded_space_provider_android.h"
-#endif
-
 namespace device {
 const std::vector<OpenXrExtensionHandlerFactory*>&
 GetExtensionHandlerFactories() {
@@ -30,17 +23,8 @@ GetExtensionHandlerFactories() {
       kFactories{std::vector<OpenXrExtensionHandlerFactory*>{
           new OpenXrSpatialFrameworkManagerFactory(),
 
-  // List platform-specific extensions first as they should generally be
-  // preferred on the platforms that they are supported for.
-#if BUILDFLAG(IS_ANDROID)
-          new OpenXrUnboundedSpaceProviderAndroidFactory(),
-
-          new OpenXrSceneUnderstandingManagerAndroidFactory(),
-
-          new OpenXrLightEstimatorAndroidFactory(),
-
-          new OpenXrDepthSensorAndroidFactory(),
-#endif
+          // List platform-specific extensions first as they should generally be
+          // preferred on the platforms that they are supported for.
 
           // List the hand trackers that can supply hand interaction data (e.g.
           // parsed pinches) first, as otherwise they won't be created. Their

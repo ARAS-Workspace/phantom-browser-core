@@ -450,16 +450,6 @@ download::DownloadItemRenameHandler* FakeDownloadItem::GetRenameHandler() {
   return nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool FakeDownloadItem::IsFromExternalApp() {
-  return false;
-}
-
-bool FakeDownloadItem::AllowAutoOpenAfterCompletion() {
-  return true;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 bool FakeDownloadItem::IsDangerous() const {
   return is_dangerous_;
 }

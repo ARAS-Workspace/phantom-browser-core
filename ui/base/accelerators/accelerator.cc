@@ -205,7 +205,7 @@ std::u16string Accelerator::GetKeyCodeStringForShortcut() const {
 #endif
 
   if (key_string.empty()) {
-#if defined(USE_AURA) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA) || BUILDFLAG(IS_MAC)
     const uint16_t c = DomCodeToUsLayoutCharacter(
         UsLayoutKeyboardCodeToDomCode(key_code_), false);
     if (c != 0) {

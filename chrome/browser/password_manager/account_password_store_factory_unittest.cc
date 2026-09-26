@@ -16,8 +16,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 class AccountPasswordStoreFactoryTest : public testing::Test {
@@ -108,5 +106,3 @@ TEST_F(AccountPasswordStoreFactoryTest,
 }
 
 }  // namespace
-
-#endif  // !BUILDFLAG(IS_ANDROID)

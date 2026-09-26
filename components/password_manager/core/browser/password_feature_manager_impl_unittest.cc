@@ -103,24 +103,6 @@ TEST_F(PasswordFeatureManagerImplTest, AccountStorageDisabledIfSigninPaused) {
   EXPECT_FALSE(password_feature_manager_.IsAccountStorageActive());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// On Android, for certain versions of GMS Core, signed-in users have a single
-// (profile) PasswordStore that successfully talks to the account GmsCore
-// backend. Such users should be able to generate passwords, so
-// IsGenerationEnabled() should return true. If the account backend is not
-// available, generation is disabled, but that is decided on a different layer.
-TEST_F(PasswordFeatureManagerImplTest,
-       GenerationEnabledEvenIfCannotCreateAccountStore) {
-  sync_service_.SetSignedIn(signin::ConsentLevel::kSignin, account_);
-
-  ASSERT_EQ(
-      password_manager::sync_util::GetPasswordSyncState(&sync_service_),
-      password_manager::sync_util::SyncState::kActiveWithNormalEncryption);
-
-  EXPECT_TRUE(password_feature_manager_.IsGenerationEnabled());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_F(PasswordFeatureManagerImplTest, GenerationDisabledIfSignedOut) {
   sync_service_.SetSignedOut();
 

@@ -10,9 +10,7 @@
 #include "base/byte_size.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/system/sys_info.h"
-#endif
 
 namespace cc {
 
@@ -20,7 +18,6 @@ namespace cc {
 size_t ImageDecodeCacheUtils::GetWorkingSetBytesForImageDecode(
     bool for_renderer) {
   base::ByteSize decoded_image_working_set_budget = base::MiBU(128);
-#if !BUILDFLAG(IS_ANDROID)
   if (for_renderer) {
     const bool using_low_memory_policy = base::SysInfo::IsLowEndDevice();
     // If there's over 4GB of RAM, increase the working set size to 256MB for
@@ -33,7 +30,6 @@ size_t ImageDecodeCacheUtils::GetWorkingSetBytesForImageDecode(
       decoded_image_working_set_budget = base::MiBU(256);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   return decoded_image_working_set_budget.InBytes();
 }
 

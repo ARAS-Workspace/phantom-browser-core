@@ -77,10 +77,3 @@ void SpellCheckHostImpl::RequestTextCheck(
 
 #endif  //  BUILDFLAG(USE_BROWSER_SPELLCHECKER) &&
         //  !BUILDFLAG(ENABLE_SPELLING_SERVICE)
-
-#if BUILDFLAG(IS_ANDROID)
-void SpellCheckHostImpl::DisconnectSessionBridge() {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  session_bridge_.DisconnectSession();
-}
-#endif

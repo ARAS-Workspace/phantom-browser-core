@@ -15,14 +15,12 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/tabs/public/tab_interface.h"
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/common/url_constants.h"
-#endif
 
 namespace autofill {
 
@@ -138,7 +136,6 @@ void PaymentsChurnedUsersBubbleController::OnAcceptButton() {
 
 void PaymentsChurnedUsersBubbleController::ShowConfirmationBubbleView() {
   HideBubble(/*initiated_by_bubble_manager=*/false);
-#if !BUILDFLAG(IS_ANDROID)
   tabs::TabInterface* tab = tabs::TabInterface::GetFromContents(web_contents());
   if (!tab) {
     return;
@@ -153,7 +150,6 @@ void PaymentsChurnedUsersBubbleController::ShowConfirmationBubbleView() {
                                                            this)) {
     SetBubbleView(*bubble_view);
   }
-#endif
 }
 
 SavePaymentMethodAndVirtualCardEnrollConfirmationUiParams
@@ -161,14 +157,12 @@ PaymentsChurnedUsersBubbleController::GetConfirmationUiParams() const {
   return SavePaymentMethodAndVirtualCardEnrollConfirmationUiParams::
       CreateForChurnedUsersAcceptanceSuccess(base::BindRepeating(
           [](content::WebContents* web_contents) {
-#if !BUILDFLAG(IS_ANDROID)
             tabs::TabInterface* tab =
                 tabs::TabInterface::GetFromContents(web_contents);
             if (tab && tab->GetBrowserWindowInterface()) {
               chrome::ShowSettingsSubPage(tab->GetBrowserWindowInterface(),
                                           chrome::kPaymentsSubPage);
             }
-#endif
           },
           web_contents()));
 }
@@ -206,7 +200,6 @@ PaymentsChurnedUsersBubbleController::GetWeakPtr() {
 }
 
 void PaymentsChurnedUsersBubbleController::DoShowBubble() {
-#if !BUILDFLAG(IS_ANDROID)
   tabs::TabInterface* tab = tabs::TabInterface::GetFromContents(web_contents());
   if (!tab) {
     return;
@@ -223,10 +216,8 @@ void PaymentsChurnedUsersBubbleController::DoShowBubble() {
     autofill_metrics::LogPaymentsChurnedUsersBubbleShowResult(
         autofill_metrics::PaymentsChurnedUsersBubbleShowResult::kShown);
   }
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<actions::ActionId>
 PaymentsChurnedUsersBubbleController::GetActionIdForPageAction() {
   return kActionShowPaymentsChurnedUsersBubble;
@@ -235,7 +226,6 @@ PaymentsChurnedUsersBubbleController::GetActionIdForPageAction() {
 bool PaymentsChurnedUsersBubbleController::ShouldShowPageAction() {
   return should_show_icon_;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void PaymentsChurnedUsersBubbleController::OnConfirmationBubbleClosed(
     PaymentsUiClosedReason closed_reason) {

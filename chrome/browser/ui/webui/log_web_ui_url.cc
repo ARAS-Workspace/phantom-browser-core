@@ -18,9 +18,7 @@
 #include "content/public/common/url_constants.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/top_chrome/webui_contents_preload_manager.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -76,7 +74,6 @@ void LogWebUIUsage(std::variant<content::WebUI*, GURL> webui_variant) {
           : GetWebUIUrlForLogging(std::get<content::WebUI*>(webui_variant));
   LogWebUICreated(web_ui_url);
 
-#if !BUILDFLAG(IS_ANDROID)
   auto* preload_manager = WebUIContentsPreloadManager::GetInstance();
   auto* web_contents =
       std::holds_alternative<content::WebUI*>(webui_variant)
@@ -89,7 +86,6 @@ void LogWebUIUsage(std::variant<content::WebUI*, GURL> webui_variant) {
       preload_manager->GetRequestTime(web_contents).has_value()) {
     LogWebUIShown(web_ui_url);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace webui

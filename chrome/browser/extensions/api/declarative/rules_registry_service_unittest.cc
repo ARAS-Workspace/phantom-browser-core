@@ -128,7 +128,6 @@ TEST_F(RulesRegistryServiceTest, ContentRulesRegistryClearedOnShutdown) {
   EXPECT_FALSE(registry_service.content_rules_registry());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // This test relies on declarativeWebRequest, which is deprecated and will not
 // be supported on desktop Android. We can't just replace it with
 // declarativeNetRequest because the test relies on the API being unavailable
@@ -177,6 +176,5 @@ TEST_F(RulesRegistryServiceTest, DefaultRulesRegistryRegistered) {
         kWebViewRulesRegistryID, declarative_webrequest_constants::kOnRequest));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions

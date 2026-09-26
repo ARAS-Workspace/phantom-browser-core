@@ -121,7 +121,6 @@ void ReclaimMemoryFromQueue(internal::TaskQueueImpl* queue, LazyNow* lazy_now) {
 // Writes |address| in hexadecimal ("0x11223344") form starting from |output|
 // and moving backwards in memory. Returns a pointer to the first digit of the
 // result. Does *not* NUL-terminate the number.
-#if !BUILDFLAG(IS_ANDROID)
 char* PrependHexAddress(char* output, const void* address) {
   uintptr_t value = reinterpret_cast<uintptr_t>(address);
   static const std::string_view kHexChars = "0123456789ABCDEF";
@@ -133,7 +132,6 @@ char* PrependHexAddress(char* output, const void* address) {
   *output = '0';
   return output;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Atomic to avoid TSAN flags when a test  tries to access the value before the
 // feature list is available.
@@ -256,12 +254,6 @@ void SequenceManagerImpl::BindToMessagePump(std::unique_ptr<MessagePump> pump) {
   CompleteInitializationOnBoundThread();
 
   // On Android attach to the native loop when there is one.
-#if BUILDFLAG(IS_ANDROID)
-  if (settings_.message_loop_type == MessagePumpType::UI ||
-      settings_.message_loop_type == MessagePumpType::JAVA) {
-    controller_->AttachToMessagePump();
-  }
-#endif
 }
 
 void SequenceManagerImpl::BindToCurrentThread() {
@@ -1048,17 +1040,14 @@ bool SequenceManagerImpl::IsType(MessagePumpType type) const {
 
 void SequenceManagerImpl::EnableCrashKeys(const char* async_stack_crash_key) {
   DCHECK(!main_thread_only().async_stack_crash_key);
-#if !BUILDFLAG(IS_ANDROID)
   main_thread_only().async_stack_crash_key = debug::AllocateCrashKeyString(
       async_stack_crash_key, debug::CrashKeySize::Size64);
   static_assert(sizeof(main_thread_only().async_stack_buffer) ==
                     static_cast<size_t>(debug::CrashKeySize::Size64),
                 "Async stack buffer size must match crash key size.");
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void SequenceManagerImpl::RecordCrashKeys(const PendingTask& pending_task) {
-#if !BUILDFLAG(IS_ANDROID)
   // SetCrashKeyString is a no-op even if the crash key is null, but we'd still
   // have construct the std::string_view that is passed in.
   if (!main_thread_only().async_stack_crash_key) {
@@ -1091,7 +1080,6 @@ void SequenceManagerImpl::RecordCrashKeys(const PendingTask& pending_task) {
   debug::SetCrashKeyString(
       main_thread_only().async_stack_crash_key,
       std::string_view(pos, static_cast<size_t>(buffer_end - pos)));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 internal::TaskQueueImpl* SequenceManagerImpl::currently_executing_task_queue()

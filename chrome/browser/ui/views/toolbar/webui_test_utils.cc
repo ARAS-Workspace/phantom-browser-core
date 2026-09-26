@@ -237,7 +237,6 @@ void AvatarToolbarButtonTestAccessor::WaitForAvatarButton() {
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // The avatar button is only added to normal browsers (those with a tab
   // strip).
   if (!browser_ ||
@@ -245,7 +244,6 @@ void AvatarToolbarButtonTestAccessor::WaitForAvatarButton() {
           WindowFeatureController::WindowFeature::kFeatureTabStrip)) {
     return;
   }
-#endif
 
   Profile* const profile = browser_->GetProfile();
   bool show_avatar_toolbar_button = true;

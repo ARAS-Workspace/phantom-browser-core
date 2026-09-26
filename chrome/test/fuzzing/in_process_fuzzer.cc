@@ -195,13 +195,11 @@ class FuzzerTestLauncherDelegate : public content::TestLauncherDelegate {
     fuzzer_->Run(libfuzzer_arguments_);
     return 0;
   }
-#if !BUILDFLAG(IS_ANDROID)
   // Android browser tests set the ContentMainDelegate itself for the test
   // harness to use, and do not go through ContentMain() in TestLauncher.
   content::ContentMainDelegate* CreateContentMainDelegate() override {
     return new FuzzerChromeMainDelegate();
   }
-#endif
 
  private:
   std::unique_ptr<InProcessFuzzer> fuzzer_;
@@ -262,13 +260,11 @@ class ChildProcessTestLauncherDelegate : public content::TestLauncherDelegate {
            "to modify these). The command line arguments passed to the "
            "fuzzing engine should use single dashes (e.g. -runs=1).";
   }
-#if !BUILDFLAG(IS_ANDROID)
   // Android browser tests set the ContentMainDelegate itself for the test
   // harness to use, and do not go through ContentMain() in TestLauncher.
   content::ContentMainDelegate* CreateContentMainDelegate() override {
     return new FuzzerChromeMainDelegate();
   }
-#endif
 };
 
 // Main function for running in process fuzz tests.

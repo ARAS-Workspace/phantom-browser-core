@@ -829,30 +829,6 @@ TEST_F(TemplateURLPrepopulateDataTest, GetPrepopulatedEngineFromFullList) {
   ExpectSimilar(expected_engine.get(), found_engine_by_keyword.get());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(TemplateURLPrepopulateDataTest, GetLocalPrepopulatedEngines) {
-  constexpr char sample_country[] = "US";
-  OverrideCountryId(CountryId(sample_country));
-
-  // For a given country, the output from `GetLocalPrepopulatedEngines`
-  // should match the template URLs obtained from `GetPrepopulatedEngines`.
-  auto expected_urls = prepopulate_data_resolver().GetPrepopulatedEngines();
-  auto actual_urls = TemplateURLPrepopulateData::GetLocalPrepopulatedEngines(
-      sample_country, *pref_service());
-
-  ASSERT_EQ(actual_urls.size(), expected_urls.size());
-  for (unsigned int i = 0; i < actual_urls.size(); ++i) {
-    EXPECT_EQ(actual_urls[i]->prepopulate_id, expected_urls[i]->prepopulate_id);
-    EXPECT_EQ(actual_urls[i]->keyword(), expected_urls[i]->keyword());
-    EXPECT_EQ(actual_urls[i]->url(), expected_urls[i]->url());
-  }
-
-  EXPECT_THAT(TemplateURLPrepopulateData::GetLocalPrepopulatedEngines(
-                  "NOT A COUNTRY", *pref_service()),
-              testing::IsEmpty());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class TemplateURLPrepopulateDataMigrationTest
     : public TemplateURLPrepopulateDataTest {
   using PrepopulatedEngine = TemplateURLPrepopulateData::PrepopulatedEngine;

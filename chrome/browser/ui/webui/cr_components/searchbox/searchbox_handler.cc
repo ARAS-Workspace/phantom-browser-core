@@ -85,10 +85,8 @@
 #include "ui/gfx/vector_icon_types.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"  // nogncheck
 #include "chrome/browser/ui/tabs/tab_strip_model.h"         // nogncheck
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace searchbox_internal {
 
@@ -785,12 +783,7 @@ SearchboxHandler::CreateAutocompleteMatch(
           AutocompleteMatch::EnterpriseSearchAggregatorType::PEOPLE;
   if (!match.from_keyword) {
     for (const auto& action : match.actions) {
-// TODO(b/544764632): Implement Pedals for Android.
-#if BUILDFLAG(IS_ANDROID)
-      if (action->ActionId() == OmniboxActionId::PEDAL) {
-        continue;
-      }
-#endif
+      // TODO(b/544764632): Implement Pedals for Android.
       std::string icon_path;
       if (action->GetIconImage().IsEmpty()) {
         icon_path = AutocompleteIconToResourceName(action->GetVectorIcon());
@@ -1535,14 +1528,12 @@ void SearchboxHandler::OnDefaultSearchExtensionDialogDone(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void SearchboxHandler::SetSmartTabSharingActive(bool active) {}
 
 void SearchboxHandler::GetSmartTabSharingActive(
     GetSmartTabSharingActiveCallback callback) {
   std::move(callback).Run(false);
 }
-#endif
 
 OmniboxController* SearchboxHandler::Delegate::GetOmniboxController() {
   return nullptr;

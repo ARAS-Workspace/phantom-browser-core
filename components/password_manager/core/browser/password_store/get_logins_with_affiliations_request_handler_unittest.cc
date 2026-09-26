@@ -60,9 +60,7 @@ constexpr const char kAffiliatedAndroidApp[] =
     "android://"
     "5Z0D_o6B8BqileZyWhXmqO_wkO8uO0etCEXvMn5tUzEqkWUgfTSjMcTM7eMMTY_"
     "FGJC9RlpRNt_8Qp5tgDocXw==@com.bambuna.podcastaddict/";
-#if !BUILDFLAG(IS_ANDROID)
 constexpr const char kGroupWebURL[] = "https://noneexample2.com/";
-#endif
 
 PasswordFormDigest CreateFormDigest(const std::string& url_string) {
   return {PasswordForm::Scheme::kHtml, url_string, GURL(url_string)};
@@ -191,11 +189,9 @@ TEST_F(GetLoginsWithAffiliationsRequestHandlerTest, AffiliatedMatchesOnlyTest) {
       observed_form, backend(), &match_helper(), result_callback.Get());
 
   std::vector<PasswordForm> expected_forms;
-#if !BUILDFLAG(IS_ANDROID)
   expected_forms.push_back(
       CreateForm(kAffiliatedWebURL, u"username1", u"password"));
   expected_forms.back().match_type = PasswordForm::MatchType::kAffiliated;
-#endif
   expected_forms.push_back(
       CreateForm(kAffiliatedAndroidApp, u"username2", u"password"));
   expected_forms.back().affiliated_web_realm = kAffiliatedWebURL;
@@ -207,7 +203,6 @@ TEST_F(GetLoginsWithAffiliationsRequestHandlerTest, AffiliatedMatchesOnlyTest) {
   RunUntilIdle();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(GetLoginsWithAffiliationsRequestHandlerTest,
        AffiliatedAndPSLMatchesTest) {
   backend()->AddLoginAsync(
@@ -512,8 +507,6 @@ TEST_F(GetLoginsWithAffiliationsRequestHandlerTest, ChangePasswordURLIsSet) {
                   MatchesForm(grouped_form)))));
   RunUntilIdle();
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(GetLoginsWithAffiliationsRequestHandlerTest, AffiliatedMatchHelperNull) {
   backend()->AddLoginAsync(

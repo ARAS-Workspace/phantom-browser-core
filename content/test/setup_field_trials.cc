@@ -29,10 +29,6 @@
 #include "components/variations/variations_switches.h"
 #include "content/public/common/content_switch_dependent_feature_overrides.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/variations/android/variations_seed_bridge.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -114,13 +110,6 @@ void SetupFieldTrials() {
   metrics_state_manager->InstantiateFieldTrialList();
 
   std::unique_ptr<variations::SeedResponse> initial_seed;
-#if BUILDFLAG(IS_ANDROID)
-  if (!pref_service.get()->HasPrefPath(
-          variations::prefs::kVariationsSeedSignature)) {
-    DVLOG(1) << "Importing first run seed from Java preferences.";
-    initial_seed = variations::android::GetVariationsFirstRunSeed();
-  }
-#endif
 
   VariationServiceClient variations_service_client(user_data_dir.GetPath());
   variations::VariationsFieldTrialCreator field_trial_creator(

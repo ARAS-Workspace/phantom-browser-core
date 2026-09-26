@@ -42,20 +42,6 @@ BASE_FEATURE(kHigherRendererMemoryLimit, base::FEATURE_DISABLED_BY_DEFAULT);
 
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-// Enables the experimental Android GPU sandbox using Landlock.
-BASE_FEATURE(kAndroidGpuSandbox, base::FEATURE_DISABLED_BY_DEFAULT);
-// Enables the renderer on Android to use a separate seccomp policy.
-BASE_FEATURE(kUseRendererProcessPolicy, base::FEATURE_ENABLED_BY_DEFAULT);
-// When enabled, this features restricts a set of syscalls in
-// BaselinePolicyAndroid that are used by RendererProcessPolicy.
-BASE_FEATURE(kRestrictRendererPoliciesInBaseline,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-// When enabled, restrict clone to just flags used by fork and pthread_create on
-// android.
-BASE_FEATURE(kRestrictCloneParameters, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 bool IsNetworkSandboxEnabled() {
 #if BUILDFLAG(IS_MAC)
   return true;

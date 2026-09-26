@@ -16,15 +16,10 @@
 #include "content/public/common/page_visibility_state.h"
 #include "content/public/common/process_type.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/crash/content/browser/crash_metrics_reporter_android.h"
-#endif
-
 namespace metrics {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 // Determines which value of RendererHostedContentType correctly describes the
 // type of content hosted by `host`.
 RendererHostedContentType DetermineHostedContentType(
@@ -72,15 +67,10 @@ RendererHostedContentType DetermineHostedContentType(
 
   return RendererHostedContentType::kNoFrameOrExtension;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool IsCdmUtilityProcess(const content::ChildProcessData& data) {
   return (data.process_type == content::PROCESS_TYPE_UTILITY &&
-          (data.sandbox_type == sandbox::mojom::Sandbox::kCdm
-#if BUILDFLAG(IS_ANDROID)
-           || data.metrics_name == "media.mojom.MediaDrmSupport"
-#endif
-           ));
+          (data.sandbox_type == sandbox::mojom::Sandbox::kCdm));
 }
 
 }  // namespace
@@ -90,12 +80,6 @@ ContentStabilityMetricsProvider::ContentStabilityMetricsProvider(
     std::unique_ptr<ExtensionsHelper> extensions_helper)
     : helper_(local_state), extensions_helper_(std::move(extensions_helper)) {
   BrowserChildProcessObserver::Add(this);
-
-#if BUILDFLAG(IS_ANDROID)
-  auto* crash_manager = crash_reporter::CrashMetricsReporter::GetInstance();
-  DCHECK(crash_manager);
-  scoped_observation_.Observe(crash_manager);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 ContentStabilityMetricsProvider::~ContentStabilityMetricsProvider() {
@@ -105,17 +89,6 @@ ContentStabilityMetricsProvider::~ContentStabilityMetricsProvider() {
 void ContentStabilityMetricsProvider::OnRecordingEnabled() {}
 
 void ContentStabilityMetricsProvider::OnRecordingDisabled() {}
-
-#if BUILDFLAG(IS_ANDROID)
-void ContentStabilityMetricsProvider::ProvideStabilityMetrics(
-    SystemProfileProto* system_profile_proto) {
-  helper_.ProvideStabilityMetrics(system_profile_proto);
-}
-
-void ContentStabilityMetricsProvider::ClearSavedStabilityMetrics() {
-  helper_.ClearSavedStabilityMetrics();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void ContentStabilityMetricsProvider::OnRenderProcessLaunched(
     content::RenderProcessHost* host) {
@@ -130,11 +103,9 @@ void ContentStabilityMetricsProvider::OnRenderProcessLaunched(
 void ContentStabilityMetricsProvider::OnRenderProcessHostCreationFailed(
     content::RenderProcessHost* host,
     const content::ChildProcessTerminationInfo& info) {
-#if !BUILDFLAG(IS_ANDROID)
   helper_.LogRendererCrash(
       DetermineHostedContentType(host, extensions_helper_.get()), info.status,
       info.exit_code);
-#endif
 }
 
 void ContentStabilityMetricsProvider::RenderProcessExited(
@@ -142,11 +113,9 @@ void ContentStabilityMetricsProvider::RenderProcessExited(
     const content::ChildProcessTerminationInfo& info) {
   // On Android, the renderer crashes are recorded in
   // `OnCrashDumpProcessed`.
-#if !BUILDFLAG(IS_ANDROID)
   helper_.LogRendererCrash(
       DetermineHostedContentType(host, extensions_helper_.get()), info.status,
       info.exit_code);
-#endif
 }
 
 void ContentStabilityMetricsProvider::RenderProcessHostDestroyed(
@@ -194,22 +163,6 @@ void ContentStabilityMetricsProvider::BrowserChildProcessLaunchFailed(
     );
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void ContentStabilityMetricsProvider::OnCrashDumpProcessed(
-    int rph_id,
-    const crash_reporter::CrashMetricsReporter::ReportedCrashTypeSet&
-        reported_counts) {
-  if (reported_counts.count(crash_reporter::CrashMetricsReporter::
-                                ProcessedCrashCounts::kRendererCrashAll)) {
-    helper_.IncreaseRendererCrashCount();
-  }
-  if (reported_counts.count(crash_reporter::CrashMetricsReporter::
-                                ProcessedCrashCounts::kGpuCrashAll)) {
-    helper_.IncreaseGpuCrashCount();
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void ContentStabilityMetricsProvider::OnPageLoadStarted() {
   helper_.LogLoadStarted();

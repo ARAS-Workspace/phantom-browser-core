@@ -361,11 +361,9 @@ Display::GetDefaultDisplayColorSpacesRef() {
       scoped_refptr<const gfx::DisplayColorSpacesRef>>
       default_color_spaces_ref([] {
         auto color_space = gfx::ColorSpace::CreateSRGB();
-#if !BUILDFLAG(IS_ANDROID)
         if (HasForceDisplayColorProfile()) {
           color_space = GetForcedDisplayColorProfile();
         }
-#endif
         return base::MakeRefCounted<gfx::DisplayColorSpacesRef>(
             gfx::DisplayColorSpaces(color_space));
       }());

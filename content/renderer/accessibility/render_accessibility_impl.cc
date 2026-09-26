@@ -83,17 +83,10 @@ RenderAccessibilityImpl::RenderAccessibilityImpl(
       factory.BindNewPipeAndPassReceiver());
   ukm_recorder_ = ukm::MojoUkmRecorder::Create(*factory);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Password values are only passed through on Android.
-  render_frame_->GetWebView()
-      ->GetSettings()
-      ->SetAccessibilityPasswordValuesEnabled(true);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   // aria-modal currently prunes the accessibility tree on Mac and Android only.
   render_frame_->GetWebView()->GetSettings()->SetAriaModalPrunesAXTree(true);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
   ax_annotators_manager_ = std::make_unique<AXAnnotatorsManager>(this);
 }

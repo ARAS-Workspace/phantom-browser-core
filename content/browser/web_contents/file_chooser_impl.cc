@@ -162,15 +162,6 @@ void FileChooserImpl::OpenFileChooser(blink::mojom::FileChooserParamsPtr params,
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  WebContents* web_contents =
-      WebContents::FromRenderFrameHost(render_frame_host());
-  if (!GetContentClient()->browser()->ShouldAllowSystemUiPopups(
-          web_contents)) {
-    std::move(callback).Run(nullptr);
-    return;
-  }
-#endif
   callback_ = std::move(callback);
   auto listener = base::MakeRefCounted<FileSelectListenerImpl>(this);
   listener_impl_ = listener.get();

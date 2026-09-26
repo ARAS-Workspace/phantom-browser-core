@@ -134,10 +134,4 @@ std::optional<ui::ColorId> MenuModel::GetSelectedBackgroundColorId(
   return std::nullopt;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-int MenuModel::GetDisplayOrderAt(size_t index) const {
-  return -1;
-}
-#endif
-
 }  // namespace ui

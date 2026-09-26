@@ -24,10 +24,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/version_info/version_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/enterprise/connectors/core/features.h"
-#endif
-
 namespace enterprise_connectors {
 
 

@@ -37,11 +37,8 @@ DataUseTracker::~DataUseTracker() = default;
 std::unique_ptr<DataUseTracker> DataUseTracker::Create(
     PrefService* local_state) {
   std::unique_ptr<DataUseTracker> data_use_tracker;
-// Instantiate DataUseTracker only on Android. UpdateMetricsUsagePrefs() honors
-// this rule too.
-#if BUILDFLAG(IS_ANDROID)
-  data_use_tracker = std::make_unique<DataUseTracker>(local_state);
-#endif
+  // Instantiate DataUseTracker only on Android. UpdateMetricsUsagePrefs()
+  // honors this rule too.
   return data_use_tracker;
 }
 
@@ -56,12 +53,7 @@ void DataUseTracker::UpdateMetricsUsagePrefs(int message_size,
                                              bool is_cellular,
                                              bool is_metrics_service_usage,
                                              PrefService* local_state) {
-// Instantiate DataUseTracker only on Android. Create() honors this rule too.
-#if BUILDFLAG(IS_ANDROID)
-  metrics::DataUseTracker tracker(local_state);
-  tracker.UpdateMetricsUsagePrefsInternal(message_size, is_cellular,
-                                          is_metrics_service_usage);
-#endif  // BUILDFLAG(IS_ANDROID)
+  // Instantiate DataUseTracker only on Android. Create() honors this rule too.
 }
 
 void DataUseTracker::UpdateMetricsUsagePrefsInternal(

@@ -219,11 +219,6 @@ QuicSessionPoolTestBase::QuicSessionPoolTestBase(
   FLAGS_quic_enable_http3_grease_randomness = false;
   context_.AdvanceTime(quic::QuicTime::Delta::FromSeconds(1));
 
-#if BUILDFLAG(IS_ANDROID)
-  base::FilePath test_data_dir("/data/local/tmp/net_test_data");
-  base::PathService::Override(base::DIR_SRC_TEST_DATA_ROOT, test_data_dir);
-#endif
-
   // It's important that different proxies have different IPs, to avoid
   // pooling them together.
   host_resolver_->rules()->AddRule(kProxy1HostName, "127.0.1.1");

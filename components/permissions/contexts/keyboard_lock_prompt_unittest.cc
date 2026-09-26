@@ -30,7 +30,6 @@ class KeyboardLockPromptTests : public testing::Test {
   base::test::ScopedFeatureList feature_list_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(KeyboardLockPromptTests, KeyboardLockPromptDisabled) {
   GURL url("https://www.example.com");
 
@@ -66,6 +65,5 @@ TEST_F(KeyboardLockPromptTests, KeyboardLockPromptEnabled) {
                                /*render_frame_host=*/nullptr, url, url)
           .status);
 }
-#endif
 
 }  // namespace permissions

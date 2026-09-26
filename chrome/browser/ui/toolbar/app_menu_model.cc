@@ -2152,7 +2152,6 @@ bool AppMenuModel::AddGlobalErrorMenuItems() {
 }
 
 bool AppMenuModel::AddDefaultBrowserMenuItems() {
-#if !BUILDFLAG(IS_ANDROID)
   if (browser_->GetProfile()->IsIncognitoProfile() ||
       browser_->GetProfile()->IsGuestSession()) {
     return false;
@@ -2171,6 +2170,5 @@ bool AppMenuModel::AddDefaultBrowserMenuItems() {
                            AppMenuModel::kSetBrowserAsDefaultMenuItem);
     return true;
   }
-#endif
   return false;
 }

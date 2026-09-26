@@ -36,13 +36,11 @@ void PointerLockPermissionContext::NotifyPermissionSet(
       request_data, std::move(callback), persist, permission_result, decision);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 ContentSetting PointerLockPermissionContext::GetContentSettingStatusInternal(
     content::RenderFrameHost* render_frame_host,
     const GURL& requesting_origin,
     const GURL& embedding_origin) const {
   return CONTENT_SETTING_ALLOW;
 }
-#endif
 
 }  // namespace permissions

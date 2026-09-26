@@ -17,10 +17,6 @@
 #include "components/variations/variations_switches.h"
 #include "ui/base/device_form_factor.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 namespace variations {
 
 version_info::Channel VariationsServiceClient::GetChannelForVariations() {
@@ -48,16 +44,11 @@ version_info::Channel VariationsServiceClient::GetChannelForVariations() {
 }
 
 Study::FormFactor VariationsServiceClient::GetCurrentFormFactor() {
-// Temporary workaround to report foldable for variations without affecting
-// other form factors. This will be removed and replaced with a long-term
-// solution in DeviceFormFactor::GetDeviceFormFactor() after conducting an
-// audit of form factor usage or exposing ui_mode.
-// FormFactorMetricsProvider::GetFormFactor() also needs to be updated.
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_foldable()) {
-    return Study::FOLDABLE;
-  }
-#endif
+  // Temporary workaround to report foldable for variations without affecting
+  // other form factors. This will be removed and replaced with a long-term
+  // solution in DeviceFormFactor::GetDeviceFormFactor() after conducting an
+  // audit of form factor usage or exposing ui_mode.
+  // FormFactorMetricsProvider::GetFormFactor() also needs to be updated.
 
 #if BUILDFLAG(PLATFORM_CFM)
   return Study::MEET_DEVICE;

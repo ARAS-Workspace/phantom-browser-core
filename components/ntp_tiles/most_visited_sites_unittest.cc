@@ -1068,7 +1068,6 @@ TEST_F(MostVisitedSitesTest, MultipleObservers) {
                                      TileSource::TOP_SITES)))));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(MostVisitedSitesTest, MostVisitedRedesignEnforcesExpandedBoundsCleanly) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures(
@@ -1180,7 +1179,6 @@ TEST_F(MostVisitedSitesTest, CustomLinksCappedAtTenWhenRedesignDisabled) {
               testing::Contains(testing::Key(SectionType::PERSONALIZED)));
   EXPECT_EQ(10ul, sections.at(SectionType::PERSONALIZED).size());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Existing tests check the default 8-link mobile cap. This dedicated test
 // verifies the 10-link limit configured on WebUI NTP (AL) builds.

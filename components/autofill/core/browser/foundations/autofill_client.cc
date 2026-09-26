@@ -271,28 +271,6 @@ bool AutofillClient::IsAndroidLargeFormFactor() const {
   return false;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool AutofillClient::ShowAmbientAutoFillNotice(
-    base::WeakPtr<TouchToFillAutofillDelegate> delegate) {
-  return false;
-}
-
-void AutofillClient::HideAmbientAutoFillNotice() {}
-
-AutofillSnackbarControllerImpl*
-AutofillClient::GetAutofillSnackbarController() {
-  return nullptr;
-}
-
-void AutofillClient::ShowAutofillAiLoadingDialog() {
-  NOTIMPLEMENTED();
-}
-
-void AutofillClient::DismissAutofillAiLoadingDialog() {
-  NOTIMPLEMENTED();
-}
-#endif
-
 void AutofillClient::TriggerUserPerceptionOfAutofillSurvey(
     FillingProduct filling_product,
     const std::map<std::string, std::string>& field_filling_stats_data) {

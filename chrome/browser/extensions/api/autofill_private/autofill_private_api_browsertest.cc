@@ -882,7 +882,7 @@ IN_PROC_BROWSER_TEST_F(AutofillPrivateApiBrowserTestWithWalletPassBranding,
 #endif
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 class AutofillPrivateApiAuthToViewSensitiveEntityTest
     : public AutofillPrivateApiBrowserTest,
       public WithParamInterface<std::tuple<bool, bool>> {
@@ -1258,6 +1258,6 @@ IN_PROC_BROWSER_TEST_F(
       autofill_client()->GetPrefs()));
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace

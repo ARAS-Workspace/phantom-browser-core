@@ -82,8 +82,7 @@ MidiManager::~MidiManager() {
   }
 }
 
-#if !BUILDFLAG(IS_APPLE) && !(defined(USE_ALSA) && defined(USE_UDEV)) && \
-    !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE) && !(defined(USE_ALSA) && defined(USE_UDEV))
 MidiManager* MidiManager::Create(MidiService* service) {
   ReportUsage(Usage::CREATED_ON_UNSUPPORTED_PLATFORMS);
   return new MidiManager(service);

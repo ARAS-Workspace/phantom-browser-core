@@ -23,17 +23,7 @@
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/safety_hub/password_status_check_result_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-// Interval to show notification for compromised password in Safety Hub
-// notifications.
-const base::TimeDelta kPasswordCheckNotificationInterval = base::Days(0);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Interval to show notification for revoked permissions in Safety Hub
 // notifications.

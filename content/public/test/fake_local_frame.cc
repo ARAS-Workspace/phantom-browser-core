@@ -181,14 +181,6 @@ void FakeLocalFrame::BindDevToolsAgent(
     mojo::PendingAssociatedRemote<blink::mojom::DevToolsAgentHost> host,
     mojo::PendingAssociatedReceiver<blink::mojom::DevToolsAgent> receiver) {}
 
-#if BUILDFLAG(IS_ANDROID)
-void FakeLocalFrame::ExtractSmartClipData(
-    const gfx::Rect& rect,
-    ExtractSmartClipDataCallback callback) {
-  std::move(callback).Run(std::u16string(), std::u16string(), gfx::Rect());
-}
-#endif
-
 void FakeLocalFrame::HandleRendererDebugURL(const GURL& url) {}
 
 void FakeLocalFrame::GetCanonicalUrlForSharing(
@@ -265,9 +257,5 @@ void FakeLocalFrame::InvokeScriptToolForInspector(
 
 void FakeLocalFrame::NotifyInspectorOfCrossDocumentScriptToolResult(
     const base::UnguessableToken& invocation_id) {}
-
-#if BUILDFLAG(IS_ANDROID)
-void FakeLocalFrame::PerformFullContentSpellCheck() {}
-#endif
 
 }  // namespace content

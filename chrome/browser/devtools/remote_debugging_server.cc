@@ -396,7 +396,6 @@ RemoteDebuggingServer::GetInstance(PrefService* local_state) {
 
   // `--remote-debugging-port` and `--remote-debugging-pipe`
   // take precedence over the new mode.
-#if !BUILDFLAG(IS_ANDROID)
   if (!debugging_server_started &&
       base::FeatureList::IsEnabled(
           ::features::kDevToolsAcceptDebuggingConnections)) {
@@ -414,7 +413,6 @@ RemoteDebuggingServer::GetInstance(PrefService* local_state) {
     // if the preference is also enabled.
     debugging_server_started = true;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (debugging_server_started) {
     return server;

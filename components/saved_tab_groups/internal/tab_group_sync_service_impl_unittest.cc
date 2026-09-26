@@ -891,33 +891,6 @@ TEST_F(TabGroupSyncServiceImplTest, RemoveTab) {
       "TabGroups.Sync.TabGroup.TabRemoved.GroupCreateOrigin", 2u);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(TabGroupSyncServiceImplTest, ForceRemoveClosedTabGroupsOnStartup) {
-  feature_list_.InitWithFeatures(
-      {tab_groups::kForceRemoveClosedTabGroupsOnStartup}, {});
-
-  EXPECT_CALL(*observer_, OnInitialized()).Times(1);
-
-  EXPECT_CALL(*observer_, OnTabGroupRemoved(testing::TypedEq<const base::Uuid&>(
-                                                group_1_.saved_guid()),
-                                            Eq(TriggerSource::LOCAL)))
-      .Times(0);
-  EXPECT_CALL(*observer_, OnTabGroupRemoved(testing::TypedEq<const base::Uuid&>(
-                                                group_2_.saved_guid()),
-                                            Eq(TriggerSource::LOCAL)))
-      .Times(1);
-  EXPECT_CALL(*observer_, OnTabGroupRemoved(testing::TypedEq<const base::Uuid&>(
-                                                group_3_.saved_guid()),
-                                            Eq(TriggerSource::LOCAL)))
-      .Times(1);
-
-  model_->LoadStoredEntries(/*groups=*/{}, /*tabs=*/{});
-  WaitForPostedTasks();
-  // Wait again as the posted task will post again.
-  WaitForPostedTasks();
-}
-#endif
-
 TEST_F(TabGroupSyncServiceImplTest, CleanUpHiddenSavedTabGroupsOnStartup) {
   SavedTabGroup saved_tab_group_1(test::CreateTestSavedTabGroup());
   saved_tab_group_1.SetIsHidden(true);

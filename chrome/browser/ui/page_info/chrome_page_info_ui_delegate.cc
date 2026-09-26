@@ -41,14 +41,12 @@
 #include "ui/events/event.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/window_controller_list.h"  // nogncheck
 #include "chrome/browser/page_info/about_this_site_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/page_info/about_this_site_side_panel.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/web_applications/web_app_ui_utils.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
@@ -123,7 +121,6 @@ std::u16string ChromePageInfoUiDelegate::GetAutomaticallyBlockedReason(
   return std::u16string();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<page_info::proto::SiteInfo>
 ChromePageInfoUiDelegate::GetAboutThisSiteInfo() {
   BrowserWindowInterface* browser =
@@ -149,13 +146,11 @@ void ChromePageInfoUiDelegate::OpenMoreAboutThisPageUrl(
   DCHECK(page_info::IsAboutThisSiteFeatureEnabled());
   ShowAboutThisSiteSidePanel(web_contents_, url);
 }
-#endif
 
 bool ChromePageInfoUiDelegate::ShouldShowAsk(ContentSettingsType type) {
   return permissions::PermissionUtil::IsGuardContentSetting(type);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool ChromePageInfoUiDelegate::ShouldShowSiteSettings(int* link_text_id,
                                                       int* tooltip_text_id) {
   if (GetProfile()->IsGuestSession()) {
@@ -298,7 +293,6 @@ void ChromePageInfoUiDelegate::SettingsLinkClicked(ContentSettingsType type) {
 bool ChromePageInfoUiDelegate::IsBlockAutoPlayEnabled() {
   return GetProfile()->GetPrefs()->GetBoolean(prefs::kBlockAutoplayEnabled);
 }
-#endif
 
 content::PermissionResult ChromePageInfoUiDelegate::GetPermissionResult(
     blink::PermissionType permission) {
@@ -317,12 +311,10 @@ ChromePageInfoUiDelegate::GetEmbargoResult(ContentSettingsType type) {
       ->GetEmbargoResult(site_url_, type);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ChromePageInfoUiDelegate::OpenMerchantTrustSidePanel(const GURL& url) {
   DCHECK(page_info::IsMerchantTrustFeatureEnabled());
   ShowMerchantTrustSidePanel(web_contents_, url);
 }
-#endif
 
 void ChromePageInfoUiDelegate::GetMerchantTrustInfo(
     page_info::MerchantDataCallback callback) {

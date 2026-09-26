@@ -33,9 +33,7 @@
 #include "components/user_prefs/user_prefs.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/custom_handlers/protocol_handler_navigation_throttle.h"
-#endif
 
 namespace {
 
@@ -103,14 +101,12 @@ class ProtocolHandlersManagerBrowserTest : public ExtensionBrowserTest {
   ProtocolHandlersManagerBrowserTest() {
     feature_list_.InitAndEnableFeature(
         extensions_features::kExtensionProtocolHandlers);
-#if !BUILDFLAG(IS_ANDROID)
     custom_handlers::ProtocolHandlerNavigationThrottle::
         GetDialogLaunchCallbackForTesting() = base::BindRepeating(
             [](HandlerPermissionGrantedCallback granted_callback,
                HandlerPermissionDeniedCallback denied_callback) {
               std::move(granted_callback).Run(/*remember=*/true);
             });
-#endif
   }
   ProtocolHandlersManagerBrowserTest(
       const ProtocolHandlersManagerBrowserTest&) = delete;

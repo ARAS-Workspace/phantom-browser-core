@@ -23,10 +23,6 @@
 #include "net/nqe/effective_connection_type_observer.h"
 #include "net/nqe/network_quality_estimator.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "services/network/public/cpp/network_connection_tracker.h"
-#endif
-
 namespace metrics {
 
 SystemProfileProto::Network::EffectiveConnectionType

@@ -54,9 +54,6 @@ void PrintManager::PrintingFailed(int32_t cookie,
   if (!IsValidCookie(cookie))
     return;
 
-#if BUILDFLAG(IS_ANDROID)
-  PdfWritingDone(0);
-#endif
 }
 
 void PrintManager::ClearPrintRenderFramesForTesting() {
@@ -100,11 +97,7 @@ content::RenderFrameHost& PrintManager::CurrentTargetFrame() {
   return print_manager_host_receivers_.CurrentTargetFrame();
 }
 
-void PrintManager::PrintingRenderFrameDeleted() {
-#if BUILDFLAG(IS_ANDROID)
-  PdfWritingDone(0);
-#endif
-}
+void PrintManager::PrintingRenderFrameDeleted() {}
 
 bool PrintManager::IsValidCookie(int cookie) const {
   return cookie > 0 && cookie == cookie_;

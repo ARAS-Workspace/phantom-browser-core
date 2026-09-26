@@ -386,7 +386,6 @@ TEST_F(AutocompleteControllerTest, CompanyEntityImageNotRemoved) {
 }
 
 // Desktop has some special handling for bare '@' inputs.
-#if !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 TEST_F(AutocompleteControllerTest, FilterMatchesForInstantKeywordWithBareAt) {
   SetAutocompleteMatches({
       CreateSearchMatch(u"@"),
@@ -413,7 +412,6 @@ TEST_F(AutocompleteControllerTest, FilterMatchesForInstantKeywordWithBareAt) {
                match.contents == u"@";
       }));
 }
-#endif
 
 TEST_F(AutocompleteControllerTest, UpdateResult_SyncAnd2Async) {
   auto sync_match = CreateSearchMatch("sync", true, 1300);
@@ -632,8 +630,7 @@ TEST_F(AutocompleteControllerTest, UpdateResult_Ranking) {
                   "800",
               }));
 
-// Android doesn't use the same grouping logic as desktop
-#if !BUILDFLAG(IS_ANDROID)
+  // Android doesn't use the same grouping logic as desktop
 
   // Searches should be grouped above non-shortcut-boosted URLs.
   EXPECT_THAT(controller_.SimulateCleanAutocompletePass({
@@ -696,8 +693,6 @@ TEST_F(AutocompleteControllerTest, UpdateResult_Ranking) {
                     "history800",
                 }));
   }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(AutocompleteControllerTest, UpdateResult_ZPSEnabledAndShownInSession) {
@@ -866,7 +861,6 @@ TEST_F(AutocompleteControllerTest, UpdateResult_ZPSEnabledAndShownInSession) {
 
 // Android isn't ready for ML and won't pass this test because it has its own
 // grouping code.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteControllerTest, MlRanking) {
   OmniboxFieldTrial::ScopedMLConfigForTesting scoped_ml_config;
   scoped_ml_config.GetMLConfig().ml_url_scoring = true;
@@ -1792,7 +1786,6 @@ TEST_F(AutocompleteControllerTest, UpdateResult_MLRanking_AllMatches) {
           "history 800 .2",
       }));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AutocompleteControllerTest, UpdateResult_NotifyingAndTimers) {
   {
@@ -2458,50 +2451,7 @@ TEST_F(AutocompleteControllerTest,
 }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(AutocompleteControllerTest, ShouldRunProvider_AndroidHubSearch) {
-  // Regular Hub search (ANDROID_HUB) should run all 4 providers.
-  std::set<AutocompleteProvider::Type> expected_provider_types = {
-      AutocompleteProvider::TYPE_SEARCH, AutocompleteProvider::TYPE_OPEN_TAB,
-      AutocompleteProvider::TYPE_BOOKMARK,
-      AutocompleteProvider::TYPE_HISTORY_QUICK};
-
-  controller_.input_ =
-      AutocompleteInput(u"a", 1u, metrics::OmniboxEventProto::ANDROID_HUB,
-                        TestSchemeClassifier());
-  for (auto& provider : controller_.providers()) {
-    EXPECT_EQ(controller_.ShouldRunProvider(provider.get()),
-              expected_provider_types.contains(provider->type()))
-        << "Provider Type: "
-        << AutocompleteProvider::TypeToString(provider->type());
-  }
-}
-
-TEST_F(AutocompleteControllerTest, ShouldRunProvider_AndroidTabSearchOverlay) {
-  // Tab Search Overlay allows search, open tabs, bookmarks, and history.
-  // Note: While AutocompleteController allows them to run, the individual
-  // providers (e.g. SearchProvider, BookmarkProvider) will filter themselves
-  // out in their Start() methods.
-  std::set<AutocompleteProvider::Type> expected_provider_types = {
-      AutocompleteProvider::TYPE_SEARCH, AutocompleteProvider::TYPE_OPEN_TAB,
-      AutocompleteProvider::TYPE_BOOKMARK,
-      AutocompleteProvider::TYPE_HISTORY_QUICK};
-
-  AutocompleteInput input(
-      u"a", 1u, metrics::OmniboxEventProto::ANDROID_TAB_SEARCH_OVERLAY,
-      TestSchemeClassifier());
-  controller_.input_ = input;
-  for (auto& provider : controller_.providers()) {
-    EXPECT_EQ(controller_.ShouldRunProvider(provider.get()),
-              expected_provider_types.contains(provider->type()))
-        << "Provider Type: "
-        << AutocompleteProvider::TypeToString(provider->type());
-  }
-}
-#endif
-
 // Android has different handling for pedals.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteControllerTest, NoActionsAttachedToLensSearchboxMatches) {
   std::unordered_map<OmniboxPedalId, scoped_refptr<OmniboxPedal>> pedals;
   const auto add = [&](OmniboxPedal* pedal) {
@@ -2558,10 +2508,8 @@ TEST_F(AutocompleteControllerTest, NoActionsAttachedToLensSearchboxMatches) {
   EXPECT_TRUE(
       controller_.internal_result_.match_at(2)->has_tab_match.value_or(false));
 }
-#endif
 
 // Android has different handling for pedals.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteControllerTest, NoActionsAttachedToNtpComposeboxMatches) {
   // Create input with lens searchbox page classification.
   controller_.input_ = AutocompleteInput(
@@ -2600,10 +2548,8 @@ TEST_F(AutocompleteControllerTest, NoActionsAttachedToNtpComposeboxMatches) {
   EXPECT_TRUE(
       controller_.internal_result_.match_at(1)->has_tab_match.value_or(false));
 }
-#endif
 
 // Feature not enabled on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteControllerTest,
        ContextualSearchActionAttachedPageKeywordMode) {
   // Create a pedal provider to ensure that the contextual search action takes
@@ -2713,7 +2659,6 @@ TEST_F(AutocompleteControllerTest,
       OmniboxActionId::CONTEXTUAL_SEARCH_FULFILLMENT,
       controller_.internal_result_.match_at(2)->takeover_action->ActionId());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AutocompleteControllerTest, UpdateAssociatedKeywords) {
   controller_.keyword_provider_ =
@@ -2995,8 +2940,6 @@ TEST_F(AutocompleteControllerTest, CheckWhetherDefaultMatchChanged) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 TEST_F(AutocompleteControllerTest, SmartComposeClearedWithNewResults) {
   auto match1 = CreateSearchMatch("match1", true, 1300);
   EXPECT_THAT(controller_.SimulateAutocompletePass(true, false, {match1}),
@@ -3019,8 +2962,6 @@ TEST_F(AutocompleteControllerTest, SmartComposeClearedWithNewResults) {
   // smart compose result.
   ASSERT_TRUE(controller_.internal_result_.smart_compose_inline_hint().empty());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 
 TEST_F(AutocompleteControllerTest, IncludesSmartComposeStatsInAdditionalStats) {
   omnibox::metrics::SmartComposeStats stats;

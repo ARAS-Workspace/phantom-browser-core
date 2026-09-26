@@ -95,10 +95,6 @@
 #include "url/gurl.h"
 #include "url/url_canon.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 #include "components/autofill/core/browser/payments/test_credit_card_fido_authenticator.h"
 
 namespace autofill::autofill_metrics {
@@ -567,12 +563,6 @@ TEST_F(AutofillMetricsTest, LogStoredCreditCardWithInvalidCardNumberMetrics) {
 
 // Test that the credit card checkout flow user actions are correctly logged.
 TEST_F(AutofillMetricsTest, CreditCardCheckoutFlowUserActions) {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_automotive()) {
-    GTEST_SKIP() << "This test should not run on automotive.";
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Disable mandatory reauth as it is not part of this test and will
   // interfere with the card retrieval flow.
   paydm().SetPaymentMethodsMandatoryReauthEnabled(false);

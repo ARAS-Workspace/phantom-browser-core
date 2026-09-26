@@ -20,13 +20,6 @@ using blink::mojom::PermissionDescriptorPtr;
 
 namespace content {
 
-#if BUILDFLAG(IS_ANDROID)
-namespace {
-constexpr const char* kIsFileURLHistogram =
-    "Permissions.GetLastCommittedOriginAsURL.IsFileURL";
-}
-#endif
-
 PermissionOption PermissionUtil::ToPermissionOption(
     blink::mojom::PermissionStatus permission_status) {
   switch (permission_status) {
@@ -73,20 +66,6 @@ GURL PermissionUtil::GetLastCommittedOriginAsURL(
 
   content::WebContents* web_contents =
       content::WebContents::FromRenderFrameHost(render_frame_host);
-#if BUILDFLAG(IS_ANDROID)
-  // If `allow_universal_access_from_file_urls` flag is enabled, a file:/// can
-  // change its url via history.pushState/replaceState to any other url,
-  // including about:blank. To avoid user confusion we should always use a
-  // visible url, in other words `GetLastCommittedURL`.
-  if (web_contents->GetOrCreateWebPreferences()
-          .allow_universal_access_from_file_urls &&
-      render_frame_host->GetLastCommittedOrigin().GetURL().SchemeIsFile()) {
-    base::UmaHistogramBoolean(kIsFileURLHistogram, true);
-    return render_frame_host->GetLastCommittedURL().DeprecatedGetOriginAsURL();
-  } else {
-    base::UmaHistogramBoolean(kIsFileURLHistogram, false);
-  }
-#endif
 
   GURL origin = render_frame_host->GetLastCommittedOrigin().GetURL();
   if (origin.is_empty() && render_frame_host->IsInPrimaryMainFrame()) {

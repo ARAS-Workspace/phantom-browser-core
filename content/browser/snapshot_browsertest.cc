@@ -197,7 +197,6 @@ class SnapshotBrowserTest : public ContentBrowserTest {
 
 // Even the single-window test doesn't work on Android yet. It's expected
 // that the multi-window tests would never work on that platform.
-#if !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -393,7 +392,5 @@ IN_PROC_BROWSER_TEST_F(SnapshotBrowserTest, MAYBE_AsyncMultiWindowTest) {
     base::RunLoop().RunUntilIdle();
   }
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

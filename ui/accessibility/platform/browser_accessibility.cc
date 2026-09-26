@@ -907,9 +907,9 @@ gfx::Rect BrowserAccessibility::RelativeToAbsoluteBounds(
     // TODO(crbug.com/40686662): this should probably apply visual viewport
     // offset as well.
     bool should_include_page_scale_factor_in_root = false;
-    #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
-      should_include_page_scale_factor_in_root = true;
-    #endif
+#if !BUILDFLAG(IS_MAC)
+    should_include_page_scale_factor_in_root = true;
+#endif
     if (!should_include_page_scale_factor_in_root) {
       BrowserAccessibilityManager* root_manager =
           manager()->GetManagerForRootFrame();

@@ -652,7 +652,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, TextareaSetValue) {
   // which contain all of the line break information.
   //
   // We should do it with accessibility flags instead. http://crbug.com/672205
-#if !BUILDFLAG(IS_ANDROID)
   // Check that it really does contain two lines.
   ui::BrowserAccessibility::AXPosition start_position =
       target->CreateTextPositionAt(0);
@@ -661,7 +660,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, TextareaSetValue) {
           {ui::AXBoundaryBehavior::kCrossBoundary,
            ui::AXBoundaryDetection::kDontCheckInitialPosition});
   EXPECT_EQ(5, end_of_line_1->text_offset());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
@@ -687,7 +685,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
   // which contain all of the line break information.
   //
   // We should do it with accessibility flags instead. http://crbug.com/672205
-#if !BUILDFLAG(IS_ANDROID)
   // Check that it really does contain two lines.
   ui::BrowserAccessibility::AXPosition start_position =
       target->CreateTextPositionAt(0);
@@ -696,7 +693,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
           {ui::AXBoundaryBehavior::kCrossBoundary,
            ui::AXBoundaryDetection::kDontCheckInitialPosition});
   EXPECT_EQ(5, end_of_line_1->text_offset());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, ShowContextMenu) {
@@ -1093,7 +1089,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
 
 // Action::kScrollToMakeVisible does not seem reliable on Android and we are
 // currently only using it for desktop screen readers.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, ScrollIntoView) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
       <!DOCTYPE html>
@@ -1231,7 +1226,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, ScrollIntoView) {
     EXPECT_FALSE(doc_left_third.Contains(bounds));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, StitchChildTree) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
@@ -1357,12 +1351,10 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, ClickSVG) {
   EXPECT_EQ(1U, target_node->PlatformChildCount());
   GetManager()->DoDefaultAction(*target_node);
   ASSERT_TRUE(click_waiter.WaitForNotification());
-#if !BUILDFLAG(IS_ANDROID)
   // This waiter times out on some Android try bots.
   // TODO(akihiroota): Refactor test to be applicable to all platforms.
   WaitForAccessibilityTreeToContainNodeWithName(shell()->web_contents(),
                                                 "SVG link was clicked!");
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // TODO(crbug.com/40928581) Disabled due to flakiness.
@@ -1387,7 +1379,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
 }
 
 // Only run this test on platforms where Blink expands and draws a popup.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, OpenSelectPopup) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
       <head><title>OpenSelectPopup</title></head>
@@ -1430,7 +1422,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, OpenSelectPopup) {
   EXPECT_FALSE(open_popup->HasState(ax::mojom::State::kInvisible));
   EXPECT_EQ(3U, open_popup->InternalChildCount());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, FocusPermissionElement) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
@@ -1511,85 +1503,5 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
   EXPECT_TRUE(target->HasState(ax::mojom::State::kCollapsed));
   EXPECT_FALSE(target->HasState(ax::mojom::State::kExpanded));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Test that the leaf cache is updated when changing a node's role updates the
-// node's BrowserAccessibilityAndroid::IsLeaf() status.
-IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
-                       DynamicRoleChangeStaleLeafCache) {
-  LoadInitialAccessibilityTreeFromHtml(R"HTML(
-      <blockquote id="target">
-        <strong>child1</strong>
-        <em>child2</em>
-      </blockquote>
-      )HTML");
-
-  ui::BrowserAccessibility* target =
-      FindNodeWithRole(ax::mojom::Role::kBlockquote);
-  EXPECT_FALSE(target->IsLeaf());
-
-  AccessibilityNotificationWaiter waiter(
-      shell()->web_contents(), ui::AXEventGenerator::Event::ROLE_CHANGED);
-  EXPECT_TRUE(ExecJs(
-      shell(),
-      "document.getElementById('target').setAttribute('role', 'button');"));
-  ASSERT_TRUE(waiter.WaitForNotification());
-
-  target = FindNodeWithRole(ax::mojom::Role::kButton);
-  EXPECT_TRUE(target->IsLeaf());
-}
-
-// Test that the leaf cache is updated when changing a node's aria-label updates
-// the node's BrowserAccessibilityAndroid::IsLeaf() status.
-IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
-                       DynamicLabelChangeStaleLeafCache) {
-  LoadInitialAccessibilityTreeFromHtml(R"HTML(
-      <h1 id="target" tabindex=0>
-        <strong>child1</strong>
-        <em>child2</em>
-      </h1>
-      )HTML");
-
-  ui::BrowserAccessibility* target =
-      FindNodeWithRole(ax::mojom::Role::kHeading);
-  EXPECT_TRUE(target->IsLeaf());
-
-  AccessibilityNotificationWaiter waiter(
-      shell()->web_contents(), ui::AXEventGenerator::Event::NAME_CHANGED);
-  EXPECT_TRUE(ExecJs(shell(),
-                     "document.getElementById('target').setAttribute('aria-"
-                     "label', 'label1');"));
-  ASSERT_TRUE(waiter.WaitForNotification());
-
-  target = FindNodeWithRole(ax::mojom::Role::kHeading);
-  EXPECT_FALSE(target->IsLeaf());
-}
-
-// Test that the leaf cache is updated when changing a node's tabindex updates
-// the node's BrowserAccessibilityAndroid::IsLeaf() status.
-IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
-                       DynamicTabIndexChangeStaleLeafCache) {
-  LoadInitialAccessibilityTreeFromHtml(R"HTML(
-      <div role="tooltip" id="target" title="label1">
-        <strong>child1</strong>
-        <em>child2</em>
-      </div>
-      )HTML");
-
-  ui::BrowserAccessibility* target =
-      FindNodeWithRole(ax::mojom::Role::kTooltip);
-  EXPECT_FALSE(target->IsLeaf());
-
-  AccessibilityNotificationWaiter waiter(
-      shell()->web_contents(), ui::AXEventGenerator::Event::STATE_CHANGED);
-  EXPECT_TRUE(ExecJs(
-      shell(),
-      "document.getElementById('target').setAttribute('tabindex', '0');"));
-  ASSERT_TRUE(waiter.WaitForNotification());
-
-  target = FindNodeWithRole(ax::mojom::Role::kTooltip);
-  EXPECT_TRUE(target->IsLeaf());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

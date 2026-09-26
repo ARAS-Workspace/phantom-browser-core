@@ -30,13 +30,4 @@ std::string CdmContext::CdmIdToString(const base::UnguessableToken* cdm_id) {
   return cdm_id ? cdm_id->ToString() : "null";
 }
 
-
-#if BUILDFLAG(IS_ANDROID)
-MediaCryptoContext* CdmContext::GetMediaCryptoContext() {
-  return nullptr;
-}
-#endif
-
-
-
 }  // namespace media

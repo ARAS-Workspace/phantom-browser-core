@@ -37,20 +37,6 @@ namespace content {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-
-// These inset and flags simulate when we are not extending into the cutout.
-const auto kNoCutoutInsets = gfx::Insets();
-
-// These inset and flags simulate when the we are extending into the cutout.
-const auto kCutoutInsets = gfx::Insets::TLBR(1, 0, 1, 0);
-
-// These inset and flags simulate when we are extending into the cutout and have
-// rotated the device so that the cutout is on the other sides.
-const auto kRotatedCutoutInsets = gfx::Insets::TLBR(0, 1, 0, 1);
-
-#endif
-
 class TestWebContentsObserver : public WebContentsObserver {
  public:
   explicit TestWebContentsObserver(content::WebContents* web_contents)
@@ -230,132 +216,6 @@ class DisplayCutoutBrowserTest : public ContentBrowserTest {
 };
 
 // The viewport meta tag is only enabled on Android.
-#if BUILDFLAG(IS_ANDROID)
-
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, ViewportFit_Fullscreen) {
-  LoadTestPageWithViewportFitFromMeta("cover");
-  LoadSubFrameWithViewportFitMetaValue("contain");
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    SimulateFullscreenStateChanged(MainFrame(), true);
-    observer.WaitForWantedValue(blink::mojom::ViewportFit::kCover);
-    web_contents_impl()->SetDisplayCutoutSafeArea(kCutoutInsets);
-  }
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    SimulateFullscreenStateChanged(ChildFrame(), true);
-    observer.WaitForWantedValue(blink::mojom::ViewportFit::kContain);
-    web_contents_impl()->SetDisplayCutoutSafeArea(kNoCutoutInsets);
-  }
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    SimulateFullscreenStateChanged(ChildFrame(), false);
-    observer.WaitForWantedValue(blink::mojom::ViewportFit::kCover);
-
-    // This simulates the user rotating the device.
-    web_contents_impl()->SetDisplayCutoutSafeArea(kCutoutInsets);
-    web_contents_impl()->SetDisplayCutoutSafeArea(kRotatedCutoutInsets);
-  }
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    SimulateFullscreenStateChanged(MainFrame(), false);
-    SimulateFullscreenExit();
-    observer.WaitForWantedValue(blink::mojom::ViewportFit::kAuto);
-    web_contents_impl()->SetDisplayCutoutSafeArea(kNoCutoutInsets);
-  }
-
-  shell()->Close();
-}
-
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest,
-                       ViewportFit_Fullscreen_Update) {
-  LoadTestPageWithViewportFitFromMeta("cover");
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    SimulateFullscreenStateChanged(MainFrame(), true);
-    observer.WaitForWantedValue(blink::mojom::ViewportFit::kCover);
-    web_contents_impl()->SetDisplayCutoutSafeArea(kNoCutoutInsets);
-  }
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    ClearViewportFitTag();
-    observer.WaitForWantedValue(blink::mojom::ViewportFit::kAuto);
-    web_contents_impl()->SetDisplayCutoutSafeArea(kNoCutoutInsets);
-  }
-  shell()->Close();
-}
-
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, ViewportFit_Noop_Navigate) {
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    LoadTestPageWithViewportFitFromMeta("cover");
-    EXPECT_FALSE(observer.has_value());
-  }
-  LoadTestPageWithData("");
-}
-
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest,
-                       ViewportFit_Noop_WebContentsDestroyed) {
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    LoadTestPageWithViewportFitFromMeta("cover");
-    EXPECT_FALSE(observer.has_value());
-  }
-
-  shell()->Close();
-}
-
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, WebDisplayMode) {
-  // Inject the custom delegate used for this test.
-  std::unique_ptr<DisplayCutoutWebContentsDelegate> delegate(
-      new DisplayCutoutWebContentsDelegate());
-  web_contents_impl()->SetDelegate(delegate.get());
-  EXPECT_EQ(delegate.get(), web_contents_impl()->GetDelegate());
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    LoadTestPageWithViewportFitFromMeta("cover");
-    EXPECT_FALSE(observer.has_value());
-  }
-}
-
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, WebDisplayMode_Fullscreen) {
-  // Inject the custom delegate used for this test.
-  std::unique_ptr<DisplayCutoutWebContentsDelegate> delegate(
-      new DisplayCutoutWebContentsDelegate());
-  delegate->SetDisplayMode(blink::mojom::DisplayMode::kFullscreen);
-  web_contents_impl()->SetDelegate(delegate.get());
-  EXPECT_EQ(delegate.get(), web_contents_impl()->GetDelegate());
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    LoadTestPageWithViewportFitFromMeta("cover");
-    observer.WaitForWantedValue(blink::mojom::ViewportFit::kCover);
-  }
-}
-
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, WebDisplayMode_Standalone) {
-  // Inject the custom delegate used for this test.
-  std::unique_ptr<DisplayCutoutWebContentsDelegate> delegate(
-      new DisplayCutoutWebContentsDelegate());
-  delegate->SetDisplayMode(blink::mojom::DisplayMode::kStandalone);
-  web_contents_impl()->SetDelegate(delegate.get());
-  EXPECT_EQ(delegate.get(), web_contents_impl()->GetDelegate());
-
-  {
-    TestWebContentsObserver observer(web_contents_impl());
-    LoadTestPageWithViewportFitFromMeta("cover");
-    EXPECT_FALSE(observer.has_value());
-  }
-}
-
-#endif
 
 IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, PublishSafeAreaVariables) {
   LoadTestPageWithData(kTestHTML);
@@ -374,41 +234,5 @@ IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserTest, PublishSafeAreaVariables) {
   EXPECT_EQ("3px", GetCurrentSafeAreaValue("bottom"));
   EXPECT_EQ("4px", GetCurrentSafeAreaValue("right"));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-class DisplayCutoutBrowserWithEdgeToEdgeTest : public DisplayCutoutBrowserTest {
- public:
-  DisplayCutoutBrowserWithEdgeToEdgeTest() = default;
-
-  DisplayCutoutBrowserWithEdgeToEdgeTest(
-      const DisplayCutoutBrowserWithEdgeToEdgeTest&) = delete;
-  DisplayCutoutBrowserWithEdgeToEdgeTest& operator=(
-      const DisplayCutoutBrowserWithEdgeToEdgeTest&) = delete;
-
-  void SetUp() override {
-    base::test::ScopedFeatureList feature_list;
-    feature_list.InitWithFeatures(
-        /*enabled_features=*/{features::kDrawCutoutEdgeToEdge},
-        /*disabled_features=*/{});
-
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-
-    embedded_test_server()->ServeFilesFromDirectory(temp_dir_.GetPath());
-    ASSERT_TRUE(embedded_test_server()->Start());
-
-    ContentBrowserTest::SetUp();
-  }
-};
-
-// Sometimes, the fullscreen exit logic is triggered before navigation
-// completes, causing a check to the RenderFrameHost before it's been set. This
-// ensures that flow doesn't cause a crash.
-IN_PROC_BROWSER_TEST_F(DisplayCutoutBrowserWithEdgeToEdgeTest,
-                       FullscreenExitBeforeNavigationCompletes) {
-  TestWebContentsObserver observer(web_contents_impl());
-  SimulateFullscreenExit();
-}
-
-#endif
 
 }  //  namespace content

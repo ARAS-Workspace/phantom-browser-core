@@ -48,7 +48,6 @@ struct RawPrepopulatedPage {
                          // roughly match favicon).
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android does not use prepopulated pages.
 constexpr auto kRawPrepopulatedPages = std::to_array<RawPrepopulatedPage>({
     {
@@ -58,12 +57,10 @@ constexpr auto kRawPrepopulatedPages = std::to_array<RawPrepopulatedPage>({
         SkColorSetRGB(63, 132, 197),
     },
 });
-#endif
 
 void InitializePrepopulatedPageList(
     Profile* profile,
     history::PrepopulatedPageList* prepopulated_pages) {
-#if !BUILDFLAG(IS_ANDROID)
   DCHECK(prepopulated_pages);
   PrefService* pref_service = profile->GetPrefs();
   bool hide_web_store_icon =
@@ -79,7 +76,6 @@ void InitializePrepopulatedPageList(
         GURL(l10n_util::GetStringUTF8(page.url_id)),
         l10n_util::GetStringUTF16(page.title_id), page.favicon_id, page.color));
   }
-#endif
 }
 
 }  // namespace

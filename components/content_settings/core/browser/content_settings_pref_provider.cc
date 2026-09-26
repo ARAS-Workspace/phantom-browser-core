@@ -47,12 +47,10 @@ namespace {
 
 // These settings are no longer used, and should be deleted on profile startup.
 
-#if !BUILDFLAG(IS_ANDROID)
 const char kObsoleteInstalledWebAppMetadataExceptionsPref[] =
     "profile.content_settings.exceptions.installed_web_app_metadata";
 const char kObsoletePpapiBrokerExceptionsPref[] =
     "profile.content_settings.exceptions.ppapi_broker";
-#endif  // !BUILDFLAG(IS_ANDROID)
 const char
     kObsoleteGetDisplayMediaSetAutoSelectAllScreensAllowedForUrlsExceptionsPref
         [] = "profile.content_settings.exceptions.get_display_media_set_select_"
@@ -114,11 +112,9 @@ void PrefProvider::RegisterProfilePrefs(
 
   // These prefs have been removed, but need to be registered so they can
   // be deleted on startup.
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterDictionaryPref(
       kObsoleteInstalledWebAppMetadataExceptionsPref);
   registry->RegisterDictionaryPref(kObsoletePpapiBrokerExceptionsPref);
-#endif  // !BUILDFLAG(IS_ANDROID)
   registry->RegisterListPref(
       kObsoleteGetDisplayMediaSetAutoSelectAllScreensAllowedForUrlsExceptionsPref);
   registry->RegisterListPref(
@@ -505,10 +501,8 @@ void PrefProvider::DiscardOrMigrateObsoletePreferences() {
 
   // These prefs were never stored on Android so they don't need to be
   // deleted.
-#if !BUILDFLAG(IS_ANDROID)
   prefs_->ClearPref(kObsoleteInstalledWebAppMetadataExceptionsPref);
   prefs_->ClearPref(kObsoletePpapiBrokerExceptionsPref);
-#endif  // !BUILDFLAG(IS_ANDROID)
   prefs_->ClearPref(
       kObsoleteGetDisplayMediaSetAutoSelectAllScreensAllowedForUrlsExceptionsPref);
   prefs_->ClearPref(kObsoleteFederatedIdentityActiveSesssionExceptionsPref);

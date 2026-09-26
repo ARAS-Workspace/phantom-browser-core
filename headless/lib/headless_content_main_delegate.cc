@@ -67,7 +67,7 @@
 #if BUILDFLAG(IS_POSIX)
 #include <signal.h>
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_MAC)
 #include "v8/include/v8-wasm-trap-handler-posix.h"
 #endif
 #endif  // BUILDFLAG(IS_POSIX)
@@ -356,7 +356,7 @@ void HeadlessContentMainDelegate::InitCrashReporter(
     g_headless_crash_client.Pointer()->set_crash_dumps_dir(
         command_line.GetSwitchValuePath(switches::kCrashDumpsDir));
     crash_reporter::InitializeCrashpad(process_type.empty(), process_type);
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
     crash_reporter::SetFirstChanceExceptionHandler(
         v8::TryHandleWebAssemblyTrapPosix);
 #endif

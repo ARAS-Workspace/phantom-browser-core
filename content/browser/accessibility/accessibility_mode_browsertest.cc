@@ -122,7 +122,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
                        FullAccessibilityHasInlineTextBoxes) {
   // TODO(dmazzoni): On Android we use an ifdef to disable inline text boxes,
   // we should do it with accessibility flags instead. http://crbug.com/672205
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(NavigateToURL(shell(), GURL(url::kAboutBlankURL)));
 
   AccessibilityNotificationWaiter waiter(shell()->web_contents(),
@@ -140,14 +139,12 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
   ui::BrowserAccessibility* inline_text = text->InternalGetChild(0);
   ASSERT_NE(nullptr, inline_text);
   EXPECT_EQ(ax::mojom::Role::kInlineTextBox, inline_text->GetRole());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
                        MinimalAccessibilityModeHasNoInlineTextBoxes) {
   // TODO(dmazzoni): On Android we use an ifdef to disable inline text boxes,
   // we should do it with accessibility flags instead. http://crbug.com/672205
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(NavigateToURL(shell(), GURL(url::kAboutBlankURL)));
 
   AccessibilityNotificationWaiter waiter(
@@ -162,7 +159,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
       FindNode(ax::mojom::Role::kStaticText, "Para");
   ASSERT_NE(nullptr, text);
   EXPECT_EQ(0U, text->InternalChildCount());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 IN_PROC_BROWSER_TEST_F(AccessibilityModeTest, AddScreenReaderModeFlag) {
@@ -254,7 +250,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
 }
 
 // Test platform node ids on OS's that have platform nodes.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(AccessibilityModeTest, ReEnablingDoesNotAlterUniqueIds) {
   ASSERT_TRUE(NavigateToURL(shell(), GURL(R"HTML(
       data:text/html,<!DOCTYPE html>
@@ -329,6 +324,5 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest, ReEnablingDoesNotAlterUniqueIds) {
   EXPECT_EQ(unique_id_1, button_1_refresh->GetAXPlatformNode()->GetUniqueId());
   EXPECT_EQ(unique_id_2, button_2_refresh->GetAXPlatformNode()->GetUniqueId());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

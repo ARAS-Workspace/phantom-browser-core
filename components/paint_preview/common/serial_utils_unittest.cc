@@ -105,7 +105,6 @@ TEST(PaintPreviewSerialUtils, TestSerialPictureNotInMap) {
 
 // Skip this on Android as we only have system fonts in this test and Android
 // doesn't serialize those.
-#if !BUILDFLAG(IS_ANDROID)
 TEST(PaintPreviewSerialUtils, TestSerialTypeface) {
   PictureSerializationContext picture_ctx;
 
@@ -135,47 +134,6 @@ TEST(PaintPreviewSerialUtils, TestSerialTypeface) {
   auto original_data = typeface->serialize();
   ASSERT_NE(original_data->size(), final_data->size());
 }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-TEST(PaintPreviewSerialUtils, TestSerialAndroidSystemTypeface) {
-  PictureSerializationContext picture_ctx;
-
-  // This is a system font serialization of the data will be skipped.
-  auto typeface = skia::MakeTypefaceFromName("sans-serif", SkFontStyle::Bold());
-  TypefaceUsageMap usage_map;
-  std::unique_ptr<GlyphUsage> usage =
-      std::make_unique<SparseGlyphUsage>(typeface->countGlyphs());
-  usage->Set(0);
-  usage->Set('a');
-  usage->Set('b');
-  EXPECT_TRUE(
-      usage_map.insert(std::make_pair(typeface->uniqueID(), std::move(usage)))
-          .second);
-  TypefaceSerializationContext typeface_ctx(&usage_map);
-  ImageSerializationContext ictx;
-
-  SkSerialProcs serial_procs =
-      MakeSerialProcs(&picture_ctx, &typeface_ctx, &ictx);
-  EXPECT_EQ(serial_procs.fPictureCtx, &picture_ctx);
-  EXPECT_EQ(serial_procs.fTypefaceCtx, &typeface_ctx);
-  EXPECT_EQ(serial_procs.fImageCtx, &ictx);
-
-  auto final_data =
-      serial_procs.fTypefaceProc(typeface.get(), serial_procs.fTypefaceCtx);
-  ASSERT_TRUE(final_data);
-  EXPECT_GT(typeface_ctx.finished.count(typeface->uniqueID()), 0U);
-  auto original_data = typeface->serialize();
-  ASSERT_EQ(original_data->size(), final_data->size());
-  // SAFETY: Skia's `serialize()` returns a valid data buffer and size.
-  ASSERT_EQ(UNSAFE_BUFFERS(base::span(
-                static_cast<const uint8_t*>(original_data->data()),
-                original_data->size())),
-            UNSAFE_BUFFERS(
-                base::span(static_cast<const uint8_t*>(final_data->data()),
-                           final_data->size())));
-}
-#endif
 
 TEST(PaintPreviewSerialUtils, TestSerialNoTypefaceInMap) {
   PictureSerializationContext picture_ctx;

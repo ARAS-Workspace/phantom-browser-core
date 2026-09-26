@@ -19,10 +19,6 @@
 #include "base/trace_event/trace_event.h"
 #include "services/resource_coordinator/public/cpp/memory_instrumentation/global_memory_dump.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/library_loader/anchor_functions.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(SUPPORTS_CODE_ORDERING)
 
 namespace {

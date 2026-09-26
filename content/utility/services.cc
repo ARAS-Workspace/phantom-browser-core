@@ -59,7 +59,7 @@
 #endif  // BUILDFLAG(ENABLE_CDM_HOST_VERIFICATION)
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(ENABLE_VR) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_VR)
 #include "content/services/isolated_xr_device/xr_device_service.h"  // nogncheck
 #include "device/vr/public/mojom/isolated_xr_service.mojom.h"       // nogncheck
 #endif
@@ -74,11 +74,6 @@
 #include "services/shape_detection/public/mojom/shape_detection_service.mojom.h"  // nogncheck
 #include "services/shape_detection/shape_detection_service.h"  // nogncheck
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_ANDROID)
-#include "media/mojo/mojom/mediadrm_support.mojom.h"       // nogncheck
-#include "media/mojo/services/mediadrm_support_service.h"  // nogncheck
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 #include "content/common/features.h"
@@ -243,13 +238,6 @@ auto RunAccessibilityService(
 }
 #endif  // BUILDFLAG(ENABLE_ACCESSIBILITY_SERVICE)
 
-#if BUILDFLAG(IS_ANDROID)
-auto RunMediaDrmSupportService(
-    mojo::PendingReceiver<media::mojom::MediaDrmSupport> receiver) {
-  return std::make_unique<media::MediaDrmSupportService>(std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 auto RunStorageService(
     mojo::PendingReceiver<storage::mojom::StorageService> receiver) {
   return std::make_unique<storage::StorageServiceImpl>(
@@ -283,7 +271,7 @@ auto RunOnDeviceModel(
   return on_device_model::OnDeviceModelService::Create(std::move(receiver));
 }
 
-#if BUILDFLAG(ENABLE_VR) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_VR)
 auto RunXrDeviceService(
     mojo::PendingReceiver<device::mojom::XRDeviceService> receiver) {
   return std::make_unique<device::XrDeviceService>(
@@ -353,13 +341,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
                    : base::ThreadType::kDefault);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(media::kMediaDrmQueryInSeparateProcess)) {
-    services.Add(RunMediaDrmSupportService);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(ENABLE_VR) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_VR)
   services.Add(RunXrDeviceService);
 #endif
 

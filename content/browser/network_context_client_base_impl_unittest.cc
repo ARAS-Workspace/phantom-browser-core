@@ -130,37 +130,6 @@ TEST_F(NetworkContextClientBaseTest, UploadOneValidFile) {
   ValidateFileContents(response.opened_files[0], kFileContent1);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Flakily fails on Android bots. See http://crbug.com/1027790
-TEST_F(NetworkContextClientBaseTest,
-       DISABLED_UploadOneValidFileWithContentUri) {
-  base::FilePath image_path;
-  EXPECT_TRUE(
-      base::PathService::Get(base::DIR_SRC_TEST_DATA_ROOT, &image_path));
-  image_path = image_path.AppendASCII("content")
-                   .AppendASCII("test")
-                   .AppendASCII("data")
-                   .AppendASCII("blank.jpg");
-  EXPECT_TRUE(base::PathExists(image_path));
-  base::FilePath content_path = base::InsertImageIntoMediaStore(image_path);
-  EXPECT_TRUE(content_path.IsContentUri());
-  EXPECT_TRUE(base::PathExists(content_path));
-  GrantAccess(content_path, kRendererProcessId);
-
-  UploadResponse response;
-  client_.OnFileUploadRequested(
-      ToOriginatingProcessId(kRendererProcessId), false, {content_path},
-      /*destination_url=*/GURL(), std::move(response.callback));
-  task_environment_.RunUntilIdle();
-  EXPECT_EQ(net::OK, response.error_code);
-  ASSERT_EQ(1U, response.opened_files.size());
-  EXPECT_FALSE(response.opened_files[0].async());
-  std::string contents;
-  EXPECT_TRUE(base::ReadFileToString(image_path, &contents));
-  ValidateFileContents(response.opened_files[0], contents);
-}
-#endif
-
 TEST_F(NetworkContextClientBaseTest, UploadTwoValidFiles) {
   base::FilePath path1 = temp_dir_.GetPath().AppendASCII("filename1");
   base::FilePath path2 = temp_dir_.GetPath().AppendASCII("filename2");

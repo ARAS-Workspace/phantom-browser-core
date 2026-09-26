@@ -45,13 +45,11 @@ std::vector<Facet> GetFacets(const FacetURI& original_facet_uri,
       result.push_back(affiliated_facet);
     }
 
-#if !BUILDFLAG(IS_ANDROID)
     // All platforms except Android supports filling across affiliated websites.
     if (affiliated_facet.uri.IsValidWebFacetURI()) {
       CHECK(!base::EndsWith(affiliated_facet.uri.canonical_spec(), "/"));
       result.push_back(affiliated_facet);
     }
-#endif
   }
   return result;
 }

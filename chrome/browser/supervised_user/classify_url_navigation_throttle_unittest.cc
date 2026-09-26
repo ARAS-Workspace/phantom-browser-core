@@ -48,10 +48,6 @@
 #include "content/public/test/navigation_simulator.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#endif
-
 namespace supervised_user {
 
 namespace {
@@ -272,9 +268,6 @@ TEST_F(ClassifyUrlNavigationThrottleTest,
 
 enum class SupervisionMode {
   kSupervisedByFamilyLink,
-#if BUILDFLAG(IS_ANDROID)
-  kLocalSupervision,
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 struct AsyncCheckerTestCase {
@@ -294,13 +287,6 @@ class ClassifyUrlNavigationThrottleAsyncCheckerTest
       case SupervisionMode::kSupervisedByFamilyLink:
         EnableParentalControls(*profile()->GetPrefs());
         break;
-#if BUILDFLAG(IS_ANDROID)
-      case SupervisionMode::kLocalSupervision:
-        GTEST_SKIP() << "Not implemented. Local parental controls are no "
-                        "longer handled by the pref store (exclusively with "
-                        "Family Link), and new url filtering service "
-                        "implementation does not support this mode yet.";
-#endif  // BUILDFLAG(IS_ANDROID)
     }
   }
 };
@@ -476,12 +462,7 @@ TEST_P(ClassifyUrlNavigationThrottleAsyncCheckerTest,
 
 const AsyncCheckerTestCase kAsyncCheckerTestCases[] = {
     {.name = "SupervisedByFamilyLink",
-     .mode = SupervisionMode::kSupervisedByFamilyLink}
-#if BUILDFLAG(IS_ANDROID)
-    ,
-    {.name = "LocalSupervision", .mode = SupervisionMode::kLocalSupervision}
-#endif  // BUILDFLAG(IS_ANDROID)
-};
+     .mode = SupervisionMode::kSupervisedByFamilyLink}};
 
 INSTANTIATE_TEST_SUITE_P(,
                          ClassifyUrlNavigationThrottleAsyncCheckerTest,

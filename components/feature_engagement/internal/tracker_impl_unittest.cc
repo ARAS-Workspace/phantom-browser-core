@@ -1273,8 +1273,6 @@ TEST_F(TrackerImplTest, TestNotifyEvent) {
   EXPECT_EQ(1u, bar_event.events(0).count());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 TEST_F(TrackerImplTest, TestNotifyUsedEvent) {
   StoringInitializedCallback callback;
   tracker_->AddOnInitializedCallback(base::BindOnce(
@@ -1322,8 +1320,6 @@ TEST_F(TrackerImplTest, TestClearEventData) {
   tracker_->ClearEventData(kTrackerTestFeatureEvent);
   EXPECT_EQ(0, event_store_->GetEvent("test_event_event").events_size());
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(TrackerImplTest, ShouldPassThroughAcquireDisplayLock) {
   auto lock_handle = std::make_unique<DisplayLockHandle>(base::DoNothing());

@@ -71,11 +71,6 @@
 #include "content/browser/tracing/cast_tracing_agent.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include <sys/time.h>
-#include "content/browser/android/tracing_controller_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 namespace {

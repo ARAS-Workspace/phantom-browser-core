@@ -49,9 +49,7 @@
 #include "chrome/browser/ui/browser.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/test/base/ui_test_utils.h"
-#endif  //! BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -407,7 +405,6 @@ IN_PROC_BROWSER_TEST_F(BrowsingDataApiTest, ValidateFilters) {
   ASSERT_TRUE(RunExtensionTest(test_dir.UnpackedPath(), {}, {})) << message_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(BrowsingDataApiTest, UnsupportedDataType) {
   static constexpr char kManifest[] =
       R"({
@@ -488,4 +485,3 @@ IN_PROC_BROWSER_TEST_F(BrowsingDataApiTest, MultipleUnsupportedDataTypes) {
   EXPECT_EQ(blink::mojom::ConsoleMessageLevel::kWarning,
             console_observer.messages()[0].log_level);
 }
-#endif  //! BUILDFLAG(IS_ANDROID)

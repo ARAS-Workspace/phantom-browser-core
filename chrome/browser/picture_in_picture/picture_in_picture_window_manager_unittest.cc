@@ -16,7 +16,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/display/display.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/simple_test_tick_clock.h"
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.h"
@@ -28,14 +27,11 @@
 #include "media/base/media_switches.h"
 #include "ui/views/bubble/bubble_dialog_delegate_view.h"
 #include "ui/views/view.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 const char kPictureInPictureTotalTimeHistogram[] =
     "Media.PictureInPicture.Window.TotalTime";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 typedef base::ScopedObservation<PictureInPictureWindowManager,
                                 PictureInPictureWindowManager::Observer>
@@ -71,7 +67,6 @@ class MockPictureInPictureWindowController
   MOCK_METHOD(std::optional<url::Origin>, GetOrigin, (), (override));
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockPictureInPictureWindow : public PictureInPictureWindow {
  public:
   MockPictureInPictureWindow() = default;
@@ -91,7 +86,6 @@ class MockPictureInPictureWindow : public PictureInPictureWindow {
  private:
   bool is_tucking_ = false;
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class PictureInPictureWindowManagerTest
     : public ChromeRenderViewHostTestHarness {
@@ -127,7 +121,6 @@ class PictureInPictureWindowManagerTest
     return mock_video_picture_in_picture_controller_.get();
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   void SetupPiPWindowManagerWithUmaHelper(
       base::SimpleTestTickClock* test_clock) {
     test_clock->SetNowTicks(base::TimeTicks::Now());
@@ -146,16 +139,13 @@ class PictureInPictureWindowManagerTest
       const std::string& name) {
     return histogram_tester_.GetHistogramSamplesSinceCreation(name);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
  private:
   std::unique_ptr<content::WebContents> child_web_contents_;
   raw_ptr<content::MockVideoPictureInPictureWindowControllerImpl>
       mock_video_picture_in_picture_controller_;
 
-#if !BUILDFLAG(IS_ANDROID)
   base::HistogramTester histogram_tester_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace
@@ -185,7 +175,6 @@ TEST_F(PictureInPictureWindowManagerTest, OnEnterVideoPictureInPicture) {
   picture_in_picture_window_manager->EnterVideoPictureInPicture(web_contents());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PictureInPictureWindowManagerTest, RespectsMinAndMaxSize) {
   // The max window size should be 80% of the screen.
   display::Display display(/*id=*/1, gfx::Rect(0, 0, 1000, 1000));
@@ -707,5 +696,3 @@ TEST_F(PictureInPictureWindowManagerTest,
   picture_in_picture_window_manager->UpdateCachedBounds(
       gfx::Rect(10, 20, 100, 100), display::Display(1));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)

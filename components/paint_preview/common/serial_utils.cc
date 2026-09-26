@@ -91,21 +91,6 @@ SkSerialReturnType SerializeTypeface(SkTypeface* typeface, void* ctx) {
     return typeface->serialize(SkTypeface::SerializeBehavior::kDontIncludeData);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  {
-    SkString familyName;
-    typeface->getFamilyName(&familyName);
-    // On Android MakeFromName will return nullptr rather than falling back to
-    // an alternative font if a system font doesn't match. As such, we can use
-    // this to check if the SkTypeface is for a system font. If it is a system
-    // font we don't need to subset/serialize it.
-    if (skia::MakeTypefaceFromName(familyName.c_str(), typeface->fontStyle())) {
-      return typeface->serialize(
-          SkTypeface::SerializeBehavior::kIncludeDataIfLocal);
-    }
-  }
-#endif
-
   auto subset_data = SubsetFont(typeface, *usage_it->second);
   if (!subset_data) {
     return typeface->serialize(

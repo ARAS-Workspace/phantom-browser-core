@@ -17,8 +17,6 @@
 #include "cc/trees/layer_tree_impl.h"
 #include "components/viz/test/test_in_process_context_provider.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace cc {
 namespace {
 
@@ -300,5 +298,3 @@ TEST_P(LayerTreeHostOverlayScrollbarsPixelTest, NinePatchScrollbarScaledDown) {
 
 }  // namespace
 }  // namespace cc
-
-#endif  // BUILDFLAG(IS_ANDROID)

@@ -48,7 +48,6 @@ namespace keys = extension_management_api_constants;
 namespace extensions {
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 // This function is unused on Android.
 bool ExpectChromeAppsDefaultEnabled() {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -57,7 +56,6 @@ bool ExpectChromeAppsDefaultEnabled() {
   return true;
 #endif
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -92,12 +90,10 @@ class ExtensionManagementApiTestWithBackgroundType
     : public ExtensionManagementApiBrowserTest {
  public:
   ExtensionManagementApiTestWithBackgroundType() {
-#if !BUILDFLAG(IS_ANDROID)
     // Android does not support Chrome apps and does not have access to the
     // variable g_enable_chrome_apps_for_testing.
     enable_chrome_apps_ = std::make_unique<base::AutoReset<bool>>(
         &extensions::testing::g_enable_chrome_apps_for_testing, true);
-#endif
   }
   ~ExtensionManagementApiTestWithBackgroundType() override = default;
   ExtensionManagementApiTestWithBackgroundType(
@@ -125,7 +121,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
   ASSERT_TRUE(listener2.WaitUntilSatisfied());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android does not support Chrome apps.
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
                        LaunchApp) {
@@ -205,7 +200,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
     EXPECT_FALSE(success.was_satisfied());
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
                        SelfUninstall) {
@@ -253,7 +247,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
   ASSERT_TRUE(listener1.WaitUntilSatisfied());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android does not support Chrome apps.
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiBrowserTest,
                        CreateAppShortcutConfirmDialog) {
@@ -280,7 +273,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiBrowserTest,
           base::StringPrintf("[\"%s\"]", app_id.c_str()), profile()),
       keys::kCreateShortcutCanceledError));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiBrowserTest,
                        GetAllIncludesTerminated) {

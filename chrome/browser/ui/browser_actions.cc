@@ -970,7 +970,6 @@ void BrowserActions::InitializeChromeMenuActions() {
                   chrome::ShowClearBrowsingDataDialog(
                       browser_for_opening_webui);
                 }
-#if !BUILDFLAG(IS_ANDROID)
                 ui::ElementContext browser_element_context =
                     BrowserElements::From(bwi)->GetContext();
                 ui::TrackedElement* const tracked_element =
@@ -981,7 +980,6 @@ void BrowserActions::InitializeChromeMenuActions() {
                       tracked_element, browsing_data_important_sites_util::
                                            kShowClearBrowsingDataDialogEventId);
                 }
-#endif  // !BUILDFLAG(IS_ANDROID)
               },
               bwi, is_incognito),
           kActionClearBrowsingData, IDS_CLEAR_BROWSING_DATA,
@@ -2686,9 +2684,7 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
                         features::kDevToolsShowPolicyDialog) &&
                     !DevToolsWindow::AllowDevToolsFor(bwi->GetProfile(),
                                                       web_contents)) {
-#if !BUILDFLAG(IS_ANDROID)
                   DevToolsPolicyDialog::Show(web_contents);
-#endif  // !BUILDFLAG(IS_ANDROID)
                 } else {
                   web_contents->GetPrimaryMainFrame()->ViewSource();
                 }
@@ -3027,7 +3023,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionShowSigninWhenPaused)
           .Build());
 
-#if !BUILDFLAG(IS_ANDROID)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
@@ -3043,7 +3038,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionSetBrowserAsDefault)
           .Build());
-#endif
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
@@ -3493,7 +3487,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionSpellcheckMultiLingual)
           .Build());
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
@@ -3549,7 +3542,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
             .SetImage(ui::ImageModel::FromVectorIcon(kWalletIcon))
             .Build());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void BrowserActions::InitializeNavigationActions() {

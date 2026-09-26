@@ -235,12 +235,6 @@ XrResult OpenXrPlatformHelper::CreateInstance(XrInstance* instance,
       static_cast<uint32_t>(extensions.size());
   instance_create_info.enabledExtensionNames = extensions.data();
 
-#if BUILDFLAG(IS_ANDROID)
-  if (create_info == nullptr) {
-    LOG(ERROR) << "Android was missing CreateInfo";
-  }
-#endif
-
   instance_create_info.next = create_info;
 
   XrResult result = xrCreateInstance(&instance_create_info, instance);

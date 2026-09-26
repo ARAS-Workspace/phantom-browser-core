@@ -78,9 +78,6 @@
 #include "third_party/libaddressinput/src/cpp/include/libaddressinput/address_formatter.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif
-
 namespace autofill {
 
 namespace {
@@ -845,7 +842,6 @@ std::vector<AutofillProfile> MaybeFetchRegularAddressSuggestionData(
           *trigger_autofill_field, GetAcUnrecognizedBehavior(client))) {
     return {};
   }
-#if !BUILDFLAG(IS_ANDROID)
   bool should_suppress =
       client.GetPersonalDataManager()
           .address_data_manager()
@@ -866,7 +862,6 @@ std::vector<AutofillProfile> MaybeFetchRegularAddressSuggestionData(
     // address suggestions are suppressed.
     return {};
   }
-#endif
 
   std::vector<AutofillProfile> profiles_to_suggest = GetProfilesToSuggest(
       client.GetPersonalDataManager().address_data_manager(), trigger_field,

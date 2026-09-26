@@ -24,14 +24,12 @@ NfcPermissionContext::NfcPermissionContext(
 
 NfcPermissionContext::~NfcPermissionContext() = default;
 
-#if !BUILDFLAG(IS_ANDROID)
 ContentSetting NfcPermissionContext::GetContentSettingStatusInternal(
     content::RenderFrameHost* render_frame_host,
     const GURL& requesting_origin,
     const GURL& embedding_origin) const {
   return CONTENT_SETTING_BLOCK;
 }
-#endif
 
 void NfcPermissionContext::DecidePermission(
     std::unique_ptr<PermissionRequestData> request_data,

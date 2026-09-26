@@ -32,7 +32,6 @@
 
 // TODO(crbug.com/40666874): Disabled all tests because they lead the flakiness
 // dashboard. The root cause is documented in the bug.
-#if !BUILDFLAG(IS_ANDROID)
 
 namespace site_engagement {
 
@@ -433,5 +432,3 @@ TEST_F(ImportantSitesUtilTest, ExcludeNonRegisterableDomains) {
 }
 
 }  // namespace site_engagement
-
-#endif  // !BUILDFLAG(IS_ANDROID)

@@ -12,11 +12,3 @@ ChromeNfcPermissionContextDelegate::ChromeNfcPermissionContextDelegate(
 
 ChromeNfcPermissionContextDelegate::~ChromeNfcPermissionContextDelegate() =
     default;
-
-#if BUILDFLAG(IS_ANDROID)
-bool ChromeNfcPermissionContextDelegate::IsInteractable(
-    content::WebContents* web_contents) {
-  return interactability_checker_ &&
-         interactability_checker_->IsInteractable(web_contents);
-}
-#endif

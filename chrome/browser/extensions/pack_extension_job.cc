@@ -18,10 +18,6 @@
 #include "extensions/common/constants.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/extensions/extension_util_bridge.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 using content::BrowserThread;
@@ -39,22 +35,6 @@ std::optional<CrxAndKeyFiles> GetCrxAndKeyFilePaths(
     const base::FilePath& key_file) {
   bool create_key_file = key_file.empty();
 
-#if BUILDFLAG(IS_ANDROID)
-  if (root_directory.IsVirtualDocumentPath()) {
-    std::vector<std::string> file_extensions{kExtensionFileExtension};
-    if (create_key_file) {
-      file_extensions.push_back(kExtensionKeyFileExtension);
-    }
-    std::optional<std::vector<base::FilePath>> crx_key_files =
-        GetOrCreateEmptyFilesUnderDownloads(root_directory, file_extensions);
-    if (!crx_key_files) {
-      return std::nullopt;
-    }
-    return CrxAndKeyFiles{(*crx_key_files)[0], create_key_file
-                                                   ? (*crx_key_files)[1]
-                                                   : base::FilePath()};
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   return CrxAndKeyFiles{
       root_directory.AddExtension(kExtensionFileExtension),
       create_key_file ? root_directory.AddExtension(kExtensionKeyFileExtension)

@@ -28,7 +28,6 @@
 #include "net/base/url_util.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
 #include "chrome/browser/trusted_vault/trusted_vault_encryption_keys_tab_helper.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -36,11 +35,8 @@
 #include "chrome/browser/ui/singleton_tabs.h"
 #include "components/trusted_vault/trusted_vault_histograms.h"
 #include "content/public/browser/navigation_handle.h"
-#endif
 
 namespace {
-
-#if !BUILDFLAG(IS_ANDROID)
 
 void OpenTabForSyncTrustedVaultUserAction(
     BrowserWindowInterface* browser,
@@ -80,14 +76,11 @@ size_t GetAccountIndexForPrimaryAccount(BrowserWindowInterface* browser) {
   return identity_manager->GetSessionIndexForPrimaryAccount().value_or(0u);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 
 const char kBookmarksLimitExceededHelpCenter[] =
     "https://support.google.com/chrome?p=manage_bookmarks_desktop";
 
-#if !BUILDFLAG(IS_ANDROID)
 SyncStatusLabels GetSyncStatusLabelsForSettings(
     const syncer::SyncService* service) {
   // Check to see if sync has been disabled via the dashboard and needs to be
@@ -285,7 +278,6 @@ std::u16string GetAvatarSyncErrorDescription(
           IDS_SYNC_ERROR_BOOKMARKS_LIMIT_EXCEEDED_DESCRIPTION);
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool ShouldRequestSyncConfirmation(const syncer::SyncService* service) {
   // This method mainly handles the situation where the initial Sync setup was
@@ -306,7 +298,6 @@ bool ShouldShowSyncPassphraseError(const syncer::SyncService* service) {
   return settings->IsPassphraseRequiredForPreferredDataTypes();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ShowSyncPassphraseDialogAndDecryptData(BrowserWindowInterface& browser) {
   syncer::SyncService* sync_service =
       SyncServiceFactory::GetForProfile(browser.GetProfile());
@@ -326,9 +317,7 @@ void ShowSyncPassphraseDialogAndDecryptData(BrowserWindowInterface& browser) {
           },
           browser.GetProfile()->GetWeakPtr()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
 void OpenTabForSyncKeyRetrieval(
     BrowserWindowInterface* browser,
     trusted_vault::TrustedVaultUserActionTriggerForUMA trigger) {
@@ -383,4 +372,3 @@ void ShowBookmarksLimitExceededHelp(
   params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
   Navigate(&params);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

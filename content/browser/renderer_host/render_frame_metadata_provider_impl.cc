@@ -9,9 +9,6 @@
 #include "base/observer_list.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "cc/base/features.h"
-#endif
 #include "content/browser/renderer_host/frame_token_message_queue.h"
 
 namespace content {
@@ -47,32 +44,12 @@ void RenderFrameMetadataProviderImpl::Bind(
   // Reset on disconnect so that pending state will be correctly stored and
   // later forwarded in the case of a renderer crash.
   render_frame_metadata_observer_remote_.reset_on_disconnect();
-#if BUILDFLAG(IS_ANDROID)
-  if (pending_root_scroll_offset_update_frequency_.has_value()) {
-    UpdateRootScrollOffsetUpdateFrequency(
-        *pending_root_scroll_offset_update_frequency_);
-    pending_root_scroll_offset_update_frequency_.reset();
-  }
-#endif
   if (pending_report_all_frame_submission_for_testing_.has_value()) {
     ReportAllFrameSubmissionsForTesting(
         *pending_report_all_frame_submission_for_testing_);
     pending_report_all_frame_submission_for_testing_.reset();
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameMetadataProviderImpl::UpdateRootScrollOffsetUpdateFrequency(
-    cc::mojom::RootScrollOffsetUpdateFrequency frequency) {
-  if (!render_frame_metadata_observer_remote_) {
-    pending_root_scroll_offset_update_frequency_ = frequency;
-    return;
-  }
-
-  render_frame_metadata_observer_remote_->UpdateRootScrollOffsetUpdateFrequency(
-      frequency);
-}
-#endif
 
 void RenderFrameMetadataProviderImpl::ReportAllFrameSubmissionsForTesting(
     bool enabled) {
@@ -170,34 +147,5 @@ void RenderFrameMetadataProviderImpl::OnFrameSubmissionForTesting(
                                       OnFrameTokenFrameSubmissionForTesting,
                                   weak_factory_.GetWeakPtr()));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameMetadataProviderImpl::OnRootScrollOffsetChanged(
-    const gfx::PointF& root_scroll_offset) {
-  for (Observer& observer : observers_)
-    observer.OnRootScrollOffsetChanged(root_scroll_offset);
-}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameMetadataProviderImpl::ReportScrollJankStats(
-    uint32_t total_frames,
-    uint32_t janky_frames) {
-  if (!features::ShouldScrollJankV4MetricReportAndroidAppJankStats()) {
-    return;
-  }
-
-  // Sanitize the inputs to prevent renderers from reporting non-sensical scroll
-  // jank statistics to the OS.
-  constexpr uint32_t kMaxTotalFrames = 5 * 60 * 120;  // 5 minutes @ 120 Hz.
-  if (janky_frames > total_frames || total_frames > kMaxTotalFrames) {
-    return;
-  }
-
-  for (Observer& observer : observers_) {
-    observer.OnReportScrollJankStats(total_frames, janky_frames);
-  }
-}
-#endif
 
 }  // namespace content

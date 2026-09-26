@@ -870,7 +870,6 @@ IN_PROC_BROWSER_TEST_F(MultipleTabSharingUIViewsBrowserTest, CloseTabs) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(
     MultipleTabSharingUIViewsBrowserTest,
     NormalModeCapturerDoesNotProduceInfobarInGuestModeTabOpenedBeforeCapture) {
@@ -1003,7 +1002,6 @@ IN_PROC_BROWSER_TEST_F(MultipleTabSharingUIViewsBrowserTest,
   ASSERT_EQ(guest_browser->tab_strip_model()->count(), 3);
   EXPECT_EQ(GetInfoBarManager(guest_browser, /*tab=*/2)->infobars().size(), 1u);
 }
-#endif
 
 class TabSharingUIViewsPreferCurrentTabBrowserTest
     : public InProcessBrowserTest {

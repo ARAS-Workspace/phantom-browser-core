@@ -65,9 +65,6 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   RuntimeAPI::GetFactoryInstance();
   SessionStorageManager::GetFactory();
   StorageFrontend::GetFactoryInstance();
-#if BUILDFLAG(IS_ANDROID)
-  SystemDisplayAPI::GetFactoryInstance();
-#endif
   TestStartedAndFinishedEventQueue::GetFactoryInstance();
   WebRequestAPI::GetFactoryInstance();
   WebRequestProxyingURLLoaderFactory::EnsureAssociatedFactoryBuilt();

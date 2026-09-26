@@ -129,7 +129,6 @@ std::string SysInfo::CPUModelName() {
   return std::string();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // static
 SysInfo::HardwareInfo SysInfo::GetHardwareInfoSync() {
   static const size_t kMaxStringSize = 100u;
@@ -149,6 +148,5 @@ SysInfo::HardwareInfo SysInfo::GetHardwareInfoSync() {
   DCHECK(IsStringUTF8(info.model));
   return info;
 }
-#endif
 
 }  // namespace base

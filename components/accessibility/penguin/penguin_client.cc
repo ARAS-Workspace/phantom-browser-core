@@ -10,11 +10,6 @@
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#include "components/accessibility/penguin_jni_headers/PenguinClient_jni.h"
-#endif
-
 namespace penguin {
 
 // static
@@ -58,40 +53,4 @@ void PenguinClient::PerformAPICall(const std::string& text_input,
 void PenguinClient::PerformAPICall(const std::string& text_input,
                                    PenguinFullResponseCallback callback) {}
 
-#if BUILDFLAG(IS_ANDROID)
-
-void PenguinClient::PerformAPICall_var1(
-    JNIEnv* env,
-    const base::android::JavaRef<jstring>& j_image_data,
-    const base::android::JavaRef<jstring>& j_text_input,
-    const base::android::JavaRef<jobject>& j_callback,
-    bool j_include_full_response) {}
-
-void PenguinClient::PerformAPICall_var2(
-    JNIEnv* env,
-    const base::android::JavaRef<jobject>& j_web_contents,
-    const base::android::JavaRef<jstring>& j_text_input,
-    const base::android::JavaRef<jobject>& j_callback,
-    bool j_include_full_response) {}
-
-void PenguinClient::PerformAPICall_var3(
-    JNIEnv* env,
-    const base::android::JavaRef<jobject>& j_web_contents,
-    const base::android::JavaRef<jstring>& j_text_input,
-    const base::android::JavaRef<jobject>& j_callback,
-    const base::android::JavaRef<jobject>& j_source_rect,
-    bool j_include_full_response) {}
-
-void PenguinClient::PerformAPICall_var4(
-    JNIEnv* env,
-    const base::android::JavaRef<jstring>& j_text_input,
-    const base::android::JavaRef<jobject>& j_callback,
-    bool j_include_full_response) {}
-
-#endif
-
 }  // namespace penguin
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(PenguinClient)
-#endif

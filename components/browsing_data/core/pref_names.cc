@@ -34,10 +34,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(kDeleteHostedAppsData, false);
   registry->RegisterBooleanPref(kDeleteSiteSettings, false);
 
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterBooleanPref(kCloseTabs, false);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   registry->RegisterBooleanPref(kQuickDeleteEverUsed, false);
 }
 

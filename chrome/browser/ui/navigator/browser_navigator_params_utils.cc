@@ -82,11 +82,9 @@ content::NavigationController::LoadURLParams LoadURLParamsFromNavigateParams(
         ChromeNavigationUIData::CreateForMainFrameNavigation(
             target_contents, params->is_using_https_as_default_scheme,
             force_no_https_upgrade);
-#if !BUILDFLAG(IS_ANDROID)
     // This field is not available on Android.
     navigation_ui_data->set_navigation_initiated_from_sync(
         params->navigation_initiated_from_sync);
-#endif
     load_url_params.navigation_ui_data = std::move(navigation_ui_data);
   }
 

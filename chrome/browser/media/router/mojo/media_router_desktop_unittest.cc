@@ -430,7 +430,6 @@ TEST_F(MediaRouterDesktopTest, TerminateRouteFails) {
                               mojom::RouteRequestResultCode::TIMED_OUT, 1);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(MediaRouterDesktopTest, HandleIssue) {
   MockIssuesObserver issue_observer1(router()->GetIssueManager());
   MockIssuesObserver issue_observer2(router()->GetIssueManager());
@@ -472,7 +471,6 @@ TEST_F(MediaRouterDesktopTest, HandlePermissionIssue) {
   router()->OnLocalDiscoveryPermissionRejected();
   run_loop.Run();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(MediaRouterDesktopTest, RegisterAndUnregisterMediaSinksObserver) {
   MediaSource media_source(kSource);

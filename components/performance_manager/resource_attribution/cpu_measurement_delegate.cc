@@ -66,16 +66,6 @@ class CPUMeasurementDelegateFactoryImpl final
 
 bool CPUMeasurementDelegateFactoryImpl::ShouldMeasureProcess(
     const ProcessNode* process_node) {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, sandbox restrictions prevent the browser process from reading
-  // /proc/<pid>/stat of other processes. Bail out early to avoid the overhead
-  // of trying and failing to read the file.
-  // TODO(crbug.com/421901748): Implement CPU measurement of child processes on
-  // Android.
-  if (process_node->GetProcessId() != base::GetCurrentProcId()) {
-    return false;
-  }
-#endif
   return ProcessNodeHasRunningProcess(process_node);
 }
 

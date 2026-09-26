@@ -121,7 +121,6 @@ IN_PROC_BROWSER_TEST_P(ChromeKeepAliveURLBrowserTest,
 }
 
 // Shutdown delay is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 // Mac browser shutdown is flaky: https://crbug.com/40201651
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ReceiveResponseAfterBrowserShutdown \
@@ -160,7 +159,6 @@ IN_PROC_BROWSER_TEST_P(ChromeKeepAliveURLBrowserTest,
   // The response should be processed by browser before shutting down.
   // TODO(crbug.com/464173571): Deflake WaitForTotalOnReceiveResponseProcessed
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Delays response to a keepalive ping until after the page making the keepalive
 // ping is put into BackForwardCache. The response should be processed by the

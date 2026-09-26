@@ -35,8 +35,6 @@
 #include "chrome/browser/chrome_browser_main_extra_parts.h"
 #include "chrome/browser/chrome_content_browser_client.h"
 #include "chrome/browser/devtools/devtools_window.h"
-#if !BUILDFLAG(IS_ANDROID)
-#endif
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
@@ -118,11 +116,9 @@
 #include "components/captive_portal/content/captive_portal_service.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "components/storage_monitor/test_storage_monitor.h"
-#endif
 
 #if BUILDFLAG(IS_OZONE)
 #include "ui/views/test/test_desktop_screen_ozone.h"
@@ -419,13 +415,11 @@ void InProcessBrowserTest::SetUp() {
   // What's New for tests that simulate first run, is unexpected by most tests.
   whats_new::DisableRemoteContentForTests();
 
-#if !BUILDFLAG(IS_ANDROID)
   // The Search Engine Choice service may attempt to show a modal dialog to the
   // profile on browser start, which is unexpected by mosts tests. Tests which
   // expect this can allow the prompt as desired.
   SearchEngineChoiceDialogService::SetDialogDisabledForTests(
       /*dialog_disabled=*/true);
-#endif
 
   EnsureBrowserContextKeyedServiceFactoriesForTestingBuilt();
 
@@ -671,7 +665,6 @@ Browser* InProcessBrowserTest::CreateBrowserForApp(const std::string& app_name,
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID)
 Browser* InProcessBrowserTest::CreateGuestBrowser() {
   // Get Guest profile.
   ProfileManager* profile_manager = g_browser_process->profile_manager();
@@ -690,7 +683,6 @@ Browser* InProcessBrowserTest::CreateGuestBrowser() {
   AddBlankTabAndShow(browser);
   return browser;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void InProcessBrowserTest::AddBlankTabAndShow(BrowserWindowInterface* browser,
                                               bool wait_for_activation) {
@@ -805,11 +797,9 @@ void InProcessBrowserTest::PreRunTestOnMainThread() {
     ensure_browser_visible(browser_->GetBrowserForMigrationOnly());
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Do not use the real StorageMonitor for tests, which introduces another
   // source of variability and potential slowness.
   ASSERT_TRUE(storage_monitor::TestStorageMonitor::CreateForBrowserTests());
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // On Mac, without the following autorelease pool, code which is directly
@@ -826,12 +816,10 @@ void InProcessBrowserTest::PreRunTestOnMainThread() {
   // browser.
   content::RunAllPendingInMessageLoop();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Wait for the initial WebUI to complete the painting and flush all the
   // histograms, so the metrics from the initial WebUI will not affect the
   // browser test that are checking some common histograms.
   WaitUntilInitialWebUIPaintAndFlushMetricsForTesting(browser_);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (browser_ && global_browser_set_up_function_) {
     ASSERT_TRUE(global_browser_set_up_function_(browser_));

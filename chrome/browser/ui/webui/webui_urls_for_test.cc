@@ -66,9 +66,7 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://indexeddb-internals",
       "chrome://infobar-internals",
       "chrome://inspect",
-#if !BUILDFLAG(IS_ANDROID)
       "chrome://iwa-dev",
-#endif
       "chrome://internals/session-service",
       "chrome://interstitials",
       "chrome://interstitials/ssl",
@@ -88,9 +86,7 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://newtab",
       "chrome://ntp-tiles-internals",
       "chrome://omnibox",
-#if !BUILDFLAG(IS_ANDROID)
       "chrome://organizer-panel.top-chrome",
-#endif
       "chrome://policy",
       "chrome://predictors",
 
@@ -143,14 +139,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
       "chrome://cast-feedback",
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-      "chrome://explore-sites-internals",
-      "chrome://internals/notifications",
-      "chrome://internals/query-tiles",
-      "chrome://snippets-internals",
-      "chrome://webapks",
 #endif
 
       "chrome://browser-switch",

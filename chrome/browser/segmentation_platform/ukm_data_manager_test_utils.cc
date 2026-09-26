@@ -81,12 +81,10 @@ UkmDataManagerTestUtils::UkmDataManagerTestUtils(
   }
 }
 UkmDataManagerTestUtils::~UkmDataManagerTestUtils() {
-#if !BUILDFLAG(IS_ANDROID)
   // The client should be torn down after profile is destroyed. On Android
   // browser tests the profile is never destroyed, so do not tear down the
   // client.
   ukm_database_client_->TearDownForTesting();
-#endif
   ukm_database_client_ = nullptr;
 }
 

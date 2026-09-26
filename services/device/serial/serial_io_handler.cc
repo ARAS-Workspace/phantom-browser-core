@@ -18,10 +18,6 @@
 #include "build/build_config.h"
 #include "components/device_event_log/device_event_log.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "services/device/serial/serial_device_enumerator_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace device {
 
 SerialIoHandler::SerialIoHandler(
@@ -62,37 +58,6 @@ void SerialIoHandler::OpenImpl() {
       base::BindOnce(&SerialIoHandler::StartOpen, this,
                      base::SingleThreadTaskRunner::GetCurrentDefault()));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-
-void SerialIoHandler::OnPathOpened(
-    scoped_refptr<base::SingleThreadTaskRunner> io_thread_task_runner,
-    base::ScopedFD fd) {
-  base::File file(std::move(fd));
-  io_thread_task_runner->PostTask(
-      FROM_HERE,
-      base::BindOnce(&SerialIoHandler::FinishOpen, this, std::move(file)));
-}
-
-void SerialIoHandler::OnPathOpenError(
-    scoped_refptr<base::SingleThreadTaskRunner> io_thread_task_runner,
-    const std::string& error_name,
-    const std::string& error_message) {
-  io_thread_task_runner->PostTask(
-      FROM_HERE, base::BindOnce(&SerialIoHandler::ReportPathOpenError, this,
-                                error_name, error_message));
-}
-
-void SerialIoHandler::ReportPathOpenError(const std::string& error_name,
-                                          const std::string& error_message) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DCHECK(open_complete_);
-  SERIAL_LOG(ERROR) << "Failed to open '" << port_ << "': " << error_name
-                    << ": " << error_message;
-  std::move(open_complete_).Run(false);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void SerialIoHandler::MergeConnectionOptions(
     const mojom::SerialConnectionOptions& options) {

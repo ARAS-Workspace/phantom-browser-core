@@ -126,7 +126,7 @@ bool StructTraits<
   if (!data.ReadChannelFormat(&out->channel_format)) {
     return false;
   }
-#if BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_OZONE)
   out->prefers_external_sampler = data.prefers_external_sampler();
 #endif
 

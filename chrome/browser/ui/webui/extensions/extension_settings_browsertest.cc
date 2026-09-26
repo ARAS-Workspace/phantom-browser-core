@@ -30,11 +30,9 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/test/extension_test_message_listener.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
 #include "components/guest_view/browser/guest_view_base.h"
@@ -59,7 +57,6 @@ class ExtensionSettingsUIBrowserTest : public ExtensionSettingsTestBase {
 };
 
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
-#if !BUILDFLAG(IS_ANDROID)  // TODO(b/476468383): does not build on android.
 // Tests that viewing a source of the options page works fine.
 // This is a regression test for https://crbug.com/41361513.
 IN_PROC_BROWSER_TEST_F(ExtensionSettingsUIBrowserTest, ViewSource) {
@@ -115,7 +112,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionSettingsUIBrowserTest, ViewSource) {
       base::RemoveChars(expected_source_text, "\n", &expected_source_text));
   EXPECT_EQ(expected_source_text, actual_source_text);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW)
 
 // Verify that listeners for the developer private API are only registered

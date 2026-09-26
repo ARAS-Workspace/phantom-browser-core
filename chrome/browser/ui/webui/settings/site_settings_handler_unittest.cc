@@ -3248,19 +3248,15 @@ class FakeBrowserWindow {
       }
       return result;
     });
-#if !BUILDFLAG(IS_ANDROID)
     static_cast<BrowserCollectionObserver*>(
         GlobalBrowserCollection::GetInstance()->GetPlatformDelegate())
         ->OnBrowserCreated(&window_);
-#endif
   }
 
   ~FakeBrowserWindow() {
-#if !BUILDFLAG(IS_ANDROID)
     static_cast<BrowserCollectionObserver*>(
         GlobalBrowserCollection::GetInstance()->GetPlatformDelegate())
         ->OnBrowserClosed(&window_);
-#endif
     CloseAllTabs();
   }
 

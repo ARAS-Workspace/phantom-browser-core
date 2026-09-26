@@ -17,8 +17,6 @@
 #include "components/viz/test/buildflags.h"
 #include "gpu/command_buffer/client/raster_interface.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace cc {
 namespace {
 
@@ -404,5 +402,3 @@ TEST_P(LayerTreeHostTilesTestPartialInvalidationLowBitDepth,
 
 }  // namespace
 }  // namespace cc
-
-#endif  // !BUILDFLAG(IS_ANDROID)

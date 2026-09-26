@@ -141,15 +141,6 @@ MockWidgetInputHandler::GetAndResetDispatchedMessages() {
   return dispatched_events;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void MockWidgetInputHandler::AttachSynchronousCompositor(
-    mojo::PendingRemote<blink::mojom::SynchronousCompositorControlHost>
-        control_host,
-    mojo::PendingAssociatedRemote<blink::mojom::SynchronousCompositorHost> host,
-    mojo::PendingAssociatedReceiver<blink::mojom::SynchronousCompositor>
-        compositor_request) {}
-#endif
-
 void MockWidgetInputHandler::GetFrameWidgetInputHandler(
     mojo::PendingAssociatedReceiver<blink::mojom::FrameWidgetInputHandler>
         interface_request) {}

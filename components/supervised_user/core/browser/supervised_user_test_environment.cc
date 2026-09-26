@@ -201,16 +201,6 @@ SupervisedUserTestEnvironment::SupervisedUserTestEnvironment(
     std::unique_ptr<SynteticFieldTrialDelegateMock>
         synthetic_field_trial_delegate,
     InitialSupervisionState initial_state) {
-#if BUILDFLAG(IS_ANDROID)
-  if (initial_state ==
-      InitialSupervisionState::kSupervisedWithAllContentFilters) {
-    pref_store_environment_.device_parental_controls()
-        .SetBrowserContentFiltersEnabledForTesting(true);
-    pref_store_environment_.device_parental_controls()
-        .SetSearchContentFiltersEnabledForTesting(true);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   pref_store_environment_.ConfigureInitialValues(initial_state);
   child_account_service_ = std::make_unique<ChildAccountService>(
       *pref_store_environment_.pref_service(),

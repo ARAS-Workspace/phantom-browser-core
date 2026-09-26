@@ -287,12 +287,10 @@ TEST_F(IdleTimeoutPolicyHandlerTest, ActionNotRecognized) {
 TEST_F(IdleTimeoutPolicyHandlerTest, AllActions) {
   SetPolicyValue(policy::key::kIdleTimeout, base::Value(15));
   base::ListValue list;
-#if !BUILDFLAG(IS_ANDROID)
   list.Append("close_browsers");
   list.Append("show_profile_picker");
   list.Append("clear_download_history");
   list.Append("clear_hosted_app_data");
-#endif  // !BUILDFLAG(IS_ANDROID)
   list.Append("clear_site_settings");
   list.Append("reload_pages");
   list.Append("clear_browsing_history");
@@ -320,12 +318,10 @@ TEST_F(IdleTimeoutPolicyHandlerTest, AllActions) {
   EXPECT_TRUE(pref_value->is_list());
   EXPECT_THAT(pref_value->GetList(),
               testing::ElementsAre(
-#if !BUILDFLAG(IS_ANDROID)
                   static_cast<int>(ActionType::kCloseBrowsers),
                   static_cast<int>(ActionType::kShowProfilePicker),
                   static_cast<int>(ActionType::kClearDownloadHistory),
                   static_cast<int>(ActionType::kClearHostedAppData),
-#endif  // !BUILDFLAG(IS_ANDROID)
                   static_cast<int>(ActionType::kClearSiteSettings),
                   static_cast<int>(ActionType::kReloadPages),
                   static_cast<int>(ActionType::kClearBrowsingHistory),
@@ -380,12 +376,10 @@ TEST_F(IdleTimeoutPolicyHandlerTest, SyncTypesDisabledForClearActions) {
   SetPolicyValue(policy::key::kSyncDisabled, base::Value(false));
 
   base::ListValue list;
-#if !BUILDFLAG(IS_ANDROID)
   list.Append("close_browsers");
   list.Append("show_profile_picker");
   list.Append("clear_download_history");
   list.Append("clear_hosted_app_data");
-#endif  // !BUILDFLAG(IS_ANDROID)
   list.Append("clear_site_settings");
   list.Append("reload_pages");
   list.Append("clear_browsing_history");
@@ -415,12 +409,10 @@ TEST_F(IdleTimeoutPolicyHandlerTest, SyncTypesDisabledForClearActions) {
   EXPECT_TRUE(pref_value->is_list());
   EXPECT_THAT(pref_value->GetList(),
               testing::ElementsAre(
-#if !BUILDFLAG(IS_ANDROID)
                   static_cast<int>(ActionType::kCloseBrowsers),
                   static_cast<int>(ActionType::kShowProfilePicker),
                   static_cast<int>(ActionType::kClearDownloadHistory),
                   static_cast<int>(ActionType::kClearHostedAppData),
-#endif  // !BUILDFLAG(IS_ANDROID)
                   static_cast<int>(ActionType::kClearSiteSettings),
                   static_cast<int>(ActionType::kReloadPages),
                   static_cast<int>(ActionType::kClearBrowsingHistory),

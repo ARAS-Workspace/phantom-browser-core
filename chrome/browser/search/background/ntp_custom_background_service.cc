@@ -99,12 +99,10 @@ SkColor GetBitmapMainColor(const SkBitmap& bitmap) {
 // static
 void NtpCustomBackgroundService::RegisterProfilePrefs(
     PrefRegistrySimple* registry) {
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterDictionaryPref(
       prefs::kDeprecatedNtpCustomBackgroundDictDoNotUse,
       NtpCustomBackgroundDefaults(),
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-#endif
 
   registry->RegisterDictionaryPref(prefs::kNtpCustomBackgroundDict,
                                    NtpCustomBackgroundDefaults());

@@ -19,12 +19,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/permissions/permission_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/location/android/location_settings_dialog_outcome.h"
-#include "components/location/android/mock_location_settings.h"
-#include "components/permissions/contexts/geolocation_permission_context_android.h"
-#endif
-
 class GeolocationPermissionContextDelegateTests
     : public ChromeRenderViewHostTestHarness {
  protected:
@@ -36,21 +30,6 @@ class GeolocationPermissionContextDelegateTests
     content_settings::PageSpecificContentSettings::CreateForWebContents(
         web_contents(),
         std::make_unique<PageSpecificContentSettingsDelegate>(web_contents()));
-#if BUILDFLAG(IS_ANDROID)
-    static_cast<permissions::GeolocationPermissionContextAndroid*>(
-        PermissionManagerFactory::GetForProfile(profile())
-            ->GetPermissionContextForTesting(ContentSettingsType::GEOLOCATION))
-        ->SetLocationSettingsForTesting(
-            std::make_unique<MockLocationSettings>());
-    MockLocationSettings::SetLocationStatus(
-        /*has_android_coarse_location_permission=*/true,
-        /*has_android_fine_location_permission=*/true,
-        /*is_system_location_setting_enabled=*/true);
-    MockLocationSettings::SetCanPromptForAndroidPermission(true);
-    MockLocationSettings::SetLocationSettingsDialogStatus(false /* enabled */,
-                                                          GRANTED);
-    MockLocationSettings::ClearHasShownLocationSettingsDialog();
-#endif
   }
 
   void RequestPermissionFromCurrentDocument(

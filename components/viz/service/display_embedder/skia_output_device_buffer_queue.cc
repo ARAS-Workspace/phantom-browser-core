@@ -168,11 +168,6 @@ SkiaOutputDeviceBufferQueue::SkiaOutputDeviceBufferQueue(
   capabilities_.number_of_buffers = 3;
   capabilities_.renderer_allocates_images = true;
 
-#if BUILDFLAG(IS_ANDROID)
-  if (::features::IncreaseBufferCountForHighFrameRate()) {
-    capabilities_.number_of_buffers = 5;
-  }
-#endif
   capabilities_.orientation_mode = OutputSurface::OrientationMode::kHardware;
 
   // Force the number of max pending frames to one when the switch
@@ -184,15 +179,6 @@ SkiaOutputDeviceBufferQueue::SkiaOutputDeviceBufferQueue(
     capabilities_.number_of_buffers = 2;
   capabilities_.pending_swap_params.max_pending_swaps =
       capabilities_.number_of_buffers - 1;
-#if BUILDFLAG(IS_ANDROID)
-  if (::features::IncreaseBufferCountForHighFrameRate() &&
-      capabilities_.number_of_buffers == 5) {
-    capabilities_.pending_swap_params.max_pending_swaps = 2;
-    capabilities_.pending_swap_params.max_pending_swaps_72hz = 3;
-    capabilities_.pending_swap_params.max_pending_swaps_90hz = 3;
-    capabilities_.pending_swap_params.max_pending_swaps_120hz = 4;
-  }
-#endif
 
   DCHECK_LT(capabilities_.pending_swap_params.max_pending_swaps,
             capabilities_.number_of_buffers);

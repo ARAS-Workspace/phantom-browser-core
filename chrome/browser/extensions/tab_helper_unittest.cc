@@ -16,10 +16,6 @@
 #include "extensions/browser/permissions_manager.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/test/test_extension_dir.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_test_helper.h"
-#endif
 #include "url/origin.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
@@ -172,55 +168,6 @@ TEST_F(TabHelperUnitTest, SetReloadRequired_AccumulatesMultipleExtensions) {
   tab_helper->SetReloadRequired(std::vector<const Extension*>{extension2});
   EXPECT_TRUE(tab_helper->IsReloadRequired());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(TabHelperUnitTest,
-       ShowReloadBubbleForAllExtensions_AndroidTabModelList) {
-  static constexpr char kManifest[] =
-      R"({
-           "name": "Extension",
-           "manifest_version": 3,
-           "version": "0.1",
-           "host_permissions": ["<all_urls>"]
-         })";
-  TestExtensionDir test_dir;
-  test_dir.WriteManifest(kManifest);
-
-  const Extension* extension =
-      PackAndInstallCRX(test_dir.UnpackedPath(), INSTALL_NEW);
-  ASSERT_TRUE(extension);
-
-  TestTabModel tab_model(profile());
-  TabModelList::AddTabModel(&tab_model);
-
-  auto web_contents_a =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-  auto web_contents_b =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-
-  TabHelper::CreateForWebContents(web_contents_a.get());
-  TabHelper::CreateForWebContents(web_contents_b.get());
-
-  const GURL url("http://www.example.com");
-  content::WebContentsTester::For(web_contents_a.get())->NavigateAndCommit(url);
-  content::WebContentsTester::For(web_contents_b.get())->NavigateAndCommit(url);
-
-  tab_model.SetWebContentsList({web_contents_a.get(), web_contents_b.get()});
-
-  ChromeExtensionsBrowserClient::Get()->ShowReloadBubbleForAllExtensions(
-      {extension}, web_contents_a.get());
-
-  TabHelper* tab_helper_a = TabHelper::FromWebContents(web_contents_a.get());
-  ASSERT_TRUE(tab_helper_a);
-  EXPECT_TRUE(tab_helper_a->IsReloadRequired());
-
-  TabHelper* tab_helper_b = TabHelper::FromWebContents(web_contents_b.get());
-  ASSERT_TRUE(tab_helper_b);
-  EXPECT_TRUE(tab_helper_b->IsReloadRequired());
-
-  TabModelList::RemoveTabModel(&tab_model);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(TabHelperUnitTest, OnExtensionUnloaded_ClearsReloadRequired) {
   static constexpr char kManifest[] =

@@ -61,9 +61,6 @@
 #include "third_party/blink/public/mojom/back_forward_cache_not_restored_reasons.mojom.h"
 #include "third_party/blink/public/mojom/frame/sudden_termination_disabler_type.mojom-shared.h"
 #include "third_party/blink/public/mojom/script_source_location.mojom.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/child_process_importance.h"
-#endif
 
 namespace content {
 
@@ -119,37 +116,6 @@ using blink::scheduler::WebSchedulerTrackedFeatures;
 // The default time to live in seconds for documents in BackForwardCache.
 // See also crbug.com/1305878.
 static constexpr int kDefaultTimeToLiveInBackForwardCacheInSeconds = 600;
-
-#if BUILDFLAG(IS_ANDROID)
-bool IsProcessBindingEnabled() {
-  // Avoid activating BackForwardCache trial for checking the parameters
-  // associated with it.
-  if (!IsBackForwardCacheEnabled()) {
-    return false;
-  }
-  const std::string process_binding_param =
-      base::GetFieldTrialParamValueByFeature(features::kBackForwardCache,
-                                             "process_binding_strength");
-  return process_binding_param.empty() || process_binding_param == "DISABLE";
-}
-
-// Association of ChildProcessImportance to corresponding string names.
-const base::FeatureParam<ChildProcessImportance>::Option
-    child_process_importance_options[] = {
-        {ChildProcessImportance::IMPORTANT, "IMPORTANT"},
-        {ChildProcessImportance::MODERATE, "MODERATE"},
-        {ChildProcessImportance::NOT_PERCEPTIBLE, "NOT_PERCEPTIBLE"},
-        {ChildProcessImportance::NORMAL, "NORMAL"}};
-
-// Defines the binding strength for a processes holding cached pages. The value
-// is read from an experiment parameter value. Ideally this would be lower than
-// the one for processes holding the foreground page and similar to that of
-// background tabs so that the OS will hopefully kill the foreground tab last.
-// The default importance is set to MODERATE.
-const base::FeatureParam<ChildProcessImportance> kChildProcessImportanceParam{
-    &features::kBackForwardCache, "process_binding_strength",
-    ChildProcessImportance::MODERATE, &child_process_importance_options};
-#endif
 
 WebSchedulerTrackedFeatures SupportedFeaturesImpl() {
   WebSchedulerTrackedFeatures features;
@@ -1378,22 +1344,6 @@ void BackForwardCacheImpl::StoreEntry(
       GetCurrentBackForwardCacheEligibility(entry->render_frame_host(),
                                             /*is_becoming_forward_entry=*/false)
           .CanStore());
-
-#if BUILDFLAG(IS_ANDROID)
-  if (!IsProcessBindingEnabled()) {
-    // Set the priority of the main frame on entering the back-forward cache to
-    // make sure the page gets evicted instead of foreground tab. This might not
-    // become the effective priority of the process if it owns other higher
-    // priority RenderWidgetHost. We don't need to reset the priority in
-    // RestoreEntry as it is taken care by WebContentsImpl::NotifyFrameSwapped
-    // on restoration.
-    RenderWidgetHostImpl* rwh =
-        entry->render_frame_host()->GetRenderWidgetHost();
-    ChildProcessImportance current_importance = rwh->importance();
-    rwh->SetImportance(
-        std::min(current_importance, kChildProcessImportanceParam.Get()));
-  }
-#endif
 
   entry->render_frame_host()->DidEnterBackForwardCache();
   entry->SetStoredPageDelegate(this);

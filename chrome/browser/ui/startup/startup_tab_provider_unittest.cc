@@ -21,11 +21,9 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/values.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension_builder.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #define CMD_ARG(x) x
 

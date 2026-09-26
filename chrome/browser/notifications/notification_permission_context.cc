@@ -33,14 +33,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "chrome/browser/android/flags/chrome_cached_flags.h"
-#include "chrome/browser/android/shortcut_helper.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/webapps/installable/installed_webapp_bridge.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/notifications/notifier_state_tracker.h"
 #include "chrome/browser/notifications/notifier_state_tracker_factory.h"
@@ -76,13 +68,7 @@ NotificationPermissionContext::NotificationPermissionContext(
     : ContentSettingPermissionContextBase(
           browser_context,
           ContentSettingsType::NOTIFICATIONS,
-          network::mojom::PermissionsPolicyFeature::kNotFound) {
-#if BUILDFLAG(IS_ANDROID)
-  if (Profile::FromBrowserContext(browser_context)->AsTestingProfile()) {
-    enabled_app_level_notification_permission_for_testing_ = true;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-}
+          network::mojom::PermissionsPolicyFeature::kNotFound) {}
 
 NotificationPermissionContext::~NotificationPermissionContext() = default;
 
@@ -212,39 +198,6 @@ void NotificationPermissionContext::DecidePermission(
             base::Seconds(delay_seconds));
     return;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  bool contains_webapk = ShortcutHelper::DoesOriginContainAnyInstalledWebApk(
-      request_data->requesting_origin);
-  bool contains_twa =
-      ShortcutHelper::DoesOriginContainAnyInstalledTrustedWebActivity(
-          request_data->requesting_origin);
-  bool contains_installed_webapp = contains_twa || contains_webapk;
-  if (base::android::android_info::sdk_int() >=
-          base::android::android_info::SDK_VERSION_T &&
-      contains_installed_webapp) {
-    // WebAPKs match URLs using a scope URL which may contain a path. An origin
-    // has no path and would not fall within such a scope. So to find a matching
-    // WebAPK we must pass a more complete URL e.g. GetLastCommittedURL.
-    InstalledWebappBridge::DecidePermission(
-        ContentSettingsType::NOTIFICATIONS, request_data->requesting_origin,
-        web_contents->GetLastCommittedURL(),
-        base::BindOnce(&NotificationPermissionContext::NotifyPermissionSet,
-                       weak_factory_ui_thread_.GetWeakPtr(),
-                       permissions::PermissionRequestData(
-                           request_data->id,
-                           content::PermissionRequestDescription(
-                               content::PermissionDescriptorUtil::
-                                   CreatePermissionDescriptorForPermissionType(
-                                       blink::PermissionType::NOTIFICATIONS)),
-                           request_data->requesting_origin,
-                           request_data->embedding_origin),
-                       std::move(callback),
-                       /*persist=*/false,
-                       /*permission_result=*/nullptr));
-    return;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   permissions::ContentSettingPermissionContextBase::DecidePermission(
       std::move(request_data), std::move(callback));

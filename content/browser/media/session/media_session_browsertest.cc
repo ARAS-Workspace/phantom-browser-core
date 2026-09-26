@@ -320,7 +320,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest, MAYBE_WebContents_Muted) {
                    ->is_controllable);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // On Android, System Audio Focus would break this test.
 
 IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest, MultipleTabsPlayPause) {
@@ -360,7 +359,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest, MultipleTabsPlayPause) {
   EXPECT_TRUE(IsPlaying(shell(), "long-video"));
   EXPECT_TRUE(IsPlaying(other_shell, "long-video"));
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest, GetMediaImageBitmap) {
   ASSERT_TRUE(embedded_test_server()->Start());

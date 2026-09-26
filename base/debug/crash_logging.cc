@@ -23,7 +23,7 @@ CrashKeyString* AllocateCrashKeyString(const char name[],
   // TODO(crbug.com/40850825): It would be great if the DCHECKs below
   // could also be enabled on Android, but debugging tryjob failures was a bit
   // difficult... :-/
-#if DCHECK_IS_ON() && !BUILDFLAG(IS_ANDROID)
+#if DCHECK_IS_ON()
   std::string_view name_piece = name;
 
   // Some `CrashKeyImplementation`s reserve certain characters and disallow

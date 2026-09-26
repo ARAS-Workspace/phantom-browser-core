@@ -166,14 +166,12 @@ void AddTabStripColorMixer(ui::ColorProvider* provider,
   mixer[kColorTabDividerFrameActive] = {kColorToolbar};
   mixer[kColorTabDividerFrameInactive] = {kColorToolbar};
 
-#if !BUILDFLAG(IS_ANDROID)
   mixer[kColorTabDiscardRingFrameActive] = ui::BlendForMinContrastWithSelf(
       kColorTabBackgroundInactiveFrameActive,
       color_utils::kMinimumVisibleContrastRatio);
   mixer[kColorTabDiscardRingFrameInactive] = ui::BlendForMinContrastWithSelf(
       kColorTabBackgroundInactiveFrameInactive,
       color_utils::kMinimumVisibleContrastRatio);
-#endif
 
   mixer[kColorNewTabButtonForegroundFrameActive] = {
       kColorTabForegroundActiveFrameActive};

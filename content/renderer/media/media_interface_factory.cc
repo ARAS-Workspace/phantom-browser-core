@@ -109,29 +109,6 @@ void MediaInterfaceFactory::CreateDefaultRenderer(
                                                     std::move(receiver));
 }
 
-
-#if BUILDFLAG(IS_ANDROID)
-void MediaInterfaceFactory::CreateFlingingRenderer(
-    const std::string& presentation_id,
-    mojo::PendingRemote<media::mojom::FlingingRendererClientExtension>
-        client_extension,
-    mojo::PendingReceiver<media::mojom::Renderer> receiver) {
-  if (!task_runner_->BelongsToCurrentThread()) {
-    task_runner_->PostTask(
-        FROM_HERE,
-        base::BindOnce(&MediaInterfaceFactory::CreateFlingingRenderer,
-                       weak_this_, presentation_id, std::move(client_extension),
-                       std::move(receiver)));
-    return;
-  }
-
-  DVLOG(1) << __func__;
-  GetMediaInterfaceFactory()->CreateFlingingRenderer(
-      presentation_id, std::move(client_extension), std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-
 void MediaInterfaceFactory::CreateCdm(const media::CdmConfig& cdm_config,
                                       CreateCdmCallback callback) {
   if (!task_runner_->BelongsToCurrentThread()) {

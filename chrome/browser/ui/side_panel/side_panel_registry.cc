@@ -111,8 +111,8 @@ bool SidePanelRegistry::Deregister(const SidePanelEntry::Key& key) {
     active_entry_.reset();
   }
 
-// TODO(crbug.com/489780669): Temporarily disabled until a coordinator is made.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(crbug.com/489780669): Temporarily disabled until a coordinator is
+  // made.
   // TODO(https://crbug.com/360163254): This is nullptr in
   // BrowserWithTestWindowTest. When the test suite goes away the nullptr check
   // can be removed.
@@ -126,7 +126,6 @@ bool SidePanelRegistry::Deregister(const SidePanelEntry::Key& key) {
                            /*suppress_animations=*/true);
     }
   }
-#endif
 
   auto it = std::find_if(entries_.begin(), entries_.end(),
                          base::MatchesUniquePtr(entry));

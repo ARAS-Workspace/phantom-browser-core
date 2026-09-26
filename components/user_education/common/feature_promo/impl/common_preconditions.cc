@@ -98,13 +98,11 @@ MeetsFeatureEngagementCriteriaPrecondition::CheckPrecondition(
     UnownedTypedDataCollection& data) const {
   if (tracker_->IsInitialized()) {
     // Note: if we don't have access to `ListEvents()` this is a no-op.
-#if !BUILDFLAG(IS_ANDROID)
     for (const auto& [config, count] : tracker_->ListEvents(*feature_)) {
       if (!config.comparator.MeetsCriteria(count)) {
         return FeaturePromoResult::kBlockedByConfig;
       }
     }
-#endif
   }
   return FeaturePromoResult::Success();
 }

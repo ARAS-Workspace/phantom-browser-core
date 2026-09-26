@@ -237,42 +237,6 @@ int GetGestureScrollIndex(EventMetrics::EventType type) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr const char kTopControlsMovedName[] = ".TopControlsMoved";
-constexpr const char kTopControlsDidNotMoveName[] = ".TopControlsDidNotMove";
-void ReportTopControlsMetric(
-    const std::string& name,
-    bool top_controls_moved,
-    base::TimeDelta latency,
-    EventMetrics::EventType type,
-    const std::optional<EventMetrics::HistogramBucketing>& bucketing) {
-  if (!bucketing) {
-    return;
-  }
-  if (top_controls_moved) {
-    std::string versioned_name = name + kTopControlsMovedName;
-    STATIC_HISTOGRAM_POINTER_GROUP(
-        versioned_name, GetGestureScrollIndex(type),
-        kMaxGestureScrollHistogramIndex,
-        AddTimeMicrosecondsGranularity(latency),
-        base::Histogram::FactoryMicrosecondsTimeGet(
-            versioned_name, bucketing->min, bucketing->max, bucketing->count,
-            base::HistogramBase::kUmaTargetedHistogramFlag));
-  } else if (base::ShouldRecordSubsampledMetric(0.001)) {
-    // We want to sub-sample the reports with top controls not moving. As they
-    // dominate in volume.
-    std::string versioned_name = name + kTopControlsDidNotMoveName;
-    STATIC_HISTOGRAM_POINTER_GROUP(
-        versioned_name, GetGestureScrollIndex(type),
-        kMaxGestureScrollHistogramIndex,
-        AddTimeMicrosecondsGranularity(latency),
-        base::Histogram::FactoryMicrosecondsTimeGet(
-            versioned_name, bucketing->min, bucketing->max, bucketing->count,
-            base::HistogramBase::kUmaTargetedHistogramFlag));
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 
 // CompositorFrameReporter::ProcessedBlinkBreakdown::Iterator ==================
@@ -1571,12 +1535,6 @@ void CompositorFrameReporter::ReportEventLatencyMetrics() const {
                     bucketing->max, bucketing->count,
                     base::HistogramBase::kUmaTargetedHistogramFlag));
           }
-
-#if BUILDFLAG(IS_ANDROID)
-          ReportTopControlsMetric(histogram_base_name, top_controls_moved_,
-                                  total_latency, event_metrics->type(),
-                                  event_metrics->GetHistogramBucketing());
-#endif  // BUILDFLAG(IS_ANDROID)
         }
       }
 

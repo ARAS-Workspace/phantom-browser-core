@@ -18,19 +18,9 @@
 #include "media/filters/memory_data_source.h"
 #include "testing/libfuzzer/libfuzzer_base_wrappers.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/test_support_android.h"
-#endif
-
 class Environment {
  public:
   Environment() {
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, BrowserTaskEnvironment creates a UI message pump that does
-    // not support RunLoop::Run(). This installs a stub pump to allow it in
-    // tests.
-    base::InitAndroidTestMessageLoop();
-#endif
     task_environment_ = std::make_unique<content::BrowserTaskEnvironment>();
   }
 

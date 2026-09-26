@@ -222,9 +222,6 @@ class SharedDictionaryManagerOnDiskTest : public ::testing::Test {
           shared_dictionary::kDictionaryMaxCountPerNetworkContext) {
     return SharedDictionaryManager::CreateOnDisk(
         database_path_, cache_directory_path_, cache_max_size, cache_max_count,
-#if BUILDFLAG(IS_ANDROID)
-        disk_cache::ApplicationStatusListenerGetter(),
-#endif  // BUILDFLAG(IS_ANDROID)
         /*file_operations_factory=*/nullptr);
   }
   const std::map<

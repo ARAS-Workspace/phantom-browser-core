@@ -35,10 +35,6 @@
 #include "services/network/public/cpp/features.h"
 #include "services/network/public/mojom/network_service_test.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -114,20 +110,6 @@ class SandboxedHttpCacheBrowserTest : public ContentBrowserTest {
   }
 
   void SetUp() override {
-
-#if BUILDFLAG(IS_ANDROID)
-    {
-      // On older android, we cannot use ftruncate in the network process.
-      // See https://crbug.com/1315933 and https://crrev.com/c/3581676.
-      // Let's skip the tests.
-      const int sdk_version = base::android::android_info::sdk_int();
-      if (sdk_version <=
-          base::android::android_info::SdkVersion::SDK_VERSION_MARSHMALLOW) {
-        DVLOG(0) << "Android is too old: " << sdk_version;
-        GTEST_SKIP();
-      }
-    }
-#endif
 
     // These assertions need to precede ContentBrowserTest::SetUp to prevent the
     // test body from running when one of the assertions fails.

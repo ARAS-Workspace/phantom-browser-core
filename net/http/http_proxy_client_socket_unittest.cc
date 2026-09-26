@@ -34,11 +34,6 @@ TEST(HttpProxyClientSocketTest, Tag) {
       /*proxy_delegate=*/nullptr, TRAFFIC_ANNOTATION_FOR_TESTS);
 
   EXPECT_EQ(tagging_sock_ptr->tag(), SocketTag());
-#if BUILDFLAG(IS_ANDROID)
-  SocketTag tag(0x12345678, 0x87654321);
-  socket.ApplySocketTag(tag);
-  EXPECT_EQ(tagging_sock_ptr->tag(), tag);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

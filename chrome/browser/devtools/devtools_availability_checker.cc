@@ -30,13 +30,11 @@
 #include "extensions/common/manifest.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
-#endif
 
 namespace {
 
@@ -116,7 +114,6 @@ bool IsInspectionAllowed(Profile* profile, content::WebContents* web_contents) {
   }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   if (web_app::AreWebAppsEnabled(profile)) {
     if (const webapps::AppId* app_id =
             web_app::WebAppTabHelper::GetAppId(web_contents)) {
@@ -129,7 +126,6 @@ bool IsInspectionAllowed(Profile* profile, content::WebContents* web_contents) {
       }
     }
   }
-#endif
 
   if (checker) {
     auto url_availability =
@@ -217,7 +213,6 @@ bool IsInspectionAllowed(Profile* profile,
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool IsInspectionAllowed(Profile* profile, const web_app::WebApp* web_app) {
   if (web_app) {
     policy::DeveloperToolsPolicyChecker* checker =
@@ -256,7 +251,6 @@ bool IsInspectionAllowed(Profile* profile, const web_app::WebApp* web_app) {
       NOTREACHED() << "Unknown developer tools policy";
   }
 }
-#endif
 
 bool IsInspectionAllowed(Profile* profile, const GURL& url) {
   if (url.is_empty() || url.SchemeIs(url::kAboutScheme)) {

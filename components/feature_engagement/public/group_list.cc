@@ -14,9 +14,6 @@ namespace feature_engagement {
 namespace {
 const base::Feature* const kAllGroups[] = {
     &kIPHDummyGroup,  // Ensures non-empty array for all platforms.
-#if BUILDFLAG(IS_ANDROID)
-    &kClankDefaultBrowserPromosGroup,
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 }  // namespace
 

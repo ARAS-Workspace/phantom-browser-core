@@ -47,24 +47,4 @@ std::unique_ptr<Renderer> MojoRendererFactory::CreateRenderer(
 
 
 
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<MojoRenderer> MojoRendererFactory::CreateFlingingRenderer(
-    const std::string& presentation_id,
-    mojo::PendingRemote<mojom::FlingingRendererClientExtension>
-        client_extension_remote,
-    const scoped_refptr<base::SequencedTaskRunner>& media_task_runner,
-    VideoRendererSink* video_renderer_sink) {
-  DCHECK(interface_factory_);
-  mojo::PendingRemote<mojom::Renderer> renderer_remote;
-
-  interface_factory_->CreateFlingingRenderer(
-      presentation_id, std::move(client_extension_remote),
-      renderer_remote.InitWithNewPipeAndPassReceiver());
-
-  return std::make_unique<MojoRenderer>(media_task_runner, nullptr,
-                                        video_renderer_sink,
-                                        std::move(renderer_remote));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace media

@@ -1366,18 +1366,6 @@ TEST_F(BookmarkModelTest, ParentForNewNodesWithEmptyModel) {
             GetParentForNewNodes(model()));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Tests that the bookmark_bar_node can still be returned even on Android in
-// case the last bookmark was added to it.
-TEST_F(BookmarkModelTest, ParentCanBeBookmarkBarOnAndroid) {
-  const std::u16string kTitle(u"foo");
-  const GURL kUrl("http://foo.com");
-
-  model()->AddURL(model()->bookmark_bar_node(), 0, kTitle, kUrl);
-  EXPECT_EQ(model()->bookmark_bar_node(), GetParentForNewNodes(model()));
-}
-#endif
-
 // Tests that adding a URL to a folder updates the last modified time.
 TEST_F(BookmarkModelTest, ParentForNewNodes) {
   const std::u16string kTitle(u"foo");
@@ -1716,7 +1704,6 @@ TEST_F(BookmarkModelTest, NodeVisibility_AddBookmarkToNonVisibleFolder) {
   EXPECT_TRUE(permanent_folder->IsVisible());
 }
 
-#if !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 TEST_F(BookmarkModelTest, NodeVisibility_AddFirstLocalBookmarkToOtherFolder) {
   model()->CreateAccountPermanentFolders();
 
@@ -1829,7 +1816,6 @@ TEST_F(BookmarkModelTest, NodeVisibility_AddFirstLocalBookmarkToMobileFolder) {
                   model()->mobile_node(), model()->account_bookmark_bar_node(),
                   model()->account_other_node()));
 }
-#endif  // !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 
 TEST_F(BookmarkModelTest, NodeVisibility_RemoveLastBookmarkFromVisibleFolder) {
   const BookmarkPermanentNode* permanent_folder =
@@ -1867,7 +1853,6 @@ TEST_F(BookmarkModelTest, NodeVisibility_RemoveLastBookmarkFromVisibleFolder) {
   EXPECT_FALSE(permanent_folder->IsVisible());
 }
 
-#if !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 TEST_F(BookmarkModelTest,
        NodeVisibility_MoveBookmarkChangesVisibilityOfSourceFolder) {
   const BookmarkPermanentNode* source_folder = model()->mobile_node();
@@ -2132,7 +2117,6 @@ TEST_F(BookmarkModelTest, NodeVisibility_RemoveAccountPermanentFolders) {
   model()->RemoveAccountPermanentFolders();
   EXPECT_THAT(GetVisiblePermanentNodes(), ElementsAre(local_bb, local_other));
 }
-#endif  // !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID))
 
 TEST_F(BookmarkModelTest, NodeVisibility_AllBookmarksPhase0) {
   base::test::ScopedFeatureList feature_list;

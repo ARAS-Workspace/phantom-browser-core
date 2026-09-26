@@ -30,18 +30,6 @@ class TestDelegate : public GeolocationPermissionContext::Delegate {
                         GeolocationPermissionContext* context) override {
     return false;
   }
-#if BUILDFLAG(IS_ANDROID)
-  bool IsInteractable(content::WebContents* web_contents) override {
-    return true;
-  }
-  PrefService* GetPrefs(content::BrowserContext* browser_context) override {
-    return nullptr;
-  }
-  bool IsRequestingOriginDSE(content::BrowserContext* browser_context,
-                             const GURL& requesting_origin) override {
-    return false;
-  }
-#endif
 };
 
 }  // namespace

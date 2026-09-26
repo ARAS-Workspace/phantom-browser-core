@@ -111,11 +111,6 @@ const base::FeatureParam<WebAuthnAmbientSigninDisplay>
         &kWebAuthnAmbientSigninDisplayOptions};
 
 // Deprecation flag. Disabled by default in M145. Remove in or after M148.
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kWebAuthnPublishPrelinkingInfo,
-             "WebAuthenticationPublishPrelinkingInfo",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Disabled by default.
 BASE_FEATURE(kWebAuthnHelloSignal,

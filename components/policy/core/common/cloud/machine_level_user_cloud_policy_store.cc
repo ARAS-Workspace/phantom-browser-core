@@ -132,23 +132,6 @@ void MachineLevelUserCloudPolicyStore::LoadImmediately() {
     VLOG_POLICY(1, POLICY_FETCHING)
         << PolicyTypeLogPrefix(policy_type(), std::string())
         << "LoadImmediately ignored, no DM token present.";
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, some dependencies (e.g. FirstRunActivity) are blocked until
-    // the PolicyService is initialized, which waits on all policy providers to
-    // indicate that policies are available.
-    //
-    // When cloud enrollment is not mandatory, machine-level cloud policies are
-    // loaded asynchronously and will be applied once they are fetched from the
-    // server. To avoid blocking those dependencies on Android, notify that the
-    // PolicyService initialization doesn't need to wait on cloud policies by
-    // sending out an empty policy set.
-    //
-    // The call to |PolicyLoaded| is exactly the same that would happen if this
-    // disk access optimization was not implemented.
-    PolicyLoadResult result;
-    result.status = policy::LOAD_RESULT_NO_POLICY_FILE;
-    PolicyLoaded(/*validate_in_background=*/false, result);
-#endif  // BUILDFLAG(IS_ANDROID)
     return;
   }
   VLOG_POLICY(1, POLICY_FETCHING)

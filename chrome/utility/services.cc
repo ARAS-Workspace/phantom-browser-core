@@ -31,10 +31,6 @@
 #include "services/passage_embeddings/passage_embeddings_service.h"
 #include "ui/accessibility/accessibility_features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/services/readaloud/read_aloud_playback_controller.h"  // nogncheck
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/services/mac_notifications/mac_notification_provider_impl.h"
 #include "chrome/services/system_signals/mac/mac_system_signals_service.h"
@@ -46,7 +42,6 @@
 #include "chrome/services/system_signals/linux/linux_system_signals_service.h"
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/common/importer/profile_import.mojom.h"
 #include "chrome/services/reading_mode_metrics/reading_mode_metrics_service.h"
 #include "chrome/utility/importer/profile_import_impl.h"
@@ -55,13 +50,12 @@
 #include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
 #include "services/screen_ai/public/mojom/screen_ai_factory.mojom.h"  // nogncheck
 #include "services/screen_ai/screen_ai_service_impl.h"  // nogncheck
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 #include "chrome/services/redirection/redirection_service.h"
 #endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/services/file_util/file_util_service.h"  // nogncheck
 #endif
 
@@ -70,7 +64,7 @@
 #include "chrome/services/removable_storage_writer/removable_storage_writer.h"
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/services/media_gallery_util/media_parser_factory.h"
 #include "components/media_gallery_util/public/mojom/media_parser.mojom.h"
 #endif
@@ -161,7 +155,6 @@ auto RunOakSessionService(
   return std::make_unique<private_ai::OakSessionService>(std::move(receiver));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 auto RunProxyResolver(
     mojo::PendingReceiver<proxy_resolver::mojom::ProxyResolverFactory>
         receiver) {
@@ -180,8 +173,6 @@ auto RunMirroringService(
       std::move(receiver), content::UtilityThread::Get()->GetIOTaskRunner());
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 auto RunRedirectionService(
     mojo::PendingReceiver<redirection::mojom::RedirectionService> receiver) {
@@ -197,8 +188,6 @@ auto RunPassageEmbeddingsService(
 }
 
 
-#if !BUILDFLAG(IS_ANDROID)
-
 auto RunReadingModeMetricsService(
     mojo::PendingReceiver<reading_mode::mojom::DistillationEvaluator>
         receiver) {
@@ -210,9 +199,8 @@ auto RunScreenAIServiceFactory(
     mojo::PendingReceiver<screen_ai::mojom::ScreenAIServiceFactory> receiver) {
   return std::make_unique<screen_ai::ScreenAIService>(std::move(receiver));
 }
-#endif
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 auto RunFileUtil(
     mojo::PendingReceiver<chrome::mojom::FileUtilService> receiver) {
   return std::make_unique<FileUtilService>(std::move(receiver));
@@ -226,12 +214,12 @@ auto RunRemovableStorageWriter(
 }
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 auto RunMediaParserFactory(
     mojo::PendingReceiver<chrome::mojom::MediaParserFactory> receiver) {
   return std::make_unique<MediaParserFactory>(std::move(receiver));
 }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 auto RunPrintingService(
@@ -283,19 +271,6 @@ auto RunOnDeviceTranslationService(
 }
 #endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<readaloud::ReadAloudPlaybackController>
-RunReadAloudPlaybackControllerFactory(
-    mojo::PendingReceiver<
-        read_aloud::mojom::ReadAloudPlaybackControllerFactory> receiver) {
-  if (!features::IsReadAloudNativeEnabled()) {
-    return nullptr;
-  }
-  return std::make_unique<readaloud::ReadAloudPlaybackController>(
-      std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 
 void RegisterElevatedMainThreadServices(mojo::ServiceFactory& services) {
@@ -311,16 +286,10 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunPassageEmbeddingsService);
   services.Add(RunOakSessionService);
 
-#if BUILDFLAG(IS_ANDROID)
-  services.Add(RunReadAloudPlaybackControllerFactory);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
   services.Add(RunProfileImporter);
   services.Add(RunMirroringService);
   services.Add(RunReadingModeMetricsService);
   services.Add(RunScreenAIServiceFactory);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
   services.Add(RunRedirectionService);
@@ -335,7 +304,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunMacNotificationService);
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   services.Add(RunFileUtil);
 #endif
 
@@ -343,7 +312,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunRemovableStorageWriter);
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
   services.Add(RunMediaParserFactory);
 #endif
 
@@ -370,9 +339,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
 }
 
 void RegisterIOThreadServices(mojo::ServiceFactory& services) {
-#if !BUILDFLAG(IS_ANDROID)
   services.Add(RunProxyResolver);
-#endif
 #if BUILDFLAG(IS_MAC)
   services.Add(RunMacSystemProxyResolver);
 #endif  // BUILDFLAG(IS_MAC)

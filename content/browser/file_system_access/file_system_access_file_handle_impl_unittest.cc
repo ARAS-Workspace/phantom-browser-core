@@ -60,15 +60,6 @@
 #include "third_party/blink/public/mojom/permissions/permission_status.mojom-shared.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/strings/string_view_util.h"
-#include "crypto/obsolete/sha1.h"
-#include "base/android/content_uri_utils.h"
-#include "base/android/path_utils.h"
-#include "base/strings/string_number_conversions.h"
-#include "base/test/android/content_uri_test_utils.h"
-#endif
-
 namespace content {
 
 using blink::mojom::FileSystemAccessStatus;
@@ -244,19 +235,6 @@ class FileSystemAccessFileHandleImplTestBase : public testing::Test {
     auto test_file_path = type == storage::kFileSystemTypeLocal
                               ? dir_.GetPath().AppendASCII("test")
                               : base::FilePath::FromUTF8Unsafe("test");
-#if BUILDFLAG(IS_ANDROID)
-    if (use_content_uri) {
-      base::FilePath parent =
-          *base::test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-              dir_.GetPath());
-      base::FilePath content_uri = base::ContentUriGetChildDocumentOrQuery(
-          parent, test_file_path.BaseName().value(), "text/plain",
-          /*is_directory=*/false,
-          /*create=*/true);
-      ASSERT_TRUE(base::ContentUriIsCreateChildDocumentQuery(content_uri));
-      test_file_path = content_uri;
-    }
-#endif
     test_file_url_ = file_system_context_->CreateCrackedFileSystemURL(
         test_src_storage_key_, type, test_file_path);
     if (type == storage::kFileSystemTypeTemporary) {
@@ -367,17 +345,6 @@ class FileSystemAccessAccessHandleIncognitoTest
                 /*use_content_uri=*/false);
   }
 };
-
-#if BUILDFLAG(IS_ANDROID)
-class FileSystemAccessAccessHandleContentUriTest
-    : public FileSystemAccessAccessHandleTest {
-  void SetUp() override {
-    // AccessHandles are only allowed for temporary file systems.
-    SetupHelper(storage::kFileSystemTypeLocal, /*is_incognito=*/false,
-                /*use_content_uri=*/true);
-  }
-};
-#endif
 
 class FileSystemAccessFileHandleImplCreateFileWriterTest
     : public FileSystemAccessFileHandleImplTestBase {
@@ -582,82 +549,6 @@ TEST_F(FileSystemAccessFileHandleImplCreateFileWriterTest,
 
 // TODO(crbug.com/40276567): Add test to cover that swap file is truncated when
 // `keep_existing_data` is false.
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(FileSystemAccessAccessHandleContentUriTest, CreateFileWriter) {
-  base::test::TestFuture<
-      blink::mojom::FileSystemAccessErrorPtr,
-      mojo::PendingRemote<blink::mojom::FileSystemAccessFileWriter>>
-      future;
-  handle_->CreateFileWriter(
-      /*keep_existing_data=*/false,
-      /*auto_close=*/false,
-      blink::mojom::FileSystemAccessWritableFileStreamLockMode::kSiloed,
-      future.GetCallback());
-  blink::mojom::FileSystemAccessErrorPtr result;
-  mojo::PendingRemote<blink::mojom::FileSystemAccessFileWriter> writer_remote;
-  std::tie(result, writer_remote) = future.Take();
-  EXPECT_EQ(result->status, FileSystemAccessStatus::kOk);
-  EXPECT_TRUE(writer_remote.is_valid());
-
-  // Swap file should be created in cache dir.
-  base::FilePath cache_dir;
-  EXPECT_TRUE(base::android::GetCacheDirectory(&cache_dir));
-  auto hex_encoded_hash =
-      content::GetHashedUrlPath(test_file_url_.path().value());
-  base::FilePath swap = cache_dir.Append("FileSystemAPISwap")
-                            .Append(hex_encoded_hash)
-                            .AddExtension(".crswap");
-  EXPECT_TRUE(base::PathExists(swap));
-}
-
-TEST_F(FileSystemAccessAccessHandleContentUriTest,
-       CreateFileWriterWithLongContentUri) {
-  // Create a very long virtual path (e.g., > 255 chars) to test regression of
-  // filename length limit issues (crbug.com/516978919).
-  std::string long_name(300, 'a');
-  base::FilePath long_file_path(long_name);
-
-  // Create a new handle with this long content URI
-  base::FilePath parent =
-      *base::test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-          dir_.GetPath());
-  base::FilePath content_uri = base::ContentUriGetChildDocumentOrQuery(
-      parent, long_file_path.value(), "text/plain",
-      /*is_directory=*/false,
-      /*create=*/true);
-
-  auto test_long_file_url = file_system_context_->CreateCrackedFileSystemURL(
-      test_src_storage_key_, storage::kFileSystemTypeLocal, content_uri);
-
-  auto long_handle = std::make_unique<FileSystemAccessFileHandleImpl>(
-      manager_.get(),
-      FileSystemAccessManagerImpl::BindingContext(
-          test_src_storage_key_, test_src_url_,
-          web_contents_->GetPrimaryMainFrame()->GetGlobalId()),
-      test_long_file_url, long_name,
-      FileSystemAccessManagerImpl::SharedHandleState(allow_grant_,
-                                                     allow_grant_));
-
-  base::test::TestFuture<
-      blink::mojom::FileSystemAccessErrorPtr,
-      mojo::PendingRemote<blink::mojom::FileSystemAccessFileWriter>>
-      future;
-  long_handle->CreateFileWriter(
-      /*keep_existing_data=*/false,
-      /*auto_close=*/false,
-      blink::mojom::FileSystemAccessWritableFileStreamLockMode::kSiloed,
-      future.GetCallback());
-  blink::mojom::FileSystemAccessErrorPtr result;
-  mojo::PendingRemote<blink::mojom::FileSystemAccessFileWriter> writer_remote;
-  std::tie(result, writer_remote) = future.Take();
-
-  // This must succeed even if the original content URI is extremely long,
-  // because the swap file is created using a SHA1 hash of the URI.
-  EXPECT_EQ(result->status, FileSystemAccessStatus::kOk);
-  EXPECT_TRUE(writer_remote.is_valid());
-}
-#endif
 
 class FileSystemAccessFileHandleImplRemoveTest
     : public FileSystemAccessFileHandleImplTestBase {};
@@ -972,53 +863,6 @@ TEST_F(FileSystemAccessFileHandleImplMoveTest, NoReadAccessWriteOnlyDest) {
   EXPECT_FALSE(base::PathExists(file));
   EXPECT_TRUE(base::PathExists(renamed_file));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(FileSystemAccessFileHandleImplMoveTest,
-       ContentUriRenameMoveNotSupported) {
-  base::FilePath dest_dir;
-  ASSERT_TRUE(base::CreateTemporaryDirInDir(
-      dir_.GetPath(), FILE_PATH_LITERAL("dest"), &dest_dir));
-  base::FilePath file;
-  ASSERT_TRUE(base::CreateTemporaryFileInDir(dir_.GetPath(), &file));
-  base::FilePath renamed_file = file.DirName().AppendASCII("new_name.txt");
-  base::FilePath moved_file = dest_dir.AppendASCII("new_name.txt");
-
-  base::FilePath content_uri_dest_dir =
-      *base::test::android::GetContentUriFromCacheDirFilePath(dest_dir);
-  base::FilePath content_uri_file =
-      *base::test::android::GetContentUriFromCacheDirFilePath(file);
-
-  auto dest_dir_handle = GetDirectoryHandleWithPermissions(
-      content_uri_dest_dir, /*read_grant=*/allow_grant_,
-      /*write_grant=*/allow_grant_);
-  auto handle =
-      GetHandleWithPermissions(content_uri_file, /*read_grant=*/allow_grant_,
-                               /*write_grant=*/allow_grant_);
-
-  mojo::PendingRemote<blink::mojom::FileSystemAccessTransferToken> dir_remote;
-  manager_->CreateTransferToken(*dest_dir_handle,
-                                dir_remote.InitWithNewPipeAndPassReceiver());
-
-  // Rename is not supported.
-  base::test::TestFuture<blink::mojom::FileSystemAccessErrorPtr> rename_future;
-  handle->Rename(renamed_file.BaseName().AsUTF8Unsafe(),
-                 rename_future.GetCallback());
-  EXPECT_EQ(rename_future.Get()->status,
-            FileSystemAccessStatus::kInvalidModificationError);
-  EXPECT_TRUE(base::PathExists(file));
-  EXPECT_FALSE(base::PathExists(renamed_file));
-
-  // Move is not supported.
-  base::test::TestFuture<blink::mojom::FileSystemAccessErrorPtr> move_future;
-  handle->Move(std::move(dir_remote), moved_file.BaseName().AsUTF8Unsafe(),
-               move_future.GetCallback());
-  EXPECT_EQ(move_future.Get()->status,
-            FileSystemAccessStatus::kInvalidModificationError);
-  EXPECT_TRUE(base::PathExists(file));
-  EXPECT_FALSE(base::PathExists(moved_file));
-}
-#endif
 
 #if BUILDFLAG(IS_MAC)
 // Tests that swap file cloning (i.e. creating a swap file using underlying

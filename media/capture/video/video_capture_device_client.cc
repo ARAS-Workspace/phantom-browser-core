@@ -455,16 +455,6 @@ void VideoCaptureDeviceClient::OnIncomingCapturedImage(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(media::kAndroidZeroCopyVideoCapture)) {
-    OnIncomingCapturedImageZeroCopy(std::move(shared_image), frame_format,
-                                    clockwise_rotation, reference_time,
-                                    timestamp, capture_begin_timestamp,
-                                    natural_size, metadata, frame_feedback_id);
-    return;
-  }
-#endif
-
   int destination_width = shared_image->size().width();
   int destination_height = shared_image->size().height();
   if (clockwise_rotation == 90 || clockwise_rotation == 270)

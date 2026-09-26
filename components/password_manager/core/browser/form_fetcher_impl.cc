@@ -138,9 +138,8 @@ void FormFetcherImpl::Fetch() {
                                       weak_ptr_factory_.GetWeakPtr());
   }
 
-// The statistics isn't needed on mobile, only on desktop. Let's save some
-// processor cycles.
-#if !BUILDFLAG(IS_ANDROID)
+  // The statistics isn't needed on mobile, only on desktop. Let's save some
+  // processor cycles.
   // The statistics is needed for the "Save password?" bubble.
   password_manager::SmartBubbleStatsStore* stats_store =
       profile_password_store->GetSmartBubbleStatsStore();
@@ -149,7 +148,6 @@ void FormFetcherImpl::Fetch() {
     stats_store->GetSiteStats(form_digest_.url.DeprecatedGetOriginAsURL(),
                               weak_ptr_factory_.GetWeakPtr());
   }
-#endif
 }
 
 FormFetcherImpl::State FormFetcherImpl::GetState() const {

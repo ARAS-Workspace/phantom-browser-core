@@ -66,7 +66,6 @@ GURL GetFaviconURL(const char* path) {
 }
 
 // Android does not support the socket API or its permission.
-#if !BUILDFLAG(IS_ANDROID)
 bool CheckSocketPermission(scoped_refptr<Extension> extension,
                            SocketPermissionRequest::OperationType type,
                            const char* host,
@@ -75,7 +74,6 @@ bool CheckSocketPermission(scoped_refptr<Extension> extension,
   return extension->permissions_data()->CheckAPIPermissionWithParam(
       APIPermissionID::kSocket, &param);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Creates and returns an extension with the given |id|, |host_permissions|, and
 // manifest |location|.
@@ -301,7 +299,6 @@ TEST(PermissionsDataTest, EffectiveHostPermissions) {
           tab_url));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Desktop Android does not support the sockets API nor its permission.
 TEST(PermissionsDataTest, SocketPermissions) {
   std::string error;
@@ -335,7 +332,6 @@ TEST(PermissionsDataTest, SocketPermissions) {
                                     SocketPermissionRequest::UDP_SEND_TO,
                                     "239.255.255.250", 1900));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST(PermissionsDataTest, IsRestrictedUrl) {
   scoped_refptr<const Extension> extension = GetExtensionWithHostPermission(

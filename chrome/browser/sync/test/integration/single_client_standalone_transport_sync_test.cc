@@ -73,9 +73,7 @@ class SingleClientStandaloneTransportSyncTest : public SyncTest {
         {
             syncer::kSyncEnableContactInfoDataTypeForCustomPassphraseUsers,
             switches::kSyncEnableBookmarksInTransportMode,
-#if !BUILDFLAG(IS_ANDROID)
             syncer::kReadingListEnableSyncTransportModeUponSignIn,
-#endif  // !BUILDFLAG(IS_ANDROID)
             syncer::kReplaceSyncPromosWithSignInPromos,
             syncer::kSeparateLocalAndAccountSearchEngines,
             syncer::kSeparateLocalAndAccountThemes,
@@ -91,7 +89,6 @@ class SingleClientStandaloneTransportSyncTest : public SyncTest {
   base::test::ScopedFeatureList override_features_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/40067025): Remove this test once
 // kReplaceSyncPromosWithSignInPromos is launched.
 IN_PROC_BROWSER_TEST_F(SingleClientStandaloneTransportSyncTest,
@@ -130,7 +127,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientStandaloneTransportSyncTest,
   EXPECT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(
       kDataTypeExcludedInTransportMode));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 
 IN_PROC_BROWSER_TEST_F(SingleClientStandaloneTransportSyncTest,
@@ -171,10 +167,8 @@ IN_PROC_BROWSER_TEST_F(SingleClientStandaloneTransportSyncTest,
       syncer::UserSelectableType::kHistory, true);
   GetSyncService(0)->GetUserSettings()->SetSelectedType(
       syncer::UserSelectableType::kTabs, true);
-#if !BUILDFLAG(IS_ANDROID)
   GetSyncService(0)->GetUserSettings()->SetSelectedType(
       syncer::UserSelectableType::kSavedTabGroups, true);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   ASSERT_TRUE(GetClient(0)->AwaitSyncTransportActive());
   ASSERT_EQ(syncer::SyncService::TransportState::ACTIVE,
@@ -216,13 +210,6 @@ IN_PROC_BROWSER_TEST_F(
                  GetTypesGatedBehindHistoryOptIn())
       ;
 
-#if BUILDFLAG(IS_ANDROID)
-  // After SyncToSignin, CONTACT_INFO are enabled for Win/Mac/Linux/ChromeOS,
-  // and disabled for other platforms. See
-  // `SyncServiceImpl::PassphraseTypeChanged`.
-  expected_types.Remove(syncer::CONTACT_INFO);
-#endif
-
   ASSERT_THAT(GetSyncService(0)->GetActiveDataTypes(),
               ContainerEq(expected_types));
 
@@ -239,11 +226,6 @@ IN_PROC_BROWSER_TEST_F(
 
   syncer::DataTypeSet expected_types_after_history_opt_in =
       AllowedTypesInStandaloneTransportMode();
-
-#if BUILDFLAG(IS_ANDROID)
-  // CONTACT_INFO should remain disabled since it's gated by kAutofill.
-  expected_types_after_history_opt_in.Remove(syncer::CONTACT_INFO);
-#endif
 
   // With a custom passphrase, the actual HISTORY types are not supported.
   expected_types_after_history_opt_in.Remove(syncer::HISTORY);
@@ -304,10 +286,8 @@ class ReplaceSyncWithSigninMigrationSyncTest : public SyncTest {
         // prerequisite to account storage for preferences.
         syncer::kSeparateLocalAndAccountSearchEngines,
         switches::kSyncEnableBookmarksInTransportMode};
-#if !BUILDFLAG(IS_ANDROID)
     enabled_features.push_back(
         syncer::kReadingListEnableSyncTransportModeUponSignIn);
-#endif
     default_features_.InitWithFeatures(enabled_features,
                                        /*disabled_features=*/{});
 

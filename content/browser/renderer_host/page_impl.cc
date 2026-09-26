@@ -36,17 +36,9 @@ namespace content {
 PageImpl::PageImpl(RenderFrameHostImpl& rfh, PageDelegate& delegate)
     : main_document_(rfh), delegate_(delegate) {
 
-#if BUILDFLAG(IS_ANDROID)
-  page_proxy_ = std::make_unique<PageProxy>(this);
-#endif
 }
 
 PageImpl::~PageImpl() {
-#if BUILDFLAG(IS_ANDROID)
-  page_proxy_->WillDeletePage(GetMainDocument().IsInLifecycleState(
-      RenderFrameHost::LifecycleState::kPrerendering));
-#endif
-
   // As SupportsUserData is a base class of PageImpl, Page members will be
   // destroyed before running ~SupportsUserData, which would delete the
   // associated PageUserData objects. Avoid this by calling ClearAllUserData
@@ -125,12 +117,6 @@ bool PageImpl::IsPageScaleFactorOne() {
 const std::string& PageImpl::GetContentsMimeType() const {
   return contents_mime_type_;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject> PageImpl::GetJavaPage() {
-  return page_proxy_->GetJavaPage();
-}
-#endif
 
 void PageImpl::OnFirstVisuallyNonEmptyPaint() {
   did_first_visually_non_empty_paint_ = true;

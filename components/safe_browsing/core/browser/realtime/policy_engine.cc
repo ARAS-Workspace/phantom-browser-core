@@ -17,11 +17,6 @@
 #include "components/user_prefs/user_prefs.h"
 #include "components/variations/service/variations_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/metrics/field_trial_params.h"
-#include "base/system/sys_info.h"
-#endif
-
 namespace {
 
 // Enum representing reasons for the real time URL lookup to

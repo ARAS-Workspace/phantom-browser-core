@@ -145,7 +145,6 @@ TEST_F(FileAnalyzerTest, TypeAndroidApk) {
 }
 
 // Archive file analysis is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(FileAnalyzerTest, TypeZippedExecutable) {
   scoped_refptr<MockBinaryFeatureExtractor> extractor =
       new testing::StrictMock<MockBinaryFeatureExtractor>();
@@ -175,7 +174,6 @@ TEST_F(FileAnalyzerTest, TypeZippedExecutable) {
   EXPECT_EQ(result_.type, ClientDownloadRequest::ZIPPED_EXECUTABLE);
   EXPECT_EQ(result_.inspection_performed, DownloadFileType::ZIP);
 }
-#endif
 
 TEST_F(FileAnalyzerTest, TypeMacExecutable) {
   scoped_refptr<MockBinaryFeatureExtractor> extractor =
@@ -203,7 +201,6 @@ TEST_F(FileAnalyzerTest, TypeMacExecutable) {
 }
 
 // Archive file analysis is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(FileAnalyzerTest, TypeZippedArchive) {
   scoped_refptr<MockBinaryFeatureExtractor> extractor =
       new testing::StrictMock<MockBinaryFeatureExtractor>();
@@ -647,7 +644,6 @@ TEST_F(FileAnalyzerTest, ArchivedBinariesRespectsPolicyMaximum) {
   EXPECT_THAT(result_.archived_binaries, SizeIs(1));
   EXPECT_EQ(result_.inspection_performed, DownloadFileType::ZIP);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(FileAnalyzerTest, ExtractsFileSignatureForExe) {
   scoped_refptr<MockBinaryFeatureExtractor> extractor =
@@ -776,7 +772,6 @@ TEST_F(FileAnalyzerTest, TypeSniffsDmgWithoutExtension) {
 #endif
 
 // Archive file analysis is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(FileAnalyzerTest, SmallRarHasContentInspection) {
   scoped_refptr<MockBinaryFeatureExtractor> extractor =
       new testing::StrictMock<MockBinaryFeatureExtractor>();
@@ -1266,6 +1261,5 @@ TEST_F(FileAnalyzerTest, ObfuscatedRarAnalysis) {
   EXPECT_EQ(result_.archive_summary.parser_status(),
             ClientDownloadRequest::ArchiveSummary::VALID);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace safe_browsing

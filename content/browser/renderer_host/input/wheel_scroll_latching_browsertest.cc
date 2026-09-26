@@ -17,10 +17,6 @@
 #include "third_party/blink/public/common/input/synthetic_web_input_event_builders.h"
 #include "ui/events/gesture_detection/gesture_configuration.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/render_widget_host_view_android.h"
-#endif
-
 using blink::WebMouseWheelEvent;
 
 namespace {

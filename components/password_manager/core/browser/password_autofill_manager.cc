@@ -236,14 +236,6 @@ PasswordAutofillManager::~PasswordAutofillManager() {
   manual_fallback_metrics_recorder_.reset();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void PasswordAutofillManager::ShowKeyboardReplacingSurface(
-    const autofill::PasswordSuggestionRequest& request) {
-  password_client_->ShowKeyboardReplacingSurface(password_manager_driver_,
-                                                 request);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 std::optional<autofill::Suggestion>
 PasswordAutofillManager::GetWebauthnSignInWithAnotherDeviceSuggestion() const {
   return suggestion_generator_.GetWebauthnSignInWithAnotherDeviceSuggestion();
@@ -404,7 +396,7 @@ void PasswordAutofillManager::DidAcceptSuggestion(
           base::BindOnce(&PasswordAutofillManager::FillBackupSuggestion,
                          weak_ptr_factory_.GetWeakPtr(), payload);
       if (payload.is_cross_domain) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
         cross_domain_confirmation_controller_ =
             password_client_->ShowCrossDomainConfirmationPopup(
                 last_popup_open_args_.element_bounds,
@@ -454,7 +446,7 @@ void PasswordAutofillManager::DidAcceptSuggestion(
           base::BindOnce(&PasswordAutofillManager::FillSuggestion,
                          weak_ptr_factory_.GetWeakPtr(), *password_credential);
       if (password_credential->is_grouped_affiliation) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
         cross_domain_confirmation_controller_ =
             password_client_->ShowCrossDomainConfirmationPopup(
                 last_popup_open_args_.element_bounds,
@@ -563,12 +555,10 @@ void PasswordAutofillManager::DeleteFillData() {
 
 void PasswordAutofillManager::ShowSuggestions(
     const autofill::TriggeringField& field) {
-#if !BUILDFLAG(IS_ANDROID)
   if (password_client_->IsActorTaskActive()) {
     // Disables password suggestions if actor is active on the tab.
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   if (autofill::IsPasswordsAutofillManuallyTriggered(field.trigger_source)) {
     if (base::FeatureList::IsEnabled(
             features::kPasswordManualFallbackSecurityChecks)) {
@@ -722,7 +712,7 @@ void PasswordAutofillManager::DidNavigateMainFrame() {
   manual_fallback_flow_.reset();
   manual_fallback_metrics_recorder_ =
       std::make_unique<PasswordManualFallbackMetricsRecorder>();
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   cross_domain_confirmation_controller_.reset();
 #endif
   wait_for_passkeys_timer_.Stop();

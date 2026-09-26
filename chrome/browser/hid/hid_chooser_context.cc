@@ -476,13 +476,11 @@ bool HidChooserContext::HasDevicePermission(
     bool is_device_protected_due_to_fido = std::ranges::contains(
         device.collections, device::mojom::kPageFido,
         [](const auto& c) { return c->usage->usage_page; });
-#if !BUILDFLAG(IS_ANDROID)
     if (base::FeatureList::IsEnabled(
             features::kSecurityKeyHidInterfacesAreFido) &&
         IsKnownSecurityKey(device)) {
       is_device_protected_due_to_fido = true;
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
     if (!is_device_protected_due_to_fido || !IsFidoAllowedForOrigin(origin)) {
       return false;
     }

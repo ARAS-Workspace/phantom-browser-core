@@ -26,9 +26,9 @@
 #include "mojo/core/ipcz_driver/transport.h"
 #include "mojo/public/c/system/thunks.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include "mojo/core/channel_linux.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace mojo::core {
 
@@ -43,7 +43,7 @@ void InitFeatures() {
   CHECK(base::FeatureList::GetInstance());
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   bool shared_mem_enabled = base::FeatureList::IsEnabled(kMojoUseEventFd);
   int num_pages = kMojoUseEventFdPages.Get();
   if (num_pages < 0) {
@@ -54,7 +54,7 @@ void InitFeatures() {
 
   ChannelLinux::SetSharedMemParameters(shared_mem_enabled,
                                        static_cast<unsigned int>(num_pages));
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 
   g_enable_memv2 = base::FeatureList::IsEnabled(kMojoIpczMemV2);

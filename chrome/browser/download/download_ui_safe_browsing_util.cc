@@ -42,11 +42,6 @@ std::string GetDangerPromptHistogramName(const std::string& suffix,
 }
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(IS_ANDROID)
-// File suffix for APKs.
-constexpr base::FilePath::CharType kApkSuffix[] = FILE_PATH_LITERAL(".apk");
-#endif
-
 }  // namespace
 
 bool WasSafeBrowsingVerdictObtained(const download::DownloadItem* item) {
@@ -101,20 +96,3 @@ void SendSafeBrowsingDownloadReport(
   }
 }
 #endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
-#if BUILDFLAG(IS_ANDROID)
-bool ShouldShowSafeBrowsingAndroidDownloadWarnings(bool enable_for_telemetry) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  return base::FeatureList::IsEnabled(
-             safe_browsing::kMaliciousApkDownloadCheck) &&
-         (enable_for_telemetry ||
-          !safe_browsing::kMaliciousApkDownloadCheckTelemetryOnly.Get());
-#else
-  return false;
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-}
-
-bool IsApkFile(download::DownloadItem* item) {
-  return item->GetFileNameToReportUser().MatchesExtension(kApkSuffix);
-}
-#endif

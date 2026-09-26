@@ -32,12 +32,6 @@ BASE_FEATURE(kEnableEncryptedFileUpload, base::FEATURE_ENABLED_BY_DEFAULT);
 // Enables scanning of pasted images for DLP.
 BASE_FEATURE(kDlpScanPastedImages, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID)
-// Controls whether WebProtect download on Clank is enabled.
-BASE_FEATURE(kEnableDownloadEnterpriseScanOnClank,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 // Controls whether cancellation of uploads is enabled for content analysis.
 BASE_FEATURE(kEnableCancelUploadOnContentAnalysis,
              base::FEATURE_DISABLED_BY_DEFAULT);

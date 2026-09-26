@@ -36,11 +36,6 @@
 #include "third_party/protobuf/src/google/protobuf/io/coded_stream.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/variations/android/variations_seed_bridge.h"
-#include "components/variations/metrics.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace variations {
 namespace {
 
@@ -190,17 +185,6 @@ base::OnceCallback<void(Args...)> CallbackUmaHistogramTimer(
       base::TimeTicks::Now());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Marks seed storing as successful on the Java side to avoid repeated seed
-// fetches. Called only on first run.
-void MarkVariationsSeedAsStoredIfEmptySeed(
-    SeedReaderWriter::ReadSeedDataResult read_result) {
-  if (read_result.result == LoadSeedResult::kEmpty) {
-    android::MarkVariationsSeedAsStored();
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 
 class VariationsSeedStore::TwoSeedReader
@@ -276,10 +260,6 @@ VariationsSeedStore::VariationsSeedStore(
                                              channel,
                                              entropy_providers,
                                              /*histogram_suffix=*/"Latest")) {
-#if BUILDFLAG(IS_ANDROID)
-  if (initial_seed)
-    ImportInitialSeed(std::move(initial_seed));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 VariationsSeedStore::~VariationsSeedStore() = default;
@@ -632,42 +612,6 @@ void VariationsSeedStore::ClearPrefs(SeedType seed_type) {
   safe_seed_store_->ClearState();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void VariationsSeedStore::ImportInitialSeed(
-    std::unique_ptr<SeedResponse> initial_seed) {
-  if (initial_seed->data.empty()) {
-    // Note: This is an expected case on non-first run starts.
-    RecordFirstRunSeedImportResult(
-        FirstRunSeedImportResult::kFailNoFirstRunSeed);
-    return;
-  }
-
-  if (initial_seed->date.is_null()) {
-    RecordFirstRunSeedImportResult(
-        FirstRunSeedImportResult::kFailInvalidResponseDate);
-    LOG(WARNING) << "Missing response date";
-    return;
-  }
-
-  auto done_callback =
-      base::BindOnce([](bool store_success, VariationsSeed seed) {
-        if (store_success) {
-          RecordFirstRunSeedImportResult(FirstRunSeedImportResult::kSuccess);
-        } else {
-          RecordFirstRunSeedImportResult(
-              FirstRunSeedImportResult::kFailStoreFailed);
-          LOG(WARNING) << "First run variations seed is invalid.";
-        }
-      });
-  StoreSeedData(std::move(done_callback), std::move(initial_seed->data),
-                std::move(initial_seed->signature),
-                std::move(initial_seed->country),
-                std::move(initial_seed->geo_level1), initial_seed->date,
-                /*is_delta_compressed=*/false, initial_seed->is_gzip_compressed,
-                /*require_synchronous=*/true);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // static
 std::optional<std::string> VariationsSeedStore::SeedBytesToCompressedBase64Seed(
     const std::string& seed_bytes) {
@@ -901,15 +845,6 @@ void VariationsSeedStore::StoreValidatedSeed(
     base::Time date_fetched,
     bool require_synchronous,
     SeedReaderWriter::ReadSeedDataResult safe_seed_read_result) {
-#if BUILDFLAG(IS_ANDROID)
-  // If currently we do not have any stored seed, then we mark seed storing as
-  // successful on the Java side to avoid repeated seed fetches.
-  if (use_first_run_prefs_) {
-    ReadSeedData(/*done_callback=*/base::BindOnce(
-                     &MarkVariationsSeedAsStoredIfEmptySeed),
-                 SeedType::LATEST, require_synchronous);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   int milestone = version_info::GetMajorVersionNumberAsInt();
 

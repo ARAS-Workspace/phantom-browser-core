@@ -100,9 +100,7 @@ void BackgroundFetchDelegateImpl::UpdateUI(
   bool should_update_visuals = ui_state.update_delta.has_value()
                                    ? ui_state.update_delta->visuals_changed
                                    : false;
-#if !BUILDFLAG(IS_ANDROID)
   should_update_visuals = false;
-#endif
 
   if (!should_update_visuals) {
     // Notify the client that the UI updates have been handed over.
@@ -230,10 +228,6 @@ void BackgroundFetchDelegateImpl::OnJobDetailsCreated(
       offline_items_collection::ContentId(provider_namespace_, job_id));
   offline_item.creation_time = base::Time::Now();
   offline_item.is_off_the_record = profile_->IsOffTheRecord();
-#if BUILDFLAG(IS_ANDROID)
-  if (profile_->IsOffTheRecord())
-    offline_item.otr_profile_id = profile_->GetOTRProfileID().Serialize();
-#endif
   offline_item.original_url =
       GetJobDetails(job_id)->fetch_description->origin.GetURL();
   ui_state.offline_item = offline_item;

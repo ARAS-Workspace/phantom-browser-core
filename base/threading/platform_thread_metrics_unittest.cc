@@ -29,11 +29,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <linux/resource.h>
-#include <sys/resource.h>
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace base {
 
 namespace {
@@ -145,7 +140,7 @@ TEST_F(PlatformThreadMetricsTest, CreateFromHandle) {
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(PlatformThreadMetricsTest, CreateFromId) {
   EXPECT_FALSE(PlatformThreadMetrics::CreateFromId(PlatformThreadId()));
   EXPECT_FALSE(PlatformThreadMetrics::CreateFromId(kInvalidThreadId));
@@ -223,110 +218,5 @@ TEST_F(PlatformThreadMetricsTest, GetCumulativeCPUUsage_OtherThread) {
     EXPECT_GE(cpu_usage3.value(), cpu_usage2.value());
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-class PlatformThreadPriorityMonitorTest : public ::testing::Test {
- public:
-  static constexpr std::string_view kMainThreadSuffix = "MainThread";
-  static constexpr std::string_view kChildThreadSuffix = "ChildThread";
-  static constexpr TimeDelta kMinSamplingInterval =
-      PlatformThreadPriorityMonitor::kMinSamplingInterval;
-
-  void TearDown() override { ASSERT_EQ(setpriority(PRIO_PROCESS, 0, 0), 0); }
-
-  size_t GetRegisteredThreadCount() {
-    auto& monitor = PlatformThreadPriorityMonitor::Get();
-    AutoLock lock(monitor.lock_);
-    return monitor.thread_id_to_histogram_.size();
-  }
-
-  static std::string HistogramNameForSuffix(const std::string_view& suffix) {
-    return PlatformThreadPriorityMonitor::Get().GetHistogramNameForSuffix(
-        suffix);
-  }
-};
-
-class PriorityMonitorTestDelegate : public PlatformThread::Delegate {
- public:
-  PriorityMonitorTestDelegate() = default;
-  ~PriorityMonitorTestDelegate() override = default;
-
-  void ThreadMain() override {
-    PlatformThreadPriorityMonitor::Get().RegisterCurrentThread(
-        PlatformThreadPriorityMonitorTest::kChildThreadSuffix);
-    registered_event_.Signal();
-    stop_event_.Wait();
-  }
-
-  void WaitUntilRegistered() { registered_event_.Wait(); }
-
-  void SignalStop() { stop_event_.Signal(); }
-
- private:
-  TestWaitableEvent stop_event_;
-  TestWaitableEvent registered_event_;
-};
-
-// Test UnregisterCurrentThread() is called on thread exit.
-TEST_F(PlatformThreadPriorityMonitorTest, UnregisterOnJoin) {
-  ASSERT_EQ(0u, GetRegisteredThreadCount());
-
-  PriorityMonitorTestDelegate delegate;
-  PlatformThreadHandle handle;
-  ASSERT_TRUE(PlatformThread::Create(0, &delegate, &handle));
-
-  delegate.WaitUntilRegistered();
-  EXPECT_EQ(1u, GetRegisteredThreadCount());
-
-  delegate.SignalStop();
-  PlatformThread::Join(handle);
-
-  EXPECT_EQ(0u, GetRegisteredThreadCount());
-}
-
-// Test that priority monitor reports thread priorities for all registered
-// threads.
-TEST_F(PlatformThreadPriorityMonitorTest, ReportThreadPriorities) {
-  test::TaskEnvironment task_environment{
-      test::TaskEnvironment::TimeSource::MOCK_TIME};
-
-  PriorityMonitorTestDelegate delegate;
-  PlatformThreadHandle handle;
-  ASSERT_TRUE(PlatformThread::Create(0, &delegate, &handle));
-
-  // Register the current thread and start monitoring thread priorities.
-  PlatformThreadPriorityMonitor::Get().RegisterCurrentThread(kMainThreadSuffix);
-  PlatformThreadPriorityMonitor::Get().Start();
-
-  // Set the priority of the current thread to a different value than the child
-  // thread.
-  constexpr int kTestNiceValue = -7;
-  ASSERT_EQ(setpriority(PRIO_PROCESS, 0, kTestNiceValue), 0);
-
-  delegate.WaitUntilRegistered();
-  EXPECT_EQ(2u, GetRegisteredThreadCount());
-
-  HistogramTester histogram_tester;
-  const std::string main_thread_histogram_name =
-      HistogramNameForSuffix(kMainThreadSuffix);
-  const std::string child_thread_histogram_name =
-      HistogramNameForSuffix(kChildThreadSuffix);
-
-  task_environment.FastForwardBy(Milliseconds(1));
-  histogram_tester.ExpectTotalCount(main_thread_histogram_name, 0);
-  histogram_tester.ExpectTotalCount(child_thread_histogram_name, 0);
-
-  // Should record a sample for each thread.
-  task_environment.FastForwardBy(kMinSamplingInterval - Milliseconds(1));
-  histogram_tester.ExpectTotalCount(main_thread_histogram_name, 1);
-  histogram_tester.ExpectUniqueSample(main_thread_histogram_name,
-                                      kTestNiceValue, 1);
-  histogram_tester.ExpectTotalCount(child_thread_histogram_name, 1);
-  histogram_tester.ExpectUniqueSample(child_thread_histogram_name, 0, 1);
-
-  delegate.SignalStop();
-  PlatformThread::Join(handle);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace base

@@ -21,9 +21,6 @@
 
 // Authenticator tests do not work on Android because there is not currently a
 // way to install a virtual authenticator.
-#if BUILDFLAG(IS_ANDROID)
-#error "These tests are unsupported on Android"
-#endif
 
 // TODO(crbug.com/40870879): Temporarily disable the tests on macOS since they
 // do not yet work with current WebAuthn UI.

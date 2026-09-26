@@ -25,10 +25,8 @@ TEST_F(ProviderStateServiceFactoryTest, PrefEnabledReturnsValidService) {
   EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
       profile_testing_helper_.guest_profile_otr()));
 
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
       profile_testing_helper_.system_profile()));
   EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
       profile_testing_helper_.system_profile_otr()));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

@@ -15,30 +15,6 @@
 #include "content/public/common/url_constants.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-// Must come after other includes, because FromJniType() uses Profile.
-#include "chrome/browser/ui/android/omnibox/jni_headers/ChromeAutocompleteSchemeClassifier_jni.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-static int64_t
-JNI_ChromeAutocompleteSchemeClassifier_CreateAutocompleteClassifier(
-    JNIEnv* env,
-    Profile* profile) {
-  DCHECK(profile);
-
-  return reinterpret_cast<intptr_t>(
-      new ChromeAutocompleteSchemeClassifier(profile));
-}
-
-static void JNI_ChromeAutocompleteSchemeClassifier_DeleteAutocompleteClassifier(
-    JNIEnv* env,
-    int64_t chrome_autocomplete_scheme_classifier) {
-  delete reinterpret_cast<ChromeAutocompleteSchemeClassifier*>(
-      chrome_autocomplete_scheme_classifier);
-}
-#endif
-
 ChromeAutocompleteSchemeClassifier::ChromeAutocompleteSchemeClassifier(
     Profile* profile)
     : profile_(profile) {}
@@ -113,7 +89,3 @@ ChromeAutocompleteSchemeClassifier::GetInputTypeForScheme(
   }
   NOTREACHED();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(ChromeAutocompleteSchemeClassifier)
-#endif

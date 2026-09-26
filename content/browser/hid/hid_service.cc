@@ -103,7 +103,6 @@ HidService::HidService(
   HidDelegate* delegate = GetContentClient()->browser()->GetHidDelegate();
   if (delegate && render_frame_host_) {
     delegate->AddObserver(GetBrowserContext(), this);
-#if !BUILDFLAG(IS_ANDROID)
   } else if (service_worker_version_) {
     // For service worker case, it relies on ServiceWorkerHidDelegateObserver to
     // be the broker between HidDelegate and HidService.
@@ -113,7 +112,6 @@ HidService::HidService(
           service_worker_version_->registration_id(),
           weak_factory_.GetWeakPtr());
     }
-#endif
   }
 }
 
@@ -310,13 +308,11 @@ void HidService::RemoveProtectedReports(device::mojom::HidDeviceInfo& device,
                                         bool is_fido_allowed) {
   // If the origin is allowed to access FIDO and `device` is a known FIDO U2F
   // security key, do not remove any reports.
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           features::kSecurityKeyHidInterfacesAreFido) &&
       is_known_security_key && is_fido_allowed) {
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   std::vector<device::mojom::HidCollectionInfoPtr> collections;
   if (base::FeatureList::IsEnabled(features::kWebHidRecursiveFiltering)) {
@@ -379,7 +375,6 @@ void HidService::RemoveProtectedReports(device::mojom::HidDeviceInfo& device,
 void HidService::RegisterClient(
     mojo::PendingAssociatedRemote<device::mojom::HidManagerClient> client) {
   clients_.Add(std::move(client));
-#if !BUILDFLAG(IS_ANDROID)
   if (service_worker_version_ && service_worker_version_->context()) {
     // HidService is expected to have only one HidManagerClient when it is for a
     // service worker. One renderer side of a service worker has its own
@@ -397,7 +392,6 @@ void HidService::RegisterClient(
         ->hid_delegate_observer()
         ->ProcessPendingCallbacks(service_worker_version_.get());
   }
-#endif
 }
 
 void HidService::GetDevices(GetDevicesCallback callback) {

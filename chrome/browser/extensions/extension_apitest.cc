@@ -77,11 +77,6 @@ ExtensionApiTest::~ExtensionApiTest() = default;
 void ExtensionApiTest::SetUpOnMainThread() {
   ExtensionBrowserTest::SetUpOnMainThread();
 
-#if BUILDFLAG(IS_ANDROID)
-  // See comment in SetUpTestDataDir().
-  SetUpTestDataDir();
-#endif
-
   DCHECK(!test_config_.get()) << "Previous test did not clear config state.";
   test_config_ = std::make_unique<base::DictValue>();
   test_config_->Set(kTestDataDirectory,
@@ -304,13 +299,11 @@ void ExtensionApiTest::SetCustomArg(std::string_view custom_arg) {
 void ExtensionApiTest::SetUpCommandLine(base::CommandLine* command_line) {
   ExtensionBrowserTest::SetUpCommandLine(command_line);
 
-#if !BUILDFLAG(IS_ANDROID)
   // On Android this is handled later.
   RegisterPathProvider();
 
   // See comment in SetUpTestDataDir().
   SetUpTestDataDir();
-#endif
 
   // Backgrounded renderer processes run at a lower priority, causing the
   // tests to take more time to complete. Disable backgrounding so that the

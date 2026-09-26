@@ -87,12 +87,10 @@ ChromeFeatureListCreator::TakeNetworkTimeTracker() {
   return std::move(network_time_tracker_);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<installer::InitialPreferences>
 ChromeFeatureListCreator::TakeInitialPrefs() {
   return std::move(installer_initial_prefs_);
 }
-#endif
 
 ChromeFeatureListCreator::ChromeFeatureListCreator() {
   CreateNetworkTimeTracker();
@@ -209,8 +207,7 @@ void ChromeFeatureListCreator::CreateMetricsServices() {
 }
 
 void ChromeFeatureListCreator::SetupInitialPrefs() {
-// Android does first run in Java instead of native.
-#if !BUILDFLAG(IS_ANDROID)
+  // Android does first run in Java instead of native.
   // On first run, we need to process the predictor preferences before the
   // browser's profile_manager object is created, but after ResourceBundle
   // is initialized.
@@ -250,5 +247,4 @@ void ChromeFeatureListCreator::SetupInitialPrefs() {
     local_state_->SetTime(variations::prefs::kVariationsSeedDate,
                           base::Time::Now());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

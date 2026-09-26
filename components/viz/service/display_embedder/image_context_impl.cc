@@ -70,31 +70,6 @@ const char* CreateFallbackImageResultToString(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(SKIA_USE_DAWN)
-bool DawnYCbCrVkDescriptorsAreCompatible(const wgpu::YCbCrVkDescriptor& left,
-                                         const wgpu::YCbCrVkDescriptor& right) {
-  // NOTE: We deliberately do not compare the swizzle components as those
-  // components are not plumbed through the Chrome-level information and thus
-  // could cause spurious equality failures. By the Vulkan spec, those
-  // components should not be set for external formats, but some drivers do not
-  // adhere to the spec here.
-  // Mismatch of model, range and chroma fields happens often enough to be
-  // problematic if we skip drawing the video for those frames. While the video
-  // may not draw 100% correctly it will still be better than not drawing it at
-  // all.
-  if (left.vkFormat != right.vkFormat) {
-    return false;
-  }
-  if (left.forceExplicitReconstruction != right.forceExplicitReconstruction) {
-    return false;
-  }
-  if (left.externalFormat != right.externalFormat) {
-    return false;
-  }
-  return true;
-}
-#endif
-
 SkColor4f GetFallbackColorForPlane(viz::SharedImageFormat format,
                                    int plane_index) {
   DCHECK(format.IsValidPlaneIndex(plane_index));
@@ -445,34 +420,6 @@ bool ImageContextImpl::BeginAccessIfNecessaryInternal(
   int num_planes =
       format().PrefersExternalSampler() ? 1 : format().NumberOfPlanes();
   if (context_state->graphite_shared_context()) {
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(SKIA_USE_DAWN)
-    // In the case of video decoding, it is possible for there to be a mismatch
-    // between the YCbCr info passed to Viz at the time of creating the promise
-    // texture and that computed at the time of fulfilling the promise texture.
-    // Detect such mismatches and error out, as Skia/Dawn will raise errors.
-    graphite_ycbcr_info_mismatch_ = false;
-
-    skgpu::graphite::DawnTextureInfo fulfillment_texture_info;
-    CHECK(skgpu::graphite::TextureInfos::GetDawnTextureInfo(
-        representation_scoped_read_access_->graphite_texture(0).info(),
-        &fulfillment_texture_info));
-
-    wgpu::YCbCrVkDescriptor promise_texture_ycbcr_desc = {};
-    if (ycbcr_info()) {
-      promise_texture_ycbcr_desc =
-          gpu::ToDawnYCbCrVkDescriptor(ycbcr_info().value());
-    }
-    wgpu::YCbCrVkDescriptor fulfillment_texture_ycbcr_desc =
-        fulfillment_texture_info.fYcbcrVkDescriptor;
-
-    if (!DawnYCbCrVkDescriptorsAreCompatible(promise_texture_ycbcr_desc,
-                                             fulfillment_texture_ycbcr_desc)) {
-      graphite_ycbcr_info_mismatch_ = true;
-      representation_scoped_read_access_.reset();
-      return false;
-    }
-#endif
-
     for (int plane_index = 0; plane_index < num_planes; plane_index++) {
       graphite_textures_.push_back(
           representation_scoped_read_access_->graphite_texture(plane_index));

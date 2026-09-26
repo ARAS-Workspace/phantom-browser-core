@@ -20,16 +20,13 @@
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "sandbox/policy/sandbox_type.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/public/common/resource_usage_reporter.mojom.h"
 #include "services/proxy_resolver/proxy_resolver_v8.h"  // nogncheck (bug 12345)
-#endif
 
 namespace content {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 class ResourceUsageReporterImpl : public mojom::ResourceUsageReporter {
  public:
   ResourceUsageReporterImpl() = default;
@@ -58,19 +55,16 @@ void CreateResourceUsageReporter(
   mojo::MakeSelfOwnedReceiver(std::make_unique<ResourceUsageReporterImpl>(),
                               std::move(receiver));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
 void ExposeUtilityInterfacesToBrowser(mojo::BinderMap* binders) {
-#if !BUILDFLAG(IS_ANDROID)
   bool bind_usage_reporter = true;
   if (bind_usage_reporter) {
     binders->Add<mojom::ResourceUsageReporter>(
         &CreateResourceUsageReporter,
         base::SingleThreadTaskRunner::GetCurrentDefault());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   GetContentClient()->utility()->ExposeInterfacesToBrowser(binders);
 }

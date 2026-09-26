@@ -152,10 +152,6 @@ class GaiaCookieManagerServiceTest : public testing::Test {
     GaiaCookieManagerService::RegisterPrefs(pref_service_.registry());
     signin_client_ = std::make_unique<CustomTestSigninClient>(&pref_service_);
 
-#if BUILDFLAG(IS_ANDROID)
-    signin::SetUpFakeAccountManagerFacade();
-#endif
-
     account_tracker_service_ = std::make_unique<AccountTrackerService>(
         &pref_service_, base::FilePath());
     token_service_ =

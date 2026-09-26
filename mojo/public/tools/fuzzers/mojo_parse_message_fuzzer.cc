@@ -15,10 +15,6 @@
 #include "mojo/public/tools/fuzzers/fuzz_impl.h"
 #include "mojo/public/tools/fuzzers/suppress_validation_error_logging.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/test_support_android.h"
-#endif
-
 void FuzzMessage(const uint8_t* data, size_t size, base::RunLoop* run) {
   mojo::PendingRemote<fuzz::mojom::FuzzInterface> fuzz;
   auto impl = std::make_unique<FuzzImpl>(fuzz.InitWithNewPipeAndPassReceiver());
@@ -50,12 +46,6 @@ void FuzzMessage(const uint8_t* data, size_t size, base::RunLoop* run) {
 // TaskRunners.
 struct Environment {
   Environment() {
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, SingleThreadTaskExecutor with MessagePumpType::UI creates a
-    // UI message pump that does not support RunLoop::Run(). This installs a
-    // stub pump to allow it in tests.
-    base::InitAndroidTestMessageLoop();
-#endif
     main_thread_task_executor =
         std::make_unique<base::SingleThreadTaskExecutor>(
             base::MessagePumpType::UI);

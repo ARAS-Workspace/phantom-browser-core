@@ -180,34 +180,6 @@ bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled() {
       ::features::kEnableCollectAccessibilityHeuristicInCanvasUkm);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-BASE_FEATURE(kAccessibilityInlineLineSeparators,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsAccessibilityInlineLineSeparatorsEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kAccessibilityInlineLineSeparators);
-}
-
-BASE_FEATURE(kAccessibilityMagnificationFollowsFocusKeyboardAttached,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kAccessibilityMagnificationFollowsFocusNoKeyboard,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kAccessibilityAndroidMath, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsAccessibilityAndroidMathEnabled() {
-  return base::FeatureList::IsEnabled(::features::kAccessibilityAndroidMath);
-}
-
-BASE_FEATURE(kReadAloudNative, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAloudNativeEnabled() {
-  return base::FeatureList::IsEnabled(::features::kReadAloudNative);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kAXTreeFixing, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsAXTreeFixingEnabled() {
   return base::FeatureList::IsEnabled(::features::kAXTreeFixing);
@@ -352,8 +324,6 @@ bool IsScreenAITestModeEnabled() {
 BASE_FEATURE(kScreenAIPartitionAllocAdvancedChecksEnabled,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 // Enables the switchover to the newer NSAccessibility property-based API.

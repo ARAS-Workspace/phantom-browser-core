@@ -193,16 +193,6 @@ StubPasswordManagerClient::GetMetricsRecorder() {
   return base::OptionalToPtr(metrics_recorder_);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-FirstCctPageLoadPasswordsUkmRecorder*
-StubPasswordManagerClient::GetFirstCctPageLoadUkmRecorder() {
-  return nullptr;
-}
-
-void StubPasswordManagerClient::PotentialSaveFormSubmitted() {}
-
-#endif
-
 signin::IdentityManager* StubPasswordManagerClient::GetIdentityManager() {
   return nullptr;
 }

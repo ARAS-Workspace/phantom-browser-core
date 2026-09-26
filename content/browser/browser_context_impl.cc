@@ -42,10 +42,6 @@
 #include "media/mojo/services/webrtc_video_perf_history.h"
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/navigation_transitions/navigation_transition_config.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -352,19 +348,6 @@ void BrowserContextImpl::SetPrefetchServiceForTesting(
     std::unique_ptr<PrefetchService> prefetch_service) {
   prefetch_service_ = std::move(prefetch_service);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-NavigationEntryScreenshotManager*
-BrowserContextImpl::GetNavigationEntryScreenshotManager() {
-  if (!nav_entry_screenshot_manager_ &&
-      BackForwardTransitionAnimationManager::
-          ShouldAnimateBackForwardTransitions()) {
-    nav_entry_screenshot_manager_ =
-        std::make_unique<NavigationEntryScreenshotManager>();
-  }
-  return nav_entry_screenshot_manager_.get();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void BrowserContextImpl::WriteIntoTrace(
     perfetto::TracedProto<TraceProto> proto) const {

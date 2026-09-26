@@ -27,11 +27,6 @@
 #include "components/feed/core/v2/public/feed_api.h"
 #include "components/feed/feed_feature_list.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "base/android/device_info.h"
-#endif
-
 namespace feed {
 namespace {
 using feedwire::Capability;
@@ -94,9 +89,6 @@ feedwire::Version GetPlatformVersionMessage() {
   result.set_major(major);
   result.set_minor(minor);
   result.set_revision(revision);
-#if BUILDFLAG(IS_ANDROID)
-  result.set_api_version(base::android::android_info::sdk_int());
-#endif
   return result;
 }
 
@@ -113,9 +105,6 @@ feedwire::Version GetAppVersionMessage(const ChromeInfo& chrome_info) {
     result.set_revision(static_cast<int32_t>(numbers[3]));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  result.set_api_version(base::android::android_info::sdk_int());
-#endif
   return result;
 }
 
@@ -136,11 +125,7 @@ feedwire::Request CreateFeedQueryRequest(
         Capability::OPEN_IN_INCOGNITO, Capability::DISMISS_COMMAND,
         Capability::INFINITE_FEED, Capability::PREFETCH_METADATA,
         Capability::REQUEST_SCHEDULE, Capability::UI_THEME_V2,
-        Capability::UNDO_FOR_DISMISS_COMMAND,
-#if BUILDFLAG(IS_ANDROID)
-        Capability::SYNC_STRING_REMOVAL,
-#endif
-        Capability::SPORTS_IN_GAME_UPDATE,
+        Capability::UNDO_FOR_DISMISS_COMMAND, Capability::SPORTS_IN_GAME_UPDATE,
         Capability::INFO_CARD_ACKNOWLEDGEMENT_TRACKING}) {
     feed_request.add_client_capability(capability);
   }
@@ -168,19 +153,6 @@ feedwire::Request CreateFeedQueryRequest(
   if (base::FeatureList::IsEnabled(kFeedStreaming)) {
     feed_request.add_client_capability(Capability::STREAMING_FULL);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_foldable() &&
-      base::FeatureList::IsEnabled(kWideScreenFeedForFoldables)) {
-    feed_request.add_client_capability(
-        Capability::WIDE_SCREEN_SINGLE_COLUMN_FEED);
-  }
-
-  if (request_metadata.is_user_feedback_disabled) {
-    feed_request.add_client_capability(
-        Capability::USER_FEEDBACK_DISABLED_BY_POLICY);
-  }
-#endif
 
   switch (request_metadata.tab_group_enabled_state) {
     case TabGroupEnabledState::kNone:
@@ -337,9 +309,6 @@ feedwire::ClientInfo CreateClientInfo(const RequestMetadata& request_metadata) {
 
   client_info.set_locale(request_metadata.language_tag);
 
-#if BUILDFLAG(IS_ANDROID)
-  client_info.set_platform_type(feedwire::ClientInfo::ANDROID_ID);
-#endif
   client_info.set_app_type(feedwire::ClientInfo::CHROME_ANDROID);
   *client_info.mutable_platform_version() = GetPlatformVersionMessage();
   *client_info.mutable_app_version() =

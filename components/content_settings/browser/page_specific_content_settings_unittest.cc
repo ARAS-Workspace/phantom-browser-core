@@ -138,9 +138,7 @@ TEST_F(PageSpecificContentSettingsTest, BlockedContent) {
           web_contents()->GetPrimaryMainFrame());
 
   // Check that after initializing, nothing is blocked.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(content_settings->IsContentBlocked(ContentSettingsType::IMAGES));
-#endif
   EXPECT_FALSE(
       content_settings->IsContentBlocked(ContentSettingsType::JAVASCRIPT));
   EXPECT_FALSE(content_settings->IsContentBlocked(ContentSettingsType::SOUND));
@@ -167,9 +165,7 @@ TEST_F(PageSpecificContentSettingsTest, BlockedContent) {
                                   false});
   content_settings = PageSpecificContentSettings::GetForFrame(
       web_contents()->GetPrimaryMainFrame());
-#if !BUILDFLAG(IS_ANDROID)
   content_settings->OnContentBlocked(ContentSettingsType::IMAGES);
-#endif
   content_settings->OnContentBlocked(ContentSettingsType::POPUPS);
   PageSpecificContentSettings::MicrophoneCameraState
       blocked_microphone_camera_state = {
@@ -181,9 +177,7 @@ TEST_F(PageSpecificContentSettingsTest, BlockedContent) {
                                                blocked_microphone_camera_state);
 
   // Check that only the respective content types are affected.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(content_settings->IsContentBlocked(ContentSettingsType::IMAGES));
-#endif
   EXPECT_FALSE(
       content_settings->IsContentBlocked(ContentSettingsType::JAVASCRIPT));
   EXPECT_FALSE(content_settings->IsContentBlocked(ContentSettingsType::SOUND));
@@ -243,9 +237,7 @@ TEST_F(PageSpecificContentSettingsTest, BlockedContent) {
   NavigateAndCommit(GURL("http://google.com"));
   content_settings = PageSpecificContentSettings::GetForFrame(
       web_contents()->GetPrimaryMainFrame());
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(content_settings->IsContentBlocked(ContentSettingsType::IMAGES));
-#endif
   EXPECT_FALSE(
       content_settings->IsContentBlocked(ContentSettingsType::JAVASCRIPT));
   EXPECT_FALSE(

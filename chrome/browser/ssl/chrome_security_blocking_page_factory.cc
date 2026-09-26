@@ -39,14 +39,6 @@
 #include "base/enterprise_util.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "components/security_interstitials/content/captive_portal_helper_android.h"
-#include "content/public/common/referrer.h"
-#include "net/android/network_library.h"
-#include "ui/base/window_open_disposition.h"
-#endif
-
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 #include "chrome/browser/captive_portal/captive_portal_service_factory.h"
 #include "chrome/browser/net/system_network_context_manager.h"

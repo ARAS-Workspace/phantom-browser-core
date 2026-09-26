@@ -1614,47 +1614,6 @@ TEST_F(TextureTest, UseDeletedTexture) {
   texture_ref = nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(TextureTest, SetStreamTextureImageServiceID) {
-  manager_->SetTarget(texture_ref_.get(), GL_TEXTURE_EXTERNAL_OES);
-  manager_->SetLevelInfo(texture_ref_.get(), GL_TEXTURE_EXTERNAL_OES, 0,
-                         GL_RGBA, 2, 2, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                         gfx::Rect(2, 2));
-  Texture* texture = texture_ref_->texture();
-
-  GLuint owned_service_id = TextureTestHelper::owned_service_id(texture);
-  GLuint service_id = texture->service_id();
-  // Initially, the texture should use the same service id that it owns.
-  EXPECT_EQ(owned_service_id, service_id);
-
-  // Override the service_id.
-  GLuint stream_texture_service_id = service_id + 1;
-  texture->BindToServiceId(stream_texture_service_id);
-
-  // Make sure that service_id() changed but owned_service_id() didn't.
-  EXPECT_EQ(stream_texture_service_id, texture->service_id());
-  EXPECT_EQ(owned_service_id, TextureTestHelper::owned_service_id(texture));
-
-  // Undo the override.
-  texture->BindToServiceId(0);
-
-  // The service IDs should be back as they were.
-  EXPECT_EQ(service_id, texture->service_id());
-  EXPECT_EQ(owned_service_id, TextureTestHelper::owned_service_id(texture));
-
-  // Override again, so that we can check delete behavior.
-  texture->BindToServiceId(stream_texture_service_id);
-
-  // Remove the Texture.  It should delete the texture id that it owns, even
-  // though it is overridden.
-  EXPECT_CALL(*gl_, DeleteTextures(1, ::testing::Pointee(owned_service_id)))
-      .Times(1)
-      .RetiresOnSaturation();
-  manager_->RemoveTexture(kClient1Id);
-  texture_ref_ = nullptr;
-}
-#endif
-
 namespace {
 
 bool InSet(std::set<std::string>* string_set, const std::string& str) {

@@ -34,10 +34,6 @@
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/safety_hub/notification_wrapper_android.h"
-#endif
-
 namespace {
 
 using RevocationState =

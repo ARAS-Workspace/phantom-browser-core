@@ -38,7 +38,6 @@ void FakeCommandBufferHelper::WaitForSyncToken(gpu::SyncToken sync_token,
   waits_.emplace(sync_token, std::move(done_cb));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 gpu::SharedImageStub* FakeCommandBufferHelper::GetSharedImageStub() {
   return nullptr;
 }
@@ -46,7 +45,6 @@ gpu::SharedImageStub* FakeCommandBufferHelper::GetSharedImageStub() {
 gpu::MemoryTypeTracker* FakeCommandBufferHelper::GetMemoryTypeTracker() {
   return nullptr;
 }
-#endif
 
 gpu::SharedImageManager* FakeCommandBufferHelper::GetSharedImageManager() {
   return nullptr;

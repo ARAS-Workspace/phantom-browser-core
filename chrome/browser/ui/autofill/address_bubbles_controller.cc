@@ -225,7 +225,6 @@ void AddressBubblesController::WebContentsDestroyed() {
                  std::nullopt);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<actions::ActionId>
 AddressBubblesController::GetActionIdForPageAction() {
   return kActionShowAddressesBubbleOrPage;
@@ -235,7 +234,6 @@ std::optional<std::u16string>
 AddressBubblesController::GetPageActionTooltipText() {
   return GetPageActionIconTooltip();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void AddressBubblesController::DoShowBubble() {
   CHECK(!bubble_view());

@@ -272,7 +272,6 @@ TEST_F(PermissionMessageCombinationsUnittest, TabsHistorySessionsCoalescing) {
       "Read and change your browsing history on all your signed-in devices"));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Test that the fileSystem permission produces no messages by itself, unless it
 // has both the 'write' and 'directory' additional permissions, in which case it
 // displays a message.
@@ -320,7 +319,6 @@ TEST_F(PermissionMessageCombinationsUnittest, FileSystemReadWriteCoalescing) {
   ASSERT_TRUE(CheckManifestProducesPermissions(
       "Write to files and folders that you open in the application"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Check that host permission messages are generated correctly when URLs are
 // entered as permissions.
@@ -590,7 +588,6 @@ TEST_F(PermissionMessageCombinationsUnittest,
 // TODO(sashab): Add tests for SettingsOverrideAPIPermission (an API permission
 // with custom messages).
 
-#if !BUILDFLAG(IS_ANDROID)
 // Check that permission messages are generated correctly for SocketPermission
 // (an API permission with custom messages).
 // NOTE: Android does not support the sockets API.
@@ -711,7 +708,6 @@ TEST_F(PermissionMessageCombinationsUnittest, SocketPermissionMessages) {
   ASSERT_TRUE(CheckManifestProducesPermissions(
       "Exchange data with any device on the local network or internet"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Check that permission messages are generated correctly for
 // USBDevicePermission (an API permission with custom messages).
@@ -787,7 +783,6 @@ TEST_F(PermissionMessageCombinationsUnittest, USBDevicePermissionMessages) {
   // TODO(sashab): Add a test with a valid product/vendor USB device.
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Test that hosted apps are not given any messages for host permissions.
 // NOTE: Android does not support packaged apps.
 TEST_F(PermissionMessageCombinationsUnittest,
@@ -821,7 +816,6 @@ TEST_F(PermissionMessageCombinationsUnittest,
       "}");
   ASSERT_TRUE(CheckManifestProducesPermissions("Read data you copy and paste"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test various apps with lots of permissions, including those with no
 // permission messages, or those that only apply to apps or extensions even when
@@ -902,7 +896,6 @@ TEST_F(PermissionMessageCombinationsUnittest, PermissionMessageCombos) {
       std::vector<std::string>(),
       "Read and change your data on a number of websites", submessages));
 
-#if !BUILDFLAG(IS_ANDROID)
   // Create an App instead, ensuring that the host permission messages are not
   // added.
   // NOTE: Android does not support Chrome Apps or accessibilityFeatures.
@@ -939,7 +932,6 @@ TEST_F(PermissionMessageCombinationsUnittest, PermissionMessageCombos) {
   ASSERT_TRUE(CheckManifestProducesPermissions(
       "Read data you copy and paste",
       "Read and change your accessibility settings"));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // Tests that the deprecated 'plugins' manifest key produces no permission.

@@ -16,13 +16,9 @@
 #include "components/prefs/pref_service.h"
 #include "components/user_prefs/user_prefs.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/prefs/pref_registry_simple.h"
-#endif
 
 namespace media_router {
-
-#if !BUILDFLAG(IS_ANDROID)
 
 void RegisterAccessCodeProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(prefs::kAccessCodeCastEnabled, false,
@@ -55,7 +51,5 @@ bool IsAccessCodeCastTabSwitchingUiEnabled(Profile* profile) {
 bool IsAccessCodeCastFreezeUiEnabled(Profile* profile) {
   return profile && GetAccessCodeCastEnabledPref(profile);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace media_router

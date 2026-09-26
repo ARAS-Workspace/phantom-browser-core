@@ -130,7 +130,7 @@ bool ProcessMetrics::GetCumulativeCPUUsagePerThread(
   return !cpu_per_thread.empty();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 base::expected<ProcessMemoryInfo, ProcessUsageError>
 ProcessMetrics::GetMemoryInfo() const {
   std::string buffer;
@@ -191,7 +191,7 @@ bool ProcessMetrics::GetPageFaultCounts(PageFaultCounts* counts) const {
       internal::GetProcStatsFieldAsInt64(proc_stats, internal::VM_MAJFLT);
   return true;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 int ProcessMetrics::GetOpenFdCount() const {
   // Use /proc/<pid>/fd to count the number of entries there.

@@ -11,10 +11,6 @@
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/identity_manager/identity_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/public/android/jni_headers/PrimaryAccountChangeEvent_jni.h"
-#endif
-
 namespace signin {
 
 PrimaryAccountChangeEvent::State::State() = default;
@@ -191,26 +187,4 @@ std::ostream& operator<<(std::ostream& os,
   return os;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-ConvertToJavaPrimaryAccountChangeEvent(
-    JNIEnv* env,
-    const PrimaryAccountChangeEvent& event_details) {
-  PrimaryAccountChangeEvent::Type event_type =
-      event_details.GetEventTypeFor(ConsentLevel::kSignin);
-  if (event_type == PrimaryAccountChangeEvent::Type::kNone) {
-    // Java layers are only aware of the kSignin account and so only observe
-    // events relevant to it.
-    return {};
-  }
-  return Java_PrimaryAccountChangeEvent_Constructor(
-      env, std::to_underlying(event_type));
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace signin
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(PrimaryAccountChangeEvent)
-#endif

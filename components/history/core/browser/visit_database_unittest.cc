@@ -1268,7 +1268,6 @@ TEST_F(VisitDatabaseTest, GetVisibleVisitsForURL) {
   EXPECT_THAT(results[1], MatchesVisitInfo(test_visit_rows[5]));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(VisitDatabaseTest, GetVisibleVisits_ActorVisits) {
   const URLID kUrlId1 = 1U;
   VisitRow visit_browsed(
@@ -1393,7 +1392,6 @@ TEST_F(VisitDatabaseTest, GetVisibleVisits_SeparateBySource) {
                                    MatchesVisitInfo(visit_actor2),
                                    MatchesVisitInfo(visit_user2)));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(VisitDatabaseTest, GetHistoryCount) {
   // Start with a day in the middle of summer, so that we are nowhere near
@@ -2337,7 +2335,6 @@ TEST_F(VisitDatabaseTest, GetLastRowForVisitByVisitTime) {
   EXPECT_THAT(result3, MatchesVisitInfo(visit3c));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(VisitDatabaseTest, ShouldFilterUserAndActorVisits) {
   auto add_visit_with_source = [&](const GURL& url, VisitSource source) {
     URLRow url_row(url);
@@ -2411,7 +2408,6 @@ TEST_F(VisitDatabaseTest, ShouldFilterUserAndActorVisits) {
     }
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests for FillVisitRow micro-optimizations ----------------------------------
 

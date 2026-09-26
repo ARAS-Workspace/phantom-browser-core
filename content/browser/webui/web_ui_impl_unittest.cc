@@ -389,7 +389,7 @@ TEST_F(WebUIImplRenderViewHostTest,
   EXPECT_EQ(config_source->replacement_strings["key"], "value");
 }
 
-#if defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#if defined(GTEST_HAS_DEATH_TEST)
 TEST_F(WebUIImplLocalResourceLoaderConfigTest, AddStringAfterFreezeCrashes) {
   URLDataManagerBackend data_backend;
   WebUIDataSourceImpl* source = CreateDataSource("test-source");

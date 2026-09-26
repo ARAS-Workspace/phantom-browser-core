@@ -260,17 +260,6 @@ gfx::Size GetScaledViewportSize(BrowserContext* context,
                                 ClientHintsControllerDelegate* delegate) {
   gfx::Size viewport_size = GetViewportSize(frame_tree_node, delegate);
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the viewport is scaled so the width is 980. See
-  // https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/css/viewportAndroid.css.
-  // TODO(crbug.com/40196453): Improve the usefulness of the viewport client
-  // hints for navigation requests.
-  if (viewport_size.width() > 0) {
-    viewport_size =
-        ScaleToRoundedSize(viewport_size, 980.0 / viewport_size.width());
-  }
-#endif
-
   double zoom_factor = GetZoomFactor(context, url);
   if (zoom_factor > 0) {
     viewport_size = ScaleToRoundedSize(viewport_size, 1.0 / zoom_factor);

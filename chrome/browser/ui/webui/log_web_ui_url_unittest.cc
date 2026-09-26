@@ -13,10 +13,8 @@ TEST(LogWebUIUrlTest, ValidUrls) {
   // chrome:// WebUI page.
   EXPECT_TRUE(webui::LogWebUICreated(GURL(chrome::kChromeUIDownloadsURL)));
 
-#if !BUILDFLAG(IS_ANDROID)
   // chrome-untrusted:// WebUI page.
   EXPECT_TRUE(webui::LogWebUICreated(GURL(chrome::kChromeUIUntrustedPrintURL)));
-#endif
 
   // WebUI page with a subpage.
   GURL::Replacements replace_clear_data_path;

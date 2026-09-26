@@ -29,13 +29,6 @@ bool TestAddressNormalizer::NormalizeAddressSync(AutofillProfile* profile) {
   return true;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-TestAddressNormalizer::GetJavaObject() {
-  return base::android::ScopedJavaLocalRef<jobject>();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void TestAddressNormalizer::DelayNormalization() {
   instantaneous_normalization_ = false;
 }

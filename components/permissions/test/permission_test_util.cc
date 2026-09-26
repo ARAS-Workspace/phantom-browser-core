@@ -28,11 +28,6 @@ class FakePermissionContext : public ContentSettingPermissionContextBase {
       : ContentSettingPermissionContextBase(browser_context,
                                             content_settings_type,
                                             permissions_policy_feature) {
-#if BUILDFLAG(IS_ANDROID)
-    if (content_settings_type == ContentSettingsType::NOTIFICATIONS) {
-      enabled_app_level_notification_permission_for_testing_ = true;
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 };
 
@@ -81,21 +76,6 @@ class TestGeolocationDelegate : public GeolocationPermissionContext::Delegate {
     return false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  bool IsInteractable(content ::WebContents* web_contents) override {
-    return true;
-  }
-
-  PrefService* GetPrefs(content ::BrowserContext* browser_context) override {
-    NOTIMPLEMENTED();
-    return nullptr;
-  }
-
-  bool IsRequestingOriginDSE(content ::BrowserContext* browser_context,
-                             const GURL& requesting_origin) override {
-    return false;
-  }
-#endif
 };
 
 PermissionManager::PermissionContextMap CreatePermissionContexts(
@@ -128,12 +108,6 @@ PermissionManager::PermissionContextMap CreatePermissionContexts(
       std::make_unique<FakeStorageAccessPermissionContext>(
           browser_context, ContentSettingsType::STORAGE_ACCESS,
           network::mojom::PermissionsPolicyFeature::kStorageAccessAPI);
-#if BUILDFLAG(IS_ANDROID)
-  permission_contexts[ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER] =
-      std::make_unique<FakePermissionContext>(
-          browser_context, ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER,
-          network::mojom::PermissionsPolicyFeature::kEncryptedMedia);
-#endif
   permission_contexts[ContentSettingsType::WEB_APP_INSTALLATION] =
       std::make_unique<FakePermissionContext>(
           browser_context, ContentSettingsType::WEB_APP_INSTALLATION,

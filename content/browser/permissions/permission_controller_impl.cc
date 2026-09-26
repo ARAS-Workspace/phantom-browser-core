@@ -33,9 +33,7 @@
 #include "third_party/blink/public/mojom/permissions/permission_status.mojom.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/common/features.h"
-#endif
 
 namespace content {
 
@@ -102,7 +100,6 @@ PermissionToSchedulingFeature(PermissionType permission_name) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool PermissionAllowedByPermissionsPolicy(PermissionType permission_type,
                                           RenderFrameHost* rfh) {
   const auto permission_policy =
@@ -114,7 +111,6 @@ bool PermissionAllowedByPermissionsPolicy(PermissionType permission_type,
 
   return rfh->IsFeatureEnabled(permission_policy.value());
 }
-#endif
 
 PermissionResult VerifyContextOfCurrentDocument(
     PermissionType permission,
@@ -130,7 +126,6 @@ PermissionResult VerifyContextOfCurrentDocument(
                             PermissionStatusSource::FENCED_FRAME);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           features::kPermissionsPolicyVerificationInContent)) {
     // Check whether the feature is enabled for the frame by permissions policy.
@@ -139,7 +134,6 @@ PermissionResult VerifyContextOfCurrentDocument(
                               PermissionStatusSource::FEATURE_POLICY);
     }
   }
-#endif
 
   return PermissionResult(PermissionStatus::ASK);
 }
@@ -185,7 +179,6 @@ bool IsRequestAllowed(
                   "inside a fenced frame. Fenced frames don't currently "
                   "support permission requests.");
           break;
-#if !BUILDFLAG(IS_ANDROID)
         case PermissionStatusSource::FEATURE_POLICY:
           render_frame_host->GetOutermostMainFrame()->AddMessageToConsole(
               blink::mojom::ConsoleMessageLevel::kWarning,
@@ -194,7 +187,6 @@ bool IsRequestAllowed(
                   "policy applied to the current document. See "
                   "https://crbug.com/414348233 for more details.");
           break;
-#endif
         default:
           break;
       }

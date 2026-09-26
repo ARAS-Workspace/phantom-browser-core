@@ -320,12 +320,10 @@ const TaskIdList& TaskManagerImpl::GetTaskIdsList() const {
     // the oldest tasks first).
     auto comparator = [](const Task* a, const Task* b) -> bool {
       bool should_make_adjustment = false;
-#if !BUILDFLAG(IS_ANDROID)
       // Move vm processes up over the arc tasks.
       should_make_adjustment =
           (a->GetType() == Task::ARC && b->GetType() == Task::CROSTINI) ||
           (b->GetType() == Task::ARC && a->GetType() == Task::CROSTINI);
-#endif
       return std::make_tuple(
                  a->HasParentTask(),
                  should_make_adjustment ? b->GetType() : a->GetType(),

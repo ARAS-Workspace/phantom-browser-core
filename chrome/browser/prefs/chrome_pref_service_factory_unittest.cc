@@ -96,22 +96,4 @@ TEST_F(ChromePrefServiceFactoryTamperedPrefTest,
   EXPECT_TRUE(chrome_prefs::GetTamperedPrefList(profile_.get()).empty());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-TEST_F(ChromePrefServiceFactoryTestBase, ShouldRemoveAccountPrefsFile) {
-  // Simulate a pre-existing account preferences file.
-  ASSERT_TRUE(base::WriteFile(AccountPreferencesFilePath(), "{}"));
-
-  BuildPrefService();
-  // Wait for the posted task on the IO thread to delete the file finish.
-  base::RunLoop run_loop;
-  content::GetIOThreadTaskRunner()->PostTask(FROM_HERE, run_loop.QuitClosure());
-  run_loop.Run();
-
-  // Account prefs file should have been removed.
-  EXPECT_FALSE(base::PathExists(AccountPreferencesFilePath()));
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace

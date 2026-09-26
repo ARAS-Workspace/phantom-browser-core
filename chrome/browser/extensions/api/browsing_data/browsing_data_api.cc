@@ -576,12 +576,10 @@ bool BrowsingDataRemovePasswordsFunction::GetRemovalMask(
 }
 
 bool BrowsingDataRemovePasswordsFunction::IsRemovalDeprecated() {
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           browsing_data::features::kPasswordRemovalExtensionErrorKillSwitch)) {
     return true;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   return false;
 }
 

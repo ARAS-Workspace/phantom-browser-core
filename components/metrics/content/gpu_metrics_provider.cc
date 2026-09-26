@@ -33,20 +33,6 @@ void GPUMetricsProvider::ProvideSystemProfileMetrics(
 }
 
 void GPUMetricsProvider::ProvideCurrentSessionData(
-    ChromeUserMetricsExtension* uma_proto) {
-#if BUILDFLAG(IS_ANDROID)
-  const gpu::GPUInfo& gpu_info =
-      content::GpuDataManager::GetInstance()->GetGPUInfo();
-
-  // It's intentional that GPU.HardwareSupportsVulkan isn't logged for the
-  // previous session. The value is unlikely to change between sessions but
-  // previous session data is recorded before GPU service is launched and
-  // current session value is known.
-  if (gpu_info.IsInitialized()) {
-    UMA_HISTOGRAM_BOOLEAN("GPU.HardwareSupportsVulkan",
-                          gpu_info.hardware_supports_vulkan);
-  }
-#endif
-}
+    ChromeUserMetricsExtension* uma_proto) {}
 
 }  // namespace metrics

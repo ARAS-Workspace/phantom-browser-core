@@ -663,12 +663,6 @@ void SimpleBackendImpl::InitializeIndex(CompletionOnceCallback callback,
                                         const DiskStatResult& result) {
   if (result.net_error == net::OK) {
     index_->SetMaxSize(result.max_size);
-#if BUILDFLAG(IS_ANDROID)
-    if (app_status_listener_getter_) {
-      index_->set_app_status_listener_getter(
-          std::move(app_status_listener_getter_));
-    }
-#endif
     index_->Initialize(result.cache_dir_mtime);
   }
   std::move(callback).Run(result.net_error);

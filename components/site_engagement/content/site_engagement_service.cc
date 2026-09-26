@@ -44,10 +44,6 @@
 #include "content/public/common/url_constants.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/site_engagement/content/android/site_engagement_service_android.h"
-#endif
-
 namespace site_engagement {
 
 namespace {
@@ -334,9 +330,7 @@ void SiteEngagementService::ResetBaseScoreForURL(const GURL& url,
 
 void SiteEngagementService::SetLastShortcutLaunchTime(
     content::WebContents* web_contents,
-#if !BUILDFLAG(IS_ANDROID)
     const webapps::AppId& app_id,
-#endif
     const GURL& url) {
   double old_score = GetScore(url);
 
@@ -348,10 +342,8 @@ void SiteEngagementService::SetLastShortcutLaunchTime(
   score.Commit();
 
   std::optional<webapps::AppId> web_app_id;
-#if !BUILDFLAG(IS_ANDROID)
   CHECK(!app_id.empty());
   web_app_id = app_id;
-#endif
 
   OnEngagementEvent(web_contents, url, EngagementType::kWebappShortcutLaunch,
                     old_score, web_app_id);
@@ -387,17 +379,6 @@ void SiteEngagementService::AddPointsForTesting(const GURL& url,
                                                 double points) {
   AddPoints(url, points);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-SiteEngagementServiceAndroid* SiteEngagementService::GetAndroidService() const {
-  return android_service_.get();
-}
-
-void SiteEngagementService::SetAndroidService(
-    std::unique_ptr<SiteEngagementServiceAndroid> android_service) {
-  android_service_ = std::move(android_service);
-}
-#endif
 
 void SiteEngagementService::AddPoints(const GURL& url, double points) {
   if (points == 0)

@@ -12,10 +12,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/test_file_util.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace offline_pages {
 
 namespace {
@@ -25,9 +21,6 @@ const std::string_view kTestData2 = "Hello World!";
 
 const int kSmallFileSize = 2 * 1024;
 const int kBigFileSize = 3 * 1024 * 1024;
-#if BUILDFLAG(IS_ANDROID)
-const int kSizeForTestContentUri = 173;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Digest for kTestData1 + kTestData2.
 const std::string kExpectedDigestForTestData(
@@ -60,26 +53,6 @@ std::string MakeContentOfSize(int size) {
     result.append(1, static_cast<char>(i % 256));
   return result;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-base::FilePath GetContentUriPathForTest() {
-  base::FilePath test_dir;
-  base::PathService::Get(base::DIR_SRC_TEST_DATA_ROOT, &test_dir);
-  test_dir = test_dir.AppendASCII("net");
-  test_dir = test_dir.AppendASCII("data");
-  test_dir = test_dir.AppendASCII("file_stream_unittest");
-  EXPECT_TRUE(base::PathExists(test_dir));
-  base::FilePath image_file = test_dir.Append(FILE_PATH_LITERAL("red.png"));
-
-  // Insert the image into MediaStore. MediaStore will do some conversions, and
-  // return the content URI.
-  base::FilePath path = base::InsertImageIntoMediaStore(image_file);
-  EXPECT_TRUE(path.IsContentUri());
-  EXPECT_TRUE(base::PathExists(path));
-
-  return path;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -142,17 +115,6 @@ TEST_F(ArchiveValidatorTest, GetSizeAndComputeDigestOnBigFile) {
   EXPECT_EQ(kExpectedDigestForBigFile, actual_size_and_digest.second);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Flaky. https://crbug.com/1022323
-TEST_F(ArchiveValidatorTest, DISABLED_GetSizeAndComputeDigestOnContentUri) {
-  base::FilePath content_uri_path = GetContentUriPathForTest();
-  std::pair<int64_t, std::string> actual_size_and_digest =
-      ArchiveValidator::GetSizeAndComputeDigest(content_uri_path);
-  EXPECT_EQ(kSizeForTestContentUri, actual_size_and_digest.first);
-  EXPECT_EQ(kExpectedDigestForContentUri, actual_size_and_digest.second);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_F(ArchiveValidatorTest, ValidateSmallFile) {
   std::string expected_data(MakeContentOfSize(kSmallFileSize));
   base::FilePath temp_file_path = CreateFileWithContent(expected_data);
@@ -166,14 +128,5 @@ TEST_F(ArchiveValidatorTest, ValidateBigFile) {
   EXPECT_TRUE(ArchiveValidator::ValidateFile(temp_file_path, kBigFileSize,
                                              kExpectedDigestForBigFile));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Flaky. https://crbug.com/1022322
-TEST_F(ArchiveValidatorTest, DISABLED_ValidateContentUri) {
-  base::FilePath content_uri_path = GetContentUriPathForTest();
-  EXPECT_TRUE(ArchiveValidator::ValidateFile(
-      content_uri_path, kSizeForTestContentUri, kExpectedDigestForContentUri));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace offline_pages

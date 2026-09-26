@@ -498,16 +498,6 @@ bool HasTextInputs(const FormData& form_data) {
                              &FormFieldData::IsTextInputElement);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool IsWebAuthnForm(base::optional_ref<const FormData> form_data) {
-  auto has_webauthn_attribute = [](const FormFieldData& field) {
-    return field.parsed_autocomplete() && field.parsed_autocomplete()->webauthn;
-  };
-  return form_data &&
-         std::ranges::any_of(form_data->fields(), has_webauthn_attribute);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 FieldPropertiesFlags GetFieldFlags(AutofillSuggestionTriggerSource source) {
   return source == AutofillSuggestionTriggerSource::kManualFallbackPasswords
              ? FieldPropertiesFlags::
@@ -631,18 +621,6 @@ PasswordAutofillAgent::FocusStateNotifier::GetFocusedFieldInfo(
   // `ChromePasswordManagerClient::FocusedInputChanged`.
   // On Desktop, contenteditable focus and suggestions are driven entirely by
   // `AutofillAgent`.
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          features::kAutofillAtMemorySupportContenteditableOnAndroid) &&
-      element && element.IsContentEditable()) {
-    if (std::optional<FormData> form =
-            form_util::FindFormForContentEditable(element)) {
-      CHECK_EQ(form->fields().size(), 1u);
-      return {mojom::FocusedFieldType::kContenteditableField,
-              form->fields().front().renderer_id()};
-    }
-  }
-#endif
   return {mojom::FocusedFieldType::kUnknown, FieldRendererId()};
 }
 
@@ -1554,14 +1532,12 @@ void PasswordAutofillAgent::SendPasswordForms(
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Provide warnings about the accessibility of password forms on the page.
   if (!password_forms_data.empty() &&
       (doc.Url().ProtocolIs(url::kHttpScheme) ||
        doc.Url().ProtocolIs(url::kHttpsScheme))) {
     page_passwords_analyser_.AnalyseDocumentDOM(frame);
   }
-#endif
 }
 
 void PasswordAutofillAgent::DispatchedDOMContentLoadedEvent(
@@ -1735,23 +1711,6 @@ void PasswordAutofillAgent::CheckViewAreaVisible(
 
   std::move(callback).Run(!element.VisibleBoundsInWidget().IsEmpty());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void PasswordAutofillAgent::TriggerFormSubmission() {
-  // Find the last interacted element to simulate an enter keystroke at.
-  WebFormControlElement form_control =
-      GetFormControlByRendererId(field_renderer_id_to_submit_);
-  if (!form_control) {
-    // The target field doesn't exist anymore. Don't try to submit it.
-    return;
-  }
-
-  // `form_control` can only be `WebInputElement`, not `WebSelectElement`.
-  WebInputElement input = form_control.To<WebInputElement>();
-  input.DispatchSimulatedEnter();
-  field_renderer_id_to_submit_ = FieldRendererId();
-}
-#endif
 
 std::optional<FormData> PasswordAutofillAgent::GetFormDataFromWebForm(
     const WebFormElement& web_form,
@@ -1952,9 +1911,7 @@ void PasswordAutofillAgent::CleanupOnDocumentShutdown() {
   field_renderer_id_to_submit_ = FieldRendererId();
   suggestion_banned_fields_.clear();
   times_received_fill_data_.clear();
-#if !BUILDFLAG(IS_ANDROID)
   page_passwords_analyser_.Reset();
-#endif
 }
 
 void PasswordAutofillAgent::InformBrowserAboutUserInput(
@@ -2423,11 +2380,6 @@ void PasswordAutofillAgent::MaybeTriggerSuggestionsOnFocusedElement(
   std::optional<FormData> form_data = GetFormDataFromWebForm(
       focused_element.GetOwningFormForAutofill(), /*form_cache=*/{});
   if (form_data && (times_received_fill_data_[form_data->renderer_id()] == 1) &&
-#if BUILDFLAG(IS_ANDROID)
-      // Limit showing suggestions on autofocus to WebAuthn forms only, since
-      // Android suggestion UI (TTF) can be much more intrusive.
-      IsWebAuthnForm(form_data) &&
-#endif  // BUILDFLAG(IS_ANDROID)
       base::FeatureList::IsEnabled(
           password_manager::features::kShowSuggestionsOnAutofocus)) {
     // Updating the focused field in the `FocusStateNotifier` to the currently

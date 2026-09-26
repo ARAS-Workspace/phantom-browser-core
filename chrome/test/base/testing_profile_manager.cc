@@ -33,9 +33,7 @@
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 
 constexpr char kGuestProfileName[] = "$guest";
-#if !BUILDFLAG(IS_ANDROID)
 constexpr char kSystemProfileName[] = "System";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -177,7 +175,6 @@ TestingProfile* TestingProfileManager::CreateGuestProfile(
   return profile_ptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TestingProfile* TestingProfileManager::CreateSystemProfile() {
   DCHECK(called_set_up_);
 
@@ -199,7 +196,6 @@ TestingProfile* TestingProfileManager::CreateSystemProfile() {
 
   return profile_ptr;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void TestingProfileManager::DeleteTestingProfile(const std::string& name) {
   DCHECK(called_set_up_);
@@ -246,7 +242,6 @@ void TestingProfileManager::DeleteGuestProfile() {
   profile_manager_->profiles_info_.erase(ProfileManager::GetGuestProfilePath());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void TestingProfileManager::DeleteSystemProfile() {
   DCHECK(called_set_up_);
 
@@ -256,7 +251,6 @@ void TestingProfileManager::DeleteSystemProfile() {
   profile_manager_->profiles_info_.erase(
       ProfileManager::GetSystemProfilePath());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void TestingProfileManager::DeleteProfileAttributesStorage() {
   profile_manager_->profile_attributes_storage_.reset(nullptr);

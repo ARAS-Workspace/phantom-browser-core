@@ -373,13 +373,6 @@ bool TestOverlayImageRepresentation::BeginReadAccess(
 void TestOverlayImageRepresentation::EndReadAccess(
     gfx::GpuFenceHandle release_fence) {}
 
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<base::android::ScopedHardwareBufferFenceSync>
-TestOverlayImageRepresentation::GetAHardwareBufferFenceSync() {
-  return nullptr;
-}
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 bool TestOverlayImageRepresentation::IsInUseByWindowServer() const {
   return static_cast<TestImageBacking*>(backing())->in_use_by_window_server();

@@ -505,10 +505,6 @@ void CommandBufferStub::OnAsyncFlush(
   if (pre_state.get_offset != post_state.get_offset)
     ReportState();
 
-#if BUILDFLAG(IS_ANDROID)
-  channel_->gpu_channel_manager()->DidAccessGpu();
-#endif
-
   if (!HasUnprocessedCommands()) {
     TRACE_EVENT("gpu,toplevel.flow", "CommandBuffer::FlushComplete",
                 perfetto::TerminatingFlow::Global(global_flush_id,

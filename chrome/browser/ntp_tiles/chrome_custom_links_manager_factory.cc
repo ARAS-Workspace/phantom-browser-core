@@ -10,22 +10,12 @@
 #include "components/ntp_tiles/constants.h"
 #include "components/ntp_tiles/custom_links_manager_impl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/feature_list.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif
-
 std::unique_ptr<ntp_tiles::CustomLinksManager>
 ChromeCustomLinksManagerFactory::NewForProfile(Profile* profile) {
   history::HistoryService* history_service =
       HistoryServiceFactory::GetForProfile(profile,
                                            ServiceAccessType::EXPLICIT_ACCESS);
   size_t max_links = ntp_tiles::kMaxNumCustomLinks;
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(chrome::android::kUseWebUiNtpAndroid)) {
-    max_links = 10;
-  }
-#endif
   return std::make_unique<ntp_tiles::CustomLinksManagerImpl>(
       ntp_tiles::CustomLinksManagerImpl::Options{
           .prefs = profile->GetPrefs(),

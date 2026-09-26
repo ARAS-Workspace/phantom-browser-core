@@ -84,10 +84,6 @@ class AudioInputTest : public testing::TestWithParam<bool> {
         audio_manager_(AudioManager::CreateForTesting(
             std::make_unique<TestAudioThread>())),
         audio_input_stream_(nullptr) {
-#if BUILDFLAG(IS_ANDROID)
-    // The only parameter is used to enable/disable AAudio.
-    features_.InitWithFeatureState(features::kUseAAudioInput, GetParam());
-#endif
     base::RunLoop().RunUntilIdle();
   }
 
@@ -239,9 +235,6 @@ class AudioInputTest : public testing::TestWithParam<bool> {
   base::TestMessageLoop message_loop_;
   std::unique_ptr<AudioManager> audio_manager_;
   raw_ptr<AudioInputStream> audio_input_stream_;
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList features_;
-#endif
 };
 
 // Test create and close of an AudioInputStream without recording audio.
@@ -294,10 +287,5 @@ TEST_P(AudioInputTest, MAYBE_Record_EchoCancellationEnabled) {
 // The test parameter is only relevant on Android. It controls whether or not we
 // allow the use of AAudio.
 INSTANTIATE_TEST_SUITE_P(Base, AudioInputTest, testing::Values(false));
-
-#if BUILDFLAG(IS_ANDROID)
-// Run tests with AAudio enabled.
-INSTANTIATE_TEST_SUITE_P(AAudio, AudioInputTest, testing::Values(true));
-#endif
 
 }  // namespace media

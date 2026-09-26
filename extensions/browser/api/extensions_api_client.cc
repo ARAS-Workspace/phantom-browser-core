@@ -144,7 +144,6 @@ MessagingDelegate* ExtensionsAPIClient::GetMessagingDelegate() {
   return nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 FileSystemDelegate* ExtensionsAPIClient::GetFileSystemDelegate() {
   return nullptr;
 }
@@ -157,7 +156,6 @@ AutomationInternalApiDelegate*
 ExtensionsAPIClient::GetAutomationInternalApiDelegate() {
   return nullptr;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::unique_ptr<NativeMessagePortDispatcher>
 ExtensionsAPIClient::CreateNativeMessagePortDispatcher(

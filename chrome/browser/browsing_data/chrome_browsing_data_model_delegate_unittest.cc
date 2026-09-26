@@ -36,10 +36,8 @@
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/web_app_command_manager.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
-#endif
 
 using ::testing::Contains;
 using ::testing::ElementsAre;
@@ -83,12 +81,10 @@ class ChromeBrowsingDataModelDelegateTest : public testing::Test {
 
     delegate_ = ChromeBrowsingDataModelDelegate::CreateForProfile(profile_);
 
-#if !BUILDFLAG(IS_ANDROID)
     if (auto* web_app_provider =
             web_app::WebAppProvider::GetForWebApps(profile_.get())) {
       web_app_provider->command_manager().Start();
     }
-#endif
 
     media_device_salt_service_ =
         MediaDeviceSaltServiceFactory::GetInstance()->GetForBrowserContext(
@@ -201,7 +197,6 @@ TEST_F(ChromeBrowsingDataModelDelegateTest, GetAllDataKeysAndGetDataOwner) {
   EXPECT_TRUE(expected_keys.empty());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeBrowsingDataModelDelegateTest, RemoveIsolatedWebAppData) {
   auto testOrigin = url::Origin::Create(
       GURL("isolated-app://"
@@ -226,7 +221,6 @@ TEST_F(ChromeBrowsingDataModelDelegateTest, RemoveIsolatedWebAppData) {
                 ~content::BrowsingDataRemover::DATA_TYPE_COOKIES,
             remover->GetLastUsedRemovalMaskForTesting());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeBrowsingDataModelDelegateTest, CookieDeletionFilterChildUser) {
   profile_->SetIsSupervisedProfile(true);

@@ -194,7 +194,6 @@ TEST_F(ContentSettingsDefaultProviderTest, DiscardObsoletePreferences) {
       "profile.default_content_setting_values.top_level_3pcd_support";
   static const char kObsoleteTopLevelTpcdOriginTrialDefaultPref[] =
       "profile.default_content_setting_values.top_level_3pcd_origin_trial";
-#if !BUILDFLAG(IS_ANDROID)
   static const char kMouselockPrefPath[] =
       "profile.default_content_setting_values.mouselock";
   const char kObsoletePluginsDefaultPref[] =
@@ -205,20 +204,17 @@ TEST_F(ContentSettingsDefaultProviderTest, DiscardObsoletePreferences) {
       "profile.default_content_setting_values.file_handling";
   const char kObsoleteInstalledWebAppMetadataDefaultPref[] =
       "profile.default_content_setting_values.installed_web_app_metadata";
-#endif
   static const char kGeolocationPrefPath[] =
       "profile.default_content_setting_values.geolocation";
 
   PrefService* prefs = profile_.GetPrefs();
   // Set some pref data.
-#if !BUILDFLAG(IS_ANDROID)
   prefs->SetInteger(kMouselockPrefPath, CONTENT_SETTING_ALLOW);
   prefs->SetInteger(kObsoletePluginsDefaultPref, CONTENT_SETTING_ALLOW);
   prefs->SetInteger(kObsoletePluginsDataDefaultPref, CONTENT_SETTING_ALLOW);
   prefs->SetInteger(kObsoleteFileHandlingDefaultPref, CONTENT_SETTING_ALLOW);
   prefs->SetInteger(kObsoleteInstalledWebAppMetadataDefaultPref,
                     CONTENT_SETTING_ALLOW);
-#endif
   prefs->SetInteger(kGeolocationPrefPath, CONTENT_SETTING_BLOCK);
   prefs->SetInteger(kObsoletePrivateNetworkGuardDefaultPref,
                     CONTENT_SETTING_BLOCK);
@@ -238,13 +234,11 @@ TEST_F(ContentSettingsDefaultProviderTest, DiscardObsoletePreferences) {
   EXPECT_FALSE(prefs->HasPrefPath(kObsoleteTpcdTrialDefaultPref));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoleteTopLevelTpcdTrialDefaultPref));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoleteTopLevelTpcdOriginTrialDefaultPref));
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(prefs->HasPrefPath(kMouselockPrefPath));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoletePluginsDefaultPref));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoletePluginsDataDefaultPref));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoleteFileHandlingDefaultPref));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoleteInstalledWebAppMetadataDefaultPref));
-#endif
   // Check that non-obsolete prefs have not been touched.
   EXPECT_TRUE(prefs->HasPrefPath(kGeolocationPrefPath));
   EXPECT_EQ(CONTENT_SETTING_BLOCK, prefs->GetInteger(kGeolocationPrefPath));

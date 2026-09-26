@@ -50,17 +50,6 @@ bool StructTraits<
   out->top_controls_shown_ratio = data.top_controls_shown_ratio();
   out->primary_main_frame_item_sequence_number =
       data.primary_main_frame_item_sequence_number();
-#if BUILDFLAG(IS_ANDROID)
-  out->bottom_controls_height = data.bottom_controls_height();
-  out->bottom_controls_shown_ratio = data.bottom_controls_shown_ratio();
-  out->top_controls_min_height_offset = data.top_controls_min_height_offset();
-  out->bottom_controls_min_height_offset =
-      data.bottom_controls_min_height_offset();
-  out->min_page_scale_factor = data.min_page_scale_factor();
-  out->max_page_scale_factor = data.max_page_scale_factor();
-  out->root_overflow_y_hidden = data.root_overflow_y_hidden();
-  out->has_transparent_background = data.has_transparent_background();
-#endif
   if (!data.ReadRootScrollOffset(&out->root_scroll_offset)) {
     SetFailedCheckCrashKey("root_scroll_offset");
     return false;
@@ -73,16 +62,6 @@ bool StructTraits<
     SetFailedCheckCrashKey("delegated_ink_metadata");
     return false;
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (!data.ReadScrollableViewportSize(&out->scrollable_viewport_size)) {
-    SetFailedCheckCrashKey("scrollable_viewport_size");
-    return false;
-  }
-  if (!data.ReadRootLayerSize(&out->root_layer_size)) {
-    SetFailedCheckCrashKey("root_layer_size");
-    return false;
-  }
-#endif
   if (!data.ReadTrackedElementRects(&out->tracked_element_rects)) {
     SetFailedCheckCrashKey("tracked_element_rects");
     return false;

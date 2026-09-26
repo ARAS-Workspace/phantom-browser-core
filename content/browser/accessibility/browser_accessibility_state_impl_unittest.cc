@@ -24,11 +24,6 @@
 #include "ui/accessibility/platform/test_ax_platform_tree_manager_delegate.h"
 #include "ui/events/base_event_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/accessibility/browser_accessibility_manager_android.h"
-#include "content/browser/accessibility/browser_accessibility_state_impl_android.h"
-#endif
-
 namespace content {
 
 class BrowserAccessibilityStateImplTest : public ::testing::Test {
@@ -184,49 +179,6 @@ TEST_F(BrowserAccessibilityStateImplTest, AXModeChangeAllowedFiltering) {
   state_->SetActivationFromPlatformEnabled(false);
 }
 
-
-#if BUILDFLAG(IS_ANDROID)
-
-// Test Accessibility Histogram Recording.
-TEST(BrowserAccessibilityStateImplAndroidTest,
-     RecordAccessibilityTechHistograms) {
-  base::HistogramTester histogram_tester;
-
-  static constexpr std::array<uint32_t, 7> service_hashes = {
-      0x1630cddb,  // Switch Access
-      0x349d4b1a,  // TalkBack
-      0xa5a469fc,  // Sound Amplifier
-      0xb13e6179,  // Action Blocks
-      0xb38ef877,  // Voice Access
-      0xbc2897b4,  // BrailleBack
-      0xf2c0d757,  // Accessibility Menu
-  };
-
-  static constexpr std::string_view histogram =
-      "Accessibility.Android.RunningAccessibilityTools";
-
-  // Try an unknown hash
-  ASSERT_FALSE(RecordAssistiveTechHistogram(0, false));
-
-  // Ensure we start at zero.
-  histogram_tester.ExpectTotalCount(histogram, 0);
-
-  // Start recording.
-  for (int i = 0; i < service_hashes.size(); ++i) {
-    ASSERT_TRUE(RecordAssistiveTechHistogram(service_hashes[i], false));
-    histogram_tester.ExpectTotalCount(histogram, i + 1);
-  }
-
-  // Duplicate one histogram.
-  ASSERT_TRUE(RecordAssistiveTechHistogram(service_hashes[0], false));
-  histogram_tester.ExpectTotalCount(histogram, service_hashes.size() + 1);
-
-  // Try an unknown accessibility tool.
-  ASSERT_TRUE(RecordAssistiveTechHistogram(0, true));
-  histogram_tester.ExpectTotalCount(histogram, service_hashes.size() + 2);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(BrowserAccessibilityStateImplTest,
        NativeAdaptedWebContentsInvariantFiltering) {

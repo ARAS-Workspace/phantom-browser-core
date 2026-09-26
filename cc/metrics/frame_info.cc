@@ -55,17 +55,6 @@ bool FrameInfo::IsDroppedAffectingSmoothness() const {
 }
 
 void FrameInfo::MergeWith(const FrameInfo& other) {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40208073): on android-webview, multiple frames can be
-  // submitted against the same BeginFrameArgs. This can trip the DCHECK()s in
-  // this function.
-  if (was_merged)
-    return;
-  if (main_thread_response == MainThreadResponse::kIncluded &&
-      other.main_thread_response == MainThreadResponse::kIncluded) {
-    return;
-  }
-#endif
   DCHECK(!was_merged);
   DCHECK(!other.was_merged);
   DCHECK(Validate());

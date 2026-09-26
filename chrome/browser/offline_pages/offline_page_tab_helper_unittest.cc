@@ -210,36 +210,6 @@ TEST_F(OfflinePageTabHelperTest, UntrustedOfflinePageForFileUrl) {
             tab_helper()->offline_header().reason);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(OfflinePageTabHelperTest,
-       UntrustedOfflinePageForContentUrlWithMultipartRelatedType) {
-  CreateNavigationSimulator(GURL("content://foo"));
-  navigation_simulator()->Start();
-  navigation_simulator()->SetContentsMimeType("multipart/related");
-  navigation_simulator()->Commit();
-
-  ASSERT_NE(nullptr, tab_helper()->offline_page());
-  EXPECT_EQ(OfflinePageTrustedState::UNTRUSTED, tab_helper()->trusted_state());
-  EXPECT_FALSE(tab_helper()->IsShowingTrustedOfflinePage());
-  EXPECT_EQ(OfflinePageHeader::Reason::NONE,
-            tab_helper()->offline_header().reason);
-}
-
-TEST_F(OfflinePageTabHelperTest,
-       UntrustedOfflinePageForContentUrlWithMessageRfc822Type) {
-  CreateNavigationSimulator(GURL("content://foo"));
-  navigation_simulator()->Start();
-  navigation_simulator()->SetContentsMimeType("message/rfc822");
-  navigation_simulator()->Commit();
-
-  ASSERT_NE(nullptr, tab_helper()->offline_page());
-  EXPECT_EQ(OfflinePageTrustedState::UNTRUSTED, tab_helper()->trusted_state());
-  EXPECT_FALSE(tab_helper()->IsShowingTrustedOfflinePage());
-  EXPECT_EQ(OfflinePageHeader::Reason::NONE,
-            tab_helper()->offline_header().reason);
-}
-#endif
-
 TEST_F(OfflinePageTabHelperTest, TestNotifyMhtmlPageLoadAttempted_Success) {
   GURL mhtml_url("https://www.example.com");
 

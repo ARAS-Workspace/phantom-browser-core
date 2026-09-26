@@ -143,7 +143,7 @@ FindFirstNodeWithAttributeTypeAndTextSubstring(
 // This helper is only used by popup opener tests, and those tests are not
 // built on Android or Mac. Keep the helper under the same guard to
 // avoid unused-function build failures on those bots.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 const optimization_guide::proto::ContentNode* FindFirstNodeWithDomNodeId(
     const optimization_guide::proto::ContentNode& root,
     int64_t dom_node_id) {
@@ -163,7 +163,7 @@ const optimization_guide::proto::ContentNode* FindFirstNodeWithDomNodeId(
   }
   return nullptr;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 void AssertRectsEqual(const optimization_guide::proto::BoundingRect& proto_rect,
                       gfx::Rect rect) {
@@ -259,7 +259,7 @@ ContentRootNodeForFrameActionableMode(
   return body;
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 // Helper function to generate a click on the given RenderWidgetHost. The
 // mouse event is forwarded directly to the RenderWidgetHost without any
 // hit-testing.
@@ -273,7 +273,7 @@ void SimulateMouseClickAt(content::RenderWidgetHost* rwh, gfx::PointF point) {
   rwh->ForwardMouseEvent(mouse_event);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 class PageContentProtoProviderBrowserTest : public content::ContentBrowserTest {
  public:
@@ -1163,12 +1163,6 @@ IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestSiteIsolation,
   tester.ExpectTotalCount(kMainFrameSchedulingDelay, 1);
   tester.ExpectTotalCount(kTotal, 1);
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/384585933): Enable this assert on Android.
-  if (EnableCrossSiteFrames()) {
-    return;
-  }
-#endif
   tester.ExpectTotalCount(kRemoteSubframe, EnableCrossSiteFrames() ? 1 : 0);
   tester.ExpectTotalCount(kRemoteSubframeSchedulingDelay,
                           EnableCrossSiteFrames() ? 1 : 0);
@@ -1210,12 +1204,6 @@ IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestSiteIsolation,
   tester.ExpectTotalCount(kMainFrameSchedulingDelay, 1);
   tester.ExpectTotalCount(kTotal, 1);
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/384585933): Enable this assert on Android.
-  if (EnableCrossSiteFrames()) {
-    return;
-  }
-#endif
   // TODO(crbug.com/389737599): We should have a metric for subframes once they
   // can use off critical path scheduling.
   tester.ExpectTotalCount(kRemoteSubframeSchedulingDelayNonCritical, 0);
@@ -1284,14 +1272,12 @@ IN_PROC_BROWSER_TEST_P(
             optimization_guide::proto::CONTENT_ATTRIBUTE_PARAGRAPH);
   EXPECT_EQ(p.content_attributes().annotated_roles().size(), 0);
 
-// TODO(khushalsagar): This is an existing bug where the scroll offset of the
-// root scroller in the ancestor remote frame is not applied.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(khushalsagar): This is an existing bug where the scroll offset of the
+  // root scroller in the ancestor remote frame is not applied.
   const auto& geometry = p.content_attributes().geometry();
   AssertRectsEqual(geometry.outer_bounding_box(),
                    gfx::Rect(-20, -10, 100, 200));
   AssertRectsEqual(geometry.visible_bounding_box(), gfx::Rect(0, 0, 80, 190));
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestSiteIsolation,
@@ -1774,7 +1760,7 @@ IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestMultiProcess,
 // Popups may be rendered as native OS-level widgets on Android and MacOS.
 //
 // TODO: b/450618828 - Enable on Fuchsia with proper geometry comparison.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestMultiProcess,
                        SelectInCrossOriginIframe) {
   LoadPage(https_server()->GetURL(
@@ -1840,7 +1826,7 @@ IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestMultiProcess,
   EXPECT_EQ(popup_window.visible_bounding_box().y(),
             select_node_geometry.visible_bounding_box().y() + 10);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 class ScaledPageContentProtoProviderBrowserTest
     : public PageContentProtoProviderBrowserTest {
@@ -1863,11 +1849,6 @@ class ScaledPageContentProtoProviderBrowserTest
 IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest, ScaleSizes) {
   // TODO(crbug.com/456812241): Re-enable this test on automotive once the test
   // is fixed.
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_automotive()) {
-    GTEST_SKIP() << "This test is disabled on automotive due to flakiness.";
-  }
-#endif
 
   const gfx::Size window_bounds(web_contents()->GetSize());
   LoadPage(https_server()->GetURL("/simple.html"));
@@ -1890,7 +1871,7 @@ IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest, ScaleSizes) {
 // Popups may be rendered as native OS-level widgets on Android and Apple OSs.
 //
 // TODO: b/450618828 - Enable on Fuchsia with proper geometry comparison.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
 IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest,
                        SelectInMainFrame) {
   LoadPage(https_server()->GetURL("/open_popup.html"));
@@ -1934,7 +1915,7 @@ IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest,
   EXPECT_EQ(page_content().popup_window().visible_bounding_box().y(),
             select_node_geometry.outer_bounding_box().y() + 10 * 2);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
+#endif  // !BUILDFLAG(IS_APPLE)
 
 bool ContainsRole(const optimization_guide::proto::ContentNode& node,
                   optimization_guide::proto::AnnotatedRole role) {
@@ -2541,7 +2522,7 @@ IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest,
 }
 
 // Popups may be rendered as native OS-level widgets on Android and MacOS.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 class PageContentProtoProviderPopupBrowserTest
     : public PageContentProtoProviderBrowserTest {
  public:
@@ -3360,7 +3341,7 @@ IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest, NavigationMetrics) {
 }
 
 // Popups may be rendered as native OS-level widgets on Android and Apple OSs.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
 IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest,
                        HiddenPopupsIgnored) {
   LoadPage(https_server()->GetURL("/open_popup.html"));
@@ -3382,7 +3363,7 @@ IN_PROC_BROWSER_TEST_F(PageContentProtoProviderBrowserTest,
   LoadData(GetActionableAIPageContentOptions());
   EXPECT_FALSE(page_content().has_popup_window());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
+#endif  // !BUILDFLAG(IS_APPLE)
 
 }  // namespace
 

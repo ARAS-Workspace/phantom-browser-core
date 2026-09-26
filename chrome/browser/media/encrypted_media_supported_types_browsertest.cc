@@ -39,10 +39,6 @@
 #include "third_party/widevine/cdm/buildflags.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error This file needs to be updated to run on Android.
-#endif
-
 #if BUILDFLAG(ENABLE_PLAYREADY)
 #include "media/base/win/mf_feature_checks.h"
 #endif

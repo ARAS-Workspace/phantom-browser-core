@@ -792,7 +792,6 @@ IN_PROC_BROWSER_TEST_F(ProfileManagerNonAsciiBrowserTest,
               ::testing::UnorderedElementsAreArray(expected_paths));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Browser object only exists on Desktop platforms and multi-profiles are
 // supported.
 
@@ -1162,4 +1161,3 @@ IN_PROC_BROWSER_TEST_F(ProfileManagerDestroyProfileBrowserTest,
   EXPECT_EQ(2u, storage.GetNumberOfProfiles());
   EXPECT_TRUE(base::PathExists(dest_path1));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

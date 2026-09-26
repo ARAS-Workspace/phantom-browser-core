@@ -97,10 +97,8 @@
 
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/enterprise/identifiers/profile_id_service_factory.h"
 #include "components/enterprise/browser/identifiers/profile_id_service.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // LINT.IfChange
 
@@ -311,13 +309,11 @@ void PolicyUIHandler::SetLocalTestPoliciesImpl(
               ->local_test_policy_provider());
   CHECK(local_test_provider);
 
-#if !BUILDFLAG(IS_ANDROID)
   profile_->GetPrefs()->ClearPref(
       prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage);
   profile_->GetPrefs()->SetDefaultPrefValue(
       prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage,
       base::Value(profile_separation_policy_response));
-#endif
 
   profile_->GetProfilePolicyConnector()->UseLocalTestPolicyProvider();
 
@@ -333,13 +329,11 @@ void PolicyUIHandler::RevertLocalTestPolicies() {
   if (!PolicyUI::ShouldLoadTestPage(&profile_.get())) {
     return;
   }
-#if !BUILDFLAG(IS_ANDROID)
   profile_->GetPrefs()->ClearPref(
       prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage);
   profile_->GetPrefs()->SetDefaultPrefValue(
       prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage,
       base::Value(std::string()));
-#endif
   profile_->GetProfilePolicyConnector()->RevertUseLocalTestPolicyProvider();
 }
 

@@ -72,12 +72,6 @@ const std::vector<FindResults>& FindTestWebContentsDelegate::GetReplyRecord() {
   return reply_record_;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void FindTestWebContentsDelegate::WaitForMatchRects() {
-  WaitFor(MATCH_RECTS);
-}
-#endif
-
 void FindTestWebContentsDelegate::FindReply(WebContents* web_contents,
                                             int request_id,
                                             int number_of_matches,
@@ -138,22 +132,6 @@ void FindTestWebContentsDelegate::StopWaiting() {
   ASSERT_NE(NOTHING, waiting_for_);
   message_loop_runner_->Quit();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void FindTestWebContentsDelegate::FindMatchRectsReply(
-    WebContents* web_contents,
-    int version,
-    const std::vector<gfx::RectF>& rects,
-    const gfx::RectF& active_rect) {
-  // Update the current rects.
-  find_match_rects_ = rects;
-  active_match_rect_ = active_rect;
-
-  // If we are waiting for match rects, stop waiting.
-  if (waiting_for_ == MATCH_RECTS)
-    StopWaiting();
-}
-#endif
 
 std::unordered_set<raw_ptr<RenderFrameHost, CtnExperimental>>
 GetRenderFrameHostsWithPendingFindResults(WebContents* web_contents) {

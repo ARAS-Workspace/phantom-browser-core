@@ -459,7 +459,6 @@ IN_PROC_BROWSER_TEST_F(ProfileBrowserTest, MAYBE_ProfileReadmeCreated) {
       base::PathExists(temp_dir.GetPath().Append(chrome::kReadmeFilename)));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(ProfileBrowserTest, SyncToSigninMigrationSynchronous) {
   base::HistogramTester histograms;
   base::ScopedAllowBlockingForTesting allow_blocking;
@@ -499,7 +498,6 @@ IN_PROC_BROWSER_TEST_F(ProfileBrowserTest, SyncToSigninMigrationAsynchronous) {
 
   FlushIoTaskRunnerAndSpinThreads();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // The EndSession IO synchronization happens under Ozone. See
 // BrowserProcessImpl::EndSession.
@@ -1001,17 +999,13 @@ IN_PROC_BROWSER_TEST_F(ProfileBrowserTest, TestProfileTypes) {
   EXPECT_EQ(profile_metrics::BrowserProfileType::kOtherOffTheRecordProfile,
             profile_metrics::GetBrowserProfileType(otr_profile));
 
-#if !BUILDFLAG(IS_ANDROID)
   base::HistogramTester tester;
   Browser* guest_browser = CreateGuestBrowser();
 
   EXPECT_EQ(
       profile_metrics::BrowserProfileType::kGuest,
       profile_metrics::GetBrowserProfileType(guest_browser->GetProfile()));
-#endif
 }
-
-#if !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(ProfileBrowserTest, UnderOneMinute) {
   base::HistogramTester tester;
@@ -1062,5 +1056,3 @@ IN_PROC_BROWSER_TEST_F(ProfileBrowserTest, LomProfileId) {
   uint64_t lom_id2 = profile->GetLomProfileId();
   EXPECT_EQ(lom_id1, lom_id2);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)

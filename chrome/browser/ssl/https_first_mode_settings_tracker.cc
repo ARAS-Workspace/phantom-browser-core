@@ -38,9 +38,7 @@
 #include "net/base/url_util.h"
 #include "third_party/blink/public/mojom/site_engagement/site_engagement.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/safe_browsing/security_settings_bundle_toast_helper.h"
-#endif
 
 // Minimum score of an HTTPS origin to enable HFM on its hostname.
 const base::FeatureParam<int> kHttpsAddThreshold{
@@ -354,12 +352,10 @@ void HttpsFirstModeService::MigrateEnhancedBundleUsersAndMaybeShowToast() {
             safe_browsing::SecuritySettingsBundleToastState::kPending));
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Dynamically trigger the toast on the active window immediately for the
   // current session.
   safe_browsing::SecuritySettingsBundleToastHelper::GetForProfile(profile_)
       ->TriggerIfNeeded();
-#endif
 }
 
 void HttpsFirstModeService::

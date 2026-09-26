@@ -29,7 +29,6 @@
 #include "ui/base/base_window.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/tab_enums.h"
@@ -38,12 +37,10 @@
 #include "components/split_tabs/split_tab_id.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/tabs/public/tab_interface.h"
-#endif
 
 namespace extensions {
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 // This variant is only available on non-Android platforms. On Android, window
 // creation / initialization is an async process.
 BrowserWindowInterface* CreateAndShowBrowser(Profile* profile,
@@ -64,14 +61,12 @@ BrowserWindowInterface* CreateAndShowBrowser(Profile* profile,
   browser->GetWindow()->Show();
   return browser;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
 OpenTabHelper::Params::Params() = default;
 OpenTabHelper::Params::~Params() = default;
 
-#if !BUILDFLAG(IS_ANDROID)
 // static
 base::expected<BrowserWindowInterface*, std::string>
 OpenTabHelper::FindOrCreateBrowser(const GURL& validated_url,
@@ -150,7 +145,6 @@ OpenTabHelper::FindOrCreateBrowser(const GURL& validated_url,
 
   return browser;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // static
 base::expected<content::WebContents*, std::string> OpenTabHelper::OpenTab(
@@ -159,14 +153,6 @@ base::expected<content::WebContents*, std::string> OpenTabHelper::OpenTab(
     const ExtensionFunction& function,
     const Params& params) {
   auto* const extension = function.extension();
-
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(https://crbug.com/480192698): Remove this restriction once split tabs
-  // are supported on Desktop Android.
-  if (params.split_with_tab_id.has_value()) {
-    return base::unexpected(tabs_constants::kSplitViewCreationFailedError);
-  }
-#endif
 
   // DCHECK because the input should already have been validated, and this is
   // a somewhat costly function.

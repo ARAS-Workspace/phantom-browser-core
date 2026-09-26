@@ -26,9 +26,7 @@
 #include "ui/base/webui/web_ui_util.h"
 #include "ui/webui/webui_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/theme_source.h"
-#endif
 
 bool OmniboxUIConfig::SupportsInProcessResourceLoadingV2() const {
   return true;
@@ -47,11 +45,9 @@ OmniboxUI::OmniboxUI(content::WebUI* web_ui)
   webui::SetupWebUIDataSource(source, kOmniboxResources,
                               IDR_OMNIBOX_OMNIBOX_HTML);
 
-#if !BUILDFLAG(IS_ANDROID)
   content::URLDataSource::Add(
       Profile::FromWebUI(web_ui),
       std::make_unique<ThemeSource>(Profile::FromWebUI(web_ui)));
-#endif
 
   // Expose version information to client because it is useful in output.
   VersionUI::AddVersionDetailStrings(source);

@@ -27,19 +27,9 @@
 #include "printing/print_settings.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "printing/printing_context_android.h"
-#endif
-
 #if BUILDFLAG(ENABLE_OOP_PRINTING)
 #include "chrome/browser/printing/oop_features.h"
 #include "chrome/browser/printing/printer_query_oop.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// Must come after all headers that specialize FromJniType() / ToJniType().
-#include "chrome/android/chrome_jni_headers/TabPrinter_jni.h"  // nogncheck
 #endif
 
 namespace printing {
@@ -331,28 +321,6 @@ void PrinterQuery::GetSettingsWithUI(uint32_t document_page_count,
   }
 
   content::WebContents* web_contents = GetWebContents();
-
-#if BUILDFLAG(IS_ANDROID)
-  if (is_scripted) {
-    TabAndroid* tab =
-        web_contents ? TabAndroid::FromWebContents(web_contents) : nullptr;
-
-    // Regardless of whether the following call fails or not, the javascript
-    // call will return since startPendingPrint will make it return immediately
-    // in case of error.
-    if (tab) {
-      JNIEnv* env = base::android::AttachCurrentThread();
-      auto* printing_context_delegate = static_cast<PrintingContextDelegate*>(
-          printing_context_delegate_.get());
-      // TODO(crbug.com/379869738) Remove GetUnsafeValue.
-      PrintingContextAndroid::SetPendingPrint(
-          web_contents->GetTopLevelNativeWindow(),
-          Java_TabPrinter_getPrintable(env, tab->GetJavaObject()),
-          printing_context_delegate->rfh_id().child_id.GetUnsafeValue(),
-          printing_context_delegate->rfh_id().frame_routing_id);
-    }
-  }
-#endif
 
   // Running a dialog causes an exit to webpage-initiated fullscreen.
   // http://crbug.com/41322524

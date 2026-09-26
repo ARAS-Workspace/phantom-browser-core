@@ -79,13 +79,6 @@ class SandboxedNetworkListBrowserTest : public ContentBrowserTest {
   }
 
  protected:
-#if BUILDFLAG(IS_ANDROID)
-  void SetUp() override {
-    GTEST_SKIP() << "GetNetworkList not yet supported in Android network "
-                    "sandbox. See https://crbug.com/1381381.";
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   void WriteInterfacesToFile(const base::FilePath& path) {
     base::ListValue interfaces_list;
     base::RunLoop run_loop;

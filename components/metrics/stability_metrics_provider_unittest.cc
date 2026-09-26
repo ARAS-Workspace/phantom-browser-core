@@ -37,13 +37,6 @@ TEST_F(StabilityMetricsProviderTest, ProvideStabilityMetrics) {
   SystemProfileProto system_profile;
   provider->ProvideStabilityMetrics(&system_profile);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Initial log metrics: only expected if non-zero.
-  const SystemProfileProto_Stability& stability = system_profile.stability();
-  // The launch count field is used on Android only.
-  EXPECT_FALSE(stability.has_launch_count());
-#endif
-
   histogram_tester.ExpectBucketCount("Stability.Counts2",
                                      StabilityEventType::kLaunch, 0);
   histogram_tester.ExpectBucketCount("Stability.Counts2",
@@ -63,13 +56,6 @@ TEST_F(StabilityMetricsProviderTest, RecordStabilityMetrics) {
     MetricsProvider* provider = &stability_provider;
     SystemProfileProto system_profile;
     provider->ProvideStabilityMetrics(&system_profile);
-
-#if BUILDFLAG(IS_ANDROID)
-    // Initial log metrics: only expected if non-zero.
-    const SystemProfileProto_Stability& stability = system_profile.stability();
-    // The launch count field is populated only on Android.
-    EXPECT_EQ(1, stability.launch_count());
-#endif
 
     histogram_tester.ExpectBucketCount("Stability.Counts2",
                                        StabilityEventType::kLaunch, 1);

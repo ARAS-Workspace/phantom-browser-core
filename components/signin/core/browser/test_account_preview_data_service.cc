@@ -28,11 +28,6 @@ void TestAccountPreviewDataService::GetPreviewPreferenceForAccount(
   std::move(callback).Run(preference_);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void TestAccountPreviewDataService::UpdateExternalAppAccount(
-    const std::optional<std::string>& email) {}
-#endif
-
 void TestAccountPreviewDataService::TriggerCallback(
     std::optional<AccountPreviewPreference> pref) {
   if (pending_callback_) {

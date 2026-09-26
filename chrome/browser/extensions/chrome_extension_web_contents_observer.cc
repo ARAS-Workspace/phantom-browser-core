@@ -29,11 +29,9 @@
 #include "third_party/blink/public/common/chrome_debug_urls.h"
 #include "third_party/blink/public/mojom/devtools/console_message.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/crash/content/browser/error_reporting/error_reporting_util.h"
 #include "components/crash/content/browser/error_reporting/javascript_error_report.h"
 #include "components/crash/content/browser/error_reporting/js_error_report_processor.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -71,7 +69,6 @@ void ChromeExtensionWebContentsObserver::RenderFrameCreated(
   ExtensionWebContentsObserver::RenderFrameCreated(render_frame_host);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ChromeExtensionWebContentsObserver::OnDidAddMessageToConsole(
     content::RenderFrameHost* source_frame,
     blink::mojom::ConsoleMessageLevel log_level,
@@ -148,7 +145,6 @@ void ChromeExtensionWebContentsObserver::OnDidAddMessageToConsole(
   processor->SendErrorReport(std::move(report), base::DoNothing(),
                              browser_context());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void ChromeExtensionWebContentsObserver::InitializeRenderFrame(
     content::RenderFrameHost* render_frame_host) {
@@ -223,13 +219,11 @@ void ChromeExtensionWebContentsObserver::SetUpRenderFrameHost(
     render_frame_host->EnableMojoJsBindings(/*features=*/nullptr);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Allow specific allowlisted component extensions to report JS errors.
   if (util::IsJsErrorReportingEnabledForExtension(extension,
                                                   browser_context())) {
     render_frame_host->SetWantErrorMessageStackTrace();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(ChromeExtensionWebContentsObserver);

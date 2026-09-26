@@ -14,7 +14,6 @@
 // infrastructure and should be moved to a new home.
 
 // ShutdownWatcherHelper is not available on Android.
-#if !BUILDFLAG(IS_ANDROID)
 
 namespace {
 base::TimeDelta GetPerChannelTimeout(base::TimeDelta duration) {
@@ -60,5 +59,3 @@ void ShutdownWatcherHelper::Arm(const base::TimeDelta& duration) {
 void ShutdownWatcherHelper::Alarm() {
   metrics::ShutdownHang();
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)

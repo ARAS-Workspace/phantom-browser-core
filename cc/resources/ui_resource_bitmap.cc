@@ -23,10 +23,6 @@
 #include "third_party/skia/include/gpu/ganesh/GrDirectContext.h"
 #include "third_party/skia/include/gpu/ganesh/GrRecordingContext.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace cc {
 
 void UIResourceBitmap::Create(sk_sp<SkPixelRef> pixel_ref,

@@ -145,20 +145,6 @@ void DownloadManagerDelegate::CheckSavePackageAllowed(
   std::move(callback).Run(true);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool DownloadManagerDelegate::IsFromExternalApp(download::DownloadItem* item) {
-  return false;
-}
-
-bool DownloadManagerDelegate::ShouldOpenPdfInline() {
-  return false;
-}
-
-bool DownloadManagerDelegate::IsDownloadRestrictedByPolicy() {
-  return false;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 bool DownloadManagerDelegate::SupportsHistoryLoading() {
   return false;
 }

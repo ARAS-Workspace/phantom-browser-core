@@ -35,7 +35,6 @@ void ProfileTestingHelper::SetUp() {
   ASSERT_TRUE(guest_profile_otr_->IsOffTheRecord());
   ASSERT_TRUE(guest_profile_otr_->IsGuestSession());
 
-#if !BUILDFLAG(IS_ANDROID)
   system_profile_ = manager_.CreateSystemProfile();
   ASSERT_TRUE(system_profile_);
   ASSERT_FALSE(system_profile_->IsOffTheRecord());
@@ -44,5 +43,4 @@ void ProfileTestingHelper::SetUp() {
   ASSERT_TRUE(system_profile_otr_);
   ASSERT_TRUE(system_profile_otr_->IsOffTheRecord());
   ASSERT_TRUE(system_profile_otr_->IsSystemProfile());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

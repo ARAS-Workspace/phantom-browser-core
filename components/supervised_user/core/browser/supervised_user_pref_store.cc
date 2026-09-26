@@ -191,11 +191,6 @@ void SupervisedUserPrefStore::RecreatePreferences() {
   if (is_family_link_settings_service_active) {
     supervised_user::SetSupervisedUserPrefStoreDefaults(*prefs_.get());
 
-#if BUILDFLAG(IS_ANDROID)
-    syncer::SyncPrefs::SetTypeDisabledByCustodian(
-        prefs_.get(), syncer::UserSelectableType::kPayments);
-#endif
-
     // Copy non-web filtering family link user settings to prefs.
     for (const auto& entry : supervised_user::kFamilyLinkSettingsPrefMapping) {
       const base::Value* value =

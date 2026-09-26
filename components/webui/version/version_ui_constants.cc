@@ -34,14 +34,6 @@ const char kLogoAltText[] = "logo_alt_text";
 const char kOfficial[] = "official";
 const char kOSName[] = "os_name";
 const char kOSType[] = "os_type";
-#if BUILDFLAG(IS_ANDROID)
-const char kOSVersion[] = "os_version";
-const char kVersionCode[] = "version_code";
-const char kTargetSdkVersionName[] = "target_sdk_version_name";
-const char kTargetSdkVersion[] = "target_sdk_version";
-const char kGmsName[] = "gms_name";
-const char kGmsVersion[] = "gms_version";
-#endif
 const char kProfilePath[] = "profile_path";
 const char kProfilePathName[] = "profile_path_name";
 const char kCopyLabel[] = "copy_label";

@@ -70,14 +70,12 @@ using testing::ElementsAre;
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<syncer::LoopbackServerEntity> CreateTombstone(
     syncer::DataType data_type,
     std::string_view client_tag) {
   return syncer::PersistentTombstoneEntity::CreateNewForTest(
       data_type, std::string(client_tag));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 base::FilePath GetTestFilePathForCacheGuid() {
   base::FilePath user_data_path;
@@ -162,7 +160,6 @@ INSTANTIATE_TEST_SUITE_P(,
                          testing::PrintToStringParamName());
 
 // Android doesn't currently support PRE_ tests, see crbug.com/40145099.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest,
                        PRE_ShouldNotIssueGetUpdatesOnBrowserRestart) {
   ASSERT_TRUE(SetupSync());
@@ -202,7 +199,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest,
           .empty())
       << "Updated data types: " << get_updates_observer.GetUpdatedTypes();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Note: See also SyncErrorTest.ClientDataObsoleteTest, which ensures the cache
 // GUID does *not* get reused if the client's data needs to be reset.
@@ -361,7 +357,6 @@ IN_PROC_BROWSER_TEST_P(
 class SingleClientGetUnsyncedTypesTest : public SyncTest {
  public:
   SingleClientGetUnsyncedTypesTest() : SyncTest(SINGLE_CLIENT) {
-#if !BUILDFLAG(IS_ANDROID)
     // These features are required to enable THEMES and BOOKMARK in transport
     // mode.
     feature_list_.InitWithFeatures(
@@ -369,7 +364,6 @@ class SingleClientGetUnsyncedTypesTest : public SyncTest {
          syncer::kSeparateLocalAndAccountThemes,
          switches::kSyncEnableBookmarksInTransportMode},
         {});
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   // Unsynced data is only valid with sync transport.
@@ -393,7 +387,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest,
                        MAYBE_ShouldGetTypesWithUnsyncedDataFromSyncService) {
   ASSERT_TRUE(SetupSync());
 
-#if !BUILDFLAG(IS_ANDROID)
   // Note: Depending on the state of feature flags (specifically
   // kReplaceSyncPromosWithSignInPromos), Bookmarks may or may not be considered
   // selected by default.
@@ -404,7 +397,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest,
   const GaiaId gaia_id = GetSyncService(0)->GetSyncAccountInfoForPrefs().gaia;
   prefs.SetBookmarksExplicitBrowserSignin(gaia_id, true);
   ASSERT_TRUE(prefs.GetBookmarksExplicitBrowserSignin(gaia_id));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   ASSERT_TRUE(GetClient(0)->AwaitSyncTransportActive());
   ASSERT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::BOOKMARKS));
@@ -447,7 +439,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest,
 
 // The following test uses THEMES for testing, however, THEMES data type is not
 // on Android.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, HttpError) {
   ASSERT_TRUE(SetupSync());
 
@@ -483,11 +474,9 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, HttpError) {
                    ->GetTypesWithUnsyncedDataAndWait({syncer::THEMES})
                    .contains(syncer::THEMES));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Android currently doesn't support some methods used in this test, see
 // crbug.com/40871747.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, SignInPendingState) {
   base::HistogramTester histograms;
 
@@ -530,10 +519,8 @@ IN_PROC_BROWSER_TEST_F(SingleClientGetUnsyncedTypesTest, SignInPendingState) {
       "Sync.DataTypeNumUnsyncedEntitiesOnReauthFromPendingState.THEME",
       /*sample=*/1, /*expected_bucket_count=*/1);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Android doesn't currently support PRE_ tests, see crbug.com/40145099.
-#if !BUILDFLAG(IS_ANDROID)
 class SingleClientFeatureToTransportSyncTest : public SyncTest {
  public:
   SingleClientFeatureToTransportSyncTest() : SyncTest(SINGLE_CLIENT) {
@@ -687,7 +674,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientFeatureToTransportSyncTest,
           ? 0
           : 1);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class SingleClientPolicySyncTest
     : public SyncTest,
@@ -771,7 +757,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPolicySyncTest,
 
 // Regression test for crbug.com/415728693.
 // EnterSyncPausedStateForPrimaryAccount() is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientPolicySyncTest,
                        ApplySyncDisabledPolicyWhileSyncPaused) {
   ASSERT_TRUE(SetupSync());
@@ -803,17 +788,14 @@ IN_PROC_BROWSER_TEST_P(SingleClientPolicySyncTest,
                                            syncer::PRIORITY_PREFERENCES),
             syncer::UploadState::NOT_ACTIVE);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class SingleClientOldProgressMarkerSyncTest : public SyncTest {
  public:
   SingleClientOldProgressMarkerSyncTest() : SyncTest(SINGLE_CLIENT) {
     features_.InitWithFeatures(
         /*enabled_features=*/{syncer::kReplaceSyncPromosWithSignInPromos,
-#if !BUILDFLAG(IS_ANDROID)
                               syncer::
                                   kReadingListEnableSyncTransportModeUponSignIn,
-#endif  // !BUILDFLAG(IS_ANDROID)
                               switches::kSyncEnableBookmarksInTransportMode},
         /*disabled_features=*/{});
   }
@@ -849,7 +831,6 @@ class SingleClientOldProgressMarkerSyncTest : public SyncTest {
 // TODO(crbug.com/465115079): Enable on Android once PRE_ tests are fully
 // supported (currently flakily fails with "Installing ParallelExecutionFence is
 // slow", pointing to tasks posted from sync_scheduler_impl.cc).
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
                        PRE_OldProgressMarker) {
   ASSERT_TRUE(SetupSyncWithMode(SetupSyncMode::kSyncTransportOnly));
@@ -952,6 +933,5 @@ IN_PROC_BROWSER_TEST_F(SingleClientOldProgressMarkerSyncTest,
       ElementsAre(base::Bucket(
           syncer::DataTypeEntityChange::kRemoteNonInitialUpdate, 2)));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace

@@ -30,17 +30,8 @@
 #if BUILDFLAG(IS_POSIX)
 #include <net/if.h>
 #include <netinet/in.h>
-#if !BUILDFLAG(IS_ANDROID)
 #include <ifaddrs.h>
-#endif  // !BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(IS_POSIX)
-
-#if BUILDFLAG(IS_ANDROID)
-#include <array>
-
-#include "base/time/time.h"
-#include "net/android/network_library.h"
-#endif
 
 namespace net {
 namespace {

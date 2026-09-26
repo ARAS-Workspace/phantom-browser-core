@@ -56,7 +56,7 @@ void InitializeMojoCore() {
   // Note #2: some platforms can directly allocated shared memory in a
   // sandboxed process. The defines below must be in sync with the
   // implementation of mojo::NodeController::CreateSharedBuffer().
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
   if (sandbox::policy::IsUnsandboxedSandboxType(
           sandbox::policy::SandboxTypeFromCommandLine(
               *base::CommandLine::ForCurrentProcess()))) {
@@ -73,7 +73,7 @@ void InitializeMojoCore() {
     // allocate shared memory.
     mojo::SharedMemoryUtils::InstallBaseHooks();
   }
-#endif  // !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_APPLE)
 }
 
 }  // namespace content

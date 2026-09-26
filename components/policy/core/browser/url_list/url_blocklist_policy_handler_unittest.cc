@@ -32,9 +32,7 @@ namespace policy {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 const char kTestDisabledScheme[] = "kTestDisabledScheme";
-#endif
 const char kTestBlocklistValue[] = "kTestBlocklistValue";
 
 }  // namespace
@@ -79,7 +77,6 @@ TEST_F(URLBlocklistPolicyHandlerTest,
   EXPECT_EQ(0U, errors_.size());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(URLBlocklistPolicyHandlerTest,
        CheckPolicySettings_URLBlocklistUnspecified) {
   EXPECT_TRUE(
@@ -96,7 +93,6 @@ TEST_F(URLBlocklistPolicyHandlerTest,
   const std::string actual = errors_.begin()->first;
   EXPECT_EQ(expected, actual);
 }
-#endif
 
 TEST_F(URLBlocklistPolicyHandlerTest,
        CheckPolicySettings_URLBlocklistWrongType) {
@@ -113,7 +109,6 @@ TEST_F(URLBlocklistPolicyHandlerTest, ApplyPolicySettings_NothingSpecified) {
   EXPECT_FALSE(prefs_.GetValue(policy_prefs::kUrlBlocklist, nullptr));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(URLBlocklistPolicyHandlerTest,
        ApplyPolicySettings_DisabledSchemesWrongType) {
   // The policy expects a list. Give it a boolean.
@@ -218,7 +213,6 @@ TEST_F(URLBlocklistPolicyHandlerTest,
   ASSERT_TRUE(out->is_list());
   EXPECT_EQ(max_filters_per_policy + 1, out->GetList().size());
 }
-#endif
 
 TEST_F(URLBlocklistPolicyHandlerTest,
        ApplyPolicySettings_URLBlocklistWrongType) {

@@ -43,14 +43,6 @@ struct TestCase {
 
     // Load the resource assets needed for the autofill code.
     ui::RegisterPathProvider();
-#if BUILDFLAG(IS_ANDROID)
-    // Override DIR_RESOURCE_PAKS_ANDROID to DIR_ASSETS to load files pushed to
-    // the shared public test data directory instead of packaging them in the
-    // APK, saving space and maintaining consistency with other Android fuzzers.
-    base::FilePath assets_dir;
-    base::PathService::Get(base::DIR_ASSETS, &assets_dir);
-    base::PathService::Override(ui::DIR_RESOURCE_PAKS_ANDROID, assets_dir);
-#endif
     ui::ResourceBundle::InitSharedInstanceWithPakPath(
         base::PathService::CheckedGet(ui::UI_TEST_PAK));
     ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(

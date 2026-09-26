@@ -78,10 +78,6 @@
 #include "ui/display/screen.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error This file should only be included on desktop.
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
 #endif

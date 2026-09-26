@@ -17,7 +17,6 @@
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 bool HasFontWithName(const base::ListValue& list,
                      std::string_view expected_font_id,
                      std::string_view expected_display_name) {
@@ -31,11 +30,9 @@ bool HasFontWithName(const base::ListValue& list,
 
   return false;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 // GetFontList is not implemented on Android and Fuchsia.
 TEST(FontList, GetFontList) {
   base::test::TaskEnvironment task_environment;
@@ -52,7 +49,6 @@ TEST(FontList, GetFontList) {
       }));
   task_environment.RunUntilIdle();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 // On some macOS versions, CTFontManager returns LastResort and/or hidden fonts.

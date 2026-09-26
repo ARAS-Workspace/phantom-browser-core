@@ -32,13 +32,11 @@
 #include "net/net_buildflags.h"
 #include "ui/base/ui_base_features.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 // This causes a gn error on Android builds, because gn does not understand
 // buildflags, so we include it only on platforms where it is used.
 #include "chrome/browser/ui/omnibox/omnibox_everywhere/omnibox_everywhere_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/tabs/tab_drag_api/desktop_tab_drag_impl/tab_drag_session_desktop_injector.h"
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // This causes a gn error on Android builds, because gn does not understand
@@ -49,13 +47,11 @@
 #include "components/user_education/common/user_education_features.h"  // nogncheck
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/lifetime/smart_restart_manager.h"
 #include "chrome/browser/lifetime/smart_restart_metrics_observer.h"
 #include "chrome/browser/ui/startup/profile_launch_observer.h"
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
 #include "chrome/common/chrome_features.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
 #include "chrome/browser/signin/bound_session_credentials/unexportable_key_obsolete_profile_garbage_collector.h"  // nogncheck
@@ -102,12 +98,10 @@ void GlobalFeatures::PostBrowserProcessInit() {
 
   PostBrowserProcessInitCore();
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(omnibox::kOmniboxEverywhere)) {
     omnibox_everywhere_controller_ =
         std::make_unique<omnibox_everywhere::OmniboxEverywhereController>();
   }
-#endif
 
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
   if (unexportable_keys::UnexportableKeyServiceImpl::
@@ -129,7 +123,6 @@ void GlobalFeatures::PostBrowserProcessInit() {
       on_device_translation::OnDeviceTranslationInstallerImpl>();
 #endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
-#if !BUILDFLAG(IS_ANDROID)
   profile_launch_observer_ = std::make_unique<ProfileLaunchObserver>();
 
   if (base::FeatureList::IsEnabled(features::kSmartRestartMetrics)) {
@@ -143,22 +136,17 @@ void GlobalFeatures::PostBrowserProcessInit() {
         std::make_unique<smart_restart::SmartRestartManager>(
             UpgradeDetector::GetInstance());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
   tab_drag_session_manager_ = std::make_unique<tabs_api::TabDragSessionManager>(
       std::make_unique<tabs_api::TabDragSessionDesktopInjector>());
-#endif
 }
 
 void GlobalFeatures::PostBrowserProcessInitCore() {
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(infobars::kCentralizedInfoBarFramework)) {
     browser_infobar_manager_ =
         GetUserDataFactory().CreateInstance<infobars::BrowserInfoBarManager>(
             *g_browser_process, g_browser_process);
   }
-#endif
   system_permissions_platform_handle_ = CreateSystemPermissionsPlatformHandle();
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/463742800): Migrate WhatsNewRegistry (and other non-core
@@ -206,15 +194,11 @@ void GlobalFeatures::PreMainMessageLoopRun() {
 }
 
 void GlobalFeatures::PostMainMessageLoopRun() {
-#if !BUILDFLAG(IS_ANDROID)
   smart_restart_manager_.reset();
   smart_restart_metrics_observer_.reset();
   profile_launch_observer_.reset();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
   omnibox_everywhere_controller_.reset();
-#endif
   audio_process_ml_model_forwarder_.reset();
   optimization_guide_global_feature_.reset();
 

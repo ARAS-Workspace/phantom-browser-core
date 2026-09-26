@@ -106,9 +106,6 @@ std::u16string ExpectedAuthority(bool is_proxy, const char* prefix) {
   // Proxies and Android have additional surrounding text. Otherwise, only the
   // host URL is shown.
   bool extra_text = is_proxy;
-#if BUILDFLAG(IS_ANDROID)
-  extra_text = true;
-#endif
   if (extra_text) {
     str += u" requires a username and password.";
   }

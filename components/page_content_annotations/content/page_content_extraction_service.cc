@@ -75,18 +75,6 @@ optimization_guide::proto::PageContext ToPageContext(
 bool IsPageContentCacheEnabled(feature_engagement::Tracker* tracker) {
   bool enabled = base::FeatureList::IsEnabled(features::kPageContentCache);
 
-#if BUILDFLAG(IS_ANDROID)
-  if (enabled && features::kPageContentCacheUseUserEngagement.Get()) {
-    if (!tracker) {
-      return false;
-    }
-    // If user engagement is required, and user has not engaged with the
-    // feature. Turn off the feature. This is currently only used on Android.
-    return tracker->WouldTriggerHelpUI(
-        feature_engagement::kIPHFuseboxAttachmentFeature);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   return enabled;
 }
 

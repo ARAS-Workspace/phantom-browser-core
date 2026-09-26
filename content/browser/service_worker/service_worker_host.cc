@@ -144,14 +144,12 @@ void ServiceWorkerHost::GetSandboxedFileSystemForBucket(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ServiceWorkerHost::BindHidService(
     mojo::PendingReceiver<blink::mojom::HidService> receiver) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   version_->embedded_worker()->BindHidService(version_->key().origin(),
                                               std::move(receiver));
 }
-#endif
 
 void ServiceWorkerHost::BindUsbService(
     mojo::PendingReceiver<blink::mojom::WebUsbService> receiver) {

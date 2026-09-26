@@ -76,10 +76,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/radio_utils.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace network {
 namespace {
 

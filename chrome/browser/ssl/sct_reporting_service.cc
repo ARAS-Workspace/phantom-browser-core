@@ -216,10 +216,8 @@ SCTReportingService::~SCTReportingService() = default;
 
 network::mojom::SCTAuditingMode SCTReportingService::GetReportingMode() {
   bool is_sct_auditing_enabled = false;
-#if !BUILDFLAG(IS_ANDROID)
   is_sct_auditing_enabled =
       SystemNetworkContextManager::IsCertificateTransparencyEnabled();
-#endif
   if (profile_->IsOffTheRecord() || !is_sct_auditing_enabled) {
     return network::mojom::SCTAuditingMode::kDisabled;
   }

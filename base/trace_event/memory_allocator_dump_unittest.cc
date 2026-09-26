@@ -151,7 +151,7 @@ TEST(MemoryAllocatorDumpTest, MovingAnEntry) {
 }
 
 // DEATH tests are not supported in Android.
-#if !defined(NDEBUG) && !BUILDFLAG(IS_ANDROID)
+#if !defined(NDEBUG)
 TEST(MemoryAllocatorDumpTest, ForbidDuplicatesDeathTest) {
   FakeMemoryAllocatorDumpProvider fmadp;
   MemoryDumpArgs dump_args = {MemoryDumpLevelOfDetail::kDetailed};

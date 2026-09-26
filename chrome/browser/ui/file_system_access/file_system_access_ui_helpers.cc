@@ -33,11 +33,6 @@ constexpr int kAvailablePixelWidthDenominator = 6;
 
 base::FilePath GetPathForDisplayAsPath(const content::PathInfo& path_info) {
   // Use display_name for android content-URIs.
-#if BUILDFLAG(IS_ANDROID)
-  if (path_info.path.IsContentUri()) {
-    return base::FilePath(path_info.display_name);
-  }
-#endif
 
   // Display the drive letter if the path is the root of the filesystem.
   auto dir_name = path_info.path.DirName();

@@ -15,9 +15,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/gfx/native_ui_types.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/window_android.h"
-#endif
 
 namespace {
 constexpr base::TimeDelta kAuthValidityPeriod = base::Seconds(60);
@@ -37,9 +34,6 @@ class ChromeDeviceAuthenticatorFactoryTest : public testing::Test {
     profile_ptr1_ = profile_manager_.CreateTestingProfile("test_profile1");
     profile_ptr2_ = profile_manager_.CreateTestingProfile("test_profile2");
     guest_profile_ptr_ = profile_manager_.CreateGuestProfile();
-#if BUILDFLAG(IS_ANDROID)
-    window_ = scoped_window_->get();
-#endif
   }
 
   void TearDown() override {
@@ -74,11 +68,6 @@ class ChromeDeviceAuthenticatorFactoryTest : public testing::Test {
   raw_ptr<TestingProfile> profile_ptr2_;
   raw_ptr<TestingProfile> guest_profile_ptr_;
   gfx::NativeWindow window_;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<ui::WindowAndroid::ScopedWindowAndroidForTesting>
-      scoped_window_ = ui::WindowAndroid::CreateForTesting();
-#endif
 };
 
 // Checks if user can perform an operation without reauthenticating during

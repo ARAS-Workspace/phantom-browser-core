@@ -40,15 +40,13 @@ MostVisitedPrefObserver::MostVisitedPrefObserver(Profile* profile,
       base::BindRepeating(
           &MostVisitedPrefObserver::OnTilesVisibilityPrefChanged,
           base::Unretained(this)));
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   pref_change_registrar_.Add(
       ntp_tiles::prefs::kEnterpriseShortcutsPolicyList,
       base::BindRepeating(
           &MostVisitedPrefObserver::OnEnterpriseShortcutsPolicyChanged,
           base::Unretained(this)));
   MaybeEnableEnterpriseShortcutsVisibility();
-#endif
 
   UpdateMostVisitedTileTypes();
   handler_->SetShortcutsVisible(IsShortcutsVisible());
@@ -171,8 +169,7 @@ void MostVisitedPrefObserver::OnEnterpriseShortcutsPolicyChanged() {
 }
 
 void MostVisitedPrefObserver::MaybeEnableEnterpriseShortcutsVisibility() {
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   // If enterprise shortcuts are available by policy and the user
   // has not previously set the visibility preference, then enable enterprise
   // shortcuts by default.
@@ -184,5 +181,4 @@ void MostVisitedPrefObserver::MaybeEnableEnterpriseShortcutsVisibility() {
     profile_->GetPrefs()->SetBoolean(ntp_prefs::kNtpEnterpriseShortcutsVisible,
                                      true);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

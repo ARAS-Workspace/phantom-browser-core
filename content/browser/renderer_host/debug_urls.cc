@@ -153,11 +153,7 @@ bool IsDebugURL(const GURL& url) {
       url == blink::kChromeUIBrowserUIHang ||
       url == blink::kChromeUIDelayedBrowserUIHang ||
       url == blink::kChromeUIGpuCleanURL ||
-      url == blink::kChromeUIGpuCrashURL ||
-#if BUILDFLAG(IS_ANDROID)
-      url == blink::kChromeUIGpuJavaCrashURL ||
-#endif
-      url == blink::kChromeUIGpuHangURL ||
+      url == blink::kChromeUIGpuCrashURL || url == blink::kChromeUIGpuHangURL ||
       url == blink::kChromeUIMemoryPressureCriticalURL ||
       url == blink::kChromeUIMemoryPressureModerateURL) {
     return true;
@@ -223,15 +219,6 @@ void HandleDebugURL(const GURL& url,
     }
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (url == blink::kChromeUIGpuJavaCrashURL) {
-    auto* host = GpuProcessHost::Get();
-    if (host) {
-      host->gpu_service()->ThrowJavaException();
-    }
-    return;
-  }
-#endif
   if (url == blink::kChromeUIGpuHangURL) {
     auto* host = GpuProcessHost::Get();
     if (host) {

@@ -66,58 +66,6 @@ class GpuChannelManagerTest : public GpuChannelTestCommon {
         id, old_size, new_size, GpuPeakMemoryAllocationSource::UNKNOWN);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  void TestApplicationBackgrounded(ContextType type,
-                                   bool should_destroy_channel) {
-    ASSERT_TRUE(channel_manager());
-
-    int32_t kClientId = 1;
-    GpuChannel* channel = CreateChannel(kClientId, true);
-    EXPECT_TRUE(channel);
-
-    auto attribs = mojom::GLESCreationAttribs::New();
-    attribs->context_type = type;
-
-    int32_t kRouteId =
-        static_cast<int32_t>(GpuChannelReservedRoutes::kMaxValue) + 1;
-    auto init_params = mojom::CreateCommandBufferParams::New();
-    init_params->stream_id = 0;
-    init_params->stream_priority = SchedulingPriority::kNormal;
-    init_params->attribs =
-        mojom::ContextCreationAttribs::NewGles(std::move(attribs));
-    init_params->active_url = GURL();
-
-    ContextResult result = ContextResult::kFatalFailure;
-    Capabilities capabilities;
-    GLCapabilities gl_capabilities;
-    CreateCommandBuffer(*channel, std::move(init_params), kRouteId,
-                        GetSharedMemoryRegion(), &result, &capabilities,
-                        &gl_capabilities);
-    EXPECT_EQ(result, ContextResult::kSuccess);
-
-    auto raster_decoder_state =
-        channel_manager()->GetSharedContextState(&result);
-    EXPECT_EQ(result, ContextResult::kSuccess);
-    ASSERT_TRUE(raster_decoder_state);
-
-    CommandBufferStub* stub = channel->LookupCommandBuffer(kRouteId);
-    EXPECT_TRUE(stub);
-
-    channel_manager()->OnBackgroundCleanup();
-
-    channel = channel_manager()->LookupChannel(kClientId);
-    if (should_destroy_channel) {
-      EXPECT_FALSE(channel);
-    } else {
-      EXPECT_TRUE(channel);
-    }
-
-    // We should always clear the shared raster state on background cleanup.
-    ASSERT_NE(channel_manager()->GetSharedContextState(&result).get(),
-              raster_decoder_state.get());
-  }
-#endif
-
  private:
   ::base::test::TracingEnvironment tracing_environment_;
 };
@@ -133,17 +81,6 @@ TEST_F(GpuChannelManagerTest, EstablishChannel) {
   EXPECT_TRUE(channel);
   EXPECT_EQ(channel_manager()->LookupChannel(kClientId), channel);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(GpuChannelManagerTest, OnBackgroundedWithoutWebGL) {
-  TestApplicationBackgrounded(CONTEXT_TYPE_OPENGLES2, true);
-}
-
-TEST_F(GpuChannelManagerTest, OnBackgroundedWithWebGL) {
-  TestApplicationBackgrounded(CONTEXT_TYPE_WEBGL2, false);
-}
-
-#endif
 
 // Tests that peak memory usage is only reported for valid sequence numbers,
 // and that polling shuts down the monitoring.

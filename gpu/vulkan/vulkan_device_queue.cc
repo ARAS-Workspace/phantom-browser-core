@@ -45,29 +45,6 @@ VkDeviceSize GetPreferredVMALargeHeapBlockSize() {
   return kVulkanVMALargeHeapBlockSize;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-class VulkanMetric final
-    : public base::android::PreFreezeBackgroundMemoryTrimmer::PreFreezeMetric {
- public:
-  explicit VulkanMetric(VmaAllocator vma_allocator)
-      : PreFreezeMetric("Vulkan"), vma_allocator_(vma_allocator) {
-    base::android::PreFreezeBackgroundMemoryTrimmer::RegisterMemoryMetric(this);
-  }
-
-  ~VulkanMetric() override {
-    base::android::PreFreezeBackgroundMemoryTrimmer::UnregisterMemoryMetric(
-        this);
-  }
-
- private:
-  std::optional<base::ByteSize> Measure() const override {
-    auto allocated_used = vma::GetTotalAllocatedAndUsedMemory(vma_allocator_);
-    return base::ByteSize(allocated_used.first);
-  }
-  VmaAllocator vma_allocator_;
-};
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // anonymous namespace
 
 VulkanDeviceQueue::VulkanDeviceQueue(VkInstance vk_instance)
@@ -284,7 +261,7 @@ bool VulkanDeviceQueue::Initialize(
   enabled_device_features_2_ = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
 
   // Android, Fuchsia, Linux (VaapiVideoDecoder) need YCbCr sampler support.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (!physical_device_info.feature_sampler_ycbcr_conversion) {
     LOG(ERROR) << "samplerYcbcrConversion is not supported.";
     return false;
@@ -297,7 +274,7 @@ bool VulkanDeviceQueue::Initialize(
   // of VkPhysicalDeviceFeatures2 to enable YCbCr sampler support.
   sampler_ycbcr_conversion_features_.pNext = enabled_device_features_2_.pNext;
   enabled_device_features_2_.pNext = &sampler_ycbcr_conversion_features_;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   if (allow_protected_memory) {
     if (!physical_device_info.feature_protected_memory) {
@@ -387,12 +364,6 @@ bool VulkanDeviceQueue::Initialize(
 
   allow_protected_memory_ = allow_protected_memory;
 
-#if BUILDFLAG(IS_ANDROID)
-  if (!metric_) {
-    metric_ = std::make_unique<VulkanMetric>(vma_allocator());
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   if (base::SingleThreadTaskRunner::HasCurrentDefault()) {
     base::trace_event::MemoryDumpManager::GetInstance()->RegisterDumpProvider(
         this, "vulkan", base::SingleThreadTaskRunner::GetCurrentDefault());
@@ -426,11 +397,6 @@ bool VulkanDeviceQueue::InitCommon(VkPhysicalDevice vk_physical_device,
         /*heap_size_limit=*/nullptr,
         /*is_thread_safe =*/is_thread_safe, &owned_vma_allocator_);
     vma_allocator_ = owned_vma_allocator_;
-#if BUILDFLAG(IS_ANDROID)
-    if (!metric_) {
-      metric_ = std::make_unique<VulkanMetric>(vma_allocator());
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   skia_vk_memory_allocator_ =
@@ -539,9 +505,6 @@ bool VulkanDeviceQueue::InitializeForCompositorGpuThread(
 void VulkanDeviceQueue::Destroy() {
   base::trace_event::MemoryDumpManager::GetInstance()->UnregisterDumpProvider(
       this);
-#if BUILDFLAG(IS_ANDROID)
-  metric_ = nullptr;
-#endif
 
   if (cleanup_helper_) {
     cleanup_helper_->Destroy();

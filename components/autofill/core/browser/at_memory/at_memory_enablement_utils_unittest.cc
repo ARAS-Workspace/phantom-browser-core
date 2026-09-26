@@ -416,56 +416,6 @@ TEST_F(AtMemoryEnablementUtilsTest,
       autofill_client().GetLastCommittedPrimaryMainFrameURL()));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Tests that a user is eligible for AtMemory if their device is a premium
-// Android device, even if their subscription tier is not eligible.
-TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_DeviceEligible) {
-  EXPECT_CALL(personal_context_service_, GetEligibilityState)
-      .WillRepeatedly(
-          Return(personal_context::PersonalContextEligibilityState::kEligible));
-
-  const std::string actual_model_name = base::SysInfo::HardwareModelName();
-
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeatureWithParameters(
-      features::kAutofillAtMemory,
-      {{"at_memory_eligible_tiers", "2"},
-       {"at_memory_enabled_devices",
-        "some-other-device," + actual_model_name}});
-
-  // User is not in the correct subscription tier, but the device is eligible.
-  autofill_client().GetPrefs()->SetInteger(
-      subscription_eligibility::prefs::kAiSubscriptionTier, 1);
-
-  EXPECT_TRUE(MayPerformAtMemoryAction(
-      AtMemoryAction::kTriggerSearchUI, autofill_client(),
-      autofill_client().GetLastCommittedPrimaryMainFrameURL()));
-}
-
-// Tests that a user is NOT eligible for AtMemory if their device is not listed
-// in the enabled devices list and their subscription tier is also not eligible.
-TEST_F(AtMemoryEnablementUtilsTest,
-       MayPerformAtMemoryAction_DeviceNotEligible) {
-  EXPECT_CALL(personal_context_service_, GetEligibilityState)
-      .WillRepeatedly(
-          Return(personal_context::PersonalContextEligibilityState::kEligible));
-
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeatureWithParameters(
-      features::kAutofillAtMemory,
-      {{"at_memory_eligible_tiers", "2"},
-       {"at_memory_enabled_devices", "some-other-device,another-device"}});
-
-  // Neither user subscription tier nor device is eligible.
-  autofill_client().GetPrefs()->SetInteger(
-      subscription_eligibility::prefs::kAiSubscriptionTier, 1);
-
-  EXPECT_FALSE(MayPerformAtMemoryAction(
-      AtMemoryAction::kTriggerSearchUI, autofill_client(),
-      autofill_client().GetLastCommittedPrimaryMainFrameURL()));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Tests that `MayPerformAtMemoryAction` returns false when the domain is
 // blocklisted by the optimization guide.
 TEST_F(AtMemoryEnablementUtilsTest,

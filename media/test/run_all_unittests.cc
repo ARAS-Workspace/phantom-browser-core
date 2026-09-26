@@ -12,11 +12,6 @@
 #include "media/base/media_switches.h"
 #include "mojo/core/embedder/embedder.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "media/base/android/media_codec_bridge_impl.h"
-#include "media/base/android/media_codec_util.h"
-#endif
-
 class TestSuiteNoAtExit : public base::TestSuite {
  public:
   TestSuiteNoAtExit(int argc, char** argv) : TestSuite(argc, argv) {}
@@ -32,10 +27,6 @@ class TestSuiteNoAtExit : public base::TestSuite {
 void TestSuiteNoAtExit::Initialize() {
   // Run TestSuite::Initialize first so that logging is initialized.
   base::TestSuite::Initialize();
-
-#if BUILDFLAG(IS_ANDROID)
-  media::MediaCodecBridgeImpl::SetupCallbackHandlerForTesting();
-#endif
 
   // Run this here instead of main() to ensure an AtExitManager is already
   // present.

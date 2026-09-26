@@ -10,24 +10,8 @@
 
 namespace webauthn::features {
 
-#if BUILDFLAG(IS_ANDROID)
-// Development flag. Not supposed to be enabled by default.
-BASE_FEATURE(kWebAuthnAndroidCredManForDev, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Parameter for `kWebAuthnAndroidCredManForDev` to specify the mode.
-// Can be "full" or "parallel".
-const base::FeatureParam<std::string> kWebAuthnAndroidCredManForDevMode{
-    &kWebAuthnAndroidCredManForDev, "mode", ""};
-
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
-
 // Not yet enabled by default.
 BASE_FEATURE(kDeleteOldHiddenPasskeys, base::FEATURE_DISABLED_BY_DEFAULT);
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enabled by default in M152. Remove in or after M155.
 BASE_FEATURE(kRejectRpIdsInsideCallersPublicSuffix,

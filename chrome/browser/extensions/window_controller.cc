@@ -73,11 +73,9 @@ BrowserWindowInterface* WindowController::GetBrowserWindowInterface() {
   return nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 BrowserWindowInterface* WindowController::GetBrowser() const {
   return nullptr;
 }
-#endif
 
 bool WindowController::MatchesFilter(TypeFilter filter) const {
   TypeFilter type = 1 << std::to_underlying(

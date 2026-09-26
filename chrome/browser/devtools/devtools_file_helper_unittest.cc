@@ -251,57 +251,6 @@ TEST_F(DevToolsFileHelperTest, Append) {
   EXPECT_EQ(base::ReadFileToBytes(tf.path()), data);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(DevToolsFileHelperTest, SaveToFileContentUri) {
-  base::ScopedTempFile tf;
-  ASSERT_TRUE(tf.Create());
-  const std::vector<uint8_t> data{'s', 'o', 'm', 'e', ' ', 't', 'e', 'x', 't'};
-
-  base::FilePath content_uri =
-      *base::test::android::GetContentUriFromCacheDirFilePath(tf.path());
-
-  ui::SelectedFileInfo file_info(content_uri);
-  file_info.display_name = "test.txt";
-
-  base::RunLoop run_loop;
-  file_helper()->Save(
-      "https://example.com/test.txt", "some text",
-      /* save_as */ true,
-      /* is_base64 */ false, FakeSelectFileCallback(file_info),
-      base::BindLambdaForTesting([&](const std::string&) { run_loop.Quit(); }),
-      base::DoNothing());
-  run_loop.Run();
-
-  EXPECT_EQ(base::ReadFileToBytes(tf.path()), data);
-}
-
-TEST_F(DevToolsFileHelperTest, AppendContentUri) {
-  base::ScopedTempFile tf;
-  ASSERT_TRUE(tf.Create());
-  const std::vector<uint8_t> data{'s', 'o', 'm', 'e', ' ', 't', 'e', 'x', 't'};
-
-  base::FilePath content_uri =
-      *base::test::android::GetContentUriFromCacheDirFilePath(tf.path());
-
-  ui::SelectedFileInfo file_info(content_uri);
-  file_info.display_name = "test.txt";
-
-  base::test::TestFuture<const std::string&> future1;
-  file_helper()->Save("https://example.com/test.txt", "some",
-                      /* save_as */ true,
-                      /* is_base64 */ false, FakeSelectFileCallback(file_info),
-                      future1.GetCallback(), base::DoNothing());
-  EXPECT_TRUE(future1.Wait());
-
-  base::test::TestFuture<void> future2;
-  file_helper()->Append("https://example.com/test.txt", " text",
-                        future2.GetCallback());
-  EXPECT_TRUE(future2.Wait());
-
-  EXPECT_EQ(base::ReadFileToBytes(tf.path()), data);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_F(DevToolsFileHelperTest, AddFileSystemWithIllegalTypeAutomatic) {
   EXPECT_CALL(delegate(), FileSystemAdded("<illegal type>", IsNull()));
 

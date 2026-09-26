@@ -145,11 +145,11 @@ uint32_t FakePeripheral::GetBluetoothClass() const {
   NOTREACHED();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 device::BluetoothTransport FakePeripheral::GetType() const {
   NOTREACHED();
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 std::string FakePeripheral::GetIdentifier() const {
   NOTREACHED();

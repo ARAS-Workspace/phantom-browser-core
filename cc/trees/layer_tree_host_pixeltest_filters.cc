@@ -15,8 +15,6 @@
 #include "cc/test/pixel_comparator.h"
 #include "cc/test/solid_color_content_layer_client.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace cc {
 namespace {
 
@@ -1402,5 +1400,3 @@ TEST_P(MixedFilterZoomAndOffsetTest, HiDpi) {
 
 }  // namespace
 }  // namespace cc
-
-#endif  // BUILDFLAG(IS_ANDROID)

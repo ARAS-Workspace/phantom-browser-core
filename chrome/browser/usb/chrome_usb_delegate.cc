@@ -50,7 +50,6 @@ UsbChooserContext* GetChooserContext(content::BrowserContext* browser_context) {
   return profile ? UsbChooserContextFactory::GetForProfile(profile) : nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 UsbConnectionTracker* GetConnectionTracker(
     content::BrowserContext* browser_context,
     bool create) {
@@ -60,7 +59,6 @@ UsbConnectionTracker* GetConnectionTracker(
   return profile ? UsbConnectionTrackerFactory::GetForProfile(profile, create)
                  : nullptr;
 }
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 // These extensions can claim the smart card USB class and automatically gain
@@ -364,9 +362,8 @@ bool ChromeUsbDelegate::IsServiceWorkerAllowedForOrigin(
 void ChromeUsbDelegate::IncrementConnectionCount(
     content::BrowserContext* browser_context,
     const url::Origin& origin) {
-// Don't track connection when the feature isn't enabled or the connection
-// isn't made by an extension origin.
-#if !BUILDFLAG(IS_ANDROID)
+  // Don't track connection when the feature isn't enabled or the connection
+  // isn't made by an extension origin.
   if (origin.scheme() != extensions::kExtensionScheme) {
     return;
   }
@@ -376,7 +373,6 @@ void ChromeUsbDelegate::IncrementConnectionCount(
   if (usb_connection_tracker) {
     usb_connection_tracker->IncrementConnectionCount(origin);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeUsbDelegate::DecrementConnectionCount(
@@ -384,7 +380,6 @@ void ChromeUsbDelegate::DecrementConnectionCount(
     const url::Origin& origin) {
   // Don't track connection when the feature isn't enabled or the connection
   // isn't made by an extension origin.
-#if !BUILDFLAG(IS_ANDROID)
   if (origin.scheme() != extensions::kExtensionScheme) {
     return;
   }
@@ -393,5 +388,4 @@ void ChromeUsbDelegate::DecrementConnectionCount(
   if (usb_connection_tracker) {
     usb_connection_tracker->DecrementConnectionCount(origin);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

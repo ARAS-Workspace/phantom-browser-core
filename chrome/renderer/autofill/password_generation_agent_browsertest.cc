@@ -185,7 +185,6 @@ constexpr char kAccountCreationNoForm[] =
     "<INPUT type = 'button' id = 'dummy'/> "
     "<INPUT type = 'submit' value = 'LOGIN' />";
 
-#if !BUILDFLAG(IS_ANDROID)
 constexpr char kAccountCreationNoIds[] =
     "<FORM action = 'http://www.random.com/pa/th?q=1&p=3#first'> "
     "  <INPUT type = 'text'/> "
@@ -195,7 +194,6 @@ constexpr char kAccountCreationNoIds[] =
     "  <INPUT type = 'button' id = 'dummy'/> "
     "  <INPUT type = 'submit' value = 'LOGIN'/>"
     "</FORM>";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 constexpr char kDisabledElementAccountCreationFormHTML[] =
     "<FORM name = 'blah' action = 'http://www.random.com/'> "
@@ -372,9 +370,7 @@ void PasswordGenerationAgentTest::SetUp() {
 
 void PasswordGenerationAgentTest::TearDown() {
   // Unloading the document may trigger the event.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus()).Times(AtMost(1));
-#endif  // !BUILDFLAG(IS_ANDROID)
   ChromeRenderViewTest::TearDown();
 }
 
@@ -405,11 +401,6 @@ WebInputElement PasswordGenerationAgentTest::GetInputElementById(
 
 void PasswordGenerationAgentTest::FocusField(const char* element_id) {
   ASSERT_TRUE(SimulateElementClick(element_id));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40820173): On Android, the JS above doesn't trigger the
-  // method below.
-  GetMainFrame()->AutofillClient()->DidCompleteFocusChangeInFrame();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PasswordGenerationAgentTest::ExpectAutomaticGenerationAvailable(
@@ -438,9 +429,7 @@ void PasswordGenerationAgentTest::ExpectAutomaticGenerationAvailable(
 
 void PasswordGenerationAgentTest::ExpectGenerationElementLostFocus(
     const char* new_element_id) {
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus());
-#endif  // !BUILDFLAG(IS_ANDROID)
   FocusField(new_element_id);
   base::RunLoop().RunUntilIdle();
   testing::Mock::VerifyAndClearExpectations(&fake_pw_client_);
@@ -448,9 +437,7 @@ void PasswordGenerationAgentTest::ExpectGenerationElementLostFocus(
 
 void PasswordGenerationAgentTest::ExpectEditingPopupOnFieldFocus(
     const char* new_element_id) {
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, ShowPasswordEditingPopup).Times(AtLeast(1));
-#endif  // !BUILDFLAG(IS_ANDROID)
   FocusField(new_element_id);
   base::RunLoop().RunUntilIdle();
   testing::Mock::VerifyAndClearExpectations(&fake_pw_client_);
@@ -783,9 +770,7 @@ TEST_F(PasswordGenerationAgentTest, MaximumCharsForGenerationOffer) {
   ExpectAutomaticGenerationAvailable("first_password", kAvailable);
 
   // Simulate the user typing a character. The popup should disappear.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, PasswordGenerationRejectedByTyping);
-#endif  // !BUILDFLAG(IS_ANDROID)
   WebInputElement first_password_element =
       GetInputElementById("first_password");
   SimulateUserInputChangeForElement(first_password_element, "a");
@@ -810,9 +795,7 @@ TEST_F(PasswordGenerationAgentTest, MaximumCharsForGenerationOffer) {
 
   // Loading a different page triggers UMA stat upload. Verify that only one
   // display event is sent.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus());
-#endif  // !BUILDFLAG(IS_ANDROID)
   LoadHTMLWithUserGesture(kSigninFormHTML);
   fake_pw_client_.Flush();
 
@@ -937,7 +920,6 @@ TEST_F(PasswordGenerationAgentTest, ChangePasswordFormDetectionTest) {
 }
 
 // These tests are for the right-click menu and it is not applicable to Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordGenerationAgentTest, DesktopContextMenuGenerationInFormTest) {
   LoadHTMLWithUserGesture(kSigninFormHTML);
   WebInputElement first_password_element = GetInputElementById("password");
@@ -1058,8 +1040,6 @@ TEST_F(PasswordGenerationAgentTest,
   EXPECT_TRUE(password_element.IsAutofilled());
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 TEST_F(PasswordGenerationAgentTest, PresavingGeneratedPassword) {
   const struct {
     const char* form;
@@ -1134,9 +1114,7 @@ TEST_F(PasswordGenerationAgentTest, AcceptAfterNavigation) {
 
   // Navigation happens. Then browser UI accepts the generated password. It
   // should not crash.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus());
-#endif  // !BUILDFLAG(IS_ANDROID)
   LoadHTMLWithUserGesture(kSigninFormHTML);
   EXPECT_CALL(fake_pw_client_, PresaveGeneratedPassword).Times(0);
   password_generation_->GeneratedPasswordAccepted(u"random_password");
@@ -1243,9 +1221,7 @@ TEST_F(PasswordGenerationAgentTest, JavascriptClearedThePassword_TypeUsername) {
 
   // Edit some other field.
   EXPECT_CALL(fake_pw_client_, PasswordNoLongerGenerated(testing::_));
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus());
-#endif  // !BUILDFLAG(IS_ANDROID)
   ExecuteJavaScriptForTests(
       "document.getElementById('first_password').value = '';");
   FocusField("username");
@@ -1522,9 +1498,7 @@ TEST_F(PasswordGenerationAgentTest,
   first_password_element.SetSelectionRange(0, password.length());
   fake_pw_client_.Flush();
   testing::Mock::VerifyAndClearExpectations(&fake_pw_client_);
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, PasswordGenerationRejectedByTyping);
-#endif  // !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, PasswordNoLongerGenerated);
   SimulateUserTypingAsciiCharacter('X', /*flush_message_loop=*/true);
 
@@ -1547,9 +1521,7 @@ TEST_F(PasswordGenerationAgentTest,
 
   // Type a character. This should result in popup being hidden and the password
   // field masked.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, PasswordGenerationRejectedByTyping);
-#endif  // !BUILDFLAG(IS_ANDROID)
   SimulateUserTypingAsciiCharacter('X', /*flush_message_loop=*/true);
 
   // First field should contain the typed letter, second field should be empty.
@@ -1620,13 +1592,11 @@ TEST_F(PasswordGenerationAgentReentrantUafTest,
   EXPECT_CALL(fake_pw_client_, AutomaticGenerationAvailable).Times(AnyNumber());
   EXPECT_CALL(fake_pw_client_, PasswordNoLongerGenerated).Times(AnyNumber());
   EXPECT_CALL(fake_pw_client_, PresaveGeneratedPassword).Times(AnyNumber());
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus()).Times(AnyNumber());
   EXPECT_CALL(fake_pw_client_, FrameWasScrolled()).Times(AnyNumber());
   EXPECT_CALL(fake_pw_client_, ShowPasswordEditingPopup).Times(AnyNumber());
   EXPECT_CALL(fake_pw_client_, PasswordGenerationRejectedByTyping())
       .Times(AnyNumber());
-#endif
 
   LoadHTMLWithUserGesture(R"(
     <form id=f1 action=http://www.random.com/a>

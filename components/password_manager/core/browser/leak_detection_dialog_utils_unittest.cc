@@ -17,10 +17,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 using password_manager::CreateLeakType;
 using password_manager::CredentialLeakFlags;
 using password_manager::CredentialLeakType;
@@ -66,44 +62,23 @@ const struct LeakTypeParams {
      {CreateLeakType(IsSaved(true), IsReused(false), IsSyncing(true)), IDS_OK,
       IDS_CLOSE, GetLeakChangePasswordMessage(),
       IDS_CREDENTIAL_LEAK_TITLE_CHANGE, false, false}},
-  kPasswordCheckLeakTypesTestCases[] =
-      {{CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(true)),
-        IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE,
+  kPasswordCheckLeakTypesTestCases[] = {
+      {CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(true)),
+       IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE,
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-        IDS_CREDENTIAL_LEAK_CHANGE_AND_CHECK_PASSWORDS_MESSAGE_GPM_BRANDED,
+       IDS_CREDENTIAL_LEAK_CHANGE_AND_CHECK_PASSWORDS_MESSAGE_GPM_BRANDED,
 #else
-        IDS_CREDENTIAL_LEAK_CHANGE_AND_CHECK_PASSWORDS_MESSAGE_GPM_NON_BRANDED,
+       IDS_CREDENTIAL_LEAK_CHANGE_AND_CHECK_PASSWORDS_MESSAGE_GPM_NON_BRANDED,
 #endif
-        IDS_CREDENTIAL_LEAK_TITLE_CHECK_GPM, true, true},
-       {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)),
-        IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE,
+       IDS_CREDENTIAL_LEAK_TITLE_CHECK_GPM, true, true},
+      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)),
+       IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE,
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-        IDS_CREDENTIAL_LEAK_CHECK_PASSWORDS_MESSAGE_GPM_BRANDED,
+       IDS_CREDENTIAL_LEAK_CHECK_PASSWORDS_MESSAGE_GPM_BRANDED,
 #else
-        IDS_CREDENTIAL_LEAK_CHECK_PASSWORDS_MESSAGE_GPM_NON_BRANDED,
+       IDS_CREDENTIAL_LEAK_CHECK_PASSWORDS_MESSAGE_GPM_NON_BRANDED,
 #endif
-        IDS_CREDENTIAL_LEAK_TITLE_CHECK_GPM, true, true}
-#if BUILDFLAG(IS_ANDROID)
-},
-  kPasswordCheckLeakTypesTestCasesAndroidAutomotive[] = {
-      {CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(true)), IDS_OK,
-       IDS_CLOSE,
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-       IDS_CREDENTIAL_LEAK_CHANGE_PASSWORD_MESSAGE_GPM_BRANDED,
-#else
-       IDS_CREDENTIAL_LEAK_CHANGE_PASSWORD_MESSAGE_GPM_NON_BRANDED,
-#endif
-       IDS_CREDENTIAL_LEAK_TITLE_CHANGE, false, false},
-      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)), IDS_OK,
-       IDS_CLOSE,
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-       IDS_CREDENTIAL_LEAK_CHANGE_PASSWORD_MESSAGE_GPM_BRANDED,
-#else
-       IDS_CREDENTIAL_LEAK_CHANGE_PASSWORD_MESSAGE_GPM_NON_BRANDED,
-#endif
-       IDS_CREDENTIAL_LEAK_TITLE_CHANGE, false, false},
-#endif
-};
+       IDS_CREDENTIAL_LEAK_TITLE_CHECK_GPM, true, true}};
 
 struct BulkCheckParams {
   // Specifies the test case.
@@ -116,18 +91,11 @@ struct BulkCheckParams {
         {CreateLeakType(IsSaved(true), IsReused(false), IsSyncing(false)),
          false},
 },
-  kPasswordCheckBulkCheckTestCases[] =
-      {{CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(false)), true},
-       {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(false)), true},
-       {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)), true}
+  kPasswordCheckBulkCheckTestCases[] = {
+      {CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(false)), true},
+      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(false)), true},
+      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)), true}
 
-#if BUILDFLAG(IS_ANDROID)
-},
-  kPasswordCheckBulkCheckTestCasesAndroidAutomotive[] = {
-      {CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(false)), false},
-      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(false)), false},
-      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)), false}
-#endif
 };
 }  // namespace
 
@@ -137,13 +105,6 @@ class CredentialLeakDialogUtilsTest
   static std::vector<LeakTypeParams> GetTestCases() {
     std::vector<LeakTypeParams> test_cases;
     std::ranges::copy(kLeakTypesTestCases, std::back_inserter(test_cases));
-#if BUILDFLAG(IS_ANDROID)
-    if (base::android::device_info::is_automotive()) {
-      std::ranges::copy(kPasswordCheckLeakTypesTestCasesAndroidAutomotive,
-                        std::back_inserter(test_cases));
-      return test_cases;
-    }
-#endif
     std::ranges::copy(kPasswordCheckLeakTypesTestCases,
                       std::back_inserter(test_cases));
     return test_cases;
@@ -203,13 +164,6 @@ class BulkCheckCredentialLeakDialogUtilsTest
   static std::vector<BulkCheckParams> GetTestCases() {
     std::vector<BulkCheckParams> test_cases;
     std::ranges::copy(kBulkCheckTestCases, std::back_inserter(test_cases));
-#if BUILDFLAG(IS_ANDROID)
-    if (base::android::device_info::is_automotive()) {
-      std::ranges::copy(kPasswordCheckBulkCheckTestCasesAndroidAutomotive,
-                        std::back_inserter(test_cases));
-      return test_cases;
-    }
-#endif
     std::ranges::copy(kPasswordCheckBulkCheckTestCases,
                       std::back_inserter(test_cases));
     return test_cases;
@@ -233,90 +187,4 @@ INSTANTIATE_TEST_SUITE_P(
     BulkCheckCredentialLeakDialogUtilsTest,
     testing::ValuesIn(BulkCheckCredentialLeakDialogUtilsTest::GetTestCases()));
 
-#if BUILDFLAG(IS_ANDROID)
-struct PasswordChangeParams {
-  // Specifies the test case.
-  CredentialLeakType leak_type;
-  // The rest of the fields specify what should be displayed for this test case.
-  int accept_button_id;
-  int cancel_button_id;
-  bool should_show_cancel_button;
-  bool should_show_change_password_button;
-} kPasswordChangeTestCases[] =
-    {{CreateLeakType(IsSaved(false), IsReused(false), IsSyncing(false)), IDS_OK,
-      0, false, false},
-     {CreateLeakType(IsSaved(false), IsReused(false), IsSyncing(true)), IDS_OK,
-      0, false, false},
-     {CreateLeakType(IsSaved(true), IsReused(false), IsSyncing(false)), IDS_OK,
-      0, false, false}},
-  kPasswordChangeTestCasesNonAuto[] =
-      {{CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(false)),
-        IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE, true, false},
-       {CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(true)),
-        IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE, true, false},
-       {CreateLeakType(IsSaved(true), IsReused(false), IsSyncing(true)), IDS_OK,
-        IDS_CLOSE, false, true},
-       {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(false)),
-        IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE, true, false},
-       {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)),
-        IDS_LEAK_CHECK_CREDENTIALS, IDS_CLOSE, true, true}},
-  kPasswordChangeTestCasesAuto[] = {
-      {CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(false)), IDS_OK,
-       0, false, false},
-      {CreateLeakType(IsSaved(false), IsReused(true), IsSyncing(true)), IDS_OK,
-       0, false, false},
-      {CreateLeakType(IsSaved(true), IsReused(false), IsSyncing(true)), IDS_OK,
-       0, false, false},
-      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(false)), IDS_OK,
-       0, false, false},
-      {CreateLeakType(IsSaved(true), IsReused(true), IsSyncing(true)), IDS_OK,
-       0, false, false}};
-
-class PasswordChangeCredentialLeakDialogUtilsTest
-    : public testing::TestWithParam<PasswordChangeParams> {
- public:
-  PasswordChangeCredentialLeakDialogUtilsTest() = default;
-
-  static std::vector<PasswordChangeParams> GetTestCases() {
-    std::vector<PasswordChangeParams> test_cases;
-    std::ranges::copy(kPasswordChangeTestCases, std::back_inserter(test_cases));
-
-    if (base::android::device_info::is_automotive()) {
-      std::ranges::copy(kPasswordChangeTestCasesAuto,
-                        std::back_inserter(test_cases));
-      return test_cases;
-    }
-
-    std::ranges::copy(kPasswordChangeTestCasesNonAuto,
-                      std::back_inserter(test_cases));
-    return test_cases;
-  }
-};
-
-TEST_P(PasswordChangeCredentialLeakDialogUtilsTest, ShouldShowCancelButton) {
-  SCOPED_TRACE(testing::Message() << GetParam().leak_type);
-  EXPECT_EQ(GetParam().should_show_cancel_button,
-            CreateDialogTraits(GetParam().leak_type)->ShouldShowCancelButton());
-}
-
-TEST_P(PasswordChangeCredentialLeakDialogUtilsTest, GetAcceptButtonLabel) {
-  SCOPED_TRACE(testing::Message() << GetParam().leak_type);
-  EXPECT_EQ(l10n_util::GetStringUTF16(GetParam().accept_button_id),
-            CreateDialogTraits(GetParam().leak_type)->GetAcceptButtonLabel());
-}
-
-TEST_P(PasswordChangeCredentialLeakDialogUtilsTest, GetCancelButtonLabel) {
-  SCOPED_TRACE(testing::Message() << GetParam().leak_type);
-  if (GetParam().should_show_cancel_button) {
-    EXPECT_EQ(l10n_util::GetStringUTF16(GetParam().cancel_button_id),
-              CreateDialogTraits(GetParam().leak_type)->GetCancelButtonLabel());
-  }
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    InstantiationName,
-    PasswordChangeCredentialLeakDialogUtilsTest,
-    testing::ValuesIn(
-        PasswordChangeCredentialLeakDialogUtilsTest::GetTestCases()));
-#endif
 }  // namespace password_manager

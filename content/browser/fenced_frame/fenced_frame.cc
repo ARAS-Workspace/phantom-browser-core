@@ -340,21 +340,6 @@ bool FencedFrame::ShouldPreserveAbortedURLs() {
 
 void FencedFrame::UpdateOverridingUserAgent() {}
 
-#if BUILDFLAG(IS_ANDROID)
-
-scoped_refptr<viz::RasterContextProvider>
-FencedFrame::GetRasterContextProvider() {
-  NOTREACHED();
-}
-
-gfx::ColorSpace FencedFrame::GetOutputColorSpace(
-    gfx::ContentColorUsage color_usage,
-    bool needs_alpha) {
-  NOTREACHED();
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void FencedFrame::DidChangeFramePolicy(const blink::FramePolicy& frame_policy) {
   FrameTreeNode* inner_root = frame_tree_->root();
   const blink::FramePolicy& current_frame_policy =

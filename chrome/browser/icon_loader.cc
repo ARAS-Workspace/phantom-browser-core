@@ -31,12 +31,9 @@ IconLoader::IconLoader(const base::FilePath& file_path,
                        base::SelfDeletingPassKey key)
     : base::SelfDeleting(key),
       file_path_(file_path),
-#if !BUILDFLAG(IS_ANDROID)
       icon_size_(size),
-#endif
       scale_(scale),
-      callback_(std::move(callback)) {
-}
+      callback_(std::move(callback)) {}
 
 IconLoader::~IconLoader() = default;
 

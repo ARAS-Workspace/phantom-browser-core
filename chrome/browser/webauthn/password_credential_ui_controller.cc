@@ -4,8 +4,6 @@
 
 #include "chrome/browser/webauthn/password_credential_ui_controller.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 #include <string>
 #include <utility>
 
@@ -138,5 +136,3 @@ RenderFrameHost* PasswordCredentialUIController::GetRenderFrameHost() const {
   CHECK(ret);
   return ret;
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)

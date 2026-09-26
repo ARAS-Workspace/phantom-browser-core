@@ -4,10 +4,6 @@
 
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_client.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/regional_capabilities/regional_capabilities_service_client_android.h"
-#endif
-
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "chrome/browser/regional_capabilities/regional_capabilities_test_environment.h"
@@ -30,15 +26,6 @@ class RegionalCapabilitiesServiceClientTest : public testing::Test {
 
   RegionalCapabilitiesTestEnvironment rcaps_env_;
 };
-
-#if BUILDFLAG(IS_ANDROID)
-// `RegionalCapabilitiesServiceClient` has outstanding Android-specific
-// virtual functions that are not implemented; they are available in the
-// `RegionalCapabilitiesServiceClientAndroid` class. Allows testing common
-// functionality for Android specific and general clients.
-using RegionalCapabilitiesServiceClient =
-    RegionalCapabilitiesServiceClientAndroid;
-#endif
 
 TEST_F(RegionalCapabilitiesServiceClientTest, GetVariationsLatestCountryId) {
   // Set up variations_service::GetLatestCountry().

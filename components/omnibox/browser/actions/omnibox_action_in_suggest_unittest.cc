@@ -307,19 +307,3 @@ TEST_F(OmniboxActionInSuggestTest, ShowAsActionButton) {
     }
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(OmniboxActionInSuggestTest, ShowAsActionButtonForTabSwitch) {
-  TemplateAction template_action;
-  template_action.set_action_type(
-      omnibox::SuggestTemplateInfo_TemplateAction_ActionType_CHROME_TAB_SWITCH);
-  auto action = base::MakeRefCounted<OmniboxActionInSuggest>(
-      std::move(template_action), std::nullopt);
-  auto form_factor = ui::GetDeviceFormFactor();
-  EXPECT_EQ(form_factor == ui::DEVICE_FORM_FACTOR_PHONE ||
-                    form_factor == ui::DEVICE_FORM_FACTOR_FOLDABLE
-                ? ActionPresentationMode::BUTTON
-                : ActionPresentationMode::CHIP,
-            action->presentation_mode_);
-}
-#endif

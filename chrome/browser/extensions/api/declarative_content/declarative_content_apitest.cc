@@ -302,12 +302,10 @@ class DeclarativeContentApiTestWithContextType
       const DeclarativeContentApiTestWithContextType&) = delete;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android only supports service worker.
 INSTANTIATE_TEST_SUITE_P(PersistentBackground,
                          DeclarativeContentApiTestWithContextType,
                          ::testing::Values(ContextType::kPersistentBackground));
-#endif
 // These tests use page_action, which is unavailable in MV3.
 INSTANTIATE_TEST_SUITE_P(ServiceWorker,
                          DeclarativeContentApiTestWithContextType,
@@ -647,14 +645,12 @@ IN_PROC_BROWSER_TEST_P(ParameterizedShowActionDeclarativeContentApiTest,
   EXPECT_FALSE(action->GetIsVisible(tab_id));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // ShowPageAction() is deprecated and isn't tested on Android.
 INSTANTIATE_TEST_SUITE_P(
     LegacyShowActionKey_PB,
     ParameterizedShowActionDeclarativeContentApiTest,
     ::testing::Values(ShowActionParams("ShowPageAction",
                                        ContextType::kPersistentBackground)));
-#endif
 
 INSTANTIATE_TEST_SUITE_P(
     ModernShowActionKey_PB,

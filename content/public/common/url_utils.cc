@@ -92,9 +92,6 @@ bool IsSafeRedirectTarget(const GURL& from_url, const GURL& to_url) {
 #if !defined(CHROMECAST_BUILD)
           url::kDataScheme,
 #endif
-#if BUILDFLAG(IS_ANDROID)
-          url::kContentScheme,
-#endif
       });
   if (HasWebUIScheme(to_url))
     return false;

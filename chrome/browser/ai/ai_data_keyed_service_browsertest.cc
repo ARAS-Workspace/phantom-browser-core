@@ -387,7 +387,6 @@ IN_PROC_BROWSER_TEST_F(AiDataKeyedServiceBrowserTest, SpecifierOff) {
   EXPECT_TRUE(ai_data->history_query_result().empty());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(AiDataKeyedServiceBrowserTest,
                        GetFormDataByFieldGlobalIdForModelPrototyping) {
   // Simulate loading `expected_form`.
@@ -428,7 +427,6 @@ IN_PROC_BROWSER_TEST_F(AiDataKeyedServiceBrowserTest,
   EXPECT_EQ(actual_form.fields(1).field_label(),
             base::UTF16ToUTF8(expected_form.fields()[1].label()));
 }
-#endif
 
 class AiDataKeyedServiceBrowserTestWithBlocklistedExtensions
     : public AiDataKeyedServiceBrowserTest {

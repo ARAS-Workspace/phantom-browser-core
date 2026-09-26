@@ -12,7 +12,6 @@
 
 int main(int argc, const char** argv) {
   content::ContentMainParams params(nullptr);
-#if !BUILDFLAG(IS_ANDROID)
   params.argc = argc;
   params.argv = argv;
 #if BUILDFLAG(IS_MAC)
@@ -23,7 +22,6 @@ int main(int argc, const char** argv) {
     CHECK(seatbelt.server->InitializeSandbox());
   }
 #endif  // BUILDFLAG(IS_MAC)
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return headless::HeadlessShellMain(std::move(params));
 }

@@ -161,8 +161,6 @@ class AfterStartupTaskTest : public testing::Test {
   }
 };
 
-#if !BUILDFLAG(IS_ANDROID)
-
 // Arbitrary, since this uses a mock clock, as long as it's less than the
 // kStartupDelayFailsafeTimeout feature param.
 constexpr base::TimeDelta kVisibleTabTimeout = base::Seconds(5);
@@ -317,8 +315,6 @@ INSTANTIATE_TEST_SUITE_P(
         StartupObserverFeatureParams::kFeatureEnabledWaitForLoad,
         StartupObserverFeatureParams::kFeatureEnabledWaitForLoadOrTimeout));
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 
 TEST_F(AfterStartupTaskTest, IsStartupComplete) {
@@ -387,8 +383,6 @@ TEST_F(AfterStartupTaskTest, PostTask) {
   EXPECT_EQ(2, background_sequence_->ran_task_count());
   EXPECT_EQ(2, ui_thread_->ran_task_count());
 }
-
-#if !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AfterStartupTaskTest, StartupInProgressRef_NoRefs) {
   base::HistogramTester histogram_tester;
@@ -671,5 +665,3 @@ TEST_P(StartupObserverTest, PageBecomesTabAfterStart) {
   page_node->SetLoadingState(PageNode::LoadingState::kLoadedIdle);
   ExpectVisiblePageLoaded();
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)

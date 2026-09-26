@@ -15,10 +15,10 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "base/test/scoped_feature_list.h"
 #include "services/device/public/cpp/device_features.h"
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace device {
 
@@ -29,10 +29,10 @@ class MockBlockingTaskRunnerHelper
     ON_CALL(*this, ClaimInterface).WillByDefault(testing::Return(true));
     ON_CALL(*this, ReleaseInterface).WillByDefault(testing::Return(true));
     ON_CALL(*this, SetInterface).WillByDefault(testing::Return(true));
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     ON_CALL(*this, DetachInterface).WillByDefault(testing::Return(true));
     ON_CALL(*this, ReattachInterface).WillByDefault(testing::Return(true));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
   }
   ~MockBlockingTaskRunnerHelper() override = default;
 
@@ -46,13 +46,13 @@ class MockBlockingTaskRunnerHelper
   MOCK_METHOD(bool, ClaimInterface, (int), (override));
   MOCK_METHOD(bool, ReleaseInterface, (int), (override));
   MOCK_METHOD(bool, SetInterface, (int, int), (override));
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   MOCK_METHOD(bool,
               DetachInterface,
               (int, const CombinedInterfaceInfo& interfaceInfo),
               (override));
   MOCK_METHOD(bool, ReattachInterface, (int), (override));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 };
 
 class UsbDeviceHandleUsbfsTest : public ::testing::Test {
@@ -93,10 +93,10 @@ class UsbDeviceHandleUsbfsTest : public ::testing::Test {
     return handle;
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   base::test::ScopedFeatureList scoped_feature_list_{
       features::kAutomaticUsbDetach};
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
   base::test::TaskEnvironment task_environment_;
   scoped_refptr<MockUsbDevice> usb_device_;
   scoped_refptr<UsbDeviceHandleUsbfs> handle1_;

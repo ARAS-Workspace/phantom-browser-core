@@ -55,15 +55,6 @@ class DateTimeFormatterTest : public testing::Test {
 
       for (const auto& expectation : entry.expectations) {
         std::string locale_str(expectation.locale);
-#if BUILDFLAG(IS_ANDROID)
-        // iOS and some Android ICU data is missing some calendar-specific names
-        // for Persian and Japanese calendars, leading to incorrect formatting
-        // or empty era names.
-        if (locale_str.find("fa") != std::string::npos ||
-            locale_str.find("japanese") != std::string::npos) {
-          continue;
-        }
-#endif
         auto language_tag =
             LanguageTagConverter::GetInstance().FromString(locale_str);
         ASSERT_TRUE(language_tag.has_value())

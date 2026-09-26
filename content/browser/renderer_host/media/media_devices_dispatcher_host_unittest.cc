@@ -1008,7 +1008,6 @@ TEST_P(MediaDevicesDispatcherHostTest, SelectAudioOutputNoFeature) {
   host_->SelectAudioOutput(kDefaultAudioDeviceID, base::DoNothing());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class SelectAudioOutputTest : public MediaDevicesDispatcherHostTest {
  public:
   SelectAudioOutputTest()
@@ -1078,8 +1077,6 @@ TEST_P(SelectAudioOutputTest, SelectAudioOutputSuccess) {
 INSTANTIATE_TEST_SUITE_P(All,
                          SelectAudioOutputTest,
                          testing::Values(std::string(), "https://test.com"));
-
-#endif
 
 INSTANTIATE_TEST_SUITE_P(All,
                          MediaDevicesDispatcherHostTest,

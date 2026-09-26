@@ -90,39 +90,6 @@ void DeviceManagerImpl::GetSecurityKeyDevice(
                            /*allow_unrestricted_control_transfers=*/false);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void DeviceManagerImpl::RefreshDeviceInfo(const std::string& guid,
-                                          RefreshDeviceInfoCallback callback) {
-  scoped_refptr<UsbDevice> device = usb_service_->GetDevice(guid);
-  if (!device) {
-    std::move(callback).Run(nullptr);
-    return;
-  }
-
-  if (device->permission_granted()) {
-    std::move(callback).Run(device->device_info().Clone());
-    return;
-  }
-
-  device->RequestPermission(
-      base::BindOnce(&DeviceManagerImpl::OnPermissionGrantedToRefresh,
-                     weak_factory_.GetWeakPtr(), device, std::move(callback)));
-}
-
-void DeviceManagerImpl::OnPermissionGrantedToRefresh(
-    scoped_refptr<UsbDevice> device,
-    RefreshDeviceInfoCallback callback,
-    bool granted) {
-  DCHECK_EQ(granted, device->permission_granted());
-  if (!device->permission_granted()) {
-    std::move(callback).Run(nullptr);
-    return;
-  }
-
-  std::move(callback).Run(device->device_info().Clone());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void DeviceManagerImpl::SetClient(
     mojo::PendingAssociatedRemote<mojom::UsbDeviceManagerClient> client) {
   DCHECK(client);

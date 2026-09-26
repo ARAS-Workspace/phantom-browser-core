@@ -74,7 +74,6 @@ TEST_F(MediaToolbarButtonContextualMenuTest, ShowMenu) {
 
 // The kMediaRouterShowCastSessionsStartedByOtherDevices pref is not registered
 // on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(MediaToolbarButtonContextualMenuTest, ToggleOtherSessionsItem) {
   PrefService* pref_service = profile()->GetPrefs();
   pref_service->SetBoolean(
@@ -92,7 +91,6 @@ TEST_F(MediaToolbarButtonContextualMenuTest, ToggleOtherSessionsItem) {
   EXPECT_FALSE(pref_service->GetBoolean(
       media_router::prefs::kMediaRouterShowCastSessionsStartedByOtherDevices));
 }
-#endif
 
 TEST_F(MediaToolbarButtonContextualMenuTest,
        DisableOtherSessionsItemWhenPolicyIsTrue) {

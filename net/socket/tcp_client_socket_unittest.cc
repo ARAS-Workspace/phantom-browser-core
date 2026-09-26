@@ -41,9 +41,7 @@
 // This matches logic in tcp_client_socket.cc. Only used once, but defining it
 // in this file instead of just inlining the OS checks where its used makes it
 // more grep-able.
-#if !BUILDFLAG(IS_ANDROID)
 #define TCP_CLIENT_SOCKET_OBSERVES_SUSPEND
-#endif
 
 using net::test::IsError;
 using net::test::IsOk;
@@ -422,114 +420,6 @@ TEST_P(TCPClientSocketTest, MAYBE_TestSocketPerformanceWatcher) {
 
 // On Android, where socket tagging is supported, verify that
 // TCPClientSocket::Tag works as expected.
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(TCPClientSocketTest, Tag) {
-  if (!CanGetTaggedBytes()) {
-    DVLOG(0) << "Skipping test - GetTaggedBytes unsupported.";
-    return;
-  }
-
-  // Start test server.
-  EmbeddedTestServer test_server;
-  test_server.AddDefaultHandlers(base::FilePath());
-  ASSERT_TRUE(test_server.Start());
-
-  AddressList addr_list;
-  ASSERT_TRUE(test_server.GetAddressList(&addr_list));
-  TCPClientSocket s(addr_list, nullptr, nullptr, nullptr, NetLogSource(),
-                    handles::kInvalidNetworkHandle);
-
-  // Verify TCP connect packets are tagged and counted properly.
-  int32_t tag_val1 = 0x12345678;
-  uint64_t old_traffic = GetTaggedBytes(tag_val1);
-  SocketTag tag1(SocketTag::UNSET_UID, tag_val1);
-  s.ApplySocketTag(tag1);
-  TestCompletionCallback connect_callback;
-  int connect_result = s.Connect(connect_callback.callback());
-  EXPECT_THAT(connect_callback.GetResult(connect_result), IsOk());
-  EXPECT_GT(GetTaggedBytes(tag_val1), old_traffic);
-
-  // Verify socket can be retagged with a new value and the current process's
-  // UID.
-  int32_t tag_val2 = 0x87654321;
-  old_traffic = GetTaggedBytes(tag_val2);
-  SocketTag tag2(getuid(), tag_val2);
-  s.ApplySocketTag(tag2);
-  const std::string kRequest1 = "GET / HTTP/1.0";
-  auto write_buffer1 = base::MakeRefCounted<StringIOBuffer>(kRequest1);
-  TestCompletionCallback write_callback1;
-  EXPECT_EQ(s.Write(write_buffer1.get(), write_buffer1->size(),
-                    write_callback1.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-            static_cast<int>(kRequest1.size()));
-  EXPECT_GT(GetTaggedBytes(tag_val2), old_traffic);
-
-  // Verify socket can be retagged with a new value and the current process's
-  // UID.
-  old_traffic = GetTaggedBytes(tag_val1);
-  s.ApplySocketTag(tag1);
-  const std::string kRequest2 = "\n\n";
-  auto write_buffer2 = base::MakeRefCounted<StringIOBuffer>(kRequest2);
-  TestCompletionCallback write_callback2;
-  EXPECT_EQ(s.Write(write_buffer2.get(), write_buffer2->size(),
-                    write_callback2.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-            static_cast<int>(kRequest2.size()));
-  EXPECT_GT(GetTaggedBytes(tag_val1), old_traffic);
-
-  s.Disconnect();
-}
-
-TEST_P(TCPClientSocketTest, TagAfterConnect) {
-  if (!CanGetTaggedBytes()) {
-    DVLOG(0) << "Skipping test - GetTaggedBytes unsupported.";
-    return;
-  }
-
-  // Start test server.
-  EmbeddedTestServer test_server;
-  test_server.AddDefaultHandlers(base::FilePath());
-  ASSERT_TRUE(test_server.Start());
-
-  AddressList addr_list;
-  ASSERT_TRUE(test_server.GetAddressList(&addr_list));
-  TCPClientSocket s(addr_list, nullptr, nullptr, nullptr, NetLogSource(),
-                    handles::kInvalidNetworkHandle);
-
-  // Connect socket.
-  TestCompletionCallback connect_callback;
-  int connect_result = s.Connect(connect_callback.callback());
-  EXPECT_THAT(connect_callback.GetResult(connect_result), IsOk());
-
-  // Verify socket can be tagged with a new value and the current process's
-  // UID.
-  int32_t tag_val2 = 0x87654321;
-  uint64_t old_traffic = GetTaggedBytes(tag_val2);
-  SocketTag tag2(getuid(), tag_val2);
-  s.ApplySocketTag(tag2);
-  const char kRequest1[] = "GET / HTTP/1.0";
-  auto write_buffer1 = base::MakeRefCounted<StringIOBuffer>(kRequest1);
-  TestCompletionCallback write_callback1;
-  EXPECT_EQ(s.Write(write_buffer1.get(), strlen(kRequest1),
-                    write_callback1.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-            static_cast<int>(strlen(kRequest1)));
-  EXPECT_GT(GetTaggedBytes(tag_val2), old_traffic);
-
-  // Verify socket can be retagged with a new value and the current process's
-  // UID.
-  int32_t tag_val1 = 0x12345678;
-  old_traffic = GetTaggedBytes(tag_val1);
-  SocketTag tag1(SocketTag::UNSET_UID, tag_val1);
-  s.ApplySocketTag(tag1);
-  const char kRequest2[] = "\n\n";
-  auto write_buffer2 = base::MakeRefCounted<StringIOBuffer>(kRequest2);
-  TestCompletionCallback write_callback2;
-  EXPECT_EQ(s.Write(write_buffer2.get(), strlen(kRequest2),
-                    write_callback2.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-            static_cast<int>(strlen(kRequest2)));
-  EXPECT_GT(GetTaggedBytes(tag_val1), old_traffic);
-
-  s.Disconnect();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // TCP socket that hangs indefinitely when establishing a connection.
 class NeverConnectingTCPClientSocket : public TCPClientSocket {

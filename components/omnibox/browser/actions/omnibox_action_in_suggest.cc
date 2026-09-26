@@ -12,16 +12,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/android/jni_string.h"
-#include "base/feature_list.h"
-#include "components/omnibox/browser/actions/omnibox_action_factory_android.h"
-#include "components/omnibox/common/omnibox_features.h"
-#include "ui/base/device_form_factor.h"
-#include "url/android/gurl_android.h"
-#endif
-
 namespace {
 // UMA reported Type of ActionInSuggest.
 //
@@ -182,36 +172,9 @@ OmniboxActionInSuggest::OmniboxActionInSuggest(
                         ? ActionPresentationMode::BUTTON
                         : ActionPresentationMode::CHIP),
       template_action{std::move(template_action)},
-      search_terms_args{std::move(search_terms_args)} {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the tab switch action will be treated as chip instead of
-  // button when the feature is enabled on the large form factor.
-  if (this->template_action.action_type() ==
-      omnibox::
-          SuggestTemplateInfo_TemplateAction_ActionType_CHROME_TAB_SWITCH) {
-    auto form_factor = ui::GetDeviceFormFactor();
-    bool is_large_form_factor = form_factor != ui::DEVICE_FORM_FACTOR_PHONE &&
-                                form_factor != ui::DEVICE_FORM_FACTOR_FOLDABLE;
-    presentation_mode_ = is_large_form_factor ? ActionPresentationMode::CHIP
-                                              : ActionPresentationMode::BUTTON;
-  }
-#endif
-}
+      search_terms_args{std::move(search_terms_args)} {}
 
 OmniboxActionInSuggest::~OmniboxActionInSuggest() = default;
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-OmniboxActionInSuggest::GetOrCreateJavaObject(JNIEnv* env) const {
-  if (!j_omnibox_action_) {
-    j_omnibox_action_.Reset(BuildOmniboxActionInSuggest(
-        env, reinterpret_cast<intptr_t>(this), strings_.hint,
-        strings_.accessibility_hint, template_action.action_type(),
-        template_action.action_uri(), tab_id, presentation_mode_));
-  }
-  return base::android::ScopedJavaLocalRef<jobject>(j_omnibox_action_);
-}
-#endif
 
 void OmniboxActionInSuggest::RecordActionShown(size_t position,
                                                bool used) const {

@@ -148,16 +148,6 @@ blink::OriginTrialPolicy* ContentClient::GetOriginTrialPolicy() {
   return nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool ContentClient::UsingSynchronousCompositing() {
-  return false;
-}
-
-media::MediaDrmBridgeClient* ContentClient::GetMediaDrmBridgeClient() {
-  return nullptr;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void ContentClient::ExposeInterfacesToBrowser(
     scoped_refptr<base::SequencedTaskRunner> io_task_runner,
     mojo::BinderMap* binders) {}

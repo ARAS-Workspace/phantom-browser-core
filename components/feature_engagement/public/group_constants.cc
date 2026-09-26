@@ -16,10 +16,4 @@ BASE_FEATURE(kIPHDummyGroup,
              "IPH_DummyGroup",
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kClankDefaultBrowserPromosGroup,
-             "IPH_ClankDefaultBrowserPromosGroup",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace feature_engagement

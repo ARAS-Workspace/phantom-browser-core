@@ -25,15 +25,6 @@
 #include "components/variations/synthetic_trials.h"
 #include "components/variations/variations_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/task/thread_pool.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/task/cancelable_task_tracker.h"
-#include "components/variations/variations_crash_keys_android.h"
-#endif
-
 namespace variations {
 
 namespace {
@@ -147,18 +138,6 @@ class VariationsCrashKeys final
   // observer calls that happen on a different thread.
   scoped_refptr<base::SequencedTaskRunner> ui_thread_task_runner_;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Task runner corresponding to a background thread, used for tasks that may
-  // block.
-  scoped_refptr<base::SequencedTaskRunner> background_thread_task_runner_;
-#endif  // IS_CHROMEOS || IS_ANDROID
-
-#if BUILDFLAG(IS_ANDROID)
-  // A task tracker that allows us to cancel any tasks that have been posted
-  // but have not started to run.
-  base::CancelableTaskTracker cancelable_task_tracker_;
-#endif  // IS_ANDROID
-
   // A serialized string containing the variations state.
   std::string variations_string_;
 
@@ -187,13 +166,6 @@ VariationsCrashKeys::VariationsCrashKeys() {
   // thread, calling OnFieldTrialGroupFinalized(), and accessing
   // |ui_thread_task_runner_| before it is set.
   ui_thread_task_runner_ = base::SequencedTaskRunner::GetCurrentDefault();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Set |background_thread_task_runner_| before observering field trials for
-  // the same reason mentioned above.
-  background_thread_task_runner_ = base::ThreadPool::CreateSequencedTaskRunner(
-      {base::TaskPriority::BEST_EFFORT, base::MayBlock()});
-#endif  // IS_CHROMEOS || IS_ANDROID
 
   // Observe field trials before filling the crash key with the currently
   // active field trials. Otherwise, there could be a race condition where a
@@ -367,11 +339,6 @@ void VariationsCrashKeys::UpdateCrashKeys() {
     SetVariationsSeedVersionCrashKey(command_line->GetSwitchValueASCII(
         variations::switches::kVariationsSeedVersion));
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  SaveVariationsForAnrReporting(&cancelable_task_tracker_,
-                                background_thread_task_runner_, info);
-#endif  // IS_ANDROID
 
 }
 

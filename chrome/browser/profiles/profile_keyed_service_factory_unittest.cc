@@ -92,14 +92,12 @@ class ProfileKeyedServiceFactoryUnittest : public testing::Test {
     return profile_testing_helper_.guest_profile_otr();
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   TestingProfile* system_profile() {
     return profile_testing_helper_.system_profile();
   }
   Profile* system_profile_otr() {
     return profile_testing_helper_.system_profile_otr();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
  private:
   ProfileTestingHelper profile_testing_helper_;
@@ -120,10 +118,8 @@ TEST_F(ProfileKeyedServiceFactoryUnittest, DefaultFactoryTest) {
   TestProfileToUse(factory, guest_profile(), nullptr);
   TestProfileToUse(factory, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileToUse(factory, system_profile(), nullptr);
   TestProfileToUse(factory, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // Factory using predefined `ProfileSelections` built
@@ -145,10 +141,8 @@ TEST_F(ProfileKeyedServiceFactoryUnittest,
   TestProfileToUse(factory, guest_profile(), nullptr);
   TestProfileToUse(factory, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileToUse(factory, system_profile(), nullptr);
   TestProfileToUse(factory, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // Factory using customized `ProfileSelections` using
@@ -176,10 +170,8 @@ TEST_F(ProfileKeyedServiceFactoryUnittest,
   TestProfileToUse(factory, guest_profile(), nullptr);
   TestProfileToUse(factory, guest_profile_otr(), guest_profile_otr());
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileToUse(factory, system_profile(), nullptr);
   TestProfileToUse(factory, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // Factory using default `ProfileKeyedServiceFactory` constructor
@@ -199,10 +191,8 @@ TEST_F(ProfileKeyedServiceFactoryUnittest, DefaultRefcountedFactoryTest) {
   TestProfileToUse(factory, guest_profile(), nullptr);
   TestProfileToUse(factory, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileToUse(factory, system_profile(), nullptr);
   TestProfileToUse(factory, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // Factory using customized `ProfileSelections` built
@@ -229,8 +219,6 @@ TEST_F(ProfileKeyedServiceFactoryUnittest,
   TestProfileToUse(factory, guest_profile(), nullptr);
   TestProfileToUse(factory, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileToUse(factory, system_profile(), nullptr);
   TestProfileToUse(factory, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

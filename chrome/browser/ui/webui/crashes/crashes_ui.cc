@@ -164,7 +164,7 @@ void CrashesDOMHandler::UpdateUI() {
   }
 
   bool manual_uploads_supported = false;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   manual_uploads_supported = true;
 #endif
   bool allow_manual_uploads =

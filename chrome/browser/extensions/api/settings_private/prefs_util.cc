@@ -72,9 +72,7 @@
 #include "extensions/browser/management_policy.h"
 #include "extensions/common/extension.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/toasts/toast_features.h"  // nogncheck
-#endif
 
 namespace {
 
@@ -91,13 +89,13 @@ bool IsSettingReadOnly(const std::string& pref_name) {
     return true;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   // Changing this pref value is protected by reauthentication.
   if (pref_name ==
       autofill::prefs::kAutofillAiReauthBeforeViewingSensitiveData) {
     return true;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_MAC)
   // Can be changed only from C++ after successful re-auth.
@@ -447,7 +445,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kString;
   (*s_allowlist)[::prefs::kAccessibilityCaptionsBackgroundOpacity] =
       settings_api::PrefType::kNumber;
-#if !BUILDFLAG(IS_ANDROID)
   (*s_allowlist)[::prefs::kLiveCaptionEnabled] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kLiveCaptionLanguageCode] =
@@ -462,14 +459,11 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kAccessibilityMainNodeAnnotationsEnabled] =
       settings_api::PrefType::kBoolean;
-#endif
 #if defined(USE_AURA)
   (*s_allowlist)[::prefs::kOverscrollHistoryNavigationEnabled] =
       settings_api::PrefType::kBoolean;
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   (*s_allowlist)[::prefs::kToastAlertLevel] = settings_api::PrefType::kNumber;
-#endif
 
   (*s_allowlist)[::prefs::kCaretBrowsingEnabled] =
       settings_api::PrefType::kBoolean;

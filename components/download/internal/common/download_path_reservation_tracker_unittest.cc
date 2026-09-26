@@ -28,10 +28,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/download/internal/common/android/download_collection_bridge.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using testing::AnyNumber;
 using testing::Return;
 using testing::ReturnRef;
@@ -102,13 +98,6 @@ DownloadPathReservationTrackerTest::DownloadPathReservationTrackerTest() =
 void DownloadPathReservationTrackerTest::SetUp() {
   ASSERT_TRUE(test_download_dir_.CreateUniqueTempDir());
   set_default_download_path(test_download_dir_.GetPath());
-#if BUILDFLAG(IS_ANDROID)
-  // Initialize the global file name map for testing.
-  if (DownloadCollectionBridge::ShouldPublishDownload(
-          GetPathInDownloadsDirectory(FILE_PATH_LITERAL("foo.txt")))) {
-    DownloadCollectionBridge::ResetExistingFileNamesForTesting();
-  }
-#endif
 }
 
 void DownloadPathReservationTrackerTest::TearDown() {
@@ -289,12 +278,6 @@ TEST_F(DownloadPathReservationTrackerTest, ConflictingFiles) {
   base::FilePath path1(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("foo (1).txt")));
   bool use_download_collection = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (DownloadCollectionBridge::ShouldPublishDownload(path)) {
-    use_download_collection = true;
-    DownloadCollectionBridge::AddExistingFileNameForTesting(path.BaseName());
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   if (!use_download_collection) {
     // Create a file at |path|, and a .crdownload file at |path1|.
     ASSERT_TRUE(base::WriteFile(path, ""));
@@ -325,12 +308,6 @@ TEST_F(DownloadPathReservationTrackerTest, CaseConflictingFiles) {
   base::FilePath path1(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("FOO (1).txt")));
   bool use_download_collection = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (DownloadCollectionBridge::ShouldPublishDownload(path)) {
-    use_download_collection = true;
-    DownloadCollectionBridge::AddExistingFileNameForTesting(path.BaseName());
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   if (!use_download_collection) {
     // Create a file at |path|, and a .crdownload file at |path1|.
     ASSERT_TRUE(base::WriteFile(path, ""));
@@ -362,12 +339,6 @@ TEST_F(DownloadPathReservationTrackerTest, ConflictingFiles_Overwrite) {
   base::FilePath path(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("foo.txt")));
   bool use_download_collection = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (DownloadCollectionBridge::ShouldPublishDownload(path)) {
-    use_download_collection = true;
-    DownloadCollectionBridge::AddExistingFileNameForTesting(path.BaseName());
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   if (!use_download_collection) {
     // Create a file at |path|.
     ASSERT_TRUE(base::WriteFile(path, ""));
@@ -393,12 +364,6 @@ TEST_F(DownloadPathReservationTrackerTest, CaseConflictingFiles_Overwrite) {
   base::FilePath target_path(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("FOO.txt")));
   bool use_download_collection = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (DownloadCollectionBridge::ShouldPublishDownload(path)) {
-    use_download_collection = true;
-    DownloadCollectionBridge::AddExistingFileNameForTesting(path.BaseName());
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   if (!use_download_collection) {
     // Create a file at |path|.
     ASSERT_TRUE(base::WriteFile(path, ""));
@@ -421,12 +386,6 @@ TEST_F(DownloadPathReservationTrackerTest, ConflictWithSource) {
   base::FilePath path(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("foo.txt")));
   bool use_download_collection = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (DownloadCollectionBridge::ShouldPublishDownload(path)) {
-    use_download_collection = true;
-    DownloadCollectionBridge::AddExistingFileNameForTesting(path.BaseName());
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   if (!use_download_collection) {
     ASSERT_TRUE(base::WriteFile(path, ""));
   }
@@ -451,12 +410,6 @@ TEST_F(DownloadPathReservationTrackerTest, CaseConflictWithSource) {
   base::FilePath target_path(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("FOO.txt")));
   bool use_download_collection = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (DownloadCollectionBridge::ShouldPublishDownload(path)) {
-    use_download_collection = true;
-    DownloadCollectionBridge::AddExistingFileNameForTesting(path.BaseName());
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   if (!use_download_collection) {
     ASSERT_TRUE(base::WriteFile(path, ""));
   }
@@ -627,11 +580,6 @@ TEST_F(DownloadPathReservationTrackerTest, MAYBE_UnwriteableDirectory) {
   std::unique_ptr<MockDownloadItem> item = CreateDownloadItem(1);
   base::FilePath path(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("foo.txt")));
-#if BUILDFLAG(IS_ANDROID)
-  // This test is only valid works if download collection is not used.
-  if (DownloadCollectionBridge::ShouldPublishDownload(path))
-    return;
-#endif  // BUILDFLAG(IS_ANDROID)
   base::FilePath dir(path.DirName());
   ASSERT_FALSE(IsPathInUse(path));
 
@@ -665,11 +613,6 @@ TEST_F(DownloadPathReservationTrackerTest, MAYBE_UnwriteableDirectory) {
 TEST_F(DownloadPathReservationTrackerTest, CreateDefaultDownloadPath) {
   base::FilePath path(
       GetPathInDownloadsDirectory(FILE_PATH_LITERAL("foo/foo.txt")));
-#if BUILDFLAG(IS_ANDROID)
-  // This test is only valid works if download collection is not used.
-  if (DownloadCollectionBridge::ShouldPublishDownload(path))
-    return;
-#endif  // BUILDFLAG(IS_ANDROID)
   base::FilePath dir(path.DirName());
   ASSERT_FALSE(base::DirectoryExists(dir));
 
@@ -824,7 +767,7 @@ TEST_F(DownloadPathReservationTrackerTest, TruncationFail) {
 
 #endif  // Platforms that support filename truncation.
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(DownloadPathReservationTrackerTest, SymlinkTraversingPath) {
   std::unique_ptr<MockDownloadItem> item = CreateDownloadItem(1);
   base::ScopedTempDir external_dir;
@@ -929,32 +872,5 @@ TEST_F(DownloadPathReservationTrackerTest,
 
   SetDownloadItemState(item.get(), DownloadItem::COMPLETE);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(DownloadPathReservationTrackerTest,
-       AndroidPathOutsideDownloadsDirectory) {
-  std::unique_ptr<MockDownloadItem> item = CreateDownloadItem(1);
-
-  base::ScopedTempDir external_dir;
-  ASSERT_TRUE(external_dir.CreateUniqueTempDir());
-
-  base::FilePath target_path =
-      external_dir.GetPath().Append(FILE_PATH_LITERAL("payload.txt"));
-  ASSERT_FALSE(IsPathInUse(target_path));
-
-  base::FilePath reserved_path;
-  PathValidationResult result = PathValidationResult::SUCCESS;
-  DownloadPathReservationTracker::FilenameConflictAction conflict_action =
-      DownloadPathReservationTracker::OVERWRITE;
-  bool create_directory = false;
-
-  CallGetReservedPath(item.get(), target_path, create_directory,
-                      conflict_action, &reserved_path, &result);
-  EXPECT_EQ(PathValidationResult::SUCCESS, result);
-  EXPECT_EQ(target_path, reserved_path);
-
-  SetDownloadItemState(item.get(), DownloadItem::COMPLETE);
-}
-#endif
 
 }  // namespace download

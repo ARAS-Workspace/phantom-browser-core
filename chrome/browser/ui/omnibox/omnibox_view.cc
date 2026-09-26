@@ -32,10 +32,8 @@
 #include "extensions/buildflags/buildflags.h"
 #include "url/url_constants.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "ui/gfx/paint_vector_icon.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 // GN doesn't understand conditional includes, so we need nogncheck here.
@@ -43,13 +41,11 @@
 #endif
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 // Return true if the given match uses a vector icon with a background.
 bool HasVectorIconBackground(const AutocompleteMatch& match) {
   return match.type == AutocompleteMatchType::HISTORY_CLUSTER ||
          match.type == AutocompleteMatchType::PEDAL;
 }
-#endif
 
 }  // namespace
 
@@ -61,7 +57,6 @@ bool OmniboxView::IsEditingOrEmpty() const {
           controller()->IsPopupOpen());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(manukh): OmniboxView::GetIcon is very similar to
 // OmniboxPopupModel::GetMatchIcon. They contain certain inconsistencies
 // concerning what flags are required to display url favicons and bookmark star
@@ -197,7 +192,6 @@ ui::ImageModel OmniboxView::GetIcon(int dip_size,
       HasVectorIconBackground(match) ? color_vectors_with_background : color,
       dip_size);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void OmniboxView::SetUserText(const std::u16string& text) {
   SetUserText(text, true);

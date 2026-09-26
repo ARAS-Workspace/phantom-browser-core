@@ -164,12 +164,6 @@
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 #include "url/scheme_host_port.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/java_interfaces.h"
-#include "net/android/http_auth_negotiate_android.h"
-#include "services/service_manager/public/cpp/interface_provider.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 #include "content/browser/media/cdm_storage_common.h"
 #include "content/browser/media/cdm_storage_manager.h"
@@ -216,7 +210,6 @@ void RunInProcessStorageService(
                                                     /*io_task_runner=*/nullptr);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void BindStorageServiceFilesystemImpl(
     const base::FilePath& directory_path,
     mojo::PendingReceiver<storage::mojom::Directory> receiver) {
@@ -225,13 +218,11 @@ void BindStorageServiceFilesystemImpl(
           directory_path, storage::FilesystemImpl::ClientType::kUntrusted),
       std::move(receiver));
 }
-#endif
 
 mojo::Remote<storage::mojom::StorageService>& GetStorageServiceRemote() {
   mojo::Remote<storage::mojom::StorageService>& remote =
       GetStorageServiceRemoteStorage();
   if (!remote) {
-#if !BUILDFLAG(IS_ANDROID)
     const base::FilePath sandboxed_data_dir =
         GetContentClient()
             ->browser()
@@ -262,9 +253,7 @@ mojo::Remote<storage::mojom::StorageService>& GetStorageServiceRemote() {
                          &BindStorageServiceFilesystemImpl, sandboxed_data_dir,
                          directory.InitWithNewPipeAndPassReceiver()));
       remote->SetDataDirectory(sandboxed_data_dir, std::move(directory));
-    } else
-#endif  // !BUILDFLAG(IS_ANDROID)
-    {
+    } else {
       GetIOThreadTaskRunner({})->PostTask(
           FROM_HERE, base::BindOnce(&RunInProcessStorageService,
                                     remote.BindNewPipeAndPassReceiver()));
@@ -727,18 +716,6 @@ class SSLErrorDelegate : public SSLErrorHandler::Delegate {
       response_;
   base::WeakPtrFactory<SSLErrorDelegate> weak_factory_{this};
 };
-
-#if BUILDFLAG(IS_ANDROID)
-void FinishGenerateNegotiateAuthToken(
-    std::unique_ptr<net::android::HttpAuthNegotiateAndroid> auth_negotiate,
-    std::unique_ptr<std::string> auth_token,
-    std::unique_ptr<net::HttpAuthPreferences> prefs,
-    network::mojom::NetworkContextClient::
-        OnGenerateHttpNegotiateAuthTokenCallback callback,
-    int result) {
-  std::move(callback).Run(result, *auth_token);
-}
-#endif
 
 // If both `storage_key_matcher` and `storage_key_policy_matcher` are null, this
 // should return a null callback that indicates all StorageKeys should match.
@@ -2778,35 +2755,6 @@ void StoragePartitionImpl::OnClearSiteData(
       partitioned_state_allowed_only, std::move(callback));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void StoragePartitionImpl::OnGenerateHttpNegotiateAuthToken(
-    const std::string& server_auth_token,
-    bool can_delegate,
-    const std::string& auth_negotiate_android_account_type,
-    const std::string& spn,
-    OnGenerateHttpNegotiateAuthTokenCallback callback) {
-  // The callback takes ownership of these unique_ptrs and destroys them when
-  // run.
-  auto prefs = std::make_unique<net::HttpAuthPreferences>();
-  prefs->set_auth_android_negotiate_account_type(
-      auth_negotiate_android_account_type);
-
-  auto auth_negotiate =
-      std::make_unique<net::android::HttpAuthNegotiateAndroid>(prefs.get());
-  net::android::HttpAuthNegotiateAndroid* auth_negotiate_raw =
-      auth_negotiate.get();
-  auth_negotiate->set_server_auth_token(server_auth_token);
-  auth_negotiate->set_can_delegate(can_delegate);
-
-  auto auth_token = std::make_unique<std::string>();
-  auth_negotiate_raw->GenerateAuthTokenAndroid(
-      nullptr, spn, std::string(), auth_token.get(),
-      base::BindOnce(&FinishGenerateNegotiateAuthToken,
-                     std::move(auth_negotiate), std::move(auth_token),
-                     std::move(prefs), std::move(callback)));
-}
-#endif
-
 #if BUILDFLAG(IS_CT_SUPPORTED)
 void StoragePartitionImpl::OnCanSendSCTAuditingReport(
     OnCanSendSCTAuditingReportCallback callback) {
@@ -3539,7 +3487,7 @@ void StoragePartitionImpl::InitNetworkContext() {
     }
   }
 
-#if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
   // TODO(https://crbug.com/353770817): Android does not support non-interactive
   // certificate selection. Do not enable this for Android.
   if (base::FeatureList::IsEnabled(

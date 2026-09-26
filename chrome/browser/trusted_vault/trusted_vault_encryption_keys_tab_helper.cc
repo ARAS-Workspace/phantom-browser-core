@@ -35,7 +35,6 @@
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 // Convert a vector from TrustedVaultKey mojo structs to
 // TrustedVaultKeyAndVersion.
 std::vector<trusted_vault::TrustedVaultKeyAndVersion> ConvertFromMojomVaultKeys(
@@ -49,7 +48,6 @@ std::vector<trusted_vault::TrustedVaultKeyAndVersion> ConvertFromMojomVaultKeys(
                          });
   return converted_keys;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // EncryptionKeyApi represents the actual exposure of the Mojo API (i.e.
 // chrome::mojom::TrustedVaultEncryptionKeysExtension) to the renderer.
@@ -69,7 +67,6 @@ class EncryptionKeyApi
   }
 
   // chrome::mojom::TrustedVaultEncryptionKeysExtension:
-#if !BUILDFLAG(IS_ANDROID)
   void SetEncryptionKeys(
       const std::string& gaia_id,
       base::flat_map<std::string,
@@ -104,7 +101,6 @@ class EncryptionKeyApi
 
     std::move(callback).Run();
   }
-#endif
 
   void AddTrustedRecoveryMethod(
       const std::string& gaia_id,
@@ -152,7 +148,6 @@ class EncryptionKeyApi
         user_action_trigger_(user_action_trigger),
         receivers_(content::WebContents::FromRenderFrameHost(rfh), this) {}
 
-#if !BUILDFLAG(IS_ANDROID)
   void AddEncryptionKeysForSecurityDomain(
       const GaiaId& gaia_id,
       trusted_vault::SecurityDomainId security_domain,
@@ -192,7 +187,6 @@ class EncryptionKeyApi
     trusted_vault_client->StoreKeys(gaia_id, keys_as_bytes, last_key_version,
                                     user_action_trigger_);
   }
-#endif
 
   friend DocumentUserData;
   DOCUMENT_USER_DATA_KEY_DECL();
@@ -236,10 +230,8 @@ void TrustedVaultEncryptionKeysTabHelper::CreateForWebContents(
   }
 
   EnclaveManager* enclave_manager = nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   enclave_manager =
       EnclaveManagerFactory::GetAsEnclaveManagerForProfile(profile);
-#endif
 
   web_contents->SetUserData(
       UserDataKey(),

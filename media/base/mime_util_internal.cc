@@ -22,14 +22,6 @@
 #include "media/base/video_color_space.h"
 #include "media/media_buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-
-// TODO(dalecurtis): This include is not allowed by media/base since
-// media/base/android is technically a different component. We should move
-// mime_util*.{cc,h} out of media/base to fix this.
-#include "media/base/android/media_codec_util.h"  // nogncheck
-#endif
-
 namespace media::internal {
 
 // A map from codec string to MimeUtil::Codec.
@@ -147,11 +139,6 @@ static MimeUtil::ParsedCodecResult MakeDefaultParsedCodecResult() {
 }
 
 MimeUtil::MimeUtil() {
-#if BUILDFLAG(IS_ANDROID)
-  platform_info_.has_platform_vp8_decoder =
-      MediaCodecUtil::IsVp8DecoderAvailable();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   InitializeMimeTypeMaps();
 }
 
@@ -971,15 +958,6 @@ SupportsType MimeUtil::IsCodecSupported(std::string_view mime_type_lower_case,
       return SupportsType::kNotSupported;
     }
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(chcunningham): Delete this. Android platform support should be
-  // handled by (android specific) media::IsDecoderSupportedVideoType() above.
-  if (!IsCodecSupportedOnAndroid(codec, mime_type_lower_case, is_encrypted,
-                                 video_profile, platform_info_)) {
-    return SupportsType::kNotSupported;
-  }
-#endif
 
   return ambiguous_platform_support ? SupportsType::kMaybeSupported
                                     : SupportsType::kSupported;

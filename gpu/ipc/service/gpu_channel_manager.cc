@@ -77,13 +77,6 @@
 namespace gpu {
 
 namespace {
-#if BUILDFLAG(IS_ANDROID)
-// Amount of time we expect the GPU to stay powered up without being used.
-const int kMaxGpuIdleTimeMs = 40;
-// Maximum amount of time we keep pinging the GPU waiting for the client to
-// draw.
-const int kMaxKeepAliveTimeMs = 200;
-#endif
 
 constexpr base::MemoryConsumerTraits kGpuChannelManagerTraits(
     // Can free hundreds of MB via Skia, Dawn, and persistent cache purges.
@@ -671,93 +664,6 @@ GpuChannelManager::GetPeakMemoryUsage(uint32_t sequence_num,
   peak_memory_monitor_->StopGpuMemoryTracking(sequence_num);
   return allocation_per_source;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void GpuChannelManager::DidAccessGpu() {
-  DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
-
-  last_gpu_access_time_ = base::TimeTicks::Now();
-}
-
-void GpuChannelManager::WakeUpGpu() {
-  DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
-
-  begin_wake_up_time_ = base::TimeTicks::Now();
-  ScheduleWakeUpGpu();
-}
-
-void GpuChannelManager::ScheduleWakeUpGpu() {
-  DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
-
-  base::TimeTicks now = base::TimeTicks::Now();
-  TRACE_EVENT2("gpu", "GpuChannelManager::ScheduleWakeUp", "idle_time",
-               (now - last_gpu_access_time_).InMilliseconds(),
-               "keep_awake_time", (now - begin_wake_up_time_).InMilliseconds());
-  if (now - last_gpu_access_time_ < base::Milliseconds(kMaxGpuIdleTimeMs))
-    return;
-  if (now - begin_wake_up_time_ > base::Milliseconds(kMaxKeepAliveTimeMs))
-    return;
-
-  DoWakeUpGpu();
-
-  base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&GpuChannelManager::ScheduleWakeUpGpu,
-                     weak_factory_.GetWeakPtr()),
-      base::Milliseconds(kMaxGpuIdleTimeMs));
-}
-
-void GpuChannelManager::DoWakeUpGpu() {
-  DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
-
-  const CommandBufferStub* stub = nullptr;
-  for (const auto& kv : gpu_channels_) {
-    const GpuChannel* channel = kv.second.get();
-    const CommandBufferStub* stub_candidate = channel->GetOneStub();
-    if (stub_candidate) {
-      DCHECK(stub_candidate->decoder_context());
-      // With Vulkan, Dawn, etc, RasterDecoders don't use GL.
-      if (stub_candidate->decoder_context()->GetGLContext()) {
-        stub = stub_candidate;
-        break;
-      }
-    }
-  }
-  if (!stub || !stub->decoder_context()->MakeCurrent())
-    return;
-  glFinish();
-  DidAccessGpu();
-}
-
-void GpuChannelManager::OnBackgroundCleanup() {
-  DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
-
-  // Delete all the GL contexts when the channel does not use WebGL and Chrome
-  // goes to background on low-end devices.
-  std::vector<int> channels_to_clear;
-  for (auto& kv : gpu_channels_) {
-    // Stateful contexts (e.g. WebGL and WebGPU) support context lost
-    // notifications, but for now, skip those.
-    if (kv.second->HasActiveStatefulContext()) {
-      continue;
-    }
-    channels_to_clear.push_back(kv.first);
-    kv.second->MarkAllContextsLost();
-  }
-  for (int channel : channels_to_clear)
-    RemoveChannel(channel);
-
-  if (program_cache_)
-    program_cache_->Trim(0u);
-
-  if (shared_context_state_) {
-    shared_context_state_->MarkContextLost();
-    shared_context_state_.reset();
-  }
-
-  SkGraphics::PurgeAllCaches();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void GpuChannelManager::OnApplicationBackgrounded() {
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);

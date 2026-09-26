@@ -33,9 +33,7 @@
 #include "extensions/common/permissions/permissions_data.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/scoped_test_mv2_enabler.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -350,7 +348,6 @@ TEST_F(RulesRegistryWithCacheTest, RulesStoredFlagMultipleRegistries) {
   EXPECT_TRUE(cache_delegate2->GetDeclarativeRulesStored(extension1_->id()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // This test relies on declarativeWebRequest, which is deprecated and will not
 // be supported on desktop Android.
 TEST_F(RulesRegistryWithCacheTest, RulesPreservedAcrossRestart) {
@@ -402,7 +399,6 @@ TEST_F(RulesRegistryWithCacheTest, RulesPreservedAcrossRestart) {
   content::RunAllTasksUntilIdle();
   EXPECT_EQ(1, GetNumberOfRules(extension1_->id(), registry.get()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(RulesRegistryWithCacheTest, ConcurrentStoringOfRules) {
   // When an extension updates its rules, the new set of rules is stored to disk

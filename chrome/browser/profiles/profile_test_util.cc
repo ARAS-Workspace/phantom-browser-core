@@ -13,11 +13,9 @@
 #include "chrome/browser/profiles/profile_keyed_service_factory.h"
 #include "chrome/browser/profiles/profile_manager.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/profiles/profile_window.h"
 #include "components/signin/public/identity_manager/account_managed_status_finder.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace profiles::testing {
 
@@ -29,8 +27,6 @@ Profile& CreateProfileSync(ProfileManager* profile_manager,
   CHECK(profile);
   return *profile;
 }
-
-#if !BUILDFLAG(IS_ANDROID)
 
 void SwitchToProfileSync(const base::FilePath& path, bool always_create) {
   base::test::TestFuture<BrowserWindowInterface*> future;
@@ -47,8 +43,6 @@ ScopedNonEnterpriseDomainSetterForTesting::
     ~ScopedNonEnterpriseDomainSetterForTesting() {
   signin::AccountManagedStatusFinder::SetNonEnterpriseDomainForTesting(nullptr);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 ScopedProfileSelectionsForFactoryTesting::
     ScopedProfileSelectionsForFactoryTesting(

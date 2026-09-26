@@ -16,10 +16,6 @@
 #include "third_party/blink/public/common/mime_util/mime_util.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/download/android/download_utils.h"
-#endif
-
 using DownloadItem = download::DownloadItem;
 using ContentId = offline_items_collection::ContentId;
 using OfflineItem = offline_items_collection::OfflineItem;
@@ -77,9 +73,6 @@ OfflineItemFilter MimeTypeToOfflineItemFilter(const std::string& mime_type) {
 
 bool IsInterruptedDownloadAutoResumable(download::DownloadItem* item) {
   int auto_resumption_size_limit = 0;
-#if BUILDFLAG(IS_ANDROID)
-  auto_resumption_size_limit = DownloadUtils::GetAutoResumptionSizeLimit();
-#endif
 
   return download::IsInterruptedDownloadAutoResumable(
       item, auto_resumption_size_limit);
@@ -112,15 +105,6 @@ OfflineItem OfflineItemUtils::CreateOfflineItem(const std::string& name_space,
   item.file_path = download_item->GetTargetFilePath();
   item.mime_type = download_item->GetMimeType();
   item.danger_type = download_item->GetDangerType();
-#if BUILDFLAG(IS_ANDROID)
-  item.mime_type = DownloadUtils::RemapGenericMimeType(
-      item.mime_type, download_item->GetOriginalUrl(),
-      download_item->GetTargetFilePath().value());
-  if (off_the_record) {
-    Profile* profile = Profile::FromBrowserContext(browser_context);
-    item.otr_profile_id = profile->GetOTRProfileID().Serialize();
-  }
-#endif
 
   item.url = download_item->GetURL();
   item.original_url = download_item->GetOriginalUrl();

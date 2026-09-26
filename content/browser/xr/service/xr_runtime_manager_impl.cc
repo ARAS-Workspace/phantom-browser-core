@@ -44,9 +44,7 @@
 #include "services/device/public/mojom/sensor_provider.mojom.h"
 #include "ui/gl/gl_switches.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/xr/service/isolated_device_provider.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 
@@ -174,9 +172,7 @@ XRRuntimeManagerImpl::GetOrCreateRuntimeManagerInternal(
   }
 
   // Then add any other "built-in" providers
-#if !BUILDFLAG(IS_ANDROID)
   providers.push_back(std::make_unique<IsolatedVRDeviceProvider>());
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   const bool is_orientation_provider_forced =
       IsForcedRuntime(base::CommandLine::ForCurrentProcess(),
@@ -299,15 +295,6 @@ BrowserXRRuntimeImpl* XRRuntimeManagerImpl::GetImmersiveVrRuntime() {
   if (openxr) {
     return openxr;
   }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(ENABLE_CARDBOARD)
-  auto* cardboard = GetRuntime(device::mojom::XRDeviceId::CARDBOARD_DEVICE_ID);
-  if (cardboard) {
-    return cardboard;
-  }
-#endif
 #endif
 
   return nullptr;

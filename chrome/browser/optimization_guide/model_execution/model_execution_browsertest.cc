@@ -796,8 +796,6 @@ class ModelExecutionNewFeaturesEnabledAutomaticallyTest
   }
 };
 
-#if !BUILDFLAG(IS_ANDROID)
-
 class ModelExecutionEnterprisePolicyBrowserTest
     : public ModelExecutionEnabledBrowserTest {
  public:
@@ -943,7 +941,5 @@ IN_PROC_BROWSER_TEST_F(ModelExecutionEnterprisePolicyBrowserTest,
   EXPECT_TRUE(ShouldFeatureBeCurrentlyEnabledForUser(
       UserVisibleFeatureKey::kWallpaperSearch));
 }
-
-#endif  //  !BUILDFLAG(IS_ANDROID)
 
 }  // namespace optimization_guide

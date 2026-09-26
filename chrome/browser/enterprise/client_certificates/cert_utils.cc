@@ -20,11 +20,6 @@
 #include "components/prefs/pref_service.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/enterprise/client_certificates/core/android_private_key_factory.h"
-#include "components/enterprise/client_certificates/core/features.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #include "components/enterprise/client_certificates/core/browser_cloud_management_delegate.h"
 #include "components/enterprise/client_certificates/core/dm_server_client.h"
 
@@ -51,16 +46,6 @@ std::unique_ptr<PrivateKeyFactory> CreatePrivateKeyFactory() {
     sub_factories.insert_or_assign(PrivateKeySource::kUnexportableKey,
                                    std::move(unexportable_key_factory));
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (features::IsClientCertificateProvisioningOnAndroidEnabled()) {
-    auto android_key_factory = AndroidPrivateKeyFactory::TryCreate();
-    if (android_key_factory) {
-      sub_factories.insert_or_assign(PrivateKeySource::kAndroidKey,
-                                     std::move(android_key_factory));
-    }
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   sub_factories.insert_or_assign(PrivateKeySource::kSoftwareKey,
                                  std::make_unique<ECPrivateKeyFactory>());

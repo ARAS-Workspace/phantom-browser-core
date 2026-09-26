@@ -96,18 +96,6 @@ sync_pb::SyncEnums_BrowserType BrowserTypeFromWindowDelegate(
   return sync_pb::SyncEnums_BrowserType_TYPE_CUSTOM_TAB;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RecordPlaceholderResync(
-    PlaceholderTabResyncResultHistogramValue result_value,
-    bool is_session_restore) {
-  const char* name = is_session_restore
-                         ? "Sync.PlaceholderResync.OnSessionRestore"
-                         : "Sync.PlaceholderResync.OnTabModification";
-  base::UmaHistogramEnumeration(name, result_value);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void RecordAssociateWindowsTime(const base::ElapsedTimer& timer,
                                 bool is_session_restore) {
   const char* name = is_session_restore
@@ -260,14 +248,6 @@ void LocalSessionEventHandlerImpl::AssociateWindows(ReloadTabsOption option,
       // window has valid tabs based on the tab's presence in the tracker.
       const sessions::SessionTab* tab =
           session_tracker_->LookupSessionTab(current_session_tag_, tab_id);
-
-#if BUILDFLAG(IS_ANDROID)
-      if (placeholder_tab) {
-        HandlePlaceholderTabForAssociate(is_session_restore,
-                                         window_delegate->GetTabAt(j), &tab,
-                                         batch);
-      }
-#endif  // BUILDFLAG(IS_ANDROID)
 
       if (tab) {
         found_tabs = true;
@@ -476,38 +456,6 @@ sync_pb::SessionTab LocalSessionEventHandlerImpl::GetTabSpecificsFromDelegate(
 
   return specifics;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void LocalSessionEventHandlerImpl::HandlePlaceholderTabForAssociate(
-    bool is_session_restore,
-    SyncedTabDelegate* synced_tab,
-    const sessions::SessionTab** tab,
-    WriteBatch* batch) {
-  if (*tab) {
-    RecordPlaceholderResync(PLACEHOLDER_TAB_FOUND, is_session_restore);
-    return;
-  }
-
-  // The placeholder tab doesn't have a tracked counterpart. This is
-  // possible, for example, if the tab was created as a placeholder tab.
-  SessionID tab_id = synced_tab->GetSessionId();
-  bool was_tab_resynced = AssociatePlaceholderTab(
-      synced_tab->ReadPlaceholderTabSnapshotIfItShouldSync(sessions_client_),
-      batch);
-
-  if (!was_tab_resynced) {
-    RecordPlaceholderResync(PLACEHOLDER_TAB_RESYNC_FAILED, is_session_restore);
-    return;
-  }
-
-  // If the tab was presumed to have resynced successfully, perform another
-  // lookup.
-  *tab = session_tracker_->LookupSessionTab(current_session_tag_, tab_id);
-  RecordPlaceholderResync(
-      *tab ? PLACEHOLDER_TAB_RESYNCED : PLACEHOLDER_TAB_RESYNC_FAILED,
-      is_session_restore);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 bool LocalSessionEventHandlerImpl::AssociatePlaceholderTab(
     std::unique_ptr<SyncedTabDelegate> snapshot,

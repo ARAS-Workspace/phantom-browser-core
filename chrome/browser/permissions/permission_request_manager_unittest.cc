@@ -51,10 +51,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/permissions/android/android_permission_util.h"
-#endif
-
 class PermissionRequestManagerTest
     : public ChromeRenderViewHostTestHarness,
       public testing::WithParamInterface<std::pair<std::string, bool>> {
@@ -270,10 +266,6 @@ TEST_F(PermissionRequestManagerTest, UMAForMergedDeniedBubble) {
 }
 
 TEST_F(PermissionRequestManagerTest, TestEmbargoForEmbeddedPermissionRequest) {
-#if BUILDFLAG(IS_ANDROID)
-  base::AutoReset<bool> enable_android_permissions =
-      permissions::EnableAllAndroidPermissionsForTesting();
-#endif
   system_permission_settings::ScopedSettingsForTesting scoped_system_permission(
       ContentSettingsType::MEDIASTREAM_CAMERA, /*blocked=*/false);
 

@@ -149,20 +149,10 @@ class InProcessContextFactory::PerCompositorData
       mojo::PendingRemote<viz::mojom::VSyncParameterObserver> observer)
       override {}
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   void UpdateRefreshRate(float refresh_rate) override {}
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  void SetAdaptiveRefreshRateInfo(
-      viz::mojom::AdaptiveRefreshRateInfoPtr info) override {}
-  void PreserveChildSurfaceControls() override {}
-  void SetSwapCompletionCallbackEnabled(bool enabled) override {}
-#endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_ANDROID)
-  void SetSupportedRefreshRates(
-      const std::vector<float>& refresh_rates) override {}
-#endif  // BUILDFLAG(IS_ANDROID)
   void SetDelegatedInkPointRenderer(
       mojo::PendingReceiver<gfx::mojom::DelegatedInkPointRenderer> receiver)
       override {}

@@ -161,20 +161,6 @@ FeedStream::FeedStream(RefreshTaskScheduler* refresh_task_scheduler,
       ::prefs::kSigninAllowed, profile_prefs,
       base::BindRepeating(&FeedStream::ClearAll, GetWeakPtr()));
 
-#if BUILDFLAG(IS_ANDROID)
-  if (!chrome_info_.user_feedback_allowed_pref_key.empty()) {
-    pref_change_registrar_.Init(profile_prefs);
-    pref_change_registrar_.Add(
-        chrome_info_.user_feedback_allowed_pref_key,
-        base::BindRepeating(&FeedStream::OnUserFeedbackPolicyChanged,
-                            GetWeakPtr()));
-    is_user_feedback_disabled_ =
-        !profile_prefs->GetBoolean(chrome_info_.user_feedback_allowed_pref_key);
-  } else {
-    is_user_feedback_disabled_ = false;
-  }
-#endif
-
   // Inserting this task first ensures that |store_| is initialized before
   // it is used.
   task_queue_.AddTask(FROM_HERE,
@@ -551,11 +537,6 @@ bool FeedStream::IsEnabledAndVisible() {
 }
 
 bool FeedStream::IsFeedEnabledByDse() {
-#if BUILDFLAG(IS_ANDROID)
-  if (chrome_info_.is_new_tab_search_engine_url_android_enabled) {
-    return snippets_enabled_by_dse_.GetValue();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   return true;
 }
 

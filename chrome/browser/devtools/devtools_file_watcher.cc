@@ -277,15 +277,6 @@ void DevToolsFileWatcher::InitSharedWatcher() {
 }
 
 void DevToolsFileWatcher::AddWatch(base::FilePath path) {
-#if BUILDFLAG(IS_ANDROID)
-  // DevToolsFileWatcher cannot watch files held by other Android apps.
-  // TODO(crbug.com/540021706): Implement watch logic for virtual document
-  // paths.
-  if (path.IsContentUri() || path.IsVirtualDocumentPath()) {
-    NOTIMPLEMENTED() << "Cannot watch this path: " << path.value();
-    return;
-  }
-#endif
   impl_task_runner()->PostTask(
       FROM_HERE, base::BindOnce(&DevToolsFileWatcher::AddWatchOnImpl,
                                 base::Unretained(this), std::move(path)));

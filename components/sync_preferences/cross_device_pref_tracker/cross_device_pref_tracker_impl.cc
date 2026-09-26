@@ -38,21 +38,6 @@
 #include "components/sync_preferences/features.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/android/jni_array.h"
-#include "base/android/jni_string.h"
-#include "base/android/scoped_java_ref.h"
-#include "base/containers/span.h"
-#include "components/sync_preferences/cross_device_pref_tracker/android/timestamped_pref_value_bridge_android.h"
-// Must come after all headers that specialize FromJniType() / ToJniType().
-#include "components/sync_preferences/cross_device_pref_tracker/android/jni_headers/CrossDevicePrefTracker_jni.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-using base::android::ScopedJavaLocalRef;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace sync_preferences {
 
 namespace {
@@ -569,14 +554,6 @@ CrossDevicePrefTrackerImpl::CrossDevicePrefTrackerImpl(
   // `sync_service_` can be null in tests or if Sync is disabled.
   CHECK(pref_provider_);
 
-#if BUILDFLAG(IS_ANDROID)
-  // This needs to come at the start of the constructor; otherwise, methods we
-  // call in the constructor will NPE.
-  JNIEnv* env = base::android::AttachCurrentThread();
-  java_object_.Reset(Java_CrossDevicePrefTracker_Constructor(
-      env, reinterpret_cast<intptr_t>(this)));
-#endif  // BUILDFLAG(IS_ANDROID)
-
   syncable_pref_observation_.Observe(profile_pref_service_);
 
   is_local_device_info_ready_ =
@@ -768,11 +745,6 @@ void CrossDevicePrefTrackerImpl::Shutdown() {
   local_pref_service_ = nullptr;
   device_info_sync_service_ = nullptr;
   sync_service_ = nullptr;
-
-#if BUILDFLAG(IS_ANDROID)
-  Java_CrossDevicePrefTracker_clearNativePtr(
-      base::android::AttachCurrentThread(), java_object_);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // `DeviceInfo` changes are relevant for several reasons:
@@ -1064,15 +1036,6 @@ void CrossDevicePrefTrackerImpl::NotifyRemotePrefChanged(
     observer.OnRemotePrefChanged(tracked_pref_name, timestamped_value,
                                  remote_device_info);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  TimestampedPrefValueBridge bridge(timestamped_value);
-  Java_CrossDevicePrefTracker_onRemotePrefChanged(
-      base::android::AttachCurrentThread(), java_object_,
-      tracked_pref_name.data(), bridge.GetJavaObject(),
-      static_cast<int>(remote_device_info.os_type()),
-      static_cast<int>(remote_device_info.form_factor()));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void CrossDevicePrefTrackerImpl::HandleLocalDeviceInfoIfAvailable() {
@@ -1320,12 +1283,6 @@ void CrossDevicePrefTrackerImpl::RefreshServiceStatusAndSyncState() {
   for (auto& observer : observers_) {
     observer.OnServiceStatusChanged(service_status_);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  Java_CrossDevicePrefTracker_onServiceStatusChanged(
-      base::android::AttachCurrentThread(), java_object_,
-      static_cast<int>(service_status_));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void CrossDevicePrefTrackerImpl::OnIsSyncingChanged() {
@@ -1338,79 +1295,4 @@ void CrossDevicePrefTrackerImpl::OnIsSyncingChanged() {
   RefreshServiceStatusAndSyncState();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-namespace {
-
-// Helper to convert OsType and FormFactor from Java ints to optional C++ enums.
-CrossDevicePrefTracker::DeviceFilter ToDeviceFilter(
-    std::optional<int> os_type,
-    std::optional<int> form_factor,
-    std::optional<int64_t> max_sync_recency_microseconds) {
-  CrossDevicePrefTracker::DeviceFilter filter;
-  if (os_type.has_value()) {
-    filter.os_type = static_cast<syncer::DeviceInfo::OsType>(os_type.value());
-  }
-  if (form_factor.has_value()) {
-    filter.form_factor =
-        static_cast<syncer::DeviceInfo::FormFactor>(form_factor.value());
-  }
-  if (max_sync_recency_microseconds.has_value()) {
-    filter.max_sync_recency =
-        base::Microseconds(max_sync_recency_microseconds.value());
-  }
-  return filter;
-}
-
-}  // namespace
-
-// Return the Java object that allows access to the CrossDevicePrefTracker.
-ScopedJavaLocalRef<jobject> CrossDevicePrefTrackerImpl::GetJavaObject() {
-  return ScopedJavaLocalRef<jobject>(java_object_);
-}
-
-// Java versions of query methods.
-int CrossDevicePrefTrackerImpl::GetServiceStatus(JNIEnv* env) const {
-  return static_cast<int>(GetServiceStatus());
-}
-
-ScopedJavaLocalRef<jobjectArray> CrossDevicePrefTrackerImpl::GetValues(
-    JNIEnv* env,
-    const base::android::JavaRef<jstring>& pref_name,
-    std::optional<int> os_type,
-    std::optional<int> form_factor,
-    std::optional<int64_t> max_sync_recency_microseconds) const {
-  std::vector<ScopedJavaLocalRef<jobject>> result;
-  std::vector<TimestampedPrefValue> timestamped_pref_values = GetValues(
-      base::android::ConvertJavaStringToUTF8(env, pref_name),
-      ToDeviceFilter(os_type, form_factor, max_sync_recency_microseconds));
-  for (const auto& timestamped_pref_value : timestamped_pref_values) {
-    TimestampedPrefValueBridge bridge(timestamped_pref_value);
-    result.push_back(bridge.GetJavaObject());
-  }
-  return base::android::ToJavaArrayOfObjects(env, result);
-}
-
-ScopedJavaLocalRef<jobject> CrossDevicePrefTrackerImpl::GetMostRecentValue(
-    JNIEnv* env,
-    const base::android::JavaRef<jstring>& pref_name,
-    std::optional<int> os_type,
-    std::optional<int> form_factor,
-    std::optional<int64_t> max_sync_recency_microseconds) const {
-  std::optional<TimestampedPrefValue> timestamped_pref_value =
-      GetMostRecentValue(
-          base::android::ConvertJavaStringToUTF8(env, pref_name),
-          ToDeviceFilter(os_type, form_factor, max_sync_recency_microseconds));
-  if (!timestamped_pref_value.has_value()) {
-    return nullptr;
-  }
-  TimestampedPrefValueBridge bridge(timestamped_pref_value.value());
-  return bridge.GetJavaObject();
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace sync_preferences
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(CrossDevicePrefTracker)
-#endif

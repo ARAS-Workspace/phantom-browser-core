@@ -53,7 +53,7 @@ ChromePingManagerFactory::ChromePingManagerFactory()
               .WithGuest(ProfileSelection::kNone)
               .Build()) {
   DependsOn(IdentityManagerFactory::GetInstance());
-#if BUILDFLAG(FULL_SAFE_BROWSING) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(FULL_SAFE_BROWSING)
   DependsOn(HatsServiceFactory::GetInstance());
 #endif
 }
@@ -65,7 +65,7 @@ ChromePingManagerFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
   std::unique_ptr<ChromeSafeBrowsingHatsDelegate> hats_delegate = nullptr;
-#if BUILDFLAG(FULL_SAFE_BROWSING) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(FULL_SAFE_BROWSING)
   hats_delegate = std::make_unique<ChromeSafeBrowsingHatsDelegate>(profile);
 #endif
   return PingManager::Create(

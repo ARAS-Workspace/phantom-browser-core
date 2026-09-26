@@ -1105,7 +1105,6 @@ void AutofillCrowdsourcingManager::OnSimpleLoaderComplete(
         GetMetricName(request_data.request_type, "FailingPayloadSize"),
         request_data.payload.length());
 
-#if !BUILDFLAG(IS_ANDROID)
     if (base::FeatureList::IsEnabled(
             features::debug::kAutofillOverridePredictions) &&
         request_data.callback) {
@@ -1118,7 +1117,6 @@ void AutofillCrowdsourcingManager::OnSimpleLoaderComplete(
                              std::move(request_data.form_signatures)));
       return;
     }
-#endif
 
     // If the failure was a client error don't retry.
     if (response_code >= 400 && response_code <= 499) {

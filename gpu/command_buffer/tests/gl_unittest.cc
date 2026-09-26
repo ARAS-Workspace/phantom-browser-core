@@ -156,7 +156,6 @@ class GL3Test : public GLTest {
 // TODO(crbug.com/513543143): Goldfish GLES emulator driver on 32-bit x86
 // Android bots has a known driver bug where it incorrectly rejects
 // glCopyTexImage2D on cubemaps with GL_INVALID_ENUM.
-#if !(BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_X86))
 TEST_F(GL3Test, CopyTexImage2DCubeMapStateDesync) {
   GLuint tex = 0;
   glGenTextures(1, &tex);
@@ -204,7 +203,6 @@ TEST_F(GL3Test, CopyTexImage2DCubeMapStateDesync) {
   glDeleteFramebuffers(1, &fbo);
   glDeleteTextures(1, &tex);
 }
-#endif  // !(BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_X86))
 
 class GL3MultisampleCopyTexImageTest : public GL3Test {
  protected:

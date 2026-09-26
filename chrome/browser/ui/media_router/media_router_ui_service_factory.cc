@@ -55,11 +55,9 @@ MediaRouterUIServiceFactory::BuildServiceInstanceForBrowserContext(
       Profile::FromBrowserContext(context));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool MediaRouterUIServiceFactory::ServiceIsCreatedWithBrowserContext() const {
   return true;
 }
-#endif
 
 bool MediaRouterUIServiceFactory::ServiceIsNULLWhileTesting() const {
   return true;

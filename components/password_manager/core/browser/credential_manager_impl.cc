@@ -99,7 +99,6 @@ void CredentialManagerImpl::Store(const CredentialInfo& credential,
   }
   form_manager_ = std::make_unique<CredentialManagerPasswordFormManager>(
       client_, std::move(form), this, nullptr, std::move(form_fetcher));
-#if !BUILDFLAG(IS_ANDROID)
   if (!last_submitted_form_) {
     return;
   }
@@ -117,7 +116,6 @@ void CredentialManagerImpl::Store(const CredentialInfo& credential,
       pwm_credential_matches_cmapi_credential) {
     form_manager_->SetShouldStoreActorLoginPermission();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void CredentialManagerImpl::PreventSilentAccess(

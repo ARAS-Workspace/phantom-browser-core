@@ -254,7 +254,6 @@ TEST_F(OnDeviceHeadProviderTest, HasTailMatches) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(OnDeviceHeadProviderTest, LaunchEnglishTailModel) {
   SetupTestOnDeviceTailModel();
   AutocompleteInput input(u"Facebook l", metrics::OmniboxEventProto::OTHER,
@@ -292,7 +291,6 @@ TEST_F(OnDeviceHeadProviderTest, LaunchEnglishTailModel) {
     EXPECT_TRUE(provider_->matches().empty());
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(OnDeviceHeadProviderTest, CancelInProgressRequest) {
   AutocompleteInput input1(u"g", metrics::OmniboxEventProto::OTHER,

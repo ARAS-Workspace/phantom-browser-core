@@ -114,13 +114,6 @@ SkiaOutputDeviceGL::SkiaOutputDeviceGL(
   }
   capabilities_.pending_swap_params.max_pending_swaps =
       gl_surface_->GetBufferCount() - 1;
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(weiliangc): This capability is used to check whether we should do
-  // overlay. Since currently none of the other overlay system is implemented,
-  // only update this for Android.
-  // This output device is never offscreen.
-  capabilities_.supports_surfaceless = gl_surface_->IsSurfaceless();
-#endif
 
   DCHECK(context_state_);
   DCHECK(gl_surface_);
@@ -168,10 +161,8 @@ SkiaOutputDeviceGL::SkiaOutputDeviceGL(
     // use-case to have multiple active windows there. On other platforms we
     // disable GLSurface's VSync if we're swapping multiple surfaces per frame
     // to prevent SwapBuffers from blocking and slowing down other windows.
-#if !BUILDFLAG(IS_ANDROID)
     multisurface_swapbuffers_tracker_ =
         std::make_unique<MultiSurfaceSwapBuffersTracker>();
-#endif
   } else {
     gl_surface_->SetVSyncEnabled(false);
   }

@@ -152,18 +152,6 @@ class SupervisedUserLogRecordTest : public ::testing::Test {
             supervised_user_test_environment_.device_parental_controls()));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  void EnableSearchContentFilters() {
-    supervised_user_test_environment_.device_parental_controls()
-        .SetSearchContentFiltersEnabledForTesting(true);
-  }
-
-  void EnableBrowserContentFilters() {
-    supervised_user_test_environment_.device_parental_controls()
-        .SetBrowserContentFiltersEnabledForTesting(true);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
  private:
   base::test::TaskEnvironment task_environment_;
   signin::IdentityTestEnvironment identity_test_env_;
@@ -317,37 +305,5 @@ TEST_F(SupervisedUserLogRecordTest, RegularUserWithDisabledSupervision) {
               Optional(SupervisedUserLogRecord::Segment::kUnsupervised));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(SupervisedUserLogRecordTest, RegularUserWithSearchFilterEnabled) {
-  CreateRegularUser();
-  EnableSearchContentFilters();
-
-  std::optional<SupervisedUserLogRecord::Segment> supervision_status =
-      CreateSupervisedUserLogRecord()->GetSupervisionStatusForPrimaryAccount();
-  EXPECT_THAT(supervision_status,
-              Optional(SupervisedUserLogRecord::Segment::kUnsupervised));
-}
-
-TEST_F(SupervisedUserLogRecordTest, RegularUserWithContentFiltersEnabled) {
-  CreateRegularUser();
-  EnableBrowserContentFilters();
-
-  std::optional<SupervisedUserLogRecord::Segment> supervision_status =
-      CreateSupervisedUserLogRecord()->GetSupervisionStatusForPrimaryAccount();
-  EXPECT_THAT(supervision_status,
-              Optional(SupervisedUserLogRecord::Segment::kUnsupervised));
-}
-
-TEST_F(SupervisedUserLogRecordTest, RegularUserWithAllLocalFiltersEnabled) {
-  CreateRegularUser();
-  EnableSearchContentFilters();
-  EnableBrowserContentFilters();
-
-  std::optional<SupervisedUserLogRecord::Segment> supervision_status =
-      CreateSupervisedUserLogRecord()->GetSupervisionStatusForPrimaryAccount();
-  EXPECT_THAT(supervision_status,
-              Optional(SupervisedUserLogRecord::Segment::kUnsupervised));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 }  // namespace
 }  // namespace supervised_user

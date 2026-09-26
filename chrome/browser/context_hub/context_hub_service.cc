@@ -51,12 +51,10 @@
 #include "content/public/browser/page.h"
 #include "content/public/browser/web_contents.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/tab_list/tab_removed_reason.h"
 #include "chrome/browser/ui/browser_tab_strip_tracker.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 namespace context_hub {
 
@@ -185,11 +183,9 @@ ContextHubService::ContextHubService(
                 weak_factory_.GetWeakPtr()));
     first_party_auto_todos_timer_->Start();
 
-#if !BUILDFLAG(IS_ANDROID)
     browser_tab_strip_tracker_ =
         std::make_unique<BrowserTabStripTracker>(this, this);
     browser_tab_strip_tracker_->Init();
-#endif
   }
 }
 
@@ -208,7 +204,6 @@ ContextHubService::~ContextHubService() {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool ContextHubService::ShouldTrackBrowser(BrowserWindowInterface* browser) {
   return browser->GetProfile() == &profile_.get();
 }
@@ -237,7 +232,6 @@ void ContextHubService::OnTabStripModelChanged(
     }
   }
 }
-#endif
 
 void ContextHubService::OnFirstPartyAutoTodosTimerTriggered() {
   GenerateFirstPartyAutoTodos(base::DoNothing());

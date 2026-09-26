@@ -1575,9 +1575,6 @@ bool TestLauncher::Init(CommandLine* command_line) {
   // Operating systems (sorted alphabetically).
   // Note that they can deliberately overlap, e.g. OS_LINUX is a subset
   // of OS_POSIX.
-#if BUILDFLAG(IS_ANDROID)
-  results_tracker_.AddGlobalTag("OS_ANDROID");
-#endif
 
 #if BUILDFLAG(IS_APPLE)
   results_tracker_.AddGlobalTag("OS_APPLE");

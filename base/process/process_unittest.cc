@@ -124,8 +124,7 @@ TEST_F(ProcessTest, CreationTimeCurrentProcess) {
   EXPECT_LE(Process::Current().CreationTime(), Time::Now());
 }
 
-#if !BUILDFLAG(IS_ANDROID)  // Cannot read other processes' creation time on
-                            // Android.
+// Android.
 TEST_F(ProcessTest, CreationTimeOtherProcess) {
   // The creation time of a process should be between a time recorded before it
   // was spawned and a time recorded after it was spawned. However, since the
@@ -150,7 +149,6 @@ TEST_F(ProcessTest, CreationTimeOtherProcess) {
   EXPECT_LE(creation, after_creation + kTolerance);
   EXPECT_TRUE(process.Terminate(kDummyExitCode, true));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ProcessTest, Terminate) {
   Process process(SpawnChild("SleepyChildProcess"));

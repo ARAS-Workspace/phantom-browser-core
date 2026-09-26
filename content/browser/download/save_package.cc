@@ -1542,14 +1542,6 @@ void SavePackage::OnPathPicked(
   // Ensure the filename is safe.
   saved_main_file_path_ = params.file_path;
 
-#if BUILDFLAG(IS_ANDROID)
-  if (saved_main_file_path_.IsContentUri()) {
-    save_type_ = SAVE_PAGE_TYPE_AS_MHTML;
-    saved_main_file_display_name_ = params.display_name;
-    Init(std::move(download_created_callback));
-    return;
-  }
-#endif
   // TODO(asanka): This call may block on IO and shouldn't be made
   // from the UI thread.  See http://crbug.com/61827.
   std::string mime_type =

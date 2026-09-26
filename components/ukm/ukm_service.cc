@@ -364,41 +364,6 @@ void UkmService::DisableReporting() {
   Flush(metrics::MetricsLogsEventManager::CreateReason::kServiceShutdown);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void UkmService::OnAppEnterForeground() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DVLOG(DebuggingLogLevel::Medium) << "UkmService::OnAppEnterForeground";
-
-  reporting_service_.OnAppEnterForeground();
-
-  // If initialize_started_ is false, UKM has not yet been started, so bail. The
-  // scheduler will instead be started via EnableReporting().
-  if (!initialize_started_) {
-    return;
-  }
-
-  scheduler_->Start();
-}
-
-void UkmService::OnAppEnterBackground() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DVLOG(DebuggingLogLevel::Medium) << "UkmService::OnAppEnterBackground";
-
-  reporting_service_.OnAppEnterBackground();
-
-  if (!initialize_started_) {
-    return;
-  }
-
-  scheduler_->Stop();
-
-  // Give providers a chance to persist ukm data as part of being backgrounded.
-  metrics_providers_.OnAppEnterBackground();
-
-  Flush(metrics::MetricsLogsEventManager::CreateReason::kBackgrounded);
-}
-#endif
-
 void UkmService::Flush(metrics::MetricsLogsEventManager::CreateReason reason) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   if (initialize_complete_) {

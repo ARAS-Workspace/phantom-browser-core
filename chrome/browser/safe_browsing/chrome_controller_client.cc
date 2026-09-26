@@ -10,12 +10,10 @@
 #include "components/security_interstitials/core/metrics_helper.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 ChromeControllerClient::ChromeControllerClient(
     content::WebContents* web_contents,
@@ -36,7 +34,6 @@ ChromeControllerClient::ChromeControllerClient(
 ChromeControllerClient::~ChromeControllerClient() = default;
 
 void ChromeControllerClient::Proceed() {
-#if !BUILDFLAG(IS_ANDROID)
   // Web Apps should not be allowed to run if Safe Browsing considers them
   // dangerous. So, when users click proceed on an interstitial, move the tab
   // to a regular Chrome window and proceed as usual there.
@@ -46,6 +43,5 @@ void ChromeControllerClient::Proceed() {
           web_contents());
   if (web_app::AppBrowserController::IsWebApp(browser))
     chrome::OpenInChrome(browser);
-#endif  // !BUILDFLAG(IS_ANDROID)
   safe_browsing::SafeBrowsingControllerClient::Proceed();
 }

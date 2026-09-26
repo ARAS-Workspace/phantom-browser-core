@@ -30,12 +30,6 @@
 #include "content/public/browser/web_contents.h"
 #include "services/network/public/cpp/features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/customtabs/client_data_header_web_contents_observer.h"
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/safe_browsing/android/suspicious_site_controller_android.h"
-#endif
-
 namespace safe_browsing {
 namespace {
 
@@ -67,14 +61,6 @@ void CreateSafeBrowsingUserInteractionObserver(
     ui_manager->StartDisplayingBlockingPage(resource);
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  // Don't delay the interstitial for Chrome Custom Tabs.
-  auto* tab_android = TabAndroid::FromWebContents(web_contents);
-  if (tab_android && tab_android->IsCustomTab()) {
-    ui_manager->StartDisplayingBlockingPage(resource);
-    return;
-  }
-#endif
   SafeBrowsingUserInteractionObserver::CreateForWebContents(
       web_contents, resource, ui_manager);
 }
@@ -168,27 +154,7 @@ void UrlCheckerDelegateImpl::NotifySuspiciousSiteDetected(
 void UrlCheckerDelegateImpl::ShowSuspiciousSiteWarning(
     int64_t navigation_id,
     const base::RepeatingCallback<content::WebContents*()>&
-        web_contents_getter) {
-#if BUILDFLAG(IS_ANDROID)
-  content::GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE,
-      base::BindOnce(
-          [](scoped_refptr<UrlCheckerDelegateImpl> delegate,
-             int64_t navigation_id,
-             const base::RepeatingCallback<content::WebContents*()>&
-                 web_contents_getter) {
-            if (!delegate->AreSuspiciousSiteWarningsAllowed(
-                    web_contents_getter)) {
-              return;
-            }
-            if (content::WebContents* contents = web_contents_getter.Run()) {
-              safe_browsing::SuspiciousSiteControllerAndroid::
-                  ShowForWebContents(contents, navigation_id);
-            }
-          },
-          base::WrapRefCounted(this), navigation_id, web_contents_getter));
-#endif
-}
+        web_contents_getter) {}
 
 void UrlCheckerDelegateImpl::SendUrlRealTimeAndHashRealTimeDiscrepancyReport(
     std::unique_ptr<ClientSafeBrowsingReportRequest> report,

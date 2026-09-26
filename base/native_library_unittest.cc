@@ -89,15 +89,12 @@ class TestLibrary {
 
 // NativeLibraaryTest.LoadLibrary is failing on M tablets only.
 // crbug/641309
-#if !BUILDFLAG(IS_ANDROID)
 
 // Verifies that we can load a native library and resolve its exported symbols.
 TEST(NativeLibraryTest, LoadLibrary) {
   TestLibrary library;
   EXPECT_EQ(5, library.Call<int>("GetSimpleTestValue"));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // !defined(ADDRESS_SANITIZER)
 

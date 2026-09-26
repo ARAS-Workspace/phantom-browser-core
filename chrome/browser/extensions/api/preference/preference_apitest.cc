@@ -180,34 +180,28 @@ class ExtensionPreferenceApiTest : public extensions::ExtensionApiTest {
     // save the profile.
     profile_ = profile();
 
-#if !BUILDFLAG(IS_ANDROID)
     // Closing the last browser window also releases a module reference. Make
     // sure it's not the last one, so the message loop doesn't quit
     // unexpectedly. On Android KeepAlive is not supported nor required.
     keep_alive_ = std::make_unique<ScopedKeepAlive>(
         KeepAliveOrigin::BROWSER, KeepAliveRestartOption::DISABLED);
-#endif
   }
 
   void TearDownOnMainThread() override {
-#if !BUILDFLAG(IS_ANDROID)
     // BrowserProcess::Shutdown() needs to be called in a message loop, so we
     // post a task to release the keep alive, then run the message loop.
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE, base::BindOnce(&std::unique_ptr<ScopedKeepAlive>::reset,
                                   base::Unretained(&keep_alive_), nullptr));
     content::RunAllPendingInMessageLoop();
-#endif
 
     extensions::ExtensionApiTest::TearDownOnMainThread();
   }
 
   raw_ptr<Profile, DanglingUntriaged> profile_ = nullptr;
   base::test::ScopedFeatureList feature_list_;
-#if !BUILDFLAG(IS_ANDROID)
   // KeepAlive is not supported nor required on Android.
   std::unique_ptr<ScopedKeepAlive> keep_alive_;
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, Standard) {

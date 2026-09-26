@@ -53,10 +53,8 @@ WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
 
   enable_feature(features::kTabsFromOtherDevicesSidePanel);
 
-#if !BUILDFLAG(IS_ANDROID)
   enable_feature(features::kIsolatedWebAppDevUi);
   enable_feature(features::kIsolatedWebApps);
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   enable_feature(switches::kFirstRunDesktopRefresh);

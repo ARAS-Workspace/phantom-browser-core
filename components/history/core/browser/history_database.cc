@@ -1151,11 +1151,6 @@ sql::InitStatus HistoryDatabase::EnsureCurrentVersion() {
   if (cur_version == 69) {
     // The android_urls table's stopped being read in 91.0.4438.0. Delete it if
     // it still exists.
-#if BUILDFLAG(IS_ANDROID)
-    if (!DropAndroidUrlsTable()) {
-      return LogMigrationFailure(69);
-    }
-#endif
     cur_version++;
     // TODO(crbug.com/40891923): Handle failure instead of ignoring it.
     std::ignore = meta_table_.SetVersionNumber(cur_version);
@@ -1210,14 +1205,5 @@ bool HistoryDatabase::MigrateRemoveTypedUrlMetadata() {
   }
   return true;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool HistoryDatabase::DropAndroidUrlsTable() {
-  if (!db_.Execute("DROP TABLE IF EXISTS android_urls;")) {
-    return false;
-  }
-  return true;
-}
-#endif
 
 }  // namespace history

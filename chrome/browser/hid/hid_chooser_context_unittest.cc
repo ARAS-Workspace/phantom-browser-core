@@ -66,10 +66,8 @@ constexpr char kTestExtensionId[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 class HidChooserContextTestBase {
  public:
   HidChooserContextTestBase() {
-#if !BUILDFLAG(IS_ANDROID)
     scoped_feature_list_.InitAndEnableFeature(
         features::kSecurityKeyHidInterfacesAreFido);
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   HidChooserContextTestBase(const HidChooserContextTestBase&) = delete;

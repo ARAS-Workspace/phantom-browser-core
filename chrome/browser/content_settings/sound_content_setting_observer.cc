@@ -36,14 +36,12 @@ SoundContentSettingObserver::SoundContentSettingObserver(
       HostContentSettingsMapFactory::GetForProfile(profile);
   observation_.Observe(host_content_settings_map_.get());
 
-#if !BUILDFLAG(IS_ANDROID)
   // Listen to changes of the block autoplay pref.
   pref_change_registrar_.Init(profile->GetPrefs());
   pref_change_registrar_.Add(
       prefs::kBlockAutoplayEnabled,
       base::BindRepeating(&SoundContentSettingObserver::UpdateAutoplayPolicy,
                           base::Unretained(this)));
-#endif
 }
 
 SoundContentSettingObserver::~SoundContentSettingObserver() = default;
@@ -100,12 +98,10 @@ void SoundContentSettingObserver::OnContentSettingChanged(
   if (!content_type_set.Contains(ContentSettingsType::SOUND))
     return;
 
-#if !BUILDFLAG(IS_ANDROID)
   if (primary_pattern.MatchesAllHosts() &&
       secondary_pattern.MatchesAllHosts()) {
     UpdateAutoplayPolicy();
   }
-#endif
 
   MuteOrUnmuteIfNecessary();
   CheckSoundBlocked(web_contents()->IsCurrentlyAudible());
@@ -194,11 +190,9 @@ SoundContentSettingObserver::GetSiteMutedReason() {
   return MuteReason::kSiteException;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void SoundContentSettingObserver::UpdateAutoplayPolicy() {
   // Force a WebkitPreferences update to update the autoplay policy.
   web_contents()->OnWebPreferencesChanged();
 }
-#endif
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(SoundContentSettingObserver);

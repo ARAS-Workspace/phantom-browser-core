@@ -31,9 +31,6 @@ void AccountPreviewDataService::RegisterProfilePrefs(
                                 0);
   registry->RegisterTimePref(prefs::kAccountPreviewDataLast429TimePref,
                              base::Time());
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterDictionaryPref(prefs::kAccountPreviewExternalAppAccount);
-#endif
 }
 
 }  // namespace signin

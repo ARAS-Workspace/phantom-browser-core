@@ -200,7 +200,6 @@ TEST_F(DiscardEligibilityPolicyTest,
                                        CannotDiscardReason::kDiscardAttempted);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(DiscardEligibilityPolicyTest, TestCannotDiscardRecentlyAudiblePage) {
   page_node()->SetIsAudible(true);
   page_node()->SetIsAudible(false);
@@ -213,7 +212,6 @@ TEST_F(DiscardEligibilityPolicyTest, TestCannotDiscardRecentlyAudiblePage) {
       page_node(),
       {DiscardReason::EXTERNAL, DiscardReason::FROZEN_WITH_GROWING_MEMORY});
 }
-#endif
 
 TEST_F(DiscardEligibilityPolicyTest, TestCanDiscardNeverAudiblePage) {
   // Ensure that if a page node is created without ever becoming audible, it
@@ -245,7 +243,6 @@ TEST_F(DiscardEligibilityPolicyTest, TestCanDiscardNeverAudiblePage) {
                                      /*ignore_recent_visibility=*/true);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(DiscardEligibilityPolicyTest,
        TestCannotDiscardRecentlyVisiblePageUnlessExplicitlyRequested) {
   page_node()->SetIsVisible(true);
@@ -265,7 +262,6 @@ TEST_F(DiscardEligibilityPolicyTest,
 
   ExpectCanDiscardEligibleAllReasons(page_node());
 }
-#endif
 
 TEST_F(DiscardEligibilityPolicyTest, TestCannotDiscardPdf) {
   SetPageAndFrameUrlWithMimeType(GURL("https://foo.com/doc.pdf"),

@@ -53,10 +53,6 @@
 #include "ui/accessibility/platform/browser_accessibility_cocoa_test_helpers.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/accessibility/android/accessibility_state.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -499,9 +495,6 @@ void DumpAccessibilityTestBase::RunTest(
   ui::BrowserAccessibility::ignore_hovered_state_for_testing_ = true;
 
   // For Android, set a consistent user preference for how password display.
-#if BUILDFLAG(IS_ANDROID)
-  ui::AccessibilityState::ForceRespectDisplayedPasswordTextForTesting();
-#endif
 
   // Normally some accessibility events that would be fired are suppressed or
   // delayed, depending on what has focus or the type of event. For testing,

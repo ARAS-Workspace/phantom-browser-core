@@ -7,7 +7,6 @@
 #include "base/metrics/histogram_macros.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
@@ -17,7 +16,6 @@
 #include "chrome/browser/ui/views/frame/picture_in_picture_browser_frame_view.h"
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_host.h"
 #include "content/public/browser/web_contents.h"
-#endif
 
 namespace content_settings {
 
@@ -27,7 +25,6 @@ void RecordPopupsAction(PopupsAction action) {
 }
 
 void UpdateLocationBarUiForWebContents(content::WebContents* web_contents) {
-#if !BUILDFLAG(IS_ANDROID)
   if (!web_contents) {
     return;
   }
@@ -62,7 +59,6 @@ void UpdateLocationBarUiForWebContents(content::WebContents* web_contents) {
         browser_view->browser_widget()->GetFrameView());
     frame_view->UpdateContentSettingsIcons();
   }
-#endif
 }
 
 }  // namespace content_settings

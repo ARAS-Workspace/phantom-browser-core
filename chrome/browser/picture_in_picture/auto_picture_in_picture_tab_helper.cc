@@ -32,11 +32,9 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/frame/user_activation_state.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/picture_in_picture/auto_pip_setting_overlay_view.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
@@ -79,14 +77,12 @@ AutoPictureInPictureTabHelper::AutoPictureInPictureTabHelper(
   // On non-Android platforms, we observe the internal AudioFocusManager to
   // track audio focus state. Android has a native system-wide AudioManager,
   // so this observer is never notified and is not used.
-#if !BUILDFLAG(IS_ANDROID)
   // Connect to receive audio focus events.
   mojo::Remote<media_session::mojom::AudioFocusManager> audio_focus_remote;
   content::GetMediaSessionService().BindAudioFocusManager(
       audio_focus_remote.BindNewPipeAndPassReceiver());
   audio_focus_remote->AddObserver(
       audio_focus_observer_receiver_.BindNewPipeAndPassRemote());
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Connect to receive media session updates if the media session already
   // exists. If it does not, then we'll become an observer in
@@ -126,15 +122,9 @@ bool AutoPictureInPictureTabHelper::HasAutoPictureInPictureBeenRegistered()
 void AutoPictureInPictureTabHelper::PrimaryPageChanged(content::Page& page) {
   has_ever_registered_for_auto_picture_in_picture_ = false;
   // On navigation, forget any 'allow once' state.
-#if !BUILDFLAG(IS_ANDROID)
   auto_pip_setting_helper_.reset();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   StopAndResetAsyncTasks();
-
-#if BUILDFLAG(IS_ANDROID)
-  hide_button_clicked_time_ = std::nullopt;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void AutoPictureInPictureTabHelper::AccumulateTotalPipTimeForSession(
@@ -336,13 +326,11 @@ void AutoPictureInPictureTabHelper::MaybeRecordTotalPipTimeForSession() {
   total_browser_initiated_pip_time_for_session_ = std::nullopt;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 AutoPictureInPictureHatsService* AutoPictureInPictureTabHelper::GetHatsService()
     const {
   return AutoPictureInPictureHatsServiceFactory::GetForProfile(
       Profile::FromBrowserContext(web_contents()->GetBrowserContext()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void AutoPictureInPictureTabHelper::MediaPictureInPictureChanged(
     bool is_in_picture_in_picture) {
@@ -353,7 +341,6 @@ void AutoPictureInPictureTabHelper::MediaPictureInPictureChanged(
   blocked_due_to_content_setting_ = false;
 
   if (!is_in_picture_in_picture_) {
-#if !BUILDFLAG(IS_ANDROID)
     if (auto* hats_service = GetHatsService()) {
       // This call will be a no-op for non-autopip windows, since the autopip
       // HaTS service active window context (`active_window_context_`) is only
@@ -364,7 +351,6 @@ void AutoPictureInPictureTabHelper::MediaPictureInPictureChanged(
         hats_service->MaybeLaunchSurvey(web_contents());
       }
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     is_in_auto_picture_in_picture_ = false;
     MaybeRecordPictureInPictureChanged(false);
@@ -379,12 +365,10 @@ void AutoPictureInPictureTabHelper::MediaPictureInPictureChanged(
     is_in_auto_picture_in_picture_ = true;
     auto_picture_in_picture_activation_time_ = base::TimeTicks();
 
-#if !BUILDFLAG(IS_ANDROID)
     if (auto* hats_service = GetHatsService()) {
       hats_service->AutoPictureInPictureWindowOpened(
           auto_pip_trigger_reason_, web_contents()->GetLastCommittedURL());
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     MaybeRecordPictureInPictureChanged(true);
 
@@ -469,7 +453,6 @@ void AutoPictureInPictureTabHelper::OnOcclusionStateChanged(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void AutoPictureInPictureTabHelper::OnFocusGained(
     media_session::mojom::AudioFocusRequestStatePtr session) {
   if (has_audio_focus_) {
@@ -498,19 +481,12 @@ void AutoPictureInPictureTabHelper::OnFocusLost(
   }
   has_audio_focus_ = (request_id != session->request_id);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void AutoPictureInPictureTabHelper::MediaSessionInfoChanged(
     media_session::mojom::MediaSessionInfoPtr session_info) {
   // On Android, audio focus is managed by the operating system. The
   // MediaSession state is the source of truth as it reflects focus changes from
   // the Android system's AudioManager.
-#if BUILDFLAG(IS_ANDROID)
-  has_audio_focus_ =
-      session_info &&
-      session_info->state ==
-          media_session::mojom::MediaSessionInfo::SessionState::kActive;
-#endif  // BUILDFLAG(IS_ANDROID)
   const bool is_playing =
       session_info && session_info->playback_state ==
                           media_session::mojom::MediaPlaybackState::kPlaying;
@@ -722,13 +698,6 @@ bool AutoPictureInPictureTabHelper::MeetsVideoPlaybackConditions() const {
 }
 
 bool AutoPictureInPictureTabHelper::IsUsingCameraOrMicrophone() const {
-#if BUILDFLAG(IS_ANDROID)
-  // For Android JNI tests, return the testing override value if it's available,
-  // completely bypassing the IsCapturingUserMedia check.
-  if (is_using_camera_or_microphone_for_testing_.has_value()) {
-    return is_using_camera_or_microphone_for_testing_.value();
-  }
-#endif
   return MediaCaptureDevicesDispatcher::GetInstance()
       ->GetMediaStreamCaptureIndicator()
       ->IsCapturingUserMedia(web_contents());
@@ -762,14 +731,6 @@ bool AutoPictureInPictureTabHelper::MeetsMediaEngagementConditions() const {
   if (!media_engagement_service_) {
     return false;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // For Android JNI tests, return the testing override value if it's available,
-  // completely bypassing the MediaEngagementService check.
-  if (has_high_engagement_for_testing_.has_value()) {
-    return has_high_engagement_for_testing_.value();
-  }
-#endif
 
   return media_engagement_service_->HasHighEngagement(origin);
 }
@@ -965,14 +926,11 @@ void AutoPictureInPictureTabHelper::set_auto_blocker_for_testing(
   // If we're clearing the auto blocker, then also drop any setting helper we
   // have, since it might also know about it.  This is intended during test
   // cleanup to prevent dangling raw ptrs.
-#if !BUILDFLAG(IS_ANDROID)
   if (auto_pip_setting_helper_ && !auto_blocker) {
     auto_pip_setting_helper_.reset();
   }
-#endif  //! BUILDFLAG(IS_ANDROID)
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<AutoPipSettingOverlayView>
 AutoPictureInPictureTabHelper::CreateOverlayPermissionViewIfNeeded(
     base::OnceClosure close_pip_cb,
@@ -995,48 +953,8 @@ AutoPictureInPictureTabHelper::CreateOverlayPermissionViewIfNeeded(
       std::move(close_pip_cb), auto_pip_trigger_reason_, GetUkmSourceId(),
       anchor_view, arrow);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-void AutoPictureInPictureTabHelper::OnPictureInPictureDismissed() {
-  // An auto-PiP window is considered "dismissed" by the user if it's closed
-  // shortly after appearing ("quick dismissal") or if the "hide" button is
-  // clicked. Both actions signal that the user may not want auto-PiP for this
-  // site, so we increment the dismissal count to potentially embargo the
-  // feature.
-  //
-  // We only count dismissals if the tab is not active, to avoid counting cases
-  // where the PiP window is automatically closed when switching back to the
-  // tab.
-  if (!tab_observer_helper_->IsTabActivated() && auto_blocker_) {
-    // Set `dismissed_prompt_was_quiet` to false for now as the dismissal count
-    // threshold is only 1(vs 3) for quiet UI permission prompts, which might be
-    // too stringent for auto-pip.
-    // TODO(crbug.com/421606013): confirm the dismissal count threshold with
-    // privacy reviewer.
-    auto_blocker_->RecordDismissAndEmbargo(
-        web_contents()->GetLastCommittedURL(),
-        ContentSettingsType::AUTO_PICTURE_IN_PICTURE,
-        /*dismissed_prompt_was_quiet=*/false);
-  }
-}
-
-void AutoPictureInPictureTabHelper::OnPictureInPictureWindowWillHide() {
-  hide_button_clicked_time_ = clock_->NowTicks();
-}
-
-int AutoPictureInPictureTabHelper::GetDismissCountForTesting(const GURL& url) {
-  if (!auto_blocker_) {
-    return 0;
-  }
-  return static_cast<permissions::PermissionDecisionAutoBlocker*>(
-             auto_blocker_.get())
-      ->GetDismissCount(url, ContentSettingsType::AUTO_PICTURE_IN_PICTURE);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void AutoPictureInPictureTabHelper::OnUserClosedWindow() {
-#if !BUILDFLAG(IS_ANDROID)
   if (!auto_pip_setting_helper_) {
     // There is definitely no auto-pip UI showing, so ignore this.  Either this
     // isn't auto-pip, or we didn't need to ask the user about it.
@@ -1046,23 +964,9 @@ void AutoPictureInPictureTabHelper::OnUserClosedWindow() {
   // There might be the auto-pip setting UI shown, so forward this.
   auto_pip_setting_helper_->OnUserClosedWindow(GetAutoPipReason(),
                                                GetUkmSourceId());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void AutoPictureInPictureTabHelper::OnTabBecameActive() {
-#if BUILDFLAG(IS_ANDROID)
-  if (hide_button_clicked_time_) {
-    base::TimeDelta back_to_tab_post_hide_time =
-        clock_->NowTicks() - hide_button_clicked_time_.value();
-    hide_button_clicked_time_ = std::nullopt;
-
-    base::UmaHistogramCustomTimes(
-        "Media.AutoPictureInPicture.BackToTabPostHideTime",
-        back_to_tab_post_hide_time, base::Milliseconds(1), base::Hours(10),
-        100);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // We're the newly active tab, possibly before we've been notified by the tab
   // strip helper.  See if there's an autopip instance to close, and close it.
   // We may be called more than once for the same tab switch operation, once
@@ -1073,7 +977,6 @@ void AutoPictureInPictureTabHelper::OnTabBecameActive() {
   // that the incoming tab has the opportunity to close pip.
   MaybeExitAutoPictureInPicture();
 
-#if !BUILDFLAG(IS_ANDROID)
   // This call will be a no-op for non-autopip windows, since the autopip HaTS
   // service active window context (`active_window_context_`) is only set for
   // autopip windows. Without an active window context, calling
@@ -1081,7 +984,6 @@ void AutoPictureInPictureTabHelper::OnTabBecameActive() {
   if (auto* hats_service = GetHatsService()) {
     hats_service->MaybeLaunchSurvey(web_contents());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(AutoPictureInPictureTabHelper);

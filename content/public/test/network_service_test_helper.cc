@@ -70,10 +70,6 @@
 #include "services/network/sct_auditing/sct_auditing_reporter.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/android/url_utils.h"
-#endif
-
 namespace content {
 namespace {
 

@@ -148,13 +148,6 @@ bool PrintViewManagerBase::PrintNow(content::RenderFrameHost* rfh) {
   return PrintNowImpl(rfh, /*print_selection_only=*/false);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool PrintViewManagerBase::PrintNow(content::RenderFrameHost* rfh,
-                                    bool print_selection_only) {
-  return PrintNowImpl(rfh, print_selection_only);
-}
-#endif
-
 bool PrintViewManagerBase::PrintNowImpl(content::RenderFrameHost* rfh,
                                         bool print_selection_only) {
   if (!StartPrintCommon(rfh, print_selection_only)) {
@@ -663,12 +656,7 @@ bool PrintViewManagerBase::GetPrintingEnabledBooleanPref() const {
   return printing_enabled_.GetValue();
 }
 
-void PrintViewManagerBase::OnDocDone(int job_id, PrintedDocument* document) {
-#if BUILDFLAG(IS_ANDROID)
-  DCHECK_LE(number_pages(), kMaxPageCount);
-  PdfWritingDone(base::checked_cast<int>(number_pages()));
-#endif
-}
+void PrintViewManagerBase::OnDocDone(int job_id, PrintedDocument* document) {}
 
 void PrintViewManagerBase::OnJobDone() {
   // Printing is done, we don't need it anymore.
@@ -797,9 +785,6 @@ void PrintViewManagerBase::TerminatePrintJob(bool cancel) {
     // We don't need the metafile data anymore because the printing is canceled.
     print_job_->Cancel();
     quit_inner_loop_.Reset();
-#if BUILDFLAG(IS_ANDROID)
-    PdfWritingDone(0);
-#endif
   } else {
     DCHECK(!quit_inner_loop_);
     DCHECK(!print_job_->document() || print_job_->document()->IsComplete());
@@ -962,9 +947,6 @@ bool PrintViewManagerBase::StartPrintCommon(content::RenderFrameHost* rfh,
 #endif
 
   SetPrintingRFH(rfh);
-#if BUILDFLAG(IS_ANDROID)
-  print_selection_only_ = print_selection_only;
-#endif
   return true;
 }
 
@@ -1030,12 +1012,6 @@ void PrintViewManagerBase::CompleteScriptedPrint(
     printer_query = queue()->CreatePrinterQuery(rfh->GetGlobalId());
 
   bool has_selection = params->has_selection;
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not support choosing "selection only" in the system print
-  // dialog. Selection is printed only if the print job was explicitly started
-  // for selection.
-  has_selection = print_selection_only_;
-#endif
 
   auto* printer_query_ptr = printer_query.get();
   printer_query_ptr->GetSettingsFromUser(

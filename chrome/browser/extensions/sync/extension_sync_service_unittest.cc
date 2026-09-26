@@ -69,11 +69,9 @@
 #include "extensions/common/mojom/manifest.mojom-shared.h"
 #include "extensions/common/permissions/permission_set.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/themes/test/theme_service_changed_waiter.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -943,7 +941,6 @@ TEST_F(ExtensionSyncServiceTest, ReinstallSyncedExtensionWhenPolicyIsLifted) {
   EXPECT_TRUE(pending_extension_manager->IsIdPending(extension_id));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Disabled on Android since Android does not support Chrome Apps.
 TEST_F(ExtensionSyncServiceTest, GetSyncAppDataUserSettings) {
   InitializeEmptyExtensionService();
@@ -1047,7 +1044,6 @@ TEST_F(ExtensionSyncServiceTest, GetSyncAppDataUserSettingsOnExtensionMoved) {
     EXPECT_TRUE(app_launch_ordinals[0].LessThan(app_launch_ordinals[2]));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ExtensionSyncServiceTest, GetSyncDataList) {
   InitializeEmptyExtensionService();
@@ -1938,7 +1934,6 @@ TEST_F(ExtensionSyncServiceCustomGalleryTest,
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Disabled on Android since Android does not support themes.
 // Regression test for crbug.com/40445445
 TEST_F(ExtensionSyncServiceTest, DontSyncThemes) {
@@ -1968,7 +1963,6 @@ TEST_F(ExtensionSyncServiceTest, DontSyncThemes) {
   waiter.WaitForThemeChanged();
   EXPECT_TRUE(processor->changes().empty());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests sync behavior in the case of an item that starts out as an app and gets
 // updated to become an extension.

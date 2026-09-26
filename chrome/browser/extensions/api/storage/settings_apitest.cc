@@ -856,7 +856,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionCorruptLocalSettingsApiTest, ReadInvalidJSON) {
 }
 
 // TODO(crbug.com/480952785): PRE_ tests with local state seem flaky on android.
-#if !BUILDFLAG(IS_ANDROID)
 
 // Tests that setting data via chrome.storage.local, restarting the browser, and
 // then discovering data corruption upon the next read after restart results in
@@ -1020,8 +1019,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionCorruptLocalSettingsApiTest,
   // DB was wiped clean during the repair.
   EXPECT_EQ(response, "get_all_success: {}");
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that heavy sequential operations like `clear()` fail immediately when
 // faced with severely corrupted physical table wreckage.

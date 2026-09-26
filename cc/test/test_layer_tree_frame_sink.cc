@@ -133,9 +133,6 @@ class TestLayerTreeFrameSink::TestCompositorFrameSinkImpl
   void NotifyNewLocalSurfaceIdExpectedWhilePaused() override {}
   void BindLayerContext(viz::mojom::PendingLayerContextPtr context,
                         viz::mojom::LayerContextSettingsPtr settings) override;
-#if BUILDFLAG(IS_ANDROID)
-  void SetThreads(const std::vector<viz::Thread>& threads) override {}
-#endif
 
   raw_ptr<viz::CompositorFrameSinkSupport> support_;
   mojo::Receiver<viz::mojom::CompositorFrameSink> receiver_;

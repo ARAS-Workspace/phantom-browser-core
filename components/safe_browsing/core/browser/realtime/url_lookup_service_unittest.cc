@@ -731,9 +731,7 @@ TEST_F(RealTimeUrlLookupServiceTest, LocalIpAndDnsResolutionCompletes) {
 
   // TODO(crbug.com/394602691): Remove Android build exclusion once IP address
   // support becomes a requirement for Android devices.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(result->local_ips().empty());
-#endif
 
   histogram_tester.ExpectUniqueSample(
       "SafeBrowsing.RT.DnsResolution.Result",

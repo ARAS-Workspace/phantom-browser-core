@@ -210,11 +210,9 @@ IN_PROC_BROWSER_TEST_F(TabGroupsApiTest, TestGroupDetachedAndReInserted) {
 
   // TODO(crbug.com/511186385): Android does not generate tab group removed
   // notifications for tab moves across windows.
-#if !BUILDFLAG(IS_ANDROID)
   event_observer.WaitForEventWithName(api::tab_groups::OnRemoved::kEventName);
   EXPECT_TRUE(
       event_observer.events().contains(api::tab_groups::OnRemoved::kEventName));
-#endif
 
   // Group added as well as the tab's group changed event should be sent.
   event_observer.WaitForEventWithName(api::tab_groups::OnCreated::kEventName);

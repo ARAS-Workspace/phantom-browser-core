@@ -44,13 +44,6 @@
 #include "third_party/blink/public/mojom/plugins/plugin_registry.mojom.h"
 #include "third_party/blink/public/public_buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/android/java_interfaces_impl.h"
-#include "content/browser/font_unique_name_lookup/font_unique_name_lookup_service.h"
-#include "content/public/browser/android/java_interfaces.h"
-#include "third_party/blink/public/mojom/android_font_lookup/android_font_lookup.mojom.h"
-#endif
-
 #if BUILDFLAG(IS_P2P_ENABLED)
 #include "content/browser/renderer_host/p2p/socket_dispatcher_host.h"
 #endif  // BUILDFLAG(IS_P2P_ENABLED)
@@ -100,14 +93,6 @@ void RenderProcessHost::InterceptBindHostReceiverForTesting(
 
 void RenderProcessHostImpl::OnBindHostReceiver(
     mojo::GenericPendingReceiver receiver) {
-#if BUILDFLAG(IS_ANDROID)
-  // content::GetGlobalJavaInterfaces() works only on the UI Thread.
-  if (auto r = receiver.As<blink::mojom::AndroidFontLookup>()) {
-    content::GetGlobalJavaInterfaces()->GetInterface(std::move(r));
-    return;
-  }
-#endif
-
   GetContentClient()->browser()->BindHostReceiverForRenderer(
       this, std::move(receiver));
 }
@@ -202,17 +187,10 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
           {base::MayBlock(), base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN,
            base::TaskPriority::USER_BLOCKING}));
 #if BUILDFLAG(USE_MINIKIN_HYPHENATION)
-#if !BUILDFLAG(IS_ANDROID)
   hyphenation::HyphenationImpl::RegisterGetDictionary();
-#endif
   registry->AddInterface(
       base::BindRepeating(&hyphenation::HyphenationImpl::Create),
       hyphenation::HyphenationImpl::GetTaskRunner());
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  registry->AddInterface(
-      base::BindRepeating(&FontUniqueNameLookupService::Create),
-      FontUniqueNameLookupService::GetTaskRunner());
 #endif
 
   file_system_manager_impl_.reset(new FileSystemManagerImpl(
@@ -389,15 +367,6 @@ void RenderProcessHostImpl::IOThreadHostImpl::BindHostReceiver(
                                             std::move(r));
     return;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // Bind the font lookup on the IO thread as an optimization to avoid
-  // running navigation critical path tasks on the UI thread.
-  if (auto r = receiver.As<blink::mojom::AndroidFontLookup>()) {
-    GetGlobalJavaInterfacesOnIOThread()->GetInterface(std::move(r));
-    return;
-  }
-#endif
 
   std::string interface_name = *receiver.interface_name();
   mojo::ScopedMessagePipeHandle pipe = receiver.PassPipe();

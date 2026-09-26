@@ -139,14 +139,6 @@ void OpenXrDevice::RequestSession(
   request_session_callback_ = std::move(callback);
 
   OpenXrCreateInfo create_info;
-#if BUILDFLAG(IS_ANDROID)
-  if (options->renderer_information) {
-    create_info.render_process_id =
-        options->renderer_information->render_process_id;
-    create_info.render_frame_id =
-        options->renderer_information->render_frame_id;
-  }
-#endif
   platform_helper_->CreateInstanceWithCreateInfo(
       create_info,
       base::BindOnce(&OpenXrDevice::OnCreateInstanceResult,

@@ -97,11 +97,6 @@ BPF_TEST_C(ParameterRestrictions,
   CheckClock(CLOCK_REALTIME);
   CheckClock(CLOCK_REALTIME_COARSE);
   CheckClock(CLOCK_THREAD_CPUTIME_ID);
-#if BUILDFLAG(IS_ANDROID)
-  clockid_t clock_id;
-  pthread_getcpuclockid(pthread_self(), &clock_id);
-  CheckClock(clock_id);
-#endif
 }
 
 void CheckClockNanosleep(clockid_t clockid) {
@@ -142,7 +137,6 @@ BPF_DEATH_TEST_C(ParameterRestrictions,
   syscall(SYS_clock_nanosleep, (~0) | CLOCKFD, 0, &ts, &out_ts);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 BPF_DEATH_TEST_C(ParameterRestrictions,
                  clock_gettime_crash_cpu_clock,
                  DEATH_SEGV_MESSAGE(sandbox::GetErrorMessageContentForTests()),
@@ -156,7 +150,6 @@ BPF_DEATH_TEST_C(ParameterRestrictions,
   struct timespec ts;
   clock_gettime(kInitCPUClockID, &ts);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class RestrictSchedPolicy : public bpf_dsl::Policy {
  public:
@@ -398,12 +391,6 @@ BPF_TEST_C(ParameterRestrictions,
            memfd_create_regular_flags_allowed,
            RestrictMemfdWithExecMappingsPolicy) {
   int fd = syscall(__NR_memfd_create, "test_shared_memory", MFD_CLOEXEC);
-#if BUILDFLAG(IS_ANDROID)
-  if (fd == -1 && errno == ENOSYS) {
-    // Older version of Android that doesn't support memfds. Skip this test.
-    return;
-  }
-#endif
   BPF_ASSERT_NE(fd, -1);
 
   // This combination of flags is used by PulseAudio, and should be the Chrome
@@ -424,12 +411,6 @@ BPF_TEST_C(ParameterRestrictions,
   // executable shared mappings.
   int fd = syscall(__NR_memfd_create, "test_shared_memory",
                    MFD_ALLOW_SEALING | MFD_CLOEXEC | MFD_EXEC);
-#if BUILDFLAG(IS_ANDROID)
-  if (fd == -1 && errno == ENOSYS) {
-    // Older version of Android that doesn't support memfds. Skip this test.
-    return;
-  }
-#endif
   if (fd == -1 && errno == EINVAL) {
     // Kernel too old for MFD_EXEC, skip
     return;

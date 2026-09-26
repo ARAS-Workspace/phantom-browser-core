@@ -17,14 +17,6 @@
 #include "chrome/common/buildflags.h"
 #include "components/search_engines/template_url_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/commerce/merchant_viewer/merchant_viewer_data_manager.h"
-#include "chrome/browser/commerce/merchant_viewer/merchant_viewer_data_manager_factory.h"
-#include "chrome/browser/commerce/shopping_service_factory.h"
-#include "components/commerce/core/feature_utils.h"
-#include "components/commerce/core/shopping_service.h"
-#endif
-
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 #include "chrome/browser/sessions/session_service_factory.h"
 #endif
@@ -92,26 +84,6 @@ void DeleteTemplateUrlsForDeletedOrigins(TemplateURLService* keywords_model,
       base::Time::Min(), base::Time::Max());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void ClearCommerceData(Profile* profile,
-                       const history::DeletionInfo& deletion_info) {
-  MerchantViewerDataManager* merchant_viewer_data_manager =
-      MerchantViewerDataManagerFactory::GetForProfile(profile);
-  if (!merchant_viewer_data_manager)
-    return;
-  if (deletion_info.time_range().IsValid()) {
-    merchant_viewer_data_manager->DeleteMerchantViewerDataForTimeRange(
-        deletion_info.time_range().begin(), deletion_info.time_range().end());
-  } else {
-    auto deleted_origins =
-        GetDeletedOrigins(deletion_info.deleted_urls_origin_map());
-
-    merchant_viewer_data_manager->DeleteMerchantViewerDataForOrigins(
-        std::move(deleted_origins));
-  }
-}
-#endif
-
 }  // namespace
 
 BrowsingDataHistoryObserverService::BrowsingDataHistoryObserverService(
@@ -159,14 +131,6 @@ void BrowsingDataHistoryObserverService::OnHistoryDeletions(
     }
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  commerce::ShoppingService* shopping_service =
-      commerce::ShoppingServiceFactory::GetForBrowserContext(profile_);
-  if (shopping_service && commerce::IsMerchantViewerEnabled(
-                              shopping_service->GetAccountChecker())) {
-    ClearCommerceData(profile_, deletion_info);
-  }
-#endif
 }
 
 // static
@@ -192,10 +156,6 @@ BrowsingDataHistoryObserverService::Factory::Factory()
   DependsOn(SessionServiceFactory::GetInstance());
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  DependsOn(MerchantViewerDataManagerFactory::GetInstance());
-  DependsOn(commerce::ShoppingServiceFactory::GetInstance());
-#endif
 }
 
 std::unique_ptr<KeyedService> BrowsingDataHistoryObserverService::Factory::

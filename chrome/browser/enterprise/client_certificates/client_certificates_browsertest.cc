@@ -60,12 +60,6 @@ class ClientCertificateBrowserTest : public MixinBasedPlatformBrowserTest,
             .is_cloud_machine_managed = !is_profile_scenario(),
             .affiliated = false,
         });
-
-#if BUILDFLAG(IS_ANDROID)
-    scoped_feature_list_.InitAndEnableFeature(
-        client_certificates::features::
-            kEnableClientCertificateProvisioningOnAndroid);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   void SetUp() override {

@@ -45,10 +45,8 @@
 #include "net/base/schemeful_site.h"
 #include "net/dns/mock_host_resolver.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
-#endif
 
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "content/public/browser/plugin_service.h"
@@ -75,13 +73,11 @@ class ExtensionContentSettingsApiTest : public ExtensionApiTest {
     // The browser might get closed later (and therefore be destroyed), so we
     // save the profile.
     profile_ = profile();
-#if !BUILDFLAG(IS_ANDROID)
     // Closing the last browser window also releases a KeepAlive. Make
     // sure it's not the last one, so the message loop doesn't quit
     // unexpectedly.
     keep_alive_ = std::make_unique<ScopedKeepAlive>(
         KeepAliveOrigin::BROWSER, KeepAliveRestartOption::DISABLED);
-#endif
 
     profile_keep_alive_ = std::make_unique<ScopedProfileKeepAlive>(
         profile_, ProfileKeepAliveOrigin::kBrowserWindow);
@@ -89,14 +85,12 @@ class ExtensionContentSettingsApiTest : public ExtensionApiTest {
 
   void TearDownOnMainThread() override {
     profile_keep_alive_.reset();
-#if !BUILDFLAG(IS_ANDROID)
     // BrowserProcess::Shutdown() needs to be called in a message loop, so we
     // post a task to release the keep alive, then run the message loop.
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE, base::BindOnce(&std::unique_ptr<ScopedKeepAlive>::reset,
                                   base::Unretained(&keep_alive_), nullptr));
     content::RunAllPendingInMessageLoop();
-#endif
 
     ExtensionApiTest::TearDownOnMainThread();
   }
@@ -280,10 +274,8 @@ class ExtensionContentSettingsApiTest : public ExtensionApiTest {
  private:
   raw_ptr<Profile, AcrossTasksDanglingUntriaged> profile_ = nullptr;
 
-#if !BUILDFLAG(IS_ANDROID)
   // KeepAlive is not supported nor required on Android.
   std::unique_ptr<ScopedKeepAlive> keep_alive_;
-#endif
   std::unique_ptr<ScopedProfileKeepAlive> profile_keep_alive_;
 };
 

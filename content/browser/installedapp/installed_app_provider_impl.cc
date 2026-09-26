@@ -13,9 +13,7 @@
 #include "base/task/task_traits.h"
 #include "build/build_config.h"
 #include "content/browser/browser_thread_impl.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/installedapp/fetch_related_web_apps_task.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 #include "content/common/features.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/render_frame_host.h"
@@ -76,14 +74,12 @@ void InstalledAppProviderImpl::FilterInstalledApps(
 
   base::ConcurrentCallbacks<FetchRelatedAppsTaskResult> concurrent;
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           features::kFilterInstalledAppsWebAppMatching)) {
     StartTask(std::make_unique<FetchRelatedWebAppsTask>(
                   render_frame_host().GetBrowserContext()),
               related_apps, concurrent.CreateCallback());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   std::move(concurrent)
       .Done(base::BindOnce(&InstalledAppProviderImpl::AggregateTaskResults,

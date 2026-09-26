@@ -832,7 +832,6 @@ TEST_F(OmniboxEditModelPopupTest, PopupPositionChanging) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(OmniboxEditModelPopupTest, PopupStepSelection) {
   ACMatches matches;
   for (size_t i = 0; i < 6; ++i) {
@@ -939,10 +938,8 @@ TEST_F(OmniboxEditModelPopupTest, PopupStepSelection) {
   model()->OnUpOrDownPressed(true, true);
   EXPECT_EQ(Selection(5, Selection::NORMAL), model()->GetPopupSelection());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Actions are not part of the selection stepping in Android at all.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(OmniboxEditModelPopupTest, PopupStepSelectionWithActions) {
   omnibox_feature_configs::ScopedConfigForTesting<
       omnibox_feature_configs::Toolbelt>
@@ -1052,7 +1049,6 @@ TEST_F(OmniboxEditModelPopupTest, PopupStepSelectionWithActions) {
   model()->OnUpOrDownPressed(true, true);
   EXPECT_EQ(Selection(3, Selection::NORMAL), model()->GetPopupSelection());
 }
-#endif
 
 TEST_F(OmniboxEditModelPopupTest, PopupInlineAutocompleteAndTemporaryText) {
   base::test::ScopedFeatureList feature_list;
@@ -1193,7 +1189,6 @@ TEST_F(OmniboxEditModelPopupTest, ResetFocusOnResultChange) {
 }
 
 // Android handles actions and metrics differently from other platforms.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(OmniboxEditModelPopupTest, OpenActionSelectionLogsOmniboxEvent) {
   base::HistogramTester histogram_tester;
   ACMatches matches;
@@ -1224,7 +1219,6 @@ TEST_F(OmniboxEditModelPopupTest, OpenActionSelectionLogsOmniboxEvent) {
             WindowOpenDisposition::SWITCH_TO_TAB);
   histogram_tester.ExpectUniqueSample("Omnibox.EventCount", 1, 1);
 }
-#endif
 
 TEST_F(OmniboxEditModelPopupTest, OpenThumbsDownSelectionShowsFeedback) {
   // Set the input on the controller.
@@ -1315,7 +1309,6 @@ TEST_F(OmniboxEditModelPopupTest, OpenThumbsDownSelectionShowsFeedback) {
   EXPECT_EQ(FeedbackType::kNone, result->match_at(1)->feedback_type);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests the `GetMatchIcon()` method, verifying that a page favicon is used for
 // `URL_WHAT_YOU_TYPED` matches.
 TEST_F(OmniboxEditModelPopupTest,
@@ -1436,7 +1429,6 @@ TEST_F(OmniboxEditModelPopupTest,
   gfx::test::CheckColors(bitmap.getColor(0, 0),
                          image.ToSkBitmap()->getColor(0, 0));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 // Tests the `GetMatchIcon()` method, verifying that the extension's icon is
@@ -1612,7 +1604,6 @@ TEST_F(OmniboxEditModelTest, IPv4AddressPartsCount) {
                            base::Bucket(4, 1)));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // The keyword mode feature is only available on Desktop. Do not test on mobile.
 TEST_F(OmniboxEditModelTest, OpenTabMatch) {
   // When the match comes from the Open Tab Provider while in keyword mode,
@@ -1653,7 +1644,6 @@ TEST_F(OmniboxEditModelTest, OpenTabMatch) {
                                GURL(), std::u16string(), 0);
   EXPECT_EQ(disposition, WindowOpenDisposition::CURRENT_TAB);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(OmniboxEditModelTest, LogAnswerUsed) {
   base::HistogramTester histogram_tester;

@@ -1103,20 +1103,6 @@ bool Database::RazeInternal() {
     return false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android compiles with SQLITE_DEFAULT_AUTOVACUUM.  Unfortunately,
-  // in-memory databases do not respect this define.
-  // TODO(shess): Figure out a way to set this without using platform
-  // specific code.  AFAICT from sqlite3.c, the only way to do it
-  // would be to create an actual filesystem database, which is
-  // unfortunate.
-  if (!null_db.Execute("PRAGMA auto_vacuum = 1")) {
-    RecordRazeDatabaseFailureReason(
-        histogram_tag_, RazeDatabaseFailedReason::kAutoVacuumFailed);
-    return false;
-  }
-#endif
-
   // The page size doesn't take effect until a database has pages, and
   // at this point the null database has none.  Changing the schema
   // version will create the first page.  This will not affect the

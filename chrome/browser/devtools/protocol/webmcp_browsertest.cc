@@ -13,7 +13,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/features_generated.h"
 
-#if (!BUILDFLAG(IS_ANDROID))
 namespace {
 class TestDevToolsClient : public ::content::DevToolsAgentHostClient {
  public:
@@ -87,5 +86,3 @@ class TestDevToolsClient : public ::content::DevToolsAgentHostClient {
 };
 
 }  // namespace
-
-#endif  // !BUILDFLAG(IS_ANDROID)

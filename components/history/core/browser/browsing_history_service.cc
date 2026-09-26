@@ -828,10 +828,8 @@ void BrowsingHistoryService::ReturnResultsToDriver(
   std::vector<HistoryEntry> results;
   bool has_remote_results = !state->remote_results.empty();
   bool group_visits = false;
-#if !BUILDFLAG(IS_ANDROID)
   group_visits =
       base::FeatureList::IsEnabled(kBrowsingHistorySimilarVisitsGrouping);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (group_visits) {
     results = GroupSimilarVisits(state.get());

@@ -1211,10 +1211,8 @@ void SearchEngineChoiceService::ResetState() {
 // static
 void SearchEngineChoiceService::RegisterLocalStatePrefs(
     PrefRegistrySimple* registry) {
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterInt64Pref(
       prefs::kDefaultSearchProviderGuestModePrepopulatedId, 0);
-#endif
 }
 
 // static

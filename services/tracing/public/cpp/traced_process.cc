@@ -34,7 +34,7 @@ void TracedProcess::OnTracedProcessRequest(
 // static
 void TracedProcess::EnableSystemTracingService(
     mojo::PendingRemote<mojom::SystemTracingService> remote) {
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && BUILDFLAG(USE_BLINK)
+#if BUILDFLAG(IS_POSIX) && BUILDFLAG(USE_BLINK)
   tracing::TracedProcessImpl::GetInstance()->EnableSystemTracingService(
       std::move(remote));
 #endif

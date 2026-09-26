@@ -1021,7 +1021,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
       UserVisibleFeatureKey::kWallpaperSearch));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // CreateGuestBrowser() is not supported for Android out of the box.
 IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
                        GuestProfileUniqueKeyedService) {
@@ -1054,7 +1053,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
   EXPECT_FALSE(guest_ogks->ShouldFeatureBeCurrentlyEnabledForUser(
       UserVisibleFeatureKey::kWallpaperSearch));
 }
-#endif
 
 // Test the visibility of features with `kOptimizationGuideModelExecution`
 // enabled or disabled.

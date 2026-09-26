@@ -517,19 +517,6 @@ void Navigator::DidNavigate(
     was_within_same_document = false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // This is the last point where the browser still embeds the `viz::Surface` of
-  // the old page. The next `WebContentsImpl::DidNavigateMainFramePreCommit()`
-  // will hide the old View, and the
-  // `RenderFrameHostManager::DidNavigateFrame()` will subsequently unload the
-  // old page and show the new View.
-  if (!was_within_same_document) {
-    NavigationTransitionUtils::
-        CaptureNavigationEntryScreenshotForCrossDocumentNavigations(
-            *navigation_request, /*did_receive_commit_ack=*/true);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Run tasks that must execute just before the commit.
   base::WeakPtr<RenderFrameHostImpl> weak_rfh = render_frame_host->GetWeakPtr();
   delegate_->DidNavigateAnyFramePreCommit(navigation_request.get(),

@@ -63,13 +63,5 @@ ReferrerChainProvider* WebUIContentInfoSingleton::GetReferrerChainProvider(
       browser_context);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-internal::ReferringAppInfo WebUIContentInfoSingleton::GetReferringAppInfo(
-    content::WebContents* web_contents) {
-  return sb_service_ ? sb_service_->GetReferringAppInfo(web_contents)
-                     : internal::ReferringAppInfo{};
-}
-#endif
-
 
 }  // namespace safe_browsing

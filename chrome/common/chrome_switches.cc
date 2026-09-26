@@ -358,7 +358,6 @@ const char kHideCrashRestoreBubble[] = "hide-crash-restore-bubble";
 // http://google.com.
 const char kHomePage[] = "homepage";
 
-#if !BUILDFLAG(IS_ANDROID)
 // Causes the browser to simulate a screen lock event shortly after startup.
 // Optional value specifies the delay in seconds (defaults to 5).
 // Used for manual testing of Smart Restart.
@@ -367,7 +366,6 @@ const char kSimulateLockScreenSmartRestart[] =
 
 // Triggers the import of passwords on startup.
 const char kImportPasswords[] = "import-passwords";
-#endif
 
 // Causes the initial browser opened to be in incognito mode. Further browsers
 // may or may not be in incognito mode; see `IncognitoModePrefs`.
@@ -735,45 +733,12 @@ const char kWinHttpProxyResolver[] = "winhttp-proxy-resolver";
 // resulted in a browser startup.
 const char kWinJumplistAction[] = "win-jumplist-action";
 
-#if BUILDFLAG(IS_ANDROID)
-// If enabled Entra SSO will accept authentication headers from a specific list
-// of non-production Microsoft Authentication broker apps.
-const char kAndroidEntraSsoAllowDebugBrokers[] =
-    "android-entra-sso-allow-debug-brokers";
-
-// Android authentication account type for SPNEGO authentication
-const char kAuthAndroidNegotiateAccountType[] = "auth-spnego-account-type";
-
-// Disable the default browser promo.
-const char kDisableDefaultBrowserPromo[] = "disable-default-browser-promo";
-
-// Forces the night mode to be enabled.
-const char kForceEnableNightMode[] = "force-enable-night-mode";
-
-// Forces the update menu badge to show.
-const char kForceShowUpdateMenuBadge[] = "force-show-update-menu-badge";
-
-// Forces the update menu type to a specific type.
-const char kForceUpdateMenuType[] = "force-update-menu-type";
-
-// Forces a custom summary to be displayed below the update menu item.
-const char kForceShowUpdateMenuItemCustomSummary[] = "custom_summary";
-
-// Sets the market URL for Chrome for use in testing.
-const char kMarketUrlForTesting[] = "market-url-for-testing";
-
-// Force enable user agent overrides to request desktop sites in Clank.
-const char kRequestDesktopSites[] = "request-desktop-sites";
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 // If enabled, overrides the target playout delay for a casting mirroring
 // session. The value will be parsed as milliseconds. Lowering this value will
 // result in a lower end to end latency, but could come at the cost of other
 // quality standards such as dropped frames or FPS.
 const char kCastMirroringTargetPlayoutDelay[] =
     "cast-mirroring-target-playout-delay";
-#endif
 
 // Enables saving webpages as MHTML (Webpage, Single) by default, instead of
 // saving as HTML with a directory of sub-resources. (Webpage, Complete).
@@ -902,16 +867,9 @@ const char kProfileBaseName[] = "profile-base-name";
 const char kProfileManagementAttributes[] = "profile-management-attributes";
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-// Custom WebAPK server URL for the sake of testing.
-const char kWebApkServerUrl[] = "webapk-server-url";
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 // Uses the system default printer as the initially selected destination in
 // print preview, instead of the most recently used destination.
 const char kUseSystemDefaultPrinter[] = "use-system-default-printer";
-#endif
 
 #if BUILDFLAG(ENABLE_DOWNGRADE_PROCESSING)
 // Indicates that this process is the product of a relaunch following migration

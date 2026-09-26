@@ -40,10 +40,6 @@
 #include "services/network/public/mojom/network_context.mojom.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/content_uri_utils.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/task/current_thread.h"
 #endif
@@ -109,14 +105,7 @@ class NetworkInterfaceChangeHelper {
 }  // namespace
 #endif
 
-NetworkServiceClient::NetworkServiceClient()
-#if BUILDFLAG(IS_ANDROID)
-    : app_status_listener_(base::android::ApplicationStatusListener::New(
-          base::BindRepeating(&NetworkServiceClient::OnApplicationStateChange,
-                              base::Unretained(this))))
-#endif
-{
-
+NetworkServiceClient::NetworkServiceClient() {
 #if BUILDFLAG(IS_MAC)
   net::CertDatabase::StartListeningForKeychainEvents();
 #endif
@@ -134,7 +123,7 @@ NetworkServiceClient::NetworkServiceClient()
 NetworkServiceClient::~NetworkServiceClient() {
   if (IsOutOfProcessNetworkService()) {
     net::CertDatabase::GetInstance()->RemoveObserver(this);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     bool remove_ncn_observers = true;
 #if BUILDFLAG(IS_LINUX)
     remove_ncn_observers = base::FeatureList::IsEnabled(
@@ -145,7 +134,7 @@ NetworkServiceClient::~NetworkServiceClient() {
       net::NetworkChangeNotifier::RemoveMaxBandwidthObserver(this);
       net::NetworkChangeNotifier::RemoveIPAddressObserver(this);
     }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
   }
 }
 
@@ -161,14 +150,7 @@ void NetworkServiceClient::OnPeerToPeerConnectionsCountChange(uint32_t count) {
   GetNetworkService()->OnPeerToPeerConnectionsCountChange(count);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void NetworkServiceClient::OnApplicationStateChange(
-    base::android::ApplicationState state) {
-  GetNetworkService()->OnApplicationStateChange(state);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 void NetworkServiceClient::OnConnectionTypeChanged(
     net::NetworkChangeNotifier::ConnectionType type) {
   network_change_manager_->OnNetworkChanged(
@@ -204,7 +186,7 @@ void NetworkServiceClient::OnIPAddressChanged(
       network::mojom::ConnectionSubtype(
           net::NetworkChangeNotifier::GetConnectionSubtype()));
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 mojo::PendingRemote<network::mojom::URLLoaderNetworkServiceObserver>
 NetworkServiceClient::BindURLLoaderNetworkServiceObserver() {
@@ -216,7 +198,7 @@ NetworkServiceClient::BindURLLoaderNetworkServiceObserver() {
 
 void NetworkServiceClient::OnNetworkServiceInitialized(
     network::mojom::NetworkService* service) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   bool add_ncn_observers = true;
 #if BUILDFLAG(IS_LINUX)
   add_ncn_observers = base::FeatureList::IsEnabled(
@@ -250,7 +232,7 @@ void NetworkServiceClient::OnNetworkServiceInitialized(
     net::NetworkChangeNotifier::AddMaxBandwidthObserver(this);
     net::NetworkChangeNotifier::AddIPAddressObserver(this);
   }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 void NetworkServiceClient::OnSSLCertificateError(

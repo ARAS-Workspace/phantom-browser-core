@@ -77,7 +77,6 @@ TEST(
   EXPECT_EQ(FeaturePromoResult::Success(), precond.CheckPrecondition(data));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST(CommonPreconditionsTest, MeetsFeatureEngagementCriteriaPrecondition) {
   using EventList = feature_engagement::Tracker::EventList;
   using feature_engagement::Comparator;
@@ -119,7 +118,6 @@ TEST(CommonPreconditionsTest, MeetsFeatureEngagementCriteriaPrecondition) {
   EXPECT_EQ(FeaturePromoResult::kBlockedByConfig,
             precond.CheckPrecondition(data));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST(CommonPreconditionsTest, ContextValidPrecondition) {
   auto context = base::MakeRefCounted<test::MockUserEducationContext>();

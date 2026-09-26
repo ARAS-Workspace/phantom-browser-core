@@ -83,7 +83,7 @@ IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest,
   network::mojom::HttpAuthStaticParamsPtr static_params =
       SystemNetworkContextManager::GetHttpAuthStaticParamsForTesting();
   EXPECT_EQ("", static_params->gssapi_library_name);
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   // Test that prefs are reflected in params.
 
   PrefService* local_state = g_browser_process->local_state();
@@ -92,7 +92,7 @@ IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest,
   static_params =
       SystemNetworkContextManager::GetHttpAuthStaticParamsForTesting();
   EXPECT_EQ(dev_null, static_params->gssapi_library_name);
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 }
 
 IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest, AuthParams) {

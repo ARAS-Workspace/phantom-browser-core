@@ -53,12 +53,10 @@
 #include "services/network/public/mojom/content_security_policy.mojom.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"  // nogncheck
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "components/autofill/content/browser/content_autofill_driver.h"
-#endif
 
 namespace autofill {
 
@@ -163,7 +161,6 @@ void InternalsUIHandler::RegisterMessages() {
       "checkAtMemoryPermissions",
       base::BindRepeating(&InternalsUIHandler::CheckAtMemoryPermissions,
                           base::Unretained(this)));
-#if !BUILDFLAG(IS_ANDROID)
   web_ui()->RegisterMessageCallback(
       "checkAutofillAiPermissions",
       base::BindRepeating(&InternalsUIHandler::CheckAutofillAiPermissions,
@@ -171,7 +168,6 @@ void InternalsUIHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "setDomNodeId", base::BindRepeating(&InternalsUIHandler::SetDomNodeId,
                                           base::Unretained(this)));
-#endif
   web_ui()->RegisterMessageCallback(
       "setPasswordChangeOverrideUrl",
       base::BindRepeating(&InternalsUIHandler::OnSetPasswordChangeOverrideUrl,
@@ -523,7 +519,6 @@ void InternalsUIHandler::CheckAtMemoryPermissions(const base::ListValue& args) {
                                       debug_message})));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void InternalsUIHandler::CheckAutofillAiPermissions(
     const base::ListValue& args) {
   std::string debug_message;
@@ -555,7 +550,6 @@ void InternalsUIHandler::SetDomNodeId(const base::ListValue& args) {
     }
   }
 }
-#endif
 
 void InternalsUIHandler::StartSubscription() {
   LogRouter* log_router =

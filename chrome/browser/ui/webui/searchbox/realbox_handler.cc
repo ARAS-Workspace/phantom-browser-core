@@ -37,9 +37,7 @@
 #include "ui/base/webui/resource_path.h"
 #include "ui/base/window_open_disposition_utils.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/bookmarks/bookmark_stats.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -66,10 +64,8 @@ RealboxOmniboxClient::GetPageClassification(bool is_prefetch) const {
 }
 
 void RealboxOmniboxClient::OnBookmarkLaunched() {
-#if !BUILDFLAG(IS_ANDROID)
   RecordBookmarkLaunch(BookmarkLaunchLocation::kOmnibox,
                        profile_metrics::GetBrowserProfileType(profile_));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

@@ -32,10 +32,6 @@
 #include "media/formats/webm/webm_stream_parser.h"
 #include "media/media_buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "media/base/android/media_codec_util.h"
-#endif
-
 #if BUILDFLAG(USE_PROPRIETARY_CODECS)
 #include "media/formats/mp4/es_descriptor.h"
 #if BUILDFLAG(ENABLE_MSE_MPEG2TS_STREAM_PARSER)

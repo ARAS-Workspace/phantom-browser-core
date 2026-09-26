@@ -66,7 +66,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -76,11 +75,8 @@
 #include "extensions/browser/install_verifier.h"
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/features/simple_feature.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/enterprise/reporting/browser_launch/scoped_initial_command_line.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using testing::_;
 using testing::Return;
@@ -503,7 +499,6 @@ IN_PROC_BROWSER_TEST_P(PolicyUITest, ReportButtonWithProfileReporting) {
   VerifyReportButton(/*visible=*/false);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(PolicyUITest, ReportButtonOTRProfile) {
   Browser* otr_browser = OpenURLOffTheRecord(browser()->GetProfile(),
                                              GURL(chrome::kChromeUIPolicyURL));
@@ -536,7 +531,6 @@ IN_PROC_BROWSER_TEST_P(PolicyUITest, ReportButtonOTRProfile) {
   EXPECT_TRUE(content::ExecJs(otr_contents,
                               "chrome.send('uploadReport', ['test_id']);"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class PolicyPrecedenceUITest
     : public PolicyUITestBase,
@@ -640,7 +634,6 @@ INSTANTIATE_TEST_SUITE_P(PolicyPrecedenceUITestInstance,
                                           testing::Bool(),
                                           testing::Bool()));
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(https://crbug.com/1027135) Add tests to verify extension policies are
 // exported correctly.
 class ExtensionPolicyUITest
@@ -949,5 +942,3 @@ IN_PROC_BROWSER_TEST_F(PolicyUITestBase,
       content::EvalJs(web_contents(), kGetCommandLineArgsJs).ExtractString(),
       testing::HasSubstr("test-custom-argument"));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)

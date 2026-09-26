@@ -229,7 +229,6 @@ void ExpectPageIsAudible(bool is_audible) {
   EXPECT_EQ(is_audible, page->IsAudible());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ExpectNotificationPermissionStatus(
     std::optional<blink::mojom::PermissionStatus> status) {
   auto* graph = PerformanceManager::GetGraph();
@@ -237,7 +236,6 @@ void ExpectNotificationPermissionStatus(
   auto* page = graph->GetAllPageNodes().AsVector()[0];
   EXPECT_EQ(status, page->GetNotificationPermissionStatus());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -251,7 +249,6 @@ TEST_P(PerformanceManagerTabHelperTest, PageIsAudible) {
   ExpectPageIsAudible(false);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(PerformanceManagerTabHelperTest, NotificationPermission) {
   auto owned_permission_controller =
       std::make_unique<testing::NiceMock<content::MockPermissionController>>();
@@ -342,7 +339,6 @@ TEST_P(PerformanceManagerTabHelperTest, NotificationPermission) {
   EXPECT_CALL(*permission_controller,
               UnsubscribeFromPermissionResultChange(kSecondSubscriptionId));
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_P(PerformanceManagerTabHelperTest, GetFrameNode) {
   SetContents(CreateTestWebContents());

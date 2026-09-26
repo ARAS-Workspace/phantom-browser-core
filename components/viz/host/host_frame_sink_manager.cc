@@ -455,12 +455,6 @@ void HostFrameSinkManager::OnConnectionLost() {
   // Clear the shared memory mapping
   viz_touch_state_ro_mapping_ = base::ReadOnlySharedMemoryMapping();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Any cached back buffers are invalid once the connection to the
-  // FrameSinkManager is lost.
-  min_valid_cache_back_buffer_id_ = next_cache_back_buffer_id_;
-#endif
-
   // CompositorFrameSinks are lost along with the connection to
   // mojom::FrameSinkManager.
   for (auto& map_entry : frame_sink_data_map_) {
@@ -536,18 +530,6 @@ void HostFrameSinkManager::OnAggregatedHitTestRegionListUpdated(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void HostFrameSinkManager::VerifyThreadIdsDoNotBelongToHost(
-    const std::vector<int32_t>& thread_ids,
-    VerifyThreadIdsDoNotBelongToHostCallback callback) {
-  static_assert(
-      std::is_same_v<int32_t, base::PlatformThreadId::UnderlyingType>);
-  base::flat_set<base::PlatformThreadId> tids(thread_ids.begin(),
-                                              thread_ids.end());
-  std::move(callback).Run(CheckThreadIdsDoNotBelongToCurrentProcess(tids));
-}
-#endif
-
 void HostFrameSinkManager::OnScreenshotCaptured(
     const blink::SameDocNavigationScreenshotDestinationToken& destination_token,
     std::unique_ptr<CopyOutputResult> copy_output_result) {
@@ -586,35 +568,6 @@ void HostFrameSinkManager::OnViewTransitionResourcesCaptured(
   view_transition_callbacks_.erase(it);
   std::move(closure).Run();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-uint32_t HostFrameSinkManager::CacheBackBufferForRootSink(
-    const FrameSinkId& root_sink_id) {
-  auto it = frame_sink_data_map_.find(root_sink_id);
-  CHECK(it != frame_sink_data_map_.end());
-  DCHECK(it->second.is_root);
-  DCHECK(it->second.IsFrameSinkRegistered());
-  DCHECK(frame_sink_manager_remote_);
-
-  uint32_t cache_id = next_cache_back_buffer_id_++;
-  frame_sink_manager_remote_->CacheBackBuffer(cache_id, root_sink_id);
-  return cache_id;
-}
-
-void HostFrameSinkManager::EvictCachedBackBuffer(uint32_t cache_id) {
-  DCHECK(frame_sink_manager_remote_);
-
-  if (cache_id < min_valid_cache_back_buffer_id_) {
-    return;
-  }
-
-  // This synchronous call ensures that the GL context/surface that draw to
-  // the platform window (eg. XWindow or HWND) get destroyed before the
-  // platform window is destroyed.
-  mojo::SyncCallRestrictions::ScopedAllowSyncCall allow_sync_call;
-  frame_sink_manager_remote_->EvictBackBuffer(cache_id);
-}
-#endif
 
 void HostFrameSinkManager::CreateHitTestQueryForSynchronousCompositor(
     const FrameSinkId& frame_sink_id) {

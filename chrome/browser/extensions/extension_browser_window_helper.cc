@@ -18,10 +18,8 @@
 #include "extensions/common/constants.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/app_tab_helper.h"
 #include "extensions/browser/mime_handler/mime_handler_stream_manager.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -55,7 +53,6 @@ bool ShouldCloseTabOnExtensionUnload(const Extension* extension,
   }
 
   // NOTE: Android does not support hosted apps.
-#if !BUILDFLAG(IS_ANDROID)
   // Case 2: Check if the page is a page associated with a hosted app, which
   // can have non-extension schemes. For example, the Gmail hosted app would
   // have a URL of https://mail.google.com.
@@ -74,7 +71,6 @@ bool ShouldCloseTabOnExtensionUnload(const Extension* extension,
       stream_manager->GetTopLevelHandlerExtensionId() == extension->id()) {
     return true;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return false;
 }
@@ -123,13 +119,6 @@ void ExtensionBrowserWindowHelper::CleanUpTabsOnUnload(
   // Iterate backwards as we may remove items while iterating.
   for (int i = tab_list->GetTabCount() - 1; i >= 0; --i) {
     content::WebContents* web_contents = tab_list->GetTab(i)->GetContents();
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(http://crbug.com/453008083): Until kLoadAllTabsAtStartup and
-    // kWebContentsDiscard ship, `web_contents` may be null for some tabs.
-    if (!web_contents) {
-      continue;
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
     if (ShouldCloseTabOnExtensionUnload(extension, web_contents)) {
       // Do not close the last tab if it belongs to the extension. Instead
       // replace it with the default NTP.

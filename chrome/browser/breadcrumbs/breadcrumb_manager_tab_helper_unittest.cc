@@ -177,7 +177,6 @@ TEST_F(BreadcrumbManagerTabHelperTest, GooglePlayNavigationStart) {
 
 // TODO(crbug.com/40740494): special handling is needed for new-tab-page tests
 // on Android, as it uses a different new-tab URL.
-#if !BUILDFLAG(IS_ANDROID)
 // Tests metadata for chrome://newtab NTP navigation.
 TEST_F(BreadcrumbManagerTabHelperTest, ChromeNewTabNavigationStart) {
   ASSERT_EQ(0u, GetNumEvents());
@@ -195,7 +194,6 @@ TEST_F(BreadcrumbManagerTabHelperTest, ChromeNewTabNavigationStart) {
             events.front().find(breadcrumbs::kBreadcrumbNtpNavigation))
       << events.front();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests unique ID in DidStartNavigation and DidFinishNavigation.
 TEST_F(BreadcrumbManagerTabHelperTest, NavigationUniqueId) {
@@ -349,7 +347,6 @@ TEST_F(BreadcrumbManagerTabHelperTest, PageLoadFailure) {
 
 // TODO(crbug.com/40740494): special handling is needed for new-tab-page tests
 // on Android, as it uses a different new-tab URL. Tests NTP page load.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BreadcrumbManagerTabHelperTest, NtpPageLoad) {
   ASSERT_EQ(0u, GetNumEvents());
   content::NavigationSimulator::NavigateAndCommitFromBrowser(
@@ -367,7 +364,6 @@ TEST_F(BreadcrumbManagerTabHelperTest, NtpPageLoad) {
             events.back().find(breadcrumbs::kBreadcrumbPageLoadFailure))
       << events.back();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests navigation error.
 TEST_F(BreadcrumbManagerTabHelperTest, NavigationError) {

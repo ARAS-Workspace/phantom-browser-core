@@ -39,10 +39,8 @@ class OriginMayUseRemoteDesktopClientOverrideTest
 
   static constexpr char kExampleOrigin[] = "https://example.com";
   static constexpr char kAnotherExampleOrigin[] = "https://another.example.com";
-#if !BUILDFLAG(IS_ANDROID)
   static constexpr char kTestIsolatedAppOrigin[] =
       "isolated-app://aerugqztij5biqquuk3mfwpsaibuegaqcitgfchwuosuofdjabzqaaic";
-#endif
   static constexpr std::string_view kTestAtExampleDotCom = "test@example.com";
 
   void SetUp() override {
@@ -179,7 +177,6 @@ TEST_F(OriginMayUseRemoteDesktopClientOverrideTest,
       browser_context(), url::Origin::Create(GURL(kExampleOrigin))));
 }
 
-#if !BUILDFLAG(IS_ANDROID)  // IWAs aren't supported on Android
 TEST_F(OriginMayUseRemoteDesktopClientOverrideTest,
        AllowedOriginsPolicy_IWAAccepted) {
   ChromeWebAuthenticationDelegateBase delegate;
@@ -239,7 +236,6 @@ TEST_F(OriginMayUseRemoteDesktopClientOverrideTest,
   EXPECT_FALSE(delegate.OriginMayUseRemoteDesktopClientOverride(
       browser_context(), url::Origin::Create(GURL(kTestIsolatedAppOrigin))));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(OriginMayUseRemoteDesktopClientOverrideTest,
        AllowedOriginsPolicy_InvalidURLs) {

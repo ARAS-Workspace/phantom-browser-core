@@ -60,10 +60,6 @@ class DumpAccessibilityNodeTest : public DumpAccessibilityTestBase {
       std::vector<base::test::FeatureRef>* enabled_features,
       std::vector<base::test::FeatureRef>* disabled_features) override {
     enabled_features->emplace_back(blink::features::kMathMLAnchorElement);
-#if BUILDFLAG(IS_ANDROID)
-    disabled_features->emplace_back(
-        features::kAccessibilityPopulateSupplementalDescriptionApi);
-#endif  // BUILDFLAG(IS_ANDROID)
     DumpAccessibilityTestBase::ChooseFeatures(enabled_features,
                                               disabled_features);
   }

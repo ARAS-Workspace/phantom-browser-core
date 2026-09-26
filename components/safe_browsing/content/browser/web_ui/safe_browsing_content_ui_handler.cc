@@ -81,24 +81,6 @@ void SafeBrowsingContentUIHandler::GetReferrerChain(
   ResolveCallback(callback_id, referrer_chain_serialized);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void SafeBrowsingContentUIHandler::GetReferringAppInfo(
-    const base::ListValue& args) {
-  base::DictValue referring_app_value;
-  internal::ReferringAppInfo info =
-      WebUIContentInfoSingleton::GetInstance()->GetReferringAppInfo(
-          web_ui()->GetWebContents());
-  referring_app_value = web_ui::SerializeReferringAppInfo(info);
-
-  std::string referring_app_serialized =
-      web_ui::SerializeJson(referring_app_value);
-
-  DCHECK(!args.empty());
-  const std::string& callback_id = args[0].GetString();
-  ResolveCallback(callback_id, referring_app_serialized);
-}
-#endif
-
 void SafeBrowsingContentUIHandler::SetWebUIForTesting(content::WebUI* web_ui) {
   set_web_ui(web_ui);
 }
@@ -109,12 +91,6 @@ void SafeBrowsingContentUIHandler::RegisterMessages() {
       "getReferrerChain",
       base::BindRepeating(&SafeBrowsingContentUIHandler::GetReferrerChain,
                           base::Unretained(this)));
-#if BUILDFLAG(IS_ANDROID)
-  RegisterMessage(
-      "getReferringAppInfo",
-      base::BindRepeating(&SafeBrowsingContentUIHandler::GetReferringAppInfo,
-                          base::Unretained(this)));
-#endif
 }
 
 void SafeBrowsingContentUIHandler::RegisterMessage(std::string_view name,

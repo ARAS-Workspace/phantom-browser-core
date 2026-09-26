@@ -34,10 +34,8 @@
 #include "ui/base/page_transition_types.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 using bookmarks_helper::StoreType;
 using history_helper::HasVisitDuration;

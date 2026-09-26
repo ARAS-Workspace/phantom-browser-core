@@ -49,7 +49,6 @@ class StabilityMetricsHelperTest : public testing::Test {
 
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(StabilityMetricsHelperTest, LogRendererCrash) {
   StabilityMetricsHelper helper(prefs());
   base::HistogramTester histogram_tester;
@@ -100,7 +99,6 @@ TEST_F(StabilityMetricsHelperTest, LogRendererCrash) {
   histogram_tester.ExpectBucketCount(
       "BrowserRenderProcessHost.ChildLaunchFailureCodes", 1, 1);
 }
-#endif
 
 // Note: ENABLE_EXTENSIONS is set to false in Android
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -139,7 +137,6 @@ TEST_F(StabilityMetricsHelperTest, LogRendererCrashEnableExtensions) {
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Verifies that "Stability.RendererAbnormalTermination2.*" histograms are
 // correctly recorded by `LogRendererCrash`.
 TEST_F(StabilityMetricsHelperTest, RendererAbnormalTerminationCount) {
@@ -235,6 +232,5 @@ TEST_F(StabilityMetricsHelperTest, RendererAbnormalTerminationCount) {
     }
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace metrics

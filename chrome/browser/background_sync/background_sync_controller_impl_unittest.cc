@@ -26,10 +26,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/background_sync_launcher_android.h"
-#endif
-
 namespace {
 
 using content::BackgroundSyncController;
@@ -61,10 +57,6 @@ class BackgroundSyncControllerImplTest : public testing::Test {
   BackgroundSyncControllerImplTest()
       : task_environment_(content::BrowserTaskEnvironment::IO_MAINLOOP) {
     ResetFieldTrialList();
-#if BUILDFLAG(IS_ANDROID)
-    BackgroundSyncLauncherAndroid::SetPlayServicesVersionCheckDisabledForTests(
-        true);
-#endif
   }
 
   void SetUp() override {

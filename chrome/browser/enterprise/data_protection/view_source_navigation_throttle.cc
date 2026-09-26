@@ -7,9 +7,7 @@
 #include "base/memory/ptr_util.h"
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/devtools/devtools_availability_checker.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/devtools/devtools_policy_dialog.h"
-#endif
 #include "chrome/browser/devtools/features.h"
 #include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/policy/developer_tools_policy_checker.h"
@@ -195,9 +193,7 @@ ViewSourceNavigationThrottle::WillProcessResponse() {
   }
   if (!IsViewSourceAllowedByPolicy(profile_, navigation_handle())) {
     if (base::FeatureList::IsEnabled(features::kDevToolsShowPolicyDialog)) {
-#if !BUILDFLAG(IS_ANDROID)
       DevToolsPolicyDialog::Show(navigation_handle()->GetWebContents());
-#endif
       return content::NavigationThrottle::ThrottleCheckResult(CANCEL);
     }
     return content::NavigationThrottle::ThrottleCheckResult(

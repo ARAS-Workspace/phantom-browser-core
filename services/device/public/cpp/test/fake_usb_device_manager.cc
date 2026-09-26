@@ -79,20 +79,6 @@ void FakeUsbDeviceManager::GetSecurityKeyDevice(
                    std::move(device_receiver), std::move(device_client));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void FakeUsbDeviceManager::RefreshDeviceInfo(
-    const std::string& guid,
-    RefreshDeviceInfoCallback callback) {
-  auto it = devices_.find(guid);
-  if (it == devices_.end()) {
-    std::move(callback).Run(nullptr);
-    return;
-  }
-
-  std::move(callback).Run(it->second->GetDeviceInfo().Clone());
-}
-#endif
-
 void FakeUsbDeviceManager::SetOnClientSetClosure(base::OnceClosure closure) {
   on_client_set_ = std::move(closure);
 }

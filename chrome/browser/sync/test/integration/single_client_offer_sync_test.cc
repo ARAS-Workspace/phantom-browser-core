@@ -107,7 +107,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, EnabledByDefault) {
 //
 // Excluded on Android because SyncServiceImplHarness doesn't have the ability
 // to mimic sync-paused on Android due to https://crbug.com/40871747.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, ClearOnSyncPaused) {
   SetOfferData(GetFakeServer(), {CreateDefaultSyncCardLinkedOffer()});
   ASSERT_TRUE(SetupSync());
@@ -136,7 +135,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, ClearOnSyncPaused) {
   WaitForNumberOfOffers(1, paydm);
   EXPECT_EQ(1uL, paydm->GetAutofillOffers().size());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Offer data should get cleared from the database when the user signs out.
 IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, ClearOnSignOut) {

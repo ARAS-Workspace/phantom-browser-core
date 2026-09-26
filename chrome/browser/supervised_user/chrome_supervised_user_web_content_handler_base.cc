@@ -80,13 +80,6 @@ void ChromeSupervisedUserWebContentHandlerBase::GoBack() {
   OnInterstitialDone();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void ChromeSupervisedUserWebContentHandlerBase::LearnMore(base::OnceClosure open_help_page) {
-  std::move(open_help_page).Run();
-  OnInterstitialDone();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void ChromeSupervisedUserWebContentHandlerBase::MaybeCloseLocalApproval() {}
 
 bool ChromeSupervisedUserWebContentHandlerBase::

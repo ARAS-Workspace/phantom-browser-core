@@ -249,10 +249,3 @@ FakeProfileOAuth2TokenServiceDelegate* FakeProfileOAuth2TokenServiceDelegate::
 bool FakeProfileOAuth2TokenServiceDelegate::FixAccountErrorIfPossible() {
   return fix_account_if_possible_ ? fix_account_if_possible_.Run() : false;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-FakeProfileOAuth2TokenServiceDelegate::GetJavaObject() {
-  return base::android::ScopedJavaLocalRef<jobject>();
-}
-#endif

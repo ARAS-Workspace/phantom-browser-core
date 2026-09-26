@@ -10402,11 +10402,6 @@ class OnScreenshotCapturedWaiter : public mojom::FrameSinkManagerClient {
   void OnAggregatedHitTestRegionListUpdated(
       const FrameSinkId& frame_sink_id,
       const std::vector<AggregatedHitTestRegion>& hit_test_data) override {}
-#if BUILDFLAG(IS_ANDROID)
-  void VerifyThreadIdsDoNotBelongToHost(
-      const std::vector<int32_t>& thread_ids,
-      VerifyThreadIdsDoNotBelongToHostCallback callback) override {}
-#endif
   void OnScreenshotCaptured(
       const blink::SameDocNavigationScreenshotDestinationToken&
           destination_token,

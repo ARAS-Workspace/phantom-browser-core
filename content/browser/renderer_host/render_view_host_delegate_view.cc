@@ -8,13 +8,6 @@
 
 namespace content {
 
-#if BUILDFLAG(IS_ANDROID)
-ui::OverscrollRefreshHandler*
-content::RenderViewHostDelegateView::GetOverscrollRefreshHandler() const {
-  return nullptr;
-}
-#endif
-
 int RenderViewHostDelegateView::GetTopControlsHeight() const {
   return 0;
 }

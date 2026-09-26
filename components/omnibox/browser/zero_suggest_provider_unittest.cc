@@ -646,7 +646,6 @@ TEST_F(ZeroSuggestProviderTest, SendRequestWithoutLensInteractionResponse) {
   EXPECT_TRUE(provider_->done());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ZeroSuggestProviderTest, FallbackMatchesOnEmptyResponse) {
   EXPECT_CALL(*client_, IsAuthenticated())
       .WillRepeatedly(testing::Return(true));
@@ -732,7 +731,6 @@ TEST_F(ZeroSuggestProviderTest, FallbackMatchesOnParseFailure) {
               match.suggestion_group_id);
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ZeroSuggestProviderTest, StartStopNTP) {
   EXPECT_CALL(*client_, IsAuthenticated())

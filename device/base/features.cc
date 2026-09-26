@@ -17,16 +17,5 @@ BASE_FEATURE(kWebBluetoothConfirmPairingSupport,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-// Controls whether to override LocationRequest parameters in
-// LocationProviderGmsCore
-BASE_FEATURE(kGmsCoreLocationRequestParamOverride,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether to fail closed and report a position error when a precise
-// location leak is detected in LocationProviderGmsCore.
-BASE_FEATURE(kGmsCoreFailClosedOnPreciseLeak, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace features
 }  // namespace device

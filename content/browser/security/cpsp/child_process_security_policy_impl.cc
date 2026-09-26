@@ -737,24 +737,6 @@ class ChildProcessSecurityPolicyImpl::ProcessState {
     return (it->second & permissions) == permissions;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Determine if the certain permissions have been granted to a content URI.
-  bool HasPermissionsForContentUri(const base::FilePath& file,
-                                   int permissions) const {
-    DCHECK(!file.empty());
-    DCHECK(file.IsContentUri());
-    if (!permissions) {
-      return false;
-    }
-    base::FilePath file_path = file.StripTrailingSeparators();
-    FileMap::const_iterator it = file_permissions_.find(file_path);
-    if (it != file_permissions_.end()) {
-      return (it->second & permissions) == permissions;
-    }
-    return false;
-  }
-#endif
-
   void GrantBindings(BindingsPolicySet bindings) {
     enabled_bindings_.PutAll(bindings);
   }
@@ -823,12 +805,6 @@ class ChildProcessSecurityPolicyImpl::ProcessState {
       }
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    if (url.SchemeIs(url::kContentScheme)) {
-      return request_file_set_.contains(base::FilePath(url.spec()));
-    }
-#endif
-
     // Otherwise, delegate to CanCommitURL. Unmentioned schemes are disallowed.
     // TODO(dcheng): It would be nice to avoid constructing the origin twice.
     return CanCommitURL(url);
@@ -837,11 +813,6 @@ class ChildProcessSecurityPolicyImpl::ProcessState {
   // Determine if the certain permissions have been granted to a file.
   bool HasPermissionsForFile(const base::FilePath& file,
                              int permissions) const {
-#if BUILDFLAG(IS_ANDROID)
-    if (file.IsContentUri()) {
-      return HasPermissionsForContentUri(file, permissions);
-    }
-#endif
     if (!permissions || file.empty() || !file.IsAbsolute()) {
       return false;
     }
@@ -1472,12 +1443,6 @@ void ChildProcessSecurityPolicyImpl::GrantRequestOfSpecificFile(
   // then we grant it the capability for that URL only. Canonicalize the path
   // via roundtrip to file:// URL so it will match the incoming URL we validate
   // against (crbug.com/382645162), except android content:// URLs.
-#if BUILDFLAG(IS_ANDROID)
-  if (path.IsContentUri()) {
-    state->GrantRequestOfSpecificFile(path);
-    return;
-  }
-#endif
   GURL url = net::FilePathToFileURL(path);
   base::FilePath canonical_path;
   if (net::FileURLToFilePath(url, &canonical_path)) {

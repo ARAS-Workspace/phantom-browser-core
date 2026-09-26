@@ -141,41 +141,6 @@ class SigninHeaderHelperTest : public testing::Test {
   scoped_refptr<content_settings::CookieSettings> cookie_settings_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// Tests that eligible_for_consistency request is returned on Android
-// when reaching to Gaia origin and there's no primary account.
-TEST_F(SigninHeaderHelperTest, TestEligibleForConsistencyRequestGaiaOrigin) {
-  account_consistency_ = AccountConsistencyMethod::kMirror;
-  CheckMirrorHeaderRequest(GURL("https://accounts.google.com"), GaiaId(),
-                           /*is_child_account=*/Tribool::kUnknown,
-                           "source=TestSource,eligible_for_consistency=true");
-  CheckMirrorCookieRequest(GURL("https://accounts.google.com"), GaiaId(),
-                           "eligible_for_consistency=true");
-}
-
-// Tests that eligible_for_consistency request is NOT returned on Android
-// when reaching to NON-Gaia origin and there's no primary account
-TEST_F(SigninHeaderHelperTest,
-       TestNoEligibleForConsistencyRequestNonGaiaOrigin) {
-  account_consistency_ = AccountConsistencyMethod::kMirror;
-  CheckMirrorHeaderRequest(GURL("https://docs.google.com"), GaiaId(),
-                           /*is_child_account=*/Tribool::kUnknown, "");
-  CheckMirrorCookieRequest(GURL("https://docs.google.com"), GaiaId(), "");
-}
-
-// Tests that the full Mirror request is returned when the
-// force_account_consistency param is true.
-TEST_F(SigninHeaderHelperTest, TestForceAccountConsistencyMobile) {
-  account_consistency_ = AccountConsistencyMethod::kMirror;
-  force_account_consistency_ = true;
-  CheckMirrorHeaderRequest(
-      GURL("https://docs.google.com"), GaiaId(),
-      /*is_child_account=*/Tribool::kUnknown,
-      "source=TestSource,mode=0,enable_account_consistency=true,"
-      "consistency_enabled_by_default=false");
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Tests that no Mirror request is returned when the user is not signed in (no
 // account id), for non Chrome OS platforms.
 TEST_F(SigninHeaderHelperTest, TestNoMirrorRequestNoAccountId) {
@@ -469,9 +434,6 @@ TEST_F(SigninHeaderHelperTest, TestBuildManageAccountsParams) {
       "action=ADDSESSION,email=%s,is_saml=true,"
       "is_same_tab=true,continue_url=%s",
       kEmail, kContinueURL);
-#if BUILDFLAG(IS_ANDROID)
-  header += ",show_consistency_promo=true";
-#endif
 
   ManageAccountsParams params = BuildManageAccountsParams(header);
   EXPECT_EQ(GAIA_SERVICE_TYPE_ADDSESSION, params.service_type);
@@ -479,9 +441,6 @@ TEST_F(SigninHeaderHelperTest, TestBuildManageAccountsParams) {
   EXPECT_EQ(true, params.is_saml);
   EXPECT_EQ(true, params.is_same_tab);
   EXPECT_EQ(GURL(kContinueURL), params.continue_url);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(true, params.show_consistency_promo);
-#endif
 }
 
 }  // namespace signin

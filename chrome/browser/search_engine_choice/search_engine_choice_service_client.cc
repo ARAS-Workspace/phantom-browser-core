@@ -18,10 +18,6 @@ SearchEngineChoiceServiceClient::SearchEngineChoiceServiceClient(
     const Profile& profile)
     : is_profile_eligible_for_dse_guest_propagation_(
           profile.IsGuestSession()) {
-#if BUILDFLAG(IS_ANDROID)
-  // We don't expect Guest profiles to be supported on Android.
-  CHECK(!is_profile_eligible_for_dse_guest_propagation_);
-#endif
 }
 
 country_codes::CountryId

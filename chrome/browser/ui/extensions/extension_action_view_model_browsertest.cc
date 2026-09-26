@@ -57,11 +57,9 @@
 #include "ui/gfx/image/image_skia_rep.h"
 #include "ui/native_theme/native_theme.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/views/extensions/extensions_toolbar_desktop.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/api/side_panel/side_panel_service.h"
@@ -431,7 +429,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionActionViewModelFeatureRolloutBrowserTest,
   toolbar_model()->SetActionVisibility(id, true);
   check_visibility_string(model, unpin_label);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Unpin the extension and ephemerally pop it out.
   // We skip this test on Android because popping out an extension via the
   // direct container access is not supported.
@@ -446,7 +443,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionActionViewModelFeatureRolloutBrowserTest,
   EXPECT_TRUE(toolbar->IsActionVisibleOnToolbar(id));
   // The string should still just be "pin".
   check_visibility_string(model, pin_label);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 enum class PermissionType {

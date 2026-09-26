@@ -46,9 +46,7 @@
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/promotion_types.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -894,7 +892,6 @@ TEST_F(WebstorePrivateManifestV2DeprecationUnitTest,
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
 class WebstorePrivateLogEnterprisePromoShownFunctionTest
     : public WebstorePrivateApiTestBase {
  protected:
@@ -933,6 +930,5 @@ TEST_F(WebstorePrivateOnEnterprisePromoClickFunctionTest,
       static_cast<int>(enterprise::CwsPromotionBannerEvent::kClicked), 1);
   EXPECT_TRUE(prefs->GetBoolean(pref_names::kHasDismissedEnterprisePromotion));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions

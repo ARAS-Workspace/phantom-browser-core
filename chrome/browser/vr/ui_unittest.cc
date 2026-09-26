@@ -43,10 +43,8 @@ TEST_F(UiTest, CaptureToasts) {
 
   for (auto& spec : GetIndicatorSpecs()) {
     for (int i = 0; i < 3; ++i) {
-#if !BUILDFLAG(IS_ANDROID)
       if (i == 1)  // Skip background tabs for non-Android platforms.
         continue;
-#endif
       // Reinitialize the WebVR state to force the indicator to trigger each
       // time.
       model_->web_vr.has_received_permissions = false;

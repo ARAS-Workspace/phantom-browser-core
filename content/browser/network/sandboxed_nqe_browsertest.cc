@@ -20,11 +20,6 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "services/network/public/mojom/network_service_test.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/android/network_change_notifier_delegate_android.h"
-#include "net/android/network_library.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -164,40 +159,6 @@ IN_PROC_BROWSER_TEST_F(SandboxedNQEBrowserTest, MAYBE_NetworkQualityTracker) {
   EXPECT_EQ(base::Milliseconds(400), tracker->GetTransportRTT());
   EXPECT_EQ(400, tracker->GetDownstreamThroughputKbps());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Turn on/off Wifi on Android and listen it in the network service.
-IN_PROC_BROWSER_TEST_F(SandboxedNQEBrowserTest, TurnWifiEnabled) {
-  const std::string wifi_ssid = net::android::GetWifiSSID();
-  if (wifi_ssid.empty()) {
-    GTEST_SKIP() << "This test requires wifi network.";
-  }
-  // Let NetworkQualityEstimator reports NetworkChangeNotifier::CONNECTION_WIFI
-  // as EFFECTIVE_CONNECTION_TYPE_SLOW_2G since EffectiveConnectionType and
-  // the production receivers doesn't notice Wifi.
-  ForceNetworkQualityEstimatorReportWifiAsSlow2G();
-  net::NetworkChangeNotifierDelegateAndroid::
-      EnableNetworkChangeNotifierAutoDetectForTest();
-
-  std::unique_ptr<network::NetworkQualityTracker> tracker =
-      std::make_unique<network::NetworkQualityTracker>(
-          base::BindRepeating(&GetNetworkService));
-  TestNetworkQualityObserver network_quality_observer;
-  tracker->AddEffectiveConnectionTypeObserver(&network_quality_observer);
-
-  net::android::SetWifiEnabledForTesting(true);
-  network_quality_observer.WaitForNotification(
-      net::EFFECTIVE_CONNECTION_TYPE_SLOW_2G);
-
-  net::android::SetWifiEnabledForTesting(false);
-  network_quality_observer.WaitForNotification(
-      net::EFFECTIVE_CONNECTION_TYPE_4G);
-
-  net::android::SetWifiEnabledForTesting(true);
-  network_quality_observer.WaitForNotification(
-      net::EFFECTIVE_CONNECTION_TYPE_SLOW_2G);
-}
-#endif
 
 }  // namespace
 }  // namespace content

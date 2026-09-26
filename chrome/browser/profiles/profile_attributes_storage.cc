@@ -53,9 +53,7 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/gfx/image/image.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck crbug.com/40147906
-#endif
 
 namespace {
 
@@ -93,10 +91,8 @@ enum class MultiProfileUserType {
 };
 
 const char kProfileCountLastUpdatePref[] = "profile.profile_counts_reported";
-#if !BUILDFLAG(IS_ANDROID)
 const char kLegacyProfileNameMigrated[] = "legacy.profile.name.migrated";
 bool g_migration_enabled_for_testing = false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Reads a PNG from disk and decodes it. If the bitmap was successfully read
 // from disk then this will return the bitmap image, otherwise it will return
@@ -314,11 +310,8 @@ ProfileAttributesStorage::ProfileAttributesStorage(
   if (!disable_avatar_download_for_testing_)
     DownloadAvatars();
 
-#if !BUILDFLAG(IS_ANDROID)
   LoadGAIAPictureIfNeeded();
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
   bool migrate_legacy_profile_names =
       (!prefs_->GetBoolean(kLegacyProfileNameMigrated) ||
        g_migration_enabled_for_testing);
@@ -331,7 +324,6 @@ ProfileAttributesStorage::ProfileAttributesStorage(
       prefs_, kProfileCountLastUpdatePref, base::Hours(24),
       base::BindRepeating(&ProfileMetrics::LogNumberOfProfiles, this));
   repeating_timer_->Start();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   EnsureProfilesOrderPrefIsInitialized();
 }
@@ -343,9 +335,7 @@ void ProfileAttributesStorage::RegisterPrefs(PrefRegistrySimple* registry) {
   registry->RegisterDictionaryPref(prefs::kProfileAttributes);
   registry->RegisterListPref(prefs::kProfilesOrder);
   registry->RegisterTimePref(kProfileCountLastUpdatePref, base::Time());
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(kLegacyProfileNameMigrated, false);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // static
@@ -696,10 +686,8 @@ bool ProfileAttributesStorage::IsDefaultProfileName(
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (!include_check_for_legacy_profile_name)
     return false;
-#endif
 
   // Check if it's a "First user" old-style name.
   if (name == l10n_util::GetStringUTF16(IDS_DEFAULT_PROFILE_NAME) ||
@@ -795,7 +783,6 @@ void ProfileAttributesStorage::RemoveObserver(Observer* obs) {
   observer_list_.RemoveObserver(obs);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ProfileAttributesStorage::RecordDeletedProfileState(
     ProfileAttributesEntry* entry) {
   DCHECK(entry);
@@ -808,7 +795,6 @@ void ProfileAttributesStorage::RecordDeletedProfileState(
   profile_metrics::LogProfileDeletionContext(is_last_profile,
                                              no_browser_windows);
 }
-#endif
 
 void ProfileAttributesStorage::RecordProfilesState() {
   std::vector<ProfileAttributesEntry*> entries = GetAllProfilesAttributes();
@@ -954,17 +940,12 @@ std::string ProfileAttributesStorage::StorageKeyFromProfilePath(
 }
 
 void ProfileAttributesStorage::DisableProfileMetricsForTesting() {
-#if !BUILDFLAG(IS_ANDROID)
   repeating_timer_.reset();
-#endif
 }
 
 void ProfileAttributesStorage::DownloadHighResAvatarIfNeeded(
     size_t icon_index,
     const base::FilePath& profile_path) {
-#if BUILDFLAG(IS_ANDROID)
-  return;
-#endif
   DCHECK(!disable_avatar_download_for_testing_);
 
   // If this is the placeholder avatar, it is already included in the
@@ -986,7 +967,6 @@ void ProfileAttributesStorage::DownloadHighResAvatarIfNeeded(
 void ProfileAttributesStorage::DownloadHighResAvatar(
     size_t icon_index,
     const base::FilePath& profile_path) {
-#if !BUILDFLAG(IS_ANDROID)
   const char* file_name =
       profiles::GetDefaultAvatarIconFileNameAtIndex(icon_index);
   DCHECK(file_name);
@@ -1006,7 +986,6 @@ void ProfileAttributesStorage::DownloadHighResAvatar(
                      weak_ptr_factory_.GetWeakPtr(), profile_path));
 
   current_downloader->Start();
-#endif
 }
 
 void ProfileAttributesStorage::SaveAvatarImageAtPath(
@@ -1060,16 +1039,13 @@ ProfileAttributesEntry* ProfileAttributesStorage::InitEntryWithKey(
 }
 
 void ProfileAttributesStorage::DownloadAvatars() {
-#if !BUILDFLAG(IS_ANDROID)
   std::vector<ProfileAttributesEntry*> entries = GetAllProfilesAttributes();
   for (ProfileAttributesEntry* entry : entries) {
     DownloadHighResAvatarIfNeeded(entry->GetAvatarIconIndex(),
                                   entry->GetPath());
   }
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ProfileAttributesStorage::LoadGAIAPictureIfNeeded() {
   std::vector<ProfileAttributesEntry*> entries = GetAllProfilesAttributes();
   for (ProfileAttributesEntry* entry : entries) {
@@ -1084,9 +1060,7 @@ void ProfileAttributesStorage::LoadGAIAPictureIfNeeded() {
       entry->GetGAIAPicture();
   }
 }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 void ProfileAttributesStorage::MigrateLegacyProfileNamesAndRecomputeIfNeeded() {
   std::vector<ProfileAttributesEntry*> entries = GetAllProfilesAttributes();
   for (size_t i = 0; i < entries.size(); i++) {
@@ -1119,7 +1093,6 @@ void ProfileAttributesStorage::MigrateLegacyProfileNamesAndRecomputeIfNeeded() {
 void ProfileAttributesStorage::SetLegacyProfileMigrationForTesting(bool value) {
   g_migration_enabled_for_testing = value;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void ProfileAttributesStorage::OnAvatarPictureLoaded(
     const base::FilePath& profile_path,

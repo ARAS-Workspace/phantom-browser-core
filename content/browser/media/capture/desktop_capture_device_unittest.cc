@@ -471,7 +471,6 @@ class DesktopCaptureDeviceTest : public testing::TestWithParam<bool> {
 // Capturer implementation for Fuchsia is not fully functional.
 // TODO(crbug.com/445218901): Capturer implementation for Android needs user
 // input to work.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(DesktopCaptureDeviceTest, Capture) {
   std::unique_ptr<webrtc::DesktopCapturer> capturer(
       desktop_capture::CreateScreenCapturer(
@@ -512,7 +511,6 @@ TEST_P(DesktopCaptureDeviceTest, Capture) {
   EXPECT_GT(format.frame_size.height(), 0);
   EXPECT_EQ(kFrameRate, format.frame_rate);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test that screen capturer behaves correctly if the source frame size changes
 // but the caller cannot cope with variable resolution output.

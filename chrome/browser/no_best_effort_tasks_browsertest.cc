@@ -124,10 +124,6 @@ constexpr base::TimeDelta kSendMessageRetryPeriod = base::Milliseconds(250);
 IN_PROC_BROWSER_TEST_F(NoBestEffortTasksTest, DISABLED_LoadAndPaintAboutBlank) {
   content::WebContents* const web_contents =
       chrome_test_utils::GetActiveWebContents(this);
-#if BUILDFLAG(IS_ANDROID)
-  // Ensure about:blank is loaded, so the last committed URL is correct.
-  EXPECT_TRUE(content::WaitForLoadStop(web_contents));
-#endif
   EXPECT_TRUE(web_contents->GetLastCommittedURL().IsAboutBlank());
 
   RunLoopUntilLoadedAndPainted run_until_loaded_and_painted(web_contents);

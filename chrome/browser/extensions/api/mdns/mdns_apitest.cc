@@ -44,14 +44,6 @@ class MDnsAPITest : public extensions::ExtensionApiTest {
   }
 
   void TearDownTestDnsSdRegistry() {
-#if BUILDFLAG(IS_ANDROID)
-    // Android skips profile teardown during test shutdown, so we must manually
-    // shut down the KeyedService. Otherwise we can't EXPECT_CALL for functions
-    // called during cleanup. This can't be done in TearDownOnMainThread() as
-    // that occurs too late.
-    // TODO(crbug.com/431730098): Move this somewhere more centralized.
-    extensions::MDnsAPI::Get(profile())->Shutdown();
-#endif
     // Don't delete `dns_sd_registry_` yet because the tests expect calls that
     // happen during the profile destruction phase.
   }

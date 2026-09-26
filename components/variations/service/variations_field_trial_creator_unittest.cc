@@ -69,10 +69,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/variations/seed_response.h"
-#endif
-
 namespace variations {
 namespace {
 
@@ -233,30 +229,6 @@ VariationsSeed CreateTestSafeSeed() {
 base::Time DistantPast() {
   return base::Time::UnixEpoch();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-const char kTestSeedCountry[] = "in";
-
-// Populates |seed| with simple test data, targetting only users in a specific
-// country. The resulting seed will contain one study called "test", which
-// contains one experiment called "abc" with probability weight 100, restricted
-// just to users in |kTestSeedCountry|.
-VariationsSeed CreateTestSeedWithCountryFilter() {
-  VariationsSeed seed = CreateTestSeed();
-  Study* study = seed.mutable_study(0);
-  Study::Filter* filter = study->mutable_filter();
-  filter->add_country(kTestSeedCountry);
-  filter->add_platform(Study::PLATFORM_ANDROID);
-  return seed;
-}
-
-// Serializes |seed| to protobuf binary format.
-std::string SerializeSeed(const VariationsSeed& seed) {
-  std::string serialized_seed;
-  seed.SerializeToString(&serialized_seed);
-  return serialized_seed;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class MockSafeSeedManager : public SafeSeedManager {
  public:
@@ -1135,76 +1107,6 @@ TEST_F(FieldTrialCreatorTest, GetClientFilterableState_HardwareManufacturer) {
   EXPECT_EQ(client_filterable_state->hardware_manufacturer,
             ClientFilterableState::GetHardwareManufacturer());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// This is a regression test for crbug/829527.
-TEST_F(FieldTrialCreatorTest, SetUpFieldTrials_LoadsCountryOnFirstRun) {
-  // Simulate having received a seed in Java during First Run.
-  const base::Time one_day_ago = base::Time::Now() - base::Days(1);
-  auto initial_seed = std::make_unique<SeedResponse>();
-  initial_seed->data = SerializeSeed(CreateTestSeedWithCountryFilter());
-  initial_seed->signature = kTestSeedSignature;
-  initial_seed->country = kTestSeedCountry;
-  initial_seed->date = one_day_ago;
-  initial_seed->is_gzip_compressed = false;
-
-  TestVariationsServiceClient variations_service_client;
-  PlatformFieldTrials platform_field_trials;
-  NiceMock<MockSafeSeedManager> safe_seed_manager(local_state());
-
-  // Note: Unlike other tests, this test does not mock out the seed store, since
-  // the interaction between these two classes is what's being tested.
-  auto seed_store = std::make_unique<VariationsSeedStore>(
-      local_state(), std::move(initial_seed),
-      /*signature_verification_enabled=*/false,
-      std::make_unique<VariationsSafeSeedStore>(
-          local_state(),
-          /*seed_file_dir=*/base::FilePath(), version_info::Channel::UNKNOWN,
-          /*entropy_providers=*/nullptr),
-      version_info::Channel::UNKNOWN, /*seed_file_dir=*/base::FilePath());
-  VariationsFieldTrialCreator field_trial_creator(&variations_service_client,
-                                                  std::move(seed_store));
-
-  metrics::TestEnabledStateProvider enabled_state_provider(/*consent=*/true,
-                                                           /*enabled=*/true);
-  auto metrics_state_manager = metrics::MetricsStateManager::Create(
-      local_state(), &enabled_state_provider, std::wstring(), base::FilePath());
-  metrics_state_manager->InstantiateFieldTrialList();
-
-  // Check that field trials are created from the seed. The test seed contains a
-  // single study with an experiment targeting 100% of users in India. Since
-  // |initial_seed| included the country code for India, this study should be
-  // active.
-  EXPECT_TRUE(field_trial_creator.SetUpFieldTrials(
-      /*variation_ids=*/std::vector<std::string>(),
-      std::vector<base::FeatureList::FeatureOverrideInfo>(),
-      std::make_unique<base::FeatureList>(), metrics_state_manager.get(),
-      &platform_field_trials, &safe_seed_manager,
-      /*add_entropy_source_to_variations_ids=*/true,
-      *metrics_state_manager->CreateEntropyProviders(
-          /*enable_limited_entropy_mode=*/false)));
-
-  EXPECT_EQ(kTestSeedExperimentName,
-            base::FieldTrialList::FindFullName(kTestSeedStudyName));
-}
-
-// Tests that the hardware class is set on Android.
-TEST_F(FieldTrialCreatorTest, ClientFilterableState_HardwareClass) {
-  NiceMock<MockSafeSeedManager> safe_seed_manager(local_state());
-
-  TestVariationsServiceClient variations_service_client;
-  TestVariationsFieldTrialCreator field_trial_creator(
-      local_state(), &variations_service_client, &safe_seed_manager,
-      user_data_dir_path());
-
-  const base::Version& current_version = version_info::GetVersion();
-  EXPECT_TRUE(current_version.IsValid());
-
-  std::unique_ptr<ClientFilterableState> client_filterable_state =
-      field_trial_creator.GetClientFilterableStateForVersion(current_version);
-  EXPECT_NE(client_filterable_state->hardware_class, std::string());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Verify that a beacon file is not written when passing an empty user data
 // directory path. Some platforms deliberately pass an empty path.

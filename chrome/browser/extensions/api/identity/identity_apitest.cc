@@ -1197,20 +1197,15 @@ IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
       IdentityGetAuthTokenError::State::kSignInFailed, 1);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
                        PRE_InteractiveNotSignedAndSigninNotAllowed) {
   // On Desktop, kSigninAllowed cannot be set after the profile creation. Use
   // kSigninAllowedOnNextStartup instead.
   profile()->GetPrefs()->SetBoolean(prefs::kSigninAllowedOnNextStartup, false);
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
                        InteractiveNotSignedAndSigninNotAllowed) {
-#if BUILDFLAG(IS_ANDROID)
-  profile()->GetPrefs()->SetBoolean(prefs::kSigninAllowed, false);
-#endif
   ASSERT_FALSE(profile()->GetPrefs()->GetBoolean(prefs::kSigninAllowed));
   scoped_refptr<FakeGetAuthTokenFunction> func(new FakeGetAuthTokenFunction());
   func->set_extension(CreateExtension(CLIENT_ID | SCOPES));
@@ -2924,7 +2919,6 @@ IN_PROC_BROWSER_TEST_F(
 // TODO(crbug.com/525397809): Currently this crashes because
 // SetInvalidRefreshTokenForAccount does not work on Android. We should fix this
 // and enable this test on Android.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
                        MultiSecondaryInteractiveInvalidToken) {
   // Setup a secondary account with no valid refresh token, and try to get a
@@ -2973,7 +2967,6 @@ IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
         IdentityGetAuthTokenError::State::kNone, 1);
   }
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest, ScopesDefault) {
   SignIn("primary@example.com");
@@ -3447,13 +3440,6 @@ class LaunchWebAuthFlowFunctionTest : public AsyncExtensionBrowserTest {
     command_line->AppendSwitch(switches::kDisableBackgroundNetworking);
   }
 
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  void CloseBrowserSynchronously(BrowserWindowInterface* browser) {
-    BrowserEventWaiter waiter(BrowserEventWaiter::Event::CLOSED, browser);
-    browser->GetWindow()->Close();
-  }
-#endif
-
   base::HistogramTester* histogram_tester() { return &histogram_tester_; }
 
  private:
@@ -3677,14 +3663,6 @@ IN_PROC_BROWSER_TEST_F(LaunchWebAuthFlowFunctionTest, UserCloseWindow) {
   RunFunctionAsync(function.get(), args);
 
   url_observer.Wait();
-
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  // On Android, wait for the window to be created.
-  base::test::TestFuture<void> future;
-  WebAuthFlow* flow = function->GetWebAuthFlowForTesting();
-  flow->SetPopupDisplayedCallbackForTesting(future.GetCallback());
-  EXPECT_TRUE(future.Wait());
-#endif
 
   BrowserWindowInterface* popup_browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(

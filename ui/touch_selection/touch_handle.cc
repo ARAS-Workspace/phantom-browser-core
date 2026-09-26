@@ -313,13 +313,6 @@ void TouchHandle::SetTransparent() {
   SetAlpha(0.f);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void TouchHandle::OnUpdateNativeViewTree(gfx::NativeView parent_native_view,
-                                         cc::slim::Layer* parent_layer) {
-  drawable_->OnUpdateNativeViewTree(parent_native_view, parent_layer);
-}
-#endif
-
 gfx::PointF TouchHandle::ComputeHandleOrigin() const {
   gfx::PointF focus = mirror_vertical_ ? focus_top_ : focus_bottom_;
   gfx::RectF drawable_bounds = drawable_->GetVisibleBounds();

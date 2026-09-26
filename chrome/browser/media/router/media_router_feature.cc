@@ -28,16 +28,13 @@
 #include "extensions/buildflags/buildflags.h"
 #include "ui/base/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 #include "components/prefs/pref_registry_simple.h"
-#endif
 
 // NOTE: Consider separating out UI-only features that are not consumed by the
 // Media Router itself into their own file in chrome/browser/ui/media_router.
 
 namespace media_router {
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 BASE_FEATURE(kMediaRouter, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kCastAllowAllIPsFeature,
              "CastAllowAllIPs",
@@ -59,9 +56,6 @@ BASE_FEATURE(kRedirectionMediaRouteProvider, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kFallbackToAudioTabMirroring,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#endif  // !BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-
 namespace {
 base::flat_map<content::BrowserContext*, bool>& GetStoredPrefValues() {
   static base::NoDestructor<base::flat_map<content::BrowserContext*, bool>>
@@ -70,13 +64,10 @@ base::flat_map<content::BrowserContext*, bool>& GetStoredPrefValues() {
   return *stored_pref_values;
 }
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 // TODO(mfoltz): Add full implementation for validating playout delay value.
 bool IsValidMirroringPlayoutDelayMs(int delay_ms) {
   return delay_ms <= 1000 && delay_ms >= 1;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 }  // namespace
 
 void ClearMediaRouterStoredPrefsForTesting() {
@@ -87,7 +78,6 @@ bool MediaRouterEnabled(content::BrowserContext* context) {
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(prefs::kMediaRouterCastAllowAllIPs, false,
                                 PrefRegistry::PUBLIC);
@@ -163,7 +153,5 @@ std::optional<base::TimeDelta> GetCastMirroringPlayoutDelay() {
 bool IsCastMessageLoggingEnabled() {
   return base::FeatureList::IsEnabled(kCastMessageLogging);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 
 }  // namespace media_router

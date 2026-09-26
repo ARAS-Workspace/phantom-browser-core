@@ -29,12 +29,10 @@ TEST_F(RemoteSuggestionsServiceFactoryTest, ServiceInstance) {
   EXPECT_TRUE(RemoteSuggestionsServiceFactory::GetForProfile(
       guest_profile_otr(), /*create_if_necessary=*/true));
 
-// Service is NOT created for System Profiles. Also Android doesn't have System
-// Profiles.
-#if !BUILDFLAG(IS_ANDROID)
+  // Service is NOT created for System Profiles. Also Android doesn't have
+  // System Profiles.
   EXPECT_FALSE(RemoteSuggestionsServiceFactory::GetForProfile(
       system_profile(), /*create_if_necessary=*/true));
   EXPECT_FALSE(RemoteSuggestionsServiceFactory::GetForProfile(
       system_profile_otr(), /*create_if_necessary=*/true));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

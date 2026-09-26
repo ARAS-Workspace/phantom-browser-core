@@ -32,9 +32,7 @@
 #include "v8/include/v8-object.h"
 #include "v8/include/v8-primitive.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/trusted_vault/trusted_vault_server_constants.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -49,7 +47,6 @@ std::vector<uint8_t> ArrayBufferAsBytes(
   return std::vector<uint8_t>(start, UNSAFE_TODO(start + length));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Converts a vector of raw encryption key bytes for the chromesync domain to
 // TrustedVaultKey mojo structs. Because for chromesync keys passed via the
 // `chrome.setSyncEncryptionKeys()` JS API, we only receive the key version of
@@ -187,14 +184,12 @@ void ParseTrustedVaultKeysFromMapMayDeleteFrame(
                      std::vector<chrome::mojom::TrustedVaultKeyPtr>>(
           std::move(result)));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 enum class ValidArgs {
   kInvalidArgs,
   kValidArgs,
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 void RecordCallToSetSyncEncryptionKeysToUma(ValidArgs args) {
   base::UmaHistogramBoolean(
       "Sync.TrustedVaultJavascriptSetEncryptionKeysValidArgs",
@@ -205,7 +200,6 @@ void RecordCallToSetClientEncryptionKeysToUma(ValidArgs args) {
       "TrustedVault.JavascriptSetClientEncryptionKeysValidArgs",
       args == ValidArgs::kValidArgs);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void RecordCallToAddTrustedSyncEncryptionRecoveryMethodToUma(ValidArgs args) {
   base::UmaHistogramBoolean(
@@ -264,7 +258,6 @@ void TrustedVaultEncryptionKeysExtension::Install() {
   // available. Namely, TrustedVaultClientAndroid::StoreKeys() isn't implemented
   // because there is no underlying Android API to invoke, given that sign in
   // and reauth flows are handled outside the browser.
-#if !BUILDFLAG(IS_ANDROID)
   chrome
       ->Set(context, gin::StringToSymbol(isolate, "setSyncEncryptionKeys"),
             gin::CreateFunctionTemplate(
@@ -287,7 +280,6 @@ void TrustedVaultEncryptionKeysExtension::Install() {
               ->GetFunction(context)
               .ToLocalChecked())
       .Check();
-#endif
 
   chrome
       ->Set(context,
@@ -303,7 +295,6 @@ void TrustedVaultEncryptionKeysExtension::Install() {
       .Check();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void TrustedVaultEncryptionKeysExtension::SetSyncEncryptionKeys(
     gin::Arguments* args) {
   DCHECK(render_frame());
@@ -496,7 +487,6 @@ void TrustedVaultEncryptionKeysExtension::SetClientEncryptionKeysContinue(
           std::make_unique<v8::Global<v8::Function>>(args->isolate(),
                                                      callback)));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void TrustedVaultEncryptionKeysExtension::
     AddTrustedSyncEncryptionRecoveryMethod(gin::Arguments* args) {

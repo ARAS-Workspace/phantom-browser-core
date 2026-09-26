@@ -19,11 +19,7 @@ namespace policy {
 
 MockConfigurationPolicyProvider::MockConfigurationPolicyProvider() = default;
 
-MockConfigurationPolicyProvider::~MockConfigurationPolicyProvider() {
-#if BUILDFLAG(IS_ANDROID)
-  ShutdownForTesting();
-#endif  // BUILDFLAG(IS_ANDROID)
-}
+MockConfigurationPolicyProvider::~MockConfigurationPolicyProvider() {}
 
 void MockConfigurationPolicyProvider::UpdateChromePolicy(
     const PolicyMap& policy) {

@@ -35,11 +35,9 @@
 #include "services/service_manager/public/cpp/interface_provider.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"  // nogncheck
 #include "extensions/browser/extension_registry.h"  // nogncheck
 #include "extensions/common/extension_set.h"        // nogncheck
-#endif
 
 namespace task_manager {
 
@@ -144,23 +142,6 @@ bool ChildProcessTask::Kill() {
   if (!IsKillable()) {
     return false;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (process_type_ == content::PROCESS_TYPE_RENDERER) {
-    if (auto* host =
-            content::RenderProcessHost::FromID(unique_child_process_id_);
-        host) {
-      return host->Shutdown(content::RESULT_CODE_KILLED);
-    }
-  }
-
-  if (auto* host =
-          content::BrowserChildProcessHost::FromID(unique_child_process_id_);
-      host) {
-    host->GetHost()->ForceShutdown();
-    return true;
-  }
-#endif
 
   return Task::Kill();
 }

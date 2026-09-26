@@ -87,7 +87,6 @@ TEST_F(ImageCaptureImplTest, SetPhotoOptionsWithHiddenVisibility) {
 // PTZ permission is always granted on Android (see
 // MediaDevicesPermissionChecker::HasPanTiltZoomPermissionGrantedOnUIThread),
 // overriding it will have no effect.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ImageCaptureImplTest, SetPhotoOptionsWithPTZNoPermission) {
   SetPermissionForPTZ(blink::mojom::PermissionStatus::DENIED);
 
@@ -99,7 +98,6 @@ TEST_F(ImageCaptureImplTest, SetPhotoOptionsWithPTZNoPermission) {
   SetPhotoOptions(std::move(photo_settings), future.GetCallback());
   EXPECT_FALSE(future.Get());
 }
-#endif
 
 TEST_F(ImageCaptureImplTest, SetPhotoOptionsWithPTZWithPermission) {
   SetPermissionForPTZ(blink::mojom::PermissionStatus::GRANTED);

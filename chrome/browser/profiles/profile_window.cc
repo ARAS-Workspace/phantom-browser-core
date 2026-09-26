@@ -48,12 +48,10 @@
 #include "content/public/browser/browser_thread.h"
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/startup/startup_browser_creator.h"
-#endif  // !defined (OS_ANDROID)
 
 #include "chrome/browser/ui/profiles/profile_picker.h"
 
@@ -195,8 +193,6 @@ void OpenBrowserWindowForProfile(
       profile, process_startup, is_first_run, true, open_command_line_urls);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 void LoadProfileAsync(const base::FilePath& path,
                       base::OnceCallback<void(Profile*)> callback) {
   g_browser_process->profile_manager()->CreateProfileAsync(
@@ -221,7 +217,6 @@ void SwitchToGuestProfile(
   SwitchToProfile(ProfileManager::GetGuestProfilePath(),
                   /*always_create=*/false, std::move(callback));
 }
-#endif
 
 bool HasProfileSwitchTargets(Profile* profile) {
   size_t min_profiles = profile->IsGuestSession() ? 1 : 2;

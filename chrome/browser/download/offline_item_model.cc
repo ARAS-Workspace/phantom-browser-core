@@ -299,7 +299,6 @@ bool OfflineItemModel::ShouldPromoteOrigin() const {
   return offline_item_ && offline_item_->promote_origin;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool OfflineItemModel::IsCommandEnabled(
     const DownloadCommands* download_commands,
     DownloadCommands::Command command) const {
@@ -401,7 +400,6 @@ void OfflineItemModel::ExecuteCommand(DownloadCommands* download_commands,
       break;
   }
 }
-#endif
 
 std::string OfflineItemModel::GetMimeType() const {
   return offline_item_ ? offline_item_->mime_type : "";

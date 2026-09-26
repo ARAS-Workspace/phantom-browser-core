@@ -18,11 +18,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/webauthn/android/cred_man_support.h"
-#include "components/webauthn/android/webauthn_cred_man_delegate.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace password_manager {
 using autofill::FormData;
 using autofill::FormFieldData;
@@ -51,12 +46,7 @@ class MockPasswordFormManagerObserver : public PasswordFormManagerObserver {
 
 class PasswordFormCacheTest : public testing::Test {
  public:
-  PasswordFormCacheTest() {
-#if BUILDFLAG(IS_ANDROID)
-    webauthn::WebAuthnCredManDelegate::override_cred_man_support_for_testing(
-        webauthn::CredManSupport::DISABLED);
-#endif  // BUILDFLAG(IS_ANDROID)
-  }
+  PasswordFormCacheTest() {}
 
   StubPasswordManagerClient& client() { return client_; }
 

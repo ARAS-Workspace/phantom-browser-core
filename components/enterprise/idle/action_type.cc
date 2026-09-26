@@ -22,12 +22,10 @@
 namespace enterprise_idle {
 
 namespace {
-#if !BUILDFLAG(IS_ANDROID)
 const char kCloseBrowsersActionName[] = "close_browsers";
 const char kShowProfilePickerActionName[] = "show_profile_picker";
 const char kClearDownloadHistoryActionName[] = "clear_download_history";
 const char kClearHostedAppDataActionName[] = "clear_hosted_app_data";
-#endif  // !BUILDFLAG(IS_ANDROID)
 const char kClearBrowsingHistoryActionName[] = "clear_browsing_history";
 const char kClearCookiesAndOtherSiteDataActionName[] =
     "clear_cookies_and_other_site_data";
@@ -40,7 +38,6 @@ const char kReloadPagesActionName[] = "reload_pages";
 }  // namespace
 
 std::optional<ActionType> NameToActionType(const std::string& name) {
-#if !BUILDFLAG(IS_ANDROID)
   if (name == kCloseBrowsersActionName) {
     return ActionType::kCloseBrowsers;
   }
@@ -53,7 +50,6 @@ std::optional<ActionType> NameToActionType(const std::string& name) {
   if (name == kClearHostedAppDataActionName) {
     return ActionType::kClearHostedAppData;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   if (name == kClearBrowsingHistoryActionName) {
     return ActionType::kClearBrowsingHistory;
   }

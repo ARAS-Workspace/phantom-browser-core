@@ -230,9 +230,6 @@ TEST(WebAuthenticationJSONConversionTest,
       device::UserVerificationRequirement::kRequired,
       AuthenticationExtensionsClientInputs::New(
           kAppId,
-#if BUILDFLAG(IS_ANDROID)
-          /*user_verification_methods=*/false,
-#endif
           /*prf=*/true, std::move(prf_values),
           /*large_blob_read=*/true,
           /*large_blob_write=*/std::vector<uint8_t>{8, 9, 10},
@@ -539,10 +536,6 @@ TEST(WebAuthenticationJSONConversionTest,
       device::AuthenticatorAttachment::kCrossPlatform, kSignature, kUserHandle,
       AuthenticationExtensionsClientOutputs::New(
           /*echo_appid_extension=*/true, /*appid_extension=*/true,
-#if BUILDFLAG(IS_ANDROID)
-          /*echo_user_verification_methods=*/false,
-          /*user_verification_methods=*/std::nullopt,
-#endif
           /*echo_prf=*/true, /*prf_results=*/nullptr,
           /*prf_not_evaluated=*/false,
           /*echo_large_blob=*/true,

@@ -113,12 +113,6 @@ ThrottleCheckResult LookalikeUrlNavigationThrottle::WillStartRequest() {
     return content::NavigationThrottle::PROCEED;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  auto* service = LookalikeUrlServiceFactory::GetForProfile(profile_);
-  if (service->EngagedSitesNeedUpdating()) {
-    service->ForceUpdateEngagedSites(base::DoNothing());
-  }
-#endif
   PrewarmLookalikeCheckAsync();
   return content::NavigationThrottle::PROCEED;
 }

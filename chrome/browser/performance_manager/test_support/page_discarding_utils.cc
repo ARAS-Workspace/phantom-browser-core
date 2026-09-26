@@ -104,7 +104,6 @@ void GraphTestHarnessWithDiscardablePage::RecreateNodes() {
   MakePageNodeDiscardable(page_node(), task_env());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 LenientMockPageDiscarder::LenientMockPageDiscarder() = default;
 LenientMockPageDiscarder::~LenientMockPageDiscarder() = default;
 
@@ -147,7 +146,6 @@ void GraphTestHarnessWithMockDiscarder::TearDown() {
   user_performance_tuning_manager_environment_.TearDown();
   GraphTestHarnessWithDiscardablePage::TearDown();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void ExpectCanDiscardEligible(const PageNode* page_node,
                               std::vector<DiscardReason> discard_reasons,

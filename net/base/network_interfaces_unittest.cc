@@ -13,7 +13,7 @@
 #include "net/base/ip_endpoint.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 #include <net/if.h>
 #endif
 
@@ -37,7 +37,7 @@ TEST(NetworkInterfacesTest, GetNetworkList) {
     EXPECT_GT(it->prefix_length, 1u);
     EXPECT_LE(it->prefix_length, it->address.size() * 8);
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
     char name[IF_NAMESIZE];
     EXPECT_TRUE(if_indextoname(it->interface_index, name));
     EXPECT_STREQ(it->name.c_str(), name);

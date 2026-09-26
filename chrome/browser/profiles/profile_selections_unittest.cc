@@ -35,10 +35,8 @@ TEST_F(ProfileSelectionsTest, DefaultConstructor) {
   TestProfileSelection(selections, guest_profile(), nullptr);
   TestProfileSelection(selections, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileSelection(selections, system_profile(), nullptr);
   TestProfileSelection(selections, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ProfileSelectionsTest, CustomImplementation) {
@@ -56,10 +54,8 @@ TEST_F(ProfileSelectionsTest, CustomImplementation) {
   TestProfileSelection(selections, guest_profile(), nullptr);
   TestProfileSelection(selections, guest_profile_otr(), guest_profile_otr());
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileSelection(selections, system_profile(), nullptr);
   TestProfileSelection(selections, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ProfileSelectionsTest, OnlyRegularProfile) {
@@ -71,10 +67,8 @@ TEST_F(ProfileSelectionsTest, OnlyRegularProfile) {
   TestProfileSelection(selections, guest_profile(), nullptr);
   TestProfileSelection(selections, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileSelection(selections, system_profile(), nullptr);
   TestProfileSelection(selections, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ProfileSelectionsTest, RegularAndIncognito) {
@@ -87,10 +81,8 @@ TEST_F(ProfileSelectionsTest, RegularAndIncognito) {
   TestProfileSelection(selections, guest_profile(), nullptr);
   TestProfileSelection(selections, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileSelection(selections, system_profile(), nullptr);
   TestProfileSelection(selections, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ProfileSelectionsTest, RedirectedInIncognito) {
@@ -103,10 +95,8 @@ TEST_F(ProfileSelectionsTest, RedirectedInIncognito) {
   TestProfileSelection(selections, guest_profile(), nullptr);
   TestProfileSelection(selections, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileSelection(selections, system_profile(), nullptr);
   TestProfileSelection(selections, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ProfileSelectionsTest, NoProfiles) {
@@ -118,8 +108,6 @@ TEST_F(ProfileSelectionsTest, NoProfiles) {
   TestProfileSelection(selections, guest_profile(), nullptr);
   TestProfileSelection(selections, guest_profile_otr(), nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   TestProfileSelection(selections, system_profile(), nullptr);
   TestProfileSelection(selections, system_profile_otr(), nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

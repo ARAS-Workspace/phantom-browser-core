@@ -21,13 +21,6 @@
 #include "services/resource_coordinator/public/cpp/memory_instrumentation/memory_instrumentation.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-// TODO: Remove this definition by targeting version 22+ NDK at build time.
-// This was copied from <malloc.h> in Bionic master.
-extern "C" int mallopt(int __option, int __value) __attribute__((weak));
-#endif
-
 using testing::Le;
 using testing::Ge;
 using testing::AllOf;
@@ -86,22 +79,6 @@ uint64_t GetPrivateFootprintKb() {
 // TODO(hjd): Move this once we have a resource_coordinator folder in browser.
 IN_PROC_BROWSER_TEST_F(MemoryInstrumentationTest,
                        MAYBE_PrivateFootprintComputation) {
-#if BUILDFLAG(IS_ANDROID)
-  // The allocator in Android N and above will defer madvising large allocations
-  // until the purge interval, which is set at 1 second. If we are on N or
-  // above, check whether we can use mallopt(M_PURGE) to trigger an immediate
-  // purge. If we can't, skip the test.
-  if (base::android::android_info::sdk_int() >=
-      base::android::android_info::SDK_VERSION_NOUGAT) {
-    // M_PURGE is supported on most devices running P, but not all of them. So
-    // we can't check the API level but must instead attempt to trigger a purge
-    // and check whether or not it succeeded.
-    if (!mallopt || mallopt(M_PURGE, 0) == 0) {
-      DVLOG(0) << "Skipping test - unable to trigger a purge.";
-      return;
-    }
-  }
-#endif
 
   Navigate(shell());
 
@@ -123,11 +100,6 @@ IN_PROC_BROWSER_TEST_F(MemoryInstrumentationTest,
 
   buffer.clear();
   buffer.shrink_to_fit();
-
-#if BUILDFLAG(IS_ANDROID)
-  if (mallopt)
-    mallopt(M_PURGE, 0);
-#endif
 
   int64_t after_kb = GetPrivateFootprintKb();
 

@@ -85,11 +85,9 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/image/image_skia_rep.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/download_item_warning_data.h"
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service.h"
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
@@ -1081,7 +1079,6 @@ bool IsDownloadDeltaField(const std::string& field) {
 // dangerous download.
 // NOTE: Android does not support the TrustSafetySentimentService.
 void MaybeTriggerTrustSafetySentimentSurvey(Profile* profile, bool accept) {
-#if !BUILDFLAG(IS_ANDROID)
   // Survey triggered on ACCEPT action, since this is where the user
   // confirms their choice to keep a dangerous download, rather than
   // triggering a survey after selecting to KEEP in the downloads page UI.
@@ -1095,7 +1092,6 @@ void MaybeTriggerTrustSafetySentimentSurvey(Profile* profile, bool accept) {
           DownloadItemWarningData::WarningAction::PROCEED);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

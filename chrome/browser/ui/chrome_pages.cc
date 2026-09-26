@@ -71,14 +71,12 @@
 
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  //! BUILDFLAG(IS_ANDROID)
 
 using base::UserMetricsAction;
 
@@ -554,7 +552,6 @@ void ShowSharedTabGroupActivity(Profile* profile) {
                    GURL(data_sharing::features::kActivityLogsURL.Get()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ShowWebAppSettingsImpl(BrowserWindowInterface* browser,
                             Profile* profile,
                             const std::string& app_id,
@@ -579,6 +576,5 @@ void ShowWebAppSettings(Profile* profile,
                         web_app::AppSettingsPageEntryPoint entry_point) {
   ShowWebAppSettingsImpl(/*browser=*/nullptr, profile, app_id, entry_point);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace chrome

@@ -110,10 +110,6 @@
 #include "net/dns/mdns_client_impl.h"
 #endif  // BUILDFLAG(ENABLE_MDNS)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using net::test::IsError;
 using net::test::IsOk;
 using ::testing::_;
@@ -5032,70 +5028,6 @@ TEST_F(HostResolverManagerDnsTest,
 
 // InsecureDnsMode::{kEnabledPlatform, kEnabledPlatformNoSystem} are currently
 // only supported on Android.
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(HostResolverManagerDnsTest,
-       DnsPlatform_ScheduledOnStartupWithEmptyConfig) {
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_Q) {
-    GTEST_SKIP() << "Platform DNS APIs are only available from Q.";
-  }
-
-  resolver_->SetInsecureDnsClientEnabled(InsecureDnsMode::kEnabledPlatform,
-                                         /*additional_dns_types_enabled=*/true);
-
-  ResolveHostResponseHelper response(resolver_->CreateRequest(
-      HostPortPair("ok", 80), NetworkAnonymizationKey(),
-      handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-      resolve_context_.get()));
-  EXPECT_THAT(response.result_error(), IsOk());
-  EXPECT_THAT(response.request()->GetAddressResults(),
-              testing::UnorderedElementsAre(CreateExpected("127.0.0.1", 80),
-                                            CreateExpected("::1", 80)));
-}
-
-TEST_F(HostResolverManagerDnsTest,
-       DnsPlatform_ScheduledWhenTransitioningToEmptyNameservers) {
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_Q) {
-    GTEST_SKIP() << "Platform DNS APIs are only available from Q.";
-  }
-
-  resolver_->SetInsecureDnsClientEnabled(InsecureDnsMode::kEnabledPlatform,
-                                         /*additional_dns_types_enabled=*/true);
-
-  // Transition to an empty config with 0 nameservers.
-  ChangeDnsConfig(DnsConfig());
-
-  ResolveHostResponseHelper response(resolver_->CreateRequest(
-      HostPortPair("ok", 80), NetworkAnonymizationKey(),
-      handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-      resolve_context_.get()));
-  EXPECT_THAT(response.result_error(), IsOk());
-  EXPECT_THAT(response.request()->GetAddressResults(),
-              testing::UnorderedElementsAre(CreateExpected("127.0.0.1", 80),
-                                            CreateExpected("::1", 80)));
-}
-
-TEST_F(HostResolverManagerDnsTest,
-       DnsPlatformNoSystem_ResolvesWithoutSystemFallback) {
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_Q) {
-    GTEST_SKIP() << "Platform DNS APIs are only available from Q.";
-  }
-
-  resolver_->SetInsecureDnsClientEnabled(
-      InsecureDnsMode::kEnabledPlatformNoSystem,
-      /*additional_dns_types_enabled=*/true);
-
-  ResolveHostResponseHelper response(resolver_->CreateRequest(
-      HostPortPair("4ok", 80), NetworkAnonymizationKey(),
-      handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-      resolve_context_.get()));
-  EXPECT_THAT(response.result_error(), IsOk());
-  EXPECT_THAT(response.request()->GetAddressResults(),
-              testing::ElementsAre(CreateExpected("127.0.0.1", 80)));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // RFC 6761 localhost names should always resolve to loopback.
 TEST_F(HostResolverManagerDnsTest, LocalhostLookup) {

@@ -12,8 +12,6 @@
 #include "cc/trees/layer_tree_impl.h"
 #include "components/viz/test/test_types.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace cc {
 namespace {
 
@@ -73,5 +71,3 @@ TEST_P(LayerTreeHostSynchronousPixelTest, OneContentLayerGpuRasterization) {
 
 }  // namespace
 }  // namespace cc
-
-#endif  // BUILDFLAG(IS_ANDROID)

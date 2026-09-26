@@ -64,7 +64,6 @@ IN_PROC_BROWSER_TEST_F(BackgroundScriptExecutorBrowserTest,
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Only manifest V3 and above is supported on desktop android.
 // Tests the ability to run JS in an extension background page.
 IN_PROC_BROWSER_TEST_F(BackgroundScriptExecutorBrowserTest,
@@ -147,6 +146,5 @@ IN_PROC_BROWSER_TEST_F(BackgroundScriptExecutorBrowserTest,
         value, base::test::IsJson(R"({"testFlag":"flag","userGesture":true})"));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions

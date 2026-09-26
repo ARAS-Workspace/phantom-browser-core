@@ -82,11 +82,6 @@ namespace page_content_annotations {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kPageContextFetcherAndroidViewportCrop,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 gfx::Size GetScreenshotSize(
     const gfx::Size& original_size,
     const std::optional<ScreenshotOptions::ScreenshotCollectionOptions>&
@@ -694,25 +689,6 @@ void PageContextFetcher::GetTabScreenshot(
     ScheduleScreenshotTimeout();
 
     gfx::Rect src_rect;
-
-#if BUILDFLAG(IS_ANDROID)
-    if (base::FeatureList::IsEnabled(kPageContextFetcherAndroidViewportCrop)) {
-      // On Android, the captured surface may be larger than the viewport (e.g.
-      // including the browser control). The view bounds represents the actual
-      // web content area, excluding top/bottom controls.
-      //
-      // Importantly, Blink's coordinate system always renders the actual web
-      // content starting at (0, 0) of the compositor surface, regardless of
-      // whether the browser control is configured at the top or at the bottom.
-      // This means the "extra" unrendered blank space corresponding to the
-      // height of the browser controls is always appended at the bottom of the
-      // compositor surface.
-      //
-      // Therefore, we can safely crop the screenshot to match the viewport size
-      // starting at (0, 0) without any vertical offsets.
-      src_rect = gfx::Rect(original_view_size_pixels_);
-    }
-#endif
 
     view->CopyFromSurface(
         src_rect,

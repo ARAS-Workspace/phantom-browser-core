@@ -290,45 +290,6 @@ TEST(DiscardableSharedMemoryTest, LockShouldAlwaysFailAfterSuccessfulPurge) {
   EXPECT_EQ(DiscardableSharedMemory::FAILED, lock_rv);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST(DiscardableSharedMemoryTest, LockShouldFailIfPlatformLockPagesFails) {
-  const uint32_t kDataSize = 1024;
-
-  // This test cannot succeed on devices without a proper ashmem device
-  // because Lock() will always succeed.
-  if (!DiscardableSharedMemory::IsAshmemDeviceSupportedForTesting()) {
-    return;
-  }
-
-  DiscardableSharedMemory memory1;
-  bool rv1 = memory1.CreateAndMap(kDataSize);
-  ASSERT_TRUE(rv1);
-
-  base::UnsafeSharedMemoryRegion region = memory1.DuplicateRegion();
-  int fd = region.GetPlatformHandle();
-  DiscardableSharedMemory memory2(std::move(region));
-  bool rv2 = memory2.Map(kDataSize);
-  ASSERT_TRUE(rv2);
-
-  // Unlock() the first page of memory, so we can test Lock()ing it.
-  memory2.Unlock(0, base::GetPageSize());
-  // To cause ashmem_pin_region() to fail, we arrange for it to be called with
-  // an invalid file-descriptor, which requires a valid-looking fd (i.e. we
-  // can't just Close() |memory|), but one on which the operation is invalid.
-  // We can overwrite the |memory| fd with a handle to a different file using
-  // dup2(), which has the nice properties that |memory| still has a valid fd
-  // that it can close, etc without errors, but on which ashmem_pin_region()
-  // will fail.
-  base::ScopedFD null(open("/dev/null", O_RDONLY));
-  ASSERT_EQ(fd, dup2(null.get(), fd));
-
-  // Now re-Lock()ing the first page should fail.
-  DiscardableSharedMemory::LockResult lock_rv =
-      memory2.Lock(0, base::GetPageSize());
-  EXPECT_EQ(DiscardableSharedMemory::FAILED, lock_rv);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST(DiscardableSharedMemoryTest, LockAndUnlockRange) {
   test::TaskEnvironment task_environment{
       test::TaskEnvironment::TimeSource::MOCK_TIME};

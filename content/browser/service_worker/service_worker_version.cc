@@ -444,19 +444,15 @@ void ServiceWorkerVersion::SetStatus(Status status) {
   if (status == INSTALLED) {
     embedded_worker_->OnWorkerVersionInstalled();
   } else if (status == ACTIVATED) {
-#if !BUILDFLAG(IS_ANDROID)
     // Notify the hid delegate observer if the active service worker has any hid
     // event handlers.
     context_->hid_delegate_observer()->UpdateHasEventHandlers(
         registration_id_, has_hid_event_handlers_);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
     // Notify the usb delegate observer if the active service worker has any usb
     // event handlers. This is limited to platforms that support extensions.
     context_->usb_delegate_observer()->UpdateHasEventHandlers(
         registration_id_, has_usb_event_handlers_);
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   } else if (status == REDUNDANT) {
     embedded_worker_->OnWorkerVersionDoomed();
 

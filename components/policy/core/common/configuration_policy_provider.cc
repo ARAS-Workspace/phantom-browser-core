@@ -76,11 +76,4 @@ void ConfigurationPolicyProvider::OnSchemaRegistryUpdated(
 
 void ConfigurationPolicyProvider::OnSchemaRegistryReady() {}
 
-#if BUILDFLAG(IS_ANDROID)
-void ConfigurationPolicyProvider::ShutdownForTesting() {
-  observer_list_.Clear();
-  Shutdown();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace policy

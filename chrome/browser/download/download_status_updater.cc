@@ -177,10 +177,3 @@ void DownloadStatusUpdater::UpdateProfileKeepAlive(
     profile_keep_alives_.erase(profile);
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void DownloadStatusUpdater::UpdateAppIconDownloadProgress(
-    download::DownloadItem* download) {
-  // TODO(avi): Implement for Android?
-}
-#endif

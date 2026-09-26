@@ -51,7 +51,6 @@ namespace {
 // ability to make NFC tags permanently read-only. See crbug.com/1275576
 const char kObsoleteNfcDefaultPref[] =
     "profile.default_content_setting_values.nfc";
-#if !BUILDFLAG(IS_ANDROID)
 const char kObsoleteMouseLockDefaultPref[] =
     "profile.default_content_setting_values.mouselock";
 const char kObsoletePluginsDefaultPref[] =
@@ -66,7 +65,6 @@ const char kObsoleteInstalledWebAppMetadataDefaultPref[] =
     "profile.default_content_setting_values.installed_web_app_metadata";
 const char kObsoletePpapiBrokerDefaultPref[] =
     "profile.default_content_setting_values.ppapi_broker";
-#endif  // !BUILDFLAG(IS_ANDROID)
 constexpr char kObsoleteFederatedIdentityDefaultPref[] =
     "profile.default_content_setting_values.fedcm_active_session";
 
@@ -145,7 +143,6 @@ void DefaultProvider::RegisterProfilePrefs(
   registry->RegisterIntegerPref(kObsoleteTopLevelTpcdTrialDefaultPref, 0);
   registry->RegisterIntegerPref(kObsoleteTopLevelTpcdOriginTrialDefaultPref, 0);
   registry->RegisterIntegerPref(kObsoleteTrackingProtectionDefaultPref, 0);
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterIntegerPref(
       kObsoleteMouseLockDefaultPref, 0,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
@@ -155,7 +152,6 @@ void DefaultProvider::RegisterProfilePrefs(
   registry->RegisterIntegerPref(kObsoleteFontAccessDefaultPref, 0);
   registry->RegisterIntegerPref(kObsoleteInstalledWebAppMetadataDefaultPref, 0);
   registry->RegisterIntegerPref(kObsoletePpapiBrokerDefaultPref, 0);
-#endif  // !BUILDFLAG(IS_ANDROID)
   registry->RegisterIntegerPref(kObsoleteFederatedIdentityDefaultPref, 0);
   registry->RegisterIntegerPref(kObsoletePrivateNetworkGuardDefaultPref, 0);
 
@@ -397,7 +393,6 @@ void DefaultProvider::DiscardOrMigrateObsoletePreferences() {
   prefs_->ClearPref(kObsoleteTopLevelTpcdTrialDefaultPref);
   prefs_->ClearPref(kObsoleteTopLevelTpcdOriginTrialDefaultPref);
   prefs_->ClearPref(kObsoleteTrackingProtectionDefaultPref);
-#if !BUILDFLAG(IS_ANDROID)
   prefs_->ClearPref(kObsoleteMouseLockDefaultPref);
   prefs_->ClearPref(kObsoletePluginsDefaultPref);
   prefs_->ClearPref(kObsoletePluginsDataDefaultPref);
@@ -405,7 +400,6 @@ void DefaultProvider::DiscardOrMigrateObsoletePreferences() {
   prefs_->ClearPref(kObsoleteFontAccessDefaultPref);
   prefs_->ClearPref(kObsoleteInstalledWebAppMetadataDefaultPref);
   prefs_->ClearPref(kObsoletePpapiBrokerDefaultPref);
-#endif  // !BUILDFLAG(IS_ANDROID)
   prefs_->ClearPref(kObsoleteFederatedIdentityDefaultPref);
   prefs_->ClearPref(kObsoletePrivateNetworkGuardDefaultPref);
 
@@ -605,24 +599,6 @@ void DefaultProvider::RecordHistogramMetrics() {
       IntToContentSetting(
           prefs_->GetInteger(GetPrefName(ContentSettingsType::SENSORS))),
       CONTENT_SETTING_NUM_SETTINGS);
-
-#if BUILDFLAG(IS_ANDROID)
-  base::UmaHistogramEnumeration(
-      "ContentSettings.RegularProfile.DefaultAutoDarkWebContentSetting",
-      IntToContentSetting(prefs_->GetInteger(
-          GetPrefName(ContentSettingsType::AUTO_DARK_WEB_CONTENT))),
-      CONTENT_SETTING_NUM_SETTINGS);
-
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  base::UmaHistogramEnumeration(
-      "ContentSettings.RegularProfile.DefaultRequestDesktopSiteSetting",
-      IntToContentSetting(prefs_->GetInteger(
-          GetPrefName(ContentSettingsType::REQUEST_DESKTOP_SITE))),
-      CONTENT_SETTING_NUM_SETTINGS);
-
-#endif
 }
 
 }  // namespace content_settings

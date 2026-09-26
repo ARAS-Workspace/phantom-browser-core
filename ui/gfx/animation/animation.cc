@@ -115,33 +115,6 @@ base::TimeDelta Animation::RichAnimationDuration(base::TimeDelta duration) {
   return ShouldRenderRichAnimation() ? duration : base::TimeDelta();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// static
-bool Animation::ShouldRenderRichAnimationImpl() {
-  return true;
-  // Defined in platform specific file for Windows, OSX, ChromeOS and Linux.
-}
-
-// static
-bool Animation::ScrollAnimationsEnabledBySystem() {
-  return true;
-  // Defined in platform specific file for Windows, OSX, ChromeOS and Linux.
-}
-
-#if !BUILDFLAG(IS_ANDROID)
-// static
-void Animation::UpdatePrefersReducedMotion() {
-  // prefers_reduced_motion_ should only be modified on the UI thread.
-  // TODO(crbug.com/40611878): DCHECK this assertion once tests are
-  // well-behaved.
-
-  // By default, we assume that animations are enabled, to avoid impacting the
-  // experience for users on systems that don't have APIs for reduced motion.
-  prefers_reduced_motion_ = false;
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // static
 bool Animation::PrefersReducedMotion() {
   // --force-prefers-reduced-motion and --force-prefers-no-reduced-motion

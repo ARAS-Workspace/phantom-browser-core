@@ -48,7 +48,7 @@
 #include "ui/base/ui_base_paths.h"
 #include "ui/base/ui_base_switches.h"
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 #include <locale.h>
 #include <signal.h>
 
@@ -74,7 +74,7 @@ namespace content {
 
 namespace {
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 
 // Setup signal-handling state: resanitize most signals, ignore SIGPIPE.
 void SetupSignalHandlers() {
@@ -102,7 +102,7 @@ void SetupSignalHandlers() {
     CHECK_EQ(0, sigaction(signal_to_reset, &sigact, nullptr));
 }
 
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
 bool IsSubprocess() {
   auto type = base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
@@ -169,9 +169,7 @@ NO_STACK_PROTECTOR int RunContentProcess(
   // may re-run Main() without restarting the browser process. This flag
   // prevents initializing things more than once.
   static bool is_initialized = false;
-#if !BUILDFLAG(IS_ANDROID)
   DCHECK(!is_initialized);
-#endif
   if (is_initialized) {
     content_main_runner->ReInitializeParams(std::move(params));
   } else {
@@ -196,7 +194,6 @@ NO_STACK_PROTECTOR int RunContentProcess(
     setenv("DBUS_SESSION_BUS_ADDRESS", "disabled:", kNoOverrideIfAlreadySet);
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
     // On Android, the command line is initialized when library is loaded.
     int argc = 0;
     const char** argv = nullptr;
@@ -213,11 +210,10 @@ NO_STACK_PROTECTOR int RunContentProcess(
     base::EnableTerminationOnHeapCorruption();
 
     base::SetProcessTitleFromCommandLine(argv);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // On Android setlocale() is not supported, and we don't override the signal
 // handlers so we can get a stack trace when crashing.
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
     // Set C library locale to make sure CommandLine can parse
     // argument values in the correct encoding and to make sure
     // generated file names (think downloads) are in the file system's
@@ -265,9 +261,7 @@ NO_STACK_PROTECTOR int RunContentProcess(
     CommonSubprocessInit();
   exit_code = content_main_runner->Run();
 
-#if !BUILDFLAG(IS_ANDROID)
   content_main_runner->Shutdown();
-#endif
 
   return exit_code;
 }

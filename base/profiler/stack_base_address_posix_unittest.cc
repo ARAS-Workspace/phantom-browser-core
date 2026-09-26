@@ -35,15 +35,4 @@ TEST(GetThreadStackBaseAddressTest, MAYBE_CurrentThread) {
   EXPECT_THAT(base, Optional(Le(ClampAdd(stack_addr, 4 * 1024 * 1024))));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-TEST(GetThreadStackBaseAddressTest, MainThread) {
-  // GetThreadStackBaseAddress does not use pthread_id for main thread on these
-  // platforms.
-  std::optional<uintptr_t> base = GetThreadStackBaseAddress(
-      PlatformThreadId(GetCurrentProcId()), pthread_t());
-  EXPECT_THAT(base, Optional(Gt(0u)));
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 }  // namespace base

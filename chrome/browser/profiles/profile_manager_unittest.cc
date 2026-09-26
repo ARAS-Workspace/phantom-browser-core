@@ -72,9 +72,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
-#endif
 
 using base::ASCIIToUTF16;
 
@@ -199,7 +197,6 @@ class ProfileManagerTestBase : public testing::Test {
                        base::Unretained(mock_observer)));
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Helper function to create a profile with |name| for a profile |manager|.
   void CreateMultiProfileAsync(ProfileManager* manager,
                                const std::string& name,
@@ -211,7 +208,6 @@ class ProfileManagerTestBase : public testing::Test {
         base::BindOnce(&MockObserver::OnProfileCreated,
                        base::Unretained(mock_observer)));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Helper function to add a profile with |profile_name| to |profile_manager|'s
   // ProfileAttributesStorage, and return the profile created.
@@ -596,7 +592,6 @@ TEST_P(ProfileManagerTest, ConcurrentCreationAsyncAndSync) {
   EXPECT_EQ(profile, profile_created);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // There's no multi-profiles on Android.
 TEST_P(ProfileManagerTest, CreateMultiProfileAsync) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
@@ -795,7 +790,6 @@ TEST_P(ProfileManagerTest, CreateHiddenProfileAsync) {
   EXPECT_TRUE(entry->IsOmitted());
   EXPECT_TRUE(entry->IsEphemeral());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Checks that the supervised profiles no longer marked as omitted on creation.
 TEST_P(ProfileManagerTest, AddProfileToStorageCheckNotOmitted) {
@@ -836,14 +830,12 @@ TEST_P(ProfileManagerTest, AddProfileToStorageCheckNotOmitted) {
   EXPECT_FALSE(entry->IsOmitted());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(ProfileManagerTest, GetSystemProfilePath) {
   base::FilePath system_profile_path = ProfileManager::GetSystemProfilePath();
   base::FilePath expected_path = temp_dir_.GetPath();
   expected_path = expected_path.Append(chrome::kSystemProfileDir);
   EXPECT_EQ(expected_path, system_profile_path);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test profile manager that creates all profiles as guest by default.
 class UnittestGuestProfileManager : public FakeProfileManager {
@@ -1098,7 +1090,6 @@ TEST_P(ProfileManagerTest, GetLastUsedProfileAllowedByPolicy) {
       profile_manager->GetLastUsedProfileAllowedByPolicy()->IsOffTheRecord());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // There's no Browser object on Android and there's no multi-profiles on Chrome.
 
 TEST_P(ProfileManagerTest, CleanUpEphemeralProfiles) {
@@ -1541,10 +1532,8 @@ TEST_P(ProfileManagerTest, ProfileDisplayNamePreservesSignedInName) {
   EXPECT_EQ(gaia_given_name,
             profiles::GetAvatarNameForProfile(profile1->GetPath()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // GetAvatarNameForProfile() is not defined on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(ProfileManagerTest, ProfileDisplayNameIsEmailIfDefaultName) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
   ProfileAttributesStorage& storage =
@@ -1611,7 +1600,6 @@ TEST_P(ProfileManagerTest, ProfileDisplayNameIsEmailIfDefaultName) {
   EXPECT_EQ(gaia_given_name,
             profiles::GetAvatarNameForProfile(profile1->GetPath()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 // These tests are for a Mac-only code path that assumes the browser
@@ -1905,10 +1893,8 @@ TEST_P(ProfileManagerTestWithParam, ScopedProfileKeepAlive) {
 
   base::RunLoop().RunUntilIdle();
   if (GetParam().should_clear_waiting_for_first_browser_window) {
-#if !BUILDFLAG(IS_ANDROID)
     // Profile* should've been destroyed by now.
     EXPECT_EQ(nullptr, profile_manager->GetProfileByPath(dest_path));
-#endif  // !BUILDFLAG(IS_ANDROID)
   } else {
     // `profile` is still valid since `kWaitingForFirstBrowserWindow` was not
     // cleared.
@@ -1946,7 +1932,6 @@ TEST_P(ProfileManagerTest, ProfileCountRecordedAtProfileInit) {
   EXPECT_THAT(histogram_tester.GetAllSamples(kHistogramName),
               BucketsAre(Bucket(1, 1), Bucket(2, 1)));
 
-#if !BUILDFLAG(IS_ANDROID)
   // Delete one profile to decrement the count.
   profile_manager->GetDeleteProfileHelper().MaybeScheduleProfileForDeletion(
       path_1, base::DoNothing(), ProfileMetrics::DELETE_PROFILE_USER_MANAGER);
@@ -1955,7 +1940,6 @@ TEST_P(ProfileManagerTest, ProfileCountRecordedAtProfileInit) {
   profile_manager->GetProfile(dest_path.Append(FILE_PATH_LITERAL("Profile 3")));
   EXPECT_THAT(histogram_tester.GetAllSamples(kHistogramName),
               BucketsAre(Bucket(1, 1), Bucket(2, 2)));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 class ProfileManagerDeferredAsyncLoadingTest : public ProfileManagerTestBase {

@@ -119,10 +119,8 @@ const auto kTrackedPrefs = std::to_array<prefs::TrackedPreferenceMetadata>({
      ValueType::PERSONAL},
     {7, prefs::kSearchProviderOverrides, EnforcementLevel::ENFORCE_ON_LOAD,
      PrefTrackingStrategy::ATOMIC, ValueType::IMPERSONAL},
-#if !BUILDFLAG(IS_ANDROID)
     {11, prefs::kPinnedTabs, EnforcementLevel::ENFORCE_ON_LOAD,
      PrefTrackingStrategy::ATOMIC, ValueType::IMPERSONAL},
-#endif
     {14, DefaultSearchManager::kDefaultSearchProviderDataPrefName,
      EnforcementLevel::NO_ENFORCEMENT, PrefTrackingStrategy::ATOMIC,
      ValueType::IMPERSONAL},
@@ -382,7 +380,6 @@ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefs(
                    std::move(extension_prefs), async, connector);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Get raw pointers to the filters before moving user_pref_store.
   PrefFilter* default_filter = nullptr;
   PrefFilter* selected_filter = nullptr;
@@ -399,19 +396,9 @@ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefs(
       default_filter = user_pref_store->GetFilter();
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (base::FeatureList::IsEnabled(
           switches::kEnablePreferencesAccountStorage)) {
-#if BUILDFLAG(IS_ANDROID)
-    // Delete account preference file on Mobile platforms.
-    // TODO(crbug.com/346508597): Remove this after a year, consistent with
-    // the pref migration process.
-    io_task_runner->PostTask(
-        FROM_HERE, base::BindOnce(IgnoreResult(&base::DeleteFile),
-                                  profile_path.Append(
-                                      chrome::kAccountPreferencesFilename)));
-#endif  // BUILDFLAG(IS_ANDROID)
     /**
      * Account values will live under `kAccountPreferencesPrefix` as a
      * dictionary in the main preference file and will be operated upon by a
@@ -467,15 +454,13 @@ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefs(
   std::unique_ptr<sync_preferences::PrefServiceSyncable> pref_service =
       factory.CreateSyncable(std::move(pref_registry));
 
-// The PrefService is created, set the weakptr for the filters.
-#if !BUILDFLAG(IS_ANDROID)
+  // The PrefService is created, set the weakptr for the filters.
   if (default_filter) {
     default_filter->SetPrefService(pref_service.get());
   }
   if (selected_filter) {
     selected_filter->SetPrefService(pref_service.get());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return pref_service;
 }

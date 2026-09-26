@@ -33,9 +33,7 @@
 #include "url/origin.h"
 #include "url/url_canon.h"
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
-#endif
 
 using metrics::OmniboxEventProto;
 
@@ -62,10 +60,8 @@ std::u16string LocationBarModelImpl::GetURLForDisplay() const {
   format_types |= url_formatter::kFormatUrlOmitHTTPS;
   format_types |= url_formatter::kFormatUrlOmitTrivialSubdomains;
 
-#if !BUILDFLAG(IS_ANDROID)
   // On desktop, the File chip makes the scheme redundant in the steady state.
   format_types |= url_formatter::kFormatUrlOmitFileScheme;
-#endif
 
   if (dom_distiller::url_utils::IsDistilledPage(GetURL())) {
     // We explicitly elide the scheme here to ensure that HTTPS and HTTP will
@@ -213,7 +209,6 @@ LocationBarModelImpl::GetOmniboxComposeboxPageClassification() const {
 }
 
 const gfx::VectorIcon& LocationBarModelImpl::GetVectorIcon() const {
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
   auto* const icon_override = delegate_->GetVectorIconOverride();
   if (icon_override)
     return *icon_override;
@@ -221,7 +216,6 @@ const gfx::VectorIcon& LocationBarModelImpl::GetVectorIcon() const {
   if (IsOfflinePage())
     return features::IsRoundedIconsEnabled() ? omnibox::kOfflinePinFilledIcon
                                              : omnibox::kOfflinePinOldIcon;
-#endif
 
   return location_bar_model::GetSecurityVectorIcon(
       GetSecurityLevel(), delegate_->GetVisibleSecurityState().get());

@@ -106,9 +106,7 @@
 #include "ui/native_theme/features/native_theme_features.h"
 #include "url/url_constants.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/host_zoom_map_impl.h"
-#endif
 
 using blink::WebInputEvent;
 

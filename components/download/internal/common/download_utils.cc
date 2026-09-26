@@ -41,10 +41,6 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/download/internal/common/android/download_collection_bridge.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace download {
 
 namespace {
@@ -69,27 +65,6 @@ const int kDefaultDownloadFileBufferSize = 524288;
 
 // Maximum size of a data URL. URLs larger than this will be truncated.
 const size_t kMaxDataURLSize = 8192u;
-
-#if BUILDFLAG(IS_ANDROID)
-// Default maximum length of a downloaded file name on Android.
-const int kDefaultMaxFileNameLengthOnAndroid = 127;
-
-DownloadItem::DownloadRenameResult RenameDownloadedFileForContentUri(
-    const base::FilePath& from_path,
-    const base::FilePath& display_name) {
-  if (static_cast<int>(display_name.value().length()) >
-      kDefaultMaxFileNameLengthOnAndroid) {
-    return DownloadItem::DownloadRenameResult::FAILURE_NAME_TOO_LONG;
-  }
-
-  if (DownloadCollectionBridge::FileNameExists(display_name))
-    return DownloadItem::DownloadRenameResult::FAILURE_NAME_CONFLICT;
-
-  return DownloadCollectionBridge::RenameDownloadUri(from_path, display_name)
-             ? DownloadItem::DownloadRenameResult::SUCCESS
-             : DownloadItem::DownloadRenameResult::FAILURE_NAME_INVALID;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void AppendExtraHeaders(net::HttpRequestHeaders* headers,
                         DownloadUrlParameters* params) {
@@ -139,43 +114,6 @@ void AppendRangeHeader(net::HttpRequestHeaders* headers,
 
   headers->SetHeader(net::HttpRequestHeaders::kRange, range_header);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-struct CreateIntermediateUriResult {
- public:
-  CreateIntermediateUriResult(const base::FilePath& content_uri,
-                              const base::FilePath& file_name)
-      : content_uri(content_uri), file_name(file_name) {}
-
-  base::FilePath content_uri;
-  base::FilePath file_name;
-};
-
-CreateIntermediateUriResult CreateIntermediateUri(
-    const GURL& original_url,
-    const GURL& referrer_url,
-    const base::FilePath& current_path,
-    const base::FilePath& suggested_name,
-    const std::string& mime_type) {
-  base::FilePath content_path =
-      current_path.IsContentUri() && base::PathExists(current_path)
-          ? current_path
-          : DownloadCollectionBridge::CreateIntermediateUriForPublish(
-                original_url, referrer_url, suggested_name, mime_type);
-  base::FilePath file_name;
-  if (!content_path.empty()) {
-    file_name = DownloadCollectionBridge::GetDisplayName(content_path);
-  }
-  if (file_name.empty())
-    file_name = suggested_name;
-  return CreateIntermediateUriResult(content_path, file_name);
-}
-
-void OnInterMediateUriCreated(LocalPathCallback callback,
-                              const CreateIntermediateUriResult& result) {
-  std::move(callback).Run(result.content_uri, result.file_name);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -668,13 +606,6 @@ ResumeMode GetDownloadResumeMode(const GURL& url,
 
   switch (reason) {
     case DOWNLOAD_INTERRUPT_REASON_NETWORK_TIMEOUT:
-#if BUILDFLAG(IS_ANDROID)
-      // If resume mode is USER_CONTINUE, android can still resume
-      // the download automatically if we didn't reach the auto resumption
-      // limit and the interruption was due to network related reasons.
-      user_action_required = true;
-      break;
-#endif
     case DOWNLOAD_INTERRUPT_REASON_FILE_TRANSIENT_ERROR:
     case DOWNLOAD_INTERRUPT_REASON_SERVER_CONTENT_LENGTH_MISMATCH:
       break;
@@ -782,10 +713,6 @@ bool DeleteDownloadedFile(const base::FilePath& path) {
 DownloadItem::DownloadRenameResult RenameDownloadedFile(
     const base::FilePath& from_path,
     const base::FilePath& display_name) {
-#if BUILDFLAG(IS_ANDROID)
-  if (from_path.IsContentUri())
-    return RenameDownloadedFileForContentUri(from_path, display_name);
-#endif  // BUILDFLAG(IS_ANDROID)
   auto to_path = base::FilePath(from_path.DirName()).Append(display_name);
   if (!base::PathExists(from_path) ||
       !base::DirectoryExists(from_path.DirName()))
@@ -841,45 +768,8 @@ size_t GetDownloadFileBufferSize() {
 void DetermineLocalPath(DownloadItem* download,
                         const base::FilePath& virtual_path,
                         LocalPathCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  if ((!download->IsTransient() &&
-       DownloadCollectionBridge::ShouldPublishDownload(virtual_path)) ||
-      virtual_path.IsContentUri()) {
-    GetDownloadTaskRunner()->PostTaskAndReplyWithResult(
-        FROM_HERE,
-        base::BindOnce(&CreateIntermediateUri,
-                       // Safe because we control download file lifetime.
-                       download->GetOriginalUrl(), download->GetReferrerUrl(),
-                       virtual_path,
-                       virtual_path.IsContentUri()
-                           ? download->GetFileNameToReportUser()
-                           : virtual_path.BaseName(),
-                       download->GetMimeType()),
-        base::BindOnce(&OnInterMediateUriCreated, std::move(callback)));
-    return;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   std::move(callback).Run(virtual_path, base::FilePath());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Determine the file path for the save package file given the `suggested_path`.
-COMPONENTS_DOWNLOAD_EXPORT
-void DetermineSavePackagePath(const GURL& url,
-                              const base::FilePath& suggested_path,
-                              LocalPathCallback callback) {
-  base::FilePath mhtml_path = suggested_path.ReplaceExtension("mhtml");
-  if (DownloadCollectionBridge::ShouldPublishDownload(mhtml_path)) {
-    GetDownloadTaskRunner()->PostTaskAndReplyWithResult(
-        FROM_HERE,
-        base::BindOnce(&CreateIntermediateUri, url, GURL(), mhtml_path,
-                       mhtml_path.BaseName(), "multipart/related"),
-        base::BindOnce(&OnInterMediateUriCreated, std::move(callback)));
-    return;
-  }
-  std::move(callback).Run(mhtml_path, mhtml_path.BaseName());
-}
-#endif
 
 bool IsInterruptedDownloadAutoResumable(download::DownloadItem* download_item,
                                         int auto_resumption_size_limit) {

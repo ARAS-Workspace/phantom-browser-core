@@ -15,10 +15,6 @@
 #include "net/base/net_errors.h"
 #include "third_party/abseil-cpp/absl/functional/overload.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "google_apis/gaia/android/jni_headers/GoogleServiceAuthError_jni.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 const char* InvalidCredentialsReasonToString(
     GoogleServiceAuthError::InvalidGaiaCredentialsReason reason) {
@@ -333,54 +329,6 @@ GoogleServiceAuthError::GetDeviceManagementErrorDetails() const {
 
 GoogleServiceAuthError::GoogleServiceAuthError(Details details)
     : details_(std::move(details)) {}
-
-#if BUILDFLAG(IS_ANDROID)
-// static
-GoogleServiceAuthError GoogleServiceAuthError::FromJavaObject(
-    JNIEnv* env,
-    const base::android::JavaRef<jobject>& j_auth_error) {
-  CHECK(j_auth_error);
-  using GSAE = GoogleServiceAuthError;
-
-  GSAE::State state = static_cast<GSAE::State>(
-      Java_GoogleServiceAuthError_getState(env, j_auth_error));
-  switch (state) {
-    case GSAE::NONE:
-      return GSAE::AuthErrorNone();
-    case GSAE::SCOPE_LIMITED_UNRECOVERABLE_ERROR:
-      // Android doesn't provide reasons for this type of errors and only
-      // creates them for enterprise policy enforced scopes. So we hardcode the
-      // value here.
-      return GSAE::FromScopeLimitedUnrecoverableErrorReason(
-          GSAE::ScopeLimitedUnrecoverableErrorReason::kAdminPolicyEnforced);
-    case GSAE::INVALID_GAIA_CREDENTIALS:
-      return GSAE::FromInvalidGaiaCredentialsReason(
-          GSAE::InvalidGaiaCredentialsReason::UNKNOWN);
-    case GSAE::CONNECTION_FAILED:
-      return GSAE::FromConnectionError(net::ERR_FAILED);
-    case GSAE::REQUEST_CANCELED:
-      return GSAE::CreateRequestCanceled();
-    case GSAE::ACCOUNT_NOT_FOUND:
-      return GSAE::CreateAccountNotFound();
-    default:
-      NOTREACHED();
-  }
-}
-
-jni_zero::ScopedJavaLocalRef<jobject> GoogleServiceAuthError::ToJavaObject(
-    JNIEnv* env) const {
-  return Java_GoogleServiceAuthError_Constructor(env, state());
-}
-
-static bool JNI_GoogleServiceAuthError_IsTransientError(JNIEnv* env,
-                                                        int32_t state) {
-  return IsTransientError(static_cast<GoogleServiceAuthError::State>(state));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(GoogleServiceAuthError)
-#endif
 
 GoogleServiceAuthError::DeviceManagementError::DeviceManagementError(
     std::unique_ptr<gaia::DeviceManagementErrorDetails> detail)

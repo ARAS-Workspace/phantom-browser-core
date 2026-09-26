@@ -160,12 +160,6 @@ class ComponentLoaderTest : public testing::Test {
 
   // The contents of the text extension's manifest file.
   std::string manifest_contents_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // WebContentImpl requires a Screen instance on Android.
-  display::test::TestScreen screen_{/*create_display=*/true,
-                                    /*register_screen=*/true};
-#endif
 };
 
 TEST_F(ComponentLoaderTest, ParseManifest) {

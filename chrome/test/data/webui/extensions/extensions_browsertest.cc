@@ -73,13 +73,11 @@ IN_PROC_BROWSER_TEST_F(CrExtensionsTest, HostPermissionsToggleList) {
 #endif
 
 // V2 is not supported on desktop android, so tests are disabled.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(CrExtensionsTest,
                        MAYBE(ExtensionsMV2DeprecationPanelUnsupportedStage)) {
   RunTest("extensions/mv2_deprecation_panel_unsupported_test.js",
           "mocha.run()");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(CrExtensionsTest, SafetyCheckReviewPanel) {
   RunTest("extensions/review_panel_test.js", "mocha.run()");

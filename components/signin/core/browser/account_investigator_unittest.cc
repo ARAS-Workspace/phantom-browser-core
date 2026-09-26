@@ -412,7 +412,6 @@ TEST_F(AccountInvestigatorTest, TryPeriodicReportWithPrimarySync) {
 }
 
 // Android does not support unconsented primary accounts.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AccountInvestigatorTest, TryPeriodicReportWithUnconsentedPrimary) {
   investigator()->Initialize();
 
@@ -432,7 +431,6 @@ TEST_F(AccountInvestigatorTest, TryPeriodicReportWithUnconsentedPrimary) {
       "Signin.CookieJar.SignedInCountWithPrimary.SyncConsumer",
       /*expected_count=*/0);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AccountInvestigatorTest, TryPeriodicReportWithEnterprisePrimary) {
   investigator()->Initialize();

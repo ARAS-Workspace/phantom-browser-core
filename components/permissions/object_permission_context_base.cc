@@ -306,14 +306,12 @@ void ObjectPermissionContextBase::SaveWebsiteSetting(
   website_setting_value.Set(kObjectListKey, std::move(objects_list));
 
   content_settings::ContentSettingConstraints constraints;
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           features::kRecordChooserPermissionLastVisitedTimestamps)) {
     if (content_settings::CanTrackLastVisit(data_content_settings_type_)) {
       constraints.set_track_last_visit_for_autoexpiration(true);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   host_content_settings_map_->SetWebsiteSettingDefaultScope(
       origin.GetURL(), GURL(), data_content_settings_type_,

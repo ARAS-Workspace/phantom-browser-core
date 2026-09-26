@@ -286,14 +286,6 @@ std::unique_ptr<VulkanImageRepresentation> SharedImageBacking::ProduceVulkan(
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<LegacyOverlayImageRepresentation>
-SharedImageBacking::ProduceLegacyOverlay(SharedImageManager* manager,
-                                         MemoryTypeTracker* tracker) {
-  return nullptr;
-}
-#endif
-
 void SharedImageBacking::UpdateEstimatedSize(size_t estimated_size_bytes) {
   if (estimated_size_bytes == estimated_size_)
     return;
@@ -454,13 +446,6 @@ gfx::GpuMemoryBufferHandle SharedImageBacking::GetGpuMemoryBufferHandle() {
   // retrieved from the backings which supports native buffer or shared memory.
   NOTREACHED();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-std::optional<VulkanYCbCrInfo> SharedImageBacking::GetVkCbCrInfo(
-    SharedContextState* context_state) {
-  return std::nullopt;
-}
-#endif
 
 bool SharedImageBacking::IsPurgeable() const {
   return false;

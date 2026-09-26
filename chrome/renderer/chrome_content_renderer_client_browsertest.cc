@@ -30,16 +30,13 @@
 #include "extensions/common/extensions_client.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/renderer/searchbox/searchbox.h"
 #include "chrome/test/base/chrome_render_view_test.h"
 #include "content/public/renderer/render_frame.h"
-#endif
 
 namespace {
 
 // SearchBox is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 
 using ChromeContentRendererClientSearchBoxTest = ChromeRenderViewTest;
 
@@ -81,8 +78,6 @@ TEST_F(ChromeContentRendererClientSearchBoxTest, RewriteThumbnailURL) {
                           net::SiteForCookies(), nullptr, &result);
   EXPECT_NE(result, thumbnail_url);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // The tests below examine Youtube requests that use the Flash API and ensure
 // that the requests have been modified to instead use HTML5. The tests also

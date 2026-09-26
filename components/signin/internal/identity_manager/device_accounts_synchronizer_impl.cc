@@ -26,14 +26,4 @@ void DeviceAccountsSynchronizerImpl::
       primary_account_id);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void DeviceAccountsSynchronizerImpl::
-    SeedAccountsThenReloadAllAccountsWithPrimaryAccount(
-        const std::vector<AccountInfo>& accounts,
-        const std::optional<CoreAccountId>& primary_account_id) {
-  token_service_delegate_->SeedAccountsThenReloadAllAccountsWithPrimaryAccount(
-      accounts, primary_account_id);
-}
-#endif
-
 }  // namespace signin

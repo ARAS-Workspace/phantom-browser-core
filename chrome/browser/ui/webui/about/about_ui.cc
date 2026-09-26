@@ -59,9 +59,7 @@
 #include "ui/base/webui/web_ui_util.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/theme_source.h"
-#endif
 
 using content::BrowserThread;
 
@@ -130,10 +128,8 @@ AboutUIConfigBase::AboutUIConfigBase(std::string_view host)
 CreditsUIConfig::CreditsUIConfig()
     : AboutUIConfigBase(chrome::kChromeUICreditsHost) {}
 
-#if !BUILDFLAG(IS_ANDROID)
 TermsUIConfig::TermsUIConfig()
     : AboutUIConfigBase(chrome::kChromeUITermsHost) {}
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
 LinuxProxyConfigUI::LinuxProxyConfigUI()
@@ -178,12 +174,10 @@ void AboutUIHTMLSource::StartDataRequest(
   } else if (source_name_ == chrome::kChromeUILinuxProxyConfigHost) {
     response = AboutLinuxProxyConfig();
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   } else if (source_name_ == chrome::kChromeUITermsHost) {
     response =
         ui::ResourceBundle::GetSharedInstance().LoadLocalizedResourceString(
             IDS_TERMS_HTML);
-#endif
   }
 
   FinishDataRequest(response, std::move(callback));
@@ -218,10 +212,8 @@ AboutUI::AboutUI(content::WebUI* web_ui, const GURL& url)
     : WebUIController(web_ui) {
   Profile* profile = Profile::FromWebUI(web_ui);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Set up the chrome://theme/ source.
   content::URLDataSource::Add(profile, std::make_unique<ThemeSource>(profile));
-#endif
 
   content::URLDataSource::Add(
       profile, std::make_unique<AboutUIHTMLSource>(url.GetHost(), profile));

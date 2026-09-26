@@ -724,7 +724,6 @@ TEST_F(SpellcheckCustomDictionaryTest, DictionaryRemoveWordNotification) {
 // TODO(crbug.com/460064444): Maybe re-enable this test on Desktop Android
 // builds. This flow is never exercised on Android because Dictionary is not
 // synced on Android, but maybe this test failure hints at a real bug.
-#if !BUILDFLAG(IS_DESKTOP_ANDROID)
 TEST_F(SpellcheckCustomDictionaryTest, DictionarySyncLimit) {
   // Here, |server_custom_dictionary| plays the role of the sync server.
   SpellcheckCustomDictionary* server_custom_dictionary =
@@ -811,7 +810,6 @@ TEST_F(SpellcheckCustomDictionaryTest, DictionarySyncLimit) {
   EXPECT_EQ(spellcheck::kMaxSyncableDictionaryWords,
             server_custom_dictionary->GetWords().size());
 }
-#endif  // !BUILDFLAG(IS_DESKTOP_ANDROID)
 
 TEST_F(SpellcheckCustomDictionaryTest, HasWord) {
   SpellcheckService* spellcheck_service =

@@ -169,18 +169,5 @@ TEST(ColorProviderKeyTest, EqualityAppController) {
   EXPECT_EQ(key1, key2);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST(ColorProviderKeyTest, EqualityContextHash) {
-  ColorProviderKey key1;
-  ColorProviderKey key2;
-  key1.context_hash = 12345;
-  key2.context_hash = 67890;
-  EXPECT_NE(key1, key2);
-
-  key2.context_hash = 12345;
-  EXPECT_EQ(key1, key2);
-}
-#endif
-
 }  // namespace
 }  // namespace ui

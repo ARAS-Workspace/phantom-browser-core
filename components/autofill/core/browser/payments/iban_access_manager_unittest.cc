@@ -25,10 +25,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 namespace autofill {
 namespace {
 
@@ -96,11 +92,6 @@ class IbanAccessManagerTest : public testing::Test {
 // Verify that `FetchValue` returns the correct value for an existing local
 // IBAN.
 TEST_F(IbanAccessManagerTest, FetchValue_ExistingLocalIban) {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_automotive()) {
-    GTEST_SKIP() << "This test should not run on automotive.";
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   Suggestion suggestion(SuggestionType::kIbanEntry);
   Iban local_iban = test::GetLocalIban();
   local_iban.set_value(kFullIbanValue);
@@ -148,11 +139,6 @@ TEST_F(IbanAccessManagerTest, NoServerIbanWithBackendId_DoesNotUnmask) {
 // Verify that a successful `UnmaskIban` call results in the `FetchValue`
 // returning the complete server IBAN value.
 TEST_F(IbanAccessManagerTest, ServerIban_BackendId_Success) {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_automotive()) {
-    GTEST_SKIP() << "This test should not run on automotive.";
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   SetUpUnmaskIbanCall(/*is_successful=*/true, /*value=*/kFullIbanValue);
 
   Iban server_iban = test::GetServerIban();
@@ -370,7 +356,7 @@ TEST_F(IbanAccessManagerTest, UnmaskIbanResult_Metric_Failure) {
                                       1);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 
 class IbanAccessManagerMandatoryReauthTest : public IbanAccessManagerTest {
  public:
@@ -641,7 +627,7 @@ TEST_F(IbanAccessManagerMandatoryReauthTest, ReauthUsage_ServerIban_Fail) {
       autofill_metrics::MandatoryReauthAuthenticationFlowEvent::kFlowFailed, 1);
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace
 }  // namespace autofill

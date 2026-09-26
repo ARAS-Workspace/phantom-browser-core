@@ -68,12 +68,10 @@
 #include "third_party/blink/public/common/features.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/api/messaging/native_messaging_test_util.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -84,7 +82,6 @@ const char* kMessageSerializationFormatError =
     "Could not establish connection. Receiving end uses different message "
     "serialization format.";
 
-#if !BUILDFLAG(IS_ANDROID)
 // Allows extension to communicate with `ScopedTestNativeMessagingHost`.
 // Extension ID: knldjmfmopnpolahpmmgbagdohdnhkik
 const char* kNativeMessageSerializationManifestKey =
@@ -92,7 +89,6 @@ const char* kNativeMessageSerializationManifestKey =
     "A52JivHZKh4YO/"
     "9vJsT3oaYhSpDCE9RPocOEQvwsHsFReW2nUEc6OLLyoCFFxIb7KkLGsmfakkut/"
     "fFdNJYh0xOTbSN8YvLWcqph09XAY2Y/f0AL7vfO1cuCqtkMt8hFrBGWxDdf9CQIDAQAB";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class MessageSender : public ExtensionHostRegistry::Observer {
  public:
@@ -1193,7 +1189,6 @@ IN_PROC_BROWSER_TEST_F(MessagingSerializationInteropApiTest,
 
 // Android builds can't use `ui_test_utils` navigation methods or
 // `ScopedTestNativeMessagingHost`.
-#if !BUILDFLAG(IS_ANDROID)
 
 class WebPageMessagingSerializationInteropApiTest
     : public StructuredCloneMessageSerializationApiTest {
@@ -1822,8 +1817,6 @@ IN_PROC_BROWSER_TEST_F(NativeMessagingSerializationInteropApiTest,
 
   ASSERT_TRUE(RunExtensionTest(dir.UnpackedPath(), {}, {}));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // -----------------------------------------------------------------------------
 // End of Message Serialization Interoperability Tests

@@ -39,7 +39,7 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/extension_telemetry/cookies_get_all_signal.h"
 #include "chrome/browser/safe_browsing/extension_telemetry/cookies_get_signal.h"
 #include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service.h"
@@ -406,7 +406,7 @@ void CookiesGetFunction::GetCookieListCallback(
 
 void CookiesGetFunction::NotifyExtensionTelemetry() {
   // TODO(crbug.com/371423073): Support telemetry on Android.
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   auto* telemetry_service =
       safe_browsing::ExtensionTelemetryServiceFactory::GetForProfile(
           Profile::FromBrowserContext(browser_context()));
@@ -515,7 +515,7 @@ void CookiesGetAllFunction::GetCookieListCallback(
 
 void CookiesGetAllFunction::NotifyExtensionTelemetry() {
   // TODO(crbug.com/371423073): Support telemetry on Android.
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   auto* telemetry_service =
       safe_browsing::ExtensionTelemetryServiceFactory::GetForProfile(
           Profile::FromBrowserContext(browser_context()));

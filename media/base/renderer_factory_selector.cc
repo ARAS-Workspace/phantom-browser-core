@@ -70,18 +70,4 @@ RendererFactory* RendererFactorySelector::GetCurrentFactory() {
   return current_factory;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RendererFactorySelector::StartRequestRemotePlayStateCB(
-    RequestRemotePlayStateChangeCB callback_request) {
-  DCHECK(!remote_play_state_change_cb_request_);
-  remote_play_state_change_cb_request_ = std::move(callback_request);
-}
-
-void RendererFactorySelector::SetRemotePlayStateChangeCB(
-    RemotePlayStateChangeCB callback) {
-  DCHECK(remote_play_state_change_cb_request_);
-  std::move(remote_play_state_change_cb_request_).Run(std::move(callback));
-}
-#endif
-
 }  // namespace media

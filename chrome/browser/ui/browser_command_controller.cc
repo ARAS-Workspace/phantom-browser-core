@@ -129,13 +129,11 @@
 #include "ui/base/window_open_disposition.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/devtools/devtools_policy_dialog.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/ui/interaction/browser_elements.h"
 #include "ui/base/interaction/element_identifier.h"
 #include "ui/base/interaction/element_tracker.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/browser_commands_mac.h"
@@ -810,9 +808,7 @@ void BrowserCommandController::HandleCommandWithDisposition(
           browser_->tab_strip_model()->GetActiveWebContents();
       if (base::FeatureList::IsEnabled(features::kDevToolsShowPolicyDialog) &&
           !DevToolsWindow::AllowDevToolsFor(profile(), web_contents)) {
-#if !BUILDFLAG(IS_ANDROID)
         DevToolsPolicyDialog::Show(web_contents);
-#endif
       } else {
         web_contents->GetPrimaryMainFrame()->ViewSource();
       }
@@ -1146,7 +1142,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       } else {
         ShowClearBrowsingDataDialog(webui::GetBrowserForOpeningWebUi(browser_));
       }
-#if !BUILDFLAG(IS_ANDROID)
       ui::ElementContext context =
           BrowserElements::From(browser_)->GetContext();
       ui::TrackedElement* const tracked_element =
@@ -1157,7 +1152,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
             tracked_element, browsing_data_important_sites_util::
                                  kShowClearBrowsingDataDialogEventId);
       }
-#endif  // !BUILDFLAG(IS_ANDROID)
       break;
     }
     case IDC_IMPORT_SETTINGS:
@@ -1373,7 +1367,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
           ProfilePicker::EntryPoint::kAppMenuProfileSubMenuManageProfiles));
       break;
-#if !BUILDFLAG(IS_ANDROID)
     case IDC_SET_BROWSER_AS_DEFAULT:
       base::MakeRefCounted<shell_integration::DefaultBrowserWorker>()
           ->StartSetAsDefault(base::DoNothing());
@@ -1384,7 +1377,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       DefaultBrowserPromptManager::GetInstance()->CloseAllPrompts(
           DefaultBrowserPromptManager::CloseReason::kAccept);
       break;
-#endif
     default:
       LOG(WARNING) << "Received Unimplemented Command: " << id;
       break;

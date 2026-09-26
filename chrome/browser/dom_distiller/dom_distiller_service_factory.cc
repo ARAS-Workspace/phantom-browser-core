@@ -22,10 +22,6 @@
 #include "content/public/browser/storage_partition.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/dom_distiller/distiller_ui_handle_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace dom_distiller {
 
 DomDistillerContextKeyedService::DomDistillerContextKeyedService(
@@ -116,11 +112,6 @@ DomDistillerServiceFactory::BuildServiceInstanceForBrowserContext(
                               weak_ptr_factory_.GetWeakPtr(),
                               base::Unretained(context)));
   std::unique_ptr<DistillerUIHandle> distiller_ui_handle;
-
-#if BUILDFLAG(IS_ANDROID)
-  distiller_ui_handle =
-      std::make_unique<dom_distiller::android::DistillerUIHandleAndroid>();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   return std::make_unique<DomDistillerContextKeyedService>(
       std::move(distiller_factory), std::move(distiller_page_factory),

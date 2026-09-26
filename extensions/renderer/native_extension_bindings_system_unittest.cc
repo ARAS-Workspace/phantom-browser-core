@@ -859,7 +859,6 @@ TEST_F(NativeExtensionBindingsSystemUnittest, UnmanagedEvents) {
   ::testing::Mock::VerifyAndClearExpectations(ipc_message_sender());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that a context having access to an aliased API (like networking.onc)
 // does not allow for accessing the source API (networkingPrivate) directly.
 // Android does not support networking.onc, nor any other aliased API.
@@ -961,7 +960,6 @@ TEST_F(NativeExtensionBindingsSystemUnittest, AliasedAPIsAreDifferentObjects) {
       &equal));
   EXPECT_FALSE(equal);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that script can overwrite the value of an API.
 TEST_F(NativeExtensionBindingsSystemUnittest, CanOverwriteAPIs) {

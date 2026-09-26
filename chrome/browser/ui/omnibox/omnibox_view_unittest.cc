@@ -39,10 +39,8 @@
 #include "ui/gfx/image/image_unittest_util.h"
 #include "ui/gfx/paint_vector_icon.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/vector_icons/vector_icons.h"     // nogncheck
-#endif
 
 using base::ASCIIToUTF16;
 using testing::_;
@@ -132,7 +130,6 @@ class OmniboxViewPopupTest : public testing::Test {
 };
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests GetIcon returns the default search icon when the match is a search
 // query.
 TEST_F(OmniboxViewTest, DISABLED_GetIcon_Default) {
@@ -287,7 +284,6 @@ TEST_F(OmniboxViewPopupTest, GetIcon_IconUrl) {
   gfx::test::CheckColors(bitmap.getColor(0, 0),
                          image.GetImage().ToSkBitmap()->getColor(0, 0));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests GetStateChanges correctly determines if text was deleted.
 TEST_F(OmniboxViewTest, GetStateChanges_DeletedText) {

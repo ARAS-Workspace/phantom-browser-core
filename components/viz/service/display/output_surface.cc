@@ -67,12 +67,6 @@ void OutputSurface::SetNeedsSwapSizeNotifications(
   DCHECK(!needs_swap_size_notifications);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::ScopedClosureRunner OutputSurface::GetCacheBackBufferCb() {
-  return base::ScopedClosureRunner();
-}
-#endif
-
 void OutputSurface::InitDelegatedInkPointRendererReceiver(
     mojo::PendingReceiver<gfx::mojom::DelegatedInkPointRenderer>
         pending_receiver) {

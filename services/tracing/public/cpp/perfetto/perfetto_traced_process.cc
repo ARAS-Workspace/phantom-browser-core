@@ -62,7 +62,7 @@ void OnPerfettoLogMessage(perfetto::base::LogMessageCallbackArgs args) {
       << args.message;
 }
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 // The async socket connection function passed to the client library for
 // connecting the producer socket in the browser process via mojo IPC.
 // |cb| is a callback from within the client library this function calls when
@@ -182,12 +182,12 @@ void PerfettoTracedProcess::RestartThreadInSandbox() {
   tracing_backend_->DetachFromMuxerSequence();
   CustomEventRecorder::GetInstance()->DetachFromSequence();
   will_trace_thread_restart_ = false;
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   if (system_tracing_producer_socket_cb_) {
     task_runner_->PostTask(FROM_HERE,
                            std::move(system_tracing_producer_socket_cb_));
   }
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 }
 
 // static
@@ -326,7 +326,7 @@ void PerfettoTracedProcess::ResetForTesting() {
   task_runner_ = nullptr;
 }
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 void PerfettoTracedProcess::DeferOrConnectProducerSocket(
     perfetto::CreateSocketCallback cb) {
   CHECK(!system_tracing_producer_socket_cb_);
@@ -338,7 +338,7 @@ void PerfettoTracedProcess::DeferOrConnectProducerSocket(
     ConnectProducerSocketViaMojo(cb, base::Milliseconds(100));
   }
 }
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
 void PerfettoTracedProcess::SetupClientLibrary(
     bool enable_consumer,
@@ -359,7 +359,7 @@ void PerfettoTracedProcess::SetupClientLibrary(
   if (enable_system_backend) {
     init_args.backends |= perfetto::kSystemBackend;
     init_args.tracing_policy = this;
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
     auto type =
         base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII("type");
     if (!type.empty()) {  // Sandboxed. Need to delegate to the browser process

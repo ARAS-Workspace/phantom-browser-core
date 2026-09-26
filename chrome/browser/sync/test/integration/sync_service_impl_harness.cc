@@ -263,7 +263,6 @@ void SyncServiceImplHarness::SignOutPrimaryAccount() {
   signin_delegate_->SignOut();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool SyncServiceImplHarness::EnterSyncPausedStateForPrimaryAccount() {
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(profile_.get());
@@ -296,7 +295,6 @@ bool SyncServiceImplHarness::ExitSignInPendingStateForPrimaryAccount() {
       IdentityManagerFactory::GetForProfile(profile_.get()));
   return AwaitSyncTransportActive();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool SyncServiceImplHarness::SetupSync(SyncTestAccount account) {
   bool result =

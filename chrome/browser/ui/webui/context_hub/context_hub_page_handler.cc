@@ -19,9 +19,7 @@
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/context_hub/context_hub_tab_provider_desktop.h"
-#endif
 #include "components/sessions/content/session_tab_helper.h"  // nogncheck
 
 ContextHubPageHandler::ContextHubPageHandler(
@@ -37,10 +35,8 @@ ContextHubPageHandler::ContextHubPageHandler(
       web_contents_(web_contents) {
   CHECK(page_.is_bound());
   if (!tab_provider_) {
-#if !BUILDFLAG(IS_ANDROID)
     tab_provider_ =
         std::make_unique<context_hub::ContextHubTabProviderDesktop>(profile_);
-#endif
   }
   context_hub::ContextHubService* service =
       ContextHubServiceFactory::GetForProfile(profile_);
@@ -230,7 +226,6 @@ namespace {
 std::vector<context_hub::TabData> GetOpenUngroupedTabs(
     ContextHubPageHandler::TabProvider* tab_provider) {
   std::vector<context_hub::TabData> tabs;
-#if !BUILDFLAG(IS_ANDROID)
   if (tab_provider) {
     for (content::WebContents* tab_contents :
          tab_provider->GetUngroupedTabs()) {
@@ -243,7 +238,6 @@ std::vector<context_hub::TabData> GetOpenUngroupedTabs(
       }
     }
   }
-#endif
   return tabs;
 }
 

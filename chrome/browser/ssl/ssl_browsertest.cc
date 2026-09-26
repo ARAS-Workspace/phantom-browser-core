@@ -1528,7 +1528,7 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestServiceWorkerRequestsUseClientCertStore) {
 // Tests that if an extension service worker requests a resource where a
 // client cert is optional (not required) and there are no client certs, the
 // request will continue without a certificate (as opposed to abort).
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 IN_PROC_BROWSER_TEST_F(
     SSLUITest,
     TestExtensionServiceWorkerCanContinueWithoutACertificate) {

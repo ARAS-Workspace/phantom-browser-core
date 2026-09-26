@@ -65,7 +65,7 @@ void SyncPageCacheToDisk() {
   sync();
 }
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_APPLE)
 bool EvictFileFromSystemCache(const FilePath& file) {
   // There doesn't seem to be a POSIX way to cool the disk cache.
   NOTIMPLEMENTED();

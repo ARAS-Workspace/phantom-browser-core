@@ -43,9 +43,6 @@ class TestFrameSinkImpl::TestMojoCompositorFrameSink
                         viz::mojom::LayerContextSettingsPtr settings) override {
   }
   void NotifyNewLocalSurfaceIdExpectedWhilePaused() override {}
-#if BUILDFLAG(IS_ANDROID)
-  void SetThreads(const std::vector<viz::Thread>& threads) override {}
-#endif
 
   viz::CompositorFrame TakeLastFrame() { return std::move(last_frame_); }
   const std::optional<::viz::HitTestRegionList>& hit_test_region_list() const {

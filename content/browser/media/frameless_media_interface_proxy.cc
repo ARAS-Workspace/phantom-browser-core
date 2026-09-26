@@ -115,16 +115,6 @@ void FramelessMediaInterfaceProxy::CreateDefaultRenderer(
     const std::string& audio_device_id,
     mojo::PendingReceiver<media::mojom::Renderer> receiver) {}
 
-
-#if BUILDFLAG(IS_ANDROID)
-void FramelessMediaInterfaceProxy::CreateFlingingRenderer(
-    const std::string& audio_device_id,
-    mojo::PendingRemote<media::mojom::FlingingRendererClientExtension>
-        client_extenion,
-    mojo::PendingReceiver<media::mojom::Renderer> receiver) {}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-
 void FramelessMediaInterfaceProxy::CreateCdm(const media::CdmConfig& cdm_config,
                                              CreateCdmCallback callback) {
   std::move(callback).Run(mojo::NullRemote(), nullptr,

@@ -22,10 +22,6 @@
 #include "sandbox/linux/syscall_broker/broker_permission_list.h"
 #include "sandbox/linux/syscall_broker/broker_simple_message.h"
 
-#if BUILDFLAG(IS_ANDROID) && !defined(MSG_CMSG_CLOEXEC)
-#define MSG_CMSG_CLOEXEC 0x40000000
-#endif
-
 namespace sandbox {
 namespace syscall_broker {
 

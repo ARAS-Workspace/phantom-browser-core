@@ -285,30 +285,6 @@ FindRequestManager::FindRequest& FindRequestManager::FindRequest::operator=(
   return *this;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-FindRequestManager::ActivateNearestFindResultState::
-ActivateNearestFindResultState() = default;
-FindRequestManager::ActivateNearestFindResultState::
-    ActivateNearestFindResultState(float x, float y)
-    : current_request_id(GetNextID()), point(x, y) {}
-FindRequestManager::ActivateNearestFindResultState::
-    ~ActivateNearestFindResultState() = default;
-
-int FindRequestManager::ActivateNearestFindResultState::GetNextID() {
-  static int next_id = 0;
-  return next_id++;
-}
-
-FindRequestManager::FrameRects::FrameRects() = default;
-FindRequestManager::FrameRects::FrameRects(const std::vector<gfx::RectF>& rects,
-                                           int version)
-    : rects(rects), version(version) {}
-FindRequestManager::FrameRects::~FrameRects() = default;
-
-FindRequestManager::FindMatchRectsState::FindMatchRectsState() = default;
-FindRequestManager::FindMatchRectsState::~FindMatchRectsState() = default;
-#endif
-
 // static
 const int FindRequestManager::kInvalidId = -1;
 
@@ -396,12 +372,6 @@ void FindRequestManager::StopFinding(StopFindAction action) {
   });
 
   current_session_id_ = kInvalidId;
-#if BUILDFLAG(IS_ANDROID)
-  // It is important that these pending replies are cleared whenever a find
-  // session ends, so that subsequent replies for the old session are ignored.
-  activate_.pending_replies.clear();
-  match_rects_.pending_replies.clear();
-#endif
 }
 
 bool FindRequestManager::ShouldIgnoreReply(RenderFrameHostImpl* rfh,
@@ -519,22 +489,6 @@ void FindRequestManager::RemoveFrame(RenderFrameHost* rfh) {
   }
   UpdateActiveMatchOrdinal();
 
-#if BUILDFLAG(IS_ANDROID)
-  // The removed frame may contain the nearest find result known so far. Note
-  // that once all queried frames have responded, if this result was the overall
-  // nearest, then no activation will occur.
-  if (rfh == activate_.nearest_frame)
-    activate_.nearest_frame = nullptr;
-
-  // Match rects in the removed frame are no longer relevant.
-  if (match_rects_.frame_rects.erase(rfh) != 0)
-    ++match_rects_.known_version;
-
-  // A reply should not be expected from the removed frame.
-  RemoveNearestFindResultPendingReply(rfh);
-  RemoveFindMatchRectsPendingReply(rfh);
-#endif
-
   if (current_session_id_ == kInvalidId) {
     // Just remove `rfh` from things that might point to it, but don't trigger
     // any extra processing as there is no current find session ongoing.
@@ -578,80 +532,6 @@ void FindRequestManager::ClearActiveFindMatch() {
   active_frame_->GetFindInPage()->ClearActiveFindMatch();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void FindRequestManager::ActivateNearestFindResult(float x, float y) {
-  if (current_session_id_ == kInvalidId)
-    return;
-
-  activate_ = ActivateNearestFindResultState(x, y);
-
-  // Request from each frame the distance to the nearest find result (in that
-  // frame) from the point (x, y), defined in find-in-page coordinates.
-  ForEachAddedFindInPageRenderFrameHost([this](RenderFrameHostImpl* rfh) {
-    activate_.pending_replies.insert(rfh);
-    // Lifetime of FindRequestManager > RenderFrameHost > Mojo
-    // connection, so it's safe to bind |this| and |rfh|.
-    rfh->GetFindInPage()->GetNearestFindResult(
-        activate_.point,
-        base::BindOnce(&FindRequestManager::OnGetNearestFindResultReply,
-                       base::Unretained(this), rfh,
-                       activate_.current_request_id));
-  });
-}
-
-void FindRequestManager::OnGetNearestFindResultReply(RenderFrameHostImpl* rfh,
-                                                     int request_id,
-                                                     float distance) {
-  if (request_id != activate_.current_request_id ||
-      !activate_.pending_replies.contains(rfh)) {
-    return;
-  }
-
-  // Check if this frame has a nearer find result than the current nearest.
-  if (distance < activate_.nearest_distance) {
-    activate_.nearest_frame = rfh;
-    activate_.nearest_distance = distance;
-  }
-
-  RemoveNearestFindResultPendingReply(rfh);
-}
-
-void FindRequestManager::RequestFindMatchRects(int current_version) {
-  match_rects_.pending_replies.clear();
-  match_rects_.request_version = current_version;
-  match_rects_.active_rect = gfx::RectF();
-
-  // Request the latest find match rects from each frame.
-  ForEachAddedFindInPageRenderFrameHost([this](RenderFrameHostImpl* rfh) {
-    match_rects_.pending_replies.insert(rfh);
-    auto it = match_rects_.frame_rects.find(rfh);
-    int version = (it != match_rects_.frame_rects.end()) ? it->second.version
-                                                         : kInvalidId;
-    // Lifetime of FindRequestManager > RenderFrameHost > Mojo
-    // connection, so it's safe to bind |this| and |rfh|.
-    rfh->GetFindInPage()->FindMatchRects(
-        version, base::BindOnce(&FindRequestManager::OnFindMatchRectsReply,
-                                base::Unretained(this), rfh));
-  });
-}
-
-void FindRequestManager::OnFindMatchRectsReply(
-    RenderFrameHost* rfh,
-    int version,
-    const std::vector<gfx::RectF>& rects,
-    const gfx::RectF& active_rect) {
-  auto it = match_rects_.frame_rects.find(rfh);
-  if (it == match_rects_.frame_rects.end() || it->second.version != version) {
-    // New version of rects has been received, so update the data.
-    match_rects_.frame_rects[rfh] = FrameRects(rects, version);
-    ++match_rects_.known_version;
-  }
-  if (!active_rect.IsEmpty())
-    match_rects_.active_rect = active_rect;
-  RemoveFindMatchRectsPendingReply(rfh);
-}
-#endif
-
 void FindRequestManager::Reset(const FindRequest& initial_request) {
   current_session_id_ = initial_request.id;
   current_request_ = initial_request;
@@ -666,10 +546,6 @@ void FindRequestManager::Reset(const FindRequest& initial_request) {
   selection_rect_ = gfx::Rect();
   last_reported_id_ = kInvalidId;
   frame_observers_.clear();
-#if BUILDFLAG(IS_ANDROID)
-  activate_ = ActivateNearestFindResultState();
-  match_rects_.pending_replies.clear();
-#endif
 }
 
 void FindRequestManager::FindInternal(const FindRequest& request) {
@@ -941,54 +817,5 @@ std::unique_ptr<FindInPageClient> FindRequestManager::CreateFindInPageClient(
     return create_find_in_page_client_for_testing_(this, rfh);
   return std::make_unique<FindInPageClient>(this, rfh);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void FindRequestManager::RemoveNearestFindResultPendingReply(
-    RenderFrameHost* rfh) {
-  auto it = activate_.pending_replies.find(rfh);
-  if (it == activate_.pending_replies.end())
-    return;
-
-  activate_.pending_replies.erase(it);
-  if (activate_.pending_replies.empty() &&
-      CheckFrame(activate_.nearest_frame)) {
-    const auto client_it = find_in_page_clients_.find(activate_.nearest_frame);
-    if (client_it != find_in_page_clients_.end())
-      client_it->second->ActivateNearestFindResult(current_session_id_,
-                                                   activate_.point);
-  }
-}
-
-void FindRequestManager::RemoveFindMatchRectsPendingReply(
-    RenderFrameHost* rfh) {
-  auto it = match_rects_.pending_replies.find(rfh);
-  if (it == match_rects_.pending_replies.end())
-    return;
-
-  match_rects_.pending_replies.erase(it);
-  if (!match_rects_.pending_replies.empty())
-    return;
-
-  // All replies are in.
-  std::vector<gfx::RectF> aggregate_rects;
-  if (match_rects_.request_version != match_rects_.known_version) {
-    // Request version is stale, so aggregate and report the newer find
-    // match rects. The rects should be aggregated in search order.
-    for (RenderFrameHost* frame = GetInitialFrame(true /* forward */); frame;
-         frame = Traverse(frame, true /* forward */, true /* matches_only */,
-                          false /* wrap */)) {
-      auto frame_it = match_rects_.frame_rects.find(frame);
-      if (frame_it == match_rects_.frame_rects.end())
-        continue;
-
-      std::vector<gfx::RectF>& frame_rects = frame_it->second.rects;
-      aggregate_rects.insert(aggregate_rects.end(), frame_rects.begin(),
-                             frame_rects.end());
-    }
-  }
-  contents_->NotifyFindMatchRectsReply(
-      match_rects_.known_version, aggregate_rects, match_rects_.active_rect);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

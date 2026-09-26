@@ -25,31 +25,6 @@ CreditCardFormEvent GetCreditCardFormEvent(SiteVisit site_visit,
   return static_cast<CreditCardFormEvent>(ordinal);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-ReferringApp FromReferringAppInfo(internal::ReferringAppInfo info) {
-  static constexpr char kAndroidAppPrefix[] = "android-app://";
-  static constexpr auto kSmsApps = base::MakeFixedFlatSet<std::string_view>({
-      "android.messages",
-      "com.samsung.android.messaging",
-  });
-  if (!info.has_referring_app()) {
-    return kNoReferringApp;
-  }
-  std::string_view app_name = info.referring_app_name;
-  if (app_name.starts_with(kAndroidAppPrefix)) {
-    app_name.remove_prefix(strlen(kAndroidAppPrefix));
-  }
-  if (app_name == "chrome") {
-    return kChrome;
-  }
-  if (kSmsApps.contains(app_name)) {
-    return kSmsApp;
-  }
-  return kOtherApp;
-}
-
-#endif
-
 void LogEvent(SiteVisit site_visit,
               ReferringApp referring_app,
               FieldDetectionHeuristic field_heuristic,

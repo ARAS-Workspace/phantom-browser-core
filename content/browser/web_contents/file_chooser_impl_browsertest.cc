@@ -309,29 +309,4 @@ IN_PROC_BROWSER_TEST_F(FileChooserImplBrowserTest,
   EXPECT_FALSE(policy->CanReadFile(rfh->GetProcess()->GetID(), test_file));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-class DisallowSystemUiPopupsContentBrowserClient
-    : public ContentBrowserTestContentBrowserClient {
- public:
-  bool ShouldAllowSystemUiPopups(WebContents* web_contents) override {
-    return false;
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(FileChooserImplBrowserTest, DisallowSystemUiPopups) {
-  DisallowSystemUiPopupsContentBrowserClient test_client;
-  EXPECT_TRUE(NavigateToURL(shell(), GURL(url::kAboutBlankURL)));
-
-  auto* rfh = static_cast<RenderFrameHostImpl*>(
-      shell()->web_contents()->GetPrimaryMainFrame());
-  auto chooser_and_remote = FileChooserImpl::CreateForTesting(rfh);
-  auto* chooser = chooser_and_remote.first;
-
-  base::test::TestFuture<blink::mojom::FileChooserResultPtr> future;
-  chooser->OpenFileChooser(blink::mojom::FileChooserParams::New(),
-                           future.GetCallback());
-  EXPECT_TRUE(future.Get().is_null());
-}
-#endif
-
 }  // namespace content

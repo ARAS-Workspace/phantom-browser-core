@@ -295,12 +295,10 @@ class RenderWidgetHostInputEventRouterTest : public testing::Test {
     browser_context_ = std::make_unique<TestBrowserContext>();
     delegate_ = std::make_unique<MockRenderWidgetHostDelegate>();
 
-// ImageTransportFactory doesn't exist on Android. This is needed to create
-// a RenderWidgetHostViewChildFrame in the test.
-#if !BUILDFLAG(IS_ANDROID)
+    // ImageTransportFactory doesn't exist on Android. This is needed to create
+    // a RenderWidgetHostViewChildFrame in the test.
     ImageTransportFactory::SetFactory(
         std::make_unique<TestImageTransportFactory>());
-#endif
 
     delegate_->CreateInputEventRouter();
 
@@ -400,9 +398,7 @@ class RenderWidgetHostInputEventRouterTest : public testing::Test {
 
     base::RunLoop().RunUntilIdle();
 
-#if !BUILDFLAG(IS_ANDROID)
     ImageTransportFactory::Terminate();
-#endif
   }
 
   input::RenderWidgetHostViewInput* touch_target() {

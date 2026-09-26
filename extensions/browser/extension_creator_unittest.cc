@@ -284,16 +284,6 @@ TEST_F(ExtensionCreatorTest, InitializeInput) {
       },
   };
 
-#if BUILDFLAG(IS_ANDROID)
-  base::FilePath extension_dir_vp =
-      *base::test::android::GetVirtualDocumentPathFromCacheDirDirectory(
-          extension_dir);
-  base::FilePath content_uri_crx =
-      *base::ResolveToContentUri(extension_dir_vp.AddExtension(".exist.crx"));
-  base::FilePath content_uri_pem =
-      *base::ResolveToContentUri(extension_dir_vp.AddExtension(".exist.pem"));
-#endif  // BUILDFLAG(IS_ANDROID)
-
   for (auto tc : test_cases) {
     EXPECT_EQ(
         InitializeInput(tc.extension_dir, tc.crx_path, tc.private_key_path,

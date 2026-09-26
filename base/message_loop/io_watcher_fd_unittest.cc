@@ -27,10 +27,6 @@
 #include "base/threading/thread.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/java_handler_thread.h"
-#endif
-
 namespace base {
 namespace {
 
@@ -38,9 +34,6 @@ namespace {
 // support is added.
 enum class FdIOCapableMessagePumpType {
   kDefaultIO,
-#if BUILDFLAG(IS_ANDROID)
-  kAndroid,
-#endif
 #if defined(USE_GLIB)
   kDefaultUI
 #endif
@@ -103,14 +96,6 @@ class IOWatcherFdTest
         io_task_runner_ = thread_->task_runner();
         break;
 
-#if BUILDFLAG(IS_ANDROID)
-      case FdIOCapableMessagePumpType::kAndroid:
-        java_thread_.emplace("Java thread");
-        java_thread_->Start();
-        io_task_runner_ = java_thread_->task_runner();
-        break;
-#endif
-
 #if defined(USE_GLIB)
       case FdIOCapableMessagePumpType::kDefaultUI:
         thread_.emplace("UI thread");
@@ -121,15 +106,7 @@ class IOWatcherFdTest
     }
   }
 
-  void TearDown() override {
-    thread_.reset();
-#if BUILDFLAG(IS_ANDROID)
-    if (java_thread_) {
-      java_thread_->Stop();
-      java_thread_.reset();
-    }
-#endif
-  }
+  void TearDown() override { thread_.reset(); }
 
   std::unique_ptr<TestFdWatcher> CreateWatcher();
 
@@ -148,9 +125,6 @@ class IOWatcherFdTest
  private:
   test::TaskEnvironment task_environment_;
   std::optional<Thread> thread_;
-#if BUILDFLAG(IS_ANDROID)
-  std::optional<android::JavaHandlerThread> java_thread_;
-#endif
   scoped_refptr<SequencedTaskRunner> io_task_runner_;
 };
 
@@ -344,7 +318,7 @@ TEST_P(IOWatcherFdTest, Write) {
   WriteToSocket(b.get(), "x");
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 TEST_P(IOWatcherFdTest, WatchSameFdForWriteSignal) {
   // Tests that the same FD can be watched twice for the write signal. We can
   // fall back to OS transports during IPC. Then, if sockets are too small or
@@ -371,7 +345,7 @@ TEST_P(IOWatcherFdTest, WatchSameFdForWriteSignal) {
   EXPECT_EQ(0, first_watcher->num_events());
   WriteToSocket(b.get(), "x");
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 TEST_P(IOWatcherFdTest, ReadWriteUnifiedOneShot) {
   // Tests that a one-shot read-write watch will observe at most one event
@@ -432,9 +406,6 @@ TEST_P(IOWatcherFdTest, CancelDuringWrite) {
 INSTANTIATE_TEST_SUITE_P(,
                          IOWatcherFdTest,
                          testing::Values(
-#if BUILDFLAG(IS_ANDROID)
-                             FdIOCapableMessagePumpType::kAndroid,
-#endif
 #if defined(USE_GLIB)
                              FdIOCapableMessagePumpType::kDefaultUI,
 #endif

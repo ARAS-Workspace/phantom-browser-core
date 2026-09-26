@@ -296,7 +296,6 @@ TEST_F(BrowsingHistoryHandlerTest, BeginTimestamp) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BrowsingHistoryHandlerTest, MdTruncatesTitles) {
   std::vector<BrowsingHistoryService::HistoryEntry> results;
   history::BrowsingHistoryService::HistoryEntry long_url_entry;
@@ -317,7 +316,6 @@ TEST_F(BrowsingHistoryHandlerTest, MdTruncatesTitles) {
   ASSERT_EQ(0u, results_mojom->value[0]->title.find("http://loooo"));
   EXPECT_EQ(300u, results_mojom->value[0]->title.size());
 }
-#endif
 
 TEST_F(BrowsingHistoryHandlerTest, RequestAccountInfo) {
   // Check that the account info is sent to the page.
@@ -395,7 +393,6 @@ TEST_F(BrowsingHistoryHandlerTest, IncludeActorVisits) {
   RunQueryHistory("test");
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BrowsingHistoryHandlerTest, QueryHistoryMojoOptionMapping) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeature(
@@ -412,7 +409,6 @@ TEST_F(BrowsingHistoryHandlerTest, QueryHistoryMojoOptionMapping) {
                           /*include_user_visits=*/false,
                           /*include_actor_visits=*/true, base::DoNothing());
 }
-#endif
 
 TEST_F(BrowsingHistoryHandlerTest, QueryHistoryWithActorOnly) {
   base::test::ScopedFeatureList feature_list;

@@ -142,7 +142,6 @@ IN_PROC_BROWSER_TEST_F(DeclarativeNetRequestApiTest, OnRulesMatchedDebug) {
   ASSERT_TRUE(RunExtensionTest("on_rules_matched_debug")) << message_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(https://crbug.com/491516661): This test uses an MV2 extension because it
 // explicitly exercises capabilities linked to MV2 (webRequestBlocking). This
 // can be updated in the future with e.g.  a policy-installed extension. Also,
@@ -151,7 +150,6 @@ IN_PROC_BROWSER_TEST_F(DeclarativeNetRequestApiTest, OnRulesMatchedDebug) {
 IN_PROC_BROWSER_TEST_F(DeclarativeNetRequestApiTest, ModifyHeaders) {
   ASSERT_TRUE(RunExtensionTest("modify_headers")) << message_;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(DeclarativeNetRequestApiTest, GetMatchedRules) {
   ASSERT_TRUE(RunExtensionTest("get_matched_rules")) << message_;

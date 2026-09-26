@@ -44,9 +44,6 @@ std::vector<std::string> GetSyncedServicePrefNames() {
         spellcheck::prefs::kSpellCheckUseSpellingService,
 #endif
         commerce::kPriceEmailNotificationsEnabled,
-#if BUILDFLAG(IS_ANDROID)
-        prefs::kContextualSearchEnabled
-#endif
   };
 }
 

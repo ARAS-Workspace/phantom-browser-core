@@ -32,13 +32,9 @@ NOINLINE NOT_TAIL_CALLED void ReportThreadHang() {
 #endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 NOINLINE void ShutdownHang() {
   ReportThreadHang();
   [[maybe_unused]] volatile int inhibit_comdat = __LINE__;
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace metrics

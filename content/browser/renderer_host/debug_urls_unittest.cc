@@ -44,9 +44,6 @@ TEST_F(DebugUrlsUnitTest, IsDebugURL_DebugUrlsReturnTrue) {
   EXPECT_TRUE(IsDebugURL(GURL("chrome://crash/gpu/heap-underflow")));
   EXPECT_TRUE(
       IsDebugURL(GURL("chrome://crash/gpu/member-dereference-after-free")));
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIGpuJavaCrashURL)));
-#endif
   EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIGpuHangURL)));
   EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIMemoryPressureCriticalURL)));
   EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIMemoryPressureModerateURL)));

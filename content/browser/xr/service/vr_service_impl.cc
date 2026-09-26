@@ -49,10 +49,6 @@
 #include "third_party/blink/public/common/permissions/permission_utils.h"
 #include "third_party/blink/public/mojom/permissions/permission_status.mojom-shared.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 namespace {
 
 device::mojom::XRRuntimeSessionOptionsPtr GetRuntimeOptions(
@@ -870,12 +866,6 @@ void VRServiceImpl::DoRequestSession(SessionRequestData request) {
                                             request.required_features.end());
   runtime_options->optional_features.assign(request.optional_features.begin(),
                                             request.optional_features.end());
-#if BUILDFLAG(IS_ANDROID)
-  runtime_options->renderer_information =
-      device::mojom::RendererInformation::New(
-          ToRendererProcessId(render_frame_host_->GetProcess()->GetID()),
-          render_frame_host_->GetRoutingID());
-#endif
 
   if (device::XRSessionModeUtils::IsImmersive(runtime_options->mode)) {
     if (!request.options->tracked_images.empty()) {
@@ -921,10 +911,6 @@ void VRServiceImpl::SupportsSession(
 
   if (!IsRenderFrameHostVisible()) {
     bool is_supported_when_hidden = false;
-#if BUILDFLAG(IS_ANDROID)
-    is_supported_when_hidden = !base::android::device_info::is_desktop() ||
-                               base::android::device_info::is_xr();
-#endif
     std::move(callback).Run(is_supported_when_hidden);
     return;
   }

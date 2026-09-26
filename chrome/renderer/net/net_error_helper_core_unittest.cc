@@ -41,10 +41,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/common/offline_page_auto_fetcher.mojom.h"
-#endif
-
 namespace {
 
 const char kFailedUrl[] = "http://failed/";
@@ -158,15 +154,6 @@ class NetErrorHelperCoreTest : public testing::Test,
     return offline_content_summary_json_;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // State of auto fetch, as reported to Delegate. Unset if SetAutoFetchState
-  // was not called.
-  std::optional<chrome::mojom::OfflinePageAutoFetcherScheduleResult>
-  auto_fetch_state() const {
-    return auto_fetch_state_;
-  }
-#endif
-
   base::test::TaskEnvironment* task_environment() { return &task_environment_; }
   content::MockRenderThread* render_thread() { return &render_thread_; }
 
@@ -254,13 +241,6 @@ class NetErrorHelperCoreTest : public testing::Test,
 
   void SetIsShowingDownloadButton(bool show) override {}
 
-#if BUILDFLAG(IS_ANDROID)
-  void SetAutoFetchState(
-      chrome::mojom::OfflinePageAutoFetcherScheduleResult result) override {
-    auto_fetch_state_ = result;
-  }
-#endif
-
   content::RenderFrame* GetRenderFrame() override { return nullptr; }
 
   base::test::TaskEnvironment task_environment_;
@@ -288,10 +268,6 @@ class NetErrorHelperCoreTest : public testing::Test,
   bool list_visible_by_prefs_;
   std::string offline_content_json_;
   std::string offline_content_summary_json_;
-#if BUILDFLAG(IS_ANDROID)
-  std::optional<chrome::mojom::OfflinePageAutoFetcherScheduleResult>
-      auto_fetch_state_;
-#endif
   bool is_offline_error_ = false;
   bool auto_fetch_allowed_ = false;
 
@@ -1096,124 +1072,5 @@ TEST_F(NetErrorHelperCoreTest, AlternativeErrorPageNoUpdates) {
   core()->OnNetErrorInfo(error_page::DNS_PROBE_FINISHED_NXDOMAIN);
   EXPECT_EQ(0, update_count());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(NetErrorHelperCoreTest, Download) {
-  DoErrorLoad(net::ERR_INTERNET_DISCONNECTED);
-  EXPECT_EQ(0, download_count());
-  core()->ExecuteButtonPress(NetErrorHelperCore::DOWNLOAD_BUTTON);
-  EXPECT_EQ(1, download_count());
-}
-
-class FakeOfflinePageAutoFetcher
-    : public chrome::mojom::OfflinePageAutoFetcher {
- public:
-  FakeOfflinePageAutoFetcher() = default;
-
-  FakeOfflinePageAutoFetcher(const FakeOfflinePageAutoFetcher&) = delete;
-  FakeOfflinePageAutoFetcher& operator=(const FakeOfflinePageAutoFetcher&) =
-      delete;
-
-  struct TryScheduleParameters {
-    bool user_requested;
-    TryScheduleCallback callback;
-  };
-
-  void TrySchedule(bool user_requested, TryScheduleCallback callback) override {
-    try_schedule_calls_.push_back({user_requested, std::move(callback)});
-  }
-
-  void CancelSchedule() override { cancel_calls_++; }
-
-  void AddReceiver(
-      mojo::PendingReceiver<chrome::mojom::OfflinePageAutoFetcher> receiver) {
-    receivers_.Add(this, std::move(receiver));
-  }
-
-  int cancel_calls() const { return cancel_calls_; }
-  std::vector<TryScheduleParameters> take_try_schedule_calls() {
-    std::vector<TryScheduleParameters> result = std::move(try_schedule_calls_);
-    try_schedule_calls_.clear();
-    return result;
-  }
-
- private:
-  mojo::ReceiverSet<chrome::mojom::OfflinePageAutoFetcher> receivers_;
-  int cancel_calls_ = 0;
-  std::vector<TryScheduleParameters> try_schedule_calls_;
-};
-// This uses the real implementation of PageAutoFetcherHelper, but with a
-// substituted fetcher.
-class TestPageAutoFetcherHelper : public PageAutoFetcherHelper {
- public:
-  explicit TestPageAutoFetcherHelper(
-      base::RepeatingCallback<
-          mojo::PendingRemote<chrome::mojom::OfflinePageAutoFetcher>()> binder)
-      : PageAutoFetcherHelper(nullptr), binder_(binder) {}
-  bool Bind() override {
-    if (!fetcher_)
-      fetcher_.Bind(binder_.Run());
-    return true;
-  }
-
- private:
-  base::RepeatingCallback<
-      mojo::PendingRemote<chrome::mojom::OfflinePageAutoFetcher>()>
-      binder_;
-};
-
-// Provides set up for testing the 'auto fetch on dino' feature.
-class NetErrorHelperCoreAutoFetchTest : public NetErrorHelperCoreTest {
- public:
-  void SetUp() override {
-    NetErrorHelperCoreTest::SetUp();
-    auto binder = base::BindLambdaForTesting([&]() {
-      mojo::PendingRemote<chrome::mojom::OfflinePageAutoFetcher> fetcher_remote;
-      fake_fetcher_.AddReceiver(
-          fetcher_remote.InitWithNewPipeAndPassReceiver());
-      return fetcher_remote;
-    });
-
-    core()->SetPageAutoFetcherHelperForTesting(
-        std::make_unique<TestPageAutoFetcherHelper>(binder));
-  }
-
- protected:
-  FakeOfflinePageAutoFetcher fake_fetcher_;
-};
-
-TEST_F(NetErrorHelperCoreAutoFetchTest, NotAllowed) {
-  set_auto_fetch_allowed(false);
-
-  DoErrorLoad(net::ERR_INTERNET_DISCONNECTED);
-  task_environment()->RunUntilIdle();
-
-  // When auto fetch is not allowed, OfflinePageAutoFetcher is not called.
-  std::vector<FakeOfflinePageAutoFetcher::TryScheduleParameters> calls =
-      fake_fetcher_.take_try_schedule_calls();
-  EXPECT_EQ(0ul, calls.size());
-}
-
-TEST_F(NetErrorHelperCoreAutoFetchTest, AutoFetchTriggered) {
-  set_auto_fetch_allowed(true);
-
-  DoErrorLoad(net::ERR_INTERNET_DISCONNECTED);
-  task_environment()->RunUntilIdle();
-
-  // Auto fetch is allowed, so OfflinePageAutoFetcher is called once.
-  std::vector<FakeOfflinePageAutoFetcher::TryScheduleParameters> calls =
-      fake_fetcher_.take_try_schedule_calls();
-  EXPECT_EQ(1ul, calls.size());
-
-  // Finalize the call to TrySchedule, and verify the delegate is called.
-  std::move(calls[0].callback)
-      .Run(chrome::mojom::OfflinePageAutoFetcherScheduleResult::kScheduled);
-  task_environment()->RunUntilIdle();
-
-  EXPECT_EQ(chrome::mojom::OfflinePageAutoFetcherScheduleResult::kScheduled,
-            auto_fetch_state());
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace

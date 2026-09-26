@@ -421,7 +421,6 @@ TEST_F(ApplicationAdvancedProtectionStatusDetectorTest, IsGuestSessionProfile) {
   EXPECT_FALSE(application_ap_detector->IsUnderAdvancedProtection());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ApplicationAdvancedProtectionStatusDetectorTest, IsSystemProfile) {
   auto* application_ap_detector = MakeTestDetectorWithObserver();
   // System profiles should not be considered for Advanced Protection status.
@@ -443,7 +442,6 @@ TEST_F(ApplicationAdvancedProtectionStatusDetectorTest, IsSystemProfile) {
   profile_manager_.DeleteTestingProfile("regular_profile");
   EXPECT_FALSE(application_ap_detector->IsUnderAdvancedProtection());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ApplicationAdvancedProtectionStatusDetectorTest, RemoveObserver) {
   auto application_ap_detector =

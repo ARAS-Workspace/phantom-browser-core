@@ -54,22 +54,5 @@ class PasswordDataTypeControllerTest : public ::testing::Test {
   raw_ptr<syncer::MockDataTypeControllerDelegate> transport_only_delegate_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PasswordDataTypeControllerTest, OverrideFullSyncMode) {
-  // `transport_only_delegate` should be used, despite syncer::SyncMode::kFull
-  // being passed below.
-  EXPECT_CALL(*full_sync_delegate(), OnSyncStarting).Times(0);
-  EXPECT_CALL(*transport_only_delegate(), OnSyncStarting);
-
-  syncer::ConfigureContext context;
-  context.authenticated_gaia_id = GaiaId("gaia");
-  context.cache_guid = "cache_guid";
-  context.sync_mode = syncer::SyncMode::kFull;
-  context.reason = syncer::ConfigureReason::kReconfiguration;
-  context.configuration_start_time = base::Time::Now();
-  controller()->LoadModels(context, base::DoNothing());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 }  // namespace password_manager

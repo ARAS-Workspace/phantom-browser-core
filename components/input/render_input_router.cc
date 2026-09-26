@@ -107,17 +107,6 @@ class UnboundWidgetInputHandler : public blink::mojom::WidgetInputHandler {
   void PingMainThread(PingMainThreadCallback callback) override {
     DLOG(WARNING) << "Input request on unbound interface";
   }
-#if BUILDFLAG(IS_ANDROID)
-  void AttachSynchronousCompositor(
-      mojo::PendingRemote<blink::mojom::SynchronousCompositorControlHost>
-          control_host,
-      mojo::PendingAssociatedRemote<blink::mojom::SynchronousCompositorHost>
-          host,
-      mojo::PendingAssociatedReceiver<blink::mojom::SynchronousCompositor>
-          compositor_request) override {
-    NOTREACHED() << "Input request on unbound interface";
-  }
-#endif
   void GetFrameWidgetInputHandler(
       mojo::PendingAssociatedReceiver<blink::mojom::FrameWidgetInputHandler>
           request) override {

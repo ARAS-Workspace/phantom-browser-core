@@ -25,13 +25,6 @@ TimeZoneMonitorBinder& GetTimeZoneMonitorBinderOverride() {
   return *binder;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-NFCProviderBinder& GetNFCProviderBinderOverride() {
-  static base::NoDestructor<NFCProviderBinder> binder;
-  return *binder;
-}
-#endif
-
 UsbDeviceManagerBinder& GetUsbDeviceManagerBinderOverride() {
   static base::NoDestructor<UsbDeviceManagerBinder> binder;
   return *binder;

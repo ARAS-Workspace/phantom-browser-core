@@ -53,9 +53,7 @@ FileAnalyzer::FileAnalyzer(
     scoped_refptr<BinaryFeatureExtractor> binary_feature_extractor,
     bool is_obfuscated)
     : binary_feature_extractor_(binary_feature_extractor) {
-#if !BUILDFLAG(IS_ANDROID)
   is_obfuscated_ = is_obfuscated;
-#endif
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 }
 
@@ -73,7 +71,6 @@ void FileAnalyzer::Start(const base::FilePath& target_file_name,
   callback_ = std::move(callback);
   start_time_ = base::Time::Now();
 
-#if !BUILDFLAG(IS_ANDROID)
   DownloadFileType::InspectionType inspection_type =
       FileTypePolicies::GetInstance()
           ->PolicyForFile(target_file_name_, GURL{}, nullptr)
@@ -100,7 +97,6 @@ void FileAnalyzer::Start(const base::FilePath& target_file_name,
     StartExtractSevenZipFeatures();
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
   // Checks for existence of "koly" signature even if file doesn't have
@@ -136,7 +132,6 @@ void FileAnalyzer::OnFileAnalysisFinished(FileAnalyzer::Results results) {
   std::move(callback_).Run(results);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void FileAnalyzer::StartExtractZipFeatures() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
@@ -272,7 +267,6 @@ void FileAnalyzer::OnRarAnalysisFinished(
   results_.inspection_performed = DownloadFileType::RAR;
   std::move(callback_).Run(std::move(results_));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 // This is called for .DMGs and other files that can be parsed by
@@ -351,7 +345,6 @@ void FileAnalyzer::OnDmgAnalysisFinished(
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID)
 void FileAnalyzer::StartExtractSevenZipFeatures() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
@@ -413,7 +406,6 @@ void FileAnalyzer::OnSevenZipAnalysisFinished(
   results_.inspection_performed = DownloadFileType::SEVEN_ZIP;
   std::move(callback_).Run(std::move(results_));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void FileAnalyzer::LogAnalysisDurationWithAndWithoutSuffix(
     const std::string& suffix) {

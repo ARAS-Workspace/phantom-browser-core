@@ -192,7 +192,6 @@ TEST_F(RenderWidgetTest, CompositorIdHitTestAPIWithImplicitRootScroller) {
 
 // Composition range isn't used on Android and we don't update the range through
 // ImeCompositionRangeChanged.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(RenderWidgetTest, GetCompositionRangeValidComposition) {
   LoadHTML(
       "<div contenteditable>EDITABLE</div>"
@@ -226,7 +225,6 @@ TEST_F(RenderWidgetTest, GetCompositionRangeInvalid) {
   // values of start/end.
   EXPECT_FALSE(range.IsValid());
 }
-#endif
 
 // This test verifies that WebInputMethodController always exists as long as
 // there is a focused frame inside the page, but, IME events are only executed

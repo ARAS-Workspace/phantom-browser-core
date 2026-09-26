@@ -152,10 +152,8 @@ TEST_F(PrefProviderTest, Observer) {
 
 // Tests that obsolete content settings are cleared.
 TEST_F(PrefProviderTest, DiscardObsoletePreferences) {
-#if !BUILDFLAG(IS_ANDROID)
   const char kObsoleteInstalledWebAppMetadataExceptionsPref[] =
       "profile.content_settings.exceptions.installed_web_app_metadata";
-#endif
   static char kObsoletePrivateNetworkChooserDataPref[] =
       "profile.content_settings.exceptions.private_network_chooser_data";
   static char kObsoleteTpcdTrialExceptionsPref[] =
@@ -185,10 +183,8 @@ TEST_F(PrefProviderTest, DiscardObsoletePreferences) {
   base::DictValue pref_data;
   base::ListValue pref_list;
   pref_data.Set(kPattern, std::move(data_for_pattern));
-#if !BUILDFLAG(IS_ANDROID)
   prefs->SetDict(kObsoleteInstalledWebAppMetadataExceptionsPref,
                  pref_data.Clone());
-#endif
   prefs->SetDict(kObsoletePrivateNetworkChooserDataPref, pref_data.Clone());
   prefs->SetDict(kObsoleteTpcdTrialExceptionsPref, pref_data.Clone());
   prefs->SetDict(kObsoleteTopLevelTpcdTrialExceptionsPref, pref_data.Clone());
@@ -205,10 +201,8 @@ TEST_F(PrefProviderTest, DiscardObsoletePreferences) {
                         /*restore_session=*/false);
   provider.ShutdownOnUIThread();
 
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(
       prefs->HasPrefPath(kObsoleteInstalledWebAppMetadataExceptionsPref));
-#endif
   EXPECT_FALSE(prefs->HasPrefPath(kObsoletePrivateNetworkChooserDataPref));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoleteTpcdTrialExceptionsPref));
   EXPECT_FALSE(prefs->HasPrefPath(kObsoleteTopLevelTpcdTrialExceptionsPref));

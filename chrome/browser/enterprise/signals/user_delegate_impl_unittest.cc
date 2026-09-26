@@ -20,9 +20,7 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/device_trust/core/fake_device_trust_connector_service.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace enterprise_signals {
 
@@ -36,14 +34,12 @@ constexpr char kUserEmail[] = "someEmail@example.com";
 constexpr char kOtherUserEmail[] = "someOtherUser@example.com";
 constexpr GaiaId::Literal kOtherUserGaiaId("some-other-user-gaia");
 
-#if !BUILDFLAG(IS_ANDROID)
 base::ListValue GetUrls() {
   base::ListValue trusted_urls;
   trusted_urls.Append("https://www.example.com");
   trusted_urls.Append("example2.example.com");
   return trusted_urls;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -60,22 +56,18 @@ class UserDelegateImplTest : public testing::Test {
     }
 
     testing_profile_ = builder.Build();
-#if !BUILDFLAG(IS_ANDROID)
     signals_dependency_delegate_ = std::make_unique<
         enterprise_connectors::FakeDeviceTrustConnectorService>(
         testing_profile_->GetTestingPrefService());
-#endif  // !BUILDFLAG(IS_ANDROID)
     user_delegate_ = std::make_unique<UserDelegateImpl>(
         testing_profile_.get(), identity_test_env_.identity_manager(),
         signals_dependency_delegate_.get());
   }
-#if !BUILDFLAG(IS_ANDROID)
   raw_ptr<enterprise_connectors::FakeDeviceTrustConnectorService>
   get_fake_dt_connector_service() {
     return static_cast<enterprise_connectors::FakeDeviceTrustConnectorService*>(
         signals_dependency_delegate_.get());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   content::BrowserTaskEnvironment task_environment_;
   signin::IdentityTestEnvironment identity_test_env_;
@@ -148,7 +140,6 @@ TEST_F(UserDelegateImplTest, GetPolicyScopesNeedingSignals_Empty) {
             std::set<policy::PolicyScope>());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests what GetPolicyScopesNeedingSignals returns when the policy is enabled
 // at the user level.
 TEST_F(UserDelegateImplTest, GetPolicyScopesNeedingSignals_User) {
@@ -183,6 +174,5 @@ TEST_F(UserDelegateImplTest, GetPolicyScopesNeedingSignals_UserAndBrowser) {
             std::set<policy::PolicyScope>(
                 {policy::POLICY_SCOPE_MACHINE, policy::POLICY_SCOPE_USER}));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace enterprise_signals

@@ -407,15 +407,6 @@ void FileSystemAccessHandleBase::DoRename(
   CHECK(sibling_safe_name.has_value());
   storage::FileSystemURL destination_url =
       url().CreateSibling(*sibling_safe_name);
-#if BUILDFLAG(IS_ANDROID)
-  // Android Content-URIs do not support CreateSibling().
-  if (!destination_url.is_valid()) {
-    CHECK(url().path().IsContentUri());
-    std::move(callback).Run(file_system_access_error::FromStatus(
-        blink::mojom::FileSystemAccessStatus::kInvalidModificationError));
-    return;
-  }
-#endif
   CHECK(destination_url.is_valid());
 
   RenamePermission permission = GetRenamePermission(

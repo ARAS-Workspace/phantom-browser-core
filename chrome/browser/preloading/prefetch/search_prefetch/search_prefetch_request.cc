@@ -64,11 +64,6 @@
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/check_is_test.h"
-#include "chrome/browser/android/omnibox/geolocation_header.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 // A custom URLLoaderThrottle delegate that is very sensitive. Anything that
@@ -321,21 +316,6 @@ bool SearchPrefetchRequest::StartPrefetchRequest(
       }
     }
   } else {
-#if BUILDFLAG(IS_ANDROID)
-    base::TimeTicks geo_header_start_timestamp = base::TimeTicks::Now();
-    std::optional<std::string> geo_header =
-        GetGeolocationHeaderIfAllowed(resource_request->url, profile);
-    if (geo_header) {
-      resource_request->headers.AddHeaderFromString(geo_header.value());
-
-      std::string histogram_name =
-          "Omnibox.SearchPrefetch.GeoLocationHeaderTime.";
-      histogram_name.append(navigation_prefetch_ ? "NavigationPrefetch"
-                                                 : "SuggestionPrefetch");
-      base::UmaHistogramTimes(histogram_name, (base::TimeTicks::Now() -
-                                               geo_header_start_timestamp));
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // Before sending out the request, allow throttles to modify the request (not

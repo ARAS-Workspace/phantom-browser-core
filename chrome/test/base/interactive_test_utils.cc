@@ -15,7 +15,6 @@
 #include "ui/events/keycodes/keyboard_codes.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/memory/scoped_refptr.h"
 #include "base/task/current_thread.h"
 #include "chrome/browser/ui/browser.h"
@@ -25,7 +24,6 @@
 #include "ui/display/display.h"
 #include "ui/display/screen.h"
 #include "ui/views/widget/widget.h"
-#endif
 
 namespace ui_test_utils {
 
@@ -43,8 +41,6 @@ bool GetNativeWindow(const BrowserWindowInterface* browser,
 }
 
 }  // namespace
-
-#if !BUILDFLAG(IS_ANDROID)
 
 BrowserActivationWaiter::BrowserActivationWaiter(
     const BrowserWindowInterface* browser) {
@@ -107,8 +103,6 @@ bool BringBrowserWindowToFront(const BrowserWindowInterface* browser) {
   return true;
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 bool SendKeyPressSync(const BrowserWindowInterface* browser,
                       ui::KeyboardCode key,
                       bool control,
@@ -150,8 +144,6 @@ bool SendKeyPressToWindowSync(const gfx::NativeWindow window,
 
   return !testing::Test::HasFatalFailure();
 }
-
-#if !BUILDFLAG(IS_ANDROID)
 
 bool SendMouseMoveSync(const gfx::Point& location,
                        gfx::NativeWindow window_hint) {
@@ -209,7 +201,5 @@ std::pair<display::Display, display::Display> GetDisplays(
   return std::make_pair(screen->GetPrimaryDisplay(),
                         GetSecondaryDisplay(screen));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace ui_test_utils

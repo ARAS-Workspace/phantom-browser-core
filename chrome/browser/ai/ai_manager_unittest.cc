@@ -47,10 +47,8 @@
 #include "third_party/blink/public/mojom/ai/ai_summarizer.mojom.h"
 #include "third_party/blink/public/mojom/ai/ai_writer.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/component_updater/ai_embeddings_component_installer.h"
 #include "components/optimization_guide/core/model_execution/test/fake_component_update_service.h"
-#endif
 
 using optimization_guide::MockSession;
 
@@ -130,7 +128,6 @@ class MockDownloadObserver : public on_device_model::mojom::DownloadObserver {
   mojo::Receiver<on_device_model::mojom::DownloadObserver> receiver_{this};
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockOnDemandUpdater : public component_updater::OnDemandUpdater {
  public:
   MockOnDemandUpdater() = default;
@@ -143,7 +140,6 @@ class MockOnDemandUpdater : public component_updater::OnDemandUpdater {
                component_updater::Callback),
               (override));
 };
-#endif
 
 class AIManagerTest : public AITestUtils::AITestBase {
  public:
@@ -165,10 +161,8 @@ class AIManagerTest : public AITestUtils::AITestBase {
   void TearDown() override {
     AISemanticEmbedderServiceLauncher::SetForTesting(nullptr);
     launcher_.reset();
-#if !BUILDFLAG(IS_ANDROID)
     fake_component_updater_ptr_ = nullptr;
     TestingBrowserProcess::GetGlobal()->SetComponentUpdater(nullptr);
-#endif
     AITestUtils::AITestBase::TearDown();
   }
 
@@ -186,7 +180,6 @@ class AIManagerTest : public AITestUtils::AITestBase {
   base::test::ScopedFeatureList scoped_feature_list_;
   std::unique_ptr<AISemanticEmbedderServiceLauncherForTest> launcher_;
 
-#if !BUILDFLAG(IS_ANDROID)
  public:
   void SetupFakeComponentUpdater() {
     auto fake_component_updater =
@@ -202,7 +195,6 @@ class AIManagerTest : public AITestUtils::AITestBase {
   NiceMock<MockOnDemandUpdater> mock_on_demand_updater_;
   raw_ptr<optimization_guide::FakeComponentUpdateService>
       fake_component_updater_ptr_;
-#endif
 };
 
 // Tests that involve invalid on-device model file paths should not crash when
@@ -236,7 +228,6 @@ TEST_F(AIManagerTest, CanCreate) {
     EXPECT_EQ(future.Get(),
               blink::mojom::ModelAvailabilityCheckResult::kDownloadable);
   }
-#if !BUILDFLAG(IS_ANDROID)
   {
     base::test::TestFuture<blink::mojom::ModelAvailabilityCheckResult> future;
     ai_manager_->CanCreateLanguageModel(/*options=*/{}, future.GetCallback());
@@ -255,7 +246,6 @@ TEST_F(AIManagerTest, CanCreate) {
     EXPECT_EQ(future.Get(),
               blink::mojom::ModelAvailabilityCheckResult::kDownloadable);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(AIManagerTest, CanCreateSpeculativeDecodingSamplingOptions) {
@@ -603,7 +593,6 @@ TEST_F(AIManagerTest, CheckAndFixLanguagesProofreader) {
       ai_manager_->CheckAndFixLanguages(options, "API", enabled, enabled));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AIManagerTest, CreateSemanticEmbedderWaitsForModel) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitWithFeatures(
@@ -766,6 +755,5 @@ TEST_F(AIManagerTest, CreateSemanticEmbedderComponentUpdateFailed) {
   EXPECT_EQ(client.error_future().Get(),
             blink::mojom::AIManagerCreateClientError::kUnableToCreateSession);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace

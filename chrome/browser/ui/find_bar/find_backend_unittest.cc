@@ -103,12 +103,6 @@ TEST_F(FindBackendTest, InternalState) {
 }
 
 TEST_F(FindBackendTest, PolicyRestrictions) {
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      data_controls::kEnableClipboardDataControlsAndroid);
-#endif
-
   data_controls::SetDataControls(profile()->GetPrefs(), {R"({
                     "name": "block_google_to_bing",
                     "rule_id": "1234",

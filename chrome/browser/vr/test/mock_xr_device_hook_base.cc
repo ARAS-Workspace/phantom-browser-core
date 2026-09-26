@@ -15,11 +15,6 @@
 #include "device/vr/public/mojom/test/controller_frame_data.h"
 #include "ui/gfx/geometry/decomposed_transform.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/webxr/android/openxr_platform_helper_android.h"
-#include "device/vr/openxr/test/openxr_test_helper.h"
-#endif
-
 MockXRDeviceHookBase::MockXRDeviceHookBase() {
   thread_ = std::make_unique<base::Thread>("MockXRDeviceHookThread");
   thread_->Start();
@@ -32,11 +27,6 @@ MockXRDeviceHookBase::MockXRDeviceHookBase() {
   // TODO(https://crbug.com/381913614): Instead of this pattern, consider
   // spinning up/holding onto and setting the test hook on the XrRuntimeManager,
   // which could pass on to providers.
-#if BUILDFLAG(IS_ANDROID)
-  webxr::OpenXrPlatformHelperAndroid::SetXrHostActivityDisabledForTesting(true);
-  OpenXrTestHelper::Get().SetTestHook(
-      receiver_.BindNewPipeAndPassRemote(thread_->task_runner()));
-#endif
 }
 
 MockXRDeviceHookBase::~MockXRDeviceHookBase() {
@@ -56,9 +46,6 @@ void MockXRDeviceHookBase::StopHooking() {
   // or crossing synchronous Mojo calls from active frames. Instead, resetting
   // `receiver_` below will close the pipe and trigger disconnection handling
   // in the service process's OpenXrTestHelper.
-#if BUILDFLAG(IS_ANDROID)
-  OpenXrTestHelper::Get().SetTestHook(mojo::NullRemote());
-#endif
   // Unretained is safe here because we are going to block until this message
   // has been processed.
   thread_->task_runner()->PostTask(

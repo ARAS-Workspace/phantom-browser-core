@@ -115,24 +115,6 @@ base::WeakPtr<DisplayResourceProvider> DisplayResourceProvider::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool DisplayResourceProvider::IsBackedBySurfaceView(ResourceId id) const {
-  const ChildResource* resource = GetResource(id);
-  return resource->transferable.is_backed_by_surface_view;
-}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-bool DisplayResourceProvider::DoesResourceWantPromotionHint(
-    ResourceId id) const {
-  const ChildResource* resource = TryGetResource(id);
-  // TODO(ericrk): We should never fail TryGetResource, but we appear to
-  // be doing so on Android in rare cases. Handle this gracefully until a
-  // better solution can be found. https://crbug.com/811858
-  return resource && resource->transferable.wants_promotion_hint;
-}
-#endif
-
 bool DisplayResourceProvider::IsOverlayCandidate(ResourceId id) const {
   const ChildResource* resource = TryGetResource(id);
   // TODO(ericrk): We should never fail TryGetResource, but we appear to

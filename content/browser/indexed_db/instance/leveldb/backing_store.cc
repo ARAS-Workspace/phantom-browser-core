@@ -4540,11 +4540,9 @@ bool BackingStore::Transaction::WriteNewBlobs(BlobWriteCallback callback) {
           // modification times. The timestamp is not checked during reading
           // on Android either. https://crbug.com/1045488
           std::optional<base::Time> last_modified;
-#if !BUILDFLAG(IS_ANDROID)
           last_modified = entry.last_modified().is_null()
                               ? std::nullopt
                               : std::make_optional(entry.last_modified());
-#endif
           backing_store_->bucket_context_->blob_storage_context()
               ->WriteBlobToFile(std::move(pending_blob),
                                 backing_store_->GetBlobFileName(

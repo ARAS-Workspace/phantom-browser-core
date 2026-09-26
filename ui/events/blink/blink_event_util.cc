@@ -30,11 +30,6 @@
 #include "ui/gfx/geometry/transform.h"
 #include "ui/gfx/geometry/vector2d_f.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/events/android/gesture_event_android.h"
-#include "ui/events/android/gesture_event_type.h"
-#endif
-
 using blink::WebGestureDevice;
 using blink::WebGestureEvent;
 using blink::WebInputEvent;
@@ -807,92 +802,5 @@ blink::WebGestureEvent ScrollBeginFromScrollUpdate(
 
   return scroll_begin;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<WebGestureEvent> CreateWebGestureEventFromGestureEventAndroid(
-    const GestureEventAndroid& event) {
-  WebInputEvent::Type event_type = WebInputEvent::Type::kUndefined;
-  switch (event.type()) {
-    case GESTURE_EVENT_TYPE_PINCH_BEGIN:
-      event_type = WebInputEvent::Type::kGesturePinchBegin;
-      break;
-    case GESTURE_EVENT_TYPE_PINCH_BY:
-      event_type = WebInputEvent::Type::kGesturePinchUpdate;
-      break;
-    case GESTURE_EVENT_TYPE_PINCH_END:
-      event_type = WebInputEvent::Type::kGesturePinchEnd;
-      break;
-    case GESTURE_EVENT_TYPE_SCROLL_START:
-      event_type = WebInputEvent::Type::kGestureScrollBegin;
-      break;
-    case GESTURE_EVENT_TYPE_SCROLL_BY:
-      event_type = WebInputEvent::Type::kGestureScrollUpdate;
-      break;
-    case GESTURE_EVENT_TYPE_SCROLL_END:
-      event_type = WebInputEvent::Type::kGestureScrollEnd;
-      break;
-    case GESTURE_EVENT_TYPE_FLING_START:
-      event_type = WebInputEvent::Type::kGestureFlingStart;
-      break;
-    case GESTURE_EVENT_TYPE_FLING_CANCEL:
-      event_type = WebInputEvent::Type::kGestureFlingCancel;
-      break;
-    case GESTURE_EVENT_TYPE_DOUBLE_TAP:
-      event_type = WebInputEvent::Type::kGestureDoubleTap;
-      break;
-    default:
-      NOTREACHED() << "Unknown gesture event type";
-  }
-  auto web_event = std::make_unique<WebGestureEvent>(
-      event_type, WebInputEvent::kNoModifiers,
-      base::TimeTicks() + base::Milliseconds(event.time()));
-  // NOTE: Source gesture events are synthetic ones that simulate
-  // gesture from keyboard (zoom in/out) for now. Should populate Blink
-  // event's fields better when extended to handle more cases.
-  web_event->SetPositionInWidget(event.location());
-  web_event->SetPositionInScreen(event.screen_location());
-  WebGestureDevice device_type = WebGestureDevice::kUninitialized;
-  switch (event.source()) {
-    case ui::GestureDeviceType::DEVICE_TOUCHPAD:
-      device_type = WebGestureDevice::kTouchpad;
-      break;
-    case ui::GestureDeviceType::DEVICE_TOUCHSCREEN:
-      device_type = WebGestureDevice::kTouchscreen;
-      break;
-    default:
-      NOTREACHED() << "Unexpected gesture device type";
-  }
-  web_event->SetSourceDevice(device_type);
-  if (event.synthetic_scroll())
-    web_event->SetSourceDevice(WebGestureDevice::kSyntheticAutoscroll);
-  if (event_type == WebInputEvent::Type::kGesturePinchUpdate) {
-    web_event->data.pinch_update.scale = event.scale();
-  } else if (event_type == WebInputEvent::Type::kGestureScrollBegin) {
-    web_event->data.scroll_begin.delta_x_hint = event.delta_x();
-    web_event->data.scroll_begin.delta_y_hint = event.delta_y();
-    web_event->data.scroll_begin.target_viewport = event.target_viewport();
-  } else if (event_type == WebInputEvent::Type::kGestureScrollUpdate) {
-    web_event->data.scroll_update.delta_x = event.delta_x();
-    web_event->data.scroll_update.delta_y = event.delta_y();
-    web_event->data.scroll_update.delta_x_unconstrained = event.delta_x();
-    web_event->data.scroll_update.delta_y_unconstrained = event.delta_y();
-  } else if (event_type == WebInputEvent::Type::kGestureFlingStart) {
-    web_event->data.fling_start.velocity_x = event.velocity_x();
-    web_event->data.fling_start.velocity_y = event.velocity_y();
-    web_event->data.fling_start.target_viewport = event.target_viewport();
-  } else if (event_type == WebInputEvent::Type::kGestureFlingCancel) {
-    web_event->data.fling_cancel.prevent_boosting = event.prevent_boosting();
-    if (event.synthetic_scroll())
-      web_event->data.fling_cancel.target_viewport = true;
-  } else if (event_type == WebInputEvent::Type::kGestureDoubleTap) {
-    // Set the tap count to 1 even for DoubleTap, in order to be consistent with
-    // double tap behavior on a mobile viewport. See https://crbug.com/234986
-    // for context.
-    web_event->data.tap.tap_count = 1;
-  }
-
-  return web_event;
-}
-#endif
 
 }  // namespace ui

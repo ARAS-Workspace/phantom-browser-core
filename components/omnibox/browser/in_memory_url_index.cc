@@ -205,7 +205,7 @@ void InMemoryURLIndex::Shutdown() {
   shutdown_ = true;
   private_data_tracker_.TryCancelAll();
 
-#if !defined(LEAK_SANITIZER) && !BUILDFLAG(IS_ANDROID)
+#if !defined(LEAK_SANITIZER)
   // Intentionally create and then leak a scoped_refptr to private_data_. This
   // permanently raises the reference count so that the URLIndexPrivateData
   // destructor won't run during browser shutdown. This saves having to walk the
@@ -219,7 +219,7 @@ void InMemoryURLIndex::Shutdown() {
     base::NoDestructor<scoped_refptr<URLIndexPrivateData>> leak_reference(
         private_data_);
   }
-#endif  // !defined(LEAK_SANITIZER) && !BUILDFLAG(IS_ANDROID)
+#endif  // !defined(LEAK_SANITIZER)
 }
 
 // Restoring from the History DB -----------------------------------------------

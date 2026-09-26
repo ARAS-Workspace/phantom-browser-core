@@ -113,9 +113,7 @@
 
 #include "chrome/browser/web_applications/isolated_web_apps/install/isolated_web_app_dev_install_manager.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/startup/focus/focus_handler.h"
-#endif
 
 using content::BrowserThread;
 using content::ChildProcessSecurityPolicy;
@@ -426,7 +424,6 @@ bool ShouldForceLaunchIntoNewProfileWithEmail(
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Attempts to handle the --focus command line switch to focus an existing
 // browser window or tab. Returns true if the focus request was handled
 // (successfully focused, parsing failed, or no fallback URL available),
@@ -466,7 +463,6 @@ std::optional<bool> MaybeHandleFocusRequest(
   // to fall back to, so continue normal processing.
   return std::nullopt;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Contains the computed profile and incognito mode settings for startup.
 struct ProfileSetupResult {
@@ -821,13 +817,11 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
   bool can_use_profile = profile_setup.can_use_profile;
   Profile* privacy_safe_profile = profile_setup.privacy_safe_profile;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Try to focus an existing window/tab if --focus is present.
   if (std::optional<bool> focus_result = MaybeHandleFocusRequest(
           command_line, process_startup, profile_info)) {
     return *focus_result;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Try to validate a CRX if --validate-crx is present.
   if (std::optional<bool> crx_result =

@@ -793,7 +793,6 @@ TEST_F(ContentSettingImageModelTest,
 }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ContentSettingImageModelTest, StorageAccess) {
   auto content_setting_image_model =
       ContentSettingImageModel::CreateForContentType(
@@ -847,6 +846,5 @@ TEST_F(ContentSettingImageModelTest, StorageAccess) {
   content_setting_image_model->Update(web_contents());
   EXPECT_FALSE(content_setting_image_model->is_visible());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace

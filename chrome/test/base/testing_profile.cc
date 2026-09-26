@@ -326,10 +326,6 @@ void TestingProfile::Init(bool is_supervised_profile, CreateMode create_mode) {
     key_ = std::make_unique<TestingProfileKey>(this, profile_path_);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  signin::SetUpFakeAccountManagerFacade();
-#endif
-
   // Normally this would happen during browser startup, but for tests
   // we need to trigger creation of Profile-related services.
   ChromeBrowserMainExtraPartsProfiles::
@@ -396,7 +392,7 @@ void TestingProfile::Init(bool is_supervised_profile, CreateMode create_mode) {
         this, base::BindRepeating(&web_app::FakeWebAppProvider::BuildDefault));
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     ChromeDeviceAuthenticatorFactory::GetInstance()->SetTestingFactory(
         this, base::BindRepeating([](content::BrowserContext* browser)
                                       -> std::unique_ptr<KeyedService> {
@@ -432,7 +428,6 @@ void TestingProfile::InitializeProfileType() {
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   bool is_system = false;
   if (IsOffTheRecord()) {
     is_system = original_profile_->IsSystemProfile();
@@ -447,7 +442,6 @@ void TestingProfile::InitializeProfileType() {
         this, profile_metrics::BrowserProfileType::kSystem);
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (IsOffTheRecord()) {
     profile_metrics::SetBrowserProfileType(

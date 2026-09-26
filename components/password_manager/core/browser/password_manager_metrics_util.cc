@@ -497,21 +497,6 @@ void LogProcessIncomingPasswordSharingInvitationResult(
       "PasswordManager.ProcessIncomingPasswordSharingInvitationResult", result);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void LogSharedPrefCredentialsAccessOutcome(
-    SharedPrefCredentialsAccessOutcome outcome) {
-  base::UmaHistogramEnumeration(
-      "PasswordProtection.SharedPrefCredentialsAccessOutcome", outcome);
-}
-
-void LogTouchToFillPasswordGenerationTriggerOutcome(
-    TouchToFillPasswordGenerationTriggerOutcome outcome) {
-  base::UmaHistogramEnumeration(
-      "PasswordManager.TouchToFill.PasswordGeneration.TriggerOutcome", outcome);
-}
-
-#endif
-
 void AddPasswordRemovalReason(
     PrefService* prefs,
     IsAccountStore is_account_store,

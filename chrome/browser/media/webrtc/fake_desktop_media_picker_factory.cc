@@ -32,7 +32,6 @@ void FakeDesktopMediaPicker::Show(
   expectation_->picker_shown = true;
   picker_params_ = params;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Android does not use DesktopMediaList. See
   // DesktopMediaPickerFactoryImpl::CreateMediaList.
   bool show_screens = false;
@@ -61,7 +60,6 @@ void FakeDesktopMediaPicker::Show(
   EXPECT_EQ(expectation_->expect_windows, show_windows);
   EXPECT_EQ(expectation_->expect_tabs, show_tabs);
   EXPECT_EQ(expectation_->expect_current_tab, show_current_tab);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   EXPECT_EQ(expectation_->expect_audio, params.request_audio);
   EXPECT_TRUE(params.modality == ui::mojom::ModalType::kChild ||

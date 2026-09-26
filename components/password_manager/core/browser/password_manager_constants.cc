@@ -8,7 +8,6 @@
 
 namespace password_manager {
 
-#if !BUILDFLAG(IS_ANDROID)
 const base::FilePath::CharType kLoginDataForProfileFileName[] =
     FILE_PATH_LITERAL("Login Data");
 const base::FilePath::CharType kLoginDataForAccountFileName[] =
@@ -17,7 +16,6 @@ const base::FilePath::CharType kLoginDataJournalForProfileFileName[] =
     FILE_PATH_LITERAL("Login Data-journal");
 const base::FilePath::CharType kLoginDataJournalForAccountFileName[] =
     FILE_PATH_LITERAL("Login Data For Account-journal");
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 const char kPasswordManagerAccountDashboardURL[] = "";
 

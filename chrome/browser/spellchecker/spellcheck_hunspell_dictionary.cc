@@ -41,10 +41,8 @@
 #include "services/network/public/mojom/url_response_head.mojom.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/files/memory_mapped_file.h"
 #include "third_party/hunspell/google/bdict.h"  // nogncheck crbug.com/40147906
-#endif
 
 using content::BrowserThread;
 
@@ -231,7 +229,6 @@ void SpellcheckHunspellDictionary::OnSimpleLoaderComplete(
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // To prevent corrupted dictionary data from causing a renderer crash, scan
   // the dictionary data and verify it is sane before save it to a file.
   if (!hunspell::BDict::Verify(base::as_byte_span(*data))) {
@@ -240,7 +237,6 @@ void SpellcheckHunspellDictionary::OnSimpleLoaderComplete(
     SaveDictionaryDataComplete(false);
     return;
   }
-#endif
 
   task_runner_->PostTaskAndReplyWithResult(
       FROM_HERE,
@@ -318,7 +314,6 @@ void SpellcheckHunspellDictionary::DownloadDictionary(GURL url) {
   browser_context_ = nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // static
 SpellcheckHunspellDictionary::DictionaryFile
 SpellcheckHunspellDictionary::OpenDictionaryFile(base::TaskRunner* task_runner,
@@ -404,7 +399,6 @@ void SpellcheckHunspellDictionary::InitializeDictionaryLocationComplete(
 
   InformListenersOfInitialization();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void SpellcheckHunspellDictionary::SaveDictionaryDataComplete(
     bool dictionary_saved) {
@@ -453,7 +447,7 @@ void SpellcheckHunspellDictionary::PlatformSupportsLanguageComplete(
     // Either the platform spellchecker is unavailable / disabled, or it doesn't
     // support this language. In either case, we must use Hunspell for this
     // language, unless we are on Android, which doesn't support Hunspell.
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(USE_RENDERER_SPELLCHECKER)
+#if BUILDFLAG(USE_RENDERER_SPELLCHECKER)
     task_runner_->PostTaskAndReplyWithResult(
         FROM_HERE,
         base::BindOnce(&InitializeDictionaryLocation,
@@ -461,7 +455,7 @@ void SpellcheckHunspellDictionary::PlatformSupportsLanguageComplete(
         base::BindOnce(
             &SpellcheckHunspellDictionary::InitializeDictionaryLocationComplete,
             weak_ptr_factory_.GetWeakPtr()));
-#endif  // !BUILDFLAG(IS_ANDROID) && BUILDFLAG(USE_RENDERER_SPELLCHECKER)
+#endif  // BUILDFLAG(USE_RENDERER_SPELLCHECKER)
   }
 }
 

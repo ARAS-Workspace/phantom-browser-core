@@ -502,7 +502,6 @@ bool FeaturePromoControllerImpl::DismissNonCriticalBubbleInRegion(
   return result;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void FeaturePromoControllerImpl::NotifyFeatureUsedIfValid(
     const base::Feature& feature) {
   if (base::FeatureList::IsEnabled(feature) &&
@@ -510,7 +509,6 @@ void FeaturePromoControllerImpl::NotifyFeatureUsedIfValid(
     feature_engagement_tracker_->NotifyUsedEvent(feature);
   }
 }
-#endif
 
 FeaturePromoHandle FeaturePromoControllerImpl::CloseBubbleAndContinuePromo(
     const base::Feature& iph_feature) {

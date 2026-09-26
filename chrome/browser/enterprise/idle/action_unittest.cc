@@ -11,7 +11,6 @@
 namespace enterprise_idle {
 
 // TODO(crbug.com/40222234): Enable this when Android supports >1 Action.
-#if !BUILDFLAG(IS_ANDROID)
 TEST(IdleActionTest, Build) {
   auto* factory = ActionFactory::GetInstance();
 
@@ -29,21 +28,17 @@ TEST(IdleActionTest, Build) {
   EXPECT_EQ(static_cast<int>(ActionType::kCloseBrowsers),
             queue.top()->priority());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST(IdleActionTest, ClearBrowsingDataIsSingleAction) {
   auto* factory = ActionFactory::GetInstance();
 
-  auto queue = factory->Build(nullptr, {
-#if !BUILDFLAG(IS_ANDROID)
-    ActionType::kClearDownloadHistory, ActionType::kClearHostedAppData,
-#endif  // !BUILDFLAG(IS_ANDROID)
-        ActionType::kClearBrowsingHistory,
-        ActionType::kClearCookiesAndOtherSiteData,
-        ActionType::kClearCachedImagesAndFiles,
-        ActionType::kClearPasswordSignin, ActionType::kClearAutofill,
-        ActionType::kClearSiteSettings
-  });
+  auto queue = factory->Build(
+      nullptr,
+      {ActionType::kClearDownloadHistory, ActionType::kClearHostedAppData,
+       ActionType::kClearBrowsingHistory,
+       ActionType::kClearCookiesAndOtherSiteData,
+       ActionType::kClearCachedImagesAndFiles, ActionType::kClearPasswordSignin,
+       ActionType::kClearAutofill, ActionType::kClearSiteSettings});
   EXPECT_EQ(1u, queue.size());
   EXPECT_EQ(static_cast<int>(ActionType::kClearBrowsingHistory),
             queue.top()->priority());

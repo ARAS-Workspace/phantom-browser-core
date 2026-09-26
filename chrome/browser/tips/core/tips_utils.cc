@@ -76,31 +76,4 @@ notifications::NotificationData GetTipsNotificationData(
   return data;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-std::string GetFeatureTypePref(TipsNotificationsFeatureType feature_type) {
-  switch (feature_type) {
-    case TipsNotificationsFeatureType::kEnhancedSafeBrowsing:
-      return prefs::kAndroidTipNotificationShownESB;
-    case TipsNotificationsFeatureType::kQuickDelete:
-      return prefs::kAndroidTipNotificationShownQuickDelete;
-    case TipsNotificationsFeatureType::kGoogleLens:
-      return prefs::kAndroidTipNotificationShownLens;
-    case TipsNotificationsFeatureType::kBottomOmnibox:
-      return prefs::kAndroidTipNotificationShownBottomOmnibox;
-    case TipsNotificationsFeatureType::kPasswordAutofill:
-      return prefs::kAndroidTipNotificationShownPasswordAutofill;
-    case TipsNotificationsFeatureType::kSignin:
-      return prefs::kAndroidTipNotificationShownSignin;
-    case TipsNotificationsFeatureType::kCreateTabGroups:
-      return prefs::kAndroidTipNotificationShownCreateTabGroups;
-    case TipsNotificationsFeatureType::kCustomizeMVT:
-      return prefs::kAndroidTipNotificationShownCustomizeMVT;
-    case TipsNotificationsFeatureType::kRecentTabs:
-      return prefs::kAndroidTipNotificationShownRecentTabs;
-    default:
-      NOTREACHED();
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace tips

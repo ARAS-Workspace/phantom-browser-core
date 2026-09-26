@@ -24,9 +24,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/shell_dialogs/fake_select_file_dialog.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/certificate_manager/certificate_manager_utils.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 class FakeCertificateManagerPage
@@ -179,7 +177,6 @@ TEST_F(UserCertSourcesUnitTest, TestImportCertificate) {
   EXPECT_TRUE(fake_page->metadata_update_called());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(UserCertSourcesUnitTest, TestImportCertificateNotAllowedByPref) {
   ASSERT_EQ(GetAllCertsFromDB().size(), 0u);
   ui::FakeSelectFileDialog::Factory* factory =
@@ -204,7 +201,6 @@ TEST_F(UserCertSourcesUnitTest, TestImportCertificateNotAllowedByPref) {
   EXPECT_TRUE(import_result->is_error());
   EXPECT_EQ(GetAllCertsFromDB().size(), 0u);
 }
-#endif  //  !BUILDFLAG(IS_ANDROID)
 
 TEST_F(UserCertSourcesUnitTest, TestImportNonExistantCertificate) {
   ASSERT_EQ(GetAllCertsFromDB().size(), 0u);
@@ -374,7 +370,6 @@ TEST_F(UserCertSourcesUnitTest, TestDeleteCertificateConfirmationRejected) {
   EXPECT_EQ(remaining_certs.size(), 2u);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(UserCertSourcesUnitTest, TestDeleteCertificateNotAllowedByPref) {
   std::vector<std::unique_ptr<net::CertBuilder>> test_cert_builder_1 =
       net::CertBuilder::CreateSimpleChain(1);
@@ -417,4 +412,3 @@ TEST_F(UserCertSourcesUnitTest, TestDeleteCertificateNotAllowedByPref) {
       GetAllCertsFromDB();
   EXPECT_EQ(remaining_certs.size(), 2u);
 }
-#endif  //  !BUILDFLAG(IS_ANDROID)

@@ -18,19 +18,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   // Disables cross-device syncing for older clients. For newer clients,
   // this value is never read.
   registry->RegisterBooleanPref(prefs::kSyncableTabGroups, false);
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterBooleanPref(prefs::kAutoOpenSyncedTabGroups, false);
-  // Always register stop showing prefs. They're conditionally used by a cached
-  // feature in Java, which is hard to synchronize.
-  registry->RegisterBooleanPref(prefs::kStopShowingTabGroupConfirmationOnClose,
-                                false);
-  registry->RegisterBooleanPref(
-      prefs::kStopShowingTabGroupConfirmationOnUngroup, false);
-  registry->RegisterBooleanPref(
-      prefs::kStopShowingTabGroupConfirmationOnTabRemove, false);
-  registry->RegisterBooleanPref(
-      prefs::kStopShowingTabGroupConfirmationOnTabClose, false);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   registry->RegisterBooleanPref(
       kAutoPinNewTabGroups, true,
