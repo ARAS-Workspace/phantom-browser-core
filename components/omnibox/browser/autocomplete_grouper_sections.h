@@ -328,14 +328,6 @@ class AndroidComposeboxZpsSection : public ZpsSection {
   static size_t num_attachments_;
 };
 
-class IOSComposeboxZpsSection : public ZpsSection {
- public:
-  explicit IOSComposeboxZpsSection(const omnibox::GroupConfigMap& group_configs,
-                                   size_t max_suggestions,
-                                   size_t max_aim_suggestions,
-                                   size_t max_contextual_suggestions);
-};
-
 class DesktopComposeboxZpsSection : public ZpsSectionWithLocalHistory {
  public:
   explicit DesktopComposeboxZpsSection(
@@ -365,52 +357,6 @@ class DesktopNonZpsSection : public Section {
   explicit DesktopNonZpsSection(const omnibox::GroupConfigMap& group_configs);
   // Section:
   void InitFromMatches(ACMatches& matches) override;
-};
-
-// Section expressing the iOS ZPS limits and grouping for the NTP.
-// - up to `total_count` suggestions total.
-//  - up to 1 clipboard suggestion.
-//  - up to `psuggest_count` MIA or personalized suggestions.
-//  - up to `max_trending_queries` trending suggestions.
-class IOSNTPZpsSection : public ZpsSectionWithLocalHistory {
- public:
-  IOSNTPZpsSection(const omnibox::GroupConfigMap& group_configs,
-                   bool mia_enabled);
-  void InitFromMatches(ACMatches& matches) override;
-};
-
-// Section expressing the iOS ZPS limits and grouping for the SRP.
-// - up to 20 suggestions total (where all MV Tiles are counted for 1).
-//  - up to 1 verbatim suggestion.
-//  - up to 1 clipboard suggestion.
-//  - up to 10 most visited in a carousel.
-//  - up to 8 previous search related suggestions.
-//  - up to 20 personalized suggestions.
-class IOSSRPZpsSection : public ZpsSectionWithMVTiles {
- public:
-  explicit IOSSRPZpsSection(const omnibox::GroupConfigMap& group_configs);
-};
-
-// Section expressing the iOS ZPS limits and grouping for the Web.
-// - up to 20 suggestions total (but all MV Tiles are counted for 1).
-//  - up to 1 verbatim suggestion.
-//  - up to 1 clipboard suggestion.
-//  - up to 10 most visited in a carousel.
-//  - up to 8 page related suggestions.
-//  - up to 20 personalized suggestions.
-class IOSWebZpsSection : public ZpsSectionWithMVTiles {
- public:
-  explicit IOSWebZpsSection(const omnibox::GroupConfigMap& group_configs);
-};
-
-// Section expressing the iOS ZPS limits and grouping for the Lens mutimodal
-// searchbox.
-// - up to 10 suggestions total.
-//  - up to 10 search suggestions.
-class IOSLensMultimodalZpsSection : public ZpsSection {
- public:
-  explicit IOSLensMultimodalZpsSection(
-      const omnibox::GroupConfigMap& group_configs);
 };
 
 #endif  // COMPONENTS_OMNIBOX_BROWSER_AUTOCOMPLETE_GROUPER_SECTIONS_H_
