@@ -98,11 +98,6 @@
 #include "services/service_manager/public/cpp/test/test_connector_factory.h"
 #include "ui/shell_dialogs/selected_file_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/android/content_uri_test_utils.h"
-#include "chrome/browser/ui/android/extensions/extension_util_bridge.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -400,41 +395,10 @@ void ItemStatePrefsChangedObserver::OnWillDispatchEvent(const Event& event) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Copies a source directory into an existing ScopedTempDir and generates a
-// content URI for it.
-//
-// This is a workaround for Android security policies that prevent loading
-// extensions directly from the file system. This function enables tests by
-// copying the extension directory to a temporary location and resolving it to
-// a content URI, which can then be used for extension packing.
-base::FilePath CreateCacheCopyAndGetContentUri(
-    const base::FilePath& source_path,
-    const base::ScopedTempDir& temp_dir) {
-  EXPECT_TRUE(base::CopyDirectory(source_path, temp_dir.GetPath(), true));
-  return *base::test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-      temp_dir.GetPath().Append(source_path.BaseName()));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 base::FilePath GetUnpackedPath(TestExtensionDir& dir) {
   base::FilePath absolute_file_path = dir.UnpackedPath();
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, file path related to load unpacked tests must be resolved to a
-  // virtual document path, as extensions can only be loaded using this path.
-  std::optional<base::FilePath> virtual_document_path =
-      base::test::android::GetVirtualDocumentPathFromCacheDirDirectory(
-          absolute_file_path);
-
-  // If the path cannot be resolved to a virtual document path, the whole test
-  // should failed as the extension cannot be loaded without it. The CHECK will
-  // abort the test execution.
-  CHECK(virtual_document_path.has_value());
-  return *virtual_document_path;
-#else
   // On other platforms, we can use the direct file path.
   return absolute_file_path;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace
@@ -710,13 +674,8 @@ void DeveloperPrivateApiUnitTest::SetDraggedFile(
     content::WebContents* web_contents,
     const base::FilePath& path) {
   dragged_file_info_ = std::make_unique<ui::FileInfo>(path, path.BaseName());
-#if BUILDFLAG(IS_ANDROID)
-  api::DeveloperPrivateNotifyDragInstallInProgressFunction::
-      SetDropFileForTesting(dragged_file_info_.get());
-#else
   DeveloperPrivateAPI::Get(profile())->SetDraggedFile(web_contents,
                                                       *dragged_file_info_);
-#endif
 }
 
 void DeveloperPrivateApiUnitTest::SetUp() {
@@ -859,21 +818,6 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivatePackFunction) {
   base::FilePath root_path = data_dir().AppendASCII("simple_with_popup");
   ASSERT_TRUE(base::CopyDirectory(root_path, temp_dir.GetPath(), true));
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android will pack extension under downloads.
-  base::FilePath temp_root_path =
-      *base::test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-          temp_dir.GetPath().Append(root_path.BaseName()));
-
-  std::optional<base::FilePath> optional_crx_path =
-      GetFileUnderDownloads("simple_with_popup.crx");
-  std::optional<base::FilePath> optional_pem_path =
-      GetFileUnderDownloads("simple_with_popup.pem");
-
-  // Shouldn't exist now.
-  EXPECT_FALSE(optional_crx_path.has_value());
-  EXPECT_FALSE(optional_pem_path.has_value());
-#else
   base::FilePath temp_root_path =
       temp_dir.GetPath().Append(root_path.BaseName());
   base::FilePath crx_path =
@@ -885,7 +829,6 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivatePackFunction) {
       << "crx should not exist before the test is run!";
   EXPECT_FALSE(base::PathExists(pem_path))
       << "pem should not exist before the test is run!";
-#endif
 
   // First, test a directory that should pack properly.
   base::ListValue pack_args;
@@ -893,27 +836,9 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivatePackFunction) {
   EXPECT_TRUE(TestPackExtensionFunction(
       pack_args, api::developer_private::PackStatus::kSuccess, 0));
 
-#if BUILDFLAG(IS_ANDROID)
-  // Query again
-  optional_crx_path = GetFileUnderDownloads("simple_with_popup.crx");
-  optional_pem_path = GetFileUnderDownloads("simple_with_popup.pem");
-  EXPECT_TRUE(optional_crx_path.has_value());
-  EXPECT_TRUE(optional_pem_path.has_value());
-
-  base::FilePath crx_path = optional_crx_path.value();
-  base::FilePath pem_path = optional_pem_path.value();
-  // Make sure the crx is packed and the key is generated. Since Android will
-  // create the content URI during the whole process whether the packing is
-  // successful or not. Apply a size check here.
-  std::optional<int64_t> crx_file_size = base::GetFileSize(crx_path);
-  std::optional<int64_t> pem_file_size = base::GetFileSize(pem_path);
-  EXPECT_TRUE(crx_file_size.has_value() && crx_file_size.value() > 0);
-  EXPECT_TRUE(pem_file_size.has_value() && pem_file_size.value() > 0);
-#else
   // Should have created crx file and pem file.
   EXPECT_TRUE(base::PathExists(crx_path));
   EXPECT_TRUE(base::PathExists(pem_path));
-#endif
   // Deliberately don't cleanup the files, and append the pem path.
   pack_args.Append(pem_path.AsUTF8Unsafe());
 
@@ -935,16 +860,9 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivatePackFunction) {
   EXPECT_TRUE(TestPackExtensionFunction(
       pack_args, api::developer_private::PackStatus::kError, 0));
 
-// In Android, even if the process fails, two empty files are still
-// created under downloads. In this teardown, we clean up these files
-// to prevent them from impacting subsequent tests.
-#if BUILDFLAG(IS_ANDROID)
-  // Needs to query crx_path again to get the latest content URI for newly
-  // created empty file.
-  optional_crx_path = GetFileUnderDownloads("simple_with_popup.crx");
-  base::DeleteFile(optional_crx_path.value());
-  base::DeleteFile(pem_path);
-#endif
+  // In Android, even if the process fails, two empty files are still
+  // created under downloads. In this teardown, we clean up these files
+  // to prevent them from impacting subsequent tests.
 }
 
 // Test developerPrivate.choosePath.
@@ -1031,11 +949,6 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivateLoadUnpacked) {
   function = base::MakeRefCounted<api::DeveloperPrivateLoadUnpackedFunction>();
   base::FilePath path = data_dir().AppendASCII("simple_with_popup");
   function->set_accept_dialog_for_testing(true);
-#if BUILDFLAG(IS_ANDROID)
-  base::ScopedTempDir temp_dir_copy;
-  ASSERT_TRUE(temp_dir_copy.CreateUniqueTempDir());
-  path = CreateCacheCopyAndGetContentUri(path, temp_dir_copy);
-#endif  // BUILDFLAG(IS_ANDROID)
   function->set_selected_file_for_testing(ui::SelectedFileInfo(path));
   function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
 
@@ -1045,25 +958,14 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivateLoadUnpacked) {
       registry()->enabled_extensions().GetIDs(), current_ids);
   ASSERT_EQ(1u, id_difference.size());
   // The new extension should have the same path.
-#if BUILDFLAG(IS_ANDROID)
-  // In Android, the unpacked extension source will be resolved as virtual
-  // document path.
-  EXPECT_EQ(
-      *base::ResolveToVirtualDocumentPath(path),
-      registry()->enabled_extensions().GetByID(*id_difference.begin())->path());
-#else
   EXPECT_EQ(
       path,
       registry()->enabled_extensions().GetByID(*id_difference.begin())->path());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Try loading a bad extension and accepting the dialog.
   function = base::MakeRefCounted<api::DeveloperPrivateLoadUnpackedFunction>();
   path = data_dir().AppendASCII("empty_manifest");
   function->set_accept_dialog_for_testing(true);
-#if BUILDFLAG(IS_ANDROID)
-  path = CreateCacheCopyAndGetContentUri(path, temp_dir_copy);
-#endif  // BUILDFLAG(IS_ANDROID)
   function->set_selected_file_for_testing(ui::SelectedFileInfo(path));
   function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
   base::ListValue unpacked_args;
@@ -1445,7 +1347,6 @@ TEST_F(DeveloperPrivateApiUnitTest, ReloadBadExtensionToLoadUnpackedRetry) {
 // event**. We must instead use the **drop event** to retrieve the file data.
 // See {@link DeveloperPrivateNotifyDragInstallInProgressFunction} for detailed
 // information.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(DeveloperPrivateApiUnitTest,
        DeveloperPrivateNotifyDragInstallInProgress) {
   std::unique_ptr<content::WebContents> web_contents(
@@ -1534,7 +1435,6 @@ TEST_F(DeveloperPrivateApiUnitTest,
   api::DeveloperPrivateNotifyDragInstallInProgressFunction::
       SetDropFileForTesting(nullptr);
 }
-#endif
 
 // Test developerPrivate.requestFileSource.
 TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivateRequestFileSource) {
@@ -1873,16 +1773,8 @@ TEST_F(DeveloperPrivateApiUnitTest, InstallDroppedFileNoDraggedPath) {
   function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
 
   TestExtensionRegistryObserver observer(registry());
-#if BUILDFLAG(IS_ANDROID)
-  // Android will SetDroppedPath on DeveloperPrivateInstallDroppedFileFunction,
-  // while other platforms will do SetDroppedPath on
-  // DeveloperPrivateNotifyDragInstallInProgressFunction.
-  EXPECT_EQ("No current drop data.", api_test_utils::RunFunctionAndReturnError(
-                                         function.get(), "[]", profile()));
-#else
   EXPECT_EQ("No dragged path", api_test_utils::RunFunctionAndReturnError(
                                    function.get(), "[]", profile()));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(DeveloperPrivateApiUnitTest, InstallDroppedFileCrx) {

@@ -43,14 +43,6 @@
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_file_modification_host.mojom.h"
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_transfer_token.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/strings/string_view_util.h"
-#include "crypto/obsolete/sha1.h"
-#include "base/path_service.h"
-#include "base/strings/string_number_conversions.h"
-#include "content/public/common/content_paths.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include <sys/clonefile.h>
 
@@ -65,17 +57,6 @@ using storage::FileSystemOperationRunner;
 
 namespace content {
 
-#if BUILDFLAG(IS_ANDROID)
-// Computes a SHA-1 hash of |url_path_value| and returns it as a hex string.
-// This function is intentionally declared in a separate header file
-// "crypto/obsolete/sha1.h", so as to easily monitor current usage of SHA-1 in
-// Chrome, since SHA-1 is now discouraged for new code.
-std::string GetHashedUrlPath(std::string_view url_path_value) {
-  return base::HexEncode(
-            base::as_string_view(crypto::obsolete::Sha1::Hash(url_path_value)));
-}
-#endif
-
 namespace {
 
 std::pair<base::File, base::FileErrorOr<int64_t>> GetFileLengthOnBlockingThread(
@@ -86,16 +67,6 @@ std::pair<base::File, base::FileErrorOr<int64_t>> GetFileLengthOnBlockingThread(
   }
   return {std::move(file), std::move(file_length)};
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void EnsureSwapDirExists(base::FilePath swap_dir) {
-  if (!base::PathExists(swap_dir)) {
-    if (!base::CreateDirectory(swap_dir)) {
-      DLOG(ERROR) << "Error creating swap dir " << swap_dir;
-    }
-  }
-}
-#endif
 
 bool HasWritePermission(const base::FilePath& path) {
   if (!base::PathExists(path)) {
@@ -544,14 +515,6 @@ void FileSystemAccessFileHandleImpl::CreateFileWriterImpl(
   // TODO(crbug.com/40194651): Expand this check to all backends.
   if (url().type() == storage::kFileSystemTypeLocal) {
     auto checks = base::BindOnce(&HasWritePermission, url().path());
-#if BUILDFLAG(IS_ANDROID)
-    if (url().path().IsContentUri()) {
-      swap_dir_ =
-          base::PathService::CheckedGet(content::DIR_FILE_SYSTEM_API_SWAP);
-      checks = base::BindOnce(&EnsureSwapDirExists, swap_dir_)
-                   .Then(std::move(checks));
-    }
-#endif
     base::ThreadPool::PostTaskAndReplyWithResult(
         FROM_HERE, {base::MayBlock()}, std::move(checks),
         base::BindOnce(
@@ -637,27 +600,7 @@ void FileSystemAccessFileHandleImpl::StartCreateSwapFile(
     std::optional<base::SafeBaseName> opt_swap_name =
         base::SafeBaseName::Create(swap_name);
     CHECK(opt_swap_name.has_value());
-#if BUILDFLAG(IS_ANDROID)
-    //  For content-URIs (e.g. content://com.android.../doc/msf%3A123), we will
-    //  write the swap file to the local cache dir
-    //  (e.g. /data/user/0/com.chrome.dev/cache/FileSystemAPISwap) and then
-    //  copy back to the original content-URI when done.
-    storage::FileSystemURL swap_url;
-    if (url().path().IsContentUri()) {
-      // Use SHA1 hash instead of escape to avoid exceeding filename length
-      // limits.
-      std::string file_name = GetHashedUrlPath(url().path().value());
-      if (count > 0) {
-        file_name += base::StringPrintf(".%d", count);
-      }
-      swap_url = manager()->CreateFileSystemURLFromPath(
-          PathInfo(swap_dir_.Append(file_name).AddExtension(".crswap")));
-    } else {
-      swap_url = url().CreateSibling(*opt_swap_name);
-    }
-#else
     storage::FileSystemURL swap_url = url().CreateSibling(*opt_swap_name);
-#endif
     CHECK(swap_url.is_valid());
 
     // Check if this swap file is not in use. If it isn't, take a lock on it.

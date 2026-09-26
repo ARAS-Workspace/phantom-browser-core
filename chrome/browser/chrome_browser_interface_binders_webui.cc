@@ -36,7 +36,6 @@
 #include "ui/webui/tracked_element/tracked_element_handler.h"
 #include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/history/history_ui.h"
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
@@ -45,7 +44,6 @@
 #include "chrome/browser/ui/webui/side_panel/reading_list/reading_list_ui.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
-#endif
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
 #include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption.mojom.h"
@@ -62,12 +60,10 @@
 #if BUILDFLAG(ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX)
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 #include "ui/webui/color_change_listener/color_change_handler.h"
 #include "ui/webui/resources/cr_components/color_change_listener/color_change_listener.mojom.h"
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/webui/discards/discards.mojom.h"
 #include "chrome/browser/ui/webui/discards/discards_ui.h"
 #include "chrome/browser/ui/webui/discards/site_data.mojom.h"
@@ -78,7 +74,6 @@ namespace chrome::internal {
 using content::RegisterWebUIControllerInterfaceBinder;
 
 namespace {
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 void BindColorChangeListener(
     content::RenderFrameHost* frame_host,
     mojo::PendingReceiver<color_change_listener::mojom::PageHandler>
@@ -87,7 +82,6 @@ void BindColorChangeListener(
       ui::ColorChangeHandler::GetOrCreateForCurrentDocument(frame_host);
   color_change_handler->Bind(std::move(pending_receiver));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 
 void BindTrackedElementHandler(
     content::RenderFrameHost* frame_host,
@@ -117,13 +111,11 @@ void BindTrackedElementHandlerRestricted(
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
       controller->GetAs<NewTabPageUI>() ||
 #endif
-#if !BUILDFLAG(IS_ANDROID)
       controller->GetAs<UserEducationInternalsUI>() ||
       controller->GetAs<ReadingListUI>() ||
       controller->GetAs<CustomizeChromeUI>() ||
       controller->GetAs<HistoryUI>() ||
       controller->GetAs<ProfilePickerUI>() ||
-#endif  // !BUILDFLAG(IS_ANDROID)
       false;
 
   if (!is_allowed) {
@@ -146,10 +138,8 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
       media::mojom::MediaEngagementScoreDetailsProvider, MediaEngagementUI>(
       map);
 
-#if !BUILDFLAG(IS_ANDROID)
   RegisterWebUIControllerInterfaceBinder<
       omnibox_popup::mojom::PageHandlerFactory, OmniboxPopupUI>(map);
-#endif
   RegisterWebUIControllerInterfaceBinder<::mojom::OmniboxPageHandler,
                                          OmniboxUI>(map);
 
@@ -193,14 +183,9 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   content::RegisterWebUIControllerInterfaceBinder<
       new_tab_page::mojom::PageHandlerFactory, NewTabPageUI>(map);
-#if BUILDFLAG(IS_ANDROID)
-  content::RegisterWebUIControllerInterfaceBinder<
-      most_visited::mojom::MostVisitedPageHandlerFactory, NewTabPageUI>(map);
-#else
   content::RegisterWebUIControllerInterfaceBinder<
       most_visited::mojom::MostVisitedPageHandlerFactory, NewTabPageUI,
       OmniboxEverywhereUI>(map);
-#endif  // BUILDFLAG(IS_ANDROID)
   content::RegisterWebUIControllerInterfaceBinder<
       customize_buttons::mojom::CustomizeButtonsHandlerFactory, NewTabPageUI>(
       map);
@@ -212,24 +197,10 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   }
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   map->Add<color_change_listener::mojom::PageHandler>(
       base::BindRepeating(&BindColorChangeListener));
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 
-// TODO(b/502297163): Implement for Android.
-#if BUILDFLAG(ENABLE_WEBUI_NTP) && BUILDFLAG(IS_ANDROID)
-  // A variant of these exist in
-  // chrome_browser_interface_binders_webui_parts_desktop.cc:
-  // that enables them for more pages.
-  content::RegisterWebUIControllerInterfaceBinder<
-      searchbox::mojom::PageHandlerFactory, NewTabPageUI>(map);
-#endif  // BUILDFLAG(ENABLE_WEBUI_NTP) && BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_WEBUI_NTP)
-  RegisterWebUIControllerInterfaceBinder<
-      help_bubble::mojom::HelpBubbleHandlerFactory, NewTabPageUI>(map);
-#endif  // BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_WEBUI_NTP)
+  // TODO(b/502297163): Implement for Android.
 
   map->Add<tracked_element::mojom::TrackedElementHandler>(
       base::BindRepeating(&BindTrackedElementHandlerRestricted));
@@ -246,13 +217,9 @@ void PopulateChromeWebUIFrameBinders(
   PopulateChromeWebUIFrameBindersPartsAllPlatforms(map, render_frame_host);
   PopulateChromeWebUIFrameBindersPartsFeatures(map, render_frame_host);
 
-#if BUILDFLAG(IS_ANDROID)
-  PopulateChromeWebUIFrameBindersPartsAndroid(map, render_frame_host);
-#else
   PopulateChromeWebUIFrameBindersPartsDesktop(map, render_frame_host);
-#endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   RegisterWebUIControllerInterfaceBinder<discards::mojom::DetailsProvider,
                                          DiscardsUI>(map);
 
@@ -271,14 +238,10 @@ void PopulateTrustedChromeWebUIFrameInterfaceBrokers(
     content::WebUIBrowserInterfaceBrokerRegistry& registry) {
   // This function is broken up into sections based on WebUI types.
 
-#if !BUILDFLAG(IS_ANDROID)
   PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(registry);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   registry.AddGlobal<color_change_listener::mojom::PageHandler>(
       base::BindRepeating(&BindColorChangeListener));
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 
   registry.AddGlobal<tracked_element::mojom::TrackedElementHandler>(
       base::BindRepeating(&BindTrackedElementHandler));
@@ -291,14 +254,10 @@ void PopulateUntrustedChromeWebUIFrameInterfaceBrokers(
     content::WebUIBrowserInterfaceBrokerRegistry& registry) {
   PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsFeatures(registry);
 
-#if !BUILDFLAG(IS_ANDROID)
   PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(registry);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   registry.AddGlobal<color_change_listener::mojom::PageHandler>(
       base::BindRepeating(&BindColorChangeListener));
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 
   registry.AddGlobal<tracked_element::mojom::TrackedElementHandler>(
       base::BindRepeating(&BindTrackedElementHandler));

@@ -231,11 +231,9 @@
 #include "chrome/browser/web_applications/extensions/launch.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/toasts/api/toast_id.h"
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
-#endif
 
 namespace {
 
@@ -1381,9 +1379,6 @@ void CloseTab(BrowserWindowInterface* browser) {
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif
-
   ToastController* toast_controller = browser->GetFeatures().toast_controller();
   if (!toast_controller) {
     CloseSelectedTabAndRecordTabCountMetric(browser);
@@ -2076,7 +2071,6 @@ void MoveTabsToReadLater(BrowserWindowInterface* browser,
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (toast_features::IsEnabled(toast_features::kReadingListToast)) {
     // Don't show the reading list toast if the side panel is visible.
     if (browser->GetFeatures().side_panel_ui()->IsSidePanelEntryShowing(
@@ -2092,7 +2086,6 @@ void MoveTabsToReadLater(BrowserWindowInterface* browser,
       toast_controller->MaybeShowToast(std::move(params));
     }
   }
-#endif
 }
 
 bool MarkCurrentTabAsReadInReadLater(BrowserWindowInterface* browser) {
@@ -2491,22 +2484,14 @@ void ToggleDevToolsWindow(BrowserWindowInterface* browser,
 }
 
 bool CanOpenTaskManager() {
-#if !BUILDFLAG(IS_ANDROID)
   return true;
-#else
-  return false;
-#endif
 }
 
 void OpenTaskManager(BrowserWindowInterface* browser,
                      task_manager::StartAction start_action) {
-#if !BUILDFLAG(IS_ANDROID)
   base::RecordAction(UserMetricsAction("TaskManager"));
   chrome::ShowTaskManager(
       browser ? browser->GetBrowserForMigrationOnly() : nullptr, start_action);
-#else
-  NOTREACHED();
-#endif
 }
 
 void OpenFeedbackDialog(BrowserWindowInterface* browser,
@@ -2666,7 +2651,6 @@ void CopyURL(BrowserWindowInterface* browser,
   ui::ScopedClipboardWriter scw(ui::ClipboardBuffer::kCopyPaste);
   scw.WriteText(base::UTF8ToUTF16(web_contents->GetVisibleURL().spec()));
 
-#if !BUILDFLAG(IS_ANDROID)
   if (toast_features::IsEnabled(toast_features::kLinkCopiedToast)) {
     ToastController* const toast_controller =
         browser->GetFeatures().toast_controller();
@@ -2674,7 +2658,6 @@ void CopyURL(BrowserWindowInterface* browser,
       toast_controller->MaybeShowToast(ToastParams(ToastId::kLinkCopied));
     }
   }
-#endif
 }
 
 bool CanCopyUrl(BrowserWindowInterface* browser) {

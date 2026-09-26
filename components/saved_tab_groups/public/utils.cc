@@ -48,11 +48,7 @@ const int kMaxTitleChars = 64;
 }  // namespace
 
 bool AreLocalIdsPersisted() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif
 }
 
 // URL to be synced if an unsupported scheme is navigated in a saved tab group.
@@ -65,16 +61,12 @@ std::string LocalTabGroupIDToString(const LocalTabGroupID& local_tab_group_id) {
 
 std::optional<LocalTabGroupID> LocalTabGroupIDFromString(
     const std::string& serialized_local_tab_group_id) {
-#if BUILDFLAG(IS_ANDROID)
-  return base::Token::FromString(serialized_local_tab_group_id);
-#else
   auto token = base::Token::FromString(serialized_local_tab_group_id);
   if (!token.has_value()) {
     return std::nullopt;
   }
 
   return tab_groups::TabGroupId::FromRawToken(token.value());
-#endif
 }
 
 bool IsURLValidForSavedTabGroups(const GURL& gurl) {

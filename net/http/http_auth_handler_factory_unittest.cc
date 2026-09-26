@@ -208,7 +208,7 @@ TEST(HttpAuthHandlerFactoryTest, DefaultFactory) {
         NetworkAnonymizationKey(), server_scheme_host_port, NetLogWithSource(),
         host_resolver.get(), &handler);
 // Note the default factory doesn't support Kerberos on Android
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_KERBEROS)
     EXPECT_THAT(rv, IsOk());
     ASSERT_FALSE(handler.get() == nullptr);
     EXPECT_EQ(HttpAuth::AUTH_SCHEME_NEGOTIATE, handler->auth_scheme());
@@ -219,7 +219,7 @@ TEST(HttpAuthHandlerFactoryTest, DefaultFactory) {
 #else
     EXPECT_THAT(rv, IsError(ERR_UNSUPPORTED_AUTH_SCHEME));
     EXPECT_TRUE(handler.get() == nullptr);
-#endif  // BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(USE_KERBEROS)
   }
 }
 
@@ -252,15 +252,15 @@ TEST(HttpAuthHandlerFactoryTest, HttpAuthUrlFilter) {
     const GURL origin;
     const char* challenge;
   } const kTestCases[] = {
-    {OK, secure_origin, "Basic realm=\"FooBar\""},
-    {ERR_UNSUPPORTED_AUTH_SCHEME, nonsecure_origin, "Basic realm=\"FooBar\""},
-    {OK, secure_origin, "Digest realm=\"FooBar\", nonce=\"xyz\""},
-    {OK, nonsecure_origin, "Digest realm=\"FooBar\", nonce=\"xyz\""},
-    {OK, secure_origin, "Ntlm"},
-    {OK, nonsecure_origin, "Ntlm"},
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
-    {OK, secure_origin, "Negotiate"},
-    {OK, nonsecure_origin, "Negotiate"},
+      {OK, secure_origin, "Basic realm=\"FooBar\""},
+      {ERR_UNSUPPORTED_AUTH_SCHEME, nonsecure_origin, "Basic realm=\"FooBar\""},
+      {OK, secure_origin, "Digest realm=\"FooBar\", nonce=\"xyz\""},
+      {OK, nonsecure_origin, "Digest realm=\"FooBar\", nonce=\"xyz\""},
+      {OK, secure_origin, "Ntlm"},
+      {OK, nonsecure_origin, "Ntlm"},
+#if BUILDFLAG(USE_KERBEROS)
+      {OK, secure_origin, "Negotiate"},
+      {OK, nonsecure_origin, "Negotiate"},
 #endif
   };
 
@@ -306,19 +306,20 @@ TEST(HttpAuthHandlerFactoryTest, BasicFactoryRespectsHTTPEnabledPref) {
     const url::SchemeHostPort scheme_host_port;
     const char* challenge;
   } const kTestCases[] = {
-    // Challenges that result in success results.
-    {OK, secure_scheme_host_port, "Basic realm=\"FooBar\""},
-    {OK, secure_scheme_host_port, "Digest realm=\"FooBar\", nonce=\"xyz\""},
-    {OK, nonsecure_scheme_host_port, "Digest realm=\"FooBar\", nonce=\"xyz\""},
-    {OK, secure_scheme_host_port, "Ntlm"},
-    {OK, nonsecure_scheme_host_port, "Ntlm"},
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
-    {OK, secure_scheme_host_port, "Negotiate"},
-    {OK, nonsecure_scheme_host_port, "Negotiate"},
+      // Challenges that result in success results.
+      {OK, secure_scheme_host_port, "Basic realm=\"FooBar\""},
+      {OK, secure_scheme_host_port, "Digest realm=\"FooBar\", nonce=\"xyz\""},
+      {OK, nonsecure_scheme_host_port,
+       "Digest realm=\"FooBar\", nonce=\"xyz\""},
+      {OK, secure_scheme_host_port, "Ntlm"},
+      {OK, nonsecure_scheme_host_port, "Ntlm"},
+#if BUILDFLAG(USE_KERBEROS)
+      {OK, secure_scheme_host_port, "Negotiate"},
+      {OK, nonsecure_scheme_host_port, "Negotiate"},
 #endif
-    // Challenges that result in error results.
-    {ERR_UNSUPPORTED_AUTH_SCHEME, nonsecure_scheme_host_port,
-     "Basic realm=\"FooBar\""},
+      // Challenges that result in error results.
+      {ERR_UNSUPPORTED_AUTH_SCHEME, nonsecure_scheme_host_port,
+       "Basic realm=\"FooBar\""},
   };
 
   for (const auto target : kTargets) {

@@ -12,26 +12,11 @@
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <sys/system_properties.h>
-
-#include "base/android/apk_info.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace metrics {
 
 // static
 AndroidMetricsHelper* AndroidMetricsHelper::GetInstance() {
-#if BUILDFLAG(IS_ANDROID)
-  char abilist32[PROP_VALUE_MAX];
-  char abilist64[PROP_VALUE_MAX];
-  static AndroidMetricsHelper instance(
-      base::android::apk_info::package_version_code(),
-      __system_property_get("ro.product.cpu.abilist32", abilist32) > 0,
-      __system_property_get("ro.product.cpu.abilist64", abilist64) > 0);
-#else
   static AndroidMetricsHelper instance("", false, false);
-#endif
   return &instance;
 }
 

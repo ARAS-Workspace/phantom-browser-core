@@ -60,7 +60,7 @@
 #include "chrome/browser/chrome_browser_application_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include "chrome/app/chrome_crash_reporter_client.h"
 #endif
 
@@ -70,20 +70,12 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/test/base/android/android_browser_test.h"
-#else
 #include "chrome/test/base/in_process_browser_test.h"
-#endif
 
 // static
 int ChromeTestSuiteRunner::RunTestSuiteInternal(ChromeTestSuite* test_suite) {
   // Browser tests are expected not to tear-down various globals.
   test_suite->DisableCheckForLeakedGlobals();
-#if BUILDFLAG(IS_ANDROID)
-  // Android browser tests run child processes as threads instead.
-  content::ContentTestSuiteBase::RegisterInProcessThreads();
-#endif
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   InstalledVersionPoller::ScopedDisableForTesting disable_polling(
       InstalledVersionPoller::MakeScopedDisableForTesting());
@@ -154,12 +146,8 @@ class BrowserTestChromeContentRendererClient
 
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID)
-ChromeTestChromeMainDelegate::ChromeTestChromeMainDelegate() = default;
-#else
 ChromeTestChromeMainDelegate::ChromeTestChromeMainDelegate()
     : ChromeMainDelegate({.exe_entry_point_ticks = base::TimeTicks::Now()}) {}
-#endif
 
 ChromeTestChromeMainDelegate::~ChromeTestChromeMainDelegate() = default;
 
@@ -199,15 +187,9 @@ std::optional<int> ChromeTestChromeMainDelegate::PostEarlyInitialization(
         chrome_content_browser_client_->startup_data()
             ->chrome_feature_list_creator();
     PrefService* const local_state = chrome_feature_list_creator->local_state();
-#if BUILDFLAG(IS_ANDROID)
-    if (auto* test_instance = AndroidBrowserTest::GetCurrent()) {
-      test_instance->SetUpLocalStatePrefService(local_state);
-    }
-#else
     if (auto* test_instance = InProcessBrowserTest::GetCurrent()) {
       test_instance->SetUpLocalStatePrefService(local_state);
     }
-#endif
   }
   return result;
 }
@@ -225,25 +207,20 @@ void ChromeTestChromeMainDelegate::CreateThreadPool(std::string_view name) {
   sampling_profiler::ThreadProfiler::SetClient(
       std::make_unique<ChromeThreadProfilerClient>());
 
-// `ChromeMainDelegateAndroid::PreSandboxStartup` creates the profiler a little
-// later.
-#if !BUILDFLAG(IS_ANDROID)
-  // Start the sampling profiler as early as possible - namely, once the thread
-  // pool has been created.
+  // `ChromeMainDelegateAndroid::PreSandboxStartup` creates the profiler a
+  // little later. Start the sampling profiler as early as possible - namely,
+  // once the thread pool has been created.
   sampling_profiler_ = std::make_unique<MainThreadStackSamplingProfiler>();
-#endif
 }
 
 bool ChromeTestChromeMainDelegate::IsInitFeatureListEarly() {
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 content::ContentMainDelegate*
 ChromeTestLauncherDelegate::CreateContentMainDelegate() {
   return new ChromeTestChromeMainDelegate();
 }
-#endif
 
 void ChromeTestLauncherDelegate::PreSharding() {
 }
@@ -276,7 +253,7 @@ int LaunchChromeTests(size_t parallel_jobs,
   // function, which are now redundant.
   base::PoissonAllocationSampler::Init();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   ChromeCrashReporterClient::Create();
 #endif
 

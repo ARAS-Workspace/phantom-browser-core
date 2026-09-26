@@ -25,15 +25,9 @@
 #include "extensions/common/constants.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-using PlatformReportingDelegateFactory =
-    enterprise_reporting::ReportingDelegateFactoryAndroid;
-#else
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
 using PlatformReportingDelegateFactory =
     enterprise_reporting::ReportingDelegateFactoryDesktop;
-#endif
 
 namespace enterprise_reporting {
 

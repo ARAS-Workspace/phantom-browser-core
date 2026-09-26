@@ -450,35 +450,6 @@ std::unique_ptr<VulkanImageRepresentation> SharedImageManager::ProduceVulkan(
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<LegacyOverlayImageRepresentation>
-SharedImageManager::ProduceLegacyOverlay(const Mailbox& mailbox,
-                                         MemoryTypeTracker* tracker) {
-  CALLED_ON_VALID_THREAD();
-
-  AutoLock autolock(this);
-  auto* backing = GetBacking(mailbox);
-  if (!backing) {
-    LOG(ERROR)
-        << "SharedImageManager::ProduceLegacyOverlay: Trying to Produce a "
-           "Legacy Overlay representation from a non-existent mailbox.";
-    return nullptr;
-  }
-
-  EnforceSharedImageUsage(backing, {SHARED_IMAGE_USAGE_SCANOUT});
-  auto representation = backing->ProduceLegacyOverlay(this, tracker);
-  if (!representation) {
-    LOG(ERROR)
-        << "SharedImageManager::ProduceLegacyOverlay: Trying to produce a "
-           "Legacy Overlay representation from an incompatible backing: "
-        << backing->GetName();
-    return nullptr;
-  }
-
-  return representation;
-}
-#endif
-
 std::optional<SharedImageUsageSet> SharedImageManager::GetUsageForMailbox(
     const Mailbox& mailbox) {
   AutoLock autolock(this);
@@ -613,8 +584,6 @@ scoped_refptr<gfx::NativePixmap> SharedImageManager::GetNativePixmap(
 
 bool SharedImageManager::SupportsScanoutImages() {
 #if BUILDFLAG(IS_APPLE)
-  return true;
-#elif BUILDFLAG(IS_ANDROID)
   return true;
 #elif BUILDFLAG(IS_LINUX)
   return supports_overlays_on_ozone_;

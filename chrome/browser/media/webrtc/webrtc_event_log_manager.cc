@@ -117,11 +117,7 @@ class PeerConnectionTrackerProxyImpl
 // necessarily for any given user profile.
 // Certain platforms (mobile) are blocked from remote-bound logging.
 bool IsRemoteLoggingFeatureEnabled() {
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
-  bool enabled = false;
-#else
   bool enabled = true;
-#endif
 
   VLOG(1) << "WebRTC remote-bound event logging "
           << (enabled ? "enabled" : "disabled") << ".";
@@ -515,13 +511,9 @@ WebRtcEventLogManager::CreateRemoteLogFileWriterFactory() {
   if (remote_log_file_writer_factory_for_testing_) {
     return std::move(remote_log_file_writer_factory_for_testing_);
   } else {
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
     return std::make_unique<GzippedLogFileWriterFactory>(
         std::make_unique<GzipLogCompressorFactory>(
             std::make_unique<DefaultGzippedSizeEstimator::Factory>()));
-#else
-    return std::make_unique<BaseLogFileWriterFactory>();
-#endif
   }
 }
 

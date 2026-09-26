@@ -16,7 +16,7 @@ BASE_FEATURE(kLazyUpdateTranslateModel, base::FEATURE_ENABLED_BY_DEFAULT);
 bool IsTFLiteLanguageDetectionEnabled() {
 // The feature is explicitly disabled on WebView.
 // TODO(crbug.com/40819484): Enable the feature on WebView.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   return true;
 #else
   return false;

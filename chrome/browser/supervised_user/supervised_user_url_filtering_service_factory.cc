@@ -18,11 +18,7 @@
 #include "components/supervised_user/core/browser/supervised_user_url_filtering_service.h"
 #include "content/public/browser/storage_partition.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/supervised_user/android/supervised_user_service_platform_delegate.h"
-#else
 #include "chrome/browser/supervised_user/desktop/supervised_user_service_platform_delegate.h"
-#endif
 
 namespace supervised_user {
 

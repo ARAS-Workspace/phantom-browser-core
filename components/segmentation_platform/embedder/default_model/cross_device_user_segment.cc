@@ -123,12 +123,6 @@ void CrossDeviceUserSegment::ExecuteModelWithInput(
 // calculation.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   desktop_count -= 1;
-#elif BUILDFLAG(IS_ANDROID)
-  if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET) {
-    tablet_count -= 1;
-  } else {
-    phone_count -= 1;
-  }
 #endif
 
   const bool multi_device_active = inputs[kFeatureDeviceCount] >= 2;

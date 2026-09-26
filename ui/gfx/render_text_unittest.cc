@@ -4780,7 +4780,6 @@ TEST_F(RenderTextTest, MoveLeftRightByWordInThaiText) {
 
 // TODO(crbug.com/40585744): Chinese and Japanese tokenization doesn't work on
 // mobile.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(RenderTextTest, MoveLeftRightByWordInChineseText) {
   RenderText* render_text = GetRenderText();
   // zh-Hans-CN: 我们去公园玩, broken to 我们|去|公园|玩.
@@ -4809,7 +4808,6 @@ TEST_F(RenderTextTest, MoveLeftRightByWordInChineseText) {
   render_text->MoveCursor(WORD_BREAK, CURSOR_LEFT, SELECTION_NONE);
   EXPECT_EQ(0U, render_text->cursor_position());
 }
-#endif
 
 // Test the correct behavior of undirected selections: selections where the
 // "end" of the selection that holds the cursor is only determined after the
@@ -6935,7 +6933,6 @@ TEST_F(RenderTextTest, HarfBuzz_BreakRunsByEmojiVariationSelectors) {
   EXPECT_EQ(1 * kGlyphWidth, render_text->GetUpdatedCursorBounds().x());
 
   // TODO(crbug.com/40585824): make this work on Android.
-#if !BUILDFLAG(IS_ANDROID)
   // Jump over the telephone: two codepoints, but a single glyph.
   render_text->MoveCursor(CHARACTER_BREAK, CURSOR_RIGHT, SELECTION_NONE);
   EXPECT_EQ(gfx::Range(3, 3), render_text->selection());
@@ -6949,7 +6946,6 @@ TEST_F(RenderTextTest, HarfBuzz_BreakRunsByEmojiVariationSelectors) {
   render_text->MoveCursor(CHARACTER_BREAK, CURSOR_RIGHT, SELECTION_NONE);
   EXPECT_EQ(gfx::Range(4, 4), render_text->selection());
   EXPECT_EQ(3 * kGlyphWidth, render_text->GetUpdatedCursorBounds().x());
-#endif
 }
 
 // Verifies that text-default emoji (codepoints with the `Emoji` property but
@@ -6995,10 +6991,6 @@ bool TypefaceMayRenderColorEmojiForTest(SkTypeface* typeface) {
     return true;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // No platform color-emoji font to match by name on these platforms.
-  return false;
-#else
   // Some color-emoji typefaces (notably Segoe UI Emoji via DirectWrite) don't
   // expose a color table to Skia, so fall back to matching the known platform
   // family names. Checking all of them regardless of platform keeps this
@@ -7011,7 +7003,6 @@ bool TypefaceMayRenderColorEmojiForTest(SkTypeface* typeface) {
                                           "Apple Color Emoji") ||
          base::EqualsCaseInsensitiveASCII(family_name.c_str(),
                                           "Noto Color Emoji");
-#endif
 }
 
 // The emoji pre-pass in RenderTextHarfBuzz::ShapeRuns must route bare
@@ -7328,11 +7319,6 @@ TEST_F(RenderTextTest, EmojiFlagGlyphCount) {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE)
   // On Linux and macOS, the flags should be found, so two glyphs result.
   EXPECT_EQ(2u, run_list->runs()[0]->shape.glyph_count);
-#elif BUILDFLAG(IS_ANDROID)
-  // It seems that some versions of android support the flags. Older versions
-  // don't support it.
-  EXPECT_TRUE(2u == run_list->runs()[0]->shape.glyph_count ||
-              4u == run_list->runs()[0]->shape.glyph_count);
 #else
   // Elsewhere, the flags are not found, so each surrogate pair gets a
   // placeholder glyph. Eventually, all platforms should have 2 glyphs.
@@ -7460,7 +7446,6 @@ TEST_F(RenderTextTest, StringFitsOwnWidth) {
 }
 
 // TODO(crbug.com/40585825): Figure out why this fails on Android.
-#if !BUILDFLAG(IS_ANDROID)
 // Ensure that RenderText examines all of the fonts in its FontList before
 // falling back to other fonts.
 TEST_F(RenderTextTest, HarfBuzz_FontListFallback) {
@@ -7482,13 +7467,12 @@ TEST_F(RenderTextTest, HarfBuzz_FontListFallback) {
   ASSERT_EQ(static_cast<size_t>(1), spans.size());
   EXPECT_EQ(kSymbolFontName, spans[0].first.GetFontName());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Ensure that the fallback fonts offered by GetFallbackFonts() are tried. Note
 // this test assumes the font "Arial" doesn't provide a unicode glyph for a
 // particular character, and that there is a system fallback font which does.
 // TODO(msw): Fallback doesn't find a glyph on Linux and Android.
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_LINUX)
 TEST_F(RenderTextTest, HarfBuzz_UnicodeFallback) {
   RenderTextHarfBuzz* render_text = GetRenderText();
   render_text->SetFontList(FontList("Arial, 12px"));
@@ -7499,7 +7483,7 @@ TEST_F(RenderTextTest, HarfBuzz_UnicodeFallback) {
   ASSERT_EQ(1U, run_list->size());
   EXPECT_EQ(0U, run_list->MissingGlyphCount());
 }
-#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_LINUX)
 
 // Ensure that the fallback fonts offered by GetFallbackFont() support glyphs
 // for different languages.
@@ -7611,40 +7595,7 @@ INSTANTIATE_TEST_SUITE_P(FallbackFontComplexTextCases,
 // block. These tests work on Windows and Mac default fonts installation.
 // On other platforms, the fonts are mock (see test_fonts).
 const FallbackFontCase kCommonScriptCases[] = {
-#if BUILDFLAG(IS_ANDROID)
-    {"common00", u"\u2497\uff04\u277c\u21b6\u2076\u21e4\u2068\u21b3"},
-    {"common01", u"\u2663\u2466\u338e\u226b\u2734\u21be\u3389\u00ab"},
-    {"common02", u"\u2062\u2197\u3392\u2681\u33be\u206d\ufe10\ufe34"},
-    {"common03", u"\u02db\u00b0\u02d3\u2745\u33d1\u21e4\u24e4\u33d6"},
-    {"common04", u"\u21da\u261f\u26a1\u2586\u27af\u2560\u21cd\u25c6"},
-    {"common05", u"\ufe51\uff17\u0027\u21fd\u24de\uff5e\u2606\u251f"},
-    {"common06", u"\u2493\u2466\u21fc\u226f\u202d\u21a9\u0040\u265d"},
-    {"common07", u"\u2103\u255a\u2153\u26be\u27ac\u222e\u2490\u21a4"},
-    {"common08", u"\u270b\u2486\u246b\u263c\u27b6\u21d9\u219d\u25a9"},
-    {"common09", u"\u002d\u2494\u25fd\u2321\u2111\u2511\u00d7\u2535"},
-    {"common10", u"\u2523\u203e\u25b2\ufe18\u2499\u2229\ufd3e\ufe16"},
-    {"common11", u"\u2133\u2716\u273f\u2064\u2248\u005c\u265f\u21e6"},
-    {"common12", u"\u2060\u246a\u231b\u2726\u25bd\ufe40\u002e\u25ca"},
-    {"common13", u"\ufe39\u24a2\ufe18\u254b\u249c\u3396\ua71f\u2466"},
-    {"common14", u"\u21b8\u2236\u251a\uff11\u2077\u0035\u27bd\u2013"},
-    {"common15", u"\u2668\u2551\u221a\u02bc\u2741\u2649\u2192\u00a1"},
-    {"common16", u"\u2211\u21ca\u24dc\u2536\u201b\u21c8\u2530\u25fb"},
-    {"common17", u"\u231a\u33d8\u2934\u27bb\u2109\u23ec\u20a9\u3000"},
-    {"common18", u"\u2069\u205f\u33d3\u2466\u24a1\u24dd\u21ac\u21e3"},
-    {"common19", u"\u2737\u219a\u21f1\u2285\u226a\u00b0\u27b2\u2746"},
-    {"common20", u"\u264f\u2539\u2202\u264e\u2548\u2530\u2111\u2007"},
-    {"common21", u"\u2799\u0035\u25e4\u265b\u24e2\u2044\u222b\u0021"},
-    {"common22", u"\u2728\u00a2\u2533\ufe43\u33c9\u27a2\u02f9\u005d"},
-    {"common23", u"\ufe68\u256c\u25b6\u276c\u2771\u33c4\u2712\u24b3"},
-    {"common24", u"\ufe5d\ufe31\ufe3d\u205e\u2512\u33b8\u272b\ufe4f"},
-    {"common25", u"\u24e7\u25fc\u2582\u2743\u2010\u2474\u2262\u251a"},
-    {"common26", u"\u2020\u211c\u24b4\u33c7\u2007\uff0f\u267f\u00b4"},
-    {"common27", u"\u266c\u3399\u2570\u33a4\u276e\u00a8\u2506\u24dc"},
-    {"common28", u"\u2202\ufe43\u2511\u2191\u339a\u33b0\u02d7\u2473"},
-    {"common29", u"\u2517\u2297\u2762\u2460\u25bd\u24a9\u21a7\ufe64"},
-    {"common30", u"\u2105\u2722\u275d\u249c\u21a2\u2590\u2260\uff5d"},
-    {"common31", u"\u33ba\u21c6\u2706\u02cb\ufe64\u02e6\u0374\u2493"},
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
     {"common00", u"\u2153\u24e0\u2109\u02f0\u2a8f\u25ed\u02c5\u2716"},
     {"common01", u"\u02f0\u208c\u2203\u2518\u2067\u2270\u21f1\ufe66"},
     {"common02", u"\u2686\u2585\u2b15\u246f\u23e3\u21b4\u2394\ufe31"},
@@ -7927,7 +7878,7 @@ TEST_F(RenderTextTest, SubpixelRenderingSuppressed) {
   render_text->SetText(u"x");
 
   DrawVisualText();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // On Linux, whether subpixel AA is supported is determined by the platform
   // FontConfig. Force it into a particular style after computing runs. Other
   // platforms use a known default FontRenderParams from a static local.
@@ -7942,7 +7893,7 @@ TEST_F(RenderTextTest, SubpixelRenderingSuppressed) {
 
   render_text->set_subpixel_rendering_suppressed(true);
   DrawVisualText();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // For Linux, runs shouldn't be re-calculated, and the suppression of the
   // SUBPIXEL_RENDERING_RGB set above should now take effect. But, after
   // checking, apply the override anyway to be explicit that it is suppressed.

@@ -90,9 +90,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/sync/test/integration/sync_test_utils_android.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -102,7 +99,6 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "components/trusted_vault/command_line_switches.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
@@ -140,7 +136,6 @@ int GetNumClients(SyncTest::TestType test_type) {
 
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 class SyncTest::ClosedBrowserObserver : public BrowserCollectionObserver {
  public:
   using OnBrowserRemovedCallback =
@@ -162,7 +157,6 @@ class SyncTest::ClosedBrowserObserver : public BrowserCollectionObserver {
       observation_{this};
   OnBrowserRemovedCallback browser_remove_callback_;
 };
-#endif
 
 SyncTest::SyncTest(TestType test_type)
     : test_type_(test_type),
@@ -189,9 +183,6 @@ void SyncTest::SetUp() {
     }
     case IN_PROCESS_FAKE_SERVER: {
       ASSERT_TRUE(embedded_test_server()->InitializeAndListen());
-#if BUILDFLAG(IS_ANDROID)
-      sync_test_utils_android::SetUpFakeAuthForTesting();
-#endif
       break;
     }
   }
@@ -216,18 +207,6 @@ void SyncTest::PostRunTestOnMainThread() {
   url_loader_interceptor_.reset();
 
   PlatformBrowserTest::PostRunTestOnMainThread();
-
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/368091420): Consider moving into SyncSigninDelegateAndroid.
-  switch (server_type_) {
-    case EXTERNAL_LIVE_SERVER:
-      sync_test_utils_android::ShutdownLiveAuthForTesting();
-      break;
-    case IN_PROCESS_FAKE_SERVER:
-      sync_test_utils_android::TearDownFakeAuthForTesting();
-      break;
-  }
-#endif
 }
 
 void SyncTest::CreatedBrowserMainParts(content::BrowserMainParts* parts) {
@@ -338,9 +317,8 @@ void SyncTest::PostCreateThreads() {
 bool SyncTest::CreateProfile(int index) {
   base::FilePath profile_path;
 
-// For Android, we don't create profile because Clank doesn't support
-// multiple profiles.
-#if !BUILDFLAG(IS_ANDROID)
+  // For Android, we don't create profile because Clank doesn't support
+  // multiple profiles.
   base::ScopedAllowBlockingForTesting allow_blocking;
 
   base::FilePath user_data_dir;
@@ -350,17 +328,11 @@ bool SyncTest::CreateProfile(int index) {
   // PRE_ tests (i.e. tests that span browser restarts) can reuse the same
   // directory and carry over state.
   profile_path = user_data_dir.Append(GetProfileBaseName(index));
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-  CHECK_EQ(index, 0);
-  Profile* profile = ProfileManager::GetLastUsedProfile();
-#else  // BUILDFLAG(IS_ANDROID)
   Profile* profile = nullptr;
   if (!profile) {
     profile = g_browser_process->profile_manager()->GetProfile(profile_path);
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   InitializeProfile(index, profile);
 
@@ -388,7 +360,6 @@ std::vector<raw_ptr<Profile, VectorExperimental>> SyncTest::GetAllProfiles() {
   return profiles;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 Browser* SyncTest::GetBrowser(int index) {
   CHECK(!browsers_.empty()) << "SetupClients() has not yet been called.";
   CHECK(index >= 0 && index < static_cast<int>(browsers_.size()))
@@ -427,7 +398,6 @@ void SyncTest::OnBrowserRemoved(Browser* browser) {
     }
   }
 }
-#endif
 
 SyncServiceImplHarness* SyncTest::GetClient(int index) {
   return const_cast<SyncServiceImplHarness*>(
@@ -483,7 +453,6 @@ bool SyncTest::SetupClients() {
   previous_profile_ =
       g_browser_process->profile_manager()->GetLastUsedProfile();
 
-#if !BUILDFLAG(IS_ANDROID)
   CHECK(browsers_.empty());
 
   // Create the browser observer now that GlobalBrowserCollection is available.
@@ -494,7 +463,6 @@ bool SyncTest::SetupClients() {
         std::make_unique<ClosedBrowserObserver>(base::BindRepeating(
             &SyncTest::OnBrowserRemoved, base::Unretained(this)));
   }
-#endif
 
   // Create the required number of sync profiles, browsers and clients.
   profiles_.resize(num_clients_);
@@ -531,7 +499,6 @@ void SyncTest::InitializeProfile(int index, Profile* profile) {
   profiles_[index] = profile;
   profile->AddObserver(this);
 
-#if !BUILDFLAG(IS_ANDROID)
   browsers_.push_back(
       CreateBrowserWindow(
           BrowserWindowCreateParams(profile, /*from_user_gesture=*/true))
@@ -546,7 +513,6 @@ void SyncTest::InitializeProfile(int index, Profile* profile) {
   // initialize or produce frames (e.g., on Wayland headless bots), which
   // can cause tests relying on hit test data or visual state to time out.
   browser->GetWindow()->Show();
-#endif
 
   SyncServiceImplHarness::SigninType signin_type =
       server_type_ == EXTERNAL_LIVE_SERVER
@@ -667,13 +633,6 @@ bool SyncTest::SetupSync(SyncTestAccount account,
 bool SyncTest::SetupSyncWithMode(SetupSyncMode setup_mode,
                                  SyncWaitCondition wait_condition,
                                  SyncTestAccount account) {
-#if BUILDFLAG(IS_ANDROID)
-  // For Android, currently the framework only supports one client.
-  // The client uses the default profile.
-  CHECK(num_clients_ == 1)
-      << "For Android, currently it only supports one client.";
-#endif
-
   base::ScopedAllowBlockingForTesting allow_blocking;
 
   if (!SetupSyncInternal(setup_mode, wait_condition, account,
@@ -686,13 +645,6 @@ bool SyncTest::SetupSyncWithMode(SetupSyncMode setup_mode,
 }
 
 bool SyncTest::SignIn(SyncTestAccount account) {
-#if BUILDFLAG(IS_ANDROID)
-  // For Android, currently the framework only supports one client.
-  // The client uses the default profile.
-  CHECK(num_clients_ == 1)
-      << "For Android, currently it only supports one client.";
-#endif
-
   base::ScopedAllowBlockingForTesting allow_blocking;
 
   if (!SetupSyncInternal(SetupSyncMode::kSyncTransportOnly,
@@ -747,42 +699,6 @@ void SyncTest::TearDownOnMainThread() {
     // Profile could be removed earlier.
     if (profile) {
       profile->RemoveObserver(this);
-
-#if BUILDFLAG(IS_ANDROID)
-      // In Android browser tests, the Profile and thus the SyncService does not
-      // get shut down in an orderly fashion. This can interfere with subsequent
-      // tests. To work around that, produce an auth error here, which results
-      // in the engine being shut down. (Note that auth errors are not
-      // persisted, so this does not interfere with PRE_ tests.)
-      signin::IdentityManager* identity_manager =
-          IdentityManagerFactory::GetForProfile(profile);
-      CoreAccountId primary_account =
-          identity_manager->GetPrimaryAccountId(signin::ConsentLevel::kSignin);
-      if (!primary_account.empty()) {
-        signin::UpdatePersistentErrorOfRefreshTokenForAccount(
-            identity_manager, primary_account,
-            GoogleServiceAuthError::FromInvalidGaiaCredentialsReason(
-                GoogleServiceAuthError::InvalidGaiaCredentialsReason::
-                    CREDENTIALS_REJECTED_BY_CLIENT));
-      }
-
-      // On Android, the Profile does not get shut down in an orderly fashion.
-      // In PRE_ tests, ensure that all relevant state is persisted to disk (in
-      // non-PRE_ tests, it doesn't matter since nothing will use it again).
-      if (content::IsPreTest()) {
-        base::test::TestFuture<void> prefs_write_done;
-        profile->GetPrefs()->CommitPendingWrite(prefs_write_done.GetCallback());
-        ASSERT_TRUE(prefs_write_done.Wait());
-
-        BookmarkModelFactory::GetForBrowserContext(profile)
-            ->CommitPendingWriteForTest();
-
-        fake_server::FakeServer* fake_server = GetFakeServer();
-        if (fake_server) {
-          fake_server->FlushToDisk();
-        }
-      }
-#endif  // BUILDFLAG(IS_ANDROID)
     }
   }
 
@@ -794,7 +710,6 @@ void SyncTest::TearDownOnMainThread() {
   // TODO(crbug.com/40798524): There are various other Profile-related members
   // around like profile_to_*_map_ - those should probably be cleaned up too.
 
-#if !BUILDFLAG(IS_ANDROID)
   // Closing all browsers created by this test. The calls here block until
   // they are closed. Other browsers created outside SyncTest setup should be
   // closed by the creator of that browser.
@@ -804,12 +719,9 @@ void SyncTest::TearDownOnMainThread() {
     }
   }
   browsers_.clear();
-#endif
 
-// Clean up the browser observer.
-#if !BUILDFLAG(IS_ANDROID)
+  // Clean up the browser observer.
   browser_list_observer_.reset();
-#endif
 
   PlatformBrowserTest::TearDownOnMainThread();
 }
@@ -825,9 +737,7 @@ void SyncTest::OnProfileWillBeDestroyed(Profile* profile) {
     CheckForDataTypeFailures(/*client_index=*/index);
     profiles_[index] = nullptr;
     clients_[index].reset();
-#if !BUILDFLAG(IS_ANDROID)
     CHECK(!browsers_[index]);
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 }
 
@@ -861,14 +771,10 @@ bool SyncTest::ResetSyncForPrimaryAccount() {
   // For external server testing, we need to have a clean account. The following
   // code will sign in one chrome browser, get the client id and access token,
   // then clean the server data.
-#if BUILDFLAG(IS_ANDROID)
-  Profile& profile = CHECK_DEREF(ProfileManager::GetLastUsedProfile());
-#else   // BUILDFLAG(IS_ANDROID)
   base::ScopedAllowBlockingForTesting allow_blocking;
   Profile& profile = profiles::testing::CreateProfileSync(
       g_browser_process->profile_manager(),
       g_browser_process->profile_manager()->GenerateNextProfileDirectoryPath());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   std::unique_ptr<SyncServiceImplHarness> client =
       SyncServiceImplHarness::Create(
@@ -989,22 +895,6 @@ bool SyncTest::WaitForAsyncChangesToBeCommitted(size_t profile_index) const {
   // CommittedAllNudgedChangesChecker will wait for all the local changes to be
   // committed, it doesn't cover all the cases.
   if (server_type_ != EXTERNAL_LIVE_SERVER) {
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, default about:blank page is loaded by default. Wait for
-    // Session to be committed to prevent unexpected commit requests during
-    // test. It shouldn't be called when custom passphrase is enabled because
-    // SessionHierarchyMatchChecker doesn't support custom passphrases.
-    if (GetSyncService(profile_index)
-            ->GetUserSettings()
-            ->GetSelectedTypes()
-            .Has(syncer::UserSelectableType::kTabs) &&
-        !SessionHierarchyMatchChecker(
-             fake_server::SessionsHierarchy({{url::kAboutBlankURL}}),
-             GetSyncService(profile_index), GetFakeServer())
-             .Wait()) {
-      return false;
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // Wait for any other locally nudged changes to be committed.
@@ -1055,12 +945,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   static_assert(67 == syncer::GetNumDataTypes(),
                 "Add new types below if they can run in transport mode");
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, `kReplaceSyncPromosWithSignInPromos` has been enabled by
-  // default for a long time, so it is not expected to be exercised in tests.
-  CHECK(syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Only some types will run by default in transport mode (i.e. without their
   // own separate opt-in).
   syncer::DataTypeSet allowed_types = {syncer::AUTOFILL_WALLET_CREDENTIAL,
@@ -1078,16 +962,12 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   if (base::FeatureList::IsEnabled(
           switches::kEnablePreferencesAccountStorage)) {
     allowed_types.Put(syncer::PRIORITY_PREFERENCES);
-#if BUILDFLAG(IS_ANDROID)
-    allowed_types.Put(syncer::PREFERENCES);
-#else
     // On desktop, support for transport mode for preferences is implemented
     // alongside that of search engines.
     if (base::FeatureList::IsEnabled(
             syncer::kSeparateLocalAndAccountSearchEngines)) {
       allowed_types.Put(syncer::PREFERENCES);
     }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
   if (base::FeatureList::IsEnabled(
           switches::kSyncEnableBookmarksInTransportMode)) {
@@ -1178,19 +1058,11 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
           syncer::kSeparateLocalAndAccountSearchEngines) &&
       // Support for transport mode for search engines is implemented alongside
       // that of preferences.
-      base::FeatureList::IsEnabled(switches::kEnablePreferencesAccountStorage)
-#if BUILDFLAG(IS_ANDROID)
-      && base::FeatureList::IsEnabled(syncer::kSyncSearchEnginesAndroidLFF)
-#endif
-  ) {
+      base::FeatureList::IsEnabled(
+          switches::kEnablePreferencesAccountStorage)) {
     allowed_types.Put(syncer::SEARCH_ENGINES);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(syncer::kWebApkBackupAndRestoreBackend)) {
-    allowed_types.Put(syncer::WEB_APKS);
-  }
-#else   // BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(syncer::kSeparateLocalAndAccountThemes)) {
     allowed_types.Put(syncer::THEMES);
   }
@@ -1199,7 +1071,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   allowed_types.Put(syncer::INCOMING_PASSWORD_SHARING_INVITATION);
   allowed_types.Put(syncer::OUTGOING_PASSWORD_SHARING_INVITATION);
   allowed_types.Put(syncer::WEBAUTHN_CREDENTIAL);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(

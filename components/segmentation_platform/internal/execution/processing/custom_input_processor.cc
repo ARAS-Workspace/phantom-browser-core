@@ -21,10 +21,6 @@
 #include "components/segmentation_platform/public/local_state_helper.h"
 #include "components/segmentation_platform/public/proto/model_metadata.pb.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/segmentation_platform/internal/android/execution/processing/custom_device_utils.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace segmentation_platform::processing {
 
 namespace {
@@ -339,13 +335,7 @@ bool CustomInputProcessor::AddDevicePPI(
   if (custom_input.tensor_length() != 1) {
     return false;
   }
-#if BUILDFLAG(IS_ANDROID)
-  float device_ppi = CustomDeviceUtils::GetDevicePPI();
-  out_tensor.emplace_back(device_ppi);
-  return true;
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool CustomInputProcessor::AddRandom(const proto::CustomInput& custom_input,

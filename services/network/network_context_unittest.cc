@@ -222,10 +222,6 @@
 #include "services/network/public/mojom/p2p_trusted.mojom.h"
 #endif  // BUILDFLAG(IS_P2P_ENABLED)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace network {
 
 namespace {
@@ -926,91 +922,13 @@ TEST_F(NetworkContextTest, EnableBrotli) {
 // Confirms that when NetworkContextParams.bound_network is set, the
 // NetworkContext properly targets that network.
 TEST_F(NetworkContextTest, NetworkBoundNetworkContext) {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_MARSHMALLOW) {
-    GTEST_SKIP()
-        << "bound_network is supported starting from Android Marshmallow";
-  }
-
-  // The actual network handle doesn't really matter, this test just wants to
-  // confirm that it is correctly passed down to the owned URLRequestContext.
-  constexpr net::handles::NetworkHandle network = 2;
-  auto scoped_mock_network_change_notifier =
-      std::make_unique<net::test::ScopedMockNetworkChangeNotifier>();
-  auto* mock_ncn =
-      scoped_mock_network_change_notifier->mock_network_change_notifier();
-  mock_ncn->ForceNetworkHandlesSupported();
-
-  mojom::NetworkContextParamsPtr context_params =
-      CreateNetworkContextParamsForTesting();
-  context_params->bound_network = network;
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(std::move(context_params));
-
-  EXPECT_EQ(network_context->url_request_context()->bound_network(), network);
-  EXPECT_EQ(network_context->url_request_context()
-                ->host_resolver()
-                ->GetTargetNetworkForTesting(),
-            network);
-  EXPECT_EQ(network_context->url_request_context()
-                ->host_resolver()
-                ->GetManagerForTesting()
-                ->target_network_for_testing(),
-            network);
-#else   // !BUILDFLAG(IS_ANDROID)
   GTEST_SKIP() << "bound_network is supported only on Android";
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Confirms that URLLoaderFactories created with target_network set in
 // URLLoaderFactoryParams correctly target that network.
 TEST_F(NetworkContextTest, URLLoaderFactoryWithTargetNetwork) {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_MARSHMALLOW) {
-    GTEST_SKIP()
-        << "bound_network is supported starting from Android Marshmallow";
-  }
-
-  // Use a normal unbound NetworkContext.
-  mojom::NetworkContextParamsPtr context_params =
-      CreateNetworkContextParamsForTesting();
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(std::move(context_params));
-
-  EXPECT_EQ(network_context->url_request_context()->bound_network(),
-            net::handles::kInvalidNetworkHandle);
-
-  constexpr net::handles::NetworkHandle network = 2;
-  auto scoped_mock_network_change_notifier =
-      std::make_unique<net::test::ScopedMockNetworkChangeNotifier>();
-  auto* mock_ncn =
-      scoped_mock_network_change_notifier->mock_network_change_notifier();
-  mock_ncn->ForceNetworkHandlesSupported();
-  const size_t start_num_url_loader_factories =
-      network_context->num_url_loader_factories_for_testing();
-
-  mojo::Remote<mojom::URLLoaderFactory> loader_factory;
-  mojom::URLLoaderFactoryParamsPtr params =
-      mojom::URLLoaderFactoryParams::New();
-  params->process_id = OriginatingProcessId::browser();
-  params->target_network = network;
-  network_context->CreateURLLoaderFactory(
-      loader_factory.BindNewPipeAndPassReceiver(), std::move(params));
-  EXPECT_TRUE(loader_factory.is_bound());
-  EXPECT_TRUE(loader_factory.is_connected());
-  // To be on the safe side, confirm that the NetworkContext is aware of the
-  // new URLLoaderFactory that has just been created.
-  EXPECT_EQ(network_context->num_url_loader_factories_for_testing() -
-                start_num_url_loader_factories,
-            1u);
-  EXPECT_EQ(
-      network_context->CountURLLoaderFactoriesBoundToNetworkForTesting(network),
-      1u);
-#else   // !BUILDFLAG(IS_ANDROID)
   GTEST_SKIP() << "bound_network is supported only on Android";
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(NetworkContextTest, UnhandedProtocols) {
@@ -1800,132 +1718,6 @@ TEST_F(NetworkContextTest, DiskCacheSize) {
   histogram_tester.ExpectUniqueSample("HttpCache.MaxFileSizeOnInit",
                                       max_file_size / 1024, 1);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(NetworkContextTest, SetHttpCacheMaxSizeAfterBackendInit) {
-  mojom::NetworkContextParamsPtr context_params =
-      CreateNetworkContextParamsForTesting();
-  // Explicitly clear file_paths to force in-memory cache.
-  context_params->file_paths.reset();
-  context_params->http_cache_enabled = true;
-
-  const base::ByteSize kInitialSize = base::MiBU(20);
-  const base::ByteSize kNewSize = base::MiBU(10);
-  context_params->http_cache_max_size =
-      base::checked_cast<int32_t>(kInitialSize.InBytes());
-
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(std::move(context_params));
-
-  disk_cache::Backend* backend = WaitForCacheBackend(*network_context);
-  ASSERT_TRUE(backend);
-
-  // Verify initial size.
-  EXPECT_EQ(kInitialSize, backend->GetMaxBytesForTesting());
-
-  // Call the Mojo endpoint.
-  network_context->SetHttpCacheMaxSize(kNewSize, false);
-
-  EXPECT_TRUE(base::test::RunUntil(
-      [&]() { return backend->GetMaxBytesForTesting() == kNewSize; }));
-
-  // Verify that setting size to 0 doesn't crash.
-  // (It could result in any size.)
-  network_context->SetHttpCacheMaxSize(base::ByteSize(0), true);
-  task_environment_.RunUntilIdle();
-}
-
-TEST_F(NetworkContextTest, SetHttpCacheMaxSizeBeforeUnforcedBackendInit) {
-  mojom::NetworkContextParamsPtr context_params =
-      CreateNetworkContextParamsForTesting();
-  // Explicitly clear file_paths to force in-memory cache.
-  context_params->file_paths.reset();
-  context_params->http_cache_enabled = true;
-
-  const base::ByteSize kInitialSize = base::MiBU(20);
-  const base::ByteSize kNewSize = base::MiBU(10);
-  context_params->http_cache_max_size =
-      base::checked_cast<int32_t>(kInitialSize.InBytes());
-
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(std::move(context_params));
-
-  // There should not be a backend yet.
-  ASSERT_EQ(nullptr, network_context->url_request_context()
-                         ->http_transaction_factory()
-                         ->GetCache()
-                         ->GetCurrentBackend());
-
-  // Invoke the resize before calling `WaitForCacheBackend()` to ensure
-  // the operation is queued or correctly forces initialization.
-  network_context->SetHttpCacheMaxSize(kNewSize, false);
-  task_environment_.RunUntilIdle();
-
-  // There should still not be a backend yet.
-  ASSERT_EQ(nullptr, network_context->url_request_context()
-                         ->http_transaction_factory()
-                         ->GetCache()
-                         ->GetCurrentBackend());
-
-  // Now trigger the initialization and wait.
-  disk_cache::Backend* backend = WaitForCacheBackend(*network_context);
-  ASSERT_TRUE(backend);
-
-  // Verify the new limit is successfully applied to the underlying backend.
-  EXPECT_EQ(kNewSize, backend->GetMaxBytesForTesting());
-}
-
-TEST_F(NetworkContextTest, SetHttpCacheMaxSizeBeforeForcedBackendInit) {
-  mojom::NetworkContextParamsPtr context_params =
-      CreateNetworkContextParamsForTesting();
-  // Explicitly clear file_paths to force in-memory cache.
-  context_params->file_paths.reset();
-  context_params->http_cache_enabled = true;
-
-  const base::ByteSize kInitialSize = base::MiBU(20);
-  const base::ByteSize kNewSize = base::MiBU(10);
-  context_params->http_cache_max_size =
-      base::checked_cast<int32_t>(kInitialSize.InBytes());
-
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(std::move(context_params));
-
-  // There should not be a backend yet.
-  ASSERT_EQ(nullptr, network_context->url_request_context()
-                         ->http_transaction_factory()
-                         ->GetCache()
-                         ->GetCurrentBackend());
-
-  // Invoke the resize before calling `WaitForCacheBackend()` to ensure
-  // the operation is queued or correctly forces initialization.
-  network_context->SetHttpCacheMaxSize(kNewSize, true);
-
-  // Now trigger the initialization and wait.
-  disk_cache::Backend* backend = WaitForCacheBackend(*network_context);
-  ASSERT_TRUE(backend);
-
-  // Verify the new limit is successfully applied to the underlying backend.
-  EXPECT_EQ(kNewSize, backend->GetMaxBytesForTesting());
-}
-
-TEST_F(NetworkContextTest, SetHttpCacheMaxSizeNoCache) {
-  mojom::NetworkContextParamsPtr context_params =
-      CreateNetworkContextParamsForTesting();
-  context_params->http_cache_enabled = false;
-
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(std::move(context_params));
-
-  // There should not be an HTTP Cache at all.
-  ASSERT_EQ(nullptr, network_context->url_request_context()
-                         ->http_transaction_factory()
-                         ->GetCache());
-
-  // Ensure this doesn't crash when the internal `GetCache()` returns nullptr.
-  network_context->SetHttpCacheMaxSize(base::MiBU(10), true);
-  task_environment_.RunUntilIdle();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // This makes sure that network_session_configurator::ChooseCacheType is
 // connected to NetworkContext.

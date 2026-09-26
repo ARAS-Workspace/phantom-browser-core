@@ -41,13 +41,8 @@
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-const int kDefaultStartupDelayMs = 0;
-const bool kDefaultSkipInBackground = false;
-#else
 const int kDefaultStartupDelayMs = 5000;
 const bool kDefaultSkipInBackground = true;
-#endif
 
 constexpr int kPreconnectIntervalSec = 60;
 constexpr int kPreconnectRetryDelayMs = 50;

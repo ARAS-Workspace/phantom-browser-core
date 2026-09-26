@@ -209,11 +209,7 @@ void KeywordWebDataService::AdjustBatchModeLevel(bool entering_batch_mode) {
       // When killing an app on Android, shutdown isn't guaranteed to be
       // called. Finishing this task immediately ensures the table is fully
       // populated even if the app is killed before the timer expires.
-#if BUILDFLAG(IS_ANDROID)
-      CommitQueuedOperations();
-#else
       timer_.Reset();
-#endif
     }
   }
 }

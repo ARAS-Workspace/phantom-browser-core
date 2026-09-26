@@ -37,9 +37,7 @@
 #error "use_kerberos should be true to use Negotiate authentication scheme."
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/android/dummy_spnego_authenticator.h"
-#elif BUILDFLAG(USE_EXTERNAL_GSSAPI)
+#if BUILDFLAG(USE_EXTERNAL_GSSAPI)
 #include "net/http/mock_gssapi_library_posix.h"
 #else
 #error "use_kerberos is true, but no Kerberos implementation available."
@@ -72,19 +70,8 @@ class HttpAuthHandlerNegotiateTest : public PlatformTest,
     factory_ = std::make_unique<HttpAuthHandlerNegotiate::Factory>(
         HttpAuthMechanismFactory());
     factory_->set_http_auth_preferences(http_auth_preferences_.get());
-#if BUILDFLAG(IS_ANDROID)
-    auth_library_for_android_ = std::move(auth_library);
-    http_auth_preferences_->set_auth_android_negotiate_account_type(
-        "org.chromium.test.DummySpnegoAuthenticator");
-    MockAuthLibrary::EnsureTestAccountExists();
-#else
     factory_->set_library(std::move(auth_library));
-#endif  // BUILDFLAG(IS_ANDROID)
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  void TearDown() override { MockAuthLibrary::RemoveTestAccounts(); }
-#endif
 
   void SetupMocks(MockAuthLibrary* mock_library) {
     // Copied from an actual transaction!
@@ -250,9 +237,6 @@ class HttpAuthHandlerNegotiateTest : public PlatformTest,
 
   NetworkAnonymizationKey network_anoymization_key_;
 
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<MockAuthLibrary> auth_library_for_android_;
-#endif
   std::unique_ptr<MockCachingHostResolver> resolver_;
   std::unique_ptr<MockAllowHttpAuthPreferences> http_auth_preferences_;
   std::unique_ptr<HttpAuthHandlerNegotiate::Factory> factory_;
@@ -495,9 +479,7 @@ TEST_F(HttpAuthHandlerNegotiateTest, OverrideAuthSystem) {
             return std::make_unique<TestAuthSystem>();
           }));
   negotiate_factory->set_http_auth_preferences(http_auth_preferences());
-#if !BUILDFLAG(IS_ANDROID)
   negotiate_factory->set_library(std::make_unique<MockAuthLibrary>());
-#endif
 
   url::SchemeHostPort scheme_host_port{GURL("http://www.example.com")};
   std::unique_ptr<HttpAuthHandler> handler;

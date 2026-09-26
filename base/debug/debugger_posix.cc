@@ -147,7 +147,7 @@ void VerifyDebugger() {
 #endif
 }
 
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 
 // We can look in /proc/self/status for TracerPid.  We are likely used in crash
 // handling, so we are careful not to use the heap or have side effects.
@@ -278,7 +278,7 @@ void VerifyDebugger() {}
 #define DEBUG_BREAK_ASM() asm("int3")
 #endif
 
-#if defined(NDEBUG) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if defined(NDEBUG) && !BUILDFLAG(IS_APPLE)
 #define DEBUG_BREAK() abort()
 #elif !BUILDFLAG(IS_APPLE)
 // Though Android has a "helpful" process called debuggerd to catch native
@@ -327,13 +327,7 @@ void BreakDebuggerAsyncSafe() {
   Alias(&static_variable_to_make_this_function_unique);
 
   DEBUG_BREAK();
-#if BUILDFLAG(IS_ANDROID) && !defined(OFFICIAL_BUILD)
-  // For Android development we always build release (debug builds are
-  // unmanageably large), so the unofficial build is used for debugging. It is
-  // helpful to be able to insert BreakDebugger() statements in the source,
-  // attach the debugger, inspect the state of the program and then resume it by
-  // setting the 'go' variable above.
-#elif defined(NDEBUG)
+#if defined(NDEBUG)
   // Terminate the program after signaling the debug break.
   // When DEBUG_BREAK() expands to abort(), this is unreachable code. Rather
   // than carefully tracking in which cases DEBUG_BREAK()s is noreturn, just

@@ -33,16 +33,9 @@
 #include "services/network/public/mojom/content_security_policy.mojom.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/feature_list.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "components/prefs/pref_service.h"
-#endif
 
 namespace {
 
@@ -93,15 +86,6 @@ ChromeNTPTilesInternalsMessageHandlerClient::MakeMostVisitedSites() {
   Profile* profile = Profile::FromWebUI(web_ui());
   auto most_visited_sites =
       ChromeMostVisitedSitesFactory::NewForProfile(profile);
-#if BUILDFLAG(IS_ANDROID)
-  // Custom links on Android: ntp_prefs::kNtpCustomLinksVisible is
-  // unavailable. Use feature list instead.
-  most_visited_sites->EnableTileTypes(
-      ntp_tiles::MostVisitedSites::EnableTileTypesOptions()
-          .with_top_sites(true)
-          .with_custom_links(base::FeatureList::IsEnabled(
-              chrome::android::kMostVisitedTilesCustomization)));
-#else
   // Custom links on Desktop.
   auto enabled_types = GetEnabledTileTypes(profile);
   most_visited_sites->EnableTileTypes(
@@ -112,7 +96,6 @@ ChromeNTPTilesInternalsMessageHandlerClient::MakeMostVisitedSites() {
               enabled_types.contains(ntp_tiles::TileType::kCustomLinks))
           .with_enterprise_shortcuts(enabled_types.contains(
               ntp_tiles::TileType::kEnterpriseShortcuts)));
-#endif
   return most_visited_sites;
 }
 

@@ -15,10 +15,6 @@
 #include "net/dns/dns_config_service_posix.h"
 #include "net/dns/system_dns_config_change_notifier.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/android/network_change_notifier_android.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include <linux/rtnetlink.h>
 
@@ -108,9 +104,7 @@ NetworkChangeNotifierPassive::GetAddressMapOwnerInternal() {
 NetworkChangeNotifier::NetworkChangeCalculatorParams
 NetworkChangeNotifierPassive::NetworkChangeCalculatorParamsPassive() {
   NetworkChangeCalculatorParams params;
-#if BUILDFLAG(IS_ANDROID)
-  params = NetworkChangeNotifierAndroid::NetworkChangeCalculatorParamsAndroid();
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   params = NetworkChangeNotifierLinux::NetworkChangeCalculatorParamsLinux();
 #else
   NOTIMPLEMENTED();

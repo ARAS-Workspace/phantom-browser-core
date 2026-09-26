@@ -51,15 +51,11 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "gpu/command_buffer/client/internal/mappable_buffer_ahb.h"
-#endif
-
 namespace gpu {
 
 namespace {
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_OZONE)
 bool GMBIsNative(gfx::GpuMemoryBufferType gmb_type) {
   return gmb_type != gfx::EMPTY_BUFFER && gmb_type != gfx::SHARED_MEMORY_BUFFER;
 }
@@ -87,7 +83,7 @@ uint32_t ComputeTextureTargetForSharedImage(
     gfx::GpuMemoryBufferType client_gmb_type,
     scoped_refptr<SharedImageInterface> sii) {
   CHECK(sii);
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_OZONE)
   return GL_TEXTURE_2D;
 #elif BUILDFLAG(IS_MAC)
   // Check for IOSurfaces being used. We infer IOSurface based on scanout or
@@ -116,7 +112,7 @@ uint32_t ComputeTextureTargetForSharedImage(
   CHECK(GMBIsNative(client_gmb_type));
   // See the note at the top of this function wrt Fuchsia.
   return GL_TEXTURE_EXTERNAL_OES;
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_OZONE)
 }
 
 }  // namespace
@@ -263,21 +259,6 @@ ClientSharedImage::CreateMappableBufferFromHandle(
       return MappableBufferNativePixmap::CreateFromHandle(
           client_native_pixmap_factory.get(), std::move(handle), size, format,
           usage);
-    }
-#endif
-#if BUILDFLAG(IS_ANDROID)
-    case gfx::ANDROID_HARDWARE_BUFFER: {
-      // ANDROID_HARDWARE_BUFFER handles require GPU roundtrip for mapping, so
-      // they will wait for event to trigger in async callback.
-      // So the copy callback must execute in internal thread otherwise there
-      // will be a deadlock: the waiting thread would be used to process the
-      // callback reply.
-      auto wrapped_callback = base::BindRepeating(
-          &ClientSharedImage::RunOnTaskRunner, base::Unretained(this),
-          copy_native_buffer_to_shmem_callback);
-      return MappableBufferAHB::CreateFromHandle(
-          std::move(handle), size, format, std::move(wrapped_callback),
-          std::move(pool));
     }
 #endif
   }

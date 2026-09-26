@@ -185,7 +185,7 @@ TEST_F(VisitedLinkPerfTest, TestAddAndQuery) {
 
 // Tests how long it takes to write and read a large database to and from disk.
 // TODO(crbug.com/40719465): Fix flakiness on macOS and Android.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_TestBigTable DISABLED_TestBigTable
 #else
 #define MAYBE_TestBigTable TestBigTable

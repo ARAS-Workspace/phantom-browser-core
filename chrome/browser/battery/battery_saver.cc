@@ -10,11 +10,6 @@
 #include "build/build_config.h"
 #include "content/public/browser/browser_thread.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <jni.h>
-#include "chrome/browser/battery/android/jni_headers/BatterySaverOSSetting_jni.h"
-#endif
-
 namespace {
 std::optional<bool> g_override_battery_saver_mode_for_testing;
 }  // namespace
@@ -34,17 +29,7 @@ bool IsBatterySaverEnabled() {
     CHECK_IS_TEST();
     return g_override_battery_saver_mode_for_testing.value();
   }
-#if BUILDFLAG(IS_ANDROID)
-  JNIEnv* env = jni_zero::AttachCurrentThread();
-  return battery::android::Java_BatterySaverOSSetting_isBatterySaverEnabled(
-      env);
-#else
   return false;
-#endif
 }
 
 }  // namespace battery
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(BatterySaverOSSetting)
-#endif

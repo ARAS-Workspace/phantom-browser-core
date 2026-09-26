@@ -21,11 +21,9 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/test_utils.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -54,11 +52,9 @@ DevToolsWindowTesting::~DevToolsWindowTesting() {
   if (!close_callback_.is_null())
     std::move(close_callback_).Run();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Needed for Chrome_DevToolsADBThread to shut down gracefully in tests.
   ChromeDevToolsManagerDelegate::GetInstance()
       ->ResetAndroidDeviceManagerForTesting();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // static
@@ -163,7 +159,6 @@ DevToolsWindow* DevToolsWindowTesting::OpenDevToolsWindowSync(
       is_docked);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // static
 DevToolsWindow* DevToolsWindowTesting::OpenDevToolsWindowSync(
     BrowserWindowInterface* browser,
@@ -171,7 +166,6 @@ DevToolsWindow* DevToolsWindowTesting::OpenDevToolsWindowSync(
   return OpenDevToolsWindowSync(
       browser->GetTabStripModel()->GetActiveWebContents(), is_docked);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // static
 DevToolsWindow* DevToolsWindowTesting::OpenDevToolsWindowSync(
@@ -199,11 +193,7 @@ void DevToolsWindowTesting::CloseDevToolsWindow(
   if (window->is_docked_) {
     window->CloseWindow();
   } else {
-#if BUILDFLAG(IS_ANDROID)
-    window->main_web_contents_->Close();
-#else
     window->browser_->GetWindow()->Close();
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 }
 

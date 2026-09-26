@@ -11,13 +11,6 @@
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "sandbox/policy/switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <unistd.h>
-
-#include "base/android/jni_android.h"
-#include "third_party/jni_zero/common_apis.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_LINUX)
 #include "sandbox/policy/linux/sandbox_linux.h"
 #endif  // BUILDFLAG(IS_LINUX)
@@ -51,20 +44,7 @@ bool Sandbox::IsProcessSandboxed() {
     return true;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Note that this does not check the status of the Seccomp sandbox.
-  if (base::android::IsJavaAvailable()) {
-    JNIEnv* env = base::android::AttachCurrentThread();
-    return jni_zero::ProcessIsIsolated(env);
-  }
-
-  // Fallback for javaless processes where JVM is not initialized.
-  // Check the UID range matching Android's Process.isIsolatedUid
-  // implementation.
-  uid_t uid = getuid();
-  uid_t app_id = uid % 100000;
-  return (app_id >= 90000 && app_id <= 99999);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   int status = SandboxLinux::GetInstance()->GetStatus();
   constexpr int kLayer1Flags = SandboxLinux::Status::kSUID |
                                SandboxLinux::Status::kPIDNS |

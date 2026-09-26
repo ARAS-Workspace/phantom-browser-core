@@ -257,13 +257,6 @@
 #include "v8/include/v8-local-handle.h"
 #include "v8/include/v8-microtask-queue.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <cpu-features.h>
-
-#include "content/renderer/java/gin_java_bridge_dispatcher.h"
-#include "mojo/public/cpp/bindings/self_owned_associated_receiver.h"
-#endif
-
 using base::Time;
 using blink::ContextMenuData;
 using blink::WebContentDecryptionModule;
@@ -1038,13 +1031,7 @@ void FillMiscNavigationParams(
   navigation_params->should_have_sticky_user_activation =
       commit_params.should_have_sticky_user_activation;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Only android webview uses this.
-  navigation_params->grant_load_local_resources =
-      commit_params.can_load_local_resources;
-#else
   DCHECK(!commit_params.can_load_local_resources);
-#endif
 
   navigation_params->origin_to_commit = commit_params.origin_to_commit;
   navigation_params->storage_key = std::move(commit_params.storage_key);
@@ -2338,13 +2325,7 @@ void RenderFrameImpl::Delete(mojom::FrameDeleteIntention intent) {
       // main frame when a commit (and ownership transfer) is imminent.
       // TODO(dcheng): This is the case of https://crbug.com/838348.
       DCHECK(is_main_frame_);
-#if !BUILDFLAG(IS_ANDROID)
       CHECK(!in_frame_tree_);
-#else
-      // Previously this CHECK() was disabled on Android because it was much
-      // easier to hit the race there.
-      CHECK(!in_frame_tree_);
-#endif  // !BUILDFLAG(IS_ANDROID)
       break;
   }
 
@@ -2505,12 +2486,6 @@ void RenderFrameImpl::AddAutoplayFlags(const url::Origin& origin,
 
 // blink::mojom::ResourceLoadInfoNotifier implementation
 // --------------------------
-
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameImpl::NotifyUpdateUserGestureCarryoverInfo() {
-  GetFrameHost()->UpdateUserGestureCarryoverInfo();
-}
-#endif
 
 void RenderFrameImpl::NotifyResourceRedirectReceived(
     const net::RedirectInfo& redirect_info,
@@ -2860,10 +2835,6 @@ void RenderFrameImpl::CommitNavigation(
   // - The actual data: URL will be saved in the document's DocumentState to
   // later be returned as the `url` in DidCommitProvisionalLoadParams.
   bool should_handle_data_url_as_string = false;
-#if BUILDFLAG(IS_ANDROID)
-  should_handle_data_url_as_string |=
-      is_main_frame_ && !commit_params->data_url_as_string.empty();
-#endif
 
   if (should_handle_data_url_as_string ||
       commit_params->is_load_data_with_base_url) {
@@ -3406,10 +3377,6 @@ void RenderFrameImpl::CommitSameDocumentNavigation(
     // should keep the base URL as document URL.
     bool use_base_url_for_data_url =
         !navigation_state->common_params().base_url_for_data_url.is_empty();
-#if BUILDFLAG(IS_ANDROID)
-    use_base_url_for_data_url |=
-        !navigation_state->commit_params().data_url_as_string.empty();
-#endif
 
     GURL url;
     if (is_main_frame_ && use_base_url_for_data_url) {
@@ -3614,7 +3581,6 @@ RenderFrameImpl::CreateWorkerContentSettingsClient() {
       this);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<media::SpeechRecognitionClient>
 RenderFrameImpl::CreateSpeechRecognitionClient() {
   if (!frame_ || !frame_->View()) {
@@ -3622,7 +3588,6 @@ RenderFrameImpl::CreateSpeechRecognitionClient() {
   }
   return GetContentClient()->renderer()->CreateSpeechRecognitionClient(this);
 }
-#endif
 
 scoped_refptr<blink::WebWorkerFetchContext>
 RenderFrameImpl::CreateWorkletFetchContext() {
@@ -5702,17 +5667,6 @@ void RenderFrameImpl::BeginNavigation(
                      !url.SchemeIs(url::kDataScheme);
   DCHECK(!(use_archive && IsMainFrame()));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The handlenavigation API is deprecated and will be removed once
-  // crbug.com/325351 is resolved.
-  if (!url.is_empty() && !use_archive && !IsURLHandledByNetworkStack(url) &&
-      GetContentClient()->renderer()->HandleNavigation(
-          this, frame_, info->url_request, info->navigation_type,
-          info->navigation_policy)) {
-    return;
-  }
-#endif
-
   // TODO(crbug.com/40221940): Refactor _unfencedTop handling.
   if (info->is_unfenced_top_navigation) {
     OpenURL(std::move(info));
@@ -6649,28 +6603,6 @@ void RenderFrameImpl::DecodeDataURL(
     GURL* base_url) {
   // A loadData request with a specified base URL.
   GURL data_url = common_params.url;
-#if BUILDFLAG(IS_ANDROID)
-  if (!commit_params.data_url_as_string.empty()) {
-#if DCHECK_IS_ON()
-    {
-      std::string mime_type_tmp, charset_tmp, data_tmp;
-      DCHECK(net::DataURL::Parse(data_url, &mime_type_tmp, &charset_tmp,
-                                 &data_tmp));
-      DCHECK(data_tmp.empty());
-    }
-#endif
-    // If `data_url_as_string` is set, the `url` in CommonNavigationParams will
-    // only contain the data: URL header and won't contain any actual data (see
-    // NavigationControllerAndroid::LoadUrl()), so we should use
-    // `data_url_as_string` if possible.
-    data_url = GURL(commit_params.data_url_as_string);
-    if (!data_url.is_valid() || !data_url.SchemeIs(url::kDataScheme)) {
-      // If the given data URL is invalid, use the data: URL header as a
-      // fallback.
-      data_url = common_params.url;
-    }
-  }
-#endif
   // Parse the given data, then set the `base_url`, which is used as the
   // document URL.
   if (net::DataURL::Parse(data_url, mime_type, charset, data)) {
@@ -6794,21 +6726,7 @@ void RenderFrameImpl::RegisterMojoInterfaces() {
       ->AddInterface<blink::mojom::RenderAccessibility>(base::BindRepeating(
           &RenderAccessibilityManager::BindReceiver,
           base::Unretained(render_accessibility_manager_.get())));
-
-#if BUILDFLAG(IS_ANDROID)
-  GetAssociatedInterfaceRegistry()->AddInterface<mojom::GinJavaBridge>(
-      base::BindRepeating(&RenderFrameImpl::BindGinJavaBridge,
-                          weak_factory_.GetWeakPtr()));
-#endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameImpl::BindGinJavaBridge(
-    mojo::PendingAssociatedReceiver<mojom::GinJavaBridge> receiver) {
-  mojo::MakeSelfOwnedAssociatedReceiver(
-      std::make_unique<GinJavaBridgeDispatcher>(this), std::move(receiver));
-}
-#endif
 
 void RenderFrameImpl::BindMhtmlFileWriter(
     mojo::PendingAssociatedReceiver<mojom::MhtmlFileWriter> receiver) {

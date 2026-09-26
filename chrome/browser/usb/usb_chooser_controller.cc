@@ -176,14 +176,9 @@ void UsbChooserController::Select(const std::vector<size_t>& indices) {
   // this callback.
   auto on_device_info_refreshed = base::BindOnce(
       &OnDeviceInfoRefreshed, chooser_context_, origin_, std::move(callback_));
-#if BUILDFLAG(IS_ANDROID)
-  chooser_context_->RefreshDeviceInfo(guid,
-                                      std::move(on_device_info_refreshed));
-#else
   auto* device_info = chooser_context_->GetDeviceInfo(guid);
   DCHECK(device_info);
   std::move(on_device_info_refreshed).Run(device_info->Clone());
-#endif
 }
 
 void UsbChooserController::Cancel() {

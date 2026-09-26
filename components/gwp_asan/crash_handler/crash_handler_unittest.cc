@@ -41,7 +41,7 @@
 #include "third_party/crashpad/crashpad/snapshot/minidump/process_snapshot_minidump.h"
 #include "third_party/crashpad/crashpad/tools/tool_support.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include "third_party/crashpad/crashpad/snapshot/sanitized/sanitization_information.h"
 #endif
 
@@ -55,7 +55,6 @@ constexpr int kSuccess = 0;
 static constexpr size_t kMaxMetadata = 2048;
 static constexpr size_t kTotalPages = 8192;
 
-#if !BUILDFLAG(IS_ANDROID)
 int HandlerMainAdaptor(int argc, char* argv[]) {
   crashpad::UserStreamDataSources user_stream_data_sources;
   user_stream_data_sources.push_back(
@@ -78,7 +77,6 @@ MULTIPROCESS_TEST_MAIN(CrashpadHandler) {
 
   return 0;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Child process that launches the crashpad handler and then crashes.
 MULTIPROCESS_TEST_MAIN(CrashingProcess) {
@@ -132,7 +130,7 @@ MULTIPROCESS_TEST_MAIN(CrashingProcess) {
   std::map<std::string, std::string> annotations;
   std::vector<std::string> arguments;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   static crashpad::SanitizationInformation sanitization_info = {};
   static crashpad::SanitizationAllowedMemoryRanges allowed_memory_ranges;
   static base::NoDestructor<
@@ -162,9 +160,7 @@ MULTIPROCESS_TEST_MAIN(CrashingProcess) {
   }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   arguments.push_back("--test-child-process=CrashpadHandler");
-#endif
 
   crashpad::CrashpadClient* client = new crashpad::CrashpadClient();
 #if BUILDFLAG(IS_LINUX)
@@ -175,20 +171,6 @@ MULTIPROCESS_TEST_MAIN(CrashingProcess) {
                                   /* url */ "",
                                   /* annotations */ annotations,
                                   /* arguments */ arguments);
-#elif BUILDFLAG(IS_ANDROID)
-
-  std::string trampoline_library_path;
-  std::string handler_library_path;
-  std::vector<std::string> env;
-  CHECK(crash_reporter::internal::GetHandlerTrampoline(&trampoline_library_path,
-                                                       &handler_library_path));
-  CHECK(crash_reporter::internal::BuildEnvironmentWithApk(
-      /* use_64_bit */ sizeof(void*) == 8, &env));
-
-  bool handler = client->StartHandlerWithLinkerAtCrash(
-      trampoline_library_path, handler_library_path,
-      /* is_64_bit */ sizeof(void*) == 8, &env, directory, metrics_dir,
-      /* url */ "", annotations, arguments);
 #else
   bool handler = client->StartHandler(/* handler */ cmd_line->GetProgram(),
                                       /* database */ directory,
@@ -343,23 +325,11 @@ class BaseCrashHandlerTest : public base::MultiProcessTest,
     base::Process process =
         base::SpawnMultiProcessTestChild("CrashingProcess", cmd_line, options);
 
-#if !BUILDFLAG(IS_ANDROID)
     int exit_code = -1;
     EXPECT_TRUE(WaitForMultiprocessTestChildExit(
         process, TestTimeouts::action_max_timeout(), &exit_code));
     EXPECT_NE(exit_code, kSuccess);
     return (exit_code != kSuccess);
-#else
-    // TODO(crbug.com/40632533): Android's implementation of
-    // WaitForMultiprocessTestChildExit can't detect child process crashes, this
-    // can be fixed after minSdkVersion >= Q.
-    for (int i = 0; i < TestTimeouts::action_max_timeout().InSeconds(); i++) {
-      if (kill(process.Pid(), 0) && errno == ESRCH)
-        return true;
-      sleep(1);
-    }
-    return false;
-#endif
   }
 
   // Given a directory with a single crashpad exception, read and parse the
@@ -472,12 +442,7 @@ class BaseCrashHandlerTest : public base::MultiProcessTest,
 
 class CrashHandlerTest : public BaseCrashHandlerTest {};
 
-#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_ANDROID)
-// ASan intercepts crashes and crashpad doesn't have a chance to see them.
-#define MAYBE_DISABLED(name) DISABLED_ ##name
-#else
 #define MAYBE_DISABLED(name) name
-#endif
 
 TEST_P(CrashHandlerTest, MAYBE_DISABLED(UseAfterFree)) {
   ASSERT_TRUE(gwp_asan_found_);
@@ -533,7 +498,7 @@ TEST_P(CrashHandlerTest, MAYBE_DISABLED(UnrelatedException)) {
 INSTANTIATE_TEST_SUITE_P(VaryAllocator,
                          CrashHandlerTest,
                          testing::Values(
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
                              TestParams("malloc",
                                         ShouldSanitize::kYes,
                                         EnableLightweightDetector::kNo),
@@ -562,7 +527,7 @@ TEST_P(LightweightDetectorCrashHandlerTest, LightweightDetectorUseAfterFree) {
 INSTANTIATE_TEST_SUITE_P(VarySanitization,
                          LightweightDetectorCrashHandlerTest,
                          testing::Values(
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
                              TestParams("partitionalloc",
                                         ShouldSanitize::kYes,
                                         EnableLightweightDetector::kYes),

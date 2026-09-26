@@ -42,11 +42,7 @@ void DisplayUtil::DisplayToScreenInfo(ScreenInfo* screen_info,
     screen_info->orientation_angle = 90;
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  screen_info->orientation_type = GetOrientationTypeForMobile(display);
-#else
   screen_info->orientation_type = GetOrientationTypeForDesktop(display);
-#endif
 
   // TODO(crbug.com/1194700 and crbug.com/1182855): Use cross-process screen
   // info caches, not local-process info, for child frames and Mac's shim.

@@ -47,13 +47,8 @@
 namespace content {
 
 // RenderViewHostTestHarness works poorly on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_RenderFrameAudioInputStreamFactoryTest \
-  DISABLED_RenderFrameAudioInputStreamFactoryTest
-#else
 #define MAYBE_RenderFrameAudioInputStreamFactoryTest \
   RenderFrameAudioInputStreamFactoryTest
-#endif
 
 class MAYBE_RenderFrameAudioInputStreamFactoryTest
     : public RenderViewHostTestHarness {

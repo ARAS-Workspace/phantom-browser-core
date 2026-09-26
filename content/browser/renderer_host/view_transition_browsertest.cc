@@ -96,13 +96,8 @@ class ViewTransitionBrowserTest : public ContentBrowserTest {
 };
 
 // TODO(crbug.com/468211765): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_NavigationCancelledAfterScreenshot \
-  DISABLED_NavigationCancelledAfterScreenshot
-#else
 #define MAYBE_NavigationCancelledAfterScreenshot \
   NavigationCancelledAfterScreenshot
-#endif
 IN_PROC_BROWSER_TEST_F(ViewTransitionBrowserTest,
                        MAYBE_NavigationCancelledAfterScreenshot) {
   // Start with a page which has an opt-in for VT.

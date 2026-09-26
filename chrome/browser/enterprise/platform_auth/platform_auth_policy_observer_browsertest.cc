@@ -27,17 +27,7 @@
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #endif  //  BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/scoped_feature_list.h"
-#include "chrome/browser/enterprise/platform_auth/platform_auth_features.h"
-#endif  //  BUILDFLAG(IS_ANDROID)
-
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-const char* kPrefKey = prefs::kAndroidEntraSSOEnabled;
-const char* kPolicyKey = policy::key::kAndroidEntraSsoEnabled;
-#endif
 
 }  // namespace
 
@@ -64,93 +54,9 @@ class PlatformAuthPolicyObserverTest : public PlatformBrowserTest {
       policy::ManagementServiceFactory::GetForPlatform(),
       policy::EnterpriseManagementAuthority::COMPUTER_LOCAL};
 #endif  //  BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList feature_list_{
-      enterprise_auth::kAndroidEntraSSO};
-#endif
 };
 
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(PlatformAuthPolicyObserverTest, EnableThenDisable) {
-  // Initialize the policy handler.
-  PrefService* prefs = g_browser_process->local_state();
-  if (prefs)
-    platform_auth_policy_observer_.emplace(prefs);
-
-  auto& manager = enterprise_auth::PlatformAuthProviderManager::GetInstance();
-  // The manager should be disabled by default since the policy is disabled.
-  ASSERT_FALSE(manager.IsEnabled());
-
-  EXPECT_EQ(/*Disabled*/ 0, prefs->GetInteger(kPrefKey));
-  EXPECT_FALSE(prefs->IsManagedPreference(kPrefKey));
-
-  // Enable the policy.
-  policy::PolicyMap policies;
-  policies.Set(kPolicyKey, policy::POLICY_LEVEL_MANDATORY,
-               policy::POLICY_SCOPE_MACHINE, policy::POLICY_SOURCE_CLOUD,
-               base::Value(1), nullptr);
-  policy_provider_.UpdateChromePolicy(policies);
-
-  EXPECT_EQ(/*Enabled*/ 1, prefs->GetInteger(kPrefKey));
-  EXPECT_TRUE(prefs->IsManagedPreference(kPrefKey));
-
-  // The manager should now be enabled.
-  ASSERT_TRUE(manager.IsEnabled());
-
-  // Disable the policy.
-  policies.Set(kPolicyKey, policy::POLICY_LEVEL_MANDATORY,
-               policy::POLICY_SCOPE_MACHINE, policy::POLICY_SOURCE_CLOUD,
-               base::Value(0), nullptr);
-  policy_provider_.UpdateChromePolicy(policies);
-
-  EXPECT_EQ(/*Disabled*/ 0, prefs->GetInteger(kPrefKey));
-  EXPECT_TRUE(prefs->IsManagedPreference(kPrefKey));
-
-  // The manager should now be disabled.
-  ASSERT_FALSE(manager.IsEnabled());
-
-  platform_auth_policy_observer_.reset();
-}
-
-IN_PROC_BROWSER_TEST_F(PlatformAuthPolicyObserverTest, EnableThenUnset) {
-  // Initialize the policy handler.
-  PrefService* prefs = g_browser_process->local_state();
-  if (prefs)
-    platform_auth_policy_observer_.emplace(prefs);
-
-  auto& manager = enterprise_auth::PlatformAuthProviderManager::GetInstance();
-  // The manager should be disabled by default since the policy is disabled.
-  ASSERT_FALSE(manager.IsEnabled());
-
-  EXPECT_EQ(/*Disabled*/ 0, prefs->GetInteger(kPrefKey));
-  EXPECT_FALSE(prefs->IsManagedPreference(kPrefKey));
-
-  // Enable the policy.
-  policy::PolicyMap policies;
-  policies.Set(kPolicyKey, policy::POLICY_LEVEL_MANDATORY,
-               policy::POLICY_SCOPE_MACHINE, policy::POLICY_SOURCE_CLOUD,
-               base::Value(1), nullptr);
-  policy_provider_.UpdateChromePolicy(policies);
-
-  EXPECT_EQ(/*Enabled*/ 1, prefs->GetInteger(kPrefKey));
-  EXPECT_TRUE(prefs->IsManagedPreference(kPrefKey));
-
-  // The manager should now be enabled.
-  ASSERT_TRUE(manager.IsEnabled());
-
-  // Unset the policy.
-  policies.Erase(kPolicyKey);
-  policy_provider_.UpdateChromePolicy(policies);
-
-  EXPECT_EQ(/*Disabled*/ 0, prefs->GetInteger(kPrefKey));
-  EXPECT_FALSE(prefs->IsManagedPreference(kPrefKey));
-
-  // The manager should now be disabled.
-  ASSERT_FALSE(manager.IsEnabled());
-
-  platform_auth_policy_observer_.reset();
-}
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(PlatformAuthPolicyObserverTest, DisableThenEnable) {
   // Initialize the policy handler.
@@ -267,4 +173,4 @@ IN_PROC_BROWSER_TEST_F(PlatformAuthPolicyObserverTest, UnmanagedDevice) {
 
   platform_auth_policy_observer_.reset();
 }
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)

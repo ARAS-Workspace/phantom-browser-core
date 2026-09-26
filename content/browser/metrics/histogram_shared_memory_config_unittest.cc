@@ -55,13 +55,8 @@ TEST(HistogramSharedMemoryConfigTest, PassOnCommandLineIsEnabled) {
   EXPECT_TRUE(
       HistogramSharedMemory::PassOnCommandLineIsEnabled(PROCESS_TYPE_GPU));
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(
-      HistogramSharedMemory::PassOnCommandLineIsEnabled(PROCESS_TYPE_UTILITY));
-#else   // !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(
       HistogramSharedMemory::PassOnCommandLineIsEnabled(PROCESS_TYPE_UTILITY));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_P(HistogramSharedMemoryConfigTest, GetHistogramSharedMemoryConfig) {

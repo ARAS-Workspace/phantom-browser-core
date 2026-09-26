@@ -565,11 +565,7 @@ TEST(V8UnwinderTest, CanUnwindFrom_NullModule) {
 // re-enable.
 // TODO(crbug.com/439522036): test fails on Win x64 dbg, fix and re-enable.
 // Checks that unwinding from C++ through JavaScript and back into C++ succeeds.
-#if (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARMEL))
-#define MAYBE_UnwindThroughV8Frames UnwindThroughV8Frames
-#else
 #define MAYBE_UnwindThroughV8Frames DISABLED_UnwindThroughV8Frames
-#endif
 TEST(V8UnwinderTest, MAYBE_UnwindThroughV8Frames) {
   v8::Isolate* isolate = nullptr;
   base::WaitableEvent isolate_available;

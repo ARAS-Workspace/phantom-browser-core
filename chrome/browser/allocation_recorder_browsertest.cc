@@ -28,11 +28,7 @@
 #include "base/command_line.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/test/base/android/android_browser_test.h"
-#else
 #include "chrome/test/base/in_process_browser_test.h"
-#endif
 
 class AllocationRecorderBrowserTest : public PlatformBrowserTest,
                                       public testing::WithParamInterface<bool> {

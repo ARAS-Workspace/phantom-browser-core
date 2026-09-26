@@ -76,13 +76,7 @@ AsyncCheckTracker::GetBlockedPageCommittedTimestamp(
 
 // static
 bool AsyncCheckTracker::IsPlatformEligibleForSyncCheckerCheckAllowlist() {
-#if BUILDFLAG(IS_ANDROID)
-  // Allowlist check is much faster than blocklist check on Android, so we are
-  // enabling this on Android only.
-  return base::FeatureList::IsEnabled(kSafeBrowsingSyncCheckerCheckAllowlist);
-#else
   return false;
-#endif
 }
 
 AsyncCheckTracker::AsyncCheckTracker(content::WebContents* web_contents,

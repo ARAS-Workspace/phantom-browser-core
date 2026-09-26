@@ -22,11 +22,7 @@
 namespace history_embeddings {
 
 constexpr auto kEnabledByDefaultForDesktopOnly =
-#if BUILDFLAG(IS_ANDROID)
-    base::FEATURE_DISABLED_BY_DEFAULT;
-#else
     base::FEATURE_ENABLED_BY_DEFAULT;
-#endif
 
 // These are the kill switches for the launched history embeddings features.
 BASE_FEATURE(kLaunchedHistoryEmbeddings, kEnabledByDefaultForDesktopOnly);

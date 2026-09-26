@@ -12,9 +12,7 @@
 #include "content/public/browser/web_contents.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/native_window_tracker/native_window_tracker.h"
-#endif
 
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
@@ -64,13 +62,9 @@ ExtensionInstallPromptShowParams::ExtensionInstallPromptShowParams(
       parent_web_contents_(nullptr),
       parent_window_(parent_window) {
   DCHECK(profile);
-#if BUILDFLAG(IS_ANDROID)
-  DCHECK(!parent_window) << "Android does not support a parent window.";
-#else
   if (parent_window_) {
     native_window_tracker_ = ui::NativeWindowTracker::Create(parent_window_);
   }
-#endif
 }
 
 ExtensionInstallPromptShowParams::~ExtensionInstallPromptShowParams() = default;
@@ -102,12 +96,10 @@ bool ExtensionInstallPromptShowParams::WasParentDestroyed() {
            !RootCheck(parent_web_contents_->GetTopLevelNativeWindow());
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (native_window_tracker_) {
     return native_window_tracker_->WasNativeWindowDestroyed() ||
            !RootCheck(parent_window_);
   }
-#endif
 
   return false;
 }

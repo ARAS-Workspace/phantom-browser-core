@@ -148,11 +148,7 @@ TEST_F(URLRequestMojomTraitsTest, Roundtrips_ResourceRequest) {
       mojom::TrustTokenSignRequestData::kInclude;
   original.trust_token_params->additional_signed_headers.push_back(
       "some_header");
-#if BUILDFLAG(IS_ANDROID)
-  original.socket_tag = net::SocketTag(1, 2);
-#else
   original.socket_tag = net::SocketTag();
-#endif
 
   network::ParsedPermissionsPolicy empty_container_policy;
   std::unique_ptr<network::PermissionsPolicy> permissions_policy =

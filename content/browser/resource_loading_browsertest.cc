@@ -20,13 +20,8 @@ const char kResourceLoadingNonMobilePage[] =
     "/resource_loading/resource_loading_non_mobile.html";
 
 // TODO(crbug.com/40850567): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ResourceLoadingAvoidDoubleDownloads \
-  DISABLED_ResourceLoadingAvoidDoubleDownloads
-#else
 #define MAYBE_ResourceLoadingAvoidDoubleDownloads \
   ResourceLoadingAvoidDoubleDownloads
-#endif
 IN_PROC_BROWSER_TEST_F(ResourceLoadingBrowserTest,
                        MAYBE_ResourceLoadingAvoidDoubleDownloads) {
   ASSERT_TRUE(embedded_test_server()->Start());

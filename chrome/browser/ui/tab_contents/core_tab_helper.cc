@@ -46,14 +46,12 @@
 #include "ui/gfx/codec/webp_codec.h"
 #include "ui/gfx/image/image_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/time/time.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/tabs/tab_strip_model.h"  // nogncheck crbug.com/40147906
-#endif
 
 using content::WebContents;
 
@@ -100,7 +98,6 @@ std::u16string CoreTabHelper::GetStatusText() const {
 
 void CoreTabHelper::UpdateContentRestrictions(int content_restrictions) {
   content_restrictions_ = content_restrictions;
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           web_contents());
@@ -111,7 +108,6 @@ void CoreTabHelper::UpdateContentRestrictions(int content_restrictions) {
   browser->GetFeatures()
       .browser_command_controller()
       ->ContentRestrictionsChanged();
-#endif
 }
 
 std::vector<unsigned char> CoreTabHelper::EncodeImage(
@@ -281,10 +277,6 @@ void CoreTabHelper::SearchByImageImpl(
 // static
 bool CoreTabHelper::GetStatusTextForWebContents(std::u16string* status_text,
                                                 content::WebContents* source) {
-#if BUILDFLAG(IS_ANDROID)
-  NOTREACHED() << "If this ends up being used on Android update "
-               << "ChromeContentBrowserClient::OverrideURLLoaderFactoryParams.";
-#else
   if (!source->IsLoading() ||
       source->GetLoadState().state == net::LOAD_STATE_IDLE) {
     return false;
@@ -359,7 +351,6 @@ bool CoreTabHelper::GetStatusTextForWebContents(std::u16string* status_text,
       break;
   }
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,7 +362,6 @@ void CoreTabHelper::DidStartLoading() {
 
 // Update back/forward buttons for web_contents that are active.
 void CoreTabHelper::NavigationEntriesDeleted() {
-#if !BUILDFLAG(IS_ANDROID)
   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
       [this](BrowserWindowInterface* browser) {
         if (web_contents() ==
@@ -382,14 +372,12 @@ void CoreTabHelper::NavigationEntriesDeleted() {
         }
         return true;
       });
-#endif
 }
 
 // Notify browser commands that depend on whether focus is in the
 // web contents or not.
 void CoreTabHelper::OnWebContentsFocused(
     content::RenderWidgetHost* render_widget_host) {
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           web_contents());
@@ -398,12 +386,10 @@ void CoreTabHelper::OnWebContentsFocused(
         .browser_command_controller()
         ->WebContentsFocusChanged();
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void CoreTabHelper::OnWebContentsLostFocus(
     content::RenderWidgetHost* render_widget_host) {
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           web_contents());
@@ -412,7 +398,6 @@ void CoreTabHelper::OnWebContentsLostFocus(
         .browser_command_controller()
         ->WebContentsFocusChanged();
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void CoreTabHelper::DoSearchByImageWithBitmap(

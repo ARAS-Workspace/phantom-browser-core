@@ -148,11 +148,7 @@ class InputSyncWriterTest : public testing::Test {
   // with a glitch summary from the destructor. Besides that only for errors
   // and fifo info.
   int GetTotalNumberOfExpectedLogCalls(int expected_calls_due_to_error) {
-#if BUILDFLAG(IS_ANDROID)
-    return expected_calls_due_to_error + 1;
-#else
     return expected_calls_due_to_error + 2;
-#endif
   }
 
   // Tests expected numbers which are given as arguments.

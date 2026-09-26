@@ -152,12 +152,6 @@ class GPU_IPC_SERVICE_EXPORT GpuChannelMessageFilter
                              const viz::SharedImageFormat& format,
                              gfx::BufferUsage buffer_usage,
                              CreateGpuMemoryBufferCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void CopyNativeGmbToSharedMemoryAsync(
-      gfx::GpuMemoryBufferHandle buffer_handle,
-      base::UnsafeSharedMemoryRegion shared_memory,
-      CopyNativeGmbToSharedMemoryAsyncCallback callback) override;
-#endif  // BUILDFLAG(IS_ANDROID)
   void WaitForTokenInRange(int32_t routing_id,
                            int32_t start,
                            int32_t end,
@@ -380,12 +374,6 @@ void GpuChannelMessageFilter::CreateGpuMemoryBuffer(
   gfx::GpuMemoryBufferHandle handle;
   if (SharedImageFactory::IsNativeBufferSupported(format, buffer_usage,
                                                   gpu_extra_info_)) {
-#if BUILDFLAG(IS_ANDROID)
-    // Creation of native buffer handles is not supported on Android (the
-    // only way that a non-null GpuMemoryBufferHandle can be created on
-    // Android is by importing an external AHB).
-    std::move(callback).Run(std::move(handle));
-#else
     base::AutoLock auto_lock(gpu_channel_lock_);
     if (!gpu_channel_) {
       std::move(callback).Run(gfx::GpuMemoryBufferHandle());
@@ -396,7 +384,6 @@ void GpuChannelMessageFilter::CreateGpuMemoryBuffer(
         gpu_channel_->shared_image_stub()
             ->factory()
             ->CreateNativeGpuMemoryBufferHandle(size, format, buffer_usage);
-#endif
   } else {
     if (SharedMemoryImageBackingFactory::IsBufferUsageSupported(buffer_usage) &&
         SharedMemoryImageBackingFactory::IsSizeValidForFormat(size, format)) {
@@ -501,25 +488,6 @@ void GpuChannelMessageFilter::DestroyCommandBuffer(
                      gpu_channel_->AsWeakPtr(), routing_id),
       std::move(callback));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void GpuChannelMessageFilter::CopyNativeGmbToSharedMemoryAsync(
-    gfx::GpuMemoryBufferHandle buffer_handle,
-    base::UnsafeSharedMemoryRegion shared_memory,
-    CopyNativeGmbToSharedMemoryAsyncCallback callback) {
-  base::AutoLock auto_lock(gpu_channel_lock_);
-  if (!gpu_channel_) {
-    std::move(callback).Run(false);
-    return;
-  }
-
-  std::move(callback).Run(
-      gpu_channel_->shared_image_stub()
-          ->factory()
-          ->CopyNativeBufferToSharedMemoryAsync(std::move(buffer_handle),
-                                                std::move(shared_memory)));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void GpuChannelMessageFilter::WaitForTokenInRange(
     int32_t routing_id,
@@ -801,18 +769,6 @@ bool GpuChannel::CreateSharedImageStub(
       shared_image_stub_->factory()->MakeCapabilities();
   return true;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-const CommandBufferStub* GpuChannel::GetOneStub() const {
-  for (const auto& kv : stubs_) {
-    const CommandBufferStub* stub = kv.second.get();
-    if (stub->decoder_context() && !stub->decoder_context()->WasContextLost())
-      return stub;
-  }
-  return nullptr;
-}
-
-#endif
 
 
 // Helper to ensure CreateCommandBuffer below always invokes its response

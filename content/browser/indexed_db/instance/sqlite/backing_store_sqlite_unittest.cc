@@ -544,16 +544,11 @@ TEST_F(BackingStoreSqliteTest, VacuumOnClose) {
 
     histograms.ExpectTotalCount("IndexedDB.SQLite.FreelistPercentageAtClose",
                                 1);
-#if BUILDFLAG(IS_ANDROID)
-    // Autovacuum is enabled by default on Android, so vacuum is not triggered.
-    histograms.ExpectTotalCount("IndexedDB.SQLite.VacuumEvent", 0);
-#else
     histograms.ExpectTotalCount("IndexedDB.SQLite.VacuumEvent", 2);
     histograms.ExpectBucketCount("IndexedDB.SQLite.VacuumEvent",
                                  1 /*kRequestedOnClose*/, 1);
     histograms.ExpectBucketCount("IndexedDB.SQLite.VacuumEvent",
                                  3 /*kForceClosing*/, 1);
-#endif
   }
 
   // Reopen the database and expect vacuum to succeed on "regular" close.
@@ -568,17 +563,12 @@ TEST_F(BackingStoreSqliteTest, VacuumOnClose) {
 
     histograms.ExpectTotalCount("IndexedDB.SQLite.FreelistPercentageAtClose",
                                 1);
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_EQ(post_vacuum_size, pre_vacuum_size);
-    histograms.ExpectTotalCount("IndexedDB.SQLite.VacuumEvent", 0);
-#else
     EXPECT_LT(post_vacuum_size, pre_vacuum_size);
     histograms.ExpectTotalCount("IndexedDB.SQLite.VacuumEvent", 2);
     histograms.ExpectBucketCount("IndexedDB.SQLite.VacuumEvent",
                                  1 /*kRequestedOnClose*/, 1);
     histograms.ExpectBucketCount("IndexedDB.SQLite.VacuumEvent",
                                  2 /*kSucceeded*/, 1);
-#endif
   }
 }
 
@@ -600,16 +590,11 @@ TEST_F(BackingStoreSqliteTest, VacuumOnIdle) {
   backing_store()->RunIdleTasks(/*long_idle=*/true);
   ASSERT_OK_AND_ASSIGN(int64_t post_vacuum_size, base::GetFileSize(db_path));
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(post_vacuum_size, pre_vacuum_size);
-  histograms.ExpectTotalCount("IndexedDB.SQLite.VacuumEvent", 0);
-#else
   EXPECT_LT(post_vacuum_size, pre_vacuum_size);
   histograms.ExpectBucketCount("IndexedDB.SQLite.VacuumEvent",
                                7 /*kRequestedOnLongIdle*/, 1);
   histograms.ExpectBucketCount("IndexedDB.SQLite.VacuumEvent", 2 /*kSucceeded*/,
                                1);
-#endif
 }
 
 // Verifies that writing enough to a database will cause a checkpoint

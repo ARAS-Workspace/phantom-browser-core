@@ -21,20 +21,7 @@ std::unique_ptr<CommandLinePolicyProvider>
 CommandLinePolicyProvider::CreateIfAllowed(
     const base::CommandLine& command_line,
     version_info::Channel channel) {
-#if BUILDFLAG(IS_ANDROID)
-  if (channel == version_info::Channel::STABLE ||
-      channel == version_info::Channel::BETA) {
-    return nullptr;
-  }
-
-  if (!base::android::android_info::is_debug_android()) {
-    return nullptr;
-  }
-
-  return base::WrapUnique(new CommandLinePolicyProvider(command_line));
-#else
   return nullptr;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // static

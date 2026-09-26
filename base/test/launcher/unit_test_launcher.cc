@@ -52,7 +52,6 @@ namespace {
 const size_t kDefaultTestBatchLimit =
     10;
 
-#if !BUILDFLAG(IS_ANDROID)
 void PrintUsage() {
   fprintf(
       stdout,
@@ -222,7 +221,6 @@ int RunTestSuite(RunTestSuiteCallback run_test_suite,
 
   return (success ? 0 : 1);
 }
-#endif
 
 int LaunchUnitTestsInternal(RunTestSuiteCallback run_test_suite,
                             size_t parallel_jobs,
@@ -233,10 +231,6 @@ int LaunchUnitTestsInternal(RunTestSuiteCallback run_test_suite,
                             OnceClosure gtest_init) {
   base::test::AllowCheckIsTestForTesting();
 
-#if BUILDFLAG(IS_ANDROID)
-  // We can't easily fork on Android, just run the test suite directly.
-  return std::move(run_test_suite).Run();
-#else
   ScopedBlockTestsWritingToSpecialDirs scoped_blocker(
       {
           // Please keep these in alphabetic order within each platform type.
@@ -252,7 +246,6 @@ int LaunchUnitTestsInternal(RunTestSuiteCallback run_test_suite,
   return RunTestSuite(std::move(run_test_suite), parallel_jobs,
                       default_batch_limit, retry_limit, use_job_objects,
                       timeout_callback, std::move(gtest_init));
-#endif
 }
 
 void InitGoogleTestChar(int* argc, char** argv) {

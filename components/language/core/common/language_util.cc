@@ -11,14 +11,7 @@
 namespace language {
 
 bool OverrideTranslateTriggerInIndia() {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(language::kDisableGeoLanguageModel)) {
-    return false;
-  }
-  return country_codes::GetCurrentCountryID().CountryCode() == "IN";
-#else
   return false;
-#endif
 }
 
 OverrideLanguageModel GetOverrideLanguageModel() {

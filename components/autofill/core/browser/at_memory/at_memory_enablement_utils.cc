@@ -32,10 +32,6 @@
 #include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/system/sys_info.h"
-#endif
-
 #include "components/variations/service/google_groups_manager.h"  // nogncheck
 
 namespace autofill {
@@ -128,15 +124,7 @@ base::flat_set<int32_t> GetAutofillAtMemoryEligibleTiers() {
 }
 
 [[nodiscard]] bool IsAndroidDeviceEligibleForAtMemory() {
-#if BUILDFLAG(IS_ANDROID)
-  const std::string model_name = base::SysInfo::HardwareModelName();
-  const base::flat_set<std::string> enabled_devices =
-      base::SplitString(features::kAutofillAtMemoryEnabledDevices.Get(), ",",
-                        base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-  return enabled_devices.contains(model_name);
-#else
   return false;
-#endif
 }
 
 // Returns whether the subscription tier eligibility or device eligibility

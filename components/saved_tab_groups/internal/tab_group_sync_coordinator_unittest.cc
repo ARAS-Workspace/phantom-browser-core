@@ -161,13 +161,8 @@ TEST_F(TabGroupSyncCoordinatorTest, ReconcileGroupsToSync) {
 
 // Desktop Platforms do not use Startup Helper to perform initializing
 // actions.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SaveUnsavedLocalGroupsOnStartupForFirstTimeFeatureLaunch \
-  SaveUnsavedLocalGroupsOnStartupForFirstTimeFeatureLaunch
-#else
 #define MAYBE_SaveUnsavedLocalGroupsOnStartupForFirstTimeFeatureLaunch \
   DISABLED_SaveUnsavedLocalGroupsOnStartupForFirstTimeFeatureLaunch
-#endif
 TEST_F(TabGroupSyncCoordinatorTest,
        MAYBE_SaveUnsavedLocalGroupsOnStartupForFirstTimeFeatureLaunch) {
   pref_service_.SetBoolean(prefs::kDidSyncTabGroupsInLastSession, false);
@@ -190,12 +185,8 @@ TEST_F(TabGroupSyncCoordinatorTest,
 
 // Desktop Platforms do not use Startup Helper to perform initializing
 // actions.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CloseUnsavedLocalGroupsOnStartup CloseUnsavedLocalGroupsOnStartup
-#else
 #define MAYBE_CloseUnsavedLocalGroupsOnStartup \
   DISABLED_CloseUnsavedLocalGroupsOnStartup
-#endif
 TEST_F(TabGroupSyncCoordinatorTest, MAYBE_CloseUnsavedLocalGroupsOnStartup) {
   pref_service_.SetBoolean(prefs::kDidSyncTabGroupsInLastSession, true);
   EXPECT_CALL(*service_, ReadAllGroups())

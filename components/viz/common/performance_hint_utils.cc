@@ -10,34 +10,12 @@
 #include "base/logging.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/linux_util.h"
-#endif
-
 namespace viz {
 
 bool CheckThreadIdsDoNotBelongToCurrentProcess(
     const base::flat_set<base::PlatformThreadId>&
         thread_ids_from_sandboxed_process) {
-#if BUILDFLAG(IS_ANDROID)
-  // This function is similar to the one above, but it's based on /proc/self
-  // instead of /proc/<pid> under the hood. Unlike /proc/<pid>, /proc/self
-  // should be always accessible for the Browser and the GPU process on
-  // Android.
-  std::vector<pid_t> privileged_thread_ids;
-  if (!base::GetThreadsForCurrentProcess(&privileged_thread_ids)) {
-    return false;
-  }
-  static_assert(std::is_same_v<pid_t, base::PlatformThreadId::UnderlyingType>);
-  for (const auto& tid : thread_ids_from_sandboxed_process) {
-    if (std::ranges::contains(privileged_thread_ids, tid.raw())) {
-      return false;
-    }
-  }
-  return true;
-#else
   return false;
-#endif
 }
 
 }  // namespace viz

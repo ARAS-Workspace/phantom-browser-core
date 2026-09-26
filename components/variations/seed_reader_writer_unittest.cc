@@ -212,9 +212,7 @@ constexpr version_info::Channel kAssignedChannels[] = {
     version_info::Channel::CANARY,
     version_info::Channel::DEV,
     version_info::Channel::BETA,
-#if !BUILDFLAG(IS_ANDROID)
     version_info::Channel::STABLE,
-#endif
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -232,13 +230,8 @@ TEST_P(ExpectedFieldTrialGroupAssignedTest, AssignedGroup) {
       kOldSeedFilename, GetParam().seed_fields_prefs, GetParam().channel,
       entropy_providers_.get(), GetHistogramSuffix(),
       file_writer_thread_.task_runner());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(base::FieldTrialList::FindFullName(kSeedFileTrial),
-              ::testing::AnyOf(kControlGroup, kSeedFilesGroup));
-#else
   EXPECT_EQ(base::FieldTrialList::FindFullName(kSeedFileTrial),
             kSeedFilesGroup);
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -1119,11 +1112,7 @@ TEST_P(SeedReaderWriterSeedFilesGroupTest, ReadSeedDataCallbackCorruptGzip) {
       });
   seed_reader_writer.ReadSeedData(lambda_cb);
   run_loop.Run();
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(load_result, LoadSeedResult::kCorruptGzip);
-#else   // !BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(load_result, LoadSeedResult::kCorruptZstd);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_P(SeedReaderWriterSeedFilesGroupTest,
@@ -1846,9 +1835,6 @@ TEST_P(SeedReaderWriterLocalStateGroupsTest, NoSeedFile) {
 
 constexpr version_info::Channel kLocalStateNoGroupChannels[] = {
     version_info::Channel::UNKNOWN,
-#if BUILDFLAG(IS_ANDROID)
-    version_info::Channel::STABLE,
-#endif
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -1861,11 +1847,10 @@ INSTANTIATE_TEST_SUITE_P(
                            ::testing::ValuesIn(kLocalStateNoGroupChannels))));
 
 constexpr version_info::Channel kLocalStateGroupsChannels[] = {
-    version_info::Channel::UNKNOWN, version_info::Channel::CANARY,
-    version_info::Channel::DEV,     version_info::Channel::BETA,
-#if BUILDFLAG(IS_ANDROID)
-    version_info::Channel::STABLE,
-#endif
+    version_info::Channel::UNKNOWN,
+    version_info::Channel::CANARY,
+    version_info::Channel::DEV,
+    version_info::Channel::BETA,
 };
 
 INSTANTIATE_TEST_SUITE_P(

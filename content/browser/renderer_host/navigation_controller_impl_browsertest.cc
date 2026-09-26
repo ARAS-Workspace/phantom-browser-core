@@ -173,11 +173,7 @@ class NavigationControllerBrowserTestBase : public ContentBrowserTest {
     TitleWatcher title_watcher(shell()->web_contents(),
                                base::UTF8ToUTF16(title));
     if (use_load_data_as_string_with_base_url) {
-#if BUILDFLAG(IS_ANDROID)
-      shell()->LoadDataAsStringWithBaseURL(history_url, data, base_url);
-#else
       NOTREACHED();
-#endif
     } else {
       shell()->LoadDataWithBaseURL(history_url, data, base_url);
     }
@@ -437,12 +433,10 @@ INSTANTIATE_TEST_SUITE_P(
 // used in the NavigationEntries.
 IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLWithPossiblyEmptyURLsBrowserTest,
                        LoadDataWithBaseURLThenReload) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -478,12 +472,7 @@ IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLWithPossiblyEmptyURLsBrowserTest,
   // 1) Load data, but don't commit yet.
   TestNavigationObserver same_tab_observer(shell()->web_contents(), 1);
   if (use_load_data_as_string_with_base_url()) {
-#if BUILDFLAG(IS_ANDROID)
-    shell()->LoadDataAsStringWithBaseURL(supplied_history_url, data,
-                                         supplied_base_url);
-#else
     NOTREACHED();
-#endif
   } else {
     shell()->LoadDataWithBaseURL(supplied_history_url, data, supplied_base_url);
   }
@@ -571,12 +560,10 @@ IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLWithPossiblyEmptyURLsBrowserTest,
 IN_PROC_BROWSER_TEST_P(
     LoadDataWithBaseURLWithPossiblyEmptyURLsBrowserTest,
     HistoryNavigationWhenLoadDataWithBaseURLWithSameDocumentNavigation) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -709,12 +696,10 @@ IN_PROC_BROWSER_TEST_P(
 // same-document navigations after LoadDataWithBaseURL instead.
 IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLWithPossiblyEmptyURLsBrowserTest,
                        LoadDataWithBaseURLThenRendererInitiatedSameDocument) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -807,12 +792,10 @@ IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLWithPossiblyEmptyURLsBrowserTest,
 // same-document navigations after LoadDataWithBaseURL instead.
 IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLWithPossiblyEmptyURLsBrowserTest,
                        LoadDataWithBaseURLThenBrowserInitiatedSameDocument) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -1225,12 +1208,10 @@ INSTANTIATE_TEST_SUITE_P(
 // URL given is invalid.
 IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
                        LoadDataWithInvalidBaseURL) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -1306,12 +1287,10 @@ class BlockAllCommitContentBrowserClient
 // typically blocked by an embedder, because it bypasses the renderer check.
 IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
                        LoadDataWithBlockedDataURL) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -1406,12 +1385,10 @@ IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
 // previously bypassed those checks in a LoadDataWithBaseURL document.
 IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
                        LoadDataWithBlockedDataURLBlocksNormalLoads) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -1472,12 +1449,10 @@ IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
 // the checks since the base URL is invalid.
 IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
                        LoadDataWithBlockedDataURLAndInvalidBaseURL) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -1504,11 +1479,7 @@ IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
       shell()->web_contents()->GetPrimaryMainFrame()->GetProcess());
 
   if (use_load_data_as_string_with_base_url()) {
-#if BUILDFLAG(IS_ANDROID)
-    shell()->LoadDataAsStringWithBaseURL(history_url, data, base_url);
-#else
     NOTREACHED();
-#endif
   } else {
     shell()->LoadDataWithBaseURL(history_url, data, base_url);
   }
@@ -1523,12 +1494,10 @@ IN_PROC_BROWSER_TEST_P(LoadDataWithBaseURLBrowserTest,
 IN_PROC_BROWSER_TEST_P(
     LoadDataWithBaseURLBrowserTest,
     LoadDataWithBaseURLThenJavaScriptURLThenSameDocumentNavigation) {
-#if !BUILDFLAG(IS_ANDROID)
   // LoadDataAsStringWithBaseURL is only supported on Android.
   if (use_load_data_as_string_with_base_url()) {
     return;
   }
-#endif
   // LoadDataWithBaseURL is never subject to --site-per-process policy today
   // (this API is only used by Android WebView [where OOPIFs have not shipped
   // yet] and GuestView cases [which always hosts guests inside a renderer
@@ -1769,11 +1738,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
 
   // Load data and commit.
   TestNavigationObserver same_tab_observer(shell()->web_contents(), 1);
-#if BUILDFLAG(IS_ANDROID)
-  shell()->LoadDataAsStringWithBaseURL(history_url, data, base_url);
-#else
   shell()->LoadDataWithBaseURL(history_url, data, base_url);
-#endif
   same_tab_observer.Wait();
   EXPECT_EQ(1, controller.GetEntryCount());
   const GURL data_url = controller.GetLastCommittedEntry()->GetURL();
@@ -2105,11 +2070,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
 
   // Load data and commit.
   TestNavigationObserver same_tab_observer(shell()->web_contents(), 1);
-#if BUILDFLAG(IS_ANDROID)
-  shell()->LoadDataAsStringWithBaseURL(history_url, data, base_url);
-#else
   shell()->LoadDataWithBaseURL(history_url, data, base_url);
-#endif
   same_tab_observer.Wait();
 
   FrameTreeNode* root = static_cast<WebContentsImpl*>(shell()->web_contents())
@@ -12289,7 +12250,6 @@ INSTANTIATE_TEST_SUITE_P(
     NavigationControllerBrowserTest::DescribeParams);
 
 // This test uses ASSERT_DEATH, which is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 // This ensures that origin integrity is enforced even during history
 // navigations, and protects against session history corruption. See
 // https://crbug.com/41492620 for context.
@@ -12322,7 +12282,6 @@ IN_PROC_BROWSER_TEST_P(ValidateCommitOriginTest,
       },
       "");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test extra lines of defense against https://crbug.com/41487933, similar to
 // SubframeBackFromSubframeLocationReplace. This test recreates the session
@@ -23807,7 +23766,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
   EXPECT_TRUE(root->current_frame_host()->IsRenderFrameLive());
 
   // - Death tests misbehave on Android, http://crbug.com/643760.
-#if !BUILDFLAG(IS_ANDROID) && defined(GTEST_HAS_DEATH_TEST)
+#if defined(GTEST_HAS_DEATH_TEST)
   // Disable the policy. Debug URL now crashes the browser process.
   content_browser_client.SetBlockDebugUrls(false);
   EXPECT_DCHECK_DEATH({
@@ -23816,7 +23775,7 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
     EXPECT_EQ(2U,
               content_browser_client.GetShouldBlockRendererDebugURLCallCount());
   });
-#endif  // !BUILDFLAG(IS_ANDROID) && defined(GTEST_HAS_DEATH_TEST)
+#endif  // defined(GTEST_HAS_DEATH_TEST)
 }
 
 IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,

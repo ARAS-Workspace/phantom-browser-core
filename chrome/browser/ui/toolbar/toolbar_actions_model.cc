@@ -47,9 +47,7 @@
 #include "extensions/common/manifest_constants.h"
 #include "extensions/common/permissions/permissions_data.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#endif
 
 namespace {
 
@@ -400,15 +398,8 @@ bool ToolbarActionsModel::HasAction(const ActionId& action_id) const {
 
 bool ToolbarActionsModel::CanShowActionsInToolbar(
     const BrowserWindowInterface& browser) {
-#if BUILDFLAG(IS_ANDROID)
-  // On Desktop Android, we show actions in the toolbar as long as the rest of
-  // the extensions UI is enabled in the browser.
-  // TODO(crbug.com/460554584): Make sure this is the intended behavior.
-  return true;
-#else   // BUILDFLAG(IS_ANDROID)
   // Pinning extensions is not available in PWAs.
   return !web_app::AppBrowserController::IsWebApp(&browser);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool ToolbarActionsModel::IsRestrictedUrl(const GURL& url) const {

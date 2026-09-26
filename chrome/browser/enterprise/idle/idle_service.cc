@@ -19,17 +19,14 @@
 #include "ui/base/idle/idle.h"
 #include "ui/base/idle/idle_polling_service.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/idle_bubble.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace enterprise_idle {
 
-#if !BUILDFLAG(IS_ANDROID)
 // Observes OnBrowserActivated(). If the kIdleTimeoutShowBubbleOnStartup
 // pref is true, it shows a bubble when a browser comes into focus. See
 // ShowBubbleAction.
@@ -96,15 +93,6 @@ class IdleService::BrowserObserver : public BrowserCollectionObserver {
   base::ScopedObservation<ProfileBrowserCollection, BrowserCollectionObserver>
       observation_{this};
 };
-#else
-// BrowserObserver for Android, to minimize #ifdef hell.
-class IdleService::BrowserObserver {
- public:
-  explicit BrowserObserver(Profile* profile) {}
-  void StartObserving() {}
-  void StopObserving() {}
-};
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IdleService::IdleService(Profile* profile)
     : profile_(profile),

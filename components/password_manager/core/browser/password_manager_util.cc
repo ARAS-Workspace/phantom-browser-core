@@ -139,14 +139,6 @@ void UserTriggeredManualGenerationFromContextMenu(
 }
 
 bool IsAbleToSavePasswords(password_manager::PasswordManagerClient* client) {
-#if BUILDFLAG(IS_ANDROID)
-  if (password_manager::sync_util::HasChosenToSyncPasswords(
-          client->GetSyncService())) {
-    const password_manager::PasswordStoreInterface* account_store =
-        client->GetAccountPasswordStore();
-    return account_store && IsAbleToSavePasswords(account_store->GetError());
-  }
-#endif
   // TODO(b/324054761): Check AccountPasswordStore store when needed.
   const password_manager::PasswordStoreInterface* profile_store =
       client->GetProfilePasswordStore();
@@ -170,15 +162,6 @@ bool IsSavingBlockedByTrustedVaultError(
     return false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  const password_manager::PasswordStoreInterface* account_store =
-      client->GetAccountPasswordStore();
-  return account_store &&
-         account_store->GetError() ==
-             password_manager::ActionableError::kTrustedVaultKeyNeeded &&
-         base::FeatureList::IsEnabled(
-             password_manager::features::kPasswordSaveInContextErrorResolution);
-#else
   bool has_trusted_vault_error = false;
   bool has_other_blocking_errors = false;
   // It might be that the credential is updated in both stores. In this case
@@ -208,7 +191,6 @@ bool IsSavingBlockedByTrustedVaultError(
   return has_trusted_vault_error && !has_other_blocking_errors &&
          base::FeatureList::IsEnabled(
              password_manager::features::kPasswordSaveInContextErrorResolution);
-#endif
 }
 
 bool IsSavingBlockedByRecoverableError(

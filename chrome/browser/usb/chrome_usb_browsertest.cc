@@ -58,7 +58,6 @@
 #include "services/service_manager/public/cpp/binder_registry.h"
 #include "third_party/blink/public/mojom/usb/web_usb_service.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/app/chrome_command_ids.h"  // nogncheck
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/chooser_bubble_testapi.h"
@@ -67,7 +66,6 @@
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "base/test/test_future.h"
@@ -102,7 +100,6 @@ constexpr const char kTestExtensionKey[] =
     "afIzV9zwe4Xiskk+5JNGt8b2rQIDAQAB";
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 constexpr uint8_t kUsbPrinterClass = 7;
 constexpr char kNonAppHost[] = "nonapp.com";
 constexpr char kNonAppHost2[] = "nonapp2.com";
@@ -122,7 +119,6 @@ constexpr char OpenAndClaimDeviceScript[] = R"((async () => {
 auto FailedWithSubstr(std::string_view substr) {
   return content::EvalJsResult::ErrorIs(testing::HasSubstr(substr));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 // Observer for an extension service worker events like start, activated, and
@@ -303,7 +299,6 @@ class ChromeWebUsbTest : public PlatformBrowserTest {
   GURL origin_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 scoped_refptr<device::FakeUsbDeviceInfo> CreateUsbDevice(
     uint8_t class_code,
     uint16_t product_id = 0x8765) {
@@ -325,7 +320,6 @@ scoped_refptr<device::FakeUsbDeviceInfo> CreateUsbDevice(
   return base::MakeRefCounted<device::FakeUsbDeviceInfo>(
       0x4321, product_id, "ACME", "Frobinator", "ABCDEF", std::move(configs));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(ChromeWebUsbTest, RequestAndGetDevices) {
   content::WebContents* web_contents = GetActiveWebContents();
@@ -466,7 +460,6 @@ IN_PROC_BROWSER_TEST_F(ChromeWebUsbTest, AddRemoveDeviceEphemeral) {
       })())"));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/494643383): Sort out chooser testing on Android. Note that
 // ChooserBubbleUiWaiter is views-only and not supported on Android.
 IN_PROC_BROWSER_TEST_F(ChromeWebUsbTest, NavigateWithChooserCrossOrigin) {
@@ -521,7 +514,6 @@ IN_PROC_BROWSER_TEST_F(ChromeWebUsbTest, ShowChooserInBackgroundTab) {
           }
         })())"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(ChromeWebUsbTest, ForgetDevice) {
   content::WebContents* web_contents = GetActiveWebContents();
@@ -546,7 +538,7 @@ IN_PROC_BROWSER_TEST_F(ChromeWebUsbTest, ForgetDevice) {
                                       WEBUSB_PERMISSION_REVOKED_BY_WEBSITE, 1);
 }
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 // Android does not support Chrome Apps.
 class ChromeWebUsbAppTest : public extensions::ExtensionBrowserTest {
  public:
@@ -616,9 +608,8 @@ IN_PROC_BROWSER_TEST_F(ChromeWebUsbAppTest, AllowProtectedInterfaces) {
   ready_listener.Reply("ok");
   EXPECT_TRUE(result_catcher.GetNextResult()) << result_catcher.message();
 }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android does not support the code in //chrome/browser/web_applications
 // needed to run these tests.
 class IsolatedWebAppUsbBrowserTest
@@ -1155,7 +1146,6 @@ IN_PROC_BROWSER_TEST_F(IsolatedWebAppPermissionsPolicyBrowserTest,
       EvalJs(iframe1, OpenAndClaimDeviceScript).ExtractString(),
       testing::EndsWith("requested interface implements a protected class."));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 class WebUsbExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
@@ -1251,9 +1241,6 @@ class WebUsbExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
   }
 
   void SimulateClickOnSystemTrayIconButton(const Extension* extension) {
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(crbug.com/494643383): Sort out notifications testing on Android.
-#else
     // On non-ChromeOS platforms, as they use status icon and there isn't good
     // test infra to simulate click on the status icon button, so simulate the
     // click event by invoking ExecuteCommand of UsbConnectionTracker directly.
@@ -1274,7 +1261,6 @@ class WebUsbExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
         GetActiveWebContents()->GetURL(),
         "chrome://settings/content/siteDetails?site=chrome-extension%3A%2F%2F" +
             extension->id());
-#endif
   }
 
  private:

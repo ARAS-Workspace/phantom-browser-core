@@ -49,8 +49,6 @@ std::optional<std::vector<uint8_t>> DecompressSnappy(
   return decompressed;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 CompressedValue CompressZstd(base::span<const uint8_t> uncompressed) {
   // Compression level of -4 yields compression output similar to Snappy.
   constexpr int kCompressionLevel = -4;
@@ -65,23 +63,6 @@ CompressedValue CompressZstd(base::span<const uint8_t> uncompressed) {
   compressed.resize(compressed_length);
   return {CompressionType::kZstd, std::move(compressed)};
 }
-
-#else
-
-CompressedValue CompressSnappy(base::span<const uint8_t> uncompressed) {
-  size_t max_compressed_size = snappy::MaxCompressedLength(uncompressed.size());
-  std::vector<uint8_t> compressed(max_compressed_size);
-
-  size_t compressed_length = 0;
-  base::span<const char> src = base::as_chars(uncompressed);
-  base::span<char> dest = base::as_writable_chars(base::span(compressed));
-  snappy::RawCompress(src.data(), src.size(), dest.data(), &compressed_length);
-
-  compressed.resize(compressed_length);
-  return {CompressionType::kSnappy, std::move(compressed)};
-}
-
-#endif
 
 }  // namespace
 
@@ -102,11 +83,7 @@ CompressedValue Compress(std::vector<uint8_t> uncompressed) {
     return {CompressionType::kUncompressed, std::move(uncompressed)};
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   CompressedValue result = CompressZstd(uncompressed);
-#else
-  CompressedValue result = CompressSnappy(uncompressed);
-#endif
 
   if (result.data.size() <= uncompressed.size() * kMinimumCompressionRatio) {
     return result;

@@ -278,17 +278,6 @@ class TracingControllerTest : public ContentBrowserTest {
 };
 
 // Consistent failures on Android Asan https://crbug.com/1045519
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-#define MAYBE_EnableAndStopTracing DISABLED_EnableAndStopTracing
-#define MAYBE_EnableAndStopTracingWithFilePath \
-  DISABLED_EnableAndStopTracingWithFilePath
-#define MAYBE_EnableAndStopTracingWithCompression \
-  DISABLED_EnableAndStopTracingWithCompression
-#define MAYBE_EnableAndStopTracingWithEmptyFile \
-  DISABLED_EnableAndStopTracingWithEmptyFile
-#define MAYBE_DoubleStopTracing DISABLED_DoubleStopTracing
-#define MAYBE_ProcessesPresentInTrace DISABLED_ProcessesPresentInTrace
-#else
 #define MAYBE_EnableAndStopTracing EnableAndStopTracing
 #define MAYBE_EnableAndStopTracingWithFilePath EnableAndStopTracingWithFilePath
 #define MAYBE_EnableAndStopTracingWithCompression \
@@ -297,7 +286,6 @@ class TracingControllerTest : public ContentBrowserTest {
   EnableAndStopTracingWithEmptyFile
 #define MAYBE_DoubleStopTracing DoubleStopTracing
 #define MAYBE_ProcessesPresentInTrace ProcessesPresentInTrace
-#endif
 
 IN_PROC_BROWSER_TEST_F(TracingControllerTest, GetCategories) {
   Navigate(shell());

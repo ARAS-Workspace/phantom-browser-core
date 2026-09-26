@@ -41,19 +41,9 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "net/http/http_response_headers.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/signin/android/signin_bridge.h"
-#include "chrome/browser/signin/android/signin_bridge_factory.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/common/webui_url_constants.h"
-#include "ui/android/view_android.h"
-#else
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "chrome/browser/signin/dice_response_handler.h"
@@ -82,21 +72,6 @@ const char kRemoveLocalAccountObfuscatedIDAttrName[] = "obfuscatedid";
 // TODO(droger): Remove this delay when the Dice implementation is finished on
 // the server side.
 int g_dice_account_reconcilor_blocked_delay_ms = 1000;
-
-#if BUILDFLAG(IS_ANDROID)
-std::optional<CoreAccountInfo> FindCoreAccountInfoByEmail(
-    const signin::IdentityManager* identity_manager,
-    const std::string& email) {
-  CHECK(identity_manager);
-  for (const CoreAccountInfo& account :
-       identity_manager->GetAccountsWithRefreshTokens()) {
-    if (gaia::AreEmailsSame(email, account.email)) {
-      return account;
-    }
-  }
-  return std::nullopt;
-}
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 
@@ -185,13 +160,7 @@ class ManageAccountsHeaderReceivedUserData
 bool IsWebContentsForemost(Profile* profile,
                            content::WebContents* web_contents,
                            GAIAServiceType service_type) {
-#if BUILDFLAG(IS_ANDROID)
-  TabModel* tab_model = TabModelList::GetTabModelForWebContents(web_contents);
-  return tab_model && tab_model->IsActiveModel() &&
-         tab_model->GetActiveWebContents() == web_contents;
-#else
   return true;  // Neither ChromeOS nor Android, always consider as foremost.
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Processes the mirror response header on the UI thread. Currently depending
@@ -253,85 +222,6 @@ void ProcessMirrorHeader(
   // actually going to be handled. So record it as such.
   base::UmaHistogramEnumeration("Signin.ManageAccountsResponse.ServiceType",
                                 service_type);
-
-#if BUILDFLAG(IS_ANDROID)
-  GURL continue_url = GURL(manage_accounts_params.continue_url.empty()
-                               ? chrome::kChromeUINativeNewTabURL
-                               : manage_accounts_params.continue_url);
-  signin::IdentityManager* const identity_manager =
-      IdentityManagerFactory::GetForProfile(profile);
-
-  std::optional<CoreAccountInfo> target_account_info =
-      manage_accounts_params.email.empty()
-          ? std::nullopt
-          : FindCoreAccountInfoByEmail(identity_manager,
-                                       manage_accounts_params.email);
-
-  if (manage_accounts_params.show_consistency_promo) {
-    SigninBridgeFactory::GetForProfile(profile)
-        ->OpenAccountPickerBottomSheetForWebSignin(
-            web_contents, continue_url,
-            target_account_info
-                ? std::make_optional(target_account_info->account_id)
-                : std::nullopt);
-    return;
-  }
-
-  if (service_type == signin::GAIA_SERVICE_TYPE_INCOGNITO) {
-    web_contents->OpenURL(
-        content::OpenURLParams(continue_url, content::Referrer(),
-                               WindowOpenDisposition::OFF_THE_RECORD,
-                               ui::PAGE_TRANSITION_AUTO_TOPLEVEL, false),
-        /*navigation_handle_callback=*/{});
-    return;
-  }
-
-  if (service_type == signin::GAIA_SERVICE_TYPE_ADDSESSION &&
-      base::FeatureList::IsEnabled(switches::kSupportWebSigninAddSession)) {
-    if (!target_account_info.has_value()) {
-      // Target account is not on the device.
-      base::UmaHistogramEnumeration(
-          "Signin.ProcessMirrorHeaders.Event",
-          signin::MirrorHeaderEvent::kAccountNotOnDevice);
-      SigninBridgeFactory::GetForProfile(profile)->StartAddAccountFlow(
-          TabAndroid::FromWebContents(web_contents),
-          manage_accounts_params.email, continue_url, /*extension_name=*/"");
-      return;
-    }
-
-    // The target account was found on the device, check for a persistent auth
-    // error.
-    if (identity_manager->HasAccountWithRefreshTokenInPersistentErrorState(
-            target_account_info->account_id)) {
-      base::UmaHistogramEnumeration(
-          "Signin.ProcessMirrorHeaders.Event",
-          signin::MirrorHeaderEvent::kAccountInPersistentError);
-      SigninBridgeFactory::GetForProfile(profile)->StartUpdateCredentialsFlow(
-          TabAndroid::FromWebContents(web_contents), continue_url,
-          target_account_info->account_id);
-      return;
-    }
-
-    // If the account is available on the device but is not in error state
-    // then we wait for cookies.
-    base::UmaHistogramEnumeration(
-        "Signin.ProcessMirrorHeaders.Event",
-        signin::MirrorHeaderEvent::kAccountRecentlyAdded);
-    SigninBridgeFactory::GetForProfile(profile)->WaitForCookiesAndRedirect(
-        TabAndroid::FromWebContents(web_contents), continue_url,
-        target_account_info->account_id);
-    return;
-  }
-
-  auto* window = web_contents->GetNativeView()->GetWindowAndroid();
-  if (!window) {
-    return;
-  }
-  signin_metrics::LogAccountReconcilorStateOnGaiaResponse(
-      account_reconcilor->GetState());
-  SigninBridgeFactory::GetForProfile(profile)->OpenAccountManagementScreen(
-      window, service_type);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 #endif  // BUILDFLAG(ENABLE_MIRROR)
 

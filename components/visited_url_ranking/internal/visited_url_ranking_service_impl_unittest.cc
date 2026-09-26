@@ -628,13 +628,8 @@ TEST_F(VisitedURLRankingServiceImplTest, DecorateURLVisitAggregates) {
             u"Your most recent tab");
   EXPECT_EQ(result.second[1].decorations[1].GetDisplayString(),
             u"You just visited");
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(result.second[0].decorations[2].GetDisplayString(),
-            u"You visited 5 min ago");
-#else
   EXPECT_EQ(result.second[0].decorations[2].GetDisplayString(),
             u"You visited 5 mins ago");
-#endif
 }
 
 TEST_F(VisitedURLRankingServiceImplTest,

@@ -720,7 +720,6 @@ TEST_P(FormFetcherImplTest, Update_Reentrance) {
               UnorderedElementsAre(form_b, form_c));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(FormFetcherImplTest, FetchStatistics) {
   InteractionsStats stats;
   stats.origin_domain = form_digest_.url.DeprecatedGetOriginAsURL();
@@ -749,16 +748,6 @@ TEST_P(FormFetcherImplTest, FetchStatistics) {
   EXPECT_THAT(form_fetcher_->GetInteractionsStats(),
               UnorderedElementsAre(stats));
 }
-#else
-TEST_P(FormFetcherImplTest, DontFetchStatistics) {
-  EXPECT_CALL(*profile_mock_store_,
-              GetLogins(form_digest_, WeakAddress<PasswordStoreConsumer>(
-                                          form_fetcher_.get())));
-  EXPECT_CALL(mock_smart_bubble_stats_store_, GetSiteStats).Times(0);
-  form_fetcher_->Fetch();
-  task_environment_.RunUntilIdle();
-}
-#endif
 
 // Test that ensures HTTP passwords are not migrated on HTTP sites.
 TEST_P(FormFetcherImplTest, DoNotTryToMigrateHTTPPasswordsOnHTTPSites) {

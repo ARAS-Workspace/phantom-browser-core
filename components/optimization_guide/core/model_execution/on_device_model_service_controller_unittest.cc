@@ -1134,7 +1134,7 @@ TEST_F(OnDeviceModelServiceControllerTest,
 }
 
 // TODO(crbug.com/380229867): Flaky on Mac and Android.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ModelValidationNewModelVersion \
   DISABLED_ModelValidationNewModelVersion
 #else

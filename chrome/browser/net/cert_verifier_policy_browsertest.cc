@@ -32,11 +32,7 @@
 #include "net/cert/x509_util_nss.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/test/base/android/android_browser_test.h"
-#else
 #include "chrome/test/base/in_process_browser_test.h"
-#endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
 #include "base/containers/span.h"

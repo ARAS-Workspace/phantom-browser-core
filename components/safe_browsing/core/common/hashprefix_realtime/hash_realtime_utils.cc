@@ -170,16 +170,9 @@ HashRealTimeSelection DetermineHashRealTimeSelection(
         !IsHashRealTimeLookupEligibleInLocation(latest_country));
   }
   return can_do_lookup
-             ?
-#if BUILDFLAG(IS_ANDROID)
-             (only_background_lookup_eligible
-                  ? HashRealTimeSelection::kDatabaseManagerBackgroundOnly
-                  : HashRealTimeSelection::kDatabaseManager)
-#else
-             (only_background_lookup_eligible
-                  ? HashRealTimeSelection::kHashRealTimeServiceBackgroundOnly
-                  : HashRealTimeSelection::kHashRealTimeService)
-#endif
+             ? (only_background_lookup_eligible
+                    ? HashRealTimeSelection::kHashRealTimeServiceBackgroundOnly
+                    : HashRealTimeSelection::kHashRealTimeService)
              : HashRealTimeSelection::kNone;
 }
 

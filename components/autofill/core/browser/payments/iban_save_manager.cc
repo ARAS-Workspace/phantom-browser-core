@@ -230,15 +230,10 @@ bool IbanSaveManager::AttemptToOfferUploadSave(const Iban& import_candidate) {
   bool show_save_prompt = !GetIbanSaveStrikeDatabase()->ShouldBlockFeature(
       GetPartialIbanHashString(base::UTF16ToUTF8(import_candidate.value())));
   std::vector<ClientBehaviorConstants> client_behavior_signals;
-#if BUILDFLAG(IS_ANDROID)
-  client_behavior_signals.push_back(
-      ClientBehaviorConstants::kShowAccountEmailInLegalMessage);
-#else
   if (base::FeatureList::IsEnabled(features::kAutofillEnableWalletBrandingV2)) {
     client_behavior_signals.push_back(
         ClientBehaviorConstants::kShowAccountEmailInLegalMessage);
   }
-#endif
   client_->GetPaymentsAutofillClient()
       ->GetPaymentsNetworkInterface()
       ->GetIbanUploadDetails(

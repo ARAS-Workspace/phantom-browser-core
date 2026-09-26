@@ -88,14 +88,7 @@
 #include "content/public/browser/storage_partition.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/commerce/price_tracking/android/price_tracking_notification_bridge.h"
-#include "chrome/browser/optimization_guide/android/jni_headers/OptimizationGuideBridge_shared_jni.h"
-#include "chrome/browser/optimization_guide/android/optimization_guide_bridge.h"
-#include "chrome/browser/optimization_guide/android/optimization_guide_tab_url_provider_android.h"
-#else
 #include "chrome/browser/optimization_guide/optimization_guide_tab_url_provider.h"
-#endif
 
 #include "chrome/browser/private_ai/private_ai_service_factory.h"
 #include "components/optimization_guide/core/model_execution/private_ai_model_execution_fetcher.h"
@@ -202,10 +195,6 @@ OptimizationGuideKeyedService::MaybeCreatePushNotificationManager(
   if (optimization_guide::features::IsPushNotificationsEnabled()) {
     auto push_notification_manager =
         std::make_unique<optimization_guide::PushNotificationManager>();
-#if BUILDFLAG(IS_ANDROID)
-    push_notification_manager->AddObserver(
-        PriceTrackingNotificationBridge::GetForBrowserContext(profile));
-#endif
     return push_notification_manager;
   }
   return nullptr;
@@ -257,18 +246,6 @@ OptimizationGuideKeyedService::CreateModelBrokerClient() {
       std::move(remote), optimization_guide_logger_->GetWeakPtr());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<JOptimizationGuideBridge>
-OptimizationGuideKeyedService::GetJavaObject() {
-  if (!android_bridge_) {
-    android_bridge_ =
-        std::make_unique<optimization_guide::android::OptimizationGuideBridge>(
-            this);
-  }
-  return android_bridge_->GetJavaObject();
-}
-#endif
-
 void OptimizationGuideKeyedService::Initialize() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
@@ -299,14 +276,8 @@ void OptimizationGuideKeyedService::Initialize() {
     top_host_provider_ =
         optimization_guide::CommandLineTopHostProvider::CreateIfEnabled();
 
-#if BUILDFLAG(IS_ANDROID)
-    tab_url_provider_ = std::make_unique<
-        optimization_guide::android::OptimizationGuideTabUrlProviderAndroid>(
-        profile);
-#else
     tab_url_provider_ =
         std::make_unique<OptimizationGuideTabUrlProvider>(profile);
-#endif
 
     hint_store_ =
         optimization_guide::features::ShouldPersistHintsToDisk()
@@ -660,12 +631,10 @@ bool OptimizationGuideKeyedService::IsSettingVisible(
     return false;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           optimization_guide::features::kAiSettingsPageForceAvailable)) {
     return true;
   }
-#endif
 
   using SettingsVisibilityResult =
       ModelExecutionFeaturesController::SettingsVisibilityResult;

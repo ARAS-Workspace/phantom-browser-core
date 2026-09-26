@@ -711,27 +711,6 @@ bool PrepareUnpackBuffer(base::span<const GLuint> buffer,
   }
 
   if (format == GL_RGB && type == GL_FLOAT) {
-#if BUILDFLAG(IS_ANDROID)
-    // Reading pixels to pbo with glReadPixels will cause random failures of
-    // GLCopyTextureCHROMIUMES3Test.FormatCombinations in gl_tests. This is seen
-    // on Nexus 5 but not Nexus 4. Read pixels to client memory, then upload to
-    // pixel unpack buffer with glBufferData.
-    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-    auto pixels = base::HeapArray<uint8_t>::Uninit(pixel_num * 4);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
-    auto data = base::HeapArray<float>::Uninit(pixel_num * 3);
-    convertToRGBFloat(pixels, data, pixel_num);
-    uint32_t bytes_per_group =
-        gpu::gles2::GLES2Util::ComputeImageGroupSize(format, type);
-    base::CheckedNumeric<uint32_t> checked_buf_size = checked_pixel_num;
-    checked_buf_size *= bytes_per_group;
-    uint32_t buf_size;
-    if (!checked_buf_size.AssignIfValid(&buf_size)) {
-      return false;
-    }
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, buffer[1]);
-    glBufferData(GL_PIXEL_UNPACK_BUFFER, buf_size, data.data(), GL_STATIC_DRAW);
-#else
     glBindBuffer(GL_PIXEL_PACK_BUFFER, buffer[0]);
     glBufferData(GL_PIXEL_PACK_BUFFER, rgba_buf_size, 0, GL_STATIC_READ);
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -756,7 +735,6 @@ bool PrepareUnpackBuffer(base::span<const GLuint> buffer,
         base::span(static_cast<float*>(data), pixel_num * 3)), pixel_num);
     glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
-#endif
     return true;
   }
 

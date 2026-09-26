@@ -35,10 +35,6 @@
 #include "google_apis/gaia/google_service_auth_error.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/browsing_data/counters/tabs_counter.h"
-#endif
-
 #if BUILDFLAG(ENABLE_HOSTED_APPS)
 #include "base/strings/string_split.h"
 #include "chrome/browser/browsing_data/counters/hosted_apps_counter.h"
@@ -59,7 +55,6 @@ class BrowsingDataCounterUtilsTest : public testing::Test {
   TestingProfile profile_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BrowsingDataCounterUtilsTest, CacheCounterResult) {
   // This test assumes that the strings are served exactly as defined,
   // i.e. that the locale is set to the default "en".
@@ -93,47 +88,6 @@ TEST_F(BrowsingDataCounterUtilsTest, CacheCounterResult) {
     EXPECT_EQ(output, base::ASCIIToUTF16(test_case.expected_output));
   }
 }
-
-#else
-// Tests the output of the hosted apps counter.
-TEST_F(BrowsingDataCounterUtilsTest, CacheCounterResultAndroid) {
-  // This test assumes that the strings are served exactly as defined,
-  // i.e. that the locale is set to the default "en".
-  ASSERT_EQ("en", TestingBrowserProcess::GetGlobal()->GetApplicationLocale());
-  const int kBytesInAMegabyte = 1024 * 1024;
-
-  // Test the output for various forms of CacheResults.
-  const struct TestCase {
-    int bytes;
-    bool is_upper_limit;
-    std::string expected_output;
-  } kTestCases[] = {
-      {42, false,
-       "Less than 1 MB. Some sites may load more slowly on your next "
-       "visit."},
-      {static_cast<int>(2.312 * kBytesInAMegabyte), false,
-       "2.3 MB. Some sites may load more slowly on your next "
-       "visit."},
-      {static_cast<int>(2.312 * kBytesInAMegabyte), true,
-       "Less than 2.3 MB. Some sites may load more slowly on your next "
-       "visit."},
-  };
-
-  for (const TestCase& test_case : kTestCases) {
-    CacheCounter counter(GetProfile());
-    counter.Init(GetProfile()->GetPrefs(),
-                 browsing_data::BrowsingDataCounter::ResultCallback());
-    CacheCounter::CacheResult result(&counter, test_case.bytes,
-                                     test_case.is_upper_limit);
-    SCOPED_TRACE(base::StringPrintf("Test params: %d bytes, %d is_upper_limit.",
-                                    test_case.bytes, test_case.is_upper_limit));
-
-    std::u16string output =
-        GetChromeCounterTextFromResult(&result, GetProfile());
-    EXPECT_EQ(output, base::ASCIIToUTF16(test_case.expected_output));
-  }
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_HOSTED_APPS)
 // Tests the complex output of the hosted apps counter.
@@ -261,41 +215,6 @@ TEST_F(BrowsingDataCounterUtilsTest, DeletePasswordsAndSigninData) {
 
   password_store->ShutdownOnUIThread();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(BrowsingDataCounterUtilsTest, TabsCounterResult) {
-  // This test assumes that the strings are served exactly as defined,
-  // i.e. that the locale is set to the default "en".
-  ASSERT_EQ("en", TestingBrowserProcess::GetGlobal()->GetApplicationLocale());
-
-  // Test the output for various forms of CacheResults.
-  const struct TestCase {
-    int tab_count;
-    int window_count;
-    std::string expected_output;
-  } kTestCases[] = {
-      {0, 0, "None"},
-      {1, 0, "1 tab on this device"},
-      {5, 1, "5 tabs on this device"},
-      {5, 2, "5 tabs from 2 windows on this device"},
-  };
-
-  for (const TestCase& test_case : kTestCases) {
-    TabsCounter counter(GetProfile());
-    counter.Init(GetProfile()->GetPrefs(),
-                 browsing_data::BrowsingDataCounter::ResultCallback());
-    TabsCounter::TabsResult result(&counter, test_case.tab_count,
-                                   test_case.window_count);
-    SCOPED_TRACE(
-        base::StringPrintf("Test params: %d tab_count, %d window_count.",
-                           test_case.tab_count, test_case.window_count));
-
-    std::u16string output =
-        GetChromeCounterTextFromResult(&result, GetProfile());
-    EXPECT_EQ(output, base::ASCIIToUTF16(test_case.expected_output));
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 

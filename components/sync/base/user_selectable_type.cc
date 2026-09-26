@@ -110,19 +110,10 @@ UserSelectableTypeInfo GetUserSelectableTypeInfo(
     case UserSelectableType::kReadingList:
       return {kReadingListTypeName, READING_LIST, {READING_LIST}};
     case UserSelectableType::kTabs:
-#if BUILDFLAG(IS_ANDROID)
-      return {kTabsTypeName,
-              SESSIONS,
-              {SESSIONS, SAVED_TAB_GROUP, SHARED_COMMENT, SHARED_TAB_GROUP_DATA,
-               COLLABORATION_GROUP, SHARED_TAB_GROUP_ACCOUNT_DATA,
-               WORKSPACE_DESK, ENCRYPTED_TAB_CONTEXT_CONTAINER,
-               ENCRYPTED_TAB_CONTEXT_ITEM, NOTEBOOK}};
-#else
       return {kTabsTypeName,
               SESSIONS,
               {SESSIONS, WORKSPACE_DESK, ENCRYPTED_TAB_CONTEXT_CONTAINER,
                ENCRYPTED_TAB_CONTEXT_ITEM, NOTEBOOK}};
-#endif
     case UserSelectableType::kSavedTabGroups:
       // Note: Tab groups is presented as a separate type only on desktop.
       // On mobile platforms, it is bundled together with open tabs.

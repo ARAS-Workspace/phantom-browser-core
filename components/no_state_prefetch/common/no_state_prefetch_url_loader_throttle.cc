@@ -90,14 +90,6 @@ void NoStatePrefetchURLLoaderThrottle::WillStartRequest(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (request->is_favicon) {
-    // Delay icon fetching until the contents are getting swapped in
-    // to conserve network usage in mobile devices.
-    *defer = true;
-    return;
-  }
-#else
   // Priorities for prerendering requests are lowered, to avoid competing with
   // other page loads, except on Android where this is less likely to be a
   // problem. In some cases, this may negatively impact the performance of
@@ -109,7 +101,6 @@ void NoStatePrefetchURLLoaderThrottle::WillStartRequest(
   } else if (request->priority != net::IDLE) {
     request->priority = net::IDLE;
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   detached_timer_.Start(
       FROM_HERE, base::Milliseconds(content::kDefaultDetachableCancelDelayMs),

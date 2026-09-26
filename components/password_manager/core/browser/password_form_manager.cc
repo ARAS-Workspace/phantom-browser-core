@@ -67,10 +67,6 @@
 #include "net/base/url_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/webauthn/android/webauthn_cred_man_delegate.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using autofill::FieldDataManager;
 using autofill::FieldRendererId;
 using autofill::FormData;
@@ -82,10 +78,6 @@ using autofill::password_generation::PasswordGenerationType;
 using base::TimeTicks;
 using password_manager_util::IsSingleUsernameType;
 using signin::GaiaIdHash;
-
-#if BUILDFLAG(IS_ANDROID)
-using webauthn::WebAuthnCredManDelegate;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 using Logger = autofill::SavePasswordProgressLogger;
 
@@ -125,39 +117,6 @@ void LogUsingPossibleUsername(PasswordManagerClient* client,
                            : Logger::STRING_POSSIBLE_USERNAME_NOT_USED,
                    message);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-std::optional<PasswordStoreBackendError> GetErrorForErrorMessage(
-    std::optional<PasswordStoreBackendError> profile_store_backend_error,
-    std::optional<PasswordStoreBackendError> account_store_backend_error,
-    PasswordManagerClient* client) {
-  if (!profile_store_backend_error && !account_store_backend_error) {
-    return std::nullopt;
-  }
-
-  base::flat_set<PasswordStoreBackendErrorType> supported_error_types = {
-      PasswordStoreBackendErrorType::kAuthErrorResolvable,
-      PasswordStoreBackendErrorType::kAuthErrorUnresolvable,
-      PasswordStoreBackendErrorType::kKeyRetrievalRequired,
-      PasswordStoreBackendErrorType::kEmptySecurityDomain,
-      PasswordStoreBackendErrorType::kIrretrievableSecurityDomain,
-  };
-
-  if (account_store_backend_error.has_value() &&
-      supported_error_types.contains(
-          account_store_backend_error.value().type)) {
-    return account_store_backend_error;
-  } else if (profile_store_backend_error.has_value() &&
-             supported_error_types.contains(
-                 profile_store_backend_error.value().type)) {
-    // This is possible only before the store split. This needs to be removed
-    // after the profile store starts to be used only for non-syncing passwords.
-    return profile_store_backend_error;
-  }
-
-  return std::nullopt;
-}
-#endif
 
 // Returns true if `form`s username value equals `username_value` (case
 // insensitive).
@@ -842,29 +801,7 @@ void PasswordFormManager::OnFetchCompleted() {
   autofills_left_ = kMaxTimesAutofill;
 
   std::optional<PasswordStoreBackendError> error = std::nullopt;
-#if BUILDFLAG(IS_ANDROID)
-  error = GetErrorForErrorMessage(form_fetcher_->GetProfileStoreBackendError(),
-                                  form_fetcher_->GetAccountStoreBackendError(),
-                                  client_);
-
-  // If there is no FormData, this is an http authentication form. We don't
-  // show the message for it because it would be hidden behind a sign in
-  // dialog and the user could miss it.
-  if (observed_form() != nullptr && error.has_value()) {
-    std::unique_ptr<PasswordForm> password_form =
-        parser_.Parse(*observed_form(), FormDataParser::Mode::kFilling,
-                      GetStoredUsernames(), client_->GetUkmSourceId());
-
-    client_->ShowPasswordManagerErrorMessage(
-        password_form && (password_form->IsLikelySignupForm() ||
-                          password_form->IsLikelyChangePasswordForm() ||
-                          password_form->IsLikelyResetPasswordForm())
-            ? password_manager::ErrorMessageFlowType::kSaveFlow
-            : password_manager::ErrorMessageFlowType::kFillFlow,
-        error.value().type);
-  }
-
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (ShouldShowKeychainErrorBubble(
           form_fetcher_->GetProfileStoreBackendError())) {
     client_->NotifyKeychainError();
@@ -923,34 +860,11 @@ bool PasswordFormManager::WebAuthnCredentialsAvailable() const {
   auto check_credentials_delegate = [=, this]() {
     WebAuthnCredentialsDelegate* delegate =
         client_->GetWebAuthnCredentialsDelegateForDriver(driver_.get());
-#if !BUILDFLAG(IS_ANDROID)
     return delegate && delegate->GetPasskeys().has_value() &&
            !delegate->GetPasskeys().value()->empty();
-#else
-    return delegate && delegate->GetPasskeys().has_value();
-#endif
   };
-#if BUILDFLAG(IS_ANDROID)
-  auto check_cred_man_delegate = [=, this]() {
-    WebAuthnCredManDelegate* delegate =
-        client_->GetWebAuthnCredManDelegateForDriver(driver_.get());
-    return delegate &&
-           delegate->HasPasskeys() == WebAuthnCredManDelegate::kHasPasskeys;
-  };
-  switch (WebAuthnCredManDelegate::CredManMode()) {
-    case webauthn::WebAuthnCredManDelegate::kNotEnabled:
-      return check_credentials_delegate();
-    case webauthn::WebAuthnCredManDelegate::kAllCredMan:
-      return check_cred_man_delegate();
-    case webauthn::WebAuthnCredManDelegate::kNonGpmPasskeys:
-      // In this mode, passkeys can exist in WebAuthnCredentialsDelegate or
-      // WebAuthnCredManDelegate.
-      return check_cred_man_delegate() || check_credentials_delegate();
-  }
-#else
 
   return check_credentials_delegate();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PasswordFormManager::CreatePendingCredentials() {

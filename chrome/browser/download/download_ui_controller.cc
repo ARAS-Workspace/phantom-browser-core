@@ -24,14 +24,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_delegate.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/strings/string_util.h"
-#include "chrome/browser/download/android/download_controller.h"
-#include "chrome/browser/download/android/download_controller_base.h"
-#include "components/pdf/common/constants.h"
-#include "content/public/browser/download_manager_delegate.h"
-#include "content/public/common/content_features.h"
-#else
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -41,12 +33,9 @@
 #include "chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 #include "extensions/browser/extension_util.h"
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 #include "chrome/browser/download/bubble/download_bubble_update_service_factory.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "components/download/public/common/desktop/desktop_auto_resumption_handler.h"
@@ -54,25 +43,6 @@
 #endif
 
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-
-class AndroidUIControllerDelegate : public DownloadUIController::Delegate {
- public:
-  AndroidUIControllerDelegate() = default;
-  ~AndroidUIControllerDelegate() override = default;
-
- private:
-  // DownloadUIController::Delegate
-  void OnNewDownloadReady(download::DownloadItem* item) override;
-};
-
-void AndroidUIControllerDelegate::OnNewDownloadReady(
-    download::DownloadItem* item) {
-  DownloadControllerBase::Get()->OnDownloadStarted(item);
-}
-
-#else
 
 void InitializeDownloadBubbleUpdateService(Profile* profile,
                                            content::DownloadManager* manager) {
@@ -147,7 +117,6 @@ void DownloadBubbleUIControllerDelegate::OnButtonClicked() {
       });
 }
 
-#endif
 }  // namespace
 
 DownloadUIController::Delegate::~Delegate() = default;
@@ -157,11 +126,6 @@ void DownloadUIController::Delegate::OnButtonClicked() {}
 DownloadUIController::DownloadUIController(content::DownloadManager* manager,
                                            std::unique_ptr<Delegate> delegate)
     : download_notifier_(manager, this), delegate_(std::move(delegate)) {
-#if BUILDFLAG(IS_ANDROID)
-  if (!delegate_) {
-    delegate_ = std::make_unique<AndroidUIControllerDelegate>();
-  }
-#else
   // The download bubble UI is used on desktop platforms besides ChromeOS,
   // which uses system notifications instead.
   if (!delegate_) {
@@ -170,7 +134,6 @@ DownloadUIController::DownloadUIController(content::DownloadManager* manager,
     delegate_ = std::make_unique<DownloadBubbleUIControllerDelegate>(profile);
     InitializeDownloadBubbleUpdateService(profile, manager);
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 DownloadUIController::~DownloadUIController() = default;
@@ -212,16 +175,6 @@ void DownloadUIController::OnDownloadUpdated(content::DownloadManager* manager,
   DownloadItemModel item_model(item);
 
   bool needs_to_render = false;
-#if BUILDFLAG(IS_ANDROID)
-  if (manager && manager->GetDelegate() &&
-      manager->GetDelegate()->ShouldOpenPdfInline() &&
-      item->AllowAutoOpenAfterCompletion() &&
-      item->GetState() == download::DownloadItem::IN_PROGRESS &&
-      base::EqualsCaseInsensitiveASCII(item->GetMimeType(),
-                                       pdf::kPDFMimeType)) {
-    needs_to_render = true;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Ignore if we've already notified the UI about |item| or if it isn't a new
   // download.
@@ -247,11 +200,6 @@ void DownloadUIController::OnDownloadUpdated(content::DownloadManager* manager,
   content::WebContents* web_contents =
       content::DownloadItemUtils::GetWebContents(item);
   if (web_contents) {
-#if BUILDFLAG(IS_ANDROID)
-    if (!needs_to_render) {
-      DownloadController::CloseTabIfEmpty(web_contents, item);
-    }
-#else   // BUILDFLAG(IS_ANDROID)
     BrowserWindowInterface* browser =
         GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
             web_contents);
@@ -268,7 +216,6 @@ void DownloadUIController::OnDownloadUpdated(content::DownloadManager* manager,
         !item->IsSavePackageDownload()) {
       web_contents->Close();
     }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   if (item->GetState() == download::DownloadItem::CANCELLED) {

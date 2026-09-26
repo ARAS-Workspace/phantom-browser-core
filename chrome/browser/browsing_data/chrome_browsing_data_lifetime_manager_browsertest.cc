@@ -65,16 +65,10 @@
 #include "third_party/blink/public/common/features.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/test/base/ui_test_utils.h"
-#else
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#endif
 
 namespace {
 
@@ -114,12 +108,8 @@ class ChromeBrowsingDataLifetimeManagerTest
                                     base::Value(true));
     } else if (GetParam().data_deletion_condition ==
                BrowsingDataDeletionCondition::BrowserSigninDisabled) {
-#if BUILDFLAG(IS_ANDROID)
-      GetProfile()->GetPrefs()->Set(prefs::kSigninAllowed, base::Value(false));
-#else
       GetProfile()->GetPrefs()->Set(prefs::kSigninAllowedOnNextStartup,
                                     base::Value(false));
-#endif  // BUILDFLAG(IS_ANDROID)
     }
   }
 
@@ -165,20 +155,13 @@ class ChromeBrowsingDataLifetimeManagerScheduledRemovalTest
 
   void SetUpOnMainThread() override {
     ChromeBrowsingDataLifetimeManagerTest::SetUpOnMainThread();
-#if !BUILDFLAG(IS_ANDROID)
     if (GetParam().browser_type == BrowserType::Incognito) {
       UseIncognitoBrowser();
     }
-#endif
   }
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// See https://crbug.com/40902685 for tracking bug.
-#define MAYBE_PrefChange DISABLED_PrefChange
-#else
 #define MAYBE_PrefChange PrefChange
-#endif
 IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
                        MAYBE_PrefChange) {
   static constexpr char kCookiesPref[] =
@@ -217,7 +200,6 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
   EXPECT_NE(net::OK, content::LoadBasicRequest(network_context(), url));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/40169678): Enable this test for android once we figure out if
 // it is possible to delete download history on Android while the browser is
 // running.
@@ -242,7 +224,6 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
   ApplyBrowsingDataLifetimeDeletion(kPref);
   VerifyDownloadCount(0u);
 }
-#endif
 
 // Failing crbug.com/40917994.
 IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
@@ -332,7 +313,6 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
   EXPECT_NE(net::OK, content::LoadBasicRequest(network_context(), url));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
                        KeepsDownloadsData) {
   static constexpr char kPref[] =
@@ -378,7 +358,6 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
   ASSERT_TRUE(content::NavigateToURL(GetActiveWebContents(), url));
   CheckSiteData(GetActiveWebContents(), /*has_site_data=*/false);
 }
-#endif  //  !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
                        KeepsOtherTabData) {
@@ -394,24 +373,11 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
   ASSERT_TRUE(content::NavigateToURL(GetActiveWebContents(), url));
 
   auto* first_tab = GetActiveWebContents();
-#if !BUILDFLAG(IS_ANDROID)
   ui_test_utils::NavigateToURLWithDisposition(
       browser(), url, WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
 
   auto* second_tab = GetActiveWebContents();
-#else
-  TabModel* tab_model = TabModelList::GetTabModelForWebContents(first_tab);
-  TabAndroid* current_tab = TabAndroid::FromWebContents(first_tab);
-  std::unique_ptr<content::WebContents> contents = content::WebContents::Create(
-      content::WebContents::CreateParams(GetProfile()));
-  auto* second_tab = contents.get();
-  tab_model->CreateTab(current_tab, std::move(contents),
-                       TabModel::kInvalidIndex,
-                       TabModel::TabLaunchType::FROM_RECENT_TABS_FOREGROUND,
-                       /*should_pin=*/false);
-  ASSERT_TRUE(content::NavigateToURL(second_tab, url));
-#endif
   DCHECK_NE(first_tab, second_tab);
 
   SetupSiteData(first_tab);
@@ -452,18 +418,8 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
   ASSERT_TRUE(content::NavigateToURL(second_tab, url));
   CheckSiteData(first_tab, /*has_site_data=*/false);
   CheckSiteData(second_tab, /*has_site_data=*/false);
-
-#if BUILDFLAG(IS_ANDROID)
-  for (int i = 0; i < tab_model->GetTabCount(); ++i) {
-    if (second_tab == tab_model->GetWebContentsAt(i)) {
-      tab_model->CloseTabAt(i);
-      break;
-    }
-  }
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
                        KeepsOtherWindowData) {
   if (IsIncognito()) {
@@ -574,9 +530,7 @@ IN_PROC_BROWSER_TEST_P(ChromeBrowsingDataLifetimeManagerScheduledRemovalTest,
             personal_data_manager->address_data_manager().GetProfileByGUID(
                 profile.guid()));
 }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 class ChromeBrowsingDataLifetimeManagerShutdownTest
     : public ChromeBrowsingDataLifetimeManagerTest {
  protected:
@@ -713,7 +667,6 @@ INSTANTIATE_TEST_SUITE_P(
         {BrowsingDataDeletionCondition::BrowserSigninDisabled,
          BrowserType::Default}
     }));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Browser signin can only be tested on desktop after restart.
 INSTANTIATE_TEST_SUITE_P(
@@ -722,10 +675,4 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(std::vector<FeatureConditions>{
         {BrowsingDataDeletionCondition::SyncDisabled, BrowserType::Incognito},
         {BrowsingDataDeletionCondition::SyncDisabled, BrowserType::Default},
-#if BUILDFLAG(IS_ANDROID)
-        {BrowsingDataDeletionCondition::BrowserSigninDisabled,
-         BrowserType::Incognito},
-        {BrowsingDataDeletionCondition::BrowserSigninDisabled,
-         BrowserType::Default}
-#endif  // BUILDFLAG(IS_ANDROID)
     }));

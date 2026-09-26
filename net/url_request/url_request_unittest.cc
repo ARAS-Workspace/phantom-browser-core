@@ -6134,11 +6134,7 @@ TEST_F(URLRequestTestHTTP, ProcessSTS) {
             sts_state.upgrade_mode);
   EXPECT_TRUE(sts_state.include_subdomains);
   EXPECT_FALSE(pkp_state.include_subdomains);
-#if BUILDFLAG(IS_ANDROID)
-  // Android's CertVerifyProc does not (yet) handle pins.
-#else
   EXPECT_FALSE(pkp_state.HasPublicKeyPins());
-#endif
 }
 
 TEST_F(URLRequestTestHTTP, STSNotProcessedOnIP) {
@@ -10663,32 +10659,19 @@ static bool SystemUsesChromiumEVMetadata() {
 }
 
 static bool SystemSupportsOCSP() {
-#if BUILDFLAG(IS_ANDROID)
-  // Unsupported, see http://crbug.com/117478.
-  return false;
-#else
   return true;
-#endif
 }
 
 static bool SystemSupportsOCSPStapling() {
   if (UsingBuiltinCertVerifier())
     return true;
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 static bool SystemSupportsCRLSets() {
   if (UsingBuiltinCertVerifier())
     return true;
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 TEST_F(HTTPSEVTest, EVCheckNoOCSP) {
@@ -12000,47 +11983,6 @@ TEST_F(URLRequestTest, UpgradeIfInsecureFlagNotSet) {
 }
 
 // Test that URLRequests get properly tagged.
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(URLRequestTestHTTP, TestTagging) {
-  if (!CanGetTaggedBytes()) {
-    DVLOG(0) << "Skipping test - GetTaggedBytes unsupported.";
-    return;
-  }
-
-  ASSERT_TRUE(http_test_server()->Start());
-
-  // The tag under which the system reports untagged traffic.
-  static const int32_t UNTAGGED_TAG = 0;
-
-  uint64_t old_traffic = GetTaggedBytes(UNTAGGED_TAG);
-
-  // Untagged traffic should be tagged with tag UNTAGGED_TAG.
-  TestDelegate delegate;
-  std::unique_ptr<URLRequest> req(default_context().CreateRequest(
-      http_test_server()->GetURL("/"), DEFAULT_PRIORITY, &delegate,
-      TRAFFIC_ANNOTATION_FOR_TESTS, net::handles::kInvalidNetworkHandle));
-  EXPECT_EQ(SocketTag(), req->socket_tag());
-  req->Start();
-  delegate.RunUntilComplete();
-
-  EXPECT_GT(GetTaggedBytes(UNTAGGED_TAG), old_traffic);
-
-  int32_t tag_val1 = 0x12345678;
-  SocketTag tag1(SocketTag::UNSET_UID, tag_val1);
-  old_traffic = GetTaggedBytes(tag_val1);
-
-  // Test specific tag value.
-  req = default_context().CreateRequest(
-      http_test_server()->GetURL("/"), DEFAULT_PRIORITY, &delegate,
-      TRAFFIC_ANNOTATION_FOR_TESTS, net::handles::kInvalidNetworkHandle);
-  req->set_socket_tag(tag1);
-  EXPECT_EQ(tag1, req->socket_tag());
-  req->Start();
-  delegate.RunUntilComplete();
-
-  EXPECT_GT(GetTaggedBytes(tag_val1), old_traffic);
-}
-#endif
 
 namespace {
 

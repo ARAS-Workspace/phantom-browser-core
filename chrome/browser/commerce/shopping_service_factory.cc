@@ -26,11 +26,9 @@
 #include "components/variations/service/variations_service_utils.h"
 #include "content/public/browser/storage_partition.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "components/commerce/core/proto/cart_db_content.pb.h"  // nogncheck
 #include "components/commerce/core/proto/discounts_db_content.pb.h"  // nogncheck
-#endif
 
 namespace commerce {
 
@@ -76,10 +74,8 @@ ShoppingServiceFactory::ShoppingServiceFactory()
   DependsOn(SessionProtoDBFactory<
             parcel_tracking_db::ParcelTrackingContent>::GetInstance());
   DependsOn(HistoryServiceFactory::GetInstance());
-#if !BUILDFLAG(IS_ANDROID)
   DependsOn(SessionProtoDBFactory<
             discounts_db::DiscountsContentProto>::GetInstance());
-#endif
   DependsOn(SessionProtoDBFactory<
             discount_infos_db::DiscountInfosContentProto>::GetInstance());
   DependsOn(SyncServiceFactory::GetInstance());
@@ -103,14 +99,10 @@ ShoppingServiceFactory::BuildServiceInstanceForBrowserContext(
                                 CommerceSubscriptionContentProto>::GetInstance()
           ->GetForProfile(context),
       PowerBookmarkServiceFactory::GetForBrowserContext(context),
-#if !BUILDFLAG(IS_ANDROID)
       SessionProtoDBFactory<discounts_db::DiscountsContentProto>::GetInstance()
           ->GetForProfile(context),
       SessionProtoDBFactory<cart_db::ChromeCartContentProto>::GetInstance()
           ->GetForProfile(context),
-#else
-      nullptr, nullptr,
-#endif
       SessionProtoDBFactory<
           discount_infos_db::DiscountInfosContentProto>::GetInstance()
           ->GetForProfile(context),

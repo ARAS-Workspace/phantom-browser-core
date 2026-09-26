@@ -79,13 +79,6 @@
 #include "content/browser/renderer_host/render_widget_host_view_aura.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/compositor_impl_android.h"
-#include "content/browser/renderer_host/render_widget_host_view_android.h"
-#include "gpu/command_buffer/client/client_shared_image.h"
-#include "ui/android/delegated_frame_host_android.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "content/browser/renderer_host/browser_compositor_view_mac.h"
 #include "content/browser/renderer_host/delegated_frame_host.h"
@@ -377,19 +370,6 @@ IN_PROC_BROWSER_TEST_F(NoCompositingRenderWidgetHostViewBrowserTest,
 
   // Hide the view before performing the next navigation.
   shell()->web_contents()->WasHidden();
-#if BUILDFLAG(IS_ANDROID)
-  // On Android we want to ensure that we maintain the currently embedded
-  // surface. So that there is something to display when returning to the tab.
-  RenderWidgetHostViewAndroid* rwhva =
-      static_cast<RenderWidgetHostViewAndroid*>(rwhvb);
-  ui::DelegatedFrameHostAndroid* dfh =
-      rwhva->delegated_frame_host_for_testing();
-  EXPECT_TRUE(dfh->HasPrimarySurface());
-  EXPECT_FALSE(dfh->IsPrimarySurfaceEvicted());
-  viz::LocalSurfaceId initial_local_surface_id =
-      dfh->SurfaceId().local_surface_id();
-  EXPECT_TRUE(initial_local_surface_id.is_valid());
-#endif
 
   // Perform a navigation to the same content source. This will reuse the
   // existing RenderWidgetHostViewBase, except if we trigger a RenderWidgetHost
@@ -399,46 +379,11 @@ IN_PROC_BROWSER_TEST_F(NoCompositingRenderWidgetHostViewBrowserTest,
   rwhvb = GetRenderWidgetHostView();
   EXPECT_FALSE(rwhvb->GetLocalSurfaceId().is_valid());
 
-#if BUILDFLAG(IS_ANDROID)
-  // Navigating while hidden should not generate a new surface. As the old one
-  // is maintained as the fallback. The DelegatedFrameHost should have not have
-  // a valid active viz::LocalSurfaceId until the first surface after navigation
-  // has been embedded.
-  //
-  // However, if the navigation involves a change of RenderFrameHosts the
-  // surface will be evicted when committing the new RenderFrameHost (see also
-  // ` DelegatedFrameHostAndroid::ClearFallbackSurfaceForCommitPending()`).
-  rwhva = static_cast<RenderWidgetHostViewAndroid*>(rwhvb);
-  dfh = rwhva->delegated_frame_host_for_testing();
-
-  if (ShouldCreateNewHostForAllFrames()) {
-    EXPECT_FALSE(dfh->HasPrimarySurface());
-    EXPECT_TRUE(dfh->IsPrimarySurfaceEvicted());
-    EXPECT_NE(initial_local_surface_id,
-              dfh->content_layer()->surface_id().local_surface_id());
-    EXPECT_TRUE(dfh->SurfaceId().local_surface_id().is_valid());
-  } else {
-    EXPECT_TRUE(dfh->HasPrimarySurface());
-    EXPECT_FALSE(dfh->IsPrimarySurfaceEvicted());
-    EXPECT_EQ(initial_local_surface_id,
-              dfh->content_layer()->surface_id().local_surface_id());
-    EXPECT_FALSE(dfh->SurfaceId().local_surface_id().is_valid());
-  }
-#endif
-
   // Showing the view should lead to a new surface being embedded.
   shell()->web_contents()->WasShown();
   viz::LocalSurfaceId new_rwhvb_local_surface_id = rwhvb->GetLocalSurfaceId();
   EXPECT_TRUE(new_rwhvb_local_surface_id.is_valid());
   EXPECT_NE(rwhvb_local_surface_id, new_rwhvb_local_surface_id);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(dfh->HasPrimarySurface());
-  EXPECT_FALSE(dfh->IsPrimarySurfaceEvicted());
-  viz::LocalSurfaceId new_local_surface_id =
-      dfh->SurfaceId().local_surface_id();
-  EXPECT_TRUE(new_local_surface_id.is_valid());
-  EXPECT_NE(initial_local_surface_id, new_local_surface_id);
-#endif
 }
 
 // Tests that if navigation fails, when re-using a RenderWidgetHostViewBase, and
@@ -459,19 +404,6 @@ IN_PROC_BROWSER_TEST_F(NoCompositingRenderWidgetHostViewBrowserTest,
 
   // Hide the view before performing the next navigation.
   shell()->web_contents()->WasHidden();
-#if BUILDFLAG(IS_ANDROID)
-  // On Android we want to ensure that we maintain the currently embedded
-  // surface. So that there is something to display when returning to the tab.
-  RenderWidgetHostViewAndroid* rwhva =
-      static_cast<RenderWidgetHostViewAndroid*>(rwhvb);
-  ui::DelegatedFrameHostAndroid* dfh =
-      rwhva->delegated_frame_host_for_testing();
-  EXPECT_TRUE(dfh->HasPrimarySurface());
-  EXPECT_FALSE(dfh->IsPrimarySurfaceEvicted());
-  viz::LocalSurfaceId initial_local_surface_id =
-      dfh->SurfaceId().local_surface_id();
-  EXPECT_TRUE(initial_local_surface_id.is_valid());
-#endif
 
   // Perform a navigation to the same content source. This will reuse the
   // existing RenderWidgetHostViewBase, except if we trigger a RenderWidgetHost
@@ -506,49 +438,17 @@ IN_PROC_BROWSER_TEST_F(NoCompositingRenderWidgetHostViewBrowserTest,
     EXPECT_FALSE(rwhvb->HasFallbackSurface());
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Navigating while hidden should not generate a new surface.
-  // The failed navigation above will lead to the primary surface being evicted.
-  // The DelegatedFrameHost should have not have a valid active
-  // viz::LocalSurfaceId until the first surface after navigation has been
-  // embedded.
-  rwhva = static_cast<RenderWidgetHostViewAndroid*>(rwhvb);
-  dfh = rwhva->delegated_frame_host_for_testing();
-  EXPECT_FALSE(dfh->HasPrimarySurface());
-  EXPECT_TRUE(dfh->IsPrimarySurfaceEvicted());
-  EXPECT_FALSE(dfh->content_layer()->surface_id().is_valid());
-  // However, if the navigation involves a change of RenderFrameHosts (and thus
-  // RenderWidgetViewHosts) a new surface is embedded (see comment a bit above).
-  EXPECT_EQ(ShouldCreateNewHostForAllFrames(),
-            dfh->SurfaceId().local_surface_id().is_valid());
-#endif
-
   // Showing the view should lead to a new surface being embedded.
   shell()->web_contents()->WasShown();
   viz::LocalSurfaceId new_rwhvb_local_surface_id = rwhvb->GetLocalSurfaceId();
   EXPECT_TRUE(new_rwhvb_local_surface_id.is_valid());
   EXPECT_NE(rwhvb_local_surface_id, new_rwhvb_local_surface_id);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(dfh->HasPrimarySurface());
-  EXPECT_FALSE(dfh->IsPrimarySurfaceEvicted());
-  viz::LocalSurfaceId new_local_surface_id =
-      dfh->SurfaceId().local_surface_id();
-  EXPECT_TRUE(new_local_surface_id.is_valid());
-  EXPECT_NE(initial_local_surface_id, new_local_surface_id);
-#endif
 }
 
 #endif  // !BUILDFLAG(IS_MAC)
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-ui::DelegatedFrameHostAndroid* GetDelegatedFrameHost(
-    RenderWidgetHostView* view) {
-  return static_cast<RenderWidgetHostViewAndroid*>(view)
-      ->delegated_frame_host_for_testing();
-}
-#else
 DelegatedFrameHost* GetDelegatedFrameHost(RenderWidgetHostView* view) {
   DelegatedFrameHost* dfh = nullptr;
 #if BUILDFLAG(IS_MAC)
@@ -560,63 +460,38 @@ DelegatedFrameHost* GetDelegatedFrameHost(RenderWidgetHostView* view) {
 #endif
   return dfh;
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 viz::SurfaceId GetCurrentSurfaceIdOnDelegatedFrameHost(
     RenderWidgetHostView* view) {
   viz::SurfaceId surface_id;
-#if BUILDFLAG(IS_ANDROID)
-  ui::DelegatedFrameHostAndroid* dfh = GetDelegatedFrameHost(view);
-  EXPECT_TRUE(dfh);
-  surface_id = dfh->GetCurrentSurfaceIdForTesting();
-#else
   DelegatedFrameHost* dfh = GetDelegatedFrameHost(view);
   EXPECT_TRUE(dfh);
   surface_id = dfh->GetCurrentSurfaceId();
-#endif
   return surface_id;
 }
 
 viz::SurfaceId GetPreNavigationSurfaceIdOnDelegatedFrameHost(
     RenderWidgetHostView* view) {
   viz::SurfaceId surface_id;
-#if BUILDFLAG(IS_ANDROID)
-  ui::DelegatedFrameHostAndroid* dfh = GetDelegatedFrameHost(view);
-  EXPECT_TRUE(dfh);
-  surface_id = dfh->GetPreNavigationSurfaceIdForTesting();
-#else
   DelegatedFrameHost* dfh = GetDelegatedFrameHost(view);
   EXPECT_TRUE(dfh);
   surface_id = dfh->GetPreNavigationSurfaceIdForTesting();
-#endif
   return surface_id;
 }
 
 viz::SurfaceId GetFallbackSurfaceId(RenderWidgetHostView* view) {
   viz::SurfaceId surface_id;
-#if BUILDFLAG(IS_ANDROID)
-  ui::DelegatedFrameHostAndroid* dfh = GetDelegatedFrameHost(view);
-  EXPECT_TRUE(dfh);
-  surface_id = dfh->GetFallbackSurfaceIdForTesting();
-#else
   DelegatedFrameHost* dfh = GetDelegatedFrameHost(view);
   EXPECT_TRUE(dfh);
   surface_id = dfh->GetFallbackSurfaceIdForTesting();
-#endif
   return surface_id;
 }
 
 viz::SurfaceId GetBFCacheFallbackSurfaceId(RenderWidgetHostView* view) {
   viz::SurfaceId surface_id;
-#if BUILDFLAG(IS_ANDROID)
-  ui::DelegatedFrameHostAndroid* dfh = GetDelegatedFrameHost(view);
-  EXPECT_TRUE(dfh);
-  surface_id = dfh->GetBFCacheFallbackSurfaceIdForTesting();
-#else
   DelegatedFrameHost* dfh = GetDelegatedFrameHost(view);
   EXPECT_TRUE(dfh);
   surface_id = dfh->GetBFCacheFallbackSurfaceIdForTesting();
-#endif
   return surface_id;
 }
 
@@ -753,23 +628,9 @@ IN_PROC_BROWSER_TEST_F(
   ASSERT_FALSE(pre_nav_id_after_cached.is_valid());
 
   // Resize.
-#if BUILDFLAG(IS_ANDROID)
-  auto new_size = shell()
-                      ->web_contents()
-                      ->GetRenderWidgetHostView()
-                      ->GetVisibleViewportSize();
-  new_size.set_height(new_size.height() / 2);
-  auto* web_contents = static_cast<WebContentsImpl*>(shell()->web_contents());
-  web_contents->GetNativeView()->OnSizeChanged(new_size.width(),
-                                               new_size.height());
-  web_contents->GetNativeView()->OnPhysicalBackingSizeChanged(
-      gfx::ScaleToCeiledSize(
-          web_contents->GetNativeView()->GetPhysicalBackingSize(), 0.5f, 1));
-#else
   auto view_bounds = shell()->web_contents()->GetViewBounds();
   view_bounds.set_height(view_bounds.height() / 2);
   shell()->web_contents()->Resize(view_bounds);
-#endif
 
   // Restore `rfh1` from BFCache.
   ASSERT_TRUE(HistoryGoBack(shell()->web_contents()));
@@ -817,19 +678,7 @@ IN_PROC_BROWSER_TEST_F(BFCachedRenderWidgetHostViewBrowserTest,
   ASSERT_FALSE(pre_nav_id_after_cached.is_valid());
 
   // No-op resize.
-#if BUILDFLAG(IS_ANDROID)
-  auto new_size = shell()
-                      ->web_contents()
-                      ->GetRenderWidgetHostView()
-                      ->GetVisibleViewportSize();
-  auto* web_contents = static_cast<WebContentsImpl*>(shell()->web_contents());
-  web_contents->GetNativeView()->OnSizeChanged(new_size.width(),
-                                               new_size.height());
-  web_contents->GetNativeView()->OnPhysicalBackingSizeChanged(
-      web_contents->GetNativeView()->GetPhysicalBackingSize());
-#else
   shell()->web_contents()->Resize(shell()->web_contents()->GetViewBounds());
-#endif
 
   // Restore `rfh1` from BFCache.
   ASSERT_TRUE(HistoryGoBack(shell()->web_contents()));
@@ -1150,7 +999,6 @@ class CompositingRenderWidgetHostViewBrowserTest
 };
 
 // Disable tests for Android as it has an incomplete implementation.
-#if !BUILDFLAG(IS_ANDROID)
 
 // The CopyFromSurface() API should work on all platforms when compositing is
 // enabled.
@@ -1813,169 +1661,6 @@ IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewPresentationFeedbackBrowserTest,
 
 #endif  // BUILDFLAG(IS_MAC)
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-void CheckSurfaceRangeRemovedAfterCopy(
-    viz::SurfaceRange range,
-    CompositorImpl* compositor,
-    base::RepeatingClosure resume_test,
-    const content::CopyFromSurfaceResult& result) {
-  // The surface range is removed first when the browser receives the result
-  // of the copy request. Then the result callback (including this function) is
-  // run.
-  auto iter =
-      compositor->GetLayerTreeForTesting()->GetSurfaceRangesForTesting().find(
-          range);
-  ASSERT_NE(
-      iter,
-      compositor->GetLayerTreeForTesting()->GetSurfaceRangesForTesting().end());
-  // In DelegatedFrameHostAndroid we keep an extra ref for visible surfaces to
-  // make sure tab capture works, so this should be 1, not 0.
-  EXPECT_EQ(iter->second, 1);
-  std::move(resume_test).Run();
-}
-
-class RenderWidgetHostViewCopyFromSurfaceBrowserTest
-    : public RenderWidgetHostViewBrowserTest {
- public:
-  RenderWidgetHostViewCopyFromSurfaceBrowserTest() {
-    // Enable `RenderDocument` to guarantee renderer/RFH swap for cross-site
-    // navigations.
-    InitAndEnableRenderDocumentFeature(&scoped_feature_list_render_document_,
-                                       RenderDocumentFeatureFullyEnabled()[0]);
-  }
-
-  void SetUpOnMainThread() override {
-    host_resolver()->AddRule("*", "127.0.0.1");
-    embedded_test_server()->ServeFilesFromSourceDirectory(
-        GetTestDataFilePath());
-    net::test_server::RegisterDefaultHandlers(embedded_test_server());
-    ASSERT_TRUE(embedded_test_server()->Start());
-    RenderWidgetHostViewBrowserTest::SetUpOnMainThread();
-  }
-
-  ~RenderWidgetHostViewCopyFromSurfaceBrowserTest() override = default;
-
-  bool SetUpSourceSurface(const char* wait_message) override { return false; }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_render_document_;
-};
-
-IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewCopyFromSurfaceBrowserTest,
-                       AsyncCopyFromSurface) {
-  EXPECT_TRUE(
-      NavigateToURL(shell(), embedded_test_server()->GetURL("/empty.html")));
-
-  auto* rwhv_android = static_cast<RenderWidgetHostViewAndroid*>(
-      GetRenderViewHost()->GetWidget()->GetView());
-  auto* compositor = static_cast<CompositorImpl*>(
-      rwhv_android->GetNativeView()->GetWindowAndroid()->GetCompositor());
-
-  const viz::SurfaceRange range_for_copy(rwhv_android->GetCurrentSurfaceId(),
-                                         rwhv_android->GetCurrentSurfaceId());
-  const viz::SurfaceRange range_for_mainframe(
-      std::nullopt, rwhv_android->GetCurrentSurfaceId());
-  base::RunLoop run_loop;
-  GetRenderViewHost()->GetWidget()->GetView()->CopyFromSurface(
-      gfx::Rect(), gfx::Size(), base::TimeDelta(),
-      base::BindOnce(&CheckSurfaceRangeRemovedAfterCopy, range_for_copy,
-                     compositor, run_loop.QuitClosure()));
-
-  // In DelegatedFrameHostAndroid we keep an extra ref for visible
-  // surfaces to make sure tab capture works.
-  EXPECT_THAT(
-      compositor->GetLayerTreeForTesting()->GetSurfaceRangesForTesting(),
-      testing::UnorderedElementsAre(std::make_pair(range_for_copy, 2),
-                                    std::make_pair(range_for_mainframe, 1)));
-  run_loop.Run(FROM_HERE);
-}
-
-namespace {
-
-void AssertCopySharedImageSucceeded(
-    base::RepeatingClosure resume_test,
-    scoped_refptr<gpu::ClientSharedImage> shared_image,
-    viz::ReleaseCallback release_callback) {
-  EXPECT_TRUE(shared_image);
-  if (release_callback) {
-    std::move(release_callback).Run(gpu::SyncToken(), /*is_lost=*/false);
-  }
-  std::move(resume_test).Run();
-}
-
-class ScopedSnapshotWaiter : public WebContentsObserver {
- public:
-  ScopedSnapshotWaiter(WebContents* wc, const GURL& destination)
-      : WebContentsObserver(wc), destination_(destination) {}
-
-  ScopedSnapshotWaiter(const ScopedSnapshotWaiter&) = delete;
-  ScopedSnapshotWaiter& operator=(const ScopedSnapshotWaiter&) = delete;
-  ~ScopedSnapshotWaiter() override = default;
-
-  void Wait() { run_loop_.Run(); }
-
- private:
-  void DidStartNavigation(NavigationHandle* handle) override {
-    if (handle->GetURL() != destination_) {
-      return;
-    }
-
-    auto* request = NavigationRequest::From(handle);
-    request->set_ready_to_commit_callback_for_testing(base::BindOnce(
-        [](RenderWidgetHostView* old_view,
-           base::OnceCallback<bool()> renderer_swapped,
-           base::RepeatingClosure resume) {
-          ASSERT_TRUE(std::move(renderer_swapped).Run());
-          ASSERT_TRUE(old_view);
-          static_cast<RenderWidgetHostViewAndroid*>(old_view)
-              ->CopySharedImageFromExactSurface(
-                  gfx::Rect(), gfx::Size(),
-                  base::BindOnce(&AssertCopySharedImageSucceeded,
-                                 std::move(resume)));
-        },
-        request->frame_tree_node()->current_frame_host()->GetView(),
-        // The request must outlive its own callback.
-        base::BindOnce(
-            base::BindLambdaForTesting([](NavigationRequest* request) {
-              return request->GetRenderFrameHost() !=
-                     request->frame_tree_node()
-                         ->render_manager()
-                         ->current_frame_host();
-            }),
-            base::Unretained(request)),
-        run_loop_.QuitClosure()));
-  }
-
-  const GURL destination_;
-  base::RunLoop run_loop_;
-};
-}  // namespace
-
-// A "best effort" browser test: issue an exact `CopyOutputRequest` during a
-// cross-renderer navigation, when the navigation is about to commit in the
-// browser. We should always be able to get a desired snapshot back.
-IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewCopyFromSurfaceBrowserTest,
-                       CopyExactSurfaceDuringCrossRendererNavigations) {
-  ASSERT_TRUE(
-      NavigateToURL(shell()->web_contents(),
-                    embedded_test_server()->GetURL("a.com", "/empty.html")));
-  // Makes sure "empty.html" is in a steady state and ready to be copied.
-  WaitForCopyableViewInWebContents(shell()->web_contents());
-
-  const auto cross_renderer_url =
-      embedded_test_server()->GetURL("b.com", "/title1.html");
-  ScopedSnapshotWaiter waiter(shell()->web_contents(), cross_renderer_url);
-  ASSERT_TRUE(NavigateToURL(shell()->web_contents(), cross_renderer_url));
-  // Force the new renderer for "title1.html" to submit a new compositor frame
-  // and ack by viz, such that our `CopyOutputRequest` is fulfilled.
-  WaitForCopyableViewInWebContents(shell()->web_contents());
-  // Blocks until we get the desired snapshot of "empty.html".
-  waiter.Wait();
-}
-#endif
-
 namespace {
 
 // When an OOPIF performs a "location.replace" main frame navigation and with
@@ -2148,70 +1833,6 @@ IN_PROC_BROWSER_TEST_P(
 // Regression test for b/302490197: the touch events should always be forwarded
 // to the main frame's `RenderWidgetHostViewAndroid` and its `ui::ViewAndroid`,
 // no matter if there are redundant RWHVAs / VAs under the same WebContents.
-#if BUILDFLAG(IS_ANDROID)
-
-IN_PROC_BROWSER_TEST_P(
-    RenderWidgetHostViewOOPIFNavigatesMainFrameLocationReplaceBrowserTest,
-    TouchEventsForwardedToTheCorrectRenderWidgetHostView) {
-  ASSERT_TRUE(NavigateToURL(web_contents(),
-                            https_server()->GetURL("a.test", "/title1.html")));
-
-  RenderFrameHostWrapper subframe_rfh(AddSubframe(
-      web_contents(), https_server()->GetURL("b.test", "/title2.html")));
-  RenderFrameHostWrapper old_main_frame(web_contents()->GetPrimaryMainFrame());
-
-  NavigateMainFrameFromSubframeAndWait(
-      subframe_rfh.get(),
-      https_server()->GetURL(
-          "b.test", "/set-header?Cross-Origin-Opener-Policy: same-origin"));
-
-  bool bfcache_enabled = GetParam();
-  if (!bfcache_enabled) {
-    ASSERT_TRUE(old_main_frame.WaitUntilRenderFrameDeleted());
-    ASSERT_TRUE(subframe_rfh.WaitUntilRenderFrameDeleted());
-  }
-
-  // Three RWHV when BFCache is enabled: old main frame and its OOPIF, and the
-  // new main frame.
-  //
-  // TODO(crbug.com/40285569): The number of RWHVs should be one,
-  // regardless of BFCache.
-  size_t num_expected_rwhv = bfcache_enabled ? 3u : 1u;
-  size_t num_actual_rwhv = 0u;
-  static_cast<WebContents*>(web_contents())
-      ->ForEachRenderFrameHost([&num_actual_rwhv](RenderFrameHost* rfh) {
-        if (rfh->GetView()) {
-          ++num_actual_rwhv;
-        }
-      });
-  ASSERT_EQ(num_actual_rwhv, num_expected_rwhv);
-
-  // On Android, when the old main frame is unloaded, we explicitly call
-  // `RWHVA::UpdateNativeViewTree()` to remove the old main frame's native
-  // view from the native view tree. Thus the number of ViewAndroids is two
-  // instead of three, when the old main frame and the OOPIF are BFCached. See
-  // `WebContentsViewAndroid::RenderViewHostChanged()`.
-  // If the DeferSpeculativeRFHCreation feature is enabled, the RWHV won't be
-  // created when the navigation starts so only one native view will be left.
-  // For some reason the android view for the first speculative RFH is not
-  // removed when the response arrives (a new speculiatve RFH will be created).
-  //
-  // TODO(crbug.com/40285569): The number of `ui::ViewAndroid`s should be
-  // one, regardless of BFCache.
-  size_t num_expected_native_view = bfcache_enabled ? 2u : 1u;
-  auto* web_contents_view_android =
-      static_cast<ui::ViewAndroid*>(web_contents()->GetNativeView());
-
-  ASSERT_EQ(web_contents_view_android->GetChildrenCountForTesting(),
-            num_expected_native_view);
-  // b/302490197: The top-most child `gfx::NativeView` under the WebContents
-  // should be the one of the primary main frame, regardless if any other
-  // siblings exist. This native view of the primary main frame is responsible
-  // for receiving gesture events, thus has to be the top-most.
-  ASSERT_EQ(web_contents_view_android->GetTopMostChildForTesting(),
-            web_contents()->GetPrimaryMainFrame()->GetNativeView());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 INSTANTIATE_TEST_SUITE_P(
     All,

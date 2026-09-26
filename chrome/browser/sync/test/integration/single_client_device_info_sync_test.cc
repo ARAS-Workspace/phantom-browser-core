@@ -43,10 +43,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 using bookmarks_helper::GetBookmarkModel;
@@ -432,12 +428,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
 }
 
 // TODO(crbug.com/40756482): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CommitLocalDevice_TransportOnly \
-  DISABLED_CommitLocalDevice_TransportOnly
-#else
 #define MAYBE_CommitLocalDevice_TransportOnly CommitLocalDevice_TransportOnly
-#endif  // BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        MAYBE_CommitLocalDevice_TransportOnly) {
   // Setup a primary account, but don't actually enable Sync-the-feature (so
@@ -454,13 +445,8 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
 }
 
 // TODO(crbug.com/40756482): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_DownloadRemoteDevices_TransportOnly \
-  DISABLED_DownloadRemoteDevices_TransportOnly
-#else
 #define MAYBE_DownloadRemoteDevices_TransportOnly \
   DownloadRemoteDevices_TransportOnly
-#endif  // BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        MAYBE_DownloadRemoteDevices_TransportOnly) {
   InjectDeviceInfoEntityToServer(/*suffix=*/1);
@@ -725,7 +711,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
 }
 
 // PRE_* tests aren't supported on Android browser tests.
-#if !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        PRE_ShouldNotSendDeviceInfoAfterBrowserRestart) {
@@ -749,7 +734,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
   ASSERT_EQ(1U, entities_after.size());
   EXPECT_EQ(entities_before.front().mtime(), entities_after.front().mtime());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class SingleClientDeviceInfoWithDeviceStatisticsSyncTest
     : public SingleClientDeviceInfoSyncTest {
@@ -780,12 +764,6 @@ class SingleClientDeviceInfoWithDeviceStatisticsSyncTest
     // Note: On Android 10 (API level 29), setting the metrics consent override
     // causes the test setup to time out, see crbug.com/483394870. The tests
     // that rely on this are similarly short-circuited.
-#if BUILDFLAG(IS_ANDROID)
-    if (base::android::android_info::sdk_int() <
-        base::android::android_info::SDK_VERSION_R) {
-      return;
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
 
     // Note: The `MetricsConsentOverride` must be set *after*
     // `g_browser_process` has been initialized, but *before* the KeyedServices
@@ -859,12 +837,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
   // Note: On Android 10 (API level 29), setting the metrics consent override
   // causes the test setup to time out, see crbug.com/483394870, so this test
   // cannot run.
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_R) {
-    return;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   ASSERT_TRUE(SetupClients());
 
@@ -884,11 +856,9 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
   // On Android, where the default profile is used, this histogram may get
   // recorded before the test body, and thus before the HistogramTester is
   // instantiated.
-#if !BUILDFLAG(IS_ANDROID)
   histograms_.ExpectUniqueSample("Sync.DeviceStatistics.RequestsStartedCount",
                                  /*sample=*/1, /*expected_bucket_count=*/1,
                                  FROM_HERE);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   histograms_.ExpectUniqueSample(
       "Sync.DeviceStatistics.RequestsCompletedSuccess",
@@ -932,25 +902,14 @@ IN_PROC_BROWSER_TEST_P(
 
 // TODO(crbug.com/483936092): signin::MakeAccountAvailable() (needed by the PRE_
 // test) doesn't work on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount \
-  DISABLED_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount
-#else
 #define MAYBE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount \
   ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount
-#endif
 IN_PROC_BROWSER_TEST_P(
     SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
     MAYBE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount) {
   // Note: On Android 10 (API level 29), setting the metrics consent override
   // causes the test setup to time out, see crbug.com/483394870, so this test
   // cannot run.
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_R) {
-    return;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   ASSERT_TRUE(SetupClients());
 
@@ -970,11 +929,9 @@ IN_PROC_BROWSER_TEST_P(
   // On Android, where the default profile is used, this histogram may get
   // recorded before the test body, and thus before the HistogramTester is
   // instantiated.
-#if !BUILDFLAG(IS_ANDROID)
   histograms_.ExpectUniqueSample("Sync.DeviceStatistics.RequestsStartedCount",
                                  /*sample=*/1, /*expected_bucket_count=*/1,
                                  FROM_HERE);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   histograms_.ExpectUniqueSample(
       "Sync.DeviceStatistics.RequestsCompletedSuccess",

@@ -36,12 +36,7 @@ const size_t kMaxRequests = 25;  // Maximum number of inflight requests allowed.
 // 16kb (64x64 @ 32bpp).  With 16, the total memory consumed would be ~256kb.
 // 16 is double the default number of maximum suggestions so this can
 // accommodate one match image plus one answer image for each result.
-#if BUILDFLAG(IS_ANDROID)
-// Android caches the images in the java layer.
-const int kMaxCacheEntries = 0;
-#else
 const int kMaxCacheEntries = 16;
-#endif
 
 constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
     net::DefineNetworkTrafficAnnotation("omnibox_result_change", R"(

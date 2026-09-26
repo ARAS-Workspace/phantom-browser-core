@@ -47,12 +47,6 @@
 #include "content/public/browser/web_ui.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_string.h"
-#include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/profiles/android/jni_headers/OtrProfileId_jni.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_pref_store.h"              // nogncheck
 #include "extensions/browser/extension_pref_value_map_factory.h"  // nogncheck
@@ -162,55 +156,6 @@ std::ostream& operator<<(std::ostream& out,
   return out;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-Profile::OTRProfileID::ConvertToJavaOTRProfileID(JNIEnv* env) const {
-  return Java_OtrProfileId_Constructor(
-      env, base::android::ConvertUTF8ToJavaString(env, profile_id_));
-}
-
-// static
-Profile::OTRProfileID Profile::OTRProfileID::ConvertFromJavaOTRProfileID(
-    JNIEnv* env,
-    const base::android::JavaRef<jobject>& j_otr_profile_id) {
-  return OTRProfileID(base::android::ConvertJavaStringToUTF8(
-      env, Java_OtrProfileId_getProfileId(env, j_otr_profile_id)));
-}
-
-// static
-static base::android::ScopedJavaLocalRef<jobject>
-JNI_OtrProfileId_CreateUniqueOtrProfileId(
-    JNIEnv* env,
-    const base::android::JavaRef<jstring>& j_profile_id_prefix) {
-  Profile::OTRProfileID profile_id = Profile::OTRProfileID::CreateUnique(
-      base::android::ConvertJavaStringToUTF8(env, j_profile_id_prefix));
-  return profile_id.ConvertToJavaOTRProfileID(env);
-}
-
-// static
-static base::android::ScopedJavaLocalRef<jobject> JNI_OtrProfileId_GetPrimaryId(
-    JNIEnv* env) {
-  return Profile::OTRProfileID::PrimaryID().ConvertToJavaOTRProfileID(env);
-}
-
-// static
-Profile::OTRProfileID Profile::OTRProfileID::Deserialize(
-    const std::string& value) {
-  JNIEnv* env = base::android::AttachCurrentThread();
-  base::android::ScopedJavaLocalRef<jstring> j_value =
-      base::android::ConvertUTF8ToJavaString(env, value);
-  base::android::ScopedJavaLocalRef<jobject> j_otr_profile_id =
-      Java_OtrProfileId_deserializeWithoutVerify(env, j_value);
-  return ConvertFromJavaOTRProfileID(env, j_otr_profile_id);
-}
-
-std::string Profile::OTRProfileID::Serialize() const {
-  JNIEnv* env = base::android::AttachCurrentThread();
-  return base::android::ConvertJavaStringToUTF8(
-      env, Java_OtrProfileId_serialize(env, ConvertToJavaOTRProfileID(env)));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 Profile::Profile(const OTRProfileID* otr_profile_id)
     : otr_profile_id_(otr_profile_id ? std::make_optional(*otr_profile_id)
                                      : std::nullopt) {
@@ -222,15 +167,9 @@ Profile::Profile(const OTRProfileID* otr_profile_id)
 
   BrowserContextDependencyManager::GetInstance()->MarkBrowserContextLive(this);
 
-#if BUILDFLAG(IS_ANDROID)
-  InitJavaObject();
-#endif
 }
 
 Profile::~Profile() {
-#if BUILDFLAG(IS_ANDROID)
-  DestroyJavaObject();
-#endif
 
 #if DCHECK_IS_ON()
   base::AutoLock lock(GetProfileInstancesLock());
@@ -302,16 +241,6 @@ void Profile::RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
       prefs::kSearchSuggestEnabled,
       true,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterStringPref(
-      prefs::kContextualSearchEnabled,
-      std::string(),
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(
-      prefs::kContextualSearchWasFullyPrivacyEnabled, false,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterIntegerPref(prefs::kContextualSearchPromoCardShownCount, 0);
-#endif  // BUILDFLAG(IS_ANDROID)
   registry->RegisterStringPref(prefs::kSessionExitType, std::string());
   registry->RegisterBooleanPref(prefs::kDisableExtensions, false);
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -344,13 +273,6 @@ void Profile::RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(prefs::kProfileIconWin11Format, false);
   registry->RegisterBooleanPref(prefs::kAllowDinosaurEasterEgg, true);
 
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterStringPref(prefs::kLatestVersionWhenClickedUpdateMenuItem,
-                               std::string());
-  registry->RegisterStringPref(prefs::kCommerceMerchantViewerMessagesShownTime,
-                               std::string());
-#endif
-
   registry->RegisterDictionaryPref(prefs::kWebShareVisitedTargets);
   registry->RegisterDictionaryPref(
       prefs::kProtocolHandlerPerOriginAllowedProtocols);
@@ -382,14 +304,8 @@ PrefService* Profile::GetReadOnlyOffTheRecordPrefs() {
 }
 
 bool Profile::IsSystemProfile() const {
-#if BUILDFLAG(IS_ANDROID)
-  DCHECK_NE(profile_metrics::GetBrowserProfileType(this),
-            profile_metrics::BrowserProfileType::kSystem);
-  return false;
-#else
   return profile_metrics::GetBrowserProfileType(this) ==
          profile_metrics::BrowserProfileType::kSystem;
-#endif
 }
 
 bool Profile::IsPrimaryOTRProfile() const {
@@ -422,10 +338,6 @@ void Profile::MaybeSendDestroyedNotification() {
   sent_destroyed_notification_ = true;
 
   NotifyWillBeDestroyed();
-
-#if BUILDFLAG(IS_ANDROID)
-  NotifyJavaOnProfileWillBeDestroyed();
-#endif
 
   for (auto& observer : observers_) {
     observer.OnProfileWillBeDestroyed(this);
@@ -573,7 +485,3 @@ std::string Profile::ToDebugString() const {
 
   return out.str();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(OtrProfileId)
-#endif

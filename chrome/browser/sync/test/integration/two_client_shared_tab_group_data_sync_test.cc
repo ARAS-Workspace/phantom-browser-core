@@ -76,19 +76,10 @@ class TwoClientSharedTabGroupDataSyncTest
   }
 
   void FakeLocalOpeningOfGroup(SavedTabGroup& group_to_edit) {
-#if BUILDFLAG(IS_ANDROID)
-    group_to_edit.SetLocalGroupId(base::Token::CreateRandom());
-#else
     group_to_edit.SetLocalGroupId(tab_groups::TabGroupId::GenerateNew());
-#endif
   }
   void FakeLocalOpeningOfTab(SavedTabGroupTab& tab_to_edit) {
-#if BUILDFLAG(IS_ANDROID)
-    static int next_value = 1;
-    tab_to_edit.SetLocalTabID(++next_value);
-#else
     tab_to_edit.SetLocalTabID(tab_groups::test::GenerateRandomTabID());
-#endif
   }
 
   void FakeCollaborationAvailable(

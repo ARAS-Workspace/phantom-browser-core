@@ -98,17 +98,8 @@ TEST_F(EphemeralHomeModuleBackendTest, InitAndFetchModel) {
 }
 
 TEST_F(EphemeralHomeModuleBackendTest, ExecuteModelWithInput) {
-#if BUILDFLAG(IS_ANDROID)
-  size_t input_size = registry_->all_cards_input_size();
-  size_t output_size = registry_->all_output_labels().size();
-  ExpectExecutionWithInput(
-      std::vector<float>(input_size, 0), /*expected_error=*/false,
-      /*expected_result=*/
-      std::vector<float>(output_size, kNotShownResultValue));
-#else
   ExpectExecutionWithInput(/*inputs=*/{}, /*expected_error=*/false,
                            /*expected_result=*/{kNotShownResultValue});
-#endif
 }
 
 // Test with adding a TestCardInfo to the registry.

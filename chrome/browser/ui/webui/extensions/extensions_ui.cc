@@ -52,10 +52,6 @@
 #include "ui/base/webui/web_ui_util.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/webui/current_channel_logo.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace extensions {
 
 namespace {
@@ -70,12 +66,8 @@ std::string GetLoadTimeClasses(bool in_dev_mode) {
 }
 
 bool IsGlobalShortcutEnabled() {
-// Disable the global scoped shortcuts on Android since they're no-ops.
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
+  // Disable the global scoped shortcuts on Android since they're no-ops.
   return true;
-#endif
 }
 
 content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
@@ -472,11 +464,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
   auto* mv2_handler = ManifestV2Handler::Get(profile);
   source->AddBoolean("MV2DeprecationNoticeDismissed",
                      mv2_handler->DidUserAcknowledgeNoticeGlobally());
-
-#if BUILDFLAG(IS_ANDROID)
-  source->AddResourcePath("images/product_logo.png",
-                          webui::CurrentChannelLogoResourceId());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   source->AddString("webuiRefresh2026", features::IsWebuiRefresh2026Enabled()
                                             ? "webui-refresh-2026"

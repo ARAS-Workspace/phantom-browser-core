@@ -59,12 +59,6 @@ class WebAuthFlowTestNavigationObserver
   }
 
   void WaitForWindow(WebAuthFlow* flow) {
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-    // On Android, wait for the window to be created.
-    base::test::TestFuture<void> future;
-    flow->SetPopupDisplayedCallbackForTesting(future.GetCallback());
-    EXPECT_TRUE(future.Wait());
-#endif
     // Wait for navigation on all platforms.
     Wait();
   }
@@ -72,14 +66,6 @@ class WebAuthFlowTestNavigationObserver
 
 class WebAuthFlowBrowserTest : public PlatformBrowserTest {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    PlatformBrowserTest::SetUpCommandLine(command_line);
-
-    command_line->AppendSwitch("disable-fre");
-  }
-#endif
-
   void SetUpOnMainThread() override {
     PlatformBrowserTest::SetUpOnMainThread();
     ASSERT_TRUE(embedded_test_server()->Start());
@@ -155,13 +141,6 @@ class WebAuthFlowBrowserTest : public PlatformBrowserTest {
         });
     return first_activated_browser;
   }
-
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  void CloseBrowserSynchronously(BrowserWindowInterface* browser) {
-    BrowserEventWaiter waiter(BrowserEventWaiter::Event::CLOSED, browser);
-    browser->GetWindow()->Close();
-  }
-#endif
 
   MockWebAuthFlowDelegate& mock() { return mock_web_auth_flow_delegate_; }
 
@@ -752,11 +731,7 @@ IN_PROC_BROWSER_TEST_F(WebAuthFlowBrowserTest,
       .WillOnce([&future](WebAuthFlow::Failure failure) {
         future.SetValue(failure);
       });
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  CloseBrowserSynchronously(popup_window_browser);
-#else
   popup_window_browser->GetWindow()->Close();
-#endif
   EXPECT_EQ(future.Get(), WebAuthFlow::Failure::WINDOW_CLOSED);
 }
 
@@ -854,23 +829,5 @@ IN_PROC_BROWSER_TEST_F(WebAuthFlowBrowserTest, StartAfterShutdownStarted) {
   EXPECT_DCHECK_DEATH(
       StartWebAuthFlow(auth_url, WebAuthFlow::Mode::INTERACTIVE));
 }
-
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-IN_PROC_BROWSER_TEST_F(WebAuthFlowBrowserTest,
-                       PopupCreationFailure_CallsCannotCreateWindow) {
-  const GURL auth_url = embedded_test_server()->GetURL("/title1.html");
-  StartWebAuthFlow(auth_url, WebAuthFlow::Mode::INTERACTIVE);
-
-  base::test::TestFuture<WebAuthFlow::Failure> future;
-  EXPECT_CALL(mock(),
-              OnAuthFlowFailure(WebAuthFlow::Failure::CANNOT_CREATE_WINDOW))
-      .WillOnce([&future](WebAuthFlow::Failure failure) {
-        future.SetValue(failure);
-      });
-
-  web_auth_flow()->OnBrowserWindowInterfaceInitialized(nullptr);
-  EXPECT_EQ(future.Get(), WebAuthFlow::Failure::CANNOT_CREATE_WINDOW);
-}
-#endif
 
 }  //  namespace extensions

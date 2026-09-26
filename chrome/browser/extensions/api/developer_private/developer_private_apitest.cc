@@ -44,11 +44,9 @@
 #include "extensions/browser/app_window/app_window_registry.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/window/dialog_delegate.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -141,11 +139,6 @@ IN_PROC_BROWSER_TEST_F(DeveloperPrivateApiTest, InspectEmbeddedOptionsPage) {
 
   // On Android, the option page will be opened in a new tab as the guest view
   // is not enabled on Android yet.
-#if BUILDFLAG(IS_ANDROID)
-  web_contents = chrome_test_utils::GetActiveWebContents(this);
-  ASSERT_EQ("chrome-extension://" + extension->id() + "/popup.html",
-            web_contents->GetURL());
-#else
   // Get the info about the extension, including the inspectable views.
   auto info = GetExtensionInfo(*extension);
 
@@ -172,7 +165,6 @@ IN_PROC_BROWSER_TEST_F(DeveloperPrivateApiTest, InspectEmbeddedOptionsPage) {
       content::WebContents::FromRenderFrameHost(render_frame_host);
   ASSERT_TRUE(wc);
   EXPECT_TRUE(DevToolsWindow::GetInstanceForInspectedWebContents(wc));
-#endif
 }
 
 // TODO(crbug.com/40273479): Test is flaky on MSan builders.

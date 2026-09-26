@@ -81,9 +81,6 @@ const base::FeatureParam<bool>* GetInfoBarMigrationParam(
 }
 
 bool IsInfoBarMigrated(InfoBarDelegate::InfoBarIdentifier infobar_id) {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   if (!base::FeatureList::IsEnabled(kCentralizedInfoBarFramework)) {
     return false;
   }
@@ -98,7 +95,6 @@ bool IsInfoBarMigrated(InfoBarDelegate::InfoBarIdentifier infobar_id) {
   }
 
   return param->Get();
-#endif
 }
 
 }  // namespace infobars

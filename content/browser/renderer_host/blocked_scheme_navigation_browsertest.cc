@@ -860,13 +860,7 @@ IN_PROC_BROWSER_TEST_P(BlockedSchemeNavigationBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Flaky on android: https://crbug.com/734563
-#define MAYBE_DataUrl_OctetStream_WindowOpen \
-  DISABLED_DataUrl_OctetStream_WindowOpen
-#else
 #define MAYBE_DataUrl_OctetStream_WindowOpen DataUrl_OctetStream_WindowOpen
-#endif
 
 // Test window.open to a data URL with binary mimetype.
 IN_PROC_BROWSER_TEST_F(BlockedSchemeNavigationBrowserTest,
@@ -994,12 +988,7 @@ IN_PROC_BROWSER_TEST_P(BlockedSchemeNavigationBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Flaky on android: https://crbug.com/734563
-#define MAYBE_UnknownMimeType_WindowOpen DISABLED_UnknownMimeType_WindowOpen
-#else
 #define MAYBE_UnknownMimeType_WindowOpen UnknownMimeType_WindowOpen
-#endif
 
 // Test window.open to a blocked scheme with an unknown mime type.
 IN_PROC_BROWSER_TEST_P(BlockedSchemeNavigationBrowserTest,

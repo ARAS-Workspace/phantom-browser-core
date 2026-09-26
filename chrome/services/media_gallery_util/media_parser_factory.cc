@@ -11,10 +11,6 @@
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_FFMPEG)
-#include "chrome/services/media_gallery_util/media_parser_android.h"
-#endif
-
 MediaParserFactory::MediaParserFactory(
     mojo::PendingReceiver<chrome::mojom::MediaParserFactory> receiver)
     : receiver_(this, std::move(receiver)) {}
@@ -28,11 +24,7 @@ void MediaParserFactory::CreateMediaParser(int64_t libyuv_cpu_flags,
 
   mojo::PendingRemote<chrome::mojom::MediaParser> remote_media_parser;
   std::unique_ptr<MediaParser> media_parser;
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_FFMPEG)
-  media_parser = std::make_unique<MediaParserAndroid>();
-#else
   media_parser = std::make_unique<MediaParser>();
-#endif
   mojo::MakeSelfOwnedReceiver(
       std::move(media_parser),
       remote_media_parser.InitWithNewPipeAndPassReceiver());

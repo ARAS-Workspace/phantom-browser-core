@@ -30,9 +30,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/security/protocol_handler_security_level.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/public/browser/host_zoom_map.h"
-#endif
 
 using custom_handlers::ProtocolHandler;
 
@@ -43,11 +41,7 @@ class SiteSettingsCounterTest : public testing::Test {
   void SetUp() override {
     profile_ = std::make_unique<TestingProfile>();
     map_ = HostContentSettingsMapFactory::GetForProfile(profile());
-#if !BUILDFLAG(IS_ANDROID)
     zoom_map_ = content::HostZoomMap::GetDefaultForBrowserContext(profile());
-#else
-    zoom_map_ = nullptr;
-#endif
     handler_registry_ =
         std::make_unique<custom_handlers::ProtocolHandlerRegistry>(
             profile()->GetPrefs(),
@@ -59,9 +53,6 @@ class SiteSettingsCounterTest : public testing::Test {
     counter_->Init(profile()->GetPrefs(),
                    base::BindRepeating(&SiteSettingsCounterTest::Callback,
                                        base::Unretained(this)));
-#if BUILDFLAG(IS_ANDROID)
-    ClearNotificationsChannels();
-#endif
   }
 
   Profile* profile() { return profile_.get(); }
@@ -100,23 +91,6 @@ class SiteSettingsCounterTest : public testing::Test {
                   result.get())
                   ->Value();
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  void ClearNotificationsChannels() {
-    // Because notification channel settings aren't tied to the profile, they
-    // will persist across tests. We need to make sure they're reset here.
-    for (auto& setting :
-         map_->GetSettingsForOneType(ContentSettingsType::NOTIFICATIONS)) {
-      if (!setting.primary_pattern.MatchesAllHosts() ||
-          !setting.secondary_pattern.MatchesAllHosts()) {
-        map_->SetContentSettingCustomScope(
-            setting.primary_pattern, setting.secondary_pattern,
-            ContentSettingsType ::NOTIFICATIONS,
-            ContentSetting::CONTENT_SETTING_DEFAULT);
-      }
-    }
-  }
-#endif
 
  private:
   content::BrowserTaskEnvironment task_environment_;
@@ -250,7 +224,6 @@ TEST_F(SiteSettingsCounterTest, PeriodChanged) {
   EXPECT_EQ(1, GetResult());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(SiteSettingsCounterTest, ZoomLevel) {
   zoom_map()->SetZoomLevelForHost("google.com", 1.5);
   zoom_map()->SetZoomLevelForHost("www.google.com", 1.5);
@@ -284,7 +257,6 @@ TEST_F(SiteSettingsCounterTest, AllSiteSettingsMixed) {
   counter()->Restart();
   EXPECT_EQ(5, GetResult());
 }
-#endif
 
 TEST_F(SiteSettingsCounterTest, ProtocolHandlerCounting) {
   base::Time now = base::Time::Now();

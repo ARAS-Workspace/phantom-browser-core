@@ -46,15 +46,6 @@ constexpr int kBuffersPerSecond = 100;  // 10 ms per buffer.
 
 int GetCaptureBufferSize(bool need_webrtc_processing,
                          const AudioParameters device_format) {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(henrika): Re-evaluate whether to use same logic as other platforms.
-  // https://crbug.com/638081
-  // Note: This computation does not match 2x10 ms as defined for audio
-  // processing when rates are 50 modulo 100. 22050 Hz here gives buffer size
-  // (2*22050)/100 = 441 samples, while WebRTC processes in chunks of 22050/100
-  // = 220 samples. This leads to unnecessary rebuffering.
-  return 2 * device_format.sample_rate() / 100;
-#else
   const int buffer_size_10_ms = device_format.sample_rate() / 100;
   // If audio processing is turned on, require 10ms buffers to avoid
   // rebuffering.
@@ -75,7 +66,6 @@ int GetCaptureBufferSize(bool need_webrtc_processing,
   // If the buffer size is missing from the device parameters, provide 10ms as
   // a fall-back.
   return buffer_size_10_ms;
-#endif
 }
 
 bool ApmNeedsPlayoutReference(const webrtc::AudioProcessing* apm) {

@@ -58,19 +58,10 @@ bool SyncCredentialsFilter::ShouldSave(const PasswordForm& form) const {
                                 primary_account.email);
   }
 
-// The browser is signed-out and the web just signed-in.
-#if !BUILDFLAG(IS_ANDROID)
+  // The browser is signed-out and the web just signed-in.
   // On desktop, this normally leads to immediate browser sign-in, in which case
   // we shouldn't offer saving. One exception is if browser sign-in is disabled.
   return !client_->GetPrefs()->GetBoolean(prefs::kSigninAllowed);
-#else
-  // On mobile, sign-in via the web page doesn't lead to browser sign-in, so
-  // offer saving.
-  // (Navigating to the Gaia web page opens Chrome UI which must be accepted to
-  // perform browser+web sign-in. The code path here is only hit if that UI was
-  // suppressed/ dismissed and the user interacted directly with the page.)
-  return true;
-#endif
 }
 
 bool SyncCredentialsFilter::ShouldSaveGaiaPasswordHash(

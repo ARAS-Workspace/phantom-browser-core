@@ -49,11 +49,7 @@ bool IsTabGroupSyncDelegateAndroidEnabled() {
 }
 
 bool IsTabGroupSyncCoordinatorEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 bool RestrictDownloadOnSyncedTabs() {
@@ -65,11 +61,7 @@ bool DeferMediaLoadInBackgroundTab() {
 }
 
 bool ShouldForceRemoveClosedTabGroupsOnStartup() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(kForceRemoveClosedTabGroupsOnStartup);
-#else
   return false;
-#endif
 }
 
 bool IsTabTitleSanitizationEnabled() {

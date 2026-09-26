@@ -43,10 +43,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 namespace tab_groups {
 namespace {
 
@@ -182,15 +178,7 @@ class SingleClientSharedTabGroupDataSyncTest
   }
   ~SingleClientSharedTabGroupDataSyncTest() override = default;
 
-  void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    if (base::android::device_info::is_automotive()) {
-      // TODO(crbug.com/399444939): Re-enable once automotive is supported.
-      GTEST_SKIP() << "Test shouldn't run on automotive builders.";
-    }
-#endif
-    SyncTest::SetUp();
-  }
+  void SetUp() override { SyncTest::SetUp(); }
 
   SyncTest::SetupSyncMode GetSetupSyncMode() const override {
     return GetParam();
@@ -365,13 +353,8 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
 }
 
 // Flaky on Android: crbug.com/403333571.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ShouldTransitionSavedToSharedTabGroup \
-  DISABLED_ShouldTransitionSavedToSharedTabGroup
-#else
 #define MAYBE_ShouldTransitionSavedToSharedTabGroup \
   ShouldTransitionSavedToSharedTabGroup
-#endif
 IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
                        MAYBE_ShouldTransitionSavedToSharedTabGroup) {
   syncer::CollaborationId kCollaborationId("collaboration");
@@ -451,13 +434,8 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
 }
 
 // Flaky on Android: crbug.com/403333571.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ShouldTransitionSavedToSharedGroupRemotely \
-  DISABLED_ShouldTransitionSavedToSharedGroupRemotely
-#else
 #define MAYBE_ShouldTransitionSavedToSharedGroupRemotely \
   ShouldTransitionSavedToSharedGroupRemotely
-#endif
 IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
                        MAYBE_ShouldTransitionSavedToSharedGroupRemotely) {
   const GURL kUrl = embedded_test_server()->GetURL(kDefaultURLPath);
@@ -854,7 +832,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
 }
 
 // Android doesn't support PRE_ tests.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
                        PRE_ShouldReloadDataOnBrowserRestart) {
   const base::Uuid group_guid = base::Uuid::GenerateRandomV4();
@@ -1106,8 +1083,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupVersioningSyncTest,
       versioning_message_controller,
       VersioningMessageController::MessageType::VERSION_UPDATED_MESSAGE));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 }  // namespace tab_groups

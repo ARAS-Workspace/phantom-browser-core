@@ -37,10 +37,6 @@
 #include "mojo/public/cpp/platform/platform_channel.h"
 #include "services/tracing/public/cpp/trace_startup.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/android/launcher_thread.h"
-#endif
-
 namespace content {
 namespace internal {
 
@@ -197,11 +193,6 @@ ChildProcessLauncherHelper::ChildProcessLauncherHelper(
     std::unique_ptr<SandboxedProcessLauncherDelegate> delegate,
     const base::WeakPtr<ChildProcessLauncher>& child_process_launcher,
     bool terminate_on_shutdown,
-#if BUILDFLAG(IS_ANDROID)
-    bool can_use_warm_up_connection,
-    bool is_spare_renderer,
-    bool is_for_outermost_main_frame,
-#endif
     mojo::OutgoingInvitation mojo_invitation,
     const mojo::ProcessErrorCallback& process_error_callback,
     std::unique_ptr<ChildProcessLauncherFileData> file_data,
@@ -220,11 +211,6 @@ ChildProcessLauncherHelper::ChildProcessLauncherHelper(
       mojo_invitation_(std::move(mojo_invitation)),
       process_error_callback_(process_error_callback),
       file_data_(std::move(file_data)),
-#if BUILDFLAG(IS_ANDROID)
-      can_use_warm_up_connection_(can_use_warm_up_connection),
-      is_spare_renderer_(is_spare_renderer),
-      is_for_outermost_main_frame_(is_for_outermost_main_frame),
-#endif
       histogram_memory_region_(std::move(histogram_memory_region)),
       tracing_config_memory_region_(std::move(tracing_config_memory_region)),
       tracing_output_memory_region_(std::move(tracing_output_memory_region)),
@@ -327,13 +313,9 @@ void ChildProcessLauncherHelper::LaunchOnLauncherThread() {
   // Launch the child process.
   Process process;
   if (BeforeLaunchOnLauncherThread(*files_to_register, options_ptr)) {
-    process = LaunchProcessOnLauncherThread(
-        options_ptr, std::move(files_to_register),
-#if BUILDFLAG(IS_ANDROID)
-        can_use_warm_up_connection_, is_spare_renderer_,
-        is_for_outermost_main_frame_,
-#endif
-        &is_synchronous_launch, &launch_result);
+    process =
+        LaunchProcessOnLauncherThread(options_ptr, std::move(files_to_register),
+                                      &is_synchronous_launch, &launch_result);
     AfterLaunchOnLauncherThread(process, options_ptr);
   }
 
@@ -448,19 +430,6 @@ void ChildProcessLauncherHelper::PassLoggingSwitches(
 
 // static
 base::SingleThreadTaskRunner* GetProcessLauncherTaskRunner() {
-#if BUILDFLAG(IS_ANDROID)
-  // Android specializes Launcher thread so it is accessible in java.
-  // Note Android never does clean shutdown, so shutdown use-after-free
-  // concerns are not a problem in practice.
-  // This process launcher thread will use the Java-side process-launching
-  // thread, instead of creating its own separate thread on C++ side. Note
-  // that means this thread will not be joined on shutdown, and may cause
-  // use-after-free if anything tries to access objects deleted by
-  // AtExitManager, such as non-leaky LazyInstance.
-  static base::NoDestructor<scoped_refptr<base::SingleThreadTaskRunner>>
-      launcher_task_runner(android::LauncherThread::GetTaskRunner());
-  return (*launcher_task_runner).get();
-#else   // BUILDFLAG(IS_ANDROID)
   // TODO(http://crbug.com/820200): Investigate whether we could use
   // SequencedTaskRunner on platforms other than Windows.
   static base::LazyThreadPoolSingleThreadTaskRunner launcher_task_runner =
@@ -469,7 +438,6 @@ base::SingleThreadTaskRunner* GetProcessLauncherTaskRunner() {
                            base::TaskShutdownBehavior::BLOCK_SHUTDOWN),
           base::SingleThreadTaskRunnerThreadMode::DEDICATED);
   return launcher_task_runner.Get().get();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // static

@@ -5,8 +5,4 @@
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
 
 // Implementation of MixinBasedInProcessBrowserTest.
-#if BUILDFLAG(IS_ANDROID)
-template class InProcessBrowserTestMixinHostSupport<AndroidBrowserTest>;
-#else
 template class InProcessBrowserTestMixinHostSupport<InProcessBrowserTest>;
-#endif

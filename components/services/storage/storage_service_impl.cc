@@ -27,7 +27,6 @@ namespace {
 
 // We don't use out-of-process Storage Service on Android, so we can avoid
 // pulling all the related code (including Directory mojom) into the build.
-#if !BUILDFLAG(IS_ANDROID)
 // The name under which we register our own sandboxed VFS instance when running
 // out-of-process.
 constexpr char kVfsName[] = "storage_service";
@@ -47,17 +46,10 @@ std::unique_ptr<FilesystemProxy> CreateRestrictedFilesystemProxy(
                                            directory_path, std::move(directory),
                                            std::move(io_task_runner));
 }
-#endif
 
 SessionStorageImpl::BackingMode GetSessionStorageBackingMode(
     bool has_path,
     bool clear_on_open) {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android there is no support for session storage restoring, and since
-  // the restoring code is responsible for database cleanup, we must
-  // manually delete the old database here before we open a new one.
-  return SessionStorageImpl::BackingMode::kClearDiskStateOnOpen;
-#else
   // In-memory profiles (e.g. incognito) have no path and must always use
   // kNoDisk regardless of clear_on_open.
   if (!has_path) {
@@ -65,7 +57,6 @@ SessionStorageImpl::BackingMode GetSessionStorageBackingMode(
   }
   return clear_on_open ? SessionStorageImpl::BackingMode::kClearDiskStateOnOpen
                        : SessionStorageImpl::BackingMode::kRestoreDiskState;
-#endif
 }
 
 }  // namespace
@@ -82,7 +73,6 @@ void StorageServiceImpl::EnableAggressiveDomStorageFlushing() {
   StorageAreaImpl::EnableAggressiveCommitDelay();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void StorageServiceImpl::SetDataDirectory(
     const base::FilePath& path,
     mojo::PendingRemote<mojom::Directory> directory) {
@@ -106,7 +96,6 @@ void StorageServiceImpl::SetDataDirectory(
       kVfsName, std::make_unique<SandboxedVfsDelegate>(CreateFilesystemProxy()),
       /*make_default=*/true);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void StorageServiceImpl::BindLocalStorageControl(
     const std::optional<base::FilePath>& path,
@@ -198,12 +187,10 @@ void StorageServiceImpl::ShutDownAndRemoveLocalStorage(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void StorageServiceImpl::BindDataDirectoryReceiver(
     mojo::PendingReceiver<mojom::Directory> receiver) {
   DCHECK(remote_data_directory_.is_bound());
   remote_data_directory_->Clone(std::move(receiver));
 }
-#endif
 
 }  // namespace storage

@@ -24,9 +24,6 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "components/location/android/mock_location_settings.h"
-#endif
 #include "services/device/public/cpp/test/scoped_geolocation_overrider.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -88,17 +85,8 @@ class GeolocationHeaderServiceTest : public testing::Test {
   }
 
   std::unique_ptr<GeolocationHeaderService> CreateService() {
-#if BUILDFLAG(IS_ANDROID)
-    auto mock = std::make_unique<MockLocationSettings>();
-    MockLocationSettings::SetLocationStatus(
-        has_android_coarse_, has_android_fine_,
-        /*is_system_location_setting_enabled=*/true);
-    return std::make_unique<GeolocationHeaderService>(
-        settings_map(), template_url_service(), std::move(mock));
-#else
     return std::make_unique<GeolocationHeaderService>(settings_map(),
                                                       template_url_service());
-#endif
   }
 
   void SetAppLevelPermission(bool granted, bool fine_granted = true) {

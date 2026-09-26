@@ -34,10 +34,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "ui/base/models/menu_model.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/extensions/extension_menu_model_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/renderer_context_menu/render_view_context_menu.h"
 #include "chrome/browser/renderer_context_menu/render_view_context_menu_test_util.h"
@@ -282,11 +278,7 @@ class ExtensionContextMenuVisibilityApiTest
   void TearDownOnMainThread() override {
     // Depends on `menu_` so must be cleared before it is destroyed.
     top_level_model_ = nullptr;
-#if BUILDFLAG(IS_ANDROID)
-    extension_menu_model_.reset();
-#else
     menu_.reset();
-#endif
     extension_ = nullptr;
     ExtensionContextMenuApiTest::TearDownOnMainThread();
   }
@@ -305,14 +297,6 @@ class ExtensionContextMenuVisibilityApiTest
     content::ContextMenuParams params;
     params.page_url = frame->GetLastCommittedURL();
 
-#if BUILDFLAG(IS_ANDROID)
-    extension_menu_model_ =
-        std::make_unique<ExtensionMenuModel>(*frame, params);
-    extension_menu_model_->PopulateModel();
-    top_level_model_ = extension_menu_model_.get();
-    top_level_index_ = 0;
-    bool valid_setup = true;
-#else
     // Create context menu.
     menu_ = std::make_unique<TestRenderViewContextMenu>(*frame, params);
     menu_->Init();
@@ -328,7 +312,6 @@ class ExtensionContextMenuVisibilityApiTest
     EXPECT_GT(top_level_index(), 0u);
     // TODO: Eliminate this variable.
     bool valid_setup = true;
-#endif  // BUILDFLAG(IS_ANDROID)
 
     return valid_setup;
   }
@@ -366,16 +349,9 @@ class ExtensionContextMenuVisibilityApiTest
   // menu items, |num_items|. Note that this includes items manually added by
   // extensions, but not the automatically added extension name, if present.
   void VerifyNumContextMenuItems(size_t num_items) {
-#if BUILDFLAG(IS_ANDROID)
-    ASSERT_TRUE(extension_menu_model_);
-    size_t items_in_menu =
-        extension_menu_model_->matcher_for_test().extension_item_map().size();
-    EXPECT_EQ(num_items, items_in_menu);
-#else
     ASSERT_TRUE(menu_);
     EXPECT_EQ(num_items,
               (menu_->extension_items().extension_item_map().size()));
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // Verifies a context menu item's visibility, title, and item type.
@@ -397,13 +373,8 @@ class ExtensionContextMenuVisibilityApiTest
 
  private:
   raw_ptr<const Extension> extension_ = nullptr;
-#if BUILDFLAG(IS_ANDROID)
-  // Contains only the extension menu items.
-  std::unique_ptr<ExtensionMenuModel> extension_menu_model_;
-#else
   // Contains Chrome context menu items and extension menu items.
   std::unique_ptr<TestRenderViewContextMenu> menu_;
-#endif
   // Where the extension items start in the menu. Always 0 on Android because
   // the menu only contains extension items.
   size_t top_level_index_ = 0;
@@ -730,7 +701,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionContextMenuVisibilityApiMenuSimplificationTest,
   VerifyMenuItem("parent", top_level_model_, top_level_index(),
                  ui::MenuModel::TYPE_SUBMENU, false);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Since the extension submenu is hidden, the previous separator should not be
   // in the model. On Android top_level_index() is 0 so we don't test this.
   // With kMenuSimplification enabled, there is a separator from the end of the
@@ -739,7 +709,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionContextMenuVisibilityApiMenuSimplificationTest,
     EXPECT_NE(ui::MenuModel::TYPE_SEPARATOR,
               top_level_model_->GetTypeAt(top_level_index() - 1));
   }
-#endif
 
   ui::MenuModel* submodel =
       top_level_model_->GetSubmenuModelAt(top_level_index());
@@ -768,14 +737,12 @@ IN_PROC_BROWSER_TEST_P(ExtensionContextMenuVisibilityApiMenuSimplificationTest,
   VerifyMenuItem("parent", top_level_model_, top_level_index(),
                  ui::MenuModel::TYPE_SUBMENU, false);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Since the extension submenu is hidden, the previous separator should not be
   // in the model. On Android top_level_index() is 0 so we don't test this.
   if (!GetParam()) {
     EXPECT_NE(ui::MenuModel::TYPE_SEPARATOR,
               top_level_model_->GetTypeAt(top_level_index() - 1));
   }
-#endif
 
   ui::MenuModel* submodel =
       top_level_model_->GetSubmenuModelAt(top_level_index());

@@ -159,13 +159,6 @@ class DownloadTestContentBrowserClient
     : public ContentBrowserTestContentBrowserClient {
  public:
   DownloadTestContentBrowserClient() {
-#if BUILDFLAG(IS_ANDROID)
-    content_url_loader_factory_ = std::make_unique<FakeNetworkURLLoaderFactory>(
-        "HTTP/1.1 200 OK\nContent-Type: multipart/related\n\n",
-        "This is a test for download mhtml through non http/https urls",
-        /* network_accessed */ true, net::OK);
-#endif  // BUILDFLAG(IS_ANDROID)
-
     file_url_loader_factory_ = std::make_unique<FakeNetworkURLLoaderFactory>(
         "HTTP/1.1 200 OK\nContent-Type: multipart/related\n\n",
         "This is a test for download mhtml through non http/https urls",
@@ -200,16 +193,6 @@ class DownloadTestContentBrowserClient
     if (!enable_register_non_network_url_loader_) {
       return {};
     }
-
-#if BUILDFLAG(IS_ANDROID)
-    if (scheme == url::kContentScheme) {
-      mojo::PendingRemote<network::mojom::URLLoaderFactory>
-          content_factory_remote;
-      content_url_loader_factory_->Clone(
-          content_factory_remote.InitWithNewPipeAndPassReceiver());
-      return content_factory_remote;
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
 
     if (scheme == url::kFileScheme) {
       mojo::PendingRemote<network::mojom::URLLoaderFactory> file_factory_remote;
@@ -3177,7 +3160,7 @@ IN_PROC_BROWSER_TEST_F(DownloadContentTest, RemoveResumedDownload) {
 }
 
 // TODO(qinmin): Flaky crashes on ASAN Linux. https://crbug.com/836689
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 #define MAYBE_CancelResumedDownload DISABLED_CancelResumedDownload
 #else
 #define MAYBE_CancelResumedDownload CancelResumedDownload
@@ -4111,7 +4094,6 @@ IN_PROC_BROWSER_TEST_F(DownloadContentTest,
 //
 // Alt-click doesn't make sense on Android, and download a HTML file results
 // in an intent, so just skip.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(DownloadContentTest,
                        DownloadAttributeSameOriginRedirectAltClick) {
   net::EmbeddedTestServer origin_one;
@@ -4184,7 +4166,6 @@ IN_PROC_BROWSER_TEST_F(DownloadContentTest,
   ASSERT_TRUE(origin_one.ShutdownAndWaitUntilComplete());
   ASSERT_TRUE(origin_two.ShutdownAndWaitUntilComplete());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test that the suggested filename for data: URLs works.
 IN_PROC_BROWSER_TEST_F(DownloadContentTest, DownloadAttributeDataUrl) {
@@ -5150,11 +5131,6 @@ class MhtmlDownloadTest : public DownloadContentTest {
 // download for mhtml.
 IN_PROC_BROWSER_TEST_F(MhtmlDownloadTest,
                        AllowListForNonHTTPNotTriggerDownload) {
-#if BUILDFLAG(IS_ANDROID)
-  // "content://" is an protocol on Android.
-  GURL content_url("content://non_download.mhtml");
-  NavigateToCommittedURLAndExpectNoDownload(shell(), content_url);
-#endif
   GURL file_url("file:///non_download.mhtml");
   NavigateToCommittedURLAndExpectNoDownload(shell(), file_url);
 }

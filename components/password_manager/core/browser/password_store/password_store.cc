@@ -490,44 +490,18 @@ void PasswordStore::NotifyLoginsChangedOnMainSequence(
     // actionable errors.
     // TODO(crbug.com/535288574): Interpret the `nullopt` value consistently
     // across platforms (or avoid using `nullopt`).
-#if BUILDFLAG(IS_ANDROID)
-    // If `changes` is std::nullopt, a refresh is starting (e.g. when Chrome
-    // comes to foreground). We don't know the actual error state yet, so we
-    // leave `error` as std::nullopt to defer propagation. The error state
-    // will be determined and propagated when the subsequent `GetAllLoginsAsync`
-    // call completes in `NotifyLoginsRetainedOnMainSequence`.
-    if (changes.has_value()) {
-      error = ActionableError::kNoError;
-    }
-#else
     // On platforms other than Android we know that in this case there are no
     // errors.
     error = ActionableError::kNoError;
-#endif
   }
   if (error.has_value()) {
     NotifyObserversIfErrorStateChanged(error.value());
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Record that an OnLoginsRetained call may be required here already since
-  // issuing the list call seems to be the most relevant and expensive step.
-  base::UmaHistogramEnumeration(
-      "PasswordManager.PasswordStore.OnLoginsRetained", logins_changed_trigger);
-  if (!changes.has_value()) {
-    TRACE_EVENT_INSTANT("passwords", "LoginsRetrievedForOnLoginsRetained",
-                        perfetto::Flow::FromPointer(this));
-    // If the changes aren't provided, the store propagates the latest logins.
-    backend_->GetAllLoginsAsync(base::BindOnce(
-        &PasswordStore::NotifyLoginsRetainedOnMainSequence, this));
-    return;
-  }
-#else
   if (!changes.has_value()) {
     // The error has already been propagated. A changelist doesn't exist.
     return;
   }
-#endif
 
   if (changes->empty()) {
     return;
@@ -571,12 +545,6 @@ void PasswordStore::NotifyLoginsRetainedOnMainSequence(
   for (auto& observer : observers_) {
     observer.OnLoginsRetained(this, retained_credentials);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  TRACE_EVENT_INSTANT("passwords",
-                      "PasswordStore::NotifyLoginsRetainedOnMainSequence",
-                      perfetto::TerminatingFlow::FromPointer(this));
-#endif
 }
 
 void PasswordStore::NotifySyncEnabledOrDisabledOnMainSequence() {

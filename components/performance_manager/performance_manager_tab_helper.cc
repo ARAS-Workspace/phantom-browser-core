@@ -500,9 +500,6 @@ std::optional<blink::mojom::PermissionStatus> PerformanceManagerTabHelper::
   // scrolling and getting the settings can invoke expensive platform APIs on
   // Android. Moreover, this information is only used to decide if a tab should
   // be discarded, which doesn't happen through Chrome code on that platform.
-#if BUILDFLAG(IS_ANDROID)
-  return std::nullopt;
-#else
   content::PermissionController* permission_controller =
       web_contents()->GetBrowserContext()->GetPermissionController();
   if (!permission_controller) {
@@ -535,7 +532,6 @@ std::optional<blink::mojom::PermissionStatus> PerformanceManagerTabHelper::
           CreatePermissionDescriptorForPermissionType(
               blink::PermissionType::NOTIFICATIONS),
       web_contents()->GetPrimaryMainFrame());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PerformanceManagerTabHelper::OnNotificationPermissionResultChange(

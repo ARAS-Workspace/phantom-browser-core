@@ -51,16 +51,12 @@ base::DictValue NetLogParameterChannelBindings(
 // Uses |negotiate_auth_system_factory| to create the auth system, otherwise
 // creates the default auth system for each platform.
 std::unique_ptr<HttpAuthMechanism> CreateAuthSystem(
-#if !BUILDFLAG(IS_ANDROID)
     HttpAuthHandlerNegotiate::AuthLibrary* auth_library,
-#endif
     const HttpAuthPreferences* prefs,
     HttpAuthMechanismFactory negotiate_auth_system_factory) {
   if (negotiate_auth_system_factory)
     return negotiate_auth_system_factory.Run(prefs);
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<android::HttpAuthNegotiateAndroid>(prefs);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return std::make_unique<HttpAuthGSSAPI>(auth_library,
                                           CHROME_GSS_SPNEGO_MECH_OID_DESC);
 #endif
@@ -74,12 +70,12 @@ HttpAuthHandlerNegotiate::Factory::Factory(
 
 HttpAuthHandlerNegotiate::Factory::~Factory() = default;
 
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 const std::string& HttpAuthHandlerNegotiate::Factory::GetLibraryNameForTesting()
     const {
   return auth_library_->GetLibraryNameForTesting();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && BUILDFLAG(IS_POSIX)
+#endif  // BUILDFLAG(IS_POSIX)
 
 int HttpAuthHandlerNegotiate::Factory::CreateAuthHandler(
     HttpAuthChallengeTokenizer* challenge,
@@ -92,19 +88,7 @@ int HttpAuthHandlerNegotiate::Factory::CreateAuthHandler(
     const NetLogWithSource& net_log,
     HostResolver* host_resolver,
     std::unique_ptr<HttpAuthHandler>* handler) {
-#if BUILDFLAG(IS_ANDROID)
-  if (is_unsupported_ || !http_auth_preferences() ||
-      http_auth_preferences()->AuthAndroidNegotiateAccountType().empty() ||
-      reason == CREATE_PREEMPTIVE)
-    return ERR_UNSUPPORTED_AUTH_SCHEME;
-  // TODO(cbentzel): Move towards model of parsing in the factory
-  //                 method and only constructing when valid.
-  std::unique_ptr<HttpAuthHandler> tmp_handler(
-      std::make_unique<HttpAuthHandlerNegotiate>(
-          CreateAuthSystem(http_auth_preferences(),
-                           negotiate_auth_system_factory_),
-          http_auth_preferences(), host_resolver));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   if (is_unsupported_)
     return ERR_UNSUPPORTED_AUTH_SCHEME;
 #if BUILDFLAG(IS_LINUX)

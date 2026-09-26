@@ -724,16 +724,6 @@ TEST_F(
   // This call represents the initial passphrase type coming in from the server.
   service()->PassphraseTypeChanged(PassphraseType::kCustomPassphrase);
 
-#if BUILDFLAG(IS_ANDROID)
-  // UserSelectableType::kAutofill should have been disabled.
-  EXPECT_FALSE(service()->GetUserSettings()->GetSelectedTypes().Has(
-      UserSelectableType::kAutofill));
-
-  // The user enables addresses sync.
-  service()->GetUserSettings()->SetSelectedType(
-      syncer::UserSelectableType::kAutofill, true);
-#endif
-
   // UserSelectableType::kAutofill should have been enabled.
   EXPECT_TRUE(service()->GetUserSettings()->GetSelectedTypes().Has(
       UserSelectableType::kAutofill));
@@ -773,16 +763,6 @@ TEST_F(
 
   // This call represents the initial passphrase type coming in from the server.
   service()->PassphraseTypeChanged(PassphraseType::kCustomPassphrase);
-
-#if BUILDFLAG(IS_ANDROID)
-  // UserSelectableType::kAutofill should have been disabled.
-  EXPECT_FALSE(service()->GetUserSettings()->GetSelectedTypes().Has(
-      UserSelectableType::kAutofill));
-
-  // The user enables addresses sync.
-  service()->GetUserSettings()->SetSelectedType(
-      syncer::UserSelectableType::kAutofill, true);
-#endif
 
   // UserSelectableType::kAutofill should have been enabled.
   EXPECT_TRUE(service()->GetUserSettings()->GetSelectedTypes().Has(
@@ -1385,17 +1365,6 @@ TEST_F(SyncServiceImplTest, DisableSyncOnClient) {
 
   EXPECT_FALSE(
       engine_factory()->HasTransportDataIncludingFirstSync(gaia_id_hash()));
-#if BUILDFLAG(IS_ANDROID)
-  // On iOS and Android, the primary account is cleared.
-  EXPECT_FALSE(
-      identity_manager()->HasPrimaryAccount(signin::ConsentLevel::kSignin));
-  EXPECT_EQ(SyncService::DisableReasonSet(
-                {SyncService::DISABLE_REASON_NOT_SIGNED_IN}),
-            service()->GetDisableReasons());
-  EXPECT_EQ(SyncService::TransportState::DISABLED,
-            service()->GetTransportState());
-  EXPECT_TRUE(service()->GetLastSyncedTimeForDebugging().is_null());
-#else
   // On Desktop and Lacros, the sync consent is revoked, but the primary account
   // is left at ConsentLevel::kSignin. Sync will restart in standalone transport
   // mode.
@@ -1410,7 +1379,6 @@ TEST_F(SyncServiceImplTest, DisableSyncOnClient) {
   base::RunLoop().RunUntilIdle();
   EXPECT_EQ(SyncService::TransportState::ACTIVE,
             service()->GetTransportState());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // TrustedVault data should have been cleared.
   EXPECT_THAT(trusted_vault_client()->GetStoredKeys(primary_account_gaia_id),
@@ -1725,9 +1693,6 @@ TEST_F(SyncServiceImplTest, ShouldProvideDisableReasonsAfterShutdown) {
   std::unique_ptr<SyncServiceImpl> service = ShutdownAndReleaseService();
   EXPECT_FALSE(service->GetDisableReasons().empty());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(SyncServiceImplTest, ShouldCallStopUponResetEngineIfAlreadyShutDown) {
   // The intention here is to stop sync without clearing metadata by getting to

@@ -23,22 +23,8 @@
 #include "media/media_buildflags.h"
 #include "ui/gl/gl_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 
 namespace features {
-
-#if BUILDFLAG(IS_ANDROID)
-// If this flag is enabled, a DumpWithoutCrashing() is captured when a bad
-// state is detected when moving the composited UI. For example, this could
-// mean scrolling without a resource, or OffsetTagValues trying to position
-// the UI outside of their valid constraints.
-BASE_FEATURE(kAndroidDumpForBadCompositedUiState,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // If enabled, each render pass eligible for scanout gets its own BufferQueue.
 // This allows for BufferQueue to be used in scenarios like partial delegated
@@ -54,11 +40,6 @@ BASE_FEATURE(kVizBufferQueueDiscardOnVisibilityChange,
 BASE_FEATURE(kUseDrmBlackFullscreenOptimization,
              base::FEATURE_DISABLED_BY_DEFAULT
 );
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kUseFrameIntervalDeciderAdaptiveFrameRate,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kUseMultipleOverlays,
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -98,19 +79,6 @@ BASE_FEATURE(kWebRtcLogCapturePipeline, base::FEATURE_DISABLED_BY_DEFAULT);
 // buffer and draw the intermediate buffer to the secondary command buffer.
 BASE_FEATURE(kWebViewVulkanIntermediateBuffer,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-// If enabled and the device's SOC manufacturer is in the allowlist, WebView
-// reports the set of threads involved in frame production to HWUI, and they're
-// included in the HWUI ADPF session.
-// If disabled, WebView never uses ADPF.
-BASE_FEATURE(kWebViewEnableADPF, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// The allowlist format is a "|" separated string, e.g. "A|B|XY" for allowing
-// SoC manufacturers A, B, and XY.
-const base::FeatureParam<std::string> kWebViewADPFSocManufacturerAllowlist{
-    &kWebViewEnableADPF, "webview_soc_manufacturer_allowlist", "Google"};
-#endif
 
 #if BUILDFLAG(IS_APPLE)
 // Increase the max CALayer number allowed for CoreAnimation.
@@ -201,37 +169,6 @@ const base::FeatureParam<int>
 BASE_FEATURE(kSelectFutureFrameDeadline, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kAllowMultipleSwapsPerVsync, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID)
-// If enabled, DisplayScheduler will use a custom FrameDeadlineDecider to
-// dynamically select VSync deadlines based on input timestamps.
-BASE_FEATURE(kUseAndroidCustomFrameDeadlines,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-constexpr base::FeatureParam<FrameDeadlineDeciderSequenceStrategy>::Option
-    kFrameDeadlineDeciderSequenceStrategyOptions[] = {
-        {FrameDeadlineDeciderSequenceStrategy::kPresentationDeltaLocking,
-         "presentation_delta_locking"},
-        {FrameDeadlineDeciderSequenceStrategy::kOsPreferredDeltaLocking,
-         "os_preferred_delta_locking"},
-};
-const base::FeatureParam<FrameDeadlineDeciderSequenceStrategy>
-    kAndroidCustomFrameDeadlineSequenceStrategy{
-        &kUseAndroidCustomFrameDeadlines, "sequence_strategy",
-        FrameDeadlineDeciderSequenceStrategy::kOsPreferredDeltaLocking,
-        &kFrameDeadlineDeciderSequenceStrategyOptions};
-
-const base::FeatureParam<int> kAndroidCustomFrameDeadlinePresentationOffset{
-    &kUseAndroidCustomFrameDeadlines, "presentation_offset", 0};
-const base::FeatureParam<base::TimeDelta>
-    kAndroidCustomFrameDeadlineMaxNonInteractiveIdleDuration{
-        &kUseAndroidCustomFrameDeadlines, "max_non_interactive_idle_duration",
-        base::Milliseconds(50)};
-const base::FeatureParam<base::TimeDelta>
-    kAndroidCustomFrameDeadlineMaxInteractionIdleDuration{
-        &kUseAndroidCustomFrameDeadlines, "max_interaction_idle_duration",
-        base::Seconds(3)};
-#endif
-
 // When enabled, SDR maximum luminance nits of then current display will be used
 // as the HDR metadata NDWL nits for PQ content (if none was specified). This
 // has the effect that its "opts-out" PQ content from being affected by the OS'
@@ -289,11 +226,7 @@ BASE_FEATURE(kVizDirectCompositorThreadIpcNonRoot,
 // messages and, in turn, all interfaces associated with it e.g. root compositor
 // frame sink, display private - skipping the IO thread hop.
 BASE_FEATURE(kVizDirectCompositorThreadIpcFrameSinkManager,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Switches the message pump to base::MessagePumpType::IO on the Viz thread.
@@ -398,15 +331,6 @@ bool IsVSyncAligned() {
 #endif
 
 
-
-#if BUILDFLAG(IS_ANDROID)
-bool ShouldUseAdpfForSoc(std::string_view soc_allowlist,
-                         std::string_view soc) {
-  std::vector<std::string_view> allowlist = base::SplitStringPiece(
-      soc_allowlist, "|", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-  return std::ranges::contains(allowlist, soc);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 bool ShouldDiscardVizBufferQueueOnVisibilityChange() {
   return kAllowVizBufferQueueDiscardOnVisibilityChange &&

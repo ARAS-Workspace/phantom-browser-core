@@ -89,11 +89,7 @@ TEST_F(PlatformRuntimeImplTest, LoadAndUnloadSuccess) {
   PlatformRuntimeImpl* runtime = PlatformRuntimeImpl::GetInstance();
 
   base::FilePath exe_path;
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(base::PathService::Get(base::DIR_MODULE, &exe_path));
-#else
   ASSERT_TRUE(base::PathService::Get(base::DIR_EXE, &exe_path));
-#endif
 
   base::FilePath library_path = exe_path.AppendASCII(
       base::GetNativeLibraryName("platform_runtime_test_lib"));
@@ -112,11 +108,7 @@ TEST_F(PlatformRuntimeImplTest, ProcessRequestHeaders) {
   PlatformRuntimeImpl* runtime = PlatformRuntimeImpl::GetInstance();
 
   base::FilePath exe_path;
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(base::PathService::Get(base::DIR_MODULE, &exe_path));
-#else
   ASSERT_TRUE(base::PathService::Get(base::DIR_EXE, &exe_path));
-#endif
 
   base::FilePath library_path = exe_path.AppendASCII(
       base::GetNativeLibraryName("platform_runtime_test_lib"));

@@ -13,11 +13,6 @@
 #include "build/build_config.h"
 #include "services/device/wake_lock/wake_lock_features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "services/device/wake_lock/wake_lock_context.h"
-#include "ui/gfx/native_ui_types.h"
-#endif
-
 namespace device {
 
 WakeLock::WakeLock(mojo::PendingReceiver<mojom::WakeLock> receiver,
@@ -31,10 +26,6 @@ WakeLock::WakeLock(mojo::PendingReceiver<mojom::WakeLock> receiver,
       type_(type),
       reason_(reason),
       description_(std::make_unique<std::string>(description)),
-#if BUILDFLAG(IS_ANDROID)
-      context_id_(context_id),
-      native_view_getter_(native_view_getter),
-#endif
       main_task_runner_(base::SingleThreadTaskRunner::GetCurrentDefault()),
       observer_(observer) {
   DCHECK(observer_);
@@ -95,10 +86,6 @@ void WakeLock::ChangeType(mojom::WakeLockType type,
                           ChangeTypeCallback callback) {
   DCHECK(main_task_runner_->RunsTasksInCurrentSequence());
 
-#if BUILDFLAG(IS_ANDROID)
-  LOG(ERROR) << "WakeLock::ChangeType() has no effect on Android.";
-  std::move(callback).Run(false);
-#else
   if (receiver_set_.size() > 1) {
     LOG(ERROR) << "WakeLock::ChangeType() is not allowed when the current wake "
                   "lock is shared by more than one clients.";
@@ -115,7 +102,6 @@ void WakeLock::ChangeType(mojom::WakeLockType type,
   }
 
   std::move(callback).Run(true);
-#endif
 }
 
 void WakeLock::HasWakeLockForTests(HasWakeLockForTestsCallback callback) {
@@ -144,17 +130,6 @@ void WakeLock::CreateWakeLock() {
   if (type_ != mojom::WakeLockType::kPreventDisplaySleep)
     return;
 
-#if BUILDFLAG(IS_ANDROID)
-  if (context_id_ == WakeLockContext::WakeLockInvalidContextId) {
-    LOG(ERROR) << "Client must pass a valid context_id when requests wake lock "
-                  "on Android.";
-    return;
-  }
-
-  gfx::NativeView native_view = native_view_getter_.Run(context_id_);
-  if (native_view)
-    wake_lock_.get()->InitDisplaySleepBlocker(native_view);
-#endif
 }
 
 void WakeLock::RemoveWakeLock() {

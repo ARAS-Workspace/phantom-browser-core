@@ -32,9 +32,6 @@
 #include "media/gpu/test/video_test_environment.h"
 #include "media/gpu/test/video_test_helpers.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "media/gpu/android/ndk_media_codec_wrapper.h"
-#endif
 
 namespace media {
 namespace test {
@@ -165,15 +162,7 @@ class VideoEncoderTest : public ::testing::Test {
     return video_encoder;
   }
 
-  void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    if (__builtin_available(android NDK_MEDIA_CODEC_MIN_API, *)) {
-      // Negation results in compiler warning.
-    } else {
-      GTEST_SKIP() << "Not supported Android version";
-    }
-#endif
-  }
+  void SetUp() override {}
 
  private:
   std::unique_ptr<BitstreamProcessor> CreateBitstreamValidator(
@@ -427,7 +416,6 @@ TEST_F(VideoEncoderTest, ForceKeyFrame) {
 }
 
 // Test forcing key frame to the first and second frames.
-#if !BUILDFLAG(IS_ANDROID)
 // Forcing keyframe is best-effort on Android and having 2 keyframes in a
 // row is often not possible.
 TEST_F(VideoEncoderTest, ForceTheFirstAndSecondKeyFrames) {
@@ -460,7 +448,6 @@ TEST_F(VideoEncoderTest, ForceTheFirstAndSecondKeyFrames) {
   EXPECT_EQ(encoder->GetFrameReleasedCount(), config.num_frames_to_encode);
   EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Execute Flush() in the middle of encoding. Supporting this is required for
 // Flush() and ChabgeOptions() in media::VideoEncoder API.
@@ -562,12 +549,7 @@ TEST_F(VideoEncoderTest, BitrateCheck) {
 
   auto encoder = CreateVideoEncoder(g_env->Video(), config);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Software encoders on Android are less accurate at rate control.
-  const double kBitrateTolerance = 0.5;
-#else
   const double kBitrateTolerance = 0.15;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   const double tolerance =
       vbr_encoding ? kVariableBitrateTolerance : kBitrateTolerance;

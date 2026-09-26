@@ -125,24 +125,14 @@ MATCHER_P3(DependingOnPolicy,
            isolate_nothing,
            isolate_extensions,
            isolate_all_sites,
-#if BUILDFLAG(IS_ANDROID)
-           std::string("(with oopifs disabled) ") +
-               PrintToString(isolate_nothing)
-#else
            content::AreAllSitesIsolatedForTesting()
                ? std::string("(under --site-per-process) ") +
                      PrintToString(isolate_all_sites)
                : std::string("(under --isolate-extensions) ") +
-                     PrintToString(isolate_extensions)
-#endif
-) {
-#if BUILDFLAG(IS_ANDROID)
-  return ExplainMatchResult(isolate_nothing, arg, result_listener);
-#else
+                     PrintToString(isolate_extensions)) {
   return content::AreAllSitesIsolatedForTesting()
              ? ExplainMatchResult(isolate_all_sites, arg, result_listener)
              : ExplainMatchResult(isolate_extensions, arg, result_listener);
-#endif
 }
 
 // Matcher for base::Bucket objects that allows bucket_min to be a matcher.

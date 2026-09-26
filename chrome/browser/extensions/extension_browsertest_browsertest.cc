@@ -99,17 +99,10 @@ IN_PROC_BROWSER_TEST_P(MultiBackgroundExtensionBrowserTestBrowserTest,
   ExtensionHostQueue::GetInstance().SetCustomDelayForTesting(base::Seconds(0));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Android only supports service worker.
-INSTANTIATE_TEST_SUITE_P(All,
-                         MultiBackgroundExtensionBrowserTestBrowserTest,
-                         testing::Values(BackgroundType::kWorker));
-#else
 INSTANTIATE_TEST_SUITE_P(All,
                          MultiBackgroundExtensionBrowserTestBrowserTest,
                          testing::Values(BackgroundType::kPersistentPage,
                                          BackgroundType::kLazyPage,
                                          BackgroundType::kWorker));
-#endif
 
 }  // namespace extensions

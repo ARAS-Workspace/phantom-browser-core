@@ -17,15 +17,7 @@ size_t AllocationInfo::GetStackTrace(base::span<const void*> trace) {
   // TODO(vtsyrklevich): Investigate using trace_event::CFIBacktraceAndroid
   // on 32-bit Android for canary/dev (where we can dynamically load unwind
   // data.)
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(CAN_UNWIND_WITH_FRAME_POINTERS)
-  // Android release builds ship without unwind tables so the normal method of
-  // stack trace collection for base::debug::StackTrace doesn't work; however,
-  // AArch64 builds ship with frame pointers so we can still collect stack
-  // traces in that case.
-  return base::debug::TraceStackFramePointers(trace, 0);
-#else
   return base::debug::CollectStackTrace(trace);
-#endif
 }
 
 }  // namespace gwp_asan::internal

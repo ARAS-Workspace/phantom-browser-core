@@ -664,8 +664,7 @@ class PasswordProtectionServiceBaseTest
     feature_list_.InitWithFeatures(enabled_features, disabled_features);
   }
 
-// Visual features are not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // Visual features are not supported on Android.
   void VerifyContentAreaSizeCollection(
       const LoginReputationClientRequest& request) {
     bool should_report_content_size =
@@ -674,7 +673,6 @@ class PasswordProtectionServiceBaseTest
     EXPECT_EQ(should_report_content_size, request.has_content_area_height());
     EXPECT_EQ(should_report_content_size, request.has_content_area_width());
   }
-#endif
 
  protected:
   // |task_environment_| is needed here because this test involves both UI and
@@ -1431,9 +1429,7 @@ TEST_P(PasswordProtectionServiceBaseTest, VerifyPasswordOnFocusRequestProto) {
   EXPECT_EQ(true, actual_request->frames(1).has_password_field());
   ASSERT_EQ(1, actual_request->frames(1).forms_size());
   EXPECT_EQ(kFormActionUrl, actual_request->frames(1).forms(0).action_url());
-#if !BUILDFLAG(IS_ANDROID)
   VerifyContentAreaSizeCollection(*actual_request);
-#endif
 }
 
 TEST_P(PasswordProtectionServiceBaseTest,
@@ -1487,9 +1483,7 @@ TEST_P(PasswordProtectionServiceBaseTest,
   ASSERT_TRUE(actual_request->has_password_reuse_event());
   const auto& reuse_event = actual_request->password_reuse_event();
   EXPECT_EQ(0, reuse_event.domains_matching_password_size());
-#if !BUILDFLAG(IS_ANDROID)
   VerifyContentAreaSizeCollection(*actual_request);
-#endif
 }
 
 TEST_P(PasswordProtectionServiceBaseTest,
@@ -1526,9 +1520,7 @@ TEST_P(PasswordProtectionServiceBaseTest,
   } else {
     EXPECT_EQ(0, reuse_event.domains_matching_password_size());
   }
-#if !BUILDFLAG(IS_ANDROID)
   VerifyContentAreaSizeCollection(*actual_request);
-#endif
 }
 
 TEST_P(PasswordProtectionServiceBaseTest, VerifyOtpRequestProto) {
@@ -1635,24 +1627,16 @@ TEST_P(PasswordProtectionServiceBaseTest, VerifyShouldShowModalWarning) {
       PHISHING_REUSE,
       password_protection_service_->GetPasswordProtectionWarningTriggerPref(
           reused_password_account_type));
-// Currently password reuse warnings are not supported for GSUITE passwords on
-// Android.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(password_protection_service_->ShouldShowModalWarning(
-#else
+  // Currently password reuse warnings are not supported for GSUITE passwords on
+  // Android.
   EXPECT_TRUE(password_protection_service_->ShouldShowModalWarning(
-#endif
       LoginReputationClientRequest::PASSWORD_REUSE_EVENT,
       reused_password_account_type, LoginReputationClientResponse::PHISHING));
 
   // Modal dialog warning is also shown on LOW_REPUTATION verdict.
-// Currently password reuse warnings are not supported for GSUITE passwords on
-// Android.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(password_protection_service_->ShouldShowModalWarning(
-#else
+  // Currently password reuse warnings are not supported for GSUITE passwords on
+  // Android.
   EXPECT_TRUE(password_protection_service_->ShouldShowModalWarning(
-#endif
       LoginReputationClientRequest::PASSWORD_REUSE_EVENT,
       reused_password_account_type,
       LoginReputationClientResponse::LOW_REPUTATION));
@@ -1673,13 +1657,9 @@ TEST_P(PasswordProtectionServiceBaseTest, VerifyShouldShowModalWarning) {
   EXPECT_CALL(*password_protection_service_,
               GetPasswordProtectionWarningTriggerPref(_))
       .WillRepeatedly(Return(PHISHING_REUSE));
-// Currently password reuse warnings are not supported for enterprise passwords
-// on Android.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(password_protection_service_->ShouldShowModalWarning(
-#else
+  // Currently password reuse warnings are not supported for enterprise
+  // passwords on Android.
   EXPECT_TRUE(password_protection_service_->ShouldShowModalWarning(
-#endif
       LoginReputationClientRequest::PASSWORD_REUSE_EVENT,
       reused_password_account_type, LoginReputationClientResponse::PHISHING));
 }
@@ -1746,7 +1726,6 @@ TEST_P(PasswordProtectionServiceBaseTest, TestPingsForAboutBlank) {
 }
 
 // DOM features and visual features are not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(PasswordProtectionServiceBaseTest,
        TestVisualFeaturesPopulatedInOnFocusPing) {
   LoginReputationClientResponse expected_response =
@@ -1800,7 +1779,6 @@ TEST_P(PasswordProtectionServiceBaseTest,
                     ->has_visual_features());
   }
 }
-#endif
 
 TEST_P(PasswordProtectionServiceBaseTest, TestWebContentsDestroyed) {
   std::unique_ptr<content::WebContents> web_contents = GetWebContents();

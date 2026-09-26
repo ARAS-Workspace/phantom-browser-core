@@ -394,15 +394,9 @@ class IdentityManagerTest : public testing::Test {
             account_tracker_service.get(), primary_account_manager.get(),
             &pref_service_, &signin_client_);
 
-#if BUILDFLAG(IS_ANDROID)
-    init_params.device_accounts_synchronizer =
-        std::make_unique<DeviceAccountsSynchronizerImpl>(
-            token_service->GetDelegate());
-#else
     init_params.accounts_mutator = std::make_unique<AccountsMutatorImpl>(
         token_service.get(), account_tracker_service.get(),
         primary_account_manager.get(), &pref_service_);
-#endif
     init_params.signin_client = &signin_client_;
     init_params.account_fetcher_service = std::move(account_fetcher_service);
     init_params.account_tracker_service = std::move(account_tracker_service);
@@ -474,13 +468,8 @@ TEST_F(IdentityManagerTest, Construct) {
   EXPECT_NE(identity_manager()->GetPrimaryAccountMutator(), nullptr);
   EXPECT_NE(identity_manager()->GetAccountsCookieMutator(), nullptr);
   EXPECT_NE(identity_manager()->GetDiagnosticsProvider(), nullptr);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(identity_manager()->GetAccountsMutator(), nullptr);
-  EXPECT_NE(identity_manager()->GetDeviceAccountsSynchronizer(), nullptr);
-#else
   EXPECT_NE(identity_manager()->GetAccountsMutator(), nullptr);
   EXPECT_EQ(identity_manager()->GetDeviceAccountsSynchronizer(), nullptr);
-#endif
 }
 
 // Test that IdentityManager starts off with the information in
@@ -2391,30 +2380,5 @@ TEST_F(IdentityManagerTest, TestPickAccountIdForAccount) {
       CoreAccountId::FromGaiaId(kTestGaiaId),
       identity_manager()->PickAccountIdForAccount(kTestGaiaId, kTestEmail));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(IdentityManagerTest, RefreshAccountInfoIfStale) {
-  identity_manager()->GetAccountFetcherService()->OnNetworkInitialized();
-  AccountInfo account_info =
-      MakeAccountAvailable(identity_manager(), kTestEmail2);
-  identity_manager()->RefreshAccountInfoIfStale(account_info.GetAccountId());
-
-  SimulateSuccessfulFetchOfAccountInfo(
-      identity_manager(), account_info.account_id, account_info.email,
-      account_info.gaia, kTestHostedDomain, kTestFullName, kTestGivenName,
-      kTestLocale, kTestPictureUrl);
-
-  const AccountInfo& refreshed_account_info =
-      identity_manager_observer()->AccountFromAccountUpdatedCallback();
-  EXPECT_EQ(refreshed_account_info.GetAccountId(), account_info.GetAccountId());
-  EXPECT_EQ(refreshed_account_info.GetEmail(), account_info.GetEmail());
-  EXPECT_EQ(refreshed_account_info.GetGaiaId(), account_info.GetGaiaId());
-  EXPECT_EQ(refreshed_account_info.GetHostedDomain(), kTestHostedDomain);
-  EXPECT_EQ(refreshed_account_info.GetFullName(), kTestFullName);
-  EXPECT_EQ(refreshed_account_info.GetGivenName(), kTestGivenName);
-  EXPECT_EQ(refreshed_account_info.GetLocale(), kTestLocale);
-  EXPECT_EQ(refreshed_account_info.GetAvatarUrl(), kTestPictureUrl);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace signin

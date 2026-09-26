@@ -27,13 +27,9 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-#else
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension_builder.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace em = enterprise_management;
 
@@ -66,7 +62,6 @@ void FindAndRemoveProfileName(std::set<std::string>* names,
 }
 
 void AddExtensionToProfile(TestingProfile* profile) {
-#if !BUILDFLAG(IS_ANDROID)
   extensions::ExtensionRegistry* extension_registry =
       extensions::ExtensionRegistry::Get(profile);
 
@@ -76,7 +71,6 @@ void AddExtensionToProfile(TestingProfile* profile) {
   extension_registry->AddEnabled(extensions::ExtensionBuilder(extension_name)
                                      .SetID("abcdefghijklmnoabcdefghijklmnoab")
                                      .Build());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace
@@ -97,9 +91,7 @@ class ReportGeneratorTest : public ::testing::Test {
 
     profile_manager_.CreateGuestProfile();
 
-#if !BUILDFLAG(IS_ANDROID)
     profile_manager_.CreateSystemProfile();
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   // Creates |number| of Profiles. Returns the set of their names. The profile
@@ -225,55 +217,13 @@ class ReportGeneratorTest : public ::testing::Test {
         .AsUTF8Unsafe();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  ReportingDelegateFactoryAndroid delegate_factory_;
-#else
   ReportingDelegateFactoryDesktop delegate_factory_;
-#endif  // BUILDFLAG(IS_ANDROID)
   ReportGenerator generator_;
 
   content::BrowserTaskEnvironment task_environment_;
   TestingProfileManager profile_manager_;
   std::unique_ptr<base::HistogramTester> histogram_tester_;
 };
-
-#if BUILDFLAG(IS_ANDROID)
-
-TEST_F(ReportGeneratorTest, GenerateBasicReport) {
-  auto requests = GenerateRequests(ReportType::kBrowser);
-  EXPECT_EQ(1u, requests.size());
-
-  // Verify the basic request
-  auto* basic_request = requests[0].get();
-
-  EXPECT_NE(std::string(),
-            basic_request->GetDeviceReportRequest().brand_name());
-  EXPECT_NE(std::string(),
-            basic_request->GetDeviceReportRequest().device_model());
-  VerifySerialNumber(basic_request->GetDeviceReportRequest().serial_number());
-
-  EXPECT_EQ(policy::GetBrowserDeviceIdentifier()->SerializePartialAsString(),
-            basic_request->GetDeviceReportRequest()
-                .browser_device_identifier()
-                .SerializePartialAsString());
-
-  // Verify the OS report
-  EXPECT_TRUE(basic_request->GetDeviceReportRequest().has_os_report());
-  auto& os_report = basic_request->GetDeviceReportRequest().os_report();
-  EXPECT_NE(std::string(), os_report.name());
-  EXPECT_NE(std::string(), os_report.arch());
-  EXPECT_NE(std::string(), os_report.version());
-
-  // Verify the browser report
-  EXPECT_TRUE(basic_request->GetDeviceReportRequest().has_browser_report());
-  auto& browser_report =
-      basic_request->GetDeviceReportRequest().browser_report();
-  EXPECT_NE(std::string(), browser_report.browser_version());
-  EXPECT_TRUE(browser_report.has_channel());
-  EXPECT_NE(std::string(), browser_report.executable_path());
-}
-
-#else  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(ReportGeneratorTest, GenerateBasicReport) {
   auto profile_names = CreateProfiles(/*number*/ 2, kIdle);
@@ -340,7 +290,5 @@ TEST_F(ReportGeneratorTest, GenerateWithoutProfiles) {
   VerifyProfileReport(/*active_profile_names*/ std::set<std::string>(),
                       profile_names, browser_report);
 }
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace enterprise_reporting

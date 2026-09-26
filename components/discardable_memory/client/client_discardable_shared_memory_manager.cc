@@ -47,7 +47,7 @@ size_t GetDefaultAllocationSize() {
   [[maybe_unused]] const size_t kDefaultLowEndDeviceAllocationSize =
       kOneMegabyteInBytes;
 
-#if defined(ARCH_CPU_32_BITS) && !BUILDFLAG(IS_ANDROID)
+#if defined(ARCH_CPU_32_BITS)
   // On 32 bit architectures, use a smaller chunk, as address space
   // fragmentation may make a 4MiB allocation impossible to fulfill in the
   // browser process.  See crbug.com/983348 for details.

@@ -48,11 +48,8 @@ PasswordSenderServiceFactory::~PasswordSenderServiceFactory() = default;
 std::unique_ptr<KeyedService>
 PasswordSenderServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-// Password sending on Android is handled in GMSCore, and hence no service
-// should be instantiated.
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
+  // Password sending on Android is handled in GMSCore, and hence no service
+  // should be instantiated.
 
   Profile* profile = Profile::FromBrowserContext(context);
 
@@ -73,5 +70,4 @@ PasswordSenderServiceFactory::BuildServiceInstanceForBrowserContext(
 
   return std::make_unique<password_manager::PasswordSenderServiceImpl>(
       std::move(sync_bridge));
-#endif  // BUILDFLAG(IS_ANDROID)
 }

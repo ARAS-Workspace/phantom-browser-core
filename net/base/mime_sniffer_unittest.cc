@@ -43,18 +43,13 @@ TEST(MimeSnifferTest, SniffableSchemes) {
     const char* scheme;
     bool sniffable;
   } kTestCases[] = {
-      {url::kAboutScheme, false},     {url::kBlobScheme, false},
-#if BUILDFLAG(IS_ANDROID)
-      {url::kContentScheme, true},
-#else
-      {url::kContentScheme, false},
-#endif
-      {url::kContentIDScheme, false}, {url::kDataScheme, false},
-      {url::kFileScheme, true},       {url::kFileSystemScheme, true},
-      {url::kFtpScheme, false},       {url::kHttpScheme, true},
-      {url::kHttpsScheme, true},      {url::kJavaScriptScheme, false},
-      {url::kMailToScheme, false},    {url::kWsScheme, false},
-      {url::kWssScheme, false}};
+      {url::kAboutScheme, false},      {url::kBlobScheme, false},
+      {url::kContentScheme, false},    {url::kContentIDScheme, false},
+      {url::kDataScheme, false},       {url::kFileScheme, true},
+      {url::kFileSystemScheme, true},  {url::kFtpScheme, false},
+      {url::kHttpScheme, true},        {url::kHttpsScheme, true},
+      {url::kJavaScriptScheme, false}, {url::kMailToScheme, false},
+      {url::kWsScheme, false},         {url::kWssScheme, false}};
 
   for (const auto& test_case : kTestCases) {
     GURL url(std::string(test_case.scheme) + "://host/path/whatever");

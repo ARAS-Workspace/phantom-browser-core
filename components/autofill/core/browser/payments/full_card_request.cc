@@ -199,16 +199,6 @@ void FullCardRequest::OnUnmaskPromptAccepted(
   }
 
   request_->user_response = user_response;
-#if BUILDFLAG(IS_ANDROID)
-  if (ui_delegate_) {
-    // An opt-in request to Payments must be included either if the user chose
-    // to opt-in through the CVC prompt or if the UI delegate indicates that the
-    // user previously chose to opt-in through the settings page.
-    request_->user_response.enable_fido_auth =
-        user_response.enable_fido_auth ||
-        ui_delegate_->UserOptedInToFidoFromSettingsPageOnMobile();
-  }
-#endif
 
   if (!request_->risk_data.empty())
     SendUnmaskCardRequest();
@@ -226,11 +216,7 @@ void FullCardRequest::OnUnmaskPromptCancelled() {
 bool FullCardRequest::ShouldOfferFidoAuth() const {
   // FIDO opt-in is only handled from card unmask on mobile. Desktop platforms
   // provide a separate opt-in bubble.
-#if BUILDFLAG(IS_ANDROID)
-  return ui_delegate_ && ui_delegate_->ShouldOfferFidoAuth();
-#else
   return false;
-#endif
 }
 
 void FullCardRequest::OnDidGetUnmaskRiskData(const std::string& risk_data) {

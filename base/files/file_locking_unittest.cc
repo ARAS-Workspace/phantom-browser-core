@@ -286,11 +286,7 @@ TEST_F(FileLockingTest, UnlockOnExitShared) {
 
 // Test that killing the process releases the lock.  This should cover crashing.
 // Flaky on Android (http://crbug.com/747518)
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_UnlockOnTerminate DISABLED_UnlockOnTerminate
-#else
 #define MAYBE_UnlockOnTerminate UnlockOnTerminate
-#endif
 TEST_F(FileLockingTest, MAYBE_UnlockOnTerminate) {
   // The child will wait for an exit which never arrives.
   StartChildAndSignalLock(File::LockMode::kExclusive, kExitUnlock);

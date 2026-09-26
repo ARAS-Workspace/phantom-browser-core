@@ -81,9 +81,6 @@ DecodeTrustedVaultAutoUpgradeExperimentGroupFromString(
 
 bool IsBookmarksSelectedByDefaultInTransportMode(PrefService& pref_service,
                                                  const GaiaId& gaia_id) {
-#if BUILDFLAG(IS_ANDROID)
-  return IsReplaceSyncPromosWithSignInPromosEnabled();
-#else
   // If `kReplaceSyncPromosWithSignInPromos` is enabled, bookmarks and reading
   // list are enabled by default for new sign-ins (not pre-existing sessions).
   // This pref is set if the above conditions are met.
@@ -91,14 +88,10 @@ bool IsBookmarksSelectedByDefaultInTransportMode(PrefService& pref_service,
   // not reset and users will keep their bookmarks because that reduces the
   // risks of perceived dataloss.
   return SigninPrefs(pref_service).GetBookmarksExplicitBrowserSignin(gaia_id);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool IsExtensionsSelectedByDefaultInTransportMode(PrefService& pref_service,
                                                   const GaiaId& gaia_id) {
-#if BUILDFLAG(IS_ANDROID)
-  return IsReplaceSyncPromosWithSignInPromosEnabled();
-#else
   // if `kReplaceSyncPromosWithSignInPromos` is enabled, extensions are enabled
   // by default for new sign-ins (not pre-existing sessions). This pref is set
   // if the above conditions are met.
@@ -106,7 +99,6 @@ bool IsExtensionsSelectedByDefaultInTransportMode(PrefService& pref_service,
   // not reset and users will keep their extensions because that reduces the
   // risks of perceived dataloss.
   return SigninPrefs(pref_service).GetExtensionsExplicitBrowserSignin(gaia_id);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace
@@ -611,13 +603,9 @@ bool SyncPrefs::IsTypeSupportedInTransportMode(UserSelectableType type) {
               switches::kEnablePreferencesAccountStorage)) {
         return false;
       }
-#if BUILDFLAG(IS_ANDROID)
-      return IsReplaceSyncPromosWithSignInPromosEnabled();
-#else
       // Search engines are behind `UserSelectableType::kPreferences`.
       return base::FeatureList::IsEnabled(
           kSeparateLocalAndAccountSearchEngines);
-#endif
     case UserSelectableType::kPasswords:
       return true;
     case UserSelectableType::kAutofill:
@@ -637,13 +625,8 @@ bool SyncPrefs::IsTypeSupportedInTransportMode(UserSelectableType type) {
     case UserSelectableType::kExtensions:
       return true;
     case UserSelectableType::kThemes:
-#if BUILDFLAG(IS_ANDROID)
-      return base::FeatureList::IsEnabled(
-          syncer::kNewTabPageCustomizationThemeSync);
-#else
       return base::FeatureList::IsEnabled(
           syncer::kSeparateLocalAndAccountThemes);
-#endif
     case UserSelectableType::kApps:
       return IsReplaceSyncPromosWithSignInPromosEnabled();
     case UserSelectableType::kCookies:
@@ -870,7 +853,6 @@ void SyncPrefs::MigrateGlobalDataTypePrefsToAccount(PrefService* pref_service,
   // were enabled previously, so they're specially tracked here.
   bool history_enabled = everything_enabled;
   bool tabs_enabled = everything_enabled;
-#if !BUILDFLAG(IS_ANDROID)
   // Saved Tab Groups user toggle is only used on desktop.
   bool saved_tab_groups_enabled = everything_enabled;
   // Explicitly set the extensions toggle, which otherwise requires an explicit
@@ -881,15 +863,12 @@ void SyncPrefs::MigrateGlobalDataTypePrefsToAccount(PrefService* pref_service,
   // sign-in to be enabled by default. This is to specifically handle the case
   // when `syncer::kExplicitSigninForBookmarks` is true.
   bool bookmarks_enabled = everything_enabled;
-#endif  // !BUILDFLAG(IS_ANDROID)
   if (everything_enabled) {
     // On desktop, Passwords is considered disabled by default and
     // so also needs to be enabled explicitly.
-#if !BUILDFLAG(IS_ANDROID)
     // TODO(b/314773312): Remove this when Uno is enabled.
     account_settings->Set(GetPrefNameForType(UserSelectableType::kPasswords),
                           true);
-#endif
   } else {
     // "Sync everything" is off, so copy over the individual value for each
     // type.
@@ -903,23 +882,13 @@ void SyncPrefs::MigrateGlobalDataTypePrefsToAccount(PrefService* pref_service,
         GetPrefNameForType(UserSelectableType::kHistory));
     tabs_enabled =
         pref_service->GetBoolean(GetPrefNameForType(UserSelectableType::kTabs));
-#if !BUILDFLAG(IS_ANDROID)
     saved_tab_groups_enabled = pref_service->GetBoolean(
         GetPrefNameForType(UserSelectableType::kSavedTabGroups));
     extensions_enabled = pref_service->GetBoolean(
         GetPrefNameForType(UserSelectableType::kExtensions));
     bookmarks_enabled = pref_service->GetBoolean(
         GetPrefNameForType(UserSelectableType::kBookmarks));
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
-#if BUILDFLAG(IS_ANDROID)
-  // On mobile, History and Tabs remain enabled only if they were both
-  // enabled previously.
-  account_settings->Set(GetPrefNameForType(UserSelectableType::kHistory),
-                        history_enabled && tabs_enabled);
-  account_settings->Set(GetPrefNameForType(UserSelectableType::kTabs),
-                        history_enabled && tabs_enabled);
-#else
   // On desktop, History, Tabs and Saved Tab Groups carry over their individual
   // values.
   account_settings->Set(GetPrefNameForType(UserSelectableType::kHistory),
@@ -932,23 +901,6 @@ void SyncPrefs::MigrateGlobalDataTypePrefsToAccount(PrefService* pref_service,
                         saved_tab_groups_enabled);
   account_settings->Set(GetPrefNameForType(UserSelectableType::kExtensions),
                         extensions_enabled);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-  // Another special case: For custom passphrase users, "Addresses and more"
-  // gets disabled by default. The reason is that for syncing custom passphrase
-  // users, this toggle mapped to the legacy AUTOFILL_PROFILE type (which
-  // supported custom passphrase), but for migrated users it maps to
-  // CONTACT_INFO (which does not). This is only done on Mobile because on
-  // Desktop the strings already mention that the addresses are not encrypted
-  // with the passphrase.
-  std::optional<PassphraseType> passphrase_type = ProtoPassphraseInt32ToEnum(
-      pref_service->GetInteger(prefs::internal::kSyncCachedPassphraseType));
-  if (passphrase_type.has_value() && IsExplicitPassphrase(*passphrase_type)) {
-    account_settings->Set(GetPrefNameForType(UserSelectableType::kAutofill),
-                          false);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Usually, the "SyncToSignin" migration (aka phase 2) will have completed
   // previously. But just in case it hasn't, make sure it doesn't run in the

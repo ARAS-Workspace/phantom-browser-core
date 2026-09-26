@@ -72,9 +72,6 @@ Platform GetCurrentPlatform() {
   return Platform::PLATFORM_MACOS;
 #elif BUILDFLAG(IS_LINUX)
   return Platform::PLATFORM_LINUX;
-#elif BUILDFLAG(IS_ANDROID)
-  // TODO(b/463580425): Differentiate between Android platforms.
-  return Platform::PLATFORM_ANDROID;
 #else
   return Platform::PLATFORM_OTHER;
 #endif

@@ -14,28 +14,19 @@
 #include "components/download/public/background_service/download_metadata.h"
 #include "components/keyed_service/core/simple_factory_key.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/startup_bridge.h"
-#endif
-
 namespace download {
 
 DeferredClientWrapper::DeferredClientWrapper(ClientFactory client_factory,
                                              SimpleFactoryKey* key)
     : client_factory_(std::move(client_factory)), key_(key) {
-#if BUILDFLAG(IS_ANDROID)
-  full_browser_requested_ = false;
-#endif
 
   FullBrowserTransitionManager::Get()->RegisterCallbackOnProfileCreation(
       key_, base::BindOnce(&DeferredClientWrapper::InflateClient,
                            weak_ptr_factory_.GetWeakPtr()));
-#if !BUILDFLAG(IS_ANDROID)
   // On non-android platforms we can only be running in full browser mode. In
   // full browser mode, FullBrowserTransitionManager synchronously calls the
   // callback when it is registered.
   DCHECK(wrapped_client_);
-#endif
 }
 
 DeferredClientWrapper::~DeferredClientWrapper() = default;
@@ -176,17 +167,9 @@ void DeferredClientWrapper::RunDeferredClosures(bool force_inflate) {
   if (wrapped_client_) {
     DoRunDeferredClosures();
   } else if (force_inflate) {
-#if BUILDFLAG(IS_ANDROID)
-    // The constructor registers InflateClient as a callback with
-    // FullBrowserTransitionManager on Profile creation. We just need to trigger
-    // loading full browser. Once full browser is loaded and  profile is
-    // created, FullBrowserTransitionManager will call InflateClient.
-    LaunchFullBrowser();
-#else
     // For platforms that do not implement reduced mode (i.e. non-android), the
     // wrapped client should have been inflated in the constructor.
     NOTREACHED();
-#endif
   }
 }
 
@@ -204,14 +187,5 @@ void DeferredClientWrapper::InflateClient(Profile* profile) {
   wrapped_client_ = std::move(client_factory_).Run(profile);
   DoRunDeferredClosures();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void DeferredClientWrapper::LaunchFullBrowser() {
-  if (full_browser_requested_)
-    return;
-  full_browser_requested_ = true;
-  android_startup::LoadFullBrowser();
-}
-#endif
 
 }  // namespace download

@@ -32,10 +32,8 @@
 #include "third_party/blink/public/mojom/usb/web_usb_service.mojom.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/usb/usb_connection_tracker.h"
 #include "chrome/browser/usb/usb_connection_tracker_factory.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "base/command_line.h"
@@ -168,7 +166,6 @@ class MockDeviceManagerClient
 };
 
 // Android does not use UsbConnectionTracker.
-#if !BUILDFLAG(IS_ANDROID)
 class MockUsbConnectionTracker : public UsbConnectionTracker {
  public:
   explicit MockUsbConnectionTracker(Profile* profile)
@@ -178,7 +175,6 @@ class MockUsbConnectionTracker : public UsbConnectionTracker {
   MOCK_METHOD(void, IncrementConnectionCount, (const url::Origin&), (override));
   MOCK_METHOD(void, DecrementConnectionCount, (const url::Origin&), (override));
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests for embedder-specific behaviors of Chrome's blink::mojom::WebUsbService
 // implementation.
@@ -249,7 +245,6 @@ class ChromeUsbTestHelper {
     return usb_device_manager_overrider_.device_manager();
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   BrowserContextKeyedServiceFactory::TestingFactory
   GetUsbConnectionTrackerTestingFactory() {
     return base::BindRepeating([](content::BrowserContext* browser_context) {
@@ -270,22 +265,17 @@ class ChromeUsbTestHelper {
   MockUsbConnectionTracker& usb_connection_tracker() {
     return *usb_connection_tracker_;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void ExpectIncrementConnectionCount(const url::Origin& origin) {
-#if !BUILDFLAG(IS_ANDROID)
     if (supports_usb_connection_tracker_) {
       EXPECT_CALL(usb_connection_tracker(), IncrementConnectionCount(origin));
     }
-#endif
   }
 
   void ExpectDecrementConnectionCount(const url::Origin& origin) {
-#if !BUILDFLAG(IS_ANDROID)
     if (supports_usb_connection_tracker_) {
       EXPECT_CALL(usb_connection_tracker(), DecrementConnectionCount(origin));
     }
-#endif
   }
 
   void TestNoPermissionDevice() {
@@ -549,23 +539,17 @@ class ChromeUsbTestHelper {
     // Remove the device and check that the WebContents no longer indicates we
     // are connected.
     base::RunLoop decrement_connection_count_loop;
-#if !BUILDFLAG(IS_ANDROID)
     if (supports_usb_connection_tracker_) {
       EXPECT_CALL(usb_connection_tracker(), DecrementConnectionCount(origin))
           .WillOnce(RunClosure(decrement_connection_count_loop.QuitClosure()));
     }
-#endif
     EXPECT_CALL(mock_device, Close).WillOnce(RunOnceClosure<0>());
     device_manager()->RemoveDevice(fake_device);
-#if !BUILDFLAG(IS_ANDROID)
     if (supports_usb_connection_tracker_) {
       decrement_connection_count_loop.Run();
     } else {
       base::RunLoop().RunUntilIdle();
     }
-#else
-    base::RunLoop().RunUntilIdle();
-#endif
     if (web_contents) {
       EXPECT_FALSE(web_contents->IsCapabilityActive(
           content::WebContentsCapabilityType::kUSB));
@@ -701,10 +685,8 @@ class ChromeUsbTestHelper {
   raw_ptr<TestingProfile, DanglingUntriaged> profile_ = nullptr;
   GURL origin_url_;
 
-#if !BUILDFLAG(IS_ANDROID)
   raw_ptr<MockUsbConnectionTracker, DanglingUntriaged> usb_connection_tracker_ =
       nullptr;
-#endif
 
   // This flag is expected to be set to true only for the scenario of extension
   // origin.
@@ -722,11 +704,9 @@ class ChromeUsbDelegateRenderFrameTestBase
     ChromeRenderViewHostTestHarness::SetUp();
     profile_ = profile();
     ASSERT_TRUE(profile_);
-#if !BUILDFLAG(IS_ANDROID)
     UsbConnectionTrackerFactory::GetInstance()->SetTestingFactory(
         profile_, GetUsbConnectionTrackerTestingFactory());
     SetUpUsbConnectionTracker();
-#endif
     SetUpOriginUrl();
     NavigateAndCommit(origin_url_);
   }
@@ -795,9 +775,7 @@ class ChromeUsbDelegateServiceWorkerTestBase
   void SetUp() override {
     content::EmbeddedWorkerInstanceTestHarness::SetUp();
     SetUpOriginUrl();
-#if !BUILDFLAG(IS_ANDROID)
     SetUpUsbConnectionTracker();
-#endif
     StartWorker();
   }
 
@@ -818,10 +796,8 @@ class ChromeUsbDelegateServiceWorkerTestBase
     auto builder = TestingProfile::Builder();
     auto testing_profile = builder.Build();
     profile_ = testing_profile.get();
-#if !BUILDFLAG(IS_ANDROID)
     UsbConnectionTrackerFactory::GetInstance()->SetTestingFactory(
         profile_, GetUsbConnectionTrackerTestingFactory());
-#endif
     return testing_profile;
   }
 
@@ -1012,7 +988,6 @@ TEST_F(ChromeUsbDelegateSmartCardExtensionRenderFrameTest,
 }
 
 // Not supported on Android. See NOTREACHED in WebUsbServiceImpl constructor.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeUsbDelegateImprivataExtensionServiceWorkerTest,
        AllowlistedImprivataExtension) {
   TestAllowlistedImprivataExtension(nullptr);
@@ -1042,7 +1017,6 @@ TEST_F(ChromeUsbDelegateExtensionServiceWorkerTest, OpenAndCloseDevice) {
 TEST_F(ChromeUsbDelegateExtensionServiceWorkerTest, OpenAndDisconnectDevice) {
   TestOpenAndDisconnectDevice(/*web_contents=*/nullptr);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 

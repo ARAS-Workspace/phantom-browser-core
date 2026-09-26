@@ -17,12 +17,8 @@ namespace {
 
 // Whether the sharing hub feature should be disabled by policy.
 bool SharingHubDisabledByPolicy(content::BrowserContext* context) {
-#if !BUILDFLAG(IS_ANDROID)
   const PrefService* prefs = Profile::FromBrowserContext(context)->GetPrefs();
   return !prefs->GetBoolean(prefs::kDesktopSharingHubEnabled);
-#else
-  return false;
-#endif
 }
 
 // Whether screenshots-related features should be disabled by policy.
@@ -60,10 +56,8 @@ bool HasPageAction(content::BrowserContext* context, bool is_popup_mode) {
 
 BASE_FEATURE(kDesktopScreenshots, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID)
 void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(prefs::kDesktopSharingHubEnabled, true);
 }
-#endif
 
 }  // namespace sharing_hub

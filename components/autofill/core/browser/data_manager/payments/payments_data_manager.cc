@@ -1350,21 +1350,11 @@ bool PaymentsDataManager::IsPaymentMethodsMandatoryReauthEnabled() {
 }
 
 bool PaymentsDataManager::ShouldShowPaymentMethodsMandatoryReauthPromo() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   // There is no need to show the promo if the feature is already enabled.
   if (prefs::IsPaymentMethodsMandatoryReauthEnabled(pref_service_)) {
-#if BUILDFLAG(IS_ANDROID)
-    // The mandatory reauth feature is always enabled on automotive, there
-    // is/was no opt-in. As such, there is no need to log anything here on
-    // automotive.
-    if (!base::android::device_info::is_automotive()) {
-      LogMandatoryReauthOfferOptInDecision(
-          MandatoryReauthOfferOptInDecision::kAlreadyOptedIn);
-    }
-#else
     LogMandatoryReauthOfferOptInDecision(
         MandatoryReauthOfferOptInDecision::kAlreadyOptedIn);
-#endif  // BUILDFLAG(IS_ANDROID)
     return false;
   }
 
@@ -1388,7 +1378,7 @@ bool PaymentsDataManager::ShouldShowPaymentMethodsMandatoryReauthPromo() {
   return allowed_by_strike_database;
 #else
   return false;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 void PaymentsDataManager::
@@ -2114,28 +2104,15 @@ bool PaymentsDataManager::HasPendingPaymentQueries() const {
 }
 
 bool PaymentsDataManager::AreBankAccountsSupported() const {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool PaymentsDataManager::AreEwalletAccountsSupported() const {
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(features::kAutofillSyncEwalletAccounts);
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool PaymentsDataManager::AreEwalletCreationOptionsSupported() const {
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(
-      ::payments::facilitated::kEnableEwalletNewAccountLinking);
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool PaymentsDataManager::AreBnplIssuersSupported() const {

@@ -17,9 +17,6 @@
 
 #if BUILDFLAG(IS_LINUX)
 #include "ui/events/devices/device_data_manager.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "ui/base/device_form_factor.h"
-#include "ui/events/devices/input_device_observer_android.h"
 #endif
 
 namespace content {
@@ -53,16 +50,12 @@ SlowWebPreferenceCache::SlowWebPreferenceCache() {
 
 #if BUILDFLAG(IS_LINUX)
   ui::DeviceDataManager::GetInstance()->AddObserver(this);
-#elif BUILDFLAG(IS_ANDROID)
-  ui::InputDeviceObserverAndroid::GetInstance()->AddObserver(this);
 #endif
 }
 
 SlowWebPreferenceCache::~SlowWebPreferenceCache() {
 #if BUILDFLAG(IS_LINUX)
   ui::DeviceDataManager::GetInstance()->RemoveObserver(this);
-#elif BUILDFLAG(IS_ANDROID)
-  ui::InputDeviceObserverAndroid::GetInstance()->RemoveObserver(this);
 #endif
 }
 
@@ -97,11 +90,6 @@ void SlowWebPreferenceCache::Load(blink::web_pref::WebPreferences* prefs) {
   SET_FROM_CACHE(prefs, pointer_events_max_touch_points);
   SET_FROM_CACHE(prefs, number_of_cpu_cores);
 
-#if BUILDFLAG(IS_ANDROID)
-  SET_FROM_CACHE(prefs, video_fullscreen_orientation_lock_enabled);
-  SET_FROM_CACHE(prefs, video_rotate_to_fullscreen_enabled);
-#endif
-
 #undef SET_FROM_CACHE
 }
 
@@ -131,12 +119,6 @@ bool SlowWebPreferenceCache::Update() {
   blink::mojom::HoverType prev_primary_hover_type = primary_hover_type_;
   int prev_pointer_events_max_touch_points = pointer_events_max_touch_points_;
   int prev_number_of_cpu_cores = number_of_cpu_cores_;
-#if BUILDFLAG(IS_ANDROID)
-  bool prev_video_fullscreen_orientation_lock_enabled =
-      video_fullscreen_orientation_lock_enabled_;
-  bool prev_video_rotate_to_fullscreen_enabled =
-      video_rotate_to_fullscreen_enabled_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   is_initialized_ = true;
 
@@ -147,9 +129,6 @@ bool SlowWebPreferenceCache::Update() {
   // Otherwise default is disabled.
   std::string touch_enabled_default_switch =
       switches::kTouchEventFeatureDetectionDisabled;
-#if BUILDFLAG(IS_ANDROID)
-  touch_enabled_default_switch = switches::kTouchEventFeatureDetectionEnabled;
-#endif  // BUILDFLAG(IS_ANDROID)
   const std::string touch_enabled_switch =
       command_line.HasSwitch(switches::kTouchEventFeatureDetection)
           ? command_line.GetSwitchValueASCII(
@@ -193,19 +172,6 @@ bool SlowWebPreferenceCache::Update() {
   }
   base::UmaHistogramEnumeration("Input.PointerTypesAll", all_pointer_types);
   base::UmaHistogramEnumeration("Input.PointerTypePrimary", primary_pointer);
-
-#if BUILDFLAG(IS_ANDROID)
-  const bool device_is_phone =
-      ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_PHONE;
-  video_fullscreen_orientation_lock_enabled_ = device_is_phone;
-  video_rotate_to_fullscreen_enabled_ = device_is_phone;
-  if (video_fullscreen_orientation_lock_enabled_ !=
-          prev_video_fullscreen_orientation_lock_enabled ||
-      video_rotate_to_fullscreen_enabled_ !=
-          prev_video_rotate_to_fullscreen_enabled) {
-    return true;
-  }
-#endif
 
   return touch_event_feature_detection_enabled_ !=
              prev_touch_event_feature_detection_enabled ||

@@ -31,18 +31,9 @@
 #include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/enterprise/connectors/core/features.h"
-#endif
-
 namespace safe_browsing {
 
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-// File suffix for APKs.
-const base::FilePath::CharType kApkSuffix[] = FILE_PATH_LITERAL(".apk");
-#endif
 
 int ArchiveEntryWeight(const ClientDownloadRequest::ArchivedBinary& entry) {
   return FileTypePolicies::GetInstance()
@@ -457,14 +448,7 @@ bool ShouldSendDangerousDownloadReport(
 #endif
 
 bool IsDeepScanningEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, only Enterprise scan may be enabled. Consumer deep scan is not
-  // (yet) supported.
-  return base::FeatureList::IsEnabled(
-      enterprise_connectors::kEnableDownloadEnterpriseScanOnClank);
-#else
   return true;
-#endif
 }
 
 std::optional<enterprise_connectors::AnalysisSettings>
@@ -482,11 +466,7 @@ bool IsFiletypeSupportedForFullDownloadProtection(
   // for Android here.
   // TODO(chlily): Refactor/fix FileTypePolicies and then remove this
   // platform-specific hardcoded behavior.
-#if BUILDFLAG(IS_ANDROID)
-  return file_name.MatchesExtension(kApkSuffix);
-#else
   return FileTypePolicies::GetInstance()->IsCheckedBinaryFile(file_name);
-#endif
 }
 
 }  // namespace safe_browsing

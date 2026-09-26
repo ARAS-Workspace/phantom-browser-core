@@ -7,11 +7,6 @@
 #include "base/feature_list.h"
 #include "device/vr/buildflags/buildflags.h"
 
-#if BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "device/vr/public/jni_headers/XrFeatureStatus_jni.h"
-#endif
-
 namespace device::features {
 // Enables rendering to WebXR sessions with the WebGPU API.
 BASE_FEATURE(kWebXRWebGPUBinding, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -27,24 +22,14 @@ BASE_FEATURE(kWebXRLayers, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Controls whether the orientation sensor based device is enabled.
 BASE_FEATURE(kWebXROrientationSensorDevice,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              // TODO(crbug.com/529477337): Restrict this feature to Android.
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables access to the WebXR plane-detection feature
 BASE_FEATURE(kWebXRPlaneDetection, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Allows blink to process the `visible-blurred` state.
 BASE_FEATURE(kWebXrVisibleBlurred, base::FEATURE_ENABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-// Controls WebXR support for the system keyboard on Android OpenXR.
-BASE_FEATURE(kOpenXrAndroidSystemKeyboard, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(ENABLE_OPENXR)
 // Controls WebXR support for the OpenXR Runtime.
@@ -54,11 +39,6 @@ BASE_FEATURE(kOpenXR, base::FEATURE_DISABLED_BY_DEFAULT);
 // hit tests or only plane-based ones.
 BASE_FEATURE(kSpatialEntitesDepthHitTest, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kOpenXrAndroidSmoothDepth, base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kOpenXrAndroidCubeMap, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 bool IsOpenXrEnabled() {
   static bool is_xr_device = IsXrDevice();
   return base::FeatureList::IsEnabled(kOpenXR) || is_xr_device;
@@ -66,12 +46,7 @@ bool IsOpenXrEnabled() {
 #endif  // ENABLE_OPENXR
 
 bool IsXrDevice() {
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_OPENXR)
-  return device::Java_XrFeatureStatus_isXrDevice(
-      base::android::AttachCurrentThread());
-#else
   return false;
-#endif
 }
 
 bool IsHandTrackingEnabled() {
@@ -82,7 +57,3 @@ bool IsHandTrackingEnabled() {
 #endif
 }
 }  // namespace device::features
-
-#if BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(XrFeatureStatus)
-#endif

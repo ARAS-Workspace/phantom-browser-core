@@ -9,15 +9,10 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/metrics/android_session_durations_service.h"
-#include "chrome/browser/android/metrics/android_session_durations_service_factory.h"
-#else
 #include "chrome/browser/metrics/desktop_session_duration/desktop_profile_session_durations_service.h"
 #include "chrome/browser/metrics/desktop_session_duration/desktop_profile_session_durations_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#endif
 
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
@@ -39,22 +34,15 @@ ChromeSigninAndSyncStatusMetricsProvider::GetStatusOfAllProfiles() const {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
   std::vector<Profile*> profile_list = profile_manager->GetLoadedProfiles();
   for (Profile* profile : profile_list) {
-#if !BUILDFLAG(IS_ANDROID)
     auto* browser_collection = ProfileBrowserCollection::GetForProfile(profile);
     if (!browser_collection || browser_collection->GetSize() == 0) {
       // The profile is loaded, but there's no opened browser for this profile.
       continue;
     }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
     auto* session_duration =
         metrics::DesktopProfileSessionDurationsServiceFactory::
             GetForBrowserContext(profile);
-#else
-    auto* session_duration =
-        AndroidSessionDurationsServiceFactory::GetForProfile(profile);
-#endif
     // |session_duration| will be null for system and guest profiles.
     if (!session_duration) {
       continue;

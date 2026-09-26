@@ -20,10 +20,6 @@
 #include "base/apple/scoped_cftyperef.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/locale_utils.h"
-#endif
-
 namespace country_codes {
 
 namespace {
@@ -47,12 +43,6 @@ CountryId GetCurrentCountryID() {
   char code[2]{static_cast<char>(isobuf[0]), static_cast<char>(isobuf[1])};
 
   return CountryId(std::string_view(code, std::size(code)));
-}
-
-#elif BUILDFLAG(IS_ANDROID)
-
-CountryId GetCurrentCountryID() {
-  return CountryId(base::android::GetDefaultCountryCode());
 }
 
 #elif BUILDFLAG(IS_POSIX)

@@ -168,14 +168,9 @@ TEST_F(BitmapFetcherServiceTest, CacheRequest) {
   CompleteFetch(url1_);
 
   // No caching on Android.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(0U, cache_size());
-#else
   EXPECT_EQ(1U, cache_size());
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BitmapFetcherServiceTest, FailedNullRequestsAreHandled) {
   RequestImage(url1_);
   RequestImage(url2_);
@@ -199,4 +194,3 @@ TEST_F(BitmapFetcherServiceTest, FailedRequestsDontEnterCache) {
   FailFetch(url2_);
   EXPECT_EQ(1U, cache_size());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

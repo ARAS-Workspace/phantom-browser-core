@@ -43,10 +43,6 @@
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "media/filters/android/media_codec_audio_decoder.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "media/filters/mac/audio_toolbox_audio_decoder.h"
 #endif
@@ -1711,7 +1707,7 @@ TEST_F(PipelineIntegrationTest, MSE_ConfigChange_EncryptedThenClear_WebM) {
   Stop();
 }
 
-#if defined(ARCH_CPU_X86_FAMILY) && !BUILDFLAG(IS_ANDROID)
+#if defined(ARCH_CPU_X86_FAMILY)
 TEST_F(PipelineIntegrationTest, BasicPlaybackHi10PVP9) {
   ASSERT_EQ(PIPELINE_OK, Start("bear-320x180-hi10p-vp9.webm"));
 
@@ -2070,14 +2066,12 @@ TEST_F(PipelineIntegrationTest, BasicPlaybackHashed_M4A) {
   EXPECT_AUDIO_HASH("3.77,4.53,4.75,3.48,3.67,3.76,");
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 std::unique_ptr<AudioDecoder> CreateXheAacDecoder(
     scoped_refptr<base::SequencedTaskRunner> task_runner,
     MediaLog& media_log) {
 #if BUILDFLAG(IS_MAC)
   return std::make_unique<AudioToolboxAudioDecoder>(media_log.Clone());
-#elif BUILDFLAG(IS_ANDROID)
-  return std::make_unique<MediaCodecAudioDecoder>(task_runner);
 #else
 #error "xHE-AAC decoding is not supported on this platform.";
 #endif
@@ -2143,7 +2137,7 @@ TEST_F(PipelineIntegrationTest, MSE_BasicPlaybackXHE_AAC) {
   Play();
   ASSERT_TRUE(WaitUntilOnEnded());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
 std::vector<std::unique_ptr<VideoDecoder>> CreateFailingVideoDecoder() {
   std::vector<std::unique_ptr<VideoDecoder>> failing_video_decoder;

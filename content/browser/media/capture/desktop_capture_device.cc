@@ -1369,9 +1369,6 @@ DesktopCaptureDevice::DesktopCaptureDevice(
 
   bool zero_hertz_is_supported = true;
 
-#if BUILDFLAG(IS_ANDROID)
-  thread_.Start();
-#else
 #if BUILDFLAG(IS_MAC)
   // On OSX the thread must be a UI thread.
   base::MessagePumpType thread_type = base::MessagePumpType::UI;
@@ -1379,7 +1376,6 @@ DesktopCaptureDevice::DesktopCaptureDevice(
   base::MessagePumpType thread_type = base::MessagePumpType::DEFAULT;
 #endif
   thread_.StartWithOptions(base::Thread::Options(thread_type, 0));
-#endif
 
   core_ = std::make_unique<Core>(thread_.task_runner(), std::move(capturer),
                                  type, zero_hertz_is_supported);

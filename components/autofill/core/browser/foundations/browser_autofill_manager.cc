@@ -495,7 +495,6 @@ bool ShouldSuppressSuggestions(SuppressReason suppress_reason,
 
 void MaybeAddAddressSuggestionStrikes(AutofillClient& client,
                                       const FormStructure& form) {
-#if !BUILDFLAG(IS_ANDROID)
   for (const std::unique_ptr<AutofillField>& field : form) {
     if (field->autocomplete_attribute() == "off" &&
         field->did_trigger_suggestions() &&
@@ -511,7 +510,6 @@ void MaybeAddAddressSuggestionStrikes(AutofillClient& client,
                                               form.source_url());
     }
   }
-#endif
 }
 
 // Returns what `FillingProduct`s should be asked for filling given this
@@ -645,14 +643,10 @@ std::optional<Suggestion> GenerateComposeSuggestion(
 }
 
 bool ShouldShowWebauthnHybridEntryPoint(const FormFieldData& field) {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   const std::optional<AutocompleteParsingResult>& autocomplete =
       field.parsed_autocomplete();
   return autocomplete.has_value() &&  // Assume no autocomplete if not parsed.
          autocomplete->webauthn;      // Field must have "webauthn" annotation.
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void LogSuggestionGenerationMetrics(
@@ -788,11 +782,11 @@ BrowserAutofillManager::GetAmountExtractionManager() {
 }
 
 payments::BnplManager* BrowserAutofillManager::GetPaymentsBnplManager() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (!bnpl_manager_) {
     bnpl_manager_ = std::make_unique<payments::BnplManager>(this);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   return bnpl_manager_.get();
 }
@@ -1095,11 +1089,7 @@ void BrowserAutofillManager::OnAskForValuesToFillImpl(
                                  /*product=*/std::nullopt);
         return;
       }
-#if !BUILDFLAG(IS_ANDROID)
       password_delegate->ShowSuggestions(password_request->field);
-#else
-      password_delegate->ShowKeyboardReplacingSurface(password_request.value());
-#endif  // !BUILDFLAG(IS_ANDROID)
       return;
     }
   } else if (IsPasswordsAutofillManuallyTriggered(trigger_source)) {

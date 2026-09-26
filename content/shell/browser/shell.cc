@@ -266,32 +266,17 @@ void Shell::LoadDataWithBaseURL(const GURL& url,
   LoadDataWithBaseURLInternal(url, data, base_url, load_as_string);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void Shell::LoadDataAsStringWithBaseURL(const GURL& url,
-                                        const std::string& data,
-                                        const GURL& base_url) {
-  bool load_as_string = true;
-  LoadDataWithBaseURLInternal(url, data, base_url, load_as_string);
-}
-#endif
-
 void Shell::LoadDataWithBaseURLInternal(const GURL& url,
                                         const std::string& data,
                                         const GURL& base_url,
                                         bool load_as_string) {
-#if !BUILDFLAG(IS_ANDROID)
   DCHECK(!load_as_string);  // Only supported on Android.
-#endif
 
   NavigationController::LoadURLParams params{GURL()};
   const std::string data_url_header = "data:text/html;charset=utf-8,";
   if (load_as_string) {
     params.url = GURL(data_url_header);
     std::string data_url_as_string = data_url_header + data;
-#if BUILDFLAG(IS_ANDROID)
-    params.data_url_as_string = base::MakeRefCounted<base::RefCountedString>(
-        std::move(data_url_as_string));
-#endif
   } else {
     params.url = GURL(data_url_header + data);
   }
@@ -311,7 +296,6 @@ WebContents* Shell::AddNewContents(
     const blink::mojom::WindowFeatures& window_features,
     bool user_gesture,
     bool* was_blocked) {
-#if !BUILDFLAG(IS_ANDROID)
   // If the shell is opening a document picture-in-picture window, it needs to
   // inform the DocumentPictureInPictureWindowController.
   if (disposition == WindowOpenDisposition::NEW_PICTURE_IN_PICTURE) {
@@ -322,7 +306,6 @@ WebContents* Shell::AddNewContents(
     controller->SetChildWebContents(new_contents.get());
     controller->Show();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   WebContents* result = new_contents.get();
   CreateShell(
@@ -386,11 +369,9 @@ gfx::NativeView Shell::GetContentView() {
   return web_contents_->GetNativeView();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 gfx::NativeWindow Shell::window() {
   return g_platform->GetNativeWindow(this);
 }
-#endif
 
 #if BUILDFLAG(IS_MAC)
 void Shell::ActionPerformed(int control) {
@@ -484,12 +465,6 @@ void Shell::LoadingStateChanged(WebContents* source,
   g_platform->SetIsLoading(this, source->IsLoading());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void Shell::SetOverlayMode(bool use_overlay_mode) {
-  g_platform->SetOverlayMode(this, use_overlay_mode);
-}
-#endif
-
 void Shell::EnterFullscreenModeForTab(
     RenderFrameHost* requesting_frame,
     const blink::mojom::FullscreenOptions& options) {
@@ -503,9 +478,6 @@ void Shell::ExitFullscreenModeForTab(WebContents* web_contents) {
 
 void Shell::ToggleFullscreenModeForTab(WebContents* web_contents,
                                        bool enter_fullscreen) {
-#if BUILDFLAG(IS_ANDROID)
-  g_platform->ToggleFullscreenModeForTab(this, web_contents, enter_fullscreen);
-#endif
   if (is_fullscreen_ != enter_fullscreen) {
     is_fullscreen_ = enter_fullscreen;
     web_contents->GetPrimaryMainFrame()
@@ -516,11 +488,7 @@ void Shell::ToggleFullscreenModeForTab(WebContents* web_contents,
 }
 
 bool Shell::IsFullscreenForTabOrPending(const WebContents* web_contents) {
-#if BUILDFLAG(IS_ANDROID)
-  return g_platform->IsFullscreenForTabOrPending(this, web_contents);
-#else
   return is_fullscreen_;
-#endif
 }
 
 blink::mojom::DisplayMode Shell::GetDisplayMode(
@@ -533,7 +501,6 @@ blink::mojom::DisplayMode Shell::GetDisplayMode(
              : blink::mojom::DisplayMode::kBrowser;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void Shell::RegisterProtocolHandler(RenderFrameHost* requesting_frame,
                                     const std::string& protocol,
                                     const GURL& url,
@@ -600,7 +567,6 @@ void Shell::UnregisterProtocolHandler(RenderFrameHost* requesting_frame,
 
   registry->RemoveHandler(handler);
 }
-#endif
 
 void Shell::RequestPointerLock(WebContents* web_contents,
                                bool user_gesture,
@@ -687,15 +653,6 @@ void Shell::ActivateContents(WebContents* contents) {
   g_platform->ActivateContents(this, contents);
 #endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<ColorChooser> Shell::OpenColorChooser(
-    WebContents* web_contents,
-    SkColor color,
-    const std::vector<blink::mojom::ColorSuggestionPtr>& suggestions) {
-  return g_platform->OpenColorChooser(web_contents, color, suggestions);
-}
-#endif
 
 void Shell::RunFileChooser(RenderFrameHost* render_frame_host,
                            scoped_refptr<FileSelectListener> listener,
@@ -802,12 +759,6 @@ gfx::Size Shell::GetShellDefaultSize() {
 
   return default_shell_size;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void Shell::LoadProgressChanged(double progress) {
-  g_platform->LoadProgressChanged(this, progress);
-}
-#endif
 
 void Shell::TitleWasSet(NavigationEntry* entry) {
   if (entry)

@@ -37,7 +37,7 @@
 #include "third_party/crashpad/crashpad/test/process_type.h"
 #include "third_party/crashpad/crashpad/util/process/process_memory_native.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "third_party/crashpad/crashpad/test/linux/fake_ptrace_connection.h"
 #endif
 
@@ -55,7 +55,7 @@ void SetNonCanonicalAccessAddress(
   UNSAFE_TODO(memset(context->x86_64, 0, sizeof(*context->x86_64)));
 #endif  // defined(ARCH_CPU_X86_64)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   exception.SetException(SIGSEGV);
 #if defined(ARCH_CPU_X86_64)
   exception.SetExceptionInfo(SI_KERNEL);
@@ -141,13 +141,13 @@ class BaseCrashAnalyzerTest : public testing::Test {
 #endif
     SetNonCanonicalAccessAddress(*exception, exception_address);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     ASSERT_TRUE(connection_.Initialize(getpid()));
     auto memory = std::make_unique<crashpad::ProcessMemoryLinux>(&connection_);
 #else
     auto memory = std::make_unique<crashpad::ProcessMemoryNative>();
     ASSERT_TRUE(memory->Initialize(crashpad::test::GetSelfProcess()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
     process_snapshot_.AddModule(std::move(module));
     process_snapshot_.SetException(std::move(exception));
@@ -156,7 +156,7 @@ class BaseCrashAnalyzerTest : public testing::Test {
 
   GuardedPageAllocator gpa_;
   crashpad::test::TestProcessSnapshot process_snapshot_;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   crashpad::test::FakePtraceConnection connection_;
 #endif
 
@@ -176,7 +176,6 @@ class CrashAnalyzerTest : public BaseCrashAnalyzerTest {
 // Stack trace collection on Android builds with frame pointers enabled does
 // not use base::debug::StackTrace, so the stack traces may vary slightly and
 // break this test.
-#if !BUILDFLAG(IS_ANDROID) || !BUILDFLAG(CAN_UNWIND_WITH_FRAME_POINTERS)
 // TODO(https://crbug.com/340586138): Disabled due to excessive flakiness.
 TEST_F(CrashAnalyzerTest, DISABLED_StackTraceCollection) {
   void* ptr = gpa_.Allocate(10);
@@ -230,7 +229,6 @@ TEST_F(CrashAnalyzerTest, DISABLED_StackTraceCollection) {
   }
   EXPECT_EQ(proto.mode(), Crash_Mode_CLASSIC);
 }
-#endif
 
 TEST_F(CrashAnalyzerTest, InternalError) {
   // Lets pretend an invalid free() occurred in the allocator region.

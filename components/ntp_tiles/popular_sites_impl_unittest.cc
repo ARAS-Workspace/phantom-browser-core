@@ -69,11 +69,7 @@ using TestPopularSectionVector = std::vector<TestPopularSection>;
 }
 
 size_t GetNumberOfDefaultPopularSitesForPlatform() {
-#if BUILDFLAG(IS_ANDROID)
-  return 8ul;
-#else
   return 0ul;
-#endif
 }
 
 class PopularSitesTest : public ::testing::Test {
@@ -294,22 +290,6 @@ TEST_F(PopularSitesTest, PopulatesWithDefaultResoucesOnFailure) {
               Eq(std::optional<bool>(false)));
   EXPECT_THAT(sites.size(), Eq(GetNumberOfDefaultPopularSitesForPlatform()));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PopularSitesTest, AddsIconResourcesToDefaultPages) {
-  std::unique_ptr<PopularSites> popular_sites = CreatePopularSites();
-
-  const PopularSites::SitesVector& sites =
-      popular_sites->sections().at(SectionType::PERSONALIZED);
-  ASSERT_FALSE(sites.empty());
-  for (const auto& site : sites) {
-    EXPECT_TRUE(site.baked_in);
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    EXPECT_THAT(site.default_icon_resource, Gt(0));
-#endif
-  }
-}
-#endif
 
 TEST_F(PopularSitesTest, ProvidesDefaultSitesUntilCallbackReturns) {
   SetCountryAndVersion("ZZ", "7");

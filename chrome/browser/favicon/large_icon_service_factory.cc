@@ -18,10 +18,6 @@
 #include "content/public/browser/storage_partition.h"
 #include "ui/gfx/favicon_size.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/search_engines/search_engine_choice/search_engine_choice_utils.h"
-#endif
-
 namespace {
 
 favicon::LargeIconService* GetLargeIconService(
@@ -29,20 +25,10 @@ favicon::LargeIconService* GetLargeIconService(
   return LargeIconServiceFactory::GetInstance()->GetForBrowserContext(context);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Seems like on Android `1 dip == 1 px`.
-// Matches the size used on iOS, see `kDipForServerRequests` in
-// `//ios/c/b/favicon/model/ios_chrome_large_icon_service_factory.cc`.
-const int kDipForServerRequests = 32;
-const favicon_base::IconType kIconTypeForServerRequests =
-    favicon_base::IconType::kTouchIcon;
-const char kGoogleServerClientParam[] = "chrome";
-#else
 const int kDipForServerRequests = 16;
 const favicon_base::IconType kIconTypeForServerRequests =
     favicon_base::IconType::kFavicon;
 const char kGoogleServerClientParam[] = "chrome_desktop";
-#endif
 
 }  // namespace
 

@@ -17,132 +17,6 @@ namespace {
 // |kIPHDemoModeChoiceVariations| array.
 const base::Feature* const kAllFeatures[] = {
     &kIPHDummyFeature,  // Ensures non-empty array for all platforms.
-#if BUILDFLAG(IS_ANDROID)
-    // keep-sorted start case=no
-    // ALL_FEATURES_ANDROID_START
-    &kIPHAccountSettingsHistorySync,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationAddToBookmarksFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationNewTabFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationOpenInBrowserFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationPageSummaryPdfFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationPageSummaryWebFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationReadAloudFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationShareFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationTranslateFeature,
-    &kIPHAdaptiveButtonInTopToolbarCustomizationVoiceSearchFeature,
-    &kIPHAimActivationHint,
-    &kIPHAndroidBottomBarAim,
-    &kIPHAndroidBottomBarAimPromoDialog,
-    &kIPHAndroidBottomBarGlic,
-    &kIPHAndroidBottomBarNewTab,
-    &kIPHAndroidBottomBarPromoDialog,
-    &kIPHAndroidTabDeclutter,
-    &kIPHAndroidVerticalTabsPromoFeature,
-    &kIPHAppRatingPromptFeature,
-    &kIPHAppSpecificHistory,
-    &kIPHAutoDarkOptOutFeature,
-    &kIPHAutoDarkUserEducationMessageFeature,
-    &kIPHAutoDarkUserEducationMessageOptInFeature,
-    &kIPHCCTHistory,
-    &kIPHCCTMinimized,
-    &kIPHChromeHomeExpandFeature,
-    &kIPHChromeHomePullToRefreshFeature,
-    &kIPHChromeReengagementNotification1Feature,
-    &kIPHChromeReengagementNotification2Feature,
-    &kIPHChromeReengagementNotification3Feature,
-    &kIPHContextualPageActionsActionChipFeature,
-    &kIPHContextualPageActionsQuietVariantFeature,
-    &kIPHDataSaverDetailFeature,
-    &kIPHDataSaverMilestonePromoFeature,
-    &kIPHDataSaverPreviewFeature,
-    &kIPHDefaultBrowserPromoMagicStackFeature,
-    &kIPHDefaultBrowserPromoMessagesFeature,
-    &kIPHDefaultBrowserPromoSettingCardFeature,
-    &kIPHDownloadHomeFeature,
-    &kIPHDownloadIndicatorFeature,
-    &kIPHDownloadInfoBarDownloadContinuingFeature,
-    &kIPHDownloadInfoBarDownloadsAreFasterFeature,
-    &kIPHDownloadPageFeature,
-    &kIPHDownloadPageScreenshotFeature,
-    &kIPHDownloadSettingsFeature,
-    &kIPHEphemeralTabFeature,
-    &kIPHExploreSitesTileFeature,
-    &kIPHExtensionsManageAppMenuFeature,
-    &kIPHExtensionsManageToolbarFeature,
-    &kIPHFeedCardMenuFeature,
-    &kIPHFeedHeaderMenuFeature,
-    &kIPHFeedSwipeRefresh,
-    &kIPHFuseboxAttachmentFeature,
-    &kIPHGenericAlwaysTriggerHelpUiFeature,
-    &kIPHGestureUserEducation,
-    &kIPHIdentityDiscFeature,
-    &kIPHIncognitoIndicatorCloseAllWindows,
-    &kIPHInstanceSwitcherFeature,
-    &kIPHKeyboardAccessoryAddressFillingFeature,
-    &kIPHKeyboardAccessoryBarSwipingFeature,
-    &kIPHKeyboardAccessoryPasswordFillingFeature,
-    &kIPHKeyboardAccessoryPaymentFillingFeature,
-    &kIPHKeyboardAccessoryPaymentOfferFeature,
-    &kIPHLowUserEngagementDetectorFeature,
-    &kIPHMenuAddToGroup,
-    &kIPHMicToolbarFeature,
-    &kIPHMostVisitedTilesCustomizationPinFeature,
-    &kIPHNewTabPageThemeCustomizationFeature,
-    &kIPHPageInfoFeature,
-    &kIPHPageInfoStoreInfoFeature,
-    &kIPHPageSummaryPdfMenuFeature,
-    &kIPHPageSummaryWebMenuFeature,
-    &kIPHPageZoomFeature,
-    &kIPHPdfPageDownloadFeature,
-    &kIPHPreviewsOmniboxUIFeature,
-    &kIPHReadAloudAppMenuFeature,
-    &kIPHReadAloudExpandedPlayerFeature,
-    &kIPHReadAloudPlaybackModeFeature,
-    &kIPHReaderModeDistillInAppFeature,
-    &kIPHReadLaterAppMenuBookmarksFeature,
-    &kIPHReadLaterAppMenuBookmarkThisPageFeature,
-    &kIPHReadLaterBottomSheetFeature,
-    &kIPHReadLaterContextMenuFeature,
-    &kIPHRecentTabsFeature,
-    &kIPHRequestDesktopSiteDefaultOnFeature,
-    &kIPHRequestDesktopSiteExceptionsGenericFeature,
-    &kIPHRequestDesktopSiteWindowSettingFeature,
-    &kIPHRestoreTabsOnFREFeature,
-    &kIPHSharedHighlightingBuilder,
-    &kIPHSharedHighlightingReceiverFeature,
-    &kIPHShareScreenshotFeature,
-    &kIPHSharingHubLinkToggleFeature,
-    &kIPHSharingHubWebnotesStylizeFeature,
-    &kIPHShoppingListMenuItemFeature,
-    &kIPHShoppingListSaveFlowFeature,
-    &kIPHSiteControlsFeature,
-    &kIPHTabGroupCreationDialogSyncTextFeature,
-    &kIPHTabGroupsDragAndDropFeature,
-    &kIPHTabGroupShareNoticeFeature,
-    &kIPHTabGroupShareNotificationBubbleOnStripFeature,
-    &kIPHTabGroupShareUpdateFeature,
-    &kIPHTabGroupShareVersionUpdateFeature,
-    &kIPHTabGroupsRemoteGroupFeature,
-    &kIPHTabGroupsSurfaceFeature,
-    &kIPHTabGroupsSurfaceOnHideFeature,
-    &kIPHTabGroupSyncOnStripFeature,
-    &kIPHTabSwitcherAddToGroup,
-    &kIPHTabSwitcherButtonFeature,
-    &kIPHTabSwitcherButtonSwitchIncognitoFeature,
-    &kIPHTabSwitcherXR,
-    &kIPHTabTearingXR,
-    &kIPHThreeDotMenuBackButton,
-    &kIPHTouchToSearchCalloutFeature,
-    &kIPHTranslateMenuButtonFeature,
-    &kIPHVideoTutorialNTPChromeIntroFeature,
-    &kIPHVideoTutorialNTPDownloadFeature,
-    &kIPHVideoTutorialNTPSearchFeature,
-    &kIPHVideoTutorialNTPSummaryFeature,
-    &kIPHVideoTutorialNTPVoiceSearchFeature,
-    &kIPHVideoTutorialTryNowFeature,
-// ALL_FEATURES_ANDROID_END
-// keep-sorted end
-#else
     // keep-sorted start case=no
     &kIPHiOSAddressPromoDesktopFeature,
     &kIPHiOSEnhancedBrowsingDesktopFeature,
@@ -151,13 +25,7 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHiOSPaymentPromoDesktopFeature,
     &kIPHiOSPriceTrackingDesktopFeature,
     &kIPHiOSTabGroupsDesktopFeature,
-// keep-sorted end
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-    &kIPHBottomToolbarTipFeature,
-    &kIPHSendTabToSelfOmnibox,
-#endif  // BUILDFLAG(IS_ANDROID)
+    // keep-sorted end
 
     &kIPHResumptionRailFeature,
 
@@ -245,7 +113,7 @@ const base::Feature* const kAllFeatures[] = {
 // keep-sorted end
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
     // keep-sorted start case=no
     &kIPHAutofillAccountNameEmailSuggestionFeature,
     &kIPHAutofillAiOptInFeature,
@@ -264,7 +132,7 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHAutofillVirtualCardCVCSuggestionFeature,
     &kIPHAutofillVirtualCardSuggestionFeature,
 // keep-sorted end
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     // keep-sorted start case=no

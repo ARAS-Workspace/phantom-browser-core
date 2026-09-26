@@ -30,11 +30,7 @@
 #include "extensions/buildflags/buildflags.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-#else
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
-#endif
 
 namespace enterprise_reporting {
 
@@ -92,11 +88,7 @@ void CloudProfileReportingService::CreateReportScheduler() {
       profile_->GetURLLoaderFactory(),
       policy::CloudPolicyClient::DeviceDMTokenCallback());
 
-#if BUILDFLAG(IS_ANDROID)
-  ReportingDelegateFactoryAndroid delegate_factory;
-#else
   ReportingDelegateFactoryDesktop delegate_factory;
-#endif  // !BUILDFLAG(IS_ANDROID)
   ReportScheduler::CreateParams params;
   params.client = cloud_policy_client_.get();
   params.delegate = delegate_factory.GetReportSchedulerDelegate(profile_);

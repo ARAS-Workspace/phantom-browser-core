@@ -762,12 +762,7 @@ TEST_F(WebContentsImplTest, CrossSiteBoundaries) {
 // RFH without requiring a cross-site transition (i.e., PENDING state).
 // TODO(crbug.com/375057184): Determine why this test crashes on Android and
 // re-enable it.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CrossSiteBoundariesAfterCrash \
-  DISABLED_CrossSiteBoundariesAfterCrash
-#else
 #define MAYBE_CrossSiteBoundariesAfterCrash CrossSiteBoundariesAfterCrash
-#endif
 TEST_F(WebContentsImplTest, MAYBE_CrossSiteBoundariesAfterCrash) {
   // Ensure that the cross-site transition will also be cross-process on
   // Android.
@@ -2436,7 +2431,7 @@ TEST_F(WebContentsImplTest, HandleWheelEvent) {
   event = blink::SyntheticWebMouseWheelEventBuilder::Build(
       0, 0, 0, 1, modifiers, ui::ScrollGranularity::kScrollByPixel);
   bool handled = contents()->HandleWheelEvent(event);
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
   EXPECT_TRUE(handled);
   EXPECT_EQ(1, delegate->GetAndResetContentsZoomChangedCallCount());
   EXPECT_TRUE(delegate->last_zoom_in());
@@ -2450,7 +2445,7 @@ TEST_F(WebContentsImplTest, HandleWheelEvent) {
   event = blink::SyntheticWebMouseWheelEventBuilder::Build(
       0, 0, 2, -5, modifiers, ui::ScrollGranularity::kScrollByPixel);
   handled = contents()->HandleWheelEvent(event);
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
   EXPECT_TRUE(handled);
   EXPECT_EQ(1, delegate->GetAndResetContentsZoomChangedCallCount());
   EXPECT_FALSE(delegate->last_zoom_in());

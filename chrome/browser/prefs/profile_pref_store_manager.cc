@@ -28,12 +28,7 @@ namespace {
 
 // Preference tracking and protection is not required on platforms where other
 // apps do not have access to chrome's persistent storage.
-const bool ProfilePrefStoreManager::kPlatformSupportsPreferenceTracking =
-#if BUILDFLAG(IS_ANDROID)
-    false;
-#else
-    true;
-#endif
+const bool ProfilePrefStoreManager::kPlatformSupportsPreferenceTracking = true;
 
 ProfilePrefStoreManager::ProfilePrefStoreManager(
     const base::FilePath& profile_path,

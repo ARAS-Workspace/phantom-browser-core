@@ -10,15 +10,10 @@
 #include "device/vr/buildflags/buildflags.h"
 #include "third_party/blink/public/common/web_preferences/web_preferences.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/feature_list.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 using blink::web_pref::WebPreferences;
 using content::WebContents;
@@ -83,7 +78,6 @@ void VrTabHelper::SetIsContentDisplayedInHeadset(content::WebContents* contents,
   bool old_state = vr_tab_helper->IsContentDisplayedInHeadset(contents);
   vr_tab_helper->SetIsContentDisplayedInHeadset(state);
   if (old_state != state) {
-#if !BUILDFLAG(IS_ANDROID)
     BrowserWindowInterface* browser =
         GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(contents);
     if (browser) {
@@ -92,7 +86,6 @@ void VrTabHelper::SetIsContentDisplayedInHeadset(content::WebContents* contents,
         tab_strip_model->UpdateWebContentsState(contents, TabChangeType::kAll);
       }
     }
-#endif
   }
 }
 

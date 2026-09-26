@@ -19,10 +19,6 @@
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/partner_browser_customizations.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using policy::IncognitoModeAvailability;
 
 // static
@@ -62,10 +58,6 @@ void IncognitoModePrefs::RegisterProfilePrefs(
   registry->RegisterIntegerPref(
       policy::policy_prefs::kIncognitoModeAvailability,
       static_cast<int>(kDefaultAvailability));
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterBooleanPref(prefs::kIncognitoReauthenticationForAndroid,
-                                false);
-#endif
 }
 
 // static
@@ -113,11 +105,7 @@ bool IncognitoModePrefs::IsIncognitoAllowed(Profile* profile) {
 
 // static
 bool IncognitoModePrefs::ArePlatformParentalControlsEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  return android::PartnerBrowserCustomizations::IsIncognitoDisabled();
-#else
   return false;
-#endif
 }
 
 // static

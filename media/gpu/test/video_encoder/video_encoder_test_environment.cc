@@ -22,10 +22,6 @@
 #include "media/gpu/gpu_video_encode_accelerator_helpers.h"
 #include "media/gpu/macros.h"
 #include "media/gpu/test/raw_video.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/gl/gl_implementation.h"
-#include "ui/gl/init/gl_factory.h"
-#endif
 
 namespace media {
 namespace test {
@@ -140,12 +136,7 @@ constexpr auto kSpatialLayersResolutionScaleDenom =
         {4, 2, 1},  // For three spatial layers.
     });
 
-#if BUILDFLAG(IS_ANDROID)
-// Android test harness already creates a task environment.
-constexpr bool kNeedInternalTaskEnvironment = false;
-#else
 constexpr bool kNeedInternalTaskEnvironment = true;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 VideoBitrateAllocation CreateBitrateAllocation(
     const VideoCodec codec,
@@ -353,15 +344,9 @@ VideoEncoderTestEnvironment::~VideoEncoderTestEnvironment() = default;
 
 void VideoEncoderTestEnvironment::SetUp() {
   VideoTestEnvironment::SetUp();
-#if BUILDFLAG(IS_ANDROID)
-  CHECK(gl::init::InitializeGLOneOff(gl::GpuPreference::kDefault));
-#endif
 }
 
 void VideoEncoderTestEnvironment::TearDown() {
-#if BUILDFLAG(IS_ANDROID)
-  gl::init::ShutdownGL(nullptr, false);
-#endif
   VideoTestEnvironment::TearDown();
 }
 

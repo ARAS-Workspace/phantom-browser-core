@@ -66,15 +66,14 @@ bool HasDocType(const WebDocument& doc) {
 }
 
 // https://crbug.com/788788
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-#define MAYBE_DomSerializerTests DISABLED_DomSerializerTests
-#elif defined(THREAD_SANITIZER) || defined(MEMORY_SANITIZER) || \
+#if defined(THREAD_SANITIZER) || defined(MEMORY_SANITIZER) || \
     defined(ADDRESS_SANITIZER)
 // http://crbug.com/1350508
 #define MAYBE_DomSerializerTests DISABLED_DomSerializerTests
 #else
 #define MAYBE_DomSerializerTests DomSerializerTests
-#endif  // BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
+#endif  // defined(THREAD_SANITIZER) || defined(MEMORY_SANITIZER) ||
+        // defined(ADDRESS_SANITIZER)
 class MAYBE_DomSerializerTests : public ContentBrowserTest,
                                  public WebFrameSerializerClient {
  public:

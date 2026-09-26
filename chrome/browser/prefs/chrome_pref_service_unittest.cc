@@ -79,13 +79,7 @@ TEST_F(ChromePrefServiceWebKitPrefs, PrefsCopied) {
 
   // These values have been overridden by the profile preferences.
   EXPECT_EQ("UTF-8", webkit_prefs.default_encoding);
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
   EXPECT_EQ(20, webkit_prefs.default_font_size);
-#else
-  // This pref is not configurable on Android without extensions so the default
-  // of 16 is always used.
-  EXPECT_EQ(16, webkit_prefs.default_font_size);
-#endif
   EXPECT_FALSE(webkit_prefs.text_areas_are_resizable);
 
   // These should still be the default values.
@@ -98,10 +92,5 @@ TEST_F(ChromePrefServiceWebKitPrefs, PrefsCopied) {
             webkit_prefs.standard_font_family_map[prefs::kWebKitCommonScript]);
   EXPECT_TRUE(webkit_prefs.javascript_enabled);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Touch event enabled only on Android.
-  EXPECT_TRUE(webkit_prefs.touch_event_feature_detection_enabled);
-#else
   EXPECT_FALSE(webkit_prefs.touch_event_feature_detection_enabled);
-#endif
 }

@@ -7,24 +7,17 @@
 #include "build/build_config.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/shortcut_helper.h"
-#else
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"  // nogncheck
 #include "chrome/browser/web_applications/web_app_filter.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "url/url_constants.h"
-#endif
 
 bool DoesOriginContainAnyInstalledWebApp(
     content::BrowserContext* browser_context,
     const GURL& origin) {
   DCHECK_EQ(origin, origin.DeprecatedGetOriginAsURL());
-#if BUILDFLAG(IS_ANDROID)
-  return ShortcutHelper::DoesOriginContainAnyInstalledWebApk(origin);
-#else
   auto* provider = web_app::WebAppProvider::GetForWebApps(
       Profile::FromBrowserContext(browser_context));
   // TODO: Change this method to async, or document that the caller must know
@@ -35,14 +28,10 @@ bool DoesOriginContainAnyInstalledWebApp(
   // for correctness.
   return provider->registrar_unsafe().DoesScopeContainAnyApp(
       origin, web_app::WebAppFilter::InstalledInChrome());
-#endif
 }
 
 std::set<GURL> GetOriginsWithInstalledWebApps(
     content::BrowserContext* browser_context) {
-#if BUILDFLAG(IS_ANDROID)
-  return ShortcutHelper::GetOriginsWithInstalledWebApksOrTwas();
-#else
   auto* provider = web_app::WebAppProvider::GetForWebApps(
       Profile::FromBrowserContext(browser_context));
   // TODO: Change this method to async, or document that the caller must know
@@ -60,5 +49,4 @@ std::set<GURL> GetOriginsWithInstalledWebApps(
     }
   }
   return installed_origins;
-#endif
 }

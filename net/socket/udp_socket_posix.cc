@@ -63,11 +63,6 @@
 #include "net/socket/udp_net_log_parameters.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/native_library.h"
-#include "net/android/network_library.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_APPLE)
 #include "net/base/apple/guarded_fd.h"
 #include "net/socket/socket_apple.h"
@@ -87,7 +82,7 @@ namespace {
 constexpr int kBindRetries = 10;
 constexpr int kPortStart = 1024;
 constexpr int kPortEnd = 65535;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // Maximum number of UDP packets that can be read at a time from recvmmsg.
 constexpr size_t kMaxMmsgMessages = 128;
 #endif
@@ -145,7 +140,6 @@ uint32_t GetInterfaceForDestination(const IPAddress& destination_address) {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Helper for IPv4 SSM. Sets sin_len on macOS, no-op on Linux.
 group_source_req CreateIPv4SourceGroupRequest(const IPAddress& group_address,
                                               const IPAddress& source_address,
@@ -205,7 +199,6 @@ group_source_req CreateSourceGroupRequest(const IPAddress& group_address,
   return CreateIPv6SourceGroupRequest(group_address, source_address,
                                       interface_index);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -277,7 +270,7 @@ int UDPSocketPosix::AdoptOpenedSocket(AddressFamily address_family,
   return ConfigureOpenedSocket();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 namespace {
 
 SetSocketOptionGroResult GetSetSocketOptionGroResult(int setsockopt_rv,
@@ -310,7 +303,7 @@ void RecordGroPacketsRead(size_t packet_count) {
 #endif
 
 void UDPSocketPosix::ConfigureGroSocketOption() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
   CHECK_NE(socket_, kInvalidSocket);
   CHECK_EQ(gro_status_, GroStatus::kUnconfigured);
@@ -523,7 +516,7 @@ base::expected<DatagramsMetadata, Error> UDPSocketPosix::ReadMultiple(
   // when reading coalesced superpackets (e.g. UDP GRO).
   CHECK_GE(buf_len, kMinimumReadMultipleBufferSize);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   if (gro_status_ == GroStatus::kUnconfigured) {
     if (base::FeatureList::IsEnabled(features::kEnableUdpGro)) {
       ConfigureGroSocketOption();
@@ -724,15 +717,8 @@ int UDPSocketPosix::BindToNetwork(handles::NetworkHandle network) {
   DCHECK_NE(socket_, kInvalidSocket);
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
   DCHECK(!is_connected());
-#if BUILDFLAG(IS_ANDROID)
-  int rv = net::android::BindToNetwork(socket_, network);
-  if (rv == OK)
-    bound_network_ = network;
-  return rv;
-#else
   NOTIMPLEMENTED();
   return ERR_NOT_IMPLEMENTED;
-#endif
 }
 
 int UDPSocketPosix::SetReceiveBufferSize(int32_t size) {
@@ -1126,7 +1112,7 @@ void UDPSocketPosix::FillResultFromMessageHeader(struct msghdr* msg,
       base::byte_span_from_ref(tclass_val).copy_from(cmsg_data_as_span);
       result->tos = static_cast<uint8_t>(tclass_val);
     }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
     else if (gro_status_ == GroStatus::kEnabled &&
              cmsg->cmsg_level == SOL_UDP && cmsg->cmsg_type == UDP_GRO &&
              cmsg->cmsg_len >= CMSG_LEN(sizeof(int)) &&
@@ -1159,7 +1145,7 @@ base::expected<DatagramsMetadata, Error> UDPSocketPosix::InternalReadMultiple(
   if (socket_ == kInvalidSocket) {
     return base::unexpected(ERR_SOCKET_NOT_CONNECTED);
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   if (gro_status_ == GroStatus::kEnabled) {
     return InternalReadMultipleWithGro(buffer, buf_len, maximum_packet_size);
   }
@@ -1170,7 +1156,7 @@ base::expected<DatagramsMetadata, Error> UDPSocketPosix::InternalReadMultiple(
 #endif
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 base::expected<DatagramsMetadata, Error> UDPSocketPosix::InternalRecvMmsg(
     IOBuffer* buffer,
     size_t num_messages,
@@ -1446,19 +1432,6 @@ int UDPSocketPosix::InternalSendTo(IOBuffer* buf,
     // android::GetNetworkBlockedReason()).
     int os_error = errno;
     result = MapSystemError(os_error);
-#if BUILDFLAG(IS_ANDROID)
-    // Android local network permission errors are surfaced as either EPERM or
-    // EACCESS when reading/writing to an UDP socket
-    // (https://developer.android.com/privacy-and-security/local-network-permission).
-    // Note that these errors are not unique to LNP. So, before returning the
-    // LNP-specific ERR_LOCAL_NETWORK_PERMISSION_MISSING, we must check whether
-    // LNP was really the cause.
-    if ((os_error == EPERM || os_error == EACCES) &&
-        android::GetNetworkBlockedReason(socket_) ==
-            android::NetworkBlockedReason::kLnp) {
-      result = ERR_LOCAL_NETWORK_PERMISSION_MISSING;
-    }
-#endif
   } else {
     CHECK_LE(result, buf_len);
   }
@@ -1631,9 +1604,6 @@ int UDPSocketPosix::LeaveGroup(const IPAddress& group_address) const {
 int UDPSocketPosix::SetSourceGroupMembership(const IPAddress& group_address,
                                              const IPAddress& source_address,
                                              int option) const {
-#if BUILDFLAG(IS_ANDROID)
-  return ERR_NOT_IMPLEMENTED;
-#else
   uint32_t interface_index = multicast_interface_;
 #if BUILDFLAG(IS_MAC)
   // macOS currently requires explicit interface index for IGMPv3/MLDv2.
@@ -1654,7 +1624,6 @@ int UDPSocketPosix::SetSourceGroupMembership(const IPAddress& group_address,
   int proto = group_address.IsIPv4() ? IPPROTO_IP : IPPROTO_IPV6;
   int rv = setsockopt(socket_, proto, option, &mreq, sizeof(mreq));
   return rv < 0 ? MapSystemError(errno) : OK;
-#endif
 }
 
 int UDPSocketPosix::JoinSourceGroup(const IPAddress& group_address,
@@ -1791,15 +1760,9 @@ int UDPSocketPosix::SetIOSNetworkServiceType(int ios_network_service_type) {
 
 void UDPSocketPosix::RegisterQuicConnectionClosePayload(
     base::span<uint8_t> payload) {
-#if BUILDFLAG(IS_ANDROID)
-  net::android::RegisterQuicConnectionClosePayload(socket_, payload);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void UDPSocketPosix::UnregisterQuicConnectionClosePayload() {
-#if BUILDFLAG(IS_ANDROID)
-  net::android::UnregisterQuicConnectionClosePayload(socket_);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace net

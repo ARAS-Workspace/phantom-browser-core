@@ -179,8 +179,6 @@ WindowsEventRouter::WindowsEventRouter(Profile* profile)
       &g_browser_process->platform_part()->key_window_notifier());
 #elif defined(TOOLKIT_VIEWS)
   views::NativeViewFocusManager::GetInstance()->AddFocusChangeListener(this);
-#elif BUILDFLAG(IS_ANDROID)
-  // TODO(https://crbug.com/424857039): Add focus support.
 #else
 #error Unsupported
 #endif

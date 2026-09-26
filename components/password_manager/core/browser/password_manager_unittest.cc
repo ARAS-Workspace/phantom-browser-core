@@ -88,13 +88,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/password_manager/core/browser/first_cct_page_load_passwords_ukm_recorder.h"
-#include "components/password_manager/core/common/password_manager_features.h"
-#include "components/webauthn/android/cred_man_support.h"
-#include "components/webauthn/android/webauthn_cred_man_delegate.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using ::autofill::FieldGlobalId;
 using ::autofill::FieldRendererId;
 using ::autofill::FieldType;
@@ -308,12 +301,6 @@ class MockPasswordManagerClient : public StubPasswordManagerClient {
               GetMetricsRecorder,
               (),
               (override));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(FirstCctPageLoadPasswordsUkmRecorder*,
-              GetFirstCctPageLoadUkmRecorder,
-              (),
-              (override));
-#endif  // BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(bool, IsNewTabPage, (), (const, override));
   MOCK_METHOD(profile_metrics::BrowserProfileType,
               GetProfileType,
@@ -334,13 +321,6 @@ class MockPasswordManagerClient : public StubPasswordManagerClient {
               GetWebAuthnCredentialsDelegateForDriver,
               (PasswordManagerDriver*),
               (override));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(void,
-              ShowPasswordManagerErrorMessage,
-              (password_manager::ErrorMessageFlowType,
-               password_manager::PasswordStoreBackendErrorType),
-              (override));
-#endif
 
   network::mojom::NetworkContext* GetNetworkContext() const override {
     return &network_context_;
@@ -549,10 +529,6 @@ class PasswordManagerTestBase : public testing::Test {
     // All tests that test working with prediction should explicitly turn
     // predictions on.
     PasswordFormManager::set_wait_for_server_predictions_for_filling(false);
-#if BUILDFLAG(IS_ANDROID)
-    webauthn::WebAuthnCredManDelegate::override_cred_man_support_for_testing(
-        webauthn::CredManSupport::DISABLED);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   void TearDown() override {
@@ -869,13 +845,8 @@ class PasswordManagerTestBase : public testing::Test {
       const std::vector<std::string>& affiliated_realms,
       const std::vector<std::string>& grouped_realms = {},
       bool repeatedly = false) {
-#if BUILDFLAG(IS_ANDROID)
-    store_->SetAffiliatedAndGroupedRealms(observed_form.signon_realm,
-                                          affiliated_realms, grouped_realms);
-#else
     mock_match_helper_->ExpectCallToGetAffiliatedAndGrouped(
         observed_form, affiliated_realms, grouped_realms, repeatedly);
-#endif
   }
 
   const GURL test_form_url_{"https://www.google.com/a/LoginAuth"};
@@ -1570,60 +1541,6 @@ TEST_P(PasswordManagerTest, FormSubmitWhenPasswordsCannotBeSaved) {
   store->ShutdownOnUIThread();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-// Tests that the user is still prompted to save the password when the account
-// store is not available due to the trusted vault key retrieval flow.
-// The same can't happen with the profile store because it's local-only and it
-// doesn't support E2EE.
-TEST_P(
-    PasswordManagerTest,
-    FormSubmitWhenPasswordsCannotBeSavedToAccountStoreBecauseOfTrustedVaultKey) {
-  base::test::ScopedFeatureList feature_list{
-      password_manager::features::kPasswordSaveInContextErrorResolution};
-
-  // Set up the sync service to sync passwords such that the account store would
-  // be used.
-  syncer::TestSyncService sync_service;
-  sync_service.GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false, {syncer::UserSelectableType::kPasswords});
-  ON_CALL(client_, GetSyncService()).WillByDefault(Return(&sync_service));
-
-  auto backend = std::make_unique<FakePasswordStoreBackend>();
-  backend->ReturnErrorOnRequest(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kIrretrievableSecurityDomain));
-  auto store = base::MakeRefCounted<PasswordStore>(std::move(backend));
-  store->Init();
-  ON_CALL(client_, GetAccountPasswordStore())
-      .WillByDefault(Return(store.get()));
-
-  FormData form_data(MakeSimpleFormData());
-  std::vector<FormData> observed = {form_data};
-  manager()->OnPasswordFormsParsed(&driver_, observed);
-  manager()->OnPasswordFormsRendered(&driver_, observed);
-  ASSERT_TRUE(base::test::RunUntil(
-      [&]() { return manager()->HaveFormManagersReceivedData(&driver_); }));
-
-  EXPECT_CALL(client_, IsSavingAndFillingEnabled(
-                           url::Origin::Create(form_data.url()),
-                           base::optional_ref<const GURL>(form_data.url())))
-      .WillRepeatedly(Return(true));
-  OnPasswordFormSubmitted(form_data);
-
-  // The user is still prompted to save the password, but it will be saved to
-  // the account store when the trusted vault key retrieval flow completes.
-  EXPECT_CALL(client_, PromptUserToSaveOrUpdatePassword).Times(1);
-
-  observed.clear();
-  manager()->OnPasswordFormsParsed(&driver_, observed);
-  manager()->OnPasswordFormsRendered(&driver_, observed);
-  // Objects owned by the manager may keep references to the store - therefore
-  // destroy the manager prior to store destruction.
-  ResetManager();
-  store->ShutdownOnUIThread();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_P(PasswordManagerTest,
        PasswordUpdateDoesNotCareAboutIsAbleToSavePasswords) {
   // Test that a plain form submit doesn't result in offering to save passwords.
@@ -1695,16 +1612,8 @@ TEST_P(PasswordManagerTest, SavingBlockedByTrustedVaultErrorMetric) {
   // On platforms other than Android, IsAbleToSavePasswords currently only
   // checks the profile store.
   bool expected_able_to_save = ShouldEnableAccountStorage();
-#if BUILDFLAG(IS_ANDROID)
-  expected_able_to_save = false;
-#endif
 
   bool expected_saving_blocked_by_trusted_vault_error = true;
-#if BUILDFLAG(IS_ANDROID)
-  // On Android and iOS, IsSavingBlockedByTrustedVaultError currently only
-  // checks the account store.
-  expected_saving_blocked_by_trusted_vault_error = ShouldEnableAccountStorage();
-#endif
 
   histogram_tester.ExpectUniqueSample(
       "PasswordManager.AbleToSavePasswordsOnSuccessfulLogin",
@@ -3340,11 +3249,7 @@ TEST_P(PasswordManagerTest, AutofillingOfAffiliatedCredentials) {
   EXPECT_EQ(android_form.password_value,
             form_data.preferred_login.password_value);
   // On Android Touch To Fill will prevent autofilling credentials on page load.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(form_data.wait_for_username);
-#else
   EXPECT_FALSE(form_data.wait_for_username);
-#endif
   EXPECT_EQ(android_form.signon_realm, form_data.preferred_login.realm);
 
   EXPECT_CALL(client_, IsSavingAndFillingEnabled(
@@ -6075,37 +5980,6 @@ TEST_P(PasswordManagerTest, ProcessingPredictionsOnSameFormSignatureForms) {
   EXPECT_FALSE(form_with_password_prediction->HasNewPasswordElement());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(PasswordManagerTest, FormSubmissionTrackingAfterTouchToFill) {
-  PasswordForm saved_match(MakeSavedForm());
-  store_->AddLogin(password_manager::FromPasswordForm(saved_match));
-
-  // A navigation without a submitted manager clears the state of submission
-  // tracking.
-  EXPECT_CALL(client_, ResetSubmissionTrackingAfterTouchToFill());
-
-  PasswordForm observed_form(MakeSimpleForm());
-  std::vector<FormData> observed_forms = {observed_form.form_data};
-  manager()->OnPasswordFormsParsed(&driver_, observed_forms);
-  manager()->OnPasswordFormsRendered(&driver_, observed_forms);
-  task_environment_.RunUntilIdle();
-  EXPECT_CALL(client_, IsSavingAndFillingEnabled(
-                           url::Origin::Create(observed_form.url),
-                           base::optional_ref<const GURL>(observed_form.url)))
-      .WillRepeatedly(Return(true));
-  OnPasswordFormSubmitted(observed_form.form_data);
-
-  // No forms means a successful login, which reports a metric and stops
-  // tracking.
-  EXPECT_CALL(client_, NotifyOnSuccessfulLogin(_));
-  EXPECT_CALL(client_, ResetSubmissionTrackingAfterTouchToFill());
-
-  observed_forms.clear();
-  manager()->OnPasswordFormsParsed(&driver_, observed_forms);
-  manager()->OnPasswordFormsRendered(&driver_, observed_forms);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Check that on successful login the credentials are checked for leak depending
 // on mute state of insecure credential.
 TEST_P(PasswordManagerTest, DontStartLeakDetectionWhenMuted) {
@@ -6539,7 +6413,6 @@ TEST_P(PasswordManagerTest, ModelPredictionsEmptyMetric_NonEmpty) {
       false);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Check that a happiness surney is triggered after the user has submitted
 // a manually filled form and logged in.
 TEST_P(PasswordManagerTest, HatsSurveyTriggeredOnSuccessfulLogin) {
@@ -6648,30 +6521,6 @@ TEST_P(PasswordManagerTest, HatsSurveyNotTriggeredAfterAutomaticFilling) {
   EXPECT_CALL(client_, TriggerUserPerceptionOfPasswordManagerSurvey).Times(0);
   manager()->OnPasswordFormsRendered(&driver_, {});
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(PasswordManagerTest, MarksHasPasswordFormForFirstCctPageLoad) {
-  ukm::TestAutoSetUkmRecorder test_ukm_recorder;
-  auto first_cct_page_recorder =
-      std::make_unique<FirstCctPageLoadPasswordsUkmRecorder>(ukm::SourceId(1));
-
-  ON_CALL(client_, GetFirstCctPageLoadUkmRecorder)
-      .WillByDefault(Return(first_cct_page_recorder.get()));
-
-  FormData form_data(MakeSimpleFormData());
-  std::vector<FormData> observed;
-  observed.push_back(std::move(form_data));
-  manager()->OnPasswordFormsParsed(&driver_, observed);
-  manager()->OnPasswordFormsRendered(&driver_, observed);
-  // Destroy the recorder as it records metrics on destruction.
-  first_cct_page_recorder.reset();
-  CheckMetricHasValue(
-      test_ukm_recorder,
-      ukm::builders::PasswordManager_FirstCCTPageLoad::kEntryName,
-      ukm::builders::PasswordManager_FirstCCTPageLoad::kHasPasswordFormName, 1);
-}
-#endif
 
 TEST_P(PasswordManagerTest, OnResourceLoadingFailed) {
   base::HistogramTester histogram_tester;

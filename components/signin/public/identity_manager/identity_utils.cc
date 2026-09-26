@@ -129,24 +129,6 @@ std::vector<AccountInfo> GetOrderedAccountsForDisplay(
     }
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // 3. On Android: ProfileOAuth2TokenServiceDelegateAndroid stores accounts in
-  // a std::vector<CoreAccountId> directly populated from
-  // AccountManagerFacade.getAccounts(). Because insertion order is preserved
-  // (unlike Desktop/iOS token service delegates which use a map or set),
-  // GetExtendedAccountInfoForAccountsWithRefreshToken() safely and
-  // deterministically returns device accounts in the OS AccountManager order
-  // (with the device's primary/default Google account at index 0).
-  for (const AccountInfo& account :
-       identity_manager->GetExtendedAccountInfoForAccountsWithRefreshToken()) {
-    if (account.account_id == primary_account_id) {
-      continue;
-    }
-    if (IsAccountAllowed(local_state, account.email)) {
-      accounts.push_back(account);
-    }
-  }
-#else
   // 4. On Desktop: Token service stores accounts in an unordered std::map, so
   // the default account ordering is determined by the Gaia cookie jar.
   std::vector<AccountInfo> accounts_with_tokens =
@@ -168,7 +150,6 @@ std::vector<AccountInfo> GetOrderedAccountsForDisplay(
       accounts.push_back(*it);
     }
   }
-#endif
 
   return accounts;
 }

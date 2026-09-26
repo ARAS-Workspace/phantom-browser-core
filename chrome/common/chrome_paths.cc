@@ -19,13 +19,6 @@
 #include "chrome/common/chrome_paths_internal.h"
 #include "media/media_buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/path_utils.h"
-#include "base/base_paths_android.h"
-// ui/base must only be used on Android. See BUILD.gn for dependency info.
-#include "ui/base/ui_base_paths.h"  // nogncheck
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/apple/bundle_locations.h"
 #include "base/apple/foundation_util.h"
@@ -153,17 +146,11 @@ bool PathProvider(int key, base::FilePath* result) {
       // Fall through for all other platforms.
 #endif
     case chrome::DIR_DEFAULT_DOWNLOADS:
-#if BUILDFLAG(IS_ANDROID)
-      if (!base::android::GetDownloadsDirectory(&cur)) {
-        return false;
-      }
-#else
       if (!GetUserDownloadsDirectory(&cur)) {
         return false;
       }
       // Do not create the download directory here, we have done it twice now
       // and annoyed a lot of users.
-#endif
       break;
     case chrome::DIR_CRASH_METRICS:
       if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {
@@ -171,11 +158,6 @@ bool PathProvider(int key, base::FilePath* result) {
       }
       break;
     case chrome::DIR_CRASH_DUMPS:
-#if BUILDFLAG(IS_ANDROID)
-      if (!base::android::GetCacheDirectory(&cur)) {
-        return false;
-      }
-#else
       // The crash reports are always stored relative to the default user data
       // directory.  This avoids the problem of having to re-initialize the
       // exception handler after parsing command line options, which may
@@ -185,8 +167,7 @@ bool PathProvider(int key, base::FilePath* result) {
       if (!GetDefaultUserDataDirectory(&cur)) {
         return false;
       }
-#endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
       cur = cur.Append(FILE_PATH_LITERAL("Crashpad"));
 #else
       cur = cur.Append(FILE_PATH_LITERAL("Crash Reports"));
@@ -194,15 +175,9 @@ bool PathProvider(int key, base::FilePath* result) {
       create_dir = true;
       break;
     case chrome::DIR_LOCAL_TRACES:
-#if BUILDFLAG(IS_ANDROID)
-      if (!base::PathService::Get(base::DIR_CACHE, &cur)) {
-        return false;
-      }
-#else
       if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {
         return false;
       }
-#endif
       cur = cur.Append(FILE_PATH_LITERAL("Local Traces"));
       create_dir = true;
       break;
@@ -274,16 +249,6 @@ bool PathProvider(int key, base::FilePath* result) {
       cur = base::apple::FrameworkBundlePath();
       cur = cur.Append(FILE_PATH_LITERAL("Resources"))
                 .Append(FILE_PATH_LITERAL("resources.pak"));
-#elif BUILDFLAG(IS_ANDROID)
-      if (!base::PathService::Get(ui::DIR_RESOURCE_PAKS_ANDROID, &cur)) {
-        return false;
-      }
-      if (key == chrome::FILE_DEV_UI_RESOURCES_PACK) {
-        cur = cur.Append(FILE_PATH_LITERAL("dev_ui_resources.pak"));
-      } else {
-        DCHECK_EQ(chrome::FILE_RESOURCES_PACK, key);
-        cur = cur.Append(FILE_PATH_LITERAL("resources.pak"));
-      }
 #else
       // If we're not bundled on mac or Android, resources.pak should be in
       // the "assets" location (e.g. next to the binary, on many platforms).
@@ -375,7 +340,7 @@ bool PathProvider(int key, base::FilePath* result) {
       break;
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID))
+    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC))
     case chrome::DIR_NATIVE_MESSAGING:
 #if BUILDFLAG(IS_MAC)
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -409,15 +374,13 @@ bool PathProvider(int key, base::FilePath* result) {
       cur = cur.Append(FILE_PATH_LITERAL("NativeMessagingHosts"));
       break;
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID))
-#if !BUILDFLAG(IS_ANDROID)
+        // BUILDFLAG(IS_MAC))
     case chrome::DIR_GLOBAL_GCM_STORE:
       if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {
         return false;
       }
       cur = cur.Append(kGCMStoreDirname);
       break;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     case chrome::DIR_OPTIMIZATION_GUIDE_PREDICTION_MODELS:
       if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {

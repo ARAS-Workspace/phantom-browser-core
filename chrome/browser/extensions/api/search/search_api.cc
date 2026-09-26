@@ -19,51 +19,19 @@
 #include "content/public/browser/web_contents.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/tabs/tab_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
-#if !BUILDFLAG(IS_ANDROID)
 using tabs::TabModel;
-#endif
 
 namespace extensions {
 
-namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-// Returns the TabModel for the last active window owned by `profile` (and
-// optionally its incognito profile). Returns null on failure.
-TabModel* GetLastActiveTabModel(Profile* profile, bool include_incognito) {
-  // Find the last active browser for the current profile.
-  BrowserWindowInterface* browser = nullptr;
-  ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
-      [&](BrowserWindowInterface* bwi) {
-        if (bwi->GetProfile() == profile ||
-            (include_incognito && bwi->GetProfile()->GetOriginalProfile() ==
-                                      profile->GetOriginalProfile())) {
-          browser = bwi;
-          return false;
-        }
-        return true;  // Keep iterating.
-      });
-  if (browser) {
-    return static_cast<TabModel*>(TabListInterface::From(browser));
-  }
-  return nullptr;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-}  // namespace
+namespace {}  // namespace
 
 using extensions::api::search::Disposition;
 
@@ -108,7 +76,6 @@ ExtensionFunction::ResponseAction SearchQueryFunction::Run() {
     // If the extension called the API from a tab, we can use that tab -
     // find the associated browser or tab model.
     web_contents = GetSenderWebContents();
-#if !BUILDFLAG(IS_ANDROID)
     BrowserWindowInterface* browser = nullptr;
     if (web_contents) {
       browser = GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
@@ -129,23 +96,6 @@ ExtensionFunction::ResponseAction SearchQueryFunction::Run() {
       }
       web_contents = browser->GetTabStripModel()->GetActiveWebContents();
     }
-#else
-    TabModel* tab_model = nullptr;
-    // If the extension called the API from a tab, use that tab model.
-    if (web_contents) {
-      tab_model = TabModelList::GetTabModelForWebContents(web_contents);
-    }
-    // If the extension called the API from a service worker, fall back to the
-    // last active browser's tab model.
-    if (!tab_model) {
-      tab_model =
-          GetLastActiveTabModel(profile, include_incognito_information());
-      if (!tab_model) {
-        return RespondNow(Error("No active browser."));
-      }
-      web_contents = tab_model->GetActiveWebContents();
-    }
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   // GURL for default search provider.

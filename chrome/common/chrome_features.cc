@@ -61,27 +61,8 @@ BASE_FEATURE(kAutofillCardSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kAutofillPasswordSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-// When enabled, GetUserCacheDirectory on Android will append the relative path
-// of non-default partitions to the cache directory.
-BASE_FEATURE(kAndroidKeepProfilePartitionDirsInCacheDir,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enable boarding pass detector on Chrome Android.
-BASE_FEATURE(kBoardingPassDetector, base::FEATURE_DISABLED_BY_DEFAULT);
-const char kBoardingPassDetectorUrlParamName[] = "boarding_pass_detector_urls";
-const base::FeatureParam<std::string> kBoardingPassDetectorUrlParam(
-    &kBoardingPassDetector,
-    kBoardingPassDetectorUrlParamName,
-    "");
-#endif  // BUILDFLAG(IS_ANDROID)
-
-
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kCaptureHandleForStandalonePwasAndIwas,
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 
 // Enables stricter cryptography settings for CNSA2 compliance. This is not
 // needed for security, but may be required by some organizations.
@@ -127,7 +108,6 @@ BASE_FEATURE_PARAM(bool,
                    &kImprovedStartupBestEffortDelay,
                    true);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Whether to allow installed-by-default web apps to be installed or not.
 BASE_FEATURE(kPreinstalledWebAppInstallation,
              "DefaultWebAppInstallation",
@@ -138,23 +118,16 @@ BASE_FEATURE(kPreinstalledWebAppInstallation,
 // Used by unit tests.
 BASE_FEATURE(kPreinstalledWebAppAlwaysMigrateForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kRemoteActorCredentialSharing, base::FEATURE_DISABLED_BY_DEFAULT);
 // This parameter is for testing purposes only and must not be used in
 // production. It overrides the whitelisted origins with the specified host.
 const base::FeatureParam<std::string>
     kRemoteActorCredentialSharingAllowedHostForTesting{
         &kRemoteActorCredentialSharing, "allowed_host_for_testing", ""};
-#endif
 
 bool RemoteActorCredentialSharingEnabled() {
-#if !BUILDFLAG(IS_ANDROID)
   return base::FeatureList::IsEnabled(features::kRemoteActorCredentialSharing);
-#else
-  return false;
-#endif
 }
 
 // Controls the enablement of structured metrics on Windows, Linux, and Mac.
@@ -190,15 +163,8 @@ BASE_FEATURE(kDesktopPWAsWindowControlsOverlayWithNoToggle,
 BASE_FEATURE(kDocumentPipStandaloneWindow, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Allows fullscreen to claim whole display area when in windowing mode
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kDisplayEdgeToEdgeFullscreen, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // Enables Fullscreen to Screen on Android platform
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kEnableFullscreenToAnyScreenAndroid,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Controls whether Chrome Apps are supported. See https://crbug.com/40186761.
@@ -222,7 +188,6 @@ BASE_FEATURE(kPrivacyGuideForceAvailable, base::FEATURE_DISABLED_BY_DEFAULT);
 #if BUILDFLAG(ENABLE_PDF)
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 // Enables or disables the Happiness Tracking System demo mode for Desktop
 // Chrome.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopDemo,
@@ -343,7 +308,6 @@ const base::FeatureParam<base::TimeDelta>
 // Enables or disables the Happiness Tracking System for SE Hijacking.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopSEHijacking,
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables HTTPS-First Mode in a balanced configuration that doesn't warn on
 // HTTP when HTTPS can't be reasonably expected.
@@ -399,10 +363,8 @@ BASE_FEATURE(kHttpsFirstModeIncognito, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIncomingCallNotifications,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID)
 // A feature that controls whether Instant uses a spare renderer.
 BASE_FEATURE(kInstantUsesSpareRenderer, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables Isolated Web App Developer Mode, which allows developers to
 // install untrusted Isolated Web Apps.
@@ -463,17 +425,8 @@ BASE_FEATURE(kSystemNotifications, base::FEATURE_ENABLED_BY_DEFAULT);
 // referrers instead of their ordinary behavior.
 BASE_FEATURE(kNoReferrers, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kOfflineAutoFetch, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 BASE_FEATURE(kOnConnectNative, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// Enables or disables the OOM intervention.
-BASE_FEATURE(kOomIntervention, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 
 
@@ -521,28 +474,6 @@ constexpr base::FeatureParam<bool>
         &kSafetyHubDisruptiveNotificationRevocation,
         /*name=*/"shadow_run", /*default_value=*/false};
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr base::FeatureParam<int>
-    kSafetyHubDisruptiveNotificationRevocationExperimentVersion{
-        &kSafetyHubDisruptiveNotificationRevocation,
-        /*name=*/"experiment_version", /*default_value=*/1};
-
-constexpr base::FeatureParam<int>
-    kSafetyHubDisruptiveNotificationRevocationMinNotificationCount{
-        &kSafetyHubDisruptiveNotificationRevocation,
-        /*name=*/"min_notification_count", /*default_value=*/4};
-
-constexpr base::FeatureParam<base::TimeDelta>
-    kSafetyHubDisruptiveNotificationRevocationWaitingTimeAsProposed{
-        &kSafetyHubDisruptiveNotificationRevocation,
-        /*name=*/"waiting_time_as_proposed", /*default_value=*/base::Days(4)};
-
-constexpr base::FeatureParam<int>
-    kSafetyHubDisruptiveNotificationRevocationNotificationTimeoutSeconds{
-        &kSafetyHubDisruptiveNotificationRevocation,
-        /*name=*/"notification_timeout_seconds",
-        /*default_value=*/7 * 24 * 3600};
-#else
 constexpr base::FeatureParam<int>
     kSafetyHubDisruptiveNotificationRevocationExperimentVersion{
         &kSafetyHubDisruptiveNotificationRevocation,
@@ -557,7 +488,6 @@ constexpr base::FeatureParam<base::TimeDelta>
     kSafetyHubDisruptiveNotificationRevocationWaitingTimeAsProposed{
         &kSafetyHubDisruptiveNotificationRevocation,
         /*name=*/"waiting_time_as_proposed", /*default_value=*/base::Days(14)};
-#endif
 
 constexpr base::FeatureParam<double>
     kSafetyHubDisruptiveNotificationRevocationMaxEngagementScore{
@@ -593,25 +523,10 @@ constexpr base::FeatureParam<int>
         &kSafetyHubDisruptiveNotificationRevocation,
         /*name=*/"waiting_for_metrics_days", /*default_value=*/1};
 
-#if BUILDFLAG(IS_ANDROID)
-// Enables Weak and Reused passwords in Safety Hub.
-BASE_FEATURE(kSafetyHubWeakAndReusedPasswords,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables the local passwords module in Safety Hub.
-BASE_FEATURE(kSafetyHubLocalPasswordsModule, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables the unified passwords module in Safety Hub.
-BASE_FEATURE(kSafetyHubUnifiedPasswordsModule,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 // Enables or disables the Trust Safety Sentiment Survey for Safety Hub.
 BASE_FEATURE(kSafetyHubTrustSafetySentimentSurvey,
              "TrustSafetySentimentSurveyForSafetyHub",
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // SCT auditing hashdance allows Chrome clients who are not opted-in to Enhanced
 // Safe Browsing Reporting to perform a k-anonymous query to see if Google knows
@@ -666,13 +581,7 @@ BASE_FEATURE(kExtensionServiceWorkerPriorityVoter,
 //
 // TODO(alexmos): Move this and the other site isolation features below to
 // browser_features, as they are only used on the browser side.
-BASE_FEATURE(kSitePerProcess,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kSitePerProcess, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // The default behavior to opt devtools users out of
 // kProcessPerSiteUpToMainFrameThreshold.
@@ -689,13 +598,7 @@ BASE_FEATURE(kProcessPerSiteSkipEnterpriseUsers,
 // Note: The "ProcessPerSiteUpToMainFrameThreshold" feature is defined in
 // //content.
 
-BASE_FEATURE(kProcessPerSiteForDSE,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kProcessPerSiteForDSE, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Consider the default search engine (DSE) warmup page as a search results page
 // (SRP), for the purpose of applying the "process per site for DSE SRP" policy
@@ -708,7 +611,6 @@ BASE_FEATURE(kConsiderDSEWarmUpPageAsSRP, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kTreatUnsafeDownloadsAsActive, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // TrustSafetySentimentSurvey
-#if !BUILDFLAG(IS_ANDROID)
 // Enables surveying of users of Trust & Safety features with HaTS.
 BASE_FEATURE(kTrustSafetySentimentSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
 // The minimum and maximum time after a user has interacted with a Trust and
@@ -767,10 +669,7 @@ const base::FeatureParam<base::TimeDelta>
         &kTrustSafetySentimentSurvey, "transactions-password-manager-time",
         base::Seconds(20)};
 
-#endif
-
 // TrustSafetySentimentSurveyV2
-#if !BUILDFLAG(IS_ANDROID)
 // Enables the second version of the sentiment survey for users of Trust &
 // Safety features, using HaTS.
 BASE_FEATURE(kTrustSafetySentimentSurveyV2, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -890,9 +789,7 @@ const base::FeatureParam<base::TimeDelta>
     kTrustSafetySentimentSurveyV2TrustedSurfaceTime{
         &kTrustSafetySentimentSurveyV2, "trusted-surface-time",
         base::Seconds(5)};
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kWebAppPeriodicPreinstallUpdate, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kWebAppMigratePreinstalledChat, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -907,12 +804,10 @@ BASE_FEATURE(kWebAppInstallDialogWinPin, base::FEATURE_DISABLED_BY_DEFAULT);
 // synced profile, no such data should exist in sync.
 BASE_FEATURE(kWebAppHandleAppMigrationViaSync,
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kWebAppUpgradeToDatabaseVersion6,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kWebium, base::FEATURE_DISABLED_BY_DEFAULT);
 // Enables logging InitialWebUI-related metrics. The metrics are not necessary
 // comes from WebUI but can also come from the C++ version of them.
@@ -1041,8 +936,6 @@ BASE_FEATURE(kWebUIPinnedToolbarActions, base::FEATURE_DISABLED_BY_DEFAULT);
 // from chrome://webui-toolbar.top-chrome.
 BASE_FEATURE(kWebUIExtensionsContainer, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 // Enables the User-Agent override fix for SearchPrefetch. This will work only
 // if enabled together with `kPreloadingRespectUserAgentOverride`.
 BASE_FEATURE(kRespectUserAgentOverrideInSearchPrefetch,
@@ -1060,7 +953,6 @@ const base::FeatureParam<std::string> kRestrictedWebUICodeCacheResources{
 
 
 
-#if !BUILDFLAG(IS_ANDROID)
 // A feature to enable smart restart metrics collection. The collected metrics
 // will be used to make informed decisions about the future of the smart restart
 // feature.
@@ -1089,6 +981,5 @@ const base::FeatureParam<double> kSmartRestartLockBypassBeforeUnloadThreshold{
 // A feature to record the difference in the number of tabs and windows between
 // the last session and the current session on restart.
 BASE_FEATURE(kRecordTabWindowDiffOnRestart, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace features

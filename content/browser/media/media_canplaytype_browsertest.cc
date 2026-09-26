@@ -20,10 +20,6 @@
 #include "media/media_buildflags.h"
 #include "ui/display/display_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 namespace content {
 
 class MediaCanPlayTypeTest : public MediaBrowserTest {
@@ -139,7 +135,7 @@ IN_PROC_BROWSER_TEST_F(MediaCanPlayTypeTest, CodecSupportTest_Mp4aVariants) {
 }
 
 IN_PROC_BROWSER_TEST_F(MediaCanPlayTypeTest, CodecSupportTest_HLS) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_HLS_DEMUXER)
+#if BUILDFLAG(ENABLE_HLS_DEMUXER)
   ExecuteTest("testHls(true)");  // has_hls_support=true
 #else
   ExecuteTest("testHls(false)");            // has_hls_support=false
@@ -166,13 +162,6 @@ IN_PROC_BROWSER_TEST_F(MediaCanPlayTypeTest, CodecSupportTest_NewVp9Variants) {
 #if (defined(ARCH_CPU_ARM_FAMILY) && !BUILDFLAG(IS_APPLE) && \
      !BUILDFLAG(IS_LINUX)) ||                                \
     defined(ARCH_CPU_MIPS_FAMILY)
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::android_info::sdk_int() >=
-      base::android::android_info::SDK_VERSION_P) {
-    ExecuteTest("testNewVp9Variants(true)");  // has_profile_2_3_support=true
-    return;
-  }
-#endif
   ExecuteTest("testNewVp9Variants(false)");  // has_profile_2_3_support=false
 #else
   ExecuteTest("testNewVp9Variants(true)");  // has_profile_2_3_support=true

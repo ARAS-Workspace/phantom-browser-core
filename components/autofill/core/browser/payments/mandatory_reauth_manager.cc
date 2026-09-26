@@ -29,9 +29,6 @@ namespace autofill::payments {
 
 using autofill_metrics::LogMandatoryReauthOfferOptInDecision;
 using autofill_metrics::MandatoryReauthOfferOptInDecision;
-#if BUILDFLAG(IS_ANDROID)
-using device_reauth::BiometricStatus;
-#endif
 
 MandatoryReauthManager::MandatoryReauthManager(AutofillClient* client)
     : client_(client) {}
@@ -116,11 +113,6 @@ void MandatoryReauthManager::StartDeviceAuthentication(
   AuthenticateWithMessage(
       l10n_util::GetStringUTF16(IDS_PAYMENTS_AUTOFILL_FILLING_MANDATORY_REAUTH),
       std::move(authentication_complete_callback));
-#elif BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40261690): Convert this to
-  // DeviceAuthenticator::AuthenticateWithMessage() with the correct message
-  // once it is supported. Currently, the message is "Verify it's you".
-  Authenticate(std::move(authentication_complete_callback));
 #else
   NOTREACHED();
 #endif
@@ -164,14 +156,9 @@ bool MandatoryReauthManager::ShouldOfferOptin(
   // enrolls, so return that we should not offer mandatory re-auth opt-in.
   std::unique_ptr<device_reauth::DeviceAuthenticator> authenticator =
       client_->GetDeviceAuthenticator();
-  bool is_auth_available = authenticator &&
-#if BUILDFLAG(IS_ANDROID)
-                           authenticator->GetBiometricAvailabilityStatus() !=
-                               BiometricStatus::kUnavailable;
-#else
-                           authenticator
-                               ->CanAuthenticateWithBiometricOrScreenLock();
-#endif  // BUILDFLAG(IS_ANDROID)
+  bool is_auth_available =
+      authenticator &&
+      authenticator->CanAuthenticateWithBiometricOrScreenLock();
   if (!is_auth_available) {
     LogMandatoryReauthOfferOptInDecision(
         MandatoryReauthOfferOptInDecision::kNoSupportedReauthMethod);
@@ -252,13 +239,6 @@ void MandatoryReauthManager::OnUserAcceptedOptInPrompt() {
       base::BindOnce(
           &MandatoryReauthManager::OnOptInAuthenticationStepCompleted,
           weak_ptr_factory_.GetWeakPtr()));
-#elif BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40261690): Convert this to
-  // DeviceAuthenticator::AuthenticateWithMessage() with the correct message
-  // once it is supported. Currently, the message is "Verify it's you".
-  Authenticate(base::BindOnce(
-      &MandatoryReauthManager::OnOptInAuthenticationStepCompleted,
-      weak_ptr_factory_.GetWeakPtr()));
 #else
   NOTREACHED();
 #endif
@@ -300,16 +280,6 @@ MandatoryReauthManager::GetAuthenticationMethod() {
   if (!authenticator) {
     return MandatoryReauthAuthenticationMethod::kUnknown;
   }
-#if BUILDFLAG(IS_ANDROID)
-  switch (authenticator->GetBiometricAvailabilityStatus()) {
-    case BiometricStatus::kBiometricsAvailable:
-      return MandatoryReauthAuthenticationMethod::kBiometric;
-    case BiometricStatus::kOnlyLskfAvailable:
-      return MandatoryReauthAuthenticationMethod::kScreenLock;
-    case BiometricStatus::kUnavailable:
-      return MandatoryReauthAuthenticationMethod::kUnsupportedMethod;
-  }
-#else
   // Order matters here.
   if (authenticator->CanAuthenticateWithBiometrics()) {
     return MandatoryReauthAuthenticationMethod::kBiometric;
@@ -318,7 +288,6 @@ MandatoryReauthManager::GetAuthenticationMethod() {
     return MandatoryReauthAuthenticationMethod::kScreenLock;
   }
   return MandatoryReauthAuthenticationMethod::kUnsupportedMethod;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 PaymentsDataManager& MandatoryReauthManager::GetPaymentsDataManager() {

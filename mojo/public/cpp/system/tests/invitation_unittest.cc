@@ -321,11 +321,7 @@ const char kDisconnectMessage[] = "go away plz";
 
 // Flakily times out on Android under ASAN.
 // crbug.com/1011494
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-#define MAYBE_ProcessErrors DISABLED_ProcessErrors
-#else
 #define MAYBE_ProcessErrors ProcessErrors
-#endif
 
 TEST_P(MAYBE_InvitationCppTest, MAYBE_ProcessErrors) {
   ProcessErrorCallback actual_error_callback;

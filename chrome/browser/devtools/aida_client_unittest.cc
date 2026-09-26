@@ -118,7 +118,7 @@ TEST_F(AidaClientTest, NotAvailableWithEnterprise) {
   profile_->GetPrefs()->SetInteger(prefs::kDevToolsGenAiSettings, 2);
 
   auto availability = AidaClient::CanUseAida(profile_.get());
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   EXPECT_TRUE(availability.available);
   EXPECT_TRUE(availability.blocked);
   EXPECT_FALSE(availability.blocked_by_age);
@@ -142,7 +142,7 @@ TEST_F(AidaClientTest, NoLoggingWithEnterprise) {
   profile_->GetPrefs()->SetInteger(prefs::kDevToolsGenAiSettings, 1);
 
   auto availability = AidaClient::CanUseAida(profile_.get());
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   EXPECT_TRUE(availability.available);
   EXPECT_FALSE(availability.blocked);
   EXPECT_FALSE(availability.blocked_by_age);
@@ -164,7 +164,7 @@ TEST_F(AidaClientTest, NoLoggingWithEnterprise) {
 TEST_F(AidaClientTest, NotAvailableIfCapabilityFalse) {
   scoped_country_override_ = AidaClient::OverrideCountryForTesting("us");
   auto availability = AidaClient::CanUseAida(profile_.get());
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   EXPECT_TRUE(availability.available);
   EXPECT_FALSE(availability.blocked);
   EXPECT_FALSE(availability.blocked_by_enterprise_policy);
@@ -194,7 +194,7 @@ TEST_F(AidaClientTest, NotAvailableInCountry) {
   scoped_country_override_ = AidaClient::OverrideCountryForTesting("cn");
   auto availability = AidaClient::CanUseAida(profile_.get());
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   EXPECT_TRUE(availability.available);
   EXPECT_TRUE(availability.blocked);
   EXPECT_FALSE(availability.blocked_by_age);
@@ -214,7 +214,7 @@ TEST_F(AidaClientTest, NotAvailableInCountry) {
 TEST_F(AidaClientTest, NoLoggingInEurope) {
   scoped_country_override_ = AidaClient::OverrideCountryForTesting("de");
   auto availability = AidaClient::CanUseAida(profile_.get());
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   EXPECT_TRUE(availability.available);
   EXPECT_FALSE(availability.blocked);
   EXPECT_FALSE(availability.blocked_by_geo);
@@ -234,7 +234,7 @@ TEST_F(AidaClientTest, NoLoggingInEurope) {
 TEST_F(AidaClientTest, LoggingInNonEurope) {
   scoped_country_override_ = AidaClient::OverrideCountryForTesting("us");
   auto availability = AidaClient::CanUseAida(profile_.get());
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   EXPECT_TRUE(availability.available);
   EXPECT_FALSE(availability.blocked);
   EXPECT_FALSE(availability.blocked_by_geo);

@@ -81,33 +81,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/preferences/autofill/settings_navigation_helper.h"
-#include "chrome/browser/keyboard_accessory/android/manual_filling_controller.h"
-#include "chrome/browser/keyboard_accessory/android/payment_method_accessory_controller.h"
-#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_payment_method_controller.h"
-#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_payment_method_controller_impl.h"
-#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_payment_method_view_impl.h"
-#include "chrome/browser/ui/android/autofill/autofill_cvc_save_message_delegate.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_card_bottom_sheet_bridge.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_card_delegate_android.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_iban_bottom_sheet_bridge.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_iban_delegate.h"
-#include "chrome/browser/ui/android/autofill/card_expiration_date_fix_flow_view_android.h"
-#include "chrome/browser/ui/android/autofill/card_name_fix_flow_view_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/browser/ui/autofill/autofill_message_controller_impl.h"
-#include "chrome/browser/ui/autofill/autofill_message_model.h"
-#include "chrome/browser/ui/autofill/autofill_snackbar_controller_impl.h"
-#include "chrome/browser/ui/autofill/payments/android_bnpl_ui_delegate.h"
-#include "chrome/browser/ui/autofill/payments/android_payments_window_manager.h"
-#include "chrome/browser/ui/autofill/payments/offer_notification_controller_android.h"
-#include "components/autofill/core/browser/payments/android_bnpl_strategy.h"
-#include "components/autofill/core/browser/payments/autofill_save_iban_ui_info.h"
-#include "components/autofill/core/browser/ui/payments/card_expiration_date_fix_flow_view.h"
-#include "components/autofill/core/browser/ui/payments/card_name_fix_flow_view.h"
-#include "components/webauthn/android/internal_authenticator_android.h"
-#else  // !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/autofill/payments/desktop_bnpl_ui_delegate.h"
 #include "chrome/browser/ui/autofill/payments/desktop_payments_window_manager.h"
 #include "chrome/browser/ui/autofill/payments/filled_card_information_bubble_controller_impl.h"
@@ -127,7 +100,6 @@
 // TODO(crbug.com/407105162): Remove nogncheck when crbug.com/40147906 is fixed.
 #include "components/tabs/public/tab_interface.h"  // nogncheck
 #include "components/webauthn/content/browser/internal_authenticator_impl.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/407106692): Refactor for Platform-Specific Code Separation.
 namespace autofill::payments {
@@ -140,15 +112,10 @@ ChromePaymentsAutofillClient::ChromePaymentsAutofillClient(
           std::make_unique<SaveAndFillManagerImpl>(&client_.get())),
       payments_churned_users_manager_(
           std::make_unique<payments::PaymentsChurnedUsersManager>(client)) {
-#if BUILDFLAG(IS_ANDROID)
-  touch_to_fill_payment_method_controller_ =
-      std::make_unique<TouchToFillPaymentMethodControllerImpl>(&client_.get());
-#else
   if (base::FeatureList::IsEnabled(features::kAutofillEnableOmniboxAutofill)) {
     omnibox_autofill_delegate_ =
         std::make_unique<OmniboxAutofillDelegate>(&client_.get());
   }
-#endif
 }
 
 ChromePaymentsAutofillClient::~ChromePaymentsAutofillClient() = default;
@@ -174,42 +141,6 @@ void ChromePaymentsAutofillClient::LoadRiskData(
                      base::TimeTicks::Now()));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-AutofillSaveCardBottomSheetBridge*
-ChromePaymentsAutofillClient::GetOrCreateAutofillSaveCardBottomSheetBridge() {
-  if (!autofill_save_card_bottom_sheet_bridge_) {
-    // During shutdown the window may be null. There is no need to show the
-    // bottom sheet during shutdown.
-    auto* window_android = web_contents()->GetTopLevelNativeWindow();
-    TabModel* tab_model =
-        TabModelList::GetTabModelForWebContents(web_contents());
-    if (window_android && tab_model) {
-      autofill_save_card_bottom_sheet_bridge_ =
-          std::make_unique<AutofillSaveCardBottomSheetBridge>(window_android,
-                                                              tab_model);
-    }
-  }
-  return autofill_save_card_bottom_sheet_bridge_.get();
-}
-
-AutofillSaveIbanBottomSheetBridge*
-ChromePaymentsAutofillClient::GetOrCreateAutofillSaveIbanBottomSheetBridge() {
-  if (!autofill_save_iban_bottom_sheet_bridge_) {
-    // During shutdown the window may be null. There is no need to show the
-    // bottom sheet during shutdown.
-    auto* window_android = web_contents()->GetTopLevelNativeWindow();
-    TabModel* tab_model =
-        TabModelList::GetTabModelForWebContents(web_contents());
-    if (window_android && tab_model) {
-      autofill_save_iban_bottom_sheet_bridge_ =
-          std::make_unique<AutofillSaveIbanBottomSheetBridge>(window_android,
-                                                              tab_model);
-    }
-  }
-  return autofill_save_iban_bottom_sheet_bridge_.get();
-}
-
-#else   // !BUILDFLAG(IS_ANDROID)
 void ChromePaymentsAutofillClient::ShowWebauthnOfferDialog(
     WebauthnDialogCallback offer_dialog_callback) {
   WebauthnDialogControllerImpl::GetOrCreateForPage(
@@ -254,32 +185,6 @@ void ChromePaymentsAutofillClient::
     controller->HideIconAndBubble();
   }
 }
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-void ChromePaymentsAutofillClient::ConfirmAccountNameFixFlow(
-    base::OnceCallback<void(const std::u16string&)> callback) {
-  CardNameFixFlowViewAndroid* card_name_fix_flow_view_android =
-      new CardNameFixFlowViewAndroid(&card_name_fix_flow_controller_,
-                                     web_contents());
-  card_name_fix_flow_controller_.Show(
-      card_name_fix_flow_view_android, GetAccountHolderName(),
-      /*name_accepted_callback=*/std::move(callback));
-}
-
-void ChromePaymentsAutofillClient::ConfirmExpirationDateFixFlow(
-    const CreditCard& card,
-    base::OnceCallback<void(const std::u16string&, const std::u16string&)>
-        callback) {
-  CardExpirationDateFixFlowViewAndroid*
-      card_expiration_date_fix_flow_view_android =
-          new CardExpirationDateFixFlowViewAndroid(
-              &card_expiration_date_fix_flow_controller_, web_contents());
-  card_expiration_date_fix_flow_controller_.Show(
-      card_expiration_date_fix_flow_view_android, card,
-      /*callback=*/std::move(callback));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 bool ChromePaymentsAutofillClient::HasCreditCardScanFeature() const {
   return CreditCardScannerController::HasCreditCardScanFeature();
@@ -299,32 +204,9 @@ void ChromePaymentsAutofillClient::ShowSaveCreditCardLocally(
     const CreditCard& card,
     SaveCreditCardOptions options,
     LocalSaveCardPromptCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  DCHECK(options.show_prompt);
-  AutofillSaveCardUiInfo ui_info =
-      AutofillSaveCardUiInfo::CreateForLocalSave(options, card);
-  auto save_card_delegate = std::make_unique<AutofillSaveCardDelegateAndroid>(
-      std::move(callback), options, web_contents());
-
-  // If a CVC is detected for an existing local card in the checkout form, the
-  // CVC save prompt is shown in a message.
-  if (options.card_save_type == CardSaveType::kCvcSaveOnly) {
-    autofill_cvc_save_message_delegate_ =
-        std::make_unique<AutofillCvcSaveMessageDelegate>(web_contents());
-    autofill_cvc_save_message_delegate_->ShowMessage(
-        ui_info, std::move(save_card_delegate));
-    return;
-  }
-
-  // Saving a new local card (may include CVC) via a bottom sheet.
-  if (auto* bridge = GetOrCreateAutofillSaveCardBottomSheetBridge()) {
-    bridge->RequestShowContent(ui_info, std::move(save_card_delegate));
-  }
-#else   // !BUILDFLAG(IS_ANDROID)
   SaveCardBubbleControllerImpl::CreateForWebContents(web_contents());
   SaveCardBubbleControllerImpl::FromWebContents(web_contents())
       ->OfferLocalSave(card, options, std::move(callback));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromePaymentsAutofillClient::ShowSaveCreditCardToCloud(
@@ -332,36 +214,6 @@ void ChromePaymentsAutofillClient::ShowSaveCreditCardToCloud(
     const LegalMessageLines& legal_message_lines,
     SaveCreditCardOptions options,
     UploadSaveCardPromptCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  DCHECK(options.show_prompt);
-  Profile* profile =
-      !web_contents()
-          ? nullptr
-          : Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(profile);
-  AccountInfo account_info = identity_manager->FindExtendedAccountInfo(
-      identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin));
-  AutofillSaveCardUiInfo ui_info = AutofillSaveCardUiInfo::CreateForUploadSave(
-      options, card, legal_message_lines, account_info);
-  auto save_card_delegate = std::make_unique<AutofillSaveCardDelegateAndroid>(
-      std::move(callback), options, web_contents());
-
-  // If a CVC is detected for an existing server card in the checkout form,
-  // the CVC save prompt is shown in a message.
-  if (options.card_save_type == CardSaveType::kCvcSaveOnly) {
-    autofill_cvc_save_message_delegate_ =
-        std::make_unique<AutofillCvcSaveMessageDelegate>(web_contents());
-    autofill_cvc_save_message_delegate_->ShowMessage(
-        ui_info, std::move(save_card_delegate));
-    return;
-  }
-
-  // For new cards, the save card prompt is shown in a bottom sheet.
-  if (auto* bridge = GetOrCreateAutofillSaveCardBottomSheetBridge()) {
-    bridge->RequestShowContent(ui_info, std::move(save_card_delegate));
-  }
-#else
   // Hide virtual card confirmation bubble showing for a different card.
   HideVirtualCardEnrollBubbleAndIconIfVisible();
 
@@ -370,7 +222,6 @@ void ChromePaymentsAutofillClient::ShowSaveCreditCardToCloud(
   SaveCardBubbleControllerImpl::FromWebContents(web_contents())
       ->OfferUploadSave(card, legal_message_lines, options,
                         std::move(callback));
-#endif
 }
 
 void ChromePaymentsAutofillClient::CreditCardUploadCompleted(
@@ -378,26 +229,6 @@ void ChromePaymentsAutofillClient::CreditCardUploadCompleted(
     std::optional<OnConfirmationClosedCallback>
         on_confirmation_closed_callback) {
   const bool card_saved = result == PaymentsRpcResult::kSuccess;
-#if BUILDFLAG(IS_ANDROID)
-  if (auto* bridge = GetOrCreateAutofillSaveCardBottomSheetBridge()) {
-    bridge->Hide();
-  }
-
-  if (card_saved) {
-    if (on_confirmation_closed_callback) {
-      client_->GetAutofillSnackbarController()->ShowWithDurationAndCallback(
-          AutofillSnackbarType::kSaveCardSuccess,
-          kSaveCardConfirmationSnackbarDuration, base::DoNothing(),
-          std::move(on_confirmation_closed_callback));
-    } else {
-      client_->GetAutofillSnackbarController()->Show(
-          AutofillSnackbarType::kSaveCardSuccess, base::DoNothing());
-    }
-  } else if (result != PaymentsRpcResult::kClientSideTimeout) {
-    GetAutofillMessageController().Show(
-        AutofillMessageModel::CreateForSaveCardFailure());
-  }
-#else  // !BUILDFLAG(IS_ANDROID)
   if (result == PaymentsRpcResult::kClientSideTimeout) {
     HideSaveCardPrompt();
     return;
@@ -437,17 +268,14 @@ void ChromePaymentsAutofillClient::CreditCardUploadCompleted(
         card_saved, /*is_for_save_and_fill=*/false,
         std::move(on_confirmation_closed_callback));
   }
-#endif
 }
 
 void ChromePaymentsAutofillClient::HideSaveCardPrompt() {
-#if !BUILDFLAG(IS_ANDROID)
   SaveCardBubbleControllerImpl* controller =
       SaveCardBubbleControllerImpl::FromWebContents(web_contents());
   if (controller) {
     controller->HideSaveCardBubble();
   }
-#endif
 }
 
 void ChromePaymentsAutofillClient::ShowVirtualCardEnrollDialog(
@@ -475,91 +303,27 @@ void ChromePaymentsAutofillClient::VirtualCardEnrollCompleted(
     // so the controller only needs to be called for desktop.
     controller->ShowConfirmationBubbleView(result);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (result == PaymentsRpcResult::kSuccess) {
-    client_->GetAutofillSnackbarController()->Show(
-        AutofillSnackbarType::kVirtualCardEnrollSuccess, base::DoNothing());
-  } else if (controller && result != PaymentsRpcResult::kClientSideTimeout) {
-    GetAutofillMessageController().Show(
-        AutofillMessageModel::CreateForVirtualCardEnrollFailure(
-            /*card_label=*/controller->GetUiModel()
-                .enrollment_fields()
-                .credit_card.NetworkAndLastFourDigits()));
-  }
-#endif
 }
 
 void ChromePaymentsAutofillClient::OnCardDataAvailable(
     const FilledCardInformationBubbleOptions& options,
     const url::Origin& origin) {
-#if BUILDFLAG(IS_ANDROID)
-  // Note that currently the snackbar is displayed only for virtual cards or
-  // cards enrolled in card info retrieval. In the case for BNPL, it is a
-  // one-time use virtual card.
-  AutofillSnackbarType type;
-  if (options.filled_card.is_bnpl_card()) {
-    type = AutofillSnackbarType::kBnpl;
-  } else {
-    type = options.filled_card.record_type() ==
-                   CreditCard::RecordType::kVirtualCard
-               ? AutofillSnackbarType::kVirtualCard
-               : AutofillSnackbarType::kCardInfoRetrieval;
-  }
-
-  // Credit card manual filling sheet should always be created on the Java side.
-  // This happens after the first time `PaymentMethodAccessoryControllerImpl`
-  // pushes data to the Java keyboard accessory. Before that, credit card manual
-  // filling sheet doesn't exist on the java side. The data is pushed
-  // asynchronously in `ManualFillingViewAndroid::OnItemsAvailable`. Manually
-  // refresh credit card suggestions before the snackbar is shown so that the
-  // credit card manual filling sheet can be opened from the snackbar.
-  // TODO(crbug.com/430575808): Consider adding a synchronous version of the
-  // `RefreshSuggestions` so that the race condition is removed completely.
-  PaymentMethodAccessoryController::GetOrCreate(web_contents())
-      ->RefreshSuggestions();
-
-  client_->GetAutofillSnackbarController()->ShowPaymentsSnackbar(
-      type, options.filled_card,
-      base::BindOnce(
-          [](base::WeakPtr<content::WebContents> contents) {
-            if (!contents) {
-              return;
-            }
-            ManualFillingController::GetOrCreate(contents.get())
-                ->ShowAccessorySheetTab(AccessoryTabType::CREDIT_CARDS);
-          },
-          web_contents()->GetWeakPtr()));
-#else
   FilledCardInformationBubbleControllerImpl::CreateForWebContents(
       web_contents());
   FilledCardInformationBubbleControllerImpl* controller =
       FilledCardInformationBubbleControllerImpl::FromWebContents(
           web_contents());
   controller->SetupAndShowBubble(options);
-#endif
 }
 
 void ChromePaymentsAutofillClient::ConfirmSaveIbanLocally(
     const Iban& iban,
     bool should_show_prompt,
     SaveIbanPromptCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  // For new IBANs, the save IBAN prompt is shown in a bottom sheet.
-  if (auto* bridge = GetOrCreateAutofillSaveIbanBottomSheetBridge()) {
-    auto save_iban_delegate = std::make_unique<AutofillSaveIbanDelegate>(
-        std::move(callback), web_contents());
-    AutofillSaveIbanUiInfo ui_info = AutofillSaveIbanUiInfo::CreateForLocalSave(
-        iban.GetIdentifierStringForAutofillDisplay(
-            /*is_value_masked=*/false));
-    bridge->RequestShowContent(ui_info, std::move(save_iban_delegate));
-  }
-#else
   // Do lazy initialization of IbanBubbleControllerImpl.
   IbanBubbleControllerImpl::CreateForWebContents(web_contents());
   IbanBubbleControllerImpl::FromWebContents(web_contents())
       ->OfferLocalSave(iban, should_show_prompt, std::move(callback));
-#endif
 }
 
 void ChromePaymentsAutofillClient::ConfirmUploadIbanToCloud(
@@ -567,44 +331,19 @@ void ChromePaymentsAutofillClient::ConfirmUploadIbanToCloud(
     LegalMessageLines legal_message_lines,
     bool should_show_prompt,
     SaveIbanPromptCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  AutofillSaveIbanUiInfo ui_info = AutofillSaveIbanUiInfo::CreateForUploadSave(
-      iban.GetIdentifierStringForAutofillDisplay(
-          /*is_value_masked=*/false),
-      legal_message_lines);
-
-  // Upload a new IBAN to the server via a Bottom Sheet.
-  if (auto* bridge = GetOrCreateAutofillSaveIbanBottomSheetBridge()) {
-    bridge->RequestShowContent(
-        ui_info, std::make_unique<AutofillSaveIbanDelegate>(std::move(callback),
-                                                            web_contents()));
-  }
-#else
   // Do lazy initialization of IbanBubbleControllerImpl.
   IbanBubbleControllerImpl::CreateForWebContents(web_contents());
   IbanBubbleControllerImpl::FromWebContents(web_contents())
       ->OfferUploadSave(iban, std::move(legal_message_lines),
                         should_show_prompt, std::move(callback));
-#endif
 }
 
 void ChromePaymentsAutofillClient::IbanUploadCompleted(bool iban_saved,
                                                        bool hit_max_strikes) {
-#if BUILDFLAG(IS_ANDROID)
-  if (auto* bridge = GetOrCreateAutofillSaveIbanBottomSheetBridge()) {
-    bridge->Hide();
-  }
-  if (iban_saved) {
-    client_->GetAutofillSnackbarController()->Show(
-        AutofillSnackbarType::kSaveServerIbanSuccess,
-        /*on_action_clicked_callback=*/base::DoNothing());
-  }
-#else  // BUILDFLAG(IS_ANDROID)
   if (IbanBubbleControllerImpl* controller =
           IbanBubbleControllerImpl::FromWebContents(web_contents())) {
     controller->ShowConfirmationBubbleView(iban_saved, hit_max_strikes);
   }
-#endif
 }
 
 void ChromePaymentsAutofillClient::ShowAutofillProgressDialog(
@@ -715,13 +454,8 @@ void ChromePaymentsAutofillClient::ShowAutofillErrorDialog(
 PaymentsWindowManager*
 ChromePaymentsAutofillClient::GetPaymentsWindowManager() {
   if (!payments_window_manager_) {
-#if BUILDFLAG(IS_ANDROID)
-    payments_window_manager_ =
-        std::make_unique<AndroidPaymentsWindowManager>(&client_.get());
-#else
     payments_window_manager_ =
         std::make_unique<DesktopPaymentsWindowManager>(&client_.get());
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   return payments_window_manager_.get();
@@ -746,31 +480,6 @@ void ChromePaymentsAutofillClient::OnUnmaskVerificationResult(
   if (unmask_controller_) {
     unmask_controller_->OnVerificationResult(result);
   }
-#if BUILDFLAG(IS_ANDROID)
-  // For VCN-related errors, on Android we show a new error dialog instead of
-  // updating the CVC unmask prompt with the error message.
-  switch (result) {
-    case PaymentsRpcResult::kVcnRetrievalPermanentFailure:
-      ShowAutofillErrorDialog(
-          AutofillErrorDialogContext::WithVirtualCardPermanentOrTemporaryError(
-              /*is_permanent_error=*/true));
-      break;
-    case PaymentsRpcResult::kVcnRetrievalTryAgainFailure:
-      ShowAutofillErrorDialog(
-          AutofillErrorDialogContext::WithVirtualCardPermanentOrTemporaryError(
-              /*is_permanent_error=*/false));
-      break;
-    case PaymentsRpcResult::kSuccess:
-    case PaymentsRpcResult::kTryAgainFailure:
-    case PaymentsRpcResult::kPermanentFailure:
-    case PaymentsRpcResult::kNetworkError:
-    case PaymentsRpcResult::kClientSideTimeout:
-      // Do nothing
-      break;
-    case PaymentsRpcResult::kNone:
-      NOTREACHED();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 VirtualCardEnrollmentManager*
@@ -828,26 +537,11 @@ void ChromePaymentsAutofillClient::ShowMandatoryReauthOptInPrompt(
 }
 
 void ChromePaymentsAutofillClient::ShowMandatoryReauthOptInConfirmation() {
-#if BUILDFLAG(IS_ANDROID)
-  client_->GetAutofillSnackbarController()->Show(
-      AutofillSnackbarType::kMandatoryReauth,
-      base::BindOnce(
-          [](base::WeakPtr<content::WebContents> contents) {
-            if (contents) {
-              return;
-            }
-            // For mandatory reauth snackbar, we will show Android credit card
-            // settings page.
-            ShowAutofillCreditCardSettings(contents.get());
-          },
-          web_contents()->GetWeakPtr()));
-#else
   MandatoryReauthBubbleControllerImpl::CreateForWebContents(web_contents());
   // TODO(crbug.com/4555994): Pass in the bubble type as a parameter so we
   // enforce that the confirmation bubble is shown.
   MandatoryReauthBubbleControllerImpl::FromWebContents(web_contents())
       ->ReshowBubble();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::IsAutofillPaymentMethodsEnabled() const {
@@ -923,119 +617,45 @@ void ChromePaymentsAutofillClient::UpdateOfferNotification(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (options.notification_has_been_shown) {
-    // For Android, if notification has been shown on this merchant, don't show
-    // it again.
-    return;
-  }
-  OfferNotificationControllerAndroid::CreateForWebContents(web_contents());
-  OfferNotificationControllerAndroid* controller =
-      OfferNotificationControllerAndroid::FromWebContents(web_contents());
-  controller->ShowIfNecessary(&offer, card);
-#else
   OfferNotificationBubbleControllerImpl::CreateForWebContents(web_contents());
   OfferNotificationBubbleControllerImpl* controller =
       OfferNotificationBubbleControllerImpl::FromWebContents(web_contents());
   controller->ShowOfferNotificationIfApplicable(offer, card, options);
-#endif
 }
 
 void ChromePaymentsAutofillClient::DismissOfferNotification() {
-#if BUILDFLAG(IS_ANDROID)
-  OfferNotificationControllerAndroid::CreateForWebContents(web_contents());
-  OfferNotificationControllerAndroid* controller =
-      OfferNotificationControllerAndroid::FromWebContents(web_contents());
-  controller->Dismiss();
-#else
   if (auto* controller = OfferNotificationBubbleControllerImpl::FromWebContents(
           web_contents())) {
     controller->DismissNotification();
   }
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillCreditCard(
     base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
     base::span<const Suggestion> suggestions) {
-#if BUILDFLAG(IS_ANDROID)
-  // Create the manual filling controller which will be used to show the
-  // unmasked virtual card details in the manual fallback.
-  ManualFillingController::GetOrCreate(web_contents())
-      ->UpdateSourceAvailability(
-          ManualFillingController::FillingSource::CREDIT_CARD_FALLBACKS,
-          !suggestions.empty());
-
-  return GetTouchToFillPaymentMethodController()->ShowPaymentMethods(
-      std::make_unique<TouchToFillPaymentMethodViewImpl>(web_contents()),
-      delegate, std::move(suggestions));
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillIban(
     base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
     base::span<const Iban> ibans_to_suggest) {
-#if BUILDFLAG(IS_ANDROID)
-  return GetTouchToFillPaymentMethodController()->ShowIbans(
-      std::make_unique<TouchToFillPaymentMethodViewImpl>(web_contents()),
-      delegate, std::move(ibans_to_suggest));
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillAffiliatedLoyaltyCard(
     base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
     std::vector<LoyaltyCard> loyalty_cards_to_suggest) {
-#if BUILDFLAG(IS_ANDROID)
-  const GURL& current_domain = client_->GetLastCommittedPrimaryMainFrameURL();
-
-  std::vector<LoyaltyCard> affiliated_loyalty_cards;
-  std::ranges::copy_if(loyalty_cards_to_suggest,
-                       std::back_inserter(affiliated_loyalty_cards),
-                       [&current_domain](const LoyaltyCard& card) {
-                         return card.GetAffiliationCategory(current_domain) ==
-                                LoyaltyCard::AffiliationCategory::kAffiliated;
-                       });
-
-  feature_engagement::Tracker* tracker =
-      feature_engagement::TrackerFactory::GetForBrowserContext(
-          Profile::FromBrowserContext(web_contents()->GetBrowserContext()));
-  const bool first_time_usage =
-      tracker && tracker->IsInitialized() &&
-      tracker->WouldTriggerHelpUI(
-          feature_engagement::kIPHAutofillEnableLoyaltyCardsFeature);
-
-  const bool loyalty_cards_shown =
-      GetTouchToFillPaymentMethodController()->ShowAffiliatedLoyaltyCards(
-          std::make_unique<TouchToFillPaymentMethodViewImpl>(web_contents()),
-          delegate, std::move(affiliated_loyalty_cards),
-          std::move(loyalty_cards_to_suggest), first_time_usage);
-  if (first_time_usage && loyalty_cards_shown) {
-    tracker->NotifyEvent("keyboard_accessory_loyalty_cards_autofilled");
-  }
-  return loyalty_cards_shown;
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillForAllLoyaltyCards(
     base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
     std::vector<LoyaltyCard> loyalty_cards_to_suggest) {
-#if BUILDFLAG(IS_ANDROID)
-  return GetTouchToFillPaymentMethodController()->ShowAllLoyaltyCards(
-      std::make_unique<TouchToFillPaymentMethodViewImpl>(web_contents()),
-      delegate, std::move(loyalty_cards_to_suggest));
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::OnPurchaseAmountExtracted(
@@ -1045,27 +665,14 @@ bool ChromePaymentsAutofillClient::OnPurchaseAmountExtracted(
     const std::optional<std::string>& app_locale,
     base::OnceCallback<void(BnplIssuer)> selected_issuer_callback,
     base::OnceClosure cancel_callback) {
-#if BUILDFLAG(IS_ANDROID)
-  return GetTouchToFillPaymentMethodController()->OnPurchaseAmountExtracted(
-      bnpl_issuer_contexts, extracted_amount, is_amount_supported_by_any_issuer,
-      app_locale, std::move(selected_issuer_callback),
-      std::move(cancel_callback));
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillProgress(
     base::OnceClosure cancel_callback) {
-#if BUILDFLAG(IS_ANDROID)
-  // TTF should already be shown, so pass nullptr for `view`.
-  return GetTouchToFillPaymentMethodController()->ShowProgressScreen(
-      /*view=*/nullptr, std::move(cancel_callback));
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillBnplIssuers(
@@ -1073,64 +680,32 @@ bool ChromePaymentsAutofillClient::ShowTouchToFillBnplIssuers(
     const std::string& app_locale,
     base::OnceCallback<void(BnplIssuer)> selected_issuer_callback,
     base::OnceClosure cancel_callback) {
-#if BUILDFLAG(IS_ANDROID)
-  return GetTouchToFillPaymentMethodController()->ShowBnplIssuers(
-      bnpl_issuer_contexts, app_locale, std::move(selected_issuer_callback),
-      std::move(cancel_callback));
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillBnplTos(
     BnplTosModel bnpl_tos_model,
     base::OnceClosure accept_callback,
     base::OnceClosure cancel_callback) {
-#if BUILDFLAG(IS_ANDROID)
-  return GetTouchToFillPaymentMethodController()->ShowBnplIssuerTos(
-      std::move(bnpl_tos_model), std::move(accept_callback),
-      std::move(cancel_callback));
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillError(
     const AutofillErrorDialogContext& context) {
-#if BUILDFLAG(IS_ANDROID)
-  // Use temporary `AutofillErrorDialogControllerImpl` to get error title and
-  // description strings.
-  AutofillErrorDialogControllerImpl autofill_error_dialog_controller =
-      AutofillErrorDialogControllerImpl(std::move(context));
-
-  // TTF should already be shown, so pass nullptr for `view`.
-  return GetTouchToFillPaymentMethodController()->ShowErrorScreen(
-      /*view=*/nullptr, autofill_error_dialog_controller.GetTitle(),
-      autofill_error_dialog_controller.GetDescription());
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 void ChromePaymentsAutofillClient::HideTouchToFillPaymentMethod() {
-#if BUILDFLAG(IS_ANDROID)
-  GetTouchToFillPaymentMethodController()->Hide();
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 void ChromePaymentsAutofillClient::SetTouchToFillVisible(bool visible) {
-#if BUILDFLAG(IS_ANDROID)
-  GetTouchToFillPaymentMethodController()->SetVisible(visible);
-#else
   // Touch To Fill is not supported on Desktop.
   NOTREACHED();
-#endif
 }
 
 PaymentsDataManager& ChromePaymentsAutofillClient::GetPaymentsDataManager() {
@@ -1142,11 +717,7 @@ ChromePaymentsAutofillClient::CreateCreditCardInternalAuthenticator(
     AutofillDriver* driver) {
   auto* cad = static_cast<ContentAutofillDriver*>(driver);
   content::RenderFrameHost* rfh = cad->render_frame_host();
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<webauthn::InternalAuthenticatorAndroid>(rfh);
-#else
   return std::make_unique<content::InternalAuthenticatorImpl>(rfh);
-#endif
 }
 
 MandatoryReauthManager*
@@ -1160,16 +731,11 @@ ChromePaymentsAutofillClient::GetOrCreatePaymentsMandatoryReauthManager() {
 }
 
 SaveAndFillManager* ChromePaymentsAutofillClient::GetSaveAndFillManager() {
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
   return save_and_fill_manager_.get();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromePaymentsAutofillClient::ShowCreditCardLocalSaveAndFillDialog(
     CardSaveAndFillDialogCallback callback) {
-#if !BUILDFLAG(IS_ANDROID)
   if (!save_and_fill_dialog_controller_) {
     save_and_fill_dialog_controller_ =
         std::make_unique<SaveAndFillDialogControllerImpl>();
@@ -1179,27 +745,19 @@ void ChromePaymentsAutofillClient::ShowCreditCardLocalSaveAndFillDialog(
                      save_and_fill_dialog_controller_->GetWeakPtr(),
                      web_contents()),
       std::move(callback));
-#else
-  NOTIMPLEMENTED();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromePaymentsAutofillClient::ShowCreditCardUploadSaveAndFillDialog(
     const LegalMessageLines& legal_message_lines,
     CardSaveAndFillDialogCallback callback) {
-#if !BUILDFLAG(IS_ANDROID)
   CHECK(save_and_fill_dialog_controller_);
   save_and_fill_dialog_controller_->ShowUploadDialog(
       std::move(legal_message_lines),
       std::move(callback));
-#else
-  NOTIMPLEMENTED();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromePaymentsAutofillClient::ShowCreditCardSaveAndFillPendingDialog(
     CardSaveAndFillDialogCallback callback) {
-#if !BUILDFLAG(IS_ANDROID)
   if (!save_and_fill_dialog_controller_) {
     save_and_fill_dialog_controller_ =
         std::make_unique<SaveAndFillDialogControllerImpl>();
@@ -1209,55 +767,35 @@ void ChromePaymentsAutofillClient::ShowCreditCardSaveAndFillPendingDialog(
                      save_and_fill_dialog_controller_->GetWeakPtr(),
                      web_contents()),
       std::move(callback));
-#else
-  NOTIMPLEMENTED();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromePaymentsAutofillClient::HideCreditCardSaveAndFillDialog() {
-#if !BUILDFLAG(IS_ANDROID)
   if (save_and_fill_dialog_controller_) {
     save_and_fill_dialog_controller_->Dismiss();
   }
-#else
-  NOTIMPLEMENTED();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 bool ChromePaymentsAutofillClient::IsTabModalPopup() const {
-#if !BUILDFLAG(IS_ANDROID)
   tabs::TabInterface* const tab_interface =
       tabs::TabInterface::MaybeGetFromContents(web_contents());
   return tab_interface &&
          tab_interface->GetBrowserWindowInterface()->IsTabModalPopup();
-#else
-  return false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 BnplStrategy* ChromePaymentsAutofillClient::GetBnplStrategy() {
   if (!bnpl_strategy_) {
-#if BUILDFLAG(IS_ANDROID)
-    bnpl_strategy_ = std::make_unique<AndroidBnplStrategy>();
-#else   // !BUILDFLAG(IS_ANDROID)
     bnpl_strategy_ = std::make_unique<DesktopBnplStrategy>();
-#endif  // BUILDFLAG(IS_ANDROID)
   }
   return bnpl_strategy_.get();
 }
 
 BnplUiDelegate* ChromePaymentsAutofillClient::GetBnplUiDelegate() {
   if (!bnpl_ui_delegate_) {
-#if BUILDFLAG(IS_ANDROID)
-    bnpl_ui_delegate_ = std::make_unique<AndroidBnplUiDelegate>(this);
-#else   // !BUILDFLAG(IS_ANDROID)
     bnpl_ui_delegate_ = std::make_unique<DesktopBnplUiDelegate>(&client_.get());
-#endif  // BUILDFLAG(IS_ANDROID)
   }
   return bnpl_ui_delegate_.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 OmniboxAutofillDelegate*
 ChromePaymentsAutofillClient::GetOmniboxAutofillDelegate() {
   return omnibox_autofill_delegate_.get();
@@ -1303,13 +841,10 @@ void ChromePaymentsAutofillClient::HideOmniboxAutofillChip() {
   }
 }
 
-#endif
-
 void ChromePaymentsAutofillClient::ShowPaymentsChurnedUsersUI(
     base::OnceClosure accept_callback,
     base::OnceClosure cancel_callback,
     base::OnceClosure closed_callback) {
-#if !BUILDFLAG(IS_ANDROID)
   tabs::TabInterface* tab_interface =
       tabs::TabInterface::MaybeGetFromContents(web_contents());
   if (!tab_interface) {
@@ -1335,25 +870,7 @@ void ChromePaymentsAutofillClient::ShowPaymentsChurnedUsersUI(
     controller->Show(std::move(accept_callback), std::move(cancel_callback),
                      std::move(closed_callback), std::move(account_info));
   }
-#endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-AutofillMessageController&
-ChromePaymentsAutofillClient::GetAutofillMessageController() {
-  if (!autofill_message_controller_) {
-    autofill_message_controller_ =
-        std::make_unique<AutofillMessageControllerImpl>(web_contents());
-  }
-
-  return *autofill_message_controller_;
-}
-
-TouchToFillPaymentMethodController*
-ChromePaymentsAutofillClient::GetTouchToFillPaymentMethodController() {
-  return touch_to_fill_payment_method_controller_.get();
-}
-#endif
 
 AutofillProgressDialogControllerImpl*
 ChromePaymentsAutofillClient::AutofillProgressDialogControllerForTesting() {
@@ -1368,37 +885,6 @@ void ChromePaymentsAutofillClient::SetCardUnmaskControllerForTesting(
     std::unique_ptr<CardUnmaskPromptControllerImpl> test_controller) {
   unmask_controller_ = std::move(test_controller);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void ChromePaymentsAutofillClient::
-    SetAutofillSaveCardBottomSheetBridgeForTesting(
-        std::unique_ptr<AutofillSaveCardBottomSheetBridge>
-            autofill_save_card_bottom_sheet_bridge) {
-  autofill_save_card_bottom_sheet_bridge_ =
-      std::move(autofill_save_card_bottom_sheet_bridge);
-}
-
-void ChromePaymentsAutofillClient::
-    SetAutofillSaveIbanBottomSheetBridgeForTesting(
-        std::unique_ptr<AutofillSaveIbanBottomSheetBridge>
-            autofill_save_iban_bottom_sheet_bridge) {
-  autofill_save_iban_bottom_sheet_bridge_ =
-      std::move(autofill_save_iban_bottom_sheet_bridge);
-}
-
-void ChromePaymentsAutofillClient::SetAutofillMessageControllerForTesting(
-    std::unique_ptr<AutofillMessageController> autofill_message_controller) {
-  autofill_message_controller_ = std::move(autofill_message_controller);
-}
-
-void ChromePaymentsAutofillClient::
-    SetTouchToFillPaymentMethodControllerForTesting(
-        std::unique_ptr<TouchToFillPaymentMethodController>
-            touch_to_fill_payment_method_controller) {
-  touch_to_fill_payment_method_controller_ =
-      std::move(touch_to_fill_payment_method_controller);
-}
-#endif  // #if BUILDFLAG(IS_ANDROID)
 
 void ChromePaymentsAutofillClient::SetRiskDataForTesting(
     const std::string& risk_data) {

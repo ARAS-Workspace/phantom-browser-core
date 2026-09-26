@@ -41,10 +41,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/chrome_user_metrics_extension.pb.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "base/nix/xdg_util.h"
 #include "base/scoped_environment_variable_override.h"
@@ -201,27 +197,6 @@ TEST_F(MetricsLogTest, SessionHash) {
             log2.uma_proto()->system_profile().session_hash());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(MetricsLogTest, FgBgId) {
-  MetricsLog log1(kClientId, kSessionId, MetricsLog::ONGOING_LOG, &client_);
-  MetricsLog log2(kClientId, kSessionId, MetricsLog::ONGOING_LOG, &client_);
-
-  // Verify that both logs have the same fg_bg_id.
-  EXPECT_TRUE(log1.uma_proto()->system_profile().has_fg_bg_id());
-  EXPECT_TRUE(log2.uma_proto()->system_profile().has_fg_bg_id());
-  EXPECT_EQ(log1.uma_proto()->system_profile().fg_bg_id(),
-            log2.uma_proto()->system_profile().fg_bg_id());
-
-  // Verify that a log created after a call to IncrementFgBgId() will have a
-  // different `fg_bg_id` than the ones before.
-  MetricsLog::IncrementFgBgId();
-  MetricsLog log3(kClientId, kSessionId, MetricsLog::ONGOING_LOG, &client_);
-  EXPECT_TRUE(log3.uma_proto()->system_profile().has_fg_bg_id());
-  EXPECT_NE(log1.uma_proto()->system_profile().fg_bg_id(),
-            log3.uma_proto()->system_profile().fg_bg_id());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_F(MetricsLogTest, LogType) {
   MetricsLog log1(kClientId, kSessionId, MetricsLog::ONGOING_LOG, &client_);
   EXPECT_EQ(MetricsLog::ONGOING_LOG, log1.log_type());
@@ -283,9 +258,6 @@ TEST_F(MetricsLogTest, BasicRecord) {
   // The session hash.
   system_profile->set_session_hash(
       log.uma_proto()->system_profile().session_hash());
-#if BUILDFLAG(IS_ANDROID)
-  system_profile->set_fg_bg_id(log.uma_proto()->system_profile().fg_bg_id());
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if defined(ADDRESS_SANITIZER) || DCHECK_IS_ON()
   system_profile->set_is_instrumented_build(true);
@@ -306,12 +278,6 @@ TEST_F(MetricsLogTest, BasicRecord) {
 #if BUILDFLAG(IS_LINUX)
   system_profile->mutable_os()->set_kernel_version(
       base::SysInfo::OperatingSystemVersion());
-#elif BUILDFLAG(IS_ANDROID)
-  system_profile->mutable_os()->set_build_fingerprint(
-      base::android::android_info::android_build_fp());
-  system_profile->mutable_hardware()->set_manufacturer(
-      base::SysInfo::HardwareManufacturer());
-  system_profile->set_app_package_name("test app");
 #endif
 
 #if BUILDFLAG(IS_LINUX)
@@ -323,10 +289,6 @@ TEST_F(MetricsLogTest, BasicRecord) {
   // Hard to mock.
   system_profile->set_build_timestamp(
       parsed.system_profile().build_timestamp());
-#if BUILDFLAG(IS_ANDROID)
-  system_profile->set_installer_package(
-      parsed.system_profile().installer_package());
-#endif
 
   // Not tested here; instead tested in Timestamps_* tests below.
   expected.mutable_time_log_created()->CopyFrom(parsed.time_log_created());

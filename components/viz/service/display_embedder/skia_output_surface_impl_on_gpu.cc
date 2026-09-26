@@ -108,9 +108,6 @@
 #include "gpu/vulkan/vulkan_implementation.h"
 #include "gpu/vulkan/vulkan_util.h"
 #include "third_party/skia/include/gpu/ganesh/vk/GrVkBackendSemaphore.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "components/viz/service/display_embedder/skia_output_device_vulkan_secondary_cb.h"
-#endif
 #endif
 
 #if BUILDFLAG(IS_OZONE)
@@ -122,10 +119,6 @@
 #if (BUILDFLAG(ENABLE_VULKAN) || BUILDFLAG(SKIA_USE_DAWN)) && \
     BUILDFLAG(SUPPORTS_OZONE_X11)
 #include "components/viz/service/display_embedder/skia_output_device_x11.h"
-#endif
-
-#if BUILDFLAG(SKIA_USE_DAWN) && BUILDFLAG(IS_ANDROID)
-#include "components/viz/service/display_embedder/skia_output_device_dawn.h"
 #endif
 
 #if BUILDFLAG(SKIA_USE_DAWN)
@@ -1899,15 +1892,6 @@ void SkiaOutputSurfaceImplOnGpu::SetVSyncDisplayID(int64_t display_id,
   output_device_->SetVSyncDisplayID(display_id, force_update);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void SkiaOutputSurfaceImplOnGpu::SetFrameRate(
-    gfx::SurfaceControlFrameRate frame_rate) {
-  if (presenter_) {
-    presenter_->SetFrameRate(frame_rate);
-  }
-}
-#endif
-
 void SkiaOutputSurfaceImplOnGpu::SetCapabilitiesForTesting(
     const OutputSurface::Capabilities& capabilities) {
   // Check that we're using an offscreen surface.
@@ -1981,12 +1965,6 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForGL() {
     presenter_ = presenter.get();
     if (!presenter_) {
       gl::GLSurfaceFormat format;
-#if BUILDFLAG(IS_ANDROID)
-      if (features::PreferRGB565ResourcesForDisplay() &&
-          !renderer_settings_.requires_alpha_channel) {
-        format.SetRGB565();
-      }
-#endif
       gl_surface_ = dependency_->CreateGLSurface(format);
       if (!gl_surface_) {
         return false;
@@ -2057,15 +2035,6 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForVulkan() {
         GetDidSwapBuffersCompleteCallback());
     return true;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (vulkan_context_provider_->GetGrSecondaryCBDrawContext()) {
-    output_device_ = std::make_unique<SkiaOutputDeviceVulkanSecondaryCB>(
-        vulkan_context_provider_, shared_gpu_deps_->memory_tracker(),
-        GetDidSwapBuffersCompleteCallback());
-    return true;
-  }
-#endif
 
   std::unique_ptr<OutputPresenter> output_presenter;
   scoped_refptr<gl::Presenter> presenter = dependency_->CreatePresenter();
@@ -2141,22 +2110,14 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForDawn() {
   }
   NOTREACHED();
 
-#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_APPLE)
   scoped_refptr<gl::Presenter> presenter = dependency_->CreatePresenter();
   presenter_ = presenter.get();
 
-#if BUILDFLAG(IS_ANDROID)
-  if (!presenter_) {
-    output_device_ = SkiaOutputDeviceDawn::Create(
-        context_state_, gfx::SurfaceOrigin::kTopLeft,
-        dependency_->GetSurfaceHandle(), shared_gpu_deps_->memory_tracker(),
-        GetDidSwapBuffersCompleteCallback());
-    return !!output_device_;
-  }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   presenter_->SetVSyncDisplayID(renderer_settings_.display_id,
                                 /*force_update=*/false);
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
   output_device_ = std::make_unique<SkiaOutputDeviceBufferQueue>(
       std::make_unique<OutputPresenterGL>(std::move(presenter), dependency_),
@@ -2165,7 +2126,7 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForDawn() {
       GetReleaseOverlaysCallback());
   return true;
 
-#else  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#else
   NOTREACHED();
 #endif
 #else   // BUILDFLAG(SKIA_USE_DAWN)
@@ -2641,21 +2602,6 @@ gpu::SkiaImageRepresentation* SkiaOutputSurfaceImplOnGpu::GetSkiaRepresentation(
   }
   return it->second.get();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-base::ScopedClosureRunner SkiaOutputSurfaceImplOnGpu::GetCacheBackBufferCb() {
-  if (gl_surface_) {
-    DCHECK(!presenter_);
-    return dependency_->CacheGLSurface(gl_surface_.get());
-  }
-
-  if (presenter_) {
-    return dependency_->CachePresenter(presenter_.get());
-  }
-
-  return base::ScopedClosureRunner();
-}
-#endif
 
 void SkiaOutputSurfaceImplOnGpu::CheckAsyncWorkCompletion() {
   if (auto* graphite_shared_context =

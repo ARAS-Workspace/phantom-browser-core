@@ -166,9 +166,6 @@ class AudioProcessorTest : public ::testing::Test {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
-#elif BUILDFLAG(IS_ANDROID)
-    EXPECT_FALSE(config.gain_controller1.enabled);
-    EXPECT_TRUE(config.gain_controller2.enabled);
 #else
     GTEST_FAIL() << "Undefined expectation.";
 #endif
@@ -212,11 +209,7 @@ INSTANTIATE_TEST_SUITE_P(
     &AudioProcessorTestMultichannelAndFormat::PrintTestName);
 
 // Test crashing with ASAN on Android. crbug.com/468762
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-#define MAYBE_WithAudioProcessing DISABLED_WithAudioProcessing
-#else
 #define MAYBE_WithAudioProcessing WithAudioProcessing
-#endif
 TEST_P(AudioProcessorTestMultichannelAndFormat, MAYBE_WithAudioProcessing) {
   AudioProcessingSettings settings{.multi_channel_capture_processing =
                                        std::get<0>(GetParam())};
@@ -250,11 +243,7 @@ TEST_F(AudioProcessorTest, TurnOffDefaultConstraints) {
 }
 
 // Test crashing with ASAN on Android. crbug.com/468762
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-#define MAYBE_TestAllSampleRates DISABLED_TestAllSampleRates
-#else
 #define MAYBE_TestAllSampleRates TestAllSampleRates
-#endif
 TEST_P(AudioProcessorTestMultichannelAndFormat, MAYBE_TestAllSampleRates) {
   AudioProcessingSettings settings{.multi_channel_capture_processing =
                                        std::get<0>(GetParam())};

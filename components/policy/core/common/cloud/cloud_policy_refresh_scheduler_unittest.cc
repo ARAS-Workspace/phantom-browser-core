@@ -193,19 +193,8 @@ class CloudPolicyRefreshSchedulerTest : public testing::Test {
 
   void CheckInitialRefresh(CloudPolicyRefreshScheduler* const scheduler,
                            bool with_invalidations) const {
-#if BUILDFLAG(IS_ANDROID)
-    // The mobile platforms take the cache age into account for the initial
-    // fetch. Usually the cache age is ignored for the initial refresh, but on
-    // mobile it's used to restrain from refreshing on every startup.
-    base::TimeDelta rate = base::Milliseconds(
-        with_invalidations
-            ? CloudPolicyRefreshScheduler::kWithInvalidationsRefreshDelayMs
-            : kPolicyRefreshRate);
-    CheckTimingWithAge(scheduler, rate, base::Minutes(kInitialCacheAgeMinutes));
-#else
     // Other platforms refresh immediately.
     EXPECT_EQ(base::TimeDelta(), GetLastDelay());
-#endif
   }
 
   void SetLastUpdateToNow() {

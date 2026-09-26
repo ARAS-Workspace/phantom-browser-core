@@ -225,15 +225,7 @@ void DevToolsFileHelper::SaveToFileSelected(
                               prefs::kDevToolsEditedFiles);
   base::DictValue& files_map = update.Get();
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the selected file path can be a content URL that isn't supposed
-  // to be shown to the user. In that case, store the display name instead.
-  base::FilePath path_in_prefs = file_info.display_name.empty()
-                                     ? file_info.path()
-                                     : base::FilePath(file_info.display_name);
-#else
   base::FilePath path_in_prefs = file_info.path();
-#endif  // BUILDFLAG(IS_ANDROID)
   files_map.Set(devtools::Md5OfUrlAsHexForDevTools(url),
                 base::FilePathToValue(path_in_prefs));
 

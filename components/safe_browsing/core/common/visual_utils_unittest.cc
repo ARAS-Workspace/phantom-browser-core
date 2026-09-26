@@ -111,13 +111,8 @@ TEST_F(VisualUtilsTest, BlurImageWhite) {
 
   ASSERT_TRUE(GetBlurredImage(bitmap_, &blurred));
 
-#if BUILDFLAG(IS_ANDROID)
-  const int kExpectedBlurredWidth = 18;
-  const int kExpectedBlurredHeight = 32;
-#else
   const int kExpectedBlurredWidth = 48;
   const int kExpectedBlurredHeight = 48;
-#endif
   ASSERT_EQ(kExpectedBlurredWidth, blurred.width());
   ASSERT_EQ(kExpectedBlurredHeight, blurred.height());
   ASSERT_EQ(3u * kExpectedBlurredWidth * kExpectedBlurredHeight,
@@ -136,13 +131,8 @@ TEST_F(VisualUtilsTest, BlurImageRed) {
   }
 
   ASSERT_TRUE(GetBlurredImage(bitmap_, &blurred));
-#if BUILDFLAG(IS_ANDROID)
-  const int kExpectedBlurredWidth = 18;
-  const int kExpectedBlurredHeight = 32;
-#else
   const int kExpectedBlurredWidth = 48;
   const int kExpectedBlurredHeight = 48;
-#endif
   ASSERT_EQ(kExpectedBlurredWidth, blurred.width());
   ASSERT_EQ(kExpectedBlurredHeight, blurred.height());
   ASSERT_EQ(3u * kExpectedBlurredWidth * kExpectedBlurredHeight,
@@ -160,15 +150,6 @@ TEST_F(VisualUtilsTest, BlurImageHalfWhiteHalfBlack) {
   bitmap_.erase(SK_ColorWHITE, SkIRect::MakeXYWH(0, 500, 1000, 1000));
 
   ASSERT_TRUE(GetBlurredImage(bitmap_, &blurred));
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ(18, blurred.width());
-  ASSERT_EQ(32, blurred.height());
-  ASSERT_EQ(3u * 18u * 32u, blurred.data().size());
-  // The middle blocks may have been blurred to something between white and
-  // black, so only verify the first 14 and last 14 rows.
-  ExpectBlurredImagePixels(SK_ColorBLACK, blurred, gfx::Rect(18, 14));
-  ExpectBlurredImagePixels(SK_ColorWHITE, blurred, gfx::Rect(0, 18, 18, 14));
-#else
   ASSERT_EQ(48, blurred.width());
   ASSERT_EQ(48, blurred.height());
   ASSERT_EQ(3u * 48u * 48u, blurred.data().size());
@@ -176,7 +157,6 @@ TEST_F(VisualUtilsTest, BlurImageHalfWhiteHalfBlack) {
   // black, so only verify the first 22 and last 22 rows.
   ExpectBlurredImagePixels(SK_ColorBLACK, blurred, gfx::Rect(48, 22));
   ExpectBlurredImagePixels(SK_ColorWHITE, blurred, gfx::Rect(0, 26, 48, 22));
-#endif
 }
 
 TEST_F(VisualUtilsTest, BlockMeanAverageOneBlock) {

@@ -200,40 +200,30 @@ bool IsCustomLinksEnabled(Profile* profile) {
 }
 
 // TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
 bool IsEnterpriseShortcutsEmpty(Profile* profile) {
   return profile->GetPrefs()
       ->GetList(ntp_tiles::prefs::kEnterpriseShortcutsPolicyList)
       .empty();
 }
-#endif
 
 bool IsEnterpriseShortcutsEnabled(Profile* profile) {
   // Enable enterprise shortcuts if the enterprise shortcuts policy is set, and
   // user has enabled visibility.
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   return !IsEnterpriseShortcutsEmpty(profile) &&
          profile->GetPrefs()->GetBoolean(
              ntp_prefs::kNtpEnterpriseShortcutsVisible);
-#else
-  return false;
-#endif
 }
 
 bool IsPersonalShortcutsVisible(Profile* profile) {
   // Always return true if no enterprise shortcuts are set by policy. Rely on
   // `IsTopSitesEnabled()` and `IsCustomLinksEnabled()` only.
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   if (IsEnterpriseShortcutsEmpty(profile)) {
     return true;
   }
   return profile->GetPrefs()->GetBoolean(
       ntp_prefs::kNtpPersonalShortcutsVisible);
-#else
-  return true;
-#endif
 }
 
 std::set<ntp_tiles::TileType> GetEnabledTileTypes(Profile* profile) {

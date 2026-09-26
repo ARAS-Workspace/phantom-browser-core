@@ -46,21 +46,11 @@
 #include "third_party/blink/public/common/permissions/permission_utils.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/metrics/histogram_tester.h"
-#include "ui/android/display_android_manager.h"
-#endif  // IS_ANDROID
-
 using blink::PermissionType;
 using network::mojom::PermissionsPolicyFeature;
 
 namespace permissions {
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-constexpr char kWindowManagementHistogramName[] =
-    "Permissions.WindowManagementApi.Android.Allowed";
-#endif  // IS_ANDROID
 
 class ScopedPartitionedOriginBrowserClient
     : public content::ContentBrowserClient {
@@ -379,15 +369,8 @@ TEST_F(PermissionManagerTest, GetPermissionStatusDefault) {
   CheckPermissionStatus(PermissionType::MIDI_SYSEX, PermissionStatus::ASK);
   CheckPermissionStatus(PermissionType::NOTIFICATIONS, PermissionStatus::ASK);
   CheckPermissionStatus(PermissionType::GEOLOCATION, PermissionStatus::ASK);
-#if BUILDFLAG(IS_ANDROID)
-  CheckPermissionStatus(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
-                        PermissionStatus::GRANTED);
-  CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                        PermissionStatus::DENIED);
-#else
   CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
                         PermissionStatus::ASK);
-#endif
 }
 
 TEST_F(PermissionManagerTest, GetPermissionStatusAfterSet) {
@@ -401,82 +384,10 @@ TEST_F(PermissionManagerTest, GetPermissionStatusAfterSet) {
   SetPermission(PermissionType::MIDI_SYSEX, PermissionStatus::GRANTED);
   CheckPermissionStatus(PermissionType::MIDI_SYSEX, PermissionStatus::GRANTED);
 
-#if BUILDFLAG(IS_ANDROID)
-  SetPermission(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
-                PermissionStatus::GRANTED);
-  CheckPermissionStatus(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
-                        PermissionStatus::GRANTED);
-
-  SetPermission(PermissionType::WINDOW_MANAGEMENT, PermissionStatus::GRANTED);
-  CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                        PermissionStatus::DENIED);
-#else
   SetPermission(PermissionType::WINDOW_MANAGEMENT, PermissionStatus::GRANTED);
   CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
                         PermissionStatus::GRANTED);
-#endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PermissionManagerTest, AndroidWindowManagementPermissionDenied) {
-  SetPermission(PermissionType::WINDOW_MANAGEMENT, PermissionStatus::GRANTED);
-
-  // Feature flag and Display Topology are disabled.
-  CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                        PermissionStatus::DENIED);
-
-  ui::DisplayAndroidManager::SetIsDisplayTopologyAvailableForTesting(true);
-
-  // Display Topology is enabled, but Feature flag is disabled.
-  CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                        PermissionStatus::DENIED);
-
-  // Enable kAndroidWindowManagementWebApi flag.
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatureState(
-      permissions::features::kAndroidWindowManagementWebApi, true);
-  ui::DisplayAndroidManager::SetIsDisplayTopologyAvailableForTesting(false);
-
-  // Feature flag is enabled, but Display Topology is disabled.
-  CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                        PermissionStatus::DENIED);
-}
-
-TEST_F(PermissionManagerTest, AndroidWindowManagementPermission) {
-  // Enable kAndroidWindowManagementWebApi flag.
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatureState(
-      permissions::features::kAndroidWindowManagementWebApi, true);
-
-  // Set display topology availability
-  ui::DisplayAndroidManager::SetIsDisplayTopologyAvailableForTesting(true);
-
-  CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                        PermissionStatus::ASK);
-
-  {
-    base::HistogramTester histogram_tester;
-
-    SetPermission(PermissionType::WINDOW_MANAGEMENT, PermissionStatus::GRANTED);
-    CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                          PermissionStatus::GRANTED);
-
-    histogram_tester.ExpectUniqueSample(kWindowManagementHistogramName, true,
-                                        1);
-  }
-
-  {
-    base::HistogramTester histogram_tester;
-
-    SetPermission(PermissionType::WINDOW_MANAGEMENT, PermissionStatus::DENIED);
-    CheckPermissionStatus(PermissionType::WINDOW_MANAGEMENT,
-                          PermissionStatus::DENIED);
-
-    histogram_tester.ExpectUniqueSample(kWindowManagementHistogramName, false,
-                                        1);
-  }
-}
-#endif
 
 TEST_F(PermissionManagerTest, CheckPermissionResultDefault) {
   CheckPermissionResult(PermissionType::MIDI_SYSEX, PermissionStatus::ASK,
@@ -485,11 +396,6 @@ TEST_F(PermissionManagerTest, CheckPermissionResultDefault) {
                         content::PermissionStatusSource::UNSPECIFIED);
   CheckPermissionResult(PermissionType::GEOLOCATION, PermissionStatus::ASK,
                         content::PermissionStatusSource::UNSPECIFIED);
-#if BUILDFLAG(IS_ANDROID)
-  CheckPermissionResult(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
-                        PermissionStatus::GRANTED,
-                        content::PermissionStatusSource::UNSPECIFIED);
-#endif
 }
 
 TEST_F(PermissionManagerTest, CheckPermissionResultAfterSet) {
@@ -505,14 +411,6 @@ TEST_F(PermissionManagerTest, CheckPermissionResultAfterSet) {
   SetPermission(PermissionType::MIDI_SYSEX, PermissionStatus::GRANTED);
   CheckPermissionResult(PermissionType::MIDI_SYSEX, PermissionStatus::GRANTED,
                         content::PermissionStatusSource::UNSPECIFIED);
-
-#if BUILDFLAG(IS_ANDROID)
-  SetPermission(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
-                PermissionStatus::GRANTED);
-  CheckPermissionResult(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
-                        PermissionStatus::GRANTED,
-                        content::PermissionStatusSource::UNSPECIFIED);
-#endif
 }
 
 TEST_F(PermissionManagerTest, PermissionIgnoredCleanup) {
@@ -570,11 +468,9 @@ TEST_F(PermissionManagerTest, InsecureOriginIsNotOverridable) {
 
 TEST_F(PermissionManagerTest, MissingContextIsNotOverridable) {
   // Permissions that are not implemented should be denied overridability.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(
       IsPermissionOverridable(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
                               url::Origin::Create(GURL("http://localhost"))));
-#endif
   EXPECT_TRUE(
       IsPermissionOverridable(PermissionType::MIDI_SYSEX,
                               url::Origin::Create(GURL("http://localhost"))));
@@ -600,16 +496,6 @@ TEST_F(PermissionManagerTest, KillSwitchOnIsNotOverridable) {
 }
 
 TEST_F(PermissionManagerTest, ResetPermission) {
-#if BUILDFLAG(IS_ANDROID)
-  CheckPermissionStatus(PermissionType::NOTIFICATIONS, PermissionStatus::ASK);
-  SetPermission(PermissionType::NOTIFICATIONS, PermissionStatus::GRANTED);
-  CheckPermissionStatus(PermissionType::NOTIFICATIONS,
-                        PermissionStatus::GRANTED);
-
-  ResetPermission(PermissionType::NOTIFICATIONS, url(), url());
-
-  CheckPermissionStatus(PermissionType::NOTIFICATIONS, PermissionStatus::ASK);
-#else
   const char* kOrigin1 = "https://example.com";
 
   NavigateAndCommit(GURL(kOrigin1));
@@ -635,7 +521,6 @@ TEST_F(PermissionManagerTest, ResetPermission) {
 
   EXPECT_EQ(PermissionStatus::ASK, GetPermissionStatusForCurrentDocument(
                                        PermissionType::NOTIFICATIONS, rfh));
-#endif
 }
 
 TEST_F(PermissionManagerTest, GetPermissionStatusDelegation) {
@@ -777,13 +662,8 @@ TEST_F(PermissionManagerTest, RequestPermissionInDifferentStoragePartition) {
 
 // TODO(crbug.com/377264243): Enable the test when device permission is
 // supported in Android
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_UpdatePermissionStatusWithDeviceStatus \
-  DISABLED_UpdatePermissionStatusWithDeviceStatus
-#else
 #define MAYBE_UpdatePermissionStatusWithDeviceStatus \
   UpdatePermissionStatusWithDeviceStatus
-#endif
 TEST_F(PermissionManagerTest, MAYBE_UpdatePermissionStatusWithDeviceStatus) {
   struct {
     blink::mojom::PermissionStatus initial_status;
@@ -854,13 +734,8 @@ class WildcardPermissionObserver : public permissions::Observer {
 
 // TODO(crbug.com/377264243): Enable when device permission is supported on
 // Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_DeviceStatusRefreshNotifiesObservers \
-  DISABLED_DeviceStatusRefreshNotifiesObservers
-#else
 #define MAYBE_DeviceStatusRefreshNotifiesObservers \
   DeviceStatusRefreshNotifiesObservers
-#endif
 // Verifies that when the device-level permission is revoked, the site-level
 // permission status is updated and a wildcard observer notification is
 // dispatched.

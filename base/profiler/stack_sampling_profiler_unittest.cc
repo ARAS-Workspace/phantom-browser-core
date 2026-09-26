@@ -48,9 +48,7 @@
 // ChromeOS x64).
 // ChromeOS: These don't run under MSan because parts of the stack aren't
 // initialized.
-#if BUILDFLAG(IS_MAC) ||      \
-    (BUILDFLAG(IS_ANDROID) && \
-     (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64)))
+#if BUILDFLAG(IS_MAC)
 #define STACK_SAMPLING_PROFILER_SUPPORTED 1
 #endif
 
@@ -189,7 +187,7 @@ void TestProfileBuilder::OnProfileCompleted(TimeDelta profile_duration,
 // is insufficient to ensure it's been unloaded.
 void SynchronousUnloadNativeLibrary(NativeLibrary library) {
   UnloadNativeLibrary(library);
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 // Unloading a library on Mac and Android is synchronous.
 #else
   NOTIMPLEMENTED();
@@ -437,8 +435,7 @@ class StackSamplingProfilerTest : public testing::Test {
 //
 // TODO(crbug.com/40702833): Enable this test again for Android with ASAN. This
 // is now disabled because the android-asan bot fails.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || \
-    (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_ANDROID))
+#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)
 #define MAYBE_Basic DISABLED_Basic
 #else
 #define MAYBE_Basic Basic
@@ -493,7 +490,7 @@ class TestAuxUnwinder : public Unwinder {
 // Checks that the profiler handles stacks containing dynamically-allocated
 // stack memory. macOS ASAN is not yet supported - crbug.com/718628. Android is
 // not supported since Chrome unwind tables don't support dynamic frames.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || BUILDFLAG(IS_ANDROID)
+#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)
 #define MAYBE_Alloca DISABLED_Alloca
 #else
 #define MAYBE_Alloca Alloca
@@ -518,9 +515,7 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_Alloca) {
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) ||         \
-    (BUILDFLAG(IS_ANDROID) && BUILDFLAG(EXCLUDE_UNWIND_TABLES)) || \
-    (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER))
+#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)
 #define MAYBE_OtherLibrary DISABLED_OtherLibrary
 #else
 #define MAYBE_OtherLibrary OtherLibrary
@@ -547,9 +542,7 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_OtherLibrary) {
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
-#if BUILDFLAG(IS_APPLE) ||                                         \
-    (BUILDFLAG(IS_ANDROID) && BUILDFLAG(EXCLUDE_UNWIND_TABLES)) || \
-    (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_UnloadingLibrary DISABLED_UnloadingLibrary
 #else
 #define MAYBE_UnloadingLibrary UnloadingLibrary
@@ -565,7 +558,7 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_UnloadingLibrary) {
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || BUILDFLAG(IS_ANDROID)
+#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)
 #define MAYBE_UnloadedLibrary DISABLED_UnloadedLibrary
 #else
 #define MAYBE_UnloadedLibrary UnloadedLibrary

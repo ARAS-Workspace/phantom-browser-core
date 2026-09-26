@@ -37,11 +37,7 @@ TEST(AcceleratorTest, TimeStamp) {
 }
 
 // Crash on Android builders. https://crbug.com/980267
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GetShortcutText DISABLED_GetShortcutText
-#else
 #define MAYBE_GetShortcutText GetShortcutText
-#endif
 TEST(AcceleratorTest, MAYBE_GetShortcutText) {
   struct {
     KeyboardCode code;

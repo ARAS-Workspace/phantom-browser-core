@@ -32,13 +32,7 @@ class OpenGLES3FunctionTest : public testing::Test {
   GLManager gl_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// Test is failing for Lollipop 64 bit Tester.
-// See crbug/550292.
-#define MAYBE_GetFragDataLocationInvalid DISABLED_GetFragDataLocationInvalid
-#else
 #define MAYBE_GetFragDataLocationInvalid GetFragDataLocationInvalid
-#endif
 TEST_F(OpenGLES3FunctionTest, MAYBE_GetFragDataLocationInvalid) {
   if (!IsApplicable()) {
     return;

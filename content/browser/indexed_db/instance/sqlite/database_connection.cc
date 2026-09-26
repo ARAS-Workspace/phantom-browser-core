@@ -311,7 +311,6 @@ std::tuple<bool, unsigned int /*freelist_percentage*/> NeedsVacuum(
   // not a reason to vacuum.
   // TODO(crbug.com/436880909): consider vacuuming old-ish databases that
   // may be fragmented.
-#if !BUILDFLAG(IS_ANDROID)
   // Note that //sql configures a multi-page chunk size for large DBs, so if
   // this threshold is too low (<25%), vacuuming may not always reduce the
   // file size. See SQLITE_FCNTL_CHUNK_SIZE.
@@ -319,7 +318,6 @@ std::tuple<bool, unsigned int /*freelist_percentage*/> NeedsVacuum(
   if (freelist_percentage >= kMinFreelistPercentageForVacuum) {
     return {true, freelist_percentage};
   }
-#endif
   return {false, freelist_percentage};
 }
 
@@ -2136,7 +2134,6 @@ StatusOr<BackingStore::RecordIdentifier> DatabaseConnection::PutRecord(
 
     // Maybe compress, updating `bits_span` and `bits_copy` as appropriate.
     if (bits_span.size() >= kMinimumCompressionSize.InBytes()) {
-#if !BUILDFLAG(IS_ANDROID)
       size_t max_compressed_size = ZSTD_compressBound(bits_span.size());
       std::vector<uint8_t> compressed_bits(max_compressed_size);
 
@@ -2145,18 +2142,6 @@ StatusOr<BackingStore::RecordIdentifier> DatabaseConnection::PutRecord(
           compressed_bits.data(), compressed_bits.size(), bits_span.data(),
           bits_span.size(), /*compressionLevel=*/-4);
       compression_type = CompressionType::kZstd;
-#else
-      size_t max_compressed_size =
-          snappy::MaxCompressedLength(bits_span.size());
-      std::vector<uint8_t> compressed_bits(max_compressed_size);
-      size_t compressed_length = 0;
-      base::span<const char> src = base::as_chars(bits_span);
-      base::span<char> dest =
-          base::as_writable_chars(base::span(compressed_bits));
-      snappy::RawCompress(src.data(), src.size(), dest.data(),
-                          &compressed_length);
-      compression_type = CompressionType::kSnappy;
-#endif
       base::UmaHistogramPercentage(
           "IndexedDB.SQLite.PutRecord.CompressionRatio",
           static_cast<int>(100.0 * compressed_length / bits_span.size()));

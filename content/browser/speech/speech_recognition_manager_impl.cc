@@ -50,10 +50,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/speech/speech_recognizer_impl_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 SpeechRecognitionManager* SpeechRecognitionManager::manager_for_tests_;
@@ -109,25 +105,7 @@ class FrameSessionTracker
   }
 
   void OnVisibilityChanged(content::Visibility visibility) override {
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, background speech recognition is not permitted. (Desktop
-    // intentionally allows background recognition).
-    // The session is terminated and remains terminated even if the page
-    // becomes visible again. The web application must explicitly call start()
-    // again to initiate a new session.
-    WebContentsImpl* web_contents_impl =
-        static_cast<WebContentsImpl*>(web_contents());
-    if (!web_contents_impl || web_contents_impl->GetPageVisibilityState() !=
-                                  PageVisibilityState::kVisible) {
-      for (int session : sessions_) {
-        GetIOThreadTaskRunner({})->PostTask(
-            FROM_HERE, base::BindOnce(frame_deleted_callback_, session));
-      }
-      sessions_.clear();
-    }
-#else
     (void)visibility;  // Suppress unused parameter warning
-#endif
   }
 
   static void CreateObserverForSession(GlobalRenderFrameHostId global_id,
@@ -138,19 +116,6 @@ class FrameSessionTracker
     RenderFrameHost* render_frame_host = RenderFrameHost::FromID(global_id);
     if (!render_frame_host)
       return;
-
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, background speech recognition is not permitted. (Desktop
-    // intentionally allows background recognition).
-    WebContentsImpl* web_contents = static_cast<WebContentsImpl*>(
-        content::WebContents::FromRenderFrameHost(render_frame_host));
-    if (!web_contents || web_contents->GetPageVisibilityState() !=
-                             PageVisibilityState::kVisible) {
-      GetIOThreadTaskRunner({})->PostTask(FROM_HERE,
-                                          base::BindOnce(callback, session_id));
-      return;
-    }
-#endif
 
     FrameSessionTracker* tracker =
         GetOrCreateForCurrentDocument(render_frame_host);
@@ -600,13 +565,7 @@ int SpeechRecognitionManagerImpl::CreateSession(
   media::mojom::SpeechRecognitionErrorCode error =
       media::mojom::SpeechRecognitionErrorCode::kNone;
 
-#if BUILDFLAG(IS_ANDROID)
-  if (config.recognition_context.has_value()) {
-    error = media::mojom::SpeechRecognitionErrorCode::kPhrasesNotSupported;
-  }
-#else
   error = media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   if (audio_forwarder_config.has_value() &&
       (audio_forwarder_config.value().sample_rate >
@@ -649,24 +608,8 @@ int SpeechRecognitionManagerImpl::CreateSession(
   session->context = config.initial_context;
   session->use_microphone = !audio_forwarder_config.has_value();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Every non-Android session is rejected above; no recognizer exists here.
   NOTREACHED();
-#else
-  session->recognizer = new SpeechRecognizerImplAndroid(this, session_id);
-
-  sessions_[session_id] = std::move(session);
-
-  GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE,
-      base::BindOnce(
-          &FrameSessionTracker::CreateObserverForSession,
-          config.initial_context.global_id, session_id,
-          base::BindRepeating(&SpeechRecognitionManagerImpl::AbortSessionImpl,
-                              weak_factory_.GetWeakPtr())));
-
-  return session_id;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void SpeechRecognitionManagerImpl::OnRecognitionEnd(int session_id) {

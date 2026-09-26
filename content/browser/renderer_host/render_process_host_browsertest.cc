@@ -373,13 +373,8 @@ class ObserverLogger : public RenderProcessHostObserver {
 };
 
 // Flaky on Android. http://crbug.com/759514.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AllProcessExitedCallsBeforeAnyHostDestroyedCalls \
-  DISABLED_AllProcessExitedCallsBeforeAnyHostDestroyedCalls
-#else
 #define MAYBE_AllProcessExitedCallsBeforeAnyHostDestroyedCalls \
   AllProcessExitedCallsBeforeAnyHostDestroyedCalls
-#endif
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
                        MAYBE_AllProcessExitedCallsBeforeAnyHostDestroyedCalls) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -500,7 +495,7 @@ class AudioStartObserver : public WebContentsObserver {
 // only used by Chromecast.
 //
 // crbug.com/864476: flaky on Android for unclear reasons.
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER)
 #define KillProcessZerosAudioStreams DISABLED_KillProcessZerosAudioStreams
 #endif
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, KillProcessZerosAudioStreams) {
@@ -616,13 +611,8 @@ IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
 // calculations) are properly set and cleared during media playback and renderer
 // terminations.
 // Test is flaky on Android builders: https://crbug.com/352065578
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_KillProcessZerosVideoCaptureStreams \
-  DISABLED_KillProcessZerosVideoCaptureStreams
-#else
 #define MAYBE_KillProcessZerosVideoCaptureStreams \
   KillProcessZerosVideoCaptureStreams
-#endif
 IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
                        MAYBE_KillProcessZerosVideoCaptureStreams) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -684,13 +674,8 @@ IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
 // calculations) are properly set and cleared during media playback and renderer
 // terminations for audio only streams.
 // Test is flaky on Android builders: https://crbug.com/352065578
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_KillProcessZerosVideoCaptureStreams \
-  DISABLED_KillProcessZerosVideoCaptureStreams
-#else
 #define MAYBE_KillProcessZerosVideoCaptureStreams \
   KillProcessZerosVideoCaptureStreams
-#endif
 IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
                        KillProcessZerosAudioCaptureStreams) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -824,12 +809,7 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
 }
 
 // Test is flaky on Android builders: https://crbug.com/875179
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_KeepAliveRendererProcess_Hung \
-  DISABLED_KeepAliveRendererProcess_Hung
-#else
 #define MAYBE_KeepAliveRendererProcess_Hung KeepAliveRendererProcess_Hung
-#endif
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
                        MAYBE_KeepAliveRendererProcess_Hung) {
   // Disable HangWatcher so it doesn't interfere with this test when hangs take
@@ -888,13 +868,8 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
 }
 
 // Test is flaky on Android builders: https://crbug.com/875179
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FetchKeepAliveRendererProcess_Hung \
-  DISABLED_FetchKeepAliveRendererProcess_Hung
-#else
 #define MAYBE_FetchKeepAliveRendererProcess_Hung \
   FetchKeepAliveRendererProcess_Hung
-#endif
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
                        MAYBE_FetchKeepAliveRendererProcess_Hung) {
   // Disable HangWatcher so it doesn't interfere with this test when hangs take
@@ -1028,7 +1003,6 @@ class IsProcessBackgroundedObserver : public RenderProcessHostInternalObserver {
       host_observation_{this};
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, PriorityOverride) {
   // Start up a real renderer process.
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1093,7 +1067,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, PriorityOverride) {
   // Clear the media stream so the test doesn't explode.
   process->OnMediaStreamRemoved();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 struct BoostRenderProcessForLoadingBrowserTestParam {
   bool enable_boost_render_process_for_loading;
@@ -1296,91 +1269,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, ConstructedButNotInitializedYet) {
   // Cleanup the resources acquired by the test.
   process->Cleanup();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// This test verifies that the process priority can be correctly set before
-// initializing the RenderProcessHost after introducing
-// MaybeUpdateSpareRendererPriorityOnReady.
-IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
-                       SetSpareRendererPriorityBeforeInitialization) {
-  using ChildBindingState = base::android::ChildBindingState;
-  RenderProcessHostImpl* process = static_cast<RenderProcessHostImpl*>(
-      RenderProcessHostImpl::CreateSpareRenderProcessHost(
-          ShellContentBrowserClient::Get()->browser_context(), nullptr));
-
-  // Before Init(), the priority is not updated yet.
-  EXPECT_TRUE(process->HasSpareRendererPriority());
-  EXPECT_EQ(process->GetEffectiveImportance(), ChildProcessImportance::NORMAL);
-  EXPECT_EQ(process->GetEffectiveChildBindingState(),
-            ChildBindingState::UNBOUND);
-
-  RenderProcessHostWatcher watcher(
-      process, RenderProcessHostWatcher::WATCH_FOR_PROCESS_READY);
-  process->Init();
-  watcher.Wait();
-
-  EXPECT_TRUE(process->HasSpareRendererPriority());
-  if (base::FeatureList::IsEnabled(features::kSpareRendererProcessPriority)) {
-    // After Init(), the priority should be updated.
-    EXPECT_EQ(process->GetEffectiveImportance(),
-              ChildProcessImportance::NORMAL);
-    EXPECT_EQ(process->GetEffectiveChildBindingState(),
-              ChildBindingState::WAIVED);
-  }
-  process->Cleanup();
-}
-
-IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, PriorityOverrideAndroid) {
-  // Start up a real renderer process.
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL test_url = embedded_test_server()->GetURL("/simple_page.html");
-  EXPECT_TRUE(NavigateToURL(shell(), test_url));
-  auto* web_contents = shell()->web_contents();
-  RenderProcessHostImpl* process = static_cast<RenderProcessHostImpl*>(
-      web_contents->GetPrimaryMainFrame()->GetProcess());
-  EXPECT_EQ(web_contents->GetVisibility(), content::Visibility::VISIBLE);
-
-  EXPECT_FALSE(process->HasPriorityOverride());
-
-  // === Case 1: Tab is Active/Visible (Client Importance is IMPORTANT) ===
-  web_contents->SetPrimaryPageImportance(ChildProcessImportance::IMPORTANT,
-                                         ChildProcessImportance::NORMAL);
-
-  // Applying an override lower than the client importance should NOT downgrade
-  // it.
-  process->SetPriorityOverride(base::Process::Priority::kBestEffort);
-  EXPECT_TRUE(process->HasPriorityOverride());
-
-  // Importance and bindings must remain at the maximum level.
-  EXPECT_EQ(process->GetEffectiveImportance(),
-            ChildProcessImportance::IMPORTANT);
-
-  // === Case 2: Simulate tab is Hidden (Client Importance drops to NORMAL) ===
-  web_contents->SetPrimaryPageImportance(ChildProcessImportance::NORMAL,
-                                         ChildProcessImportance::NORMAL);
-
-  // The client importance drops and our priority override is still
-  // kBestEffort. The effective importance should now fall to NORMAL (WAIVED)
-  // since both inputs are NORMAL.
-  EXPECT_EQ(process->GetEffectiveImportance(), ChildProcessImportance::NORMAL);
-
-  // Upgrade to base::Process::Priority::kUserVisible (corresponds to MODERATE).
-  process->SetPriorityOverride(base::Process::Priority::kUserVisible);
-  EXPECT_EQ(process->GetEffectiveImportance(),
-            ChildProcessImportance::MODERATE);
-
-  // Upgrade to base::Process::Priority::kUserBlocking (corresponds to
-  // IMPORTANT).
-  process->SetPriorityOverride(base::Process::Priority::kUserBlocking);
-  EXPECT_EQ(process->GetEffectiveImportance(),
-            ChildProcessImportance::IMPORTANT);
-
-  // Clear override.
-  process->ClearPriorityOverride();
-  EXPECT_FALSE(process->HasPriorityOverride());
-  EXPECT_EQ(process->GetEffectiveImportance(), ChildProcessImportance::NORMAL);
-}
-#endif
 
 class DiscardFrameBrowserTest : public RenderProcessHostTestBase,
                                 public WebContentsObserver {
@@ -2376,13 +2264,8 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, DISABLED_ReuseSiteURLChanges) {
 }
 
 // Test is flaky on Android bots: https://crbug.com/465476682
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FastShutdownWithSingleOutermostMainFrame \
-  DISABLED_FastShutdownWithSingleOutermostMainFrame
-#else
 #define MAYBE_FastShutdownWithSingleOutermostMainFrame \
   FastShutdownWithSingleOutermostMainFrame
-#endif
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
                        MAYBE_FastShutdownWithSingleOutermostMainFrame) {
   IsolateAllSitesForTesting(base::CommandLine::ForCurrentProcess());
@@ -2440,13 +2323,8 @@ class RenderProcessHostTestWithBFCache : public RenderProcessHostTest {
 };
 
 // Test is flaky on Android bots: https://crbug.com/465476682
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FastShutdownWithSingleOutermostMainFrameBFCache \
-  DISABLED_FastShutdownWithSingleOutermostMainFrameBFCache
-#else
 #define MAYBE_FastShutdownWithSingleOutermostMainFrameBFCache \
   FastShutdownWithSingleOutermostMainFrameBFCache
-#endif
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTestWithBFCache,
                        MAYBE_FastShutdownWithSingleOutermostMainFrameBFCache) {
   IsolateAllSitesForTesting(base::CommandLine::ForCurrentProcess());
@@ -2541,12 +2419,8 @@ class PreEstablishGpuChannelRenderProcessHostTest
 INSTANTIATE_TEST_SUITE_P(
     All,
     PreEstablishGpuChannelRenderProcessHostTest,
-// Android doesn't support software compositing.
-#if !BUILDFLAG(IS_ANDROID)
+    // Android doesn't support software compositing.
     testing::Bool(),
-#else
-    testing::Values(true),
-#endif
     [](const testing::TestParamInfo<
         PreEstablishGpuChannelRenderProcessHostTest::ParamType>& info) {
       return info.param ? "WithGpuCompositing" : "WithoutGpuCompositing";
@@ -2891,7 +2765,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
   process_b->Cleanup();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Asserts RenderProcessHosts are configured to reflect the embedder's policy
 // defined by `ContentBrowserClient::IsTopChromeWebUIURL()`.
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, ForTopChromeWebUIAppliedToHosts) {
@@ -2944,7 +2817,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, ForTopChromeWebUIAppliedToHosts) {
                      base::Unretained(&done)));
   ASSERT_TRUE(done.TimedWait(TestTimeouts::action_timeout()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 

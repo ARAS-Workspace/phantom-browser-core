@@ -253,11 +253,7 @@ std::vector<uint8_t> DecompressData(const std::vector<uint8_t>& data,
 }
 
 bool CompressProgramBinaries() {
-#if !BUILDFLAG(IS_ANDROID)
   return false;
-#else   // !BUILDFLAG(IS_ANDROID)
-  return base::SysInfo::IsLowEndDevice();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 constexpr base::MemoryConsumerTraits kMemoryProgramCacheTraits(

@@ -117,10 +117,6 @@ SearchEngineChoiceDialogServiceFactory::ComputeProfileEligibilityForTesting(
 std::unique_ptr<KeyedService>
 SearchEngineChoiceDialogServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
-
 #if BUILDFLAG(CHROME_FOR_TESTING)
   if (!chrome_for_testing::IsEnableSearchEngineChoiceDialog()) {
     return nullptr;
@@ -159,5 +155,4 @@ SearchEngineChoiceDialogServiceFactory::BuildServiceInstanceForBrowserContext(
       CHECK_DEREF(TemplateURLServiceFactory::GetForProfile(&profile));
   return std::make_unique<SearchEngineChoiceDialogService>(
       profile, search_engine_choice_service, template_url_service);
-#endif  // BUILDFLAG(IS_ANDROID)
 }

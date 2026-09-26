@@ -59,11 +59,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/webui/bookmarks/bookmarks_ui_android.h"
-#include "chrome/browser/ui/webui/history/history_ui_android.h"
-#include "components/feed/feed_feature_list.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "base/memory/ref_counted_memory.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/types/expected_macros.h"
@@ -83,22 +78,19 @@
 #include "media/base/media_switches.h"
 #include "ui/gfx/codec/png_codec.h"
 #include "ui/gfx/image/image_skia_rep.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 #include "chrome/browser/devtools/devtools_ui_bindings.h"
 #include "chrome/browser/ui/webui/devtools/devtools_ui.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/app_home/app_home_ui.h"
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/webui/sandbox/sandbox_internals_ui.h"
 #endif
 
@@ -149,7 +141,6 @@ WebUIFactoryFunction GetWebUIFactoryFunction(Profile* profile,
 #endif  // BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Reads favicons for the IWA represented by `page_url` in all available sizes
 // from the disk.
 // `callback` is always run asynchronously for consistency with how extensions
@@ -207,7 +198,6 @@ void ReadIsolatedWebAppFaviconsFromDisk(
         return favicon_bitmap_results;
       }).Then(std::move(callback_async)));
 }
-#endif
 
 }  // namespace
 
@@ -336,25 +326,14 @@ scoped_refptr<base::RefCountedMemory>
 ChromeWebUIControllerFactory::GetFaviconResourceBytes(
     const GURL& page_url,
     ui::ResourceScaleFactor scale_factor) const {
-#if !BUILDFLAG(IS_ANDROID)
   // The extension scheme is handled in GetFaviconForURL.
   if (page_url.SchemeIs(extensions::kExtensionScheme)) {
     NOTREACHED();
   }
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-  // For Android, we're allowing the favicon requests for chrome native pages.
-  // Now only history and bookmarks are supported.
-  if (!content::HasWebUIScheme(page_url) &&
-      !HasFaviconForNativePage(page_url)) {
-    return nullptr;
-  }
-#else
   if (!content::HasWebUIScheme(page_url)) {
     return nullptr;
   }
-#endif
 
   if (page_url.host() == chrome::kChromeUIComponentsHost) {
     return ComponentsUI::GetFaviconResourceBytes(scale_factor);
@@ -392,7 +371,6 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
         .LoadDataResourceBytesForScale(IDR_DOWNLOADS_FAVICON, scale_factor);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // The chrome://apps page is not available on Android.
   if (page_url.host() == chrome::kChromeUIAppLauncherPageHost) {
     return webapps::AppHomeUI::GetFaviconResourceBytes(scale_factor);
@@ -414,8 +392,6 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
     return NewTabPageUI::GetFaviconResourceBytes(scale_factor);
   }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (page_url.host() == chrome::kChromeUIExtensionsHost) {
     return extensions::ExtensionsUI::GetFaviconResourceBytes(scale_factor);
@@ -424,16 +400,3 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
 
   return nullptr;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool ChromeWebUIControllerFactory::HasFaviconForNativePage(
-    const GURL& page_url) const {
-  if (!page_url.SchemeIs(content::kChromeNativeScheme)) {
-    return false;
-  }
-  return page_url.host() == chrome::kChromeUIHistoryHost ||
-         page_url.host() == chrome::kChromeUIBookmarksHost ||
-         page_url.host() == chrome::kChromeUISettingsHost ||
-         page_url.host() == chrome::kChromeUIDownloadsHost;
-}
-#endif

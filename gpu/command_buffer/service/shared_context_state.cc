@@ -85,16 +85,7 @@ static constexpr size_t kInitialScratchDeserializationBufferSize = 1024;
 
 size_t MaxNumSkSurface() {
   static constexpr size_t kNormalMaxNumSkSurface = 16;
-#if BUILDFLAG(IS_ANDROID)
-  static constexpr size_t kLowEndMaxNumSkSurface = 4;
-  if (base::SysInfo::IsLowEndDevice()) {
-    return kLowEndMaxNumSkSurface;
-  } else {
-    return kNormalMaxNumSkSurface;
-  }
-#else
   return kNormalMaxNumSkSurface;
-#endif
 }
 
 void ReportPipelineCacheStats(

@@ -32,18 +32,14 @@
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/password_manager/password_change/change_password_form_waiter.h"
 #include "chrome/browser/password_manager/password_change/features.h"
 #include "chrome/browser/password_manager/password_change/model_quality_logs_uploader.h"
 #include "chrome/browser/password_manager/password_change_delegate_impl.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 inline constexpr base::TimeDelta kThrottleDuration = base::Days(14);
-#endif
 
 // Shorten the name to spare line breaks. The code provides enough context
 // already.
@@ -73,7 +69,6 @@ CreateLoggerPair(autofill::LogRouter* log_router) {
   return {std::move(log_manager), std::move(logger)};
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool IsPasswordFieldVisible(const password_manager::PasswordForm& form) {
   for (autofill::FieldRendererId renderer_id :
        {form.password_element_renderer_id,
@@ -87,7 +82,6 @@ bool IsPasswordFieldVisible(const password_manager::PasswordForm& form) {
   }
   return true;
 }
-#endif
 
 }  // namespace
 
@@ -112,41 +106,29 @@ ChromePasswordChangeService::~ChromePasswordChangeService() {
 }
 
 bool ChromePasswordChangeService::IsPasswordChangeAvailable() const {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return GetGeneralAvailability() == PasswordChangeAvailability::kAvailable;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromePasswordChangeService::RecordLoginAttemptQuality(
     password_manager::LogInWithChangedPasswordOutcome login_outcome,
     const GURL& page_url) const {
-#if BUILDFLAG(IS_ANDROID)
-  return;
-#else
   optimization_guide::ModelQualityLogsUploaderService* mqls_service =
       optimization_keyed_service_->GetModelQualityLogsUploaderService();
   if (mqls_service) {
     ModelQualityLogsUploader::RecordLoginAttemptQuality(mqls_service, page_url,
                                                         login_outcome);
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool ChromePasswordChangeService::IsPasswordChangeSupported(
     const password_manager::PasswordForm& form,
     bool is_non_password_login_detected) const {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   PasswordChangeAvailability availability =
       GetPerSiteAvailability(form, is_non_password_login_detected);
   base::UmaHistogramEnumeration("PasswordManager.PasswordChangeAvailability",
                                 availability);
 
   return availability == PasswordChangeAvailability::kAvailable;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool ChromePasswordChangeService::UserIsActivePasswordChangeUser() const {
@@ -172,7 +154,6 @@ void ChromePasswordChangeService::AddChangePasswordUrlOverride(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool ChromePasswordChangeService::HasChangePasswordUrlOverride() const {
   return !override_urls_.empty();
 }
@@ -197,12 +178,10 @@ GURL ChromePasswordChangeService::GetChangePasswordURLOverride(
   }
   return GURL();
 }
-#endif
 
 void ChromePasswordChangeService::OfferPasswordChangeUi(
     password_manager::PasswordForm credentials,
     content::WebContents* web_contents) {
-#if !BUILDFLAG(IS_ANDROID)
   GURL change_pwd_url = GetChangePasswordURLOverride(credentials.url);
   if (!change_pwd_url.is_valid()) {
     change_pwd_url = credentials.change_password_url;
@@ -216,9 +195,6 @@ void ChromePasswordChangeService::OfferPasswordChangeUi(
           tabs::TabInterface::GetFromContents(web_contents));
   delegate->AddObserver(this);
   password_change_delegates_.push_back(std::move(delegate));
-#else
-  NOTREACHED();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 PasswordChangeDelegate* ChromePasswordChangeService::GetPasswordChangeDelegate(
@@ -252,7 +228,6 @@ void ChromePasswordChangeService::Shutdown() {
   password_change_delegates_.clear();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 PasswordChangeAvailability ChromePasswordChangeService::GetGeneralAvailability()
     const {
   auto [log_manager, logger] = CreateLoggerPair(log_router_);
@@ -396,4 +371,3 @@ PasswordChangeAvailability ChromePasswordChangeService::GetPerSiteAvailability(
 
   return PasswordChangeAvailability::kAvailable;
 }
-#endif

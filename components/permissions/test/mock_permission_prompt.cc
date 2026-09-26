@@ -13,9 +13,7 @@
 #include "components/permissions/test/mock_permission_prompt_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/vector_icon_types.h"
-#endif
 
 namespace permissions {
 
@@ -30,19 +28,11 @@ bool MockPermissionPrompt::UpdateAnchor() {
 
 PermissionPrompt::TabSwitchingBehavior
 MockPermissionPrompt::GetTabSwitchingBehavior() {
-#if BUILDFLAG(IS_ANDROID)
-  return TabSwitchingBehavior::kKeepPromptAlive;
-#else
   return TabSwitchingBehavior::kDestroyPromptButKeepRequestPending;
-#endif
 }
 
 PermissionPromptDisposition MockPermissionPrompt::GetPromptDisposition() const {
-#if BUILDFLAG(IS_ANDROID)
-  return PermissionPromptDisposition::MODAL_DIALOG;
-#else
   return PermissionPromptDisposition::ANCHORED_BUBBLE;
-#endif
 }
 
 std::optional<gfx::Rect> MockPermissionPrompt::GetViewBoundsInScreen() const {
@@ -70,21 +60,8 @@ MockPermissionPrompt::MockPermissionPrompt(MockPermissionPromptFactory* factory,
   for (const auto& request : delegate_->Requests()) {
     RequestType request_type = request->request_type();
     // The actual prompt will call these, so test they're sane.
-#if BUILDFLAG(IS_ANDROID)
-    // For kStorageAccess, the prompt itself calculates the message text.
-    if (request_type != permissions::RequestType::kStorageAccess) {
-      EXPECT_FALSE(
-          request
-              ->GetDialogAnnotatedMessageText(delegate_->GetRequestingOrigin())
-              .text.empty());
-    }
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_NE(0, permissions::GetIconId(request_type));
-#endif  // BUILDFLAG(IS_ANDROID)
-#else
     EXPECT_FALSE(request->GetMessageTextFragment().empty());
     EXPECT_FALSE(permissions::GetIconId(request_type).is_empty());
-#endif  // BUILDFLAG(IS_ANDROID)
     EXPECT_EQ(request->ShouldUseTwoOriginPrompt(),
               request_type == permissions::RequestType::kStorageAccess);
   }

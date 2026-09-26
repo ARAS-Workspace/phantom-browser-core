@@ -143,7 +143,6 @@
 #include "ui/views/views_features.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -152,7 +151,6 @@
 #include "chrome/browser/ui/tabs/tab_enums.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/api/developer_private/developer_private_functions.h"
@@ -217,7 +215,6 @@ const char kArbitraryPage[] = "/title1.html";
 const char kPageWithContentScript[] = "/devtools/page_with_content_script.html";
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 const char kDispatchKeyEventShowsAutoFill[] =
     "/devtools/dispatch_key_event_shows_auto_fill.html";
 const char kEmulateNetworkConditionsPage[] =
@@ -229,7 +226,6 @@ const char kReloadSharedWorkerTestWorker[] =
 const char kSharedWorkerTestPage[] = "/workers/workers_ui_shared_worker.html";
 const char kSharedWorkerTestWorker[] = "/workers/workers_ui_shared_worker.js";
 const char kWindowOpenTestPage[] = "/devtools/window_open.html";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 template <typename... T>
 void DispatchOnTestSuiteSkipCheck(DevToolsWindow* window,
@@ -332,11 +328,6 @@ class DevToolsTest : public PlatformBrowserTest {
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     PlatformBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_ANDROID)
-    // Disable the first-run experience (FRE) to prevent FirstRunActivity from
-    // being launched when launching a new activity.
-    command_line->AppendSwitch("disable-fre");
-#endif
   }
 
   void SetUpOnMainThread() override {
@@ -424,15 +415,7 @@ class DevToolsTest : public PlatformBrowserTest {
     return DevToolsWindowTesting::Get(window_)->toolbox_web_contents();
   }
 
-  BrowserWindowInterface* browser_window_interface() {
-#if BUILDFLAG(IS_ANDROID)
-    std::vector<BrowserWindowInterface*> all_browsers =
-        GetAllBrowserWindowInterfaces();
-    return all_browsers.empty() ? nullptr : all_browsers.front();
-#else
-    return browser();
-#endif
-  }
+  BrowserWindowInterface* browser_window_interface() { return browser(); }
 
   bool NavigateToURL(content::WebContents* web_contents, const GURL& url) {
     return chrome_test_utils::NavigateToURL(web_contents, url);
@@ -469,7 +452,6 @@ class SitePerProcessDevToolsTest : public DevToolsTest {
   }
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Used to block until a dev tools window gets beforeunload event.
 class DevToolsWindowBeforeUnloadObserver : public content::WebContentsObserver {
  public:
@@ -604,7 +586,6 @@ class DevToolsBeforeUnloadTest : public DevToolsTest {
     return view;
   }
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
@@ -904,7 +885,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsServiceWorkerExtensionTest,
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 class WorkerDevToolsTest : public InProcessBrowserTest {
  public:
   WorkerDevToolsTest() : window_(nullptr) {}
@@ -1130,7 +1110,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsBeforeUnloadTest,
     close_observer->Wait();
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests scripts panel showing.
 IN_PROC_BROWSER_TEST_F(DevToolsTest, TestShowScriptsTab) {
@@ -1805,13 +1784,8 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_DevtoolsInDevTools) {
 // ToDo(993982): The test is flaky (timeout, crash, and fail) on several builds:
 // Debug, Windows, Mac, MSan, and ASan.
 // TODO(crbug.com/405219356): Flaky. Enable the test on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_DevToolsExtensionSecurityPolicyGrants \
-  DISABLED_DevToolsExtensionSecurityPolicyGrants
-#else
 #define MAYBE_DevToolsExtensionSecurityPolicyGrants \
   DevToolsExtensionSecurityPolicyGrants
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
                        MAYBE_DevToolsExtensionSecurityPolicyGrants) {
   auto dir = std::make_unique<extensions::TestExtensionDir>();
@@ -2109,7 +2083,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
 // TODO(crbug.com/41495883): Re-enable on linux.
 // TODO(crbug.com/405219356, crbug.com/406406862): Enable the test on Android.
 // This requires the support of DevTools in a web app window.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_CanInspectExtensionOffscreenDoc \
   DISABLED_CanInspectExtensionOffscreenDoc
 #else
@@ -2366,11 +2340,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestPauseWhenLoadingDevTools) {
 // Tests network timing.
 // TODO(crbug.com/40218872): Enable this flaky test. This is flaky on Android
 // build.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_TestNetworkTiming DISABLED_TestNetworkTiming
-#else
 #define MAYBE_TestNetworkTiming TestNetworkTiming
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestNetworkTiming) {
   RunTest("testNetworkTiming", kSlowTestPage);
 }
@@ -2378,7 +2348,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestNetworkTiming) {
 // Tests network size.
 // TODO(crbug/40218872): Enable this flaky test. This is flaky on Linux debug
 // build and Android build. See also: https://crrev.com/c/2772698
-#if (BUILDFLAG(IS_LINUX) && !defined(NDEBUG)) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_TestNetworkSize DISABLED_TestNetworkSize
 #else
 #define MAYBE_TestNetworkSize TestNetworkSize
@@ -2390,7 +2360,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestNetworkSize) {
 // Tests raw headers text.
 // TODO(crbug.com/40218872): Enable this flaky test. This is flaky on Linux
 // debug build and Android build.
-#if (BUILDFLAG(IS_LINUX) && !defined(NDEBUG)) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_TestNetworkSyncSize DISABLED_TestNetworkSyncSize
 #else
 #define MAYBE_TestNetworkSyncSize TestNetworkSyncSize
@@ -2464,7 +2434,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, DISABLED_TestConsoleOnNavigateBack) {
   RunTest("testConsoleOnNavigateBack", kNavigateBackTestPage);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // Flaking on linux runs, see crbug.com/40638917.
 #define MAYBE_TestDeviceEmulation DISABLED_TestDeviceEmulation
 #else
@@ -2508,7 +2478,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsVisibilityTest,
 }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 class BrowserAutofillManagerTestDelegateDevtoolsImpl
     : public autofill::BrowserAutofillManagerTestDelegate {
  public:
@@ -2588,7 +2557,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, testForwardedKeysChanged) {
   RunTestFunction(window_, "testForwardedKeysChanged");
   CloseDevToolsWindow();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(DevToolsTest, testCloseActionRecorded) {
   base::UserActionTester user_action_tester;
@@ -2615,7 +2583,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, TestSettings) {
   CloseDevToolsWindow();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that external navigation from inspector page is always handled by
 // DevToolsWindow and results in inspected page navigation.  See also
 // https://crbug.com/40077090.
@@ -2851,7 +2818,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsAgentHostTest, TestAgentHostReleased) {
   EXPECT_FALSE(DevToolsAgentHost::GetForId(agent_id).get())
       << "DevToolsAgentHost is not released when the tab is closed";
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 
@@ -3046,12 +3012,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsDisallowedForForceInstalledExtensionsPolicyTest,
 
 // TODO(crbug.com/405219356, crbug.com/406406862): Enable on Android.
 // This requires the support of DevTools in a web app window.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ClosedAfterNavigationToExtension \
-  DISABLED_ClosedAfterNavigationToExtension
-#else
 #define MAYBE_ClosedAfterNavigationToExtension ClosedAfterNavigationToExtension
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsDisallowedForForceInstalledExtensionsPolicyTest,
                        MAYBE_ClosedAfterNavigationToExtension) {
   // DevTools are disallowed for policy-installed extensions by default.
@@ -3095,7 +3056,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsDisallowedForForceInstalledExtensionsPolicyTest,
   ASSERT_TRUE(DevToolsWindow::FindDevToolsWindow(agent_host.get()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(DevToolsDisallowedForForceInstalledExtensionsPolicyTest,
                        ExtensionMainFrameWithBlocklistedIframeBlocksDevTools) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -3196,7 +3156,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsDisallowedForForceInstalledExtensionsPolicyTest,
   auto agent_host = GetOrCreateDevToolsHostForWebContents(web_contents);
   EXPECT_TRUE(DevToolsWindow::FindDevToolsWindow(agent_host.get()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class DevToolsAllowedByCommandLineSwitch
     : public DevToolsDisallowedForForceInstalledExtensionsPolicyTest {
@@ -3224,7 +3183,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsAllowedByCommandLineSwitch,
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 class DevToolsNetInfoTest : public DevToolsTest {
  protected:
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -3362,8 +3320,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, TestRawHeadersWithRedirectAndHSTS) {
   CloseDevToolsWindow();
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 // Tests that OpenInNewTab filters URLs.
 // TODO(crbug.com/40847130): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
@@ -3458,12 +3414,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, TestOpenSearchResultsInNewTab) {
 
   std::string opened_url = new_wc->GetVisibleURL().spec();
   constexpr char kExpectedUrl[] =
-#if BUILDFLAG(IS_ANDROID)
-      "https://www.google.com/"
-      "search?q=test+query&sourceid=chrome-mobile&ie=UTF-8";
-#else
       "https://www.google.com/search?q=test+query&sourceid=chrome&ie=UTF-8";
-#endif
   EXPECT_EQ(opened_url, kExpectedUrl);
   CloseDevToolsWindow();
 }
@@ -3599,8 +3550,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, ExistsForWebContentsAfterClosing) {
   // it is now closed.
   ASSERT_TRUE(content::DevToolsAgentHost::HasFor(GetInspectedTab()));
 }
-
-#if !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(InProcessBrowserTest, BrowserCloseWithBeforeUnload) {
   EXPECT_FALSE(KeepAliveRegistry::GetInstance()->IsOriginRegistered(
@@ -4103,7 +4052,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsPolicyBFCacheTest,
   DevToolsWindowTesting::OpenDevToolsWindowSync(web_contents, false);
   EXPECT_TRUE(DevToolsWindow::FindDevToolsWindow(agent_host.get()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 class DevToolsExtensionHostsPolicyTest : public DevToolsExtensionTest {
@@ -4194,7 +4142,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionHostsPolicyTest,
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Times out. See https://crbug.com/41375011.
 IN_PROC_BROWSER_TEST_F(SitePerProcessDevToolsTest,
                        DISABLED_InputDispatchEventsToOOPIF) {
@@ -4223,7 +4170,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessDevToolsTest,
   RunTestFunction(window, "testInputDispatchEventsToOOPIF");
   DevToolsWindowTesting::CloseDevToolsWindowSync(window);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 // See https://crbug.com/40630787
@@ -4450,7 +4396,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, NoJavascriptUrlOnDevtools) {
   EXPECT_EQ(false, content::EvalJs(wc, "!!window.xss"));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // According to DevToolsTest.AutoAttachToWindowOpen, using
 // According to DevToolsTest.AutoAttachToWindowOpen, using
 // `waitForDebuggerPaused()` is flaky on Linux.
@@ -5041,7 +4986,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsGdpProfilesTest,
 #endif
   EXPECT_EQ(configGdpAvailability2.FindInt("enterprisePolicyValue").value(), 2);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class DevToolsSelfXssTest : public DevToolsTest {
  public:

@@ -2578,14 +2578,8 @@ TEST_P(HttpProxyConnectJobTest, ConnectionTimeoutNoNQE) {
           *CreateParams(true /* tunnel */, SecureDnsPolicy::kAllow),
           /*network_quality_estimator=*/nullptr);
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android and iOS, when there's no NQE, there's a hard-coded alternate
-  // proxy timeout.
-  EXPECT_EQ(base::Seconds(10), alternate_connection_timeout);
-#else
   // On other platforms, there is not.
   EXPECT_EQ(base::TimeDelta(), alternate_connection_timeout);
-#endif
 }
 
 TEST_P(HttpProxyConnectJobTest, ConnectionTimeoutMin) {

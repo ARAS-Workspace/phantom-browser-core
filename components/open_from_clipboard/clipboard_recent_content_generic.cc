@@ -13,10 +13,6 @@
 #include "ui/base/data_transfer_policy/data_transfer_endpoint.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/base/clipboard/clipboard_android.h"
-#endif
-
 namespace {
 // Schemes appropriate for suggestion by ClipboardRecentContent.
 constexpr const char* kAuthorizedSchemes[] = {
@@ -66,17 +62,10 @@ void ClipboardRecentContentGeneric::GetRecentURLFromClipboard(
   ui::DataTransferEndpoint data_dst = ui::DataTransferEndpoint(
       ui::EndpointType::kDefault, {.notify_if_restricted = false});
 
-#if BUILDFLAG(IS_ANDROID)
-  ui::Clipboard::GetForCurrentThread()->ReadURL(
-      std::move(data_dst),
-      base::BindOnce(&ClipboardRecentContentGeneric::OnReadURL,
-                     weak_factory_.GetWeakPtr(), std::move(callback)));
-#else
   ui::Clipboard::GetForCurrentThread()->ReadAsciiText(
       ui::ClipboardBuffer::kCopyPaste, std::move(data_dst),
       base::BindOnce(&ClipboardRecentContentGeneric::OnReadURLAsAsciiText,
                      weak_factory_.GetWeakPtr(), std::move(callback)));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ClipboardRecentContentGeneric::OnReadURLAsAsciiText(

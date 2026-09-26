@@ -60,10 +60,6 @@
 #include "ui/base/webui/web_ui_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/common/offline_page_auto_fetcher.mojom.h"
-#endif
-
 using content::RenderFrame;
 using content::RenderFrameObserver;
 using content::RenderThread;
@@ -85,11 +81,7 @@ bool IsExtensionExtendedErrorCode(int extended_error_code) {
 }
 
 bool IsAutoFetchFeatureEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(features::kOfflineAutoFetch);
-#else   // BUILDFLAG(IS_ANDROID)
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool IsRunningInForcedAppMode() {
@@ -315,28 +307,6 @@ void NetErrorHelper::SetIsShowingDownloadButton(bool show) {
   GetRemoteNetErrorPageSupport()->SetIsShowingDownloadButtonInErrorPage(show);
 #endif  // BUILDFLAG(ENABLE_OFFLINE_PAGES)
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void NetErrorHelper::SetAutoFetchState(
-    chrome::mojom::OfflinePageAutoFetcherScheduleResult result) {
-  const char* scheduled = "false";
-  const char* can_schedule = "false";
-  switch (result) {
-    case chrome::mojom::OfflinePageAutoFetcherScheduleResult::kAlreadyScheduled:
-    case chrome::mojom::OfflinePageAutoFetcherScheduleResult::kScheduled:
-      scheduled = "true";
-      can_schedule = "true";
-      break;
-    case chrome::mojom::OfflinePageAutoFetcherScheduleResult::kOtherError:
-      break;
-    case chrome::mojom::OfflinePageAutoFetcherScheduleResult::kNotEnoughQuota:
-      can_schedule = "true";
-      break;
-  }
-  render_frame()->ExecuteJavaScript(base::UTF8ToUTF16(base::StrCat(
-      {"setAutoFetchState(", scheduled, ", ", can_schedule, ");"})));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void NetErrorHelper::DNSProbeStatus(int32_t status_num) {
   DCHECK(status_num >= 0 && status_num < error_page::DNS_PROBE_MAX);

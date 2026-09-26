@@ -166,21 +166,12 @@ class PasswordReceiverServiceImplTest : public testing::Test {
   // passwords. This depends only on the platform. It isn't affected by whether
   // the user under test is currently syncing or not.
   TestPasswordStore& expected_password_store_for_syncing() {
-#if BUILDFLAG(IS_ANDROID)
-    // Android differs from the rest, syncing users use the account store.
-    return account_password_store();
-#else
     return profile_password_store();
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // The PasswordStore where syncing users should NOT store shared passwords.
   TestPasswordStore& unexpected_password_store_for_syncing() {
-#if BUILDFLAG(IS_ANDROID)
-    return profile_password_store();
-#else
     return account_password_store();
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   TestPasswordStore& profile_password_store() {
@@ -206,14 +197,9 @@ class PasswordReceiverServiceImplTest : public testing::Test {
       const PasswordFormDigest& form,
       const std::vector<std::string>& affiliated_realms,
       const std::vector<std::string>& grouped_realms = {}) {
-#if BUILDFLAG(IS_ANDROID)
-    expected_password_store_for_syncing().SetAffiliatedAndGroupedRealms(
-        form.signon_realm, affiliated_realms, grouped_realms);
-#else
     expected_affiliated_match_helper_for_syncing()
         .ExpectCallToGetAffiliatedAndGrouped(
             form, affiliated_realms, grouped_realms, /*repeatedly=*/true);
-#endif
   }
 
  private:

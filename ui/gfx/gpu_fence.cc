@@ -10,7 +10,7 @@
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include <sync/sync.h>
 #endif
 
@@ -43,7 +43,7 @@ void GpuFence::Wait() {
     return;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   static const int kInfiniteSyncWaitTimeout = -1;
   DCHECK_GE(fence_handle_.Peek(), 0);
   if (sync_wait(fence_handle_.Peek(), kInfiniteSyncWaitTimeout) < 0) {
@@ -58,7 +58,7 @@ void GpuFence::Wait() {
 GpuFence::FenceStatus GpuFence::GetStatusChangeTime(int fd,
                                                     base::TimeTicks* time) {
   DCHECK_NE(fd, -1);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   auto info =
       std::unique_ptr<struct sync_file_info, void (*)(struct sync_file_info*)>{
           sync_file_info(fd), sync_file_info_free};
@@ -96,11 +96,11 @@ GpuFence::FenceStatus GpuFence::GetStatusChangeTime(int fd,
   return FenceStatus::kSignaled;
 #else
   NOTREACHED();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 base::TimeTicks GpuFence::GetMaxTimestamp() const {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   base::TimeTicks timestamp;
   FenceStatus status = GetStatusChangeTime(fence_handle_.Peek(), &timestamp);
   DCHECK_EQ(status, FenceStatus::kSignaled);

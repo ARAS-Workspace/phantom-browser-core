@@ -292,10 +292,6 @@ void GetDawnTogglesForSkiaGraphite(
   force_enabled_toggles->push_back("dump_shaders_on_failure");
   if (backend_type == wgpu::BackendType::Vulkan) {
     force_enabled_toggles->push_back("vulkan_monolithic_pipeline_cache");
-#if BUILDFLAG(IS_ANDROID)
-    force_enabled_toggles->push_back(
-        "ignore_imported_ahardwarebuffer_vulkan_image_size");
-#endif
   }
 #endif  // DCHECK_IS_ON()
 }
@@ -355,7 +351,7 @@ void ReportWebGPUAdapterMetrics(dawn::native::Instance* instance) {
 
 void ReportWebGPUSupportMetrics(dawn::native::Instance* instance) {
   static BASE_FEATURE(kCollectWebGPUSupportMetrics,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
                       base::FEATURE_DISABLED_BY_DEFAULT);
 #else
                       base::FEATURE_ENABLED_BY_DEFAULT);
@@ -605,13 +601,6 @@ bool CollectGraphicsInfoGL(GPUInfo* gpu_info, gl::GLDisplay* display) {
   }
   gpu_info->max_msaa_samples = base::NumberToString(max_samples);
 
-#if BUILDFLAG(IS_ANDROID)
-  gpu_info->can_support_threaded_texture_mailbox =
-      egl_display->ext->b_EGL_KHR_fence_sync &&
-      egl_display->ext->b_EGL_KHR_image_base &&
-      egl_display->ext->b_EGL_KHR_gl_texture_2D_image &&
-      gfx::HasExtension(extension_set, "GL_OES_EGL_image");
-#else
   gl::GLWindowSystemBindingInfo window_system_binding_info;
   if (gl::init::GetGLWindowSystemBindingInfo(gl_info,
                                              &window_system_binding_info)) {
@@ -621,7 +610,6 @@ bool CollectGraphicsInfoGL(GPUInfo* gpu_info, gl::GLDisplay* display) {
     gpu_info->direct_rendering_version =
         window_system_binding_info.direct_rendering_version;
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   bool supports_robustness =
       gfx::HasExtension(extension_set, "GL_EXT_robustness") ||
@@ -757,11 +745,7 @@ void FillGPUInfoFromSystemInfo(GPUInfo* gpu_info,
 
 void CollectGraphicsInfoForTesting(GPUInfo* gpu_info) {
   DCHECK(gpu_info);
-#if BUILDFLAG(IS_ANDROID)
-  CollectContextGraphicsInfo(gpu_info);
-#else
   CollectBasicGraphicsInfo(gpu_info);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool CollectGpuExtraInfo(gfx::GpuExtraInfo* gpu_extra_info,

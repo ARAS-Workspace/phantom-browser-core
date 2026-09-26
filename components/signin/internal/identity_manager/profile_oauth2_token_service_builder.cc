@@ -14,10 +14,6 @@
 #include "components/signin/public/base/signin_client.h"
 #include "components/signin/public/base/signin_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/internal/identity_manager/profile_oauth2_token_service_delegate_android.h"
-#endif
-
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "components/signin/internal/identity_manager/mutable_profile_oauth2_token_service_delegate.h"
 #include "components/signin/internal/identity_manager/token_binding_helper.h"
@@ -27,15 +23,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/40637107) Provide AccountManagerFacade as a parameter once
-// IdentityServicesProvider owns its instance management.
-std::unique_ptr<ProfileOAuth2TokenServiceDelegateAndroid>
-CreateAndroidOAuthDelegate(AccountTrackerService* account_tracker_service) {
-  return std::make_unique<ProfileOAuth2TokenServiceDelegateAndroid>(
-      account_tracker_service);
-}
-#elif BUILDFLAG(ENABLE_DICE_SUPPORT)
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 std::unique_ptr<MutableProfileOAuth2TokenServiceDelegate>
 CreateMutableProfileOAuthDelegate(
@@ -65,7 +53,7 @@ CreateMutableProfileOAuthDelegate(
       MutableProfileOAuth2TokenServiceDelegate::FixRequestErrorCallback()
   );
 }
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 std::unique_ptr<ProfileOAuth2TokenServiceDelegate>
 CreateOAuth2TokenServiceDelegate(
@@ -79,9 +67,7 @@ CreateOAuth2TokenServiceDelegate(
     unexportable_keys::UnexportableKeyService* unexportable_key_service,
 #endif
     network::NetworkConnectionTracker* network_connection_tracker) {
-#if BUILDFLAG(IS_ANDROID)
-  return CreateAndroidOAuthDelegate(account_tracker_service);
-#elif BUILDFLAG(ENABLE_DICE_SUPPORT)
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
   // Fall back to |MutableProfileOAuth2TokenServiceDelegate| on all platforms
   // other than Android, iOS, and Chrome OS (Ash).
   return CreateMutableProfileOAuthDelegate(
@@ -90,7 +76,7 @@ CreateOAuth2TokenServiceDelegate(
       network_connection_tracker);
 #else
   NOTREACHED();
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 }
 
 }  // namespace

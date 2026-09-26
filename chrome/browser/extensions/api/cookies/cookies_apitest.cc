@@ -44,13 +44,11 @@ enum class SameSiteCookieSemantics {
 
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 // This test cannot be run by a Service Worked-based extension
 // because it uses the Document object.
 IN_PROC_BROWSER_TEST_F(ExtensionApiTest, ReadFromDocument) {
   ASSERT_TRUE(RunExtensionTest("cookies/read_from_doc")) << message_;
 }
-#endif
 
 class CookiesApiTest
     : public ExtensionApiTest,
@@ -111,11 +109,7 @@ INSTANTIATE_TEST_SUITE_P(All,
                                            SameSiteCookieSemantics::kModern));
 
 // TODO(crbug.com/371423073): Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Cookies DISABLED_Cookies
-#else
 #define MAYBE_Cookies Cookies
-#endif
 IN_PROC_BROWSER_TEST_P(CookiesApiTest, MAYBE_Cookies) {
   ASSERT_TRUE(RunTest("cookies/api", /*allow_in_incognito=*/false,
                       AreSameSiteCookieSemanticsModern() ? "true" : "false"))
@@ -130,7 +124,6 @@ IN_PROC_BROWSER_TEST_P(CookiesApiTest, CookiesNoPermission) {
   ASSERT_TRUE(RunTest("cookies/no_permission")) << message_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/488468448): On Android, crashes without a stack while waiting
 // for the Java layer to asynchronously return the Java window.
 IN_PROC_BROWSER_TEST_P(CookiesApiTest, CookiesEventsSpanningAsync) {
@@ -152,9 +145,7 @@ IN_PROC_BROWSER_TEST_P(CookiesApiTest, CookiesEventsSpanningAsync) {
                       /*allow_in_incognito=*/true))
       << message_;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android only supports a single primary profile and a single OTR profile.
 IN_PROC_BROWSER_TEST_P(CookiesApiTest, CookiesEventsObservePrimaryOTROnly) {
   // In addition to above, this test makes sure that CookiesEventRouter
@@ -177,7 +168,6 @@ IN_PROC_BROWSER_TEST_P(CookiesApiTest, CookiesEventsObservePrimaryOTROnly) {
     ProfileDestroyer::DestroyOTRProfileWhenAppropriate(second_profile);
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(CookiesApiTest, CookiesEventsSpanning) {
   // We need to initialize an incognito mode window in order have an initialized

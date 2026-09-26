@@ -45,10 +45,6 @@
 #include "chrome/browser/media/webrtc/display_media_access_handler.h"
 #endif  // BUILDFLAG(ENABLE_SCREEN_CAPTURE)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/common/content_features.h"
-#endif  //  BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/media/webrtc/desktop_capture_access_handler.h"
 #include "chrome/browser/media/webrtc/tab_capture_access_handler.h"
@@ -73,15 +69,8 @@ MediaCaptureDevicesDispatcher::MediaCaptureDevicesDispatcher()
       media_stream_capture_indicator_(new MediaStreamCaptureIndicator()) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(kAndroidMediaPicker)) {
-    media_access_handlers_.push_back(
-        std::make_unique<DisplayMediaAccessHandler>());
-  }
-#elif !BUILDFLAG(IS_ANDROID)
   media_access_handlers_.push_back(
       std::make_unique<DisplayMediaAccessHandler>());
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   media_access_handlers_.push_back(
@@ -132,19 +121,6 @@ void MediaCaptureDevicesDispatcher::ProcessMediaAccessRequest(
     content::MediaResponseCallback callback,
     const extensions::Extension* extension) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Kill switch for getDisplayMedia() on browser side to prevent renderer from
-  // bypassing blink side checks.
-  if (request.video_type ==
-          blink::mojom::MediaStreamType::DISPLAY_VIDEO_CAPTURE &&
-      !base::FeatureList::IsEnabled(features::kUserMediaScreenCapturing)) {
-    std::move(callback).Run(
-        blink::mojom::StreamDevicesSet(),
-        blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED, nullptr);
-    return;
-  }
-#endif
 
   auto* render_frame_host = content::RenderFrameHost::FromID(
       request.render_process_id, request.render_frame_id);

@@ -22,14 +22,7 @@ ClientSharedImageInterface::ClientSharedImageInterface(
     scoped_refptr<gpu::GpuChannelHost> channel)
     : gpu_channel_(std::move(channel)),
       proxy_(proxy),
-      shared_memory_pool_(
-#if BUILDFLAG(IS_ANDROID)
-          base::MakeRefCounted<base::UnsafeSharedMemoryPool>()
-#else
-          nullptr
-#endif
-      ) {
-}
+      shared_memory_pool_(nullptr) {}
 
 ClientSharedImageInterface::~ClientSharedImageInterface() {
   gpu::SyncToken sync_token;
@@ -222,21 +215,6 @@ void ClientSharedImageInterface::CopyToGpuMemoryBuffer(
     const Mailbox& mailbox) {
   proxy_->CopyToGpuMemoryBuffer(sync_token, mailbox);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void ClientSharedImageInterface::CopyNativeGmbToSharedMemoryAsync(
-    gfx::GpuMemoryBufferHandle buffer_handle,
-    base::UnsafeSharedMemoryRegion memory_region,
-    base::OnceCallback<void(bool)> callback) {
-#if BUILDFLAG(IS_ANDROID)
-  CHECK_EQ(buffer_handle.type,
-           gfx::GpuMemoryBufferType::ANDROID_HARDWARE_BUFFER);
-#endif
-  CHECK(memory_region.IsValid());
-  proxy_->CopyNativeGmbToSharedMemoryAsync(
-      std::move(buffer_handle), std::move(memory_region), std::move(callback));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void ClientSharedImageInterface::DestroySharedImage(const SyncToken& sync_token,
                                                     const Mailbox& mailbox) {

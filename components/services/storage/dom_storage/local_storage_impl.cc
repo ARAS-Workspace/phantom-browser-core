@@ -57,14 +57,10 @@ StorageAreaImpl::Options createOptions() {
   options.default_commit_delay = kCommitDefaultDelaySecs;
   options.max_bytes_per_hour = kMaxBytesPerHour;
   options.max_commits_per_hour = kMaxCommitsPerHour;
-#if BUILDFLAG(IS_ANDROID)
-    options.cache_mode = StorageAreaImpl::CacheMode::KEYS_ONLY_WHEN_POSSIBLE;
-#else
     options.cache_mode = StorageAreaImpl::CacheMode::KEYS_AND_VALUES;
     if (base::SysInfo::IsLowEndDevice()) {
       options.cache_mode = StorageAreaImpl::CacheMode::KEYS_ONLY_WHEN_POSSIBLE;
     }
-#endif
     return options;
 }
 }  // namespace

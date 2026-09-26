@@ -207,11 +207,6 @@ TEST_P(GPUInfoCollectorTest, CollectGraphicsInfoGL) {
     EXPECT_EQ(test_values_.gpu.driver_vendor, gpu_info.gpu.driver_vendor);
     EXPECT_EQ(test_values_.gpu.driver_version, gpu_info.gpu.driver_version);
   }
-#elif BUILDFLAG(IS_ANDROID)
-  if (GetParam() == kMockedAndroid) {
-    EXPECT_EQ(test_values_.gpu.driver_vendor, gpu_info.gpu.driver_vendor);
-    EXPECT_EQ(test_values_.gpu.driver_version, gpu_info.gpu.driver_version);
-  }
 #else
   if (GetParam() == kMockedLinux) {
     EXPECT_EQ(test_values_.gpu.driver_vendor, gpu_info.gpu.driver_vendor);

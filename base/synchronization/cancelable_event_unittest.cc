@@ -70,7 +70,7 @@ TEST_F(CancelableEventTest, TimedWaitSuccess) {
 }
 
 // These are the platforms on which a functional CancelableEvent is implemented.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 
 TEST_F(CancelableEventTest, CancelSucceedsWhenNoWaiterAndWaitTimesOut) {
   CancelableEvent event;

@@ -92,15 +92,7 @@ const GroupConfigMap& BuildDefaultHubTypedGroups(bool is_incognito) {
     group_map = {
         // clang-format off
                 {GROUP_MOBILE_OPEN_TABS,
-#if BUILDFLAG(IS_ANDROID)
-         !is_incognito
-             ? CreateGroup(SECTION_MOBILE_OPEN_TABS,
-                           GroupConfig_RenderType_DEFAULT_VERTICAL,
-                           IDS_OMNIBOX_HUB_TYPED_MATCH_HEADER)
-             : CreateGroup(SECTION_MOBILE_OPEN_TABS)
-#else
              CreateGroup(SECTION_MOBILE_OPEN_TABS)
-#endif
         },
         {GROUP_MOBILE_BOOKMARKS,
              CreateGroup(SECTION_MOBILE_BOOKMARKS,
@@ -128,15 +120,7 @@ const GroupConfigMap& BuildDefaultTabSearchOverlayGroups(bool is_incognito) {
     group_map = {
         // clang-format off
         {GROUP_MOBILE_OPEN_TABS,
-#if BUILDFLAG(IS_ANDROID)
-         !is_incognito
-             ? CreateGroup(SECTION_MOBILE_OPEN_TABS,
-                           GroupConfig_RenderType_DEFAULT_VERTICAL,
-                           IDS_OMNIBOX_HUB_TYPED_MATCH_HEADER)
-             : CreateGroup(SECTION_MOBILE_OPEN_TABS)
-#else
              CreateGroup(SECTION_MOBILE_OPEN_TABS)
-#endif
         },
         {GROUP_MOBILE_HISTORY,
              CreateGroup(SECTION_MOBILE_HISTORY,

@@ -267,10 +267,6 @@ void DwaService::RecordCoarseSystemInformation(
   coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_MACOS);
 #elif BUILDFLAG(IS_LINUX)
   coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_LINUX);
-#elif BUILDFLAG(IS_ANDROID)
-  // TODO(b/366276323): Populate set_platform using more granular
-  // PLATFORM_ANDROID enum.
-  coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_ANDROID);
 #else
   coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_OTHER);
 #endif

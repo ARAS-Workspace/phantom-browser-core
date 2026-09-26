@@ -884,15 +884,7 @@ IOSurfaceRef WebNNTensorRepresentation::GetIOSurface() const {
 ///////////////////////////////////////////////////////////////////////////////
 // OverlayImageRepresentation
 
-#if BUILDFLAG(IS_ANDROID)
-AHardwareBuffer* OverlayImageRepresentation::GetAHardwareBuffer() {
-  NOTREACHED();
-}
-std::unique_ptr<base::android::ScopedHardwareBufferFenceSync>
-OverlayImageRepresentation::GetAHardwareBufferFenceSync() {
-  NOTREACHED();
-}
-#elif BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
 scoped_refptr<gfx::NativePixmap> OverlayImageRepresentation::GetNativePixmap() {
   return backing()->GetNativePixmap();
 }

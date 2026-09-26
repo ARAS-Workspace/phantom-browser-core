@@ -44,10 +44,6 @@
 #include "content/public/browser/download_manager.h"
 #include "content/public/browser/save_page_type.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/safe_browsing/content/common/file_type_policies.h"
 #endif
@@ -72,16 +68,11 @@ bool DownloadPathIsDangerous(const base::FilePath& download_path) {
   }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not have a desktop dir.
-  return false;
-#else
   base::FilePath desktop_dir;
   if (!base::PathService::Get(base::DIR_USER_DESKTOP, &desktop_dir)) {
     return false;
   }
   return (download_path == desktop_dir);
-#endif
 }
 
 base::FilePath::StringType StringToFilePathString(const std::string& src) {
@@ -152,12 +143,6 @@ DownloadPrefs::DownloadPrefs(Profile* profile) : profile_(profile) {
   }
 
   prompt_for_download_.Init(prefs::kPromptForDownload, prefs);
-#if BUILDFLAG(IS_ANDROID)
-  prompt_for_download_android_.Init(prefs::kPromptForDownloadAndroid, prefs);
-  RecordDownloadPromptStatus(
-      static_cast<DownloadPromptStatus>(*prompt_for_download_android_));
-  auto_open_pdf_enabled_.Init(prefs::kAutoOpenPdfEnabled, prefs);
-#endif
   download_path_.Init(prefs::kDownloadDefaultDirectory, prefs);
   save_file_path_.Init(prefs::kSaveFileDefaultDirectory, prefs);
   save_file_type_.Init(prefs::kSaveFileType, prefs);
@@ -254,20 +239,6 @@ void DownloadPrefs::RegisterProfilePrefs(
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   registry->RegisterBooleanPref(prefs::kOpenPdfDownloadInSystemReader, false);
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  DownloadPromptStatus download_prompt_status =
-      DownloadPromptStatus::SHOW_INITIAL;
-
-  registry->RegisterIntegerPref(
-      prefs::kPromptForDownloadAndroid,
-      static_cast<int>(download_prompt_status),
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-
-  registry->RegisterBooleanPref(prefs::kShowMissingSdCardErrorAndroid, true);
-  registry->RegisterBooleanPref(prefs::kAutoOpenPdfEnabled, false);
-  registry->RegisterListPref(prefs::kDownloadAppVerificationPromptTimestamps,
-                             {});
-#endif
 }
 
 base::FilePath DownloadPrefs::GetDefaultDownloadDirectoryForProfile() const {
@@ -332,18 +303,7 @@ bool DownloadPrefs::PromptForDownload() const {
   DCHECK(!download_path_.IsManaged() || !prompt_for_download_.GetValue());
 
 // Return the Android prompt for download only.
-#if BUILDFLAG(IS_ANDROID)
-  // Use |prompt_for_download_| preference for enterprise policy.
-  if (prompt_for_download_.IsManaged())
-    return prompt_for_download_.GetValue();
-
-  // As long as they haven't indicated in preferences they do not want the
-  // dialog shown, show the dialog.
-  return *prompt_for_download_android_ !=
-         static_cast<int>(DownloadPromptStatus::DONT_SHOW);
-#else
   return *prompt_for_download_;
-#endif
 }
 
 bool DownloadPrefs::IsDownloadPathManaged() const {
@@ -444,12 +404,6 @@ void DownloadPrefs::ResetAutoOpenByUser() {
 void DownloadPrefs::SkipSanitizeDownloadTargetPathForTesting() {
   skip_sanitize_download_target_path_for_testing_ = true;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool DownloadPrefs::IsAutoOpenPdfEnabled() {
-  return *auto_open_pdf_enabled_;
-}
-#endif
 
 void DownloadPrefs::SaveAutoOpenState() {
   std::string extensions;

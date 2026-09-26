@@ -19,17 +19,10 @@
 
 namespace webrtc_event_logging {
 
-#if BUILDFLAG(IS_ANDROID)
-const size_t kDefaultMaxLocalEventLogFileSizeBytes = 10'000'000;
-const size_t kMaxNumberLocalWebRtcEventLogFiles = 3;
-const size_t kDefaultMaxLocalDataChannelFileSizeBytes = 10'000'000;
-const size_t kMaxNumberLocalWebRtcDataChannelLogFiles = 3;
-#else
 const size_t kDefaultMaxLocalEventLogFileSizeBytes = 60'000'000;
 const size_t kMaxNumberLocalWebRtcEventLogFiles = 5;
 const size_t kDefaultMaxLocalDataChannelFileSizeBytes = 100'000'000;
 const size_t kMaxNumberLocalWebRtcDataChannelLogFiles = 5;
-#endif
 
 struct WebRtcLocalEventLogManager::LogFiles {
   std::unique_ptr<LogFileWriter> event_log;

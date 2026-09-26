@@ -18,9 +18,7 @@
 #include "components/url_matcher/url_util.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/public/browser/host_zoom_map.h"
-#endif
 
 SiteSettingsCounter::SiteSettingsCounter(
     HostContentSettingsMap* map,
@@ -33,11 +31,7 @@ SiteSettingsCounter::SiteSettingsCounter(
       pref_service_(pref_service) {
   DCHECK(map_);
   DCHECK(handler_registry_);
-#if !BUILDFLAG(IS_ANDROID)
   DCHECK(zoom_map_);
-#else
-  DCHECK(!zoom_map_);
-#endif
   DCHECK(pref_service_);
 }
 
@@ -85,7 +79,6 @@ void SiteSettingsCounter::Count() {
       ContentSettingsType::USB_CHOOSER_DATA,
       map_->GetSettingsForOneType(ContentSettingsType::USB_CHOOSER_DATA));
 
-#if !BUILDFLAG(IS_ANDROID)
   for (const auto& zoom_level : zoom_map_->GetAllZoomLevels()) {
     // zoom_level with non-empty scheme are only used for some internal
     // features and not stored in preferences. They are not counted.
@@ -94,7 +87,6 @@ void SiteSettingsCounter::Count() {
       hosts.insert(zoom_level.host);
     }
   }
-#endif
 
   auto handlers =
       handler_registry_->GetUserDefinedHandlers(period_start, period_end);

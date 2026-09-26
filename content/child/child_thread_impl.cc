@@ -83,10 +83,8 @@
 #if BUILDFLAG(IS_POSIX)
 #include "base/posix/global_descriptors.h"
 #include "content/public/common/content_descriptors.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "services/tracing/public/cpp/system_tracing_service.h"
 #include "services/tracing/public/cpp/traced_process.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_APPLE)
@@ -191,15 +189,6 @@ void TerminateSelfOnDisconnect(
 #endif
 #else
 
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(CLANG_PROFILING)
-  // TerminateSelfOnDisconnect() is called upon an IPC `OnChannelError`. Then,
-  // clang will dump the profile to a file in
-  // TerminateCurrentProcessImmediately. However, if the Android ActivityManager
-  // detects the render thread as an 'isolated not needed' process, it sends
-  // SIGKILL to this process, which corrupts the PGO profile. Here we call
-  // `_exit()` without dumping the `clang` profile.
-  _exit(0);
-#else
   if (base::FeatureList::IsEnabled(features::kKeepChildProcessAfterIPCReset)) {
     // On Android, the browser process unbinds all service bindings to the child
     // process to terminate the child process and AMS (ActivityManagerService)
@@ -222,7 +211,6 @@ void TerminateSelfOnDisconnect(
   }
 
   base::Process::TerminateCurrentProcessImmediately(0);
-#endif  // IS_ANDROID && CLANG_PROFILING
 #endif
 }
 
@@ -252,12 +240,6 @@ mojo::IncomingInvitation InitializeMojoIPCChannel() {
       mojo::PlatformChannelEndpoint(mojo::PlatformHandle(std::move(receive)));
 #endif
 #elif BUILDFLAG(IS_POSIX)
-#if BUILDFLAG(IS_ANDROID)
-  // If the endpoint is backed by a BinderRef it will be recovered here.
-  // Otherwise we'll assume a socket FD below.
-  endpoint = mojo::PlatformChannel::RecoverPassedEndpointFromCommandLine(
-      *base::CommandLine::ForCurrentProcess());
-#endif
   if (!endpoint.is_valid()) {
     endpoint =
         mojo::PlatformChannelEndpoint(mojo::PlatformHandle(base::ScopedFD(
@@ -344,7 +326,7 @@ class ChildThreadImpl::IOThreadState
                        weak_main_thread_, std::move(receiver)));
   }
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   void EnableSystemTracingService(
       mojo::PendingRemote<tracing::mojom::SystemTracingService> remote)
       override {

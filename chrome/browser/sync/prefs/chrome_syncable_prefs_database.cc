@@ -449,56 +449,6 @@ enum {
 constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
     std::string_view,
     sync_preferences::SyncablePrefMetadata>({
-#if BUILDFLAG(IS_ANDROID)
-    {language::prefs::kAppLanguagePromptShown,
-     {syncable_prefs_ids::kAppLanguagePromptShown, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAppRatingPromptShown,
-     {syncable_prefs_ids::kAppRatingPromptShown, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kContextualSearchEnabled,
-     {syncable_prefs_ids::kContextualSearchEnabled, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kContextualSearchWasFullyPrivacyEnabled,
-     {syncable_prefs_ids::kContextualSearchWasFullyPrivacyEnabled,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityImageLabelsEnabledAndroid,
-     {syncable_prefs_ids::kAccessibilityImageLabelsEnabledAndroid,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityImageLabelsOnlyOnWifi,
-     {syncable_prefs_ids::kAccessibilityImageLabelsOnlyOnWifi,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kPromptForDownloadAndroid,
-     {syncable_prefs_ids::kPromptForDownloadAndroid, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kReadAloudVoiceSettings,
-     {syncable_prefs_ids::kReadAloudVoiceSettings, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kMergeableDict}},
-    {prefs::kReadAloudSpeed,
-     {syncable_prefs_ids::kReadAloudSpeed, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kReadAloudPlaybackMode,
-     {syncable_prefs_ids::kReadAloudPlaybackMode, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kReadAloudHighlightingEnabled,
-     {syncable_prefs_ids::kReadAloudHighlightingEnabled, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kListenToThisPageEnabled,
-     {syncable_prefs_ids::kListenToThisPageEnabled, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-#else
     {prefs::kHatsSurveyMetadata,
      {syncable_prefs_ids::kHatsSurveyMetadata, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,
@@ -571,7 +521,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
      {syncable_prefs_ids::kOrganizerPanelEntrypointEnabled, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
-#endif  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     {extensions::pref_names::kPinnedExtensions,
      {syncable_prefs_ids::kPinnedExtensions, syncer::PREFERENCES,
@@ -720,7 +669,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
       sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
-#if !BUILDFLAG(IS_ANDROID)
     // The following prefs are constructed from a prefix in
     // website_settings_info and are registered in
     // content_settings_registry.
@@ -904,7 +852,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
      {syncable_prefs_ids::kProfileDefaultContentSettingValuesWindowPlacement,
       syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
-#endif
     // This is not exposed in a header.
     // TODO(crbug.com/40896017): Declare this in the corresponding header.
     {"webauthn.cablev2_pairings",

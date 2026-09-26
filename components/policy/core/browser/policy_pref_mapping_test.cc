@@ -413,13 +413,7 @@ class PolicyTestCase {
   }
 
   bool IsOsSupported() const {
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-    // For prefs testing desktop Android is considered a separate OS because it
-    // registers some additional prefs (e.g. extensions prefs).
-    const std::string os("desktop_android");
-#elif BUILDFLAG(IS_ANDROID)
-    const std::string os("android");
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     const std::string os("linux");
 #elif BUILDFLAG(IS_MAC)
     const std::string os("mac");
@@ -429,16 +423,7 @@ class PolicyTestCase {
     return std::ranges::contains(supported_os_, os);
   }
 
-  bool IsOsCovered() const {
-#if BUILDFLAG(IS_ANDROID)
-    // Android policies that apply to desktop Android are covered as part of the
-    // desktop Android build because they may invoke desktop-only code.
-    return std::ranges::contains(supported_os_, "android") ||
-           std::ranges::contains(supported_os_, "desktop_android");
-#else
-    return IsOsSupported();
-#endif
-  }
+  bool IsOsCovered() const { return IsOsSupported(); }
 
   bool IsSupported() const {
 #if !BUILDFLAG(GOOGLE_CHROME_BRANDING)

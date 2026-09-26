@@ -111,19 +111,11 @@ BatterySaverModeState GetCurrentBatterySaverModeState(
 }
 
 bool ShouldShowDiscardRingTreatment(PrefService* pref_service) {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return pref_service->GetBoolean(kDiscardRingTreatmentEnabled);
-#endif
 }
 
 bool ShouldShowPerformanceInterventionNotification(PrefService* pref_service) {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return pref_service->GetBoolean(kPerformanceInterventionNotificationEnabled);
-#endif
 }
 
 void MigrateMemorySaverModePref(PrefService* pref_service) {

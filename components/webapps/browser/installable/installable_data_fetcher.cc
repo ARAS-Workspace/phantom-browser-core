@@ -118,17 +118,10 @@ void InstallableDataFetcher::CheckAndFetchScreenshots(
 
   int num_of_screenshots = 0;
   for (const auto& url : page_data_->GetManifest().screenshots) {
-#if BUILDFLAG(IS_ANDROID)
-    if (url->form_factor ==
-        blink::mojom::ManifestScreenshot::FormFactor::kWide) {
-      continue;
-    }
-#else
     if (url->form_factor !=
         blink::mojom::ManifestScreenshot::FormFactor::kWide) {
       continue;
     }
-#endif  // BUILDFLAG(IS_ANDROID)
 
     if (++num_of_screenshots > kMaximumNumOfScreenshots) {
       break;

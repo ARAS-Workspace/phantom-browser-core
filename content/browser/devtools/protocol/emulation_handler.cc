@@ -633,16 +633,12 @@ Response EmulationHandler::SetEmitTouchEventsForMouse(
 }
 
 Response EmulationHandler::CanEmulate(bool* result) {
-#if BUILDFLAG(IS_ANDROID)
-  *result = false;
-#else
   *result = true;
   if (host_) {
     if (GetWebContents()->GetVisibleURL().SchemeIs(kChromeDevToolsScheme) ||
         host_->GetRenderWidgetHost()->auto_resize_enabled())
       *result = false;
   }
-#endif  // BUILDFLAG(IS_ANDROID)
   return Response::Success();
 }
 

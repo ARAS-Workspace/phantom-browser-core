@@ -39,13 +39,8 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/tracing/public/cpp/tracing_features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck
-#endif
 
 namespace {
 
@@ -59,37 +54,12 @@ ChromeTracingDelegate::ChromeTracingDelegate() {
   DCHECK(
       content::BrowserThread::CurrentlyOn(content::BrowserThread::UI) ||
       !content::BrowserThread::IsThreadInitialized(content::BrowserThread::UI));
-#if !BUILDFLAG(IS_ANDROID)
   GlobalBrowserCollection::GetInstance()->AddObserver(this);
-#else
-  TabModelList::AddObserver(this);
-#endif
 }
 
 ChromeTracingDelegate::~ChromeTracingDelegate() {
   CHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
-#if BUILDFLAG(IS_ANDROID)
-  TabModelList::RemoveObserver(this);
-#endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void ChromeTracingDelegate::OnTabModelAdded(TabModel* tab_model) {
-  for (const TabModel* model : TabModelList::models()) {
-    if (model->GetProfile()->IsOffTheRecord()) {
-      latest_incognito_launched_ = base::TimeTicks::Now();
-      base::trace_event::EmitNamedTrigger("incognito-start");
-    }
-  }
-}
-
-void ChromeTracingDelegate::OnTabModelRemoved(TabModel* tab_model) {
-  if (!IsOffTheRecordSessionActive()) {
-    base::trace_event::EmitNamedTrigger("incognito-end");
-  }
-}
-
-#else
 
 void ChromeTracingDelegate::OnBrowserCreated(BrowserWindowInterface* browser) {
   if (browser->GetProfile()->IsOffTheRecord()) {
@@ -103,8 +73,6 @@ void ChromeTracingDelegate::OnBrowserClosed(BrowserWindowInterface* browser) {
     base::trace_event::EmitNamedTrigger("incognito-end");
   }
 }
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 bool ChromeTracingDelegate::IsRecordingAllowed(
     bool requires_anonymized_data,

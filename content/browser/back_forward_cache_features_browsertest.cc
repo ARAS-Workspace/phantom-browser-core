@@ -1229,7 +1229,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
 // mediaDevice.getDisplayMedia() and still has live MediaStreamTrack.
 // Since mediaDevice.getDisplayMedia() is not supported in Android, the tests
 // can't run on the OS.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
                        DoesNotCacheIfDisplayMediaAccessGranted) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1297,7 +1296,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
   ASSERT_TRUE(HistoryGoBack(web_contents()));
   ExpectRestored(FROM_HERE);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest, CacheIfWebGL) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1322,7 +1320,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest, CacheIfWebGL) {
 // Since blink::mojom::HidService binder is not added in
 // content/browser/browser_interface_binders.cc for Android, this test is not
 // applicable for this OS.
-#if !BUILDFLAG(IS_ANDROID)
 class HidBrowserTestContentBrowserClient
     : public ContentBrowserTestContentBrowserClient {
  public:
@@ -1451,7 +1448,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheWebHidTest,
   EXPECT_EQ(current_frame_host(), rfh_a.get());
   ExpectRestored(FROM_HERE);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
                        WakeLockReleasedUponEnteringBfcache) {
@@ -3084,11 +3080,7 @@ IN_PROC_BROWSER_TEST_P(BackForwardCacheWithBroadcastChannelTest,
 // Disabled on Android, since we have problems starting up the websocket test
 // server in the host
 // TODO(crbug.com/40241677): Re-enable the test after solving the WS server.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_WebSocketCachedIfClosed DISABLED_WebSocketCachedIfClosed
-#else
 #define MAYBE_WebSocketCachedIfClosed WebSocketCachedIfClosed
-#endif
 // Pages with WebSocket should be cached if the connection is closed.
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
                        MAYBE_WebSocketCachedIfClosed) {
@@ -4064,12 +4056,8 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Combine(testing::Values(SerialContext::kDocument,
                                      SerialContext::kWorker,
                                      SerialContext::kNestedWorker),
-                     testing::Values(SerialType::kWebUsb
-#if !BUILDFLAG(IS_ANDROID)
-                                     ,
-                                     SerialType::kSerial
-#endif  // !BUILDFLAG(IS_ANDROID)
-                                     )));
+                     testing::Values(SerialType::kWebUsb,
+                                     SerialType::kSerial)));
 
 // Check that an audio suspends when the page goes to the cache and can resume
 // after restored.
@@ -4293,12 +4281,7 @@ class SensorBackForwardCacheBrowserTest : public BackForwardCacheBrowserTest {
 //
 // TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
 // sensors are not automatically resumed.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AccelerometerPausedWhileCached \
-  DISABLED_AccelerometerPausedWhileCached
-#else
 #define MAYBE_AccelerometerPausedWhileCached AccelerometerPausedWhileCached
-#endif
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_AccelerometerPausedWhileCached) {
   ASSERT_TRUE(CreateHttpsServer()->Start());
@@ -4354,12 +4337,7 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 //
 // TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
 // sensors are not automatically resumed.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AmbientLightPausedWhileCached \
-  DISABLED_AmbientLightPausedWhileCached
-#else
 #define MAYBE_AmbientLightPausedWhileCached AmbientLightPausedWhileCached
-#endif
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_AmbientLightPausedWhileCached) {
   ASSERT_TRUE(CreateHttpsServer()->Start());
@@ -4413,13 +4391,8 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 //
 // TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
 // sensors are not automatically resumed.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_LinearAccelerationPausedWhileCached \
-  DISABLED_LinearAccelerationPausedWhileCached
-#else
 #define MAYBE_LinearAccelerationPausedWhileCached \
   LinearAccelerationPausedWhileCached
-#endif
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_LinearAccelerationPausedWhileCached) {
   ASSERT_TRUE(CreateHttpsServer()->Start());
@@ -4473,11 +4446,7 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 //
 // TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
 // sensors are not automatically resumed.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GravityPausedWhileCached DISABLED_GravityPausedWhileCached
-#else
 #define MAYBE_GravityPausedWhileCached GravityPausedWhileCached
-#endif
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_GravityPausedWhileCached) {
   ASSERT_TRUE(CreateHttpsServer()->Start());
@@ -4531,11 +4500,7 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 //
 // TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
 // sensors are not automatically resumed.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GyroscopePausedWhileCached DISABLED_GyroscopePausedWhileCached
-#else
 #define MAYBE_GyroscopePausedWhileCached GyroscopePausedWhileCached
-#endif
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_GyroscopePausedWhileCached) {
   ASSERT_TRUE(CreateHttpsServer()->Start());
@@ -4712,7 +4677,6 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 // long as it doesn't make a connection.
 // On the Android test environments, the test might fail due to IP restrictions.
 // See the discussion at http://crrev.com/c/2564926.
-#if !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/40183520): The test is consistently failing on some Mac
 // bots.
@@ -4788,13 +4752,11 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
     });
   )"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // This tests that a page using WebRTC and creating actual connections cannot be
 // cached.
 // On the Android test environments, the test might fail due to IP restrictions.
 // See the discussion at http://crrev.com/c/2564926.
-#if !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/40183520): The test is consistently failing on some Mac
 // bots.
@@ -4880,7 +4842,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
        blink::scheduler::WebSchedulerTrackedFeature::kLiveMediaStreamTrack},
       {}, {}, {}, FROM_HERE);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 enum TestAuthenticatorBehavior {
   kErrorOut,

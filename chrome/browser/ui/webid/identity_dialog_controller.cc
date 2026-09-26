@@ -33,11 +33,9 @@
 
 // We add nognchecks on these includes so that Android bots do not fail
 // dependency checks.
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck
 #include "chrome/browser/ui/views/webid/fedcm_account_selection_view_desktop.h"  // nogncheck
 #include "components/tabs/public/tab_interface.h"  // nogncheck
-#endif
 
 using content::webid::FederatedLoginResult;
 
@@ -500,25 +498,11 @@ content::WebContents* IdentityDialogController::ShowModalDialog(
 }
 
 void IdentityDialogController::CloseModalDialog() {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, this method is invoked on the modal dialog controller,
-  // which means we may need to initialize the |account_view|.
-  if (!account_view_) {
-    account_view_ = AccountSelectionView::Create(this);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   CHECK(account_view_);
   account_view_->CloseModalDialog();
 }
 
 content::WebContents* IdentityDialogController::GetRpWebContents() {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, this method is invoked on the modal dialog controller,
-  // which means we may need to initialize the |account_view|.
-  if (!account_view_) {
-    account_view_ = AccountSelectionView::Create(this);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   CHECK(account_view_);
   return account_view_->GetRpWebContents();
 }
@@ -544,9 +528,6 @@ bool IdentityDialogController::TrySetAccountView() {
   if (account_view_) {
     return true;
   }
-#if BUILDFLAG(IS_ANDROID)
-  account_view_ = AccountSelectionView::Create(this);
-#else
   tabs::TabInterface* tab =
       tabs::TabInterface::MaybeGetFromContents(rp_web_contents_);
   // FedCM is supported in general web content, but not in chrome UI. Of the
@@ -557,7 +538,6 @@ bool IdentityDialogController::TrySetAccountView() {
     return false;
   }
   account_view_ = std::make_unique<webid::FedCmAccountSelectionView>(this, tab);
-#endif
   account_view_->SetCanShowUi(ShouldShowFedCmUi());
   return true;
 }

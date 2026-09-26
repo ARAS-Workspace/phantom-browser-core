@@ -99,11 +99,7 @@ tab_groups::SavedTabGroup CreateSavedTabGroupFromLocalId(
       tab_list->GetTabGroupVisualData(group_id);
   CHECK(visual_data);
 
-#if BUILDFLAG(IS_ANDROID)
-  tab_groups::LocalTabGroupID local_id = group_id.token();
-#else
   tab_groups::LocalTabGroupID local_id = group_id;
-#endif
 
   tab_groups::SavedTabGroup saved_group(visual_data->title(),
                                         visual_data->color(), {}, std::nullopt,
@@ -159,12 +155,10 @@ class TabGroupsApiBrowserTest : public ExtensionBrowserTest {
 
     // Wait for the TabGroupSyncService to properly initialize before making any
     // changes to tab groups. This is not used on Android.
-#if !BUILDFLAG(IS_ANDROID)
     auto observer =
         std::make_unique<tab_groups::TabGroupSyncServiceInitializedObserver>(
             tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile()));
     observer->Wait();
-#endif
   }
   void TearDownOnMainThread() override {
     web_contents_.clear();
@@ -324,12 +318,7 @@ class SharedTabGroupExtensionsBrowserTest : public TabGroupsApiBrowserTest {
     tab_groups::TabGroupSyncService* service =
         static_cast<tab_groups::TabGroupSyncService*>(
             tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile()));
-#if BUILDFLAG(IS_ANDROID)
-    // TabGroupSyncService uses a different type on Android.
-    const base::Token local_id = group_id.token();
-#else
     const TabGroupId local_id = group_id;
-#endif
     service->MakeTabGroupSharedForTesting(local_id, collaboration_id);
   }
 
@@ -497,11 +486,7 @@ IN_PROC_BROWSER_TEST_F(TabGroupsApiBrowserTest, TabGroupsUpdateSavedTab) {
   saved_service->AddGroup(CreateSavedTabGroupFromLocalId(group, tab_list));
 
   int group_id = ExtensionTabUtil::GetGroupId(group);
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(saved_service->GetGroup(group.token()));
-#else
   ASSERT_TRUE(saved_service->GetGroup(group));
-#endif
 
   scoped_refptr<const Extension> extension = CreateTabGroupsExtension();
 
@@ -680,11 +665,7 @@ IN_PROC_BROWSER_TEST_F(TabGroupsApiBrowserTest, TabGroupsMoveAcrossWindows) {
   // CreateBrowserWindowWithType() creates zero tabs on Win/Mac/Linux, but
   // creates one tab on Android.
   // TODO(crbug.com/477611601): Reconcile this difference.
-#if BUILDFLAG(IS_ANDROID)
-  constexpr int kInitialTabs = 1;
-#else
   constexpr int kInitialTabs = 0;
-#endif
   // The target number of tabs in window 2.
   constexpr int kNumTabs2 = 3;
   for (int i = 0; i < kNumTabs2 - kInitialTabs; ++i) {

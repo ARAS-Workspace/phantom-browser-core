@@ -67,8 +67,6 @@ CreateRegionHandleFromPlatformHandles(
 
 #if BUILDFLAG(IS_APPLE)
   return handles[0].TakeMachSendRight();
-#elif BUILDFLAG(IS_ANDROID)
-  return handles[0].TakeFD();
 #else
   base::ScopedFD readonly_fd;
   if (mode == base::subtle::PlatformSharedMemoryRegion::Mode::kWritable) {
@@ -176,7 +174,7 @@ bool SharedBuffer::GetSerializedDimensions(Transport& transmitter,
                                            size_t& num_bytes,
                                            size_t& num_handles) {
   num_bytes = sizeof(BufferHeader);
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
   num_handles = 1;
 #else
   if (region_.GetMode() ==
@@ -217,7 +215,7 @@ bool SharedBuffer::Serialize(Transport& transmitter,
   header.guid_high = guid.GetHighForSerialization();
 
   auto handle = region_.PassPlatformHandle();
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
   DCHECK_EQ(handles.size(), 1u);
   handles[0] = PlatformHandle(std::move(handle));
 #else

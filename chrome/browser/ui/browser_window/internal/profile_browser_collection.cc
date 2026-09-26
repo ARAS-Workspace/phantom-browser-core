@@ -10,15 +10,10 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/android_profile_browser_collection_service.h"
-#include "chrome/browser/ui/android/android_profile_browser_collection_service_factory.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_manager_service.h"
 #include "chrome/browser/ui/browser_manager_service_factory.h"
 #include "chrome/browser/ui/browser_window.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 ProfileBrowserCollection::ProfileBrowserCollection(Profile* profile)
     : profile_(CHECK_DEREF(profile)) {}
@@ -40,12 +35,10 @@ BrowserWindowInterface* ProfileBrowserCollection::FindTabbedBrowser(
       return true;
     }
 
-#if !BUILDFLAG(IS_ANDROID)
     BrowserWindow* browser_window = BrowserWindow::FromBrowser(browser);
     if (!browser_window || !browser_window->IsOnCurrentWorkspace()) {
       return true;
     }
-#endif
 
     match = browser;
     return false;  // stop iterating
@@ -62,15 +55,13 @@ BrowserWindowInterface* ProfileBrowserCollection::FindTabbedBrowser(
 size_t ProfileBrowserCollection::GetOffTheRecordBrowserCount() {
   size_t count = 0;
   auto count_browsers = [&count](BrowserWindowInterface* browser) {
-  // TODO(crbug.com/511561378): Explore removing this exception for
-  // TYPE_DEVTOOLS. Inherited from the prior BrowserList implementation,
-  // but similar simplifications elsewhere suggest this exception is
-  // unnecessary and is an unexpected exception to clients of this API.
-#if !BUILDFLAG(IS_ANDROID)
+    // TODO(crbug.com/511561378): Explore removing this exception for
+    // TYPE_DEVTOOLS. Inherited from the prior BrowserList implementation,
+    // but similar simplifications elsewhere suggest this exception is
+    // unnecessary and is an unexpected exception to clients of this API.
     if (browser->GetType() == BrowserWindowInterface::Type::TYPE_DEVTOOLS) {
       return true;
     }
-#endif
     ++count;
     return true;
   };
@@ -85,9 +76,5 @@ size_t ProfileBrowserCollection::GetOffTheRecordBrowserCount() {
 // static
 ProfileBrowserCollection* ProfileBrowserCollection::GetForProfile(
     Profile* profile) {
-#if BUILDFLAG(IS_ANDROID)
-  return AndroidProfileBrowserCollectionServiceFactory::GetForProfile(profile);
-#else
   return BrowserManagerServiceFactory::GetForProfile(profile);
-#endif  // BUILDFLAG(IS_ANDROID)
 }

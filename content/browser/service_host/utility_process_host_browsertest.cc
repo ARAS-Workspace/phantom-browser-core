@@ -246,13 +246,7 @@ class UtilityProcessHostBrowserTest : public BrowserChildProcessObserver,
       const ChildProcessData& data,
       const ChildProcessTerminationInfo& info) override {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
-#if BUILDFLAG(IS_ANDROID)
-    // Android does not send crash notifications but sends kills. See comment in
-    // browser_child_process_observer.h.
-    BrowserChildProcessCrashed(data, info);
-#else
     FAIL() << "Killed notifications should only happen on Android.";
-#endif
   }
 
   void BrowserChildProcessCrashed(
@@ -310,11 +304,7 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest, SkiaInitialized) {
 
 // TODO(crbug.com/40253015): Re-enable this test on Android when
 // `files_to_preload` is actually fixed there.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FileDescriptorStore DISABLED_FileDescriptorStore
-#else
 #define MAYBE_FileDescriptorStore FileDescriptorStore
-#endif
 IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
                        MAYBE_FileDescriptorStore) {
   UtilityProcessHost::Options options = DefaultOptions();
@@ -402,7 +392,6 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
 // `BrowserChildProcessCrashed` function above without raising a bug in
 // Internals>Core.
 // ** READ THIS **
-#if !(BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARM64))
 #if BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_X86_64)
 #define MAYBE_LaunchProcessAndCrash DISABLED_LaunchProcessAndCrash
 #else
@@ -417,7 +406,6 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
   ASSERT_TRUE(crash_was_pre_ipc_.has_value());
   EXPECT_FALSE(crash_was_pre_ipc_.value());
 }
-#endif
 
 // This test won't work as-is on POSIX platforms, where fork()+exec() is used to
 // launch child processes, failure does not happen until exec(), therefore the

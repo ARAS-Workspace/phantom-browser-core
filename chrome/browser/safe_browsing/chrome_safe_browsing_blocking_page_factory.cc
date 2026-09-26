@@ -23,10 +23,8 @@
 #include "components/security_interstitials/content/security_interstitial_controller_client.h"
 #include "content/public/browser/web_contents.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service.h"
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
-#endif
 
 namespace safe_browsing {
 
@@ -72,10 +70,8 @@ ChromeSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
       g_browser_process->safe_browsing_service()
           ? g_browser_process->safe_browsing_service()->trigger_manager()
           : nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   TrustSafetySentimentService* trust_safety_sentiment_service =
       TrustSafetySentimentServiceFactory::GetForProfile(profile);
-#endif
   bool is_safe_browsing_surveys_enabled = IsSafeBrowsingSurveysEnabled(*prefs);
   // Use base::Unretained since blocking pages are owned by
   // SecurityInterstitialTabHelper, which is associated with a WebContents, and
@@ -93,16 +89,12 @@ ChromeSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
       SafeBrowsingMetricsCollectorFactory::GetForProfile(profile),
       trigger_manager, is_proceed_anyway_disabled,
       is_safe_browsing_surveys_enabled,
-#if !BUILDFLAG(IS_ANDROID)
       trust_safety_sentiment_service == nullptr ||
               !is_safe_browsing_surveys_enabled
           ? base::NullCallback()
           : base::BindOnce(&TrustSafetySentimentService::
                                InteractedWithSafeBrowsingInterstitial,
                            base::Unretained(trust_safety_sentiment_service)),
-#else
-      base::NullCallback(),
-#endif
       base::NullCallback(),
       /*url_loader_for_testing=*/nullptr);
 }

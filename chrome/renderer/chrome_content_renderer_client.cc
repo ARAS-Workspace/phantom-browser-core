@@ -189,18 +189,12 @@
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/renderer/sandbox_status_extension_android.h"
-#include "chrome/renderer/wallet/boarding_pass_extractor.h"
-#include "components/feed/feed_feature_list.h"
-#else
 #include "chrome/renderer/password_manager/remote_actor_credential_sharing_extension.h"
 #include "chrome/renderer/searchbox/searchbox.h"
 #include "chrome/renderer/searchbox/searchbox_extension.h"
 #include "components/record_replay/content/renderer/record_replay_agent.h"
 #include "components/record_replay/core/common/record_replay_features.h"
 #include "components/search/ntp_features.h"  // nogncheck
-#endif
 
 
 
@@ -252,7 +246,7 @@
 #endif  // BUILDFLAG(HAS_SPELLCHECK_PANEL)
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 #include "chrome/renderer/media/chrome_key_systems.h"
 #endif
 
@@ -497,7 +491,6 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   bool should_restrict_chrome_search_scheme =
       !command_line->HasSwitch(switches::kInstantProcess);
 
-#if !BUILDFLAG(IS_ANDROID)
   // If the feature is enabled, the `kInstantProcess` command line switch is
   // replaced by the `is_instant_process` flag, which is set later. As a result,
   // we cannot perform chrome-search scheme registration at this stage. This
@@ -507,7 +500,6 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   if (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
     should_restrict_chrome_search_scheme = false;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   if (should_restrict_chrome_search_scheme) {
     WebSecurityPolicy::RegisterURLSchemeAsDisplayIsolated(chrome_search_scheme);
   }
@@ -527,11 +519,6 @@ void ChromeContentRendererClient::RenderThreadStarted() {
         WebString::FromAscii("chromium"));
 #endif
   }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  WebSecurityPolicy::RegisterURLSchemeAsAllowedForReferrer(
-      WebString::FromUtf8(content::kAndroidAppScheme));
 #endif
 
   // chrome-search: pages should not be accessible by bookmarklets
@@ -618,17 +605,11 @@ void ChromeContentRendererClient::RenderFrameCreated(
   new paint_preview::PaintPreviewRecorderImpl(render_frame);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  SandboxStatusExtension::Create(render_frame);
-#endif
-
   TrustedVaultEncryptionKeysExtension::Create(render_frame);
-#if !BUILDFLAG(IS_ANDROID)
   if (features::RemoteActorCredentialSharingEnabled() &&
       render_frame->IsMainFrame()) {
     RemoteActorCredentialSharingExtension::Create(render_frame);
   }
-#endif
   GoogleAccountsPrivateApiExtension::Create(render_frame);
 
   if (render_frame->IsMainFrame())
@@ -685,12 +666,10 @@ void ChromeContentRendererClient::RenderFrameCreated(
                       associated_interfaces);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           record_replay::features::kRecordReplayBase)) {
     new record_replay::RecordReplayAgent(render_frame, associated_interfaces);
   }
-#endif
 
   if (content_capture::features::IsContentCaptureEnabled()) {
     new content_capture::ContentCaptureSender(render_frame,
@@ -716,11 +695,9 @@ void ChromeContentRendererClient::RenderFrameCreated(
     subresource_filter_agent->Initialize();
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (process_state::IsInstantProcess() && render_frame->IsMainFrame()) {
     new SearchBox(render_frame);
   }
-#endif
 
 #if BUILDFLAG(ENABLE_SPELLCHECK)
   new SpellCheckProvider(render_frame, spellcheck_.get());
@@ -735,24 +712,15 @@ void ChromeContentRendererClient::RenderFrameCreated(
     new commerce::CommerceWebExtractor(render_frame, registry);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kBoardingPassDetector) &&
-      render_frame->IsMainFrame()) {
-    new wallet::BoardingPassExtractor(render_frame, registry);
-  }
-#endif
-
   if (base::FeatureList::IsEnabled(
           wallet::features::kWalletablePassDetection) &&
       render_frame->IsMainFrame()) {
     wallet::ImageExtractor::Create(render_frame, registry);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(features::kWebium)) {
     WebUIBrowserRendererExtension::Create(render_frame);
   }
-#endif
 
   // Wire up the PageStabilityMonitorManager to allow components to
   // request stability monitors for this frame.
@@ -866,7 +834,6 @@ bool ChromeContentRendererClient::OverrideCreatePlugin(
     WebPlugin** plugin) {
   std::string orig_mime_type = params.mime_type.Utf8();
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(surface_embed::features::kSurfaceEmbed)) {
     GURL url = render_frame->GetWebFrame()->GetDocument().Url();
     if (url.SchemeIs(content::kChromeUIScheme) &&
@@ -876,7 +843,6 @@ bool ChromeContentRendererClient::OverrideCreatePlugin(
       }
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   // Used for plugins.
@@ -1224,7 +1190,6 @@ void ChromeContentRendererClient::WillSendRequest(
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   SearchBox* search_box =
       SearchBox::Get(content::RenderFrame::FromWebFrame(frame->LocalRoot()));
   if (search_box) {
@@ -1234,7 +1199,6 @@ void ChromeContentRendererClient::WillSendRequest(
       search_box->GenerateImageURLFromTransientURL(target_url, new_url);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 bool ChromeContentRendererClient::IsPrefetchOnly(
@@ -1323,7 +1287,7 @@ std::unique_ptr<media::KeySystemSupportRegistration>
 ChromeContentRendererClient::GetSupportedKeySystems(
     content::RenderFrame* render_frame,
     media::GetSupportedKeySystemsCB cb) {
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS)
   return GetChromeKeySystems(render_frame, std::move(cb));
 #else
   std::move(cb).Run({});
@@ -1382,7 +1346,7 @@ void ChromeContentRendererClient::
 
 // Web Share is conditionally enabled here in chrome/, to avoid it
 // being made available in WebView or Linux.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   blink::WebRuntimeFeatures::EnableWebShare(true);
 #endif
 
@@ -1407,9 +1371,7 @@ void ChromeContentRendererClient::
   if (IsStandaloneContentExtensionProcess()) {
     // These Web API features are exposed in extensions.
     blink::WebRuntimeFeatures::EnableWebUSBOnServiceWorkers(true);
-#if !BUILDFLAG(IS_ANDROID)
     blink::WebRuntimeFeatures::EnableWebHIDOnServiceWorkers(true);
-#endif  // !BUILDFLAG(IS_ANDROID)
     blink::WebRuntimeFeatures::EnableAIPromptAPIForWorkers(true);
     blink::WebRuntimeFeatures::EnableAIPromptAPILegacyIdentifiers(true);
     blink::WebRuntimeFeatures::EnableAIPromptAPILegacyParams(true);

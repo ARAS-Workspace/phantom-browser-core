@@ -120,12 +120,7 @@ TEST(AutocompleteInputTest, InputType) {
       {u"javascript:the cromulent parts", metrics::OmniboxInputType::UNKNOWN},
       {u"javascript:foo.getter", metrics::OmniboxInputType::URL},
       {u"JavaScript:Tutorials", metrics::OmniboxInputType::UNKNOWN},
-#if BUILDFLAG(IS_ANDROID)
-      {u"file:///foo", metrics::OmniboxInputType::QUERY},
-      {u"/foo", metrics::OmniboxInputType::QUERY},
-#else
       {u"file:///foo", metrics::OmniboxInputType::URL},
-#endif  // BUILDFLAG(IS_ANDROID)
       {u"http:foo", metrics::OmniboxInputType::URL},
       {u"http://foo", metrics::OmniboxInputType::URL},
       {u"http://foo._", metrics::OmniboxInputType::UNKNOWN},

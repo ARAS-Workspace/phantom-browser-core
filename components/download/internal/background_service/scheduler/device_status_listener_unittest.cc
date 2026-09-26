@@ -291,13 +291,8 @@ TEST_F(DeviceStatusListenerTest, ConnectionUnknownTreatedCorrectly) {
   base::RunLoop().RunUntilIdle();
 
   // Initial states check.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(NetworkStatus::DISCONNECTED,
-            listener_->CurrentDeviceStatus().network_status);
-#else
   EXPECT_EQ(NetworkStatus::UNMETERED,
             listener_->CurrentDeviceStatus().network_status);
-#endif
 }
 
 // Ensures the observer is notified when battery condition changes.

@@ -23,10 +23,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/public/identity_manager/identity_test_utils.h"
-#endif
-
 namespace signin {
 
 class MockAccountFetcherFactory : public AccountFetcherFactory {
@@ -94,10 +90,6 @@ TEST_F(IdentityManagerBuilderTest, BuildIdentityManagerInitParameters) {
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
   base::FilePath profile_path = temp_dir.GetPath();
 
-#if BUILDFLAG(IS_ANDROID)
-  SetUpFakeAccountManagerFacade();
-#endif
-
   IdentityManagerBuildParams params;
   params.image_decoder = std::make_unique<image_fetcher::FakeImageDecoder>();
   params.local_state = GetPrefService();
@@ -119,13 +111,8 @@ TEST_F(IdentityManagerBuilderTest, BuildIdentityManagerInitParameters) {
   EXPECT_NE(init_params.primary_account_mutator, nullptr);
   EXPECT_NE(init_params.accounts_cookie_mutator, nullptr);
   EXPECT_NE(init_params.diagnostics_provider, nullptr);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_NE(init_params.device_accounts_synchronizer, nullptr);
-  EXPECT_EQ(init_params.accounts_mutator, nullptr);
-#else
   EXPECT_EQ(init_params.device_accounts_synchronizer, nullptr);
   EXPECT_NE(init_params.accounts_mutator, nullptr);
-#endif
 }
 
 }  // namespace signin

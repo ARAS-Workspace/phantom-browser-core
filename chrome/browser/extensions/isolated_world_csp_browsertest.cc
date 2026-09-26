@@ -38,17 +38,10 @@ class IsolatedWorldCspBrowserTest
   }
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// Android only supports manifest V3.
-INSTANTIATE_TEST_SUITE_P(ManifestVersion,
-                         IsolatedWorldCspBrowserTest,
-                         testing::Values(ManifestVersion::kMV3));
-#else
 INSTANTIATE_TEST_SUITE_P(ManifestVersion,
                          IsolatedWorldCspBrowserTest,
                          testing::Values(ManifestVersion::kMV2,
                                          ManifestVersion::kMV3));
-#endif
 
 // Test that a Manifest V2 content script can use eval by bypassing the main
 // world CSP, but a Manifest V3 script cannot.

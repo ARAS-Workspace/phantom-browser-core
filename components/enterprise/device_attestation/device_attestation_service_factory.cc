@@ -10,11 +10,6 @@
 #include "build/build_config.h"
 #include "components/enterprise/device_attestation/device_attestation_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/enterprise/device_attestation/android/android_attestation_client.h"
-#include "components/enterprise/device_attestation/android/device_attestation_service_android.h"
-#endif
-
 namespace enterprise {
 
 namespace {
@@ -40,12 +35,7 @@ DeviceAttestationServiceFactory::GetInstance() {
 
 std::unique_ptr<DeviceAttestationService>
 DeviceAttestationServiceFactory::CreateDeviceAttestationService() {
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<DeviceAttestationServiceAndroid>(
-      std::make_unique<AndroidAttestationClient>());
-#else
   return std::make_unique<DeviceAttestationService>();
-#endif
 }
 
 // static

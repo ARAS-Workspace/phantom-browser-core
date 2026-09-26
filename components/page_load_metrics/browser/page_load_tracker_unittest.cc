@@ -259,21 +259,7 @@ TEST_F(PageLoadTrackerTest, EventForwarding) {
   // delete them when a navigation commits. On Android, when RenderFrameHost is
   // disabled, the same RenderFrameHost will be reused and not be deleted.
 
-#if BUILDFLAG(IS_ANDROID)
-  // With default SiteInstanceGroup enabled, the navigations are all
-  // cross-SiteInstance, so there will be as many RenderFrameHost deletions as
-  // in the (non-Android) Site Isolation cases, which is possibly more than the
-  // RenderDocument cases. (Applies here and below.)
-  if (content::WillSameSiteNavigationChangeRenderFrameHosts(
-          /*is_main_frame=*/true) ||
-      base::FeatureList::IsEnabled(features::kDefaultSiteInstanceGroups)) {
-    EXPECT_EQ(1u, GetEvents().render_frame_deleted_count);
-  } else {
-    EXPECT_EQ(0u, GetEvents().render_frame_deleted_count);
-  }
-#else
   EXPECT_EQ(1u, GetEvents().render_frame_deleted_count);
-#endif
 
   EXPECT_EQ(0u, GetEvents().sub_frame_deleted_count);
 
@@ -290,18 +276,7 @@ TEST_F(PageLoadTrackerTest, EventForwarding) {
     rfh_c = simulator->GetFinalRenderFrameHost();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kDefaultSiteInstanceGroups)) {
-    EXPECT_EQ(2u, GetEvents().render_frame_deleted_count);
-  } else if (content::WillSameSiteNavigationChangeRenderFrameHosts(
-                 /*is_main_frame=*/true)) {
-    EXPECT_EQ(1u, GetEvents().render_frame_deleted_count);
-  } else {
-    EXPECT_EQ(0u, GetEvents().render_frame_deleted_count);
-  }
-#else
   EXPECT_EQ(2u, GetEvents().render_frame_deleted_count);
-#endif
 
   EXPECT_EQ(0u, GetEvents().sub_frame_deleted_count);
 
@@ -312,18 +287,7 @@ TEST_F(PageLoadTrackerTest, EventForwarding) {
     delete_observer.WaitUntilDeleted();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kDefaultSiteInstanceGroups)) {
-    EXPECT_EQ(3u, GetEvents().render_frame_deleted_count);
-  } else if (content::WillSameSiteNavigationChangeRenderFrameHosts(
-                 /*is_main_frame=*/true)) {
-    EXPECT_EQ(2u, GetEvents().render_frame_deleted_count);
-  } else {
-    EXPECT_EQ(1u, GetEvents().render_frame_deleted_count);
-  }
-#else
   EXPECT_EQ(3u, GetEvents().render_frame_deleted_count);
-#endif
 
   {
     content::RenderFrameDeletedObserver delete_observer(rfh_b);
@@ -332,18 +296,7 @@ TEST_F(PageLoadTrackerTest, EventForwarding) {
     delete_observer.WaitUntilDeleted();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kDefaultSiteInstanceGroups)) {
-    EXPECT_EQ(4u, GetEvents().render_frame_deleted_count);
-  } else if (content::WillSameSiteNavigationChangeRenderFrameHosts(
-                 /*is_main_frame=*/true)) {
-    EXPECT_EQ(3u, GetEvents().render_frame_deleted_count);
-  } else {
-    EXPECT_EQ(2u, GetEvents().render_frame_deleted_count);
-  }
-#else
   EXPECT_EQ(4u, GetEvents().render_frame_deleted_count);
-#endif
 
   // "2" may look good, but it is wrong, indeed. "1" is correct.
   //

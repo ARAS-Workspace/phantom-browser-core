@@ -16,10 +16,6 @@
 #include "base/time/time_override.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID) && !defined(__LP64__)
-#include <time64.h>
-#endif
-
 // Ensure the Fuchsia and Mac builds do not include this module. Instead,
 // non-POSIX implementation is used for sampling the system clocks.
 #if BUILDFLAG(IS_APPLE)
@@ -49,7 +45,7 @@ int64_t ConvertTimespecToMicros(const struct timespec& ts) {
 // _POSIX_MONOTONIC_CLOCK to -1.
 #if (BUILDFLAG(IS_POSIX) && defined(_POSIX_MONOTONIC_CLOCK) && \
      _POSIX_MONOTONIC_CLOCK >= 0) ||                           \
-    BUILDFLAG(IS_BSD) || BUILDFLAG(IS_ANDROID)
+    BUILDFLAG(IS_BSD)
 int64_t ClockNow(clockid_t clk_id) {
   struct timespec ts;
   CHECK(clock_gettime(clk_id, &ts) == 0);
@@ -133,8 +129,7 @@ bool TimeTicks::IsConsistentAcrossProcesses() {
 
 namespace subtle {
 ThreadTicks ThreadTicksNowIgnoringOverride() {
-#if (defined(_POSIX_THREAD_CPUTIME) && (_POSIX_THREAD_CPUTIME >= 0)) || \
-    BUILDFLAG(IS_ANDROID)
+#if defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME >= 0
   return ThreadTicks() + Microseconds(ClockNow(CLOCK_THREAD_CPUTIME_ID));
 #else
   NOTREACHED();

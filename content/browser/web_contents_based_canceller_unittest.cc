@@ -98,14 +98,7 @@ TEST_P(WebContentsBasedCancellerTest, BecomeHidden) {
       EXPECT_FALSE(future.IsReady());
       break;
     case WebContentsBasedCanceller::CancelCondition::kVisibility:
-#if BUILDFLAG(IS_ANDROID)
-      // Android sends HIDDEN when picking a file. We should not cancel in this
-      // case.
-      // TODO(crbug.com/457495639): Figure out how to handle Android.
-      EXPECT_FALSE(future.IsReady());
-#else
       EXPECT_TRUE(future.IsReady());
-#endif
       break;
   }
 }
@@ -121,17 +114,10 @@ TEST_P(WebContentsBasedCancellerTest, BecomeOccluded) {
       EXPECT_FALSE(future.IsReady());
       break;
     case WebContentsBasedCanceller::CancelCondition::kVisibility:
-#if BUILDFLAG(IS_ANDROID)
-      // Android sends HIDDEN when picking a file. We should not cancel in this
-      // case.
-      // TODO(crbug.com/457495639): Figure out how to handle Android.
-      EXPECT_FALSE(future.IsReady());
-#else
       EXPECT_TRUE(future.IsReady())
           << "Dialog was NOT cancelled when WebContents became OCCLUDED. "
           << "The file picker remains visible over a foreign foreground "
           << "window, enabling origin spoofing.";
-#endif
       break;
   }
 }

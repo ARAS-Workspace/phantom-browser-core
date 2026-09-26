@@ -823,7 +823,7 @@ TEST_F(AutofillOptimizationGuideDeciderTest,
   guide().OnDidParseForm(form_structure, payments_data_manager());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class BuyNowPayLaterAutofillOptimizationGuideDeciderTest
     : public AutofillOptimizationGuideDeciderTest,
       public testing::WithParamInterface<bool> {
@@ -838,42 +838,21 @@ class BuyNowPayLaterAutofillOptimizationGuideDeciderTest
   optimization_guide::proto::OptimizationType GetAffirmOptimizationType()
       const {
     return IsBlocklistFlagEnabled()
-#if BUILDFLAG(IS_ANDROID)
-               ? optimization_guide::proto::
-                     BUY_NOW_PAY_LATER_BLOCKLIST_AFFIRM_ANDROID
-               : optimization_guide::proto::
-                     BUY_NOW_PAY_LATER_ALLOWLIST_AFFIRM_ANDROID;
-#else
                ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_AFFIRM
                : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_AFFIRM;
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   optimization_guide::proto::OptimizationType GetZipOptimizationType() const {
     return IsBlocklistFlagEnabled()
-#if BUILDFLAG(IS_ANDROID)
-               ? optimization_guide::proto::
-                     BUY_NOW_PAY_LATER_BLOCKLIST_ZIP_ANDROID
-               : optimization_guide::proto::
-                     BUY_NOW_PAY_LATER_ALLOWLIST_ZIP_ANDROID;
-#else
                ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_ZIP
                : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_ZIP;
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   optimization_guide::proto::OptimizationType GetKlarnaOptimizationType()
       const {
     return IsBlocklistFlagEnabled()
-#if BUILDFLAG(IS_ANDROID)
-               ? optimization_guide::proto::
-                     BUY_NOW_PAY_LATER_BLOCKLIST_KLARNA_ANDROID
-               : optimization_guide::proto::
-                     BUY_NOW_PAY_LATER_ALLOWLIST_KLARNA_ANDROID;
-#else
                ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_KLARNA
                : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_KLARNA;
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 };
 
@@ -1264,7 +1243,7 @@ TEST_P(
   EXPECT_TRUE(guide().IsUrlEligibleForBnplIssuer(
       BnplIssuer::IssuerId::kBnplKlarna, GURL("https://www.testurl.test")));
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Test that the ablation site lists are registered in case the ablation
 // experiment is enabled.

@@ -10,11 +10,7 @@
 namespace shared_highlighting {
 
 int GetPreemptiveLinkGenTimeoutLengthMs() {
-#if BUILDFLAG(IS_ANDROID)
-  return 100;
-#else
   return 500;
-#endif
 }
 
 }  // namespace shared_highlighting

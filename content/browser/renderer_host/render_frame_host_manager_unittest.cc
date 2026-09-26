@@ -83,10 +83,6 @@
 #include "ui/base/page_transition_types.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/compositor.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -2398,27 +2394,12 @@ TEST_P(RenderFrameHostManagerTestWithSiteIsolation, DetachPendingChild) {
       << "This SiteInstance should be destroyable now.";
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(lukasza): https://crbug.com/1067432: Calling Compositor::Initialize()
-// DCHECKs flakily and without such call the test below consistently fails on
-// Android (DCHECKing about parent_view->GetFrameSinkId().is_valid() in
-// RenderWidgetHostViewChildFrame::SetFrameConnectorDelegate).
-#define MAYBE_TwoTabsCrashOneReloadsOneLeaves \
-  DISABLED_TwoTabsCrashOneReloadsOneLeaves
-#else
 #define MAYBE_TwoTabsCrashOneReloadsOneLeaves TwoTabsCrashOneReloadsOneLeaves
-#endif
 // Two tabs in the same process crash. The first tab is reloaded, and the second
 // tab navigates away without reloading. The second tab's navigation shouldn't
 // mess with the first tab's content. Motivated by http://crbug.com/473714.
 TEST_P(RenderFrameHostManagerTestWithSiteIsolation,
        MAYBE_TwoTabsCrashOneReloadsOneLeaves) {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(lukasza): https://crbug.com/1067432: This call might DCHECK flakily
-  // about !CompositorImpl::IsInitialized()..
-  Compositor::Initialize();
-#endif
-
   const GURL kUrl1("http://www.google.com/");
   const GURL kUrl2("http://webkit.org/");
   const GURL kUrl3("http://whatwg.org/");
@@ -2511,13 +2492,8 @@ TEST_P(RenderFrameHostManagerTestWithSiteIsolation,
 // the navigation. (https://crbug.com/1258363)
 // TODO(crbug.com/375057184): Determine why this test crashes on Android and
 // re-enable it.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_TwoTabsOneNavigatesAndCrashesThenNavigatesBack \
-  DISABLED_TwoTabsOneNavigatesAndCrashesThenNavigatesBack
-#else
 #define MAYBE_TwoTabsOneNavigatesAndCrashesThenNavigatesBack \
   TwoTabsOneNavigatesAndCrashesThenNavigatesBack
-#endif
 TEST_P(RenderFrameHostManagerTestWithSiteIsolation,
        MAYBE_TwoTabsOneNavigatesAndCrashesThenNavigatesBack) {
   const GURL kUrl1("http://www.google.com/");

@@ -68,8 +68,6 @@ PlatformType GetPlatformInput() {
   return PlatformType::kMac;
 #elif BUILDFLAG(IS_LINUX)
   return PlatformType::kLinux;
-#elif BUILDFLAG(IS_ANDROID)
-  return PlatformType::kAndroid;
 #else
   return PlatformType::kOther;
 #endif
@@ -530,23 +528,8 @@ std::u16string GetStringForRecencyDecorationWithTime(
                                   /*visited_recently=*/true);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  std::u16string relative_time = FormatRelativeTime(last_visit_time);
-  if (relative_time.find(u"hour") != std::string::npos) {
-    relative_time.erase(relative_time.find(u"hour"));
-    relative_time +=
-        l10n_util::GetStringUTF16(IDS_TAB_RESUME_N_HOURS_AGO_NARROW);
-  } else if (relative_time.find(u"min") != std::string::npos) {
-    relative_time.erase(relative_time.find(u"min"));
-    relative_time +=
-        l10n_util::GetStringUTF16(IDS_TAB_RESUME_N_MINUTES_AGO_NARROW);
-  }
-  return GetStringForDecoration(DecorationType::kVisitedXAgo) + u" " +
-         relative_time;
-#else
   return GetStringForDecoration(DecorationType::kVisitedXAgo) + u" " +
          FormatRelativeTime(last_visit_time);
-#endif
 }
 
 }  // namespace visited_url_ranking

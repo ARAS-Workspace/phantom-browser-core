@@ -17,10 +17,8 @@
 #include "ui/base/interaction/element_tracker.h"
 #include "ui/base/interaction/safe_castable.h"
 #include "ui/gfx/geometry/rect_conversions.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/native_ui_util.h"
 #include "ui/views/interaction/view_subregion_anchor.h"
-#endif
 #include "ui/webui/tracked_element/tracked_element_handler.h"
 
 namespace ui {
@@ -107,21 +105,15 @@ gfx::Rect TrackedElementWebUI::GetBoundsInWebContents() const {
   return result;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 views::WebView* TrackedElementWebUI::GetWebView() const {
   return handler_ ? handler_->GetWebView() : nullptr;
 }
-#endif
 
 gfx::NativeView TrackedElementWebUI::GetNativeView() const {
   auto* const contents = handler_->web_contents();
-#if !BUILDFLAG(IS_ANDROID)
   return (contents && contents->GetTopLevelNativeWindow())
              ? gfx::GetViewForWindow(contents->GetTopLevelNativeWindow())
              : gfx::NativeView();
-#else
-  return (contents) ? contents->GetNativeView() : gfx::NativeView();
-#endif
 }
 
 std::string TrackedElementWebUI::GetSecondaryIdentifier() const {
@@ -194,10 +186,8 @@ void TrackedElementWebUI::UpdateEffectiveVisibility(bool bounds_changed) {
       // This event signals that the bounds of the element have been updated.
       ui::ElementTracker::GetFrameworkDelegate()->NotifyCustomEvent(
           this, kElementBoundsChangedEvent);
-#if !BUILDFLAG(IS_ANDROID)
       ui::ElementTracker::GetFrameworkDelegate()->NotifyCustomEvent(
           this, views::ViewSubregionAnchor::kAnchorBoundsChangedEvent);
-#endif
     }
     return;
   }

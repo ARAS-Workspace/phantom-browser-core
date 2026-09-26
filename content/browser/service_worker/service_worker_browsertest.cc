@@ -1549,7 +1549,7 @@ IN_PROC_BROWSER_TEST_F(ServiceWorkerBrowserTest, StartWorkerWhileInstalling) {
   run_loop.Run();
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // http://crbug.com/1347684
 #define MAYBE_DispatchFetchEventToStoppedWorkerSynchronously \
   DISABLED_DispatchFetchEventToStoppedWorkerSynchronously
@@ -3665,12 +3665,7 @@ IN_PROC_BROWSER_TEST_F(ServiceWorkerDisableWebSecurityTest,
   RunTestWithCrossOriginURL(kPageUrl, kScopeUrl);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Flaky on Android, http://crbug.com/1141870.
-#define MAYBE_RegisterNoCrash DISABLED_RegisterNoCrash
-#else
 #define MAYBE_RegisterNoCrash RegisterNoCrash
-#endif
 IN_PROC_BROWSER_TEST_F(ServiceWorkerDisableWebSecurityTest,
                        MAYBE_RegisterNoCrash) {
   StartServerAndNavigateToSetup();
@@ -4239,12 +4234,7 @@ IN_PROC_BROWSER_TEST_P(ServiceWorkerCrossOriginIsolatedBrowserTest,
             process_lock.GetWebExposedIsolationInfo().is_isolated());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Flaky on Android, http://crbug.com/1335344.
-#define MAYBE_PostInstallRun DISABLED_PostInstallRun
-#else
 #define MAYBE_PostInstallRun PostInstallRun
-#endif
 IN_PROC_BROWSER_TEST_P(ServiceWorkerCrossOriginIsolatedBrowserTest,
                        MAYBE_PostInstallRun) {
   StartServerAndNavigateToSetup();
@@ -4654,13 +4644,8 @@ class ServiceWorkerBackForwardCacheBrowserTest
 };
 
 // Fails on Android. https://crbug.com/1216619
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_EvictionOfBackForwardCacheWithMultipleServiceWorkers \
-  DISABLED_EvictionOfBackForwardCacheWithMultipleServiceWorkers
-#else
 #define MAYBE_EvictionOfBackForwardCacheWithMultipleServiceWorkers \
   EvictionOfBackForwardCacheWithMultipleServiceWorkers
-#endif
 
 // Regression test for https://crbug.com/1212618.
 IN_PROC_BROWSER_TEST_F(
@@ -5009,7 +4994,7 @@ INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(
     ServiceWorkerBrowserTestWithStoragePartitioning);
 
 // http://crbug.com/1385779
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_StorageKeyWithHostPermissionsWithDedicatedWorkers \
   DISABLED_StorageKeyWithHostPermissionsWithDedicatedWorkers
 #else
@@ -5023,7 +5008,6 @@ IN_PROC_BROWSER_TEST_P(
 }
 
 // Android does not have Shared Workers, so skip the shared worker test.
-#if !BUILDFLAG(IS_ANDROID)
 // http://crbug.com/1385779
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_StorageKeyWithHostPermissionsWithSharedWorkers \
@@ -5036,7 +5020,6 @@ IN_PROC_BROWSER_TEST_P(ServiceWorkerBrowserTestWithStoragePartitioning,
                        MAYBE_StorageKeyWithHostPermissionsWithSharedWorkers) {
   RunTestWithWorkers("with-shared-worker");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(ServiceWorkerBrowserTest, WarmUpAndStartServiceWorker) {
   base::HistogramTester histogram_tester;
@@ -5296,7 +5279,6 @@ class ServiceWorkerWarmUpBrowserTestBase : public ServiceWorkerBrowserTest {
 };
 
 // Pointer triggered ServiceWorkerWarmUp is not currently available on Android.
-#if !BUILDFLAG(IS_ANDROID)
 
 struct ServiceWorkerWarmUpByPointerBrowserTestParam {
   bool enable_warm_up_by_pointerover;
@@ -5423,8 +5405,6 @@ IN_PROC_BROWSER_TEST_P(ServiceWorkerWarmUpByPointerBrowserTest,
 
   WaitForWarmedUp(*version);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class ServiceWorkerSkipEmptyFetchHandlerBrowserTest
     : public ServiceWorkerBrowserTest {
@@ -6584,13 +6564,8 @@ IN_PROC_BROWSER_TEST_P(
 
 // TODO(crbug.com/40263529): Flaky on Fuchsia.
 // TODO(crbug.com/41490535): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Subresource_FetchHandler_Wins_Redirect \
-  DISABLED_Subresource_FetchHandler_Wins_Redirect
-#else
 #define MAYBE_Subresource_FetchHandler_Wins_Redirect \
   Subresource_FetchHandler_Wins_Redirect
-#endif
 IN_PROC_BROWSER_TEST_P(
     ServiceWorkerStaticRouterRaceNetworkAndFetchHandlerSourceBrowserTest,
     MAYBE_Subresource_FetchHandler_Wins_Redirect) {

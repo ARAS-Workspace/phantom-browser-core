@@ -32,12 +32,6 @@
 #include "gin/v8_initializer.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_assets.h"
-#include "base/android/locale_utils.h"
-#include "ui/base/resource/resource_bundle_android.h"
-#endif
-
 #include "ui/accessibility/platform/ax_platform_node_base.h"
 
 namespace content {
@@ -136,31 +130,14 @@ void ContentTestSuiteBase::RegisterInProcessThreads() {
 void ContentTestSuiteBase::InitializeResourceBundle() {
   base::FilePath content_shell_pack_path;
 
-#if BUILDFLAG(IS_ANDROID)
-  // on Android all pak files are inside the paks folder.
-  CHECK(base::PathService::Get(base::DIR_ANDROID_APP_DATA,
-                               &content_shell_pack_path));
-  content_shell_pack_path =
-      content_shell_pack_path.Append(FILE_PATH_LITERAL("paks"));
-#else
   CHECK(base::PathService::Get(base::DIR_ASSETS, &content_shell_pack_path));
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Add the content_shell main pak file.
   content_shell_pack_path =
       content_shell_pack_path.Append(FILE_PATH_LITERAL("content_shell.pak"));
 
   if (!ui::ResourceBundle::HasSharedInstance()) {
-#if BUILDFLAG(IS_ANDROID)
-    ui::ResourceBundle::InitSharedInstanceWithLocale(
-        base::android::GetDefaultLocaleString(), NULL,
-        ui::ResourceBundle::DO_NOT_LOAD_COMMON_RESOURCES);
-
-    ui::LoadMainAndroidPackFile("assets/content_shell.pak",
-                                content_shell_pack_path);
-#else
     ui::ResourceBundle::InitSharedInstanceWithPakPath(content_shell_pack_path);
-#endif
   }
 }
 

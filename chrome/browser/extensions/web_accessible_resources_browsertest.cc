@@ -695,11 +695,7 @@ IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest, DNRRedirect) {
 // both a query and a ref.
 // Regression test for crbug.com/461824106.
 // TODO(crbug.com/512084385): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_DNRRedirectWithQueryAndRef DISABLED_DNRRedirectWithQueryAndRef
-#else
 #define MAYBE_DNRRedirectWithQueryAndRef DNRRedirectWithQueryAndRef
-#endif
 IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest,
                        MAYBE_DNRRedirectWithQueryAndRef) {
   auto file_path = test_data_dir_.AppendASCII(
@@ -867,7 +863,6 @@ IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest,
   };
 
   // Android only supports manifest V3.
-#if !BUILDFLAG(IS_ANDROID)
   auto TestBrowserRedirectMV2 = [&]() {
     TestBrowserRedirect(
         R"({
@@ -879,7 +874,6 @@ IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest,
         "Extensions.WAR.XOriginWebAccessible.MV2");
   };
   TestBrowserRedirectMV2();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   auto TestBrowserRedirectMV3 = [&]() {
     TestBrowserRedirect(
@@ -1047,9 +1041,7 @@ IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest,
 
   TestBrowserRedirect(MV3);
   // Android only supports manifest V3.
-#if !BUILDFLAG(IS_ANDROID)
   TestBrowserRedirect(MV2);
-#endif
 }
 
 // Test dynamic origins in web accessible resources.

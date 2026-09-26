@@ -37,10 +37,6 @@
 #include "ui/gfx/geometry/rect_f.h"
 #include "ui/gl/gl_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/common/content_features.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -505,12 +501,6 @@ class WebContentsVideoCaptureDeviceBrowserTestP
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     WebContentsVideoCaptureDeviceBrowserTest::SetUpCommandLine(command_line);
-
-#if BUILDFLAG(IS_ANDROID)
-    // Disable RenderDocument temporarily while we figure out why the test
-    // "CapturesContentChange" is flaky when we change RenderFrameHosts.
-    scoped_feature_list_.InitWithFeatures({}, {features::kRenderDocument});
-#endif
   }
 
   // Returns human-readable description of the test based on test parameters.
@@ -534,20 +524,7 @@ class WebContentsVideoCaptureDeviceBrowserTestP
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    WebContentsVideoCaptureDeviceBrowserTestP,
-    testing::Combine(
-        // Note: On ChromeOS and Android, software compositing is not an option.
-        testing::Values(false /* GPU-accelerated compositing */),
-        testing::Values(false /* variable aspect ratio */,
-                        true /* fixed aspect ratio */),
-        testing::Values(false /* page has only a main frame */,
-                        true /* page contains a cross-site iframe */),
-        testing::Values(media::VideoPixelFormat::PIXEL_FORMAT_I420)),
-    &WebContentsVideoCaptureDeviceBrowserTestP::GetDescription);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // On MacOS, there is a newly added support for NV12-in-GMB. It relies on GPU
 // acceleration, but has a feature detection built-in if the format is
 // specified as media::VideoPixelFormat::PIXEL_FORMAT_UNKNOWN.

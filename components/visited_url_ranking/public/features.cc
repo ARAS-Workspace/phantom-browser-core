@@ -17,11 +17,7 @@ constexpr base::FeatureParam<bool>
     kVisitedURLRankingHistoryFetcherDiscardZeroDurationVisits{
         &kVisitedURLRankingService,
         /*name=*/"history_fetcher_discard_zero_duration_visits",
-#if BUILDFLAG(IS_ANDROID)
-        /*default_value=*/false};
-#else
         /*default_value=*/true};
-#endif  // BUILDFLAG(IS_ANDROID)
 
 constexpr base::FeatureParam<std::string> kVisitedURLRankingResultTypesParam{
     &kVisitedURLRankingService,

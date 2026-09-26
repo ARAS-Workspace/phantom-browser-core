@@ -58,20 +58,11 @@ std::string protobuf_to_string(
   return source;
 }
 
-extern "C" int
-LLVMFuzzerInitialize(int* argc, char*** argv) {
-// TODO(crbug.com/515765355): Consider centralizing this fallback logic in V8
-// code.
-#if BUILDFLAG(IS_ANDROID)
-  base::FilePath assets_dir;
-  CHECK(base::PathService::Get(base::DIR_ASSETS, &assets_dir));
-  v8::V8::InitializeICUDefaultLocation(assets_dir.value().c_str());
-  base::FilePath snapshot_path = assets_dir.Append("snapshot_blob.bin");
-  v8::V8::InitializeExternalStartupDataFromFile(snapshot_path.value().c_str());
-#else
+extern "C" int LLVMFuzzerInitialize(int* argc, char*** argv) {
+  // TODO(crbug.com/515765355): Consider centralizing this fallback logic in V8
+  // code.
   v8::V8::InitializeICUDefaultLocation((*argv)[0]);
   v8::V8::InitializeExternalStartupData((*argv)[0]);
-#endif  // BUILDFLAG(IS_ANDROID)
   v8::V8::SetFlagsFromCommandLine(argc, *argv, true);
   return 0;
 }

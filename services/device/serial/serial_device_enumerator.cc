@@ -16,8 +16,6 @@
 #include "services/device/serial/serial_device_enumerator_linux.h"
 #elif BUILDFLAG(IS_MAC)
 #include "services/device/serial/serial_device_enumerator_mac.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "services/device/serial/serial_device_enumerator_android.h"
 #endif
 
 namespace device {
@@ -29,10 +27,6 @@ std::unique_ptr<SerialDeviceEnumerator> SerialDeviceEnumerator::Create(
   return SerialDeviceEnumeratorLinux::Create();
 #elif BUILDFLAG(IS_MAC)
   return std::make_unique<SerialDeviceEnumeratorMac>();
-#elif BUILDFLAG(IS_ANDROID)
-  auto instance = std::make_unique<SerialDeviceEnumeratorAndroid>();
-  instance->Initialize();
-  return instance;
 #else
 #error "No implementation of SerialDeviceEnumerator on this platform."
 #endif

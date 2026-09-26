@@ -182,11 +182,7 @@ class ChromeHintsManagerFetchingTest
 };
 
 TEST_F(ChromeHintsManagerFetchingTest, PushManagerSet) {
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(hints_manager()->push_notification_manager());
-#else
   EXPECT_FALSE(hints_manager()->push_notification_manager());
-#endif
 }
 
 TEST_F(ChromeHintsManagerFetchingTest, NoOptimizationGuideWebContentsObserver) {

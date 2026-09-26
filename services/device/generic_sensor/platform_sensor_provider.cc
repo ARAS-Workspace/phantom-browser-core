@@ -14,8 +14,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "services/device/generic_sensor/platform_sensor_provider_mac.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "services/device/generic_sensor/platform_sensor_provider_android.h"
 #elif BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 #include "services/device/generic_sensor/platform_sensor_provider_linux.h"
 #endif
@@ -54,8 +52,6 @@ PlatformSensorProvider::~PlatformSensorProvider() {
 std::unique_ptr<PlatformSensorProvider> PlatformSensorProvider::Create() {
 #if BUILDFLAG(IS_MAC)
   return std::make_unique<PlatformSensorProviderMac>();
-#elif BUILDFLAG(IS_ANDROID)
-  return std::make_unique<PlatformSensorProviderAndroid>();
 #elif BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
   return std::make_unique<PlatformSensorProviderLinux>();
 #else

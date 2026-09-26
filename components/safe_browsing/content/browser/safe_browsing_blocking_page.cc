@@ -184,12 +184,10 @@ void SafeBrowsingBlockingPage::OnInterstitialClosing() {
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (trust_safety_sentiment_service_trigger_) {
     std::move(trust_safety_sentiment_service_trigger_)
         .Run(proceeded(), threat_type_);
   }
-#endif
 
   BaseBlockingPage::OnInterstitialClosing();
 }
@@ -249,12 +247,7 @@ void SafeBrowsingBlockingPage::FinishThreatDetails(const base::TimeDelta& delay,
   trigger_manager_->SetInterstitialInteractions(
       std::move(interstitial_interactions_));
   bool is_hats_candidate = false;
-  const base::Feature& hats_feature =
-#if BUILDFLAG(IS_ANDROID)
-      kRedWarningSurveyAndroid;
-#else
-      kRedWarningSurvey;
-#endif
+  const base::Feature& hats_feature = kRedWarningSurvey;
   if (base::FeatureList::IsEnabled(hats_feature)) {
     is_hats_candidate =
         SafeBrowsingHatsDelegate::IsSurveyCandidate(

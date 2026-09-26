@@ -95,13 +95,8 @@ IN_PROC_BROWSER_TEST_F(DevtoolsApiTest,
 // DevTools is reopened.
 // Regression test for https://crbug.com/483435192.
 // TODO(https://crbug.com/546216109): Enable on desktop android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CantGetFileResourceWhenFileAccessRevoked \
-  DISABLED_CantGetFileResourceWhenFileAccessRevoked
-#else
 #define MAYBE_CantGetFileResourceWhenFileAccessRevoked \
   CantGetFileResourceWhenFileAccessRevoked
-#endif
 IN_PROC_BROWSER_TEST_F(DevtoolsApiTest,
                        MAYBE_CantGetFileResourceWhenFileAccessRevoked) {
   ASSERT_TRUE(StartEmbeddedTestServer());

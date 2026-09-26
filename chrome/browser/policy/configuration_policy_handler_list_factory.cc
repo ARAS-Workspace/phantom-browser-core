@@ -140,10 +140,6 @@
 #include "pdf/buildflags.h"
 #include "printing/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/first_run/android/first_run_prefs.h"
-#include "ui/accessibility/accessibility_prefs.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/default_download_dir_policy_handler.h"
 #include "chrome/browser/download/download_auto_open_policy_handler.h"
 #include "chrome/browser/download/download_dir_policy_handler.h"
@@ -159,7 +155,6 @@
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/search_engines/enterprise/search_aggregator_policy_handler.h"
 #include "components/search_engines/enterprise/site_search_policy_handler.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/enterprise/reporting/extension_request/extension_request_policy_handler.h"
@@ -413,11 +408,9 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kGeminiSettings,
     optimization_guide::prefs::kGeminiSettings,
     base::Value::Type::INTEGER },
-#if !BUILDFLAG(IS_ANDROID)
   { key::kVoiceTypingSettings,
     prefs::kVoiceTypingSettings,
     base::Value::Type::INTEGER },
-#endif
   { key::kAllowDeletingBrowserHistory,
     prefs::kAllowDeletingBrowserHistory,
     base::Value::Type::BOOLEAN },
@@ -464,38 +457,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kManagedWebHidBlockedForUrls,
     base::Value::Type::LIST },
 // Policies for all platforms - End
-#if BUILDFLAG(IS_ANDROID)
-  { key::kAccessibilityPerformanceFilteringAllowed,
-    prefs::kAccessibilityPerformanceFilteringAllowed,
-    base::Value::Type::BOOLEAN },
-  { key::kAuthAndroidNegotiateAccountType,
-    prefs::kAuthAndroidNegotiateAccountType,
-    base::Value::Type::STRING },
-  { key::kBackForwardCacheEnabled,
-    policy_prefs::kBackForwardCacheEnabled,
-    base::Value::Type::BOOLEAN },
-  { key::kNTPContentSuggestionsEnabled,
-    feed::prefs::kEnableSnippets,
-    base::Value::Type::BOOLEAN },
-  { key::kSitePerProcessAndroid,
-    prefs::kSitePerProcess,
-    base::Value::Type::BOOLEAN },
-  { key::kTosDialogBehavior,
-    first_run::kTosDialogBehavior,
-    base::Value::Type::INTEGER },
-  { key::kThirdPartyPasswordManagersAllowed,
-    autofill::prefs::kAutofillThirdPartyPasswordManagersAllowed,
-    base::Value::Type::BOOLEAN },
-  { key::kWebXRImmersiveArEnabled,
-    prefs::kWebXRImmersiveArEnabled,
-    base::Value::Type::BOOLEAN },
-  { key::kListenToThisPageEnabled,
-    prefs::kListenToThisPageEnabled,
-    base::Value::Type::BOOLEAN },
-  { key::kSearchContentSharingSettings,
-    contextual_search::kSearchContentSharingSettings,
-    base::Value::Type::INTEGER },
-#else // !BUILDFLAG(IS_ANDROID)
   { key::kAbusiveExperienceInterventionEnforce,
     blocked_content::prefs::kAbusiveExperienceInterventionEnforce,
     base::Value::Type::BOOLEAN },
@@ -564,14 +525,12 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kOriginKeyedProcessesEnabled,
     prefs::kOriginKeyedProcessesEnabled,
     base::Value::Type::BOOLEAN },
-#endif // !BUILDFLAG(IS_ANDROID)
   { key::kDefaultIdleDetectionSetting,
     prefs::kManagedDefaultIdleDetectionSetting,
     base::Value::Type::INTEGER },
   { key::kDefaultImagesSetting,
     prefs::kManagedDefaultImagesSetting,
     base::Value::Type::INTEGER },
-#if !BUILDFLAG(IS_ANDROID)
   { key::kDefaultInsecureContentSetting,
     prefs::kManagedDefaultInsecureContentSetting,
     base::Value::Type::INTEGER },
@@ -658,7 +617,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kHideWebStoreIcon,
     policy::policy_prefs::kHideWebStoreIcon,
     base::Value::Type::BOOLEAN },
-#endif // !BUILDFLAG(IS_ANDROID)
   { key::kHomepageIsNewTabPage,
     prefs::kHomePageIsNewTabPage,
     base::Value::Type::BOOLEAN },
@@ -674,7 +632,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kUserFeedbackAllowed,
     prefs::kUserFeedbackAllowed,
     base::Value::Type::BOOLEAN },
-#if !BUILDFLAG(IS_ANDROID)
   { key::kRestrictYouTubeCookiesDeletion,
     prefs::kRestrictYouTubeCookiesDeletion,
     base::Value::Type::BOOLEAN },
@@ -845,7 +802,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kPasswordManagerPasskeysEnabled,
     password_manager::prefs::kCredentialsEnablePasskeys,
     base::Value::Type::BOOLEAN },
-#endif // !BUILDFLAG(IS_ANDROID)
   { key::kWebAuthenticationRemoteDesktopAllowedOrigins,
     webauthn::pref_names::kRemoteDesktopAllowedOrigins,
     base::Value::Type::LIST },
@@ -1063,12 +1019,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     base::Value::Type::STRING },
 #endif // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-  { key::kProtectedContentIdentifiersAllowed,
-    policy_prefs::kProtectedContentIdentifiersAllowed,
-    base::Value::Type::BOOLEAN },
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_LINUX)
   { key::kNetworkServiceSandboxEnabled,
     prefs::kNetworkServiceSandboxEnabled,
@@ -1122,7 +1072,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kLiveTranslateEnabled,
     base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#if !BUILDFLAG(IS_ANDROID)
   // First run import.
   { key::kImportBookmarks,
     prefs::kImportBookmarks,
@@ -1212,7 +1161,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kSigninInterceptionEnabled,
     prefs::kSigninInterceptionEnabled,
     base::Value::Type::BOOLEAN },
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   { key::kAlternativeBrowserPath,
@@ -1333,29 +1281,17 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kShoppingListEnabled,
     commerce::kShoppingListEnabledPrefName,
     base::Value::Type::BOOLEAN},
-#if BUILDFLAG(IS_ANDROID)
-  { key::kVirtualKeyboardResizesLayoutByDefault,
-    prefs::kVirtualKeyboardResizesLayoutByDefault,
-    base::Value::Type::BOOLEAN},
-#endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_ANDROID)
-    { key::kAndroidEntraSsoEnabled,
-    prefs::kAndroidEntraSSOEnabled,
-    base::Value::Type::INTEGER },
-#endif
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   { key::kOutOfProcessSystemDnsResolutionEnabled,
     prefs::kOutOfProcessSystemDnsResolutionEnabled,
     base::Value::Type::BOOLEAN },
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
-#if !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
   { key::kGoogleSearchSidePanelEnabled,
     prefs::kGoogleSearchSidePanelEnabled,
     base::Value::Type::BOOLEAN },
   { key::kSafeBrowsingDeepScanningEnabled,
     prefs::kSafeBrowsingDeepScanningEnabled,
     base::Value::Type::BOOLEAN },
-#endif  // BUILDFLAG(IS_ANDROID)
   { key::kAllowBackForwardCacheForCacheControlNoStorePageEnabled,
     policy_prefs::kAllowBackForwardCacheForCacheControlNoStorePageEnabled,
     base::Value::Type::BOOLEAN},
@@ -1377,14 +1313,12 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kIPv6ReachabilityOverrideEnabled,
     prefs::kIPv6ReachabilityOverrideEnabled,
     base::Value::Type::BOOLEAN },
-#if !BUILDFLAG(IS_ANDROID)
   { key::kDevToolsGenAiSettings,
     prefs::kDevToolsGenAiSettings,
     base::Value::Type::INTEGER },
   { key::kDevToolsGoogleDeveloperProgramProfileAvailability,
     prefs::kDevToolsGoogleDeveloperProgramProfileAvailability,
     base::Value::Type::INTEGER },
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   { key::kExtensionInstallTypeBlocklist,
@@ -1392,7 +1326,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     base::Value::Type::LIST},
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
   { key::kHelpMeWriteSettings,
     optimization_guide::prefs::kComposeEnterprisePolicyAllowed,
     base::Value::Type::INTEGER},
@@ -1402,19 +1335,13 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kHistorySearchSettings,
     optimization_guide::prefs::kHistorySearchEnterprisePolicyAllowed,
     base::Value::Type::INTEGER},
-#endif // !BUILDFLAG(IS_ANDROID)
   { key::kTabCompareSettings,
     optimization_guide::prefs::kProductSpecificationsEnterprisePolicyAllowed,
     base::Value::Type::INTEGER},
   { key::kAutofillPredictionSettings,
     optimization_guide::prefs::kAutofillPredictionImprovementsEnterprisePolicyAllowed,
     base::Value::Type::INTEGER},
-#if BUILDFLAG(IS_ANDROID)
-  { key::kFindsSettings,
-    optimization_guide::prefs::kFindsEnterprisePolicyAllowed,
-    base::Value::Type::INTEGER},
-#endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   { key::kChromeForTestingAllowed,
     prefs::kChromeForTestingAllowed,
     base::Value::Type::BOOLEAN },
@@ -1432,11 +1359,9 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kCAHintCertificates,
     prefs::kCAHintCertificates,
     base::Value::Type::LIST },
-#if !BUILDFLAG(IS_ANDROID)
   { key::kCACertificateManagementAllowed,
     prefs::kCACertificateManagementAllowed,
     base::Value::Type::INTEGER },
-#endif  // !BUILDFLAG(IS_ANDROID)
   { key::kLocalNetworkAccessRestrictionsTemporaryOptOut,
     prefs::kManagedLocalNetworkAccessRestrictionsTemporaryOptOut,
     base::Value::Type::BOOLEAN },
@@ -1492,11 +1417,9 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kReduceAcceptLanguageEnabled,
     prefs::kReduceAcceptLanguageEnabled,
     base::Value::Type::BOOLEAN },
-#if !BUILDFLAG(IS_ANDROID)
   { key::kBuiltInAIAPIsEnabled,
     policy_prefs::kBuiltInAIAPIsEnabled,
     base::Value::Type::BOOLEAN },
-#endif  // BUILDFLAG(IS_ANDROID)
   { key::kThirdPartyAiChatSettings,
     omnibox::kThirdPartyAiChatSettings,
     base::Value::Type::INTEGER },
@@ -1631,7 +1554,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 
   handlers->AddHandler(std::make_unique<IsolateOriginsPolicyHandler>());
 
-#if !BUILDFLAG(IS_ANDROID)
   handlers->AddHandler(
       std::make_unique<DeveloperToolsAvailabilityListPolicyHandler>(
           key::kDeveloperToolsAvailabilityAllowlist,
@@ -1641,7 +1563,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       std::make_unique<DeveloperToolsAvailabilityListPolicyHandler>(
           key::kDeveloperToolsAvailabilityBlocklist,
           prefs::kDeveloperToolsAvailabilityBlocklist));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   handlers->AddHandler(std::make_unique<IntRangePolicyHandler>(
       key::kGenAILocalFoundationalModelSettings,
@@ -1711,10 +1632,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   handlers->AddHandler(std::make_unique<WebHidDevicePolicyHandler>(
       key::kWebHidAllowDevicesWithHidUsagesForUrls,
       prefs::kManagedWebHidAllowDevicesWithHidUsagesForUrls, chrome_schema));
-#if BUILDFLAG(IS_ANDROID)
-  handlers->AddHandler(
-      std::make_unique<ContextualSearchPolicyHandlerAndroid>());
-#else  // !BUILDFLAG(IS_ANDROID)
   handlers->AddHandler(std::make_unique<BrowsingDataLifetimePolicyHandler>(
       key::kClearBrowsingDataOnExitList,
       browsing_data::prefs::kClearBrowsingDataOnExitList, chrome_schema));
@@ -1867,7 +1784,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       SCHEMA_ALLOW_UNKNOWN_AND_INVALID_LIST_ENTRY,
       SimpleSchemaValidatingPolicyHandler::RECOMMENDED_PROHIBITED,
       SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   handlers->AddHandler(
       std::make_unique<enterprise_idle::IdleTimeoutPolicyHandler>());
@@ -1998,7 +1914,7 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 #endif
   std::vector<std::unique_ptr<ConfigurationPolicyHandler>>
       signin_legacy_policies;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   signin_legacy_policies.push_back(std::make_unique<SimplePolicyHandler>(
       key::kForceBrowserSignin, prefs::kForceBrowserSignin,
       base::Value::Type::BOOLEAN));
@@ -2012,15 +1928,7 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           base::Value::Type::LIST)));
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   signin_legacy_policies.push_back(std::make_unique<SimplePolicyHandler>(
-      key::kSigninAllowed,
-#if BUILDFLAG(IS_ANDROID)
-      // The new kSigninAllowedOnNextStartup pref is only used on Desktop.
-      // Keep the old kSigninAllowed pref for Android until the policy is
-      // fully deprecated in M71 and can be removed.
-      prefs::kSigninAllowed,
-#else   // BUILDFLAG(IS_ANDROID)
-      prefs::kSigninAllowedOnNextStartup,
-#endif  // BUILDFLAG(IS_ANDROID)
+      key::kSigninAllowed, prefs::kSigninAllowedOnNextStartup,
       base::Value::Type::BOOLEAN));
   handlers->AddHandler(std::make_unique<LegacyPoliciesDeprecatingPolicyHandler>(
       std::move(signin_legacy_policies),
@@ -2043,14 +1951,10 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           chrome_schema));
 #endif  // BUILDFLAG(IS_MAC)
 
-// On most platforms, there is a legacy policy
-// kUnsafelyTreatInsecureOriginAsSecure which has been replaced by
-// kOverrideSecurityRestrictionsOnInsecureOrigin. The legacy policy was never
-// supported on Android, so on those platforms, simply use the new one.
-#if BUILDFLAG(IS_ANDROID)
-  handlers->AddHandler(std::make_unique<SecureOriginPolicyHandler>(
-      key::kOverrideSecurityRestrictionsOnInsecureOrigin, chrome_schema));
-#else
+  // On most platforms, there is a legacy policy
+  // kUnsafelyTreatInsecureOriginAsSecure which has been replaced by
+  // kOverrideSecurityRestrictionsOnInsecureOrigin. The legacy policy was never
+  // supported on Android, so on those platforms, simply use the new one.
   std::vector<std::unique_ptr<ConfigurationPolicyHandler>>
       secure_origin_legacy_policy;
   secure_origin_legacy_policy.push_back(
@@ -2080,7 +1984,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       SCHEMA_ALLOW_UNKNOWN,
       SimpleSchemaValidatingPolicyHandler::RECOMMENDED_PROHIBITED,
       SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
-#endif  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   handlers->AddHandler(
       std::make_unique<extensions::ExtensionSettingsPolicyHandler>(
@@ -2144,9 +2047,7 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           chrome_schema));
 #endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 
-#if !BUILDFLAG(IS_ANDROID)
   handlers->AddHandler(std::make_unique<BatterySaverPolicyHandler>());
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   handlers->AddHandler(std::make_unique<DataRegionPolicyHandler>(
       key::kChromeDataRegionSetting, prefs::kChromeDataRegionSetting));
@@ -2177,11 +2078,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       key::kAutofillPredictionSettings,
       optimization_guide::prefs::
           kAutofillPredictionImprovementsEnterprisePolicyAllowed);
-#if BUILDFLAG(IS_ANDROID)
-  gen_ai_default_policies.emplace_back(
-      key::kFindsSettings,
-      optimization_guide::prefs::kFindsEnterprisePolicyAllowed);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   gen_ai_default_policies.emplace_back(
       key::kThirdPartyAiChatSettings, omnibox::kThirdPartyAiChatSettings,
@@ -2191,10 +2087,8 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       key::kGeminiSettings, optimization_guide::prefs::kGeminiSettings,
       GenAiDefaultSettingsPolicyHandler::PolicyValueToPrefMap(
           {{0, 0}, {1, 0}, {2, 1}}));
-#if !BUILDFLAG(IS_ANDROID)
   gen_ai_default_policies.emplace_back(key::kVoiceTypingSettings,
                                        prefs::kVoiceTypingSettings);
-#endif
   gen_ai_default_policies.emplace_back(
       key::kFindAndFillWithGeminiSettings,
       optimization_guide::prefs::kFindAndFillWithGeminiSettings);

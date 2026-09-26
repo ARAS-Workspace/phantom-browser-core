@@ -29,11 +29,6 @@
 #include "net/ssl/ssl_info.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/time/time.h"
-#include "net/android/network_library.h"
-#endif
-
 // static
 const void* const CaptivePortalBlockingPage::kTypeForTesting =
     &CaptivePortalBlockingPage::kTypeForTesting;
@@ -105,8 +100,6 @@ std::string CaptivePortalBlockingPage::GetWiFiSSID() const {
     return std::string();
 #elif BUILDFLAG(IS_LINUX)
   ssid = net::GetWifiSSID();
-#elif BUILDFLAG(IS_ANDROID)
-  ssid = net::android::GetWifiSSID();
 #endif
   // TODO(meacer): Handle non UTF8 SSIDs.
   if (!base::IsStringUTF8(ssid))

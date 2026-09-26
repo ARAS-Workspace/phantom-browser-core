@@ -16,34 +16,14 @@ namespace policy::features {
 BASE_FEATURE(kProfileSeparationDomainExceptionListRetroactive,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kEnhancedSecurityEventFields,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
+BASE_FEATURE(kEnhancedSecurityEventFields, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kUseCECFlagInPolicyData, base::FEATURE_ENABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kInitializePoliciesForSignedInUserInNewEntryPoints,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kAndroidUseAdminsForEnterpriseInfo,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // Enables a configurable delay for policy registration.
 BASE_FEATURE(kCustomPolicyRegistrationDelay, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<base::TimeDelta> kPolicyRegistrationDelay{
     &kCustomPolicyRegistrationDelay, "PolicyRegistrationDelay", base::Hours(6)};
-
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-// A blocklist of policies to be blocked/ignored on Desktop Android.
-BASE_FEATURE(kDesktopAndroidPolicy, base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<std::string> kDesktopAndroidPolicyBlocklist{
-    &kDesktopAndroidPolicy, "blocklist", ""};
-#endif  // BUILDFLAG(IS_DESKTOP_ANDROID)
 
 // Used to enable extension install policy support.
 BASE_FEATURE(kEnableExtensionInstallPolicyFetching,

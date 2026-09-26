@@ -35,14 +35,7 @@ bool SupportsUnpackSubimage() {
 
 // This value can't be cached as it may change for different contexts.
 bool SupportsPackSubimage() {
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_X86_FAMILY)
-  // GL_PACK_ROW_LENGTH is broken in the Android emulator. glReadPixels()
-  // modifies bytes between the last pixel in a row and the end of the stride
-  // for that row.
-  return false;
-#else
   return gl::g_current_gl_version->IsAtLeastGLES(3, 0);
-#endif
 }
 
 // Shared memory GMBs tend to use a stride that is 4 bytes aligned. If
@@ -163,17 +156,6 @@ void GLTextureHolder::Initialize(
   // if available.
   if (format_info.supports_storage) {
     {
-#if BUILDFLAG(IS_ANDROID)
-      // When using angle via enabling passthrough command decoder on android,
-      // disable renderability validation in angle for this texture since it is
-      // being created in ES3 context with a format which could be
-      // invalid/non-renderable in ES2/WEBGL1 context when this texture gets
-      // imported into the ES2/WEBGL1 context.
-      if (gl::g_current_gl_driver->ext.b_GL_ANGLE_renderability_validation) {
-        api->glTexParameteriFn(format_desc_.target,
-                               GL_RENDERABILITY_VALIDATION_ANGLE, GL_FALSE);
-      }
-#endif
       gl::ScopedProgressReporter scoped_progress_reporter(progress_reporter_);
       api->glTexStorage2DEXTFn(format_desc_.target, /*levels=*/1,
                                format_info.adjusted_storage_internal_format,

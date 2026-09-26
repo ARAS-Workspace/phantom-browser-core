@@ -23,11 +23,7 @@ BASE_FEATURE(kLocalWebApprovals, base::FEATURE_ENABLED_BY_DEFAULT);
 // TODO(crbug.com/391799078): Support local web approval for subframes on
 // Desktop.
 BASE_FEATURE(kAllowSubframeLocalWebApprovals,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 const int kLocalWebApprovalBottomSheetLoadTimeoutDefaultValueMs = 5000;
@@ -54,12 +50,7 @@ bool IsLocalWebApprovalsEnabled() {
   // Move this logic to SupervisedUserService, once it's migrated to
   // components, and de-release the intended usage of
   // WebsiteParentApproval::IsLocalApprovalSupported for Android.
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(kLocalWebApprovals) &&
-         IsGoogleBrandedBuild();
-#else
   return base::FeatureList::IsEnabled(kLocalWebApprovals);
-#endif
 }
 
 bool IsLocalWebApprovalsEnabledForSubframes() {

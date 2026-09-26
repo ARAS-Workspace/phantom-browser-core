@@ -69,10 +69,6 @@
 #include "base/strings/string_util.h"
 #include "third_party/icu/source/common/unicode/uloc.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/test_support_android.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "partition_alloc/tagging.h"  // nogncheck
 #endif
@@ -275,13 +271,8 @@ void InitializeLogging() {
   CHECK(logging::InitLogging({.logging_dest = kLoggingDest}));
 
   // We want process and thread IDs because we may have multiple processes.
-#if BUILDFLAG(IS_ANDROID)
-  // To view log output with IDs and timestamps use "adb logcat -v threadtime".
-  logging::SetLogItems(false, false, false, false);
-#else
   // We want process and thread IDs because we may have multiple processes.
   logging::SetLogItems(true, true, false, false);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 
@@ -350,11 +341,6 @@ int TestSuite::Run() {
   // pointer mismatches are detected immediately.
   ::partition_alloc::ChangeMemoryTaggingModeForCurrentThread(
       ::partition_alloc::TagViolationReportingMode::kSynchronous);
-#elif BUILDFLAG(IS_ANDROID)
-  // On Android, the tests are opted into synchronous MTE mode by the
-  // memtagMode attribute in an AndroidManifest.xml file or via an `am compat`
-  // command, so and explicit call to ChangeMemoryTaggingModeForCurrentThread
-  // is not needed.
 #endif
 
   int result = RunAllTests();
@@ -388,20 +374,6 @@ void TestSuite::UnitTestAssertHandler(const char* file,
                                       int line,
                                       std::string_view summary,
                                       std::string_view stack_trace) {
-#if BUILDFLAG(IS_ANDROID)
-  // Correlating test stdio with logcat can be difficult, so we emit this
-  // helpful little hint about what was running.  Only do this for Android
-  // because other platforms don't separate out the relevant logs in the same
-  // way.
-  const ::testing::TestInfo* const test_info =
-      ::testing::UnitTest::GetInstance()->current_test_info();
-  if (test_info) {
-    LOG(ERROR) << "Currently running: " << test_info->test_suite_name() << "."
-               << test_info->name();
-    fflush(stderr);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // XmlUnitTestResultPrinter inherits gtest format, where assert has summary
   // and message. In GTest, summary is just a logged text, and message is a
   // logged text, concatenated with stack trace of assert.
@@ -491,10 +463,6 @@ void TestSuite::Initialize() {
   }
 #endif  // BUILDFLAG(DCHECK_IS_CONFIGURABLE)
 
-#if BUILDFLAG(IS_ANDROID)
-  InitAndroidTestMessageLoop();
-#endif  // else BUILDFLAG(IS_ANDROID)
-
   CHECK(debug::EnableInProcessStackDumping());
 
   // In some cases, we do not want to see standard error dialogs.
@@ -581,9 +549,7 @@ void TestSuite::PreInitialize() {
   // https://crbug.com/41372437#comment12.
   // TODO(https://crbug.com/41372437): Use "threadsafe" on Android once it is
   // supported.
-#if !BUILDFLAG(IS_ANDROID)
   GTEST_FLAG_SET(death_test_style, "threadsafe");
-#endif
 
   EnableTerminationOnHeapCorruption();
 #if BUILDFLAG(IS_LINUX) && defined(USE_AURA)
@@ -597,9 +563,7 @@ void TestSuite::PreInitialize() {
 
   // On Android, AtExitManager is created in
   // testing/android/native_test_wrapper.cc before main() is called.
-#if !BUILDFLAG(IS_ANDROID)
   at_exit_manager_ = std::make_unique<AtExitManager>();
-#endif
 
   // This needs to be done during construction as some users of this class rely
   // on the constructor to initialise the CommandLine.

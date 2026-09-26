@@ -81,13 +81,8 @@ IN_PROC_BROWSER_TEST_P(PaymentHandlerEnforceFullDelegationTest,
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_WhenEnabled_ShowPaymentSheet_WhenDisabled_Reject \
-  DISABLED_WhenEnabled_ShowPaymentSheet_WhenDisabled_Reject
-#else
 #define MAYBE_WhenEnabled_ShowPaymentSheet_WhenDisabled_Reject \
   WhenEnabled_ShowPaymentSheet_WhenDisabled_Reject
-#endif
 IN_PROC_BROWSER_TEST_P(PaymentHandlerEnforceFullDelegationTest,
                        MAYBE_WhenEnabled_ShowPaymentSheet_WhenDisabled_Reject) {
   NavigateTo("a.com", "/enforce_full_delegation.test/index.html");

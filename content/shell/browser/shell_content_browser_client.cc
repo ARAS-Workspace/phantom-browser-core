@@ -102,21 +102,11 @@
 #include "url/url_canon.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_assets.h"
-#include "base/android/path_utils.h"
-#include "content/shell/android/shell_descriptors.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "components/crash/content/browser/crash_handler_host_linux.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include "components/crash/core/app/crash_switches.h"
 #include "components/crash/core/app/crashpad.h"
 #include "content/public/common/content_descriptors.h"
@@ -143,11 +133,7 @@ GetShellContentBrowserClientInstancesImpl() {
   return *instances;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-int GetCrashSignalFD(const base::CommandLine& command_line) {
-  return crashpad::CrashHandlerHost::Get()->GetDeathSignalSocket();
-}
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 int GetCrashSignalFD(const base::CommandLine& command_line) {
   int fd;
   pid_t pid;
@@ -665,12 +651,6 @@ std::string ShellContentBrowserClient::GetUserAgent() {
 
   std::string product =
       base::StringPrintf("Chrome/%s.0.0.0", CONTENT_SHELL_MAJOR_VERSION);
-#if BUILDFLAG(IS_ANDROID)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          embedder_support::kUseMobileUserAgent)) {
-    product += " Mobile";
-  }
-#endif
 
   return embedder_support::BuildUnifiedPlatformUserAgentFromProduct(product);
 }
@@ -691,23 +671,17 @@ void ShellContentBrowserClient::OverrideURLLoaderFactoryParams(
   }
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 void ShellContentBrowserClient::GetAdditionalMappedFilesForChildProcess(
     const base::CommandLine& command_line,
     int child_process_id,
     content::PosixFileDescriptorInfo* mappings) {
-#if BUILDFLAG(IS_ANDROID)
-  mappings->ShareWithRegion(
-      kShellPakDescriptor,
-      base::GlobalDescriptors::GetInstance()->Get(kShellPakDescriptor),
-      base::GlobalDescriptors::GetInstance()->GetRegion(kShellPakDescriptor));
-#endif
   int crash_signal_fd = GetCrashSignalFD(command_line);
   if (crash_signal_fd >= 0) {
     mappings->Share(kCrashDumpSignal, crash_signal_fd);
   }
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Note that ShellContentBrowserClient overrides this method to work around
 // test flakiness that happens when NetworkService::SetTestDohConfigForTesting()
@@ -717,7 +691,6 @@ void ShellContentBrowserClient::OnNetworkServiceCreated(
     network::mojom::NetworkService* network_service) {
   // TODO(bashi): Consider enabling this for Android. Excluded because the
   // built-in resolver may not work on older SDK versions.
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(net::features::kAsyncDns)) {
     network_service->ConfigureStubHostResolver(
         net::InsecureDnsMode::kEnabledBuiltIn,
@@ -726,7 +699,6 @@ void ShellContentBrowserClient::OnNetworkServiceCreated(
         /*additional_dns_types_enabled=*/true,
         /*fallback_doh_nameservers=*/{});
   }
-#endif
 }
 
 void ShellContentBrowserClient::ConfigureNetworkContextParams(

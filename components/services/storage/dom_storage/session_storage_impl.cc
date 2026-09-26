@@ -39,13 +39,8 @@ namespace {
 
 // Limits on the cache size and number of areas in memory, over which the areas
 // are purged.
-#if BUILDFLAG(IS_ANDROID)
-const unsigned kMaxSessionStorageAreaCount = 10;
-const size_t kMaxSessionStorageCacheSize = 2 * 1024 * 1024;
-#else
 const unsigned kMaxSessionStorageAreaCount = 50;
 const size_t kMaxSessionStorageCacheSize = 20 * 1024 * 1024;
-#endif
 
 }  // namespace
 

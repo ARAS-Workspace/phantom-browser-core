@@ -379,9 +379,7 @@ IN_PROC_BROWSER_TEST_F(CommandsApiTest, UnpinnedPageActionTriggers) {
   DisableActionGlobally(profile(), *extension);
 
   auto* toolbar_model = ToolbarActionsModel::Get(profile());
-#if !BUILDFLAG(IS_ANDROID)
   RunScheduledLayouts();
-#endif
   EXPECT_FALSE(toolbar_model->IsActionPinned(extension->id()));
 
   const int tab_id = NavigateToTestURLAndReturnTabId();
@@ -741,14 +739,7 @@ IN_PROC_BROWSER_TEST_P(ActionCommandsApiTest,
   EXPECT_TRUE(click_listener.WaitUntilSatisfied());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/405219115): For some reason this is causing flakiness issue
-// on bot (but not yet locally reproducible). Investigate and fix the issue.
-#define MAYBE_TriggeringCommandTriggersPopup \
-  DISABLED_TriggeringCommandTriggersPopup
-#else
 #define MAYBE_TriggeringCommandTriggersPopup TriggeringCommandTriggersPopup
-#endif
 
 // Tests that triggering a command associated with an action opens an
 // extension's popup.

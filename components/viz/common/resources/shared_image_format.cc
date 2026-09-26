@@ -407,11 +407,7 @@ SharedImageFormat SharedImageFormat::N32Format() {
   // Skia has an internal algorithm for determining the N32 flag, but we
   // override this with a build flag based on the Platform, so we can reduce
   // this to checking if we're building for Android.
-#if BUILDFLAG(IS_ANDROID)
-  return SinglePlaneFormat::kRGBA_8888;
-#else
   return SinglePlaneFormat::kBGRA_8888;
-#endif
 }
 
 bool SharedImageFormat::operator==(const SharedImageFormat& o) const {

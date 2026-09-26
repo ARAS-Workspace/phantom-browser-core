@@ -186,19 +186,13 @@ class MemoryInternalsDOMHandler : public content::WebUIMessageHandler,
   void SaveTraceFinished(bool success);
 
   scoped_refptr<ui::SelectFileDialog> select_file_dialog_;
-#if !BUILDFLAG(IS_ANDROID)
   raw_ptr<content::WebUI> web_ui_;  // The WebUI that owns us.
-#endif
 
   base::WeakPtrFactory<MemoryInternalsDOMHandler> weak_factory_{this};
 };
 
 MemoryInternalsDOMHandler::MemoryInternalsDOMHandler(content::WebUI* web_ui)
-#if !BUILDFLAG(IS_ANDROID)
-    : web_ui_(web_ui)
-#endif
-{
-}
+    : web_ui_(web_ui) {}
 
 MemoryInternalsDOMHandler::~MemoryInternalsDOMHandler() {
   if (select_file_dialog_) {
@@ -236,22 +230,6 @@ void MemoryInternalsDOMHandler::HandleSaveDump(const base::ListValue&) {
 
   AllowJavascript();
 
-#if BUILDFLAG(IS_ANDROID)
-  base::Value result("Saving...");
-  FireWebUIListener("save-dump-progress", result);
-
-  // On Android write to the user data dir.
-  // TODO(bug 757115) Does it make sense to show the Android file picker here
-  // instead? Need to test what that looks like.
-  base::FilePath user_data_dir;
-  base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);
-  base::FilePath output_path = user_data_dir.Append(default_file);
-  ProfilingProcessHost::GetInstance()->SaveTraceWithHeapDumpToFile(
-      std::move(output_path),
-      base::BindOnce(&MemoryInternalsDOMHandler::SaveTraceFinished,
-                     weak_factory_.GetWeakPtr()),
-      false);
-#else
   if (select_file_dialog_) {
     return;  // Currently running, wait for existing save to complete.
   }
@@ -263,7 +241,6 @@ void MemoryInternalsDOMHandler::HandleSaveDump(const base::ListValue&) {
       ui::SelectFileDialog::SELECT_SAVEAS_FILE, std::u16string(), default_file,
       nullptr, 0, FILE_PATH_LITERAL(".json.gz"),
       web_ui_->GetWebContents()->GetTopLevelNativeWindow());
-#endif
 }
 
 void MemoryInternalsDOMHandler::HandleStartProfiling(

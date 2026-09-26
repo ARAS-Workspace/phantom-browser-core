@@ -46,15 +46,9 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#else
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#endif
 
 namespace {
 
@@ -112,13 +106,11 @@ class BrowsingDataRemoverObserver
         filterable_deletion_(filterable_deletion),
         profile_(profile),
         keep_browser_alive_(keep_browser_alive) {
-#if !BUILDFLAG(IS_ANDROID)
     if (keep_browser_alive) {
       keep_alive_ = std::make_unique<ScopedKeepAlive>(
           KeepAliveOrigin::BROWSING_DATA_LIFETIME_MANAGER,
           KeepAliveRestartOption::DISABLED);
     }
-#endif
     browsing_data_remover_observer_.Observe(remover);
   }
 
@@ -143,9 +135,7 @@ class BrowsingDataRemoverObserver
 
   const raw_ptr<Profile> profile_;
   bool keep_browser_alive_;
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<ScopedKeepAlive> keep_alive_;
-#endif
 };
 
 uint64_t GetOriginTypeMask(const base::ListValue& data_types) {
@@ -229,7 +219,6 @@ std::vector<ScheduledRemovalSettings> ConvertToScheduledRemovalSettings(
 std::set<GURL> GetOpenedUrlsAndOngoingDownloads(Profile* profile) {
   std::set<GURL> result;
   // TODO (crbug.com/40211511): Enable this for android.
-#if !BUILDFLAG(IS_ANDROID)
   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
       [profile, &result](BrowserWindowInterface* browser) {
         if (browser->GetProfile() != profile) {
@@ -241,15 +230,6 @@ std::set<GURL> GetOpenedUrlsAndOngoingDownloads(Profile* profile) {
         }
         return true;
       });
-#else
-  for (const TabModel* model : TabModelList::models()) {
-    for (int index = 0; index < model->GetTabCount(); ++index) {
-      TabAndroid* tab = model->GetTabAt(index);
-      if (tab)
-        result.insert(tab->GetURL());
-    }
-  }
-#endif
 
   download::SimpleDownloadManager::DownloadVector downloads;
   if (auto* download_manager = profile->GetDownloadManager()) {

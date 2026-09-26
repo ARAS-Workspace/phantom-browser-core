@@ -1877,11 +1877,7 @@ TEST_P(LayerTreeHostImplTest, ScrollUpdateReturnsCorrectValue) {
 }
 
 // TODO(crbug.com/487287578): Re-enable on Android once it's non-flaky.
-#if BUILDFLAG(IS_ANDROID)
-#define DISABLED_ON_ANDROID(test_name) DISABLED_##test_name
-#else
 #define DISABLED_ON_ANDROID(test_name) test_name
-#endif
 
 TEST_P(LayerTreeHostImplTest,
        DISABLED_ON_ANDROID(ScrollEndMainThreadRepaintFastPathScroll)) {
@@ -8997,74 +8993,6 @@ TEST_P(CompositorFrameProducingLayerTreeHostImplTest,
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(LayerTreeHostImplTest, SelectionBoundsPassedToCompositorFrameMetadata) {
-  LayerImpl* root = SetupRootLayer<SolidColorLayerImpl>(
-      host_impl_->active_tree(), gfx::Size(10, 10));
-  UpdateDrawProperties(host_impl_->active_tree());
-
-  // Plumb the layer-local selection bounds.
-  gfx::Point selection_start(5, 0);
-  gfx::Point selection_end(5, 5);
-  LayerSelection selection;
-  selection.start.type = gfx::SelectionBound::CENTER;
-  selection.start.layer_id = root->id();
-  selection.start.edge_end = selection_end;
-  selection.start.edge_start = selection_start;
-  selection.end = selection.start;
-  host_impl_->active_tree()->RegisterSelection(selection);
-
-  host_impl_->SetNeedsRedraw(/*animation_only=*/false,
-                             /*skip_if_inside_draw=*/false);
-  RenderFrameMetadata metadata = StartDrawAndProduceRenderFrameMetadata();
-
-  // Ensure the selection bounds have propagated to the frame metadata.
-  const viz::Selection<gfx::SelectionBound>& selection_after =
-      metadata.selection;
-  EXPECT_EQ(selection.start.type, selection_after.start.type());
-  EXPECT_EQ(selection.end.type, selection_after.end.type());
-  EXPECT_EQ(gfx::PointF(selection_end), selection_after.start.edge_end());
-  EXPECT_EQ(gfx::PointF(selection_start), selection_after.start.edge_start());
-  EXPECT_TRUE(selection_after.start.visible());
-  EXPECT_TRUE(selection_after.end.visible());
-}
-
-TEST_P(LayerTreeHostImplTest, HiddenSelectionBoundsStayHidden) {
-  LayerImpl* root = SetupDefaultRootLayer(gfx::Size(10, 10));
-
-  UpdateDrawProperties(host_impl_->active_tree());
-
-  // Plumb the layer-local selection bounds.
-  gfx::Point selection_start(5, 0);
-  gfx::Point selection_end(5, 5);
-  LayerSelection selection;
-
-  // Mark the start as hidden.
-  selection.start.hidden = true;
-
-  selection.start.type = gfx::SelectionBound::CENTER;
-  selection.start.layer_id = root->id();
-  selection.start.edge_end = selection_end;
-  selection.start.edge_start = selection_start;
-  selection.end = selection.start;
-  host_impl_->active_tree()->RegisterSelection(selection);
-
-  host_impl_->SetNeedsRedraw(/*animation_only=*/false,
-                             /*skip_if_inside_draw=*/false);
-  RenderFrameMetadata metadata = StartDrawAndProduceRenderFrameMetadata();
-
-  // Ensure the selection bounds have propagated to the frame metadata.
-  const viz::Selection<gfx::SelectionBound>& selection_after =
-      metadata.selection;
-  EXPECT_EQ(selection.start.type, selection_after.start.type());
-  EXPECT_EQ(selection.end.type, selection_after.end.type());
-  EXPECT_EQ(gfx::PointF(selection_end), selection_after.start.edge_end());
-  EXPECT_EQ(gfx::PointF(selection_start), selection_after.start.edge_start());
-  EXPECT_FALSE(selection_after.start.visible());
-  EXPECT_FALSE(selection_after.end.visible());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_P(LayerTreeHostImplTest, SimpleSwapPromiseMonitor) {
   {
     StrictMock<MockLatencyInfoSwapPromiseMonitor> monitor(host_impl_.get());
@@ -12943,14 +12871,6 @@ TEST_P(LayerTreeHostImplTest, RenderFrameMetadata) {
 
     EXPECT_EQ(gfx::PointF(), metadata.root_scroll_offset);
     EXPECT_EQ(1, metadata.page_scale_factor);
-
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_EQ(gfx::SizeF(50, 50), metadata.scrollable_viewport_size);
-    EXPECT_EQ(0.5f, metadata.min_page_scale_factor);
-    EXPECT_EQ(4, metadata.max_page_scale_factor);
-    EXPECT_EQ(gfx::SizeF(100, 100), metadata.root_layer_size);
-    EXPECT_FALSE(metadata.root_overflow_y_hidden);
-#endif
   }
 
   // Scrolling should update metadata immediately.
@@ -12973,55 +12893,6 @@ TEST_P(LayerTreeHostImplTest, RenderFrameMetadata) {
     EXPECT_EQ(gfx::PointF(0, 10), metadata.root_scroll_offset);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Root "overflow: hidden" properties should be reflected on the outer
-  // viewport scroll layer.
-  {
-    UpdateDrawProperties(host_impl_->active_tree());
-    host_impl_->OuterViewportScrollNode()->user_scrollable_horizontal = false;
-
-    RenderFrameMetadata metadata = StartDrawAndProduceRenderFrameMetadata();
-    EXPECT_FALSE(metadata.root_overflow_y_hidden);
-  }
-
-  {
-    UpdateDrawProperties(host_impl_->active_tree());
-    host_impl_->OuterViewportScrollNode()->user_scrollable_vertical = false;
-
-    RenderFrameMetadata metadata = StartDrawAndProduceRenderFrameMetadata();
-    EXPECT_TRUE(metadata.root_overflow_y_hidden);
-  }
-
-  // Re-enable scrollability and verify that overflows are no longer
-  // hidden.
-  {
-    UpdateDrawProperties(host_impl_->active_tree());
-    host_impl_->OuterViewportScrollNode()->user_scrollable_horizontal = true;
-    host_impl_->OuterViewportScrollNode()->user_scrollable_vertical = true;
-
-    RenderFrameMetadata metadata = StartDrawAndProduceRenderFrameMetadata();
-    EXPECT_FALSE(metadata.root_overflow_y_hidden);
-  }
-
-  // Root "overflow: hidden" properties should also be reflected on the
-  // inner viewport scroll layer.
-  {
-    UpdateDrawProperties(host_impl_->active_tree());
-    host_impl_->OuterViewportScrollNode()->user_scrollable_horizontal = false;
-
-    RenderFrameMetadata metadata = StartDrawAndProduceRenderFrameMetadata();
-    EXPECT_FALSE(metadata.root_overflow_y_hidden);
-  }
-
-  {
-    UpdateDrawProperties(host_impl_->active_tree());
-    host_impl_->OuterViewportScrollNode()->user_scrollable_vertical = false;
-
-    RenderFrameMetadata metadata = StartDrawAndProduceRenderFrameMetadata();
-    EXPECT_TRUE(metadata.root_overflow_y_hidden);
-  }
-#endif
-
   // Page scale should update metadata correctly (shrinking only the viewport).
   GetInputHandler().ScrollBegin(BeginState(gfx::Point(), gfx::Vector2dF(),
                                            ui::ScrollInputType::kTouchscreen)
@@ -13037,13 +12908,6 @@ TEST_P(LayerTreeHostImplTest, RenderFrameMetadata) {
 
     EXPECT_EQ(gfx::PointF(0, 10), metadata.root_scroll_offset);
     EXPECT_EQ(2, metadata.page_scale_factor);
-
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_EQ(gfx::SizeF(25, 25), metadata.scrollable_viewport_size);
-    EXPECT_EQ(0.5f, metadata.min_page_scale_factor);
-    EXPECT_EQ(4, metadata.max_page_scale_factor);
-    EXPECT_EQ(gfx::SizeF(100, 100), metadata.root_layer_size);
-#endif
   }
 
   // Likewise if set from the main thread.
@@ -13055,13 +12919,6 @@ TEST_P(LayerTreeHostImplTest, RenderFrameMetadata) {
 
     EXPECT_EQ(gfx::PointF(0, 10), metadata.root_scroll_offset);
     EXPECT_EQ(4, metadata.page_scale_factor);
-
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_EQ(gfx::SizeF(12.5f, 12.5f), metadata.scrollable_viewport_size);
-    EXPECT_EQ(0.5f, metadata.min_page_scale_factor);
-    EXPECT_EQ(4, metadata.max_page_scale_factor);
-    EXPECT_EQ(gfx::SizeF(100, 100), metadata.root_layer_size);
-#endif
   }
 }
 
@@ -15743,18 +15600,9 @@ TEST_P(ElasticOverscrollInvalidationTest, ElasticOverscrollSyncsToPendingTree) {
     // Ensure update is copied over to the active tree.
     EXPECT_FALSE(transform_node_active().needs_local_transform_update);
 
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, elastic overscroll is implemented as a "stretch" effect.
-    // This modifies the scale of the transform rather than applying a
-    // translation.
-    EXPECT_FALSE(transform_node_active().to_parent.IsIdentity());
-    EXPECT_NE(transform_node_active().to_parent.To2dScale(),
-              gfx::Vector2dF(1.0f, 1.0f));
-#else
     // On non-Android, elastic overscroll translates the scroll container.
     // The transform is the inverse of the stretch vector (like scroll offset).
     EXPECT_EQ(transform_node_active().to_parent.To2dTranslation(), -stretch);
-#endif
   } else {
     helper->SetStretchAmount(id, stretch);
     EXPECT_EQ(gfx::Vector2dF(), helper->StretchAmount(id));

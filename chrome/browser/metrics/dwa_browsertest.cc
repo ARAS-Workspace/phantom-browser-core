@@ -25,16 +25,7 @@
 #include "third_party/federated_compute/src/fcp/confidentialcompute/crypto.h"
 #include "third_party/federated_compute/src/fcp/confidentialcompute/crypto_test_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#else
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_observer.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_test_helper.h"
-#include "content/public/browser/web_contents.h"
-#include "content/public/test/browser_test_utils.h"
-#endif
 
 namespace metrics::dwa {
 
@@ -53,11 +44,7 @@ std::string CreatePublicKeyForTesting() {
 
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 using PlatformBrowser = BrowserWindowInterface*;
-#else
-typedef std::unique_ptr<TestTabModel> PlatformBrowser;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 DwaService* GetDwaService() {
   return g_browser_process->GetMetricsServicesManager()->GetDwaService();
@@ -81,29 +68,6 @@ class DwaBrowserTest : public SyncTest {
 
   DwaBrowserTest(const DwaBrowserTest&) = delete;
   DwaBrowserTest& operator=(const DwaBrowserTest&) = delete;
-
-#if BUILDFLAG(IS_ANDROID)
-  void PreRunTestOnMainThread() override {
-    // At some point during set-up, Android's TabModelList is populated with a
-    // TabModel. However, it is desirable to begin the tests with an empty
-    // TabModelList to avoid complicated logic in CreatePlatformBrowser.
-    //
-    // For example, if the pre-existing TabModel is not deleted and if the first
-    // tab created in a test is an incognito tab, then CreatePlatformBrowser
-    // would need to remove the pre-existing TabModel and add a new one.
-    // Having an empty TabModelList allows us to simply add the appropriate
-    // TabModel.
-    EXPECT_EQ(1U, TabModelList::models().size());
-    initial_tab_model_ = TabModelList::models()[0].get();
-    TabModelList::RemoveTabModel(initial_tab_model_);
-    EXPECT_EQ(0U, TabModelList::models().size());
-  }
-
-  void PostRunTestOnMainThread() override {
-    // Restore the initial tab model so the browser can shut down cleanly.
-    TabModelList::AddTabModel(initial_tab_model_);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   void AssertDwaIsEnabledAndAllowed() const {
     ASSERT_TRUE(metrics::dwa::DwaRecorder::Get()->IsEnabled());
@@ -216,51 +180,22 @@ class DwaBrowserTest : public SyncTest {
 
   // Creates and returns a platform-appropriate browser for |profile|.
   PlatformBrowser CreatePlatformBrowser(Profile* profile) {
-#if !BUILDFLAG(IS_ANDROID)
     return CreateBrowser(profile);
-#else
-    std::unique_ptr<TestTabModel> tab_model =
-        std::make_unique<TestTabModel>(profile);
-    tab_model->SetWebContentsList(
-        {content::WebContents::Create(
-             content::WebContents::CreateParams(profile))
-             .release()});
-    TabModelList::AddTabModel(tab_model.get());
-    EXPECT_TRUE(content::NavigateToURL(tab_model->GetActiveWebContents(),
-                                       GURL("about:blank")));
-    return tab_model;
-#endif
   }
 
   // Creates a platform-appropriate incognito browser for |profile|.
   PlatformBrowser CreateIncognitoPlatformBrowser(Profile* profile) {
     EXPECT_TRUE(profile->IsOffTheRecord());
-#if !BUILDFLAG(IS_ANDROID)
     return CreateIncognitoBrowser(profile);
-#else
-    // On Android, an incognito platform is the same as a regular platform
-    // browser but with an incognito profile. The incognito profile is validated
-    // with profile->IsOffTheRecord().
-    return CreatePlatformBrowser(profile);
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   // Closes |browser| in a way that is appropriate for the platform.
   void ClosePlatformBrowser(PlatformBrowser& browser) {
-#if !BUILDFLAG(IS_ANDROID)
     CloseBrowserSynchronously(browser);
-#else
-    TabModelList::RemoveTabModel(browser.get());
-    browser.reset();
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
-
-#if BUILDFLAG(IS_ANDROID)
-  raw_ptr<TabModel> initial_tab_model_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 // LINT.IfChange(DwaServiceCheck)
@@ -400,7 +335,6 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_Msbb) {
 
 // Not enabled on Android because on Android, kApps and kExtensions is not
 // registered through UserSelectableType.
-#if !BUILDFLAG(IS_ANDROID)
 // This test ensures that disabling Extensions UKM consent disables and purges
 // DWA. Additionally ensures that DWA is disabled until all UKM consents are
 // enabled.
@@ -587,6 +521,5 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest,
   // consents are enabled.
   RecordTestMetricsAndAssertMetricsRecorded();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace metrics::dwa

@@ -181,11 +181,7 @@ TEST_F(IsolatedContextTest, IsPathValid) {
       {DRIVE FPL("/foo"), true},
       {DRIVE FPL("foo"), false},
       {DRIVE FPL("/foo/../bar"), false},
-#if BUILDFLAG(IS_ANDROID)
-      {FPL("content://authority/path"), true},
-#else
       {FPL("content://authority/path"), false},
-#endif
   };
 
   for (const auto& tc : cases) {

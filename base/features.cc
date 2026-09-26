@@ -17,7 +17,7 @@
 #include "build/build_config.h"
 #include "build/buildflag.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include "base/message_loop/message_pump_epoll.h"
 #endif
 
@@ -28,10 +28,6 @@
 
 #include "base/message_loop/message_pump_kqueue.h"
 
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/input_hint_checker.h"
 #endif
 
 
@@ -63,14 +59,8 @@ BASE_FEATURE(kHeapProfilerIncludeResidency, FEATURE_DISABLED_BY_DEFAULT);
 
 // Use non default low memory device threshold.
 // Value should be given via |LowMemoryDeviceThresholdMB|.
-#if BUILDFLAG(IS_ANDROID)
-// LINT.IfChange
-#define LOW_MEMORY_DEVICE_THRESHOLD_MB 1024
-// LINT.ThenChange(//base/android/java/src/org/chromium/base/SysUtils.java)
-#else
 // Updated Desktop default threshold to match the Android 2021 definition.
 #define LOW_MEMORY_DEVICE_THRESHOLD_MB 2048
-#endif
 BASE_FEATURE(kLowEndMemoryExperiment, FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE_PARAM(int,
                    kLowMemoryDeviceThresholdMB,
@@ -112,82 +102,6 @@ BASE_FEATURE_PARAM(int,
                    &kStackScanMaxFramePointerToStackEndGap,
                    "StackScanMaxFramePointerToStackEndGapThresholdMB",
                    100);
-
-#if BUILDFLAG(IS_ANDROID)
-// Force to enable LowEndDeviceMode partially on Android 3Gb devices.
-// (see PartialLowEndModeOnMidRangeDevices below)
-BASE_FEATURE(kPartialLowEndModeOn3GbDevices, FEATURE_DISABLED_BY_DEFAULT);
-
-// Used to enable LowEndDeviceMode partially on Android and ChromeOS mid-range
-// devices. Such devices aren't considered low-end, but we'd like experiment
-// with a subset of low-end features to see if we get a good memory vs.
-// performance tradeoff.
-//
-// TODO(crbug.com/40264947): |#if| out 32-bit before launching or going to
-// high Stable %, because we will enable the feature only for <8GB 64-bit
-// devices, where we didn't ship yet. However, we first need a larger
-// population to collect data.
-BASE_FEATURE(kPartialLowEndModeOnMidRangeDevices,
-#if BUILDFLAG(IS_ANDROID)
-             FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-// Enable not perceptible binding without cpu priority boosting.
-BASE_FEATURE(kBackgroundNotPerceptibleBinding, FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, post registering PowerMonitor broadcast receiver to a background
-// thread,
-BASE_FEATURE(kPostPowerMonitorBroadcastReceiverInitToBackground,
-             FEATURE_ENABLED_BY_DEFAULT);
-// If enabled, getMyMemoryState IPC will be posted to background.
-BASE_FEATURE(kPostGetMyMemoryStateToBackground, FEATURE_ENABLED_BY_DEFAULT);
-
-// Use a single connection and rebindService() to manage the binding to a child
-// process service.
-BASE_FEATURE(kRebindingChildServiceConnectionController,
-             FEATURE_DISABLED_BY_DEFAULT);
-
-// Use a batch API to rebind service connections.
-BASE_FEATURE(kRebindServiceBatchApi, FEATURE_DISABLED_BY_DEFAULT);
-
-// Use shared service connection to rebind a service binding to update the LRU
-// in the ProcessList of OomAdjuster.
-BASE_FEATURE(kUseSharedRebindServiceConnection, FEATURE_ENABLED_BY_DEFAULT);
-
-// Kill switch for Android VirtualKeyboard API geometry and inset fixes.
-BASE_FEATURE(kVirtualKeyboardGeometryAndInsetFixes, FEATURE_ENABLED_BY_DEFAULT);
-
-// Use madvise MADV_WILLNEED to prefetch the native library. This replaces the
-// default mechanism of pre-reading the memory from a forked process.
-BASE_FEATURE(kLibraryPrefetcherMadvise, FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, only the ordered text section will be prefetched.
-BASE_FEATURE(kLibraryPrefetcherOnlyOrderedText, FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, after start up the thread pool in PostTask.java will be
-// shutdown after pre-native to stop consuming resources.
-BASE_FEATURE(kShutdownPreNativeThreadPoolAfterStartup,
-             FEATURE_DISABLED_BY_DEFAULT);
-
-// If > 0, split the madvise range into chunks of this many bytes, rounded up to
-// a page size. The default of 1 therefore rounds to a whole page.
-BASE_FEATURE_PARAM(size_t,
-                   kLibraryPrefetcherMadviseLength,
-                   &kLibraryPrefetcherMadvise,
-                   "length",
-                   1);
-
-// Whether to fall back to the fork-and-read method if madvise is not supported.
-// Does not trigger fork-and-read if madvise failed during the actual prefetch.
-BASE_FEATURE_PARAM(bool,
-                   kLibraryPrefetcherMadviseFallback,
-                   &kLibraryPrefetcherMadvise,
-                   "fallback",
-                   true);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // When enabled, GetTerminationStatus() returns
 // TERMINATION_STATUS_EVICTED_FOR_MEMORY for processes terminated due to commit
@@ -231,7 +145,7 @@ void Init() {
   debug::StackTrace::InitializeFeatures();
   FilePath::InitializeFeatures();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   MessagePumpEpoll::InitializeFeatures();
 #endif
 
@@ -244,10 +158,6 @@ void Init() {
 
   MessagePumpKqueue::InitializeFeatures();
 
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  android::InputHintChecker::InitializeFeatures();
 #endif
 
 }

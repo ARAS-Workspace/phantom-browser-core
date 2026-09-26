@@ -43,11 +43,6 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/ui_base_paths.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/locale_utils.h"
-#include "ui/base/l10n/l10n_util_android.h"
-#endif
-
 #if defined(USE_GLIB)
 #include <glib.h>
 #endif
@@ -73,7 +68,7 @@ bool IsResourceBundleLocale(const LanguageTag& locale) {
 // if "foo bar" is RTL. So this function prepends the necessary RLM in such
 // cases.
 void AdjustParagraphDirectionality(std::u16string* paragraph) {
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   if (base::i18n::IsRTL() &&
       base::i18n::StringContainsStrongRTLChars(*paragraph)) {
     paragraph->insert(0, 1, char16_t{base::i18n::kRightToLeftMark});
@@ -141,16 +136,7 @@ std::string GetApplicationLocaleInternalNonMac(std::string_view pref_locale) {
   // to renderer and plugin processes is common, so they know what language the
   // parent process decided to use.
 
-#if BUILDFLAG(IS_ANDROID)
-  // Try pref_locale first.
-  if (!pref_locale.empty()) {
-    prefered_tag = GetLanguageTagFromString(pref_locale);
-  }
-
-  // On Android, query java.util.Locale for the default locale.
-  candidates.push_back(
-      GetLanguageTagFromString(base::android::GetDefaultLocaleString()));
-#elif defined(USE_GLIB)
+#if defined(USE_GLIB)
   // GLib implements correct environment variable parsing with
   // the precedence order: LANGUAGE, LC_ALL, LC_MESSAGES and LANG.
   const char* const* languages = g_get_language_names();
@@ -172,7 +158,7 @@ std::string GetApplicationLocaleInternalNonMac(std::string_view pref_locale) {
   if (!pref_locale.empty()) {
     prefered_tag = GetLanguageTagFromString(pref_locale);
   }
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // defined(USE_GLIB)
 
   // If `prefered_tag`, it is attempt to get a match for it, even if it is not
   // exact.
@@ -301,17 +287,6 @@ std::u16string GetDisplayNameForLocale(std::string_view locale,
   }
 #endif  // BUILDFLAG(ENABLE_PSEUDOLOCALES)
 
-#if BUILDFLAG(IS_ANDROID)
-  // Use Java API to get locale display name so it would be possible to remove
-  // most of the lang data from icu data to reduce binary size, except for
-  // zh-Hans and zh-Hant because the current Android Java API doesn't support
-  // scripts.
-  // TODO(wangxianzhu): remove the special handling of zh-Hans and zh-Hant once
-  // Android Java API supports scripts.
-  if (!locale_code.starts_with("zh-Han")) {
-    display_name = GetDisplayNameForLocale(locale_code, display_locale_code);
-  } else
-#endif  // BUILDFLAG(IS_ANDROID)
   {
     UErrorCode error = U_ZERO_ERROR;
     const int kBufferSize = 1024;

@@ -60,11 +60,6 @@
 #include "components/keep_alive_registry/scoped_keep_alive.h"
 #endif  // BUILDFLAG(ENABLE_BACKGROUND_MODE)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/android/notification_content_detection_manager_android.h"
-#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using content::BrowserThread;
 
 namespace {
@@ -230,19 +225,6 @@ void PersistentNotificationHandler::OnClick(
           base::BindOnce(&PersistentNotificationHandler::OnClickCompleted,
                          weak_ptr_factory_.GetWeakPtr(), profile,
                          notification_id, std::move(completed_closure)));
-
-#if BUILDFLAG(IS_ANDROID)
-  // If there is a proposed disruptive notification revocation, report a false
-  // positive due to user interacting with a notification. Disruptive are
-  // notifications with high notification volume and low site engagement score.
-  ukm::SourceId source_id = ukm::UkmRecorder::GetSourceIdForNotificationEvent(
-      base::PassKey<PersistentNotificationHandler>(), origin);
-  DisruptiveNotificationPermissionsManager::MaybeReportFalsePositive(
-      profile, origin,
-      DisruptiveNotificationPermissionsManager::FalsePositiveReason::
-          kPersistentNotificationClick,
-      source_id);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PersistentNotificationHandler::OnClickCompleted(
@@ -314,15 +296,8 @@ void PersistentNotificationHandler::DisableNotifications(
       scoped_revocation_reporter(
           profile, origin, origin, ContentSettingsType::NOTIFICATIONS,
           permissions::PermissionSourceUI::INLINE_SETTINGS);
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, NotificationChannelsProviderAndroid does not support moving a
-  // channel from ALLOW to BLOCK state, so simply delete the channel instead.
-  NotificationPermissionContext::UpdatePermission(profile, origin,
-                                                  CONTENT_SETTING_DEFAULT);
-#else
   NotificationPermissionContext::UpdatePermission(profile, origin,
                                                   CONTENT_SETTING_BLOCK);
-#endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   // Remove `origin` from user allowlisted sites when user unsubscribes. On
@@ -336,21 +311,6 @@ void PersistentNotificationHandler::DisableNotifications(
         ContentSettingsType::ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER,
         base::Value(base::DictValue().Set(
             safe_browsing::kIsAllowlistedByUserKey, false)));
-#if BUILDFLAG(IS_ANDROID)
-    if (notification_id.has_value()) {
-      safe_browsing::MaybeLogSuspiciousNotificationUnsubscribeUkm(
-          hcsm, origin, notification_id.value(), profile);
-    }
-    if (is_suspicious.has_value()) {
-      safe_browsing::SafeBrowsingMetricsCollector::
-          LogSafeBrowsingNotificationRevocationSourceHistogram(
-              is_suspicious.value()
-                  ? safe_browsing::NotificationRevocationSource::
-                        kSuspiciousWarningOneTapUnsubscribe
-                  : safe_browsing::NotificationRevocationSource::
-                        kStandardOneTapUnsubscribe);
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 }
@@ -394,28 +354,7 @@ void PersistentNotificationHandler::ReportUnwarnedNotificationAsSpam(
 void PersistentNotificationHandler::OnShowOriginalNotification(
     const GURL& url,
     const std::string& notification_id,
-    Profile* profile) {
-#if BUILDFLAG(IS_ANDROID)
-  safe_browsing::NotificationContentDetectionUkmUtil::
-      RecordSuspiciousNotificationInteractionUkm(
-          static_cast<int>(
-              safe_browsing::SuspiciousNotificationWarningInteractions::
-                  kShowOriginalNotification),
-          url, notification_id, profile);
-  if (base::FeatureList::IsEnabled(
-          safe_browsing::kAutoRevokeSuspiciousNotification)) {
-    auto* hcsm = HostContentSettingsMapFactory::GetForProfile(profile);
-    if (hcsm && !url.is_empty()) {
-      hcsm->SetWebsiteSettingCustomScope(
-          ContentSettingsPattern::FromURLNoWildcard(url),
-          ContentSettingsPattern::Wildcard(),
-          ContentSettingsType::SUSPICIOUS_NOTIFICATION_SHOW_ORIGINAL,
-          base::Value(base::DictValue().Set(
-              safe_browsing::kSuspiciousNotificationShowOriginalKey, true)));
-    }
-  }
-#endif
-}
+    Profile* profile) {}
 
 void PersistentNotificationHandler::OnMaybeReport(
     const std::string& notification_id,

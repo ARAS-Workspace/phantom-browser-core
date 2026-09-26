@@ -11,18 +11,14 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/rand_util.h"
 #include "components/sync/protocol/webauthn_credential_specifics.pb.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace password_manager {
 
 namespace {
 
 using ::testing::UnorderedElementsAre;
-
-#if !BUILDFLAG(IS_ANDROID)
 
 constexpr char kRpId[] = "gensokyo.com";
 
@@ -48,13 +44,10 @@ std::vector<uint8_t> ToUint8Vector(
   return std::vector<uint8_t>(byte_array.begin(), byte_array.end());
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 
 class PasskeyCredentialTest : public testing::Test {};
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasskeyCredentialTest, FromCredentialSpecifics) {
   sync_pb::WebauthnCredentialSpecifics credential1;
   credential1.set_sync_id(base::RandBytesAsString(16));
@@ -205,20 +198,13 @@ TEST_F(PasskeyCredentialTest, FromCredentialSpecifics_EmptyOptionalFields) {
           PasskeyCredential::DisplayName(""))));
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 TEST_F(PasskeyCredentialTest, GetAuthenticatorLabel) {
   PasskeyCredential credential(PasskeyCredential::Source::kAndroidPhone,
                                PasskeyCredential::RpId("rpid.com"),
                                PasskeyCredential::CredentialId({1, 2, 3, 4}),
                                PasskeyCredential::UserId({5, 6, 7, 8}));
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(credential.GetAuthenticatorLabel(),
-            l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_PASSKEY));
-#else
   EXPECT_EQ(credential.GetAuthenticatorLabel(),
             l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_USE_SCREEN_LOCK));
-#endif  // BUILDFLAG(IS_ANDROID)
   std::u16string authenticator_label = u"Reimu's phone";
   credential.SetAuthenticatorLabel(authenticator_label);
   EXPECT_EQ(credential.GetAuthenticatorLabel(), authenticator_label);

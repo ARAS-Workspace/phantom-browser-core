@@ -100,19 +100,8 @@ std::unique_ptr<OutputSurface> OutputSurfaceProviderImpl::CreateOutputSurface(
           gpu_dependency, renderer_settings, debug_settings);
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    // As with non-skia-renderer case, communicate the creation result to
-    // CompositorImplAndroid so that it can attempt to recreate the surface on
-    // failure.
-    display_client->OnContextCreationResult(
-        output_surface ? gpu::ContextResult::kSuccess
-                       : gpu::ContextResult::kSurfaceFailure);
-#endif  // BUILDFLAG(IS_ANDROID)
-
     if (!output_surface) {
-#if !BUILDFLAG(IS_ANDROID)
       gpu_service_impl_->DisableGpuCompositing();
-#endif
     }
 
     return output_surface;
@@ -128,9 +117,6 @@ OutputSurfaceProviderImpl::CreateSoftwareOutputDeviceForPlatform(
 
 #if BUILDFLAG(IS_APPLE)
   return std::make_unique<SoftwareOutputDeviceMac>(task_runner_);
-#elif BUILDFLAG(IS_ANDROID)
-  // Android does not do software compositing, so we can't get here.
-  NOTREACHED();
 #elif BUILDFLAG(IS_OZONE)
   ui::SurfaceFactoryOzone* factory =
       ui::OzonePlatform::GetInstance()->GetSurfaceFactoryOzone();

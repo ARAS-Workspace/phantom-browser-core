@@ -189,34 +189,6 @@ TEST_F(OriginIsolationForJsOptExceptionsTest,
       SiteIsolationPolicy::IsOriginIsolationForJsOptExceptionsEnabled(nullptr));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-class OriginIsolationForJsOptExceptionsLowMemoryTest
-    : public OriginIsolationForJsOptExceptionsTest {
- public:
-  void SetUp() override {
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        switches::kEnableLowEndDeviceMode);
-    // Without strict site isolation, AreOriginKeyedProcessesByDefaultEnabled()
-    // will always be false. This is needed to run the test on Android.
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        switches::kSitePerProcess);
-    EXPECT_EQ(512u, base::SysInfo::AmountOfTotalPhysicalMemory().InMiB());
-    OriginIsolationForJsOptExceptionsTest::SetUp();
-  }
-};
-
-TEST_F(OriginIsolationForJsOptExceptionsLowMemoryTest,
-       ReturnsFalseOnLowMemoryDevice) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitWithFeatures(
-      {site_isolation::features::kOriginIsolationForJsOptExceptions},
-      {::features::kStrictOriginIsolation,
-       ::features::kOriginKeyedProcessesByDefault});
-  EXPECT_FALSE(
-      SiteIsolationPolicy::IsOriginIsolationForJsOptExceptionsEnabled(nullptr));
-}
-#endif
-
 // Tests with OriginKeyedProcessesByDefault enabled.
 class OriginKeyedProcessesByDefaultSiteIsolationPolicyTest
     : public BaseSiteIsolationTest {
@@ -327,18 +299,6 @@ class WebTriggeredIsolatedOriginsPolicyTest : public SiteIsolationPolicyTest {
 
     std::vector<base::test::FeatureRefAndParams> enabled_features = {
         coop_feature};
-
-#if BUILDFLAG(IS_ANDROID)
-    // Some machines running this test may be below the default memory
-    // threshold.  To ensure that COOP isolation is also enabled on those
-    // machines, set a very low 128MB threshold.
-    base::test::FeatureRefAndParams memory_threshold_feature = {
-        site_isolation::features::kSiteIsolationMemoryThresholdsAndroid,
-        { {site_isolation::features::
-               kPartialSiteIsolationMemoryThresholdParamName,
-           "128"} }};
-    enabled_features.push_back(memory_threshold_feature);
-#endif  // BUILDFLAG(IS_ANDROID)
 
     feature_list_.InitWithFeaturesAndParameters(enabled_features,
                                                 /* disabled_features = */ {});
@@ -665,11 +625,6 @@ TEST_P(OriginIsolationMemoryThresholdBrowserTest, IsolationThresholds) {
   // OAC opt-in is enabled by default, and since the test forces strict site
   // isolation on, we expect OAC opt-in process isolation to always work.
   bool expected_oac_optin_process = true;
-#if BUILDFLAG(IS_ANDROID)
-  // Android doesn't enable kOriginKeyedProcessesByDefault, so if it's on it's
-  // because it was explicitly enable, in which case we don't do memory checks.
-  bool expected_process_origin_isolation = GetParam().enabled;
-#else
   // If enabled, two of the three threshold settings are compatible with the
   // kLowEndDeviceMode switch, which simulated 512MB or RAM.
   OriginIsolationProcessMemoryThreshold threshold = GetParam().threshold;
@@ -677,7 +632,6 @@ TEST_P(OriginIsolationMemoryThresholdBrowserTest, IsolationThresholds) {
       GetParam().enabled &&
       (threshold == OriginIsolationProcessMemoryThreshold::kNone ||
        threshold == OriginIsolationProcessMemoryThreshold::k128MB);
-#endif
   EXPECT_EQ(expected_oac_optin_process,
             content::SiteIsolationPolicy::
                 IsProcessIsolationForOriginAgentClusterEnabled());
@@ -725,10 +679,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 enum class SitePerProcessMemoryThreshold {
   kNone,
-#if BUILDFLAG(IS_ANDROID)
-  k128MB,
-  k768MB,
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 enum class SitePerProcessMode {
@@ -763,20 +713,6 @@ class SitePerProcessMemoryThresholdBrowserTest
     switch (GetParam().threshold) {
       case SitePerProcessMemoryThreshold::kNone:
         break;
-#if BUILDFLAG(IS_ANDROID)
-      case SitePerProcessMemoryThreshold::k128MB:
-        threshold_feature_.InitAndEnableFeatureWithParameters(
-            features::kSiteIsolationMemoryThresholdsAndroid,
-            {{features::kStrictSiteIsolationMemoryThresholdParamName, "128"},
-             {features::kPartialSiteIsolationMemoryThresholdParamName, "128"}});
-        break;
-      case SitePerProcessMemoryThreshold::k768MB:
-        threshold_feature_.InitAndEnableFeatureWithParameters(
-            features::kSiteIsolationMemoryThresholdsAndroid,
-            {{features::kStrictSiteIsolationMemoryThresholdParamName, "768"},
-             {features::kPartialSiteIsolationMemoryThresholdParamName, "768"}});
-        break;
-#endif  // BUILDFLAG(IS_ANDROID)
     }
 
     switch (GetParam().mode) {
@@ -822,16 +758,9 @@ class SitePerProcessMemoryThresholdBrowserTest
   // ContentBrowserClient::ShouldDisableSiteIsolation() returns true.
   std::vector<url::Origin> expected_embedder_origins_;
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android we don't expect any trial origins because the 512MB
-  // physical memory used for testing is below the Android specific
-  // hardcoded 1024MB memory limit that disables site isolation.
-  const std::size_t kExpectedTrialOrigins = 0;
-#else
   // All other platforms expect the single trial origin to be returned because
   // they don't have the memory limit that disables site isolation.
   const std::size_t kExpectedTrialOrigins = 1;
-#endif
 
  private:
   base::test::ScopedFeatureList threshold_feature_;
@@ -866,68 +795,17 @@ TEST_P(SitePerProcessMemoryThresholdBrowserTestIsolation, Isolation) {
 INSTANTIATE_TEST_SUITE_P(
     NoIsolation,
     SitePerProcessMemoryThresholdBrowserTestNoIsolation,
-    testing::Values(
-#if BUILDFLAG(IS_ANDROID)
-        // Expect no isolation on Android because 512MB physical memory
-        // triggered by kEnableLowEndDeviceMode in SetUp() is below the 1024MB
-        // Android specific memory limit which disables site isolation for all
-        // sites.
-        SitePerProcessMemoryThresholdBrowserTestParams{
-            SitePerProcessMemoryThreshold::kNone, SitePerProcessMode::kEnabled},
-        SitePerProcessMemoryThresholdBrowserTestParams{
-            SitePerProcessMemoryThreshold::k768MB,
-            SitePerProcessMode::kEnabled},
-        SitePerProcessMemoryThresholdBrowserTestParams{
-            SitePerProcessMemoryThreshold::k128MB,
-            SitePerProcessMode::kDisabled},
-        SitePerProcessMemoryThresholdBrowserTestParams{
-            SitePerProcessMemoryThreshold::k768MB,
-            SitePerProcessMode::kDisabled},
-#endif  // BUILDFLAG(IS_ANDROID)
-        SitePerProcessMemoryThresholdBrowserTestParams{
-            SitePerProcessMemoryThreshold::kNone,
-            SitePerProcessMode::kDisabled}));
+    testing::Values(SitePerProcessMemoryThresholdBrowserTestParams{
+        SitePerProcessMemoryThreshold::kNone, SitePerProcessMode::kDisabled}));
 
 INSTANTIATE_TEST_SUITE_P(Isolation,
                          SitePerProcessMemoryThresholdBrowserTestIsolation,
                          testing::Values(
-#if BUILDFLAG(IS_ANDROID)
-                             SitePerProcessMemoryThresholdBrowserTestParams{
-                                 SitePerProcessMemoryThreshold::k128MB,
-                                 SitePerProcessMode::kEnabled}));
-#else
                              // See the note above regarding why this
                              // expectation is different on Android.
                              SitePerProcessMemoryThresholdBrowserTestParams{
                                  SitePerProcessMemoryThreshold::kNone,
                                  SitePerProcessMode::kEnabled}));
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-using SitePerProcessMemoryThresholdBrowserTestNoIsolatedOrigin =
-    SitePerProcessMemoryThresholdBrowserTest;
-TEST_P(SitePerProcessMemoryThresholdBrowserTestNoIsolatedOrigin,
-       TrialNoIsolatedOrigin) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  content::SiteIsolationPolicy::ApplyGlobalIsolatedOrigins();
-
-  auto* cpsp = content::ChildProcessSecurityPolicy::GetInstance();
-  std::vector<url::Origin> isolated_origins = cpsp->GetIsolatedOrigins();
-  EXPECT_EQ(expected_embedder_origins_.size(), isolated_origins.size());
-
-  // Verify that the expected embedder origins are present even though site
-  // isolation has been disabled and the trial origins should not be present.
-  EXPECT_THAT(expected_embedder_origins_,
-              ::testing::IsSubsetOf(isolated_origins));
-
-  // Verify that the trial origin is not present.
-  EXPECT_THAT(isolated_origins,
-              ::testing::Not(::testing::Contains(GetTrialOrigin())));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 using SitePerProcessMemoryThresholdBrowserTestIsolatedOrigin =
     SitePerProcessMemoryThresholdBrowserTest;
@@ -949,39 +827,12 @@ TEST_P(SitePerProcessMemoryThresholdBrowserTestIsolatedOrigin,
   EXPECT_THAT(isolated_origins, ::testing::Contains(GetTrialOrigin()));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-INSTANTIATE_TEST_SUITE_P(
-    TrialNoIsolatedOrigin,
-    SitePerProcessMemoryThresholdBrowserTestNoIsolatedOrigin,
-    testing::Values(
-        // When the memory threshold is not explicitly specified, Android uses
-        // a 1900MB global memory threshold.  The 512MB simulated device memory
-        // is below 1900MB, so the test origin should not be isolated.
-        SitePerProcessMemoryThresholdBrowserTestParams{
-            SitePerProcessMemoryThreshold::kNone,
-            SitePerProcessMode::kIsolatedOrigin},
-        // The 512MB simulated device memory is under the explicit 768MB memory
-        // threshold below, so the test origin should not be isolated.
-        SitePerProcessMemoryThresholdBrowserTestParams{
-            SitePerProcessMemoryThreshold::k768MB,
-            SitePerProcessMode::kIsolatedOrigin}));
-#endif  // BUILDFLAG(IS_ANDROID)
-
 INSTANTIATE_TEST_SUITE_P(
     TrialIsolatedOrigin,
     SitePerProcessMemoryThresholdBrowserTestIsolatedOrigin,
-#if BUILDFLAG(IS_ANDROID)
-    // The 512MB simulated device memory is above the explicit 128MB memory
-    // threshold below, so the test origin should be isolated both on desktop
-    // and Android.
-    testing::Values(SitePerProcessMemoryThresholdBrowserTestParams{
-        SitePerProcessMemoryThreshold::k128MB,
-        SitePerProcessMode::kIsolatedOrigin}));
-#else
     testing::Values(SitePerProcessMemoryThresholdBrowserTestParams{
         SitePerProcessMemoryThreshold::kNone,
         SitePerProcessMode::kIsolatedOrigin}));
-#endif
 
 // Helper class to run tests with password-triggered site isolation initialized
 // via a regular field trial and *not* via a command-line override.  It
@@ -1058,71 +909,6 @@ class DisabledPasswordSiteIsolationFieldTrialTest
       const DisabledPasswordSiteIsolationFieldTrialTest&) = delete;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(EnabledPasswordSiteIsolationFieldTrialTest, BelowThreshold_Android) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  // If no memory threshold is defined, password site isolation should be
-  // disabled on Android, because Android defaults to a 1900MB memory threshold,
-  // which is above the 512MB physical memory that this test simulates.
-  EXPECT_FALSE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-
-  // Define a memory threshold at 768MB.  Since this is above the 512MB of
-  // physical memory that this test simulates, password site isolation should
-  // now be disabled on Android.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "768"}});
-
-  EXPECT_FALSE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-
-  // Simulate enabling password site isolation from command line.  (Note that
-  // InitAndEnableFeature uses ScopedFeatureList::InitFromCommandLine
-  // internally, and that triggering the feature via chrome://flags follows the
-  // same override path as well.)
-  base::test::ScopedFeatureList password_site_isolation_feature;
-  password_site_isolation_feature.InitAndEnableFeature(
-      features::kSiteIsolationForPasswordSites);
-
-  // This should override the memory threshold and enable password site
-  // isolation.
-  EXPECT_TRUE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-}
-
-TEST_F(EnabledPasswordSiteIsolationFieldTrialTest, AboveThreshold_Android) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  // If no memory threshold is defined, password site isolation should be
-  // disabled on Android, because Android defaults to a 1900MB memory threshold,
-  // which is above the 512MB physical memory that this test simulates.
-  EXPECT_FALSE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-
-  // Define a memory threshold at 128MB.  Since this is below the 512MB of
-  // physical memory that this test simulates, password site isolation should
-  // still be enabled.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "128"}});
-
-  EXPECT_TRUE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-
-  // Simulate disabling password site isolation from command line.  (Note that
-  // InitAndEnableFeature uses ScopedFeatureList::InitFromCommandLine
-  // internally, and that triggering the feature via chrome://flags follows the
-  // same override path as well.)  This should take precedence over the regular
-  // field trial behavior.
-  base::test::ScopedFeatureList password_site_isolation_feature;
-  password_site_isolation_feature.InitAndDisableFeature(
-      features::kSiteIsolationForPasswordSites);
-  EXPECT_FALSE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-}
-#else  // BUILDFLAG(IS_ANDROID)
 TEST_F(EnabledPasswordSiteIsolationFieldTrialTest, NonAndroid) {
   if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
     return;
@@ -1140,7 +926,6 @@ TEST_F(EnabledPasswordSiteIsolationFieldTrialTest, NonAndroid) {
       features::kSiteIsolationForPasswordSites);
   EXPECT_FALSE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
 }
-#endif
 
 // This test verifies that when password-triggered site isolation is disabled
 // via field trials but force-enabled via command line, it takes effect even
@@ -1165,19 +950,6 @@ TEST_F(DisabledPasswordSiteIsolationFieldTrialTest,
   // If no memory threshold is defined, password site isolation should be
   // enabled.
   EXPECT_TRUE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-
-#if BUILDFLAG(IS_ANDROID)
-  // Define a memory threshold at 768MB.  This is above the 512MB of physical
-  // memory that this test simulates, but password site isolation should still
-  // be enabled, because the test has simulated the user manually overriding
-  // this feature via command line.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "768"}});
-
-  EXPECT_TRUE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Similar to the test above, but with device memory being above memory
@@ -1197,15 +969,6 @@ TEST_F(DisabledPasswordSiteIsolationFieldTrialTest,
   // If no memory threshold is defined, password site isolation should be
   // enabled.
   EXPECT_TRUE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "128"}});
-
-  EXPECT_TRUE(SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Helper class to run tests with strict origin isolation initialized via
@@ -1292,22 +1055,6 @@ TEST_F(EnabledStrictOriginIsolationFieldTrialTest,
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // If no memory threshold is defined, strict origin isolation should be
-  // disabled on Android, because Android defaults to a 1900MB memory threshold,
-  // which is above the 512MB physical memory that this test simulates.
-  EXPECT_FALSE(content::SiteIsolationPolicy::IsStrictOriginIsolationEnabled());
-
-  // Define a memory threshold at 128MB.  Since this is below the 512MB of
-  // physical memory that this test simulates, strict origin isolation should
-  // now be enabled. String origin isolation should be enabled on desktop
-  // platforms regardless, since they do not respect memory thresholds.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kStrictSiteIsolationMemoryThresholdParamName, "128"}});
-#endif  //  BUILDFLAG(IS_ANDROID)
-
   EXPECT_TRUE(content::SiteIsolationPolicy::IsStrictOriginIsolationEnabled());
 
   // Simulate disabling strict origin isolation from command line.  (Note that
@@ -1343,148 +1090,11 @@ TEST_F(DisabledStrictOriginIsolationFieldTrialTest,
   // If no memory threshold is defined, strict origin isolation should be
   // enabled.
   EXPECT_TRUE(content::SiteIsolationPolicy::IsStrictOriginIsolationEnabled());
-
-#if BUILDFLAG(IS_ANDROID)
-  // Define a memory threshold at 768MB.  This is above the 512MB of physical
-  // memory that this test simulates, but strict origin isolation should still
-  // be enabled, because the test has simulated the user manually overriding
-  // this feature via command line.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kStrictSiteIsolationMemoryThresholdParamName, "768"}});
-
-  EXPECT_TRUE(content::SiteIsolationPolicy::IsStrictOriginIsolationEnabled());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // The following tests verify that the list of Android's built-in isolated
 // origins takes effect. This list is only used in official builds, and only
 // when above the memory threshold.
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_ANDROID)
-class BuiltInIsolatedOriginsTest : public SiteIsolationPolicyTest {
- public:
-  BuiltInIsolatedOriginsTest() = default;
-
-  BuiltInIsolatedOriginsTest(const BuiltInIsolatedOriginsTest&) = delete;
-  BuiltInIsolatedOriginsTest& operator=(const BuiltInIsolatedOriginsTest&) =
-      delete;
-
- protected:
-  void SetUp() override {
-    // Simulate a 512MB device.
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        switches::kEnableLowEndDeviceMode);
-    EXPECT_EQ(512u, base::SysInfo::AmountOfTotalPhysicalMemory().InMiB());
-    SiteIsolationPolicyTest::SetUp();
-  }
-};
-
-// Check that the list of preloaded isolated origins is properly applied when
-// device RAM is above the site isolation memory threshold.
-TEST_F(BuiltInIsolatedOriginsTest, DefaultThreshold) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  // Define a memory threshold at 128MB.  This is below the 512MB of physical
-  // memory that this test simulates, so preloaded isolated origins should take
-  // effect.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "128"}});
-
-  // Ensure that isolated origins that are normally loaded on browser
-  // startup are applied.
-  content::SiteIsolationPolicy::ApplyGlobalIsolatedOrigins();
-
-  EXPECT_TRUE(
-      content::SiteIsolationPolicy::ArePreloadedIsolatedOriginsEnabled());
-
-  auto* cpsp = content::ChildProcessSecurityPolicy::GetInstance();
-  std::vector<url::Origin> isolated_origins = cpsp->GetIsolatedOrigins(
-      content::ChildProcessSecurityPolicy::IsolatedOriginSource::BUILT_IN);
-
-  // The list of built-in origins is fairly large; we don't want to hardcode
-  // the size here as it might change, so just check that there are at least 10
-  // origins.
-  EXPECT_GT(isolated_origins.size(), 10u);
-
-  // Check that a couple of well-known origins are on the list.
-  EXPECT_THAT(
-      isolated_origins,
-      ::testing::Contains(url::Origin::Create(GURL("https://google.com/"))));
-  EXPECT_THAT(
-      isolated_origins,
-      ::testing::Contains(url::Origin::Create(GURL("https://amazon.com/"))));
-  EXPECT_THAT(
-      isolated_origins,
-      ::testing::Contains(url::Origin::Create(GURL("https://facebook.com/"))));
-
-  cpsp->ClearIsolatedOriginsForTesting();
-}
-
-TEST_F(BuiltInIsolatedOriginsTest, BelowThreshold) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  // Define a memory threshold at 768MB.  This is above the 512MB of physical
-  // memory that this test simulates, so preloaded isolated origins shouldn't
-  // take effect.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "768"}});
-
-  // Ensure that isolated origins that are normally loaded on browser
-  // startup are applied.
-  content::SiteIsolationPolicy::ApplyGlobalIsolatedOrigins();
-
-  EXPECT_FALSE(
-      content::SiteIsolationPolicy::ArePreloadedIsolatedOriginsEnabled());
-
-  auto* cpsp = content::ChildProcessSecurityPolicy::GetInstance();
-  std::vector<url::Origin> isolated_origins = cpsp->GetIsolatedOrigins(
-      content::ChildProcessSecurityPolicy::IsolatedOriginSource::BUILT_IN);
-
-  // There shouldn't be any built-in origins on Android. (Note that desktop has
-  // some built-in origins that are applied regardless of memory threshold.)
-  EXPECT_EQ(isolated_origins.size(), 0u);
-
-  cpsp->ClearIsolatedOriginsForTesting();
-}
-
-// Check that the list of preloaded isolated origins is not applied when full
-// site isolation is used, since in that case the list is redundant.
-TEST_F(BuiltInIsolatedOriginsTest, NotAppliedWithFullSiteIsolation) {
-  // Force full site-per-process mode.
-  content::IsolateAllSitesForTesting(base::CommandLine::ForCurrentProcess());
-
-  // Define a memory threshold at 128MB.  This is below the 512MB of physical
-  // memory that this test simulates, so preloaded isolated origins shouldn't
-  // be disabled by the memory threshold.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "128"}});
-
-  // Ensure that isolated origins that are normally loaded on browser
-  // startup are applied.
-  content::SiteIsolationPolicy::ApplyGlobalIsolatedOrigins();
-
-  // Because full site-per-process is used, the preloaded isolated origins are
-  // redundant and should not be applied.
-  EXPECT_FALSE(
-      content::SiteIsolationPolicy::ArePreloadedIsolatedOriginsEnabled());
-
-  auto* cpsp = content::ChildProcessSecurityPolicy::GetInstance();
-  std::vector<url::Origin> isolated_origins = cpsp->GetIsolatedOrigins(
-      content::ChildProcessSecurityPolicy::IsolatedOriginSource::BUILT_IN);
-  EXPECT_EQ(isolated_origins.size(), 0u);
-}
-#endif
 
 // Helper class for tests that use header-based opt-in origin isolation and
 // simulate a 512MB device, while turning off strict site isolation.  This is
@@ -1523,88 +1133,6 @@ class OptInOriginIsolationPolicyTest : public BaseSiteIsolationTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// Check that opt-in origin isolation is not applied when below the memory
-// threshold (and when full site isolation is not used).
-TEST_F(OptInOriginIsolationPolicyTest, BelowThreshold_Android) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  // Define a memory threshold at 768MB.  This is above the 512MB of physical
-  // memory that this test simulates, so process isolation for
-  // Origin-Agent-Cluster (OAC) should be disabled. But other aspects of OAC
-  // should still take effect.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "768"}});
-
-  EXPECT_FALSE(content::SiteIsolationPolicy::
-                   IsProcessIsolationForOriginAgentClusterEnabled());
-  EXPECT_TRUE(content::SiteIsolationPolicy::IsOriginAgentClusterEnabled());
-
-  // Simulate a navigation to a URL that serves an Origin-Agent-Cluster header.
-  // Since we're outside of content/, it's difficult to verify that internal
-  // ChildProcessSecurityPolicy state wasn't changed by opt-in origin
-  // isolation.  Instead, verify that the resulting SiteInstance doesn't
-  // require a dedicated process.  This should be the end result, and it
-  // implicitly checks that ChildProcessSecurityPolicy::IsIsolatedOrigin()
-  // doesn't return true for this origin.
-  const GURL kUrl("https://www.google.com/");
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(browser_context(),
-                                                        nullptr);
-  std::unique_ptr<content::NavigationSimulator> simulator =
-      SimulateNavigationToURLWithOriginAgentClusterHeader(kUrl,
-                                                          web_contents.get());
-
-  content::SiteInstance* site_instance =
-      simulator->GetFinalRenderFrameHost()->GetSiteInstance();
-  EXPECT_FALSE(site_instance->RequiresDedicatedProcess());
-  // Despite not getting process isolation, the origin will still get logical
-  // isolation in Blink, and should still be tracked by
-  // ChildProcessSecurityPolicy to ensure consistent OAC behavior for this
-  // origin within this BrowsingInstance.
-  EXPECT_TRUE(IsOriginAgentClusterEnabledForOrigin(site_instance,
-                                                   url::Origin::Create(kUrl)));
-}
-
-// Counterpart to the test above, but verifies that opt-in origin isolation is
-// enabled when above the memory threshold.
-TEST_F(OptInOriginIsolationPolicyTest, AboveThreshold_Android) {
-  if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
-    return;
-  }
-
-  // Define a memory threshold at 128MB.  This is below the 512MB of physical
-  // memory that this test simulates, so opt-in origin isolation should be
-  // enabled.
-  base::test::ScopedFeatureList memory_feature;
-  memory_feature.InitAndEnableFeatureWithParameters(
-      features::kSiteIsolationMemoryThresholdsAndroid,
-      {{features::kPartialSiteIsolationMemoryThresholdParamName, "128"}});
-
-  EXPECT_TRUE(content::SiteIsolationPolicy::
-                  IsProcessIsolationForOriginAgentClusterEnabled());
-  EXPECT_TRUE(content::SiteIsolationPolicy::IsOriginAgentClusterEnabled());
-
-  // Simulate a navigation to a URL that serves an Origin-Agent-Cluster header.
-  // Verify that the resulting SiteInstance requires a dedicated process.  Note
-  // that this test disables strict site isolation, so this would happen only
-  // if opt-in isolation took place.
-  const GURL kUrl("https://www.google.com/");
-  std::unique_ptr<content::WebContents> web_contents =
-      content::WebContentsTester::CreateTestWebContents(browser_context(),
-                                                        nullptr);
-  std::unique_ptr<content::NavigationSimulator> simulator =
-      SimulateNavigationToURLWithOriginAgentClusterHeader(kUrl,
-                                                          web_contents.get());
-  content::SiteInstance* site_instance =
-      simulator->GetFinalRenderFrameHost()->GetSiteInstance();
-  EXPECT_TRUE(site_instance->RequiresDedicatedProcess());
-}
-#else  // BUILDFLAG(IS_ANDROID)
 // Check that opt-in origin isolation is applied on non-Android.
 TEST_F(OptInOriginIsolationPolicyTest, NonAndroid) {
   if (ShouldSkipBecauseOfConflictingCommandLineSwitches()) {
@@ -1631,6 +1159,5 @@ TEST_F(OptInOriginIsolationPolicyTest, NonAndroid) {
       simulator->GetFinalRenderFrameHost()->GetSiteInstance();
   EXPECT_TRUE(site_instance->RequiresDedicatedProcess());
 }
-#endif
 
 }  // namespace site_isolation

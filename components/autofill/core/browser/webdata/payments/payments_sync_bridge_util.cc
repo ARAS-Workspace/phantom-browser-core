@@ -785,19 +785,11 @@ void SetAutofillOfferSpecificsFromOfferData(
       (offer_data.GetExpiry() - base::Time::UnixEpoch()).InSeconds());
   offer_specifics->mutable_display_strings()->set_value_prop_text(
       offer_data.GetDisplayStrings().value_prop_text);
-#if BUILDFLAG(IS_ANDROID)
-  offer_specifics->mutable_display_strings()->set_see_details_text_mobile(
-      offer_data.GetDisplayStrings().see_details_text);
-  offer_specifics->mutable_display_strings()
-      ->set_usage_instructions_text_mobile(
-          offer_data.GetDisplayStrings().usage_instructions_text);
-#else
   offer_specifics->mutable_display_strings()->set_see_details_text_desktop(
       offer_data.GetDisplayStrings().see_details_text);
   offer_specifics->mutable_display_strings()
       ->set_usage_instructions_text_desktop(
           offer_data.GetDisplayStrings().usage_instructions_text);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Because card_linked_offer_data and promo_code_offer_data are a oneof,
   // setting one will clear the other. We should figure out which one we care
@@ -840,17 +832,10 @@ AutofillOfferData AutofillOfferDataFromOfferSpecifics(
   DisplayStrings display_strings;
   display_strings.value_prop_text =
       offer_specifics.display_strings().value_prop_text();
-#if BUILDFLAG(IS_ANDROID)
-  display_strings.see_details_text =
-      offer_specifics.display_strings().see_details_text_mobile();
-  display_strings.usage_instructions_text =
-      offer_specifics.display_strings().usage_instructions_text_mobile();
-#else
   display_strings.see_details_text =
       offer_specifics.display_strings().see_details_text_desktop();
   display_strings.usage_instructions_text =
       offer_specifics.display_strings().usage_instructions_text_desktop();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   if (offer_specifics.promo_code_offer_data().promo_code().empty()) {
     // Card-linked offer fields:
@@ -1269,28 +1254,20 @@ bool IsAutofillWalletCredentialDataSpecificsValid(
 }
 
 bool AreMaskedBankAccountSupported() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool IsBnplIssuerSupported() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return base::FeatureList::IsEnabled(
       features::kAutofillEnableBuyNowPayLaterSyncing);
 #else
   return false;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 bool IsEwalletAccountSupported() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(features::kAutofillSyncEwalletAccounts);
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool IsGenericPaymentInstrumentSupported() {
@@ -1300,12 +1277,7 @@ bool IsGenericPaymentInstrumentSupported() {
 }
 
 bool IsEwalletCreationOptionSupported() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(
-      ::payments::facilitated::kEnableEwalletNewAccountLinking);
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool IsPaymentInstrumentCreationOptionSupported() {

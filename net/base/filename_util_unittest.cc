@@ -48,9 +48,7 @@ base::FilePath WStringAsFilePath(const std::wstring& str) {
 }
 
 std::string GetLocaleWarningString() {
-#if BUILDFLAG(IS_ANDROID)
-  return "";
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // The generate filename tests can fail on certain OS_POSIX platforms when
   // LC_CTYPE is not "utf8" or "utf-8" because some of the string conversions
   // fail.

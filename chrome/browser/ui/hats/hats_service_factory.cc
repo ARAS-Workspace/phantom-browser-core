@@ -10,11 +10,7 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/hats/hats_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/hats/hats_service_android.h"
-#else
 #include "chrome/browser/ui/hats/hats_service_desktop.h"
-#endif
 
 // static
 HatsService* HatsServiceFactory::GetForProfile(Profile* profile,
@@ -46,11 +42,7 @@ std::unique_ptr<KeyedService>
 HatsServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<HatsServiceAndroid>(profile);
-#else
   return std::make_unique<HatsServiceDesktop>(profile);
-#endif
 }
 
 HatsServiceFactory::~HatsServiceFactory() = default;

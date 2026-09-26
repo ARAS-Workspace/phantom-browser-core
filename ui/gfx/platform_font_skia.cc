@@ -35,11 +35,7 @@ namespace {
 // The font family name which is used when a user's application font for
 // GNOME/KDE is a non-scalable one. The name should be listed in the
 // IsFallbackFontAllowed function in skia/ext/SkFontHost_fontconfig_direct.cpp.
-#if BUILDFLAG(IS_ANDROID)
-const char kFallbackFontFamilyName[] = "serif";
-#else
 const char kFallbackFontFamilyName[] = "sans";
-#endif
 
 constexpr SkGlyphID kUnsupportedGlyph = 0;
 

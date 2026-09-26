@@ -13,10 +13,6 @@
 #include "media/base/test_data_util.h"
 #include "media/mojo/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/system/sys_info.h"
-#endif
-
 #if BUILDFLAG(ENABLE_MOJO_RENDERER)
 // Remote mojo renderer does not send audio/video frames back to the renderer
 // process and hence does not support capture: https://crbug.com/641559.
@@ -103,7 +99,7 @@ IN_PROC_BROWSER_TEST_F(WebRtcCaptureFromElementBrowserTest,
 }
 
 // TODO(crbug.com/40856408): Flaky.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_VerifyCanvasCapture2DFrames DISABLED_VerifyCanvasCapture2DFrames
 #else
 #define MAYBE_VerifyCanvasCapture2DFrames VerifyCanvasCapture2DFrames

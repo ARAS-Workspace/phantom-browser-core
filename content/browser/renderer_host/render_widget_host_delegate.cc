@@ -113,11 +113,7 @@ RenderWidgetHostDelegate::GetDevicePostureProvider() {
 }
 
 bool RenderWidgetHostDelegate::GetResizable() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 gfx::Rect RenderWidgetHostDelegate::GetWindowsControlsOverlayRect() const {
@@ -191,11 +187,5 @@ int RenderWidgetHostDelegate::GetVirtualKeyboardResizeHeight() {
 bool RenderWidgetHostDelegate::ShouldDoLearning() {
   return true;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-gfx::PointF RenderWidgetHostDelegate::GetCurrentTouchSequenceOffset() {
-  return gfx::PointF();
-}
-#endif
 
 }  // namespace content

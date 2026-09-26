@@ -20,19 +20,6 @@
 
 namespace media {
 
-#if BUILDFLAG(IS_ANDROID)
-RendererImplFactory::RendererImplFactory(
-    MediaLog* media_log,
-    DecoderFactory* decoder_factory,
-    const GetGpuFactoriesCB& get_gpu_factories_cb,
-    MediaPlayerLoggingID media_player_id)
-    : media_log_(MediaLog::CloneSafely(media_log)),
-      decoder_factory_(decoder_factory),
-      get_gpu_factories_cb_(get_gpu_factories_cb),
-      media_player_id_(media_player_id) {
-  DCHECK(decoder_factory_);
-}
-#else
 RendererImplFactory::RendererImplFactory(
     MediaLog* media_log,
     DecoderFactory* decoder_factory,
@@ -46,7 +33,6 @@ RendererImplFactory::RendererImplFactory(
       speech_recognition_client_(std::move(speech_recognition_client)) {
   DCHECK(decoder_factory_);
 }
-#endif
 
 RendererImplFactory::~RendererImplFactory() = default;
 
@@ -96,13 +82,7 @@ std::unique_ptr<Renderer> RendererImplFactory::CreateRenderer(
       // finishes.
       base::BindRepeating(&RendererImplFactory::CreateAudioDecoders,
                           base::Unretained(this), media_task_runner),
-      media_log_.get(), media_player_id_
-#if BUILDFLAG(IS_ANDROID)
-      ));
-#else
-      ,
-      speech_recognition_client_.get()));
-#endif
+      media_log_.get(), media_player_id_, speech_recognition_client_.get()));
 
   GpuVideoAcceleratorFactories* gpu_factories = nullptr;
   if (get_gpu_factories_cb_)

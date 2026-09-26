@@ -90,11 +90,7 @@
 #include "media/mojo/services/video_decode_perf_history.h"
 #include "net/http/transport_security_state.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/prefs/scoped_user_pref_update.h"
-#else
 #include "chrome/browser/accessibility/tree_fixing/pref_names.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/extension_special_storage_policy.h"
@@ -211,11 +207,9 @@ void OffTheRecordProfileImpl::Init() {
   GetPrefs()->SetBoolean(prefs::kAccessibilityImageLabelsEnabled, false);
   GetPrefs()->SetBoolean(prefs::kAccessibilityImageLabelsOptInAccepted, false);
 
-#if !BUILDFLAG(IS_ANDROID)
   // To avoid using any server-side tree fixing service, it is disabled in
   // Incognito profiles.
   tree_fixing::InitOffTheRecordPrefs(this);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // The ad service might not be available for some irregular profiles, like the
   // System Profile.

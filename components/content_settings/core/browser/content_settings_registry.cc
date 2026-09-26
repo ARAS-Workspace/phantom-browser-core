@@ -219,12 +219,7 @@ void ContentSettingsRegistry::Init() {
   Register(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER,
            "protected-media-identifier", CONTENT_SETTING_ALLOW,
            WebsiteSettingsInfo::UNSYNCABLE, /*allowlisted_primary_schemes=*/{},
-#if BUILDFLAG(IS_ANDROID)
-           /*valid_settings=*/
-           {CONTENT_SETTING_ALLOW, CONTENT_SETTING_BLOCK, CONTENT_SETTING_ASK},
-#else   // BUILDFLAG(IS_ANDROID)
            /*valid_settings=*/{CONTENT_SETTING_ALLOW, CONTENT_SETTING_BLOCK},
-#endif  // else
            WebsiteSettingsInfo::TOP_ORIGIN_ONLY_SCOPE,
            WebsiteSettingsRegistry::PLATFORM_ANDROID |
                WebsiteSettingsRegistry::PLATFORM_CHROMEOS |
@@ -589,14 +584,7 @@ void ContentSettingsRegistry::Init() {
            ContentSettingsInfo::INHERIT_IN_INCOGNITO,
            PermissionSettingsInfo::EXCEPTIONS_ON_SECURE_AND_INSECURE_ORIGINS);
 
-  const auto auto_dark_web_content_setting =
-#if BUILDFLAG(IS_ANDROID)
-      content_settings::kDarkenWebsitesCheckboxOptOut.Get()
-          ? CONTENT_SETTING_ALLOW
-          : CONTENT_SETTING_BLOCK;
-#else
-      CONTENT_SETTING_ALLOW;
-#endif  // BUILDFLAG(IS_ANDROID)
+  const auto auto_dark_web_content_setting = CONTENT_SETTING_ALLOW;
 
   Register(ContentSettingsType::AUTO_DARK_WEB_CONTENT, "auto-dark-web-content",
            auto_dark_web_content_setting, WebsiteSettingsInfo::UNSYNCABLE,

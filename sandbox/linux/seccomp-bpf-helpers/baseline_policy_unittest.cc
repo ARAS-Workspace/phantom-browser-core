@@ -47,10 +47,6 @@
 #include "sandbox/linux/tests/test_utils.h"
 #include "sandbox/linux/tests/unit_tests.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/background_thread_pool_field_trial.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if !defined(SO_PEEK_OFF)
 #define SO_PEEK_OFF 42
 #endif
@@ -164,11 +160,7 @@ BPF_TEST_C(BaselinePolicy, ForkArmEperm, BaselinePolicy) {
 // blocked. This causes undefined behavior on x86 Android builds on versions
 // prior to Q, which causes the stack to get corrupted, so this test cannot be
 // made to pass.
-#if BUILDFLAG(IS_ANDROID) && defined(__i386__)
-#define MAYBE_SystemEperm DISABLED_SystemEperm
-#else
 #define MAYBE_SystemEperm SystemEperm
-#endif
 BPF_TEST_C(BaselinePolicy, MAYBE_SystemEperm, BaselinePolicy) {
   errno = 0;
   int ret_val = system("echo SHOULD NEVER RUN");
@@ -204,7 +196,6 @@ BPF_TEST_C(BaselinePolicy, CreateThread, BaselinePolicy) {
 }
 
 // Rseq should be enabled if it exists (i.e. shouldn't receive EPERM).
-#if !BUILDFLAG(IS_ANDROID)
 BPF_TEST_C(BaselinePolicy, RseqEnabled, BaselinePolicy) {
   errno = 0;
   int res = syscall(__NR_rseq, 0, 0, 0, 0);
@@ -214,7 +205,6 @@ BPF_TEST_C(BaselinePolicy, RseqEnabled, BaselinePolicy) {
   // EINVAL, or ENOSYS if the kernel is too old to recognize the system call.
   BPF_ASSERT(EINVAL == errno || ENOSYS == errno);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 BPF_DEATH_TEST_C(BaselinePolicy,
                  DisallowedCloneFlagCrashes,
@@ -568,12 +558,6 @@ BPF_DEATH_TEST_C(BaselinePolicy,
                  DEATH_SUCCESS(),
                  BaselinePolicy) {
   int fd = syscall(__NR_memfd_create, "test_shared_memory", MFD_CLOEXEC);
-#if BUILDFLAG(IS_ANDROID)
-  if (fd == -1 && errno == ENOSYS) {
-    // Older version of Android that doesn't support memfds. Skip this test.
-    return;
-  }
-#endif
   BPF_ASSERT_NE(fd, -1);
 
   fd = syscall(__NR_memfd_create, "test_shared_memory2",

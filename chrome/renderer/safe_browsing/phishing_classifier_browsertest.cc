@@ -243,13 +243,8 @@ class PhishingClassifierTest
 
   void GetTfliteModelPath(base::FilePath* path) {
     ASSERT_TRUE(base::PathService::Get(chrome::DIR_TEST_DATA, path));
-#if BUILDFLAG(IS_ANDROID)
-    *path = path->AppendASCII("safe_browsing")
-                .AppendASCII("visual_model_android.tflite");
-#else
     *path = path->AppendASCII("safe_browsing")
                 .AppendASCII("visual_model_desktop.tflite");
-#endif
   }
 
   void SetUpClassifier() {
@@ -371,40 +366,6 @@ TEST_F(PhishingClassifierTest, CancelImageEmbeddingWhenNotReady) {
   image_embedder_->CancelPendingImageEmbedding();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PhishingClassifierTest, TestImageEmbeddingMatchPopulatesEmbedding) {
-  LoadHtml(
-      GURL("http://host.net"),
-      "<html><body><a href=\"http://phishing.com/\">login</a></body></html>");
-
-  classifier_->SetClientSideDetectionType(
-      safe_browsing::ClientSideDetectionType::IMAGE_EMBEDDING_MATCH);
-
-  RunPhishingClassifier();
-
-  // Verify that image_feature_embedding is populated.
-  ASSERT_TRUE(verdict_.has_image_feature_embedding());
-
-  // Depending on the test model, you might be able to assert on the size
-  // or contents of embedding_value.
-  EXPECT_GT(verdict_.image_feature_embedding().embedding_value_size(), 0);
-}
-
-TEST_F(PhishingClassifierTest,
-       TestNonImageEmbeddingMatchDoesNotPopulateEmbedding) {
-  LoadHtml(
-      GURL("http://host.net"),
-      "<html><body><a href=\"http://phishing.com/\">login</a></body></html>");
-
-  classifier_->SetClientSideDetectionType(
-      safe_browsing::ClientSideDetectionType::TRIGGER_MODELS);
-
-  RunPhishingClassifier();
-
-  // Verify that image_feature_embedding is not populated.
-  ASSERT_FALSE(verdict_.has_image_feature_embedding());
-}
-#endif
 // TODO(jialiul): Add test to verify that classification only starts on GET
 // method. It seems there is no easy way to simulate a HTTP POST in
 // ChromeRenderViewTest.

@@ -56,11 +56,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/policy/cloud/user_policy_signin_service_mobile.h"
-#else
 #include "chrome/browser/policy/cloud/user_policy_signin_service.h"
-#endif
 
 namespace em = enterprise_management;
 
@@ -374,7 +370,6 @@ TEST_F(UserPolicySigninServiceTest, InitWhileSignedOut) {
 // TODO(crbug.com/40831734): Extend the test coverage by merging tests from
 // ios/chrome/browser/policy/cloud/user_policy_signin_service_unittest.mm here.
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(UserPolicySigninServiceTest, InitRefreshTokenAvailableBeforeSignin) {
   // Make sure user is not signed in.
   ASSERT_FALSE(identity_test_env()->identity_manager()->HasPrimaryAccount(
@@ -402,12 +397,10 @@ TEST_F(UserPolicySigninServiceTest, InitRefreshTokenAvailableBeforeSignin) {
   ASSERT_TRUE(IsRequestActive());
   EXPECT_TRUE(manager_->ArePoliciesRequired());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(joaodasilva): these tests rely on issuing the OAuth2 login refresh
 // token after signin. Revisit this after figuring how to handle that on
 // Android.
-#if !BUILDFLAG(IS_ANDROID)
 
 TEST_F(UserPolicySigninServiceSignedInTest, InitWhileSignedIn) {
   // UserCloudPolicyManager should be initialized.
@@ -767,8 +760,6 @@ TEST_F(UserPolicySigninServiceTest,
   EXPECT_TRUE(future.Get());
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 TEST_F(UserPolicySigninServiceSignedInTest, SignOutAfterInit) {
   // UserCloudPolicyManager should be initialized.
   EXPECT_EQ(mock_store_->signin_account_id(), test_account_id_);
@@ -1007,34 +998,6 @@ TEST_F(UserPolicySigninServiceTest, SignOutThenSignInAgain) {
   histogram_tester_.ExpectTotalCount(kRegisterCloudPolicyServiceHistogramName,
                                      0);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(UserPolicySigninServiceTest, CanApplyPoliciesMetricOnSignIn) {
-  UserPolicySigninService* signin_service =
-      UserPolicySigninServiceFactory::GetForProfile(profile_.get());
-
-  // Disable testing override.
-  signin_service->set_profile_can_be_managed_for_testing(false);
-
-  // Seed the account as managed.
-  AccountInfo account_info =
-      identity_test_env()->MakeAccountAvailable(kTestUser);
-  AccountInfo::Builder builder(account_info);
-  builder.SetHostedDomain("test.com");
-  identity_test_env()->UpdateAccountInfoForAccount(builder.Build());
-
-  base::HistogramTester tester;
-
-  // Sign in. This should trigger OnPrimaryAccountChanged -> CanApplyPolicies.
-  identity_test_env()->SetPrimaryAccount(kTestUser,
-                                         signin::ConsentLevel::kSignin);
-
-  // Since ProfileCanBeManaged will return false (no profile manager or not set
-  // up), we expect the metric to be logged as false.
-  tester.ExpectUniqueSample(
-      "Enterprise.CloudPolicy.ProfileCanBeManagedForManagedUser", false, 1);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 

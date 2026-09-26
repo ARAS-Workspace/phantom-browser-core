@@ -124,7 +124,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
@@ -138,25 +137,10 @@
 #include "media/base/picture_in_picture_events_info.h"
 #include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
 #include "ui/base/page_transition_types.h"
-#else
-#include "base/system/sys_info.h"
-#endif
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 #include "components/captive_portal/content/captive_portal_tab_helper.h"
 #endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/android/tab_web_contents_delegate_android.h"
-#include "chrome/browser/android/web_contents_theme_client.h"
-
-#if BUILDFLAG(ENABLE_GUEST_VIEW) && !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/android/guest_view/chrome_guest_view_manager_delegate.h"
-#include "components/guest_view/browser/slim_web_view/slim_web_view_guest.h"  // nogncheck
-#include "components/guest_view/browser/test_guest_view_manager.h"
-#endif  // BUILDFLAG(ENABLE_GUEST_VIEW)  && !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/web_applications/web_app.h"
@@ -292,7 +276,6 @@ TEST_F(ChromeContentBrowserClientTest, ShouldAssignSiteForURL) {
 }
 
 // BrowserWithTestWindowTest doesn't work on Android.
-#if !BUILDFLAG(IS_ANDROID)
 
 using ChromeContentBrowserClientTestWithWebContents =
     ChromeRenderViewHostTestHarness;
@@ -587,9 +570,6 @@ TEST_F(ChromeContentBrowserClientTestWithWebContents,
             client.GetAutoPipInfo(*web_contents()).auto_pip_reason);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeContentBrowserClientTestWithWebContents,
        QueryInstalledWebAppsByManifestIdFrameUrlInScope) {
   ChromeContentBrowserClient client;
@@ -730,8 +710,6 @@ TEST_F(ChromeContentBrowserClientTestWithWebContents,
       profile(), GURL("http://example.com/test?q=test")));
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 // NOTE: Any updates to the expectations in these tests should also be done in
 // the browser test WebRtcDisableEncryptionFlagBrowserTest.
 class DisableWebRtcEncryptionFlagTest : public testing::Test {
@@ -776,11 +754,7 @@ TEST_F(DisableWebRtcEncryptionFlagTest, DevChannel) {
 
 TEST_F(DisableWebRtcEncryptionFlagTest, BetaChannel) {
   MaybeCopyDisableWebRtcEncryptionSwitch(version_info::Channel::BETA);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(to_command_line_.HasSwitch(switches::kDisableWebRtcEncryption));
-#else
   EXPECT_FALSE(to_command_line_.HasSwitch(switches::kDisableWebRtcEncryption));
-#endif
 }
 
 TEST_F(DisableWebRtcEncryptionFlagTest, StableChannel) {
@@ -1627,7 +1601,6 @@ TEST_F(ChromeContentBrowserClientTest, ShouldUseSpareRenderProcessHost) {
       nullptr, GURL("https://www.example.com"), refused_reason));
   EXPECT_EQ(SpareProcessRefusedByEmbedderReason::NoProfile, refused_reason);
 
-#if !BUILDFLAG(IS_ANDROID)
   {
     // Disable kInstantUsesSpareRenderer flag to verify
     // that Chrome-search URLs are not using the spare renderer.
@@ -1651,7 +1624,6 @@ TEST_F(ChromeContentBrowserClientTest, ShouldUseSpareRenderProcessHost) {
         &profile_, GURL("chrome-search://test"), refused_reason));
     EXPECT_FALSE(refused_reason.has_value());
   }
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // Extension URL
@@ -1797,105 +1769,6 @@ TEST_F(IsJitDisabledForSiteTest, AllowedByDefault) {
   EXPECT_FALSE(IsJitDisabledForSite(GURL("blob:null/guid")));
   EXPECT_FALSE(IsJitDisabledForSite(GURL("chrome://settings")));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-
-class ChromeContentBrowserClientPreferredColorSchemeAndroidTest
-    : public ChromeRenderViewHostTestHarness,
-      public testing::WithParamInterface<bool> {
- public:
-  ChromeContentBrowserClientPreferredColorSchemeAndroidTest() = default;
-
-  bool IsDarkMode() const { return GetParam(); }
-
- protected:
-  void SetUp() override { ChromeRenderViewHostTestHarness::SetUp(); }
-
-  ChromeContentBrowserClient client_;
-};
-
-TEST_P(ChromeContentBrowserClientPreferredColorSchemeAndroidTest,
-       RootWebContents) {
-  std::unique_ptr<TabAndroid> tab =
-      TabAndroid::CreateForTesting(profile(), 1, CreateTestWebContents());
-  content::WebContents* web_contents = tab->web_contents();
-  tabs::TabLookupFromWebContents::CreateForWebContents(web_contents,
-                                                        tab.get());
-
-  bool is_dark_mode = IsDarkMode();
-  night_mode::WebContentsThemeClient::SetIsNightModeEnabledForTesting(
-      web_contents, is_dark_mode);
-
-  blink::web_pref::WebPreferences web_preferences;
-  content::SiteInstance* site_instance = web_contents->GetSiteInstance();
-  client_.OverrideWebPreferences(web_contents, *site_instance,
-                                 &web_preferences);
-
-  auto expected_color_scheme = is_dark_mode
-                                   ? blink::mojom::PreferredColorScheme::kDark
-                                   : blink::mojom::PreferredColorScheme::kLight;
-  EXPECT_EQ(expected_color_scheme, web_preferences.preferred_color_scheme);
-  EXPECT_EQ(expected_color_scheme,
-            web_preferences.preferred_root_scrollbar_color_scheme);
-}
-
-#if BUILDFLAG(ENABLE_GUEST_VIEW) && !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-TEST_P(ChromeContentBrowserClientPreferredColorSchemeAndroidTest,
-       SlimWebViewGuest) {
-  if (base::FeatureList::IsEnabled(features::kGuestViewMPArch)) {
-    GTEST_SKIP() << "MPArch based guests do not have inner WebContents.";
-  }
-  guest_view::TestGuestViewManagerFactory factory;
-  factory.GetOrCreateTestGuestViewManager(
-      profile(), std::make_unique<android::ChromeGuestViewManagerDelegate>());
-
-  // Create Owner WebContents
-  std::unique_ptr<TabAndroid> owner_tab =
-      TabAndroid::CreateForTesting(profile(), 1, CreateTestWebContents());
-  content::WebContents* owner_contents = owner_tab->web_contents();
-  tabs::TabLookupFromWebContents::CreateForWebContents(owner_contents,
-                                                       owner_tab.get());
-
-  // Set Color Scheme in Owner
-  bool is_dark_mode = IsDarkMode();
-  night_mode::WebContentsThemeClient::SetIsNightModeEnabledForTesting(
-      owner_contents, is_dark_mode);
-
-  // Create Guest WebContents
-  std::unique_ptr<content::WebContents> guest_contents =
-      CreateTestWebContents();
-
-  // Associate Guest with Owner
-  std::unique_ptr<guest_view::GuestViewBase> slim_webview_guest =
-      guest_view::SlimWebViewGuest::Create(
-          owner_contents->GetPrimaryMainFrame());
-  slim_webview_guest->InitWithWebContents(base::DictValue(),
-                                          guest_contents.get());
-
-  // Verify Color Scheme
-  blink::web_pref::WebPreferences web_preferences;
-  content::SiteInstance* site_instance = guest_contents->GetSiteInstance();
-  client_.OverrideWebPreferences(guest_contents.get(), *site_instance,
-                                 &web_preferences);
-
-  auto expected_color_scheme = is_dark_mode
-                                   ? blink::mojom::PreferredColorScheme::kDark
-                                   : blink::mojom::PreferredColorScheme::kLight;
-  EXPECT_EQ(expected_color_scheme, web_preferences.preferred_color_scheme);
-  EXPECT_EQ(expected_color_scheme,
-            web_preferences.preferred_root_scrollbar_color_scheme);
-}
-#endif  // BUILDFLAG(ENABLE_GUEST_VIEW) && !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    ChromeContentBrowserClientPreferredColorSchemeAndroidTest,
-    testing::Bool(),
-    [](const testing::TestParamInfo<bool>& info) {
-      return info.param ? "DarkMode" : "LightMode";
-    });
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class ChromeContentBrowserClientAIPrefsTest
     : public ChromeRenderViewHostTestHarness {
@@ -2071,7 +1944,7 @@ TEST_F(ChromeContentBrowserClientOopifPdfTest,
 }
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 class ChromeContentBrowserClientMimeHandlerFilePickerTest
     : public ChromeRenderViewHostTestHarness {
  public:
@@ -2200,7 +2073,7 @@ TEST_F(ChromeContentBrowserClientMimeHandlerFilePickerTest,
       url::Origin::Create(GURL(
           "chrome-extension://bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/viewer.html"))));
 }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class ChromeContentBrowserClientHandleExternalProtocolTest

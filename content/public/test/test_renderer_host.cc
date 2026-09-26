@@ -44,12 +44,8 @@
 #include "third_party/blink/public/common/input/synthetic_web_input_event_builders.h"
 #include "third_party/blink/public/common/input/web_input_event.h"
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 #include "ui/display/screen.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/dummy_screen_android.h"
 #endif
 
 
@@ -131,14 +127,8 @@ RenderViewHostTestEnabler::RenderViewHostTestEnabler(
     task_environment_ =
         std::make_unique<base::test::SingleThreadTaskEnvironment>();
   }
-#if !BUILDFLAG(IS_ANDROID)
   ImageTransportFactory::SetFactory(
       std::make_unique<TestImageTransportFactory>());
-#else
-  if (!screen_)
-    screen_.reset(ui::CreateDummyScreenAndroid());
-  display::Screen::SetScreenInstance(screen_.get());
-#endif
 #if BUILDFLAG(IS_MAC)
   if (base::SingleThreadTaskRunner::HasCurrentDefault())
     ui::WindowResizeHelperMac::Get()->Init(
@@ -150,13 +140,9 @@ RenderViewHostTestEnabler::~RenderViewHostTestEnabler() {
 #if BUILDFLAG(IS_MAC)
   ui::WindowResizeHelperMac::Get()->ShutdownForTests();
 #endif  // BUILDFLAG(IS_MAC)
-#if !BUILDFLAG(IS_ANDROID)
   // RenderWidgetHostView holds on to a reference to SurfaceManager, so it
   // must be shut down before the ImageTransportFactory.
   ImageTransportFactory::Terminate();
-#else
-  display::Screen::SetScreenInstance(nullptr);
-#endif
 }
 
 

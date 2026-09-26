@@ -12,13 +12,7 @@ namespace features {
 // Enables the Media Session service including audio focus tracking. This allows
 // clients to consume the Media Session Mojo APIs but should not have any
 // changes to behavior. It is enabled by default on all platforms except Android.
-BASE_FEATURE(kMediaSessionService,
-#if !BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kMediaSessionService, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enables Audio Focus enforcement which means that only one media session can
 // have audio focus at any one time.

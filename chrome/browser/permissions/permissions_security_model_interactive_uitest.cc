@@ -875,11 +875,7 @@ IN_PROC_BROWSER_TEST_F(PermissionsSecurityModelInteractiveUITest,
   EXPECT_TRUE(main_rfh->GetLastCommittedOrigin().GetURL().SchemeIsFile());
 
   // `https://chromium.org` is used for permissions verification.
-#if BUILDFLAG(IS_ANDROID)
-  VerifyPermissionsForFile(main_rfh, /*expect_granted=*/false);
-#else
   VerifyPermissionsForFile(main_rfh, /*expect_granted=*/true);
-#endif
 }
 
 // Verifies that permissions are not supported for file:/// with changed URL to
@@ -919,11 +915,7 @@ IN_PROC_BROWSER_TEST_F(PermissionsSecurityModelInteractiveUITest,
   EXPECT_EQ("about:blank", main_rfh->GetLastCommittedURL().spec());
   EXPECT_TRUE(main_rfh->GetLastCommittedURL().IsAboutBlank());
 
-#if BUILDFLAG(IS_ANDROID)
-  VerifyPermissionsForFile(main_rfh, /*expect_granted=*/false);
-#else
   VerifyPermissionsForFile(main_rfh, /*expect_granted=*/true);
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(PermissionsSecurityModelInteractiveUITest,

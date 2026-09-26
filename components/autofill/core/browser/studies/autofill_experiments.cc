@@ -227,7 +227,7 @@ bool IsInAutofillSuggestionsDisabledExperiment() {
 }
 
 bool IsCreditCardFidoAuthenticationEnabled() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   // Better Auth project is fully launched on Mac for Desktop, and Android for
   // mobile.
   return true;
@@ -254,12 +254,7 @@ bool IsDeviceAuthAvailable(
 }
 
 bool IsTouchToFillPaymentMethodSupported() {
-#if BUILDFLAG(IS_ANDROID)
-  // Touch To Fill is only supported on Android.
-  return true;
-#else
   return false;
-#endif
 }
 
 void SetUserOptedInWalletSyncTransport(PrefService* prefs,

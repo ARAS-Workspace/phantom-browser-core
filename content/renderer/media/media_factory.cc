@@ -73,13 +73,6 @@
 #include "third_party/blink/public/web/web_view.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/renderer/media/android/flinging_renderer_client_factory.h"
-#include "media/base/android/media_codec_util.h"
-#include "media/base/media.h"
-#include "url/gurl.h"
-#endif
-
 
 #if BUILDFLAG(ENABLE_MOJO_CDM)
 #include "media/mojo/clients/mojo_cdm_factory.h"  // nogncheck
@@ -206,19 +199,11 @@ std::unique_ptr<media::RendererImplFactory> CreateRendererImplFactory(
     media::DecoderFactory* decoder_factory,
     content::RenderThreadImpl* render_thread,
     content::RenderFrameImpl* render_frame) {
-#if BUILDFLAG(IS_ANDROID)
-  auto factory = std::make_unique<media::RendererImplFactory>(
-      media_log, decoder_factory,
-      base::BindRepeating(&content::RenderThreadImpl::GetGpuFactories,
-                          base::Unretained(render_thread)),
-      player_id);
-#else
   auto factory = std::make_unique<media::RendererImplFactory>(
       media_log, decoder_factory,
       base::BindRepeating(&content::RenderThreadImpl::GetGpuFactories,
                           base::Unretained(render_thread)),
       player_id, render_frame->CreateSpeechRecognitionClient());
-#endif
   return factory;
 }
 
@@ -358,10 +343,6 @@ std::unique_ptr<blink::WebMediaPlayer> MediaFactory::CreateMediaPlayer(
   const blink::web_pref::WebPreferences webkit_preferences =
       render_frame_->GetBlinkPreferences();
   bool embedded_media_experience_enabled = false;
-#if BUILDFLAG(IS_ANDROID)
-  embedded_media_experience_enabled =
-      webkit_preferences.embedded_media_experience_enabled;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   media::MediaPlayerLoggingID player_id = media::GetNextMediaPlayerLoggingID();
   std::vector<std::unique_ptr<BatchingMediaLog::EventHandler>> handlers;
@@ -485,26 +466,6 @@ MediaFactory::CreateRendererFactorySelector(
     factory_selector->AddBaseFactory(RendererType::kContentEmbedderDefined,
                                      std::move(factory));
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // FlingingRendererClientFactory (FRCF) setup.
-  auto flinging_factory = std::make_unique<FlingingRendererClientFactory>(
-      CreateMojoRendererFactory(), std::move(client_wrapper));
-
-  // base::Unretained() is safe here because |factory_selector| owns and
-  // outlives |flinging_factory|.
-  factory_selector->StartRequestRemotePlayStateCB(
-      base::BindOnce(&FlingingRendererClientFactory::SetRemotePlayStateChangeCB,
-                     base::Unretained(flinging_factory.get())));
-
-  // Must bind the callback first since |flinging_factory| will be moved.
-  // base::Unretained() is also safe here, for the same reasons.
-  auto is_flinging_cb =
-      base::BindRepeating(&FlingingRendererClientFactory::IsFlingingActive,
-                          base::Unretained(flinging_factory.get()));
-  factory_selector->AddConditionalFactory(
-      RendererType::kFlinging, std::move(flinging_factory), is_flinging_cb);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_MOJO_RENDERER)
   if (!is_base_renderer_factory_set &&

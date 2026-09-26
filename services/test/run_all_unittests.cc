@@ -19,10 +19,6 @@
 #include "ui/base/resource/resource_scale_factor.h"
 #include "ui/base/ui_base_paths.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif
-
 namespace {
 
 class ServiceTestSuite : public base::TestSuite {
@@ -45,11 +41,7 @@ class ServiceTestSuite : public base::TestSuite {
     ui::ResourceBundle::InitSharedInstanceWithPakPath(ui_test_pak_path);
 
     base::FilePath path;
-#if BUILDFLAG(IS_ANDROID)
-    ASSERT_TRUE(base::PathService::Get(ui::DIR_RESOURCE_PAKS_ANDROID, &path));
-#else
     ASSERT_TRUE(base::PathService::Get(base::DIR_ASSETS, &path));
-#endif
     base::FilePath bluetooth_test_strings =
         path.Append(FILE_PATH_LITERAL("bluetooth_test_strings.pak"));
     ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(

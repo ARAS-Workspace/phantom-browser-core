@@ -109,10 +109,6 @@ std::string FakeDistilledPage::GetPageHtmlWithScripts() {
 
   std::string min_scale = "0.5";
   std::string max_scale = "2.0";
-#if BUILDFLAG(IS_ANDROID)
-  min_scale = "1.0";
-  max_scale = "2.5";
-#endif
   base::ReplaceFirstSubstringAfterOffset(&viewer_js, 0, "$MIN_SCALE",
                                          min_scale);
   base::ReplaceFirstSubstringAfterOffset(&viewer_js, 0, "$MAX_SCALE",
@@ -142,14 +138,11 @@ std::unique_ptr<FakeDistilledPage> SetUpTestServerWithDistilledPage(
 void AddComponentsResources() {
   FilePath pak_file;
   FilePath pak_dir;
-#if BUILDFLAG(IS_ANDROID)
-  CHECK(PathService::Get(base::DIR_ANDROID_APP_DATA, &pak_dir));
-  pak_dir = pak_dir.Append(FILE_PATH_LITERAL("paks"));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   PathService::Get(base::DIR_MODULE, &pak_dir);
 #else
   PathService::Get(base::DIR_ASSETS, &pak_dir);
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
   pak_file =
       pak_dir.Append(FILE_PATH_LITERAL("components_tests_resources.pak"));
   ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(

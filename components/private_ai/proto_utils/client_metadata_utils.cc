@@ -33,8 +33,6 @@ proto::ChromeClientMetadata::Channel ConvertChannelToProto(
 proto::ChromeClientMetadata::Platform GetPlatformForProto() {
 #if BUILDFLAG(IS_MAC)
   return proto::ChromeClientMetadata::PLATFORM_MAC;
-#elif BUILDFLAG(IS_ANDROID)
-  return proto::ChromeClientMetadata::PLATFORM_ANDROID;
 #elif BUILDFLAG(IS_LINUX)
   return proto::ChromeClientMetadata::PLATFORM_LINUX;
 #else

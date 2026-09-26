@@ -62,10 +62,6 @@
 #include "third_party/skia/include/ports/SkTypeface_mac.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/locale_utils.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #include <hb.h>
 
 namespace gfx {
@@ -1536,12 +1532,7 @@ void ShapeRunWithFont(const ShapeRunWithFontInput& in,
 }
 
 std::string GetApplicationLocale() {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(etienneb): Android locale should work the same way than base locale.
-  return base::android::GetDefaultLocaleString();
-#else
   return base::i18n::GetConfiguredLocale();
-#endif
 }
 
 }  // namespace

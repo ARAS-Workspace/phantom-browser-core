@@ -8,10 +8,6 @@
 #include "third_party/dawn/include/dawn/webgpu.h"
 #include "ui/gl/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 namespace gpu {
 
 bool IsWebGPUAdapterBlocklisted(const WGPUAdapterInfo& info,
@@ -25,51 +21,6 @@ bool IsWebGPUAdapterBlocklisted(const WGPUAdapterInfo& info,
 
 class WebGPUBlocklistTest : public testing::Test {};
 
-#if BUILDFLAG(IS_ANDROID)
-// Android is currently more restrictive than other platforms around which GPUs
-// are allowed, which causes the usual tests to fail. This test exercises the
-// Android-specific restrictions.
-
-TEST_F(WebGPUBlocklistTest, BlockAndroidVendorId) {
-  WGPUAdapterInfo info1 = {};
-  info1.vendorID = 0x13B5;
-
-  WGPUAdapterInfo info2 = {};
-  info2.vendorID = 0x5143;
-
-  WGPUAdapterInfo info3 = {};
-  info3.vendorID = 0x8086;
-
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_S) {
-    // If the Android version is R or lower, the Vulkan backend should be
-    // blocked.
-    info1.backendType = info2.backendType = info3.backendType =
-        WGPUBackendType_Vulkan;
-    EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info1));
-    EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info2));
-    EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info3));
-    return;
-  }
-
-  // Test the default vendor blocks
-  EXPECT_FALSE(IsWebGPUAdapterBlocklisted(info1));
-  EXPECT_FALSE(IsWebGPUAdapterBlocklisted(info2));
-
-  // Test that blocking a vendor which is otherwise allowed still works
-  EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info1, "13b5"));
-  EXPECT_FALSE(IsWebGPUAdapterBlocklisted(info2, "13b5"));
-
-  // Test blocking *
-  EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info1, "*"));
-  EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info2, "*"));
-
-  // Test blocking a list of patterns
-  EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info1, "13b5|5143"));
-  EXPECT_TRUE(IsWebGPUAdapterBlocklisted(info2, "13b5|5143"));
-}
-
-#else
 TEST_F(WebGPUBlocklistTest, BlockVendorId) {
   WGPUAdapterInfo info1 = {};
   info1.vendorID = 0x8086;
@@ -202,6 +153,5 @@ TEST_F(WebGPUBlocklistTest, BlockDriverDescription) {
   EXPECT_TRUE(
       IsWebGPUAdapterBlocklisted(info3, "*:*:D3D12 driver version 31.*"));
 }
-#endif  // BUILDFLAG(IS_ANDROID) else
 
 }  // namespace gpu

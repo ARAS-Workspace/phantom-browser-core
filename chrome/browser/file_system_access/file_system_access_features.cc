@@ -17,11 +17,7 @@ BASE_FEATURE(kFileSystemAccessMoveWithOverwrite,
 // Enables persistent permissions for the File System Access API.
 BASE_FEATURE(kFileSystemAccessPersistentPermissions,
              "kFileSystemAccessPersistentPermissions",
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // Enables performing the blocklist check on a full absolute path, which
 // resolves any symbolic link.

@@ -546,11 +546,7 @@ IN_PROC_BROWSER_TEST_F(SearchPrefetchServiceEnabledBrowserTest,
 
   EXPECT_EQ(1u, search_server_requests().size());
   auto headers = search_server_requests()[0].headers;
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(headers.contains("X-Geo"));
-#else
   ASSERT_FALSE(headers.contains("X-Geo"));
-#endif
 }
 
 class SearchPrefetchXGeoEnabledBrowserTest

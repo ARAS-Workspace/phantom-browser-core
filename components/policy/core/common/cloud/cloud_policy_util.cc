@@ -95,15 +95,13 @@ std::string GetMachineName() {
   }
 
   return split.value().category;
-#elif BUILDFLAG(IS_ANDROID)
-  return std::string();
 #else
 #error Unsupported platform
 #endif
 }
 
 std::string GetOSVersion() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE)
   return base::SysInfo::OperatingSystemVersion();
 #else
   NOTREACHED();
@@ -125,10 +123,6 @@ std::string GetOSUsername() {
     return std::string();
 
   return creds->pw_name;
-#elif BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40200780): This should be fully implemented when there is
-  // support in fuchsia.
-  return std::string();
 #else
   NOTREACHED();
 #endif

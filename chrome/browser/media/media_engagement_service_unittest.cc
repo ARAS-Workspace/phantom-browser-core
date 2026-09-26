@@ -634,7 +634,7 @@ TEST_P(MediaEngagementServiceTest, CleanupOriginsOnHistoryDeletion) {
 }
 
 // The test is flaky: crbug.com/40668468.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_CleanUpDatabaseWhenHistoryIsExpired \
   DISABLED_CleanUpDatabaseWhenHistoryIsExpired
 #else
@@ -896,13 +896,8 @@ TEST_P(MediaEngagementServiceTest, HasHighEngagement) {
 
 // Disable test on Android. Feature `kPreloadMediaEngagementData` is not
 // available for this platforms.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_HasHighEngagement_PreloadListOriginPresent \
-  DISABLED_HasHighEngagement_PreloadListOriginPresent
-#else
 #define MAYBE_HasHighEngagement_PreloadListOriginPresent \
   HasHighEngagement_PreloadListOriginPresent
-#endif
 TEST_P(MediaEngagementServiceTest,
        MAYBE_HasHighEngagement_PreloadListOriginPresent) {
   url::Origin origin = url::Origin::Create(GURL("https://google.com"));
@@ -919,12 +914,7 @@ TEST_P(MediaEngagementServiceTest,
 
 // Disable test on Android. Feature `kPreloadMediaEngagementData` is not
 // available for this platforms.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_HasHighEngagement_ScoreVisits \
-  DISABLED_HasHighEngagement_ScoreVisits
-#else
 #define MAYBE_HasHighEngagement_ScoreVisits HasHighEngagement_ScoreVisits
-#endif
 TEST_P(MediaEngagementServiceTest, MAYBE_HasHighEngagement_ScoreVisits) {
   url::Origin origin = url::Origin::Create(GURL("https://google.com"));
   EXPECT_FALSE(HasHighEngagement(origin));
@@ -986,15 +976,7 @@ class MediaEngagementServiceEnabledTest
     : public ChromeRenderViewHostTestHarness {};
 
 TEST_F(MediaEngagementServiceEnabledTest, IsEnabled) {
-#if BUILDFLAG(IS_ANDROID)
-  // Make sure these flags are disabled on Android
-  EXPECT_FALSE(base::FeatureList::IsEnabled(
-      media::kMediaEngagementBypassAutoplayPolicies));
-  EXPECT_FALSE(
-      base::FeatureList::IsEnabled(media::kPreloadMediaEngagementData));
-#else
   EXPECT_TRUE(base::FeatureList::IsEnabled(
       media::kMediaEngagementBypassAutoplayPolicies));
   EXPECT_TRUE(base::FeatureList::IsEnabled(media::kPreloadMediaEngagementData));
-#endif
 }

@@ -43,19 +43,10 @@
 #include "net/cookies/cookie_monster.h"
 #include "ui/base/resource/resource_bundle.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/web_test/browser/web_test_browser_main_runner.h"  // nogncheck
 #include "content/web_test/browser/web_test_content_browser_client.h"  // nogncheck
 #include "content/web_test/renderer/web_test_content_renderer_client.h"  // nogncheck
 #include "ui/native_theme/mock_os_settings_provider.h"  // nogncheck
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_assets.h"
-#include "base/posix/global_descriptors.h"
-#include "content/public/browser/android/compositor.h"
-#include "content/shell/android/shell_descriptors.h"
-#endif
 
 #include "components/crash/core/app/crashpad.h"  // nogncheck
 
@@ -67,7 +58,7 @@
 #include "content/shell/app/shell_main_delegate_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 #include "v8/include/v8-wasm-trap-handler-posix.h"
 #endif
 
@@ -152,10 +143,6 @@ std::optional<int> ShellMainDelegate::BasicStartupComplete() {
     command_line.AppendSwitch(switches::kRunWebTests);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  Compositor::Initialize();
-#endif
-
 #if BUILDFLAG(IS_MAC)
   // Needs to happen before InitializeResourceBundle().
   EnsureCorrectResolutionSettings();
@@ -163,7 +150,6 @@ std::optional<int> ShellMainDelegate::BasicStartupComplete() {
 
   InitLogging(command_line);
 
-#if !BUILDFLAG(IS_ANDROID)
   if (switches::IsRunWebTestsSwitchPresent()) {
     // Instantiating `ui::OsSettingsProvider` will both provide sane default
     // behavior and prevent `ui::OsSettingsProvider::Get()` from instantiating a
@@ -178,7 +164,6 @@ std::optional<int> ShellMainDelegate::BasicStartupComplete() {
       web_test_runner_->Initialize();
     }
   }
-#endif
 
 #if BUILDFLAG(IS_IOS_TVOS)
   // On tvOS, local storage is limited and data cannot be written anywhere
@@ -246,7 +231,6 @@ std::variant<int, MainFunctionParams> ShellMainDelegate::RunProcess(
   base::CurrentProcess::GetInstance().SetProcessType(
       base::CurrentProcessType::PROCESS_BROWSER);
 
-#if !BUILDFLAG(IS_ANDROID)
   if (switches::IsRunWebTestsSwitchPresent()) {
     // Web tests implement their own BrowserMain() replacement.
     web_test_runner_->RunBrowserMain(std::move(main_function_params));
@@ -256,31 +240,10 @@ std::variant<int, MainFunctionParams> ShellMainDelegate::RunProcess(
     // return an error.
     return 0;
   }
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android and iOS, we defer to the system message loop when the stack
-  // unwinds. So here we only create (and leak) a BrowserMainRunner. The
-  // shutdown of BrowserMainRunner doesn't happen in Chrome Android/iOS and
-  // doesn't work properly on Android/iOS at all.
-  std::unique_ptr<BrowserMainRunner> main_runner = BrowserMainRunner::Create();
-  // In browser tests, the |main_function_params| contains a |ui_task| which
-  // will execute the testing. The task will be executed synchronously inside
-  // Initialize() so we don't depend on the BrowserMainRunner being Run().
-  int initialize_exit_code =
-      main_runner->Initialize(std::move(main_function_params));
-  DCHECK_LT(initialize_exit_code, 0)
-      << "BrowserMainRunner::Initialize failed in ShellMainDelegate";
-  std::ignore = main_runner.release();
-  // Return 0 as BrowserMain() should not be called after this, bounce up to
-  // the system message loop for ContentShell, and we're already done thanks
-  // to the |ui_task| for browser tests.
-  return 0;
-#else
   // On non-Android, we can return the |main_function_params| back and have the
   // caller run BrowserMain() normally.
   return std::move(main_function_params);
-#endif
 }
 
 #if BUILDFLAG(IS_LINUX)
@@ -298,40 +261,7 @@ void ShellMainDelegate::ZygoteForked() {
 #endif  // BUILDFLAG(IS_LINUX)
 
 void ShellMainDelegate::InitializeResourceBundle() {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the renderer runs with a different UID and can never access
-  // the file system. Use the file descriptor passed in at launch time.
-  auto* global_descriptors = base::GlobalDescriptors::GetInstance();
-  int pak_fd = global_descriptors->MaybeGet(kShellPakDescriptor);
-  base::MemoryMappedFile::Region pak_region;
-  if (pak_fd >= 0) {
-    pak_region = global_descriptors->GetRegion(kShellPakDescriptor);
-  } else {
-    pak_fd =
-        base::android::OpenApkAsset("assets/content_shell.pak", &pak_region);
-    // Loaded from disk for browsertests.
-    if (pak_fd < 0) {
-      base::FilePath pak_file;
-      bool r = base::PathService::Get(base::DIR_ANDROID_APP_DATA, &pak_file);
-      DCHECK(r);
-      pak_file = pak_file.Append(FILE_PATH_LITERAL("paks"));
-      pak_file = pak_file.Append(FILE_PATH_LITERAL("content_shell.pak"));
-      int flags = base::File::FLAG_OPEN | base::File::FLAG_READ;
-      pak_fd = base::File(pak_file, flags).TakePlatformFile();
-      pak_region = base::MemoryMappedFile::Region::kWholeFile;
-    }
-    global_descriptors->Set(kShellPakDescriptor, pak_fd, pak_region);
-  }
-  DCHECK_GE(pak_fd, 0);
-  // TODO(crbug.com/40346051): A better way to prevent fdsan error from a double
-  // close is to refactor GlobalDescriptors.{Get,MaybeGet} to return
-  // "const base::File&" rather than fd itself.
-  base::File android_pak_file(pak_fd);
-  ui::ResourceBundle::InitSharedInstanceWithPakFileRegion(
-      android_pak_file.Duplicate(), pak_region);
-  ui::ResourceBundle::GetSharedInstance().AddDataPackFromFileRegion(
-      std::move(android_pak_file), pak_region, ui::k100Percent);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   ui::ResourceBundle::InitSharedInstanceWithPakPath(GetResourcesPakFilePath());
 #else
   base::FilePath pak_file;
@@ -394,12 +324,10 @@ ContentClient* ShellMainDelegate::CreateContentClient() {
 }
 
 ContentBrowserClient* ShellMainDelegate::CreateContentBrowserClient() {
-#if !BUILDFLAG(IS_ANDROID)
   if (switches::IsRunWebTestsSwitchPresent()) {
     browser_client_ = std::make_unique<WebTestContentBrowserClient>();
     return browser_client_.get();
   }
-#endif
   browser_client_ = std::make_unique<ShellContentBrowserClient>();
   return browser_client_.get();
 }
@@ -410,12 +338,10 @@ ContentGpuClient* ShellMainDelegate::CreateContentGpuClient() {
 }
 
 ContentRendererClient* ShellMainDelegate::CreateContentRendererClient() {
-#if !BUILDFLAG(IS_ANDROID)
   if (switches::IsRunWebTestsSwitchPresent()) {
     renderer_client_ = std::make_unique<WebTestContentRendererClient>();
     return renderer_client_.get();
   }
-#endif
   renderer_client_ =
       std::make_unique<ShellContentRendererClient>(is_content_browsertests_);
   return renderer_client_.get();

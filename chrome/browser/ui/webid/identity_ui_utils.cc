@@ -19,21 +19,12 @@
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-// The desired size of the IDP icon used as badge for the user account avatar
-// when there are multiple IDPs.
-inline constexpr int kLargeAvatarBadgeSize = 20;
-// The border radius of the background circle containing the IDP icon in an
-// account button.
-constexpr int kIdpBorderRadius = 12;
-#else
 // The desired size of the IDP icon used as badge for the user account avatar
 // when there are multiple IDPs.
 inline constexpr int kLargeAvatarBadgeSize = 16;
 // The border radius of the background circle containing the IDP icon in an
 // account button.
 constexpr int kIdpBorderRadius = 10;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Returns an image consisting of `base_image` with `badge_image` being badged
 // towards its bottom right corner. `badge_offset` is used to determine how much

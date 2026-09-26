@@ -34,14 +34,7 @@ bool IsValidKeySystemCapabilities(KeySystemCapabilities capabilities) {
 KeySystemSupportImpl::KeySystemSupportImpl(RenderFrameHost* render_frame_host)
     : DocumentUserData(render_frame_host) {}
 
-KeySystemSupportImpl::~KeySystemSupportImpl() {
-#if BUILDFLAG(IS_ANDROID)
-  render_frame_host()
-      .GetBrowserContext()
-      ->GetPermissionController()
-      ->UnsubscribeFromPermissionResultChange(permission_subscription_id_);
-#endif
-}
+KeySystemSupportImpl::~KeySystemSupportImpl() {}
 
 void KeySystemSupportImpl::SetGetKeySystemCapabilitiesUpdateCbForTesting(
     GetKeySystemCapabilitiesUpdateCB get_support_cb_for_testing) {
@@ -108,66 +101,14 @@ void KeySystemSupportImpl::InitializePermissions() {
               render_frame_host().GetRenderViewHost()))
           .enable_encrypted_media;
 
-// Initialize permissions for platforms that supports
-// PROTECTED_MEDIA_IDENTIFIER.
-#if BUILDFLAG(IS_ANDROID)
-  // Don't call RequestPermissionFromCurrentDocument API that requests
-  // permission right away since `is_protected_identifier_allowed_` flag is used
-  // only when deciding whether we allow or disallow hardware secure capability
-  // check. Instead whether or not to call GetPermissionStatusForCurrentDocument
-  // API will be decided in KeySystemConfigSelector::SelectConfigInternal().
-  // TODO(crbug.com/435220187): Add a unit test that would fail if it uses
-  // RequestPermissionFromCurrentDocument instead of
-  // GetPermissionForCurrentDocument.
-  auto status =
-      render_frame_host()
-          .GetBrowserContext()
-          ->GetPermissionController()
-          ->GetPermissionStatusForCurrentDocument(
-              content::PermissionDescriptorUtil::
-                  CreatePermissionDescriptorForPermissionType(
-                      blink::PermissionType::PROTECTED_MEDIA_IDENTIFIER),
-              &render_frame_host());
-  is_protected_identifier_allowed_ =
-      status == blink::mojom::PermissionStatus::GRANTED;
+  // Initialize permissions for platforms that supports
+  // PROTECTED_MEDIA_IDENTIFIER.
   are_permissions_initialized_ = true;
   SetUpPermissionListeners();
   ObserveKeySystemCapabilities();
-#else
-  are_permissions_initialized_ = true;
-  SetUpPermissionListeners();
-  ObserveKeySystemCapabilities();
-#endif
 }
 
 void KeySystemSupportImpl::SetUpPermissionListeners() {
-#if BUILDFLAG(IS_ANDROID)
-  // Setup permission listeners.
-  permission_subscription_id_ =
-      render_frame_host()
-          .GetBrowserContext()
-          ->GetPermissionController()
-          ->SubscribeToPermissionResultChange(
-              PermissionDescriptorUtil::
-                  CreatePermissionDescriptorForPermissionType(
-                      blink::PermissionType::PROTECTED_MEDIA_IDENTIFIER),
-              /*render_process_host=*/nullptr, &render_frame_host(),
-              PermissionUtil::GetLastCommittedOriginAsURL(&render_frame_host()),
-              /*should_include_device_status=*/false,
-              base::BindRepeating(
-                  &KeySystemSupportImpl::
-                      OnProtectedMediaIdentifierPermissionUpdated,
-                  weak_ptr_factory_.GetWeakPtr()));
-
-  if (permission_subscription_id_.is_null()) {
-    LOG(ERROR) << "Could not subscribe to permissions changes for "
-                  "PROTECTED_MEDIA_IDENTIFIER";
-    // Since we cannot observe changes to PROTECTED_MEDIA_IDENTIFIER, revert
-    // back to its default value.
-    is_protected_identifier_allowed_ = false;
-  }
-#endif
-
   GetContentClient()->browser()->RegisterRendererPreferenceWatcher(
       render_frame_host().GetBrowserContext(),
       preference_watcher_receiver_.BindNewPipeAndPassRemote());

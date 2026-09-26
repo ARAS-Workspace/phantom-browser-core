@@ -45,13 +45,6 @@
 
 namespace base {
 
-#if BUILDFLAG(IS_ANDROID)
-// Some Android (Cast) test devices have a large portion of physical memory
-// reserved. During investigation, around 115-150 MB were seen reserved, so we
-// track this here with a factory of safety of 2.
-static constexpr ByteSize kReservedPhysicalMemory = MiB(300);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using SysInfoTest = PlatformTest;
 
 TEST_F(SysInfoTest, NumProcs) {
@@ -90,7 +83,7 @@ TEST_F(SysInfoTest, AmountOfMem) {
   EXPECT_GE(SysInfo::AmountOfVirtualMemory(), ByteSize(0));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_AmountOfAvailablePhysicalMemory \
   DISABLED_AmountOfAvailablePhysicalMemory
@@ -108,13 +101,7 @@ TEST_F(SysInfoTest, MAYBE_AmountOfAvailablePhysicalMemory) {
     // We aren't actually testing that it's correct, just that it's sane.
     // Available memory is |free - reserved + reclaimable (inactive, non-free)|.
     // On some android platforms, reserved is a substantial portion.
-    const ByteSize available =
-#if BUILDFLAG(IS_ANDROID)
-        std::max(info.free - kReservedPhysicalMemory, ByteSizeDelta(0))
-            .AsByteSize();
-#else
-        info.free;
-#endif  // BUILDFLAG(IS_ANDROID)
+    const ByteSize available = info.free;
     EXPECT_GT(amount, available);
     EXPECT_LT(amount, info.available);
     // Simulate as if there is no MemAvailable.
@@ -127,7 +114,7 @@ TEST_F(SysInfoTest, MAYBE_AmountOfAvailablePhysicalMemory) {
   EXPECT_GT(amount, info.free);
   EXPECT_LT(amount, info.total);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 TEST_F(SysInfoTest, AmountOfFreeDiskSpace) {
   // We aren't actually testing that it's correct, just that it's sane.
@@ -212,7 +199,7 @@ TEST_F(SysInfoTest, GetHardwareInfo) {
   EXPECT_TRUE(IsStringUTF8(hardware_info->manufacturer));
   EXPECT_TRUE(IsStringUTF8(hardware_info->model));
   bool empty_result_expected =
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
       false;
 #else
       true;
@@ -220,24 +207,6 @@ TEST_F(SysInfoTest, GetHardwareInfo) {
   EXPECT_EQ(hardware_info->manufacturer.empty(), empty_result_expected);
   EXPECT_EQ(hardware_info->model.empty(), empty_result_expected);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(SysInfoTest, HardwareManufacturer) {
-  std::string manufacturer = SysInfo::HardwareManufacturer();
-  EXPECT_TRUE(IsStringUTF8(manufacturer));
-  EXPECT_FALSE(manufacturer.empty());
-}
-
-TEST_F(SysInfoTest, GetAndroidBuildFingerprint) {
-  std::string fingerprint = SysInfo::GetAndroidBuildFingerprint();
-  EXPECT_TRUE(IsStringUTF8(fingerprint));
-  EXPECT_FALSE(fingerprint.empty());
-  // Speculative regression test for https://crbug.com/532132431.
-  EXPECT_EQ(fingerprint.find("Must use"), std::string::npos);
-}
-#endif
-
-
 
 #if BUILDFLAG(IS_POSIX)
 TEST_F(SysInfoTest, KernelVersionNumber) {
@@ -262,7 +231,7 @@ TEST_F(SysInfoTest, KernelVersionNumber) {
 }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(SysInfoTest, NumberOfEfficientProcessors) {
   std::vector<uint64_t> frequencies = SysInfo::MaxFrequencyPerProcessor();
   if (frequencies.empty()) {
@@ -300,7 +269,7 @@ TEST_F(SysInfoTest, MaxFrequencyPerProcessor) {
   EXPECT_TRUE(
       std::ranges::all_of(frequencies, [](uint64_t freq) { return freq > 0; }));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 TEST_F(SysInfoTest, MemoryOverride_LowEndDevice) {
   {
@@ -312,28 +281,5 @@ TEST_F(SysInfoTest, MemoryOverride_LowEndDevice) {
     EXPECT_FALSE(SysInfo::IsLowEndDevice());
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(SysInfoTest, MemoryOverride_IsNGbDevice) {
-  {
-    test::ScopedAmountOfPhysicalMemoryOverride memory_override(GiB(3));
-    EXPECT_TRUE(SysInfo::Is3GbDevice());
-    EXPECT_FALSE(SysInfo::Is4GbDevice());
-    EXPECT_FALSE(SysInfo::Is6GbDevice());
-  }
-  {
-    test::ScopedAmountOfPhysicalMemoryOverride memory_override(GiB(4));
-    EXPECT_FALSE(SysInfo::Is3GbDevice());
-    EXPECT_TRUE(SysInfo::Is4GbDevice());
-    EXPECT_FALSE(SysInfo::Is6GbDevice());
-  }
-  {
-    test::ScopedAmountOfPhysicalMemoryOverride memory_override(GiB(6));
-    EXPECT_FALSE(SysInfo::Is3GbDevice());
-    EXPECT_FALSE(SysInfo::Is4GbDevice());
-    EXPECT_TRUE(SysInfo::Is6GbDevice());
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace base

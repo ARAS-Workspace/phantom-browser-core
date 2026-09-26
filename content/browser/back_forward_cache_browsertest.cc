@@ -200,10 +200,6 @@ void BackForwardCacheBrowserTest::SetUpCommandLine(
 
   // Do not trigger DumpWithoutCrashing() for JavaScript execution.
   DisableFeature(blink::features::kBackForwardCacheDWCOnJavaScriptExecution);
-#if BUILDFLAG(IS_ANDROID)
-  EnableFeatureAndSetParams(features::kBackForwardCache,
-                            "process_binding_strength", "NORMAL");
-#endif
     // Allow BackForwardCache for all devices regardless of their memory.
     DisableFeature(features::kBackForwardCacheMemoryControls);
     // Many browser tests assume a cache size of 1.
@@ -1170,13 +1166,8 @@ IN_PROC_BROWSER_TEST_F(
 
 // Make sure we fire DidFirstVisuallyNonEmptyPaint when restoring from bf-cache.
 // TODO(crbug.com/327195951): Re-enable this test
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FiresDidFirstVisuallyNonEmptyPaintWhenRestoredFromCache \
-  DISABLED_FiresDidFirstVisuallyNonEmptyPaintWhenRestoredFromCache
-#else
 #define MAYBE_FiresDidFirstVisuallyNonEmptyPaintWhenRestoredFromCache \
   FiresDidFirstVisuallyNonEmptyPaintWhenRestoredFromCache
-#endif
 IN_PROC_BROWSER_TEST_F(
     BackForwardCacheBrowserTest,
     MAYBE_FiresDidFirstVisuallyNonEmptyPaintWhenRestoredFromCache) {
@@ -1204,13 +1195,8 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_TRUE(web_contents()->CompletedFirstVisuallyNonEmptyPaint());
   EXPECT_TRUE(observer.did_fire());
 }
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SetsThemeColorWhenRestoredFromCache \
-  DISABLED_SetsThemeColorWhenRestoredFromCache
-#else
 #define MAYBE_SetsThemeColorWhenRestoredFromCache \
   SetsThemeColorWhenRestoredFromCache
-#endif
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
                        MAYBE_SetsThemeColorWhenRestoredFromCache) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1804,7 +1790,7 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
 // Tests that we're getting the correct TextInputState and focus updates when a
 // page enters the back-forward cache and when it gets restored.
 // TODO(b/324570785): Re-enable the test for Android.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_TextInputStateUpdated DISABLED_TextInputStateUpdated
 #else
 #define MAYBE_TextInputStateUpdated TextInputStateUpdated
@@ -1884,7 +1870,7 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
   }
 }
 
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SubframeTextInputStateUpdated DISABLED_SubframeTextInputStateUpdated
 #else
 #define MAYBE_SubframeTextInputStateUpdated SubframeTextInputStateUpdated
@@ -2664,11 +2650,7 @@ const base::HistogramTester& BackForwardCacheBrowserTest::histogram_tester() {
 // Ensure that psges with unload are only allowed to enter back/forward cache by
 // default on Android.
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest, UnloadAllowedFlag) {
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(BackForwardCacheImpl::IsUnloadAllowed());
-#else
   ASSERT_FALSE(BackForwardCacheImpl::IsUnloadAllowed());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,

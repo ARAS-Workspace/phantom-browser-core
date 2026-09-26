@@ -124,22 +124,15 @@
 #include "chrome/browser/sessions/session_service_factory.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
 #include "chrome/browser/profiles/nuke_profile_directory_utils.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"  // nogncheck
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck
 #include "components/optimization_guide/core/model_execution/model_execution_features.h"
-#else
-#include "chrome/browser/profiles/profile_manager_android.h"
-#include "chrome/browser/signin/signin_manager_android_factory.h"
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/profiles/profile_statistics.h"
 #include "chrome/browser/profiles/profile_statistics_factory.h"
-#endif
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 #include "chrome/browser/signin/bound_session_credentials/bound_session_cookie_refresh_service_factory.h"
@@ -360,7 +353,6 @@ void RunCallbacks(std::vector<base::OnceCallback<void(Profile*)>>& callbacks,
     std::move(callback).Run(profile);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ClearPrimaryAccountForProfile(
     base::WeakPtr<Profile> weak_profile,
     signin_metrics::ProfileSignout signout_source_metric) {
@@ -372,7 +364,6 @@ void ClearPrimaryAccountForProfile(
       ->GetPrimaryAccountMutator()
       ->ClearPrimaryAccount(signout_source_metric);
 }
-#endif
 
 std::string GetKeepAliveOriginName(ProfileKeepAliveOrigin origin) {
   std::ostringstream oss;
@@ -392,18 +383,12 @@ BASE_FEATURE(kProfileManagerDeferAsyncLoading,
 
 ProfileManager::ProfileManager(const base::FilePath& user_data_dir)
     : user_data_dir_(user_data_dir)
-#if !BUILDFLAG(IS_ANDROID)
       ,
       delete_profile_helper_(std::make_unique<DeleteProfileHelper>(*this))
-#endif
 {
-#if !BUILDFLAG(IS_ANDROID)
   closing_all_browsers_subscription_ = chrome::AddClosingAllBrowsersCallback(
       base::BindRepeating(&ProfileManager::OnClosingAllBrowsersChanged,
                           base::Unretained(this)));
-#else
-  profile_manager_android_ = std::make_unique<ProfileManagerAndroid>(this);
-#endif
 
   if (ProfileShortcutManager::IsFeatureEnabled() && !user_data_dir_.empty())
     profile_shortcut_manager_ = ProfileShortcutManager::Create(this);
@@ -541,46 +526,6 @@ std::vector<Profile*> ProfileManager::GetLastOpenedProfiles() {
   }
   return to_return;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// static
-Profile* ProfileManager::GetPrimaryUserProfile(
-) {
-
-  ProfileManager* profile_manager = g_browser_process->profile_manager();
-  if (!profile_manager)  // Can be null in unit tests.
-    return nullptr;
-
-  return profile_manager->GetActiveUserOrOffTheRecordProfile();
-}
-
-// static
-Profile* ProfileManager::GetActiveUserProfile(
-) {
-  ProfileManager* profile_manager = g_browser_process->profile_manager();
-
-  Profile* profile = profile_manager->GetActiveUserOrOffTheRecordProfile();
-  // |profile| could be null if the user doesn't have a profile yet and the path
-  // is on a read-only volume (preventing Chrome from making a new one).
-  // However, most callers of this function immediately dereference the result
-  // which would lead to crashes in a variety of call sites. Assert here to
-  // figure out how common this is. http://crbug.com/40369785
-  CHECK(profile) << profile_manager->user_data_dir().AsUTF8Unsafe();
-  return profile;
-}
-
-// static
-Profile* ProfileManager::CreateInitialProfile() {
-  ProfileManager* const profile_manager = g_browser_process->profile_manager();
-  Profile* profile = profile_manager->GetProfile(
-      profile_manager->user_data_dir().Append(GetInitialProfileDir()));
-
-  if (ShouldGoOffTheRecord(profile)) {
-    return profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-  }
-  return profile;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void ProfileManager::AddObserver(ProfileManagerObserver* observer) {
   observers_.AddObserver(observer);
@@ -788,10 +733,8 @@ bool ProfileManager::CanCreateProfileAtPath(const base::FilePath& path) const {
     return false;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (IsProfileDirectoryMarkedForDeletion(path))
     return false;
-#endif
 
   return true;
 }
@@ -824,7 +767,6 @@ std::map<ProfileKeepAliveOrigin, int> ProfileManager::GetKeepAlivesByPath(
                       : std::map<ProfileKeepAliveOrigin, int>();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // static
 void ProfileManager::CreateMultiProfileAsync(
     const std::u16string& name,
@@ -889,7 +831,6 @@ void ProfileManager::CreateMultiProfileAsync(
                                     new_path, std::move(initialized_callback),
                                     std::move(created_callback))));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // static
 base::FilePath ProfileManager::GetGuestProfilePath() {
@@ -901,7 +842,6 @@ base::FilePath ProfileManager::GetGuestProfilePath() {
   return guest_path.Append(chrome::kGuestProfileDir);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // static
 base::FilePath ProfileManager::GetSystemProfilePath() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -911,7 +851,6 @@ base::FilePath ProfileManager::GetSystemProfilePath() {
   base::FilePath system_path = profile_manager->user_data_dir();
   return system_path.Append(chrome::kSystemProfileDir);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 base::FilePath ProfileManager::GenerateNextProfileDirectoryPath() {
   PrefService* local_state = g_browser_process->local_state();
@@ -1000,12 +939,7 @@ void ProfileManager::InitProfileUserPrefs(Profile* profile) {
       supervised_user_id = entry->GetSupervisedUserId();
     } else {
       avatar_index = profiles::GetPlaceholderAvatarIndex();
-#if !BUILDFLAG(IS_ANDROID)
       profile_name = base::UTF16ToUTF8(storage.ChooseNameForNewProfile());
-#else
-      profile_name =
-          l10n_util::GetStringUTF8(IDS_PROFILE_MENU_PLACEHOLDER_PROFILE_NAME);
-#endif
     }
   }
 
@@ -1161,7 +1095,6 @@ void ProfileManager::RemoveKeepAlive(Profile* profile,
 
   DCHECK(info->keep_alives.contains(origin));
 
-#if !BUILDFLAG(IS_ANDROID)
   // When removing the last keep alive of an ephemeral profile, schedule the
   // profile for deletion if it is not yet marked.
   bool ephemeral =
@@ -1174,7 +1107,6 @@ void ProfileManager::RemoveKeepAlive(Profile* profile,
         std::make_unique<ScopedProfileKeepAlive>(
             profile, ProfileKeepAliveOrigin::kProfileDeletionProcess));
   }
-#endif
 
   info->keep_alives[origin]--;
   DCHECK_LE(0, info->keep_alives[origin]);
@@ -1213,7 +1145,6 @@ void ProfileManager::NotifyOnProfileMarkedForPermanentDeletion(
 }
 
 void ProfileManager::UnloadProfileIfNoKeepAlive(const ProfileInfo* info) {
-#if !BUILDFLAG(IS_ANDROID)
   if (GetTotalRefCount(info->keep_alives) != 0)
     return;
 
@@ -1232,7 +1163,6 @@ void ProfileManager::UnloadProfileIfNoKeepAlive(const ProfileInfo* info) {
 
   VLOG(1) << "Unloading profile " << info->GetCreatedProfile()->GetDebugName();
   UnloadProfile(info->GetCreatedProfile()->GetPath());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ProfileManager::DoFinalInit(ProfileInfo* profile_info,
@@ -1254,14 +1184,12 @@ void ProfileManager::DoFinalInit(ProfileInfo* profile_info,
   for (auto& observer : observers_)
     observer.OnProfileAdded(profile);
 
-#if !BUILDFLAG(IS_ANDROID)
   // The caret browsing command-line switch toggles caret browsing on
   // initially, but the user can still toggle it from there.
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kEnableCaretBrowsing)) {
     profile->GetPrefs()->SetBoolean(prefs::kCaretBrowsingEnabled, true);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Delete browsing data specified by the ClearBrowsingDataOnExitList policy
   // if they were not properly deleted on the last browser shutdown.
@@ -1313,10 +1241,6 @@ void ProfileManager::DoFinalInitForServices(Profile* profile,
 
   IdentityManagerFactory::GetForProfile(profile)->OnNetworkInitialized();
   AccountReconcilorFactory::GetForProfile(profile);
-#if BUILDFLAG(IS_ANDROID)
-  // Should be after IdentityManager::OnNetworkInitialized.
-  SigninManagerAndroidFactory::GetForProfile(profile);
-#endif
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
   BoundSessionCookieRefreshServiceFactory::GetForProfile(profile);
@@ -1408,15 +1332,6 @@ Profile* ProfileManager::ProfileInfo::GetRawProfile() const {
   return unowned_profile_;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-Profile* ProfileManager::GetActiveUserOrOffTheRecordProfile() {
-  base::FilePath default_profile_dir =
-      user_data_dir_.Append(GetInitialProfileDir());
-  return GetProfile(default_profile_dir);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 void ProfileManager::UnloadProfile(const base::FilePath& profile_dir) {
   TRACE_EVENT0("browser", "ProfileManager::UnloadProfile");
 
@@ -1449,7 +1364,6 @@ void ProfileManager::UnloadProfile(const base::FilePath& profile_dir) {
        base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
       base::BindOnce(&NukeProfileFromDisk, profile_dir, base::OnceClosure()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 Profile* ProfileManager::CreateAndInitializeProfile(
     const base::FilePath& profile_dir,
@@ -1584,8 +1498,6 @@ void ProfileManager::OnProfileCreationStarted(Profile* profile,
   RegisterUnownedProfile(profile);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 std::optional<base::FilePath> ProfileManager::FindLastActiveProfile(
     base::RepeatingCallback<bool(ProfileAttributesEntry*)> predicate) {
   bool found_entry_loaded = false;
@@ -1627,8 +1539,6 @@ std::optional<base::FilePath> ProfileManager::FindLastActiveProfile(
 DeleteProfileHelper& ProfileManager::GetDeleteProfileHelper() {
   return *delete_profile_helper_;
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 ProfileManager::ProfileInfo* ProfileManager::RegisterOwnedProfile(
     std::unique_ptr<Profile> profile) {
@@ -1688,9 +1598,7 @@ void ProfileManager::AddProfileToStorage(Profile* profile) {
     ProfileAttributesEntry* entry =
         storage.GetProfileAttributesWithPath(profile->GetPath());
     if (entry) {
-#if !BUILDFLAG(IS_ANDROID)
       bool could_be_managed_status = entry->CanBeManaged();
-#endif
       // The ProfileAttributesStorage's info must match the Identity Manager.
       entry->SetAuthInfo(account_info.gaia, username,
                          is_consented_primary_account);
@@ -1698,7 +1606,6 @@ void ProfileManager::AddProfileToStorage(Profile* profile) {
       entry->SetSignedInWithCredentialProvider(profile->GetPrefs()->GetBoolean(
           prefs::kSignedInWithCredentialProvider));
 
-#if !BUILDFLAG(IS_ANDROID)
       // Sign out if force-sign-in policy is enabled and profile is not signed
       // in.
       VLOG(1) << "ForceSigninCheck: " << signin_util::IsForceSigninEnabled()
@@ -1713,7 +1620,6 @@ void ProfileManager::AddProfileToStorage(Profile* profile) {
                            signin_metrics::ProfileSignout::
                                kAuthenticationFailedWithForceSignin));
       }
-#endif
       return;
     }
   }
@@ -1830,13 +1736,11 @@ void ProfileManager::OnProfileDestructionComplete(
 }
 
 void ProfileManager::SetProfileAsLastUsed(Profile* last_active) {
-#if !BUILDFLAG(IS_ANDROID)
   // The profile may incorrectly become "active" during its destruction, caused
   // by the UI teardown. See https://crbug.com/40686320
   if (IsProfileDirectoryMarkedForDeletion(last_active->GetPath())) {
     return;
   }
-#endif
 
   // If there is a primary account, mark it as used "just now".
   signin::IdentityManager* identity_manager =
@@ -1892,7 +1796,6 @@ void ProfileManager::UnblockAsyncLoading() {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ProfileManager::OnBrowserOpened(BrowserWindowInterface* browser) {
   DCHECK(browser);
   Profile* profile = browser->GetProfile();
@@ -2004,7 +1907,6 @@ void ProfileManager::OnClosingAllBrowsersChanged(bool closing) {
   closing_all_browsers_ = closing;
   SaveActiveProfiles();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 ProfileManagerWithoutInit::ProfileManagerWithoutInit(
     const base::FilePath& user_data_dir)

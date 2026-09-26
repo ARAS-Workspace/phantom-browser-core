@@ -1039,11 +1039,7 @@ TEST_F(DevToolsUIBindingsHostConfigTest, GetHostConfigGdpProfiles) {
   ASSERT_TRUE(gdp_profiles);
   std::optional<bool> gdp_enabled = gdp_profiles->FindBool("enabled");
   ASSERT_TRUE(gdp_enabled.has_value());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(*gdp_enabled);
-#else
   EXPECT_TRUE(*gdp_enabled);
-#endif
 
   const base::DictValue* gdp_profiles_availability =
       config.FindDict("devToolsGdpProfilesAvailability");
@@ -1051,7 +1047,7 @@ TEST_F(DevToolsUIBindingsHostConfigTest, GetHostConfigGdpProfiles) {
   std::optional<bool> availability_enabled =
       gdp_profiles_availability->FindBool("enabled");
   ASSERT_TRUE(availability_enabled.has_value());
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   EXPECT_TRUE(*availability_enabled);
 #else
   EXPECT_FALSE(*availability_enabled);

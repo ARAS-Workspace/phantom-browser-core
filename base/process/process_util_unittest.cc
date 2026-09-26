@@ -70,9 +70,6 @@
 #include <mach/vm_param.h>
 #include <malloc/malloc.h>
 #endif
-#if BUILDFLAG(IS_ANDROID)
-#include "third_party/lss/linux_syscall_support.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include <mach/mach.h>
@@ -159,16 +156,7 @@ class ProcessUtilTest : public MultiProcessTest {
 };
 
 std::string ProcessUtilTest::GetSignalFilePath(const char* filename) {
-#if BUILDFLAG(IS_ANDROID)
-  FilePath tmp_dir;
-  PathService::Get(DIR_TEMP, &tmp_dir);
-  // Ensure the directory exists to avoid harder to debug issues later.
-  CHECK(PathExists(tmp_dir));
-  tmp_dir = tmp_dir.Append(filename);
-  return tmp_dir.value();
-#else
   return filename;
-#endif
 }
 
 MULTIPROCESS_TEST_MAIN(SimpleChildProcess) {
@@ -226,7 +214,6 @@ TEST_F(ProcessUtilTest, MAYBE_GetTerminationStatusExit) {
 
 // On Android SpawnProcess() doesn't use LaunchProcess() and doesn't support
 // LaunchOptions::current_directory.
-#if !BUILDFLAG(IS_ANDROID)
 static void CheckCwdIsExpected(FilePath expected) {
   FilePath actual;
   CHECK(GetCurrentDirectory(&actual));
@@ -321,10 +308,8 @@ TEST_F(ProcessUtilTest, CurrentDirectory) {
   EXPECT_EQ(kSuccess, exit_code);
 }
 #endif  // !defined(MEMORY_SANITIZER)
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
 // This test is disabled on Mac, since it's flaky due to ReportCrash
 // taking a variable amount of time to parse and load the debug and
 // symbol data for this unit test's executable before firing the
@@ -386,7 +371,7 @@ TEST_F(ProcessUtilTest, MAYBE_GetTerminationStatusCrash) {
   debug::EnableInProcessStackDumping();
   remove(signal_file.c_str());
 }
-#endif  // !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_APPLE)
 
 MULTIPROCESS_TEST_MAIN(KilledChildProcess) {
   WaitToDie(ProcessUtilTest::GetSignalFilePath(kSignalFileKill).c_str());
@@ -790,7 +775,7 @@ TEST_F(ProcessUtilTest, GetParentProcessId) {
   EXPECT_EQ(ppid, static_cast<ProcessId>(getppid()));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
 class WriteToPipeDelegate : public LaunchOptions::PreExecDelegate {
  public:
   explicit WriteToPipeDelegate(int fd) : fd_(fd) {}
@@ -831,7 +816,7 @@ TEST_F(ProcessUtilTest, PreExecHook) {
   EXPECT_TRUE(process.WaitForExit(&exit_code));
   EXPECT_EQ(0, exit_code);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
+#endif  // !BUILDFLAG(IS_APPLE)
 
 #endif  // BUILDFLAG(IS_POSIX)
 

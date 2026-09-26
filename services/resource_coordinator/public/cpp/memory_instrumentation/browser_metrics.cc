@@ -56,11 +56,7 @@ std::string GetPrivateFootprintHistogramName(HistogramProcessType type) {
 }
 
 base::TimeDelta GetDelayForNextMemoryLog() {
-#if BUILDFLAG(IS_ANDROID)
-  base::TimeDelta mean_time = base::Minutes(5);
-#else
   base::TimeDelta mean_time = base::Minutes(30);
-#endif
   // Compute the actual delay before sampling using a Poisson process. Use
   // `1-RandDouble()` to avoid log(0).
   double uniform = base::RandDouble();

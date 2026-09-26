@@ -20,12 +20,7 @@
 
 namespace content {
 
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-// Renderer crashes under Android ASAN: https://crbug.com/408496.
-#define MAYBE_WebRtcDataBrowserTest DISABLED_WebRtcDataBrowserTest
-#else
 #define MAYBE_WebRtcDataBrowserTest WebRtcDataBrowserTest
-#endif
 
 // This class tests the scenario when permission to access mic or camera is
 // granted.
@@ -52,7 +47,7 @@ IN_PROC_BROWSER_TEST_F(MAYBE_WebRtcDataBrowserTest, CallWithSctpDataOnly) {
   MakeTypicalPeerConnectionCall("callWithSctpDataOnly();");
 }
 
-#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_ANDROID)
+#if defined(MEMORY_SANITIZER)
 // Fails under MemorySanitizer: http://crbug.com/405951
 // Fails on Android: http://crbug.com/427258783
 #define MAYBE_CallWithSctpDataAndMedia DISABLED_CallWithSctpDataAndMedia

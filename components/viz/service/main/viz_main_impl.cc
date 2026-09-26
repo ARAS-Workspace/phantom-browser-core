@@ -97,11 +97,6 @@ VizMainImpl::VizMainImpl(Delegate* delegate,
   if (!dependencies_.io_thread_task_runner)
     io_thread_ = CreateAndStartIOThread();
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the compositor thread runner may be created externally and
-  // passed in (in particular, for WebView).
-  viz_compositor_thread_runner_ = dependencies_.viz_compositor_thread_runner;
-#endif
   if (!viz_compositor_thread_runner_) {
     viz_compositor_thread_runner_impl_ =
         std::make_unique<VizCompositorThreadRunnerImpl>();
@@ -212,21 +207,11 @@ void VizMainImpl::CreateGpuService(
         std::move(pending_gpu_logging), io_task_runner());
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  gpu_service_->InitializeWithHost(
-      gpu_host.Unbind(),
-      gpu::GpuProcessShmCount(std::move(use_shader_cache_shm_region)),
-      gpu_init_->TakeDefaultOffscreenSurface(), std::move(params),
-      dependencies_.sync_point_manager, dependencies_.shared_image_manager,
-      dependencies_.scheduler, dependencies_.shutdown_event,
-      dependencies_.gr_context_options_provider);
-#else
   gpu_service_->InitializeWithHost(
       gpu_host.Unbind(),
       gpu::GpuProcessShmCount(std::move(use_shader_cache_shm_region)),
       gpu_init_->TakeDefaultOffscreenSurface(), std::move(params),
       dependencies_.shutdown_event);
-#endif
 
   CompositorGpuThread* compositor_gpu_thread =
       gpu_service_->compositor_gpu_thread();
@@ -246,9 +231,6 @@ void VizMainImpl::CreateGpuService(
     // thread IDs.
     base::PlatformThreadId main_thread_id = base::PlatformThread::CurrentId();
     gpu_process_thread_ids.insert(main_thread_id);
-#if BUILDFLAG(IS_ANDROID)
-    viz_compositor_thread_runner_->SetGpuMainThreadId(main_thread_id);
-#endif
 
     if (compositor_gpu_thread) {
       gpu_process_thread_ids.insert(compositor_gpu_thread->GetThreadId());
@@ -294,17 +276,6 @@ void VizMainImpl::SetRenderParams(
           subpixel_rendering),
       text_contrast, text_gamma);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void VizMainImpl::SetHostProcessId(int32_t pid) {
-  if (gpu_service_)
-    gpu_service_->SetHostProcessId(pid);
-}
-
-void VizMainImpl::NotifyWorkloadIncrease() {
-  viz_compositor_thread_runner_->NotifyWorkloadIncrease();
-}
-#endif
 
 void VizMainImpl::CreateFrameSinkManager(
     mojom::FrameSinkManagerParamsPtr params) {

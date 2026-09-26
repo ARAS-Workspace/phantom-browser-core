@@ -75,29 +75,19 @@ PermissionDelegationMode GetPermissionDelegationMode(
   return PermissionDelegationMode::kDelegated;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr const char* kIsFileURLHistogram =
-    "Permissions.GetLastCommittedOriginAsURL.IsFileURL";
-#endif
-
 }  // namespace
 
 RequestTypeForUma PermissionUtil::GetUmaValueForMultipleRequests(
     const RequestType first_request) {
-  if (
-#if !BUILDFLAG(IS_ANDROID)
-      first_request == RequestType::kCameraPanTiltZoom ||
-#endif  // !BUILDFLAG(IS_ANDROID)
+  if (first_request == RequestType::kCameraPanTiltZoom ||
       first_request == RequestType::kCameraStream ||
       first_request == RequestType::kMicStream) {
     return RequestTypeForUma::MULTIPLE_AUDIO_AND_VIDEO_CAPTURE;
   }
-#if !BUILDFLAG(IS_ANDROID)
   if (first_request == RequestType::kKeyboardLock ||
       first_request == RequestType::kPointerLock) {
     return RequestTypeForUma::MULTIPLE_KEYBOARD_AND_POINTER_LOCK;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   return RequestTypeForUma::UNKNOWN;
 }
 
@@ -133,21 +123,17 @@ RequestTypeForUma PermissionUtil::GetUmaValueForRequestType(
   switch (request_type) {
     case RequestType::kArSession:
       return RequestTypeForUma::PERMISSION_AR;
-#if !BUILDFLAG(IS_ANDROID)
     case RequestType::kCameraPanTiltZoom:
       return RequestTypeForUma::PERMISSION_CAMERA_PAN_TILT_ZOOM;
-#endif  // !BUILDFLAG(IS_ANDROID)
     case RequestType::kCameraStream:
       return RequestTypeForUma::PERMISSION_MEDIASTREAM_CAMERA;
     case RequestType::kClipboard:
       return RequestTypeForUma::PERMISSION_CLIPBOARD_READ_WRITE;
     case RequestType::kDiskQuota:
       return RequestTypeForUma::QUOTA;
-#if !BUILDFLAG(IS_ANDROID)
     // TODO(crbug.com/40214907): Enable on Android
     case RequestType::kLocalFonts:
       return RequestTypeForUma::PERMISSION_LOCAL_FONTS;
-#endif  // !BUILDFLAG(IS_ANDROID)
     case RequestType::kLocalNetwork:
       return RequestTypeForUma::PERMISSION_LOCAL_NETWORK;
     case RequestType::kLoopbackNetwork:
@@ -169,36 +155,22 @@ RequestTypeForUma PermissionUtil::GetUmaValueForRequestType(
       return RequestTypeForUma::PERMISSION_HAND_TRACKING;
     case RequestType::kIdleDetection:
       return RequestTypeForUma::PERMISSION_IDLE_DETECTION;
-#if !BUILDFLAG(IS_ANDROID)
     case RequestType::kKeyboardLock:
       return RequestTypeForUma::PERMISSION_KEYBOARD_LOCK;
-#endif  // !BUILDFLAG(IS_ANDROID)
     case RequestType::kMicStream:
       return RequestTypeForUma::PERMISSION_MEDIASTREAM_MIC;
     case RequestType::kMidiSysex:
       return RequestTypeForUma::PERMISSION_MIDI_SYSEX;
     case RequestType::kMultipleDownloads:
       return RequestTypeForUma::DOWNLOAD;
-#if BUILDFLAG(IS_ANDROID)
-    case RequestType::kNfcDevice:
-      return RequestTypeForUma::PERMISSION_NFC;
-#endif  // BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_ANDROID)
     case RequestType::kPointerLock:
       return RequestTypeForUma::PERMISSION_POINTER_LOCK;
-#endif  // !BUILDFLAG(IS_ANDROID)
     case RequestType::kNotifications:
       return RequestTypeForUma::PERMISSION_NOTIFICATIONS;
     case RequestType::kSensors:
       return RequestTypeForUma::PERMISSION_SENSORS;
-#if BUILDFLAG(IS_ANDROID)
-    case RequestType::kProtectedMediaIdentifier:
-      return RequestTypeForUma::PERMISSION_PROTECTED_MEDIA_IDENTIFIER;
-#endif
-#if !BUILDFLAG(IS_ANDROID)
     case RequestType::kRegisterProtocolHandler:
       return RequestTypeForUma::REGISTER_PROTOCOL_HANDLER;
-#endif  // !BUILDFLAG(IS_ANDROID)
     case RequestType::kStorageAccess:
       return RequestTypeForUma::PERMISSION_STORAGE_ACCESS;
     case RequestType::kVrSession:
@@ -209,12 +181,10 @@ RequestTypeForUma PermissionUtil::GetUmaValueForRequestType(
       return RequestTypeForUma::PERMISSION_TOP_LEVEL_STORAGE_ACCESS;
     case RequestType::kFileSystemAccess:
       return RequestTypeForUma::PERMISSION_FILE_SYSTEM_ACCESS;
-#if !BUILDFLAG(IS_ANDROID)
     case RequestType::kCapturedSurfaceControl:
       return RequestTypeForUma::CAPTURED_SURFACE_CONTROL;
     case RequestType::kWebAppInstallation:
       return RequestTypeForUma::PERMISSION_WEB_APP_INSTALLATION;
-#endif  // !BUILDFLAG(IS_ANDROID)
     case RequestType::kIdentityProvider:
       return RequestTypeForUma::PERMISSION_IDENTITY_PROVIDER;
   }
@@ -276,11 +246,6 @@ bool PermissionUtil::GetPermissionType(ContentSettingsType type,
     case ContentSettingsType::BACKGROUND_SYNC:
       *out = PermissionType::BACKGROUND_SYNC;
       break;
-#if BUILDFLAG(IS_ANDROID)
-    case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
-      *out = PermissionType::PROTECTED_MEDIA_IDENTIFIER;
-      break;
-#endif
     case ContentSettingsType::SENSORS:
       *out = PermissionType::SENSORS;
       break;
@@ -464,20 +429,6 @@ GURL PermissionUtil::GetLastCommittedOriginAsURL(
 
   content::WebContents* web_contents =
       content::WebContents::FromRenderFrameHost(render_frame_host);
-#if BUILDFLAG(IS_ANDROID)
-  // If `allow_universal_access_from_file_urls` flag is enabled, a file:/// can
-  // change its url via history.pushState/replaceState to any other url,
-  // including about:blank. To avoid user confusion we should always use a
-  // visible url, in other words `GetLastCommittedURL`.
-  if (web_contents->GetOrCreateWebPreferences()
-          .allow_universal_access_from_file_urls &&
-      render_frame_host->GetLastCommittedOrigin().GetURL().SchemeIsFile()) {
-    base::UmaHistogramBoolean(kIsFileURLHistogram, true);
-    return render_frame_host->GetLastCommittedURL().DeprecatedGetOriginAsURL();
-  } else {
-    base::UmaHistogramBoolean(kIsFileURLHistogram, false);
-  }
-#endif
 
   GURL origin = render_frame_host->GetLastCommittedOrigin().GetURL();
   if (origin.is_empty() && render_frame_host->IsInPrimaryMainFrame()) {
@@ -501,11 +452,7 @@ ContentSettingsType PermissionUtil::PermissionTypeToContentSettingsTypeSafe(
     case PermissionType::GEOLOCATION_APPROXIMATE:
       return content_settings::GeolocationContentSettingsType();
     case PermissionType::PROTECTED_MEDIA_IDENTIFIER:
-#if BUILDFLAG(IS_ANDROID)
-      return ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER;
-#else
       break;
-#endif
     case PermissionType::PERSISTENT_STORAGE:
       return ContentSettingsType::PERSISTENT_STORAGE;
     case PermissionType::AUDIO_CAPTURE:
@@ -754,11 +701,7 @@ bool PermissionUtil::CanPermissionRequestIgnoreStatus(
 
 // static
 bool PermissionUtil::DoesPlatformSupportChip() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // static

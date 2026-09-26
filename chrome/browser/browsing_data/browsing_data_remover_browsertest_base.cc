@@ -48,30 +48,11 @@
 #include "third_party/re2/src/re2/re2.h"
 #include "ui/base/models/tree_model.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/download_browsertest_utils.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif
 
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/40169678): Move these functions to
-// /chrome/test/base/test_utils.{h|cc}.
-base::FilePath GetTestFilePath(const char* dir, const char* file) {
-  base::FilePath path;
-  base::ScopedAllowBlockingForTesting allow_blocking;
-  base::PathService::Get(chrome::DIR_TEST_DATA, &path);
-  if (dir)
-    path = path.AppendASCII(dir);
-  return path.AppendASCII(file);
-}
-
-GURL GetTestUrl(const char* dir, const char* file) {
-  return net::FilePathToFileURL(GetTestFilePath(dir, file));
-}
-#endif
 
 // Class for waiting for download manager to be initiailized.
 class DownloadManagerWaiter : public content::DownloadManager::Observer {
@@ -118,7 +99,6 @@ void BrowsingDataRemoverBrowserTestBase::InitFeatureLists(
   feature_list_.InitWithFeatures(enabled_features, disabled_features);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 BrowserWindowInterface* BrowsingDataRemoverBrowserTestBase::GetBrowser() const {
   return incognito_browser_ ? incognito_browser_.get() : browser();
 }
@@ -135,8 +115,6 @@ void BrowsingDataRemoverBrowserTestBase::RestartIncognitoBrowser() {
   incognito_browser_ = nullptr;
   UseIncognitoBrowser();
 }
-
-#endif
 
 void BrowsingDataRemoverBrowserTestBase::SetUpOnMainThread() {
   base::FilePath path;
@@ -181,17 +159,11 @@ void BrowsingDataRemoverBrowserTestBase::DownloadAnItem() {
       download_manager, 1,
       content::DownloadTestObserver::ON_DANGEROUS_DOWNLOAD_ACCEPT);
 
-#if BUILDFLAG(IS_ANDROID)
-  GURL download_url = GetTestUrl("downloads", "a_zip_file.zip");
-  ASSERT_TRUE(content::NavigateToURL(GetActiveWebContents(), download_url,
-                                     GURL("about:blank")));
-#else
   GURL download_url = chrome_test_utils::GetTestUrl(
       base::FilePath().AppendASCII("downloads"),
       base::FilePath().AppendASCII("a_zip_file.zip"));
   SetPromptForDownload(GetBrowser(), false);
   ASSERT_TRUE(ui_test_utils::NavigateToURL(GetBrowser(), download_url));
-#endif
   observer->WaitForFinished();
 
   VerifyDownloadCount(1u);
@@ -248,26 +220,16 @@ BrowsingDataRemoverBrowserTestBase::network_context() {
 // window created by tests, more specific behaviour requires other means.
 content::WebContents*
 BrowsingDataRemoverBrowserTestBase::GetActiveWebContents() {
-#if BUILDFLAG(IS_ANDROID)
-  return chrome_test_utils::GetActiveWebContents(this);
-#else
   return GetBrowser()->tab_strip_model()->GetActiveWebContents();
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 content::WebContents* BrowsingDataRemoverBrowserTestBase::GetActiveWebContents(
     BrowserWindowInterface* browser) {
   return browser->tab_strip_model()->GetActiveWebContents();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 Profile* BrowsingDataRemoverBrowserTestBase::GetProfile() {
-#if BUILDFLAG(IS_ANDROID)
-  return chrome_test_utils::GetProfile(this);
-#else
   return GetBrowser()->GetProfile();
-#endif
 }
 
 // static

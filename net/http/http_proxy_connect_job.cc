@@ -60,11 +60,7 @@ namespace {
 
 // HttpProxyConnectJobs will time out after this many seconds.  Note this is in
 // addition to the timeout for the transport socket.
-#if BUILDFLAG(IS_ANDROID)
-constexpr base::TimeDelta kHttpProxyConnectJobTunnelTimeout = base::Seconds(10);
-#else
 constexpr base::TimeDelta kHttpProxyConnectJobTunnelTimeout = base::Seconds(30);
-#endif
 
 class HttpProxyTimeoutExperiments {
  public:
@@ -354,9 +350,6 @@ base::TimeDelta HttpProxyConnectJob::AlternateNestedConnectionTimeout(
 
   // On Android, a default proxy connection timeout is used instead of
   // the actual TCP/SSL timeouts of nested jobs.
-#if BUILDFLAG(IS_ANDROID)
-  default_alternate_timeout = kHttpProxyConnectJobTunnelTimeout;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   bool is_https = params.proxy_server().is_https();
 

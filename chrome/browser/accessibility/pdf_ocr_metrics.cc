@@ -10,11 +10,7 @@
 namespace accessibility {
 
 void RecordPDFOpenedWithA11yFeatureWithPdfOcr() {
-#if BUILDFLAG(IS_ANDROID)
-  bool is_pdf_ocr_on = false;
-#else
   bool is_pdf_ocr_on = true;
-#endif
 
   if (ui::AXPlatform::GetInstance().IsScreenReaderActive()) {
     UMA_HISTOGRAM_BOOLEAN("Accessibility.PDF.OpenedWithScreenReader.PdfOcr",

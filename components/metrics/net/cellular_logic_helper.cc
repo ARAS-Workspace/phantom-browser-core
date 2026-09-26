@@ -14,11 +14,7 @@ namespace metrics {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-const int kStandardUploadIntervalSeconds = 5 * 60;  // Five minutes.
-#else
 const int kStandardUploadIntervalSeconds = 30 * 60;  // Thirty minutes.
-#endif
 
 // This parameter is intended to be used for Structured metrics, which is
 // currently only enabled on Chrome OS.
@@ -29,28 +25,15 @@ constexpr base::FeatureParam<int> kUmaUploadCadence{
     kStandardUploadIntervalSeconds};
 
 // Android-only cellular settings.
-#if BUILDFLAG(IS_ANDROID)
-const int kStandardUploadIntervalCellularSeconds = 15 * 60;  // Fifteen minutes.
-#endif
 
 }  // namespace
 
 base::TimeDelta GetUploadInterval(bool use_cellular_upload_interval) {
-#if BUILDFLAG(IS_ANDROID)
-  if (use_cellular_upload_interval) {
-    return base::Seconds(kStandardUploadIntervalCellularSeconds);
-  }
-#endif
   return base::Seconds(kUmaUploadCadence.Get());
 }
 
 bool ShouldUseCellularUploadInterval() {
-#if BUILDFLAG(IS_ANDROID)
-  return net::NetworkChangeNotifier::IsConnectionCellular(
-      net::NetworkChangeNotifier::GetConnectionType());
-#else
   return false;
-#endif
 }
 
 }  // namespace metrics

@@ -395,11 +395,7 @@ TEST_P(WebUsbServiceImplTest, OpenAndDisconnectDevice) {
 
 INSTANTIATE_TEST_SUITE_P(WebUsbServiceImplTests,
                          WebUsbServiceImplTest,
-                          #if !BUILDFLAG(IS_ANDROID)
                             Values(kCreateForFrame, kCreateForServiceWorker),
-                          #else
-                            Values(kCreateForFrame),
-                          #endif
                          [](const auto& info) {
                            return ServiceCreationTypeToString(info.param);
                          });
@@ -546,7 +542,6 @@ TEST_F(WebUsbServiceImplFrameTest, RejectOpaqueOriginEmbeddedFrame) {
 
 using WebUsbServiceImplServiceWorkerTest = WebUsbServiceImplBaseTest;
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 TEST_F(WebUsbServiceImplServiceWorkerTest,
        GetPermissionFromServiceWorkerReportsBadMessage) {
   // Create the service via the service worker path, which sets
@@ -571,7 +566,6 @@ TEST_F(WebUsbServiceImplServiceWorkerTest,
             "GetPermission is not allowed from a service worker.");
   EXPECT_FALSE(future.Get());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class WebUsbServiceImplProtectedInterfaceTest
     : public WebUsbServiceImplBaseTest,
@@ -615,11 +609,7 @@ TEST_P(WebUsbServiceImplProtectedInterfaceTest, BlockProtectedInterface) {
 INSTANTIATE_TEST_SUITE_P(
     WebUsbServiceImplProtectedInterfaceTests,
     WebUsbServiceImplProtectedInterfaceTest,
-#if !BUILDFLAG(IS_ANDROID)
     Combine(Values(kCreateForFrame, kCreateForServiceWorker),
-#else
-    Combine(Values(kCreateForFrame),
-#endif
             Values(device::mojom::kUsbAudioClass,
                    device::mojom::kUsbHidClass,
                    device::mojom::kUsbMassStorageClass,

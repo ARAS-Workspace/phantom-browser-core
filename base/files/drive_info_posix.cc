@@ -27,10 +27,7 @@ namespace base {
 
 std::optional<DriveInfo> GetFileDriveInfo(const FilePath& file_path) {
   DriveInfo drive_info;
-#if BUILDFLAG(IS_ANDROID)
-  drive_info.has_seek_penalty = false;
-  return drive_info;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   constexpr char kRotationalFormat[] =
       "/sys/dev/block/%lu:%lu/queue/rotational";
   constexpr char kRemovableFormat[] = "/sys/dev/block/%lu:%lu/removable";

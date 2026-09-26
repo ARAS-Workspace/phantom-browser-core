@@ -89,13 +89,6 @@ constexpr int kDefaultTotalPages = kCpuIs64Bit ? 2048 : kDefaultMaxMetadata * 2;
 constexpr int kDefaultAllocationSamplingMultiplier = 1500;
 constexpr int kDefaultAllocationSamplingRange = 16;
 constexpr double kDefaultProcessSamplingProbability = 0.01;
-#elif BUILDFLAG(IS_ANDROID)
-constexpr int kDefaultMaxAllocations = 70;
-constexpr int kDefaultMaxMetadata = 255;
-constexpr int kDefaultTotalPages = 512;
-constexpr int kDefaultAllocationSamplingMultiplier = 2000;
-constexpr int kDefaultAllocationSamplingRange = 20;
-constexpr double kDefaultProcessSamplingProbability = 0.015;
 #else
 constexpr int kDefaultMaxAllocations = 70;
 constexpr int kDefaultMaxMetadata = 255;

@@ -35,11 +35,6 @@ const base::FilePath::CharType kBrowserProcessExecutableName[] =
     FPL(PRODUCT_FULLNAME_STRING);
 const base::FilePath::CharType kHelperProcessExecutableName[] =
     FPL(PRODUCT_FULLNAME_STRING " Helper");
-#elif BUILDFLAG(IS_ANDROID)
-// NOTE: Keep it synced with the process names defined in AndroidManifest.xml.
-const base::FilePath::CharType kBrowserProcessExecutableName[] = FPL("chrome");
-const base::FilePath::CharType kHelperProcessExecutableName[] =
-    FPL("sandboxed_process");
 #elif BUILDFLAG(IS_POSIX)
 const base::FilePath::CharType kBrowserProcessExecutableName[] = FPL("chrome");
 // Helper processes end up with a name of "exe" due to execing via
@@ -61,9 +56,6 @@ const base::FilePath::CharType kChromiumBrowserProcessExecutablePath[] =
 const base::FilePath::CharType kHelperProcessExecutablePath[] =
     FPL(PRODUCT_FULLNAME_STRING
         " Helper.app/Contents/MacOS/" PRODUCT_FULLNAME_STRING " Helper");
-#elif BUILDFLAG(IS_ANDROID)
-const base::FilePath::CharType kBrowserProcessExecutablePath[] = FPL("chrome");
-const base::FilePath::CharType kHelperProcessExecutablePath[] = FPL("chrome");
 #elif BUILDFLAG(IS_POSIX)
 const base::FilePath::CharType kBrowserProcessExecutablePath[] = FPL("chrome");
 const base::FilePath::CharType kHelperProcessExecutablePath[] = FPL("chrome");

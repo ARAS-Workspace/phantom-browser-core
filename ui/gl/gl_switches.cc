@@ -13,15 +13,10 @@
 #include "ui/gl/buildflags.h"
 #include "ui/gl/gl_display_manager.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
-#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
 #include <vulkan/vulkan_core.h>
 #include "third_party/angle/src/gpu_info_util/SystemInfo.h"  // nogncheck
-#endif  // BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_ANDROID))
+#endif  // BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
 
 namespace gl {
 
@@ -205,18 +200,6 @@ const auto kGLSwitchesCopiedFromGpuProcessHostArray = std::to_array({
 const base::span<const char* const> kGLSwitchesCopiedFromGpuProcessHost =
     kGLSwitchesCopiedFromGpuProcessHostArray;
 
-#if BUILDFLAG(IS_ANDROID)
-// On some Android emulators with software GL, ANGLE
-// is exposing the native fence sync extension but it doesn't
-// actually work. This switch is used to disable the Android native fence sync
-// during test to avoid crashes.
-//
-// TODO(https://crbug.com/337886037): Remove this flag once the upstream ANGLE
-// is fixed.
-const char kDisableAndroidNativeFenceSyncForTesting[] =
-    "disable-android-native-fence-sync-for-testing";
-#endif
-
 }  // namespace switches
 
 namespace features {
@@ -301,22 +284,7 @@ bool IsDefaultANGLEVulkan() {
 #if defined(MEMORY_SANITIZER)
   return false;
 #else  // !defined(MEMORY_SANITIZER)
-#if BUILDFLAG(IS_ANDROID)
-  // No support for devices before Q -- exit before checking feature flags
-  // so that devices are not counted in finch trials.
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_Q) {
-    return false;
-  }
-
-  // For the sake of finch trials, limit to newer devices (Android T+); this
-  // condition can be relaxed over time.
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_T) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
   angle::SystemInfo system_info;
   {
     TRACE_EVENT("gpu,startup", "angle::GetSystemInfoVulkan");
@@ -343,61 +311,6 @@ bool IsDefaultANGLEVulkan() {
   if (active_gpu.driverId == 0)
     return false;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Exclude SwiftShader-based Android emulators for now.
-  if (active_gpu.driverId == VK_DRIVER_ID_GOOGLE_SWIFTSHADER) {
-    return false;
-  }
-
-  // Encountered bugs with older Imagination drivers.  New drivers seem fixed,
-  // but disabled for the sake of experiment for now. crbug.com/371512561
-  if (active_gpu.driverId == VK_DRIVER_ID_IMAGINATION_PROPRIETARY) {
-    return false;
-  }
-
-  // Exclude old ARM drivers due to crashes related to creating
-  // AHB-based Video images in Vulkan.  http://crbug.com/382676807.
-  if (active_gpu.driverId == VK_DRIVER_ID_ARM_PROPRIETARY &&
-      active_gpu.detailedDriverVersion.major <= 32) {
-    return false;
-  }
-
-  // Exclude old ARM chipsets due to rendering bugs, G52 is still found in
-  // Xiaomi phones. Note that if included in the future, there still seems to be
-  // a driver bug with async garbage collection, so that feature needs to be
-  // disabled in ANGLE. http://crbug.com/405085132
-  if (active_gpu.driverId == VK_DRIVER_ID_ARM_PROPRIETARY &&
-      active_gpu.deviceName.find("G52") != std::string::npos) {
-    return false;
-  }
-
-  // Exclude old Qualcomm drivers due to inefficient (and buggy) fallback
-  // to CPU path in glCopyTextureCHROMIUM with multi-plane images.
-  // http://crbug.com/383056998.
-  if (active_gpu.driverId == VK_DRIVER_ID_QUALCOMM_PROPRIETARY &&
-      active_gpu.detailedDriverVersion.minor <= 530) {
-    return false;
-  }
-
-  // Exclude Qualcomm 512.615 driver on Xiaomi phones that is the cause of
-  // yet-to-be explained GPU hangs.
-  // http://crbug.com/382725542
-  if (active_gpu.driverId == VK_DRIVER_ID_QUALCOMM_PROPRIETARY &&
-      active_gpu.detailedDriverVersion.minor == 615) {
-    return false;
-  }
-
-  // Exclude Qualcomm 512.676 driver on Adreno 720 that is the cause of
-  // undiagnosed rendering issues.
-  // http://crbug.com/440110161
-  if (active_gpu.driverId == VK_DRIVER_ID_QUALCOMM_PROPRIETARY &&
-      active_gpu.deviceName.find("Adreno") != std::string::npos &&
-      active_gpu.deviceName.find("720") != std::string::npos &&
-      active_gpu.detailedDriverVersion.minor == 676) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_LINUX)
   // AMDVLK driver is buggy, so disable Vulkan with AMDVLK for now.
   // crbug.com/1340081
@@ -410,8 +323,7 @@ bool IsDefaultANGLEVulkan() {
     return false;
   }
 
-#endif  // BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_ANDROID))
+#endif  // BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
 
   return base::FeatureList::IsEnabled(kDefaultANGLEVulkan);
 #endif  // !defined(MEMORY_SANITIZER)

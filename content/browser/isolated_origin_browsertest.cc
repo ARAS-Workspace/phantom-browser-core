@@ -3390,11 +3390,7 @@ class InjectIsolationRequestingNavigation
 };
 
 // TODO(crbug.com/40708791): flaky on Android builders since 2020-07-28.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FrameTreeTestBeforeDidCommit DISABLED_FrameTreeTestBeforeDidCommit
-#else
 #define MAYBE_FrameTreeTestBeforeDidCommit FrameTreeTestBeforeDidCommit
-#endif
 // This test is similar to the one above, but exercises the pending navigation
 // when it's at a different stage, namely between the CommitNavigation and
 // DidCommitProvisionalLoad, rather than at WillProcessResponse.
@@ -4913,16 +4909,11 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_EQ(bad_message::RPH_MOJO_PROCESS_ERROR, kill_waiter.Wait());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_LocalStorageOriginEnforcement_NonIsolatedAccessingIsolated \
-  LocalStorageOriginEnforcement_NonIsolatedAccessingIsolated
-#else
 // TODO(lukasza): https://crbug.com/566091: Once remote NTP is capable of
 // embedding OOPIFs, start enforcing citadel-style checks on desktop
 // platforms.
 #define MAYBE_LocalStorageOriginEnforcement_NonIsolatedAccessingIsolated \
   DISABLED_LocalStorageOriginEnforcement_NonIsolatedAccessingIsolated
-#endif
 // Verify that a non-isolated renderer process cannot read localStorage of an
 // isolated origin.
 //
@@ -5429,9 +5420,6 @@ class IsolatedOriginPolicyOverrideTest : public IsolatedOriginFieldTrialTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     IsolatedOriginFieldTrialTest::SetUpCommandLine(command_line);
     command_line->AppendSwitch(switches::kDisableSiteIsolation);
-#if BUILDFLAG(IS_ANDROID)
-    command_line->AppendSwitch(switches::kDisableSiteIsolationForPolicy);
-#endif
   }
 };
 
@@ -5458,9 +5446,6 @@ class IsolatedOriginNoFlagOverrideTest : public IsolatedOriginTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     IsolatedOriginTest::SetUpCommandLine(command_line);
     command_line->AppendSwitch(switches::kDisableSiteIsolation);
-#if BUILDFLAG(IS_ANDROID)
-    command_line->AppendSwitch(switches::kDisableSiteIsolationForPolicy);
-#endif
   }
 };
 

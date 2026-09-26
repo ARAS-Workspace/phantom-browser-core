@@ -32,7 +32,7 @@ namespace viz {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
 // Helper function for moving a GpuFence from a fence handle to a unique_ptr.
 std::unique_ptr<gfx::GpuFence> TakeGpuFence(gfx::GpuFenceHandle fence) {
   return fence.is_null() ? nullptr
@@ -61,9 +61,6 @@ void OutputPresenterGL::InitializeCapabilities(
   // Set resize_based_on_root_surface to omit platform proposed size.
   capabilities->resize_based_on_root_surface =
       presenter_->SupportsOverridePlatformSize();
-#if BUILDFLAG(IS_ANDROID)
-  capabilities->supports_dynamic_frame_buffer_allocation = true;
-#endif
   // MakeCurrent needs to be called if the platform can not rely on kernel (GPU
   // fences) to sync. In configurations like this, the Presenter commonly waits
   // on CPU for GPU to finish with a (EGL) fence + a worker thread.
@@ -112,7 +109,7 @@ void OutputPresenterGL::ScheduleOverlayPlane(
   // Note that |overlay_plane_candidate| has different types on different
   // platforms. On Android, Ozone, and Windows, it is an OverlayCandidate and on
   // macOS it is a CALayeroverlay.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
 #if BUILDFLAG(IS_OZONE)
   // TODO(crbug.com/40239878): Add ScopedOverlayAccess::GetOverlayImage() that
   // works on all platforms.
@@ -127,12 +124,6 @@ void OutputPresenterGL::ScheduleOverlayPlane(
     // properly.
     LOG_IF(WARNING, overlay_plane_candidate.is_root_render_pass)
         << "root_render_pass is missing overlay_image.";
-    return;
-  }
-#elif BUILDFLAG(IS_ANDROID)
-  gl::OverlayImage overlay_image =
-      access ? access->GetAHardwareBufferFenceSync() : nullptr;
-  if (!overlay_image) {
     return;
   }
 #endif

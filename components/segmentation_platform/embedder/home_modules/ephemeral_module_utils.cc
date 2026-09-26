@@ -20,13 +20,8 @@ GetForcedEphemeralModuleShowResult() {
       features::kEphemeralCardRankerForceShowCardParam, "");
 
   if (!force_show_param.empty()) {
-#if BUILDFLAG(IS_ANDROID)
-    return CardSelectionInfo::ShowResult(EphemeralHomeModuleRank::kLast,
-                                         force_show_param);
-#else
     return CardSelectionInfo::ShowResult(EphemeralHomeModuleRank::kTop,
                                          force_show_param);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   std::string force_hide_param = base::GetFieldTrialParamByFeatureAsString(

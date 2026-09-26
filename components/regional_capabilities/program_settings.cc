@@ -41,28 +41,6 @@ constexpr ProgramSettings kWaffleWithLocationRestrictionSettings = []() {
   return ret;
 }();
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr country_codes::CountryId kTaiyakiCountry("JP");
-
-constexpr ProgramSettings kTaiyakiSettings{
-    .program = Program::kTaiyaki,
-    .associated_countries =
-        base::raw_span<const country_codes::CountryId>(&kTaiyakiCountry, 1u),
-    .search_engine_list_type = SearchEngineListType::kShuffled,
-    .selection_from_settings_counts_as_choice_screen_choice = false,
-    .choice_screen_eligibility_config =
-        ChoiceScreenEligibilityConfig{
-            .managed_users_can_be_eligible = false,
-            .should_preserve_non_prepopulated_dse = false,
-            .should_preserve_imported_choice = true,
-            .should_preserve_non_google_dse = false,
-            .restrict_to_associated_countries = true,
-            .restrict_surfaces_to_fre_only = false,
-            .highlight_current_default = true,
-        },
-};
-#endif  // BUILDFLAG(IS_ANDROID)
-
 constexpr ProgramSettings kDefaultSettings{
     .program = Program::kDefault,
     .associated_countries = base::raw_span<const country_codes::CountryId>(),
@@ -101,19 +79,6 @@ bool IsInProgramRegion(Program program,
 bool IsClientCompatibleWithProgram(Program program) {
   switch (program) {
     case Program::kTaiyaki:
-#if BUILDFLAG(IS_ANDROID)
-      switch (ui::GetDeviceFormFactor()) {
-        case ui::DEVICE_FORM_FACTOR_PHONE:
-        case ui::DEVICE_FORM_FACTOR_FOLDABLE:
-          return true;
-        case ui::DEVICE_FORM_FACTOR_DESKTOP:
-        case ui::DEVICE_FORM_FACTOR_TABLET:
-        case ui::DEVICE_FORM_FACTOR_TV:
-        case ui::DEVICE_FORM_FACTOR_AUTOMOTIVE:
-        case ui::DEVICE_FORM_FACTOR_XR:
-          break;
-      }
-#endif
       return false;
     case Program::kWaffle:
     case Program::kDefault:
@@ -125,11 +90,7 @@ bool IsClientCompatibleWithProgram(Program program) {
 const ProgramSettings& GetSettingsForProgram(Program program) {
   switch (program) {
     case Program::kTaiyaki:
-#if BUILDFLAG(IS_ANDROID)
-      return kTaiyakiSettings;
-#else
       NOTREACHED();
-#endif
     case Program::kWaffle:
       if (base::FeatureList::IsEnabled(
               switches::kWaffleRestrictToAssociatedCountries)) {

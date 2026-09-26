@@ -247,14 +247,10 @@ void SSLErrorUI::HandleCommand(SecurityInterstitialCommand command) {
       break;
     }
     case CMD_SHOW_CERTIFICATE_VIEWER: {
-#if !BUILDFLAG(IS_ANDROID)
       controller_->metrics_helper()->RecordUserInteraction(
           security_interstitials::MetricsHelper::VIEW_CERTIFICATE);
       controller_->ShowCertificateViewer();
       break;
-#else
-      NOTREACHED();
-#endif
     }
     case CMD_OPEN_DATE_SETTINGS:
     case CMD_OPEN_DIAGNOSTIC:

@@ -1173,13 +1173,6 @@ TEST_P(GLCopyTextureCHROMIUMES3Test, CopyTextureLevel) {
   for (GLint source_level = 0; source_level < 3; source_level++) {
     for (GLint dest_level = 0; dest_level < 3; dest_level++) {
       for (auto dest_format_type : dest_format_types) {
-#if BUILDFLAG(IS_ANDROID)
-        // TODO(qiankun.miao@intel.com): source_level > 0 or dest_level > 0
-        // isn't available due to renderinig bug for non-zero base level in
-        // Android: crbug.com/680460.
-        if (dest_level > 0)
-          continue;
-#endif
         RunCopyTexture(GL_TEXTURE_2D, copy_type, src_format_type, source_level,
                        dest_format_type, dest_level, true);
       }
@@ -1962,10 +1955,6 @@ TEST_P(GLCopyTextureCHROMIUMES3Test, PixelUnpackBufferDoesNotInterfere) {
     GTEST_SKIP() << "ES3 context unavailable";
   }
 
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_X86_FAMILY)
-  GTEST_SKIP() << "Skipping test on Android x86/x64";
-#else
-
   constexpr GLsizei kW = 8, kH = 8;
   const uint8_t kGreen[4] = {0u, 255u, 0u, 255u};
 
@@ -2043,7 +2032,6 @@ TEST_P(GLCopyTextureCHROMIUMES3Test, PixelUnpackBufferDoesNotInterfere) {
   glDeleteBuffers(1, &pbo);
   glDeleteTextures(1, &src);
   glDeleteTextures(1, &dest);
-#endif  // BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_X86_FAMILY)
 #endif  // !BUILDFLAG(ENABLE_VALIDATING_COMMAND_DECODER)
 }
 

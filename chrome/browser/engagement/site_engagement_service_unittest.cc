@@ -278,11 +278,7 @@ class SiteEngagementServiceTest : public ChromeRenderViewHostTestHarness {
 
   void SetLastShortcutLaunchTime(content::WebContents* web_contents, GURL url) {
     static const webapps::AppId kFakeAppId = "abcdefg";
-#if BUILDFLAG(IS_ANDROID)
-    service_->SetLastShortcutLaunchTime(web_contents, url);
-#else
     service_->SetLastShortcutLaunchTime(web_contents, kFakeAppId, url);
-#endif
   }
 
   base::ScopedTempDir temp_dir_;

@@ -25,10 +25,6 @@
 // static
 const char BackgroundSyncControllerImpl::kFieldTrialName[] = "BackgroundSync";
 const char BackgroundSyncControllerImpl::kDisabledParameterName[] = "disabled";
-#if BUILDFLAG(IS_ANDROID)
-const char BackgroundSyncControllerImpl::kRelyOnAndroidNetworkDetection[] =
-    "rely_on_android_network_detection";
-#endif
 const char BackgroundSyncControllerImpl::kKeepBrowserAwakeParameterName[] =
     "keep_browser_awake_till_events_complete";
 const char BackgroundSyncControllerImpl::kSkipPermissionsCheckParameterName[] =
@@ -103,11 +99,6 @@ void BackgroundSyncControllerImpl::OnContentSettingChanged(
 void BackgroundSyncControllerImpl::GetParameterOverrides(
     content::BackgroundSyncParameters* parameters) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-#if BUILDFLAG(IS_ANDROID)
-  if (delegate_->ShouldDisableBackgroundSync())
-    parameters->disable = true;
-#endif
 
   std::map<std::string, std::string> field_params;
   if (!base::GetFieldTrialParams(kFieldTrialName, &field_params)) {
@@ -190,18 +181,6 @@ void BackgroundSyncControllerImpl::GetParameterOverrides(
     }
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Check if the delegate explicitly disabled this feature.
-  if (delegate_->ShouldDisableAndroidNetworkDetection()) {
-    parameters->rely_on_android_network_detection = false;
-  } else if (field_params.contains(kRelyOnAndroidNetworkDetection)) {
-    if (base::EqualsCaseInsensitiveASCII(
-            field_params[kRelyOnAndroidNetworkDetection], "true")) {
-      parameters->rely_on_android_network_detection = true;
-    }
-  }
-#endif
-
   return;
 }
 
@@ -255,9 +234,6 @@ void BackgroundSyncControllerImpl::ScheduleBrowserWakeUpWithDelay(
   if (delegate_->IsProfileOffTheRecord())
     return;
 
-#if BUILDFLAG(IS_ANDROID)
-  delegate_->ScheduleBrowserWakeUpWithDelay(sync_type, delay);
-#endif
 }
 
 void BackgroundSyncControllerImpl::CancelBrowserWakeup(
@@ -267,9 +243,6 @@ void BackgroundSyncControllerImpl::CancelBrowserWakeup(
   if (delegate_->IsProfileOffTheRecord())
     return;
 
-#if BUILDFLAG(IS_ANDROID)
-  delegate_->CancelBrowserWakeup(sync_type);
-#endif
 }
 
 base::TimeDelta BackgroundSyncControllerImpl::SnapToMaxOriginFrequency(
@@ -367,12 +340,7 @@ base::TimeDelta BackgroundSyncControllerImpl::GetNextEventDelay(
 
 std::unique_ptr<content::BackgroundSyncController::BackgroundSyncEventKeepAlive>
 BackgroundSyncControllerImpl::CreateBackgroundSyncEventKeepAlive() {
-#if BUILDFLAG(IS_ANDROID)
-  // Not needed on Android.
-  return nullptr;
-#else
   return delegate_->CreateBackgroundSyncEventKeepAlive();
-#endif
 }
 
 void BackgroundSyncControllerImpl::NoteSuspendedPeriodicSyncOrigins(

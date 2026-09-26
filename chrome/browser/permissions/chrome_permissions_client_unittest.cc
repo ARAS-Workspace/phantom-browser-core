@@ -14,7 +14,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"  // nogncheck
 #include "chrome/browser/ui/hats/mock_hats_service.h"     // nogncheck
@@ -23,9 +22,8 @@
 #include "components/permissions/permission_hats_trigger_helper.h"
 #include "components/prefs/pref_service.h"
 #include "components/unified_consent/pref_names.h"
-#endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 #include <optional>
 #include <string>
 
@@ -42,46 +40,25 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "url/gurl.h"
 #include "url/origin.h"
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 class ChromePermissionsClientTest : public ChromeRenderViewHostTestHarness {
  public:
   void SetUp() override {
     ChromeRenderViewHostTestHarness::SetUp();
-#if !BUILDFLAG(IS_ANDROID)
     permissions::PermissionHatsTriggerHelper::SetIsTest();
     TemplateURLServiceFactory::GetInstance()->SetTestingFactoryAndUse(
         profile(),
         base::BindRepeating(&TemplateURLServiceFactory::BuildInstanceFor));
-#endif
     permissions::PermissionRequestManager::CreateForWebContents(web_contents());
   }
 
-#if !BUILDFLAG(IS_ANDROID)
  private:
   variations::test::ScopedVariationsIdsProvider scoped_variations_ids_provider_{
       variations::VariationsIdsProvider::Mode::kUseSignedInState};
-#endif
 };
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(ChromePermissionsClientTest,
-       MaybeCreateMessageUINeverQuietForUpgradeToPrecise) {
-  auto request = std::make_unique<permissions::MockPermissionRequest>(
-      GURL(permissions::MockPermissionRequest::kDefaultOrigin),
-      permissions::RequestType::kGeolocation,
-      permissions::PermissionRequestGestureType::GESTURE,
-      permissions::GeolocationPromptType::kUpgradeToPrecise);
-
-  base::WeakPtr<permissions::PermissionPromptAndroid> dummy_prompt;
-
-  auto* client = ChromePermissionsClient::GetInstance();
-  auto message_ui =
-      client->MaybeCreateMessageUI(web_contents(), *request, dummy_prompt);
-
-  EXPECT_FALSE(message_ui);
-}
-#elif BUILDFLAG(ENABLE_EXTENSIONS)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 namespace {
 
 constexpr char kExtensionOrigin[] =
@@ -185,9 +162,8 @@ TEST_F(ChromePermissionsClientMimeHandlerTest,
       embedder->GetLastCommittedOrigin().GetURL(), embedder);
   EXPECT_FALSE(outside.has_value());
 }
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromePermissionsClientTest, HaTSUrlReportedOnlyIfOptedIn) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeaturesAndParameters(
@@ -403,4 +379,3 @@ TEST_F(ChromePermissionsClientTest, IsPrivilegedInternalWebUIWithSubpaths) {
                                         /*already_overrode_requester=*/false));
   EXPECT_TRUE(client->IsPrivilegedInternalWebUIForUIRouting(web_contents()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

@@ -181,24 +181,6 @@
 #include "ui/aura/env.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "components/input/android/input_token_forwarder.h"
-#include "components/tracing/common/graphics_memory_dump_provider_android.h"
-#include "content/browser/android/browser_startup_controller.h"
-#include "content/browser/android/input_token_forwarder_manager.h"
-#include "content/browser/android/launcher_thread.h"
-#include "content/browser/android/tracing_controller_android.h"
-#include "content/browser/font_unique_name_lookup/font_unique_name_lookup_android.h"
-#include "content/browser/memory_pressure/user_level_memory_pressure_signal_generator.h"
-#include "content/browser/screen_orientation/screen_orientation_delegate_android.h"
-#include "media/base/android/media_drm_bridge_client.h"
-#include "ui/android/screen_android.h"
-#include "ui/display/screen.h"
-#include "ui/events/devices/input_device_observer_android.h"
-#include "ui/gl/gl_surface.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/apple/scoped_nsautorelease_pool.h"
 #include "content/browser/renderer_host/browser_compositor_view_mac.h"
@@ -225,7 +207,7 @@
 #include "content/browser/plugin_service_impl.h"
 #endif
 
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 #include "content/browser/media/cdm_registry_impl.h"
 #endif
 
@@ -347,7 +329,7 @@ CreateMemoryPressureMonitor(const base::CommandLine& command_line) {
 
   std::unique_ptr<memory_pressure::MultiSourceMemoryPressureMonitor> monitor;
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
   monitor =
       std::make_unique<memory_pressure::MultiSourceMemoryPressureMonitor>();
 #endif
@@ -355,13 +337,6 @@ CreateMemoryPressureMonitor(const base::CommandLine& command_line) {
 
   if (monitor)
     monitor->MaybeStartPlatformVoter();
-
-#if BUILDFLAG(IS_ANDROID)
-  if (auto evaluator = UserLevelMemoryPressureSignalGenerator::MaybeCreate(
-          monitor->CreateVoter())) {
-    monitor->SetSystemEvaluator(std::move(evaluator));
-  }
-#endif
 
   return monitor;
 }
@@ -388,7 +363,6 @@ class OopDataDecoder : public data_decoder::ServiceProvider {
 };
 
 void BindHidManager(mojo::PendingReceiver<device::mojom::HidManager> receiver) {
-#if !BUILDFLAG(IS_ANDROID)
   if (!BrowserThread::CurrentlyOn(BrowserThread::UI)) {
     GetUIThreadTaskRunner({})->PostTask(
         FROM_HERE, base::BindOnce(&BindHidManager, std::move(receiver)));
@@ -396,7 +370,6 @@ void BindHidManager(mojo::PendingReceiver<device::mojom::HidManager> receiver) {
   }
 
   GetDeviceService().BindHidManager(std::move(receiver));
-#endif
 }
 
 uint32_t GenerateBrowserSalt() {
@@ -425,20 +398,6 @@ std::string GetRelatedWebsiteSetSwitch() {
 // The currently-running BrowserMainLoop.  There can be one or zero.
 BrowserMainLoop* g_current_browser_main_loop = nullptr;
 
-#if BUILDFLAG(IS_ANDROID)
-
-namespace {
-// Whether or not BrowserMainLoop::CreateStartupTasks() posts any tasks.
-bool g_post_startup_tasks = true;
-}  // namespace
-
-// static
-void BrowserMainLoop::EnableStartupTasks(bool enabled) {
-  g_post_startup_tasks = enabled;
-}
-
-#endif
-
 // BrowserMainLoop construction / destruction =============================
 
 BrowserMainLoop* BrowserMainLoop::GetInstance() {
@@ -459,14 +418,10 @@ BrowserMainLoop::BrowserMainLoop(
       parsed_command_line_(*parameters_.command_line),
       result_code_(RESULT_CODE_NORMAL_EXIT),
       created_threads_(false),
-      scoped_execution_fence_(std::move(scoped_execution_fence))
-#if !BUILDFLAG(IS_ANDROID)
-      ,
+      scoped_execution_fence_(std::move(scoped_execution_fence)),
       // TODO(fdoray): Create the fence on Android too. Not enabled yet because
       // tests timeout. https://crbug.com/887407
-      scoped_best_effort_execution_fence_(std::in_place)
-#endif
-{
+      scoped_best_effort_execution_fence_(std::in_place) {
   DCHECK(!g_current_browser_main_loop);
   DCHECK(scoped_execution_fence_)
       << "ThreadPool must be halted before kicking off content.";
@@ -546,7 +501,7 @@ int BrowserMainLoop::EarlyInitialization() {
   DCHECK(base::CurrentUIThread::IsSet());
   base::PlatformThread::SetDefaultThreadType(base::ThreadType::kPresentation);
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
   // We use quite a few file descriptors for our IPC as well as disk the disk
   // cache, and the default limit on Apple is low (256), so bump it up.
 
@@ -555,7 +510,7 @@ int BrowserMainLoop::EarlyInitialization() {
   // users can easily hit this limit with many open tabs. Bump up the limit to
   // an arbitrarily high number. See https://crbug.com/539567
   base::IncreaseFdLimitTo(8192);
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(USE_NSS_CERTS)
   // We want to be sure to init NSPR on the main thread.
@@ -695,25 +650,6 @@ void BrowserMainLoop::PostCreateMainMessageLoop() {
   if (parts_)
     parts_->PostCreateMainMessageLoop();
 
-#if BUILDFLAG(IS_ANDROID)
-  {
-    TRACE_EVENT0("startup",
-                 "BrowserMainLoop::Subsystem:InputTokenForwarderManager");
-    if (UsingInProcessGpu()) {
-      input::InputTokenForwarder::SetInstance(
-          InputTokenForwarderManager::GetInstance());
-    }
-  }
-
-  if (!parsed_command_line_->HasSwitch(
-          switches::kDisableScreenOrientationLock)) {
-    TRACE_EVENT0("startup",
-                 "BrowserMainLoop::Subsystem:ScreenOrientationProvider");
-    screen_orientation_delegate_ =
-        std::make_unique<ScreenOrientationDelegateAndroid>();
-  }
-#endif
-
   if (UsingInProcessGpu()) {
     // Make sure to limits for skia font cache are applied for in process
     // gpu setup (crbug.com/1183230).
@@ -801,7 +737,7 @@ int BrowserMainLoop::PreCreateThreads() {
   // while avoiding doing so in unit tests by making it explicitly enabled here.
   GpuDataManagerImpl::GetInstance()->StartUmaTimer();
 
-#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
   // Single-process is an unsupported and not fully tested mode, so
   // don't enable it for official Chrome builds (except on Android and iOS).
   if (parsed_command_line_->HasSwitch(switches::kSingleProcess))
@@ -836,15 +772,6 @@ int BrowserMainLoop::PreCreateThreads() {
   base::UmaHistogramBoolean("SiteIsolation.IsSitePerProcessOrStricter",
                             SiteIsolationPolicy::IsSitePerProcessOrStricter());
 
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(IS_DESKTOP_ANDROID)
-  base::UmaHistogramBoolean(
-      "SiteIsolation.IsSitePerProcessOrStricter.AndroidDesktop",
-      SiteIsolationPolicy::IsSitePerProcessOrStricter());
-  base::UmaHistogramEnumeration(
-      "SiteIsolation.DisabledReason.AndroidDesktop",
-      SiteIsolationPolicy::GetSiteIsolationDisabledReason());
-#endif
-
   // Generate the browser process salt. This is then accessible by calls to
   // GetPseudonymizationSalt in the browser process. This generation is only
   // needed in the browser process, because for other processes it is
@@ -858,20 +785,9 @@ void BrowserMainLoop::CreateStartupTasks() {
   TRACE_EVENT0("startup", "BrowserMainLoop::CreateStartupTasks");
 
   DCHECK(!startup_task_runner_);
-#if BUILDFLAG(IS_ANDROID)
-  // Some java scheduler tests need to test migration to C++, but the browser
-  // environment isn't set up fully and if these tasks run they may crash.
-  if (!g_post_startup_tasks)
-    return;
-
-  startup_task_runner_ = std::make_unique<StartupTaskRunner>(
-      base::BindOnce(&BrowserStartupComplete),
-      GetUIThreadTaskRunner({BrowserTaskType::kStartup}));
-#else
   startup_task_runner_ = std::make_unique<StartupTaskRunner>(
       base::OnceCallback<void(int, base::TimeDelta, base::TimeDelta)>(),
       base::SingleThreadTaskRunner::GetCurrentDefault());
-#endif
   StartupTask pre_create_threads = base::BindOnce(
       &BrowserMainLoop::PreCreateThreads, base::Unretained(this));
   startup_task_runner_->AddTask(std::move(pre_create_threads));
@@ -888,27 +804,12 @@ void BrowserMainLoop::CreateStartupTasks() {
       &BrowserMainLoop::PreMainMessageLoopRun, base::Unretained(this));
   startup_task_runner_->AddTask(std::move(pre_main_message_loop_run));
 
-// On Android, the native message loop is already running when the app is
-// entered and startup tasks are run asynchronously from it.
-// InterceptMainMessageLoopRun() thus needs to be forced instead of happening
-// from MainMessageLoopRun().
-#if BUILDFLAG(IS_ANDROID)
-  StartupTask intercept_main_message_loop_run = base::BindOnce(
-      [](BrowserMainLoop* self) {
-        // Lambda to ignore the return value and always keep a clean exit code
-        // for this StartupTask.
-        self->InterceptMainMessageLoopRun();
-        return self->result_code_;
-      },
-      base::Unretained(this));
-  startup_task_runner_->AddTask(std::move(intercept_main_message_loop_run));
-#endif
+  // On Android, the native message loop is already running when the app is
+  // entered and startup tasks are run asynchronously from it.
+  // InterceptMainMessageLoopRun() thus needs to be forced instead of happening
+  // from MainMessageLoopRun().
 
-#if BUILDFLAG(IS_ANDROID)
-  startup_task_runner_->StartRunningTasksAsync();
-#else
   startup_task_runner_->RunAllTasksNow(false);
-#endif
 }
 
 scoped_refptr<base::SingleThreadTaskRunner>
@@ -937,12 +838,6 @@ gpu::GpuChannelEstablishFactory*
 BrowserMainLoop::gpu_channel_establish_factory() const {
   return BrowserGpuChannelHostFactory::instance();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void BrowserMainLoop::SynchronouslyFlushStartupTasks(bool was_posted) {
-  startup_task_runner_->RunAllTasksNow(was_posted);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 int BrowserMainLoop::CreateThreads() {
   TRACE_EVENT0("startup,rail", "BrowserMainLoop::CreateThreads");
@@ -1001,14 +896,6 @@ int BrowserMainLoop::PreMainMessageLoopRun() {
       font_render_params.text_contrast, font_render_params.text_gamma);
   viz::GpuHostImpl::InitFontRenderParams(font_render_params);
 
-#if BUILDFLAG(IS_ANDROID)
-  bool use_display_wide_color_gamut =
-      GetContentClient()->browser()->GetWideColorGamutHeuristic() ==
-      ContentBrowserClient::WideColorGamutHeuristic::kUseDisplay;
-  // Let screen instance be overridable by parts.
-  ui::SetScreenAndroid(use_display_wide_color_gamut);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   if (parts_)
     result_code_ = parts_->PreMainMessageLoopRun();
 
@@ -1054,16 +941,6 @@ int BrowserMainLoop::PreMainMessageLoopRun() {
                   },
                   base::Unretained(this)));
 
-#if BUILDFLAG(IS_ANDROID)
-  base::PlatformThreadPriorityMonitor::Get().RegisterCurrentThread("UIThread");
-  GetIOThreadTaskRunner({})->PostTask(
-      FROM_HERE, base::BindOnce([] {
-        base::PlatformThreadPriorityMonitor::Get().RegisterCurrentThread(
-            "IOThread");
-      }));
-  base::PlatformThreadPriorityMonitor::Get().Start();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // If the UI thread blocks, the whole UI is unresponsive. Do not allow
   // unresponsive tasks from the UI thread and instantiate a
   // responsiveness::Watcher to catch jank induced by any unintentionally
@@ -1090,10 +967,6 @@ BrowserMainLoop::InterceptMainMessageLoopRun() {
 }
 
 void BrowserMainLoop::RunMainMessageLoop() {
-#if BUILDFLAG(IS_ANDROID)
-  // Android's main message loop is the Java message loop.
-  NOTREACHED();
-#else  // BUILDFLAG(IS_ANDROID)
   if (InterceptMainMessageLoopRun() != ProceedWithMainMessageLoopRun(true))
     return;
 
@@ -1111,7 +984,6 @@ void BrowserMainLoop::RunMainMessageLoop() {
 
   DCHECK(main_run_loop);
   main_run_loop->Run();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void BrowserMainLoop::PreShutdown() {
@@ -1218,16 +1090,14 @@ void BrowserMainLoop::ShutdownThreadsAndCleanUp() {
   }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   host_frame_sink_manager_.reset();
   compositing_mode_reporter_impl_.reset();
-#endif
 
-// The device monitors are using |system_monitor_| as dependency, so delete
-// them before |system_monitor_| goes away.
-// On windows, the monitor needs to be destroyed on the same thread
-// as they were created. On Linux, the monitor will be deleted when IO thread
-// goes away.
+  // The device monitors are using |system_monitor_| as dependency, so delete
+  // them before |system_monitor_| goes away.
+  // On windows, the monitor needs to be destroyed on the same thread
+  // as they were created. On Linux, the monitor will be deleted when IO thread
+  // goes away.
 
   if (BrowserGpuChannelHostFactory::instance())
     BrowserGpuChannelHostFactory::instance()->CloseChannel();
@@ -1271,13 +1141,6 @@ void BrowserMainLoop::ShutdownThreadsAndCleanUp() {
     device::GamepadService::GetInstance()->Terminate();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  {
-    TRACE_EVENT0("shutdown",
-                 "BrowserMainLoop::Subsystem:InputDeviceObserverAndroid");
-    ui::InputDeviceObserverAndroid::GetInstance()->Shutdown();
-  }
-#endif
   {
     TRACE_EVENT0("shutdown", "BrowserMainLoop::Subsystem:DeleteDataSources");
     URLDataManager::DeleteDataSources();
@@ -1309,13 +1172,7 @@ media::AudioManager* BrowserMainLoop::audio_manager() const {
 
 void BrowserMainLoop::GetCompositingModeReporter(
     mojo::PendingReceiver<viz::mojom::CompositingModeReporter> receiver) {
-#if BUILDFLAG(IS_ANDROID)
-  // Android doesn't support non-gpu compositing modes, and doesn't make a
-  // CompositingModeReporter.
-  return;
-#else
   compositing_mode_reporter_impl_->BindReceiver(std::move(receiver));
-#endif
 }
 
 void BrowserMainLoop::PostCreateThreadsImpl() {
@@ -1351,12 +1208,6 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
 
   bool always_uses_gpu = true;
   bool establish_gpu_channel = false;
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40396955): This should be set to |true|.
-  establish_gpu_channel = false;
-  always_uses_gpu = ShouldStartGpuProcessOnBrowserStartup();
-  BrowserGpuChannelHostFactory::Initialize(establish_gpu_channel);
-#else
   establish_gpu_channel = true;
   if (parsed_command_line_->HasSwitch(switches::kDisableGpu) ||
       parsed_command_line_->HasSwitch(switches::kDisableGpuCompositing) ||
@@ -1378,13 +1229,6 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
 #if defined(USE_AURA)
   env_->set_context_factory(GetContextFactory());
 #endif  // defined(USE_AURA)
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-  base::trace_event::MemoryDumpManager::GetInstance()->RegisterDumpProvider(
-      tracing::GraphicsMemoryDumpProvider::GetInstance(), "AndroidGraphics",
-      nullptr);
-#endif
 
   {
     TRACE_EVENT0("startup", "PostCreateThreads::Subsystem:AudioMan");
@@ -1400,10 +1244,8 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
     TRACE_EVENT0("startup", "PostCreateThreads::Subsystem:Devices");
     device::GamepadService::GetInstance()->StartUp(
         base::BindRepeating(&BindHidManager));
-#if !BUILDFLAG(IS_ANDROID)
     device::FidoHidDiscovery::SetHidManagerBinder(
         base::BindRepeating(&BindHidManager));
-#endif
   }
 
 #if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
@@ -1467,16 +1309,6 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
   ThemeHelperMac::GetInstance();
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_ANDROID)
-  media::SetMediaDrmBridgeClient(GetContentClient()->GetMediaDrmBridgeClient());
-
-  // On Android this must be done after SetMediaDrmBridgeClient(). For Android
-  // all CDMs are part of the OS, so no file checks are involved.
-  CdmRegistry::GetInstance()->Init();
-
-  FontUniqueNameLookup::GetInstance();
-#endif
-
 #if defined(ENABLE_IPC_FUZZER)
   SetFileUrlPathAliasForIpcFuzzer();
 #endif
@@ -1516,10 +1348,6 @@ bool BrowserMainLoop::InitializeToolkit() {
     return false;
 #endif  // defined(USE_AURA)
 
-#if BUILDFLAG(IS_ANDROID)
-  ui::InputDeviceObserverAndroid::GetInstance()->Initialize();
-#endif
-
   if (parts_)
     parts_->ToolkitInitialized();
 
@@ -1541,10 +1369,6 @@ void BrowserMainLoop::InitializeMojo() {
   // MessagePumpForUI::ScheduleWork() before MessagePumpForUI::Start().
   startup_tracing_controller_ =
       std::make_unique<tracing::StartupTracingController>(
-#if BUILDFLAG(IS_ANDROID)
-          base::BindRepeating(
-              &content::TracingControllerAndroid::GenerateTracingFilePath),
-#endif
           content::GetIOThreadTaskRunner({}));
 
   startup_tracing_controller_->StartIfNeeded();

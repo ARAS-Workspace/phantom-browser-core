@@ -28,13 +28,9 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-#else
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension_builder.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "content/public/browser/plugin_service.h"
@@ -70,9 +66,7 @@ class ReportRequestQueueGeneratorTest : public ::testing::Test {
   void SetUp() override {
     ASSERT_TRUE(profile_manager_.SetUp());
     profile_manager_.CreateGuestProfile();
-#if !BUILDFLAG(IS_ANDROID)
     profile_manager_.CreateSystemProfile();
-#endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_PLUGINS)
     content::PluginService::GetInstance()->Init();
 #endif  // BUILDFLAG(ENABLE_PLUGINS)
@@ -90,13 +84,11 @@ class ReportRequestQueueGeneratorTest : public ::testing::Test {
     return std::set<std::string>{kActiveProfileName1, kActiveProfileName2};
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   std::set<std::string> CreateActiveProfilesWithContent() {
     CreateActiveProfileWithContent(kActiveProfileName1);
     CreateActiveProfileWithContent(kActiveProfileName2);
     return std::set<std::string>{kActiveProfileName1, kActiveProfileName2};
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void CreateIdleProfile(const std::string& profile_name) {
     ProfileAttributesInitParams params;
@@ -122,7 +114,6 @@ class ReportRequestQueueGeneratorTest : public ::testing::Test {
         std::move(policy_service));
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   void CreateActiveProfileWithContent(const std::string& profile_name) {
     TestingProfile* active_profile = CreateActiveProfile(profile_name);
 
@@ -136,7 +127,6 @@ class ReportRequestQueueGeneratorTest : public ::testing::Test {
             .SetID("abcdefghijklmnoabcdefghijklmnoab")
             .Build());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   std::unique_ptr<ReportRequest> GenerateBasicRequest() {
     auto request = std::make_unique<ReportRequest>(ReportType::kBrowser);
@@ -237,11 +227,7 @@ class ReportRequestQueueGeneratorTest : public ::testing::Test {
 
   content::BrowserTaskEnvironment task_environment_;
   TestingProfileManager profile_manager_;
-#if BUILDFLAG(IS_ANDROID)
-  ReportingDelegateFactoryAndroid reporting_delegate_factory_;
-#else
   ReportingDelegateFactoryDesktop reporting_delegate_factory_;
-#endif
   BrowserReportGenerator browser_report_generator_;
   ReportRequestQueueGenerator report_request_queue_generator_;
   std::unique_ptr<base::HistogramTester> histogram_tester_;
@@ -301,8 +287,6 @@ TEST_F(ReportRequestQueueGeneratorTest, ChromePoliciesCollection) {
 
 // Android has only one profile which is always `active` and no extensions. So
 // we only check a subset of desktop tests.
-
-#if !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ReportRequestQueueGeneratorTest, GenerateReport) {
   auto idle_profile_names = CreateIdleProfiles();
@@ -380,7 +364,5 @@ TEST_F(ReportRequestQueueGeneratorTest, ProfileReportIsTooBig) {
 
   tester.ExpectTotalCount("Enterprise.CloudReporting.DroppedReportSize", 1);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace enterprise_reporting

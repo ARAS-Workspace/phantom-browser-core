@@ -20,10 +20,8 @@
 
 // TODO(jamescook): We probably shouldn't compile this class at all on Android.
 // See http://crbug.com/40351600
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/apps/chrome_app_delegate.h"
-#endif
 
 ChromeAppWindowClient::ChromeAppWindowClient() = default;
 
@@ -39,24 +37,16 @@ ChromeAppWindowClient* ChromeAppWindowClient::GetInstance() {
 extensions::AppWindow* ChromeAppWindowClient::CreateAppWindow(
     content::BrowserContext* context,
     const extensions::Extension* extension) {
-#if BUILDFLAG(IS_ANDROID)
-  return NULL;
-#else
   Profile* profile = Profile::FromBrowserContext(context);
   return new extensions::AppWindow(
       context, std::make_unique<ChromeAppDelegate>(profile, true), extension);
-#endif
 }
 
 std::unique_ptr<extensions::NativeAppWindow>
 ChromeAppWindowClient::CreateNativeAppWindow(
     extensions::AppWindow* window,
     extensions::AppWindow::CreateParams* params) {
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
   return base::WrapUnique(CreateNativeAppWindowImpl(window, *params));
-#endif
 }
 
 void ChromeAppWindowClient::OpenDevToolsWindow(

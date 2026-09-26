@@ -12,9 +12,7 @@
 #include "base/strings/string_util.h"
 #include "base/values.h"
 #include "build/buildflag.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/commerce/core/commerce_heuristics_data.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 #include "components/commerce/core/commerce_heuristics_data_metrics_helper.h"
 #include "components/commerce/core/pref_names.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
@@ -40,11 +38,6 @@ const CountryLocaleMap& GetAllowedCountryToLocaleMap() {
   // function is called. This gets around the "static initializers" problem.
   static const base::NoDestructor<CountryLocaleMap> allowed_map([] {
     CountryLocaleMap map;
-
-#if BUILDFLAG(IS_ANDROID)
-    map[&kCommerceMerchantViewer] = {{"us", {"en-us"}}};
-    map[&kPriceAnnotations] = {{"us", {"en-us"}}};
-#endif  // BUILDFLAG(IS_ANDROID)
 
     map[&kEnableDiscountInfoApi] = {{"us", {"en-us"}}};
 
@@ -76,7 +69,6 @@ constexpr base::FeatureParam<std::string> kCouponPartnerMerchantPattern{
     "\\b\\B"};
 
 const re2::RE2& GetRulePartnerMerchantPattern() {
-#if !BUILDFLAG(IS_ANDROID)
   auto* pattern_from_component =
       commerce_heuristics::CommerceHeuristicsData::GetInstance()
           .GetRuleDiscountPartnerMerchantPattern();
@@ -86,7 +78,6 @@ const re2::RE2& GetRulePartnerMerchantPattern() {
         CommerceHeuristicsDataMetricsHelper::HeuristicsSource::FROM_COMPONENT);
     return *pattern_from_component;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   re2::RE2::Options options;
   options.set_case_sensitive(false);
   static base::NoDestructor<re2::RE2> instance(
@@ -98,7 +89,6 @@ const re2::RE2& GetRulePartnerMerchantPattern() {
 }
 
 const re2::RE2& GetCouponPartnerMerchantPattern() {
-#if !BUILDFLAG(IS_ANDROID)
   auto* pattern_from_component =
       commerce_heuristics::CommerceHeuristicsData::GetInstance()
           .GetCouponDiscountPartnerMerchantPattern();
@@ -107,7 +97,6 @@ const re2::RE2& GetCouponPartnerMerchantPattern() {
           kCouponPartnerMerchantPattern.default_value) {
     return *pattern_from_component;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   re2::RE2::Options options;
   options.set_case_sensitive(false);
   static base::NoDestructor<re2::RE2> instance(
@@ -160,7 +149,7 @@ BASE_FEATURE(kShoppingAlternateServer, base::FEATURE_DISABLED_BY_DEFAULT);
 // TODO(crbug.com/406555154): Clean up this flag when discount on clank launched.
 const char kDiscountOnShoppyPageParam[] = "discount-on-shoppy-page";
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 const base::FeatureParam<bool> kDiscountOnShoppyPage{
     &kEnableDiscountInfoApi, kDiscountOnShoppyPageParam, true};
 #else
@@ -310,7 +299,6 @@ bool IsRegionLockedFeatureEnabled(const base::Feature& feature,
   return flag_enabled || region_launched;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 base::TimeDelta GetDiscountFetchDelay() {
   auto delay_from_component =
       commerce_heuristics::CommerceHeuristicsData::GetInstance()
@@ -334,5 +322,4 @@ bool IsNoDiscountMerchant(const GURL& url) {
   }
   return RE2::PartialMatch(url.host(), *pattern_from_component);
 }
-#endif
 }  // namespace commerce

@@ -26,13 +26,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-// Set the render host waiting time to 5s on Android, that's the same
-// as an "Application Not Responding" timeout.
-const int64_t kTimerDelaySeconds = 5;
-#else
 const int64_t kTimerDelaySeconds = 1;
-#endif
 
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.

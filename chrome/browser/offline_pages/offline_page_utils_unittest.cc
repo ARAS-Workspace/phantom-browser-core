@@ -47,11 +47,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/test_timeouts.h"
-#include "chrome/browser/download/android/mock_download_controller.h"
-#endif
-
 namespace offline_pages {
 namespace {
 
@@ -179,14 +174,6 @@ class OfflinePageUtilsTest : public testing::Test,
   TestingProfile profile_;
   std::unique_ptr<content::WebContents> web_contents_;
   base::test::ScopedFeatureList scoped_feature_list_;
-#if BUILDFLAG(IS_ANDROID)
-  android::MockDownloadController download_controller_;
-  // OfflinePageTabHelper instantiates PrefetchService which in turn requests a
-  // fresh GCM token automatically. This causes the request to be done
-  // synchronously instead of with a posted task.
-  instance_id::InstanceIDAndroid::ScopedBlockOnAsyncTasksForTesting
-      block_async_;
-#endif
 };
 
 OfflinePageUtilsTest::OfflinePageUtilsTest() = default;
@@ -215,17 +202,10 @@ void OfflinePageUtilsTest::SetUp() {
   // we should avoid this to be less surprising.
   CreateRequests();
 
-// This is needed in order to skip the logic to request storage permission.
-#if BUILDFLAG(IS_ANDROID)
-  DownloadControllerBase::SetDownloadControllerBase(&download_controller_);
-#endif
+  // This is needed in order to skip the logic to request storage permission.
 }
 
-void OfflinePageUtilsTest::TearDown() {
-#if BUILDFLAG(IS_ANDROID)
-  DownloadControllerBase::SetDownloadControllerBase(nullptr);
-#endif
-}
+void OfflinePageUtilsTest::TearDown() {}
 
 void OfflinePageUtilsTest::SavePage(
     const GURL& url,
@@ -392,13 +372,6 @@ TEST_F(OfflinePageUtilsTest, TestGetCachedOfflinePageSizeBetween) {
 }
 
 TEST_F(OfflinePageUtilsTest, TestGetCachedOfflinePageSizeNoPageInModel) {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40646823): Fix this test to run in < action_timeout()
-  // on the Android bots.
-  const base::test::ScopedRunLoopTimeout increased_run_timeout(
-      FROM_HERE, TestTimeouts::action_max_timeout());
-#endif  // BUILDFLAG(IS_ANDROID)
-
   clock()->Advance(base::Hours(3));
 
   // Get the size of cached offline pages between 01:00:00 and 03:00:00.
@@ -460,13 +433,8 @@ TEST_F(OfflinePageUtilsTest, TestGetCachedOfflinePageSizeEdgeCase) {
 }
 
 // Timeout on Android.  http://crbug.com/40635196
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_TestExtractOfflineHeaderValueFromNavigationEntry \
-  DISABLED_TestExtractOfflineHeaderValueFromNavigationEntry
-#else
 #define MAYBE_TestExtractOfflineHeaderValueFromNavigationEntry \
   TestExtractOfflineHeaderValueFromNavigationEntry
-#endif
 TEST_F(OfflinePageUtilsTest,
        MAYBE_TestExtractOfflineHeaderValueFromNavigationEntry) {
   std::unique_ptr<content::NavigationEntry> entry(

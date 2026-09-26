@@ -115,22 +115,9 @@ class SyncServiceFactoryTest : public testing::Test {
     datatypes.Put(syncer::WEB_APPS);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_ANDROID)
-    if (base::FeatureList::IsEnabled(
-            syncer::kNewTabPageCustomizationThemeSync)) {
-      datatypes.Put(syncer::THEMES);
-    }
-#else
     datatypes.Put(syncer::THEMES);
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-    if (base::FeatureList::IsEnabled(syncer::kSyncSearchEnginesAndroidLFF)) {
-      datatypes.Put(syncer::SEARCH_ENGINES);
-    }
-#else
     datatypes.Put(syncer::SEARCH_ENGINES);
-#endif  // BUILDFLAG(IS_ANDROID)
 
     datatypes.Put(syncer::SAVED_TAB_GROUP);
 
@@ -162,9 +149,7 @@ class SyncServiceFactoryTest : public testing::Test {
     datatypes.Put(syncer::USER_CONSENTS);
     datatypes.Put(syncer::SEND_TAB_TO_SELF);
     datatypes.Put(syncer::SHARING_MESSAGE);
-#if !BUILDFLAG(IS_ANDROID)
     datatypes.Put(syncer::WEBAUTHN_CREDENTIAL);
-#endif  // !BUILDFLAG(IS_ANDROID)
     if (base::FeatureList::IsEnabled(
             data_sharing::features::kDataSharingFeature)) {
       datatypes.Put(syncer::COLLABORATION_GROUP);
@@ -177,11 +162,6 @@ class SyncServiceFactoryTest : public testing::Test {
         datatypes.Put(syncer::SHARED_COMMENT);
       }
     }
-#if BUILDFLAG(IS_ANDROID)
-    if (base::FeatureList::IsEnabled(syncer::kWebApkBackupAndRestoreBackend)) {
-      datatypes.Put(syncer::WEB_APKS);
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
 
     // syncer::PLUS_ADDRESS and syncer::PLUS_ADDRESS_SETTING are excluded
     // because GoogleGroupsManagerFactory is null for testing and hence no
@@ -219,12 +199,10 @@ class SyncServiceFactoryTest : public testing::Test {
       datatypes.Put(syncer::THEMES_IOS);
     }
 
-#if !BUILDFLAG(IS_ANDROID) || !BUILDFLAG(ENABLE_WEBUI_NTP)
     if (base::FeatureList::IsEnabled(
             syncer::kNewTabPageCustomizationThemeSync)) {
       datatypes.Put(syncer::THEMES_ANDROID);
     }
-#endif
 
     if (base::FeatureList::IsEnabled(syncer::kSyncNotebook)) {
       datatypes.Put(syncer::NOTEBOOK);
@@ -298,10 +276,6 @@ TEST_F(SyncServiceFactoryTestWithCrossDeviceThemeFeatures,
   // THEMES_ANDROID is registered on desktop (via CrossDeviceThemeTracker) and
   // on Android (via NtpAndroidCustomBackgroundService), except on Desktop
   // Android where NTP theme sync is temporarily disabled (crbug.com/488439751).
-#if !BUILDFLAG(IS_ANDROID) || !BUILDFLAG(ENABLE_WEBUI_NTP)
   EXPECT_TRUE(types.Has(syncer::THEMES_ANDROID));
-#else
-  EXPECT_FALSE(types.Has(syncer::THEMES_ANDROID));
-#endif
   EXPECT_TRUE(types.Has(syncer::THEMES));
 }

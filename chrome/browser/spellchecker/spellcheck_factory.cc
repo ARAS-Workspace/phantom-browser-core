@@ -67,11 +67,7 @@ void SpellcheckServiceFactory::RegisterProfilePrefs(
       l10n_util::GetStringUTF8(IDS_SPELLCHECK_DICTIONARY));
   user_prefs->RegisterBooleanPref(
       spellcheck::prefs::kSpellCheckUseSpellingService, false);
-#if BUILDFLAG(IS_ANDROID)
-  uint32_t flags = PrefRegistry::NO_REGISTRATION_FLAGS;
-#else
   uint32_t flags = user_prefs::PrefRegistrySyncable::SYNCABLE_PREF;
-#endif
   user_prefs->RegisterBooleanPref(spellcheck::prefs::kSpellCheckEnable, true,
                                   flags);
 }

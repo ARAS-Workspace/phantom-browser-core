@@ -23,8 +23,6 @@ constexpr char kUnknown[] = "unknown";
 constexpr std::string_view kOs =
 #if BUILDFLAG(IS_APPLE)
     "mac";
-#elif BUILDFLAG(IS_ANDROID)
-    "android";
 #elif BUILDFLAG(IS_LINUX)
     "linux";
 #elif BUILDFLAG(IS_OPENBSD)
@@ -41,7 +39,7 @@ constexpr std::string_view kArch =
 #elif defined(ARCH_CPU_ARMEL)
     "arm";
 #elif defined(ARCH_CPU_ARM64)
-    "arm64";
+        "arm64";
 #elif defined(ARCH_CPU_MIPS64EL)
     "mips64el";
 #elif defined(ARCH_CPU_MIPSEL)

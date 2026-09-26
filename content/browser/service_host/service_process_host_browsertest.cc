@@ -341,10 +341,6 @@ IN_PROC_BROWSER_TEST_F(ServiceProcessHostBrowserTest, UtilityCheckIsTest) {
 }
 
 IN_PROC_BROWSER_TEST_F(ServiceProcessHostBrowserTest, Priority) {
-#if BUILDFLAG(IS_ANDROID)
-  // Process priority elevation is not supported on Android utility processes.
-  GTEST_SKIP();
-#else
   if (!base::Process::CanSetPriority()) {
     GTEST_SKIP()
         << "Setting process priority is not supported on this platform.";
@@ -362,7 +358,6 @@ IN_PROC_BROWSER_TEST_F(ServiceProcessHostBrowserTest, Priority) {
 #endif
   );
   EXPECT_EQ(base::Process::Priority::kUserBlocking, priority);
-#endif
 }
 
 }  // namespace content

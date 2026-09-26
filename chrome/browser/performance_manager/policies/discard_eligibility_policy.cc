@@ -15,12 +15,7 @@
 #include "components/url_matcher/url_util.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#else
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace performance_manager::policies {
 
@@ -182,14 +177,6 @@ CanDiscardResult DiscardEligibilityPolicy::CanDiscard(
 
   base::TimeDelta minimum_time_in_background =
       internal::kNonVisiblePagesUrgentProtectionTime;
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_desktop() ||
-      base::FeatureList::IsEnabled(
-          chrome::android::kProtectRecentlyVisibleTab)) {
-    minimum_time_in_background = base::Seconds(
-        chrome::android::kProtectRecentlyVisibleTabDuration.Get());
-  }
-#endif
 
   return CanDiscardWithCustomRecentVisibilityWindow(page_node, discard_reason,
                                                     minimum_time_in_background,
@@ -310,7 +297,6 @@ DiscardEligibilityPolicy::CanDiscardWithCustomRecentVisibilityWindow(
                                  CanDiscardResult::kProtected);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   {
     // Do not discard Desktop PWA windows. Preserve native-app experience.
     content::WebContents* web_contents = page_node->GetWebContents().get();
@@ -323,7 +309,6 @@ DiscardEligibilityPolicy::CanDiscardWithCustomRecentVisibilityWindow(
       }
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Only discard http(s) pages and internal pages to make sure that we don't
   // discard extensions or other PageNode that don't correspond to a tab.

@@ -238,17 +238,6 @@ TEST(PropertyTreeTest, UndoOverscroll) {
                                   &viewport_property_ids);  // overscroll_node
   transform_tree.UpdateTransforms(3, &viewport_property_ids);  // fixed_node
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, we expect the UndoOverscroll to not run.
-  gfx::Transform expected;
-  expected.MakeIdentity();
-  EXPECT_TRANSFORM_EQ(expected,
-                      transform_tree.MutableNode(fixed_node.id).to_parent);
-
-  gfx::RectF expected_clip_rect(clip_rect);
-  EXPECT_EQ(clip_tree.MutableNode(viewport_property_ids.outer_clip).clip,
-            expected_clip_rect);
-#else
   gfx::Transform expected;
   expected.Translate(overscroll_offset.OffsetFromOrigin());
   EXPECT_TRANSFORM_EQ(expected,
@@ -258,7 +247,6 @@ TEST(PropertyTreeTest, UndoOverscroll) {
   expected_clip_rect.set_height(clip_rect.height() + overscroll_offset.y());
   EXPECT_EQ(clip_tree.MutableNode(viewport_property_ids.outer_clip).clip,
             expected_clip_rect);
-#endif
 }
 
 TEST(PropertyTreeTest,
@@ -308,37 +296,11 @@ TEST(PropertyTreeTest,
 
   const TransformNode& node = transform_tree.Node(overscroll_transform.id);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Create expected transform.
-  gfx::Transform expected;
-
-  // Pivot in physical space.
-  gfx::PointF pivot(inner_scroll.container_bounds.width(),
-                    inner_scroll.container_bounds.height());
-
-  // Scale pivot to content space.
-  pivot.Scale(1.f / kPageScale);
-
-  // Apply pivot logic.
-  expected.Translate(pivot.OffsetFromOrigin());
-  const float expected_scale_x =
-      1.f +
-      std::abs(kElasticOverscroll.x()) / inner_scroll.container_bounds.width();
-  const float expected_scale_y =
-      1.f +
-      std::abs(kElasticOverscroll.y()) / inner_scroll.container_bounds.height();
-  expected.Scale(expected_scale_x, expected_scale_y);
-  expected.Translate(-pivot.OffsetFromOrigin());
-
-  EXPECT_TRANSFORM_EQ(expected, node.to_parent);
-
-#else
   // Non-Android: expect a simple translate by overscroll.
   gfx::Transform expected;
   expected.Translate(-kElasticOverscroll.x(), -kElasticOverscroll.y());
 
   EXPECT_TRANSFORM_EQ(expected, node.to_parent);
-#endif
 }
 
 // Tests that elastic overscroll is applied correctly when the content is
@@ -395,23 +357,10 @@ TEST(PropertyTreeTest, ElasticOverscrollWithScrollOffset) {
 
   const TransformNode& node = transform_tree.Node(transform_node.id);
 
-#if BUILDFLAG(IS_ANDROID)
-  constexpr float kEpsilon = 0.1f;
-
-  // Verify the stretch anchors to the bottom of the viewport (y=100).
-  gfx::PointF content_bottom(0, 200);
-  EXPECT_NEAR(100.0f, node.to_parent.MapPoint(content_bottom).y(), kEpsilon);
-
-  // Verify the top is stretched past the standard rigid translation.
-  // Rigid: Scroll(-100) + Overscroll(-50) = -150.
-  gfx::PointF content_top(0, 0);
-  EXPECT_LT(node.to_parent.MapPoint(content_top).y(), -150.0f - kEpsilon);
-#else
   // Verify standard translation includes both scroll and overscroll.
   gfx::Transform expected;
   expected.Translate(0, -150);
   EXPECT_TRANSFORM_EQ(expected, node.to_parent);
-#endif
 }
 
 TEST(PropertyTreeTest, TransformsWithFlattening) {

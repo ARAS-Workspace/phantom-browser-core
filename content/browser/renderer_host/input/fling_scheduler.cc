@@ -56,11 +56,7 @@ bool FlingScheduler::ProgressFlingOnFlingStart() {
 }
 
 bool FlingScheduler::ShouldUseMobileFlingCurve() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif
 }
 
 gfx::Vector2dF FlingScheduler::GetPixelsPerInch(

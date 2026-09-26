@@ -85,10 +85,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/view_android.h"
-#endif
-
 using content::BrowserThread;
 using content::WebContents;
 
@@ -793,12 +789,7 @@ ChromeUserPopulation ClientSideDetectionHost::GetUserPopulation() {
 
 safe_browsing::credit_card_form::ReferringApp
 ClientSideDetectionHost::GetReferringApp() const {
-#if BUILDFLAG(IS_ANDROID)
-  return safe_browsing::credit_card_form::FromReferringAppInfo(
-      delegate_->GetReferringAppInfo(web_contents()));
-#else
   return safe_browsing::credit_card_form::kNoReferringApp;
-#endif
 }
 
 void ClientSideDetectionHost::RegisterPermissionRequestManager() {
@@ -1271,19 +1262,6 @@ ClientSideDetectionHost::DetermineVisualFeaturesExtraction() {
       can_extract_visual_features_result;
   content::RenderWidgetHostView* view =
       web_contents()->GetRenderWidgetHostView();
-#if BUILDFLAG(IS_ANDROID)
-  gfx::Size size;
-  // native view can be null in tests.
-  if (view && view->GetNativeView()) {
-    gfx::SizeF viewport = view->GetNativeView()->viewport_size();
-    viewport_width = static_cast<int>(viewport.width());
-    viewport_height = static_cast<int>(viewport.height());
-    size = gfx::Size(viewport_width, viewport_height);
-  }
-  can_extract_visual_features_result = visual_utils::CanExtractVisualFeatures(
-      IsEnhancedProtectionEnabled(),
-      web_contents()->GetBrowserContext()->IsOffTheRecord(), size);
-#else
   gfx::Size size;
   if (view) {
     size = view->GetVisibleViewportSize();
@@ -1294,7 +1272,6 @@ ClientSideDetectionHost::DetermineVisualFeaturesExtraction() {
       IsEnhancedProtectionEnabled(),
       web_contents()->GetBrowserContext()->IsOffTheRecord(), size,
       zoom::ZoomController::GetZoomLevelForWebContents(web_contents()));
-#endif
   base::UmaHistogramSparse("SBClientPhishing.Viewport.Width", viewport_width);
   base::UmaHistogramSparse("SBClientPhishing.Viewport.Height", viewport_height);
 

@@ -195,15 +195,7 @@ TEST(StackCopierSignalTest, MAYBE_CopyStackDelegateInvoked) {
 // Limit to 32-bit Android, which is the platform we care about for this
 // functionality. The test is broken on too many other varied platforms to try
 // to selectively disable.
-#if !(BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_32_BITS))
 #define MAYBE_CopyStackFromOtherThread DISABLED_CopyStackFromOtherThread
-#elif BUILDFLAG(IS_LINUX)
-// We don't support getting the stack base address on Linux, and thus can't
-// copy the stack. // https://crbug.com/1394278
-#define MAYBE_CopyStackFromOtherThread DISABLED_CopyStackFromOtherThread
-#else
-#define MAYBE_CopyStackFromOtherThread CopyStackFromOtherThread
-#endif
 TEST(StackCopierSignalTest, MAYBE_CopyStackFromOtherThread) {
   StackBuffer stack_buffer(/* buffer_size = */ 1 << 20);
   std::ranges::fill(stack_buffer.as_span(), 0);

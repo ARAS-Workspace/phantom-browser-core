@@ -40,12 +40,8 @@ bool IsExtendedPSLMatch(const StoredCredential& form,
                         const PasswordFormDigest& digest,
                         const base::flat_set<std::string>& psl_extensions) {
   DCHECK_NE(GetMatchResult(form, digest), MatchResult::NO_MATCH);
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return affiliations::IsExtendedPublicSuffixDomainMatch(
       GURL(form.url), GURL(digest.url), psl_extensions);
-#endif
 }
 
 // Do post-processing on forms and mark PSL matches as such.

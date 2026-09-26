@@ -91,12 +91,8 @@ class ProfileDestroyerTest : public testing::Test,
   // Destroying profile is still not universally supported. We need to disable
   // some tests, because it isn't possible to start destroying the profile.
   bool IsScopedProfileKeepAliveSupported() {
-#if BUILDFLAG(IS_ANDROID)
-    return false;
-#else
     return base::FeatureList::IsEnabled(
         features::kDestroyProfileOnBrowserClose);
-#endif
   }
 
  protected:

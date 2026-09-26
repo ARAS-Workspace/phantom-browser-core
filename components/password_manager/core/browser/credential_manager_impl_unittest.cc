@@ -424,13 +424,8 @@ class CredentialManagerImplTest : public testing::Test,
       const PasswordFormDigest& form,
       const std::vector<std::string>& affiliated_realms,
       const std::vector<std::string>& grouped_realms = {}) {
-#if BUILDFLAG(IS_ANDROID)
-    store_->SetAffiliatedAndGroupedRealms(form.signon_realm, affiliated_realms,
-                                          grouped_realms);
-#else
     mock_match_helper_->ExpectCallToGetAffiliatedAndGrouped(
         form, affiliated_realms, grouped_realms);
-#endif
   }
 
  protected:
@@ -1608,11 +1603,9 @@ TEST_P(CredentialManagerImplTest,
   PasswordFormDigest digest = cm_service_impl_->GetSynthesizedFormForOrigin();
   digest.url = HttpURLFromHttps(digest.url);
   digest.signon_realm = digest.url.spec();
-#if !BUILDFLAG(IS_ANDROID)
   // The second call happens for HTTP as the migration is triggered.
   mock_match_helper_->ExpectCallToGetAffiliatedAndGrouped(digest,
                                                           affiliated_realms);
-#endif
 
   std::vector<GURL> federations;
   ExpectZeroClickSignInFailure(CredentialMediationRequirement::kSilent, true,
@@ -1886,7 +1879,6 @@ TEST_P(CredentialManagerImplTest, StorePasswordCredentialStartsLeakDetection) {
 
 INSTANTIATE_TEST_SUITE_P(All, CredentialManagerImplTest, testing::Bool());
 
-#if !BUILDFLAG(IS_ANDROID)
 class CredentialManagerImplTestWithActorLoginPermissions
     : public CredentialManagerImplTest {
  public:
@@ -2037,7 +2029,6 @@ TEST_P(CredentialManagerImplTestWithActorLoginPermissions,
 INSTANTIATE_TEST_SUITE_P(All,
                          CredentialManagerImplTestWithActorLoginPermissions,
                          testing::Bool());
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_P(CredentialManagerImplTest, ReauthAfterAccountSelection) {
   ON_CALL(*client_, IsReauthBeforeFillingRequired).WillByDefault(Return(true));

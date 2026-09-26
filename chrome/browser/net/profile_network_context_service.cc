@@ -110,15 +110,11 @@
 #include "net/ssl/client_cert_store_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/ssl/client_cert_store_empty.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/common/constants.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/enterprise/client_certificates/certificate_provisioning_service_factory.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
@@ -293,7 +289,7 @@ void UpdateCookieSettings(Profile* profile, ContentSettingsType type) {
       });
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 std::unique_ptr<net::ClientCertStore> GetWrappedCertStore(
     Profile* profile,
     std::unique_ptr<net::ClientCertStore> platform_store) {
@@ -318,7 +314,7 @@ std::unique_ptr<net::ClientCertStore> GetWrappedCertStore(
       profile_provisioning_service, browser_provisioning_service,
       std::move(platform_store));
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 bool IsValidDNSConstraint(std::string_view possible_dns_constraint) {
   return base::IsStringASCII(possible_dns_constraint) &&
@@ -1112,15 +1108,6 @@ ProfileNetworkContextService::CreateClientCertStore() {
 #elif BUILDFLAG(IS_MAC)
   return GetWrappedCertStore(profile_,
                              std::make_unique<net::ClientCertStoreMac>());
-#elif BUILDFLAG(IS_ANDROID)
-  // On Android client we don't use a platform client cert store, but we still
-  // need to use Chrome profile and browser level stores, so we wrap the empty
-  // store to use it as a platform cert store.
-  // The certificate matching for android will first try to find a matching cert
-  // in the profile/browser stores, and if none is found, it will proceed with
-  // the OS as part of the call to show the cert selection dialog.
-  return GetWrappedCertStore(profile_,
-                             std::make_unique<net::ClientCertStoreEmpty>());
 #else
 #error Unknown platform.
 #endif

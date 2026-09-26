@@ -102,13 +102,9 @@ TEST_F(WebsiteSettingsRegistryTest, Properties) {
             info->default_value_pref_name());
   ASSERT_TRUE(info->initial_default_value().is_int());
   EXPECT_EQ(999, info->initial_default_value().GetInt());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(PrefRegistry::LOSSY_PREF, info->GetPrefRegistrationFlags());
-#else
   EXPECT_EQ(PrefRegistry::LOSSY_PREF |
                 user_prefs::PrefRegistrySyncable::SYNCABLE_PREF,
             info->GetPrefRegistrationFlags());
-#endif
   EXPECT_EQ(WebsiteSettingsInfo::TOP_ORIGIN_ONLY_SCOPE, info->scoping_type());
   EXPECT_EQ(WebsiteSettingsInfo::INHERIT_IN_INCOGNITO,
             info->incognito_behavior());

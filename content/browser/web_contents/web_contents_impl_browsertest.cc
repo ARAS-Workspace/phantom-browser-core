@@ -444,7 +444,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest,
 }
 
 // Crashes under ThreadSanitizer, http://crbug.com/356758.
-#if BUILDFLAG(IS_ANDROID) || defined(THREAD_SANITIZER)
+#if defined(THREAD_SANITIZER)
 #define MAYBE_GetSizeForNewRenderView DISABLED_GetSizeForNewRenderView
 #else
 #define MAYBE_GetSizeForNewRenderView DISABLED_GetSizeForNewRenderView
@@ -1115,12 +1115,8 @@ struct FirstVisuallyNonEmptyPaintObserver : public WebContentsObserver {
 };
 
 // See: http://crbug.com/395664
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FirstVisuallyNonEmptyPaint DISABLED_FirstVisuallyNonEmptyPaint
-#else
 // http://crbug.com/398471
 #define MAYBE_FirstVisuallyNonEmptyPaint DISABLED_FirstVisuallyNonEmptyPaint
-#endif
 IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest,
                        MAYBE_FirstVisuallyNonEmptyPaint) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1243,55 +1239,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, ChangePageScale) {
     observer.WaitForPageScaleUpdate();
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Test that when navigating between pages with the same non-one initial scale,
-// the browser tracks the correct scale value.
-// This test is only relevant for Android, since desktop would always have one
-// as the initial scale.
-IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest,
-                       SameInitialScaleAcrossNavigations) {
-  // Scale value comparisons don't need to be precise.
-  constexpr double kEpsilon = 0.01;
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-  const GURL url(embedded_test_server()->GetURL("/title1.html"));
-  auto* contents = static_cast<WebContentsImpl*>(shell()->web_contents());
-
-  // Navigate to a page with a non-one initial scale, then determine what the
-  // renderer and browser each think the scale is.
-  EXPECT_TRUE(NavigateToURL(shell(), url));
-  double initial_renderer_scale_1 =
-      EvalJs(contents, "window.visualViewport.scale").ExtractDouble();
-  double initial_browser_scale_1 =
-      contents->GetPrimaryPage().GetPageScaleFactor();
-
-  // Now navigate to another page and record the scales again. Note that this
-  // navigation could reuse the RenderFrameHost and in that case the renderer
-  // will not inform the browser of the scale again. This was the case in
-  // https://crbug.com/1301879
-  const auto rfh_id_1 = contents->GetPrimaryMainFrame()->GetGlobalId();
-  EXPECT_TRUE(NavigateToURL(shell(), url));
-  const auto rfh_id_2 = contents->GetPrimaryMainFrame()->GetGlobalId();
-  SCOPED_TRACE(testing::Message()
-               << "CanSameSiteMainFrameNavigationsChangeRenderFrameHosts = "
-               << CanSameSiteMainFrameNavigationsChangeRenderFrameHosts());
-  SCOPED_TRACE(testing::Message()
-               << "Did change RenderFrameHost? " << (rfh_id_1 != rfh_id_2));
-  double initial_renderer_scale_2 =
-      EvalJs(contents, "window.visualViewport.scale").ExtractDouble();
-  double initial_browser_scale_2 =
-      contents->GetPrimaryPage().GetPageScaleFactor();
-
-  // Ensure both pages are scaled to the same non-one value.
-  ASSERT_LT(initial_renderer_scale_1, 1.0 - kEpsilon);
-  ASSERT_NEAR(initial_renderer_scale_1, initial_renderer_scale_2, kEpsilon);
-
-  // Test that the browser and renderer agree on the scale.
-  EXPECT_NEAR(initial_browser_scale_1, initial_renderer_scale_1, kEpsilon);
-  EXPECT_NEAR(initial_browser_scale_2, initial_renderer_scale_2, kEpsilon);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Test that a direct navigation to a view-source URL works.
 IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, ViewSourceDirectNavigation) {
@@ -4703,16 +4650,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, ToggleFullscreen) {
   EXPECT_TRUE(IsInFullscreen());
 
   // Full document orientation lock is only available on Android.
-#if BUILDFLAG(IS_ANDROID)
-  {
-    TitleWatcher title_watcher(web_contents, u"portrait_lock_fulfilled");
-    EXPECT_TRUE(ExecJs(main_frame,
-                       "screen.orientation.lock('portrait').then(() => "
-                       "{document.title = 'portrait_lock_fulfilled'});"));
-    std::u16string title = title_watcher.WaitAndGetTitle();
-    ASSERT_EQ(title, u"portrait_lock_fulfilled");
-  }
-#endif
 
   // Exiting fullscreen should update the title. This should not block
   // subsequent request to re-enter fullscreen.
@@ -4952,7 +4889,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, InnerWebContentsVisibility) {
 // Not supported on Android. Android assumes that WebContentsViewAndroid is
 // always the view of a WebContents, whereas an inner WebContents has a
 // WebContentsViewChildFrame as its view.
-#if !BUILDFLAG(IS_ANDROID)
 class UnownedInnerWebContentsBrowserTest : public WebContentsImplBrowserTest {
  public:
   UnownedInnerWebContentsBrowserTest()
@@ -6048,8 +5984,6 @@ IN_PROC_BROWSER_TEST_F(UnownedInnerWebContentsBrowserTest,
   EXPECT_EQ(outer_main_rwh,
             inner_wc_impl->GetFocusedRenderWidgetHost(inner_rwh));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // SurfaceEmbedConnectorWebContentsBrowserTest tests are similar to
 // UnownedInnerWebContentsBrowserTest but for SurfaceEmbedConnector instead of
@@ -7510,7 +7444,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest,
   ASSERT_EQ(url_a, web_contents->GetLastCommittedURL());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // https://crbug.com/1402816. This test verifies that when mouse down is on main
 // frame and mouse up is on OOF iframe, the mouse up event is delivered to the
 // main frame as well to clear cached mouse states including autoscroll
@@ -7668,7 +7601,6 @@ IN_PROC_BROWSER_TEST_F(
             EvalJs(web_contents, "document.getElementById('input1').value")
                 .ExtractString());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, FrameCount) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -8129,7 +8061,7 @@ class DidChangeVerticalScrollDirectionObserver : public WebContentsObserver {
 // scroll direction has changed and that it includes the correct details.
 // TODO(crbug.com/40862270): This is flaky on the Mac10.14 bot.
 // TODO(crbug.com/401544068): This is failing on Android bots.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_DidChangeVerticalScrollDirection \
   DISABLED_DidChangeVerticalScrollDirection
 #else
@@ -8486,7 +8418,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsDiscardBrowserTest, DiscardRetainsFavicon) {
   EXPECT_THAT(favicon_url, contents->GetFaviconURLs()[0]->icon_url);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class WebContentsImplBrowserTestWindowControlsOverlay
     : public WebContentsImplBrowserTest {
  public:
@@ -8768,7 +8699,6 @@ IN_PROC_BROWSER_TEST_F(
 
   ValidateWindowsControlOverlayState(web_contents, bounding_client_rect, 70);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class RenderFrameCreatedObserver : public WebContentsObserver {
  public:

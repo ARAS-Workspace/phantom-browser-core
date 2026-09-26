@@ -35,14 +35,12 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/image/image_skia.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/media/webrtc/media_stream_focus_delegate.h"
 #include "chrome/grit/branded_strings.h"
 #include "components/vector_icons/vector_icons.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/gfx/color_palette.h"
 #include "ui/gfx/paint_vector_icon.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "base/strings/utf_string_conversions.h"
@@ -266,9 +264,7 @@ class MediaStreamCaptureIndicator::UIDelegate : public content::MediaStreamUI {
       : device_usage_(device_usage),
         devices_(devices),
         ui_(std::move(ui)),
-#if !BUILDFLAG(IS_ANDROID)
         focus_delegate_(web_contents),
-#endif
         application_title_(std::move(application_title)),
         stop_callback_id_(MediaStreamCaptureIndicator::g_stop_callback_id_++) {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -340,14 +336,12 @@ class MediaStreamCaptureIndicator::UIDelegate : public content::MediaStreamUI {
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   void SetFocus(const content::DesktopMediaID& media_id,
                 bool focus,
                 bool is_from_microtask,
                 bool is_from_timer) override {
     focus_delegate_.SetFocus(media_id, focus, is_from_microtask, is_from_timer);
   }
-#endif
 
   void StopCaptureDueToPolicy(content::WebContents* contents) {
     if (device_usage_) {
@@ -360,9 +354,7 @@ class MediaStreamCaptureIndicator::UIDelegate : public content::MediaStreamUI {
   base::WeakPtr<WebContentsDeviceUsage> device_usage_;
   const blink::mojom::StreamDevices devices_;
   const std::unique_ptr<::MediaStreamUI> ui_;
-#if !BUILDFLAG(IS_ANDROID)
   MediaStreamFocusDelegate focus_delegate_;
-#endif
   const std::u16string application_title_;
   bool started_ = false;
   const int stop_callback_id_;
@@ -817,9 +809,6 @@ void MediaStreamCaptureIndicator::GetStatusTrayIconInfo(
     bool video,
     gfx::ImageSkia* image,
     std::u16string* tool_tip) {
-#if BUILDFLAG(IS_ANDROID)
-  NOTREACHED();
-#else   // !BUILDFLAG(IS_ANDROID)
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DCHECK(audio || video);
   DCHECK(image);
@@ -845,5 +834,4 @@ void MediaStreamCaptureIndicator::GetStatusTrayIconInfo(
 
   *tool_tip = l10n_util::GetStringUTF16(message_id);
   *image = gfx::CreateVectorIcon(*icon, 16, gfx::kGoogleGrey700);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

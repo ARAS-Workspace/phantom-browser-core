@@ -38,9 +38,6 @@
 
 #include "base/test/malloc_wrapper.h"
 #endif
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 
@@ -147,14 +144,7 @@ class OutOfMemoryDeathTest : public OutOfMemoryTest {
 #endif
 
   // These tests don't work properly on old x86 Android; crbug.com/1181112
-  bool ShouldSkipTest() {
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_X86)
-    return base::android::android_info::sdk_int() <
-           base::android::android_info::SDK_VERSION_NOUGAT;
-#else
-    return false;
-#endif
-  }
+  bool ShouldSkipTest() { return false; }
 };
 
 TEST_F(OutOfMemoryDeathTest, New) {
@@ -339,7 +329,7 @@ TEST_F(OutOfMemoryDeathTest, ViaSharedLibraries) {
 #endif  // BUILDFLAG(IS_LINUX)
 
 // Android doesn't implement posix_memalign().
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(OutOfMemoryDeathTest, Posix_memalign) {
   // Grab the return value of posix_memalign to silence a compiler warning
   // about unused return values. We don't actually care about the return
@@ -350,7 +340,7 @@ TEST_F(OutOfMemoryDeathTest, Posix_memalign) {
     EXPECT_EQ(ENOMEM, posix_memalign(&ptr, 8, test_size_));
   });
 }
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_MAC)
 
@@ -534,33 +524,6 @@ TEST_F(OutOfMemoryHandledTest, NewReleasesReservation) {
 }
 #endif  // defined(ARCH_CPU_32_BITS) && BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-
-// Android's allocator does not allow overcommits, so very large
-// UncheckedMallocs will yield OOM errors.
-// TODO(crbug.com/40143202): Fails on some Android bots.
-#define MAYBE_UncheckedMallocDies DISABLED_UncheckedMallocDies
-#define MAYBE_UncheckedCallocDies DISABLED_UncheckedCallocDies
-TEST_F(OutOfMemoryDeathTest, MAYBE_UncheckedMallocDies) {
-  ASSERT_OOM_DEATH({
-    SetUpInDeathAssert();
-    void* data;
-    std::ignore = base::UncheckedMalloc(test_size_, &data);
-    // Death expected here.
-  });
-}
-
-TEST_F(OutOfMemoryDeathTest, MAYBE_UncheckedCallocDies) {
-  ASSERT_OOM_DEATH({
-    SetUpInDeathAssert();
-    void* data;
-    std::ignore = base::UncheckedCalloc(1, test_size_, &data);
-    // Death expected here.
-  });
-}
-
-#else
-
 TEST_F(OutOfMemoryHandledTest, UncheckedMalloc) {
   void* ptr;
   EXPECT_TRUE(base::UncheckedMalloc(kSafeMallocSize, &ptr));
@@ -593,7 +556,6 @@ TEST_F(OutOfMemoryHandledTest, UncheckedCalloc) {
   EXPECT_TRUE(ptr == nullptr);
 }
 
-#endif  // BUILDFLAG(IS_ANDROID)
 #endif  // !BUILDFLAG(IS_OPENBSD) && PA_BUILDFLAG(USE_ALLOCATOR_SHIM) &&
         // !PA_BUILDFLAG(MEMORY_TOOL_REPLACES_ALLOCATOR)
 

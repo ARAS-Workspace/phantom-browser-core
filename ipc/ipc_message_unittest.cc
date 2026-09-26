@@ -184,11 +184,7 @@ TEST(IPCMessageIntegrity, ReadVectorNegativeSize) {
   EXPECT_FALSE(ReadParam(&m, &iter, &vec));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ReadVectorTooLarge1 DISABLED_ReadVectorTooLarge1
-#else
 #define MAYBE_ReadVectorTooLarge1 ReadVectorTooLarge1
-#endif
 TEST(IPCMessageIntegrity, MAYBE_ReadVectorTooLarge1) {
   // This was BUG 1006367. This is the large but positive length case. Again
   // we try to hit the non-specialized case vector<P>.

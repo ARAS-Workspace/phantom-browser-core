@@ -17,26 +17,9 @@ namespace viz {
 
 FrameDeadlineDecider::FrameDeadlineDecider(
     bool use_platform_preferred_deadlines)
-    : max_non_interactive_idle_duration_(
-#if BUILDFLAG(IS_ANDROID)
-          features::kAndroidCustomFrameDeadlineMaxNonInteractiveIdleDuration
-              .Get()
-#else
-          base::Milliseconds(50)
-#endif
-              ),
-      max_interactive_idle_duration_(
-#if BUILDFLAG(IS_ANDROID)
-          features::kAndroidCustomFrameDeadlineMaxInteractionIdleDuration.Get()
-#else
-          base::Seconds(3)
-#endif
-              ),
-#if BUILDFLAG(IS_ANDROID)
-      strategy_(features::kAndroidCustomFrameDeadlineSequenceStrategy.Get()),
-#endif
-      use_platform_preferred_deadlines_(use_platform_preferred_deadlines) {
-}
+    : max_non_interactive_idle_duration_(base::Milliseconds(50)),
+      max_interactive_idle_duration_(base::Seconds(3)),
+      use_platform_preferred_deadlines_(use_platform_preferred_deadlines) {}
 
 FrameDeadlineDecider::~FrameDeadlineDecider() = default;
 
@@ -84,10 +67,6 @@ FrameDeadlineDecider::QueryResult FrameDeadlineDecider::QueryDeadline(
   }
 
   int presentation_offset = 0;
-#if BUILDFLAG(IS_ANDROID)
-  presentation_offset =
-      features::kAndroidCustomFrameDeadlinePresentationOffset.Get();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // num_buffers * vsync_interval is the maximum presentation interval we would
   // want to target. Since going beyond this threshold means frames would now

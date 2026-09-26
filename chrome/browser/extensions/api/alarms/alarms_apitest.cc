@@ -108,11 +108,7 @@ IN_PROC_BROWSER_TEST_F(AlarmsApiTest, IncognitoSpanning) {
 }
 
 // TODO(crbug.com/451193827): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Count DISABLED_Count
-#else
 #define MAYBE_Count Count
-#endif
 IN_PROC_BROWSER_TEST_F(AlarmsApiTest, MAYBE_Count) {
   EXPECT_TRUE(RunExtensionTest("alarms/count")) << message_;
 }

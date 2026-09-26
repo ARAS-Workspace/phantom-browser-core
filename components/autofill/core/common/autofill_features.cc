@@ -21,15 +21,8 @@ namespace autofill::features {
 // but only in certain countries on mobile.
 // Note that even on desktop, the Wallet private passes integration is only
 // launched outside of WALLET_UNSUPPORTED_COUNTRIES.
-#if BUILDFLAG(IS_ANDROID)
-#define DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(feature_name)           \
-  BASE_FEATURE_WITH_COUNTRY_RESTRICTIONS(feature_name,                         \
-                                         base::FEATURE_DISABLED_FOR_COUNTRIES, \
-                                         WALLET_UNSUPPORTED_COUNTRIES)
-#else
 #define DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(feature_name) \
   BASE_FEATURE(feature_name, base::FEATURE_ENABLED_BY_DEFAULT)
-#endif
 
 BASE_FEATURE(kActorFormFillingServiceEnableAddress,
              base::FEATURE_ENABLED_BY_DEFAULT);
@@ -184,19 +177,9 @@ BASE_FEATURE(kAutofillAiAlwaysTriggerServerModel,
 // If enabled Autofill AI becomes available by default and the previous enable
 // toggle controls whether online model runs and MQLS logging are allowed.
 // TODO(crbug.com/440488776): Remove once clean up happens.
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(kAutofillAiAvailableByDefault);
-#endif
 
 // If enabled, AutofillAi entities will be deduped on every major milestone.
 DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(kAutofillAiDedupeEntities);
-
-#if BUILDFLAG(IS_ANDROID)
-// When enabled, the entity save/update prompt displays an edit button that
-// opens the entity editor on click.
-BASE_FEATURE(kAutofillAiEditEntitiesFromSaveUpdatePrompt,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // When enabled, a HaTS survey is shown after a walletable suggestion is
 // displayed and the form submitted. The survey does not require the suggestion
@@ -339,34 +322,10 @@ BASE_FEATURE_PARAM(bool,
 // If enabled, AutofillAi supports shipment entities.
 BASE_FEATURE(kAutofillAiShipment, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID)
-// If enabled, the user is notified about a failure to upstream data to Wallet
-// via a dialog instead of a snackbar.
-BASE_FEATURE(kAutofillAiShowDialogInSettingsWhenUpstreamingFails,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, a loading dialog is shown to the user during the time their data
-// is fetched from the server for personal context entities.
-BASE_FEATURE(kAutofillAiShowPersonalContextFillingYourInfoDialog,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, a loading dialog is shown to the user during the time their data
-// is fetched from the server for server wallet entities.
-BASE_FEATURE(kAutofillAiShowServerWalletFillingYourInfoDialog,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Controls whether a banner is shown in settings when wallet data sharing is
 // disabled.
 BASE_FEATURE(kAutofillAiShowWalletDisabledBanner,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-// If enabled, the entity editor on Android uses the date picker from the
-// material design library instead of the ad-hoc date picker implementation.
-BASE_FEATURE(kAutofillAiUseMaterialDatePickerInEntityEditor,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // If enabled, the client may trigger the server model for AutofillAI type
 // predictions using Private AI Compute.
@@ -498,14 +457,6 @@ BASE_FEATURE(kAutofillAndroidDisableSuggestionsOnJSFocus,
 // TODO(crbug.com/438125774): Remove when launched.
 BASE_FEATURE(kAutofillAndroidKeyboardAccessoryDynamicPositioning,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-// If enabled, on Android, hovering over an Autofill suggestion in the keyboard
-// accessory triggers a preview of the suggestion.
-// TODO(crbug.com/542535472): Remove when launched.
-BASE_FEATURE(kAutofillAndroidKeyboardAccessoryHoverPreview,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Feature flag for kAutofillAtMemory.
 BASE_FEATURE(kAutofillAtMemory, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -732,13 +683,6 @@ BASE_FEATURE(kAutofillEnableNonAffiliatedLoyaltyCardsFilling,
 // When enabled, Autofill will use heuristics to identify OTP fields.
 BASE_FEATURE(kAutofillEnableOneTimeCodeHeuristics,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-// Controls if Chrome Autofill UI surfaces ignore touch events if something is
-// fully or partially obscuring the Chrome window.
-BASE_FEATURE(kAutofillEnableSecurityTouchEventFilteringAndroid,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Kill switch: If enabled, `AutofillField` may not suppress suggestions on
 // field that has autocomplete=unrecognized attribute.
@@ -1057,12 +1001,7 @@ BASE_FEATURE(kAutofillUseStructuralSignatureInsteadOfSecondary,
 // TODO(crbug.com/371933424). Clean up when launched, if not used for Autofill
 // experiments.
 BASE_FEATURE(kFieldClassificationModelCaching,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 // When enabled, a HaTS survey is shown after the user visited "Contact info"
 // settings page.

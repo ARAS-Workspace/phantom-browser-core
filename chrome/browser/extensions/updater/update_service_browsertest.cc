@@ -570,12 +570,7 @@ class PolicyUpdateServiceTest : public ExtensionUpdateClientBaseTest {
 // Tests that if CheckForExternalUpdates() fails, then we retry reinstalling
 // corrupted policy extensions. For example: if network is unavailable,
 // CheckForExternalUpdates() will fail.
-#if BUILDFLAG(IS_ANDROID)
-// TODO(https://crbug.com/469417243): Fails on desktop android.
-#define MAYBE_FailedUpdateRetries DISABLED_FailedUpdateRetries
-#else
 #define MAYBE_FailedUpdateRetries FailedUpdateRetries
-#endif
 IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest, MAYBE_FailedUpdateRetries) {
   ExtensionRegistry* registry = ExtensionRegistry::Get(profile());
   ContentVerifier* verifier =
@@ -641,12 +636,7 @@ IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest, MAYBE_FailedUpdateRetries) {
   EXPECT_EQ(disable_reason::DISABLE_CORRUPTED, disabled.FindInt("reason"));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(https://crbug.com/469417243): Fails on desktop android.
-#define MAYBE_Backoff DISABLED_Backoff
-#else
 #define MAYBE_Backoff Backoff
-#endif
 IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest, MAYBE_Backoff) {
   ExtensionRegistry* registry = ExtensionRegistry::Get(profile());
   ContentVerifier* verifier =
@@ -706,13 +696,8 @@ IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest, MAYBE_Backoff) {
 }
 
 // Also flaky on desktop Android. Crashes during test shutdown in ~CrxInstaller.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PRE_PolicyCorruptedOnStartup DISABLED_PRE_PolicyCorruptedOnStartup
-#define MAYBE_PolicyCorruptedOnStartup DISABLED_PolicyCorruptedOnStartup
-#else
 #define MAYBE_PRE_PolicyCorruptedOnStartup PRE_PolicyCorruptedOnStartup
 #define MAYBE_PolicyCorruptedOnStartup PolicyCorruptedOnStartup
-#endif
 // We want to test what happens at startup with a corruption-disabled policy
 // force installed extension. So we set that up in the PRE test here.
 IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest,
@@ -744,16 +729,6 @@ IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest,
   EXPECT_EQ(0, update_interceptor_->GetCount())
       << update_interceptor_->GetRequestsAsString();
   EXPECT_EQ(0, get_interceptor_count());
-
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not perform a graceful shutdown in browser tests, so we have
-  // to explicitly flush extension preferences to disk.
-  profile()->GetPrefs()->CommitPendingWrite();
-
-  // Ensure writes on other threads (e.g. from GetExtensionFileTaskRunner())
-  // have a chance to complete (e.g. StateStore and CrxInstaller).
-  base::ThreadPoolInstance::Get()->FlushForTesting();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Now actually test what happens on the next startup after the PRE test above.
@@ -807,16 +782,6 @@ IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest,
   const base::DictValue& disabled =
       CHECK_DEREF(app.FindList("disabled"))[0].GetDict();
   EXPECT_EQ(disable_reason::DISABLE_CORRUPTED, disabled.FindInt("reason"));
-
-#if BUILDFLAG(IS_ANDROID)
-  // Signal any in-flight CrxInstaller instances to clean up.
-  // TODO(jamescook): Consider moving this to AndroidBrowserTest shutdown.
-  browser_shutdown::NotifyAppTerminating();
-
-  // Ensure cleanup on other threads (e.g. from GetExtensionFileTaskRunner())
-  // has a chance to complete (e.g. CrxInstaller).
-  base::ThreadPoolInstance::Get()->FlushForTesting();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace extensions

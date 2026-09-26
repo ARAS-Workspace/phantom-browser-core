@@ -13,10 +13,6 @@
 #include "components/regional_capabilities/regional_capabilities_service.h"
 #include "components/variations/service/variations_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/regional_capabilities/regional_capabilities_service_client_android.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_client_linux.h"
 #endif
@@ -26,10 +22,7 @@ namespace {
 
 std::unique_ptr<RegionalCapabilitiesService::Client>
 CreateRegionalCapabilitiesServiceClient() {
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<RegionalCapabilitiesServiceClientAndroid>(
-      g_browser_process->variations_service());
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return std::make_unique<RegionalCapabilitiesServiceClientLinux>(
       g_browser_process->variations_service());
 #else

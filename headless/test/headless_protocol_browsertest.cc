@@ -283,13 +283,8 @@ HEADLESS_PROTOCOL_TEST(
 HEADLESS_PROTOCOL_TEST(PageBeforeUnload, "page/page-before-unload.js")
 
 // http://crbug.com/633321
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_VirtualTimeTimerOrder DISABLED_VirtualTimeTimerOrder
-#define MAYBE_VirtualTimeTimerSuspend DISABLED_VirtualTimeTimerSuspend
-#else
 #define MAYBE_VirtualTimeTimerOrder VirtualTimeTimerOrder
 #define MAYBE_VirtualTimeTimerSuspend VirtualTimeTimerSuspend
-#endif
 HEADLESS_PROTOCOL_TEST(MAYBE_VirtualTimeTimerOrder,
                        "emulation/virtual-time-timer-order.js")
 HEADLESS_PROTOCOL_TEST(MAYBE_VirtualTimeTimerSuspend,

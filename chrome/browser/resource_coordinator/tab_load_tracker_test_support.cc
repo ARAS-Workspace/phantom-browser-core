@@ -8,9 +8,7 @@
 #include "base/run_loop.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 namespace resource_coordinator {
 
@@ -39,7 +37,6 @@ class WaitForLoadingStateHelper : public TabLoadTracker::Observer {
         waiting_for_no_longer_tracked_(true),
         wait_successful_(false) {}
 
-#if !BUILDFLAG(IS_ANDROID)
   // Configures this helper to wait until all tabs in |tab_strip_model| are have
   // transitionned to |state|.
   WaitForLoadingStateHelper(TabStripModel* waiting_for_tab_strip,
@@ -48,7 +45,6 @@ class WaitForLoadingStateHelper : public TabLoadTracker::Observer {
         waiting_for_state_(waiting_for_state),
         waiting_for_no_longer_tracked_(false),
         wait_successful_(false) {}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   WaitForLoadingStateHelper(const WaitForLoadingStateHelper&) = delete;
   WaitForLoadingStateHelper& operator=(const WaitForLoadingStateHelper&) =
@@ -86,9 +82,6 @@ class WaitForLoadingStateHelper : public TabLoadTracker::Observer {
              waiting_for_state_;
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    return false;
-#else
     DCHECK(waiting_for_tab_strip_);
     for (int i = 0; i < waiting_for_tab_strip_->count(); ++i) {
       if (tracker->GetLoadingState(waiting_for_tab_strip_->GetWebContentsAt(
@@ -98,7 +91,6 @@ class WaitForLoadingStateHelper : public TabLoadTracker::Observer {
     }
 
     return true;
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   void OnLoadingStateChange(content::WebContents* web_contents,
@@ -121,12 +113,8 @@ class WaitForLoadingStateHelper : public TabLoadTracker::Observer {
     } else if (waiting_for_contents_) {
       wait_successful_ = (waiting_for_state_ == loading_state);
     } else {
-#if BUILDFLAG(IS_ANDROID)
-      NOTREACHED();
-#else
       DCHECK(waiting_for_tab_strip_);
       wait_successful_ = AllContentsReachedState();
-#endif  // BUILDFLAG(IS_ANDROID)
     }
     std::move(run_loop_quit_closure_).Run();
   }
@@ -134,9 +122,7 @@ class WaitForLoadingStateHelper : public TabLoadTracker::Observer {
  private:
   // The WebContents or TabStripModel and state that is being waited for.
   const raw_ptr<content::WebContents> waiting_for_contents_ = nullptr;
-#if !BUILDFLAG(IS_ANDROID)
   const raw_ptr<TabStripModel> waiting_for_tab_strip_ = nullptr;
-#endif
   const LoadingState waiting_for_state_;
   const bool waiting_for_no_longer_tracked_;
 
@@ -172,7 +158,6 @@ bool WaitUntilNoLongerTracked(content::WebContents* contents) {
   return waiter.Wait();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool WaitForTransitionToLoadingState(TabStripModel* tab_strip,
                                      LoadingState loading_state) {
   WaitForLoadingStateHelper waiter(tab_strip, loading_state);
@@ -190,6 +175,5 @@ bool WaitForTransitionToLoading(TabStripModel* tab_strip) {
 bool WaitForTransitionToLoaded(TabStripModel* tab_strip) {
   return WaitForTransitionToLoadingState(tab_strip, LoadingState::LOADED);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace resource_coordinator

@@ -147,15 +147,9 @@ class SafeBrowsingBlockingPageHatsSurveyPlatformTest
   SafeBrowsingBlockingPageHatsSurveyPlatformTest() = default;
 
   void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    scoped_feature_list_.InitWithFeatures(
-        {kRedWarningSurveyAndroid, kExtendedReportingRemovePrefDependency},
-        /*disabled_features=*/{kDelayedWarnings});
-#else
     scoped_feature_list_.InitWithFeatures(
         {kRedWarningSurvey, kExtendedReportingRemovePrefDependency},
         /*disabled_features=*/{kDelayedWarnings});
-#endif
     SafeBrowsingBlockingPagePlatformBrowserTest::SetUp();
   }
 

@@ -141,9 +141,7 @@ class SupervisedUserGoogleAuthNavigationThrottleTest
 TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
        NavigationForValidSignedinSupervisedUsers) {
   SetUserAsSupervised();
-#if !BUILDFLAG(IS_ANDROID)
   SetRefreshTokenForPrimaryAccount(identity_manager());
-#endif
   signin::SetListAccountsResponseOneAccountWithParams(
       {kChildTestEmail,
        identity_manager()
@@ -196,12 +194,9 @@ TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
 TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
        NavigationForPendingSignedInSupervisedUsers) {
   SetUserAsSupervised();
-#if !BUILDFLAG(IS_ANDROID)
   SetInvalidRefreshTokenForPrimaryAccount(
       identity_manager(),
       signin_metrics::SourceForRefreshTokenOperation::kUnknown);
-#endif  // !BUILDFLAG(IS_ANDROID)
-  // An invalid, signed-in account is not authenticated.
   signin::SetListAccountsResponseOneAccountWithParams(
       {kChildTestEmail,
        identity_manager()
@@ -247,23 +242,6 @@ TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
   EXPECT_NE(std::string::npos,
             youtube_navigation_throttle.error_page_content()->find(
                 "supervised-user-verify"));
-#elif BUILDFLAG(IS_ANDROID)
-  // For Android, navigation to Google and YouTube are deferred.
-  EXPECT_EQ(content::NavigationThrottle::DEFER,
-            CreateNavigationThrottle(GURL(kGoogleSearchURL), true)
-                ->throttles()
-                .back()
-                ->WillStartRequest());
-  EXPECT_EQ(content::NavigationThrottle::DEFER,
-            CreateNavigationThrottle(GURL(kGoogleHomeURL))
-                ->throttles()
-                .back()
-                ->WillStartRequest());
-  EXPECT_EQ(content::NavigationThrottle::DEFER,
-            CreateNavigationThrottle(GURL(kYoutubeDomain))
-                ->throttles()
-                .back()
-                ->WillStartRequest());
 #endif
 
   // Prerendering is not supported for supervised users.

@@ -41,11 +41,7 @@ NetworkStatus ToNetworkStatus(net::NetworkChangeNotifier::ConnectionType type) {
     case net::NetworkChangeNotifier::ConnectionType::CONNECTION_BLUETOOTH:
       return NetworkStatus::DISCONNECTED;
     case net::NetworkChangeNotifier::ConnectionType::CONNECTION_UNKNOWN:
-#if BUILDFLAG(IS_ANDROID)
-      return NetworkStatus::DISCONNECTED;
-#else
       return NetworkStatus::UNMETERED;
-#endif
   }
   NOTREACHED();
 }

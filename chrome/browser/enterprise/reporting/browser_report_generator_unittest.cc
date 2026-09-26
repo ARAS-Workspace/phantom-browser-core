@@ -27,24 +27,13 @@
 #include "device_management_backend.pb.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_info.h"
-#include "components/enterprise/browser/reporting/reporting_features.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/upgrade_detector/build_state.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "chrome/test/base/scoped_channel_override.h"
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-#else
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace em = enterprise_management;
 
@@ -68,7 +57,6 @@ void VerifyBrowserVersionAndChannel(em::BrowserReport* report,
 }
 
 void VerifyBuildState(em::BrowserReport* report, bool with_version_info) {
-#if !BUILDFLAG(IS_ANDROID)
   if (!with_version_info)
     return;
   const auto* build_state = g_browser_process->GetBuildState();
@@ -79,7 +67,6 @@ void VerifyBuildState(em::BrowserReport* report, bool with_version_info) {
     EXPECT_EQ(report->installed_browser_version(),
               build_state->installed_version()->GetString());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void VerifyExtendedStableChannel(em::BrowserReport* report) {
@@ -91,9 +78,7 @@ void VerifyExtendedStableChannel(em::BrowserReport* report) {
   } else {
     EXPECT_FALSE(report->has_is_extended_stable_channel());
     // On Android, local Chrome branded builds report "CHANNEL_UNKNOWN".
-#if !BUILDFLAG(IS_ANDROID)
     EXPECT_NE(report->channel(), em::Channel::CHANNEL_UNKNOWN);
-#endif
   }
 #else
   EXPECT_FALSE(report->has_is_extended_stable_channel());
@@ -111,11 +96,7 @@ void VerifyProfile(em::BrowserReport* report) {
 
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID)
-typedef ReportingDelegateFactoryAndroid PlatformReportingDelegateFactory;
-#else
 typedef ReportingDelegateFactoryDesktop PlatformReportingDelegateFactory;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class BrowserReportGeneratorTest : public ::testing::Test {
  public:
@@ -142,18 +123,14 @@ class BrowserReportGeneratorTest : public ::testing::Test {
 
   void InitializeIrregularProfiles() {
     profile_manager_.CreateGuestProfile();
-#if !BUILDFLAG(IS_ANDROID)
     profile_manager_.CreateSystemProfile();
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   void InitializeUpdate() {
     auto* build_state = g_browser_process->GetBuildState();
     build_state->SetUpdate(BuildState::UpdateType::kNormalUpdate,
                            base::Version("1.2.3.4"), std::nullopt);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void GenerateAndVerify() {
     base::RunLoop run_loop;
@@ -162,21 +139,9 @@ class BrowserReportGeneratorTest : public ::testing::Test {
         base::BindLambdaForTesting(
             [&run_loop](std::unique_ptr<em::BrowserReport> report) {
               ASSERT_TRUE(report.get());
-#if BUILDFLAG(IS_ANDROID)
-              if (base::FeatureList::IsEnabled(
-                      kCbcmAndroidPackageNameIdentifier)) {
-                EXPECT_EQ(base::android::apk_info::package_name(),
-                          report->executable_path());
-              } else {
-                EXPECT_EQ(
-                    base::PathService::CheckedGet(base::DIR_EXE).AsUTF8Unsafe(),
-                    report->executable_path());
-              }
-#else
               EXPECT_EQ(
                   base::PathService::CheckedGet(base::DIR_EXE).AsUTF8Unsafe(),
                   report->executable_path());
-#endif
               bool with_version_info = true;
               VerifyBrowserVersionAndChannel(report.get(), with_version_info);
               VerifyBuildState(report.get(), with_version_info);
@@ -195,24 +160,10 @@ class BrowserReportGeneratorTest : public ::testing::Test {
         base::BindLambdaForTesting(
             [&run_loop](std::unique_ptr<em::BrowserReport> report) {
               ASSERT_TRUE(report.get());
-#if BUILDFLAG(IS_ANDROID)
-              if (base::FeatureList::IsEnabled(
-                      kCbcmAndroidPackageNameIdentifier)) {
-                EXPECT_EQ(
-                    ObfuscateFilePath(base::android::apk_info::package_name()),
-                    report->executable_path());
-              } else {
-                EXPECT_EQ(ObfuscateFilePath(
-                              base::PathService::CheckedGet(base::DIR_EXE)
-                                  .AsUTF8Unsafe()),
-                          report->executable_path());
-              }
-#else
               EXPECT_EQ(
                   ObfuscateFilePath(base::PathService::CheckedGet(base::DIR_EXE)
                                         .AsUTF8Unsafe()),
                   report->executable_path());
-#endif
 
               VerifyBrowserVersionAndChannel(report.get(),
                                              /*with_version_info=*/true);
@@ -241,64 +192,20 @@ TEST_F(BrowserReportGeneratorTest, GenerateBasicReport) {
   GenerateAndVerify();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(BrowserReportGeneratorTest, GenerateBasicReport_UseLegacyIdentifier) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndDisableFeature(kCbcmAndroidPackageNameIdentifier);
-
-  InitializeProfile();
-  InitializeIrregularProfiles();
-  GenerateAndVerify();
-}
-
-TEST_F(BrowserReportGeneratorTest, GenerateBasicReport_UsePackageName) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(kCbcmAndroidPackageNameIdentifier);
-
-  InitializeProfile();
-  InitializeIrregularProfiles();
-  GenerateAndVerify();
-}
-#endif
-
 TEST_F(BrowserReportGeneratorTest, GenerateBasicReportForProfileReporting) {
   InitializeProfile();
   InitializeIrregularProfiles();
   GenerateProfileReportAndVerify();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(BrowserReportGeneratorTest,
-       GenerateBasicReportForProfileReporting_UseLegacyIdentifier) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndDisableFeature(kCbcmAndroidPackageNameIdentifier);
-
-  InitializeProfile();
-  InitializeIrregularProfiles();
-  GenerateProfileReportAndVerify();
-}
-
-TEST_F(BrowserReportGeneratorTest,
-       GenerateBasicReportForProfileReporting_UsePackageName) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(kCbcmAndroidPackageNameIdentifier);
-
-  InitializeProfile();
-  InitializeIrregularProfiles();
-  GenerateProfileReportAndVerify();
-}
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BrowserReportGeneratorTest, GenerateBasicReportWithUpdate) {
   InitializeUpdate();
   InitializeProfile();
   InitializeIrregularProfiles();
   GenerateAndVerify();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 TEST_F(BrowserReportGeneratorTest, ExtendedStableChannel) {
   chrome::ScopedChannelOverride channel_override(
       chrome::ScopedChannelOverride::Channel::kExtendedStable);
@@ -308,6 +215,6 @@ TEST_F(BrowserReportGeneratorTest, ExtendedStableChannel) {
   InitializeIrregularProfiles();
   GenerateAndVerify();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 }  // namespace enterprise_reporting

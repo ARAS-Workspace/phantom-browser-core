@@ -13,24 +13,13 @@ namespace passage_embeddings {
 namespace {
 
 constexpr auto enabled_by_default_desktop_only =
-#if BUILDFLAG(IS_ANDROID)
-    base::FEATURE_DISABLED_BY_DEFAULT;
-#else
     base::FEATURE_ENABLED_BY_DEFAULT;
-#endif
 
 }  // namespace
 
 BASE_FEATURE(kPassageEmbedder, enabled_by_default_desktop_only);
 
 BASE_FEATURE(kPDFEmbeddingsGeneration, enabled_by_default_desktop_only);
-
-#if BUILDFLAG(IS_ANDROID)
-const base::FeatureParam<int> kPassageEmbedderMinRequiredRamMb(
-    &kPassageEmbedder,
-    "PassageEmbedderMinRequiredRamMb",
-    0);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 const base::FeatureParam<int> kUserInitiatedPriorityNumThreads(
     &kPassageEmbedder,

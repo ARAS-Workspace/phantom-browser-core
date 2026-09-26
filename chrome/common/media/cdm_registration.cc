@@ -41,10 +41,6 @@
 #endif                            // BUILDFLAG(IS_LINUX)
 #endif  // BUILDFLAG(ENABLE_WIDEVINE)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/cdm/common/android_cdm_registration.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_PLAYREADY)
 #include "base/file_version_info_win.h"
 #include "components/cdm/common/playready_cdm_common.h"
@@ -152,16 +148,7 @@ std::unique_ptr<content::CdmInfo> GetHintedWidevine() {
 void AddSoftwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
   DVLOG(1) << __func__;
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android Widevine is done by MediaDrm, and should be supported on all
-  // devices. Register Widevine without any capabilities so that it will be
-  // checked the first time some page attempts to play protected content.
-  cdms->emplace_back(
-      kWidevineKeySystem, Robustness::kSoftwareSecure, std::nullopt,
-      /*supports_sub_key_systems=*/false, kWidevineCdmDisplayName,
-      kWidevineCdmType, base::FilePath());
-
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // The Widevine CDM on Linux needs to be registered (and loaded)
   // before the zygote is locked down. The CDM can be found from the version
   // bundled with Chrome (if BUNDLE_WIDEVINE_CDM = true) and/or the version
@@ -236,22 +223,13 @@ void AddSoftwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
       cdms->push_back(*hinted_widevine);
     }
   }
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 void AddHardwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
   DVLOG(1) << __func__;
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android Widevine is done by MediaDrm, and should be supported on all
-  // devices. Register Widevine without any capabilities so that it will be
-  // checked the first time some page attempts to play protected content.
-  cdms->emplace_back(
-      kWidevineKeySystem, Robustness::kHardwareSecure, std::nullopt,
-      /*supports_sub_key_systems=*/false, kWidevineCdmDisplayName,
-      kWidevineCdmType, base::FilePath());
-
-#elif BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
+#if BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
   media::CdmCapability capability;
 
   // The following audio formats are supported for decrypt-only.
@@ -283,7 +261,7 @@ void AddHardwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
   cdms->push_back(
       content::CdmInfo(kWidevineKeySystem, Robustness::kHardwareSecure,
                        std::move(capability), content::kChromeOsCdmType));
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
 }
 
 void AddWidevine(std::vector<content::CdmInfo>* cdms) {
@@ -341,10 +319,6 @@ void RegisterCdmInfo(std::vector<content::CdmInfo>* cdms) {
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
   AddExternalClearKey(cdms);
 #endif
-
-#if BUILDFLAG(IS_ANDROID)
-  cdm::AddOtherAndroidCdms(cdms);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   DVLOG(3) << __func__ << " done with " << cdms->size() << " cdms";
 }

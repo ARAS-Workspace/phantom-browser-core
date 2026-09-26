@@ -31,13 +31,6 @@
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/gfx/animation/animation.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/compositor_impl_android.h"
-#include "content/browser/renderer_host/render_widget_host_view_android.h"
-#include "ui/android/view_android.h"
-#include "ui/android/window_android.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -92,15 +85,7 @@ void InvokeTestCallback(int index,
 }
 
 bool SupportsETC1NonPowerOfTwo(const NavigationRequest& navigation_request) {
-#if BUILDFLAG(IS_ANDROID)
-  auto* rfh = navigation_request.frame_tree_node()->current_frame_host();
-  auto* rwhv = rfh->GetView();
-  auto* window_android = rwhv->GetNativeView()->GetWindowAndroid();
-  auto* compositor = window_android->GetCompositor();
-  return static_cast<CompositorImpl*>(compositor)->SupportsETC1NonPowerOfTwo();
-#else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Returns the first entry that matches `destination_token`. Returns null if no
@@ -544,17 +529,6 @@ bool NavigationTransitionUtils::
     return false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (!rwhv->GetNativeView() || !rwhv->GetNativeView()->GetWindowAndroid() ||
-      !rwhv->GetNativeView()->GetWindowAndroid()->GetCompositor()) {
-    InvokeTestCallbackForNoScreenshot(navigation_request);
-    last_committed_entry->navigation_transition_data()
-        .set_cache_hit_or_miss_reason(
-            CacheHitOrMissReason::kNoRootWindowOrCompositor);
-    return false;
-  }
-#endif
-
   if (!rwhv->IsSurfaceAvailableForCopy()) {
     // See https://crbug.com/368289857: If we hide the WebContents after a
     // same-RFH navigation starts, we invalidate the `viz::LocalSurfaceID`
@@ -615,23 +589,6 @@ bool NavigationTransitionUtils::
   // meaning we will capture at full-size, unless specified by tests.
   const gfx::Size output_size = g_output_size_for_test;
 
-#if BUILDFLAG(IS_ANDROID)
-  auto context_provider = GetRasterContextProviderOrSetMissReason(
-      rwhv, navigation_request, last_committed_entry);
-  if (!context_provider) {
-    return false;
-  }
-  static_cast<RenderWidgetHostViewAndroid*>(rwhv)
-      ->CopySharedImageFromExactSurface(
-          /*src_rect=*/gfx::Rect(), output_size,
-          base::BindOnce(
-              &CacheScreenshotSharedImageImpl,
-              navigation_controller.GetWeakPtr(),
-              navigation_request.GetWeakPtr(), std::move(context_provider),
-              last_committed_entry->navigation_transition_data().unique_id(),
-              /*is_copied_from_embedder=*/false, request_sequence,
-              SupportsETC1NonPowerOfTwo(navigation_request)));
-#else
   static_cast<RenderWidgetHostViewBase*>(rwhv)->CopyFromExactSurface(
       /*src_rect=*/gfx::Rect(), output_size,
       base::BindOnce([](const viz::CopyOutputBitmapWithMetadata& result) {
@@ -643,7 +600,6 @@ bool NavigationTransitionUtils::
               last_committed_entry->navigation_transition_data().unique_id(),
               /*is_copied_from_embedder=*/false, request_sequence,
               SupportsETC1NonPowerOfTwo(navigation_request))));
-#endif
 
   ++g_num_copy_requests_issued_for_testing;
 
@@ -701,19 +657,6 @@ void NavigationTransitionUtils::SetSameDocumentNavigationEntryScreenshotToken(
     // Again, can't always trust the renderer to send a non-duplicated token.
     return;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  RenderFrameHostImpl* current_rfh =
-      navigation_request.frame_tree_node()->current_frame_host();
-  RenderWidgetHostView* rwhv = current_rfh->GetView();
-  if (auto* window_android = rwhv->GetNativeView()->GetWindowAndroid();
-      !window_android || !window_android->GetCompositor()) {
-    last_committed_entry->navigation_transition_data()
-        .set_cache_hit_or_miss_reason(
-            CacheHitOrMissReason::kNoRootWindowOrCompositor);
-    return;
-  }
-#endif
 
   // NOTE: `destination_token` is to set on the last committed entry (the
   // screenshot's destination), instead of the destination entry of this

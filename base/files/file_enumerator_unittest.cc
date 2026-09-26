@@ -18,12 +18,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/content_uri_utils.h"
-#include "base/android/virtual_document_path.h"
-#include "base/test/android/content_uri_test_utils.h"
-#endif
-
 using testing::ElementsAre;
 using testing::IsEmpty;
 using testing::UnorderedElementsAre;
@@ -461,13 +455,7 @@ TEST(FileEnumerator, GetInfo) {
       TestFile(FILE_PATH_LITERAL("file3"), "Third-third-third")};
   SetUpTestFiles(temp_dir, files);
 
-#if BUILDFLAG(IS_ANDROID)
-  FilePath root_dir =
-      *base::test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-          temp_dir.GetPath());
-#else
   FilePath root_dir = temp_dir.GetPath();
-#endif
   FileEnumerator file_enumerator(
       root_dir, false, FileEnumerator::FILES | FileEnumerator::DIRECTORIES);
   while (!file_enumerator.Next().empty()) {
@@ -502,13 +490,7 @@ TEST(FileEnumerator, GetInfoOnFiles) {
   ASSERT_TRUE(CreateDirectory(dir));
   ASSERT_TRUE(WriteFile(dir_file, ""));
 
-#if BUILDFLAG(IS_ANDROID)
-  FilePath root_dir =
-      *base::test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-          temp_dir.GetPath());
-#else
   FilePath root_dir = temp_dir.GetPath();
-#endif
 
   FileEnumerator file_enumerator(root_dir, false, FileEnumerator::FILES);
   int count = 0;
@@ -559,13 +541,7 @@ TEST(FileEnumerator, GetInfoRecursive) {
     ASSERT_TRUE(GetFileInfo(dir_path, dir.info));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  FilePath root_dir =
-      *base::test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-          temp_dir.GetPath());
-#else
   FilePath root_dir = temp_dir.GetPath();
-#endif
   FileEnumerator file_enumerator(
       root_dir, true, FileEnumerator::FILES | FileEnumerator::DIRECTORIES);
   while (!file_enumerator.Next().empty()) {
@@ -583,11 +559,6 @@ TEST(FileEnumerator, GetInfoRecursive) {
       for (TestFile& file : files) {
         if (info.GetName() == file.path.BaseName()) {
           CheckFileAgainstInfo(info, file);
-#if BUILDFLAG(IS_ANDROID)
-          std::string expected =
-              temp_dir.GetPath().BaseName().Append(file.path.DirName()).value();
-          EXPECT_EQ(base::JoinString(info.subdirs(), "/"), expected);
-#endif
           found = true;
           break;
         }
@@ -606,68 +577,6 @@ TEST(FileEnumerator, GetInfoRecursive) {
         << "File " << file.path.value() << " was not returned";
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST(FileEnumerator, VirtualDocumentPath) {
-  ScopedTempDir temp_dir;
-  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-
-  FilePath dir = temp_dir.GetPath().AppendUTF8("subdir");
-  ASSERT_TRUE(CreateDirectory(dir));
-  FilePath file1 = temp_dir.GetPath().AppendUTF8("file1.txt");
-  ASSERT_TRUE(WriteFile(file1, "hello"));
-  FilePath file2 = dir.AppendUTF8("file2.txt");
-  ASSERT_TRUE(WriteFile(file2, "world"));
-
-  std::optional<FilePath> content_tree_uri =
-      test::android::GetInMemoryContentTreeUriFromCacheDirDirectory(
-          temp_dir.GetPath());
-  ASSERT_TRUE(content_tree_uri.has_value());
-
-  std::optional<FilePath> virtual_doc_path =
-      ResolveToVirtualDocumentPath(*content_tree_uri);
-  ASSERT_TRUE(virtual_doc_path.has_value());
-  EXPECT_TRUE(virtual_doc_path->IsVirtualDocumentPath());
-
-  // Non-recursive enumeration: expect virtual document paths for immediate
-  // children.
-  {
-    std::vector<FilePath> results;
-    FileEnumerator enumerator(
-        *virtual_doc_path, /*recursive=*/false,
-        FileEnumerator::FILES | FileEnumerator::DIRECTORIES);
-    for (FilePath path = enumerator.Next(); !path.empty();
-         path = enumerator.Next()) {
-      EXPECT_TRUE(path.IsVirtualDocumentPath());
-      EXPECT_TRUE(virtual_doc_path->IsParent(path));
-      results.push_back(path);
-    }
-    EXPECT_THAT(results,
-                UnorderedElementsAre(virtual_doc_path->AppendUTF8("file1.txt"),
-                                     virtual_doc_path->AppendUTF8("subdir")));
-  }
-
-  // Recursive enumeration: expect virtual document paths for all nested items.
-  {
-    std::vector<FilePath> results;
-    FileEnumerator enumerator(
-        *virtual_doc_path, /*recursive=*/true,
-        FileEnumerator::FILES | FileEnumerator::DIRECTORIES);
-    for (FilePath path = enumerator.Next(); !path.empty();
-         path = enumerator.Next()) {
-      EXPECT_TRUE(path.IsVirtualDocumentPath());
-      EXPECT_TRUE(virtual_doc_path->IsParent(path));
-      results.push_back(path);
-    }
-    EXPECT_THAT(
-        results,
-        UnorderedElementsAre(
-            virtual_doc_path->AppendUTF8("file1.txt"),
-            virtual_doc_path->AppendUTF8("subdir"),
-            virtual_doc_path->AppendUTF8("subdir").AppendUTF8("file2.txt")));
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Tests that FileEnumerator::GetInfo() returns the correct info for the ..
 // directory.

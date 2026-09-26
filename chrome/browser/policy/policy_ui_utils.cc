@@ -26,10 +26,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/android_about_app_info.h"
-#endif
-
 namespace policy {
 
 JsonGenerationParams GetChromeMetadataParams(
@@ -41,9 +37,6 @@ JsonGenerationParams GetChromeMetadataParams(
   os_name = base::mac::GetOSDisplayName();
 #else
   os_name = version_info::GetOSType();
-#if BUILDFLAG(IS_ANDROID)
-  os_name = os_name.value() + " " + AndroidAboutAppInfo::GetOsInfo();
-#endif
 #endif
   policy::JsonGenerationParams params;
   params.with_application_name(application_name)

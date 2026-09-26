@@ -22,12 +22,10 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/test/fake_web_app_provider.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/test/web_app_test_utils.h"
 #include "chrome/browser/web_applications/web_app_install_info.h"
-#endif
 
 namespace {
 
@@ -39,20 +37,10 @@ class MockPeriodicBackgroundSyncPermissionContext
 
   void InstallPwa(const GURL& url) { installed_pwas_.insert(url); }
 
-#if BUILDFLAG(IS_ANDROID)
-  void InstallTwa(const GURL& url) { installed_twas_.insert(url); }
-#endif
-
   // PeriodicBackgroundSyncPermissionContext overrides:
   bool IsPwaInstalled(const GURL& url) const override {
     return installed_pwas_.find(url) != installed_pwas_.end();
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  bool IsTwaInstalled(const GURL& url) const override {
-    return installed_twas_.find(url) != installed_twas_.end();
-  }
-#endif
 
   GURL GetDefaultSearchEngineUrl() const override {
     return default_search_engine_url_;
@@ -71,9 +59,6 @@ class MockPeriodicBackgroundSyncPermissionContext
 
  private:
   std::set<GURL> installed_pwas_;
-#if BUILDFLAG(IS_ANDROID)
-  std::set<GURL> installed_twas_;
-#endif
   GURL default_search_engine_url_;
 };
 
@@ -94,9 +79,7 @@ class PeriodicBackgroundSyncPermissionContextTest
     mock_permission_context_ =
         std::make_unique<MockPeriodicBackgroundSyncPermissionContext>(
             profile());
-#if !BUILDFLAG(IS_ANDROID)
     web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   void TearDown() override {
@@ -137,11 +120,6 @@ class PeriodicBackgroundSyncPermissionContextTest
   void InstallPwa(const GURL& url) {
     mock_permission_context_->InstallPwa(url);
   }
-#if BUILDFLAG(IS_ANDROID)
-  void InstallTwa(const GURL& url) {
-    mock_permission_context_->InstallTwa(url);
-  }
-#endif
 
   void SetUpPwaAndContentSettings(const GURL& url) {
     InstallPwa(url);
@@ -196,17 +174,6 @@ TEST_F(PeriodicBackgroundSyncPermissionContextTest, DesktopPwa) {
   EXPECT_EQ(GetPermissionStatus(url), CONTENT_SETTING_BLOCK);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PeriodicBackgroundSyncPermissionContextTest, Twa) {
-  GURL url("https://example.com");
-
-  // No TWA or PWA installed.
-  EXPECT_EQ(GetPermissionStatus(url), CONTENT_SETTING_BLOCK);
-
-  InstallTwa(url);
-  EXPECT_EQ(GetPermissionStatus(url), CONTENT_SETTING_ALLOW);
-}
-#else  // !BUILDFLAG(IS_ANDROID)
 TEST_F(PeriodicBackgroundSyncPermissionContextTest, OnWebAppInstalled) {
   GURL url("https://example.com");
   // Both both `OnWebAppInstalled` and `OnWebAppInstalledWithOsHooks`
@@ -237,7 +204,6 @@ TEST_F(PeriodicBackgroundSyncPermissionContextTest, OnWebAppUninstalled) {
 
   web_app::test::UninstallWebApp(profile(), app_id);
 }
-#endif
 
 TEST_F(PeriodicBackgroundSyncPermissionContextTest, DefaultSearchEngine) {
   GURL requesting_origin("https://example.com");

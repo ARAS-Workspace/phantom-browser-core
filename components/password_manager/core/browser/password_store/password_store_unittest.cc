@@ -202,10 +202,8 @@ class PasswordStoreTest : public testing::Test {
     ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
     pref_service_.registry()->RegisterBooleanPref(
         password_manager::prefs::kWereOldGoogleLoginsRemoved, false);
-#if !BUILDFLAG(IS_ANDROID)
     pref_service_.registry()->RegisterBooleanPref(
         prefs::kClearingUndecryptablePasswords, false);
-#endif
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     pref_service_.registry()->RegisterBooleanPref(
         prefs::kDeletingUndecryptablePasswordsEnabled, true);
@@ -936,38 +934,6 @@ TEST_F(PasswordStoreTest, UpdateLoginWithPrimaryKey_UsernameChanges) {
   store->ShutdownOnUIThread();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Tests that when foreground transitions trigger a refresh (which starts by
-// running the remote changes callback with std::nullopt and results in an async
-// call to GetAllLoginsAsync), the password store does not notify observers that
-// the error is resolved (with ActionableError::kNoError) before it
-// executes/completes the query. If the query subsequently fails with an error,
-// the store must correctly propagate the failure (e.g.
-// ActionableError::kInactionable) to observers.
-TEST_F(PasswordStoreTest,
-       OnErrorStateChangedFlowOnAndroidForegroundRefreshFailure) {
-  MockPasswordStoreObserver mock_observer;
-  auto [store, fake_backend] = CreateUnownedStoreWithOwnedFakeBackend();
-
-  store->Init();
-  store->AddObserver(&mock_observer);
-
-  fake_backend->ReturnErrorOnRequest(kBackendError);
-
-  EXPECT_CALL(mock_observer,
-              OnErrorStateChanged(store.get(), ActionableError::kNoError))
-      .Times(0);
-  EXPECT_CALL(mock_observer,
-              OnErrorStateChanged(store.get(), ActionableError::kInactionable));
-
-  fake_backend->NotifyAboutError();
-
-  WaitForPasswordStore();
-
-  store->RemoveObserver(&mock_observer);
-  store->ShutdownOnUIThread();
-}
-#else
 // Tests that on non-Android platforms, when remote changes callback is called
 // with std::nullopt (no changelist provided), the store propagates
 // ActionableError::kNoError to observers via OnErrorStateChanged.
@@ -989,7 +955,6 @@ TEST_F(PasswordStoreTest,
   store->RemoveObserver(&mock_observer);
   store->ShutdownOnUIThread();
 }
-#endif
 
 // Collection of origin-related testcases common to all platform-specific
 // stores.

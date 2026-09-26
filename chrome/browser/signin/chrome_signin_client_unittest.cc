@@ -26,8 +26,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 class MockChromeSigninClient : public ChromeSigninClient {
  public:
   explicit MockChromeSigninClient(Profile* profile)
@@ -114,11 +112,7 @@ TEST_F(ChromeSigninClientSignoutTest, ChildProfile) {
   EXPECT_TRUE(profile->IsChild());
 
   CreateClient(profile.get());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(client_->IsClearPrimaryAccountAllowed());
-#else
   EXPECT_TRUE(client_->IsClearPrimaryAccountAllowed());
-#endif
 }
 
 TEST_F(ChromeSigninClientSignoutTest, GetOAuthConsumerForContextualTasks) {
@@ -316,5 +310,3 @@ static_assert(std::size(kSignoutSources) + kNumberOfObsoleteSignoutSources ==
 INSTANTIATE_TEST_SUITE_P(AllSignoutSources,
                          ChromeSigninClientSignoutSourceTest,
                          testing::ValuesIn(kSignoutSources));
-
-#endif  // !BUILDFLAG(IS_ANDROID)

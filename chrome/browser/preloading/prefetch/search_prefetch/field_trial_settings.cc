@@ -92,21 +92,10 @@ void SetSearchPrefetchMaxCacheEntriesForTesting(size_t cache_size) {
   g_cache_size_for_testing = cache_size;
 }
 
-BASE_FEATURE(kSearchNavigationPrefetch,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_ANDROID)
-);
+BASE_FEATURE(kSearchNavigationPrefetch, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSearchPrefetchIgnoreSaverModesOnPress,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_ANDROID)
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 const base::FeatureParam<std::string> kSuggestPrefetchParam{
     &kSearchNavigationPrefetch, "suggest_prefetch_param", "cs"};

@@ -100,16 +100,6 @@ class DummyImageProvider : public ImageProvider {
   }
 };
 
-#if BUILDFLAG(IS_ANDROID)
-struct MetricsDrawSizes {
-  const int kTopPadding = 35;
-  const int kPadding = 15;
-  const int kFontHeight = 32;
-  const int kWidth = 525;
-  const int kSidePadding = 20;
-  const int kBadgeWidth = 25;
-} constexpr metrics_sizes;
-#else
 struct MetricsDrawSizes {
   const int kTopPadding = 35;
   const int kPadding = 15;
@@ -118,7 +108,6 @@ struct MetricsDrawSizes {
   const int kSidePadding = 20;
   const int kBadgeWidth = 25;
 } constexpr metrics_sizes;
-#endif
 
 }  // namespace
 

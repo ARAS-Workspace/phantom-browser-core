@@ -30,11 +30,6 @@
 #include "media/mojo/buildflags.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/media/key_system_support_android.h"
-#include "media/base/android/media_drm_bridge.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -503,12 +498,8 @@ void CdmRegistryImpl::LazyInitializeCapability(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  GetAndroidCdmCapability(key_system, robustness, std::move(cdm_capability_cb));
-#else
   std::move(cdm_capability_cb)
       .Run(base::unexpected(media::CdmCapabilityQueryStatus::kUnknown));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void CdmRegistryImpl::OnCapabilityInitialized(

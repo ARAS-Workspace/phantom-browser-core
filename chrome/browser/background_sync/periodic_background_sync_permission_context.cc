@@ -19,15 +19,11 @@
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/shortcut_helper.h"
-#else
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"  // nogncheck
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_install_manager_observer.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
-#endif
 
 namespace features {
 
@@ -46,13 +42,11 @@ PeriodicBackgroundSyncPermissionContext::
           browser_context,
           ContentSettingsType::PERIODIC_BACKGROUND_SYNC,
           network::mojom::PermissionsPolicyFeature::kNotFound) {
-#if !BUILDFLAG(IS_ANDROID)
   auto* provider = web_app::WebAppProvider::GetForWebApps(
       Profile::FromBrowserContext(browser_context));
   if (provider) {
     install_manager_observation_.Observe(&provider->install_manager());
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 PeriodicBackgroundSyncPermissionContext::
@@ -69,14 +63,6 @@ bool PeriodicBackgroundSyncPermissionContext::IsPwaInstalled(
   // succeed, provided other required conditions are met.
   return DoesOriginContainAnyInstalledWebApp(browser_context(), origin);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool PeriodicBackgroundSyncPermissionContext::IsTwaInstalled(
-    const GURL& origin) const {
-  return ShortcutHelper::DoesOriginContainAnyInstalledTrustedWebActivity(
-      origin);
-}
-#endif
 
 GURL PeriodicBackgroundSyncPermissionContext::GetDefaultSearchEngineUrl()
     const {
@@ -100,10 +86,6 @@ PeriodicBackgroundSyncPermissionContext::GetContentSettingStatusInternal(
 
 // TODO(crbug.com/397357113): PermissionStatus `change` event not triggered
 // when TWA or PWA is installed or uninstalled on Android.
-#if BUILDFLAG(IS_ANDROID)
-  if (IsTwaInstalled(requesting_origin))
-    return CONTENT_SETTING_ALLOW;
-#endif
 
   bool can_bypass_install_requirement =
       base::FeatureList::IsEnabled(
@@ -164,7 +146,6 @@ void PeriodicBackgroundSyncPermissionContext::OnContentSettingChanged(
       ContentSettingsTypeSet(ContentSettingsType::PERIODIC_BACKGROUND_SYNC));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void PeriodicBackgroundSyncPermissionContext::OnWebAppInstalled(
     const webapps::AppId& app_id) {
   auto* provider = web_app::WebAppProvider::GetForWebApps(
@@ -227,4 +208,3 @@ void PeriodicBackgroundSyncPermissionContext::
   install_manager_observation_.Reset();
   app_id_origin_map_.clear();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

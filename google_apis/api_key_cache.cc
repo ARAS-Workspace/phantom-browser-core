@@ -54,15 +54,8 @@ ApiKeyCache::ApiKeyCache(const DefaultApiKeys& default_api_keys)
   api_key_ = CalculateKeyValue(
       default_api_keys.google_api_key, STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY),
       std::string(), default_api_keys.allow_unset_values);
-// A special non-stable key is at the moment defined only for Android Chrome.
-#if BUILDFLAG(IS_ANDROID)
-  api_key_non_stable_ = CalculateKeyValue(
-      default_api_keys.google_api_key_android_non_stable,
-      STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_ANDROID_NON_STABLE), std::string(),
-      default_api_keys.allow_unset_values);
-#else
+  // A special non-stable key is at the moment defined only for Android Chrome.
   api_key_non_stable_ = api_key_;
-#endif
 
   api_key_remoting_ =
       CalculateKeyValue(default_api_keys.google_api_key_remoting,
@@ -78,12 +71,10 @@ ApiKeyCache::ApiKeyCache(const DefaultApiKeys& default_api_keys)
       default_api_keys.google_api_key_partial_translate,
       STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_PARTIAL_TRANSLATE), std::string(),
       default_api_keys.allow_unset_values);
-#if !BUILDFLAG(IS_ANDROID)
   api_key_hats_ =
       CalculateKeyValue(default_api_keys.google_api_key_hats,
                         STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_HATS),
                         std::string(), default_api_keys.allow_unset_values);
-#endif
 
   metrics_key_ =
       CalculateKeyValue(default_api_keys.google_metrics_signing_key,

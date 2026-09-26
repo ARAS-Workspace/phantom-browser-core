@@ -517,13 +517,8 @@ IN_PROC_BROWSER_TEST_P(ExtensionSameSiteCookiesTest,
 }
 
 // TODO(crbug.com/509639786): Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ActiveTabPermissions_BackgroundPage \
-  DISABLED_ActiveTabPermissions_BackgroundPage
-#else
 #define MAYBE_ActiveTabPermissions_BackgroundPage \
   ActiveTabPermissions_BackgroundPage
-#endif
 // SameSite-cookies-flavoured copy of the ExtensionActiveTabTest.ActiveTab test.
 // In this test, the effective extension permissions are changing at runtime
 // - the test verifies that the changing permissions are correctly propagated
@@ -716,13 +711,8 @@ IN_PROC_BROWSER_TEST_P(ExtensionSameSiteCookiesTest,
 }
 
 // TODO(crbug.com/509639786): Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ActiveTabPermissions_ExtensionServiceWorker \
-  DISABLED_ActiveTabPermissions_ExtensionServiceWorker
-#else
 #define MAYBE_ActiveTabPermissions_ExtensionServiceWorker \
   ActiveTabPermissions_ExtensionServiceWorker
-#endif
 IN_PROC_BROWSER_TEST_P(ExtensionSameSiteCookiesTest,
                        MAYBE_ActiveTabPermissions_ExtensionServiceWorker) {
   const char kServiceWorker[] = R"(

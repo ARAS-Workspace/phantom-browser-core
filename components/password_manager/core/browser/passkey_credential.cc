@@ -15,15 +15,11 @@
 #include "components/strings/grit/components_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/containers/span.h"
 #include "components/sync/protocol/webauthn_credential_specifics.pb.h"
 #include "components/webauthn/core/browser/passkey_model_utils.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace password_manager {
-
-#if !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -64,16 +60,10 @@ std::vector<PasskeyCredential> PasskeyCredential::FromCredentialSpecifics(
   return ret;
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 int GetAuthenticationLabelForPasskeysFromAndroid() {
-#if BUILDFLAG(IS_ANDROID)
-  return IDS_PASSWORD_MANAGER_PASSKEY;
-#else
   return IDS_PASSWORD_MANAGER_USE_SCREEN_LOCK;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

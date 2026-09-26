@@ -46,13 +46,8 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/report_scheduler_android.h"
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-#else
 #include "chrome/browser/enterprise/reporting/report_scheduler_desktop.h"
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 using ::base::test::RunOnceCallback;
 using ::testing::_;
@@ -107,15 +102,9 @@ ACTION(ScheduleProfileRequestGeneratorEmptyReportCallback) {
 
 class MockReportGenerator : public ReportGenerator {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  explicit MockReportGenerator(
-      ReportingDelegateFactoryAndroid* delegate_factory)
-      : ReportGenerator(delegate_factory) {}
-#else
   explicit MockReportGenerator(
       ReportingDelegateFactoryDesktop* delegate_factory)
       : ReportGenerator(delegate_factory) {}
-#endif  // BUILDFLAG(IS_ANDROID)
   void Generate(ReportType report_type, ReportCallback callback) override {
     OnGenerate(report_type, callback);
   }
@@ -144,16 +133,10 @@ class MockReportUploader : public ReportUploader {
 
 class MockChromeProfileRequestGenerator : public ChromeProfileRequestGenerator {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  explicit MockChromeProfileRequestGenerator(
-      ReportingDelegateFactoryAndroid* delegate_factory)
-#else
   explicit MockChromeProfileRequestGenerator(
       ReportingDelegateFactoryDesktop* delegate_factory)
-#endif  // BUILDFLAG(IS_ANDROID)
       : ChromeProfileRequestGenerator(/*profile_path=*/base::FilePath(),
-                                      delegate_factory) {
-  }
+                                      delegate_factory) {}
   void Generate(ReportGenerationConfig generation_config,
                 ReportCallback callback) override {
     OnGenerate(callback);
@@ -216,12 +199,7 @@ class ReportSchedulerTest : public ::testing::Test {
     ReportScheduler::CreateParams params;
     params.client = client_;
     client_->SetDMToken("dm-token");
-    params.delegate =
-#if BUILDFLAG(IS_ANDROID)
-        std::make_unique<ReportSchedulerAndroid>(profile);
-#else
-        std::make_unique<ReportSchedulerDesktop>(profile);
-#endif  // BUILDFLAG(IS_ANDROID)
+    params.delegate = std::make_unique<ReportSchedulerDesktop>(profile);
     if (params.delegate->GetPrefService()
             ->GetTime(kLastUploadTimestamp)
             .is_null()) {
@@ -306,11 +284,7 @@ class ReportSchedulerTest : public ::testing::Test {
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   TestingProfileManager profile_manager_{TestingBrowserProcess::GetGlobal()};
 
-#if BUILDFLAG(IS_ANDROID)
-  ReportingDelegateFactoryAndroid report_delegate_factory_;
-#else
   ReportingDelegateFactoryDesktop report_delegate_factory_;
-#endif  // BUILDFLAG(IS_ANDROID)
   std::unique_ptr<policy::MockCloudPolicyClient> client_ptr_;
   std::unique_ptr<MockReportGenerator> generator_ptr_;
   std::unique_ptr<MockReportUploader> uploader_ptr_;
@@ -718,7 +692,6 @@ TEST_F(ReportSchedulerTest, ManualReportWithRegularOneOngoing) {
 }
 
 // Android does not support version updates
-#if !BUILDFLAG(IS_ANDROID)
 
 // Tests that a basic report is generated and uploaded when a browser update is
 // detected.
@@ -962,7 +935,6 @@ TEST_F(ReportSchedulerTest, UploadReportSucceededForProfileReporting) {
   ::testing::Mock::VerifyAndClearExpectations(client_);
   ::testing::Mock::VerifyAndClearExpectations(profile_request_generator_);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class EnabledProfileSecuritySignalsReportSchedulerTest
     : public ReportSchedulerTest {
@@ -1373,13 +1345,8 @@ TEST_F(EnabledProfileSecuritySignalsReportSchedulerTest,
 
   // Trigger security report via delegate callback.
   auto* delegate = scheduler_->GetDelegateForTesting();
-#if BUILDFLAG(IS_ANDROID)
-  static_cast<ReportSchedulerAndroid*>(delegate)->OnReportEventTriggered(
-      SecurityReportTrigger::kTimer);
-#else
   static_cast<ReportSchedulerDesktop*>(delegate)->OnReportEventTriggered(
       SecurityReportTrigger::kTimer);
-#endif
 
   EXPECT_NE(scheduler_->GetActiveTriggerForTesting(),
             ReportTrigger::kTriggerSecurity);

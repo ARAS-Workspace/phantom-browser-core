@@ -27,16 +27,7 @@ namespace base {
 namespace {
 
 base::Time GetUpperBoundTime() {
-#if BUILDFLAG(IS_ANDROID)
-  // If process creation time is not available then use instance creation
-  // time as the upper-bound for old files. Modification times may be
-  // rounded-down to coarse-grained increments, e.g. FAT has 2s granularity,
-  // so it is necessary to set the upper-bound earlier than Now() by at least
-  // that margin to account for modification times being rounded-down.
-  return Time::Now() - Seconds(2);
-#else
   return Process::Current().CreationTime() - Seconds(2);
-#endif
 }
 
 }  // namespace

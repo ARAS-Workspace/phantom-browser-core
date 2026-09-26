@@ -20,11 +20,7 @@ namespace sandbox {
 namespace {
 
 // Fails on Android: crbug.com/459158
-#if !BUILDFLAG(IS_ANDROID)
 #define MAYBE_NoFork DISABLE_ON_ASAN(NoFork)
-#else
-#define MAYBE_NoFork DISABLED_NoFork
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Not being able to fork breaks LeakSanitizer, so disable on
 // all ASAN builds.

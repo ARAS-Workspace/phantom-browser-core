@@ -14,11 +14,7 @@
 #include "content/public/browser/secure_payment_confirmation_utils.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/webauthn/android/internal_authenticator_android.h"
-#else
 #include "components/webauthn/content/browser/internal_authenticator_impl.h"
-#endif
 
 namespace payments {
 
@@ -42,14 +38,8 @@ void CreateSecurePaymentConfirmationService(
 
   std::unique_ptr<webauthn::InternalAuthenticator> maybe_authenticator;
   if (render_frame_host->IsActive() && render_frame_host->IsRenderFrameLive()) {
-#if BUILDFLAG(IS_ANDROID)
-    maybe_authenticator =
-        std::make_unique<webauthn::InternalAuthenticatorAndroid>(
-            render_frame_host);
-#else
     maybe_authenticator =
         std::make_unique<content::InternalAuthenticatorImpl>(render_frame_host);
-#endif
   }
 
   // The object is bound to the lifetime of |render_frame_host| and the mojo

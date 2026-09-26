@@ -34,9 +34,7 @@
 #include "content/public/browser/browsing_data_remover.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
-#endif
 
 #include <algorithm>
 #include <optional>
@@ -49,11 +47,7 @@
 namespace profiles {
 
 bool IsMultipleProfilesEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 base::FilePath GetDefaultProfileDir(const base::FilePath& user_data_dir) {
@@ -81,10 +75,8 @@ void RegisterPrefs(PrefRegistrySimple* registry) {
       prefs::kBrowserProfilePickerAvailabilityOnStartup,
       static_cast<int>(ProfilePicker::AvailabilityOnStartup::kEnabled));
   registry->RegisterBooleanPref(prefs::kBrowserProfilePickerShown, false);
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(
       prefs::kEnterpriseProfileCreationKeepBrowsingData, false);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void SetLastUsedProfile(const base::FilePath& profile_dir) {
@@ -110,7 +102,6 @@ bool IsRegularUserProfile(Profile* profile) {
   return selections.ApplyProfileSelection(profile);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::u16string GetAvatarNameForProfile(const base::FilePath& profile_path) {
   if (profile_path == ProfileManager::GetGuestProfilePath()) {
     return l10n_util::GetStringUTF16(IDS_GUEST_PROFILE_NAME);
@@ -332,7 +323,5 @@ std::u16string GetDefaultNameForNewSignedInProfileWithIncompleteInfo(
   CHECK(!account_info.email.empty());
   return base::UTF8ToUTF16(account_info.email);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace profiles

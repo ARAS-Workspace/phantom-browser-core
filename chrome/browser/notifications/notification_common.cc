@@ -51,13 +51,8 @@ void NotificationCommon::OpenNotificationSettings(Profile* profile,
   // TODO(peter): Use the |origin| to direct the user to a more appropriate
   // settings page to toggle permission.
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android settings are handled through Java.
-  NOTREACHED();
-#else
   chrome::ScopedTabbedBrowserDisplayer browser_displayer(profile);
   chrome::ShowContentSettingsExceptions(
       browser_displayer.browser_window_interface(),
       ContentSettingsType::NOTIFICATIONS);
-#endif
 }

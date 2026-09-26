@@ -41,15 +41,6 @@ TEST(ServiceUtilsTest, UpdateShaderCacheSizeOnMemoryLimit_Aggressive) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeature(features::kAggressiveShaderCacheLimits);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android ignores all pressure.
-  EXPECT_EQ(UpdateShaderCacheSizeOnMemoryLimit(kMaxCacheSize, 100),
-            kMaxCacheSize);
-  EXPECT_EQ(UpdateShaderCacheSizeOnMemoryLimit(kMaxCacheSize, 50),
-            kMaxCacheSize);
-  EXPECT_EQ(UpdateShaderCacheSizeOnMemoryLimit(kMaxCacheSize, 0),
-            kMaxCacheSize);
-#else
   // Non-Android desktop:
   // Ignore limits above Moderate (50%).
   EXPECT_EQ(UpdateShaderCacheSizeOnMemoryLimit(kMaxCacheSize, 100),
@@ -67,7 +58,6 @@ TEST(ServiceUtilsTest, UpdateShaderCacheSizeOnMemoryLimit_Aggressive) {
   // Critical (0%) -> 25% of max size
   EXPECT_EQ(UpdateShaderCacheSizeOnMemoryLimit(kMaxCacheSize, 0),
             kMaxCacheSize / 4);
-#endif
 }
 
 TEST(ServiceUtilsTest, UpdateShaderCacheSizeOnMemoryPressure) {

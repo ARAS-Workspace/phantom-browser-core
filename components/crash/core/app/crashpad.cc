@@ -75,7 +75,7 @@ bool InitializeCrashpadImpl(bool initial_client,
     // sanitization.
     DCHECK(browser_process || process_type == "relauncher" ||
            process_type == "app_shim");
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_LINUX)
     DCHECK(browser_process);
 #else
 #error Port.
@@ -136,7 +136,7 @@ bool InitializeCrashpadImpl(bool initial_client,
   // On Mac, we only want the browser to initialize the database, but not the
   // relauncher.
   const bool should_initialize_database_and_set_upload_policy = browser_process;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_LINUX)
   const bool should_initialize_database_and_set_upload_policy = browser_process;
 #endif
   if (should_initialize_database_and_set_upload_policy) {
@@ -145,13 +145,11 @@ bool InitializeCrashpadImpl(bool initial_client,
     g_database =
         crashpad::CrashReportDatabase::Initialize(database_path).release();
 
-#if !BUILDFLAG(IS_ANDROID)
     // On Android crashpad doesn't handle uploads. Android uses
     // //components/minidump_uploader which queries metrics sample/consent opt
     // in from preferences.
     CrashReporterClient* crash_reporter_client = GetCrashReporterClient();
     SetUploadConsent(crash_reporter_client->GetCollectStatsConsent());
-#endif
   }
   return true;
 }
@@ -202,18 +200,15 @@ void SetUploadConsent(bool consent) {
                               crash_reporter_client->GetCollectStatsInSample());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void DumpWithoutCrashing() {
   CRASHPAD_SIMULATE_CRASH();
 }
 
-#endif
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 void CrashWithoutDumping(const std::string& message) {
   crashpad::CrashpadClient::CrashWithoutDump(message);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 void GetReports(std::vector<Report>* reports) {
   GetReportsImpl(reports);

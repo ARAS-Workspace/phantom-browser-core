@@ -154,19 +154,11 @@ RevokedPermissionsService::RevokedPermissionsService(
   pref_change_registrar_ = std::make_unique<PrefChangeRegistrar>();
   pref_change_registrar_->Init(prefs);
 
-#if BUILDFLAG(IS_ANDROID)
-    pref_change_registrar_->Add(
-        safety_hub_prefs::kUnusedSitePermissionsRevocationEnabled,
-        base::BindRepeating(&RevokedPermissionsService::
-                                OnPermissionsAutorevocationControlChanged,
-                            base::Unretained(this)));
-#else   // BUILDFLAG(IS_ANDROID)
   pref_change_registrar_->Add(
       safety_hub_prefs::kUnusedSitePermissionsRevocationEnabled,
       base::BindRepeating(
           &RevokedPermissionsService::OnPermissionsAutorevocationControlChanged,
           base::Unretained(this)));
-#endif  // BUILDFLAG(IS_ANDROID)
 
     RevokedPermissionsOSNotificationDisplayManager*
         notification_display_manager =

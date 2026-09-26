@@ -11,10 +11,6 @@
 #include "base/metrics/field_trial_params.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #endif
@@ -120,26 +116,9 @@ BASE_FEATURE(kExperimentalFlingAnimation,
 #endif
 );
 
-#if BUILDFLAG(IS_ANDROID)
-// Whether to use the desktop scrolling behavior on Android. This is intended
-// for desktop Android, though it's available everywhere.
-BASE_FEATURE(kDesktopFlingCurveOnAndroid, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Whether to suppress legacy overscroll edge glow (OverscrollGlow) on Android.
-// This is intended for desktop Android, where neither elastic stretch nor
-// legacy shade should be shown.
-BASE_FEATURE(kSuppressOverscrollGlow, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
-
 #if !BUILDFLAG(IS_APPLE)
 // Cached in Java as well, make sure defaults are updated together.
-BASE_FEATURE(kElasticOverscroll,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else  // BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kElasticOverscroll, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
 // Limits the scroll delta to the size of the scroller when scrolled using the
@@ -166,7 +145,7 @@ bool IsTouchTextEditingRedesignEnabled() {
 
 // This feature enables drag and drop using touch input devices.
 BASE_FEATURE(kTouchDragAndDrop,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -260,13 +239,8 @@ BASE_FEATURE(kUIDebugTools,
 
 bool IsSwipeToMoveCursorEnabled() {
   static const bool enabled =
-#if BUILDFLAG(IS_ANDROID)
-      base::android::android_info::sdk_int() >=
-      base::android::android_info::SDK_VERSION_R;
-#else
       base::FeatureList::IsEnabled(kSwipeToMoveCursor) ||
       IsTouchTextEditingRedesignEnabled();
-#endif
   return enabled;
 }
 

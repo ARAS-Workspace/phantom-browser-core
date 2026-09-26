@@ -114,13 +114,9 @@ TEST_F(OpenTabProviderTest, TestChromeNewTabPageOmitted) {
   open_tab_provider().Start(input, /* minimal_changes= */ false);
 
   int test_index = 0;
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ(3UL, open_tab_provider().matches().size());
-#else
   ASSERT_EQ(4UL, open_tab_provider().matches().size());
   ASSERT_EQ(open_tab_provider().matches()[test_index++].destination_url,
             "chrome-native://newtab/");
-#endif
   ASSERT_EQ(open_tab_provider().matches()[test_index++].destination_url,
             "chrome-native://bookmarks/");
   ASSERT_EQ(open_tab_provider().matches()[test_index++].destination_url,
@@ -159,11 +155,7 @@ TEST_F(OpenTabProviderTest, TestZPS) {
                           TestSchemeClassifier());
   open_tab_provider().Start(input, /* minimal_changes= */ false);
 
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ(2UL, open_tab_provider().matches().size());
-#else
   ASSERT_EQ(0UL, open_tab_provider().matches().size());
-#endif
 }
 
 TEST_F(OpenTabProviderTest, KeywordMode) {
@@ -212,14 +204,5 @@ TEST_F(OpenTabProviderTest, TestZPS_WeightedByRecency) {
                           TestSchemeClassifier());
   open_tab_provider().Start(input, /* minimal_changes= */ false);
 
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ(3UL, open_tab_provider().matches().size());
-  auto match1 = open_tab_provider().matches()[0];
-  auto match2 = open_tab_provider().matches()[1];
-  auto match3 = open_tab_provider().matches()[2];
-  ASSERT_GT(match1.relevance, match2.relevance);
-  ASSERT_GT(match3.relevance, match1.relevance);
-#else
   ASSERT_EQ(0UL, open_tab_provider().matches().size());
-#endif
 }

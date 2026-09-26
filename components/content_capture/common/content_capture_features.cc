@@ -17,11 +17,7 @@ BASE_FEATURE(kContentCaptureSendMetadataForDataShare,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 bool IsContentCaptureEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif
 }
 
 bool ShouldSendMetadataForDataShare() {

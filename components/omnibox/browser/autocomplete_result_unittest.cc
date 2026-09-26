@@ -826,7 +826,6 @@ TEST_F(AutocompleteResultTest, SortAndCullEmptyDestinationURLs) {
   EXPECT_EQ(1000, result.match_at(3)->relevance);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests which remove results only work on desktop.
 
 TEST_F(AutocompleteResultTest, SortAndCullTailSuggestions) {
@@ -1011,8 +1010,6 @@ TEST_F(AutocompleteResultTest, SortAndCullZeroRelevanceDefaultMatches) {
       EXPECT_FALSE(result.match_at(i)->allowed_to_be_default_match);
   }
 }
-
-#endif
 
 TEST_F(AutocompleteResultTest, SortAndCullOnlyTailSuggestions) {
   // clang-format off
@@ -1346,7 +1343,6 @@ TEST_F(AutocompleteResultTest, DemoteByType) {
   matches[0].allowed_to_be_default_match = false;
   matches[2].allowed_to_be_default_match = false;
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   // Where Grouping suggestions by Search vs URL kicks in, search gets
   // promoted to the top of the list.
 
@@ -1358,18 +1354,6 @@ TEST_F(AutocompleteResultTest, DemoteByType) {
   //   `expected_demoted_non_default_order` are different.
   // Demoting non-default matches (e.g. realbox, URL input)
   const std::vector<size_t> expected_demoted_non_default_order{1, 2, 3, 0};
-#else
-  // Note: Android and iOS performs grouping by Search vs URL at a later stage,
-  // when views are built. this means the vector below will be demoted by type,
-  // but not rearranged by Search vs URL.
-
-  // No demotion (e.g. omnibox input)
-  const std::vector<size_t> expected_natural_order{1, 0, 2, 3};
-  // Demoting all matches (e.g. realbox, search input)
-  const std::vector<size_t> expected_demoted_all_order{3, 2, 0, 1};
-  // Demoting non-default matches (e.g. realbox, URL input)
-  const std::vector<size_t> expected_demoted_non_default_order{1, 2, 3, 0};
-#endif
 
   // Expect no demotion on `HOME_PAGE` inputs. Expect grouping to only non-
   // default matches. History-title is the highest scoring defaultable
@@ -1961,7 +1945,6 @@ TEST_F(AutocompleteResultTest, SortAndCullPromoteDuplicateSearchURLs) {
   EXPECT_EQ(900, result.match_at(2)->relevance);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteResultTest, SortAndCullFeaturedSearchBeforeStarterPack) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeatureWithParameters(
@@ -1999,7 +1982,6 @@ TEST_F(AutocompleteResultTest, SortAndCullFeaturedSearchBeforeStarterPack) {
   }};
   AssertResultMatches(result, expected_data);
 }
-#endif
 
 TEST_F(AutocompleteResultTest,
        GroupSuggestionsBySearchVsURLHonorsProtectedSuggestions) {
@@ -2041,7 +2023,6 @@ TEST_F(AutocompleteResultTest,
                                   .first(AutocompleteResult::GetMaxMatches()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteResultTest, GroupSuggestionsByExtension) {
   const auto group1 = omnibox::GROUP_UNSCOPED_EXTENSION_1;
   const auto group2 = omnibox::GROUP_UNSCOPED_EXTENSION_2;
@@ -2117,7 +2098,6 @@ TEST_F(AutocompleteResultTest, SortAndCullMaxHistoryClusterSuggestions) {
   ASSERT_EQ(result.size(), 1u);
   EXPECT_EQ(result.match_at(0)->type, AutocompleteMatchType::HISTORY_CLUSTER);
 }
-#endif
 
 TEST_F(AutocompleteResultTest, SortAndCullMaxURLMatches) {
   base::test::ScopedFeatureList feature_list;
@@ -2132,7 +2112,6 @@ TEST_F(AutocompleteResultTest, SortAndCullMaxURLMatches) {
   // Case 1: Eject URL match for a search.
   // Does not apply to Android which picks top N matches and performs
   // group by search vs URL separately (Adaptive Suggestions).
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   {
     ACMatches matches;
     const AutocompleteMatchTestData data[] = {
@@ -2171,7 +2150,6 @@ TEST_F(AutocompleteResultTest, SortAndCullMaxURLMatches) {
       EXPECT_EQ(result.match_at(i)->type, expected_types[i]);
     result.ClearMatches();
   }
-#endif
 
   // Case 2: Do not eject URL match because there's no replacement.
   {
@@ -2237,61 +2215,6 @@ TEST_F(AutocompleteResultTest, ConvertsOpenTabsCorrectly) {
   EXPECT_TRUE(result.match_at(1)->has_tab_match.value_or(false));
   EXPECT_FALSE(result.match_at(2)->has_tab_match.value_or(false));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(AutocompleteResultTest, ConvertOpenTabMatches_AttachTabSwitchAction) {
-
-  AutocompleteResult result;
-  ACMatches matches;
-  AutocompleteMatch match;
-  match.destination_url = GURL("http://this-site-matches.com");
-  matches.push_back(match);
-  result.AppendMatches(matches);
-
-  // Have IsTabOpenWithURL() return true for the URL.
-  FakeAutocompleteProviderClient client;
-  static_cast<FakeTabMatcher&>(const_cast<TabMatcher&>(client.GetTabMatcher()))
-      .set_url_substring_match("matches");
-
-  result.ConvertOpenTabMatches(&client, nullptr);
-
-  ASSERT_TRUE(result.match_at(0)->has_tab_match.value_or(false));
-  ASSERT_EQ(result.match_at(0)->actions.size(), 1u);
-  auto* action = result.match_at(0)->actions[0].get();
-  EXPECT_EQ(action->ActionId(), OmniboxActionId::ACTION_IN_SUGGEST);
-  const auto* action_in_suggest = OmniboxActionInSuggest::FromAction(action);
-  ASSERT_TRUE(action_in_suggest);
-  EXPECT_EQ(
-      action_in_suggest->template_action.action_type(),
-      omnibox::SuggestTemplateInfo_TemplateAction_ActionType_CHROME_TAB_SWITCH);
-}
-
-TEST_F(AutocompleteResultTest,
-       ConvertOpenTabMatches_DoNotAttachTabSwitchActionInKeywordMode) {
-
-  AutocompleteResult result;
-  ACMatches matches;
-  AutocompleteMatch match;
-  match.destination_url = GURL("http://this-site-matches.com");
-  match.type = AutocompleteMatchType::OPEN_TAB;
-  match.from_keyword = true;
-  matches.push_back(match);
-  result.AppendMatches(matches);
-
-  // Have IsTabOpenWithURL() return true for the URL.
-  FakeAutocompleteProviderClient client;
-  static_cast<FakeTabMatcher&>(const_cast<TabMatcher&>(client.GetTabMatcher()))
-      .set_url_substring_match("matches");
-
-  AutocompleteInput input(u"query", metrics::OmniboxEventProto::OTHER,
-                          TestSchemeClassifier());
-  result.ConvertOpenTabMatches(&client, &input);
-
-  ASSERT_TRUE(result.match_at(0)->has_tab_match.value_or(false));
-  // Should NOT attach the action because it's OPEN_TAB in keyword mode.
-  EXPECT_EQ(result.match_at(0)->actions.size(), 0u);
-}
-#endif
 
 TEST_F(AutocompleteResultTest,
        ConvertOpenTabMatches_WebUiNtpEnabled_DoNotAttachTabSwitchAction) {
@@ -2394,7 +2317,6 @@ TEST_F(AutocompleteResultTest, AttachesPedals) {
   }));
 
 // Android avoids attaching tab-switch actions by design.
-#if !BUILDFLAG(IS_ANDROID)
   // Include a tab-switch action, which is common and shouldn't prevent
   // pedals from attaching to the same match. The first match has a URL
   // that triggers tab-switch action attachment with this fake matcher.
@@ -2412,7 +2334,6 @@ TEST_F(AutocompleteResultTest, AttachesPedals) {
     const auto* pedal = OmniboxPedal::FromAction(action.get());
     return pedal && pedal->PedalId() == OmniboxPedalId::CLEAR_BROWSING_DATA;
   }));
-#endif
 }
 
 TEST_F(AutocompleteResultTest, DocumentSuggestionsCanMergeButNotToDefault) {
@@ -2707,7 +2628,6 @@ TEST_F(AutocompleteResultTest, MaybeCullTailSuggestions) {
   EXPECT_THAT(test({nd, td, t, h}), testing::ElementsAre(nd, tdp, t));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests zps grouping for most visited sites and backfills with different
 // suggestion limits.
 TEST_F(AutocompleteResultTest, Desktop_MostVisitedSitesGrouping) {
@@ -3198,8 +3118,6 @@ TEST_F(AutocompleteResultTest, SplitActionsToSuggestions) {
   EXPECT_EQ(result.size(), 4u);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 TEST_F(AutocompleteResultTest, BadDestinationUrls) {
   AutocompleteMatch empty_url_match;
   empty_url_match.destination_url = GURL();
@@ -3219,64 +3137,6 @@ TEST_F(AutocompleteResultTest, BadDestinationUrls) {
   // Result set of matches should remain empty.
   EXPECT_TRUE(result.empty());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(AutocompleteResultTest, Android_InspireMe) {
-  const auto group1 = omnibox::GROUP_PERSONALIZED_ZERO_SUGGEST;
-  const auto group2 = omnibox::GROUP_TRENDS;
-  const auto group3 = omnibox::GROUP_PREVIOUS_SEARCH_RELATED;
-  TestData data[] = {
-      {0, 1, 500, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {1, 1, 490, true, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {2, 1, 480, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {3, 1, 470, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-      {4, 1, 460, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-      {5, 1, 450, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group3},
-      {6, 1, 440, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group3},
-  };
-  ACMatches matches;
-  PopulateAutocompleteMatches(data, &matches);
-
-  // Suggestion groups have the omnibox::SECTION_DEFAULT and
-  // omnibox::GroupConfig_SideType_DEFAULT_PRIMARY by default.
-  omnibox::GroupConfigMap suggestion_groups_map;
-  suggestion_groups_map[group1];
-  suggestion_groups_map[group2];
-  suggestion_groups_map[group3];
-
-  // Set up input for zero-prefix suggestions.
-  AutocompleteInput zero_input(u"", metrics::OmniboxEventProto::NTP,
-                               TestSchemeClassifier());
-  zero_input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-
-  // NOTE:
-  // The tests below verify the behavior with the Grouping Framework for ZPS
-  // enabled. This is intentional: Suggestion Groups make no sense outside of
-  // the grouping framework.
-
-  {
-    SCOPED_TRACE("Inspire Me Passes Only Trending Queries");
-    AutocompleteResult result;
-    result.MergeSuggestionGroupsMap(suggestion_groups_map);
-    result.AppendMatches(matches);
-    result.SortAndCull(zero_input, &template_url_service(),
-                       triggered_feature_service(), /*is_lens_active=*/false,
-                       /*can_show_contextual_suggestions=*/false,
-                       /*mia_enabled=*/false, /*is_incognito=*/false);
-
-    const std::array<TestData, 5> expected_data{{
-        // Default suggestion comes 1st.
-        {1, 1, 490, true, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-        // Other types include all of the Inspire Me queries.
-        {0, 1, 500, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-        {2, 1, 480, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-        {3, 1, 470, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-        {4, 1, 460, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-    }};
-    AssertResultMatches(result, expected_data);
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(AutocompleteResultTest, Android_UndedupTopSearch) {
   scoped_refptr<FakeAutocompleteProvider> provider =
@@ -3354,166 +3214,6 @@ TEST_F(AutocompleteResultTest, Android_UndedupTopSearch) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
-
-TEST_F(AutocompleteResultTest, Mobile_TrimOmniboxActions) {
-  scoped_refptr<FakeAutocompleteProvider> provider =
-      new FakeAutocompleteProvider(AutocompleteProvider::Type::TYPE_SEARCH);
-  using OmniboxActionId::ACTION_IN_SUGGEST;
-  using OmniboxActionId::PEDAL;
-  using OmniboxActionId::UNKNOWN;
-  const std::set<OmniboxActionId> all_actions_to_test{ACTION_IN_SUGGEST, PEDAL};
-
-  struct FilterOmniboxActionsTestData {
-    std::string test_name;
-    std::vector<std::vector<OmniboxActionId>> input_matches_and_actions;
-    std::vector<std::vector<OmniboxActionId>> result_matches_and_actions_zps;
-    std::vector<std::vector<OmniboxActionId>> result_matches_and_actions_typed;
-    bool include_url = false;
-    bool use_tab_switch = false;
-  } test_cases[]{
-      {"No actions attached to matches",
-       {{}, {}, {}, {}},
-       {{}, {}, {}, {}},
-       {{}, {}, {}, {}}},
-      {"Pedals shown only in top three slots",
-       {{PEDAL}, {PEDAL}, {PEDAL}, {PEDAL}},
-       // ZPS
-       {{PEDAL}, {PEDAL}, {PEDAL}, {}},
-       // Typed
-       {{PEDAL}, {PEDAL}, {PEDAL}, {}}},
-      {"Actions are shown only in first position",
-       {{ACTION_IN_SUGGEST}, {}, {ACTION_IN_SUGGEST}, {ACTION_IN_SUGGEST}},
-#if BUILDFLAG(IS_ANDROID)
-       // ZPS
-       {{ACTION_IN_SUGGEST}, {}, {}, {}},
-       // Typed
-       {{ACTION_IN_SUGGEST}, {}, {}, {}}
-#else
-       // ZPS
-       {{}, {}, {}, {}},
-       // Typed
-       {{ACTION_IN_SUGGEST}, {}, {}, {}}
-#endif
-      },
-      {"Actions are promoted over Pedals; positions dictate preference",
-       {{ACTION_IN_SUGGEST, PEDAL},
-        {PEDAL},
-        {ACTION_IN_SUGGEST, PEDAL},
-        {ACTION_IN_SUGGEST, PEDAL}},
-#if BUILDFLAG(IS_ANDROID)
-       // ZPS
-       {{ACTION_IN_SUGGEST}, {PEDAL}, {}, {}},
-       // Typed
-       {{ACTION_IN_SUGGEST}, {PEDAL}, {}, {}}
-#else
-       // ZPS
-       {{PEDAL}, {PEDAL}, {PEDAL}, {}},
-       // Typed
-       {{ACTION_IN_SUGGEST}, {PEDAL}, {PEDAL}, {}}
-#endif
-      },
-      {"Tab Switch actions can appear at any index on Android",
-       {{ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST}},
-#if BUILDFLAG(IS_ANDROID)
-       // ZPS
-       {{ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST}},
-       // Typed
-       {{ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST},
-        {ACTION_IN_SUGGEST}}
-#else
-       // ZPS
-       {{}, {}, {}, {}},
-       // Typed
-       {{ACTION_IN_SUGGEST}, {}, {}, {}}
-#endif
-       ,
-       false,
-       true},
-  };
-
-  // Crete matches following the `input_matches_and_actions` input.
-  // The input specifies what type of OMNIBOX_ACTION should be added to every
-  // individual match.
-  // Once done, run the trimming and verify that the output contains exactly the
-  // matches we want to see.
-  auto run_test = [&](const FilterOmniboxActionsTestData& data) {
-    // Create AutocompleteResult from the test data
-    AutocompleteResult zps_result;
-    AutocompleteResult typed_result;
-    for (const auto& actions : data.input_matches_and_actions) {
-      AutocompleteMatch match(
-          provider.get(), 1, false,
-          data.include_url ? AutocompleteMatchType::URL_WHAT_YOU_TYPED
-                           : AutocompleteMatchType::SEARCH_SUGGEST_ENTITY);
-      for (auto& action_id : actions) {
-        if (action_id == OmniboxActionId::ACTION_IN_SUGGEST) {
-          omnibox::SuggestTemplateInfo::TemplateAction action;
-          action.set_action_type(
-              data.use_tab_switch
-                  ? omnibox::
-                        SuggestTemplateInfo_TemplateAction_ActionType_CHROME_TAB_SWITCH
-                  : omnibox::
-                        SuggestTemplateInfo_TemplateAction_ActionType_DIRECTIONS);
-          match.actions.push_back(base::MakeRefCounted<OmniboxActionInSuggest>(
-              std::move(action), std::nullopt));
-        } else {
-          match.actions.push_back(
-              base::MakeRefCounted<FakeOmniboxAction>(action_id));
-        }
-      }
-      zps_result.AppendMatches({match});
-      typed_result.AppendMatches({match});
-    }
-
-    auto check_results =
-        [&](AutocompleteResult& result,
-            std::vector<std::vector<OmniboxActionId>> expected_actions) {
-          // Check results.
-          EXPECT_EQ(result.size(), expected_actions.size())
-              << "while testing variant: " << data.test_name;
-
-          for (size_t index = 0u; index < result.size(); ++index) {
-            const auto* match = result.match_at(index);
-            const auto& expected_actions_at_position = expected_actions[index];
-            EXPECT_EQ(match->actions.size(),
-                      expected_actions_at_position.size())
-                << " while testing variant: " << data.test_name;
-            for (size_t action_index = 0u;
-                 action_index < expected_actions_at_position.size();
-                 ++action_index) {
-              EXPECT_EQ(expected_actions_at_position[action_index],
-                        match->actions[action_index]->ActionId())
-                  << "match " << index << "action " << action_index
-                  << " while testing variant: " << data.test_name;
-            }
-          }
-        };
-
-    // Run the trimmer. ZPS, then typed.
-    zps_result.TrimOmniboxActions(true);
-    check_results(zps_result, data.result_matches_and_actions_zps);
-
-    typed_result.TrimOmniboxActions(false);
-    check_results(typed_result, data.result_matches_and_actions_typed);
-  };
-
-  for (const auto& test_case : test_cases) {
-    run_test(test_case);
-  }
-}
-
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteResultTest, ContextualSearchAblateOthers) {
   omnibox_feature_configs::ScopedConfigForTesting<
       omnibox_feature_configs::ContextualSearch>
@@ -3715,7 +3415,6 @@ TEST_F(AutocompleteResultTest, ContextualSearchAblateOthers_AblateUrlOnly) {
   }};
   AssertResultMatches(result, expected_data);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AutocompleteResultTest, AttachContextualSearchOpenLensActionToMatches) {
   AutocompleteResult result;

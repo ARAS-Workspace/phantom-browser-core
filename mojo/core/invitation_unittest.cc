@@ -830,11 +830,7 @@ DEFINE_TEST_CLIENT(BrokenTransportClient) {
 }
 
 // TODO(crbug.com/407060377): Flaky in Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_NonBrokerToNonBroker DISABLED_NonBrokerToNonBroker
-#else
 #define MAYBE_NonBrokerToNonBroker NonBrokerToNonBroker
-#endif
 
 TEST_F(MAYBE_InvitationTest, MAYBE_NonBrokerToNonBroker) {
   // Tests a non-broker inviting another non-broker to join the network.

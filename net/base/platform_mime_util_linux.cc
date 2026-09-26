@@ -8,21 +8,10 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/android/network_library.h"
-#else
 #include "base/nix/mime_util_xdg.h"
-#endif
 
 namespace net {
 
-#if BUILDFLAG(IS_ANDROID)
-bool PlatformMimeUtil::GetPlatformMimeTypeFromExtension(
-    const base::FilePath::StringType& ext,
-    std::string* result) const {
-  return android::GetMimeTypeFromExtension(ext, result);
-}
-#else
 bool PlatformMimeUtil::GetPlatformMimeTypeFromExtension(
     const base::FilePath::StringType& ext,
     std::string* result) const {
@@ -45,8 +34,6 @@ bool PlatformMimeUtil::GetPlatformMimeTypeFromExtension(
   *result = out;
   return true;
 }
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 bool PlatformMimeUtil::GetPlatformPreferredExtensionForMimeType(
     std::string_view mime_type,

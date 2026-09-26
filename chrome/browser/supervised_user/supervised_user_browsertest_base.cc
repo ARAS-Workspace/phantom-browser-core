@@ -35,10 +35,6 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace supervised_user {
 
 namespace {
@@ -80,11 +76,7 @@ SupervisedUserBrowserTestBase::~SupervisedUserBrowserTestBase() = default;
 
 void SupervisedUserBrowserTestBase::SetUpBrowserContextKeyedServices(
     content::BrowserContext* context) {
-#if BUILDFLAG(IS_ANDROID)
-  AndroidBrowserTest::SetUpBrowserContextKeyedServices(context);
-#else
   MixinBasedInProcessBrowserTest::SetUpBrowserContextKeyedServices(context);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Preset user-prefs before any service is initialized.
   Profile* profile = Profile::FromBrowserContext(context);
@@ -93,13 +85,6 @@ void SupervisedUserBrowserTestBase::SetUpBrowserContextKeyedServices(
   } else {
     DisableParentalControls(*profile->GetPrefs());
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  GetDeviceParentalControls().SetBrowserContentFiltersEnabledForTesting(
-      initial_state_.android_parental_controls.browser_filter);
-  GetDeviceParentalControls().SetSearchContentFiltersEnabledForTesting(
-      initial_state_.android_parental_controls.search_filter);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   SupervisedUserServiceFactory::GetInstance()->SetTestingFactory(
       context, base::BindRepeating(&BuildSupervisedUserService,
@@ -134,17 +119,9 @@ MockUrlCheckerClient& SupervisedUserBrowserTestBase::GetMockUrlCheckerClient() {
   return mock_url_checker_client_;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-AndroidParentalControls&
-SupervisedUserBrowserTestBase::GetDeviceParentalControls() {
-  return static_cast<AndroidParentalControls&>(
-      g_browser_process->device_parental_controls());
-}
-#else
 DeviceParentalControls&
 SupervisedUserBrowserTestBase::GetDeviceParentalControls() {
   return g_browser_process->device_parental_controls();
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace supervised_user

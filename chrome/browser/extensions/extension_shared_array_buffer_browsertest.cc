@@ -17,23 +17,6 @@
 
 namespace extensions {
 
-#if BUILDFLAG(IS_ANDROID)
-
-constexpr char kBackgroundJS_SabDisallowed[] = R"(
-  chrome.test.runTests([
-    function sendSharedArrayBufferToWorker() {
-      try {
-        let sab = new SharedArrayBuffer(16);
-        chrome.test.fail('SAB construction succeeded unexpectedly')
-      } catch (e) {
-        chrome.test.succeed();
-      }
-    }
-  ]);
-)";
-
-#else
-
 constexpr char kWorkerJS[] = R"(
   function verifyData(data) {
     if (data.byteLength != 16)
@@ -84,8 +67,6 @@ constexpr char kBackgroundJS_SabAllowed[] = R"(
   ]);
 )";
 
-#endif
-
 // Parameterized on tuple of
 // <is_sab_allowed_unconditionally, is_cross_origin_isolated, is_platform_app>.
 class SharedArrayBufferTest
@@ -130,14 +111,9 @@ IN_PROC_BROWSER_TEST_P(SharedArrayBufferTest, TransferToWorker) {
 
   test_dir().WriteManifest(builder);
 
-#if BUILDFLAG(IS_ANDROID)
-  test_dir().WriteFile(FILE_PATH_LITERAL("background.js"),
-                       kBackgroundJS_SabDisallowed);
-#else
   test_dir().WriteFile(FILE_PATH_LITERAL("background.js"),
                        kBackgroundJS_SabAllowed);
   test_dir().WriteFile(FILE_PATH_LITERAL("worker.js"), kWorkerJS);
-#endif
 
   ASSERT_TRUE(RunExtensionTest(test_dir().Pack(),
                                {.launch_as_platform_app = is_platform_app},

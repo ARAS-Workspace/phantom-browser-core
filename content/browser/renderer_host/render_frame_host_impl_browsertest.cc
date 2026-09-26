@@ -122,12 +122,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/render_widget_host_view_android.h"
-#include "third_party/blink/public/mojom/remote_objects/remote_objects.mojom.h"
-#include "ui/android/delegated_frame_host_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if defined(USE_AURA)
 #include "content/browser/renderer_host/delegated_frame_host.h"
 #include "content/browser/renderer_host/render_widget_host_view_aura.h"
@@ -3909,14 +3903,6 @@ IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest, GetCanonicalUrl_None) {
   // No canonical link should be returned if the page has none.
   ASSERT_FALSE(canon_url.has_value());
   content::FetchHistogramsFromChildProcesses();
-
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(base::TimeTicks::IsHighResolution())
-      << "The Blink.Frame.GetCanonicalUrlRendererTime histogram has "
-         "microseconds precision and requires a high-resolution clock";
-  histogram_tester.ExpectTotalCount("Blink.Frame.GetCanonicalUrlRendererTime",
-                                    1);
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest, GetCanonicalUrl_InBody) {
@@ -3929,14 +3915,6 @@ IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest, GetCanonicalUrl_InBody) {
   // A canonical link in the body should be ignored.
   ASSERT_FALSE(canon_url.has_value());
   content::FetchHistogramsFromChildProcesses();
-
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(base::TimeTicks::IsHighResolution())
-      << "The Blink.Frame.GetCanonicalUrlRendererTime histogram has "
-         "microseconds precision and requires a high-resolution clock";
-  histogram_tester.ExpectTotalCount("Blink.Frame.GetCanonicalUrlRendererTime",
-                                    1);
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
@@ -3957,14 +3935,6 @@ IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
   EXPECT_EQ(GURL("https://example.com/canonical.html#fragment"),
             canon_url.value());
   content::FetchHistogramsFromChildProcesses();
-
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(base::TimeTicks::IsHighResolution())
-      << "The Blink.Frame.GetCanonicalUrlRendererTime histogram has "
-         "microseconds precision and requires a high-resolution clock";
-  histogram_tester.ExpectTotalCount("Blink.Frame.GetCanonicalUrlRendererTime",
-                                    1);
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
@@ -3984,14 +3954,6 @@ IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
   // take precedence over the one from the loaded document/URL.
   EXPECT_EQ(GURL("https://example.com/canonical1.html#a1"), canon_url.value());
   content::FetchHistogramsFromChildProcesses();
-
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(base::TimeTicks::IsHighResolution())
-      << "The Blink.Frame.GetCanonicalUrlRendererTime histogram has "
-         "microseconds precision and requires a high-resolution clock";
-  histogram_tester.ExpectTotalCount("Blink.Frame.GetCanonicalUrlRendererTime",
-                                    1);
-#endif
 }
 
 // Regression test for https://crbug.com/852350
@@ -4632,15 +4594,6 @@ class RenderFrameHostImplNoStrictSiteIsolationOnAndroidBrowserTest
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     RenderFrameHostImplBrowserTest::SetUpCommandLine(command_line);
-
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, --site-per-process may be passed on some bots to force strict
-    // site isolation.  That causes this test too create a lot of processes and
-    // time out due to running too slowly, so force this test to run without
-    // strict site isolation on Android.  This is ok since this test doesn't
-    // actually care about process isolation.
-    command_line->RemoveSwitch(switches::kSitePerProcess);
-#endif
   }
 };
 
@@ -6051,284 +6004,6 @@ IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest, CrossSiteFrame) {
 
 // TODO(crbug.com/40554401): the code below is temporary and will be
 // removed when Java Bridge is mojofied.
-#if BUILDFLAG(IS_ANDROID)
-
-struct ObjectData {
-  const int32_t id;
-  const std::vector<std::string> methods;
-};
-
-ObjectData kMainObject{5, {"getId", "getInnerObject", "readArray"}};
-ObjectData kInnerObject{10, {"getInnerId"}};
-
-class MockInnerObject : public blink::mojom::RemoteObject {
- public:
-  void HasMethod(const std::string& name, HasMethodCallback callback) override {
-    std::move(callback).Run(std::ranges::contains(kInnerObject.methods, name));
-  }
-  void GetMethods(GetMethodsCallback callback) override {
-    std::move(callback).Run(kInnerObject.methods);
-  }
-  void InvokeMethod(
-      const std::string& name,
-      std::vector<blink::mojom::RemoteInvocationArgumentPtr> arguments,
-      InvokeMethodCallback callback) override {
-    EXPECT_EQ("getInnerId", name);
-    blink::mojom::RemoteInvocationResultPtr result =
-        blink::mojom::RemoteInvocationResult::New();
-    result->error = blink::mojom::RemoteInvocationError::OK;
-    result->value = blink::mojom::RemoteInvocationResultValue::NewNumberValue(
-        kInnerObject.id);
-    std::move(callback).Run(std::move(result));
-  }
-  void NotifyReleasedObject() override {}
-};
-
-class MockObject : public blink::mojom::RemoteObject {
- public:
-  explicit MockObject(
-      mojo::PendingReceiver<blink::mojom::RemoteObject> receiver)
-      : receiver_(this, std::move(receiver)) {}
-  void HasMethod(const std::string& name, HasMethodCallback callback) override {
-    std::move(callback).Run(std::ranges::contains(kMainObject.methods, name));
-  }
-
-  void GetMethods(GetMethodsCallback callback) override {
-    std::move(callback).Run(kMainObject.methods);
-  }
-  void InvokeMethod(
-      const std::string& name,
-      std::vector<blink::mojom::RemoteInvocationArgumentPtr> arguments,
-      InvokeMethodCallback callback) override {
-    blink::mojom::RemoteInvocationResultPtr result =
-        blink::mojom::RemoteInvocationResult::New();
-    result->error = blink::mojom::RemoteInvocationError::OK;
-    if (name == "getId") {
-      result->value = blink::mojom::RemoteInvocationResultValue::NewNumberValue(
-          kMainObject.id);
-    } else if (name == "readArray") {
-      EXPECT_EQ(1U, arguments.size());
-      EXPECT_TRUE(arguments[0]->is_array_value());
-      num_elements_received_ = arguments[0]->get_array_value().size();
-      result->value =
-          blink::mojom::RemoteInvocationResultValue::NewBooleanValue(true);
-    } else if (name == "getInnerObject") {
-      result->value = blink::mojom::RemoteInvocationResultValue::NewObjectId(
-          kInnerObject.id);
-    }
-    std::move(callback).Run(std::move(result));
-  }
-
-  void NotifyReleasedObject() override {}
-
-  int get_num_elements_received() const { return num_elements_received_; }
-
- private:
-  int num_elements_received_ = 0;
-  mojo::Receiver<blink::mojom::RemoteObject> receiver_;
-};
-
-class MockObjectHost : public blink::mojom::RemoteObjectHost {
- public:
-  void GetObject(
-      int32_t object_id,
-      mojo::PendingReceiver<blink::mojom::RemoteObject> receiver) override {
-    if (object_id == kMainObject.id) {
-      mock_object_ = std::make_unique<MockObject>(std::move(receiver));
-    } else if (object_id == kInnerObject.id) {
-      mojo::MakeSelfOwnedReceiver(std::make_unique<MockInnerObject>(),
-                                  std::move(receiver));
-    }
-    reference_count_map_[object_id]++;
-  }
-
-  void AcquireObject(int32_t object_id) override {
-    reference_count_map_[object_id]++;
-  }
-
-  void ReleaseObject(int32_t object_id) override {
-    reference_count_map_[object_id]--;
-  }
-
-  mojo::PendingRemote<blink::mojom::RemoteObjectHost> GetRemote() {
-    if (receiver_.is_bound()) {
-      // When a new RenderFrame is created for a navigation we call this
-      // function again from `RemoteObjectInjector::RenderFrameCreated()`,
-      // so unbind the previous connection with the previous RenderFrame if
-      // needed. Note that we might lose some in-flight messages with the
-      // previous RenderFrame in this case, so this is not perfect.
-      // TODO(https://crbug.com/40615943): Add better support for RemoteObjects
-      // on RenderFrame swaps, if needed.
-      receiver_.reset();
-    }
-    return receiver_.BindNewPipeAndPassRemote();
-  }
-
-  MockObject* GetMockObject() const { return mock_object_.get(); }
-
-  int ReferenceCount(int32_t object_id) const {
-    return !reference_count_map_.at(object_id);
-  }
-
- private:
-  mojo::Receiver<blink::mojom::RemoteObjectHost> receiver_{this};
-  std::unique_ptr<MockObject> mock_object_;
-  std::map<int32_t, int> reference_count_map_{{kMainObject.id, 0},
-                                              {kInnerObject.id, 0}};
-};
-
-class RemoteObjectInjector : public WebContentsObserver {
- public:
-  explicit RemoteObjectInjector(WebContents* web_contents)
-      : WebContentsObserver(web_contents) {}
-
-  RemoteObjectInjector(const RemoteObjectInjector&) = delete;
-  RemoteObjectInjector& operator=(const RemoteObjectInjector&) = delete;
-
-  const MockObjectHost& GetObjectHost() const { return host_; }
-
- private:
-  void RenderFrameCreated(RenderFrameHost* render_frame_host) override {
-    mojo::Remote<blink::mojom::RemoteObjectGateway> gateway;
-    mojo::Remote<blink::mojom::RemoteObjectGatewayFactory> factory;
-    static_cast<RenderFrameHostImpl*>(render_frame_host)
-        ->GetRemoteInterfaces()
-        ->GetInterface(factory.BindNewPipeAndPassReceiver());
-    factory->CreateRemoteObjectGateway(host_.GetRemote(),
-                                       gateway.BindNewPipeAndPassReceiver());
-    gateway->AddNamedObject("testObject", kMainObject.id);
-  }
-
-  MockObjectHost host_;
-};
-
-namespace {
-void SetupRemoteObjectInvocation(Shell* shell, const GURL& url) {
-  WebContents* web_contents = shell->web_contents();
-
-  // The first load triggers RenderFrameCreated on a WebContentsObserver
-  // instance, where the object injection happens.
-  shell->LoadURL(url);
-  EXPECT_TRUE(WaitForLoadStop(web_contents));
-  // Injected objects become visible only after reload.
-  web_contents->GetController().Reload(ReloadType::NORMAL, false);
-  EXPECT_TRUE(WaitForLoadStop(web_contents));
-}
-}  // namespace
-
-// TODO(crbug.com/40554401): Remove this when the new Java Bridge code is
-// integrated into WebView.
-// This test is a temporary way of verifying that the renderer part
-// works as expected.
-// TODO(crbug.com/347691518): This test is flaky.
-IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
-                       DISABLED_RemoteObjectEnumerateProperties) {
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-
-  RemoteObjectInjector injector(web_contents());
-  SetupRemoteObjectInvocation(shell(), url);
-
-  std::string kScript = "Object.keys(testObject).join(' ');";
-  auto result = EvalJs(web_contents(), kScript);
-  EXPECT_EQ(base::JoinString(kMainObject.methods, " "), result);
-}
-
-IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
-                       RemoteObjectInvokeNonexistentMethod) {
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-
-  RemoteObjectInjector injector(web_contents());
-  SetupRemoteObjectInvocation(shell(), url);
-
-  std::string kScript = "testObject.getInnerId();";
-  EXPECT_FALSE(ExecJs(web_contents(), kScript));
-}
-
-// TODO(crbug.com/40236762): This test is flaky.
-IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
-                       DISABLED_RemoteObjectInvokeMethodReturningNumber) {
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-
-  RemoteObjectInjector injector(web_contents());
-  SetupRemoteObjectInvocation(shell(), url);
-
-  std::string kScript = "testObject.getId();";
-  EXPECT_EQ(kMainObject.id, EvalJs(web_contents(), kScript));
-}
-
-// TODO(crbug.com/40236899): This test is flaky.
-IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
-                       DISABLED_RemoteObjectInvokeMethodTakingArray) {
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-
-  RemoteObjectInjector injector(web_contents());
-  SetupRemoteObjectInvocation(shell(), url);
-
-  std::string kScript = "testObject.readArray([6, 8, 2]);";
-  EXPECT_TRUE(ExecJs(web_contents(), kScript));
-  EXPECT_EQ(
-      3, injector.GetObjectHost().GetMockObject()->get_num_elements_received());
-}
-
-// TODO(crbug.com/40274210): This test is flaky.
-IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
-                       DISABLED_RemoteObjectInvokeMethodReturningObject) {
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-
-  RemoteObjectInjector injector(web_contents());
-  SetupRemoteObjectInvocation(shell(), url);
-
-  std::string kScript = "testObject.getInnerObject().getInnerId();";
-  EXPECT_EQ(kInnerObject.id, EvalJs(web_contents(), kScript));
-}
-
-// TODO(crbug.com/340869172): This test is flaky.
-IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
-                       DISABLED_RemoteObjectInvokeMethodException) {
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-
-  RemoteObjectInjector injector(web_contents());
-  SetupRemoteObjectInvocation(shell(), url);
-
-  std::string error_message = "hahaha";
-
-  std::string kScript = JsReplace(R"(
-      const array = [1, 2, 3];
-      Object.defineProperty(array, 0, {
-        get() { throw new Error($1); }
-      });
-      testObject.readArray(array);
-    )",
-                                  error_message);
-  EXPECT_THAT(EvalJs(web_contents(), kScript),
-              EvalJsResult::ErrorIs(testing::HasSubstr(error_message)));
-}
-
-// Based on testReturnedObjectIsGarbageCollected.
-// TODO(crbug.com/340928363): This test is flaky.
-IN_PROC_BROWSER_TEST_F(RenderFrameHostImplBrowserTest,
-                       DISABLED_RemoteObjectRelease) {
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-
-  RemoteObjectInjector injector(web_contents());
-  SetupRemoteObjectInvocation(shell(), url);
-
-  EXPECT_EQ(
-      "object",
-      EvalJs(
-          web_contents(),
-          "globalInner = testObject.getInnerObject(); typeof globalInner; "));
-
-  EXPECT_GT(injector.GetObjectHost().ReferenceCount(kInnerObject.id), 0);
-  EXPECT_EQ("object", EvalJs(web_contents(), "gc(); typeof globalInner;"));
-  EXPECT_GT(injector.GetObjectHost().ReferenceCount(kInnerObject.id), 0);
-  EXPECT_EQ(
-      "undefined",
-      EvalJs(web_contents(), "delete globalInner; gc(); typeof globalInner;"));
-  EXPECT_EQ(injector.GetObjectHost().ReferenceCount(kInnerObject.id), 0);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // The RenderFrameHost's last HTTP status code shouldn't change after
 // same-document navigations.
@@ -6763,7 +6438,6 @@ class RenderFrameHostImplReuseEmptyAvailableRenderBrowserTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/442684241): Re-enable once flakiness is fixed.
 IN_PROC_BROWSER_TEST_F(RenderFrameHostImplReuseEmptyAvailableRenderBrowserTest,
                        DISABLED_ReuseEmptyAvailableRenderForMainFrame) {
@@ -6804,62 +6478,6 @@ IN_PROC_BROWSER_TEST_F(RenderFrameHostImplReuseEmptyAvailableRenderBrowserTest,
       shell()->web_contents()->GetPrimaryMainFrame()->GetProcess();
   EXPECT_EQ(first_navigation_rph->GetID(), third_navigation_rph->GetID());
 }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// On Android, the OS can kill the renderer process at any point without the
-// browser's control. Therefore, the Android version of the test below cannot
-// guarantee that the original process will still be alive and available for
-// reuse. It checks if it's still alive; if so, it should be reused. If not,
-// a new process will be created, which is also acceptable. This is different
-// from the Desktop scenario where the browser has more control over the process
-// lifecycle.
-// TODO(crbug.com/405884216): Very flaky on multiple bots.
-IN_PROC_BROWSER_TEST_F(
-    RenderFrameHostImplReuseEmptyAvailableRenderBrowserTest,
-    DISABLED_ReuseEmptyAvailableRenderIfAvailableForMainFrame) {
-  // The test assumes that the main frame RFH will be reused when navigating.
-  DisableBackForwardCacheForTesting(shell()->web_contents(),
-                                    BackForwardCache::TEST_REQUIRES_NO_CACHING);
-
-  const GURL url_a(embedded_test_server()->GetURL("a.com", "/title1.html"));
-  const GURL url_b(embedded_test_server()->GetURL("b.com", "/title1.html"));
-
-  EXPECT_TRUE(NavigateToURL(shell(), url_a));
-
-  auto* first_navigation_rph =
-      shell()->web_contents()->GetPrimaryMainFrame()->GetProcess();
-
-  // Normally, a policy above //content (e.g., KeepAliveDSEPolicy, like via
-  // SetDSEKeepAlive()) might keep an empty process alive using
-  // IncrementPendingReuseRefCount(). This emulates such a policy directly and
-  // force the renderer process to remain alive for reuse.
-  first_navigation_rph->IncrementPendingReuseRefCount();
-  EXPECT_EQ(1, first_navigation_rph->GetPendingReuseRefCountForTesting());
-  EXPECT_TRUE(first_navigation_rph->IsInitializedAndNotDead());
-
-  // Navigate to a different page.
-  EXPECT_TRUE(NavigateToURL(shell(), url_b));
-
-  auto* second_navigation_rph =
-      shell()->web_contents()->GetPrimaryMainFrame()->GetProcess();
-  EXPECT_NE(first_navigation_rph->GetID(), second_navigation_rph->GetID());
-
-  // Make sure the initial renderer is still available.
-  EXPECT_EQ(1, first_navigation_rph->GetPendingReuseRefCountForTesting());
-
-  // Navigate back to the initial page should take the empty renderer process
-  // being kept alive from the first navigation.
-  EXPECT_TRUE(NavigateToURL(shell(), url_a));
-  auto* third_navigation_rph =
-      shell()->web_contents()->GetPrimaryMainFrame()->GetProcess();
-  if (first_navigation_rph->IsInitializedAndNotDead()) {
-    EXPECT_EQ(first_navigation_rph->GetID(), third_navigation_rph->GetID());
-  } else {
-    EXPECT_NE(first_navigation_rph->GetID(), third_navigation_rph->GetID());
-  }
-}
-#endif
 
 // Test that multiple subframe-shutdown delays from the same source can be in
 // effect, and that cancelling one delay does not cancel the others.
@@ -9062,7 +8680,7 @@ class RenderFrameHostImplBrowsingContextStateNameTest
  protected:
   void SetUp() override {
     // TODO(crbug.com/40840863): Flaky on Mac, Android, Linux.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     GTEST_SKIP();
 #else
 
@@ -9835,14 +9453,6 @@ bool IsChildFrame(RenderWidgetHostView* view) {
       ->IsRenderWidgetHostViewChildFrame();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-ui::DelegatedFrameHostAndroid* GetDelegatedFrameHost(
-    RenderWidgetHostView* view) {
-  CHECK(!IsChildFrame(view));
-  return static_cast<RenderWidgetHostViewAndroid*>(view)
-      ->delegated_frame_host_for_testing();
-}
-#else
 DelegatedFrameHost* GetDelegatedFrameHost(RenderWidgetHostView* view) {
   CHECK(!IsChildFrame(view));
   DelegatedFrameHost* dfh = nullptr;
@@ -9855,17 +9465,12 @@ DelegatedFrameHost* GetDelegatedFrameHost(RenderWidgetHostView* view) {
 #endif  // BUILDFLAG(IS_MAC)
   return dfh;
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 viz::SurfaceId GetCurrentSurfaceIdOnDelegatedFrameHost(
     RenderWidgetHostView* view) {
   auto* dfh = GetDelegatedFrameHost(view);
   CHECK(dfh);
-#if BUILDFLAG(IS_ANDROID)
-  return dfh->GetCurrentSurfaceIdForTesting();
-#else
   return dfh->GetCurrentSurfaceId();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 viz::SurfaceId GetFirstSurfaceIdAfterNavigation(RenderWidgetHostView* view) {
@@ -10182,14 +9787,6 @@ IN_PROC_BROWSER_TEST_F(RenderFrameHostImplPrerenderBrowserTest,
   viz::SurfaceId fallback_surface_id =
       activated_dfh->GetFallbackSurfaceIdForTesting();
   EXPECT_TRUE(initial_surface_id.IsSameOrNewerThan(fallback_surface_id));
-#elif BUILDFLAG(IS_ANDROID)
-  ui::DelegatedFrameHostAndroid* activated_dfh =
-      static_cast<RenderWidgetHostViewAndroid*>(activated_view)
-          ->delegated_frame_host_for_testing();
-  viz::SurfaceId fallback_surface_id =
-      activated_dfh->GetFallbackSurfaceIdForTesting();
-  EXPECT_TRUE(initial_surface_id.IsSameOrNewerThan(fallback_surface_id))
-      << initial_surface_id.ToString() << " " << fallback_surface_id.ToString();
 #endif
 }
 

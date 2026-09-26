@@ -31,18 +31,13 @@
 
 // TODO(http://crbug.com/453008083): Stop including
 // "android/chrome_feature_list.h".
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"  // nogncheck
 #include "chrome/browser/ui/exclusive_access/fullscreen_controller.h"  // nogncheck
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/browser/ui/singleton_tabs.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -74,14 +69,8 @@ api::tabs::WindowType GetTabsWindowType(const BrowserWindowInterface* browser) {
     case BrowserWindowInterface::TYPE_APP_POPUP:
     case BrowserWindowInterface::TYPE_POPUP:
       return api::tabs::WindowType::kPopup;
-#if BUILDFLAG(IS_ANDROID)
-    case BrowserWindowInterface::TYPE_CUSTOM_TAB:
-      return api::tabs::WindowType::kCustomTab;
-#endif
-#if !BUILDFLAG(IS_ANDROID)
     case BrowserWindowInterface::TYPE_DEVTOOLS:
       return api::tabs::WindowType::kDevtools;
-#endif
 
     // All the following are considered "normal".
     // TODO(https://crbug.com/438514981): This is almost certainly wrong, and
@@ -89,9 +78,7 @@ api::tabs::WindowType GetTabsWindowType(const BrowserWindowInterface* browser) {
     // closer to a popup, and custom tabs might be app-like (if they can even
     // reach this point).
     case BrowserWindowInterface::TYPE_NORMAL:
-#if !BUILDFLAG(IS_ANDROID)
     case BrowserWindowInterface::TYPE_PICTURE_IN_PICTURE:
-#endif
       return api::tabs::WindowType::kNormal;
   }
 }
@@ -132,15 +119,11 @@ std::string BrowserExtensionWindowController::GetWindowTypeText() const {
 void BrowserExtensionWindowController::SetFullscreenMode(
     bool is_fullscreen,
     const GURL& extension_url) const {
-#if BUILDFLAG(IS_ANDROID)
-  NOTIMPLEMENTED();
-#else
   if (window()->IsFullscreen() != is_fullscreen) {
     ExclusiveAccessManager::From(&browser_.get())
         ->fullscreen_controller()
         ->ToggleBrowserFullscreenModeWithExtension(extension_url);
   }
-#endif
 }
 
 BrowserWindowInterface*
@@ -148,11 +131,9 @@ BrowserExtensionWindowController::GetBrowserWindowInterface() {
   return &browser_.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 BrowserWindowInterface* BrowserExtensionWindowController::GetBrowser() const {
   return &browser_.get();
 }
-#endif
 
 content::WebContents* BrowserExtensionWindowController::GetActiveTab() const {
   // In some situations, especially tests, there may not be an active tab.
@@ -233,32 +214,7 @@ base::ListValue BrowserExtensionWindowController::CreateTabList(
   for (int i = 0; i < tab_count; ++i) {
     content::WebContents* web_contents = tab_list_->GetTab(i)->GetContents();
 
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(http://crbug.com/453008083): Remove feature flags
-    // kLoadAllTabsAtStartup, and kWebContentsDiscard when both of them are
-    // enabled by default.
-    //
-    // On Android, it was possible for tabs to have null WebContents, so we
-    // implemented a temporary workaround that ignored such tabs to avoid
-    // crashes. The workaround introduced a bug: tabs with null WebContents were
-    // visible on the tab strip, but they couldn't be seen by extensions.
-    //
-    // When feature flags kLoadAllTabsAtStartup, and kWebContentsDiscard are
-    // enabled, all tabs will create a WebContents without a renderer during
-    // initialization, which will properly fix the issue above. As of Feb 2026,
-    // the kLoadAllTabsAtStartup is not enabled by default on non-desktop
-    // Android. WebContentsDiscard is enabled by default on all Android, but the
-    // flag still remains available on other platforms.
-    bool is_non_null_web_contents_guaranteed =
-        base::FeatureList::IsEnabled(chrome::android::kLoadAllTabsAtStartup) &&
-        base::FeatureList::IsEnabled(features::kWebContentsDiscard);
-
-    if (!is_non_null_web_contents_guaranteed && web_contents == nullptr) {
-      continue;
-    }
-#else
     CHECK(web_contents);
-#endif
 
     const ExtensionTabUtil::ScrubTabBehavior scrub_tab_behavior =
         ExtensionTabUtil::GetScrubTabBehavior(extension, context, web_contents);
@@ -277,15 +233,6 @@ bool BrowserExtensionWindowController::OpenOptionsPage(
     bool open_in_tab) {
   DCHECK(OptionsPageInfo::HasOptionsPage(extension));
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, we just open the options page in a new tab.
-  content::OpenURLParams params(
-      url, content::Referrer(),
-      open_in_tab ? WindowOpenDisposition::NEW_FOREGROUND_TAB
-                  : WindowOpenDisposition::CURRENT_TAB,
-      ui::PAGE_TRANSITION_LINK, /*is_renderer_initiated=*/false);
-  browser_->OpenURL(params, /*navigation_handle_callback=*/{});
-#else
   // Force the options page to open in non-OTR window if the extension is not
   // running in split mode, because it won't be able to save settings from OTR.
   // This version of OpenOptionsPage() can be called from an OTR window via e.g.
@@ -306,7 +253,6 @@ bool BrowserExtensionWindowController::OpenOptionsPage(
                                  open_in_tab
                                      ? NavigateParams::RESPECT
                                      : NavigateParams::IGNORE_AND_NAVIGATE);
-#endif
 
   return true;
 }

@@ -190,7 +190,6 @@ TEST_F(WakeLockTest, MultipleRequests) {
 // multiple clients. Has no effect on Android either.
 TEST_F(WakeLockTest, ChangeType) {
   EXPECT_FALSE(HasWakeLock());
-#if !BUILDFLAG(IS_ANDROID)
   // Call ChangeType() on a wake lock that is in inactive status.
   EXPECT_TRUE(ChangeType(device::mojom::WakeLockType::kPreventAppSuspension));
   EXPECT_TRUE(ChangeType(device::mojom::WakeLockType::kPreventDisplaySleep));
@@ -256,16 +255,6 @@ TEST_F(WakeLockTest, ChangeType) {
   EXPECT_EQ(0, GetActiveWakeLocks(mojom::WakeLockType::kPreventDisplaySleep));
   EXPECT_EQ(0, GetActiveWakeLocks(
                    mojom::WakeLockType::kPreventDisplaySleepAllowDimming));
-#else  // BUILDFLAG(IS_ANDROID):
-  EXPECT_FALSE(ChangeType(device::mojom::WakeLockType::kPreventAppSuspension));
-  EXPECT_FALSE(ChangeType(device::mojom::WakeLockType::kPreventDisplaySleep));
-  EXPECT_FALSE(ChangeType(
-      device::mojom::WakeLockType::kPreventDisplaySleepAllowDimming));
-  EXPECT_EQ(0, GetActiveWakeLocks(mojom::WakeLockType::kPreventAppSuspension));
-  EXPECT_EQ(0, GetActiveWakeLocks(mojom::WakeLockType::kPreventDisplaySleep));
-  EXPECT_EQ(0, GetActiveWakeLocks(
-                   mojom::WakeLockType::kPreventDisplaySleepAllowDimming));
-#endif
 }
 
 // WakeLockProvider connection broken doesn't affect WakeLock.

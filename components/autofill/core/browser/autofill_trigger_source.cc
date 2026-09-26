@@ -30,11 +30,7 @@ AutofillTriggerSource TriggerSourceFromSuggestionTriggerSource(
     case AutofillSuggestionTriggerSource::kAtMemoryKeyboardShortcut:
     case AutofillSuggestionTriggerSource::kAtMemoryTriggerString:
       // On Android, no popup exists. Instead, the keyboard accessory is used.
-#if BUILDFLAG(IS_ANDROID)
-      return AutofillTriggerSource::kKeyboardAccessoryOrBottomSheet;
-#else
       return AutofillTriggerSource::kPopup;
-#endif  // BUILDFLAG(IS_ANDROID)
     case AutofillSuggestionTriggerSource::kManualFallbackPasswords:
       // Manual fallbacks are both a suggestion trigger source (e.g. through the
       // context menu) and a trigger source (by selecting a suggestion generated

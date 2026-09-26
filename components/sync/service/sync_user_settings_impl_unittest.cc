@@ -204,7 +204,6 @@ TEST_F(SyncUserSettingsImplTest, GetSelectedTypesWhileSignedOut) {
 
 // kReplaceSyncPromosWithSignInPromos has been enabled by default on mobile
 // platforms for a long time, so the feature-disabled case is not worth testing.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(SyncUserSettingsImplTest,
        DefaultSelectedTypesWhileSignedIn_SyncToSigninDisabled) {
   base::test::ScopedFeatureList feature_list;
@@ -243,7 +242,6 @@ TEST_F(SyncUserSettingsImplTest,
   EXPECT_THAT(sync_user_settings->GetSelectedTypes(),
               ContainerEq(expected_types));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(SyncUserSettingsImplTest,
        DefaultSelectedTypesWhileSignedIn_SyncToSigninEnabled) {
@@ -251,11 +249,9 @@ TEST_F(SyncUserSettingsImplTest,
   feature_list.InitWithFeatures(
       /*enabled_features=*/{switches::kSyncEnableBookmarksInTransportMode,
                             kReplaceSyncPromosWithSignInPromos,
-#if !BUILDFLAG(IS_ANDROID)
                             kReadingListEnableSyncTransportModeUponSignIn,
                             kSeparateLocalAndAccountSearchEngines,
                             syncer::kSeparateLocalAndAccountThemes,
-#endif
                             switches::kEnablePreferencesAccountStorage},
       /*disabled_features=*/{});
 
@@ -268,10 +264,6 @@ TEST_F(SyncUserSettingsImplTest,
 
   UserSelectableTypeSet expected_disabled_types = {};
 
-#if BUILDFLAG(IS_ANDROID)
-  // Themes is not supported on mobile.
-  expected_disabled_types.Put(UserSelectableType::kThemes);
-#endif
   expected_disabled_types.Put(UserSelectableType::kHistory);
   expected_disabled_types.Put(UserSelectableType::kTabs);
   expected_disabled_types.Put(UserSelectableType::kSavedTabGroups);
@@ -424,22 +416,11 @@ TEST_F(SyncUserSettingsImplTest, ShouldSyncSessionsOnlyIfOpenTabsIsSelected) {
   sync_user_settings->SetSelectedTypes(
       /*sync_everything=*/false,
       /*types=*/{UserSelectableType::kHistory, UserSelectableType::kTabs});
-#if BUILDFLAG(IS_ANDROID)
-  // For android and iOS, we enable SAVED_TAB_GROUP under OpenTabs as well.
-  EXPECT_EQ(GetPreferredUserTypes(*sync_user_settings),
-            Union(AlwaysPreferredUserTypes(),
-                  {COLLABORATION_GROUP, HISTORY, HISTORY_DELETE_DIRECTIVES,
-                   SAVED_TAB_GROUP, SHARED_COMMENT, SHARED_TAB_GROUP_DATA,
-                   SESSIONS, USER_EVENTS, SHARED_TAB_GROUP_ACCOUNT_DATA,
-                   WORKSPACE_DESK, ENCRYPTED_TAB_CONTEXT_CONTAINER,
-                   ENCRYPTED_TAB_CONTEXT_ITEM, NOTEBOOK, JOURNEY}));
-#else
   EXPECT_EQ(GetPreferredUserTypes(*sync_user_settings),
             Union(AlwaysPreferredUserTypes(),
                   {HISTORY, HISTORY_DELETE_DIRECTIVES, SESSIONS, USER_EVENTS,
                    WORKSPACE_DESK, ENCRYPTED_TAB_CONTEXT_CONTAINER,
                    ENCRYPTED_TAB_CONTEXT_ITEM, NOTEBOOK, JOURNEY}));
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // History only: SESSIONS-related types are gone.
   sync_user_settings->SetSelectedTypes(
@@ -453,24 +434,13 @@ TEST_F(SyncUserSettingsImplTest, ShouldSyncSessionsOnlyIfOpenTabsIsSelected) {
   sync_user_settings->SetSelectedTypes(
       /*sync_everything=*/false,
       /*types=*/{UserSelectableType::kTabs});
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(
-      GetPreferredUserTypes(*sync_user_settings),
-      Union(AlwaysPreferredUserTypes(),
-            {COLLABORATION_GROUP, SAVED_TAB_GROUP, SESSIONS,
-             SHARED_TAB_GROUP_DATA, SHARED_TAB_GROUP_ACCOUNT_DATA,
-             WORKSPACE_DESK, SHARED_COMMENT, ENCRYPTED_TAB_CONTEXT_CONTAINER,
-             ENCRYPTED_TAB_CONTEXT_ITEM, NOTEBOOK}));
-#else
   EXPECT_EQ(GetPreferredUserTypes(*sync_user_settings),
             Union(AlwaysPreferredUserTypes(),
                   {SESSIONS, WORKSPACE_DESK, ENCRYPTED_TAB_CONTEXT_CONTAINER,
                    ENCRYPTED_TAB_CONTEXT_ITEM, NOTEBOOK}));
-#endif  // BUILDFLAG(IS_ANDROID)
 
-// SavedTabGroups enabled on desktop. It should enable both saved tab groups and
-// shared tab groups.
-#if !BUILDFLAG(IS_ANDROID)
+  // SavedTabGroups enabled on desktop. It should enable both saved tab groups
+  // and shared tab groups.
   sync_user_settings->SetSelectedTypes(
       /*sync_everything=*/false,
       /*types=*/{UserSelectableType::kSavedTabGroups});
@@ -478,7 +448,6 @@ TEST_F(SyncUserSettingsImplTest, ShouldSyncSessionsOnlyIfOpenTabsIsSelected) {
             Union(AlwaysPreferredUserTypes(),
                   {COLLABORATION_GROUP, SAVED_TAB_GROUP, SHARED_COMMENT,
                    SHARED_TAB_GROUP_DATA, SHARED_TAB_GROUP_ACCOUNT_DATA}));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(SyncUserSettingsImplTest, ShouldMutePassphrasePrompt) {

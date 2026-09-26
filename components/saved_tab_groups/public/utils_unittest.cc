@@ -76,11 +76,7 @@ TEST_F(UtilsUnitTest, TestValidGroups) {
   std::optional<base::Token> local_id_token2 =
       base::Token::FromString("0123456789ABCDEF5A5A5A5AA5A5A5A5");
   EXPECT_TRUE(local_id_token2.has_value());
-#if BUILDFLAG(IS_ANDROID)
-  LocalTabGroupID local_id2 = local_id_token2.value();
-#else
   LocalTabGroupID local_id2 = TabGroupId::FromRawToken(local_id_token2.value());
-#endif
 
   SavedTabGroup g2(u"title1", tab_groups::TabGroupColorId::kBlue,
                    /*tabs=*/{tab},

@@ -79,10 +79,8 @@ class PermissionRequestManagerTest : public content::RenderViewHostTestHarness {
                      PermissionRequestGestureType::NO_GESTURE),
         request_camera_(RequestType::kCameraStream,
                         PermissionRequestGestureType::NO_GESTURE),
-#if !BUILDFLAG(IS_ANDROID)
         request_ptz_(RequestType::kCameraPanTiltZoom,
                      PermissionRequestGestureType::NO_GESTURE),
-#endif  // !BUILDFLAG(IS_ANDROID)
         iframe_request_same_domain_(GURL("https://www.google.com/some/url"),
                                     RequestType::kMidiSysex),
         iframe_request_other_domain_(GURL("https://www.youtube.com"),
@@ -90,8 +88,7 @@ class PermissionRequestManagerTest : public content::RenderViewHostTestHarness {
         iframe_request_camera_other_domain_(GURL("https://www.youtube.com"),
                                             RequestType::kStorageAccess),
         iframe_request_mic_other_domain_(GURL("https://www.youtube.com"),
-                                         RequestType::kMicStream) {
-  }
+                                         RequestType::kMicStream) {}
 
   void SetUp() override {
     content::RenderViewHostTestHarness::SetUp();
@@ -155,15 +152,8 @@ class PermissionRequestManagerTest : public content::RenderViewHostTestHarness {
   }
 
   void OpenHelpCenterLink() {
-#if !BUILDFLAG(IS_ANDROID)
     const ui::MouseEvent event(ui::EventType::kMousePressed, gfx::Point(),
                                gfx::Point(), ui::EventTimeForNow(), 0, 0);
-#else  // BUILDFLAG(IS_ANDROID)
-    const ui::TouchEvent event(
-        ui::EventType::kTouchMoved, gfx::PointF(), gfx::PointF(),
-        ui::EventTimeForNow(),
-        ui::PointerDetails(ui::EventPointerType::kTouch, 1));
-#endif
     manager_->OpenHelpCenterLink(event);
     task_environment()->RunUntilIdle();
   }
@@ -249,9 +239,7 @@ class PermissionRequestManagerTest : public content::RenderViewHostTestHarness {
   std::pair<RequestType, PermissionRequestGestureType> request2_;
   std::pair<RequestType, PermissionRequestGestureType> request_mic_;
   std::pair<RequestType, PermissionRequestGestureType> request_camera_;
-#if !BUILDFLAG(IS_ANDROID)
   std::pair<RequestType, PermissionRequestGestureType> request_ptz_;
-#endif
 
   std::pair<GURL, RequestType> iframe_request_same_domain_;
   std::pair<GURL, RequestType> iframe_request_other_domain_;
@@ -425,34 +413,6 @@ TEST_F(PermissionRequestManagerTest, UkmSourceIdIsCorrectlyPopulated) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // Android is the only platform that does not support the permission chip.
-#if BUILDFLAG(IS_ANDROID)
-// Most requests should never be grouped.
-// Grouping for chip feature is tested in ThreeRequestsStackOrderChip.
-TEST_F(PermissionRequestManagerTest, TwoRequestsUngrouped) {
-  MockPermissionRequest::MockPermissionRequestState request1_state;
-  MockPermissionRequest::MockPermissionRequestState request2_state;
-  manager_->AddRequest(web_contents()->GetPrimaryMainFrame(),
-                       CreateRequest(request1_, request1_state.GetWeakPtr()));
-  manager_->AddRequest(web_contents()->GetPrimaryMainFrame(),
-                       CreateRequest(request2_, request2_state.GetWeakPtr()));
-
-  WaitForBubbleToBeShown();
-  EXPECT_TRUE(prompt_factory_->is_visible());
-  ASSERT_EQ(prompt_factory_->request_count(), 1);
-  Accept();
-  EXPECT_TRUE(request1_state.granted);
-
-  WaitForBubbleToBeShown();
-  EXPECT_TRUE(prompt_factory_->is_visible());
-  ASSERT_EQ(prompt_factory_->request_count(), 1);
-  Accept();
-  EXPECT_TRUE(request2_state.granted);
-
-  ASSERT_EQ(prompt_factory_->show_count(), 2);
-}
-
-// Tests for non-Android platforms which support the permission chip.
-#else   // BUILDFLAG(IS_ANDROID)
 TEST_F(PermissionRequestManagerTest, ThreeRequestsStackOrderChip) {
   // Test new permissions order, requests shouldn't be grouped.
   MockPermissionRequest::MockPermissionRequestState request1_state;
@@ -528,7 +488,6 @@ TEST_F(PermissionRequestManagerTest, ThreeRequestsOneByOneStackOrderChip) {
   Accept();
   EXPECT_TRUE(request1_state.granted);
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Only mic/camera requests from the same origin should be grouped.
 TEST_F(PermissionRequestManagerTest, MicCameraGrouped) {
@@ -564,7 +523,6 @@ TEST_F(PermissionRequestManagerTest, MicCameraDifferentOrigins) {
   ASSERT_EQ(prompt_factory_->request_count(), 1);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Only camera/ptz requests from the same origin should be grouped.
 TEST_F(PermissionRequestManagerTest, CameraPtzGrouped) {
   MockPermissionRequest::MockPermissionRequestState request_camera_state;
@@ -646,7 +604,6 @@ TEST_F(PermissionRequestManagerTest, MicCameraPtzDifferentOrigins) {
   EXPECT_TRUE(prompt_factory_->is_visible());
   ASSERT_LT(prompt_factory_->request_count(), 3);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests mix of grouped media requests and non-groupable request.
 TEST_F(PermissionRequestManagerTest, MixOfMediaAndNotMediaRequests) {
@@ -693,36 +650,6 @@ TEST_F(PermissionRequestManagerTest, OpenHelpCenterLink_RequestNotSupported) {
 ////////////////////////////////////////////////////////////////////////////////
 // Tab switching
 ////////////////////////////////////////////////////////////////////////////////
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PermissionRequestManagerTest, TwoRequestsTabSwitch) {
-  MockPermissionRequest::MockPermissionRequestState request_mic_state;
-  MockPermissionRequest::MockPermissionRequestState request_camera_state;
-
-  manager_->AddRequest(
-      web_contents()->GetPrimaryMainFrame(),
-      CreateRequest(request_mic_, request_mic_state.GetWeakPtr()));
-  manager_->AddRequest(
-      web_contents()->GetPrimaryMainFrame(),
-      CreateRequest(request_camera_, request_camera_state.GetWeakPtr()));
-  WaitForBubbleToBeShown();
-
-  EXPECT_TRUE(prompt_factory_->is_visible());
-  ASSERT_EQ(prompt_factory_->request_count(), 2);
-
-  MockTabSwitchAway();
-  EXPECT_TRUE(prompt_factory_->is_visible());
-
-  MockTabSwitchBack();
-  WaitForBubbleToBeShown();
-  EXPECT_TRUE(prompt_factory_->is_visible());
-  ASSERT_EQ(prompt_factory_->request_count(), 2);
-
-  Accept();
-  EXPECT_TRUE(request_mic_state.granted);
-  EXPECT_TRUE(request_camera_state.granted);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(PermissionRequestManagerTest, PermissionRequestWhileTabSwitchedAway) {
   MockTabSwitchAway();
@@ -1655,37 +1582,6 @@ TEST_F(PermissionRequestManagerTest, NotificationsSingleBubbleAndChipRequest) {
 }
 
 // Android is the only platform that does not support the permission chip.
-#if BUILDFLAG(IS_ANDROID)
-// Quiet UI feature is disabled. Chip is disabled. No low priority requests, the
-// first request is always shown.
-//
-// Permissions requested in order:
-// 1. Notification (non abusive)
-// 2. Geolocation
-// 3. Camera
-//
-// Prompt display order:
-// 1. Notification request shown
-// 2. Geolocation request shown
-// 3. Camera request shown
-TEST_F(PermissionRequestManagerTest,
-       NotificationsGeolocationCameraBubbleRequest) {
-  auto request_notifications = CreateAndAddRequest(RequestType::kNotifications,
-                                                   /*should_be_seen=*/true, 1);
-  auto request_geolocation = CreateAndAddRequest(RequestType::kGeolocation,
-                                                 /*should_be_seen=*/false, 1);
-  auto request_camera = CreateAndAddRequest(RequestType::kCameraStream,
-                                            /*should_be_seen=*/false, 1);
-
-  WaitAndAcceptPromptForRequest(request_notifications.get());
-  WaitAndAcceptPromptForRequest(request_geolocation.get());
-  WaitAndAcceptPromptForRequest(request_camera.get());
-
-  EXPECT_EQ(prompt_factory_->show_count(), 3);
-}
-
-// Tests for non-Android platforms which support the permission chip.
-#else  // BUILDFLAG(IS_ANDROID)
 // Quiet UI feature is disabled, no low priority requests, the last request is
 // always shown.
 //
@@ -2591,8 +2487,6 @@ TEST_F(PermissionRequestManagerTest,
   EXPECT_NE(nullptr, manager_->GetEmbeddedPromptFlowModel());
   Accept();
 }
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class PermissionRequestManagerApproximateGeolocationTest
     : public PermissionRequestManagerTest,

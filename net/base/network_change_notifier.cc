@@ -36,8 +36,6 @@
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "net/base/network_change_notifier_apple.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "net/base/network_change_notifier_passive.h"
 #endif
 
 namespace net {
@@ -299,13 +297,7 @@ std::unique_ptr<NetworkChangeNotifier> NetworkChangeNotifier::CreateIfNeeded(
         initial_type, initial_subtype);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Fallback to use NetworkChangeNotifierPassive if
-  // NetworkChangeNotifierFactory is not set. Currently used for tests and when
-  // running network service in a separate process.
-  return std::make_unique<NetworkChangeNotifierPassive>(initial_type,
-                                                        initial_subtype);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return std::make_unique<NetworkChangeNotifierLinux>(
       absl::flat_hash_set<std::string>());
 #elif BUILDFLAG(IS_APPLE)

@@ -69,11 +69,7 @@
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/autofill/core/browser/metrics/payments/credit_card_save_metrics_android.h"
-#else
 #include "components/autofill/core/browser/metrics/payments/credit_card_save_metrics_desktop.h"
-#endif
 
 namespace autofill {
 namespace {
@@ -156,17 +152,11 @@ void LogPromptOfferMetricForCreditCardSave(
       // SaveCardBubbleController. This kCvcMissing case will abort early, so we
       // must call LogSaveCreditCardPromptOfferMetricDesktop(~) here now, in
       // addition to the other metrics.
-#if !BUILDFLAG(IS_ANDROID)
       autofill_metrics::LogSaveCreditCardPromptOfferMetricDesktop(
           metric, is_upload_save, /*save_credit_card_options=*/options);
-#endif
       [[fallthrough]];
     case SaveCardPromptOffer::kNotShownMaxStrikesReached:
     case SaveCardPromptOffer::kNotShownRequiredDelay:
-#if BUILDFLAG(IS_ANDROID)
-      autofill_metrics::LogSaveCreditCardPromptOfferMetricAndroid(
-          metric, is_upload_save, /*save_credit_card_options=*/options);
-#endif
       break;
     case SaveCardPromptOffer::kShown:
       break;
@@ -561,15 +551,10 @@ void CreditCardSaveManager::AttemptToOfferCardUploadSave(
         base::UTF16ToUTF8(upload_request_.card.LastFourDigits()));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  upload_request_.client_behavior_signals.push_back(
-      ClientBehaviorConstants::kShowAccountEmailInLegalMessage);
-#else
   if (base::FeatureList::IsEnabled(features::kAutofillEnableWalletBrandingV2)) {
     upload_request_.client_behavior_signals.push_back(
         ClientBehaviorConstants::kShowAccountEmailInLegalMessage);
   }
-#endif
 
   // Check if we should request the CVC-inclusive legal message and if the user
   // has enabled CVC storage.
@@ -852,11 +837,7 @@ void CreditCardSaveManager::OnDidGetUploadDetails(
 }
 
 void CreditCardSaveManager::OfferCardLocalSave() {
-#if BUILDFLAG(IS_ANDROID)
-  bool is_mobile_build = true;
-#else
   bool is_mobile_build = false;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   payments::PaymentsAutofillClient::CardSaveType card_save_type =
       payments::PaymentsAutofillClient::CardSaveType::kCardSaveOnly;
@@ -931,11 +912,7 @@ void CreditCardSaveManager::OfferCvcLocalSave() {
 }
 
 void CreditCardSaveManager::OfferCardUploadSave(ukm::SourceId ukm_source_id) {
-#if BUILDFLAG(IS_ANDROID)
-  bool is_mobile_build = true;
-#else
   bool is_mobile_build = false;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   payments::PaymentsAutofillClient::CardSaveType card_save_type =
       payments::PaymentsAutofillClient::CardSaveType::kCardSaveOnly;
@@ -1332,25 +1309,7 @@ void CreditCardSaveManager::OnUserDidDecideOnUploadSave(
     case SaveCardOfferUserDecision::kAccepted:
       autofill_metrics::LogSaveCreditCardPromptResultMetric(
           SaveCardPromptResult::kAccepted, /*is_upload_save=*/true);
-#if BUILDFLAG(IS_ANDROID)
-      // On Android, requesting cardholder name is a two step flow.
-      if (should_request_name_from_user_) {
-        payments_autofill_client().ConfirmAccountNameFixFlow(base::BindOnce(
-            &CreditCardSaveManager::OnUserDidAcceptAccountNameFixFlow,
-            weak_ptr_factory_.GetWeakPtr()));
-        // On Android, requesting expiration date is a two step flow.
-      } else if (should_request_expiration_date_from_user_) {
-        payments_autofill_client().ConfirmExpirationDateFixFlow(
-            upload_request_.card,
-            base::BindOnce(
-                &CreditCardSaveManager::OnUserDidAcceptExpirationDateFixFlow,
-                weak_ptr_factory_.GetWeakPtr()));
-      } else {
-        OnUserDidAcceptUploadHelper(user_provided_card_details);
-      }
-#else
       OnUserDidAcceptUploadHelper(user_provided_card_details);
-#endif  // BUILDFLAG(IS_ANDROID)
       break;
     case SaveCardOfferUserDecision::kDeclined:
     case SaveCardOfferUserDecision::kIgnored:
@@ -1420,26 +1379,6 @@ void CreditCardSaveManager::OnUserDidDecideOnCvcUploadSave(
       }
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void CreditCardSaveManager::OnUserDidAcceptAccountNameFixFlow(
-    const std::u16string& cardholder_name) {
-  DCHECK(should_request_name_from_user_);
-
-  payments::PaymentsAutofillClient::UserProvidedCardDetails details;
-  details.cardholder_name = cardholder_name;
-  OnUserDidAcceptUploadHelper(details);
-}
-
-void CreditCardSaveManager::OnUserDidAcceptExpirationDateFixFlow(
-    const std::u16string& month,
-    const std::u16string& year) {
-  payments::PaymentsAutofillClient::UserProvidedCardDetails details;
-  details.expiration_date_month = month;
-  details.expiration_date_year = year;
-  OnUserDidAcceptUploadHelper(details);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void CreditCardSaveManager::OnUserDidAcceptUploadHelper(
     const payments::PaymentsAutofillClient::UserProvidedCardDetails&

@@ -8,10 +8,6 @@
 #include <memory>
 #include <ostream>
 
-#if BUILDFLAG(IS_ANDROID)
-#include "gpu/vulkan/android/vulkan_implementation_android.h"
-#endif
-
 #if BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #include "ui/ozone/public/surface_factory_ozone.h"
@@ -43,9 +39,7 @@ std::unique_ptr<VulkanImplementation> CreateVulkanImplementation(
   DCHECK(!allow_protected_memory)
       << "Protected memory is not supported on this platform.";
 
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<VulkanImplementationAndroid>(force_native);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return std::make_unique<VulkanImplementationMac>(use_swiftshader);
 #else
   NOTREACHED();

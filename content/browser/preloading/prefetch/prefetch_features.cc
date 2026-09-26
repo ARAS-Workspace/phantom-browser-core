@@ -69,21 +69,12 @@ const base::FeatureParam<size_t>
 
 BASE_FEATURE(kPrefetchCanaryCheckerParams, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kPrefetchMultipleActiveSetSizeLimitForBase,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<size_t>
-    kPrefetchMultipleActiveSetSizeLimitForBaseValue{
-        &kPrefetchMultipleActiveSetSizeLimitForBase,
-        "prefetch_multiple_active_set_size_limit_for_base_value", 2};
-#else
 BASE_FEATURE(kPrefetchMultipleActiveSetSizeLimitForBase,
              base::FEATURE_ENABLED_BY_DEFAULT);
 const base::FeatureParam<size_t>
     kPrefetchMultipleActiveSetSizeLimitForBaseValue{
         &kPrefetchMultipleActiveSetSizeLimitForBase,
         "prefetch_multiple_active_set_size_limit_for_base_value", 3};
-#endif
 
 BASE_FEATURE(kPrefetchEagerLimit, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<size_t> kMaxNumberOfEagerPrefetchesPerPage{

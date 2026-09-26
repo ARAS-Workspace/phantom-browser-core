@@ -35,21 +35,10 @@ BASE_FEATURE(kSyncNotebook, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSyncJourney, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kUnoPhase2FollowUp,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kUnoPhase2FollowUp, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSyncEnableContactInfoDataTypeForCustomPassphraseUsers,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 bool IsContactInfoDataTypeForCustomPassphraseUsersEnabled() {
   return base::FeatureList::IsEnabled(
@@ -66,12 +55,7 @@ BASE_FEATURE(kSeparateLocalAndAccountSearchEngines,
 );
 
 BASE_FEATURE(kReplaceSyncPromosWithSignInPromos,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kReplaceSyncPromosWithSigninPromosNewSignin,
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -88,18 +72,8 @@ bool IsReplaceSyncPromosWithSignInPromosEnabled() {
 }
 
 // Like DECLARE_SYNC_AUTOFILL_AI_FEATURE but for the definition.
-#if BUILDFLAG(IS_ANDROID)
-#define DEFINE_SYNC_AUTOFILL_AI_FEATURE(feature_name)                         \
-  BASE_FEATURE_WITH_COUNTRY_RESTRICTIONS(                                     \
-      feature_name, base::FEATURE_DISABLED_FOR_COUNTRIES, "ao", "at", "au",   \
-      "be", "bg", "br", "ca", "ch", "cy", "cz", "de", "dk", "dz", "ee", "es", \
-      "fi", "fr", "gb", "gr", "hr", "hu", "id", "ie", "in", "is", "it", "jp", \
-      "kr", "li", "lt", "lu", "lv", "md", "mk", "ml", "mt", "nl", "no", "om", \
-      "pl", "pt", "ro", "se", "si", "sk", "th")
-#else
 #define DEFINE_SYNC_AUTOFILL_AI_FEATURE(feature_name) \
   BASE_FEATURE(feature_name, base::FEATURE_ENABLED_BY_DEFAULT)
-#endif
 
 DEFINE_SYNC_AUTOFILL_AI_FEATURE(kSyncAccountSettings);
 
@@ -114,7 +88,6 @@ DEFINE_SYNC_AUTOFILL_AI_FEATURE(kSyncWalletVehicleRegistrations);
 BASE_FEATURE(kSpellcheckSeparateLocalAndAccountDictionaries,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kReadingListEnableSyncTransportModeUponSignIn,
              base::FEATURE_ENABLED_BY_DEFAULT
 );
@@ -123,10 +96,6 @@ bool IsReadingListAccountStorageEnabled() {
   return base::FeatureList::IsEnabled(
       syncer::kReadingListEnableSyncTransportModeUponSignIn);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Enabled by default, intended as a kill switch.
 BASE_FEATURE(kSyncReadingListBatchUploadSelectedItems,
@@ -138,18 +107,6 @@ BASE_FEATURE(kSeparateLocalAndAccountThemes,
 
 BASE_FEATURE(kSyncIncreaseNudgeDelayForSingleClient,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kWebApkBackupAndRestoreBackend, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kSyncEnablePasswordsSyncErrorMessageAlternative,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kSyncTrustedVaultErrorMessageDuration,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kSyncPreferencesUseSelectedTypes,
              base::FEATURE_ENABLED_BY_DEFAULT);
@@ -175,13 +132,6 @@ BASE_FEATURE(kSyncUsePropagatedAccessToken, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSyncInvalidationsBypassScheduler,
              base::FEATURE_ENABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kSyncSearchEnginesAndroidLFF, base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kSyncUploadAndroidBuildFingerprintPrefix,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 
 BASE_FEATURE(kSyncFixWebSigninSessionDurationForShortLivedSessions,
              base::FEATURE_ENABLED_BY_DEFAULT);

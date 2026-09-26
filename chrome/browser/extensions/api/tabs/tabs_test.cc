@@ -101,7 +101,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/resource_coordinator/tab_lifecycle_unit_source.h"
 #include "chrome/browser/resource_coordinator/tab_manager.h"
 #include "chrome/browser/resource_coordinator/time.h"
@@ -129,7 +128,6 @@
 #include "components/split_tabs/split_tab_id.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/webapps/isolated_web_apps/test_support/signing_keys.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "ui/base/test/scoped_fake_nswindow_fullscreen.h"
@@ -1051,7 +1049,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, InvalidUpdateWindowBounds) {
 
 // On Android this fails when Run() calls BaseWindow::CanResize() returns false
 // due to default Android Browser Tests not having free-form windows.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
                        UpdatingWindowBoundsSucceedsForValidBounds) {
   scoped_refptr<const Extension> extension(ExtensionBuilder("Test").Build());
@@ -1083,73 +1080,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
                            profile(), api_test_utils::FunctionMode::kNone));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
-                       UpdateWindowStateFailsWhenNotResizable) {
-  scoped_refptr<const Extension> extension(ExtensionBuilder("Test").Build());
-  std::vector<BrowserWindowInterface*> windows =
-      GetAllBrowserWindowInterfaces();
-  ASSERT_FALSE(windows.empty());
-  int window_id = ExtensionTabUtil::GetWindowId(windows[0]);
-
-  auto function = base::MakeRefCounted<WindowsUpdateFunction>();
-  function->set_extension(extension.get());
-
-  // Attempting to maximize on Android triggers the CanResize() check. Since
-  // the standard test environment is not in desktop windowing mode (and may
-  // run on older SDKs), this is expected to fail. We verify that an error is
-  // returned without checking the exact string.
-  std::string error = utils::RunFunctionAndReturnError(
-      function.get(),
-      base::StringPrintf("[%u, {\"state\": \"maximized\"}]", window_id),
-      profile());
-  EXPECT_FALSE(error.empty());
-}
-
-// TODO(crbug.com/491868694) Remove once overlapping tests are enabled on
-// Android.
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
-                       UpdateWindowStateSucceedsWhenNoResizeNeeded) {
-  scoped_refptr<const Extension> extension(ExtensionBuilder("Test").Build());
-  std::vector<BrowserWindowInterface*> windows =
-      GetAllBrowserWindowInterfaces();
-  ASSERT_FALSE(windows.empty());
-  int window_id = ExtensionTabUtil::GetWindowId(windows[0]);
-
-  auto function = base::MakeRefCounted<WindowsUpdateFunction>();
-  function->set_extension(extension.get());
-
-  // A simple update that does not require resizing bypasses the CanResize()
-  // check, succeeding without an error code.
-  EXPECT_TRUE(utils::RunFunction(
-      function.get(),
-      base::StringPrintf("[%u, {\"drawAttention\": true}]", window_id),
-      profile(), api_test_utils::FunctionMode::kNone));
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
-                       UpdateWindowStateFullscreenFailsOnAndroid) {
-  scoped_refptr<const Extension> extension(ExtensionBuilder("Test").Build());
-  std::vector<BrowserWindowInterface*> windows =
-      GetAllBrowserWindowInterfaces();
-  ASSERT_FALSE(windows.empty());
-  int window_id = ExtensionTabUtil::GetWindowId(windows[0]);
-
-  auto function = base::MakeRefCounted<WindowsUpdateFunction>();
-  function->set_extension(extension.get());
-
-  // Attempting to enter fullscreen on Android should explicitly fail with
-  // the kUnableToEnterFullScreenAndroid error message.
-  std::string error = utils::RunFunctionAndReturnError(
-      function.get(),
-      base::StringPrintf("[%u, {\"state\": \"fullscreen\"}]", window_id),
-      profile());
-
-  EXPECT_EQ(tabs_constants::kUnableToEnterFullScreenAndroid, error);
-}
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 
@@ -2493,11 +2423,9 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, DiscardSavedTabGroupTabAllowed) {
       tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile());
   ASSERT_TRUE(saved_service);
 
-#if !BUILDFLAG(IS_ANDROID)
   tab_groups::TabGroupSyncServiceInitializedObserver sync_observer(
       saved_service);
   sync_observer.Wait();
-#endif
 
   // Activate the first tab since the second one will be discarded and active
   // tabs cannot be discarded on Android.
@@ -3582,10 +3510,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_SavedTabGroupTab) {
   ASSERT_TRUE(saved_service);
   // Wait for the TabGroupSyncService to properly initialize before making any
   // changes to tab groups. This is not used on Android.
-#if !BUILDFLAG(IS_ANDROID)
   tab_groups::TabGroupSyncServiceInitializedObserver observer(saved_service);
   observer.Wait();
-#endif
 
   // Group the tab and save it.
   tab_groups::TabGroupId group =
@@ -3598,15 +3524,10 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_SavedTabGroupTab) {
       tab_list->GetTab(1)->GetGroup();
   ASSERT_TRUE(tab1_group_id.has_value());
 
-// TabGroupSyncService takes in different types for its methods depending on
-// platform.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(saved_service->GetGroup(tab1_group_id->token()).has_value());
-  auto group_id = group.token();
-#else
+  // TabGroupSyncService takes in different types for its methods depending on
+  // platform.
   EXPECT_TRUE(saved_service->GetGroup(*tab1_group_id).has_value());
   tab_groups::TabGroupId group_id = group;
-#endif
 
   {  // Test the active state change for a saved tab.
     tab_list->ActivateTab(tab_list->GetTab(2)->GetHandle());
@@ -3681,9 +3602,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_SavedTabGroupTab) {
 
   ASSERT_TRUE(saved_service->GetGroup(group_id));
 
-// TODO(https://crbug.com/447211263): Re-enable this subtest once there is
-// support on desktop android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(https://crbug.com/447211263): Re-enable this subtest once there is
+  // support on desktop android.
   {  // Test setting the discard state.
     auto function = base::MakeRefCounted<TabsUpdateFunction>();
     function->set_extension(extension.get());
@@ -3700,7 +3620,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_SavedTabGroupTab) {
   }
 
   ASSERT_TRUE(saved_service->GetGroup(group_id));
-#endif
 
   {  // Test setting URL should pass.
     EXPECT_EQ(example_url, tab1_contents->GetLastCommittedURL());
@@ -3846,11 +3765,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_WebToAboutNewTab) {
   // definitely undesirable for http-initiated navigations (see r818969), but
   // it is less clear what should happen in extension-initiated navigations.
   GURL about_newtab_url = GURL("about:newtab");
-#if BUILDFLAG(IS_ANDROID)
-  GURL chrome_newtab_url = GURL("chrome-native://newtab/");
-#else
   GURL chrome_newtab_url = GURL("chrome://new-tab-page/");
-#endif
   // Navigate a tab to an extension page.
   content::WebContents* extension_contents = GetActiveWebContents();
   ASSERT_TRUE(NavigateToURL(extension_contents, extension_url));
@@ -3885,13 +3800,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_WebToAboutNewTab) {
   content::RenderFrameHost* test_frame = test_contents->GetPrimaryMainFrame();
   EXPECT_EQ(chrome_newtab_url, test_frame->GetLastCommittedURL());
 
-#if BUILDFLAG(IS_ANDROID)
-  // "chrome-native://newtab/" has an opaque origin.
-  EXPECT_TRUE(test_frame->GetLastCommittedOrigin().opaque());
-#else
   EXPECT_EQ(url::Origin::Create(chrome_newtab_url),
             test_frame->GetLastCommittedOrigin());
-#endif
   EXPECT_NE(extension_contents->GetPrimaryMainFrame()->GetProcess(),
             test_contents->GetPrimaryMainFrame()->GetProcess());
 }
@@ -4431,10 +4341,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsMoveSavedTabGroupTabAllowed) {
   ASSERT_TRUE(saved_service);
   // Wait for the TabGroupSyncService to properly initialize before making any
   // changes to tab groups. This is not used on Android.
-#if !BUILDFLAG(IS_ANDROID)
   tab_groups::TabGroupSyncServiceInitializedObserver observer(saved_service);
   observer.Wait();
-#endif
 
   // Group the tab and save it.
   std::optional<tab_groups::TabGroupId> group = tab_list->CreateTabGroup(
@@ -4623,10 +4531,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsGroupForSavedTabGroupTab) {
       tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile());
   ASSERT_TRUE(saved_service);
 
-#if !BUILDFLAG(IS_ANDROID)
   tab_groups::TabGroupSyncServiceInitializedObserver observer(saved_service);
   observer.Wait();
-#endif
 
   // Group the first tab.
   std::optional<tab_groups::TabGroupId> old_group =
@@ -4701,10 +4607,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
       tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile());
   ASSERT_TRUE(saved_service);
 
-#if !BUILDFLAG(IS_ANDROID)
   tab_groups::TabGroupSyncServiceInitializedObserver observer(saved_service);
   observer.Wait();
-#endif
 
   // Group the tab and save it.
   std::optional<tab_groups::TabGroupId> group =
@@ -4870,11 +4774,9 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
       tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile());
   ASSERT_TRUE(saved_service);
 
-#if !BUILDFLAG(IS_ANDROID)
   tab_groups::TabGroupSyncServiceInitializedObserver sync_observer(
       saved_service);
   sync_observer.Wait();
-#endif
 
   // Save the tab and expect that it cannot be navigated forwards or backwards.
   std::optional<tab_groups::TabGroupId> group =
@@ -4978,7 +4880,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsGoForwardAndBackWithoutTabId) {
 }
 
 
-#if !BUILDFLAG(IS_ANDROID)
 // Picture in picture is not supported for Android.
 IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
                        CannotDuplicatePictureInPictureWindows) {
@@ -5009,10 +4910,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
             error);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-
-#if !BUILDFLAG(IS_ANDROID)
 // Split view is not enabled on Android.
 IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, SplitViewAddedAndRemoved) {
   // Create the `TabsEventRouter`, which is required to get a tab update event.
@@ -5393,9 +5290,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, GroupSingleTabInSplitView) {
   EXPECT_TRUE(browser()->tab_strip_model()->GetSplitForTab(1).has_value());
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 class ExtensionTabsDiscardTest : public ExtensionTabsTest,
                                  public ::testing::WithParamInterface<bool> {
  public:
@@ -5464,7 +5358,5 @@ IN_PROC_BROWSER_TEST_P(ExtensionTabsDiscardTest, DiscardEvent) {
   // Wait for the JS to discard the tab, catch the event and send "success".
   ASSERT_TRUE(success_listener.WaitUntilSatisfied());
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions

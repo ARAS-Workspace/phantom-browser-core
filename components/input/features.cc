@@ -9,25 +9,6 @@
 
 namespace input::features {
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kInputOnViz, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kUseAndroidBufferedInputDispatch,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Whether to transfer the sequences to Viz which have down time after event
-// time.
-const base::FeatureParam<bool> kTransferSequencesWithAbnormalDownTime{
-    &features::kInputOnViz,
-    /*name=*/"transfer_sequences_with_abnormal_down_time", false};
-
-// Whether to forward the events that were seen by Browser to Viz.
-const base::FeatureParam<bool> kForwardEventsSeenOnBrowserToViz{
-    &features::kInputOnViz,
-    /*name=*/"forward_events_seen_on_browser_to_viz", false};
-
-BASE_FEATURE(kInputVizardSpeculativeTransfer, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 BASE_FEATURE(kDispatchSingleEventIfNoPrediction,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -39,12 +20,7 @@ BASE_FEATURE(kIgnoreBubblingCollisionIfSourceDevicesMismatch,
 BASE_FEATURE(kScrollBubblingFix, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kUpdateScrollPredictorInputMapping,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE_PARAM(bool,
                    kGenerateSyntheticScrollPrediction,
                    &kUpdateScrollPredictorInputMapping,

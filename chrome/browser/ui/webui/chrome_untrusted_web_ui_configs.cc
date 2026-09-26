@@ -21,20 +21,12 @@
 #include "chrome/browser/ui/webui/print_preview/print_preview_ui_untrusted.h"
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_untrusted_ui.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void RegisterChromeUntrustedWebUIConfigs() {
-
-#if defined(TOOLKIT_VIEWS) || BUILDFLAG(ENABLE_PRINT_PREVIEW) || \
-    BUILDFLAG(IS_ANDROID)
+#if defined(TOOLKIT_VIEWS) || BUILDFLAG(ENABLE_PRINT_PREVIEW)
   auto& map = content::WebUIConfigMap::GetInstance();
-#endif  // defined(TOOLKIT_VIEWS) || BUILDFLAG(ENABLE_PRINT_PREVIEW) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // defined(TOOLKIT_VIEWS) || BUILDFLAG(ENABLE_PRINT_PREVIEW)
 
 #if defined(TOOLKIT_VIEWS)
   map.AddUntrustedWebUIConfig(std::make_unique<DataSharingUIConfig>());
@@ -50,9 +42,6 @@ void RegisterChromeUntrustedWebUIConfigs() {
       std::make_unique<printing::PrintPreviewUIUntrustedConfig>());
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
 
-#if BUILDFLAG(IS_ANDROID)
-#else
   map.AddUntrustedWebUIConfig(
       std::make_unique<NtpMicrosoftAuthUntrustedUIConfig>());
-#endif  // BUILDFLAG(IS_ANDROID)
 }

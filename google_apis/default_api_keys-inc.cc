@@ -57,13 +57,6 @@
   google_apis::DefaultApiKeys::kUnsetApiToken
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#if !defined(GOOGLE_API_KEY_ANDROID_NON_STABLE)
-#define GOOGLE_API_KEY_ANDROID_NON_STABLE \
-  google_apis::DefaultApiKeys::kUnsetApiToken
-#endif
-#endif
-
 #if !defined(GOOGLE_API_KEY_REMOTING)
 #define GOOGLE_API_KEY_REMOTING google_apis::DefaultApiKeys::kUnsetApiToken
 #endif
@@ -79,11 +72,9 @@
   google_apis::DefaultApiKeys::kUnsetApiToken
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 // API key for the HaTS API.
 #if !defined(GOOGLE_API_KEY_HATS)
 #define GOOGLE_API_KEY_HATS google_apis::DefaultApiKeys::kUnsetApiToken
-#endif
 #endif
 
 // These are used as shortcuts for developers and users providing
@@ -114,11 +105,7 @@ constexpr ::google_apis::DefaultApiKeys GetDefaultApiKeysFromDefinedValues() {
 #if BUILDFLAG(SUPPORT_CDM_SERVER_CERTIFICATE)
       .google_cdm_server_certificate = GOOGLE_CDM_SERVER_CERTIFICATE,
 #endif
-#if BUILDFLAG(IS_ANDROID)
-      .google_api_key_android_non_stable = GOOGLE_API_KEY_ANDROID_NON_STABLE,
-#else
       .google_api_key_hats = GOOGLE_API_KEY_HATS,
-#endif  // BUILDFLAG(IS_ANDROID)
       .google_api_key_remoting = GOOGLE_API_KEY_REMOTING,
       .google_api_key_soda = GOOGLE_API_KEY_SODA,
       .google_api_key_partial_translate = GOOGLE_API_KEY_PARTIAL_TRANSLATE,

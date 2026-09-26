@@ -9,10 +9,6 @@
 #include "content/public/browser/render_frame_host.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/compiler_specific.h"
-#endif
-
 ChromeCameraPanTiltZoomPermissionContextDelegate::
     ChromeCameraPanTiltZoomPermissionContextDelegate(
         content::BrowserContext* browser_context)
@@ -25,12 +21,5 @@ bool ChromeCameraPanTiltZoomPermissionContextDelegate::
     GetPermissionStatusInternal(const GURL& requesting_origin,
                                 const GURL& embedding_origin,
                                 ContentSetting* content_setting_result) {
-#if BUILDFLAG(IS_ANDROID)
-  // The PTZ permission is automatically granted on Android. It is safe to do so
-  // because pan and tilt are not supported on Android.
-  *content_setting_result = CONTENT_SETTING_ALLOW;
-  return true;
-#else
   return false;
-#endif
 }

@@ -637,12 +637,7 @@ IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, GenerateMHTML) {
 // Regression test for the crash/race from https://crbug.com/612098.
 //
 // TODO(crbug.com/41456635): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GenerateMHTMLAndCloseConnection \
-  DISABLED_GenerateMHTMLAndCloseConnection
-#else
 #define MAYBE_GenerateMHTMLAndCloseConnection GenerateMHTMLAndCloseConnection
-#endif
 IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest,
                        MAYBE_GenerateMHTMLAndCloseConnection) {
   scoped_refptr<RespondAndDisconnectMockWriter> mock_writer =
@@ -721,13 +716,8 @@ IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, GenerateMHTMLIgnoreNoStore) {
 }
 
 // TODO(crbug.com/40470937): These fail on Android under some circumstances.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ViewedMHTMLContainsNoStoreContent \
-  DISABLED_ViewedMHTMLContainsNoStoreContent
-#else
 #define MAYBE_ViewedMHTMLContainsNoStoreContent \
   ViewedMHTMLContainsNoStoreContent
-#endif
 
 IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest,
                        MAYBE_ViewedMHTMLContainsNoStoreContent) {

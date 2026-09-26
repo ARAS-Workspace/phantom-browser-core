@@ -32,8 +32,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "ui/base/interaction/interaction_test_util_mac.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "ui/android/window_android.h"
 #elif USE_AURA
 #include "ui/aura/window.h"
 #endif
@@ -83,9 +81,6 @@ class InteractiveTestPrivateFrameworkImpl
       const TrackedElement* el) const override {
 #if BUILDFLAG(IS_MAC)
     return InteractionTestUtilMac::GetNativeWindowFor(el);
-#elif BUILDFLAG(IS_ANDROID)
-    const auto view = el->GetNativeView();
-    return view ? view->GetWindowAndroid() : gfx::NativeWindow();
 #elif USE_AURA
     const auto view = el->GetNativeView();
     return view ? view->GetToplevelWindow() : gfx::NativeWindow();

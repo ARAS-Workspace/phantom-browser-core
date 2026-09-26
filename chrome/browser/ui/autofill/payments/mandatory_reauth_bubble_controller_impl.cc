@@ -13,10 +13,6 @@
 #include "components/strings/grit/components_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "chrome/browser/mandatory_reauth/android/internal/jni/MandatoryReauthOptInBottomSheetControllerBridge_jni.h"
-#else
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -25,7 +21,6 @@
 #include "chrome/browser/ui/page_action/page_action_controller.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "components/tabs/public/tab_interface.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace autofill {
 
@@ -35,15 +30,7 @@ MandatoryReauthBubbleControllerImpl::MandatoryReauthBubbleControllerImpl(
       content::WebContentsUserData<MandatoryReauthBubbleControllerImpl>(
           *web_contents) {}
 
-MandatoryReauthBubbleControllerImpl::~MandatoryReauthBubbleControllerImpl() {
-#if BUILDFLAG(IS_ANDROID)
-  // The view is closed by the AutofillBubbleControllerBase base class.
-  if (java_controller_bridge_) {
-    Java_MandatoryReauthOptInBottomSheetControllerBridge_destroy(
-        base::android::AttachCurrentThread(), java_controller_bridge_);
-  }
-#endif
-}
+MandatoryReauthBubbleControllerImpl::~MandatoryReauthBubbleControllerImpl() {}
 
 void MandatoryReauthBubbleControllerImpl::SetupAndShowBubble(
     base::OnceClosure accept_mandatory_reauth_callback,
@@ -181,11 +168,8 @@ void MandatoryReauthBubbleControllerImpl::OnBubbleClosed(
     PaymentsUiClosedReason closed_reason) {
   ResetBubbleViewAndInformBubbleManager();
 
-// After resetting the raw pointer to the view in the base class, the Android
-// view has to be deleted.
-#if BUILDFLAG(IS_ANDROID)
-  view_android_.reset();
-#endif
+  // After resetting the raw pointer to the view in the base class, the Android
+  // view has to be deleted.
 
   // On macOS without biometrics, the accept/cancel callbacks have the potential
   // to destroy WebContents in a nested runloop due to OS implementations. A
@@ -241,13 +225,6 @@ void MandatoryReauthBubbleControllerImpl::OnBubbleClosed(
   UpdatePageActionIcon();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void MandatoryReauthBubbleControllerImpl::OnClosed(JNIEnv* env,
-                                                   int32_t closed_reason) {
-  OnBubbleClosed(static_cast<PaymentsUiClosedReason>(closed_reason));
-}
-#endif
-
 AutofillBubbleBase* MandatoryReauthBubbleControllerImpl::GetBubbleView() {
   return bubble_view();
 }
@@ -261,7 +238,6 @@ MandatoryReauthBubbleControllerImpl::GetMandatoryReauthBubbleType() const {
   return current_bubble_type_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<actions::ActionId>
 MandatoryReauthBubbleControllerImpl::GetActionIdForPageAction() {
   return kActionAutofillMandatoryReauth;
@@ -270,21 +246,8 @@ MandatoryReauthBubbleControllerImpl::GetActionIdForPageAction() {
 bool MandatoryReauthBubbleControllerImpl::ShouldShowPageAction() {
   return IsIconVisible();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void MandatoryReauthBubbleControllerImpl::DoShowBubble() {
-#if BUILDFLAG(IS_ANDROID)
-  // The Android view's lifecycle is managed by this controller. We also
-  // register it as a raw pointer in the base class to use its closing logic
-  // when this controller wants to close it.
-  view_android_ =
-      MandatoryReauthOptInViewAndroid::CreateAndShow(web_contents(), this);
-  if (!view_android_) {
-    java_controller_bridge_.Reset();
-    return;
-  }
-  SetBubbleView(*view_android_.get());
-#else
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           web_contents());
@@ -292,7 +255,6 @@ void MandatoryReauthBubbleControllerImpl::DoShowBubble() {
       BrowserWindow::FromBrowser(browser)->GetAutofillBubbleHandler();
   SetBubbleView(*autofill_bubble_handler->ShowMandatoryReauthBubble(
       web_contents(), this, /*is_user_gesture=*/false, current_bubble_type_));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool MandatoryReauthBubbleControllerImpl::CanBeReshown() const {
@@ -308,23 +270,6 @@ MandatoryReauthBubbleControllerImpl::GetBubbleControllerBaseWeakPtr() {
   return weak_ptr_factory_.GetWeakPtr();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-MandatoryReauthBubbleControllerImpl::GetJavaControllerBridge() {
-  if (!java_controller_bridge_) {
-    java_controller_bridge_ =
-        Java_MandatoryReauthOptInBottomSheetControllerBridge_create(
-            base::android::AttachCurrentThread(),
-            reinterpret_cast<intptr_t>(this));
-  }
-  return base::android::ScopedJavaLocalRef<jobject>(java_controller_bridge_);
-}
-#endif
-
 WEB_CONTENTS_USER_DATA_KEY_IMPL(MandatoryReauthBubbleControllerImpl);
 
 }  // namespace autofill
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(MandatoryReauthOptInBottomSheetControllerBridge)
-#endif

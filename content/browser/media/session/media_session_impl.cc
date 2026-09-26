@@ -49,10 +49,6 @@
 #include "ui/gfx/geometry/size.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/media/session/media_session_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 using blink::mojom::MediaSessionPlaybackState;
@@ -256,16 +252,6 @@ MediaSessionImpl::~MediaSessionImpl() {
   DCHECK(audio_focus_state_ == State::INACTIVE);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void MediaSessionImpl::ClearMediaSessionAndroid() {
-  session_android_.reset();
-}
-
-MediaSessionAndroid* MediaSessionImpl::GetMediaSessionAndroid() {
-  return session_android_.get();
-}
-#endif
-
 void MediaSessionImpl::WebContentsDestroyed() {
   delegate_->ReleaseRequestId();
 
@@ -322,7 +308,7 @@ void MediaSessionImpl::DidFinishNavigation(
 void MediaSessionImpl::OnWebContentsFocused(RenderWidgetHost*) {
   focused_ = true;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   // If we have just gained focus and we have audio focus we should re-request
   // system audio focus. This will ensure this media session is towards the top
   // of the stack if we have multiple sessions active at the same time.
@@ -810,12 +796,10 @@ bool MediaSessionImpl::IsControllable() const {
     return false;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (routed_service_ && routed_service_->playback_state() !=
                              blink::mojom::MediaSessionPlaybackState::NONE) {
     return true;
   }
-#endif
 
   return desired_audio_focus_type_ == AudioFocusType::kGain;
 }
@@ -1020,10 +1004,6 @@ MediaSessionImpl::MediaSessionImpl(WebContents* web_contents)
       is_ducking_(false),
       ducking_volume_multiplier_(media::kDefaultDuckingVolumeMultiplier),
       routed_service_(nullptr) {
-#if BUILDFLAG(IS_ANDROID)
-  session_android_ = std::make_unique<MediaSessionAndroid>(this);
-  should_throttle_duration_update_ = true;
-#endif  // BUILDFLAG(IS_ANDROID)
   if (web_contents && web_contents->GetPrimaryMainFrame() &&
       web_contents->GetPrimaryMainFrame()->GetView()) {
     focused_ = web_contents->GetPrimaryMainFrame()->GetView()->HasFocus();
@@ -1592,10 +1572,6 @@ bool MediaSessionImpl::AddOneShotPlayer(MediaSessionPlayerObserver* observer,
 
 bool MediaSessionImpl::AddAmbientPlayer(MediaSessionPlayerObserver* observer,
                                         int player_id) {
-#if BUILDFLAG(IS_ANDROID)
-  // Ambient players are completely ignored for Android audio focus.
-  return true;
-#else
   // If we're currently ducking, ensure the new player is also ducked.
   observer->OnSetVolumeMultiplier(player_id, GetVolumeMultiplier());
 
@@ -1613,7 +1589,6 @@ bool MediaSessionImpl::AddAmbientPlayer(MediaSessionPlayerObserver* observer,
   // ambient players.
   ambient_players_.insert(PlayerIdentifier(observer, player_id));
   return true;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // MediaSessionService-related methods

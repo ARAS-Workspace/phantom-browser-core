@@ -2695,15 +2695,7 @@ bool HistoryBackend::CreateDownload(const DownloadRow& history_info) {
     return false;
   }
   bool success = db_->CreateDownload(history_info);
-#if BUILDFLAG(IS_ANDROID)
-  // On android, browser process can get easily killed. Download will no longer
-  // be able to resume and the temporary file will linger forever if the
-  // download is not committed before that. Do the commit right away to avoid
-  // uncommitted download entry if browser is killed.
-  Commit();
-#else
   ScheduleCommit();
-#endif
   return success;
 }
 

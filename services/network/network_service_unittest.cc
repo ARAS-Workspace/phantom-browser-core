@@ -239,96 +239,6 @@ TEST_F(NetworkServiceBoostIOThreadTest, DoesNotBoostIOThreadWhenFeatureIsOff) {
   EXPECT_FALSE(base::PlatformThread::CurrentThreadHasLeases());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Test that when cookie_store_ready_callback is provided, NetworkContext
-// creation is deferred until OnCookieStoreReady() is signaled, and that
-// mojo messages sent to the NetworkContext remote are naturally buffered.
-TEST_F(NetworkServiceTest, DeferredNetworkContextCreation_WaitsForReady) {
-  mojom::NetworkContextParamsPtr params = CreateContextParams();
-
-  mojo::Remote<mojom::CookieStoreReadyCallback> ready_callback_remote;
-  params->cookie_store_ready_callback =
-      ready_callback_remote.BindNewPipeAndPassReceiver();
-
-  mojo::Remote<mojom::NetworkContext> network_context;
-  service()->CreateNetworkContext(network_context.BindNewPipeAndPassReceiver(),
-                                  std::move(params));
-
-  // Send a mojo call that will be buffered in the pipe until the
-  // NetworkContext is actually created.
-  mojo::Remote<mojom::CookieManager> cookie_manager;
-  network_context->GetCookieManager(
-      cookie_manager.BindNewPipeAndPassReceiver());
-
-  // Signal that the cookie store is ready.
-  ready_callback_remote->OnCookieStoreReady();
-
-  // The buffered GetCookieManager call should now work.
-  base::test::TestFuture<net::CookieList> future;
-  cookie_manager->GetAllCookies(future.GetCallback<const net::CookieList&>());
-  EXPECT_TRUE(future.Get().empty());
-}
-
-// Test backward compatibility: when no cookie_store_ready_callback is
-// provided, the NetworkContext is created immediately.
-TEST_F(NetworkServiceTest, DeferredNetworkContextCreation_NoCallback) {
-  mojo::Remote<mojom::NetworkContext> network_context;
-  service()->CreateNetworkContext(network_context.BindNewPipeAndPassReceiver(),
-                                  CreateContextParams());
-
-  // The NetworkContext should be immediately available.
-  mojo::Remote<mojom::CookieManager> cookie_manager;
-  network_context->GetCookieManager(
-      cookie_manager.BindNewPipeAndPassReceiver());
-
-  base::test::TestFuture<net::CookieList> future;
-  cookie_manager->GetAllCookies(future.GetCallback<const net::CookieList&>());
-  EXPECT_TRUE(future.Get().empty());
-}
-
-// Test that destroying the NetworkService with pending (not yet ready)
-// network contexts does not crash.
-TEST_F(NetworkServiceTest, DeferredNetworkContextCreation_ShutdownBeforeReady) {
-  mojom::NetworkContextParamsPtr params = CreateContextParams();
-
-  mojo::Remote<mojom::CookieStoreReadyCallback> ready_callback_remote;
-  params->cookie_store_ready_callback =
-      ready_callback_remote.BindNewPipeAndPassReceiver();
-
-  mojo::Remote<mojom::NetworkContext> network_context;
-  service()->CreateNetworkContext(network_context.BindNewPipeAndPassReceiver(),
-                                  std::move(params));
-
-  // Destroy the service without ever signaling OnCookieStoreReady().
-  // This should not crash.
-  DestroyService();
-}
-
-// Test that disconnecting the ready callback before signaling cleans up
-// the pending context without crashing.
-TEST_F(NetworkServiceTest,
-       DeferredNetworkContextCreation_ReadyCallbackDisconnect) {
-  mojom::NetworkContextParamsPtr params = CreateContextParams();
-
-  mojo::Remote<mojom::CookieStoreReadyCallback> ready_callback_remote;
-  params->cookie_store_ready_callback =
-      ready_callback_remote.BindNewPipeAndPassReceiver();
-
-  mojo::Remote<mojom::NetworkContext> network_context;
-  service()->CreateNetworkContext(network_context.BindNewPipeAndPassReceiver(),
-                                  std::move(params));
-
-  // Disconnect the ready callback without calling OnCookieStoreReady().
-  ready_callback_remote.reset();
-
-  // The pending context should be cleaned up, and the NetworkContext remote
-  // should see a disconnect.
-  base::RunLoop run_loop;
-  network_context.set_disconnect_handler(run_loop.QuitClosure());
-  run_loop.Run();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_F(NetworkServiceTest, CreateContextWithoutChannelID) {
   mojom::NetworkContextParamsPtr params = CreateContextParams();
   mojo::Remote<mojom::NetworkContext> network_context;
@@ -358,13 +268,13 @@ TEST_F(NetworkServiceTest, AuthDefaultParams) {
   EXPECT_TRUE(
       auth_handler_factory->IsSchemeAllowedForTesting(net::kNtlmAuthScheme));
 
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_KERBEROS)
   ASSERT_TRUE(auth_handler_factory->IsSchemeAllowedForTesting(
       net::kNegotiateAuthScheme));
 #if BUILDFLAG(IS_POSIX)
   EXPECT_EQ("", auth_handler_factory->GetNegotiateLibraryNameForTesting());
 #endif
-#endif  // BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(USE_KERBEROS)
 
   EXPECT_FALSE(auth_handler_factory->http_auth_preferences()
                    ->NegotiateDisableCnameLookup());
@@ -373,10 +283,6 @@ TEST_F(NetworkServiceTest, AuthDefaultParams) {
 #if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE(auth_handler_factory->http_auth_preferences()->NtlmV2Enabled());
 #endif  // BUILDFLAG(IS_POSIX)
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ("", auth_handler_factory->http_auth_preferences()
-                    ->AuthAndroidNegotiateAccountType());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(NetworkServiceTest, AuthSchemesDynamicallyChanging) {
@@ -397,7 +303,7 @@ TEST_F(NetworkServiceTest, AuthSchemesDynamicallyChanging) {
       auth_handler_factory->IsSchemeAllowedForTesting(net::kDigestAuthScheme));
   EXPECT_TRUE(
       auth_handler_factory->IsSchemeAllowedForTesting(net::kNtlmAuthScheme));
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_KERBEROS)
   EXPECT_TRUE(auth_handler_factory->IsSchemeAllowedForTesting(
       net::kNegotiateAuthScheme));
 #else
@@ -446,7 +352,7 @@ TEST_F(NetworkServiceTest, AuthSchemesDynamicallyChanging) {
         net::kDigestAuthScheme));
     EXPECT_TRUE(
         auth_handler_factory->IsSchemeAllowedForTesting(net::kNtlmAuthScheme));
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_KERBEROS)
     EXPECT_TRUE(auth_handler_factory->IsSchemeAllowedForTesting(
         net::kNegotiateAuthScheme));
 #else
@@ -1233,38 +1139,6 @@ TEST_F(NetworkServiceTest, AuthNtlmV2Enabled) {
 #endif  // BUILDFLAG(IS_POSIX)
 
 // |android_negotiate_account_type| is only supported on Android.
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(NetworkServiceTest, AuthAndroidNegotiateAccountType) {
-  const char kInitialAccountType[] = "Scorpio";
-  const char kFinalAccountType[] = "Pisces";
-  // Set |android_negotiate_account_type| to before creating any
-  // NetworkContexts.
-  mojom::HttpAuthDynamicParamsPtr auth_params =
-      mojom::HttpAuthDynamicParams::New();
-  auth_params->android_negotiate_account_type = kInitialAccountType;
-  service()->ConfigureHttpAuthPrefs(std::move(auth_params));
-
-  // Create a network context, which should reflect the setting.
-  mojo::Remote<mojom::NetworkContext> network_context_remote;
-  NetworkContext network_context(
-      service(), network_context_remote.BindNewPipeAndPassReceiver(),
-      CreateContextParams());
-  net::HttpAuthHandlerFactory* auth_handler_factory =
-      network_context.url_request_context()->http_auth_handler_factory();
-  ASSERT_TRUE(auth_handler_factory);
-  ASSERT_TRUE(auth_handler_factory->http_auth_preferences());
-  EXPECT_EQ(kInitialAccountType, auth_handler_factory->http_auth_preferences()
-                                     ->AuthAndroidNegotiateAccountType());
-
-  // Change |android_negotiate_account_type|. The pre-existing NetworkContext
-  // should be using the new setting.
-  auth_params = mojom::HttpAuthDynamicParams::New();
-  auth_params->android_negotiate_account_type = kFinalAccountType;
-  service()->ConfigureHttpAuthPrefs(std::move(auth_params));
-  EXPECT_EQ(kFinalAccountType, auth_handler_factory->http_auth_preferences()
-                                   ->AuthAndroidNegotiateAccountType());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 static size_t GetGlobalMaxConnectionsPerProxyChain() {
   return net::ClientSocketPoolManager::max_sockets_per_proxy_chain(

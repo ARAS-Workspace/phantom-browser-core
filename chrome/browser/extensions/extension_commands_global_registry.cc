@@ -19,7 +19,7 @@
 #include "ui/base/accelerators/command.h"
 #include "ui/base/accelerators/global_accelerator_listener/global_accelerator_listener.h"
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -37,7 +37,7 @@ namespace {
 
 gfx::AcceleratedWidget GetAcceleratedWidgetForContext(
     content::BrowserContext* context) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
   auto* profile = Profile::FromBrowserContext(context);
   if (!profile) {
     return gfx::kNullAcceleratedWidget;
@@ -59,7 +59,7 @@ gfx::AcceleratedWidget GetAcceleratedWidgetForContext(
   return native_window->GetHost()->GetAcceleratedWidget();
 #else
   return gfx::kNullAcceleratedWidget;
-#endif  // defined(USE_AURA) && !BUILDFLAG(IS_ANDROID)
+#endif  // defined(USE_AURA)
 }
 
 }  // namespace

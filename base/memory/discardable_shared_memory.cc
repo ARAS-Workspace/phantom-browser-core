@@ -29,12 +29,6 @@
 #include <sys/mman.h>
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include <linux/ashmem.h>
-
-#include "base/android/linker/ashmem.h"
-#endif
-
 
 
 #include "base/trace_event/memory_allocator_dump.h"
@@ -262,11 +256,7 @@ DiscardableSharedMemory::LockResult DiscardableSharedMemory::Lock(
     return PURGED;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Ensure that the platform won't discard the required pages.
-  return LockPages(shared_memory_region_,
-                   AlignToPageSize(sizeof(SharedState)) + offset, length);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   // On macOS, there is no mechanism to lock pages. However, we do need to call
   // madvise(MADV_FREE_REUSE) in order to correctly update accounting for memory
   // footprint via task_info().
@@ -404,7 +394,7 @@ bool DiscardableSharedMemory::Purge(Time current_time) {
 // Linux and Android provide MADV_REMOVE which is preferred as it has a
 // behavior that can be verified in tests. Other POSIX flavors (MacOSX, BSDs),
 // provide MADV_FREE which has the same result but memory is purged lazily.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #define MADV_PURGE_ARGUMENT MADV_REMOVE
 #elif BUILDFLAG(IS_APPLE)
   // MADV_FREE_REUSABLE is similar to MADV_FREE, but also marks the pages with
@@ -491,20 +481,6 @@ DiscardableSharedMemory::LockResult DiscardableSharedMemory::LockPages(
     const UnsafeSharedMemoryRegion& region,
     size_t offset,
     size_t length) {
-#if BUILDFLAG(IS_ANDROID)
-  if (region.IsValid()) {
-    if (AshmemDeviceIsSupported()) {
-      int pin_result =
-          AshmemPinRegion(region.GetPlatformHandle(), offset, length);
-      if (pin_result == ASHMEM_WAS_PURGED) {
-        return PURGED;
-      }
-      if (pin_result < 0) {
-        return FAILED;
-      }
-    }
-  }
-#endif
   return SUCCESS;
 }
 
@@ -512,23 +488,6 @@ DiscardableSharedMemory::LockResult DiscardableSharedMemory::LockPages(
 void DiscardableSharedMemory::UnlockPages(
     const UnsafeSharedMemoryRegion& region,
     size_t offset,
-    size_t length) {
-#if BUILDFLAG(IS_ANDROID)
-  if (region.IsValid()) {
-    if (AshmemDeviceIsSupported()) {
-      int unpin_result =
-          AshmemUnpinRegion(region.GetPlatformHandle(), offset, length);
-      DCHECK_EQ(0, unpin_result);
-    }
-  }
-#endif
-}
-
-#if BUILDFLAG(IS_ANDROID)
-// static
-bool DiscardableSharedMemory::IsAshmemDeviceSupportedForTesting() {
-  return AshmemDeviceIsSupported();
-}
-#endif
+    size_t length) {}
 
 }  // namespace base

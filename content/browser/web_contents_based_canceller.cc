@@ -82,13 +82,6 @@ void WebContentsBasedCanceller::SetCancelCallback(
 void WebContentsBasedCanceller::OnVisibilityChanged(Visibility visibility) {
   // TODO(https://crbug.com/446032849): Remove this.
   VLOG(1) << "Visibility changed: " << static_cast<int>(visibility);
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/457495639): We need a different way to detect when a
-  // WebContents is no longer displayed to the user for android since the
-  // intent to select a file always causes a HIDDEN event as the whole app
-  // receives onStop().
-  return;
-#else
   if (cancel_callback_.is_null()) {
     return;
   }
@@ -97,7 +90,6 @@ void WebContentsBasedCanceller::OnVisibilityChanged(Visibility visibility) {
     VLOG(1) << "Cancelling";
     std::move(cancel_callback_).Run();
   }
-#endif
 }
 
 void WebContentsBasedCanceller::RenderFrameHostStateChanged(

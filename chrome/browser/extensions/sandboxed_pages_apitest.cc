@@ -111,13 +111,8 @@ class SandboxAPIMetricsTest : public ExtensionApiTest,
 
 INSTANTIATE_TEST_SUITE_P(,
                          SandboxedPagesTest,
-#if BUILDFLAG(IS_ANDROID)
-                         // Android only supports manifest V3.
-                         ::testing::Values(ManifestVersion::THREE));
-#else
                          ::testing::Values(ManifestVersion::TWO,
                                            ManifestVersion::THREE));
-#endif
 
 IN_PROC_BROWSER_TEST_P(SandboxedPagesTest, SandboxedPages) {
   const char* kManifestV2 = R"(
@@ -147,7 +142,6 @@ IN_PROC_BROWSER_TEST_P(SandboxedPagesTest, SandboxedPages) {
       << message_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Verifies the behavior of sandboxed pages in Manifest V2. Remote frames
 // should be disallowed. Android only supports Manifest V3, so this test is
 // skipped on Android.
@@ -175,7 +169,6 @@ IN_PROC_BROWSER_TEST_F(SandboxedPagesTest, ManifestV2DisallowsWebContent) {
                       {.ignore_manifest_warnings = true}))
       << message_;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Verifies the behavior of sandboxed pages in Manifest V3. Remote frames
 // should be allowed.

@@ -300,11 +300,7 @@ std::unique_ptr<net::test_server::HttpResponse> CancelOnRequest(
 // URLRequest, which passes the error on ResourceLoader teardown, rather than in
 // response to call to AsyncResourceHandler::OnResponseComplete.
 // Failed on Android M builder. See crbug/1111427.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SyncXMLHttpRequest_Cancelled DISABLED_SyncXMLHttpRequest_Cancelled
-#else
 #define MAYBE_SyncXMLHttpRequest_Cancelled SyncXMLHttpRequest_Cancelled
-#endif
 IN_PROC_BROWSER_TEST_F(LoaderBrowserTest, MAYBE_SyncXMLHttpRequest_Cancelled) {
   // If network service is running in-process, we can't simulate a crash.
   if (IsInProcessNetworkService()) {

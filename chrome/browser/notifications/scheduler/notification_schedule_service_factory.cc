@@ -22,13 +22,6 @@
 #include "components/keyed_service/core/simple_dependency_manager.h"
 #include "content/public/browser/storage_partition.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/notifications/scheduler/display_agent_android.h"
-#include "chrome/browser/notifications/scheduler/finds_agent_android.h"
-#include "chrome/browser/notifications/scheduler/notification_background_task_scheduler_android.h"
-#include "chrome/browser/notifications/scheduler/tips_agent_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // static
 NotificationScheduleServiceFactory*
 NotificationScheduleServiceFactory::GetInstance() {
@@ -58,19 +51,11 @@ NotificationScheduleServiceFactory::BuildServiceInstanceFor(
       chrome::kNotificationSchedulerStorageDirname);
   auto client_registrar =
       std::make_unique<notifications::NotificationSchedulerClientRegistrar>();
-#if BUILDFLAG(IS_ANDROID)
-  auto display_agent = std::make_unique<DisplayAgentAndroid>();
-  auto background_task_scheduler =
-      std::make_unique<NotificationBackgroundTaskSchedulerAndroid>();
-  auto tips_agent = std::make_unique<TipsAgentAndroid>();
-  auto finds_agent = std::make_unique<FindsAgentAndroid>();
-#else
   auto display_agent = notifications::DisplayAgent::Create();
   auto background_task_scheduler =
       std::make_unique<NotificationBackgroundTaskSchedulerImpl>();
   auto tips_agent = notifications::TipsAgent::Create();
   auto finds_agent = notifications::FindsAgent::Create();
-#endif  // BUILDFLAG(IS_ANDROID)
   auto* db_provider = profile_key->GetProtoDatabaseProvider();
   return notifications::CreateNotificationScheduleService(
       std::move(client_registrar), std::move(background_task_scheduler),

@@ -32,9 +32,6 @@ bool GetDefaultUserDataDirectory(base::FilePath* result) {
 #elif BUILDFLAG(IS_APPLE)
   CHECK(base::PathService::Get(base::DIR_APP_DATA, result));
   *result = result->Append("Chromium Content Shell");
-#elif BUILDFLAG(IS_ANDROID)
-  CHECK(base::PathService::Get(base::DIR_ANDROID_APP_DATA, result));
-  *result = result->Append(FILE_PATH_LITERAL("content_shell"));
 #else
   NOTIMPLEMENTED();
   return false;

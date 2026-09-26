@@ -128,13 +128,6 @@
 #include "ui/gfx/range/range.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "third_party/blink/public/common/input/web_coalesced_input_event.h"
-#include "third_party/blink/public/common/input/web_gesture_device.h"
-#include "third_party/blink/public/common/input/web_gesture_event.h"
-#include "third_party/blink/public/common/input/web_input_event.h"
-#endif
-
 #if BUILDFLAG(IS_OZONE)
 #include "ui/events/keycodes/keyboard_code_conversion.h"
 #endif
@@ -695,54 +688,6 @@ TEST_F(RenderViewImplTest, OnNavigationHttpPost) {
       });
   EXPECT_EQ(raw_data_span, flat_data.as_span());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-namespace {
-class UpdateTitleLocalFrameHost : public LocalFrameHostInterceptor {
- public:
-  explicit UpdateTitleLocalFrameHost(
-      blink::AssociatedInterfaceProvider* provider)
-      : LocalFrameHostInterceptor(provider) {}
-
-  MOCK_METHOD(void, UpdateTitle, (const std::optional<std::u16string>&));
-};
-}  // namespace
-
-class RenderViewImplUpdateTitleTest : public RenderViewImplTest {
- public:
-  using MockedTestRenderFrame =
-      MockedLocalFrameHostInterceptorTestRenderFrame<UpdateTitleLocalFrameHost>;
-
-  RenderViewImplUpdateTitleTest()
-      : RenderViewImplTest(&MockedTestRenderFrame::CreateTestRenderFrame) {}
-
-  UpdateTitleLocalFrameHost* title_mock_frame_host() {
-    return static_cast<MockedTestRenderFrame*>(frame())
-        ->mock_local_frame_host();
-  }
-};
-
-TEST_F(RenderViewImplUpdateTitleTest, OnNavigationLoadDataWithBaseURL) {
-  auto common_params = blink::CreateCommonNavigationParams();
-  common_params->url = GURL("data:text/html,");
-  common_params->navigation_type =
-      blink::mojom::NavigationType::DIFFERENT_DOCUMENT;
-  common_params->transition = ui::PAGE_TRANSITION_TYPED;
-  common_params->base_url_for_data_url = GURL("about:blank");
-  auto commit_params = DummyCommitNavigationParams();
-  commit_params->data_url_as_string =
-      "data:text/html,<html><head><title>Data page</title></head></html>";
-
-  auto title = std::make_optional(std::u16string(u"Data page"));
-  EXPECT_CALL(*title_mock_frame_host(), UpdateTitle(title));
-  FrameLoadWaiter waiter(frame());
-  frame()->Navigate(std::move(common_params), std::move(commit_params));
-  waiter.Wait();
-
-  base::RunLoop().RunUntilIdle();
-  testing::Mock::VerifyAndClearExpectations(title_mock_frame_host());
-}
-#endif
 
 TEST_F(RenderViewImplTest, BeginNavigation) {
   WebUITestWebUIControllerFactory factory;
@@ -2087,7 +2032,6 @@ class RenderViewImplContextMenuTest : public RenderViewImplTest {
   }
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(RenderViewImplContextMenuTest, ContextMenu) {
   LoadHTML("<div>Page A</div>");
 
@@ -2110,47 +2054,6 @@ TEST_F(RenderViewImplContextMenuTest, ContextMenu) {
               ShowContextMenu(testing::_, testing::_))
       .Times(1);
 }
-
-#else
-TEST_F(RenderViewImplContextMenuTest, AndroidContextMenuSelectionOrdering) {
-  LoadHTML("<div>Page A</div><div id=result>Not selected</div>");
-
-  ExecuteJavaScriptForTests(
-      "document.onselectionchange = function() { "
-      "document.getElementById('result').innerHTML = 'Selected'}");
-
-  // Create a long press in the center of the iframe. (I'm hoping this will
-  // make this a bit more robust in case of some other formatting or other bug.)
-  WebGestureEvent gesture_event(WebInputEvent::Type::kGestureLongPress,
-                                WebInputEvent::kNoModifiers,
-                                ui::EventTimeForNow());
-  gesture_event.SetPositionInWidget(gfx::PointF(250, 250));
-
-  EXPECT_CALL(*context_menu_frame_host(),
-              ShowContextMenu(testing::_, testing::_))
-      .Times(0);
-
-  SendWebGestureEvent(gesture_event);
-
-  EXPECT_CALL(*context_menu_frame_host(),
-              ShowContextMenu(testing::_, testing::_))
-      .Times(1);
-
-  scoped_refptr<content::MessageLoopRunner> message_loop_runner =
-      new content::MessageLoopRunner;
-  blink::scheduler::GetSingleThreadTaskRunnerForTesting()->PostTask(
-      FROM_HERE, message_loop_runner->QuitClosure());
-
-  message_loop_runner->Run();
-
-  int did_select = -1;
-  std::u16string check_did_select =
-      u"Number(document.getElementById('result').innerHTML == 'Selected')";
-  EXPECT_TRUE(
-      ExecuteJavaScriptAndReturnIntValue(check_did_select, &did_select));
-  EXPECT_EQ(1, did_select);
-}
-#endif
 
 TEST_F(RenderViewImplTest, TestBackForward) {
   LoadHTML("<div id=pagename>Page A</div>");
@@ -2455,14 +2358,8 @@ TEST_F(RenderViewImplTest,
   EXPECT_EQ(0, info.selection_end);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Failing on Android M: http://crbug.com/873580
-#define MAYBE_OnDeleteSurroundingTextInCodePoints \
-  DISABLED_OnDeleteSurroundingTextInCodePoints
-#else
 #define MAYBE_OnDeleteSurroundingTextInCodePoints \
   OnDeleteSurroundingTextInCodePoints
-#endif
 TEST_F(RenderViewImplTest, MAYBE_OnDeleteSurroundingTextInCodePoints) {
   // Load an HTML page consisting of an input field.
   LoadHTML(
@@ -3212,7 +3109,6 @@ TEST_F(RenderViewImplScaleFactorTest,
 }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 // No extensions/autoresize on Android.
 namespace {
 
@@ -3246,8 +3142,6 @@ TEST_F(RenderViewImplTest, ZoomLevelUpdate) {
   // Use EXPECT_FLOAT_EQ here because view()->GetZoomLevel returns a float.
   EXPECT_FLOAT_EQ(zoom_level, web_view_->MainFrameWidget()->GetZoomLevel());
 }
-
-#endif
 
 TEST_F(RenderViewImplTest, OriginTrialDisabled) {
   // HTML Document with no origin trial.

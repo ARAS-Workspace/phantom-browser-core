@@ -87,10 +87,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/application_status_listener.h"
-#endif
-
 
 namespace content {
 
@@ -235,11 +231,7 @@ class NetworkServiceBrowserTest : public ContentBrowserTest {
   base::ScopedTempDir temp_dir_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_WebUIBindingsNoHttp DISABLED_WebUIBindingsNoHttp
-#else
 #define MAYBE_WebUIBindingsNoHttp WebUIBindingsNoHttp
-#endif
 
 // Verifies that WebUI pages with WebUI bindings can't make network requests.
 IN_PROC_BROWSER_TEST_F(NetworkServiceBrowserTest, MAYBE_WebUIBindingsNoHttp) {
@@ -300,70 +292,7 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceBrowserTest,
   ASSERT_EQ(headers->response_code(), 401);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-class NetworkServiceBrowserSimpleCacheTest : public NetworkServiceBrowserTest {
- public:
-  NetworkServiceBrowserSimpleCacheTest() {
-    scoped_feature_list_.InitAndEnableFeatureWithParameters(
-        net::features::kDiskCacheBackendExperiment, {{"backend", "simple"}});
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// `HttpCacheWrittenToDiskOnApplicationStateChange` test tests the behavior
-// specific to SimpleCache, so it is extracted to a dedicated test class that
-// enables DiskCacheBackendExperiment with simple backend.
-IN_PROC_BROWSER_TEST_F(NetworkServiceBrowserSimpleCacheTest,
-                       HttpCacheWrittenToDiskOnApplicationStateChange) {
-  ASSERT_TRUE(disk_cache::InSimpleBackendExperimentGroup());
-  base::ScopedAllowBlockingForTesting allow_blocking;
-
-  // Create network context with cache pointing to the temp cache dir.
-  mojo::Remote<network::mojom::NetworkContext> network_context;
-  network::mojom::NetworkContextParamsPtr context_params =
-      network::mojom::NetworkContextParams::New();
-  context_params->cert_verifier_params = GetCertVerifierParams(
-      cert_verifier::mojom::CertVerifierCreationParams::New());
-  context_params->file_paths = network::mojom::NetworkContextFilePaths::New();
-  context_params->file_paths->http_cache_directory = GetCacheDirectory();
-  CreateNetworkContextInNetworkService(
-      network_context.BindNewPipeAndPassReceiver(), std::move(context_params));
-
-  network::mojom::URLLoaderFactoryParamsPtr params =
-      network::mojom::URLLoaderFactoryParams::New();
-  params->process_id = network::OriginatingProcessId::browser();
-  params->automatically_assign_isolation_info = true;
-  params->is_orb_enabled = false;
-  params->is_trusted = true;
-  mojo::Remote<network::mojom::URLLoaderFactory> loader_factory;
-  network_context->CreateURLLoaderFactory(
-      loader_factory.BindNewPipeAndPassReceiver(), std::move(params));
-
-  // Load a URL and check the cache index size.
-  LoadURL(embedded_test_server()->GetURL("/cachetime"), loader_factory.get());
-  int64_t directory_size = base::ComputeDirectorySize(GetCacheIndexDirectory());
-
-  // Load another URL, cache index should not be written to disk yet.
-  LoadURL(embedded_test_server()->GetURL("/cachetime?foo"),
-          loader_factory.get());
-  EXPECT_EQ(directory_size,
-            base::ComputeDirectorySize(GetCacheIndexDirectory()));
-
-  // After application state changes, cache index should be written to disk.
-  base::android::ApplicationStatusListener::NotifyApplicationStateChange(
-      base::android::APPLICATION_STATE_HAS_STOPPED_ACTIVITIES);
-  base::RunLoop().RunUntilIdle();
-  FlushNetworkServiceInstanceForTesting();
-  disk_cache::FlushCacheThreadForTesting();
-
-  EXPECT_GT(base::ComputeDirectorySize(GetCacheIndexDirectory()),
-            directory_size);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 class NetworkConnectionObserver
     : public network::NetworkConnectionTracker::NetworkConnectionObserver {
  public:
@@ -435,7 +364,7 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceConnectionTypeSyncedBrowserTest,
   observer.WaitForConnectionType(
       net::NetworkChangeNotifier::ConnectionType::CONNECTION_ETHERNET);
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 class NetworkServiceOutOfProcessBrowserTest : public NetworkServiceBrowserTest {
  public:
@@ -898,17 +827,10 @@ static const base::FilePath::CharType kNetworkSubpath[] =
 
 // Disable the following data migration tests on Android because the data
 // migration logic is disabled and compiled out on this platform.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_NetworkServiceDataMigrationBrowserTest \
-  DISABLED_NetworkServiceDataMigrationBrowserTest
-#define MAYBE_NetworkServiceDataMigrationBrowserTestWithFailures \
-  DISABLED_NetworkServiceDataMigrationBrowserTestWithFailures
-#else
 #define MAYBE_NetworkServiceDataMigrationBrowserTest \
   NetworkServiceDataMigrationBrowserTest
 #define MAYBE_NetworkServiceDataMigrationBrowserTestWithFailures \
   NetworkServiceDataMigrationBrowserTestWithFailures
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // A class to test various behavior of network context data migration.
 class MAYBE_NetworkServiceDataMigrationBrowserTest : public ContentBrowserTest {
@@ -1445,13 +1367,8 @@ IN_PROC_BROWSER_TEST_F(MAYBE_NetworkServiceDataMigrationBrowserTest,
 
 // Disable instantiation of parametrized tests for disk access sandboxing on
 // Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_InProcess DISABLED_InProcess
-#define MAYBE_OutOfProcess DISABLED_OutOfProcess
-#else
 #define MAYBE_InProcess InProcess
 #define MAYBE_OutOfProcess OutOfProcess
-#endif  // BUILDFLAG(IS_ANDROID)
 
 INSTANTIATE_TEST_SUITE_P(
     MAYBE_InProcess,

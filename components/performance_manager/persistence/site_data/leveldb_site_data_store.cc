@@ -38,10 +38,8 @@ std::string Md5AsHexForDatabaseKey(std::string_view input) {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 // Disable some testing features in Android to reduce APK size.
 std::atomic<bool> g_use_in_memory_db_for_testing = false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Attempt to repair the database stored in |db_path|.
 bool RepairDatabase(const std::string& db_path) {
@@ -162,12 +160,10 @@ class LevelDBSiteDataStore::AsyncHelper {
   // Implementation for the ClearDatabase function.
   void ClearDatabaseImpl();
 
-#if !BUILDFLAG(IS_ANDROID)
   // A levelDB environment that gets used for testing. This allows using an
   // in-memory database when needed.
   std::unique_ptr<leveldb::Env> env_for_testing_
       GUARDED_BY_CONTEXT(sequence_checker_);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // The on disk location of the database.
   const base::FilePath db_path_ GUARDED_BY_CONTEXT(sequence_checker_);
@@ -355,12 +351,10 @@ LevelDBSiteDataStore::AsyncHelper::OpenOrCreateDatabaseImpl() {
   leveldb_env::Options options;
   options.create_if_missing = true;
 
-#if !BUILDFLAG(IS_ANDROID)
   if (g_use_in_memory_db_for_testing.load(std::memory_order_relaxed)) {
     env_for_testing_ = leveldb_chrome::NewMemEnv("LevelDBSiteDataStore");
     options.env = env_for_testing_.get();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   const std::string db_path_str = db_path_.AsUTF8Unsafe();
   const leveldb::Status status =
@@ -491,7 +485,6 @@ void LevelDBSiteDataStore::GetStoreSize(GetStoreSizeCallback callback) {
 
 void LevelDBSiteDataStore::SetInitializationCallbackForTesting(
     base::OnceClosure callback) {
-#if !BUILDFLAG(IS_ANDROID)
   // This testing function cannot be optimized out by linker for unknown reason.
   // Manually exclude it on Android to reduce APK size.
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -500,7 +493,6 @@ void LevelDBSiteDataStore::SetInitializationCallbackForTesting(
                                     SetInitializationCallbackForTesting,
                                 base::Unretained(async_helper_.get()),
                                 std::move(callback)));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void LevelDBSiteDataStore::DatabaseIsInitializedForTesting(
@@ -530,14 +522,10 @@ void LevelDBSiteDataStore::RunTaskWithRawDBForTesting(
 
 // static
 base::ScopedClosureRunner LevelDBSiteDataStore::UseInMemoryDBForTesting() {
-#if !BUILDFLAG(IS_ANDROID)
   g_use_in_memory_db_for_testing.store(true, std::memory_order_relaxed);
   return base::ScopedClosureRunner(base::BindOnce([] {
     g_use_in_memory_db_for_testing.store(false, std::memory_order_relaxed);
   }));
-#else
-  return base::ScopedClosureRunner();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace performance_manager

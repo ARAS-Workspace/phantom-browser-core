@@ -105,11 +105,7 @@ class InotifyReaderThreadDelegate final : public PlatformThread::Delegate {
 class InotifyReader {
  public:
   // Watch descriptor used by AddWatch() and RemoveWatch().
-#if BUILDFLAG(IS_ANDROID)
-  using Watch = uint32_t;
-#else
   using Watch = int;
-#endif
 
   // Record of watchers tracked for watch descriptors.
   struct WatcherEntry {

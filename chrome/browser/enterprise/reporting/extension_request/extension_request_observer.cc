@@ -132,12 +132,6 @@ void ExtensionRequestObserver::ShowNotification(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/486965804): Support extension request notifications on
-  // Android. On Android, transient notifications are unsupported. Clean up
-  // resolved requests from the pending list directly when policy changes.
-  RemoveExtensionsFromPendingList(filtered_extension_ids);
-#else
   // Open a new notification, notification with same type will be replaced if
   // exists.
   notifications_[type] = std::make_unique<ExtensionRequestNotification>(
@@ -145,7 +139,6 @@ void ExtensionRequestObserver::ShowNotification(
   notifications_[type]->Show(base::BindOnce(
       &ExtensionRequestObserver::OnNotificationClosed,
       weak_factory_.GetWeakPtr(), std::move(filtered_extension_ids)));
-#endif
 }
 
 void ExtensionRequestObserver::CloseAllNotifications() {
@@ -157,7 +150,6 @@ void ExtensionRequestObserver::CloseAllNotifications() {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ExtensionRequestObserver::OnNotificationClosed(
     std::vector<std::string>&& extension_ids,
     bool by_user) {
@@ -166,7 +158,6 @@ void ExtensionRequestObserver::OnNotificationClosed(
 
   RemoveExtensionsFromPendingList(extension_ids);
 }
-#endif
 
 void ExtensionRequestObserver::RemoveExtensionsFromPendingList(
     const std::vector<std::string>& extension_ids) {

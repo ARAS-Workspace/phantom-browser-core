@@ -71,7 +71,6 @@
 #include "extensions/common/extension_builder.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"
 #include "chrome/browser/web_applications/test/fake_web_app_provider.h"
 #include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
@@ -87,7 +86,6 @@
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "components/webapps/browser/install_result_code.h"
 #include "components/webapps/browser/installable/installable_metrics.h"
-#endif
 
 using blink::NotificationResources;
 using blink::PlatformNotificationData;
@@ -412,8 +410,6 @@ TEST_F(PlatformNotificationServiceTest, NextPersistentNotificationId) {
   EXPECT_LT(first_id, second_id);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 class PlatformNotificationServiceTest_WebApps
     : public PlatformNotificationServiceTest {
  public:
@@ -562,8 +558,6 @@ TEST_F(PlatformNotificationServiceTest_WebApps, PopulateWebAppId_NotInScope) {
       NotificationHandler::Type::WEB_PERSISTENT);
   EXPECT_EQ(std::nullopt, notification.notifier_id().web_app_id);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
@@ -777,16 +771,7 @@ TEST_F(PlatformNotificationServiceTest_ReportNotificationContentDetectionData,
       HostContentSettingsMapFactory::GetForProfile(profile_.get());
   base::Value cur_value(hcsm->GetWebsiteSetting(
       origin, origin, ContentSettingsType::SUSPICIOUS_NOTIFICATION_IDS));
-#if BUILDFLAG(IS_ANDROID)
-  const base::ListValue* suspicious_notification_ids =
-      cur_value.GetDict().FindList(
-          safe_browsing::kSuspiciousNotificationIdsKey);
-  ASSERT_EQ(1u, suspicious_notification_ids->size());
-  ASSERT_EQ(full_notification_id_str,
-            suspicious_notification_ids->front().GetString());
-#else
   ASSERT_TRUE(cur_value.is_none());
-#endif
 }
 
 class PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification
@@ -912,161 +897,3 @@ TEST_F(PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
           ContentSettingsType::NOTIFICATION_INTERACTIONS);
   ASSERT_EQ(0U, notifications_engagement_setting.size());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-       RevokeNotificationPermission) {
-  HostContentSettingsMap* hcsm =
-      HostContentSettingsMapFactory::GetForProfile(profile_.get());
-  // Set up notification.
-  int notification_id = 1;
-  GURL origin("https://example.com");
-  std::string full_notification_id_str =
-      "p#" + origin.spec() + "#0" + base::NumberToString(notification_id);
-  Notification notification = message_center::Notification(
-      message_center::NOTIFICATION_TYPE_SIMPLE, full_notification_id_str,
-      /*title=*/std::u16string(),
-      /*message=*/std::u16string(), /*icon=*/ui::ImageModel(),
-      /*display_source=*/std::u16string(), origin, message_center::NotifierId(),
-      message_center::RichNotificationData(), /*delegate=*/nullptr);
-  auto metadata = std::make_unique<PersistentNotificationMetadata>();
-
-  // Simulate suspicious site to trigger auto-revocation.
-  SetUpSuspiciousSite(origin, /*suspicious_warning_count*/ 1);
-
-  // Notification should not be revoked prior to meeting revocation threshold.
-  service()->HandleOnDeviceModelResponseThenMaybeDisplay(
-      notification, std::move(metadata), /*should_show_warning=*/true,
-      /* serialized_content_detection_metadata*/ std::nullopt);
-  EXPECT_FALSE(safety_hub_util::IsUrlRevokedAbusiveNotification(hcsm, origin));
-
-  // Verify notification permission has been revoked.
-  service()->HandleOnDeviceModelResponseThenMaybeDisplay(
-      notification, std::move(metadata), /*should_show_warning=*/true,
-      /* serialized_content_detection_metadata*/ std::nullopt);
-  EXPECT_TRUE(safety_hub_util::IsUrlRevokedAbusiveNotification(hcsm, origin));
-  EXPECT_EQ(safe_browsing::NotificationRevocationSource::
-                kSuspiciousContentAutoRevocation,
-            AbusiveNotificationPermissionsManager::
-                GetRevokedAbusiveNotificationRevocationSource(hcsm, origin));
-}
-
-TEST_F(PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-       DoNotRevokeWhenFeatureDisabled) {
-  scoped_feature_list_.Reset();
-
-  HostContentSettingsMap* hcsm =
-      HostContentSettingsMapFactory::GetForProfile(profile_.get());
-  // Set up notification.
-  int notification_id = 1;
-  GURL origin("https://example.com");
-  std::string full_notification_id_str =
-      "p#" + origin.spec() + "#0" + base::NumberToString(notification_id);
-  Notification notification = message_center::Notification(
-      message_center::NOTIFICATION_TYPE_SIMPLE, full_notification_id_str,
-      /*title=*/std::u16string(),
-      /*message=*/std::u16string(), /*icon=*/ui::ImageModel(),
-      /*display_source=*/std::u16string(), origin, message_center::NotifierId(),
-      message_center::RichNotificationData(), /*delegate=*/nullptr);
-  auto metadata = std::make_unique<PersistentNotificationMetadata>();
-
-  // Simulate suspicious site to trigger auto-revocation.
-  SetUpSuspiciousSite(origin, /*suspicious_warning_count*/ 3);
-
-  service()->HandleOnDeviceModelResponseThenMaybeDisplay(
-      notification, std::move(metadata), /*should_show_warning=*/true,
-      /* serialized_content_detection_metadata*/ std::nullopt);
-
-  // Verify notification permission has not been revoked.
-  EXPECT_FALSE(safety_hub_util::IsUrlRevokedAbusiveNotification(hcsm, origin));
-}
-
-TEST_F(PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-       RevokeNotificationPermission_UpdateNotificationDatabaseMetadata) {
-  HostContentSettingsMap* hcsm =
-      HostContentSettingsMapFactory::GetForProfile(profile_.get());
-  // Store notification data in `NotificationDatabase`.
-  const int64_t kFakeServiceWorkerRegistrationId = 42;
-  int notification_id_1 = 1;
-  int notification_id_2 = 2;
-  GURL origin("https://example.com");
-  NotificationDatabaseData notification_database_data;
-  notification_database_data.origin = origin;
-  GetPlatformNotificationContext(origin)->WriteNotificationData(
-      notification_id_1, kFakeServiceWorkerRegistrationId, origin,
-      notification_database_data, base::DoNothing());
-  GetPlatformNotificationContext(origin)->WriteNotificationData(
-      notification_id_2, kFakeServiceWorkerRegistrationId, origin,
-      notification_database_data, base::DoNothing());
-  base::RunLoop().RunUntilIdle();
-  // Update `NotificationDatabase` entry with metadata.
-  std::string full_notification_1_str =
-      "p#" + origin.spec() + "#0" + base::NumberToString(notification_id_1);
-  std::string full_notification_2_str =
-      "p#" + origin.spec() + "#0" + base::NumberToString(notification_id_2);
-  Notification notification_1 = message_center::Notification(
-      message_center::NOTIFICATION_TYPE_SIMPLE, full_notification_1_str,
-      /*title=*/std::u16string(),
-      /*message=*/std::u16string(), /*icon=*/ui::ImageModel(),
-      /*display_source=*/std::u16string(), origin, message_center::NotifierId(),
-      message_center::RichNotificationData(), /*delegate=*/nullptr);
-  Notification notification_2 = message_center::Notification(
-      message_center::NOTIFICATION_TYPE_SIMPLE, full_notification_2_str,
-      /*title=*/std::u16string(),
-      /*message=*/std::u16string(), /*icon=*/ui::ImageModel(),
-      /*display_source=*/std::u16string(), origin, message_center::NotifierId(),
-      message_center::RichNotificationData(), /*delegate=*/nullptr);
-  bool is_on_global_cache_list = false;
-  bool is_allowlisted_by_user = false;
-  double suspicious_score = 70.0;
-
-  // Simulate suspicious site to trigger auto-revocation.
-  SetUpSuspiciousSite(origin, /*suspicious_warning_count*/ 1);
-
-  // Notification should not be revoked prior to meeting revocation threshold.
-  service()->HandleOnDeviceModelResponseThenMaybeDisplay(
-      notification_1, std::make_unique<PersistentNotificationMetadata>(),
-      /*should_show_warning=*/true,
-      safe_browsing::NotificationContentDetectionModel::GetSerializedMetadata(
-          is_on_global_cache_list, is_allowlisted_by_user, suspicious_score));
-  EXPECT_FALSE(safety_hub_util::IsUrlRevokedAbusiveNotification(hcsm, origin));
-  // Notification metadata is stored as normal.
-  NotificationDatabaseData data =
-      ReadNotificationDataAndRecordInteractionSynchronous(
-          GetPlatformNotificationContext(origin),
-          base::NumberToString(notification_id_1), origin);
-  EXPECT_TRUE(data.serialized_metadata.contains(
-      safe_browsing::kNotificationContentDetectionMetadataDictionaryKey));
-  EXPECT_EQ(
-      safe_browsing::NotificationContentDetectionModel::GetSerializedMetadata(
-          is_on_global_cache_list, is_allowlisted_by_user, suspicious_score),
-      data.serialized_metadata.at(
-          safe_browsing::kNotificationContentDetectionMetadataDictionaryKey));
-
-  // Revoke notification permission.
-  service()->HandleOnDeviceModelResponseThenMaybeDisplay(
-      notification_2, std::make_unique<PersistentNotificationMetadata>(),
-      /*should_show_warning=*/true,
-      safe_browsing::NotificationContentDetectionModel::GetSerializedMetadata(
-          is_on_global_cache_list, is_allowlisted_by_user, suspicious_score));
-  // Verify notification permission has been revoked.
-  EXPECT_TRUE(safety_hub_util::IsUrlRevokedAbusiveNotification(hcsm, origin));
-  EXPECT_EQ(safe_browsing::NotificationRevocationSource::
-                kSuspiciousContentAutoRevocation,
-            AbusiveNotificationPermissionsManager::
-                GetRevokedAbusiveNotificationRevocationSource(hcsm, origin));
-  // Read and check the entry from `NotificationDatabase`.
-  // Notification metadata should still be stored.
-  NotificationDatabaseData post_revoked_data =
-      ReadNotificationDataAndRecordInteractionSynchronous(
-          GetPlatformNotificationContext(origin),
-          base::NumberToString(notification_id_2), origin);
-  ASSERT_TRUE(post_revoked_data.serialized_metadata.contains(
-      safe_browsing::kNotificationContentDetectionMetadataDictionaryKey));
-  ASSERT_EQ(
-      safe_browsing::NotificationContentDetectionModel::GetSerializedMetadata(
-          is_on_global_cache_list, is_allowlisted_by_user, suspicious_score),
-      post_revoked_data.serialized_metadata.at(
-          safe_browsing::kNotificationContentDetectionMetadataDictionaryKey));
-}
-#endif

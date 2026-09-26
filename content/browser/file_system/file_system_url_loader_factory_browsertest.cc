@@ -846,13 +846,8 @@ IN_PROC_BROWSER_TEST_P(FileSystemURLLoaderFactoryTest,
 }
 
 // TODO(crbug.com/516040951): Fix flakiness and re-enable.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FileTestMultipleRangesNotSupported \
-  DISABLED_FileTestMultipleRangesNotSupported
-#else
 #define MAYBE_FileTestMultipleRangesNotSupported \
   FileTestMultipleRangesNotSupported
-#endif
 IN_PROC_BROWSER_TEST_P(FileSystemURLLoaderFactoryTest,
                        MAYBE_FileTestMultipleRangesNotSupported) {
   base::ScopedAllowBlockingForTesting allow_blocking;

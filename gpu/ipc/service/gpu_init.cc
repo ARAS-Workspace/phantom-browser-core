@@ -66,10 +66,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/gfx/android/android_surface_control_compat.h"
-#endif
-
 #if BUILDFLAG(ENABLE_VULKAN)
 #include "gpu/vulkan/init/vulkan_factory.h"
 #include "gpu/vulkan/vulkan_implementation.h"
@@ -114,14 +110,8 @@ void InitializeDawnProcs() {
 
 void InitializePlatformOverlaySettings(GPUInfo* gpu_info,
                                        const GpuFeatureInfo& gpu_feature_info) {
-#if BUILDFLAG(IS_ANDROID)
-  if (gpu_info->gpu.vendor_string.find("Qualcomm") != std::string::npos) {
-    gfx::SurfaceControl::EnableQualcommUBWC();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool CanAccessDeviceFile(const GPUInfo& gpu_info) {
 #if BUILDFLAG(IS_LINUX)
   if (gpu_info.gpu.vendor_id != 0x10de ||  // NVIDIA
@@ -139,7 +129,6 @@ bool CanAccessDeviceFile(const GPUInfo& gpu_info) {
   return true;
 #endif  // BUILDFLAG(IS_LINUX)
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class GpuWatchdogInit {
  public:
@@ -181,22 +170,6 @@ void DisableInProcessGpuVulkan(GpuFeatureInfo* gpu_feature_info,
     gpu_preferences->gr_context_type = GrContextType::kGL;
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// TODO(https://crbug.com/324468229): We currently do not handle Dawn device
-// lost with in-process-gpu.
-void DisableInProcessGpuGraphite(GpuFeatureInfo& gpu_feature_info,
-                                 GpuPreferences& gpu_preferences) {
-  if (gpu_feature_info.status_values[GPU_FEATURE_TYPE_SKIA_GRAPHITE] ==
-          kGpuFeatureStatusEnabled ||
-      gpu_preferences.gr_context_type == GrContextType::kGraphiteDawn) {
-    LOG(ERROR) << "Graphite not supported with in process gpu";
-    gpu_feature_info.status_values[GPU_FEATURE_TYPE_SKIA_GRAPHITE] =
-        kGpuFeatureStatusDisabled;
-    gpu_preferences.gr_context_type = GrContextType::kGL;
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_VULKAN)
 bool MatchGLInfo(const std::string& field, const std::string& patterns) {
@@ -308,7 +281,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   // need more context based GPUInfo. In such situations, switching to
   // SwiftShader needs to wait until creating a context.
   bool needs_more_info = true;
-#if !BUILDFLAG(IS_ANDROID)
   needs_more_info = false;
   CollectBasicGraphicsInfo(command_line, &gpu_info_);
 
@@ -339,7 +311,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
 #if BUILDFLAG(IS_MAC)
   SetupGLDisplayManagerEGL(gpu_info_, gpu_feature_info_);
 #endif  // IS_WIN || IS_MAC
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   GpuDriverBugWorkarounds workarounds(
       gpu_feature_info_.enabled_gpu_driver_bug_workarounds);
@@ -748,19 +719,10 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
     if (!InitializeDawn()) {
       auto& graphite_feature =
           gpu_feature_info_.status_values[GPU_FEATURE_TYPE_SKIA_GRAPHITE];
-#if BUILDFLAG(IS_ANDROID)
-      // On Android it's expected most users don't support Vulkan so dawn
-      // initialization will fail. Immediately fallback to Ganesh/GL for those
-      // users to avoid regressing startup time.
-      if (graphite_feature == kGpuFeatureStatusEnabled) {
-        graphite_feature = kGpuFeatureStatusDisabled;
-      }
-#else
       if (graphite_feature == kGpuFeatureStatusEnabled) {
         return false;
       }
       // SkiaGraphite is disabled by software_rendering_list.json
-#endif  // BUILDFLAG(IS_ANDROID)
       gpu_preferences_.gr_context_type = GrContextType::kGL;
     }
   }
@@ -814,44 +776,6 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
   gpu_preferences_ = gpu_preferences;
   init_successful_ = true;
 
-#if BUILDFLAG(IS_ANDROID)
-  DCHECK(!EnableSwiftShaderIfNeeded(
-      command_line, gpu_feature_info_,
-      gpu_preferences_.disable_software_rasterizer, false));
-
-  gl::GLDisplay* gl_display = InitializeGLThreadSafe(
-      command_line, gpu_preferences_, &gpu_info_, &gpu_feature_info_);
-
-  if (!gl_display) {
-    LOG(FATAL) << "gpu::InitializeGLThreadSafe() failed.";
-  }
-
-  if (command_line->HasSwitch(switches::kWebViewDrawFunctorUsesVulkan)) {
-    if (gpu_feature_info_.status_values[GPU_FEATURE_TYPE_SKIA_GRAPHITE] ==
-        kGpuFeatureStatusEnabled) {
-      gpu_feature_info_.status_values[GPU_FEATURE_TYPE_SKIA_GRAPHITE] =
-          kGpuFeatureStatusDisabled;
-    }
-    gpu_feature_info_.status_values[GPU_FEATURE_TYPE_VULKAN] =
-        kGpuFeatureStatusEnabled;
-    gpu_preferences_.gr_context_type = GrContextType::kVulkan;
-    bool result = InitializeVulkan();
-    // There is no fallback for webview.
-    CHECK(result);
-  } else {
-    // Try to fall back to a valid GrContextType after GpuFeatureInfo is
-    // computed.
-    if (!TryFallbackGrContextTypesIfNeeded(gpu_feature_info_, gpu_preferences_,
-                                           gpu_info_, command_line)) {
-      LOG(FATAL) << "All gr_context_type fallbacks exhausted";
-    }
-    DisableInProcessGpuVulkan(&gpu_feature_info_, &gpu_preferences_);
-    DisableInProcessGpuGraphite(gpu_feature_info_, gpu_preferences_);
-  }
-
-  default_offscreen_surface_ =
-      gl::init::CreateOffscreenGLSurface(gl_display, gfx::Size());
-#else  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_OZONE)
   ui::OzonePlatform::InitParams params;
   params.single_process = true;
@@ -999,10 +923,8 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
     LOG(FATAL) << "All gr_context_type fallbacks exhausted";
   }
   DisableInProcessGpuVulkan(&gpu_feature_info_, &gpu_preferences_);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   InitializeDawnProcs();
-#if !BUILDFLAG(IS_ANDROID)
   if (gpu_preferences_.gr_context_type == GrContextType::kGraphiteDawn) {
     if (!InitializeDawn()) {
       if (gpu_feature_info_.status_values[GPU_FEATURE_TYPE_SKIA_GRAPHITE] !=
@@ -1014,7 +936,6 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
       }
     }
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   SetSkiaBackendType();
   RecordUMA();
@@ -1027,11 +948,9 @@ void GpuInit::RecordUMA() {
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   IntelGpuSeriesType intel_gpu_series_type = GetIntelGpuSeriesType(
       gpu_info_.active_gpu().vendor_id, gpu_info_.active_gpu().device_id);
   UMA_HISTOGRAM_ENUMERATION("GPU.IntelGpuSeriesType", intel_gpu_series_type);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   UMA_HISTOGRAM_ENUMERATION("GPU.GLImplementation", gl::GetGLImplementation());
 
@@ -1118,40 +1037,7 @@ bool GpuInit::InitializeDawn() {
     return false;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  auto validate_adapter_fn = [this](wgpu::BackendType backend_type,
-                                    wgpu::Adapter adapter) {
-    if (backend_type == wgpu::BackendType::Vulkan) {
-      // Check if the GPU and driver version are suitable for using Vulkan
-      // based hardware acceleration.
-      wgpu::AdapterInfo adapter_info;
-      wgpu::AdapterPropertiesVk adapter_properties_vk;
-      adapter_info.nextInChain = &adapter_properties_vk;
-      adapter.GetInfo(&adapter_info);
-
-      VulkanPhysicalDeviceProperties device_properties;
-      device_properties.device_name = adapter_info.device;
-      device_properties.vendor_id = adapter_info.vendorID;
-      device_properties.device_id = adapter_info.deviceID;
-      device_properties.driver_version = adapter_properties_vk.driverVersion;
-
-      if (!CheckVulkanCompatibilities(device_properties, gpu_info_)) {
-        return false;
-      }
-
-      gpu_info_.hardware_supports_vulkan = true;
-
-      // Limit the use of Vulkan's vendorID and deviceID to Android. This is
-      // because other platforms, for example, Linux, collect such information
-      // somewhere else and we don't want to overwrite it.
-      gpu_info_.gpu.vendor_id = device_properties.vendor_id;
-      gpu_info_.gpu.device_id = device_properties.device_id;
-    }
-    return true;
-  };
-#else
   auto validate_adapter_fn = DawnContextProvider::DefaultValidateAdapterFn;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   static BASE_FEATURE(kGraphiteDawnReportWorkerTaskProgressToWatchdog,
                       base::FEATURE_ENABLED_BY_DEFAULT);
@@ -1249,10 +1135,6 @@ bool GpuInit::InitializeVulkan() {
   // Limit the use of Vulkan's vendorID and deviceID to Android.
   // This is because other platforms, for example, Linux, collect such
   // information somewhere else and we don't want to overwrite it.
-#if BUILDFLAG(IS_ANDROID)
-  gpu_info_.gpu.vendor_id = device_properties.vendor_id;
-  gpu_info_.gpu.device_id = device_properties.device_id;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   return true;
 #else   // !BUILDFLAG(ENABLE_VULKAN)

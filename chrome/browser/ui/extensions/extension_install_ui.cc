@@ -23,11 +23,7 @@ static bool g_disable_ui_for_tests = false;
 // static
 std::unique_ptr<ExtensionInstallUI> ExtensionInstallUI::Create(
     content::BrowserContext* context) {
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<ExtensionInstallUIAndroid>(context);
-#else
   return std::make_unique<ExtensionInstallUIDesktop>(context);
-#endif
 }
 
 ExtensionInstallUI::ExtensionInstallUI(content::BrowserContext* context)

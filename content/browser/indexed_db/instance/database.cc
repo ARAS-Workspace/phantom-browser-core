@@ -756,13 +756,8 @@ Status Database::GetAllOperation(
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
     // channel_posix limits the number of file descriptors per message to 128:
     // crbug.com/439305148.
-#if BUILDFLAG(IS_ANDROID)
-    // 1 file descriptor is used per shared memory buffer.
-    max_shared_memory_values_in_chunk = 128;
-#else
     // 2 file descriptors are used per shared memory buffer.
     max_shared_memory_values_in_chunk = 64;
-#endif
 #endif
   }
 

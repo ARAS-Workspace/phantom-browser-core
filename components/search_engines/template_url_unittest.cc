@@ -227,7 +227,6 @@ TEST_F(TemplateURLTest, URLRefTestImageURLWithPOST) {
   data.image_url = KImageSearchURL;
 
   // Try to parse invalid post parameters.
-#if !BUILDFLAG(IS_ANDROID)
   const char kInvalidPostParamsString[] =
       "unknown_template={UnknownTemplate},bad_value=bad{value},"
       "{google:sbiSource}";
@@ -239,7 +238,6 @@ TEST_F(TemplateURLTest, URLRefTestImageURLWithPOST) {
   ASSERT_EQ(2U, bad_post_params.size());
   ExpectPostParamIs(bad_post_params[0], "unknown_template", "");
   ExpectPostParamIs(bad_post_params[1], "bad_value", "bad{value}");
-#endif
 
   // Try to parse valid post parameters.
   data.image_url_post_params = kValidPostParamsString;
@@ -1482,11 +1480,7 @@ TEST_F(TemplateURLTest, SearchSourceId) {
   GURL result(
       url.url_ref().ReplaceSearchTerms(search_terms_args, search_terms_data_));
   ASSERT_TRUE(result.is_valid());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ("http://google.com/?sourceid=chrome-mobile&", result.spec());
-#else
   EXPECT_EQ("http://google.com/?sourceid=chrome&", result.spec());
-#endif
 }
 
 TEST_F(TemplateURLTest, SearchClient) {
@@ -1534,15 +1528,7 @@ TEST_F(TemplateURLTest, SuggestClient) {
   GURL result(
       url.url_ref().ReplaceSearchTerms(search_terms_args, search_terms_data_));
   ASSERT_TRUE(result.is_valid());
-#if BUILDFLAG(IS_ANDROID)
-  if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_PHONE) {
-    EXPECT_EQ("http://google.com/?client=chrome", result.spec());
-  } else {
-    EXPECT_EQ("http://google.com/?client=chrome-omni", result.spec());
-  }
-#else
   EXPECT_EQ("http://google.com/?client=chrome-omni", result.spec());
-#endif
 }
 
 TEST_F(TemplateURLTest, ComposeboxSuggestClient) {
@@ -1564,11 +1550,7 @@ TEST_F(TemplateURLTest, ComposeboxSuggestClient) {
   features.InitAndEnableFeature(omnibox::kComposeboxUsesChromeComposeClient);
   GURL result(
       url.url_ref().ReplaceSearchTerms(search_terms_args, search_terms_data_));
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ("http://google.com/?client=chrome-mobile-aim", result.spec());
-#else
   EXPECT_EQ("http://google.com/?client=chrome-compose", result.spec());
-#endif
 }
 
 TEST_F(TemplateURLTest, CoBrowseComposeboxSuggestClient) {
@@ -1611,15 +1593,7 @@ TEST_F(TemplateURLTest, SuggestRequestIdentifier) {
   GURL result(
       url.url_ref().ReplaceSearchTerms(search_terms_args, search_terms_data_));
   ASSERT_TRUE(result.is_valid());
-#if BUILDFLAG(IS_ANDROID)
-  if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_PHONE) {
-    EXPECT_EQ("http://google.com/?gs_ri=chrome-mobile-ext-ansg", result.spec());
-  } else {
-    EXPECT_EQ("http://google.com/?gs_ri=chrome-ext-ansg", result.spec());
-  }
-#else
   EXPECT_EQ("http://google.com/?gs_ri=chrome-ext-ansg", result.spec());
-#endif
 
   search_terms_args.request_source = RequestSource::COMPOSEBOX;
   // Check that the URL is correct for `RequestSource::COMPOSEBOX`.
@@ -3310,7 +3284,6 @@ TEST_F(TemplateURLTest, GetBuiltinImageResourceId_FromCustomEngine) {
   EXPECT_EQ(t_url.GetBuiltinImageResourceId(), "IDR_DEFAULT_FAVICON");
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(TemplateURLTest, GetMarketingSnippet_Custom) {
   std::u16string engine_name = u"My Custom Engine";
   TemplateURLData custom_data;
@@ -3320,7 +3293,6 @@ TEST_F(TemplateURLTest, GetMarketingSnippet_Custom) {
   EXPECT_NE(custom_url.GetMarketingSnippet().find(engine_name),
             std::u16string::npos);
 }
-#endif
 
 TEST_F(TemplateURLTest, GetBuiltinImageResourceId_YahooJpBranded) {
   // Test relevant for this special case of prepopulated search engines data. If

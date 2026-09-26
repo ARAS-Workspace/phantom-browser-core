@@ -22,14 +22,10 @@ namespace autofill {
 namespace {
 
 bool ShouldShowWebauthnHybridEntryPoint(const FormFieldData& field) {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   const std::optional<AutocompleteParsingResult>& autocomplete =
       field.parsed_autocomplete();
   return autocomplete.has_value() &&  // Assume no autcomplete if not parsed.
          autocomplete->webauthn;      // Field must have "webauthn" annotation.
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

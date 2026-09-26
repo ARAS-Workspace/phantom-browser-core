@@ -103,26 +103,7 @@ Calculator::Calculator(
       delegate_(std::move(delegate)),
       congestion_track_(
           kCongestionTrack,
-          static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this)))
-#if BUILDFLAG(IS_ANDROID)
-      ,
-      application_status_listener_(
-          base::android::ApplicationStatusListener::New(
-              base::BindRepeating(&Calculator::OnApplicationStateChanged,
-                                  // Listener is destroyed at destructor, and
-                                  // object will be alive for any callback.
-                                  base::Unretained(this)))) {
-  // This class assumes construction and access from the UI thread from all
-  // methods that aren't explicitly flagged otherwise (i.e. *OnIOThread()).
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  OnApplicationStateChanged(
-      base::android::ApplicationStatusListener::GetState());
-}
-#else
-{
-}
-#endif
+          static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this))) {}
 
 Calculator::~Calculator() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -319,9 +300,6 @@ void Calculator::CalculateResponsivenessIfNecessary(
   // the UI thread. If there's been a significant amount of time since the last
   // calculation, then it's likely because Chrome was suspended.
   bool is_suspended = current_time - last_activity_time > kSuspendInterval;
-#if BUILDFLAG(IS_ANDROID)
-  is_suspended |= !is_application_visible_;
-#endif
   if (is_suspended) {
     // Notify the delegate that the interval ended so that it can reset its
     // accumulated data for the current interval.
@@ -450,26 +428,6 @@ Calculator::CongestionList& Calculator::GetCongestionOnUIThread() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   return congestion_on_ui_thread_;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void Calculator::OnApplicationStateChanged(
-    base::android::ApplicationState state) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  switch (state) {
-    case base::android::APPLICATION_STATE_HAS_RUNNING_ACTIVITIES:
-    case base::android::APPLICATION_STATE_HAS_PAUSED_ACTIVITIES:
-      // The application is still visible and partially hidden in paused state.
-      is_application_visible_ = true;
-      break;
-    case base::android::APPLICATION_STATE_HAS_STOPPED_ACTIVITIES:
-    case base::android::APPLICATION_STATE_HAS_DESTROYED_ACTIVITIES:
-      is_application_visible_ = false;
-      break;
-    case base::android::APPLICATION_STATE_UNKNOWN:
-      break;  // Keep in previous state.
-  }
-}
-#endif
 
 // static
 Calculator::CongestionList Calculator::TakeCongestionsOlderThanTime(

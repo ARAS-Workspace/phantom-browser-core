@@ -36,11 +36,7 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/geolocation/geolocation_permission_context_delegate_android.h"
-#else
 #include "chrome/browser/geolocation/geolocation_permission_context_delegate.h"
-#endif
 
 // Integration tests for querying permissions that have a permissions policy
 // set. These tests are not meant to cover every edge case as the
@@ -156,12 +152,7 @@ class PermissionContextBasePermissionsPolicyTest
   MakeGeolocationPermissionContext() {
     return std::make_unique<permissions::GeolocationPermissionContext>(
         profile(),
-#if BUILDFLAG(IS_ANDROID)
-        std::make_unique<GeolocationPermissionContextDelegateAndroid>(profile())
-#else
-        std::make_unique<GeolocationPermissionContextDelegate>(profile())
-#endif
-    );
+        std::make_unique<GeolocationPermissionContextDelegate>(profile()));
   }
 
  private:

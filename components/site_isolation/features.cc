@@ -15,16 +15,12 @@ namespace features {
 // SiteIsolationPolicy::IsIsolationForPasswordSitesEnabled() rather than
 // checking the feature directly, since that decision is influenced by other
 // factors as well.
-BASE_FEATURE(kSiteIsolationForPasswordSites,
-             "site-isolation-for-password-sites",
-// Enabled by default on Android; see https://crbug.com/849815.  Note that this
-// should not affect Android Webview, which does not include this code.
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(
+    kSiteIsolationForPasswordSites,
+    "site-isolation-for-password-sites",
+    // Enabled by default on Android; see https://crbug.com/849815.  Note that
+    // this should not affect Android Webview, which does not include this code.
+    base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Controls a mode for dynamically process-isolating sites where the user has
 // logged in via OAuth.  These sites are determined by runtime heuristics.
@@ -37,49 +33,10 @@ BASE_FEATURE(kSiteIsolationForPasswordSites,
 //
 // This feature does not affect Android Webview, which does not include this
 // code.
-BASE_FEATURE(kSiteIsolationForOAuthSites,
-// Enabled by default on Android only; see https://crbug.com/1206770.
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
-
-#if BUILDFLAG(IS_ANDROID)
-// kSiteIsolationMemoryThresholdsAndroid is checked before individual site
-// isolation mode base::Features (such as kSitePerProcess or
-// kSiteIsolationForPasswordSites), and (if enabled) can restrict those modes
-// to not apply to low-memory devices below a certain memory threshold.  The
-// threshold for what is considered a "low memory" device can be set (in MB)
-// via field trial params with the names defined below, with independent params
-// for strict site isolation (kSitePerProcess) and partial site isolation modes
-// (kSiteIsolationForPasswordSites, kSiteIsolationForOAuthSites, etc). These
-// thresholds are compared against base::SysInfo::AmountOfPhysicalMemoryMB().
-// On devices below the memory threshold, the site isolation features such as
-// kSitePerProcess won't be checked at all, and field trials won't activate
-// either the control or the experiment group.
-BASE_FEATURE(kSiteIsolationMemoryThresholdsAndroid,
-             "SiteIsolationMemoryThresholds",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-const char kStrictSiteIsolationMemoryThresholdParamName[] =
-    "strict_site_isolation_threshold_mb";
-const char kPartialSiteIsolationMemoryThresholdParamName[] =
-    "partial_site_isolation_threshold_mb";
-
-// Controls whether to enable the memory threshold for site isolation on
-// Android. This flag was disabled on Android Desktop to ensure site isolation
-// is always active regardless of memory thresholds.
-//
-// This flag differs from kSiteIsolationMemoryThresholdsAndroid in that
-// kSiteIsolationMemoryThresholdsAndroid typically defines the memory
-// threshold values in field trials. In contrast,
-// kSiteIsolationEnableMemoryThresholdAndroid flag, if DISABLED, it bypasses all
-// memory threshold checks, including any thresholds that might be set by
-// kSiteIsolationMemoryThresholdsAndroid or default values.
-BASE_FEATURE(kSiteIsolationEnableMemoryThresholdAndroid,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
+BASE_FEATURE(
+    kSiteIsolationForOAuthSites,
+    // Enabled by default on Android only; see https://crbug.com/1206770.
+    base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Controls the rollout of the IsolateOriginsShortlist policy, which allows
 // isolating a shortlist of critical origins on resource-constrained devices

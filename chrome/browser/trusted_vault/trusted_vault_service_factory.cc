@@ -14,15 +14,9 @@
 #include "components/trusted_vault/trusted_vault_service.h"
 #include "device/fido/public/features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/public/identity_manager/account_info.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/trusted_vault/android/trusted_vault_client_android.h"
-#else
 #include "base/files/file_path.h"
 #include "components/trusted_vault/standalone_trusted_vault_client.h"
 #include "content/public/browser/storage_partition.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/common/chrome_version.h"
@@ -34,7 +28,6 @@ namespace {
 constexpr char kICloudKeychainAccessGroupPrefix[] = MAC_TEAM_IDENTIFIER_STRING;
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<trusted_vault::TrustedVaultClient>
 CreateChromeSyncStandaloneTrustedVaultClient(Profile* profile) {
   return std::make_unique<trusted_vault::StandaloneTrustedVaultClient>(
@@ -47,27 +40,10 @@ CreateChromeSyncStandaloneTrustedVaultClient(Profile* profile) {
       profile->GetDefaultStoragePartition()
           ->GetURLLoaderFactoryForBrowserProcess());
 }
-#endif
 
 std::unique_ptr<trusted_vault::TrustedVaultClient>
 CreateChromeSyncTrustedVaultClient(Profile* profile) {
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<
-      TrustedVaultClientAndroid>(/*gaia_account_info_by_gaia_id_cb=*/
-                                 base::BindRepeating(
-                                     [](signin::IdentityManager*
-                                            identity_manager,
-                                        const GaiaId& gaia_id)
-                                         -> CoreAccountInfo {
-                                       return identity_manager
-                                           ->FindExtendedAccountInfoByGaiaId(
-                                               gaia_id);
-                                     },
-                                     IdentityManagerFactory::GetForProfile(
-                                         profile)));
-#else
   return CreateChromeSyncStandaloneTrustedVaultClient(profile);
-#endif
 }
 
 std::unique_ptr<KeyedService> BuildTrustedVaultService(

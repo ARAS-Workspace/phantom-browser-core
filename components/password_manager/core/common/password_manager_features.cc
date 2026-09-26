@@ -46,12 +46,7 @@ BASE_FEATURE(kNoPasswordSuggestionFiltering, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Allows to show suggestions automatically when password forms are autofocused
 // on pageload. Enabled by default on desktop in M140.
-BASE_FEATURE(kShowSuggestionsOnAutofocus,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
+BASE_FEATURE(kShowSuggestionsOnAutofocus, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Field trial identifier for password generation requirements.
 const char kGenerationRequirementsFieldTrial[] =

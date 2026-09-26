@@ -92,13 +92,7 @@ class FlingControllerTest : public FlingControllerEventSenderClient,
   bool ProgressFlingOnFlingStart() override {
     return progress_fling_on_fling_start_;
   }
-  bool ShouldUseMobileFlingCurve() override {
-#if BUILDFLAG(IS_ANDROID)
-    return true;
-#else
-    return false;
-#endif
-  }
+  bool ShouldUseMobileFlingCurve() override { return false; }
   gfx::Vector2dF GetPixelsPerInch(
       const gfx::PointF& position_in_screen) override {
     return gfx::Vector2dF(kDefaultPixelsPerInch, kDefaultPixelsPerInch);
@@ -831,9 +825,6 @@ TEST_P(FlingControllerWithPhysicsBasedFlingTest,
   // Android and iOS use Mobile fling curve so they are ignored
   // for this test
   bool use_mobile_fling_curve = false;
-#if BUILDFLAG(IS_ANDROID)
-  use_mobile_fling_curve = true;
-#endif
   if (use_mobile_fling_curve)
     return;
 
@@ -879,9 +870,6 @@ TEST_P(FlingControllerWithPhysicsBasedFlingTest,
   // Android and iOS use Mobile fling curve so they are ignored
   // for this test
   bool use_mobile_fling_curve = false;
-#if BUILDFLAG(IS_ANDROID)
-  use_mobile_fling_curve = true;
-#endif
   if (use_mobile_fling_curve)
     return;
   SimulateFlingStart(blink::WebGestureDevice::kTouchscreen,

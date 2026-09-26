@@ -12,11 +12,7 @@
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/safe_browsing/core/browser/intelligent_scan_delegate.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/android/client_side_detection_intelligent_scan_delegate_android.h"
-#else
 #include "chrome/browser/safe_browsing/client_side_detection_intelligent_scan_delegate_desktop.h"
-#endif
 
 namespace safe_browsing {
 
@@ -59,14 +55,9 @@ ClientSideDetectionIntelligentScanDelegateFactory::
   if (!opt_guide) {
     return nullptr;
   }
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<ClientSideDetectionIntelligentScanDelegateAndroid>(
-      *profile->GetPrefs(), opt_guide->CreateModelBrokerClient(), opt_guide);
-#else
   return std::make_unique<ClientSideDetectionIntelligentScanDelegateDesktop>(
       *profile->GetPrefs(), opt_guide,
       policy::ManagementServiceFactory::GetForProfile(profile));
-#endif
 }
 
 bool ClientSideDetectionIntelligentScanDelegateFactory::

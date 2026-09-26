@@ -87,27 +87,17 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/resource_mapper.h"
-#include "chrome/browser/android/search_permissions/search_permissions_service.h"
-#include "chrome/browser/favicon/favicon_service_factory.h"
-#include "chrome/browser/permissions/permission_blocked_message_delegate_android.h"
-#include "chrome/browser/permissions/permission_update_message_controller_android.h"
-#include "components/permissions/android/permissions_android_feature_map.h"
-#include "components/permissions/permission_request_manager.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/permission_bubble/permission_prompt.h"
 #include "components/vector_icons/vector_icons.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/common/constants.h"
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/browser/mime_handler/mime_handler_stream_manager.h"
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
@@ -144,26 +134,6 @@ const url::Origin& GetOmniboxEverywhereOrigin() {
   return *origin;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool ShouldUseQuietUI(content::WebContents* web_contents,
-                      const permissions::PermissionRequest& request) {
-  if (request.GetGeolocationPromptType() ==
-      permissions::GeolocationPromptType::kUpgradeToPrecise) {
-    // We don't support quiet UI for upgrade prompts from approximate location
-    // to precise location.
-    return false;
-  }
-  ContentSettingsType type = request.GetContentSettingsType();
-  auto* manager =
-      permissions::PermissionRequestManager::FromWebContents(web_contents);
-  if (type != ContentSettingsType::NOTIFICATIONS &&
-      type != permissions::PermissionUtil::GetGeolocationType()) {
-    return false;
-  }
-  return manager->ShouldCurrentRequestUseQuietUI();
-}
-#endif
-
 bool IsPermissionSetByAdministator(
     PermissionSetting setting,
     const content_settings::PermissionSettingsInfo* permission_info,
@@ -173,7 +143,6 @@ bool IsPermissionSetByAdministator(
           info.source == content_settings::SettingSource::kSupervised);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Infobar exists only on Desktop platforms.
 bool ShouldShowInfobarOnPromptResolved(
     content::WebContents* web_contents,
@@ -221,7 +190,6 @@ void ShowInfobar(content::WebContents* web_contents) {
     }
   }
 }
-#endif
 }  // namespace
 
 // static
@@ -444,24 +412,14 @@ void ChromePermissionsClient::TriggerPromptHatsSurveyIfEnabled(
   auto survey_data = permissions::PermissionHatsTriggerHelper::
       SurveyProductSpecificData::PopulateFrom(prompt_parameters);
 
-#if !BUILDFLAG(IS_ANDROID)
   hats_service->LaunchSurvey(
       kHatsSurveyTriggerPermissionsPrompt, std::move(hats_shown_callback),
       base::DoNothing(), survey_data.survey_bits_data,
       survey_data.survey_string_data, survey_parameters->supplied_trigger_id,
-#else
-  // Launching surveys on android requires an active web contents.
-  hats_service->LaunchSurveyForWebContents(
-      kHatsSurveyTriggerPermissionsPrompt, web_contents,
-      survey_data.survey_bits_data, survey_data.survey_string_data,
-      std::move(hats_shown_callback), base::DoNothing(),
-      survey_parameters->supplied_trigger_id,
-#endif
       HatsService::SurveyOptions(survey_parameters->custom_survey_invitation,
                                  survey_parameters->message_identifier));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 permissions::PermissionIgnoredReason
 ChromePermissionsClient::DetermineIgnoreReason(
     content::WebContents* web_contents) {
@@ -480,7 +438,6 @@ ChromePermissionsClient::DetermineIgnoreReason(
   }
   return permissions::PermissionIgnoredReason::UNKNOWN;
 }
-#endif
 
 std::vector<std::unique_ptr<permissions::PermissionUiSelector>>
 ChromePermissionsClient::CreatePermissionUiSelectors(
@@ -556,7 +513,6 @@ void ChromePermissionsClient::OnPromptResolved(
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Infobar exists only on Desktop platforms.
   bool should_show_infobar = ShouldShowInfobarOnPromptResolved(
       web_contents, request, quiet_ui_reason, action);
@@ -565,7 +521,6 @@ void ChromePermissionsClient::OnPromptResolved(
   if (should_show_infobar) {
     ShowInfobar(web_contents);
   }
-#endif
 
   auto content_setting_type = RequestTypeToContentSettingsType(request_type);
   if (content_setting_type.has_value()) {
@@ -744,7 +699,7 @@ std::optional<GURL> ChromePermissionsClient::GetEmbeddingOriginOverride(
     return embedder.GetURL();
   }
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
   // When a MIME handler extension is rendered as an OOPIF, key the
   // embedding origin to the extension so prompts and content settings
   // are attributed to the extension that produced the streamed content,
@@ -770,7 +725,7 @@ std::optional<GURL> ChromePermissionsClient::GetEmbeddingOriginOverride(
       }
     }
   }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   return std::nullopt;
 }
@@ -842,67 +797,6 @@ bool ChromePermissionsClient::
          embedding_origin == GetOmniboxEverywhereOrigin();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool ChromePermissionsClient::IsDseOrigin(
-    content::BrowserContext* browser_context,
-    const url::Origin& origin) {
-  SearchPermissionsService* search_helper =
-      SearchPermissionsService::Factory::GetForBrowserContext(browser_context);
-  return search_helper && search_helper->IsDseOrigin(origin);
-}
-
-std::unique_ptr<ChromePermissionsClient::PermissionMessageDelegate>
-ChromePermissionsClient::MaybeCreateMessageUI(
-    content::WebContents* web_contents,
-    const permissions::PermissionRequest& request,
-    base::WeakPtr<permissions::PermissionPromptAndroid> prompt) {
-  ContentSettingsType type = request.GetContentSettingsType();
-  if (ShouldUseQuietUI(web_contents, request) ||
-      // The quiet UI is enabled for both Notifications and Geolocation but the
-      // Loud Clapper supports only Notifications.
-      (type == ContentSettingsType::NOTIFICATIONS &&
-       base::FeatureList::IsEnabled(
-           permissions::kPermissionsAndroidClapperLoud))) {
-    auto delegate =
-        std::make_unique<PermissionBlockedMessageDelegate::Delegate>(
-            std::move(prompt));
-    return std::make_unique<PermissionBlockedMessageDelegate>(
-        web_contents, std::move(delegate));
-  }
-
-  return {};
-}
-
-void ChromePermissionsClient::RepromptForAndroidPermissions(
-    content::WebContents* web_contents,
-    const std::vector<ContentSettingsType>& content_settings_types,
-    const std::vector<ContentSettingsType>& filtered_content_settings_types,
-    const std::vector<std::string>& required_permissions,
-    const std::vector<std::string>& optional_permissions,
-    PermissionsUpdatedCallback callback) {
-  PermissionUpdateMessageController::CreateForWebContents(web_contents);
-  PermissionUpdateMessageController::FromWebContents(web_contents)
-      ->ShowMessage(content_settings_types, filtered_content_settings_types,
-                    required_permissions, optional_permissions,
-                    std::move(callback));
-}
-
-int ChromePermissionsClient::MapToJavaDrawableId(int resource_id) {
-  return ResourceMapper::MapToJavaDrawableId(resource_id);
-}
-
-favicon::FaviconService* ChromePermissionsClient::GetFaviconService(
-    content::BrowserContext* browser_context) {
-  return FaviconServiceFactory::GetForProfile(
-      Profile::FromBrowserContext(browser_context),
-      ServiceAccessType::EXPLICIT_ACCESS);
-}
-
-const std::u16string ChromePermissionsClient::GetClientApplicationName() const {
-  return l10n_util::GetStringUTF16(IDS_SHORT_PRODUCT_NAME);
-}
-
-#else
 std::unique_ptr<permissions::PermissionPrompt>
 ChromePermissionsClient::CreatePrompt(
     content::WebContents* web_contents,
@@ -918,7 +812,6 @@ ChromePermissionsClient::CreatePromptContentScrim(
   CHECK(web_contents);
   return CreatePermissionPromptContentScrim(*web_contents, flow_model);
 }
-#endif
 
 bool ChromePermissionsClient::HasDevicePermission(
     ContentSettingsType type) const {

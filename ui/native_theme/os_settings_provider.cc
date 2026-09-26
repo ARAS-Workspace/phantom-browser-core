@@ -25,9 +25,7 @@
 
 // `OsSettingsProviderImpl` is an alias to a forward-declared type; to construct
 // it in `Get()` below, we must have the full type definition.
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/native_theme/os_settings_provider_android.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "ui/native_theme/os_settings_provider_mac.h"
 #endif
 
@@ -238,12 +236,6 @@ OsSettingsProvider::SchemeVariant() const {
 base::TimeDelta OsSettingsProvider::CaretBlinkInterval() const {
   return kDefaultCaretBlinkInterval;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool OsSettingsProvider::IsAndroidProvider() const {
-  return false;
-}
-#endif
 
 void OsSettingsProvider::NotifyOnSettingsChanged(bool force_notify) {
   // Don't notify if this provider isn't the active one.

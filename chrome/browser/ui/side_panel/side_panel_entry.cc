@@ -13,19 +13,10 @@
 #include "chrome/browser/ui/side_panel/side_panel_enums.h"
 #include "chrome/browser/ui/side_panel/side_panel_metrics.h"
 
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_OWNED_UI_CLASS_PROPERTY_KEY(std::u16string, kSidePanelTitleKey)
-#else
 DEFINE_UI_CLASS_PROPERTY_KEY(bool, kShouldShowTitleInSidePanelHeaderKey, true)
-#endif
 
 namespace {
-#if BUILDFLAG(IS_ANDROID)
-// Only supported type on Android.
-constexpr SidePanelType kDefaultSidePanelType = SidePanelType::kToolbar;
-#else
 constexpr SidePanelType kDefaultSidePanelType = SidePanelType::kContent;
-#endif
 }  // namespace
 
 SidePanelEntry::SidePanelEntry(
@@ -111,13 +102,6 @@ void SidePanelEntry::OnEntryHidden() {
   SidePanelMetrics::RecordEntryHiddenMetrics(key_.id(), entry_shown_timestamp_);
   observers_.Notify(&SidePanelEntryObserver::OnEntryHidden, this);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void SidePanelEntry::OnEntryHiddenWithReason(SidePanelEntryHideReason reason) {
-  observers_.Notify(&SidePanelEntryObserver::OnEntryHiddenWithReason, this,
-                    reason);
-}
-#endif
 
 void SidePanelEntry::AddObserver(SidePanelEntryObserver* observer) {
   observers_.AddObserver(observer);

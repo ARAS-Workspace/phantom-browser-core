@@ -11,21 +11,13 @@
 #include "media/base/media_switches.h"
 #include "media/mojo/common/media_type_converters.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "media/base/android/media_codec_util.h"
-#endif
-
 namespace media {
 
 // static
 bool MojoAudioEncoder::IsSupported(AudioCodec codec) {
   switch (codec) {
     case AudioCodec::kAAC:
-#if BUILDFLAG(IS_ANDROID)
       return base::FeatureList::IsEnabled(media::kPlatformAudioEncoder);
-#else
-      return base::FeatureList::IsEnabled(media::kPlatformAudioEncoder);
-#endif
     default:
       // We only spin up platform AudioEncoders for AAC for now.
       return false;

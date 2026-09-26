@@ -84,10 +84,6 @@
 #include "ui/gfx/skbitmap_operations.h"
 #include "ui/snapshot/snapshot.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/compositor_impl_android.h"
-#endif
-
 namespace content {
 namespace protocol {
 
@@ -522,11 +518,7 @@ PageHandler::PageHandler(
       emulation_handler_(emulation_handler),
       browser_handler_(browser_handler),
       prepare_for_reload_callback_(std::move(prepare_for_reload_callback)) {
-#if BUILDFLAG(IS_ANDROID)
-  constexpr auto kScreencastPixelFormat = media::PIXEL_FORMAT_I420;
-#else
   constexpr auto kScreencastPixelFormat = media::PIXEL_FORMAT_ARGB;
-#endif
   video_consumer_ = std::make_unique<DevToolsVideoConsumer>(base::BindRepeating(
       &PageHandler::OnFrameFromVideoConsumer, weak_factory_.GetWeakPtr()));
   video_consumer_->SetFormat(kScreencastPixelFormat);

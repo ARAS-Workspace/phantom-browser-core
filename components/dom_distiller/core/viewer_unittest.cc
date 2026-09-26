@@ -186,17 +186,10 @@ TEST_F(DomDistillerViewerTest, TestGetAddToPageJsDisplaysContent) {
 }
 
 TEST_F(DomDistillerViewerTest, TestGetJavaScriptPinchMinMaxZoom) {
-#if BUILDFLAG(IS_ANDROID)
-  std::string output = viewer::GetJavaScript();
-  EXPECT_THAT(output,
-              testing::ContainsRegex(
-                  "/\\* PINCH_SCALE \\*/ Math\\.max\\(1, Math\\.min\\(2\\.5,"));
-#else
   std::string output = viewer::GetJavaScript();
   EXPECT_THAT(output,
               testing::ContainsRegex(
                   "/\\* PINCH_SCALE \\*/ Math\\.max\\(0\\.5, Math\\.min\\(2,"));
-#endif
 }
 
 }  // namespace dom_distiller

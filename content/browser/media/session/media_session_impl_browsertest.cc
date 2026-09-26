@@ -1019,7 +1019,6 @@ IN_PROC_BROWSER_TEST_P(MediaSessionImplParamBrowserTest,
 }
 
 // This behaviour is specific to desktop.
-#if !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(MediaSessionImplParamBrowserTest,
                        ControlsNoShowForTransientAndRoutedService) {
@@ -1117,8 +1116,6 @@ IN_PROC_BROWSER_TEST_P(MediaSessionImplParamBrowserTest,
   EXPECT_TRUE(IsControllable());
   EXPECT_TRUE(IsActive());
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(MediaSessionImplParamBrowserTest,
                        ControlsHideWhenStopped) {
@@ -2966,13 +2963,7 @@ IN_PROC_BROWSER_TEST_F(MediaSessionImplBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/40097218): Re-enable this test.
-#define MAYBE_PositionStateRouteWithOnePlayer \
-  DISABLED_PositionStateRouteWithOnePlayer
-#else
 #define MAYBE_PositionStateRouteWithOnePlayer PositionStateRouteWithOnePlayer
-#endif
 IN_PROC_BROWSER_TEST_F(MediaSessionImplBrowserTest,
                        MAYBE_PositionStateRouteWithOnePlayer) {
   EXPECT_TRUE(NavigateToURL(
@@ -3306,7 +3297,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionImplBrowserTest,
   EXPECT_FALSE(waiter.MeetsVisibility());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(MediaSessionImplBrowserTest,
                        WebAudioPlayersAreRegisteredAsAmbientPlayers) {
   // Start WebAudio playback.
@@ -3320,7 +3310,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionImplBrowserTest,
   ASSERT_TRUE(GetSessionAudioFocusType().has_value());
   EXPECT_EQ(AudioFocusType::kAmbient, *GetSessionAudioFocusType());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(MediaSessionImplBrowserTest,
                        DownloadArtworkFromCorrectFrame) {
@@ -3551,13 +3540,6 @@ class MediaSessionImplWithBackForwardCacheBrowserTest
 
     feature_list_.InitWithFeaturesAndParameters(
         GetBasicBackForwardCacheFeatureForTesting(
-#if BUILDFLAG(IS_ANDROID)
-            {{ features::kBackForwardCache,
-               {
-                 { "process_binding_strength",
-                   "NORMAL" }
-               } }}
-#endif
             ),
         GetDefaultDisabledBackForwardCacheFeaturesForTesting());
   }

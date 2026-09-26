@@ -266,16 +266,12 @@ class NetworkServiceHttpCacheEarlyInitTest : public testing::Test {
 
   bool CacheExists() {
     // See HttpCache::DefaultBackend::HasExistingFileToLoad() for detail.
-#if !BUILDFLAG(IS_ANDROID)
     if (!base::DirectoryExists(cache_path_)) {
       return false;
     }
     base::FileEnumerator enumerator(cache_path_, true,
                                     base::FileEnumerator::FILES);
     return !enumerator.Next().empty();
-#else
-    return base::DirectoryExists(cache_path_);
-#endif
   }
 
   BrowserTaskEnvironment task_environment_{BrowserTaskEnvironment::IO_MAINLOOP};

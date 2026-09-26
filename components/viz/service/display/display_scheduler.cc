@@ -40,11 +40,7 @@ base::TimeDelta ComputeAdpfTarget(const BeginFrameArgs& args) {
 }
 
 bool AdpfCanUseSetThreads() {
-#if BUILDFLAG(IS_ANDROID)
-  return android_get_device_api_level() >= __ANDROID_API_U__;
-#else
   return false;
-#endif
 }
 
 }  // namespace
@@ -101,10 +97,6 @@ DisplayScheduler::DisplayScheduler(BeginFrameSource* begin_frame_source,
       wait_for_all_surfaces_before_draw_(wait_for_all_surfaces_before_draw),
       allow_multiple_swaps_per_vsync_(
           base::FeatureList::IsEnabled(features::kAllowMultipleSwapsPerVsync)),
-#if BUILDFLAG(IS_ANDROID)
-      use_platform_preferred_deadlines_(!base::FeatureList::IsEnabled(
-          features::kUseAndroidCustomFrameDeadlines)),
-#endif
       observing_begin_frame_source_(false),
       last_targeted_latch_time_(),
       hint_session_factory_(hint_session_factory),

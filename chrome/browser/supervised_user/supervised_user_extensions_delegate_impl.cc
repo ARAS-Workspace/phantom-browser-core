@@ -23,10 +23,6 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/supervised_user/android/extension_parent_approval.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 void OnParentPermissionDialogComplete(
@@ -247,10 +243,6 @@ void SupervisedUserExtensionsDelegateImpl::RequestExtensionApproval(
   // Always invoke the parent permission dialog.
   ShowParentPermissionDialogForExtension(extension, web_contents, icon);
   return;
-#elif BUILDFLAG(IS_ANDROID)
-  CHECK(contents.value());
-  ExtensionParentApproval::RequestExtensionApproval(contents.value().get(),
-                                                    std::move(done_callback_));
 #endif
 }
 

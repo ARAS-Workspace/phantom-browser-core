@@ -77,13 +77,7 @@ void SetFlagAndRunClosure(bool* flag, base::OnceClosure closure) {
 // Uses BackgroundServiceManager to start the service manager in the background
 // and connects to background_service_manager_test_service, verifying we can
 // send a message to the service.
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/40458478): This test is disabled, as it fails
-// on the Android GN bot.
-#define MAYBE_Basic DISABLED_Basic
-#else
 #define MAYBE_Basic Basic
-#endif
 TEST(BackgroundServiceManagerTest, MAYBE_Basic) {
   base::test::TaskEnvironment task_environment;
   BackgroundServiceManager background_service_manager(GetTestManifests());

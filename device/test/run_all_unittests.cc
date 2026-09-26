@@ -35,11 +35,7 @@ class DeviceTestSuite : public base::TestSuite {
     ui::ResourceBundle::InitSharedInstanceWithPakPath(ui_test_pak_path);
 
     base::FilePath path;
-#if BUILDFLAG(IS_ANDROID)
-    ASSERT_TRUE(base::PathService::Get(ui::DIR_RESOURCE_PAKS_ANDROID, &path));
-#else
     ASSERT_TRUE(base::PathService::Get(base::DIR_ASSETS, &path));
-#endif  // BUILDFLAG(IS_ANDROID)
     base::FilePath bluetooth_test_strings =
         path.Append(FILE_PATH_LITERAL("bluetooth_test_strings.pak"));
     ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(

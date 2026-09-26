@@ -70,16 +70,6 @@
 #include "third_party/blink/public/mojom/loader/referrer.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/android/features/dev_ui/buildflags.h"
-#include "chrome/browser/signin/android/cross_device_signin_flow_navigation_throttle.h"
-#include "components/navigation_interception/intercept_navigation_delegate.h"
-
-#if BUILDFLAG(DFMIFY_DEV_UI)
-#include "chrome/browser/dev_ui/android/dev_ui_loader_throttle.h"
-#endif  // BUILDFLAG(DFMIFY_DEV_UI)
-
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/background/background_contents_navigation_throttle.h"
 #include "chrome/browser/devtools/devtools_navigation_throttle.h"
 #include "chrome/browser/page_info/web_view_side_panel_throttle.h"
@@ -91,15 +81,12 @@
 #include "chrome/browser/ui/webui/image/image_navigation_throttle.h"
 #include "chrome/browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_response_capture_navigation_throttle.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_throttle.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
 #include "chrome/browser/apps/platform_apps/platform_app_navigation_redirector.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 #include "chrome/browser/devtools/devtools_window.h"
@@ -149,14 +136,12 @@
 #include "chrome/browser/offline_pages/offline_page_navigation_throttle.h"
 #endif  // BUILDFLAG(ENABLE_OFFLINE_PAGES)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/platform_auth/platform_auth_navigation_throttle.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/enterprise/connectors/device_trust/navigation_throttle.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #include "chrome/browser/enterprise/incognito/incognito_navigation_throttle.h"
 #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"
@@ -204,14 +189,10 @@ void HandleSSLErrorWrapper(
 // Returns whether `web_contents` is within a web app.
 // TODO(crbug.com/505461569): Support Android.
 bool IsInWebApp(content::WebContents* web_contents) {
-#if !BUILDFLAG(IS_ANDROID)
   tabs::TabInterface* tab =
       tabs::TabInterface::MaybeGetFromContents(web_contents);
   return tab && web_app::AppBrowserController::IsWebApp(
                     tab->GetBrowserWindowInterface());
-#else
-  return false;
-#endif
 }
 
 bool IsErrorPageAutoReloadEnabled() {
@@ -276,41 +257,18 @@ void CreateAndAddChromeThrottlesForNavigation(
             GeolocationNavigationThrottle::MaybeCreateThrottleFor(registry)) {
       registry.AddThrottle(std::move(throttle));
     }
-
-#if BUILDFLAG(IS_ANDROID)
-    CrossDeviceSigninFlowNavigationThrottle::MaybeCreateAndAdd(registry);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   DSEPrewarmNavigationThrottle::MaybeCreateAndAdd(registry);
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(davidben): This is insufficient to integrate with prerender properly.
-  // https://crbug.com/40364296
-  prerender::NoStatePrefetchContents* no_state_prefetch_contents =
-      prerender::ChromeNoStatePrefetchContentsDelegate::FromWebContents(
-          handle.GetWebContents());
-  if (!no_state_prefetch_contents) {
-    navigation_interception::InterceptNavigationDelegate::MaybeCreateAndAdd(
-        registry, navigation_interception::SynchronyMode::kAsync);
-  }
-
-#if BUILDFLAG(DFMIFY_DEV_UI)
-  // If the DevUI DFM is already installed, then this is a no-op, except for the
-  // side effect of ensuring that the DevUI DFM is loaded.
-  dev_ui::DevUiLoaderThrottle::MaybeCreateAndAdd(registry);
-#endif  // BUILDFLAG(DFMIFY_DEV_UI)
-
-#elif BUILDFLAG(ENABLE_PLATFORM_APPS)
+#if BUILDFLAG(ENABLE_PLATFORM_APPS)
   // Redirect some navigations to apps that have registered matching URL
   // handlers ('url_handlers' in the manifest).
   PlatformAppNavigationRedirector::MaybeCreateAndAdd(registry);
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
   Profile* profile =
       Profile::FromBrowserContext(handle.GetWebContents()->GetBrowserContext());
-
-#if !BUILDFLAG(IS_ANDROID)
 
   web_app::NavigationCapturingRedirectionThrottle::MaybeCreateAndAdd(registry);
 
@@ -323,7 +281,6 @@ void CreateAndAddChromeThrottlesForNavigation(
           MaybeCreateAndAdd(protocol_handler_registry, registry);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (!extensions::ChromeContentBrowserClientExtensionsPart::
@@ -422,7 +379,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   DevToolsWindow::MaybeCreateAndAddNavigationThrottle(registry);
 #endif  // BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
 
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(features::kInstantUsesSpareRenderer)) {
     ChromeSearchNavigationThrottle::MaybeCreateAndAdd(registry);
   }
@@ -434,7 +390,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   web_app::WebUIWebAppNavigationThrottle::MaybeCreateAndAdd(registry);
 
   ImageNavigationThrottle::MaybeCreateAndAdd(registry);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   // g_browser_process->safe_browsing_service() may be null in unittests.
@@ -476,11 +431,8 @@ void CreateAndAddChromeThrottlesForNavigation(
 
   payments::PaymentHandlerNavigationThrottle::MaybeCreateAndAdd(registry);
 
-#if !BUILDFLAG(IS_ANDROID)
-
   NtpMicrosoftAuthResponseCaptureNavigationThrottle::MaybeCreateAndAdd(
       registry);
-#endif
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
   offline_pages::OfflinePageNavigationThrottle::MaybeCreateAndAdd(registry);
@@ -492,17 +444,15 @@ void CreateAndAddChromeThrottlesForNavigation(
         profile);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   MaybeCreateAndAddWebViewSidePanelThrottle(registry);
-#endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   // Don't perform platform authentication in incognito and guest profiles.
   if (profile && !profile->IsOffTheRecord()) {
     enterprise_auth::PlatformAuthNavigationThrottle::MaybeCreateAndAdd(
         registry);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (profile && profile->IsIncognitoProfile() && profile->IsOffTheRecord()) {
@@ -515,11 +465,9 @@ void CreateAndAddChromeThrottlesForNavigation(
 
   data_sharing::DataSharingNavigationThrottle::MaybeCreateAndAdd(registry);
 
-#if !BUILDFLAG(IS_ANDROID)
   BackgroundContentsNavigationThrottle::MaybeCreateAndAdd(registry);
   web_app::IsolatedWebAppThrottle::MaybeCreateAndAdd(registry);
   DevToolsNavigationThrottle::MaybeCreateAndAdd(registry);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   dom_distiller::DistillerPageWebContents::MaybeCreateAndAddNavigationThrottle(
       registry);

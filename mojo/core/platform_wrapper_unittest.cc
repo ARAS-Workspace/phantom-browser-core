@@ -120,7 +120,7 @@ TEST_F(PlatformWrapperTest, MAYBE_WrapPlatformSharedMemoryRegion) {
     MojoPlatformHandle os_buffer;
     os_buffer.struct_size = sizeof(MojoPlatformHandle);
     os_buffer.type = SHARED_BUFFER_PLATFORM_HANDLE_TYPE;
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
     os_buffer.value =
         static_cast<uint64_t>(platform_region.PassPlatformHandle().release());
 #elif BUILDFLAG(IS_POSIX)

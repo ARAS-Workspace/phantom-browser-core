@@ -56,11 +56,6 @@ TestRenderWidgetHostView::TestRenderWidgetHostView(RenderWidgetHost* rwh)
       is_showing_(false),
       is_occluded_(false),
       cursor_manager_(this) {
-#if BUILDFLAG(IS_ANDROID)
-  frame_sink_id_ = AllocateFrameSinkId();
-  GetHostFrameSinkManager()->RegisterFrameSinkId(
-      frame_sink_id_, this, viz::ReportFirstSurfaceActivation::kYes);
-#else
   default_background_color_ = SK_ColorWHITE;
   // Not all tests initialize or need an image transport factory.
   if (ImageTransportFactory::GetInstance()) {
@@ -72,7 +67,6 @@ TestRenderWidgetHostView::TestRenderWidgetHostView(RenderWidgetHost* rwh)
         frame_sink_id_, "TestRenderWidgetHostView");
 #endif
   }
-#endif
 
   host()->SetView(this);
 
@@ -184,12 +178,6 @@ void TestRenderWidgetHostView::ShowSharePicker(
 
 uint64_t TestRenderWidgetHostView::GetNSViewId() const {
   return 0;
-}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-bool TestRenderWidgetHostView::IsTouchSequencePotentiallyActiveOnViz() {
-  return false;
 }
 #endif
 
@@ -308,7 +296,6 @@ void TestRenderWidgetHostView::
     RequestSuccessfulPresentationTimeFromHostOrDelegate(
         blink::RecordContentToVisibleTimeRequest visible_time_request) {
   // Should only be called if the view was already shown.
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(jonross): Update the constructor to determine showing state
   // `is_showing_ = !host()->IsHidden()` this will match production code. Also
   // update various tests not prepared for this to also match production.
@@ -319,7 +306,6 @@ void TestRenderWidgetHostView::
   // recreating the main render frame. This leads to requests while already
   // visible in tests.
   EXPECT_TRUE(is_showing_);
-#endif
   EXPECT_FALSE(is_occluded_);
   EXPECT_EQ(page_visibility_, PageVisibilityState::kVisible);
 }

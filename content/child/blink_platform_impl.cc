@@ -234,21 +234,6 @@ bool BlinkPlatformImpl::IsURLSavableForSavableResource(
 size_t BlinkPlatformImpl::MaxDecodedImageBytes() {
   const int kMB = 1024 * 1024;
   const int kMaxNumberOfBytesPerPixel = 4;
-#if BUILDFLAG(IS_ANDROID)
-  if (base::SysInfo::IsLowEndDevice()) {
-    // Limit image decoded size to 3M pixels on low end devices.
-    // 4 is maximum number of bytes per pixel.
-    return 3 * kMB * kMaxNumberOfBytesPerPixel;
-  }
-  // For other devices, limit decoded image size based on the amount of physical
-  // memory.
-  // In some cases all physical memory is not accessible by Chromium, as it can
-  // be reserved for direct use by certain hardware. Thus, we set the limit so
-  // that 1.6GB of reported physical memory on a 2GB device is enough to set the
-  // limit at 16M pixels, which is a desirable value since 4K*4K is a relatively
-  // common texture size.
-  return base::SysInfo::AmountOfTotalPhysicalMemory().InBytes() / 25;
-#else
   size_t max_decoded_image_byte_limit = kNoDecodedImageByteLimit;
   base::CommandLine& command_line = *base::CommandLine::ForCurrentProcess();
   if (command_line.HasSwitch(switches::kMaxDecodedImageSizeMb)) {
@@ -259,7 +244,6 @@ size_t BlinkPlatformImpl::MaxDecodedImageBytes() {
     }
   }
   return max_decoded_image_byte_limit;
-#endif
 }
 
 bool BlinkPlatformImpl::IsLowEndDevice() {

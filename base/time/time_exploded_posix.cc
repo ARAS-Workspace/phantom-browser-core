@@ -15,10 +15,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID) && !defined(__LP64__)
-#include <time64.h>
-#endif
-
 namespace {
 
 // This prevents a crash on traversing the environment global and looking up
@@ -31,29 +27,7 @@ base::Lock* GetSysTimeToTimeStructLock() {
 // Define a system-specific SysTime that wraps either to a time_t or
 // a time64_t depending on the host system, and associated convertion.
 // See crbug.com/162007
-#if BUILDFLAG(IS_ANDROID) && !defined(__LP64__)
-
-typedef time64_t SysTime;
-
-SysTime SysTimeFromTimeStruct(struct tm* timestruct, bool is_local) {
-  base::AutoLock locked(*GetSysTimeToTimeStructLock());
-  if (is_local) {
-    return mktime64(timestruct);
-  } else {
-    return timegm64(timestruct);
-  }
-}
-
-void SysTimeToTimeStruct(SysTime t, struct tm* timestruct, bool is_local) {
-  base::AutoLock locked(*GetSysTimeToTimeStructLock());
-  if (is_local) {
-    localtime64_r(&t, timestruct);
-  } else {
-    gmtime64_r(&t, timestruct);
-  }
-}
-
-#elif BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_AIX)
 
 // The function timegm is not available on AIX.
 time_t aix_timegm(struct tm* tm) {
@@ -115,7 +89,7 @@ void SysTimeToTimeStruct(SysTime t, struct tm* timestruct, bool is_local) {
   }
 }
 
-#endif  // BUILDFLAG(IS_ANDROID) && !defined(__LP64__)
+#endif  // BUILDFLAG(IS_AIX)
 
 }  // namespace
 

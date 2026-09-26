@@ -20,12 +20,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "base/android/locale_utils.h"
-#include "base/strings/stringprintf.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 namespace {
@@ -93,16 +87,7 @@ TEST_F(URLProvisionFetcherTest, SendsPostRequestWithBody) {
 TEST_F(URLProvisionFetcherTest, UserAgent) {
 
   std::string expected_user_agent;
-#if BUILDFLAG(IS_ANDROID)
-  expected_user_agent = base::StringPrintf(
-      "Widevine CDM v1.0 (Linux; U; Android %d; %s; Build/%s; %s)",
-      base::android::android_info::sdk_int(),
-      base::android::GetDefaultLocaleString().c_str(),
-      base::android::android_info::android_build_id(),
-      base::android::android_info::build_type());
-#else
   expected_user_agent = "Widevine CDM v1.0";
-#endif
 
   auto fetcher = CreateProvisionFetcherWithUserAgent(shared_url_loader_factory_,
                                                      expected_user_agent);

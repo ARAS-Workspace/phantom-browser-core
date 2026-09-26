@@ -66,15 +66,6 @@ void OnMachineStatisticsLoaded(LocalDeviceNameInfo* name_info_ptr,
 DeviceInfo::DeviceType GetLocalDeviceType() {
 #if BUILDFLAG(IS_LINUX)
   return DeviceInfo::DeviceType::kLinux;
-#elif BUILDFLAG(IS_ANDROID)
-  switch (ui::GetDeviceFormFactor()) {
-    case ui::DEVICE_FORM_FACTOR_TABLET:
-      return DeviceInfo::DeviceType::kTablet;
-    case ui::DEVICE_FORM_FACTOR_PHONE:
-      return DeviceInfo::DeviceType::kPhone;
-    default:
-      return DeviceInfo::DeviceType::kOther;
-  }
 #elif BUILDFLAG(IS_MAC)
   return DeviceInfo::DeviceType::kMac;
 #else
@@ -85,8 +76,6 @@ DeviceInfo::DeviceType GetLocalDeviceType() {
 DeviceInfo::OsType GetLocalDeviceOSType() {
 #if BUILDFLAG(IS_LINUX)
   return DeviceInfo::OsType::kLinux;
-#elif BUILDFLAG(IS_ANDROID)
-  return DeviceInfo::OsType::kAndroid;
 #elif BUILDFLAG(IS_MAC)
   return DeviceInfo::OsType::kMac;
 #else
@@ -130,9 +119,6 @@ BlockingDeviceDetails GetBlockingDeviceDetails() {
   std::string device_name = GetPersonalizableDeviceNameBlocking();
 
   std::optional<std::string> android_build_fingerprint;
-#if BUILDFLAG(IS_ANDROID)
-  android_build_fingerprint = base::SysInfo::GetAndroidBuildFingerprint();
-#endif
 
   return {std::move(device_name), std::move(android_build_fingerprint)};
 }

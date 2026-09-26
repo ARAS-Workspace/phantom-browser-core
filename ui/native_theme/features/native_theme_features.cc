@@ -16,13 +16,8 @@ constexpr base::FeatureParam<ScrollbarMode>::Option kScrollbarModeOptions[] = {
     {ScrollbarMode::kClassic, "classic"},
 };
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr base::FeatureState kOverlayScrollbarFeatureState =
-    base::FEATURE_ENABLED_BY_DEFAULT;
-#else
 constexpr base::FeatureState kOverlayScrollbarFeatureState =
     base::FEATURE_DISABLED_BY_DEFAULT;
-#endif
 
 // Controls the scrollbar mode in Blink (i.e. web content) on Windows, Linux,
 // and ChromeOS.

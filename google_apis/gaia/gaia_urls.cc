@@ -58,11 +58,7 @@ const char kSigninChromeSyncDice[] = "signin/chrome/sync?ssp=1";
 // Opens the "Verify it's you" reauth gaia page.
 const char kAccountChooser[] = "AccountChooser";
 
-#if BUILDFLAG(IS_ANDROID)
-const char kSigninChromeSyncKeysRetrievalUrl[] = "encryption/unlock/android";
-#else
 const char kSigninChromeSyncKeysRetrievalUrl[] = "encryption/unlock/desktop";
-#endif
 // Parameter "kdi" is used to distinguish recoverability management from
 // retrieval. The value is a base64-encoded serialized protobuf, referred to
 // internally as ClientDecryptableKeyDataInputs.

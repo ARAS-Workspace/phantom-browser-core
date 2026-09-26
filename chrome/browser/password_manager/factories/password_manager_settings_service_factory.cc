@@ -13,13 +13,6 @@
 #include "components/password_manager/core/browser/password_manager_settings_service.h"
 #include "components/password_manager/core/browser/password_manager_settings_service_impl.h"
 #include "components/password_manager/core/common/password_manager_features.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/password_manager/android/password_manager_android_util.h"
-#include "chrome/browser/password_manager/android/password_manager_settings_service_android_impl.h"
-#include "chrome/browser/password_manager/android/password_manager_util_bridge.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/prefs/pref_service.h"
-#endif
 
 // static
 password_manager::PasswordManagerSettingsService*
@@ -53,12 +46,7 @@ PasswordManagerSettingsServiceFactory::PasswordManagerSettingsServiceFactory()
               // TODO(crbug.com/41488885): Check if this service is needed for
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kRedirectedToOriginal)
-              .Build()) {
-#if BUILDFLAG(IS_ANDROID)
-  // The sync status is necessary on Android to decide which prefs to check.
-  DependsOn(SyncServiceFactory::GetInstance());
-#endif
-}
+              .Build()) {}
 
 PasswordManagerSettingsServiceFactory::
     ~PasswordManagerSettingsServiceFactory() = default;
@@ -83,16 +71,6 @@ PasswordManagerSettingsServiceFactory::BuildServiceInstanceForBrowserContext(
 
 std::unique_ptr<password_manager::PasswordManagerSettingsService>
 PasswordManagerSettingsServiceFactory::CreateService(Profile* profile) const {
-#if BUILDFLAG(IS_ANDROID)
-  if (password_manager_android_util::IsPasswordManagerAvailable(
-          std::make_unique<
-              password_manager_android_util::PasswordManagerUtilBridge>())) {
-    return std::make_unique<PasswordManagerSettingsServiceAndroidImpl>(
-        profile->GetPrefs(), SyncServiceFactory::GetForProfile(profile));
-  }
-  return nullptr;
-#else
   return std::make_unique<password_manager::PasswordManagerSettingsServiceImpl>(
       profile->GetPrefs());
-#endif
 }

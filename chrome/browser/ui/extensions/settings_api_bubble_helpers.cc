@@ -35,7 +35,7 @@ namespace {
 
 // Whether the NTP post-install UI is enabled. By default, this is limited to
 // Mac, and Desktop Android but can be overridden for testing.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 bool g_ntp_post_install_ui_enabled = true;
 #else
 bool g_ntp_post_install_ui_enabled = false;

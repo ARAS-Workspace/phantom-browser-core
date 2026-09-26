@@ -11,15 +11,10 @@
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 namespace {
 
@@ -219,36 +214,6 @@ void MultiTabLoadingPageLoadMetricsObserver::RecordHistograms(
   RECORD_HISTOGRAM(num_of_tabs >= 64, MultiTab64);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-int MultiTabLoadingPageLoadMetricsObserver::NumberOfTabsWithInflightLoad(
-    content::NavigationHandle* navigation_handle) {
-  content::WebContents* this_contents = navigation_handle->GetWebContents();
-  int num_loading = 0;
-  for (const TabModel* model : TabModelList::models()) {
-    // Note: |this_contents| may not appear in |model|.
-    for (int i = 0; i < model->GetTabCount(); ++i) {
-      content::WebContents* other_contents = model->GetWebContentsAt(i);
-      if (other_contents && other_contents != this_contents &&
-          other_contents->IsLoading()) {
-        num_loading++;
-      }
-    }
-  }
-  return num_loading;
-}
-
-int MultiTabLoadingPageLoadMetricsObserver::NumberOfTabs(
-    content::NavigationHandle* navigation_handle) {
-  int num_of_tabs = 0;
-  for (const TabModel* model : TabModelList::models()) {
-    num_of_tabs += model->GetTabCount();
-  }
-  return num_of_tabs;
-}
-
-#else  // BUILDFLAG(IS_ANDROID)
-
 int MultiTabLoadingPageLoadMetricsObserver::NumberOfTabsWithInflightLoad(
     content::NavigationHandle* navigation_handle) {
   content::WebContents* const this_contents =
@@ -281,5 +246,3 @@ int MultiTabLoadingPageLoadMetricsObserver::NumberOfTabs(
       });
   return num_of_tabs;
 }
-
-#endif  // BUILDFLAG(IS_ANDROID)

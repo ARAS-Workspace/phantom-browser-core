@@ -236,25 +236,6 @@ TEST_F(CreditCardFidoAuthenticatorTest, IsUserOptedIn_True) {
   EXPECT_TRUE(fido_authenticator().IsUserOptedIn());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(CreditCardFidoAuthenticatorTest,
-       GetUserOptInIntention_IntentToOptIn_Android) {
-  // If payments is offering to opt-in, then that means user is not opted in
-  // from payments.
-  payments::UnmaskDetails unmask_details;
-  unmask_details.server_denotes_fido_eligible_but_not_opted_in = true;
-  // Set the local preference to be enabled, which denotes user manually opted
-  // in from settings page, and Payments did not update the status in time.
-  SetUserOptInPreference(true);
-  EXPECT_TRUE(fido_authenticator().IsUserOptedIn());
-
-  EXPECT_EQ(fido_authenticator().GetUserOptInIntention(unmask_details),
-            UserOptInIntention::kIntentToOptIn);
-  // On Android, the local pref is not consistent with payments until opt-in
-  // succeeds, so it is unnecessary to check that IsUserOptedIn() is true here,
-  // since it will not have updated yet.
-}
-#else
 TEST_F(CreditCardFidoAuthenticatorTest,
        GetUserOptInIntention_IntentToOptIn_Desktop) {
   // If payments is offering to opt-in, then that means user is not opted in
@@ -274,7 +255,6 @@ TEST_F(CreditCardFidoAuthenticatorTest,
   // payments.
   EXPECT_FALSE(fido_authenticator().IsUserOptedIn());
 }
-#endif
 
 TEST_F(CreditCardFidoAuthenticatorTest, GetUserOptInIntention_IntentToOptOut) {
   // If payments is requesting a FIDO auth, then that means user is opted in
@@ -573,7 +553,6 @@ TEST_F(CreditCardFidoAuthenticatorTest,
       autofill_metrics::WebauthnOptInParameters::kWithCreationChallenge, 1);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // This test is not applicable for Android (we won't opt-in with Register).
 TEST_F(CreditCardFidoAuthenticatorTest,
        Register_OptInAttemptReturnsRequestOptions) {
@@ -598,7 +577,6 @@ TEST_F(CreditCardFidoAuthenticatorTest,
             /*user_is_opted_in=*/true);
   EXPECT_TRUE(fido_authenticator().IsUserOptedIn());
 }
-#endif
 
 TEST_F(CreditCardFidoAuthenticatorTest, Register_NewCardAuthorization) {
   SetUserOptInPreference(true);

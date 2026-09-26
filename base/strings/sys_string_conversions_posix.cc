@@ -29,7 +29,7 @@ std::wstring SysUTF8ToWide(std::string_view utf8) {
   return out;
 }
 
-#if defined(SYSTEM_NATIVE_UTF8) || BUILDFLAG(IS_ANDROID)
+#if defined(SYSTEM_NATIVE_UTF8)
 // TODO(port): Consider reverting the OS_ANDROID when we have wcrtomb()
 // support and a better understanding of what calls these routines.
 
@@ -156,6 +156,6 @@ std::wstring SysNativeMBToWide(std::string_view native_mb) {
   return out;
 }
 
-#endif  // defined(SYSTEM_NATIVE_UTF8) || BUILDFLAG(IS_ANDROID)
+#endif  // defined(SYSTEM_NATIVE_UTF8)
 
 }  // namespace base

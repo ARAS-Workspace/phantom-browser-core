@@ -70,22 +70,13 @@ const char kLexendCssClass[] = "Lexend";
 // LINT.ThenChange(//components/dom_distiller/core/css/distilledpage_common.css)
 
 std::string GetVersionedCss() {
-#if BUILDFLAG(IS_ANDROID)
-  return ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
-      IDR_DISTILLER_NEW_CSS);
-#else
   return ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
       IDR_DISTILLER_CSS);
-#endif
 }
 
 std::string GetPlatformSpecificCss() {
-#if BUILDFLAG(IS_ANDROID)
-  return "";
-#else  // Desktop
   return ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
       IDR_DISTILLER_DESKTOP_CSS);
-#endif
 }
 
 // Maps themes to JS themes.
@@ -317,21 +308,11 @@ const std::string GetLoadingImage() {
 
 static std::string GetMinPinchZoomScale() {
   float min_scale = kMinFontScaleAndroidCCT;
-#if BUILDFLAG(IS_ANDROID)
-  // Make the minimum pinch zoom value to be 1.0 for distillation in app to
-  // align with prefs UI.
-  min_scale = kMinFontScaleAndroidInApp;
-#endif
   return base::NumberToString(min_scale);
 }
 
 static std::string GetMaxPinchZoomScale() {
   float max_scale = kMaxFontScaleAndroidCCT;
-#if BUILDFLAG(IS_ANDROID)
-  // Make the maximum pinch zoom value to be 2.5 for distillation in app to
-  // align with prefs UI.
-  max_scale = kMaxFontScaleAndroidInApp;
-#endif
   return base::NumberToString(max_scale);
 }
 

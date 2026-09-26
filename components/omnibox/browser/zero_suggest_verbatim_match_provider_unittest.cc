@@ -27,16 +27,6 @@
 #include "ui/base/device_form_factor.h"
 
 namespace {
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<TemplateURLData> GenerateSimpleTemplateURLData(
-    const std::string& keyword) {
-  auto data = std::make_unique<TemplateURLData>();
-  data->SetShortName(base::UTF8ToUTF16(keyword));
-  data->SetKeyword(base::UTF8ToUTF16(keyword));
-  data->SetURL(std::string("https://") + keyword + "/q={searchTerms}");
-  return data;
-}
-#endif
 
 using testing::_;
 
@@ -80,9 +70,6 @@ bool ZeroSuggestVerbatimMatchProviderTest::IsVerbatimMatchEligible() const {
 }
 
 void ZeroSuggestVerbatimMatchProviderTest::SetUp() {
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-  GTEST_SKIP() << "No zero-suggest verbatim match on Android Desktop.";
-#else   // IS_DESKTOP_ANDROID
   provider_ = new ZeroSuggestVerbatimMatchProvider(&mock_client_);
   ON_CALL(mock_client_, IsOffTheRecord()).WillByDefault([] { return false; });
   ON_CALL(mock_client_, Classify)
@@ -92,7 +79,6 @@ void ZeroSuggestVerbatimMatchProviderTest::SetUp() {
              metrics::OmniboxEventProto::PageClassification page_classification,
              AutocompleteMatch* match,
              GURL* alternate_nav_url) { match->destination_url = GURL(text); });
-#endif  // IS_DESKTOP_ANDROID
 }
 
 TEST_P(ZeroSuggestVerbatimMatchProviderTest,
@@ -223,7 +209,6 @@ TEST_P(ZeroSuggestVerbatimMatchProviderTest,
   // test. As a result, the test would validate what the mocks fill in.
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(ZeroSuggestVerbatimMatchProviderTest,
        DoesNotAttemptToPopulateFillIntoEditWithFeatureDisabled) {
   base::test::ScopedFeatureList features;
@@ -243,143 +228,6 @@ TEST_P(ZeroSuggestVerbatimMatchProviderTest,
     ASSERT_EQ(u"title", provider_->matches()[0].description);
   }
 }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(ZeroSuggestVerbatimMatchProviderTest,
-       NoFillIntoEditResolutionWithNoSearchEngines) {
-  base::test::ScopedFeatureList features;
-  std::string url("https://www.search.com/q=abc");
-  AutocompleteInput input(std::u16string(),  // Note: empty input.
-                          GetParam(), TestSchemeClassifier());
-  input.set_current_title(u"title");
-  input.set_current_url(GURL(url));
-  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-  provider_->Start(input, false);
-  if (IsVerbatimMatchEligible()) {
-    ASSERT_FALSE(provider_->matches().empty());
-    ASSERT_EQ(u"https://www.search.com/q=abc",
-              provider_->matches()[0].fill_into_edit);
-    ASSERT_EQ(u"title", provider_->matches()[0].description);
-  }
-}
-
-TEST_P(ZeroSuggestVerbatimMatchProviderTest,
-       UpdateFillIntoEditWhenUrlMatchesSearchResultsPage) {
-  base::test::ScopedFeatureList features;
-
-  // Default TemplateURL to parse the URL.
-  std::unique_ptr<TemplateURLData> engine =
-      GenerateSimpleTemplateURLData("www.search.com");
-  mock_client_.GetTemplateURLService()->ApplyDefaultSearchChangeForTesting(
-      engine.get(), DefaultSearchManager::FROM_USER);
-
-  std::string url("https://www.search.com/q=abc");
-  AutocompleteInput input(std::u16string(),  // Note: empty input.
-                          GetParam(), TestSchemeClassifier());
-  input.set_current_title(u"title");
-  input.set_current_url(GURL(url));
-  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-  provider_->Start(input, false);
-  if (IsVerbatimMatchEligible()) {
-    ASSERT_FALSE(provider_->matches().empty());
-    ASSERT_EQ(u"abc", provider_->matches()[0].fill_into_edit);
-    ASSERT_EQ(u"title", provider_->matches()[0].description);
-  }
-}
-
-TEST_P(ZeroSuggestVerbatimMatchProviderTest,
-       UpdateFillIntoEditWhenUrlMatchesSearchResultsPageWithTrailingSpace) {
-  base::test::ScopedFeatureList features;
-
-  // Default TemplateURL to parse the URL.
-  std::unique_ptr<TemplateURLData> engine =
-      GenerateSimpleTemplateURLData("www.search.com");
-  mock_client_.GetTemplateURLService()->ApplyDefaultSearchChangeForTesting(
-      engine.get(), DefaultSearchManager::FROM_USER);
-
-  // Ensure URLs with trailing escaped whitespace (%20) are correctly sanitized
-  // upon search term extraction to avoid AutocompleteResult DCHECK crashes.
-  std::string url("https://www.search.com/q=abc%20");
-  AutocompleteInput input(std::u16string(),  // Note: empty input.
-                          GetParam(), TestSchemeClassifier());
-  input.set_current_title(u"title");
-  input.set_current_url(GURL(url));
-  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-  provider_->Start(input, false);
-  if (IsVerbatimMatchEligible()) {
-    ASSERT_FALSE(provider_->matches().empty());
-    ASSERT_EQ(u"abc", provider_->matches()[0].fill_into_edit);
-    ASSERT_EQ(u"abc", provider_->matches()[0].contents);
-    ASSERT_EQ(u"title", provider_->matches()[0].description);
-  }
-}
-
-TEST_P(ZeroSuggestVerbatimMatchProviderTest,
-       DontUpdateFillIntoEditWhenUrlMatchesNonDefaultSearchEngine) {
-  base::test::ScopedFeatureList features;
-
-  // Default TemplateURL to parse the URL.
-  std::unique_ptr<TemplateURLData> engine =
-      GenerateSimpleTemplateURLData("www.search.com");
-  // Other search engines.
-  TemplateURLService::Initializer other_engines[] = {
-      {"non-default", "https://www.non-default.com/q=abc", "non-default"}};
-  search_engines::SearchEnginesTestEnvironment test_environment(
-      {.template_url_service_initializer = other_engines});
-  mock_client_.set_template_url_service(
-      test_environment.template_url_service());
-  mock_client_.GetTemplateURLService()->ApplyDefaultSearchChangeForTesting(
-      engine.get(), DefaultSearchManager::FROM_USER);
-
-  std::string url("https://www.non-default.com/q=abc");
-  AutocompleteInput input(std::u16string(),  // Note: empty input.
-                          GetParam(), TestSchemeClassifier());
-  input.set_current_title(u"title");
-  input.set_current_url(GURL(url));
-  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-  provider_->Start(input, false);
-  if (IsVerbatimMatchEligible()) {
-    ASSERT_FALSE(provider_->matches().empty());
-    ASSERT_EQ(u"https://www.non-default.com/q=abc",
-              provider_->matches()[0].fill_into_edit);
-    ASSERT_EQ(u"title", provider_->matches()[0].description);
-  }
-
-  // `mock_client_` points to the `TemplateURLService` found in
-  // `test_environment`, which is going out of scope here.
-  // Destroy it to avoid dangling pointers.
-  mock_client_.set_template_url_service(nullptr);
-}
-TEST_P(ZeroSuggestVerbatimMatchProviderTest,
-       UpdateFillIntoEditWhenUrlIsDistilledPage) {
-  GURL original_url("https://www.wired.com/article");
-
-  GURL distilled_url = dom_distiller::url_utils::GetDistillerViewUrlFromUrl(
-      dom_distiller::kDomDistillerScheme, original_url, "");
-
-  AutocompleteInput input(std::u16string(), GetParam(), TestSchemeClassifier());
-  input.set_current_title(u"title");
-  input.set_current_url(distilled_url);
-  input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-
-  GURL extracted_original_url =
-      dom_distiller::url_utils::GetOriginalUrlFromDistillerUrl(distilled_url);
-
-  ASSERT_TRUE(extracted_original_url.is_valid());
-
-  provider_->Start(input, false);
-
-  if (IsVerbatimMatchEligible()) {
-    ASSERT_FALSE(provider_->matches().empty());
-    const auto& match = provider_->matches()[0];
-    EXPECT_EQ(base::UTF8ToUTF16(extracted_original_url.spec()),
-              match.fill_into_edit);
-    EXPECT_EQ(u"wired.com/article", match.contents);
-    EXPECT_EQ(u"title", match.description);
-  }
-}
-#endif
 
 TEST_P(ZeroSuggestVerbatimMatchProviderTest,
        MissingPageTitle_NoHistoryService) {

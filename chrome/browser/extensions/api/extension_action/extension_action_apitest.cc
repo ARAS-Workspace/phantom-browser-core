@@ -315,12 +315,10 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTest, ActionSetTitleLengthHistogram) {
                               /*sample=*/150, /*expected_count=*/1);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Alias these for readability, when a test only exercises one type of action.
 // These APIs are MV2-only, so will never be supported on Android.
 using BrowserActionAPITest = ExtensionActionAPITest;
 using PageActionAPITest = ExtensionActionAPITest;
-#endif
 
 // A class that runs tests exercising each type of possible toolbar action.
 class MultiActionAPITest
@@ -369,7 +367,6 @@ class MultiActionAPITest
   }
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Check that updating the browser action badge for a specific tab id does not
 // cause a disk write (since we only persist the defaults).
 // Only browser actions persist settings.
@@ -439,7 +436,6 @@ IN_PROC_BROWSER_TEST_F(BrowserActionAPITest, TestNoUnnecessaryIO) {
     EXPECT_EQ(1, test_state_store_observer.CountForKey(kBrowserActionKey));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Verify that tab-specific values are cleared on navigation and on tab
 // removal. Regression test for https://crbug.com/41383956.
@@ -594,11 +590,7 @@ IN_PROC_BROWSER_TEST_P(MultiActionAPITest, OnClickedDispatching) {
 // Tests the creation of a popup when one is specified in the manifest.
 // TODO(crbug.com/478717514): Enable on Android when we support triggering a
 // popup of an unpinned extension.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PopupCreation DISABLED_PopupCreation
-#else
 #define MAYBE_PopupCreation PopupCreation
-#endif
 IN_PROC_BROWSER_TEST_P(MultiActionAPITest, MAYBE_PopupCreation) {
   constexpr char kManifestTemplate[] =
       R"({
@@ -729,7 +721,7 @@ IN_PROC_BROWSER_TEST_P(MultiActionAPITest, SetPopupToEmptyString) {
 // TODO(crbug.com/478717514): Enable on Android when we support triggering a
 // popup of an unpinned extension.
 // TODO(crbug.com/40795982): Flaky on Linux.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SessionStorageDoesNotPersistBetweenOpenings \
   DISABLED_SessionStorageDoesNotPersistBetweenOpenings
 #else
@@ -2074,17 +2066,6 @@ IN_PROC_BROWSER_TEST_P(ActionAndBrowserActionAPITest,
   EXPECT_EQ("", action->GetExplicitlySetBadgeText(tab_id2));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Android ony supports manifest V3, so only supports chrome.action. Also,
-// MultiActionAPICanvasTest doesn't run yet on Android.
-INSTANTIATE_TEST_SUITE_P(All,
-                         MultiActionAPITest,
-                         testing::Values(ActionInfo::Type::kAction));
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         ActionAndBrowserActionAPITest,
-                         testing::Values(ActionInfo::Type::kAction));
-#else
 INSTANTIATE_TEST_SUITE_P(All,
                          MultiActionAPITest,
                          testing::Values(ActionInfo::Type::kAction,
@@ -2101,6 +2082,5 @@ INSTANTIATE_TEST_SUITE_P(All,
                          testing::Values(ActionInfo::Type::kAction,
                                          ActionInfo::Type::kPage,
                                          ActionInfo::Type::kBrowser));
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions

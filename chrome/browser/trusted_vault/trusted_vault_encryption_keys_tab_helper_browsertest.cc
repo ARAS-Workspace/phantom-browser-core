@@ -41,9 +41,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/site_isolation/features.h"
-#else
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/webauthn/enclave_manager.h"
@@ -52,7 +49,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/trusted_vault/standalone_trusted_vault_client.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -63,7 +59,6 @@ using testing::IsEmpty;
 
 constexpr GaiaId::Literal kFakeGaiaId("fake_gaia_id");
 
-#if !BUILDFLAG(IS_ANDROID)
 const AccountInfo& FakeAccount() {
   static const base::NoDestructor<AccountInfo> account([]() {
     AccountInfo account;
@@ -72,14 +67,11 @@ const AccountInfo& FakeAccount() {
   }());
   return *account;
 }
-#endif
 
 const char kConsoleSuccessMessage[] = "trusted_vault_encryption_keys:OK";
 const char kConsoleFailureMessage[] = "trusted_vault_encryption_keys:FAIL";
-#if !BUILDFLAG(IS_ANDROID)
 const char kConsoleUncaughtTypeErrorMessagePattern[] =
     "Uncaught TypeError: Error processing argument at index *";
-#endif
 
 // Executes JS to call chrome.setSyncEncryptionKeys(). Either
 // |kConsoleSuccessMessage| or |kConsoleFailureMessage| is logged to the console
@@ -141,7 +133,6 @@ void ExecJsSetClientEncryptionKeys(content::RenderFrameHost* render_frame_host,
       render_frame_host, trusted_vault::kSyncSecurityDomainName, key);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ExecJsSetClientEncryptionKeysForInvalidSecurityDomain(
     content::RenderFrameHost* render_frame_host,
     const std::vector<uint8_t>& key) {
@@ -186,7 +177,6 @@ void ExecJsSetClientEncryptionKeysWithIllformedArgs(
 
   std::ignore = content::ExecJs(render_frame_host, script);
 }
-#endif
 
 // Executes JS to call chrome.addTrustedSyncEncryptionRecoveryMethod. Either
 // |kConsoleSuccessMessage| or |kConsoleFailureMessage| is logged to the console
@@ -216,7 +206,6 @@ void ExecJsAddTrustedSyncEncryptionRecoveryMethod(
 }
 
 // Key retrieval doesn't exist on Android and cannot be verified.
-#if !BUILDFLAG(IS_ANDROID)
 std::vector<std::vector<uint8_t>> FetchTrustedVaultKeysForProfile(
     Profile* profile,
     trusted_vault::SecurityDomainId security_domain,
@@ -257,8 +246,6 @@ int FetchLastTrustedVaultKeyVersionForProfile(
   return actual_last_key_version;
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 class MockTrustedVaultClientObserver
     : public trusted_vault::TrustedVaultClient::Observer {
  public:
@@ -280,22 +267,7 @@ class TrustedVaultEncryptionKeysTabHelperBrowserTest
       : https_server_(net::EmbeddedTestServer::TYPE_HTTPS),
         prerender_helper_(base::BindRepeating(
             &TrustedVaultEncryptionKeysTabHelperBrowserTest::web_contents,
-            base::Unretained(this))) {
-#if BUILDFLAG(IS_ANDROID)
-    // Avoid the disabling of site isolation due to memory constraints, required
-    // on Android so that ApplyGlobalIsolatedOrigins() takes effect regardless
-    // of available memory when running the test (otherwise low-memory bots may
-    // run into test failures).
-    feature_list_.InitAndEnableFeatureWithParameters(
-        site_isolation::features::kSiteIsolationMemoryThresholdsAndroid,
-        {{site_isolation::features::
-              kStrictSiteIsolationMemoryThresholdParamName,
-          "0"},
-         {site_isolation::features::
-              kPartialSiteIsolationMemoryThresholdParamName,
-          "0"}});
-#endif
-  }
+            base::Unretained(this))) {}
 
   ~TrustedVaultEncryptionKeysTabHelperBrowserTest() override {
     // An explicit reset is required here to avoid CHECK failures due to
@@ -366,33 +338,6 @@ class TrustedVaultEncryptionKeysTabHelperBrowserTest
 
 // Tests that chrome.setSyncEncryptionKeys() works in the main frame, except on
 // Android. On Android, this particular Javascript API isn't defined.
-#if BUILDFLAG(IS_ANDROID)
-
-IN_PROC_BROWSER_TEST_F(TrustedVaultEncryptionKeysTabHelperBrowserTest,
-                       ShouldNotBindEncryptionKeysApiOnAndroid) {
-  const GURL initial_url =
-      https_server()->GetURL("accounts.google.com", "/title1.html");
-  ASSERT_TRUE(content::NavigateToURL(web_contents(), initial_url));
-  // EncryptionKeysApi is created for the primary page as the origin is allowed.
-  EXPECT_TRUE(HasEncryptionKeysApi(web_contents()->GetPrimaryMainFrame()));
-
-  content::WebContentsConsoleObserver console_observer(web_contents());
-  console_observer.SetPattern(kConsoleFailureMessage);
-
-  // Calling setSyncEncryptionKeys() or setClientEncryptionKeys() in the main
-  // frame shouldn't work.
-  const std::vector<uint8_t> kEncryptionKey = {7};
-  ExecJsSetSyncEncryptionKeys(web_contents()->GetPrimaryMainFrame(),
-                              kEncryptionKey, /*key_version=*/1);
-  ASSERT_TRUE(console_observer.Wait());
-  EXPECT_EQ(1u, console_observer.messages().size());
-  ExecJsSetClientEncryptionKeys(web_contents()->GetPrimaryMainFrame(),
-                                kEncryptionKey);
-  ASSERT_TRUE(console_observer.Wait());
-  EXPECT_EQ(2u, console_observer.messages().size());
-}
-
-#else
 
 void ExecJsSetClientEncryptionKeysWithMultipleKeys(
     content::RenderFrameHost* render_frame_host,
@@ -1083,7 +1028,6 @@ IN_PROC_BROWSER_TEST_F(TrustedVaultEncryptionKeysTabHelperBrowserTest,
   ASSERT_TRUE(console_observer.Wait());
   EXPECT_EQ(1u, console_observer.messages().size());
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Tests that chrome.addTrustedSyncEncryptionRecoveryMethod() works in the main
 // frame.
@@ -1093,11 +1037,9 @@ IN_PROC_BROWSER_TEST_F(TrustedVaultEncryptionKeysTabHelperBrowserTest,
   // needs to be set for the Javascript operation to complete. Otherwise, the
   // logic is deferred until a primary account is set and the test would wait
   // indefinitely until it times out.
-#if !BUILDFLAG(IS_ANDROID)
   signin::MakePrimaryAccountAvailable(
       IdentityManagerFactory::GetForProfile(browser()->GetProfile()),
       "testusername", GetConsentLevel());
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   const GURL initial_url =
       https_server()->GetURL("accounts.google.com", "/title1.html");
@@ -1127,13 +1069,6 @@ IN_PROC_BROWSER_TEST_F(TrustedVaultEncryptionKeysTabHelperBrowserTest,
   histogram_tester.ExpectUniqueSample(
       "Sync.TrustedVaultJavascriptAddRecoveryMethodIsIncognito",
       0 /*Not Incognito*/, 1);
-
-#if BUILDFLAG(IS_ANDROID)
-  // This metric is only instrumented on Android.
-  histogram_tester.ExpectUniqueSample(
-      "Sync.TrustedVaultJavascriptAddRecoveryMethodUserKnown", 0 /*Unknown*/,
-      1);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Tests that chrome.setSyncEncryptionKeys() doesn't work in prerendering.
@@ -1145,11 +1080,9 @@ IN_PROC_BROWSER_TEST_F(TrustedVaultEncryptionKeysTabHelperBrowserTest,
   // needs to be set for the Javascript operation to complete. Otherwise, the
   // logic is deferred until a primary account is set and the test would wait
   // indefinitely until it times out.
-#if !BUILDFLAG(IS_ANDROID)
   signin::MakePrimaryAccountAvailable(
       IdentityManagerFactory::GetForProfile(browser()->GetProfile()),
       "testusername", GetConsentLevel());
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::HistogramTester histogram_tester;
   const GURL signin_url =

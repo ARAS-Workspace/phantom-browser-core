@@ -22,9 +22,6 @@
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/browser/navigation_entry.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif
-
 namespace safe_browsing {
 
 using content::BrowserThread;
@@ -117,7 +114,6 @@ void CheckFileSystemAccessWriteRequest::SetDownloadProtectionData(
 std::optional<enterprise_connectors::AnalysisSettings>
 CheckFileSystemAccessWriteRequest::ShouldUploadBinary(
     DownloadCheckResultReason reason) {
-#if !BUILDFLAG(IS_ANDROID)
   if (!base::FeatureList::IsEnabled(kEnterpriseFileSystemAccessDeepScan)) {
     return std::nullopt;
   }
@@ -144,16 +140,12 @@ CheckFileSystemAccessWriteRequest::ShouldUploadBinary(
     }
   }
   return settings;
-#else
-  return std::nullopt;
-#endif
 }
 
 void CheckFileSystemAccessWriteRequest::UploadBinary(
     DownloadCheckResult result,
     DownloadCheckResultReason reason,
     enterprise_connectors::AnalysisSettings settings) {
-#if !BUILDFLAG(IS_ANDROID)
   if (!base::FeatureList::IsEnabled(kEnterpriseFileSystemAccessDeepScan)) {
     return;
   }
@@ -161,8 +153,6 @@ void CheckFileSystemAccessWriteRequest::UploadBinary(
   // Stores callback in metadata as it's not repeating, and we ensure this
   // callback is only run once.
   metadata_->SetCallback(TakeCallback());
-
-#endif
 }
 
 bool CheckFileSystemAccessWriteRequest::ShouldImmediatelyDeepScan(

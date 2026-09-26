@@ -89,14 +89,9 @@ LocationProviderManager::LocationProviderManager(
       internals_updated_closure_(std::move(internals_updated_closure)),
       network_request_callback_(std::move(network_request_callback)),
       network_response_callback_(std::move(network_response_callback)) {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android and iOS, default to using the platform location provider.
-  provider_manager_mode_ = kPlatformOnly;
-#else
   // On macOS / Windows / Linux platforms, use the mode specified by the feature
   // flag.
   provider_manager_mode_ = features::GetLocationProviderManagerMode();
-#endif
   GEOLOCATION_LOG(DEBUG) << "LocationProviderManager::LocationProviderManager: "
                             "provider_manager_mode_ is initialized to "
                          << LocationProviderManagerModeAsString(
@@ -371,15 +366,10 @@ LocationProviderManager::NewNetworkLocationProvider(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     const std::string& api_key) {
   DCHECK(url_loader_factory);
-#if BUILDFLAG(IS_ANDROID)
-  // Android uses its own SystemLocationProvider.
-  return nullptr;
-#else
   return std::make_unique<NetworkLocationProvider>(
       std::move(url_loader_factory), api_key, position_cache_.get(),
       internals_updated_closure_, network_request_callback_,
       network_response_callback_);
-#endif
 }
 
 std::unique_ptr<LocationProvider>
@@ -388,7 +378,7 @@ LocationProviderManager::NewSystemLocationProvider() {
   CHECK(geolocation_system_permission_manager_);
   return device::NewSystemLocationProvider(
       geolocation_system_permission_manager_->GetSystemGeolocationSource());
-#elif BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS))
+#elif BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
   return device::NewSystemLocationProvider();
 #else
   return nullptr;

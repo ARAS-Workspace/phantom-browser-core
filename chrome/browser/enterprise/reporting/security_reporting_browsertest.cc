@@ -60,13 +60,8 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/boringssl/src/include/openssl/ssl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/safe_browsing/android/safe_browsing_api_handler_bridge.h"
-#include "components/safe_browsing/android/safe_browsing_api_handler_util.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 using ManagementContextMixin = enterprise::test::ManagementContextMixin;
 using ManagementContext = enterprise::test::ManagementContext;
@@ -399,17 +394,10 @@ class SecurityReportingBrowserTest
   base::OnceCallback<void(CapturedProfileReportRequest)> pending_capture_;
 
   void SetFakeCookieValue(std::string_view cookie_value) {
-#if BUILDFLAG(IS_ANDROID)
-    ASSERT_TRUE(content::NavigateToURL(
-        chrome_test_utils::GetActiveWebContents(this),
-        embedded_https_test_server().GetURL("accounts.google.com",
-                                            GetSetCookiesPath(cookie_value))));
-#else
     ASSERT_TRUE(ui_test_utils::NavigateToURL(
         browser(),
         embedded_https_test_server().GetURL("accounts.google.com",
                                             GetSetCookiesPath(cookie_value))));
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
  private:

@@ -85,12 +85,6 @@
 #include "ui/events/keycodes/keyboard_codes.h"
 #include "ui/gfx/canvas.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/strings/utf_string_conversions.h"
-#include "content/browser/renderer_host/render_widget_host_view_android.h"
-#include "ui/android/screen_android.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "content/browser/renderer_host/test_render_widget_host_view_mac_factory.h"
 #endif
@@ -329,10 +323,6 @@ class FakeRenderFrameMetadataObserver
 
   ~FakeRenderFrameMetadataObserver() override {}
 
-#if BUILDFLAG(IS_ANDROID)
-  void UpdateRootScrollOffsetUpdateFrequency(
-      cc::mojom::RootScrollOffsetUpdateFrequency frequency) override {}
-#endif
   void ReportAllFrameSubmissionsForTesting(bool enabled) override {}
 
  private:
@@ -357,12 +347,6 @@ class MockInputEventObserver : public RenderWidgetHost::InputEventObserver {
                const blink::WebInputEvent&,
                InputEventSource),
               (override));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD1(OnImeTextCommittedEvent, void(const std::u16string& text_str));
-  MOCK_METHOD1(OnImeSetComposingTextEvent,
-               void(const std::u16string& text_str));
-  MOCK_METHOD0(OnImeFinishComposingTextEvent, void());
-#endif
 };
 
 // MockRenderWidgetHostDelegate --------------------------------------------
@@ -606,10 +590,6 @@ class RenderWidgetHostTest : public testing::Test {
     ImageTransportFactory::SetFactory(
         std::make_unique<TestImageTransportFactory>());
 #endif
-#if BUILDFLAG(IS_ANDROID)
-    // calls display::Screen::SetScreenInstance().
-    ui::SetScreenAndroid(false /* use_display_wide_color_gamut */);
-#endif
 #if BUILDFLAG(IS_APPLE)
     screen_ = std::make_unique<display::test::TestScreen>();
     display::Screen::SetScreenInstance(screen_.get());
@@ -676,7 +656,7 @@ class RenderWidgetHostTest : public testing::Test {
 #if defined(USE_AURA) || BUILDFLAG(IS_APPLE)
     ImageTransportFactory::Terminate();
 #endif
-#if defined(USE_AURA) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA) || BUILDFLAG(IS_APPLE)
     display::Screen::SetScreenInstance(nullptr);
     screen_.reset();
 #endif
@@ -1461,18 +1441,12 @@ TEST_F(RenderWidgetHostTest, Background) {
   RenderWidgetHostViewBase* view;
 #if defined(USE_AURA)
   view = new RenderWidgetHostViewAura(host_.get());
-#elif BUILDFLAG(IS_ANDROID)
-  view = new RenderWidgetHostViewAndroid(host_.get(),
-                                         /*parent_native_view=*/nullptr,
-                                         /*parent_layer=*/nullptr);
 #elif BUILDFLAG(IS_MAC)
   view = CreateRenderWidgetHostViewMacForTesting(host_.get());
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(derat): Call this on all platforms: http://crbug.com/102450.
   view->InitAsChild(gfx::NativeView());
-#endif
   host_->SetView(view);
 
   ASSERT_FALSE(view->GetBackgroundColor());
@@ -1512,14 +1486,6 @@ TEST_F(RenderWidgetHostTest, Background) {
     EXPECT_EQ(unsigned{SK_ColorBLUE}, *view->GetBackgroundColor());
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Surface Eviction attempts to crawl the FrameTree. This makes use of
-  // RenderViewHostImpl::From which performs a static_cast on the
-  // RenderWidgetHostOwnerDelegate. Our MockRenderWidgetHostOwnerDelegate is not
-  // a RenderViewHostImpl, so it crashes. Clear this here as it is not needed
-  // for TearDown.
-  host_->set_owner_delegate(nullptr);
-#endif  // BUILDFLAG(IS_ANDROID)
   host_->SetView(nullptr);
   view->Destroy();
 }
@@ -2693,26 +2659,6 @@ TEST_F(RenderWidgetHostTest, ScopedObservationWithInputEventObserver) {
   std::move(host_->GetRenderInputRouter()->GetDispatchToRendererCallback())
       .Run(native_event, input::DispatchToRendererResult::kNotDispatched);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(RenderWidgetHostTest, AddAndRemoveImeInputEventObserver) {
-  MockInputEventObserver observer;
-
-  // Add ImeInputEventObserver.
-  host_->AddImeInputEventObserver(&observer);
-
-  // Confirm ImeFinishComposingTextEvent is triggered.
-  EXPECT_CALL(observer, OnImeFinishComposingTextEvent()).Times(1);
-  host_->ImeFinishComposingText(true);
-
-  // Remove ImeInputEventObserver.
-  host_->RemoveImeInputEventObserver(&observer);
-
-  // Confirm ImeInputEventObserver is removed.
-  EXPECT_CALL(observer, OnImeFinishComposingTextEvent()).Times(0);
-  host_->ImeFinishComposingText(true);
-}
-#endif
 
 TEST_F(RenderWidgetHostTest, SetAndCommitExternallySourcedComposition) {
   std::u16string text = u"hello";

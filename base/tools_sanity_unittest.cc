@@ -112,13 +112,7 @@ NOOPT void MakeSomeErrors(char* ptr, size_t size) {
 // We had problems with __asan_default_options not being used, so this test
 // verifies that _sanitizer_options_link_helper actually makes it into our
 // binaries.
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/40224191): Sanitizer options are currently broken
-// on Android.
-#define MAYBE_LinksSanitizerOptions DISABLED_LinksSanitizerOptions
-#else
 #define MAYBE_LinksSanitizerOptions LinksSanitizerOptions
-#endif
 TEST(ToolsSanityTest, MAYBE_LinksSanitizerOptions) {
   constexpr char kSym[] = "_sanitizer_options_link_helper";
   void* sym = dlsym(RTLD_DEFAULT, kSym);
@@ -168,7 +162,7 @@ TEST(ToolsSanityTest, AccessesToStack) {
 // alloc_dealloc_mismatch defaults to
 // !SANITIZER_MAC && !SANITIZER_WINDOWS && !SANITIZER_ANDROID,
 // in the sanitizer runtime upstream.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SingleElementDeletedWithBraces \
   DISABLED_SingleElementDeletedWithBraces
 #define MAYBE_ArrayDeletedWithoutBraces DISABLED_ArrayDeletedWithoutBraces
@@ -358,13 +352,7 @@ TEST(ToolsSanityTest, AtomicsAreIgnored) {
 }
 
 #if BUILDFLAG(CFI_ENFORCEMENT_TRAP)
-#if BUILDFLAG(IS_ANDROID)
-// TODO(pcc): Produce proper stack dumps on Android and test for the correct
-// si_code here.
-#define CFI_ERROR_MSG "^$"
-#else
 #define CFI_ERROR_MSG "ILL_ILLOPN"
-#endif
 #elif BUILDFLAG(CFI_ENFORCEMENT_DIAGNOSTIC)
 #define CFI_ERROR_MSG "runtime error: control flow integrity check"
 #endif  // BUILDFLAG(CFI_ENFORCEMENT_TRAP || CFI_ENFORCEMENT_DIAGNOSTIC)

@@ -115,15 +115,6 @@ void PhishyInteractionTracker::HandleInputEvent(
                                 PhishySiteInteraction::PHISHY_CLICK_EVENT);
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, key down events are triggered if a user types in through a
-  // number bar on Android keyboard. If text is typed in through other parts of
-  // Android keyboard, ImeTextCommittedEvent is triggered instead.
-  if (event.GetType() == blink::WebInputEvent::Type::kKeyDown) {
-    HandlePhishyInteraction(ClientSafeBrowsingReportRequest::
-                                PhishySiteInteraction::PHISHY_KEY_EVENT);
-  }
-#else   // !BUILDFLAG(IS_ANDROID)
   if (event.GetType() == blink::WebInputEvent::Type::kChar) {
     const blink::WebKeyboardEvent& key_event =
         static_cast<const blink::WebKeyboardEvent&>(event);
@@ -137,7 +128,6 @@ void PhishyInteractionTracker::HandleInputEvent(
                                   PhishySiteInteraction::PHISHY_KEY_EVENT);
     }
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PhishyInteractionTracker::ResetLoggingHelpers() {

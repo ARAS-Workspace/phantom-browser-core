@@ -11,13 +11,13 @@
 #include "base/strings/string_number_conversions.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 #include <pthread.h>
 #endif
 
 namespace base::allocator::dispatcher {
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 // pthread_key_t has different signedness on Mac and Android. Store the null
 // value in a strongly-typed constant to avoid "comparison of integers of
 // different signs" warnings when comparing with 0.
@@ -52,7 +52,7 @@ void ReentryGuard::RecordTLSSlotToCrashKey() {
   static auto* const crash_key = base::debug::AllocateCrashKeyString(
       "reentry_guard_tls_slot", base::debug::CrashKeySize::Size32);
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
   base::debug::SetCrashKeyString(crash_key, base::NumberToString(entered_key_));
 #else
   base::debug::SetCrashKeyString(crash_key, "unused");

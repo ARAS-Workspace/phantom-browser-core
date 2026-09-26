@@ -125,16 +125,9 @@
 #include "printing/buildflags/buildflags.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/metrics/chrome_android_metrics_provider.h"
-#include "chrome/browser/metrics/page_load_metrics_provider.h"
-#include "components/metrics/android_metrics_provider.h"
-#include "components/metrics/gms_metrics_provider.h"
-#else
 #include "chrome/browser/metrics/browser_activity_watcher.h"
 #include "chrome/browser/performance_manager/metrics/metrics_provider_desktop.h"
 #include "chrome/browser/ui/tabs/tab_metrics_provider.h"
-#endif
 
 #if BUILDFLAG(IS_POSIX)
 #include <signal.h>
@@ -162,7 +155,7 @@
 #include "components/metrics/motherboard_metrics_provider.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/metrics/chrome_metrics_service_crash_reporter.h"
 #endif
 
@@ -176,11 +169,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-const int kMaxHistogramStorageKiB = 100 << 10;  // 100 MiB
-#else
 const int kMaxHistogramStorageKiB = 500 << 10;  // 500 MiB
-#endif
 
 // This specifies the amount of time to wait for all renderers to send their
 // data.
@@ -189,12 +178,12 @@ const int kMaxHistogramGatheringWaitDuration = 60000;  // 60 seconds.
 // Needs to be kept in sync with the writer in
 // third_party/crashpad/crashpad/handler/handler_main.cc.
 const char kCrashpadHistogramAllocatorName[] = "CrashpadMetrics";
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 ChromeMetricsServiceCrashReporter& GetCrashReporter() {
   static base::NoDestructor<ChromeMetricsServiceCrashReporter> crash_reporter;
   return *crash_reporter;
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 void RegisterFileMetricsPreferences(PrefRegistrySimple* registry) {
   metrics::FileMetricsProvider::RegisterSourcePrefs(registry,
@@ -439,10 +428,6 @@ void ChromeMetricsServiceClient::RegisterPrefs(PrefRegistrySimple* registry) {
 
   metrics::RegisterMetricsReportingStatePrefs(registry);
 
-#if BUILDFLAG(IS_ANDROID)
-  ChromeAndroidMetricsProvider::RegisterPrefs(registry);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   metrics::structured::StructuredMetricsService::RegisterPrefs(registry);
 
@@ -530,12 +515,12 @@ std::string ChromeMetricsServiceClient::GetVersionString() {
 void ChromeMetricsServiceClient::OnEnvironmentUpdate(std::string* environment) {
   // TODO(https://bugs.chromium.org/p/crashpad/issues/detail?id=135): call this
   // on Mac when the Crashpad API supports it.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Register the environment with the crash reporter. Note that there is a
   // window from startup to this point during which crash reports will not have
   // an environment set.
   GetCrashReporter().OnEnvironmentUpdate(*environment);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 void ChromeMetricsServiceClient::MergeSubprocessHistograms() {
@@ -724,19 +709,8 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
       std::make_unique<metrics::BluetoothMetricsProvider>());
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<metrics::AndroidMetricsProvider>());
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<ChromeAndroidMetricsProvider>(local_state));
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<PageLoadMetricsProvider>());
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<metrics::GmsMetricsProvider>());
-#else
   metrics_service_->RegisterMetricsProvider(base::WrapUnique(
       new performance_manager::MetricsProviderDesktop(local_state)));
-#endif  // BUILDFLAG(IS_ANDROID)
 
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<performance_manager::MetricsProviderCommon>());
@@ -773,11 +747,9 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<HttpsEngagementMetricsProvider>());
 
-#if !BUILDFLAG(IS_ANDROID)
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<TabMetricsProvider>(
           g_browser_process->profile_manager()));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
   metrics_service_->RegisterMetricsProvider(
@@ -846,11 +818,6 @@ void ChromeMetricsServiceClient::RegisterUKMProviders() {
 
   ukm_service_->RegisterMetricsProvider(
       std::make_unique<metrics::EntropyStateProvider>(local_state));
-
-#if BUILDFLAG(IS_ANDROID)
-  ukm_service_->RegisterMetricsProvider(
-      std::make_unique<ChromeAndroidMetricsProvider>(local_state));
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // LINT.ThenChange(/ios/chrome/browser/metrics/model/ios_chrome_metrics_service_client.mm:UkmProviders)
 }
@@ -936,11 +903,9 @@ bool ChromeMetricsServiceClient::RegisterObservers() {
               &ChromeMetricsServiceClient::OnURLOpenedFromOmnibox,
               base::Unretained(this)));
 
-#if !BUILDFLAG(IS_ANDROID)
   browser_activity_watcher_ = std::make_unique<BrowserActivityWatcher>(
       base::BindRepeating(&metrics::MetricsService::OnApplicationNotIdle,
                           base::Unretained(metrics_service_.get())));
-#endif
 
   bool all_profiles_succeeded = true;
   for (Profile* profile :

@@ -30,13 +30,7 @@ namespace mojo {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-// Leave room for any other descriptors defined in content for example.
-// TODO(crbug.com/40499227): Consider changing base::GlobalDescriptors to
-// generate a key when setting the file descriptor.
-constexpr int kAndroidClientHandleDescriptor =
-    base::GlobalDescriptors::kBaseDescriptor + 10000;
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
 bool IsTargetDescriptorUsed(const base::FileHandleMappingVector& mapping,
                             int target_fd) {
   for (auto& [i, fd] : mapping) {
@@ -83,12 +77,7 @@ void PlatformChannelEndpoint::PrepareToPass(HandlePassingInfo& info,
 void PlatformChannelEndpoint::PrepareToPass(HandlePassingInfo& info,
                                             std::string& value) {
   DCHECK(is_valid());
-#if BUILDFLAG(IS_ANDROID)
-  int fd = platform_handle().GetFD().get();
-  int mapped_fd = kAndroidClientHandleDescriptor + info.size();
-  info.emplace_back(fd, mapped_fd);
-  value = base::NumberToString(mapped_fd);
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   DCHECK(platform_handle().is_mach_receive());
   base::apple::ScopedMachReceiveRight receive_right =
       TakePlatformHandle().TakeMachReceiveRight();
@@ -145,15 +134,7 @@ void PlatformChannelEndpoint::ProcessLaunchAttempted() {
 // static
 PlatformChannelEndpoint PlatformChannelEndpoint::RecoverFromString(
     std::string_view value) {
-#if BUILDFLAG(IS_ANDROID)
-  base::GlobalDescriptors::Key key = -1;
-  if (value.empty() || !base::StringToUint(value, &key)) {
-    DLOG(ERROR) << "Invalid PlatformChannel endpoint string.";
-    return PlatformChannelEndpoint();
-  }
-  return PlatformChannelEndpoint(PlatformHandle(
-      base::ScopedFD(base::GlobalDescriptors::GetInstance()->Get(key))));
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   auto* client = base::MachPortRendezvousClient::GetInstance();
   if (!client) {
     DLOG(ERROR) << "Mach rendezvous failed.";

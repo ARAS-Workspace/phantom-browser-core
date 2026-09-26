@@ -704,17 +704,7 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
 // Returns whether the current Android hardware model is configured as eligible
 // for Ambient Autofill by feature parameters.
 [[nodiscard]] bool IsAndroidDeviceEligibleForAmbientAutofill() {
-#if BUILDFLAG(IS_ANDROID)
-  const std::string model_name = base::SysInfo::HardwareModelName();
-  const std::string enabled_devices_str =
-      features::kAutofillAmbientAutofillEnabledDevices.Get();
-  return std::ranges::contains(
-      base::SplitStringPiece(enabled_devices_str, ",", base::TRIM_WHITESPACE,
-                             base::SPLIT_WANT_NONEMPTY),
-      model_name);
-#else
   return false;
-#endif
 }
 
 }  // namespace
@@ -952,11 +942,7 @@ bool IsAutofillAiEntityTypeBlockedByPolicy(const AutofillClient& client,
 }
 
 bool IsAutofillAiDefaultAvailabilityEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::FeatureList::IsEnabled(features::kAutofillAiAvailableByDefault);
-#else
   return true;
-#endif
 }
 
 [[nodiscard]] bool IsDeviceOrSubscriptionTierEligibleForAmbientAutofill(

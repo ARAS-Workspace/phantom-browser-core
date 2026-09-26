@@ -35,14 +35,7 @@
 #include "ui/base/window_open_disposition.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#include "chrome/browser/android/framebust_intervention/framebust_blocked_delegate_android.h"
-#include "components/messages/android/mock_message_dispatcher_bridge.h"
-#else
 #include "chrome/browser/ui/blocked_content/framebust_block_tab_helper.h"
-#endif
-
 
 class PopupOpenerTabHelperTest : public ChromeRenderViewHostTestHarness {
  public:
@@ -63,19 +56,7 @@ class PopupOpenerTabHelperTest : public ChromeRenderViewHostTestHarness {
         std::make_unique<PageSpecificContentSettingsDelegate>(web_contents()));
     blocked_content::PopupBlockerTabHelper::CreateForWebContents(
         web_contents());
-#if BUILDFLAG(IS_ANDROID)
-    message_dispatcher_bridge_.SetMessagesEnabledForEmbedder(true);
-    messages::MessageDispatcherBridge::SetInstanceForTesting(
-        &message_dispatcher_bridge_);
-    blocked_content::FramebustBlockedMessageDelegate::CreateForWebContents(
-        web_contents());
-    framebust_blocked_message_delegate_ =
-        blocked_content::FramebustBlockedMessageDelegate::FromWebContents(
-            web_contents());
-#endif
-#if !BUILDFLAG(IS_ANDROID)
     FramebustBlockTabHelper::CreateForWebContents(web_contents());
-#endif
 
     // The tick clock needs to be advanced manually so it isn't set to null,
     // which the code uses to determine if it is set yet.
@@ -86,9 +67,6 @@ class PopupOpenerTabHelperTest : public ChromeRenderViewHostTestHarness {
 
   void TearDown() override {
     popups_.clear();
-#if BUILDFLAG(IS_ANDROID)
-    messages::MessageDispatcherBridge::SetInstanceForTesting(nullptr);
-#endif
     ChromeRenderViewHostTestHarness::TearDown();
   }
 
@@ -121,27 +99,11 @@ class PopupOpenerTabHelperTest : public ChromeRenderViewHostTestHarness {
 
   base::SimpleTestTickClock* raw_clock() { return &raw_clock_; }
 
-#if BUILDFLAG(IS_ANDROID)
-  messages::MessageWrapper* message_wrapper() {
-    return framebust_blocked_message_delegate_->message_for_testing();
-  }
-#endif
-
-  void expect_message() {
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_CALL(message_dispatcher_bridge_, EnqueueMessage)
-        .WillOnce(testing::Return(true));
-#endif
-  }
+  void expect_message() {}
 
  private:
   base::SimpleTestTickClock raw_clock_;
   std::vector<std::unique_ptr<content::WebContents>> popups_;
-#if BUILDFLAG(IS_ANDROID)
-  messages::MockMessageDispatcherBridge message_dispatcher_bridge_;
-  raw_ptr<blocked_content::FramebustBlockedMessageDelegate>
-      framebust_blocked_message_delegate_;
-#endif
 };
 
 // Navigate to a site without pop-ups, verify the user popup settings are not
@@ -213,12 +175,8 @@ TEST_F(PopupOpenerTabHelperTest,
 class BlockTabUnderDisabledTest : public PopupOpenerTabHelperTest {
  public:
   void ExpectUIShown(bool shown) {
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_EQ(shown, !!message_wrapper());
-#else
     EXPECT_EQ(shown, FramebustBlockTabHelper::FromWebContents(web_contents())
                          ->HasBlockedUrls());
-#endif
   }
 };
 

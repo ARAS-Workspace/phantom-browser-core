@@ -586,16 +586,8 @@ base::DictValue GpuMessageHandler::GetClientInfo() {
   base::CommandLine::StringType command_line =
       base::CommandLine::ForCurrentProcess()->GetCommandLineString();
   dict.Set("command_line", command_line);
-#if BUILDFLAG(IS_ANDROID)
-  dict.Set("operating_system",
-           base::StringPrintf("%s %s %s", base::SysInfo::OperatingSystemName(),
-                              base::SysInfo::OperatingSystemVersion(),
-                              base::SysInfo::GetAndroidBuildID()));
-
-#else
   dict.Set("operating_system", base::SysInfo::OperatingSystemName() + " " +
                                    base::SysInfo::OperatingSystemVersion());
-#endif
   dict.Set("angle_commit_id", angle::GetANGLECommitHash());
   dict.Set("graphics_backend",
            std::string("Skia/" STRINGIZE(SK_MILESTONE) " " SKIA_COMMIT_HASH));

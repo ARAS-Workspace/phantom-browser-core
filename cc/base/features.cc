@@ -7,9 +7,6 @@
 #include <atomic>
 #include <string>
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
 #include "base/feature_list.h"
 #include "build/build_config.h"
 
@@ -46,7 +43,7 @@ const base::FeatureParam<int> kDeferImplInvalidationFrames{
 // Note that kUseDMSAAForTiles only controls vulkan launch on android. We will
 // be using a separate flag to control the launch on GL.
 BASE_FEATURE(kUseDMSAAForTiles,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -176,21 +173,7 @@ BASE_FEATURE_PARAM(int,
                    2);
 
 // Enabled on Android, after a field trial showed improvements.
-BASE_FEATURE(kThrottleMainFrameTo60Hz,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kThrottleMainFrameTo60HzWebView,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kThrottleMainFrameTo60HzDesktopAndroid,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
+BASE_FEATURE(kThrottleMainFrameTo60Hz, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kHighFramerateRequestFromClient,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -234,11 +217,7 @@ BASE_FEATURE(kProgrammaticScrollAnimationOverride,
                      base::Milliseconds(duration_ms))
 // Default to `gfx::CubicBezierTimingFunction::EaseType::EASE_IN_OUT` on
 // Android. On other platforms, use the tweaked cubic bezier curve.
-#if BUILDFLAG(IS_ANDROID)
-PROGRAMMATIC_SCROLL_ANIMATION_CURVE(0.42, 0.0, 0.58, 1.0, 700);
-#else
 PROGRAMMATIC_SCROLL_ANIMATION_CURVE(0.4, 0.0, 0.0, 1.0, 1500);
-#endif
 #undef PROGRAMMATIC_SCROLL_ANIMATION_CURVE
 
 BASE_FEATURE(kSlimDirectReceiverIpc, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -278,20 +257,6 @@ BASE_FEATURE_PARAM(double,
 
 BASE_FEATURE(kScrollJankV4MetricFastScrollContinuityRequiresSameDirection,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kScrollJankV4MetricReportAndroidAppJankStats,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-bool ShouldScrollJankV4MetricReportAndroidAppJankStats() {
-  if (base::android::android_info::sdk_int() <
-      base::android::android_info::SDK_VERSION_BAKLAVA) {
-    return false;
-  }
-  return base::FeatureList::IsEnabled(
-      features::kScrollJankV4MetricReportAndroidAppJankStats);
-}
-#endif
 
 BASE_FEATURE(kManualBeginFrame, base::FEATURE_DISABLED_BY_DEFAULT);
 

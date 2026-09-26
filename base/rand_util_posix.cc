@@ -59,7 +59,7 @@ class URandomFd {
   const int fd_;
 };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 
 bool KernelSupportsGetRandom() {
   return base::SysInfo::KernelVersionNumber::Current() >=
@@ -81,7 +81,7 @@ bool GetRandomSyscall(void* output, size_t output_length) {
   }
   return false;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace
 
@@ -117,7 +117,7 @@ void RandBytesInternal(span<uint8_t> output, bool avoid_allocation) {
     (void)RAND_bytes(output.data(), output.size());
     return;
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // On Android it is mandatory to check that the kernel _version_ has the
   // support for a syscall before calling. The same check is made on Linux to
   // avoid making a syscall that predictably returns ENOSYS.

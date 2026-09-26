@@ -23,10 +23,8 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "media/filters/decrypting_audio_decoder.h"
 #include "media/filters/decrypting_video_decoder.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using ::base::test::RunCallback;
 using ::base::test::RunOnceCallback;
@@ -104,9 +102,7 @@ class AudioDecoderSelectorTestParam {
   using Output = AudioBuffer;
   using DecoderType = AudioDecoderType;
 
-#if !BUILDFLAG(IS_ANDROID)
   using DecryptingDecoder = DecryptingAudioDecoder;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // StreamTraits() takes different parameters depending on the type.
   static std::unique_ptr<StreamTraits> CreateStreamTraits(MediaLog* media_log) {
@@ -154,9 +150,7 @@ class VideoDecoderSelectorTestParam {
   using Output = VideoFrame;
   using DecoderType = VideoDecoderType;
 
-#if !BUILDFLAG(IS_ANDROID)
   using DecryptingDecoder = DecryptingVideoDecoder;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   static std::unique_ptr<StreamTraits> CreateStreamTraits(MediaLog* media_log) {
     return std::make_unique<StreamTraits>(media_log);
@@ -293,13 +287,11 @@ class DecoderSelectorTest : public ::testing::Test {
   std::vector<std::unique_ptr<Decoder>> CreateDecoders() {
     std::vector<std::unique_ptr<Decoder>> decoders;
 
-#if !BUILDFLAG(IS_ANDROID)
     if (use_decrypting_decoder_) {
       decoders.push_back(
           std::make_unique<typename TypeParam::DecryptingDecoder>(
               task_environment_.GetMainThreadTaskRunner(), &media_log_));
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     for (const auto& args : mock_decoders_to_create_) {
       std::unique_ptr<StrictMock<MockDecoder>> decoder =
@@ -741,17 +733,10 @@ TYPED_TEST(DecoderSelectorTest, EncryptedStream_DecryptAndDecode) {
   this->UseEncryptedDecoderConfig();
   this->CreateDecoderSelector();
 
-#if !BUILDFLAG(IS_ANDROID)
   // A DecryptingVideoDecoder will be created and selected. The clear decoder
   // should not be touched at all. No DecryptingDemuxerStream should be
   // created.
   EXPECT_CALL(*this, OnDecoderSelected(TestFixture::DecoderType::kDecrypting));
-#else
-  // A DecryptingDemuxerStream will be created. The clear decoder will be
-  // initialized and returned.
-  EXPECT_CALL(*this, OnDecoderSelected(kDecoder1));
-  EXPECT_CALL(*this, OnDemuxerStreamSelected(NotNull()));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   this->SelectNextDecoder();
 }
@@ -765,11 +750,9 @@ TYPED_TEST(DecoderSelectorTest,
   this->UseEncryptedDecoderConfig();
   this->CreateDecoderSelector();
 
-#if !BUILDFLAG(IS_ANDROID)
   // DecryptingDecoder is selected immediately.
   EXPECT_CALL(*this, OnDecoderSelected(TestFixture::DecoderType::kDecrypting));
   this->SelectNextDecoder();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // On fallback, a DecryptingDemuxerStream will be created.
   std::unique_ptr<DecryptingDemuxerStream> saved_dds;

@@ -1484,11 +1484,6 @@ WGPUFuture WebGPUDecoderImpl::RequestDeviceImpl(
       wgpu::FeatureName::SharedTextureMemoryIOSurface,
       wgpu::FeatureName::SharedFenceMTLSharedEvent,
 
-#if BUILDFLAG(IS_ANDROID)
-      wgpu::FeatureName::SharedTextureMemoryAHardwareBuffer,
-      wgpu::FeatureName::SharedFenceSyncFD,
-#endif
-
       wgpu::FeatureName::SharedTextureMemoryD3D11Texture2D,
       wgpu::FeatureName::SharedTextureMemoryDXGISharedHandle,
       wgpu::FeatureName::SharedFenceDXGISharedHandle,
@@ -1747,16 +1742,6 @@ wgpu::Adapter WebGPUDecoderImpl::CreatePreferredAdapter(
 #if BUILDFLAG(IS_APPLE)
     supports_external_textures =
         adapter.HasFeature(wgpu::FeatureName::SharedTextureMemoryIOSurface);
-#elif BUILDFLAG(IS_ANDROID)
-    if (adapter_info.backendType == wgpu::BackendType::OpenGLES) {
-      if (!base::FeatureList::IsEnabled(features::kWebGPUAndroidOpenGLES)) {
-        return false;
-      }
-      supports_external_textures = native_adapter.SupportsExternalImages();
-    } else {
-      supports_external_textures = adapter.HasFeature(
-          wgpu::FeatureName::SharedTextureMemoryAHardwareBuffer);
-    }
 #else
     // Chromium is in the midst of being transitioned to SharedTextureMemory
     // platform by platform. On platforms that have not yet been transitioned,
@@ -2027,7 +2012,7 @@ WebGPUDecoderImpl::AssociateMailboxDawn(
     return nullptr;
   }
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_LINUX)
+#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_LINUX)
   if (usage & wgpu::TextureUsage::StorageBinding) {
     LOG(ERROR) << "AssociateMailbox: wgpu::TextureUsage::StorageBinding is NOT "
                   "supported yet on this platform.";

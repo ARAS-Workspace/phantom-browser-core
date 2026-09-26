@@ -550,11 +550,6 @@ void MediaDevicesDispatcherHost::SelectAudioOutput(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  auto result = blink::mojom::SelectAudioOutputResult::New();
-  result->status = blink::mojom::AudioOutputStatus::kUnknown;
-  std::move(select_audio_output_callback).Run(std::move(result));
-#else
   if (select_audio_output_callback_) {
     auto result = blink::mojom::SelectAudioOutputResult::New();
     result->status =
@@ -578,7 +573,6 @@ void MediaDevicesDispatcherHost::SelectAudioOutput(
       base::BindOnce(
           &MediaDevicesDispatcherHost::OnGotTransientUserActivationResult,
           weak_factory_.GetWeakPtr(), hashed_device_id));
-#endif
 }
 
 void MediaDevicesDispatcherHost::OnGotTransientUserActivationResult(

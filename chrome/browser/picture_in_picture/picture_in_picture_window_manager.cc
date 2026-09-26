@@ -25,7 +25,6 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/memory/singleton.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/numerics/checked_math.h"
@@ -40,7 +39,6 @@
 #include "media/base/media_switches.h"
 #include "net/base/url_util.h"
 #include "ui/views/view.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/common/constants.h"
@@ -57,17 +55,12 @@ constexpr double kInitialAspectRatio = 1.0;
 
 // The minimum window size for Document Picture-in-Picture windows. This does
 // not apply to video Picture-in-Picture windows.
-#if !BUILDFLAG(IS_ANDROID)
 constexpr gfx::Size kMinWindowSize(240, 52);
-#else
-constexpr gfx::Size kMinWindowSize(220, 220);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // The maximum window size for Document Picture-in-Picture windows. This does
 // not apply to video Picture-in-Picture windows.
 constexpr double kMaxWindowSizeRatio = 0.8;
 
-#if !BUILDFLAG(IS_ANDROID)
 // The largest fraction of the screen that Document Picture-in-Picture windows
 // can take up by request of the website. The user can still manually resize to
 // `kMaxWindowSizeRatio`.
@@ -96,7 +89,6 @@ base::CheckedNumeric<int> GetMaximumSiteRequestedWindowArea(
     const display::Display& display) {
   return display.size().GetCheckedArea() * kMaxSiteRequestedWindowSizeRatio;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -154,7 +146,6 @@ void PictureInPictureWindowManager::EnterPictureInPictureWithController(
 
   pip_window_controller_->Show();
 
-#if !BUILDFLAG(IS_ANDROID)
   if (number_of_existing_scoped_disallow_picture_in_pictures_ > 0) {
     // Don't exit picture-in-picture synchronously since exiting in the middle
     // of opening leaves us in a bad state.
@@ -164,7 +155,6 @@ void PictureInPictureWindowManager::EnterPictureInPictureWithController(
   }
 
   MaybeRecordPictureInPictureChanged(true);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void PictureInPictureWindowManager::EnterDocumentPictureInPicture(
@@ -209,9 +199,7 @@ PictureInPictureWindowManager::EnterVideoPictureInPicture(
     CreateWindowInternal(web_contents);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   MaybeRecordPictureInPictureChanged(true);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return content::PictureInPictureResult::kSuccess;
 }
@@ -222,14 +210,12 @@ bool PictureInPictureWindowManager::ExitPictureInPictureViaWindowUi(
     return false;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // The user manually closed the pip window, so let the tab helper know in case
   // the auto-pip permission dialog was visible.
   if (auto* tab_helper = AutoPictureInPictureTabHelper::FromWebContents(
           pip_window_controller_->GetWebContents())) {
     tab_helper->OnUserClosedWindow();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   switch (behavior) {
     case UiBehavior::kCloseWindowOnly:
@@ -243,9 +229,7 @@ bool PictureInPictureWindowManager::ExitPictureInPictureViaWindowUi(
       break;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   MaybeRecordPictureInPictureChanged(false);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return true;
 }
@@ -256,9 +240,7 @@ bool PictureInPictureWindowManager::ExitPictureInPicture() {
     return true;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   MaybeRecordPictureInPictureChanged(false);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return false;
 }
@@ -310,9 +292,6 @@ bool PictureInPictureWindowManager::IsChildWebContents(
 gfx::Size PictureInPictureWindowManager::AdjustRequestedSizeIfNecessary(
     const gfx::Size& requested_size,
     const display::Display& display) {
-#if BUILDFLAG(IS_ANDROID)
-  return requested_size;
-#else   // BUILDFLAG(IS_ANDROID)
   base::CheckedNumeric<int> requested_area = requested_size.GetCheckedArea();
   base::CheckedNumeric<int> max_requested_area =
       GetMaximumSiteRequestedWindowArea(display);
@@ -404,7 +383,6 @@ gfx::Size PictureInPictureWindowManager::AdjustRequestedSizeIfNecessary(
   output_size.SetToMin(maximum_size);
 
   return output_size;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 std::optional<gfx::Rect>
@@ -460,13 +438,11 @@ gfx::Rect PictureInPictureWindowManager::CalculateOuterWindowBounds(
     gfx::Size window_size =
         AdjustRequestedSizeIfNecessary(requested_window_size, opener_display);
 
-#if !BUILDFLAG(IS_ANDROID)
     if (is_calculating_initial_document_pip_size_) {
       base::UmaHistogramBoolean(
           "Media.DocumentPictureInPicture.RequestedLargeInitialSize",
           requested_window_size != window_size);
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     // The pip options are the desired inner size, so we add any non-client size
     // we need to convert to outer size by adding back the margin around the
@@ -519,12 +495,10 @@ PictureInPictureWindowManager::CalculateInitialPictureInPictureWindowBounds(
     const display::Display& display) {
   opener_display_ = display;
 
-#if !BUILDFLAG(IS_ANDROID)
   RecordDocumentPictureInPictureRequestedSizeMetrics(pip_options,
                                                      opener_display_.value());
   base::AutoReset<bool> auto_reset(&is_calculating_initial_document_pip_size_,
                                    true);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Use an empty `excluded_margin`, which more or less guarantees that these
   // bounds are incorrect if `pip_options` includes a requested inner size that
@@ -581,14 +555,12 @@ gfx::Size PictureInPictureWindowManager::GetMaximumWindowSize(
 
 // static
 void PictureInPictureWindowManager::SetWindowParams(NavigateParams& params) {
-#if !BUILDFLAG(IS_ANDROID)
   // Always show document picture-in-picture in a new window. When this is
   // not opened via the AutoPictureInPictureTabHelper, focus the window.
   params.window_action =
       ShouldFocusPictureInPictureWindow(params)
           ? NavigateParams::WindowAction::kShowWindow
           : NavigateParams::WindowAction::kShowWindowInactive;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // static
@@ -626,7 +598,6 @@ void PictureInPictureWindowManager::CreateWindowInternal(
                      base::Unretained(this)));
   pip_window_controller_ = video_pip_window_controller;
 
-#if !BUILDFLAG(IS_ANDROID)
   if (number_of_existing_scoped_disallow_picture_in_pictures_ > 0) {
     // Don't exit picture-in-picture synchronously since exiting in the middle
     // of opening leaves us in a bad state.
@@ -634,20 +605,17 @@ void PictureInPictureWindowManager::CreateWindowInternal(
     RecordPictureInPictureDisallowed(
         PictureInPictureDisallowedType::kNewWindowClosed);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void PictureInPictureWindowManager::CloseWindowInternal() {
   video_web_contents_observer_.reset();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Close the standalone Document PiP window, if one is open. The host itself
   // stays attached to the opener WebContents.
   if (document_pip_host_) {
     document_pip_host_->Close();
     document_pip_host_ = nullptr;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Close and reset the picture-in-picture window controller, if it exists.
   if (pip_window_controller_) {
@@ -659,17 +627,11 @@ void PictureInPictureWindowManager::CloseWindowInternal() {
 
   opener_display_.reset();
 
-#if !BUILDFLAG(IS_ANDROID)
   MaybeRecordPictureInPictureChanged(false);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 bool PictureInPictureWindowManager::IsPictureInPictureDisabled() const {
-#if !BUILDFLAG(IS_ANDROID)
   return number_of_existing_scoped_disallow_picture_in_pictures_ > 0;
-#else
-  return false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 #if BUILDFLAG(IS_MAC)
@@ -689,7 +651,6 @@ void PictureInPictureWindowManager::DocumentWebContentsDestroyed() {
     pip_window_controller_ = nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void PictureInPictureWindowManager::EnterStandaloneDocumentPictureInPicture(
     content::WebContents* parent_web_contents,
     std::unique_ptr<content::WebContents> child_web_contents,
@@ -950,8 +911,6 @@ void PictureInPictureWindowManager::MaybeRecordPictureInPictureChanged(
     uma_helper_.reset();
   }
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void PictureInPictureWindowManager::NotifyObserversOnEnterPictureInPicture() {
   for (Observer& observer : observers_) {

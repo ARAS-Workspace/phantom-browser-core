@@ -35,10 +35,6 @@
 #include "base/debug/dump_without_crashing.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/common/chrome_descriptors_android.h"
-#endif
-
 namespace {
 
 constexpr const char* UpdaterVersion() {
@@ -78,7 +74,7 @@ ChromeCrashReporterClient::ChromeCrashReporterClient() = default;
 
 ChromeCrashReporterClient::~ChromeCrashReporterClient() = default;
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_MAC)
 void ChromeCrashReporterClient::SetCrashReporterClientIdFromGUID(
     const std::string& client_guid) {
   crash_keys::SetMetricsClientIdFromGUID(client_guid);
@@ -103,9 +99,7 @@ bool ChromeCrashReporterClient::GetCrashDumpLocation(
 void ChromeCrashReporterClient::GetProductInfo(ProductInfo* product_info) {
   CHECK(product_info);
 
-#if BUILDFLAG(IS_ANDROID)
-  product_info->product_name = "Chrome_Android";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #if defined(ADDRESS_SANITIZER)
   product_info->product_name = "Chrome_Linux_ASan";
 #else
@@ -144,12 +138,6 @@ bool ChromeCrashReporterClient::GetCollectStatsConsent() {
   bool is_official_chrome_build = false;
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(jcivelli): we should not initialize the crash-reporter when it was not
-  // enabled. Right now if it is disabled we still generate the minidumps but we
-  // do not upload them.
-  return is_official_chrome_build;
-#else   // !BUILDFLAG(IS_ANDROID)
   if (!is_official_chrome_build) {
     VLOG(1) << "GetCollectStatsConsent(): is_official_chrome_build is false "
             << "so returning false";
@@ -159,7 +147,6 @@ bool ChromeCrashReporterClient::GetCollectStatsConsent() {
   VLOG(1) << "GetCollectStatsConsent(): settings_consent: " << settings_consent
           << " so returning that";
   return settings_consent;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 #if BUILDFLAG(IS_LINUX)

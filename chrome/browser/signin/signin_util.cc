@@ -81,7 +81,6 @@ ScopedForceSigninSetterForTesting::~ScopedForceSigninSetterForTesting() {
   ResetForceSigninForTesting();  // IN-TEST
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 CookiesMover::CookiesMover(base::WeakPtr<Profile> source_profile,
                            base::WeakPtr<Profile> destination_profile,
                            base::OnceCallback<void()> callback)
@@ -148,7 +147,6 @@ void CookiesMover::OnCookiesReceived(
 void CookiesMover::OnCookiesMoved() {
   std::move(callback_).Run();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool IsForceSigninEnabled() {
   if (g_is_force_signin_enabled_cache == NOT_CACHED) {
@@ -171,14 +169,9 @@ void ResetForceSigninForTesting() {
 }
 
 bool IsProfileDeletionAllowed(Profile* profile) {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Returns true if managed accounts signin are required to create a new profile
 // by policies set in `profile`.
 bool IsProfileSeparationEnforcedByProfile(
@@ -274,8 +267,6 @@ void RecordEnterpriseProfileCreationUserChoice(bool enforced_by_policy,
           : "Signin.Enterprise.WorkProfile.ProfileCreatedwithPolicyUnset",
       created);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 PrimaryAccountError SetPrimaryAccountWithInvalidToken(
     Profile* profile,

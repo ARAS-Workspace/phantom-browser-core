@@ -26,10 +26,6 @@
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/enterprise/idle/dialog_manager.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/ui/browser.h"
@@ -37,13 +33,11 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/idle_bubble.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace enterprise_idle {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 bool ProfileHasBrowsers(const Profile* profile) {
   DCHECK(profile);
   profile = profile->GetOriginalProfile();
@@ -168,7 +162,6 @@ class ShowProfilePickerAction : public Action {
     return false;
   }
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Action that clears one or more types of data via BrowsingDataRemover.
 // Multiple data types may be grouped into a single ClearBrowsingDataAction
@@ -206,11 +199,7 @@ class ClearBrowsingDataAction : public Action,
   }
 
   bool ShouldNotifyUserOfPendingDestructiveAction(Profile* profile) override {
-#if BUILDFLAG(IS_ANDROID)
-    return true;
-#else
     return profile && ProfileHasBrowsers(profile);
-#endif
   }
 
   // content::BrowsingDataRemoverObserver::Observer:
@@ -229,12 +218,10 @@ class ClearBrowsingDataAction : public Action,
   uint64_t GetRemoveMask() const {
     using content::BrowsingDataRemover;
     static const std::pair<ActionType, uint64_t> entries[] = {
-#if !BUILDFLAG(IS_ANDROID)
       {ActionType::kClearDownloadHistory,
        BrowsingDataRemover::DATA_TYPE_DOWNLOADS},
       {ActionType::kClearHostedAppData,
        chrome_browsing_data_remover::DATA_TYPE_SITE_DATA},
-#endif  // !BUILDFLAG(IS_ANDROID)
       {ActionType::kClearBrowsingHistory,
        chrome_browsing_data_remover::DATA_TYPE_HISTORY},
       {ActionType::kClearCookiesAndOtherSiteData,
@@ -263,11 +250,9 @@ class ClearBrowsingDataAction : public Action,
     if (action_types_.contains(ActionType::kClearCookiesAndOtherSiteData)) {
       result |= BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB;
     }
-#if !BUILDFLAG(IS_ANDROID)
     if (action_types_.contains(ActionType::kClearHostedAppData)) {
       result |= BrowsingDataRemover::ORIGIN_TYPE_PROTECTED_WEB;
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
     return result;
   }
 
@@ -286,19 +271,6 @@ class ReloadPagesAction : public Action {
   ReloadPagesAction() : Action(static_cast<int>(ActionType::kReloadPages)) {}
 
   void Run(Profile* profile, Continuation continuation) override {
-#if BUILDFLAG(IS_ANDROID)
-    // This covers regular tabs, PWAs, and CCTs.
-    for (TabModel* model : TabModelList::models()) {
-      if (model->GetProfile() != profile) {
-        continue;  // Deliberately ignore incognito.
-      }
-      for (int i = 0; i < model->GetTabCount(); i++) {
-        model->GetWebContentsAt(i)->GetController().Reload(
-            content::ReloadType::NORMAL,
-            /*check_for_repost=*/true);
-      }
-    }
-#else
     // This covers regular tabs and PWAs.
     ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
         [profile](BrowserWindowInterface* browser_window_interface) {
@@ -314,22 +286,16 @@ class ReloadPagesAction : public Action {
           }
           return true;
         });
-#endif  // BUILDFLAG(IS_ANDROID)
     metrics::RecordActionsSuccess(metrics::IdleTimeoutActionType::kReloadPages,
                                   true);
     std::move(continuation).Run(/*success=*/true);
   }
 
   bool ShouldNotifyUserOfPendingDestructiveAction(Profile* profile) override {
-#if BUILDFLAG(IS_ANDROID)
-    return true;
-#else
     return profile && ProfileHasBrowsers(profile);
-#endif
   }
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Shows a bubble anchored to the 3-dot menu after other actions are finished.
 class ShowBubbleAction : public Action {
  public:
@@ -372,7 +338,6 @@ class ShowBubbleAction : public Action {
 
   base::flat_set<ActionType> action_types_;
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -400,22 +365,18 @@ ActionFactory::ActionQueue ActionFactory::Build(
   base::flat_set<ActionType> clear_actions;
   for (auto action_type : action_types) {
     switch (action_type) {
-#if !BUILDFLAG(IS_ANDROID)
       case ActionType::kCloseBrowsers:
         actions.push_back(std::make_unique<CloseBrowsersAction>());
         break;
       case ActionType::kShowProfilePicker:
         actions.push_back(std::make_unique<ShowProfilePickerAction>());
         break;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
       // "clear_*" actions are all grouped into a single Action object. Collect
       // them in a flat_set<>, and create the shared object once we have the
       // entire collection.
-#if !BUILDFLAG(IS_ANDROID)
       case ActionType::kClearDownloadHistory:
       case ActionType::kClearHostedAppData:
-#endif  // !BUILDFLAG(IS_ANDROID)
       case ActionType::kClearBrowsingHistory:
       case ActionType::kClearCookiesAndOtherSiteData:
       case ActionType::kClearCachedImagesAndFiles:
@@ -441,7 +402,6 @@ ActionFactory::ActionQueue ActionFactory::Build(
         std::move(clear_actions), browsing_data_remover_for_testing_));
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   bool needs_dialog = std::ranges::any_of(actions, [profile](const auto& a) {
     return a->ShouldNotifyUserOfPendingDestructiveAction(profile);
   });
@@ -449,7 +409,6 @@ ActionFactory::ActionQueue ActionFactory::Build(
     actions.push_back(std::make_unique<ShowDialogAction>(action_types));
     actions.push_back(std::make_unique<ShowBubbleAction>(action_types));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return ActionQueue(ActionQueue::value_compare(), std::move(actions));
 }
@@ -463,7 +422,6 @@ void ActionFactory::SetBrowsingDataRemoverForTesting(
   browsing_data_remover_for_testing_ = remover;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IdleDialog::ActionSet ActionsToActionSet(
     const base::flat_set<ActionType>& action_types) {
   IdleDialog::ActionSet action_set = {.close = false, .clear = false};
@@ -493,6 +451,5 @@ IdleDialog::ActionSet ActionsToActionSet(
   }
   return action_set;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace enterprise_idle

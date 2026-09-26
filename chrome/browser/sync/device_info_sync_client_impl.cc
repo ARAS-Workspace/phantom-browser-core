@@ -18,10 +18,6 @@
 #include "components/sync_device_info/device_info_proto_enum_util.h"
 #include "device/fido/public/features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/webauthn/android/cable_module_android.h"
-#endif
-
 namespace browser_sync {
 
 DeviceInfoSyncClientImpl::DeviceInfoSyncClientImpl(Profile* profile)
@@ -62,14 +58,7 @@ DeviceInfoSyncClientImpl::GetLocalSharingInfo() const {
 
 syncer::DeviceInfo::PhoneAsASecurityKeyInfo::StatusOrInfo
 DeviceInfoSyncClientImpl::GetPhoneAsASecurityKeyInfo() const {
-#if BUILDFLAG(IS_ANDROID)
-  if (!base::FeatureList::IsEnabled(device::kWebAuthnPublishPrelinkingInfo)) {
-    return syncer::DeviceInfo::PhoneAsASecurityKeyInfo::NoSupport();
-  }
-  return webauthn::authenticator::GetSyncDataIfRegistered();
-#else
   return syncer::DeviceInfo::PhoneAsASecurityKeyInfo::NoSupport();
-#endif
 }
 
 bool DeviceInfoSyncClientImpl::IsUmaEnabledOnCrOSDevice() const {

@@ -22,13 +22,8 @@
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/data_sharing/android/data_sharing_ui_delegate_android.h"
-#include "chrome/browser/data_sharing/data_sharing_service_factory_bridge.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/data_sharing/desktop/data_sharing_sdk_delegate_desktop.h"
 #include "chrome/browser/data_sharing/desktop/data_sharing_ui_delegate_desktop.h"
-#endif
 
 namespace data_sharing {
 // static
@@ -70,16 +65,8 @@ DataSharingServiceFactory::BuildServiceInstanceForBrowserContext(
   std::unique_ptr<DataSharingUIDelegate> ui_delegate;
   std::unique_ptr<DataSharingSDKDelegate> sdk_delegate;
 
-#if BUILDFLAG(IS_ANDROID)
-  ui_delegate = std::make_unique<DataSharingUIDelegateAndroid>(profile);
-  // Profile will be alive by the time callback runs.
-  auto callback = base::BindOnce(
-      &DataSharingServiceFactoryBridge::CreateJavaSDKDelegate, profile);
-  sdk_delegate = DataSharingSDKDelegate::CreateDelegate(std::move(callback));
-#else
   ui_delegate = std::make_unique<DataSharingUIDelegateDesktop>(profile);
   sdk_delegate = std::make_unique<DataSharingSDKDelegateDesktop>(context);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   return std::make_unique<DataSharingServiceImpl>(
       profile->GetPath(),

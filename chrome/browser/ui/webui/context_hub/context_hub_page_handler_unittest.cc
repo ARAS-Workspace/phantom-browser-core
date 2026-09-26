@@ -47,7 +47,6 @@ using ::testing::_;
 using ::testing::IsEmpty;
 using ::testing::Not;
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockTabProvider : public ContextHubPageHandler::TabProvider {
  public:
   MOCK_METHOD(std::vector<content::WebContents*>, GetTabs, (), (override));
@@ -70,7 +69,6 @@ class MockTabProvider : public ContextHubPageHandler::TabProvider {
               (const base::Uuid&),
               (override));
 };
-#endif
 
 class MockPage : public browser::context_hub::mojom::Page {
  public:
@@ -140,26 +138,17 @@ class ContextHubPageHandlerTest : public testing::Test {
     profile_.GetPrefs()->SetTime(prefs::kContextHubLastAutoTodosGenerationTime,
                                  base::Time::Now());
 
-#if !BUILDFLAG(IS_ANDROID)
     auto mock_tab_provider = std::make_unique<MockTabProvider>();
     mock_tab_provider_ = mock_tab_provider.get();
     handler_ = std::make_unique<ContextHubPageHandler>(
         mock_page_.BindAndGetRemote(),
         mojo::PendingReceiver<browser::context_hub::mojom::PageHandler>(),
         &profile_, nullptr, std::move(mock_tab_provider));
-#else
-    handler_ = std::make_unique<ContextHubPageHandler>(
-        mock_page_.BindAndGetRemote(),
-        mojo::PendingReceiver<browser::context_hub::mojom::PageHandler>(),
-        &profile_, nullptr, nullptr);
-#endif
     mock_page_.Flush();
   }
 
   void TearDown() override {
-#if !BUILDFLAG(IS_ANDROID)
     mock_tab_provider_ = nullptr;
-#endif
     handler_.reset();
     testing::Test::TearDown();
   }
@@ -190,9 +179,7 @@ class ContextHubPageHandlerTest : public testing::Test {
   content::RenderViewHostTestEnabler rvh_test_enabler_;
   base::CallbackListSubscription create_services_subscription_;
   TestingProfile profile_;
-#if !BUILDFLAG(IS_ANDROID)
   raw_ptr<MockTabProvider> mock_tab_provider_ = nullptr;
-#endif
   MockPage mock_page_;
   std::unique_ptr<ContextHubPageHandler> handler_;
 };
@@ -976,7 +963,6 @@ TEST_F(ContextHubPageHandlerTest, DeleteMemoryBankEntries_Success) {
   EXPECT_TRUE(entries2.empty());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ContextHubPageHandlerTest, SwitchToTab) {
   EXPECT_CALL(*mock_tab_provider_, SwitchToTab(42)).Times(1);
 
@@ -1296,7 +1282,6 @@ TEST_F(ContextHubPageHandlerTest, GenerateTabBasedTodos) {
   handler_->GenerateTabBasedTodos(future.GetCallback());
   EXPECT_TRUE(future.Get());
 }
-#endif
 
 TEST_F(ContextHubPageHandlerTest, ClearTabGroupChatHistory) {
   ContextHubService* service =

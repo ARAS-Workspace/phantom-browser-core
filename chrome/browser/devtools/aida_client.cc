@@ -111,7 +111,7 @@ AidaClient::Availability AidaClient::CanUseAida(Profile* profile) {
   // AidaClient is only available on branded builds.
   // Currently it's also not available on Android.
   // TODO(b/532900989): Enable this on Android.
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   result.available = true;
   auto account_info = AccountInfoForProfile(profile);
   result.blocked_by_age = IsAidaBlockedByAge(account_info);

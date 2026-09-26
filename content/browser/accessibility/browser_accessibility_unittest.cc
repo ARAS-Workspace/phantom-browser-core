@@ -20,10 +20,6 @@
 #include "ui/gfx/geometry/vector2d.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/accessibility/browser_accessibility_manager_android.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -32,21 +28,12 @@ ui::BrowserAccessibilityManager* CreateBrowserAccessibilityManager(
     const ui::AXTreeUpdate& initial_tree,
     ui::AXNodeIdDelegate& node_id_delegate,
     ui::AXPlatformTreeManagerDelegate* delegate) {
-#if BUILDFLAG(IS_ANDROID)
-  return content::BrowserAccessibilityManagerAndroid::Create(
-      initial_tree, node_id_delegate, delegate);
-#else
   return ui::BrowserAccessibilityManager::Create(initial_tree, node_id_delegate,
                                                  delegate);
-#endif
 }
 
 gfx::AcceleratedWidget MakeAcceleratedWidget(uintptr_t value) {
-#if BUILDFLAG(IS_ANDROID)
-  return reinterpret_cast<gfx::AcceleratedWidget>(value);
-#else
   return static_cast<gfx::AcceleratedWidget>(value);
-#endif
 }
 
 }  // namespace
@@ -109,17 +96,11 @@ TEST_F(BrowserAccessibilityTest, TestCanFireEvents) {
 
   ui::BrowserAccessibility* para_obj = root_obj->PlatformGetChild(0);
   EXPECT_TRUE(para_obj->CanFireEvents());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(para_obj->IsLeaf());
-#else
   EXPECT_FALSE(para_obj->IsLeaf());
-#endif
 
   ui::BrowserAccessibility* text_obj = manager->GetFromID(111);
   EXPECT_TRUE(text_obj->IsLeaf());
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(text_obj->CanFireEvents());
-#endif
   ui::BrowserAccessibility* retarget =
       manager->RetargetBrowserAccessibilityForEvents(
           text_obj, RetargetEventType::RetargetEventTypeBlinkHover);
@@ -922,15 +903,6 @@ TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRect) {
       root_accessible->PlatformGetChild(0);
   ASSERT_NE(nullptr, static_text_accessible);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android disallows getting inner text from root accessibility nodes.
-  EXPECT_EQ(gfx::Rect(0, 0, 0, 0).ToString(),
-            root_accessible
-                ->GetInnerTextRangeBoundsRect(
-                    0, 1, ui::AXCoordinateSystem::kRootFrame,
-                    ui::AXClippingBehavior::kUnclipped)
-                .ToString());
-#else
   // Validate the bounding box of 'H' from root.
   EXPECT_EQ(gfx::Rect(100, 100, 6, 9).ToString(),
             root_accessible
@@ -938,7 +910,6 @@ TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRect) {
                     0, 1, ui::AXCoordinateSystem::kRootFrame,
                     ui::AXClippingBehavior::kUnclipped)
                 .ToString());
-#endif
 
   // Validate the bounding box of 'H' from static text.
   EXPECT_EQ(gfx::Rect(100, 100, 6, 9).ToString(),
@@ -964,15 +935,6 @@ TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRect) {
                     ui::AXClippingBehavior::kUnclipped)
                 .ToString());
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android disallows getting inner text from root accessibility nodes.
-  EXPECT_EQ(gfx::Rect(0, 0, 0, 0).ToString(),
-            root_accessible
-                ->GetInnerTextRangeBoundsRect(
-                    0, 13, ui::AXCoordinateSystem::kRootFrame,
-                    ui::AXClippingBehavior::kUnclipped)
-                .ToString());
-#else
   // Validate the bounding box of 'Hello, world.' from root.
   EXPECT_EQ(gfx::Rect(100, 100, 29, 18).ToString(),
             root_accessible
@@ -980,7 +942,6 @@ TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRect) {
                     0, 13, ui::AXCoordinateSystem::kRootFrame,
                     ui::AXClippingBehavior::kUnclipped)
                 .ToString());
-#endif
 }
 
 TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRectPlainTextField) {
@@ -1135,23 +1096,6 @@ TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRectMultiElement) {
                     ui::AXClippingBehavior::kUnclipped)
                 .ToString());
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android disallows getting inner text from accessibility root nodes.
-  EXPECT_EQ(gfx::Rect(0, 0, 0, 0).ToString(),
-            root_accessible
-                ->GetInnerTextRangeBoundsRect(
-                    0, 6, ui::AXCoordinateSystem::kRootFrame,
-                    ui::AXClippingBehavior::kUnclipped)
-                .ToString());
-
-  // Android disallows getting inner text from accessibility root nodes.
-  EXPECT_EQ(gfx::Rect(0, 0, 0, 0).ToString(),
-            root_accessible
-                ->GetInnerTextRangeBoundsRect(
-                    2, 4, ui::AXCoordinateSystem::kRootFrame,
-                    ui::AXClippingBehavior::kUnclipped)
-                .ToString());
-#else
   // Validate the bounds of 'ABCABC' from both lines.
   EXPECT_EQ(gfx::Rect(0, 20, 43, 29).ToString(),
             root_accessible
@@ -1167,7 +1111,6 @@ TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRectMultiElement) {
                     2, 4, ui::AXCoordinateSystem::kRootFrame,
                     ui::AXClippingBehavior::kUnclipped)
                 .ToString());
-#endif
 }
 
 TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRectBiDi) {
@@ -1505,10 +1448,6 @@ TEST_F(BrowserAccessibilityTest, CreatePositionAt) {
   EXPECT_TRUE(pos->IsTreePosition());
 
   ASSERT_EQ(1U, gc_accessible->InternalChildCount());
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, nodes with only static text can drop their children.
-  ASSERT_EQ(0U, gc_accessible->PlatformChildCount());
-#else
   ASSERT_EQ(1U, gc_accessible->PlatformChildCount());
   ui::BrowserAccessibility* text_accessible =
       gc_accessible->PlatformGetChild(0);
@@ -1516,7 +1455,6 @@ TEST_F(BrowserAccessibilityTest, CreatePositionAt) {
 
   pos = text_accessible->CreatePositionAt(0);
   EXPECT_TRUE(pos->IsTextPosition());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(BrowserAccessibilityTest, NativeAdaptedWebContentsMode) {

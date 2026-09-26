@@ -495,9 +495,6 @@ void RequestService::UnregisterIdP(const GURL& idp,
 }
 
 void RequestService::CloseModalDialogView() {
-#if BUILDFLAG(IS_ANDROID)
-  SetupIdentityRegistryFromPopup();
-#endif
   // Invoke OnClose on the opener.
   if (IdentityRegistry* registry = GetIdentityRegistry()) {
     registry->NotifyClose(render_frame_host().GetLastCommittedOrigin());
@@ -520,34 +517,7 @@ void RequestService::SetRequiresUserMediation(bool requires_user_mediation,
 }
 
 bool RequestService::SetupIdentityRegistryFromPopup() {
-#if BUILDFLAG(IS_ANDROID)
-  if (GetIdentityRegistry()) {
-    return true;
-  }
-  IdentityRequestDialogController* controller = GetOrCreateDialogController();
-  CHECK(controller);
-  // Because ShowModalDialog does not return the web contents on Android, we
-  // need to set up the IdentityRegistry now.
-  WebContents* rp_web_contents = controller->GetRpWebContents();
-  // This can be null if resolve was called in a regular tab (as opposed to
-  // a CCT opened from ShowModalDialog).
-  if (!rp_web_contents) {
-    return false;
-  }
-  Request* rp_request = GetPageData(rp_web_contents->GetPrimaryPage())
-                            ->PendingWebIdentityRequest();
-  if (!rp_request) {
-    return false;
-  }
-  WebContents* web_contents =
-      WebContents::FromRenderFrameHost(&render_frame_host());
-  IdentityRegistry::CreateForWebContents(
-      web_contents, rp_request->weak_ptr_factory_.GetWeakPtr(),
-      rp_request->config_url_);
-  return true;
-#else
   return false;
-#endif
 }
 
 void RequestService::RequestUserInfo(

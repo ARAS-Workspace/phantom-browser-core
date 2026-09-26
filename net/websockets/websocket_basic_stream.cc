@@ -74,12 +74,8 @@ constexpr net::NetworkTrafficAnnotationTag kTrafficAnnotation =
 //     around
 //  4. We would like to hit any sweet-spots that might exist in terms of network
 //     packet sizes / encryption block sizes / IPC alignment issues, etc.
-#if BUILDFLAG(IS_ANDROID)
-constexpr size_t kLargeReadBufferSize = 32 * 1024;
-#else
 // |2^n - delta| is better than 2^n on Linux. See crrev.com/c/1792208.
 constexpr size_t kLargeReadBufferSize = 131000;
-#endif
 
 // The number of bytes to attempt to read at a time. It's set as an initial read
 // buffer size and used for low throughput connections.

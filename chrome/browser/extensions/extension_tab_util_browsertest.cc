@@ -154,11 +154,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabUtilBrowserTest,
       options_in_view, active_contents));
 
   GURL expected_url;
-#if BUILDFLAG(IS_ANDROID)
-  expected_url = OptionsPageInfo::GetOptionsPage(options_in_view);
-#else
   expected_url = GURL("chrome://extensions?options=" + options_in_view->id());
-#endif
 
   EXPECT_EQ(GetActiveWebContents()->GetURL(), expected_url);
 }
@@ -230,13 +226,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabUtilBrowserTest, SupportsTabGroups) {
 }
 
 IN_PROC_BROWSER_TEST_F(ExtensionTabUtilBrowserTest, DoesNotSupportTabGroups) {
-#if BUILDFLAG(IS_ANDROID)
-  // Android doesn't support Chrome Apps, so we test with popups.
-  const auto window_type = BrowserWindowInterface::Type::TYPE_POPUP;
-#else
   // Test other platforms with apps, because they are a more typical use case.
   const auto window_type = BrowserWindowInterface::Type::TYPE_APP;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   BrowserWindowInterface* browser = CreateBrowserWindowWithType(window_type);
 

@@ -228,15 +228,6 @@ class MockDownloadTargetDeterminerDelegate
                     const base::FilePath&,
                     DownloadConfirmationReason,
                     ConfirmationCallback&));
-#if BUILDFLAG(IS_ANDROID)
-  void RequestIncognitoWarningConfirmation(
-      content::WebContents* web_contents,
-      IncognitoWarningConfirmationCallback cb) override {
-    RequestIncognitoWarningConfirmation_(std::move(cb));
-  }
-  MOCK_METHOD1(RequestIncognitoWarningConfirmation_,
-               void(IncognitoWarningConfirmationCallback cb));
-#endif
   void DetermineLocalPath(DownloadItem* item,
                           const base::FilePath& path,
                           download::LocalPathCallback cb) override {
@@ -415,11 +406,6 @@ void DownloadTargetDeterminerTest::SetUp() {
   test_virtual_dir_ = test_download_dir().Append(FILE_PATH_LITERAL("virtual"));
   delegate_.SetupDefaults();
   SetUpFileTypePolicies();
-#if BUILDFLAG(IS_ANDROID)
-  profile()->GetTestingPrefService()->SetInteger(
-      prefs::kPromptForDownloadAndroid,
-      static_cast<int>(DownloadPromptStatus::DONT_SHOW));
-#endif
 }
 
 void DownloadTargetDeterminerTest::TearDown() {
@@ -504,14 +490,6 @@ void DownloadTargetDeterminerTest::SetManagedDownloadPath(
 void DownloadTargetDeterminerTest::SetPromptForDownload(bool prompt) {
   profile()->GetTestingPrefService()->
       SetBoolean(prefs::kPromptForDownload, prompt);
-#if BUILDFLAG(IS_ANDROID)
-  DownloadPromptStatus download_prompt_status =
-      prompt ? DownloadPromptStatus::SHOW_PREFERENCE
-             : DownloadPromptStatus::DONT_SHOW;
-  profile()->GetTestingPrefService()->SetInteger(
-      prefs::kPromptForDownloadAndroid,
-      static_cast<int>(download_prompt_status));
-#endif
 }
 
 base::FilePath DownloadTargetDeterminerTest::GetPathInDownloadDir(
@@ -922,12 +900,7 @@ TEST_F(DownloadTargetDeterminerTest,
 }
 
 // Test whether the last saved directory is used for 'Save As' downloads.
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-// https://crbug.com/531834681
-#define MAYBE_LastSavePath DISABLED_LastSavePath
-#else
 #define MAYBE_LastSavePath LastSavePath
-#endif
 TEST_F(DownloadTargetDeterminerTest, MAYBE_LastSavePath) {
   const DownloadTestCase kLastSavePathTestCasesPre[] = {
       {// 0: If the last save path is empty, then the default download directory
@@ -3023,39 +2996,5 @@ TEST_F(DownloadTargetDeterminerTestWithPlugin,
 }
 
 #endif  // BUILDFLAG(ENABLE_PLUGINS)
-
-#if BUILDFLAG(IS_ANDROID)
-// If a content URI is returned when determining local path, virtual path
-// is updated.
-TEST_F(DownloadTargetDeterminerTest, DetermineLocalPathReturnsContentUri) {
-  const DownloadTestCase kLocalPathContentUriCase = {
-      AUTOMATIC,
-      download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-      DownloadFileType::NOT_DANGEROUS,
-      "http://example.com/foo.txt",
-      "text/plain",
-      FILE_PATH_LITERAL(""),
-      FILE_PATH_LITERAL("content://media/123"),
-      DownloadItem::TARGET_DISPOSITION_OVERWRITE,
-      EXPECT_LOCAL_PATH};
-
-  std::unique_ptr<download::MockDownloadItem> item =
-      CreateActiveDownloadItem(0, kLocalPathContentUriCase);
-  // The default download directory is the virtual path.
-  download_prefs()->SetDownloadPath(test_virtual_dir());
-
-  EXPECT_CALL(
-      *delegate(),
-      DetermineLocalPath_(
-          _, GetPathInDownloadDir(FILE_PATH_LITERAL("virtual/foo.txt")), _))
-      .WillOnce(WithArg<2>(ScheduleCallback2(
-          base::FilePath("content://media/123"), base::FilePath("foor.txt"))));
-  TargetInfoAndDangerLevel info =
-      RunDownloadTargetDeterminer(base::FilePath(), item.get());
-
-  EXPECT_EQ(info.target_info.display_name.value(), "foor.txt");
-  EXPECT_EQ(info.target_info.target_path.value(), "content://media/123");
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace

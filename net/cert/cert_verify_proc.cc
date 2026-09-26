@@ -63,10 +63,6 @@
 #include "net/cert/internal/trust_store_chrome.h"
 #endif  // CHROME_ROOT_STORE_SUPPORTED
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/cert/cert_verify_proc_android.h"
-#endif
-
 namespace net {
 
 namespace {
@@ -373,12 +369,7 @@ base::DictValue CertVerifyParams(X509Certificate* cert,
 scoped_refptr<CertVerifyProc> CertVerifyProc::CreateSystemVerifyProc(
     scoped_refptr<CertNetFetcher> cert_net_fetcher,
     scoped_refptr<CRLSet> crl_set) {
-#if BUILDFLAG(IS_ANDROID)
-  return base::MakeRefCounted<CertVerifyProcAndroid>(
-      std::move(cert_net_fetcher), std::move(crl_set));
-#else
 #error Unsupported platform
-#endif
 }
 #endif
 

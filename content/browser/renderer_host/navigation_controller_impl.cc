@@ -125,12 +125,6 @@
 #include "third_party/blink/public/mojom/runtime_feature_state/runtime_feature.mojom.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/navigation_transitions/navigation_entry_screenshot_cache.h"
-#include "content/browser/renderer_host/navigation_transitions/navigation_entry_screenshot_manager.h"
-#include "content/browser/renderer_host/navigation_transitions/navigation_transition_config.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 namespace {
 
@@ -1519,58 +1513,6 @@ bool NavigationControllerImpl::CanGoToOffset(int offset) {
   return index >= 0 && index < GetEntryCount();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool NavigationControllerImpl::CanGoToOffsetWithSkipping(int offset) {
-  return GetIndexForOffsetWithSkipping(offset, /*performing_navigation=*/false)
-      .has_value();
-}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-std::optional<int> NavigationControllerImpl::GetIndexForOffsetWithSkipping(
-    int offset,
-    bool performing_navigation) {
-  int current_scan_index = GetCurrentEntryIndex();
-
-  if (offset == 0) {
-    return current_scan_index;
-  }
-
-  int steps = std::abs(offset);
-
-  // Note on time complexity:
-  //
-  // This algorithm is O(N) (where N is the number of entries) despite the
-  // nested loop structure.
-  //
-  // The outer loop runs 'steps' times. However, 'current_scan_index' is updated
-  // at the end of each iteration. The inner scanning functions
-  // (GetIndexForGoBackWithSkipping / GetIndexForGoForwardWithSkipping) start
-  // scanning strictly adjacent to the passed input index and never backtrack.
-  // This ensures that each entry in the navigation list is visited at most
-  // once.
-  for (int i = 0; i < steps; ++i) {
-    std::optional<int> next_index;
-
-    if (offset < 0) {
-      next_index = GetIndexForGoBackWithSkipping(current_scan_index,
-                                                 performing_navigation);
-    } else {
-      next_index = GetIndexForGoForwardWithSkipping(current_scan_index,
-                                                    performing_navigation);
-    }
-
-    if (!next_index.has_value()) {
-      return std::nullopt;
-    }
-
-    current_scan_index = next_index.value();
-  }
-
-  return current_scan_index;
-}
-#endif
-
 NavigationController::WeakNavigationHandleVector
 NavigationControllerImpl::GoBack() {
   if (!CanGoBack()) {
@@ -1684,20 +1626,6 @@ NavigationControllerImpl::GoToIndexAndReturnAllRequests(int index) {
                    /*actual_navigation_start=*/base::TimeTicks::Now());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void NavigationControllerImpl::GoToOffsetWithSkipping(int offset) {
-  std::optional<int> target_index =
-      GetIndexForOffsetWithSkipping(offset, /*performing_navigation=*/true);
-
-  // Note: This is actually reached in unit tests.
-  if (!target_index.has_value()) {
-    return;
-  }
-
-  GoToIndex(target_index.value());
-}
-#endif
-
 bool NavigationControllerImpl::RemoveEntryAtIndex(int index) {
   if (index == last_committed_entry_index_ || index == pending_entry_index_) {
     return false;
@@ -1786,9 +1714,6 @@ base::WeakPtr<NavigationHandle> NavigationControllerImpl::LoadURLWithParams(
   switch (params.load_type) {
     case LOAD_TYPE_DEFAULT:
     case LOAD_TYPE_HTTP_POST:
-#if BUILDFLAG(IS_ANDROID)
-    case LOAD_TYPE_PDF_ANDROID:
-#endif
       break;
     case LOAD_TYPE_DATA:
       if (!params.url.SchemeIs(url::kDataScheme)) {
@@ -3121,24 +3046,6 @@ BackForwardCacheImpl& NavigationControllerImpl::GetBackForwardCache() {
   return delegate_->GetBackForwardCache();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-NavigationEntryScreenshotCache*
-NavigationControllerImpl::GetNavigationEntryScreenshotCache() {
-  CHECK(frame_tree_->is_primary());
-  if (!nav_entry_screenshot_cache_ &&
-      BackForwardTransitionAnimationManager::
-          ShouldAnimateBackForwardTransitions()) {
-    nav_entry_screenshot_cache_ =
-        std::make_unique<NavigationEntryScreenshotCache>(
-            BrowserContextImpl::From(browser_context_)
-                ->GetNavigationEntryScreenshotManager()
-                ->GetSafeRef(),
-            this);
-  }
-  return nav_entry_screenshot_cache_.get();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void NavigationControllerImpl::DiscardPendingEntry(bool was_failure) {
   // It is not safe to call DiscardPendingEntry while NavigateToEntry is in
   // progress, since this will cause a use-after-free.  (We only allow this
@@ -3171,33 +3078,6 @@ void NavigationControllerImpl::SetPendingNavigationSSLError(bool error) {
     pending_entry_->set_ssl_error(error);
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// static
-bool NavigationControllerImpl::ValidateDataURLAsString(
-    const scoped_refptr<const base::RefCountedString>& data_url_as_string) {
-  if (!data_url_as_string) {
-    return false;
-  }
-
-  if (data_url_as_string->size() > kMaxLengthOfDataURLString.InBytes()) {
-    return false;
-  }
-
-  // The number of characters that is enough for validating a data: URI.
-  // From the GURL's POV, the only important part here is scheme, it doesn't
-  // check the actual content. Thus we can take only the prefix of the url, to
-  // avoid unneeded copying of a potentially long string.
-  constexpr size_t kDataUriPrefixMaxLen = 64;
-  const size_t len = std::min(data_url_as_string->size(), kDataUriPrefixMaxLen);
-  GURL data_url(base::as_string_view(*data_url_as_string).substr(0u, len));
-  if (!data_url.is_valid() || !data_url.SchemeIs(url::kDataScheme)) {
-    return false;
-  }
-
-  return true;
-}
-#endif
 
 void NavigationControllerImpl::NotifyUserActivation() {
   // When a user activation occurs, ensure that all adjacent entries for the
@@ -4548,18 +4428,8 @@ NavigationControllerImpl::CreateNavigationEntryFromLoadParams(
       // URL.
       entry->SetBaseURLForDataURL(params.base_url_for_data_url);
       entry->SetVirtualURL(params.virtual_url_for_special_cases);
-#if BUILDFLAG(IS_ANDROID)
-      entry->SetDataURLAsString(params.data_url_as_string);
-#endif
       entry->SetCanLoadLocalResources(params.can_load_local_resources);
       break;
-#if BUILDFLAG(IS_ANDROID)
-    case LOAD_TYPE_PDF_ANDROID:
-      // Android PDF URLs show the actual PDF URL as a virtual URL, while an
-      // internal URL is used for the navigation URL.
-      entry->SetVirtualURL(params.virtual_url_for_special_cases);
-      break;
-#endif
   }
 
   // TODO(clamy): NavigationEntry is meant for information that will be kept
@@ -4616,11 +4486,6 @@ NavigationControllerImpl::CreateNavigationRequestFromLoadParams(
     if (params.load_type == LOAD_TYPE_DATA) {
       virtual_url = params.virtual_url_for_special_cases;
     }
-#if BUILDFLAG(IS_ANDROID)
-    if (params.load_type == LOAD_TYPE_PDF_ANDROID) {
-      virtual_url = params.virtual_url_for_special_cases;
-    }
-#endif
 
     if (virtual_url.is_empty()) {
       virtual_url = url_to_load;
@@ -4741,9 +4606,6 @@ NavigationControllerImpl::CreateNavigationRequestFromLoadParams(
           blink::mojom::WasActivatedOption::kUnknown,
           /*navigation_token=*/base::UnguessableToken::Create(),
           std::vector<blink::mojom::PrefetchedSignedExchangeInfoPtr>(),
-#if BUILDFLAG(IS_ANDROID)
-          /*data_url_as_string=*/std::string(),
-#endif
           /*is_browser_initiated=*/!params.is_renderer_initiated,
           /*has_ua_visual_transition*/ false,
           /*document_ukm_source_id=*/ukm::kInvalidSourceId,
@@ -4787,12 +4649,8 @@ NavigationControllerImpl::CreateNavigationRequestFromLoadParams(
           /*force_new_document_sequence_number=*/false,
           /*navigation_metrics_token=*/base::UnguessableToken::Create(),
           /*commit_target_frame_token=*/std::nullopt,
-  /*is_initial_webui=*/
-#if !BUILDFLAG(IS_ANDROID)
+          /*is_initial_webui=*/
           GetContentClient()->browser()->IsInitialWebUIURL(common_params->url),
-#else
-          false,
-#endif
           /*permissions_policy_override=*/std::nullopt,
           /*internal_scroll_to_text_fragment=*/
           params.internal_scroll_to_text_fragment,
@@ -4803,12 +4661,6 @@ NavigationControllerImpl::CreateNavigationRequestFromLoadParams(
   if (params.internal_scroll_to_text_fragment) {
     CHECK(!params.is_renderer_initiated);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (ValidateDataURLAsString(params.data_url_as_string)) {
-    commit_params->data_url_as_string = params.data_url_as_string->as_string();
-  }
-#endif
 
   commit_params->was_activated = params.was_activated;
 
@@ -5038,13 +4890,6 @@ void NavigationControllerImpl::SetActive(bool is_active) {
   if (is_active && needs_reload_) {
     LoadIfNecessary();
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (frame_tree_->is_primary();
-      auto* cache = GetNavigationEntryScreenshotCache()) {
-    cache->SetVisible(is_active);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void NavigationControllerImpl::LoadIfNecessary() {

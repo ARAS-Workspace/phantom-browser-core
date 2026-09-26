@@ -456,11 +456,7 @@ std::pair<std::string, std::string> ExtractBoundaryAndBody(
 
 // Tests a subresource request.
 // Flaky on Android; see https://crbug.com/1320972.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Subresource DISABLED_Subresource
-#else
 #define MAYBE_Subresource Subresource
-#endif
 IN_PROC_BROWSER_TEST_P(ServiceWorkerFileUploadTest, MAYBE_Subresource) {
   const base::FilePath file_path = CreateTemporaryFile();
 
@@ -476,7 +472,7 @@ IN_PROC_BROWSER_TEST_P(ServiceWorkerFileUploadTest, MAYBE_Subresource) {
 // for https://crbug.com/1017184.
 // Flaky on Android; see https://crbug.com/1335344.
 // Fail on Mac; see https://crbug.com/1320972.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_Subresource_NonAsciiFilename DISABLED_Subresource_NonAsciiFilename
 #else
 #define MAYBE_Subresource_NonAsciiFilename Subresource_NonAsciiFilename

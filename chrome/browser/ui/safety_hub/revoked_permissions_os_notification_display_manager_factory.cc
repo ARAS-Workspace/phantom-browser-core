@@ -7,9 +7,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_os_notification_display_manager.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/safety_hub/notification_wrapper_android.h"
-#endif
 
 // static
 RevokedPermissionsOSNotificationDisplayManager*
@@ -46,11 +43,6 @@ RevokedPermissionsOSNotificationDisplayManagerFactory::
   Profile* profile = Profile::FromBrowserContext(context);
   return std::make_unique<RevokedPermissionsOSNotificationDisplayManager>(
       HostContentSettingsMapFactory::GetForProfile(profile),
-// Notification is only displayed on Android.
-#if BUILDFLAG(IS_ANDROID)
-      std::make_unique<NotificationWrapperAndroid>()
-#else
-      nullptr
-#endif
-  );
+      // Notification is only displayed on Android.
+      nullptr);
 }

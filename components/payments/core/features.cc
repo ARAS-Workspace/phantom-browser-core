@@ -19,13 +19,7 @@ BASE_FEATURE(kWebPaymentsSingleAppUiSkip, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kWebPaymentsJustInTimePaymentApp,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kAppStoreBilling,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kAppStoreBilling, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kAppStoreBillingDebug, base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -40,13 +34,7 @@ BASE_FEATURE(kEnforceFullDelegation, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kGPayAppDynamicUpdate, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSecurePaymentConfirmationUseCredentialStoreAPIs,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
-
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kPaymentRequestUseRendererUrlLoader,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -55,12 +43,7 @@ BASE_FEATURE(kPaymentRequestRejectTooSmallWindows,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kPaymentHandlerDialogUseInitiatorInUrlLoad,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kPaymentHandlerHtmlHeadThemeColor,
              base::FEATURE_ENABLED_BY_DEFAULT);

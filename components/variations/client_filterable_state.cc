@@ -118,8 +118,6 @@ Study::Platform ClientFilterableState::GetCurrentPlatform() {
 
 #if BUILDFLAG(IS_MAC)
   return Study::PLATFORM_MAC;
-#elif BUILDFLAG(IS_ANDROID)
-  return Study::PLATFORM_ANDROID;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD) || BUILDFLAG(IS_SOLARIS)
   // Default BSD and SOLARIS to Linux to not break those builds, although these
   // platforms are not officially supported by Chrome.
@@ -144,19 +142,11 @@ base::Version ClientFilterableState::GetOSVersion() {
 
 std::string ClientFilterableState::GetHardwareClass() {
   // TODO(crbug.com/40708998): Expand to other platforms.
-#if BUILDFLAG(IS_ANDROID)
-  return base::SysInfo::HardwareModelName();
-#else
   return "";
-#endif
 }
 
 std::string ClientFilterableState::GetHardwareManufacturer() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::SysInfo::HardwareManufacturer();
-#else
   return "";
-#endif
 }
 
 }  // namespace variations

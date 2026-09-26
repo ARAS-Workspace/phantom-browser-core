@@ -68,13 +68,8 @@ TEST_F(FeedApiTest, DoNotRefreshIfSnippetsByDseDisabled) {
   CreateStream(/*wait_for_initialization=*/true,
                /*is_new_tab_search_engine_url_android_enabled*/ true);
   stream_->ExecuteRefreshTask();
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(refresh_scheduler_.scheduled_run_time.has_value());
-  EXPECT_TRUE(refresh_scheduler_.completed);
-#else
   WaitForIdleTaskQueue();
   EXPECT_TRUE(refresh_scheduler_.scheduled_run_time.has_value());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(FeedApiTest, BackgroundRefreshForYouSuccess) {
@@ -2489,69 +2484,6 @@ TEST_F(FeedApiTest, ClearAllOnStartupIfFeedIsDisabled) {
                                 UserSettingsOnStart::kFeedNotEnabledByPolicy,
                                 1);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(FeedApiTest, ClearAllOnStartupIfFeedIsDisabledByDse) {
-  CallbackReceiver<> on_clear_all;
-  on_clear_all_ = on_clear_all.BindRepeating();
-
-  // Fetch a feed, so that there's stored data.
-  response_translator_.InjectResponse(MakeTypicalInitialModelState());
-  TestForYouSurface surface(stream_.get());
-  WaitForIdleTaskQueue();
-
-  // Turn off the feed, and re-create FeedStream. It should perform a ClearAll.
-  profile_prefs_.SetBoolean(feed::prefs::kEnableSnippetsByDse, false);
-  CreateStream(/*wait_for_initialization=*/true,
-               /*is_new_tab_search_engine_url_android_enabled*/ true);
-  EXPECT_TRUE(on_clear_all.called());
-
-  // Re-create the feed, and verify ClearAll isn't called again.
-  on_clear_all.Clear();
-  base::HistogramTester histograms;
-  CreateStream(/*wait_for_initialization=*/true,
-               /*is_new_tab_search_engine_url_android_enabled*/ true);
-
-  EXPECT_FALSE(on_clear_all.called());
-}
-
-TEST_F(FeedApiTest,
-       OnUserFeedbackPolicyChanged_MarksStreamStaleAndSendsNetworkCapability) {
-  // Verify initial state is completely fresh.
-  EXPECT_FALSE(
-      IsKnownStale(stream_->GetMetadata(), StreamType(StreamKind::kForYou)));
-
-  // Disabling user feedback triggers a stale content state.
-  profile_prefs_.SetBoolean(kFeedbackAllowedPref, false);
-  EXPECT_TRUE(
-      IsKnownStale(stream_->GetMetadata(), StreamType(StreamKind::kForYou)));
-
-  // Re-enabling user feedback should also mark the stream stale to fetch
-  // compliant cards.
-  profile_prefs_.SetBoolean(kFeedbackAllowedPref, true);
-  EXPECT_TRUE(
-      IsKnownStale(stream_->GetMetadata(), StreamType(StreamKind::kForYou)));
-
-  // Disabling feedback again attaches the correct capability to outgoing
-  // network refreshes.
-  profile_prefs_.SetBoolean(kFeedbackAllowedPref, false);
-
-  // Trigger a manual refresh to force a network fetch.
-  TestForYouSurface surface(stream_.get());
-  WaitForIdleTaskQueue();
-
-  response_translator_.InjectResponse(MakeTypicalInitialModelState());
-  stream_->ManualRefresh(surface.GetSurfaceId(), base::DoNothing());
-  WaitForIdleTaskQueue();
-
-  // Verify the outgoing wire request carries the correct policy restriction
-  // capability.
-  ASSERT_TRUE(network_.query_request_sent);
-  EXPECT_THAT(network_.query_request_sent->feed_request().client_capability(),
-              testing::Contains(
-                  feedwire::Capability::USER_FEEDBACK_DISABLED_BY_POLICY));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(FeedApiTest, ReportUserSettingsFromMetadataWaaOnDpOff) {
   // Fetch a feed, so that there's stored data.

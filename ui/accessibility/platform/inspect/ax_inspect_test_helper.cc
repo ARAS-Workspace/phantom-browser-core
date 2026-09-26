@@ -218,8 +218,6 @@ std::vector<AXApiType::Type> AXInspectTestHelper::TreeTestPasses() {
   return {AXApiType::kBlink};
 #elif BUILDFLAG(IS_MAC)
   return {AXApiType::kBlink, AXApiType::kMac};
-#elif BUILDFLAG(IS_ANDROID)
-  return {AXApiType::kAndroid};
 #else  // fallback
   return {AXApiType::kBlink};
 #endif
@@ -316,10 +314,6 @@ bool AXInspectTestHelper::ValidateAgainstExpectation(
         base::JoinString(actual_lines, "\n") + "\n";
     CHECK(base::WriteFile(expected_file, actual_contents_for_output));
     LOG(INFO) << "Wrote expectations to: " << expected_file.LossyDisplayName();
-#if BUILDFLAG(IS_ANDROID)
-    LOG(INFO) << "Generated expectations written to file on test device.";
-    LOG(INFO) << "To fetch, run: adb pull " << expected_file.LossyDisplayName();
-#endif
   }
 
   return !is_different;

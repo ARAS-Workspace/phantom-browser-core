@@ -78,10 +78,7 @@ class ReduceUserAgentPlatformBrowserTest : public InProcessBrowserTest {
 };
 
 IN_PROC_BROWSER_TEST_F(ReduceUserAgentPlatformBrowserTest, NavigatorPlatform) {
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ("Linux armv81",
-            content::EvalJs(web_contents(), "navigator.platform"));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ("MacIntel", content::EvalJs(web_contents(), "navigator.platform"));
 #else
   EXPECT_EQ("Linux x86_64",

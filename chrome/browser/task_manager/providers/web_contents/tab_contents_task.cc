@@ -8,11 +8,9 @@
 #include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/web_contents.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "extensions/browser/extension_registry.h"  // nogncheck
 #include "extensions/browser/process_map.h"         // nogncheck
 #include "extensions/common/constants.h"            // nogncheck
-#endif                                              // !BUILDFLAG(IS_ANDROID)
 
 namespace task_manager {
 
@@ -20,12 +18,8 @@ namespace {
 
 bool HostsExtension(content::WebContents* web_contents) {
   DCHECK(web_contents);
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else   // BUILDFLAG(IS_ANDROID)
   return web_contents->GetLastCommittedURL().SchemeIs(
       extensions::kExtensionScheme);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace
@@ -58,9 +52,6 @@ std::u16string TabContentsTask::GetCurrentTitle() const {
   Profile* profile =
       Profile::FromBrowserContext(web_contents()->GetBrowserContext());
 
-#if BUILDFLAG(IS_ANDROID)
-  bool is_app = false;
-#else   // BUILDFLAG(IS_ANDROID)
   extensions::ProcessMap* process_map = extensions::ProcessMap::Get(profile);
   extensions::ExtensionRegistry* extension_registry =
       extensions::ExtensionRegistry::Get(profile);
@@ -68,7 +59,6 @@ std::u16string TabContentsTask::GetCurrentTitle() const {
 
   bool is_app = process_map->Contains(GetChildProcessUniqueID()) &&
       extension_registry->enabled_extensions().GetAppByURL(url) != nullptr;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   bool is_extension = HostsExtension(web_contents());
   bool is_incognito = profile->IsOffTheRecord();

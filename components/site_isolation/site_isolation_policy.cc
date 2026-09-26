@@ -39,53 +39,6 @@ struct IsolationDisableDecisions {
 
 bool ShouldDisableSiteIsolationDueToMemorySlow(
     content::SiteIsolationMode site_isolation_mode) {
-#if BUILDFLAG(IS_ANDROID)
-  if (!base::FeatureList::IsEnabled(
-          features::kSiteIsolationEnableMemoryThresholdAndroid)) {
-    // If kSiteIsolationEnableMemoryThresholdAndroid is disabled, site isolation
-    // should be enabled regardless of memory constraints.
-    return false;
-  }
-  // The memory threshold behavior differs for desktop and Android:
-  // - Android uses a 1900MB default threshold for partial site isolation modes
-  //   and a 3200MB default threshold for strict site isolation. See docs in
-  //   https://crbug.com/849815. The thresholds roughly correspond to 2GB+ and
-  //   4GB+ devices and are lower to account for memory carveouts, which
-  //   reduce the amount of memory seen by AmountOfPhysicalMemoryMB(). Both
-  //   partial and strict site isolation thresholds can be overridden via
-  //   params defined in a kSiteIsolationMemoryThresholds field trial.
-  // - Desktop does not enforce a default memory threshold.
-  uint64_t default_memory_threshold_mb;
-  if (site_isolation_mode == content::SiteIsolationMode::kStrictSiteIsolation) {
-    default_memory_threshold_mb = 3200;
-  } else {
-    default_memory_threshold_mb = 1900;
-  }
-
-  if (base::FeatureList::IsEnabled(
-          features::kSiteIsolationMemoryThresholdsAndroid)) {
-    std::string param_name;
-    switch (site_isolation_mode) {
-      case content::SiteIsolationMode::kStrictSiteIsolation:
-        param_name = features::kStrictSiteIsolationMemoryThresholdParamName;
-        break;
-      case content::SiteIsolationMode::kPartialSiteIsolation:
-        param_name = features::kPartialSiteIsolationMemoryThresholdParamName;
-        break;
-    }
-    int memory_threshold_mb = base::GetFieldTrialParamByFeatureAsInt(
-        features::kSiteIsolationMemoryThresholdsAndroid, param_name,
-        default_memory_threshold_mb);
-    return base::SysInfo::AmountOfTotalPhysicalMemory() <=
-           base::MiBU(base::saturated_cast<uint64_t>(memory_threshold_mb));
-  }
-
-  if (base::SysInfo::AmountOfTotalPhysicalMemory() <=
-      base::MiBU(default_memory_threshold_mb)) {
-    return true;
-  }
-#endif
-
   return false;
 }
 
@@ -108,12 +61,6 @@ bool CachedDisableSiteIsolation(
 }
 
 bool ShouldDisableOriginIsolationDueToMemorySlow() {
-#if BUILDFLAG(IS_ANDROID)
-  // We won't enable OI on Android by default, but users should be able to turn
-  // it on themselves if they wish. No need for us to enforce memory
-  // restrictions in that case.
-  return false;
-#else
   // This value matches the threshold in the origin isolation study.
   int default_memory_threshold_mb = 4096;
   if (base::FeatureList::IsEnabled(features::kOriginIsolationMemoryThreshold)) {
@@ -125,7 +72,6 @@ bool ShouldDisableOriginIsolationDueToMemorySlow() {
            base::MiBU(base::saturated_cast<uint64_t>(memory_threshold_mb));
   }
   return false;
-#endif
 }
 
 bool CachedDisableOriginIsolation() {
@@ -218,17 +164,7 @@ bool SiteIsolationPolicy::IsOriginIsolationForJsOptExceptionsSupported() {
 
 // static
 bool SiteIsolationPolicy::IsEnterprisePolicyApplicable() {
-#if BUILDFLAG(IS_ANDROID)
-  // https://crbug.com/844118: Limiting policy to devices with > 1GB RAM.
-  // Using 1077 rather than 1024 because it helps ensure that devices with
-  // exactly 1GB of RAM won't get included because of inaccuracies or off-by-one
-  // errors.
-  bool have_enough_memory =
-      base::SysInfo::AmountOfTotalPhysicalMemory().InMiB() > 1077u;
-  return have_enough_memory;
-#else
   return true;
-#endif
 }
 
 // static
@@ -436,23 +372,8 @@ void SiteIsolationPolicy::IsolateNewOAuthURL(
 
 // static
 bool SiteIsolationPolicy::ShouldPdfCompositorBeEnabledForOopifs() {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40657857): Always enable on Android, at which point, this
-  // method should go away.
-  //
-  // Only use the PDF compositor when one of the site isolation modes that
-  // forces OOPIFs is on. This includes:
-  // - Full site isolation, which may be forced on.
-  // - Password-triggered site isolation for high-memory devices
-  // - Isolated origins specified via command line, enterprise policy, or field
-  //   trials.
-  return content::SiteIsolationPolicy::UseDedicatedProcessesForAllSites() ||
-         IsIsolationForPasswordSitesEnabled() ||
-         content::SiteIsolationPolicy::AreIsolatedOriginsEnabled();
-#else
   // Always use the PDF compositor on non-mobile platforms.
   return true;
-#endif
 }
 
 // static

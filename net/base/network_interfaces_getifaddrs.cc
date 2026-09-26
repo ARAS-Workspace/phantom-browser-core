@@ -32,17 +32,6 @@
 #include <sys/ioctl.h>
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "net/base/network_interfaces_getifaddrs_android.h"
-// Declare getifaddrs() and freeifaddrs() weakly as they're only available
-// on Android N+.
-extern "C" {
-int getifaddrs(struct ifaddrs** __list_ptr) __attribute__((weak_import));
-void freeifaddrs(struct ifaddrs* __ptr) __attribute__((weak_import));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace net {
 namespace internal {
 
@@ -230,18 +219,8 @@ bool IfaddrsToNetworkInterfaceList(int policy,
 
 // This version of GetNetworkList() can only be called on Android N+, so give it
 // a different and internal name so it isn't invoked mistakenly.
-#if BUILDFLAG(IS_ANDROID)
-namespace internal {
-bool GetNetworkListUsingGetifaddrs(NetworkInterfaceList* networks,
-                                   int policy,
-                                   bool use_alternative_getifaddrs) {
-  DCHECK_GE(base::android::android_info::sdk_int(), GETIFADDRS_MIN_API);
-  DCHECK(getifaddrs);
-  DCHECK(freeifaddrs);
-#else
 bool GetNetworkList(NetworkInterfaceList* networks, int policy) {
   constexpr bool use_alternative_getifaddrs = false;
-#endif
   if (networks == nullptr)
     return false;
 
@@ -252,13 +231,7 @@ bool GetNetworkList(NetworkInterfaceList* networks, int policy) {
   ifaddrs* interfaces;
   int getifaddrs_result;
   if (use_alternative_getifaddrs) {
-#if BUILDFLAG(IS_ANDROID)
-    // Chromium ships its own implementation of getifaddrs()
-    // under the name Getifaddrs.
-    getifaddrs_result = Getifaddrs(&interfaces);
-#else
     NOTREACHED();
-#endif
   } else {
     getifaddrs_result = getifaddrs(&interfaces);
   }
@@ -277,25 +250,16 @@ bool GetNetworkList(NetworkInterfaceList* networks, int policy) {
       policy, interfaces, ip_attributes_getter.get(), networks);
 
   if (use_alternative_getifaddrs) {
-#if BUILDFLAG(IS_ANDROID)
-    Freeifaddrs(interfaces);
-#else
     NOTREACHED();
-#endif
   } else {
     freeifaddrs(interfaces);
   }
   return result;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-}  // namespace internal
-// For Android use GetWifiSSID() impl in network_interfaces_linux.cc.
-#else
 std::string GetWifiSSID() {
   NOTIMPLEMENTED();
   return std::string();
 }
-#endif
 
 }  // namespace net

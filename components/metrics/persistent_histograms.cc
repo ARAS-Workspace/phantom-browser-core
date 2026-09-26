@@ -20,34 +20,19 @@
 #include "build/build_config.h"
 #include "components/metrics/persistent_system_profile.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/metrics/android_unconditional_persistent_histograms_field_trial.h"
-#endif
-
 namespace {
 // Creating a "spare" file for persistent metrics involves a lot of I/O and
 // isn't important so delay the operation for a while after startup.
-#if BUILDFLAG(IS_ANDROID)
-// Android launches faster but has shorter average session durations. Shorter
-// delay ensures the spare file is created before mobile sessions terminate.
-constexpr int kSpareFileCreateDelaySeconds = 10;
-#else
 // Desktop may have to restore a lot of tabs so give it more time before doing
 // non-essential work.
 constexpr int kSpareFileCreateDelaySeconds = 90;
-#endif
 
 // Evaluates whether a pre-allocated spare file is required to initialize
 // persistent histograms. On Android, the requirement is eliminated if the
 // client-side field trial is enabled. On Desktop platforms, early
 // initialization is unconditional, so no spare file is required.
 bool IsSpareFileRequired() {
-#if BUILDFLAG(IS_ANDROID)
-  return !metrics::android_unconditional_persistent_histograms_field_trial::
-      IsEnabled();
-#else
   return false;
-#endif
 }
 
 // Create persistent/shared memory and allow histograms to be stored in

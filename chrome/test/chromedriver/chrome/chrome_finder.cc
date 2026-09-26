@@ -40,10 +40,6 @@ void GetApplicationDirs(std::vector<base::FilePath>* locations) {
   locations->emplace_back("/opt/google/chrome");
   locations->emplace_back("/opt/chromium.org/chromium");
 }
-#elif BUILDFLAG(IS_ANDROID)
-void GetApplicationDirs(std::vector<base::FilePath>* locations) {
-  // On Android we won't be able to find Chrome executable
-}
 #endif
 
 void GetPathsFromEnvironment(std::vector<base::FilePath>* paths) {

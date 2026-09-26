@@ -35,11 +35,7 @@ namespace optimization_guide::features {
 namespace {
 
 constexpr auto enabled_by_default_mobile_only =
-#if BUILDFLAG(IS_ANDROID)
-    base::FEATURE_ENABLED_BY_DEFAULT;
-#else
     base::FEATURE_DISABLED_BY_DEFAULT;
-#endif
 
 }  // namespace
 
@@ -88,7 +84,7 @@ BASE_FEATURE(kOptimizationGuideModelExecution,
 
 // Whether to use the on device model service in optimization guide.
 BASE_FEATURE(kOptimizationGuideOnDeviceModel,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT);
 #else
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -349,13 +345,7 @@ bool ShouldMetadataValidationFetchHostKeyed() {
 
 bool ShouldDeferStartupActiveTabsHintsFetch() {
   return GetFieldTrialParamByFeatureAsBool(
-      kOptimizationHints, "defer_startup_active_tabs_hints_fetch",
-#if BUILDFLAG(IS_ANDROID)
-      true
-#else
-      false
-#endif
-  );
+      kOptimizationHints, "defer_startup_active_tabs_hints_fetch", false);
 }
 
 std::optional<int> OverrideNumThreadsForOptTarget(

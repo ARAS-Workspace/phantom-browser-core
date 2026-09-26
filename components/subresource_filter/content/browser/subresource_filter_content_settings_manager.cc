@@ -34,11 +34,7 @@ const char kNonRenewingExpiryTime[] = "NonRenewingExpiryTime";
 const char kNonRenewingLifetimeKey[] = "NonRenewingLifetime";
 
 bool ShouldUseSmartUI() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif
 }
 
 }  // namespace

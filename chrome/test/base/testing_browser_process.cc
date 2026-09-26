@@ -84,22 +84,16 @@
 #include "chrome/browser/printing/print_preview_dialog_controller.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/hid/hid_status_icon.h"
 #include "chrome/browser/usb/usb_status_icon.h"
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_init.h"
 #include "components/component_updater/component_updater_service.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
 #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_CHROME_NOTIFICATIONS)
 #include "chrome/browser/notifications/notification_ui_manager.h"
 #endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -152,13 +146,8 @@ void TestingBrowserProcess::TearDownAndDeleteInstance() {
 
 TestingBrowserProcess::TestingBrowserProcess()
     : testing_local_state_(std::make_unique<TestingPrefServiceSimple>()),
-#if BUILDFLAG(IS_ANDROID)
-      device_parental_controls_(
-          std::make_unique<supervised_user::AndroidParentalControls>()),
-#else
       device_parental_controls_(
           std::make_unique<supervised_user::DeviceParentalControlsNoOpImpl>()),
-#endif
       platform_part_(std::make_unique<TestingBrowserProcessPlatformPart>()),
       os_crypt_async_(os_crypt_async::GetTestOSCryptAsyncForTesting()) {
   RegisterLocalState(testing_local_state_->registry());
@@ -299,13 +288,11 @@ void TestingBrowserProcess::Init() {
   // Make sure permissions client has been set.
   ChromePermissionsClient::GetInstance();
 
-#if !BUILDFLAG(IS_ANDROID)
   web_app::InitializeIsolatedWebAppRuntime(
       base::PassKey<TestingBrowserProcess>());
   KeepAliveRegistry::GetInstance()->SetIsShuttingDown(false);
   hid_system_tray_icon_ = std::make_unique<HidStatusIcon>();
   usb_system_tray_icon_ = std::make_unique<UsbStatusIcon>();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void TestingBrowserProcess::EndSession() {}
@@ -485,11 +472,9 @@ TestingBrowserProcess::notification_platform_bridge() {
   return notification_platform_bridge_.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IntranetRedirectDetector* TestingBrowserProcess::intranet_redirect_detector() {
   return nullptr;
 }
-#endif
 
 void TestingBrowserProcess::CreateDevToolsProtocolHandler() {}
 
@@ -539,13 +524,6 @@ TestingBrowserProcess::background_printing_manager() {
 #endif
 }
 
-#if BUILDFLAG(IS_ANDROID)
-supervised_user::AndroidParentalControls&
-TestingBrowserProcess::android_parental_controls() {
-  return *device_parental_controls_;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 supervised_user::DeviceParentalControls&
 TestingBrowserProcess::device_parental_controls() {
   return *device_parental_controls_;
@@ -585,11 +563,7 @@ TestingBrowserProcess::activity_reporter() {
 
 component_updater::ComponentUpdateService*
 TestingBrowserProcess::component_updater() {
-#if !BUILDFLAG(IS_ANDROID)
   return component_updater_.get();
-#else
-  return nullptr;
-#endif
 }
 
 network_time::NetworkTimeTracker*
@@ -622,7 +596,6 @@ SerialPolicyAllowedPorts* TestingBrowserProcess::serial_policy_allowed_ports() {
   return serial_policy_allowed_ports_.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 HidSystemTrayIcon* TestingBrowserProcess::hid_system_tray_icon() {
   return hid_system_tray_icon_.get();
 }
@@ -640,7 +613,6 @@ void TestingBrowserProcess::set_usb_system_tray_icon_for_test(
     std::unique_ptr<UsbSystemTrayIcon> icon) {
   usb_system_tray_icon_ = std::move(icon);
 }
-#endif
 
 os_crypt_async::OSCryptAsync* TestingBrowserProcess::os_crypt_async() {
   return os_crypt_async_.get();
@@ -654,11 +626,7 @@ void TestingBrowserProcess::set_additional_os_crypt_async_provider_for_test(
 }
 
 BuildState* TestingBrowserProcess::GetBuildState() {
-#if !BUILDFLAG(IS_ANDROID)
   return &build_state_;
-#else
-  return nullptr;
-#endif
 }
 
 GlobalFeatures* TestingBrowserProcess::GetFeatures() {
@@ -730,7 +698,6 @@ void TestingBrowserProcess::MaybeStartTearDown() {
 
 void TestingBrowserProcess::ShutdownBrowserPolicyConnector() {
   if (browser_policy_connector_) {
-#if !BUILDFLAG(IS_ANDROID)
     // Initial cleanup for ChromeBrowserCloudManagement, shutdown components
     // that depend on profile and notification system. For example,
     // ProfileManager observer and KeyServices observer need to be removed
@@ -740,7 +707,6 @@ void TestingBrowserProcess::ShutdownBrowserPolicyConnector() {
     if (cloud_management_controller) {
       cloud_management_controller->ShutDown();
     }
-#endif
     browser_policy_connector_->Shutdown();
   }
 }
@@ -776,13 +742,11 @@ void TestingBrowserProcess::SetStatusTray(
   status_tray_ = std::move(status_tray);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void TestingBrowserProcess::SetComponentUpdater(
     std::unique_ptr<component_updater::ComponentUpdateService>
         component_updater) {
   component_updater_ = std::move(component_updater);
 }
-#endif
 
 TestingPrefServiceSimple* TestingBrowserProcess::GetTestingLocalState() {
   return testing_local_state_.get();

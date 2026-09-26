@@ -29,10 +29,8 @@ using ::testing::AssertionSuccess;
 using ::testing::ElementsAre;
 using ::testing::UnorderedElementsAreArray;
 
-#if !BUILDFLAG(IS_ANDROID)
 constexpr char kTestWebFacetURIAlpha1[] = "https://one.alpha.example.com";
 constexpr char kTestWebFacetURIAlpha2[] = "https://two.alpha.example.com";
-#endif
 constexpr char kTestAndroidFacetURIAlpha3[] =
     "android://hash@com.example.alpha.android";
 constexpr char kTestWebRealmAlpha1[] = "https://one.alpha.example.com/";
@@ -155,13 +153,9 @@ TEST_F(PasswordAffiliationSourceAdapterTest, GetFacetsReturnsNoCredentials) {
 TEST_F(PasswordAffiliationSourceAdapterTest, GetFacetsForWebOnlyCredentials) {
   AddLoginAndWait(GetTestCredential(kTestWebRealmAlpha1));
   AddLoginAndWait(GetTestCredential(kTestWebRealmAlpha2));
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(ExpectAdapterToReturnFacets(
       {FacetURI::FromCanonicalSpec(kTestWebFacetURIAlpha1),
        FacetURI::FromCanonicalSpec(kTestWebFacetURIAlpha2)}));
-#else
-  EXPECT_TRUE(ExpectAdapterToReturnFacets({}));
-#endif
 }
 
 // Verifies that facets for Android application credentials are available
@@ -193,10 +187,8 @@ TEST_F(PasswordAffiliationSourceAdapterTest,
   AddLoginAndWait(GetTestCredential(kTestAndroidRealmGamma));
 
   std::vector<FacetURI> expected_facets = {
-#if !BUILDFLAG(IS_ANDROID)
       FacetURI::FromCanonicalSpec(kTestWebFacetURIAlpha1),
       FacetURI::FromCanonicalSpec(kTestWebFacetURIAlpha2),
-#endif
       FacetURI::FromCanonicalSpec(kTestAndroidFacetURIAlpha3),
       FacetURI::FromCanonicalSpec(kTestAndroidFacetURIBeta2),
       FacetURI::FromCanonicalSpec(kTestAndroidFacetURIGamma),

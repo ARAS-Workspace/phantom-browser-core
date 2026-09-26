@@ -41,12 +41,10 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/color/color_id.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "components/url_formatter/elide_url.h"
 #include "ui/gfx/text_elider.h"
 #include "ui/views/vector_icons.h"
-#endif
 
 using download::DownloadItem;
 using offline_items_collection::FailState;
@@ -230,7 +228,6 @@ std::u16string DownloadUIModel::GetStatusText() const {
   return status_text_builder_->GetStatusText(GetState());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::u16string DownloadUIModel::GetStatusTextForLabel(
     const gfx::FontList& font_list,
     float available_pixel_width) const {
@@ -247,7 +244,6 @@ std::u16string DownloadUIModel::GetStatusTextForLabel(
   }
   return GetStatusText();
 }
-#endif
 
 std::u16string DownloadUIModel::StatusTextBuilderBase::GetStatusText(
     download::DownloadItem::DownloadState state) const {
@@ -593,7 +589,6 @@ bool DownloadUIModel::ShouldPromoteOrigin() const {
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool DownloadUIModel::IsCommandEnabled(
     const DownloadCommands* download_commands,
     DownloadCommands::Command command) const {
@@ -739,7 +734,6 @@ void DownloadUIModel::SetShouldShowInUi(bool should_show) {}
 bool DownloadUIModel::ShouldShowInBubble() const {
   return ShouldShowInUi();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool DownloadUIModel::IsEphemeralWarning() const {
   return false;
@@ -907,11 +901,6 @@ DownloadUIModel::BubbleStatusTextBuilder::GetBubbleWarningStatusText() const {
           l10n_util::GetStringUTF16(
               IDS_DOWNLOAD_BUBBLE_STATUS_PASSWORD_NEEDED));
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-#if BUILDFLAG(IS_ANDROID)
-      // "Scanning..."
-      return l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_STATUS_ASYNC_SCANNING);
-#else
       // Either "Checking with your organization's security policies..." or
       // "Scanning..."
       if (download::DoesDownloadConnectorBlock(
@@ -922,7 +911,6 @@ DownloadUIModel::BubbleStatusTextBuilder::GetBubbleWarningStatusText() const {
         return l10n_util::GetStringUTF16(
             IDS_DOWNLOAD_BUBBLE_STATUS_ASYNC_SCANNING);
       }
-#endif
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
       // "Checking for malware..."
       return l10n_util::GetStringUTF16(

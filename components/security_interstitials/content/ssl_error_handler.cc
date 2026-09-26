@@ -51,11 +51,6 @@
 #include "components/captive_portal/content/captive_portal_tab_helper.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "components/security_interstitials/content/captive_portal_helper_android.h"
-#endif
-
 BASE_FEATURE(kMITMSoftwareInterstitial, base::FEATURE_ENABLED_BY_DEFAULT);
 
 namespace {
@@ -429,11 +424,7 @@ void SSLErrorHandlerDelegateImpl::CheckForCaptivePortal() {
 }
 
 bool SSLErrorHandlerDelegateImpl::DoesOSReportCaptivePortal() {
-#if BUILDFLAG(IS_ANDROID)
-  return security_interstitials::IsBehindCaptivePortal();
-#else
   return false;
-#endif
 }
 
 bool SSLErrorHandlerDelegateImpl::GetSuggestedUrl(
@@ -511,12 +502,7 @@ void SSLErrorHandlerDelegateImpl::ShowLocalSelfSignedInterstitial() {
 
 void SSLErrorHandlerDelegateImpl::ReportNetworkConnectivity(
     base::OnceClosure callback) {
-#if BUILDFLAG(IS_ANDROID)
-  security_interstitials::ReportNetworkConnectivity(
-      base::android::AttachCurrentThread());
-#else
-// Nothing to do on other platforms.
-#endif
+  // Nothing to do on other platforms.
   if (callback)
     std::move(callback).Run();
 }
@@ -808,17 +794,6 @@ void SSLErrorHandler::StartHandlingError() {
   }
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the OS may not detect a captive portal due to portal
-  // misconfiguration. In that situation we should not also run Chromium's
-  // captive portal detection — it can fail because of VPNs or private DNS.
-  // Prefer the OS-level detection so the portal operator can fix the portal and
-  // allow the OS to handle the login flow.
-  if (!does_os_report_captive_portal) {
-    ShowSSLInterstitial();
-    return;
-  }
-#endif
   subscription_ = captive_portal_service_->RegisterCallback(
       base::BindRepeating(&SSLErrorHandler::Observe, base::Unretained(this)));
 

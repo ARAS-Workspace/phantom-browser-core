@@ -221,13 +221,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/child_process_binding_types.h"
-#include "content/browser/font_unique_name_lookup/font_unique_name_lookup_service.h"
-#include "media/audio/android/audio_manager_android.h"
-#include "third_party/blink/public/mojom/android_font_lookup/android_font_lookup.mojom.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include <sys/resource.h>
 
@@ -247,19 +240,17 @@
 #include "content/browser/child_process_task_port_provider_mac.h"
 #endif
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 #include "services/tracing/public/cpp/system_tracing_service.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "services/resource_coordinator/public/cpp/memory_instrumentation/os_metrics.h"
-#endif
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 #include "content/browser/v8_snapshot_files.h"
 #endif
 
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 #include "content/browser/media/key_system_support_impl.h"
 #endif
 
@@ -1156,7 +1147,6 @@ RenderProcessHostImpl::DomStorageBinder& GetDomStorageBinder() {
   return *binder;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 static constexpr size_t kUnknownPlatformProcessLimit = 0;
 
 // Returns the process limit from the system. Use |kUnknownPlatformProcessLimit|
@@ -1176,7 +1166,6 @@ size_t GetPlatformProcessLimit() {
   return kUnknownPlatformProcessLimit;
 #endif  // BUILDFLAG(IS_LINUX)
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 RenderProcessHostImpl::BadMojoMessageCallbackForTesting&
 GetBadMojoMessageCallbackForTesting() {
@@ -1243,11 +1232,9 @@ void InvokeVideoDecoderEventCB(RenderProcessHostImpl::VideoDecoderEvent event) {
 }
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Enables kUserVisible process priority. Otherwise when feature is disabled,
 // Priority::kUserVisible has same behavior as Priority::kUserBlocking.
 BASE_FEATURE(kUserVisibleProcessPriority, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 // Please keep in sync with "RenderProcessHostBlockedURLReason" in
 // tools/metrics/histograms/metadata/browser/enums.xml. These values are
@@ -1443,7 +1430,6 @@ RenderProcessHostImpl::GetInProcessRendererThreadTaskRunnerForTesting() {
   return g_in_process_thread->task_runner();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // static
 size_t RenderProcessHostImpl::GetPlatformMaxRendererProcessCount() {
   // Set the limit to half of the system limit to leave room for other programs.
@@ -1461,7 +1447,6 @@ size_t RenderProcessHostImpl::GetPlatformMaxRendererProcessCount() {
 bool RenderProcessHostImpl::IsPlatformProcessLimitUnknownForTesting() {
   return GetPlatformProcessLimit() == kUnknownPlatformProcessLimit;
 }
-#endif
 
 // static
 size_t RenderProcessHost::GetMaxRendererProcessCount() {
@@ -1472,19 +1457,6 @@ size_t RenderProcessHost::GetMaxRendererProcessCount() {
       GetContentClient()->browser()->GetMaxRendererProcessCountOverride();
   if (client_override)
     return client_override;
-
-#if BUILDFLAG(IS_ANDROID)
-  // On Android we don't maintain a limit of renderer process hosts - we are
-  // happy with keeping a lot of these, as long as the number of live renderer
-  // processes remains reasonable, and on Android the OS takes care of that.
-  // This has shown to have adversarial effects, so we fall back to desktop
-  // behavior for desktop-like form factors.
-  if (base::FeatureList::IsEnabled(features::kRendererProcessLimitOnAndroid)) {
-    return features::kRendererProcessLimitOnAndroidCount.Get();
-  } else {
-    return std::numeric_limits<size_t>::max();
-  }
-#else
 
   // On other platforms, calculate the maximum number of renderer process hosts
   // according to the amount of installed memory as reported by the OS, along
@@ -1529,7 +1501,6 @@ size_t RenderProcessHost::GetMaxRendererProcessCount() {
     MAYBEVLOG(1) << __func__ << ": Calculated max " << max_count;
   }
   return max_count;
-#endif
 }
 
 // static
@@ -1610,7 +1581,6 @@ RenderProcessHost* RenderProcessHostImpl::CreateRenderProcessHost(
     flags |= RenderProcessFlags::kDisallowV8FeatureFlagOverrides;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (site_instance) {
     const GURL& site_url =
         site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL();
@@ -1618,7 +1588,6 @@ RenderProcessHost* RenderProcessHostImpl::CreateRenderProcessHost(
       flags |= RenderProcessFlags::kForTopChromeWebUI;
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   return new RenderProcessHostImpl(browser_context, storage_partition_impl,
                                    flags, is_spare_renderer,
@@ -1662,29 +1631,15 @@ RenderProcessHostImpl::RenderProcessHostImpl(
                 true /* boost_for_pending_views */,
                 false /*boost_for_loading*/,
                 false /* boost_for_discard */,
-#if BUILDFLAG(IS_ANDROID)
-                is_spare_renderer,
-                ChildProcessImportance::NORMAL
-#else
-                std::nullopt
-#endif
-                ),
+                std::nullopt),
       id_(ChildProcessHostImpl::GenerateChildProcessUniqueId()),
       browser_context_(browser_context),
       storage_partition_impl_(storage_partition_impl),
       flags_(flags),
-#if BUILDFLAG(IS_ANDROID)
-      spare_renderer_priority_status_(
-          is_spare_renderer ? SpareRendererPriorityStatus::kSpare
-                            : SpareRendererPriorityStatus::kNormal),
-      next_launch_for_initial_outermost_main_frame_(
-          is_for_outermost_main_frame),
-#endif
       tracing_track_(
           perfetto::NamedTrack::FromPointer("RenderProcessHostImpl",
                                             this,
                                             GetChildProcessTracingTrack(id_))) {
-
   CHECK(!browser_context->ShutdownStarted());
   TRACE_EVENT("shutdown", "RenderProcessHostImpl",
               ChromeTrackEvent::kRenderProcessHost, *this);
@@ -1825,7 +1780,6 @@ bool RenderProcessHostImpl::Init() {
   if (IsInitializedAndNotDead())
     return true;
 
-#if !BUILDFLAG(IS_ANDROID)
   bool is_initial_web_ui = false;
   // If `use_separate_process` is true, the initial WebUI has its own process
   // lock URL (e.g. chrome://webui-toolbar.top-chrome/), which can be uniquely
@@ -1858,7 +1812,6 @@ bool RenderProcessHostImpl::Init() {
         "InitialWebUI.Toolbar.ProcessAlreadyExistsForTheSameProfileOnCreation",
         existing_found);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::CommandLine::StringType renderer_prefix;
   // A command prefix is something prepended to the command line of the spawned
@@ -1867,15 +1820,6 @@ bool RenderProcessHostImpl::Init() {
       *base::CommandLine::ForCurrentProcess();
   renderer_prefix =
       browser_command_line.GetSwitchValueNative(switches::kRendererCmdPrefix);
-
-#if BUILDFLAG(IS_ANDROID)
-  // If the spare renderer gets killed when graduating the priority to normal,
-  // we will set the priority to normal during re-initialization.
-  if (spare_renderer_priority_status_ ==
-      SpareRendererPriorityStatus::kGraduating) {
-    spare_renderer_priority_status_ = SpareRendererPriorityStatus::kNormal;
-  }
-#endif
 
 #if BUILDFLAG(IS_LINUX)
   int flags = renderer_prefix.empty() ? ChildProcessHost::CHILD_ALLOW_SELF
@@ -1946,13 +1890,6 @@ bool RenderProcessHostImpl::Init() {
   GetContentClient()->browser()->RenderProcessWillLaunch(this);
 
   FieldTrialSynchronizer::UpdateRendererVariationsHeader(this);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Initialize the java audio manager so that media session tests will pass.
-  // See internal b/29872494.
-  static_cast<media::AudioManagerAndroid*>(media::AudioManager::Get())
-      ->InitializeIfNeeded();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   CreateMessageFilters();
   RegisterMojoInterfaces();
@@ -2854,9 +2791,6 @@ void RenderProcessHostImpl::OnMemoryPressure(
   // Match the existing behavior of only sending the memory pressure level on
   // select platforms.
   // TODO(pmonette): Enable for all platforms.
-#if BUILDFLAG(IS_ANDROID)
-  child_process_->OnMemoryPressure(memory_pressure_level);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void RenderProcessHostImpl::CreateRendererHost(
@@ -3240,40 +3174,6 @@ bool RenderProcessHostImpl::GetIntersectsViewport() {
   return intersects_viewport_;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RenderProcessHostImpl::GraduateSpareToNormalRendererPriority() {
-  if (spare_renderer_priority_status_ == SpareRendererPriorityStatus::kSpare) {
-    spare_renderer_priority_status_ = SpareRendererPriorityStatus::kGraduating;
-    UpdateProcessPriority();
-  }
-}
-
-bool RenderProcessHostImpl::
-    ShouldThrottleNavigationForSpareRendererGraduation() {
-  return !is_dead_ && spare_renderer_priority_status_ !=
-                          SpareRendererPriorityStatus::kNormal;
-}
-
-ChildProcessImportance RenderProcessHostImpl::GetEffectiveImportance() {
-  return effective_importance_;
-}
-
-base::android::ChildBindingState
-RenderProcessHostImpl::GetEffectiveChildBindingState() {
-  if (child_process_launcher_) {
-    return child_process_launcher_->GetEffectiveChildBindingState();
-  }
-
-  // If there is no ChildProcessLauncher this is the best default.
-  return base::android::ChildBindingState::UNBOUND;
-}
-
-void RenderProcessHostImpl::DumpProcessStack() {
-  if (child_process_launcher_)
-    child_process_launcher_->DumpProcessStack();
-}
-#endif
-
 void RenderProcessHostImpl::OnMediaStreamAdded() {
   CHECK_NE(media_stream_count_, std::numeric_limits<int>::max());
   ++media_stream_count_;
@@ -3617,13 +3517,8 @@ bool RenderProcessHostImpl::ShouldPauseChannelUntilProcessLaunched() {
   if (base::FeatureList::IsEnabled(
           features::kSkipIPCChannelPausingForNonGuests)) {
     if (features::kSkipIPCChannelPausingForNonGuestsInternalWebUiOnly.Get()) {
-#if !BUILDFLAG(IS_ANDROID)
       // Skip pausing if we're on initial WebUI, so return false in that case.
       return !IsForTopChromeWebUI();
-#else
-      // We're definitely not on initial WebUI, so return true to pause.
-      return true;
-#endif
     }
     // Skip pausing in all cases.
     return false;
@@ -3909,10 +3804,6 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
       switches::kEnableLowEndDeviceMode,
       switches::kDisableLowEndDeviceMode,
       switches::kDisallowNonExactResourceReuse,
-#if BUILDFLAG(IS_ANDROID)
-      switches::kDisableMediaSessionAPI,
-      switches::kRendererWaitForJavaDebugger,
-#endif
 #if BUILDFLAG(IS_OZONE)
       switches::kOzonePlatform,
 #endif
@@ -3938,18 +3829,12 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
         renderer_cmd);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (browser_cmd.HasSwitch(switches::kDisableGpuCompositing)) {
-    renderer_cmd->AppendSwitch(switches::kDisableGpuCompositing);
-  }
-#else
   // If gpu compositing is not being used, tell the renderer at startup. This
   // is inherently racey, as it may change while the renderer is being
   // launched, but the renderer will hear about the correct state eventually.
   // This optimizes the common case to avoid wasted work.
   if (GpuDataManagerImpl::GetInstance()->IsGpuCompositingDisabled())
     renderer_cmd->AppendSwitch(switches::kDisableGpuCompositing);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Add kWaitForDebugger to let renderer process wait for a debugger.
   if (browser_cmd.HasSwitch(switches::kWaitForDebuggerChildren)) {
@@ -4529,19 +4414,6 @@ void RenderProcessHostImpl::Cleanup() {
   storage_partition_impl_ = nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RenderProcessHostImpl::PopulateTerminationInfoRendererFields(
-    ChildProcessTerminationInfo* info) {
-  info->renderer_has_visible_clients = VisibleClientCount() > 0;
-  info->renderer_was_subframe = GetFrameDepth() > 0;
-  info->has_spare_renderer =
-      SpareRenderProcessHostManagerImpl::Get().HasSpareRenderer();
-  info->last_spare_renderer_creation_info =
-      SpareRenderProcessHostManagerImpl::Get()
-          .GetLastSpareRendererCreationInfo();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void RenderProcessHostImpl::AddPendingView() {
   const bool had_pending_views = pending_views_++;
   if (!had_pending_views)
@@ -4572,13 +4444,7 @@ void RenderProcessHostImpl::RemovePriorityClient(
 void RenderProcessHostImpl::SetPriorityOverride(
     base::Process::Priority priority) {
   priority_override_ = priority;
-#if !BUILDFLAG(IS_ANDROID)
   UpdateProcessPriority();
-#else
-  // On Android, the priority override might boost the effective importance,
-  // which is calculated based on the client inputs.
-  UpdateProcessPriorityInputs();
-#endif
 }
 
 bool RenderProcessHostImpl::HasPriorityOverride() {
@@ -4587,13 +4453,7 @@ bool RenderProcessHostImpl::HasPriorityOverride() {
 
 void RenderProcessHostImpl::ClearPriorityOverride() {
   priority_override_.reset();
-#if !BUILDFLAG(IS_ANDROID)
   UpdateProcessPriority();
-#else
-  // On Android, the priority override might boost the effective importance,
-  // which is calculated based on the client inputs.
-  UpdateProcessPriorityInputs();
-#endif
 }
 
 void RenderProcessHostImpl::SetSuddenTerminationAllowed(bool allowed) {
@@ -5146,7 +5006,6 @@ bool RenderProcessHost::IsProcessLimitReached() {
     // This ensures that the experiment only measures the impact on affected
     // users, as the experiment is configured with "starts_active" set to false
     // (meaning it only collects data from users who reach this code).
-#if !BUILDFLAG(IS_ANDROID)
     if (base::FeatureList::IsEnabled(features::kRemoveRendererProcessLimit)) {
       // This is used for tests. To avoid changing test behaviors, don't
       // change the behavior when it is set.
@@ -5159,7 +5018,6 @@ bool RenderProcessHost::IsProcessLimitReached() {
       }
       return process_count >= sys_limit;
     }
-#endif
     return true;
   }
 
@@ -5519,10 +5377,6 @@ ChildProcessTerminationInfo RenderProcessHostImpl::GetChildTerminationInfo(
     // TODO(siggi): Remove this once https://crbug.com/806661 is resolved.
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  PopulateTerminationInfoRendererFields(&info);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   return info;
 }
 
@@ -5692,26 +5546,14 @@ void RenderProcessHostImpl::RecordUserMetricsAction(const std::string& action) {
   base::RecordComputedAction(action);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RenderProcessHostImpl::SetPrivateMemoryFootprint(
-    uint64_t private_memory_footprint_bytes) {
-  private_memory_footprint_bytes_ = private_memory_footprint_bytes;
-}
-#endif
-
 void RenderProcessHostImpl::SetPrivateMemoryFootprintForTesting(
     uint64_t private_memory_footprint_bytes) {
   private_memory_footprint_bytes_ = private_memory_footprint_bytes;
-#if !BUILDFLAG(IS_ANDROID)
   private_memory_footprint_valid_until_ =
       base::TimeTicks::Now() + base::Hours(1);
-#endif
 }
 
 uint64_t RenderProcessHostImpl::GetPrivateMemoryFootprint() {
-#if BUILDFLAG(IS_ANDROID)
-  return private_memory_footprint_bytes_;
-#else
   // If we don't have a process yet or have died, our memory footprint is 0.
   if (!GetProcess().IsValid()) {
     return 0;
@@ -5751,7 +5593,7 @@ uint64_t RenderProcessHostImpl::GetPrivateMemoryFootprint() {
   // - Mac OS: https://crbug.com/707021 .
   // - Win: https://crbug.com/707022 .
   uint64_t total_size = 0;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   total_size = dump->platform_private_footprint->rss_anon_bytes +
                dump->platform_private_footprint->vm_swap_bytes;
 #elif BUILDFLAG(IS_APPLE)
@@ -5765,7 +5607,6 @@ uint64_t RenderProcessHostImpl::GetPrivateMemoryFootprint() {
   private_memory_footprint_valid_until_ =
       now + kPrivateMemoryFootprintCacheValidTime;
   return total_size;
-#endif
 }
 
 // static
@@ -5783,11 +5624,6 @@ void RenderProcessHostImpl::UpdateProcessPriorityInputs() {
   unsigned int new_frame_depth = kMaxFrameDepthForPriority;
   bool new_intersects_viewport = false;
   bool new_is_discarding = false;
-#if BUILDFLAG(IS_ANDROID)
-  ChildProcessImportance new_effective_importance =
-      priority_override_ ? PriorityToChildProcessImportance(*priority_override_)
-                         : ChildProcessImportance::NORMAL;
-#endif
   for (RenderProcessHostPriorityClient* client : priority_clients_) {
     RenderProcessHostPriorityClient::Priority priority = client->GetPriority();
 
@@ -5811,11 +5647,6 @@ void RenderProcessHostImpl::UpdateProcessPriorityInputs() {
       new_visible_widgets_count++;
     }
     new_is_discarding = new_is_discarding || priority.is_discarding;
-
-#if BUILDFLAG(IS_ANDROID)
-    new_effective_importance =
-        std::max(new_effective_importance, priority.importance);
-#endif
   }
 
   bool inputs_changed = new_visible_widgets_count != visible_clients_ ||
@@ -5826,11 +5657,6 @@ void RenderProcessHostImpl::UpdateProcessPriorityInputs() {
   frame_depth_ = new_frame_depth;
   intersects_viewport_ = new_intersects_viewport;
   is_discarding_ = new_is_discarding;
-#if BUILDFLAG(IS_ANDROID)
-  inputs_changed =
-      inputs_changed || new_effective_importance != effective_importance_;
-  effective_importance_ = new_effective_importance;
-#endif
   if (inputs_changed)
     UpdateProcessPriority();
 }
@@ -5851,14 +5677,7 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
       media_stream_count_ > 0, has_immersive_xr_session_,
       foreground_service_worker_count_ > 0, frame_depth_, intersects_viewport_,
       pending_views_ > 0, /* boost_for_pending_views */
-      boost_for_loading_count_ > 0, is_discarding_,
-#if BUILDFLAG(IS_ANDROID)
-      spare_renderer_priority_status_ == SpareRendererPriorityStatus::kSpare,
-      GetEffectiveImportance()
-#else
-      priority_override_
-#endif
-  );
+      boost_for_loading_count_ > 0, is_discarding_, priority_override_);
 
   if (priority_ == priority) {
     return;
@@ -5881,11 +5700,6 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
       GetContentClient()->browser()->IsRendererProcessPriorityEnabled()) {
     CHECK(child_process_launcher_.get(), base::NotFatalUntil::M152);
     CHECK(!child_process_launcher_->IsStarting(), base::NotFatalUntil::M152);
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(339097516): Remove the following CHECK when the issue is fixed.
-    CHECK(child_process_launcher_->GetProcess().IsValid());
-    child_process_launcher_->SetRenderProcessPriority(priority_);
-#else  // !BUILDFLAG(IS_ANDROID)
     auto process_priority = priority_.GetProcessPriority();
     if (!base::FeatureList::IsEnabled(kUserVisibleProcessPriority) &&
         process_priority == base::Process::Priority::kUserVisible) {
@@ -5899,7 +5713,6 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
 #else   // !BUILDFLAG(IS_MAC)
     child_process_launcher_->SetProcessPriority(process_priority);
 #endif  // BUILDFLAG(IS_MAC)
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // Notify the child process of the change in state.
@@ -5960,10 +5773,6 @@ void RenderProcessHostImpl::OnProcessLaunched() {
 
   process_launched_time_ = base::TimeTicks::Now();
 
-#if BUILDFLAG(IS_ANDROID)
-  next_launch_for_initial_outermost_main_frame_ = false;
-#endif
-
   if (child_process_launcher_) {
     CHECK(child_process_launcher_->GetProcess().IsValid(),
           base::NotFatalUntil::M152);
@@ -6007,13 +5816,6 @@ void RenderProcessHostImpl::OnProcessLaunched() {
     priority_.visible = child_process_launcher_->GetProcess().GetPriority(
                             ChildProcessTaskPortProvider::GetInstance()) ==
                         base::Process::Priority::kUserBlocking;
-#elif BUILDFLAG(IS_ANDROID)
-    // Android child process priority works differently and cannot be queried
-    // directly from base::Process.
-    // TODO(crbug.com/40590142): Fix initial priority on Android to
-    // reflect |priority_.GetProcessPriority()|.
-    CHECK_EQ(blink::kLaunchingProcessIsBackgrounded, !priority_.visible,
-             base::NotFatalUntil::M152);
 #else
     priority_.visible = child_process_launcher_->GetProcess().GetPriority() !=
                         base::Process::Priority::kBestEffort;
@@ -6088,7 +5890,7 @@ void RenderProcessHostImpl::OnProcessLaunched() {
       base::BindRepeating(&RenderProcessHostImpl::BindTracedProcess,
                           instance_weak_factory_.GetWeakPtr()));
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   system_tracing_service_ = std::make_unique<tracing::SystemTracingService>();
   child_process_->EnableSystemTracingService(
       system_tracing_service_->BindAndPassPendingRemote());
@@ -6102,36 +5904,11 @@ void RenderProcessHostImpl::OnProcessLaunchFailed(int error_code) {
   if (deleting_soon_)
     return;
 
-#if BUILDFLAG(IS_ANDROID)
-  next_launch_for_initial_outermost_main_frame_ = false;
-#endif
-
   ChildProcessTerminationInfo info;
   info.status = base::TERMINATION_STATUS_LAUNCH_FAILED;
   info.exit_code = error_code;
-#if BUILDFLAG(IS_ANDROID)
-  PopulateTerminationInfoRendererFields(&info);
-#endif  // BUILDFLAG(IS_ANDROID)
   ProcessDied(info);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool RenderProcessHostImpl::HasSpareRendererPriority() {
-  return spare_renderer_priority_status_ !=
-         SpareRendererPriorityStatus::kNormal;
-}
-
-void RenderProcessHostImpl::OnSpareRendererPriorityGraduated(bool is_alive) {
-  spare_renderer_priority_status_ = SpareRendererPriorityStatus::kNormal;
-  for (auto& observer : observers_) {
-    observer.SpareRendererPriorityGraduated(this, is_alive);
-  }
-}
-
-bool RenderProcessHostImpl::IsForOutermostMainFrame() {
-  return next_launch_for_initial_outermost_main_frame_;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void RenderProcessHostImpl::BindChildHistogramFetcherFactory(
     mojo::PendingReceiver<metrics::mojom::ChildHistogramFetcherFactory>

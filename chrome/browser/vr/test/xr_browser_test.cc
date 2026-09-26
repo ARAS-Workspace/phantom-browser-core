@@ -30,17 +30,10 @@
 #include "third_party/blink/public/common/features_generated.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/path_utils.h"
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#endif
 
 #if BUILDFLAG(ENABLE_VR)
 #include "device/vr/public/cpp/features.h"
@@ -66,10 +59,6 @@ XrBrowserTestBase::XrBrowserTestBase() : env_(base::Environment::Create()) {
   enable_features_.push_back(features::kLogJsConsoleMessages);
 #if BUILDFLAG(ENABLE_VR)
   enable_features_.push_back(device::features::kWebXrVisibleBlurred);
-#if BUILDFLAG(IS_ANDROID)
-  enable_features_.push_back(device::features::kWebXRLayers);
-  enable_features_.push_back(blink::features::kWebXRMediaBinding);
-#endif
 #endif
 }
 
@@ -88,9 +77,6 @@ std::string WideToUTF8IfNecessary(base::FilePath::StringType input) {
 // is "test", the returned string should be out/Debug/test.
 std::string MakeExecutableRelative(const char* path) {
   base::FilePath executable_path;
-#if BUILDFLAG(IS_ANDROID)
-  NOTREACHED();
-#else
   EXPECT_TRUE(
       base::PathService::Get(base::BasePathKey::FILE_EXE, &executable_path));
   executable_path = executable_path.DirName();
@@ -101,7 +87,6 @@ std::string MakeExecutableRelative(const char* path) {
       base::MakeAbsoluteFilePath(
           executable_path.Append(base::FilePath(UTF8ToWideIfNecessary(path))))
           .value());
-#endif
 }
 
 void XrBrowserTestBase::SetUp() {
@@ -141,7 +126,6 @@ void XrBrowserTestBase::SetUp() {
 
   // OpenXr on Android cannot use the environment variable as the loader cannot
   // read it on Android at present.
-#if !BUILDFLAG(IS_ANDROID)
   // Set the environment variable to use the mock OpenXR client.
   // If the kOpenXrConfigPathEnvVar environment variable is set, the OpenXR
   // loader will look for the OpenXR runtime specified in that json file. The
@@ -151,7 +135,6 @@ void XrBrowserTestBase::SetUp() {
   ASSERT_TRUE(env_->SetVar(kOpenXrConfigPathEnvVar,
                            MakeExecutableRelative(kOpenXrConfigPathVal)))
       << "Failed to set OpenXR JSON location environment variable";
-#endif
 
   // Set any command line flags that subclasses have set, e.g. enabling features
   // or specific runtimes.
@@ -208,7 +191,6 @@ net::EmbeddedTestServer* XrBrowserTestBase::GetEmbeddedServer() {
 }
 
 content::WebContents* XrBrowserTestBase::GetCurrentWebContents() {
-#if !BUILDFLAG(IS_ANDROID)
   // `chrome_test_utils::GetActiveWebContents()` doesn't properly account for
   // the presence of an incognito browser, and only looks in the browser
   // returned by the base class, which doesn't get overridden by the incognito
@@ -221,7 +203,6 @@ content::WebContents* XrBrowserTestBase::GetCurrentWebContents() {
             ->FindTabbedBrowser();
     return incognito_browser->GetTabStripModel()->GetActiveWebContents();
   }
-#endif
   return chrome_test_utils::GetActiveWebContents(this);
 }
 
@@ -235,46 +216,16 @@ void XrBrowserTestBase::OpenNewTab(const std::string& url) {
 }
 
 void XrBrowserTestBase::OpenNewTab(const std::string& url, bool incognito) {
-#if BUILDFLAG(IS_ANDROID)
-  auto* profile = chrome_test_utils::GetProfile(this);
-  if (incognito) {
-    profile = profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-  }
-
-  TabModel* tab_model =
-      TabModelList::GetTabModelForWebContents(GetCurrentWebContents());
-  TabAndroid* first_tab = TabAndroid::FromWebContents(GetCurrentWebContents());
-  std::unique_ptr<content::WebContents> contents =
-      content::WebContents::Create(content::WebContents::CreateParams(profile));
-  EXPECT_TRUE(content::NavigateToURL(contents.get(), GURL(url)));
-  // TabModel takes ownership of the WebContents, so we release it here.
-  tab_model->CreateTab(first_tab, std::move(contents), TabModel::kInvalidIndex,
-                       TabModel::TabLaunchType::FROM_RECENT_TABS_FOREGROUND,
-                       /*should_pin=*/false);
-#else
   if (incognito) {
     OpenURLOffTheRecord(browser()->GetProfile(), GURL(url));
   } else {
     // -1 is a special index value used to append to the end of the tab list.
     chrome::AddTabAt(browser(), GURL(url), /*index=*/-1, /*foreground=*/true);
   }
-#endif
 }
 
 void XrBrowserTestBase::CloseTab(content::WebContents* web_contents) {
-#if BUILDFLAG(IS_ANDROID)
-  TabModel* tab_model = TabModelList::GetTabModelForWebContents(web_contents);
-  ASSERT_TRUE(tab_model);
-  for (int i = 0; i < tab_model->GetTabCount(); ++i) {
-    if (tab_model->GetWebContentsAt(i) == web_contents) {
-      tab_model->CloseTabAt(i);
-      return;
-    }
-  }
-  ADD_FAILURE() << "Failed to find tab to close";
-#else
   chrome::CloseWebContents(browser(), web_contents, /*add_to_history=*/false);
-#endif
 }
 
 void XrBrowserTestBase::LoadFileAndAwaitInitialization(

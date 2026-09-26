@@ -23,11 +23,7 @@
 #include "ui/gfx/geometry/point.h"
 #include "ui/gfx/geometry/rect.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/event_forwarder.h"
-#include "ui/android/view_android.h"
-#include "ui/events/android/motion_event_android.h"
-#elif defined(USE_AURA)
+#if defined(USE_AURA)
 #include "ui/aura/window.h"
 #include "ui/events/test/event_generator.h"
 #endif
@@ -91,80 +87,7 @@ void MouseCursorOverlayControllerTestBase::RunRestrictsToWebContentsTest() {
   controller.Stop();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-class MouseCursorOverlayControllerAndroidTest
-    : public MouseCursorOverlayControllerTestBase {
- protected:
-  void SetupCaptureTarget(WebContents* target_web_contents,
-                          const gfx::Rect& bounds) override {
-    target_web_contents->GetNativeView()->SetLayoutForTesting(
-        bounds.x(), bounds.y(), bounds.width(), bounds.height());
-
-    parent_view_ = std::make_unique<ui::ViewAndroid>(
-        ui::ViewAndroid::LayoutType::kMatchParent);
-    parent_view_->GetEventForwarder();
-
-    child_view_ = std::make_unique<ui::ViewAndroid>(
-        ui::ViewAndroid::LayoutType::kMatchParent);
-    parent_view_->AddChild(child_view_.get());
-  }
-
-  gfx::NativeView GetTargetView() override { return child_view_.get(); }
-
-  void InitializeEventGenerator() override {
-    event_forwarder_ = parent_view_->event_forwarder();
-    ASSERT_TRUE(event_forwarder_);
-  }
-
-  void SendMouseMove(const gfx::Point& position_in_parent) override {
-    ui::MotionEventAndroid event = CreateAndroidMouseEvent(
-        ui::MotionEventAndroid::GetAndroidAction(ui::MotionEvent::Action::DOWN),
-        position_in_parent.x(), position_in_parent.y());
-    for (ui::EventForwarder::Observer& obs :
-         event_forwarder_->GetObserversForTesting()) {
-      obs.OnMouseEvent(event);
-    }
-  }
-
-  gfx::Point GetExpectedCapturedPosition(
-      const gfx::Point& position_in_parent,
-      const gfx::Rect& target_bounds) override {
-    return position_in_parent;
-  }
-
- private:
-  ui::MotionEventAndroid CreateAndroidMouseEvent(int android_action,
-                                                 float x,
-                                                 float y) {
-    ui::MotionEventAndroid::Pointer p(
-        /*id=*/0, x, y, /*touch_major_pixels=*/0, /*touch_minor_pixels=*/0,
-        /*pressure=*/0, /*orientation_rad=*/0, /*tilt_rad=*/0,
-        ui::MotionEventAndroid::GetAndroidToolType(
-            ui::MotionEvent::ToolType::MOUSE));
-    return ui::MotionEventAndroid(
-        /*pix_to_dip=*/1.0f, /*ticks_x=*/0.0f, /*ticks_y=*/0.0f,
-        /*tick_multiplier=*/0.0f, base::TimeTicks::Now(),
-        base::TimeTicks::Now(), base::TimeTicks::Now(), android_action,
-        /*pointer_count=*/1,
-        /*history_size=*/0, /*action_index=*/0, /*android_action_button=*/0,
-        /*android_gesture_classification=*/0, /*android_button_state=*/0,
-        /*android_meta_state=*/0, /*raw_offset_x_pixels=*/0.0f,
-        /*raw_offset_y_pixels=*/0.0f, /*for_touch_handle=*/false, &p,
-        /*pointer1=*/nullptr, /*source=*/nullptr);
-  }
-
-  std::unique_ptr<ui::ViewAndroid> parent_view_;
-  std::unique_ptr<ui::ViewAndroid> child_view_;
-  raw_ptr<ui::EventForwarder> event_forwarder_ = nullptr;
-};
-
-TEST_F(MouseCursorOverlayControllerAndroidTest,
-       DISABLED_RestrictsToWebContents) {
-  RunRestrictsToWebContentsTest();
-}
-
-#elif defined(USE_AURA)
+#if defined(USE_AURA)
 
 class MouseCursorOverlayControllerAuraTest
     : public MouseCursorOverlayControllerTestBase {

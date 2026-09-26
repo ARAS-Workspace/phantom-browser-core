@@ -52,10 +52,6 @@
 #include "url/gurl.h"
 #include "url/scheme_host_port.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/android/network_change_notifier_factory_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace net {
 
 namespace {
@@ -941,50 +937,8 @@ class NetworkAwareHostResolverProc : public HostResolverProc {
 };
 
 TEST_F(ContextHostResolverTest, ExistingNetworkBoundLookup) {
-#if BUILDFLAG(IS_ANDROID)
-  auto scoped_mock_network_change_notifier =
-      std::make_unique<test::ScopedMockNetworkChangeNotifier>();
-  scoped_mock_network_change_notifier->mock_network_change_notifier()
-      ->ForceNetworkHandlesSupported();
-
-  const url::SchemeHostPort host(url::kHttpsScheme, "example.com",
-                                 NetworkAwareHostResolverProc::kPort);
-  auto resolver_proc = base::MakeRefCounted<NetworkAwareHostResolverProc>();
-  ScopedDefaultHostResolverProc scoped_default_host_resolver;
-  scoped_default_host_resolver.Init(resolver_proc.get());
-
-  // ResolveContexts bound to a specific network should end up in a call to
-  // Resolve with `network` == context.GetTargetNetwork(). Confirm that we do
-  // indeed receive the IP address associated with that network.
-  for (const auto& iter : NetworkAwareHostResolverProc::kResults) {
-    auto network = iter.first;
-    auto expected_ipv4 = iter.second;
-    auto resolve_context = std::make_unique<NetworkBoundResolveContext>(
-        nullptr /* url_request_context */, false /* enable_caching */, network);
-    // DNS lookups originated from network-bound ResolveContexts must be
-    // resolved through a HostResolverManager bound to the same network.
-    auto manager = HostResolverManager::CreateNetworkBoundHostResolverManager(
-        HostResolver::ManagerOptions(), network, nullptr /* net_log */);
-    auto resolver = std::make_unique<ContextHostResolver>(
-        manager.get(), std::move(resolve_context));
-    std::unique_ptr<HostResolver::ResolveHostRequest> request =
-        resolver->CreateRequest(host, NetworkAnonymizationKey(),
-                                handles::kInvalidNetworkHandle,
-                                NetLogWithSource(), std::nullopt);
-
-    TestCompletionCallback callback;
-    int rv = request->Start(callback.callback());
-    EXPECT_THAT(callback.GetResult(rv), test::IsOk());
-    EXPECT_THAT(request->GetResolveErrorInfo().error, test::IsError(net::OK));
-    ASSERT_EQ(1u, request->GetAddressResults().size());
-    EXPECT_THAT(request->GetAddressResults(),
-                testing::ElementsAre(
-                    NetworkAwareHostResolverProc::ToIPEndPoint(expected_ipv4)));
-  }
-#else   // !BUILDFLAG(IS_ANDROID)
   GTEST_SKIP()
       << "Network-bound HostResolverManager are supported only on Android.";
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ContextHostResolverTest, NotExistingNetworkBoundLookup) {
@@ -1017,42 +971,8 @@ TEST_F(ContextHostResolverTest, NotExistingNetworkBoundLookup) {
 // Test that the underlying HostCache does not receive invalidations when its
 // ResolveContext/HostResolverManager is bound to a network.
 TEST_F(ContextHostResolverTest, NetworkBoundResolverCacheInvalidation) {
-#if BUILDFLAG(IS_ANDROID)
-  auto scoped_mock_network_change_notifier =
-      std::make_unique<test::ScopedMockNetworkChangeNotifier>();
-  test::MockNetworkChangeNotifier* mock_ncn =
-      scoped_mock_network_change_notifier->mock_network_change_notifier();
-  mock_ncn->ForceNetworkHandlesSupported();
-
-  // The actual network handle doesn't really matter, this test just wants to
-  // check that all the pieces are in place and configured correctly.
-  constexpr handles::NetworkHandle network = 2;
-  manager_ = HostResolverManager::CreateNetworkBoundHostResolverManager(
-      HostResolver::ManagerOptions(), network, nullptr /* net_log */);
-  manager_->SetLastIPv6ProbeResultForTesting(true);
-  // Set empty MockDnsClient rules to ensure DnsClient is mocked out.
-  MockDnsClientRuleList rules;
-  SetMockDnsRules(std::move(rules));
-
-  auto resolve_context = std::make_unique<NetworkBoundResolveContext>(
-      nullptr /* url_request_context */, true /* enable_caching */, network);
-  ResolveContext* resolve_context_ptr = resolve_context.get();
-  auto resolver = std::make_unique<ContextHostResolver>(
-      manager_.get(), std::move(resolve_context));
-
-  // Network events should not trigger cache invalidations
-  auto network_changes_before_events =
-      resolve_context_ptr->host_cache()->network_changes();
-  NetworkChangeNotifier::NotifyObserversOfIPAddressChangeForTests();
-  NetworkChangeNotifier::NotifyObserversOfConnectionTypeChangeForTests(
-      NetworkChangeNotifier::CONNECTION_NONE);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(network_changes_before_events,
-            resolve_context_ptr->host_cache()->network_changes());
-#else   // !BUILDFLAG(IS_ANDROID)
   GTEST_SKIP()
       << "Network-bound HostResolverManagers are supported only on Android";
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ContextHostResolverTest, OnShutdown_ReentrantRequest) {

@@ -35,10 +35,6 @@
 #include "third_party/blink/public/mojom/page/widget.mojom-test-utils.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/view_android.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -48,12 +44,6 @@ const int kInvalidId = -1;
 const url::Origin& GetOriginForFrameTreeNode(FrameTreeNode* node) {
   return node->current_frame_host()->GetLastCommittedOrigin();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-double GetFrameDeviceScaleFactor(const ToRenderFrameHost& adapter) {
-  return EvalJs(adapter, "window.devicePixelRatio;").ExtractDouble();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -187,11 +177,7 @@ INSTANTIATE_TEST_SUITE_P(FindRequestManagerTests,
                          testing::Bool());
 
 // TODO(crbug.com/40470937): These tests frequently fail on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE(x) DISABLED_##x
-#else
 #define MAYBE(x) x
-#endif
 
 
 // Tests basic find-in-page functionality (such as searching forward and
@@ -293,11 +279,7 @@ IN_PROC_BROWSER_TEST_P(FindRequestManagerTest, ScrollAndZoomIntoView) {
   LoadAndWait("/find_in_page_desktop.html");
   // Note: for now, don't run this test on Android in OOPIF mode.
   if (test_with_oopif())
-#if BUILDFLAG(IS_ANDROID)
-    return;
-#else
     MakeChildFrameCrossProcess();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FrameTreeNode* root = static_cast<WebContentsImpl*>(shell()->web_contents())
                             ->GetPrimaryFrameTree()
@@ -642,8 +624,7 @@ IN_PROC_BROWSER_TEST_F(FindRequestManagerTest, MAYBE(HiddenFrame)) {
 
 // Tests that new matches can be found in dynamically added text.
 // TODO(crbug.com/330194342): Deflake and re-enable.
-#if BUILDFLAG(IS_ANDROID) || \
-    (BUILDFLAG(IS_LINUX) && !defined(UNDEFINED_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && !defined(UNDEFINED_SANITIZER)
 #define MAYBE_FindNewMatches DISABLED_FindNewMatches
 #else
 #define MAYBE_FindNewMatches FindNewMatches
@@ -680,11 +661,7 @@ IN_PROC_BROWSER_TEST_P(FindRequestManagerTest, MAYBE_FindNewMatches) {
 // TODO(crbug.com/40470937): These tests frequently fail on Android.
 // TODO(crbug.com/41352658): Flaky timeout on Win7 (dbg).
 // TODO(crbug.com/41408666): Flaky on Win10.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FindInPage_Issue627799 DISABLED_FindInPage_Issue627799
-#else
 #define MAYBE_FindInPage_Issue627799 FindInPage_Issue627799
-#endif
 
 IN_PROC_BROWSER_TEST_F(FindRequestManagerTest, MAYBE_FindInPage_Issue627799) {
   LoadAndWait("/find_in_long_page.html");
@@ -770,313 +747,6 @@ IN_PROC_BROWSER_TEST_F(FindRequestManagerTest, MAYBE(FindInPage_Issue644448)) {
   EXPECT_EQ(last_request_id(), results.request_id);
   EXPECT_EQ(5, results.number_of_matches);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Tests empty active match rect when kWrapAround is false.
-IN_PROC_BROWSER_TEST_F(FindRequestManagerTest, EmptyActiveMatchRect) {
-  LoadAndWait("/find_in_page.html");
-
-  // kWrapAround is false by default.
-  auto default_options = blink::mojom::FindOptions::New();
-  default_options->run_synchronously_for_testing = true;
-  Find("result 01", default_options.Clone());
-  delegate()->WaitForFinalReply();
-  EXPECT_EQ(1, delegate()->GetFindResults().number_of_matches);
-
-  // Request the find match rects.
-  contents()->RequestFindMatchRects(-1);
-  delegate()->WaitForMatchRects();
-  const std::vector<gfx::RectF>& rects = delegate()->find_match_rects();
-
-  // The first match should be active.
-  EXPECT_EQ(rects[0], delegate()->active_match_rect());
-
-  Find("result 00", default_options.Clone());
-  delegate()->WaitForFinalReply();
-  EXPECT_EQ(1, delegate()->GetFindResults().number_of_matches);
-
-  // Request the find match rects.
-  contents()->RequestFindMatchRects(-1);
-  delegate()->WaitForMatchRects();
-
-  // The active match rect should be empty.
-  EXPECT_EQ(gfx::RectF(), delegate()->active_match_rect());
-}
-
-class MainFrameSizeChangedWaiter : public WebContentsObserver {
- public:
-  MainFrameSizeChangedWaiter(WebContents* web_contents)
-      : WebContentsObserver(web_contents) {}
-  void Wait() { run_loop_.Run(); }
-
- private:
-  void FrameSizeChanged(RenderFrameHost* render_frame_host,
-                        const gfx::Size& frame_size) override {
-    if (render_frame_host->IsInPrimaryMainFrame())
-      run_loop_.Quit();
-  }
-
-  base::RunLoop run_loop_;
-};
-
-// Tests match rects in the iframe are updated with the size of the main frame,
-// and the active match rect should be in it.
-IN_PROC_BROWSER_TEST_F(FindRequestManagerTest,
-                       RectsUpdateWhenMainFrameSizeChanged) {
-  LoadAndWait("/find_in_page.html");
-
-  // Make a initial size for native view.
-  const int kWidth = 1080;
-  const int kHeight = 1286;
-  gfx::Size size(kWidth, kHeight);
-  contents()->GetNativeView()->OnSizeChanged(kWidth, kHeight);
-  contents()->GetNativeView()->OnPhysicalBackingSizeChanged(size);
-
-  // Make a FindRequest for "result".
-  auto options = blink::mojom::FindOptions::New();
-  options->run_synchronously_for_testing = true;
-  Find("result", options->Clone());
-  delegate()->WaitForFinalReply();
-  EXPECT_EQ(19, delegate()->GetFindResults().number_of_matches);
-
-  contents()->RequestFindMatchRects(-1);
-  delegate()->WaitForMatchRects();
-
-  // Change the size of native view.
-  const int kNewHeight = 2121;
-  size = gfx::Size(kWidth, kNewHeight);
-  contents()->GetNativeView()->OnSizeChanged(kWidth, kNewHeight);
-  contents()->GetNativeView()->OnPhysicalBackingSizeChanged(size);
-
-  // Wait for the size of the mainframe to change, and then the position
-  // of match rects should change as expected.
-  MainFrameSizeChangedWaiter(contents()).Wait();
-
-  contents()->RequestFindMatchRects(-1);
-  delegate()->WaitForMatchRects();
-  std::vector<gfx::RectF> new_rects = delegate()->find_match_rects();
-
-  // The first match should be active.
-  EXPECT_EQ(new_rects[0], delegate()->active_match_rect());
-
-  // Check that all active rects (including iframe) matches with corresponding
-  // match rect.
-  for (int i = 1; i < 19; i++) {
-    options->new_session = false;
-    options->forward = true;
-    Find("result", options->Clone());
-    delegate()->WaitForFinalReply();
-
-    EXPECT_EQ(19, delegate()->GetFindResults().number_of_matches);
-
-    // Request the find match rects.
-    contents()->RequestFindMatchRects(-1);
-    delegate()->WaitForMatchRects();
-    new_rects = delegate()->find_match_rects();
-
-    // The active rect should be equal to the corresponding match rect.
-    EXPECT_EQ(new_rects[i], delegate()->active_match_rect());
-  }
-}
-
-// TODO(wjmaclean): This test, if re-enabled, may require work to make it
-// OOPIF-compatible.
-// Tests requesting find match rects.
-IN_PROC_BROWSER_TEST_F(FindRequestManagerTest, MAYBE(FindMatchRects)) {
-  LoadAndWait("/find_in_page.html");
-  if (test_with_oopif())
-    MakeChildFrameCrossProcess();
-
-  auto default_options = blink::mojom::FindOptions::New();
-  default_options->run_synchronously_for_testing = true;
-  Find("result", default_options.Clone());
-  delegate()->WaitForFinalReply();
-  EXPECT_EQ(19, delegate()->GetFindResults().number_of_matches);
-
-  // Request the find match rects.
-  contents()->RequestFindMatchRects(-1);
-  delegate()->WaitForMatchRects();
-  const std::vector<gfx::RectF>& rects = delegate()->find_match_rects();
-
-  // The first match should be active.
-  EXPECT_EQ(rects[0], delegate()->active_match_rect());
-
-  // All results after the first two should be between them in find-in-page
-  // coordinates. This is because results 2 to 19 are inside an iframe located
-  // between results 0 and 1. This applies to the fixed div too.
-  EXPECT_LT(rects[0].y(), rects[1].y());
-  for (int i = 2; i < 19; ++i) {
-    EXPECT_LT(rects[0].y(), rects[i].y());
-    EXPECT_GT(rects[1].y(), rects[i].y());
-  }
-
-  // Result 3 should be below results 2 and 4. This is caused by the CSS
-  // transform in the containing div. If the transform doesn't work then result
-  // 3 will be between results 2 and 4.
-  EXPECT_GT(rects[3].y(), rects[2].y());
-  EXPECT_GT(rects[3].y(), rects[4].y());
-
-  // Results 6, 7, 8 and 9 should be one below the other in that same order. If
-  // overflow:scroll is not properly handled then result 8 would be below result
-  // 9 or result 7 above result 6 depending on the scroll.
-  EXPECT_LT(rects[6].y(), rects[7].y());
-  EXPECT_LT(rects[7].y(), rects[8].y());
-  EXPECT_LT(rects[8].y(), rects[9].y());
-
-  // Results 11, 12, 13 and 14 should be between results 10 and 15, as they are
-  // inside the table.
-  EXPECT_GT(rects[11].y(), rects[10].y());
-  EXPECT_GT(rects[12].y(), rects[10].y());
-  EXPECT_GT(rects[13].y(), rects[10].y());
-  EXPECT_GT(rects[14].y(), rects[10].y());
-  EXPECT_LT(rects[11].y(), rects[15].y());
-  EXPECT_LT(rects[12].y(), rects[15].y());
-  EXPECT_LT(rects[13].y(), rects[15].y());
-  EXPECT_LT(rects[14].y(), rects[15].y());
-
-  // Result 11 should be above results 12, 13 and 14 as it's in the table
-  // header.
-  EXPECT_LT(rects[11].y(), rects[12].y());
-  EXPECT_LT(rects[11].y(), rects[13].y());
-  EXPECT_LT(rects[11].y(), rects[14].y());
-
-  // Result 11 should also be right of results 12, 13 and 14 because of the
-  // colspan.
-  EXPECT_GT(rects[11].x(), rects[12].x());
-  EXPECT_GT(rects[11].x(), rects[13].x());
-  EXPECT_GT(rects[11].x(), rects[14].x());
-
-  // Result 12 should be left of results 11, 13 and 14 in the table layout.
-  EXPECT_LT(rects[12].x(), rects[11].x());
-  EXPECT_LT(rects[12].x(), rects[13].x());
-  EXPECT_LT(rects[12].x(), rects[14].x());
-
-  // Results 13, 12 and 14 should be one above the other in that order because
-  // of the rowspan and vertical-align: middle by default.
-  EXPECT_LT(rects[13].y(), rects[12].y());
-  EXPECT_LT(rects[12].y(), rects[14].y());
-
-  // Result 16 should be below result 15.
-  EXPECT_GT(rects[15].y(), rects[14].y());
-
-  // Result 18 should be normalized with respect to the position:relative div,
-  // and not it's immediate containing div. Consequently, result 18 should be
-  // above result 17.
-  EXPECT_GT(rects[17].y(), rects[18].y());
-}
-
-namespace {
-
-class ZoomToFindInPageRectMessageFilter
-    : public blink::mojom::FrameWidgetHostInterceptorForTesting {
- public:
-  ZoomToFindInPageRectMessageFilter(RenderWidgetHostImpl* rwhi)
-      : impl_(rwhi->frame_widget_host_receiver_for_testing().SwapImplForTesting(
-            this)),
-        widget_message_seen_(false) {}
-
-  ZoomToFindInPageRectMessageFilter(const ZoomToFindInPageRectMessageFilter&) =
-      delete;
-  ZoomToFindInPageRectMessageFilter& operator=(
-      const ZoomToFindInPageRectMessageFilter&) = delete;
-
-  ~ZoomToFindInPageRectMessageFilter() override {}
-
-  blink::mojom::FrameWidgetHost* GetForwardingInterface() override {
-    return impl_;
-  }
-
-  void Reset() {
-    widget_rect_seen_ = gfx::Rect();
-    widget_message_seen_ = false;
-  }
-
-  void WaitForWidgetHostMessage() {
-    if (widget_message_seen_)
-      return;
-
-    base::RunLoop run_loop;
-    quit_closure_ = run_loop.QuitClosure();
-    run_loop.Run();
-  }
-
-  gfx::Rect& widget_message_rect() { return widget_rect_seen_; }
-
- private:
-  void ZoomToFindInPageRectInMainFrame(const gfx::Rect& rect_to_zoom) override {
-    widget_rect_seen_ = rect_to_zoom;
-    widget_message_seen_ = true;
-    if (!quit_closure_.is_null())
-      std::move(quit_closure_).Run();
-  }
-
-  raw_ptr<blink::mojom::FrameWidgetHost> impl_;
-  gfx::Rect widget_rect_seen_;
-  bool widget_message_seen_;
-  base::OnceClosure quit_closure_;
-};
-
-}  // namespace
-
-// Tests activating the find match nearest to a given point.
-// TODO(crbug.com/40864045): Fix flaky failures.
-IN_PROC_BROWSER_TEST_P(FindRequestManagerTest,
-                       DISABLED_ActivateNearestFindMatch) {
-  LoadAndWait("/find_in_page.html");
-  if (test_with_oopif())
-    MakeChildFrameCrossProcess();
-
-  std::unique_ptr<ZoomToFindInPageRectMessageFilter> message_interceptor_child;
-
-  if (test_with_oopif()) {
-    message_interceptor_child =
-        std::make_unique<ZoomToFindInPageRectMessageFilter>(
-            first_child()->current_frame_host()->GetRenderWidgetHost());
-  }
-
-  auto default_options = blink::mojom::FindOptions::New();
-  default_options->run_synchronously_for_testing = true;
-  Find("result", default_options.Clone());
-  delegate()->WaitForFinalReply();
-  EXPECT_EQ(19, delegate()->GetFindResults().number_of_matches);
-
-  auto* find_request_manager = contents()->GetFindRequestManagerForTesting();
-
-  // Get the find match rects.
-  contents()->RequestFindMatchRects(-1);
-  delegate()->WaitForMatchRects();
-  const std::vector<gfx::RectF>& rects = delegate()->find_match_rects();
-
-  double device_scale_factor = GetFrameDeviceScaleFactor(contents());
-
-  // Activate matches via points inside each of the find match rects, in an
-  // arbitrary order. Check that the correct match becomes active after each
-  // activation.
-  const std::array<int, 19> order = {11, 13, 2, 0,  16, 5, 7, 10, 6, 1,
-                                     15, 14, 9, 17, 18, 3, 8, 12, 4};
-  for (const int rect_index : order) {
-    delegate()->MarkNextReply();
-    contents()->ActivateNearestFindResult(rects[rect_index].CenterPoint().x(),
-                                          rects[rect_index].CenterPoint().y());
-    delegate()->WaitForNextReply();
-
-    bool is_match_in_oopif = rect_index > 1 && test_with_oopif();
-    // Check widget message rect to make sure it matches.
-    if (is_match_in_oopif) {
-      message_interceptor_child->WaitForWidgetHostMessage();
-      auto expected_rect = gfx::ScaleToEnclosingRect(
-          message_interceptor_child->widget_message_rect(),
-          1.f / device_scale_factor);
-      EXPECT_EQ(find_request_manager->GetSelectionRectForTesting(),
-                expected_rect);
-      message_interceptor_child->Reset();
-    }
-
-    EXPECT_EQ(rect_index + 1,
-              delegate()->GetFindResults().active_match_ordinal);
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Test basic find-in-page functionality after going back and forth to the same
 // page. In particular, find-in-page should continue to work after going back to
@@ -1647,7 +1317,7 @@ INSTANTIATE_TEST_SUITE_P(
 // new results from the new document when we navigate the subframe that
 // hasn't finished the find-in-page session to the new document.
 // TODO(crbug.com/40220234): Fix flakiness and reenable the test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_NavigateFrameDuringFind DISABLED_NavigateFrameDuringFind
 #else
 #define MAYBE_NavigateFrameDuringFind NavigateFrameDuringFind

@@ -783,19 +783,15 @@ IN_PROC_BROWSER_TEST_F(FindBarViewsUiTest, MAYBE_PasteWithoutTextChange) {
       CheckViewProperty(FindBarView::kElementId, &FindBarView::GetFindText,
                         kSearchA),
       // Reload the page to clear the matching result.
-      // TODO(crbug.com/479732140): improve the test method to simplify the call.
+      // TODO(crbug.com/479732140): improve the test method to simplify the
+      // call.
       MoveMouseTo(kReloadButtonElementId,
-#if !BUILDFLAG(IS_ANDROID)
                   features::IsWebUIReloadButtonEnabled()
                       ? RelativePositionSpecifier(
                             base::BindOnce([](ui::TrackedElement* el) {
                               return el->GetScreenBounds().CenterPoint();
                             }))
-                      : CenterPoint()
-#else
-                  CenterPoint()
-#endif  // !BUILDFLAG(IS_ANDROID)
-                      ),
+                      : CenterPoint()),
       ClickMouse(), WaitForWebContentsNavigation(kTabId),
       WaitForState(views::test::kCurrentFocusedViewId,
                    ContentsWebView::kContentsWebViewElementId),

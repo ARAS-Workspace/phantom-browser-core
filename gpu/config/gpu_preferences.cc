@@ -19,7 +19,6 @@ namespace gpu {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 size_t GetCustomGpuCacheSizeBytesIfExists(std::string_view switch_string) {
   const base::CommandLine& process_command_line =
       *base::CommandLine::ForCurrentProcess();
@@ -33,13 +32,11 @@ size_t GetCustomGpuCacheSizeBytesIfExists(std::string_view switch_string) {
   }
   return 0;
 }
-#endif
 
 }  // namespace
 
 size_t GetDefaultGpuDiskCacheSize() {
   size_t cache_size = 0;
-#if !BUILDFLAG(IS_ANDROID)
   size_t custom_cache_size =
       GetCustomGpuCacheSizeBytesIfExists(switches::kGpuDiskCacheSizeKB);
   if (custom_cache_size) {
@@ -47,11 +44,6 @@ size_t GetDefaultGpuDiskCacheSize() {
   } else {
     cache_size = kDefaultMaxProgramCacheMemoryBytes;
   }
-#else   // !BUILDFLAG(IS_ANDROID)
-  cache_size = base::SysInfo::IsLowEndDevice()
-                   ? kLowEndMaxProgramCacheMemoryBytes
-                   : kDefaultMaxProgramCacheMemoryBytes;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (base::FeatureList::IsEnabled(::features::kAggressiveShaderCacheLimits)) {
     cache_size *= 2;

@@ -109,11 +109,7 @@ std::string Serialize(HandleType shmem_handle,
   // TODO(crbug.com/40109064): Get rid of |descriptor_to_share| and just
   // populate |launch_options|. The caller should be responsible for translating
   // between |launch_options| and zygote parameters as necessary.
-#if BUILDFLAG(IS_ANDROID)
-  shared_memory_switch->out_descriptor_to_share = std::move(shmem_handle);
-#else
   shared_memory_switch->out_descriptor_to_share = std::move(shmem_handle.fd);
-#endif
   DVLOG(1) << "Sharing fd="
            << shared_memory_switch->out_descriptor_to_share.get()
            << " with child process as fd_key="

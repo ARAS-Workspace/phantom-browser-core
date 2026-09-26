@@ -871,13 +871,8 @@ TEST_F(PermissionSubscriptionTest,
 }
 
 // TODO(https://crbug.com/359831269): Fix new tab page test for Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SubscribeUnsubscribeForNewTabPage \
-  DISABLED_SubscribeUnsubscribeForNewTabPage
-#else
 #define MAYBE_SubscribeUnsubscribeForNewTabPage \
   SubscribeUnsubscribeForNewTabPage
-#endif
 TEST_P(PermissionSubscriptionGeolocationTest,
        MAYBE_SubscribeUnsubscribeForNewTabPage) {
   NavigateAndCommit(chrome::ChromeUINewTabURLAsGURL());

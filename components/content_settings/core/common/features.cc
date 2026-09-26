@@ -10,22 +10,12 @@
 namespace content_settings {
 
 // Enables auto dark feature in theme settings.
-#if BUILDFLAG(IS_ANDROID)
-BASE_FEATURE(kDarkenWebsitesCheckboxInThemesSetting,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-constexpr base::FeatureParam<bool> kDarkenWebsitesCheckboxOptOut{
-    &kDarkenWebsitesCheckboxInThemesSetting, "opt_out", true};
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace features {
 
 // Enables unused site permission module in Safety Check.
 BASE_FEATURE(kSafetyCheckUnusedSitePermissions,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else   // BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kActiveContentSettingExpiry, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kEagerStorageAccessPermissionCheck,
@@ -40,12 +30,7 @@ const base::FeatureParam<bool> kSafetyCheckUnusedSitePermissionsWithDelay{
     "unused-site-permissions-with-delay-for-testing", false};
 
 BASE_FEATURE(kApproximateGeolocationPermission,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kLeftHandSideActivityIndicators, base::FEATURE_ENABLED_BY_DEFAULT);
 

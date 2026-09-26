@@ -128,10 +128,6 @@
 #include "url/scheme_host_port.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/pre_freeze_background_memory_trimmer.h"
-#endif
-
 using std::string;
 
 namespace net::test {
@@ -3006,150 +3002,6 @@ TEST_P(QuicSessionPoolTest, CloseSessionsOnIPAddressChanged) {
   socket_data2.ExpectAllReadDataConsumed();
   socket_data2.ExpectAllWriteDataConsumed();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-class ScopedSupportsModernTrim {
- public:
-  explicit ScopedSupportsModernTrim(bool supports)
-      : original_supports_(base::android::PreFreezeBackgroundMemoryTrimmer::
-                               SupportsModernTrim()) {
-    base::android::PreFreezeBackgroundMemoryTrimmer::
-        SetSupportsModernTrimForTesting(supports);
-  }
-  ~ScopedSupportsModernTrim() {
-    base::android::PreFreezeBackgroundMemoryTrimmer::
-        SetSupportsModernTrimForTesting(original_supports_);
-  }
-
- private:
-  const bool original_supports_;
-};
-
-TEST_P(QuicSessionPoolTest, CloseSessionsOnPreFreeze) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      features::kCloseQuicSessionsOnPreFreeze);
-  ScopedSupportsModernTrim scoped_supports(true);
-
-  Initialize();
-  base::HistogramTester histograms;
-
-  ProofVerifyDetailsChromium verify_details = DefaultProofVerifyDetails();
-  crypto_client_stream_factory_.AddProofVerifyDetails(&verify_details);
-
-  MockQuicData socket_data(version_);
-  socket_data.AddReadPauseForever();
-  int packet_num = 1;
-  socket_data.AddWrite(SYNCHRONOUS,
-                       ConstructInitialSettingsPacket(packet_num++));
-  socket_data.AddWrite(
-      SYNCHRONOUS,
-      client_maker_.Packet(packet_num)
-          .AddConnectionCloseFrame(quic::QUIC_PEER_GOING_AWAY, "net error")
-          .Build());
-  socket_data.AddSocketDataToFactory(socket_factory_.get());
-
-  RequestBuilder builder(this);
-  EXPECT_EQ(ERR_IO_PENDING, builder.CallRequest());
-  histograms.ExpectUniqueSample("Net.QuicSession.RequestBlockedByPreFreeze",
-                                false, 1);
-  EXPECT_THAT(callback_.WaitForResult(), IsOk());
-  std::unique_ptr<HttpStream> stream = CreateStream(&builder.request);
-  HttpRequestInfo request_info;
-  request_info.traffic_annotation =
-      MutableNetworkTrafficAnnotationTag(TRAFFIC_ANNOTATION_FOR_TESTS);
-  stream->RegisterRequest(&request_info);
-  EXPECT_EQ(OK, stream->InitializeStream(false, DEFAULT_PRIORITY, net_log_,
-                                         CompletionOnceCallback()));
-
-  // Check an active session exists for the destination.
-  EXPECT_TRUE(HasActiveSession(kDefaultDestination));
-  QuicChromiumClientSession* session = GetActiveSession(kDefaultDestination);
-  EXPECT_TRUE(QuicSessionPoolPeer::IsLiveSession(pool_.get(), session));
-
-  // Trigger pre-freeze.
-  base::android::PreFreezeBackgroundMemoryTrimmer::OnPreFreezeForTesting();
-
-  // Wait for the session to be closed.
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    return !HasActiveSession(kDefaultDestination) &&
-           !QuicSessionPoolPeer::IsLiveSession(pool_.get(), session);
-  }));
-
-  base::android::PreFreezeBackgroundMemoryTrimmer::SetForcePreFrozenForTesting(
-      true);
-
-  // Verify that new requests are blocked immediately.
-  RequestBuilder builder2(this);
-  EXPECT_EQ(ERR_ABORTED, builder2.CallRequest());
-  histograms.ExpectBucketCount("Net.QuicSession.RequestBlockedByPreFreeze",
-                               true, 1);
-  histograms.ExpectTotalCount("Net.QuicSession.RequestBlockedByPreFreeze", 2);
-
-  base::android::PreFreezeBackgroundMemoryTrimmer::SetForcePreFrozenForTesting(
-      false);
-
-  socket_data.ExpectAllReadDataConsumed();
-  socket_data.ExpectAllWriteDataConsumed();
-}
-
-TEST_P(QuicSessionPoolTest, CloseSessionsOnPreFreezeDisabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndDisableFeature(
-      features::kCloseQuicSessionsOnPreFreeze);
-  ScopedSupportsModernTrim scoped_supports(true);
-
-  Initialize();
-  ProofVerifyDetailsChromium verify_details = DefaultProofVerifyDetails();
-  crypto_client_stream_factory_.AddProofVerifyDetails(&verify_details);
-
-  MockQuicData socket_data(version_);
-  socket_data.AddReadPauseForever();
-  int packet_num = 1;
-  socket_data.AddWrite(SYNCHRONOUS,
-                       ConstructInitialSettingsPacket(packet_num++));
-  // Expect ConnectionClose on shutdown
-  socket_data.AddWrite(
-      SYNCHRONOUS,
-      client_maker_.Packet(packet_num)
-          .AddConnectionCloseFrame(quic::QUIC_CONNECTION_CANCELLED, "net error")
-          .Build());
-  socket_data.AddSocketDataToFactory(socket_factory_.get());
-
-  RequestBuilder builder(this);
-  EXPECT_EQ(ERR_IO_PENDING, builder.CallRequest());
-  EXPECT_THAT(callback_.WaitForResult(), IsOk());
-  std::unique_ptr<HttpStream> stream = CreateStream(&builder.request);
-  HttpRequestInfo request_info;
-  request_info.traffic_annotation =
-      MutableNetworkTrafficAnnotationTag(TRAFFIC_ANNOTATION_FOR_TESTS);
-  stream->RegisterRequest(&request_info);
-  EXPECT_EQ(OK, stream->InitializeStream(false, DEFAULT_PRIORITY, net_log_,
-                                         CompletionOnceCallback()));
-
-  // Check an active session exists for the destination.
-  EXPECT_TRUE(HasActiveSession(kDefaultDestination));
-  QuicChromiumClientSession* session = GetActiveSession(kDefaultDestination);
-  EXPECT_TRUE(QuicSessionPoolPeer::IsLiveSession(pool_.get(), session));
-
-  // Trigger pre-freeze.
-  base::android::PreFreezeBackgroundMemoryTrimmer::OnPreFreezeForTesting();
-
-  // Check that the session is NOT closed.
-  EXPECT_TRUE(HasActiveSession(kDefaultDestination));
-  EXPECT_TRUE(QuicSessionPoolPeer::IsLiveSession(pool_.get(), session));
-
-  // Verify that new requests are NOT blocked and reuse the session.
-  RequestBuilder builder2(this);
-  EXPECT_EQ(OK, builder2.CallRequest());
-
-  // Destroy pool first to close session cleanly (writing ConnectionClose)
-  pool_.reset();
-
-  socket_data.ExpectAllReadDataConsumed();
-  socket_data.ExpectAllWriteDataConsumed();
-}
-#endif
 
 // Test that if goaway_session_on_ip_change is set, old sessions will be marked
 // as going away on IP address change instead of being closed. New requests will
@@ -14654,13 +14506,8 @@ TEST_P(QuicSessionPoolTest, Tag) {
   socket_data2.AddWrite(SYNCHRONOUS, ConstructInitialSettingsPacket());
   socket_data2.AddSocketDataToFactory(socket_factory_.get());
 
-#if BUILDFLAG(IS_ANDROID)
-  SocketTag tag1(SocketTag::UNSET_UID, 0x12345678);
-  SocketTag tag2(getuid(), 0x87654321);
-#else
   // On non-Android platforms we can only use the default constructor.
   SocketTag tag1, tag2;
-#endif
 
   // Request a stream with |tag1|.
   RequestBuilder builder1(this);
@@ -14698,12 +14545,8 @@ TEST_P(QuicSessionPoolTest, Tag) {
       builder3.request.ReleaseSessionHandle();
   EXPECT_TRUE(stream3);
   EXPECT_TRUE(stream3->IsConnected());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(stream3->SharesSameSession(*stream1));
-#else
   // Same tag should reuse session.
   EXPECT_TRUE(stream3->SharesSameSession(*stream1));
-#endif
 }
 
 TEST_P(QuicSessionPoolTest, ReadErrorClosesConnection) {

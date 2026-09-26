@@ -35,8 +35,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/platform_auth/extensible_enterprise_sso_provider_mac.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/platform_auth/entra_provider_android.h"
 #endif
 
 namespace enterprise_auth {
@@ -46,8 +44,6 @@ namespace {
 std::unique_ptr<PlatformAuthProvider> MakeProvider() {
 #if BUILDFLAG(IS_MAC)
   return std::make_unique<ExtensibleEnterpriseSSOProvider>();
-#elif BUILDFLAG(IS_ANDROID)
-  return std::make_unique<EntraProviderAndroid>();
 #else
 #error Unsupported platform
 #endif

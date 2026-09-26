@@ -451,13 +451,7 @@ BASE_FEATURE(kDedicatedMediaServiceThread,
 // Defer requesting persistent audio focus until the WebContents is audible.
 // The goal is to prevent silent playback from taking audio focus from
 // background apps on android, where focus is typically exclusive.
-BASE_FEATURE(kDeferAudioFocusUntilAudible,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kDeferAudioFocusUntilAudible, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Controls whether the OpusAudioDecoder is used for Opus audio decoding
 // (instead of the FFmpegAudioDecoder).
@@ -477,12 +471,7 @@ BASE_FEATURE(kDocumentPictureInPictureNavigation,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kDocumentPictureInPictureReparenting,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables support for >8 audio channel layouts (i.e., 5.1.4 and 7.1.4).
 BASE_FEATURE(kEnableHighChannelLayouts, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -536,11 +525,7 @@ BASE_FEATURE(kFeatureManagementLiveTranslateCrOS,
 // (sometimes) not available.
 // TODO: crbug.com/40068556 - Enable for Android and remove this flag.
 BASE_FEATURE(kForceSoftwareForRtcLowResolutions,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // When getDisplayMedia() is invoked, the user sees and interacts with
 // a Chromium prompt through which they choose which tab/window/screen
@@ -635,13 +620,7 @@ BASE_FEATURE(kHeadlessLiveCaption, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables the internal Media Session logic without enabling the Media Session
 // service.
-BASE_FEATURE(kInternalMediaSession,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kInternalMediaSession, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables the Live Caption feature on supported devices.
 BASE_FEATURE(kLiveCaption, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -716,12 +695,7 @@ BASE_FEATURE(kMediaCapabilitiesWithParameters,
 //   having a high MEI until there is enough local data to determine the user's
 //   preferred behaviour.
 BASE_FEATURE(kMediaEngagementBypassAutoplayPolicies,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kMediaEngagementHTTPSOnly, base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -732,13 +706,7 @@ BASE_FEATURE(kMediaLinkHelpers, base::FEATURE_ENABLED_BY_DEFAULT);
 // development by ensuring logs can be seen without a remote desktop session.
 // Only affects builds when DCHECK is on for non-ERROR logs (ERROR logs are
 // always sent to the log stream). Enabled by default on Android and ChromeOS.
-BASE_FEATURE(kMediaLogToConsole,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kMediaLogToConsole, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enable the prototype global optimization of tuneables via finch.  See
 // media/base/tuneable.h for how to create tuneable parameters.
@@ -799,20 +767,14 @@ BASE_FEATURE(kParseSEIRecoveryPoints, base::FEATURE_ENABLED_BY_DEFAULT);
 // previous behavior if we find any problems while disabling this feature.
 BASE_FEATURE(kPauseBackgroundTimer, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kPauseMutedBackgroundAudio,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kPauseMutedBackgroundAudio, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Adds a mute/unmute button to the Video Picture-in-Picture overlay window.
 BASE_FEATURE(kPictureInPictureMuteControl, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Allows usage of OS-level (platform) audio encoders.
 BASE_FEATURE(kPlatformAudioEncoder,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -823,13 +785,7 @@ BASE_FEATURE(kPlatformAudioEncoder,
 // packs.
 BASE_FEATURE(kPreemptiveSodaDownload, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kPreloadMediaEngagementData,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kPreloadMediaEngagementData, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enables Media Engagement Index recording. This data will be used to determine
 // when to bypass autoplay policies. This is recorded on all platforms.
@@ -852,12 +808,7 @@ BASE_FEATURE(kResolutionBasedDecoderPriority, base::FEATURE_ENABLED_BY_DEFAULT);
 // when in background.
 BASE_FEATURE(kResumeBackgroundVideo,
              "resume-background-video",
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Approach original pre-REC MSE object URL autorevoking behavior, though await
 // actual attempt to use the object URL for attachment to perform revocation.
@@ -1031,7 +982,6 @@ BASE_FEATURE(kWidevinePersistentLicenseSupport,
 // Gated behind feature flag to allow safe rollback of zero-copy capture.
 BASE_FEATURE(kZeroCopyDesktopCapture, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Blocks picture-in-picture windows while file dialogs are open.
 BASE_FEATURE(kFileDialogsBlockPictureInPicture,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -1069,8 +1019,6 @@ BASE_FEATURE(kVideoPipDisplaySmoothnessOptimization,
 // playback. Used for debugging.
 BASE_FEATURE(kVideoPipForceTrustedForMediaPlaybackForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 // Spawn utility processes to perform hardware decode acceleration on behalf of
@@ -1140,10 +1088,10 @@ BASE_FEATURE(kPlatformEncryptedDolbyVision,
 // Enables HEVC hardware accelerated decoding.
 BASE_FEATURE(kPlatformHEVCDecoderSupport, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 // Enables HEVC hardware accelerated encoding for Apple and Android.
 BASE_FEATURE(kPlatformHEVCEncoderSupport, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE)
 
 #if BUILDFLAG(IS_APPLE)
 // Enables HEVC Main10 (10-bit) hardware accelerated encoding on macOS.
@@ -1163,143 +1111,6 @@ BASE_FEATURE(kSymphoniaMp3Decoding, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kSymphoniaPcmDecoding, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kSymphoniaVorbisDecoding, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(ENABLE_SYMPHONIA)
-
-#if BUILDFLAG(IS_ANDROID)
-// Allows audio playback capture on Android.
-BASE_FEATURE(kAllowAudioPlaybackCapture, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Allows media playback to start when the audio focus request is delayed
-// (e.g. during a phone call).
-BASE_FEATURE(kAllowDelayedAudioFocusGainAndroid,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Allows the enhanced picture-in-picture transition animation that depend on
-// the sourceRectHint PictureInPictureParam.
-BASE_FEATURE(kAllowEnhancedPipTransition, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Allow the media pipeline to prioritize the software decoder provided by
-// MediaCodec, instead of the built-in software decoders. This is only enabled
-// for platforms which shows worse performance when using the built-in software
-// decoders, e.g. Cast on ATV.
-BASE_FEATURE(kAllowMediaCodecSoftwareDecoder,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables media capturing to continue in the background.
-BASE_FEATURE(kAndroidEnableBackgroundMediaCapturing,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables zero-copy video capture on Android.
-BASE_FEATURE(kAndroidZeroCopyVideoCapture, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables automatic Picture-in-Picture permission prompt on Android for
-// document picture-in-picture.
-BASE_FEATURE(kAutoDocPiPPermissionPromptAndroid,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables automatic Picture-in-Picture on Android for supported websites.
-// This triggers for active video playback or camera/microphone usage on sites
-// that have registered an auto picture-in-picture action.
-BASE_FEATURE(kAutoPictureInPictureAndroid, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables Picture-in-Picture menu item on the video context menu on Android.
-BASE_FEATURE(kContextMenuPictureInPictureAndroid,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables fullscreen video Picture-in-Picture on Android.
-BASE_FEATURE(kFullscreenVideoPictureInPicture,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables block model (LinearBlock) on supported devices.
-// TODO(crbug.com/327625558): Currently block model is buggy and can't be
-// enabled, we need to test it again when Android 17 is released.
-BASE_FEATURE(kMediaCodecBlockModel, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables output-side block model (OutputFrame) on supported devices.
-BASE_FEATURE(kMediaCodecBlockModelOutput, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Kill switch for removing idiosyncratic use of MediaCodec color APIs.
-BASE_FEATURE(kMediaCodecColorSpaceCleanup, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Allow selection of low latency decoders in low delay mode.
-BASE_FEATURE(kMediaCodecLowDelayMode, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables MediaDrmBridge to call into MediaDrm API to query HDCP Status to
-// support the CDM API GetStatusForPolicy.
-BASE_FEATURE(kMediaDrmGetStatusForPolicy, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// An experimental feature to enable persistent-license type support in MediaDrm
-// when using Encrypted Media Extensions (EME) API.
-// TODO(xhwang): Remove this after feature launch. See http://crbug.com/493521
-BASE_FEATURE(kMediaDrmPersistentLicense, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables MediaDrmOriginIdManager to provide preprovisioned origin IDs for
-// MediaDrmBridge. If disabled, MediaDrmBridge will get unprovisioned origin IDs
-// which will trigger provisioning process after MediaDrmBridge is created.
-BASE_FEATURE(kMediaDrmPreprovisioning, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Determines if MediaDrmOriginIdManager should attempt to pre-provision origin
-// IDs at startup (whenever a profile is loaded). Also used by tests that
-// disable it so that the tests can setup before pre-provisioning is done.
-// Note: Has no effect if kMediaDrmPreprovisioning feature is disabled.
-BASE_FEATURE(kMediaDrmPreprovisioningAtStartup,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables exponential backoff for preprovisioning requests in
-// MediaDrmOriginIdManager.
-BASE_FEATURE(kMediaDrmPreprovisioningBackoff, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// This feature allows for some MediaDrm functions to be executed in a separate
-// process so that crashes do not bring down the browser. Flag is available so
-// that it can be disabled for WebView as separate processes are not allowed.
-BASE_FEATURE(kMediaDrmQueryInSeparateProcess, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Allows setting SVC bitrate layers for NdkVideoEncodeAccelerator.
-BASE_FEATURE(kNdkVideoEncodeAcceleratorBitrateLayering,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Allows native temporal layer ID retrieval for NdkVideoEncodeAccelerator.
-BASE_FEATURE(kNdkVideoEncodeAcceleratorNativeSvc,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, do not pause media when a headphone unplug event is received.
-BASE_FEATURE(kNoPauseMediaOnHeadphoneUnplug, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Pause media when a system sleep/suspension is detected.
-BASE_FEATURE(kPauseMediaOnSystemSleepAndroid,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, Playing media sessions will request audio focus from the
-// Android system.
-BASE_FEATURE(kRequestSystemAudioFocus, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables skipping MediaCodec reallocation if input buffer requirements
-// are already met.
-BASE_FEATURE(kSkipMediaCodecReallocation, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Allow the video decoder (MediaCodecVideoDecoder) to query the MediaCrypto
-// object with a mime type to see if a secure decoder component is required.
-// If disabled, we use the fallback Widevine L1/L3 security level check.
-BASE_FEATURE(kUseMediaCryptoRequiresSecureDecoderComponent,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Use the (hacky) AudioManager.getOutputLatency() call to get the estimated
-// hardware latency for a stream for OpenSLES playback.  This is normally not
-// needed, except for some Android TV devices.
-BASE_FEATURE(kUseAudioLatencyFromHAL, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Allows Chrome to query Android for supported layouts, and forces the use
-// of the layout with the maximum number of channels. This avoids
-// downmixing (and losing channel information) if a media file starts with
-// a low channel count but switches to a higher channel later in the file.
-// For example, when this feature is disabled and playing a media file
-// which starts with 5.1 and switches to 7.1, we would be forced to downmix
-// from 7.1 to 5.1, since we don't update ChannelLayouts mid-playback.
-// Used on Android automotive only.
-BASE_FEATURE(kUseAudioManagerMaxChannelLayout,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kUseMediaFormatCodedSize, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_APPLE)
 // Enables VideoToolbox Quality Metrics (MSE / PSNR) generation.
@@ -1509,12 +1320,8 @@ std::string GetEffectiveAutoplayPolicy(const base::CommandLine& command_line) {
     return switches::autoplay::kDocumentUserActivationRequiredPolicy;
   }
 
-// The default value is platform dependent.
-#if BUILDFLAG(IS_ANDROID)
-  return switches::autoplay::kUserGestureRequiredPolicy;
-#else
+  // The default value is platform dependent.
   return switches::autoplay::kNoUserGestureRequiredPolicy;
-#endif
 }
 
 // Return bitmask of audio formats supported by EDID.
@@ -1686,15 +1493,6 @@ bool IsOutOfProcessVideoDecodingEnabled() {
 }
 
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
-
-#if BUILDFLAG(IS_ANDROID)
-bool IsAndroidZeroCopyVideoCaptureEnabled(
-    const gpu::GpuDriverBugWorkarounds& gpu_workarounds) {
-  return !gpu_workarounds.disable_android_zero_copy_video_capture &&
-         base::FeatureList::IsEnabled(media::kAndroidZeroCopyVideoCapture);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 namespace {

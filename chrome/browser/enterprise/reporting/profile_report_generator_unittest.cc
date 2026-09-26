@@ -35,11 +35,7 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-#else
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"
@@ -93,11 +89,7 @@ std::unique_ptr<KeyedService> CreateProfileIdService(
 
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID)
-typedef ReportingDelegateFactoryAndroid PlatformReportingDelegateFactory;
-#else
 typedef ReportingDelegateFactoryDesktop PlatformReportingDelegateFactory;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class ProfileReportGeneratorTest : public ::testing::Test {
  public:

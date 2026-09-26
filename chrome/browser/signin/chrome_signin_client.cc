@@ -67,20 +67,11 @@
 #include "ui/base/models/tree_node_iterator.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
-#endif
 
 #include "chrome/browser/signin/wait_for_network_callback_helper_chrome.h"
 
@@ -329,7 +320,6 @@ void ChromeSigninClient::PreSignOut(
   DCHECK(!on_signout_decision_reached_) << "SignOut already in-progress!";
   on_signout_decision_reached_ = std::move(on_signout_decision_reached);
 
-#if !BUILDFLAG(IS_ANDROID)
   // `signout_source_metric` is `signin_metrics::ProfileSignout::kAbortSignin`
   // if the user declines sync in the signin process. In case the user accepts
   // the managed account but declines sync, we should keep the window open.
@@ -369,9 +359,6 @@ void ChromeSigninClient::PreSignOut(
         base::BindRepeating(&ChromeSigninClient::OnCloseBrowsersAborted,
                             base::Unretained(this)));
   } else {
-#else
-  {
-#endif
     std::move(on_signout_decision_reached_)
         .Run(GetSignoutDecision(signout_source_metric));
   }
@@ -469,29 +456,16 @@ SigninClient::SignoutDecision ChromeSigninClient::GetSignoutDecision(
     return is_clear_primary_account_allowed_for_testing_.value();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android we do not allow supervised users to sign out.
-  // We also don't allow sign out on ChromeOS, though this is enforced outside
-  // the scope of this method.
-  // Other platforms do not restrict signout of supervised users.
-  if (profile_->IsChild()) {
-    return SigninClient::SignoutDecision::CLEAR_PRIMARY_ACCOUNT_DISALLOWED;
-  }
-#endif
-
-// Android allows signing out of Managed accounts.
-#if !BUILDFLAG(IS_ANDROID)
+  // Android allows signing out of Managed accounts.
   // Check if managed user.
   if (enterprise_util::UserAcceptedAccountManagement(profile_)) {
     // Disallow signout regardless of consent level of the primary account.
     return SigninClient::SignoutDecision::CLEAR_PRIMARY_ACCOUNT_DISALLOWED;
   }
-#endif
   return SigninClient::SignoutDecision::ALLOW;
 }
 
 void ChromeSigninClient::VerifySyncToken() {
-#if !BUILDFLAG(IS_ANDROID)
   // We only verify the token once when Profile is just created.
   if (signin_util::IsForceSigninEnabled() && !force_signin_verifier_) {
     force_signin_verifier_ = std::make_unique<ForceSigninVerifier>(
@@ -499,10 +473,8 @@ void ChromeSigninClient::VerifySyncToken() {
         base::BindOnce(&ChromeSigninClient::OnTokenFetchComplete,
                        base::Unretained(this)));
   }
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ChromeSigninClient::OnTokenFetchComplete(bool token_is_valid) {
   // If the token is valid we do need to do anything special and let the user
   // proceed.
@@ -523,24 +495,12 @@ void ChromeSigninClient::OnTokenFetchComplete(bool token_is_valid) {
           // profile picker.
           /*should_sign_out=*/false));
 }
-#endif
 
 void ChromeSigninClient::RecordOpenTabCount(
     signin_metrics::AccessPoint access_point,
     signin::ConsentLevel consent_level) {
   size_t tabs_count = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  for (const TabModel* model : TabModelList::models()) {
-    // Note: Even though on Android only a single regular profile is supported,
-    // there can also be an incognito profile which should be excluded here.
-    if (model->GetProfile() != profile_) {
-      continue;
-    }
-
-    tabs_count += model->GetTabCount();
-  }
-#else   // !BUILDFLAG(IS_ANDROID)
   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
       [this, &tabs_count](BrowserWindowInterface* browser) {
         if (browser->GetProfile() != profile_) {
@@ -552,7 +512,6 @@ void ChromeSigninClient::RecordOpenTabCount(
         }
         return true;
       });
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   signin_metrics::RecordOpenTabCountOnSignin(consent_level, tabs_count);
 }
@@ -566,11 +525,9 @@ void ChromeSigninClient::OnCloseBrowsersSuccess(
     const signin_metrics::ProfileSignout signout_source_metric,
     bool should_sign_out,
     const base::FilePath& profile_path) {
-#if !BUILDFLAG(IS_ANDROID)
   if (signin_util::IsForceSigninEnabled() && force_signin_verifier_.get()) {
     force_signin_verifier_->Cancel();
   }
-#endif
 
   if (should_sign_out) {
     std::move(on_signout_decision_reached_)
@@ -608,8 +565,6 @@ void ChromeSigninClient::LockForceSigninProfile(
 }
 
 void ChromeSigninClient::ShowUserManager(const base::FilePath& profile_path) {
-#if !BUILDFLAG(IS_ANDROID)
   ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
       ProfilePicker::EntryPoint::kProfileLocked));
-#endif
 }

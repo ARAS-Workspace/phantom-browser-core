@@ -123,8 +123,6 @@ class DeviceStatisticsTrackerTest : public testing::Test {
     return sync_pb::SyncEnums_OsType_OS_TYPE_MAC;
 #elif BUILDFLAG(IS_LINUX)
     return sync_pb::SyncEnums_OsType_OS_TYPE_LINUX;
-#elif BUILDFLAG(IS_ANDROID)
-    return sync_pb::SyncEnums_OsType_OS_TYPE_ANDROID;
 #else
     return sync_pb::SyncEnums_OsType_OS_TYPE_UNSPECIFIED;
 #endif

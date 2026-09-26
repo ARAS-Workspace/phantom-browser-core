@@ -63,7 +63,7 @@ class StringWrapper {
   std::u16string string_;
 };
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
 // On Mac, we are disabling this test because GetApplicationLocale() as an
 // API isn't something that we'll easily be able to unit test in this manner.
 // The meaning of that API, on the Mac, is "the locale used by Cocoa's main
@@ -658,9 +658,7 @@ TEST_F(L10nUtilTest, GetUserFacingUILocaleList) {
   // Chinese and Chinese (Hong Kong), as we do not have specific strings for
   // them (except on Android).
   EXPECT_FALSE(locales.contains("zh"));
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(locales.contains("zh-HK"));
-#endif
   // Norwegian (no), as it does not specify a written form.
   EXPECT_FALSE(locales.contains("no"));
   // English (Germany). A valid locale and in ICU's list of locales, but not in
@@ -736,7 +734,7 @@ TEST_F(L10nUtilTest, FormatStringComputeCorrectOffsetInRTL) {
   // On Linux, an extra base::i18n::kRightToLeftMark character is appended for
   // the text rendering engine to render the string correctly. This should be
   // considered when computing the offsets.
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   EXPECT_EQ(offsets[0], 11u);
 #else
   EXPECT_EQ(offsets[0], 10u);

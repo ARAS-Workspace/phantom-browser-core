@@ -18,7 +18,6 @@
 #include "chrome/browser/media/webrtc/thumbnail_capturer_mac.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace {
 std::unique_ptr<ThumbnailCapturer> MakeScreenCapturer(
     content::WebContents* web_contents) {
@@ -55,7 +54,6 @@ std::unique_ptr<ThumbnailCapturer> MakeWindowCapturer(
                           : nullptr;
 }
 }  // namespace
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 DesktopMediaPickerFactoryImpl::DesktopMediaPickerFactoryImpl() = default;
 
@@ -73,11 +71,6 @@ std::unique_ptr<DesktopMediaPicker> DesktopMediaPickerFactoryImpl::CreatePicker(
   // desktop Android builds.
 #if defined(TOOLKIT_VIEWS)
   return DesktopMediaPicker::Create(request);
-#elif BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(kAndroidMediaPicker)) {
-    return DesktopMediaPicker::Create(request);
-  }
-  return nullptr;
 #else
   return nullptr;
 #endif
@@ -88,10 +81,6 @@ DesktopMediaPickerFactoryImpl::CreateMediaList(
     const std::vector<DesktopMediaList::Type>& types,
     content::WebContents* web_contents,
     DesktopMediaList::WebContentsFilter includable_web_contents_filter) {
-#if BUILDFLAG(IS_ANDROID)
-  // We do not use DesktopMediaList on Android.
-  return {};
-#else
   // If we're supposed to include Tabs, but aren't including Windows (either
   // directly or indirectly), then we need to add Chrome App Windows back in.
   const bool add_chrome_app_windows =
@@ -186,5 +175,4 @@ DesktopMediaPickerFactoryImpl::CreateMediaList(
     }
   }
   return source_lists;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }

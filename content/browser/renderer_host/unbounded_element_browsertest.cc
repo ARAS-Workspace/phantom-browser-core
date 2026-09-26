@@ -42,26 +42,11 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 namespace content {
 
 namespace {
 
-void SkipTestsForUnsupportedPlatforms() {
-#if BUILDFLAG(IS_ANDROID)
-  // if (base::android::android_info::sdk_int() <
-  //     base::android::android_info::SDK_VERSION_U) {
-  //   GTEST_SKIP()
-  //       << "Unbounded elements require Android U (API 34+ / Android 14+).";
-  // }
-
-  // TODO(crbug.com/544212552): Flaky/failing on Android.
-  GTEST_SKIP();
-#endif
-}
+void SkipTestsForUnsupportedPlatforms() {}
 
 }  // namespace
 
@@ -314,11 +299,7 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest, InputEventRoutingTouch) {
 }
 
 // TODO(crbug.com/534380085): Flaky/failing on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_LightDismissEscKey DISABLED_LightDismissEscKey
-#else
 #define MAYBE_LightDismissEscKey LightDismissEscKey
-#endif
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest, MAYBE_LightDismissEscKey) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
   EXPECT_TRUE(NavigateToURL(shell(), url));
@@ -577,11 +558,7 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // Mouse events are not routed through UnboundedSurfaceWindow on Android, as
 // native touch/pointer events are handled by the regular Android View
 // hierarchy.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PopupInputEventRouting DISABLED_PopupInputEventRouting
-#else
 #define MAYBE_PopupInputEventRouting PopupInputEventRouting
-#endif
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
                        MAYBE_PopupInputEventRouting) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
@@ -630,13 +607,8 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // Mouse events are not routed through UnboundedSurfaceWindow on Android, as
 // native touch/pointer events are handled by the regular Android View
 // hierarchy.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PopupOutsideViewportInputEventRouting \
-  DISABLED_PopupOutsideViewportInputEventRouting
-#else
 #define MAYBE_PopupOutsideViewportInputEventRouting \
   PopupOutsideViewportInputEventRouting
-#endif
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
                        MAYBE_PopupOutsideViewportInputEventRouting) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
@@ -733,11 +705,7 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // Mouse events are not routed through UnboundedSurfaceWindow on Android, as
 // native touch/pointer events are handled by the regular Android View
 // hierarchy.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_IframeClickEventRouting DISABLED_IframeClickEventRouting
-#else
 #define MAYBE_IframeClickEventRouting IframeClickEventRouting
-#endif
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
                        MAYBE_IframeClickEventRouting) {
   GURL url(embedded_test_server()->GetURL("/page_with_iframe.html"));
@@ -884,13 +852,8 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest, DynamicBoundsSync) {
 }
 
 // TODO(crbug.com/534380085): Flaky/failing on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_NestedChildBoundsExpansionTriggersRedraw \
-  DISABLED_NestedChildBoundsExpansionTriggersRedraw
-#else
 #define MAYBE_NestedChildBoundsExpansionTriggersRedraw \
   NestedChildBoundsExpansionTriggersRedraw
-#endif
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
                        MAYBE_NestedChildBoundsExpansionTriggersRedraw) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
@@ -936,13 +899,8 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 }
 
 // TODO(crbug.com/534380085): Flaky/failing on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AnimatedChildWithBoxShadowSubmitsFrame \
-  DISABLED_AnimatedChildWithBoxShadowSubmitsFrame
-#else
 #define MAYBE_AnimatedChildWithBoxShadowSubmitsFrame \
   AnimatedChildWithBoxShadowSubmitsFrame
-#endif
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
                        MAYBE_AnimatedChildWithBoxShadowSubmitsFrame) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));

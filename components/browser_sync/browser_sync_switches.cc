@@ -9,12 +9,7 @@
 
 namespace switches {
 
-BASE_FEATURE(kMigrateSyncingUserToSignedIn,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
+BASE_FEATURE(kMigrateSyncingUserToSignedIn, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE_PARAM(base::TimeDelta,
                    kMinDelayToMigrateSyncPaused,
@@ -26,11 +21,7 @@ BASE_FEATURE(kUndoMigrationOfSyncingUserToSignedIn,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kForceMigrateSyncingUserToSignedIn,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kForceMigrateNoopForDebugging,
              base::FEATURE_DISABLED_BY_DEFAULT);

@@ -26,23 +26,17 @@
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_jni_bridge.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "components/ntp_tiles/custom_links_store.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace {
 
 bool IsPageInTabGroup(content::WebContents* contents) {
   DCHECK(contents);
 
-#if !BUILDFLAG(IS_ANDROID)
   if (BrowserWindowInterface* browser =
           GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
               contents)) {
@@ -54,13 +48,6 @@ bool IsPageInTabGroup(content::WebContents* contents) {
     }
   }
   return false;
-#else   // BUILDFLAG(IS_ANDROID)
-  TabAndroid* const tab = TabAndroid::FromWebContents(contents);
-  if (!tab) {
-    return false;
-  }
-  return tab->GetGroup().has_value();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Pass in a separate `url` parameter to ensure that we check the same URL that
@@ -424,7 +411,6 @@ void HistoryClustersTabHelper::RecordPageEndMetricsIfNeeded(
       IsPageBookmarked(web_contents(),
                        incomplete_visit_context_annotations.url_row.url());
   // Android does not have NTP Custom Links.
-#if !BUILDFLAG(IS_ANDROID)
   // This queries the prefs directly if the visit URL is stored as an NTP
   // custom link, bypassing the CustomLinksManager.
   PrefService* pref_service =
@@ -435,7 +421,6 @@ void HistoryClustersTabHelper::RecordPageEndMetricsIfNeeded(
       std::ranges::contains(custom_link_store.RetrieveLinks(),
                             incomplete_visit_context_annotations.url_row.url(),
                             [](const auto& link) { return link.url; });
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   incomplete_visit_context_annotations.status.navigation_end_signals = true;
   history_clusters_service->CompleteVisitContextAnnotationsIfReady(

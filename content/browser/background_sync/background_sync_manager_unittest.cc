@@ -696,17 +696,7 @@ class BackgroundSyncManagerTest
   }
 
   void SetRelyOnAndroidNetworkDetectionAndRestartManager(
-      bool rely_on_android_network_detection) {
-#if BUILDFLAG(IS_ANDROID)
-    BackgroundSyncParameters* parameters =
-        GetController()->background_sync_parameters();
-    parameters->rely_on_android_network_detection =
-        rely_on_android_network_detection;
-
-    // Restart BackgroundSyncManager so that it updates its parameters.
-    SetupBackgroundSyncManager();
-#endif
-  }
+      bool rely_on_android_network_detection) {}
 
   void SetPeriodicSyncEventsMinIntervalAndRestartManager(
       base::TimeDelta periodic_sync_events_min_interval) {
@@ -2023,13 +2013,8 @@ TEST_F(BackgroundSyncManagerTest, RelyOnAndroidNetworkDetection) {
   EXPECT_TRUE(Register(sync_options_1_));
   SetNetwork(net::NetworkChangeNotifier::ConnectionType::CONNECTION_WIFI);
   base::RunLoop().RunUntilIdle();
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(0, sync_events_called_);
-  EXPECT_TRUE(GetRegistration(sync_options_1_));
-#else
   EXPECT_EQ(1, sync_events_called_);
   EXPECT_FALSE(GetRegistration(sync_options_1_));
-#endif
 }
 
 TEST_F(BackgroundSyncManagerTest, OneAttempt) {

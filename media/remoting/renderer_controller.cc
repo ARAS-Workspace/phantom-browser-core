@@ -15,10 +15,6 @@
 #include "media/base/remoting_constants.h"
 #include "media/remoting/metrics.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "media/base/android/media_codec_util.h"
-#endif
-
 namespace media {
 namespace remoting {
 
@@ -332,20 +328,16 @@ void RendererController::OnHlsManifestDetected() {
 }
 
 void RendererController::UpdateRemotePlaybackAvailabilityMonitoringState() {
-// Currently RemotePlayback-initated media remoting only supports URL flinging
-// thus the source is supported when the URL is either http or https, video and
-// audio codecs are supported by the remote playback device; HLS is playable by
-// Chrome on Android (which is not detected by the pipeline metadata atm).
-// On Desktop, `sink_metadata_` is empty until a streaming session has been
-// established. So it's not possible to check if the receiver device supports
-// the media's codec.
-#if BUILDFLAG(IS_ANDROID)
-  const bool is_media_supported = is_hls_ || IsRemotePlaybackSupported();
-#else
+  // Currently RemotePlayback-initated media remoting only supports URL flinging
+  // thus the source is supported when the URL is either http or https, video
+  // and audio codecs are supported by the remote playback device; HLS is
+  // playable by Chrome on Android (which is not detected by the pipeline
+  // metadata atm). On Desktop, `sink_metadata_` is empty until a streaming
+  // session has been established. So it's not possible to check if the receiver
+  // device supports the media's codec.
   const bool is_media_supported =
       !pipeline_metadata_.video_decoder_config.is_encrypted() &&
       !pipeline_metadata_.audio_decoder_config.is_encrypted();
-#endif
   // TODO(avayvod): add a check for CORS.
   bool is_source_supported = url_after_redirects_.has_scheme() &&
                              (url_after_redirects_.SchemeIs("http") ||
@@ -686,67 +678,6 @@ void RendererController::SendMessageToSink(std::vector<uint8_t> message) {
   DCHECK(thread_checker_.CalledOnValidThread());
   remoter_->SendMessageToSink(message);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-
-bool RendererController::IsAudioRemotePlaybackSupported() const {
-  DCHECK(thread_checker_.CalledOnValidThread());
-  DCHECK(has_audio());
-
-  if (pipeline_metadata_.audio_decoder_config.is_encrypted())
-    return false;
-
-  switch (pipeline_metadata_.audio_decoder_config.codec()) {
-    case AudioCodec::kAAC:
-    case AudioCodec::kOpus:
-    case AudioCodec::kMP3:
-    case AudioCodec::kPCM:
-    case AudioCodec::kVorbis:
-    case AudioCodec::kFLAC:
-    case AudioCodec::kAMR_NB:
-    case AudioCodec::kAMR_WB:
-    case AudioCodec::kPCM_MULAW:
-    case AudioCodec::kGSM_MS:
-    case AudioCodec::kPCM_S16BE:
-    case AudioCodec::kPCM_S24BE:
-    case AudioCodec::kEAC3:
-    case AudioCodec::kPCM_ALAW:
-    case AudioCodec::kALAC:
-    case AudioCodec::kAC3:
-    case AudioCodec::kDTS:
-    case AudioCodec::kDTSXP2:
-    case AudioCodec::kDTSE:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool RendererController::IsVideoRemotePlaybackSupported() const {
-  DCHECK(thread_checker_.CalledOnValidThread());
-  DCHECK(has_video());
-
-  if (pipeline_metadata_.video_decoder_config.is_encrypted())
-    return false;
-
-  switch (pipeline_metadata_.video_decoder_config.codec()) {
-    case VideoCodec::kH264:
-    case VideoCodec::kVP8:
-    case VideoCodec::kVP9:
-    case VideoCodec::kHEVC:
-      return true;
-    default:
-      return false;
-  }
-}
-
-bool RendererController::IsRemotePlaybackSupported() const {
-  return ((has_audio() || has_video()) &&
-          (!has_video() || IsVideoRemotePlaybackSupported()) &&
-          (!has_audio() || IsAudioRemotePlaybackSupported()));
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace remoting
 }  // namespace media

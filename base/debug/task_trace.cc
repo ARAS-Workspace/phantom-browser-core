@@ -12,37 +12,12 @@
 #include "base/task/common/task_annotator.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <android/log.h>
-
-#include "base/no_destructor.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace base::debug {
 namespace {
-#if BUILDFLAG(IS_ANDROID)
-// Android sends stdout and stderr to /dev/null; logging should be done through
-// the __android_log_write() function. Here we create an override of
-// std::stringbuf that writes to the Android log.
-class AndroidErrBuffer : public std::stringbuf {
- protected:
-  int sync() override {
-    __android_log_write(ANDROID_LOG_ERROR, "chromium", str().c_str());
-    return 0;
-  }
-};
-
-std::ostream& DefaultOutputStream() {
-  static NoDestructor<AndroidErrBuffer> buf;
-  static NoDestructor<std::ostream> out(buf.get());
-  return *out;
-}
-#else
 // Use stderr by default.
 std::ostream& DefaultOutputStream() {
   return std::cerr;
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 }  // namespace
 
 TaskTrace::TaskTrace() {

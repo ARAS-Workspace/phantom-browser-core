@@ -48,10 +48,8 @@
 #include "extensions/buildflags/buildflags.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/component_updater/mock_component_updater_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"
@@ -120,25 +118,17 @@ class ChromeMetricsServiceClientTest : public testing::Test {
         &prefs_, &enabled_state_provider_, std::wstring(), base::FilePath());
     metrics_state_manager_->InstantiateFieldTrialList();
     ASSERT_TRUE(profile_manager_.SetUp());
-#if BUILDFLAG(IS_ANDROID)
-    scoped_feature_list_.InitWithFeatures({metrics::dwa::kDwaFeature}, {});
-#else
     scoped_feature_list_.InitWithFeatures(
         {metrics::dwa::kDwaFeature, switches::kDynamicProfileCountry}, {});
-#endif  // BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
     auto mock_component_updater = std::make_unique<
         testing::NiceMock<component_updater::MockComponentUpdateService>>();
     TestingBrowserProcess::GetGlobal()->SetComponentUpdater(
         std::move(mock_component_updater));
-#endif
   }
 
   void TearDown() override {
-#if !BUILDFLAG(IS_ANDROID)
     TestingBrowserProcess::GetGlobal()->SetComponentUpdater(nullptr);
-#endif
   }
 
   void TriggerOnAdvancedReportingEnabledForAllProfilesChanged(
@@ -211,11 +201,6 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterUKMProviders) {
   // exception on ChromeOS.
   size_t expected_providers = 10;
 
-#if BUILDFLAG(IS_ANDROID)
-  // ChromeAndroidMetricsProvider
-  expected_providers++;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   std::unique_ptr<ChromeMetricsServiceClient> chrome_metrics_service_client =
       TestChromeMetricsServiceClient::Create(metrics_state_manager_.get(),
                                              synthetic_trial_registry_.get());
@@ -261,14 +246,8 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   expected_providers++;
 #endif  // defined(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(IS_ANDROID)
-  // AndroidMetricsProvider, ChromeAndroidMetricsProvider,
-  // PageLoadMetricsProvider, GmsMetricsProvider.
-  expected_providers += 4;
-#else
   // performance_manager::MetricsProvider
   expected_providers += 1;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // ChromeSigninStatusMetricsProvider (for non). FamilyLinkUserMetricsProvider
   expected_providers += 2;

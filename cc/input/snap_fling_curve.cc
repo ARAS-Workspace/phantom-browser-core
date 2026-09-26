@@ -13,15 +13,9 @@
 namespace cc {
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr double kDistanceEstimatorScalar = 40;
-// The delta to be scrolled in next frame is 0.9 of the delta in last frame.
-constexpr double kRatio = 0.9;
-#else
 constexpr double kDistanceEstimatorScalar = 25;
 // The delta to be scrolled in next frame is 0.92 of the delta in last frame.
 constexpr double kRatio = 0.92;
-#endif
 constexpr auto kFrameTime = base::Milliseconds(16);
 constexpr base::TimeDelta kMaximumSnapDuration = base::Seconds(5);
 

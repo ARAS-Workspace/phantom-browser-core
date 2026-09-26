@@ -33,11 +33,7 @@ const AccessTokenRestrictionTestParam kTestParams[] = {
  {GaiaConstants::kSecureConnectOAuth2Scope, OAuth2ScopeRestriction::kNoRestriction},
  // keep-sorted end
  {GaiaConstants::kDeviceManagementServiceOAuth,
-#if BUILDFLAG(IS_ANDROID)
-  OAuth2ScopeRestriction::kNoRestriction
-#else
   OAuth2ScopeRestriction::kSignedIn
-#endif
  },
 #if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
  {GaiaConstants::kDriveOAuth2Scope, OAuth2ScopeRestriction::kNoRestriction},

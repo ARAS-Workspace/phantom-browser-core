@@ -17,12 +17,7 @@ PassthroughTouchEventQueue::Config CreateTouchEventQueueConfig(
     scoped_refptr<base::SingleThreadTaskRunner> task_runner) {
   PassthroughTouchEventQueue::Config config;
 
-#if BUILDFLAG(IS_ANDROID)
-  // For historical reasons only Android enables the touch ack timeout.
-  config.touch_ack_timeout_supported = true;
-#else
   config.touch_ack_timeout_supported = false;
-#endif
   config.task_runner = task_runner;
   return config;
 }

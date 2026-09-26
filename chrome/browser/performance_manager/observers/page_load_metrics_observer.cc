@@ -28,12 +28,8 @@
 #include "components/guest_view/browser/guest_view_base.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#else
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#endif
 
 namespace performance_manager {
 
@@ -151,12 +147,8 @@ WebContentsType PageLoadMetricsWebContentsObserver::GetWebContentsType() {
 }
 
 bool PageLoadMetricsWebContentsObserver::IsTab() const {
-#if BUILDFLAG(IS_ANDROID)
-  return !!TabAndroid::FromWebContents(web_contents());
-#else
   return !!GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
       web_contents());
-#endif
 }
 
 bool PageLoadMetricsWebContentsObserver::IsExtension() const {
@@ -181,11 +173,7 @@ bool PageLoadMetricsWebContentsObserver::IsPrerender() const {
 }
 
 bool PageLoadMetricsWebContentsObserver::IsDevTools() const {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return DevToolsWindow::IsDevToolsWindow(web_contents());
-#endif
 }
 
 void PageLoadMetricsWebContentsObserver::RecordUKM() {

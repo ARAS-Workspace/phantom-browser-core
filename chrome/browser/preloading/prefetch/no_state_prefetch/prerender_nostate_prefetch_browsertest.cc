@@ -1610,13 +1610,7 @@ IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, IssuesIdlePriorityRequests) {
   WaitForRequestCount(script_url, 1);
   monitor.WaitForUrls();
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android requests from prerenders do not get downgraded
-  // priority. See: https://crbug.com/41278923.
-  constexpr net::RequestPriority kExpectedPriority = net::HIGHEST;
-#else
   constexpr net::RequestPriority kExpectedPriority = net::IDLE;
-#endif
   std::optional<network::ResourceRequest> request =
       monitor.GetRequestInfo(script_url);
   EXPECT_EQ(kExpectedPriority, request->priority);

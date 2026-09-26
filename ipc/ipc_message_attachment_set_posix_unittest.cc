@@ -123,11 +123,7 @@ TEST(MessageAttachmentSet, WalkWrongOrder) {
   set->CommitAllDescriptors();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_DontClose DISABLED_DontClose
-#else
 #define MAYBE_DontClose DontClose
-#endif
 TEST(MessageAttachmentSet, MAYBE_DontClose) {
   scoped_refptr<MessageAttachmentSet> set(new MessageAttachmentSet);
 

@@ -35,7 +35,7 @@
 #include <pthread.h>
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include <sys/prctl.h>
 #endif
 
@@ -79,7 +79,7 @@ const char* GetAndLeakThreadName() {
   // 64 on macOS, see PlatformThread::SetName in platform_thread_apple.mm.
   constexpr size_t kBufferLen = 64;
   char name[kBufferLen];
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // If the thread name is not set, try to get it from prctl. Thread name might
   // not be set in cases where the thread started before heap profiling was
   // enabled.
@@ -92,7 +92,7 @@ const char* GetAndLeakThreadName() {
   if (err == 0 && *name != '\0') {
     return UNSAFE_TODO(strdup(name));
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // Use tid if we don't have a thread name.
   snprintf(name, sizeof(name), "Thread %lu",
@@ -124,9 +124,6 @@ StackUnwinder ChooseStackUnwinder() {
 #if BUILDFLAG(CAN_UNWIND_WITH_FRAME_POINTERS)
   // Use frame pointers if available, since they can be faster than the default.
   return StackUnwinder::kFramePointers;
-#elif BUILDFLAG(IS_ANDROID)
-  // Default unwind tables aren't always present on Android.
-  return CheckForDefaultUnwindTables();
 #else
   return StackUnwinder::kDefault;
 #endif

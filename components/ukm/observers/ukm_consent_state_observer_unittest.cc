@@ -320,7 +320,6 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_AllEnabled) {
   MockSyncService sync;
   sync.SetSignedIn(signin::ConsentLevel::kSignin);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Mark apps and extensions sync as supported (registered) and enabled.
   syncer::UserSelectableTypeSet registered_types = {
       syncer::UserSelectableType::kExtensions};
@@ -331,7 +330,6 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_AllEnabled) {
   sync.GetUserSettings()->SetRegisteredSelectableTypes(registered_types);
   sync.GetUserSettings()->SetSelectedTypes(/*sync_everything=*/false,
                                            selected_types);
-#endif
 
   sync_preferences::TestingPrefServiceSyncable prefs;
   RegisterUrlKeyedAnonymizedDataCollectionPref(prefs);
@@ -354,7 +352,6 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_APPSDisabled) {
   MockSyncService sync;
   sync.SetSignedIn(signin::ConsentLevel::kSignin);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Mark apps and extensions sync as supported, but only extensions enabled.
   syncer::UserSelectableTypeSet registered_types = {
       syncer::UserSelectableType::kExtensions};
@@ -362,7 +359,6 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_APPSDisabled) {
   sync.GetUserSettings()->SetRegisteredSelectableTypes(registered_types);
   sync.GetUserSettings()->SetSelectedTypes(
       /*sync_everything=*/false, {syncer::UserSelectableType::kExtensions});
-#endif
 
   sync_preferences::TestingPrefServiceSyncable prefs;
   RegisterUrlKeyedAnonymizedDataCollectionPref(prefs);
@@ -371,21 +367,12 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_APPSDisabled) {
   TestUkmConsentStateObserver observer;
   observer.StartObserving(&sync, &prefs);
 
-#if BUILDFLAG(IS_ANDROID)
-  // On mobile platforms, apps sync is not supported, so it is ignored. MSBB is
-  // enabled, so migration succeeds!
-  EXPECT_TRUE(prefs.GetBoolean(metrics::prefs::kAdvancedReportingEnabled));
-  histogram_tester.ExpectUniqueSample(
-      "UKM.ConsentObserver.ConsentStateBeforeRestructure",
-      /*sample=*/2, 1);  // kMsbbEnabledWithAppAndExtensionSync
-#else
   // On desktop platforms, apps sync is supported but disabled, so migration
   // fails!
   EXPECT_FALSE(prefs.GetBoolean(metrics::prefs::kAdvancedReportingEnabled));
   histogram_tester.ExpectUniqueSample(
       "UKM.ConsentObserver.ConsentStateBeforeRestructure",
       /*sample=*/1, 1);  // kMsbbEnabledWithoutAppOrExtensionSync
-#endif
   EXPECT_TRUE(
       prefs.GetBoolean(metrics::prefs::kAdvancedReportingProfileMigrationDone));
 }
@@ -395,7 +382,6 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_AlreadyDone) {
   MockSyncService sync;
   sync.SetSignedIn(signin::ConsentLevel::kSignin);
 
-#if !BUILDFLAG(IS_ANDROID)
   syncer::UserSelectableTypeSet registered_types = {
       syncer::UserSelectableType::kExtensions};
   syncer::UserSelectableTypeSet selected_types = {
@@ -405,7 +391,6 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_AlreadyDone) {
   sync.GetUserSettings()->SetRegisteredSelectableTypes(registered_types);
   sync.GetUserSettings()->SetSelectedTypes(/*sync_everything=*/false,
                                            selected_types);
-#endif
 
   sync_preferences::TestingPrefServiceSyncable prefs;
   RegisterUrlKeyedAnonymizedDataCollectionPref(prefs);

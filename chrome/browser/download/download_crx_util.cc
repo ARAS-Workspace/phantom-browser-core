@@ -27,10 +27,8 @@
 #include "extensions/common/extension_urls.h"
 #include "extensions/common/user_script.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -69,16 +67,8 @@ std::unique_ptr<ExtensionInstallPrompt> CreateExtensionInstallPrompt(
         extensions::browser_window_util::GetLastActiveBrowserWithProfile(
             *profile, false);
     if (!browser) {
-#if BUILDFLAG(IS_ANDROID)
-      // TODO(crbug.com/474161414): Implement fallback if no browser is found.
-      // Android does not have Browser implementation yet, but we are okay with
-      // not showing an installed dialog if no window is open. The caller
-      // handles having an empty ExtensionInstallPrompt.
-      return nullptr;
-#else
       browser = CreateBrowserWindow(BrowserWindowCreateParams(
           BrowserWindowInterface::TYPE_NORMAL, profile, true));
-#endif
     }
     TabListInterface* tab_list = TabListInterface::From(browser);
     web_contents = tab_list->GetActiveTab()->GetContents();

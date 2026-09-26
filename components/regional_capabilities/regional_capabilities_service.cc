@@ -33,13 +33,6 @@
 #include "third_party/abseil-cpp/absl/functional/overload.h"
 #include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-
-// Must come after all headers that specialize FromJniType() / ToJniType().
-#include "components/regional_capabilities/android/jni_headers/RegionalCapabilitiesService_jni.h"
-#endif
-
 using ::country_codes::CountryId;
 using ::TemplateURLPrepopulateData::PrepopulatedEngine;
 
@@ -361,11 +354,7 @@ RegionalCapabilitiesService::RegionalCapabilitiesService(
   CHECK(client_);
 }
 
-RegionalCapabilitiesService::~RegionalCapabilitiesService() {
-#if BUILDFLAG(IS_ANDROID)
-  DestroyJavaObject();
-#endif
-}
+RegionalCapabilitiesService::~RegionalCapabilitiesService() {}
 
 std::vector<raw_ptr<const PrepopulatedEngine>>
 RegionalCapabilitiesService::GetRegionalPrepopulatedEngines() {
@@ -498,7 +487,6 @@ bool RegionalCapabilitiesService::
       .selection_from_settings_counts_as_choice_screen_choice;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::optional<RegionalCapabilitiesService::ChoiceScreenDesign>
 RegionalCapabilitiesService::GetChoiceScreenDesign() {
   switch (GetActiveProgramSettings().program) {
@@ -520,7 +508,6 @@ RegionalCapabilitiesService::GetChoiceScreenDesign() {
   }
   NOTREACHED();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 const std::optional<ChoiceScreenEligibilityConfig>&
 RegionalCapabilitiesService::GetChoiceScreenEligibilityConfig() {
@@ -616,21 +603,7 @@ void RegionalCapabilitiesService::EnsureRegionalScopeCacheInitialized() {
 
   Program program;
 
-#if BUILDFLAG(IS_ANDROID)
-  program = client_->GetDeviceProgram();
-
-  if (IsInProgramRegion(program, country_id_cache_.value())) {
-    RecordAndroidProgramResolution(AndroidProgramResolution::kSuccess);
-  } else {
-    // Interim program inconsistencies originate from asynchronous nature of
-    // their resolution. For the time being, use a reasonable default.
-    program = Program::kDefault;
-    RecordAndroidProgramResolution(
-        AndroidProgramResolution::kDefaultForOutOfProgramCountry);
-  }
-#else
   program = CountryIdToProgram(country_id_cache_.value());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   program_settings_cache_ = GetSettingsForProgram(program);
 
@@ -713,36 +686,9 @@ void RegionalCapabilitiesService::TrySetPersistedCountryId(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-RegionalCapabilitiesService::GetJavaObject() {
-  if (!java_ref_) {
-    java_ref_.Reset(Java_RegionalCapabilitiesService_Constructor(
-        jni_zero::AttachCurrentThread(), reinterpret_cast<intptr_t>(this)));
-  }
-  return base::android::ScopedJavaLocalRef<jobject>(java_ref_);
-}
-
-void RegionalCapabilitiesService::DestroyJavaObject() {
-  if (java_ref_) {
-    Java_RegionalCapabilitiesService_destroy(jni_zero::AttachCurrentThread(),
-                                             java_ref_);
-    java_ref_.Reset();
-  }
-}
-
-bool RegionalCapabilitiesService::IsInEeaCountry(JNIEnv* env) {
-  return IsInEeaCountry();
-}
-#endif
-
 Program CountryIdToProgramForTesting(
     const country_codes::CountryId& country_id) {
   return CountryIdToProgram(country_id);
 }
 
 }  // namespace regional_capabilities
-
-#if BUILDFLAG(IS_ANDROID)
-DEFINE_JNI(RegionalCapabilitiesService)
-#endif

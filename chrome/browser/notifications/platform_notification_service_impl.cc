@@ -61,7 +61,6 @@
 #include "ui/strings/grit/ui_strings.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
@@ -70,11 +69,6 @@
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"  // nogncheck
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
-#else
-#include "chrome/browser/safe_browsing/android/notification_content_detection_manager_android.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
-#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"
@@ -102,10 +96,6 @@ constexpr char
 // screen mode.
 static bool ShouldDisplayWebNotificationOnFullScreen(Profile* profile,
                                                      const GURL& origin) {
-#if BUILDFLAG(IS_ANDROID)
-  NOTIMPLEMENTED();
-  return false;
-#else
   // Check to see if this notification comes from a webpage that is displaying
   // fullscreen content.
   bool found = false;
@@ -143,7 +133,6 @@ static bool ShouldDisplayWebNotificationOnFullScreen(Profile* profile,
         return !found;
       });
   return found;
-#endif
 }
 
 // Records the total number of deleted notifications after all storage
@@ -280,17 +269,6 @@ void PlatformNotificationServiceImpl::DisplayNotification(
   if (service) {
     service->RecordNotificationDisplayed(notification.origin_url());
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // Logs metrics for proposed disruptive notification revocation when
-  // displaying a non persistent notification. Disruptive are notifications
-  // with high notification volume and low site engagement score.
-  ukm::SourceId source_id = ukm::UkmRecorder::GetSourceIdForNotificationEvent(
-      base::PassKey<PlatformNotificationServiceImpl>(),
-      notification.origin_url());
-  DisruptiveNotificationPermissionsManager::LogMetrics(
-      profile_, notification.origin_url(), source_id);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PlatformNotificationServiceImpl::DisplayPersistentNotification(
@@ -358,17 +336,6 @@ void PlatformNotificationServiceImpl::DisplayPersistentNotification(
 
   LogPersistentNotificationShownMetrics(notification_data, origin,
                                         notification.origin_url());
-
-#if BUILDFLAG(IS_ANDROID)
-  // Logs metrics for proposed disruptive notification revocation when
-  // displaying a persistent notification. Disruptive are notifications with
-  // high notification volume and low site engagement score.
-  ukm::SourceId source_id = ukm::UkmRecorder::GetSourceIdForNotificationEvent(
-      base::PassKey<PlatformNotificationServiceImpl>(),
-      notification.origin_url());
-  DisruptiveNotificationPermissionsManager::LogMetrics(
-      profile_, notification.origin_url(), source_id);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PlatformNotificationServiceImpl::CloseNotification(
@@ -667,25 +634,18 @@ std::u16string PlatformNotificationServiceImpl::DisplayNameForContextMessage(
 
 std::optional<webapps::AppId> PlatformNotificationServiceImpl::FindWebAppId(
     const GURL& web_app_hint_url) const {
-#if !BUILDFLAG(IS_ANDROID)
   web_app::WebAppProvider* web_app_provider =
       web_app::WebAppProvider::GetForLocalAppsUnchecked(profile_);
   if (web_app_provider) {
     return web_app_provider->registrar_unsafe().FindBestAppWithUrlInScope(
         web_app_hint_url, web_app::WebAppFilter::InstalledInChrome());
   }
-#endif
 
   return std::nullopt;
 }
 
 bool PlatformNotificationServiceImpl::IsActivelyInstalledWebAppScope(
     const GURL& web_app_url) const {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(peter): Investigate whether it makes sense to consider installed
-  // WebAPKs and TWAs on Android here, when depending features are considered.
-  return false;
-#else
   web_app::WebAppProvider* web_app_provider =
       web_app::WebAppProvider::GetForLocalAppsUnchecked(profile_);
   if (!web_app_provider) {
@@ -695,7 +655,6 @@ bool PlatformNotificationServiceImpl::IsActivelyInstalledWebAppScope(
       web_app_provider->registrar_unsafe().FindBestAppWithUrlInScope(
           web_app_url, web_app::WebAppFilter::SupportsOsNotifications());
   return app_id.has_value();
-#endif
 }
 
 void PlatformNotificationServiceImpl::
@@ -708,12 +667,6 @@ void PlatformNotificationServiceImpl::
   if (base::FeatureList::IsEnabled(
           safe_browsing::kAutoRevokeSuspiciousNotification) &&
       should_show_warning) {
-#if BUILDFLAG(IS_ANDROID)
-    suspicious_notification_revoked = AbusiveNotificationPermissionsManager::
-        MaybeRevokeSuspiciousNotificationPermission(profile_,
-                                                    notification.origin_url());
-#endif
-
     auto* service =
         NotificationsEngagementServiceFactory::GetForProfile(profile_);
     // This service might be missing for incognito profiles and in tests.
@@ -736,14 +689,6 @@ void PlatformNotificationServiceImpl::
                                         weak_ptr_factory_.GetWeakPtr(),
                                         std::move(persistent_metadata),
                                         notification, should_show_warning);
-#if BUILDFLAG(IS_ANDROID)
-    if (should_show_warning && !suspicious_notification_revoked) {
-      // Keep track of suspicious notification ids.
-      safe_browsing::UpdateSuspiciousNotificationIds(
-          HostContentSettingsMapFactory::GetForProfile(profile_),
-          notification.origin_url(), notification.id());
-    }
-#endif
     if (serialized_content_detection_metadata.has_value()) {
       scoped_refptr<content::PlatformNotificationContext> notification_context =
           profile_->GetStoragePartitionForUrl(notification.origin_url())

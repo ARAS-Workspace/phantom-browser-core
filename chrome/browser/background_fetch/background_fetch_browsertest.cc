@@ -631,13 +631,7 @@ IN_PROC_BROWSER_TEST_F(BackgroundFetchBrowserTest,
   // Get visuals associated with the newly added offline item.
   std::unique_ptr<OfflineItemVisuals> out_visuals;
   GetVisualsForOfflineItemSync(offline_item.id, &out_visuals);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(out_visuals->icon.IsEmpty());
-  EXPECT_EQ(out_visuals->icon.Size().width(), 100);
-  EXPECT_EQ(out_visuals->icon.Size().height(), 100);
-#else
   EXPECT_TRUE(out_visuals->icon.IsEmpty());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(

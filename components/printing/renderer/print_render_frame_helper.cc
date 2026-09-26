@@ -1264,24 +1264,7 @@ void PrintRenderFrameHelper::ScriptedPrint(bool user_initiated) {
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the PDF rendering process is driven asynchronously by the
-  // system's PrintDocumentAdapter. The browser process shows the system print
-  // dialog, and the framework later requests the document's content.
-  // To ensure window.print() behaves synchronously from the web page's
-  // perspective, start a nested run loop. This blocks JS execution until the
-  // user completes the print dialog and the system signals the end of the
-  // print session.
-  // Since the actual printing is triggered later by the system, do not call
-  // Print() here directly.
-  base::RunLoop loop{base::RunLoop::Type::kNestableTasksAllowed};
-  base::OnceClosure quit_closure = loop.QuitClosure();
-  GetPrintManagerHost()->SetupScriptedPrintAndroid(
-      mojo::WrapCallbackWithDefaultInvokeIfNotRun(std::move(quit_closure)));
-  loop.Run();
-#else
   Print(web_frame, blink::WebNode(), PrintRequestType::kScripted);
-#endif
   if (!weak_this) {
     return;
   }
@@ -1325,11 +1308,7 @@ void PrintRenderFrameHelper::PrintRequestedPagesInternal(
 
   blink::WebLocalFrame* frame = render_frame()->GetWebFrame();
 
-#if BUILDFLAG(IS_ANDROID)
-  bool is_scripted = print_in_progress_;
-#else
   constexpr bool is_scripted = false;
-#endif
 
   if (!already_notified_frame && !is_scripted) {
     frame->DispatchBeforePrintEvent(/*print_client=*/nullptr);
@@ -2503,7 +2482,6 @@ bool PrintRenderFrameHelper::RenderPagesForPrint(blink::WebLocalFrame* frame,
   const mojom::PrintPagesParams& params = *print_pages_params_;
   const mojom::PrintParams& print_params = *params.params;
   prep_frame_view_ = std::make_unique<PrepareFrameAndViewForPrint>(frame, node);
-#if !BUILDFLAG(IS_ANDROID)
   // On Desktop, the Print Preview WebUI explicitly prevents page range
   // selection when "Selection only" is checked. Therefore, `pages` is always
   // expected to be empty. However, on Android, Chrome relies on the standard
@@ -2512,7 +2490,6 @@ bool PrintRenderFrameHelper::RenderPagesForPrint(blink::WebLocalFrame* frame,
   // `pages` can be non-empty.
   DCHECK(!print_pages_params_->params->selection_only ||
          print_pages_params_->pages.empty());
-#endif
   prep_frame_view_->BeginPrinting(
       render_frame()->GetBlinkPreferences(), print_params, ignore_css_margins_,
       base::BindOnce(&PrintRenderFrameHelper::OnFramePreparedForPrintPages,

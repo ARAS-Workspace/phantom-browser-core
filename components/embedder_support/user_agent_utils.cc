@@ -35,10 +35,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/user_agent/user_agent_metadata.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/base/device_form_factor.h"
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 #include <sys/utsname.h>
 #endif
@@ -112,12 +108,6 @@ std::string GetUserAgentInternal() {
     product.insert(0, "Headless");
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(kUseMobileUserAgent)) {
-    product += " Mobile";
-  }
-#endif
-
   return ShouldSendUserAgentUnifiedPlatform()
              ? BuildUnifiedPlatformUserAgentFromProduct(product)
              : BuildUserAgentFromProduct(product);
@@ -176,31 +166,13 @@ std::string GetUserAgentPlatform() {
   return "Macintosh; ";
 #elif BUILDFLAG(IS_LINUX)
   return "X11; ";  // strange, but that's what Firefox uses
-#elif BUILDFLAG(IS_ANDROID)
-  return "Linux; ";
 #else
 #error Unsupported platform
 #endif
 }
 
 std::string GetUnifiedPlatform() {
-#if BUILDFLAG(IS_ANDROID)
-  // This constant is only used on Android (desktop) and Linux.
-  constexpr char kUnifiedPlatformChromeOSX64[] = "X11; CrOS x86_64 14541.0.0";
-
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  // The Android XR device by default also has the unified platform of desktop
-  // form factor.
-  if (base::android::device_info::is_desktop() ||
-      base::android::device_info::is_xr()) {
-    return base::FeatureList::IsEnabled(
-               blink::features::kAndroidDesktopUASpoofAsChromeOS)
-               ? kUnifiedPlatformChromeOSX64
-               : "X11; Linux x86_64";
-  }
-  return "Linux; Android 10; K";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return "Macintosh; Intel Mac OS X 10_15_7";
 #elif BUILDFLAG(IS_LINUX)
   return "X11; Linux x86_64";
@@ -257,19 +229,10 @@ std::string GetOSVersion(IncludeAndroidBuildNumber include_android_build_number,
 
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  std::string android_version_str = base::SysInfo::OperatingSystemVersion();
-  std::string android_info_str =
-      GetAndroidOSInfo(include_android_build_number, include_android_model);
-#endif
-
   base::StringAppendF(&os_version,
 #if BUILDFLAG(IS_MAC)
                       "%d_%d_%d", os_major_version, os_minor_version,
                       os_bugfix_version
-#elif BUILDFLAG(IS_ANDROID)
-                      "%s%s", android_version_str.c_str(),
-                      android_info_str.c_str()
 #else
                       ""
 #endif
@@ -416,39 +379,11 @@ bool GetMobileBitForUAMetadata() {
   // The mobile bit for UA-CH is true if the platform is iOS, or if it's
   // Android and not a desktop form factor, AND the kUseMobileUserAgent switch
   // is present.
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_desktop() ||
-      base::android::device_info::is_xr()) {
-    return false;
-  }
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-  return base::CommandLine::ForCurrentProcess()->HasSwitch(kUseMobileUserAgent);
-#else
   return false;
-#endif
 }
 
 std::string GetPlatformVersion() {
-#if BUILDFLAG(IS_ANDROID)
-  // For Android XR or desktop form factors, report a non-empty platform
-  // version when kAndroidDesktopUAPlatform is enabled to follow the spec:
-  // https://wicg.github.io/ua-client-hints/#sec-ch-ua-platform-version. When
-  // disabled, their UA-CH platform is spoofed (see GetPlatformForUAMetadata()),
-  // so they follow the Linux platform version which is empty. Once
-  // kAndroidDesktopUAPlatform is fully launched, this gating should be removed
-  // and the real OS version reported unconditionally.
-  // Note: check the feature flag first since it is cheaper than the device
-  // info checks.
-  if (!base::FeatureList::IsEnabled(
-          blink::features::kAndroidDesktopUAPlatform) &&
-      (base::android::device_info::is_desktop() ||
-       base::android::device_info::is_xr())) {
-    return std::string();
-  }
-#endif
-
 #if BUILDFLAG(IS_LINUX)
   return std::string();
 #elif BUILDFLAG(IS_MAC)
@@ -462,19 +397,6 @@ std::string GetPlatformVersion() {
 }
 
 std::string GetPlatformForUAMetadata() {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_desktop() ||
-      base::android::device_info::is_xr()) {
-    return base::FeatureList::IsEnabled(
-               blink::features::kAndroidDesktopUAPlatform)
-               ? "Android"
-               : (base::FeatureList::IsEnabled(
-                      blink::features::kAndroidDesktopUASpoofAsChromeOS)
-                      ? "Chrome OS"
-                      : "Linux");
-  }
-#endif
-
 #if BUILDFLAG(IS_MAC)
   // TODO(crbug.com/40704421): This can be removed/re-refactored once we use
   // "macOS" by default
@@ -530,11 +452,6 @@ std::vector<std::string> GetFormFactorsClientHint(
   std::vector<std::string> form_factors = {
       is_mobile ? blink::kMobileFormFactor : blink::kDesktopFormFactor};
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_xr()) {
-    form_factors.push_back(blink::kXRFormFactor);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   return form_factors;
 }
 
@@ -547,15 +464,6 @@ std::string GetUnifiedPlatformForTesting() {
 std::string GetCpuArchitecture() {
 #if BUILDFLAG(IS_MAC)
   return "x86";
-#elif BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/433345971) The user agent string should contain the actual
-  // cpu type information obtained from the Android device. Same for the cpu bit
-  // count in #GetCpuBitness below.
-  if (base::android::device_info::is_desktop() ||
-      base::android::device_info::is_xr()) {
-    return "x86";
-  }
-  return std::string();
 #elif BUILDFLAG(IS_POSIX)
   std::string cpu_info = BuildCpuInfo();
   if (base::StartsWith(cpu_info, "arm") ||
@@ -578,12 +486,6 @@ std::string GetCpuArchitecture() {
 std::string GetCpuBitness() {
 #if BUILDFLAG(IS_APPLE)
   return "64";
-#elif BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_desktop() ||
-      base::android::device_info::is_xr()) {
-    return "64";
-  }
-  return std::string();
 #elif BUILDFLAG(IS_POSIX)
   return BuildCpuInfo().contains("64") ? "64" : "32";
 #else
@@ -595,7 +497,7 @@ std::string BuildOSCpuInfoFromOSVersionAndCpuType(const std::string& os_version,
                                                   const std::string& cpu_type) {
   std::string os_cpu;
 
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   // Should work on any Posix system.
   struct utsname unixinfo;
   uname(&unixinfo);
@@ -604,8 +506,6 @@ std::string BuildOSCpuInfoFromOSVersionAndCpuType(const std::string& os_version,
   base::StringAppendF(&os_cpu,
 #if BUILDFLAG(IS_MAC)
                       "%s Mac OS X %s", cpu_type.c_str(), os_version.c_str()
-#elif BUILDFLAG(IS_ANDROID)
-                      "Android %s", os_version.c_str()
 #elif BUILDFLAG(IS_POSIX)
                       "%s %s",
                       unixinfo.sysname,  // e.g. Linux
@@ -631,72 +531,8 @@ std::string BuildUserAgentFromProduct(const std::string& product) {
 }
 
 std::string BuildModelInfo() {
-#if BUILDFLAG(IS_ANDROID)
-  // Model information is not exposed on Android desktop.
-  if (base::android::device_info::is_desktop()) {
-    return std::string();
-  }
-
-  // Only send the model information if on the release build of Android,
-  // matching user agent behaviour.
-  if (base::SysInfo::GetAndroidBuildCodename() == "REL") {
-    return base::SysInfo::HardwareModelName();
-  }
-#endif
-
   return std::string();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-std::string BuildUserAgentFromProductAndExtraOSInfo(
-    const std::string& product,
-    const std::string& extra_os_info,
-    IncludeAndroidBuildNumber include_android_build_number) {
-  std::string os_info;
-  base::StrAppend(&os_info, {GetUserAgentPlatform(),
-                             BuildOSCpuInfo(include_android_build_number,
-                                            IncludeAndroidModel::Include),
-                             extra_os_info});
-  return BuildUserAgentFromOSAndProduct(os_info, product);
-}
-
-std::string BuildUnifiedPlatformUAFromProductAndExtraOs(
-    const std::string& product,
-    const std::string& extra_os_info) {
-  std::string os_info;
-  base::StrAppend(&os_info, {GetUnifiedPlatform(), extra_os_info});
-  return BuildUserAgentFromOSAndProduct(os_info, product);
-}
-
-std::string GetAndroidOSInfo(
-    IncludeAndroidBuildNumber include_android_build_number,
-    IncludeAndroidModel include_android_model) {
-  std::string android_info_str;
-
-  // Send information about the device.
-  bool semicolon_inserted = false;
-  if (include_android_model == IncludeAndroidModel::Include) {
-    std::string android_device_name = BuildModelInfo();
-    if (!android_device_name.empty()) {
-      android_info_str += "; " + android_device_name;
-      semicolon_inserted = true;
-    }
-  }
-
-  // Append the build ID.
-  if (include_android_build_number == IncludeAndroidBuildNumber::Include) {
-    std::string android_build_id = base::SysInfo::GetAndroidBuildID();
-    if (!android_build_id.empty()) {
-      if (!semicolon_inserted) {
-        android_info_str += ";";
-      }
-      android_info_str += " Build/" + android_build_id;
-    }
-  }
-
-  return android_info_str;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 std::string BuildUserAgentFromOSAndProduct(const std::string& os_info,
                                            const std::string& product) {

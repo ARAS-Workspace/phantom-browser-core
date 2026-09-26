@@ -173,7 +173,6 @@ RendererStartupHelper::~RendererStartupHelper() {
 
 void RendererStartupHelper::OnRenderProcessHostCreated(
     content::RenderProcessHost* host) {
-#if !BUILDFLAG(IS_ANDROID)
   if (host->IsForTopChromeWebUI() &&
       base::FeatureList::IsEnabled(
           blink::features::kInitialWebUIWithoutExtensions)) {
@@ -181,7 +180,6 @@ void RendererStartupHelper::OnRenderProcessHostCreated(
     // ReadyToCommitNavigation.
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (host->IsForGuestsOnly()) {
     // GuestView initialization is done in OnRenderProcessLaunched()
@@ -194,7 +192,6 @@ void RendererStartupHelper::OnRenderProcessHostCreated(
 
 void RendererStartupHelper::OnRenderProcessLaunched(
     content::RenderProcessHost* host) {
-#if !BUILDFLAG(IS_ANDROID)
   if (host->IsForTopChromeWebUI() &&
       base::FeatureList::IsEnabled(
           blink::features::kInitialWebUIWithoutExtensions)) {
@@ -202,31 +199,14 @@ void RendererStartupHelper::OnRenderProcessLaunched(
     // ReadyToCommitNavigation.
     return;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (!host->IsForGuestsOnly()) {
     // Any process that *isn't* for guests or an initial WebUI with disabled
     // extensions should have already been initialized in
     // OnRenderProcessHostCreated(), if it corresponds to the same context.
     ExtensionsBrowserClient* client = ExtensionsBrowserClient::Get();
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, handle race condition during process restart:
-    // 1. OnRenderProcessHostCreated() initializes extensions and populates
-    // process_mojo_map_.
-    // 2. Process startup fails in some cases.
-    // 3. RenderProcessExited() clears process_mojo_map_ via UntrackProcess().
-    // 4. The process is reused and OnRenderProcessLaunched() is still called.
-    //
-    // Re-register the process to restore Mojo communication without
-    // re-initializing extensions to avoid duplicate loading.
-    if (GetRenderer(host) == nullptr &&
-        client->IsSameContext(browser_context_, host->GetBrowserContext())) {
-      RegisterProcess(host);
-    }
-#else
     CHECK(GetRenderer(host) != nullptr ||
           !client->IsSameContext(browser_context_, host->GetBrowserContext()));
-#endif  // BUILDFLAG(IS_ANDROID)
     return;
   }
   // Otherwise, we should *not* have initialized the host yet.

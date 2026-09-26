@@ -19,20 +19,7 @@
 namespace content {
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr auto kExpectedFontFamilyNames = std::to_array({
-    "AndroidClock",
-    "Droid Sans Mono",
-    "Roboto",
-    "Noto Color Emoji",
-    "Noto Sans Lao UI",
-    "Noto Sans Lao UI",
-    "Noto Sans Thai",
-    "Noto Sans Thai",
-    "Noto Sans Thai UI",
-    "Noto Sans Thai UI",
-});
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 constexpr auto kExpectedFontFamilyNames = std::to_array({
     "Ahem",
     "Arimo",

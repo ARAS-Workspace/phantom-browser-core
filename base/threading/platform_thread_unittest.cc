@@ -36,10 +36,6 @@ std::ostream& operator<<(std::ostream& os, MessagePumpType type) {
       return os << "CUSTOM";
     case MessagePumpType::IO:
       return os << "IO";
-#if BUILDFLAG(IS_ANDROID)
-    case MessagePumpType::JAVA:
-      return os << "JAVA";
-#endif
 #if BUILDFLAG(IS_APPLE)
     case MessagePumpType::NS_RUNLOOP:
       return os << "NS_RUNLOOP";
@@ -69,10 +65,6 @@ std::ostream& operator<<(std::ostream& os, MessagePumpType type) {
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/system/sys_info.h"
 #endif
 
 using ::testing::_;
@@ -457,9 +449,7 @@ TEST(PlatformThreadTest, SetHugeThreadName) {
 
 TEST(PlatformThreadTest, GetDefaultThreadStackSize) {
   size_t stack_size = PlatformThread::GetDefaultThreadStackSize();
-#if (BUILDFLAG(IS_LINUX) && defined(__GLIBC__) && \
-     !defined(THREAD_SANITIZER)) ||               \
-    (BUILDFLAG(IS_ANDROID) && !defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(__GLIBC__) && !defined(THREAD_SANITIZER)
   EXPECT_EQ(0u, stack_size);
 #else
   EXPECT_GT(stack_size, 0u);
@@ -687,118 +677,6 @@ TEST(PlatformThreadTidCacheTest, MainThreadSecond) {
 }  // namespace
 
 #endif  // BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_ANDROID)
-
-namespace {
-// Helper function to put all the UNSAFE_BUFFERS() in a single place.
-int NumberOfAllowedProcessors() {
-  cpu_set_t cpuset;
-  // SAFETY: Here and below, these macros are part of system headers, and we
-  // cannot assume their content, however it checks the bounds.
-  UNSAFE_BUFFERS(CPU_ZERO(&cpuset));
-  EXPECT_EQ(0, sched_getaffinity(0, sizeof(cpu_set_t), &cpuset));
-  return UNSAFE_BUFFERS(CPU_COUNT(&cpuset));
-}
-}  // namespace
-
-TEST(PlatformThreadCpuAffinity, DefaultToAllCores) {
-  if (!IsEligibleForBigCoreAffinityChange()) {
-    GTEST_SKIP();
-  }
-
-  test::ScopedFeatureList feature_list{kRestrictBigCoreThreadAffinity};
-  EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-}
-
-TEST(PlatformThreadCpuAffinity, RestrictAffinity) {
-  // Need at least three distinct classes to test affinity, skip if there are
-  // fewer CPUs than that.
-  if (SysInfo::NumberOfProcessors() < 3) {
-    GTEST_SKIP();
-  }
-
-  std::vector<uint64_t> fake_frequencies = SysInfo::MaxFrequencyPerProcessor();
-  if (fake_frequencies.empty()) {
-    GTEST_SKIP() << "Cannot determine frequencies. This can happen in VMs for "
-                 << "instance";
-  }
-
-  for (size_t i = 0; i < fake_frequencies.size(); i++) {
-    fake_frequencies[i] = static_cast<uint64_t>(1000000000) + (i * 100000000);
-  }
-  SetMaxFrequencyPerProcessorOverrideForTesting(&fake_frequencies);
-  ASSERT_TRUE(IsEligibleForBigCoreAffinityChange());
-
-  {
-    test::ScopedFeatureList feature_list{kRestrictBigCoreThreadAffinity};
-
-    EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-    PlatformThread::SetDefaultThreadType(ThreadType::kBackground);
-    EXPECT_EQ(SysInfo::NumberOfProcessors() - 1, NumberOfAllowedProcessors());
-    PlatformThread::SetDefaultThreadType(ThreadType::kPresentation);
-    EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-    PlatformThread::SetDefaultThreadType(ThreadType::kDefault);
-    EXPECT_EQ(SysInfo::NumberOfProcessors() - 1, NumberOfAllowedProcessors());
-
-    // Make sure that affinity is reset to everything, as when the feature is
-    // disabled, the affinity will stay to the value it had previously.
-    PlatformThread::SetDefaultThreadType(ThreadType::kPresentation);
-    EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-  }
-
-  {
-    test::ScopedFeatureList feature_list;
-    feature_list.InitAndDisableFeature(kRestrictBigCoreThreadAffinity);
-
-    PlatformThread::SetDefaultThreadType(ThreadType::kBackground);
-    EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-    PlatformThread::SetDefaultThreadType(ThreadType::kDefault);
-    EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-  }
-
-  SetMaxFrequencyPerProcessorOverrideForTesting(nullptr);
-}
-
-TEST(PlatformThreadCpuAffinity, RestrictAffinityNoopWithTwoCoreTypes) {
-  // Only two core types.
-  std::vector<uint64_t> fake_frequencies = SysInfo::MaxFrequencyPerProcessor();
-  for (size_t i = 0; i < fake_frequencies.size(); i++) {
-    fake_frequencies[i] = i % 2 ? 1000000000 : 1500000000;
-  }
-  SetMaxFrequencyPerProcessorOverrideForTesting(&fake_frequencies);
-  EXPECT_FALSE(IsEligibleForBigCoreAffinityChange());
-
-  test::ScopedFeatureList feature_list{kRestrictBigCoreThreadAffinity};
-
-  EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-  PlatformThread::SetDefaultThreadType(ThreadType::kBackground);
-  EXPECT_EQ(SysInfo::NumberOfProcessors(), NumberOfAllowedProcessors());
-
-  SetMaxFrequencyPerProcessorOverrideForTesting(nullptr);
-}
-
-TEST(PlatformThreadCpuAffinity, IsEligibleForBigCoreAffinityChange) {
-  std::vector<uint64_t> fake_frequencies;
-  SetMaxFrequencyPerProcessorOverrideForTesting(&fake_frequencies);
-  EXPECT_FALSE(IsEligibleForBigCoreAffinityChange());
-
-  fake_frequencies = {1000, 2000};
-  EXPECT_FALSE(IsEligibleForBigCoreAffinityChange());
-
-  fake_frequencies = {1000, 2000, 3000};
-  EXPECT_TRUE(IsEligibleForBigCoreAffinityChange());
-
-  fake_frequencies = {1000, 2000, 2000, 3000};
-  EXPECT_TRUE(IsEligibleForBigCoreAffinityChange());
-
-  fake_frequencies = {1000, 1000, 1000};
-  EXPECT_FALSE(IsEligibleForBigCoreAffinityChange());
-
-  SetMaxFrequencyPerProcessorOverrideForTesting(nullptr);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class PlatformThreadThreadTypeManagerTest : public ::testing::Test,
                                             public internal::ThreadTypeManager {

@@ -135,11 +135,7 @@ class CreditCardAccessManagerBetterAuthOptInLogTest
 
     CreateServerCard(kTestGUID, kTestNumber);
     GetFIDOAuthenticator()->SetUserVerifiable(true);
-#if BUILDFLAG(IS_ANDROID)
-    SetCreditCardFIDOAuthEnabled(HasOptedInFromAndroidSettings());
-#else
     SetCreditCardFIDOAuthEnabled(false);
-#endif  // BUILDFLAG(OS_ANDROID)
     payments_network_interface().AllowFidoRegistration(
         /*server_denotes_fido_eligible_but_not_opted_in=*/
         UnmaskDetailsOfferFidoOptIn());
@@ -195,7 +191,6 @@ class CreditCardAccessManagerBetterAuthOptInLogTest
       "Autofill.BetterAuth.OptInPromoNotOfferedReason";
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Ensures that the correct metrics are logged when the FIDO opt-in dialog is
 // not shown on Desktop.
 TEST_P(CreditCardAccessManagerBetterAuthOptInLogTest,
@@ -252,50 +247,6 @@ TEST_P(CreditCardAccessManagerBetterAuthOptInLogTest,
                                       /*expected_count=*/0);
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-// Ensures that the correct metrics are logged when the FIDO opt-in checkbox is
-// not shown on Android.
-TEST_P(CreditCardAccessManagerBetterAuthOptInLogTest,
-       FidoOptInNotShown_Android) {
-  base::HistogramTester histogram_tester;
-
-  EXPECT_EQ(test_api(credit_card_access_manager()).ShouldOfferFidoAuth(),
-            ShouldOfferFidoOptInAndroid());
-
-  if (IsOptedIntoFido()) {
-    histogram_tester.ExpectUniqueSample(
-        GetFidoOptInNotOfferedHistogram(),
-        /*sample=*/
-        autofill_metrics::WebauthnOptInPromoNotOfferedReason::kAlreadyOptedIn,
-        /*expected_bucket_count=*/1);
-  } else if (!UnmaskDetailsOfferFidoOptIn()) {
-    histogram_tester.ExpectUniqueSample(
-        GetFidoOptInNotOfferedHistogram(),
-        /*sample=*/
-        autofill_metrics::WebauthnOptInPromoNotOfferedReason::
-            kUnmaskDetailsOfferFidoOptInFalse,
-        /*expected_bucket_count=*/1);
-  } else if (HasOptedInFromAndroidSettings()) {
-    histogram_tester.ExpectUniqueSample(
-        GetFidoOptInNotOfferedHistogram(),
-        /*sample=*/
-        autofill_metrics::WebauthnOptInPromoNotOfferedReason::
-            kOptedInFromSettings,
-        /*expected_bucket_count=*/1);
-  } else if (IsVirtualCard()) {
-    histogram_tester.ExpectUniqueSample(
-        GetFidoOptInNotOfferedHistogram(),
-        /*sample=*/
-        autofill_metrics::WebauthnOptInPromoNotOfferedReason::kVirtualCard,
-        /*expected_bucket_count=*/1);
-  } else {
-    histogram_tester.ExpectTotalCount(GetFidoOptInNotOfferedHistogram(),
-                                      /*expected_count=*/0);
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 INSTANTIATE_TEST_SUITE_P(,
                          CreditCardAccessManagerBetterAuthOptInLogTest,

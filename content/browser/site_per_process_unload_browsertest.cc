@@ -880,7 +880,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
 }
 
 #if defined(ADDRESS_SANITIZER) || defined(THREAD_SANITIZER) || \
-    !defined(NDEBUG) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+    !defined(NDEBUG) || BUILDFLAG(IS_LINUX)
 // Too slow under sanitizers and debug builds, even with increased timeout:
 // https://crbug.com/1096612
 // Disabled for Linux/Android due to failures: https://crbug.com/1494811

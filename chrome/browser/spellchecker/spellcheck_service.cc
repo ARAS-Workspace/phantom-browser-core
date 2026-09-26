@@ -107,13 +107,6 @@ SpellcheckService::SpellcheckService(content::BrowserContext* context)
     InitializePlatformLanguageMacWithLanguage(
         spellcheck_platform::GetSpellCheckerLanguage());
   }
-#elif BUILDFLAG(IS_ANDROID)
-  // Ensure that the renderer always knows the platform spellchecking
-  // language. This language is used for initialization of the text iterator.
-  // If the iterator is not initialized, then the context menu does not show
-  // spellcheck suggestions.
-  dictionaries_pref.SetValue(std::vector<std::string>(
-      1, spellcheck_platform::GetSpellCheckerLanguage()));
 #else
   // Migrate preferences from single-language to multi-language schema.
   StringPrefMember single_dictionary_pref;
@@ -130,7 +123,7 @@ SpellcheckService::SpellcheckService(content::BrowserContext* context)
   }
 
   single_dictionary_pref.SetValue("");
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
   pref_change_registrar_.Add(
       spellcheck::prefs::kSpellCheckDictionaries,

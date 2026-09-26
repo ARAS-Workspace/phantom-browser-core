@@ -115,7 +115,7 @@ TEST(HttpAuthTest, ChooseBestChallenge) {
           "WWW-Authenticate: Negotiate\n"
           "WWW-Authenticate: NTLM\n",
 
-#if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(USE_KERBEROS)
           // Choose Negotiate over NTLM on all platforms.
           // TODO(ahendrickson): This may be flaky on Linux and OSX as
           // it relies on being able to load one of the known .so files

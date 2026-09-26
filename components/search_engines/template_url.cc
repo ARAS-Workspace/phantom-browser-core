@@ -59,7 +59,7 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(ENABLE_BUILTIN_SEARCH_PROVIDER_ASSETS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_BUILTIN_SEARCH_PROVIDER_ASSETS)
 #include "third_party/search_engines_data/search_engine_descriptions_strings_map.h"
 #endif
 
@@ -1441,11 +1441,7 @@ std::string TemplateURLRef::HandleReplacements(
           case RequestSource::CROS_APP_LIST:
           case RequestSource::COMPOSEBOX:
           case RequestSource::NTP_ACTION_CHIPS:
-#if BUILDFLAG(IS_ANDROID)
-            HandleReplacement("sourceid", "chrome-mobile", replacement, &url);
-#else
             HandleReplacement("sourceid", "chrome", replacement, &url);
-#endif
             break;
           case RequestSource::LENS_OVERLAY:
             // Lens Overlay searchboxes don't rely on TemplateURL replacement
@@ -1505,13 +1501,6 @@ std::string TemplateURLRef::HandleReplacements(
         switch (search_terms_args.request_source) {
           case RequestSource::SEARCHBOX:
           case RequestSource::CROS_APP_LIST:
-#if BUILDFLAG(IS_ANDROID)
-            if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_PHONE) {
-              HandleReplacement(std::string(), "chrome-mobile-ext-ansg",
-                                replacement, &url);
-              break;
-            }
-#endif
             HandleReplacement(std::string(), "chrome-ext-ansg", replacement,
                               &url);
             break;
@@ -1814,21 +1803,10 @@ std::string TemplateURL::GetSuggestionClient(
     const TemplateURLRef::SearchTermsArgs& search_terms_args) {
   switch (search_terms_args.request_source) {
     case SearchTermsData::RequestSource::NTP_MODULE:
-#if BUILDFLAG(IS_ANDROID)
-      return "chrome-android-search-resumption-module";
-#else
       NOTREACHED();
-#endif
     case SearchTermsData::RequestSource::SEARCHBOX:
     case SearchTermsData::RequestSource::CROS_APP_LIST:
-#if BUILDFLAG(IS_ANDROID)
-      if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_PHONE) {
-        return "chrome";
-      }
       return "chrome-omni";
-#else
-      return "chrome-omni";
-#endif
     case SearchTermsData::RequestSource::COMPOSEBOX: {
       // Co-browsing composebox uses a different client since its zps
       // behave differently.
@@ -2001,7 +1979,7 @@ std::string TemplateURL::GetBuiltinDescriptionResourceId() const {
 }
 
 std::optional<std::u16string> TemplateURL::GetBuiltinMarketingSnippet() const {
-#if BUILDFLAG(ENABLE_BUILTIN_SEARCH_PROVIDER_ASSETS) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_BUILTIN_SEARCH_PROVIDER_ASSETS)
   auto resource_id = GetBuiltinDescriptionResourceId();
   if (!resource_id.empty()) {
     auto iter = std::ranges::find_if(
@@ -2016,12 +1994,10 @@ std::optional<std::u16string> TemplateURL::GetBuiltinMarketingSnippet() const {
   return std::nullopt;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::u16string TemplateURL::GetMarketingSnippet() const {
   return GetBuiltinMarketingSnippet().value_or(l10n_util::GetStringFUTF16(
       IDS_SEARCH_ENGINE_FALLBACK_MARKETING_SNIPPET, short_name()));
 }
-#endif
 
 SearchEngineType TemplateURL::GetEngineType(
     const SearchTermsData& search_terms_data) const {

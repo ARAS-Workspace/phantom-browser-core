@@ -156,35 +156,12 @@ video_capture::mojom::VideoCaptureService& GetVideoCaptureService() {
            base::TaskPriority::BEST_EFFORT},
           base::SingleThreadTaskRunnerThreadMode::DEDICATED);
 
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
-      auto* factory = BrowserGpuChannelHostFactory::instance();
-      if (base::FeatureList::IsEnabled(media::kAndroidZeroCopyVideoCapture) &&
-          factory) {
-        factory->EstablishGpuChannel(base::BindOnce(
-            [](mojo::PendingReceiver<video_capture::mojom::VideoCaptureService>
-                   receiver,
-               scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-               scoped_refptr<gpu::GpuChannelHost> gpu_channel_host) {
-              task_runner->PostTask(
-                  FROM_HERE,
-                  base::BindOnce(&BindInProcessInstance, std::move(receiver),
-                                 std::move(gpu_channel_host)));
-            },
-            std::move(receiver), dedicated_task_runner));
-      } else {
-        dedicated_task_runner->PostTask(
-            FROM_HERE, base::BindOnce(&BindInProcessInstance,
-                                      std::move(receiver), nullptr));
-      }
-#else
       dedicated_task_runner->PostTask(
           FROM_HERE,
           base::BindOnce(&BindInProcessInstance, std::move(receiver), nullptr));
-#endif
     } else {
       // Launch in a utility service.
       VideoCaptureServiceLauncher::Launch(std::move(receiver));
-#if !BUILDFLAG(IS_ANDROID)
       // On Android, we do not use automatic service shutdown, because when
       // shutting down the service, we lose caching of the supported formats,
       // and re-querying these can take several seconds on certain Android
@@ -195,7 +172,6 @@ video_capture::mojom::VideoCaptureService& GetVideoCaptureService() {
               [](mojo::Remote<video_capture::mojom::VideoCaptureService>*
                      remote) { remote->reset(); },
               &remote));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
       // Make sure the Remote is also reset in case of e.g. service crash so we
       // can restart it as needed.

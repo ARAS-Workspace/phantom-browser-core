@@ -66,13 +66,8 @@ class SampledOutClientIdSavedBrowserTest : public PlatformBrowserTest {
     // Android Chrome, we instead disable |kPostFREFixMetricsReportingFeature|
     // since that is the feature used to verify sampling for clients that newly
     // enable metrics reporting.
-#if BUILDFLAG(IS_ANDROID)
-    feature_list_.InitAndDisableFeature(
-        metrics::internal::kPostFREFixMetricsReportingFeature);
-#else
     feature_list_.InitAndDisableFeature(
         metrics::internal::kMetricsReportingFeature);
-#endif  // BUILDFLAG(IS_ANDROID)
 
     PlatformBrowserTest::SetUp();
   }
@@ -100,12 +95,6 @@ IN_PROC_BROWSER_TEST_F(SampledOutClientIdSavedBrowserTest, ClientIdSaved) {
   ASSERT_TRUE(metrics_service()->GetClientId().empty());
   ASSERT_TRUE(
       local_state()->GetString(metrics::prefs::kMetricsClientID).empty());
-#if BUILDFLAG(IS_ANDROID)
-  // On Android Chrome, since we have not yet consented to metrics reporting,
-  // the new sampling trial should be used to verify sampling.
-  EXPECT_TRUE(
-      local_state()->GetBoolean(metrics::prefs::kUsePostFREFixSamplingTrial));
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Verify that we are considered sampled out.
   EXPECT_FALSE(
@@ -132,22 +121,4 @@ IN_PROC_BROWSER_TEST_F(SampledOutClientIdSavedBrowserTest, ClientIdSaved) {
   EXPECT_FALSE(client_id.empty());
   EXPECT_EQ(client_id,
             local_state()->GetString(metrics::prefs::kMetricsClientID));
-
-#if BUILDFLAG(IS_ANDROID)
-  // Set the pref that dictates whether the new sampling trial should be used to
-  // false so that we can verify that upon disabling metrics reporting, this
-  // pref is again set to true.
-  local_state()->SetBoolean(metrics::prefs::kUsePostFREFixSamplingTrial, false);
-
-  // Disable metrics reporting, and verify that it was successful.
-  ASSERT_FALSE(ChangeMetricsReporting(false));
-  ASSERT_FALSE(
-      metrics::MetricsReportingChoiceService::IsBasicMetricsReportingEnabled(
-          local_state()));
-
-  // Verify that the pref dictating whether we use new sampling trial should be
-  // used is set to true.
-  EXPECT_TRUE(
-      local_state()->GetBoolean(metrics::prefs::kUsePostFREFixSamplingTrial));
-#endif  // BUILDFLAG(IS_ANDROID)
 }

@@ -88,11 +88,7 @@
 #include "components/prefs/pref_service.h"
 #include "media/base/media_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/android_theme_resources.h"
-#else
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
-#endif
 
 using content::SSLStatus;
 using content_settings::SettingSource;
@@ -156,10 +152,8 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
     // TODO(crbug.com/40231917): Fix tests and enable the feature.
     scoped_feature_list_.InitWithFeatures(
         {
-    // Enabled features
-#if !BUILDFLAG(IS_ANDROID)
+            // Enabled features
             features::kFileSystemAccessPersistentPermissions,
-#endif
         },
         {// Disabled features
          privacy_sandbox::kPrivacySandboxAdPrivacyUxDeprecation});
@@ -203,11 +197,7 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
   }
 
   void ExpectInitialSetCookieInfoCall(MockPageInfoUI* mock_ui) {
-#if !BUILDFLAG(IS_ANDROID)
     EXPECT_CALL(*mock_ui, SetCookieInfo(_)).Times(1);
-#else
-    EXPECT_CALL(*mock_ui, SetCookieInfo(_));
-#endif
   }
 
   void SetURL(const std::string& url) {
@@ -326,9 +316,7 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
   std::unique_ptr<PageInfo> incognito_page_info_;
   std::unique_ptr<NiceMock<MockPageInfoUI>> incognito_mock_ui_;
 
-#if !BUILDFLAG(IS_ANDROID)
   ChromeLayoutProvider layout_provider_;
-#endif
 
   scoped_refptr<net::X509Certificate> cert_;
   GURL url_;
@@ -365,17 +353,9 @@ TEST_F(PageInfoTest, PermissionStringsHaveMidSentenceVersion) {
       case ContentSettingsType::MIDI_SYSEX:
       case ContentSettingsType::NFC:
       case ContentSettingsType::USB_GUARD:
-#if !BUILDFLAG(IS_ANDROID)
       case ContentSettingsType::HID_GUARD:
-#endif
         EXPECT_EQ(normal, mid_sentence);
         break;
-#if BUILDFLAG(IS_ANDROID)
-      case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
-        EXPECT_NE(normal, mid_sentence);
-        EXPECT_EQ(base::ToLowerASCII(normal), base::ToLowerASCII(mid_sentence));
-        break;
-#endif
       default:
         EXPECT_NE(normal, mid_sentence);
         EXPECT_EQ(base::ToLowerASCII(normal), mid_sentence);
@@ -392,13 +372,6 @@ TEST_F(PageInfoTest, NonFactoryDefaultAndRecentlyChangedPermissionsShown) {
   page_info()->PresentSitePermissionsForTesting();
   std::set<ContentSettingsType> expected_visible_permissions;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_visible_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 
@@ -428,14 +401,12 @@ TEST_F(PageInfoTest, NonFactoryDefaultAndRecentlyChangedPermissionsShown) {
                                        url::Origin::Create(kEmbedded1),
                                        /*is_one_time=*/false);
   expected_visible_permissions.insert(ContentSettingsType::STORAGE_ACCESS);
-#if !BUILDFLAG(IS_ANDROID)
   page_info()->OnSitePermissionChanged(
       ContentSettingsType::FILE_SYSTEM_WRITE_GUARD, CONTENT_SETTING_ALLOW,
       url::Origin::Create(kEmbedded1),
       /*is_one_time=*/false);
   expected_visible_permissions.insert(
       ContentSettingsType::FILE_SYSTEM_WRITE_GUARD);
-#endif
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 
@@ -653,13 +624,6 @@ TEST_F(PageInfoTest, StorageAccessGrantsAreFiltered) {
                                      CONTENT_SETTING_ALLOW, constraint);
   page_info()->PresentSitePermissionsForTesting();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_visible_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 
@@ -682,13 +646,6 @@ TEST_F(PageInfoTest, StorageAccessGrantsDisplayedWhenDefaultBlocked) {
   map->SetDefaultContentSetting(type, CONTENT_SETTING_BLOCK);
   page_info()->PresentSitePermissionsForTesting();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_visible_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 
@@ -734,13 +691,6 @@ TEST_F(PageInfoRelatedWebsiteSetsTest, ShowAutograntedRWSPermissions) {
                                      CONTENT_SETTING_BLOCK, constraint);
   page_info()->PresentSitePermissionsForTesting();
   expected_visible_permissions.insert(ContentSettingsType::STORAGE_ACCESS);
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_visible_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 }
@@ -761,18 +711,10 @@ TEST_F(PageInfoRelatedWebsiteSetsTest, HideAutograntedRWSPermissions) {
                                      ContentSettingsType::STORAGE_ACCESS,
                                      CONTENT_SETTING_ALLOW, constraint);
   page_info()->PresentSitePermissionsForTesting();
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_visible_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(https://crbug.com/421606013): Enable test for Android once the
 // permission is available for that platform.
 TEST_F(PageInfoTest, AutoPictureInPicturePermissionShownOnChange) {
@@ -806,19 +748,11 @@ TEST_F(PageInfoTest, AutoPictureInPicturePermissionShownOnChange) {
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test that Local Network Access permissions are correctly displayed in Page
 // Info.
 TEST_F(PageInfoTest, LocalNetworkAccessPermissions) {
   std::set<ContentSettingsType> expected_visible_permissions;
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_visible_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   // Set permissions for both Local Network Access types
   page_info()->OnSitePermissionChanged(ContentSettingsType::LOCAL_NETWORK,
                                        CONTENT_SETTING_ALLOW,
@@ -846,13 +780,6 @@ TEST_F(PageInfoTest, IncognitoPermissionsDontShowAsk) {
   page_info()->PresentSitePermissionsForTesting();
   std::set<ContentSettingsType> expected_permissions;
   std::set<ContentSettingsType> expected_incognito_permissions;
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   ExpectPermissionInfoList(expected_permissions, last_permission_info_list());
 
   const content_settings::PermissionSettingsInfo* geolocation_info =
@@ -934,22 +861,16 @@ TEST_F(PageInfoTest, OnPermissionsChanged) {
   setting = content_settings->GetContentSetting(
       kEmbedded, url(), ContentSettingsType::STORAGE_ACCESS);
   EXPECT_EQ(setting, CONTENT_SETTING_ASK);
-#if !BUILDFLAG(IS_ANDROID)
   setting = content_settings->GetContentSetting(
       kEmbedded, url(), ContentSettingsType::FILE_SYSTEM_WRITE_GUARD);
   EXPECT_EQ(setting, CONTENT_SETTING_ASK);
-#endif
 
   EXPECT_CALL(*mock_ui(), SetIdentityInfo(_));
   ExpectInitialSetCookieInfoCall(mock_ui());
 
   // SetPermissionInfo() is called once initially, and then again every time
   // OnSitePermissionChanged() is called.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(*mock_ui(), SetPermissionInfoStub()).Times(11);
-#else
-  EXPECT_CALL(*mock_ui(), SetPermissionInfoStub()).Times(10);
-#endif
 
   // Execute code under tests.
   page_info()->OnSitePermissionChanged(ContentSettingsType::POPUPS,
@@ -977,12 +898,10 @@ TEST_F(PageInfoTest, OnPermissionsChanged) {
                                        CONTENT_SETTING_ALLOW,
                                        url::Origin::Create(kEmbedded),
                                        /*is_one_time=*/false);
-#if !BUILDFLAG(IS_ANDROID)
   page_info()->OnSitePermissionChanged(
       ContentSettingsType::FILE_SYSTEM_WRITE_GUARD, CONTENT_SETTING_ALLOW,
       url::Origin::Create(kEmbedded),
       /*is_one_time=*/false);
-#endif
 
   // Verify that the site permissions were changed correctly.
   setting = content_settings->GetContentSetting(url(), url(),
@@ -1004,11 +923,9 @@ TEST_F(PageInfoTest, OnPermissionsChanged) {
   setting = content_settings->GetContentSetting(
       kEmbedded, url(), ContentSettingsType::STORAGE_ACCESS);
   EXPECT_EQ(setting, CONTENT_SETTING_ALLOW);
-#if !BUILDFLAG(IS_ANDROID)
   setting = content_settings->GetContentSetting(
       kEmbedded, url(), ContentSettingsType::FILE_SYSTEM_WRITE_GUARD);
   EXPECT_EQ(setting, CONTENT_SETTING_ALLOW);
-#endif
 
   // Changing NOTIFICATIONS from ALLOW to BLOCK logs the histogram.
   histograms.ExpectTotalCount("SafeBrowsing.NotificationRevocationSource", 0);
@@ -1194,9 +1111,7 @@ TEST_F(PageInfoTest, HTTPSConnection) {
 }
 
 // Define some dummy constants for Android-only resources.
-#if !BUILDFLAG(IS_ANDROID)
 #define IDR_PAGEINFO_BAD 0
-#endif
 
 TEST_F(PageInfoTest, InsecureContent) {
   struct TestCase {
@@ -1457,13 +1372,8 @@ TEST_F(PageInfoTest, HTTPSSHA1) {
             page_info()->site_connection_status());
   EXPECT_EQ(PageInfo::SITE_IDENTITY_STATUS_DEPRECATED_SIGNATURE_ALGORITHM,
             page_info()->site_identity_status());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(IDR_PAGEINFO_BAD,
-            PageInfoUI::GetIdentityIconID(page_info()->site_identity_status()));
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PageInfoTest, NoInfoBar) {
   SetDefaultUIExpectations(mock_ui());
   EXPECT_EQ(0u, infobar_manager()->infobars().size());
@@ -1858,8 +1768,6 @@ TEST_F(PageInfoTest, ShowInfoBarWhenBlockingThirdPartyCookies) {
   infobar_manager()->RemoveInfoBar(infobar_manager()->infobars()[0]);
 }
 
-#endif
-
 TEST_F(PageInfoTest, AboutBlankPage) {
   SetURL(url::kAboutBlankURL);
   SetDefaultUIExpectations(mock_ui());
@@ -1871,16 +1779,6 @@ TEST_F(PageInfoTest, AboutBlankPage) {
 
 // On desktop, internal URLs aren't handled by PageInfo class. Instead, a
 // custom and simpler bubble is shown, so no need to test.
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PageInfoTest, InternalPage) {
-  SetURL("chrome://bookmarks");
-  SetDefaultUIExpectations(mock_ui());
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_INTERNAL_PAGE,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SITE_IDENTITY_STATUS_INTERNAL_PAGE,
-            page_info()->site_identity_status());
-}
-#endif
 
 // Tests that "Re-Enable Warnings" button on PageInfo both removes certificate
 // exceptions and logs metrics correctly.
@@ -2051,11 +1949,7 @@ TEST_F(PageInfoTest, TimeOpenMetrics) {
 // Tests that metrics are recorded on a PageInfo for pages with
 // various Safety Tip statuses.
 // See https://crbug.com/40710931 for why the test is disabled on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SafetyTipMetrics DISABLED_SafetyTipMetrics
-#else
 #define MAYBE_SafetyTipMetrics SafetyTipMetrics
-#endif
 TEST_F(PageInfoTest, MAYBE_SafetyTipMetrics) {
   struct TestCase {
     const security_state::SafetyTipInfo safety_tip_info;
@@ -2280,92 +2174,6 @@ TEST_F(PageInfoTest, PermissionUsed30MinutesAgoStrings) {
                                                           camera_permission));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PageInfoTest, AutoPictureInPicturePermissionNotShownIfNotRegistered) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(media::kAutoPictureInPictureAndroid);
-  page_info()->PresentSitePermissionsForTesting();
-  const auto& permissions = last_permission_info_list();
-  auto it =
-      std::find_if(permissions.begin(), permissions.end(), [](const auto& p) {
-        return p.type == ContentSettingsType::AUTO_PICTURE_IN_PICTURE;
-      });
-  // If the site hasn't registered for auto-pip, and the setting is default,
-  // the permission should not be shown.
-  EXPECT_EQ(it, permissions.end());
-}
-
-TEST_F(PageInfoTest, AutoPictureInPicturePermissionShownIfPreviouslySet) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(media::kAutoPictureInPictureAndroid);
-
-  // The site is NOT registered for Auto-PiP, but the user has previously set
-  // the permission for this site.
-  HostContentSettingsMap* content_settings =
-      HostContentSettingsMapFactory::GetForProfile(profile());
-  content_settings->SetContentSettingDefaultScope(
-      url(), url(), ContentSettingsType::AUTO_PICTURE_IN_PICTURE,
-      CONTENT_SETTING_BLOCK);
-
-  page_info()->PresentSitePermissionsForTesting();
-  const auto& permissions = last_permission_info_list();
-  auto it =
-      std::find_if(permissions.begin(), permissions.end(), [](const auto& p) {
-        return p.type == ContentSettingsType::AUTO_PICTURE_IN_PICTURE;
-      });
-
-  // The permission should be shown because it has a non-default setting.
-  ASSERT_NE(it, permissions.end());
-  EXPECT_EQ(it->setting.value(), PermissionSetting{CONTENT_SETTING_BLOCK});
-}
-
-TEST_F(PageInfoTest, AutoPictureInPicturePermissionInfoIncognito) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(media::kAutoPictureInPictureAndroid);
-
-  AutoPictureInPictureTabHelper::CreateForWebContents(incognito_web_contents());
-  auto* tab_helper =
-      AutoPictureInPictureTabHelper::FromWebContents(incognito_web_contents());
-  std::vector<media_session::mojom::MediaSessionAction> actions;
-  actions.push_back(
-      media_session::mojom::MediaSessionAction::kEnterAutoPictureInPicture);
-  tab_helper->MediaSessionActionsChanged(actions);
-
-  incognito_page_info()->PresentSitePermissionsForTesting();
-  const auto& permissions = last_permission_info_list();
-  auto it =
-      std::find_if(permissions.begin(), permissions.end(), [](const auto& p) {
-        return p.type == ContentSettingsType::AUTO_PICTURE_IN_PICTURE;
-      });
-  ASSERT_NE(it, permissions.end());
-  EXPECT_EQ(it->default_setting, PermissionSetting{CONTENT_SETTING_BLOCK});
-}
-
-TEST_F(PageInfoTest, AutoPictureInPicturePermissionInfoRegular) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(media::kAutoPictureInPictureAndroid);
-
-  AutoPictureInPictureTabHelper::CreateForWebContents(web_contents());
-  auto* tab_helper =
-      AutoPictureInPictureTabHelper::FromWebContents(web_contents());
-  std::vector<media_session::mojom::MediaSessionAction> actions;
-  actions.push_back(
-      media_session::mojom::MediaSessionAction::kEnterAutoPictureInPicture);
-  tab_helper->MediaSessionActionsChanged(actions);
-
-  page_info()->PresentSitePermissionsForTesting();
-  const auto& permissions = last_permission_info_list();
-  auto it =
-      std::find_if(permissions.begin(), permissions.end(), [](const auto& p) {
-        return p.type == ContentSettingsType::AUTO_PICTURE_IN_PICTURE;
-      });
-  ASSERT_NE(it, permissions.end());
-  EXPECT_EQ(it->default_setting, PermissionSetting{CONTENT_SETTING_ALLOW});
-}
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
-
 // Unit tests with the unified autoplay sound settings UI enabled. When enabled
 // the sound settings dropdown on the page info UI will have custom wording.
 
@@ -2509,8 +2317,6 @@ TEST_F(UnifiedAutoplaySoundSettingsPageInfoTest, NotSoundSetting_Noop) {
       l10n_util::GetStringUTF16(IDS_PAGE_INFO_STATE_TEXT_ALLOWED_BY_DEFAULT),
       PageInfoUI::PermissionStateToUIString(&delegate, info));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Unit tests for logic in the PageInfoUI that toggles permission between
 // allow/block and remember/forget.
@@ -2759,13 +2565,6 @@ TEST_F(PageInfoTest, MidiGrantsAreFilteredWhenAllowSysex) {
   auto* map = HostContentSettingsMapFactory::GetForProfile(profile());
   page_info()->PresentSitePermissionsForTesting();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Geolocation is always allowed to pass through to Android-specific logic to
-  // check for DSE settings (so expect 1 item), but isn't actually shown later
-  // on because this test isn't testing with a default search engine origin.
-  expected_visible_permissions.insert(
-      content_settings::GeolocationContentSettingsType());
-#endif
   ExpectPermissionInfoList(expected_visible_permissions,
                            last_permission_info_list());
 
@@ -2922,72 +2721,3 @@ TEST_F(PageInfoTest, ResetPermissionClearsEmbargo) {
   EXPECT_FALSE(autoblocker->IsEmbargoed(
       target_url, content_settings::GeolocationContentSettingsType()));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PageInfoTest, PermanentNotificationSubscribeShowPermission) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      permissions::features::kPermanentNotificationSubscribeInPageInfo);
-
-  // By default, notification permission should not be shown.
-  page_info()->PresentSitePermissionsForTesting();
-  {
-    std::set<ContentSettingsType> expected_visible_permissions;
-    expected_visible_permissions.insert(
-        content_settings::GeolocationContentSettingsType());
-    ExpectPermissionInfoList(expected_visible_permissions,
-                             last_permission_info_list());
-  }
-
-  // Initialize PermissionRequestManager.
-  permissions::PermissionRequestManager::CreateForWebContents(web_contents());
-  permissions::PermissionRequestManager* manager =
-      permissions::PermissionRequestManager::FromWebContents(web_contents());
-  ASSERT_TRUE(manager);
-
-  auto prompt_factory =
-      std::make_unique<permissions::MockPermissionPromptFactory>(manager);
-
-  // Simulate notification request.
-  auto request = std::make_unique<permissions::MockPermissionRequest>(
-      permissions::RequestType::kNotifications);
-  base::RunLoop run_loop;
-  request->RegisterOnPermissionDecidedCallback(run_loop.QuitClosure());
-  prompt_factory->set_response_type(
-      permissions::PermissionRequestManager::AutoResponseType::DISMISS);
-  manager->AddRequest(web_contents()->GetPrimaryMainFrame(),
-                      std::move(request));
-
-  run_loop.Run();
-
-  // Even if the permission request has been dismissed, the notification entry
-  // should be shown in Page Info.
-  page_info()->PresentSitePermissionsForTesting();
-  {
-    std::set<ContentSettingsType> expected_visible_permissions;
-    expected_visible_permissions.insert(
-        content_settings::GeolocationContentSettingsType());
-    expected_visible_permissions.insert(ContentSettingsType::NOTIFICATIONS);
-    ExpectPermissionInfoList(expected_visible_permissions,
-                             last_permission_info_list());
-  }
-
-  // Simulate navigation to reset the state.
-  ClearPageInfo();
-  SetURL("http://www.example.com/new_page");
-  NavigateAndCommit(url());
-
-  // Recreate PageInfo and present permissions.
-  page_info()->PresentSitePermissionsForTesting();
-
-  // Notification permission should not be shown anymore.
-  {
-    std::set<ContentSettingsType> expected_visible_permissions;
-    expected_visible_permissions.insert(
-        content_settings::GeolocationContentSettingsType());
-    ExpectPermissionInfoList(expected_visible_permissions,
-                             last_permission_info_list());
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-

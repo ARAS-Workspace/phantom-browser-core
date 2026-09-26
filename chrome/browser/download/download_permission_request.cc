@@ -17,13 +17,6 @@
 #include "components/permissions/resolvers/content_setting_permission_resolver.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/android_theme_resources.h"
-#include "components/url_formatter/elide_url.h"
-#include "url/origin.h"
-#else
-#endif
-
 DownloadPermissionRequest::DownloadPermissionRequest(
     base::WeakPtr<DownloadRequestLimiter::TabDownloadState> host,
     const url::Origin& requesting_origin)

@@ -1046,11 +1046,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionBackForwardCacheBrowserTest,
 }
 
 // Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ActiveTabPermissionRevoked DISABLED_ActiveTabPermissionRevoked
-#else
 #define MAYBE_ActiveTabPermissionRevoked ActiveTabPermissionRevoked
-#endif
 // Test that an activeTab permission temporarily granted to an extension for a
 // page does not revive when the BFCache entry is restored.
 IN_PROC_BROWSER_TEST_F(ExtensionBackForwardCacheBrowserTest,
@@ -1098,13 +1094,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionBackForwardCacheBrowserTest,
 }
 
 // Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ActiveTabPermissionClearedOnBFCacheRestore \
-  DISABLED_ActiveTabPermissionClearedOnBFCacheRestore
-#else
 #define MAYBE_ActiveTabPermissionClearedOnBFCacheRestore \
   ActiveTabPermissionClearedOnBFCacheRestore
-#endif
 // Test that an activeTab permission granted to an extension for a page is
 // cleared when a cross-origin page activation (restoring a BFCache entry)
 // commits.

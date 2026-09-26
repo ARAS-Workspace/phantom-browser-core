@@ -29,31 +29,12 @@
 #include "components/signin/public/base/consent_level.h"
 #include "google_apis/gaia/gaia_auth_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/json/json_reader.h"
-#include "base/json/json_writer.h"
-#include "base/memory/scoped_refptr.h"
-#include "components/os_crypt/async/common/encryptor.h"
-#include "google_apis/gaia/gaia_auth_util.h"
-#endif
-
 using base::RecordAction;
 using base::UserMetricsAction;
 
 namespace password_manager {
 
 namespace {
-
-#if BUILDFLAG(IS_ANDROID)
-// Time in seconds by which calls to the password store happening on startup
-// should be delayed.
-constexpr base::TimeDelta kPasswordStoreCallDelaySeconds = base::Seconds(5);
-// Keys for accessing credentials passed from Android.
-// Must be kept in sync with PasswordProtectionBroadcastReceiver.java.
-constexpr char kLoginAccountIdentifier[] = "Login.accountIdentifier";
-constexpr char kLoginHashedPassword[] = "Login.hashedPassword";
-constexpr char kLoginSalt[] = "Login.salt";
-#endif
 
 // Represents a single CheckReuse() request. Implements functionality to
 // listen to reuse events and propagate them to |consumer| on the sequence on
@@ -158,12 +139,6 @@ void PasswordReuseManagerImpl::Init(
   prefs_ = prefs;
   InitHashPasswordManager(local_prefs);
   identity_manager_ = identity_manager;
-#if BUILDFLAG(IS_ANDROID)
-  if (shared_pref_delegate) {
-    shared_pref_delegate_ = std::move(shared_pref_delegate);
-    identity_manager_observation_.Observe(identity_manager_);
-  }
-#endif
   main_task_runner_ = base::SequencedTaskRunner::GetCurrentDefault();
   DCHECK(main_task_runner_);
 
@@ -176,20 +151,7 @@ void PasswordReuseManagerImpl::Init(
 
   account_store_ = account_store;
   profile_store_ = profile_store;
-#if BUILDFLAG(IS_ANDROID)
-  // Calls to the password store result in a call to Google Play Services which
-  // can be resource-intesive. In order not to slow down other startup
-  // operations, requesting logins is delayed by
-  // `kPasswordStoreCallDelaySeconds`.
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&PasswordReuseManagerImpl::RequestLoginsFromStores,
-                     weak_ptr_factory_.GetWeakPtr()),
-      kPasswordStoreCallDelaySeconds);
-  return;
-#else
   RequestLoginsFromStores();
-#endif
 }
 
 void PasswordReuseManagerImpl::ReportMetrics(const std::string& username) {
@@ -587,71 +549,6 @@ void PasswordReuseManagerImpl::OnPrimaryAccountChanged(
   if (!shared_pref_delegate_) {
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  // Check for a Chrome sign-in event.
-  if (event_details.GetEventTypeFor(signin::ConsentLevel::kSignin) ==
-      signin::PrimaryAccountChangeEvent::Type::kSet) {
-    // On Android, check if there are any gaia credentials saved for this user.
-    auto saved_creds = shared_pref_delegate_->GetCredentials("");
-    if (saved_creds.empty()) {
-      metrics_util::LogSharedPrefCredentialsAccessOutcome(
-          metrics_util::SharedPrefCredentialsAccessOutcome::kNoCredentials);
-      return;
-    }
-    auto parsed_json = base::JSONReader::ReadAndReturnValueWithError(
-        saved_creds, base::JSON_ALLOW_TRAILING_COMMAS);
-    if (!parsed_json.has_value()) {
-      LOG(ERROR) << "Error parsing JSON: " << parsed_json.error().message;
-      metrics_util::LogSharedPrefCredentialsAccessOutcome(
-          metrics_util::SharedPrefCredentialsAccessOutcome::kParseError);
-      return;
-    }
-    if (!parsed_json->is_list()) {
-      LOG(ERROR) << "Error parsing JSON: Expected a list but got non-list.";
-      metrics_util::LogSharedPrefCredentialsAccessOutcome(
-          metrics_util::SharedPrefCredentialsAccessOutcome::kBadType);
-      return;
-    }
-    auto& saved_creds_list = parsed_json->GetList();
-    if (saved_creds_list.empty()) {
-      metrics_util::LogSharedPrefCredentialsAccessOutcome(
-          metrics_util::SharedPrefCredentialsAccessOutcome::kEmptyCredentials);
-      return;
-    }
-    for (size_t i = 0; i < saved_creds_list.size(); i++) {
-      base::DictValue* saved_creds_entry = saved_creds_list[i].GetIfDict();
-      const std::string* account_id =
-          saved_creds_entry->FindString(kLoginAccountIdentifier);
-      CHECK(account_id);
-      if (identity_manager_
-              ->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
-              .email == *account_id) {
-        metrics_util::LogSharedPrefCredentialsAccessOutcome(
-            metrics_util::SharedPrefCredentialsAccessOutcome::kLoginMatch);
-        PasswordHashData password_hash_data;
-        password_hash_data.username = gaia::CanonicalizeEmail(*account_id);
-        password_hash_data.length = 8;  // Min size for gaia passwords is 8.
-        password_hash_data.salt = *saved_creds_entry->FindString(kLoginSalt);
-        password_hash_data.hash = static_cast<uint64_t>(
-            saved_creds_entry->FindDouble(kLoginHashedPassword).value());
-        password_hash_data.force_update = true;
-        hash_password_manager_->SavePasswordHash(password_hash_data);
-        SchedulePasswordHashUpdate(/*sign_in_state_for_metrics=*/std::nullopt);
-        metrics_util::LogGaiaPasswordHashChange(
-            metrics_util::GaiaPasswordHashChange::SAVED_ON_CHROME_SIGNIN,
-            /*is_sync_password=*/true);
-        // Remove the saved credential that matched the signed in user.
-        saved_creds_list.EraseValue(saved_creds_list[i]);
-        shared_pref_delegate_->SetCredentials(
-            base::WriteJson(saved_creds_list).value());
-        break;
-      } else {
-        metrics_util::LogSharedPrefCredentialsAccessOutcome(
-            metrics_util::SharedPrefCredentialsAccessOutcome::kLoginMismatch);
-      }
-    }
-  }
-#endif
 }
 
 void PasswordReuseManagerImpl::MaybeSavePasswordHash(

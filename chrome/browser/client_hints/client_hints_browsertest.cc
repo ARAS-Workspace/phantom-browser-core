@@ -1080,22 +1080,14 @@ class ClientHintsBrowserTest : public policy::PolicyTest {
             request.headers.find("viewport-width")->second, &value));
         EXPECT_TRUE(
             IsSimilarToIntABNF(request.headers.find("viewport-width")->second));
-#if !BUILDFLAG(IS_ANDROID)
         EXPECT_LT(0.0, value);
-#else
-        EXPECT_EQ(980, value);
-#endif
         main_frame_viewport_width_observed_deprecated_ = value;
 
         EXPECT_TRUE(base::StringToDouble(
             request.headers.find("sec-ch-viewport-width")->second, &value));
         EXPECT_TRUE(IsSimilarToIntABNF(
             request.headers.find("sec-ch-viewport-width")->second));
-#if !BUILDFLAG(IS_ANDROID)
         EXPECT_LT(0.0, value);
-#else
-        EXPECT_EQ(980, value);
-#endif
         main_frame_viewport_width_observed_ = value;
 
         EXPECT_TRUE(base::StringToDouble(
@@ -1153,37 +1145,13 @@ class ClientHintsBrowserTest : public policy::PolicyTest {
             request.headers.find("viewport-width")->second, &value));
         EXPECT_TRUE(
             IsSimilarToIntABNF(request.headers.find("viewport-width")->second));
-#if !BUILDFLAG(IS_ANDROID)
         EXPECT_LT(0.0, value);
-#else
-        EXPECT_EQ(980, value);
-#endif
-#if BUILDFLAG(IS_ANDROID)
-        // TODO(tbansal): https://crbug.com/41378979: Viewport width on main
-        // frame requests may be incorrect when the Chrome window is not
-        // maximized.
-        if (main_frame_viewport_width_observed_deprecated_ > 0) {
-          EXPECT_EQ(main_frame_viewport_width_observed_deprecated_, value);
-        }
-#endif
 
         EXPECT_TRUE(base::StringToDouble(
             request.headers.find("sec-ch-viewport-width")->second, &value));
         EXPECT_TRUE(IsSimilarToIntABNF(
             request.headers.find("sec-ch-viewport-width")->second));
-#if !BUILDFLAG(IS_ANDROID)
         EXPECT_LT(0.0, value);
-#else
-        EXPECT_EQ(980, value);
-#endif
-#if BUILDFLAG(IS_ANDROID)
-        // TODO(tbansal): https://crbug.com/41378979: Viewport width on main
-        // frame requests may be incorrect when the Chrome window is not
-        // maximized.
-        if (main_frame_viewport_width_observed_ > 0) {
-          EXPECT_EQ(main_frame_viewport_width_observed_, value);
-        }
-#endif
 
         EXPECT_TRUE(base::StringToDouble(
             request.headers.find("sec-ch-viewport-height")->second, &value));
@@ -1712,12 +1680,8 @@ IN_PROC_BROWSER_TEST_F(ClientHintsBrowserTest,
   metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
 
   // The device-memory and dprheader is attached to the main frame request.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(expected_client_hints_number, count_client_hints_headers_seen());
-#else
   EXPECT_EQ(expected_client_hints_number * 3,
             count_client_hints_headers_seen());
-#endif
 
   // Requests to third party servers should have three (3) client hints attached
   // (`Sec-CH-UA`, `Sec-CH-UA-Mobile`, `Sec-CH-UA-Platform`).
@@ -4514,10 +4478,6 @@ IN_PROC_BROWSER_TEST_F(SameOriginUaReductionBrowserTest, NormalRequest) {
       /*expected_ua_reduced=*/UAReductionEnabled());
   // Instead of checking all platform types, just check one that has a
   // difference between the full and reduced versions.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ("Linux x86_64",
-            content::EvalJs(web_contents, "navigator.platform"));
-#endif
 
   CheckSecClientHintUaCount();
 }

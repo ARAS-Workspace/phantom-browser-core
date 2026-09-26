@@ -12,10 +12,6 @@
 #include "components/download/public/common/download_item_rename_handler.h"
 #include "components/download/public/common/download_target_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/download/public/common/android/auto_resumption_handler.h"
-#endif
-
 namespace download {
 
 // Infrastructure in DownloadItemImplDelegate to assert invariant that
@@ -110,12 +106,7 @@ bool DownloadItemImplDelegate::IsOffTheRecord() const {
 }
 
 bool DownloadItemImplDelegate::IsActiveNetworkMetered() const {
-#if BUILDFLAG(IS_ANDROID)
-  return download::AutoResumptionHandler::Get() &&
-         download::AutoResumptionHandler::Get()->IsActiveNetworkMetered();
-#else
   return false;
-#endif
 }
 
 void DownloadItemImplDelegate::ReportBytesWasted(DownloadItemImpl* download) {}

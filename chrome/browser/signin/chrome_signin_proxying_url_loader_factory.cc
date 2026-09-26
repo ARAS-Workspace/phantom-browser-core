@@ -38,11 +38,6 @@
 #include "services/network/public/mojom/url_response_head.mojom.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/android/tab_web_contents_delegate_android.h"
-#endif
-
 namespace signin {
 
 namespace {
@@ -69,22 +64,7 @@ class BrowserContextData : public base::SupportsUserData::Data {
       profile->SetUserData(kBrowserContextUserDataKey, base::WrapUnique(self));
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    bool is_custom_tab = false;
-    content::WebContents* web_contents = web_contents_getter.Run();
-    if (web_contents) {
-      auto* delegate =
-          TabAndroid::FromWebContents(web_contents)
-              ? static_cast<android::TabWebContentsDelegateAndroid*>(
-                    web_contents->GetDelegate())
-              : nullptr;
-      is_custom_tab = delegate && delegate->IsCustomTab();
-    }
-    auto delegate = std::make_unique<HeaderModificationDelegateImpl>(
-        profile, /*incognito_enabled=*/!is_custom_tab);
-#else
     auto delegate = std::make_unique<HeaderModificationDelegateImpl>(profile);
-#endif
     auto proxy = std::make_unique<ProxyingURLLoaderFactory>(
         std::move(delegate), factory_isolation_info,
         std::move(web_contents_getter), factory_builder,

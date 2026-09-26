@@ -1001,10 +1001,6 @@ class BrowserAutofillManagerTest
 
     // Mandatory re-auth is required for credit card autofill on automotive, so
     // the authenticator response needs to be properly mocked.
-#if BUILDFLAG(IS_ANDROID)
-    payments_autofill_client()
-        .SetUpDeviceBiometricAuthenticatorSuccessOnAutomotive();
-#endif
   }
 
   void TearDown() override { DestroyAutofillClient(); }
@@ -1639,7 +1635,6 @@ TEST_F(BrowserAutofillManagerTest, OnFormsSeen_SendTypePredictionsToRenderer) {
   FormsSeen({form1, form2});
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that the `kWebauthnSignInWithAnotherDevice` suggestion is present if
 // the `PasswordManagerDelegate` returns it.
 TEST_F(BrowserAutofillManagerTest, WebauthnSignInWithAnotherDeviceSuggestion) {
@@ -1829,7 +1824,6 @@ TEST_F(BrowserAutofillManagerTest,
 
   external_delegate()->DidAcceptSuggestion(suggestion, {.multi_index = {0}});
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test that we return no suggestions when autofill is disabled.
 TEST_F(BrowserAutofillManagerTest,
@@ -6126,7 +6120,6 @@ TEST_F(BrowserAutofillManagerTest_MockAutofillAi, ShowAutofillAiSuggestions) {
                                 Eq(SuggestionType::kFillAutofillAi))));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that no Autofill AI suggestions are shown if the autocomplete attribute
 // is unrecognized.
 TEST_F(BrowserAutofillManagerTest_MockAutofillAi,
@@ -6139,7 +6132,6 @@ TEST_F(BrowserAutofillManagerTest_MockAutofillAi,
       passport_form(), passport_form().fields().front(),
       AutofillSuggestionTriggerSource::kFormControlElementClicked);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that if a name field is dynamically assigned to an Autofill AI entity
 // but the EntityDataManager cannot fill that specific field, there are no
@@ -7058,11 +7050,7 @@ TEST_F(BrowserAutofillManagerTest, QueriesDelegateWhenGeneratingSuggestions) {
   FormData form = CreateTestAddressFormData();
   FormsSeen({form});
 
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(password_delegate(), ShowSuggestions);
-#else   // BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(password_delegate(), ShowKeyboardReplacingSurface);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   OnAskForValuesToFill(form, form.fields()[0],
                        AutofillSuggestionTriggerSource::kTextFieldValueChanged,

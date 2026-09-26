@@ -37,8 +37,6 @@ namespace {
 gfx::GpuMemoryBufferType GetNativeBufferType() {
 #if BUILDFLAG(IS_APPLE)
   return gfx::IO_SURFACE_BUFFER;
-#elif BUILDFLAG(IS_ANDROID)
-  return gfx::ANDROID_HARDWARE_BUFFER;
 #else
   // Ozone
   return gfx::NATIVE_PIXMAP;

@@ -24,10 +24,6 @@
 #include "testing/gmock/include/gmock/gmock-matchers.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 using ::testing::Eq;
@@ -96,11 +92,7 @@ class SupervisedUserPrefStoreTestBase : public ::testing::Test {
   // Backend of the FamilyLinkSettingsService.
   scoped_refptr<TestingPrefStore> service_backing_pref_store_;
 
-#if BUILDFLAG(IS_ANDROID)
-  supervised_user::AndroidParentalControls device_parental_controls_;
-#else
   supervised_user::DeviceParentalControlsNoOpImpl device_parental_controls_;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 void SupervisedUserPrefStoreTestBase::SetUp() {
@@ -146,12 +138,6 @@ TEST_F(SupervisedUserPrefStoreTest, ConfigureSettings) {
       fixture.changed_prefs()
           ->FindIntByDottedPath(policy::policy_prefs::kForceYouTubeRestrict)
           .has_value());
-
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(fixture.changed_prefs()->FindBoolByDottedPath(
-                  syncer::prefs::internal::kSyncPayments),
-              false);
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // Permissions requests default to allowed, to match server-side behavior.
@@ -279,114 +265,3 @@ TEST_F(SupervisedUserPrefStoreTest, CreatePrefStoreAfterInitialization) {
   SupervisedUserPrefStoreFixture fixture(&service_, device_parental_controls_);
   EXPECT_TRUE(fixture.initialization_completed());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(SupervisedUserPrefStoreTest,
-       ContentFiltersServiceControlsIncognitoMode) {
-  base::test::ScopedFeatureList feature_list;
-
-  SupervisedUserPrefStoreFixture fixture(&service_, device_parental_controls_);
-  EXPECT_FALSE(fixture.initialization_completed());
-
-  service_backing_pref_store_->SetInitializationCompleted();
-  EXPECT_TRUE(fixture.initialization_completed());
-
-  device_parental_controls_.SetBrowserContentFiltersEnabledForTesting(true);
-  EXPECT_THAT(
-      fixture.changed_prefs()->FindIntByDottedPath(
-          policy::policy_prefs::kIncognitoModeAvailability),
-      Optional(static_cast<int>(policy::IncognitoModeAvailability::kDisabled)));
-
-  // The other filter is not affecting incognito mode.
-  device_parental_controls_.SetSearchContentFiltersEnabledForTesting(false);
-  EXPECT_THAT(
-      fixture.changed_prefs()->FindIntByDottedPath(
-          policy::policy_prefs::kIncognitoModeAvailability),
-      Optional(static_cast<int>(policy::IncognitoModeAvailability::kDisabled)));
-}
-
-TEST_F(SupervisedUserPrefStoreTest, ContentFiltersServiceEnablesSearchFilters) {
-  SupervisedUserPrefStoreFixture fixture(&service_, device_parental_controls_);
-  EXPECT_FALSE(fixture.initialization_completed());
-
-  service_backing_pref_store_->SetInitializationCompleted();
-  EXPECT_TRUE(fixture.initialization_completed());
-
-  device_parental_controls_.SetSearchContentFiltersEnabledForTesting(true);
-
-  EXPECT_THAT(
-      fixture.changed_prefs()->FindIntByDottedPath(
-          policy::policy_prefs::kIncognitoModeAvailability),
-      Optional(static_cast<int>(policy::IncognitoModeAvailability::kDisabled)));
-  EXPECT_THAT(fixture.changed_prefs()->FindBoolByDottedPath(
-                  policy::policy_prefs::kForceGoogleSafeSearch),
-              Optional(true));
-
-  // The other filter is not affecting incognito mode.
-  device_parental_controls_.SetBrowserContentFiltersEnabledForTesting(false);
-  EXPECT_THAT(
-      fixture.changed_prefs()->FindIntByDottedPath(
-          policy::policy_prefs::kIncognitoModeAvailability),
-      Optional(static_cast<int>(policy::IncognitoModeAvailability::kDisabled)));
-}
-
-TEST_F(SupervisedUserPrefStoreTest, InactiveSettingsServiceDoesNotAffectPrefs) {
-  SupervisedUserPrefStoreFixture fixture(&service_, device_parental_controls_);
-  EXPECT_FALSE(fixture.initialization_completed());
-
-  service_backing_pref_store_->SetInitializationCompleted();
-  EXPECT_TRUE(fixture.initialization_completed());
-
-  // After set search is set, one pref is expected to change.
-  device_parental_controls_.SetSearchContentFiltersEnabledForTesting(true);
-  base::DictValue prefs;
-  EXPECT_EQ(2u, fixture.changed_prefs()->size());
-  EXPECT_TRUE(fixture.changed_prefs()->FindBoolByDottedPath(
-      policy::policy_prefs::kForceGoogleSafeSearch));
-  EXPECT_TRUE(fixture.changed_prefs()->FindIntByDottedPath(
-      policy::policy_prefs::kIncognitoModeAvailability));
-
-  // service_ is still inactive. On each SetLocalSetting, service_ wants to emit
-  // empty dict (empty dict because it's inactive) that would normally clear the
-  // prefs, but this happens only once (subsequent attempts to emit empty
-  // settings are vetoed). This means that prefs coming from
-  // SetSearchFiltersEnabled are maintained.
-  service_.SetLocalSetting(supervised_user::kGeolocationDisabled,
-                           base::Value(true));
-  EXPECT_EQ(2u, fixture.changed_prefs()->size());
-  EXPECT_TRUE(fixture.changed_prefs()->FindBoolByDottedPath(
-      policy::policy_prefs::kForceGoogleSafeSearch));
-  EXPECT_TRUE(fixture.changed_prefs()->FindIntByDottedPath(
-      policy::policy_prefs::kIncognitoModeAvailability));
-}
-
-// Family Link and Device Parental Controls cooperate to block incognito mode
-// and force safe search.
-TEST_F(SupervisedUserPrefStoreTestBase, SearchAndIncognitoPrefsAreMerged) {
-  SupervisedUserPrefStoreFixture fixture(&service_, device_parental_controls_);
-
-  service_backing_pref_store_->SetInitializationCompleted();
-  service_.SetActive(true);
-
-  ASSERT_TRUE(fixture.initialization_completed());
-
-  EXPECT_EQ(policy::IncognitoModeAvailability::kDisabled,
-            static_cast<policy::IncognitoModeAvailability>(
-                *fixture.changed_prefs()->FindIntByDottedPath(
-                    policy::policy_prefs::kIncognitoModeAvailability)));
-  EXPECT_FALSE(
-      fixture.changed_prefs()
-          ->FindIntByDottedPath(policy::policy_prefs::kForceGoogleSafeSearch)
-          .has_value());
-
-  // After enabling device parental controls, incognito mode is still disabled
-  // but now also safe search is forced (merged with family link settings).
-  device_parental_controls_.SetSearchContentFiltersEnabledForTesting(true);
-  EXPECT_EQ(policy::IncognitoModeAvailability::kDisabled,
-            static_cast<policy::IncognitoModeAvailability>(
-                *fixture.changed_prefs()->FindIntByDottedPath(
-                    policy::policy_prefs::kIncognitoModeAvailability)));
-  EXPECT_TRUE(*fixture.changed_prefs()->FindBoolByDottedPath(
-      policy::policy_prefs::kForceGoogleSafeSearch));
-}
-#endif  // BUILDFLAG(IS_ANDROID)

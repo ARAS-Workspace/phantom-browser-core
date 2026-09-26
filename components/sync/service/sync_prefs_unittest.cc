@@ -459,7 +459,6 @@ TEST_F(SyncPrefsTest, SetTypeDisabledByCustodian) {
 
 // kReplaceSyncPromosWithSignInPromos has been enabled by default on mobile
 // platforms for a long time, so the feature-disabled case is not worth testing.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(SyncPrefsTest,
        DefaultSelectedTypesForAccountInTransportMode_SyncToSigninDisabled) {
   base::test::ScopedFeatureList features;
@@ -476,7 +475,6 @@ TEST_F(SyncPrefsTest,
                                          UserSelectableType::kAutofill,
                                          UserSelectableType::kPayments})));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(SyncPrefsTest,
        DefaultSelectedTypesForAccountInTransportMode_SyncToSigninEnabled) {
@@ -484,10 +482,8 @@ TEST_F(SyncPrefsTest,
   features.InitWithFeatures(
       /*enabled_features=*/{switches::kSyncEnableBookmarksInTransportMode,
                             kReplaceSyncPromosWithSignInPromos,
-#if !BUILDFLAG(IS_ANDROID)
                             kReadingListEnableSyncTransportModeUponSignIn,
                             kSeparateLocalAndAccountSearchEngines,
-#endif  // !BUILDFLAG(IS_ANDROID)
                             syncer::kSeparateLocalAndAccountThemes,
                             switches::kEnablePreferencesAccountStorage},
       /*disabled_features=*/{});
@@ -499,14 +495,9 @@ TEST_F(SyncPrefsTest,
   // also listed as they are not enabled by default but require new sign.
   const UserSelectableTypeSet expected_types = Difference(
       UserSelectableTypeSet::All(), {
-#if BUILDFLAG(IS_ANDROID)
-                                        // kThemes is not supported on mobile.
-                                        UserSelectableType::kThemes,
-#else
                                         UserSelectableType::kBookmarks,
                                         UserSelectableType::kReadingList,
                                         UserSelectableType::kExtensions,
-#endif  // BUILDFLAG(IS_ANDROID)
                                         UserSelectableType::kHistory,
                                         UserSelectableType::kSavedTabGroups,
                                         UserSelectableType::kTabs,
@@ -526,10 +517,6 @@ TEST_F(SyncPrefsTest,
                                         UserSelectableType::kSavedTabGroups,
                                         UserSelectableType::kTabs,
                                         UserSelectableType::kCookies,
-#if BUILDFLAG(IS_ANDROID)
-                                        // kThemes is not supported on mobile.
-                                        UserSelectableType::kThemes,
-#endif  // BUILDFLAG(IS_ANDROID)
                                     });
 
   EXPECT_THAT(sync_prefs_->GetSelectedTypesForAccount(gaia_id_),
@@ -666,23 +653,18 @@ class SyncPrefsMigrationTest : public testing::Test {
     // in transport mode.
     feature_list_.InitWithFeatures(
         /*enabled_features=*/
-        {
-#if !BUILDFLAG(IS_ANDROID)
-            switches::kSyncEnableBookmarksInTransportMode,
-            kReadingListEnableSyncTransportModeUponSignIn,
-            kSeparateLocalAndAccountSearchEngines,
-#endif  // !BUILDFLAG(IS_ANDROID)
-            switches::kEnablePreferencesAccountStorage},
+        {switches::kSyncEnableBookmarksInTransportMode,
+         kReadingListEnableSyncTransportModeUponSignIn,
+         kSeparateLocalAndAccountSearchEngines,
+         switches::kEnablePreferencesAccountStorage},
         /*disabled_features=*/{});
 
     SyncPrefs::RegisterProfilePrefs(pref_service_.registry());
     SigninPrefs::RegisterProfilePrefs(pref_service_.registry());
     gaia_id_ = GaiaId("account_gaia");
-#if !BUILDFLAG(IS_ANDROID)
     signin::IdentityManager::RegisterProfilePrefs(pref_service_.registry());
     pref_service_.SetBoolean(
         ::prefs::kPrefsThemesSearchEnginesAccountStorageEnabled, true);
-#endif
   }
 
   void SetBooleanUserPrefValue(const char* pref_name, BooleanPrefState state) {
@@ -1008,10 +990,8 @@ TEST_F(SyncPrefsMigrationTest, MigratesBookmarksOptedIn) {
     // a special opt-in pref for bookmarks.
     SyncPrefs prefs(&pref_service_);
 
-#if !BUILDFLAG(IS_ANDROID)
     SigninPrefs(pref_service_)
         .SetBookmarksExplicitBrowserSignin(gaia_id_, true);
-#endif
 
     prefs.SetSelectedTypeForAccount(UserSelectableType::kBookmarks, true,
                                     gaia_id_);
@@ -1236,12 +1216,6 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_DefaultState) {
       UserSelectableType::kAutofill, UserSelectableType::kPasswords,
       UserSelectableType::kPayments, UserSelectableType::kPreferences};
 
-#if BUILDFLAG(IS_ANDROID)
-  // Bookmarks and Reading List are only selected by default on mobile.
-  default_enabled_types.Put(UserSelectableType::kBookmarks);
-  default_enabled_types.Put(UserSelectableType::kReadingList);
-#endif
-
   ASSERT_TRUE(SyncPrefs(&pref_service_)
                   .GetSelectedTypesForAccount(gaia_id_)
                   .HasAll(default_enabled_types));
@@ -1262,9 +1236,7 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_DefaultState) {
   EXPECT_TRUE(selected_types.Has(UserSelectableType::kHistory));
   EXPECT_TRUE(selected_types.Has(UserSelectableType::kTabs));
   EXPECT_TRUE(selected_types.Has(UserSelectableType::kPasswords));
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(selected_types.Has(UserSelectableType::kSavedTabGroups));
-#endif
 }
 
 TEST_F(SyncPrefsMigrationTest, GlobalToAccount_CustomState) {
@@ -1291,12 +1263,6 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_CustomState) {
   UserSelectableTypeSet pre_migration_selected_types{
       UserSelectableType::kAutofill, UserSelectableType::kPasswords,
       UserSelectableType::kPayments, UserSelectableType::kPreferences};
-
-#if BUILDFLAG(IS_ANDROID)
-  // Bookmarks and Reading List are only selected by default on mobile.
-  pre_migration_selected_types.Put(UserSelectableType::kBookmarks);
-  pre_migration_selected_types.Put(UserSelectableType::kReadingList);
-#endif
 
   ASSERT_TRUE(SyncPrefs(&pref_service_)
                   .GetSelectedTypesForAccount(gaia_id_)
@@ -1334,18 +1300,11 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_HistoryDisabled) {
   SyncPrefs prefs(&pref_service_);
   UserSelectableTypeSet selected_types =
       prefs.GetSelectedTypesForAccount(gaia_id_);
-#if BUILDFLAG(IS_ANDROID)
-  // On mobile, after the migration, both kHistory and kTabs should be disabled,
-  // since there is only a single toggle for both of them.
-  EXPECT_FALSE(selected_types.Has(UserSelectableType::kHistory));
-  EXPECT_FALSE(selected_types.Has(UserSelectableType::kTabs));
-#else
   // On desktop, after the migration, kHistory should be disabled, but kTabs
   // should still be enabled, as the original settings are carried over. The UI
   // takes care of appropriately merging the toggle values.
   EXPECT_FALSE(selected_types.Has(UserSelectableType::kHistory));
   EXPECT_TRUE(selected_types.Has(UserSelectableType::kTabs));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(SyncPrefsMigrationTest, GlobalToAccount_TabsDisabled) {
@@ -1367,21 +1326,13 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_TabsDisabled) {
   SyncPrefs prefs(&pref_service_);
   UserSelectableTypeSet selected_types =
       prefs.GetSelectedTypesForAccount(gaia_id_);
-#if BUILDFLAG(IS_ANDROID)
-  // On mobile, after the migration, both kHistory and kTabs should be disabled,
-  // since there is only a single toggle for both of them.
-  EXPECT_FALSE(selected_types.Has(UserSelectableType::kHistory));
-  EXPECT_FALSE(selected_types.Has(UserSelectableType::kTabs));
-#else
   // On desktop, after the migration, kHistory should be enabled, but kTabs
   // should still be disabled, as the original settings are carried over. The UI
   // takes care of appropriately merging the toggle values.
   EXPECT_TRUE(selected_types.Has(UserSelectableType::kHistory));
   EXPECT_FALSE(selected_types.Has(UserSelectableType::kTabs));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(SyncPrefsMigrationTest, GlobalToAccount_SavedTabGroupsEnabled) {
   base::test::ScopedFeatureList enable_sync_to_signin(
       kReplaceSyncPromosWithSignInPromos);
@@ -1427,7 +1378,6 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_SavedTabGroupsDisabled) {
       prefs.GetSelectedTypesForAccount(gaia_id_);
   EXPECT_FALSE(selected_types.Has(UserSelectableType::kSavedTabGroups));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(SyncPrefsMigrationTest, GlobalToAccount_CustomPassphrase) {
   base::test::ScopedFeatureList enable_sync_to_signin(
@@ -1448,12 +1398,6 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_CustomPassphrase) {
       UserSelectableType::kAutofill, UserSelectableType::kPasswords,
       UserSelectableType::kPayments, UserSelectableType::kPreferences};
 
-#if BUILDFLAG(IS_ANDROID)
-  // Bookmarks and Reading List are only selected by default on mobile.
-  default_enabled_types.Put(UserSelectableType::kBookmarks);
-  default_enabled_types.Put(UserSelectableType::kReadingList);
-#endif
-
   ASSERT_TRUE(SyncPrefs(&pref_service_)
                   .GetSelectedTypesForAccount(gaia_id_)
                   .HasAll(default_enabled_types));
@@ -1464,9 +1408,6 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_CustomPassphrase) {
   // For Android, and iOS, kAutofill ("Addresses and more") should've been
   // disabled for custom passphrase users.
   UserSelectableTypeSet expected_types = default_enabled_types;
-#if BUILDFLAG(IS_ANDROID)
-  expected_types.Remove(UserSelectableType::kAutofill);
-#endif  // BUILDFLAG(IS_ANDROID)
   SyncPrefs prefs(&pref_service_);
   UserSelectableTypeSet selected_types =
       prefs.GetSelectedTypesForAccount(gaia_id_);
@@ -1488,7 +1429,6 @@ TEST_F(SyncPrefsMigrationTest,
                        gaia_id_));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(SyncPrefsMigrationTest,
        GlobalToAccount_ExplicitSigninForExtensionsEnabled_SyncEverything) {
   base::test::ScopedFeatureList feature_list(
@@ -1623,7 +1563,6 @@ TEST_F(SyncPrefsMigrationTest,
   EXPECT_FALSE(prefs.GetSelectedTypesForAccount(gaia_id_).Has(
       UserSelectableType::kBookmarks));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(SyncPrefsTest, IsTypeDisabledByUserForAccount) {
   base::test::ScopedFeatureList enable_sync_to_signin(

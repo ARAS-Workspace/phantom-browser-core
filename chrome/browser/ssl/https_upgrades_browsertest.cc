@@ -3301,13 +3301,8 @@ IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
 // Test that HTTPS Upgrades are skipped if the "Insecure content" site setting
 // is set to "allow".
 // MIXED_SCRIPT isn't enabled as a content setting on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_InsecureContentSettingDisablesUpgrades \
-  DISABLED_InsecureContentSettingDisablesUpgrades
-#else
 #define MAYBE_InsecureContentSettingDisablesUpgrades \
   InsecureContentSettingDisablesUpgrades
-#endif
 IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
                        MAYBE_InsecureContentSettingDisablesUpgrades) {
   content::WebContents* contents =
@@ -3371,13 +3366,8 @@ IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
 // This test is identical to InsecureContentSettingDisablesUpgrades except it
 // sets a high site engagement score for the https URL and checks an additional
 // histogram.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_InsecureContentSettingDisablesHFMForEngagedSites \
-  DISABLED_InsecureContentSettingDisablesHFMForEngagedSites
-#else
 #define MAYBE_InsecureContentSettingDisablesHFMForEngagedSites \
   InsecureContentSettingDisablesHFMForEngagedSites
-#endif
 IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
                        MAYBE_InsecureContentSettingDisablesHFMForEngagedSites) {
   content::WebContents* contents =

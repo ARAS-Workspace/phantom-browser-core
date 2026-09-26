@@ -28,9 +28,7 @@
 #include "third_party/blink/public/mojom/permissions/permission_status.mojom.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/permissions/permission_request_manager.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"
@@ -183,11 +181,7 @@ class MediaStreamDevicePermissionContextTests
   // ChromeRenderViewHostTestHarness:
   void SetUp() override {
     ChromeRenderViewHostTestHarness::SetUp();
-#if BUILDFLAG(IS_ANDROID)
-    infobars::ContentInfoBarManager::CreateForWebContents(web_contents());
-#else
     permissions::PermissionRequestManager::CreateForWebContents(web_contents());
-#endif
   }
 };
 

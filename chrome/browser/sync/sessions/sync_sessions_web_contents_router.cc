@@ -8,12 +8,8 @@
 #include "build/build_config.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/sync/sessions/browser_list_router_helper.h"
 #include "chrome/browser/ui/sync/browser_synced_tab_delegate.h"
-#else
-#include "chrome/browser/android/tab_android.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 #include "components/history/core/browser/history_service.h"
 #include "components/sync_sessions/sync_sessions_client.h"
 #include "components/sync_sessions/synced_tab_delegate.h"
@@ -24,23 +20,16 @@ namespace {
 
 SyncedTabDelegate* GetSyncedTabDelegateFromWebContents(
     content::WebContents* web_contents) {
-#if BUILDFLAG(IS_ANDROID)
-  TabAndroid* tab = TabAndroid::FromWebContents(web_contents);
-  return tab ? tab->GetSyncedTabDelegate() : nullptr;
-#else
   SyncedTabDelegate* delegate =
       BrowserSyncedTabDelegate::FromWebContents(web_contents);
   return delegate;
-#endif
 }
 
 }  // namespace
 
 SyncSessionsWebContentsRouter::SyncSessionsWebContentsRouter(Profile* profile) {
-#if !BUILDFLAG(IS_ANDROID)
   browser_list_helper_ =
       std::make_unique<BrowserListRouterHelper>(this, profile);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 SyncSessionsWebContentsRouter::~SyncSessionsWebContentsRouter() = default;
@@ -90,9 +79,7 @@ void SyncSessionsWebContentsRouter::Stop() {
 }
 
 void SyncSessionsWebContentsRouter::Shutdown() {
-#if !BUILDFLAG(IS_ANDROID)
   browser_list_helper_.reset();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace sync_sessions

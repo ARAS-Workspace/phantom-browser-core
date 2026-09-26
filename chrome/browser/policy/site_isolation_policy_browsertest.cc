@@ -37,14 +37,8 @@
 #include "net/test/embedded_test_server/default_handlers.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/android/advanced_protection_status_manager_test_util.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif
 
 class SiteIsolationPolicyBrowserTest : public PlatformBrowserTest {
  public:
@@ -125,11 +119,7 @@ class SitePerProcessPolicyBrowserTest : public SiteIsolationPolicyBrowserTest {
 
     policy::PolicyMap values;
 
-#if BUILDFLAG(IS_ANDROID)
-    const char* kPolicyName = policy::key::kSitePerProcessAndroid;
-#else
     const char* kPolicyName = policy::key::kSitePerProcess;
-#endif
     values.Set(kPolicyName, policy::POLICY_LEVEL_MANDATORY,
                policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
                base::Value(policy_value), nullptr);
@@ -156,9 +146,6 @@ class NoOverrideSitePerProcessPolicyBrowserTest
   NoOverrideSitePerProcessPolicyBrowserTest() = default;
   void SetUpCommandLine(base::CommandLine* command_line) override {
     command_line->AppendSwitch(switches::kDisableSiteIsolation);
-#if BUILDFLAG(IS_ANDROID)
-    command_line->AppendSwitch(switches::kDisableSiteIsolationForPolicy);
-#endif
   }
 };
 
@@ -244,123 +231,6 @@ IN_PROC_BROWSER_TEST_F(IsolateOriginsPolicyBrowserTest, Simple) {
   CheckIsolatedOriginExpectations(expectations2);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-class IsolateOriginsShortlistPolicyBrowserTest
-    : public IsolateOriginsShortlistFeaturePolicyBrowserTest {
- public:
-  IsolateOriginsShortlistPolicyBrowserTest(
-      const IsolateOriginsShortlistPolicyBrowserTest&) = delete;
-  IsolateOriginsShortlistPolicyBrowserTest& operator=(
-      const IsolateOriginsShortlistPolicyBrowserTest&) = delete;
-
-  IsolateOriginsShortlistPolicyBrowserTest()
-      : memory_override_(std::make_unique<base::test::ScopedAmountOfPhysicalMemoryOverride>(base::MiBU(2000))) {}  // 2GB
-  ~IsolateOriginsShortlistPolicyBrowserTest() override = default;
-
- protected:
-  void SetUpInProcessBrowserTestFixture() override {
-    provider_.SetDefaultReturns(
-        true /* is_initialization_complete_return */,
-        true /* is_first_policy_load_complete_return */);
-    policy::BrowserPolicyConnector::SetPolicyProviderForTesting(&provider_);
-
-    policy::PolicyMap values;
-    values.Set(
-        policy::key::kIsolateOriginsShortlist, policy::POLICY_LEVEL_MANDATORY,
-        policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
-        base::Value("https://shortlist-policy.example.org/"), nullptr);
-    provider_.UpdateChromePolicy(values);
-  }
-
- private:
-  std::unique_ptr<base::test::ScopedAmountOfPhysicalMemoryOverride> memory_override_;
-};
-
-IN_PROC_BROWSER_TEST_F(IsolateOriginsShortlistPolicyBrowserTest, Simple) {
-  Expectations expectations[] = {
-      {"https://shortlist-policy.example.org/", true},
-      {"https://foo.com/", false},
-  };
-  CheckIsolatedOriginExpectations(expectations);
-}
-
-class IsolateOriginsMultiplePolicyBrowserTest
-    : public IsolateOriginsShortlistFeaturePolicyBrowserTest {
- public:
-  IsolateOriginsMultiplePolicyBrowserTest() = default;
-
- protected:
-  void SetUpInProcessBrowserTestFixture() override {
-    provider_.SetDefaultReturns(
-        true /* is_initialization_complete_return */,
-        true /* is_first_policy_load_complete_return */);
-    policy::BrowserPolicyConnector::SetPolicyProviderForTesting(&provider_);
-
-    policy::PolicyMap values;
-    values.Set(
-        policy::key::kIsolateOrigins, policy::POLICY_LEVEL_MANDATORY,
-        policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
-        base::Value("https://standard-policy.example.org/"), nullptr);
-    values.Set(
-        policy::key::kIsolateOriginsShortlist, policy::POLICY_LEVEL_MANDATORY,
-        policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
-        base::Value("https://shortlist-policy.example.org/"), nullptr);
-    values.Set(
-        policy::key::kIsolateOriginsAndroid, policy::POLICY_LEVEL_MANDATORY,
-        policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
-        base::Value("https://legacy-policy.example.org/"), nullptr);
-    provider_.UpdateChromePolicy(values);
-  }
-};
-
-class IsolateOriginsMultipleHighEndPolicyBrowserTest
-    : public IsolateOriginsMultiplePolicyBrowserTest {
- public:
-  IsolateOriginsMultipleHighEndPolicyBrowserTest()
-      : memory_override_(std::make_unique<base::test::ScopedAmountOfPhysicalMemoryOverride>(base::MiBU(4000))) {}  // 4GB
-  ~IsolateOriginsMultipleHighEndPolicyBrowserTest() override = default;
-
- private:
-  std::unique_ptr<base::test::ScopedAmountOfPhysicalMemoryOverride> memory_override_;
-};
-
-IN_PROC_BROWSER_TEST_F(IsolateOriginsMultipleHighEndPolicyBrowserTest,
-                       HighEndPriority) {
-  // On High-End devices, IsolateOrigins (standard) should take precedence
-  // over both shortlist and legacy Android policies.
-  Expectations expectations[] = {
-      {"https://standard-policy.example.org/", true},
-      {"https://shortlist-policy.example.org/", false},
-      {"https://legacy-policy.example.org/", false},
-  };
-  CheckIsolatedOriginExpectations(expectations);
-}
-
-class IsolateOriginsMultipleLowEndPolicyBrowserTest
-    : public IsolateOriginsMultiplePolicyBrowserTest {
- public:
-  IsolateOriginsMultipleLowEndPolicyBrowserTest()
-      : memory_override_(std::make_unique<base::test::ScopedAmountOfPhysicalMemoryOverride>(base::MiBU(2000))) {}  // 2GB
-  ~IsolateOriginsMultipleLowEndPolicyBrowserTest() override = default;
-
- private:
-  std::unique_ptr<base::test::ScopedAmountOfPhysicalMemoryOverride> memory_override_;
-};
-
-IN_PROC_BROWSER_TEST_F(IsolateOriginsMultipleLowEndPolicyBrowserTest,
-                       LowEndPriority) {
-  // On Low-End devices, IsolateOriginsShortlist should take precedence
-  // over the deprecated IsolateOriginsAndroid policy, and IsolateOrigins (standard)
-  // should be ignored.
-  Expectations expectations[] = {
-      {"https://standard-policy.example.org/", false},
-      {"https://shortlist-policy.example.org/", true},
-      {"https://legacy-policy.example.org/", false},
-  };
-  CheckIsolatedOriginExpectations(expectations);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 IN_PROC_BROWSER_TEST_F(NoOverrideSitePerProcessPolicyBrowserTest, Simple) {
   Expectations expectations[] = {
       {"https://foo.com/noodles.html", true},
@@ -374,66 +244,6 @@ IN_PROC_BROWSER_TEST_F(NoOverrideSitePerProcessPolicyBrowserTest, Simple) {
 // SitePerProcessPolicyBrowserTestFieldTrialTest tests should not be run on any
 // other platform.  Note that browser_tests won't run on Android until
 // https://crbug.com/40469222 is fixed.
-#if BUILDFLAG(IS_ANDROID)
-class SitePerProcessPolicyBrowserTestFieldTrialTest
-    : public SitePerProcessPolicyBrowserTestDisabled {
- public:
-  SitePerProcessPolicyBrowserTestFieldTrialTest() {
-    scoped_feature_list_.InitAndEnableFeature(features::kSitePerProcess);
-  }
-  SitePerProcessPolicyBrowserTestFieldTrialTest(
-      const SitePerProcessPolicyBrowserTestFieldTrialTest&) = delete;
-  SitePerProcessPolicyBrowserTestFieldTrialTest& operator=(
-      const SitePerProcessPolicyBrowserTestFieldTrialTest&) = delete;
-  ~SitePerProcessPolicyBrowserTestFieldTrialTest() override = default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(SitePerProcessPolicyBrowserTestFieldTrialTest, Simple) {
-  // Skip this test if the --site-per-process switch is present (e.g. on Site
-  // Isolation Android chromium.fyi bot).  The test is still valid if
-  // SitePerProcess is the default (e.g. via ContentBrowserClient's
-  // ShouldEnableStrictSiteIsolation method) - don't skip the test in such case.
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kSitePerProcess)) {
-    return;
-  }
-
-  // Policy should inject kDisableSiteIsolationForPolicy rather than
-  // kDisableSiteIsolation switch.
-  EXPECT_FALSE(base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kDisableSiteIsolation));
-  ASSERT_TRUE(base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kDisableSiteIsolationForPolicy));
-  EXPECT_FALSE(
-      content::SiteIsolationPolicy::UseDedicatedProcessesForAllSites());
-
-  Expectations expectations[] = {
-      {"https://foo.com/noodles.html", false},
-      {"http://example.org/pumpkins.html", false},
-  };
-  CheckExpectations(expectations);
-}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-namespace {
-bool CheckUseDedicatedProcessesForAllSitesWithAndroidState(
-    bool is_under_advanced_protection,
-    base::ByteSize ram) {
-  safe_browsing::SetAdvancedProtectionStateForTesting(
-      is_under_advanced_protection);
-  ChromeContentBrowserClient::DisableAdvancedProtectionCachingForTests();
-
-  base::test::ScopedAmountOfPhysicalMemoryOverride memory_override(ram);
-  site_isolation::SiteIsolationPolicy::
-      SetDisallowMemoryThresholdCachingForTesting(true);
-  return content::SiteIsolationPolicy::UseDedicatedProcessesForAllSites();
-}
-}  // anonymous namespace
-#endif  // BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(SiteIsolationPolicyBrowserTest,
                        NoPolicyNoTrialsFlags_NoAdvancedProtection_HighRam) {
@@ -441,63 +251,9 @@ IN_PROC_BROWSER_TEST_F(SiteIsolationPolicyBrowserTest,
   // without an explicit enterprise policy).
   EXPECT_FALSE(base::CommandLine::ForCurrentProcess()->HasSwitch(
       switches::kDisableSiteIsolation));
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kDisableSiteIsolationForPolicy));
-  EXPECT_EQ(CheckUseDedicatedProcessesForAllSitesWithAndroidState(
-                /*is_under_advanced_protection=*/false,
-                // TODO(crbug.com/429140103): Comments in the original code
-                // suggested that this was in KiB, but it was in fact in MiB.
-                // Needs investigation.
-                /*ram=*/base::MiBU(8000)),
-            base::FeatureList::IsEnabled(features::kSitePerProcess));
-#else
   EXPECT_TRUE(content::SiteIsolationPolicy::UseDedicatedProcessesForAllSites());
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(SiteIsolationPolicyBrowserTest,
-                       NoPolicy_AdvancedProtection_HighRam) {
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  EXPECT_FALSE(command_line->HasSwitch(switches::kDisableSiteIsolation));
-  EXPECT_FALSE(
-      command_line->HasSwitch(switches::kDisableSiteIsolationForPolicy));
-  EXPECT_TRUE(CheckUseDedicatedProcessesForAllSitesWithAndroidState(
-      /*is_under_advanced_protection=*/true,
-      // TODO(crbug.com/429140103): Comments in the original code suggested that
-      // this was in KiB, but it was in fact in MiB. Needs investigation.
-      /*ram=*/base::MiBU(8000)));
-}
-
-IN_PROC_BROWSER_TEST_F(SiteIsolationPolicyBrowserTest,
-                       NoPolicy_AdvancedProtection_LowRam) {
-  // This test relies on site isolation memory thresholds being enabled. Skip
-  // if that feature is disable.
-  if (!base::FeatureList::IsEnabled(
-          site_isolation::features::
-              kSiteIsolationEnableMemoryThresholdAndroid)) {
-    GTEST_SKIP();
-  }
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  // Skip this test if the --site-per-process switch is present (e.g. on Site
-  // Isolation Android chromium.fyi bot).
-  if (command_line->HasSwitch(switches::kSitePerProcess)) {
-    return;
-  }
-
-  EXPECT_FALSE(command_line->HasSwitch(switches::kDisableSiteIsolation));
-  EXPECT_FALSE(
-      command_line->HasSwitch(switches::kDisableSiteIsolationForPolicy));
-  EXPECT_FALSE(CheckUseDedicatedProcessesForAllSitesWithAndroidState(
-      /*is_under_advanced_protection=*/true,
-      // TODO(crbug.com/429140103): Comments in the original code suggested that
-      // this was in KiB, but it was in fact in MiB. Needs investigation.
-      /*ram=*/base::MiBU(1000)));
-}
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 // Parameterized test class to check that an enterprise policy can set the
 // origin-keyed processes by default feature, but a user can override the value
 // that was set by the enterprise policy (via either the command-line flags or
@@ -602,4 +358,3 @@ IN_PROC_BROWSER_TEST_P(OriginKeyedProcessesEnabledPolicyBrowserTest, Simple) {
         << "The root frame and child iframe should be in separate processes.";
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)

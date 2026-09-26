@@ -58,11 +58,7 @@ namespace autofill_private = extensions::api::autofill_private;
 namespace {
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 // Gets the string corresponding to |type| from |profile|.

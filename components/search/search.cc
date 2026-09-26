@@ -13,11 +13,7 @@
 namespace search {
 
 bool IsInstantExtendedAPIEnabled() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 bool DefaultSearchProviderIsGoogle(

@@ -276,11 +276,7 @@ Response MediaRecorder::Start(RenderFrameHostImpl* host,
     last_surface_size_ = snapshot_size;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  constexpr auto kScreencastPixelFormat = media::PIXEL_FORMAT_I420;
-#else
   constexpr auto kScreencastPixelFormat = media::PIXEL_FORMAT_ARGB;
-#endif
 
   constexpr int kIdleKeepAliveIntervalMs = 1000;
 

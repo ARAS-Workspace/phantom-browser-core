@@ -41,11 +41,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/platform_test.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/android/network_change_notifier_factory_android.h"
-#include "net/base/network_change_notifier.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // For getsockopt() call.
 #include <sys/socket.h>
 
@@ -1262,7 +1257,7 @@ TEST_P(TCPSocketTest, BeforeConnectCallback) {
   ASSERT_EQ(0, os_result);
 // Linux platforms generally allocate twice as much buffer size is requested to
 // account for internal kernel data structures.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(2 * kReceiveBufferSize, actual_size);
 // Unfortunately, Apple platform behavior doesn't seem to be documented, and
 // doesn't match behavior on any other platforms.
@@ -1384,152 +1379,6 @@ TEST_P(TCPSocketTest, SPWNoAdvance) {
 
 // On Android, where socket tagging is supported, verify that TCPSocket::Tag
 // works as expected.
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(TCPSocketTest, Tag) {
-  if (!CanGetTaggedBytes()) {
-    DVLOG(0) << "Skipping test - GetTaggedBytes unsupported.";
-    return;
-  }
-
-  // Start test server.
-  EmbeddedTestServer test_server;
-  test_server.AddDefaultHandlers(base::FilePath());
-  ASSERT_TRUE(test_server.Start());
-
-  AddressList addr_list;
-  ASSERT_TRUE(test_server.GetAddressList(&addr_list));
-  EXPECT_EQ(socket_->Open(addr_list[0].GetFamily()), OK);
-
-  // Verify TCP connect packets are tagged and counted properly.
-  int32_t tag_val1 = 0x12345678;
-  uint64_t old_traffic = GetTaggedBytes(tag_val1);
-  SocketTag tag1(SocketTag::UNSET_UID, tag_val1);
-  socket_->ApplySocketTag(tag1);
-  TestCompletionCallback connect_callback;
-  int connect_result =
-      socket_->Connect(addr_list[0], connect_callback.callback());
-  EXPECT_THAT(connect_callback.GetResult(connect_result), IsOk());
-  EXPECT_GT(GetTaggedBytes(tag_val1), old_traffic);
-
-  // Verify socket can be retagged with a new value and the current process's
-  // UID.
-  int32_t tag_val2 = 0x87654321;
-  old_traffic = GetTaggedBytes(tag_val2);
-  SocketTag tag2(getuid(), tag_val2);
-  socket_->ApplySocketTag(tag2);
-  const char kRequest1[] = "GET / HTTP/1.0";
-  scoped_refptr<IOBuffer> write_buffer1 =
-      base::MakeRefCounted<StringIOBuffer>(kRequest1);
-  TestCompletionCallback write_callback1;
-  EXPECT_EQ(
-      socket_->Write(write_buffer1.get(), strlen(kRequest1),
-                     write_callback1.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-      static_cast<int>(strlen(kRequest1)));
-  EXPECT_GT(GetTaggedBytes(tag_val2), old_traffic);
-
-  // Verify socket can be retagged with a new value and the current process's
-  // UID.
-  old_traffic = GetTaggedBytes(tag_val1);
-  socket_->ApplySocketTag(tag1);
-  const char kRequest2[] = "\n\n";
-  scoped_refptr<IOBuffer> write_buffer2 =
-      base::MakeRefCounted<StringIOBuffer>(kRequest2);
-  TestCompletionCallback write_callback2;
-  EXPECT_EQ(
-      socket_->Write(write_buffer2.get(), strlen(kRequest2),
-                     write_callback2.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-      static_cast<int>(strlen(kRequest2)));
-  EXPECT_GT(GetTaggedBytes(tag_val1), old_traffic);
-
-  socket_->Close();
-}
-
-TEST_P(TCPSocketTest, TagAfterConnect) {
-  if (!CanGetTaggedBytes()) {
-    DVLOG(0) << "Skipping test - GetTaggedBytes unsupported.";
-    return;
-  }
-
-  // Start test server.
-  EmbeddedTestServer test_server;
-  test_server.AddDefaultHandlers(base::FilePath());
-  ASSERT_TRUE(test_server.Start());
-
-  AddressList addr_list;
-  ASSERT_TRUE(test_server.GetAddressList(&addr_list));
-  EXPECT_EQ(socket_->Open(addr_list[0].GetFamily()), OK);
-
-  // Connect socket.
-  TestCompletionCallback connect_callback;
-  int connect_result =
-      socket_->Connect(addr_list[0], connect_callback.callback());
-  EXPECT_THAT(connect_callback.GetResult(connect_result), IsOk());
-
-  // Verify socket can be tagged with a new value and the current process's
-  // UID.
-  int32_t tag_val2 = 0x87654321;
-  uint64_t old_traffic = GetTaggedBytes(tag_val2);
-  SocketTag tag2(getuid(), tag_val2);
-  socket_->ApplySocketTag(tag2);
-  const char kRequest1[] = "GET / HTTP/1.0";
-  scoped_refptr<IOBuffer> write_buffer1 =
-      base::MakeRefCounted<StringIOBuffer>(kRequest1);
-  TestCompletionCallback write_callback1;
-  EXPECT_EQ(
-      socket_->Write(write_buffer1.get(), strlen(kRequest1),
-                     write_callback1.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-      static_cast<int>(strlen(kRequest1)));
-  EXPECT_GT(GetTaggedBytes(tag_val2), old_traffic);
-
-  // Verify socket can be retagged with a new value and the current process's
-  // UID.
-  int32_t tag_val1 = 0x12345678;
-  old_traffic = GetTaggedBytes(tag_val1);
-  SocketTag tag1(SocketTag::UNSET_UID, tag_val1);
-  socket_->ApplySocketTag(tag1);
-  const char kRequest2[] = "\n\n";
-  scoped_refptr<IOBuffer> write_buffer2 =
-      base::MakeRefCounted<StringIOBuffer>(kRequest2);
-  TestCompletionCallback write_callback2;
-  EXPECT_EQ(
-      socket_->Write(write_buffer2.get(), strlen(kRequest2),
-                     write_callback2.callback(), TRAFFIC_ANNOTATION_FOR_TESTS),
-      static_cast<int>(strlen(kRequest2)));
-  EXPECT_GT(GetTaggedBytes(tag_val1), old_traffic);
-
-  socket_->Close();
-}
-
-TEST_P(TCPSocketTest, BindToNetwork) {
-  NetworkChangeNotifierFactoryAndroid ncn_factory;
-  NetworkChangeNotifier::DisableForTest ncn_disable_for_test;
-  std::unique_ptr<NetworkChangeNotifier> ncn(ncn_factory.CreateInstance());
-  if (!NetworkChangeNotifier::AreNetworkHandlesSupported())
-    GTEST_SKIP() << "Network handles are required to test BindToNetwork.";
-
-  const handles::NetworkHandle wrong_network_handle = 65536;
-  // Try binding to this IP to trigger the underlying BindToNetwork call.
-  const IPEndPoint ip(IPAddress::IPv4Localhost(), 0);
-  // TestCompletionCallback connect_callback;
-  TCPClientSocket wrong_socket(local_address_list(), nullptr, nullptr, nullptr,
-                               NetLogSource(), wrong_network_handle);
-  // Different Android versions might report different errors. Hence, just check
-  // what shouldn't happen.
-  int rv = wrong_socket.Bind(ip);
-  EXPECT_NE(OK, rv);
-  EXPECT_NE(ERR_NOT_IMPLEMENTED, rv);
-
-  // Connecting using an existing network should succeed.
-  const handles::NetworkHandle network_handle =
-      NetworkChangeNotifier::GetDefaultNetwork();
-  if (network_handle != handles::kInvalidNetworkHandle) {
-    TCPClientSocket correct_socket(local_address_list(), nullptr, nullptr,
-                                   nullptr, NetLogSource(), network_handle);
-    EXPECT_EQ(OK, correct_socket.Bind(ip));
-  }
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Tests error handling in write.
 TEST_P(TCPSocketTest, WriteError) {

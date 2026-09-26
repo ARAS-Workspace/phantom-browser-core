@@ -97,13 +97,8 @@ static constexpr base::TimeDelta kMaxRejectionTime = base::Seconds(60);
 // Users spend less time on Android to dismiss the UI. Given the difference, we
 // use two set of values. The values are calculated based on UMA data to follow
 // lognormal distribution.
-#if BUILDFLAG(IS_ANDROID)
-static constexpr double kRejectionLogNormalMu = 7.4;
-static constexpr double kRejectionLogNormalSigma = 1.24;
-#else
 static constexpr double kRejectionLogNormalMu = 8.6;
 static constexpr double kRejectionLogNormalSigma = 1.4;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // The time from when the accounts dialog is shown to when a user explicitly
 // closes it follows normal distribution. To make the random failures

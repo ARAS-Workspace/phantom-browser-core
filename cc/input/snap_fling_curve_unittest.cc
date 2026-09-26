@@ -93,22 +93,14 @@ TEST(SnapFlingCurveTest, EstimateDisplacementFeatureDisabled) {
                                            /*allow_slow_decay=*/false);
   EXPECT_TRUE(displacement.has_value());
   // Default scalar is 25 on non-Android, 40 on Android.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(gfx::Vector2dF(0, -400), *displacement);
-#else
   EXPECT_EQ(gfx::Vector2dF(0, -250), *displacement);
-#endif
 
   previous_delta = gfx::Vector2dF(0, -20);
   displacement =
       SnapFlingCurve::EstimateDisplacement(current_delta, previous_delta,
                                            /*allow_slow_decay=*/false);
   EXPECT_TRUE(displacement.has_value());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(gfx::Vector2dF(0, -400), *displacement);
-#else
   EXPECT_EQ(gfx::Vector2dF(0, -250), *displacement);
-#endif
 }
 
 TEST(SnapFlingCurveTest, EstimateDisplacementFeatureEnabled) {

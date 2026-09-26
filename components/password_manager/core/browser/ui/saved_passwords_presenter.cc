@@ -407,24 +407,7 @@ void SavedPasswordsPresenter::MoveCredentialsToAccount(
 
 std::vector<CredentialUIEntry> SavedPasswordsPresenter::GetSavedCredentials()
     const {
-#if BUILDFLAG(IS_ANDROID)
-  std::vector<CredentialUIEntry> credentials;
-  auto it = sort_key_to_stored_credentials_.begin();
-  while (it != sort_key_to_stored_credentials_.end()) {
-    auto current_key = it->first;
-    // Aggregate all passwords for the current key.
-    std::vector<StoredCredential> current_passwords_group;
-    while (it != sort_key_to_stored_credentials_.end() &&
-           it->first == current_key) {
-      current_passwords_group.push_back(CloneStoredCredential(it->second));
-      ++it;
-    }
-    credentials.emplace_back(std::move(current_passwords_group));
-  }
-  return credentials;
-#else
   return passwords_grouper_->GetAllCredentials();
-#endif
 }
 
 std::vector<AffiliatedGroup> SavedPasswordsPresenter::GetAffiliatedGroups() {
@@ -449,43 +432,6 @@ base::flat_set<ActorLoginPermission>
 SavedPasswordsPresenter::GetActorLoginPermissions(
     const syncer::SyncService* sync_service) const {
   std::vector<ActorLoginPermission> permissions;
-#if BUILDFLAG(IS_ANDROID)
-  for (const CredentialUIEntry& credential : GetSavedCredentials()) {
-    std::vector<CredentialUIEntry::DomainInfo> affiliated_domains =
-        credential.GetAffiliatedDomains();
-    for (const StoredCredential& stored_credential :
-         GetCorrespondingStoredCredentials(credential)) {
-      if (stored_credential.actor_login_approved) {
-        auto form_domain_info_it = std::ranges::find_if(
-            affiliated_domains.begin(), affiliated_domains.end(),
-            [&stored_credential](
-                const CredentialUIEntry::DomainInfo& domain_info) {
-              return stored_credential.signon_realm == domain_info.signon_realm;
-            });
-        // This can happen if a user has credentials stored for 2 app versions
-        // with the same app package name. Affiliated domains are unique per
-        // URL, which in the case of such 2 versions of an app, would be
-        // identical.
-        if (form_domain_info_it == affiliated_domains.end()) {
-          continue;
-        }
-
-        // Create fallback URL because currently we cannot use
-        // AffiliatedGroup::GetAllowedIconUrl on Android.
-        GURL favicon_url;
-        for (const CredentialFacet& facet : credential.facets) {
-          if (facet.url.SchemeIs(url::kHttpsScheme)) {
-            favicon_url = facet.url;
-            break;
-          }
-        }
-
-        permissions.emplace_back(*form_domain_info_it,
-                                 stored_credential.username_value, favicon_url);
-      }
-    }
-  }
-#else
   std::vector<AffiliatedGroup> groups =
       passwords_grouper_->GetAffiliatedGroupsWithGroupingInfo();
   for (const AffiliatedGroup& group : groups) {
@@ -516,7 +462,6 @@ SavedPasswordsPresenter::GetActorLoginPermissions(
       }
     }
   }
-#endif
   return base::flat_set<ActorLoginPermission>(std::move(permissions));
 }
 
@@ -524,11 +469,7 @@ void SavedPasswordsPresenter::RevokeActorLoginPermission(
     const std::string& signon_realm,
     const std::string& username) {
   std::vector<CredentialUIEntry> credentials;
-#if BUILDFLAG(IS_ANDROID)
-  credentials = GetSavedCredentials();
-#else
   credentials = passwords_grouper_->GetAllCredentials();
-#endif
   for (const CredentialUIEntry& credential : credentials) {
     for (const StoredCredential& stored_credential :
          GetCorrespondingStoredCredentials(credential)) {
@@ -548,17 +489,9 @@ std::vector<StoredCredential>
 SavedPasswordsPresenter::GetCorrespondingStoredCredentials(
     const CredentialUIEntry& credential) const {
   std::vector<StoredCredential> credentials;
-#if BUILDFLAG(IS_ANDROID)
-  const auto range =
-      sort_key_to_stored_credentials_.equal_range(CreateSortKey(credential));
-  std::ranges::transform(
-      range.first, range.second, std::back_inserter(credentials),
-      [](const auto& pair) { return CloneStoredCredential(pair.second); });
-#else
   passwords_grouper_->CheckHeapIntegrity();
   credentials = passwords_grouper_->GetStoredCredentialsFor(credential);
   passwords_grouper_->CheckHeapIntegrity();
-#endif
   return credentials;
 }
 
@@ -717,12 +650,7 @@ void SavedPasswordsPresenter::AddCredentialsToCache(
         std::make_pair(std::move(sort_key), std::move(cred)));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Passwords grouping is disabled on Android.
-  std::move(completion).Run();
-#else
   MaybeGroupCredentials(std::move(completion));
-#endif
 }
 
 void SavedPasswordsPresenter::MaybeGroupCredentials(
@@ -740,14 +668,12 @@ void SavedPasswordsPresenter::MaybeGroupCredentials(
 
   // Passkeys are collected synchronously.
   std::vector<PasskeyCredential> passkeys;
-#if !BUILDFLAG(IS_ANDROID)
   if (passkey_store_) {
     passkeys =
         PasskeyCredential::FromCredentialSpecifics(passkey_store_->GetPasskeys(
             webauthn::PasskeyModel::AnyRp(),
             webauthn::PasskeyModel::ShadowedCredentials::kInclude));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Notify observers after grouping is complete.
   passwords_grouper_->CheckHeapIntegrity();

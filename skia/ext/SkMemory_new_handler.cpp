@@ -153,7 +153,7 @@ size_t sk_malloc_size(void* addr, size_t size) {
 
 #if BUILDFLAG(IS_APPLE)
   completeSize = malloc_size(addr);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_LINUX)
   completeSize = malloc_usable_size(addr);
 #endif
 

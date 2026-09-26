@@ -454,7 +454,6 @@ DEFINE_TEST_CLIENT_WITH_PIPE(CheckPlatformHandleFile,
   return 0;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class MultiprocessMessagePipeTestWithPipeCount
     : public MultiprocessMessagePipeTest,
       public testing::WithParamInterface<size_t> {};
@@ -508,7 +507,6 @@ INSTANTIATE_TEST_SUITE_P(
     // ChannelPosix is fixed to safely support chunking of many-handle messages
     // across multiple sendmsg() calls, rather than crashing the sender.
     testing::Values(1u, 64u, 128u /*, 250u*/));
-#endif
 
 DEFINE_TEST_CLIENT_WITH_PIPE(CheckMessagePipe, MultiprocessMessagePipeTest, h) {
   // Wait for the first message from our parent.
@@ -896,12 +894,7 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport,
 }
 
 // Flaky on Android. See https://crbug.com/905620.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ChannelPipesWithMultipleChildren \
-  DISABLED_ChannelPipesWithMultipleChildren
-#else
 #define MAYBE_ChannelPipesWithMultipleChildren ChannelPipesWithMultipleChildren
-#endif
 TEST_P(MultiprocessMessagePipeTestWithPeerSupport,
        MAYBE_ChannelPipesWithMultipleChildren) {
   RunTestClient("ChannelEchoClient", [&](MojoHandle a) {
@@ -1201,14 +1194,8 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceivePipeWithClosedPeerFromOtherChild,
   EXPECT_EQ(MOJO_RESULT_OK, MojoClose(h));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Android multi-process tests are not executing the new process. This is flaky.
-#define MAYBE_SendPipeWithClosedPeerBetweenChildren \
-  DISABLED_SendPipeWithClosedPeerBetweenChildren
-#else
 #define MAYBE_SendPipeWithClosedPeerBetweenChildren \
   SendPipeWithClosedPeerBetweenChildren
-#endif
 TEST_F(MultiprocessMessagePipeTest,
        MAYBE_SendPipeWithClosedPeerBetweenChildren) {
   RunTestClient("SendOtherChildPipeWithClosedPeer", [&](MojoHandle kid_a) {

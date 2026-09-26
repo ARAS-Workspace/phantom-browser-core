@@ -17,9 +17,7 @@
 #include "services/device/usb/usb_device.h"
 #include "services/device/usb/usb_device_handle.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "services/device/usb/usb_service_android.h"
-#elif defined(USE_UDEV)
+#if defined(USE_UDEV)
 #include "services/device/usb/usb_service_linux.h"
 #elif BUILDFLAG(IS_MAC)
 #include "services/device/usb/usb_service_impl.h"
@@ -43,9 +41,7 @@ constexpr base::TaskTraits UsbService::kBlockingTaskTraits;
 
 // static
 std::unique_ptr<UsbService> UsbService::Create() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::WrapUnique(new UsbServiceAndroid());
-#elif defined(USE_UDEV)
+#if defined(USE_UDEV)
   return base::WrapUnique(new UsbServiceLinux());
 #elif BUILDFLAG(IS_MAC)
   return base::WrapUnique(new UsbServiceImpl());

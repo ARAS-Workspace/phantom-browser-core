@@ -94,9 +94,7 @@ class MockPasswordManagerClient : public StubPasswordManagerClient {
               (),
               (const, override));
   MOCK_METHOD(bool, IsPasswordChangeOngoing, (), (override));
-#if !BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(bool, IsActorTaskActive, (), (override));
-#endif
 };
 
 class MockPasswordChangeService : public PasswordChangeServiceInterface {
@@ -249,7 +247,7 @@ TEST_F(PasswordFormFillingTest, Autofill) {
 
   // On Android, Mac and Win authentication will prevent autofilling credentials
   // on page load.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
   EXPECT_TRUE(fill_data.wait_for_username);
 #else
@@ -338,7 +336,7 @@ TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestion) {
     if (test_case.current_password_present) {
       // On Android, Mac and Win authentication will prevent autofilling
       // credentials on page load.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
 #else
       EXPECT_EQ(LikelyFormFilling::kFillOnPageLoad, likely_form_filling);
@@ -349,7 +347,6 @@ TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestion) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordFormFillingTest, FillWithOnlyWebAuthnCredentials) {
   observed_form_.accepts_webauthn_credentials = true;
   std::vector<PasswordForm> best_matches = {saved_match_};
@@ -362,13 +359,11 @@ TEST_F(PasswordFormFillingTest, FillWithOnlyWebAuthnCredentials) {
       /*suggestion_banned_fields=*/{});
   EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
 }
-#endif
 
 // Test autofill when username and password are prefilled. Check that we not
 // overwrite values in the form if username doesn't look like a placeholder.
 // Skip for Android since it uses touch to fill, meaning placeholders
 // will never be overwritten.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestionWithPrefill) {
   PasswordForm preferred_match = saved_match_;
   std::vector<PasswordForm> best_matches = {preferred_match};
@@ -390,7 +385,6 @@ TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestionWithPrefill) {
 
   EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
 }
-#endif
 
 TEST_F(PasswordFormFillingTest, AutofillPSLMatch) {
   std::vector<PasswordForm> best_matches = {psl_saved_match_};
@@ -453,19 +447,6 @@ TEST_F(PasswordFormFillingTest, NoAutofillOnHttp) {
   EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PasswordFormFillingTest, TouchToFill) {
-  std::vector<PasswordForm> best_matches = {saved_match_};
-
-  LikelyFormFilling likely_form_filling = SendFillInformationToRenderer(
-      &client_, &driver_, observed_form_, best_matches, federated_matches_,
-      &saved_match_, metrics_recorder_.get(),
-      /*webauthn_suggestions_available=*/false,
-      /*suggestion_banned_fields=*/{});
-  EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
-}
-#endif
-
 TEST_F(PasswordFormFillingTest, AutofillAffiliatedWebMatch) {
   base::HistogramTester histogram_tester;
   // Create a match from the database that matches using affiliation.
@@ -508,7 +489,6 @@ TEST_F(PasswordFormFillingTest, AutofillAffiliatedWebMatch) {
 
 // Exclude Android, because there credentials are not filled on
 // the page load in any case.
-#if !BUILDFLAG(IS_ANDROID)
 
 TEST_F(PasswordFormFillingTest, NoFillOnPageloadWithCrossOriginAncestor) {
   base::HistogramTester histogram_tester;
@@ -608,7 +588,6 @@ TEST_F(PasswordFormFillingTest, NoFillOnPageLoadForLeakedPassword) {
           kPasswordChangeOngoing,
       1);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that the when there is a single preferred match, and no extra
 // matches, the PasswordFormFillData is filled in correctly.

@@ -86,7 +86,6 @@ AffiliatedFacets GetTestEquivalenceClassAlpha() {
   };
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::vector<GroupedFacets> GetTestEquivalenceGroupClassAlpha() {
   std::vector<Facet> facets = {
       Facet(FacetURI::FromCanonicalSpec(kTestWebFacetURIAlpha1)),
@@ -99,7 +98,6 @@ std::vector<GroupedFacets> GetTestEquivalenceGroupClassAlpha() {
       kTestAndroidFacetNameAlpha3, GURL(kTestAndroidFacetIconURLAlpha3)};
   return {result_group};
 }
-#endif
 
 AffiliatedFacets GetTestEquivalenceClassBeta() {
   return {
@@ -219,14 +217,6 @@ TEST_F(AffiliatedMatchHelperTest, GetAffiliatedAndroidRealmsAndWebsites) {
 
   base::MockCallback<AffiliatedMatchHelper::AffiliatedRealmsCallback> callback;
   // Android doesn't support filling across affiliated websites.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(callback,
-              Run(ElementsAre(Facet(
-                      FacetURI::FromCanonicalSpec(kTestAndroidFacetURIAlpha3),
-                      FacetBrandingInfo{kTestAndroidFacetNameAlpha3,
-                                        GURL(kTestAndroidFacetIconURLAlpha3)})),
-                  IsEmpty()));
-#else
   EXPECT_CALL(
       callback,
       Run(UnorderedElementsAre(
@@ -235,7 +225,6 @@ TEST_F(AffiliatedMatchHelperTest, GetAffiliatedAndroidRealmsAndWebsites) {
                     FacetBrandingInfo{kTestAndroidFacetNameAlpha3,
                                       GURL(kTestAndroidFacetIconURLAlpha3)})),
           IsEmpty()));
-#endif
   match_helper()->GetAffiliatedAndGroupedRealms(
       GetTestObservedWebForm(kTestWebRealmAlpha1, nullptr), callback.Get());
 }
@@ -281,7 +270,6 @@ TEST_F(AffiliatedMatchHelperTest,
                                                 callback.Get());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AffiliatedMatchHelperTest, GetGroupedRealms) {
   EXPECT_CALL(*mock_affiliation_service(), GetAffiliationsAndBranding)
       .WillOnce(RunOnceCallback<1>(AffiliatedFacets(), true));
@@ -339,7 +327,6 @@ TEST_F(AffiliatedMatchHelperTest, GetGroupedRealmsWhenNoMatch) {
   match_helper()->GetAffiliatedAndGroupedRealms(
       GetTestObservedWebForm(kTestWebRealmAlpha1, nullptr), callback.Get());
 }
-#endif
 
 TEST_F(AffiliatedMatchHelperTest, InjectAffiliationAndBrandingInformation) {
   std::vector<PasswordForm> forms;

@@ -1395,13 +1395,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest, UpdateManifestOrderedAppTags) {
 // repaired (reinstalled).
 
 // TODO(crbug.com/511917153): Re-enable this test on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CorruptedNonWebstoreExtensionRepaired \
-  DISABLED_CorruptedNonWebstoreExtensionRepaired
-#else
 #define MAYBE_CorruptedNonWebstoreExtensionRepaired \
   CorruptedNonWebstoreExtensionRepaired
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
                        MAYBE_CorruptedNonWebstoreExtensionRepaired) {
   // Mark as enterprise managed.
@@ -1474,13 +1469,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
 // repaired (reinstalled) even if hashes file is damaged too.
 // crbug.com/40150293: flaky on win
 // crbug.com/512086953: flaky on android
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired \
-  DISABLED_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired
-#else
 #define MAYBE_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired \
   CorruptedNonWebstoreExtensionWithDamagedHashesRepaired
-#endif
 IN_PROC_BROWSER_TEST_F(
     ExtensionPolicyTest,
     MAYBE_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired) {
@@ -1559,13 +1549,8 @@ IN_PROC_BROWSER_TEST_F(
 // TODO(crbug.com/40669814): Change this test so extension without hashes
 // will be also reinstalled.
 // TODO(crbug.com/511917153): Re-enable this test on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CorruptedNonWebstoreExtensionWithoutHashesRemained \
-  DISABLED_CorruptedNonWebstoreExtensionWithoutHashesRemained
-#else
 #define MAYBE_CorruptedNonWebstoreExtensionWithoutHashesRemained \
   CorruptedNonWebstoreExtensionWithoutHashesRemained
-#endif
 IN_PROC_BROWSER_TEST_F(
     ExtensionPolicyTest,
     MAYBE_CorruptedNonWebstoreExtensionWithoutHashesRemained) {

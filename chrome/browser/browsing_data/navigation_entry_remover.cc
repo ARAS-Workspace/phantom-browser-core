@@ -20,15 +20,9 @@
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 #include "chrome/browser/sessions/session_service.h"
@@ -103,27 +97,6 @@ void DeleteTabNavigationEntries(
                        : base::BindRepeating(&UrlMatcherForNavigationEntry,
                                              std::cref(url_set));
 
-#if BUILDFLAG(IS_ANDROID)
-  auto session_predicate =
-      time_range.IsValid()
-          ? base::BindRepeating(&ShouldDeleteSerializedNavigationEntry,
-                                time_range.begin(), time_range.end(),
-                                std::cref(restrict_urls))
-          : base::BindRepeating(&UrlMatcherForSerializedNavigationEntry,
-                                std::cref(url_set));
-
-  for (const TabModel* tab_model : TabModelList::models()) {
-    if (tab_model->GetProfile() == profile) {
-      for (int i = 0; i < tab_model->GetTabCount(); i++) {
-        TabAndroid* tab = tab_model->GetTabAt(i);
-        tab->DeleteFrozenNavigationEntries(session_predicate);
-        content::WebContents* web_contents = tab->web_contents();
-        if (web_contents)
-          DeleteNavigationEntries(web_contents, predicate);
-      }
-    }
-  }
-#else
   GlobalBrowserCollection::GetInstance()->ForEach(
       [profile, &predicate](BrowserWindowInterface* browser) {
         if (browser->GetProfile() == profile) {
@@ -134,7 +107,6 @@ void DeleteTabNavigationEntries(
         }
         return true;
       });
-#endif
 }
 
 void PerformTabRestoreDeletion(

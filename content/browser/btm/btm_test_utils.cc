@@ -384,11 +384,7 @@ void OpenedWindowObserver::DidOpenRequestedURL(
 // SimulateMouseClickAndWait() once mouse clicks / taps reliably trigger user
 // activation on Android
 void SimulateUserActivation(WebContents* web_contents) {
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(ExecJs(web_contents, ""));
-#else
   SimulateMouseClickAndWait(web_contents);
-#endif
 }
 
 void SimulateMouseClickAndWait(WebContents* web_contents) {

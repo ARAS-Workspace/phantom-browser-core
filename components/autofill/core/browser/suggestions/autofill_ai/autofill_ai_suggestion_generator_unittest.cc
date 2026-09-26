@@ -477,23 +477,6 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
   EXPECT_THAT(suggestions[0], HasIcon(Suggestion::Icon::kFlight));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Tests that no icon is set when `kAutofillAiNoFillingIconsExperiment` is
-// enabled.
-TEST_F(AutofillAiSuggestionGeneratorTest,
-       GetFillingSuggestion_FlightReservationEntity_NoIconIfFeatureIsEnabled) {
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillAiNoFillingIconsExperiment);
-  SetEntities({GetFlightReservationEntityInstanceWithRandomGuid()});
-  SetForm({FLIGHT_RESERVATION_FLIGHT_NUMBER, FLIGHT_RESERVATION_TICKET_NUMBER,
-           FLIGHT_RESERVATION_CONFIRMATION_CODE});
-
-  std::vector<Suggestion> suggestions =
-      CreateAutofillAiFillingSuggestions(field(0));
-  EXPECT_THAT(suggestions[0], HasIcon(Suggestion::Icon::kNoIcon));
-}
-#endif
-
 TEST_F(AutofillAiSuggestionGeneratorTest,
        GetFillingSuggestion_PersonalContextEntity_UseSparkIcon) {
   SetEntities({GetFlightReservationEntityInstanceWithRandomGuid(
@@ -538,7 +521,6 @@ TEST_F(
   std::vector<Suggestion> suggestions =
       CreateAutofillAiFillingSuggestions(field(0));
 
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(suggestions,
               IdentityDocSuggestionsAre(
                   AllOf(EqualsSuggestion(SuggestionType::kFillAutofillAi,
@@ -551,21 +533,8 @@ TEST_F(
                         HasLabels(u"Passport · Harry Potter",
                                   l10n_util::GetStringUTF16(
                                       IDS_AUTOFILL_AI_SUGGESTED_BY_GEMINI)))));
-#else
-  EXPECT_THAT(suggestions,
-              IdentityDocSuggestionsAre(
-                  AllOf(EqualsSuggestion(SuggestionType::kFillAutofillAi,
-                                         Suggestion::AutofillAiPayload(
-                                             passport_local.guid())),
-                        HasLabels(u"Passport · Jon Doe")),
-                  AllOf(EqualsSuggestion(SuggestionType::kFillAutofillAi,
-                                         Suggestion::AutofillAiPayload(
-                                             passport_personal_context.guid())),
-                        HasLabels(u"Passport · Harry Potter"))));
-#endif
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutofillAiSuggestionGeneratorTest,
        GetFillingSuggestion_PersonalContext_HideSuggestion) {
   base::test::ScopedFeatureList scoped_feature_list(
@@ -590,7 +559,6 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
                       Suggestion::AutofillAiPayload(
                           passport_personal_context.guid()))))));
 }
-#endif
 
 TEST_F(AutofillAiSuggestionGeneratorTest, GetFillingSuggestion_PrefixMatching) {
   EntityInstance passport_prefix_matches =
@@ -1251,15 +1219,9 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
   client()
       .GetPersonalContextFirstRunService()
       ->set_should_show_ambient_autofill_notice(true);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(
-      CreateAutofillAiFillingSuggestions(field(0)),
-      Not(Contains(EqualsSuggestion(SuggestionType::kPersonalContextNotice))));
-#else
   EXPECT_THAT(
       CreateAutofillAiFillingSuggestions(field(0)),
       Contains(EqualsSuggestion(SuggestionType::kPersonalContextNotice)));
-#endif
 }
 
 // Tests that a kPersonalContextNotice suggestion is not appended if the
@@ -2373,7 +2335,6 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
                   SuggestionType::kAutofillAiPrivateInferenceNotice)));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutofillAiSuggestionGeneratorTest,
        PrivateInferenceNoticeNotShownWhenPersonalContextNoticeIsAdded) {
   base::test::ScopedFeatureList scoped_feature_list(
@@ -2396,7 +2357,6 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
               Not(Contains(EqualsSuggestion(
                   SuggestionType::kAutofillAiPrivateInferenceNotice))));
 }
-#endif
 
 TEST_F(AutofillAiSuggestionGeneratorTest,
        PrivateInferenceNoticeNotShownWhenAmbientAutofillShownButNotAcked) {

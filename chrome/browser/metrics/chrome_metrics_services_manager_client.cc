@@ -42,13 +42,6 @@
 #include "content/public/browser/network_service_instance.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/metrics/histogram_functions.h"
-#include "chrome/browser/android/metrics/uma_session_stats.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace metrics {
 namespace internal {
 
@@ -58,17 +51,6 @@ namespace internal {
 BASE_FEATURE(kMetricsReportingFeature,
              "MetricsReporting",
              base::FEATURE_ENABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-// Same as |kMetricsReportingFeature|, but this feature is associated with a
-// different trial, which has different sampling rates. This is due to a bug
-// in which the old sampling rate was not being applied correctly. In order for
-// the fix to not affect the overall sampling rate, this new feature was
-// created. See crbug.com/40218371.
-BASE_FEATURE(kPostFREFixMetricsReportingFeature,
-             "PostFREFixMetricsReporting",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Name of the variations param that defines the sampling rate.
 const char kRateParamName[] = "sampling_rate_per_mille";
@@ -89,24 +71,6 @@ void PostStoreMetricsClientInfo(const metrics::ClientInfo& client_info) {
                                 client_info));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Returns true if we should use the new sampling trial and feature to determine
-// sampling. See the comment on |kUsePostFREFixSamplingTrial| for more details.
-bool ShouldUsePostFREFixSamplingTrial(PrefService* local_state) {
-  return local_state->GetBoolean(metrics::prefs::kUsePostFREFixSamplingTrial);
-}
-
-bool ShouldUsePostFREFixSamplingTrial() {
-  // We check for g_browser_process and local_state() because some unit tests
-  // may reach this point without creating a test browser process and/or local
-  // state.
-  // TODO(crbug.com/40837610): Fix the unit tests so that we do not need to
-  // check for g_browser_process and local_state().
-  return g_browser_process && g_browser_process->local_state() &&
-         ShouldUsePostFREFixSamplingTrial(g_browser_process->local_state());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Implementation of IsClientInSample() that takes a PrefService param.
 bool IsClientInSampleImpl(PrefService* local_state) {
   // Test the MetricsReporting or PostFREFixMetricsReporting feature (depending
@@ -114,12 +78,6 @@ bool IsClientInSampleImpl(PrefService* local_state) {
   // ensure that the trial is reported. See the comment on
   // |kUsePostFREFixSamplingTrial| for more details on why there are two
   // different features.
-#if BUILDFLAG(IS_ANDROID)
-  if (ShouldUsePostFREFixSamplingTrial(local_state)) {
-    return base::FeatureList::IsEnabled(
-        metrics::internal::kPostFREFixMetricsReportingFeature);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   return base::FeatureList::IsEnabled(
       metrics::internal::kMetricsReportingFeature);
 }
@@ -179,61 +137,9 @@ bool ChromeMetricsServicesManagerClient::IsClientInSampleForMetrics() {
   return IsClientInSampleImpl(g_browser_process->local_state());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// static
-bool ChromeMetricsServicesManagerClient::IsClientInSampleForCrashes() {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, there are two field trials that, together, drive metrics and
-  // crash reporting. The determination of which trial to use is based on
-  // whether the client went through the FRE before or after the fix to
-  // crbug.com/40218371 was deployed.
-  //
-  // The PostFREFixSamplingTrial controls crash and metrics sampling for clients
-  // which went through the FRE after the FRE fix was deployed. These clients
-  // use the PostFREFixMetricsReortingFeature and its "disable_crashes" feature
-  // parameter to control whether the client is in-sample for crash reporting.
-  if (ShouldUsePostFREFixSamplingTrial(g_browser_process->local_state())) {
-    // If reporting isn't enabled at all, then we can return early.
-    if (!base::FeatureList::IsEnabled(
-            metrics::internal::kPostFREFixMetricsReportingFeature)) {
-      return false;
-    }
-    // Otherwise, send crashes if crash reporting is NOT disabled. By default
-    // crash reporting is not disabled.
-    const bool crashes_are_disabled = base::GetFieldTrialParamByFeatureAsBool(
-        metrics::internal::kPostFREFixMetricsReportingFeature,
-        "disable_crashes", false);
-    return !crashes_are_disabled;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
-  // If this is a Windows client, or if this is an Android client that went
-  // through the FRE before the FRE fix was deployed, then this client uses
-  // the MetricsReportingFeature and its "disable_crashes" parameter to control
-  // whether the client is in-sample for crash reporting.
-
-  // If reporting isn't enabled at all, then we can return early.
-  if (!base::FeatureList::IsEnabled(
-          metrics::internal::kMetricsReportingFeature)) {
-    return false;
-  }
-
-  const bool crashes_are_disabled = base::GetFieldTrialParamByFeatureAsBool(
-      metrics::internal::kMetricsReportingFeature, "disable_crashes", false);
-  return !crashes_are_disabled;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // static
 bool ChromeMetricsServicesManagerClient::GetSamplingRatePerMille(int* rate) {
-#if BUILDFLAG(IS_ANDROID)
-  const base::Feature& feature =
-      ShouldUsePostFREFixSamplingTrial()
-          ? metrics::internal::kPostFREFixMetricsReportingFeature
-          : metrics::internal::kMetricsReportingFeature;
-#else
   const base::Feature& feature = metrics::internal::kMetricsReportingFeature;
-#endif  // BUILDFLAG(IS_ANDROID)
   std::string rate_str = base::GetFieldTrialParamValueByFeature(
       feature, metrics::internal::kRateParamName);
   if (rate_str.empty()) {
@@ -272,14 +178,7 @@ ChromeMetricsServicesManagerClient::GetMetricsStateManager() {
     base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);
 
     metrics::StartupVisibility startup_visibility;
-#if BUILDFLAG(IS_ANDROID)
-    startup_visibility = UmaSessionStats::HasVisibleActivity()
-                             ? metrics::StartupVisibility::kForeground
-                             : metrics::StartupVisibility::kBackground;
-    base::UmaHistogramEnumeration("UMA.StartupVisibility", startup_visibility);
-#else
     startup_visibility = metrics::StartupVisibility::kForeground;
-#endif  // BUILDFLAG(IS_ANDROID)
 
     metrics_state_manager_ = metrics::MetricsStateManager::Create(
         local_state_, enabled_state_provider_.get(), GetRegistryBackupKey(),
@@ -309,22 +208,5 @@ ChromeMetricsServicesManagerClient::GetEnabledStateProvider() {
 }
 
 bool ChromeMetricsServicesManagerClient::IsOffTheRecordSessionActive() {
-#if BUILDFLAG(IS_ANDROID)
-  // This differs from TabModelList::IsOffTheRecordSessionActive in that it
-  // does not ignore TabModels that have no open tabs, because it may be checked
-  // before tabs get added to the TabModel. This means it may be more
-  // conservative in case unused TabModels are not cleaned up, but it seems to
-  // work correctly.
-  // TODO(crbug.com/40107157): This function should return true for Incognito
-  // CCTs.
-  for (const TabModel* model : TabModelList::models()) {
-    if (model->IsOffTheRecord()) {
-      return true;
-    }
-  }
-
-  return false;
-#else
   return ::IsOffTheRecordSessionActive();
-#endif
 }

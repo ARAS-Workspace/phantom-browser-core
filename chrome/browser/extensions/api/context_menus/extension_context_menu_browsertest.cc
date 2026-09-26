@@ -52,11 +52,7 @@
 #include "ui/menus/simple_menu_model.h"
 
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/extensions/test_extension_menu_model_android.h"
-#else
 #include "chrome/browser/renderer_context_menu/render_view_context_menu_test_util.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -69,11 +65,7 @@ namespace {
 // Defines `PlatformContextMenu`, which maps to different types based on
 // platform. This is similar to PlatformBrowserTest, which maps to
 // InProcessBrowserTest or AndroidBrowserTest based on platform.
-#if BUILDFLAG(IS_ANDROID)
-using PlatformContextMenu = TestExtensionMenuModel;
-#else
 using PlatformContextMenu = TestRenderViewContextMenu;
-#endif
 
 constexpr char kPersistentExtensionId[] = "knldjmfmopnpolahpmmgbagdohdnhkik";
 
@@ -82,15 +74,9 @@ constexpr char kPersistentExtensionId[] = "knldjmfmopnpolahpmmgbagdohdnhkik";
 std::unique_ptr<PlatformContextMenu> CreateContextMenu(
     content::RenderFrameHost* frame,
     const content::ContextMenuParams& params) {
-#if BUILDFLAG(IS_ANDROID)
-  auto menu = std::make_unique<TestExtensionMenuModel>(*frame, params);
-  menu->PopulateModel();
-  return menu;
-#else
   auto menu = std::make_unique<TestRenderViewContextMenu>(*frame, params);
   menu->Init();
   return menu;
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 }
 
 // Creates a platform-specific context menu containing extension items for a
@@ -831,7 +817,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuLazyTest, StartDisabled) {
   TestEnabledContextMenu(false);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Not relevant on Android, which only supports service worker.
 IN_PROC_BROWSER_TEST_F(ExtensionContextMenuLazyTest, EventPage) {
   GURL about_blank("about:blank");
@@ -898,7 +883,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuLazyTest,
   profile()->DestroyOffTheRecordProfile(incognito);
   ASSERT_EQ(1u, GetItems().size());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests updating checkboxes' checked state to true and false.
 IN_PROC_BROWSER_TEST_F(ExtensionContextMenuLazyTest, UpdateCheckboxes) {

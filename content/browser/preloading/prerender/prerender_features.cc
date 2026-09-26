@@ -27,12 +27,8 @@ const base::FeatureParam<Prerender2FallbackPrefetchSchedulerPolicy>
     kPrerender2FallbackPrefetchSchedulerPolicy{
         &kPrerender2FallbackPrefetchSpecRules,
         "kPrerender2FallbackPrefetchSchedulerPolicy",
-// TODO(crbug.com/342089123): Use consistent policy if possible.
-#if BUILDFLAG(IS_ANDROID)
-        Prerender2FallbackPrefetchSchedulerPolicy::kNotUse,
-#else
+        // TODO(crbug.com/342089123): Use consistent policy if possible.
         Prerender2FallbackPrefetchSchedulerPolicy::kBurst,
-#endif
         &kPrerender2FallbackPrefetchSchedulerPolicyOptios};
 
 BASE_FEATURE(kPrerender2NoVarySearch, base::FEATURE_ENABLED_BY_DEFAULT);

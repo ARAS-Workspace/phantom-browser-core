@@ -77,10 +77,8 @@
 #include "components/sync_user_events/user_event_service.h"
 #include "components/variations/service/google_groups_manager.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/webauthn/core/browser/passkey_data_type_controller.h"
 #include "components/webauthn/core/browser/passkey_model.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
 #include "components/supervised_user/core/browser/family_link_settings_data_type_controller.h"
@@ -191,11 +189,7 @@ bool ArePreferencesAllowedInTransportMode() {
           switches::kEnablePreferencesAccountStorage)) {
     return false;
   }
-#if BUILDFLAG(IS_ANDROID)
-  return syncer::IsReplaceSyncPromosWithSignInPromosEnabled();
-#else
   return true;
-#endif
 }
 
 }  // namespace
@@ -296,12 +290,10 @@ void CommonControllerBuilder::SetNotebooksService(
   notebooks_service_.Set(notebooks_service);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void CommonControllerBuilder::SetPasskeyModel(
     webauthn::PasskeyModel* passkey_model) {
   passkey_model_.Set(passkey_model);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void CommonControllerBuilder::SetPasswordReceiverService(
     password_manager::PasswordReceiverService* password_receiver_service) {
@@ -536,11 +528,9 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
     add_controller(CreateContextualTaskDataTypeController());
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (!disabled_types.Has(syncer::WEBAUTHN_CREDENTIAL)) {
     add_controller(CreateWebauthnCredentialDataTypeController(sync_service));
   }
-#endif
 
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
   add_controller(
@@ -1129,7 +1119,6 @@ CommonControllerBuilder::CreateJourneyDataTypeController() {
   return nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<syncer::DataTypeController>
 CommonControllerBuilder::CreateWebauthnCredentialDataTypeController(
     syncer::SyncService* sync_service) {
@@ -1145,7 +1134,6 @@ CommonControllerBuilder::CreateWebauthnCredentialDataTypeController(
       /*delegate_for_transport_mode=*/
       std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate));
 }
-#endif
 
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
 std::unique_ptr<syncer::DataTypeController>

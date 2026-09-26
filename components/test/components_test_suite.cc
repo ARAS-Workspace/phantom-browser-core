@@ -84,11 +84,7 @@ class ComponentsTestSuite : public base::TestSuite {
     ui::RegisterPathProvider();
 
     base::FilePath pak_path;
-#if BUILDFLAG(IS_ANDROID)
-    base::PathService::Get(ui::DIR_RESOURCE_PAKS_ANDROID, &pak_path);
-#else
     base::PathService::Get(base::DIR_ASSETS, &pak_path);
-#endif
 
     base::FilePath ui_test_pak_path;
     ASSERT_TRUE(base::PathService::Get(ui::UI_TEST_PAK, &ui_test_pak_path));

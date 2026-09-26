@@ -1777,16 +1777,8 @@ TEST_F(DeviceInfoSyncBridgeTest, ShouldDeriveAndroidBuildFingerprintPrefix) {
   const DeviceInfo* local_device_info =
       bridge()->GetLocalDeviceInfoProvider()->GetLocalDeviceInfo();
   ASSERT_TRUE(local_device_info);
-#if BUILDFLAG(IS_ANDROID)
-  std::string real_fingerprint = base::SysInfo::GetAndroidBuildFingerprint();
-  std::string expected_prefix =
-      DeriveAndroidBuildFingerprintPrefixForTesting(real_fingerprint);
-  EXPECT_EQ(local_device_info->android_os_build_fingerprint_prefix(),
-            expected_prefix);
-#else
   EXPECT_EQ(local_device_info->android_os_build_fingerprint_prefix(),
             std::nullopt);
-#endif
 }
 
 TEST(DeriveAndroidBuildFingerprintPrefixTest,

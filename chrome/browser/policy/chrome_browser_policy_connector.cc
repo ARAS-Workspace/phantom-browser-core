@@ -50,9 +50,6 @@
 #include "base/strings/sys_string_conversions.h"
 #include "components/policy/core/common/policy_loader_mac.h"
 #include "components/policy/core/common/preferences_mac.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/policy/chrome_browser_cloud_management_controller_android.h"
-#include "components/policy/core/common/android/android_combined_policy_provider.h"
 #elif BUILDFLAG(IS_POSIX)
 #include "components/policy/core/common/config_dir_policy_loader.h"
 #endif
@@ -70,11 +67,7 @@ bool g_command_line_enabled_for_testing = false;
 ChromeBrowserPolicyConnector::ChromeBrowserPolicyConnector()
     : BrowserPolicyConnector(base::BindRepeating(&BuildHandlerList)) {
   std::unique_ptr<ChromeBrowserCloudManagementController::Delegate> delegate =
-#if BUILDFLAG(IS_ANDROID)
-      std::make_unique<ChromeBrowserCloudManagementControllerAndroid>();
-#else
       std::make_unique<ChromeBrowserCloudManagementControllerDesktop>();
-#endif
 
   chrome_browser_cloud_management_controller_ =
       std::make_unique<ChromeBrowserCloudManagementController>(
@@ -102,11 +95,6 @@ void ChromeBrowserPolicyConnector::Init(
       std::make_unique<DeviceManagementService>(std::move(configuration));
   device_management_service->ScheduleInitialization(
       kServiceInitializationStartupDelay);
-
-#if BUILDFLAG(IS_ANDROID)
-  policy_cache_updater_ = std::make_unique<android::PolicyCacheUpdater>(
-      GetPolicyService(), GetHandlerList());
-#endif
 
   InitInternal(local_state, std::move(device_management_service));
 }
@@ -316,7 +304,7 @@ ChromeBrowserPolicyConnector::CreatePlatformProvider() {
       std::make_unique<MacPreferences>(), bundle_id);
   return std::make_unique<AsyncPolicyProvider>(GetSchemaRegistry(),
                                                std::move(loader));
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_POSIX)
   base::FilePath config_dir_path;
   if (base::PathService::Get(chrome::DIR_POLICY_FILES, &config_dir_path)) {
     auto loader = std::make_unique<ConfigDirPolicyLoader>(
@@ -328,9 +316,6 @@ ChromeBrowserPolicyConnector::CreatePlatformProvider() {
   } else {
     return nullptr;
   }
-#elif BUILDFLAG(IS_ANDROID)
-  return std::make_unique<android::AndroidCombinedPolicyProvider>(
-      GetSchemaRegistry());
 #else
   return nullptr;
 #endif

@@ -7,10 +7,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "components/device_reauth/device_authenticator_common.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/device_reauth/android/device_authenticator_android.h"
-#include "chrome/browser/device_reauth/android/device_authenticator_bridge_impl.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/device_reauth/mac/authenticator_mac.h"
 #include "chrome/browser/device_reauth/mac/device_authenticator_mac.h"
 #endif
@@ -44,33 +41,9 @@ ChromeDeviceAuthenticatorFactory::GetForProfile(
     Profile* profile,
     const gfx::NativeWindow window,
     const device_reauth::DeviceAuthParams& params) {
-#if BUILDFLAG(IS_ANDROID)
-  DeviceAuthenticatorProxy* proxy = static_cast<DeviceAuthenticatorProxy*>(
-      GetInstance()->GetServiceForBrowserContext(profile, true));
-  CHECK(proxy);
-  return std::make_unique<DeviceAuthenticatorAndroid>(
-      std::make_unique<DeviceAuthenticatorBridgeImpl>(window), proxy, params);
-#else
   return ChromeDeviceAuthenticatorFactory::GetForProfile(profile, params);
-#endif
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// static
-std::unique_ptr<device_reauth::DeviceAuthenticator>
-ChromeDeviceAuthenticatorFactory::GetForProfile(
-    Profile* profile,
-    const base::android::JavaRef<jobject>& activity,
-    const device_reauth::DeviceAuthParams& params) {
-  DeviceAuthenticatorProxy* proxy = static_cast<DeviceAuthenticatorProxy*>(
-      GetInstance()->GetServiceForBrowserContext(profile, true));
-
-  CHECK(proxy);
-
-  return std::make_unique<DeviceAuthenticatorAndroid>(
-      std::make_unique<DeviceAuthenticatorBridgeImpl>(activity), proxy, params);
-}
-#else
 // static
 std::unique_ptr<DeviceAuthenticator>
 ChromeDeviceAuthenticatorFactory::GetForProfile(
@@ -89,7 +62,6 @@ ChromeDeviceAuthenticatorFactory::GetForProfile(
 #endif
   return std::move(device_authenticator);
 }
-#endif
 
 std::unique_ptr<KeyedService>
 ChromeDeviceAuthenticatorFactory::BuildServiceInstanceForBrowserContext(

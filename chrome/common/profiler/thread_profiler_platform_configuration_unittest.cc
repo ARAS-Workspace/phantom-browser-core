@@ -18,9 +18,7 @@
 #include "components/version_info/version_info.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_MAC) ||                                          \
-    (BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_ARM_CFI_TABLE)) || \
-    (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARM64))
+#if BUILDFLAG(IS_MAC)
 constexpr bool kThreadProfilerSupportedOnPlatform = true;
 #else
 constexpr bool kThreadProfilerSupportedOnPlatform = false;
@@ -80,16 +78,9 @@ INSTANTIATE_TEST_SUITE_P(
     ThreadProfilerPlatformConfigurationThreadTest,
     ::testing::Combine(
         ::testing::Bool(),
-#if BUILDFLAG(IS_ANDROID)
-        // AndroidPlatformConfiguration::IsEnabledForThread() checks the
-        // channel, so test with dev channel both enabled and disabled.
-        ::testing::Bool()
-#else
         // DefaultPlatformConfiguration::IsEnabledForThread() doesn't check the
         // channel, so no need to test with dev channel disabled.
-        ::testing::Values(true)
-#endif
-            ));
+        ::testing::Values(true)));
 
 }  // namespace
 
@@ -105,11 +96,7 @@ bool operator==(const RelativePopulations& a, const RelativePopulations& b) {
 }
 
 TEST_F(ThreadProfilerPlatformConfigurationTest, IsSupported) {
-#if BUILDFLAG(IS_ANDROID) && !defined(ARCH_CPU_ARM64)
-  constexpr bool kIsSupportedOnStable = false;
-#else
   constexpr bool kIsSupportedOnStable = true;
-#endif
   EXPECT_FALSE(config()->IsSupported(version_info::Channel::UNKNOWN));
   EXPECT_EQ(config()->IsSupported(version_info::Channel::CANARY),
             kThreadProfilerSupportedOnPlatform);
@@ -124,19 +111,9 @@ TEST_F(ThreadProfilerPlatformConfigurationTest, IsSupported) {
 }
 
 TEST_F(ThreadProfilerPlatformConfigurationDeathTest, GetEnableRates) {
-#if BUILDFLAG(IS_ANDROID)
-  constexpr double kCanaryDevExperimentRate = 100.0;
-  constexpr double kBetaExperimentRate = 100.0;
-#if defined(ARCH_CPU_ARM64)
-  constexpr double kStableExperimentRate = 0.0001;
-#else
-  constexpr double kStableExperimentRate = 0.0;
-#endif
-#else   // !BUILDFLAG(IS_ANDROID)
   constexpr double kCanaryDevExperimentRate = 20.0;
   constexpr double kBetaExperimentRate = 10.0;
   constexpr double kStableExperimentRate = 0.006;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   EXPECT_CHECK_DEATH(config()->GetEnableRates(version_info::Channel::UNKNOWN));
 
@@ -166,13 +143,7 @@ TEST_F(ThreadProfilerPlatformConfigurationDeathTest, GetEnableRates) {
 
 TEST_F(ThreadProfilerPlatformConfigurationTest,
        GetChildProcessPerExecutionEnableFraction) {
-#if BUILDFLAG(IS_ANDROID)
-  // Android child processes that match ChooseEnabledProcess() should be
-  // profiled unconditionally.
-  constexpr bool kAlwaysEnable = true;
-#else
   constexpr bool kAlwaysEnable = false;
-#endif
 
   EXPECT_EQ(1.0, config()->GetChildProcessPerExecutionEnableFraction(
                      sampling_profiler::ProfilerProcessType::kGpu));
@@ -211,10 +182,8 @@ TEST_P(ThreadProfilerPlatformConfigurationThreadTest, IsEnabledForThread) {
       EXPECT_EQ(config()->IsEnabledForThread(process, thread,
                                              version_info::Channel::CANARY),
                 thread_type_enabled);
-#if !BUILDFLAG(IS_ANDROID)
       // Dev channel only has special handling on Android.
       ASSERT_TRUE(enable_on_dev_channel());
-#endif
       EXPECT_EQ(config()->IsEnabledForThread(process, thread,
                                              version_info::Channel::DEV),
                 thread_type_enabled && enable_on_dev_channel());

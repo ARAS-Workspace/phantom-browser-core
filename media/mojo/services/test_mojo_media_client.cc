@@ -63,15 +63,9 @@ std::unique_ptr<Renderer> TestMojoMediaClient::CreateRenderer(
   media::MediaPlayerLoggingID player_id = media::GetNextMediaPlayerLoggingID();
 
   if (!renderer_factory_) {
-#if BUILDFLAG(IS_ANDROID)
-    renderer_factory_ = std::make_unique<RendererImplFactory>(
-        media_log, decoder_factory_.get(),
-        RendererImplFactory::GetGpuFactoriesCB(), player_id);
-#else
     renderer_factory_ = std::make_unique<RendererImplFactory>(
         media_log, decoder_factory_.get(),
         RendererImplFactory::GetGpuFactoriesCB(), player_id, nullptr);
-#endif
   }
 
   // We cannot share the NullAudioSink or NullVideoSink among different

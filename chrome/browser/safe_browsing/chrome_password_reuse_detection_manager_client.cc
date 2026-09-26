@@ -40,11 +40,9 @@
 #include "extensions/common/constants.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service.h"
 #include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service_factory.h"
 #include "chrome/browser/safe_browsing/extension_telemetry/password_reuse_signal.h"
-#endif
 
 namespace {
 
@@ -56,13 +54,9 @@ using PasswordReuseEvent =
 void AddToWidgetInputEventObservers(
     content::RenderWidgetHost* widget_host,
     content::RenderWidgetHost::InputEventObserver* observer) {
-#if BUILDFLAG(IS_ANDROID)
-  widget_host->AddImeInputEventObserver(observer);
-#endif
   widget_host->AddInputEventObserver(observer);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Retrieves and formats the saved passwords domains from signon_realms.
 std::vector<std::string> GetMatchingDomains(
     const std::vector<password_manager::MatchingReusedCredential>&
@@ -80,7 +74,6 @@ std::vector<std::string> GetMatchingDomains(
   }
   return std::move(matching_domains).extract();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -174,31 +167,6 @@ void ChromePasswordReuseDetectionManagerClient::InternalOnPrimaryAccountChanged(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void ChromePasswordReuseDetectionManagerClient::OnPasswordSelected(
-    const std::u16string& text) {
-  password_reuse_detection_manager_.OnPaste(text);
-}
-
-void ChromePasswordReuseDetectionManagerClient::OnImeTextCommittedEvent(
-    const std::u16string& text_str) {
-  password_reuse_detection_manager_.OnKeyPressedCommitted(text_str);
-}
-
-void ChromePasswordReuseDetectionManagerClient::OnImeSetComposingTextEvent(
-    const std::u16string& text_str) {
-  last_composing_text_ = text_str;
-  password_reuse_detection_manager_.OnKeyPressedUncommitted(
-      last_composing_text_);
-}
-
-void ChromePasswordReuseDetectionManagerClient::
-    OnImeFinishComposingTextEvent() {
-  password_reuse_detection_manager_.OnKeyPressedCommitted(last_composing_text_);
-  last_composing_text_.clear();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 autofill::LogManager*
 ChromePasswordReuseDetectionManagerClient::GetCurrentLogManager() {
   if (!log_manager_ && log_router_ && log_router_->HasReceivers()) {
@@ -281,7 +249,6 @@ void ChromePasswordReuseDetectionManagerClient::CheckProtectedPasswordEntry(
       web_contents(), web_contents()->GetLastCommittedURL(), username,
       password_type, matching_reused_credentials, password_field_exists);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Converts the url_string to GURL to avoid constructing it twice.
   GURL domain_gurl(domain);
   // If the webpage is not an extension page, do nothing.
@@ -315,7 +282,6 @@ void ChromePasswordReuseDetectionManagerClient::CheckProtectedPasswordEntry(
       std::make_unique<safe_browsing::PasswordReuseSignal>(host,
                                                            password_reuse_info);
   telemetry_service->AddSignal(std::move(password_reuse_signal));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 ChromePasswordReuseDetectionManagerClient::
@@ -392,19 +358,6 @@ void ChromePasswordReuseDetectionManagerClient::OnInputEvent(
     const blink::WebInputEvent& event,
     input::InputEventSource source) {
   phishy_interaction_tracker_.HandleInputEvent(event);
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, key down events are triggered if a user types in through a
-  // number bar on Android keyboard. If text is typed in through other parts of
-  // Android keyboard, ImeTextCommittedEvent is triggered instead.
-  if (event.GetType() != blink::WebInputEvent::Type::kKeyDown) {
-    return;
-  }
-  const blink::WebKeyboardEvent& key_event =
-      static_cast<const blink::WebKeyboardEvent&>(event);
-  password_reuse_detection_manager_.OnKeyPressedCommitted(
-      key_event.text.data());
-
-#else   // !BUILDFLAG(IS_ANDROID)
   if (event.GetType() != blink::WebInputEvent::Type::kChar) {
     return;
   }
@@ -418,7 +371,6 @@ void ChromePasswordReuseDetectionManagerClient::OnInputEvent(
     password_reuse_detection_manager_.OnKeyPressedCommitted(
         key_event.text.data());
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(ChromePasswordReuseDetectionManagerClient);

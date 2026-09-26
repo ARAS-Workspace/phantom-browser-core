@@ -25,9 +25,7 @@ test::SingleThreadTaskEnvironment::MainThreadType GetMainThreadType(
     case MessagePumpType::UI:
       return test::SingleThreadTaskEnvironment::MainThreadType::UI;
     case MessagePumpType::CUSTOM:
-#if BUILDFLAG(IS_ANDROID)
-    case MessagePumpType::JAVA:
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
     case MessagePumpType::NS_RUNLOOP:
 #endif
       NOTREACHED();

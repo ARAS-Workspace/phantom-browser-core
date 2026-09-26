@@ -15,22 +15,12 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_android.h"
-#include "chrome/browser/safe_browsing/android/advanced_protection_status_manager_test_util.h"
-#else
 #include "chrome/browser/safe_browsing/advanced_protection_status_manager_desktop.h"
-#endif
 
 namespace safe_browsing {
 
-#if BUILDFLAG(IS_ANDROID)
-typedef AdvancedProtectionStatusManagerAndroid
-    AdvancedProtectionStatusManagerPlatform;
-#else
 typedef AdvancedProtectionStatusManagerDesktop
     AdvancedProtectionStatusManagerPlatform;
-#endif
 
 class AdvancedProtectionStatusManagerTest : public testing::Test {
  public:
@@ -38,24 +28,15 @@ class AdvancedProtectionStatusManagerTest : public testing::Test {
     RegisterProfilePrefs(pref_service_.registry());
   }
 
-  void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    SetAdvancedProtectionStateForTesting(
-        /*is_advanced_protection_requested_by_os=*/false);
-#endif  // BUILDFLAG(IS_ANDROID)
-  }
+  void SetUp() override {}
 
   std::unique_ptr<AdvancedProtectionStatusManagerPlatform> BuildManager(
       PrefService* pref_service,
       signin::IdentityManager* identity_manager) {
-#if BUILDFLAG(IS_ANDROID)
-    return std::make_unique<AdvancedProtectionStatusManagerAndroid>();
-#else
     return std::unique_ptr<AdvancedProtectionStatusManagerDesktop>(
         new AdvancedProtectionStatusManagerDesktop(
             pref_service, identity_manager,
             base::TimeDelta() /*no min delay*/));
-#endif
   }
 
  protected:
@@ -76,11 +57,7 @@ TEST_F(AdvancedProtectionStatusManagerTest, TracksUnconsentedPrimaryAccount) {
   auto manager =
       BuildManager(&pref_service_, identity_test_env.identity_manager());
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(manager->IsUnderAdvancedProtection());
-#else
   EXPECT_TRUE(manager->IsUnderAdvancedProtection());
-#endif
 
   manager->Shutdown();
 }

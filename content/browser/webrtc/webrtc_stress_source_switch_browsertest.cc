@@ -29,14 +29,8 @@ static const int kNumPeerConnections = 5;
 #endif
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-// Renderer crashes under Android ASAN: https://crbug.com/408496.
-#define MAYBE_WebRtcStressSourceSwitchBrowserTest \
-  DISABLED_WebRtcStressSourceSwitchBrowserTest
-#else
 #define MAYBE_WebRtcStressSourceSwitchBrowserTest \
   WebRtcStressSourceSwitchBrowserTest
-#endif
 
 class MAYBE_WebRtcStressSourceSwitchBrowserTest
     : public WebRtcContentBrowserTestBase {

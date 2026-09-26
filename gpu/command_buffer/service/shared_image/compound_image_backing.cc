@@ -580,15 +580,7 @@ class WrappedOverlayCompoundImageRepresentation
     wrapped_->EndReadAccess(std::move(release_fence));
     compound_backing()->NotifyEndAccess(wrapped_->backing(), AccessMode::kRead);
   }
-#if BUILDFLAG(IS_ANDROID)
-  AHardwareBuffer* GetAHardwareBuffer() final {
-    return wrapped_->GetAHardwareBuffer();
-  }
-  std::unique_ptr<base::android::ScopedHardwareBufferFenceSync>
-  GetAHardwareBufferFenceSync() final {
-    return wrapped_->GetAHardwareBufferFenceSync();
-  }
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   gfx::ScopedIOSurface GetIOSurface() const final {
     return wrapped_->GetIOSurface();
   }
@@ -761,11 +753,6 @@ class WrappedVideoCompoundImageRepresentation
     wrapped_->EndReadAccess();
     compound_backing()->NotifyEndAccess(wrapped_->backing(), AccessMode::kRead);
   }
-#if BUILDFLAG(IS_ANDROID)
-  AHardwareBuffer* GetAHardwareBuffer() const override {
-    return wrapped_->GetAHardwareBuffer();
-  }
-#endif
 
   void SetClearedRect(const gfx::Rect& cleared_rect) override {
     SharedImageRepresentation::SetClearedRect(cleared_rect);
@@ -1535,22 +1522,6 @@ scoped_refptr<gfx::NativePixmap> CompoundImageBacking::GetNativePixmap() {
   }
   return nullptr;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-std::optional<VulkanYCbCrInfo> CompoundImageBacking::GetVkCbCrInfo(
-    SharedContextState* context_state) {
-  AutoLock auto_lock(this);
-  for (const auto& element : elements_) {
-    if (element.backing) {
-      auto info = element.backing->GetVkCbCrInfo(context_state);
-      if (info) {
-        return info;
-      }
-    }
-  }
-  return std::nullopt;
-}
-#endif
 
 std::unique_ptr<DawnImageRepresentation> CompoundImageBacking::ProduceDawn(
     SharedImageManager* manager,

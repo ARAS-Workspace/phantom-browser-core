@@ -101,13 +101,8 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/renderer_host/navigation_transitions/navigation_transition_config.h"
-#include "content/public/browser/tts_environment_android.h"
-#else
 #include "content/public/browser/authenticator_request_client_delegate.h"
 #include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
-#endif
 
 namespace content {
 
@@ -390,11 +385,7 @@ ContentBrowserClient::GetOriginsRequiringDedicatedProcess() {
 }
 
 bool ContentBrowserClient::ShouldEnableStrictSiteIsolation() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 std::optional<bool>
@@ -422,11 +413,9 @@ bool ContentBrowserClient::ShouldUrlUseApplicationIsolationLevel(
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool ContentBrowserClient::IsInitialWebUIURL(const GURL& url) {
   return false;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool ContentBrowserClient::IsTopChromeWebUIURL(const GURL& url) {
   return false;
@@ -765,12 +754,6 @@ ContentBrowserClient::GetGeolocationSystemPermissionManager() {
   return nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool ContentBrowserClient::ShouldUseGmsCoreGeolocationProvider() {
-  return false;
-}
-#endif
-
 StoragePartitionConfig ContentBrowserClient::GetStoragePartitionConfigForSite(
     BrowserContext* browser_context,
     const GURL& site) {
@@ -833,11 +816,9 @@ TtsPlatform* ContentBrowserClient::GetTtsPlatform() {
   return nullptr;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 DirectSocketsDelegate* ContentBrowserClient::GetDirectSocketsDelegate() {
   return nullptr;
 }
-#endif
 
 base::FilePath ContentBrowserClient::GetDefaultDownloadDirectory() {
   return base::FilePath();
@@ -1125,22 +1106,6 @@ base::DictValue ContentBrowserClient::GetNetLogConstants() {
   return base::DictValue();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool ContentBrowserClient::ShouldOverrideUrlLoading(
-    FrameTreeNodeId frame_tree_node_id,
-    bool browser_initiated,
-    const GURL& gurl,
-    const std::string& request_method,
-    bool has_user_gesture,
-    bool is_redirect,
-    bool is_outermost_main_frame,
-    bool is_prerendering,
-    ui::PageTransition transition,
-    bool* ignore_navigation) {
-  return true;
-}
-#endif
-
 bool ContentBrowserClient::SupportsAvoidUnnecessaryBeforeUnloadCheckSync() {
   return true;
 }
@@ -1222,13 +1187,11 @@ ContentBrowserClient::GetWebAuthenticationDelegate() {
   return delegate.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<AuthenticatorRequestClientDelegate>
 ContentBrowserClient::GetWebAuthenticationRequestDelegate(
     RenderFrameHost* render_frame_host) {
   return std::make_unique<DefaultAuthenticatorRequestClientDelegate>();
 }
-#endif
 
 std::unique_ptr<net::ClientCertStore>
 ContentBrowserClient::CreateClientCertStore(BrowserContext* browser_context) {
@@ -1385,23 +1348,6 @@ std::optional<base::TimeDelta>
 ContentBrowserClient::GetSpareRendererDelayForSiteURL(const GURL& site_url) {
   return std::nullopt;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-ContentBrowserClient::WideColorGamutHeuristic
-ContentBrowserClient::GetWideColorGamutHeuristic() {
-  return WideColorGamutHeuristic::kNone;
-}
-
-std::unique_ptr<TtsEnvironmentAndroid>
-ContentBrowserClient::CreateTtsEnvironmentAndroid() {
-  return nullptr;
-}
-
-bool ContentBrowserClient::
-    ShouldObserveContainerViewLocationForDialogOverlays() {
-  return false;
-}
-#endif
 
 base::flat_set<std::string>
 ContentBrowserClient::GetPluginMimeTypesWithExternalHandlers(
@@ -1870,7 +1816,6 @@ void ContentBrowserClient::BindLanguageDetectionDriver(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ContentBrowserClient::QueryInstalledWebAppsByManifestId(
     const GURL& frame_url,
     const GURL& manifest_id,
@@ -1879,7 +1824,6 @@ void ContentBrowserClient::QueryInstalledWebAppsByManifestId(
         callback) {
   std::move(callback).Run(std::nullopt);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool ContentBrowserClient::AllowNonActivatedCrossOriginPaintHolding() {
   return false;
@@ -1931,19 +1875,13 @@ bool ContentBrowserClient::UsePrefetchPrerenderIntegration() {
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool ContentBrowserClient::ShouldDisallowCredentialRequest(
     WebContents* web_contents) {
   return false;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool ContentBrowserClient::ShouldAnimateBackForwardTransitions() {
-#if BUILDFLAG(IS_ANDROID)
-  return NavigationTransitionConfig::SupportsBackForwardTransitions({});
-#else
   return false;
-#endif
 }
 
 std::optional<int> ContentBrowserClient::GetCpuPerformanceTierOverride(
@@ -1987,12 +1925,5 @@ bool ContentBrowserClient::IsFullscreenAllowedForUnfocusedWebContents(
     content::WebContents* unfocused_web_contents) {
   return false;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool ContentBrowserClient::ShouldAllowSystemUiPopups(
-    content::WebContents* web_contents) {
-  return true;
-}
-#endif
 
 }  // namespace content

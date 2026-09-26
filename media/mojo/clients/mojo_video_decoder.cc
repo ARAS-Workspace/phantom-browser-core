@@ -123,7 +123,7 @@ bool MojoVideoDecoder::IsPlatformDecoder() const {
 bool MojoVideoDecoder::SupportsDecryption() const {
   // Currently only the Android backends and specific ChromeOS configurations
   // support decryption.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
+#if BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
   return true;
 #else
   return false;

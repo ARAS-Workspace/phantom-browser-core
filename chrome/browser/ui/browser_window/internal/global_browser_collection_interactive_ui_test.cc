@@ -18,13 +18,8 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "ui/base/base_window.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/browser_window/test/android/browser_window_android_browsertest_base.h"
-#define TestBase BrowserWindowAndroidBrowserTestBase
-#else
 #include "chrome/test/base/in_process_browser_test.h"
 #define TestBase InProcessBrowserTest
-#endif  // BUILDFLAG(IS_ANDROID)
 
 using testing::_;
 
@@ -90,9 +85,7 @@ class GlobalBrowserCollectionTest : public TestBase {
     // TODO(crbug.com/477251911): Enable this on Android (if Android browsers
     // aren't already activated upon creation) once we implement activation
     // tracking in GlobalBrowserCollection for Android.
-#if !BUILDFLAG(IS_ANDROID)
     ActivateBrowser(browser);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     return browser;
   }
@@ -125,24 +118,16 @@ class GlobalBrowserCollectionTest : public TestBase {
       active_browser_ = nullptr;
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    browser->GetWindow()->Close();
-#else
     // TODO(crbug.com/478908209): I don't know why, but
     // `browser->GetWindow()->Close();` doesn't seem to trigger
     // GlobalBrowserCollection::OnBrowserClosed() on desktop.
     CloseBrowserSynchronously(browser);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // Returns the result of browser->IsActive() on platforms that support it.
   // Otherwise, just returns the |want| value.
   bool IsActiveIfAvailable(BrowserWindowInterface* browser, bool want) {
-#if BUILDFLAG(IS_ANDROID)
-    return want;
-#else
     return browser->IsActive();
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
  private:
@@ -156,12 +141,12 @@ class GlobalBrowserCollectionTest : public TestBase {
 //
 // TODO(crbug.com/483363917): Enable this on Linux once the
 // BaseWindow::Activate() behaviour is fixed.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestObservationWithSingleProfile \
   DISABLED_TestObservationWithSingleProfile
 #else
 #define MAYBE_TestObservationWithSingleProfile TestObservationWithSingleProfile
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(GlobalBrowserCollectionTest,
                        MAYBE_TestObservationWithSingleProfile) {
   // Observe GlobalBrowserCollection.
@@ -209,13 +194,13 @@ IN_PROC_BROWSER_TEST_F(GlobalBrowserCollectionTest,
 //
 // TODO(crbug.com/483363917): Enable this on Linux once the
 // BaseWindow::Activate() behaviour is fixed.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestObservationWithMultipleProfiles \
   DISABLED_TestObservationWithMultipleProfiles
 #else
 #define MAYBE_TestObservationWithMultipleProfiles \
   TestObservationWithMultipleProfiles
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(GlobalBrowserCollectionTest,
                        MAYBE_TestObservationWithMultipleProfiles) {
   // This test is only relevant on platforms that support multi-profile.
@@ -368,14 +353,12 @@ IN_PROC_BROWSER_TEST_P(GlobalBrowserCollectionTestWithOrder,
 INSTANTIATE_TEST_SUITE_P(
     ,
     GlobalBrowserCollectionTestWithOrder,
-    ::testing::Values(BrowserCollection::Order::kCreation
-// TODO(crbug.com/477251911): Enable this on Android once we implement
-// activation tracking in GlobalBrowserCollection for Android.
-#if !BUILDFLAG(IS_ANDROID)
-                      ,
-                      BrowserCollection::Order::kActivation
-#endif  // !BUILDFLAG(IS_ANDROID)
-                      ),
+    ::testing::Values(
+        BrowserCollection::Order::kCreation
+        // TODO(crbug.com/477251911): Enable this on Android once we implement
+        // activation tracking in GlobalBrowserCollection for Android.
+        ,
+        BrowserCollection::Order::kActivation),
     [](const testing::TestParamInfo<BrowserCollection::Order>& param) {
       switch (param.param) {
         case BrowserCollection::Order::kCreation:

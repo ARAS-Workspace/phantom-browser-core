@@ -37,10 +37,6 @@
 #include <sys/stat.h>
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/path_utils.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_POSIX)
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif  // BUILDFLAG(IS_POSIX)
@@ -56,7 +52,7 @@ namespace {
 
 AtomicSequenceNumber g_next_delegate_id;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // inotify fires two events - one for each file creation + modification.
 constexpr size_t kExpectedEventsForNewFileWrite = 2;
 #else
@@ -164,7 +160,7 @@ inline constexpr auto IsType =
           testing::Field(&FilePathWatcher::ChangeInfo::change_type,
                          change_type));
     };
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 inline constexpr auto IsFile = [] {
   return testing::Field(
       &Event::change_info,
@@ -184,7 +180,7 @@ inline constexpr auto IsUnknownPathType = [] {
       testing::Field(&FilePathWatcher::ChangeInfo::file_path_type,
                      FilePathWatcher::FilePathType::kUnknown));
 };
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Enables an accumulative, add-as-you-go pattern for expecting events:
 //   - Do something that should fire `event1` on `delegate`
@@ -362,19 +358,7 @@ class FilePathWatcherTest : public testing::Test {
   ~FilePathWatcherTest() override = default;
 
  protected:
-  void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    // Watching files is only permitted when all parent directories are
-    // accessible, which is not the case for the default temp directory
-    // on Android which is under /data/data.  Use /sdcard instead.
-    // TODO(pauljensen): Remove this when crbug.com/475568 is fixed.
-    FilePath parent_dir;
-    ASSERT_TRUE(android::GetExternalStorageDirectory(&parent_dir));
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDirUnderPath(parent_dir));
-#else   // BUILDFLAG(IS_ANDROID)
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-#endif  // BUILDFLAG(IS_ANDROID)
-  }
+  void SetUp() override { ASSERT_TRUE(temp_dir_.CreateUniqueTempDir()); }
 
   void TearDown() override { RunLoop().RunUntilIdle(); }
 
@@ -783,12 +767,12 @@ TEST_F(FilePathWatcherTest, DisappearingDirectory) {
 
   ASSERT_TRUE(DeletePathRecursively(dir));
   event_expecter.AddExpectedEventForPath(file);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/40263766): Figure out why this may fire two events on
   // inotify. Only the file is being watched, so presumably there should only be
   // one deletion event.
   event_expecter.AddExpectedEventForPath(file);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
@@ -948,17 +932,16 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
   FilePath subdir2b(subdir.AppendASCII("subdir2b"));
   Move(subdir2, subdir2b);
   event_expecter.AddExpectedEventForPath(dir);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // inotify generates separate IN_MOVED_TO and IN_MOVED_FROM events for a
   // rename. Since both the source and destination are within the scope of this
   // watch, both events should be received.
   event_expecter.AddExpectedEventForPath(dir);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
   delegate.RunUntilEventsMatch(event_expecter);
 
-// Mac and Win don't generate events for Touch.
-// Android TouchFile returns false.
-#if !BUILDFLAG(IS_ANDROID)
+  // Mac and Win don't generate events for Touch.
+  // Android TouchFile returns false.
   // Touch "$dir".
   Time access_time;
   ASSERT_TRUE(Time::FromString("Wed, 16 Nov 1994, 00:00:00", &access_time));
@@ -971,7 +954,6 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
 #endif  // !BUILDFLAG(IS_APPLE)
   delegate.RunUntilEventsMatch(event_expecter);
   // TODO(crbug.com/40263777): Add a test touching `subdir`.
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Create "$dir/subdir/subdir_file1".
   FilePath subdir_file1(subdir.AppendASCII("subdir_file1"));
@@ -1000,17 +982,15 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
   event_expecter.AddExpectedEventForPath(dir);
   delegate.RunUntilEventsMatch(event_expecter);
 
-// Apps cannot change file attributes on Android in /sdcard as /sdcard uses the
-// "fuse" file system, while /data uses "ext4".  Running these tests in /data
-// would be preferable and allow testing file attributes and symlinks.
-// TODO(pauljensen): Re-enable when crbug.com/475568 is fixed and SetUp() places
-// the |temp_dir_| in /data.
-#if !BUILDFLAG(IS_ANDROID)
-  // Modify "$dir/subdir/subdir_child_dir/child_dir_file1" attributes.
+  // Apps cannot change file attributes on Android in /sdcard as /sdcard uses
+  // the "fuse" file system, while /data uses "ext4".  Running these tests in
+  // /data would be preferable and allow testing file attributes and symlinks.
+  // TODO(pauljensen): Re-enable when crbug.com/475568 is fixed and SetUp()
+  // places the |temp_dir_| in /data. Modify
+  // "$dir/subdir/subdir_child_dir/child_dir_file1" attributes.
   ASSERT_TRUE(MakeFileUnreadable(child_dir_file1));
   event_expecter.AddExpectedEventForPath(dir);
   delegate.RunUntilEventsMatch(event_expecter);
-#endif  // !BUILDFLAG(IS_ANDROID))
 
   // Delete "$dir/subdir/subdir_file1".
   ASSERT_TRUE(DeleteFile(subdir_file1));
@@ -1023,7 +1003,7 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 // Apps cannot create symlinks on Android in /sdcard as /sdcard uses the
 // "fuse" file system, while /data uses "ext4".  Running these tests in /data
 // would be preferable and allow testing file attributes and symlinks.
@@ -1089,7 +1069,7 @@ TEST_F(FilePathWatcherTest, RecursiveWithSymLink) {
   }
   delegate.RunUntilEventsMatch(event_expecter);
 }
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
 TEST_F(FilePathWatcherTest, MoveChild) {
   FilePathWatcher file_watcher, subdir_watcher;
@@ -1120,14 +1100,6 @@ TEST_F(FilePathWatcherTest, MoveChild) {
 }
 
 // Verify that changing attributes on a file is caught
-#if BUILDFLAG(IS_ANDROID)
-// Apps cannot change file attributes on Android in /sdcard as /sdcard uses the
-// "fuse" file system, while /data uses "ext4".  Running these tests in /data
-// would be preferable and allow testing file attributes and symlinks.
-// TODO(pauljensen): Re-enable when crbug.com/475568 is fixed and SetUp() places
-// the |temp_dir_| in /data.
-#define FileAttributesChanged DISABLED_FileAttributesChanged
-#endif  // BUILDFLAG(IS_ANDROID)
 TEST_F(FilePathWatcherTest, FileAttributesChanged) {
   ASSERT_TRUE(WriteFile(test_file(), "content"));
   FilePathWatcher watcher;
@@ -1557,7 +1529,7 @@ TEST_F(FilePathWatcherTest, InotifyLimitInUpdateRecursive) {
 
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 
 TEST_F(FilePathWatcherTest, ReturnFullPath_RecursiveInRootFolder) {
   FilePathWatcher directory_watcher;
@@ -1767,7 +1739,7 @@ TEST_F(FilePathWatcherTest, ReturnWatchedPath_NonRecursiveInRootFolder) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace {
 
@@ -1927,7 +1899,7 @@ TEST_F(FilePathWatcherTest, TrivialDirMove) {
 
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/40263777): Ideally most all of the tests above would be
 // parameterized in this way.
 // TODO(crbug.com/40260973): ChangeInfo is currently only supported by
@@ -1998,14 +1970,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, ModifiedFile) {
                      testing::Not(HasCookie())));
 
   ASSERT_TRUE(WriteFile(test_file(), "content"));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2056,14 +2020,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, MatchCookies) {
 
   ASSERT_TRUE(CreateDirectory(test_file()));
   ASSERT_TRUE(WriteFile(source_file, "content"));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2088,14 +2044,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DeletedFile) {
                      testing::Not(HasCookie())));
 
   ASSERT_TRUE(WriteFile(test_file(), "content"));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2113,14 +2061,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DeletedDirectory) {
       testing::Not(HasCookie())));
 
   ASSERT_TRUE(CreateDirectory(test_file()));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2244,14 +2184,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DisappearingDirectory) {
 
   ASSERT_TRUE(CreateDirectory(dir));
   ASSERT_TRUE(WriteFile(file, "content"));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2276,14 +2208,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DeleteAndRecreate) {
   const auto matcher = testing::AllOf(each_event_matcher, sequence_matcher);
 
   ASSERT_TRUE(WriteFile(test_file(), "content"));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2315,14 +2239,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, WatchDirectory) {
   const auto matcher = testing::AllOf(each_event_matcher, sequence_matcher);
 
   ASSERT_TRUE(CreateDirectory(dir));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2423,7 +2339,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, MoveChild) {
 
 // TODO(pauljensen): Re-enable when crbug.com/475568 is fixed and SetUp() places
 // the |temp_dir_| in /data.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(FilePathWatcherWithChangeInfoTest, FileAttributesChanged) {
   const auto matcher = testing::ElementsAre(
       testing::AllOf(HasPath(test_file()), testing::Not(HasErrored()), IsFile(),
@@ -2658,7 +2573,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, LinkedDirectoryPart3) {
   ASSERT_TRUE(DeleteFile(file));
   delegate.RunUntilEventsMatch(matcher);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_P(FilePathWatcherWithChangeInfoTest, CreatedFileInDirectory) {
   // Expect the change to be reported as a file creation, not as a
@@ -2695,21 +2609,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, ModifiedFileInDirectory) {
 
   ASSERT_TRUE(CreateDirectory(parent));
   ASSERT_TRUE(WriteFile(child, "contents"));
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40286767): There appears to be a race condition
-  // between setting up the inotify watch and the processing of the file system
-  // notifications created while setting up the file system for this test. Spin
-  // the event loop to ensure that the events have been processed by the time
-  // the inotify watch has been set up.
-  SpinEventLoopForABit();
-#endif  // BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
 
   FilePathWatcher watcher;
   TestDelegate delegate;
@@ -2928,6 +2827,6 @@ TEST_F(FilePathWatcherTest, UseDummyChangeInfoIfNotSupported) {
   delegate.RunUntilEventsMatch(matcher);
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace base

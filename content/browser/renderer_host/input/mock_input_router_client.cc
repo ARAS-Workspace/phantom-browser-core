@@ -132,11 +132,7 @@ bool MockInputRouterClient::ProgressFlingOnFlingStart() {
 }
 
 bool MockInputRouterClient::ShouldUseMobileFlingCurve() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif
 }
 
 gfx::Vector2dF MockInputRouterClient::GetPixelsPerInch(

@@ -199,11 +199,6 @@ TEST(ElfReaderTestWithCurrentElfImage, ReadElfBuildId) {
 }
 
 TEST(ElfReaderTestWithCurrentImage, ReadElfBuildId) {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android the library loader memory maps the full so file.
-  const char kLibraryName[] = "libbase_unittests__library";
-  const void* addr = &__executable_start;
-#else
   const char kLibraryName[] = MALLOC_WRAPPER_LIB;
   // On Linux the executable does not contain soname and is not mapped till
   // dynamic segment. So, use malloc wrapper so file on which the test already
@@ -221,7 +216,6 @@ TEST(ElfReaderTestWithCurrentImage, ReadElfBuildId) {
   int res = dladdr(init_addr, &info);
   ASSERT_NE(0, res);
   const void* addr = info.dli_fbase;
-#endif
 
   auto name = ReadElfLibraryName(addr);
   ASSERT_TRUE(name);
@@ -229,9 +223,7 @@ TEST(ElfReaderTestWithCurrentImage, ReadElfBuildId) {
       << "Library name " << *name << " doesn't contain expected "
       << kLibraryName;
 
-#if !BUILDFLAG(IS_ANDROID)
   UnloadNativeLibrary(library);
-#endif
 }
 
 }  // namespace base::debug

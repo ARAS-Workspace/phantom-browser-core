@@ -468,11 +468,7 @@ class PacLibraryTest : public testing::Test {
 // Tests for actual PacMyIpAddress() and PacMyIpAddressEx() (real socket
 // connections and DNS results rather than mocks)
 // https://crbug.com/407547495
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ActualPacMyIpAddress DISABLED_ActualPacMyIpAddress
-#else
 #define MAYBE_ActualPacMyIpAddress ActualPacMyIpAddress
-#endif
 TEST_F(PacLibraryTest, MAYBE_ActualPacMyIpAddress) {
   SetRealTest();
   auto my_ip_addresses = PacMyIpAddressForTest();
@@ -481,11 +477,7 @@ TEST_F(PacLibraryTest, MAYBE_ActualPacMyIpAddress) {
 }
 
 // https://crbug.com/407547495
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ActualPacMyIpAddressEx DISABLED_ActualPacMyIpAddressEx
-#else
 #define MAYBE_ActualPacMyIpAddressEx ActualPacMyIpAddressEx
-#endif
 TEST_F(PacLibraryTest, MAYBE_ActualPacMyIpAddressEx) {
   SetRealTest();
   auto my_ip_addresses = PacMyIpAddressExForTest();

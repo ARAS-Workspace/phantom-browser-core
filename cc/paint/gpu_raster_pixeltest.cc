@@ -68,10 +68,6 @@
 #include "ui/gfx/geometry/skia_conversions.h"
 #include "ui/gl/gl_implementation.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#endif
-
 namespace cc {
 namespace {
 
@@ -729,12 +725,7 @@ TEST_F(GpuRasterPixelTest, DrawImageWithTargetColorSpace) {
 
   auto actual = Raster(display_item_list, options);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android has slight differences in color.
-  FuzzyPixelOffByOneComparator comparator;
-#else
   ExactPixelComparator comparator;
-#endif
 
   ExpectEquals(actual, FILE_PATH_LITERAL("oop_image_target_color_space.png"),
                comparator);
@@ -1039,13 +1030,7 @@ TEST_F(GpuRasterPixelTest, DrawHdrImageWithMetadata) {
   constexpr gfx::Rect kRect(kSize);
   constexpr float kContentAvgNits = 100;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Allow large quantization error on Android.
-  // TODO(crbug.com/40238547): Ensure higher precision for HDR images.
-  constexpr float kEpsilon = 1 / 16.f;
-#else
   constexpr float kEpsilon = 1 / 32.f;
-#endif
 
   // Create `image` with 500 nits in PQ color space.
   const auto make_image = [&](float pixel_value) {
@@ -1217,15 +1202,7 @@ TEST_F(GpuRasterPixelTest, DrawImageWithSourceColorSpace) {
 
   auto actual = Raster(display_item_list, options);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android has slight differences in color.
-  auto comparator = FuzzyPixelComparator()
-                        .SetErrorPixelsPercentageLimit(100.0f)
-                        .SetAvgAbsErrorLimit(1.2f)
-                        .SetAbsErrorLimit(2);
-#else
   ExactPixelComparator comparator;
-#endif
 
   ExpectEquals(actual,
                FILE_PATH_LITERAL("oop_draw_image_source_color_space.png"),
@@ -1259,12 +1236,7 @@ TEST_F(GpuRasterPixelTest, DrawImageWithSourceAndTargetColorSpace) {
 
   auto actual = Raster(display_item_list, options);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android has slight differences in color.
-  FuzzyPixelOffByOneComparator comparator;
-#else
   ExactPixelComparator comparator;
-#endif
 
   ExpectEquals(actual, FILE_PATH_LITERAL("oop_draw_image_both_color_space.png"),
                comparator);
@@ -1299,12 +1271,7 @@ TEST_F(GpuRasterPixelTest, MAYBE_DrawImageReinterpretedAsSRGB) {
 
   auto actual = Raster(display_item_list, options);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android has slight differences in color.
-  FuzzyPixelOffByOneComparator comparator;
-#else
   ExactPixelComparator comparator;
-#endif
 
   ExpectEquals(actual, FILE_PATH_LITERAL("oop_image_target_color_space.png"),
                comparator);
@@ -2164,19 +2131,6 @@ class GpuRasterTextBlobPixelTest
     // and distinctly different from using the wrong glyph or text params.
     float error_pixels_percentage = 0.f;
     int max_abs_error = 0;
-#if BUILDFLAG(IS_ANDROID)
-    // The nexus5 and nexus5x bots are particularly susceptible to small changes
-    // when bilerping an image (not visible).
-    const int sdk = base::android::android_info::sdk_int();
-    if (sdk <= base::android::android_info::SDK_VERSION_MARSHMALLOW) {
-      error_pixels_percentage = 10.f;
-      max_abs_error = 20;
-    } else {
-      // Newer OSes occasionally have smaller flakes when using the real GPU
-      error_pixels_percentage = 1.5f;
-      max_abs_error = 2;
-    }
-#endif
     // Many platforms need very small tolerances under complex transforms,
     // and higher tolerances for perspective, since it triggers path rendering
     // for each glyph. Additionally, record filters require higher tolerance
@@ -2205,15 +2159,8 @@ class GpuRasterTextBlobPixelTest
           // differences as text spacing subtly varies between `expected` and
           // `actual`.
           error_pixels_percentage = std::max(19.0f, error_pixels_percentage);
-#if BUILDFLAG(IS_ANDROID)
-          // For some reason the text spacing is less consistent on Android
-          // causing larger average difference between pixels.
-          max_abs_error = std::max(237, max_abs_error);
-          avg_error = std::max(61.4f, avg_error);
-#else
           max_abs_error = std::max(229, max_abs_error);
           avg_error = std::max(40.2f, avg_error);
-#endif
           break;
         default:
           error_pixels_percentage = std::max(4.0f, error_pixels_percentage);
@@ -2780,7 +2727,6 @@ TEST_F(GpuRasterPixelTest, CopySharedImage) {
 }
 
 // The Android emulator does not support RED_8 or RG_88 texture formats.
-#if !BUILDFLAG(IS_ANDROID_EMULATOR)
 class GpuRasterYUVToRGBPixelTest
     : public GpuRasterPixelTest,
       public ::testing::WithParamInterface<gfx::ColorSpace> {
@@ -2952,7 +2898,6 @@ TEST_F(GpuRasterPixelTest, CopyNV12SharedImage) {
   dest_client_si->UpdateDestructionSyncToken(sync_token);
   y_uv_client_si->UpdateDestructionSyncToken(sync_token);
 }
-#endif  // !BUILDFLAG(IS_ANDROID_EMULATOR)
 
 class GpuRasterPathPixelTest : public GpuRasterPixelTest,
                                public ::testing::WithParamInterface<bool> {

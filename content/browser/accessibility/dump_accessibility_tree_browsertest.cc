@@ -35,11 +35,7 @@
 // Tests that use @DEFAULT_ACTION-ON to open a popup for an <input> (such as
 // color or date/time pickers) never complete on Android, where native pickers
 // are used. Because that UI is native, it is not necessary to pass those tests.
-#if BUILDFLAG(IS_ANDROID)
-#define NOT_ANDROID(x) DISABLED_##x
-#else
 #define NOT_ANDROID(x) x
-#endif
 
 namespace content {
 
@@ -135,17 +131,12 @@ void DumpAccessibilityTreeTest::ChooseFeatures(
   enabled_features->emplace_back(blink::features::kUserMediaElement);
   enabled_features->emplace_back(blink::features::kUserMediaElementLegacy);
   enabled_features->emplace_back(blink::features::kInstallElement);
-#if BUILDFLAG(IS_ANDROID)
-  disabled_features->emplace_back(
-      features::kAccessibilityPopulateSupplementalDescriptionApi);
-#endif  // BUILDFLAG(IS_ANDROID)
   DumpAccessibilityTestBase::ChooseFeatures(enabled_features,
                                             disabled_features);
 }
 
 class DumpAccessibilityTreeTestExceptUIA : public DumpAccessibilityTreeTest {};
 
-#if !BUILDFLAG(IS_ANDROID)
 // Material Design accessibility tests use third_party components.
 class DumpAccessibilityTreeWithMaterialDesignTest
     : public DumpAccessibilityTreeTest {
@@ -155,7 +146,6 @@ class DumpAccessibilityTreeWithMaterialDesignTest
     DumpAccessibilityTreeTest::SetUpOnMainThread();
   }
 };
-#endif
 
 // Parameterize the tests so that each test-pass is run independently.
 struct DumpAccessibilityTreeTestPassToString {
@@ -216,13 +206,11 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(DumpAccessibilityTestBase::TreeTestPasses()),
     DumpAccessibilityTreeTestPassToString());
 
-#if !BUILDFLAG(IS_ANDROID)
 INSTANTIATE_TEST_SUITE_P(
     All,
     DumpAccessibilityTreeWithMaterialDesignTest,
     ::testing::ValuesIn(DumpAccessibilityTestBase::TreeTestPasses()),
     DumpAccessibilityTreeTestPassToString());
-#endif
 
 INSTANTIATE_TEST_SUITE_P(
     All,
@@ -2173,11 +2161,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
 }
 
 // TODO(crbug.com/40943250): Fix failure on android
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AccessibilityAudio DISABLED_AccessibilityAudio
-#else
 #define MAYBE_AccessibilityAudio AccessibilityAudio
-#endif
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, MAYBE_AccessibilityAudio) {
   RunHtmlTest(FILE_PATH_LITERAL("audio.html"));
 }
@@ -3126,13 +3110,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
                        AccessibilityInputRadioCheckboxLabel) {
   RunHtmlTest(FILE_PATH_LITERAL("input-radio-checkbox-label.html"));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
-                       AccessibilityInputRadioSiblingWithSpan) {
-  RunHtmlTest(FILE_PATH_LITERAL("input-radio-sibling-with-span.html"));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
                        AccessibilityInputRadioChunked) {
@@ -4268,11 +4245,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
 }
 
 // TODO(crbug.com/40866942): This test is failing on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AccessibilityNoSourceVideo DISABLED_AccessibilityNoSourceVideo
-#else
 #define MAYBE_AccessibilityNoSourceVideo AccessibilityNoSourceVideo
-#endif  // BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
                        MAYBE_AccessibilityNoSourceVideo) {
 #if BUILDFLAG(IS_MAC)
@@ -4834,7 +4807,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
   RunCSSTest(FILE_PATH_LITERAL("interactivity-inert.html"));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeWithMaterialDesignTest,
                        MaterialDesignButtons) {
   RunMaterialDesignTest(FILE_PATH_LITERAL("buttons.html"));
@@ -4940,7 +4912,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeWithMaterialDesignTest,
   RunMaterialDesignTest(FILE_PATH_LITERAL("version-info.html"));
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID)
 class DumpAccessibilityTreeWithCarouselTest : public DumpAccessibilityTreeTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     DumpAccessibilityTreeTest::SetUpCommandLine(command_line);

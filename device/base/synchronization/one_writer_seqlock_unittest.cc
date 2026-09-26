@@ -97,11 +97,7 @@ class MaxRetriesSeqLockTestThread : public base::PlatformThread::Delegate {
   raw_ptr<std::atomic<int>> ready_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ManyThreads FLAKY_ManyThreads
-#else
 #define MAYBE_ManyThreads ManyThreads
-#endif
 TEST(OneWriterSeqLockTest, MAYBE_ManyThreads) {
   OneWriterSeqLock seqlock;
   TestData data;

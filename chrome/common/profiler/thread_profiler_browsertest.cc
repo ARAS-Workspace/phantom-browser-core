@@ -150,13 +150,7 @@ bool WaitForProfile(metrics::SampledProfile::TriggerEvent trigger_event,
 
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARMEL)
-// Android doesn't have a network service process.
-#define MAYBE_NetworkServiceProcessIOThread \
-  DISABLED_NetworkServiceProcessIOThread
-#else
 #define MAYBE_NetworkServiceProcessIOThread NetworkServiceProcessIOThread
-#endif
 
 // Check that we receive startup profiles in the browser process for profiled
 // processes/threads. We've seen multiple breakages previously where profiles

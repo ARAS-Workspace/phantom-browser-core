@@ -169,11 +169,7 @@ bool MaySendTraffic() {
     // Use a fixed state for benchmarking.
     if (base::CommandLine::ForCurrentProcess()->HasSwitch(
             ::switches::kEnableBenchmarking)) {
-#if BUILDFLAG(IS_ANDROID)
-      return true;
-#else
       return false;
-#endif
     }
 
     int enabled_percent =

@@ -22,13 +22,8 @@
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/grit/branded_strings.h"
-#include "ui/base/l10n/l10n_util.h"
-#else
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"  // nogncheck
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_page_handler.h"  // nogncheck
-#endif
 
 namespace customize_chrome {
 
@@ -84,15 +79,9 @@ void SidePanelControllerBase::OnEntryWillHide(SidePanelEntry* entry,
 }
 
 bool SidePanelControllerBase::CanShowOnURL(const GURL& url) const {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/507919199): CustomizeChromePageHandler is not compiled on
-  // Android, so its support check is not available here yet.
-  return true;
-#else
   Profile* const profile = tab_->GetProfile();
   return CustomizeChromePageHandler::IsSupported(
       NtpCustomBackgroundServiceFactory::GetForProfile(profile), profile);
-#endif
 }
 
 void SidePanelControllerBase::DidFinishNavigation(
@@ -131,11 +120,6 @@ void SidePanelControllerBase::CreateAndRegisterEntry() {
       base::BindRepeating(&SidePanelControllerBase::CreateCustomizeChromeView,
                           base::Unretained(this)),
       /*default_content_width_callback=*/base::NullCallback());
-#if BUILDFLAG(IS_ANDROID)
-  entry->SetProperty(
-      kSidePanelTitleKey,
-      l10n_util::GetStringUTF16(IDS_SIDE_PANEL_CUSTOMIZE_CHROME_TITLE));
-#endif
   entry->AddObserver(this);
   registry->Register(std::move(entry));
 }

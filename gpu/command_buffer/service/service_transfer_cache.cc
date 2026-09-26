@@ -37,35 +37,22 @@ constexpr base::TimeDelta kOldEntryCutoffTimeDelta = base::Seconds(25);
 constexpr base::TimeDelta kOldEntryPruneInterval = base::Seconds(30);
 
 size_t DiscardableCacheSizeLimit() {
-// Cache size values are designed to roughly correspond to existing image cache
-// sizes for 1-1.5 renderers. These will be updated as more types of data are
-// moved to this cache.
-#if BUILDFLAG(IS_ANDROID)
-  const size_t kLowEndCacheSizeBytes = 1024 * 1024;
-  const size_t kNormalCacheSizeBytes = 128 * 1024 * 1024;
-#else
+  // Cache size values are designed to roughly correspond to existing image
+  // cache sizes for 1-1.5 renderers. These will be updated as more types of
+  // data are moved to this cache.
   const size_t kNormalCacheSizeBytes = 192 * 1024 * 1024;
   const size_t kLargeCacheSizeBytes = 256 * 1024 * 1024;
   // Device ram threshold at which we move from a normal cache to a large cache.
   // While this is a GPU memory cache, we can't read GPU memory reliably, so we
   // use system ram as a proxy.
   constexpr base::ByteSize kLargeCacheSizeMemoryThreshold = base::GiBU(4);
-#endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::SysInfo::IsLowEndDevice()) {
-    return kLowEndCacheSizeBytes;
-  } else {
-    return kNormalCacheSizeBytes;
-  }
-#else
   if (base::SysInfo::AmountOfTotalPhysicalMemory() <
       kLargeCacheSizeMemoryThreshold) {
     return kNormalCacheSizeBytes;
   } else {
     return kLargeCacheSizeBytes;
   }
-#endif
 }
 
 size_t DiscardableCacheSizeLimitForPressure(

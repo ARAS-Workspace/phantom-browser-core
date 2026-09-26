@@ -37,10 +37,6 @@
 #include <sys/utsname.h>
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace embedder_support {
 
 namespace {
@@ -123,34 +119,6 @@ void CheckUserAgentStringOrdering(bool mobile_device) {
   ASSERT_EQ(2u, pieces.size());
   ASSERT_EQ("Linux", pieces[0]);
   ASSERT_EQ("x86_64", pieces[1]);
-#elif BUILDFLAG(IS_ANDROID)
-  // Post-UA Reduction there is a single <unifiedPlatform> value for Android:
-  // Linux; Android 10; K
-  ASSERT_GE(3u, pieces.size());
-  ASSERT_EQ("Linux", pieces[0]);
-  std::string model;
-  if (pieces.size() > 2)
-    model = pieces[2];
-
-  pieces = base::SplitStringUsingSubstr(pieces[1], " ", base::KEEP_WHITESPACE,
-                                        base::SPLIT_WANT_ALL);
-  ASSERT_EQ(2u, pieces.size());
-  ASSERT_EQ("Android", pieces[0]);
-  ASSERT_EQ("10", pieces[1]);
-  pieces = base::SplitStringUsingSubstr(pieces[1], ".", base::KEEP_WHITESPACE,
-                                        base::SPLIT_WANT_ALL);
-  for (unsigned int i = 1; i < pieces.size(); ++i) {
-    int value;
-    ASSERT_TRUE(base::StringToInt(pieces[i], &value));
-  }
-
-  if (!model.empty()) {
-    if (base::SysInfo::GetAndroidBuildCodename() == "REL") {
-      ASSERT_EQ("K", model);
-    } else {
-      ASSERT_EQ("", model);
-    }
-  }
 #else
 #error Unsupported platform
 #endif
@@ -198,8 +166,6 @@ class UserAgentUtilsTest : public testing::Test,
         "X11; Linux x86_64";
 #elif BUILDFLAG(IS_MAC)
         "Macintosh; Intel Mac OS X 10_15_7";
-#elif BUILDFLAG(IS_ANDROID)
-        "Linux; Android 10; K";
 #else
 #error Unsupported platform
 #endif
@@ -249,21 +215,7 @@ class UserAgentUtilsTest : public testing::Test,
 };
 
 TEST_F(UserAgentUtilsTest, UserAgentStringOrdering) {
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedCommandLine scoped_command_line;
-  base::CommandLine* command_line = scoped_command_line.GetProcessCommandLine();
-
-  // Do it for regular devices.
-  ASSERT_FALSE(command_line->HasSwitch(kUseMobileUserAgent));
   CheckUserAgentStringOrdering(false);
-
-  // Do it for mobile devices.
-  command_line->AppendSwitch(kUseMobileUserAgent);
-  ASSERT_TRUE(command_line->HasSwitch(kUseMobileUserAgent));
-  CheckUserAgentStringOrdering(true);
-#else
-  CheckUserAgentStringOrdering(false);
-#endif
 }
 
 TEST_F(UserAgentUtilsTest, CustomUserAgent) {
@@ -319,25 +271,7 @@ TEST_F(UserAgentUtilsTest, UserAgentStringReduced) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeature(
       blink::features::kReduceUserAgentMinorVersion);
-#if BUILDFLAG(IS_ANDROID)
-  // Verify the correct user agent is returned when the UseMobileUserAgent
-  // command line flag is present.
-  base::test::ScopedCommandLine scoped_command_line;
-  base::CommandLine* command_line = scoped_command_line.GetProcessCommandLine();
-
-  // Verify the mobile user agent string is not returned when not using a mobile
-  // user agent.
-  ASSERT_FALSE(command_line->HasSwitch(kUseMobileUserAgent));
   EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent());
-
-  // Verify the mobile user agent string is returned when using a mobile user
-  // agent.
-  command_line->AppendSwitch(kUseMobileUserAgent);
-  ASSERT_TRUE(command_line->HasSwitch(kUseMobileUserAgent));
-  EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent(kMobileProductSuffix));
-#else
-  EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent());
-#endif
 }
 
 TEST_F(UserAgentUtilsTest, UserAgentStringFull) {
@@ -370,28 +304,6 @@ TEST_F(UserAgentUtilsTest, ReduceUserAgentPlatformOsCpu) {
   base::test::ScopedCommandLine scoped_command_line;
   base::CommandLine* command_line = scoped_command_line.GetProcessCommandLine();
 
-#if BUILDFLAG(IS_ANDROID)
-  scoped_feature_list.Reset();
-  scoped_feature_list.InitWithFeatures(
-      {blink::features::kReduceUserAgentMinorVersion}, {});
-  // Verify the mobile platform and oscpu user agent string is reduced when
-  // not using a mobile user agent.
-  ASSERT_FALSE(command_line->HasSwitch(kUseMobileUserAgent));
-  {
-    EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent());
-    EXPECT_EQ(GetUnifiedPlatformForTesting().c_str(),
-              GetUserAgentPlatformOsCpu(GetUserAgent()));
-  }
-
-  // Verify the mobile platform and oscpu user agent string is reduced when
-  // using a mobile user agent (but still on Android)
-  command_line->AppendSwitch(kUseMobileUserAgent);
-  ASSERT_TRUE(command_line->HasSwitch(kUseMobileUserAgent));
-  {
-    EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent(kMobileProductSuffix));
-  }
-
-#else
   scoped_feature_list.Reset();
   scoped_feature_list.InitWithFeatures(
       {blink::features::kReduceUserAgentMinorVersion}, {});
@@ -401,8 +313,6 @@ TEST_F(UserAgentUtilsTest, ReduceUserAgentPlatformOsCpu) {
     EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent());
   }
 
-#endif
-
   // Verify we reduce platform and oscpu
   scoped_feature_list.Reset();
   scoped_feature_list.InitWithFeatures(
@@ -410,37 +320,6 @@ TEST_F(UserAgentUtilsTest, ReduceUserAgentPlatformOsCpu) {
   EXPECT_EQ(GetUnifiedPlatformForTesting().c_str(),
             GetUserAgentPlatformOsCpu(GetUserAgent()));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(UserAgentUtilsTest, ReduceUserAgentAndroidVersionDeviceModel) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {blink::features::kReduceUserAgentMinorVersion}, {});
-  // Verify the correct user agent is returned when the UseMobileUserAgent
-  // command line flag is present.
-  base::test::ScopedCommandLine scoped_command_line;
-  base::CommandLine* command_line = scoped_command_line.GetProcessCommandLine();
-
-  // Verify the mobile deviceModel and androidVersion in the user agent string
-  // is reduced when not using a mobile user agent.
-  ASSERT_FALSE(command_line->HasSwitch(kUseMobileUserAgent));
-  {
-    std::string buffer = GetUserAgent();
-    EXPECT_EQ("Linux; Android 10; K", GetUserAgentPlatformOsCpu(buffer));
-    EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent());
-  }
-
-  // Verify the mobile deviceModel and androidVersion in the user agent string
-  // is reduced when using a mobile user agent.
-  command_line->AppendSwitch(kUseMobileUserAgent);
-  ASSERT_TRUE(command_line->HasSwitch(kUseMobileUserAgent));
-  {
-    std::string buffer = GetUserAgent();
-    EXPECT_EQ("Linux; Android 10; K", GetUserAgentPlatformOsCpu(buffer));
-    EXPECT_EQ(GetUserAgent(), GenerateExpectedUserAgent(kMobileProductSuffix));
-  }
-}
-#endif
 
 TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   auto metadata = GetUserAgentMetadata();
@@ -490,8 +369,6 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   // breaking client hints. Check with the code owners for further guidance.
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ(metadata.platform, "macOS");
-#elif BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(metadata.platform, "Android");
 #elif BUILDFLAG(IS_LINUX)
   EXPECT_EQ(metadata.platform, "Linux");
 #elif BUILDFLAG(IS_FREEBSD)
@@ -521,66 +398,6 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   EXPECT_TRUE(metadata.brand_full_version_list.empty());
   EXPECT_TRUE(metadata.full_version.empty());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(UserAgentUtilsTest, UserAgentMetadataForXrDevice) {
-  if (base::android::device_info::is_automotive()) {
-    GTEST_SKIP() << "This test should not run on automotive.";
-  }
-
-  base::android::device_info::set_is_xr_for_testing();
-  EXPECT_EQ(base::android::device_info::is_xr(), true);
-
-  // By default (flag disabled), it should return Linux.
-  EXPECT_EQ(GetUnifiedPlatformForTesting(), "X11; Linux x86_64");
-
-  auto metadata = GetUserAgentMetadata();
-  EXPECT_EQ(metadata.platform, "Linux");
-
-  // Enable the flag to spoof as ChromeOS.
-  {
-    base::test::ScopedFeatureList feature_list;
-    feature_list.InitAndEnableFeature(
-        blink::features::kAndroidDesktopUASpoofAsChromeOS);
-
-    // Get unified platform of the user-agent on xr device.
-    EXPECT_EQ(GetUnifiedPlatformForTesting(), "X11; CrOS x86_64 14541.0.0");
-
-    auto metadata_cros = GetUserAgentMetadata();
-    EXPECT_EQ(metadata_cros.platform, "Chrome OS");
-  }
-
-  // Verify the XR specific info set.
-  // TODO(crbug.com/433345971) The user agent string should contain the actual
-  // cpu type information obtained from the Android device.
-  EXPECT_EQ(metadata.architecture, "x86");
-  EXPECT_EQ(metadata.bitness, "64");
-  EXPECT_EQ(metadata.mobile, false);
-  EXPECT_EQ(metadata.platform_version, "");
-
-  // Verify user-agent client-hints form-factors
-  std::vector<std::string> expected_form_factors = {"Desktop", "XR"};
-  EXPECT_EQ(metadata.form_factors, expected_form_factors);
-
-  // The kAndroidDesktopUAPlatform changes XR devices platform client hint to
-  // Android, and reports the real OS version instead of an empty platform
-  // version.
-  {
-    base::test::ScopedFeatureList feature_list;
-    feature_list.InitAndEnableFeature(
-        blink::features::kAndroidDesktopUAPlatform);
-    auto metadata_with_feature = GetUserAgentMetadata();
-    EXPECT_EQ(metadata_with_feature.platform, "Android");
-    int32_t major, minor, bugfix = 0;
-    base::SysInfo::OperatingSystemVersionNumbers(&major, &minor, &bugfix);
-    EXPECT_EQ(metadata_with_feature.platform_version,
-              base::StringPrintf("%d.%d.%d", major, minor, bugfix));
-  }
-
-  // Restore the device info.
-  base::android::device_info::reset_is_xr_for_testing();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(UserAgentUtilsTest, GenerateBrandVersionListUnbranded) {
   blink::UserAgentMetadata metadata;
@@ -909,24 +726,6 @@ TEST_F(UserAgentUtilsTest, BuildOSCpuInfoFromOSVersionAndCpuType) {
         /*cpu_type=*/"CPU TYPE",
         /*expected_os_cpu_info=*/"CPU TYPE Mac OS X VERSION",
     },
-#elif BUILDFLAG(IS_ANDROID)
-    {
-        /*os_version=*/"7.1.1",
-        /*cpu_type=*/"UNUSED",
-        /*expected_os_cpu_info=*/"Android 7.1.1",
-    },
-    // These cases should never happen in real life, but may be useful to detect
-    // changes when things are refactored.
-    {
-        /*os_version=*/"",
-        /*cpu_type=*/"",
-        /*expected_os_cpu_info=*/"Android ",
-    },
-    {
-        /*os_version=*/"VERSION",
-        /*cpu_type=*/"CPU TYPE",
-        /*expected_os_cpu_info=*/"Android VERSION",
-    },
 #endif
   };
   // clang-format on
@@ -941,9 +740,7 @@ TEST_F(UserAgentUtilsTest, BuildOSCpuInfoFromOSVersionAndCpuType) {
 TEST_F(UserAgentUtilsTest, GetCpuArchitecture) {
   std::string arch = GetCpuArchitecture();
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ("", arch);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE("arm" == arch || "x86" == arch);
 #else
 #error Unsupported platform
@@ -953,9 +750,7 @@ TEST_F(UserAgentUtilsTest, GetCpuArchitecture) {
 TEST_F(UserAgentUtilsTest, GetCpuBitness) {
   std::string bitness = GetCpuBitness();
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ("", bitness);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE("32" == bitness || "64" == bitness);
 #else
 #error Unsupported platform

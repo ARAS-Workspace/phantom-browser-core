@@ -13,9 +13,7 @@
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "content/public/browser/web_contents.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/vector_icon_types.h"
-#endif
 
 namespace permissions {
 namespace {
@@ -73,11 +71,7 @@ void PermissionsClient::GetUkmSourceId(
 }
 
 IconId PermissionsClient::GetOverrideIconId(RequestType request_type) {
-#if BUILDFLAG(IS_ANDROID)
-  return 0;
-#else
   return gfx::VectorIcon::EmptyIcon();
-#endif
 }
 
 std::vector<std::unique_ptr<PermissionUiSelector>>
@@ -189,40 +183,11 @@ permissions::PermissionIgnoredReason PermissionsClient::DetermineIgnoreReason(
   return permissions::PermissionIgnoredReason::UNKNOWN;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool PermissionsClient::IsDseOrigin(content::BrowserContext* browser_context,
-                                    const url::Origin& origin) {
-  return false;
-}
-
-std::unique_ptr<PermissionsClient::PermissionMessageDelegate>
-PermissionsClient::MaybeCreateMessageUI(
-    content::WebContents* web_contents,
-    const PermissionRequest& request,
-    base::WeakPtr<PermissionPromptAndroid> prompt) {
-  return nullptr;
-}
-
-void PermissionsClient::RepromptForAndroidPermissions(
-    content::WebContents* web_contents,
-    const std::vector<ContentSettingsType>& content_settings_types,
-    const std::vector<ContentSettingsType>& filtered_content_settings_types,
-    const std::vector<std::string>& required_permissions,
-    const std::vector<std::string>& optional_permissions,
-    PermissionsUpdatedCallback callback) {
-  std::move(callback).Run(false);
-}
-
-int PermissionsClient::MapToJavaDrawableId(int resource_id) {
-  return 0;
-}
-#else
 std::unique_ptr<PermissionPrompt> PermissionsClient::CreatePrompt(
     content::WebContents* web_contents,
     PermissionPrompt::Delegate* delegate) {
   return nullptr;
 }
-#endif
 
 std::unique_ptr<EmbeddedPermissionPromptFlowModel::PromptContentScrim>
 PermissionsClient::CreatePromptContentScrim(

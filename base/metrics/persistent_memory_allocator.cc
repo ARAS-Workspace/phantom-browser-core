@@ -31,9 +31,6 @@
 
 #if BUILDFLAG(IS_POSIX)
 #include <sys/mman.h>
-#if BUILDFLAG(IS_ANDROID)
-#include <sys/prctl.h>
-#endif
 #endif
 
 #define PMA "PMA-DBG"
@@ -1084,13 +1081,6 @@ LocalPersistentMemoryAllocator::AllocateLocalMemory(size_t size,
   address = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED,
                    -1, 0);
   if (address != MAP_FAILED) {
-#if BUILDFLAG(IS_ANDROID)
-    // Allow the anonymous memory region allocated by mmap(MAP_ANON) to be
-    // identified in /proc/$PID/smaps.  This helps improve visibility into
-    // Chrome's memory usage on Android.
-    const std::string arena_name = base::StrCat({"persistent:", name});
-    prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, address, size, arena_name.c_str());
-#endif
     return Memory(address, MEM_VIRTUAL);
   }
 #else

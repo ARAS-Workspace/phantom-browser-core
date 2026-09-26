@@ -56,11 +56,6 @@
 #include "third_party/blink/public/mojom/permissions/permission.mojom.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/permissions/contexts/geolocation_permission_context_android.h"
-#include "components/prefs/pref_service.h"
-#endif
-
 // This file contains tests for PermissionContextBase,
 // ContentSettingPermissionContextBase and GeolocationPermissionContext.
 
@@ -69,11 +64,7 @@ namespace permissions {
 // We can't use content_settings::GeolocationContentSettingsType() because this
 // must be constexpr.
 constexpr ContentSettingsType kGeolocationContentSettingsType =
-#if BUILDFLAG(IS_ANDROID)
-    ContentSettingsType::GEOLOCATION_WITH_OPTIONS;
-#else
     ContentSettingsType::GEOLOCATION;
-#endif
 
 using PermissionStatus = blink::mojom::PermissionStatus;
 
@@ -104,33 +95,13 @@ class TestGeolocationPermissionContextDelegate
     : public GeolocationPermissionContext::Delegate {
  public:
   explicit TestGeolocationPermissionContextDelegate(
-      content::BrowserContext* browser_context) {
-#if BUILDFLAG(IS_ANDROID)
-    GeolocationPermissionContextAndroid::RegisterProfilePrefs(
-        prefs_.registry());
-#endif
-  }
+      content::BrowserContext* browser_context) {}
 
   bool DecidePermission(const PermissionRequestData& request_data,
                         BrowserPermissionCallback* callback,
                         GeolocationPermissionContext* context) override {
     return false;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  bool IsInteractable(content::WebContents* web_contents) override {
-    return true;
-  }
-
-  PrefService* GetPrefs(content::BrowserContext* browser_context) override {
-    return &prefs_;
-  }
-
-  bool IsRequestingOriginDSE(content::BrowserContext* browser_context,
-                             const GURL& requesting_origin) override {
-    return false;
-  }
-#endif
 
  private:
   TestingPrefServiceSimple prefs_;
@@ -142,23 +113,11 @@ template <typename T>
 class TestPermissionContext : public T {
  public:
   TestPermissionContext(content::BrowserContext* browser_context,
-                        const ContentSettingsType content_settings_type
-#if BUILDFLAG(IS_ANDROID)
-                        ,
-                        bool enabled_app_level_notification_permission
-#endif  // BUILDFLAG(IS_ANDROID)
-                        )
+                        const ContentSettingsType content_settings_type)
     requires(std::is_same_v<T, ContentSettingPermissionContextBase>)
       : T(browser_context,
           content_settings_type,
-          network::mojom::PermissionsPolicyFeature::kNotFound) {
-#if BUILDFLAG(IS_ANDROID)
-    if (content_settings_type == ContentSettingsType::NOTIFICATIONS) {
-      this->enabled_app_level_notification_permission_for_testing_ =
-          enabled_app_level_notification_permission;
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
-  }
+          network::mojom::PermissionsPolicyFeature::kNotFound) {}
   TestPermissionContext(
       content::BrowserContext* browser_context,
       std::unique_ptr<GeolocationPermissionContext::Delegate> delegate)
@@ -278,37 +237,19 @@ class PermissionContextBaseTests : public content::RenderViewHostTestHarness {
 
  protected:
   PermissionContextBaseTests() {
-#if BUILDFLAG(IS_ANDROID)
-    scoped_feature_list_.InitAndEnableFeature(
-        content_settings::features::kApproximateGeolocationPermission);
-#else
     scoped_feature_list_.InitAndDisableFeature(
         content_settings::features::kApproximateGeolocationPermission);
-#endif
   }
   ~PermissionContextBaseTests() override = default;
 
   template <ContentSettingsType content_settings_type>
-  auto CreateTestPermissionContext(
-#if BUILDFLAG(IS_ANDROID)
-      bool enable_app_level_notification_permission = true
-#endif
-  ) {
+  auto CreateTestPermissionContext() {
     return TestPermissionContext<ContentSettingPermissionContextBase>(
-        browser_context(), content_settings_type
-#if BUILDFLAG(IS_ANDROID)
-        ,
-        enable_app_level_notification_permission
-#endif
-    );
+        browser_context(), content_settings_type);
   }
   template <>
   auto
-  CreateTestPermissionContext<ContentSettingsType::GEOLOCATION_WITH_OPTIONS>(
-#if BUILDFLAG(IS_ANDROID)
-      bool enable_app_level_notification_permission
-#endif
-  ) {
+  CreateTestPermissionContext<ContentSettingsType::GEOLOCATION_WITH_OPTIONS>() {
     return TestPermissionContext<GeolocationPermissionContext>(
         browser_context(),
         std::make_unique<TestGeolocationPermissionContextDelegate>(
@@ -415,15 +356,9 @@ class PermissionContextBaseTests : public content::RenderViewHostTestHarness {
           "Permissions.Prompt." + decision_string + ".PriorIgnoreCount2." +
               PermissionUtil::GetPermissionString(content_settings_type),
           0, 1);
-#if BUILDFLAG(IS_ANDROID)
-      histograms.ExpectUniqueSample(
-          "Permissions.Action.WithDisposition.ModalDialog",
-          static_cast<int>(action.value()), 1);
-#else
       histograms.ExpectUniqueSample(
           "Permissions.Action.WithDisposition.AnchoredBubble",
           static_cast<int>(action.value()), 1);
-#endif
     }
 
     const content_settings::PermissionSettingsInfo* info =
@@ -459,15 +394,9 @@ class PermissionContextBaseTests : public content::RenderViewHostTestHarness {
       EXPECT_EQ(*ukm_recorder.GetEntryMetric(entry, "Action"),
                 static_cast<int64_t>(action.value()));
 
-#if BUILDFLAG(IS_ANDROID)
-      EXPECT_EQ(
-          *ukm_recorder.GetEntryMetric(entry, "PromptDisposition"),
-          static_cast<int64_t>(PermissionPromptDisposition::MODAL_DIALOG));
-#else
       EXPECT_EQ(
           *ukm_recorder.GetEntryMetric(entry, "PromptDisposition"),
           static_cast<int64_t>(PermissionPromptDisposition::ANCHORED_BUBBLE));
-#endif
     }
   }
 
@@ -1069,17 +998,8 @@ TEST_F(PermissionContextBaseTests, TestGrantAndRevoke) {
       blink::PermissionType::GEOLOCATION, CONTENT_SETTING_ASK);
   TestGrantAndRevoke_TestContent<ContentSettingsType::MIDI_SYSEX>(
       blink::PermissionType::MIDI_SYSEX, CONTENT_SETTING_ASK);
-#if BUILDFLAG(IS_ANDROID)
-  TestGrantAndRevoke_TestContent<
-      ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER>(
-      blink::PermissionType::PROTECTED_MEDIA_IDENTIFIER, CONTENT_SETTING_ASK);
-  // TODO(timvolodine): currently no test for
-  // ContentSettingsType::NOTIFICATIONS because notification permissions work
-  // differently with infobars as compared to bubbles (crbug.com/453784).
-#else
   TestGrantAndRevoke_TestContent<ContentSettingsType::NOTIFICATIONS>(
       blink::PermissionType::NOTIFICATIONS, CONTENT_SETTING_ASK);
-#endif
 }
 
 // Tests the global kill switch by enabling/disabling the Field Trials.
@@ -1088,10 +1008,6 @@ TEST_F(PermissionContextBaseTests, TestGlobalKillSwitch) {
   TestGlobalPermissionsKillSwitch<ContentSettingsType::NOTIFICATIONS>();
   TestGlobalPermissionsKillSwitch<ContentSettingsType::MIDI_SYSEX>();
   TestGlobalPermissionsKillSwitch<ContentSettingsType::PERSISTENT_STORAGE>();
-#if BUILDFLAG(IS_ANDROID)
-  TestGlobalPermissionsKillSwitch<
-      ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER>();
-#endif
   TestGlobalPermissionsKillSwitch<ContentSettingsType::MEDIASTREAM_MIC>();
   TestGlobalPermissionsKillSwitch<ContentSettingsType::MEDIASTREAM_CAMERA>();
 }
@@ -1188,56 +1104,6 @@ TEST_F(PermissionContextBaseTests, TestVirtualURLSameOrigin) {
                  content::PermissionStatusSource::UNSPECIFIED);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(PermissionContextBaseTests,
-       NotificationPermissionDeniedIfNoAppLevelSettings) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      features::kReturnDeniedForNotificationsWhenNoAppLevelSettings);
-  base::HistogramTester histograms;
-  auto permission_context = CreateTestPermissionContext<
-      ContentSettingsType::
-          NOTIFICATIONS>(/*enable_app_level_notification_permission=*/
-                         false);
-  GURL url("https://example.test");
-  controller().LoadURL(url, content::Referrer(), ui::PAGE_TRANSITION_TYPED,
-                       std::string());
-
-  const PermissionRequestID id(
-      web_contents()->GetPrimaryMainFrame()->GetGlobalId(),
-      PermissionRequestID::RequestLocalId());
-
-  auto request_data = std::make_unique<PermissionRequestData>(
-      content::PermissionDescriptorUtil::
-          CreatePermissionDescriptorForPermissionType(
-              permissions::PermissionUtil::ContentSettingsTypeToPermissionType(
-                  ContentSettingsType::NOTIFICATIONS)),
-      id,
-      /*user_gesture=*/
-      true, url);
-  EXPECT_EQ(permission_context.GetPermissionStatus(
-                *request_data, web_contents()->GetPrimaryMainFrame()),
-            content::PermissionResult(
-                content::PermissionStatus::DENIED,
-                content::PermissionStatusSource::APP_LEVEL_SETTINGS));
-
-  permission_context.RequestPermission(
-      std::move(request_data),
-      base::BindOnce(&decltype(permission_context)::TrackPermissionDecision,
-                     base::Unretained(&permission_context)));
-
-  ASSERT_EQ(permission_context.permission_statuses().size(), 1u);
-  EXPECT_EQ(permission_context.permission_statuses()[0],
-            content::PermissionStatus::DENIED);
-  EXPECT_TRUE(permission_context.tab_context_updated());
-  EXPECT_EQ(PermissionSetting(CONTENT_SETTING_ASK),
-            permission_context.GetPermissionSettingFromMap(url, url));
-  histograms.ExpectUniqueSample(
-      "Permissions.Status.Notifications.EnabledAppLevel", false, 2);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PermissionContextBaseTests, ExpirationAllow) {
   base::Time now = base::Time::Now();
   TestAskAndDecide_TestContent<kGeolocationContentSettingsType>(
@@ -1273,7 +1139,5 @@ TEST_F(PermissionContextBaseTests, ExpirationBlock) {
   // last_visited is not set for BLOCKed permissions.
   EXPECT_EQ(base::Time(), info.metadata.last_visited());
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace permissions

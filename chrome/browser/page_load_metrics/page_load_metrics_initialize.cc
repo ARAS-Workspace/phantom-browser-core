@@ -15,14 +15,12 @@
 #include "chrome/browser/browser_process.h"
 #include "components/page_load_metrics/browser/observers/core/uma_page_load_metrics_observer.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/restore_type.h"
-#endif
 #include "chrome/browser/heavy_ad_intervention/heavy_ad_service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/page_load_metrics/observers/bookmark_bar_page_load_metrics_observer.h"
@@ -83,11 +81,6 @@
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/page_load_metrics/observers/android_page_load_metrics_observer.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/page_load_metrics/observers/initial_webui_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/non_tab_webui_page_load_metrics_observer.h"
 #include "chrome/browser/page_load_metrics/observers/top_chrome_webui_metrics_observer.h"
@@ -96,7 +89,6 @@
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_webui_config.h"
 #include "chrome/common/webui_url_constants.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/page_load_metrics/observers/serp_page_load_metrics_observer.h"
@@ -104,7 +96,6 @@
 #endif
 
 namespace {
-#if !BUILDFLAG(IS_ANDROID)
 bool IsNonTabWebUI(content::BrowserContext* browser_context, const GURL& url) {
   return TopChromeWebUIConfig::From(browser_context, url) != nullptr;
 }
@@ -114,11 +105,6 @@ std::string_view GetNonTabWebUIName(content::BrowserContext* browser_context,
   CHECK(IsNonTabWebUI(browser_context, url));
   return TopChromeWebUIConfig::From(browser_context, url)->GetWebUIName();
 }
-#else
-bool IsNonTabWebUI(content::BrowserContext* browser_context, const GURL& url) {
-  return false;
-}
-#endif
 
 std::string GetApplicationLocale() {
   return g_browser_process->GetApplicationLocale();
@@ -173,16 +159,13 @@ void PageLoadMetricsEmbedder::RegisterObservers(
     tracker->AddObserver(std::make_unique<WebUIPageLoadMetricsObserver>());
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   if (HasWebUIConfig(navigation_handle->GetURL()) &&
       waap::IsForInitialWebUI(navigation_handle->GetURL()) &&
       waap::IsInitialWebUIMetricsLoggingEnabled()) {
     tracker->AddObserver(
         std::make_unique<InitialWebUIPageLoadMetricsObserver>());
   }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
   if (IsNonTabWebUI(navigation_handle->GetURL())) {
     // This embedder is for a non-tab chrome:// page.
     tracker->AddObserver(std::make_unique<NonTabPageLoadMetricsObserver>(
@@ -195,7 +178,6 @@ void PageLoadMetricsEmbedder::RegisterObservers(
     }
     return;
   }
-#endif
 
   if (IsNewTabPageUrl(navigation_handle->GetURL())) {
     tracker->AddObserver(std::make_unique<NewTabPagePageLoadMetricsObserver>());
@@ -265,9 +247,6 @@ void PageLoadMetricsEmbedder::RegisterObservers(
       tracker->AddObserver(std::move(ukm_observer));
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    tracker->AddObserver(std::make_unique<AndroidPageLoadMetricsObserver>());
-#endif  // BUILDFLAG(IS_ANDROID)
     std::unique_ptr<page_load_metrics::PageLoadMetricsObserver>
         loading_predictor_observer =
             LoadingPredictorPageLoadMetricsObserver::CreateIfNeeded(
@@ -299,12 +278,10 @@ void PageLoadMetricsEmbedder::RegisterObservers(
       std::make_unique<PageAnchorsMetricsObserver>(tracker->GetWebContents()));
   tracker->AddObserver(std::make_unique<ZstdPageLoadMetricsObserver>());
 
-#if !BUILDFLAG(IS_ANDROID)
   if (features::IsImmersiveReadAnythingEnabled()) {
     tracker->AddObserver(
         std::make_unique<ReadAnythingSoftNavigationObserver>());
   }
-#endif
 
   tracker->AddObserver(std::make_unique<CaptchaMetricsObserver>());
 }
@@ -312,9 +289,6 @@ void PageLoadMetricsEmbedder::RegisterObservers(
 page_load_metrics::NavigationScenario
 PageLoadMetricsEmbedder::GetNavigationScenario(
     content::NavigationHandle* navigation_handle) const {
-#if BUILDFLAG(IS_ANDROID)
-  return page_load_metrics::NavigationScenario::kUnknown;
-#else
   // Slicing by navigation scenario is currently only evaluated after startup.
   if (!AfterStartupTaskUtils::IsBrowserStartupComplete()) {
     return page_load_metrics::NavigationScenario::kStartup;
@@ -370,7 +344,6 @@ PageLoadMetricsEmbedder::GetNavigationScenario(
   }
 
   return page_load_metrics::NavigationScenario::kSameWindow;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 bool PageLoadMetricsEmbedder::IsNewTabPageUrl(const GURL& url) {

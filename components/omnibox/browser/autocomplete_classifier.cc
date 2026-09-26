@@ -24,10 +24,6 @@
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 #include "components/history_clusters/core/config.h"  // nogncheck
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -53,7 +49,6 @@ void AutocompleteClassifier::Shutdown() {
 // static
 int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
   return
-#if !BUILDFLAG(IS_ANDROID)
       // Custom search engines cannot be used on mobile.
       AutocompleteProvider::TYPE_KEYWORD | AutocompleteProvider::TYPE_OPEN_TAB |
       AutocompleteProvider::TYPE_FEATURED_SEARCH |
@@ -66,24 +61,6 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
            ? AutocompleteProvider::TYPE_RECENTLY_CLOSED_TABS
            : 0) |
       AutocompleteProvider::TYPE_CONTEXTUAL_SEARCH |
-#elif !BUILDFLAG(IS_DESKTOP_ANDROID)
-      AutocompleteProvider::TYPE_CLIPBOARD |
-      AutocompleteProvider::TYPE_MOST_VISITED_SITES |
-#endif
-#if BUILDFLAG(IS_ANDROID)
-      AutocompleteProvider::TYPE_VOICE_SUGGEST |
-      // For Desktop Android's Lens Overlay integration.
-      AutocompleteProvider::TYPE_CONTEXTUAL_SEARCH |
-      // Only enabled for hub search.
-      AutocompleteProvider::TYPE_OPEN_TAB |
-      // Only enabled for hub search.
-      AutocompleteProvider::TYPE_TAB_GROUP |
-      // Keyword search for Android.
-      (base::FeatureList::IsEnabled(omnibox::kOmniboxSiteSearch)
-           ? AutocompleteProvider::TYPE_KEYWORD |
-                 AutocompleteProvider::TYPE_FEATURED_SEARCH
-           : 0) |
-#endif
       (history_clusters::GetConfig().is_journeys_enabled_no_locale_check &&
                history_clusters::GetConfig().omnibox_history_cluster_provider
            ? AutocompleteProvider::TYPE_HISTORY_CLUSTER_PROVIDER
@@ -91,9 +68,6 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
       AutocompleteProvider::TYPE_ZERO_SUGGEST |
       AutocompleteProvider::TYPE_ZERO_SUGGEST_LOCAL_HISTORY |
       (base::FeatureList::IsEnabled(omnibox::kDocumentProvider)
-#if BUILDFLAG(IS_ANDROID)
-               && base::android::device_info::is_desktop()
-#endif
            ? AutocompleteProvider::TYPE_DOCUMENT
            : 0) |
       (OmniboxFieldTrial::IsOnDeviceHeadSuggestEnabledForAnyMode()
@@ -111,22 +85,14 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
       AutocompleteProvider::TYPE_ENTERPRISE_SEARCH_AGGREGATOR |
       AutocompleteProvider::TYPE_VERBATIM_MATCH |
 
-#if !BUILDFLAG(IS_ANDROID)
       (history_embeddings::GetFeatureParameters().omnibox_scoped ||
                history_embeddings::GetFeatureParameters().omnibox_unscoped
            ? AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS
            : 0) |
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
       // The `chrome.omnibox` extension API uses `TYPE_KEYWORD`, including on
       // desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-      (base::FeatureList::IsEnabled(omnibox::kOmniboxSiteSearch)
-           ? AutocompleteProvider::TYPE_KEYWORD
-           : 0) |
-#else
       AutocompleteProvider::TYPE_KEYWORD |
-#endif
       // `UnscopedExtensionProvider` should only be included when extensions are
       // enabled and the `ExperimentalOmniboxLabs` feature is enabled.
       (base::FeatureList::IsEnabled(

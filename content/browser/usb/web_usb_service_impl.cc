@@ -145,7 +145,6 @@ WebUsbServiceImpl::WebUsbServiceImpl(
   if (delegate && render_frame_host_) {
     delegate->AddObserver(GetBrowserContext(), this);
   } else if (service_worker_version_) {
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
     // For service worker case, it relies on ServiceWorkerUsbDelegateObserver to
     // be the broker between UsbDelegate and UsbService. This is limited to
     // platforms that support extensions.
@@ -155,9 +154,6 @@ WebUsbServiceImpl::WebUsbServiceImpl(
           service_worker_version_->registration_id(),
           weak_factory_.GetWeakPtr());
     }
-#else
-    NOTREACHED();
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   }
 }
 
@@ -383,7 +379,6 @@ void WebUsbServiceImpl::SetClient(
         client) {
   DCHECK(client);
   clients_.Add(std::move(client));
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   if (service_worker_version_ && service_worker_version_->context()) {
     // WebUsbService is expected to have only one DeviceManagerClient when it is
     // for a service worker. One renderer side of a service worker has its own
@@ -401,7 +396,6 @@ void WebUsbServiceImpl::SetClient(
         ->usb_delegate_observer()
         ->ProcessPendingCallbacks(service_worker_version_.get());
   }
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 }
 
 void WebUsbServiceImpl::OnPermissionRevoked(const url::Origin& origin) {

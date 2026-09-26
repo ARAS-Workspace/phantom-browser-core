@@ -16,12 +16,8 @@
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 #include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "services/proxy_resolver/proxy_resolver_factory_impl.h"  // nogncheck crbug.com/40147906
-#else
 #include "content/public/browser/service_process_host.h"
 #include "services/strings/grit/services_strings.h"
-#endif
 
 namespace {
 
@@ -30,12 +26,6 @@ proxy_resolver::mojom::ProxyResolverFactory* GetProxyResolverFactory() {
       mojo::Remote<proxy_resolver::mojom::ProxyResolverFactory>>
       remote;
   if (!remote->is_bound()) {
-#if BUILDFLAG(IS_ANDROID)
-    // For Android we just lazily initialize a single factory instance and keep
-    // it around forever.
-    static base::NoDestructor<proxy_resolver::ProxyResolverFactoryImpl> factory(
-        remote->BindNewPipeAndPassReceiver());
-#else
     // For other platforms we launch the resolver in its own sandboxed service
     // process.
     content::ServiceProcessHost::Launch(
@@ -52,7 +42,6 @@ proxy_resolver::mojom::ProxyResolverFactory* GetProxyResolverFactory() {
 
     // Also reset on disconnection in case, e.g., the service crashes.
     remote->reset_on_disconnect();
-#endif
   }
 
   return remote->get();

@@ -156,22 +156,14 @@ bool SystemSupportsOCSPStapling() {
   if (UsingBuiltinCertVerifier()) {
     return true;
   }
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 bool CertVerifierSupportsCRLSetBlocking() {
   if (UsingBuiltinCertVerifier()) {
     return true;
   }
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 void SetHSTSForHostName(content::BrowserContext* context,

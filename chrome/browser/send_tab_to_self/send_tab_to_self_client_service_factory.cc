@@ -16,11 +16,7 @@
 #include "components/send_tab_to_self/send_tab_to_self_model.h"
 #include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/send_tab_to_self/android_notification_handler.h"
-#else
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_toolbar_icon_controller.h"
-#endif
 
 namespace send_tab_to_self {
 // static
@@ -62,13 +58,7 @@ SendTabToSelfClientServiceFactory::BuildServiceInstanceForBrowserContext(
 
   SendTabToSelfModel* model = sync_service->GetSendTabToSelfModel();
   return std::make_unique<SendTabToSelfClientService>(
-#if BUILDFLAG(IS_ANDROID)
-      std::make_unique<AndroidNotificationHandler>(model)
-#else
-      std::make_unique<SendTabToSelfToolbarIconController>(profile)
-#endif
-          ,
-      model);
+      std::make_unique<SendTabToSelfToolbarIconController>(profile), model);
 }
 
 bool SendTabToSelfClientServiceFactory::ServiceIsCreatedWithBrowserContext()

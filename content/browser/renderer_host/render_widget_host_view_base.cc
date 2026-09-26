@@ -118,14 +118,10 @@ void RenderWidgetHostViewBase::SelectionBoundsChanged(
     base::i18n::TextDirection focus_dir,
     const gfx::Rect& bounding_box,
     bool is_anchor_first) {
-#if !BUILDFLAG(IS_ANDROID)
   if (GetTextInputManager())
     GetTextInputManager()->SelectionBoundsChanged(
         this, anchor_rect, anchor_dir, focus_rect, focus_dir, bounding_box,
         is_anchor_first);
-#else
-  NOTREACHED() << "Selection bounds should be routed through the compositor.";
-#endif
 }
 
 RenderWidgetHostViewBase* RenderWidgetHostViewBase::GetRootView() {
@@ -198,12 +194,6 @@ void RenderWidgetHostViewBase::CopyMainAndPopupFromSurface(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  NOTREACHED()
-      << "RenderWidgetHostViewAndroid::CopyFromSurface calls "
-         "DelegatedFrameHostAndroid::CopyFromCompositingSurface directly, "
-         "and popups are not supported.";
-#else
   RenderWidgetHostViewBase* main_view =
       main_host ? static_cast<RenderWidgetHostViewBase*>(main_host->GetView())
                 : nullptr;
@@ -319,7 +309,6 @@ void RenderWidgetHostViewBase::CopyMainAndPopupFromSurface(
   // Request the main image (happens first).
   main_frame_host->CopyFromCompositingSurface(
       src_subrect, dst_size, timeout, std::move(main_image_done_callback));
-#endif
 }
 
 void RenderWidgetHostViewBase::CopyFromSurface(

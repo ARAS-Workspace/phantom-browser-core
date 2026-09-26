@@ -10,11 +10,9 @@
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 namespace {
 
@@ -64,9 +62,6 @@ const std::vector<GURL> OptimizationGuideTabUrlProvider::GetUrlsOfActiveTabs(
 
 const std::vector<content::WebContents*>
 OptimizationGuideTabUrlProvider::GetAllWebContentsForProfile(Profile* profile) {
-#if BUILDFLAG(IS_ANDROID)
-  NOTREACHED();
-#else
   std::vector<content::WebContents*> web_contents_list;
   GlobalBrowserCollection::GetInstance()->ForEach(
       [profile, &web_contents_list](BrowserWindowInterface* browser) {
@@ -85,5 +80,4 @@ OptimizationGuideTabUrlProvider::GetAllWebContentsForProfile(Profile* profile) {
         return true;
       });
   return web_contents_list;
-#endif
 }

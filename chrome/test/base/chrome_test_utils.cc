@@ -13,67 +13,27 @@
 #include "content/public/test/test_navigation_observer.h"
 #include "net/base/filename_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 namespace chrome_test_utils {
 
 content::WebContents* GetActiveWebContents(
     const PlatformBrowserTest* browser_test) {
-#if BUILDFLAG(IS_ANDROID)
-  for (const TabModel* model : TabModelList::models()) {
-    if (model->IsActiveModel())
-      return model->GetActiveWebContents();
-  }
-  NOTREACHED() << "No active TabModel??";
-#else
   return browser_test->browser()->tab_strip_model()->GetActiveWebContents();
-#endif
 }
 
 tabs::TabInterface* GetActiveTab(const PlatformBrowserTest* browser_test) {
-#if BUILDFLAG(IS_ANDROID)
-  for (TabModel* model : TabModelList::models()) {
-    if (model->IsActiveModel()) {
-      return model->GetActiveTab();
-    }
-  }
-  NOTREACHED() << "No active TabModel??";
-#else
   return browser_test->browser()->tab_strip_model()->GetActiveTab();
-#endif
 }
 
 content::WebContents* GetWebContentsAt(const PlatformBrowserTest* browser_test,
                                        int index) {
-#if BUILDFLAG(IS_ANDROID)
-  for (const TabModel* model : TabModelList::models()) {
-    if (model->IsActiveModel()) {
-      return model->GetWebContentsAt(index);
-    }
-  }
-  NOTREACHED() << "No active TabModel??";
-#else
   return browser_test->browser()->tab_strip_model()->GetWebContentsAt(index);
-#endif
 }
 
 Profile* GetProfile(const PlatformBrowserTest* browser_test) {
-#if BUILDFLAG(IS_ANDROID)
-  for (TabModel* model : TabModelList::models()) {
-    if (model->IsActiveModel())
-      return model->GetProfile();
-  }
-  NOTREACHED() << "No active TabModel??";
-#else
   return browser_test->browser()->GetProfile();
-#endif
 }
 
 bool NavigateToURL(content::WebContents* web_contents, const GURL& url) {

@@ -147,11 +147,7 @@ TEST_F(AudioServiceOutputDeviceTest, CreatePlayPause) {
 
 // Flaky on Linux Chromium OS ASan LSan (https://crbug.com/889845)
 // Disabled on Android (crbug.com/395710100).
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_VerifyDataFlow DISABLED_VerifyDataFlow
-#else
 #define MAYBE_VerifyDataFlow VerifyDataFlow
-#endif
 TEST_F(AudioServiceOutputDeviceTest, MAYBE_VerifyDataFlow) {
   auto params(media::AudioParameters::UnavailableDeviceParams());
   params.set_frames_per_buffer(kFrames);

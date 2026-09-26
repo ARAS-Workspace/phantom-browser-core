@@ -42,11 +42,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/simple_url_loader.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/grit/components_resources.h"
-#include "ui/base/resource/resource_bundle.h"
-#endif
-
 using variations::VariationsService;
 
 namespace ntp_tiles {
@@ -229,53 +224,9 @@ std::map<SectionType, PopularSites::SitesVector> ParseSites(
   return IsSectioned(list) ? ParseSectioned(list) : ParseSimple(list);
 }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_ANDROID)
-void SetDefaultResourceForSite(size_t index,
-                               int resource_id,
-                               base::ListValue& sites) {
-  if (index >= sites.size() || !sites[index].is_dict()) {
-    return;
-  }
-
-  sites[index].GetDict().Set("default_icon_resource", resource_id);
-}
-#endif
-
 // Creates the list of popular sites based on a snapshot available for mobile.
 base::ListValue DefaultPopularSites(std::optional<std::string> country) {
-#if !BUILDFLAG(IS_ANDROID)
   return base::ListValue();
-#else
-  if (!base::FeatureList::IsEnabled(kPopularSitesBakedInContentFeature)) {
-    return base::ListValue();
-  }
-
-  int popular_sites_json = IDR_DEFAULT_POPULAR_SITES_JSON;
-
-  std::optional<base::Value> sites = base::JSONReader::Read(
-      ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
-          popular_sites_json),
-      base::JSON_PARSE_CHROMIUM_EXTENSIONS);
-  base::ListValue& sites_list = sites->GetList();
-  for (base::Value& site : sites_list) {
-    site.GetDict().Set("baked_in", true);
-  }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  static constexpr int default_popular_sites_icons[] = {
-      IDR_DEFAULT_POPULAR_SITES_ICON0, IDR_DEFAULT_POPULAR_SITES_ICON1,
-      IDR_DEFAULT_POPULAR_SITES_ICON2, IDR_DEFAULT_POPULAR_SITES_ICON3,
-      IDR_DEFAULT_POPULAR_SITES_ICON4, IDR_DEFAULT_POPULAR_SITES_ICON5,
-      IDR_DEFAULT_POPULAR_SITES_ICON6, IDR_DEFAULT_POPULAR_SITES_ICON7};
-  base::span<const int> icon_list = default_popular_sites_icons;
-
-  size_t index = 0;
-  for (int icon_resource : icon_list) {
-    SetDefaultResourceForSite(index++, icon_resource, sites_list);
-  }
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  return std::move(sites_list);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

@@ -186,12 +186,6 @@ SharedImageInterfaceInProcess::CreateSharedImage(
   DCHECK(gpu::IsValidClientUsage(si_info.usage));
 
   if (always_create_native_gmb_handles_) {
-#if BUILDFLAG(IS_ANDROID)
-    // Creation of native buffer handles is not supported on Android (the
-    // only way that a non-null GpuMemoryBufferHandle can be created on
-    // Android is by importing an external AHB).
-    return nullptr;
-#else
     // The below method doesn't (yet?) take in pool IDs.
     CHECK(!pool_id);
 
@@ -209,7 +203,6 @@ SharedImageInterfaceInProcess::CreateSharedImage(
     }
     return SharedImageInterfaceInProcessBase::CreateSharedImage(
         si_info, surface_handle, buffer_usage, std::move(gmb_handle));
-#endif
   }
 
   return SharedImageInterfaceInProcessBase::CreateSharedImage(

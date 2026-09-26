@@ -92,7 +92,7 @@ class WebRtcAudioDebugRecordingsBrowserTest
   ~WebRtcAudioDebugRecordingsBrowserTest() override {}
 };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Renderer crashes under Android ASAN: https://crbug.com/408496.
 // Renderer crashes under Android: https://crbug.com/820934.
 // Failures on Android M. https://crbug.com/535728.
@@ -196,15 +196,8 @@ IN_PROC_BROWSER_TEST_F(WebRtcAudioDebugRecordingsBrowserTest,
 // TODO(grunell): Add test for multiple dumps when re-use of
 // MediaStreamAudioProcessor in AudioCapturer has been removed.
 
-#if BUILDFLAG(IS_ANDROID)
-// Renderer crashes under Android ASAN: https://crbug.com/408496.
-// Renderer crashes under Android: https://crbug.com/820934.
-#define MAYBE_CallWithAudioDebugRecordingsEnabledThenDisabled \
-  DISABLED_CallWithAudioDebugRecordingsEnabledThenDisabled
-#else
 #define MAYBE_CallWithAudioDebugRecordingsEnabledThenDisabled \
   CallWithAudioDebugRecordingsEnabledThenDisabled
-#endif
 
 // As above, but enable and disable recordings before starting a call. No files
 // should be created.

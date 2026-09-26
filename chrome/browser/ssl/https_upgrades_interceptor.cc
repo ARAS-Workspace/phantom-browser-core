@@ -132,9 +132,6 @@ net::RedirectInfo SetupRedirect(
 bool DoesInsecureContentSettingDisableUpgrading(const GURL& url,
                                                 Profile* profile) {
   // Mixed content isn't an overridable content setting on Android.
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   HostContentSettingsMap* content_settings =
       HostContentSettingsMapFactory::GetForProfile(profile);
 
@@ -159,7 +156,6 @@ bool DoesInsecureContentSettingDisableUpgrading(const GURL& url,
     return true;
   }
   return false;
-#endif
 }
 
 // Check for net errors that should not result in an HTTPS-First Mode

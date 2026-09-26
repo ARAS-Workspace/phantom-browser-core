@@ -25,25 +25,13 @@
 
 namespace content {
 
-#if BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)
-// Renderer crashes under Android ASAN: https://crbug.com/408496.
-#define MAYBE_WebRtcBrowserTest DISABLED_WebRtcBrowserTest
-#else
 #define MAYBE_WebRtcBrowserTest WebRtcBrowserTest
-#endif
 
 // This class tests the scenario when permission to access mic or camera is
 // granted.
 class MAYBE_WebRtcBrowserTest : public WebRtcContentBrowserTestBase {
  public:
-  MAYBE_WebRtcBrowserTest() {
-#if BUILDFLAG(IS_ANDROID)
-    // This test fails on Nexus 5 devices.
-    // TODO(henrika): see http://crbug.com/362437 and http://crbug.com/359389
-    // for details.
-    scoped_feature_list_.InitAndDisableFeature(features::kWebRtcHWDecoding);
-#endif
-  }
+  MAYBE_WebRtcBrowserTest() {}
   ~MAYBE_WebRtcBrowserTest() override = default;
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -73,7 +61,7 @@ IN_PROC_BROWSER_TEST_F(MAYBE_WebRtcBrowserTest, CanSetupAudioAndVideoCall) {
 }
 
 // Flaky on Android and Linux ASAN https://crbug.com/1099365.
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 #define MAYBE_NetworkProcessCrashRecovery DISABLED_NetworkProcessCrashRecovery
 #else
 #define MAYBE_NetworkProcessCrashRecovery NetworkProcessCrashRecovery
@@ -114,12 +102,7 @@ IN_PROC_BROWSER_TEST_F(MAYBE_WebRtcBrowserTest,
 // TODO(crbug.com/40930185): Re-enable this test.
 IN_PROC_BROWSER_TEST_F(MAYBE_WebRtcBrowserTest,
                        DISABLED_CanSetupVideoCallWith16To9AspectRatio) {
-#if BUILDFLAG(IS_ANDROID)
-  // Android requires 16x16 alignment for hardware encoding.
-  constexpr int kExpectedAlignment = 16;
-#else
   constexpr int kExpectedAlignment = 1;
-#endif
   const std::string javascript = base::StringPrintf(
       "callAndExpectResolution({video: {mandatory: {minWidth: 640,"
       " maxWidth: 640, minAspectRatio: 1.777}}}, 640, 360, %d);",
@@ -274,13 +257,5 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // Flaky on Android: https://crbug.com/1366910.
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(USE_PROPRIETARY_CODECS)
-// This test is to make sure HW H264 work normally on supported devices, since
-// there is no SW H264 fallback available on Android.
-IN_PROC_BROWSER_TEST_F(MAYBE_WebRtcBrowserTest,
-                       DISABLED_CanSetupH264VideoCallOnSupportedDevice) {
-  MakeTypicalPeerConnectionCall("CanSetupH264VideoCallOnSupportedDevice();");
-}
-#endif
 
 }  // namespace content

@@ -70,7 +70,6 @@ SessionProtoDBFactory<
   return GetDiscountInfosSessionProtoDBFactory();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 SessionProtoDBFactory<cart_db::ChromeCartContentProto>*
 GetChromeCartSessionProtoDBFactory() {
   static base::NoDestructor<
@@ -112,20 +111,3 @@ SessionProtoDBFactory<discounts_db::DiscountsContentProto>*
 SessionProtoDBFactory<discounts_db::DiscountsContentProto>::GetInstance() {
   return GetDiscountsSessionProtoDBFactory();
 }
-
-#else
-SessionProtoDBFactory<merchant_signal_db::MerchantSignalContentProto>*
-GetMerchantSignalSessionProtoDBFactory() {
-  static base::NoDestructor<
-      SessionProtoDBFactory<merchant_signal_db::MerchantSignalContentProto>>
-      instance;
-  return instance.get();
-}
-
-template <>
-SessionProtoDBFactory<merchant_signal_db::MerchantSignalContentProto>*
-SessionProtoDBFactory<
-    merchant_signal_db::MerchantSignalContentProto>::GetInstance() {
-  return GetMerchantSignalSessionProtoDBFactory();
-}
-#endif

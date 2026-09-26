@@ -31,16 +31,10 @@ namespace {
 // This predicate is only about passwords in the profile store.
 bool IsProfilePasswordSyncEnabled(PrefService* pref_service,
                                   const syncer::SyncService* sync_service) {
-#if BUILDFLAG(IS_ANDROID)
-  // After login db deprecation there won't be any more users syncing passwords
-  // from the profile store. All users will have split stores.
-  return false;
-#else
   // TODO(crbug.com/40067058): Clean this up once Sync-the-feature is gone on
   // all platforms.
   return password_manager::sync_util::IsSyncFeatureEnabledIncludingPasswords(
       sync_service);
-#endif
 }
 
 }  // namespace

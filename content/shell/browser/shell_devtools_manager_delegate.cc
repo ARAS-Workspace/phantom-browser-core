@@ -36,11 +36,6 @@
 #include "net/socket/tcp_server_socket.h"
 #include "ui/base/resource/resource_bundle.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/devtools_auth.h"
-#include "net/socket/unix_domain_server_socket_posix.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -49,37 +44,6 @@ const int kBackLog = 10;
 
 std::atomic<int> g_last_used_port;
 
-#if BUILDFLAG(IS_ANDROID)
-class UnixDomainServerSocketFactory : public content::DevToolsSocketFactory {
- public:
-  explicit UnixDomainServerSocketFactory(const std::string& socket_name)
-      : socket_name_(socket_name) {}
-
-  UnixDomainServerSocketFactory(const UnixDomainServerSocketFactory&) = delete;
-  UnixDomainServerSocketFactory& operator=(
-      const UnixDomainServerSocketFactory&) = delete;
-
- private:
-  // content::DevToolsSocketFactory.
-  std::unique_ptr<net::ServerSocket> CreateForHttpServer() override {
-    std::unique_ptr<net::UnixDomainServerSocket> socket(
-        new net::UnixDomainServerSocket(
-            base::BindRepeating(&CanUserConnectToDevTools),
-            true /* use_abstract_namespace */));
-    if (socket->BindAndListen(socket_name_, kBackLog) != net::OK)
-      return nullptr;
-
-    return std::move(socket);
-  }
-
-  std::unique_ptr<net::ServerSocket> CreateForTethering(
-      std::string* out_name) override {
-    return nullptr;
-  }
-
-  std::string socket_name_;
-};
-#else
 class TCPServerSocketFactory : public content::DevToolsSocketFactory {
  public:
   TCPServerSocketFactory(const std::string& address, uint16_t port)
@@ -111,20 +75,10 @@ class TCPServerSocketFactory : public content::DevToolsSocketFactory {
   std::string address_;
   uint16_t port_;
 };
-#endif
 
 std::unique_ptr<content::DevToolsSocketFactory> CreateSocketFactory() {
   const base::CommandLine& command_line =
       *base::CommandLine::ForCurrentProcess();
-#if BUILDFLAG(IS_ANDROID)
-  std::string socket_name = "content_shell_devtools_remote";
-  if (command_line.HasSwitch(switches::kRemoteDebuggingSocketName)) {
-    socket_name = command_line.GetSwitchValueASCII(
-        switches::kRemoteDebuggingSocketName);
-  }
-  return std::unique_ptr<content::DevToolsSocketFactory>(
-      new UnixDomainServerSocketFactory(socket_name));
-#else
   // See if the user specified a port on the command line (useful for
   // automation). If not, use an ephemeral port by specifying 0.
   uint16_t port = 0;
@@ -151,7 +105,6 @@ std::unique_ptr<content::DevToolsSocketFactory> CreateSocketFactory() {
   }
   return std::unique_ptr<content::DevToolsSocketFactory>(
       new TCPServerSocketFactory(address_str, port));
-#endif
 }
 
 } //  namespace
@@ -228,20 +181,12 @@ scoped_refptr<DevToolsAgentHost> ShellDevToolsManagerDelegate::CreateNewTarget(
 }
 
 std::string ShellDevToolsManagerDelegate::GetDiscoveryPageHTML() {
-#if BUILDFLAG(IS_ANDROID)
-  return std::string();
-#else
   return ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
       IDR_CONTENT_SHELL_DEVTOOLS_DISCOVERY_PAGE);
-#endif
 }
 
 bool ShellDevToolsManagerDelegate::HasBundledFrontendResources() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 }  // namespace content

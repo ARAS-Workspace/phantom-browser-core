@@ -30,12 +30,6 @@
 #include "ui/base/cursor/cursor.h"
 #include "ui/compositor/compositor.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/view_android.h"
-#include "ui/android/window_android.h"
-#include "ui/android/window_android_compositor.h"
-#endif
-
 namespace content {
 
 // Forwards notifications about the child web contents to the connector.
@@ -665,19 +659,9 @@ void SurfaceEmbedConnectorImpl::SetKeepSurfaceAlive(bool keep_alive) {
   }
 
   auto surface_id = view_->GetCurrentSurfaceId();
-#if BUILDFLAG(IS_ANDROID)
-  ui::WindowAndroidCompositor* compositor = nullptr;
-  if (view_->GetNativeView() && view_->GetNativeView()->GetWindowAndroid()) {
-    compositor = view_->GetNativeView()->GetWindowAndroid()->GetCompositor();
-  }
-  if (should_keep_alive_ && compositor && surface_id.is_valid()) {
-    keep_surface_alive_ = base::ScopedClosureRunner(
-        compositor->TakeScopedKeepSurfaceAliveCallback(surface_id));
-#else
   if (should_keep_alive_ && view_->GetCompositor() && surface_id.is_valid()) {
     keep_surface_alive_ =
         view_->GetCompositor()->TakeScopedKeepSurfaceAliveCallback(surface_id);
-#endif
   } else {
     keep_surface_alive_.RunAndReset();
   }

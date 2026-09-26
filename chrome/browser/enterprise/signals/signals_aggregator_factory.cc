@@ -35,13 +35,9 @@
 #include "content/public/browser/browser_context.h"
 #include "net/ssl/client_cert_store.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/device_signals/core/browser/android/android_os_signals_collector.h"
-#else
 #include "chrome/browser/enterprise/signals/system_signals_service_host_factory.h"
 #include "components/device_signals/core/browser/desktop/desktop_os_signals_collector.h"
 #include "components/device_signals/core/browser/system_signals_service_host.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 #include "components/device_signals/core/browser/mac/plist_settings_client.h"
@@ -81,9 +77,7 @@ SignalsAggregatorFactory::SignalsAggregatorFactory()
     : ProfileKeyedServiceFactory(
           "SignalsAggregator",
           ProfileSelections::BuildForRegularAndIncognito()) {
-#if !BUILDFLAG(IS_ANDROID)
   DependsOn(SystemSignalsServiceHostFactory::GetInstance());
-#endif  // !BUILDFLAG(IS_ANDROID)
   DependsOn(UserPermissionServiceFactory::GetInstance());
   DependsOn(enterprise::ProfileIdServiceFactory::GetInstance());
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -107,12 +101,10 @@ SignalsAggregatorFactory::BuildServiceInstanceForBrowserContext(
   }
 
   std::vector<std::unique_ptr<device_signals::SignalsCollector>> collectors;
-#if !BUILDFLAG(IS_ANDROID)
   auto* service_host = SystemSignalsServiceHostFactory::GetForProfile(profile);
   collectors.push_back(
       std::make_unique<device_signals::FileSystemSignalsCollector>(
           service_host));
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   collectors.push_back(std::make_unique<device_signals::AgentSignalsCollector>(
@@ -158,15 +150,9 @@ SignalsAggregatorFactory::BuildServiceInstanceForBrowserContext(
     }
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  collectors.push_back(
-      std::make_unique<device_signals::AndroidOsSignalsCollector>(
-          browser_policy_manager));
-#else
   collectors.push_back(
       std::make_unique<device_signals::DesktopOsSignalsCollector>(
           browser_policy_manager));
-#endif  // BUILDFLAG(IS_ANDROID)
   collectors.push_back(
       std::make_unique<device_signals::ProfileSignalsCollector>(profile));
 

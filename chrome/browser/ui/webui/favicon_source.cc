@@ -35,10 +35,8 @@
 #include "ui/resources/grit/ui_resources.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/ui/webui/util/webui_util_desktop.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -232,23 +230,17 @@ bool FaviconSource::ShouldServiceRequest(
     const GURL& url,
     content::BrowserContext* browser_context,
     int render_process_id) {
-#if !BUILDFLAG(IS_ANDROID)
   if (url.SchemeIs(chrome::kChromeSearchScheme)) {
     return InstantService::ShouldServiceRequest(url, browser_context,
                                                 render_process_id);
   }
-#endif
   return URLDataSource::ShouldServiceRequest(url, browser_context,
                                              render_process_id);
 }
 
 ui::NativeTheme* FaviconSource::GetNativeTheme(
     const content::WebContents::Getter& wc_getter) {
-#if BUILDFLAG(IS_ANDROID)
-  return ui::NativeTheme::GetInstanceForNativeUi();
-#else
   return webui::GetNativeThemeDeprecated(wc_getter.Run());
-#endif
 }
 
 void FaviconSource::OnFaviconDataAvailable(
@@ -317,7 +309,6 @@ void FaviconSource::SendDefaultResponse(
 
   int resource_id;
   switch (size_in_dip) {
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
     case 64:
       resource_id =
           dark_mode ? IDR_DEFAULT_FAVICON_DARK_64 : IDR_DEFAULT_FAVICON_64;
@@ -326,7 +317,6 @@ void FaviconSource::SendDefaultResponse(
       resource_id =
           dark_mode ? IDR_DEFAULT_FAVICON_DARK_32 : IDR_DEFAULT_FAVICON_32;
       break;
-#endif
     default:
       resource_id = dark_mode ? IDR_DEFAULT_FAVICON_DARK : IDR_DEFAULT_FAVICON;
       break;

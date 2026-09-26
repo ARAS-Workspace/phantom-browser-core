@@ -160,10 +160,8 @@
 #include "ui/gfx/geometry/rect.h"
 #include "ui/latency/latency_info.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/media/captured_surface_controller.h"
 #include "content/public/test/mock_captured_surface_controller.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if defined(USE_AURA)
 #include "content/browser/renderer_host/delegated_frame_host.h"
@@ -957,20 +955,6 @@ void WaitForResizeComplete(WebContents* web_contents) {
     resize_observer.Wait();
   }
 }
-#elif BUILDFLAG(IS_ANDROID)
-bool IsResizeComplete(RenderWidgetHostImpl* widget_host) {
-  return !widget_host->visual_properties_ack_pending_for_testing();
-}
-
-void WaitForResizeComplete(WebContents* web_contents) {
-  RenderWidgetHostImpl* widget_host = RenderWidgetHostImpl::From(
-      web_contents->GetRenderViewHost()->GetWidget());
-  if (!IsResizeComplete(widget_host)) {
-    ResizeObserver resize_observer(
-        widget_host, base::BindRepeating(IsResizeComplete, widget_host));
-    resize_observer.Wait();
-  }
-}
 #endif
 
 void NotifyCopyableViewInWebContents(WebContents* web_contents,
@@ -1102,13 +1086,8 @@ void SimulateMouseClickOrTapElementWithId(WebContents* web_contents,
   gfx::Point point = gfx::ToFlooredPoint(
       GetCenterCoordinatesOfElementWithId(web_contents, id));
 
-#if BUILDFLAG(IS_ANDROID)
-  SimulateTapDownAt(web_contents, point);
-  SimulateTapAt(web_contents, point);
-#else
   SimulateMouseClickAt(web_contents, 0, blink::WebMouseEvent::Button::kLeft,
                        point);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void SimulateMouseEvent(WebContents* web_contents,
@@ -2653,7 +2632,6 @@ std::optional<int> RenderProcessHostKillWaiter::Wait() {
 
   // Wait for the renderer kill.
   exit_watcher_.Wait();
-#if !BUILDFLAG(IS_ANDROID)
   // Getting termination status on android is not reliable. To avoid flakiness,
   // we can skip this check and just check bad message. On other platforms we
   // want to verify that the renderer got killed, rather than exiting normally.
@@ -2661,7 +2639,6 @@ std::optional<int> RenderProcessHostKillWaiter::Wait() {
     LOG(ERROR) << "Renderer unexpectedly exited normally.";
     return result;
   }
-#endif
 
   // Find the logged UMA data (if present).
   std::vector<base::Bucket> uma_samples =
@@ -4837,7 +4814,6 @@ base::CallbackListSubscription RegisterWebContentsCreationCallback(
   return WebContentsImpl::FriendWrapper::AddCreatedCallbackForTesting(callback);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void SetConditionalFocusWindowForTesting(base::TimeDelta window) {
   MediaStreamManager::GetInstance()->SetConditionalFocusWindowForTesting(
       window);
@@ -4871,7 +4847,6 @@ void SetCapturedSurfaceControllerFactoryForTesting(
   MediaStreamManager::GetInstance()
       ->SetCapturedSurfaceControllerFactoryForTesting(wrapped_factory);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::optional<int> GetDOMNodeId(RenderFrameHost& rfh,
                                 std::string_view query_selector) {
@@ -5097,7 +5072,7 @@ CreateNewPopupWidgetInterceptor::GetForwardingInterface() {
   return swapped_impl_.old_impl();
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 ShowPopupWidgetWaiter::ShowPopupMenuInterceptor::ShowPopupMenuInterceptor(
     RenderFrameHost* rfh,
     base::OnceCallback<void(const gfx::Rect&)> did_show_popup_menu_callback)
@@ -5141,7 +5116,7 @@ ShowPopupWidgetWaiter::ShowPopupWidgetWaiter(WebContents* web_contents,
           static_cast<RenderFrameHostImpl*>(frame_host),
           base::BindOnce(&ShowPopupWidgetWaiter::DidCreatePopupWidget,
                          base::Unretained(this))),
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
       show_popup_menu_interceptor_(
           frame_host,
           base::BindOnce(&ShowPopupWidgetWaiter::DidShowPopupMenu,
@@ -5186,7 +5161,7 @@ void ShowPopupWidgetWaiter::DidCreatePopupWidget(
                     .SwapImplForTesting(this);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 void ShowPopupWidgetWaiter::DidShowPopupMenu(const gfx::Rect& bounds) {
   initial_rect_ = bounds;
   run_loop_.Quit();

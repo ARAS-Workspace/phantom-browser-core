@@ -28,9 +28,7 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/common/content_features.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/guest_view/browser/guest_view_base.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using content::RenderFrameHost;
 using content::RenderProcessHost;
@@ -45,14 +43,9 @@ bool IsMPArchGuestMainFrame(RenderFrameHost* render_frame_host) {
   if (!base::FeatureList::IsEnabled(features::kGuestViewMPArch)) {
     return false;
   }
-#if BUILDFLAG(IS_ANDROID)
-  // Guest view is not enabled on Android.
-  return false;
-#else   // BUILDFLAG(IS_ANDROID)
   auto* guest =
       guest_view::GuestViewBase::FromRenderFrameHost(render_frame_host);
   return guest && guest->GetGuestMainFrame() == render_frame_host;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

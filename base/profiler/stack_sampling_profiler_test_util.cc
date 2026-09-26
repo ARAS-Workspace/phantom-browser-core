@@ -25,21 +25,7 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID) && \
-    (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64))
-#include "base/no_destructor.h"
-#include "base/profiler/native_unwinder_android.h"
-#if BUILDFLAG(ENABLE_ARM_CFI_TABLE)
-#include "base/android/apk_assets.h"
-#include "base/android/library_loader/anchor_functions.h"
-#include "base/files/memory_mapped_file.h"
-#include "base/profiler/chrome_unwinder_android_32.h"
-#endif
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/profiler/core_unwinders.h"
-#endif
 
 #include <alloca.h>
 
@@ -100,80 +86,6 @@ void OtherLibraryCallback(void* arg) {
   // Prevent tail call.
   [[maybe_unused]] volatile int i = 0;
 }
-
-#if BUILDFLAG(IS_ANDROID) && \
-    (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64))
-class NativeUnwinderAndroidMapDelegateForTesting
-    : public NativeUnwinderAndroidMapDelegate {
- public:
-  explicit NativeUnwinderAndroidMapDelegateForTesting(
-      std::unique_ptr<NativeUnwinderAndroidMemoryRegionsMap> memory_regions_map)
-      : memory_regions_map_(std::move(memory_regions_map)) {}
-
-  NativeUnwinderAndroidMemoryRegionsMap* GetMapReference() override {
-    return memory_regions_map_.get();
-  }
-  void ReleaseMapReference() override {}
-
- private:
-  const std::unique_ptr<NativeUnwinderAndroidMemoryRegionsMap>
-      memory_regions_map_;
-};
-
-// `map_delegate` should outlive the unwinder instance, so we cannot make a
-// derived `NativeUnwinderAndroidForTesting` to own the `map_delegate`, as
-// the base class outlives the derived class.
-NativeUnwinderAndroidMapDelegateForTesting* GetMapDelegateForTesting() {
-  static base::NoDestructor<NativeUnwinderAndroidMapDelegateForTesting>
-      map_delegate(NativeUnwinderAndroid::CreateMemoryRegionsMap());
-  return map_delegate.get();
-}
-
-std::unique_ptr<NativeUnwinderAndroid> CreateNativeUnwinderAndroidForTesting(
-    uintptr_t exclude_module_with_base_address) {
-  return std::make_unique<NativeUnwinderAndroid>(
-      exclude_module_with_base_address, GetMapDelegateForTesting());
-}
-
-#if BUILDFLAG(ENABLE_ARM_CFI_TABLE)
-std::unique_ptr<Unwinder> CreateChromeUnwinderAndroid32ForTesting(
-    uintptr_t chrome_module_base_address) {
-  static constexpr char kCfiFileName[] = "assets/unwind_cfi_32_v2";
-
-  // The wrapper class ensures that `MemoryMappedFile` has the same lifetime
-  // as the unwinder.
-  class ChromeUnwinderAndroid32ForTesting : public ChromeUnwinderAndroid32 {
-   public:
-    ChromeUnwinderAndroid32ForTesting(
-        std::unique_ptr<MemoryMappedFile> cfi_file,
-        const ChromeUnwindInfoAndroid32& unwind_info,
-        uintptr_t chrome_module_base_address,
-        uintptr_t text_section_start_address)
-        : ChromeUnwinderAndroid32(unwind_info,
-                                  chrome_module_base_address,
-                                  text_section_start_address),
-          cfi_file_(std::move(cfi_file)) {}
-    ~ChromeUnwinderAndroid32ForTesting() override = default;
-
-   private:
-    std::unique_ptr<MemoryMappedFile> cfi_file_;
-  };
-
-  MemoryMappedFile::Region cfi_region;
-  int fd = base::android::OpenApkAsset(kCfiFileName, &cfi_region);
-  DCHECK_GT(fd, 0);
-  auto cfi_file = std::make_unique<MemoryMappedFile>();
-  bool ok = cfi_file->Initialize(base::File(fd), cfi_region);
-  DCHECK(ok);
-  return std::make_unique<ChromeUnwinderAndroid32ForTesting>(
-      std::move(cfi_file),
-      base::CreateChromeUnwindInfoAndroid32(cfi_file->bytes()),
-      chrome_module_base_address,
-      /* text_section_start_address= */ base::android::kStartOfText);
-}
-#endif  // BUILDFLAG(ENABLE_ARM_CFI_TABLE)
-#endif  // BUILDFLAG(IS_ANDROID) && (BUILDFLAG(ENABLE_ARM_CFI_TABLE) ||
-        // defined(ARCH_CPU_ARM64))
 
 }  // namespace
 
@@ -452,38 +364,7 @@ uintptr_t GetAddressInOtherLibrary(NativeLibrary library) {
 
 StackSamplingProfiler::UnwindersFactory CreateCoreUnwindersFactoryForTesting(
     ModuleCache* module_cache) {
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_ARM_CFI_TABLE)
-  std::vector<std::unique_ptr<Unwinder>> unwinders;
-  unwinders.push_back(CreateNativeUnwinderAndroidForTesting(
-      reinterpret_cast<uintptr_t>(&__executable_start)));
-  unwinders.push_back(CreateChromeUnwinderAndroid32ForTesting(
-      reinterpret_cast<uintptr_t>(&__executable_start)));
-  return BindOnce(
-      [](std::vector<std::unique_ptr<Unwinder>> unwinders) {
-        return unwinders;
-      },
-      std::move(unwinders));
-#elif BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARM64)
-  std::vector<std::unique_ptr<Unwinder>> unwinders;
-  unwinders.push_back(CreateNativeUnwinderAndroidForTesting(
-      reinterpret_cast<uintptr_t>(&__executable_start)));
-  unwinders.push_back(std::make_unique<base::FramePointerUnwinder>(
-      base::BindRepeating([](const base::Frame& current_frame) {
-        return current_frame.module &&
-               current_frame.module->GetBaseAddress() ==
-                   reinterpret_cast<uintptr_t>(&__executable_start);
-      }),
-      /*is_system_unwinder=*/false));
-  return BindOnce(
-      [](std::vector<std::unique_ptr<Unwinder>> unwinders) {
-        return unwinders;
-      },
-      std::move(unwinders));
-#elif BUILDFLAG(IS_ANDROID)
-  return StackSamplingProfiler::UnwindersFactory();
-#else
   return CreateCoreUnwindersFactory();
-#endif
 }
 
 uintptr_t TestModule::GetBaseAddress() const {

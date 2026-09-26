@@ -299,41 +299,6 @@
 
 // Per-platform #include blocks, in alphabetical order.
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/metrics/android_session_durations_service_factory.h"
-#include "chrome/browser/android/omnibox/autocomplete_controller_android.h"
-#include "chrome/browser/android/persisted_tab_data/leveldb_persisted_tab_data_storage_android_factory.h"
-#include "chrome/browser/android/search_permissions/search_permissions_service.h"
-#include "chrome/browser/android/tab_state_storage_service_factory.h"
-#include "chrome/browser/android/thin_webview/chrome_thin_webview_initializer.h"
-#include "chrome/browser/android/webapk/webapk_install_service_factory.h"
-#include "chrome/browser/android/webapk/webapk_sync_service_factory.h"
-#include "chrome/browser/autofill/android/android_sms_otp_backend_factory.h"
-#include "chrome/browser/auxiliary_search/auxiliary_search_donation_service_factory.h"
-#include "chrome/browser/auxiliary_search/auxiliary_search_provider.h"
-#include "chrome/browser/commerce/merchant_viewer/merchant_viewer_data_manager_factory.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/media/android/cdm/media_drm_origin_id_manager_factory.h"
-#include "chrome/browser/ntp_customization/ntp_android_background_service_factory.h"
-#include "chrome/browser/ntp_customization/ntp_android_custom_background_service_factory.h"
-#include "chrome/browser/password_manager/android/delayed_password_field_classification_model_handler_factory.h"
-#include "chrome/browser/readaloud/read_aloud_service_factory.h"
-#include "chrome/browser/signin/android/signin_bridge_factory.h"
-#include "chrome/browser/signin/signin_manager_android_factory.h"
-#include "chrome/browser/ui/android/android_profile_browser_collection_service_factory.h"
-#include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"
-#include "chrome/browser/ui/safety_hub/notification_permission_review_service_factory.h"
-#include "chrome/browser/ui/safety_hub/revoked_permissions_os_notification_display_manager_factory.h"
-#include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
-#include "components/commerce/core/commerce_feature_list.h"
-#include "components/commerce/core/proto/discount_infos_db_content.pb.h"  // nogncheck
-#include "components/commerce/core/proto/merchant_signal_db_content.pb.h"
-
-#if BUILDFLAG(ENABLE_OFFLINE_PAGES)
-#include "chrome/browser/offline_pages/android/offline_page_auto_fetcher_service_factory.h"
-#include "chrome/browser/offline_pages/request_coordinator_factory.h"
-#endif
-#else  // !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/accessibility/ax_main_node_annotator_controller_factory.h"
 #include "chrome/browser/accessibility/phrase_segmentation/dependency_parser_model_loader_factory.h"
 #include "chrome/browser/accessibility/tree_fixing/ax_tree_fixing_services_router_factory.h"
@@ -387,14 +352,12 @@
 #include "chrome/browser/ui/startup/first_run_service.h"
 #include "chrome/browser/ui/webui/signin/turn_sync_on_helper.h"
 
-#endif
-
 #if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
 #include "chrome/browser/enterprise/client_certificates/certificate_provisioning_service_factory.h"
 #include "chrome/browser/enterprise/client_certificates/certificate_store_factory.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/idle/idle_service_factory.h"
 #endif
 
@@ -411,7 +374,6 @@
 #include "chrome/browser/ui/tabs/saved_tab_groups/collaboration_messaging_observer_factory.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/multistep_filter/core/multistep_filter_log_router_factory.h"
 #include "chrome/browser/multistep_filter/core/multistep_filter_service_factory.h"
 #include "chrome/browser/notebooks/notebooks_service_factory.h"
@@ -419,7 +381,6 @@
 #include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
 #include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "device/fido/public/features.h"
-#endif
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/policy/messaging_layer/util/manual_test_heartbeat_event_factory.h"
 #endif
@@ -507,7 +468,7 @@
 #include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_factory.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
+#if BUILDFLAG(FULL_SAFE_BROWSING)
 #include "chrome/browser/enterprise/connectors/reporting/browser_crash_event_router.h"
 #include "chrome/browser/enterprise/connectors/reporting/reporting_event_router_factory.h"
 #endif
@@ -583,22 +544,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   chrome_apps::EnsureBrowserContextKeyedServiceFactoriesBuilt();
   chrome_extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
   extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-#elif BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  chrome_extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-  // EnsureBrowserContextKeyedServiceFactoriesBuilt() is invoked before the
-  // ExtensionsBrowserClient is ready on Android. This is due to Android
-  // specific initialization steps in
-  // ChromeMainDelegate::PostEarlyInitialization(). ExtensionsBrowserClient is
-  // expected to be ready when browser context keyed factory service is being
-  // created. Otherwise, it can cause problems.
-  //
-  // To avoid this issue, browser context keyed factory services are created
-  // during a later initialization phase of chrome browser process when
-  // EnsureBrowserContextKeyedServiceFactoriesBuilt() is invoked again,
-  // guaranteeing that the ExtensionsBrowserClient is available.
-  if (extensions::ExtensionsBrowserClient::Get()) {
-    extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-  }
 #endif
 
   // ---------------------------------------------------------------------------
@@ -615,26 +560,15 @@ void ChromeBrowserMainExtraPartsProfiles::
   AccountReconcilorFactory::GetInstance();
   AccountSettingServiceFactory::GetInstance();
   AtMemoryQueryServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   AutoPictureInPictureHatsServiceFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   AccountsPolicyManagerFactory::GetInstance();
   search_integrity::SearchIntegrityFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  AndroidSessionDurationsServiceFactory::GetInstance();
-#endif
   AffiliationServiceFactory::GetInstance();
   AiDataKeyedServiceFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  AndroidProfileBrowserCollectionServiceFactory::GetInstance();
-  AndroidSmsOtpBackendFactory::GetInstance();
-#endif
   AnnouncementNotificationServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   apps::AppServiceProxyFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   AppSessionServiceFactory::GetInstance();
 #endif
@@ -661,20 +595,13 @@ void ChromeBrowserMainExtraPartsProfiles::
   autofill::PersonalDataManagerFactory::GetInstance();
   autofill::ValuablesDataManagerFactory::GetInstance();
   autofill::WalletPassAccessManagerFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  AutocompleteControllerAndroid::EnsureFactoryBuilt();
-  AuxiliarySearchDonationServiceFactory::GetInstance();
-  AuxiliarySearchProvider::EnsureFactoryBuilt();
-#endif
 #if BUILDFLAG(ENABLE_BACKGROUND_CONTENTS)
   BackgroundContentsServiceFactory::GetInstance();
 #endif
   BackgroundDownloadServiceFactory::GetInstance();
   BackgroundFetchDelegateFactory::GetInstance();
   BackgroundSyncControllerFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   badging::BadgeManagerFactory::GetInstance();
-#endif
   BitmapFetcherServiceFactory::GetInstance();
   BluetoothChooserContextFactory::GetInstance();
 #if defined(TOOLKIT_VIEWS)
@@ -698,26 +625,18 @@ void ChromeBrowserMainExtraPartsProfiles::
   browser_switcher::BrowserSwitcherServiceFactory::GetInstance();
 #endif
   browser_sync::UserEventServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   BrowserManagerServiceFactory::GetInstance();
-#endif
   BrowsingDataHistoryObserverService::Factory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   BulkLeakCheckServiceFactory::GetInstance();
-#endif  // !BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_ANDROID)
-#endif
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
   CaptivePortalServiceFactory::GetInstance();
 #endif
   ChildAccountServiceFactory::GetInstance();
   chrome_browser_net::DnsProbeServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   chrome_colors::ChromeColorsFactory::GetInstance();
-#endif
   ChromeBrowsingDataLifetimeManagerFactory::GetInstance();
   ChromeBrowsingDataRemoverDelegateFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ChromeDeviceAuthenticatorFactory::GetInstance();
 #endif
   ChromePolicyBlocklistServiceFactory::GetInstance();
@@ -728,9 +647,7 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   ClientHintsFactory::GetInstance();
   ClipboardRestrictionServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   CmtgDeviceKeyProviderFactory::GetInstance();
-#endif
   collaboration::CollaborationServiceFactory::GetInstance();
   collaboration::comments::CommentsServiceFactory::GetInstance();
   collaboration::messaging::MessagingBackendServiceFactory::GetInstance();
@@ -746,9 +663,7 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #endif
   CookieSettingsFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   metrics::CriticalUserJourneyServiceFactory::GetInstance();
-#endif  // BUILDFLAG(!IS_ANDROID)
   critical_actions::CriticalActionFactory::GetInstance();
   CrossDevicePrefTrackerFactory::GetInstance();
   DataTypeStoreServiceFactory::GetInstance();
@@ -758,10 +673,8 @@ void ChromeBrowserMainExtraPartsProfiles::
   data_sharing::DataSharingServiceFactory::GetInstance();
   data_sharing::personal_collaboration_data::
       PersonalCollaborationDataServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   DependencyParserModelLoaderFactory::GetInstance();
   DevToolsAndroidBridge::Factory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   DiceMigrationServiceFactory::GetInstance();
   DiceResponseHandlerFactory::GetInstance();
@@ -769,23 +682,17 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   BtmBrowserSigninDetectorFactory::GetInstance();
   policy::DeveloperToolsPolicyCheckerFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   dictation::DictationKeyedServiceFactory::GetInstance();
-#endif
   digital_credentials::DigitalCredentialsKeyedServiceFactory::GetInstance();
   DocumentSuggestionsServiceFactory::GetInstance();
   dom_distiller::DomDistillerServiceFactory::GetInstance();
   DomainDiversityReporterFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   DownloadBubbleUpdateServiceFactory::GetInstance();
-#endif
   DownloadCoreServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   EnclaveManagerFactory::GetInstance();
-#endif
   enterprise::ProfileIdServiceFactory::GetInstance();
   enterprise_commands::UserRemoteCommandsServiceFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
+#if BUILDFLAG(FULL_SAFE_BROWSING)
   enterprise_connectors::BrowserCrashEventRouterFactory::GetInstance();
 #endif
   enterprise_connectors::ConnectorsServiceFactory::GetInstance();
@@ -793,7 +700,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   enterprise_connectors::DeviceTrustConnectorServiceFactory::GetInstance();
   enterprise_connectors::DeviceTrustServiceFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
+#if BUILDFLAG(FULL_SAFE_BROWSING)
   enterprise_connectors::ReportingEventRouterFactory::GetInstance();
 #endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -807,7 +714,7 @@ void ChromeBrowserMainExtraPartsProfiles::
       GetInstance();
 #endif
   enterprise_groups::EnterpriseGroupsProfileHandlerFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   enterprise_idle::IdleServiceFactory::GetInstance();
 #endif
   enterprise_signals::SignalsAggregatorFactory::GetInstance();
@@ -816,15 +723,13 @@ void ChromeBrowserMainExtraPartsProfiles::
   EnterpriseProxyServiceFactory::GetInstance();
   enterprise_reporting::CloudProfileReportingServiceFactory::GetInstance();
   enterprise_reporting::LegacyTechServiceFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   enterprise_signals::UserPermissionServiceFactory::GetInstance();
 #endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   enterprise_signin::EnterpriseSigninServiceFactory::GetInstance();
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   OmniboxEverywhereServiceFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   ExitTypeServiceFactory::GetInstance();
 #endif
@@ -839,18 +744,13 @@ void ChromeBrowserMainExtraPartsProfiles::
   FederatedIdentityApiPermissionContextFactory::GetInstance();
   FederatedIdentityAutoReauthnPermissionContextFactory::GetInstance();
   FederatedIdentityPermissionContextFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  feed::FeedServiceFactory::GetInstance();
-#endif
   feedback::FeedbackUploaderFactoryChrome::GetInstance();
   FieldInfoManagerFactory::GetInstance();
   FileSystemAccessPermissionContextFactory::GetInstance();
   FindBarStateFactory::GetInstance();
   finds::FindsServiceFactory::GetInstance();
   first_party_sets::FirstPartySetsPolicyServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   FirstRunServiceFactory::GetInstance();
-#endif
   FontPrefChangeNotifierFactory::GetInstance();
   FromGWSNavigationAndKeepAliveRequestTrackerFactory::GetInstance();
   GAIAInfoUpdateServiceFactory::GetInstance();
@@ -859,17 +759,13 @@ void ChromeBrowserMainExtraPartsProfiles::
     GapisServiceFactory::GetInstance();
   }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#if !BUILDFLAG(IS_ANDROID)
   GlobalErrorServiceFactory::GetInstance();
-#endif
   GoogleGroupsManagerFactory::GetInstance();
   HatsServiceFactory::GetInstance();
   HeavyAdServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   HidChooserContextFactory::GetInstance();
   HidConnectionTrackerFactory::GetInstance();
   HidPolicyAllowedDevicesFactory::GetInstance();
-#endif
   HistoryClustersServiceFactory::EnsureFactoryBuilt();
   HistoryEmbeddingsServiceFactory::GetInstance();
   HistoryServiceFactory::GetInstance();
@@ -878,55 +774,30 @@ void ChromeBrowserMainExtraPartsProfiles::
   HttpsEngagementServiceFactory::GetInstance();
   HttpsFirstModeServiceFactory::GetInstance();
   IdentityManagerFactory::EnsureFactoryAndDependeeFactoriesBuilt();
-#if !BUILDFLAG(IS_ANDROID)
   ImmediateRequestRateLimiterFactory::GetInstance();
-#endif  // !BUILDFLAG(IS_ANDROID)
   InMemoryURLIndexFactory::GetInstance();
   visited_url_ranking::VisitedURLRankingServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   InstantServiceFactory::GetInstance();
-#endif
-#if !BUILDFLAG(IS_ANDROID)
   IOSPromoTriggerServiceFactory::GetInstance();
-#endif
   LanguageDetectionModelServiceFactory::GetInstance();
   LanguageModelManagerFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  LevelDBPersistedTabDataStorageAndroidFactory::GetInstance();
-#endif
   LocalOrSyncableBookmarkSyncServiceFactory::GetInstance();
   login_detection::LoginDetectionKeyedServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   LoginUIServiceFactory::GetInstance();
-#endif
   LogoServiceFactory::GetInstance();
   LookalikeUrlServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   ManagedConfigurationAPIFactory::GetInstance();
-#endif
   manta::MantaServiceFactory::GetInstance();
   MediaDeviceSaltServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   media_router::AccessCodeCastSinkServiceFactory::GetInstance();
-#endif
   media_router::ChromeLocalPresentationManagerFactory::GetInstance();
   media_router::ChromeMediaRouterFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   media_router::MediaRouterUIServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  MediaDrmOriginIdManagerFactory::GetInstance();
-#endif
   if (MediaEngagementService::IsEnabled()) {
     MediaEngagementServiceFactory::GetInstance();
   }
-#if !BUILDFLAG(IS_ANDROID)
   MediaNotificationServiceFactory::GetInstance();
-#endif
   MerchantTrustServiceFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  MerchantViewerDataManagerFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   metrics::DesktopProfileSessionDurationsServiceFactory::GetInstance();
 #endif
@@ -935,12 +806,10 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   MicrosoftAuthServiceFactory::GetInstance();
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   multistep_filter::MultistepFilterLogRouterFactory::GetInstance();
   multistep_filter::MultistepFilterServiceFactory::GetInstance();
   web_app::IsolatedWebAppsWindowOpenPermissionServiceFactory::GetInstance();
   web_app::IwaPermissionsPolicyCacheFactory::GetInstance();
-#endif  // !BUILDFLAG(IS_ANDROID)
   NavigationPredictorKeyedServiceFactory::GetInstance();
 #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
   net::ServerCertificateDatabaseServiceFactory::GetInstance();
@@ -949,35 +818,18 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   ProfileManagementDisclaimerServiceFactory::GetInstance();
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   notebooks::NotebooksServiceFactory::GetInstance();
-#endif
   NotificationDisplayServiceFactory::GetInstance();
   NotificationMetricsLoggerFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  NotificationPermissionsReviewServiceFactory::GetInstance();
-#endif  // BUILDFLAG(IS_ANDROID)
   NotificationsEngagementServiceFactory::GetInstance();
   NotifierStateTrackerFactory::GetInstance();
 #if BUILDFLAG(USE_NSS_CERTS)
   NssServiceFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  NtpAndroidBackgroundServiceFactory::GetInstance();
-  NtpAndroidCustomBackgroundServiceFactory::GetInstance();
-#endif
   NtpBackgroundServiceFactory::GetInstance();
   NtpCustomBackgroundServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   NTPResourceCacheFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_OFFLINE_PAGES)
-  offline_pages::OfflinePageAutoFetcherServiceFactory::GetInstance();
-  offline_pages::RequestCoordinatorFactory::GetInstance();
-#endif
-#if !BUILDFLAG(IS_ANDROID)
   OfflineItemModelManagerFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   OmniboxInputWatcherFactory::GetInstance();
   OmniboxSuggestionsWatcherFactory::GetInstance();
@@ -990,10 +842,8 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   OneGoogleBarServiceFactory::GetInstance();
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(b/502297163): Implement for Android.
   OneTimePermissionsTrackerFactory::GetInstance();
-#endif
   OptimizationGuideGlobalStateHolderKeyedServiceFactory::GetInstance();
   OptimizationGuideKeyedServiceFactory::GetInstance();
   OriginKeyedPermissionActionServiceFactory::GetInstance();
@@ -1002,56 +852,37 @@ void ChromeBrowserMainExtraPartsProfiles::
   page_content_annotations::PageContentExtractionServiceFactory::GetInstance();
   page_content_annotations::PageContentScreenshotServiceFactory::GetInstance();
   page_image_service::ImageServiceFactory::EnsureFactoryBuilt();
-#if !BUILDFLAG(IS_ANDROID)
   PageColorsControllerFactory::GetInstance();
-#endif
   passage_embeddings::PassageEmbedderModelObserverFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   webauthn::PasskeyUnlockManagerFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  DelayedPasswordFieldClassificationModelHandlerFactory::GetInstance();
-#endif
   password_manager::PasswordManagerLogRouterFactory::GetInstance();
   password_manager::PasswordRequirementsServiceFactory::GetInstance();
   PasswordFieldClassificationModelHandlerFactory::GetInstance();
   PasswordChangeServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   PasswordCounterFactory::GetInstance();
-#endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   PasswordManagerBlocklistPolicyFactory::GetInstance();
 #endif
   PasswordManagerSettingsServiceFactory::GetInstance();
   PasswordReuseManagerFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(features::kRemoteActorCredentialSharing)) {
     password_manager::RemoteActorCredentialSharingServiceFactory::GetInstance();
   }
-#endif
   payments::BrowserBoundKeyDeleterServiceFactory::GetInstance();
   payments::HasEnrolledInstrumentQueryFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   payments::PaymentRequestDisplayManagerFactory::GetInstance();
-#endif
   if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_DESKTOP) {
     performance_manager::SiteDataCacheFacadeFactory::GetInstance();
   }
-#if !BUILDFLAG(IS_ANDROID)
   PerformanceControlsHatsServiceFactory::GetInstance();
-#endif
   PermissionActionsHistoryFactory::GetInstance();
   PermissionDecisionAutoBlockerFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   PersistentRendererPrefsManagerFactory::GetInstance();
-#endif
   PersonalContextEligibilityServiceFactory::GetInstance();
   PersonalContextFirstRunServiceFactory::GetInstance();
   PersonalContextServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   PinnedTabServiceFactory::GetInstance();
   PinnedToolbarActionsModelFactory::GetInstance();
-#endif
   PlatformNotificationServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_PLUGINS)
   PluginInfoHostImpl::EnsureFactoryBuilt();
@@ -1082,9 +913,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   private_ai::PrivateAiServiceFactory::GetInstance();
   ProfileNetworkContextServiceFactory::GetInstance();
   ProfilePasswordStoreFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   ProfileStatisticsFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   ProfileTokenWebSigninInterceptorFactory::GetInstance();
   OidcAuthenticationSigninInterceptorFactory::GetInstance();
@@ -1094,27 +923,17 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   ProtocolHandlerRegistryFactory::GetInstance();
   ProviderStateServiceFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  readaloud::ReadAloudServiceFactory::GetInstance();
-#endif
-#if !BUILDFLAG(IS_ANDROID)
   ReadAnythingServiceFactory::GetInstance();
-#endif
   ReadingListModelFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   record_replay::TaskStoreFactory::GetInstance();
   record_replay::TaskParametersExtractorFactory::GetInstance();
   record_replay::TaskServiceFactory::GetInstance();
-#endif
   ReduceAcceptLanguageFactory::GetInstance();
   RendererUpdaterFactory::GetInstance();
   regional_capabilities::RegionalCapabilitiesServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX)
   reporting::ManualTestHeartbeatEventFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  RevokedPermissionsOSNotificationDisplayManagerFactory::GetInstance();
-#endif  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   safe_browsing::AdvancedProtectionStatusManagerFactory::GetInstance();
 #endif
@@ -1146,23 +965,13 @@ void ChromeBrowserMainExtraPartsProfiles::
   safe_browsing::V5SearchHashesCacheFactory::GetInstance();
 #endif
   safe_browsing::VerdictCacheManagerFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  SafetyHubMenuNotificationServiceFactory::GetInstance();
-#endif  // BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_ANDROID)
   if (features::IsMainNodeAnnotationsEnabled()) {
     screen_ai::AXMainNodeAnnotatorControllerFactory::GetInstance();
   }
   screen_ai::ScreenAIServiceRouterFactory::EnsureFactoryBuilt();
-#endif
   SCTReportingServiceFactory::GetInstance();
   search_engines::SearchEngineChoiceServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   SearchEngineChoiceDialogServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  SearchPermissionsService::Factory::GetInstance();
-#endif
   SearchPrefetchServiceFactory::GetInstance();
   SearchPrewarmProgressServiceFactory::GetInstance();
   if (SearchEnginePreconnector::ShouldBeEnabledAsKeyedService()) {
@@ -1175,37 +984,21 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   SessionDataServiceFactory::GetInstance();
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   SessionProtoDBFactory<cart_db::ChromeCartContentProto>::GetInstance();
-#endif
   SessionProtoDBFactory<commerce_subscription_db::
                             CommerceSubscriptionContentProto>::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   SessionProtoDBFactory<coupon_db::CouponContentProto>::GetInstance();
   SessionProtoDBFactory<discounts_db::DiscountsContentProto>::GetInstance();
-#endif
   SessionProtoDBFactory<
       discount_infos_db::DiscountInfosContentProto>::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  SessionProtoDBFactory<
-      merchant_signal_db::MerchantSignalContentProto>::GetInstance();
-#endif
   SessionProtoDBFactory<
       persisted_state_db::PersistedStateContentProto>::GetInstance();
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   SessionServiceFactory::GetInstance();
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   sharing_hub::SharingHubServiceFactory::GetInstance();
-#endif
   ShortcutsBackendFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   SigninDetectionServiceFactoryEnsureFactoryBuilt();
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  SigninManagerAndroidFactory::GetInstance();
-  SigninBridgeFactory::GetInstance();
-#endif
   SigninMetricsServiceFactory::GetInstance();
   SigninPolicyServiceFactory::GetInstance();
   SigninProfileAttributesUpdaterFactory::GetInstance();
@@ -1216,19 +1009,13 @@ void ChromeBrowserMainExtraPartsProfiles::
           site_token_provider::features::kSiteTokenProviderEnabled)) {
     site_token_provider::SiteTokenProviderServiceFactory::GetInstance();
   }
-#if !BUILDFLAG(IS_ANDROID)
-#endif
 #if BUILDFLAG(ENABLE_SPELLCHECK)
   SpellcheckServiceFactory::GetInstance();
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   StartupPasswordsImportServiceFactory::GetInstance();
-#endif
   StatefulSSLHostStateDelegateFactory::GetInstance();
   StorageAccessAPIServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   StorageNotificationServiceFactory::GetInstance();
-#endif
   SubresourceFilterProfileContextFactory::GetInstance();
   subscription_eligibility::SubscriptionEligibilityServiceFactory::
       GetInstance();
@@ -1239,65 +1026,40 @@ void ChromeBrowserMainExtraPartsProfiles::
   SyncServiceFactory::GetInstance();
   tab_groups::TabGroupSyncServiceFactory::GetInstance();
   TabRestoreServiceFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  tabs::TabStateStorageServiceFactory::GetInstance();
-#endif
   TemplateURLFetcherFactory::GetInstance();
   TemplateURLPrepopulateData::ResolverFactory::GetInstance();
   TemplateURLServiceFactory::GetInstance();
   tips::TipsServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   ThemeColorsSourceManagerFactory::GetInstance();
   ThemeServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  thin_webview::android::ChromeThinWebViewInitializer::Initialize();
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   ToolbarActionsModelFactory::GetInstance();
 #endif
   TopSitesFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   tree_fixing::AXTreeFixingServicesRouterFactory::GetInstance();
   TriggeredProfileResetterFactory::GetInstance();
-#endif
-#if !BUILDFLAG(IS_ANDROID)
   TurnSyncOnHelper::EnsureFactoryBuilt();
-#endif
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
   unexportable_keys::UnexportableKeyProfileGarbageCollectionServiceFactory::
       GetInstance();
 #endif
   UnifiedConsentServiceFactory::GetInstance();
   universal_optout::UniversalOptOutServiceFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID)
-  RevokedPermissionsServiceFactory::GetInstance();
-#endif  // BUILDFLAG(IS_ANDROID)
   UrlLanguageHistogramFactory::GetInstance();
   UsbChooserContextFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   UsbConnectionTrackerFactory::GetInstance();
   UserEducationServiceFactory::GetInstance();
-#endif
   visited_url_ranking::GroupSuggestionsServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
   InitialWebUIProfileServiceFactory::GetInstance();
   WaapUIMetricsServiceFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   web_app::IsolatedWebAppReaderRegistryFactory::GetInstance();
   web_app::IsolatedWebAppURLLoaderFactory::EnsureAssociatedFactoryBuilt();
   web_app::WebAppMetricsFactory::GetInstance();
   web_app::WebAppProviderFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  WebApkInstallServiceFactory::GetInstance();
-  if (base::FeatureList::IsEnabled(syncer::kWebApkBackupAndRestoreBackend)) {
-    webapk::WebApkSyncServiceFactory::GetInstance();
-  }
-#endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   autofill::AtMemoryCrossTabCopyPasteTrackerFactory::GetInstance();
 #endif
 

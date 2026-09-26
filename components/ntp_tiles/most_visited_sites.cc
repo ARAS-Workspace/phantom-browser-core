@@ -368,11 +368,9 @@ bool MostVisitedSites::IsCustomLinksInitialized() const {
 void MostVisitedSites::EnableTileTypes(
     const MostVisitedSites::EnableTileTypesOptions& options) {
   // Mixing of personal types is only supported on mobile.
-#if !BUILDFLAG(IS_ANDROID)
   if (options.enable_top_sites && options.enable_custom_links) {
     NOTIMPLEMENTED();
   }
-#endif
   if (enabled_tile_types_ != options) {
     enabled_tile_types_ = options;
     BuildCurrentTiles(/* is_user_triggered= */ true);
@@ -550,16 +548,11 @@ void MostVisitedSites::ResetProfilePrefs(PrefService* prefs) {
 }
 
 size_t MostVisitedSites::GetMaxNumSites() const {
-#if BUILDFLAG(IS_ANDROID)
-  // The "Add new" button (for custom tiles) is not a Tile; don't include.
-  return max_num_sites_;
-#else
   size_t limit = max_num_sites_;
   if (base::FeatureList::IsEnabled(ntp_features::kNtpShortcutsRedesign)) {
     limit = ntp_features::GetMaxMostVisitedTilesInExpandedState();
   }
   return limit + ((custom_links_manager_ && IsCustomLinksEnabled()) ? 1 : 0);
-#endif
 }
 
 void MostVisitedSites::InitiateTopSitesQuery(bool is_user_triggered) {
@@ -719,10 +712,8 @@ NTPTilesVector MostVisitedSites::GetEnterpriseShortcutTiles() {
     tile.title = shortcut.title;
     tile.url = shortcut.url;
     tile.source = TileSource::ENTERPRISE_SHORTCUTS;
-#if !BUILDFLAG(IS_ANDROID)
     tile.allow_user_edit = shortcut.allow_user_edit;
     tile.allow_user_delete = shortcut.allow_user_delete;
-#endif  // !BUILDFLAG(IS_ANDROID)
     new_tiles.push_back(std::move(tile));
   }
   return new_tiles;

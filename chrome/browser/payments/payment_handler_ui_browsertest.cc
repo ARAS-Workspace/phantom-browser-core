@@ -15,13 +15,8 @@ namespace {
 
 using PaymentHandlerUiBrowserTest = PaymentRequestPlatformBrowserTestBase;
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_OpenPaymentTwiceShouldBeSuccessful \
-  DISABLED_OpenPaymentTwiceShouldBeSuccessful
-#else
 #define MAYBE_OpenPaymentTwiceShouldBeSuccessful \
   OpenPaymentTwiceShouldBeSuccessful
-#endif
 
 // Make sure a page can open the Payment UI multiple times.
 IN_PROC_BROWSER_TEST_F(PaymentHandlerUiBrowserTest,

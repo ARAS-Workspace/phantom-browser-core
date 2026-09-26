@@ -12,10 +12,6 @@
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/grit/components_scaled_resources.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/resources/android/theme_resources.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace autofill {
 
 namespace {
@@ -24,11 +20,7 @@ namespace {
 constexpr int kResourceNotFoundId = 0;
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 constexpr auto kOldDataResources = base::MakeFixedFlatMap<Suggestion::Icon,
@@ -52,40 +44,6 @@ constexpr auto kOldDataResources = base::MakeFixedFlatMap<Suggestion::Icon,
     {Suggestion::Icon::kBnplAfterpay, IDR_AUTOFILL_METADATA_AFTERPAY},
     {Suggestion::Icon::kBnplKlarna, IDR_AUTOFILL_METADATA_KLARNA},
     {Suggestion::Icon::kBnplZip, IDR_AUTOFILL_METADATA_ZIP},
-#if BUILDFLAG(IS_ANDROID)
-    {Suggestion::Icon::kHome, IDR_ANDROID_AUTOFILL_HOME},
-    {Suggestion::Icon::kScanCreditCard, IDR_ANDROID_AUTOFILL_CC_SCAN_NEW},
-    {Suggestion::Icon::kOfferTag, IDR_ANDROID_AUTOFILL_OFFER_TAG_GREEN},
-    {Suggestion::Icon::kWork, IDR_ANDROID_AUTOFILL_WORK},
-    {Suggestion::Icon::kAndroidMessages, IDR_ANDROID_AUTOFILL_ANDROID_MESSAGES},
-    {Suggestion::Icon::kRecoveryPassword, IDR_ANDROID_PASSWORD_HISTORY},
-    {Suggestion::Icon::kCardGenericSpark,
-     IDR_ANDROID_AUTOFILL_CARD_GENERIC_SPARK},
-    {Suggestion::Icon::kCardGenericVector,
-     IDR_ANDROID_AUTOFILL_CARD_GENERIC_VECTOR},
-    {Suggestion::Icon::kIdCard, IDR_ANDROID_AUTOFILL_ID_CARD},
-    {Suggestion::Icon::kIdCard2, IDR_ANDROID_AUTOFILL_ID_CARD_2},
-    {Suggestion::Icon::kIdCard2Spark, IDR_ANDROID_AUTOFILL_ID_CARD_2_SPARK},
-    {Suggestion::Icon::kIdCardSpark, IDR_ANDROID_AUTOFILL_ID_CARD_SPARK},
-    {Suggestion::Icon::kFlight, IDR_ANDROID_AUTOFILL_FLIGHT},
-    {Suggestion::Icon::kFlightSpark, IDR_ANDROID_AUTOFILL_FLIGHT_SPARK},
-    {Suggestion::Icon::kLocation, IDR_ANDROID_AUTOFILL_LOCATION},
-    {Suggestion::Icon::kLocationSpark, IDR_ANDROID_AUTOFILL_LOCATION_SPARK},
-    {Suggestion::Icon::kOrder, IDR_ANDROID_AUTOFILL_SHOPPING_BAG},
-    {Suggestion::Icon::kOrderSpark, IDR_ANDROID_AUTOFILL_SHOPPING_BAG_SPARK},
-    {Suggestion::Icon::kPersonCheck, IDR_ANDROID_AUTOFILL_PERSON_CHECK},
-    {Suggestion::Icon::kShipment, IDR_ANDROID_AUTOFILL_SHIPMENT},
-    {Suggestion::Icon::kShipmentSpark, IDR_ANDROID_AUTOFILL_SHIPMENT_SPARK},
-    {Suggestion::Icon::kVehicle, IDR_ANDROID_AUTOFILL_VEHICLE},
-    {Suggestion::Icon::kVehicleSpark, IDR_ANDROID_AUTOFILL_CAR_SPARK},
-    {Suggestion::Icon::kPassport, IDR_ANDROID_AUTOFILL_PASSPORT},
-    {Suggestion::Icon::kPassportSpark, IDR_ANDROID_AUTOFILL_PASSPORT_SPARK},
-    {Suggestion::Icon::kSpark, IDR_ANDROID_AUTOFILL_SPARK},
-    {Suggestion::Icon::kTextSpark, IDR_ANDROID_AUTOFILL_TEXT_SPARK},
-    {Suggestion::Icon::kEmail, IDR_ANDROID_AUTOFILL_EMAIL},
-    {Suggestion::Icon::kSadTab, IDR_ANDROID_AUTOFILL_SAD_TAB},
-    {Suggestion::Icon::kSettings, IDR_ANDROID_AUTOFILL_SETTINGS},
-#endif  // BUILDFLAG(IS_ANDROID)
 });
 
 constexpr auto kDataResources = base::MakeFixedFlatMap<Suggestion::Icon, int>({
@@ -107,40 +65,6 @@ constexpr auto kDataResources = base::MakeFixedFlatMap<Suggestion::Icon, int>({
     {Suggestion::Icon::kBnplAfterpay, IDR_AUTOFILL_METADATA_AFTERPAY},
     {Suggestion::Icon::kBnplKlarna, IDR_AUTOFILL_METADATA_KLARNA},
     {Suggestion::Icon::kBnplZip, IDR_AUTOFILL_METADATA_ZIP},
-#if BUILDFLAG(IS_ANDROID)
-    {Suggestion::Icon::kHome, IDR_ANDROID_AUTOFILL_HOME},
-    {Suggestion::Icon::kScanCreditCard, IDR_ANDROID_AUTOFILL_CC_SCAN_NEW},
-    {Suggestion::Icon::kOfferTag, IDR_ANDROID_AUTOFILL_OFFER_TAG_GREEN},
-    {Suggestion::Icon::kWork, IDR_ANDROID_AUTOFILL_WORK},
-    {Suggestion::Icon::kAndroidMessages, IDR_ANDROID_AUTOFILL_ANDROID_MESSAGES},
-    {Suggestion::Icon::kRecoveryPassword, IDR_ANDROID_PASSWORD_HISTORY},
-    {Suggestion::Icon::kCardGenericSpark,
-     IDR_ANDROID_AUTOFILL_CARD_GENERIC_SPARK},
-    {Suggestion::Icon::kCardGenericVector,
-     IDR_ANDROID_AUTOFILL_CARD_GENERIC_VECTOR},
-    {Suggestion::Icon::kIdCard, IDR_ANDROID_AUTOFILL_ID_CARD},
-    {Suggestion::Icon::kIdCard2, IDR_ANDROID_AUTOFILL_ID_CARD_2},
-    {Suggestion::Icon::kIdCard2Spark, IDR_ANDROID_AUTOFILL_ID_CARD_2_SPARK},
-    {Suggestion::Icon::kIdCardSpark, IDR_ANDROID_AUTOFILL_ID_CARD_SPARK},
-    {Suggestion::Icon::kFlight, IDR_ANDROID_AUTOFILL_FLIGHT},
-    {Suggestion::Icon::kFlightSpark, IDR_ANDROID_AUTOFILL_FLIGHT_SPARK},
-    {Suggestion::Icon::kLocation, IDR_ANDROID_AUTOFILL_LOCATION},
-    {Suggestion::Icon::kLocationSpark, IDR_ANDROID_AUTOFILL_LOCATION_SPARK},
-    {Suggestion::Icon::kOrder, IDR_ANDROID_AUTOFILL_SHOPPING_BAG},
-    {Suggestion::Icon::kOrderSpark, IDR_ANDROID_AUTOFILL_SHOPPING_BAG_SPARK},
-    {Suggestion::Icon::kPersonCheck, IDR_ANDROID_AUTOFILL_PERSON_CHECK},
-    {Suggestion::Icon::kShipment, IDR_ANDROID_AUTOFILL_SHIPMENT},
-    {Suggestion::Icon::kShipmentSpark, IDR_ANDROID_AUTOFILL_SHIPMENT_SPARK},
-    {Suggestion::Icon::kVehicle, IDR_ANDROID_AUTOFILL_VEHICLE},
-    {Suggestion::Icon::kVehicleSpark, IDR_ANDROID_AUTOFILL_CAR_SPARK},
-    {Suggestion::Icon::kPassport, IDR_ANDROID_AUTOFILL_PASSPORT},
-    {Suggestion::Icon::kPassportSpark, IDR_ANDROID_AUTOFILL_PASSPORT_SPARK},
-    {Suggestion::Icon::kSpark, IDR_ANDROID_AUTOFILL_SPARK},
-    {Suggestion::Icon::kTextSpark, IDR_ANDROID_AUTOFILL_TEXT_SPARK},
-    {Suggestion::Icon::kEmail, IDR_ANDROID_AUTOFILL_EMAIL},
-    {Suggestion::Icon::kSadTab, IDR_ANDROID_AUTOFILL_SAD_TAB},
-    {Suggestion::Icon::kSettings, IDR_ANDROID_AUTOFILL_SETTINGS},
-#endif  // BUILDFLAG(IS_ANDROID)
 });
 
 }  // namespace

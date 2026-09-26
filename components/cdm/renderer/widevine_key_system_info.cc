@@ -156,20 +156,11 @@ EmeConfig::Rule WidevineKeySystemInfo::GetRobustnessConfigRule(
   [[maybe_unused]] bool hw_secure_codecs_required =
       hw_secure_requirement && *hw_secure_requirement;
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, require hardware secure codecs for SW_SECURE_DECODE and above.
-  if (robustness >= Robustness::SW_SECURE_DECODE || hw_secure_codecs_required) {
-    return EmeConfig{.hw_secure_codecs = EmeConfigRuleState::kRequired};
-  }
-
-#else
   // On other platforms, require hardware secure codecs for HW_SECURE_CRYPTO and
   // above.
   if (robustness >= Robustness::HW_SECURE_CRYPTO) {
     return EmeConfig{.hw_secure_codecs = EmeConfigRuleState::kRequired};
   }
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
   return media::EmeConfig::SupportedRule();
 }

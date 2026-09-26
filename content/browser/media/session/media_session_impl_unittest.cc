@@ -521,8 +521,6 @@ TEST_F(MediaSessionImplTest, ResumeUI_WithAction) {
   observer.WaitForExpectedActions(default_actions());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 TEST_F(MediaSessionImplTest, WebContentsDestroyed_ReleasesFocus) {
   std::unique_ptr<WebContents> web_contents(CreateTestWebContents());
   MediaSessionImpl* media_session = MediaSessionImpl::Get(web_contents.get());
@@ -691,8 +689,6 @@ TEST_F(MediaSessionImplTest, RequestAudioFocus_OnFocus_Suspended) {
 }
 
 #endif  // BUILDFLAG(IS_MAC)
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(MediaSessionImplTest, SourceId_SameBrowserContext) {
   auto other_contents = TestWebContents::Create(browser_context(), nullptr);
@@ -1030,11 +1026,6 @@ TEST_F(MediaSessionImplTest, AmbientPlayerFocusRequest) {
   MockMediaSessionMojoObserver observer(*GetMediaSession());
   GetMediaSession()->AddPlayer(player_observer_.get(), player_id);
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, ambient players should not request audio focus.
-  observer.WaitForState(MediaSessionInfo::SessionState::kInactive);
-  EXPECT_FALSE(delegate->GetLastRequestedFocusType().has_value());
-#else
   // On other platforms, an ambient player should request ambient focus.
   observer.WaitForState(MediaSessionInfo::SessionState::kActive);
   EXPECT_TRUE(delegate->GetLastRequestedFocusType().has_value());
@@ -1049,7 +1040,6 @@ TEST_F(MediaSessionImplTest, AmbientPlayerFocusRequest) {
             kDuckingMultiplier);
   GetMediaSession()->StopDucking();
   EXPECT_EQ(player_observer_->GetVolumeMultiplier(player_id), 1.0);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(MediaSessionImplTest, AmbientPlayerDoesNotRequestFocusWhenSuspended) {

@@ -290,11 +290,7 @@ TEST_F(DawnCachingInterfaceTest, TestAggressiveCacheAndMemoryPressure) {
 
     // But not critical, except on Android
     factory.PurgeMemory(base::MEMORY_PRESSURE_LEVEL_CRITICAL);
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_EQ(kDataSize, interface->FindKey(kKey1));
-#else
     EXPECT_EQ(0u, interface->FindKey(kKey1));
-#endif
   }
 }
 

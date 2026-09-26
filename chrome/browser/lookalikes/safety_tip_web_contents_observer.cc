@@ -245,15 +245,8 @@ void SafetyTipWebContentsObserver::HandleSafetyTipCheckResult(
                      result.url, result.safety_tip_status,
                      std::move(safety_tip_close_callback_for_testing_));
 
-#if BUILDFLAG(IS_ANDROID)
-  delegate_.DisplaySafetyTipPrompt(result.safety_tip_status,
-                                   result.suggested_url, web_contents(),
-                                   std::move(close_callback));
-#else
-
   ShowSafetyTipDialog(web_contents(), result.safety_tip_status,
                       result.suggested_url, std::move(close_callback));
-#endif
   MaybeCallSafetyTipCheckCallback(true);
 }
 

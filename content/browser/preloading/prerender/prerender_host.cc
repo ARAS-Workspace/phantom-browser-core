@@ -64,10 +64,6 @@
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/strings/stringprintf.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -113,14 +109,7 @@ base::flat_map<PrerenderHostId, FrameTreeNodeId>& GetPrerenderHostIdMap() {
 // RenderProcessHost as the 1st SiteInstance is what makes it important to
 // carefully choose the RenderProcessHost for the 1st SiteInstance.
 BASE_FEATURE(kCreatePrerenderSiteInstanceWithURL,
-#if BUILDFLAG(IS_ANDROID)
-             // TODO(crbug.com/444530329): Fix incompatibility with the
-             // Android-only `kProcessReuseOnPrerenderCOOPSwap` feature.
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 base::OnceCallback<void(PrerenderHostId)>& GetHostCreationCallback() {
   static base::NoDestructor<base::OnceCallback<void(PrerenderHostId)>>
@@ -147,24 +136,6 @@ void CheckPrerenderAttributes(const PrerenderAttributes& attributes) {
     CHECK(attributes.initiator_frame_tree_node_id);
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// This is similar to `HttpRequestHeaders::ToString()` but the headers are
-// separated by "\n", not "\r\n", as
-// `NavigationController::LoadURLParams::extra_headers` requires the format.
-std::string SerializeHttpRequestHeaders(
-    const net::HttpRequestHeaders& headers) {
-  CHECK(!headers.IsEmpty());
-  std::string output;
-  for (const auto& header : headers.GetHeaderVector()) {
-    base::StringAppendF(&output, "%s: %s\n", header.key.c_str(),
-                        header.value.c_str());
-  }
-  // Add the trailing `\n`.
-  output.append("\n");
-  return output;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 PrerenderHostId NextPrerenderHostId() {
   static PrerenderHostId::Generator generator;
@@ -287,21 +258,6 @@ bool PrerenderHost::PrerenderFrameTreeDelegate::ShouldPreserveAbortedURLs() {
   return false;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-scoped_refptr<viz::RasterContextProvider>
-PrerenderHost::PrerenderFrameTreeDelegate::GetRasterContextProvider() {
-  NOTREACHED();
-}
-
-gfx::ColorSpace PrerenderHost::PrerenderFrameTreeDelegate::GetOutputColorSpace(
-    gfx::ContentColorUsage color_usage,
-    bool needs_alpha) {
-  NOTREACHED();
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 PrerenderHost::LoadingOutcome
 PrerenderHost::PrerenderFrameTreeDelegate::WaitForLoadStopForTesting() {
   LoadingOutcome status = LoadingOutcome::kLoadingCompleted;
@@ -416,9 +372,6 @@ constexpr auto kIgnoredHeaders =
 // static
 bool PrerenderHost::AreHttpRequestHeadersCompatible(
     const std::string& potential_activation_headers_str,
-#if BUILDFLAG(IS_ANDROID)
-    const std::string& potential_activation_additional_headers_str,
-#endif  // BUILDFLAG(IS_ANDROID)
     const std::string& prerender_headers_str,
     PreloadingTriggerType trigger_type,
     const std::string& histogram_suffix,
@@ -430,10 +383,6 @@ bool PrerenderHost::AreHttpRequestHeadersCompatible(
   net::HttpRequestHeaders potential_activation_headers;
   potential_activation_headers.AddHeadersFromString(
       potential_activation_headers_str);
-#if BUILDFLAG(IS_ANDROID)
-  potential_activation_headers.AddHeadersFromString(
-      potential_activation_additional_headers_str);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   CHECK(!potential_activation_headers.HasHeader(
       blink::kSecSpeculationTagsHeaderName));
@@ -493,12 +442,6 @@ PrerenderHost::PrerenderHost(
       devtools_attempt_(std::move(devtools_attempt)),
       web_contents_(web_contents),
       host_reused_(reuse_host) {
-#if BUILDFLAG(IS_ANDROID)
-  if (trigger_type() == PreloadingTriggerType::kSpeculationRule) {
-    base::trace_event::EmitNamedTrigger("sp-prerender-start");
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   CheckPrerenderAttributes(attributes_);
   SetTriggeringOutcome(PreloadingTriggeringOutcome::kTriggeredButPending);
 
@@ -600,12 +543,6 @@ bool PrerenderHost::StartPrerendering() {
   load_url_params.initiator_frame_token = attributes_.initiator_frame_token;
   load_url_params.initiator_navigation_state =
       attributes_.initiator_navigation_state;
-#if BUILDFLAG(IS_ANDROID)
-  if (!attributes_.additional_headers.IsEmpty()) {
-    load_url_params.extra_headers =
-        SerializeHttpRequestHeaders(attributes_.additional_headers);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   load_url_params.is_renderer_initiated = !attributes_.IsBrowserInitiated();
   load_url_params.transition_type =
       ui::PageTransitionFromInt(attributes_.transition_type);
@@ -1080,14 +1017,6 @@ bool PrerenderHost::AreInitialPrerenderNavigationParamsCompatibleWithNavigation(
   return true;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// The flag below is provided in case the workaround had a bug. Use the flag to
-// revert back to the previous behavior.
-// TODO(crbug.com/399478939): Remove the workaround and this flag.
-BASE_FEATURE(kPrerenderActivationMismatchWebViewWorkaround,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 PrerenderHost::ActivationNavigationParamsMatch
 PrerenderHost::AreBeginNavigationParamsCompatibleWithNavigation(
     const GURL& potential_activation_url,
@@ -1104,23 +1033,9 @@ PrerenderHost::AreBeginNavigationParamsCompatibleWithNavigation(
     return ActivationNavigationParamsMatch::kInitiatorFrameToken;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  std::string activation_additional_headers_str;
-  bool workaround_enabled = base::FeatureList::IsEnabled(
-      kPrerenderActivationMismatchWebViewWorkaround);
-  if (!workaround_enabled || !IsSpeculationRuleType(trigger_type())) {
-    activation_additional_headers_str =
-        web_contents_->GetBrowserContext()->GetExtraHeadersForUrl(
-            potential_activation_url);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-  if (!AreHttpRequestHeadersCompatible(potential_activation.headers,
-#if BUILDFLAG(IS_ANDROID)
-                                       activation_additional_headers_str,
-#endif  // BUILDFLAG(IS_ANDROID)
-                                       begin_params_->headers, trigger_type(),
-                                       GetHistogramSuffix(),
-                                       allow_partial_mismatch, reason)) {
+  if (!AreHttpRequestHeadersCompatible(
+          potential_activation.headers, begin_params_->headers, trigger_type(),
+          GetHistogramSuffix(), allow_partial_mismatch, reason)) {
     return ActivationNavigationParamsMatch::kHttpRequestHeader;
   }
 

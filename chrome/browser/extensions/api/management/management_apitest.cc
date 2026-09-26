@@ -96,10 +96,8 @@ bool ExpectChromeAppsDefaultEnabled() {
 class ExtensionManagementApiTest : public extensions::ExtensionApiTest {
  public:
   ExtensionManagementApiTest() {
-#if !BUILDFLAG(IS_ANDROID)
     enable_chrome_apps_ = std::make_unique<base::AutoReset<bool>>(
         &extensions::testing::g_enable_chrome_apps_for_testing, true);
-#endif
   }
   ~ExtensionManagementApiTest() override = default;
   ExtensionManagementApiTest& operator=(const ExtensionManagementApiTest&) =
@@ -161,17 +159,13 @@ class ExtensionManagementApiTest : public extensions::ExtensionApiTest {
 
  protected:
   std::unique_ptr<base::AutoReset<bool>> enable_chrome_apps_;
-#if !BUILDFLAG(IS_ANDROID)
   web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, Basics) {
-#if !BUILDFLAG(IS_ANDROID)
   // Android does not provide the XmlUnitTestResultPrinter this method needs.
   base::AddFeatureIdTagToTestResult(
       "screenplay-7a245632-83b2-4dc8-a1db-283ef595e2df");
-#endif
 
   LoadExtensions();
 
@@ -188,11 +182,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, Basics) {
 }
 
 // TODO(crbug.com/371332103): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_NoPermission DISABLED_NoPermission
-#else
 #define MAYBE_NoPermission NoPermission
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, MAYBE_NoPermission) {
   LoadExtensions();
   ASSERT_TRUE(RunExtensionTest("management/no_permission"));
@@ -206,7 +196,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, Uninstall) {
   ASSERT_TRUE(RunExtensionTest("management/uninstall"));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Skipped on Android because it does not support Chrome apps.
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, CreateAppShortcut) {
   LoadExtensions();
@@ -222,7 +211,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, GenerateAppForLink) {
   web_app::test::WaitUntilReady(web_app::WebAppProvider::GetForTest(profile()));
   ASSERT_TRUE(RunExtensionTest("management/generate_app_for_link"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 // TODO(crbug.com/371332103): Determine if this needs to be supported on desktop
@@ -500,7 +488,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, ManagementPolicyProhibited) {
                                {.custom_arg = "runProhibitedTests"}));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Skipped on Android because it does not support Chrome apps.
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, LaunchPanelApp) {
   // Load an extension that calls launchApp() on any app that gets
@@ -674,7 +661,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, NoLaunchTabAppDeprecated) {
     EXPECT_FALSE(launched_app.was_satisfied());
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Flaky on MacOS: crbug.com/41431910
 #if BUILDFLAG(IS_MAC)

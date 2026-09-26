@@ -26,10 +26,6 @@
 #include "ui/accessibility/platform/test_ax_platform_tree_manager_delegate.h"
 #include "ui/accessibility/test_ax_tree_update.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/accessibility/browser_accessibility_manager_android.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -39,11 +35,9 @@ struct FiredGeneratedEvent {
   ui::AXNodeID node_id;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 gfx::AcceleratedWidget MakeAcceleratedWidget(uintptr_t value) {
   return static_cast<gfx::AcceleratedWidget>(value);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class CountingAXTreeObserver : public ui::AXTreeObserver {
  public:
@@ -77,13 +71,8 @@ ui::BrowserAccessibilityManager* CreateBrowserAccessibilityManager(
     const ui::AXTreeUpdate& initial_tree,
     ui::AXNodeIdDelegate& node_id_delegate,
     ui::AXPlatformTreeManagerDelegate* delegate) {
-#if BUILDFLAG(IS_ANDROID)
-  return content::BrowserAccessibilityManagerAndroid::Create(
-      initial_tree, node_id_delegate, delegate);
-#else
   return ui::BrowserAccessibilityManager::Create(initial_tree, node_id_delegate,
                                                  delegate);
-#endif
 }
 
 }  // anonymous namespace
@@ -1412,18 +1401,11 @@ TEST_F(BrowserAccessibilityManagerTest, TestShouldFireEventForNode) {
   EXPECT_TRUE(manager->ShouldFireEventForNode(manager->GetFromID(1)));
   EXPECT_TRUE(manager->ShouldFireEventForNode(manager->GetFromID(11)));
   EXPECT_TRUE(manager->ShouldFireEventForNode(manager->GetFromID(111)));
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, ShouldFireEventForNode walks up the ancestor that's a leaf node
-  // node and the event is fired on the updated target.
-  EXPECT_TRUE(manager->ShouldFireEventForNode(manager->GetFromID(1111)));
-#else
   EXPECT_FALSE(manager->ShouldFireEventForNode(manager->GetFromID(1111)));
-#endif
 }
 
 // Desktop keeps MENU_POPUP_END on the menu that just became ignored. Android
 // retargets generated events, so it does not use this exact path.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(BrowserAccessibilityManagerTest,
        MenuPopupEndFiresWhenMenuBecomesIgnored) {
   ui::AXNodeData root;
@@ -1471,7 +1453,6 @@ TEST_F(BrowserAccessibilityManagerTest,
   }
   EXPECT_TRUE(found_menu_popup_end);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(BrowserAccessibilityManagerTest, NestedChildRoot) {
   ui::AXNodeData root;

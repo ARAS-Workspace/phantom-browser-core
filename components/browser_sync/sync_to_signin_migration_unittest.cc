@@ -544,9 +544,7 @@ TEST_P(SyncToSigninMigrationTest, UndoFeaturePreventsMigration) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
       syncer::THEMES,
-#endif  // !BUILDFLAG(IS_ANDROID)
   }));
 
   // Save the above state to prefs.
@@ -644,9 +642,7 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncAndAllDataTypesActive) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
       syncer::THEMES,
-#endif  // !BUILDFLAG(IS_ANDROID)
   }));
 
   // Save the above state to prefs.
@@ -689,15 +685,9 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncAndAllDataTypesActive) {
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-#if BUILDFLAG(IS_ANDROID)
-  // PASSWORDS is migrated by other layers on Android.
-  histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD", 0);
-#else
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-#endif
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
@@ -706,11 +696,9 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncAndAllDataTypesActive) {
       "Sync.SyncToSigninMigrationDecision." + infix + ".EXTENSION",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".THEME",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_P(SyncToSigninMigrationMetricsTest, SyncActiveButNotDataTypes) {
@@ -762,18 +750,11 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncActiveButNotDataTypes) {
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-#if BUILDFLAG(IS_ANDROID)
-  // PASSWORDS is migrated by other layers on Android.
-  histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD", 0);
-#else
   // Passwords was not active, even though it was enabled.
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
       1);
-#endif  // BUILDFLAG(IS_ANDROID)
-  // ReadingList was disabled by the user.
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeDisabled*/ 1, 1);
@@ -791,9 +772,7 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncStatusPrefsUnset) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
       syncer::THEMES,
-#endif  // !BUILDFLAG(IS_ANDROID)
   }));
 
   // Save the Sync configuration (enabled data types etc) to prefs, but not the
@@ -840,12 +819,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncStatusPrefsUnset) {
         "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#if !BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.READING_LIST",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
@@ -856,12 +833,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncStatusPrefsUnset) {
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.THEME",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif  // !BUILDFLAG(IS_ANDROID)
   } else {
     // The overall migration didn't run.
     histograms.ExpectTotalCount(
@@ -933,9 +908,7 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncTransport) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       syncer::EXTENSIONS,
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
       syncer::THEMES,
-#endif  // !BUILDFLAG(IS_ANDROID)
   }));
 
   // Save the above state to prefs.
@@ -1003,16 +976,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayNotPassed) {
         "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#if BUILDFLAG(IS_ANDROID)
-    // PASSWORDS is migrated by other layers on Android.
-    histograms.ExpectTotalCount(
-        "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD", 0);
-#else
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif  // BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
@@ -1023,12 +990,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayNotPassed) {
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".THEME",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif  // !BUILDFLAG(IS_ANDROID)
   } else if (IsMigrationEnabled()) {
     // The migration should not run because not enough time passed since the
     // auth error was detected. There's still a chance the user will resolve it.
@@ -1061,16 +1026,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayNotPassed) {
         "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#if BUILDFLAG(IS_ANDROID)
-    // PASSWORDS is migrated by other layers on Android.
-    histograms.ExpectTotalCount(
-        "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD", 0);
-#else
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif  // BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
@@ -1081,12 +1040,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayNotPassed) {
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision." + infix + ".THEME",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 }
 
@@ -1143,16 +1100,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayPassed) {
       "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
       1);
-#if BUILDFLAG(IS_ANDROID)
-  // PASSWORDS is migrated by other layers on Android.
-  histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD", 0);
-#else
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
       1);
-#endif  // BUILDFLAG(IS_ANDROID)
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
@@ -1163,12 +1114,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_MinDelayPassed) {
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
       1);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".THEME",
       /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
       1);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_AuthErrorResolved) {
@@ -1211,15 +1160,9 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_AuthErrorResolved) {
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".BOOKMARK",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-#if BUILDFLAG(IS_ANDROID)
-  // PASSWORDS is migrated by other layers on Android.
-  histograms.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD", 0);
-#else
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".PASSWORD",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-#endif  // BUILDFLAG(IS_ANDROID)
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".READING_LIST",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
@@ -1228,11 +1171,9 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncPaused_AuthErrorResolved) {
       "Sync.SyncToSigninMigrationDecision." + infix + ".EXTENSION",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
   histograms.ExpectUniqueSample(
       "Sync.SyncToSigninMigrationDecision." + infix + ".THEME",
       /*SyncToSigninMigrationDataTypeDecision::kMigrate*/ 0, 1);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_P(SyncToSigninMigrationMetricsTest, SyncInitializing) {
@@ -1283,12 +1224,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncInitializing) {
         "Sync.SyncToSigninMigrationDecision.Migration.BOOKMARK",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#if !BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.PASSWORD",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.READING_LIST",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
@@ -1299,12 +1238,10 @@ TEST_P(SyncToSigninMigrationMetricsTest, SyncInitializing) {
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
     histograms.ExpectUniqueSample(
         "Sync.SyncToSigninMigrationDecision.Migration.THEME",
         /*SyncToSigninMigrationDataTypeDecision::kDontMigrateTypeNotActive*/ 2,
         1);
-#endif  // !BUILDFLAG(IS_ANDROID)
   } else {
     // The overall migration didn't run.
     histograms.ExpectTotalCount(
@@ -1516,9 +1453,7 @@ class SyncToSigninMigrationDataTypesTest
 #if BUILDFLAG(ENABLE_EXTENSIONS)
         syncer::EXTENSIONS,
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
         syncer::THEMES,
-#endif  // !BUILDFLAG(IS_ANDROID)
     }));
 
     // Save the above state to prefs.
@@ -1812,28 +1747,6 @@ TEST_P(SyncToSigninMigrationDataTypesTest,
       -base::File::FILE_ERROR_NOT_FOUND, 1);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(SyncToSigninMigrationDataTypesTest, MovePasswords_NoMoveOnAndroid) {
-  base::WriteFile(GetPasswordsLocalStorePath(), "local passwords");
-  base::WriteFile(GetPasswordsAccountStorePath(), "account passwords");
-  base::HistogramTester histogram_tester;
-
-  MaybeMigrateSyncingUserToSignedInWrapper(
-      IsBlockingAllowed(), fake_profile_dir_.GetPath(), &pref_service_);
-
-  // The files should be unchanged.
-  std::string local_contents;
-  std::string account_contents;
-  ASSERT_TRUE(
-      base::ReadFileToString(GetPasswordsLocalStorePath(), &local_contents));
-  ASSERT_TRUE(base::ReadFileToString(GetPasswordsAccountStorePath(),
-                                     &account_contents));
-  EXPECT_EQ(local_contents, "local passwords");
-  EXPECT_EQ(account_contents, "account passwords");
-  histogram_tester.ExpectTotalCount(
-      "Sync.SyncToSigninMigrationOutcome.PasswordsFileMove", 0);
-}
-#else
 TEST_P(SyncToSigninMigrationDataTypesTest, MovePasswords_BothExist) {
   // Both password stores exist on disk. The account store is empty, since it
   // was unused pre-migration. This is the typical pre-migration state.
@@ -1986,7 +1899,6 @@ TEST_P(SyncToSigninMigrationDataTypesTest, MarkStatsTableToBeCleanedUp) {
       "Sync.SyncToSigninMigration.StatsTableCleanupStep",
       syncer::SyncToSigninMigrationStatsTableCleanupStep::kCleanupRequested, 1);
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 TEST_P(SyncToSigninMigrationDataTypesTest, MarkExtensionsToBeMigrated) {
@@ -2007,7 +1919,6 @@ TEST_P(SyncToSigninMigrationDataTypesTest, MarkExtensionsToBeMigrated) {
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_P(SyncToSigninMigrationDataTypesTest, MarkThemeToBeMigrated) {
   ASSERT_FALSE(pref_service_.GetBoolean(
       syncer::prefs::internal::kMigrateThemeFromLocalToAccount));
@@ -2024,7 +1935,6 @@ TEST_P(SyncToSigninMigrationDataTypesTest, MarkThemeToBeMigrated) {
       "Sync.SyncToSigninMigration.ThemeMigrationStep",
       syncer::SyncToSigninMigrationThemeStep::kMigrationRequested, 1);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 INSTANTIATE_TEST_SUITE_P(
     ,
@@ -2066,9 +1976,7 @@ class SyncToSigninMigrationUndoTest
 #if BUILDFLAG(ENABLE_EXTENSIONS)
         syncer::EXTENSIONS,
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-#if !BUILDFLAG(IS_ANDROID)
         syncer::THEMES,
-#endif  // !BUILDFLAG(IS_ANDROID)
     }));
 
     // Save the above state to prefs.

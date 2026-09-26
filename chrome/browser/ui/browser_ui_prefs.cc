@@ -28,7 +28,6 @@
 void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(prefs::kAllowFileSelectionDialogs, true);
 
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterIntegerPref(prefs::kRelaunchNotification, 0);
   registry->RegisterIntegerPref(
       prefs::kRelaunchNotificationPeriod,
@@ -37,7 +36,6 @@ void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
               .InMilliseconds()));
   registry->RegisterDictionaryPref(prefs::kRelaunchWindow);
   registry->RegisterIntegerPref(prefs::kRelaunchFastIfOutdated, 0);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
   registry->RegisterIntegerPref(
@@ -75,19 +73,13 @@ void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
   registry->RegisterStringPref(prefs::kEnterpriseLogoUrlForBrowser,
                                std::string());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterIntegerPref(prefs::kSplitViewDragAndDropNudgeShownCount, 0);
   registry->RegisterIntegerPref(prefs::kSplitViewDragAndDropNudgeUsedCount, 0);
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
-#if BUILDFLAG(IS_ANDROID)
-  const uint32_t pref_registration_flags = PrefRegistry::NO_REGISTRATION_FLAGS;
-#else
   const uint32_t pref_registration_flags =
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF;
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   registry->RegisterIntegerPref(prefs::kSessionRestoreInfoBarTimesShown, 0);
@@ -124,10 +116,8 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(
       prefs::kEnableDoNotTrack, false,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(prefs::kPrintPreviewUseSystemDefaultPrinter,
                                 false);
-#endif
   registry->RegisterStringPref(prefs::kWebRTCIPHandlingPolicy,
                                blink::kWebRTCIPHandlingDefault);
   registry->RegisterListPref(prefs::kWebRTCIPHandlingUrl, base::ListValue());
@@ -177,10 +167,8 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
 
   registry->RegisterBooleanPref(prefs::kCaretBrowsingEnabled, false);
   registry->RegisterBooleanPref(prefs::kShowCaretBrowsingDialog, true);
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(prefs::kNTPFooterExtensionAttributionEnabled,
                                 true);
-#endif
 
   registry->RegisterBooleanPref(prefs::kAccessibilityFocusHighlightEnabled,
                                 false);

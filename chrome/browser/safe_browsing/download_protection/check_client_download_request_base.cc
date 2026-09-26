@@ -38,12 +38,10 @@
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/time/time.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/safe_browsing/core/browser/sync/safe_browsing_primary_account_token_fetcher.h"
 #include "components/safe_browsing/core/browser/sync/sync_utils.h"
-#endif
 
 namespace safe_browsing {
 
@@ -89,7 +87,6 @@ CheckClientDownloadRequestBase::CheckClientDownloadRequestBase(
     is_incognito_ = browser_context->IsOffTheRecord();
     is_enhanced_protection_ =
         profile && IsEnhancedProtectionEnabled(*profile->GetPrefs());
-#if !BUILDFLAG(IS_ANDROID)
     signin::IdentityManager* identity_manager =
         IdentityManagerFactory::GetForProfile(profile);
     if (!profile->IsOffTheRecord() && identity_manager &&
@@ -97,7 +94,6 @@ CheckClientDownloadRequestBase::CheckClientDownloadRequestBase(
       token_fetcher_ = std::make_unique<SafeBrowsingPrimaryAccountTokenFetcher>(
           identity_manager);
     }
-#endif
   }
 }
 
@@ -364,14 +360,12 @@ void CheckClientDownloadRequestBase::OnRequestBuilt(
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(chlily): Factor this out into delegate's modifications.
   if (is_enhanced_protection_ && token_fetcher_) {
     token_fetcher_->Start(base::BindOnce(
         &CheckClientDownloadRequestBase::OnGotAccessToken, GetWeakPtr()));
     return;
   }
-#endif
 
   StartModificationsFromDelegate();
 }
@@ -420,14 +414,12 @@ void CheckClientDownloadRequestBase::StartTimeout() {
       service_->GetDownloadRequestTimeout());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void CheckClientDownloadRequestBase::OnGotAccessToken(
     const std::string& access_token) {
   access_token_ = access_token;
 
   StartModificationsFromDelegate();
 }
-#endif
 
 void CheckClientDownloadRequestBase::SendRequest() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -504,13 +496,11 @@ void CheckClientDownloadRequestBase::SendRequest() {
   resource_request->site_for_cookies =
       net::SiteForCookies::FromUrl(resource_request->url);
 
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(chlily): Factor this out into
   // DownloadProtectionDelegate::FinalizeResourceRequest.
   if (!access_token_.empty()) {
     SetAccessToken(resource_request.get(), access_token_);
   }
-#endif
 
   network::mojom::URLLoaderFactory* url_loader_factory =
       service_->GetURLLoaderFactory(GetBrowserContext()).get();
@@ -568,13 +558,6 @@ void CheckClientDownloadRequestBase::OnURLLoaderComplete(
       // Ignore the verdict because we were just reporting a sampled file.
       reason = REASON_SAMPLED_UNSUPPORTED_FILE;
       result = DownloadCheckResult::UNKNOWN;
-#if BUILDFLAG(IS_ANDROID)
-    } else if (kMaliciousApkDownloadCheckTelemetryOnly.Get()) {
-      // If Android download protection is in telemetry-only mode, ignore the
-      // verdict.
-      reason = REASON_IGNORED_VERDICT;
-      result = DownloadCheckResult::UNKNOWN;
-#endif
     } else {
       switch (response.verdict()) {
         case ClientDownloadResponse::SAFE:
@@ -630,14 +613,9 @@ void CheckClientDownloadRequestBase::OnURLLoaderComplete(
     if (!token.empty()) {
       SetDownloadProtectionData(
           token, response.verdict(),
-#if !BUILDFLAG(IS_ANDROID)
           WebUIContentInfoSingleton::GetInstance()
               ->tailored_verdict_override()
-              .override_value.value_or(response.tailored_verdict())
-#else
-          response.tailored_verdict()
-#endif
-      );
+              .override_value.value_or(response.tailored_verdict()));
     }
   }
 

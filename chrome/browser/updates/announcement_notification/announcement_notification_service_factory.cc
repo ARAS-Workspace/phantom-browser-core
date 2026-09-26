@@ -15,10 +15,6 @@
 #include "chrome/browser/updates/announcement_notification/announcement_notification_service.h"
 #include "chrome/browser/updates/announcement_notification/empty_announcement_notification_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/updates/announcement_notification/announcement_notification_delegate_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // static
 AnnouncementNotificationServiceFactory*
 AnnouncementNotificationServiceFactory::GetInstance() {
@@ -42,16 +38,12 @@ AnnouncementNotificationServiceFactory::BuildServiceInstanceForBrowserContext(
 
   Profile* profile = Profile::FromBrowserContext(context);
   PrefService* pref = profile->GetPrefs();
-#if BUILDFLAG(IS_ANDROID)
-  auto delegate = std::make_unique<AnnouncementNotificationDelegateAndroid>();
-#else
   NotificationDisplayService* display_service =
       static_cast<NotificationDisplayService*>(
           NotificationDisplayServiceFactory::GetInstance()->GetForProfile(
               profile));
   auto delegate =
       std::make_unique<AnnouncementNotificationDelegate>(display_service);
-#endif  // BUILDFLAG(IS_ANDROID)
   return AnnouncementNotificationService::Create(
       profile, pref, std::move(delegate), base::DefaultClock::GetInstance());
 }

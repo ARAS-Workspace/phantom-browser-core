@@ -29,10 +29,8 @@
 #include "ui/gfx/skia_paint_util.h"
 
 // Typography is not supported in Android yet.
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/views/style/typography.h"
 #include "ui/views/style/typography_provider.h"
-#endif
 
 namespace {
 
@@ -104,16 +102,8 @@ void IconWithBadgeImageSource::SetBadge(std::unique_ptr<Badge> badge) {
 
   constexpr int badge_height = 14;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Since typography is not currently supported on Android, we use a hardcode
-  // way to set the text now.
-  constexpr int kBadgeFontSize = 11;
-  gfx::FontList base_font =
-      gfx::FontList(gfx::Font(std::string(), kBadgeFontSize));
-#else
   gfx::FontList base_font = views::TypographyProvider::Get().GetFont(
       views::style::CONTEXT_BADGE, views::style::STYLE_SECONDARY);
-#endif
 
   std::u16string utf16_text = base::UTF8ToUTF16(badge_->text);
 

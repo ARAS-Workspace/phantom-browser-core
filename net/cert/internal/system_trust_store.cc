@@ -33,8 +33,6 @@
 #include "net/base/features.h"
 #include "net/cert/internal/trust_store_mac.h"
 #include "net/cert/x509_util_apple.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "net/cert/internal/trust_store_android.h"
 #endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
@@ -206,53 +204,6 @@ void InitializeTrustStoreMacCache() {
       {base::MayBlock(), base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
       base::BindOnce(&InitializeTrustCacheForCRSOnWorkerThread));
 }
-
-#elif BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
-
-namespace {
-TrustStoreAndroid* GetGlobalTrustStoreAndroidForCRS() {
-  static base::NoDestructor<TrustStoreAndroid> static_trust_store_android;
-  return static_trust_store_android.get();
-}
-
-void InitializeTrustStoreForCRSOnWorkerThread() {
-  GetGlobalTrustStoreAndroidForCRS()->Initialize();
-}
-}  // namespace
-
-std::unique_ptr<SystemTrustStore> CreateSslSystemTrustStoreChromeRoot(
-    std::unique_ptr<TrustStoreChrome> chrome_root) {
-  return std::make_unique<SystemTrustStoreChromeWithUnOwnedSystemStore>(
-      std::move(chrome_root), GetGlobalTrustStoreAndroidForCRS());
-}
-
-void InitializeTrustStoreAndroid() {
-  // Start observing DB change before the Trust Store is initialized so we don't
-  // accidentally miss any changes. See https://crrev.com/c/4226436 for context.
-  //
-  // This call is safe here because we're the only callers of
-  // ObserveCertDBChanges on the singleton TrustStoreAndroid.
-  GetGlobalTrustStoreAndroidForCRS()->ObserveCertDBChanges();
-
-  static bool initialized = false;
-  if (initialized) {
-    return;
-  }
-
-  initialized = true;
-  base::ThreadPool::PostTask(
-      FROM_HERE,
-      {base::MayBlock(), base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
-      base::BindOnce(&InitializeTrustStoreForCRSOnWorkerThread));
-}
-
-#else
-
-void InitializeTrustStoreAndroid() {}
-
-#endif  // CHROME_ROOT_STORE_SUPPORTED
 
 #endif
 

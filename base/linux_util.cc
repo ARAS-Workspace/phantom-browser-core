@@ -117,12 +117,7 @@ constexpr int kDistroSize = 128 + 1;
 
 // We use this static string to hold the Linux distro info. If we
 // crash, the crash handler code will send this in the crash dump.
-char g_linux_distro[kDistroSize] =
-#if BUILDFLAG(IS_ANDROID)
-    "Android";
-#else
-    "Unknown";
-#endif
+char g_linux_distro[kDistroSize] = "Unknown";
 
 // This function is only supposed to be used in tests. The declaration in the
 // header file is guarded by "#if defined(UNIT_TEST)" so that they can be used

@@ -90,11 +90,7 @@ std::u16string GetYearInTheFuture() {
 }
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 TEST(CreditCardTest, GetObfuscatedStringForCardDigits) {
@@ -1137,7 +1133,6 @@ TEST(CreditCardTest, CompareCardCreationSource) {
   EXPECT_EQ(a.Compare(b), 0);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Test we get the correct icon for each card type.
 TEST(CreditCardTest, IconResourceId) {
   EXPECT_EQ(CreditCard::IconResourceId(Suggestion::Icon::kCardDiners),
@@ -1227,7 +1222,6 @@ TEST(CreditCardTest, IconResourceIdFromString_NewAmexNetworkArtDisabled) {
   EXPECT_EQ(CreditCard::IconResourceId(kAmericanExpressCard),
             IDR_AUTOFILL_METADATA_CC_AMEX);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST(CreditCardTest, UpdateFromImportedCard_UpdatedWithNameAndExpirationDate) {
   const std::u16string kYearInFuture = GetYearInTheFuture();
@@ -2091,19 +2085,6 @@ INSTANTIATE_TEST_SUITE_P(
             false, kOneYear, CreditCard::RecordType::kMaskedServerCard},
         ShouldUpdateExpirationTestCase{
             false, kOneYear, CreditCard::RecordType::kFullServerCard}));
-
-#if BUILDFLAG(IS_ANDROID)
-TEST(CreditCardTestForKeyboardAccessory, GetObfuscatedStringForCardDigits) {
-  const std::u16string digits = u"1235";
-  const std::u16string expected =
-      std::u16string() + base::i18n::kLeftToRightEmbeddingMark +
-      CreditCard::GetMidlineEllipsisDots(2) + digits +
-      base::i18n::kPopDirectionalFormatting;
-
-  EXPECT_EQ(expected, CreditCard::GetObfuscatedStringForCardDigits(
-                          /*obfuscation_length=*/2, digits));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 }  // namespace autofill

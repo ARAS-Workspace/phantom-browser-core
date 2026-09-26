@@ -118,11 +118,7 @@ network::ResourceRequest CreateResourceRequest() {
       mojom::TrustTokenSignRequestData::kInclude;
   request.trust_token_params->additional_signed_headers.push_back(
       "some_header");
-#if BUILDFLAG(IS_ANDROID)
-  request.socket_tag = net::SocketTag(1, 2);
-#else
   request.socket_tag = net::SocketTag();
-#endif
 
   return request;
 }

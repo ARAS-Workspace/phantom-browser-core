@@ -66,8 +66,6 @@ GPUTestConfig::OS GetCurrentOS() {
       return GPUTestConfig::kOsMacTahoe;
   }
   return GPUTestConfig::kOsUnknown;
-#elif BUILDFLAG(IS_ANDROID)
-  return GPUTestConfig::kOsAndroid;
 #else
 #error "unknown os"
 #endif

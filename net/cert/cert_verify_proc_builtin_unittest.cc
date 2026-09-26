@@ -4850,13 +4850,8 @@ TEST_F(CertVerifyProcBuiltinTest, UnknownSignatureAlgorithmRoot) {
 // ScopedTestRoot causes it to be parsed by the Java X509 code which barfs. We
 // could re-enable if Chrome on Android has fully switched to the
 // builtin-verifier and ScopedTestRoot no longer has Android-specific code.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_UnparsableMismatchedTBSSignatureAlgorithmRoot \
-  DISABLED_UnparsableMismatchedTBSSignatureAlgorithmRoot
-#else
 #define MAYBE_UnparsableMismatchedTBSSignatureAlgorithmRoot \
   UnparsableMismatchedTBSSignatureAlgorithmRoot
-#endif
 TEST_F(CertVerifyProcBuiltinTest,
        MAYBE_UnparsableMismatchedTBSSignatureAlgorithmRoot) {
   auto [leaf, intermediate, root] = CertBuilder::CreateSimpleChain3();

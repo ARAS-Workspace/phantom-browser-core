@@ -34,10 +34,6 @@
 #include "ui/base/ozone_buildflags.h"
 #include "ui/gfx/geometry/skia_conversions.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/viz/service/frame_sinks/external_begin_frame_source_android.h"
-#endif
-
 #include "components/viz/service/frame_sinks/external_begin_frame_source_mojo.h"
 
 #if BUILDFLAG(IS_MAC)
@@ -48,18 +44,6 @@
 namespace viz {
 
 namespace {
-#if BUILDFLAG(IS_ANDROID)
-gfx::SurfaceControlFrameRateCompatibility IntervalTypeToCompat(
-    FrameIntervalMatcher::ResultIntervalType interval_type) {
-  switch (interval_type) {
-    case FrameIntervalMatcher::ResultIntervalType::kExact:
-      return gfx::SurfaceControlFrameRateCompatibility::kFixedSource;
-    case FrameIntervalMatcher::ResultIntervalType::kAtLeast:
-      return gfx::SurfaceControlFrameRateCompatibility::kAtLeast;
-  }
-  NOTREACHED();
-}
-#endif
 }  // namespace
 
 class RootCompositorFrameSinkImpl::StandaloneBeginFrameObserver
@@ -164,13 +148,6 @@ RootCompositorFrameSinkImpl::Create(
         static_cast<ExternalBeginFrameSourceMojo*>(
             external_begin_frame_source.get());
   } else {
-#if BUILDFLAG(IS_ANDROID)
-    hw_support_for_multiple_refresh_rates = true;
-    external_begin_frame_source =
-        std::make_unique<ExternalBeginFrameSourceAndroid>(
-            restart_id, params->refresh_rate,
-            /*requires_align_with_java=*/false);
-#else
     if (params->disable_frame_rate_limit) {
       synthetic_begin_frame_source =
           std::make_unique<BackToBackBeginFrameSource>(
@@ -195,7 +172,6 @@ RootCompositorFrameSinkImpl::Create(
                                                          restart_id);
       }
     }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   BeginFrameSource* begin_frame_source = synthetic_begin_frame_source.get();
@@ -428,67 +404,12 @@ void RootCompositorFrameSinkImpl::ForceImmediateDrawAndSwapIfPossible() {
   display_->ForceImmediateDrawAndSwapIfPossible();
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 void RootCompositorFrameSinkImpl::UpdateRefreshRate(float refresh_rate) {
   if (external_begin_frame_source_)
     external_begin_frame_source_->UpdateRefreshRate(refresh_rate);
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_ANDROID)
-void RootCompositorFrameSinkImpl::SetAdaptiveRefreshRateInfo(
-    mojom::AdaptiveRefreshRateInfoPtr info) {
-  supports_adaptive_refresh_rate_ =
-      info->has_support &&
-      base::FeatureList::IsEnabled(
-          features::kUseFrameIntervalDeciderAdaptiveFrameRate);
-  suggested_frame_interval_high_ = base::Hertz(info->suggested_high);
-  device_scale_factor_ = info->device_scale_factor;
-  adaptive_refresh_rate_velocity_points_.clear();
-  if (!info->velocity_mapping.empty()) {
-    adaptive_refresh_rate_velocity_points_.reserve(
-        info->velocity_mapping.size());
-    for (auto& point : info->velocity_mapping) {
-      adaptive_refresh_rate_velocity_points_.push_back(*point);
-    }
-  } else {
-    // The hard-coded values are copied from AOSP
-    // View.convertVelocityToFrameRate.
-    adaptive_refresh_rate_velocity_points_.emplace_back(120, 300);
-    adaptive_refresh_rate_velocity_points_.emplace_back(80, 125);
-    adaptive_refresh_rate_velocity_points_.emplace_back(60, 0);
-  }
-  UpdateFrameIntervalDeciderSettings();
-}
-
-void RootCompositorFrameSinkImpl::PreserveChildSurfaceControls() {
-  display_->PreserveChildSurfaceControls();
-}
-
-void RootCompositorFrameSinkImpl::SetSwapCompletionCallbackEnabled(
-    bool enable) {
-  enable_swap_completion_callback_ = enable;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-void RootCompositorFrameSinkImpl::SetSupportedRefreshRates(
-    const std::vector<float>& supported_refresh_rates) {
-
-  exact_supported_refresh_rates_.clear();
-  for (float rate : supported_refresh_rates) {
-    const base::TimeDelta interval = base::Hertz(rate);
-    exact_supported_refresh_rates_[interval] = rate;
-  }
-
-  if (!exact_supported_refresh_rates_.empty() && display_) {
-    display_->NotifyMinSupportedVsyncInterval(
-        exact_supported_refresh_rates_.begin()->first);
-  }
-
-  UpdateFrameIntervalDeciderSettings();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
 void RootCompositorFrameSinkImpl::AddVSyncParameterObserver(
     mojo::PendingRemote<mojom::VSyncParameterObserver> observer) {
@@ -565,13 +486,6 @@ void RootCompositorFrameSinkImpl::BindLayerContext(
   support_->BindLayerContext(*context, std::move(settings));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RootCompositorFrameSinkImpl::SetThreads(
-    const std::vector<Thread>& threads) {
-  support_->SetThreads(/*from_untrusted_client=*/false, threads);
-}
-#endif
-
 RootCompositorFrameSinkImpl::RootCompositorFrameSinkImpl(
     FrameSinkManagerImpl* frame_sink_manager,
     const FrameSinkId& frame_sink_id,
@@ -615,10 +529,6 @@ RootCompositorFrameSinkImpl::RootCompositorFrameSinkImpl(
         external_begin_frame_source_->GetMinimumFrameInterval();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  interval_decider_use_fixed_intervals_ =
-      !display_->OutputSurfaceSupportsSetFrameRate();
-#endif
   UpdateFrameIntervalDeciderSettings();
 }
 
@@ -628,33 +538,11 @@ void RootCompositorFrameSinkImpl::UpdateFrameIntervalDeciderSettings() {
   // Note that matcher order defines precedence.
   std::vector<std::unique_ptr<FrameIntervalMatcher>> matchers;
 
-#if BUILDFLAG(IS_ANDROID)
-  if (supports_adaptive_refresh_rate_) {
-    matchers.push_back(std::make_unique<UserInputBoostMatcher>());
-    if (!adaptive_refresh_rate_velocity_points_.empty()) {
-      matchers.push_back(std::make_unique<SlowScrollThrottleMatcher>(
-          device_scale_factor_, adaptive_refresh_rate_velocity_points_));
-    }
-  } else {
-    matchers.push_back(std::make_unique<InputBoostMatcher>());
-  }
-#else
   matchers.push_back(std::make_unique<InputBoostMatcher>());
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-  matchers.push_back(std::make_unique<OnlyVideoMatcher>());
-  if (supports_adaptive_refresh_rate_) {
-    matchers.push_back(std::make_unique<OnlyAnimatingImageMatcher>());
-    matchers.push_back(
-        std::make_unique<OnlyScrollBarFadeOutAnimationMatcher>());
-  }
-#else
   if (base::FeatureList::IsEnabled(features::kSingleVideoFrameRateThrottling)) {
     matchers.push_back(std::make_unique<OnlyVideoMatcher>());
   }
-
-#endif
 
   if (enable_video_conference_matcher_) {
     matchers.push_back(std::make_unique<VideoConferenceMatcher>());
@@ -664,15 +552,8 @@ void RootCompositorFrameSinkImpl::UpdateFrameIntervalDeciderSettings() {
   if (interval_decider_use_fixed_intervals_) {
     FrameIntervalMatcher::FixedIntervalSettings fixed_interval_settings;
     fixed_interval_settings.supported_intervals = GetSupportedFrameIntervals();
-#if BUILDFLAG(IS_ANDROID)
-    // Android relies on always returning an element from
-    // `exact_supported_refresh_rates_`.
-    fixed_interval_settings.default_interval =
-        *fixed_interval_settings.supported_intervals.begin();
-#else
     // Other platforms uses the special unspecified value for default.
     fixed_interval_settings.default_interval = base::TimeDelta();
-#endif
     settings.interval_settings = fixed_interval_settings;
   } else if (max_vsync_interval_.has_value()) {
     FrameIntervalMatcher::ContinuousRangeSettings continuous_range_settings;
@@ -695,45 +576,6 @@ void RootCompositorFrameSinkImpl::UpdateFrameIntervalDeciderSettings() {
 void RootCompositorFrameSinkImpl::FrameIntervalDeciderResultCallback(
     FrameIntervalDecider::Result result,
     FrameIntervalMatcherType matcher_type) {
-#if BUILDFLAG(IS_ANDROID)
-  base::TimeDelta interval;
-  std::pair<base::TimeDelta, gfx::SurfaceControlFrameRateCompatibility>
-      interval_and_compat = std::visit(
-          absl::Overload(
-              [this](FrameIntervalDecider::FrameIntervalClass
-                         frame_interval_class) {
-                switch (frame_interval_class) {
-                  case FrameIntervalDecider::FrameIntervalClass::kBoost:
-                    if (supports_adaptive_refresh_rate_) {
-                      return std::pair(
-                          suggested_frame_interval_high_,
-                          gfx::SurfaceControlFrameRateCompatibility::kAtLeast);
-                    }
-                    return std::pair(base::Milliseconds(0),
-                                     gfx::SurfaceControlFrameRateCompatibility::
-                                         kFixedSource);
-                  case FrameIntervalDecider::FrameIntervalClass::kDefault:
-                    // 0 is a special value on Android for no preference.
-                    return std::pair(base::Milliseconds(0),
-                                     gfx::SurfaceControlFrameRateCompatibility::
-                                         kFixedSource);
-                }
-              },
-              [](FrameIntervalDecider::ResultInterval interval) {
-                return std::pair(interval.interval,
-                                 IntervalTypeToCompat(interval.type));
-              }),
-          result);
-  interval = interval_and_compat.first;
-  gfx::SurfaceControlFrameRateCompatibility compat = interval_and_compat.second;
-
-  if (decided_display_interval_ == interval &&
-      decided_display_frame_rate_compat_ == compat) {
-    return;
-  }
-  decided_display_interval_ = interval;
-  decided_display_frame_rate_compat_ = compat;
-#else
   base::TimeDelta interval = std::visit(
       absl::Overload(
           [](FrameIntervalDecider::FrameIntervalClass frame_interval_class) {
@@ -753,17 +595,7 @@ void RootCompositorFrameSinkImpl::FrameIntervalDeciderResultCallback(
     return;
   }
   decided_display_interval_ = interval;
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-  if (display_->OutputSurfaceSupportsSetFrameRate()) {
-    float interval_s = interval.InSecondsF();
-    float frame_rate = interval_s == 0 ? 0 : (1 / interval_s);
-    display_->SetFrameIntervalOnOutputSurface(
-        {.frame_rate = frame_rate, .compatibility = compat});
-    return;
-  }
-#endif
   SetPreferredFrameInterval(interval);
 }
 
@@ -824,12 +656,6 @@ void RootCompositorFrameSinkImpl::DisplayWillDrawAndSwap(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::ScopedClosureRunner RootCompositorFrameSinkImpl::GetCacheBackBufferCb() {
-  return display_->GetCacheBackBufferCb();
-}
-#endif
-
 void RootCompositorFrameSinkImpl::SetHwSupportForMultipleRefreshRates(
     bool support) {
   interval_decider_use_fixed_intervals_ = !support;
@@ -875,17 +701,13 @@ void RootCompositorFrameSinkImpl::DisplayDidReceiveCALayerParams(
 
 void RootCompositorFrameSinkImpl::DisplayDidCompleteSwapWithSize(
     const gfx::Size& pixel_size) {
-#if BUILDFLAG(IS_ANDROID)
-  if (display_client_ && enable_swap_completion_callback_) {
-    display_client_->DidCompleteSwapWithSize(pixel_size);
-  }
-#elif BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_X11)
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_X11)
   if (display_client_ && pixel_size != last_swap_pixel_size_) {
     last_swap_pixel_size_ = pixel_size;
     display_client_->DidCompleteSwapWithNewSize(last_swap_pixel_size_);
   }
-#else  // !BUILDFLAG(IS_ANDROID) && !(BUILDFLAG(IS_LINUX) &&
-       // BUILDFLAG(SUPPORTS_OZONE_X11))
+#else
+  // BUILDFLAG(SUPPORTS_OZONE_X11))
   NOTREACHED();
 #endif
 }
@@ -896,36 +718,12 @@ void RootCompositorFrameSinkImpl::DisplayAddChildWindowToBrowser(
 }
 
 void RootCompositorFrameSinkImpl::SetWideColorEnabled(bool enabled) {
-#if BUILDFLAG(IS_ANDROID)
-  if (display_client_)
-    display_client_->SetWideColorEnabled(enabled);
-#endif
 }
 
 void RootCompositorFrameSinkImpl::SetPreferredFrameInterval(
     base::TimeDelta interval) {
-#if BUILDFLAG(IS_ANDROID)
-  if (display_client_) {
-    float refresh_rate;
-    if (interval.is_zero()) {
-      refresh_rate = 0;
-    } else {
-      auto it = exact_supported_refresh_rates_.find(interval);
-      if (it != exact_supported_refresh_rates_.end()) {
-        refresh_rate = it->second;
-      } else {
-        refresh_rate = 1 / interval.InSecondsF();
-        LOG_IF(WARNING, interval_decider_use_fixed_intervals_)
-            << "Requested unsupported preferred frame interval " << interval
-            << " (=" << refresh_rate << "Hz)";
-      }
-    }
-    display_client_->SetPreferredRefreshRate(refresh_rate);
-  }
-#else
   preferred_frame_interval_ = interval;
   UpdateVSyncParameters();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void RootCompositorFrameSinkImpl::DisplayDidDrawAndSwap() {}

@@ -13,16 +13,12 @@
 #include "media/base/media_switches.h"
 #include "media/capture/video/fake_video_capture_device_factory.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "media/capture/video/file_video_capture_device_factory.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 #include "media/capture/video/linux/video_capture_device_factory_linux.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "media/capture/video/apple/video_capture_device_factory_apple.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "media/capture/video/android/video_capture_device_factory_android.h"
 #endif
 
 namespace media {
@@ -33,7 +29,6 @@ std::unique_ptr<VideoCaptureDeviceFactory>
 CreateFakeVideoCaptureDeviceFactory() {
   const base::CommandLine* command_line =
       base::CommandLine::ForCurrentProcess();
-#if !BUILDFLAG(IS_ANDROID)
   // Use a File Video Device Factory if the command line flag is present.
   // Otherwise, use a Fake Video Device Factory. The File Video Device Factory
   // is not supported on Android due to the lack of file system access and
@@ -41,7 +36,6 @@ CreateFakeVideoCaptureDeviceFactory() {
   if (command_line->HasSwitch(switches::kUseFileForFakeVideoCapture)) {
     return std::make_unique<FileVideoCaptureDeviceFactory>();
   }
-#endif
 
   std::vector<FakeVideoCaptureDeviceSettings> config;
   FakeVideoCaptureDeviceFactory::ParseFakeDevicesConfigFromOptionsString(
@@ -64,9 +58,6 @@ CreatePlatformSpecificVideoCaptureDeviceFactory(
 #else
   return std::make_unique<VideoCaptureDeviceFactoryApple>();
 #endif  // BUILDFLAG(IS_IOS_TVOS)
-#elif BUILDFLAG(IS_ANDROID)
-  return std::make_unique<VideoCaptureDeviceFactoryAndroid>(
-      gpu_workarounds ? *gpu_workarounds : gpu::GpuDriverBugWorkarounds());
 #else
   NOTIMPLEMENTED();
   return nullptr;

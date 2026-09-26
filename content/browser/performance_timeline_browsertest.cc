@@ -695,15 +695,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   ASSERT_TRUE(dict.FindBool("resizeObserverFired").value());
 
   const std::string* error = dict.FindString("error");
-#if BUILDFLAG(IS_ANDROID)
-  // On slow Android emulators, LoAF entries may not be captured reliably.
-  // Skip the test rather than fail flakily.
-  if (error) {
-    return;
-  }
-#else
   ASSERT_FALSE(error) << "Test failed: " << *error;
-#endif
 
   EXPECT_TRUE(dict.FindBool("hasStyleDuration").value());
 
@@ -717,7 +709,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_GT(duration, 0.0);
   EXPECT_LE(style_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID)
   // On Android emulators, timing discrepancies between the LoAF API and tracing
   // may be too large to reliably compare. Skip the tolerance-based assertions
   // on these platforms.
@@ -738,7 +729,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
 
   EXPECT_LE(api_total_style, trace_style_duration + tolerance_ms);
   EXPECT_GE(api_total_style, trace_style_duration - lower_tolerance_ms);
-#endif
 }
 
 // Test that styleDuration is properly captured across multiple ResizeObserver
@@ -777,15 +767,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   ASSERT_GE(iteration_count, 1);
 
   const std::string* error = dict.FindString("error");
-#if BUILDFLAG(IS_ANDROID)
-  // On slow Android emulators, LoAF entries may not be captured reliably.
-  // Skip the test rather than fail flakily.
-  if (error) {
-    return;
-  }
-#else
   ASSERT_FALSE(error) << "Test failed: " << *error;
-#endif
 
   EXPECT_TRUE(dict.FindBool("hasStyleDuration").value());
 
@@ -799,7 +781,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_GT(duration, 0.0);
   EXPECT_LE(style_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID)
   // On Android emulators, timing discrepancies between the LoAF API and tracing
   // may be too large to reliably compare. Skip the tolerance-based assertions
   // on these platforms.
@@ -820,7 +801,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
 
   EXPECT_LE(api_total_style, trace_style_duration + tolerance_ms);
   EXPECT_GE(api_total_style, trace_style_duration - lower_tolerance_ms);
-#endif
 }
 
 // Test that forced style during script execution is properly captured in
@@ -856,18 +836,10 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   const base::DictValue& dict = result.ExtractDict();
 
   const std::string* error = dict.FindString("error");
-#if BUILDFLAG(IS_ANDROID)
-  // On slow Android emulators, LoAF entries may not be captured reliably.
-  // Skip the test rather than fail flakily.
-  if (error) {
-    return;
-  }
-#else
   ASSERT_FALSE(error) << "Test failed: " << *error << ", hasLoafEntry: "
                       << dict.FindBool("hasLoafEntry").value_or(false)
                       << ", scriptCount: "
                       << dict.FindInt("scriptCount").value_or(-1);
-#endif
 
   EXPECT_TRUE(dict.FindBool("hasStyleDuration").value());
   EXPECT_TRUE(dict.FindBool("hasForcedStyleDuration").value());
@@ -884,7 +856,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_GE(script_forced_style_and_layout_duration,
             script_forced_style_duration);
 
-#if !BUILDFLAG(IS_ANDROID)
   // The trace should capture the same style recalc events.
   // script_forced_style_duration should be close to trace_style_duration
   // because the test only forces style during script execution, not during
@@ -912,9 +883,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   // the script. Allow some tolerance for any incidental style work.
   EXPECT_LE(entry_style_duration, 30.0)
       << "Render-phase style should be minimal in this test";
-#else
-  (void)trace_str;
-#endif
 }
 
 // Test that layoutDuration is properly captured during ResizeObserver
@@ -952,15 +920,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   ASSERT_TRUE(dict.FindBool("resizeObserverFired").value());
 
   const std::string* error = dict.FindString("error");
-#if BUILDFLAG(IS_ANDROID)
-  // On slow Android emulators, LoAF entries may not be captured reliably.
-  // Skip the test rather than fail flakily.
-  if (error) {
-    return;
-  }
-#else
   ASSERT_FALSE(error) << "Test failed: " << *error;
-#endif
 
   EXPECT_TRUE(dict.FindBool("hasLayoutDuration").value());
 
@@ -990,7 +950,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
       total_forced_style_duration + total_forced_layout_duration;
   EXPECT_NEAR(sum_forced, total_forced_style_and_layout_duration, 1.0);
 
-#if !BUILDFLAG(IS_ANDROID)
   // On Android emulators, timing discrepancies between the LoAF API and tracing
   // may be too large to reliably compare. Skip the tolerance-based assertions
   // on these platforms.
@@ -1025,11 +984,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
       << "API layout (" << api_total_layout << "ms) vs trace ("
       << trace_layout_duration << "ms, event_count=" << trace_result.event_count
       << ")";
-#else
-  // Suppress unused variable warning on platforms where we skip trace
-  // comparison.
-  (void)trace_str;
-#endif
 }
 
 // Test that forced layout during script execution is properly captured in
@@ -1071,18 +1025,10 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   const base::DictValue& dict = result.ExtractDict();
 
   const std::string* error = dict.FindString("error");
-#if BUILDFLAG(IS_ANDROID)
-  // On slow Android emulators, LoAF entries may not be captured reliably.
-  // Skip the test rather than fail flakily.
-  if (error) {
-    return;
-  }
-#else
   ASSERT_FALSE(error) << "Test failed: " << *error << ", hasLoafEntry: "
                       << dict.FindBool("hasLoafEntry").value_or(false)
                       << ", scriptCount: "
                       << dict.FindInt("scriptCount").value_or(-1);
-#endif
 
   EXPECT_TRUE(dict.FindBool("hasLayoutDuration").value());
   EXPECT_TRUE(dict.FindBool("hasForcedLayoutDuration").value());
@@ -1113,7 +1059,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
       script_forced_style_duration + script_forced_layout_duration;
   EXPECT_NEAR(sum_style_layout, script_forced_style_and_layout_duration, 1.0);
 
-#if !BUILDFLAG(IS_ANDROID)
   // For forced layout, the trace should capture the same layout events.
   // The script_forced_layout_duration should be close to trace_layout_duration
   // because the test only forces layout during script execution, not during
@@ -1154,9 +1099,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   // render phase. Allow some tolerance for any incidental layout work.
   EXPECT_LE(entry_layout_duration, 30.0)
       << "Render-phase layout should be minimal in this test";
-#else
-  (void)trace_str;
-#endif
 }
 
 // Test that container queries produce measurable style and layout durations.
@@ -1195,13 +1137,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   const base::DictValue& dict = result.ExtractDict();
 
   const std::string* error = dict.FindString("error");
-#if BUILDFLAG(IS_ANDROID)
-  if (error) {
-    return;
-  }
-#else
   ASSERT_FALSE(error) << "Test failed: " << *error;
-#endif
 
   EXPECT_TRUE(dict.FindBool("hasStyleDuration").value());
   EXPECT_TRUE(dict.FindBool("hasLayoutDuration").value());
@@ -1217,7 +1153,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   // styleDuration + layoutDuration should not exceed total frame duration.
   EXPECT_LE(style_duration + layout_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Verify that trace events for both style and layout were emitted.
   TraceStyleResult trace_style = GetStyleDurationFromTrace(trace_str);
   TraceLayoutResult trace_layout = GetLayoutDurationFromTrace(trace_str);
@@ -1260,7 +1195,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_GE(api_total, trace_total - lower_tolerance_ms)
       << "API total style+layout (" << api_total << "ms) vs trace total ("
       << trace_total << "ms)";
-#endif
 }
 
 // Test that forced style+layout with container queries during script execution
@@ -1299,16 +1233,10 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   const base::DictValue& dict = result.ExtractDict();
 
   const std::string* error = dict.FindString("error");
-#if BUILDFLAG(IS_ANDROID)
-  if (error) {
-    return;
-  }
-#else
   ASSERT_FALSE(error) << "Test failed: " << *error << ", hasLoafEntry: "
                       << dict.FindBool("hasLoafEntry").value_or(false)
                       << ", scriptCount: "
                       << dict.FindInt("scriptCount").value_or(-1);
-#endif
 
   EXPECT_TRUE(dict.FindBool("hasStyleDuration").value());
   EXPECT_TRUE(dict.FindBool("hasLayoutDuration").value());
@@ -1349,7 +1277,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   // All durations should fit within the total frame duration.
   EXPECT_LE(entry_style_duration + entry_layout_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Verify trace captured interleaved style and layout events from
   // container query evaluation.
   TraceStyleResult trace_style = GetStyleDurationFromTrace(trace_str);
@@ -1397,7 +1324,6 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_LE(script_forced_style_and_layout, js_measured + tolerance_ms)
       << "API forcedStyleAndLayout (" << script_forced_style_and_layout
       << "ms) should be <= JS measured (" << js_measured << "ms) + tolerance";
-#endif
 }
 
 }  // namespace content

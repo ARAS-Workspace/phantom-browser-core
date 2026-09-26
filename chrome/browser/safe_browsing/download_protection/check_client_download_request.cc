@@ -42,10 +42,6 @@
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/download_item_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/android/download_protection_metrics_data.h"
-#endif
-
 namespace safe_browsing {
 
 using content::BrowserThread;
@@ -133,12 +129,7 @@ CheckClientDownloadRequest::~CheckClientDownloadRequest() {
 MayCheckDownloadResult CheckClientDownloadRequest::IsSupportedDownload(
     DownloadCheckResultReason* reason) {
   return IsSupportedDownload(*item_,
-#if BUILDFLAG(IS_ANDROID)
-                             /*file_name=*/item_->GetFileNameToReportUser(),
-#else
-                             /*file_name=*/item_->GetTargetFilePath(),
-#endif
-                             reason);
+                             /*file_name=*/item_->GetTargetFilePath(), reason);
 }
 
 download::DownloadItem* CheckClientDownloadRequest::item() const {
@@ -165,11 +156,6 @@ void CheckClientDownloadRequest::NotifySendRequest(
   UMA_HISTOGRAM_COUNTS_100(
       "SafeBrowsing.ReferrerURLChainSize.DownloadAttribution",
       request->referrer_chain().size());
-#if BUILDFLAG(IS_ANDROID)
-  DownloadProtectionMetricsData::SetOutcome(
-      item_, DownloadProtectionMetricsData::AndroidDownloadProtectionOutcome::
-                 kClientDownloadRequestSent);
-#endif
 }
 
 void CheckClientDownloadRequest::SetDownloadProtectionData(
@@ -249,10 +235,6 @@ void CheckClientDownloadRequest::NotifyRequestFinished(
   DVLOG(2) << "SafeBrowsing download verdict for: " << item_->DebugString(true)
            << " verdict:" << reason << " result:" << static_cast<int>(result);
 
-#if BUILDFLAG(IS_ANDROID)
-  DownloadProtectionMetricsData::GetOrCreate(item_)->LogToHistogram();
-#endif
-
   item_->RemoveObserver(this);
 }
 
@@ -297,7 +279,6 @@ bool CheckClientDownloadRequest::ShouldPromptForDeepScanning(
     return false;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   Profile* profile = Profile::FromBrowserContext(GetBrowserContext());
   if (!profile) {
     return false;
@@ -315,16 +296,12 @@ bool CheckClientDownloadRequest::ShouldPromptForDeepScanning(
       IsEnhancedProtectionEnabled(*profile->GetPrefs())) {
     return true;
   }
-#endif
 
   return false;
 }
 
 bool CheckClientDownloadRequest::ShouldPromptForLocalDecryption(
     bool server_requests_prompt) const {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   if (!server_requests_prompt) {
     return false;
   }
@@ -358,17 +335,12 @@ bool CheckClientDownloadRequest::ShouldPromptForLocalDecryption(
   }
 
   return true;
-#endif
 }
 
 bool CheckClientDownloadRequest::ShouldPromptForIncorrectPassword() const {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return password_.has_value() &&
          DownloadItemWarningData::HasShownLocalDecryptionPrompt(item_) &&
          DownloadItemWarningData::HasIncorrectPassword(item_);
-#endif
 }
 
 bool CheckClientDownloadRequest::ShouldShowScanFailure() const {

@@ -89,11 +89,7 @@ class FakeScreenDetailsTest : public ScreenDetailsTest {
 };
 
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GetScreensFaked DISABLED_GetScreensFaked
-#else
 #define MAYBE_GetScreensFaked GetScreensFaked
-#endif
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_GetScreensFaked) {
   ASSERT_TRUE(NavigateToURL(test_shell(), GetTestUrl(nullptr, "empty.html")));
   ASSERT_EQ(true, EvalJs(test_shell(), "'getScreenDetails' in self"));
@@ -127,11 +123,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_GetScreensFaked) {
 }
 
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_IsExtendedFaked DISABLED_IsExtendedFaked
-#else
 #define MAYBE_IsExtendedFaked IsExtendedFaked
-#endif
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_IsExtendedFaked) {
   ASSERT_TRUE(NavigateToURL(test_shell(), GetTestUrl(nullptr, "empty.html")));
   EXPECT_FALSE(EvalJs(test_shell(), "screen.isExtended").ExtractBool());
@@ -145,11 +137,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_IsExtendedFaked) {
 }
 
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ScreenOnchangeNoPermission DISABLED_ScreenOnchangeNoPermission
-#else
 #define MAYBE_ScreenOnchangeNoPermission ScreenOnchangeNoPermission
-#endif
 // Sites with no permission only get an event if screen.isExtended changes.
 // TODO(crbug.com/40145721): Need content_browsertests permission controls.
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
@@ -195,11 +183,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
 }
 
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ScreenOnChangeForIsExtended DISABLED_ScreenOnChangeForIsExtended
-#else
 #define MAYBE_ScreenOnChangeForIsExtended ScreenOnChangeForIsExtended
-#endif
 // Sites should get Screen.change events anytime Screen.isExtended changes.
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
                        MAYBE_ScreenOnChangeForIsExtended) {
@@ -243,11 +227,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
 }
 
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ScreenOnChangeForAttributes DISABLED_ScreenOnChangeForAttributes
-#else
 #define MAYBE_ScreenOnChangeForAttributes ScreenOnChangeForAttributes
-#endif
 // Sites should get Screen.change events anytime other Screen attributes change.
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
                        MAYBE_ScreenOnChangeForAttributes) {

@@ -15,9 +15,6 @@
 #include "components/permissions/permissions_client.h"
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "content/public/browser/web_contents.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "components/permissions/android/android_permission_util.h"
-#endif
 
 namespace {
 
@@ -111,17 +108,6 @@ EmbeddedPermissionPromptFlowModel::DeterminePromptVariant(
   auto* permission_info =
       content_settings::PermissionSettingsRegistry::GetInstance()->Get(type);
 
-#if BUILDFLAG(IS_ANDROID)
-  if (!HasSystemPermission(type, web_contents_) &&
-      !CanRequestSystemPermission(type, web_contents_)) {
-    return Variant::kOsSystemSettings;
-  }
-  if (permission_info->delegate().IsAnyPermissionAllowed(setting) &&
-      !HasSystemPermission(type, web_contents_) &&
-      CanRequestSystemPermission(type, web_contents_)) {
-    return Variant::kOsPrompt;
-  }
-#else
   if (PermissionsClient::Get()->IsSystemDenied(type)) {
     return Variant::kOsSystemSettings;
   }
@@ -129,7 +115,6 @@ EmbeddedPermissionPromptFlowModel::DeterminePromptVariant(
       PermissionsClient::Get()->CanPromptSystemPermission(type)) {
     return Variant::kOsPrompt;
   }
-#endif
 
   if (PermissionsClient::Get()->IsPermissionAllowedByDevicePolicy(
           web_contents(), setting, info, type)) {
@@ -198,12 +183,7 @@ void EmbeddedPermissionPromptFlowModel::PrecalculateVariantsForMetrics() {
   if (os_prompt_variant_ == Variant::kUninitialized) {
     for (const auto& request : delegate_->Requests()) {
       const auto& type = request->GetContentSettingsType();
-#if BUILDFLAG(IS_ANDROID)
-      if (!HasSystemPermission(type, web_contents_) &&
-          CanRequestSystemPermission(type, web_contents_)) {
-#else
       if (PermissionsClient::Get()->CanPromptSystemPermission(type)) {
-#endif
         os_prompt_variant_ = Variant::kOsPrompt;
         break;
       }
@@ -213,12 +193,7 @@ void EmbeddedPermissionPromptFlowModel::PrecalculateVariantsForMetrics() {
   if (os_system_settings_variant_ == Variant::kUninitialized) {
     for (const auto& request : delegate_->Requests()) {
       const auto& type = request->GetContentSettingsType();
-#if BUILDFLAG(IS_ANDROID)
-      if (!HasSystemPermission(type, web_contents_) &&
-          !CanRequestSystemPermission(type, web_contents_)) {
-#else
       if (PermissionsClient::Get()->IsSystemDenied(type)) {
-#endif
         os_system_settings_variant_ = Variant::kOsSystemSettings;
         break;
       }
@@ -283,7 +258,7 @@ EmbeddedPermissionPromptFlowModel::GetPromptVariants() const {
     variants.push_back(GetElementAnchoredBubbleVariant(prompt_variant()));
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   if (os_prompt_variant_ != Variant::kUninitialized) {
     variants.push_back(GetElementAnchoredBubbleVariant(os_prompt_variant_));
   }
@@ -291,7 +266,7 @@ EmbeddedPermissionPromptFlowModel::GetPromptVariants() const {
     variants.push_back(
         GetElementAnchoredBubbleVariant(os_system_settings_variant_));
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
 
   return variants;
 }

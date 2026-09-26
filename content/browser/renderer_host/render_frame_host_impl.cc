@@ -350,19 +350,7 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_service_binding_batch.h"
-#include "content/browser/accessibility/browser_accessibility_manager_android.h"
-#include "content/browser/android/content_url_loader_factory.h"
-#include "content/browser/android/java_interfaces_impl.h"
-#include "content/browser/renderer_host/navigation_transitions/navigation_transition_utils.h"
-#include "content/browser/renderer_host/render_frame_host_android.h"
-#include "content/browser/renderer_host/render_widget_host_view_android.h"
-#include "content/public/browser/android/java_interfaces.h"
-#include "content/public/browser/authenticator_request_client_delegate.h"
-#else
 #include "content/browser/host_zoom_map_impl.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "content/browser/renderer_host/popup_menu_helper_mac.h"
@@ -464,10 +452,6 @@ static_assert(kSubframeProcessShutdownDelay + kUnloadTimeout <
               "The maximum process shutdown delay should not exceed the "
               "keepalive timeout. This has security implications, see "
               "https://crbug.com/1177674.");
-
-#if BUILDFLAG(IS_ANDROID)
-const void* const kRenderFrameHostAndroidKey = &kRenderFrameHostAndroidKey;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 const void* const kDiscardedRFHProcessHelperKey =
     &kDiscardedRFHProcessHelperKey;
@@ -1169,12 +1153,6 @@ bool IsDocumentLoadedWithoutUrlLoaderClient(
     GURL url,
     bool is_same_document,
     bool is_mhtml_subframe) {
-#if BUILDFLAG(IS_ANDROID)
-  if (navigation_request->GetUrlInfo().embedder_isolation_info.is_pdf()) {
-    return true;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   return is_mhtml_subframe || is_same_document ||
          url.SchemeIs(url::kDataScheme) || !IsURLHandledByNetworkStack(url) ||
          // Initial WebUI navigations loads the body internally within the
@@ -2756,12 +2734,6 @@ RenderFrameHostImpl::RenderFrameHostImpl(
   // IdleManager should be unique per RenderFrame to provide proper isolation
   // of overrides.
   idle_manager_ = std::make_unique<IdleManagerImpl>(this);
-
-#if BUILDFLAG(IS_ANDROID)
-  // The renderer process priority has been set in the RenderWidgetHost so
-  // it is safe to remove to spare renderer priority here.
-  site_instance->GetProcess()->GraduateSpareToNormalRendererPriority();
-#endif
 
   SiteInstanceGroupId sig_id = site_instance_->group()->GetId();
   bool rfh_in_bfcache =
@@ -4553,17 +4525,6 @@ void RenderFrameHostImpl::RenderProcessGone(
   must_be_replaced_for_crash_ = true;
   has_committed_any_navigation_ = false;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Execute any pending Samsung smart clip callbacks.
-  for (base::IDMap<std::unique_ptr<ExtractSmartClipDataCallback>>::iterator
-           iter(&smart_clip_callbacks_);
-       !iter.IsAtEnd(); iter.Advance()) {
-    std::move(*iter.GetCurrentValue())
-        .Run(std::u16string(), std::u16string(), gfx::Rect());
-  }
-  smart_clip_callbacks_.Clear();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Ensure that future remote interface requests are associated with the new
   // process's channel.
   remote_associated_interfaces_.reset();
@@ -4906,10 +4867,6 @@ void RenderFrameHostImpl::RenderFrameCreated() {
 
 void RenderFrameHostImpl::RendererWidgetCreated() {
   if (GetLocalRenderWidgetHost()) {
-#if BUILDFLAG(IS_ANDROID)
-    GetLocalRenderWidgetHost()->SetForceEnableZoom(
-        delegate_->GetOrCreateWebPreferences().force_enable_zoom);
-#endif  // BUILDFLAG(IS_ANDROID)
     GetLocalRenderWidgetHost()->RendererWidgetCreated(
         /*for_frame_widget=*/true);
   }
@@ -4934,10 +4891,8 @@ void RenderFrameHostImpl::RenderFrameDeleted() {
   }
   TearDownMojoConnection();
 
-#if !BUILDFLAG(IS_ANDROID)
   HostZoomMap* host_zoom_map = HostZoomMap::Get(GetSiteInstance());
   host_zoom_map->ClearTemporaryZoomLevel(GetGlobalId());
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (web_ui_) {
     web_ui_->RenderFrameDeleted();
@@ -7335,27 +7290,6 @@ void RenderFrameHostImpl::OnKeepAliveRequestCreated(
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameHostImpl::RequestSmartClipExtract(
-    ExtractSmartClipDataCallback callback,
-    gfx::Rect rect) {
-  int32_t callback_id = smart_clip_callbacks_.Add(
-      std::make_unique<ExtractSmartClipDataCallback>(std::move(callback)));
-  GetAssociatedLocalFrame()->ExtractSmartClipData(
-      rect, base::BindOnce(&RenderFrameHostImpl::OnSmartClipDataExtracted,
-                           base::Unretained(this), callback_id));
-}
-
-void RenderFrameHostImpl::OnSmartClipDataExtracted(int32_t callback_id,
-                                                   const std::u16string& text,
-                                                   const std::u16string& html,
-                                                   const gfx::Rect& clip_rect) {
-  std::move(*smart_clip_callbacks_.Lookup(callback_id))
-      .Run(text, html, clip_rect);
-  smart_clip_callbacks_.Remove(callback_id);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void RenderFrameHostImpl::RunModalAlertDialog(
     const std::u16string& alert_message,
     bool disable_third_party_subframe_suppresion,
@@ -8685,7 +8619,6 @@ void RenderFrameHostImpl::FullscreenStateChanged(
   delegate_->FullscreenStateChanged(this, is_fullscreen, std::move(options));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool RenderFrameHostImpl::CanUseWindowingControls(
     std::string_view js_api_name) {
   if (!base::FeatureList::IsEnabled(
@@ -8746,7 +8679,6 @@ void RenderFrameHostImpl::SetResizable(bool resizable) {
 
   delegate_->SetResizable(resizable);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void RenderFrameHostImpl::DraggableRegionsChanged(
     std::vector<blink::mojom::DraggableRegionPtr> regions) {
@@ -8815,12 +8747,10 @@ void RenderFrameHostImpl::MainDocumentElementAvailable(
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   HostZoomMapImpl* host_zoom_map =
       static_cast<HostZoomMapImpl*>(HostZoomMap::Get(GetSiteInstance()));
   host_zoom_map->SetTemporaryZoomLevel(GetGlobalId(),
                                        host_zoom_map->GetDefaultZoomLevel());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void RenderFrameHostImpl::SetNeedsOcclusionTracking(bool needs_tracking) {
@@ -8855,17 +8785,6 @@ void RenderFrameHostImpl::SetVirtualKeyboardMode(
   }
   GetPage().SetVirtualKeyboardMode(mode);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameHostImpl::UpdateUserGestureCarryoverInfo() {
-  // This should not occur for prerenders but may occur for pages in
-  // the BackForwardCache depending on timing.
-  if (!IsActive()) {
-    return;
-  }
-  delegate_->UpdateUserGestureCarryoverInfo();
-}
-#endif
 
 void RenderFrameHostImpl::VisibilityChanged(
     blink::mojom::FrameVisibility visibility) {
@@ -11269,17 +11188,6 @@ void RenderFrameHostImpl::StartDragging(
     // TODO(crbug.com/523886022): Add more checks for e.g. visibility.
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  RenderWidgetHostImpl* widget = GetRenderWidgetHost();
-  RenderWidgetHostViewBase* view = (widget) ? widget->GetView() : nullptr;
-  if (view && view->IsTouchSequencePotentiallyActiveOnViz()) {
-    view->RequestInputBackForDragAndDrop(
-        GetWeakDocumentPtr(), std::move(drag_data), drag_operations_mask,
-        unsafe_bitmap, cursor_offset_in_dip, drag_obj_rect_in_dip,
-        std::move(event_info));
-    return;
-  }
-#endif
   GetRenderWidgetHost()->StartDragging(
       *this, std::move(drag_data), drag_operations_mask, unsafe_bitmap,
       cursor_offset_in_dip, drag_obj_rect_in_dip, std::move(event_info));
@@ -13188,16 +13096,6 @@ void RenderFrameHostImpl::CommitNavigation(
               file_factory_priority));
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    if (effective_scheme == url::kContentScheme &&
-        !navigation_request->GetUrlInfo().embedder_isolation_info.is_pdf()) {
-      // Only non-PDF content:// URLs can load content:// subresources. PDF URIs
-      // shouldn't load other content URIs.
-      non_network_factories.emplace(url::kContentScheme,
-                                    ContentURLLoaderFactory::Create());
-    }
-#endif
-
     auto* partition = GetStoragePartition();
     non_network_factories.emplace(
         url::kFileSystemScheme,
@@ -13255,11 +13153,6 @@ void RenderFrameHostImpl::CommitNavigation(
   // subresource ULFs.
   CHECK(is_same_document || !is_first_navigation || is_srcdoc ||
         subresource_loader_factories);
-
-#if BUILDFLAG(IS_ANDROID)
-  commit_params->should_skip_screenshot =
-      NavigationTransitionUtils::ShouldSkipScreenshot(*navigation_request);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   if (commit_params->load_with_storage_access !=
       net::StorageAccessApiStatus::kNone) {
@@ -14055,13 +13948,8 @@ RenderFrameHostImpl::GetOrCreateBrowserAccessibilityManager() {
     return browser_accessibility_manager_.get();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  browser_accessibility_manager_.reset(
-      BrowserAccessibilityManagerAndroid::Create(*this, this));
-#else
   browser_accessibility_manager_.reset(
       ui::BrowserAccessibilityManager::Create(*this, this));
-#endif
   return browser_accessibility_manager_.get();
 }
 
@@ -15152,13 +15040,6 @@ void RenderFrameHostImpl::CreateDedicatedWorkerHostFactory(
       /*creator_coep_reporter=*/coep_reporter, GetNetworkRestrictionsID());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameHostImpl::BindNFCReceiver(
-    mojo::PendingReceiver<device::mojom::NFC> receiver) {
-  delegate_->GetNFC(this, std::move(receiver));
-}
-#endif
-
 void RenderFrameHostImpl::BindSerialService(
     mojo::PendingReceiver<blink::mojom::SerialService> receiver) {
   if (!IsFeatureEnabled(network::mojom::PermissionsPolicyFeature::kSerial)) {
@@ -15464,11 +15345,7 @@ void RenderFrameHostImpl::GetWebAuthenticationService(
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   AuthenticatorImpl::Create(this, std::move(receiver));
-#else
-  GetJavaInterfaces()->GetInterface(std::move(receiver));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 bool IsInitialSynchronousAboutBlankCommit(const GURL& url,
@@ -15614,33 +15491,6 @@ void RenderFrameHostImpl::SetLastCommittedSiteInfo(const UrlInfo& url_info) {
         browser_context, GetProcess(), last_committed_url_derived_site_info_);
   }
 }
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-RenderFrameHostImpl::GetJavaRenderFrameHost() {
-  RenderFrameHostAndroid* render_frame_host_android =
-      static_cast<RenderFrameHostAndroid*>(
-          GetUserData(kRenderFrameHostAndroidKey));
-  if (!render_frame_host_android) {
-    render_frame_host_android = new RenderFrameHostAndroid(this);
-    SetUserData(kRenderFrameHostAndroidKey,
-                base::WrapUnique(render_frame_host_android));
-  }
-  return render_frame_host_android->GetJavaObject();
-}
-
-service_manager::InterfaceProvider* RenderFrameHostImpl::GetJavaInterfaces() {
-  if (!java_interfaces_) {
-    mojo::PendingRemote<service_manager::mojom::InterfaceProvider> provider;
-    BindInterfaceRegistryForRenderFrameHost(
-        provider.InitWithNewPipeAndPassReceiver(), this);
-    java_interfaces_ = std::make_unique<service_manager::InterfaceProvider>(
-        base::SingleThreadTaskRunner::GetCurrentDefault());
-    java_interfaces_->Bind(std::move(provider));
-  }
-  return java_interfaces_.get();
-}
-#endif
 
 void RenderFrameHostImpl::ForEachImmediateLocalRoot(
     base::FunctionRef<void(RenderFrameHostImpl*)> func_ref) {
@@ -16740,14 +16590,6 @@ bool RenderFrameHostImpl::DidCommitNavigationInternal(
                                ukm::SourceIdType::NAVIGATION_ID));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (is_same_document_navigation) {
-    NavigationTransitionUtils::SetSameDocumentNavigationEntryScreenshotToken(
-        *(navigation_request.get()),
-        same_document_params->navigation_entry_screenshot_destination);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // The navigation entry ID isn't updated until the call to DidNavigate(), so
   // this call to UpdateState() will target the previous navigation entry.
   if (params->previous_page_state.has_value()) {
@@ -17186,9 +17028,6 @@ void RenderFrameHostImpl::MaybeGenerateCrashReport(
       break;
     case base::TERMINATION_STATUS_OOM:
     case base::TERMINATION_STATUS_EVICTED_FOR_MEMORY:
-#if BUILDFLAG(IS_ANDROID)
-    case base::TERMINATION_STATUS_OOM_PROTECTED:
-#endif
       reason = "oom";
       break;
     default:
@@ -17460,18 +17299,6 @@ void RenderFrameHostImpl::SendCommitNavigation(
         GetSiteInstance()->browsing_instance_token();
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(khushalsagar): This code-path can be removed after RenderDocument is
-  // fully enabled. See crbug.com/346500010.
-  if (!navigation_request->IsSameDocument() &&
-      NavigationTransitionUtils::
-          CaptureNavigationEntryScreenshotForCrossDocumentNavigations(
-              *navigation_request, /*did_receive_commit_ack=*/false)) {
-    commit_params->local_surface_id =
-        GetView()->IncrementSurfaceIdForNavigation();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   commit_params->commit_sent = base::TimeTicks::Now();
   {
     auto scope = MakeUrgentMessageScopeIfNeeded();
@@ -17555,12 +17382,6 @@ void RenderFrameHostImpl::DidCommitNavigation(
   TRACE_EVENT("navigation", "RenderFrameHostImpl::DidCommitNavigation",
               ChromeTrackEvent::kRenderFrameHost, this, "params", params);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Batch service binding updates for renderer processes of the page going to
-  // be hidden and/or going to BFCache.
-  base::android::ScopedServiceBindingBatch scoped_service_binding_batch;
-#endif
-
   // BackForwardCacheImpl::CanStoreRenderFrameHost prevents placing the pages
   // with in-flight navigation requests in the back-forward cache and it's not
   // possible to start/commit a new one after the RenderFrameHost is in the
@@ -17586,7 +17407,6 @@ void RenderFrameHostImpl::DidCommitNavigation(
   }
 
   // TODO(https://crbug.com/445585641): Make this enforceable on Android.
-#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(kCheckDocumentSequenceNumber)) {
     if (params->document_sequence_number == -1) {
       bad_message::ReceivedBadMessage(
@@ -17594,7 +17414,6 @@ void RenderFrameHostImpl::DidCommitNavigation(
       return;
     }
   }
-#endif
 
   std::unique_ptr<NavigationRequest> request;
   // TODO(crbug.com/40546539): a `committing_navigation_request` is not
@@ -18645,10 +18464,6 @@ void RenderFrameHostImpl::
   SCOPED_CRASH_KEY_STRING32(
       "VerifyDidCommit", "base_url_fdu_type",
       GetURLTypeForCrashKey(request->common_params().base_url_for_data_url));
-#if BUILDFLAG(IS_ANDROID)
-  SCOPED_CRASH_KEY_BOOL("VerifyDidCommit", "data_url_empty",
-                        request->commit_params().data_url_as_string.empty());
-#endif
 
   SCOPED_CRASH_KEY_BOOL("VerifyDidCommit", "intended_as_new_entry",
                         request->commit_params().intended_as_new_entry);
@@ -18840,9 +18655,7 @@ void RenderFrameHostImpl::
     // doesn't match.
     // Note: This is temporarily disabled on Android as there has been a recent
     // spike of reports on Android WebView.
-#if !BUILDFLAG(IS_ANDROID)
     base::debug::DumpWithoutCrashing();
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 }
 
@@ -19064,180 +18877,6 @@ bool RenderFrameHostImpl::IsDOMContentLoaded() {
 void RenderFrameHostImpl::UpdateIsAdFrame(bool is_ad_frame) {
   browsing_context_state_->SetIsAdFrame(is_ad_frame);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void RenderFrameHostImpl::PerformGetAssertionWebAuthSecurityChecks(
-    const std::string& relying_party_id,
-    const url::Origin& effective_origin,
-    bool is_payment_credential_get_assertion,
-    const std::optional<url::Origin>& remote_desktop_client_override_origin,
-    const std::optional<std::string>& app_id,
-    base::OnceCallback<void(blink::mojom::AuthenticatorStatus, bool)>
-        callback) {
-  bool is_cross_origin = true;  // Will be reset in ValidateAncestorOrigins().
-
-  WebAuthRequestSecurityChecker::RequestType request_type =
-      is_payment_credential_get_assertion
-          ? WebAuthRequestSecurityChecker::RequestType::
-                kGetPaymentCredentialAssertion
-          : WebAuthRequestSecurityChecker::RequestType::kGetAssertion;
-  blink::mojom::AuthenticatorStatus status =
-      GetWebAuthRequestSecurityCheckerImpl()->ValidateAncestorOrigins(
-          effective_origin, request_type, &is_cross_origin);
-  if (status != blink::mojom::AuthenticatorStatus::SUCCESS) {
-    std::move(callback).Run(status, is_cross_origin);
-    return;
-  }
-
-  if (app_id.has_value()) {
-    blink::mojom::RemoteDesktopClientOverridePtr remote_desktop_client_override;
-    if (remote_desktop_client_override_origin) {
-      remote_desktop_client_override =
-          blink::mojom::RemoteDesktopClientOverride::New(
-              *remote_desktop_client_override_origin, !is_cross_origin);
-    }
-    // `out_app_id` is ignored because the original string is passed to the
-    // credential provider on Android.
-    std::string out_app_id;
-    status = GetWebAuthRequestSecurityCheckerImpl()->ValidateAppIdExtension(
-        *app_id, effective_origin, remote_desktop_client_override, &out_app_id);
-    if (status != blink::mojom::AuthenticatorStatus::SUCCESS) {
-      std::move(callback).Run(status, is_cross_origin);
-      return;
-    }
-  }
-
-  if (!GetContentClient()->browser()->IsSecurityLevelAcceptableForWebAuthn(
-          this, effective_origin)) {
-    std::move(callback).Run(
-        blink::mojom::AuthenticatorStatus::CERTIFICATE_ERROR, is_cross_origin);
-    return;
-  }
-
-  std::unique_ptr<webauthn::RemoteValidation> remote_validation =
-      GetWebAuthRequestSecurityCheckerImpl()->ValidateDomainAndRelyingPartyID(
-          effective_origin, relying_party_id, request_type,
-          remote_desktop_client_override_origin,
-          base::BindOnce(&RenderFrameHostImpl::OnWebAuthSecurityChecksCompleted,
-                         weak_ptr_factory_.GetWeakPtr(), std::move(callback),
-                         is_cross_origin));
-
-  // If `remote_validation` is nullptr then this object may already have been
-  // destroyed.
-  if (remote_validation) {
-    webauthn_remote_rp_id_validation_ = std::move(remote_validation);
-  }
-}
-
-void RenderFrameHostImpl::PerformMakeCredentialWebAuthSecurityChecks(
-    const std::string& relying_party_id,
-    const url::Origin& effective_origin,
-    bool is_payment_credential_creation,
-    const std::optional<url::Origin>& remote_desktop_client_override_origin,
-    const std::optional<std::string>& app_id,
-    base::OnceCallback<void(blink::mojom::AuthenticatorStatus, bool)>
-        callback) {
-  bool is_cross_origin = true;  // Will be reset in ValidateAncestorOrigins().
-
-  WebAuthRequestSecurityChecker::RequestType request_type =
-      is_payment_credential_creation
-          ? WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential
-          : WebAuthRequestSecurityChecker::RequestType::kMakeCredential;
-  blink::mojom::AuthenticatorStatus status =
-      GetWebAuthRequestSecurityCheckerImpl()->ValidateAncestorOrigins(
-          effective_origin, request_type, &is_cross_origin);
-  if (status != blink::mojom::AuthenticatorStatus::SUCCESS) {
-    std::move(callback).Run(status, is_cross_origin);
-    return;
-  }
-
-  if (app_id.has_value()) {
-    blink::mojom::RemoteDesktopClientOverridePtr remote_desktop_client_override;
-    if (remote_desktop_client_override_origin) {
-      remote_desktop_client_override =
-          blink::mojom::RemoteDesktopClientOverride::New(
-              *remote_desktop_client_override_origin, !is_cross_origin);
-    }
-    // `out_app_id` is ignored because the original string is passed to the
-    // credential provider on Android.
-    std::string out_app_id;
-    status = GetWebAuthRequestSecurityCheckerImpl()->ValidateAppIdExtension(
-        *app_id, effective_origin, remote_desktop_client_override, &out_app_id);
-    if (status != blink::mojom::AuthenticatorStatus::SUCCESS) {
-      std::move(callback).Run(status, is_cross_origin);
-      return;
-    }
-  }
-
-  if (!GetContentClient()->browser()->IsSecurityLevelAcceptableForWebAuthn(
-          this, effective_origin)) {
-    std::move(callback).Run(
-        blink::mojom::AuthenticatorStatus::CERTIFICATE_ERROR, is_cross_origin);
-    return;
-  }
-
-  std::unique_ptr<webauthn::RemoteValidation> remote_validation =
-      GetWebAuthRequestSecurityCheckerImpl()->ValidateDomainAndRelyingPartyID(
-          effective_origin, relying_party_id, request_type,
-          remote_desktop_client_override_origin,
-          base::BindOnce(&RenderFrameHostImpl::OnWebAuthSecurityChecksCompleted,
-                         weak_ptr_factory_.GetWeakPtr(), std::move(callback),
-                         is_cross_origin));
-
-  // If `remote_validation` is nullptr then this object may already have been
-  // destroyed.
-  if (remote_validation) {
-    webauthn_remote_rp_id_validation_ = std::move(remote_validation);
-  }
-}
-
-void RenderFrameHostImpl::PerformReportWebAuthSecurityChecks(
-    const std::string& relying_party_id,
-    const url::Origin& effective_origin,
-    base::OnceCallback<void(blink::mojom::AuthenticatorStatus, bool)>
-        callback) {
-  bool is_cross_origin = true;
-
-  blink::mojom::AuthenticatorStatus status =
-      GetWebAuthRequestSecurityCheckerImpl()->ValidateAncestorOrigins(
-          effective_origin, WebAuthRequestSecurityChecker::RequestType::kReport,
-          &is_cross_origin);
-  if (status != blink::mojom::AuthenticatorStatus::SUCCESS) {
-    std::move(callback).Run(status, is_cross_origin);
-    return;
-  }
-
-  if (!GetContentClient()->browser()->IsSecurityLevelAcceptableForWebAuthn(
-          this, effective_origin)) {
-    std::move(callback).Run(
-        blink::mojom::AuthenticatorStatus::CERTIFICATE_ERROR, is_cross_origin);
-    return;
-  }
-
-  std::unique_ptr<webauthn::RemoteValidation> remote_validation =
-      GetWebAuthRequestSecurityCheckerImpl()->ValidateDomainAndRelyingPartyID(
-          effective_origin, relying_party_id,
-          WebAuthRequestSecurityChecker::RequestType::kReport,
-          /*remote_desktop_client_override_origin=*/std::nullopt,
-          base::BindOnce(&RenderFrameHostImpl::OnWebAuthSecurityChecksCompleted,
-                         weak_ptr_factory_.GetWeakPtr(), std::move(callback),
-                         is_cross_origin));
-
-  // If `remote_validation` is nullptr then this object may already have been
-  // destroyed.
-  if (remote_validation) {
-    webauthn_remote_rp_id_validation_ = std::move(remote_validation);
-  }
-}
-
-void RenderFrameHostImpl::OnWebAuthSecurityChecksCompleted(
-    base::OnceCallback<void(blink::mojom::AuthenticatorStatus, bool)> callback,
-    bool is_cross_origin,
-    blink::mojom::AuthenticatorStatus status) {
-  webauthn_remote_rp_id_validation_.reset();
-  std::move(callback).Run(status, is_cross_origin);
-}
-#endif
 
 void RenderFrameHostImpl::CleanUpMediaStreams() {
   for (int i = 0; i < static_cast<int>(MediaStreamType::kCount); ++i) {
@@ -20366,12 +20005,10 @@ RenderFrameHostImpl::GetCachedPermissionStatuses() {
       std::to_array<std::pair<PermissionName, PermissionType>>(
           {{PermissionName::VIDEO_CAPTURE, PermissionType::VIDEO_CAPTURE},
            {PermissionName::AUDIO_CAPTURE, PermissionType::AUDIO_CAPTURE},
-#if !BUILDFLAG(IS_ANDROID)
            // `WEB_APP_INSTALLATION` is only registered for desktop platforms
            // via `WebsiteSettingsRegistry::DESKTOP`.
            {PermissionName::WEB_APP_INSTALLATION,
             PermissionType::WEB_APP_INSTALLATION},
-#endif
            {PermissionName::GEOLOCATION, PermissionType::GEOLOCATION}});
 
   base::flat_map<PermissionName, PermissionStatus> permission_map;

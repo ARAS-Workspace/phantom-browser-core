@@ -40,12 +40,8 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "net/cert/x509_certificate.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/enterprise/reporting/reporting_delegate_factory_android.h"
-#else
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
 #include "components/enterprise/device_trust/core/device_trust_connector_service.h"  // nogncheck
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/core/mac/secure_enclave_client.h"
@@ -66,7 +62,6 @@ constexpr char kProfile[] = "Profile";
 constexpr char kBrowser[] = "Browser";
 #endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
 
-#if !BUILDFLAG(IS_ANDROID)
 std::string ConvertPolicyLevelToString(DTCPolicyLevel level) {
   switch (level) {
     case DTCPolicyLevel::kBrowser:
@@ -75,7 +70,6 @@ std::string ConvertPolicyLevelToString(DTCPolicyLevel level) {
       return "User";
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::string GetStringFromTimestamp(base::Time timestamp) {
   using base::i18n::DateTimeFormatterOptions;
@@ -105,9 +99,6 @@ ConnectorsInternalsPageHandler::~ConnectorsInternalsPageHandler() = default;
 
 void ConnectorsInternalsPageHandler::GetDeviceTrustState(
     GetDeviceTrustStateCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  NOTIMPLEMENTED();
-#else
   auto* device_trust_service =
       DeviceTrustServiceFactory::GetForProfile(profile_);
 
@@ -133,7 +124,6 @@ void ConnectorsInternalsPageHandler::GetDeviceTrustState(
       base::BindOnce(&ConnectorsInternalsPageHandler::OnSignalsCollected,
                      weak_ptr_factory_.GetWeakPtr(), std::move(callback),
                      device_trust_service->IsEnabled()));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ConnectorsInternalsPageHandler::DeleteDeviceTrustKey(
@@ -267,13 +257,8 @@ void ConnectorsInternalsPageHandler::GetSignalsReportingState(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  auto delegate_factory =
-      std::make_unique<enterprise_reporting::ReportingDelegateFactoryAndroid>();
-#else
   auto delegate_factory =
       std::make_unique<enterprise_reporting::ReportingDelegateFactoryDesktop>();
-#endif
 
   request_generator_ =
       std::make_unique<enterprise_reporting::ChromeProfileRequestGenerator>(
@@ -290,7 +275,6 @@ void ConnectorsInternalsPageHandler::GetSignalsReportingState(
                      std::move(state)));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ConnectorsInternalsPageHandler::OnSignalsCollected(
     GetDeviceTrustStateCallback callback,
     bool is_device_trust_enabled,
@@ -324,7 +308,6 @@ void ConnectorsInternalsPageHandler::OnSignalsCollected(
       signals_json, std::move(consent_metadata));
   std::move(callback).Run(std::move(state));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void ConnectorsInternalsPageHandler::OnReportGenerated(
     GetSignalsReportingStateCallback callback,

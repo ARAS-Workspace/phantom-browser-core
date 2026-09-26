@@ -38,11 +38,9 @@
 #include "ui/base/page_transition_types.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/metrics/desktop_session_duration/desktop_session_duration_tracker.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif
 
 using history_helper::CoreTransitionIs;
 using history_helper::HasHttpResponseCode;
@@ -68,12 +66,10 @@ namespace {
 constexpr char kRedirectFromPath[] = "/redirect.html";
 constexpr char kRedirectToPath[] = "/sync/simple.html";
 
-#if !BUILDFLAG(IS_ANDROID)
 constexpr char kMetricNameWithHistorySync[] =
     "Session.TotalDurationMax1Day.WithHistorySync";
 constexpr char kMetricNameWithHistorySyncWithoutAuthError[] =
     "Session.TotalDurationMax1Day.WithHistorySyncWithoutAuthError";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 GURL GetFileUrl(const char* file) {
   base::ScopedAllowBlockingForTesting allow_blocking;
@@ -187,7 +183,6 @@ class SingleClientHistorySyncTest
       return false;
     }
 
-#if !BUILDFLAG(IS_ANDROID)
     // On non-Android platforms, SyncTest doesn't create any tabs in the
     // profiles/browsers it creates. Create an "empty" tab here, so that
     // NavigateToURL() will have a non-null WebContents to navigate in.
@@ -197,7 +192,6 @@ class SingleClientHistorySyncTest
         return false;
       }
     }
-#endif
 
     return true;
   }
@@ -240,14 +234,10 @@ class SingleClientHistorySyncTest
   }
 
   content::WebContents* GetActiveWebContents() {
-#if BUILDFLAG(IS_ANDROID)
-    return chrome_test_utils::GetActiveWebContents(this);
-#else
     // Note: chrome_test_utils::GetActiveWebContents() doesn't work on
     // non-Android platforms, since it uses the profile created by
     // InProcessBrowserTest, not the profile(s) from SyncTest.
     return GetBrowser(0)->tab_strip_model()->GetActiveWebContents();
-#endif
   }
 
  private:
@@ -318,7 +308,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
 
 // TODO(crbug.com/40871747): EnterSyncPausedStateForPrimaryAccount is currently
 // not supported on Android. Enable these tests once it is.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest, DoesNotUploadWhilePaused) {
   ASSERT_TRUE(SetupSync());
 
@@ -434,7 +423,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
     histograms.ExpectTotalCount(kMetricNameWithHistorySyncWithoutAuthError, 1);
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest, UploadsAllFields) {
   ASSERT_TRUE(SetupSync());
@@ -837,13 +825,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
   GetFakeServer()->InjectEntity(CreateFakeServerEntity(specifics1));
   GetFakeServer()->InjectEntity(CreateFakeServerEntity(specifics2));
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, invalidations for HISTORY are disabled, so trigger an explicit
-  // refresh to fetch the updated data.
-  GetSyncService(0)->TriggerRefresh(
-      syncer::SyncService::TriggerRefreshSource::kUnknown, {syncer::HISTORY});
-#endif
-
   // Wait for the updates to arrive.
   WaitForLocalHistory(
       {{url1, UnorderedElementsAre(
@@ -971,12 +952,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
   const GURL new_url("https://www.new-url.com");
   GetFakeServer()->InjectEntity(CreateFakeServerEntity(
       CreateSpecifics(now - base::Seconds(1), "other_cache_guid", new_url)));
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, invalidations for HISTORY are disabled by default, so
-  // explicitly trigger a GetUpdates.
-  GetSyncService(0)->TriggerRefresh(
-      syncer::SyncService::TriggerRefreshSource::kUnknown, {syncer::HISTORY});
-#endif  // BUILDFLAG(IS_ANDROID)
   WaitForLocalHistory({{new_url, testing::SizeIs(1)}});
 
   // The latency of this update should've been recorded.

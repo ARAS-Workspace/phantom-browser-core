@@ -195,11 +195,7 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
 
   // TODO(crbug.com/40247129): Remove the ExecJs workaround once
   // SimulateMouseClickOrTapElementWithId is able to activate iframes on Android
-#if !BUILDFLAG(IS_ANDROID)
   SimulateMouseClickOrTapElementWithId(web_contents, kIframeId);
-#else
-  ASSERT_TRUE(ExecJs(iframe, "// empty script to activate iframe"));
-#endif
   observer_b.Wait();
 
   // User activation on the top-level is updated by interacting with b.test
@@ -436,13 +432,8 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
 }
 
 // Flaky on Android: https://crbug.com/369717773
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_UserClearedSitesAreNotReportedToUKM \
-  DISABLED_UserClearedSitesAreNotReportedToUKM
-#else
 #define MAYBE_UserClearedSitesAreNotReportedToUKM \
   UserClearedSitesAreNotReportedToUKM
-#endif
 IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
                        MAYBE_UserClearedSitesAreNotReportedToUKM) {
   ukm::TestAutoSetUkmRecorder ukm_recorder;
@@ -638,7 +629,6 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
 }
 
 // Multiple running profiles is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
                        SitesInOpenTabsForDifferentProfilesAreNotExempt) {
   WebContents* web_contents = GetActiveWebContents();
@@ -684,6 +674,5 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
   EXPECT_FALSE(GetBtmState(GetBtmService(web_contents), GURL("http://c.test"))
                    .has_value());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

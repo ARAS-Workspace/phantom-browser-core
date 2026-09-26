@@ -33,20 +33,11 @@
 #include "url/url_constants.h"
 
 // These tests time out on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SitePerProcessAccessibilityBrowserTest \
-  DISABLED_SitePerProcessAccessibilityBrowserTest
-#else
 #define MAYBE_SitePerProcessAccessibilityBrowserTest \
   SitePerProcessAccessibilityBrowserTest
-#endif
 // "All/DISABLED_SitePerProcessAccessibilityBrowserTest" does not work. We need
 // "DISABLED_All/...". TODO(crbug.com/40136187) delete when fixed.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_All DISABLED_All
-#else
 #define MAYBE_All All
-#endif
 
 namespace content {
 

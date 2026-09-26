@@ -50,10 +50,6 @@
 #include "ui/shell_dialogs/selected_file_info.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/browser_ui/share/android/intent_helper.h"
-#endif
-
 using content::BrowserThread;
 using content::WebContents;
 using content::WebUIMessageHandler;
@@ -298,12 +294,6 @@ void NetExportMessageHandler::FileSelectionCanceled() {
 void NetExportMessageHandler::OnNewState(const base::DictValue& state) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   const bool will_be_logging = file_writer_->IsLogging();
-#if BUILDFLAG(IS_ANDROID)
-  if (!will_be_logging && is_logging_) {
-    file_writer_->GetFilePathToCompletedLog(
-        base::BindOnce(&chrome_browser_net::PublishNetLogToDownloads));
-  }
-#endif
   is_logging_ = will_be_logging;
   NotifyUIWithState(state);
 }
@@ -311,20 +301,6 @@ void NetExportMessageHandler::OnNewState(const base::DictValue& state) {
 // static
 void NetExportMessageHandler::SendEmail(const base::FilePath& file_to_send) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-#if BUILDFLAG(IS_ANDROID)
-  if (file_to_send.empty()) {
-    return;
-  }
-  std::string email;
-  std::string subject = "net_internals_log";
-  std::string title = "Issue number: ";
-  std::string body =
-      "Please add some informative text about the network issues.";
-  base::FilePath::StringType file_to_attach(file_to_send.value());
-  browser_ui::SendEmail(base::UTF8ToUTF16(email), base::UTF8ToUTF16(subject),
-                        base::UTF8ToUTF16(body), base::UTF8ToUTF16(title),
-                        base::UTF8ToUTF16(file_to_attach));
-#endif
 }
 
 void NetExportMessageHandler::StartNetLog(const base::FilePath& path) {
@@ -354,11 +330,7 @@ void NetExportMessageHandler::ShowFileInShell(const base::FilePath& path) {
 
 // static
 bool NetExportMessageHandler::UsingMobileUI() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif
 }
 
 void NetExportMessageHandler::NotifyUIWithState(const base::DictValue& state) {

@@ -213,11 +213,7 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_AudioClearVideo_WebM) {
 }
 
 // TODO(crbug.com/40784898): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Playback_VideoAudio_WebM DISABLED_Playback_VideoAudio_WebM
-#else
 #define MAYBE_Playback_VideoAudio_WebM Playback_VideoAudio_WebM
-#endif
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, MAYBE_Playback_VideoAudio_WebM) {
   TestSimplePlayback("bear-320x240-av_enc-av.webm");
 }
@@ -241,12 +237,7 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoClearAudio_WebM) {
 }
 
 // TODO(crbug.com/40784898): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Playback_VideoAudio_WebM_Opus \
-  DISABLED_Playback_VideoAudio_WebM_Opus
-#else
 #define MAYBE_Playback_VideoAudio_WebM_Opus Playback_AudioOnly_WebM_Opus
-#endif
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
                        MAYBE_Playback_VideoAudio_WebM_Opus) {
   TestSimplePlayback("bear-320x240-opus-a_enc-a.webm");
@@ -278,7 +269,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoOnly_MP4_VP9) {
 }
 
 // TODO(crbug.com/40513452): Decide when it's supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40187305): Failing on Mac.
@@ -312,7 +302,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
 
   TestSimplePlayback("bear-320x240-v-vp9_profile2_subsample_cenc-v.mp4");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_AV1_DECODER)
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoOnly_WebM_AV1) {
@@ -320,13 +309,8 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoOnly_WebM_AV1) {
 }
 
 // TODO(crbug.com/40863206): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Playback_VideoOnly_WebM_AV1_10bit \
-  DISABLED_Playback_VideoOnly_WebM_AV1_10bit
-#else
 #define MAYBE_Playback_VideoOnly_WebM_AV1_10bit \
   Playback_VideoOnly_WebM_AV1_10bit
-#endif
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
                        MAYBE_Playback_VideoOnly_WebM_AV1_10bit) {
   TestSimplePlayback("bear-av1-320x180-10bit-cenc.webm");
@@ -361,13 +345,8 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
 }
 
 // Failed on Android, see https://crbug.com/1014540.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ConfigChangeVideo_ClearToEncrypted \
-  DISABLED_ConfigChangeVideo_ClearToEncrypted
-#else
 #define MAYBE_ConfigChangeVideo_ClearToEncrypted \
   ConfigChangeVideo_ClearToEncrypted
-#endif
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
                        MAYBE_ConfigChangeVideo_ClearToEncrypted) {
   TestConfigChange(ConfigChangeType::CLEAR_TO_ENCRYPTED);
@@ -383,11 +362,7 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
 }
 
 // Fails on Android (https://crbug.com/778245 and https://crbug.com/1023638).
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_FrameSizeChangeVideo DISABLED_FrameSizeChangeVideo
-#else
 #define MAYBE_FrameSizeChangeVideo FrameSizeChangeVideo
-#endif
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, MAYBE_FrameSizeChangeVideo) {
   TestFrameSizeChange();
 }
@@ -404,11 +379,7 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_Encryption_CBC1) {
 }
 
 // TODO(crbug.com/40863223): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Playback_Encryption_CENS DISABLED_Playback_Encryption_CENS
-#else
 #define MAYBE_Playback_Encryption_CENS Playback_Encryption_CENS
-#endif
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, MAYBE_Playback_Encryption_CENS) {
   RunMultipleFileTest("bear-640x360-v_frag-cens.mp4", std::string(),
                       media::kErrorTitle);

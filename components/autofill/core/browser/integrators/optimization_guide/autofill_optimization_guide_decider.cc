@@ -231,7 +231,7 @@ void AddOptimizationTypesForBnplIssuers(
     const std::vector<BnplIssuer>& bnpl_issuers,
     base::flat_set<optimization_guide::proto::OptimizationType>&
         optimization_types) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   auto bnpl_issuer_allowlist_can_be_loaded =
       [&bnpl_issuers](BnplIssuer::IssuerId issuer_id) {
         return std::ranges::contains(bnpl_issuers, issuer_id,
@@ -242,46 +242,26 @@ void AddOptimizationTypesForBnplIssuers(
     optimization_types.insert(
         base::FeatureList::IsEnabled(
             features::kAutofillPreferBuyNowPayLaterBlocklists)
-#if BUILDFLAG(IS_ANDROID)
-            ? optimization_guide::proto::
-                  BUY_NOW_PAY_LATER_BLOCKLIST_AFFIRM_ANDROID
-            : optimization_guide::proto::
-                  BUY_NOW_PAY_LATER_ALLOWLIST_AFFIRM_ANDROID);
-#else
             ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_AFFIRM
             : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_AFFIRM);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   if (bnpl_issuer_allowlist_can_be_loaded(BnplIssuer::IssuerId::kBnplZip)) {
     optimization_types.insert(
         base::FeatureList::IsEnabled(
             features::kAutofillPreferBuyNowPayLaterBlocklists)
-#if BUILDFLAG(IS_ANDROID)
-            ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_ZIP_ANDROID
-            : optimization_guide::proto::
-                  BUY_NOW_PAY_LATER_ALLOWLIST_ZIP_ANDROID);
-#else
             ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_ZIP
             : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_ZIP);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   if (bnpl_issuer_allowlist_can_be_loaded(BnplIssuer::IssuerId::kBnplKlarna)) {
     optimization_types.insert(
         base::FeatureList::IsEnabled(
             features::kAutofillPreferBuyNowPayLaterBlocklists)
-#if BUILDFLAG(IS_ANDROID)
-            ? optimization_guide::proto::
-                  BUY_NOW_PAY_LATER_BLOCKLIST_KLARNA_ANDROID
-            : optimization_guide::proto::
-                  BUY_NOW_PAY_LATER_ALLOWLIST_KLARNA_ANDROID);
-#else
             ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_KLARNA
             : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_KLARNA);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 }  // namespace
@@ -534,45 +514,22 @@ bool AutofillOptimizationGuideDecider::IsUrlEligibleForBnplIssuer(
       return can_apply_optimization(
           base::FeatureList::IsEnabled(
               features::kAutofillPreferBuyNowPayLaterBlocklists)
-#if BUILDFLAG(IS_ANDROID)
-              ? optimization_guide::proto::
-                    BUY_NOW_PAY_LATER_BLOCKLIST_AFFIRM_ANDROID
-              : optimization_guide::proto::
-                    BUY_NOW_PAY_LATER_ALLOWLIST_AFFIRM_ANDROID);
-#else
               ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_AFFIRM
               : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_AFFIRM);
-#endif  // BUILDFLAG(IS_ANDROID)
     case BnplIssuer::IssuerId::kBnplZip:
       return can_apply_optimization(
           base::FeatureList::IsEnabled(
               features::kAutofillPreferBuyNowPayLaterBlocklists)
-#if BUILDFLAG(IS_ANDROID)
-              ? optimization_guide::proto::
-                    BUY_NOW_PAY_LATER_BLOCKLIST_ZIP_ANDROID
-              : optimization_guide::proto::
-                    BUY_NOW_PAY_LATER_ALLOWLIST_ZIP_ANDROID);
-#else
               ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_ZIP
               : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_ZIP);
-#endif  // BUILDFLAG(IS_ANDROID)
-    // TODO(crbug.com/408268581): Handle Afterpay issuer enum value when
-    // adding Afterpay to the BNPL flow.
     case BnplIssuer::IssuerId::kBnplAfterpay:
       NOTREACHED();
     case BnplIssuer::IssuerId::kBnplKlarna:
       return can_apply_optimization(
           base::FeatureList::IsEnabled(
               features::kAutofillPreferBuyNowPayLaterBlocklists)
-#if BUILDFLAG(IS_ANDROID)
-              ? optimization_guide::proto::
-                    BUY_NOW_PAY_LATER_BLOCKLIST_KLARNA_ANDROID
-              : optimization_guide::proto::
-                    BUY_NOW_PAY_LATER_ALLOWLIST_KLARNA_ANDROID);
-#else
               ? optimization_guide::proto::BUY_NOW_PAY_LATER_BLOCKLIST_KLARNA
               : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_KLARNA);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
   NOTREACHED();
 }

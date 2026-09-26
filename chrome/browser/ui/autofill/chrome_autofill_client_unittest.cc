@@ -80,12 +80,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/autofill/autofill_cvc_save_message_delegate.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_card_bottom_sheet_bridge.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_card_delegate_android.h"
-#include "components/autofill/core/browser/payments/autofill_save_card_ui_info.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/account_settings/account_setting_service_factory.h"
 #include "chrome/browser/profiles/profile_attributes_init_params.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
@@ -101,7 +95,6 @@
 #include "components/autofill/core/browser/foundations/mock_autofill_manager.h"
 #include "components/tabs/public/mock_tab_interface.h"
 #include "components/tabs/public/tab_interface.h"
-#endif  //   BUILDFLAG(IS_ANDROID)
 
 namespace autofill {
 namespace {
@@ -143,7 +136,6 @@ class MockPersonalContextEligibilityService
       (const, override));
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockSaveCardBubbleController : public SaveCardBubbleControllerImpl {
  public:
   explicit MockSaveCardBubbleController(content::WebContents* web_contents)
@@ -160,9 +152,7 @@ class MockSaveCardBubbleController : public SaveCardBubbleControllerImpl {
       (override));
   MOCK_METHOD(void, HideSaveCardBubble, (), (override));
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockAutofillFieldPromoController : public AutofillFieldPromoController {
  public:
   ~MockAutofillFieldPromoController() override = default;
@@ -171,7 +161,6 @@ class MockAutofillFieldPromoController : public AutofillFieldPromoController {
   MOCK_METHOD(bool, IsMaybeShowing, (), (const override));
   MOCK_METHOD(const base::Feature&, GetFeaturePromo, (), (const override));
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // This test class is needed to make the constructor public.
 class TestChromeAutofillClient : public ChromeAutofillClient {
@@ -196,14 +185,11 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
     // Creates the AutofillDriver and AutofillManager.
     NavigateAndCommit(GURL("about:blank"));
 
-#if !BUILDFLAG(IS_ANDROID)
-
     auto save_card_bubble_controller =
         std::make_unique<MockSaveCardBubbleController>(web_contents());
     const auto* user_data_key = save_card_bubble_controller->UserDataKey();
     web_contents()->SetUserData(user_data_key,
                                 std::move(save_card_bubble_controller));
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   void InitializePersonalContextEligibilityService() {
@@ -219,7 +205,6 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
                     })));
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   void SetUpIphForTesting(const base::Feature& feature_promo) {
     auto autofill_field_promo_controller =
         std::make_unique<MockAutofillFieldPromoController>();
@@ -231,13 +216,10 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
     client()->SetAutofillFieldPromoTesting(
         std::move(autofill_field_promo_controller));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void TearDown() override {
     // Avoid that the raw pointer becomes dangling.
-#if !BUILDFLAG(IS_ANDROID)
     autofill_field_promo_controller_ = nullptr;
-#endif  // !BUILDFLAG(IS_ANDROID)
     personal_context_eligibility_service_ = nullptr;
     ChromeRenderViewHostTestHarness::TearDown();
   }
@@ -260,18 +242,14 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
     return personal_context_eligibility_service_;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   MockAutofillFieldPromoController* autofill_field_promo_controller() {
     return autofill_field_promo_controller_;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
   MockSaveCardBubbleController& save_card_bubble_controller() {
     return static_cast<MockSaveCardBubbleController&>(
         *SaveCardBubbleControllerImpl::FromWebContents(web_contents()));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
  protected:
   TestingProfile::TestingFactories GetTestingFactories() const override {
@@ -292,9 +270,7 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
 
   test::AutofillUnitTestEnvironment autofill_environment_{
       {.disable_server_communication = true}};
-#if !BUILDFLAG(IS_ANDROID)
   raw_ptr<MockAutofillFieldPromoController> autofill_field_promo_controller_;
-#endif  // !BUILDFLAG(IS_ANDROID)
   raw_ptr<MockPersonalContextEligibilityService>
       personal_context_eligibility_service_;
   TestAutofillClientInjector<TestChromeAutofillClient>
@@ -397,7 +373,6 @@ TEST_F(ChromeAutofillClientTest, ClassifiesLoginFormOnChildFrame) {
             expected);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Test the scenario when the plus address survey delay is not configured. The
 // random delay of the survey should be between the 10s and 60s.
 
@@ -782,7 +757,6 @@ TEST_F(ChromeAutofillClientTestWithMockWindow,
                   FeaturePromoFeatureUsedAction::kClosePromoIfPresent));
   client()->NotifyIphFeatureUsed(AutofillClient::IphFeature::kAutofillAi);
 }
-#endif  //  !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
@@ -1132,7 +1106,6 @@ TEST_F(ChromeAutofillClientTest, GetPersonalContextEligibilityState_HappyPath) {
             personal_context::PersonalContextEligibilityState::kEligible);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeAutofillClientTest, HideSuggestions_ProductFilter) {
   testing::NiceMock<MockAutofillPopupController> mock_controller;
   ON_CALL(mock_controller, GetMainFillingProduct)
@@ -1150,7 +1123,6 @@ TEST_F(ChromeAutofillClientTest, HideSuggestions_ProductFilter) {
   client()->HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
                             FillingProduct::kAddress);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeAutofillClientTest, IsAutofillProfileEnabled_BlockedByPolicy) {
   base::test::ScopedFeatureList feature_list(

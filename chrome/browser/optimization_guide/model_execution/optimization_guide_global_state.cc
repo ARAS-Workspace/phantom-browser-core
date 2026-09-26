@@ -109,16 +109,10 @@ OptimizationGuideGlobalState::OptimizationGuideGlobalState(
 ModelBrokerState* OptimizationGuideGlobalState::model_broker_state() {
   return nullptr;
 }
-#else  // !BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
+#else   // !BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
 OptimizationGuideGlobalState::OptimizationGuideGlobalState() {
-
-#if BUILDFLAG(IS_ANDROID)
-  on_device_capability_ = std::make_unique<ModelBrokerAndroid>(
-      *g_browser_process->local_state(), model_provider());
-#else   // !BUILDFLAG(IS_ANDROID)
   // Create a stub capability that can't do anything.
   on_device_capability_ = std::make_unique<OnDeviceCapability>();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 #endif  // BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
 

@@ -239,32 +239,7 @@
 #include "ui/events/base_event_utils.h"
 #include "ui/gfx/animation/animation.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#include "base/android/scoped_service_binding_batch.h"
-#include "base/check.h"
-#include "components/viz/common/gpu/raster_context_provider.h"
-#include "content/browser/android/java_interfaces_impl.h"
-#include "content/browser/android/nfc_host.h"
-#include "content/browser/android/selection/selection_popup_controller.h"
-#include "content/browser/navigation_transitions/back_forward_transition_animation_manager_android.h"
-#include "content/browser/renderer_host/compositor_impl_android.h"
-#include "content/browser/web_contents/web_contents_android.h"
-#include "content/browser/web_contents/web_contents_view_android.h"
-#include "content/public/browser/android/child_process_importance.h"
-#include "content/public/browser/android/selection_popup_delegate.h"
-#include "services/device/public/mojom/nfc.mojom.h"
-#include "services/service_manager/public/cpp/interface_provider.h"
-#include "ui/android/event_forwarder.h"
-#include "ui/android/view_android.h"
-#include "ui/base/device_form_factor.h"
-#else  // !BUILDFLAG(IS_ANDROID)
 #include "ui/accessibility/accessibility_features.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/date_time_chooser/date_time_chooser.h"
-#endif
 
 #if BUILDFLAG(ENABLE_VR)
 #include "content/browser/xr/service/xr_runtime_manager_impl.h"
@@ -942,59 +917,6 @@ class WebContentsImpl::WebContentsDestructionObserver
   raw_ptr<WebContentsImpl> owner_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(sreejakshetty): Make |WebContentsImpl::ColorChooserHolder| per-frame
-// instead of WebContents-owned.
-// WebContentsImpl::ColorChooserHolder -----------------------------------------
-class WebContentsImpl::ColorChooserHolder : public blink::mojom::ColorChooser {
- public:
-  ColorChooserHolder(
-      mojo::PendingReceiver<blink::mojom::ColorChooser> receiver,
-      mojo::PendingRemote<blink::mojom::ColorChooserClient> client)
-      : receiver_(this, std::move(receiver)), client_(std::move(client)) {}
-
-  ~ColorChooserHolder() override {
-    if (chooser_) {
-      chooser_->End();
-    }
-  }
-
-  void SetChooser(std::unique_ptr<content::ColorChooser> chooser) {
-    chooser_ = std::move(chooser);
-    if (chooser_) {
-      receiver_.set_disconnect_handler(
-          base::BindOnce([](content::ColorChooser* chooser) { chooser->End(); },
-                         base::Unretained(chooser_.get())));
-    }
-  }
-
-  void SetSelectedColor(SkColor color) override {
-    OPTIONAL_TRACE_EVENT0(
-        "content", "WebContentsImpl::ColorChooserHolder::SetSelectedColor");
-    if (chooser_) {
-      chooser_->SetSelectedColor(color);
-    }
-  }
-
-  void DidChooseColorInColorChooser(SkColor color) {
-    OPTIONAL_TRACE_EVENT0(
-        "content",
-        "WebContentsImpl::ColorChooserHolder::DidChooseColorInColorChooser");
-    client_->DidChooseColor(color);
-  }
-
- private:
-  // Color chooser that was opened by this tab.
-  std::unique_ptr<content::ColorChooser> chooser_;
-
-  // mojo receiver.
-  mojo::Receiver<blink::mojom::ColorChooser> receiver_;
-
-  // mojo renderer client.
-  mojo::Remote<blink::mojom::ColorChooserClient> client_;
-};
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // WebContentsImpl::WebContentsTreeNode ----------------------------------------
 WebContentsImpl::WebContentsTreeNode::WebContentsTreeNode(
     WebContentsImpl* current_web_contents)
@@ -1257,14 +1179,6 @@ class WebContentsOfBrowserContext : public base::SupportsUserData::Data {
     }
     SCOPED_CRASH_KEY_STRING256("shutdown", "web_contents/owner", owner);
 
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, also report the Java stack trace from WebContents's
-    // creation.
-    WebContentsAndroid::ReportDanglingPtrToBrowserContext(
-        base::android::AttachCurrentThread(),
-        web_contents_with_dangling_ptr_to_browser_context);
-#endif  // BUILDFLAG(IS_ANDROID)
-
     NOTREACHED()
         << "BrowserContext is getting destroyed without first closing all "
         << "WebContents (for more info see https://crbug.com/1376879#c44); "
@@ -1352,9 +1266,6 @@ WebContentsImpl::WebContentsImpl(BrowserContext* browser_context)
   back_forward_cache_ = std::make_unique<BackForwardCacheImpl>(*this);
   WebContentsOfBrowserContext::Attach(*this);
   node_.SetFocusedFrameTree(&primary_frame_tree_);
-#if BUILDFLAG(IS_ANDROID)
-  safe_area_insets_host_ = SafeAreaInsetsHost::Create(this);
-#endif
 
   auto* const native_theme = ui::NativeTheme::GetInstanceForWeb();
   native_theme_observation_.Observe(native_theme);
@@ -1461,9 +1372,6 @@ WebContentsImpl::~WebContentsImpl() {
   // Clear out any JavaScript state.
   CancelDialogManagerDialogs(/*reset_state=*/true);
 
-#if BUILDFLAG(IS_ANDROID)
-  color_chooser_holder_.reset();
-#endif
   find_request_manager_.reset();
 
   // crbug.com/373898450: The `FrameTree` should outlive the animation manager.
@@ -1504,12 +1412,6 @@ WebContentsImpl::~WebContentsImpl() {
   }
 
   observers_.NotifyObservers(&WebContentsObserver::WebContentsDestroyed);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Destroy the WebContentsAndroid here, so that its observers still can access
-  // `this`.
-  ClearWebContentsAndroid();
-#endif
 
   observers_.NotifyObservers(&WebContentsObserver::ResetWebContents);
   SetDelegate(nullptr);
@@ -2579,24 +2481,6 @@ bool WebContentsImpl::IsFullAccessibilityModeForTesting() {
   return accessibility_mode_ == ui::kAXModeDefaultForTests;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-void WebContentsImpl::SetDisplayCutoutSafeArea(gfx::Insets insets) {
-  OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::SetDisplayCutoutSafeArea");
-  if (safe_area_insets_host_) {
-    safe_area_insets_host_->SetDisplayCutoutSafeArea(insets);
-  }
-}
-
-void WebContentsImpl::ShowInterestInElement(int nodeID) {
-  OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::ShowInterestInElement");
-  if (auto* rwhv = GetRenderWidgetHostView()) {
-    rwhv->ShowInterestInElement(nodeID);
-  }
-}
-
-#endif
-
 const std::u16string& WebContentsImpl::GetTitle() {
   WebUI* our_web_ui =
       GetRenderManager()->speculative_frame_host()
@@ -2905,9 +2789,6 @@ bool WebContentsImpl::IsCrashed() {
     case base::TERMINATION_STATUS_OOM:
     case base::TERMINATION_STATUS_EVICTED_FOR_MEMORY:
     case base::TERMINATION_STATUS_LAUNCH_FAILED:
-#if BUILDFLAG(IS_ANDROID)
-    case base::TERMINATION_STATUS_OOM_PROTECTED:
-#endif
       return true;
     case base::TERMINATION_STATUS_NORMAL_TERMINATION:
     case base::TERMINATION_STATUS_STILL_RUNNING:
@@ -3094,18 +2975,6 @@ WebContents::ScopedIgnoreInputEvents WebContentsImpl::IgnoreInputEvents(
     } while (web_input_event_audit_callbacks_.contains(callback_id));
     web_input_event_audit_callbacks_[callback_id] = std::move(*audit_callback);
   } else {
-#if BUILDFLAG(IS_ANDROID)
-    if (ignore_input_events_count_ == 0) {
-      // Reset gesture detection before starting input suppression so that any
-      // ongoing scroll gesture is correctly finished.
-      //
-      // TODO(crbug.com/362301376): This might be a side-effect of the
-      // referenced bug. Revisit restoring the CHECK when it's resolved.
-      if (auto* view = GetRenderWidgetHostView()) {
-        static_cast<RenderWidgetHostViewBase*>(view)->ResetGestureDetection();
-      }
-    }
-#endif
     ++ignore_input_events_count_;
   }
 
@@ -3121,22 +2990,6 @@ WebContents::ScopedIgnoreInputEvents WebContentsImpl::IgnoreInputEvents(
             CHECK(it != wc->web_input_event_audit_callbacks_.end());
             wc->web_input_event_audit_callbacks_.erase(it);
           } else {
-#if BUILDFLAG(IS_ANDROID)
-            // Reset gesture detection so that we don't continue to generate new
-            // gestures from suppressed touches. These suppressed gestures would
-            // otherwise confuse the event stream validator when input is
-            // re-enabled.
-            //
-            // This needs to be done while input is still suppressed since
-            // resetting can generate gesture end events for a gesture sequence
-            // which was being suppressed.
-            if (wc->ignore_input_events_count_ == 1) {
-              if (auto* view = wc->GetRenderWidgetHostView()) {
-                static_cast<RenderWidgetHostViewBase*>(view)
-                    ->ResetGestureDetection();
-              }
-            }
-#endif
             --wc->ignore_input_events_count_;
           }
         }
@@ -3169,60 +3022,6 @@ const std::optional<blink::mojom::PictureInPictureWindowOptions>&
 WebContentsImpl::GetPictureInPictureOptions() const {
   return picture_in_picture_options_;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-ChildProcessImportance
-WebContentsImpl::GetPrimaryMainFrameImportanceForTesting() {
-  return GetPrimaryMainFrame()->GetRenderWidgetHost()->importance();
-}
-
-ChildProcessImportance
-WebContentsImpl::GetPrimaryPageSubframeImportanceForTesting() {
-  return primary_subframe_importance_;
-}
-
-void WebContentsImpl::SetPrimaryPageImportance(
-    ChildProcessImportance main_frame_importance,
-    ChildProcessImportance subframe_importance) {
-  OPTIONAL_TRACE_EVENT2(
-      "content", "WebContentsImpl::SetPrimaryPageImportance",
-      "main_frame_importance", static_cast<int>(main_frame_importance),
-      "subframe_importance", static_cast<int>(subframe_importance));
-  CHECK(IsNotPerceptibleImportanceSupported() ||
-        (main_frame_importance != ChildProcessImportance::NOT_PERCEPTIBLE &&
-         subframe_importance != ChildProcessImportance::NOT_PERCEPTIBLE))
-      << "Setter of ChildProcessImportance::NOT_PERCEPTIBLE should be aware of "
-         "the support and avoid using NOT_PERCEPTIBLE if "
-         "IsNotPerceptibleImportanceSupported() is false";
-  CHECK(main_frame_importance >= subframe_importance);
-
-  // Batch service binding updates for the renderer processes of the main frame
-  // and the subframes.
-  base::android::ScopedServiceBindingBatch scoped_service_binding_batch;
-
-  if (subframe_importance != primary_subframe_importance_) {
-    primary_subframe_importance_ = subframe_importance;
-    ApplyPrimaryPageSubframeImportance();
-  }
-
-  GetPrimaryMainFrame()->GetRenderWidgetHost()->SetImportance(
-      main_frame_importance);
-}
-
-void WebContentsImpl::ApplyPrimaryPageSubframeImportance() {
-  OPTIONAL_TRACE_EVENT1(
-      "content", "WebContentsImpl::ApplyPrimaryPageSubframeImportance",
-      "importance", static_cast<int>(primary_subframe_importance_));
-  for (FrameTreeNode* node : primary_frame_tree_.Nodes()) {
-    if (node->IsMainFrame()) {
-      continue;
-    }
-    if (auto* rwh = node->current_frame_host()->GetLocalRenderWidgetHost()) {
-      rwh->SetImportance(primary_subframe_importance_);
-    }
-  }
-}
-#endif
 
 void WebContentsImpl::WasOccluded() {
   TRACE_EVENT0("content", "WebContentsImpl::WasOccluded");
@@ -3944,39 +3743,9 @@ const blink::web_pref::WebPreferences WebContentsImpl::ComputeWebPreferences(
 
   prefs.viewport_enabled = command_line.HasSwitch(switches::kEnableViewport);
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40925473): GetPrimaryDisplay() won't be correct for
-  // externally connected displays. Get the display where Chrome is opened
-  // instead.
-  display::Display display = display::Screen::Get()->GetPrimaryDisplay();
-  gfx::Size size = display.GetSizeInPixel();
-  int min_width = size.width() < size.height() ? size.width() : size.height();
-  int min_width_in_dp =
-      static_cast<int>(min_width / display.device_scale_factor());
-  if (prefs.viewport_enabled &&
-      (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_AUTOMOTIVE ||
-       (min_width_in_dp >= kAndroidMinimumTabletWidthDp &&
-        ui::GetDeviceFormFactor() != ui::DEVICE_FORM_FACTOR_TV))) {
-    prefs.viewport_style = blink::mojom::ViewportStyle::kDefault;
-  }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  bool is_request_android_desktop_site = false;
-#endif
-
   if (GetController().GetVisibleEntry() &&
       GetController().GetVisibleEntry()->GetIsOverridingUserAgent()) {
-#if BUILDFLAG(IS_ANDROID)
-    // Only ignore viewport meta tag when Request Desktop Site is used, but not
-    // in other situations where embedder changes to arbitrary mobile UA string.
-    is_request_android_desktop_site =
-        renderer_preferences_.user_agent_override.ua_metadata_override &&
-        !renderer_preferences_.user_agent_override.ua_metadata_override->mobile;
-    prefs.viewport_meta_enabled = !is_request_android_desktop_site;
-#else
     prefs.viewport_meta_enabled = false;
-#endif
   }
 
   prefs.spatial_navigation_enabled =
@@ -3985,26 +3754,6 @@ const blink::web_pref::WebPreferences WebContentsImpl::ComputeWebPreferences(
   if (is_spatial_navigation_disabled_) {
     prefs.spatial_navigation_enabled = false;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  prefs.long_press_link_select_text = long_press_link_select_text_;
-
-  if (base::FeatureList::IsEnabled(
-          features::kRestrictOrientationLockToPhones)) {
-    // Only lock fullscreen orientation if the provider allows it, and if the
-    // prefs currently want to do so.  While current behavior happens to match
-    // exactly with the provider claiming to support orientation lock, we still
-    // want to give the cache the opportunity to turn it off for other reasons.
-    // For example, if a foldable is folded, then the prefs cache should notify
-    // us that the behavior may have changed.
-    prefs.video_fullscreen_orientation_lock_enabled &=
-        screen_orientation_provider_->IsOrientationLockSupported();
-  }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  prefs.stylus_handwriting_enabled = stylus_handwriting_enabled_;
-#endif
 
   prefs.disable_reading_from_canvas =
       command_line.HasSwitch(switches::kDisableReadingFromCanvas);
@@ -4047,61 +3796,10 @@ const blink::web_pref::WebPreferences WebContentsImpl::ComputeWebPreferences(
   prefs.payment_request_enabled =
       base::FeatureList::IsEnabled(features::kWebPayments);
 
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kWebauthnDisabledOnAuto) &&
-      base::android::device_info::is_automotive()) {
-    prefs.disable_webauthn = true;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // For devices that have larger displays (e.g. tablets, desktops), they
   // require a different set of webpref settings that is different from smaller
   // form-factors such as phones in order to render appropriately (e.g.
   // viewport)
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          blink::features::kAndroidDesktopWebPrefsLargeDisplays)) {
-    bool apply_desktop_common_settings = false;
-    switch (ui::GetDeviceFormFactor()) {
-      case ui::DEVICE_FORM_FACTOR_DESKTOP:
-        apply_desktop_common_settings = true;
-        // There are no orientation changes in desktop mode.
-        // Might need to revisit for convertible devices (i.e. clamshell ->
-        // tablet).
-        prefs.main_frame_resizes_are_orientation_changes = false;
-        break;
-      case ui::DEVICE_FORM_FACTOR_TABLET:
-      case ui::DEVICE_FORM_FACTOR_XR:
-        // Specific to large tablets (10") and XR devices, by default they
-        // request desktop site, but can per-site optionally override it to
-        // request mobile instead.
-        if (is_request_android_desktop_site) {
-          apply_desktop_common_settings = true;
-        }
-        break;
-      case ui::DEVICE_FORM_FACTOR_AUTOMOTIVE:
-      case ui::DEVICE_FORM_FACTOR_TV:
-      case ui::DEVICE_FORM_FACTOR_FOLDABLE:
-      case ui::DEVICE_FORM_FACTOR_PHONE:
-        break;
-    }
-
-    if (apply_desktop_common_settings) {
-      // Settings below matches up with desktop chrome
-
-      // Set page scale factors to be similar to desktop.
-      // The significant change compared to mobile is that we lock the min scale
-      // to 1, so that we don't allow for a birds-eye-view zoom-out (this
-      // matches desktop).
-      prefs.default_minimum_page_scale_factor = 1.f;
-      prefs.default_maximum_page_scale_factor = 4.f;
-
-      // Ensure no further viewport scaling
-      prefs.shrinks_viewport_contents_to_fit = false;
-    }
-  }
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) && BUILDFLAG(USE_EXTERNAL_POPUP_MENU)
   prefs.should_disable_external_popups =
@@ -4124,35 +3822,6 @@ void WebContentsImpl::OnWebPreferencesChanged() {
   }
   updating_web_preferences_ = true;
   SetWebPreferences(ComputeWebPreferences(GetPrimaryMainFrame()));
-
-#if BUILDFLAG(IS_ANDROID)
-  const bool force_enable_zoom_changed =
-      (force_enable_zoom_ != web_preferences_->force_enable_zoom);
-  force_enable_zoom_ = web_preferences_->force_enable_zoom;
-  if (force_enable_zoom_changed) {
-    for (FrameTreeNode* node : primary_frame_tree_.Nodes()) {
-      RenderFrameHostImpl* rfh = node->current_frame_host();
-      if (rfh->is_local_root()) {
-        if (auto* rwh = rfh->GetRenderWidgetHost()) {
-          rwh->SetForceEnableZoom(force_enable_zoom_);
-        }
-      }
-    }
-  }
-
-  const bool enable_touchpad_overscroll_history_navigation_changed =
-      (enable_touchpad_overscroll_history_navigation_ !=
-       web_preferences_->enable_touchpad_overscroll_history_navigation);
-  enable_touchpad_overscroll_history_navigation_ =
-      web_preferences_->enable_touchpad_overscroll_history_navigation;
-  if (enable_touchpad_overscroll_history_navigation_changed) {
-    if (auto* rwhv = GetRenderWidgetHostView()) {
-      static_cast<RenderWidgetHostViewBase*>(rwhv)
-          ->SetTouchpadOverscrollHistoryNavigation(
-              enable_touchpad_overscroll_history_navigation_);
-    }
-  }
-#endif
 
   // Update inner WebContents.
   for (WebContents* inner : GetInnerWebContents()) {
@@ -4352,9 +4021,6 @@ void WebContentsImpl::Init(const WebContents::CreateParams& params,
   privileged_params_ = params.privileged_params;
 
   creator_location_ = params.creator_location;
-#if BUILDFLAG(IS_ANDROID)
-  java_creator_location_ = params.java_creator_location;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   if (params.picture_in_picture_options.has_value()) {
     picture_in_picture_options_ = params.picture_in_picture_options;
@@ -4430,10 +4096,6 @@ void WebContentsImpl::Init(const WebContents::CreateParams& params,
 
   screen_orientation_provider_ =
       std::make_unique<ScreenOrientationProvider>(this);
-
-#if BUILDFLAG(IS_ANDROID)
-  DateTimeChooser::CreateDateTimeChooser(this);
-#endif
 
   SchedulerLoopQuarantineWebContentsObserver::MaybeCreateForWebContents(this);
   RedirectChainDetector::CreateForWebContents(this);
@@ -5039,7 +4701,6 @@ void WebContentsImpl::FullscreenStateChanged(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool WebContentsImpl::CanUseWindowingControls(
     RenderFrameHostImpl* requesting_frame) {
   return GetDelegate() &&
@@ -5073,7 +4734,6 @@ void WebContentsImpl::SetResizable(bool resizable) {
   }
   GetDelegate()->SetResizableFromWebAPI(resizable);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(laurila, crbug.com/1466855): Map into new `ui::DisplayState` enum
 // instead of `ui::mojom::WindowShowState`.
@@ -5314,16 +4974,6 @@ void WebContentsImpl::SetPrimaryMainFrameViewVisibility(Visibility visibility) {
 
   SetVisibilityForChildViews(view_is_visible);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::UpdateUserGestureCarryoverInfo() {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::UpdateUserGestureCarryoverInfo");
-  if (delegate_) {
-    delegate_->UpdateUserGestureCarryoverInfo(this);
-  }
-}
-#endif
 
 bool WebContentsImpl::IsFullscreen() {
   return delegate_ && delegate_->IsFullscreenForTabOrPending(this);
@@ -6463,17 +6113,6 @@ device::mojom::WakeLockContext* WebContentsImpl::GetWakeLockContext() {
   return wake_lock_context_host_->GetWakeLockContext();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::GetNFC(
-    RenderFrameHostImpl* render_frame_host,
-    mojo::PendingReceiver<device::mojom::NFC> receiver) {
-  if (!nfc_host_) {
-    nfc_host_ = std::make_unique<NFCHost>(this);
-  }
-  nfc_host_->GetNFC(render_frame_host, std::move(receiver));
-}
-#endif
-
 void WebContentsImpl::SendScreenRects() {
   OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::SendScreenRects");
 
@@ -7493,22 +7132,6 @@ WebContents* WebContentsImpl::GetFirstWebContentsInLiveOriginalOpenerChain() {
                     : nullptr;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::DidChooseColorInColorChooser(SkColor color) {
-  OPTIONAL_TRACE_EVENT1("content",
-                        "WebContentsImpl::DidChooseColorInColorChooser",
-                        "color", color);
-  if (color_chooser_holder_) {
-    color_chooser_holder_->DidChooseColorInColorChooser(color);
-  }
-}
-
-void WebContentsImpl::DidEndColorChooser() {
-  OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::DidEndColorChooser");
-  color_chooser_holder_.reset();
-}
-#endif
-
 int WebContentsImpl::DownloadImageFromAxNode(const ui::AXTreeID tree_id,
                                              const ui::AXNodeID node_id,
                                              const gfx::Size& preferred_size,
@@ -8110,15 +7733,7 @@ void WebContentsImpl::DidFinishNavigation(NavigationHandle* navigation_handle) {
 }
 
 void WebContentsImpl::DidCancelNavigationBeforeStart(
-    NavigationHandle* navigation_handle) {
-#if BUILDFLAG(IS_ANDROID)
-  if (auto* animation_manager =
-          static_cast<BackForwardTransitionAnimationManagerAndroid*>(
-              GetBackForwardTransitionAnimationManager())) {
-    animation_manager->OnNavigationCancelledBeforeStart(navigation_handle);
-  }
-#endif
-}
+    NavigationHandle* navigation_handle) {}
 
 void WebContentsImpl::DidFailLoadWithError(
     RenderFrameHostImpl* render_frame_host,
@@ -8216,36 +7831,6 @@ void WebContentsImpl::NotifyNavigationStateChangedFromController(
   NotifyNavigationStateChanged(changed_flags);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-
-scoped_refptr<viz::RasterContextProvider>
-WebContentsImpl::GetRasterContextProvider() {
-  auto window = GetTopLevelNativeWindow();
-  if (!window) {
-    return nullptr;
-  }
-
-  auto* compositor = static_cast<CompositorImpl*>(window->GetCompositor());
-  if (!compositor) {
-    return nullptr;
-  }
-  return compositor->GetRasterContextProvider();
-}
-
-gfx::ColorSpace WebContentsImpl::GetOutputColorSpace(
-    gfx::ContentColorUsage color_usage,
-    bool needs_alpha) {
-  auto window = GetTopLevelNativeWindow();
-  if (!window) {
-    return gfx::ColorSpace();
-  }
-  return window->GetDisplayWithWindowColorSpace()
-      .GetColorSpaces()
-      .GetOutputColorSpace(color_usage, needs_alpha);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 input::TouchEmulator* WebContentsImpl::GetTouchEmulator(
     bool create_if_necessary) {
   CHECK(rwh_input_event_router_);
@@ -8284,17 +7869,6 @@ void WebContentsImpl::DidNavigateMainFramePreCommit(
   if (!is_primary_mainframe) {
     return;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  auto* animation_manager =
-      static_cast<BackForwardTransitionAnimationManagerAndroid*>(
-          GetBackForwardTransitionAnimationManager());
-  if (animation_manager) {
-    animation_manager->OnDidNavigatePrimaryMainFramePreCommit(
-        request, frame_tree_node->render_manager()->current_frame_host(),
-        request->GetRenderFrameHost());
-  }
-#endif
 
   if (navigation_is_within_page) {
     return;
@@ -8780,13 +8354,6 @@ void WebContentsImpl::CapturePaintPreviewOfCrossProcessSubframe(
   delegate_->CapturePaintPreviewOfSubframe(this, rect, guid, render_frame_host);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-WebContentsImpl::GetJavaRenderFrameHostDelegate() {
-  return GetJavaWebContents();
-}
-#endif
-
 void WebContentsImpl::DOMContentLoaded(RenderFrameHostImpl* render_frame_host) {
   OPTIONAL_TRACE_EVENT1("content", "WebContentsImpl::DOMContentLoaded",
                         "render_frame_host", render_frame_host);
@@ -8997,35 +8564,6 @@ void WebContentsImpl::OnColorChooserFactoryReceiver(
   color_chooser_factory_receivers_.Add(this, std::move(receiver));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::OpenColorChooser(
-    mojo::PendingReceiver<blink::mojom::ColorChooser> chooser_receiver,
-    mojo::PendingRemote<blink::mojom::ColorChooserClient> client,
-    SkColor color,
-    std::vector<blink::mojom::ColorSuggestionPtr> suggestions) {
-  OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::OpenColorChooser");
-  // Create `color_chooser_holder_` before calling OpenColorChooser since
-  // OpenColorChooser may callback with results.
-  color_chooser_holder_.reset();
-  color_chooser_holder_ = std::make_unique<ColorChooserHolder>(
-      std::move(chooser_receiver), std::move(client));
-
-  auto new_color_chooser =
-      delegate_ ? delegate_->OpenColorChooser(this, color, suggestions)
-                : nullptr;
-  if (color_chooser_holder_ && new_color_chooser) {
-    color_chooser_holder_->SetChooser(std::move(new_color_chooser));
-  } else if (new_color_chooser) {
-    // OpenColorChooser synchronously called back to DidEndColorChooser.
-    DCHECK(!color_chooser_holder_);
-    new_color_chooser->End();
-  } else if (color_chooser_holder_) {
-    DCHECK(!new_color_chooser);
-    color_chooser_holder_.reset();
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void WebContentsImpl::UpdateFaviconURL(
     RenderFrameHostImpl* source,
     const std::vector<blink::mojom::FaviconURLPtr>& candidates,
@@ -9074,14 +8612,6 @@ void WebContentsImpl::OnFirstVisuallyNonEmptyPaint(PageImpl& page) {
     observers_.NotifyObservers(&WebContentsObserver::OnBackgroundColorChanged);
     last_sent_background_color_ = page.background_color();
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          features::kAndroidWarmUpSpareRendererWithTimeout) &&
-      features::kAndroidSpareRendererCreationTiming.Get() ==
-          features::kAndroidSpareRendererCreationAfterFirstPaint) {
-    WarmUpAndroidSpareRenderer();
-  }
-#endif
 }
 
 bool WebContentsImpl::IsGuest() {
@@ -9249,14 +8779,6 @@ void WebContentsImpl::NotifyFrameSwapped(RenderFrameHostImpl* old_frame,
                                          RenderFrameHostImpl* new_frame) {
   TRACE_EVENT2("content", "WebContentsImpl::NotifyFrameSwapped", "old_frame",
                old_frame, "new_frame", new_frame);
-#if BUILDFLAG(IS_ANDROID)
-  // Copy importance from |old_frame| if |new_frame| is a main frame.
-  if (old_frame && !new_frame->GetParent()) {
-    RenderWidgetHostImpl* old_widget = old_frame->GetRenderWidgetHost();
-    RenderWidgetHostImpl* new_widget = new_frame->GetRenderWidgetHost();
-    new_widget->SetImportance(old_widget->importance());
-  }
-#endif
   observers_.NotifyObservers(&WebContentsObserver::RenderFrameHostChanged,
                              old_frame, new_frame);
 }
@@ -9327,15 +8849,6 @@ void WebContentsImpl::RenderFrameCreated(
   if (safe_area_insets_host_) {
     safe_area_insets_host_->RenderFrameCreated(render_frame_host);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (render_frame_host->GetParent() &&
-      render_frame_host->frame_tree()->is_primary()) {
-    if (auto* rwh = render_frame_host->GetLocalRenderWidgetHost()) {
-      rwh->SetImportance(primary_subframe_importance_);
-    }
-  }
-#endif
 }
 
 void WebContentsImpl::RenderFrameDeleted(
@@ -9636,26 +9149,6 @@ void WebContentsImpl::RunBeforeUnloadConfirm(
     dialog_manager->RunBeforeUnloadDialog(
         this, render_frame_host, is_reload,
         base::BindOnce(&CloseDialogCallbackWrapper::Run, wrapper, false));
-#if BUILDFLAG(IS_ANDROID)
-    // If A embeds a subframe B and B has a BeforeUnload handler whereas A
-    // doesn't, the main frame navigation from A will show a dialog. In that
-    // case `render_frame_host` is B and `initiator` is A. The navigation
-    // request is on A.
-    RenderFrameHostImpl* initiator =
-        render_frame_host->GetBeforeUnloadInitiator();
-    NavigationRequest* request =
-        initiator ? initiator->frame_tree_node()->navigation_request()
-                  : nullptr;
-    auto* animation_manager =
-        static_cast<BackForwardTransitionAnimationManagerAndroid*>(
-            GetBackForwardTransitionAnimationManager());
-    // We might not always have a NavigationRequest at this point (i.e. a
-    // renderer-initiated navigation). However if this is a browser-initiated
-    // history navigation, the request can't be null.
-    if (animation_manager && request) {
-      animation_manager->OnBeforeUnloadDialogShown(request->GetNavigationId());
-    }
-#endif
   }
 }
 
@@ -9759,14 +9252,8 @@ double WebContentsImpl::GetPendingZoomLevel(RenderWidgetHostImpl* rwh) {
     // zoom.
     return HostZoomMap::GetZoomLevel(this, rfh->GetGlobalId());
   }
-#if BUILDFLAG(IS_ANDROID)
-  return HostZoomMapForRenderFrameHost(rfh)
-      ->GetZoomLevelForHostAndSchemeAndroid(url.GetScheme(),
-                                            net::GetHostOrSpecFromURL(url));
-#else
   return HostZoomMapForRenderFrameHost(rfh)->GetZoomLevelForHostAndScheme(
       url.GetScheme(), net::GetHostOrSpecFromURL(url));
-#endif
 }
 
 bool WebContentsImpl::IsPictureInPictureAllowedForFullscreenVideo() const {
@@ -10310,15 +9797,6 @@ void WebContentsImpl::DidStopLoading() {
           manager->DidStopLoading();
         }
       });
-
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          features::kAndroidWarmUpSpareRendererWithTimeout) &&
-      features::kAndroidSpareRendererCreationTiming.Get() ==
-          features::kAndroidSpareRendererCreationAfterLoading) {
-    WarmUpAndroidSpareRenderer();
-  }
-#endif
 }
 
 ui::AXTreeUpdate WebContentsImpl::RequestAXTreeSnapshotWithinBrowserProcess() {
@@ -10379,8 +9857,7 @@ void WebContentsImpl::RecursivelyConstructAXTree(
 void WebContentsImpl::ApplyAXTreeFixingResult(ui::AXTreeID tree_id,
                                               ui::AXNodeID node_id,
                                               ax::mojom::Role role) {
-// The AXTreeFixing feature is not currently available on Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // The AXTreeFixing feature is not currently available on Android.
   CHECK(features::IsAXTreeFixingEnabled());
 
   GetPrimaryMainFrame()->ForEachRenderFrameHostImplWithAction(
@@ -10407,7 +9884,6 @@ void WebContentsImpl::ApplyAXTreeFixingResult(ui::AXTreeID tree_id,
         node->SetData(new_data);
         return RenderFrameHost::FrameIterationAction::kStop;
       });
-#endif
 }
 
 void WebContentsImpl::DidChangeLoadProgressForMainFrame(
@@ -10557,30 +10033,9 @@ bool WebContentsImpl::MaybeCopyContentAreaAsBitmap(
   return GetDelegate()->MaybeCopyContentAreaAsBitmap(std::move(callback));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool WebContentsImpl::MaybeCopyContentAreaAsHardwareBuffer(
-    HardwareBufferResultCallback callback) {
-  if (!GetDelegate()) {
-    return false;
-  }
-  return GetDelegate()->MaybeCopyContentAreaAsHardwareBuffer(
-      std::move(callback));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 bool WebContentsImpl::SupportsForwardTransitionAnimation() {
-#if BUILDFLAG(IS_ANDROID)
-  return supports_forward_transition_animation_;
-#else
   return true;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::SetSupportsForwardTransitionAnimation(bool supports) {
-  supports_forward_transition_animation_ = supports;
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void WebContentsImpl::DidChangeName(RenderFrameHostImpl* render_frame_host,
                                     const std::string& name) {
@@ -11121,17 +10576,8 @@ void WebContentsImpl::FocusOwningWebContents(
   if (focused_widget != render_widget_host &&
       (!focused_widget ||
        focused_widget->delegate() != render_widget_host->delegate())) {
-#if BUILDFLAG(IS_ANDROID)
-    if (&GetPrimaryFrameTree() != GetFocusedFrameTree()) {
-      UMA_HISTOGRAM_BOOLEAN("Android.FocusChanged.FocusOwningWebContents",
-                            true);
-    }
-#endif
     SetAsFocusedWebContentsIfNecessary();
   } else {
-#if BUILDFLAG(IS_ANDROID)
-    UMA_HISTOGRAM_BOOLEAN("Android.FocusChanged.FocusOwningWebContents", false);
-#endif
   }
 }
 
@@ -11418,7 +10864,7 @@ bool WebContentsImpl::CreateRenderViewForRenderManager(
     ReattachOuterDelegateIfNeeded();
   }
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
   // Force a ViewMsg_Resize to be sent, needed to make plugins show up on
   // linux. See crbug.com/83941.
   RenderWidgetHostView* rwh_view = render_view_host->GetWidget()->GetView();
@@ -11432,62 +10878,6 @@ bool WebContentsImpl::CreateRenderViewForRenderManager(
 
   return true;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-
-base::android::ScopedJavaLocalRef<jobject>
-WebContentsImpl::GetJavaWebContents() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  return GetWebContentsAndroid()->GetJavaObject();
-}
-
-base::android::ScopedJavaLocalRef<jthrowable>
-WebContentsImpl::GetJavaCreatorLocation() {
-  return base::android::ScopedJavaLocalRef<jthrowable>(java_creator_location_);
-}
-
-WebContentsAndroid* WebContentsImpl::GetWebContentsAndroid() {
-  if (!web_contents_android_) {
-    web_contents_android_ = std::make_unique<WebContentsAndroid>(this);
-  }
-  return web_contents_android_.get();
-}
-
-void WebContentsImpl::ClearWebContentsAndroid() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  web_contents_android_.reset();
-}
-
-void WebContentsImpl::ActivateNearestFindResult(float x, float y) {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::ActivateNearestFindResult");
-  GetOrCreateFindRequestManager()->ActivateNearestFindResult(x, y);
-}
-
-void WebContentsImpl::RequestFindMatchRects(int current_version) {
-  OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::RequestFindMatchRects");
-  GetOrCreateFindRequestManager()->RequestFindMatchRects(current_version);
-}
-
-service_manager::InterfaceProvider* WebContentsImpl::GetJavaInterfaces() {
-  if (!java_interfaces_) {
-    mojo::PendingRemote<service_manager::mojom::InterfaceProvider> provider;
-    BindInterfaceRegistryForWebContents(
-        provider.InitWithNewPipeAndPassReceiver(), this);
-    java_interfaces_ = std::make_unique<service_manager::InterfaceProvider>(
-        base::SingleThreadTaskRunner::GetCurrentDefault());
-    java_interfaces_->Bind(std::move(provider));
-  }
-  return java_interfaces_.get();
-}
-
-void WebContentsImpl::SetSelectionPopupDelegate(
-    std::unique_ptr<SelectionPopupDelegate> delegate) {
-  SelectionPopupController::FromWebContents(*this)->SetDelegate(
-      std::move(delegate));
-}
-
-#endif
 
 bool WebContentsImpl::CompletedFirstVisuallyNonEmptyPaint() {
   return GetPrimaryPage().did_first_visually_non_empty_paint();
@@ -12031,16 +11421,6 @@ void WebContentsImpl::SetSpatialNavigationDisabled(bool disabled) {
   NotifyPreferencesChanged();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::SetStylusHandwritingEnabled(bool enabled) {
-  if (stylus_handwriting_enabled_ == enabled) {
-    return;
-  }
-  stylus_handwriting_enabled_ = enabled;
-  NotifyPreferencesChanged();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 PictureInPictureResult WebContentsImpl::EnterPictureInPicture() {
   OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::EnterPictureInPicture");
   return delegate_ ? delegate_->EnterPictureInPicture(this)
@@ -12078,19 +11458,6 @@ WebContentsImpl::CaptureTarget WebContentsImpl::GetCaptureTarget() {
   return CaptureTarget{.sink_id = base_view->GetFrameSinkId(),
                        .view = host_view->GetNativeView()};
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::NotifyFindMatchRectsReply(
-    int version,
-    const std::vector<gfx::RectF>& rects,
-    const gfx::RectF& active_rect) {
-  OPTIONAL_TRACE_EVENT0("content",
-                        "WebContentsImpl::NotifyFindMatchRectsReply");
-  if (delegate_) {
-    delegate_->FindMatchRectsReply(this, version, rects, active_rect);
-  }
-}
-#endif
 
 void WebContentsImpl::SetForceDisableOverscrollContent(bool force_disable) {
   OPTIONAL_TRACE_EVENT1("content",
@@ -12717,14 +12084,6 @@ void WebContentsImpl::NotifyPageBecamePrimary(PageImpl& page) {
 
   DCHECK_EQ(&page, &GetPrimaryPage());
 
-#if BUILDFLAG(IS_ANDROID)
-  // Apply the cached subframe importance if it is set. This is needed for
-  // pages restored from back/forward cache. Note that we don't need to clear
-  // importance for non-primary pages because the importance is ignored at
-  // RenderWidgetHostImpl::GetPriority() and updated when it becomes inactive.
-  ApplyPrimaryPageSubframeImportance();
-#endif
-
   // Clear |save_package_| since the primary page changed.
   if (save_package_) {
     save_package_->ClearPage();
@@ -12768,16 +12127,6 @@ void WebContentsImpl::RenderFrameHostStateChanged(
                        "WebContentsImpl::RenderFrameHostStateChanged",
                        "render_frame_host", render_frame_host, "old_state",
                        old_state, "new_state", new_state);
-
-#if BUILDFLAG(IS_ANDROID)
-  if (old_state == LifecycleState::kActive && !render_frame_host->GetParent()) {
-    // TODO(sreejakshetty): Remove this reset when ColorChooserHolder becomes
-    // per-frame.
-    // Close the color chooser popup when RenderFrameHost changes state from
-    // kActive.
-    color_chooser_holder_.reset();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   observers_.NotifyObservers(&WebContentsObserver::RenderFrameHostStateChanged,
                              render_frame_host, old_state, new_state);
@@ -12897,13 +12246,6 @@ gfx::mojom::DelegatedInkPointRenderer* WebContentsImpl::GetDelegatedInkRenderer(
   return delegated_ink_point_renderer_.get();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-gfx::PointF WebContentsImpl::GetCurrentTouchSequenceOffset() {
-  ui::ViewAndroid* view_android = GetNativeView();
-  return view_android->event_forwarder()->GetCurrentTouchSequenceOffset();
-}
-#endif
-
 std::unique_ptr<PrefetchHandle> WebContentsImpl::StartPrefetch(
     const GURL& prefetch_url,
     bool use_prefetch_proxy,
@@ -12964,12 +12306,8 @@ std::unique_ptr<PrerenderHandle> WebContentsImpl::StartPrerendering(
           static_cast<PreloadPipelineInfoImpl*>(preload_pipeline_info.get())),
       allow_reuse,
       /*form_submission=*/false);
-#if BUILDFLAG(IS_ANDROID)
-  attributes.additional_headers = std::move(additional_headers);
-#else
   CHECK(additional_headers.IsEmpty())
       << "additional_headers is supported only on Android WebView.";
-#endif  // BUILDFLAG(IS_ANDROID)
   attributes.holdback_status_override = holdback_status_override;
 
   PrerenderHostId prerender_host_id =
@@ -13082,29 +12420,6 @@ BackForwardTransitionAnimationManager*
 WebContentsImpl::GetBackForwardTransitionAnimationManager() {
   return GetView()->GetBackForwardTransitionAnimationManager();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void WebContentsImpl::SetLongPressLinkSelectText(bool enabled) {
-  if (long_press_link_select_text_ == enabled) {
-    return;
-  }
-  long_press_link_select_text_ = enabled;
-  NotifyPreferencesChanged();
-}
-
-void WebContentsImpl::SetCanAcceptLoadDrops(bool enabled) {
-  if (renderer_preferences_.can_accept_load_drops == enabled) {
-    return;
-  }
-  renderer_preferences_.can_accept_load_drops = enabled;
-  SyncRendererPrefs();
-}
-
-bool WebContentsImpl::GetCanAcceptLoadDropsForTesting() {
-  return renderer_preferences_.can_accept_load_drops;
-}
-
-#endif
 
 net::handles::NetworkHandle WebContentsImpl::GetTargetNetwork() {
   return target_network_;

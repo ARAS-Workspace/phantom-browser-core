@@ -96,11 +96,9 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/public/browser/scoped_authenticator_environment_for_testing.h"
 #include "device/fido/virtual_ctap2_device.h"
 #include "device/fido/virtual_fido_device_factory.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using base::Bucket;
 using testing::Contains;
@@ -1805,7 +1803,6 @@ INSTANTIATE_TEST_SUITE_P(All,
 // TODO(crbug.com/40269763): Implement automated testing once the infrastructure
 // permits it (Requires mocking the Android Platform Authenticator i.e. GMS
 // Core).
-#if !BUILDFLAG(IS_ANDROID)
 // Some refs for this test fixture:
 // clang-format off
 // - https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/webauthn/chrome_webauthn_browsertest.cc;drc=c4061a03f240338b42a5b84c98b1a11b62a97a9a
@@ -2050,7 +2047,6 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_THAT(reports, ElementsAre(("a.test"), ("d.test"), ("c.test"),
                                    ("e.test, f.test")));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Verifies that a successfully registered service worker is tracked as a
 // storage access.
@@ -2766,11 +2762,7 @@ class BtmBounceDetectorBFCacheTest : public BtmBounceDetectorBrowserTest,
 // Confirm that BTM records a bounce, even if the user immediately navigates
 // away.
 // TODO(https://crbug.com/425717555): Very flaky if BF Cache is disabled.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_LateCookieAccessTest DISABLED_LateCookieAccessTest
-#else
 #define MAYBE_LateCookieAccessTest LateCookieAccessTest
-#endif
 IN_PROC_BROWSER_TEST_P(BtmBounceDetectorBFCacheTest,
                        MAYBE_LateCookieAccessTest) {
   const GURL bounce_url =

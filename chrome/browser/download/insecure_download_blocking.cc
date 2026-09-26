@@ -152,17 +152,7 @@ struct InsecureDownloadData {
     }
 
     // Extract extension.
-#if BUILDFLAG(IS_ANDROID)
-    // If the file path is a content URI, extension should come from the file
-    // name.
-    if (path.IsContentUri()) {
-      extension_ = item->GetFileNameToReportUser().FinalExtension();
-    } else {
-      extension_ = path.FinalExtension();
-    }
-#else
     extension_ = path.FinalExtension();
-#endif
     if (!extension_.empty()) {
       DCHECK_EQ(extension_[0], '.');
       extension_ = extension_.substr(1);  // Omit leading dot.
@@ -376,9 +366,6 @@ bool IsDownloadPermittedByContentSettings(
     const std::optional<url::Origin>& initiator) {
   // TODO(crbug.com/40117459): Checking content settings crashes unit tests on
   // Android. It shouldn't.
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   HostContentSettingsMap* host_content_settings_map =
       HostContentSettingsMapFactory::GetForProfile(profile);
   ContentSettingsForOneType settings =
@@ -398,7 +385,6 @@ bool IsDownloadPermittedByContentSettings(
     }
   }
   NOTREACHED();
-#endif
 }
 
 bool IsHttpsFirstModeEnabled(Profile* profile) {

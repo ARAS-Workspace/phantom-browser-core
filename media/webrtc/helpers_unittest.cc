@@ -36,9 +36,6 @@ TEST(CreateWebRtcAudioProcessingModuleTest, CheckDefaultAudioProcessingConfig) {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   EXPECT_FALSE(config.gain_controller1.enabled);
   EXPECT_TRUE(config.gain_controller2.enabled);
-#elif BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(config.gain_controller1.enabled);
-  EXPECT_TRUE(config.gain_controller2.enabled);
 #else
   GTEST_FAIL() << "Undefined expectation.";
 #endif

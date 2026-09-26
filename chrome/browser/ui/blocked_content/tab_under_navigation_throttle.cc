@@ -34,11 +34,7 @@
 #include "third_party/blink/public/mojom/devtools/console_message.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/framebust_intervention/framebust_blocked_delegate_android.h"
-#else
 #include "chrome/browser/ui/blocked_content/framebust_block_tab_helper.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/common/constants.h"
@@ -151,25 +147,11 @@ TabUnderNavigationThrottle::MaybeBlockNavigation() {
 void TabUnderNavigationThrottle::ShowUI() {
   content::WebContents* web_contents = navigation_handle()->GetWebContents();
   const GURL& url = navigation_handle()->GetURL();
-#if BUILDFLAG(IS_ANDROID)
-  blocked_content::FramebustBlockedMessageDelegate::CreateForWebContents(
-      web_contents);
-  blocked_content::FramebustBlockedMessageDelegate*
-      framebust_blocked_message_delegate =
-          blocked_content::FramebustBlockedMessageDelegate::FromWebContents(
-              web_contents);
-  framebust_blocked_message_delegate->ShowMessage(
-      url, navigation_handle()->GetInitiatorOrigin(),
-      HostContentSettingsMapFactory::GetForProfile(
-          web_contents->GetBrowserContext()),
-      base::NullCallback());
-#else
   if (auto* tab_helper =
           FramebustBlockTabHelper::FromWebContents(web_contents)) {
     tab_helper->AddBlockedUrl(url, navigation_handle()->GetInitiatorOrigin(),
                               base::NullCallback());
   }
-#endif
 }
 
 bool TabUnderNavigationThrottle::HasOpenedPopupSinceLastUserGesture() const {

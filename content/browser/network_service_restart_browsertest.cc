@@ -990,31 +990,6 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest, Cookies) {
 }
 
 // TODO(crbug.com/41423903): Fix deadlock on process startup on Android.
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest,
-                       DISABLED_SyncCallDuringRestart) {
-  if (IsInProcessNetworkService())
-    return;
-  base::RunLoop run_loop;
-  mojo::Remote<network::mojom::NetworkServiceTest> network_service_test;
-  content::GetNetworkService()->BindTestInterfaceForTesting(
-      network_service_test.BindNewPipeAndPassReceiver());
-
-  // Crash the network service, but do not wait for full startup.
-  IgnoreNetworkServiceCrashes();
-  network_service_test.set_disconnect_handler(run_loop.QuitClosure());
-  network_service_test->SimulateCrash();
-  run_loop.Run();
-
-  network_service_test.reset();
-  content::GetNetworkService()->BindTestInterfaceForTesting(
-      network_service_test.BindNewPipeAndPassReceiver());
-
-  // Sync call should be fine, even though network process is still starting up.
-  mojo::ScopedAllowSyncCallForTesting allow_sync_call;
-  network_service_test->AddRules({});
-}
-#endif
 
 // Tests handling of a NetworkService crash that happens after a navigation
 // triggers sending a Commit IPC to the renderer process, but before a DidCommit
@@ -1023,7 +998,7 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest,
 //
 // TODO(lukasza): https://crbug.com/1129592: Flaky on Android and Mac.  No
 // flakiness observed whatsoever on Windows, Linux or CrOS.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_BetweenCommitNavigationAndDidCommit \
   DISABLED_BetweenCommitNavigationAndDidCommit
 #else

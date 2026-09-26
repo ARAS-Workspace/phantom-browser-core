@@ -30,10 +30,7 @@
 #include "components/leveldb_proto/public/proto_database_provider.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/download/internal/background_service/android/battery_status_listener_android.h"
-#include "components/download/network/android/network_status_listener_android.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "components/download/internal/background_service/scheduler/battery_status_listener_mac.h"
 #include "components/download/network/network_status_listener_impl.h"
 #else
@@ -64,11 +61,7 @@ std::unique_ptr<BackgroundDownloadService> CreateDownloadServiceInternal(
   auto model = std::make_unique<ModelImpl>(std::move(store));
 
 // Build platform network/battery status listener.
-#if BUILDFLAG(IS_ANDROID)
-  auto battery_listener = std::make_unique<BatteryStatusListenerAndroid>(
-      config->battery_query_interval);
-  auto network_listener = std::make_unique<NetworkStatusListenerAndroid>();
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   auto battery_listener = std::make_unique<BatteryStatusListenerMac>();
   auto network_listener =
       std::make_unique<NetworkStatusListenerImpl>(network_connection_tracker);

@@ -75,17 +75,6 @@
 #include "ui/base/test/scoped_preferred_scroller_style_mac.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "base/android/device_info.h"
-#include "base/android/jni_android.h"
-#include "content/browser/renderer_host/render_widget_host_view_android.h"
-#include "content/test/mock_overscroll_refresh_handler_android.h"
-#include "ui/events/android/motion_event_android_factory.h"
-#include "ui/events/android/motion_event_android_java.h"
-#include "ui/events/motionevent_jni_headers/MotionEvent_jni.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -798,7 +787,7 @@ enum class HitTestType {
   kSurfaceLayer,
 };
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_MAC)
 bool IsScreenTooSmallForPopup(const display::ScreenInfo& screen_info) {
   // Small display size will cause popup positions to be adjusted,
   // causing test failures.
@@ -812,51 +801,11 @@ bool IsScreenTooSmallForPopup(const display::ScreenInfo& screen_info) {
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-std::unique_ptr<ui::MotionEventAndroid> GetMotionEventAndroid(
-    ui::MotionEvent::Action action,
-    base::TimeTicks event_time,
-    base::TimeTicks down_time,
-    const ui::MotionEventAndroid::Pointer& pointer) {
-  float pix_to_dip = 1.0;
-
-  JNIEnv* env = base::android::AttachCurrentThread();
-  base::android::ScopedJavaLocalRef<jobject> obj =
-      JNI_MotionEvent::Java_MotionEvent_obtain(
-          env, /*downTime=*/0, /*eventTime=*/0, /*action=*/0, /*x=*/0, /*y=*/0,
-          /*metaState=*/0);
-  return ui::MotionEventAndroidFactory::CreateFromJava(
-      env, obj, pix_to_dip,
-      /*ticks_x=*/0.f,
-      /*ticks_y=*/0.f,
-      /*tick_multiplier=*/0.f,
-      /*oldest_event_time=*/event_time,
-      /*latest_event_time=*/event_time,
-      /*down_time_ms=*/down_time,
-      /*android_action=*/ui::MotionEventAndroid::GetAndroidAction(action),
-      /*pointer_count=*/1,
-      /*history_size=*/0,
-      /*action_index=*/0,
-      /*android_action_button=*/0,
-      /*android_gesture_classification=*/0,
-      /*android_button_state=*/0,
-      /*raw_offset_x_pixels=*/0,
-      /*raw_offset_y_pixels=*/0,
-      /*for_touch_handle=*/false,
-      /*pointer0=*/&pointer,
-      /*pointer1=*/nullptr,
-      /*is_latest_event_time_resampled=*/false);
-}
-#endif
 }  // namespace
 
 class SitePerProcessHitTestBrowserTest : public SitePerProcessBrowserTestBase {
  public:
-  SitePerProcessHitTestBrowserTest() {
-#if BUILDFLAG(IS_ANDROID)
-    feature_list_.InitWithFeatures({kTooltips}, {});
-#endif
-  }
+  SitePerProcessHitTestBrowserTest() {}
 
 #if defined(USE_AURA)
   void PreRunTestOnMainThread() override {
@@ -879,9 +828,6 @@ class SitePerProcessHitTestBrowserTest : public SitePerProcessBrowserTestBase {
 
 #if defined(USE_AURA)
   SystemEventRewriter event_rewriter_;
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList feature_list_;
 #endif
 };
 
@@ -1320,7 +1266,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // subframe.
 // https://crbug.com/959848: Flaky on Linux MSAN bots
 // https://crbug.com/959924: Flaky on Android MSAN bots
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TouchAndGestureEventPositionChange \
   DISABLED_TouchAndGestureEventPositionChange
 #else
@@ -2185,70 +2131,8 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessEmulatedTouchBrowserTest,
 // Regression test for https://crbug.com/851644. The test passes as long as it
 // doesn't crash.
 // Touch action ack timeout is enabled on Android only.
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
-                       TouchActionAckTimeout) {
-  GURL main_url(
-      embedded_test_server()->GetURL("/frame_tree/page_with_janky_frame.html"));
-  ASSERT_TRUE(NavigateToURL(shell(), main_url));
-  FrameTreeNode* root = web_contents()->GetPrimaryFrameTree().root();
-  ASSERT_EQ(1U, root->child_count());
-  GURL frame_url(embedded_test_server()->GetURL(
-      "baz.com", "/page_with_touch_start_janking_main_thread.html"));
-  auto* child_frame_host = root->child_at(0)->current_frame_host();
 
-  RenderWidgetHostViewBase* rwhv_root = static_cast<RenderWidgetHostViewBase*>(
-      root->current_frame_host()->GetRenderWidgetHost()->GetView());
-  RenderWidgetHostViewChildFrame* rwhv_child =
-      static_cast<RenderWidgetHostViewChildFrame*>(
-          child_frame_host->GetRenderWidgetHost()->GetView());
-
-  WaitForHitTestData(child_frame_host);
-
-  // Compute the point so that the gesture event can target the child frame.
-  const gfx::Rect root_bounds = rwhv_root->GetViewBounds();
-  const gfx::Rect child_bounds = rwhv_child->GetViewBounds();
-  RenderFrameSubmissionObserver render_frame_submission_observer(
-      web_contents());
-  const float page_scale_factor =
-      render_frame_submission_observer.LastRenderFrameMetadata()
-          .page_scale_factor;
-  const gfx::PointF point_in_child(
-      (child_bounds.x() - root_bounds.x() + 25) * page_scale_factor,
-      (child_bounds.y() - root_bounds.y() + 25) * page_scale_factor);
-
-  SyntheticSmoothScrollGestureParams params;
-  params.gesture_source_type = content::mojom::GestureSourceType::kTouchInput;
-  params.anchor = gfx::PointF(point_in_child.x(), point_in_child.y());
-  params.distances.push_back(gfx::Vector2dF(0, -10));
-  // The JS jank from the "page_with_touch_start_janking_main_thread.html"
-  // causes the touch ack timeout. Set the speed high so that the gesture can be
-  // completed quickly and so does this test.
-  params.speed_in_pixels_s = 100000;
-  std::unique_ptr<SyntheticSmoothScrollGesture> gesture(
-      new SyntheticSmoothScrollGesture(params));
-
-  InputEventAckWaiter ack_observer(
-      child_frame_host->GetRenderWidgetHost(),
-      base::BindRepeating([](blink::mojom::InputEventResultSource source,
-                             blink::mojom::InputEventResultState state,
-                             const blink::WebInputEvent& event) {
-        return event.GetType() ==
-               blink::WebGestureEvent::Type::kGestureScrollEnd;
-      }));
-  ack_observer.Reset();
-
-  RenderWidgetHostImpl* render_widget_host =
-      root->current_frame_host()->GetRenderWidgetHost();
-  render_widget_host->QueueSyntheticGesture(
-      std::move(gesture), base::BindOnce([](SyntheticGesture::Result result) {
-        EXPECT_EQ(SyntheticGesture::GESTURE_FINISHED, result);
-      }));
-  ack_observer.Wait();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
 
 // When unconsumed scrolls in a child bubble to the root and start an
 // overscroll gesture, the subsequent gesture scroll update events should be
@@ -2273,9 +2157,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 #if defined(USE_AURA)
   // The child must be horizontally scrollable.
   GURL child_url(embedded_test_server()->GetURL("b.com", "/wide_page.html"));
-#elif BUILDFLAG(IS_ANDROID)
-  // The child must be vertically scrollable.
-  GURL child_url(embedded_test_server()->GetURL("b.com", "/tall_page.html"));
 #endif
   EXPECT_TRUE(NavigateToURLFromRenderer(child_node, child_url));
 
@@ -2351,15 +2232,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
       mock_overscroll_delegate->GetWeakPtr());
   MockOverscrollObserver* mock_overscroll_observer =
       mock_overscroll_delegate.get();
-#elif BUILDFLAG(IS_ANDROID)
-  RenderWidgetHostViewAndroid* rwhv_android =
-      static_cast<RenderWidgetHostViewAndroid*>(rwhv_root);
-  std::unique_ptr<MockOverscrollRefreshHandlerAndroid> mock_overscroll_handler =
-      std::make_unique<MockOverscrollRefreshHandlerAndroid>();
-  rwhv_android->SetOverscrollControllerForTesting(
-      mock_overscroll_handler.get());
-  MockOverscrollObserver* mock_overscroll_observer =
-      mock_overscroll_handler.get();
 #endif  // defined(USE_AURA)
 
   InputEventAckWaiter gesture_begin_observer_child(
@@ -2372,8 +2244,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 #if defined(USE_AURA)
   const float overscroll_threshold =
       OverscrollConfig::kStartTouchscreenThresholdDips;
-#elif BUILDFLAG(IS_ANDROID)
-  const float overscroll_threshold = 0.f;
 #endif
 
   // First we need our scroll to initiate an overscroll gesture in the root
@@ -2391,10 +2261,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 #if defined(USE_AURA)
   // For aura, we scroll horizontally to activate an overscroll navigation.
   gesture_scroll_begin.data.scroll_begin.delta_x_hint =
-      overscroll_threshold + 1;
-#elif BUILDFLAG(IS_ANDROID)
-  // For android, we scroll vertically to activate pull-to-refresh.
-  gesture_scroll_begin.data.scroll_begin.delta_y_hint =
       overscroll_threshold + 1;
 #endif
   router->RouteGestureEvent(rwhv_root, &gesture_scroll_begin,
@@ -2415,8 +2281,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   gesture_scroll_update.data.scroll_update.delta_y = 0.f;
 #if defined(USE_AURA)
   float* delta = &gesture_scroll_update.data.scroll_update.delta_x;
-#elif BUILDFLAG(IS_ANDROID)
-  float* delta = &gesture_scroll_update.data.scroll_update.delta_y;
 #endif
   *delta = overscroll_threshold + 1;
   mock_overscroll_observer->Reset();
@@ -2449,26 +2313,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   auto route_event = [&](blink::WebGestureEvent& event) {
     router->RouteGestureEvent(rwhv_root, &event, ui::LatencyInfo());
   };
-#elif BUILDFLAG(IS_ANDROID)
-  base::TimeTicks event_time = base::TimeTicks::Now();
-  // Input event is being generated by moving in the same direction.
-  ui::MotionEventAndroid::Pointer finger_pointer(0, 10.0f, 0, 0, 0, 0, 0, 0, 1);
-  auto event1 = GetMotionEventAndroid(ui::MotionEvent::Action::MOVE, event_time,
-                                      event_time, finger_pointer);
-
-  // Now we reverse direction.
-  finger_pointer =
-      ui::MotionEventAndroid::Pointer(0, -5.0f, 0, 0, 0, 0, 0, 0, 1);
-  auto event2 = GetMotionEventAndroid(ui::MotionEvent::Action::MOVE, event_time,
-                                      event_time, finger_pointer);
-
-  auto end_event = GetMotionEventAndroid(
-      ui::MotionEvent::Action::UP, event_time, event_time, finger_pointer);
-
-  auto route_event = [&](const std::unique_ptr<ui::MotionEventAndroid>& event) {
-    rwhv_android->OnTouchEvent(*event);
-  };
-
 #endif
 
   // This scroll is in the same direction and so it will contribute to the
@@ -2493,7 +2337,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   gesture_end_observer_child.Wait();
 #endif
 }
-#endif  // defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#endif  // defined(USE_AURA)
 
 // Test that an EventType::kScroll event sent to an out-of-process iframe
 // correctly results in a scroll. This is only handled by
@@ -2634,13 +2478,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest, SurfaceHitTestTest) {
 }
 
 // Same test as above, but runs in high-dpi mode.
-#if BUILDFLAG(IS_ANDROID)
-// High DPI browser tests are not needed on Android, and confuse some of the
-// coordinate calculations. Android uses fixed device scale factor.
-#define MAYBE_SurfaceHitTestTest DISABLED_SurfaceHitTestTest
-#else
 #define MAYBE_SurfaceHitTestTest SurfaceHitTestTest
-#endif
 IN_PROC_BROWSER_TEST_F(SitePerProcessHighDPIHitTestBrowserTest,
                        MAYBE_SurfaceHitTestTest) {
   SurfaceHitTestTestHelper(shell(), embedded_test_server());
@@ -2672,13 +2510,8 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHighDPIHitTestBrowserTest,
 // transformed event coordinates when we do manual calculation of expected
 // values. We can't rely on browser side transformation because it is broken
 // for perspective transforms. See https://crbug.com/854247.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PerspectiveTransformedSurfaceHitTestTest \
-  DISABLED_PerspectiveTransformedSurfaceHitTestTest
-#else
 #define MAYBE_PerspectiveTransformedSurfaceHitTestTest \
   PerspectiveTransformedSurfaceHitTestTest
-#endif
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        MAYBE_PerspectiveTransformedSurfaceHitTestTest) {
   PerspectiveTransformedSurfaceHitTestHelper(shell(), embedded_test_server());
@@ -3255,14 +3088,6 @@ class TooltipMonitor : public RenderWidgetHostViewBase::TooltipObserver {
 
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        CrossProcessTooltipTest) {
-#if BUILDFLAG(IS_ANDROID)
-  // Tooltips are only supported on desktop devices up to B.
-  if (base::android::android_info::sdk_int() <=
-          base::android::android_info::SDK_VERSION_BAKLAVA &&
-      !base::android::device_info::is_desktop()) {
-    return;
-  }
-#endif
   GURL main_url(embedded_test_server()->GetURL(
       "a.com", "/cross_site_iframe_factory.html?a(b)"));
   EXPECT_TRUE(NavigateToURL(shell(), main_url));
@@ -3352,120 +3177,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
   rwhv_a->SetTooltipObserverForTesting(nullptr);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-class SitePerProcessHitTestAndroidBrowserTest
-    : public SitePerProcessHitTestBrowserTest {
- public:
-  SitePerProcessHitTestAndroidBrowserTest() {
-    feature_list_.InitWithFeatures({}, {kTooltips});
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-// TODO(crbug.com/409903982): Remove test once kTooltips is fully launched.
-// The following test ensures that we don't get a crash if a tooltip is
-// triggered on Android. This test is nearly identical to
-// SitePerProcessHitTestBrowserTest.CrossProcessTooltipTestAndroid, except
-// it omits the tooltip monitor, and all dereferences of GetCursorManager().
-IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestAndroidBrowserTest,
-                       CrossProcessTooltipTestAndroid) {
-  GURL main_url(embedded_test_server()->GetURL(
-      "a.com", "/cross_site_iframe_factory.html?a(b)"));
-  EXPECT_TRUE(NavigateToURL(shell(), main_url));
-
-  FrameTreeNode* root = web_contents()->GetPrimaryFrameTree().root();
-
-  EXPECT_EQ(
-      " Site A ------------ proxies for B\n"
-      "   +--Site B ------- proxies for A\n"
-      "Where A = http://a.com/\n"
-      "      B = http://b.com/",
-      DepictFrameTree(root));
-
-  FrameTreeNode* b_node = root->child_at(0);
-
-  RenderWidgetHostViewBase* rwhv_a = static_cast<RenderWidgetHostViewBase*>(
-      root->current_frame_host()->GetRenderWidgetHost()->GetView());
-  RenderWidgetHostViewBase* rwhv_b = static_cast<RenderWidgetHostViewBase*>(
-      b_node->current_frame_host()->GetRenderWidgetHost()->GetView());
-
-  // On Android we don't expect GetCursorManager() to return anything other
-  // than nullptr. If it did, this test would be unnecessary.
-  DCHECK(!rwhv_a->GetCursorManager());
-
-  WaitForHitTestData(b_node->current_frame_host());
-
-  // Make sure the point_in_a_frame value is outside the default 8px margin
-  // for the body element.
-  gfx::Point point_in_a_frame(10, 10);
-  gfx::Point point_in_b_frame =
-      rwhv_b->TransformPointToRootCoordSpace(gfx::Point(25, 25));
-
-  // Create listeners for mouse events. These are used to verify that the
-  // RenderWidgetHostInputEventRouter is generating MouseLeave, etc for
-  // the right renderers.
-  RenderWidgetHostMouseEventMonitor a_frame_monitor(
-      root->current_frame_host()->GetRenderWidgetHost());
-  RenderWidgetHostMouseEventMonitor b_frame_monitor(
-      b_node->current_frame_host()->GetRenderWidgetHost());
-
-  // Add tooltip text to both the body and the iframe in A.
-  std::string script_a =
-      "body = document.body.setAttribute('title', 'body_a_tooltip');\n"
-      "iframe = document.getElementsByTagName('iframe')[0];\n"
-      "iframe.setAttribute('title','iframe_for_b');";
-  EXPECT_TRUE(ExecJs(root->current_frame_host(), script_a));
-  std::string script_b =
-      "body = document.body.setAttribute('title', 'body_b_tooltip');";
-  EXPECT_TRUE(ExecJs(b_node->current_frame_host(), script_b));
-
-  // Send mouse events to both A and B.
-  blink::WebMouseEvent mouse_event(
-      blink::WebInputEvent::Type::kMouseMove,
-      blink::WebInputEvent::kNoModifiers,
-      blink::WebInputEvent::GetStaticTimeStampForTests());
-  auto* router = web_contents()->GetInputEventRouter();
-
-  // Alternate mouse moves between main frame and the cross-process iframe to
-  // test that the tool tip in the iframe can override the one set by the main
-  // frame renderer, even on a second entry into the iframe.
-  gfx::Point current_point;
-  for (int iteration = 0; iteration < 2; ++iteration) {
-    // The following is a bit of a hack to prevent hitting the same
-    // position/node check in ChromeClient::SetToolTip().
-    current_point = point_in_a_frame;
-    current_point.Offset(iteration, iteration);
-    SetWebEventPositions(&mouse_event, current_point, rwhv_a);
-    RouteMouseEventAndWaitUntilDispatch(router, rwhv_a, rwhv_a, &mouse_event);
-    EXPECT_TRUE(a_frame_monitor.EventWasReceived());
-    a_frame_monitor.ResetEventReceived();
-    // B will receive a mouseLeave on all but the first iteration.
-    EXPECT_EQ(iteration != 0, b_frame_monitor.EventWasReceived());
-    b_frame_monitor.ResetEventReceived();
-
-    // Next send a MouseMove to B frame, and A should receive a MouseMove event.
-    current_point = point_in_b_frame;
-    current_point.Offset(iteration, iteration);
-    SetWebEventPositions(&mouse_event, current_point, rwhv_a);
-    RouteMouseEventAndWaitUntilDispatch(router, rwhv_a, rwhv_b, &mouse_event);
-    EXPECT_TRUE(a_frame_monitor.EventWasReceived());
-    EXPECT_EQ(a_frame_monitor.event().GetType(),
-              blink::WebInputEvent::Type::kMouseMove);
-    a_frame_monitor.ResetEventReceived();
-    EXPECT_TRUE(b_frame_monitor.EventWasReceived());
-    b_frame_monitor.ResetEventReceived();
-  }
-
-  // This is an (arbitrary) delay to allow the test to crash if it's going to.
-  base::RunLoop run_loop;
-  base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE, run_loop.QuitClosure(), TestTimeouts::action_max_timeout());
-  run_loop.Run();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // This test verifies that MouseEnter and MouseLeave events fire correctly
 // when the mouse cursor moves between processes.
@@ -3753,7 +3464,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // a scrollbar thumb or a subframe, and does not trigger mouse
 // capture if it hits an element in the main frame.
 // Flaky, https://crbug.com/1269160
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_CrossProcessMouseCapture DISABLED_CrossProcessMouseCapture
 #else
 #define MAYBE_CrossProcessMouseCapture CrossProcessMouseCapture
@@ -3910,7 +3621,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   base::RunLoop().RunUntilIdle();
 
 // Targeting a scrollbar with a click doesn't work on Mac or Android.
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_MAC)
   scoped_refptr<SetMouseCaptureInterceptor> root_interceptor =
       new SetMouseCaptureInterceptor(static_cast<RenderWidgetHostImpl*>(
           root->current_frame_host()->GetRenderWidgetHost()));
@@ -3958,7 +3669,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
   root_interceptor->Wait();
   EXPECT_FALSE(root_interceptor->Capturing());
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_MAC)
 }
 
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
@@ -4297,7 +4008,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 }
 
 // There are no cursors on Android.
-#if !BUILDFLAG(IS_ANDROID)
 namespace {
 
 // Intercepts SetCursor calls. The caller has to guarantee that
@@ -4568,7 +4278,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   EXPECT_EQ(ui::mojom::CursorType::kPointer,
             set_cursor_interceptor->cursor()->type());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if defined(USE_AURA)
 // Browser process hit testing is not implemented on Android, and these tests
@@ -5416,7 +5125,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // TODO: Flaking test crbug.com/802827
 #define MAYBE_InputEventRouterGesturePreventDefaultTargetMapTest \
   InputEventRouterGesturePreventDefaultTargetMapTest
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
 IN_PROC_BROWSER_TEST_F(
     SitePerProcessHitTestBrowserTest,
     MAYBE_InputEventRouterGesturePreventDefaultTargetMapTest) {
@@ -5491,7 +5200,7 @@ IN_PROC_BROWSER_TEST_F(
                                            rwhv_parent, thirdId);
   EXPECT_EQ(0u, router->touchscreen_gesture_target_map_.size());
 }
-#endif  // defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#endif  // defined(USE_AURA)
 
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        InputEventRouterTouchpadGestureTargetTest) {
@@ -5690,7 +5399,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
 // Tests that performing a touchpad double-tap zoom over an OOPIF offers the
 // synthetic wheel event to the child.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/41449850): Flaky on multiple platforms.
 #define MAYBE_TouchpadDoubleTapZoomOverOOPIF \
   DISABLED_TouchpadDoubleTapZoomOverOOPIF
@@ -5881,12 +5590,7 @@ void CreateContextMenuTestHelper(
   EXPECT_NEAR(point.y(), params.y, kHitTestTolerance);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// High DPI tests don't work properly on Android, which has fixed scale factor.
-#define MAYBE_CreateContextMenuTest DISABLED_CreateContextMenuTest
-#else
 #define MAYBE_CreateContextMenuTest CreateContextMenuTest
-#endif
 
 // Test that a mouse right-click to an out-of-process iframe causes a context
 // menu to be generated with the correct screen position.
@@ -5961,7 +5665,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest, MAYBE_PopupMenuTest) {
   gfx::Rect popup_rect = popup_waiter->last_initial_rect();
   popup_rect =
       gfx::ScaleToRoundedRect(popup_rect, 1 / screen_info.device_scale_factor);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   // On Mac and Android we receive the coordinates before they are transformed,
   // so they are still relative to the out-of-process iframe origin.
   int expected_x = base::ClampRound(9 / screen_info.device_scale_factor);
@@ -6083,7 +5787,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
   gfx::Rect popup_rect = popup_waiter->last_initial_rect();
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(popup_rect.x(), 9);
   EXPECT_EQ(popup_rect.y(), 9);
 #else
@@ -6131,7 +5835,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
   popup_rect = popup_waiter->last_initial_rect();
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(popup_rect.x(), 9);
   EXPECT_EQ(popup_rect.y(), 9);
 #else
@@ -6152,7 +5856,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // On Mac and Android, the reported menu coordinates are relative to the
 // OOPIF, and its screen position is computed later, so this test isn't
 // relevant on those platforms.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        ScrolledNestedPopupMenuTest) {
   GURL main_url(embedded_test_server()->GetURL(
@@ -6262,7 +5966,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   // they access deleted state.
   RunPostedTasks();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 // On Mac and Android, the reported menu coordinates are relative to the OOPIF,
 // and its screen position is computed later, so this test isn't relevant on
@@ -6270,7 +5974,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 //
 // Tests that a <select>'s visibility is correctly computed and thus shows the
 // popup when clicked.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40252258): Test is flaky on every platform.
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        DISABLED_ScrolledMainFrameSelectInLongIframe) {
@@ -6330,7 +6034,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   // Ensure the popup is requested. This test fails if this timesouts.
   popup_waiter.Wait();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 #if defined(USE_AURA)
 class SitePerProcessGestureHitTestBrowserTest
@@ -6631,7 +6335,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessGestureHitTestBrowserTest,
 
 // Android uses fixed scale factor, which makes this test unnecessary.
 // MacOSX does not have fractional device scales.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_MouseClickWithNonIntegerScaleFactor \
   DISABLED_MouseClickWithNonIntegerScaleFactor
 #else

@@ -52,10 +52,8 @@
 #include "ui/base/window_open_disposition.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 // Used by DisableWithNewProfile test. See the comment in above that test.
 #include "chrome/test/base/ui_test_utils.h"
-#endif
 
 namespace policy {
 
@@ -561,11 +559,7 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest,
 }
 
 // TODO(crbug.com/418717917, crbug.com/419211957): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_TLS13EarlyDataPolicyEnable DISABLED_TLS13EarlyDataPolicyEnable
-#else
 #define MAYBE_TLS13EarlyDataPolicyEnable TLS13EarlyDataPolicyEnable
-#endif
 IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest,
                        MAYBE_TLS13EarlyDataPolicyEnable) {
   PolicyMap policies;
@@ -591,11 +585,7 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest, TLS13EarlyDataPolicyDisable) {
 }
 
 // TODO(crbug.com/475587477, crbug.com/477510552): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_EnableWithRestart DISABLED_EnableWithRestart
-#else
 #define MAYBE_EnableWithRestart EnableWithRestart
-#endif
 IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest, MAYBE_EnableWithRestart) {
   PolicyMap policies;
   SetPolicy(&policies, key::kTLS13EarlyDataEnabled, base::Value(true));
@@ -650,7 +640,6 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
   EXPECT_EQ(FetchResourceForEarlyDataCheck(), kEarlyDataNotAcceptedTitle);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // This test doesn't work on Android because off-the-record profiles work
 // differently there. The behavior being tested is cross-platform, so it is not
 // critical to test on Android, but it would be better.
@@ -710,7 +699,5 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
                 new_browser->tab_strip_model()->GetActiveWebContents()),
             kEarlyDataNotAcceptedTitle);
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace policy

@@ -494,13 +494,8 @@ TEST_F(MostRelevantTabResumptionPageHandlerTest,
   ASSERT_EQ(
       ntp::most_relevant_tab_resumption::mojom::DecorationType::kVisitedXAgo,
       url_visits_mojom[0]->decoration->type);
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ("You visited 5 min ago",
-            url_visits_mojom[1]->decoration->display_string);
-#else
   ASSERT_EQ("You visited 5 mins ago",
             url_visits_mojom[1]->decoration->display_string);
-#endif
   ASSERT_EQ(
       ntp::most_relevant_tab_resumption::mojom::DecorationType::kVisitedXAgo,
       url_visits_mojom[1]->decoration->type);

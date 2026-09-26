@@ -115,9 +115,7 @@ void RecordNetworkResultWithAndWithoutSuffix(const std::string& metric,
 }
 
 RTLookupRequest::OSType GetRTLookupRequestOSType() {
-#if BUILDFLAG(IS_ANDROID)
-  return RTLookupRequest::OS_TYPE_ANDROID;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return RTLookupRequest::OS_TYPE_LINUX;
 #elif BUILDFLAG(IS_MAC)
   return RTLookupRequest::OS_TYPE_MAC;

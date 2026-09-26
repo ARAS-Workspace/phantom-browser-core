@@ -109,13 +109,7 @@ class GestureEventQueueTest : public testing::Test,
   void DidStopFlingingOnBrowser(
       base::WeakPtr<FlingController> fling_controller) override {}
   bool ProgressFlingOnFlingStart() override { return true; }
-  bool ShouldUseMobileFlingCurve() override {
-#if BUILDFLAG(IS_ANDROID)
-    return true;
-#else
-    return false;
-#endif
-  }
+  bool ShouldUseMobileFlingCurve() override { return false; }
   gfx::Vector2dF GetPixelsPerInch(
       const gfx::PointF& position_in_screen) override {
     return gfx::Vector2dF(input::kDefaultPixelsPerInch,

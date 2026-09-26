@@ -61,13 +61,7 @@ class BookmarksServiceImplTest : public testing::Test {
   mojo::Remote<mojom::BookmarksService> remote_service_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/527150892): Permanent folders are handled differently on
-// Android.
-#define MAYBE_GetBookmarks_Empty DISABLED_GetBookmarks_Empty
-#else
 #define MAYBE_GetBookmarks_Empty GetBookmarks_Empty
-#endif
 TEST_F(BookmarksServiceImplTest, MAYBE_GetBookmarks_Empty) {
   base::RunLoop run_loop;
   remote_service_->GetBookmarks(base::BindOnce(

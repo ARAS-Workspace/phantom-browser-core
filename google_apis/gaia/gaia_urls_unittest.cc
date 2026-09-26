@@ -23,11 +23,7 @@
 #include "url/gurl.h"
 
 namespace {
-#if BUILDFLAG(IS_ANDROID)
-const char kSigninChromeSyncKeysPlatformSuffix[] = "android";
-#else
 const char kSigninChromeSyncKeysPlatformSuffix[] = "desktop";
-#endif
 
 base::FilePath GetTestFilePath(const std::string& relative_path) {
   base::FilePath path;

@@ -113,17 +113,7 @@ TEST(AudioLatency, InteractiveBufferSizes) {
   // The |first| is a requested buffer size and and the |second| is a computed
   // "interactive" buffer size from the method.
   std::vector<std::pair<int, int>> buffer_size_pairs = {
-#if BUILDFLAG(IS_ANDROID)
-    {64, 128},
-    {96, 384},   // Pixel 3, 4, 5. (See crbug.com/1090441)
-    {240, 240},  // Nexus 7
-    {144, 144},  // Galaxy Nexus
-    // Irregular device buffer size
-    {100, 512},
-    {127, 512},
-#else
     {64, 64},
-#endif  // BUILDFLAG(IS_ANDROID)
     {128, 128},
     {256, 256},
     {512, 512},
@@ -140,12 +130,7 @@ TEST(AudioLatency, InteractiveBufferSizes) {
 TEST(AudioLatency, RtcBufferSizes) {
   for (int i = 6400; i < 204800; i *= 2) {
     EXPECT_EQ(i / 100, AudioLatency::GetRtcBufferSize(i, 0));
-#if BUILDFLAG(IS_ANDROID)
-    EXPECT_EQ(i / 50, AudioLatency::GetRtcBufferSize(i, i / 50 - 1));
-    EXPECT_EQ(i / 50 + 1, AudioLatency::GetRtcBufferSize(i, i / 50 + 1));
-#else
     EXPECT_EQ(i / 100, AudioLatency::GetRtcBufferSize(i, 500));
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 }
 

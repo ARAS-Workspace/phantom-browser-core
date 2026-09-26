@@ -36,14 +36,8 @@ constexpr base::MemoryConsumerTraits kMemoryConsumerTraits(
 // system queries.
 size_t GetBaselineMaxSavedFrames() {
   static const size_t baseline = []() -> size_t {
-#if BUILDFLAG(IS_ANDROID)
-    // If the amount of memory on the device is >= 3.5 GB, save up to 5
-    // frames.
-    return base::SysInfo::AmountOfTotalPhysicalMemory().InGiBF() < 3.5f ? 1 : 5;
-#else
     return std::min<size_t>(
         5, 2 + (base::SysInfo::AmountOfTotalPhysicalMemory().InMiB() / 256));
-#endif
   }();
   return baseline;
 }
@@ -169,15 +163,8 @@ void FrameEvictionManager::CullUnlockedFrames(size_t saved_frame_limit) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void FrameEvictionManager::CullOldUnlockedFrames(
-    base::MemoryReductionTaskContext task_type) {
-  const bool should_cull_all =
-      task_type == base::MemoryReductionTaskContext::kProactive;
-#else
 void FrameEvictionManager::CullOldUnlockedFrames() {
   const bool should_cull_all = false;
-#endif
   DCHECK(std::is_sorted(
       unlocked_frames_.begin(), unlocked_frames_.end(),
       [](const auto& a, const auto& b) { return a.second >= b.second; }));

@@ -11,10 +11,8 @@
 #include "chrome/browser/ui/side_panel/side_panel_entry.h"
 #include "ui/base/class_property.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/views/side_panel/side_panel_helper.h"
 #include "ui/actions/actions.h"
-#endif
 
 // static
 SidePanelContentProxy* SidePanelUtil::GetSidePanelContentProxy(
@@ -31,15 +29,8 @@ SidePanelContentProxy* SidePanelUtil::GetSidePanelContentProxy(
 std::u16string_view SidePanelUtil::GetTitleText(
     SidePanelEntry* entry,
     BrowserWindowInterface* browser) {
-#if BUILDFLAG(IS_ANDROID)
-  auto* title = entry->GetProperty(kSidePanelTitleKey);
-  if (title) {
-    return *title;
-  }
-#else
   if (entry->GetProperty(kShouldShowTitleInSidePanelHeaderKey)) {
     return SidePanelHelper::GetActionItem(browser, entry->key())->GetText();
   }
-#endif
   return std::u16string_view();
 }

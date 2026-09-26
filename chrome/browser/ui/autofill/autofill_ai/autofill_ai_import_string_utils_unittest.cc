@@ -22,23 +22,13 @@ TEST(AutofillAiImportStringUtilsTest, GetPromptTitleUnbranded) {
       GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/true,
                      /*is_banner_prompt=*/false, /*is_server_wallet=*/false),
       l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-          IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID
-#else
-          IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE
-#endif
-          ));
+          IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE));
 
   EXPECT_EQ(
       GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/false,
                      /*is_banner_prompt=*/false, /*is_server_wallet=*/false),
       l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-          IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID
-#else
-          IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE
-#endif
-          ));
+          IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE));
 
   // Banner prompts disable branding even when server wallet is true and feature is enabled.
   {
@@ -49,12 +39,7 @@ TEST(AutofillAiImportStringUtilsTest, GetPromptTitleUnbranded) {
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/true,
                        /*is_banner_prompt=*/true, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID
-#else
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE
-#endif
-            ));
+            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE));
   }
 }
 
@@ -70,22 +55,12 @@ TEST(AutofillAiImportStringUtilsTest, GetPromptTitleBrandedVariants) {
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/true,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID_BRANDED
-#else
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_BRANDED
-#endif
-            ));
+            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_BRANDED));
     EXPECT_EQ(
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/false,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID_BRANDED
-#else
-            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_BRANDED
-#endif
-            ));
+            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_BRANDED));
   }
 
   {
@@ -98,34 +73,19 @@ TEST(AutofillAiImportStringUtilsTest, GetPromptTitleBrandedVariants) {
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/true,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID_VARIANT_1_BRANDED
-#else
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_1_BRANDED
-#endif
-            ));
+            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_1_BRANDED));
 
     EXPECT_EQ(
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/false,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID_VARIANT_1_BRANDED
-#else
-            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_1_BRANDED
-#endif
-            ));
+            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_1_BRANDED));
 
     EXPECT_EQ(
         GetPromptTitle(EntityTypeName::kDriversLicense, /*is_save_prompt=*/true,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_SAVE_DRIVERS_LICENSE_ENTITY_DIALOG_TITLE_ANDROID_VARIANT_1_BRANDED
-#else
-            IDS_AUTOFILL_AI_SAVE_DRIVERS_LICENSE_ENTITY_DIALOG_TITLE_VARIANT_1_BRANDED
-#endif
-            ));
+            IDS_AUTOFILL_AI_SAVE_DRIVERS_LICENSE_ENTITY_DIALOG_TITLE_VARIANT_1_BRANDED));
   }
 
   {
@@ -138,23 +98,13 @@ TEST(AutofillAiImportStringUtilsTest, GetPromptTitleBrandedVariants) {
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/true,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID_VARIANT_2_SECURELY
-#else
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_2_SECURELY
-#endif
-            ));
+            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_2_SECURELY));
 
     EXPECT_EQ(
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/false,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID_VARIANT_2_SECURELY
-#else
-            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_2_SECURELY
-#endif
-            ));
+            IDS_AUTOFILL_AI_UPDATE_PASSPORT_ENTITY_DIALOG_TITLE_VARIANT_2_SECURELY));
   }
 
   {
@@ -167,12 +117,7 @@ TEST(AutofillAiImportStringUtilsTest, GetPromptTitleBrandedVariants) {
         GetPromptTitle(EntityTypeName::kPassport, /*is_save_prompt=*/true,
                        /*is_banner_prompt=*/false, /*is_server_wallet=*/true),
         l10n_util::GetStringUTF16(
-#if BUILDFLAG(IS_ANDROID)
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_ANDROID_BRANDED
-#else
-            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_BRANDED
-#endif
-            ));
+            IDS_AUTOFILL_AI_SAVE_PASSPORT_ENTITY_DIALOG_TITLE_BRANDED));
   }
 }
 

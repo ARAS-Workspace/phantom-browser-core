@@ -64,9 +64,6 @@ class AsyncCheckTrackerTest : public content::RenderViewHostTestHarness {
             content::BrowserTaskEnvironment::REAL_IO_THREAD,
             base::test::TaskEnvironment::TimeSource::MOCK_TIME) {
     std::vector<base::test::FeatureRef> enabled = {};
-#if BUILDFLAG(IS_ANDROID)
-    enabled.push_back(kSafeBrowsingSyncCheckerCheckAllowlist);
-#endif
     feature_list_.InitWithFeatures(enabled, {});
   }
 
@@ -415,13 +412,8 @@ TEST_F(
 }
 
 TEST_F(AsyncCheckTrackerTest, IsPlatformEligibleForSyncCheckerCheckAllowlist) {
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(
-      AsyncCheckTracker::IsPlatformEligibleForSyncCheckerCheckAllowlist());
-#else
   EXPECT_FALSE(
       AsyncCheckTracker::IsPlatformEligibleForSyncCheckerCheckAllowlist());
-#endif
 }
 
 TEST_F(AsyncCheckTrackerTest, GetShouldSyncCheckerCheckAllowlist) {
@@ -600,25 +592,5 @@ TEST_F(AsyncCheckTrackerObserverTest, AsyncCheckTrackerDeletedWhileObserving) {
   EXPECT_FALSE(observer_.IsInObserverList());
   EXPECT_EQ(observer_.TrackerDestructedTimes(), 1);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-class AsyncCheckTrackerSyncCheckerCheckAllowlistDisabledTest
-    : public AsyncCheckTrackerTest {
- protected:
-  AsyncCheckTrackerSyncCheckerCheckAllowlistDisabledTest()
-      : AsyncCheckTrackerTest() {
-    feature_list_.InitAndDisableFeature(kSafeBrowsingSyncCheckerCheckAllowlist);
-  }
-
-  base::test::ScopedFeatureList feature_list_;
-};
-
-TEST_F(AsyncCheckTrackerSyncCheckerCheckAllowlistDisabledTest,
-       IsPlatformEligibleForSyncCheckerCheckAllowlist) {
-  EXPECT_FALSE(
-      AsyncCheckTracker::IsPlatformEligibleForSyncCheckerCheckAllowlist());
-}
-
-#endif
 
 }  // namespace safe_browsing

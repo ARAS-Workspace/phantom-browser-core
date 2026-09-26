@@ -2227,11 +2227,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemChooserBrowserTest, DontShowWhileInactive) {
 // WebContents is no longer displayed to the user for android since the
 // intent to select a file always causes a HIDDEN event as the whole app
 // receives onStop().
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ShowThenHide DISABLED_ShowThenHide
-#else
 #define MAYBE_ShowThenHide ShowThenHide
-#endif
 // Show the dialog then hide the WebContents and ensure the dialog is dismissed.
 IN_PROC_BROWSER_TEST_F(FileSystemChooserBrowserTest, MAYBE_ShowThenHide) {
   GURL url = embedded_test_server()->GetURL("/title1.html");

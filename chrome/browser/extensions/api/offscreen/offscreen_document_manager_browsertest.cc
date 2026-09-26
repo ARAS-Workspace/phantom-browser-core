@@ -554,15 +554,9 @@ IN_PROC_BROWSER_TEST_F(OffscreenDocumentManagerBrowserTest,
   {
     ExtensionHostTestHelper host_waiter(incognito_profile);
     host_waiter.RestrictToHost(incognito_host);
-#if BUILDFLAG(IS_ANDROID)
-    // Destroy OTR profile. Consequently, the `incognito_host` should be
-    // destroyed.
-    ProfileDestroyer::DestroyOTRProfileWhenAppropriate(incognito_profile);
-#else
     // Shut down the incognito browser, OTR profile will be destroyed.
     // Consequently, the `incognito_host` should be destroyed.
     CloseBrowserSynchronously(incognito_browser);
-#endif
     host_waiter.WaitForHostDestroyed();
     // Note: `incognito_host` is destroyed at this point.
   }

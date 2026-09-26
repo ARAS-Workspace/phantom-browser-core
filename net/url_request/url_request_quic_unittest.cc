@@ -553,11 +553,7 @@ TEST_P(URLRequestQuicWithTcpTest, AltServiceWrongCert) {
 // still seems better to keep them enabled where possible.
 //
 // TODO(https://crbug.com/503402050): Fix these tests.
-#if !defined(NDEBUG) && BUILDFLAG(IS_ANDROID)
-#define MAYBE_AltServiceRightCert DISABLED_AltServiceRightCert
-#else
 #define MAYBE_AltServiceRightCert AltServiceRightCert
-#endif
 TEST_P(URLRequestQuicWithTcpTest, MAYBE_AltServiceRightCert) {
   SetUpLocalhostDnsRecord(kOtherHost);
   auto context = BuildContext();
@@ -588,13 +584,8 @@ TEST_P(URLRequestQuicWithTcpTest, MAYBE_AltServiceRightCert) {
 // still seems better to keep them enabled where possible.
 //
 // TODO(https://crbug.com/503402050): Fix these tests.
-#if !defined(NDEBUG) && BUILDFLAG(IS_ANDROID)
-#define MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttempt \
-  DISABLED_AltServiceWrongCertSimultaneousNonAltServiceQuicAttempt
-#else
 #define MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttempt \
   AltServiceWrongCertSimultaneousNonAltServiceQuicAttempt
-#endif
 TEST_P(URLRequestQuicWithTcpTest,
        MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttempt) {
   SetUpHttpsRecord();
@@ -639,13 +630,8 @@ TEST_P(URLRequestQuicWithTcpTest,
 // still seems better to keep them enabled where possible.
 //
 // TODO(https://crbug.com/503402050): Fix these tests.
-#if !defined(NDEBUG) && BUILDFLAG(IS_ANDROID)
-#define MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttemptReverseOrder \
-  DISABLED_AltServiceWrongCertSimultaneousNonAltServiceQuicAttemptReverseOrder
-#else
 #define MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttemptReverseOrder \
   AltServiceWrongCertSimultaneousNonAltServiceQuicAttemptReverseOrder
-#endif
 TEST_P(
     URLRequestQuicWithTcpTest,
     MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttemptReverseOrder) {
@@ -689,13 +675,8 @@ TEST_P(
 // still seems better to keep them enabled where possible.
 //
 // TODO(https://crbug.com/503402050): Fix these tests.
-#if !defined(NDEBUG) && BUILDFLAG(IS_ANDROID)
-#define MAYBE_AltServiceWrongCertExistingNonAltServiceQuicSession \
-  DISABLED_AltServiceWrongCertExistingNonAltServiceQuicSession
-#else
 #define MAYBE_AltServiceWrongCertExistingNonAltServiceQuicSession \
   AltServiceWrongCertExistingNonAltServiceQuicSession
-#endif
 TEST_P(URLRequestQuicWithTcpTest,
        MAYBE_AltServiceWrongCertExistingNonAltServiceQuicSession) {
   SetUpHttpsRecord();
@@ -735,13 +716,8 @@ TEST_P(URLRequestQuicWithTcpTest,
 // still seems better to keep them enabled where possible.
 //
 // TODO(https://crbug.com/503402050): Fix these tests.
-#if !defined(NDEBUG) && BUILDFLAG(IS_ANDROID)
-#define MAYBE_TwoAltServiceRequestsOneWrongCert \
-  DISABLED_TwoAltServiceRequestsOneWrongCert
-#else
 #define MAYBE_TwoAltServiceRequestsOneWrongCert \
   TwoAltServiceRequestsOneWrongCert
-#endif
 TEST_P(URLRequestQuicWithTcpTest, MAYBE_TwoAltServiceRequestsOneWrongCert) {
   SetUpLocalhostDnsRecord(kOtherHost2);
   auto context = BuildContext();
@@ -782,13 +758,8 @@ TEST_P(URLRequestQuicWithTcpTest, MAYBE_TwoAltServiceRequestsOneWrongCert) {
 // still seems better to keep them enabled where possible.
 //
 // TODO(https://crbug.com/503402050): Fix these tests.
-#if !defined(NDEBUG) && BUILDFLAG(IS_ANDROID)
-#define MAYBE_TwoAltServiceRequestsOneWrongCertReverseOrder \
-  DISABLED_TwoAltServiceRequestsOneWrongCertReverseOrder
-#else
 #define MAYBE_TwoAltServiceRequestsOneWrongCertReverseOrder \
   TwoAltServiceRequestsOneWrongCertReverseOrder
-#endif
 TEST_P(URLRequestQuicWithTcpTest,
        MAYBE_TwoAltServiceRequestsOneWrongCertReverseOrder) {
   SetUpLocalhostDnsRecord(kOtherHost2);
@@ -831,13 +802,8 @@ TEST_P(URLRequestQuicWithTcpTest,
 // still seems better to keep them enabled where possible.
 //
 // TODO(https://crbug.com/503402050): Fix these tests.
-#if !defined(NDEBUG) && BUILDFLAG(IS_ANDROID)
-#define MAYBE_AltServiceRequestWrongCertExistingAltServiceQuicSession \
-  DISABLED_AltServiceRequestWrongCertExistingAltServiceQuicSession
-#else
 #define MAYBE_AltServiceRequestWrongCertExistingAltServiceQuicSession \
   AltServiceRequestWrongCertExistingAltServiceQuicSession
-#endif
 // but different target origin.
 TEST_P(URLRequestQuicWithTcpTest,
        MAYBE_AltServiceRequestWrongCertExistingAltServiceQuicSession) {

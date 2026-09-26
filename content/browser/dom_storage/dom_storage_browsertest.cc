@@ -177,22 +177,14 @@ IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, SanityCheck) {
 }
 
 // TODO(crbug.com/488417166): Fix flakiness on android-x86-rel and re-enable.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SanityCheckIncognito DISABLED_SanityCheckIncognito
-#else
 #define MAYBE_SanityCheckIncognito SanityCheckIncognito
-#endif
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, MAYBE_SanityCheckIncognito) {
   SimpleTest(GetTestUrl("dom_storage", "sanity_check.html"), kIncognito);
 }
 
 // http://crbug.com/654704 PRE_ tests aren't supported on Android.
 // TODO(crbug.com/40885339): Re-enable this test for fuchsia.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_DataPersists DISABLED_DataPersists
-#else
 #define MAYBE_DataPersists DataPersists
-#endif
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, PRE_DataPersists) {
   SimpleTest(GetTestUrl("dom_storage", "store_data.html"), kNotIncognito);
 
@@ -239,7 +231,6 @@ IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, LocalStorageOnDiskSize) {
 // SessionStorage on Android uses BackingMode::kClearDiskStateOnOpen, which
 // destroys any pre-existing on-disk data on open. That makes the on-disk size
 // unobservable across a restart, so we skip these tests on Android.
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, PRE_SessionStorageOnDiskSize) {
   if (IsSqliteBackendOnFuchsia()) {
     GTEST_SKIP() << "SQLite DomStorage backend unsupported on Fuchsia";
@@ -269,14 +260,9 @@ IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, SessionStorageOnDiskSize) {
   ASSERT_TRUE(ExecJs(shell()->web_contents(), "sessionStorage.length;"));
   ExpectNonZeroOnDiskSize("Storage.SessionStorage.DatabaseOnDiskSizeKB");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug/361107780): Fix flakiness on android-bfcache-rel and re-enable.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_DeletePhysicalStorageKey DISABLED_DeletePhysicalStorageKey
-#else
 #define MAYBE_DeletePhysicalStorageKey DeletePhysicalStorageKey
-#endif
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, MAYBE_DeletePhysicalStorageKey) {
   EXPECT_EQ(0U, GetUsage().size());
   SimpleTest(GetTestUrl("dom_storage", "store_data.html"), kNotIncognito);

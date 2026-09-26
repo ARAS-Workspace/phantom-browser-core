@@ -89,12 +89,6 @@ class PolicyPrefsTest : public PlatformBrowserTest {
         true /* is_first_policy_load_complete_return */);
     BrowserPolicyConnector::SetPolicyProviderForTesting(
         GetMockPolicyProvider());
-
-#if BUILDFLAG(IS_ANDROID)
-    // Intentionally leak the mock provider on Android. See comment in
-    // GetMockPolicyProvider() for details.
-    ::testing::Mock::AllowLeak(GetMockPolicyProvider());
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   void TearDownOnMainThread() override { ClearProviderPolicy(); }
@@ -105,29 +99,13 @@ class PolicyPrefsTest : public PlatformBrowserTest {
   }
 
   MockConfigurationPolicyProvider* GetMockPolicyProvider() {
-#if BUILDFLAG(IS_ANDROID)
-    // Trying to delete the mock provider on Android leads to a cascade of
-    // crashes due to ChromeBrowserPolicyConnector and ProfileImpl not being
-    // deleted. Those crashes are caused by checks that ensure that observer
-    // lists of ConfigurationPolicyProvider are always empty on destruction.
-    // On Desktop, removal of observers from those lists is triggered by the
-    // destructors of the classes above, but those same destructors are never
-    // invoked on Android.
-    static base::NoDestructor<
-        testing::NiceMock<MockConfigurationPolicyProvider>>
-        provider;
-    return provider.get();
-#else
     // On non-Android platforms, the mock provider cleanup will be triggered
     // by ChromeBrowserPolicyConnector and ProfileImpl destructors. Thus it's
     // safe to define a provider object that is deleted on scope destruction.
     return &provider_;
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   testing::NiceMock<MockConfigurationPolicyProvider> provider_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 // Splits the test cases into `kNumChunks` and the testing parameter determines

@@ -347,11 +347,7 @@ bool UnionTraits<network::mojom::DataElementDataView, network::DataElement>::
 bool StructTraits<network::mojom::SocketTagDataView, net::SocketTag>::Read(
     network::mojom::SocketTagDataView data,
     net::SocketTag* out) {
-#if BUILDFLAG(IS_ANDROID)
-  *out = net::SocketTag(data.uid(), data.tag());
-#else
   *out = net::SocketTag();
-#endif  // BUILDFLAG(IS_ANDROID)
   return true;
 }
 

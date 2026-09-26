@@ -268,15 +268,10 @@ TEST_F(ConfigurationPolicyHandlerListTest, ApplySettingsWithCloudOnlyPolicy) {
   SetPolicy(kPolicyName, POLICY_LEVEL_MANDATORY, POLICY_SCOPE_MACHINE,
             POLICY_SOURCE_COMMAND_LINE, base::Value(kPolicyValue));
   ApplySettings();
-#if BUILDFLAG(IS_ANDROID)
-  VerifyPolicyAndPref(kPolicyName, /*in_pref=*/true);
-  EXPECT_TRUE(IsErrorsEmpty());
-#else
   VerifyPolicyAndPref(kPolicyName, /*in_pref=*/false);
   EXPECT_EQ(GetErrorMessages(kPolicyName),
             l10n_util::GetStringUTF16(IDS_POLICY_CLOUD_SOURCE_ONLY_ERROR));
   ClearErrors();
-#endif
 }
 
 // TODO(crbug.com/491119520): Remove this test once the CloudReportingEnabled
@@ -355,63 +350,5 @@ TEST_F(ConfigurationPolicyHandlerListTest,
             l10n_util::GetStringUTF16(IDS_POLICY_CLOUD_SOURCE_ONLY_ERROR));
   ClearErrors();
 }
-
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-TEST_F(ConfigurationPolicyHandlerListTest, DesktopAndroidBlocklist_Default) {
-  base::test::ScopedFeatureList feature_list;
-
-  AddSimplePolicy();
-  ApplySettings();
-
-  VerifyPolicyAndPref(kPolicyName, /*in_pref=*/true);
-}
-
-TEST_F(ConfigurationPolicyHandlerListTest, DesktopAndroidBlocklist_Blocked) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeatureWithParameters(
-      features::kDesktopAndroidPolicy,
-      {{features::kDesktopAndroidPolicyBlocklist.name, kPolicyName}});
-
-  AddSimplePolicy();
-  ApplySettings();
-
-  VerifyPolicyAndPref(kPolicyName, /*in_pref=*/false);
-}
-
-TEST_F(ConfigurationPolicyHandlerListTest,
-       DesktopAndroidBlocklist_AllowedAndBlocked) {
-  const char kPolicyName3[] = "PolicyName3";
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeatureWithParameters(
-      features::kDesktopAndroidPolicy,
-      {{features::kDesktopAndroidPolicyBlocklist.name,
-        base::StrCat({kPolicyName2, ", ", kPolicyName3})}});
-
-  AddSimplePolicy();
-  AddPolicy(kPolicyName2, /*is_cloud=*/true, base::Value(kPolicyValue));
-
-  ApplySettings();
-
-  VerifyPolicyAndPref(kPolicyName, /*in_pref=*/true);
-  VerifyPolicyAndPref(kPolicyName2, /*in_pref=*/false);
-}
-
-// Test that other filters still works.
-TEST_F(ConfigurationPolicyHandlerListTest,
-       DesktopAndroidBlocklist_AllowedButBlockedByOtherFilter) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeatureWithParameters(
-      features::kDesktopAndroidPolicy,
-      {{features::kDesktopAndroidPolicyBlocklist.name, kPolicyName2}});
-
-  AddSimplePolicy();
-  details()->is_future = true;
-
-  ApplySettings();
-
-  VerifyPolicyAndPref(kPolicyName, /*in_pref=*/false, /*in_deprecated=*/false,
-                      /*in_future=*/true);
-}
-#endif  // BUILDFLAG(IS_DESKTOP_ANDROID)
 
 }  // namespace policy

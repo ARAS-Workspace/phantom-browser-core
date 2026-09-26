@@ -23,7 +23,7 @@ class VulkanCXXTest : public testing::Test {
     use_swiftshader_ =
         base::CommandLine::ForCurrentProcess()->HasSwitch("use-swiftshader");
     base::FilePath path;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
     if (use_swiftshader_) {
 #if BUILDFLAG(IS_LINUX)
       EXPECT_TRUE(base::PathService::Get(base::DIR_MODULE, &path));

@@ -37,9 +37,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.h"
-#endif
 
 namespace {
 
@@ -53,7 +51,6 @@ using testing::ElementsAre;
 using testing::IsEmpty;
 using testing::UnorderedElementsAre;
 
-#if !BUILDFLAG(IS_ANDROID)
 std::string CreateSerializedProtoField(int field_number,
                                        const std::string& value) {
   std::string result;
@@ -74,7 +71,6 @@ MATCHER_P2(HasContactInfoWithGuidAndUnknownFields, guid, unknown_fields, "") {
   return arg.specifics().contact_info().guid() == guid &&
          arg.specifics().contact_info().unknown_fields() == unknown_fields;
 }
-#endif
 
 // Matches a sync::entity_data has a contact info field with `address`.
 MATCHER_P(HasContactInfoWithAddress, address, "") {
@@ -326,11 +322,7 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 // TODO(crbug.com/336993637): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_Passphrase DISABLED_Passphrase
-#else
 #define MAYBE_Passphrase Passphrase
-#endif
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoPassphraseSyncTest,
                        MAYBE_Passphrase) {
   ASSERT_TRUE(SetupSyncAndHideAccountNameEmailProfile());
@@ -457,7 +449,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, AuthErrorState) {
 }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest,
                        PreservesUnsupportedFieldsDataOnCommits) {
   // Create an unsupported field with an unused tag.
@@ -659,6 +650,5 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest,
   EXPECT_FALSE(
       GetSyncService(0)->GetActiveDataTypes().Has(syncer::CONTACT_INFO));
 }
-#endif
 
 }  // namespace

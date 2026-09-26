@@ -19,15 +19,7 @@ TabGroupSyncCoordinatorImpl::TabGroupSyncCoordinatorImpl(
     PrefService* pref_service)
     : service_(service),
       platform_delegate_(std::move(delegate)),
-      startup_helper_(
-#if BUILDFLAG(IS_ANDROID)
-          std::make_unique<StartupHelper>(platform_delegate_.get(),
-                                          service_,
-                                          pref_service)
-#else
-          nullptr
-#endif
-      ) {
+      startup_helper_(nullptr) {
   CHECK(platform_delegate_);
   CHECK(service_);
 }

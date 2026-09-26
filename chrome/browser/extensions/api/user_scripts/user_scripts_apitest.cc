@@ -477,13 +477,8 @@ IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,
 // Tests that registered user scripts are properly ignored when loading
 // stored dynamic scripts if the API is not allowed.
 // TODO(crbug.com/441364550): Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PRE_UserScriptsDisabledOnStartupIfAPINotAllowed \
-  DISABLED_PRE_UserScriptsDisabledOnStartupIfAPINotAllowed
-#else
 #define MAYBE_PRE_UserScriptsDisabledOnStartupIfAPINotAllowed \
   PRE_UserScriptsDisabledOnStartupIfAPINotAllowed
-#endif
 IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,
                        MAYBE_PRE_UserScriptsDisabledOnStartupIfAPINotAllowed) {
   // Load an extension and register user scripts and a dynamic content script.
@@ -517,13 +512,8 @@ IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,
 }
 
 // TODO(crbug.com/441364550): Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_UserScriptsDisabledOnStartupIfAPINotAllowed \
-  DISABLED_UserScriptsDisabledOnStartupIfAPINotAllowed
-#else
 #define MAYBE_UserScriptsDisabledOnStartupIfAPINotAllowed \
   UserScriptsDisabledOnStartupIfAPINotAllowed
-#endif
 IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,
                        MAYBE_UserScriptsDisabledOnStartupIfAPINotAllowed) {
   // Wait until the extension loads so we can get it's ID.

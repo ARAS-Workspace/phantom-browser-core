@@ -18,11 +18,7 @@
 #include "content/public/test/browser_test.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/test/base/android/android_browser_test.h"
-#else
 #include "chrome/test/base/in_process_browser_test.h"
-#endif
 
 namespace enterprise_reporting {
 

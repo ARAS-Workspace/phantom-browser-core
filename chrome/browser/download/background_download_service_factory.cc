@@ -44,10 +44,6 @@
 #include "content/public/browser/network_service_instance.h"
 #include "content/public/browser/storage_partition.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/download/android/service/download_task_scheduler.h"
-#endif
-
 namespace {
 
 std::unique_ptr<download::Client> CreateBackgroundFetchDownloadClient(
@@ -175,17 +171,12 @@ BackgroundDownloadServiceFactory::BuildServiceInstanceFor(
             {base::MayBlock(), base::TaskPriority::BEST_EFFORT});
 
     std::unique_ptr<download::TaskScheduler> task_scheduler;
-#if BUILDFLAG(IS_ANDROID)
-    task_scheduler =
-        std::make_unique<download::android::DownloadTaskScheduler>();
-#else
     task_scheduler =
         std::make_unique<download::BasicTaskScheduler>(base::BindRepeating(
             [](SimpleFactoryKey* key) {
               return BackgroundDownloadServiceFactory::GetForKey(key);
             },
             key));
-#endif
     // Some tests doesn't initialize DownloadManager when profile is created,
     // and cause the download service to fail. Call
     // InitializeSimpleDownloadManager() to initialize the DownloadManager

@@ -1061,7 +1061,7 @@ IN_PROC_BROWSER_TEST_F(NavigationBrowserTest,
 }
 
 // TODO(crbug.com/40924471): Test is flaky on Android, Linux.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_BackFollowedByReload DISABLED_BackFollowedByReload
 #else
 #define MAYBE_BackFollowedByReload BackFollowedByReload
@@ -4407,7 +4407,7 @@ class InitiatorClosingOpenURLInterceptor
 // be received.
 //
 // Fails on linux-bfcache-rel and android-bfcache-rel. See crbug.com/336671248.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_FormSubmissionInRemoteFrameSenderDeletedBeforeReceivingOpenURL \
   DISABLED_FormSubmissionInRemoteFrameSenderDeletedBeforeReceivingOpenURL
 #else
@@ -9719,95 +9719,6 @@ IN_PROC_BROWSER_TEST_F(VisualPropertiesSynchronization,
                 .ExtractDouble(),
             0);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-class AndroidPrewarmSpareRendererTest
-    : public NavigationBrowserTest,
-      public ::testing::WithParamInterface<std::tuple<std::string, bool>> {
- public:
-  AndroidPrewarmSpareRendererTest() {
-    std::map<std::string, std::string> parameters = {
-        {"spare_renderer_creation_timing", std::get<0>(GetParam())},
-        {"spare_renderer_timeout_seconds",
-         std::get<1>(GetParam()) ? "10" : "-1"},
-    };
-    feature_list_.InitWithFeaturesAndParameters(
-        /*enabled_features=*/{{features::kAndroidWarmUpSpareRendererWithTimeout,
-                               parameters}},
-        /*disabled_features=*/{{features::kSpareRendererForSitePerProcess}});
-  }
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // Enable site per process so that the navigation will take
-    // the spare process.
-    command_line->AppendSwitch(switches::kSitePerProcess);
-  }
-
-  bool SpareRendererHasTimeout() { return std::get<1>(GetParam()); }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    AndroidPrewarmSpareRendererTest,
-    testing::Combine(
-        testing::Values(
-            features::kAndroidSpareRendererCreationAfterLoading,
-            features::kAndroidSpareRendererCreationAfterFirstPaint,
-            features::kAndroidSpareRendererCreationDelayedDuringLoading),
-        testing::Bool()));
-
-IN_PROC_BROWSER_TEST_P(AndroidPrewarmSpareRendererTest, ReuseSpareRenderer) {
-  auto& spare_manager = SpareRenderProcessHostManagerImpl::Get();
-  spare_manager.CleanupSparesForTesting();
-  SpareRenderProcessHostStartedObserver spare_started_observer;
-  ASSERT_TRUE(NavigateToURL(
-      shell(), embedded_test_server()->GetURL("a.com", "/title1.html")));
-  RenderProcessHost* created_process =
-      spare_started_observer.WaitForSpareRenderProcessStarted();
-  ASSERT_TRUE(!!created_process);
-  ASSERT_THAT(spare_manager.GetSpares(), testing::ElementsAre(created_process));
-  WebContentsImpl* web_contents =
-      static_cast<WebContentsImpl*>(shell()->web_contents());
-  ASSERT_TRUE(NavigateToURL(
-      shell(), embedded_test_server()->GetURL("b.com", "/title1.html")));
-  ASSERT_EQ(web_contents->GetSiteInstance()->GetProcess(), created_process);
-}
-
-IN_PROC_BROWSER_TEST_P(AndroidPrewarmSpareRendererTest, RendererTimeout) {
-  scoped_refptr<base::TestMockTimeTaskRunner> task_runner =
-      new base::TestMockTimeTaskRunner();
-  auto& spare_manager = SpareRenderProcessHostManagerImpl::Get();
-  spare_manager.SetDeferTimerTaskRunnerForTesting(task_runner);
-  const base::TimeDelta kTimeout = base::Seconds(10);
-
-  spare_manager.CleanupSparesForTesting();
-  SpareRenderProcessHostStartedObserver spare_started_observer;
-  ASSERT_TRUE(NavigateToURL(
-      shell(), embedded_test_server()->GetURL("a.com", "/title1.html")));
-  RenderProcessHost* created_process =
-      spare_started_observer.WaitForSpareRenderProcessStarted();
-  ASSERT_TRUE(!!created_process);
-  ASSERT_THAT(spare_manager.GetSpares(), testing::ElementsAre(created_process));
-
-  if (!SpareRendererHasTimeout()) {
-    // Warming up a spare renderer with a timeout shall not override
-    // a spare renderer without a timeout.
-    spare_manager.WarmupSpare(shell()->web_contents()->GetBrowserContext(),
-                              kTimeout);
-  }
-  task_runner->FastForwardBy(kTimeout);
-  base::RunLoop().RunUntilIdle();
-  if (SpareRendererHasTimeout()) {
-    EXPECT_TRUE(spare_manager.GetSpares().empty());
-  } else {
-    ASSERT_THAT(spare_manager.GetSpares(),
-                testing::ElementsAre(created_process));
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class HstsUpgradeBrowserTest : public NavigationBrowserTest {
  public:

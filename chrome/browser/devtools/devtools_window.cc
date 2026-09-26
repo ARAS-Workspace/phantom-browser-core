@@ -109,9 +109,6 @@
 #include "extensions/browser/view_type_utils.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/android/chrome_jni_headers/DevToolsActivity_jni.h"
-#else
 #include "chrome/browser/devtools/devtools_policy_dialog.h"
 #include "chrome/browser/devtools/devtools_ui_controller.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
@@ -121,7 +118,6 @@
 #include "chrome/browser/ui/web_modal/browser_window_modal_dialog_delegate.h"  // nogncheck crbug.com/40147906
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
-#endif
 
 using blink::WebInputEvent;
 using content::BrowserThread;
@@ -198,9 +194,7 @@ class DevToolsToolboxDelegate : public content::WebContentsObserver,
   void WebContentsDestroyed() override;
 
  private:
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindow* GetInspectedBrowserWindow();
-#endif
   base::WeakPtr<content::WebContents> inspected_web_contents_;
 };
 
@@ -235,35 +229,28 @@ content::KeyboardEventProcessingResult
 DevToolsToolboxDelegate::PreHandleKeyboardEvent(
     content::WebContents* source,
     const input::NativeWebKeyboardEvent& event) {
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindow* window = GetInspectedBrowserWindow();
   if (window) {
     return window->PreHandleKeyboardEvent(event);
   }
-#endif
   return content::KeyboardEventProcessingResult::NOT_HANDLED;
 }
 
 bool DevToolsToolboxDelegate::HandleKeyboardEvent(
     content::WebContents* source,
     const input::NativeWebKeyboardEvent& event) {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   if (event.windows_key_code == 0x08) {
     // Do not navigate back in history on Windows (http://crbug.com/40529649).
     return false;
   }
   BrowserWindow* window = GetInspectedBrowserWindow();
   return window && window->HandleKeyboardEvent(event);
-#endif
 }
 
 void DevToolsToolboxDelegate::WebContentsDestroyed() {
   delete this;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 BrowserWindow* DevToolsToolboxDelegate::GetInspectedBrowserWindow() {
   if (!inspected_web_contents_) {
     return nullptr;
@@ -273,7 +260,6 @@ BrowserWindow* DevToolsToolboxDelegate::GetInspectedBrowserWindow() {
           inspected_web_contents_.get());
   return browser ? BrowserWindow::FromBrowser(browser) : nullptr;
 }
-#endif
 
 // static
 GURL DecorateFrontendURL(const GURL& base_url) {
@@ -456,11 +442,8 @@ class DevToolsWindow::OwnedMainWebContents {
  public:
   explicit OwnedMainWebContents(
       std::unique_ptr<content::WebContents> web_contents)
-      :
-#if !BUILDFLAG(IS_ANDROID)
-        keep_alive_(KeepAliveOrigin::DEVTOOLS_WINDOW,
+      : keep_alive_(KeepAliveOrigin::DEVTOOLS_WINDOW,
                     KeepAliveRestartOption::DISABLED),
-#endif
         web_contents_(std::move(web_contents)) {
     Profile* profile = GetProfileForDevToolsWindow(web_contents_.get());
     DCHECK(profile);
@@ -477,9 +460,7 @@ class DevToolsWindow::OwnedMainWebContents {
   }
 
  private:
-#if !BUILDFLAG(IS_ANDROID)
   ScopedKeepAlive keep_alive_;
-#endif
   std::unique_ptr<ScopedProfileKeepAlive> profile_keep_alive_;
   std::unique_ptr<content::WebContents> web_contents_;
 };
@@ -521,9 +502,7 @@ DevToolsWindow::~DevToolsWindow() {
 
   capture_handle_.RunAndReset();
   owned_toolbox_web_contents_.reset();
-#if !BUILDFLAG(IS_ANDROID)
   browser_collection_observation_.Reset();
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // Activate the inspected browser when undocked DevTools closes, so focus
@@ -903,9 +882,7 @@ void DevToolsWindow::ToggleDevToolsWindow(
                     /* browser_connection */ false, toggled_by);
     if (!window) {
       if (base::FeatureList::IsEnabled(features::kDevToolsShowPolicyDialog)) {
-#if !BUILDFLAG(IS_ANDROID)
         DevToolsPolicyDialog::Show(inspected_web_contents);
-#endif
       }
       return;
     }
@@ -1035,18 +1012,6 @@ void DevToolsWindow::Show(const DevToolsToggleAction& action) {
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  if (!owned_main_web_contents_ || launched_activity_) {
-    return;
-  }
-  JNIEnv* env = base::android::AttachCurrentThread();
-  Java_DevToolsActivity_launchDevToolsActivity(
-      env, main_web_contents_->GetJavaWebContents());
-
-  launched_activity_ = true;
-
-  OverrideAndSyncDevToolsRendererPrefs();
-#else
   if (is_docked_) {
     DCHECK(can_dock_);
     content::WebContents* inspected_web_contents = GetInspectedWebContents();
@@ -1114,11 +1079,9 @@ void DevToolsWindow::Show(const DevToolsToggleAction& action) {
   if (toolbox_web_contents_) {
     UpdateBrowserWindow();
   }
-#endif
   DoAction(action);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void DevToolsWindow::ActivateInspectedTab() {
   content::WebContents* inspected_web_contents = GetInspectedWebContents();
   if (!inspected_web_contents) {
@@ -1144,7 +1107,6 @@ void DevToolsWindow::ActivateInspectedTab() {
             TabStripUserGestureDetails::GestureType::kOther));
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // static
 bool DevToolsWindow::HandleBeforeUnload(WebContents* frontend_contents,
@@ -1381,10 +1343,6 @@ DevToolsWindow* DevToolsWindow::Create(
   }
 
   SessionID inspected_browser_session_id = SessionID::InvalidValue();
-#if BUILDFLAG(IS_ANDROID)
-  // Docking is not supported yet.
-  can_dock = false;
-#else
   if (inspected_web_contents) {
     // Check for a place to dock.
     BrowserWindowInterface* browser =
@@ -1401,7 +1359,6 @@ DevToolsWindow* DevToolsWindow::Create(
       can_dock = false;
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Create WebContents with devtools.
   GURL url(GetDevToolsURL(profile, frontend_type, frontend_url, can_dock, panel,
@@ -1561,13 +1518,9 @@ void DevToolsWindow::ActivateContents(WebContents* contents) {
       inspected_tab->GetDelegate()->ActivateContents(inspected_tab);
     }
   } else {
-#if BUILDFLAG(IS_ANDROID)
-    NOTIMPLEMENTED();
-#else
     if (browser_) {
       browser_->GetWindow()->Activate();
     }
-#endif
   }
 }
 
@@ -1704,28 +1657,20 @@ void DevToolsWindow::ActivateWindow() {
   if (life_stage_ != kLoadCompleted) {
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  NOTIMPLEMENTED();
-#else
   if (is_docked_ && GetInspectedBrowserWindow()) {
     main_web_contents_->Focus();
   } else if (!is_docked_ && browser_ && !browser_->GetWindow()->IsActive()) {
     browser_->GetWindow()->Activate();
   }
-#endif
 }
 
 void DevToolsWindow::CloseWindow() {
   if (is_docked_) {
     Close(DevToolsClosedByAction::kCloseButton);
   } else {
-#if BUILDFLAG(IS_ANDROID)
-    main_web_contents_->Close();
-#else
     if (browser_) {
       browser_->GetWindow()->Close();
     }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 }
 
@@ -1795,9 +1740,6 @@ void DevToolsWindow::SetIsDocked(bool dock_requested) {
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  LOG_IF(WARNING, dock_requested) << "Docking is not supported yet.";
-#else
   if (dock_requested && !was_docked && browser_) {
     // Detach window from the external devtools browser. It will lead to
     // the browser object's close and delete. Remove observer first.
@@ -1820,7 +1762,6 @@ void DevToolsWindow::SetIsDocked(bool dock_requested) {
   } else if (!dock_requested && was_docked) {
     UpdateBrowserWindow();
   }
-#endif
 
   Show(DevToolsToggleAction::Show());
 }
@@ -1877,13 +1818,9 @@ void DevToolsWindow::OpenInNewTab(const GURL& url) {
   if (!inspected_web_contents ||
       !inspected_web_contents->OpenURL(params,
                                        /*navigation_handle_callback=*/{})) {
-#if BUILDFLAG(IS_ANDROID)
-    NOTIMPLEMENTED();
-#else
     chrome::ScopedTabbedBrowserDisplayer displayer(profile_);
     chrome::AddSelectedTabWithURL(displayer.browser_window_interface(),
                                   fixed_url, ui::PAGE_TRANSITION_LINK);
-#endif
   }
 }
 
@@ -1953,11 +1890,9 @@ void DevToolsWindow::RenderProcessGone(bool crashed) {
   if (is_docked_) {
     CloseContents(main_web_contents_);
   } else {
-#if !BUILDFLAG(IS_ANDROID)
     if (browser_ && crashed) {
       browser_->GetWindow()->Close();
     }
-#endif
   }
 }
 
@@ -1986,9 +1921,6 @@ void DevToolsWindow::ShowCertificateViewer(const std::string& cert_chain) {
   if (!inspected_contents) {
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  NOTIMPLEMENTED();
-#else
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           inspected_contents);
@@ -1997,7 +1929,6 @@ void DevToolsWindow::ShowCertificateViewer(const std::string& cert_chain) {
   }
   gfx::NativeWindow parent = browser->GetWindow()->GetNativeWindow();
   ::ShowCertificateViewer(inspected_contents, parent, cert.get());
-#endif
 }
 
 void DevToolsWindow::OnLoadCompleted() {
@@ -2078,9 +2009,6 @@ void DevToolsWindow::CreateDevToolsBrowser() {
     wp_prefs.Set(kDevToolsApp, std::move(dev_tools_defaults));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  NOTIMPLEMENTED();
-#else
   if (GetBrowserWindowCreationStatusForProfile(*profile_) !=
       BrowserWindowInterface::CreationStatus::kOk) {
     return;
@@ -2091,7 +2019,6 @@ void DevToolsWindow::CreateDevToolsBrowser() {
       OwnedMainWebContents::TakeWebContents(
           std::move(owned_main_web_contents_)),
       -1, ui::PAGE_TRANSITION_AUTO_TOPLEVEL, AddTabTypes::ADD_ACTIVE);
-#endif
   OverrideAndSyncDevToolsRendererPrefs();
 }
 
@@ -2221,19 +2148,14 @@ void DevToolsWindow::MaybeShowSharedProcessInfobar() {
   }
 
   if (primary_main_frame_count > 1) {
-#if !BUILDFLAG(IS_ANDROID)
     auto* info_bar_manager = GetInfoBarManager();
     sharing_infobar_ = info_bar_manager->AddInfoBar(
         CreateConfirmInfoBar(std::make_unique<ProcessSharingInfobarDelegate>(
             inspected_web_contents)));
     info_bar_manager->AddObserver(this);
-#else
-    NOTIMPLEMENTED();
-#endif
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void DevToolsWindow::OnBrowserClosed(BrowserWindowInterface* browser) {
   // If the modal dialog manager has this browser as its delegate, clear the
   // reference before it becomes dangling.
@@ -2245,7 +2167,6 @@ void DevToolsWindow::OnBrowserClosed(BrowserWindowInterface* browser) {
     dialog_manager->SetDelegate(nullptr);
   }
 }
-#endif
 
 void DevToolsWindow::OnInfoBarRemoved(infobars::InfoBar* infobar,
                                       bool animate) {

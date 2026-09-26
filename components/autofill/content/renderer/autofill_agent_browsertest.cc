@@ -1774,11 +1774,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 // Tests that clicking on a field triggers AskForValuesToFillOnClick().
 // TODO(crbug.com/342126797): Fix Android's OnAskForValuesToFill() event.
-#if !BUILDFLAG(IS_ANDROID)
 #define MAYBE_AskForValuesToFillOnClick AskForValuesToFillOnClick
-#else
-#define MAYBE_AskForValuesToFillOnClick DISABLED_AskForValuesToFillOnClick
-#endif
 TEST_P(AutofillAgentTestClick, MAYBE_AskForValuesToFillOnClick) {
   testing::MockFunction<void(std::string_view)> checkpoint;
   {

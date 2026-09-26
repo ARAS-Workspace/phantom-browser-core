@@ -37,11 +37,6 @@
 #include "third_party/blink/public/mojom/service_worker/service_worker_event_status.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_registration.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/android/background_sync_network_observer_android.h"
-#include "content/browser/background_sync/background_sync_launcher.h"
-#endif
-
 using blink::mojom::BackgroundSyncType;
 using blink::mojom::PermissionStatus;
 using SyncAndNotificationPermissions =
@@ -673,15 +668,9 @@ BackgroundSyncManager::BackgroundSyncManager(
 
   service_worker_context_->AddObserver(this);
 
-#if BUILDFLAG(IS_ANDROID)
-  network_observer_ = std::make_unique<BackgroundSyncNetworkObserverAndroid>(
-      base::BindRepeating(&BackgroundSyncManager::OnNetworkChanged,
-                          weak_ptr_factory_.GetWeakPtr()));
-#else
   network_observer_ = std::make_unique<BackgroundSyncNetworkObserver>(
       base::BindRepeating(&BackgroundSyncManager::OnNetworkChanged,
                           weak_ptr_factory_.GetWeakPtr()));
-#endif
 }
 
 void BackgroundSyncManager::Init() {
@@ -2346,11 +2335,6 @@ void BackgroundSyncManager::OnStorageWipedImpl(base::OnceClosure callback) {
 
 void BackgroundSyncManager::OnNetworkChanged() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-#if BUILDFLAG(IS_ANDROID)
-  if (parameters_->rely_on_android_network_detection)
-    return;
-#endif
 
   if (!AreOptionConditionsMet())
     return;

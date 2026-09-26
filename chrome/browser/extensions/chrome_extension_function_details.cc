@@ -93,13 +93,9 @@ gfx::NativeWindow ChromeExtensionFunctionDetails::GetNativeWindowForUI() {
   // TODO(devlin): This seems weird. Why wouldn't we check this first?
   content::WebContents* sender_web_contents = function_->GetSenderWebContents();
   if (sender_web_contents) {
-#if BUILDFLAG(IS_ANDROID)
-    bool supports_modal = !!sender_web_contents->GetTopLevelNativeWindow();
-#else
     bool supports_modal =
         web_modal::WebContentsModalDialogManager::FromWebContents(
             sender_web_contents);
-#endif
     if (supports_modal) {
       return sender_web_contents->GetTopLevelNativeWindow();
     }

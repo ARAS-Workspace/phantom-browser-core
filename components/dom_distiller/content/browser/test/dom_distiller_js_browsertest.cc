@@ -106,8 +106,7 @@ class DomDistillerJsTest : public content::ContentBrowserTest {
 // and it results in the failure of
 // EmbedExtractorTest.testImageExtractorWithAttributesCSSHeightCM (See
 // crrev.com/c/916021). We must solve this precision issue.
-#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_ANDROID) ||        \
-    defined(THREAD_SANITIZER) ||                                 \
+#if defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER) ||    \
     (BUILDFLAG(IS_LINUX) &&                                      \
      (BUILDFLAG(CFI_CAST_CHECK) || BUILDFLAG(CFI_ICALL_CHECK) || \
       BUILDFLAG(CFI_ENFORCEMENT_DIAGNOSTIC) ||                   \

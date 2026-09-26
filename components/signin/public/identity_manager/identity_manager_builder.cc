@@ -24,20 +24,10 @@
 #include "components/signin/public/identity_manager/accounts_mutator.h"
 #include "components/signin/public/identity_manager/device_accounts_synchronizer.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/internal/identity_manager/account_fetcher_factory_android.h"
-#else
 #include "components/signin/internal/identity_manager/account_fetcher_factory_gaia.h"
 #include "components/signin/public/webdata/token_web_data.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/internal/identity_manager/device_accounts_synchronizer_impl.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/signin/internal/identity_manager/accounts_mutator_impl.h"
-#endif
 
 namespace signin {
 
@@ -57,12 +47,8 @@ std::unique_ptr<AccountsMutator> BuildAccountsMutator(
     AccountTrackerService* account_tracker_service,
     ProfileOAuth2TokenService* token_service,
     PrimaryAccountManager* primary_account_manager) {
-#if !BUILDFLAG(IS_ANDROID)
   return std::make_unique<AccountsMutatorImpl>(
       token_service, account_tracker_service, primary_account_manager, prefs);
-#else
-  return nullptr;
-#endif
 }
 
 std::unique_ptr<AccountFetcherService> BuildAccountFetcherService(
@@ -136,10 +122,6 @@ IdentityManager::InitParameters BuildIdentityManagerInitParameters(
       token_service.get(), gaia_cookie_manager_service.get());
 
   std::unique_ptr<AccountFetcherFactory> account_fetcher_factory;
-#if BUILDFLAG(IS_ANDROID)
-  account_fetcher_factory = std::make_unique<AccountFetcherFactoryAndroid>(
-      *token_service.get(), *params->signin_client);
-#else
   // Default to server-based lookups if platform-specific capabilities fetcher
   // is not defined.
   if (params->account_fetcher_factory) {
@@ -148,17 +130,10 @@ IdentityManager::InitParameters BuildIdentityManagerInitParameters(
     account_fetcher_factory = std::make_unique<AccountFetcherFactoryGaia>(
         *token_service, *params->signin_client);
   }
-#endif  // BULIDFLAG(IS_ANDROID)
 
   init_params.account_fetcher_service = BuildAccountFetcherService(
       params->signin_client, token_service.get(), account_tracker_service.get(),
       std::move(params->image_decoder), std::move(account_fetcher_factory));
-
-#if BUILDFLAG(IS_ANDROID)
-  init_params.device_accounts_synchronizer =
-      std::make_unique<DeviceAccountsSynchronizerImpl>(
-          token_service->GetDelegate());
-#endif
 
   init_params.account_tracker_service = std::move(account_tracker_service);
   init_params.gaia_cookie_manager_service =

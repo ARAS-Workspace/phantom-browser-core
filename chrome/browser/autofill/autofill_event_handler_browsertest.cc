@@ -10,11 +10,7 @@
 #include "build/build_config.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/test/base/android/android_browser_test.h"  // nogncheck
-#else
 #include "chrome/browser/ui/browser.h"  // nogncheck
-#endif
 #include "base/command_line.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/test/base/chrome_test_utils.h"
@@ -46,11 +42,7 @@
 
 namespace autofill {
 
-#if BUILDFLAG(IS_ANDROID)
-class AutofillEventHandlerBrowserTest : public AndroidBrowserTest {
-#else
 class AutofillEventHandlerBrowserTest : public InProcessBrowserTest {
-#endif
  protected:
   class TestAutofillManager : public BrowserAutofillManager {
    public:
@@ -82,11 +74,7 @@ class AutofillEventHandlerBrowserTest : public InProcessBrowserTest {
   AutofillEventHandlerBrowserTest() = default;
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_ANDROID)
-    AndroidBrowserTest::SetUpOnMainThread();
-#else
     InProcessBrowserTest::SetUpOnMainThread();
-#endif
     ASSERT_TRUE(embedded_test_server()->Start());
 
     // Set up a test autofill profile
@@ -215,13 +203,7 @@ class AutofillEventHandlerBrowserTest : public InProcessBrowserTest {
   }
 
  private:
-  void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    AndroidBrowserTest::SetUp();
-#else
-    InProcessBrowserTest::SetUp();
-#endif
-  }
+  void SetUp() override { InProcessBrowserTest::SetUp(); }
 
   test::AutofillBrowserTestEnvironment autofill_test_environment_;
   TestAutofillManagerInjector<TestAutofillManager> autofill_manager_injector_;
@@ -479,11 +461,7 @@ IN_PROC_BROWSER_TEST_F(AutofillEventHandlerBrowserTest, CompleteAutofillFlow) {
 // Tests credit card forms where fields are split across multiple iframes,
 // verifying that the autofill event fires correctly in each frame with
 // the appropriate field data.
-#if BUILDFLAG(IS_ANDROID)
-class AutofillEventMultiFrameBrowserTest : public AndroidBrowserTest {
-#else
 class AutofillEventMultiFrameBrowserTest : public InProcessBrowserTest {
-#endif
  protected:
   // Credit card test data
   static constexpr char kNameFull[] = "John Doe";
@@ -647,11 +625,7 @@ class AutofillEventMultiFrameBrowserTest : public InProcessBrowserTest {
   AutofillEventMultiFrameBrowserTest() = default;
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_ANDROID)
-    AndroidBrowserTest::SetUpOnMainThread();
-#else
     InProcessBrowserTest::SetUpOnMainThread();
-#endif
     // Register request handler before starting server.
     embedded_test_server()->RegisterRequestHandler(
         base::BindRepeating(&AutofillEventMultiFrameBrowserTest::HandleRequest,
@@ -828,13 +802,7 @@ class AutofillEventMultiFrameBrowserTest : public InProcessBrowserTest {
   }
 
  private:
-  void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    AndroidBrowserTest::SetUp();
-#else
-    InProcessBrowserTest::SetUp();
-#endif
-  }
+  void SetUp() override { InProcessBrowserTest::SetUp(); }
 
   test::AutofillBrowserTestEnvironment autofill_test_environment_;
   TestAutofillManagerInjector<TestAutofillManager> autofill_manager_injector_;

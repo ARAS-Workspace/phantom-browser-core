@@ -30,13 +30,9 @@ bool DeviceHasEnoughMemoryForBackForwardCache() {
     // On Android, BackForwardCache is enabled for devices with 1200MB memory or
     // above.
     int default_memory_threshold_mb =
-#if BUILDFLAG(IS_ANDROID)
-        1200;
-#else
         // Desktop has lower memory limitations compared to Android allowing us
         // to enable BackForwardCache for all devices.
         0;
-#endif
     int memory_threshold_mb = base::GetFieldTrialParamByFeatureAsInt(
         features::kBackForwardCacheMemoryControls,
         "memory_threshold_for_back_forward_cache_in_mb",

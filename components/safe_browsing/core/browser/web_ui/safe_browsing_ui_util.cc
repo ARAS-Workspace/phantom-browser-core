@@ -17,11 +17,7 @@
 #include "components/safe_browsing/core/common/proto/realtimeapi.to_value.h"
 #include "components/safe_browsing/core/common/proto/safebrowsingv5.to_value.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/strings/escape.h"
-#else
 #include "components/enterprise/common/proto/upload_request_response.to_value.h"  // nogncheck crbug.com/40147906
-#endif
 
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "components/enterprise/common/proto/connectors.pb.h"
@@ -38,7 +34,7 @@ DeepScanDebugData::DeepScanDebugData(const DeepScanDebugData&) = default;
 DeepScanDebugData::~DeepScanDebugData() = default;
 #endif  //  BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 TailoredVerdictOverrideData::TailoredVerdictOverrideData() = default;
 TailoredVerdictOverrideData::~TailoredVerdictOverrideData() = default;
 
@@ -58,8 +54,7 @@ void TailoredVerdictOverrideData::Clear() {
   override_value.reset();
   source = 0u;
 }
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) &&
-        // !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 #if BUILDFLAG(SAFE_BROWSING_DB_LOCAL)
 
@@ -360,21 +355,6 @@ base::DictValue SerializeSecurityEvent(
   return result;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-base::DictValue SerializeReferringAppInfo(
-    const internal::ReferringAppInfo& info) {
-  base::DictValue dict;
-  dict.Set("referring_app_source",
-           ReferringAppInfo_ReferringAppSource_Name(info.referring_app_source));
-  dict.Set("referring_app_info", info.referring_app_name);
-  dict.Set("target_url", info.target_url.spec());
-  // Do not bother serializing referring_webapk_* here, because they are only
-  // populated for a WebAPK, and it is not possible to launch
-  // chrome://safe-browsing in a WebAPK, so they will never show up here.
-  return dict;
-}
-#endif
-
 std::string SerializePGPing(
     const LoginReputationClientRequestAndToken& request_and_token) {
   base::Value request = ToValue(request_and_token.request);
@@ -450,13 +430,8 @@ base::DictValue SerializeUploadEventsRequest(
         upload_events_request,
     const base::DictValue& result) {
   base::DictValue message;
-#if BUILDFLAG(IS_ANDROID)
-  message.Set("request",
-              base::EscapeNonASCII(upload_events_request.SerializeAsString()));
-#else
   message.Set("request",
               ::chrome::cros::reporting::proto::ToValue(upload_events_request));
-#endif
   message.Set("response", result.Clone());
 
   base::DictValue wrapper;

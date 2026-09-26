@@ -393,11 +393,7 @@ IN_PROC_BROWSER_TEST_P(DataSaverForWorkerBrowserTest,
 // Checks that the Save-Data header is sent in a request for shared worker
 // script when the data saver is enabled. Disabled on Android since a shared
 // worker is not available on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SharedWorker DISABLED_SharedWorker
-#else
 #define MAYBE_SharedWorker SharedWorker
-#endif
 IN_PROC_BROWSER_TEST_P(DataSaverForWorkerBrowserTest, MAYBE_SharedWorker) {
   data_saver::OverrideIsDataSaverEnabledForTesting(IsEnabledDataSaver());
 

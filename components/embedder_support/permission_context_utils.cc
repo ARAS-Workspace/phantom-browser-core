@@ -27,11 +27,6 @@
 #include "device/vr/buildflags/buildflags.h"
 #include "services/network/public/cpp/features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/permissions/contexts/geolocation_permission_context_android.h"
-#include "components/permissions/contexts/nfc_permission_context_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 #include "components/permissions/contexts/geolocation_permission_context_system.h"
 #include "services/device/public/cpp/device_features.h"
@@ -87,13 +82,7 @@ CreateDefaultPermissionContexts(content::BrowserContext* browser_context,
               delegates.clipboard_sanitized_write_permission_context_delegate));
   ContentSettingsType location_context_key =
       content_settings::GeolocationContentSettingsType();
-#if BUILDFLAG(IS_ANDROID)
-  permission_contexts[location_context_key] =
-      std::make_unique<permissions::GeolocationPermissionContextAndroid>(
-          browser_context,
-          std::move(delegates.geolocation_permission_context_delegate),
-          is_regular_profile);
-#elif BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
+#if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
   if (features::IsOsLevelGeolocationPermissionSupportEnabled()) {
     permission_contexts[location_context_key] =
         std::make_unique<permissions::GeolocationPermissionContextSystem>(
@@ -110,7 +99,7 @@ CreateDefaultPermissionContexts(content::BrowserContext* browser_context,
       std::make_unique<permissions::GeolocationPermissionContext>(
           browser_context,
           std::move(delegates.geolocation_permission_context_delegate));
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 #if BUILDFLAG(ENABLE_VR)
   if (device::features::IsHandTrackingEnabled()) {
     permission_contexts[ContentSettingsType::HAND_TRACKING] =
@@ -136,17 +125,10 @@ CreateDefaultPermissionContexts(content::BrowserContext* browser_context,
   permission_contexts[ContentSettingsType::MIDI_SYSEX] =
       std::make_unique<permissions::MidiSysexPermissionContext>(
           browser_context);
-#if BUILDFLAG(IS_ANDROID)
-  permission_contexts[ContentSettingsType::NFC] =
-      std::make_unique<permissions::NfcPermissionContextAndroid>(
-          browser_context,
-          std::move(delegates.nfc_permission_context_delegate));
-#else
   permission_contexts[ContentSettingsType::NFC] =
       std::make_unique<permissions::NfcPermissionContext>(
           browser_context,
           std::move(delegates.nfc_permission_context_delegate));
-#endif  // BUILDFLAG(IS_ANDROID)
   permission_contexts[ContentSettingsType::PAYMENT_HANDLER] =
       std::make_unique<payments::PaymentHandlerPermissionContext>(
           browser_context);

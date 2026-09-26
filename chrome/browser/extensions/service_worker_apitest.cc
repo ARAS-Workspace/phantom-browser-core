@@ -1245,13 +1245,8 @@ IN_PROC_BROWSER_TEST_F(ServiceWorkerTest,
 }
 
 // Flaky crashes during test setup. http://crbug.com/534230908
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ServiceWorkerSuspensionOnExtensionUnload \
-  DISABLED_ServiceWorkerSuspensionOnExtensionUnload
-#else
 #define MAYBE_ServiceWorkerSuspensionOnExtensionUnload \
   ServiceWorkerSuspensionOnExtensionUnload
-#endif
 IN_PROC_BROWSER_TEST_F(ServiceWorkerTest,
                        MAYBE_ServiceWorkerSuspensionOnExtensionUnload) {
   // For this test, only hold onto the extension's ID and URL + a function to
@@ -1633,7 +1628,6 @@ IN_PROC_BROWSER_TEST_F(ServiceWorkerTest,
       << message_;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // This test requires chrome.mimeHandlerPrivate, which is not supported on
 // Android.
 IN_PROC_BROWSER_TEST_F(ServiceWorkerTest, MimeHandlerView) {
@@ -1760,7 +1754,6 @@ IN_PROC_BROWSER_TEST_F(
       {embedder.spec(), "?inner=",
        base::EscapeQueryParamValue(inner.spec(), /*use_plus=*/false)})));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(ServiceWorkerBasedBackgroundTest,
                        EventsToStoppedWorker) {

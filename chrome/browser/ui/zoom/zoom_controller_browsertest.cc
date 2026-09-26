@@ -81,11 +81,7 @@ class ZoomControllerBrowserTest : public InProcessBrowserTest {
   }
 };  // ZoomControllerBrowserTest
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CrashedTabsDoNotChangeZoom DISABLED_CrashedTabsDoNotChangeZoom
-#else
 #define MAYBE_CrashedTabsDoNotChangeZoom CrashedTabsDoNotChangeZoom
-#endif
 IN_PROC_BROWSER_TEST_F(ZoomControllerBrowserTest,
                        MAYBE_CrashedTabsDoNotChangeZoom) {
   // At the start of the test we are at a tab displaying about:blank.

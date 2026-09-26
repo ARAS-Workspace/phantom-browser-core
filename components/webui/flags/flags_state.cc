@@ -38,10 +38,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/cached_flags/android/jni_delegate_impl.h"
-#endif
-
 namespace flags_ui {
 
 namespace internal {
@@ -287,13 +283,7 @@ FlagsState::FlagsState(base::span<const FeatureEntry> feature_entries,
                        FlagsState::Delegate* delegate)
     : feature_entries_(feature_entries),
       needs_restart_(false),
-      delegate_(delegate)
-#if BUILDFLAG(IS_ANDROID)
-      ,
-      jni_delegate_(std::make_unique<cached_flags::JniDelegateImpl>())
-#endif
-{
-}
+      delegate_(delegate) {}
 
 FlagsState::~FlagsState() = default;
 
@@ -653,8 +643,6 @@ unsigned short FlagsState::GetCurrentPlatform() {
   return kOsMac;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
   return kOsLinux;
-#elif BUILDFLAG(IS_ANDROID)
-  return kOsAndroid;
 #else
 #error Unknown platform
 #endif
@@ -972,98 +960,6 @@ void FlagsState::SetFlags(
     const std::set<std::string>& enabled_flags,
     const std::set<std::string>& prev_enabled_flags) const {
   flags_storage->SetFlags(enabled_flags);
-
-#if BUILDFLAG(IS_ANDROID)
-  // feature name -> feature value
-  // TODO(crbug.com/392871545): Change the type of this to
-  // std::map<std::string, bool> once Jni Autoboxing is working.
-  std::map<std::string, std::string> features;
-  // feature name -> (param name -> param value)
-  std::map<std::string, std::map<std::string, std::string>> feature_params;
-
-  // Handle flags that have been set to "Enabled" or "Disabled".
-  for (const std::string& flag : enabled_flags) {
-    size_t at_index = flag.find(testing::kMultiSeparator);
-    std::string feature_internal_name = flag.substr(0, at_index);
-    const flags_ui::FeatureEntry* entry =
-        FindFeatureEntryByName(feature_internal_name);
-    // Since this flag is currently enabled, we know for sure that we can find
-    // its feature entry using its internal name.
-    CHECK(entry);
-
-    if (entry->type == FeatureEntry::FEATURE_VALUE ||
-        entry->type == FeatureEntry::FEATURE_WITH_PARAMS_VALUE) {
-      std::string feature_name = entry->feature.feature->name;
-      std::string feature_option_str = flag.substr(at_index + 1);
-      int feature_option;
-      bool result = base::StringToInt(feature_option_str, &feature_option);
-      DCHECK(result);
-      FeatureEntry::FeatureState feature_state =
-          entry->StateForOption(feature_option);
-      bool feature_value =
-          (feature_state == FeatureEntry::FeatureState::ENABLED);
-      features[feature_name] = base::ToString(feature_value);
-
-      if (entry->type == FeatureEntry::FEATURE_WITH_PARAMS_VALUE) {
-        feature_params[feature_name] = std::map<std::string, std::string>();
-        std::map<std::string, std::string>& cur_feature_params =
-            feature_params[feature_name];
-        const FeatureEntry::FeatureVariation* feature_variations =
-            entry->VariationForOption(feature_option);
-        if (!feature_variations) {
-          // When this line is reached, the feature must be set to either
-          // "Enabled" (without parameters) or "Disabled". Both of these options
-          // are associated with an empty set of parameters. Hence the key
-          // feature_name is mapped to an empty map in feature_params.
-          continue;
-        }
-        for (const auto& feature_param : feature_variations->params) {
-          std::string param_name = std::string(feature_param.param_name);
-          std::string param_value = std::string(feature_param.param_value);
-          cur_feature_params[param_name] = std::move(param_value);
-        }
-      }
-    }
-  }
-
-  jni_delegate_->CacheNativeFlagsImmediately(features);
-  jni_delegate_->CacheFeatureParamsImmediately(feature_params);
-
-  // a list of feature names for which we need to erase the
-  // Java cached values of the associated features
-  std::vector<std::string> features_to_erase;
-  // a list of feature names for which we need to erase the
-  // Java cached values of the associated feature params
-  std::vector<std::string> feature_params_to_erase;
-
-  // Handle flags that have been switched to "Default".
-  for (const std::string& flag : prev_enabled_flags) {
-    if (enabled_flags.find(flag) == enabled_flags.end()) {
-      size_t at_index = flag.find(testing::kMultiSeparator);
-      std::string feature_internal_name = flag.substr(0, at_index);
-      const flags_ui::FeatureEntry* entry =
-          FindFeatureEntryByName(feature_internal_name);
-      // Since this flag is enabled previously but not enabled right now, it is
-      // possible that we have removed this flag from the codebase. Therefore,
-      // if we cannot find the feature entry, we just move on.
-      if (entry == nullptr) {
-        continue;
-      }
-
-      if (entry->type == FeatureEntry::FEATURE_VALUE ||
-          entry->type == FeatureEntry::FEATURE_WITH_PARAMS_VALUE) {
-        std::string feature_name = entry->feature.feature->name;
-        features_to_erase.push_back(feature_name);
-        if (entry->type == FeatureEntry::FEATURE_WITH_PARAMS_VALUE) {
-          feature_params_to_erase.push_back(feature_name);
-        }
-      }
-    }
-  }
-
-  jni_delegate_->EraseNativeFlagCachedValues(features_to_erase);
-  jni_delegate_->EraseFeatureParamCachedValues(feature_params_to_erase);
-#endif
 }
 
 }  // namespace flags_ui

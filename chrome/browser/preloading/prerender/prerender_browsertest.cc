@@ -47,11 +47,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "ui/base/device_form_factor.h"
-#endif
-
 namespace {
 
 namespace {
@@ -192,25 +187,15 @@ void PrerenderBrowserTest::TestPrerenderAndActivateInNewTab(
 
 // An end-to-end test of prerendering in a new tab and activating.
 // Disabled on Android due to failures: https://crbug.com/355255740.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PrerenderAndActivate_InNewTab \
-  DISABLED_PrerenderAndActivate_InNewTab
-#else
 #define MAYBE_PrerenderAndActivate_InNewTab PrerenderAndActivate_InNewTab
-#endif
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
                        MAYBE_PrerenderAndActivate_InNewTab) {
   TestPrerenderAndActivateInNewTab("clickSameSiteNewWindowLink();", true);
 }
 
 // Disabled on Android due to failures: https://crbug.com/355255740.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PrerenderAndActivate_InNewTab_Noopener \
-  DISABLED_PrerenderAndActivate_InNewTab_Noopener
-#else
 #define MAYBE_PrerenderAndActivate_InNewTab_Noopener \
   PrerenderAndActivate_InNewTab_Noopener
-#endif
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
                        MAYBE_PrerenderAndActivate_InNewTab_Noopener) {
   TestPrerenderAndActivateInNewTab("clickSameSiteNewWindowWithNoopenerLink();",
@@ -220,13 +205,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
 // Prerendering in a new tab should not be activate for a new window with an
 // opener.
 // The test is flaky on android-12l-x64-dbg-tests: https://crbug.com/40935364.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PrerenderAndActivate_InNewTab_Opener \
-  DISABLED_PrerenderAndActivate_InNewTab_Opener
-#else
 #define MAYBE_PrerenderAndActivate_InNewTab_Opener \
   PrerenderAndActivate_InNewTab_Opener
-#endif  // #if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_X86)
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
                        MAYBE_PrerenderAndActivate_InNewTab_Opener) {
   TestPrerenderAndActivateInNewTab("clickSameSiteNewWindowWithOpenerLink();",
@@ -241,11 +221,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
 
 // Tests main frame navigation on a prerendered page in a new tab.
 // Disabled on Android due to failures: https://crbug.com/355255740.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_MainFrameNavigation_InNewTab DISABLED_MainFrameNavigation_InNewTab
-#else
 #define MAYBE_MainFrameNavigation_InNewTab MainFrameNavigation_InNewTab
-#endif
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
                        MAYBE_MainFrameNavigation_InNewTab) {
   base::HistogramTester histogram_tester;
@@ -476,21 +452,10 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, DisableNetworkPrediction) {
 }
 
 // TODO(https://crbug.com/455854991): Failing on Android tablets.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PreloadingHoldbackOverridden DISABLED_PreloadingHoldbackOverridden
-#else
 #define MAYBE_PreloadingHoldbackOverridden PreloadingHoldbackOverridden
-#endif
 // Tests that DevTools open overrides PreloadingConfig's holdback.
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
                        MAYBE_PreloadingHoldbackOverridden) {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::android_info::sdk_int() >=
-          base::android::android_info::SDK_VERSION_U &&
-      ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_DESKTOP) {
-    GTEST_SKIP() << "Disabled on Android U+ tablets due to crbug.com/393195683";
-  }
-#endif
   prerender_helper().SetHoldback("Prerender", "SpeculationRules", true);
   base::HistogramTester histogram_tester;
 
@@ -1076,13 +1041,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderPrewarmDefaultSearchEngineTest,
 }
 
 // TODO(https://crbug.com/455856004): Failing on Android tablets.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PrewarmPrerenderReuseThenActivate \
-  DISABLED_PrewarmPrerenderReuseThenActivate
-#else
 #define MAYBE_PrewarmPrerenderReuseThenActivate \
   PrewarmPrerenderReuseThenActivate
-#endif
 IN_PROC_BROWSER_TEST_F(PrerenderPrewarmDefaultSearchEngineTest,
                        MAYBE_PrewarmPrerenderReuseThenActivate) {
   // Navigate to an initial page.

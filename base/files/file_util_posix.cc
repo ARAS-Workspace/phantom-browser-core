@@ -61,14 +61,8 @@
 #include "base/apple/foundation_util.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include <sys/sendfile.h>
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/content_uri_utils.h"
-#include "base/android/virtual_document_path.h"
-#include "base/os_compat_android.h"
 #endif
 
 #include <grp.h>
@@ -374,12 +368,6 @@ bool DoDeleteFile(const PlatformFile at_fd,
 bool DoDeleteFile(const FilePath& path, bool recursive) {
   ScopedBlockingCall scoped_blocking_call(FROM_HERE, BlockingType::MAY_BLOCK);
 
-#if BUILDFLAG(IS_ANDROID)
-  if (path.IsContentUri()) {
-    return internal::DeleteContentUri(path);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
-
   return DoDeleteFile(AT_FDCWD, path.value().c_str(), recursive);
 }
 
@@ -396,8 +384,7 @@ std::string AppendModeCharacter(std::string_view mode, char mode_char) {
 }
 #endif
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_APPLE) && \
-    !(BUILDFLAG(IS_ANDROID) && __ANDROID_API__ >= 21)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_APPLE)
 bool PreReadFileSlow(const FilePath& file_path, int64_t max_bytes) {
   DCHECK_GE(max_bytes, 0);
 
@@ -431,11 +418,6 @@ bool PreReadFileSlow(const FilePath& file_path, int64_t max_bytes) {
 }  // namespace
 
 FilePath MakeAbsoluteFilePath(const FilePath& input) {
-#if BUILDFLAG(IS_ANDROID)
-  if (input.IsContentUri() || input.IsVirtualDocumentPath()) {
-    return input;
-  }
-#endif
   ScopedBlockingCall scoped_blocking_call(FROM_HERE, BlockingType::MAY_BLOCK);
   char full_path[PATH_MAX];
   if (realpath(input.value().c_str(), full_path) == nullptr) {
@@ -600,12 +582,6 @@ bool RemoveCloseOnExec(int fd) {
 
 bool PathExists(const FilePath& path) {
   ScopedBlockingCall scoped_blocking_call(FROM_HERE, BlockingType::MAY_BLOCK);
-#if BUILDFLAG(IS_ANDROID)
-  if (path.IsContentUri() || path.IsVirtualDocumentPath()) {
-    std::optional<FilePath> content_uri = base::ResolveToContentUri(path);
-    return content_uri && internal::ContentUriExists(*content_uri);
-  }
-#endif
   return access(path.value().c_str(), F_OK) == 0;
 }
 
@@ -669,15 +645,7 @@ bool ReadSymbolicLink(const FilePath& symlink_path, FilePath* target_path) {
   char buf[PATH_MAX];
   ssize_t count = ::readlink(symlink_path.value().c_str(), buf, std::size(buf));
 
-#if BUILDFLAG(IS_ANDROID) && defined(__LP64__)
-  // A few 64-bit Android L/M devices return INT_MAX instead of -1 here for
-  // errors; this is related to bionic's (incorrect) definition of ssize_t as
-  // being long int instead of int. Cast it so the compiler generates the
-  // comparison we want here. https://crbug.com/1101940
-  bool error = static_cast<int32_t>(count) <= 0;
-#else
   bool error = count <= 0;
-#endif
 
   if (error) {
     target_path->clear();
@@ -708,14 +676,6 @@ std::optional<FilePath> ReadSymbolicLinkAbsolute(const FilePath& symlink_path) {
 bool GetPosixFilePermissions(const FilePath& path, int* mode) {
   ScopedBlockingCall scoped_blocking_call(FROM_HERE, BlockingType::MAY_BLOCK);
   DCHECK(mode);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Stat() for content URIs only implements dir bit currently, so fail for
-  // GetPosixFilePermissions() until permissions are implemented.
-  if (path.IsContentUri()) {
-    return false;
-  }
-#endif
 
   stat_wrapper_t file_info;
   // Uses stat(), because on symbolic link, lstat() does not return valid
@@ -782,12 +742,8 @@ bool GetTempDir(FilePath* path) {
     return true;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  return PathService::Get(DIR_CACHE, path);
-#else
   *path = FilePath("/tmp");
   return true;
-#endif
 }
 #endif  // !BUILDFLAG(IS_APPLE)
 
@@ -798,10 +754,6 @@ FilePath GetHomeDir() {
   if (home_dir && home_dir[0]) {
     return FilePath(home_dir);
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  DLOG(WARNING) << "OS_ANDROID: Home directory lookup not yet implemented.";
-#endif
 
   FilePath rv;
   if (GetTempDir(&rv)) {
@@ -1057,21 +1009,6 @@ FILE* OpenFile(const FilePath& filename, base::cstring_view mode) {
          (comma_pos != base::cstring_view::npos && e_pos > comma_pos));
   ScopedBlockingCall scoped_blocking_call(FROM_HERE, BlockingType::MAY_BLOCK);
   FILE* result = nullptr;
-#if BUILDFLAG(IS_ANDROID)
-  if (filename.IsContentUri() || filename.IsVirtualDocumentPath()) {
-    std::optional<FilePath> content_uri = base::ResolveToContentUri(filename);
-    if (!content_uri) {
-      return nullptr;
-    }
-    // TODO(crbug.com/428129200): use mode.
-    int fd = internal::ContentUriGetFd(internal::OpenContentUri(
-        *content_uri, File::FLAG_OPEN | File::FLAG_READ));
-    if (fd < 0) {
-      return nullptr;
-    }
-    return fdopen(fd, mode.c_str());
-  }
-#endif
 #if BUILDFLAG(IS_APPLE)
   // macOS does not provide a mode character to set O_CLOEXEC; see
   // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man3/fopen.3.html.
@@ -1141,17 +1078,6 @@ std::optional<uint64_t> ReadFile(const FilePath& filename, span<char> buffer) {
 
 bool WriteFile(const FilePath& filename, span<const uint8_t> data) {
   ScopedBlockingCall scoped_blocking_call(FROM_HERE, BlockingType::MAY_BLOCK);
-#if BUILDFLAG(IS_ANDROID)
-  if (filename.IsVirtualDocumentPath()) {
-    std::optional<files_internal::VirtualDocumentPath> vp =
-        files_internal::VirtualDocumentPath::Parse(filename.value());
-    return vp && vp->WriteFile(data);
-  } else if (filename.IsContentUri()) {
-    File file(filename,
-              File::Flags::FLAG_WRITE | File::Flags::FLAG_CREATE_ALWAYS);
-    return file.Write(0, data).has_value();
-  }
-#endif
 
   int fd = HANDLE_EINTR(creat(filename.value().c_str(), 0666));
   if (fd < 0) {
@@ -1378,7 +1304,6 @@ int GetMaximumPathComponentLength(const FilePath& path) {
   return saturated_cast<int>(pathconf(path.value().c_str(), _PC_NAME_MAX));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // This is implemented in file_util_android.cc for that platform.
 bool GetShmemTempDir(bool executable, FilePath* path) {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
@@ -1398,7 +1323,6 @@ bool GetShmemTempDir(bool executable, FilePath* path) {
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   return GetTempDir(path);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_APPLE)
 // Mac has its own implementation, this is for all other Posix systems.
@@ -1427,7 +1351,7 @@ bool PreReadFile(const FilePath& file_path,
   // posix_fadvise() is only available in the Android NDK in API 21+. Older
   // versions may have the required kernel support, but don't have enough usage
   // to justify backporting.
-#if BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_ANDROID) && __ANDROID_API__ >= 21)
+#if BUILDFLAG(IS_LINUX)
   File file(file_path, File::FLAG_OPEN | File::FLAG_READ);
   if (!file.IsValid()) {
     return false;
@@ -1459,8 +1383,7 @@ bool PreReadFile(const FilePath& file_path,
   return fcntl(fd, F_RDADVISE, &read_advise_data) != -1;
 #else
   return PreReadFileSlow(file_path, max_bytes);
-#endif  // BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_ANDROID) && __ANDROID_API__ >=
-        // 21)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 // -----------------------------------------------------------------------------
@@ -1494,7 +1417,7 @@ bool MoveUnsafe(const FilePath& from_path, const FilePath& to_path) {
   return true;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 bool CopyFileContentsWithSendfile(File& infile,
                                   File& outfile,
                                   bool& retry_slow) {
@@ -1548,7 +1471,7 @@ bool CopyFileContentsWithSendfile(File& infile,
 
   return res >= 0;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace internal
 

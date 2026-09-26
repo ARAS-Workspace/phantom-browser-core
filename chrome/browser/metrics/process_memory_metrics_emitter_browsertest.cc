@@ -247,7 +247,7 @@ void CheckStableMemoryMetrics(const base::HistogramTester& histogram_tester,
       count;
 #endif
   const int count_for_private_swap_footprint =
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
       count;
 #else
       0;

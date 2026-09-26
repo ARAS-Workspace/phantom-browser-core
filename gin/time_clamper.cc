@@ -10,11 +10,6 @@ namespace gin {
 
 // As site isolation is enabled on desktop platforms, we can safely provide
 // more timing resolution. Jittering is still enabled everywhere.
-#if BUILDFLAG(IS_ANDROID)
-// static
-const int64_t TimeClamper::kResolutionMicros = 100;
-#else
 const int64_t TimeClamper::kResolutionMicros = 5;
-#endif
 
 }  // namespace gin

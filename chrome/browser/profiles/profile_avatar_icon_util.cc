@@ -207,10 +207,6 @@ void AvatarImageSource::Draw(gfx::Canvas* canvas) {
     y = canvas_size_.height() - height_ - 1;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Circular shape is only available on desktop platforms.
-  DCHECK(shape_ != profiles::SHAPE_CIRCLE);
-#else
   if (shape_ == profiles::SHAPE_CIRCLE) {
     // Draw the avatar on the bottom center of the canvas; overrides the
     // previous position specification to avoid leaving visible gap below the
@@ -224,7 +220,6 @@ void AvatarImageSource::Draw(gfx::Canvas* canvas) {
                        canvas_size_.width() / 2);
     canvas->ClipPath(circular_mask, true);
   }
-#endif
 
   canvas->DrawImageInt(avatar_, x, y);
 }
@@ -253,7 +248,6 @@ class ImageWithBackgroundSource : public gfx::CanvasImageSource {
   const SkColor background_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 struct AvatarRingGeometry {
   AvatarRingGeometry(int avatar_size, int gap_width, int ring_thickness)
       : total_size(avatar_size + 2 * (gap_width + ring_thickness)),
@@ -392,7 +386,6 @@ class AvatarWithProjectedRingSource : public gfx::CanvasImageSource {
   const AvatarRingGeometry geom_;
   const sk_sp<cc::PaintShader> shader_;
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Returns icon with padding with no background.
 const gfx::ImageSkia CreatePaddedIcon(const gfx::VectorIcon& icon,
@@ -519,18 +512,10 @@ constexpr base::FilePath::CharType kHighResAvatarFolderName[] =
     FILE_PATH_LITERAL("Avatars");
 
 // The size of the function-static kDefaultAvatarIconResources array below.
-#if BUILDFLAG(IS_ANDROID)
-constexpr size_t kDefaultAvatarIconsCount = 1;
-#else
 constexpr size_t kDefaultAvatarIconsCount = 56;
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 // The avatar used as a placeholder.
 constexpr size_t kPlaceholderAvatarIndex = 26;
-#else
-constexpr size_t kPlaceholderAvatarIndex = 0;
-#endif
 
 ui::ImageModel GetGuestAvatar(int size) {
   // Guest profiles generally use the default theme, no need to go through the
@@ -589,7 +574,6 @@ ui::ImageModel GetSizedAvatarImageModel(const ui::ImageModel& image, int size) {
                                         size);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 gfx::ImageSkia GetAvatarWithDottedRing(
     const ui::ImageModel& image,
     int size,
@@ -628,7 +612,6 @@ gfx::ImageSkia GetAvatarWithDottedRing(
           color_provider.GetColor(ui::kColorSysStateInactiveRing)),
       gfx::Size(size, size));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 gfx::Image GetAvatarIconForWebUI(const gfx::Image& image) {
   return GetSizedAvatarIcon(image, kAvatarIconSize, kAvatarIconSize);
@@ -691,15 +674,7 @@ size_t GetPlaceholderAvatarIndex() {
 }
 
 size_t GetModernAvatarIconStartIndex() {
-#if !BUILDFLAG(IS_ANDROID)
   return GetPlaceholderAvatarIndex() + 1;
-#else
-  // Only use the placeholder avatar on ChromeOS and Android.
-  // TODO(crbug.com/41444689): Clean up code and remove code dependencies from
-  // Android and ChromeOS. Avatar icons from this file are not used on these
-  // platforms.
-  return GetPlaceholderAvatarIndex();
-#endif
 }
 
 bool IsModernAvatarIconIndex(size_t icon_index) {
@@ -727,8 +702,7 @@ const IconResourceInfo* GetDefaultAvatarIconResourceInfo(size_t index) {
   CHECK_LT(index, kDefaultAvatarIconsCount);
   static const std::array<IconResourceInfo, kDefaultAvatarIconsCount>
       resource_info = {{
-  // Old avatar icons:
-#if !BUILDFLAG(IS_ANDROID)
+          // Old avatar icons:
           {IDR_PROFILE_AVATAR_0, "avatar_generic.png",
            IDS_DEFAULT_AVATAR_LABEL_0},
           {IDR_PROFILE_AVATAR_1, "avatar_generic_aqua.png",
@@ -781,11 +755,9 @@ const IconResourceInfo* GetDefaultAvatarIconResourceInfo(size_t index) {
            IDS_DEFAULT_AVATAR_LABEL_24},
           {IDR_PROFILE_AVATAR_25, "avatar_sun_cloud.png",
            IDS_DEFAULT_AVATAR_LABEL_25},
-#endif
           // Placeholder avatar icon:
           {IDR_PROFILE_AVATAR_26, nullptr, IDS_DEFAULT_AVATAR_LABEL_26},
 
-#if !BUILDFLAG(IS_ANDROID)
           // Modern avatar icons:
           {IDR_PROFILE_AVATAR_27, "avatar_origami_cat.png",
            IDS_DEFAULT_AVATAR_LABEL_27},
@@ -845,7 +817,6 @@ const IconResourceInfo* GetDefaultAvatarIconResourceInfo(size_t index) {
            IDS_DEFAULT_AVATAR_LABEL_54},
           {IDR_PROFILE_AVATAR_55, "avatar_abstract_sandwich.png",
            IDS_DEFAULT_AVATAR_LABEL_55},
-#endif
       }};
   return &resource_info[index];
 }
@@ -920,9 +891,7 @@ base::FilePath GetPathOfHighResAvatarAtIndex(size_t index) {
 }
 
 std::string GetDefaultAvatarIconUrl(size_t index) {
-#if !BUILDFLAG(IS_ANDROID)
   CHECK(IsDefaultAvatarIconIndex(index));
-#endif
   return base::StringPrintf("%s%" PRIuS, kDefaultUrlPrefix, index);
 }
 
@@ -1019,7 +988,6 @@ size_t GetRandomAvatarIconIndex(
   return interval_begin + random_offset;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 base::ListValue GetIconsAndLabelsForProfileAvatarSelector(
     const base::FilePath& profile_path) {
   ProfileAttributesEntry* entry =
@@ -1060,7 +1028,6 @@ base::ListValue GetIconsAndLabelsForProfileAvatarSelector(
 
   return avatars;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void SetDefaultProfileAvatarIndex(Profile* profile, size_t avatar_icon_index) {
   CHECK(IsDefaultAvatarIconIndex(avatar_icon_index));
@@ -1091,7 +1058,6 @@ ui::ImageModel EmbedAvatarOntoImage(int resource_id,
           avatar, avatar_position, avatar_size));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 gfx::ImageSkia AddLinearGradientRingToAvatar(
     const ui::ImageModel& avatar_image,
     const ui::ColorProvider& color_provider,
@@ -1120,6 +1086,5 @@ gfx::ImageSkia AddLinearGradientRingToAvatar(
                             sized_avatar_image, geom, std::move(shader)),
                         gfx::Size(geom.total_size, geom.total_size));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace profiles

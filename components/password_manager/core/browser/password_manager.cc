@@ -68,12 +68,6 @@
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/password_manager/core/browser/first_cct_page_load_passwords_ukm_recorder.h"
-#include "components/password_manager/core/browser/password_feature_manager.h"
-#include "components/password_manager/core/browser/password_sync_util.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 
 using autofill::ACCOUNT_CREATION_PASSWORD;
 using autofill::CalculateFormSignature;
@@ -426,38 +420,6 @@ base::flat_map<FieldRendererId, FieldType> KeyPredictionsByRendererIds(
       });
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Records the form submission if the user has saving enabled and
-// the password is eligible for saving.
-void SignalFormSubmissionIfEligibleForSaving(PasswordFormManager* manager,
-                                             PasswordManagerClient* client) {
-  if (!password_manager_util::IsAbleToSavePasswords(client)) {
-    return;
-  }
-
-  if (!manager->IsSavingAllowed()) {
-    return;
-  }
-
-  if (!ShouldPromptUserToSavePassword(*manager)) {
-    return;
-  }
-
-  if (!StoreResultFilterAllowsSaving(manager, client)) {
-    return;
-  }
-
-  if (manager->IsBlocklisted()) {
-    return;
-  }
-
-
-  client->PotentialSaveFormSubmitted();
-}
-
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 bool HasManuallyFilledFields(const PasswordForm& form) {
   return std::ranges::any_of(
       form.form_data.fields(), [&](const autofill::FormFieldData& field) {
@@ -465,7 +427,6 @@ bool HasManuallyFilledFields(const PasswordForm& form) {
                autofill::FieldPropertiesFlags::kAutofilledOnUserTrigger;
       });
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void RecordProvisionalSaveFailure(
     password_manager::PasswordManagerClient* client,
@@ -488,11 +449,9 @@ void HandleFailedLoginDetectionForPasswordChange(
                                            /*login_successful=*/false);
 
   // Proactive recovery on mobile will be implemented via touch to fill instead.
-#if !BUILDFLAG(IS_ANDROID)
   // Create a copy of the submitted form because it will soon be destroyed.
   client->GetUndoPasswordChangeController()->OnLoginPotentiallyFailed(
       driver, *submitted_manager.GetSubmittedForm());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 bool HasManuallyFilledPassword(const PasswordForm& form) {
@@ -544,10 +503,8 @@ void PasswordManager::RegisterProfilePrefs(
   registry->RegisterDoublePref(prefs::kLastTimePasswordStoreMetricsReported,
                                0.0);
 
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterDictionaryPref(
       prefs::kObsoleteAccountStoragePerAccountSettings);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   registry->RegisterTimePref(prefs::kProfileStoreDateLastUsedForFilling,
                              base::Time());
@@ -570,13 +527,6 @@ void PasswordManager::RegisterProfilePrefs(
       prefs::kPasswordDismissCompromisedAlertEnabled, true,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
   registry->RegisterBooleanPref(prefs::kPasswordsPrefWithNewLabelUsed, false);
-#if BUILDFLAG(IS_ANDROID)
-  registry->RegisterBooleanPref(prefs::kOfferToSavePasswordsEnabledGMS, true);
-  registry->RegisterBooleanPref(prefs::kAutoSignInEnabledGMS, true);
-  registry->RegisterStringPref(prefs::kUPMErrorUIShownTimestamp, "0");
-  registry->RegisterIntegerPref(
-      prefs::kPasswordGenerationBottomSheetDismissCount, 0);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
   registry->RegisterIntegerPref(
@@ -584,13 +534,11 @@ void PasswordManager::RegisterProfilePrefs(
   registry->RegisterBooleanPref(prefs::kHasUserInteractedWithBiometricAuthPromo,
                                 false);
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   registry->RegisterBooleanPref(prefs::kBiometricAuthenticationBeforeFilling,
                                 false);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_ANDROID)  // Desktop
+#endif  // BUILDFLAG(IS_MAC)
   registry->RegisterListPref(prefs::kPasswordManagerPromoCardsList);
-#endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   registry->RegisterListPref(prefs::kPasswordManagerBlocklist);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -603,9 +551,7 @@ void PasswordManager::RegisterProfilePrefs(
   registry->RegisterIntegerPref(prefs::kTotalPasswordsAvailableForProfile, 0);
   registry->RegisterIntegerPref(prefs::kPasswordRemovalReasonForAccount, 0);
   registry->RegisterIntegerPref(prefs::kPasswordRemovalReasonForProfile, 0);
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(prefs::kClearingUndecryptablePasswords, false);
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   registry->RegisterBooleanPref(prefs::kDeletingUndecryptablePasswordsEnabled,
@@ -823,15 +769,7 @@ bool PasswordManager::IsPasswordFieldDetectedOnPage() const {
 
 void PasswordManager::OnPasswordFormSubmitted(PasswordManagerDriver* driver,
                                               const FormData& form_data) {
-#if BUILDFLAG(IS_ANDROID)
-  PasswordFormManager* form_manager =
-      ProvisionallySaveForm(form_data, driver, false);
-  if (form_manager) {
-    SignalFormSubmissionIfEligibleForSaving(form_manager, client_);
-  }
-#else
   ProvisionallySaveForm(form_data, driver, false);
-#endif
 }
 
 void PasswordManager::OnDynamicFormSubmission(
@@ -866,10 +804,6 @@ void PasswordManager::OnDynamicFormSubmission(
     // false positives with regard to successful logins.
     return;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  SignalFormSubmissionIfEligibleForSaving(submitted_manager, client_);
-#endif
 
   submitted_manager->UpdateSubmissionIndicatorEvent(event);
 
@@ -906,9 +840,6 @@ void PasswordManager::OnPasswordFormCleared(
             manager->GetSubmittedForm()->new_password_element_renderer_id)) {
       manager->UpdateSubmissionIndicatorEvent(
           SubmissionIndicatorEvent::CHANGE_PASSWORD_FORM_CLEARED);
-#if BUILDFLAG(IS_ANDROID)
-      SignalFormSubmissionIfEligibleForSaving(manager, client_);
-#endif
       OnLoginSuccessful();
       return;
     }
@@ -1297,13 +1228,6 @@ bool PasswordManager::ShouldBlockPasswordForSameOriginButDifferentScheme(
 void PasswordManager::OnPasswordFormsRendered(
     password_manager::PasswordManagerDriver* driver,
     const std::vector<FormData>& visible_forms_data) {
-#if BUILDFLAG(IS_ANDROID)
-  FirstCctPageLoadPasswordsUkmRecorder* cct_ukm_recorder =
-      client_->GetFirstCctPageLoadUkmRecorder();
-  if (cct_ukm_recorder) {
-    cct_ukm_recorder->RecordHasPasswordForm();
-  }
-#endif
   CreatePendingLoginManagers(driver, visible_forms_data);
   std::unique_ptr<BrowserSavePasswordProgressLogger> logger =
       password_manager_util::GetLoggerIfAvailable(client_);
@@ -1398,9 +1322,7 @@ void PasswordManager::OnLoginSuccessful() {
   const PasswordForm* submitted_form = submitted_manager->GetSubmittedForm();
   CHECK(submitted_form);
 
-#if !BUILDFLAG(IS_ANDROID)
   MaybeTriggerHatsSurvey(*submitted_manager);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // User might fill several login flows during their user journey. For example,
   // Forgot Password Flow followed by sign-in flow. To not suggest usernames
@@ -1541,9 +1463,7 @@ void PasswordManager::OnLoginFailed(PasswordManagerDriver* driver,
   CHECK(submitted_manager);
   submitted_manager->GetMetricsRecorder()->LogSubmitFailed();
 
-#if !BUILDFLAG(IS_ANDROID)
   MaybeTriggerHatsSurvey(*submitted_manager);
-#endif  // !BUILDFLAG(IS_ANDROID)
   HandleFailedLoginDetectionForPasswordChange(client_, driver,
                                               *submitted_manager);
 
@@ -1832,7 +1752,6 @@ bool PasswordManager::IsFormManagerPendingPasswordUpdate() const {
          owned_submitted_form_manager_->IsPasswordUpdate();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void PasswordManager::MaybeTriggerHatsSurvey(
     PasswordFormManager& form_manager) {
   const PasswordForm* submitted_form = form_manager.GetSubmittedForm();
@@ -1844,6 +1763,5 @@ void PasswordManager::MaybeTriggerHatsSurvey(
             ->FillingAssinstanceToHatsInProductDataString());
   }
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager

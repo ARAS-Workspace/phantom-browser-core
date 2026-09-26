@@ -126,13 +126,6 @@ class CertVerifyProcFactoryImpl : public net::CertVerifyProcFactory {
           net::CreateChromeOnlySystemTrustStore(std::move(chrome_root));
     }
 
-#if BUILDFLAG(IS_ANDROID)
-    // Start initialization of TrustStoreAndroid on a separate thread if it
-    // hasn't been done already. We do this here instead of in the
-    // TrustStoreAndroid constructor to avoid any unnecessary threading in unit
-    // tests that don't use threads otherwise.
-    net::InitializeTrustStoreAndroid();
-#endif
     return net::CreateCertVerifyProcBuiltin(
         std::move(cert_net_fetcher), std::move(crl_set), std::move(ct_verifier),
         std::move(ct_policy_enforcer), std::move(trust_store), instance_params,
@@ -175,7 +168,7 @@ ConvertMojoListToInternalList(
 }  // namespace
 
 bool IsUsingCertNetFetcher() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
+#if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
   return true;
 #else
   return false;

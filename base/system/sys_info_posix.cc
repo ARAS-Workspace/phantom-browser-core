@@ -35,12 +35,7 @@
 #include "base/threading/scoped_blocking_call.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <sys/vfs.h>
-#define statvfs statfs  // Android uses a statvfs-like statfs struct and call.
-#else
 #include <sys/statvfs.h>
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 #include <linux/magic.h>
@@ -220,7 +215,7 @@ std::optional<SysInfo::DiskSpaceInfo> SysInfo::AmountOfDiskSpace(
       .available = ByteSize(static_cast<uint64_t>(available_bytes))};
 }
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
 // static
 std::string SysInfo::OperatingSystemName() {
   struct utsname info;
@@ -229,9 +224,9 @@ std::string SysInfo::OperatingSystemName() {
   }
   return std::string(info.sysname);
 }
-#endif  //! BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_APPLE)
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
 // static
 std::string SysInfo::OperatingSystemVersion() {
   struct utsname info;
@@ -242,7 +237,7 @@ std::string SysInfo::OperatingSystemVersion() {
 }
 #endif
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
 // static
 void SysInfo::OperatingSystemVersionNumbers(int32_t* major_version,
                                             int32_t* minor_version,
@@ -287,7 +282,7 @@ size_t SysInfo::VMAllocationGranularity() {
   return GetPageSize();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 
 namespace {
 std::vector<uint64_t> MaxFrequencyPerProcessorImpl() {
@@ -328,7 +323,7 @@ const std::vector<uint64_t>& SysInfo::MaxFrequencyPerProcessor() {
 #if !BUILDFLAG(IS_APPLE)
 // static
 int SysInfo::NumberOfEfficientProcessorsImpl() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // Try to guess the CPU architecture and cores of each cluster by comparing
   // the maximum frequencies of the available (online and offline) cores.
   const std::vector<uint64_t>& max_core_frequencies =

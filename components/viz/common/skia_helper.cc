@@ -19,12 +19,6 @@
 namespace viz {
 
 sk_sp<SkColorFilter> SkiaHelper::MakeOverdrawColorFilter() {
-#if BUILDFLAG(IS_ANDROID)
-  static const SkColor colors[SkOverdrawColorFilter::kNumColors] = {
-      0x00000000, 0x00000000, 0x2f0000ff, 0x2f00ff00, 0x3fff0000, 0x7fff0000,
-  };
-  return SkOverdrawColorFilter::MakeWithSkColors(colors);
-#else
   constexpr int kNumColors = 9;
   static const std::array<SkColor, kNumColors> colors = {
       /*no-color=*/0x00000000,  /*no-color=*/0x00000000,
@@ -60,7 +54,6 @@ sk_sp<SkColorFilter> SkiaHelper::MakeOverdrawColorFilter() {
   }
 
   return builder.makeColorFilter();
-#endif
 }
 
 sk_sp<SkImageFilter> SkiaHelper::BuildOpacityFilter(float opacity) {

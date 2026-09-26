@@ -23,11 +23,6 @@ namespace chrome {
 // Test the behavior of chrome::GetUserCacheDirectory.
 // See that function's comments for discussion of the subtleties.
 TEST(ChromePaths, UserCacheDir) {
-#if BUILDFLAG(IS_ANDROID)
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndDisableFeature(
-      features::kAndroidKeepProfilePartitionDirsInCacheDir);
-#endif
   base::FilePath test_profile_dir;  // Platform-specific profile directory path.
   base::FilePath expected_cache_dir;
 
@@ -36,11 +31,6 @@ TEST(ChromePaths, UserCacheDir) {
   test_profile_dir = test_profile_dir.Append("foobar");
   ASSERT_TRUE(base::PathService::Get(base::DIR_CACHE, &expected_cache_dir));
   expected_cache_dir = expected_cache_dir.Append("foobar");
-#elif BUILDFLAG(IS_ANDROID)
-  // No matter what the test_profile_dir is, Android always uses the
-  // application's cache directory since multiple profiles are not supported.
-  test_profile_dir = base::FilePath("\\Not a valid path");
-  ASSERT_TRUE(base::PathService::Get(base::DIR_CACHE, &expected_cache_dir));
 #elif BUILDFLAG(IS_POSIX)
   base::FilePath homedir;
   base::PathService::Get(base::DIR_HOME, &homedir);
@@ -65,98 +55,8 @@ TEST(ChromePaths, UserCacheDir) {
   base::FilePath non_special_profile_dir =
       base::FilePath(FILE_PATH_LITERAL("/some/other/path"));
   GetUserCacheDirectory(non_special_profile_dir, &cache_dir);
-#if BUILDFLAG(IS_ANDROID)
-  // Android always uses the same application cache directory.
-  EXPECT_EQ(expected_cache_dir.value(), cache_dir.value());
-#else
   EXPECT_EQ(non_special_profile_dir.value(), cache_dir.value());
-#endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-class ChromePathsAndroidTest : public testing::Test {
- protected:
-  void SetUp() override {
-    ASSERT_TRUE(base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir_));
-    ASSERT_TRUE(base::PathService::Get(base::DIR_CACHE, &cache_dir_base_));
-    default_profile_dir_ = user_data_dir_.AppendASCII(chrome::kInitialProfile);
-    partition_profile_dir_ = default_profile_dir_.AppendASCII("Storage")
-                                 .AppendASCII("ext")
-                                 .AppendASCII("glic");
-  }
-
-  base::FilePath user_data_dir_;
-  base::FilePath cache_dir_base_;
-  base::FilePath default_profile_dir_;
-  base::FilePath partition_profile_dir_;
-};
-
-TEST_F(ChromePathsAndroidTest, DefaultProfileFeatureEnabled) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(
-      features::kAndroidKeepProfilePartitionDirsInCacheDir);
-
-  base::FilePath cache_dir;
-  GetUserCacheDirectory(default_profile_dir_, &cache_dir);
-  EXPECT_EQ(cache_dir_base_.value(), cache_dir.value());
-}
-
-TEST_F(ChromePathsAndroidTest, PartitionFeatureEnabled) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(
-      features::kAndroidKeepProfilePartitionDirsInCacheDir);
-
-  base::FilePath cache_dir;
-  GetUserCacheDirectory(partition_profile_dir_, &cache_dir);
-  base::FilePath expected_partition_cache_dir =
-      cache_dir_base_.AppendASCII("Storage").AppendASCII("ext").AppendASCII(
-          "glic");
-  EXPECT_EQ(expected_partition_cache_dir.value(), cache_dir.value());
-}
-
-TEST_F(ChromePathsAndroidTest, TestProfileFeatureEnabled) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(
-      features::kAndroidKeepProfilePartitionDirsInCacheDir);
-
-  // Simulate a TestingProfile directory.
-  const base::FilePath test_profile_dir =
-      user_data_dir_.AppendASCII("test_profile_dir");
-
-  base::FilePath cache_dir;
-  GetUserCacheDirectory(test_profile_dir, &cache_dir);
-  EXPECT_EQ(cache_dir_base_.AppendASCII("test_profile_dir").value(),
-            cache_dir.value());
-
-  // Test partition under the test profile directory.
-  const base::FilePath test_partition_profile_dir =
-      test_profile_dir.AppendASCII("Storage").AppendASCII("ext").AppendASCII(
-          "glic");
-  GetUserCacheDirectory(test_partition_profile_dir, &cache_dir);
-  const base::FilePath expected_partition_cache_dir =
-      cache_dir_base_.AppendASCII("test_profile_dir")
-          .AppendASCII("Storage")
-          .AppendASCII("ext")
-          .AppendASCII("glic");
-  EXPECT_EQ(expected_partition_cache_dir.value(), cache_dir.value());
-}
-
-TEST_F(ChromePathsAndroidTest, FeatureDisabled) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndDisableFeature(
-      features::kAndroidKeepProfilePartitionDirsInCacheDir);
-
-  base::FilePath cache_dir;
-  // Default profile dir should NOT append anything.
-  GetUserCacheDirectory(default_profile_dir_, &cache_dir);
-  EXPECT_EQ(cache_dir_base_.value(), cache_dir.value());
-
-  // Partition profile dir should NOT append anything (old behavior).
-  GetUserCacheDirectory(partition_profile_dir_, &cache_dir);
-  EXPECT_EQ(cache_dir_base_.value(), cache_dir.value());
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Chrome OS doesn't use any of the desktop linux configuration.
 #if BUILDFLAG(IS_LINUX)

@@ -162,19 +162,10 @@ TEST(HashRealTimeUtilsTest,
 
 TEST(HashRealTimeUtilsTest, TestDetermineHashRealTimeSelection) {
   hash_realtime_utils::HashRealTimeSelection enabled_selection =
-#if BUILDFLAG(IS_ANDROID)
-      hash_realtime_utils::HashRealTimeSelection::kDatabaseManager;
-#else
       hash_realtime_utils::HashRealTimeSelection::kHashRealTimeService;
-#endif
   hash_realtime_utils::HashRealTimeSelection enabled_background_selection =
-#if BUILDFLAG(IS_ANDROID)
-      hash_realtime_utils::HashRealTimeSelection::
-          kDatabaseManagerBackgroundOnly;
-#else
       hash_realtime_utils::HashRealTimeSelection::
           kHashRealTimeServiceBackgroundOnly;
-#endif
   struct TestCase {
     SafeBrowsingState safe_browsing_state =
         SafeBrowsingState::STANDARD_PROTECTION;

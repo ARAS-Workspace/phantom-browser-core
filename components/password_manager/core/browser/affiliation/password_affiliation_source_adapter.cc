@@ -14,11 +14,7 @@ using affiliations::FacetURI;
 
 // Filling across affiliated sites is implemented differently on Android.
 bool IsFacetValidForAffiliation(const FacetURI& facet) {
-#if BUILDFLAG(IS_ANDROID)
-  return facet.IsValidAndroidFacetURI();
-#else
   return facet.IsValidAndroidFacetURI() || facet.IsValidWebFacetURI();
-#endif
 }
 }  // namespace
 

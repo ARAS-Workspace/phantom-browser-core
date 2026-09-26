@@ -31,12 +31,8 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/test/base/android/android_ui_test_utils.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif
 
 SubTestResult::SubTestResult() = default;
 SubTestResult::SubTestResult(const SubTestResult& other) = default;
@@ -107,14 +103,8 @@ std::tuple<bool, std::vector<SubTestResult>> ProcessMessagesFromJsTest(
 WebUIMochaBrowserTest::WebUIMochaBrowserTest()
     : test_loader_host_(chrome::kChromeUIWebUITestHost),
       test_loader_scheme_(content::kChromeUIScheme),
-// XmlUnitTestResultPrinter is not supported on Android.
-#if BUILDFLAG(IS_ANDROID)
-      sub_test_reporter_(nullptr)
-#else
-      sub_test_reporter_(std::make_unique<SubTestReporter>())
-#endif
-{
-}
+      // XmlUnitTestResultPrinter is not supported on Android.
+      sub_test_reporter_(std::make_unique<SubTestReporter>()) {}
 
 WebUIMochaBrowserTest::~WebUIMochaBrowserTest() = default;
 
@@ -136,13 +126,7 @@ Profile* WebUIMochaBrowserTest::GetProfileForSetup() {
 void WebUIMochaBrowserTest::SetUpOnMainThread() {
   // Load browser_tests.pak.
   base::FilePath pak_path;
-#if BUILDFLAG(IS_ANDROID)
-  // on Android all pak files are inside the paks folder.
-  ASSERT_TRUE(base::PathService::Get(base::DIR_ANDROID_APP_DATA, &pak_path));
-  pak_path = pak_path.Append(FILE_PATH_LITERAL("paks"));
-#else
   ASSERT_TRUE(base::PathService::Get(base::DIR_ASSETS, &pak_path));
-#endif  // BUILDFLAG(IS_ANDROID)
   pak_path = pak_path.AppendASCII("browser_tests.pak");
   ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
       pak_path, ui::kScaleFactorNone);
@@ -156,7 +140,6 @@ void WebUIMochaBrowserTest::SetUpOnMainThread() {
     webui::CreateAndAddUntrustedWebUITestDataSource(profile);
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Necessary setup for reporting code coverage metrics.
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(switches::kDevtoolsCodeCoverage)) {
@@ -165,7 +148,6 @@ void WebUIMochaBrowserTest::SetUpOnMainThread() {
     coverage_handler_ = std::make_unique<DevToolsAgentCoverageObserver>(
         devtools_code_coverage_dir, base::NullCallback(), test_loader_host_);
   }
-#endif
 }
 
 void WebUIMochaBrowserTest::RunTest(const std::string& file,
@@ -189,13 +171,7 @@ void WebUIMochaBrowserTest::RunTest(const std::string& file,
                              "/test_loader.html?module=") +
                      file);
 
-#if BUILDFLAG(IS_ANDROID)
-  android_ui_test_utils::OpenUrlInNewTab(
-      chrome_test_utils::GetProfile(this),
-      chrome_test_utils::GetActiveWebContents(this), url);
-#else
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-#endif
   content::WebContents* web_contents =
       chrome_test_utils::GetActiveWebContents(this);
   ASSERT_TRUE(web_contents);
@@ -276,7 +252,6 @@ testing::AssertionResult WebUIMochaBrowserTest::RunTestOnWebContents(
     }
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Report code coverage metrics.
   if (coverage_handler_ && coverage_handler_->CoverageEnabled()) {
     const std::string& full_test_name = base::StrCat({
@@ -287,7 +262,6 @@ testing::AssertionResult WebUIMochaBrowserTest::RunTestOnWebContents(
     });
     coverage_handler_->CollectCoverage(full_test_name);
   }
-#endif
 
   if (!success) {
     testing::Message msg;

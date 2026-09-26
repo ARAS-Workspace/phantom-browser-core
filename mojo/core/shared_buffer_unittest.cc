@@ -218,12 +218,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReceiveAndEditBufferParent,
   EXPECT_EQ(MOJO_RESULT_OK, MojoClose(parent));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Android multi-process tests are not executing the new process. This is flaky.
-#define MAYBE_PassHandleBetweenCousins DISABLED_PassHandleBetweenCousins
-#else
 #define MAYBE_PassHandleBetweenCousins PassHandleBetweenCousins
-#endif
 TEST_F(SharedBufferTest, MAYBE_PassHandleBetweenCousins) {
   if (IsMojoIpczEnabled()) {
     // TODO(crbug.com/40058840): This test relies on Mojo invitations

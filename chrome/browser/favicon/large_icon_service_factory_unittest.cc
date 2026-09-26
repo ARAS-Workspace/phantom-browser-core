@@ -10,11 +10,7 @@
 class LargeIconServiceFactoryTest : public testing::Test {};
 
 TEST_F(LargeIconServiceFactoryTest, DesiredSizeInDipForServerRequests) {
-#if BUILDFLAG(IS_ANDROID)
-  const int expected = 32;
-#else
   const int expected = 16;
-#endif
 
   EXPECT_EQ(LargeIconServiceFactory::desired_size_in_dip_for_server_requests(),
             expected);

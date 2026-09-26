@@ -93,7 +93,6 @@ class SecureOriginAllowlistBrowsertest
     }
 
     policy::PolicyMap values;
-#if !BUILDFLAG(IS_ANDROID)
     values.Set((variant == TestVariant::kPolicyOld ||
                 variant == TestVariant::kPolicyOldAndNew)
                    ? policy::key::kUnsafelyTreatInsecureOriginAsSecure
@@ -109,12 +108,6 @@ class SecureOriginAllowlistBrowsertest
                  policy::POLICY_SOURCE_CLOUD,
                  base::Value(std::move(other_urls)), nullptr);
     }
-#else
-    values.Set(policy::key::kOverrideSecurityRestrictionsOnInsecureOrigin,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
-               policy::POLICY_SOURCE_CLOUD, base::Value(std::move(urls)),
-               nullptr);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     provider_.UpdateChromePolicy(values);
   }
@@ -133,19 +126,18 @@ class SecureOriginAllowlistBrowsertest
   testing::NiceMock<policy::MockConfigurationPolicyProvider> provider_;
 };
 
-INSTANTIATE_TEST_SUITE_P(SecureOriginAllowlistBrowsertest,
-                         SecureOriginAllowlistBrowsertest,
-                         testing::Values(TestVariant::kNone,
-                                         TestVariant::kCommandline,
-// The legacy policy isn't defined on Android, so skip tests that use it on
-// those platforms.
-#if !BUILDFLAG(IS_ANDROID)
-                                         TestVariant::kPolicyOld,
-                                         TestVariant::kPolicyOldAndNew,
-#endif
-                                         TestVariant::kPolicy,
-                                         TestVariant::kPolicy2,
-                                         TestVariant::kPolicy3));
+INSTANTIATE_TEST_SUITE_P(
+    SecureOriginAllowlistBrowsertest,
+    SecureOriginAllowlistBrowsertest,
+    testing::Values(TestVariant::kNone,
+                    TestVariant::kCommandline,
+                    // The legacy policy isn't defined on Android, so skip tests
+                    // that use it on those platforms.
+                    TestVariant::kPolicyOld,
+                    TestVariant::kPolicyOldAndNew,
+                    TestVariant::kPolicy,
+                    TestVariant::kPolicy2,
+                    TestVariant::kPolicy3));
 
 IN_PROC_BROWSER_TEST_P(SecureOriginAllowlistBrowsertest, Simple) {
   GURL url = embedded_test_server()->GetURL(

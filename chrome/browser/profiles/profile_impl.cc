@@ -189,17 +189,11 @@
 #include "services/service_manager/public/cpp/service.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/profile_key_startup_accessor.h"
-#include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
-#include "components/password_manager/core/common/password_manager_features.h"
-#else
 #include "chrome/browser/accessibility/ax_main_node_annotator_controller_factory.h"
 #include "chrome/browser/first_run/first_run.h"
 #include "chrome/browser/ui/startup/features.h"
 #include "content/public/common/page_zoom.h"
 #include "ui/accessibility/accessibility_features.h"
-#endif
 
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 #include "chrome/browser/background/extensions/background_mode_manager.h"  // nogncheck crbug.com/40147906
@@ -237,9 +231,7 @@
 #include "components/gapis/gapis_service.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/themes/theme_service_factory.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 using bookmarks::BookmarkModel;
 using content::BrowserThread;
@@ -363,11 +355,7 @@ void ProfileImpl::RegisterProfilePrefs(
   // Whether a profile is using a default avatar name (eg. Pickles or Person 1).
   registry->RegisterBooleanPref(prefs::kProfileUsingDefaultName, true);
   registry->RegisterStringPref(prefs::kProfileName, std::string());
-#if BUILDFLAG(IS_ANDROID)
-  uint32_t home_page_flags = PrefRegistry::NO_REGISTRATION_FLAGS;
-#else
   uint32_t home_page_flags = user_prefs::PrefRegistrySyncable::SYNCABLE_PREF;
-#endif
   registry->RegisterStringPref(prefs::kHomePage, std::string(),
                                home_page_flags);
   registry->RegisterStringPref(prefs::kNewTabPageLocationOverride,
@@ -392,9 +380,7 @@ void ProfileImpl::RegisterProfilePrefs(
 
   registry->RegisterBooleanPref(prefs::kForceEphemeralProfiles, false);
   registry->RegisterBooleanPref(prefs::kEnableMediaRouter, true);
-#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(prefs::kShowCastIconInToolbar, false);
-#endif  // !BUILDFLAG(IS_ANDROID)
   registry->RegisterTimePref(prefs::kProfileCreationTime, base::Time());
 
 #if BUILDFLAG(ENABLE_PDF_INK2)
@@ -432,11 +418,9 @@ ProfileImpl::ProfileImpl(
   if (is_guest_session) {
     profile_metrics::SetBrowserProfileType(
         this, profile_metrics::BrowserProfileType::kGuest);
-#if !BUILDFLAG(IS_ANDROID)
   } else if (path == ProfileManager::GetSystemProfilePath()) {
     profile_metrics::SetBrowserProfileType(
         this, profile_metrics::BrowserProfileType::kSystem);
-#endif  // !BUILDFLAG(IS_ANDROID)
   } else {
     profile_metrics::SetBrowserProfileType(
         this, profile_metrics::BrowserProfileType::kRegular);
@@ -449,14 +433,7 @@ ProfileImpl::ProfileImpl(
   // The ProfileImpl can be created both synchronously and asynchronously.
   bool async_prefs = create_mode == CreateMode::kAsynchronous;
 
-#if BUILDFLAG(IS_ANDROID)
-  auto* startup_data = g_browser_process->startup_data();
-  DCHECK(startup_data && startup_data->GetProfileKey());
-  TakePrefsFromStartupData();
-  async_prefs = false;
-#else
   LoadPrefsForNormalStartup(async_prefs);
-#endif
 
   // Register on BrowserContext.
   user_prefs::UserPrefs::Set(this, prefs_.get());
@@ -474,7 +451,6 @@ ProfileImpl::ProfileImpl(
     // Prefs were loaded synchronously so we can continue directly.
     OnPrefsLoaded(create_mode, true);
   }
-#if !BUILDFLAG(IS_ANDROID)
   if (IsGuestSession()) {
     PrefService* local_state = g_browser_process->local_state();
     DCHECK(local_state);
@@ -482,31 +458,7 @@ ProfileImpl::ProfileImpl(
         "Profile.Guest.ForcedByPolicy",
         local_state->GetBoolean(prefs::kBrowserGuestModeEnforced));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void ProfileImpl::TakePrefsFromStartupData() {
-  auto* startup_data = g_browser_process->startup_data();
-
-  // On Android, it is possible that the ProfileKey has been build before the
-  // ProfileImpl is created. The ownership of all these pre-created objects
-  // will be taken by ProfileImpl.
-  key_ = startup_data->TakeProfileKey();
-  prefs_ = startup_data->TakeProfilePrefService();
-  schema_registry_service_ = startup_data->TakeSchemaRegistryService();
-  user_cloud_policy_manager_ = startup_data->TakeUserCloudPolicyManager();
-  profile_policy_connector_ = startup_data->TakeProfilePolicyConnector();
-  pref_registry_ = startup_data->TakePrefRegistrySyncable();
-
-  // The extension prefs value store requires a profile, so it can't be created
-  // in StartupData.
-  prefs_->UpdateExtensionPrefStore(
-      CreateExtensionPrefStore(this, /*incognito_pref_store=*/false));
-
-  ProfileKeyStartupAccessor::GetInstance()->Reset();
-}
-#endif
 
 void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
   key_ = std::make_unique<ProfileKey>(GetPath());
@@ -766,16 +718,9 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   // preference reconciliation occurs.
   PrivacySandboxServiceFactory::GetForProfile(this);
 
-#if BUILDFLAG(IS_ANDROID)
-  // The password settings service needs to start listening to settings
-  // changes from Google Mobile Services, as early as possible.
-  PasswordManagerSettingsServiceFactory::GetForProfile(this);
-#else
-
   if (features::IsMainNodeAnnotationsEnabled()) {
     screen_ai::AXMainNodeAnnotatorControllerFactory::GetForProfile(this);
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // The announcement notification  service might not be available for some
   // irregular profiles, like the System Profile.
@@ -1020,7 +965,6 @@ void ProfileImpl::OnLocaleReady(CreateMode create_mode) {
   CHECK(!ProfilePasswordStoreFactory::HasStore(this));
   CHECK(!AccountPasswordStoreFactory::HasStore(this));
   CHECK(!ReadingListModelFactory::HasModel(this));
-#if !BUILDFLAG(IS_ANDROID)
   CHECK(!ThemeServiceFactory::GetForProfileIfExists(this));
 
   if (create_mode == CreateMode::kAsynchronous) {
@@ -1028,9 +972,7 @@ void ProfileImpl::OnLocaleReady(CreateMode create_mode) {
         GetPath(), GetPrefs(),
         base::BindOnce(&ProfileImpl::OnSyncToSigninMigrationMaybeCompleted,
                        weak_ptr_factory_.GetWeakPtr(), create_mode));
-  } else
-#endif  // !BUILDFLAG(IS_ANDROID)
-  {
+  } else {
     browser_sync::MaybeMigrateSyncingUserToSignedIn(GetPath(), GetPrefs());
     OnSyncToSigninMigrationMaybeCompleted(create_mode);
   }
@@ -1093,16 +1035,11 @@ bool ProfileImpl::WasCreatedByVersionOrLater(const std::string& version) {
 }
 
 bool ProfileImpl::ShouldRestoreOldSessionCookies() {
-#if BUILDFLAG(IS_ANDROID)
-  SessionStartupPref startup_pref(SessionStartupPref::GetDefaultStartupType());
-  return startup_pref.ShouldRestoreLastSession();
-#else
   SessionStartupPref startup_pref =
       StartupBrowserCreator::GetSessionStartupPref(
           *base::CommandLine::ForCurrentProcess(), this);
   return ExitTypeService::GetLastSessionExitType(this) == ExitType::kCrashed ||
          startup_pref.ShouldRestoreLastSession();
-#endif
 }
 
 bool ProfileImpl::ShouldPersistSessionCookies() const {
@@ -1110,12 +1047,6 @@ bool ProfileImpl::ShouldPersistSessionCookies() const {
 }
 
 bool ProfileImpl::ShouldClearSessionStorageOnStartup() {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, Session Storage doesn't support restore. So, we always clear
-  // session storage on open. As such, we don't need to signal it from the
-  // browser process.
-  return false;
-#else
   if (!base::FeatureList::IsEnabled(
           features::kClearSessionStorageDiskStateOnStartup)) {
     return false;
@@ -1127,7 +1058,6 @@ bool ProfileImpl::ShouldClearSessionStorageOnStartup() {
   // restore is needed.
   return ExitTypeService::GetLastSessionExitType(this) != ExitType::kCrashed &&
          !startup_pref.ShouldRestoreLastSession();
-#endif
 }
 
 PrefService* ProfileImpl::GetPrefs() {
@@ -1223,11 +1153,7 @@ ProfileImpl::GetPlatformNotificationService() {
 
 content::StorageNotificationService*
 ProfileImpl::GetStorageNotificationService() {
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
   return StorageNotificationServiceFactory::GetForBrowserContext(this);
-#endif
 }
 
 content::SSLHostStateDelegate* ProfileImpl::GetSSLHostStateDelegate() {
@@ -1291,13 +1217,7 @@ ProfileImpl::GetOriginTrialsControllerDelegate() {
 
 std::unique_ptr<leveldb_proto::ProtoDatabaseProvider>
 ProfileImpl::TakeDefaultProtoDatabaseProvider() {
-#if BUILDFLAG(IS_ANDROID)
-  // On Android StartupData creates proto database provider for the profile
-  // before profile is created, so move ownership to storage partition.
-  return g_browser_process->startup_data()->TakeProtoDatabaseProvider();
-#else
   return nullptr;
-#endif
 }
 
 std::unique_ptr<download::InProgressDownloadManager>
@@ -1334,13 +1254,11 @@ void ProfileImpl::EnsureSessionServiceCreated() {
 #endif
 
 bool ProfileImpl::IsNewProfile() const {
-#if !BUILDFLAG(IS_ANDROID)
   // The profile is new if the preference files has just been created, except on
   // first run, because the installer may create a preference file. See
   // https://crbug.com/40523550
   if (first_run::IsChromeFirstRun())
     return true;
-#endif
 
   return GetPrefs()->GetInitializationStatus() ==
          PrefService::INITIALIZATION_STATUS_CREATED_NEW_PREF_STORE;

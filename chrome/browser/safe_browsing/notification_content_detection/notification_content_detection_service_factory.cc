@@ -58,16 +58,7 @@ std::unique_ptr<KeyedService> NotificationContentDetectionServiceFactory::
     return nullptr;
   }
 
-// The model takes up too much memory to be run on ARM devices.
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARMEL)
-  return nullptr;
-#else
-#if BUILDFLAG(IS_ANDROID)
-  // The model takes up too much memory to be run on low end Android devices.
-  if (base::SysInfo::IsLowEndDevice()) {
-    return nullptr;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
+  // The model takes up too much memory to be run on ARM devices.
   auto* holder_service =
       OptimizationGuideGlobalStateHolderKeyedServiceFactory::GetForProfile(
           Profile::FromBrowserContext(context));
@@ -77,7 +68,6 @@ std::unique_ptr<KeyedService> NotificationContentDetectionServiceFactory::
 
   auto& opt_guide = holder_service->GetGlobalState().model_provider();
   return CreateNotificationContentDetectionService(&opt_guide, context);
-#endif  // BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARMEL)
 }
 
 std::unique_ptr<NotificationContentDetectionService>

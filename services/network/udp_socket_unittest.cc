@@ -659,14 +659,7 @@ TEST_F(UDPSocketTest, TestReadZeroByte) {
   EXPECT_EQ(std::vector<uint8_t>(), result.data.value());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Some Android devices do not support multicast socket.
-// The ones supporting multicast need WifiManager.MulticastLock to enable it.
-// https://developer.android.com/reference/android/net/wifi/WifiManager.MulticastLock.html
-#define MAYBE_JoinMulticastGroup DISABLED_JoinMulticastGroup
-#else
 #define MAYBE_JoinMulticastGroup JoinMulticastGroup
-#endif  // BUILDFLAG(IS_ANDROID)
 TEST_F(UDPSocketTest, MAYBE_JoinMulticastGroup) {
 #if BUILDFLAG(IS_MAC)
   // See https://crbug.com/354933441

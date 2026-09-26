@@ -39,10 +39,6 @@ bool ShouldUpdateTextInputState(const ui::mojom::TextInputState& old_state,
   return old_state.type != new_state.type ||
          old_state.flags != new_state.flags ||
          old_state.can_compose_inline != new_state.can_compose_inline;
-#elif BUILDFLAG(IS_ANDROID)
-  // On Android, TextInputState update is sent only if there is some change in
-  // the state. So the new state is always different.
-  return true;
 #else
   NOTREACHED();
 #endif
@@ -213,9 +209,7 @@ void TextInputManager::UpdateTextInputState(
     // calls necessary).
     // NOTE: Android requires state to be returned even when the current state
     // is/becomes NONE. Otherwise IME may become irresponsive.
-#if !BUILDFLAG(IS_ANDROID)
     return;
-#endif
   }
 
   // Since |view| is registered, we already have a previous value for its

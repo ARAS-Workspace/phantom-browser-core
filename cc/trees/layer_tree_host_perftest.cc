@@ -169,11 +169,7 @@ class LayerTreeHostPerfTestJsonReader : public LayerTreeHostPerfTest {
 
 // Simulates a tab switcher scene with two stacks of 10 tabs each.
 // Timed out on Android: http://crbug.com/723821
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_TenTenSingleThread DISABLED_TenTenSingleThread
-#else
 #define MAYBE_TenTenSingleThread TenTenSingleThread
-#endif
 TEST_F(LayerTreeHostPerfTestJsonReader, MAYBE_TenTenSingleThread) {
   SetUpReporter("10_10_single_thread");
   ReadTestFile("10_10_layer_tree");
@@ -181,11 +177,7 @@ TEST_F(LayerTreeHostPerfTestJsonReader, MAYBE_TenTenSingleThread) {
 }
 
 // Timed out on Android: http://crbug.com/723821
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_TenTenThreaded DISABLED_TenTenThreaded
-#else
 #define MAYBE_TenTenThreaded TenTenThreaded
-#endif
 TEST_F(LayerTreeHostPerfTestJsonReader, MAYBE_TenTenThreaded) {
   SetUpReporter("10_10_threaded_impl_side");
   ReadTestFile("10_10_layer_tree");
@@ -275,12 +267,7 @@ class ScrollingLayerTreePerfTest : public LayerTreeHostPerfTestJsonReader {
 };
 
 // Timed out on Android: http://crbug.com/723821
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_LongScrollablePageSingleThread \
-    DISABLED_LongScrollablePageSingleThread
-#else
 #define MAYBE_LongScrollablePageSingleThread LongScrollablePageSingleThread
-#endif
 TEST_F(ScrollingLayerTreePerfTest, MAYBE_LongScrollablePageSingleThread) {
   SetUpReporter("long_scrollable_page");
   ReadTestFile("long_scrollable_page");
@@ -288,11 +275,7 @@ TEST_F(ScrollingLayerTreePerfTest, MAYBE_LongScrollablePageSingleThread) {
 }
 
 // Timed out on Android: http://crbug.com/723821
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_LongScrollablePageThreaded DISABLED_LongScrollablePageThreaded
-#else
 #define MAYBE_LongScrollablePageThreaded LongScrollablePageThreaded
-#endif
 TEST_F(ScrollingLayerTreePerfTest, MAYBE_LongScrollablePageThreaded) {
   SetUpReporter("long_scrollable_page_threaded_impl_side");
   ReadTestFile("long_scrollable_page");
@@ -391,11 +374,7 @@ TEST_F(BrowserCompositorInvalidateLayerTreePerfTest, DenseBrowserUIThreaded) {
 
 // Simulates a page with several large, transformed and animated layers.
 // Timed out on Android: http://crbug.com/723821
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_HeavyPageThreaded DISABLED_HeavyPageThreaded
-#else
 #define MAYBE_HeavyPageThreaded HeavyPageThreaded
-#endif
 TEST_F(LayerTreeHostPerfTestJsonReader, MAYBE_HeavyPageThreaded) {
   begin_frame_driven_drawing_ = true;
   measure_commit_cost_ = true;

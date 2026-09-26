@@ -32,7 +32,7 @@
 #include "third_party/crashpad/crashpad/snapshot/process_snapshot.h"
 #include "third_party/crashpad/crashpad/util/process/process_memory.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include <signal.h>
 #elif BUILDFLAG(IS_APPLE)
 #include <mach/exception_types.h>
@@ -90,7 +90,7 @@ bool CrashAnalyzer::GetExceptionInfo(
 
 crashpad::VMAddress CrashAnalyzer::GetAccessAddress(
     const crashpad::ExceptionSnapshot& exception) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   if (exception.Exception() == SIGSEGV || exception.Exception() == SIGBUS)
     return exception.ExceptionAddress();
 #elif BUILDFLAG(IS_APPLE)
@@ -250,7 +250,7 @@ bool CrashAnalyzer::AnalyzeLightweightDetectorCrash(
   // crash. See also "Intel 64 and IA-32 Architectures Software Developer’s
   // Manual", Volume 1, Section 3.3.7.1.
   if (
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
       // https://elixir.bootlin.com/linux/v6.2.2/source/arch/x86/kernel/traps.c#L719
       exception->Exception() == SIGSEGV &&
       exception->ExceptionInfo() == SI_KERNEL
@@ -258,7 +258,7 @@ bool CrashAnalyzer::AnalyzeLightweightDetectorCrash(
       // https://opensource.apple.com/source/xnu/xnu-1699.24.8/osfmk/i386/trap.c
       exception->Exception() == EXC_BAD_ACCESS &&
       exception->ExceptionInfo() == EXC_I386_GPFLT
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
   ) {
     auto& context = *exception->Context()->x86_64;
     candidate_addresses = {context.rax, context.rbx, context.rcx, context.rdx,

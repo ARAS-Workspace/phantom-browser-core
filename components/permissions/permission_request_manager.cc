@@ -64,10 +64,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/permissions/android/android_permission_util.h"
-#endif
-
 namespace permissions {
 
 const char kAbusiveNotificationRequestsEnforcementMessage[] =
@@ -136,20 +132,16 @@ bool ShouldShowQuietRequestAgainIfPreempted(
 }
 
 bool IsMediaRequest(RequestType type) {
-#if !BUILDFLAG(IS_ANDROID)
   if (type == RequestType::kCameraPanTiltZoom) {
     return true;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   return type == RequestType::kMicStream || type == RequestType::kCameraStream;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 bool IsExclusiveAccessRequest(RequestType type) {
   return type == RequestType::kPointerLock ||
          type == RequestType::kKeyboardLock;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool ShouldGroupRequests(PermissionRequest* a, PermissionRequest* b) {
   if (a->requesting_origin() != b->requesting_origin()) {
@@ -159,12 +151,10 @@ bool ShouldGroupRequests(PermissionRequest* a, PermissionRequest* b) {
   if (IsMediaRequest(a->request_type()) && IsMediaRequest(b->request_type())) {
     return true;
   }
-#if !BUILDFLAG(IS_ANDROID)
   if (IsExclusiveAccessRequest(a->request_type()) &&
       IsExclusiveAccessRequest(b->request_type())) {
     return true;
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
   return false;
 }
 
@@ -179,11 +169,7 @@ bool RequestExistsExactlyOnce(
 }
 
 tabs::TabInterface* GetTabInterface(content::WebContents* web_contents) {
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
   return tabs::TabInterface::MaybeGetFromContents(web_contents);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace
@@ -241,27 +227,6 @@ void PermissionRequestManager::AddRequest(
     request->Cancelled();
     return;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  if (!base::FeatureList::IsEnabled(
-          features::kReturnDeniedForNotificationsWhenNoAppLevelSettings) &&
-      request->GetContentSettingsType() == ContentSettingsType::NOTIFICATIONS) {
-    bool app_level_settings_allow_site_notifications =
-        enabled_app_level_notification_permission_for_testing_.has_value()
-            ? enabled_app_level_notification_permission_for_testing_.value()
-            : DoesAppLevelSettingsAllowSiteNotifications();
-    base::UmaHistogramBoolean(
-        "Permissions.Prompt.Notifications.EnabledAppLevel",
-        app_level_settings_allow_site_notifications);
-
-    if (!app_level_settings_allow_site_notifications) {
-      // Automatically cancel site Notification requests when Chrome is not
-      // able to send notifications in an app level.
-      request->Cancelled();
-      return;
-    }
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   if (is_notification_prompt_cooldown_active_ &&
       request->GetContentSettingsType() == ContentSettingsType::NOTIFICATIONS) {
@@ -655,7 +620,6 @@ void PermissionRequestManager::Accept(const PromptOptions& prompt_options) {
     PermissionGrantedIncludingDuplicates(request.get(), prompt_options,
                                          /*is_one_time=*/false);
 
-#if !BUILDFLAG(IS_ANDROID)
     std::optional<ContentSettingsType> content_settings_type =
         RequestTypeToContentSettingsType(request->request_type());
     if (content_settings_type.has_value()) {
@@ -664,7 +628,6 @@ void PermissionRequestManager::Accept(const PromptOptions& prompt_options) {
           PermissionSourceUI::PROMPT, web_contents()->GetBrowserContext(),
           base::Time::Now());
     }
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   NotifyRequestDecided(action);
@@ -1209,13 +1172,6 @@ void PermissionRequestManager::ShowPrompt() {
     PermissionUmaUtil::PermissionPromptShown(requests_);
 
     if (!requests_.empty()) {
-#if BUILDFLAG(IS_ANDROID)
-      if (requests_[0]->GetContentSettingsType() ==
-          ContentSettingsType::NOTIFICATIONS) {
-        has_requested_notifications_ = true;
-      }
-#endif  // BUILDFLAG(IS_ANDROID)
-
       // The session duration before a permission prompt is displayed is only
       // recorded for geolocation and notifications requests because these two
       // permission types are supported by the PermissionsAI and potentially can
@@ -1369,13 +1325,11 @@ void PermissionRequestManager::CurrentRequestsDecided(
 
   std::optional<permissions::PermissionIgnoredReason> ignore_reason =
       std::nullopt;
-#if !BUILDFLAG(IS_ANDROID)
   // ignore reason metric currently not supported on android
   if (permission_action == PermissionAction::IGNORED) {
     ignore_reason = std::make_optional(
         PermissionsClient::Get()->DetermineIgnoreReason(web_contents()));
   }
-#endif
 
   content::BrowserContext* browser_context =
       web_contents()->GetBrowserContext();
@@ -1470,10 +1424,6 @@ void PermissionRequestManager::CurrentRequestsDecided(
 }
 
 void PermissionRequestManager::CleanUpRequests() {
-#if BUILDFLAG(IS_ANDROID)
-  has_requested_notifications_ = false;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // No need to execute the preignore logic as we canceling currently active
   // requests anyway.
   preignore_timer_.Stop();
@@ -1652,12 +1602,8 @@ bool PermissionRequestManager::IsRequestInProgress() const {
 }
 
 bool PermissionRequestManager::CanRestorePrompt() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return IsRequestInProgress() &&
          current_request_prompt_disposition_.has_value() && !view_;
-#endif
 }
 
 void PermissionRequestManager::RestorePrompt() {
@@ -1874,12 +1820,8 @@ void PermissionRequestManager::DoAutoResponseForTesting() {
 }
 
 bool PermissionRequestManager::IsCurrentRequestExclusiveAccess() const {
-#if !BUILDFLAG(IS_ANDROID)
   return IsRequestInProgress() &&
          IsExclusiveAccessRequest(requests_[0]->request_type());
-#else
-  return false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 PermissionEmbargoStatus

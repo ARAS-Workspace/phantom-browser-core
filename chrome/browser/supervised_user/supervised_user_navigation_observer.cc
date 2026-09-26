@@ -52,10 +52,7 @@
 #include "services/metrics/public/cpp/ukm_recorder.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/supervised_user/android/supervised_user_web_content_handler_impl.h"
-#include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/supervised_user/linux_mac_windows/supervised_user_web_content_handler_impl.h"
 #endif
 
@@ -67,10 +64,7 @@ std::unique_ptr<supervised_user::WebContentHandler> CreateWebContentHandler(
     Profile* profile,
     content::FrameTreeNodeId frame_id,
     int navigation_id) {
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<SupervisedUserWebContentHandlerImpl>(
-      web_contents, frame_id, navigation_id);
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return std::make_unique<SupervisedUserWebContentHandlerImpl>(
       web_contents, frame_id, navigation_id);
 #endif
@@ -99,19 +93,6 @@ SupervisedUserNavigationObserver::SupervisedUserNavigationObserver(
       receivers_(web_contents, this) {
   url_filtering_service_observation_.Observe(
       supervised_user_url_filtering_service());
-
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/543033880): Extract this feature to a separate class.
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-
-  pref_change_registrar_.Init(profile->GetPrefs());
-  pref_change_registrar_.Add(
-      policy::policy_prefs::kForceGoogleSafeSearch,
-      base::BindRepeating(
-          &SupervisedUserNavigationObserver::OnForceGoogleSafeSearchChanged,
-          base::Unretained(this)));
-#endif
 }
 
 // static
@@ -275,38 +256,6 @@ void SupervisedUserNavigationObserver::OnUrlFilteringServiceChanged() {
         FilterRenderFrame(render_frame_host);
       });
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void SupervisedUserNavigationObserver::OnForceGoogleSafeSearchChanged(
-    std::string_view safe_search_pref_name) {
-  // Reloads the current page when all conditions hold:
-  // 1. Last committed URL is a Google search URL.
-  // 2. Safe search is forced.
-  // 3. Android parental controls have search settings enabled.
-
-  if (!google_util::IsGoogleSearchUrl(web_contents()->GetLastCommittedURL())) {
-    // Uninteresting navigation (not a search page).
-    return;
-  }
-
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-  if (!profile->GetPrefs()->GetBoolean(safe_search_pref_name)) {
-    // Safe search is off. We can't undo safe search url params, because they
-    // might've been added by the user as well.
-    return;
-  }
-
-  if (!g_browser_process->device_parental_controls().IsSafeSearchForced()) {
-    // Safe search is forced but for different reason than supervision - do not
-    // step into other features shoes.
-    return;
-  }
-
-  web_contents()->GetController().Reload(content::ReloadType::NORMAL,
-                                         /*check_for_repost=*/false);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 void SupervisedUserNavigationObserver::OnInterstitialDone(
     content::FrameTreeNodeId frame_id) {
@@ -507,17 +456,6 @@ void SupervisedUserNavigationObserver::RequestUrlAccessLocal(
   }
   interstitial->RequestUrlAccessLocal(std::move(callback));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void SupervisedUserNavigationObserver::LearnMore(LearnMoreCallback callback) {
-  supervised_user::SupervisedUserInterstitial* interstitial =
-      GetInterstitialForFrame();
-  if (!interstitial) {
-    return;
-  }
-  interstitial->LearnMore(std::move(callback));
-}
-#endif
 
 void SupervisedUserNavigationObserver::RequestCreated(
     RequestUrlAccessRemoteCallback callback,

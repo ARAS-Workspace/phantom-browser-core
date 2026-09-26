@@ -117,11 +117,7 @@ IN_PROC_BROWSER_TEST_F(SyntheticInputTest, DestroyWidgetWithOngoingGesture) {
 
 // This test ensures that synthetic wheel scrolling works on all platforms.
 // Disabled for flakiness on Android (crbug.com/1103731).
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_SmoothScrollWheel DISABLED_SmoothScrollWheel
-#else
 #define MAYBE_SmoothScrollWheel SmoothScrollWheel
-#endif  // BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(SyntheticInputTest, MAYBE_SmoothScrollWheel) {
   LoadURL(R"HTML(
     data:text/html;charset=utf-8,

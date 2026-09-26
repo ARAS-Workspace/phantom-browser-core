@@ -126,19 +126,11 @@ TEST_P(ExtensionActionAPIUnitTest, ActionLocalization) {
             action->GetTitle(ExtensionAction::kDefaultTabId));
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Android only supports manifest V3, which has chrome.action but not
-// chrome.browserAction or chrome.pageAction.
-INSTANTIATE_TEST_SUITE_P(All,
-                         ExtensionActionAPIUnitTest,
-                         testing::Values(ActionInfo::Type::kAction));
-#else
 INSTANTIATE_TEST_SUITE_P(All,
                          ExtensionActionAPIUnitTest,
                          testing::Values(ActionInfo::Type::kBrowser,
                                          ActionInfo::Type::kPage,
                                          ActionInfo::Type::kAction));
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 }  // namespace extensions

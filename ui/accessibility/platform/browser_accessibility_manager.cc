@@ -1254,14 +1254,12 @@ void BrowserAccessibilityManager::ScrollToMakeVisible(
   AXPlatform::GetInstance().OnActionFromAssistiveTech();
 
   // Android has an official api for accessibility focus.
-#if !BUILDFLAG(IS_ANDROID)
   // Update our notion of accessibility focus on the root browser accessibility
   // manager.
   BrowserAccessibilityManager* root_manager = GetManagerForRootFrame();
   if (root_manager) {
     root_manager->UpdateAccessibilityFocus(this, node);
   }
-#endif
 }
 
 void BrowserAccessibilityManager::ScrollToPoint(
@@ -2252,11 +2250,7 @@ bool BrowserAccessibilityManager::ShouldFireEventForNode(
 
 std::unique_ptr<BrowserAccessibility>
 BrowserAccessibilityManager::CreateBrowserAccessibility(AXNode* node) {
-#if !BUILDFLAG(IS_ANDROID)
   return BrowserAccessibility::Create(this, node);
-#else
-  NOTREACHED();
-#endif
 }
 
 BrowserAccessibility*

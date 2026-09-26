@@ -46,13 +46,6 @@ constexpr LogTrimmingDefaults GetLogTrimmingDefaults() {
       .log_bytes_trim_threshold = 3 * 1024 * 1024,  // 3 MiB
       .max_ongoing_log_size_bytes = 1024 * 1024,    // 1 MiB
   };
-#elif BUILDFLAG(IS_ANDROID)
-  return {
-      .initial_log_count_trim_threshold = 40,
-      .ongoing_log_count_trim_threshold = 16,
-      .log_bytes_trim_threshold = 600 * 1024,    // 600 KiB
-      .max_ongoing_log_size_bytes = 200 * 1024,  // 200 KiB
-  };
 #else
   return {
       .initial_log_count_trim_threshold = 20,
@@ -160,12 +153,6 @@ GURL MetricsServiceClient::GetInsecureMetricsServerUrl() {
   // Explicitly prefix with metrics namespace due to name collision.
   return metrics::GetInsecureMetricsServerUrl();
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool MetricsServiceClient::IsJobSchedulerSupported() const {
-  return base::FeatureList::IsEnabled(features::kMetricsLogJobSchedulerUpload);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 base::TimeDelta MetricsServiceClient::GetUploadInterval() {
   const base::CommandLine* command_line =

@@ -826,7 +826,6 @@ static void CopyLevelDBToProfile(
   ASSERT_TRUE(base::CopyDirectory(test_blob_data_dir, data_path, kRecursive));
   // For some reason touching files on Android fails with EPERM.
   // https://crbug.com/1045488
-#if !BUILDFLAG(IS_ANDROID)
   // The modification time of the saved blobs is used for File objects, so these
   // need to manually be set (they are clobbered both by the above copy
   // operation and by git).
@@ -834,7 +833,6 @@ static void CopyLevelDBToProfile(
     base::FilePath total_path = blob_dest.Append(time.relative_blob_path);
     ASSERT_TRUE(base::TouchFile(total_path, time.time, time.time));
   }
-#endif
 }
 
 class IndexedDBBrowserTestWithPreexistingLevelDB
@@ -890,11 +888,7 @@ IN_PROC_BROWSER_TEST_F(IndexedDBBrowserTestWithVersion3Schema, MigrationTest) {
   const GURL kTestUrl = GetTestUrl("indexeddb", "v3_migration_test.html");
   // For some reason setting empty file modification time on Android fails with
   // EPERM. https://crbug.com/1045488
-#if BUILDFLAG(IS_ANDROID)
-  SimpleTest(GURL(kTestUrl.spec() + "#ignoreTimes"));
-#else
   SimpleTest(kTestUrl);
-#endif
 }
 
 class IndexedDBBrowserTestWithVersion123456Schema : public
@@ -1042,11 +1036,7 @@ IN_PROC_BROWSER_TEST_P(IndexedDBBrowserTest, EmptyBlob) {
   // For some reason Android's futimes fails (EPERM) in this test. Do not assert
   // file times on Android, but do so on other platforms. crbug.com/467247
   // TODO(cmumford): Figure out why this is the case and fix if possible.
-#if BUILDFLAG(IS_ANDROID)
-  SimpleTest(GURL(kTestUrl.spec() + "#ignoreTimes"));
-#else
   SimpleTest(kTestUrl);
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(IndexedDBBrowserTest, BlobsCountAgainstQuota) {

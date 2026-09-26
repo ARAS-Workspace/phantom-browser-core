@@ -184,9 +184,6 @@ class ChildProcessSecurityPolicyTest
     // for default protocols as this is the responsibility of the browser (which
     // is responsible for adding the appropriate ProtocolHandler).
     test_browser_client_.AddScheme(url::kFileScheme);
-#if BUILDFLAG(IS_ANDROID)
-    test_browser_client_.AddScheme(url::kContentScheme);
-#endif
     SiteIsolationPolicy::DisableFlagCachingForTesting();
 
     // With unit tests, it's possible that the same global
@@ -796,15 +793,8 @@ TEST_P(ChildProcessSecurityPolicyTest, ContentUri) {
   LockProcessIfNeeded(kRendererProcess, browser_context(),
                       content_uri_sensitive);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Since android handles content:// URLs, CanRequestURL() is false for a URL
-  // which was not registered with GrantRequestOfSpecificFile().
-  EXPECT_FALSE(p->CanRequestURL(kRendererID, content_uri));
-  EXPECT_FALSE(p->CanRequestURL(kRendererID, content_uri_sensitive));
-#else
   EXPECT_TRUE(p->CanRequestURL(kRendererID, content_uri));
   EXPECT_TRUE(p->CanRequestURL(kRendererID, content_uri_sensitive));
-#endif
   EXPECT_TRUE(p->CanRedirectToURL(content_uri));
   EXPECT_TRUE(p->CanRedirectToURL(content_uri_sensitive));
   EXPECT_FALSE(p->CanCommitURL(kRendererID, content_uri));
@@ -814,11 +804,7 @@ TEST_P(ChildProcessSecurityPolicyTest, ContentUri) {
       kRendererProcess,
       base::FilePath::FromUTF8Unsafe(content_uri.possibly_invalid_spec()));
   EXPECT_TRUE(p->CanRequestURL(kRendererID, content_uri));
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_FALSE(p->CanRequestURL(kRendererID, content_uri_sensitive));
-#else
   EXPECT_TRUE(p->CanRequestURL(kRendererID, content_uri_sensitive));
-#endif
   EXPECT_TRUE(p->CanRedirectToURL(content_uri));
   EXPECT_TRUE(p->CanRedirectToURL(content_uri_sensitive));
   EXPECT_FALSE(p->CanCommitURL(kRendererID, content_uri));

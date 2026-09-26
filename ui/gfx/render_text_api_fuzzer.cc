@@ -20,32 +20,18 @@
 #include "ui/gfx/font_util.h"
 #include "ui/gfx/render_text.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/test/test_support_android.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "third_party/test_fonts/fontconfig/fontconfig_util_linux.h"
 #endif
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-const char kFontDescription[] = "serif, 13px";
-#else
 const char kFontDescription[] = "sans, 13px";
-#endif
 
 struct Environment {
   Environment() {
     base::CommandLine::Init(0, nullptr);
     TestTimeouts::Initialize();
-#if BUILDFLAG(IS_ANDROID)
-    // On Android, TaskEnvironment with MainThreadType::UI creates a UI message
-    // pump that does not support RunLoop::Run(). This installs a stub pump to
-    // allow it in tests.
-    base::InitAndroidTestMessageLoop();
-#endif
     task_environment = std::make_unique<base::test::TaskEnvironment>(
         base::test::TaskEnvironment::MainThreadType::UI);
 

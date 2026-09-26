@@ -17,8 +17,6 @@
 #include "net/proxy_resolution/proxy_config_service_mac.h"
 #elif BUILDFLAG(IS_LINUX)
 #include "net/proxy_resolution/proxy_config_service_linux.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "net/proxy_resolution/proxy_config_service_android.h"
 #endif
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
@@ -97,10 +95,6 @@ ProxyConfigService::CreateSystemProxyConfigService(
       kSystemProxyConfigTrafficAnnotation);
 
   return std::move(linux_config_service);
-#elif BUILDFLAG(IS_ANDROID)
-  return std::make_unique<ProxyConfigServiceAndroid>(
-      std::move(main_task_runner),
-      base::SingleThreadTaskRunner::GetCurrentDefault());
 #else
   LOG(WARNING) << "Failed to choose a system proxy settings fetcher "
                   "for this platform.";

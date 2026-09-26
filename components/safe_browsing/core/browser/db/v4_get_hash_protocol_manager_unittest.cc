@@ -642,11 +642,7 @@ TEST_F(V4GetHashProtocolManagerTest,
   m->set_threat_type(API_ABUSE);
   // TODO(crbug.com/40661879): This special case for Android will no longer be
   // needed once GetCurrentPlatformType() returns ANDROID_PLATFORM on Android.
-#if BUILDFLAG(IS_ANDROID)
-  m->set_platform_type(ANDROID_PLATFORM);
-#else
   m->set_platform_type(GetCurrentPlatformType());
-#endif
   m->set_threat_entry_type(URL);
   m->mutable_threat()->set_hash(full_hash);
   ThreatEntryMetadata::MetadataEntry* e =

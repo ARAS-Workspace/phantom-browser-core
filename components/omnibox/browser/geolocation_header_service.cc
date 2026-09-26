@@ -23,10 +23,6 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/location/android/location_settings.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
 #include "content/public/browser/device_service.h"
@@ -110,19 +106,8 @@ void RecordGetLocationOutcome(GeolocationHeaderGetLocationOutcome outcome,
 
 GeolocationHeaderService::GeolocationHeaderService(
     HostContentSettingsMap* settings_map,
-    TemplateURLService* template_url_service
-#if BUILDFLAG(IS_ANDROID)
-    ,
-    std::unique_ptr<LocationSettings> location_settings
-#endif
-    )
-    : settings_map_(settings_map),
-      template_url_service_(template_url_service)
-#if BUILDFLAG(IS_ANDROID)
-      ,
-      location_settings_(std::move(location_settings))
-#endif
-{
+    TemplateURLService* template_url_service)
+    : settings_map_(settings_map), template_url_service_(template_url_service) {
   CHECK(settings_map_);
 }
 
@@ -447,17 +432,8 @@ bool GeolocationHeaderService::HasPrecisePermission(const GURL& url) const {
 
 bool GeolocationHeaderService::HasDeviceLocationPermission(
     GeolocationAccuracy accuracy) const {
-#if BUILDFLAG(IS_ANDROID)
-  if (!location_settings_) {
-    return true;
-  }
-  return accuracy == GeolocationAccuracy::kPrecise
-             ? location_settings_->HasAndroidFineLocationPermission()
-             : location_settings_->HasAndroidLocationPermission();
-#else
   return permissions::PermissionsClient::Get()->HasDevicePermission(
       ContentSettingsType::GEOLOCATION);
-#endif
 }
 
 bool GeolocationHeaderService::EnsureGeolocationServiceConnection(

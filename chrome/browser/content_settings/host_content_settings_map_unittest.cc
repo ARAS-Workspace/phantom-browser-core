@@ -924,7 +924,6 @@ TEST_F(HostContentSettingsMapTest, IncognitoInheritPopups) {
 }
 
 // The tested setting is only registered for desktop.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(HostContentSettingsMapTest, IncognitoDontInherit) {
   TestingProfile profile;
   Profile* otr_profile =
@@ -955,7 +954,6 @@ TEST_F(HostContentSettingsMapTest, IncognitoDontInherit) {
   EXPECT_EQ(CONTENT_SETTING_ALLOW, map->GetDefaultContentSetting(type));
   EXPECT_EQ(CONTENT_SETTING_BLOCK, otr_map->GetDefaultContentSetting(type));
 }
-#endif
 
 TEST_F(HostContentSettingsMapTest, IncognitoPartialInheritPref) {
   // Permissions marked INHERIT_IF_LESS_PERMISSIVE in
@@ -1976,7 +1974,6 @@ TEST_F(HostContentSettingsMapTest, AddContentSettingsObserver) {
 }
 
 // Guest profiles do not exist on Android, so don't run these tests there.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(HostContentSettingsMapTest, GuestProfile) {
   TestingProfile::Builder profile_builder;
   profile_builder.SetGuestSession();
@@ -2028,7 +2025,6 @@ TEST_F(HostContentSettingsMapTest, GuestProfileDefaultSetting) {
             host_content_settings_map->GetContentSetting(
                 host, host, ContentSettingsType::COOKIES));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(HostContentSettingsMapTest, InvalidPattern) {
   // This is a regression test for crbug.com/40472343, which fixed a memory leak
@@ -2658,11 +2654,7 @@ TEST_F(HostContentSettingsMapTest, IncognitoChangesDoNotPersist) {
 // Validate that a content setting that uses a different scope/constraint can
 // co-exist with another setting
 // TODO(crbug.com/398993133): Fix flakes on some Android builders.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_MixedScopeSettings DISABLED_MixedScopeSettings
-#else
 #define MAYBE_MixedScopeSettings MixedScopeSettings
-#endif
 TEST_F(HostContentSettingsMapTest, MAYBE_MixedScopeSettings) {
   TestingProfile profile;
   HostContentSettingsMap* map =
@@ -2724,13 +2716,8 @@ TEST_F(HostContentSettingsMapTest, MAYBE_MixedScopeSettings) {
 // SessionModel::None; otherwise, only the preferences from the specified
 // scope should be returned (if any).
 // TODO(crbug.com/399254058): flaky on Android
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GetSettingsForOneTypeWithSessionModel \
-  DISABLED_GetSettingsForOneTypeWithSessionModel
-#else
 #define MAYBE_GetSettingsForOneTypeWithSessionModel \
   GetSettingsForOneTypeWithSessionModel
-#endif
 TEST_F(HostContentSettingsMapTest,
        MAYBE_GetSettingsForOneTypeWithSessionModel) {
   TestingProfile profile;
@@ -2830,13 +2817,8 @@ INSTANTIATE_TEST_SUITE_P(All,
 // for settings and they can detect if and when they expire.
 // GetSettingsForOneType should also omit any settings that are already expired.
 // TODO(crbug.com/398993133): Fix flakes on some Android builders.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GetSettingsForOneTypeWithExpiryAndVerifyUmaHistograms \
-  DISABLED_GetSettingsForOneTypeWithExpiryAndVerifyUmaHistograms
-#else
 #define MAYBE_GetSettingsForOneTypeWithExpiryAndVerifyUmaHistograms \
   GetSettingsForOneTypeWithExpiryAndVerifyUmaHistograms
-#endif
 TEST_P(HostContentSettingsMapActiveExpirationTest,
        MAYBE_GetSettingsForOneTypeWithExpiryAndVerifyUmaHistograms) {
   base::HistogramTester t;
@@ -2980,11 +2962,7 @@ TEST_F(HostContentSettingsMapTest, StorageAccessMetrics) {
 }
 
 // TODO(crbug.com/398993133): Fix flakes on some Android builders.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_RenewContentSetting DISABLED_RenewContentSetting
-#else
 #define MAYBE_RenewContentSetting RenewContentSetting
-#endif
 TEST_F(HostContentSettingsMapTest, MAYBE_RenewContentSetting) {
   TestingProfile profile;
   const base::Time now = base::Time::Now();
@@ -3096,7 +3074,6 @@ TEST_F(HostContentSettingsMapTest, ShutdownDuringExpirationAsanTest) {
 
 // File access is not implemented on Android. Luckily we don't need it for
 // DevTools.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(HostContentSettingsMapTest, DevToolsFileAccess) {
   TestingProfile profile;
   HostContentSettingsMap* host_content_settings_map =
@@ -3116,7 +3093,6 @@ TEST_F(HostContentSettingsMapTest, DevToolsFileAccess) {
                 example_host, example_host,
                 ContentSettingsType::FILE_SYSTEM_WRITE_GUARD));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 TEST_F(HostContentSettingsMapTest, ExtensionContentSetting) {

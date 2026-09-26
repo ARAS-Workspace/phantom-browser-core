@@ -123,11 +123,7 @@ class ExtensionURLLoaderThrottleWithSplitCacheBrowserTest
 };
 
 // TODO(crbug.com/469417243): Flaky on desktop Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ThrottleRequest DISABLED_ThrottleRequest
-#else
 #define MAYBE_ThrottleRequest ThrottleRequest
-#endif
 // Tests that if the same URL is requested repeatedly by an extension, it will
 // eventually be throttled.
 IN_PROC_BROWSER_TEST_P(ExtensionURLLoaderThrottleWithSplitCacheBrowserTest,

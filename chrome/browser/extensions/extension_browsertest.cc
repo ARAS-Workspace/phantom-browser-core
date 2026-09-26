@@ -59,18 +59,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/base_switches.h"
-#include "base/check.h"
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/test/base/android/android_ui_test_utils.h"
-#include "components/feed/feed_feature_list.h"
-#include "content/public/browser/web_contents.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -172,14 +160,6 @@ ExtensionBrowserTest::ExtensionBrowserTest(ContextType context_type)
           false),
       verifier_format_override_(crx_file::VerifierFormat::CRX3) {
   EXPECT_TRUE(temp_dir_.CreateUniqueTempDir());
-
-#if BUILDFLAG(IS_ANDROID)
-  feature_list_.InitWithFeatures(
-      /*enabled_features=*/
-      {// Enable incognito windows on Android.
-       feed::kAndroidOpenIncognitoAsWindow},
-      /*disabled_features=*/{});
-#endif
 }
 
 ExtensionBrowserTest::~ExtensionBrowserTest() = default;
@@ -222,10 +202,8 @@ void ExtensionBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
   PlatformBrowserTest::SetUpCommandLine(command_line);
 
   // On Android, these are handled in SetUpOnMainThread().
-#if !BUILDFLAG(IS_ANDROID)
   base::PathService::Get(chrome::DIR_TEST_DATA, &test_data_dir_);
   test_data_dir_ = test_data_dir_.AppendASCII("extensions");
-#endif
 
   if (!ShouldEnableContentVerification()) {
     ignore_content_verification_ =
@@ -240,24 +218,12 @@ void ExtensionBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
   if (ShouldAllowMV2Extensions()) {
     mv2_enabler_.emplace();
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // Disable the first-run experience (FRE) so that when a function under
-  // test launches an Intent for ChromeTabbedActivity, ChromeTabbedActivity
-  // will be shown instead of FirstRunActivity.
-  command_line->AppendSwitch("disable-fre");
-#endif
 }
 
 void ExtensionBrowserTest::SetUpOnMainThread() {
   PlatformBrowserTest::SetUpOnMainThread();
 
   // On non-Android, these are handled in SetUpCommandLine().
-#if BUILDFLAG(IS_ANDROID)
-  RegisterPathProvider();
-  base::PathService::Get(chrome::DIR_TEST_DATA, &test_data_dir_);
-  test_data_dir_ = test_data_dir_.AppendASCII("extensions");
-#endif
 
   SetUpTestProtocolHandler();
   registry_observation_.Observe(ExtensionRegistry::Get(profile()));
@@ -795,33 +761,8 @@ bool ExtensionBrowserTest::GetCurrentTabTitle(std::u16string* title) {
 content::WebContents* ExtensionBrowserTest::PlatformOpenURLOffTheRecord(
     Profile* profile,
     const GURL& url) {
-#if BUILDFLAG(IS_ANDROID)
-  // Android doesn't have an OpenURLOffTheRecord() helper so we roll our own.
-  Profile* incognito_profile =
-      profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-  CHECK(incognito_profile);
-  BrowserWindowCreateParams params(*incognito_profile,
-                                   /*from_user_gesture=*/false);
-  base::test::TestFuture<BrowserWindowInterface*> future;
-  CreateBrowserWindow(std::move(params), future.GetCallback());
-
-  BrowserWindowInterface* browser = future.Get();
-  CHECK(browser);
-  TabListInterface* tab_list = TabListInterface::From(browser);
-  CHECK(tab_list);
-  // Android windows open with an existing tab.
-  CHECK_EQ(tab_list->GetTabCount(), 1);
-  content::WebContents* web_contents = tab_list->GetTab(0)->GetContents();
-  CHECK(web_contents);
-  // This blocks until the navigation completes. The return value is ignored
-  // because some tests intentionally navigate to blocked URLs which fail to
-  // load.
-  (void)content::NavigateToURL(web_contents, url);
-  return web_contents;
-#else
   BrowserWindowInterface* otr_browser = OpenURLOffTheRecord(profile, url);
   return otr_browser->GetTabStripModel()->GetActiveWebContents();
-#endif
 }
 
 BrowserWindowInterface* ExtensionBrowserTest::CreateBrowserWindowWithType(
@@ -850,19 +791,9 @@ BrowserWindowInterface* ExtensionBrowserTest::CreateIncognitoBrowserWindow() {
 
 content::RenderFrameHost* ExtensionBrowserTest::NavigateToURLInNewTab(
     const GURL& url) {
-#if BUILDFLAG(IS_ANDROID)
-  // Navigate and block until navigation finishes.
-  android_ui_test_utils::OpenUrlInNewTab(profile(), GetActiveWebContents(),
-                                         url);
-  content::WebContents* new_web_contents = GetActiveWebContents();
-  // Mimic BROWSER_TEST_WAIT_FOR_LOAD_STOP like above.
-  content::WaitForLoadStop(new_web_contents);
-  return content::ConvertToRenderFrameHost(new_web_contents);
-#else
   return ui_test_utils::NavigateToURLWithDisposition(
       browser(), url, WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
-#endif
 }
 
 void ExtensionBrowserTest::OpenWindow(content::WebContents* contents,

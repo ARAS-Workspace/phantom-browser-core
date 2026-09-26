@@ -46,9 +46,7 @@
 #include "extensions/common/permissions/permission_set.h"
 #include "extensions/common/permissions/permissions_data.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/preinstalled_web_apps/preinstalled_web_apps.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -884,10 +882,6 @@ bool ExtensionSyncService::ShouldSync(const Extension& extension) const {
 
 bool ExtensionSyncService::IsMigratingPreinstalledWebApp(
     const extensions::ExtensionId& extension_id) {
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not support Chrome Apps.
-  return false;
-#else
   if (!migrating_default_chrome_app_ids_cache_) {
     std::vector<web_app::PreinstalledWebAppMigration> migrations =
         web_app::GetPreinstalledWebAppMigrations(*profile_);
@@ -902,5 +896,4 @@ bool ExtensionSyncService::IsMigratingPreinstalledWebApp(
   }
 
   return migrating_default_chrome_app_ids_cache_->contains(extension_id);
-#endif  // BUILDFLAG(IS_ANDROID)
 }

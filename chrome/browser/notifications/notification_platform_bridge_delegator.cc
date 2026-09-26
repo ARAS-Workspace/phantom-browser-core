@@ -46,9 +46,6 @@ namespace {
 // Please try to keep this comment up to date when changing behaviour on one of
 // the platforms supported by the browser.
 bool SystemNotificationsEnabled(Profile* profile) {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
 #if BUILDFLAG(IS_LINUX)
   if (profile) {
     // Prefs take precedence over flags.
@@ -60,7 +57,6 @@ bool SystemNotificationsEnabled(Profile* profile) {
 #endif  // BUILDFLAG(IS_LINUX)
   return base::FeatureList::IsEnabled(features::kNativeNotifications) &&
          base::FeatureList::IsEnabled(features::kSystemNotifications);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 NotificationPlatformBridge* GetSystemNotificationPlatformBridge(

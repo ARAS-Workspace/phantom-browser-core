@@ -57,13 +57,9 @@ constexpr size_t kOversizedCapacity = std::numeric_limits<uint32_t>::max();
 // want this to be as small as possible without causing too much flakiness.
 base::TimeDelta EpsilonDeadline() {
   const int64_t tiny_timeout = TestTimeouts::tiny_timeout().InMicroseconds();
-// Currently, |tiny_timeout()| is usually 100 ms (possibly scaled under ASAN,
-// etc.). Based on this, set it to (usually be) 20 ms.
-#if BUILDFLAG(IS_ANDROID)
-  const int64_t deadline = (tiny_timeout * 3) / 10;
-#else
+  // Currently, |tiny_timeout()| is usually 100 ms (possibly scaled under ASAN,
+  // etc.). Based on this, set it to (usually be) 20 ms.
   const int64_t deadline = (tiny_timeout * 2) / 10;
-#endif
   return base::Microseconds(deadline);
 }
 

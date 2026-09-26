@@ -207,19 +207,6 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   MOCK_METHOD(bool, LocalCardSaveIsSupported, (), (override));
   MOCK_METHOD(void, HideSaveCardPrompt, (), (override));
 
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(void,
-              ConfirmAccountNameFixFlow,
-              (base::OnceCallback<void(const std::u16string&)> callback),
-              (override));
-  MOCK_METHOD(void,
-              ConfirmExpirationDateFixFlow,
-              (const CreditCard& card,
-               base::OnceCallback<void(const std::u16string&,
-                                       const std::u16string&)> callback),
-              (override));
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Used in tests to ensure that:
   // 1) ShowSaveCreditCardLocally() was called.
   // 2) The SaveCreditCardOptions::show_prompt matches the `prompt_shown` param.
@@ -272,19 +259,6 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
               std::move(callback).Run(offer_decision, user_provided_details);
             });
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  void ExpectAccountFixFlow(const std::u16string& cardholder_name) {
-    EXPECT_CALL(*this, ConfirmAccountNameFixFlow)
-        .WillOnce(RunOnceCallback<0>(cardholder_name));
-  }
-
-  void ExpectExpirationDateFixFlow(const std::u16string& month,
-                                   const std::u16string& year) {
-    EXPECT_CALL(*this, ConfirmExpirationDateFixFlow)
-        .WillOnce(RunOnceCallback<1>(month, year));
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 // A mock AutofillClient using the `MockPaymentsDataManager` and
@@ -397,22 +371,8 @@ class CreditCardSaveManagerTest
   void SetCardDetailsForFixFlow(UserProvidedCardDetails user_provided_details) {
     // On Android, requesting expiration date or cardholder name has an
     // additional fix flow step. A combined fix flow is not supported.
-#if BUILDFLAG(IS_ANDROID)
-    if (!user_provided_details.cardholder_name.empty()) {
-      ASSERT_TRUE(user_provided_details.expiration_date_month.empty());
-      ASSERT_TRUE(user_provided_details.expiration_date_year.empty());
-
-      payments_autofill_client().ExpectAccountFixFlow(
-          user_provided_details.cardholder_name);
-    } else {
-      payments_autofill_client().ExpectExpirationDateFixFlow(
-          user_provided_details.expiration_date_month,
-          user_provided_details.expiration_date_year);
-    }
-#else
     payments_autofill_client().SetCloudSaveCallbackOfferDecision(
         SaveCardOfferUserDecision::kAccepted, user_provided_details);
-#endif
   }
 
   // Returns a `FormData` with data corresponding to a simple credit card form.
@@ -577,12 +537,7 @@ class CreditCardSaveManagerTest
 
 // Tests that credit card data are saved for forms on https
 // TODO(crbug.com/40494359): Flaky on android_n5x_swarming_rel bot.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ImportFormDataCreditCardHTTPS \
-  DISABLED_ImportFormDataCreditCardHTTPS
-#else
 #define MAYBE_ImportFormDataCreditCardHTTPS ImportFormDataCreditCardHTTPS
-#endif
 TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTPS) {
   credit_card_save_manager().SetCreditCardUploadEnabled(false);
   TestSaveCreditCards(true);
@@ -590,11 +545,7 @@ TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTPS) {
 
 // Tests that credit card data are saved for forms on http
 // TODO(crbug.com/40494359): Flaky on android_n5x_swarming_rel bot.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ImportFormDataCreditCardHTTP DISABLED_ImportFormDataCreditCardHTTP
-#else
 #define MAYBE_ImportFormDataCreditCardHTTP ImportFormDataCreditCardHTTP
-#endif
 TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTP) {
   credit_card_save_manager().SetCreditCardUploadEnabled(false);
   TestSaveCreditCards(false);
@@ -602,13 +553,8 @@ TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTP) {
 
 // Tests that credit card data are saved when autocomplete=off for CC field.
 // TODO(crbug.com/40494359): Flaky on android_n5x_swarming_rel bot.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_CreditCardSavedWhenAutocompleteOff \
-  DISABLED_CreditCardSavedWhenAutocompleteOff
-#else
 #define MAYBE_CreditCardSavedWhenAutocompleteOff \
   CreditCardSavedWhenAutocompleteOff
-#endif
 TEST_F(CreditCardSaveManagerTest, MAYBE_CreditCardSavedWhenAutocompleteOff) {
   credit_card_save_manager().SetCreditCardUploadEnabled(false);
 
@@ -2044,10 +1990,8 @@ TEST_F(CreditCardSaveManagerTest, UploadCreditCard_NoNameAvailable) {
 
 TEST_F(CreditCardSaveManagerTest,
        AttemptToOfferCardUploadSave_AutofillShowAccountEmailInLegalMessage) {
-#if !BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList feature_list{
       features::kAutofillEnableWalletBrandingV2};
-#endif
 
   // Set up our credit card form data.
   FormData credit_card_form = CreateTestCreditCardFormData();
@@ -2077,7 +2021,6 @@ TEST_F(CreditCardSaveManagerTest,
                   ClientBehaviorConstants::kShowAccountEmailInLegalMessage));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(
     CreditCardSaveManagerTest,
     AttemptToOfferCardUploadSave_AutofillDoNotShowAccountEmailInLegalMessage_FlagOff) {
@@ -2111,7 +2054,6 @@ TEST_F(
               testing::Not(testing::Contains(
                   ClientBehaviorConstants::kShowAccountEmailInLegalMessage)));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(CreditCardSaveManagerTest,
        AttemptToOfferCardUploadSave_SendSaveCvcSignalIfOfferingToSaveCvc) {
@@ -3867,15 +3809,6 @@ TEST_F(CreditCardSaveManagerTest,
       "Autofill.SaveCreditCardPromptOffer.Server",
       autofill_metrics::SaveCardPromptOffer::kCvcMissingForPotentialUpdate, 1);
 
-#if BUILDFLAG(IS_ANDROID)
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Server",
-      autofill_metrics::SaveCardPromptOffer::kCvcMissingForPotentialUpdate, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Server."
-      "WithSameLastFourButDifferentExpiration",
-      autofill_metrics::SaveCardPromptOffer::kCvcMissingForPotentialUpdate, 1);
-#else  // BUILDFLAG(IS_DESKTOP)
   histogram_tester.ExpectUniqueSample(
       "Autofill.SaveCreditCardPromptOffer.Desktop.Server",
       autofill_metrics::SaveCardPromptOffer::kCvcMissingForPotentialUpdate, 1);
@@ -3883,7 +3816,6 @@ TEST_F(CreditCardSaveManagerTest,
       "Autofill.SaveCreditCardPromptOffer.Desktop.Server."
       "WithSameLastFourButDifferentExpiration",
       autofill_metrics::SaveCardPromptOffer::kCvcMissingForPotentialUpdate, 1);
-#endif
 
   histogram_tester.ExpectUniqueSample(
       "Autofill.SaveCreditCardPromptOffer.Upload.FirstShow",
@@ -5013,7 +4945,6 @@ TEST_F(CreditCardSaveManagerTest,
   histogram_tester.ExpectTotalCount("Autofill.UploadAcceptedCardOrigin", 0);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // Android is skipped because the show email client behavior signal is always
 // sent.
 // CVC storage isn't launched on iOS, so this test is skipped.
@@ -5096,8 +5027,6 @@ TEST_F(
       payments_network_interface().client_behavior_signals_in_request(),
       UnorderedElementsAre(ClientBehaviorConstants::kOfferingToSaveCvc));
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(CreditCardSaveManagerTest,
        UploadCreditCard_ShouldAddBillableServiceNumberInRequest) {
@@ -5407,311 +5336,6 @@ TEST_F(CreditCardSaveManagerTest,
       "Autofill.StrikeDatabase.CreditCardSaveNotOfferedDueToMaxStrikes", 0);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Tests that a card with max strikes does not offer save on mobile at all.
-TEST_F(CreditCardSaveManagerTest,
-       LocallySaveCreditCard_MaxStrikesDisallowsSave) {
-  credit_card_save_manager().SetCreditCardUploadEnabled(false);
-  TestCreditCardSaveStrikeDatabase credit_card_save_strike_database =
-      TestCreditCardSaveStrikeDatabase(&strike_database());
-
-  // Max out strikes for the card to be added.
-  credit_card_save_strike_database.AddStrike("1111");
-  credit_card_save_strike_database.AddStrike("1111");
-  credit_card_save_strike_database.AddStrike("1111");
-  EXPECT_EQ(credit_card_save_strike_database.GetStrikes("1111"), 3);
-
-  // Set up our credit card form data.
-  FormData credit_card_form = CreateTestCreditCardFormData();
-  FormsSeen(std::vector<FormData>(1, credit_card_form));
-
-  // Edit the data, and submit.
-  test_api(credit_card_form).field(0).set_value(u"Jane Doe");
-  test_api(credit_card_form).field(1).set_value(u"4111111111111111");
-  test_api(credit_card_form)
-      .field(2)
-      .set_value(ASCIIToUTF16(test::NextMonth()));
-  test_api(credit_card_form).field(3).set_value(ASCIIToUTF16(test::NextYear()));
-  test_api(credit_card_form).field(4).set_value(u"123");
-
-  base::HistogramTester histogram_tester;
-
-  // No form of credit card save should be shown.
-  EXPECT_CALL(payments_autofill_client(), ShowSaveCreditCardLocally).Times(0);
-
-  FormSubmitted(credit_card_form);
-
-  EXPECT_FALSE(credit_card_save_manager().CreditCardWasUploaded());
-
-  // Verify that the correct histogram entries for card save not offered due to
-  // max strikes were logged.
-  histogram_tester.ExpectBucketCount(
-      "Autofill.StrikeDatabase.CreditCardSaveNotOfferedDueToMaxStrikes",
-      AutofillMetrics::SaveTypeMetric::LOCAL, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Local",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-
-#if BUILDFLAG(IS_ANDROID)
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Local",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-#else
-  histogram_tester.ExpectBucketCount(
-      "Autofill.SaveCreditCardPromptOffer.IOS.Local.Banner",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-#endif
-}
-
-// Tests that a card with max strikes does not offer save on mobile at all.
-TEST_F(CreditCardSaveManagerTest, UploadCreditCard_MaxStrikesDisallowsSave) {
-  TestCreditCardSaveStrikeDatabase credit_card_save_strike_database =
-      TestCreditCardSaveStrikeDatabase(&strike_database());
-
-  // Max out strikes for the card to be added.
-  credit_card_save_strike_database.AddStrike("1111");
-  credit_card_save_strike_database.AddStrike("1111");
-  credit_card_save_strike_database.AddStrike("1111");
-  EXPECT_EQ(credit_card_save_strike_database.GetStrikes("1111"), 3);
-
-  // Create, fill and submit an address form in order to establish a recent
-  // profile which can be selected for the upload request.
-  FormData address_form = CreateTestAddressFormData();
-  FormsSeen(std::vector<FormData>(1, address_form));
-
-  ManuallyFillAddressForm("Jane", "Doe", "77401", "US", &address_form);
-  FormSubmitted(address_form);
-
-  // Set up our credit card form data.
-  FormData credit_card_form = CreateTestCreditCardFormData();
-  FormsSeen(std::vector<FormData>(1, credit_card_form));
-
-  // Edit the data, and submit.
-  test_api(credit_card_form).field(0).set_value(u"Jane Doe");
-  test_api(credit_card_form).field(1).set_value(u"4111111111111111");
-  test_api(credit_card_form)
-      .field(2)
-      .set_value(ASCIIToUTF16(test::NextMonth()));
-  test_api(credit_card_form).field(3).set_value(ASCIIToUTF16(test::NextYear()));
-  test_api(credit_card_form).field(4).set_value(u"123");
-
-  base::HistogramTester histogram_tester;
-
-  // No form of credit card save should be shown.
-  EXPECT_CALL(payments_autofill_client(), ShowSaveCreditCardLocally).Times(0);
-
-  FormSubmitted(credit_card_form);
-
-  EXPECT_FALSE(credit_card_save_manager().CreditCardWasUploaded());
-
-  // Verify that the correct histogram entries for card save not offered due to
-  // max strikes were logged.
-  ExpectCardUploadDecision(
-      histogram_tester,
-      autofill_metrics::UPLOAD_NOT_OFFERED_MAX_STRIKES_ON_MOBILE);
-  histogram_tester.ExpectBucketCount(
-      "Autofill.StrikeDatabase.CreditCardSaveNotOfferedDueToMaxStrikes",
-      AutofillMetrics::SaveTypeMetric::SERVER, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Server",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-#if BUILDFLAG(IS_ANDROID)
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Server",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-#else
-  histogram_tester.ExpectBucketCount(
-      "Autofill.SaveCreditCardPromptOffer.IOS.Server.Banner",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-#endif
-  // Verify that the correct UKM was logged.
-  ExpectCardUploadDecisionUkm(
-      autofill_metrics::UPLOAD_NOT_OFFERED_MAX_STRIKES_ON_MOBILE);
-}
-
-// Tests that a card that gets a strike does not offer save on mobile at all as
-// long as the required delay has not passed.
-TEST_F(CreditCardSaveManagerTest,
-       LocallySaveCreditCard_RequiredDelayNotPassedDoesNotOfferToSave) {
-  base::test::ScopedFeatureList feature_list{
-      features::kAutofillUpstreamEnforceStrikeDelay};
-
-  credit_card_save_manager().SetCreditCardUploadEnabled(false);
-  TestCreditCardSaveStrikeDatabase credit_card_save_strike_database =
-      TestCreditCardSaveStrikeDatabase(&strike_database());
-
-  // Add a single strike for the card to be added, but do not advance the clock.
-  credit_card_save_strike_database.AddStrike("1111");
-  EXPECT_EQ(credit_card_save_strike_database.GetStrikes("1111"), 1);
-
-  // Set up our credit card form data.
-  FormData credit_card_form = CreateTestCreditCardFormData();
-  FormsSeen(std::vector<FormData>(1, credit_card_form));
-
-  // Edit the data, and submit.
-  test_api(credit_card_form).field(0).set_value(u"Jane Doe");
-  test_api(credit_card_form).field(1).set_value(u"4111111111111111");
-  test_api(credit_card_form)
-      .field(2)
-      .set_value(ASCIIToUTF16(test::NextMonth()));
-  test_api(credit_card_form).field(3).set_value(ASCIIToUTF16(test::NextYear()));
-  test_api(credit_card_form).field(4).set_value(u"123");
-
-  base::HistogramTester histogram_tester;
-
-  // No form of credit card save should be shown.
-  EXPECT_CALL(payments_autofill_client(), ShowSaveCreditCardLocally).Times(0);
-
-  FormSubmitted(credit_card_form);
-
-  EXPECT_FALSE(credit_card_save_manager().CreditCardWasUploaded());
-
-  // Verify that the correct histogram entries for card save not offered due to
-  // required delay not passed were logged.
-  histogram_tester.ExpectBucketCount(
-      "Autofill.StrikeDatabase.CreditCardSaveNotOfferedDueToMaxStrikes",
-      AutofillMetrics::SaveTypeMetric::LOCAL, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Local",
-      autofill_metrics::SaveCardPromptOffer::kNotShownRequiredDelay, 1);
-
-#if BUILDFLAG(IS_ANDROID)
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Local",
-      autofill_metrics::SaveCardPromptOffer::kNotShownRequiredDelay, 1);
-#else
-  histogram_tester.ExpectBucketCount(
-      "Autofill.SaveCreditCardPromptOffer.IOS.Local.Banner",
-      autofill_metrics::SaveCardPromptOffer::kNotShownRequiredDelay, 1);
-#endif
-}
-
-// Tests that a card that gets a strike does not show the save bubble/infobar as
-// long as the required delay has not passed.
-TEST_F(CreditCardSaveManagerTest,
-       UploadCreditCard_RequiredDelayNotPassedDoesNotOfferToSave) {
-  base::test::ScopedFeatureList feature_list{
-      features::kAutofillUpstreamEnforceStrikeDelay};
-
-  TestCreditCardSaveStrikeDatabase credit_card_save_strike_database =
-      TestCreditCardSaveStrikeDatabase(&strike_database());
-
-  // Add a single strike for the card to be added, but do not advance the clock.
-  credit_card_save_strike_database.AddStrike("1111");
-  EXPECT_EQ(credit_card_save_strike_database.GetStrikes("1111"), 1);
-
-  // Create, fill and submit an address form in order to establish a recent
-  // profile which can be selected for the upload request.
-  FormData address_form = CreateTestAddressFormData();
-  FormsSeen(std::vector<FormData>(1, address_form));
-
-  ManuallyFillAddressForm("Jane", "Doe", "77401", "US", &address_form);
-  FormSubmitted(address_form);
-
-  // Set up our credit card form data.
-  FormData credit_card_form = CreateTestCreditCardFormData();
-  FormsSeen(std::vector<FormData>(1, credit_card_form));
-
-  // Edit the data, and submit.
-  test_api(credit_card_form).field(0).set_value(u"Jane Doe");
-  test_api(credit_card_form).field(1).set_value(u"4111111111111111");
-  test_api(credit_card_form)
-      .field(2)
-      .set_value(ASCIIToUTF16(test::NextMonth()));
-  test_api(credit_card_form).field(3).set_value(ASCIIToUTF16(test::NextYear()));
-  test_api(credit_card_form).field(4).set_value(u"123");
-
-  base::HistogramTester histogram_tester;
-
-  // No form of credit card save should be shown.
-  EXPECT_CALL(payments_autofill_client(), ShowSaveCreditCardLocally).Times(0);
-
-  FormSubmitted(credit_card_form);
-
-  EXPECT_FALSE(credit_card_save_manager().CreditCardWasUploaded());
-
-  // Verify that the correct histogram entries for card save not offered due to
-  // required delay not passed were logged.
-  ExpectCardUploadDecision(
-      histogram_tester,
-      autofill_metrics::UPLOAD_NOT_OFFERED_MAX_STRIKES_ON_MOBILE);
-  histogram_tester.ExpectBucketCount(
-      "Autofill.StrikeDatabase.CreditCardSaveNotOfferedDueToMaxStrikes",
-      AutofillMetrics::SaveTypeMetric::SERVER, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Server",
-      autofill_metrics::SaveCardPromptOffer::kNotShownRequiredDelay, 1);
-#if BUILDFLAG(IS_ANDROID)
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Server",
-      autofill_metrics::SaveCardPromptOffer::kNotShownRequiredDelay, 1);
-#else
-  histogram_tester.ExpectBucketCount(
-      "Autofill.SaveCreditCardPromptOffer.IOS.Server.Banner",
-      autofill_metrics::SaveCardPromptOffer::kNotShownRequiredDelay, 1);
-#endif
-  // Verify that the correct UKM was logged.
-  ExpectCardUploadDecisionUkm(
-      autofill_metrics::UPLOAD_NOT_OFFERED_MAX_STRIKES_ON_MOBILE);
-}
-
-TEST_F(CreditCardSaveManagerTest,
-       SaveCreditCard_RequestingMissingData_MaxStrikesDisallowsSave) {
-  TestCreditCardSaveStrikeDatabase credit_card_save_strike_database =
-      TestCreditCardSaveStrikeDatabase(&strike_database());
-
-  // Max out strikes for the card to be added.
-  credit_card_save_strike_database.AddStrike("1111");
-  credit_card_save_strike_database.AddStrike("1111");
-  credit_card_save_strike_database.AddStrike("1111");
-  EXPECT_EQ(credit_card_save_strike_database.GetStrikes("1111"), 3);
-
-  // Create, fill and submit an address form in order to establish a recent
-  // profile which can be selected for the upload request.
-  FormData address_form = CreateTestAddressFormData();
-  FormsSeen(std::vector<FormData>(1, address_form));
-
-  ManuallyFillAddressForm("Jane", "Doe", "77401", "US", &address_form);
-  FormSubmitted(address_form);
-
-  // Set up our credit card form data.
-  FormData credit_card_form = CreateTestCreditCardFormData();
-  FormsSeen(std::vector<FormData>(1, credit_card_form));
-
-  // Edit the credit card data without expiration month, and submit.
-  test_api(credit_card_form).field(0).set_value(u"Jane Doe");
-  test_api(credit_card_form).field(1).set_value(u"4111111111111111");
-  test_api(credit_card_form).field(2).set_value(u"");
-  test_api(credit_card_form).field(3).set_value(ASCIIToUTF16(test::NextYear()));
-  test_api(credit_card_form).field(4).set_value(u"123");
-
-  base::HistogramTester histogram_tester;
-
-  EXPECT_CALL(payments_autofill_client(), ShowSaveCreditCardLocally).Times(0);
-
-  FormSubmitted(credit_card_form);
-
-  EXPECT_FALSE(credit_card_save_manager().CreditCardWasUploaded());
-
-  // Verify that the correct histogram entries for card save not offered due to
-  // max strikes were logged.
-  histogram_tester.ExpectBucketCount(
-      "Autofill.StrikeDatabase.CreditCardSaveNotOfferedDueToMaxStrikes",
-      AutofillMetrics::SaveTypeMetric::SERVER, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Server",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Server",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Autofill.SaveCreditCardPromptOffer.Android.Server."
-      "RequestingExpirationDate",
-      autofill_metrics::SaveCardPromptOffer::kNotShownMaxStrikesReached, 1);
-}
-
-#else
 // Tests that a card with max strikes should still offer to save on Desktop via
 // the omnibox icon, but that the offer-to-save bubble itself is not shown.
 TEST_F(CreditCardSaveManagerTest,
@@ -5912,7 +5536,6 @@ TEST_F(CreditCardSaveManagerTest,
       "Autofill.SaveCreditCardPromptOffer.Server",
       autofill_metrics::SaveCardPromptOffer::kNotShownRequiredDelay, 1);
 }
-#endif
 
 // Tests that adding a card clears all strikes for that card.
 TEST_F(CreditCardSaveManagerTest, LocallySaveCreditCard_ClearStrikesOnAdd) {

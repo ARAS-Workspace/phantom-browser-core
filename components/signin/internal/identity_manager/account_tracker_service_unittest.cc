@@ -52,10 +52,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/signin/public/identity_manager/identity_test_utils.h"
-#endif
-
 using signin::constants::kNoHostedDomainFound;
 
 namespace {
@@ -79,9 +75,7 @@ const AccountKey kAccountKeyIncomplete = {"incomplete"};
 const AccountKey kAccountKeyFooBar = {"foobar"};
 const AccountKey kAccountKeyFooDotBar = {"foo.bar"};
 
-#if !BUILDFLAG(IS_ANDROID)
 const AccountKey kAccountKeyAdvancedProtection = {"advanced_protection"};
-#endif
 
 const char kTokenInfoResponseFormat[] =
     "{                        \
@@ -200,12 +194,6 @@ class AccountTrackerServiceTest : public testing::Test {
   AccountTrackerServiceTest()
       : signin_client_(&pref_service_),
         fake_oauth2_token_service_(&pref_service_) {
-#if BUILDFLAG(IS_ANDROID)
-    // Mock AccountManagerFacade in java code for tests that require its
-    // initialization.
-    signin::SetUpFakeAccountManagerFacade();
-#endif
-
     AccountTrackerService::RegisterPrefs(pref_service_.registry());
     AccountFetcherService::RegisterPrefs(pref_service_.registry());
     ProfileOAuth2TokenService::RegisterProfilePrefs(pref_service_.registry());
@@ -1000,10 +988,8 @@ TEST_F(AccountTrackerServiceTest, Persistence) {
   account_tracker()->SetIsChildAccount(AccountKeyToAccountId(kAccountKeyBeta),
                                        true);
 
-#if !BUILDFLAG(IS_ANDROID)
   account_tracker()->SetIsAdvancedProtectionAccount(
       AccountKeyToAccountId(kAccountKeyBeta), true);
-#endif
 
   // Create a new tracker and make sure it loads the single account from
   // persistence. Also verify it is a child account.
@@ -1014,11 +1000,7 @@ TEST_F(AccountTrackerServiceTest, Persistence) {
   CheckAccountDetails(kAccountKeyBeta, infos[0]);
   CheckAccountCapabilities(kAccountKeyBeta, infos[0]);
   EXPECT_EQ(infos[0].IsChildAccount(), signin::Tribool::kTrue);
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(infos[0].IsUnderAdvancedProtection());
-#else
-  EXPECT_FALSE(infos[0].IsUnderAdvancedProtection());
-#endif
 
   // Delete the account tracker before cleaning up |scoped_user_data_dir| so
   // that all in-use files are closed.
@@ -1512,7 +1494,6 @@ TEST_F(AccountTrackerServiceTest, RemoveAccountBeforeCapabilitiesFetched) {
   EXPECT_TRUE(account_fetcher()->AreAllAccountCapabilitiesFetched());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AccountTrackerServiceTest, AdvancedProtectionAccountBasic) {
   SimulateTokenAvailable(kAccountKeyAdvancedProtection);
   IssueAccessToken(kAccountKeyAdvancedProtection);
@@ -1529,7 +1510,6 @@ TEST_F(AccountTrackerServiceTest, AdvancedProtectionAccountBasic) {
 
   SimulateTokenRevoked(kAccountKeyAdvancedProtection);
 }
-#endif
 
 TEST_F(AccountTrackerServiceTest, CountOfLoadedAccounts_NoAccount) {
   base::HistogramTester tester;

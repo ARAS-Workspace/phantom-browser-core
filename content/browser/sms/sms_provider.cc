@@ -14,9 +14,6 @@
 #include "content/public/common/content_switches.h"
 #include "url/gurl.h"
 #include "url/origin.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/sms/sms_provider_gms.h"
-#endif
 
 namespace content {
 
@@ -25,11 +22,7 @@ SmsProvider::~SmsProvider() = default;
 
 // static
 std::unique_ptr<SmsProvider> SmsProvider::Create() {
-#if BUILDFLAG(IS_ANDROID)
-  return std::make_unique<SmsProviderGms>();
-#else
   return nullptr;
-#endif
 }
 
 void SmsProvider::AddObserver(Observer* observer) {

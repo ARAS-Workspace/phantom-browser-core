@@ -48,9 +48,6 @@ SecurePaymentConfirmationController::~SecurePaymentConfirmationController() =
     default;
 
 void SecurePaymentConfirmationController::ShowDialog() {
-#if BUILDFLAG(IS_ANDROID)
-  NOTREACHED();
-#else
   if (!request_ || !request_->spec())
     return;
 
@@ -66,7 +63,6 @@ void SecurePaymentConfirmationController::ShowDialog() {
 
   if (number_of_initialization_tasks_ == 0)
     SetupModelAndShowDialogIfApplicable();
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void SecurePaymentConfirmationController::RetryDialog() {

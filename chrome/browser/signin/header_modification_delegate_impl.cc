@@ -121,18 +121,9 @@ void ProcessBoundSessionResponseHeaders(
 }  // namespace
 #endif  // BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 
-#if BUILDFLAG(IS_ANDROID)
-HeaderModificationDelegateImpl::HeaderModificationDelegateImpl(
-    Profile* profile,
-    bool incognito_enabled)
-    : profile_(profile),
-      cookie_settings_(CookieSettingsFactory::GetForProfile(profile_)),
-      incognito_enabled_(incognito_enabled) {}
-#else
 HeaderModificationDelegateImpl::HeaderModificationDelegateImpl(Profile* profile)
     : profile_(profile),
       cookie_settings_(CookieSettingsFactory::GetForProfile(profile_)) {}
-#endif
 
 HeaderModificationDelegateImpl::~HeaderModificationDelegateImpl() = default;
 
@@ -177,11 +168,9 @@ void HeaderModificationDelegateImpl::ProcessRequest(
       SyncServiceFactory::GetForProfile(profile_);
 
   ConsentLevel consent_level = ConsentLevel::kSignin;
-#if !BUILDFLAG(IS_ANDROID)
   if (!syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
     consent_level = ConsentLevel::kSync;
   }
-#endif
 
   IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(profile_);
@@ -200,12 +189,6 @@ void HeaderModificationDelegateImpl::ProcessRequest(
 
   int incognito_mode_availability =
       prefs->GetInteger(policy::policy_prefs::kIncognitoModeAvailability);
-#if BUILDFLAG(IS_ANDROID)
-  incognito_mode_availability =
-      incognito_enabled_
-          ? incognito_mode_availability
-          : static_cast<int>(policy::IncognitoModeAvailability::kDisabled);
-#endif
 
   // SyncService and IdentityManager updates are not atomic. There are edge
   // cases where SyncService thinks sync is enabled but IdentityManager has

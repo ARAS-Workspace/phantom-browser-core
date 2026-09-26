@@ -235,13 +235,8 @@ IN_PROC_BROWSER_TEST_P(WebRtcVideoCaptureServiceEnumerationBrowserTest,
 }
 
 // The mediadevices.ondevicechange event is currently not supported on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AddingAndRemovingVirtualDeviceTriggersMediaElementOnDeviceChange \
-  DISABLED_AddingAndRemovingVirtualDeviceTriggersMediaElementOnDeviceChange
-#else
 #define MAYBE_AddingAndRemovingVirtualDeviceTriggersMediaElementOnDeviceChange \
   AddingAndRemovingVirtualDeviceTriggersMediaElementOnDeviceChange
-#endif
 
 IN_PROC_BROWSER_TEST_P(
     WebRtcVideoCaptureServiceEnumerationBrowserTest,

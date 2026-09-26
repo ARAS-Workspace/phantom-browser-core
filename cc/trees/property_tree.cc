@@ -831,11 +831,9 @@ void TransformTree::UpdateLocalTransform(
   // Android does a stretch effect instead of translation - since we cannot do
   // a simple translation to undo the root elastic overscroll effect -
   // on Android we simply skip this.
-#if !BUILDFLAG(IS_ANDROID)
   if (node->should_undo_overscroll) {
     UndoOverscroll(*node, position_adjustment, viewport_property_ids);
   }
-#endif
   transform.Translate(position_adjustment);
 
   const std::pair<ElementId, gfx::Vector2dF> elastic_overscroll =
@@ -844,14 +842,8 @@ void TransformTree::UpdateLocalTransform(
 
   if (!elastic_overscroll.second.IsZero()) {
     const auto& scroll_tree = property_trees()->scroll_tree();
-#if BUILDFLAG(IS_ANDROID)
-
-    ApplyElasticOverscrollStretch(scroll_tree, page_scale_factor(),
-                                  elastic_overscroll, &transform);
-#else
     ApplyElasticOverscrollTranslate(scroll_tree, page_scale_factor(),
                                     elastic_overscroll, &transform);
-#endif
   }
 
   // Apply scroll translate after elastic stretch so that the origin for

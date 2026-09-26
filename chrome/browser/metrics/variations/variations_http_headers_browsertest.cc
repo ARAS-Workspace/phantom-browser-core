@@ -81,15 +81,8 @@
 #include "third_party/zlib/google/compression_utils.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/test/base/android/android_ui_test_utils.h"
-#else
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/test/base/ui_test_utils.h"
-#endif
 
 namespace variations {
 namespace {
@@ -183,46 +176,6 @@ VariationsSeed CreateTestSeedWithLimitedEntropyLayer(
 
   return seed;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TabModel* FindTabModelForProfile(content::BrowserContext* context) {
-  for (TabModel* model : TabModelList::models()) {
-    if (model->GetProfile() == context) {
-      return model;
-    }
-  }
-  return nullptr;
-}
-
-void OpenUrlInNewTab(content::BrowserContext* context,
-                     content::WebContents* parent,
-                     const GURL& url) {
-  CHECK(parent);
-  CHECK(context);
-  TabModel* tab_model = TabModelList::GetTabModelForWebContents(parent);
-
-  std::unique_ptr<content::WebContents> contents =
-      content::WebContents::Create(content::WebContents::CreateParams(context));
-  content::WebContents* raw_web_contents = contents.get();
-  auto* new_tab =
-      tab_model->CreateTab(TabAndroid::FromWebContents(parent),
-                           std::move(contents), TabModel::kInvalidIndex,
-                           TabModel::TabLaunchType::FROM_RECENT_TABS_FOREGROUND,
-                           /*should_pin=*/false);
-
-  content::NavigateToURLBlockUntilNavigationsComplete(
-      raw_web_contents, url, /*number_of_navigations=*/1,
-      /*ignore_uncommitted_navigations=*/false);
-
-  TabModel* new_tab_model = FindTabModelForProfile(context);
-  ASSERT_NE(new_tab_model, nullptr);
-  ASSERT_TRUE(new_tab_model->IsOffTheRecord());
-
-  tabs::TabHandle new_tab_handle = new_tab->GetHandle();
-  ASSERT_NE(new_tab_handle.raw_value(), 0);
-  new_tab_model->ActivateTab(new_tab_handle);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 GURL GetGoogleUrlWithPath(const std::string& path,
                           net::EmbeddedTestServer* server) {
@@ -373,20 +326,6 @@ class VariationsHttpHeadersBrowserTest : public PlatformBrowserTest {
   void TearDownOnMainThread() override {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(crbug.com/480962318): Remove this workaround when fixed.
-    // On Android there seems to be a race between deinitialization of the
-    // FeatureList through the browsertest and Android actual UI thread.
-    // This results in rare crash in
-    // BluetoothNotificationManager.clearBluetoothNotifications().
-    // The workaround is to drain the RunLoop before allowing the test
-    // to tear down.
-    base::RunLoop run_loop;
-    base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-        FROM_HERE, run_loop.QuitClosure());
-    run_loop.Run();
-    sync();
-#endif
     PlatformBrowserTest::TearDownOnMainThread();
   }
 
@@ -396,17 +335,10 @@ class VariationsHttpHeadersBrowserTest : public PlatformBrowserTest {
     CHECK(!chrome_test_utils::GetProfile(this)->IsIncognitoProfile());
     const GURL url("about:blank");
 
-#if BUILDFLAG(IS_ANDROID)
-    Profile* otr_profile =
-        chrome_test_utils::GetProfile(this)->GetPrimaryOTRProfile(
-            /*create_if_needed=*/true);
-    OpenUrlInNewTab(otr_profile, GetWebContents(), url);
-#else
     BrowserWindowInterface* incognito =
         CreateIncognitoBrowser(chrome_test_utils::GetProfile(this));
     SetBrowser(incognito);
     NavigateToURL(url);
-#endif
     ASSERT_TRUE(chrome_test_utils::GetProfile(this)->IsIncognitoProfile());
   }
 

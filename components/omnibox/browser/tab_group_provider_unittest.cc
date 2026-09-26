@@ -212,13 +212,8 @@ TEST_F(TabGroupProviderTest, TestFilterChromePrefixedTabs) {
   ASSERT_TRUE(
       tab_group_provider().matches()[0].matching_tab_group_uuid.has_value());
   ASSERT_EQ("0", tab_group_provider().matches()[0].image_dominant_color);
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ(u"google.com/saved_2",
-            tab_group_provider().matches()[0].description);
-#else
   ASSERT_EQ(u"chrome://newtab, google.com/saved_2",
             tab_group_provider().matches()[0].description);
-#endif
 }
 
 TEST_F(TabGroupProviderTest, TestFilterChromePrefixedTabsNoDescription) {
@@ -240,11 +235,7 @@ TEST_F(TabGroupProviderTest, TestFilterChromePrefixedTabsNoDescription) {
   ASSERT_TRUE(
       tab_group_provider().matches()[0].matching_tab_group_uuid.has_value());
   ASSERT_EQ("0", tab_group_provider().matches()[0].image_dominant_color);
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ(u"", tab_group_provider().matches()[0].description);
-#else
   ASSERT_EQ(u"chrome://newtab", tab_group_provider().matches()[0].description);
-#endif
 }
 
 TEST_F(TabGroupProviderTest, TestNoMatchResultsOnChromePrefixedUrlMatch) {
@@ -261,9 +252,5 @@ TEST_F(TabGroupProviderTest, TestNoMatchResultsOnChromePrefixedUrlMatch) {
                               OmniboxEventProto_PageClassification_ANDROID_HUB,
                           TestSchemeClassifier());
   tab_group_provider().Start(input, /* minimal_changes= */ false);
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_EQ(0UL, tab_group_provider().matches().size());
-#else
   ASSERT_EQ(1UL, tab_group_provider().matches().size());
-#endif
 }

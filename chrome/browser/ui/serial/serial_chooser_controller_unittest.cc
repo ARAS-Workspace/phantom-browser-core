@@ -666,11 +666,7 @@ TEST_F(SerialChooserControllerTest,
   run_loop.Run();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_BluetoothAdapterNotPresent BluetoothAdapterNotPresent
-#else
 #define MAYBE_BluetoothAdapterNotPresent DISABLED_BluetoothAdapterNotPresent
-#endif  // BUILDFLAG(IS_ANDROID)
 TEST_F(SerialChooserControllerTest, MAYBE_BluetoothAdapterNotPresent) {
   std::vector<blink::mojom::SerialPortFilterPtr> filters;
   auto filter = blink::mojom::SerialPortFilter::New();

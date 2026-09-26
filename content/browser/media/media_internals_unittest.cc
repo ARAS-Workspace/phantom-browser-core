@@ -173,8 +173,6 @@ TEST_F(MediaInternalsVideoCaptureDeviceTest,
 #elif BUILDFLAG(IS_LINUX)
   descriptor.device_id = "/dev/dummy";
   descriptor.capture_api = media::VideoCaptureApi::LINUX_V4L2_SINGLE_PLANE;
-#elif BUILDFLAG(IS_ANDROID)
-  descriptor.capture_api = media::VideoCaptureApi::ANDROID_API2_LEGACY;
 #endif
   std::vector<std::tuple<media::VideoCaptureDeviceDescriptor,
                          media::VideoCaptureFormats>>
@@ -201,8 +199,6 @@ TEST_F(MediaInternalsVideoCaptureDeviceTest,
   ExpectString("captureApi", "V4L2 SPLANE");
 #elif BUILDFLAG(IS_MAC)
   ExpectString("captureApi", "AV Foundation");
-#elif BUILDFLAG(IS_ANDROID)
-  ExpectString("captureApi", "Camera API2 Legacy");
 #endif
 }
 
@@ -301,7 +297,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 // TODO(crbug.com/40589017): AudioFocusManager is not available on
 // Android.
-#if !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -493,7 +488,5 @@ TEST_F(MediaInternalsAudioFocusTest, AudioFocusStateIsUpdated) {
     EXPECT_EQ(0u, found_sessions.GetList().size());
   }
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

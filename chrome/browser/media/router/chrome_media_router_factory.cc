@@ -12,13 +12,7 @@
 #include "components/media_router/browser/media_router_dialog_controller.h"
 #include "content/public/browser/browser_context.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/media/android/router/chrome_media_router_client.h"
-#include "components/media_router/browser/android/media_router_android.h"
-#include "components/media_router/browser/android/media_router_dialog_controller_android.h"
-#else
 #include "chrome/browser/media/router/mojo/media_router_desktop.h"
-#endif
 
 using content::BrowserContext;
 
@@ -37,24 +31,7 @@ ChromeMediaRouterFactory* ChromeMediaRouterFactory::GetInstance() {
 }
 
 // static
-void ChromeMediaRouterFactory::DoPlatformInit() {
-#if BUILDFLAG(IS_ANDROID)
-  InitChromeMediaRouterJavaClient();
-
-  // The desktop (Views) version of this is in ChromeBrowserMainExtraPartsViews
-  // because we can't reach into Views from this directory.
-  media_router::MediaRouterDialogController::SetGetOrCreate(
-      base::BindRepeating([](content::WebContents* web_contents) {
-        DCHECK(web_contents);
-        MediaRouterDialogController* controller = nullptr;
-        // This call does nothing if the controller already exists.
-        MediaRouterDialogControllerAndroid::CreateForWebContents(web_contents);
-        controller =
-            MediaRouterDialogControllerAndroid::FromWebContents(web_contents);
-        return controller;
-      }));
-#endif
-}
+void ChromeMediaRouterFactory::DoPlatformInit() {}
 
 ChromeMediaRouterFactory::ChromeMediaRouterFactory() = default;
 
@@ -80,11 +57,7 @@ ChromeMediaRouterFactory::BuildServiceInstanceForBrowserContext(
     BrowserContext* context) const {
   CHECK(MediaRouterEnabled(context));
   std::unique_ptr<MediaRouterBase> media_router = nullptr;
-#if BUILDFLAG(IS_ANDROID)
-  media_router = std::make_unique<MediaRouterAndroid>();
-#else
   media_router = std::make_unique<MediaRouterDesktop>(context);
-#endif  // BUILDFLAG(IS_ANDROID)
   media_router->Initialize();
   return media_router;
 }

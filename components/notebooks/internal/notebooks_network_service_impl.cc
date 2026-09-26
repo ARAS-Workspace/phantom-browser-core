@@ -27,10 +27,6 @@
 #include "net/traffic_annotation/network_traffic_annotation.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 using endpoint_fetcher::EndpointFetcher;
 using endpoint_fetcher::EndpointResponse;
 
@@ -168,12 +164,7 @@ enum class Device {
 enum class ApplicationPlatform { kWeb, kNative };
 
 Device GetDevice() {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_desktop()) {
-    return Device::kDesktopAndroid;
-  }
-  return Device::kMobileAndroid;
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return Device::kDesktop;
 #else
   return Device::kOther;
@@ -196,14 +187,7 @@ std::string_view DeviceToString(Device device) {
 }
 
 ApplicationPlatform GetApplicationPlatform() {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::android::device_info::is_desktop()) {
-    return ApplicationPlatform::kWeb;
-  }
-  return ApplicationPlatform::kNative;
-#else
   return ApplicationPlatform::kWeb;
-#endif
 }
 
 std::string_view ApplicationPlatformToString(ApplicationPlatform platform) {

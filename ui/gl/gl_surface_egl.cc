@@ -123,14 +123,7 @@ bool ValidateEglConfig(EGLDisplay display,
 }
 
 bool IsAndroidEmulator() {
-#if BUILDFLAG(IS_ANDROID)
-  static bool is_emulator =
-      base::SysInfo::GetAndroidHardwareEGL() == "swiftshader" ||
-      base::SysInfo::GetAndroidHardwareEGL() == "emulation";
-  return is_emulator;
-#else
   return false;
-#endif
 }
 
 EGLConfig ChooseConfig(EGLDisplay display,
@@ -310,18 +303,6 @@ GLSurfaceEGL::~GLSurfaceEGL() {
   CHECK(!HasWeakPtrs());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-NativeViewGLSurfaceEGL::NativeViewGLSurfaceEGL(
-    GLDisplayEGL* display,
-    ScopedANativeWindow scoped_window,
-    std::unique_ptr<gfx::VSyncProvider> vsync_provider,
-    bool video_encoder_input)
-    : GLSurfaceEGL(display),
-      scoped_window_(std::move(scoped_window)),
-      video_encoder_input_(video_encoder_input),
-      window_(scoped_window_.a_native_window()),
-      vsync_provider_external_(std::move(vsync_provider)) {}
-#else
 NativeViewGLSurfaceEGL::NativeViewGLSurfaceEGL(
     GLDisplayEGL* display,
     EGLNativeWindowType window,
@@ -330,18 +311,6 @@ NativeViewGLSurfaceEGL::NativeViewGLSurfaceEGL(
       window_(window),
       vsync_provider_external_(std::move(vsync_provider)) {
 }
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-EGLConfig NativeViewGLSurfaceEGL::GetConfig() {
-  if (!config_) {
-    config_ =
-        ChooseConfig(display_->GetDisplay(), format_, IsSurfaceless(),
-                     IsOffscreen(), video_encoder_input_, GetNativeVisualID());
-  }
-  return config_;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 bool NativeViewGLSurfaceEGL::Initialize(GLSurfaceFormat format) {
   DCHECK(!surface_);
@@ -399,12 +368,7 @@ bool NativeViewGLSurfaceEGL::Initialize(GLSurfaceFormat format) {
   // Note that COLORSPACE_LINEAR refers to the sRGB color space, but
   // without opting into sRGB blending. It is equivalent to
   // COLORSPACE_SRGB with Disable(FRAMEBUFFER_SRGB).
-  if (display_->ext->b_EGL_KHR_gl_colorspace
-#if BUILDFLAG(IS_ANDROID)
-      // These attributes upset video encoder and cause an internal error
-      && !video_encoder_input_
-#endif
-  ) {
+  if (display_->ext->b_EGL_KHR_gl_colorspace) {
     egl_window_attributes.push_back(EGL_GL_COLORSPACE_KHR);
     egl_window_attributes.push_back(EGL_GL_COLORSPACE_LINEAR_KHR);
   }
@@ -903,20 +867,6 @@ bool NativeViewGLSurfaceEGL::GetFrameTimestampInfoIfAvailable(
   return true;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-void NativeViewGLSurfaceEGL::SetPresentationTimestamp(
-    base::TimeTicks presentation_time) {
-  DCHECK(surface_);
-  if (!display_->ext->b_EGL_ANDROID_presentation_time) {
-    LOG(ERROR) << "EGL_ANDROID_presentation_time is not supported";
-    return;
-  }
-
-  EGLnsecsANDROID time_nsecs = presentation_time.since_origin().InNanoseconds();
-  eglPresentationTimeANDROID(display_->GetDisplay(), surface_, time_nsecs);
-}
-#endif
-
 gfx::SwapResult NativeViewGLSurfaceEGL::SwapBuffersWithDamage(
     const std::vector<int>& rects,
     PresentationCallback callback,
@@ -1009,16 +959,6 @@ bool PbufferGLSurfaceEGL::Initialize(GLSurfaceFormat format) {
   }
 
   EGLSurface old_surface = surface_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // This is to allow context virtualization which requires on- and offscreen
-  // to use a compatible config. We expect the client to request RGB565
-  // onscreen surface also for this to work (with the exception of
-  // fullscreen video).
-  if (features::PreferRGB565ResourcesForDisplay()) {
-    format.SetRGB565();
-  }
-#endif
 
   format_ = format;
 
@@ -1117,9 +1057,6 @@ EGLSurface PbufferGLSurfaceEGL::GetHandle() {
 }
 
 void* PbufferGLSurfaceEGL::GetShareHandle() {
-#if BUILDFLAG(IS_ANDROID)
-  NOTREACHED();
-#else
   if (!display_->ext->b_EGL_ANGLE_query_surface_pointer)
     return nullptr;
 
@@ -1134,7 +1071,6 @@ void* PbufferGLSurfaceEGL::GetShareHandle() {
   }
 
   return handle;
-#endif
 }
 
 PbufferGLSurfaceEGL::~PbufferGLSurfaceEGL() {

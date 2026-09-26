@@ -79,22 +79,12 @@
 #include "chrome/browser/web_applications/sub_apps/sub_apps_service_impl.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/dom_distiller/distiller_ui_handle_android.h"
-#include "chrome/browser/facilitated_payments/payment_link_handler_binder.h"
-#include "chrome/browser/offline_pages/android/offline_page_auto_fetcher.h"
-#include "chrome/common/offline_page_auto_fetcher.mojom.h"
-#include "services/service_manager/public/cpp/interface_provider.h"
-#include "third_party/blink/public/mojom/digital_goods/digital_goods.mojom.h"
-#include "third_party/blink/public/mojom/installedapp/installed_app_provider.mojom.h"
-#else
 #include "chrome/browser/badging/badge_manager.h"
 #include "chrome/browser/payments/payment_request_factory.h"
 #include "chrome/browser/prefs/persistent_renderer_prefs_manager.h"
 #include "chrome/browser/web_applications/web_install_service_impl.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/webshare/share_service_impl.h"
 #include "chrome/common/chrome_features.h"
@@ -174,11 +164,6 @@ void BindDistillerJavaScriptService(
   dom_distiller::DomDistillerService* dom_distiller_service =
       dom_distiller::DomDistillerServiceFactory::GetForBrowserContext(
           web_contents->GetBrowserContext());
-#if BUILDFLAG(IS_ANDROID)
-  static_cast<dom_distiller::android::DistillerUIHandleAndroid*>(
-      dom_distiller_service->GetDistillerUIHandle())
-      ->set_render_frame_host(frame_host);
-#endif
   CreateDistillerJavaScriptService(dom_distiller_service->GetWeakPtr(),
                                    std::move(receiver));
 }
@@ -213,24 +198,6 @@ void BindNoStatePrefetchProcessor(
       std::make_unique<
           prerender::ChromeNoStatePrefetchProcessorImplDelegate>());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-template <typename Interface>
-void ForwardToJavaWebContents(content::RenderFrameHost* frame_host,
-                              mojo::PendingReceiver<Interface> receiver) {
-  content::WebContents* contents =
-      content::WebContents::FromRenderFrameHost(frame_host);
-  if (contents) {
-    contents->GetJavaInterfaces()->GetInterface(std::move(receiver));
-  }
-}
-
-template <typename Interface>
-void ForwardToJavaFrame(content::RenderFrameHost* render_frame_host,
-                        mojo::PendingReceiver<Interface> receiver) {
-  render_frame_host->GetJavaInterfaces()->GetInterface(std::move(receiver));
-}
-#endif
 
 void BindNetworkHintsHandler(
     content::RenderFrameHost* frame_host,
@@ -345,28 +312,6 @@ void PopulateChromeFrameBinders(
       base::BindRepeating(
           &SearchEngineTabHelper::BindOpenSearchDescriptionDocumentHandler));
 
-#if BUILDFLAG(IS_ANDROID)
-  map->Add<blink::mojom::InstalledAppProvider>(
-      &ForwardToJavaFrame<blink::mojom::InstalledAppProvider>);
-  map->Add<payments::mojom::DigitalGoodsFactory>(
-      &ForwardToJavaFrame<payments::mojom::DigitalGoodsFactory>);
-#if defined(BROWSER_MEDIA_CONTROLS_MENU)
-  map->Add<blink::mojom::MediaControlsMenuHost>(
-      &ForwardToJavaFrame<blink::mojom::MediaControlsMenuHost>);
-#endif
-  map->Add<chrome::mojom::OfflinePageAutoFetcher>(
-      &offline_pages::OfflinePageAutoFetcher::Create);
-  if (base::FeatureList::IsEnabled(features::kWebPayments)) {
-    map->Add<payments::mojom::PaymentRequest>(
-        &ForwardToJavaFrame<payments::mojom::PaymentRequest>);
-  }
-
-#if BUILDFLAG(ENABLE_UNHANDLED_TAP)
-  map->Add<blink::mojom::UnhandledTapNotifier>(
-      &BindUnhandledTapWebContentsObserver);
-#endif  // BUILDFLAG(ENABLE_UNHANDLED_TAP)
-
-#else
   map->Add<blink::mojom::BadgeService>(
       &badging::BadgeManager::BindFrameReceiverIfAllowed);
   map->Add<blink::mojom::PersistentRendererPrefsService>(
@@ -380,14 +325,9 @@ void PopulateChromeFrameBinders(
     map->Add<blink::mojom::WebInstallService>(
         &web_app::WebInstallServiceImpl::CreateIfAllowed);
   }
-#endif
 
 #if BUILDFLAG(IS_MAC)
   map->Add<blink::mojom::ShareService>(&ShareServiceImpl::Create);
-#endif
-#if BUILDFLAG(IS_ANDROID)
-  map->Add<blink::mojom::ShareService>(
-      &ForwardToJavaWebContents<blink::mojom::ShareService>);
 #endif
 
   map->Add<network_hints::mojom::NetworkHintsHandler>(&BindNetworkHintsHandler);
@@ -416,13 +356,6 @@ void PopulateChromeFrameBinders(
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
   map->Add<blink::mojom::WebPrintingService>(
       &printing::CreateWebPrintingServiceForFrame);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(blink::features::kPaymentLinkDetection)) {
-    map->Add<payments::facilitated::mojom::PaymentLinkHandler>(
-        &BindPaymentLinkHandler);
-  }
 #endif
 
 #if BUILDFLAG(ENABLE_SPELLCHECK)

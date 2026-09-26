@@ -119,11 +119,7 @@ const std::string_view kHttpTestUrls[] = {"http://www.example.com",
 
 // The default delay for main job defined in QuicSessionPool::
 // GetTimeDelayForWaitingJob().
-#if BUILDFLAG(IS_ANDROID)
-const int kDefaultDelayMilliSecsForWaitingJob = 400;
-#else
 const int kDefaultDelayMilliSecsForWaitingJob = 300;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Phases in which errors will happen for HTTP, HTTPS and SOCKS5 tests.
 enum class TcpErrorPhase {

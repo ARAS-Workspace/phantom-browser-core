@@ -75,11 +75,7 @@ void CheckDeathBySEGV(int status, const std::string& details) {
 namespace sandbox {
 
 bool IsAndroid() {
-#if BUILDFLAG(IS_ANDROID)
-  return true;
-#else
   return false;
-#endif
 }
 
 bool IsArchitectureArm() {
@@ -177,18 +173,6 @@ void UnitTests::RunTestInProcess(SandboxTestRunner* test_runner,
     // cases.
     struct rlimit no_core = {0};
     setrlimit(RLIMIT_CORE, &no_core);
-
-#if BUILDFLAG(IS_ANDROID)
-    // On Android Oreo and higher, the system applies a seccomp filter to all
-    // processes. It has its own SIGSYS handler that is un-hooked here in the
-    // test child process, so that the Chromium handler can be used. This
-    // is performed by SeccompStarterAndroid in normal builds.
-    signal(SIGSYS, SIG_DFL);
-    // In addition, libsigchain will install a SEGV handler that is normally
-    // used for JVM fault handling. Reset it so that the test SEGV failures
-    // are interpreted correctly.
-    signal(SIGSEGV, SIG_DFL);
-#endif
 
     test_runner->Run();
     if (test_runner->ShouldCheckForLeaks()) {
@@ -288,7 +272,7 @@ void UnitTests::DeathMessage(int status,
 
 // In official builds CHECK messages are dropped, look for SIGABRT or SIGTRAP.
 // See https://crbug.com/437312 and https://crbug.com/612507.
-#if defined(OFFICIAL_BUILD) && defined(NDEBUG) && !BUILDFLAG(IS_ANDROID)
+#if defined(OFFICIAL_BUILD) && defined(NDEBUG)
   if (subprocess_exited_without_matching_message) {
     static const char kSigTrapMessage[] = "Received signal 5";
     static const char kSigAbortMessage[] = "Received signal 6";

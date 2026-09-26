@@ -127,14 +127,10 @@ bool TestBookmarkClient::IsNodeManaged(const BookmarkNode* node) {
 
 // static
 bool TestBookmarkClient::IsDesktopFormFactorByDefault() {
-// TODO(crbug.com/509156770): Replace this ifdef with a call to
-// DeviceInfo::is_desktop() once it returns the correct value for desktop
-// Android tests.
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
-  return false;
-#else
+  // TODO(crbug.com/509156770): Replace this ifdef with a call to
+  // DeviceInfo::is_desktop() once it returns the correct value for desktop
+  // Android tests.
   return true;
-#endif
 }
 
 BookmarkFormFactor TestBookmarkClient::GetBookmarkFormFactor() {

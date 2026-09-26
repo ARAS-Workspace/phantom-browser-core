@@ -336,14 +336,7 @@ IN_PROC_BROWSER_TEST_F(BrowserChildProcessObserverBrowserTest,
     waiter.Wait();
   }
 
-  Notification kExitNotification =
-#if BUILDFLAG(IS_ANDROID)
-      // TODO(pmonette): On Android, this currently causes a killed
-      // notification. Consider fixing.
-      Notification::kKilled;
-#else
-      Notification::kExitedNormally;
-#endif  // BUILDFLAG(IS_ANDROID)
+  Notification kExitNotification = Notification::kExitedNormally;
 
   // The host should be deleted now.
   EXPECT_FALSE(host);
@@ -415,13 +408,7 @@ IN_PROC_BROWSER_TEST_F(BrowserChildProcessObserverBrowserTest,
     waiter.Wait();
   }
 
-  Notification kExitNotification =
-#if BUILDFLAG(IS_ANDROID)
-      // On Android, kKilled is always sent in the case of a crash.
-      Notification::kKilled;
-#else
-      Notification::kExitedNormally;
-#endif  // BUILDFLAG(IS_ANDROID)
+  Notification kExitNotification = Notification::kExitedNormally;
 
   // The host should be deleted now.
   EXPECT_FALSE(host);
@@ -436,11 +423,7 @@ IN_PROC_BROWSER_TEST_F(BrowserChildProcessObserverBrowserTest,
 // Tests that launching and then causing a crash the host results in a crashed
 // notification.
 // TODO(crbug.com/40868150): Times out on Android tests.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_LaunchAndCrash DISABLED_LaunchAndCrash
-#else
 #define MAYBE_LaunchAndCrash LaunchAndCrash
-#endif
 IN_PROC_BROWSER_TEST_F(BrowserChildProcessObserverBrowserTest,
                        MAYBE_LaunchAndCrash) {
   base::WeakPtr<TestProcessHost> host = TestProcessHost::Create();
@@ -461,13 +444,7 @@ IN_PROC_BROWSER_TEST_F(BrowserChildProcessObserverBrowserTest,
     waiter.Wait();
   }
 
-  Notification kCrashedNotification =
-#if BUILDFLAG(IS_ANDROID)
-      // On Android, kKilled is always sent in the case of a crash.
-      Notification::kKilled;
-#else
-      Notification::kCrashed;
-#endif  // BUILDFLAG(IS_ANDROID)
+  Notification kCrashedNotification = Notification::kCrashed;
 
   // The host should be deleted now.
   EXPECT_FALSE(host);

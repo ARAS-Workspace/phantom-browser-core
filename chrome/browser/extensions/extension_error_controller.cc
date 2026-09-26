@@ -13,11 +13,7 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension_set.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/extensions/extension_error_ui_android.h"
-#else
 #include "chrome/browser/extensions/extension_error_ui_desktop.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -27,11 +23,7 @@ namespace {
 
 ExtensionErrorUI* CreateDefaultExtensionErrorUI(
     ExtensionErrorUI::Delegate* delegate) {
-#if BUILDFLAG(IS_ANDROID)
-  return new ExtensionErrorUIAndroid(delegate);
-#else
   return new ExtensionErrorUIDesktop(delegate);
-#endif
 }
 
 ExtensionErrorController::UICreateMethod g_create_ui =

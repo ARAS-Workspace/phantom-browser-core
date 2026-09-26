@@ -38,11 +38,7 @@
 #include "chrome/browser/browsing_data/counters/hosted_apps_counter.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/public/browser/host_zoom_map.h"
-#else
-#include "chrome/browser/browsing_data/counters/tabs_counter.h"
-#endif
 
 namespace {
 
@@ -101,11 +97,7 @@ BrowsingDataCounterFactory::GetForProfileAndPref(Profile* profile,
   if (pref_name == browsing_data::prefs::kDeleteSiteSettings) {
     return std::make_unique<SiteSettingsCounter>(
         HostContentSettingsMapFactory::GetForProfile(profile),
-#if !BUILDFLAG(IS_ANDROID)
         content::HostZoomMap::GetDefaultForBrowserContext(profile),
-#else
-        nullptr,
-#endif
         ProtocolHandlerRegistryFactory::GetForBrowserContext(profile),
         profile->GetPrefs());
   }
@@ -113,12 +105,6 @@ BrowsingDataCounterFactory::GetForProfileAndPref(Profile* profile,
 #if BUILDFLAG(ENABLE_HOSTED_APPS)
   if (pref_name == browsing_data::prefs::kDeleteHostedAppsData) {
     return std::make_unique<HostedAppsCounter>(profile);
-  }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  if (pref_name == browsing_data::prefs::kCloseTabs) {
-    return std::make_unique<TabsCounter>(profile);
   }
 #endif
 

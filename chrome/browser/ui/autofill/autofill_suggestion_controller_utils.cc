@@ -25,11 +25,9 @@
 #include "content/public/browser/web_contents.h"
 #include "third_party/abseil-cpp/absl/functional/overload.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 // UserEducationService is not implemented on Android.
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/user_education/user_education_service.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace autofill {
 
@@ -118,11 +116,7 @@ SuggestionSection GetSuggestionSection(SuggestionType type) {
       return SuggestionSection::kBody;
 
     case SuggestionType::kWebauthnSignInWithAnotherDevice:
-#if BUILDFLAG(IS_ANDROID)
-      return SuggestionSection::kBody;
-#else
       return SuggestionSection::kFooter;
-#endif
   }
 }
 
@@ -310,37 +304,6 @@ bool IsPointerLocked(content::WebContents* web_contents) {
 
 void NotifyUserEducationAboutAcceptedSuggestion(content::WebContents* contents,
                                                 const Suggestion& suggestion) {
-#if BUILDFLAG(IS_ANDROID)
-  if (suggestion.iph_metadata.feature) {
-    using IphEventPair = std::pair<const base::Feature*, const char*>;
-    static const auto kIphFeatures = std::to_array<IphEventPair>(
-        {IphEventPair{&feature_engagement::kIPHAutofillCreditCardBenefitFeature,
-                      "autofill_credit_card_benefit_iph_accepted"},
-         IphEventPair{&feature_engagement::
-                          kIPHAutofillExternalAccountProfileSuggestionFeature,
-                      "autofill_external_account_profile_suggestion_accepted"},
-         IphEventPair{
-             &feature_engagement::kIPHAutofillVirtualCardSuggestionFeature,
-             "autofill_virtual_card_suggestion_accepted"},
-         IphEventPair{&feature_engagement::
-                          kIPHAutofillCardInfoRetrievalSuggestionFeature,
-                      "autofill_card_info_retrieval_suggestion_accepted"},
-         IphEventPair{&feature_engagement::
-                          kIPHAutofillDisabledVirtualCardSuggestionFeature,
-                      "autofill_disabled_virtual_card_suggestion_accepted"},
-         IphEventPair{
-             &feature_engagement::kIPHAutofillVirtualCardCVCSuggestionFeature,
-             "autofill_virtual_card_cvc_suggestion_accepted"}});
-    if (auto it =
-            std::ranges::find(kIphFeatures, suggestion.iph_metadata.feature,
-                              &IphEventPair::first);
-        it != kIphFeatures.end()) {
-      feature_engagement::TrackerFactory::GetForBrowserContext(
-          contents->GetBrowserContext())
-          ->NotifyEvent(it->second);
-    }
-  }
-#else
   if (suggestion.iph_metadata.feature) {
     if (auto* interface =
             BrowserUserEducationInterface::MaybeGetForWebContentsInTab(
@@ -355,7 +318,6 @@ void NotifyUserEducationAboutAcceptedSuggestion(content::WebContents* contents,
     UserEducationService::MaybeNotifyNewBadgeFeatureUsed(
         contents->GetBrowserContext(), *suggestion.feature_for_new_badge);
   }
-#endif
 }
 
 std::vector<Suggestion> UpdateSuggestionsFromDataList(

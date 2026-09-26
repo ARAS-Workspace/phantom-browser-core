@@ -63,7 +63,7 @@
 #include "content/common/sandbox_support.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 #include "services/tracing/public/cpp/system_tracing_service.h"
 #endif
 
@@ -333,27 +333,12 @@ void BrowserChildProcessHostImpl::LaunchWithoutExtraCommandLineSwitches(
     OnProcessConnected();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void BrowserChildProcessHostImpl::SetProcessPriority(
     base::Process::Priority priority) {
   DCHECK(child_process_launcher_);
   DCHECK(!child_process_launcher_->IsStarting());
   child_process_launcher_->SetProcessPriority(priority);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-void BrowserChildProcessHostImpl::EnableWarmUpConnection() {
-  can_use_warm_up_connection_ = true;
-}
-
-void BrowserChildProcessHostImpl::DumpProcessStack() {
-  if (!child_process_launcher_) {
-    return;
-  }
-  child_process_launcher_->DumpProcessStack();
-}
-#endif
 
 ChildProcessTerminationInfo BrowserChildProcessHostImpl::GetTerminationInfo(
     bool known_dead) {
@@ -428,20 +413,6 @@ void BrowserChildProcessHostImpl::OnChildDisconnected() {
   if (child_process_launcher_.get() || IsProcessLaunched()) {
     ChildProcessTerminationInfo info =
         GetTerminationInfo(true /* known_dead */);
-#if BUILDFLAG(IS_ANDROID)
-    info.has_spare_renderer =
-        SpareRenderProcessHostManagerImpl::Get().HasSpareRenderer();
-    info.last_spare_renderer_creation_info =
-        SpareRenderProcessHostManagerImpl::Get()
-            .GetLastSpareRendererCreationInfo();
-    exited_abnormally_ = true;
-    // Do not treat clean_exit, ie when child process exited due to quitting
-    // its main loop, as a crash.
-    if (!info.clean_exit) {
-      delegate_->OnProcessCrashed(info.exit_code);
-    }
-    NotifyProcessKilled(data_, info);
-#else  // BUILDFLAG(IS_ANDROID)
     switch (info.status) {
       case base::TERMINATION_STATUS_PROCESS_CRASHED:
       case base::TERMINATION_STATUS_ABNORMAL_TERMINATION: {
@@ -491,7 +462,6 @@ void BrowserChildProcessHostImpl::OnChildDisconnected() {
         NOTREACHED();
       }
     }
-#endif  // BUILDFLAG(IS_ANDROID)
   }
   delete delegate_;  // Will delete us
 }
@@ -590,25 +560,12 @@ void BrowserChildProcessHostImpl::OnProcessLaunchFailed(int error_code) {
   delegate_->OnProcessLaunchFailed(error_code);
   ChildProcessTerminationInfo info =
       child_process_launcher_->GetChildTerminationInfo(/*known_dead=*/true);
-#if BUILDFLAG(IS_ANDROID)
-  info.has_spare_renderer =
-      SpareRenderProcessHostManagerImpl::Get().HasSpareRenderer();
-  info.last_spare_renderer_creation_info =
-      SpareRenderProcessHostManagerImpl::Get()
-          .GetLastSpareRendererCreationInfo();
-#endif
   DCHECK_EQ(info.status, base::TERMINATION_STATUS_LAUNCH_FAILED);
 
   for (auto& observer : g_browser_child_process_observers.Get())
     observer.BrowserChildProcessLaunchFailed(data_, info);
   delete delegate_;  // Will delete us
 }
-
-#if BUILDFLAG(IS_ANDROID)
-bool BrowserChildProcessHostImpl::CanUseWarmUpConnection() {
-  return can_use_warm_up_connection_;
-}
-#endif
 
 void BrowserChildProcessHostImpl::OnProcessLaunched() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -643,7 +600,7 @@ void BrowserChildProcessHostImpl::OnProcessLaunched() {
       GetData().id,
       static_cast<ChildProcessHostImpl*>(GetHost())->child_process());
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   system_tracing_service_ = std::make_unique<tracing::SystemTracingService>();
   child_process()->EnableSystemTracingService(
       system_tracing_service_->BindAndPassPendingRemote());
@@ -694,14 +651,10 @@ void BrowserChildProcessHostImpl::OnMemoryPressure(
   // Match the existing behavior of only sending the memory pressure level to
   // select process types.
   // TODO(pmonette): Enable for all child processes.
-#if BUILDFLAG(IS_ANDROID)
-  child_process()->OnMemoryPressure(memory_pressure_level);
-#else
   if (data_.process_type == PROCESS_TYPE_GPU ||
       delegate_->GetServiceName() == network::mojom::NetworkService::Name_) {
     child_process()->OnMemoryPressure(memory_pressure_level);
   }
-#endif
 }
 
 bool BrowserChildProcessHostImpl::IsProcessLaunched() const {

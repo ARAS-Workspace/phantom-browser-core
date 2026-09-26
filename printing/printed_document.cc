@@ -59,11 +59,7 @@ void DumpMetafileIfDebugEnabled(const std::u16string& doc_name,
       PrintedDocument::CreateDebugDumpPath(doc_name, kExtension);
   base::File file(path,
                   base::File::FLAG_CREATE_ALWAYS | base::File::FLAG_WRITE);
-#if BUILDFLAG(IS_ANDROID)
-  metafile->SaveToFileDescriptor(file.GetPlatformFile());
-#else
   metafile->SaveTo(&file);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 namespace {

@@ -185,17 +185,14 @@ constexpr FeatureParam<BackupRefPtrEnabledProcesses>::Option
         {BackupRefPtrEnabledProcesses::kNonRenderer, kNonRendererStr},
         {BackupRefPtrEnabledProcesses::kAllProcesses, kAllProcessesStr}};
 
-BASE_FEATURE_ENUM_PARAM(BackupRefPtrEnabledProcesses,
-                        kBackupRefPtrEnabledProcessesParam,
-                        &kPartitionAllocBackupRefPtr,
-                        kPAFeatureEnabledProcessesStr,
-// Exception for IS_DESKTOP_ANDROID approved in crbug.com/482155132.
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
-                        BackupRefPtrEnabledProcesses::kNonRenderer,
-#else
-                        BackupRefPtrEnabledProcesses::kAllProcesses,
-#endif
-                        &kBackupRefPtrEnabledProcessesOptions);
+BASE_FEATURE_ENUM_PARAM(
+    BackupRefPtrEnabledProcesses,
+    kBackupRefPtrEnabledProcessesParam,
+    &kPartitionAllocBackupRefPtr,
+    kPAFeatureEnabledProcessesStr,
+    // Exception for IS_DESKTOP_ANDROID approved in crbug.com/482155132.
+    BackupRefPtrEnabledProcesses::kAllProcesses,
+    &kBackupRefPtrEnabledProcessesOptions);
 
 constexpr FeatureParam<BackupRefPtrMode>::Option kBackupRefPtrModeOptions[] = {
     {BackupRefPtrMode::kDisabled, "disabled"},
@@ -219,7 +216,7 @@ constinit const FeatureParam<bool> kBackupRefPtrSuppressCorruptionDetectedCrash{
     false};
 
 BASE_FEATURE(kPartitionAllocMemoryTagging,
-#if PA_BUILDFLAG(USE_FULL_MTE) || BUILDFLAG(IS_ANDROID)
+#if PA_BUILDFLAG(USE_FULL_MTE)
              FEATURE_ENABLED_BY_DEFAULT
 #else
              FEATURE_DISABLED_BY_DEFAULT
@@ -288,13 +285,7 @@ BASE_FEATURE(kAsanBrpInstantiationCheck, FEATURE_ENABLED_BY_DEFAULT);
 //
 // We enable this by default everywhere except for 32-bit Android, since we saw
 // regressions there.
-BASE_FEATURE(kPartitionAllocUseDenserDistribution,
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_32_BITS)
-             FEATURE_DISABLED_BY_DEFAULT
-#else
-             FEATURE_ENABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_32_BITS)
-);
+BASE_FEATURE(kPartitionAllocUseDenserDistribution, FEATURE_ENABLED_BY_DEFAULT);
 const FeatureParam<BucketDistributionMode>::Option
     kPartitionAllocBucketDistributionOption[] = {
         {BucketDistributionMode::kDefault, "default"},
@@ -304,11 +295,7 @@ const FeatureParam<BucketDistributionMode>::Option
 constinit const FeatureParam<BucketDistributionMode>
     kPartitionAllocBucketDistributionParam{
         &kPartitionAllocUseDenserDistribution, "mode",
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_32_BITS)
-        BucketDistributionMode::kDefault,
-#else
         BucketDistributionMode::kDenser,
-#endif  // BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_32_BITS)
         &kPartitionAllocBucketDistributionOption};
 
 BASE_FEATURE(kPartitionAllocMemoryReclaimer, FEATURE_ENABLED_BY_DEFAULT);
@@ -385,20 +372,6 @@ BASE_FEATURE(kPartitionAllocSortSmallerSlotSpanFreeLists,
 
 // Whether to sort the active slot spans in PurgeMemory().
 BASE_FEATURE(kPartitionAllocSortActiveSlotSpans, FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_ANDROID)
-// A parameter to exclude or not exclude PartitionAllocSupport from
-// PartialLowModeOnMidRangeDevices. This is used to see how it affects
-// renderer performances, e.g. blink_perf.parser benchmark.
-// The feature: kPartialLowEndModeOnMidRangeDevices is defined in
-// //base/features.cc. Since the following feature param is related to
-// PartitionAlloc, define the param here.
-BASE_FEATURE_PARAM(bool,
-                   kPartialLowEndModeExcludePartitionAllocSupport,
-                   &kPartialLowEndModeOnMidRangeDevices,
-                   "exclude-partition-alloc-support",
-                   false);
-#endif
 
 constexpr partition_alloc::internal::base::TimeDelta ToPartitionAllocTimeDelta(
     TimeDelta time_delta) {

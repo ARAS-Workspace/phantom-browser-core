@@ -245,9 +245,6 @@ void ManagementService::RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
 #if BUILDFLAG(IS_MAC)
   registry->RegisterIntegerPref(policy_prefs::kEnterpriseMDMManagementMac,
                                 NONE);
-#elif BUILDFLAG(IS_ANDROID)
-  registry->RegisterIntegerPref(policy_prefs::kEnterpriseMDMManagementAndroid,
-                                NONE);
 #endif
 }
 

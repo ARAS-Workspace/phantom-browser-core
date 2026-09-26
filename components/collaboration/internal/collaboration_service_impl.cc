@@ -361,12 +361,8 @@ SyncStatus CollaborationServiceImpl::GetSyncStatus() {
   syncer::SyncUserSettings* user_settings = sync_service_->GetUserSettings();
   // The mapping between the selected type and what is actually sync'ed is done
   // in `GetUserSelectableTypeInfo()`.
-  constexpr syncer::UserSelectableTypeSet kRequiredTypes =
-#if BUILDFLAG(IS_ANDROID)
-      {syncer::UserSelectableType::kTabs, syncer::UserSelectableType::kHistory};
-#else
-      {syncer::UserSelectableType::kSavedTabGroups};
-#endif
+  constexpr syncer::UserSelectableTypeSet kRequiredTypes = {
+      syncer::UserSelectableType::kSavedTabGroups};
 
   // Note: Policy checking is also handled in `CollaborationController`.
   // However, setting `kSyncDisabledByEnterprise` is necessary for properly
@@ -453,18 +449,11 @@ CollaborationStatus CollaborationServiceImpl::GetCollaborationStatus() {
   }
 
   // Check if device policy allow signin.
-#if BUILDFLAG(IS_ANDROID)
-  if (!profile_prefs_->GetBoolean(::prefs::kSigninAllowed) &&
-      profile_prefs_->IsManagedPreference(::prefs::kSigninAllowed)) {
-    return CollaborationStatus::kDisabledForPolicy;
-  }
-#else
   if (!profile_prefs_->GetBoolean(::prefs::kSigninAllowedOnNextStartup) &&
       profile_prefs_->IsManagedPreference(
           ::prefs::kSigninAllowedOnNextStartup)) {
     return CollaborationStatus::kDisabledForPolicy;
   }
-#endif
 
   // Check if device policy allow sync.
   if (current_status_.sync_status == SyncStatus::kSyncDisabledByEnterprise) {

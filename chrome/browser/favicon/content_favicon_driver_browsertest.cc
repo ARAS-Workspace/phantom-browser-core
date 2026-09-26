@@ -560,24 +560,6 @@ IN_PROC_BROWSER_TEST_F(ContentFaviconDriverTest, ChangeTouchIconViaJavascript) {
 
 // Test that favicon mappings are removed if the page initially lists a touch
 // icon and later uses Javascript to remove it.
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(ContentFaviconDriverTest, RemoveTouchIconViaJavascript) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url = embedded_test_server()->GetURL(
-      "/favicon/page_change_favicon_type_to_favicon_via_js.html");
-
-  PendingTaskWaiter waiter(web_contents());
-  waiter.AlsoRequireTitle(u"OK");
-  ui_test_utils::NavigateToURLWithDisposition(
-      browser(), url, WindowOpenDisposition::CURRENT_TAB,
-      ui_test_utils::BROWSER_TEST_NO_WAIT);
-  waiter.Wait();
-
-  EXPECT_EQ(nullptr,
-            GetFaviconForPageURL(url, favicon_base::IconType::kTouchIcon)
-                .bitmap_data);
-}
-#endif
 
 // Test that favicon mappings are not removed if the page with favicons (cached
 // in favicon database) is stopped while being loaded. More precisely, we test
@@ -640,16 +622,7 @@ IN_PROC_BROWSER_TEST_F(ContentFaviconDriverTest, LoadIconFromWebManifest) {
       ui_test_utils::BROWSER_TEST_NO_WAIT);
   waiter.Wait();
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(url_loader_interceptor.was_loaded(icon_url));
-  ASSERT_EQ(network::mojom::RequestDestination::kImage,
-            url_loader_interceptor.destination(icon_url));
-  EXPECT_NE(nullptr,
-            GetFaviconForPageURL(url, favicon_base::IconType::kWebManifestIcon)
-                .bitmap_data);
-#else
   EXPECT_FALSE(url_loader_interceptor.was_loaded(icon_url));
-#endif
 }
 
 // Test that a page which uses a meta refresh tag to redirect gets associated
@@ -902,29 +875,6 @@ IN_PROC_BROWSER_TEST_F(ContentFaviconDriverTest,
       nullptr,
       GetFaviconForPageURL(url, favicon_base::IconType::kFavicon).bitmap_data);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(ContentFaviconDriverTest,
-                       LoadIconFromWebManifestDespitePushState) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url =
-      embedded_test_server()->GetURL("/favicon/pushstate_with_manifest.html");
-  GURL pushstate_url = embedded_test_server()->GetURL(
-      "/favicon/pushstate_with_manifest.html#pushState");
-
-  PendingTaskWaiter waiter(web_contents());
-  waiter.AlsoRequireUrl(pushstate_url);
-  ui_test_utils::NavigateToURLWithDisposition(
-      browser(), url, WindowOpenDisposition::CURRENT_TAB,
-      ui_test_utils::BROWSER_TEST_NO_WAIT);
-  waiter.Wait();
-
-  EXPECT_NE(nullptr,
-            GetFaviconForPageURL(pushstate_url,
-                                 {favicon_base::IconType::kWebManifestIcon})
-                .bitmap_data);
-}
-#endif
 
 class ContentFaviconDriverTestWithAutoupgradesDisabled
     : public ContentFaviconDriverTest {

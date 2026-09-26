@@ -58,7 +58,7 @@
 #include "base/process/port_provider_mac.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE)
 #define ENABLE_CPU_TESTS 1
 #else
 #define ENABLE_CPU_TESTS 0
@@ -270,7 +270,7 @@ bool TestChildLauncher::TerminateChildProcess() {
                                       /*wait=*/true)) {
     return false;
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // After the process exits, ProcessMetrics races to read /proc/<pid>/stat
   // before it's deleted. Wait until it's definitely gone.
   const auto stat_path = FilePath(FILE_PATH_LITERAL("/proc"))
@@ -303,7 +303,7 @@ class SystemMetricsTest : public testing::Test {
   SystemMetricsTest& operator=(const SystemMetricsTest&) = delete;
 };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(SystemMetricsTest, IsValidDiskName) {
   const char invalid_input1[] = "";
   const char invalid_input2[] = "s";
@@ -647,7 +647,7 @@ TEST_F(SystemMetricsTest, ParseVmstat) {
   const char empty_input[] = "";
   EXPECT_FALSE(ParseProcVmstat(empty_input, &vmstat));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if ENABLE_CPU_TESTS
 // Test that ProcessMetrics::GetPlatformIndependentCPUUsage() doesn't return
@@ -760,13 +760,13 @@ TEST_F(SystemMetricsTest, TestValidMemoryInfo) {
   EXPECT_GE(memory_info->compressed_bytes, 0U);
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_GT(memory_info->rss_anon_bytes, 0U);
   EXPECT_GE(memory_info->vm_swap_bytes, 0U);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 TEST(SystemMetrics2Test, GetSystemMemoryInfo) {
   SystemMemoryInfo info;
   EXPECT_TRUE(GetSystemMemoryInfo(&info));
@@ -774,33 +774,33 @@ TEST(SystemMetrics2Test, GetSystemMemoryInfo) {
   // Ensure each field received a value.
   EXPECT_GT(info.total, ByteSize(0));
   EXPECT_GT(info.free, ByteSize(0));
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_GT(info.buffers, ByteSize(0));
   EXPECT_GT(info.cached, ByteSize(0));
   EXPECT_GT(info.active_anon + info.inactive_anon, ByteSize(0));
   EXPECT_GT(info.active_file + info.inactive_file, ByteSize(0));
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // All the values should be less than the total amount of memory.
   // TODO(crbug.com/40515565): re-enable the following assertion on iOS.
   EXPECT_LT(info.free, info.total);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_LT(info.buffers, info.total);
   EXPECT_LT(info.cached, info.total);
   EXPECT_LT(info.active_anon, info.total);
   EXPECT_LT(info.inactive_anon, info.total);
   EXPECT_LT(info.active_file, info.total);
   EXPECT_LT(info.inactive_file, info.total);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_APPLE)
   EXPECT_GT(info.file_backed, ByteSize(0));
 #endif
 
 }
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 TEST(ProcessMetricsTest, ParseProcStatCPU) {
   // /proc/self/stat for a process running "top".
   const char kTopStat[] =
@@ -834,7 +834,7 @@ TEST(ProcessMetricsTest, ParseProcStatCPU) {
       "140735857770737 140735857774557 0";
   EXPECT_EQ(5186 + 11, ParseProcStatCPU(kWeirdNameStat));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Disable on Android because base_unittests runs inside a Dalvik VM that
 // starts and stop threads (crbug.com/175563).
@@ -976,7 +976,7 @@ TEST(ProcessMetricsTest, GetOpenFdCount) {
 }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 
 TEST(ProcessMetricsTestLinux, GetPageFaultCounts) {
   std::unique_ptr<ProcessMetrics> process_metrics =
@@ -1066,6 +1066,6 @@ TEST(ProcessMetricsTestLinux, GetCumulativeCPUUsagePerThread) {
     }
   }
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace base::debug

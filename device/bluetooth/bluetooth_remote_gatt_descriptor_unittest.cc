@@ -13,9 +13,7 @@
 #include "device/bluetooth/bluetooth_remote_gatt_service.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "device/bluetooth/test/bluetooth_test_android.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "device/bluetooth/test/bluetooth_test_mac.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
@@ -81,7 +79,7 @@ class BluetoothRemoteGattDescriptorTest :
   raw_ptr<BluetoothRemoteGattDescriptor> descriptor2_ = nullptr;
 };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_GetIdentifier GetIdentifier
 #else
 #define MAYBE_GetIdentifier DISABLED_GetIdentifier
@@ -166,7 +164,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_GetIdentifier) {
   EXPECT_NE(desc5->GetIdentifier(), desc6->GetIdentifier());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_GetUUID GetUUID
 #else
 #define MAYBE_GetUUID DISABLED_GetUUID
@@ -213,7 +211,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_GetUUID) {
   EXPECT_EQ(uuid2, descriptor2->GetUUID());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_ReadRemoteDescriptor_Empty ReadRemoteDescriptor_Empty
 #else
 #define MAYBE_ReadRemoteDescriptor_Empty DISABLED_ReadRemoteDescriptor_Empty
@@ -237,7 +235,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor_Empty) {
   EXPECT_EQ(empty_vector, descriptor1_->GetValue());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_WriteRemoteDescriptor_Empty WriteRemoteDescriptor_Empty
 #else
 #define MAYBE_WriteRemoteDescriptor_Empty DISABLED_WriteRemoteDescriptor_Empty
@@ -260,13 +258,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor_Empty) {
   EXPECT_EQ(empty_vector, last_write_value_);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ReadRemoteDescriptor_AfterDeleted \
-  ReadRemoteDescriptor_AfterDeleted
-#else
 #define MAYBE_ReadRemoteDescriptor_AfterDeleted \
   DISABLED_ReadRemoteDescriptor_AfterDeleted
-#endif
 // Tests ReadRemoteDescriptor completing after Chrome objects are deleted.
 // macOS: Not applicable: This can never happen if CBPeripheral delegate is set
 // to nil.
@@ -288,13 +281,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_TRUE("Did not crash!");
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_WriteRemoteDescriptor_AfterDeleted \
-  WriteRemoteDescriptor_AfterDeleted
-#else
 #define MAYBE_WriteRemoteDescriptor_AfterDeleted \
   DISABLED_WriteRemoteDescriptor_AfterDeleted
-#endif
 // Tests WriteRemoteDescriptor completing after Chrome objects are deleted.
 // macOS: Not applicable: This can never happen if CBPeripheral delegate is set
 // to nil.
@@ -316,7 +304,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_TRUE("Did not crash!");
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_ReadRemoteDescriptor ReadRemoteDescriptor
 #else
 #define MAYBE_ReadRemoteDescriptor DISABLED_ReadRemoteDescriptor
@@ -345,7 +333,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor) {
   EXPECT_EQ(test_vector, descriptor1_->GetValue());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_WriteRemoteDescriptor WriteRemoteDescriptor
 #else
 #define MAYBE_WriteRemoteDescriptor DISABLED_WriteRemoteDescriptor
@@ -368,7 +356,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor) {
   EXPECT_EQ(test_vector, last_write_value_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_ReadRemoteDescriptor_Twice ReadRemoteDescriptor_Twice
 #else
 #define MAYBE_ReadRemoteDescriptor_Twice DISABLED_ReadRemoteDescriptor_Twice
@@ -406,7 +394,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor_Twice) {
   EXPECT_EQ(empty_vector, descriptor1_->GetValue());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_WriteRemoteDescriptor_Twice WriteRemoteDescriptor_Twice
 #else
 #define MAYBE_WriteRemoteDescriptor_Twice DISABLED_WriteRemoteDescriptor_Twice
@@ -442,7 +430,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor_Twice) {
   EXPECT_EQ(empty_vector, last_write_value_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_ReadRemoteDescriptor_MultipleDescriptors \
   ReadRemoteDescriptor_MultipleDescriptors
 #else
@@ -480,7 +468,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_EQ(test_vector2, descriptor2_->GetValue());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_WriteRemoteDescriptor_MultipleDescriptors \
   WriteRemoteDescriptor_MultipleDescriptors
 #else
@@ -516,7 +504,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_EQ(0, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_ReadError ReadError
 #else
 #define MAYBE_ReadError DISABLED_ReadError
@@ -536,7 +524,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadError) {
             last_gatt_error_code_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_WriteError WriteError
 #else
 #define MAYBE_WriteError DISABLED_WriteError
@@ -559,11 +547,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteError) {
             last_gatt_error_code_);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ReadSynchronousError ReadSynchronousError
-#else
 #define MAYBE_ReadSynchronousError DISABLED_ReadSynchronousError
-#endif
 // Tests ReadRemoteDescriptor synchronous error.
 // Test not relevant for macOS since descriptor read cannot generate
 // synchronous error.
@@ -592,11 +576,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadSynchronousError) {
   EXPECT_EQ(0, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_WriteSynchronousError WriteSynchronousError
-#else
 #define MAYBE_WriteSynchronousError DISABLED_WriteSynchronousError
-#endif
 // Tests WriteRemoteDescriptor synchronous error.
 // Test not relevant for macOS since descriptor write cannot generate
 // synchronous error.
@@ -626,7 +606,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteSynchronousError) {
   EXPECT_EQ(0, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_ReadRemoteDescriptor_ReadPending ReadRemoteDescriptor_ReadPending
 #else
 #define MAYBE_ReadRemoteDescriptor_ReadPending \
@@ -658,7 +638,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_EQ(0, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_WriteRemoteDescriptor_WritePending \
   WriteRemoteDescriptor_WritePending
 #else
@@ -692,7 +672,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_EQ(0, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_ReadRemoteDescriptor_WritePending \
   ReadRemoteDescriptor_WritePending
 #else
@@ -725,7 +705,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_EQ(0, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_WriteRemoteDescriptor_ReadPending \
   WriteRemoteDescriptor_ReadPending
 #else
@@ -758,11 +738,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   EXPECT_EQ(0, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_ReadDuringDisconnect ReadDuringDisconnect
-#else
 #define MAYBE_ReadDuringDisconnect DISABLED_ReadDuringDisconnect
-#endif
 // Tests that read requests after a device disconnects but before the
 // disconnect task runs do not result in a crash.
 // macOS: Does not apply. All events arrive on the UI Thread.
@@ -780,11 +756,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadDuringDisconnect) {
   // TODO(crbug.com/40473783): Test error callback was called.
 }
 
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_WriteDuringDisconnect WriteDuringDisconnect
-#else
 #define MAYBE_WriteDuringDisconnect DISABLED_WriteDuringDisconnect
-#endif
 // Tests that write requests after a device disconnects but before the
 // disconnect task runs do not result in a crash.
 // macOS: Does not apply. All events arrive on the UI Thread.

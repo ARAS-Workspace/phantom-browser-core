@@ -22,38 +22,15 @@
 #include "services/cert_verifier/public/mojom/cert_verifier_service_factory.mojom.h"
 #include "ui/base/window_open_disposition.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "chrome/browser/ssl/known_interception_disclosure_message_delegate.h"
-#include "components/messages/android/message_wrapper.h"
-#include "components/messages/android/mock_message_dispatcher_bridge.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/infobars/core/confirm_infobar_delegate.h"
 #include "components/infobars/core/infobar.h"
-#endif
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-messages::MessageWrapper* g_last_message_wrapper = nullptr;
-
-size_t GetDisclosureCount(content::WebContents* contents) {
-  return g_last_message_wrapper ? 1 : 0;
-}
-
-void CloseDisclosure(content::WebContents* contents) {
-  if (g_last_message_wrapper) {
-    g_last_message_wrapper->HandleDismissCallback(
-        base::android::AttachCurrentThread(),
-        static_cast<int>(messages::DismissReason::UNKNOWN));
-    g_last_message_wrapper = nullptr;
-  }
-}
-#else
 size_t GetDisclosureCount(content::WebContents* contents) {
   infobars::ContentInfoBarManager* infobar_manager =
       infobars::ContentInfoBarManager::FromWebContents(contents);
@@ -84,7 +61,6 @@ void CloseDisclosure(content::WebContents* contents) {
   infobar->delegate()->InfoBarDismissed();
   infobar->RemoveSelf();
 }
-#endif
 
 }  // namespace
 
@@ -110,30 +86,9 @@ class KnownInterceptionDisclosurePlatformBrowserTest
   KnownInterceptionDisclosurePlatformBrowserTest& operator=(
       const KnownInterceptionDisclosurePlatformBrowserTest&) = delete;
 
-  void SetUp() override {
-#if BUILDFLAG(IS_ANDROID)
-    messages::MessageDispatcherBridge::SetInstanceForTesting(
-        &mock_message_dispatcher_bridge_);
+  void SetUp() override { PlatformBrowserTest::SetUp(); }
 
-    ON_CALL(mock_message_dispatcher_bridge_, EnqueueMessage)
-        .WillByDefault([](messages::MessageWrapper* message,
-                          content::WebContents* web_contents,
-                          messages::MessageScopeType scope_type,
-                          messages::MessagePriority priority) {
-          g_last_message_wrapper = message;
-          return true;
-        });
-#endif
-    PlatformBrowserTest::SetUp();
-  }
-
-  void TearDown() override {
-#if BUILDFLAG(IS_ANDROID)
-    messages::MessageDispatcherBridge::SetInstanceForTesting(nullptr);
-    g_last_message_wrapper = nullptr;
-#endif
-    PlatformBrowserTest::TearDown();
-  }
+  void TearDown() override { PlatformBrowserTest::TearDown(); }
 
   void SetUpOnMainThread() override {
     ASSERT_TRUE(https_server_.Start());
@@ -156,21 +111,11 @@ class KnownInterceptionDisclosurePlatformBrowserTest
   net::EmbeddedTestServer https_server_;
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  testing::NiceMock<messages::MockMessageDispatcherBridge>
-      mock_message_dispatcher_bridge_;
-#endif
   base::test::ScopedFeatureList feature_list_;
 };
 
 IN_PROC_BROWSER_TEST_P(KnownInterceptionDisclosurePlatformBrowserTest,
                        DisclosureTriggerSmokeTest) {
-#if BUILDFLAG(IS_ANDROID)
-  // Clear the mock so the real MessageDispatcherBridge is used to ensure
-  // the Java-side UI is correctly triggered.
-  messages::MessageDispatcherBridge::SetInstanceForTesting(nullptr);
-#endif
-
   const GURL kInterceptedUrl(https_server_.GetURL("/ssl/google.html"));
   content::WebContents* tab = chrome_test_utils::GetActiveWebContents(this);
 
@@ -195,7 +140,6 @@ IN_PROC_BROWSER_TEST_P(KnownInterceptionDisclosurePlatformBrowserTest,
   ASSERT_TRUE(content::NavigateToURL(tab1, kInterceptedUrl));
   EXPECT_EQ(1u, GetDisclosureCount(tab1));
 
-#if !BUILDFLAG(IS_ANDROID)
   TabStripModel* tab_strip_model = browser()->tab_strip_model();
   // Test that the infobar is shown on new tabs after it has been triggered
   // once.
@@ -208,7 +152,6 @@ IN_PROC_BROWSER_TEST_P(KnownInterceptionDisclosurePlatformBrowserTest,
   // Close the new tab.
   tab_strip_model->CloseWebContentsAt(tab_strip_model->active_index(),
                                       TabCloseTypes::CLOSE_USER_GESTURE);
-#endif
 
   // Reload the first page -- infobar should still show.
   ASSERT_TRUE(content::NavigateToURL(tab1, kInterceptedUrl));
@@ -242,15 +185,6 @@ IN_PROC_BROWSER_TEST_P(KnownInterceptionDisclosurePlatformBrowserTest,
   // Dismiss the disclosure.
   CloseDisclosure(tab);
   EXPECT_EQ(0u, GetDisclosureCount(tab));
-
-#if BUILDFLAG(IS_ANDROID)
-  // Ensure the pref is written to disk so it can be read in the next test.
-  base::RunLoop run_loop;
-  Profile::FromBrowserContext(tab->GetBrowserContext())
-      ->GetPrefs()
-      ->CommitPendingWrite(run_loop.QuitClosure());
-  run_loop.Run();
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(KnownInterceptionDisclosurePlatformBrowserTest,
@@ -261,17 +195,10 @@ IN_PROC_BROWSER_TEST_P(KnownInterceptionDisclosurePlatformBrowserTest,
   content::WebContents* tab = chrome_test_utils::GetActiveWebContents(this);
   EXPECT_EQ(0u, GetDisclosureCount(tab));
 
-#if !BUILDFLAG(IS_ANDROID)
   // Triggering the disclosure again after browser restart should show
   // the infobar (the cooldown period should no longer apply on Desktop).
   ASSERT_TRUE(content::NavigateToURL(tab, kInterceptedUrl));
   EXPECT_EQ(1u, GetDisclosureCount(tab));
-#else
-  // On Android, the cooldown persists across restarts, so the disclosure should
-  // NOT show.
-  ASSERT_TRUE(content::NavigateToURL(tab, kInterceptedUrl));
-  EXPECT_EQ(0u, GetDisclosureCount(tab));
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(All,

@@ -45,13 +45,7 @@
 // base/metrics/field_trial.cc
 namespace base {
 
-BASE_FEATURE(kPassHistogramSharedMemoryOnLaunch,
-#if BUILDFLAG(IS_ANDROID)
-             FEATURE_DISABLED_BY_DEFAULT
-#else
-             FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+BASE_FEATURE(kPassHistogramSharedMemoryOnLaunch, FEATURE_ENABLED_BY_DEFAULT);
 
 HistogramSharedMemory::SharedMemory::SharedMemory(
     UnsafeSharedMemoryRegion r,
@@ -105,11 +99,7 @@ bool HistogramSharedMemory::PassOnCommandLineIsEnabled(int process_type) {
   // TODO(crbug.com/40109064): Fix Android utility processes. Constants from
   // content::ProcessType;
   [[maybe_unused]] constexpr int PROCESS_TYPE_UTILITY = 6;
-  return (FeatureList::IsEnabled(kPassHistogramSharedMemoryOnLaunch)
-#if BUILDFLAG(IS_ANDROID)
-          && process_type != PROCESS_TYPE_UTILITY
-#endif
-  );
+  return (FeatureList::IsEnabled(kPassHistogramSharedMemoryOnLaunch));
 }
 
 // static

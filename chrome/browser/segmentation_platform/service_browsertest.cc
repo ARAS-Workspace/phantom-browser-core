@@ -305,14 +305,8 @@ class SegmentationPlatformTest : public PlatformBrowserTest {
 };
 
 // https://crbug.com/40200835 -- Tests using "PRE_" don't work on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PRE_CachedClassificationModel \
-  DISABLED_PRE_CachedClassificationModel
-#define MAYBE_CachedClassificationModel DISABLED_CachedClassificationModel
-#else
 #define MAYBE_PRE_CachedClassificationModel PRE_CachedClassificationModel
 #define MAYBE_CachedClassificationModel CachedClassificationModel
-#endif
 
 IN_PROC_BROWSER_TEST_F(SegmentationPlatformTest,
                        MAYBE_PRE_CachedClassificationModel) {
@@ -533,7 +527,6 @@ IN_PROC_BROWSER_TEST_F(SegmentationPlatformTest,
 }
 
 // Android doesn't have a shutdown path in which databases are closed.
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that the database's -wal file is removed at shutdown. A failure to do
 // so means that the database was not closed.
 class SegmentationPlatformCleanupTest : public SegmentationPlatformTest {
@@ -555,7 +548,6 @@ IN_PROC_BROWSER_TEST_F(SegmentationPlatformCleanupTest, WalFileIsRemoved) {
   ASSERT_TRUE(
       base::PathExists(sql::Database::WriteAheadLogPath(GetUkmDbPath())));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class SegmentationPlatformUkmModelTest : public SegmentationPlatformTest {
  public:
@@ -589,7 +581,7 @@ class SegmentationPlatformUkmModelTest : public SegmentationPlatformTest {
 };
 
 // This disables the segmentation platform data collection.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_PRE_RunUkmBasedModel DISABLED_PRE_RunUkmBasedModel
 #define MAYBE_RunUkmBasedModel DISABLED_RunUkmBasedModel
 #else

@@ -115,7 +115,6 @@ namespace gles2 {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID)
 // Valid gl texture internal format that can try to use direct uploading path.
 bool ValidFormatForDirectUploading(GLenum format, uint32_t type) {
   switch (format) {
@@ -137,7 +136,6 @@ bool ValidFormatForDirectUploading(GLenum format, uint32_t type) {
       return false;
   }
 }
-#endif
 
 
 void CopyRectToBuffer(base::span<const uint8_t> pixels,
@@ -214,9 +212,6 @@ bool CanCopySharedImageToGLTextureViaSkia(bool is_opaque,
   // Hence, disable this codepath on Android.
   // TODO(crbug.com/40075313): Enable on Android once the passthrough command
   // decoder is used universally there.
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   bool si_usable_by_gles2_interface = shared_image_target != 0;
   // Since skia always produces premultiply alpha outputs, trying direct
   // uploading path when the source is opaque or premultiply alpha been
@@ -234,7 +229,6 @@ bool CanCopySharedImageToGLTextureViaSkia(bool is_opaque,
   // 2d array, 3d etc.
   return si_usable_by_gles2_interface && dst_level == 0 && is_premul &&
          dst_target == GL_TEXTURE_2D && supports_one_copy_format;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // anonymous namespace

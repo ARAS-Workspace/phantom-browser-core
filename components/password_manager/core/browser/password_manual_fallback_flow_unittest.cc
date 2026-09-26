@@ -297,13 +297,8 @@ class PasswordManualFallbackFlowTest : public Test {
       const PasswordFormDigest& form,
       const std::vector<std::string>& affiliated_realms,
       const std::vector<std::string>& grouped_realms = {}) {
-#if BUILDFLAG(IS_ANDROID)
-    profile_password_store().SetAffiliatedAndGroupedRealms(
-        form.signon_realm, affiliated_realms, grouped_realms);
-#else
     affiliated_match_helper().ExpectCallToGetAffiliatedAndGrouped(
         form, affiliated_realms, grouped_realms);
-#endif
   }
 
   void ResetFlowAndMetricsRecorder() {

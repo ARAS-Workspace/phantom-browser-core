@@ -39,18 +39,11 @@
 #include "content/public/browser/storage_partition.h"
 #include "google_apis/google_api_keys.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/feed/android/feed_service_bridge.h"
-#include "chrome/browser/feed/android/refresh_task_scheduler_impl.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#endif
-
 namespace feed {
 const base::FilePath::CharType kFeedv2Folder[] = FILE_PATH_LITERAL("feedv2");
 
 namespace internal {
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(jianli): Need to figure out what to do for desktop version.
 class NoOpRefreshTaskScheduler : public feed::RefreshTaskScheduler {
  public:
@@ -61,7 +54,6 @@ class NoOpRefreshTaskScheduler : public feed::RefreshTaskScheduler {
   void Cancel() override {}
   void RefreshTaskComplete() override {}
 };
-#endif
 
 }  // namespace internal
 
@@ -69,44 +61,26 @@ class FeedServiceDelegateImpl : public FeedService::Delegate {
  public:
   ~FeedServiceDelegateImpl() override = default;
   std::string GetLanguageTag() override {
-#if BUILDFLAG(IS_ANDROID)
-    return FeedServiceBridge::GetLanguageTag();
-#else
     // TODO(jianli): Need to figure out what to do for desktop version.
     return "en";
-#endif
   }
   std::string GetCountry() override { return FeedServiceFactory::GetCountry(); }
   DisplayMetrics GetDisplayMetrics() override {
-#if BUILDFLAG(IS_ANDROID)
-    return FeedServiceBridge::GetDisplayMetrics();
-#else
     // TODO(jianli): Need to figure out what to do for desktop version.
     DisplayMetrics metrics;
     metrics.density = 0;
     metrics.width_pixels = 0;
     metrics.height_pixels = 0;
     return metrics;
-#endif
   }
   TabGroupEnabledState GetTabGroupEnabledState() override {
-#if BUILDFLAG(IS_ANDROID)
-    return TabGroupEnabledState::kBoth;
-#else
     return TabGroupEnabledState::kNone;
-#endif
   }
   void ClearAll() override {
     // TODO(jianli): Need to figure out what to do for desktop version.
-#if BUILDFLAG(IS_ANDROID)
-    FeedServiceBridge::ClearAll();
-#endif
   }
   void PrefetchImage(const GURL& url) override {
     // TODO(jianli): Need to figure out what to do for desktop version.
-#if BUILDFLAG(IS_ANDROID)
-    FeedServiceBridge::PrefetchImage(url);
-#endif
   }
   void RegisterExperiments(const Experiments& experiments) override {
     experiments_ = experiments;
@@ -178,11 +152,6 @@ FeedServiceFactory::FeedServiceFactory()
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(HistoryServiceFactory::GetInstance());
   DependsOn(TemplateURLServiceFactory::GetInstance());
-
-#if BUILDFLAG(IS_ANDROID)
-  DependsOn(
-      regional_capabilities::RegionalCapabilitiesServiceFactory::GetInstance());
-#endif
 }
 
 FeedServiceFactory::~FeedServiceFactory() = default;
@@ -211,25 +180,11 @@ FeedServiceFactory::BuildServiceInstanceForBrowserContext(
   feed::ChromeInfo chrome_info;
   chrome_info.version = base::Version({CHROME_VERSION});
   chrome_info.channel = chrome::GetChannel();
-#if BUILDFLAG(IS_ANDROID)
-  regional_capabilities::RegionalCapabilitiesService* regional_capabilities =
-      regional_capabilities::RegionalCapabilitiesServiceFactory::GetForProfile(
-          profile);
-  chrome_info.is_new_tab_search_engine_url_android_enabled =
-      regional_capabilities->IsInEeaCountry();
-  chrome_info.user_feedback_allowed_pref_key = ::prefs::kUserFeedbackAllowed;
-#else
   chrome_info.is_new_tab_search_engine_url_android_enabled = false;
-#endif
 
   return std::make_unique<FeedService>(
       std::make_unique<FeedServiceDelegateImpl>(),
-#if BUILDFLAG(IS_ANDROID)
-      std::make_unique<RefreshTaskSchedulerImpl>(
-          background_task::BackgroundTaskSchedulerFactory::GetScheduler()),
-#else
       std::make_unique<internal::NoOpRefreshTaskScheduler>(),
-#endif
       profile->GetPrefs(), g_browser_process->local_state(),
       storage_partition->GetProtoDatabaseProvider()->GetDB<feedstore::Record>(
           leveldb_proto::ProtoDbType::FEED_STREAM_DATABASE,

@@ -12,18 +12,9 @@
 #include "components/infobars/core/infobar.h"
 #include "ui/gfx/image/image.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/scoped_multi_source_observation.h"
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list_observer.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_observer.h"
-#else
 #include "chrome/browser/ui/browser_tab_strip_tracker.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
-#endif
 
 class GlobalConfirmInfoBar::DelegateProxy : public ConfirmInfoBarDelegate {
  public:
@@ -170,60 +161,6 @@ void GlobalConfirmInfoBar::DelegateProxy::Detach() {
   global_info_bar_.reset();
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Android uses TabModel to track tabs.
-class GlobalConfirmInfoBar::TabHelper : public TabModelListObserver,
-                                        public TabModelObserver {
- public:
-  explicit TabHelper(GlobalConfirmInfoBar* global_info_bar)
-      : global_info_bar_(global_info_bar) {}
-
-  ~TabHelper() override {
-    tab_model_observations_.RemoveAllObservations();
-    TabModelList::RemoveObserver(this);
-  }
-
-  void Init() {
-    // This is the equivalent of observing for new windows (each window has a
-    // TabModel).
-    TabModelList::AddObserver(this);
-    // Add the TabModel for each existing window.
-    for (TabModel* const model : TabModelList::models()) {
-      OnTabModelAdded(model);
-    }
-  }
-
-  void OnTabModelAdded(TabModel* tab_model) override {
-    // This is the equivalent of a new window being added. Observe for new tabs
-    // and add the infobar to all existing tabs.
-    tab_model_observations_.AddObservation(tab_model);
-    for (::tabs::TabInterface* tab : tab_model->GetAllTabs()) {
-      if (tab && tab->GetContents()) {
-        global_info_bar_->MaybeAddInfoBar(tab->GetContents());
-      }
-    }
-  }
-
-  void OnTabModelRemoved(TabModel* tab_model) override {
-    if (tab_model_observations_.IsObservingSource(tab_model)) {
-      tab_model_observations_.RemoveObservation(tab_model);
-    }
-  }
-
-  void DidAddTab(TabAndroid* tab, TabModel::TabLaunchType type) override {
-    if (tab->GetContents()) {
-      global_info_bar_->MaybeAddInfoBar(tab->GetContents());
-    }
-  }
-
- private:
-  const raw_ptr<GlobalConfirmInfoBar> global_info_bar_;
-  base::ScopedMultiSourceObservation<TabModel, TabModelObserver>
-      tab_model_observations_{this};
-};
-
-#else
-
 // Windows/Mac/Linux uses TabStripModel to track tabs.
 class GlobalConfirmInfoBar::TabHelper : public TabStripModelObserver {
  public:
@@ -255,7 +192,6 @@ class GlobalConfirmInfoBar::TabHelper : public TabStripModelObserver {
   const raw_ptr<GlobalConfirmInfoBar> global_info_bar_;
   BrowserTabStripTracker browser_tab_strip_tracker_{this, nullptr};
 };
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // static
 GlobalConfirmInfoBar* GlobalConfirmInfoBar::Show(

@@ -27,9 +27,7 @@
 #include "chrome/browser/browser_switcher/browser_switcher_policy_migrator.h"
 #include "chrome/browser/enterprise/util/affiliation.h"
 #include "chrome/browser/infobars/simple_alert_infobar_creator.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/infobars/browser_infobar_manager.h"
-#endif
 #include "chrome/browser/infobars/infobar_features.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "components/infobars/content/content_infobar_manager.h"
@@ -55,31 +53,19 @@
 #include "content/public/browser/web_contents.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#endif
 
 namespace policy {
 
 namespace internal {
 // Class responsible for showing infobar when test policies are set from
 // the chrome://policy/test page
-class LocalTestInfoBarVisibilityManager :
-#if BUILDFLAG(IS_ANDROID)
-    public TabModelObserver
-#else
-    public BrowserCollectionObserver,
-    public TabStripModelObserver
-#endif  // BUILDFLAG(IS_ANDROID)
-{
+class LocalTestInfoBarVisibilityManager : public BrowserCollectionObserver,
+                                          public TabStripModelObserver {
  public:
   LocalTestInfoBarVisibilityManager() = default;
 
@@ -94,23 +80,6 @@ class LocalTestInfoBarVisibilityManager :
     }
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // TabModelObserver
-  void DidAddTab(TabAndroid* tab, TabModel::TabLaunchType type) override {
-    DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-    if (tab && tab->web_contents()) {
-      EnsureInfobarForActiveLocalTestPolicies(tab->web_contents());
-    }
-  }
-
-  // TabModelObserver
-  void DidSelectTab(TabAndroid* tab, TabModel::TabSelectionType type) override {
-    DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-    if (tab && tab->web_contents()) {
-      EnsureInfobarForActiveLocalTestPolicies(tab->web_contents());
-    }
-  }
-#else
   void OnBrowserCreated(BrowserWindowInterface* browser) override {
     DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
     CHECK(browser);
@@ -142,21 +111,9 @@ class LocalTestInfoBarVisibilityManager :
       tab_strip_model->RemoveObserver(this);
     }
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   void AddInfobarsForActiveLocalTestPoliciesAllTabs() {
     DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-#if BUILDFLAG(IS_ANDROID)
-    for (TabModel* model : TabModelList::models()) {
-      for (int index = 0; index < model->GetTabCount(); ++index) {
-        TabAndroid* tab = model->GetTabAt(index);
-        if (tab && tab->web_contents()) {
-          EnsureInfobarForActiveLocalTestPolicies(tab->web_contents());
-        }
-      }
-      model->AddObserver(this);
-    }
-#else
     ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
         [this](BrowserWindowInterface* browser) {
           CHECK(browser);
@@ -172,7 +129,6 @@ class LocalTestInfoBarVisibilityManager :
         });
     browser_collection_observation_.Observe(
         GlobalBrowserCollection::GetInstance());
-#endif  // BUILDFLAG(IS_ANDROID)
     infobar_active_ = true;
   }
 
@@ -198,17 +154,6 @@ class LocalTestInfoBarVisibilityManager :
 
   void DismissInfobarsForActiveLocalTestPoliciesAllTabs() {
     DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-#if BUILDFLAG(IS_ANDROID)
-    for (TabModel* model : TabModelList::models()) {
-      for (int index = 0; index < model->GetTabCount(); ++index) {
-        TabAndroid* tab = model->GetTabAt(index);
-        if (tab) {
-          DismissInfobarForActiveLocalTestPolicies(tab->web_contents());
-        }
-      }
-      model->RemoveObserver(this);
-    }
-#else
     ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
         [this](BrowserWindowInterface* browser) {
           CHECK(browser);
@@ -223,7 +168,6 @@ class LocalTestInfoBarVisibilityManager :
           return true;
         });
     browser_collection_observation_.Reset();
-#endif  // BUILDFLAG(IS_ANDROID)
     infobar_active_ = false;
   }
 
@@ -249,10 +193,8 @@ class LocalTestInfoBarVisibilityManager :
 
  private:
   bool infobar_active_ = false;
-#if !BUILDFLAG(IS_ANDROID)
   base::ScopedObservation<GlobalBrowserCollection, BrowserCollectionObserver>
       browser_collection_observation_{this};
-#endif  // !BUILDFLAG(IS_ANDROID)
   base::WeakPtrFactory<LocalTestInfoBarVisibilityManager> weak_ptr_factory_{
       this};
 };
@@ -458,7 +400,6 @@ bool ProfilePolicyConnector::IsUsingLocalTestPolicyProvider() const {
 }
 
 void ProfilePolicyConnector::UpdateLocalTestInfoBar(bool show) {
-#if !BUILDFLAG(IS_ANDROID)
   if (infobars::IsInfoBarMigrated(
           infobars::InfoBarDelegate::LOCAL_TEST_POLICIES_APPLIED_INFOBAR)) {
     RunNowOnOrPostToUIThread(base::BindOnce(
@@ -477,7 +418,6 @@ void ProfilePolicyConnector::UpdateLocalTestInfoBar(bool show) {
         show));
     return;
   }
-#endif
 
   if (show) {
     if (!local_test_infobar_visibility_manager_->infobar_active()) {

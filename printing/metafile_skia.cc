@@ -41,10 +41,6 @@
 #include "base/file_descriptor_posix.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/files/file_util.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace {
 
 // `InitFromData()` should make a copy of data for the safety of all operations
@@ -322,33 +318,6 @@ bool MetafileSkia::RenderPage(unsigned int page_number,
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-bool MetafileSkia::SaveToFileDescriptor(int fd) const {
-  if (GetDataSize() == 0u)
-    return false;
-
-  std::unique_ptr<SkStreamAsset> asset(data_->data_stream->duplicate());
-
-  static constexpr size_t kMaximumBufferSize = 1024 * 1024;
-  std::vector<uint8_t> buffer(std::min(kMaximumBufferSize, asset->getLength()));
-  do {
-    size_t read_size = asset->read(&buffer[0], buffer.size());
-    bool is_at_end = read_size < buffer.size();
-    if (read_size == 0u) {
-      break;
-    }
-    DCHECK_GE(buffer.size(), read_size);
-    buffer.resize(read_size);
-    if (!base::WriteFileDescriptor(fd, buffer)) {
-      return false;
-    } else if (is_at_end) {
-      break;
-    }
-  } while (true);
-
-  return true;
-}
-#else
 bool MetafileSkia::SaveTo(base::File* file) const {
   if (GetDataSize() == 0U)
     return false;
@@ -377,7 +346,6 @@ bool MetafileSkia::SaveTo(base::File* file) const {
 
   return true;
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 std::unique_ptr<MetafileSkia> MetafileSkia::GetMetafileForCurrentPage(
     mojom::SkiaDocumentType type) {

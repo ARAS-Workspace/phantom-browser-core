@@ -77,13 +77,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_info.h"
-#include "base/android/content_uri_utils.h"
-#include "base/strings/string_util.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"  // nogncheck crbug.com/40147906
@@ -99,7 +92,6 @@
 #include "extensions/browser/extension_registry.h"  // nogncheck
 #include "extensions/common/extension.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
@@ -321,7 +313,7 @@ GenerateBlockPaths(bool should_normalize_file_path) {
           FILE_PATH_LITERAL("Library/Mobile Documents/com~apple~CloudDocs"),
           BlockType::kDontBlockChildren),
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
       // On Linux also block access to devices via /dev.
       BlockPath::CreateAbsolute(FILE_PATH_LITERAL("/dev"),
                                 BlockType::kBlockAllChildren),
@@ -346,10 +338,6 @@ GenerateBlockPaths(bool should_normalize_file_path) {
       // And block all of ~/.cache, matching the similar restrictions on mac
       // and windows.
       BlockPath::CreateRelative(base::DIR_CACHE, BlockType::kBlockAllChildren),
-#endif
-#if BUILDFLAG(IS_ANDROID)
-      BlockPath::CreateRelative(base::DIR_ANDROID_APP_DATA,
-                                BlockType::kBlockAllChildren),
 #endif
       // TODO(crbug.com/40095723): Refine this list, for example add
       // XDG_CONFIG_HOME when it is not set ~/.config?
@@ -1419,10 +1407,6 @@ ChromeFileSystemAccessPermissionContext::
   content_settings_ = base::WrapRefCounted(
       HostContentSettingsMapFactory::GetForProfile(profile_));
 
-#if BUILDFLAG(IS_ANDROID)
-  one_time_permissions_tracker_.Observe(
-      OneTimePermissionsTrackerFactory::GetForBrowserContext(context));
-#else
   auto* provider = web_app::WebAppProvider::GetForWebApps(
       Profile::FromBrowserContext(profile_));
   if (provider) {
@@ -1447,7 +1431,6 @@ ChromeFileSystemAccessPermissionContext::
       }
     }
   }
-#endif
 }
 
 ChromeFileSystemAccessPermissionContext::
@@ -2022,15 +2005,6 @@ void ChromeFileSystemAccessPermissionContext::CheckPathAgainstBlocklist(
     std::move(callback).Run(/*should_block=*/false);
     return;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  // The only check for content-URIs is that they are not from an internal
-  // FileProvider.
-  if (path_info.path.IsContentUri()) {
-    std::move(callback).Run(base::IsContentUriFromThisApp(path_info.path));
-    return;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Unlike the DIR_USER_DATA check, this handles the --user-data-dir override.
   // We check for the user data dir in two different ways: directly, via the
@@ -2770,11 +2744,8 @@ void ChromeFileSystemAccessPermissionContext::OnAllTabsInBackgroundTimerExpired(
     const url::Origin& origin,
     const OneTimePermissionsTrackerObserver::BackgroundExpiryType&
         expiry_type) {
-  if (
-#if !BUILDFLAG(IS_ANDROID)
-      !base::FeatureList::IsEnabled(
+  if (!base::FeatureList::IsEnabled(
           features::kFileSystemAccessPersistentPermissions) ||
-#endif
       expiry_type != BackgroundExpiryType::kLongTimeout) {
     return;
   }
@@ -2796,7 +2767,6 @@ void ChromeFileSystemAccessPermissionContext::OnShutdown() {
   one_time_permissions_tracker_.Reset();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ChromeFileSystemAccessPermissionContext::OnWebAppInstalled(
     const webapps::AppId& app_id) {
   if (!base::FeatureList::IsEnabled(
@@ -2896,7 +2866,6 @@ void ChromeFileSystemAccessPermissionContext::
     OnWebAppInstallManagerDestroyed() {
   install_manager_observation_.Reset();
 }
-#endif
 
 void ChromeFileSystemAccessPermissionContext::NavigatedAwayFromOrigin(
     const url::Origin& origin) {
@@ -2937,27 +2906,6 @@ void ChromeFileSystemAccessPermissionContext::MaybeCleanupPermissions(
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   // Iterate over all top-level frames by iterating over all tabs in all browser
   // windows. This also counts PWAs in windows without tab strips.
-#if BUILDFLAG(IS_ANDROID)
-  for (TabModel* tabs : TabModelList::models()) {
-    if (tabs->GetProfile() != profile()) {
-      continue;
-    }
-    int tab_count = tabs->GetTabCount();
-    for (int i = 0; i < tab_count; ++i) {
-      content::WebContents* web_contents = tabs->GetWebContentsAt(i);
-      if (!web_contents) {
-        continue;
-      }
-      url::Origin tab_origin = url::Origin::Create(
-          permissions::PermissionUtil::GetLastCommittedOriginAsURL(
-              web_contents->GetPrimaryMainFrame()));
-      // Found a tab for this origin, so early exit and don't revoke grants.
-      if (tab_origin == origin) {
-        return;
-      }
-    }
-  }
-#else
   bool found_origin = false;
   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
       [this, &origin,
@@ -2986,7 +2934,6 @@ void ChromeFileSystemAccessPermissionContext::MaybeCleanupPermissions(
   if (found_origin) {
     return;
   }
-#endif
 
   CleanupPermissions(origin);
 }
@@ -3154,11 +3101,6 @@ bool ChromeFileSystemAccessPermissionContext::
         HandleType handle_type,
         UserAction user_action,
         GrantType grant_type) {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40101963): Enable when android persisted permissions are
-  // implemented.
-  return false;
-#else
   if (!base::FeatureList::IsEnabled(
           features::kFileSystemAccessPersistentPermissions)) {
     return false;
@@ -3208,7 +3150,6 @@ bool ChromeFileSystemAccessPermissionContext::
   }
 
   return false;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 std::vector<FileRequestData> ChromeFileSystemAccessPermissionContext::
@@ -3375,11 +3316,6 @@ bool ChromeFileSystemAccessPermissionContext::OriginHasExtendedPermission(
     const url::Origin& origin) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40101963): Enable when android persisted permissions are
-  // implemented.
-  return false;
-#else
   if (!base::FeatureList::IsEnabled(
           features::kFileSystemAccessPersistentPermissions)) {
     return false;
@@ -3422,7 +3358,6 @@ bool ChromeFileSystemAccessPermissionContext::OriginHasExtendedPermission(
                                             ? WebAppInstallStatus::kInstalled
                                             : WebAppInstallStatus::kUninstalled;
   return app_has_os_integration;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeFileSystemAccessPermissionContext::SetOriginExtendedPermissionByUser(
@@ -3584,7 +3519,6 @@ void ChromeFileSystemAccessPermissionContext::ScheduleUsageIconUpdate() {
 void ChromeFileSystemAccessPermissionContext::DoUsageIconUpdate() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   usage_icon_update_scheduled_ = false;
-#if !BUILDFLAG(IS_ANDROID)
   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
       [this](BrowserWindowInterface* browser_window_interface) {
         if (browser_window_interface->GetProfile() != profile()) {
@@ -3604,7 +3538,6 @@ void ChromeFileSystemAccessPermissionContext::DoUsageIconUpdate() {
             tab_features->file_system_access_page_action_controller());
         return true;
       });
-#endif
 }
 
 base::WeakPtr<ChromeFileSystemAccessPermissionContext>
@@ -3612,7 +3545,6 @@ ChromeFileSystemAccessPermissionContext::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ChromeFileSystemAccessPermissionContext::UpdatePageAction(
     FileSystemAccessPageActionController* controller) {
   CHECK(controller);
@@ -3628,4 +3560,3 @@ bool ChromeFileSystemAccessPermissionContext::
   }
   return it->second.downgraded_read_paths.contains(path);
 }
-#endif

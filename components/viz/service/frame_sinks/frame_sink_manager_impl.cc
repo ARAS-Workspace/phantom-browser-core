@@ -133,9 +133,6 @@ FrameSinkManagerImpl::~FrameSinkManagerImpl() {
   // this point.
   CHECK(sink_map_.empty());
   CHECK(root_sink_map_.empty());
-#if BUILDFLAG(IS_ANDROID)
-  CHECK(cached_back_buffers_.empty());
-#endif
   CHECK(registered_sources_.empty());
 
   surface_manager_.RemoveObserver(this);
@@ -260,9 +257,6 @@ void FrameSinkManagerImpl::CreateRootCompositorFrameSink(
   }
 
   bool create_input_receiver = false;
-#if BUILDFLAG(IS_ANDROID)
-  create_input_receiver = params->create_input_receiver;
-#endif
   gpu::SurfaceHandle widget = params->widget;
 
   // Creating RootCompositorFrameSinkImpl can fail and return null.
@@ -1094,49 +1088,8 @@ void FrameSinkManagerImpl::OnCaptureStopped(const FrameSinkId& id) {
 void FrameSinkManagerImpl::VerifySandboxedThreadIds(
     const base::flat_set<base::PlatformThreadId>& thread_ids,
     base::OnceCallback<void(bool)> verification_callback) {
-#if BUILDFLAG(IS_ANDROID)
-  if (!CheckThreadIdsDoNotBelongToCurrentProcess(thread_ids)) {
-    // At least one thread belongs to the GPU process, verification failed.
-    std::move(verification_callback).Run(false);
-    return;
-  }
-  // GPU check passed, now do an async check for the Browser process.
-  static_assert(
-      std::is_same_v<int32_t, base::PlatformThreadId::UnderlyingType>);
-  std::vector<int32_t> tids;
-  tids.reserve(thread_ids.size());
-  std::transform(thread_ids.begin(), thread_ids.end(), std::back_inserter(tids),
-                 [](const base::PlatformThreadId& tid) { return tid.raw(); });
-  client_->VerifyThreadIdsDoNotBelongToHost(tids,
-                                            std::move(verification_callback));
-#else
   std::move(verification_callback).Run(false);
-#endif
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void FrameSinkManagerImpl::CacheBackBuffer(
-    uint32_t cache_id,
-    const FrameSinkId& root_frame_sink_id) {
-  RootCompositorFrameSinkImpl* root_frame_sink =
-      base::FindPtrOrNull(root_sink_map_, root_frame_sink_id);
-
-  // If creating RootCompositorFrameSinkImpl failed there might not be an entry
-  // in |root_sink_map_|.
-  if (!root_frame_sink) {
-    return;
-  }
-
-  CHECK(!cached_back_buffers_.contains(cache_id));
-  cached_back_buffers_[cache_id] = root_frame_sink->GetCacheBackBufferCb();
-}
-
-void FrameSinkManagerImpl::EvictBackBuffer(uint32_t cache_id,
-                                           EvictBackBufferCallback callback) {
-  cached_back_buffers_.erase(cache_id);
-  std::move(callback).Run();
-}
-#endif
 
 void FrameSinkManagerImpl::UpdateDebugRendererSettings(
     const DebugRendererSettings& debug_settings) {

@@ -40,14 +40,10 @@
 #include "chrome/browser/offline_pages/offline_page_bookmark_observer.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#else
 #include "base/memory/scoped_refptr.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
 #include "components/os_crypt/async/common/encryptor.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -137,7 +133,6 @@ void ChromeBookmarkClient::Init(bookmarks::BookmarkModel* model) {
   model_observation_->Observe(model);
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   // Ensure `BookmarkMergedSurfaceService` is created all the time when
   // `BookmarkModel` is created and before the `BookmarkModel` completes loading
   // to catch if `ids_reassigned`. Posting a task is required as
@@ -152,7 +147,6 @@ void ChromeBookmarkClient::Init(bookmarks::BookmarkModel* model) {
             }
           },
           profile_->GetWeakPtr()));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 base::CancelableTaskTracker::TaskId
@@ -218,13 +212,7 @@ bool ChromeBookmarkClient::IsNodeManaged(const bookmarks::BookmarkNode* node) {
 }
 
 bookmarks::BookmarkFormFactor ChromeBookmarkClient::GetBookmarkFormFactor() {
-#if BUILDFLAG(IS_ANDROID)
-  return base::android::device_info::is_desktop()
-             ? bookmarks::BookmarkFormFactor::kDesktop
-             : bookmarks::BookmarkFormFactor::kMobile;
-#else
   return bookmarks::BookmarkFormFactor::kDesktop;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 std::string ChromeBookmarkClient::EncodeLocalOrSyncableBookmarkSyncMetadata() {

@@ -35,29 +35,6 @@
 #include "content/public/test/web_contents_tester.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/functional/callback.h"
-#include "chrome/browser/feature_engagement/tracker_factory.h"
-#include "chrome/browser/keyboard_accessory/android/payment_method_accessory_controller.h"
-#include "chrome/browser/keyboard_accessory/test_utils/android/mock_payment_method_accessory_controller.h"
-#include "chrome/browser/touch_to_fill/autofill/android/mock_touch_to_fill_payment_method_controller.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_card_bottom_sheet_bridge.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_card_delegate_android.h"
-#include "chrome/browser/ui/android/autofill/autofill_save_iban_bottom_sheet_bridge.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_test_helper.h"
-#include "chrome/browser/ui/autofill/autofill_message_controller.h"
-#include "chrome/browser/ui/autofill/autofill_snackbar_controller_impl.h"
-#include "chrome/browser/ui/autofill/mock_autofill_message_controller.h"
-#include "components/autofill/core/browser/data_model/payments/bnpl_issuer.h"
-#include "components/autofill/core/browser/payments/android_bnpl_strategy.h"
-#include "components/autofill/core/browser/payments/autofill_save_card_ui_info.h"
-#include "components/autofill/core/browser/payments/bnpl_util.h"
-#include "components/autofill/core/browser/test_utils/autofill_test_utils.h"
-#include "components/feature_engagement/public/feature_constants.h"
-#include "components/feature_engagement/test/mock_tracker.h"
-#include "ui/android/window_android.h"
-#else  // !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/autofill/payments/omnibox_autofill_page_action_controller.h"
 #include "chrome/browser/ui/autofill/payments/save_card_bubble_controller_impl.h"
@@ -67,7 +44,6 @@
 #include "components/autofill/core/browser/payments/desktop_bnpl_strategy.h"
 #include "components/tabs/public/mock_tab_interface.h"
 #include "ui/base/unowned_user_data/unowned_user_data_host.h"
-#endif                                      // BUILDFLAG(IS_ANDROID)
 
 using ::autofill::test::CreateLoyaltyCard;
 using ::testing::_;
@@ -85,67 +61,6 @@ using ::testing::Return;
 
 namespace autofill {
 
-#if BUILDFLAG(IS_ANDROID)
-
-Matcher<payments::BnplIssuerContext> EqualsBnplIssuerContext(
-    BnplIssuer::IssuerId issuer_id,
-    payments::BnplIssuerEligibilityForPage eligibility) {
-  return AllOf(Field(&payments::BnplIssuerContext::issuer,
-                     Property(&BnplIssuer::issuer_id, Eq(issuer_id))),
-               Field(&payments::BnplIssuerContext::eligibility, eligibility));
-}
-
-class MockAutofillSaveCardBottomSheetBridge
-    : public AutofillSaveCardBottomSheetBridge {
- public:
-  MockAutofillSaveCardBottomSheetBridge()
-      : AutofillSaveCardBottomSheetBridge(
-            base::android::ScopedJavaGlobalRef<jobject>(nullptr)) {}
-
-  MOCK_METHOD(void,
-              RequestShowContent,
-              (const AutofillSaveCardUiInfo&,
-               std::unique_ptr<AutofillSaveCardDelegateAndroid>),
-              (override));
-  MOCK_METHOD(void, Hide, (), (override));
-};
-
-class MockAutofillSaveIbanBottomSheetBridge
-    : public AutofillSaveIbanBottomSheetBridge {
- public:
-  MockAutofillSaveIbanBottomSheetBridge()
-      : AutofillSaveIbanBottomSheetBridge(
-            base::android::ScopedJavaGlobalRef<jobject>(nullptr)) {}
-
-  MOCK_METHOD(void, Hide, (), (override));
-};
-
-class MockAutofillSnackbarControllerImpl
-    : public AutofillSnackbarControllerImpl {
- public:
-  explicit MockAutofillSnackbarControllerImpl(
-      content::WebContents* web_contents)
-      : AutofillSnackbarControllerImpl(web_contents) {}
-
-  MOCK_METHOD(void,
-              Show,
-              (AutofillSnackbarType, base::OnceClosure),
-              (override));
-  MOCK_METHOD(void,
-              ShowWithDurationAndCallback,
-              (AutofillSnackbarType,
-               base::TimeDelta,
-               base::OnceClosure,
-               std::optional<base::OnceClosure>),
-              (override));
-  MOCK_METHOD(void,
-              ShowPaymentsSnackbar,
-              (AutofillSnackbarType type,
-               const CreditCard& filled_card,
-               base::OnceClosure),
-              (override));
-};
-#else  //! BUILDFLAG(IS_ANDROID)
 class MockSaveCardBubbleController : public SaveCardBubbleControllerImpl {
  public:
   explicit MockSaveCardBubbleController(content::WebContents* web_contents)
@@ -168,7 +83,6 @@ class MockSaveCardBubbleController : public SaveCardBubbleControllerImpl {
       (override));
   MOCK_METHOD(void, HideSaveCardBubble, (), (override));
 };
-#endif
 
 class MockVirtualCardEnrollBubbleController
     : public VirtualCardEnrollBubbleControllerImpl {
@@ -214,23 +128,17 @@ class ChromePaymentsAutofillClientTest
     ChromeRenderViewHostTestHarness::SetUp();
 
     ChromeAutofillClient::CreateForWebContents(web_contents());
-#if BUILDFLAG(IS_ANDROID)
-    MockPaymentMethodAccessoryController::GetOrCreate(web_contents())
-        ->RegisterFillingSourceObserver(mock_filling_source_observer_.Get());
-#endif
     auto mock_virtual_card_bubble_controller =
         std::make_unique<MockVirtualCardEnrollBubbleController>(web_contents());
     const auto* user_data_key =
         mock_virtual_card_bubble_controller->UserDataKey();
     web_contents()->SetUserData(user_data_key,
                                 std::move(mock_virtual_card_bubble_controller));
-#if !BUILDFLAG(IS_ANDROID)
     auto mock_save_card_bubble_controller =
         std::make_unique<MockSaveCardBubbleController>(web_contents());
     user_data_key = mock_save_card_bubble_controller->UserDataKey();
     web_contents()->SetUserData(user_data_key,
                                 std::move(mock_save_card_bubble_controller));
-#endif
   }
 
   ChromeAutofillClient* client() {
@@ -246,536 +154,14 @@ class ChromePaymentsAutofillClientTest
     return static_cast<MockVirtualCardEnrollBubbleController&>(
         *VirtualCardEnrollBubbleController::GetOrCreate(web_contents()));
   }
-#if BUILDFLAG(IS_ANDROID)
-  // Injects a new MockAutofillSaveCardBottomSheetBridge and returns a pointer
-  // to the mock.
-  MockAutofillSaveCardBottomSheetBridge*
-  InjectMockAutofillSaveCardBottomSheetBridge() {
-    std::unique_ptr<MockAutofillSaveCardBottomSheetBridge> mock =
-        std::make_unique<MockAutofillSaveCardBottomSheetBridge>();
-    MockAutofillSaveCardBottomSheetBridge* pointer = mock.get();
-    chrome_payments_client()->SetAutofillSaveCardBottomSheetBridgeForTesting(
-        std::move(mock));
-    return pointer;
-  }
-
-  MockAutofillSaveIbanBottomSheetBridge*
-  InjectMockAutofillSaveIbanBottomSheetBridge() {
-    std::unique_ptr<MockAutofillSaveIbanBottomSheetBridge> mock =
-        std::make_unique<MockAutofillSaveIbanBottomSheetBridge>();
-    MockAutofillSaveIbanBottomSheetBridge* pointer = mock.get();
-    chrome_payments_client()->SetAutofillSaveIbanBottomSheetBridgeForTesting(
-        std::move(mock));
-    return pointer;
-  }
-
-  MockAutofillSnackbarControllerImpl*
-  InjectMockAutofillSnackbarControllerImpl() {
-    std::unique_ptr<MockAutofillSnackbarControllerImpl> mock =
-        std::make_unique<MockAutofillSnackbarControllerImpl>(web_contents());
-    MockAutofillSnackbarControllerImpl* pointer = mock.get();
-    client()->SetAutofillSnackbarControllerImplForTesting(std::move(mock));
-    return pointer;
-  }
-
-  MockAutofillMessageController* InjectMockAutofillMessageController() {
-    std::unique_ptr<MockAutofillMessageController> mock =
-        std::make_unique<MockAutofillMessageController>();
-    MockAutofillMessageController* pointer = mock.get();
-    chrome_payments_client()->SetAutofillMessageControllerForTesting(
-        std::move(mock));
-    return pointer;
-  }
-
-  MockTouchToFillPaymentMethodController*
-  InjectMockTouchToFillPaymentMethodController() {
-    std::unique_ptr<MockTouchToFillPaymentMethodController> mock =
-        std::make_unique<MockTouchToFillPaymentMethodController>();
-    MockTouchToFillPaymentMethodController* pointer = mock.get();
-    chrome_payments_client()->SetTouchToFillPaymentMethodControllerForTesting(
-        std::move(mock));
-    return pointer;
-  }
-
-  void InjectFeatureEngagementMockTracker() {
-    feature_engagement::TrackerFactory::GetInstance()->SetTestingFactory(
-        Profile::FromBrowserContext(web_contents()->GetBrowserContext()),
-        base::BindRepeating([](content::BrowserContext* context)
-                                -> std::unique_ptr<KeyedService> {
-          auto tracker =
-              std::make_unique<feature_engagement::test::MockTracker>();
-
-          ON_CALL(*tracker, IsInitialized()).WillByDefault(Return(true));
-
-          return tracker;
-        }));
-  }
-
-#else  // !BUILDFLAG(IS_ANDROID)
   MockSaveCardBubbleController& save_card_bubble_controller() {
     return static_cast<MockSaveCardBubbleController&>(
         *SaveCardBubbleController::GetOrCreate(web_contents()));
   }
-#endif
 
  private:
   base::test::ScopedFeatureList feature_list_;
-#if BUILDFLAG(IS_ANDROID)
-  base::MockCallback<AccessoryController::FillingSourceObserver>
-      mock_filling_source_observer_;
-#endif
 };
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(ChromePaymentsAutofillClientTest,
-       GetOrCreateAutofillSaveCardBottomSheetBridge_IsNotNull) {
-  std::unique_ptr<ui::WindowAndroid::ScopedWindowAndroidForTesting> window =
-      ui::WindowAndroid::CreateForTesting();
-  window.get()->get()->AddChild(web_contents()->GetNativeView());
-
-  TestTabModel tab_model(profile());
-  tab_model.SetWebContentsList({web_contents()});
-  TabModelList::AddTabModel(&tab_model);
-
-  EXPECT_NE(
-      chrome_payments_client()->GetOrCreateAutofillSaveCardBottomSheetBridge(),
-      nullptr);
-
-  TabModelList::RemoveTabModel(&tab_model);
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       ShowSaveCreditCardLocally_CardSaveOnly_RequestsBottomSheet) {
-  MockAutofillSaveCardBottomSheetBridge* save_card_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-
-  EXPECT_CALL(
-      *save_card_bridge,
-      RequestShowContent(
-          AllOf(
-              Field(&AutofillSaveCardUiInfo::is_for_upload, false),
-              Field(&AutofillSaveCardUiInfo::description_text,
-                    u"To pay faster next time, save your card to your device")),
-          NotNull()));
-
-  chrome_payments_client()->ShowSaveCreditCardLocally(
-      CreditCard(),
-      payments::ChromePaymentsAutofillClient::SaveCreditCardOptions()
-          .with_card_save_type(payments::ChromePaymentsAutofillClient::
-                                   CardSaveType::kCardSaveOnly)
-          .with_show_prompt(true),
-      base::DoNothing());
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       ShowSaveCreditCardLocally_CardSaveWithCvc_RequestsBottomSheet) {
-  MockAutofillSaveCardBottomSheetBridge* save_card_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-
-  EXPECT_CALL(*save_card_bridge,
-              RequestShowContent(
-                  AllOf(Field(&AutofillSaveCardUiInfo::is_for_upload, false),
-                        Field(&AutofillSaveCardUiInfo::description_text,
-                              u"To pay faster next time, save your card and "
-                              u"encrypted security code to your device")),
-                  NotNull()));
-
-  chrome_payments_client()->ShowSaveCreditCardLocally(
-      CreditCard(),
-      payments::ChromePaymentsAutofillClient::SaveCreditCardOptions()
-          .with_card_save_type(payments::ChromePaymentsAutofillClient::
-                                   CardSaveType::kCardSaveWithCvc)
-          .with_show_prompt(true),
-      base::DoNothing());
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       ShowSaveCreditCardLocally_WindowNotSet_DoesNotFail) {
-  EXPECT_NO_FATAL_FAILURE(chrome_payments_client()->ShowSaveCreditCardLocally(
-      CreditCard(),
-      payments::ChromePaymentsAutofillClient::SaveCreditCardOptions()
-          .with_show_prompt(true),
-      base::DoNothing()));
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       ShowSaveCreditCardToCloud_DoesNotFailWithoutAWindow) {
-  EXPECT_NO_FATAL_FAILURE(chrome_payments_client()->ShowSaveCreditCardToCloud(
-      CreditCard(), LegalMessageLines(),
-      payments::ChromePaymentsAutofillClient::SaveCreditCardOptions()
-          .with_show_prompt(true),
-      base::DoNothing()));
-}
-
-TEST_F(
-    ChromePaymentsAutofillClientTest,
-    CreditCardUploadCompletedSuccessful_CallsSaveCardBottomSheetBridgeAndSnackbarControllerWithDurationAndCallback) {
-  MockAutofillSaveCardBottomSheetBridge* save_card_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-  MockAutofillSnackbarControllerImpl* snackbar_controller =
-      InjectMockAutofillSnackbarControllerImpl();
-
-  EXPECT_CALL(*save_card_bridge, Hide);
-  EXPECT_CALL(
-      *snackbar_controller,
-      ShowWithDurationAndCallback(AutofillSnackbarType::kSaveCardSuccess,
-                                  payments::ChromePaymentsAutofillClient::
-                                      kSaveCardConfirmationSnackbarDuration,
-                                  _, Ne(std::nullopt)));
-
-  std::optional<base::OnceClosure> callback = base::OnceClosure();
-  chrome_payments_client()->CreditCardUploadCompleted(
-      payments::PaymentsAutofillClient::PaymentsRpcResult::kSuccess,
-      std::move(callback));
-}
-
-TEST_F(
-    ChromePaymentsAutofillClientTest,
-    CreditCardUploadCompletedSuccessfulButNoCallback_CallsSaveCardBottomSheetBridgeAndSnackbarControllerWithoutDuration) {
-  MockAutofillSaveCardBottomSheetBridge* save_card_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-  MockAutofillSnackbarControllerImpl* snackbar_controller =
-      InjectMockAutofillSnackbarControllerImpl();
-
-  EXPECT_CALL(*save_card_bridge, Hide);
-  EXPECT_CALL(*snackbar_controller,
-              Show(AutofillSnackbarType::kSaveCardSuccess, _));
-
-  chrome_payments_client()->CreditCardUploadCompleted(
-      payments::PaymentsAutofillClient::PaymentsRpcResult::kSuccess,
-      std::nullopt);
-}
-
-TEST_F(
-    ChromePaymentsAutofillClientTest,
-    CreditCardUploadCompletedFailure_CallsSaveCardBottomSheetBridgeAndAutofillMessageController) {
-  MockAutofillSaveCardBottomSheetBridge* save_card_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-  MockAutofillMessageController* message_controller =
-      InjectMockAutofillMessageController();
-
-  EXPECT_CALL(*save_card_bridge, Hide);
-  EXPECT_CALL(*message_controller, Show)
-      .WillOnce([](std::unique_ptr<AutofillMessageModel> model) {
-        EXPECT_EQ(model->GetType(),
-                  AutofillMessageModel::Type::kSaveCardFailure);
-      });
-
-  chrome_payments_client()->CreditCardUploadCompleted(
-      payments::PaymentsAutofillClient::PaymentsRpcResult::kPermanentFailure,
-      std::nullopt);
-}
-
-TEST_F(
-    ChromePaymentsAutofillClientTest,
-    CreditCardUploadCompletedOnClientSideTimeout_HidesSaveCardBottomSheetBridge_NoErrorConfirmation) {
-  MockAutofillSaveCardBottomSheetBridge* save_card_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-  MockAutofillMessageController* message_controller =
-      InjectMockAutofillMessageController();
-
-  EXPECT_CALL(*save_card_bridge, Hide);
-  EXPECT_CALL(*message_controller, Show).Times(0);
-
-  chrome_payments_client()->CreditCardUploadCompleted(
-      payments::PaymentsAutofillClient::PaymentsRpcResult::kClientSideTimeout,
-      std::nullopt);
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       VirtualCardEnrollSuccessful_CallsSnackbarController) {
-  MockAutofillSnackbarControllerImpl* snackbar_controller =
-      InjectMockAutofillSnackbarControllerImpl();
-
-  EXPECT_CALL(*snackbar_controller,
-              Show(AutofillSnackbarType::kVirtualCardEnrollSuccess, _));
-
-  chrome_payments_client()->VirtualCardEnrollCompleted(
-      payments::PaymentsAutofillClient::PaymentsRpcResult::kSuccess);
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       VirtualCardEnrollFailure_CallsAutofillMessageController) {
-  MockAutofillMessageController* message_controller =
-      InjectMockAutofillMessageController();
-  test_api(virtual_card_bubble_controller())
-      .SetUiModel(std::make_unique<VirtualCardEnrollUiModel>(
-          VirtualCardEnrollmentFields()));
-  EXPECT_CALL(*message_controller, Show)
-      .WillOnce([](std::unique_ptr<AutofillMessageModel> model) {
-        EXPECT_EQ(model->GetType(),
-                  AutofillMessageModel::Type::kVirtualCardEnrollFailure);
-      });
-
-  chrome_payments_client()->VirtualCardEnrollCompleted(
-      payments::PaymentsAutofillClient::PaymentsRpcResult::kPermanentFailure);
-}
-
-TEST_F(
-    ChromePaymentsAutofillClientTest,
-    VirtualCardEnrollClientSideTimeout_DoesNotCallAutofillMessageController) {
-  MockAutofillMessageController* message_controller =
-      InjectMockAutofillMessageController();
-  EXPECT_CALL(*message_controller, Show).Times(0);
-
-  chrome_payments_client()->VirtualCardEnrollCompleted(
-      payments::PaymentsAutofillClient::PaymentsRpcResult::kClientSideTimeout);
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       GetOrCreateAutofillSaveIbanBottomSheetBridge_IsNotNull) {
-  std::unique_ptr<ui::WindowAndroid::ScopedWindowAndroidForTesting> window =
-      ui::WindowAndroid::CreateForTesting();
-  window.get()->get()->AddChild(web_contents()->GetNativeView());
-
-  TestTabModel tab_model(profile());
-  tab_model.SetWebContentsList({web_contents()});
-  TabModelList::AddTabModel(&tab_model);
-
-  EXPECT_NE(
-      chrome_payments_client()->GetOrCreateAutofillSaveIbanBottomSheetBridge(),
-      nullptr);
-
-  TabModelList::RemoveTabModel(&tab_model);
-}
-
-TEST_F(
-    ChromePaymentsAutofillClientTest,
-    IbanUploadCompletedSuccessful_CallsSaveIbanBottomSheetBridgeAndSnackbarController) {
-  MockAutofillSaveIbanBottomSheetBridge* save_iban_bridge =
-      InjectMockAutofillSaveIbanBottomSheetBridge();
-  MockAutofillSnackbarControllerImpl* snackbar_controller =
-      InjectMockAutofillSnackbarControllerImpl();
-
-  EXPECT_CALL(*save_iban_bridge, Hide);
-  EXPECT_CALL(*snackbar_controller,
-              Show(AutofillSnackbarType::kSaveServerIbanSuccess, _));
-  chrome_payments_client()->IbanUploadCompleted(/*iban_saved=*/true,
-                                                /*max_strikes=*/false);
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       OnCardDataAvailable_BnplCard_ShowsBnplSnackbar) {
-  MockAutofillSnackbarControllerImpl* snackbar_controller =
-      InjectMockAutofillSnackbarControllerImpl();
-
-  CreditCard card = test::GetCreditCard();
-  card.set_record_type(CreditCard::RecordType::kVirtualCard);
-  card.set_issuer_id(kBnplAffirmIssuerId);
-  card.set_is_bnpl_card(true);
-
-  FilledCardInformationBubbleOptions options;
-  options.filled_card = card;
-
-  EXPECT_CALL(
-      *snackbar_controller,
-      ShowPaymentsSnackbar(AutofillSnackbarType::kBnpl, options.filled_card, _))
-      .WillOnce([=](AutofillSnackbarType type, const CreditCard& card,
-                    base::OnceClosure callback) {
-        snackbar_controller
-            ->AutofillSnackbarControllerImpl::ShowPaymentsSnackbar(
-                type, card, std::move(callback));
-      });
-  EXPECT_CALL(*snackbar_controller, Show(AutofillSnackbarType::kBnpl, _));
-
-  chrome_payments_client()->OnCardDataAvailable(options, url::Origin());
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       OnCardDataAvailable_VirtualCard_ShowsVirtualCardSnackbar) {
-  MockAutofillSnackbarControllerImpl* snackbar_controller =
-      InjectMockAutofillSnackbarControllerImpl();
-
-  CreditCard card = test::GetCreditCard();
-  card.set_record_type(CreditCard::RecordType::kVirtualCard);
-
-  FilledCardInformationBubbleOptions options;
-  options.filled_card = card;
-
-  EXPECT_CALL(*snackbar_controller,
-              ShowPaymentsSnackbar(AutofillSnackbarType::kVirtualCard,
-                                   options.filled_card, _))
-      .WillOnce([=](AutofillSnackbarType type, const CreditCard& card,
-                    base::OnceClosure callback) {
-        snackbar_controller
-            ->AutofillSnackbarControllerImpl::ShowPaymentsSnackbar(
-                type, card, std::move(callback));
-      });
-  EXPECT_CALL(*snackbar_controller,
-              Show(AutofillSnackbarType::kVirtualCard, _));
-
-  chrome_payments_client()->OnCardDataAvailable(options, url::Origin());
-}
-
-TEST_F(ChromePaymentsAutofillClientTest,
-       OnCardDataAvailable_ShowsCardInfoRetrievalSnackbar) {
-  MockAutofillSnackbarControllerImpl* snackbar_controller =
-      InjectMockAutofillSnackbarControllerImpl();
-
-  CreditCard card = test::GetCreditCard();
-  card.set_record_type(CreditCard::RecordType::kMaskedServerCard);
-
-  FilledCardInformationBubbleOptions options;
-  options.filled_card = card;
-
-  EXPECT_CALL(*snackbar_controller,
-              ShowPaymentsSnackbar(AutofillSnackbarType::kCardInfoRetrieval,
-                                   options.filled_card, _))
-      .WillOnce([=](AutofillSnackbarType type, const CreditCard& card,
-                    base::OnceClosure callback) {
-        snackbar_controller
-            ->AutofillSnackbarControllerImpl::ShowPaymentsSnackbar(
-                type, card, std::move(callback));
-      });
-  EXPECT_CALL(*snackbar_controller,
-              Show(AutofillSnackbarType::kCardInfoRetrieval, _));
-
-  chrome_payments_client()->OnCardDataAvailable(options, url::Origin());
-}
-
-// Test that calling `ShowAffiliatedLoyaltyCards` passes the correct lists of
-// loyalty cards.
-TEST_F(ChromePaymentsAutofillClientTest, ShowTouchToFillAffiliatedLoyaltyCard) {
-  MockTouchToFillPaymentMethodController* ttf_payment_method_controller =
-      InjectMockTouchToFillPaymentMethodController();
-
-  const LoyaltyCard affiliated_card_1 = LoyaltyCard(
-      /*loyalty_card_id=*/ValuableId("id_2"),
-      /*merchant_name=*/"Walgreens",
-      /*program_name=*/"CustomerCard",
-      /*program_logo=*/GURL(""),
-      /*loyalty_card_number=*/"998766823",
-      /*merchant_domains=*/{GURL("https://example.com")},
-      /*use_date=*/{}, /*use_count=*/0);
-  const LoyaltyCard affiliated_card_2 = LoyaltyCard(
-      /*loyalty_card_id=*/ValuableId("id_3"),
-      /*merchant_name=*/"Ticket Maester",
-      /*program_name=*/"TourLoyal",
-      /*program_logo=*/GURL(""),
-      /*loyalty_card_number=*/"37262999281",
-      /*merchant_domains=*/{GURL("https://affiliated.example.com")},
-      /*use_date=*/{}, /*use_count=*/0);
-  content::WebContentsTester::For(web_contents())
-      ->NavigateAndCommit(GURL("https://example.com"));
-
-  const std::vector<LoyaltyCard> cards = {CreateLoyaltyCard(),
-                                          affiliated_card_1, affiliated_card_2};
-  EXPECT_CALL(*ttf_payment_method_controller,
-              ShowAffiliatedLoyaltyCards(
-                  _, _, ElementsAre(affiliated_card_1, affiliated_card_2),
-                  ElementsAreArray(cards), _));
-
-  chrome_payments_client()->ShowTouchToFillAffiliatedLoyaltyCard(
-      /*delegate=*/nullptr, cards);
-}
-
-// Test that calling ShowAffiliatedLoyaltyCards checks/updates for IPH status
-// correctly if IPH was never shown before.
-TEST_F(ChromePaymentsAutofillClientTest,
-       ShowTouchToFillAffiliatedLoyaltyCardFirstTimeUsage) {
-  MockTouchToFillPaymentMethodController* ttf_payment_method_controller =
-      InjectMockTouchToFillPaymentMethodController();
-  InjectFeatureEngagementMockTracker();
-  feature_engagement::test::MockTracker* tracker =
-      static_cast<feature_engagement::test::MockTracker*>(
-          feature_engagement::TrackerFactory::GetForBrowserContext(
-              Profile::FromBrowserContext(
-                  web_contents()->GetBrowserContext())));
-  ON_CALL(*tracker,
-          WouldTriggerHelpUI(
-              Ref(feature_engagement::kIPHAutofillEnableLoyaltyCardsFeature)))
-      .WillByDefault(Return(true));
-  content::WebContentsTester::For(web_contents())
-      ->NavigateAndCommit(GURL("https://example.com"));
-
-  EXPECT_CALL(*ttf_payment_method_controller,
-              ShowAffiliatedLoyaltyCards(_, _, _, _,
-                                         /*first_time_usage=*/true))
-      .WillOnce(Return(true));
-  EXPECT_CALL(*tracker,
-              NotifyEvent("keyboard_accessory_loyalty_cards_autofilled"));
-
-  chrome_payments_client()->ShowTouchToFillAffiliatedLoyaltyCard(
-      /*delegate=*/nullptr, {CreateLoyaltyCard()});
-}
-
-// Test that calling ShowAffiliatedLoyaltyCards does not update IPH status if
-// IPH already shown.
-TEST_F(ChromePaymentsAutofillClientTest,
-       ShowTouchToFillAffiliatedLoyaltyCardNotFirstTimeUsage) {
-  MockTouchToFillPaymentMethodController* ttf_payment_method_controller =
-      InjectMockTouchToFillPaymentMethodController();
-  InjectFeatureEngagementMockTracker();
-  feature_engagement::test::MockTracker* tracker =
-      static_cast<feature_engagement::test::MockTracker*>(
-          feature_engagement::TrackerFactory::GetForBrowserContext(
-              Profile::FromBrowserContext(
-                  web_contents()->GetBrowserContext())));
-  ON_CALL(*tracker,
-          WouldTriggerHelpUI(
-              Ref(feature_engagement::kIPHAutofillEnableLoyaltyCardsFeature)))
-      .WillByDefault(Return(false));
-  content::WebContentsTester::For(web_contents())
-      ->NavigateAndCommit(GURL("https://example.com"));
-
-  EXPECT_CALL(*ttf_payment_method_controller,
-              ShowAffiliatedLoyaltyCards(_, _, _, _,
-                                         /*first_time_usage=*/false))
-      .WillOnce(Return(true));
-  EXPECT_CALL(*tracker,
-              NotifyEvent("keyboard_accessory_loyalty_cards_autofilled"))
-      .Times(0);
-
-  chrome_payments_client()->ShowTouchToFillAffiliatedLoyaltyCard(
-      /*delegate=*/nullptr, {CreateLoyaltyCard()});
-}
-
-TEST_F(ChromePaymentsAutofillClientTest, ShowTouchToFillBnplIssuers) {
-  MockTouchToFillPaymentMethodController* ttf_payment_method_controller =
-      InjectMockTouchToFillPaymentMethodController();
-  const std::vector<payments::BnplIssuerContext> issuer_context = {
-      payments::BnplIssuerContext(
-          test::GetTestLinkedBnplIssuer(),
-          payments::BnplIssuerEligibilityForPage::kIsEligible)};
-
-  EXPECT_CALL(*ttf_payment_method_controller,
-              ShowBnplIssuers(ElementsAre(EqualsBnplIssuerContext(
-                                  issuer_context[0].issuer.issuer_id(),
-                                  issuer_context[0].eligibility)),
-                              /*app_locale=*/"en-US", _, _));
-
-  chrome_payments_client()->ShowTouchToFillBnplIssuers(
-      issuer_context, /*app_locale=*/"en-US",
-      /*selected_issuer_callback=*/base::DoNothing(),
-      /*cancel_callback=*/base::DoNothing());
-}
-
-TEST_F(ChromePaymentsAutofillClientTest, OnPurchaseAmountExtracted) {
-  MockTouchToFillPaymentMethodController* ttf_payment_method_controller =
-      InjectMockTouchToFillPaymentMethodController();
-  std::optional<int64_t> extracted_amount = 12345;
-  std::optional<std::string> app_locale = "en-US";
-  const std::vector<payments::BnplIssuerContext> issuer_context = {
-      payments::BnplIssuerContext(
-          test::GetTestLinkedBnplIssuer(),
-          payments::BnplIssuerEligibilityForPage::kIsEligible)};
-
-  EXPECT_CALL(
-      *ttf_payment_method_controller,
-      OnPurchaseAmountExtracted(ElementsAre(EqualsBnplIssuerContext(
-                                    issuer_context[0].issuer.issuer_id(),
-                                    issuer_context[0].eligibility)),
-                                extracted_amount,
-                                /*is_amount_supported_by_any_issuer=*/true,
-                                /*app_locale=*/app_locale, _, _));
-
-  chrome_payments_client()->OnPurchaseAmountExtracted(
-      issuer_context, extracted_amount,
-      /*is_amount_supported_by_any_issuer=*/true, app_locale,
-      /*selected_issuer_callback=*/base::DoNothing(),
-      /*cancel_callback=*/base::DoNothing());
-}
-
-#else   // !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/410047802): Disable test on Linux TSan due to flakiness/issue.
 #if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
@@ -835,7 +221,6 @@ TEST_F(
       payments::PaymentsAutofillClient::PaymentsRpcResult::kClientSideTimeout,
       std::nullopt);
 }
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Verify that the confirmation bubble view is shown after virtual card
 // enrollment is completed.
@@ -914,101 +299,6 @@ TEST_F(ChromePaymentsAutofillClientTest,
   EXPECT_FALSE(chrome_payments_client()->IsAutofillPaymentMethodsEnabled());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-class ChromePaymentsAutofillClientWalletBrandingTest
-    : public ChromePaymentsAutofillClientTest,
-      public testing::WithParamInterface<bool> {
- public:
-  ChromePaymentsAutofillClientWalletBrandingTest() {
-    if (IsWalletBrandingEnabled()) {
-      feature_list_.InitAndEnableFeature(
-          features::kAutofillEnableWalletBranding);
-    } else {
-      feature_list_.InitAndDisableFeature(
-          features::kAutofillEnableWalletBranding);
-    }
-  }
-
-  bool IsWalletBrandingEnabled() { return GetParam(); }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-INSTANTIATE_TEST_SUITE_P(,
-                         ChromePaymentsAutofillClientWalletBrandingTest,
-                         testing::Bool());
-
-// Verify that the prompt to upload save a user's card without CVC is shown in a
-// bottom sheet.
-TEST_P(ChromePaymentsAutofillClientWalletBrandingTest,
-       ShowSaveCreditCardToCloud_CardSaveTypeIsOnlyCard_RequestsBottomSheet) {
-  MockAutofillSaveCardBottomSheetBridge* bottom_sheet_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-
-  std::u16string expected_description;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  expected_description = IsWalletBrandingEnabled()
-                             ? u"To pay faster next time, save your card and "
-                               u"billing address in Google Wallet"
-                             : u"To pay faster next time, save your card and "
-                               u"billing address in your Google Account";
-#endif
-
-  // Verify that `AutofillSaveCardUiInfo` has the correct attributes
-  // that indicate upload save card prompt without CVC.
-  EXPECT_CALL(*bottom_sheet_bridge,
-              RequestShowContent(
-                  AllOf(Field(&AutofillSaveCardUiInfo::is_for_upload, true),
-                        Field(&AutofillSaveCardUiInfo::description_text,
-                              expected_description)),
-                  NotNull()));
-
-  chrome_payments_client()->ShowSaveCreditCardToCloud(
-      CreditCard(), LegalMessageLines(),
-      payments::ChromePaymentsAutofillClient::SaveCreditCardOptions()
-          .with_card_save_type(payments::ChromePaymentsAutofillClient::
-                                   CardSaveType::kCardSaveOnly)
-          .with_show_prompt(true),
-      base::DoNothing());
-}
-
-// Verify that the prompt to upload save a user's card with CVC is shown in a
-// bottom sheet.
-TEST_P(ChromePaymentsAutofillClientWalletBrandingTest,
-       ShowSaveCreditCardToCloud_CardSaveTypeIsWithCvc_RequestsBottomSheet) {
-  MockAutofillSaveCardBottomSheetBridge* bottom_sheet_bridge =
-      InjectMockAutofillSaveCardBottomSheetBridge();
-
-  std::u16string expected_description;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  expected_description = IsWalletBrandingEnabled()
-                             ? u"Pay faster when your card is saved. Card "
-                               u"details are encrypted in Google Wallet."
-                             : u"Pay faster when your card is saved. Card "
-                               u"details are encrypted in your Google Account.";
-#endif
-
-  // Verify that `AutofillSaveCardUiInfo` has the correct attributes
-  // that indicate upload save card prompt with CVC.
-  EXPECT_CALL(*bottom_sheet_bridge,
-              RequestShowContent(
-                  AllOf(Field(&AutofillSaveCardUiInfo::is_for_upload, true),
-                        Field(&AutofillSaveCardUiInfo::description_text,
-                              expected_description)),
-                  NotNull()));
-
-  chrome_payments_client()->ShowSaveCreditCardToCloud(
-      CreditCard(), LegalMessageLines(),
-      payments::ChromePaymentsAutofillClient::SaveCreditCardOptions()
-          .with_card_save_type(payments::ChromePaymentsAutofillClient::
-                                   CardSaveType::kCardSaveWithCvc)
-          .with_show_prompt(true),
-      base::DoNothing());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 class ChromePaymentsAutofillIOSPromoClientTest
     : public ChromePaymentsAutofillClientTest {
  public:
@@ -1033,9 +323,6 @@ TEST_F(ChromePaymentsAutofillIOSPromoClientTest,
       payments::PaymentsAutofillClient::PaymentsRpcResult::kSuccess,
       std::nullopt);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 
 class ChromePaymentsAutofillClientOmniboxTest
     : public ChromePaymentsAutofillClientTest {
@@ -1156,7 +443,5 @@ TEST_F(ChromePaymentsAutofillClientTest,
   chrome_payments_client()->ShowPaymentsChurnedUsersUI(
       base::DoNothing(), base::DoNothing(), base::DoNothing());
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace autofill

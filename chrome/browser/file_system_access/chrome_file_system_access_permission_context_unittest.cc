@@ -58,17 +58,12 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/apk_info.h"
-#include "base/android/path_utils.h"
-#else
 #include "chrome/browser/permissions/one_time_permissions_tracker_observer.h"
 #include "chrome/browser/web_applications/test/fake_web_app_provider.h"
 #include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/test/web_app_test_utils.h"
 #include "chrome/browser/web_applications/web_app_install_info.h"
-#endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/safe_browsing/content/common/file_type_policies_test_util.h"
@@ -200,15 +195,10 @@ class ChromeFileSystemAccessPermissionContextTest : public testing::Test {
   };
 
   ChromeFileSystemAccessPermissionContextTest() {
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
-#if BUILDFLAG(IS_ANDROID)
-    scoped_feature_list_.InitWithFeatures(
-        {}, {features::kFileSystemAccessPersistentPermissions});
-#else
+    // TODO(crbug.com/40101963): Enable when android persisted permissions are
+    // implemented.
     scoped_feature_list_.InitWithFeatures(
         {features::kFileSystemAccessPersistentPermissions}, {});
-#endif
   }
   void SetUp() override {
     // Create a scoped directory under %TEMP% instead of using
@@ -252,9 +242,7 @@ class ChromeFileSystemAccessPermissionContextTest : public testing::Test {
     permission_context_ =
         std::make_unique<TestFileSystemAccessPermissionContext>(
             browser_context(), task_environment_.GetMockClock());
-#if !BUILDFLAG(IS_ANDROID)
     web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-#endif
   }
 
   void TearDown() override {
@@ -356,14 +344,6 @@ class ChromeFileSystemAccessPermissionContextTest : public testing::Test {
           RestorePermissionPromptOutcome::kAllowed, 1);
       EXPECT_EQ(grant1->GetStatus(), PermissionStatus::GRANTED);
       EXPECT_EQ(grant2->GetStatus(), PermissionStatus::GRANTED);
-#if BUILDFLAG(IS_ANDROID)
-    } else if (result == PermissionRequestOutcome::kUserGranted) {
-      // Android does not support persistent permissions and requests again.
-      // TODO(crbug.com/40101963): Remove when android persisted permissions are
-      // implemented.
-      EXPECT_EQ(grant1->GetStatus(), PermissionStatus::GRANTED);
-      EXPECT_EQ(grant2->GetStatus(), PermissionStatus::ASK);
-#endif
     } else {
       EXPECT_EQ(grant1->GetStatus(), PermissionStatus::ASK);
       EXPECT_EQ(grant2->GetStatus(), PermissionStatus::ASK);
@@ -573,22 +553,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(IsOpenAbort(app_dir.AppendASCII("foo"), HandleType::kFile));
   EXPECT_TRUE(IsOpenAbort(app_dir.AppendASCII("foo"), HandleType::kDirectory));
 
-#if BUILDFLAG(IS_ANDROID)
-  base::FilePath app_data_dir = temp_dir_.GetPath().AppendASCII("app_data");
-  base::ScopedPathOverride app_data_override(base::DIR_ANDROID_APP_DATA,
-                                             app_data_dir, true, true);
-  ResetBlockPath();
-
-  // The android app data directory, its parent and paths inside should not be
-  // allowed.
-  EXPECT_TRUE(IsOpenAbort(app_data_dir, HandleType::kDirectory));
-  EXPECT_TRUE(IsOpenAbort(temp_dir_.GetPath(), HandleType::kDirectory));
-  EXPECT_TRUE(IsOpenAbort(app_data_dir.AppendASCII("foo"), HandleType::kFile));
-  EXPECT_TRUE(
-      IsOpenAbort(app_data_dir.AppendASCII("foo"), HandleType::kDirectory));
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   base::FilePath cache_dir = temp_dir_.GetPath().AppendASCII("cache");
   base::ScopedPathOverride cache_override(base::DIR_CACHE, cache_dir, true,
                                           true);
@@ -600,7 +565,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(IsOpenAbort(cache_dir.AppendASCII("foo"), HandleType::kFile));
   EXPECT_TRUE(
       IsOpenAbort(cache_dir.AppendASCII("foo"), HandleType::kDirectory));
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 // TODO(crbug.com/432011571): Flaky test.
@@ -674,7 +639,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ConfirmSensitiveEntryAccess_ExplicitPathBlock) {
 // Linux is the only OS where we have some blocked directories with explicit
 // paths (as opposed to PathService provided paths).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // /dev should be blocked.
   EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
                 permission_context(), PathInfo(FILE_PATH_LITERAL("/dev")),
@@ -804,64 +769,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       ConfirmSensitiveEntryAccess_ContentUri) {
-  // Content-URI with an authority which matches the package name should fail.
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(
-          base::StrCat({"content://", base::android::apk_info::package_name(),
-                        ".fileprovider/cache/dir"})),
-      HandleType::kDirectory));
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(
-          base::StrCat({"content://", base::android::apk_info::package_name(),
-                        ".fileprovider/cache/file"})),
-      HandleType::kFile));
-
-  // Percent-encoded authority should also fail.
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(
-          base::StrCat({"content://", base::android::apk_info::package_name(),
-                        "%2Efileprovider/cache/dir"})),
-      HandleType::kDirectory));
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(
-          base::StrCat({"content://", base::android::apk_info::package_name(),
-                        "%2efileprovider/cache/file"})),
-      HandleType::kFile));
-
-  // Authority exactly matching package name (no dot) should fail.
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(
-          base::StrCat({"content://", base::android::apk_info::package_name(),
-                        "/cache/dir"})),
-      HandleType::kDirectory));
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(
-          base::StrCat({"content://", base::android::apk_info::package_name(),
-                        "/cache/file"})),
-      HandleType::kFile));
-
-  // Userinfo bypass should also fail.
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(base::StrCat({"content://user@",
-                                   base::android::apk_info::package_name(),
-                                   ".fileprovider/cache/dir"})),
-      HandleType::kDirectory));
-  EXPECT_TRUE(IsOpenAbort(
-      base::FilePath(base::StrCat({"content://user@",
-                                   base::android::apk_info::package_name(),
-                                   "/cache/file"})),
-      HandleType::kFile));
-
-  EXPECT_TRUE(IsOpenAllowed(base::FilePath("content://authority/dir"),
-                            HandleType::kDirectory));
-  EXPECT_TRUE(IsOpenAllowed(base::FilePath("content://authority/file"),
-                            HandleType::kFile));
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 TEST_F(ChromeFileSystemAccessPermissionContextSymbolicLinkCheckTest,
        ConfirmSensitiveEntryAccess_ResolveSymbolicLink) {
   base::FilePath symlink1 = temp_dir_.GetPath().AppendASCII("symlink1");
@@ -960,20 +867,8 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       SensitiveDirectoryResult::kAbort);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/465668234): This test is disabled on Android because
-// `NormalizeFilePath` fails for non-existent paths on Android (where
-// `/data/user/0` is a symlink to `/data/data`), causing a mismatch between the
-// normalized rule and the un-normalized checked path.
-// We add this test as a protection in case the big refactoring in
-// http://crrev.com/c/7665590 breaks the `ConfirmSensitiveEntryAccess()` logic.
-// Even without Android, it serves the purpose.
-#define MAYBE_ConfirmSensitiveEntryAccess_AllPlatformBlockedPaths \
-  DISABLED_ConfirmSensitiveEntryAccess_AllPlatformBlockedPaths
-#else
 #define MAYBE_ConfirmSensitiveEntryAccess_AllPlatformBlockedPaths \
   ConfirmSensitiveEntryAccess_AllPlatformBlockedPaths
-#endif
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        MAYBE_ConfirmSensitiveEntryAccess_AllPlatformBlockedPaths) {
   struct TestCase {
@@ -1014,7 +909,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
        false},
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
       {kNoBasePathKey, FILE_PATH_LITERAL("/dev"), true, false},
       {kNoBasePathKey, FILE_PATH_LITERAL("/proc"), true, false},
       {kNoBasePathKey, FILE_PATH_LITERAL("/sys"), true, false},
@@ -1024,10 +919,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       {base::DIR_HOME, FILE_PATH_LITERAL(".dbus"), true, false},
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-      {base::DIR_ANDROID_APP_DATA, nullptr, true, false},
-      {base::DIR_CACHE, nullptr, true, false},
-#endif
   };
 
   for (const auto& test_case : kTestCases) {
@@ -1390,10 +1281,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   DownloadPrefs::FromBrowserContext(browser_context())
       ->SetDownloadPath(temp_dir_.GetPath());
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android always uses the system Download directory (/storage/emulated/...).
-  ASSERT_TRUE(base::android::GetDownloadsDirectory(&expected_downloads));
-#endif
   EXPECT_EQ(permission_context()->GetWellKnownDirectoryPath(
                 blink::mojom::WellKnownDirectory::kDirDownloads, kPdfOrigin),
             expected_downloads);
@@ -1411,7 +1298,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetReadPermissionGrant_InitialState_Open_File) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -1421,7 +1307,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(permission_context()->HasExtendedPermissionForTesting(
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kRead));
 }
-#endif
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetReadPermissionGrant_InitialState_Open_Directory) {
@@ -1462,7 +1347,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetWritePermissionGrant_InitialState_WritableImplicitState) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -1504,7 +1388,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(permission_context()->HasExtendedPermissionForTesting(
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kWrite));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(
     ChromeFileSystemAccessPermissionContextNoPersistenceTest,
@@ -1522,7 +1405,6 @@ TEST_F(
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetWritePermissionGrant_GrantIsAutoGrantedViaPersistentPermissions) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -1544,7 +1426,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
             PermissionRequestOutcome::kGrantedByPersistentPermission);
   EXPECT_EQ(grant->GetStatus(), PermissionStatus::GRANTED);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        IsValidObject_GrantsWithDeprecatedTimestampKeyAreNotValidObjects) {
@@ -1563,7 +1444,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(
     ChromeFileSystemAccessPermissionContextTest,
     GetGrantedObjectsAndConvertObjectsToGrants_GrantsAreRetainedViaPersistedPermissions) {
@@ -1688,7 +1568,6 @@ TEST_F(
   EXPECT_TRUE(permission_context()->HasExtendedPermissionForTesting(
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kWrite));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(
     ChromeFileSystemAccessPermissionContextTest,
@@ -1766,14 +1645,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       ->set_auto_response_for_test(PermissionAction::GRANTED);
   auto result =
       TriggerRestorePermissionPromptAfterBeingBackgrounded(kTestOrigin);
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not support persistent permissions and requests again.
-  // TODO(crbug.com/40101963): Remove when android persisted permissions are
-  // implemented.
-  EXPECT_EQ(result, PermissionRequestOutcome::kUserGranted);
-#else
   EXPECT_EQ(result, PermissionRequestOutcome::kGrantedByRestorePrompt);
-#endif
 }
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
@@ -1822,18 +1694,9 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   base::test::TestFuture<PermissionRequestOutcome> future;
   grant1_from_storage->RequestPermission(
       frame_id(), UserActivationState::kNotRequired, future.GetCallback());
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not support persistent permissions and requests again.
-  // TODO(crbug.com/40101963): Remove when android persisted permissions are
-  // implemented.
-  EXPECT_EQ(future.Get(), PermissionRequestOutcome::kUserGranted);
-  EXPECT_EQ(grant1_from_storage->GetStatus(), PermissionStatus::GRANTED);
-  EXPECT_EQ(grant2_from_storage->GetStatus(), PermissionStatus::ASK);
-#else
   EXPECT_EQ(future.Get(), PermissionRequestOutcome::kGrantedByRestorePrompt);
   EXPECT_EQ(grant1_from_storage->GetStatus(), PermissionStatus::GRANTED);
   EXPECT_EQ(grant2_from_storage->GetStatus(), PermissionStatus::GRANTED);
-#endif
 }
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
@@ -1962,7 +1825,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RestorePermissionPrompt_AllowEveryTime) {
   FileSystemAccessPermissionRequestManager::FromWebContents(web_contents())
@@ -2085,10 +1947,8 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
               ContentSettingsType::FILE_SYSTEM_ACCESS_RESTORE_PERMISSION);
   EXPECT_TRUE(origin_is_embargoed_after_rejection_limit);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/40101963): Enable when android webapps integration is done.
-#if !BUILDFLAG(IS_ANDROID)
 
 class ChromeFileSystemAccessPermissionContextTestWithWebApp
     : public ChromeFileSystemAccessPermissionContextTest {
@@ -2229,11 +2089,9 @@ TEST_F(ChromeFileSystemAccessPermissionContextTestWithWebApp,
       permission_context()->GetPersistedGrantStatusForTesting(kTestOrigin),
       PersistedGrantStatus::kCurrent);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ToggleExtendedPermissionByUser) {
   auto read_grant = permission_context()->GetReadPermissionGrant(
@@ -2331,7 +2189,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
               ContentSettingsType::FILE_SYSTEM_ACCESS_RESTORE_PERMISSION);
   EXPECT_TRUE(origin_is_embargoed_after_ignore_limit);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/40101962): Expand upon this test case to cover checking that
 // dormant grants are not revoked, when backgrounded dormant grants exist.
@@ -2357,7 +2214,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        OnLastPageFromOriginClosed_PersistedGrantStatusUpdated) {
   // Create a current grant by triggering the restore prompt, and accepting it.
@@ -2393,7 +2249,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   ASSERT_THAT(permission_context()->GetGrantedObjects(kTestOrigin),
               testing::SizeIs(1));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(
     ChromeFileSystemAccessPermissionContextNoPersistenceTest,
@@ -2456,7 +2311,6 @@ TEST_F(
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetReadPermissionGrant_InheritFromAncestor) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -2644,7 +2498,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(permission_context()->HasExtendedPermissionForTesting(
       kTestOrigin, file_path, HandleType::kFile, GrantType::kWrite));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        PersistedPermission_RevokeGrantByFilePath) {
@@ -2663,7 +2516,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        PersistedPermission_NotAccessibleIfContentSettingBlock) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -2712,7 +2564,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(permission_context()->HasExtendedPermissionForTesting(
       kTestOrigin, kTestPathInfo, HandleType::kDirectory, GrantType::kWrite));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RequestPermission_ClearOutdatedDormantGrants) {
@@ -2748,7 +2599,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RequestPermission_Dismissed) {
   base::HistogramTester histograms;
@@ -2790,7 +2640,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest, RequestPermission_Granted) {
   EXPECT_TRUE(permission_context()->HasExtendedPermissionForTesting(
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kWrite));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest, RequestPermission_Denied) {
   FileSystemAccessPermissionRequestManager::FromWebContents(web_contents())
@@ -2812,7 +2661,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest, RequestPermission_Denied) {
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RequestPermission_NoUserActivation) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -2868,7 +2716,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(permission_context()->HasExtendedPermissionForTesting(
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kWrite));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RequestPermission_GlobalGuardBlockedBeforeOpenGrant) {
@@ -3054,7 +2901,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 // TODO(crbug.com/40101963): Enable when android persisted permissions are
 // implemented.
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetReadPermissionGrant_FileBecomesDirectory) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -3825,7 +3671,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_FALSE(permission_context()->IsPathInDowngradedReadPathsForTesting(
       kTestOrigin, file_path_info.path));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ReadGrantDestroyedOnRevokeActiveGrants) {

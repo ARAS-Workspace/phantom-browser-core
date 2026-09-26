@@ -31,13 +31,8 @@ namespace {
 
 using ::testing::_;
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr int kExpectedVisualWidth = 18;
-constexpr int kExpectedVisualHeight = 32;
-#else
 constexpr int kExpectedVisualWidth = 48;
 constexpr int kExpectedVisualHeight = 48;
-#endif
 constexpr size_t kExpectedVisualDataSize =
     3u * kExpectedVisualWidth * kExpectedVisualHeight;
 

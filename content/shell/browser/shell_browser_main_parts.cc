@@ -43,13 +43,6 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/crash/content/browser/child_exit_observer_android.h"
-#include "components/crash/content/browser/child_process_crash_observer_android.h"
-#include "net/android/network_change_notifier_factory_android.h"
-#include "net/base/network_change_notifier.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) && defined(USE_AURA)
 #include "ui/base/ime/init/input_method_initializer.h"
 #endif
@@ -70,10 +63,6 @@ GURL GetStartupURL() {
   if (command_line->HasSwitch(switches::kBrowserTest))
     return GURL();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Delay renderer creation on Android until surface is ready.
-  return GURL();
-#else
   const base::CommandLine::StringVector& args = command_line->GetArgs();
   if (args.empty())
     return GURL("https://www.google.com/");
@@ -84,7 +73,6 @@ GURL GetStartupURL() {
 
   return net::FilePathToFileURL(
       base::MakeAbsoluteFilePath(base::FilePath(args[0])));
-#endif
 }
 
 scoped_refptr<base::RefCountedMemory> PlatformResourceProvider(int key) {
@@ -110,9 +98,6 @@ void ShellBrowserMainParts::PostCreateMainMessageLoop() {
 int ShellBrowserMainParts::PreEarlyInitialization() {
 #if BUILDFLAG(IS_LINUX) && defined(USE_AURA)
   ui::InitializeInputMethodForTesting();
-#elif BUILDFLAG(IS_ANDROID)
-  net::NetworkChangeNotifier::SetFactory(
-      new net::NetworkChangeNotifierFactoryAndroid());
 #endif
   return RESULT_CODE_NORMAL_EXIT;
 }
@@ -142,15 +127,6 @@ void ShellBrowserMainParts::ToolkitInitialized() {
 }
 
 int ShellBrowserMainParts::PreCreateThreads() {
-#if BUILDFLAG(IS_ANDROID)
-  const base::CommandLine* command_line =
-      base::CommandLine::ForCurrentProcess();
-  child_exit_observer_ = std::make_unique<crash_reporter::ChildExitObserver>();
-  if (command_line->HasSwitch(switches::kEnableCrashReporter)) {
-    child_exit_observer_->RegisterClient(
-        std::make_unique<crash_reporter::ChildProcessCrashObserver>());
-  }
-#endif
   return 0;
 }
 

@@ -29,10 +29,6 @@
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 namespace content {
 
 class XRRuntimeManagerTest : public RenderViewHostTestHarness {
@@ -186,28 +182,9 @@ TEST_F(XRRuntimeManagerTest, SupportsSession_VisibilityGate) {
   // Simulate hiding the frame.
   RenderViewHostTester::For(rvh())->SimulateWasHidden();
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, standard devices return true when hidden.
-  EXPECT_TRUE(QuerySupportsSession(service.get(),
-                                   device::mojom::XRSessionMode::kImmersiveVr));
-
-  // On Desktop Android without XR device, hidden tabs should return false.
-  base::android::device_info::set_is_desktop_for_testing(true);
-  EXPECT_FALSE(QuerySupportsSession(
-      service.get(), device::mojom::XRSessionMode::kImmersiveVr));
-
-  // On Desktop Android with XR device, hidden tabs should return true.
-  base::android::device_info::set_is_xr_for_testing();
-  EXPECT_TRUE(QuerySupportsSession(service.get(),
-                                   device::mojom::XRSessionMode::kImmersiveVr));
-
-  base::android::device_info::reset_is_desktop_for_testing();
-  base::android::device_info::reset_is_xr_for_testing();
-#else
   // On desktop platforms (e.g. Windows/Linux), hidden tabs should return false.
   EXPECT_FALSE(QuerySupportsSession(
       service.get(), device::mojom::XRSessionMode::kImmersiveVr));
-#endif
 
   // Restoring visibility should re-enable query results.
   RenderViewHostTester::For(rvh())->SimulateWasShown();

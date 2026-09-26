@@ -39,13 +39,8 @@ TEST(UrlUtilTest, ValidateLaunchUrlWebUnsafe) {
   EXPECT_FALSE(ValidateLaunchUrlWebUnsafe(GURL("about:about")));
   EXPECT_FALSE(ValidateLaunchUrlWebUnsafe(GURL("about:")));
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(ValidateLaunchUrlWebUnsafe(
-      GURL("content://packagename.providername/path")));
-#else
   EXPECT_FALSE(ValidateLaunchUrlWebUnsafe(
       GURL("content://packagename.providername/path")));
-#endif
 }
 
 TEST(UrlUtilTest, ValidateLaunchUrlWebSafe) {

@@ -8,15 +8,10 @@
 #include "base/time/time.h"
 #include "base/time/time_delta_from_string.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
 
@@ -35,15 +30,6 @@ namespace {
 // in other places we need to iterate across tabs for both Android and desktop.
 std::vector<std::vector<content::WebContents*>> GetAllWebContents() {
   std::vector<std::vector<content::WebContents*>> all_web_contents;
-#if BUILDFLAG(IS_ANDROID)
-  for (const TabModel* model : TabModelList::models()) {
-    std::vector<content::WebContents*> web_contents_for_tab_strip;
-    for (int i = 0; i < model->GetTabCount(); ++i) {
-      web_contents_for_tab_strip.push_back(model->GetWebContentsAt(i));
-    }
-    all_web_contents.push_back(web_contents_for_tab_strip);
-  }
-#else   // BUILDFLAG(IS_ANDROID)
   ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
       [&all_web_contents](BrowserWindowInterface* browser) {
         std::vector<content::WebContents*> web_contents_for_tab_strip;
@@ -54,7 +40,6 @@ std::vector<std::vector<content::WebContents*>> GetAllWebContents() {
         all_web_contents.push_back(web_contents_for_tab_strip);
         return true;
       });
-#endif  // BUILDFLAG(IS_ANDROID)
   return all_web_contents;
 }
 

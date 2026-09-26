@@ -66,9 +66,6 @@ bool IsBinaryDownloadForCurrentOS(
   if (download_type == ClientDownloadRequest::MAC_EXECUTABLE ||
       download_type == ClientDownloadRequest::MAC_ARCHIVE_FAILED_PARSING)
     return true;
-#elif BUILDFLAG(IS_ANDROID)
-  if (download_type == ClientDownloadRequest::ANDROID_APK)
-    return true;
 #endif
 
 // Extensions are supported where enabled.

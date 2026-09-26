@@ -63,12 +63,10 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/core/common/policy_types.h"
-#endif
 
 namespace webrtc_event_logging {
 
@@ -86,8 +84,6 @@ using RenderProcessHost = content::RenderProcessHost;
 using Compression = WebRtcEventLogCompression;
 
 namespace {
-
-#if !BUILDFLAG(IS_ANDROID)
 
 auto SaveFilePathTo(std::optional<base::FilePath>* output) {
   return [output](PeerConnectionKey ignored_key, base::FilePath file_path,
@@ -119,8 +115,6 @@ base::Time GetLastModificationTime(const base::FilePath& file_path) {
   }
   return file_info.last_modified;
 }
-
-#endif
 
 // Common default/arbitrary values.
 constexpr int kLid = 478;
@@ -309,15 +303,11 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
     SetLocalLogsObserver(&local_observer_);
     SetRemoteLogsObserver(&remote_observer_);
     LoadMainTestProfile();
-#if !BUILDFLAG(IS_ANDROID)
     policy::BrowserPolicyConnectorBase::SetPolicyProviderForTesting(&provider_);
-#endif
   }
 
   void TearDown() override {
-#if !BUILDFLAG(IS_ANDROID)
     policy::BrowserPolicyConnectorBase::SetPolicyProviderForTesting(nullptr);
-#endif
   }
 
   void SetUpNetworkConnection(
@@ -746,7 +736,6 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
                                 policy_allows_remote_logging.value());
     }
 
-#if !BUILDFLAG(IS_ANDROID)
     policy::PolicyMap policy_map;
     if (has_device_level_policies) {
       policy_map.Set("test-policy", policy::POLICY_LEVEL_MANDATORY,
@@ -755,12 +744,6 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
                      nullptr);
     }
     provider_.UpdateChromePolicy(policy_map);
-#else
-    if (has_device_level_policies) {
-      ADD_FAILURE() << "Invalid test setup. Chrome platform policies cannot be "
-                       "set on Chrome OS and Android.";
-    }
-#endif
 
     // Build the profile.
     TestingProfile::Builder profile_builder;
@@ -904,9 +887,7 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
   scoped_refptr<network::SharedURLLoaderFactory>
       test_shared_url_loader_factory_;
 
-#if !BUILDFLAG(IS_ANDROID)
   policy::MockConfigurationPolicyProvider provider_;
-#endif
 
   // The main loop, which allows waiting for the operations invoked on the
   // unit-under-test to be completed. Do not use this object directly from the
@@ -978,8 +959,6 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
   NiceMock<MockWebRtcLocalEventLogsObserver> local_observer_;
   NiceMock<MockWebRtcRemoteEventLogsObserver> remote_observer_;
 };
-
-#if !BUILDFLAG(IS_ANDROID)
 
 class WebRtcEventLogManagerTest : public WebRtcEventLogManagerTestBase,
                                   public ::testing::WithParamInterface<bool> {
@@ -4419,27 +4398,6 @@ TEST_P(WebRtcEventLogManagerTestWithRemoteLoggingDisabled,
   EXPECT_TRUE(DisableLocalLogging());
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(WebRtcEventLogManagerTestWithRemoteLoggingDisabled,
-       SanityStartRemoteLogging) {
-  const auto key = GetPeerConnectionKey(rph_.get(), kLid);
-  ASSERT_TRUE(OnPeerConnectionAdded(key));
-  ASSERT_TRUE(OnPeerConnectionSessionIdSet(key));
-  std::string error_message;
-  EXPECT_FALSE(StartRemoteLogging(key, nullptr, &error_message));
-  EXPECT_EQ(error_message, kStartRemoteLoggingFailureFeatureDisabled);
-}
-
-TEST_P(WebRtcEventLogManagerTestWithRemoteLoggingDisabled,
-       SanityOnWebRtcEventLogWrite) {
-  const auto key = GetPeerConnectionKey(rph_.get(), kLid);
-  ASSERT_TRUE(OnPeerConnectionAdded(key));
-  ASSERT_TRUE(OnPeerConnectionSessionIdSet(key));
-  ASSERT_FALSE(StartRemoteLogging(key));
-  EXPECT_EQ(OnWebRtcEventLogWrite(key, "log"), std::make_pair(false, false));
-}
-#endif
-
 INSTANTIATE_TEST_SUITE_P(All,
                          WebRtcEventLogManagerTestWithRemoteLoggingDisabled,
                          ::testing::Bool());
@@ -4504,7 +4462,6 @@ TEST_F(WebRtcEventLogManagerTestPolicy,
   EXPECT_EQ(StartRemoteLogging(key), allow_remote_logging);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(WebRtcEventLogManagerTestPolicy,
        OnlyManagedByPlatformPoliciesDoesNotAllowRemoteLoggingByDefault) {
   const bool allow_remote_logging = false;
@@ -4519,7 +4476,6 @@ TEST_F(WebRtcEventLogManagerTestPolicy,
   ASSERT_TRUE(OnPeerConnectionSessionIdSet(key));
   EXPECT_EQ(StartRemoteLogging(key), allow_remote_logging);
 }
-#endif
 
 void WebRtcEventLogManagerTestPolicy::TestManagedProfileAfterBeingExplicitlySet(
     bool explicitly_set_value) {
@@ -5490,27 +5446,5 @@ TEST_F(WebRtcEventLogManagerTestLocalOnly, LocalOnlyLogNotUploadedAndPruned) {
 
 // TODO(crbug.com/40545136): Add a test for the limit on the number of history
 // files allowed to remain on disk.
-
-#else  // BUILDFLAG(IS_ANDROID)
-
-class WebRtcEventLogManagerTestOnMobileDevices
-    : public WebRtcEventLogManagerTestBase {
- public:
-  WebRtcEventLogManagerTestOnMobileDevices() {
-    // features::kWebRtcRemoteEventLog not defined on mobile, and can therefore
-    // not be forced on. This test is here to make sure that when the feature
-    // is changed to be on by default, it will still be off for mobile devices.
-    CreateWebRtcEventLogManager();
-  }
-};
-
-TEST_F(WebRtcEventLogManagerTestOnMobileDevices, RemoteBoundLoggingDisabled) {
-  const auto key = GetPeerConnectionKey(rph_.get(), kLid);
-  ASSERT_TRUE(OnPeerConnectionAdded(key));
-  ASSERT_TRUE(OnPeerConnectionSessionIdSet(key));
-  EXPECT_FALSE(StartRemoteLogging(key));
-}
-
-#endif
 
 }  // namespace webrtc_event_logging

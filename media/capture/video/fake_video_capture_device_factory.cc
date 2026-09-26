@@ -218,8 +218,6 @@ void FakeVideoCaptureDeviceFactory::GetDevicesInfo(
         VideoCaptureApi::LINUX_V4L2_SINGLE_PLANE;
 #elif BUILDFLAG(IS_MAC)
         VideoCaptureApi::MACOSX_AVFOUNDATION;
-#elif BUILDFLAG(IS_ANDROID)
-        VideoCaptureApi::ANDROID_API2_LEGACY;
 #else
 #error Unsupported platform
 #endif

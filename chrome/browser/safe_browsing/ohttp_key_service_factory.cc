@@ -46,9 +46,6 @@ OhttpKeyServiceFactory::BuildServiceInstanceForBrowserContext(
   // TODO(crbug.com/390190632) [Also TODO(thefrog)]: For now we simply return
   // nullptr for Android. This should instead be refactored to avoid including
   // this and associated files in the binary.
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
   if (!g_browser_process->safe_browsing_service()) {
     return nullptr;
   }
@@ -62,7 +59,6 @@ OhttpKeyServiceFactory::BuildServiceInstanceForBrowserContext(
       profile->GetPrefs(), g_browser_process->local_state(),
       base::BindRepeating(&OhttpKeyServiceFactory::GetCountry),
       /*are_background_lookups_allowed=*/true);
-#endif
 }
 
 bool OhttpKeyServiceFactory::ServiceIsCreatedWithBrowserContext() const {

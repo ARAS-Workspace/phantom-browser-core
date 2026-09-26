@@ -27,9 +27,7 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIAboutHost,
       kChromeUIAccessibilityHost,
       kChromeUIActorInternalsHost,
-#if !BUILDFLAG(IS_ANDROID)
       kChromeUIAppServiceInternalsHost,
-#endif
       kChromeUIChromeFindsInternalsHost,
       kChromeUIChromeURLsHost,
       kChromeUIComponentsHost,
@@ -43,9 +41,7 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIHistoryHost,
       history_clusters_internals::kChromeUIHistoryClustersInternalsHost,
       kChromeUIInterstitialHost,
-#if !BUILDFLAG(IS_ANDROID)
       kChromeUIIwaDevHost,
-#endif
       kChromeUILocalStateHost,
       kChromeUIMediaEngagementHost,
       kChromeUIMetricsInternalsHost,
@@ -54,17 +50,13 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUINewTabHost,
       kChromeUIOmniboxHost,
       kChromeUIOmniboxAimEligibilityPage,
-#if !BUILDFLAG(IS_ANDROID)
       kChromeUIOnDeviceInternalsHost,
-#endif
       kChromeUIPolicyHost,
       kChromeUIPredictorsHost,
       kChromeUIPrefsInternalsHost,
       kChromeUIProfileInternalsHost,
       content::kChromeUIQuotaInternalsHost,
-#if !BUILDFLAG(IS_ANDROID)
       kChromeUIWebUIToolbarHost,
-#endif
       kChromeUISignInInternalsHost,
       kChromeUISiteEngagementHost,
       kChromeUISkillsHost,
@@ -72,17 +64,13 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUINTPTilesInternalsHost,
       safe_browsing::kChromeUISafeBrowsingHost,
       kChromeUISyncInternalsHost,
-#if !BUILDFLAG(IS_ANDROID)
       kChromeUITabSearchHost,
       kChromeUITabsFromOtherDevicesSidePanelHost,
       kChromeUITermsHost,
-#endif
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif
       kChromeUIUserActionsHost,
       kChromeUIVersionHost,
-#if !BUILDFLAG(IS_ANDROID)
-#endif
       content::kChromeUIBlobInternalsHost,
       content::kChromeUIDinoHost,
       content::kChromeUIGpuHost,
@@ -92,15 +80,12 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       content::kChromeUINetworkErrorsListingHost,
       content::kChromeUIProcessInternalsHost,
       content::kChromeUIServiceWorkerInternalsHost,
-#if !BUILDFLAG(IS_ANDROID)
       content::kChromeUITracingHost,
-#endif
       content::kChromeUIUkmHost,
       content::kChromeUIWebRTCInternalsHost,
 #if BUILDFLAG(ENABLE_VR)
       content::kChromeUIWebXrInternalsHost,
 #endif
-#if !BUILDFLAG(IS_ANDROID)
       kChromeUIAppLauncherPageHost,
       kChromeUIBookmarksHost,
       kChromeUIDownloadsHost,
@@ -108,26 +93,18 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIInspectHost,
       kChromeUINewTabPageHost,
       kChromeUINewTabPageThirdPartyHost,
-#if BUILDFLAG(IS_ANDROID)
-      kChromeUINotificationsInternalsHost,
-#endif
       kChromeUISettingsHost,
       kChromeUISystemInfoHost,
       kChromeUIWhatsNewHost,
-#endif
-#if BUILDFLAG(IS_ANDROID)
-      kChromeUISnippetsInternalsHost,
-      kChromeUIWebApksHost,
-#endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       kChromeUIDiscardsHost,
 #endif
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
       kChromeUILinuxProxyConfigHost,
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
       kChromeUISandboxHost,
 #endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -138,10 +115,8 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIPrintHost,
 #endif
       kChromeUIWebRtcLogsHost,
-#if !BUILDFLAG(IS_ANDROID)
       kChromeUIOrganizerPanelHost,
       kChromeUIWebuiBrowserHost,
-#endif  // !BUILDFLAG(IS_ANDROID)
   });
 
   return base::span(kChromeURLHosts);
@@ -181,12 +156,7 @@ base::span<const base::cstring_view> ChromeDebugURLs() {
        blink::kChromeUIMemoryExhaustURL,
        blink::kChromeUIMemoryPressureCriticalURL,
        blink::kChromeUIMemoryPressureModerateURL,
-#if BUILDFLAG(IS_ANDROID)
-       blink::kChromeUIGpuJavaCrashURL,
-       kChromeUIJavaCrashURL,
-#else
        kChromeUIWebUIJsErrorURL,
-#endif  // BUILDFLAG(IS_ANDROID)
        kChromeUIQuitURL,
        kChromeUIRestartURL});
 

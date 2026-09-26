@@ -329,9 +329,6 @@ void ChromeRuntimeAPIDelegate::OpenURL(const GURL& uninstall_url) {
 extensions::api::runtime::PlatformNaclArch GetPlatformInfoNaClArch() {
 // Return no value on Android, since it never supported extensions
 // while NaCl was relevant.
-#if BUILDFLAG(IS_ANDROID)
-  return extensions::api::runtime::PlatformNaclArch::kNone;
-#else
 #if defined(ARCH_CPU_X86_FAMILY)
 #if defined(ARCH_CPU_X86_64)
   return extensions::api::runtime::PlatformNaclArch::kX86_64;
@@ -348,7 +345,6 @@ extensions::api::runtime::PlatformNaclArch GetPlatformInfoNaClArch() {
   // NOTE: Other architectures did not support extensions at the time
   // of NaCl removal.
   return extensions::api::runtime::PlatformNaclArch::kNone;
-#endif
 #endif
 }
 
@@ -441,31 +437,10 @@ void ChromeRuntimeAPIDelegate::OpenOptionsPage(
     BrowserWindowCreateParams params(BrowserWindowInterface::TYPE_NORMAL,
                                      *profile, user_gesture);
 
-#if BUILDFLAG(IS_ANDROID)
-    // Asynchronously create the window on Android, then open the options page.
-    auto creation_callback = base::BindOnce(
-        [](scoped_refptr<const Extension> extension,
-           base::OnceCallback<void(bool)> complete_callback,
-           BrowserWindowInterface* new_browser) {
-          if (!new_browser) {
-            std::move(complete_callback).Run(false);
-            return;
-          }
-          std::move(complete_callback)
-              .Run(extensions::ExtensionTabUtil::OpenOptionsPage(
-                  extension.get(), new_browser));
-        },
-        base::WrapRefCounted(extension), std::move(callback));
-    CreateBrowserWindow(std::move(params), std::move(creation_callback));
-
-    // Nothing to do here, the callback will open the options page eventually.
-    return;
-#else
     // Other platforms create windows synchronously. Fallthrough and open
     // the options page afterwards.
     browser = CreateBrowserWindow(std::move(params));
     CHECK(browser);
-#endif
   }
   std::move(callback).Run(
       extensions::ExtensionTabUtil::OpenOptionsPage(extension, browser));

@@ -41,7 +41,7 @@ struct ContextCounts {
 // platform-specific policies, such as preloading, can change the number. Still,
 // leaving it enabled on platforms that aren't currently flaking gives some
 // coverage.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_V8ContextTrackerTest DISABLED_V8ContextTrackerTest
 #else
 #define MAYBE_V8ContextTrackerTest V8ContextTrackerTest

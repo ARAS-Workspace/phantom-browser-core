@@ -34,12 +34,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionFunctionRegistrationTest,
   const ExtensionFunctionRegistry::FactoryMap& factories =
       ExtensionFunctionRegistry::GetInstance().GetFactoriesForTesting();
   // Sanity check: Many, many functions should have been registered.
-#if BUILDFLAG(IS_ANDROID)
-  // Android has fewer supported APIs than Win/Mac/Linux.
-  EXPECT_GT(factories.size(), 400u);
-#else
   EXPECT_GT(factories.size(), 500u);
-#endif
 
   std::set<std::string> seen_names;
   std::map<functions::HistogramValue, std::string> seen_histograms;

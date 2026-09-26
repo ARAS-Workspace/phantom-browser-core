@@ -14,7 +14,6 @@
 
 namespace performance_manager::features {
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kPerformanceControlsPPMSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE_PARAM(base::TimeDelta,
@@ -136,8 +135,6 @@ BASE_FEATURE_PARAM(int,
                    &kPerformanceInterventionNotificationStringImprovements,
                    "string_version",
                    1);
-
-#endif
 
 BASE_FEATURE(kLevelDBSiteDataStoreBestEffort,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -261,12 +258,7 @@ BASE_FEATURE(kUnimportantFramesPriority, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kThrottleUnimportantFrameRate, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kKeepDefaultSearchEngineRendererAlive,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kBoostClosingTabs, base::FEATURE_DISABLED_BY_DEFAULT);
 

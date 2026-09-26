@@ -17,12 +17,8 @@
 #include "content/public/common/content_features.h"
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/resource_coordinator/utils.h"
-#else
 #include "chrome/browser/resource_coordinator/tab_lifecycle_unit.h"
 #include "chrome/browser/resource_coordinator/tab_lifecycle_unit_external.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace performance_manager::mechanism {
 namespace {
@@ -62,12 +58,6 @@ std::optional<base::ByteSize> PageDiscarder::DiscardPageNode(
   base::ByteSize memory_footprint_estimate =
       user_tuning::GetDiscardedMemoryEstimateForPage(page_node);
 
-#if BUILDFLAG(IS_ANDROID)
-  CHECK(base::FeatureList::IsEnabled(features::kWebContentsDiscard));
-  resource_coordinator::AttemptFastKillForDiscard(contents.get(),
-                                                  discard_reason);
-  contents->Discard(base::NullCallback());
-#else
   auto* lifecycle_unit =
       resource_coordinator::TabLifecycleUnitSource::GetTabLifecycleUnitExternal(
           contents.get());
@@ -81,8 +71,6 @@ std::optional<base::ByteSize> PageDiscarder::DiscardPageNode(
     outcome = DiscardPageOnUIThreadOutcome::kDiscardTabFailure;
     return std::nullopt;
   }
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
   outcome = DiscardPageOnUIThreadOutcome::kSuccess;
   return memory_footprint_estimate;

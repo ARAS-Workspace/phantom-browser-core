@@ -101,17 +101,7 @@ TEST_F(GeolocationNavigationThrottleTest, FeatureDisabled) {
   auto throttle =
       GeolocationNavigationThrottle::MaybeCreateThrottleFor(registry);
 
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(throttle);
-
-  EXPECT_CALL(handle, SetRequestHeader(testing::_, testing::_)).Times(0);
-  EXPECT_EQ(content::NavigationThrottle::PROCEED, throttle->WillStartRequest());
-
-  histogram_tester_.ExpectUniqueSample("Omnibox.Search.XGeoHeaderAttached",
-                                       false, 1);
-#else
   ASSERT_FALSE(throttle);
-#endif
 }
 
 // Tests that the GeolocationHeaderService (and therefore the navigation

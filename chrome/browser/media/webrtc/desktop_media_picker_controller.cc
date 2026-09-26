@@ -55,11 +55,6 @@ void DesktopMediaPickerController::Show(
 
   Observe(params.web_contents);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not use DesktopMediaList. See
-  // DesktopMediaPickerFactoryImpl::CreateMediaList.
-  ShowPickerDialog();
-#else
   // Keep same order as the input |sources| and avoid duplicates.
   source_lists_ = picker_factory_->CreateMediaList(
       sources, params.web_contents, params.includable_web_contents_filter);
@@ -79,7 +74,6 @@ void DesktopMediaPickerController::Show(
   } else {
     ShowPickerDialog();
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void DesktopMediaPickerController::WebContentsDestroyed() {

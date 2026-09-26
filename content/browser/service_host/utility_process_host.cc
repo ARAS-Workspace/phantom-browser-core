@@ -54,10 +54,6 @@
 #include "ui/base/ui_base_switches.h"
 #include "ui/gl/gl_switches.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "services/network/public/mojom/network_service.mojom.h"
-#endif
-
 #if BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_switches.h"
 #endif
@@ -313,17 +309,6 @@ bool UtilityProcessHost::StartProcess() {
   bool has_cmd_prefix =
       browser_command_line.HasSwitch(switches::kUtilityCmdPrefix);
 
-#if BUILDFLAG(IS_ANDROID)
-  // readlink("/prof/self/exe") sometimes fails on Android at startup.
-  // As a workaround skip calling it here, since the executable name is
-  // not needed on Android anyway. See crbug.com/500854.
-  std::unique_ptr<base::CommandLine> cmd_line =
-      std::make_unique<base::CommandLine>(base::CommandLine::NO_PROGRAM);
-  if (options_.metrics_name_ == network::mojom::NetworkService::Name_ &&
-      base::FeatureList::IsEnabled(features::kWarmUpNetworkProcess)) {
-    process_->EnableWarmUpConnection();
-  }
-#else  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_MAC)
   if (options_.sandbox_type_ == sandbox::mojom::Sandbox::kServiceWithJit) {
     DCHECK_EQ(options_.child_flags_, ChildProcessHost::CHILD_RENDERER);
@@ -347,7 +332,6 @@ bool UtilityProcessHost::StartProcess() {
 
   std::unique_ptr<base::CommandLine> cmd_line =
       std::make_unique<base::CommandLine>(exe_path);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   cmd_line->AppendSwitchASCII(switches::kProcessType,
                               switches::kUtilityProcess);
@@ -515,11 +499,9 @@ bool UtilityProcessHost::StartProcess() {
 
 void UtilityProcessHost::OnProcessLaunched() {
   launch_state_ = LaunchState::kLaunchComplete;
-#if !BUILDFLAG(IS_ANDROID)
   if (options_.priority_.has_value()) {
     process_->SetProcessPriority(options_.priority_.value());
   }
-#endif
   if (client_) {
     client_->OnProcessLaunched(process_->GetProcess());
   }

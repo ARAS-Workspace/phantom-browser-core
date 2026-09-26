@@ -34,11 +34,7 @@ namespace dom_distiller {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID)
-constexpr int kDefaultMinContentLength = 100;
-#else
 constexpr int kDefaultMinContentLength = 0;
-#endif
 
 }  // namespace
 

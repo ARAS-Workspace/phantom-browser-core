@@ -92,13 +92,8 @@ TEST_F(ContentSettingsRegistryTest, Properties) {
   ASSERT_TRUE(website_settings_info->initial_default_value().is_int());
   EXPECT_EQ(CONTENT_SETTING_ALLOW,
             website_settings_info->initial_default_value().GetInt());
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(PrefRegistry::NO_REGISTRATION_FLAGS,
-            website_settings_info->GetPrefRegistrationFlags());
-#else
   EXPECT_EQ(user_prefs::PrefRegistrySyncable::SYNCABLE_PREF,
             website_settings_info->GetPrefRegistrationFlags());
-#endif
 
   // Check the WebsiteSettingsInfo is registered correctly.
   EXPECT_EQ(website_settings_registry()->Get(ContentSettingsType::COOKIES),
@@ -171,10 +166,8 @@ TEST_F(ContentSettingsRegistryTest, IsDefaultSettingValid) {
   info = registry()->Get(ContentSettingsType::MEDIASTREAM_CAMERA);
   EXPECT_FALSE(info->IsDefaultSettingValid(CONTENT_SETTING_ALLOW));
 
-#if !BUILDFLAG(IS_ANDROID)
   info = registry()->Get(ContentSettingsType::FILE_SYSTEM_WRITE_GUARD);
   EXPECT_FALSE(info->IsDefaultSettingValid(CONTENT_SETTING_ALLOW));
-#endif
 }
 
 // Check the correct factory default setting is retrieved. Note the factory

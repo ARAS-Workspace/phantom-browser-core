@@ -1408,12 +1408,7 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/371298229): Flaky on Android.
-#define MAYBE_BlockRequests_RequestDomains DISABLED_BlockRequests_RequestDomains
-#else
 #define MAYBE_BlockRequests_RequestDomains BlockRequests_RequestDomains
-#endif
 // Tests the "requestDomains" and "excludedRequestDomains" properties of
 // declarativeNetRequest rule conditions.
 IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest,
@@ -1551,7 +1546,6 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest,
   }
 
   // Test requests made outside of tabs (from a shared worker).
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(https://crbug.com/40290702): Enable once SharedWorker support comes to
   // Android.
   struct {
@@ -1586,7 +1580,6 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest,
       EXPECT_EQ("TypeError: Failed to fetch", actual_response);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // Tests the "domainType" property of a declarative rule condition.
@@ -1801,11 +1794,7 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest, AllowBlock) {
 
 // Tests allowing rules for redirects.
 // TODO(crbug.com/crbug.com/371298229): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_AllowRedirect DISABLED_AllowRedirect
-#else
 #define MAYBE_AllowRedirect AllowRedirect
-#endif
 IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest, MAYBE_AllowRedirect) {
   set_config_flags(ConfigFlag::kConfig_HasBackgroundScript);
 
@@ -2524,7 +2513,7 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest, HostAccessPermission) {
   }
 }
 
-#if (BUILDFLAG(IS_MAC) && !defined(NDEBUG)) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) && !defined(NDEBUG)
 // Times out on mac-debug: https://crbug.com/40737441
 // Flaky on Android: https://crbug.com/371298229
 #define MAYBE_ChromeURLS DISABLED_ChromeURLS
@@ -7980,12 +7969,7 @@ IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,
 // Verify that getMatchedRules returns the correct rule matches for rules which
 // match on response headers.
 // TODO(crbug.com/crbug.com/371298229): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GetMatchedRules_SingleExtension \
-  DISABLED_GetMatchedRules_SingleExtension
-#else
 #define MAYBE_GetMatchedRules_SingleExtension GetMatchedRules_SingleExtension
-#endif
 IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,
                        MAYBE_GetMatchedRules_SingleExtension) {
   set_config_flags(ConfigFlag::kConfig_HasBackgroundScript |
@@ -8144,13 +8128,8 @@ IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,
 // Verify that getMatchedRules returns the correct rule matches for rules which
 // match on response headers between different extensions.
 // TODO(crbug.com/crbug.com/371298229): Flaky on Android.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_GetMatchedRules_MultipleExtensions \
-  DISABLED_GetMatchedRules_MultipleExtensions
-#else
 #define MAYBE_GetMatchedRules_MultipleExtensions \
   GetMatchedRules_MultipleExtensions
-#endif
 IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,
                        MAYBE_GetMatchedRules_MultipleExtensions) {
   set_config_flags(ConfigFlag::kConfig_HasBackgroundScript |
@@ -8879,7 +8858,6 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestThrottledRulesetLoadBrowserTest,
 const auto kExtensionLoadTypes =
     ::testing::Values(ExtensionLoadType::PACKED, ExtensionLoadType::UNPACKED);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that an extension must have local file access to redirect TO file URLs.
 // Disabled on Android since it heavily discourages direct file scheme URL
 // access.
@@ -8949,7 +8927,6 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest, FileUrlRedirect) {
   run_test("ext_denied", false);
   run_test("ext_allowed", true);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 INSTANTIATE_TEST_SUITE_P(All,
                          DeclarativeNetRequestBrowserTest,

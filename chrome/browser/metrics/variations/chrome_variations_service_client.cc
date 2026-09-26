@@ -25,13 +25,7 @@
 #include "components/version_info/version_info.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/upgrade_detector/build_state.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "components/variations/android/variations_seed_bridge.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "base/enterprise_util.h"
@@ -42,11 +36,9 @@ ChromeVariationsServiceClient::ChromeVariationsServiceClient() = default;
 ChromeVariationsServiceClient::~ChromeVariationsServiceClient() = default;
 
 base::Version ChromeVariationsServiceClient::GetVersionForSimulation() {
-#if !BUILDFLAG(IS_ANDROID)
   const auto* build_state = g_browser_process->GetBuildState();
   if (build_state->installed_version().has_value())
     return *build_state->installed_version();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // TODO(asvitkine): Get the version that will be used on restart instead of
   // the current version on Android, iOS and ChromeOS.
@@ -77,14 +69,7 @@ base::FilePath ChromeVariationsServiceClient::GetVariationsSeedFileDir() {
 
 std::unique_ptr<variations::SeedResponse>
 ChromeVariationsServiceClient::TakeSeedFromNativeVariationsSeedStore() {
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<variations::SeedResponse> seed =
-      variations::android::GetVariationsFirstRunSeed();
-  variations::android::ClearJavaFirstRunPrefs();
-  return seed;
-#else
   return nullptr;
-#endif
 }
 
 bool ChromeVariationsServiceClient::IsEnterprise() {

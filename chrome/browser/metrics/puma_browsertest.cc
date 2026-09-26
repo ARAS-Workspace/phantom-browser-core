@@ -25,15 +25,7 @@
 #include "third_party/metrics_proto/private_metrics/system_profiles/rc_coarse_system_profile.pb.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#else
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_test_helper.h"
-#include "content/public/browser/web_contents.h"
-#include "content/public/test/browser_test_utils.h"
-#endif
 
 namespace metrics::private_metrics {
 
@@ -52,11 +44,7 @@ enum class TestEnum {
 
 }  // namespace
 
-#if !BUILDFLAG(IS_ANDROID)
 using PlatformBrowser = BrowserWindowInterface*;
-#else
-typedef std::unique_ptr<TestTabModel> PlatformBrowser;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 PumaService* GetPumaService() {
   return g_browser_process->GetMetricsServicesManager()->GetPumaService();
@@ -79,43 +67,18 @@ class PumaBrowserTest : public SyncTest {
 
   // Creates and returns a platform-appropriate browser for |profile|.
   PlatformBrowser CreatePlatformBrowser(Profile* profile) {
-#if !BUILDFLAG(IS_ANDROID)
     return CreateBrowser(profile);
-#else
-    std::unique_ptr<TestTabModel> tab_model =
-        std::make_unique<TestTabModel>(profile);
-    tab_model->SetWebContentsList(
-        {content::WebContents::Create(
-             content::WebContents::CreateParams(profile))
-             .release()});
-    TabModelList::AddTabModel(tab_model.get());
-    EXPECT_TRUE(content::NavigateToURL(tab_model->GetActiveWebContents(),
-                                       GURL("about:blank")));
-    return tab_model;
-#endif
   }
 
   // Creates a platform-appropriate incognito browser for |profile|.
   PlatformBrowser CreateIncognitoPlatformBrowser(Profile* profile) {
     EXPECT_TRUE(profile->IsOffTheRecord());
-#if !BUILDFLAG(IS_ANDROID)
     return CreateIncognitoBrowser(profile);
-#else
-    // On Android, an incognito platform is the same as a regular platform
-    // browser but with an incognito profile. The incognito profile is validated
-    // with profile->IsOffTheRecord().
-    return CreatePlatformBrowser(profile);
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   // Closes |browser| in a way that is appropriate for the platform.
   void ClosePlatformBrowser(PlatformBrowser& browser) {
-#if !BUILDFLAG(IS_ANDROID)
     CloseBrowserSynchronously(browser);
-#else
-    TabModelList::RemoveTabModel(browser.get());
-    browser.reset();
-#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   void ExpectPumaReportingEnabled(const std::string& failed_message = "") {
@@ -206,9 +169,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, VerifyRcCoarseSystemProfile) {
   EXPECT_EQ(rc_profile.platform(), ::private_metrics::Platform::PLATFORM_LINUX);
 #elif BUILDFLAG(IS_MAC)
   EXPECT_EQ(rc_profile.platform(), ::private_metrics::Platform::PLATFORM_MACOS);
-#elif BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(rc_profile.platform(),
-            ::private_metrics::Platform::PLATFORM_ANDROID);
 #else
   EXPECT_EQ(rc_profile.platform(), ::private_metrics::Platform::PLATFORM_OTHER);
 #endif
@@ -233,9 +193,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, PumaServiceCheck) {
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
   ASSERT_NE(GetPumaService(), nullptr);
   // For Android, EnableReporting to avoid flaky test failures.
-#if BUILDFLAG(IS_ANDROID)
-  GetPumaService()->EnableReporting();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   PlatformBrowser browser = CreatePlatformBrowser(profile);
   ExpectPumaReportingEnabled("Browser did not enable PUMA.");
@@ -256,9 +213,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, RegularBrowserPlusIncognitoCheck) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
   // For Android, EnableReporting to avoid flaky test failures.
-#if BUILDFLAG(IS_ANDROID)
-  GetPumaService()->EnableReporting();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // PUMA should be enabled when opening the first regular browser.
   PlatformBrowser browser1 = CreatePlatformBrowser(profile);
@@ -319,9 +273,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, IncognitoPlusRegularBrowserCheck) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
   // For Android, EnableReporting to avoid flaky test failures.
-#if BUILDFLAG(IS_ANDROID)
-  GetPumaService()->EnableReporting();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   Profile* incognito_profile =
       profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);

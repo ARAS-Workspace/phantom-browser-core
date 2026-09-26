@@ -13,21 +13,10 @@
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_ANDROID)
-
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list.h"
-#include "components/sync_sessions/synced_tab_delegate.h"
-
-#else  // !BUILDFLAG(IS_ANDROID)
-
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/sync/browser_synced_tab_delegate.h"
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace segmentation_platform::processing {
 
@@ -37,11 +26,6 @@ GURL GetLocalTabURL(const TabFetcher::Tab& tab) {
   if (tab.webcontents) {
     return tab.webcontents->GetURL();
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (tab.tab_android) {
-    return tab.tab_android->GetURL();
-  }
-#endif
   return GURL();
 }
 
@@ -54,61 +38,8 @@ base::TimeDelta GetLocalTimeSinceModified(const TabFetcher::Tab& tab) {
       last_modified_timestamp = last_entry->GetTimestamp();
     }
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (tab.tab_android) {
-    last_modified_timestamp = tab.tab_android->GetLastShownTimestamp();
-  }
-#endif
   return base::Time::Now() - last_modified_timestamp;
 }
-
-#if BUILDFLAG(IS_ANDROID)
-
-// Returns a list of all tabs from tab model.
-std::vector<TabFetcher::TabEntry> FetchTabs(const Profile* profile) {
-  std::vector<TabFetcher::TabEntry> tabs;
-  for (const TabModel* model : TabModelList::models()) {
-    if (model->GetProfile() != profile) {
-      continue;
-    }
-    // Store count in local variable since it makes expensive JNI call.
-    int count = model->GetTabCount();
-    for (int i = 0; i < count; ++i) {
-      auto* web_contents = model->GetWebContentsAt(i);
-      auto* tab_android = model->GetTabAt(i);
-      auto tab_id = tab_android->GetSyncedTabDelegate()->GetSessionId();
-      tabs.emplace_back(tab_id, web_contents, tab_android);
-    }
-  }
-  return tabs;
-}
-
-TabFetcher::Tab FindLocalTabAndroid(const Profile* profile,
-                                    const TabFetcher::TabEntry& entry) {
-  for (const TabModel* model : TabModelList::models()) {
-    if (model->GetProfile() != profile) {
-      continue;
-    }
-    // Store count in local variable since it makes expensive JNI call.
-    int count = model->GetTabCount();
-    for (int i = 0; i < count; ++i) {
-      auto* tab_android = model->GetTabAt(i);
-      SessionID id = tab_android->GetSyncedTabDelegate()->GetSessionId();
-      if (id != entry.tab_id) {
-        continue;
-      }
-      TabFetcher::Tab result;
-      result.webcontents = model->GetWebContentsAt(i);
-      result.tab_android = tab_android;
-      result.time_since_modified = GetLocalTimeSinceModified(result);
-      result.tab_url = GetLocalTabURL(result);
-      return result;
-    }
-  }
-  return TabFetcher::Tab();
-}
-
-#else  // BUILDFLAG(IS_ANDROID)
 
 // Returns a list of all tabs from tab strip model.
 std::vector<TabFetcher::TabEntry> FetchTabs(const Profile* profile) {
@@ -133,8 +64,6 @@ std::vector<TabFetcher::TabEntry> FetchTabs(const Profile* profile) {
   return tabs;
 }
 
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace
 
 LocalTabHandler::LocalTabHandler(
@@ -151,9 +80,6 @@ bool LocalTabHandler::FillAllLocalTabsFromTabModel(
 }
 
 TabFetcher::Tab LocalTabHandler::FindLocalTab(const TabEntry& entry) {
-#if BUILDFLAG(IS_ANDROID)
-  return FindLocalTabAndroid(profile_, entry);
-#else
   TabFetcher::Tab result;
   // Fetch all tabs and verify if the `entry` is still valid.
   auto all_local_tabs = FetchTabs(profile_);
@@ -169,7 +95,6 @@ TabFetcher::Tab LocalTabHandler::FindLocalTab(const TabEntry& entry) {
     }
   }
   return result;
-#endif
 }
 
 LocalTabSource::LocalTabSource(

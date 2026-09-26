@@ -24,11 +24,7 @@
 #include "chrome/browser/apps/platform_apps/platform_app_launch.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_live_tab_context.h"
-#else
-#include "chrome/browser/ui/android/tab_model/android_live_tab_context.h"
-#endif
 
 ChromeTabRestoreServiceClient::ChromeTabRestoreServiceClient(Profile* profile)
     : profile_(profile) {}
@@ -44,47 +40,27 @@ sessions::LiveTabContext* ChromeTabRestoreServiceClient::CreateLiveTabContext(
     const std::string& workspace,
     const std::string& user_title,
     const std::map<std::string, std::string>& extra_data) {
-#if BUILDFLAG(IS_ANDROID)
-  // Android does not support creating a LiveTabContext here. Return the
-  // existing context instead.
-  DCHECK(existing_context);
-  return existing_context;
-#else
   return BrowserLiveTabContext::Create(profile_, type, app_name, bounds,
                                        show_state, workspace, user_title,
                                        extra_data);
-#endif
 }
 
 sessions::LiveTabContext*
 ChromeTabRestoreServiceClient::FindLiveTabContextForTab(
     const sessions::LiveTab* tab) {
-#if BUILDFLAG(IS_ANDROID)
-  return AndroidLiveTabContext::FindContextForWebContents(
-      &static_cast<const sessions::ContentLiveTab*>(tab)->GetWebContents());
-#else
   return BrowserLiveTabContext::FindContextForWebContents(
       &static_cast<const sessions::ContentLiveTab*>(tab)->GetWebContents());
-#endif
 }
 
 sessions::LiveTabContext*
 ChromeTabRestoreServiceClient::FindLiveTabContextWithID(SessionID desired_id) {
-#if BUILDFLAG(IS_ANDROID)
-  return AndroidLiveTabContext::FindContextWithID(desired_id);
-#else
   return BrowserLiveTabContext::FindContextWithID(desired_id);
-#endif
 }
 
 sessions::LiveTabContext*
 ChromeTabRestoreServiceClient::FindLiveTabContextWithGroup(
     tab_groups::TabGroupId group) {
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
   return BrowserLiveTabContext::FindContextWithGroup(group, profile_);
-#endif
 }
 
 bool ChromeTabRestoreServiceClient::ShouldTrackURLForRestore(const GURL& url) {

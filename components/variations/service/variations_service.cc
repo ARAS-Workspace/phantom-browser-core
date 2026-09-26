@@ -133,8 +133,6 @@ std::string GetPlatformString() {
 
 #if BUILDFLAG(IS_MAC)
   return "mac";
-#elif BUILDFLAG(IS_ANDROID)
-  return "android";
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD) || BUILDFLAG(IS_SOLARIS)
   // Default BSD and SOLARIS to Linux to not break those builds, although these
   // platforms are not officially supported by Chrome.
@@ -380,17 +378,15 @@ void VariationsService::PerformPreMainMessageLoopStartup() {
 
   InitResourceRequestedAllowedNotifier();
 
-// Android instead calls OnAppEnterForeground() which then calls
-// StartRepeatedVariationsSeedFetch(). This is too early to do it on Android
-// because at this point the |restrict_mode_| hasn't been set yet. See also
-// the CHECK in SetRestrictMode().
-#if !BUILDFLAG(IS_ANDROID)
+  // Android instead calls OnAppEnterForeground() which then calls
+  // StartRepeatedVariationsSeedFetch(). This is too early to do it on Android
+  // because at this point the |restrict_mode_| hasn't been set yet. See also
+  // the CHECK in SetRestrictMode().
   if (!IsFetchingEnabled()) {
     return;
   }
 
   StartRepeatedVariationsSeedFetch();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void VariationsService::AddObserver(Observer* observer) {
@@ -507,14 +503,6 @@ GURL VariationsService::GetVariationsServerURL(HttpOptions http_options) {
 }
 
 void VariationsService::EnsureLocaleEquals(const std::string& locale) {
-
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(asvitkine): Speculative early return to silence CHECK failures on
-  // Android, see crbug.com/912320.
-  if (locale.empty()) {
-    return;
-  }
-#endif
 
   // Uses a CHECK rather than a DCHECK to ensure that issues are caught since
   // problems in this area may only appear in the wild due to official builds

@@ -28,11 +28,7 @@
 #include "extensions/browser/extensions_browser_client.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/supervised_user/android/supervised_user_service_platform_delegate.h"
-#else
 #include "chrome/browser/supervised_user/desktop/supervised_user_service_platform_delegate.h"
-#endif
 
 namespace supervised_user {
 

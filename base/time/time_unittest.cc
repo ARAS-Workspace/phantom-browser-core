@@ -28,10 +28,6 @@
 #include "third_party/icu/source/common/unicode/utypes.h"
 #include "third_party/icu/source/i18n/unicode/timezone.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif
-
 namespace base {
 
 namespace {
@@ -787,30 +783,6 @@ TEST_F(TimeTest, TimeTOverflow) {
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-TEST_F(TimeTest, FromLocalExplodedCrashOnAndroid) {
-  // This crashed inside Time:: FromLocalExploded() on Android 4.1.2.
-  // See http://crbug.com/287821
-  Time::Exploded midnight = {
-      2013,  // year
-      10,    // month
-      0,     // day_of_week
-      13,    // day_of_month
-      0,     // hour
-      0,     // minute
-      0,     // second
-  };
-  // The string passed to putenv() must be a char* and the documentation states
-  // that it 'becomes part of the environment', so use a static buffer.
-  static char buffer[] = "TZ=America/Santiago";
-  putenv(buffer);
-  tzset();
-  Time t;
-  EXPECT_TRUE(Time::FromLocalExploded(midnight, &t));
-  EXPECT_EQ(1381633200, t.ToTimeT());
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Regression test for https://crbug.com/1104442
 TEST_F(TimeTest, Explode_Y10KCompliance) {
   constexpr int kDaysPerYear = 365;
@@ -953,7 +925,7 @@ TEST_F(TimeTest, FromExploded_MinMax) {
     EXPECT_FALSE(parsed_time.is_null());
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
     // The dates earlier than |kExplodedMinYear| that don't work are OS version
     // dependent on Android and Mac (for example, macOS 10.13 seems to support
     // dates before 1902).
@@ -994,11 +966,7 @@ class TimeOverride {
 Time TimeOverride::now_time_;
 
 // Disabled on Android due to flakes; see https://crbug.com/1474884.
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_NowOverride DISABLED_NowOverride
-#else
 #define MAYBE_NowOverride NowOverride
-#endif
 TEST_F(TimeTest, MAYBE_NowOverride) {
   TimeOverride::now_time_ = Time::UnixEpoch();
 
@@ -1417,46 +1385,6 @@ TEST(TimeTicks, SnappedToNextTickOverflow) {
             big_timestamp.SnappedToNextTick(big_timestamp, interval)
                 .ToInternalValue());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST(TimeTicks, Android_FromUptimeMillis_ClocksMatch) {
-  JNIEnv* const env = android::AttachCurrentThread();
-  android::ScopedJavaLocalRef<jclass> clazz(
-      android::GetClass(env, "android/os/SystemClock"));
-  ASSERT_TRUE(clazz.obj());
-  const jmethodID method_id =
-      android::MethodID::Get<android::MethodID::TYPE_STATIC>(
-          env, clazz.obj(), "uptimeMillis", "()J");
-  ASSERT_FALSE(!method_id);
-  // Subtract 1ms from the expected lower bound to allow millisecond-level
-  // truncation performed in uptimeMillis().
-  const TimeTicks lower_bound_ticks = TimeTicks::Now() - Milliseconds(1);
-  const TimeTicks converted_ticks = TimeTicks::FromUptimeMillis(
-      env->CallStaticLongMethod(clazz.obj(), method_id));
-  const TimeTicks upper_bound_ticks = TimeTicks::Now();
-  EXPECT_LE(lower_bound_ticks, converted_ticks);
-  EXPECT_GE(upper_bound_ticks, converted_ticks);
-}
-
-TEST(TimeTicks, Android_FromJavaNanoTime_ClocksMatch) {
-  JNIEnv* const env = android::AttachCurrentThread();
-  android::ScopedJavaLocalRef<jclass> clazz(
-      android::GetClass(env, "java/lang/System"));
-  ASSERT_TRUE(clazz.obj());
-  const jmethodID method_id =
-      android::MethodID::Get<android::MethodID::TYPE_STATIC>(env, clazz.obj(),
-                                                             "nanoTime", "()J");
-  ASSERT_FALSE(!method_id);
-  const TimeTicks lower_bound_ticks = TimeTicks::Now();
-  const TimeTicks converted_ticks = TimeTicks::FromJavaNanoTime(
-      env->CallStaticLongMethod(clazz.obj(), method_id));
-  // Add 1us to the expected upper bound to allow microsecond-level
-  // truncation performed in TimeTicks::Now().
-  const TimeTicks upper_bound_ticks = TimeTicks::Now() + Microseconds(1);
-  EXPECT_LE(lower_bound_ticks, converted_ticks);
-  EXPECT_GE(upper_bound_ticks, converted_ticks);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class LiveTicksOverride {
  public:

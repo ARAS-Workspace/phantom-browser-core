@@ -29,9 +29,6 @@
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/android/suspicious_site_controller_android.h"
-#endif
 #include "chrome/browser/ui/url_identity.h"
 #include "chrome/browser/usb/usb_chooser_context.h"
 #include "chrome/browser/usb/usb_chooser_context_factory.h"
@@ -67,10 +64,6 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/grit/branded_strings.h"
-#include "ui/base/l10n/l10n_util.h"
-#else
 #include "chrome/browser/certificate_viewer.h"
 #include "chrome/browser/hid/hid_chooser_context.h"
 #include "chrome/browser/hid/hid_chooser_context_factory.h"
@@ -96,7 +89,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/events/event.h"
-#endif
 
 namespace {
 
@@ -125,10 +117,8 @@ ChromePageInfoDelegate::ChromePageInfoDelegate(
     : get_browser_callback_(std::move(get_browser_callback)),
       web_contents_(web_contents) {
   CHECK(get_browser_callback_);
-#if !BUILDFLAG(IS_ANDROID)
   sentiment_service_ =
       TrustSafetySentimentServiceFactory::GetForProfile(GetProfile());
-#endif
   base::UmaHistogramBoolean("Security.PageInfo.AboutThisSiteLanguageSupported",
                             page_info::IsAboutThisSiteFeatureEnabled(
                                 g_browser_process->GetApplicationLocale()));
@@ -158,11 +148,7 @@ ChromePageInfoDelegate::GetChooserContext(ContentSettingsType type) {
     case ContentSettingsType::SERIAL_CHOOSER_DATA:
       return SerialChooserContextFactory::GetForProfile(GetProfile());
     case ContentSettingsType::HID_CHOOSER_DATA:
-#if !BUILDFLAG(IS_ANDROID)
       return HidChooserContextFactory::GetForProfile(GetProfile());
-#else
-      NOTREACHED();
-#endif
     case ContentSettingsType::SMART_CARD_DATA:
       return nullptr;
     default:
@@ -226,7 +212,6 @@ content::PermissionResult ChromePageInfoDelegate::GetPermissionResult(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void ChromePageInfoDelegate::FocusWebContents() {
   BrowserWindowInterface* browser = get_browser_callback_.Run(web_contents_);
   BrowserWebContentsDelegate::From(browser)->ActivateContents(web_contents_);
@@ -419,23 +404,12 @@ void ChromePageInfoDelegate::OnUIClosing() {
     sentiment_service_->PageInfoClosed();
   }
 }
-#endif
 
 void ChromePageInfoDelegate::OpenSafeBrowsingHelpCenterPage(
     const ui::Event* event,
     bool is_suspicious_site) {}
 
 void ChromePageInfoDelegate::OnSuspiciousSiteBackToSafety() {
-#if BUILDFLAG(IS_ANDROID)
-  if (auto* ssc =
-          safe_browsing::SuspiciousSiteControllerAndroid::FromWebContents(
-              web_contents_)) {
-    ssc->HandleBackNavigation(
-        safe_browsing::SuspiciousSiteWarningUserInteraction::
-            kBackToSafetyButton);
-    return;
-  }
-#endif
   if (!web_contents_) {
     return;
   }
@@ -462,14 +436,6 @@ void ChromePageInfoDelegate::OnSuspiciousSiteBackToSafety() {
 }
 
 void ChromePageInfoDelegate::OnSuspiciousSiteMarkAsSafe() {
-#if BUILDFLAG(IS_ANDROID)
-  if (auto* ssc =
-          safe_browsing::SuspiciousSiteControllerAndroid::FromWebContents(
-              web_contents_)) {
-    ssc->OnContinueButtonClicked();
-    return;
-  }
-#endif
   if (!web_contents_) {
     return;
   }
@@ -525,11 +491,6 @@ bool ChromePageInfoDelegate::IsSubresourceFilterActivated(
 }
 
 bool ChromePageInfoDelegate::HasAutoPictureInPictureBeenRegistered() {
-#if BUILDFLAG(IS_ANDROID)
-  if (!base::FeatureList::IsEnabled(media::kAutoPictureInPictureAndroid)) {
-    return false;
-  }
-#endif
   auto* auto_pip_tab_helper =
       AutoPictureInPictureTabHelper::FromWebContents(web_contents_);
   return auto_pip_tab_helper &&
@@ -575,12 +536,6 @@ ChromePageInfoDelegate::GetPageSpecificContentSettingsDelegate() {
       std::make_unique<PageSpecificContentSettingsDelegate>(web_contents_);
   return std::move(delegate);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-const std::u16string ChromePageInfoDelegate::GetClientApplicationName() {
-  return l10n_util::GetStringUTF16(IDS_SHORT_PRODUCT_NAME);
-}
-#endif
 
 bool ChromePageInfoDelegate::IsHttpsFirstModeEnabledForUrl(const GURL& url) {
   return IsInterstitialEnabled(ComputeInterstitialState(web_contents_, url));

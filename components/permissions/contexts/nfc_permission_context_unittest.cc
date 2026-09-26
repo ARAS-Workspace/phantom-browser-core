@@ -18,22 +18,12 @@
 #include "content/public/test/test_renderer_host.h"
 #include "content/public/test/test_utils.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/permissions/android/nfc/mock_nfc_system_level_setting.h"
-#include "components/permissions/contexts/nfc_permission_context_android.h"
-#endif
-
 using content::MockRenderProcessHost;
 
 namespace permissions {
 namespace {
 class TestNfcPermissionContextDelegate : public NfcPermissionContext::Delegate {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  bool IsInteractable(content::WebContents* web_contents) override {
-    return true;
-  }
-#endif
 };
 }  // namespace
 
@@ -141,18 +131,8 @@ void NfcPermissionContextTests::SetUp() {
 
   auto delegate = std::make_unique<TestNfcPermissionContextDelegate>();
 
-#if BUILDFLAG(IS_ANDROID)
-  auto context = std::make_unique<NfcPermissionContextAndroid>(
-      browser_context(), std::move(delegate));
-  context->set_nfc_system_level_setting_for_testing(
-      std::unique_ptr<NfcSystemLevelSetting>(new MockNfcSystemLevelSetting()));
-  MockNfcSystemLevelSetting::SetNfcSystemLevelSettingEnabled(true);
-  MockNfcSystemLevelSetting::SetNfcAccessIsPossible(true);
-  MockNfcSystemLevelSetting::ClearHasShownNfcSettingPrompt();
-#else
   auto context = std::make_unique<NfcPermissionContext>(browser_context(),
                                                         std::move(delegate));
-#endif
 
   nfc_permission_context_ = context.get();
 
@@ -239,11 +219,7 @@ TEST_F(NfcPermissionContextTests, SinglePermissionPrompt) {
   EXPECT_FALSE(HasActivePrompt());
   RequestNfcPermission(RequestID(0), requesting_frame, true /* user_gesture */);
 
-#if BUILDFLAG(IS_ANDROID)
-  ASSERT_TRUE(HasActivePrompt());
-#else
   ASSERT_FALSE(HasActivePrompt());
-#endif
 }
 
 TEST_F(NfcPermissionContextTests, SinglePermissionPromptFailsOnInsecureOrigin) {
@@ -255,139 +231,5 @@ TEST_F(NfcPermissionContextTests, SinglePermissionPromptFailsOnInsecureOrigin) {
   RequestNfcPermission(RequestID(0), requesting_frame, true);
   ASSERT_FALSE(HasActivePrompt());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// Tests concerning Android NFC setting
-TEST_F(NfcPermissionContextTests,
-       SystemNfcSettingDisabledWhenNfcPermissionGetsGranted) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-  MockNfcSystemLevelSetting::SetNfcSystemLevelSettingEnabled(false);
-  EXPECT_FALSE(HasActivePrompt());
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-  ASSERT_TRUE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  AcceptPrompt();
-  ASSERT_TRUE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  CheckPermissionMessageSent(0 /* request _id */, true /* allowed */);
-}
-
-TEST_F(NfcPermissionContextTests,
-       SystemNfcSettingDisabledWhenNfcPermissionGetsDenied) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-  MockNfcSystemLevelSetting::SetNfcSystemLevelSettingEnabled(false);
-  EXPECT_FALSE(HasActivePrompt());
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-  ASSERT_TRUE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  DenyPrompt();
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  CheckPermissionMessageSent(0 /* request _id */, false /* allowed */);
-}
-
-TEST_F(NfcPermissionContextTests,
-       SystemNfcSettingDisabledWhenNfcPermissionAlreadyGranted) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  SetNfcContentSetting(requesting_frame, requesting_frame,
-                       CONTENT_SETTING_ALLOW);
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-  MockNfcSystemLevelSetting::SetNfcSystemLevelSettingEnabled(false);
-  EXPECT_FALSE(HasActivePrompt());
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-  ASSERT_FALSE(HasActivePrompt());
-  ASSERT_TRUE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-}
-
-TEST_F(NfcPermissionContextTests,
-       SystemNfcSettingEnabledWhenNfcPermissionAlreadyGranted) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  SetNfcContentSetting(requesting_frame, requesting_frame,
-                       CONTENT_SETTING_ALLOW);
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-  EXPECT_FALSE(HasActivePrompt());
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-  ASSERT_FALSE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-}
-
-TEST_F(NfcPermissionContextTests,
-       SystemNfcSettingCantBeEnabledWhenNfcPermissionGetsGranted) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-  MockNfcSystemLevelSetting::SetNfcSystemLevelSettingEnabled(false);
-  MockNfcSystemLevelSetting::SetNfcAccessIsPossible(false);
-  EXPECT_FALSE(HasActivePrompt());
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-  ASSERT_TRUE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  AcceptPrompt();
-  ASSERT_FALSE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  CheckPermissionMessageSent(0 /* request _id */, true /* allowed */);
-}
-
-TEST_F(NfcPermissionContextTests,
-       SystemNfcSettingCantBeEnabledWhenNfcPermissionGetsDenied) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-  MockNfcSystemLevelSetting::SetNfcSystemLevelSettingEnabled(false);
-  MockNfcSystemLevelSetting::SetNfcAccessIsPossible(false);
-  EXPECT_FALSE(HasActivePrompt());
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-  ASSERT_TRUE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  DenyPrompt();
-  ASSERT_FALSE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  CheckPermissionMessageSent(0 /* request _id */, false /* allowed */);
-}
-
-TEST_F(NfcPermissionContextTests,
-       SystemNfcSettingCantBeEnabledWhenNfcPermissionAlreadyGranted) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  SetNfcContentSetting(requesting_frame, requesting_frame,
-                       CONTENT_SETTING_ALLOW);
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-  MockNfcSystemLevelSetting::SetNfcSystemLevelSettingEnabled(false);
-  MockNfcSystemLevelSetting::SetNfcAccessIsPossible(false);
-  EXPECT_FALSE(HasActivePrompt());
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-  ASSERT_FALSE(HasActivePrompt());
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-  CheckPermissionMessageSent(0 /* request _id */, true /* allowed */);
-}
-
-TEST_F(NfcPermissionContextTests, CancelNfcPermissionRequest) {
-  GURL requesting_frame("https://www.example.com/nfc");
-  EXPECT_EQ(CONTENT_SETTING_ASK,
-            GetNfcContentSetting(requesting_frame, requesting_frame));
-
-  NavigateAndCommit(requesting_frame);
-  RequestManagerDocumentLoadCompleted();
-
-  ASSERT_FALSE(HasActivePrompt());
-
-  RequestNfcPermission(RequestID(0), requesting_frame, true);
-
-  ASSERT_TRUE(HasActivePrompt());
-
-  // Simulate the frame going away; the request should be removed.
-  ClosePrompt();
-
-  ASSERT_FALSE(MockNfcSystemLevelSetting::HasShownNfcSettingPrompt());
-
-  // Ensure permission isn't persisted.
-  EXPECT_EQ(CONTENT_SETTING_ASK,
-            GetNfcContentSetting(requesting_frame, requesting_frame));
-}
-#endif
 
 }  // namespace permissions

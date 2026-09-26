@@ -73,10 +73,6 @@ std::string Command::CommandPlatform() {
   return ui::kKeybindingPlatformMac;
 #elif BUILDFLAG(IS_LINUX)
   return ui::kKeybindingPlatformLinux;
-#elif BUILDFLAG(IS_ANDROID)
-  // For now, we use linux keybindings on android.
-  // TODO(https://crbug.com/356905053): Should this be ChromeOS keybindings?
-  return ui::kKeybindingPlatformLinux;
 #else
   return "";
 #endif
