@@ -1793,7 +1793,6 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest, AllowBlock) {
 }
 
 // Tests allowing rules for redirects.
-// TODO(crbug.com/crbug.com/371298229): Flaky on Android.
 #define MAYBE_AllowRedirect AllowRedirect
 IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest, MAYBE_AllowRedirect) {
   set_config_flags(ConfigFlag::kConfig_HasBackgroundScript);
@@ -7968,7 +7967,6 @@ IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,
 
 // Verify that getMatchedRules returns the correct rule matches for rules which
 // match on response headers.
-// TODO(crbug.com/crbug.com/371298229): Flaky on Android.
 #define MAYBE_GetMatchedRules_SingleExtension GetMatchedRules_SingleExtension
 IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,
                        MAYBE_GetMatchedRules_SingleExtension) {
@@ -8127,7 +8125,6 @@ IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,
 
 // Verify that getMatchedRules returns the correct rule matches for rules which
 // match on response headers between different extensions.
-// TODO(crbug.com/crbug.com/371298229): Flaky on Android.
 #define MAYBE_GetMatchedRules_MultipleExtensions \
   GetMatchedRules_MultipleExtensions
 IN_PROC_BROWSER_TEST_P(DNRMatchResponseHeadersBrowserTest,

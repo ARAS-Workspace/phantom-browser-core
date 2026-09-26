@@ -212,7 +212,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_AudioClearVideo_WebM) {
   TestSimplePlayback("bear-320x240-av_enc-a.webm");
 }
 
-// TODO(crbug.com/40784898): Flaky on Android.
 #define MAYBE_Playback_VideoAudio_WebM Playback_VideoAudio_WebM
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, MAYBE_Playback_VideoAudio_WebM) {
   TestSimplePlayback("bear-320x240-av_enc-av.webm");
@@ -236,7 +235,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoClearAudio_WebM) {
   TestSimplePlayback("bear-320x240-av_enc-v.webm");
 }
 
-// TODO(crbug.com/40784898): Flaky on Android.
 #define MAYBE_Playback_VideoAudio_WebM_Opus Playback_AudioOnly_WebM_Opus
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
                        MAYBE_Playback_VideoAudio_WebM_Opus) {
@@ -267,8 +265,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoOnly_MP4_VP9) {
 
   TestSimplePlayback("bear-320x240-v_frag-vp9-cenc.mp4");
 }
-
-// TODO(crbug.com/40513452): Decide when it's supported on Android.
 
 #if BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40187305): Failing on Mac.
@@ -308,7 +304,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoOnly_WebM_AV1) {
   TestSimplePlayback("bear-av1-cenc.webm");
 }
 
-// TODO(crbug.com/40863206): Flaky on Android.
 #define MAYBE_Playback_VideoOnly_WebM_AV1_10bit \
   Playback_VideoOnly_WebM_AV1_10bit
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
@@ -344,7 +339,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
   TestConfigChange(ConfigChangeType::CLEAR_TO_CLEAR);
 }
 
-// Failed on Android, see https://crbug.com/1014540.
 #define MAYBE_ConfigChangeVideo_ClearToEncrypted \
   ConfigChangeVideo_ClearToEncrypted
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
@@ -361,7 +355,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
   TestConfigChange(ConfigChangeType::ENCRYPTED_TO_ENCRYPTED);
 }
 
-// Fails on Android (https://crbug.com/778245 and https://crbug.com/1023638).
 #define MAYBE_FrameSizeChangeVideo FrameSizeChangeVideo
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, MAYBE_FrameSizeChangeVideo) {
   TestFrameSizeChange();
@@ -378,7 +371,6 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_Encryption_CBC1) {
                       media::kErrorTitle);
 }
 
-// TODO(crbug.com/40863223): Flaky on Android.
 #define MAYBE_Playback_Encryption_CENS Playback_Encryption_CENS
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, MAYBE_Playback_Encryption_CENS) {
   RunMultipleFileTest("bear-640x360-v_frag-cens.mp4", std::string(),

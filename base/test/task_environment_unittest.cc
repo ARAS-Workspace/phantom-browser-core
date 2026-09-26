@@ -1516,7 +1516,6 @@ TEST_F(TaskEnvironmentTest,
   TaskEnvironment::ParallelExecutionFence fence;
 }
 
-// Android doesn't support death tests, see base/test/gtest_util.h
 TEST_F(TaskEnvironmentTest, ParallelExecutionFenceNonMainThreadDeath) {
   TaskEnvironment task_environment;
 

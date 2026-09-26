@@ -302,7 +302,6 @@ bool DownloadPrefs::PromptForDownload() const {
   // always be false.
   DCHECK(!download_path_.IsManaged() || !prompt_for_download_.GetValue());
 
-// Return the Android prompt for download only.
   return *prompt_for_download_;
 }
 

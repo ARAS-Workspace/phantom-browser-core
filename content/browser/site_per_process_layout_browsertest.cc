@@ -1206,7 +1206,6 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest, ViewBoundsInNestedFrameTest) {
 
 // Verify that "scrolling" property on frame elements propagates to child frames
 // correctly.
-// Does not work on android since android has scrollbars overlaid.
 // TODO(bokan): Pretty soon most/all platforms will use overlay scrollbars. This
 // test should find a better way to check for scrollability. crbug.com/662196.
 // Flaky on Linux. crbug.com/790929.
@@ -1418,7 +1417,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
 // This test verifies that changing the CSS visibility of a cross-origin
 // <iframe> is forwarded to its corresponding RenderWidgetHost and all other
 // RenderWidgetHosts corresponding to the nested cross-origin frame.
-// TODO(crbug.com/40865141): Flaky on mac and android.
+// TODO(crbug.com/40865141): Flaky on mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_CSSVisibilityChanged DISABLED_CSSVisibilityChanged
 #else

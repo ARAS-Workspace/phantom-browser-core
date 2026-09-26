@@ -406,7 +406,6 @@ void BrowserGpuChannelHostFactory::GpuChannelEstablished(
 
 void BrowserGpuChannelHostFactory::RestartTimeout() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-// Only implement timeout on Android, which does not have a software fallback.
 }
 
 }  // namespace content

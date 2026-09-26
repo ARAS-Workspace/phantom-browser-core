@@ -664,7 +664,6 @@ class PasswordProtectionServiceBaseTest
     feature_list_.InitWithFeatures(enabled_features, disabled_features);
   }
 
-  // Visual features are not supported on Android.
   void VerifyContentAreaSizeCollection(
       const LoginReputationClientRequest& request) {
     bool should_report_content_size =
@@ -1627,15 +1626,11 @@ TEST_P(PasswordProtectionServiceBaseTest, VerifyShouldShowModalWarning) {
       PHISHING_REUSE,
       password_protection_service_->GetPasswordProtectionWarningTriggerPref(
           reused_password_account_type));
-  // Currently password reuse warnings are not supported for GSUITE passwords on
-  // Android.
   EXPECT_TRUE(password_protection_service_->ShouldShowModalWarning(
       LoginReputationClientRequest::PASSWORD_REUSE_EVENT,
       reused_password_account_type, LoginReputationClientResponse::PHISHING));
 
   // Modal dialog warning is also shown on LOW_REPUTATION verdict.
-  // Currently password reuse warnings are not supported for GSUITE passwords on
-  // Android.
   EXPECT_TRUE(password_protection_service_->ShouldShowModalWarning(
       LoginReputationClientRequest::PASSWORD_REUSE_EVENT,
       reused_password_account_type,
@@ -1657,8 +1652,6 @@ TEST_P(PasswordProtectionServiceBaseTest, VerifyShouldShowModalWarning) {
   EXPECT_CALL(*password_protection_service_,
               GetPasswordProtectionWarningTriggerPref(_))
       .WillRepeatedly(Return(PHISHING_REUSE));
-  // Currently password reuse warnings are not supported for enterprise
-  // passwords on Android.
   EXPECT_TRUE(password_protection_service_->ShouldShowModalWarning(
       LoginReputationClientRequest::PASSWORD_REUSE_EVENT,
       reused_password_account_type, LoginReputationClientResponse::PHISHING));
@@ -1725,7 +1718,6 @@ TEST_P(PasswordProtectionServiceBaseTest, TestPingsForAboutBlank) {
   histograms_.ExpectTotalCount(kPasswordOnFocusRequestOutcomeHistogram, 1);
 }
 
-// DOM features and visual features are not supported on Android.
 TEST_P(PasswordProtectionServiceBaseTest,
        TestVisualFeaturesPopulatedInOnFocusPing) {
   LoginReputationClientResponse expected_response =

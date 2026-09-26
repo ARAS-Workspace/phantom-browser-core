@@ -95,7 +95,6 @@ class ViewTransitionBrowserTest : public ContentBrowserTest {
   std::unique_ptr<base::RunLoop> run_loop_;
 };
 
-// TODO(crbug.com/468211765): Flaky on Android.
 #define MAYBE_NavigationCancelledAfterScreenshot \
   NavigationCancelledAfterScreenshot
 IN_PROC_BROWSER_TEST_F(ViewTransitionBrowserTest,

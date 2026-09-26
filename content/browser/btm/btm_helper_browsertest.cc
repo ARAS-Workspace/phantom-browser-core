@@ -193,8 +193,6 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
   SetBtmTime(frame_interaction_time);
   UserActivationObserver observer_b(web_contents, iframe);
 
-  // TODO(crbug.com/40247129): Remove the ExecJs workaround once
-  // SimulateMouseClickOrTapElementWithId is able to activate iframes on Android
   SimulateMouseClickOrTapElementWithId(web_contents, kIframeId);
   observer_b.Wait();
 
@@ -431,7 +429,6 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
   }
 }
 
-// Flaky on Android: https://crbug.com/369717773
 #define MAYBE_UserClearedSitesAreNotReportedToUKM \
   UserClearedSitesAreNotReportedToUKM
 IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
@@ -628,7 +625,6 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
                    .has_value());
 }
 
-// Multiple running profiles is not supported on Android.
 IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
                        SitesInOpenTabsForDifferentProfilesAreNotExempt) {
   WebContents* web_contents = GetActiveWebContents();

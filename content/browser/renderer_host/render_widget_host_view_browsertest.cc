@@ -998,8 +998,6 @@ class CompositingRenderWidgetHostViewBrowserTest
   const CompositingMode compositing_mode_;
 };
 
-// Disable tests for Android as it has an incomplete implementation.
-
 // The CopyFromSurface() API should work on all platforms when compositing is
 // enabled.
 IN_PROC_BROWSER_TEST_P(CompositingRenderWidgetHostViewBrowserTest,

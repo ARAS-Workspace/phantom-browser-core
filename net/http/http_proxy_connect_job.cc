@@ -348,9 +348,6 @@ base::TimeDelta HttpProxyConnectJob::AlternateNestedConnectionTimeout(
     const NetworkQualityEstimator* network_quality_estimator) {
   base::TimeDelta default_alternate_timeout;
 
-  // On Android, a default proxy connection timeout is used instead of
-  // the actual TCP/SSL timeouts of nested jobs.
-
   bool is_https = params.proxy_server().is_https();
 
   if (!network_quality_estimator) {

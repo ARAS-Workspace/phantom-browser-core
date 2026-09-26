@@ -17406,7 +17406,6 @@ void RenderFrameHostImpl::DidCommitNavigation(
     return;
   }
 
-  // TODO(https://crbug.com/445585641): Make this enforceable on Android.
   if (base::FeatureList::IsEnabled(kCheckDocumentSequenceNumber)) {
     if (params->document_sequence_number == -1) {
       bad_message::ReceivedBadMessage(
@@ -18653,8 +18652,6 @@ void RenderFrameHostImpl::
     // If the origin doesn't match, we would do a DumpWithoutCrashing above.
     // So, don't do a DumpWithoutCrashing unless there's another param that
     // doesn't match.
-    // Note: This is temporarily disabled on Android as there has been a recent
-    // spike of reports on Android WebView.
     base::debug::DumpWithoutCrashing();
   }
 }

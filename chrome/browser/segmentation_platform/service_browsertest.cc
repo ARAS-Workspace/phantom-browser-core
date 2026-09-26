@@ -304,7 +304,6 @@ class SegmentationPlatformTest : public PlatformBrowserTest {
   base::WeakPtrFactory<SegmentationPlatformTest> weak_ptr_factory_{this};
 };
 
-// https://crbug.com/40200835 -- Tests using "PRE_" don't work on Android.
 #define MAYBE_PRE_CachedClassificationModel PRE_CachedClassificationModel
 #define MAYBE_CachedClassificationModel CachedClassificationModel
 
@@ -526,7 +525,6 @@ IN_PROC_BROWSER_TEST_F(SegmentationPlatformTest,
       1, 0);
 }
 
-// Android doesn't have a shutdown path in which databases are closed.
 // Tests that the database's -wal file is removed at shutdown. A failure to do
 // so means that the database was not closed.
 class SegmentationPlatformCleanupTest : public SegmentationPlatformTest {

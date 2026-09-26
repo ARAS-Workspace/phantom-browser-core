@@ -19,7 +19,6 @@ namespace sandbox {
 
 namespace {
 
-// Fails on Android: crbug.com/459158
 #define MAYBE_NoFork DISABLE_ON_ASAN(NoFork)
 
 // Not being able to fork breaks LeakSanitizer, so disable on

@@ -2223,10 +2223,6 @@ IN_PROC_BROWSER_TEST_F(FileSystemChooserBrowserTest, DontShowWhileInactive) {
   EXPECT_EQ(recorder.state, SelectFileDialogRecorder::kNotCreated);
 }
 
-// TODO(crbug.com/457495639): We need a different way to detect when a
-// WebContents is no longer displayed to the user for android since the
-// intent to select a file always causes a HIDDEN event as the whole app
-// receives onStop().
 #define MAYBE_ShowThenHide ShowThenHide
 // Show the dialog then hide the WebContents and ensure the dialog is dismissed.
 IN_PROC_BROWSER_TEST_F(FileSystemChooserBrowserTest, MAYBE_ShowThenHide) {

@@ -319,8 +319,6 @@ TEST(MAYBE_InvitationCppTest_NoParam, SendIsolatedInvitationWithDuplicateName) {
 const char kErrorMessage[] = "ur bad :{{";
 const char kDisconnectMessage[] = "go away plz";
 
-// Flakily times out on Android under ASAN.
-// crbug.com/1011494
 #define MAYBE_ProcessErrors ProcessErrors
 
 TEST_P(MAYBE_InvitationCppTest, MAYBE_ProcessErrors) {

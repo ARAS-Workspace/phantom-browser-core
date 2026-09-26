@@ -170,8 +170,6 @@ VkResult VulkanQueuePresentKHRHook(VkQueue queue,
 bool CheckVulkanCompatibilities(
     const VulkanPhysicalDeviceProperties& device_properties,
     const GPUInfo& gpu_info) {
-  // Android uses AHB and SyncFD for interop. They are imported into GL with
-  // other API.
   constexpr char kMemoryObjectExtension[] = "GL_EXT_memory_object_fd";
   constexpr char kSemaphoreExtension[] = "GL_EXT_semaphore_fd";
 

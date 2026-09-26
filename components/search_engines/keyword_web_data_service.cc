@@ -206,9 +206,6 @@ void KeywordWebDataService::AdjustBatchModeLevel(bool entering_batch_mode) {
     --batch_mode_level_;
     if (!batch_mode_level_ && !queued_keyword_operations_.empty() &&
         !timer_.IsRunning()) {
-      // When killing an app on Android, shutdown isn't guaranteed to be
-      // called. Finishing this task immediately ensures the table is fully
-      // populated even if the app is killed before the timer expires.
       timer_.Reset();
     }
   }

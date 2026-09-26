@@ -4649,8 +4649,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, ToggleFullscreen) {
   }
   EXPECT_TRUE(IsInFullscreen());
 
-  // Full document orientation lock is only available on Android.
-
   // Exiting fullscreen should update the title. This should not block
   // subsequent request to re-enter fullscreen.
   {
@@ -4886,9 +4884,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, InnerWebContentsVisibility) {
   EXPECT_EQ(Visibility::HIDDEN, inner_contents->GetVisibility());
 }
 
-// Not supported on Android. Android assumes that WebContentsViewAndroid is
-// always the view of a WebContents, whereas an inner WebContents has a
-// WebContentsViewChildFrame as its view.
 class UnownedInnerWebContentsBrowserTest : public WebContentsImplBrowserTest {
  public:
   UnownedInnerWebContentsBrowserTest()
@@ -8060,7 +8055,6 @@ class DidChangeVerticalScrollDirectionObserver : public WebContentsObserver {
 // Tests that DidChangeVerticalScrollDirection is called only when the vertical
 // scroll direction has changed and that it includes the correct details.
 // TODO(crbug.com/40862270): This is flaky on the Mac10.14 bot.
-// TODO(crbug.com/401544068): This is failing on Android bots.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_DidChangeVerticalScrollDirection \
   DISABLED_DidChangeVerticalScrollDirection

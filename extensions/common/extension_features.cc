@@ -165,8 +165,6 @@ BASE_FEATURE(kDisableDisableExtensionsExceptCommandLineSwitch,
 );
 
 BASE_FEATURE(kDisableExtensionsOnChromeUrlsSwitch,
-// TODO (crbug.com/426554244): Determine if this switch should be
-// removed for desktop-android builds as well.
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else

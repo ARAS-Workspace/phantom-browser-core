@@ -84,7 +84,6 @@ AutofillBubbleControllerBase::GetPageActionTooltipText() {
 }
 
 void AutofillBubbleControllerBase::UpdatePageActionIcon() {
-  // Page action icons do not exist for Android.
   std::optional<PageActionIconType> icon_type = GetPageActionIconType();
   if (!icon_type.has_value()) {
     return;

@@ -824,8 +824,6 @@ static void CopyLevelDBToProfile(
     return;
   ASSERT_TRUE(base::CreateDirectory(blob_dest));
   ASSERT_TRUE(base::CopyDirectory(test_blob_data_dir, data_path, kRecursive));
-  // For some reason touching files on Android fails with EPERM.
-  // https://crbug.com/1045488
   // The modification time of the saved blobs is used for File objects, so these
   // need to manually be set (they are clobbered both by the above copy
   // operation and by git).
@@ -886,8 +884,6 @@ class IndexedDBBrowserTestWithVersion3Schema
 
 IN_PROC_BROWSER_TEST_F(IndexedDBBrowserTestWithVersion3Schema, MigrationTest) {
   const GURL kTestUrl = GetTestUrl("indexeddb", "v3_migration_test.html");
-  // For some reason setting empty file modification time on Android fails with
-  // EPERM. https://crbug.com/1045488
   SimpleTest(kTestUrl);
 }
 
@@ -1033,9 +1029,6 @@ IN_PROC_BROWSER_TEST_P(IndexedDBBrowserTest, EmptyBlob) {
   const auto bucket_locator = bucket_info.ToBucketLocator();
   EXPECT_EQ(0,
             GetBlobFileCount(bucket_locator));  // Start with no blob files.
-  // For some reason Android's futimes fails (EPERM) in this test. Do not assert
-  // file times on Android, but do so on other platforms. crbug.com/467247
-  // TODO(cmumford): Figure out why this is the case and fix if possible.
   SimpleTest(kTestUrl);
 }
 

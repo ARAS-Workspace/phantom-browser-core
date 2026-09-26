@@ -43,9 +43,6 @@ OhttpKeyServiceFactory::OhttpKeyServiceFactory()
 std::unique_ptr<KeyedService>
 OhttpKeyServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  // TODO(crbug.com/390190632) [Also TODO(thefrog)]: For now we simply return
-  // nullptr for Android. This should instead be refactored to avoid including
-  // this and associated files in the binary.
   if (!g_browser_process->safe_browsing_service()) {
     return nullptr;
   }

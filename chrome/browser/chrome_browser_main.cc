@@ -958,7 +958,6 @@ int ChromeBrowserMainParts::OnLocalStateLoaded(
 }
 
 int ChromeBrowserMainParts::ApplyFirstRunPrefs() {
-  // Android does first run in Java instead of native.
   master_prefs_ = std::make_unique<first_run::MasterPrefs>();
 
   std::unique_ptr<installer::InitialPreferences> installer_initial_prefs =
@@ -1014,7 +1013,6 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
   // Force MediaCaptureDevicesDispatcher to be created on UI thread.
   MediaCaptureDevicesDispatcher::GetInstance();
 
-  // Android's first run is done in Java instead of native.
   // Cache first run state early.
   first_run::IsChromeFirstRun();
 
@@ -1049,7 +1047,6 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
 
   browser_process_->browser_policy_connector()->OnResourceBundleCreated();
 
-  // Android does first run in Java instead of native.
   if (first_run::IsChromeFirstRun()) {
     if (!base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kApp) &&
         !base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kAppId)) {
@@ -1169,8 +1166,6 @@ void ChromeBrowserMainParts::PostCreateThreads() {
       FROM_HERE,
       base::BindOnce(&sampling_profiler::ThreadProfiler::StartOnChildThread,
                      sampling_profiler::ProfilerThreadType::kIo));
-  // Sampling multiple threads might cause overhead on Android and we don't want
-  // to enable it unless the data is needed.
   // We pass in CreateCoreUnwindersFactory here since it lives in the chrome/
   // layer while TracingSamplerProfiler is outside of chrome/.
   content::GetIOThreadTaskRunner({})->PostTask(

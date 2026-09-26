@@ -2726,7 +2726,6 @@ TEST_F(GpuRasterPixelTest, CopySharedImage) {
   EXPECT_EQ(*upload_bitmap.getAddr32(0, 0), *readback_bitmap.getAddr32(0, 0));
 }
 
-// The Android emulator does not support RED_8 or RG_88 texture formats.
 class GpuRasterYUVToRGBPixelTest
     : public GpuRasterPixelTest,
       public ::testing::WithParamInterface<gfx::ColorSpace> {

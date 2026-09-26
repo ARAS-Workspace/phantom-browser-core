@@ -804,11 +804,6 @@ void BrowserMainLoop::CreateStartupTasks() {
       &BrowserMainLoop::PreMainMessageLoopRun, base::Unretained(this));
   startup_task_runner_->AddTask(std::move(pre_main_message_loop_run));
 
-  // On Android, the native message loop is already running when the app is
-  // entered and startup tasks are run asynchronously from it.
-  // InterceptMainMessageLoopRun() thus needs to be forced instead of happening
-  // from MainMessageLoopRun().
-
   startup_task_runner_->RunAllTasksNow(false);
 }
 

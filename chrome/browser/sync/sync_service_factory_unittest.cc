@@ -273,9 +273,7 @@ TEST_F(SyncServiceFactoryTestWithCrossDeviceThemeFeatures,
   syncer::DataTypeSet types = sync_service->GetRegisteredDataTypesForTest();
 
   EXPECT_TRUE(types.Has(syncer::THEMES_IOS));
-  // THEMES_ANDROID is registered on desktop (via CrossDeviceThemeTracker) and
-  // on Android (via NtpAndroidCustomBackgroundService), except on Desktop
-  // Android where NTP theme sync is temporarily disabled (crbug.com/488439751).
+  // THEMES_ANDROID is registered on desktop (via CrossDeviceThemeTracker).
   EXPECT_TRUE(types.Has(syncer::THEMES_ANDROID));
   EXPECT_TRUE(types.Has(syncer::THEMES));
 }

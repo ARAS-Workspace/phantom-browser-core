@@ -321,7 +321,6 @@ INSTANTIATE_TEST_SUITE_P(
                                       : "_DisabledForCustomPassphrase");
     });
 
-// TODO(crbug.com/336993637): Flaky on Android.
 #define MAYBE_Passphrase Passphrase
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoPassphraseSyncTest,
                        MAYBE_Passphrase) {

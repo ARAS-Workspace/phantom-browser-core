@@ -1876,7 +1876,6 @@ TEST_P(LayerTreeHostImplTest, ScrollUpdateReturnsCorrectValue) {
           .did_scroll);
 }
 
-// TODO(crbug.com/487287578): Re-enable on Android once it's non-flaky.
 #define DISABLED_ON_ANDROID(test_name) test_name
 
 TEST_P(LayerTreeHostImplTest,

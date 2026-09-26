@@ -649,9 +649,6 @@ class TabStatsTrackerPrerenderBrowserTest : public TabStatsTrackerBrowserTest {
   content::test::PrerenderTestHelper prerender_helper_;
 };
 
-// TODO(crbug.com/412634171): On desktop Android, the prerender fails with error
-// kActivationNavigationParameterMismatch. Find out why.
-// TODO(crbug.com/455855986): Also starting failing on tablets.
 #define MAYBE_PrerenderingShouldNotCallOnPrimaryMainFrameNavigationCommitted \
   PrerenderingShouldNotCallOnPrimaryMainFrameNavigationCommitted
 IN_PROC_BROWSER_TEST_F(
@@ -712,8 +709,6 @@ class TabStatsTrackerSubFrameBrowserTest : public TabStatsTrackerBrowserTest {
   content::test::FencedFrameTestHelper fenced_frame_helper_;
 };
 
-// TODO(crbug.com/532509057): Fix the flakiness on Android and re-enable the
-// test.
 #define MAYBE_VerifyBehaviorOnSubFrameNavigation \
   VerifyBehaviorOnSubFrameNavigation
 

@@ -33,8 +33,7 @@ static const size_t kDataSize = 1024;
 // success, false otherwise.
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
 static bool CheckReadOnlySharedMemoryFdPosix(int fd) {
-  // Note that the error on Android is EPERM, unlike other platforms where
-  // it will be EACCES.
+  // Note that the error is EACCES.
   const int kExpectedErrno = EACCES;
   errno = 0;
   void* address =

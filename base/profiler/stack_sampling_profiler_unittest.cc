@@ -44,8 +44,7 @@
 #include <alloca.h>
 
 // STACK_SAMPLING_PROFILER_SUPPORTED is used to conditionally enable the tests
-// below for supported platforms (currently Mac, some Android, and
-// ChromeOS x64).
+// below for supported platforms (currently Mac and ChromeOS x64).
 // ChromeOS: These don't run under MSan because parts of the stack aren't
 // initialized.
 #if BUILDFLAG(IS_MAC)
@@ -432,9 +431,6 @@ class StackSamplingProfilerTest : public testing::Test {
 // Checks that the basic expected information is present in sampled frames.
 //
 // macOS ASAN is not yet supported - crbug.com/718628.
-//
-// TODO(crbug.com/40702833): Enable this test again for Android with ASAN. This
-// is now disabled because the android-asan bot fails.
 #if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)
 #define MAYBE_Basic DISABLED_Basic
 #else
@@ -488,8 +484,7 @@ class TestAuxUnwinder : public Unwinder {
 };
 
 // Checks that the profiler handles stacks containing dynamically-allocated
-// stack memory. macOS ASAN is not yet supported - crbug.com/718628. Android is
-// not supported since Chrome unwind tables don't support dynamic frames.
+// stack memory. macOS ASAN is not yet supported - crbug.com/718628.
 #if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)
 #define MAYBE_Alloca DISABLED_Alloca
 #else
@@ -508,10 +503,6 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_Alloca) {
 // Checks that a stack that runs through another library produces a stack with
 // the expected functions.
 // macOS ASAN is not yet supported - crbug.com/718628.
-// Android is not supported when EXCLUDE_UNWIND_TABLES |other_library| doesn't
-// have unwind tables.
-// TODO(crbug.com/40702833): Enable this test again for Android with
-// ASAN. This is now disabled because the android-asan bot fails.
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
@@ -535,10 +526,6 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_OtherLibrary) {
 // Checks that a stack that runs through a library that is unloading produces a
 // stack, and doesn't crash.
 // Unloading is synchronous on the Mac, so this test is inapplicable.
-// Android is not supported when EXCLUDE_UNWIND_TABLES |other_library| doesn't
-// have unwind tables.
-// TODO(crbug.com/40702833): Enable this test again for Android with
-// ASAN. This is now disabled because the android-asan bot fails.
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
@@ -554,7 +541,6 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_UnloadingLibrary) {
 // Checks that a stack that runs through a library that has been unloaded
 // produces a stack, and doesn't crash.
 // macOS ASAN is not yet supported - crbug.com/718628.
-// Android is not supported since modules are found before unwinding.
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.

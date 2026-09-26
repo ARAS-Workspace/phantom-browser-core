@@ -686,8 +686,6 @@ class PrintRenderFrameHelperTestBase : public content::RenderViewTest {
       frame_to_print_manager_map_;
 };
 
-// RenderViewTest-based tests crash on Android
-// http://crbug.com/187500
 #define MAYBE_PrintRenderFrameHelperTest PrintRenderFrameHelperTest
 
 class MAYBE_PrintRenderFrameHelperTest : public PrintRenderFrameHelperTestBase {

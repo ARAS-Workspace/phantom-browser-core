@@ -176,13 +176,11 @@ IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, SanityCheck) {
   SimpleTest(GetTestUrl("dom_storage", "sanity_check.html"), kNotIncognito);
 }
 
-// TODO(crbug.com/488417166): Fix flakiness on android-x86-rel and re-enable.
 #define MAYBE_SanityCheckIncognito SanityCheckIncognito
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, MAYBE_SanityCheckIncognito) {
   SimpleTest(GetTestUrl("dom_storage", "sanity_check.html"), kIncognito);
 }
 
-// http://crbug.com/654704 PRE_ tests aren't supported on Android.
 // TODO(crbug.com/40885339): Re-enable this test for fuchsia.
 #define MAYBE_DataPersists DataPersists
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, PRE_DataPersists) {
@@ -228,9 +226,6 @@ IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, LocalStorageOnDiskSize) {
   ExpectNonZeroOnDiskSize("LocalStorage.DatabaseOnDiskSizeKB");
 }
 
-// SessionStorage on Android uses BackingMode::kClearDiskStateOnOpen, which
-// destroys any pre-existing on-disk data on open. That makes the on-disk size
-// unobservable across a restart, so we skip these tests on Android.
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, PRE_SessionStorageOnDiskSize) {
   if (IsSqliteBackendOnFuchsia()) {
     GTEST_SKIP() << "SQLite DomStorage backend unsupported on Fuchsia";
@@ -261,7 +256,6 @@ IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, SessionStorageOnDiskSize) {
   ExpectNonZeroOnDiskSize("Storage.SessionStorage.DatabaseOnDiskSizeKB");
 }
 
-// TODO(crbug/361107780): Fix flakiness on android-bfcache-rel and re-enable.
 #define MAYBE_DeletePhysicalStorageKey DeletePhysicalStorageKey
 IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, MAYBE_DeletePhysicalStorageKey) {
   EXPECT_EQ(0U, GetUsage().size());

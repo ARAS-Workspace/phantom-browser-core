@@ -200,8 +200,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   map->Add<color_change_listener::mojom::PageHandler>(
       base::BindRepeating(&BindColorChangeListener));
 
-  // TODO(b/502297163): Implement for Android.
-
   map->Add<tracked_element::mojom::TrackedElementHandler>(
       base::BindRepeating(&BindTrackedElementHandlerRestricted));
 

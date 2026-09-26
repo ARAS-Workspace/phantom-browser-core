@@ -107,7 +107,6 @@ IN_PROC_BROWSER_TEST_F(AlarmsApiTest, IncognitoSpanning) {
   EXPECT_TRUE(catcher.GetNextResult()) << catcher.message();
 }
 
-// TODO(crbug.com/451193827): Flaky on Android.
 #define MAYBE_Count Count
 IN_PROC_BROWSER_TEST_F(AlarmsApiTest, MAYBE_Count) {
   EXPECT_TRUE(RunExtensionTest("alarms/count")) << message_;

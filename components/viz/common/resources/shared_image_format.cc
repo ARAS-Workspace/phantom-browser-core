@@ -405,8 +405,7 @@ int SharedImageFormat::BytesPerPixel() const {
 
 SharedImageFormat SharedImageFormat::N32Format() {
   // Skia has an internal algorithm for determining the N32 flag, but we
-  // override this with a build flag based on the Platform, so we can reduce
-  // this to checking if we're building for Android.
+  // override this with a build flag based on the Platform.
   return SinglePlaneFormat::kBGRA_8888;
 }
 

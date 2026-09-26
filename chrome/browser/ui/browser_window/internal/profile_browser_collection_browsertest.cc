@@ -200,12 +200,8 @@ IN_PROC_BROWSER_TEST_P(ProfileBrowserCollectionTest,
 INSTANTIATE_TEST_SUITE_P(
     ,
     ProfileBrowserCollectionTest,
-    ::testing::Values(
-        BrowserCollection::Order::kCreation
-        // TODO(crbug.com/477251911): Enable this on Android once we implement
-        // activation tracking in ProfileBrowserCollection for Android.
-        ,
-        BrowserCollection::Order::kActivation),
+    ::testing::Values(BrowserCollection::Order::kCreation,
+                      BrowserCollection::Order::kActivation),
     [](const testing::TestParamInfo<BrowserCollection::Order>& param) {
       switch (param.param) {
         case BrowserCollection::Order::kCreation:

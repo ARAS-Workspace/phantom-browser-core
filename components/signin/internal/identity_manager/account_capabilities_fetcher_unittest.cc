@@ -358,8 +358,6 @@ TEST_P(AccountCapabilitiesFetcherTest, FetchFailure) {
       AccountCapabilitiesFetcherGaia::FetchResult::kOAuthError, 1);
 }
 
-// Exclude Android because `AccountCapabilitiesFetcherAndroid` doesn't request
-// an access token.
 TEST_P(AccountCapabilitiesFetcherTest, TokenFailure) {
   base::MockCallback<
       AccountCapabilitiesFetcher::OnSomeCapabilitiesFetchedCallback>

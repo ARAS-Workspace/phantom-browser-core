@@ -1394,7 +1394,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest, UpdateManifestOrderedAppTags) {
 // Verifies that corrupted non-webstore policy-based extension is automatically
 // repaired (reinstalled).
 
-// TODO(crbug.com/511917153): Re-enable this test on Android.
 #define MAYBE_CorruptedNonWebstoreExtensionRepaired \
   CorruptedNonWebstoreExtensionRepaired
 IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
@@ -1468,7 +1467,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
 // Verifies that corrupted non-webstore policy-based extension is automatically
 // repaired (reinstalled) even if hashes file is damaged too.
 // crbug.com/40150293: flaky on win
-// crbug.com/512086953: flaky on android
 #define MAYBE_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired \
   CorruptedNonWebstoreExtensionWithDamagedHashesRepaired
 IN_PROC_BROWSER_TEST_F(
@@ -1548,7 +1546,6 @@ IN_PROC_BROWSER_TEST_F(
 // See https://crbug.com/40625642#comment23 for details.
 // TODO(crbug.com/40669814): Change this test so extension without hashes
 // will be also reinstalled.
-// TODO(crbug.com/511917153): Re-enable this test on Android.
 #define MAYBE_CorruptedNonWebstoreExtensionWithoutHashesRemained \
   CorruptedNonWebstoreExtensionWithoutHashesRemained
 IN_PROC_BROWSER_TEST_F(

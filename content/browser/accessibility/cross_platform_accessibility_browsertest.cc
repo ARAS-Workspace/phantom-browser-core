@@ -414,7 +414,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
             checkbox->GetStringAttribute(ax::mojom::StringAttribute::kDisplay));
 }
 
-// Android's text representation is different, so disable the test there.
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        ReparentingANodeShouldReuseSameNativeWrapper) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
@@ -920,7 +919,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
       button3->GetStringAttribute(ax::mojom::StringAttribute::kName).c_str());
 }
 
-// Android's text representation is different, so disable the test there.
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        AXNodePositionTreeBoundary) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
@@ -1014,7 +1012,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
   EXPECT_TRUE(test_position->AtEndOfAXTree());
 }
 
-// Android's text representation is different, so disable the test there.
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        NavigationSkipsCompositeItems) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
@@ -1430,7 +1427,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-// Select controls behave differently on Mac/Android, this test
+// Select controls behave differently on Mac, this test
 // doesn't apply.
 #if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
@@ -1530,7 +1527,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-// Android and Mac do not expose <select>s the same as other platforms do.
+// Mac does not expose <select>s the same as other platforms do.
 #if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        SelectWithOptgroupActiveDescendant) {
@@ -1749,8 +1746,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-// The color picker's popup behaves differently on Android, this test
-// doesn't apply.
 // TODO(crbug.com/40835208): This test is consistently failing in Fuchsia.
 // Similar to the test `ControlsIdsForDateTimePopup`, we should try to re-enable
 // it when content_browsertests runs in non-headless mode.
@@ -2298,8 +2293,6 @@ IN_PROC_BROWSER_TEST_F(
       input2->GetStringAttribute(StringAttribute::kPlaceholder).c_str());
 }
 
-// On Android root scroll offset is handled by the Java layer. The final rect
-// bounds is device specific.
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        GetBoundsRectUnclippedRootFrameFromIFrame) {
   LoadInitialAccessibilityTreeFromHtmlFilePath(
@@ -2710,9 +2703,6 @@ IN_PROC_BROWSER_TEST_F(
               root_accessibility_manager->GetFocus());
   }
 }
-
-// This test is checking behavior when ImplicitRootScroller is enabled which
-// applies only on Android.
 
 #if defined(IS_FAST_BUILD)  // Avoid flakiness on slower debug/sanitizer builds.
 
@@ -3206,9 +3196,6 @@ IN_PROC_BROWSER_TEST_F(
       ax::mojom::BoolAttribute::kSelectedFromFocus));
 }
 
-// We do not run this test on Android because only the Java code can change the
-// size of the web contents, instead see the associated test in
-// WebContentsAccessibilityTest#testBoundingBoxUpdatesOnWindowResize().
 #define MAYBE_FlexBoxBoundingBoxUpdatesOnWindowResize \
   FlexBoxBoundingBoxUpdatesOnWindowResize
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,

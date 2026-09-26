@@ -249,7 +249,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionOverrideTest, OverrideBookmarks) {
 
 // Test for overriding the Bookmarks page with an "incognito": "split"
 // extension.
-// TODO(crbug.com/531593528): Flaky on Android.
 #define MAYBE_OverrideBookmarksSplitMode OverrideBookmarksSplitMode
 IN_PROC_BROWSER_TEST_F(ExtensionOverrideTest, MAYBE_OverrideBookmarksSplitMode) {
   scoped_refptr<const Extension> extension =

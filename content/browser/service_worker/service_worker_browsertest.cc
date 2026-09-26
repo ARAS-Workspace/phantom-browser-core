@@ -4643,7 +4643,6 @@ class ServiceWorkerBackForwardCacheBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Fails on Android. https://crbug.com/1216619
 #define MAYBE_EvictionOfBackForwardCacheWithMultipleServiceWorkers \
   EvictionOfBackForwardCacheWithMultipleServiceWorkers
 
@@ -5007,7 +5006,6 @@ IN_PROC_BROWSER_TEST_P(
   RunTestWithWorkers("with-worker");
 }
 
-// Android does not have Shared Workers, so skip the shared worker test.
 // http://crbug.com/1385779
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_StorageKeyWithHostPermissionsWithSharedWorkers \
@@ -5277,8 +5275,6 @@ class ServiceWorkerWarmUpBrowserTestBase : public ServiceWorkerBrowserTest {
     base::RunLoop().RunUntilIdle();
   }
 };
-
-// Pointer triggered ServiceWorkerWarmUp is not currently available on Android.
 
 struct ServiceWorkerWarmUpByPointerBrowserTestParam {
   bool enable_warm_up_by_pointerover;
@@ -6563,7 +6559,6 @@ IN_PROC_BROWSER_TEST_P(
 }
 
 // TODO(crbug.com/40263529): Flaky on Fuchsia.
-// TODO(crbug.com/41490535): Flaky on Android.
 #define MAYBE_Subresource_FetchHandler_Wins_Redirect \
   Subresource_FetchHandler_Wins_Redirect
 IN_PROC_BROWSER_TEST_P(

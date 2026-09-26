@@ -797,7 +797,6 @@ TEST_F(MAYBE_LayerTreeHostScrollTestCaseWithChild,
 
 // TODO(crbug.com/41490731): Test is flaky on (at least) Mac and Linux asan.
 // TODO(crbug.com/345499781): Test is flaky on Linux.
-// TODO(crbug.com/364628836): Test is flaky on Android.
 #if defined(ADDRESS_SANITIZER) || defined(IS_LINUX)
 #define MAYBE_DeviceScaleFactor15_ScrollChild \
   DISABLED_DeviceScaleFactor15_ScrollChild

@@ -352,7 +352,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
   }
 }
 
-// Flaky on Android: crbug.com/403333571.
 #define MAYBE_ShouldTransitionSavedToSharedTabGroup \
   ShouldTransitionSavedToSharedTabGroup
 IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
@@ -433,7 +432,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
             saved_group_specifics.guid());
 }
 
-// Flaky on Android: crbug.com/403333571.
 #define MAYBE_ShouldTransitionSavedToSharedGroupRemotely \
   ShouldTransitionSavedToSharedGroupRemotely
 IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
@@ -831,7 +829,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
   EXPECT_THAT(GetAllTabGroups().front().saved_tabs(), SizeIs(1));
 }
 
-// Android doesn't support PRE_ tests.
 IN_PROC_BROWSER_TEST_P(SingleClientSharedTabGroupDataSyncTest,
                        PRE_ShouldReloadDataOnBrowserRestart) {
   const base::Uuid group_guid = base::Uuid::GenerateRandomV4();

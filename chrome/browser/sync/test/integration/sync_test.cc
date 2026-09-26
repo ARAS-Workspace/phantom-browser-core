@@ -317,8 +317,6 @@ void SyncTest::PostCreateThreads() {
 bool SyncTest::CreateProfile(int index) {
   base::FilePath profile_path;
 
-  // For Android, we don't create profile because Clank doesn't support
-  // multiple profiles.
   base::ScopedAllowBlockingForTesting allow_blocking;
 
   base::FilePath user_data_dir;

@@ -829,7 +829,6 @@ DEFINE_TEST_CLIENT(BrokenTransportClient) {
   // No-op. Exit immediately without accepting any invitation.
 }
 
-// TODO(crbug.com/407060377): Flaky in Android.
 #define MAYBE_NonBrokerToNonBroker NonBrokerToNonBroker
 
 TEST_F(MAYBE_InvitationTest, MAYBE_NonBrokerToNonBroker) {

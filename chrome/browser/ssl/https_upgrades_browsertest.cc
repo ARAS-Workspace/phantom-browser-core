@@ -3300,7 +3300,6 @@ IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
 
 // Test that HTTPS Upgrades are skipped if the "Insecure content" site setting
 // is set to "allow".
-// MIXED_SCRIPT isn't enabled as a content setting on Android.
 #define MAYBE_InsecureContentSettingDisablesUpgrades \
   InsecureContentSettingDisablesUpgrades
 IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
@@ -3362,7 +3361,6 @@ IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
 
 // Test that HTTPS Upgrades are skipped if the "Insecure content" site setting
 // is set to "allow".
-// MIXED_SCRIPT isn't enabled as a content setting on Android.
 // This test is identical to InsecureContentSettingDisablesUpgrades except it
 // sets a high site engagement score for the https URL and checks an additional
 // histogram.

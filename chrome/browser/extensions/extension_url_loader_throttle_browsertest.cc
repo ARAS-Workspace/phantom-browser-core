@@ -122,7 +122,6 @@ class ExtensionURLLoaderThrottleWithSplitCacheBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-// TODO(crbug.com/469417243): Flaky on desktop Android.
 #define MAYBE_ThrottleRequest ThrottleRequest
 // Tests that if the same URL is requested repeatedly by an extension, it will
 // eventually be throttled.

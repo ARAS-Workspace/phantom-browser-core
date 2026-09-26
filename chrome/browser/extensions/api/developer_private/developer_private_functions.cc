@@ -1051,7 +1051,6 @@ DeveloperPrivateNotifyDragInstallInProgressFunction::
 
 ExtensionFunction::ResponseAction
 DeveloperPrivateNotifyDragInstallInProgressFunction::Run() {
-  // Drop data is available only on drop on android.
   content::WebContents* web_contents = GetSenderWebContents();
   if (!web_contents) {
     return RespondNow(Error(kCouldNotFindWebContentsError));

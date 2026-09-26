@@ -640,8 +640,6 @@ TEST_F(V4GetHashProtocolManagerTest,
   res.mutable_negative_cache_duration()->set_seconds(600);
   ThreatMatch* m = res.add_matches();
   m->set_threat_type(API_ABUSE);
-  // TODO(crbug.com/40661879): This special case for Android will no longer be
-  // needed once GetCurrentPlatformType() returns ANDROID_PLATFORM on Android.
   m->set_platform_type(GetCurrentPlatformType());
   m->set_threat_entry_type(URL);
   m->mutable_threat()->set_hash(full_hash);

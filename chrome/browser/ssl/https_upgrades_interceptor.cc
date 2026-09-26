@@ -131,7 +131,6 @@ net::RedirectInfo SetupRedirect(
 // or hostname patterns (e.g., [*.]example.com) in site settings.
 bool DoesInsecureContentSettingDisableUpgrading(const GURL& url,
                                                 Profile* profile) {
-  // Mixed content isn't an overridable content setting on Android.
   HostContentSettingsMap* content_settings =
       HostContentSettingsMapFactory::GetForProfile(profile);
 

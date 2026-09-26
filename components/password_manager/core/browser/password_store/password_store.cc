@@ -484,12 +484,8 @@ void PasswordStore::NotifyLoginsChangedOnMainSequence(
     error = BackendErrorToActionableError(backend_error.type);
   } else {
     changes = std::move(std::get<PasswordChanges>(changes_or_error));
-    // On Android the `nullopt` value of `PasswordChangesOrError` is interpreted
-    // as not knowing the actual error state yet. On other platforms the
-    // `nullopt` value of `PasswordChangesOrError` means that there no
+    // The `nullopt` value of `PasswordChangesOrError` means that there no
     // actionable errors.
-    // TODO(crbug.com/535288574): Interpret the `nullopt` value consistently
-    // across platforms (or avoid using `nullopt`).
     // On platforms other than Android we know that in this case there are no
     // errors.
     error = ActionableError::kNoError;

@@ -63,9 +63,6 @@ ResultExpr RendererProcessPolicy::EvaluateSyscall(int sysno) const {
     case __NR_clock_getres_time64:
 #endif
       return RestrictClockID();
-      // Android requires a larger set of allowed ioctls, so this case is
-      // handled through BPFBasePolicy calling through to BaselinePolicyAndroid
-      // on Android.
     case __NR_ioctl:
       return RestrictIoctl();
     case __NR_fdatasync:

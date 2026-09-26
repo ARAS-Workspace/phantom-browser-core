@@ -14,9 +14,6 @@
 namespace gwp_asan::internal {
 
 size_t AllocationInfo::GetStackTrace(base::span<const void*> trace) {
-  // TODO(vtsyrklevich): Investigate using trace_event::CFIBacktraceAndroid
-  // on 32-bit Android for canary/dev (where we can dynamically load unwind
-  // data.)
   return base::debug::CollectStackTrace(trace);
 }
 

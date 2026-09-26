@@ -333,9 +333,6 @@ BASE_FEATURE_PARAM(size_t,
 
 BASE_FEATURE(kRelatedWebsitePartitionAPI, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Network-change migration requires NetworkHandle support, which are currently
-// only supported on Android (see
-// NetworkChangeNotifier::AreNetworkHandlesSupported).
 inline constexpr auto kMigrateSessionsOnNetworkChangeV2Default =
     base::FEATURE_DISABLED_BY_DEFAULT;
 BASE_FEATURE(kMigrateSessionsOnNetworkChangeV2,
@@ -738,9 +735,6 @@ BASE_FEATURE_PARAM(bool,
                    "http_cache_transaction",
                    false);
 
-// Since we are seeing consistent wins on Android, enable by default. We are
-// reiterating the experiment on other platforms to gather more data so that we
-// can make a launch decision.
 inline constexpr auto kDelayMainJob = base::FEATURE_DISABLED_BY_DEFAULT;
 inline constexpr auto kDefaultAdditionalDelay = base::Milliseconds(0);
 BASE_FEATURE(kAdditionalDelayMainJob, kDelayMainJob);

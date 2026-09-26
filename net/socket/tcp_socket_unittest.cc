@@ -1377,9 +1377,6 @@ TEST_P(TCPSocketTest, SPWNoAdvance) {
 }
 #endif  // defined(TCP_INFO) || BUILDFLAG(IS_LINUX)
 
-// On Android, where socket tagging is supported, verify that TCPSocket::Tag
-// works as expected.
-
 // Tests error handling in write.
 TEST_P(TCPSocketTest, WriteError) {
   ASSERT_NO_FATAL_FAILURE(SetUpListenIPv4());

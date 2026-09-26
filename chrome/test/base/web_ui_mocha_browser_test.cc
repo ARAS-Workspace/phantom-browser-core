@@ -103,7 +103,6 @@ std::tuple<bool, std::vector<SubTestResult>> ProcessMessagesFromJsTest(
 WebUIMochaBrowserTest::WebUIMochaBrowserTest()
     : test_loader_host_(chrome::kChromeUIWebUITestHost),
       test_loader_scheme_(content::kChromeUIScheme),
-      // XmlUnitTestResultPrinter is not supported on Android.
       sub_test_reporter_(std::make_unique<SubTestReporter>()) {}
 
 WebUIMochaBrowserTest::~WebUIMochaBrowserTest() = default;

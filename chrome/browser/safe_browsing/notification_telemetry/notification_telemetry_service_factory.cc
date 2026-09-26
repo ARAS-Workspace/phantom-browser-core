@@ -41,9 +41,6 @@ NotificationTelemetryServiceFactory::NotificationTelemetryServiceFactory()
 std::unique_ptr<KeyedService>
 NotificationTelemetryServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  // Exclude Android arm32 devices for performance and memory reasons.
-  // The ClientIncidentReport proto used to send these reports increases the
-  // Android binary size by more than the arm32 threshold.
   if (!g_browser_process || !g_browser_process->safe_browsing_service()) {
     return nullptr;
   }

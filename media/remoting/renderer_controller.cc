@@ -330,11 +330,10 @@ void RendererController::OnHlsManifestDetected() {
 void RendererController::UpdateRemotePlaybackAvailabilityMonitoringState() {
   // Currently RemotePlayback-initated media remoting only supports URL flinging
   // thus the source is supported when the URL is either http or https, video
-  // and audio codecs are supported by the remote playback device; HLS is
-  // playable by Chrome on Android (which is not detected by the pipeline
-  // metadata atm). On Desktop, `sink_metadata_` is empty until a streaming
-  // session has been established. So it's not possible to check if the receiver
-  // device supports the media's codec.
+  // and audio codecs are supported by the remote playback device. On Desktop,
+  // `sink_metadata_` is empty until a streaming session has been established.
+  // So it's not possible to check if the receiver device supports the media's
+  // codec.
   const bool is_media_supported =
       !pipeline_metadata_.video_decoder_config.is_encrypted() &&
       !pipeline_metadata_.audio_decoder_config.is_encrypted();

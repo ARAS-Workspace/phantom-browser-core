@@ -828,9 +828,6 @@ void TransformTree::UpdateLocalTransform(
   }
   gfx::Vector2dF position_adjustment(0.f, y_adjustment);
 
-  // Android does a stretch effect instead of translation - since we cannot do
-  // a simple translation to undo the root elastic overscroll effect -
-  // on Android we simply skip this.
   if (node->should_undo_overscroll) {
     UndoOverscroll(*node, position_adjustment, viewport_property_ids);
   }

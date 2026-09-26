@@ -495,11 +495,6 @@ void PerformanceManagerTabHelper::DidFinishNavigation(
 
 std::optional<blink::mojom::PermissionStatus> PerformanceManagerTabHelper::
     GetNotificationPermissionStatusAndObserveChanges() {
-  // Don't get the content settings on android on each navigation because it may
-  // induce scroll jank. There are many same-document navigations while
-  // scrolling and getting the settings can invoke expensive platform APIs on
-  // Android. Moreover, this information is only used to decide if a tab should
-  // be discarded, which doesn't happen through Chrome code on that platform.
   content::PermissionController* permission_controller =
       web_contents()->GetBrowserContext()->GetPermissionController();
   if (!permission_controller) {

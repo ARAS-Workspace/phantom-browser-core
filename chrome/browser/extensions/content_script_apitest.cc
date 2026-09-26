@@ -1106,7 +1106,6 @@ IN_PROC_BROWSER_TEST_F(ContentScriptApiTest,
   EXPECT_TRUE(listener.was_satisfied());
 }
 
-// TODO(crbug.com/441557607) Causes flaky GPU crashes on Android.
 #define MAYBE_DontInjectContentScriptsInBackgroundPages \
   DontInjectContentScriptsInBackgroundPages
 IN_PROC_BROWSER_TEST_F(ContentScriptApiTest,

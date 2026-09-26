@@ -124,7 +124,6 @@ constexpr char kDismissInteraction[] = "dismiss";
 constexpr char kIgnoreInteraction[] = "ignore";
 constexpr char kUseInteraction[] = "use";
 
-// TODO(b/502297163): Implement for Android.
 constexpr auto kModuleInteractionNames =
     base::MakeFixedFlatSet<std::string_view>(
         {kDisableInteraction, kDismissInteraction, kIgnoreInteraction,
@@ -180,7 +179,6 @@ new_tab_page::mojom::ThemePtr MakeTheme(
           ? ntp_custom_background_service->GetCustomBackground()
           : std::nullopt;
   theme->background_color = color_provider.GetColor(kColorNewTabPageBackground);
-  // TODO(b/502297163): Implement for Android.
   theme->is_baseline = theme_service->GetIsBaseline();
   // Theme is GM3 if there is a GM3 color set or the theme is baseline and no
   // CWS theme is set.
@@ -307,7 +305,6 @@ new_tab_page::mojom::ThemePtr MakeTheme(
   // installed a CWS theme with a bundled background image. The first condition
   // is necessary as a custom background image can be set while a CWS theme with
   // a bundled image is concurrently enabled (see crbug.com/40842679).
-  // TODO(b/502297163): Implement for Android.
   bool force_dark_logo = ShouldForceDarkForegroundColorsForLogo(theme_service);
   if (!custom_background.has_value() && theme_has_custom_image &&
       force_dark_logo) {
@@ -437,7 +434,6 @@ new_tab_page::mojom::PromoPtr MakePromo(const PromoData& data) {
   return promo;
 }
 
-// TODO(b/502297163): Implement for Android.
 base::DictValue MakeModuleInteractionTriggerIdDictionary() {
   const auto data = base::GetFieldTrialParamValueByFeature(
       features::kHappinessTrackingSurveysForDesktopNtpModules,
@@ -498,14 +494,12 @@ NewTabPageHandler::NewTabPageHandler(
               ntp_navigation_start_time_ticks),
       ntp_custom_background_service_(ntp_custom_background_service),
       logo_service_(logo_service),
-      // TODO(b/502297163): Implement for Android.
       theme_provider_(webui::GetThemeProviderDeprecated(web_contents)),
       theme_service_(theme_service),
       sync_service_(sync_service),
       segmentation_platform_service_(segmentation_platform_service),
       profile_(profile),
       web_contents_(web_contents),
-      // TODO(b/502297163): Implement for Android.
       feature_promo_helper_(std::make_unique<NewTabPageFeaturePromoHelper>()),
       ntp_navigation_start_time_(ntp_navigation_start_time),
       module_id_details_(module_id_details),
@@ -573,7 +567,6 @@ NewTabPageHandler::NewTabPageHandler(
       base::BindRepeating(&NewTabPageHandler::MaybeShowWebstoreToast,
                           base::Unretained(this)));
 
-  // TODO(b/502297163): Implement for Android.
   if (base::FeatureList::IsEnabled(
           feature_engagement::kIPHDesktopRealboxContextualSearchFeature)) {
     searchbox_shown_subscription_ =
@@ -592,7 +585,6 @@ NewTabPageHandler::~NewTabPageHandler() {
         ->RemoveModelExecutionSettingsEnabledObserver(this);
     optimization_guide_keyed_service_ = nullptr;
   }
-  // TODO(b/502297163): Implement for Android.
   if (microsoft_auth_service_) {
     microsoft_auth_service_->RemoveObserver(this);
   }
@@ -615,7 +607,6 @@ void NewTabPageHandler::RegisterProfilePrefs(PrefRegistrySimple* registry) {
       prefs::kNtpCustomizeChromeSidePanelAutoOpeningsCount, 0);
   registry->RegisterBooleanPref(prefs::kNtpCustomizeChromeExplicitlyClosed,
                                 false);
-  // TODO(b/502297163): Implement for Android.
   registry->RegisterBooleanPref(prefs::kNtpCustomizeChromeIPHAutoOpened, false);
 }
 
@@ -668,12 +659,10 @@ void NewTabPageHandler::UpdatePromoData() {
 }
 
 void NewTabPageHandler::BlocklistPromo(const std::string& promo_id) {
-  // TODO(b/502297163): Implement for Android.
   promo_service_->BlocklistPromo(promo_id);
 }
 
 void NewTabPageHandler::UndoBlocklistPromo(const std::string& promo_id) {
-  // TODO(b/502297163): Implement for Android.
   promo_service_->UndoBlocklistPromo(promo_id);
 }
 
@@ -766,7 +755,6 @@ void NewTabPageHandler::OnModulesLoadedWithData(
     IncrementDictPrefKeyCount(prefs::kNtpModulesLoadedCountDict, module_id);
   }
 
-  // TODO(b/502297163): Implement for Android.
   std::vector<std::string> survey_eligible_module_ids =
       GetSurveyEligibleModuleIds();
   if (std::any_of(module_ids.begin(), module_ids.end(),
@@ -925,7 +913,6 @@ void NewTabPageHandler::UpdateModulesLoadable() {
 }
 
 void NewTabPageHandler::UpdateFooterVisibility() {
-  // TODO(b/502297163): Implement for Android.
   if (!base::FeatureList::IsEnabled(ntp_features::kNtpFooter)) {
     return;
   }
@@ -1171,7 +1158,6 @@ void NewTabPageHandler::OnPromoDataUpdated() {
 }
 
 void NewTabPageHandler::OnPromoServiceShuttingDown() {
-  // TODO(b/502297163): Implement for Android.
   promo_service_observation_.Reset();
   promo_service_ = nullptr;
 }
@@ -1232,7 +1218,6 @@ void NewTabPageHandler::OnLogoAvailable(
 }
 
 void NewTabPageHandler::OnBrowserWindowInterfaceChanged() {
-  // TODO(b/502297163): Implement for Android.
   if (!base::FeatureList::IsEnabled(ntp_features::kNtpFooter)) {
     return;
   }
@@ -1258,7 +1243,6 @@ void NewTabPageHandler::OnBrowserWindowInterfaceChanged() {
 }
 
 void NewTabPageHandler::MaybeTriggerAutomaticCustomizeChromePromo() {
-  // TODO(b/502297163): Implement for Android.
   feature_promo_helper_->MaybeTriggerAutomaticCustomizeChromePromo(
       web_contents_);
 }
@@ -1381,7 +1365,6 @@ void NewTabPageHandler::MaybeLaunchInteractionSurvey(
     std::string_view interaction,
     const std::string& module_id,
     int delay_time_ms) {
-  // TODO(b/502297163): Implement for Android.
   const auto& module_trigger_id =
       GetSurveyTriggerIdForModuleAndInteraction(interaction, module_id);
   if (module_trigger_id.empty()) {
@@ -1419,7 +1402,6 @@ void NewTabPageHandler::IncrementDictPrefKeyCount(const std::string& pref_name,
                   : 1);
 }
 
-// TODO(b/502297163): Implement for Android.
 const std::string& NewTabPageHandler::GetSurveyTriggerIdForModuleAndInteraction(
     std::string_view interaction,
     const std::string& module_id) {
@@ -1486,7 +1468,6 @@ bool NewTabPageHandler::SyncMicrosoftModulesWithAuth() {
   return state != MicrosoftAuthService::AuthState::kNone;
 }
 
-// TODO(b/502297163): Implement for Android.
 void NewTabPageHandler::TryShowRealboxContextualMenuIPH(
     ui::TrackedElement* element) {
   if (!element || !element->IsA<ui::TrackedElementWebUI>()) {

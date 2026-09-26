@@ -313,7 +313,6 @@ class UkmBrowserTestWithDemographics
 
 // Make sure that UKM is disabled while an incognito window is open.
 // LINT.IfChange(RegularPlusIncognitoCheck)
-// Disabled on Android due to flakiness. See crbug.com/355609356.
 #define MAYBE_RegularPlusIncognitoCheck RegularPlusIncognitoCheck
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MAYBE_RegularPlusIncognitoCheck) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());
@@ -408,7 +407,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, RegularPlusGuestCheck) {
   CloseBrowserSynchronously(regular_browser);
 }
 
-// ProfilePicker and System profile do not exist on Android.
 // Displaying the ProfilePicker implicitly creates a System Profile.
 // System Profile shouldn't have any effect on the UKM Enable Status.
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, ProfilePickerCheck) {
@@ -440,7 +438,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, ProfilePickerCheck) {
   CloseBrowserSynchronously(regular_browser);
 }
 
-// Not applicable to Android as it doesn't have multiple profiles.
 // Make sure that UKM is disabled while an non-sync profile's window is open.
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, OpenNonSyncCheck) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());
@@ -642,7 +639,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, NetworkProviderPopulatesSystemProfile) {
 }
 
 // Verifies that install date is attached.
-// Disabled on Android due to flakiness. See crbug.com/355609356.
 #define MAYBE_InstallDateProviderPopulatesSystemProfile \
   InstallDateProviderPopulatesSystemProfile
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest,
@@ -676,7 +672,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest,
 }
 
 // Make sure that providing consent doesn't enable UKM when sync is disabled.
-// Flaky on Android crbug.com/40700711
 #define MAYBE_ConsentAddedButNoSyncCheck ConsentAddedButNoSyncCheck
 // LINT.IfChange(ConsentAddedButNoSyncCheck)
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MAYBE_ConsentAddedButNoSyncCheck) {
@@ -890,8 +885,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, LogsOpenerSource) {
             subsequent_source->navigation_data().opener_source_id);
 }
 
-// Flaky on Android: https://crbug.com/40700532.
-//
 // Make sure that UKM is disabled when the profile signs out of Sync.
 // LINT.IfChange(SingleSyncSignoutCheck)
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, SingleSyncSignoutCheck) {
@@ -914,7 +907,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, SingleSyncSignoutCheck) {
   ClosePlatformBrowser(browser);
 }
 
-// Android doesn't have multiple profiles.
 // Make sure that UKM is disabled when any profile signs out of Sync.
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MultiSyncSignoutCheck) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());
@@ -987,7 +979,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MetricsReportingCheck) {
 
 // Make sure that pending data is deleted when user deletes history.
 // LINT.IfChange(HistoryDeleteCheck)
-// Flaky on Android: https://crbug.com/40721445.
 #define MAYBE_HistoryDeleteCheck HistoryDeleteCheck
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MAYBE_HistoryDeleteCheck) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());

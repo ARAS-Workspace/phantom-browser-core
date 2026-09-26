@@ -173,7 +173,6 @@ std::unique_ptr<addrinfo, FreeAddrInfoFunc> AddrInfoGetter::getaddrinfo(
   std::unique_ptr<addrinfo, FreeAddrInfoFunc> rv = {nullptr, deleter};
 
   if (network != handles::kInvalidNetworkHandle) {
-    // Currently, only Android supports lookups for a specific network.
     errno = ENOSYS;
     *out_os_error = EAI_SYSTEM;
     return rv;

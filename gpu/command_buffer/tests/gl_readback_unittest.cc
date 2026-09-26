@@ -155,8 +155,6 @@ static GLuint CompileShader(GLenum type, const char *data) {
 
 // TODO(zmo): ReadPixels with float type isn't implemented in ANGLE ES2
 // backend. crbug.com/607283.
-// TODO(zmo): This test also fails on some android devices when the readback
-// type is HALF_FLOAT_OES. Likely it's due to a driver bug. crbug.com/607936.
 #define MAYBE_ReadPixelsFloat ReadPixelsFloat
 TEST_F(GLReadbackTest, MAYBE_ReadPixelsFloat) {
   const GLsizei kTextureSize = 4;

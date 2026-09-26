@@ -372,7 +372,6 @@ class ObserverLogger : public RenderProcessHostObserver {
   bool host_destroyed_;
 };
 
-// Flaky on Android. http://crbug.com/759514.
 #define MAYBE_AllProcessExitedCallsBeforeAnyHostDestroyedCalls \
   AllProcessExitedCallsBeforeAnyHostDestroyedCalls
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
@@ -493,8 +492,6 @@ class AudioStartObserver : public WebContentsObserver {
 // Note: This test can't run when the Mojo Renderer is used since it does not
 // create audio streams through the normal audio pathways; at present this is
 // only used by Chromecast.
-//
-// crbug.com/864476: flaky on Android for unclear reasons.
 #if BUILDFLAG(ENABLE_MOJO_RENDERER)
 #define KillProcessZerosAudioStreams DISABLED_KillProcessZerosAudioStreams
 #endif
@@ -610,7 +607,6 @@ IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
 // Tests that video capture stream counts (used for process priority
 // calculations) are properly set and cleared during media playback and renderer
 // terminations.
-// Test is flaky on Android builders: https://crbug.com/352065578
 #define MAYBE_KillProcessZerosVideoCaptureStreams \
   KillProcessZerosVideoCaptureStreams
 IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
@@ -673,7 +669,6 @@ IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
 // Tests that media stream counts (used for process priority
 // calculations) are properly set and cleared during media playback and renderer
 // terminations for audio only streams.
-// Test is flaky on Android builders: https://crbug.com/352065578
 #define MAYBE_KillProcessZerosVideoCaptureStreams \
   KillProcessZerosVideoCaptureStreams
 IN_PROC_BROWSER_TEST_F(CaptureStreamRenderProcessHostTest,
@@ -808,7 +803,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
   EXPECT_EQ(rph->worker_ref_count(), 1);
 }
 
-// Test is flaky on Android builders: https://crbug.com/875179
 #define MAYBE_KeepAliveRendererProcess_Hung KeepAliveRendererProcess_Hung
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
                        MAYBE_KeepAliveRendererProcess_Hung) {
@@ -867,7 +861,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
   }
 }
 
-// Test is flaky on Android builders: https://crbug.com/875179
 #define MAYBE_FetchKeepAliveRendererProcess_Hung \
   FetchKeepAliveRendererProcess_Hung
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
@@ -2263,7 +2256,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, DISABLED_ReuseSiteURLChanges) {
             site_instance->GetProcess());
 }
 
-// Test is flaky on Android bots: https://crbug.com/465476682
 #define MAYBE_FastShutdownWithSingleOutermostMainFrame \
   FastShutdownWithSingleOutermostMainFrame
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
@@ -2322,7 +2314,6 @@ class RenderProcessHostTestWithBFCache : public RenderProcessHostTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Test is flaky on Android bots: https://crbug.com/465476682
 #define MAYBE_FastShutdownWithSingleOutermostMainFrameBFCache \
   FastShutdownWithSingleOutermostMainFrameBFCache
 IN_PROC_BROWSER_TEST_P(RenderProcessHostTestWithBFCache,
@@ -2419,7 +2410,6 @@ class PreEstablishGpuChannelRenderProcessHostTest
 INSTANTIATE_TEST_SUITE_P(
     All,
     PreEstablishGpuChannelRenderProcessHostTest,
-    // Android doesn't support software compositing.
     testing::Bool(),
     [](const testing::TestParamInfo<
         PreEstablishGpuChannelRenderProcessHostTest::ParamType>& info) {

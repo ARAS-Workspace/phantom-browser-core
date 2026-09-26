@@ -186,8 +186,7 @@ IN_PROC_BROWSER_TEST_F(PageContentMetadataObserverBrowserTest,
 
 // TODO(https://crbug.com/455816130): Test is flaky on component browser tests.
 // TODO(https://crbug.com/460575998): Test is flaky on fuchsia-fyi-x64-asan.
-// TODO(https://crbug.com/460575998): Test is flaky on linux, android-arm-64 and
-// chromeos tests.
+// TODO(https://crbug.com/460575998): Test is flaky on linux and chromeos tests.
 // TODO(crbug.com/542608093): Test is flaky on linux-win-cross-rel and windows.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_NoMetaTags DISABLED_NoMetaTags

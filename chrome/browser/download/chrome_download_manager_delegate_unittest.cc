@@ -2255,7 +2255,6 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
 }
 
 // Auto cancel is only available on platforms with download bubble.
-// TODO(crbug.com/397407934): Support auto cancel reports on Android.
 TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
        AutoCanceledReport_Sent) {
   safe_browsing::SetSafeBrowsingState(

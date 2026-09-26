@@ -239,12 +239,6 @@ IN_PROC_BROWSER_TEST_F(NoOverrideSitePerProcessPolicyBrowserTest, Simple) {
   CheckExpectations(expectations);
 }
 
-// After https://crbug.com/41429044 was fixed, enterprise policy can only be
-// used to disable Site Isolation on Android - the
-// SitePerProcessPolicyBrowserTestFieldTrialTest tests should not be run on any
-// other platform.  Note that browser_tests won't run on Android until
-// https://crbug.com/40469222 is fixed.
-
 IN_PROC_BROWSER_TEST_F(SiteIsolationPolicyBrowserTest,
                        NoPolicyNoTrialsFlags_NoAdvancedProtection_HighRam) {
   // The switch to disable Site Isolation should be missing by default (i.e.

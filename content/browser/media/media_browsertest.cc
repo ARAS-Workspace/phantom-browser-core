@@ -29,7 +29,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "url/url_util.h"
 
-// Proprietary codecs require acceleration on Android.
 #define REQUIRE_ACCELERATION_ON_ANDROID()
 
 namespace content {
@@ -214,8 +213,6 @@ IN_PROC_BROWSER_TEST_P(MediaTest, VideoBearSilentWebm) {
   PlayVideo("bear_silent.webm");
 }
 
-// We don't expect android devices to support highbit yet.
-
 // TODO(crbug.com/40242077): DEMUXER_ERROR_NO_SUPPORTED_STREAMS error on
 // Fuchsia Arm64.
 #define MAYBE_VideoBearHighBitDepthVP9 VideoBearHighBitDepthVP9
@@ -361,8 +358,6 @@ IN_PROC_BROWSER_TEST_P(MediaTest, VideoBearHighBitDepthMp4) {
 
 #endif
 
-// Android can't reliably load lots of videos on a page.
-// See http://crbug.com/749265
 // TODO(crbug.com/40774322): Flaky on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_LoadManyVideos DISABLED_LoadManyVideos

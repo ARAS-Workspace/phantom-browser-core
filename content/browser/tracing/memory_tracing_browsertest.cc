@@ -182,11 +182,7 @@ class MemoryTracingTest : public ContentBrowserTest {
   bool last_callback_success_;
 };
 
-// Run SingleProcessMemoryTracingTests only on Android, since these tests are
-// intended to give coverage to Android WebView.
-
 // Flaky on Mac. crbug.com/809809
-// Failing on Android ASAN. crbug.com/1041392
 // TODO(crbug.com/40720107): OSMetrics::GetProcessMemoryMaps is not
 // implemented on Fuchsia
 #if BUILDFLAG(IS_MAC)

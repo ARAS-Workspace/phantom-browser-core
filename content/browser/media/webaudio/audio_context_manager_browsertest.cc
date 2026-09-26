@@ -95,7 +95,6 @@ IN_PROC_BROWSER_TEST_F(AudioContextManagerTest,
 }
 
 // Flaky on Linux: crbug.com/941219
-// Flaky on Android: crbug.com/941219
 // Flaky on Mac: crbug.com/941219
 // Flaky on Fuchsia: crbug.com/941219
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

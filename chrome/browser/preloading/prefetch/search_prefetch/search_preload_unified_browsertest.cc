@@ -1431,8 +1431,6 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
       SearchPrefetchStatus::kCanBeServed, 1);
 }
 
-// TODO(https://cubug.com/1282624): This test should run on Android after we're
-// able to interact with Android UI.
 IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest, TriggerAndActivate) {
   base::HistogramTester histogram_tester;
   const GURL kInitialUrl = embedded_test_server()->GetURL("/empty.html");
@@ -1791,7 +1789,6 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
 
 // Tests that the SearchSuggestionService can trigger prerendering if it
 // receives prerender hints after the previous prefetch request succeeds.
-// TODO(crbug.com/442469525): Deflake and re-enable on Android.
 #define MAYBE_PrerenderHintReceivedAfterCompletion \
   PrerenderHintReceivedAfterCompletion
 IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
@@ -2026,7 +2023,6 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
 
 // Edge case: when the prerendering navigation is still reading from the cache,
 // the loader would not be deleted until finishing reading.
-//  TODO(crbug.com/498955649): Flaky on Android device Pixel Tablet
 #define MAYBE_ServingToPrerenderingUntilCompletion \
   ServingToPrerenderingUntilCompletion
 IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
@@ -2305,8 +2301,6 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
   prerender_serving_loader.DisconnectMojoPipes();
 }
 
-// We cannot open the result in another tab on Android.
-
 // Tests that even when prerendering is not failed, users can open the
 // prefetched result in another tab and activate the prefetched response
 // successfully.
@@ -2541,8 +2535,6 @@ IN_PROC_BROWSER_TEST_F(SearchPrefetchActivationBeaconBrowserTest,
   WaitForActivationBeacon();
 }
 
-// TODO(crbug.com/393195683): Same as the FetchPrerenderActivated test, the
-// user agent mismatch will cause the test to fail on Android desktop.
 #define MAYBE_SearchPrefetchToPrerenderUpgradeActivationBeaconSent \
   SearchPrefetchToPrerenderUpgradeActivationBeaconSent
 IN_PROC_BROWSER_TEST_F(

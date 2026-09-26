@@ -870,7 +870,6 @@ TEST_F(PermissionSubscriptionTest,
       ->UnsubscribeFromPermissionResultChange(subscription_id);
 }
 
-// TODO(https://crbug.com/359831269): Fix new tab page test for Android.
 #define MAYBE_SubscribeUnsubscribeForNewTabPage \
   SubscribeUnsubscribeForNewTabPage
 TEST_P(PermissionSubscriptionGeolocationTest,

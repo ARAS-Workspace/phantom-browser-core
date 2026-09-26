@@ -1252,7 +1252,7 @@ bool Channel::OnControlMessage(Message::MessageType message_type,
   return false;
 }
 
-// Currently only CrOs, Linux, and Android support upgrades.
+// Currently only CrOs and Linux support upgrades.
 #if !BUILDFLAG(IS_LINUX)
 // static
 MOJO_SYSTEM_IMPL_EXPORT bool Channel::SupportsChannelUpgrade() {

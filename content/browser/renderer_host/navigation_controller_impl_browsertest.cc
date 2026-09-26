@@ -12249,7 +12249,6 @@ INSTANTIATE_TEST_SUITE_P(
                      testing::Bool()),
     NavigationControllerBrowserTest::DescribeParams);
 
-// This test uses ASSERT_DEATH, which is not supported on Android.
 // This ensures that origin integrity is enforced even during history
 // navigations, and protects against session history corruption. See
 // https://crbug.com/41492620 for context.
@@ -23765,7 +23764,6 @@ IN_PROC_BROWSER_TEST_P(NavigationControllerBrowserTest,
   FrameTreeNode* root = contents()->GetPrimaryFrameTree().root();
   EXPECT_TRUE(root->current_frame_host()->IsRenderFrameLive());
 
-  // - Death tests misbehave on Android, http://crbug.com/643760.
 #if defined(GTEST_HAS_DEATH_TEST)
   // Disable the policy. Debug URL now crashes the browser process.
   content_browser_client.SetBlockDebugUrls(false);

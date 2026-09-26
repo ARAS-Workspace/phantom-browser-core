@@ -1138,8 +1138,6 @@ TEST_F(NetworkServiceTest, AuthNtlmV2Enabled) {
 }
 #endif  // BUILDFLAG(IS_POSIX)
 
-// |android_negotiate_account_type| is only supported on Android.
-
 static size_t GetGlobalMaxConnectionsPerProxyChain() {
   return net::ClientSocketPoolManager::max_sockets_per_proxy_chain(
       net::HttpNetworkSession::SocketPoolType::kNormal);

@@ -391,7 +391,7 @@ bool DiscardableSharedMemory::Purge(Time current_time) {
 // freed asynchronously at a later time, so just do the best
 // immediately.
 #if BUILDFLAG(IS_POSIX)
-// Linux and Android provide MADV_REMOVE which is preferred as it has a
+// Linux provides MADV_REMOVE which is preferred as it has a
 // behavior that can be verified in tests. Other POSIX flavors (MacOSX, BSDs),
 // provide MADV_FREE which has the same result but memory is purged lazily.
 #if BUILDFLAG(IS_LINUX)

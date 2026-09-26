@@ -36,8 +36,6 @@ void CreateAndAddHTMLSource(Profile* profile, const std::string& host_name) {
 
   source->AddString("pageTitle", page_title);
 
-  // TODO(crbug.com/391777809): Make the message available on desktop android
-  // without adding unused strings.
   std::u16string page_heading = l10n_util::GetStringFUTF16(
       IDS_PAGE_NOT_AVAILABLE_FOR_GUEST_HEADING, page_title);
   source->AddString("pageHeading", page_heading);

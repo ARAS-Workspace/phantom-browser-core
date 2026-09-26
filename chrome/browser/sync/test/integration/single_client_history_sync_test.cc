@@ -306,8 +306,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
   WaitForServerHistory(UnorderedElementsAre(UrlIs(synced_url)));
 }
 
-// TODO(crbug.com/40871747): EnterSyncPausedStateForPrimaryAccount is currently
-// not supported on Android. Enable these tests once it is.
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest, DoesNotUploadWhilePaused) {
   ASSERT_TRUE(SetupSync());
 

@@ -4846,10 +4846,6 @@ TEST_F(CertVerifyProcBuiltinTest, UnknownSignatureAlgorithmRoot) {
   EXPECT_THAT(error, IsOk());
 }
 
-// This test is disabled on Android as adding the invalid root through
-// ScopedTestRoot causes it to be parsed by the Java X509 code which barfs. We
-// could re-enable if Chrome on Android has fully switched to the
-// builtin-verifier and ScopedTestRoot no longer has Android-specific code.
 #define MAYBE_UnparsableMismatchedTBSSignatureAlgorithmRoot \
   UnparsableMismatchedTBSSignatureAlgorithmRoot
 TEST_F(CertVerifyProcBuiltinTest,

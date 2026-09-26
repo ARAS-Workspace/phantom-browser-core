@@ -1796,13 +1796,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                                            StorageTypeAccessed::kFileSystem,
                                            StorageTypeAccessed::kIndexedDB));
 
-// WebAuthn tests do not work on Android because there is no current way to
-// install a virtual authenticator.
-// NOTE: Manual testing was performed to ensure this implementation works as
-// expected on Android platform.
-// TODO(crbug.com/40269763): Implement automated testing once the infrastructure
-// permits it (Requires mocking the Android Platform Authenticator i.e. GMS
-// Core).
 // Some refs for this test fixture:
 // clang-format off
 // - https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/webauthn/chrome_webauthn_browsertest.cc;drc=c4061a03f240338b42a5b84c98b1a11b62a97a9a

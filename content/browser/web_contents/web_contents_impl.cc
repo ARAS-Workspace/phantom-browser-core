@@ -9857,7 +9857,6 @@ void WebContentsImpl::RecursivelyConstructAXTree(
 void WebContentsImpl::ApplyAXTreeFixingResult(ui::AXTreeID tree_id,
                                               ui::AXNodeID node_id,
                                               ax::mojom::Role role) {
-  // The AXTreeFixing feature is not currently available on Android.
   CHECK(features::IsAXTreeFixingEnabled());
 
   GetPrimaryMainFrame()->ForEachRenderFrameHostImplWithAction(

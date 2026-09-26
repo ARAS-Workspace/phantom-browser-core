@@ -364,8 +364,6 @@ void PrintConsoleMessage(const InsecureDownloadData& data) {
 bool IsDownloadPermittedByContentSettings(
     Profile* profile,
     const std::optional<url::Origin>& initiator) {
-  // TODO(crbug.com/40117459): Checking content settings crashes unit tests on
-  // Android. It shouldn't.
   HostContentSettingsMap* host_content_settings_map =
       HostContentSettingsMapFactory::GetForProfile(profile);
   ContentSettingsForOneType settings =

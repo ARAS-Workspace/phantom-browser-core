@@ -181,7 +181,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, Basics) {
   ASSERT_TRUE(RunExtensionTest("management/basics"));
 }
 
-// TODO(crbug.com/371332103): Flaky on Android.
 #define MAYBE_NoPermission NoPermission
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, MAYBE_NoPermission) {
   LoadExtensions();

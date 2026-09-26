@@ -208,7 +208,6 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Combine(::testing::Bool(), ::testing::Bool()),
     &AudioProcessorTestMultichannelAndFormat::PrintTestName);
 
-// Test crashing with ASAN on Android. crbug.com/468762
 #define MAYBE_WithAudioProcessing WithAudioProcessing
 TEST_P(AudioProcessorTestMultichannelAndFormat, MAYBE_WithAudioProcessing) {
   AudioProcessingSettings settings{.multi_channel_capture_processing =
@@ -242,7 +241,6 @@ TEST_F(AudioProcessorTest, TurnOffDefaultConstraints) {
   ProcessDataAndVerifyFormat(*audio_processor, mock_capture_callback_);
 }
 
-// Test crashing with ASAN on Android. crbug.com/468762
 #define MAYBE_TestAllSampleRates TestAllSampleRates
 TEST_P(AudioProcessorTestMultichannelAndFormat, MAYBE_TestAllSampleRates) {
   AudioProcessingSettings settings{.multi_channel_capture_processing =

@@ -215,8 +215,7 @@ BASE_FEATURE(kProgrammaticScrollAnimationOverride,
                      &kProgrammaticScrollAnimationOverride,                    \
                      "max_animation_duration",                                 \
                      base::Milliseconds(duration_ms))
-// Default to `gfx::CubicBezierTimingFunction::EaseType::EASE_IN_OUT` on
-// Android. On other platforms, use the tweaked cubic bezier curve.
+// Use the tweaked cubic bezier curve.
 PROGRAMMATIC_SCROLL_ANIMATION_CURVE(0.4, 0.0, 0.0, 1.0, 1500);
 #undef PROGRAMMATIC_SCROLL_ANIMATION_CURVE
 

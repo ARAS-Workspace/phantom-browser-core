@@ -1253,7 +1253,6 @@ void BrowserAccessibilityManager::ScrollToMakeVisible(
   delegate_->AccessibilityPerformAction(action_data);
   AXPlatform::GetInstance().OnActionFromAssistiveTech();
 
-  // Android has an official api for accessibility focus.
   // Update our notion of accessibility focus on the root browser accessibility
   // manager.
   BrowserAccessibilityManager* root_manager = GetManagerForRootFrame();

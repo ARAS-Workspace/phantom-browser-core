@@ -1045,7 +1045,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionBackForwardCacheBrowserTest,
              "document.getElementById('stage').value;"));
 }
 
-// Flaky on desktop Android.
 #define MAYBE_ActiveTabPermissionRevoked ActiveTabPermissionRevoked
 // Test that an activeTab permission temporarily granted to an extension for a
 // page does not revive when the BFCache entry is restored.
@@ -1093,7 +1092,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionBackForwardCacheBrowserTest,
   ExpectTitleChangeFail(*extension);
 }
 
-// Flaky on desktop Android.
 #define MAYBE_ActiveTabPermissionClearedOnBFCacheRestore \
   ActiveTabPermissionClearedOnBFCacheRestore
 // Test that an activeTab permission granted to an extension for a page is

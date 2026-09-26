@@ -28,7 +28,6 @@
 #include "ui/gfx/shadow_value.h"
 #include "ui/gfx/skia_paint_util.h"
 
-// Typography is not supported in Android yet.
 #include "ui/views/style/typography.h"
 #include "ui/views/style/typography_provider.h"
 

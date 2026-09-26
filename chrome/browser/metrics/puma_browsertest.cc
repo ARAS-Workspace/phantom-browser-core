@@ -192,7 +192,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, PumaServiceCheck) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
   ASSERT_NE(GetPumaService(), nullptr);
-  // For Android, EnableReporting to avoid flaky test failures.
 
   PlatformBrowser browser = CreatePlatformBrowser(profile);
   ExpectPumaReportingEnabled("Browser did not enable PUMA.");
@@ -212,7 +211,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, PumaServiceCheck) {
 IN_PROC_BROWSER_TEST_F(PumaBrowserTest, RegularBrowserPlusIncognitoCheck) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
-  // For Android, EnableReporting to avoid flaky test failures.
 
   // PUMA should be enabled when opening the first regular browser.
   PlatformBrowser browser1 = CreatePlatformBrowser(profile);
@@ -272,7 +270,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, RegularBrowserPlusIncognitoCheck) {
 IN_PROC_BROWSER_TEST_F(PumaBrowserTest, IncognitoPlusRegularBrowserCheck) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
-  // For Android, EnableReporting to avoid flaky test failures.
 
   Profile* incognito_profile =
       profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);

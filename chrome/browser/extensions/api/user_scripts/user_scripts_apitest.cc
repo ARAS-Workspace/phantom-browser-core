@@ -476,7 +476,6 @@ IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,
 
 // Tests that registered user scripts are properly ignored when loading
 // stored dynamic scripts if the API is not allowed.
-// TODO(crbug.com/441364550): Flaky on desktop Android.
 #define MAYBE_PRE_UserScriptsDisabledOnStartupIfAPINotAllowed \
   PRE_UserScriptsDisabledOnStartupIfAPINotAllowed
 IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,
@@ -511,7 +510,6 @@ IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,
                                                    /*allowed=*/false);
 }
 
-// TODO(crbug.com/441364550): Flaky on desktop Android.
 #define MAYBE_UserScriptsDisabledOnStartupIfAPINotAllowed \
   UserScriptsDisabledOnStartupIfAPINotAllowed
 IN_PROC_BROWSER_TEST_F(UserScriptsAPITestWithoutAPIAllowed,

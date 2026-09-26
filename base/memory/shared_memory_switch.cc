@@ -103,9 +103,6 @@ std::string Serialize(HandleType shmem_handle,
   // caller, who is responsible for updating |launch_options| or the zygote
   // launch parameters, as appropriate.
   //
-  // TODO(crbug.com/40109064): Create a wrapper to release and return the
-  // primary descriptor for android (ScopedFD) vs non-android (ScopedFDPair).
-  //
   // TODO(crbug.com/40109064): Get rid of |descriptor_to_share| and just
   // populate |launch_options|. The caller should be responsible for translating
   // between |launch_options| and zygote parameters as necessary.

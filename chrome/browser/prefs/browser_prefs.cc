@@ -1346,7 +1346,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 
   UnifiedAutoplayConfig::RegisterProfilePrefs(registry);
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
-  // TODO(b/502297163): Implement for Android.
   NewTabFooterUI::RegisterProfilePrefs(registry);
   NewTabPageHandler::RegisterProfilePrefs(registry);
   NewTabPageUI::RegisterProfilePrefs(registry);

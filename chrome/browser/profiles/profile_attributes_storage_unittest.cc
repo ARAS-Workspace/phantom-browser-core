@@ -345,7 +345,6 @@ TEST_F(ProfileAttributesStorageTest, AddProfiles) {
   DisableObserver();  // This test doesn't test observers.
 
   EXPECT_EQ(0u, storage()->GetNumberOfProfiles());
-  // Avatar icons not used on Android.
   ui::ResourceBundle& rb = ui::ResourceBundle::GetSharedInstance();
 
   for (size_t i = 0; i < 4u; ++i) {
@@ -1361,7 +1360,6 @@ TEST_F(ProfileAttributesStorageTest, ProfileForceSigninLock) {
   ASSERT_FALSE(entry->IsSigninRequired());
 }
 
-// Avatar icons not used on Android.
 TEST_F(ProfileAttributesStorageTest, AvatarIconIndex) {
   base::FilePath profile_path = AddTestingProfile();
 
@@ -1643,8 +1641,6 @@ TEST_F(ProfileAttributesStorageTest, ProfilesState_ActiveMultiProfile) {
       "Profile.State.LastUsed_LatentMultiProfileOthers", 0);
 }
 
-// On Android (at least on KitKat), all profiles are considered active (because
-// ActiveTime is not set in production). Thus, these test does not work.
 TEST_F(ProfileAttributesStorageTest, ProfilesState_LatentMultiProfile) {
   EXPECT_EQ(0U, storage()->GetNumberOfProfiles());
   for (size_t i = 0; i < 5; ++i)
@@ -1696,7 +1692,6 @@ TEST_F(ProfileAttributesStorageTest, ProfilesState_SingleProfile) {
       "Profile.State.LastUsed_LatentMultiProfileOthers", 0);
 }
 
-// Themes aren't used on Android
 TEST_F(ProfileAttributesStorageTest, ProfileThemeColors) {
   ui::MockOsSettingsProvider os_settings_provider;
   base::FilePath profile_path = AddTestingProfile();
@@ -1785,7 +1780,6 @@ TEST_F(ProfileAttributesStorageTest, GAIAPicture) {
   VerifyAndResetCallExpectations();
   EXPECT_FALSE(entry->IsUsingDefaultAvatar());
   EXPECT_FALSE(entry->IsUsingGAIAPicture());
-  // Avatar icons not used on Android.
 
   size_t other_avatar_id =
       GetDefaultAvatarIconResourceIDAtIndex(kOtherAvatarIndex);

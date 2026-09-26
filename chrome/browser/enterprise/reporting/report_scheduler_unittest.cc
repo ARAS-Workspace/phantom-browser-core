@@ -691,8 +691,6 @@ TEST_F(ReportSchedulerTest, ManualReportWithRegularOneOngoing) {
   ::testing::Mock::VerifyAndClearExpectations(uploader_);
 }
 
-// Android does not support version updates
-
 // Tests that a basic report is generated and uploaded when a browser update is
 // detected.
 TEST_F(ReportSchedulerTest, OnUpdate) {

@@ -165,7 +165,6 @@ class MockDeviceManagerClient
   mojo::AssociatedReceiver<UsbDeviceManagerClient> receiver_{this};
 };
 
-// Android does not use UsbConnectionTracker.
 class MockUsbConnectionTracker : public UsbConnectionTracker {
  public:
   explicit MockUsbConnectionTracker(Profile* profile)
@@ -987,7 +986,6 @@ TEST_F(ChromeUsbDelegateSmartCardExtensionRenderFrameTest,
   TestAllowlistedSmartCardConnectorExtension(web_contents());
 }
 
-// Not supported on Android. See NOTREACHED in WebUsbServiceImpl constructor.
 TEST_F(ChromeUsbDelegateImprivataExtensionServiceWorkerTest,
        AllowlistedImprivataExtension) {
   TestAllowlistedImprivataExtension(nullptr);

@@ -519,12 +519,8 @@ void ExternalProtocolHandler::LaunchUrl(
 
   g_accept_requests = false;
 
-  // Shell integration code below doesn't work on Android - default handler
-  // checks are instead handled through the InterceptNavigationDelegate. See
-  // ExternalNavigationHandler.java.
   // The Origin is used for security checks, not for displaying to the user, so
   // the precursor origin should not be used.
-  // Also, a protocol dialog isn't used on Android.
   std::optional<url::Origin> initiating_origin_or_precursor;
   if (initiating_origin) {
     // Transform the initiating origin to its precursor origin if it is

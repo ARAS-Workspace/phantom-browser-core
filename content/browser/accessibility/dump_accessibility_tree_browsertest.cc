@@ -32,9 +32,6 @@
 #endif
 
 
-// Tests that use @DEFAULT_ACTION-ON to open a popup for an <input> (such as
-// color or date/time pickers) never complete on Android, where native pickers
-// are used. Because that UI is native, it is not necessary to pass those tests.
 #define NOT_ANDROID(x) x
 
 namespace content {
@@ -2160,7 +2157,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
   RunHtmlTest(FILE_PATH_LITERAL("aside-inside-section-role-generic.html"));
 }
 
-// TODO(crbug.com/40943250): Fix failure on android
 #define MAYBE_AccessibilityAudio AccessibilityAudio
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, MAYBE_AccessibilityAudio) {
   RunHtmlTest(FILE_PATH_LITERAL("audio.html"));
@@ -4244,7 +4240,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
   RunCrashTest(FILE_PATH_LITERAL("node-changed-crash-in-editable-text.html"));
 }
 
-// TODO(crbug.com/40866942): This test is failing on Android.
 #define MAYBE_AccessibilityNoSourceVideo AccessibilityNoSourceVideo
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
                        MAYBE_AccessibilityNoSourceVideo) {

@@ -116,8 +116,7 @@ IN_PROC_BROWSER_TEST_P(ScrollingIntegrationTest,
 
   content::mojom::GestureSourceType source;
 
-  // TODO(bokan): Mac doesn't support touch events and for an unknown reason,
-  // Android doesn't like mouse wheel here. https://crbug.com/897520.
+  // TODO(bokan): Mac doesn't support touch events. https://crbug.com/897520.
   source = content::mojom::GestureSourceType::kTouchpadInput;
 
   // Perform the scroll (below the iframe), ensure it's correctly processed.
@@ -866,7 +865,6 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
 
 // Tests that scrolling with the keyboard will bubble unused scroll to the
 // OOPIF's parent.
-// Disabled on Android due to flakes; see b/338341090.
 #define MAYBE_KeyboardScrollBubblingFromOOPIF KeyboardScrollBubblingFromOOPIF
 IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
                        MAYBE_KeyboardScrollBubblingFromOOPIF) {

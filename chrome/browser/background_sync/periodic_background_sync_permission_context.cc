@@ -84,9 +84,6 @@ PeriodicBackgroundSyncPermissionContext::GetContentSettingStatusInternal(
     const GURL& embedding_origin) const {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
-// TODO(crbug.com/397357113): PermissionStatus `change` event not triggered
-// when TWA or PWA is installed or uninstalled on Android.
-
   bool can_bypass_install_requirement =
       base::FeatureList::IsEnabled(
           features::kPeriodicSyncPermissionForDefaultSearchEngine) &&

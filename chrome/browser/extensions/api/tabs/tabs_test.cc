@@ -1047,8 +1047,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, InvalidUpdateWindowBounds) {
   }
 }
 
-// On Android this fails when Run() calls BaseWindow::CanResize() returns false
-// due to default Android Browser Tests not having free-form windows.
 IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
                        UpdatingWindowBoundsSucceedsForValidBounds) {
   scoped_refptr<const Extension> extension(ExtensionBuilder("Test").Build());
@@ -3509,7 +3507,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_SavedTabGroupTab) {
       tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile());
   ASSERT_TRUE(saved_service);
   // Wait for the TabGroupSyncService to properly initialize before making any
-  // changes to tab groups. This is not used on Android.
+  // changes to tab groups.
   tab_groups::TabGroupSyncServiceInitializedObserver observer(saved_service);
   observer.Wait();
 
@@ -3602,8 +3600,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsUpdate_SavedTabGroupTab) {
 
   ASSERT_TRUE(saved_service->GetGroup(group_id));
 
-  // TODO(https://crbug.com/447211263): Re-enable this subtest once there is
-  // support on desktop android.
   {  // Test setting the discard state.
     auto function = base::MakeRefCounted<TabsUpdateFunction>();
     function->set_extension(extension.get());
@@ -4340,7 +4336,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsMoveSavedTabGroupTabAllowed) {
       tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile());
   ASSERT_TRUE(saved_service);
   // Wait for the TabGroupSyncService to properly initialize before making any
-  // changes to tab groups. This is not used on Android.
+  // changes to tab groups.
   tab_groups::TabGroupSyncServiceInitializedObserver observer(saved_service);
   observer.Wait();
 

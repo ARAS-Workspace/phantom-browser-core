@@ -29,9 +29,6 @@
 #include "extensions/common/mojom/context_type.mojom.h"
 #include "ui/base/base_window.h"
 
-// TODO(http://crbug.com/453008083): Stop including
-// "android/chrome_feature_list.h".
-
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"  // nogncheck

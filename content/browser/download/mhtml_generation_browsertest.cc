@@ -635,8 +635,6 @@ IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, GenerateMHTML) {
 
 
 // Regression test for the crash/race from https://crbug.com/612098.
-//
-// TODO(crbug.com/41456635): Flaky on Android.
 #define MAYBE_GenerateMHTMLAndCloseConnection GenerateMHTMLAndCloseConnection
 IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest,
                        MAYBE_GenerateMHTMLAndCloseConnection) {
@@ -715,7 +713,6 @@ IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, GenerateMHTMLIgnoreNoStore) {
   EXPECT_THAT(info.ContentLocations(), Contains(EndsWith("/nostore.html")));
 }
 
-// TODO(crbug.com/40470937): These fail on Android under some circumstances.
 #define MAYBE_ViewedMHTMLContainsNoStoreContent \
   ViewedMHTMLContainsNoStoreContent
 

@@ -90,8 +90,6 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
            ? AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS
            : 0) |
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-      // The `chrome.omnibox` extension API uses `TYPE_KEYWORD`, including on
-      // desktop Android.
       AutocompleteProvider::TYPE_KEYWORD |
       // `UnscopedExtensionProvider` should only be included when extensions are
       // enabled and the `ExperimentalOmniboxLabs` feature is enabled.

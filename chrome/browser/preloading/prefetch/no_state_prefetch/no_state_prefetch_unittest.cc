@@ -946,7 +946,6 @@ TEST_F(NoStatePrefetchTest, LinkManagerAbandonThenCancel) {
   ASSERT_FALSE(no_state_prefetch_manager()->FindEntry(url));
 }
 
-// Flaky on Android, crbug.com/40695134.
 // Flaky on Mac and Linux, crbug.com/40695035.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_LinkManagerAddTwiceCancelTwice \

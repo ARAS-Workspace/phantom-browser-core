@@ -62,10 +62,7 @@ class SampledOutClientIdSavedBrowserTest : public PlatformBrowserTest {
     ChromeMetricsServiceAccessor::SetForceIsMetricsReportingEnabledPrefLookup(
         true);
 
-    // Disable |kMetricsReportingFeature| to simulate being sampled out. For
-    // Android Chrome, we instead disable |kPostFREFixMetricsReportingFeature|
-    // since that is the feature used to verify sampling for clients that newly
-    // enable metrics reporting.
+    // Disable |kMetricsReportingFeature| to simulate being sampled out.
     feature_list_.InitAndDisableFeature(
         metrics::internal::kMetricsReportingFeature);
 

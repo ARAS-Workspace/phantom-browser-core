@@ -547,12 +547,6 @@ TEST_P(URLRequestQuicWithTcpTest, AltServiceWrongCert) {
 // case, the `kTestServerHost` alt service entry points to `kOtherHost`, which
 // is the only hostname that resolves (and serves a response using a
 // `kTestServerHost` cert).
-//
-// These tests are slightly flaky, but are particularly so on Android debug
-// bots. These are the only QUIC integration tests that don't disable TCP, so
-// still seems better to keep them enabled where possible.
-//
-// TODO(https://crbug.com/503402050): Fix these tests.
 #define MAYBE_AltServiceRightCert AltServiceRightCert
 TEST_P(URLRequestQuicWithTcpTest, MAYBE_AltServiceRightCert) {
   SetUpLocalhostDnsRecord(kOtherHost);
@@ -578,12 +572,6 @@ TEST_P(URLRequestQuicWithTcpTest, MAYBE_AltServiceRightCert) {
 // Tests that the alt service destination checks block alt-service requests from
 // reusing a non-alt-service QUIC session with the same destination, when the
 // connection attempts are both alive at once.
-//
-// These tests are slightly flaky, but are particularly so on Android debug
-// bots. These are the only QUIC integration tests that don't disable TCP, so
-// still seems better to keep them enabled where possible.
-//
-// TODO(https://crbug.com/503402050): Fix these tests.
 #define MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttempt \
   AltServiceWrongCertSimultaneousNonAltServiceQuicAttempt
 TEST_P(URLRequestQuicWithTcpTest,
@@ -624,12 +612,6 @@ TEST_P(URLRequestQuicWithTcpTest,
 // Tests that the alt service destination checks block alt-service requests from
 // reusing a non-alt-service QUIC session with the same destination, when the
 // connection attempts are both alive at once.
-//
-// These tests are slightly flaky, but are particularly so on Android debug
-// bots. These are the only QUIC integration tests that don't disable TCP, so
-// still seems better to keep them enabled where possible.
-//
-// TODO(https://crbug.com/503402050): Fix these tests.
 #define MAYBE_AltServiceWrongCertSimultaneousNonAltServiceQuicAttemptReverseOrder \
   AltServiceWrongCertSimultaneousNonAltServiceQuicAttemptReverseOrder
 TEST_P(
@@ -669,12 +651,6 @@ TEST_P(
 // Tests that the alt service destination checks block alt-service requests from
 // reusing a pre-existing non-alt-service QUIC session with the same
 // destination.
-//
-// These tests are slightly flaky, but are particularly so on Android debug
-// bots. These are the only QUIC integration tests that don't disable TCP, so
-// still seems better to keep them enabled where possible.
-//
-// TODO(https://crbug.com/503402050): Fix these tests.
 #define MAYBE_AltServiceWrongCertExistingNonAltServiceQuicSession \
   AltServiceWrongCertExistingNonAltServiceQuicSession
 TEST_P(URLRequestQuicWithTcpTest,
@@ -710,12 +686,6 @@ TEST_P(URLRequestQuicWithTcpTest,
 
 // Tests the case where two hosts have the same QUIC alt service destination,
 // but the server only serves a response that's valid for one of the two hosts.
-//
-// These tests are slightly flaky, but are particularly so on Android debug
-// bots. These are the only QUIC integration tests that don't disable TCP, so
-// still seems better to keep them enabled where possible.
-//
-// TODO(https://crbug.com/503402050): Fix these tests.
 #define MAYBE_TwoAltServiceRequestsOneWrongCert \
   TwoAltServiceRequestsOneWrongCert
 TEST_P(URLRequestQuicWithTcpTest, MAYBE_TwoAltServiceRequestsOneWrongCert) {
@@ -752,12 +722,6 @@ TEST_P(URLRequestQuicWithTcpTest, MAYBE_TwoAltServiceRequestsOneWrongCert) {
 }
 
 // Same as above, but with the order flipped.
-//
-// These tests are slightly flaky, but are particularly so on Android debug
-// bots. These are the only QUIC integration tests that don't disable TCP, so
-// still seems better to keep them enabled where possible.
-//
-// TODO(https://crbug.com/503402050): Fix these tests.
 #define MAYBE_TwoAltServiceRequestsOneWrongCertReverseOrder \
   TwoAltServiceRequestsOneWrongCertReverseOrder
 TEST_P(URLRequestQuicWithTcpTest,
@@ -796,12 +760,6 @@ TEST_P(URLRequestQuicWithTcpTest,
 
 // Tests that the alt service destination checks block alt-service requests from
 // reusing a pre-existing alt-service QUIC session with the same destination,
-//
-// These tests are slightly flaky, but are particularly so on Android debug
-// bots. These are the only QUIC integration tests that don't disable TCP, so
-// still seems better to keep them enabled where possible.
-//
-// TODO(https://crbug.com/503402050): Fix these tests.
 #define MAYBE_AltServiceRequestWrongCertExistingAltServiceQuicSession \
   AltServiceRequestWrongCertExistingAltServiceQuicSession
 // but different target origin.

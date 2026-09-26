@@ -21,7 +21,6 @@ TEST(BuildTime, DateLooksValid) {
 #endif
 }
 
-// Disabled on Android due to flakes; see https://crbug.com/1474884.
 #define MAYBE_InThePast InThePast
 TEST(BuildTime, MAYBE_InThePast) {
   EXPECT_LT(base::GetBuildTime(), base::Time::Now());

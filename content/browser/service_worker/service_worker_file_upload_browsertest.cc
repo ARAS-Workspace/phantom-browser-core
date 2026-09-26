@@ -455,7 +455,6 @@ std::pair<std::string, std::string> ExtractBoundaryAndBody(
 }
 
 // Tests a subresource request.
-// Flaky on Android; see https://crbug.com/1320972.
 #define MAYBE_Subresource Subresource
 IN_PROC_BROWSER_TEST_P(ServiceWorkerFileUploadTest, MAYBE_Subresource) {
   const base::FilePath file_path = CreateTemporaryFile();
@@ -470,7 +469,6 @@ IN_PROC_BROWSER_TEST_P(ServiceWorkerFileUploadTest, MAYBE_Subresource) {
 
 // Tests a subresource request where the filename is non-ascii. Regression test
 // for https://crbug.com/1017184.
-// Flaky on Android; see https://crbug.com/1335344.
 // Fail on Mac; see https://crbug.com/1320972.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_Subresource_NonAsciiFilename DISABLED_Subresource_NonAsciiFilename

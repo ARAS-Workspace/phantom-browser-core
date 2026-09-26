@@ -414,8 +414,6 @@ bool PasswordProtectionServiceBase::IsSupportedPasswordTypeForModalWarning(
   if (password_type.account_type() == ReusedPasswordAccountType::SAVED_PASSWORD)
     return true;
 
-  // Currently password reuse warnings are only supported for saved passwords
-  // and GAIA passwords on Android.
   if (password_type.account_type() ==
       ReusedPasswordAccountType::NON_GAIA_ENTERPRISE)
     return true;

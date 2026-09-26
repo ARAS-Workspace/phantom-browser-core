@@ -412,7 +412,6 @@ TEST_F(PermissionRequestManagerTest, UkmSourceIdIsCorrectlyPopulated) {
 // Requests grouping
 ////////////////////////////////////////////////////////////////////////////////
 
-// Android is the only platform that does not support the permission chip.
 TEST_F(PermissionRequestManagerTest, ThreeRequestsStackOrderChip) {
   // Test new permissions order, requests shouldn't be grouped.
   MockPermissionRequest::MockPermissionRequestState request1_state;
@@ -1581,7 +1580,6 @@ TEST_F(PermissionRequestManagerTest, NotificationsSingleBubbleAndChipRequest) {
   EXPECT_EQ(prompt_factory_->show_count(), 1);
 }
 
-// Android is the only platform that does not support the permission chip.
 // Quiet UI feature is disabled, no low priority requests, the last request is
 // always shown.
 //

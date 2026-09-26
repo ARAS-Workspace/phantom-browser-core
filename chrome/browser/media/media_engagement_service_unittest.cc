@@ -894,8 +894,6 @@ TEST_P(MediaEngagementServiceTest, HasHighEngagement) {
   EXPECT_FALSE(HasHighEngagement(origin3));
 }
 
-// Disable test on Android. Feature `kPreloadMediaEngagementData` is not
-// available for this platforms.
 #define MAYBE_HasHighEngagement_PreloadListOriginPresent \
   HasHighEngagement_PreloadListOriginPresent
 TEST_P(MediaEngagementServiceTest,
@@ -912,8 +910,6 @@ TEST_P(MediaEngagementServiceTest,
   EXPECT_TRUE(HasHighEngagement(origin));
 }
 
-// Disable test on Android. Feature `kPreloadMediaEngagementData` is not
-// available for this platforms.
 #define MAYBE_HasHighEngagement_ScoreVisits HasHighEngagement_ScoreVisits
 TEST_P(MediaEngagementServiceTest, MAYBE_HasHighEngagement_ScoreVisits) {
   url::Origin origin = url::Origin::Create(GURL("https://google.com"));

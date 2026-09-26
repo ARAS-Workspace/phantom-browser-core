@@ -42,7 +42,6 @@
 
 namespace base {
 
-// TODO(jrg): Find out if setproctitle or equivalent is available on Android.
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_SOLARIS)
 
 void SetProcessTitleFromCommandLine(const char** main_argv) {

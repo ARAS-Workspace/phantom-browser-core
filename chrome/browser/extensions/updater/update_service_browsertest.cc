@@ -695,7 +695,6 @@ IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest, MAYBE_Backoff) {
   }
 }
 
-// Also flaky on desktop Android. Crashes during test shutdown in ~CrxInstaller.
 #define MAYBE_PRE_PolicyCorruptedOnStartup PRE_PolicyCorruptedOnStartup
 #define MAYBE_PolicyCorruptedOnStartup PolicyCorruptedOnStartup
 // We want to test what happens at startup with a corruption-disabled policy

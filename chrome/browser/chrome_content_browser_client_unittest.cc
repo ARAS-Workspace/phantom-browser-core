@@ -275,8 +275,6 @@ TEST_F(ChromeContentBrowserClientTest, ShouldAssignSiteForURL) {
       GURL("https://www.google.com")));
 }
 
-// BrowserWithTestWindowTest doesn't work on Android.
-
 using ChromeContentBrowserClientTestWithWebContents =
     ChromeRenderViewHostTestHarness;
 

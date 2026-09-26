@@ -35,9 +35,6 @@ namespace {
 base::FilePath GetProfileFileDirectory() {
   base::FilePath path;
 
-  // Android differs from the other platforms because it's not possible to
-  // write in base::DIR_CURRENT and environment variables aren't well supported.
-
   std::unique_ptr<base::Environment> env(base::Environment::Create());
   std::optional<std::string> prof_template = env->GetVar("LLVM_PROFILE_FILE");
   if (prof_template.has_value()) {

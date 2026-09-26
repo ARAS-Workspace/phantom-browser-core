@@ -87,8 +87,6 @@
 #include "ui/gfx/color_palette.h"
 #include "url/gurl.h"
 
-// TODO(b/502297163): Remove this guard once these desktop-only features are
-// enabled on Android.
 #include "chrome/browser/themes/theme_helper.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/themes/theme_service.h"

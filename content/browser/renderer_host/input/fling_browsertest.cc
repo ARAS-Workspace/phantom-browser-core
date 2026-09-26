@@ -646,7 +646,6 @@ class PhysicsBasedFlingCurveBrowserTest : public BrowserSideFlingBrowserTest {
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-// TODO(crbug.com/40737075): Re-enable on Android.
 #define MAYBE_TargetScrollOffsetForFlingAnimation \
   TargetScrollOffsetForFlingAnimation
 IN_PROC_BROWSER_TEST_F(PhysicsBasedFlingCurveBrowserTest,

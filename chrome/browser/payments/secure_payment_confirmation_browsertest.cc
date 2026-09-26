@@ -479,8 +479,6 @@ IN_PROC_BROWSER_TEST_F(SecurePaymentConfirmationActivationlessShowTest,
   ExpectEvent2(Event2::kActivationlessShow, true);
 }
 
-// TODO(crbug.com/40266119): This test does not work on Android as it is
-// difficult to wait for the bottom sheet to finish showing.
 #define MAYBE_ShowAfterActivationlessShow ShowAfterActivationlessShow
 IN_PROC_BROWSER_TEST_F(SecurePaymentConfirmationActivationlessShowTest,
                        MAYBE_ShowAfterActivationlessShow) {

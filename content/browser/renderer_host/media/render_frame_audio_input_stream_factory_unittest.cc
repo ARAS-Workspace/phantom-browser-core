@@ -46,7 +46,6 @@
 
 namespace content {
 
-// RenderViewHostTestHarness works poorly on Android.
 #define MAYBE_RenderFrameAudioInputStreamFactoryTest \
   RenderFrameAudioInputStreamFactoryTest
 

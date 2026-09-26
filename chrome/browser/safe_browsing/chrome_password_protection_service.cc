@@ -316,9 +316,6 @@ void ChromePasswordProtectionService::Init() {
 
 void ChromePasswordProtectionService::SetSyncPasswordHash(
     const std::string& sync_password_hash) {
-  // The following code is disabled on Android. RefreshTokenIsAvailable cannot
-  // be used in unit tests, because it needs to interact with system accounts.
-  // Considering avoid running it during unit tests. See: crbug.com/40101266.
   // This code is shared by the normal ctor and testing ctor.
   sync_password_hash_ = sync_password_hash;
   if (!sync_password_hash_.empty()) {
@@ -1345,8 +1342,6 @@ void ChromePasswordProtectionService::MaybeReportPasswordReuseDetected(
     std::string username_or_email =
         username.empty() ? GetAccountInfo().email : username;
 
-    // Disabled on Android, because enterprise reporting extension is not
-    // supported.
     auto* safe_browsing_event_router =
         extensions::SafeBrowsingPrivateEventRouterFactory::GetForProfile(
             profile_);
@@ -1375,8 +1370,6 @@ void ChromePasswordProtectionService::ReportPasswordChanged() {
     return;
   }
 
-  // Disabled on Android, because enterprise reporting extension is not
-  // supported.
   auto* safe_browsing_event_router =
       extensions::SafeBrowsingPrivateEventRouterFactory::GetForProfile(
           profile_);
@@ -1635,11 +1628,6 @@ bool ChromePasswordProtectionService::IsPingingEnabled(
       return extended_reporting_enabled;
     }
 
-    // Only saved password reuse, GAIA password reuse, and OTP field detection
-    // can result in enforcement for Android users. Therefore, other types of
-    // password reuse events should be gated by Safe Browsing extended reporting
-    // because phishy verdicts won't be enforced making the pings
-    // telemetry-only.
     return true;
   }
   // Since it's possible that on-focus pings could trigger for many visited

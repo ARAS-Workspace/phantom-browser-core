@@ -192,9 +192,6 @@ TEST(StackCopierSignalTest, MAYBE_CopyStackDelegateInvoked) {
   EXPECT_TRUE(stack_copier_delegate.on_stack_copy_was_invoked());
 }
 
-// Limit to 32-bit Android, which is the platform we care about for this
-// functionality. The test is broken on too many other varied platforms to try
-// to selectively disable.
 #define MAYBE_CopyStackFromOtherThread DISABLED_CopyStackFromOtherThread
 TEST(StackCopierSignalTest, MAYBE_CopyStackFromOtherThread) {
   StackBuffer stack_buffer(/* buffer_size = */ 1 << 20);

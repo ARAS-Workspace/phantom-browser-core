@@ -173,7 +173,6 @@ void MaybeCreateExtensionWebRequestReporterForRenderer(
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-// BadgeManager is not used for Android.
 void BindBadgeServiceForServiceWorker(
     const content::ServiceWorkerVersionBaseInfo& info,
     mojo::PendingReceiver<blink::mojom::BadgeService> receiver) {

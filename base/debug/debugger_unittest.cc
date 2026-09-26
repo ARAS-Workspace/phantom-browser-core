@@ -20,7 +20,6 @@ void CrashWithBreakDebugger() {
 
 }  // namespace
 
-// Death tests misbehave on Android.
 #if defined(GTEST_HAS_DEATH_TEST)
 
 TEST(Debugger, CrashAtBreakpoint) {

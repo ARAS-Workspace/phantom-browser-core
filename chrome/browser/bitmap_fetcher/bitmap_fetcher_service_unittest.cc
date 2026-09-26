@@ -167,7 +167,6 @@ TEST_F(BitmapFetcherServiceTest, CacheRequest) {
   RequestImage(url1_);
   CompleteFetch(url1_);
 
-  // No caching on Android.
   EXPECT_EQ(1U, cache_size());
 }
 

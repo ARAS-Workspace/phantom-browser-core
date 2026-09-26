@@ -4091,9 +4091,6 @@ IN_PROC_BROWSER_TEST_F(DownloadContentTest,
 
 // A download initiated by the user via alt-click on a link should download,
 // even when redirected cross origin.
-//
-// Alt-click doesn't make sense on Android, and download a HTML file results
-// in an intent, so just skip.
 IN_PROC_BROWSER_TEST_F(DownloadContentTest,
                        DownloadAttributeSameOriginRedirectAltClick) {
   net::EmbeddedTestServer origin_one;

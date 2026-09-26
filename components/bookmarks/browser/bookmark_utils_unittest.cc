@@ -61,8 +61,6 @@ class BookmarkUtilsTest : public testing::Test,
   // expect one call each to GroupedBookmarkChangesBeginning/Ended.
   void ExpectGroupedChangeCount(int expected_beginning_count,
                                 int expected_ended_count) {
-    // The undo framework is not used under Android.  Thus the group change
-    // events will not be fired and so should not be tested for Android.
     EXPECT_EQ(grouped_changes_beginning_count_, expected_beginning_count);
     EXPECT_EQ(grouped_changes_ended_count_, expected_ended_count);
   }

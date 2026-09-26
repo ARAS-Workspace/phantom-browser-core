@@ -94,9 +94,6 @@ namespace {
 static constexpr base::TimeDelta kTokenRequestDelay = base::Seconds(3);
 static constexpr base::TimeDelta kMaxRejectionTime = base::Seconds(60);
 
-// Users spend less time on Android to dismiss the UI. Given the difference, we
-// use two set of values. The values are calculated based on UMA data to follow
-// lognormal distribution.
 static constexpr double kRejectionLogNormalMu = 8.6;
 static constexpr double kRejectionLogNormalSigma = 1.4;
 

@@ -333,8 +333,6 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_Msbb) {
 }
 // LINT.ThenChange(/ios/chrome/browser/metrics/model/dwa_egtest.mm:UkmMsbbConsentChangeCheck)
 
-// Not enabled on Android because on Android, kApps and kExtensions is not
-// registered through UserSelectableType.
 // This test ensures that disabling Extensions UKM consent disables and purges
 // DWA. Additionally ensures that DWA is disabled until all UKM consents are
 // enabled.

@@ -1132,9 +1132,6 @@ bool GpuInit::InitializeVulkan() {
   gpu_info_.hardware_supports_vulkan = true;
   gpu_info_.vulkan_info =
       vulkan_implementation_->GetVulkanInstance()->vulkan_info();
-  // Limit the use of Vulkan's vendorID and deviceID to Android.
-  // This is because other platforms, for example, Linux, collect such
-  // information somewhere else and we don't want to overwrite it.
 
   return true;
 #else   // !BUILDFLAG(ENABLE_VULKAN)

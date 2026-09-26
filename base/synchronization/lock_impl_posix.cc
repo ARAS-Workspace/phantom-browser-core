@@ -177,10 +177,6 @@ bool LockImpl::PriorityInheritanceAvailable() {
 }  // namespace internal
 
 bool KernelSupportsPriorityInheritanceFutex() {
-  // https://android-review.googlesource.com/c/3481472 which fixes priority
-  // inheritance using rt-mutexes in the kernel landed in the 6.12.13 android
-  // kernel and was backported to the 6.1.75 and 6.6.29 kernels. This change
-  // hasn't been upstreamed yet.
   return false;
 }
 

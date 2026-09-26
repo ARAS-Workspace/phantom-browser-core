@@ -96,11 +96,10 @@ class DomDistillerJsTest : public content::ContentBrowserTest {
   }
 };
 
-// Disabled on MSan, TSAN as well as Android and Linux CFI bots.
+// Disabled on MSan, TSAN as well as Linux CFI bots.
 // https://crbug.com/845180
 // https://crbug.com/1434395
 // https://crbug.com/387892105
-// Then disabled more generally on Android: https://crbug.com/979685
 // TODO(jaebaek):  HTMLImageElement::LayoutBoxWidth() returns a value that has
 // a small error from the real one (i.e., the real is 38, but it returns 37)
 // and it results in the failure of

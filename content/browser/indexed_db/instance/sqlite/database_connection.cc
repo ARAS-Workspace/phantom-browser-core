@@ -307,8 +307,6 @@ std::tuple<bool, unsigned int /*freelist_percentage*/> NeedsVacuum(
     sql::Database& db) {
   unsigned int freelist_percentage =
       base::ClampDiv(GetFreelistCount(db) * 100, GetPageCount(db));
-  // Default autovacuum is enabled on Android, so reclaiming free space is
-  // not a reason to vacuum.
   // TODO(crbug.com/436880909): consider vacuuming old-ish databases that
   // may be fragmented.
   // Note that //sql configures a multi-page chunk size for large DBs, so if

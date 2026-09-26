@@ -1953,8 +1953,7 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 
   // On most platforms, there is a legacy policy
   // kUnsafelyTreatInsecureOriginAsSecure which has been replaced by
-  // kOverrideSecurityRestrictionsOnInsecureOrigin. The legacy policy was never
-  // supported on Android, so on those platforms, simply use the new one.
+  // kOverrideSecurityRestrictionsOnInsecureOrigin.
   std::vector<std::unique_ptr<ConfigurationPolicyHandler>>
       secure_origin_legacy_policy;
   secure_origin_legacy_policy.push_back(

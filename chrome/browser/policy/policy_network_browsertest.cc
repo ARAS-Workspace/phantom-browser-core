@@ -558,7 +558,6 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest,
   EXPECT_EQ(FetchResourceForEarlyDataCheck(), kEarlyDataNotAcceptedTitle);
 }
 
-// TODO(crbug.com/418717917, crbug.com/419211957): Flaky on Android.
 #define MAYBE_TLS13EarlyDataPolicyEnable TLS13EarlyDataPolicyEnable
 IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest,
                        MAYBE_TLS13EarlyDataPolicyEnable) {
@@ -584,7 +583,6 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest, TLS13EarlyDataPolicyDisable) {
   EXPECT_EQ(FetchResourceForEarlyDataCheck(), kEarlyDataNotAcceptedTitle);
 }
 
-// TODO(crbug.com/475587477, crbug.com/477510552): Flaky on Android.
 #define MAYBE_EnableWithRestart EnableWithRestart
 IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest, MAYBE_EnableWithRestart) {
   PolicyMap policies;

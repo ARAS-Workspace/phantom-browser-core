@@ -298,7 +298,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest, InputEventRoutingTouch) {
   EXPECT_EQ(50, EvalJs(primary_main_frame_host(), "window.__touch_y"));
 }
 
-// TODO(crbug.com/534380085): Flaky/failing on Android.
 #define MAYBE_LightDismissEscKey LightDismissEscKey
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest, MAYBE_LightDismissEscKey) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
@@ -555,9 +554,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
   EXPECT_GE(popup_bounds.height(), 90);
 }
 
-// Mouse events are not routed through UnboundedSurfaceWindow on Android, as
-// native touch/pointer events are handled by the regular Android View
-// hierarchy.
 #define MAYBE_PopupInputEventRouting PopupInputEventRouting
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
                        MAYBE_PopupInputEventRouting) {
@@ -604,9 +600,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
             EvalJs(primary_main_frame_host(), "window.__mouse_y"));
 }
 
-// Mouse events are not routed through UnboundedSurfaceWindow on Android, as
-// native touch/pointer events are handled by the regular Android View
-// hierarchy.
 #define MAYBE_PopupOutsideViewportInputEventRouting \
   PopupOutsideViewportInputEventRouting
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
@@ -702,9 +695,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
   EXPECT_EQ(370, EvalJs(primary_main_frame_host(), "window.__mouse_y"));
 }
 
-// Mouse events are not routed through UnboundedSurfaceWindow on Android, as
-// native touch/pointer events are handled by the regular Android View
-// hierarchy.
 #define MAYBE_IframeClickEventRouting IframeClickEventRouting
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
                        MAYBE_IframeClickEventRouting) {
@@ -851,7 +841,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest, DynamicBoundsSync) {
   }
 }
 
-// TODO(crbug.com/534380085): Flaky/failing on Android.
 #define MAYBE_NestedChildBoundsExpansionTriggersRedraw \
   NestedChildBoundsExpansionTriggersRedraw
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
@@ -898,7 +887,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
   EXPECT_EQ(200, window->GetBounds().width());
 }
 
-// TODO(crbug.com/534380085): Flaky/failing on Android.
 #define MAYBE_AnimatedChildWithBoxShadowSubmitsFrame \
   AnimatedChildWithBoxShadowSubmitsFrame
 IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,

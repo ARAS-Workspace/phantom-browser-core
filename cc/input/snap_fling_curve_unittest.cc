@@ -92,7 +92,7 @@ TEST(SnapFlingCurveTest, EstimateDisplacementFeatureDisabled) {
       SnapFlingCurve::EstimateDisplacement(current_delta, previous_delta,
                                            /*allow_slow_decay=*/false);
   EXPECT_TRUE(displacement.has_value());
-  // Default scalar is 25 on non-Android, 40 on Android.
+  // Default scalar is 25.
   EXPECT_EQ(gfx::Vector2dF(0, -250), *displacement);
 
   previous_delta = gfx::Vector2dF(0, -20);

@@ -89,8 +89,6 @@ MULTIPROCESS_TEST_MAIN(InitFromLaunchParameters) {
 //
 // Note:
 //  - This doesn't apply on Apple platforms (which use Rendezvous Keys)
-//  - On Android the global descriptor table is managed by the launcher
-//    service, so we don't have to manually update the mapping here.
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   GlobalDescriptors::GetInstance()->Set(
       kArbitraryDescriptorKey,

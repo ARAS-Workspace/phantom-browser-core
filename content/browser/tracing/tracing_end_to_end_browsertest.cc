@@ -935,9 +935,8 @@ IN_PROC_BROWSER_TEST_F(SystemTracingEndToEndBrowserTest, SimpleTraceEvent) {
 }
 
 // Tests that system tracing works from a sandboxed process (Renderer).
-// The test fails on Android because Renderers can't connect to an
-// arbitrary socket. Flaky on Mac since the renderer doesn't connect on
-// time. crbug.com/324063092
+// Flaky on Mac since the renderer doesn't connect on time.
+// crbug.com/324063092
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_PerformanceMark DISABLED_PerformanceMark
 #else

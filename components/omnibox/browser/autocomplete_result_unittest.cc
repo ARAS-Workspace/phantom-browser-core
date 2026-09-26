@@ -2110,8 +2110,6 @@ TEST_F(AutocompleteResultTest, SortAndCullMaxURLMatches) {
   result.max_url_matches_ = 3;
 
   // Case 1: Eject URL match for a search.
-  // Does not apply to Android which picks top N matches and performs
-  // group by search vs URL separately (Adaptive Suggestions).
   {
     ACMatches matches;
     const AutocompleteMatchTestData data[] = {
@@ -2316,7 +2314,6 @@ TEST_F(AutocompleteResultTest, AttachesPedals) {
     return pedal && pedal->PedalId() == OmniboxPedalId::CLEAR_BROWSING_DATA;
   }));
 
-// Android avoids attaching tab-switch actions by design.
   // Include a tab-switch action, which is common and shouldn't prevent
   // pedals from attaching to the same match. The first match has a URL
   // that triggers tab-switch action attachment with this fake matcher.

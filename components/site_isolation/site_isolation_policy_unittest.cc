@@ -1092,10 +1092,6 @@ TEST_F(DisabledStrictOriginIsolationFieldTrialTest,
   EXPECT_TRUE(content::SiteIsolationPolicy::IsStrictOriginIsolationEnabled());
 }
 
-// The following tests verify that the list of Android's built-in isolated
-// origins takes effect. This list is only used in official builds, and only
-// when above the memory threshold.
-
 // Helper class for tests that use header-based opt-in origin isolation and
 // simulate a 512MB device, while turning off strict site isolation.  This is
 // used for checking how opt-in origin isolation behaves with site isolation

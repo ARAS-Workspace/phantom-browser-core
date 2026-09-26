@@ -694,9 +694,9 @@ TEST_F(GpuDataManagerImplPrivateTest,
       << "gpu_mode_ = " << static_cast<int>(mode);
 }
 
-// Android does not support software compositing, while Fuchsia does not support
-// falling back to software from Vulkan. Explicitly disable SkiaGraphite for
-// tests that run with Ganesh as some platforms have started shipping Graphite.
+// Fuchsia does not support falling back to software from Vulkan.
+// Explicitly disable SkiaGraphite for tests that run with Ganesh as some
+// platforms have started shipping Graphite.
 TEST_F(GpuDataManagerImplPrivateTest, NoDefaultFallbackToSwiftShaderForGanesh) {
   base::test::ScopedCommandLine command_line;
   command_line.GetProcessCommandLine()->AppendSwitch(

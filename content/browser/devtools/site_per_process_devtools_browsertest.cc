@@ -76,7 +76,6 @@ DevToolsAgentHost::List ExtractPageOrFrameTargets(
   return result;
 }
 
-// Fails on Android, http://crbug.com/464993.
 #define MAYBE_CrossSiteIframeAgentHost CrossSiteIframeAgentHost
 IN_PROC_BROWSER_TEST_P(SitePerProcessDevToolsBrowserTest,
                        MAYBE_CrossSiteIframeAgentHost) {

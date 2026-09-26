@@ -168,9 +168,6 @@ void MandatoryReauthBubbleControllerImpl::OnBubbleClosed(
     PaymentsUiClosedReason closed_reason) {
   ResetBubbleViewAndInformBubbleManager();
 
-  // After resetting the raw pointer to the view in the base class, the Android
-  // view has to be deleted.
-
   // On macOS without biometrics, the accept/cancel callbacks have the potential
   // to destroy WebContents in a nested runloop due to OS implementations. A
   // weak pointer must be kept to then later be checked.

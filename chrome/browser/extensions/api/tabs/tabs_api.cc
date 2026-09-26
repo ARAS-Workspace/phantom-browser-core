@@ -1036,8 +1036,6 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
     // TYPE_POPUP everywhere.
     create_params.type = BrowserWindowInterface::TYPE_APP_POPUP;
 
-    // TODO(https://crbug.com/545671279): Initialize app name on android, or
-    // verify this is unnecessary.
     create_params.app_name =
         web_app::GenerateApplicationNameFromAppId(extension_id);
     create_params.is_trusted_source = false;
@@ -1169,7 +1167,6 @@ ExtensionFunction::ResponseValue WindowsCreateFunction::OnBrowserWindowCreated(
 
   // Create a new tab if the created window is still empty. Don't create a new
   // tab when it is intended to create an empty popup.
-  // TODO(https://crbug.com/545671279): Port to desktop android.
   if (!moved_tab && urls_.empty() &&
       new_window->GetType() == Browser::TYPE_NORMAL) {
     // TODO(crbug.com/452431839) Make a new NewTabTypes value for
@@ -1191,7 +1188,6 @@ ExtensionFunction::ResponseValue WindowsCreateFunction::OnBrowserWindowCreated(
   if (focused) {
     new_window->GetWindow()->Show();
   } else {
-    // TODO(https://crbug.com/545671279): Port to desktop android.
     // Show an unfocused new window.
     BrowserWindowInterface* const last_active_bwi =
         GetLastActiveBrowserWindowInterfaceWithAnyProfile();
@@ -1995,13 +1991,6 @@ ExtensionFunction::ResponseAction TabsCreateFunction::Run() {
     create_if_needed = true;
   }
 
-  // TODO(crbug.com/491910697): This is a short-term solution for Android to
-  // ensure new tabs are routed to a tabbed browser when the current browser
-  // is non-NORMAL (e.g., a PWA). The long-term goal is to unify this with
-  // the cross-platform logic below by making the tab creation process
-  // (specifically OpenTabHelper::OpenTab) asynchronous, which is required
-  // on Android when a new window needs to be created.
-
   // This check (for the opener) comes last. It will fail (by design) if
   // we're intending to create a new browser; that's good, because the new
   // browser would never match the one with the opener.
@@ -2387,7 +2376,6 @@ ExtensionFunction::ResponseAction TabsUpdateFunction::Run() {
     }
   }
 
-  // TODO(https://crbug.com/505306735): Support on desktop android.
   if (params->update_properties.auto_discardable) {
     bool state = *params->update_properties.auto_discardable;
     resource_coordinator::TabLifecycleUnitExternal::FromWebContents(

@@ -184,7 +184,6 @@ void CacheCreator::Run() {
   }
 #endif  // ENABLE_DISK_CACHE_SQL_BACKEND
 
-  // Avoid references to blockfile functions on Android to reduce binary size.
   auto cache = std::make_unique<disk_cache::BackendImpl>(
       path_, cleanup_tracker_.get(),
       /*cache_thread = */ nullptr, type_, net_log_);

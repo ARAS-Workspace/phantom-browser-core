@@ -216,7 +216,6 @@ TEST_F(AffiliatedMatchHelperTest, GetAffiliatedAndroidRealmsAndWebsites) {
           RunOnceCallback<1>(std::vector<GroupedFacets>{result_grouped_facet}));
 
   base::MockCallback<AffiliatedMatchHelper::AffiliatedRealmsCallback> callback;
-  // Android doesn't support filling across affiliated websites.
   EXPECT_CALL(
       callback,
       Run(UnorderedElementsAre(

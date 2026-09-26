@@ -2222,7 +2222,6 @@ class RFHMProcessPerTabTest : public RenderFrameHostManagerTest {
 
 // Test that we still swap processes for BrowsingInstance changes even in
 // --process-per-tab mode.  See http://crbug.com/343017.
-// Disabled on Android: http://crbug.com/345873.
 // Crashes under ThreadSanitizer, http://crbug.com/356758.
 #if defined(THREAD_SANITIZER)
 #define MAYBE_BackFromWebUI DISABLED_BackFromWebUI

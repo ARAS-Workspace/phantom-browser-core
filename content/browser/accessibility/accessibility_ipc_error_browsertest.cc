@@ -46,7 +46,6 @@ class AccessibilityIpcErrorBrowserTest : public ContentBrowserTest {
   }
 };
 
-// Failed on Android x86 in crbug.com/1123641.
 // Do not test on AX_FAIL_FAST_BUILDS, where the BAD IPC will simply assert.
 #if AX_FAIL_FAST_BUILD()
 #define MAYBE_UnrecoverableAccessibilityErrorDisallowReenabling \

@@ -303,8 +303,6 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Select) {
           /* screenshot_height */ 200, [](PixelComparatorType& comparator) {});
 }
 
-// TODO(crbug.com/448656594): The test fails on Android. Probably we need
-// separate baselines for phone and tablet devices.
 // TODO(crbug.com/449053040): Re-enable the test on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_MultiSelect DISABLED_MultiSelect

@@ -66,7 +66,6 @@ std::string GetLoadTimeClasses(bool in_dev_mode) {
 }
 
 bool IsGlobalShortcutEnabled() {
-  // Disable the global scoped shortcuts on Android since they're no-ops.
   return true;
 }
 

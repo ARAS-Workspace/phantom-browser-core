@@ -3389,7 +3389,6 @@ class InjectIsolationRequestingNavigation
   bool was_called_ = false;
 };
 
-// TODO(crbug.com/40708791): flaky on Android builders since 2020-07-28.
 #define MAYBE_FrameTreeTestBeforeDidCommit FrameTreeTestBeforeDidCommit
 // This test is similar to the one above, but exercises the pending navigation
 // when it's at a different stage, namely between the CommitNavigation and

@@ -833,9 +833,6 @@ TEST_F(UDPSocketTest, CloseWithPendingRead) {
   EXPECT_FALSE(callback.have_result());
 }
 
-// Some Android devices do not support multicast.
-// The ones supporting multicast need WifiManager.MulitcastLock to enable it.
-// http://goo.gl/jjAk9
 TEST_F(UDPSocketTest, JoinMulticastGroup) {
 #if BUILDFLAG(IS_MAC)
   // See https://crbug.com/354933441
@@ -1399,9 +1396,6 @@ TEST_F(UDPSocketTest, ReadWithSocketOptimizationTruncation) {
   server.Close();
   client.Close();
 }
-
-// On Android, where socket tagging is supported, verify that UDPSocket::Tag
-// works as expected.
 
 // Test the behavior of OwnedUDPSocketCount directly. Could be in its own file,
 // but seems best to keep it with the more integration-y tests that cover
@@ -2030,7 +2024,7 @@ TEST_F(UDPSocketTest, ReadMultiple) {
 }
 
 // This test is only run on platforms that support the recvmmsg-based
-// implementation of ReadMultiple (Linux, Android). On fallback POSIX platforms
+// implementation of ReadMultiple (Linux). On fallback POSIX platforms
 // (macOS, iOS, Fuchsia), ReadMultiple delegates to the standard RecvFrom
 // method, which uses a large 512-byte control buffer. Because this 512-byte
 // buffer is large enough to accommodate the IP_PKTINFO control message, the

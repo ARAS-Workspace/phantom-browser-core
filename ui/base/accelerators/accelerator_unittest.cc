@@ -36,7 +36,6 @@ TEST(AcceleratorTest, TimeStamp) {
   EXPECT_EQ(event_time, accelerator_b.time_stamp());
 }
 
-// Crash on Android builders. https://crbug.com/980267
 #define MAYBE_GetShortcutText GetShortcutText
 TEST(AcceleratorTest, MAYBE_GetShortcutText) {
   struct {

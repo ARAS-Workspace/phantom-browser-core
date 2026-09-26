@@ -195,8 +195,6 @@ class ChromeFileSystemAccessPermissionContextTest : public testing::Test {
   };
 
   ChromeFileSystemAccessPermissionContextTest() {
-    // TODO(crbug.com/40101963): Enable when android persisted permissions are
-    // implemented.
     scoped_feature_list_.InitWithFeatures(
         {features::kFileSystemAccessPersistentPermissions}, {});
   }
@@ -1296,8 +1294,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kRead));
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetReadPermissionGrant_InitialState_Open_File) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -1345,8 +1341,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       kTestOrigin, kTestPathInfo, HandleType::kDirectory, GrantType::kWrite));
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetWritePermissionGrant_InitialState_WritableImplicitState) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -1403,8 +1397,6 @@ TEST_F(
   EXPECT_EQ(grant->GetStatus(), PermissionStatus::ASK);
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetWritePermissionGrant_GrantIsAutoGrantedViaPersistentPermissions) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -1442,8 +1434,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_FALSE(permission_context()->IsValidObject(grant));
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(
     ChromeFileSystemAccessPermissionContextTest,
     GetGrantedObjectsAndConvertObjectsToGrants_GrantsAreRetainedViaPersistedPermissions) {
@@ -1823,8 +1813,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
             PermissionRequestOutcome::kGrantedByRestorePrompt);
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RestorePermissionPrompt_AllowEveryTime) {
   FileSystemAccessPermissionRequestManager::FromWebContents(web_contents())
@@ -1947,8 +1935,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
               ContentSettingsType::FILE_SYSTEM_ACCESS_RESTORE_PERMISSION);
   EXPECT_TRUE(origin_is_embargoed_after_rejection_limit);
 }
-
-// TODO(crbug.com/40101963): Enable when android webapps integration is done.
 
 class ChromeFileSystemAccessPermissionContextTestWithWebApp
     : public ChromeFileSystemAccessPermissionContextTest {
@@ -2090,8 +2076,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTestWithWebApp,
       PersistedGrantStatus::kCurrent);
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ToggleExtendedPermissionByUser) {
   auto read_grant = permission_context()->GetReadPermissionGrant(
@@ -2212,8 +2196,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
               testing::IsEmpty());
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        OnLastPageFromOriginClosed_PersistedGrantStatusUpdated) {
   // Create a current grant by triggering the restore prompt, and accepting it.
@@ -2309,8 +2291,6 @@ TEST_F(
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kWrite));
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetReadPermissionGrant_InheritFromAncestor) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -2514,8 +2494,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kWrite));
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        PersistedPermission_NotAccessibleIfContentSettingBlock) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -2597,8 +2575,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_EQ(grant->GetStatus(), PermissionStatus::GRANTED);
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RequestPermission_Dismissed) {
   base::HistogramTester histograms;
@@ -2659,8 +2635,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest, RequestPermission_Denied) {
       kTestOrigin, kTestPathInfo, HandleType::kFile, GrantType::kWrite));
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        RequestPermission_NoUserActivation) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);
@@ -2899,8 +2873,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_EQ(grant4->GetStatus(), PermissionStatus::GRANTED);
 }
 
-// TODO(crbug.com/40101963): Enable when android persisted permissions are
-// implemented.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        GetReadPermissionGrant_FileBecomesDirectory) {
   permission_context()->SetOriginHasExtendedPermissionForTesting(kTestOrigin);

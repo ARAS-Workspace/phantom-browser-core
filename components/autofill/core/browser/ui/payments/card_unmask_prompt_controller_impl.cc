@@ -192,9 +192,6 @@ void CardUnmaskPromptControllerImpl::OnUnmaskPromptAccepted(
     pending_details_.exp_year = exp_year;
   }
 
-  // On Android, FIDO authentication is fully launched and its checkbox should
-  // always be shown. Remember the last choice the user made on this device.
-
   // There is a chance the delegate has disappeared (i.e. tab closed) before the
   // unmask response came in. Avoid a crash.
   if (delegate_)

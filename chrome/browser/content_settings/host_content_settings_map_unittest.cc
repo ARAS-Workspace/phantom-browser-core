@@ -1973,7 +1973,6 @@ TEST_F(HostContentSettingsMapTest, AddContentSettingsObserver) {
       host, GURL(), ContentSettingsType::COOKIES, CONTENT_SETTING_BLOCK);
 }
 
-// Guest profiles do not exist on Android, so don't run these tests there.
 TEST_F(HostContentSettingsMapTest, GuestProfile) {
   TestingProfile::Builder profile_builder;
   profile_builder.SetGuestSession();
@@ -2653,7 +2652,6 @@ TEST_F(HostContentSettingsMapTest, IncognitoChangesDoNotPersist) {
 
 // Validate that a content setting that uses a different scope/constraint can
 // co-exist with another setting
-// TODO(crbug.com/398993133): Fix flakes on some Android builders.
 #define MAYBE_MixedScopeSettings MixedScopeSettings
 TEST_F(HostContentSettingsMapTest, MAYBE_MixedScopeSettings) {
   TestingProfile profile;
@@ -2715,7 +2713,6 @@ TEST_F(HostContentSettingsMapTest, MAYBE_MixedScopeSettings) {
 // We should act like no preference is specified if the value is
 // SessionModel::None; otherwise, only the preferences from the specified
 // scope should be returned (if any).
-// TODO(crbug.com/399254058): flaky on Android
 #define MAYBE_GetSettingsForOneTypeWithSessionModel \
   GetSettingsForOneTypeWithSessionModel
 TEST_F(HostContentSettingsMapTest,
@@ -2816,7 +2813,6 @@ INSTANTIATE_TEST_SUITE_P(All,
 // Validate that the settings array retrieved correctly carries the expiry data
 // for settings and they can detect if and when they expire.
 // GetSettingsForOneType should also omit any settings that are already expired.
-// TODO(crbug.com/398993133): Fix flakes on some Android builders.
 #define MAYBE_GetSettingsForOneTypeWithExpiryAndVerifyUmaHistograms \
   GetSettingsForOneTypeWithExpiryAndVerifyUmaHistograms
 TEST_P(HostContentSettingsMapActiveExpirationTest,
@@ -2961,7 +2957,6 @@ TEST_F(HostContentSettingsMapTest, StorageAccessMetrics) {
   t.ExpectUniqueSample(base_histogram + ".MaxTopLevel", 4, 1);
 }
 
-// TODO(crbug.com/398993133): Fix flakes on some Android builders.
 #define MAYBE_RenewContentSetting RenewContentSetting
 TEST_F(HostContentSettingsMapTest, MAYBE_RenewContentSetting) {
   TestingProfile profile;
@@ -3072,8 +3067,6 @@ TEST_F(HostContentSettingsMapTest, ShutdownDuringExpirationAsanTest) {
   FastForwardTime(ttl);
 }
 
-// File access is not implemented on Android. Luckily we don't need it for
-// DevTools.
 TEST_F(HostContentSettingsMapTest, DevToolsFileAccess) {
   TestingProfile profile;
   HostContentSettingsMap* host_content_settings_map =

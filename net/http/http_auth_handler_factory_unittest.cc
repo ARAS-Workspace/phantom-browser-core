@@ -207,7 +207,6 @@ TEST(HttpAuthHandlerFactoryTest, DefaultFactory) {
         "Negotiate", HttpAuth::AUTH_SERVER, null_ssl_info,
         NetworkAnonymizationKey(), server_scheme_host_port, NetLogWithSource(),
         host_resolver.get(), &handler);
-// Note the default factory doesn't support Kerberos on Android
 #if BUILDFLAG(USE_KERBEROS)
     EXPECT_THAT(rv, IsOk());
     ASSERT_FALSE(handler.get() == nullptr);

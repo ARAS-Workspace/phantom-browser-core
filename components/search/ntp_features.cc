@@ -230,12 +230,10 @@ BASE_FEATURE(kNtpTabGroupsModuleZeroState,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, stale modules will be auto-removed from the NTP.
-// TODO(b/525245973): Enable on Android once customize chrome is implemented.
 BASE_FEATURE(kNtpFeatureOptimizationModuleRemoval,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 // If enabled, stale shortcuts will be auto-removed from the NTP.
-// TODO(b/525245973): Enable on Android once customize chrome is implemented.
 BASE_FEATURE(kNtpFeatureOptimizationShortcutsRemoval,
              base::FEATURE_ENABLED_BY_DEFAULT);
 

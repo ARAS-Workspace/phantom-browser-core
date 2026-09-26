@@ -624,7 +624,6 @@ void DanglingRawPtrReleased(uintptr_t id) {
 void CheckDanglingRawPtrBufferEmpty() {
   internal::PartitionAutoLock guard(g_stack_trace_buffer_lock);
 
-  // TODO(crbug.com/40260713): Check for leaked refcount on Android.
   bool errors = false;
   for (const auto& entry : g_stack_trace_buffer) {
     if (!entry) {

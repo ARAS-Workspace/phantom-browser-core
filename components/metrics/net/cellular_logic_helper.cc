@@ -24,8 +24,6 @@ constexpr base::FeatureParam<int> kUmaUploadCadence{
     &features::kStructuredMetrics, "uma_upload_cadence",
     kStandardUploadIntervalSeconds};
 
-// Android-only cellular settings.
-
 }  // namespace
 
 base::TimeDelta GetUploadInterval(bool use_cellular_upload_interval) {

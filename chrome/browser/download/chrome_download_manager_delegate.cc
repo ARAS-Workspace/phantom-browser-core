@@ -240,8 +240,6 @@ std::string GetMimeType(const base::FilePath& path) {
   return mime_type;
 }
 
-// On Android, Chrome wants to warn the user of file overwrites rather than
-// uniquify.
 const DownloadPathReservationTracker::FilenameConflictAction
     kDefaultPlatformConflictAction = DownloadPathReservationTracker::UNIQUIFY;
 
@@ -404,8 +402,6 @@ void ChromeDownloadManagerDelegate::SetDownloadManager(DownloadManager* dm) {
 
   download_manager_ = dm;
 
-  // This is only for Incident Reporting, which does not report on downloads on
-  // Android.
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   safe_browsing::SafeBrowsingService* sb_service =
       g_browser_process->safe_browsing_service();
@@ -1442,7 +1438,6 @@ bool ChromeDownloadManagerDelegate::IsOpenInBrowserPreferredForFile(
   }
 #endif
 
-  // On Android, always prefer opening with an external app.
 #if BUILDFLAG(ENABLE_PLUGINS)
   // TODO(asanka): Consider other file types and MIME types.
   // http://crbug.com/41076988

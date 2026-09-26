@@ -88,7 +88,6 @@ class FakeScreenDetailsTest : public ScreenDetailsTest {
   raw_ptr<Shell> test_shell_ = nullptr;
 };
 
-// TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #define MAYBE_GetScreensFaked GetScreensFaked
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_GetScreensFaked) {
   ASSERT_TRUE(NavigateToURL(test_shell(), GetTestUrl(nullptr, "empty.html")));
@@ -122,7 +121,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_GetScreensFaked) {
   EXPECT_EQ(content::test::GetExpectedScreenDetails(), result);
 }
 
-// TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #define MAYBE_IsExtendedFaked IsExtendedFaked
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_IsExtendedFaked) {
   ASSERT_TRUE(NavigateToURL(test_shell(), GetTestUrl(nullptr, "empty.html")));
@@ -136,7 +134,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_IsExtendedFaked) {
   EXPECT_FALSE(EvalJs(test_shell(), "screen.isExtended").ExtractBool());
 }
 
-// TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #define MAYBE_ScreenOnchangeNoPermission ScreenOnchangeNoPermission
 // Sites with no permission only get an event if screen.isExtended changes.
 // TODO(crbug.com/40145721): Need content_browsertests permission controls.
@@ -182,7 +179,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
   EXPECT_EQ("2", EvalJs(test_shell(), "document.title"));
 }
 
-// TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #define MAYBE_ScreenOnChangeForIsExtended ScreenOnChangeForIsExtended
 // Sites should get Screen.change events anytime Screen.isExtended changes.
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
@@ -226,7 +222,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
   EXPECT_EQ("2", EvalJs(test_shell(), "document.title"));
 }
 
-// TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #define MAYBE_ScreenOnChangeForAttributes ScreenOnChangeForAttributes
 // Sites should get Screen.change events anytime other Screen attributes change.
 IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,

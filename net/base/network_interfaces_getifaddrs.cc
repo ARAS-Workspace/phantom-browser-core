@@ -217,8 +217,6 @@ bool IfaddrsToNetworkInterfaceList(int policy,
 
 }  // namespace internal
 
-// This version of GetNetworkList() can only be called on Android N+, so give it
-// a different and internal name so it isn't invoked mistakenly.
 bool GetNetworkList(NetworkInterfaceList* networks, int policy) {
   constexpr bool use_alternative_getifaddrs = false;
   if (networks == nullptr)

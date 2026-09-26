@@ -186,14 +186,12 @@ void PrerenderBrowserTest::TestPrerenderAndActivateInNewTab(
 }
 
 // An end-to-end test of prerendering in a new tab and activating.
-// Disabled on Android due to failures: https://crbug.com/355255740.
 #define MAYBE_PrerenderAndActivate_InNewTab PrerenderAndActivate_InNewTab
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
                        MAYBE_PrerenderAndActivate_InNewTab) {
   TestPrerenderAndActivateInNewTab("clickSameSiteNewWindowLink();", true);
 }
 
-// Disabled on Android due to failures: https://crbug.com/355255740.
 #define MAYBE_PrerenderAndActivate_InNewTab_Noopener \
   PrerenderAndActivate_InNewTab_Noopener
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
@@ -204,7 +202,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
 
 // Prerendering in a new tab should not be activate for a new window with an
 // opener.
-// The test is flaky on android-12l-x64-dbg-tests: https://crbug.com/40935364.
 #define MAYBE_PrerenderAndActivate_InNewTab_Opener \
   PrerenderAndActivate_InNewTab_Opener
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
@@ -220,7 +217,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
 }
 
 // Tests main frame navigation on a prerendered page in a new tab.
-// Disabled on Android due to failures: https://crbug.com/355255740.
 #define MAYBE_MainFrameNavigation_InNewTab MainFrameNavigation_InNewTab
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
                        MAYBE_MainFrameNavigation_InNewTab) {
@@ -451,7 +447,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, DisableNetworkPrediction) {
   EXPECT_TRUE(host_id);
 }
 
-// TODO(https://crbug.com/455854991): Failing on Android tablets.
 #define MAYBE_PreloadingHoldbackOverridden PreloadingHoldbackOverridden
 // Tests that DevTools open overrides PreloadingConfig's holdback.
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
@@ -1040,7 +1035,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderPrewarmDefaultSearchEngineTest,
   prerender_helper().WaitForPrerenderLoadCompletion(host_id);
 }
 
-// TODO(https://crbug.com/455856004): Failing on Android tablets.
 #define MAYBE_PrewarmPrerenderReuseThenActivate \
   PrewarmPrerenderReuseThenActivate
 IN_PROC_BROWSER_TEST_F(PrerenderPrewarmDefaultSearchEngineTest,

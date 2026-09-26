@@ -1345,7 +1345,7 @@ void ChromeContentRendererClient::
   blink::WebRuntimeFeatures::EnablePerformanceManagerInstrumentation(true);
 
 // Web Share is conditionally enabled here in chrome/, to avoid it
-// being made available in WebView or Linux.
+// being made available in Linux.
 #if BUILDFLAG(IS_MAC)
   blink::WebRuntimeFeatures::EnableWebShare(true);
 #endif

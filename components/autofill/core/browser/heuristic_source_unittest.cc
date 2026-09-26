@@ -52,7 +52,6 @@ class HeuristicSourceTest
   base::test::ScopedFeatureList features_;
 };
 
-// TODO(crbug.com/373902907): Flaky on android bots.
 #define MAYBE_HeuristicSourceParams HeuristicSourceParams
 TEST_P(HeuristicSourceTest, MAYBE_HeuristicSourceParams) {
   const HeuristicSourceParams& test_case = GetParam();

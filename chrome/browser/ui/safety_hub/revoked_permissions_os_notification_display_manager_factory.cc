@@ -42,7 +42,5 @@ RevokedPermissionsOSNotificationDisplayManagerFactory::
         content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
   return std::make_unique<RevokedPermissionsOSNotificationDisplayManager>(
-      HostContentSettingsMapFactory::GetForProfile(profile),
-      // Notification is only displayed on Android.
-      nullptr);
+      HostContentSettingsMapFactory::GetForProfile(profile), nullptr);
 }

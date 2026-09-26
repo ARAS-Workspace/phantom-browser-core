@@ -429,8 +429,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessObserveWithFlagBrowserTest,
   EXPECT_THAT(records, testing::IsEmpty());
 }
 
-// Local file system access - including the open*Picker() methods used here
-// - is not supported on Android. Fuchsia does not support symlinks.
+// Fuchsia does not support symlinks.
 IN_PROC_BROWSER_TEST_F(FileSystemAccessObserveWithFlagBrowserTest,
                        SymlinkCannotBeObserved) {
   base::HistogramTester histogram_tester;
@@ -1179,9 +1178,7 @@ INSTANTIATE_TEST_SUITE_P(
     FileSystemAccessObserverBrowserTest,
     testing::Values(TestFileSystemType::kBucket, TestFileSystemType::kLocal));
 
-// Local file system access - including the open*Picker() methods used here
-// - is not supported on Android. See https://crbug.com/1011535.
-// Meanwhile, `FilePathWatcher` is not implemented on Fuchsia. See
+// `FilePathWatcher` is not implemented on Fuchsia. See
 // https://crbug.com/851641.
 class FileSystemAccessObserverWithBFCacheBrowserTest
     : public FileSystemAccessObserverBrowserTestBase {

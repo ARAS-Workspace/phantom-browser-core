@@ -55,9 +55,6 @@ class MockAudioInputDeviceManagerListener : public MediaStreamProviderListener {
                     const base::UnguessableToken&));
 };
 
-// TODO(henrika): there are special restrictions for Android since
-// AudioInputDeviceManager::Open() must be called on the audio thread.
-// This test suite must be modified to run on Android.
 // Flaky on Linux. See http://crbug.com/867397.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_AudioInputDeviceManagerTest DISABLED_AudioInputDeviceManagerTest

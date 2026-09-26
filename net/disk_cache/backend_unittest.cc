@@ -1195,8 +1195,6 @@ TEST_P(DiskCacheGenericBackendTest, ShutdownWithPendingDoom) {
   BackendShutdownWithPendingDoom();
 }
 
-// Disabled on android since this test requires cache creator to create
-// blockfile caches.
 TEST_F(DiskCacheTest, TruncatedIndex) {
   ASSERT_TRUE(CleanupCacheDir());
   base::FilePath index = cache_path_.AppendASCII("index");
@@ -2566,8 +2564,6 @@ TEST_F(DiskCacheTest, WrongVersion) {
 }
 
 // Tests that the cache is properly restarted on recovery error.
-// Disabled on android since this test requires cache creator to create
-// blockfile caches.
 TEST_F(DiskCacheBackendTest, DeleteOld) {
   ASSERT_TRUE(CopyTestCache("wrong_version"));
   SetNewEviction();
@@ -4619,8 +4615,6 @@ void DiskCacheBackendTest::Test2GiBLimit(net::CacheType type,
   }
 }
 
-// Disabled on android since this test requires cache creator to create
-// blockfile caches.
 TEST_F(DiskCacheBackendTest, BlockFileMaxSizeLimit) {
   // Note: blockfile actually has trouble before 2GiB as well.
   Test2GiBLimit(net::DISK_CACHE, net::CACHE_BACKEND_BLOCKFILE,
@@ -5348,8 +5342,6 @@ TEST_F(DiskCacheBackendTest, BlockfileMigrateNewEviction21) {
   BackendValidateMigrated();
 }
 
-// Disabled on android since this test requires cache creator to create
-// blockfile caches, and we don't use them on Android anyway.
 TEST_F(DiskCacheBackendTest, BlockfileEmptyIndex) {
   // Regression case for https://crbug.com/1441330 --- blockfile DCHECKing
   // on mmap error for files it uses.

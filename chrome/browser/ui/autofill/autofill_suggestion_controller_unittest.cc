@@ -375,7 +375,6 @@ TEST_F(AutofillSuggestionControllerTest, ShouldReportHidingPopupReason) {
 // Tests that when a picture-in-picture window is initialized, there is a call
 // to the popup view to check if the autofill popup bounds overlap with the
 // picture-in-picture window.
-// TODO(crbug.com/40280362): Implement PIP overlap checks on Android.
 TEST_F(AutofillSuggestionControllerTest,
        CheckBoundsOverlapWithPictureInPicture) {
   ShowSuggestions(manager(), {SuggestionType::kAddressEntry});

@@ -57,7 +57,6 @@ class DistilledPageJsTest : public content::ContentBrowserTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Pincher is only used on Android.
 #define MAYBE_Pinch DISABLED_Pinch
 IN_PROC_BROWSER_TEST_F(DistilledPageJsTest, MAYBE_Pinch) {
   LoadAndExecuteTestScript("pinch_tester.js");

@@ -516,7 +516,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionSameSiteCookiesTest,
   ExpectSameSiteCookies(cookies);
 }
 
-// TODO(crbug.com/509639786): Flaky on desktop Android.
 #define MAYBE_ActiveTabPermissions_BackgroundPage \
   ActiveTabPermissions_BackgroundPage
 // SameSite-cookies-flavoured copy of the ExtensionActiveTabTest.ActiveTab test.
@@ -710,7 +709,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionSameSiteCookiesTest,
   }
 }
 
-// TODO(crbug.com/509639786): Flaky on desktop Android.
 #define MAYBE_ActiveTabPermissions_ExtensionServiceWorker \
   ActiveTabPermissions_ExtensionServiceWorker
 IN_PROC_BROWSER_TEST_P(ExtensionSameSiteCookiesTest,

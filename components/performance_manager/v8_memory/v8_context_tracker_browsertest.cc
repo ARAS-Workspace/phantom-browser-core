@@ -34,7 +34,7 @@ struct ContextCounts {
   size_t destroyed_execution_context_count = 0;
 };
 
-// TODO(crbug.com/40931300): Re-enable on Mac and Android.
+// TODO(crbug.com/40931300): Re-enable on Mac.
 // The whole theory behind this test suite is wrong, because it assumes that
 // navigating to a page has a precise effect on the number of contexts. But the
 // test doesn't control the environment enough to be sure of this -

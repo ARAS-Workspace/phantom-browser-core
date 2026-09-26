@@ -328,7 +328,6 @@ TEST_F(OutOfMemoryDeathTest, ViaSharedLibraries) {
 }
 #endif  // BUILDFLAG(IS_LINUX)
 
-// Android doesn't implement posix_memalign().
 #if BUILDFLAG(IS_POSIX)
 TEST_F(OutOfMemoryDeathTest, Posix_memalign) {
   // Grab the return value of posix_memalign to silence a compiler warning

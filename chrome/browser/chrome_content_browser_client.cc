@@ -3637,18 +3637,6 @@ base::OnceClosure ChromeContentBrowserClient::SelectClientCertificate(
     // Those cases would lead to the SSLClientCertificateSelector, which would
     // automatically continue if the associated certificate list was empty.
     // See https://crbug.com/333954429.
-    // Note: the !IS_ANDROID here is currently moot, but is important in case
-    // this ever changes. On Android, `matching_certificates` and
-    // `nonmatching_certificates` are always empty at this stage, even when
-    // there are matching certificates available in the OS, so this would
-    // result in always proceeding with no certificate for any request from an
-    // extension service worker. That decision would be remembered across the
-    // entire profile, potentially locking the user out of the origin.
-    // For now, allow all extension background requests on desktop android to
-    // proceed without a certificate. This is done as a temporary workaround to
-    // enable testing.
-    // TODO(wenz): This should instead proceed with the selected certificate
-    // when there are matching certificates in the OS.
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     if (matching_certificates.empty() && nonmatching_certificates.empty()) {
       extensions::ProcessMap* process_map =
@@ -3892,9 +3880,7 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
   PrefService* prefs = profile->GetPrefs();
 
-  // Fill font preferences. These are not registered on Android unless we're
-  // built with extensions (the chrome.fontSettings API can change these).
-  // - http://crbug.com/40337093, http://crbug.com/41304476.
+  // Fill font preferences.
   // Enabling the FontFamilyCache needs some KeyedService that might not be
   // available for some irregular profiles, like the System Profile.
   if (!AreKeyedServicesDisabledForProfileByDefault(profile)) {
@@ -5134,7 +5120,6 @@ void AddChromeSchemeFactories(
     content::WebContents* web_contents,
     const extensions::Extension* extension,
     ChromeContentBrowserClient::NonNetworkURLLoaderFactoryMap* factories) {
-  // Android does not support instant.
   Profile* profile =
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
   InstantService* instant_service =
@@ -6190,8 +6175,6 @@ bool ChromeContentBrowserClient::ShouldSandboxNetworkService() {
 }
 
 bool ChromeContentBrowserClient::ShouldRunOutOfProcessSystemDnsResolution() {
-// This enterprise policy is supported on Android, but the feature will not be
-// launched there.
 #if BUILDFLAG(IS_LINUX)
   // This is possibly called before `g_browser_process` is initialized.
   PrefService* local_state;
@@ -6240,8 +6223,6 @@ blink::UserAgentMetadata ChromeContentBrowserClient::GetUserAgentMetadata() {
 }
 
 std::optional<gfx::ImageSkia> ChromeContentBrowserClient::GetProductLogo() {
-  // This icon is available on Android, but adds 19KiB to the APK. Since it
-  // isn't used on Android we exclude it to avoid bloat.
   return std::optional<gfx::ImageSkia>(
       *ui::ResourceBundle::GetSharedInstance().GetImageSkiaNamed(
           IDR_PRODUCT_LOGO_256));
@@ -6471,7 +6452,6 @@ void ChromeContentBrowserClient::IsClipboardPasteAllowedByPolicy(
     IsClipboardPasteAllowedCallback callback) {
   // TODO(b/508693696): Add copy and paste support on AL.
 
-// TODO(b/352728209): Add Android-specific hook for Data Controls.
 #if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
   enterprise_data_protection::PasteAllowedRequest::StartPasteAllowedRequest(
       source, destination, metadata, std::move(clipboard_paste_data),

@@ -1227,8 +1227,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
 
 // Checks that the page is not restored from BFCache when it calls
 // mediaDevice.getDisplayMedia() and still has live MediaStreamTrack.
-// Since mediaDevice.getDisplayMedia() is not supported in Android, the tests
-// can't run on the OS.
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
                        DoesNotCacheIfDisplayMediaAccessGranted) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1317,9 +1315,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest, CacheIfWebGL) {
   ExpectRestored(FROM_HERE);
 }
 
-// Since blink::mojom::HidService binder is not added in
-// content/browser/browser_interface_binders.cc for Android, this test is not
-// applicable for this OS.
 class HidBrowserTestContentBrowserClient
     : public ContentBrowserTestContentBrowserClient {
  public:
@@ -3077,9 +3072,6 @@ IN_PROC_BROWSER_TEST_P(BackForwardCacheWithBroadcastChannelTest,
                     {}, FROM_HERE);
 }
 
-// Disabled on Android, since we have problems starting up the websocket test
-// server in the host
-// TODO(crbug.com/40241677): Re-enable the test after solving the WS server.
 #define MAYBE_WebSocketCachedIfClosed WebSocketCachedIfClosed
 // Pages with WebSocket should be cached if the connection is closed.
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
@@ -4278,9 +4270,6 @@ class SensorBackForwardCacheBrowserTest : public BackForwardCacheBrowserTest {
 // Tests that Accelerometer sensor is suspended while in bfcache. Note that
 // we are only testing FakeSensor::Suspend() and FakeSensor::Resume() are
 // called, and they have no implementation.
-//
-// TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
-// sensors are not automatically resumed.
 #define MAYBE_AccelerometerPausedWhileCached AccelerometerPausedWhileCached
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_AccelerometerPausedWhileCached) {
@@ -4334,9 +4323,6 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 // Tests that Ambient Light sensor is suspended while in bfcache. Note that
 // we are only testing FakeSensor::Suspend() and FakeSensor::Resume() are
 // called, and they have no implementation.
-//
-// TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
-// sensors are not automatically resumed.
 #define MAYBE_AmbientLightPausedWhileCached AmbientLightPausedWhileCached
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_AmbientLightPausedWhileCached) {
@@ -4388,9 +4374,6 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 // Tests that Linear Acceleration sensor is suspended while in bfcache.
 // Note that we are only testing FakeSensor::Suspend() and
 // FakeSensor::Resume() are called, and they have no implementation.
-//
-// TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
-// sensors are not automatically resumed.
 #define MAYBE_LinearAccelerationPausedWhileCached \
   LinearAccelerationPausedWhileCached
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
@@ -4443,9 +4426,6 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 }
 
 // Tests that Gravity sensor is suspended while in bfcache.
-//
-// TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
-// sensors are not automatically resumed.
 #define MAYBE_GravityPausedWhileCached GravityPausedWhileCached
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_GravityPausedWhileCached) {
@@ -4497,9 +4477,6 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 // Tests that Gyroscope sensor is suspended while in bfcache. Note that
 // we are only testing FakeSensor::Suspend() and FakeSensor::Resume() are
 // called, and they have no implementation.
-//
-// TODO(crbug.com/364143617): Focus not retrieved on Android bots and thus
-// sensors are not automatically resumed.
 #define MAYBE_GyroscopePausedWhileCached GyroscopePausedWhileCached
 IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
                        MAYBE_GyroscopePausedWhileCached) {
@@ -4675,8 +4652,6 @@ IN_PROC_BROWSER_TEST_F(SensorBackForwardCacheBrowserTest,
 
 // This tests that even if a page initializes WebRTC, tha page can be cached as
 // long as it doesn't make a connection.
-// On the Android test environments, the test might fail due to IP restrictions.
-// See the discussion at http://crrev.com/c/2564926.
 
 // TODO(crbug.com/40183520): The test is consistently failing on some Mac
 // bots.
@@ -4755,8 +4730,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
 
 // This tests that a page using WebRTC and creating actual connections cannot be
 // cached.
-// On the Android test environments, the test might fail due to IP restrictions.
-// See the discussion at http://crrev.com/c/2564926.
 
 // TODO(crbug.com/40183520): The test is consistently failing on some Mac
 // bots.

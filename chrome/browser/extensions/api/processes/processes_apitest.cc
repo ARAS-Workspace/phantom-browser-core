@@ -74,7 +74,6 @@ IN_PROC_BROWSER_TEST_F(ProcessesApiTest, DISABLED_ProcessesApiListeners) {
   EXPECT_EQ(0, GetListenersCount());
 }
 
-// TODO(crbug.com/500051686): Flaky on desktop Android.
 #define MAYBE_OnUpdatedWithMemoryRefreshTypes OnUpdatedWithMemoryRefreshTypes
 IN_PROC_BROWSER_TEST_F(ProcessesApiTest,
                        MAYBE_OnUpdatedWithMemoryRefreshTypes) {

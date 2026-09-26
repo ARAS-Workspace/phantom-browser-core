@@ -556,11 +556,6 @@ void InitLogging(const std::string& process_type) {
 void RecordMainStartupMetrics(const StartupTimestamps& timestamps) {
   const base::TimeTicks now = base::TimeTicks::Now();
 
-  // On Android the main entry point time is the time when the Java code starts.
-  // This happens before the shared library containing this code is even loaded.
-  // The Java startup code has recorded that time, but the C++ code can't fetch
-  // it from the Java side until it has initialized the JNI. See
-  // ChromeMainDelegateAndroid.
   // On all other platforms, `timestamps.exe_entry_point_ticks` contains the exe
   // entry point time (on some platforms this is ChromeMain, on some it is
   // before).
@@ -916,11 +911,6 @@ std::optional<int> ChromeMainDelegate::BasicStartupComplete() {
   ContentSettingsPattern::SetNonWildcardDomainNonPortSchemes(
       GetNonWildcardDomainNonPortSchemes());
 
-// No support for ANDROID yet as DiagnosticsController needs wchar support.
-// TODO(gspencer): That's not true anymore, or at least there are no w-string
-// references anymore. Not sure if that means this can be enabled on Android or
-// not though.  As there is no easily accessible command line on Android, I'm
-// not sure this is a big deal.
 #if !defined(BUILDING_CHROME_RENDERER)
   // If we are in diagnostics mode this is the end of the line: after the
   // diagnostics are run the process will invariably exit.

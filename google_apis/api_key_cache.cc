@@ -54,7 +54,6 @@ ApiKeyCache::ApiKeyCache(const DefaultApiKeys& default_api_keys)
   api_key_ = CalculateKeyValue(
       default_api_keys.google_api_key, STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY),
       std::string(), default_api_keys.allow_unset_values);
-  // A special non-stable key is at the moment defined only for Android Chrome.
   api_key_non_stable_ = api_key_;
 
   api_key_remoting_ =

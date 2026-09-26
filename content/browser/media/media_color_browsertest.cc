@@ -66,7 +66,6 @@ IN_PROC_BROWSER_TEST_F(MediaColorTest, Yuv420pH264) {
   RunBlackWhiteTest("yuv420p.mp4");
 }
 
-// TODO(crbug.com/501324952): Fix and enable on Android with hardware decoding.
 #define MAYBE_Yuvj420pH264 Yuvj420pH264
 IN_PROC_BROWSER_TEST_F(MediaColorTest, MAYBE_Yuvj420pH264) {
   RunBlackWhiteTest("yuvj420p.mp4");

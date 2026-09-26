@@ -456,7 +456,6 @@ SigninClient::SignoutDecision ChromeSigninClient::GetSignoutDecision(
     return is_clear_primary_account_allowed_for_testing_.value();
   }
 
-  // Android allows signing out of Managed accounts.
   // Check if managed user.
   if (enterprise_util::UserAcceptedAccountManagement(profile_)) {
     // Disallow signout regardless of consent level of the primary account.

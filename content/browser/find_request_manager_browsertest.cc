@@ -176,7 +176,6 @@ INSTANTIATE_TEST_SUITE_P(FindRequestManagerTests,
                          FindRequestManagerTest,
                          testing::Bool());
 
-// TODO(crbug.com/40470937): These tests frequently fail on Android.
 #define MAYBE(x) x
 
 
@@ -658,7 +657,6 @@ IN_PROC_BROWSER_TEST_P(FindRequestManagerTest, MAYBE_FindNewMatches) {
   EXPECT_EQ(4, results.active_match_ordinal);
 }
 
-// TODO(crbug.com/40470937): These tests frequently fail on Android.
 // TODO(crbug.com/41352658): Flaky timeout on Win7 (dbg).
 // TODO(crbug.com/41408666): Flaky on Win10.
 #define MAYBE_FindInPage_Issue627799 FindInPage_Issue627799

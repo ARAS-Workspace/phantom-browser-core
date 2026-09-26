@@ -543,12 +543,6 @@ void TestSuite::PreInitialize() {
   // flakiness. And on some platforms like macOS, use of system libraries after
   // fork() but before exec() is unsafe. Using the threadsafe style by default
   // alleviates these concerns.
-  //
-  // However, the threadsafe style does not work reliably on Android, so for
-  // that we will keep the default of "fast". For more information, see:
-  // https://crbug.com/41372437#comment12.
-  // TODO(https://crbug.com/41372437): Use "threadsafe" on Android once it is
-  // supported.
   GTEST_FLAG_SET(death_test_style, "threadsafe");
 
   EnableTerminationOnHeapCorruption();
@@ -561,8 +555,6 @@ void TestSuite::PreInitialize() {
   setlocale(LC_NUMERIC, "C");
 #endif  // BUILDFLAG(IS_LINUX) && defined(USE_AURA)
 
-  // On Android, AtExitManager is created in
-  // testing/android/native_test_wrapper.cc before main() is called.
   at_exit_manager_ = std::make_unique<AtExitManager>();
 
   // This needs to be done during construction as some users of this class rely

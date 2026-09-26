@@ -461,11 +461,6 @@ ShouldUploadBinaryForDeepScanning(download::DownloadItem* item) {
 
 bool IsFiletypeSupportedForFullDownloadProtection(
     const base::FilePath& file_name) {
-  // On Android, do not use FileTypePolicies, which are currently only
-  // applicable to desktop platforms. Instead, hardcode the APK filetype check
-  // for Android here.
-  // TODO(chlily): Refactor/fix FileTypePolicies and then remove this
-  // platform-specific hardcoded behavior.
   return FileTypePolicies::GetInstance()->IsCheckedBinaryFile(file_name);
 }
 

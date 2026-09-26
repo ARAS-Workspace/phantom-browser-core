@@ -200,10 +200,10 @@ void HttpCache::DefaultBackend::HasExistingFileToLoad(
       base::BindOnce(
           [](std::unique_ptr<disk_cache::BackendFileOperations> ops,
              base::FilePath path) {
-            // On platforms other than Android, GrantSandboxAccessOnThreadPool()
-            // is called when the browser process creates a NetworkContext, and
-            // that function explicitly ensures the/ cache directory is created.
-            // Thus we need to check if cache files actually exist.
+            // GrantSandboxAccessOnThreadPool() is called when the browser
+            // process creates a NetworkContext, and that function explicitly
+            // ensures the/ cache directory is created. Thus we need to check if
+            // cache files actually exist.
             if (!ops->PathExists(path)) {
               return false;
             }

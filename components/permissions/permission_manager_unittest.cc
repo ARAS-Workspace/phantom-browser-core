@@ -660,8 +660,6 @@ TEST_F(PermissionManagerTest, RequestPermissionInDifferentStoragePartition) {
                 partitioned_child->GetLastCommittedOrigin().GetURL()));
 }
 
-// TODO(crbug.com/377264243): Enable the test when device permission is
-// supported in Android
 #define MAYBE_UpdatePermissionStatusWithDeviceStatus \
   UpdatePermissionStatusWithDeviceStatus
 TEST_F(PermissionManagerTest, MAYBE_UpdatePermissionStatusWithDeviceStatus) {
@@ -732,8 +730,6 @@ class WildcardPermissionObserver : public permissions::Observer {
   int wildcard_count_ = 0;
 };
 
-// TODO(crbug.com/377264243): Enable when device permission is supported on
-// Android.
 #define MAYBE_DeviceStatusRefreshNotifiesObservers \
   DeviceStatusRefreshNotifiesObservers
 // Verifies that when the device-level permission is revoked, the site-level

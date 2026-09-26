@@ -73,8 +73,6 @@ TEST(ExtensionUtilTest, MapUrlToLocalFilePath) {
   EXPECT_FALSE(does_not_exist_path.empty());
 }
 
-// TODO(https://crbug.com/356905053):Strict site isolation is not enabled on
-// Android, so this test is disabled on desktop android.
 #define MAYBE_ExtensionIdForSiteInstance ExtensionIdForSiteInstance
 TEST(ExtensionUtilTest, MAYBE_ExtensionIdForSiteInstance) {
   content::BrowserTaskEnvironment test_environment;

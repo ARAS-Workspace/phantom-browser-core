@@ -965,7 +965,6 @@ class TimeOverride {
 // static
 Time TimeOverride::now_time_;
 
-// Disabled on Android due to flakes; see https://crbug.com/1474884.
 #define MAYBE_NowOverride NowOverride
 TEST_F(TimeTest, MAYBE_NowOverride) {
   TimeOverride::now_time_ = Time::UnixEpoch();

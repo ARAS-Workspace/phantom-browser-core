@@ -1265,7 +1265,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // touch end would pass (15, 10) to subframe which should be (15, 15) in
 // subframe.
 // https://crbug.com/959848: Flaky on Linux MSAN bots
-// https://crbug.com/959924: Flaky on Android MSAN bots
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_TouchAndGestureEventPositionChange \
   DISABLED_TouchAndGestureEventPositionChange
@@ -2130,7 +2129,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessEmulatedTouchBrowserTest,
 
 // Regression test for https://crbug.com/851644. The test passes as long as it
 // doesn't crash.
-// Touch action ack timeout is enabled on Android only.
 
 #if defined(USE_AURA)
 
@@ -2506,10 +2504,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHighDPIHitTestBrowserTest,
   NonFlatTransformedSurfaceHitTestHelper(shell(), embedded_test_server());
 }
 
-// TODO(kenrb): Running this test on Android bots has slight discrepancies in
-// transformed event coordinates when we do manual calculation of expected
-// values. We can't rely on browser side transformation because it is broken
-// for perspective transforms. See https://crbug.com/854247.
 #define MAYBE_PerspectiveTransformedSurfaceHitTestTest \
   PerspectiveTransformedSurfaceHitTestTest
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
@@ -3620,7 +3614,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   EXPECT_FALSE(child_interceptor->Capturing());
   base::RunLoop().RunUntilIdle();
 
-// Targeting a scrollbar with a click doesn't work on Mac or Android.
+// Targeting a scrollbar with a click doesn't work on Mac.
 #if !BUILDFLAG(IS_MAC)
   scoped_refptr<SetMouseCaptureInterceptor> root_interceptor =
       new SetMouseCaptureInterceptor(static_cast<RenderWidgetHostImpl*>(
@@ -4007,7 +4001,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   EXPECT_TRUE(child_frame_monitor.EventWasReceived());
 }
 
-// There are no cursors on Android.
 namespace {
 
 // Intercepts SetCursor calls. The caller has to guarantee that
@@ -5853,9 +5846,9 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // Verify that scrolling the main frame correctly updates the position to
 // a nested child frame. See issue https://crbug.com/878703 for more
 // information.
-// On Mac and Android, the reported menu coordinates are relative to the
-// OOPIF, and its screen position is computed later, so this test isn't
-// relevant on those platforms.
+// On Mac, the reported menu coordinates are relative to the OOPIF, and its
+// screen position is computed later, so this test isn't relevant on that
+// platform.
 #if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        ScrolledNestedPopupMenuTest) {
@@ -5968,9 +5961,9 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-// On Mac and Android, the reported menu coordinates are relative to the OOPIF,
-// and its screen position is computed later, so this test isn't relevant on
-// those platforms.
+// On Mac, the reported menu coordinates are relative to the OOPIF, and its
+// screen position is computed later, so this test isn't relevant on that
+// platform.
 //
 // Tests that a <select>'s visibility is correctly computed and thus shows the
 // popup when clicked.
@@ -6333,7 +6326,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessGestureHitTestBrowserTest,
 }
 #endif  // defined(USE_AURA)
 
-// Android uses fixed scale factor, which makes this test unnecessary.
 // MacOSX does not have fractional device scales.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_MouseClickWithNonIntegerScaleFactor \

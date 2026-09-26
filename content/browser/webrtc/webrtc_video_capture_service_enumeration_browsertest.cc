@@ -234,7 +234,6 @@ IN_PROC_BROWSER_TEST_P(WebRtcVideoCaptureServiceEnumerationBrowserTest,
   DisconnectFromService();
 }
 
-// The mediadevices.ondevicechange event is currently not supported on Android.
 #define MAYBE_AddingAndRemovingVirtualDeviceTriggersMediaElementOnDeviceChange \
   AddingAndRemovingVirtualDeviceTriggersMediaElementOnDeviceChange
 

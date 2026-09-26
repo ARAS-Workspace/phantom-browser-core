@@ -332,7 +332,6 @@ IN_PROC_BROWSER_TEST_F(ContentScriptMatchingBrowserTest,
 }
 
 // Flaky on MacOS since r622662. See https://crbug.com/40609469
-// Also flaky on desktop Android.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ContentScriptMatching_NotAllFrames \
   DISABLED_ContentScriptMatching_NotAllFrames

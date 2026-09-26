@@ -6932,7 +6932,6 @@ TEST_F(RenderTextTest, HarfBuzz_BreakRunsByEmojiVariationSelectors) {
   EXPECT_EQ(gfx::Range(1, 1), render_text->selection());
   EXPECT_EQ(1 * kGlyphWidth, render_text->GetUpdatedCursorBounds().x());
 
-  // TODO(crbug.com/40585824): make this work on Android.
   // Jump over the telephone: two codepoints, but a single glyph.
   render_text->MoveCursor(CHARACTER_BREAK, CURSOR_RIGHT, SELECTION_NONE);
   EXPECT_EQ(gfx::Range(3, 3), render_text->selection());
@@ -7445,7 +7444,6 @@ TEST_F(RenderTextTest, StringFitsOwnWidth) {
   EXPECT_EQ(kString, render_text->GetDisplayText());
 }
 
-// TODO(crbug.com/40585825): Figure out why this fails on Android.
 // Ensure that RenderText examines all of the fonts in its FontList before
 // falling back to other fonts.
 TEST_F(RenderTextTest, HarfBuzz_FontListFallback) {
@@ -7471,7 +7469,7 @@ TEST_F(RenderTextTest, HarfBuzz_FontListFallback) {
 // Ensure that the fallback fonts offered by GetFallbackFonts() are tried. Note
 // this test assumes the font "Arial" doesn't provide a unicode glyph for a
 // particular character, and that there is a system fallback font which does.
-// TODO(msw): Fallback doesn't find a glyph on Linux and Android.
+// TODO(msw): Fallback doesn't find a glyph on Linux.
 #if !BUILDFLAG(IS_LINUX)
 TEST_F(RenderTextTest, HarfBuzz_UnicodeFallback) {
   RenderTextHarfBuzz* render_text = GetRenderText();

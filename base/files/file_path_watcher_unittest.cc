@@ -941,7 +941,6 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
   delegate.RunUntilEventsMatch(event_expecter);
 
   // Mac and Win don't generate events for Touch.
-  // Android TouchFile returns false.
   // Touch "$dir".
   Time access_time;
   ASSERT_TRUE(Time::FromString("Wed, 16 Nov 1994, 00:00:00", &access_time));
@@ -982,12 +981,7 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
   event_expecter.AddExpectedEventForPath(dir);
   delegate.RunUntilEventsMatch(event_expecter);
 
-  // Apps cannot change file attributes on Android in /sdcard as /sdcard uses
-  // the "fuse" file system, while /data uses "ext4".  Running these tests in
-  // /data would be preferable and allow testing file attributes and symlinks.
-  // TODO(pauljensen): Re-enable when crbug.com/475568 is fixed and SetUp()
-  // places the |temp_dir_| in /data. Modify
-  // "$dir/subdir/subdir_child_dir/child_dir_file1" attributes.
+  // Modify "$dir/subdir/subdir_child_dir/child_dir_file1" attributes.
   ASSERT_TRUE(MakeFileUnreadable(child_dir_file1));
   event_expecter.AddExpectedEventForPath(dir);
   delegate.RunUntilEventsMatch(event_expecter);

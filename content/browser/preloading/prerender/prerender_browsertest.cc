@@ -746,9 +746,7 @@ class PrerenderBrowserTest : public ContentBrowserTest,
     return prerender_helper_.get();
   }
 
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // The viewport meta tag is only enabled on Android.
-  }
+  void SetUpCommandLine(base::CommandLine* command_line) override {}
 
   void TestNavigationHistory(const GURL& expected_current_url,
                              int expected_history_index,
@@ -1441,7 +1439,6 @@ IN_PROC_BROWSER_TEST_P(NoVarySearchPrerenderBrowserTest,
 
 // Test that the timer is enabled and cleared appropriately when navigating to
 // a No-Vary-Search hint matched prerender with timeout waiting for headers.
-// Flaky on android: crbug.com/395337644
 #define MAYBE_EagerTimerWorksCorrectlyForHeadersThatArriveAfterTimeout \
   EagerTimerWorksCorrectlyForHeadersThatArriveAfterTimeout
 IN_PROC_BROWSER_TEST_P(
@@ -8506,9 +8503,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,
       "Navigation.Prerender.ActivationCommitDeferTime.SpeculationRule", 1u);
 }
 
-// TODO(crbug.com/40170624): Now the File System Access API is not
-// supported on Android. Enable this browser test after
-// https://crbug.com/1011535 is fixed.
 #define MAYBE_DeferPrivateOriginFileSystem DeferPrivateOriginFileSystem
 // Tests that access to the origin private file system via the File System
 // Access API is deferred until activating the prerendered page.
@@ -8794,8 +8788,6 @@ IN_PROC_BROWSER_TEST_P(PrerenderTargetAgnosticBrowserTest, DownloadInSubframe) {
 
   ExpectFinalStatusForSpeculationRule(PrerenderFinalStatus::kDownload);
 }
-
-// The viewport meta tag is only enabled on Android.
 
 // End: Tests for feature restrictions in prerendered pages ====================
 
@@ -12922,8 +12914,6 @@ class MultiplePrerendersWithLimitedMemoryBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Memory pressure notifications to PrerenderHostRegistry are disabled on
-// Android only.
 // Tests that moderate-level memory pressure doesn't cancel prerendering on
 // trigger.
 IN_PROC_BROWSER_TEST_F(MultiplePrerendersBrowserTest,
@@ -17302,8 +17292,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptBrowserTest, DeferredScript) {
 }
 
 // Tests that standby prerender-until-script candidates work.
-// TODO(crbug.com/40269669): Add the implementation of pointer interaction
-// on Android to the function below.
 #define MAYBE_NonImmediateEagerness NonImmediateEagerness
 IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptBrowserTest,
                        MAYBE_NonImmediateEagerness) {
@@ -17878,8 +17866,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptBrowserTest,
 // Tests that a moderate-eagerness prerender rule triggers an upgrade of an
 // existing PUS host when the user hovers over the navigation link. This
 // exercises the MaybePrerender() code path.
-// TODO(crbug.com/40269669): Pointer hover simulation is not supported on
-// Android.
 #define MAYBE_UpgradeOnModerateHover UpgradeOnModerateHover
 IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptBrowserTest,
                        MAYBE_UpgradeOnModerateHover) {
@@ -17948,8 +17934,6 @@ IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptBrowserTest,
 
 // Tests that a conservative-eagerness prerender rule triggers an upgrade of an
 // existing PUS host when the user clicks the navigation link (pointerdown).
-// TODO(crbug.com/40269669): Pointer hover simulation is not supported on
-// Android.
 #define MAYBE_UpgradeOnConservativeClick UpgradeOnConservativeClick
 IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptBrowserTest,
                        MAYBE_UpgradeOnConservativeClick) {
@@ -18024,8 +18008,6 @@ class PrerenderUntilScriptUpgradeDisabledBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-// TODO(crbug.com/40269669): Pointer hover simulation is not supported on
-// Android.
 #define MAYBE_NoUpgradeWhenFlagDisabled NoUpgradeWhenFlagDisabled
 IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptUpgradeDisabledBrowserTest,
                        MAYBE_NoUpgradeWhenFlagDisabled) {
@@ -18977,8 +18959,6 @@ class ReuseInitiatorProcessTest : public PrerenderBrowserTest {
 // Tests that a same-origin prerender-until-script with moderate eagerness
 // reuses the initiator's process when the feature is enabled with default
 // eagerness (moderate).
-// TODO(crbug.com/40269669): Add the implementation of pointer interaction
-// on Android to the function below.
 #define MAYBE_ModerateEagernessPrerenderUntilScriptReusesProcess \
   ModerateEagernessPrerenderUntilScriptReusesProcess
 IN_PROC_BROWSER_TEST_F(

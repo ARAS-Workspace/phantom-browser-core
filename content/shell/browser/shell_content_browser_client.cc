@@ -689,8 +689,6 @@ void ShellContentBrowserClient::GetAdditionalMappedFilesForChildProcess(
 // TODO(crbug.com/41494161): Remove that override once the flakiness is fixed.
 void ShellContentBrowserClient::OnNetworkServiceCreated(
     network::mojom::NetworkService* network_service) {
-  // TODO(bashi): Consider enabling this for Android. Excluded because the
-  // built-in resolver may not work on older SDK versions.
   if (base::FeatureList::IsEnabled(net::features::kAsyncDns)) {
     network_service->ConfigureStubHostResolver(
         net::InsecureDnsMode::kEnabledBuiltIn,

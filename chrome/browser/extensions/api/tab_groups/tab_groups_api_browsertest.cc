@@ -154,7 +154,7 @@ class TabGroupsApiBrowserTest : public ExtensionBrowserTest {
     }
 
     // Wait for the TabGroupSyncService to properly initialize before making any
-    // changes to tab groups. This is not used on Android.
+    // changes to tab groups.
     auto observer =
         std::make_unique<tab_groups::TabGroupSyncServiceInitializedObserver>(
             tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile()));
@@ -662,9 +662,6 @@ IN_PROC_BROWSER_TEST_F(TabGroupsApiBrowserTest, TabGroupsMoveAcrossWindows) {
   TabListInterface* tab_list2 = TabListInterface::From(browser2);
   ASSERT_TRUE(tab_list2);
 
-  // CreateBrowserWindowWithType() creates zero tabs on Win/Mac/Linux, but
-  // creates one tab on Android.
-  // TODO(crbug.com/477611601): Reconcile this difference.
   constexpr int kInitialTabs = 0;
   // The target number of tabs in window 2.
   constexpr int kNumTabs2 = 3;

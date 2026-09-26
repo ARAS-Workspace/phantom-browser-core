@@ -2490,8 +2490,6 @@ TEST_P(RenderFrameHostManagerTestWithSiteIsolation,
 // This test confirms that for this return navigation that we identified that
 // there is no FallbackSurface for the RenderWidgetHostView to display during
 // the navigation. (https://crbug.com/1258363)
-// TODO(crbug.com/375057184): Determine why this test crashes on Android and
-// re-enable it.
 #define MAYBE_TwoTabsOneNavigatesAndCrashesThenNavigatesBack \
   TwoTabsOneNavigatesAndCrashesThenNavigatesBack
 TEST_P(RenderFrameHostManagerTestWithSiteIsolation,

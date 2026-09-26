@@ -825,8 +825,6 @@ static const base::FilePath::CharType kCookieDatabaseName[] =
 static const base::FilePath::CharType kNetworkSubpath[] =
     FILE_PATH_LITERAL("Network");
 
-// Disable the following data migration tests on Android because the data
-// migration logic is disabled and compiled out on this platform.
 #define MAYBE_NetworkServiceDataMigrationBrowserTest \
   NetworkServiceDataMigrationBrowserTest
 #define MAYBE_NetworkServiceDataMigrationBrowserTestWithFailures \
@@ -1365,8 +1363,6 @@ IN_PROC_BROWSER_TEST_F(MAYBE_NetworkServiceDataMigrationBrowserTest,
   EXPECT_TRUE(base::PathExists(checkpoint_file));
 }
 
-// Disable instantiation of parametrized tests for disk access sandboxing on
-// Android.
 #define MAYBE_InProcess InProcess
 #define MAYBE_OutOfProcess OutOfProcess
 

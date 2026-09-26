@@ -94,7 +94,6 @@ IN_PROC_BROWSER_TEST_F(DevtoolsApiTest,
 // window and prevents the extension from accessing local file resources when
 // DevTools is reopened.
 // Regression test for https://crbug.com/483435192.
-// TODO(https://crbug.com/546216109): Enable on desktop android.
 #define MAYBE_CantGetFileResourceWhenFileAccessRevoked \
   CantGetFileResourceWhenFileAccessRevoked
 IN_PROC_BROWSER_TEST_F(DevtoolsApiTest,

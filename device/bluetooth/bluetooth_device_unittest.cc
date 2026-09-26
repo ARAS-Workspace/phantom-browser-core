@@ -964,10 +964,10 @@ TEST_F(BluetoothTest, MAYBE_GetName_NullName) {
   BluetoothDevice* device = SimulateLowEnergyDevice(5);
   EXPECT_FALSE(device->GetName());
 
-  // The check below is not currently working on Android and Mac because the
-  // GetAppearance() method is not implemented on those platforms.
+  // The check below is not currently working on Mac because the GetAppearance()
+  // method is not implemented on that platform.
   // TODO(crbug.com/41240161): Enable the check below when GetAppearance()
-  // is implemented for Android and Mac.
+  // is implemented for Mac.
 #if !BUILDFLAG(IS_APPLE)
   EXPECT_EQ(device->GetNameForDisplay(),
             u"Unknown or Unsupported Device (01:00:00:90:1E:BE)");
@@ -1288,8 +1288,6 @@ TEST_F(BluetoothTest,
                   }));
 
   EXPECT_EQ(1, gatt_connection_attempts_);
-  // On Android, calling DisconnectGatt() while the GATT connection is still
-  // pending cancels the in-flight attempt, so the connection never completes.
   // Other platforms let the pending connection finish before applying the
   // disconnect, so the connection succeeds and is then torn down below.
   EXPECT_TRUE(connected);

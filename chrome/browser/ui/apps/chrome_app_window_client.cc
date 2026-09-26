@@ -18,8 +18,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/features/feature_channel.h"
 
-// TODO(jamescook): We probably shouldn't compile this class at all on Android.
-// See http://crbug.com/40351600
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/apps/chrome_app_delegate.h"
 

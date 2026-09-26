@@ -1060,7 +1060,7 @@ IN_PROC_BROWSER_TEST_F(NavigationBrowserTest,
             controller.GetLastCommittedEntry()->GetVirtualURL());
 }
 
-// TODO(crbug.com/40924471): Test is flaky on Android, Linux.
+// TODO(crbug.com/40924471): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_BackFollowedByReload DISABLED_BackFollowedByReload
 #else
@@ -4406,7 +4406,7 @@ class InitiatorClosingOpenURLInterceptor
 // the same SiteInstanceGroup to be deleted, meaning the OpenURL IPC may never
 // be received.
 //
-// Fails on linux-bfcache-rel and android-bfcache-rel. See crbug.com/336671248.
+// Fails on linux-bfcache-rel. See crbug.com/336671248.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_FormSubmissionInRemoteFrameSenderDeletedBeforeReceivingOpenURL \
   DISABLED_FormSubmissionInRemoteFrameSenderDeletedBeforeReceivingOpenURL

@@ -208,10 +208,7 @@ bool CanCopySharedImageToGLTextureViaSkia(bool is_opaque,
                                           int32_t dst_level,
                                           SkAlphaType dst_alpha_type) {
   // NOTE: CopySharedImageToGLTextureINTERNAL() is implemented only in the
-  // passthrough command decoder, which is not yet fully rolled out on Android.
-  // Hence, disable this codepath on Android.
-  // TODO(crbug.com/40075313): Enable on Android once the passthrough command
-  // decoder is used universally there.
+  // passthrough command decoder.
   bool si_usable_by_gles2_interface = shared_image_target != 0;
   // Since skia always produces premultiply alpha outputs, trying direct
   // uploading path when the source is opaque or premultiply alpha been

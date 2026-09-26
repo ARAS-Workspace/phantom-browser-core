@@ -427,7 +427,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                            ModelEntryHasCacheGuid(CacheGuidForSuffix(1))));
 }
 
-// TODO(crbug.com/40756482): Flaky on Android.
 #define MAYBE_CommitLocalDevice_TransportOnly CommitLocalDevice_TransportOnly
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        MAYBE_CommitLocalDevice_TransportOnly) {
@@ -444,7 +443,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                   .Wait());
 }
 
-// TODO(crbug.com/40756482): Flaky on Android.
 #define MAYBE_DownloadRemoteDevices_TransportOnly \
   DownloadRemoteDevices_TransportOnly
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
@@ -710,8 +708,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                   .Wait());
 }
 
-// PRE_* tests aren't supported on Android browser tests.
-
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        PRE_ShouldNotSendDeviceInfoAfterBrowserRestart) {
   ASSERT_TRUE(SetupSync());
@@ -761,10 +757,6 @@ class SingleClientDeviceInfoWithDeviceStatisticsSyncTest
 
  private:
   void OnWillCreateBrowserContextServices(content::BrowserContext* context) {
-    // Note: On Android 10 (API level 29), setting the metrics consent override
-    // causes the test setup to time out, see crbug.com/483394870. The tests
-    // that rely on this are similarly short-circuited.
-
     // Note: The `MetricsConsentOverride` must be set *after*
     // `g_browser_process` has been initialized, but *before* the KeyedServices
     // have been created (since SyncService creation kicks off the metrics
@@ -834,10 +826,6 @@ IN_PROC_BROWSER_TEST_P(
 
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
                        ShouldRecordDeviceStatisticsMetricsWithPrimaryAccount) {
-  // Note: On Android 10 (API level 29), setting the metrics consent override
-  // causes the test setup to time out, see crbug.com/483394870, so this test
-  // cannot run.
-
   ASSERT_TRUE(SetupClients());
 
   // Wait for the test profile's statistics request to complete. Only check
@@ -853,9 +841,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
 
   // Note: Since the default profile doesn't have any signed-in accounts, it
   // shouldn't have started any requests, so there should be only one request.
-  // On Android, where the default profile is used, this histogram may get
-  // recorded before the test body, and thus before the HistogramTester is
-  // instantiated.
   histograms_.ExpectUniqueSample("Sync.DeviceStatistics.RequestsStartedCount",
                                  /*sample=*/1, /*expected_bucket_count=*/1,
                                  FROM_HERE);
@@ -900,17 +885,11 @@ IN_PROC_BROWSER_TEST_P(
                                    SyncTestAccount::kDefaultAccount)));
 }
 
-// TODO(crbug.com/483936092): signin::MakeAccountAvailable() (needed by the PRE_
-// test) doesn't work on Android.
 #define MAYBE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount \
   ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount
 IN_PROC_BROWSER_TEST_P(
     SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
     MAYBE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount) {
-  // Note: On Android 10 (API level 29), setting the metrics consent override
-  // causes the test setup to time out, see crbug.com/483394870, so this test
-  // cannot run.
-
   ASSERT_TRUE(SetupClients());
 
   // Wait for the test profile's statistics request to complete. Only check
@@ -926,9 +905,6 @@ IN_PROC_BROWSER_TEST_P(
 
   // Note: Since the default profile doesn't have any signed-in accounts, it
   // shouldn't have started any requests, so there should be only one request.
-  // On Android, where the default profile is used, this histogram may get
-  // recorded before the test body, and thus before the HistogramTester is
-  // instantiated.
   histograms_.ExpectUniqueSample("Sync.DeviceStatistics.RequestsStartedCount",
                                  /*sample=*/1, /*expected_bucket_count=*/1,
                                  FROM_HERE);

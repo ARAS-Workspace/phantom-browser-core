@@ -378,10 +378,6 @@ void VariationsService::PerformPreMainMessageLoopStartup() {
 
   InitResourceRequestedAllowedNotifier();
 
-  // Android instead calls OnAppEnterForeground() which then calls
-  // StartRepeatedVariationsSeedFetch(). This is too early to do it on Android
-  // because at this point the |restrict_mode_| hasn't been set yet. See also
-  // the CHECK in SetRestrictMode().
   if (!IsFetchingEnabled()) {
     return;
   }

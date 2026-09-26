@@ -25,8 +25,6 @@ namespace content {
 // Logitech.
 #define MAYBE_ManipulateFocusDistance DISABLED_ManipulateFocusDistance
 
-// TODO(crbug.com/40554182): Re-enable test on Android as soon as the cause for
-// the bug is understood and fixed.
 // TODO(crbug.com/40754212): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_ManipulatePan DISABLED_ManipulatePan
@@ -36,8 +34,7 @@ namespace content {
 #define MAYBE_ManipulateZoom ManipulateZoom
 #endif
 
-// TODO(crbug.com/793859, crbug.com/986602): This test is broken on Android
-// (see above) and flaky on Linux.
+// TODO(crbug.com/793859, crbug.com/986602): This test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_ManipulateExposureTime DISABLED_ManipulateExposureTime
 #else
@@ -214,8 +211,6 @@ IN_PROC_BROWSER_TEST_P(WebRtcImageCaptureSucceedsBrowserTest,
 }
 
 // TODO(crbug.com/41478484): Flaky on Linux.
-// TODO(crbug.com/40554182): Re-enable test on Android as soon as the cause for
-// the bug is understood and fixed.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_ManipulateTilt DISABLED_ManipulateTilt
 #else

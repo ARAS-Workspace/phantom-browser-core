@@ -109,8 +109,6 @@ bool IsAidaBlockedByGeo(std::string country_code) {
 AidaClient::Availability AidaClient::CanUseAida(Profile* profile) {
   struct Availability result;
   // AidaClient is only available on branded builds.
-  // Currently it's also not available on Android.
-  // TODO(b/532900989): Enable this on Android.
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   result.available = true;
   auto account_info = AccountInfoForProfile(profile);

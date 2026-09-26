@@ -302,8 +302,6 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest, SkiaInitialized) {
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 
-// TODO(crbug.com/40253015): Re-enable this test on Android when
-// `files_to_preload` is actually fixed there.
 #define MAYBE_FileDescriptorStore FileDescriptorStore
 IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
                        MAYBE_FileDescriptorStore) {
@@ -382,8 +380,6 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) &&
         // BUILDFLAG(USE_ZYGOTE)
 
-// Disabled because it crashes on android-arm64-tests:
-// https://crbug.com/1358585.
 // TODO(crbug.com/41484083): Re-enable this test on ChromeOS.
 // ** READ THIS **
 // This is a critical test for crash reporting: if this starts to flake or fail

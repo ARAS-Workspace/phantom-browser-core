@@ -277,7 +277,6 @@ class TracingControllerTest : public ContentBrowserTest {
   std::unique_ptr<std::string> last_data_;
 };
 
-// Consistent failures on Android Asan https://crbug.com/1045519
 #define MAYBE_EnableAndStopTracing EnableAndStopTracing
 #define MAYBE_EnableAndStopTracingWithFilePath EnableAndStopTracingWithFilePath
 #define MAYBE_EnableAndStopTracingWithCompression \

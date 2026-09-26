@@ -720,10 +720,7 @@ void TracingSamplerProfiler::StartTracing(
       should_enable_filtering, sample_callback_for_testing_);
 
   profile_builder_ = profile_builder.get();
-  // There is a dichotomy between stack samplers for Android and other
-  // platforms. While Android explicitly needs a factory to provide "core"
-  // unwinders, other platforms explicitly check that no such factory is
-  // provided.
+  // Explicitly check that no core unwinder factory is provided.
   if (unwinder_type_ == UnwinderType::kUnknown) {
     unwinder_type_ = UnwinderType::kDefault;
   }

@@ -376,9 +376,8 @@ blink::UserAgentBrandVersion GetGreasedUserAgentBrandVersion(
 }
 
 bool GetMobileBitForUAMetadata() {
-  // The mobile bit for UA-CH is true if the platform is iOS, or if it's
-  // Android and not a desktop form factor, AND the kUseMobileUserAgent switch
-  // is present.
+  // The mobile bit for UA-CH is true if the platform is iOS AND the
+  // kUseMobileUserAgent switch is present.
 
   return false;
 }

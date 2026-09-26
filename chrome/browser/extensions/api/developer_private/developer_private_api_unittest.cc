@@ -859,10 +859,6 @@ TEST_F(DeveloperPrivateApiUnitTest, DeveloperPrivatePackFunction) {
   pack_args.erase(pack_args.begin() + 1, pack_args.begin() + 3);
   EXPECT_TRUE(TestPackExtensionFunction(
       pack_args, api::developer_private::PackStatus::kError, 0));
-
-  // In Android, even if the process fails, two empty files are still
-  // created under downloads. In this teardown, we clean up these files
-  // to prevent them from impacting subsequent tests.
 }
 
 // Test developerPrivate.choosePath.
@@ -1343,10 +1339,6 @@ TEST_F(DeveloperPrivateApiUnitTest, ReloadBadExtensionToLoadUnpackedRetry) {
   }
 }
 
-// On Android, file information cannot be directly accessed from the **drag
-// event**. We must instead use the **drop event** to retrieve the file data.
-// See {@link DeveloperPrivateNotifyDragInstallInProgressFunction} for detailed
-// information.
 TEST_F(DeveloperPrivateApiUnitTest,
        DeveloperPrivateNotifyDragInstallInProgress) {
   std::unique_ptr<content::WebContents> web_contents(

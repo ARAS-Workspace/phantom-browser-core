@@ -588,8 +588,6 @@ IN_PROC_BROWSER_TEST_P(MultiActionAPITest, OnClickedDispatching) {
 }
 
 // Tests the creation of a popup when one is specified in the manifest.
-// TODO(crbug.com/478717514): Enable on Android when we support triggering a
-// popup of an unpinned extension.
 #define MAYBE_PopupCreation PopupCreation
 IN_PROC_BROWSER_TEST_P(MultiActionAPITest, MAYBE_PopupCreation) {
   constexpr char kManifestTemplate[] =
@@ -718,8 +716,6 @@ IN_PROC_BROWSER_TEST_P(MultiActionAPITest, SetPopupToEmptyString) {
 
 // Tests that sessionStorage does not persist between closing and opening of a
 // popup.
-// TODO(crbug.com/478717514): Enable on Android when we support triggering a
-// popup of an unpinned extension.
 // TODO(crbug.com/40795982): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_SessionStorageDoesNotPersistBetweenOpenings \

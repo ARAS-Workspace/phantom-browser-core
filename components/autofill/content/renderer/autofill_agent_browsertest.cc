@@ -1773,7 +1773,6 @@ INSTANTIATE_TEST_SUITE_P(
                       R"(<div contenteditable id=f><div></div></div>)"));
 
 // Tests that clicking on a field triggers AskForValuesToFillOnClick().
-// TODO(crbug.com/342126797): Fix Android's OnAskForValuesToFill() event.
 #define MAYBE_AskForValuesToFillOnClick AskForValuesToFillOnClick
 TEST_P(AutofillAgentTestClick, MAYBE_AskForValuesToFillOnClick) {
   testing::MockFunction<void(std::string_view)> checkpoint;

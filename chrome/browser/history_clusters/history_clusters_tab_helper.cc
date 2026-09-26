@@ -410,7 +410,6 @@ void HistoryClustersTabHelper::RecordPageEndMetricsIfNeeded(
            .is_existing_bookmark &&
       IsPageBookmarked(web_contents(),
                        incomplete_visit_context_annotations.url_row.url());
-  // Android does not have NTP Custom Links.
   // This queries the prefs directly if the visit URL is stored as an NTP
   // custom link, bypassing the CustomLinksManager.
   PrefService* pref_service =

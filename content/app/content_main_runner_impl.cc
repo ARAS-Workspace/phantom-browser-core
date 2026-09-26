@@ -729,9 +729,7 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
   [[maybe_unused]] base::GlobalDescriptors* g_fds =
       base::GlobalDescriptors::GetInstance();
 
-  // On Android, the shared descriptors are passed through the Java service,
-  // which takes care of updating these mappings; otherwise, we need to update
-  // the mappings explicitly.
+  // We need to update the mappings explicitly.
   g_fds->Set(kMojoIPCChannel,
              kMojoIPCChannel + base::GlobalDescriptors::kBaseDescriptor);
   g_fds->Set(kFieldTrialDescriptor,
@@ -758,7 +756,6 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
   TRACE_EVENT0("startup,benchmark,rail", "ContentMainRunnerImpl::Initialize");
 
   // The exit manager is in charge of calling the dtors of singleton objects.
-  // On Android, AtExitManager is set up when library is loaded.
   // A consequence of this is that you can't use the ctor/dtor-based
   // TRACE_EVENT methods on Linux builds till after we set this up.
   if (!content_main_params_->ui_task) {

@@ -6353,9 +6353,9 @@ class NewPopupWidgetCreatedObserver {
 // TwoSubframesOpenWindowsSimultaneously, but use popup menu widgets instead of
 // windows.
 //
-// The plumbing that this test is verifying is not utilized on Mac/Android,
-// where popup menus don't create a popup RenderWidget, but rather they trigger
-// a FrameHostMsg_ShowPopup to ask the browser to build and display the actual
+// The plumbing that this test is verifying is not utilized on Mac, where popup
+// menus don't create a popup RenderWidget, but rather they trigger a
+// FrameHostMsg_ShowPopup to ask the browser to build and display the actual
 // popup using native controls.
 #if !BUILDFLAG(IS_MAC)
 // Disable the test due to flaky: https://crbug.com/1126165
@@ -10073,7 +10073,7 @@ class CommitMessageOrderReverser : public DidCommitNavigationInterceptor {
 // Create an out-of-process iframe that causes itself to be detached during its
 // layout/animate phase. See https://crbug.com/802932.
 //
-// TODO(crbug.com/40561636): Disabled on Android, Mac due to flakiness.
+// TODO(crbug.com/40561636): Disabled on Mac due to flakiness.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_OOPIFDetachDuringAnimation DISABLED_OOPIFDetachDuringAnimation
 #else

@@ -131,7 +131,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, MAYBE_Muted) {
   ASSERT_TRUE(RunExtensionTest("tabs/basics/muted")) << message_;
 }
 
-// TODO(crbug.com/471405507): Disabled on Android.
 #define MAYBE_Tabs2 Tabs2
 IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, MAYBE_Tabs2) {
   ASSERT_TRUE(RunExtensionTest("tabs/basics", {.extension_url = "crud2.html"}))
@@ -319,7 +318,6 @@ class ExtensionApiCaptureTest : public ExtensionApiTabTest {
 
 // https://crbug.com/40915448 Flaky on Mac.
 // TODO(crbug.com/540627656): Disabled on Linux dbg due to timeout.
-// TODO(crbug.com/488154807): Flaky on desktop Android.
 #if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
 #define MAYBE_CaptureVisibleTabJpeg DISABLED_CaptureVisibleTabJpeg
 #else
@@ -346,7 +344,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiCaptureTest, MAYBE_CaptureVisibleTabJpeg) {
 
 // https://crbug.com/40915548 Flaky on Mac.
 // TODO(crbug.com/451698327): Disabled on Linux dbg due to flakiness.
-// TODO(crbug.com/488154807): Flaky on desktop Android.
 #if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
 #define MAYBE_CaptureVisibleTabPng DISABLED_CaptureVisibleTabPng
 #else
@@ -378,8 +375,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiCaptureTest,
       << message_;
 }
 
-// https://crbug.com/40707203 Flaky on Linux. TODO(crbug.com/488154807): Flaky
-// on desktop Android.
+// https://crbug.com/40707203 Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_CaptureVisibleFile DISABLED_CaptureVisibleFile
 #else
@@ -472,8 +468,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, IncognitoDisabledByPref) {
   ASSERT_TRUE(RunExtensionTest("tabs/incognito_disabled")) << message_;
 }
 
-// TODO(crbug.com/500790726): Flaky on desktop Android. Crashes during test
-// shutdown with a Java exception in ChromeAndroidTaskTrackerImpl.
 #define MAYBE_GetViewsOfCreatedPopup GetViewsOfCreatedPopup
 IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, MAYBE_GetViewsOfCreatedPopup) {
   ASSERT_TRUE(RunExtensionTest("tabs/basics",
@@ -587,8 +581,6 @@ class IncognitoExtensionApiTabTest : public ExtensionApiTabTest,
   ~IncognitoExtensionApiTabTest() override = default;
 };
 
-// TODO(crbug.com/500790726): Flaky on desktop Android. Crashes during test
-// shutdown with a Java exception in ChromeAndroidTaskTrackerImpl.
 #define MAYBE_IncognitoTabs IncognitoTabs
 IN_PROC_BROWSER_TEST_P(IncognitoExtensionApiTabTest, MAYBE_IncognitoTabs) {
   bool is_incognito_enabled = GetParam();
@@ -1088,8 +1080,6 @@ class ExtensionApiTabSplitViewTest : public ExtensionApiTabTest {
       extensions_features::kApiTabsSplitView};
 };
 
-// TODO(https://crbug.com/480192698): Remove this restriction once split tabs
-// are supported on Desktop Android.
 IN_PROC_BROWSER_TEST_F(ExtensionApiTabSplitViewTest, CreateSplitWithTabId) {
   ASSERT_TRUE(RunExtensionTest("tabs/split_view_create_split_with_id"))
       << message_;

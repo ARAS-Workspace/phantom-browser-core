@@ -40,9 +40,7 @@ namespace {
 // Maximum trace config file size that will be loaded, in bytes.
 const size_t kTraceConfigFileSizeLimit = 64 * 1024;
 
-// Trace config file path:
-// - Android: /data/local/chrome-trace-config.json
-// - Others: specified by --trace-config-file flag.
+// Trace config file path: specified by --trace-config-file flag.
 
 // String parameters that can be used to parse the trace config file content.
 const char kTraceConfigParam[] = "trace_config";

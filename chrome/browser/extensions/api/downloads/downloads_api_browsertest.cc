@@ -4753,7 +4753,7 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
 }
 
 // The DownloadExtensionBubbleEnabledTest relies on the download surface, which
-// ChromeOS_ASH and Android don't use (see crbug.com/40224714).
+// ChromeOS_ASH doesn't use (see crbug.com/40224714).
 class DownloadExtensionBubbleEnabledTest : public DownloadExtensionTest {
  public:
   DownloadExtensionBubbleEnabledTest() = default;

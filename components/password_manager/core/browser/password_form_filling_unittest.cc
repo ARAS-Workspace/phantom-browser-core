@@ -245,7 +245,7 @@ TEST_F(PasswordFormFillingTest, Autofill) {
       /*webauthn_suggestions_available=*/false,
       /*suggestion_banned_fields=*/{});
 
-  // On Android, Mac and Win authentication will prevent autofilling credentials
+  // On Mac and Win authentication will prevent autofilling credentials
   // on page load.
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
@@ -334,7 +334,7 @@ TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestion) {
     // permitted. Otherwise, the renderer will not fill anyway and return
     // kFillOnAccountSelect.
     if (test_case.current_password_present) {
-      // On Android, Mac and Win authentication will prevent autofilling
+      // On Mac and Win authentication will prevent autofilling
       // credentials on page load.
 #if BUILDFLAG(IS_MAC)
       EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
@@ -362,8 +362,6 @@ TEST_F(PasswordFormFillingTest, FillWithOnlyWebAuthnCredentials) {
 
 // Test autofill when username and password are prefilled. Check that we not
 // overwrite values in the form if username doesn't look like a placeholder.
-// Skip for Android since it uses touch to fill, meaning placeholders
-// will never be overwritten.
 TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestionWithPrefill) {
   PasswordForm preferred_match = saved_match_;
   std::vector<PasswordForm> best_matches = {preferred_match};
@@ -486,9 +484,6 @@ TEST_F(PasswordFormFillingTest, AutofillAffiliatedWebMatch) {
       "PasswordManager.MatchedFormType",
       PasswordFormMetricsRecorder::MatchedFormType::kAffiliatedWebsites, 1);
 }
-
-// Exclude Android, because there credentials are not filled on
-// the page load in any case.
 
 TEST_F(PasswordFormFillingTest, NoFillOnPageloadWithCrossOriginAncestor) {
   base::HistogramTester histogram_tester;

@@ -46,10 +46,6 @@ bool IsGoogleBrandedBuild() {
 }
 
 bool IsLocalWebApprovalsEnabled() {
-  // TODO(crbug.com/1272462, b/261729051):
-  // Move this logic to SupervisedUserService, once it's migrated to
-  // components, and de-release the intended usage of
-  // WebsiteParentApproval::IsLocalApprovalSupported for Android.
   return base::FeatureList::IsEnabled(kLocalWebApprovals);
 }
 

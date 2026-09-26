@@ -1783,7 +1783,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_DevtoolsInDevTools) {
 // devtools extension.
 // ToDo(993982): The test is flaky (timeout, crash, and fail) on several builds:
 // Debug, Windows, Mac, MSan, and ASan.
-// TODO(crbug.com/405219356): Flaky. Enable the test on Android.
 #define MAYBE_DevToolsExtensionSecurityPolicyGrants \
   DevToolsExtensionSecurityPolicyGrants
 IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
@@ -2081,8 +2080,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 // TODO(crbug.com/41495883): Re-enable on linux.
-// TODO(crbug.com/405219356, crbug.com/406406862): Enable the test on Android.
-// This requires the support of DevTools in a web app window.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_CanInspectExtensionOffscreenDoc \
   DISABLED_CanInspectExtensionOffscreenDoc
@@ -2338,8 +2335,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestPauseWhenLoadingDevTools) {
 }
 
 // Tests network timing.
-// TODO(crbug.com/40218872): Enable this flaky test. This is flaky on Android
-// build.
 #define MAYBE_TestNetworkTiming TestNetworkTiming
 IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestNetworkTiming) {
   RunTest("testNetworkTiming", kSlowTestPage);
@@ -2347,7 +2342,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestNetworkTiming) {
 
 // Tests network size.
 // TODO(crbug/40218872): Enable this flaky test. This is flaky on Linux debug
-// build and Android build. See also: https://crrev.com/c/2772698
+// build. See also: https://crrev.com/c/2772698
 #if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_TestNetworkSize DISABLED_TestNetworkSize
 #else
@@ -2359,7 +2354,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_TestNetworkSize) {
 
 // Tests raw headers text.
 // TODO(crbug.com/40218872): Enable this flaky test. This is flaky on Linux
-// debug build and Android build.
+// debug build.
 #if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_TestNetworkSyncSize DISABLED_TestNetworkSyncSize
 #else
@@ -3010,8 +3005,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsDisallowedForForceInstalledExtensionsPolicyTest,
   EXPECT_FALSE(DevToolsWindow::FindDevToolsWindow(agent_host.get()));
 }
 
-// TODO(crbug.com/405219356, crbug.com/406406862): Enable on Android.
-// This requires the support of DevTools in a web app window.
 #define MAYBE_ClosedAfterNavigationToExtension ClosedAfterNavigationToExtension
 IN_PROC_BROWSER_TEST_F(DevToolsDisallowedForForceInstalledExtensionsPolicyTest,
                        MAYBE_ClosedAfterNavigationToExtension) {

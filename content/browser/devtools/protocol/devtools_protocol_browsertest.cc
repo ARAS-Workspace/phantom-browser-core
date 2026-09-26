@@ -858,10 +858,7 @@ IN_PROC_BROWSER_TEST_F(CaptureScreenshotTest,
       /*clip_scale=*/1, /*capture_beyond_viewport=*/true);
 }
 
-// Android has fading out scrollbars, which makes the test flacky.
-// TODO(crbug.com/40157725) Android has a problem with changing scale.
-// TODO(crbug.com/40156819) Android Lollipop has a problem with capturing
-// screenshot. TODO(crbug.com/40815512): Failing on MacOS.
+// TODO(crbug.com/40815512): Failing on MacOS.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_CaptureScreenshotBeyondViewport_InnerScrollbarsAreShown \
   DISABLED_CaptureScreenshotBeyondViewport_InnerScrollbarsAreShown
@@ -903,8 +900,6 @@ IN_PROC_BROWSER_TEST_F(
       /*clip=*/gfx::RectF(0, 0, view_size.width(), view_size.height()),
       /*clip_scale=*/1, /*capture_beyond_viewport=*/true);
 }
-
-// Android doesn't support software compositing.
 
 class NoGPUCaptureScreenshotTest : public CaptureScreenshotTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -1177,8 +1172,6 @@ IN_PROC_BROWSER_TEST_F(CaptureScreenshotTest,
   SendCommandSync("Emulation.clearDeviceMetricsOverride");
 }
 
-// TODO(crbug.com/40239673): Semi-transparent screenshots of viewport fail on
-// android devices - a scrollbar is showing.
 IN_PROC_BROWSER_TEST_F(CaptureScreenshotTest, TransparentScreenshotsFull) {
   if (base::SysInfo::IsLowEndDevice())
     return;
@@ -3184,7 +3177,6 @@ class DevToolsProtocolDeviceEmulationTest : public DevToolsProtocolTest {
   }
 };
 
-// Setting frame size (through RWHV) is not supported on Android.
 #define MAYBE_DeviceSize DeviceSize
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolDeviceEmulationTest, MAYBE_DeviceSize) {
   content::SetupCrossSiteRedirector(embedded_test_server());
@@ -3216,7 +3208,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolDeviceEmulationTest, MAYBE_DeviceSize) {
   EXPECT_EQ(original_size, GetViewSize());
 }
 
-// Setting frame size (through RWHV) is not supported on Android.
 #define MAYBE_RenderKillDoesNotCrashBrowser RenderKillDoesNotCrashBrowser
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolDeviceEmulationTest,
                        MAYBE_RenderKillDoesNotCrashBrowser) {
@@ -3296,7 +3287,6 @@ class DevToolsProtocolDeviceEmulationPrerenderTest
   test::PrerenderTestHelper prerender_helper_;
 };
 
-// Setting frame size (through RWHV) is not supported on Android.
 #define MAYBE_DeviceSize DeviceSize
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolDeviceEmulationPrerenderTest,
                        DevicePostureOverrideDuringPrerenderActivation) {
@@ -3493,7 +3483,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolBackForwardCacheTest, Basic) {
   EXPECT_EQ("page1", Evaluate("state", FROM_HERE));
 }
 
-// Download tests are flaky on Android: https://crbug.com/7546
 namespace {
 
 static DownloadManagerImpl* DownloadManagerForShell(Shell* shell) {
@@ -4242,7 +4231,6 @@ class FakeSystemTracingDevToolsProtocolTest
   std::unique_ptr<tracing::MockSystemService> system_service_;
 };
 
-// No system consumer support on Android to reduce Chrome binary size.
 #define MAYBE_TracingWithFakeSystemBackend TracingWithFakeSystemBackend
 IN_PROC_BROWSER_TEST_F(FakeSystemTracingDevToolsProtocolTest,
                        MAYBE_TracingWithFakeSystemBackend) {
@@ -4261,7 +4249,6 @@ class FakeSystemTracingForbiddenDevToolsProtocolTest
   }
 };
 
-// No system consumer support on Android to reduce Chrome binary size.
 #define MAYBE_SystemConsumerForbidden SystemConsumerForbidden
 IN_PROC_BROWSER_TEST_F(FakeSystemTracingForbiddenDevToolsProtocolTest,
                        MAYBE_SystemConsumerForbidden) {

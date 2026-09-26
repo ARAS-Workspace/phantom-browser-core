@@ -202,9 +202,6 @@ void RecordNavigationScheme(const GURL& url,
 }
 
 bool ShouldOpenInTab(const Extension* extension) {
-  // We always open the options page in new tab on android. Embedding the page
-  // on chrome://extensions is done with guest_view, but it's not enabled on
-  // android.
   return OptionsPageInfo::ShouldOpenInTab(extension);
 }
 
@@ -1156,8 +1153,7 @@ bool ExtensionTabUtil::BrowserSupportsTabs(BrowserWindowInterface* browser) {
     return false;
   }
 
-  // On non-android platforms, devtools windows are backed by a Browser
-  // instance.
+  // Devtools windows are backed by a Browser instance.
   // TODO(devlin): Should we be checking for other types, too? Like PiP?
   if (browser->GetType() == BrowserWindowInterface::TYPE_DEVTOOLS) {
     return false;

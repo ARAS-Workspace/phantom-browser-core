@@ -369,8 +369,6 @@ class CreditCardSaveManagerTest
   }
 
   void SetCardDetailsForFixFlow(UserProvidedCardDetails user_provided_details) {
-    // On Android, requesting expiration date or cardholder name has an
-    // additional fix flow step. A combined fix flow is not supported.
     payments_autofill_client().SetCloudSaveCallbackOfferDecision(
         SaveCardOfferUserDecision::kAccepted, user_provided_details);
   }
@@ -536,7 +534,6 @@ class CreditCardSaveManagerTest
 };
 
 // Tests that credit card data are saved for forms on https
-// TODO(crbug.com/40494359): Flaky on android_n5x_swarming_rel bot.
 #define MAYBE_ImportFormDataCreditCardHTTPS ImportFormDataCreditCardHTTPS
 TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTPS) {
   credit_card_save_manager().SetCreditCardUploadEnabled(false);
@@ -544,7 +541,6 @@ TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTPS) {
 }
 
 // Tests that credit card data are saved for forms on http
-// TODO(crbug.com/40494359): Flaky on android_n5x_swarming_rel bot.
 #define MAYBE_ImportFormDataCreditCardHTTP ImportFormDataCreditCardHTTP
 TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTP) {
   credit_card_save_manager().SetCreditCardUploadEnabled(false);
@@ -552,7 +548,6 @@ TEST_F(CreditCardSaveManagerTest, MAYBE_ImportFormDataCreditCardHTTP) {
 }
 
 // Tests that credit card data are saved when autocomplete=off for CC field.
-// TODO(crbug.com/40494359): Flaky on android_n5x_swarming_rel bot.
 #define MAYBE_CreditCardSavedWhenAutocompleteOff \
   CreditCardSavedWhenAutocompleteOff
 TEST_F(CreditCardSaveManagerTest, MAYBE_CreditCardSavedWhenAutocompleteOff) {

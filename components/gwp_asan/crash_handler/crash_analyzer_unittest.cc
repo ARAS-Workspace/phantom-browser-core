@@ -173,9 +173,6 @@ class CrashAnalyzerTest : public BaseCrashAnalyzerTest {
   }
 };
 
-// Stack trace collection on Android builds with frame pointers enabled does
-// not use base::debug::StackTrace, so the stack traces may vary slightly and
-// break this test.
 // TODO(https://crbug.com/340586138): Disabled due to excessive flakiness.
 TEST_F(CrashAnalyzerTest, DISABLED_StackTraceCollection) {
   void* ptr = gpa_.Allocate(10);

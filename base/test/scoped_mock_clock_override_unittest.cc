@@ -17,7 +17,6 @@ constexpr TimeTicks kOneYearAfterUnixEpoch =
     TimeTicks() + Microseconds(Time::kMicrosecondsFromWindowsToUnixEpoch) +
     Days(365);
 
-// Disabled on Android due to flakes; see https://crbug.com/1474884.
 #define MAYBE_Time Time
 TEST(ScopedMockClockOverrideTest, MAYBE_Time) {
   // Choose a reference time that we know to be in the past but close to now.

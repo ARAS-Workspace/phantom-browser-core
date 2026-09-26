@@ -223,8 +223,6 @@ void ShowBadFlagsInfoBarHelper(content::WebContents* web_contents,
 }  // namespace
 
 void ShowBadFlagsPrompt(content::WebContents* web_contents) {
-  // On Android, ShowBadFlagsPrompt doesn't show the warning notification
-  // for flags which are not available in about:flags.
   for (const char* flag : kBadFlags) {
     if (base::CommandLine::ForCurrentProcess()->HasSwitch(flag)) {
       ShowBadFlagsInfoBar(web_contents, IDS_BAD_FLAGS_WARNING_MESSAGE, flag);

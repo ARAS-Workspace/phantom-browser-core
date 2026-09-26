@@ -164,8 +164,6 @@ BASE_FEATURE(kDocumentPipStandaloneWindow, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Allows fullscreen to claim whole display area when in windowing mode
 
-// Enables Fullscreen to Screen on Android platform
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Controls whether Chrome Apps are supported. See https://crbug.com/40186761.
 // If the feature is disabled, Chrome Apps continue to work. If enabled, Chrome

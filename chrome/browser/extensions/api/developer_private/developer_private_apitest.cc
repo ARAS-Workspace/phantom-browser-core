@@ -137,8 +137,6 @@ IN_PROC_BROWSER_TEST_F(DeveloperPrivateApiTest, InspectEmbeddedOptionsPage) {
                                                                web_contents));
   WaitForExtensionNotIdle(extension->id());
 
-  // On Android, the option page will be opened in a new tab as the guest view
-  // is not enabled on Android yet.
   // Get the info about the extension, including the inspectable views.
   auto info = GetExtensionInfo(*extension);
 

@@ -229,11 +229,8 @@ bool AskBeforeHttpDialogController::HasOpenDialog() const {
 }
 
 void AskBeforeHttpDialogController::CloseDialog() {
-  // Dialog closing events are dispatched slightly differently in Views vs. in
-  // Android ModalDialogWrapper. On Desktop, we just defer to
-  // CloseDialogWidget() to reuse code across different cases where the dialog
-  // widget is closed. On Android, we handle this here directly, as we can't use
-  // Views code.
+  // We defer to CloseDialogWidget() to reuse code across different cases where
+  // the dialog widget is closed.
   if (HasOpenDialog()) {
     CloseDialogWidget(views::Widget::ClosedReason::kUnspecified);
   }

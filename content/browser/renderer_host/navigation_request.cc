@@ -8557,8 +8557,6 @@ void NavigationRequest::OnWillRedirectRequestProcessed(
   if (result.action() == NavigationThrottle::PROCEED) {
     // Notify the delegate that a redirect was encountered and will be followed.
     if (GetDelegate()) {
-      // TODO(crbug.com/504574017): Remove the WeakPtr check once Android
-      // WebView can avoid the synchronous deletion case.
       CHECK(is_safe_to_delete_);
       base::AutoReset<bool> resetter(&is_safe_to_delete_, false);
       GetDelegate()->DidRedirectNavigation(this);
@@ -9409,8 +9407,6 @@ void NavigationRequest::ReadyToCommitNavigation(bool is_error) {
   commit_params_->origin_to_commit = origin_to_commit.value();
 
   if (!IsSameDocument()) {
-    // TODO(crbug.com/504574017): Remove the WeakPtr check once Android
-    // WebView can avoid the synchronous deletion case.
     CHECK(is_safe_to_delete_);
     base::AutoReset<bool> resetter(&is_safe_to_delete_, false);
     GetDelegate()->ReadyToCommitNavigation(this);

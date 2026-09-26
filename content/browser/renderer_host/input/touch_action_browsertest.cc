@@ -771,7 +771,6 @@ IN_PROC_BROWSER_TEST_F(TouchActionBrowserTest,
                                     kShortJankTime);
 }
 
-// TODO(crbug.com/41422733): Make this test work on Android.
 #define MAYBE_TwoFingerPanYDisallowed TwoFingerPanYDisallowed
 // Test that two finger panning is treated as pinch zoom and is disallowed when
 // touching the pan-y area.

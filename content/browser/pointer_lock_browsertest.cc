@@ -704,7 +704,6 @@ IN_PROC_BROWSER_TEST_F(PointerLockBrowserTest, PointerLockOnDroppedElem) {
   EXPECT_TRUE(ExecJs(shell(), "", EXECUTE_SCRIPT_NO_USER_GESTURE));
 }
 
-// unajustedMovement flag is not supported on Android
 #define MAYBE_PointerLockRequestUnadjustedMovement \
   PointerLockRequestUnadjustedMovement
 IN_PROC_BROWSER_TEST_F(PointerLockBrowserTest,

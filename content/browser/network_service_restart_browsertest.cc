@@ -989,15 +989,13 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest, Cookies) {
   EXPECT_EQ("foo=bar", EvalJs(web_contents, "document.cookie;"));
 }
 
-// TODO(crbug.com/41423903): Fix deadlock on process startup on Android.
-
 // Tests handling of a NetworkService crash that happens after a navigation
 // triggers sending a Commit IPC to the renderer process, but before a DidCommit
 // IPC from the renderer process is handled.  See also
 // https://crbug.com/1056949#c75.
 //
-// TODO(lukasza): https://crbug.com/1129592: Flaky on Android and Mac.  No
-// flakiness observed whatsoever on Windows, Linux or CrOS.
+// TODO(lukasza): https://crbug.com/1129592: Flaky on Mac.  No flakiness
+// observed whatsoever on Windows, Linux or CrOS.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_BetweenCommitNavigationAndDidCommit \
   DISABLED_BetweenCommitNavigationAndDidCommit

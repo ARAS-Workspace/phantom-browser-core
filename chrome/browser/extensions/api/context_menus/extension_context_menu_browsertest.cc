@@ -64,7 +64,7 @@ namespace {
 
 // Defines `PlatformContextMenu`, which maps to different types based on
 // platform. This is similar to PlatformBrowserTest, which maps to
-// InProcessBrowserTest or AndroidBrowserTest based on platform.
+// InProcessBrowserTest based on platform.
 using PlatformContextMenu = TestRenderViewContextMenu;
 
 constexpr char kPersistentExtensionId[] = "knldjmfmopnpolahpmmgbagdohdnhkik";

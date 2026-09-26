@@ -108,7 +108,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                          ::testing::Values(SameSiteCookieSemantics::kLegacy,
                                            SameSiteCookieSemantics::kModern));
 
-// TODO(crbug.com/371423073): Flaky on desktop Android.
 #define MAYBE_Cookies Cookies
 IN_PROC_BROWSER_TEST_P(CookiesApiTest, MAYBE_Cookies) {
   ASSERT_TRUE(RunTest("cookies/api", /*allow_in_incognito=*/false,

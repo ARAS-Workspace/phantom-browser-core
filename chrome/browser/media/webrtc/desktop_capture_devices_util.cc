@@ -233,7 +233,6 @@ DesktopMediaIDToDisplayMediaInformation(
       CreateCaptureHandle(capturer, capturer_origin, media_id), zoom_level);
 }
 
-// Showing notifications about capture is handled at the OS level in Android.
 std::u16string GetNotificationText(const std::u16string& application_title,
                                    bool capture_audio,
                                    content::DesktopMediaID::Type capture_type) {

@@ -23,8 +23,6 @@ namespace {
 const char kPeerConnectionHtml[] = "/media/peerconnection-call.html";
 }  // namespace
 
-// Disable these test cases for Android since in some bots, there exists only
-// the loopback interface.
 #define MAYBE_WebRtcIPPermissionGrantedTest WebRtcIPPermissionGrantedTest
 #define MAYBE_WebRtcIPPermissionDeniedTest WebRtcIPPermissionDeniedTest
 #define MAYBE_WebRtcIPPolicyPublicAndPrivateInterfacesTest \

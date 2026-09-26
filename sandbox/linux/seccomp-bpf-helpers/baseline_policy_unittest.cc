@@ -156,10 +156,6 @@ BPF_TEST_C(BaselinePolicy, ForkArmEperm, BaselinePolicy) {
   BPF_ASSERT_EQ(EPERM, fork_errno);
 }
 
-// system() calls into vfork() on old Android builds and returns when vfork is
-// blocked. This causes undefined behavior on x86 Android builds on versions
-// prior to Q, which causes the stack to get corrupted, so this test cannot be
-// made to pass.
 #define MAYBE_SystemEperm SystemEperm
 BPF_TEST_C(BaselinePolicy, MAYBE_SystemEperm, BaselinePolicy) {
   errno = 0;

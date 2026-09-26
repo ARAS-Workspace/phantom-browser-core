@@ -519,7 +519,7 @@ class FileSystemAccessWatcherManagerRealIOTest
   }
 };
 
-// Watching the local file system is not supported on Android or Fuchsia.
+// Watching the local file system is not supported on Fuchsia.
 TEST_F(FileSystemAccessWatcherManagerTest, BasicRegistration) {
   base::FilePath dir_path = dir_.GetPath().AppendASCII("dir");
   auto dir_url = manager_->CreateFileSystemURLFromPath(PathInfo(dir_path));
@@ -637,7 +637,7 @@ TEST_F(FileSystemAccessWatcherManagerTest, IgnoreSwapFileChanges) {
 
   auto observation_or_error = ObserveDirectory(dir_url, /*is_recursive=*/false);
 
-  // Watching the local file system is not supported on Android or Fuchsia.
+  // Watching the local file system is not supported on Fuchsia.
   if (!ReportsChangeInfoForLocalObservations()) {
     GTEST_SKIP();
   }
@@ -1012,7 +1012,7 @@ TEST_F(FileSystemAccessWatcherManagerTest, WatchLocalDirectory) {
   auto observation_or_error = ObserveDirectory(dir_url,
                                                /*is_recursive=*/false);
 
-  // Watching the local file system is not supported on Android or Fuchsia.
+  // Watching the local file system is not supported on Fuchsia.
   ASSERT_TRUE(observation_or_error.has_value());
   // Constructing an observation registers it with the manager.
   ChangeAccumulator accumulator(std::move(observation_or_error));
@@ -1051,7 +1051,7 @@ TEST_F(FileSystemAccessWatcherManagerTest,
   auto observation_or_error = ObserveDirectory(dir_url,
                                                /*is_recursive=*/false);
 
-  // Watching the local file system is not supported on Android or Fuchsia.
+  // Watching the local file system is not supported on Fuchsia.
   ASSERT_TRUE(observation_or_error.has_value());
 
   ChangeAccumulator accumulator(std::move(observation_or_error));
@@ -1082,7 +1082,7 @@ TEST_F(FileSystemAccessWatcherManagerTest, WatchLocalDirectoryRecursively) {
   auto observation_or_error = ObserveDirectory(dir_url,
                                                /*is_recursive=*/true);
 
-  // Watching the local file system is not supported on Android or Fuchsia.
+  // Watching the local file system is not supported on Fuchsia.
   ASSERT_TRUE(observation_or_error.has_value());
 
   ChangeAccumulator accumulator(std::move(observation_or_error));
@@ -1114,7 +1114,7 @@ TEST_F(FileSystemAccessWatcherManagerTest, WatchLocalFile) {
 
   auto observation_or_error = ObserveFile(file_url);
 
-  // Watching the local file system is not supported on Android or Fuchsia.
+  // Watching the local file system is not supported on Fuchsia.
   ASSERT_TRUE(observation_or_error.has_value());
 
   ChangeAccumulator accumulator(std::move(observation_or_error));
@@ -1146,7 +1146,7 @@ TEST_F(FileSystemAccessWatcherManagerTest,
   auto observation_or_error2 = ObserveFile(file_url);
   auto observation_or_error3 = ObserveFile(file_url);
 
-  // Watching the local file system is not supported on Android or Fuchsia.
+  // Watching the local file system is not supported on Fuchsia.
   ASSERT_TRUE(observation_or_error1.has_value());
   ASSERT_TRUE(observation_or_error2.has_value());
   ASSERT_TRUE(observation_or_error3.has_value());
@@ -1183,7 +1183,7 @@ TEST_F(FileSystemAccessWatcherManagerTest, OutOfScope) {
 
   auto observation_or_error = ObserveFile(file_url);
 
-  // Watching the local file system is not supported on Android or Fuchsia.
+  // Watching the local file system is not supported on Fuchsia.
   ASSERT_TRUE(observation_or_error.has_value());
 
   ChangeAccumulator accumulator(std::move(observation_or_error));

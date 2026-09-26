@@ -1404,8 +1404,7 @@ TEST_F(BrowserAccessibilityManagerTest, TestShouldFireEventForNode) {
   EXPECT_FALSE(manager->ShouldFireEventForNode(manager->GetFromID(1111)));
 }
 
-// Desktop keeps MENU_POPUP_END on the menu that just became ignored. Android
-// retargets generated events, so it does not use this exact path.
+// Desktop keeps MENU_POPUP_END on the menu that just became ignored.
 TEST_F(BrowserAccessibilityManagerTest,
        MenuPopupEndFiresWhenMenuBecomesIgnored) {
   ui::AXNodeData root;

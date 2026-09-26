@@ -893,7 +893,6 @@ TEST_P(MultiprocessMessagePipeTestWithPeerSupport,
   CloseHandle(echo_proxy_c);
 }
 
-// Flaky on Android. See https://crbug.com/905620.
 #define MAYBE_ChannelPipesWithMultipleChildren ChannelPipesWithMultipleChildren
 TEST_P(MultiprocessMessagePipeTestWithPeerSupport,
        MAYBE_ChannelPipesWithMultipleChildren) {

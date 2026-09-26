@@ -1133,7 +1133,7 @@ TEST_F(OnDeviceModelServiceControllerTest,
             OnDeviceModelEligibilityReason::kSuccess);
 }
 
-// TODO(crbug.com/380229867): Flaky on Mac and Android.
+// TODO(crbug.com/380229867): Flaky on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ModelValidationNewModelVersion \
   DISABLED_ModelValidationNewModelVersion

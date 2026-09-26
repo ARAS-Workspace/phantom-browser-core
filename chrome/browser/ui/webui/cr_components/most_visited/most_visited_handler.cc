@@ -24,7 +24,6 @@
 #include "chrome/browser/preloading/new_tab_page_preload/new_tab_page_preload_pipeline_manager.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-// Android uses a different implementation of tab features.
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "components/history/core/browser/features.h"
@@ -87,7 +86,6 @@ MostVisitedHandler::MostVisitedHandler(
   most_visited_sites_->AddMostVisitedURLsObserver(
       this, ntp_tiles::kMaxNumMostVisited);
 
-  // TODO(b/502297163): Implement for Android.
   web_app::WebAppProvider* web_app_provider_ =
       web_app::WebAppProvider::GetForWebApps(profile);
   if (web_app_provider_) {
@@ -489,7 +487,6 @@ bool MostVisitedHandler::MaybeRemoveStaleShortcuts() {
   return true;
 }
 
-// TODO(b/502297163): Implement for Android.
 void MostVisitedHandler::OnMigrationRun() {
   most_visited_sites_->RefreshTiles();
 }

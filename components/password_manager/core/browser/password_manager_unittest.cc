@@ -3248,7 +3248,6 @@ TEST_P(PasswordManagerTest, AutofillingOfAffiliatedCredentials) {
             form_data.preferred_login.username_value);
   EXPECT_EQ(android_form.password_value,
             form_data.preferred_login.password_value);
-  // On Android Touch To Fill will prevent autofilling credentials on page load.
   EXPECT_FALSE(form_data.wait_for_username);
   EXPECT_EQ(android_form.signon_realm, form_data.preferred_login.realm);
 

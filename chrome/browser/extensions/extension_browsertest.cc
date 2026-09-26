@@ -201,7 +201,6 @@ void ExtensionBrowserTest::SetUp() {
 void ExtensionBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
   PlatformBrowserTest::SetUpCommandLine(command_line);
 
-  // On Android, these are handled in SetUpOnMainThread().
   base::PathService::Get(chrome::DIR_TEST_DATA, &test_data_dir_);
   test_data_dir_ = test_data_dir_.AppendASCII("extensions");
 
@@ -223,7 +222,7 @@ void ExtensionBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
 void ExtensionBrowserTest::SetUpOnMainThread() {
   PlatformBrowserTest::SetUpOnMainThread();
 
-  // On non-Android, these are handled in SetUpCommandLine().
+  // These are handled in SetUpCommandLine().
 
   SetUpTestProtocolHandler();
   registry_observation_.Observe(ExtensionRegistry::Get(profile()));

@@ -53,9 +53,6 @@ PasswordReceiverServiceFactory::~PasswordReceiverServiceFactory() = default;
 std::unique_ptr<KeyedService>
 PasswordReceiverServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  // Password receiving on Android is handled in GMSCore, and hence no service
-  // should be instantiated.
-
   Profile* profile = Profile::FromBrowserContext(context);
 
   // Since Password Manager doesn't work for non-standard profiles, the

@@ -205,7 +205,6 @@ void ExecJsAddTrustedSyncEncryptionRecoveryMethod(
   std::ignore = content::ExecJs(render_frame_host, script);
 }
 
-// Key retrieval doesn't exist on Android and cannot be verified.
 std::vector<std::vector<uint8_t>> FetchTrustedVaultKeysForProfile(
     Profile* profile,
     trusted_vault::SecurityDomainId security_domain,
@@ -336,8 +335,7 @@ class TrustedVaultEncryptionKeysTabHelperBrowserTest
   content::test::PrerenderTestHelper prerender_helper_;
 };
 
-// Tests that chrome.setSyncEncryptionKeys() works in the main frame, except on
-// Android. On Android, this particular Javascript API isn't defined.
+// Tests that chrome.setSyncEncryptionKeys() works in the main frame.
 
 void ExecJsSetClientEncryptionKeysWithMultipleKeys(
     content::RenderFrameHost* render_frame_host,

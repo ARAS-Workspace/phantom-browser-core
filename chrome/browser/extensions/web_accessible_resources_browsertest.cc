@@ -694,7 +694,6 @@ IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest, DNRRedirect) {
 // Succeed when DNR redirects a script to a WAR where the redirect URL contains
 // both a query and a ref.
 // Regression test for crbug.com/461824106.
-// TODO(crbug.com/512084385): Flaky on Android.
 #define MAYBE_DNRRedirectWithQueryAndRef DNRRedirectWithQueryAndRef
 IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest,
                        MAYBE_DNRRedirectWithQueryAndRef) {
@@ -862,7 +861,6 @@ IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest,
     server_redirect(net::ERR_BLOCKED_BY_CLIENT, "resource.html", false);
   };
 
-  // Android only supports manifest V3.
   auto TestBrowserRedirectMV2 = [&]() {
     TestBrowserRedirect(
         R"({
@@ -1040,7 +1038,6 @@ IN_PROC_BROWSER_TEST_F(WebAccessibleResourcesBrowserTest,
   };
 
   TestBrowserRedirect(MV3);
-  // Android only supports manifest V3.
   TestBrowserRedirect(MV2);
 }
 

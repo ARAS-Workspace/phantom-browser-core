@@ -107,7 +107,7 @@ void OutputPresenterGL::ScheduleOverlayPlane(
     const OutputPresenter::OverlayPlaneCandidate& overlay_plane_candidate,
     ScopedOverlayAccess* access) {
   // Note that |overlay_plane_candidate| has different types on different
-  // platforms. On Android, Ozone, and Windows, it is an OverlayCandidate and on
+  // platforms. On Ozone and Windows, it is an OverlayCandidate and on
   // macOS it is a CALayeroverlay.
 #if BUILDFLAG(IS_OZONE)
 #if BUILDFLAG(IS_OZONE)

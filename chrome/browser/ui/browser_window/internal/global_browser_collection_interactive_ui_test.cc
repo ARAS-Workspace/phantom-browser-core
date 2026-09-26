@@ -82,9 +82,6 @@ class GlobalBrowserCollectionTest : public TestBase {
           BrowserWindowCreateParams(*profile, /*from_user_gesture=*/true));
     }
 
-    // TODO(crbug.com/477251911): Enable this on Android (if Android browsers
-    // aren't already activated upon creation) once we implement activation
-    // tracking in GlobalBrowserCollection for Android.
     ActivateBrowser(browser);
 
     return browser;
@@ -136,9 +133,6 @@ class GlobalBrowserCollectionTest : public TestBase {
   raw_ptr<BrowserWindowInterface> active_browser_ = nullptr;
 };
 
-// TODO(crbug.com/477251911): Enable this on Android once we implement
-// activation tracking in GlobalBrowserCollection for Android.
-//
 // TODO(crbug.com/483363917): Enable this on Linux once the
 // BaseWindow::Activate() behaviour is fixed.
 #if BUILDFLAG(IS_LINUX)
@@ -189,9 +183,6 @@ IN_PROC_BROWSER_TEST_F(GlobalBrowserCollectionTest,
   CloseBrowserSynchronouslyCrossPlatform(secondary_browser);
 }
 
-// TODO(crbug.com/477251911): Enable this on Android once we implement
-// activation tracking in GlobalBrowserCollection for Android.
-//
 // TODO(crbug.com/483363917): Enable this on Linux once the
 // BaseWindow::Activate() behaviour is fixed.
 #if BUILDFLAG(IS_LINUX)
@@ -353,12 +344,8 @@ IN_PROC_BROWSER_TEST_P(GlobalBrowserCollectionTestWithOrder,
 INSTANTIATE_TEST_SUITE_P(
     ,
     GlobalBrowserCollectionTestWithOrder,
-    ::testing::Values(
-        BrowserCollection::Order::kCreation
-        // TODO(crbug.com/477251911): Enable this on Android once we implement
-        // activation tracking in GlobalBrowserCollection for Android.
-        ,
-        BrowserCollection::Order::kActivation),
+    ::testing::Values(BrowserCollection::Order::kCreation,
+                      BrowserCollection::Order::kActivation),
     [](const testing::TestParamInfo<BrowserCollection::Order>& param) {
       switch (param.param) {
         case BrowserCollection::Order::kCreation:

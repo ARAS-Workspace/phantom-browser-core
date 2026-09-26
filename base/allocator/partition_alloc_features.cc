@@ -185,14 +185,12 @@ constexpr FeatureParam<BackupRefPtrEnabledProcesses>::Option
         {BackupRefPtrEnabledProcesses::kNonRenderer, kNonRendererStr},
         {BackupRefPtrEnabledProcesses::kAllProcesses, kAllProcessesStr}};
 
-BASE_FEATURE_ENUM_PARAM(
-    BackupRefPtrEnabledProcesses,
-    kBackupRefPtrEnabledProcessesParam,
-    &kPartitionAllocBackupRefPtr,
-    kPAFeatureEnabledProcessesStr,
-    // Exception for IS_DESKTOP_ANDROID approved in crbug.com/482155132.
-    BackupRefPtrEnabledProcesses::kAllProcesses,
-    &kBackupRefPtrEnabledProcessesOptions);
+BASE_FEATURE_ENUM_PARAM(BackupRefPtrEnabledProcesses,
+                        kBackupRefPtrEnabledProcessesParam,
+                        &kPartitionAllocBackupRefPtr,
+                        kPAFeatureEnabledProcessesStr,
+                        BackupRefPtrEnabledProcesses::kAllProcesses,
+                        &kBackupRefPtrEnabledProcessesOptions);
 
 constexpr FeatureParam<BackupRefPtrMode>::Option kBackupRefPtrModeOptions[] = {
     {BackupRefPtrMode::kDisabled, "disabled"},

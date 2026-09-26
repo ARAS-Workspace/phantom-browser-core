@@ -455,12 +455,6 @@ BASE_FEATURE(kFedCmNativeIdPs, base::FEATURE_DISABLED_BY_DEFAULT);
 // Enables browser-side focus verification when crossing fenced boundaries.
 BASE_FEATURE(kFencedFramesEnforceFocus, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// This is a kill switch for focusing the RenderWidgetHostViewAndroid on
-// ActionDown on every touch sequence if not focused already, please see
-// crbug.com/381820236. The root view, RWHVA, is always focused in Chrome,
-// however this might not be true on WebView, see crbug.com/378779896 for more
-// details.
-
 // Whether a memory pressure signal in a renderer should be forwarded to Blink
 // isolates. Forwarding the signal triggers a GC (critical) or starts
 // incremental marking (moderate), see `v8::Heap::CheckMemoryPressure`.
@@ -845,13 +839,6 @@ BASE_FEATURE(kRestrictThreadPoolInBackground,
 // parameters in ContentFeatureList.java.
 BASE_FEATURE(kSpareRendererProcessPriority, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// If enabled, set a soft limit on the number of renderer processes on
-// Android, after which Chrome will reuse existing processes when possible.
-// This diverges from current Clank behavior, where we do not set any upper
-// bound and instead delegate that to the system. 42 is approximated from
-// 8GBs ((8192 - 1024) / (16384 / 96)), and has nothing to do with Douglas
-// Adams' book. 1GB is a carve-out for integrated GPU VRAM.
-
 // When enabled, the IPC channel will not be paused when launching non-guest
 // renderer processes. This makes it possible for all kinds of mojo calls
 // to be sent to the renderer process before OnProcessLaunched fires. When the
@@ -1022,10 +1009,8 @@ BASE_FEATURE(kDefaultSiteInstanceGroups, base::FEATURE_ENABLED_BY_DEFAULT);
 // Cross-Origin-Opener-Policy header.  Note that this is only intended to be
 // used on Android, which does not use strict site isolation. See
 // https://crbug.com/1018656.
-BASE_FEATURE(
-    kSiteIsolationForCrossOriginOpenerPolicy,
-    // Enabled by default on Android only; see https://crbug.com/1206770.
-    base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kSiteIsolationForCrossOriginOpenerPolicy,
+             base::FEATURE_DISABLED_BY_DEFAULT);
 // This feature param (true by default) controls whether sites are persisted
 // across restarts.
 const base::FeatureParam<bool>
@@ -1224,8 +1209,6 @@ BASE_FEATURE(kSonomaAccessibilityActivationRefinements,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 #endif  // BUILDFLAG(IS_MAC)
-
-// Enables Exclusive Access Manager on Android platform
 
 // Sets IO threads to kInteractive all the time.
 BASE_FEATURE(kIOThreadInteractiveThreadType, base::FEATURE_DISABLED_BY_DEFAULT);

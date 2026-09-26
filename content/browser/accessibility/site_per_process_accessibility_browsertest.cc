@@ -32,7 +32,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-// These tests time out on Android.
 #define MAYBE_SitePerProcessAccessibilityBrowserTest \
   SitePerProcessAccessibilityBrowserTest
 // "All/DISABLED_SitePerProcessAccessibilityBrowserTest" does not work. We need

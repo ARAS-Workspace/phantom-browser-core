@@ -637,7 +637,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionWebRequestApiDispatchModeTest,
 }
 
 // Regression test for https://crbug.com/395985663.
-// TODO(crbug.com/399261153): Flaky on Android.
 IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest,
                        ExtensionRequestRedirectToServer) {
   ASSERT_TRUE(StartEmbeddedTestServer());
@@ -1988,8 +1987,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionWebRequestApiTestWithContextType,
                                               ReplyBehavior::kWillReply);
   ExtensionTestMessageListener listener_main2("web_request_status2",
                                               ReplyBehavior::kWillReply);
-  // Android does not support platform apps, so tests for requests from apps are
-  // omitted. See https://crbug.com/440452765 for more details.
   ExtensionTestMessageListener listener_app("app_done");
   ExtensionTestMessageListener listener_extension("extension_done");
 
@@ -8991,8 +8988,6 @@ IN_PROC_BROWSER_TEST_F(ManifestV3WebRequestApiTest, RecordUkmOnNavigation) {
   ASSERT_TRUE(LoadExtension(test_dir2.UnpackedPath()));
   EXPECT_TRUE(listener.WaitUntilSatisfied());
 
-  // We don't support manifest version 2 on android, so only the first extension
-  // will be loaded on android.
   const size_t expected_entries = 2;
 
   base::RunLoop ukm_loop;

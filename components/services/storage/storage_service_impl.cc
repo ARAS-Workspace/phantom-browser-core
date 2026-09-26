@@ -25,8 +25,6 @@ namespace storage {
 
 namespace {
 
-// We don't use out-of-process Storage Service on Android, so we can avoid
-// pulling all the related code (including Directory mojom) into the build.
 // The name under which we register our own sandboxed VFS instance when running
 // out-of-process.
 constexpr char kVfsName[] = "storage_service";

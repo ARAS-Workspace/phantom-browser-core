@@ -939,7 +939,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                                  // No child process.
                                  Values(ProfilerProcessType::kUnknown)));
 
-// Sampling profiler is not capable of unwinding stack on Android under tests.
 TEST_P(HeapProfilerControllerTest, ProfileCollectionsScheduler) {
   constexpr int kSnapshotsToCollect = 3;
 

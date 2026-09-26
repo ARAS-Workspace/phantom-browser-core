@@ -60,7 +60,7 @@ IN_PROC_BROWSER_TEST_F(MAYBE_WebRtcBrowserTest, CanSetupAudioAndVideoCall) {
   MakeTypicalPeerConnectionCall("call({video: true, audio: true});");
 }
 
-// Flaky on Android and Linux ASAN https://crbug.com/1099365.
+// Flaky on Linux ASAN https://crbug.com/1099365.
 #if BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 #define MAYBE_NetworkProcessCrashRecovery DISABLED_NetworkProcessCrashRecovery
 #else
@@ -255,7 +255,5 @@ IN_PROC_BROWSER_TEST_F(
   MakeTypicalPeerConnectionCall(
       "testEstablishVideoOnlyCallAndVerifyGetSynchronizationSourcesWorks();");
 }
-
-// Flaky on Android: https://crbug.com/1366910.
 
 }  // namespace content

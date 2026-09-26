@@ -327,8 +327,6 @@ void ChromeRuntimeAPIDelegate::OpenURL(const GURL& uninstall_url) {
 // Helper function for GetPlatformInfo(). nacl_arch is deprecated, so
 // please do not add any new values here.
 extensions::api::runtime::PlatformNaclArch GetPlatformInfoNaClArch() {
-// Return no value on Android, since it never supported extensions
-// while NaCl was relevant.
 #if defined(ARCH_CPU_X86_FAMILY)
 #if defined(ARCH_CPU_X86_64)
   return extensions::api::runtime::PlatformNaclArch::kX86_64;

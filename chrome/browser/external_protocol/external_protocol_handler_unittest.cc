@@ -277,8 +277,6 @@ TEST_F(ExternalProtocolHandlerTest,
          shell_integration::OTHER_MODE_IS_DEFAULT, Action::BLOCK);
 }
 
-// Android doesn't use the external protocol dialog.
-
 TEST_F(ExternalProtocolHandlerTest, TestLaunchSchemeUnBlockedChromeDefault) {
   DoTest(ExternalProtocolHandler::DONT_BLOCK, shell_integration::IS_DEFAULT,
          Action::BLOCK);

@@ -124,8 +124,6 @@ void XrBrowserTestBase::SetUp() {
   XR_CONDITIONAL_SKIP_PRETEST(runtime_requirements_, ignored_requirements_,
                               &test_skipped_at_startup_)
 
-  // OpenXr on Android cannot use the environment variable as the loader cannot
-  // read it on Android at present.
   // Set the environment variable to use the mock OpenXR client.
   // If the kOpenXrConfigPathEnvVar environment variable is set, the OpenXR
   // loader will look for the OpenXR runtime specified in that json file. The

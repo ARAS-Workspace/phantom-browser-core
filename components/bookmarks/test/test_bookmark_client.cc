@@ -127,9 +127,6 @@ bool TestBookmarkClient::IsNodeManaged(const BookmarkNode* node) {
 
 // static
 bool TestBookmarkClient::IsDesktopFormFactorByDefault() {
-  // TODO(crbug.com/509156770): Replace this ifdef with a call to
-  // DeviceInfo::is_desktop() once it returns the correct value for desktop
-  // Android tests.
   return true;
 }
 

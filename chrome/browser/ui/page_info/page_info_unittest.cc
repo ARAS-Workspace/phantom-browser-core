@@ -1110,7 +1110,6 @@ TEST_F(PageInfoTest, HTTPSConnection) {
             page_info()->site_identity_status());
 }
 
-// Define some dummy constants for Android-only resources.
 #define IDR_PAGEINFO_BAD 0
 
 TEST_F(PageInfoTest, InsecureContent) {
@@ -1948,7 +1947,6 @@ TEST_F(PageInfoTest, TimeOpenMetrics) {
 
 // Tests that metrics are recorded on a PageInfo for pages with
 // various Safety Tip statuses.
-// See https://crbug.com/40710931 for why the test is disabled on Android.
 #define MAYBE_SafetyTipMetrics SafetyTipMetrics
 TEST_F(PageInfoTest, MAYBE_SafetyTipMetrics) {
   struct TestCase {

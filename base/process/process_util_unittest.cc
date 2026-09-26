@@ -212,8 +212,6 @@ TEST_F(ProcessUtilTest, MAYBE_GetTerminationStatusExit) {
 }
 
 
-// On Android SpawnProcess() doesn't use LaunchProcess() and doesn't support
-// LaunchOptions::current_directory.
 static void CheckCwdIsExpected(FilePath expected) {
   FilePath actual;
   CHECK(GetCurrentDirectory(&actual));

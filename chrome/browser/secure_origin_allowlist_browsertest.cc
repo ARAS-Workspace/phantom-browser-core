@@ -126,18 +126,15 @@ class SecureOriginAllowlistBrowsertest
   testing::NiceMock<policy::MockConfigurationPolicyProvider> provider_;
 };
 
-INSTANTIATE_TEST_SUITE_P(
-    SecureOriginAllowlistBrowsertest,
-    SecureOriginAllowlistBrowsertest,
-    testing::Values(TestVariant::kNone,
-                    TestVariant::kCommandline,
-                    // The legacy policy isn't defined on Android, so skip tests
-                    // that use it on those platforms.
-                    TestVariant::kPolicyOld,
-                    TestVariant::kPolicyOldAndNew,
-                    TestVariant::kPolicy,
-                    TestVariant::kPolicy2,
-                    TestVariant::kPolicy3));
+INSTANTIATE_TEST_SUITE_P(SecureOriginAllowlistBrowsertest,
+                         SecureOriginAllowlistBrowsertest,
+                         testing::Values(TestVariant::kNone,
+                                         TestVariant::kCommandline,
+                                         TestVariant::kPolicyOld,
+                                         TestVariant::kPolicyOldAndNew,
+                                         TestVariant::kPolicy,
+                                         TestVariant::kPolicy2,
+                                         TestVariant::kPolicy3));
 
 IN_PROC_BROWSER_TEST_P(SecureOriginAllowlistBrowsertest, Simple) {
   GURL url = embedded_test_server()->GetURL(

@@ -398,10 +398,6 @@ TEST_F(UserPolicySigninServiceTest, InitRefreshTokenAvailableBeforeSignin) {
   EXPECT_TRUE(manager_->ArePoliciesRequired());
 }
 
-// TODO(joaodasilva): these tests rely on issuing the OAuth2 login refresh
-// token after signin. Revisit this after figuring how to handle that on
-// Android.
-
 TEST_F(UserPolicySigninServiceSignedInTest, InitWhileSignedIn) {
   // UserCloudPolicyManager should be initialized.
   ASSERT_TRUE(manager_->core()->service());

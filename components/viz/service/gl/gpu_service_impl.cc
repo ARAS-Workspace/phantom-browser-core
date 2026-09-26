@@ -954,12 +954,10 @@ void GpuServiceImpl::OnBackgroundCleanup() {
 }
 
 void GpuServiceImpl::OnBackgroundCleanupGpuMainThread() {
-  // Currently only called on Android.
   NOTREACHED();
 }
 
 void GpuServiceImpl::OnBackgroundCleanupCompositorGpuThread() {
-  // Currently only called on Android.
   NOTREACHED();
 }
 

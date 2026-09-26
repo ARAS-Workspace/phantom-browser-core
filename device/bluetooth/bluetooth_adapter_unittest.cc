@@ -770,12 +770,6 @@ TEST_F(BluetoothTest, MAYBE_DiscoverySession) {
   EXPECT_FALSE(discovery_sessions_[0]->IsActive());
 }
 
-// Android only: this test is specific for Android and should not be
-// enabled for other platforms.
-
-// Android only: this test is specific for Android and should not be
-// enabled for other platforms.
-
 #if BUILDFLAG(IS_APPLE)
 #define MAYBE_NoPermissions NoPermissions
 #else
@@ -799,9 +793,6 @@ TEST_F(BluetoothTest, MAYBE_NoPermissions) {
   EXPECT_EQ(0, callback_count_);
   EXPECT_EQ(1, error_callback_count_);
 }
-
-// Android-only: Only Android requires location services to be turned on to scan
-// for Bluetooth devices.
 
 #if BUILDFLAG(IS_APPLE)
 #define MAYBE_DiscoverLowEnergyDevice DiscoverLowEnergyDevice
