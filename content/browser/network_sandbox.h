@@ -11,9 +11,6 @@
 #include "services/network/public/mojom/network_context.mojom.h"
 #include "services/network/public/mojom/network_service.mojom.h"
 
-// As of 2022-03 there is no plan to sandbox the network service in any special
-// way on Android.
-
 namespace content {
 
 enum class SandboxGrantResult;

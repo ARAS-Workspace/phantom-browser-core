@@ -158,8 +158,6 @@ class AutofillProfile : public FormGroup {
   std::string guid() const { return guid_; }
   void set_guid(std::string_view guid) { guid_ = guid; }
 
-  // Android/Java API.
-
   // FormGroup:
   void GetMatchingTypes(std::u16string_view text,
                         std::string_view app_locale,

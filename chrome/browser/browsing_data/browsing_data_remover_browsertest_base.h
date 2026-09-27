@@ -59,7 +59,6 @@ class BrowsingDataRemoverBrowserTestBase : public PlatformBrowserTest {
   bool WaitForSiteDataCount(int expected_count,
                             content::WebContents* web_contents = nullptr);
 
-  // TODO(crbug.com/40169678): Support incognito browser tests on android.
   BrowserWindowInterface* GetBrowser() const;
   void UseIncognitoBrowser();
   void RestartIncognitoBrowser();

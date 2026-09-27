@@ -227,7 +227,6 @@ class NewTabPageHandler
   void IncrementDictPrefKeyCount(const std::string& pref_name,
                                  const std::string& key);
 
-  // TODO(b/502297163): Implement for Android.
   // Returns a HaTS trigger id associated with the given combination of user
   // interaction and module id if one exists, or nullptr otherwise to indicate
   // that there is no configured survey trigger id for such combination. The
@@ -245,7 +244,6 @@ class NewTabPageHandler
   void SetStaleModulesDisabled(const std::vector<std::string>& module_ids,
                                bool disabled);
 
-  // TODO(b/502297163): Implement for Android.
   void TryShowRealboxContextualMenuIPH(ui::TrackedElement* element);
 
   // Synchronizes Microsoft module enablement with their current authentication
@@ -293,7 +291,6 @@ class NewTabPageHandler
                           NtpCustomBackgroundServiceObserver>
       ntp_custom_background_service_observation_{this};
   std::optional<base::TimeTicks> promo_load_start_time_;
-  // TODO(b/502297163): Implement for Android.
   base::DictValue interaction_module_id_trigger_dict_;
   // Notifies this when the browser window context changes.
   base::CallbackListSubscription browser_window_changed_subscription_;

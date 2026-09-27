@@ -84,7 +84,7 @@ struct SupportsUnretainedImpl {
 // - non-test code
 // - non-official code (because these builds don't run as part of the default CQ
 //   and are slower due to PGO and LTO)
-// - Android, Linux or Windows
+// - Linux
 //
 // to make this easier to land without potentially breaking the tree.
 //

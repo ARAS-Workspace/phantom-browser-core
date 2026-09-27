@@ -192,9 +192,6 @@ class HostZoomMap {
 
   virtual void SetClockForTesting(base::Clock* clock) = 0;
 
-  // On Android only, set a callback for when the Java-side UI sets a default
-  // zoom level so the HostZoomMapImpl does not depend on Prefs or //chrome/.
-
   // Allows lookup and setting of ZoomLevel for the content currently displayed
   // in the indicated FrameTreeNode. `ftn_id` must refer to a RenderFrameHost
   // local-root.

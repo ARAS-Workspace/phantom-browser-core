@@ -154,12 +154,8 @@ struct ParamTraits<unsigned int> {
 // long isn't safe to send over IPC because it's 4 bytes on 32 bit builds but
 // 8 bytes on 64 bit builds. So if a 32 bit and 64 bit process have a channel
 // that would cause problem.
-// We need to keep this on for a few configs:
-//   1) We need to keep it for Linux for two reasons: int64_t is typedef'd
-//      to long, and gfx::PluginWindow is long and is used in one GPU IPC.
-//   2) Android 64 bit also has int64_t typedef'd to long.
-// Since we want to support Android 32<>64 bit IPC, as long as we don't have
-// these traits for 32 bit ARM then that'll catch any errors.
+// We need to keep it for Linux for two reasons: int64_t is typedef'd to long,
+// and gfx::PluginWindow is long and is used in one GPU IPC.
 #if BUILDFLAG(IS_LINUX)
 template <>
 struct ParamTraits<long> {

@@ -9,8 +9,6 @@
 
 namespace browsing_data::features {
 
-// Pipes down the BrowsingDataModel to power site settings on Android.
-
 // When enabled, calls to browsingData.removePasswords extension API would
 // result in an error response instead of a console warning.
 BASE_DECLARE_FEATURE(kPasswordRemovalExtensionErrorKillSwitch);

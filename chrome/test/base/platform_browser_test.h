@@ -9,8 +9,7 @@
 
 #include "chrome/test/base/in_process_browser_test.h"
 
-// PlatformBrowserTest is aliased to either AndroidBrowserTest or
-// InProcessBrowserTest, depending on the platform.
+// PlatformBrowserTest is aliased to InProcessBrowserTest.
 // Further details and methodology can be found in the design doc:
 // https://docs.google.com/document/d/1jT3W6VnVI4b0FuiNbYzgGZPxIOUZmppUZZwi3OebvVE/preview
 using PlatformBrowserTest = InProcessBrowserTest;

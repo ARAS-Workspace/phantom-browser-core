@@ -229,10 +229,6 @@ BASE_EXPORT int GetVlogLevelHelper(const char* file_start, size_t N);
 // Gets the current vlog level for the given file (usually taken from __FILE__).
 template <size_t N>
 int GetVlogLevel(const char (&file)[N]) {
-  // Disable runtime VLOG()s in official non-DCHECK builds. This saves ~135k on
-  // the android-binary-size bot in crrev.com/c/6344673. Parts of the code can,
-  // and do, override ENABLED_VLOG_LEVEL to collect logs in the wild. The rest
-  // is dead-code stripped.
   return GetVlogLevelHelper(file, N);
 }
 

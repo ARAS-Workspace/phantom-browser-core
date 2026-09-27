@@ -71,8 +71,6 @@ extern const char kGlicOnboardingCompleted[];
 
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
-// Android.
-
 extern const char kTabSearchComboButtonUsed[];
 
 }  // namespace events

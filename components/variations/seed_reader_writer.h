@@ -33,7 +33,6 @@ class EntropyProviders;
 const char kSeedFileTrial[] = "SeedFileTrial";
 const char kDefaultGroup[] = "Default";
 const char kControlGroup[] = "Control_V12";
-// TODO(crbug.com/530049020): Launch on Android
 const char kSeedFilesGroup[] = "SeedFilesLaunched";
 
 // A sentinel value that may be stored as the latest variations seed value in

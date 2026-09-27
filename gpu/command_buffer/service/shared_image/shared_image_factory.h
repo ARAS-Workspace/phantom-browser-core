@@ -130,9 +130,6 @@ class GPU_GLES2_EXPORT SharedImageFactory {
 
   bool CopyToGpuMemoryBuffer(const Mailbox& mailbox);
 
-  // Creation of native buffer handles is not supported on Android (the
-  // only way that a non-null GpuMemoryBufferHandle can be created on
-  // Android is by importing an external AHB).
   // Creates a native GpuMemoryBufferHandle for MappableSI.
   gfx::GpuMemoryBufferHandle CreateNativeGpuMemoryBufferHandle(
       const gfx::Size& size,

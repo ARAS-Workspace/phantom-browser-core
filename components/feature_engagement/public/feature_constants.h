@@ -158,11 +158,6 @@ FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHBookmarkBarSimplifiedFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHExtensionsPinnedByDefaultFeature);
 #endif
 
-// All the features declared for Android below that are also used in Java,
-// should also be declared in:
-// org.chromium.components.feature_engagement.FeatureConstants.
-// clang-format off
-
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHAutofillAtMemoryFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHAutofillBnplAffirmOrZipSuggestionFeature);

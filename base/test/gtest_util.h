@@ -25,7 +25,6 @@
 // by default and there are no known tests that configure a FATAL level. If this
 // gets used from FATAL contexts under DCHECK_IS_CONFIGURABLE this may need to
 // be updated to look at LOGGING_DCHECK's current severity level.
-// Death tests misbehave on Android.
 #if DCHECK_IS_ON() && defined(GTEST_HAS_DEATH_TEST) && \
     !BUILDFLAG(DCHECK_IS_CONFIGURABLE)
 
@@ -87,8 +86,7 @@
 
 #endif  // defined(GTEST_HAS_DEATH_TEST)
 
-// `BASE_EXPECT_DEATH` is similar to gtest's `EXPECT_DEATH_IF_SUPPORTED`. It
-// takes into account that Android does not support them.
+// `BASE_EXPECT_DEATH` is similar to gtest's `EXPECT_DEATH_IF_SUPPORTED`.
 #if defined(GTEST_HAS_DEATH_TEST)
 
 #define BASE_EXPECT_DEATH EXPECT_DEATH

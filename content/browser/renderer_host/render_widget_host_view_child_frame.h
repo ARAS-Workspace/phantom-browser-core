@@ -331,8 +331,7 @@ class CONTENT_EXPORT RenderWidgetHostViewChildFrame
       blink::mojom::InputEventResultState ack_result) override;
 
   // TODO(crbug.com/375388841): Remove these once Aura also uses
-  // TouchSelectionControllerInputObserver. These are not needed on Android
-  // since it uses TouchSelectionControllerInputObserver.
+  // TouchSelectionControllerInputObserver.
   // Performs gesture ack handling needed for swipe-to-move-cursor gestures.
   void HandleSwipeToMoveCursorGestureAck(const blink::WebGestureEvent& event);
 

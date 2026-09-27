@@ -20,10 +20,6 @@ inline constexpr char kClearKeyKeySystem[] = "org.w3.clearkey";
 // This is used by UMA. Do not change it!
 inline constexpr char kClearKeyKeySystemNameForUMA[] = "ClearKey";
 
-// UUID from http://dashif.org/identifiers/content_protection/. UUIDs are used
-// in Android for creating MediaDRM objects that support the DRM scheme required
-// by content.
-
 // External Clear Key key system ("org.chromium.externalclearkey" and variants)
 // only for testing.
 inline constexpr char kExternalClearKeyKeySystem[] =

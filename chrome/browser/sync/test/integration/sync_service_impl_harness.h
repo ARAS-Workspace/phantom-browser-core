@@ -81,8 +81,6 @@ class SyncServiceImplHarness {
   // Signs out of the primary account.
   void SignOutPrimaryAccount();
 
-  // The underlying implementation for mimic-ing persistent auth errors isn't
-  // implemented on Android, see https://crbug.com/40871747.
   // Enters/exits the "Sync paused" state, which in real life happens if a
   // syncing user signs out of the content area.
   // TODO(crbug.com/401470426): Replace the usages with

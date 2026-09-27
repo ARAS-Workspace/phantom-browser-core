@@ -49,7 +49,6 @@ class MediaEngagementService;
 class AutoPictureInPictureTabHelper
     : public content::WebContentsObserver,
       public content::WebContentsUserData<AutoPictureInPictureTabHelper>,
-      // On Android, audio focus is observed via MediaSessionInfoChanged.
       public media_session::mojom::AudioFocusObserver,
       public media_session::mojom::MediaSessionObserver {
  public:

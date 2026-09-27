@@ -21,13 +21,13 @@
 #include <set>
 #endif
 
-// Linux (including Android) support the MADV_REMOVE argument with madvise()
-// which has the behavior of reliably causing zero-fill-on-demand pages to
-// be returned after a call. Here we define
+// Linux supports the MADV_REMOVE argument with madvise() which has the
+// behavior of reliably causing zero-fill-on-demand pages to be returned
+// after a call. Here we define
 // DISCARDABLE_SHARED_MEMORY_ZERO_FILL_ON_DEMAND_PAGES_AFTER_PURGE on Linux
-// and Android to indicate that this type of behavior can be expected on
-// those platforms. Note that madvise() will still be used on other POSIX
-// platforms but doesn't provide the zero-fill-on-demand pages guarantee.
+// to indicate that this type of behavior can be expected on that platform.
+// Note that madvise() will still be used on other POSIX platforms but
+// doesn't provide the zero-fill-on-demand pages guarantee.
 #if BUILDFLAG(IS_LINUX)
 #define DISCARDABLE_SHARED_MEMORY_ZERO_FILL_ON_DEMAND_PAGES_AFTER_PURGE
 #endif

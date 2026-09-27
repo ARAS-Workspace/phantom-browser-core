@@ -39,8 +39,6 @@ inline constexpr char kPopularSitesJsonPref[] = "suggested_sites_json";
 inline constexpr char kPopularSitesVersionPref[] = "suggested_sites_version";
 
 // Prefs used to cache custom links.
-// TODO(crbug.com/525465032): Clean `IS_DESKTOP_ANDROID` up by plumbing a
-// runtime option through the backend instead of relying on build flags.
 inline constexpr char kCustomLinksList[] = "custom_links.list";
 inline constexpr char kCustomLinksInitialized[] = "custom_links.initialized";
 

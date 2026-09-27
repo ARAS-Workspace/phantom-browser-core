@@ -36,8 +36,6 @@
 #include "ui/gfx/geometry/rect_f.h"
 #include "ui/gfx/geometry/size.h"
 
-// RenderViewTest-based tests crash on Android
-// http://crbug.com/187500
 #define MAYBE_PrintRenderFrameHelperTest PrintRenderFrameHelperTest
 
 namespace blink {

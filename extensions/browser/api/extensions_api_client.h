@@ -197,7 +197,6 @@ class ExtensionsAPIClient {
   // Returns a delegate for embedder-specific extension messaging.
   virtual MessagingDelegate* GetMessagingDelegate();
 
-  // The APIs that need these methods are not supported on desktop Android.
   // Returns a delegate for embedder-specific chrome.fileSystem behavior.
   virtual FileSystemDelegate* GetFileSystemDelegate();
 

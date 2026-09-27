@@ -987,10 +987,6 @@ TYPED_TEST(ClipboardTest, WriteEverything) {
   // Passes if we don't crash.
 }
 
-// TODO(dcheng): Fix this test for Android. It's rather involved, since the
-// clipboard change listener is posted to the Java message loop, and spinning
-// that loop from C++ to trigger the callback in the test requires a non-trivial
-// amount of additional work.
 // Simple test that the sequence number appears to change when the clipboard is
 // written to.
 // TODO(dcheng): Add a version to test ClipboardBuffer::kSelection.

@@ -40,9 +40,7 @@ enum class MostVisitedShowActions {
 
 // Handles bidirectional communication between MV tiles and the browser.
 class MostVisitedHandler : public most_visited::mojom::MostVisitedPageHandler,
-                           public ntp_tiles::MostVisitedSites::Observer
-    // TODO(b/502297163): Implement for Android.
-    ,
+                           public ntp_tiles::MostVisitedSites::Observer,
                            public web_app::PreinstalledWebAppManager::Observer {
  public:
   MostVisitedHandler(
@@ -113,7 +111,6 @@ class MostVisitedHandler : public most_visited::mojom::MostVisitedPageHandler,
   bool MaybeRemoveStaleShortcuts();
 
   raw_ptr<Profile> profile_;
-  // TODO(b/502297163): Implement for Android.
   // web_app::PreinstalledWebAppManager::Observer
   void OnMigrationRun() override;
   void OnDestroyed() override;
@@ -127,7 +124,6 @@ class MostVisitedHandler : public most_visited::mojom::MostVisitedPageHandler,
   mojo::Receiver<most_visited::mojom::MostVisitedPageHandler> page_handler_;
   mojo::Remote<most_visited::mojom::MostVisitedPage> page_;
 
-  // TODO(b/502297163): Implement for Android.
   base::ScopedObservation<web_app::PreinstalledWebAppManager,
                           web_app::PreinstalledWebAppManager::Observer>
       preinstalled_web_app_observer_{this};

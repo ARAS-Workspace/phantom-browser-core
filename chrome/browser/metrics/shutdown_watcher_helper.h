@@ -11,9 +11,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-// ShutdownWatcherHelper is useless on Android because there is no shutdown,
-// Chrome is always killed one way or another (swiped away in the task
-// switcher, OOM-killed, etc.).
 // This is a wrapper class for detecting hangs during shutdown.
 class ShutdownWatcherHelper : public base::Watchdog::Delegate {
  public:

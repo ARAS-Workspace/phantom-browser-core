@@ -203,10 +203,6 @@ class SystemDisplaySetMirrorModeFunction
   void Response(std::optional<std::string> error);
 };
 
-// This keyed service is currently only needed on Android, where
-// ENABLE_EXTENSIONS_CORE can be enabled without full ENABLE_EXTENSIONS, so
-// onDisplayChanged still needs explicit listener-lifecycle wiring.
-
 }  // namespace extensions
 
 #endif  // EXTENSIONS_BROWSER_API_SYSTEM_DISPLAY_SYSTEM_DISPLAY_API_H_

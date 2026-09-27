@@ -506,7 +506,6 @@ class TestCustomDisallow;
 class Thread;
 
 // NaCL doesn't support stack capture.
-// Android can hang in stack capture (crbug.com/959139).
 // Stack capture is slow. Only enable it in developer builds, to avoid user
 // visible jank when thread restrictions are set.
 #define CAPTURE_THREAD_RESTRICTIONS_STACK_TRACES() EXPENSIVE_DCHECKS_ARE_ON()
