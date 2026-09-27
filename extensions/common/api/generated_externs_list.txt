@@ -4,7 +4,6 @@
 audio.webidl
 bluetooth.webidl
 bluetooth_private.webidl
-clipboard.webidl
 events.json
 extension_types.json
 metrics_private.json

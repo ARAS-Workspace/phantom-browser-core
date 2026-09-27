@@ -136,20 +136,6 @@
     "contexts": ["privileged_extension"],
     "platforms": ["chromeos"]
   },
-  "cecPrivate": {
-    "dependencies": ["permission:cecPrivate"],
-    "contexts": ["privileged_extension"]
-  },
-  "clipboard": {
-    "dependencies": ["permission:clipboard"],
-    "contexts": ["privileged_extension"]
-  },
-  "clipboard.onClipboardDataChanged": {
-    "dependencies": ["permission:clipboardRead"]
-  },
-  "clipboard.setImageData": {
-    "dependencies": ["permission:clipboardWrite"]
-  },
   "declarativeNetRequest": [{
     "dependencies": ["permission:declarativeNetRequest"],
     "contexts": ["privileged_extension"],

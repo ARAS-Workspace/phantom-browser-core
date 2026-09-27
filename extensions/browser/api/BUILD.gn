@@ -134,8 +134,6 @@ function_registration("api_registration") {
   custom_impl_schemas = [
     "app_view_guest_internal",
     "bluetooth_private",
-    "cec_private",
-    "clipboard",
     "events",
     "guest_view_internal",
     "printer_provider_internal",

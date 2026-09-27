@@ -74,8 +74,6 @@ if (enable_extensions) {
     "app_window.webidl",
     "audio.webidl",
     "automation_internal.webidl",
-    "cec_private.webidl",
-    "clipboard.webidl",
     "feedback_private.webidl",
     "file_system.idl",
     "hid.idl",
@@ -110,7 +108,6 @@ if (enable_extensions) {
 # API by moving these entries to the `extensions_api_schema_files_` above.
 if (enable_desktop_android_extensions) {
   extensions_types_only_schema_files_ += [
-    "clipboard.webidl",
     "scripts_internal.webidl",
     "usb.webidl",
     "virtual_keyboard_private.json",
