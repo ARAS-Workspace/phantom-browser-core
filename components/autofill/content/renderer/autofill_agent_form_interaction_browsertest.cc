@@ -388,7 +388,6 @@ TEST_F(AutofillAgentContentEditableInteractionTest,
   ChangeFocusToNull(GetMainFrame()->GetDocument());
 }
 
-// Scrolling doesn't hide the popup on Android.
 // Tests that scrolling triggers a call to `AutofillDriver::HidePopup()`.
 TEST_F(AutofillAgentContentEditableInteractionTest,
        ScrollingHidesAutofillPopup) {

@@ -199,9 +199,7 @@ void SetUpSeedFileTrial(
     return;
   }
 
-  // Launch seed files on desktop. Continue the experiment on
-  // Android Chrome: 50% enabled on pre-Stable and 10%
-  // enabled on Stable.
+  // Launch seed files on desktop.
   base::FieldTrial::Probability control_probability = 0;
   base::FieldTrial::Probability seed_files_probability = 100;
 

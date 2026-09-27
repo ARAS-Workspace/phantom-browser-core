@@ -4181,8 +4181,6 @@ TEST_F(PasswordAutofillAgentTest, SuggestPasswordWhenUsernameFieldDisabled) {
                           form_util::GetFieldRendererId(password_element_)));
 }
 
-// TODO(crbug.com/40819370): Amend the test to port it on Android if possible.
-// Otherwise, remove the TODO and add the reason why it is excluded.
 // Tests that a suggestion dropdown is shown on each password field. But when a
 // user chose one of the fields to autofill, a suggestion dropdown will be shown
 // only on this field.

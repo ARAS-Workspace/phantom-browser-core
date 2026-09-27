@@ -1484,7 +1484,7 @@ TEST_F(CreditCardSuggestionGeneratorTest, IsCreditCardFooterSuggestion) {
                                             footer_suggestions.size()));
 }
 
-// BNPL is currently only available for desktop and android platforms.
+// BNPL is currently only available for desktop platforms.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class CreditCardSuggestionGeneratorBnplTest
     : public CreditCardSuggestionGeneratorTest {

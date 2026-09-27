@@ -650,7 +650,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
 // correct metrics are recorded. The distinction between empty and disabled is
 // that empty means that promos would have been shown, whereas disabled
 // indicates that no promo is allowed for the current page.
-// TODO(b/502297163): Implement for Android.
 constexpr std::string_view kSimpleBrowserPromo = "simple";
 constexpr std::string_view kEmptyBrowserPromo = "empty";
 constexpr std::string_view kDisabledBrowserPromo = "disabled";
@@ -668,13 +667,11 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
       page_factory_receiver_(this),
       customize_buttons_factory_receiver_(this),
       most_visited_page_factory_receiver_(this),
-      // TODO(b/502297163): Implement for Android.
       ntp_promo_handler_factory_receiver_(this),
       browser_command_factory_receiver_(this),
       searchbox_page_factory_receiver_(this),
       help_bubble_handler_factory_receiver_(this),
       profile_(Profile::FromWebUI(web_ui)),
-      // TODO(b/502297163): Implement for Android.
       theme_service_(ThemeServiceFactory::GetForProfile(profile_)),
       ntp_custom_background_service_(
           NtpCustomBackgroundServiceFactory::GetForProfile(profile_)),
@@ -690,13 +687,11 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
   instance_count_++;
   base::UmaHistogramCounts100("NewTabPage.Count", instance_count_);
   auto* source = CreateAndAddNewTabPageUiHtmlSource(profile_);
-  // TODO(b/502297163): Implement for Android.
   bool wallpaper_search_button_enabled =
       base::FeatureList::IsEnabled(ntp_features::kNtpWallpaperSearchButton) &&
       customize_chrome::IsWallpaperSearchEnabledForProfile(profile_);
   source->AddBoolean("wallpaperSearchButtonEnabled",
                      wallpaper_search_button_enabled);
-  // TODO(b/502297163): Implement for Android.
   int wallpaper_search_animation_shown_threshold =
       ntp_features::GetWallpaperSearchButtonAnimationShownThreshold();
   // Animate the button if the threshold is negative (unconditional) or if the
@@ -733,7 +728,6 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
   content::URLDataSource::Add(
       profile_,
       std::make_unique<ThemeSource>(profile_, /*serve_untrusted=*/true));
-  // TODO(b/502297163): Implement for Android.
 
   web_ui->AddRequestableScheme(content::kChromeUIUntrustedScheme);
 
@@ -745,7 +739,6 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
           ContentSettingsPattern::FromURL(GURL("https://corp.google.com")),
       });
 
-  // TODO(b/502297163): Implement for Android.
   // Store basic theme info in load time data to make the background color and
   // background image available as soon as the page loads to prevent a potential
   // white flicker.
@@ -933,7 +926,6 @@ void NewTabPageUI::BindInterface(
   help_bubble_handler_factory_receiver_.Bind(std::move(pending_receiver));
 }
 
-// TODO(b/502297163): Implement for Android.
 void NewTabPageUI::BindInterface(
     mojo::PendingReceiver<ntp_promo::mojom::NtpPromoHandlerFactory>
         pending_receiver) {
@@ -969,7 +961,6 @@ void NewTabPageUI::ConnectToParentDocument(
 void NewTabPageUI::CreateBrowserCommandHandler(
     mojo::PendingReceiver<browser_command::mojom::CommandHandler>
         pending_handler) {
-  // TODO(b/502297163): Implement for Android.
   using browser_command::mojom::Command;
   std::vector<Command> supported_commands = {
       Command::kNoOpCommand,
@@ -1018,14 +1009,12 @@ void NewTabPageUI::CreatePageHandler(
 void NewTabPageUI::CreateHelpBubbleHandler(
     mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,
     mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler) {
-  // TODO(b/502297163): Implement for Android.
   help_bubble_handler_ = std::make_unique<user_education::HelpBubbleHandler>(
       std::move(handler), std::move(client),
       ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(
           web_ui()->GetRenderFrameHost()));
 }
 
-// TODO(b/502297163): Implement for Android.
 void NewTabPageUI::CreateNtpPromoHandler(
     mojo::PendingRemote<ntp_promo::mojom::NtpPromoClient> client,
     mojo::PendingReceiver<ntp_promo::mojom::NtpPromoHandler> handler) {
@@ -1115,7 +1104,6 @@ scoped_refptr<base::RefCountedMemory> NewTabPageUI::GetFaviconResourceBytes(
 }
 
 std::string_view NewTabPageUI::GetNtpPromoType() {
-  // TODO(b/502297163): Implement for Android.
   auto* controller = UserEducationServiceFactory::GetForBrowserContext(profile_)
                          ->ntp_promo_controller();
   if (!controller) {
