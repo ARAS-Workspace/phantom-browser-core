@@ -45,9 +45,6 @@ class StubPasswordManagerDriver : public PasswordManagerDriver {
       const std::u16string& username,
       const std::u16string& password,
       autofill::AutofillSuggestionTriggerSource suggestion_source) override;
-#if BUILDFLAG(IS_ANDROID)
-  void TriggerFormSubmission() override;
-#endif
   void PreviewSuggestion(const std::u16string& username,
                          const std::u16string& password) override;
   void PreviewSuggestionById(autofill::FieldRendererId username_element_id,

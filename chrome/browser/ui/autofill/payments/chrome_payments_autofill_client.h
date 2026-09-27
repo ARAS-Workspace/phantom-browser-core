@@ -23,12 +23,6 @@
 #include "components/autofill/core/browser/ui/payments/save_and_fill_dialog_controller_impl.h"
 #include "content/public/browser/web_contents_observer.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_payment_method_controller.h"
-#include "components/autofill/core/browser/ui/payments/card_expiration_date_fix_flow_controller_impl.h"
-#include "components/autofill/core/browser/ui/payments/card_name_fix_flow_controller_impl.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class GURL;
 
 namespace webauthn {
@@ -37,14 +31,8 @@ class InternalAuthenticator;
 
 namespace autofill {
 
-#if BUILDFLAG(IS_ANDROID)
-class AutofillCvcSaveMessageDelegate;
-#endif  // BUILDFLAG(IS_ANDROID)
 class AutofillDriver;
 class AutofillErrorDialogControllerImpl;
-#if BUILDFLAG(IS_ANDROID)
-class AutofillMessageController;
-#endif
 class AutofillOfferData;
 class AutofillOfferManager;
 enum class AutofillProgressUiType;
@@ -103,12 +91,6 @@ class ChromePaymentsAutofillClient : public PaymentsAutofillClient,
       base::OnceCallback<void(const std::string&)> callback) override;
 
   // PaymentsAutofillClient:
-#if BUILDFLAG(IS_ANDROID)
-  AutofillSaveCardBottomSheetBridge*
-  GetOrCreateAutofillSaveCardBottomSheetBridge() override;
-  AutofillSaveIbanBottomSheetBridge*
-  GetOrCreateAutofillSaveIbanBottomSheetBridge() override;
-#else   // !BUILDFLAG(IS_ANDROID)
   void ShowWebauthnOfferDialog(
       WebauthnDialogCallback offer_dialog_callback) override;
   void ShowWebauthnVerifyPendingDialog(
@@ -116,15 +98,6 @@ class ChromePaymentsAutofillClient : public PaymentsAutofillClient,
   void UpdateWebauthnOfferDialogWithError() override;
   bool CloseWebauthnDialog() override;
   void HideVirtualCardEnrollBubbleAndIconIfVisible() override;
-#endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_ANDROID)
-  void ConfirmAccountNameFixFlow(
-      base::OnceCallback<void(const std::u16string&)> callback) override;
-  void ConfirmExpirationDateFixFlow(
-      const CreditCard& card,
-      base::OnceCallback<void(const std::u16string&, const std::u16string&)>
-          callback) override;
-#endif
   bool HasCreditCardScanFeature() const override;
   void ScanCreditCard(CreditCardScanCallback callback) override;
   bool LocalCardSaveIsSupported() override;
@@ -251,7 +224,6 @@ class ChromePaymentsAutofillClient : public PaymentsAutofillClient,
   bool IsTabModalPopup() const override;
   BnplStrategy* GetBnplStrategy() override;
   BnplUiDelegate* GetBnplUiDelegate() override;
-#if !BUILDFLAG(IS_ANDROID)
   OmniboxAutofillDelegate* GetOmniboxAutofillDelegate() override;
   void ShowExpandedOmniboxAutofillChip(
       std::vector<Suggestion> suggestions,
@@ -267,20 +239,11 @@ class ChromePaymentsAutofillClient : public PaymentsAutofillClient,
                const AutofillSuggestionDelegate::SuggestionMetadata&)>
           did_accept_suggestion) override;
   void HideOmniboxAutofillChip() override;
-#endif
   void ShowPaymentsChurnedUsersUI(base::OnceClosure accept_callback,
                                   base::OnceClosure cancel_callback,
                                   base::OnceClosure closed_callback) final;
 
   // Begin ChromePaymentsAutofillClient-specific section.
-
-#if BUILDFLAG(IS_ANDROID)
-  // The AutofillMessageController is used to show a message notification
-  // on Android.
-  AutofillMessageController& GetAutofillMessageController();
-
-  TouchToFillPaymentMethodController* GetTouchToFillPaymentMethodController();
-#endif
 
   AutofillProgressDialogControllerImpl*
   AutofillProgressDialogControllerForTesting();
@@ -290,23 +253,6 @@ class ChromePaymentsAutofillClient : public PaymentsAutofillClient,
 
   void SetCardUnmaskControllerForTesting(
       std::unique_ptr<CardUnmaskPromptControllerImpl> test_controller);
-
-#if BUILDFLAG(IS_ANDROID)
-  void SetAutofillSaveCardBottomSheetBridgeForTesting(
-      std::unique_ptr<AutofillSaveCardBottomSheetBridge>
-          autofill_save_card_bottom_sheet_bridge);
-
-  void SetAutofillSaveIbanBottomSheetBridgeForTesting(
-      std::unique_ptr<AutofillSaveIbanBottomSheetBridge>
-          autofill_save_iban_bottom_sheet_bridge);
-
-  void SetAutofillMessageControllerForTesting(
-      std::unique_ptr<AutofillMessageController> autofill_message_controller);
-
-  void SetTouchToFillPaymentMethodControllerForTesting(
-      std::unique_ptr<TouchToFillPaymentMethodController>
-          touch_to_fill_payment_method_controller);
-#endif
 
   void SetRiskDataForTesting(const std::string& risk_data);
 
@@ -324,27 +270,6 @@ class ChromePaymentsAutofillClient : public PaymentsAutofillClient,
   void OnRiskDataLoaded(base::OnceCallback<void(const std::string&)> callback,
                         base::TimeTicks start_time,
                         const std::string& risk_data);
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<AutofillCvcSaveMessageDelegate>
-      autofill_cvc_save_message_delegate_;
-
-  std::unique_ptr<AutofillSaveCardBottomSheetBridge>
-      autofill_save_card_bottom_sheet_bridge_;
-
-  std::unique_ptr<AutofillSaveIbanBottomSheetBridge>
-      autofill_save_iban_bottom_sheet_bridge_;
-
-  std::unique_ptr<AutofillMessageController> autofill_message_controller_;
-
-  CardNameFixFlowControllerImpl card_name_fix_flow_controller_;
-
-  CardExpirationDateFixFlowControllerImpl
-      card_expiration_date_fix_flow_controller_;
-
-  std::unique_ptr<TouchToFillPaymentMethodController>
-      touch_to_fill_payment_method_controller_;
-#endif
 
   std::unique_ptr<PaymentsNetworkInterface> payments_network_interface_;
 
@@ -407,11 +332,9 @@ class ChromePaymentsAutofillClient : public PaymentsAutofillClient,
   // Lazily initialized: access only through `GetBnplUiDelegate()`.
   std::unique_ptr<BnplUiDelegate> bnpl_ui_delegate_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // The OmniboxAutofillDelegate used to handle the logic flow and user
   // interactions when the user triggers Autofill from the Omnibox.
   std::unique_ptr<OmniboxAutofillDelegate> omnibox_autofill_delegate_;
-#endif
 
   // Used to cache client side risk data. The cache is invalidated when the
   // chrome browser tab is closed.

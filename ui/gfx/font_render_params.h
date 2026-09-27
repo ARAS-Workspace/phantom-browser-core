@@ -129,7 +129,7 @@ COMPONENT_EXPORT(GFX) bool GetFontRenderParamsSubpixelRenderingEnabled();
 // Gets the device scale factor to query the FontRenderParams.
 COMPONENT_EXPORT(GFX) float GetFontRenderParamsDeviceScaleFactor();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // Sets the device scale factor for FontRenderParams to decide
 // if it should enable subpixel positioning.
 COMPONENT_EXPORT(GFX)

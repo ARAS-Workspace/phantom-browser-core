@@ -27,13 +27,6 @@ inline constexpr char kForcedLanguages[] = "intl.forced_languages";
 // locale if needed, such as "en-GB".
 inline constexpr char kApplicationLocale[] = "intl.app_locale";
 
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr char kAppLanguagePromptShown[] =
-    "language.app_language_prompt_shown";
-
-inline constexpr char kULPLanguages[] = "language.ulp_languages";
-#endif
-
 // Boolean that is true when offering translate (i.e. the automatic Full Page
 // Translate bubble) is enabled. Even when this is false, the user can force
 // translate from the right-click context menu unless translate is disabled by

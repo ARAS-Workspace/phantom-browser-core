@@ -29,26 +29,15 @@ namespace performance_manager::policies {
 namespace internal {
 // kNonVisiblePagesUrgentProtectionTime is encapsulated in CanDiscard(). This is
 // only accessible to testing code.
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr base::TimeDelta kNonVisiblePagesUrgentProtectionTime =
-    base::TimeDelta();
-#else
 // Time during which non visible pages are protected from urgent discarding
 // (not on ChromeOS).
 inline constexpr base::TimeDelta kNonVisiblePagesUrgentProtectionTime =
     base::Minutes(10);
-#endif
 
 }  // namespace internal
 
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/412839833): kTabAudioProtectionTime may be needed on Android
-// as well.
-inline constexpr base::TimeDelta kTabAudioProtectionTime = base::TimeDelta();
-#else
 // Time during which a tab cannot be discarded after having played audio.
 inline constexpr base::TimeDelta kTabAudioProtectionTime = base::Minutes(1);
-#endif
 
 // LINT.IfChange(CanDiscardResult)
 // Whether a page can be discarded. These values are persisted to logs. Entries

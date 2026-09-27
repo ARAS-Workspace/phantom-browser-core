@@ -63,46 +63,6 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kBoundSessionCredentialsKillSwitch);
 #endif  // BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kCctSignInPrompt);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kChromeAndroidIdentitySurveyFirstRun);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(double,
-                           kChromeAndroidIdentitySurveyFirstRunProbability);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kChromeAndroidIdentitySurveyWeb);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(double, kChromeAndroidIdentitySurveyWebProbability);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kChromeAndroidIdentitySurveyNtpSigninButton);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(
-    double,
-    kChromeAndroidIdentitySurveyNtpSigninButtonProbability);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kChromeAndroidIdentitySurveyNtpAccountAvatarTap);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(
-    double,
-    kChromeAndroidIdentitySurveyNtpAccountAvatarTapProbability);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kChromeAndroidIdentitySurveyNtpPromo);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(double,
-                           kChromeAndroidIdentitySurveyNtpPromoProbability);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kChromeAndroidIdentitySurveyBookmarkPromo);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(
-    double,
-    kChromeAndroidIdentitySurveyBookmarkPromoProbability);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Enables surveys to measure the effectiveness of the identity model.
 // These surveys would be displayed after interactions such as signin, profile
@@ -189,15 +149,6 @@ BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
                            kChromeIdentitySurveyLaunchWithDelayDuration);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-// Feature flag to enable cross-device sign-in.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kCrossDeviceSignin);
-// Parameter containing the base URL for cross device sign-in.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const base::FeatureParam<std::string> kCrossDeviceSigninUrl;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Feature flag to enable cross-device sign-in promo.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -278,29 +229,6 @@ BASE_DECLARE_FEATURE_PARAM(
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const base::FeatureParam<bool> kAccountPreviewDataPersistAccounts;
 
-#if BUILDFLAG(IS_ANDROID)
-// Enables the use of 1P app account information on Android in preferred account
-// computation.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnableAccountPreviewUseAppAccount);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
-                           kAccountPreviewAppAccountExpirationDuration);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// Whether activityless sign-in should be used for all entry points.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnableActivitylessSigninAllEntryPoint);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// After an account is added via the ADD_SESSION header it will be redirected to
-// the specified URL.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnableAddSessionRedirect);
-#endif
-
 // Enables the AI subscription level decorative ring around the user's avatar.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kEnableAiSubscriptionAvatarRing);
@@ -343,7 +271,7 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE_PARAM(std::string, kCookieBindingUpgradeSessionId);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#if !defined(NDEBUG) && !BUILDFLAG(IS_ANDROID)
+#if !defined(NDEBUG)
 // A fake feature corresponding to the kFakeCapabilityForTestingName account
 // capability. This is only used in unit tests (and must be left disabled to
 // prevent fetching the fake capability).
@@ -389,27 +317,6 @@ BASE_DECLARE_FEATURE_PARAM(bool, kOAuthMultiloginYoutubeCookieBindingEnforced);
 // Enables a separate account-scoped storage for preferences.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kEnablePreferencesAccountStorage);
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnableSeamlessSignin);
-enum class SeamlessSigninPromoType {
-  // Compact design with a single button to sign in and a dropdown icon for
-  // changing account.
-  kCompact,
-  // Design with a button to sign in and a button for changing account, similar
-  // to the current promo.
-  kTwoButtons,
-};
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const base::FeatureParam<SeamlessSigninPromoType>
-    kSeamlessSigninPromoType;
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kEnableWebSigninLoadingDialog);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -539,27 +446,6 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kFirstRunFeatureShowcaseGeminiStep);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kForceHistoryOptInScreen);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kForceShowWebSigninLoadingDialog);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kForceStartupSigninPromo);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/408962000): This feature is going to be used after clients
-// have the required information in local storage.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kFullscreenSignInPromoUseDate);
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE_PARAM(int, kFullscreenSignInPromoUseDateInterval);
-#endif
-
 // When enabled, AccountInfo is required to have a CoreAccountId which is also
 // guaranteed to be a Gaia Id.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -592,26 +478,8 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kMagiChromeSignInExperimentsBatch1);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#if BUILDFLAG(IS_ANDROID)
-// Allow to switch the source of truth for accounts from AccountManagerFacade to
-// IdentityManager.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kMakeIdentityManagerSourceOfAccounts);
-
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kMakeIdentityManagerSourceOfAccountsPart2);
-
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kMigrateAccountManagerDelegate);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kNonDefaultGaiaOriginCheck);
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kOpenSystemAccountSettingsDirectly);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // It enables the pre first run desktop refresh (changes to the onboarding flow
@@ -639,13 +507,6 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kProfileCreationDeclineSigninCTAExperiment);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-// Shows the Signin Button Profile Disc in the toolbar on all pages, rather than
-// solely the NTP. See crbug.com/495820974.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kProfileDiscOnAllPages);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kProfilesReordering);
 
@@ -657,11 +518,9 @@ BASE_DECLARE_FEATURE(kReadIsSubjectToUniversalOptOutCapability);
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kReadSupportsWalletPrivatePassesInAutofillCapability);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Kill switch for Device Management Service OAuth scope.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kRestrictDeviceManagementServiceOAuthScope);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables the new visual design for the profile switch interception bubble,
 // aligning it with the V2 style used for new profiles. Used in
@@ -670,13 +529,6 @@ BASE_DECLARE_FEATURE(kRestrictDeviceManagementServiceOAuthScope);
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kSigninInterceptGraphicUpdate);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
-#if BUILDFLAG(IS_ANDROID)
-// Experiment replacing signed out avatar with signin button on Android, see
-// crbug.com/475816843.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSigninLevelUpButton);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Feature to control the experiment for max count of showing contextual sign-in
 // promos and UNO bubble reprompt.
@@ -709,39 +561,14 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kSigninWindows10DepreciationStateBypassForTesting);
 COMPONENT_EXPORT(SIGNIN_SWITCHES) bool IsSigninWindows10DepreciationState();
 
-#if BUILDFLAG(IS_ANDROID)
-// Feature to show "Sign out of Chrome" string to android desktop users.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSignOutOfChrome);
-
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSkipCheckForAccountManagementOnSignin);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kSkipRefreshTokenCheckInIdentityManager);
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSmartEmailLineBreaking);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Kill switch for displaying sign-in errors in the profile picker.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kSupportErrorsInProfilePicker);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSupportForcedSigninPolicy);
-
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSupportWebSigninAddSession);
-
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kSwitchToIncognitoInSettings);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // This gates the new single-model approach where account bookmarks are stored
 // in separate permanent folders in BookmarkModel. The flag controls whether
@@ -757,27 +584,6 @@ BASE_DECLARE_FEATURE(kSyncEnableBookmarksInTransportMode);
 // flag is enabled by default on Windows/Mac/Linux.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kBookmarksMigrateUiChanges);
-
-#if BUILDFLAG(IS_ANDROID)
-// Additional gate for user policy registration and download based on user
-// accepting account management.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kUserPolicyFetchRequiresAcceptance);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-enum class SeamlessSigninStringType {
-  // Strings with "Sign in to Chrome" in the title and "Continue as" in the
-  // primary button
-  kContinueButton,
-  // Strings with "Sign in to Chrome" in the description and "Sign in as" in the
-  // primary button
-  kSigninButton,
-};
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const base::FeatureParam<SeamlessSigninStringType>
-    kSeamlessSigninStringType;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // keep-sorted end
 

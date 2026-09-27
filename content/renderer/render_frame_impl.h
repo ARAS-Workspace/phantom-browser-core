@@ -128,10 +128,6 @@
 #include "url/origin.h"
 #include "v8/include/v8-forward.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/common/gin_java_bridge.mojom.h"
-#endif
-
 namespace blink {
 namespace scheduler {
 class WebAgentGroupScheduler;
@@ -391,9 +387,6 @@ class CONTENT_EXPORT RenderFrameImpl
                         const int32_t flags) override;
 
   // blink::mojom::ResourceLoadInfoNotifier implementation:
-#if BUILDFLAG(IS_ANDROID)
-  void NotifyUpdateUserGestureCarryoverInfo() override;
-#endif
   void NotifyResourceRedirectReceived(
       const net::RedirectInfo& redirect_info,
       network::mojom::URLResponseHeadPtr redirect_response) override;
@@ -490,10 +483,8 @@ class CONTENT_EXPORT RenderFrameImpl
       scoped_refptr<base::TaskRunner> compositor_worker_task_runner) override;
   std::unique_ptr<blink::WebContentSettingsClient>
   CreateWorkerContentSettingsClient() override;
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<media::SpeechRecognitionClient>
   CreateSpeechRecognitionClient() override;
-#endif
   scoped_refptr<blink::WebWorkerFetchContext> CreateWorkletFetchContext()
       override;
   scoped_refptr<blink::WebWorkerFetchContext> CreateWorkerFetchContext(
@@ -702,11 +693,6 @@ class CONTENT_EXPORT RenderFrameImpl
   // Binds to the MHTML file generation service in the browser.
   void BindMhtmlFileWriter(
       mojo::PendingAssociatedReceiver<mojom::MhtmlFileWriter> receiver);
-
-#if BUILDFLAG(IS_ANDROID)
-  void BindGinJavaBridge(
-      mojo::PendingAssociatedReceiver<mojom::GinJavaBridge> receiver);
-#endif
 
   // Binds to the autoplay configuration service in the browser.
   void BindAutoplayConfiguration(

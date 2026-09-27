@@ -14,8 +14,6 @@ class PrefRegistrySimple;
 
 namespace browser_shutdown {
 
-#if !BUILDFLAG(IS_ANDROID)
-
 // The type of restart to perform during shutdown; see ShutdownPostThreadsStop.
 enum class RestartMode {
   // Do not restart the browser.
@@ -39,8 +37,6 @@ enum class RestartMode {
   // line of the new process.
   kRestartThisSession,
 };
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -81,7 +77,6 @@ bool ShouldIgnoreUnloadHandlers();
 // Get the current shutdown type.
 ShutdownType GetShutdownType();
 
-#if !BUILDFLAG(IS_ANDROID)
 // Performs the shutdown tasks that need to be done before
 // BrowserProcess and the various threads go away.
 //
@@ -98,7 +93,6 @@ RestartMode RecordShutdownInfoPrefs();
 // Performs the remaining shutdown tasks after all threads but the
 // main thread have been stopped.  This includes deleting g_browser_process.
 void ShutdownPostThreadsStop(RestartMode restart_mode);
-#endif
 
 // There are various situations where the browser process should continue to
 // run after the last browser window has closed - the Mac always continues

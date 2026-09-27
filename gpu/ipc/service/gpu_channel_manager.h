@@ -131,9 +131,6 @@ class GPU_IPC_SERVICE_EXPORT GpuChannelManager
   void PopulateCache(const gpu::GpuDiskCacheHandle& handle,
                      const std::string& key,
                      const std::string& program);
-#if BUILDFLAG(IS_ANDROID)
-  void WakeUpGpu();
-#endif
   void DestroyAllChannels();
 
   // Remove the channel for a particular renderer.
@@ -170,11 +167,6 @@ class GPU_IPC_SERVICE_EXPORT GpuChannelManager
   GpuProcessShmCount* use_shader_cache_shm_count() {
     return use_shader_cache_shm_count_;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  void DidAccessGpu();
-  void OnBackgroundCleanup();
-#endif
 
   void OnApplicationBackgrounded();
   void OnApplicationForegounded();
@@ -297,11 +289,6 @@ class GPU_IPC_SERVICE_EXPORT GpuChannelManager
     mutable base::Lock peak_mem_lock_;
   };
 
-#if BUILDFLAG(IS_ANDROID)
-  void ScheduleWakeUpGpu();
-  void DoWakeUpGpu();
-#endif
-
   // base::MemoryConsumer:
   void OnUpdateMemoryLimit() override;
   void OnReleaseMemory() override;
@@ -332,12 +319,6 @@ class GPU_IPC_SERVICE_EXPORT GpuChannelManager
   gles2::FramebufferCompletenessCache framebuffer_completeness_cache_;
   scoped_refptr<gl::GLSurface> default_offscreen_surface_;
   GpuFeatureInfo gpu_feature_info_;
-#if BUILDFLAG(IS_ANDROID)
-  // Last time we know the GPU was powered on. Global for tracking across all
-  // transport surfaces.
-  base::TimeTicks last_gpu_access_time_;
-  base::TimeTicks begin_wake_up_time_;
-#endif
 
   // A count in shared memory that's non-zero for the duration of loading
   // shaders. Read by the browser process on GPU process crash.

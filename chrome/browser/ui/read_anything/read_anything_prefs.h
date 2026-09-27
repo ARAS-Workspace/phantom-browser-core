@@ -8,8 +8,6 @@
 #include "build/build_config.h"
 #include "chrome/common/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace prefs {
 
 // String to represent the user's preferred font name for the read anything UI.
@@ -92,7 +90,5 @@ inline constexpr char kAccessibilityReadAnythingLastOpenedPresentationState[] =
     "settings.a11y.read_anything.last_opened_presentation_state";
 
 }  // namespace prefs
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // CHROME_BROWSER_UI_READ_ANYTHING_READ_ANYTHING_PREFS_H_

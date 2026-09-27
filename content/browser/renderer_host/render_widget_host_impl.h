@@ -78,10 +78,6 @@
 #include "ui/latency/latency_info.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/child_process_importance.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "services/device/public/mojom/wake_lock.mojom.h"
 #endif
@@ -519,18 +515,6 @@ class CONTENT_EXPORT RenderWidgetHostImpl
   void RequestSuccessfulPresentationTimeForNextFrame(
       blink::RecordContentToVisibleTimeRequest visible_time_request);
   void CancelSuccessfulPresentationTimeRequest();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Set the importance of widget. The importance is passed onto
-  // RenderProcessHost which aggregates importance of all of its widgets.
-  void SetImportance(ChildProcessImportance importance);
-  ChildProcessImportance importance() const { return importance_; }
-
-  void AddImeInputEventObserver(
-      RenderWidgetHost::InputEventObserver* observer) override;
-  void RemoveImeInputEventObserver(
-      RenderWidgetHost::InputEventObserver* observer) override;
-#endif
 
   // Called to notify the RenderWidget that its associated native window
   // got/lost focused.
@@ -1014,18 +998,6 @@ class CONTENT_EXPORT RenderWidgetHostImpl
                      const gfx::Rect& drag_obj_rect_in_dip,
                      blink::mojom::DragEventSourceInfoPtr event_info);
 
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, drag and drop may need to request input back from Viz, so the
-  // actual drag and drop may be started asynchronously.
-  void AsyncStartDragging(WeakDocumentPtr source_document,
-                          blink::mojom::DragDataPtr drag_data,
-                          blink::DragOperationsMask drag_operations_mask,
-                          const SkBitmap& unsafe_bitmap,
-                          const gfx::Vector2d& cursor_offset_in_dip,
-                          const gfx::Rect& drag_obj_rect_in_dip,
-                          blink::mojom::DragEventSourceInfoPtr event_info);
-#endif
-
   // Notifies the widget that the viz::FrameSinkId assigned to it is now bound
   // to its renderer side widget. If the renderer issued a FrameSink request
   // before this handoff, the request is buffered and will be issued here.
@@ -1409,11 +1381,6 @@ class CONTENT_EXPORT RenderWidgetHostImpl
   // then keep track of this value to handle passing focus to other frames.
   bool has_lost_focus_ = false;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Tracks the current importance of widget.
-  ChildProcessImportance importance_ = ChildProcessImportance::NORMAL;
-#endif
-
   // True when waiting for visual_properties_ack.
   bool visual_properties_ack_pending_ = false;
 
@@ -1480,13 +1447,6 @@ class CONTENT_EXPORT RenderWidgetHostImpl
       /*check_empty=*/false,
       base::ObserverListReentrancyPolicy::kAllowReentrancyUntriaged>::Unchecked
       input_event_observers_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Ime input event callbacks. This is separated from input_event_observers_,
-  // because not all text events are triggered by input events on Android.
-  base::ObserverList<RenderWidgetHost::InputEventObserver>::Unchecked
-      ime_input_event_observers_;
-#endif
 
   // The observers watching for tracked element changes.
   base::ObserverList<TrackedElementObserver> tracked_element_observers_;

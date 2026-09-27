@@ -60,10 +60,6 @@ class SupervisedUserGoogleAuthNavigationThrottle
   raw_ptr<supervised_user::ChildAccountService> child_account_service_;
   base::CallbackListSubscription google_auth_state_subscription_;
 
-#if BUILDFLAG(IS_ANDROID)
-  bool has_shown_reauth_;
-#endif
-
   // Used only for testing to omit the JNI call in ReauthenticateChildAccount().
   bool skip_jni_call_for_testing_ = false;
 

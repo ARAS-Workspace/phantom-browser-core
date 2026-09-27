@@ -16,10 +16,6 @@
 #include "content/public/browser/responsiveness_calculator_delegate.h"
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/application_status_listener.h"
-#endif
-
 namespace content {
 namespace responsiveness {
 
@@ -161,11 +157,6 @@ class CONTENT_EXPORT Calculator {
   CongestionList& GetExecutionCongestionOnUIThread();
   CongestionList& GetCongestionOnUIThread();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Callback invoked when the application state changes.
-  void OnApplicationStateChanged(base::android::ApplicationState state);
-#endif
-
   // This helper method:
   //   1) Removes all Congestions with Congestion.end_time < |end_time| from
   //   |congestions|. 2) Returns all Congestions with Congestion.start_time <
@@ -183,12 +174,6 @@ class CONTENT_EXPORT Calculator {
   // UI thread. Should only be accessed via the accessor, which checks that the
   // caller is on the UI thread.
   CongestionList congestion_on_ui_thread_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Stores the current visibility state of the application. Accessed only on
-  // the UI thread.
-  bool is_application_visible_ = false;
-#endif
 
   StartupStage startup_stage_ = StartupStage::kFirstInterval;
   bool past_first_idle_ = false;
@@ -223,13 +208,6 @@ class CONTENT_EXPORT Calculator {
   std::unique_ptr<ResponsivenessCalculatorDelegate> delegate_;
 
   perfetto::NamedTrack congestion_track_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Listener for changes in application state, unregisters itself when
-  // destroyed.
-  const std::unique_ptr<base::android::ApplicationStatusListener>
-      application_status_listener_;
-#endif
 };
 
 }  // namespace responsiveness

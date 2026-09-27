@@ -10,12 +10,10 @@
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/permissions/content_setting_permission_context_base.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/scoped_observation.h"
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_install_manager_observer.h"
 #include "url/origin.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 class BrowserContext;
@@ -48,12 +46,8 @@ struct PermissionPromptDecision;
 // If there is a PWA installed, grant/deny permission based on whether the
 // one-shot Background Sync content setting is set to allow/block.
 class PeriodicBackgroundSyncPermissionContext
-    : public permissions::ContentSettingPermissionContextBase
-#if !BUILDFLAG(IS_ANDROID)
-    ,
-      public web_app::WebAppInstallManagerObserver
-#endif  // !BUILDFLAG(IS_ANDROID)
-{
+    : public permissions::ContentSettingPermissionContextBase,
+      public web_app::WebAppInstallManagerObserver {
  public:
   explicit PeriodicBackgroundSyncPermissionContext(
       content::BrowserContext* browser_context);
@@ -68,9 +62,6 @@ class PeriodicBackgroundSyncPermissionContext
  protected:
   // Virtual for testing.
   virtual bool IsPwaInstalled(const GURL& origin) const;
-#if BUILDFLAG(IS_ANDROID)
-  virtual bool IsTwaInstalled(const GURL& origin) const;
-#endif
   virtual GURL GetDefaultSearchEngineUrl() const;
 
  private:
@@ -97,7 +88,6 @@ class PeriodicBackgroundSyncPermissionContext
       const ContentSettingsPattern& secondary_pattern,
       ContentSettingsTypeSet content_type_set) override;
 
-#if !BUILDFLAG(IS_ANDROID)
   // web_app::WebAppInstallManagerObserver:
   void OnWebAppInstalled(const webapps::AppId& app_id) override;
   void OnWebAppWillBeUninstalled(const webapps::AppId& app_id) override;
@@ -113,7 +103,6 @@ class PeriodicBackgroundSyncPermissionContext
   base::ScopedObservation<web_app::WebAppInstallManager,
                           web_app::WebAppInstallManagerObserver>
       install_manager_observation_{this};
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 #endif  // CHROME_BROWSER_BACKGROUND_SYNC_PERIODIC_BACKGROUND_SYNC_PERMISSION_CONTEXT_H_

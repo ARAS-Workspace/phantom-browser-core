@@ -40,19 +40,9 @@ class ChromeDeviceAuthenticatorFactory : public ProfileKeyedServiceFactory {
       const gfx::NativeWindow window,
       const device_reauth::DeviceAuthParams& params);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Create an instance of the DeviceAuthenticator. Trying to use this
-  // API on platforms that do not provide an implementation will result in a
-  // link error.
-  static std::unique_ptr<device_reauth::DeviceAuthenticator> GetForProfile(
-      Profile* profile,
-      const base::android::JavaRef<jobject>& activity,
-      const device_reauth::DeviceAuthParams& params);
-#else
   static std::unique_ptr<device_reauth::DeviceAuthenticator> GetForProfile(
       Profile* profile,
       const device_reauth::DeviceAuthParams& params);
-#endif
 
  private:
   std::unique_ptr<KeyedService> BuildServiceInstanceForBrowserContext(

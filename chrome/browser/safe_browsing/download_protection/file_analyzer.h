@@ -17,11 +17,9 @@
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "third_party/protobuf/src/google/protobuf/repeated_field.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/services/file_util/public/cpp/sandboxed_rar_analyzer.h"
 #include "chrome/services/file_util/public/cpp/sandboxed_seven_zip_analyzer.h"
 #include "chrome/services/file_util/public/cpp/sandboxed_zip_analyzer.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/common/safe_browsing/disk_image_type_sniffer_mac.h"
@@ -100,13 +98,11 @@ class FileAnalyzer {
   void StartExtractFileFeatures();
   void OnFileAnalysisFinished(FileAnalyzer::Results results);
 
-#if !BUILDFLAG(IS_ANDROID)
   void StartExtractZipFeatures();
   void OnZipAnalysisFinished(const ArchiveAnalyzerResults& archive_results);
 
   void StartExtractRarFeatures();
   void OnRarAnalysisFinished(const ArchiveAnalyzerResults& archive_results);
-#endif
 
 #if BUILDFLAG(IS_MAC)
   void StartExtractDmgFeatures();
@@ -115,11 +111,9 @@ class FileAnalyzer {
       const safe_browsing::ArchiveAnalyzerResults& archive_results);
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   void StartExtractSevenZipFeatures();
   void OnSevenZipAnalysisFinished(
       const ArchiveAnalyzerResults& archive_results);
-#endif
 
   void LogAnalysisDurationWithAndWithoutSuffix(const std::string& suffix);
 
@@ -137,7 +131,6 @@ class FileAnalyzer {
   base::Time start_time_;
   Results results_;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<SandboxedZipAnalyzer, base::OnTaskRunnerDeleter>
       zip_analyzer_{nullptr, base::OnTaskRunnerDeleter(nullptr)};
 
@@ -145,17 +138,14 @@ class FileAnalyzer {
       rar_analyzer_{nullptr, base::OnTaskRunnerDeleter(nullptr)};
 
   bool is_obfuscated_ = false;
-#endif
 
 #if BUILDFLAG(IS_MAC)
   std::unique_ptr<SandboxedDMGAnalyzer, base::OnTaskRunnerDeleter>
       dmg_analyzer_{nullptr, base::OnTaskRunnerDeleter(nullptr)};
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<SandboxedSevenZipAnalyzer, base::OnTaskRunnerDeleter>
       seven_zip_analyzer_{nullptr, base::OnTaskRunnerDeleter(nullptr)};
-#endif
 
   base::WeakPtrFactory<FileAnalyzer> weakptr_factory_{this};
 };

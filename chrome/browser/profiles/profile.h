@@ -19,10 +19,6 @@
 #include "build/build_config.h"
 #include "content/public/browser/browser_context.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 class ChromeZoomLevelPrefs;
 class ExtensionSpecialStoragePolicy;
 class GURL;
@@ -101,27 +97,6 @@ class Profile : public content::BrowserContext {
 
     bool AllowsBrowserWindows() const;
     bool IsDevTools() const;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Constructs a Java OTRProfileID from the provided C++ OTRProfileID
-    base::android::ScopedJavaLocalRef<jobject> ConvertToJavaOTRProfileID(
-        JNIEnv* env) const;
-
-    // Constructs a C++ OTRProfileID from the provided Java OTRProfileID
-    static OTRProfileID ConvertFromJavaOTRProfileID(
-        JNIEnv* env,
-        const base::android::JavaRef<jobject>& j_otr_profile_id);
-
-    // Constructs an OTRProfileID based on the string passed in. Should only be
-    // called with values previously returned by Serialize().
-    static OTRProfileID Deserialize(const std::string& value);
-
-    // Constructs a string that represents OTRProfileID from the provided
-    // OTRProfileID.
-    // TODO(crbug.com/40162345): Use one serialize function for both java and
-    // native side instead of having duplicate code.
-    std::string Serialize() const;
-#endif
 
    private:
     friend std::ostream& operator<<(std::ostream& out,
@@ -445,11 +420,6 @@ class Profile : public content::BrowserContext {
   // Returns a debug information in std::string.
   std::string ToDebugString() const;
 
-#if BUILDFLAG(IS_ANDROID)
-  static Profile* FromJavaObject(const jni_zero::JavaRef<jobject>& obj);
-  jni_zero::ScopedJavaLocalRef<jobject> GetJavaObject() const;
-#endif  // BUILDFLAG(IS_ANDROID)
-
  protected:
   // Creates an OffTheRecordProfile which points to this Profile.
   static std::unique_ptr<Profile> CreateOffTheRecordProfile(
@@ -507,13 +477,6 @@ class Profile : public content::BrowserContext {
   // match that of Profile itself.
   std::unique_ptr<variations::VariationsClient> chrome_variations_client_;
 
-#if BUILDFLAG(IS_ANDROID)
-  void InitJavaObject();
-  void NotifyJavaOnProfileWillBeDestroyed();
-  void DestroyJavaObject();
-
-  jni_zero::ScopedJavaGlobalRef<jobject> j_obj_;
-#endif
   base::WeakPtrFactory<Profile> weak_factory_{this};
 };
 
@@ -525,19 +488,4 @@ struct ProfileCompare {
 std::ostream& operator<<(std::ostream& out,
                          const Profile::OTRProfileID& profile_id);
 
-#if BUILDFLAG(IS_ANDROID)
-namespace jni_zero {
-template <>
-inline Profile* FromJniType<Profile*>(JNIEnv* env,
-                                      const JavaRef<jobject>& j_profile) {
-  return Profile::FromJavaObject(j_profile);
-}
-
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType<Profile>(JNIEnv* env,
-                                                      const Profile& profile) {
-  return profile.GetJavaObject();
-}
-}  // namespace jni_zero
-#endif  // BUILDFLAG(IS_ANDROID)
 #endif  // CHROME_BROWSER_PROFILES_PROFILE_H_

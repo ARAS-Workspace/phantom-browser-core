@@ -46,7 +46,6 @@ enum class StartupIsCompleteReason {
 
 class AfterStartupTaskUtils {
  public:
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/528419929): Refactor AfterStartupTaskUtils.java on Android
   // to create a StartupInProgressRef instead of calling
   // SetBrowserStartupIsComplete() directly, enabling startup refs on Android.
@@ -68,18 +67,15 @@ class AfterStartupTaskUtils {
    private:
     StartupIsCompleteReason reason_;
   };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   AfterStartupTaskUtils() = delete;
   AfterStartupTaskUtils(const AfterStartupTaskUtils&) = delete;
   AfterStartupTaskUtils& operator=(const AfterStartupTaskUtils&) = delete;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Register a reference that delays startup completion. Startup is considered
   // complete only when all registered references are released.
   static std::unique_ptr<StartupInProgressRef> RegisterStartupInProgressRef(
       StartupIsCompleteReason reason);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Signals the end of the startup registration phase, allowing startup to be
   // considered complete once all registered references are released. On

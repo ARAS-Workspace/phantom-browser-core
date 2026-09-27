@@ -19,13 +19,6 @@ namespace tips {
 notifications::NotificationData GetTipsNotificationData(
     TipsNotificationsFeatureType feature_type);
 
-#if BUILDFLAG(IS_ANDROID)
-// Returns the string representing the pref for recording whether the
-// notification for the feature type in question has been shown before.
-// |feature_type| the feature in question to return the pref for.
-std::string GetFeatureTypePref(TipsNotificationsFeatureType feature_type);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace tips
 
 #endif  // CHROME_BROWSER_TIPS_CORE_TIPS_UTILS_H_

@@ -56,18 +56,6 @@ class GeolocationPermissionContext : public PermissionContextBase {
     virtual bool DecidePermission(const PermissionRequestData& request_data,
                                   BrowserPermissionCallback* callback,
                                   GeolocationPermissionContext* context) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Returns whether or not this |web_contents| is interactable.
-    virtual bool IsInteractable(content::WebContents* web_contents) = 0;
-
-    // Gets the pref service associated with |browser_context|.
-    virtual PrefService* GetPrefs(content::BrowserContext* browser_context) = 0;
-
-    // Returns whether |requesting_origin| is the default search engine.
-    virtual bool IsRequestingOriginDSE(content::BrowserContext* browser_context,
-                                       const GURL& requesting_origin) = 0;
-#endif
   };
 
   GeolocationPermissionContext(content::BrowserContext* browser_context,

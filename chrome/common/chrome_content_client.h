@@ -65,9 +65,6 @@ class ChromeContentClient : public content::ContentClient {
   blink::OriginTrialPolicy* GetOriginTrialPolicy() override;
   bool IsFilePickerAllowedForCrossOriginSubframe(
       const url::Origin& origin) override;
-#if BUILDFLAG(IS_ANDROID)
-  media::MediaDrmBridgeClient* GetMediaDrmBridgeClient() override;
-#endif  // BUILDFLAG(IS_ANDROID)
   void ExposeInterfacesToBrowser(
       scoped_refptr<base::SequencedTaskRunner> io_task_runner,
       mojo::BinderMap* binders) override;

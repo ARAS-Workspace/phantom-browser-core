@@ -36,10 +36,6 @@
 #include "media/capture/video_capture_types.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/application_status_listener.h"
-#endif
-
 namespace content {
 struct GlobalRenderFrameHostId;
 
@@ -212,13 +208,6 @@ class CONTENT_EXPORT VideoCaptureManager
   void TakePhoto(const base::UnguessableToken& session_id,
                  VideoCaptureDevice::TakePhotoCallback callback);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Some devices had troubles when stopped and restarted quickly, so the device
-  // is only stopped when Chrome is sent to background and not when, e.g., a tab
-  // is hidden, see http://crbug.com/582295.
-  void OnApplicationStateChange(base::android::ApplicationState state);
-#endif
-
   using EnumerationCallback =
       base::OnceCallback<void(media::mojom::DeviceEnumerationResult result_code,
                               const media::VideoCaptureDeviceDescriptors&)>;
@@ -337,12 +326,6 @@ class CONTENT_EXPORT VideoCaptureManager
 
   void ReleaseDevices();
   void ResumeDevices();
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<base::android::ApplicationStatusListener>
-      app_status_listener_;
-  bool application_state_has_running_activities_;
-#endif
 
   // ScreenlockObserver implementation:
   void OnScreenLocked() override;

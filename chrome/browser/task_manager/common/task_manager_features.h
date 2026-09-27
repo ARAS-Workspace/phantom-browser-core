@@ -7,12 +7,6 @@
 
 #include "base/feature_list.h"
 
-namespace features {
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kTaskManagerClank);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-}  // namespace features
+namespace features {}  // namespace features
 
 #endif  // CHROME_BROWSER_TASK_MANAGER_COMMON_TASK_MANAGER_FEATURES_H_

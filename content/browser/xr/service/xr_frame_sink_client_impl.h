@@ -70,9 +70,6 @@ class XrFrameSinkClientImpl : public device::XrFrameSinkClient,
 
   std::optional<viz::SurfaceId> dom_surface_id_;
   base::Lock dom_surface_lock_;
-#if BUILDFLAG(IS_ANDROID)
-  base::CallbackListSubscription surface_id_changed_subscription_;
-#endif
 
   // Must be last so that it will be invalidated before any other members.
   base::WeakPtrFactory<XrFrameSinkClientImpl> weak_ptr_factory_{this};

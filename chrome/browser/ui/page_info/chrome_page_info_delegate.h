@@ -33,11 +33,9 @@ class PasswordProtectionService;
 class ChromePasswordProtectionService;
 }  // namespace safe_browsing
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace infobars {
 class BrowserInfoBarManager;
 }
-#endif
 
 class ChromePageInfoDelegate : public PageInfoDelegate {
  public:
@@ -49,12 +47,10 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
   // WebContents.
   static GetBrowserCallback DefaultGetBrowserCallback();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Registers the Page Info InfoBar specification in the centralized
   // infobar framework.
   static void RegisterPageInfoInfoBar(
       infobars::BrowserInfoBarManager* infobar_manager);
-#endif
 
   ChromePageInfoDelegate(content::WebContents* web_contents,
                          GetBrowserCallback get_browser_callback);
@@ -78,7 +74,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
       blink::PermissionType permission,
       const url::Origin& origin,
       const std::optional<url::Origin>& requesting_origin) override;
-#if !BUILDFLAG(IS_ANDROID)
   std::optional<std::u16string> GetRwsOwner(const GURL& site_url) override;
   bool IsRwsManaged(const GURL& site_url) override;
   bool CreateInfoBarDelegate() override;
@@ -102,7 +97,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
       ContentSettingsType content_settings_type) override;
   void OnPageInfoActionOccurred(page_info::PageInfoAction action) override;
   void OnUIClosing() override;
-#endif
 
   void OpenSafeBrowsingHelpCenterPage(const ui::Event* event,
                                       bool is_suspicious_site) override;
@@ -122,10 +116,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
   std::unique_ptr<content_settings::PageSpecificContentSettings::Delegate>
   GetPageSpecificContentSettingsDelegate() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  const std::u16string GetClientApplicationName() override;
-#endif
-
   bool IsHttpsFirstModeEnabledForUrl(const GURL& url) override;
   bool IsIncognitoProfile() override;
 
@@ -140,7 +130,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
   GetChromePasswordProtectionService() const;
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   // Focus the window and tab for the web contents.
   void FocusWebContents();
 
@@ -148,7 +137,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
   // service cannot be retrieved via |web_contents_| as that may be destroyed
   // before this is.
   raw_ptr<TrustSafetySentimentService> sentiment_service_;
-#endif
 
   // Callback used to look up the BrowserWindowInterface for a WebContents.
   //

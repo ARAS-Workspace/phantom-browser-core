@@ -100,11 +100,6 @@ class NetErrorHelper
   void SetIsShowingDownloadButton(bool show) override;
   content::RenderFrame* GetRenderFrame() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  void SetAutoFetchState(
-      chrome::mojom::OfflinePageAutoFetcherScheduleResult state) override;
-#endif
-
   void OnNetworkDiagnosticsClientRequest(
       mojo::PendingAssociatedReceiver<chrome::mojom::NetworkDiagnosticsClient>
           receiver);

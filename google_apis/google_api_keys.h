@@ -87,11 +87,9 @@ COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetSodaAPIKey();
 // Retrieves the Translate Private API Key.
 COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetPartialTranslateAPIKey();
 
-#if !BUILDFLAG(IS_ANDROID)
 // Retrieves the HaTS API Key. This key is only used for desktop HaTS
 // and the internal API Key is only defined in non-Android builds.
 COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetHatsAPIKey();
-#endif
 
 // Retrieves the key used to sign metrics (UMA/UKM) uploads.
 COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetMetricsKey();

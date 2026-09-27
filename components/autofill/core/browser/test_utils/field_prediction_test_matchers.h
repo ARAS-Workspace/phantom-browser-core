@@ -25,13 +25,11 @@ inline ::testing::Matcher<FieldPrediction> EqualsPrediction(FieldType type) {
   return ::testing::Property("type", &FieldPrediction::type, type);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 inline ::testing::Matcher<FieldPrediction> EqualsPrediction(
     FieldType type,
     FieldPrediction::Source source) {
   return EqualsPrediction(test::CreateFieldPrediction(type, source));
 }
-#endif
 
 }  // namespace autofill::test
 

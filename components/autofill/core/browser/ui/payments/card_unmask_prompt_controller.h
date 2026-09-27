@@ -48,17 +48,6 @@ class CardUnmaskPromptController {
   // information accessors and instead return the credit card object directly.
   // Only exposing necessary information is good but this list is growing
   // larger.
-#if BUILDFLAG(IS_ANDROID)
-  virtual Suggestion::Icon GetCardIcon() const = 0;
-  virtual std::u16string GetCardName() const = 0;
-  virtual std::u16string GetCardLastFourDigits() const = 0;
-  virtual std::u16string GetCardExpiration() const = 0;
-  virtual const GURL& GetCardArtUrl() const = 0;
-  virtual int GetGooglePayImageRid() const = 0;
-  virtual bool ShouldOfferWebauthn() const = 0;
-  virtual bool GetWebauthnOfferStartState() const = 0;
-  virtual std::u16string GetCvcImageAnnouncement() const = 0;
-#endif
   virtual base::TimeDelta GetSuccessMessageDuration() const = 0;
   virtual payments::PaymentsAutofillClient::PaymentsRpcResult
   GetVerificationResult() const = 0;

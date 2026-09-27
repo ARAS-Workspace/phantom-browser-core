@@ -87,7 +87,6 @@ std::vector<raw_ptr<const BookmarkNode>> GetMostRecentlyModifiedUserFolders(
 // If this should be used on mobile we need to reevaluate if this implementation
 // makes sense. See tests in bookmark_utils_unittest.cc which currently fail
 // outside of desktop. Enable and update those if this is to be used on mobile.
-#if !BUILDFLAG(IS_ANDROID)
 // Bookmark nodes, split by account/local bookmarks.
 struct BookmarkNodesSplitByAccountAndLocal final {
   BookmarkNodesSplitByAccountAndLocal();
@@ -131,7 +130,6 @@ BookmarkNodesSplitByAccountAndLocal GetMostRecentlyUsedFoldersForDisplay(
 // nodes).
 BookmarkNodesSplitByAccountAndLocal GetPermanentNodesForDisplay(
     const BookmarkModel* model);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Returns true if any local permanent nodes contain bookmarks.
 bool HasLocalOrSyncableBookmarks(const BookmarkModel* model);

@@ -14,7 +14,7 @@
 namespace mojo {
 namespace core {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 COMPONENT_EXPORT(MOJO_CORE_EMBEDDER_FEATURES)
 BASE_DECLARE_FEATURE(kMojoUseEventFd);
 
@@ -23,7 +23,7 @@ extern const base::FeatureParam<int> kMojoUseEventFdPages;
 
 COMPONENT_EXPORT(MOJO_CORE_EMBEDDER_FEATURES)
 extern const char kSuppressEventfdUpgradeForWebview[];
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 COMPONENT_EXPORT(MOJO_CORE_EMBEDDER_FEATURES)
 BASE_DECLARE_FEATURE(kMojoIpczMemV2);

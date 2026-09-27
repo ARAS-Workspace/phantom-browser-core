@@ -24,19 +24,6 @@ namespace tab_groups::prefs {
 // Whether tab groups are syncable across devices.
 inline constexpr char kSyncableTabGroups[] = "tabgroup.sync_enabled";
 
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr char kAutoOpenSyncedTabGroups[] =
-    "auto_open_synced_tab_groups";
-inline constexpr char kStopShowingTabGroupConfirmationOnClose[] =
-    "stop_showing_tab_group_confirmation_on_close";
-inline constexpr char kStopShowingTabGroupConfirmationOnUngroup[] =
-    "stop_showing_tab_group_confirmation_on_ungroup";
-inline constexpr char kStopShowingTabGroupConfirmationOnTabRemove[] =
-    "stop_showing_tab_group_confirmation_on_tab_remove";
-inline constexpr char kStopShowingTabGroupConfirmationOnTabClose[] =
-    "stop_showing_tab_group_confirmation_on_tab_close";
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Boolean which specifies whether the tab group is automatically pinned when
 // it's created.
 inline constexpr char kAutoPinNewTabGroups[] = "auto_pin_new_tab_groups";

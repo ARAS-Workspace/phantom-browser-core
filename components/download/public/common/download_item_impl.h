@@ -321,10 +321,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadItemImpl
   void DeleteFile(base::OnceCallback<void(bool)> callback) override;
   DownloadFile* GetDownloadFile() override;
   DownloadItemRenameHandler* GetRenameHandler() override;
-#if BUILDFLAG(IS_ANDROID)
-  bool IsFromExternalApp() override;
-  bool AllowAutoOpenAfterCompletion() override;
-#endif  // BUILDFLAG(IS_ANDROID)
   bool IsDangerous() const override;
   bool IsInsecure() const override;
   bool IsUserConfirmed() const override;
@@ -423,12 +419,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadItemImpl
   void SetDelegate(DownloadItemImplDelegate* delegate);
 
   void SetDownloadId(uint32_t download_id);
-
-#if BUILDFLAG(IS_ANDROID)
-  void set_is_from_external_app(bool is_from_external_app) {
-    is_from_external_app_ = is_from_external_app;
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   const DownloadUrlParameters::RequestHeadersType& request_headers() const {
     return request_headers_;
@@ -924,11 +914,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadItemImpl
 
   // Whether the URL was truncated to save memory.
   bool url_truncated_ = false;
-
-#if BUILDFLAG(IS_ANDROID)
-  bool is_from_external_app_ = false;
-  bool allow_auto_open_after_completion_ = true;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   THREAD_CHECKER(thread_checker_);
 

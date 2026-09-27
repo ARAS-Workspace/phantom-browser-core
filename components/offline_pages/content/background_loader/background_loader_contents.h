@@ -78,10 +78,6 @@ class BackgroundLoaderContents : public content::WebContentsDelegate {
       bool user_gesture,
       bool* was_blocked) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  bool ShouldBlockMediaRequest(const GURL& url) override;
-#endif
-
   void RequestMediaAccessPermission(
       content::WebContents* contents,
       const content::MediaStreamRequest& request,

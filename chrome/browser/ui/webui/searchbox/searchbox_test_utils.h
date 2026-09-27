@@ -19,9 +19,7 @@
 #include "ui/base/window_open_disposition.h"
 #include "ui/gfx/geometry/size.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup.mojom.h"
-#endif
 
 using testing::_;
 using testing::DoAll;
@@ -59,9 +57,7 @@ class MockSearchboxPage : public searchbox::mojom::Page {
               AddFileContext,
               (const base::UnguessableToken&,
                searchbox::mojom::SelectedFileInfoPtr));
-#if !BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(void, UpdateSmartTabSharingActive, (bool active), (override));
-#endif
   MOCK_METHOD(void, UpdateContentSharingPolicy, (bool enabled), (override));
   MOCK_METHOD(void,
               OnPermissionPromptChanged,
@@ -73,7 +69,6 @@ class MockSearchboxPage : public searchbox::mojom::Page {
               (override));
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockOmniboxPopupPage : public omnibox_popup::mojom::Page {
  public:
   MockOmniboxPopupPage();
@@ -93,7 +88,6 @@ class MockOmniboxPopupPage : public omnibox_popup::mojom::Page {
   MOCK_METHOD(void, ClearAutocompleteMatches, (), (override));
   MOCK_METHOD(void, ClearPopup, (ClearPopupCallback callback), (override));
 };
-#endif
 
 class MockAutocompleteController : public AutocompleteController {
  public:

@@ -56,11 +56,6 @@ class COMPONENT_EXPORT(UI_BASE_CLIPBOARD_TYPES) ClipboardFormatType {
   // consisting of individual bookmark nodes and/or bookmark folders.
   static const ClipboardFormatType& BookmarkEntriesType();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Type only used by Chromium to track the source URL of clipboard data.
-  static const ClipboardFormatType& InternalSourceUrlType();
-#endif
-
   // For custom formats, individual types are added to the clipboard with a type
   // consisting of a prefix + index, and a map type that maps the custom format
   // type to the type used on the clipboard. On Windows/Linux, this is done
@@ -123,7 +118,7 @@ class COMPONENT_EXPORT(UI_BASE_CLIPBOARD_TYPES) ClipboardFormatType {
   //
   // In all platforms, format names may be ASCII or UTF8/16.
   // TODO(huangdarwin): Convert interfaces to std::u16string.
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
   explicit ClipboardFormatType(std::string_view native_format);
   std::string data_;
 #elif BUILDFLAG(IS_APPLE)

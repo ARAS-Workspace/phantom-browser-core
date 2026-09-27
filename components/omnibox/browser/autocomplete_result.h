@@ -25,11 +25,6 @@
 #include "third_party/omnibox_proto/groups.pb.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_array.h"
-#include "base/android/scoped_java_ref.h"
-#endif
-
 class AutocompleteInput;
 class AutocompleteProvider;
 class AutocompleteProviderClient;
@@ -65,45 +60,6 @@ class AutocompleteResult {
   ~AutocompleteResult();
   AutocompleteResult(const AutocompleteResult&) = delete;
   AutocompleteResult& operator=(const AutocompleteResult&) = delete;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a corresponding Java object, creating it if necessary.
-  // NOTE: Android specific methods are defined in autocomplete_match_android.cc
-  base::android::ScopedJavaLocalRef<jobject> GetOrCreateJavaObject(
-      JNIEnv* env,
-      const TemplateURLService* template_url_service) const;
-
-  // Notify the Java object that its native counterpart is about to be
-  // destroyed.
-  void DestroyJavaObject() const;
-
-  // Construct an array of AutocompleteMatch objects arranged in the exact same
-  // order as |matches_|.
-  base::android::ScopedJavaLocalRef<jobjectArray> BuildJavaMatches(
-      JNIEnv* env,
-      const TemplateURLService* template_url_service) const;
-
-  // Group suggestions in specified range by search vs url.
-  // The range used is [first_index, last_index), which contains all the
-  // elements between first_index and last_index, including the element pointed
-  // by first_index, but not the element pointed by last_index.
-  void GroupSuggestionsBySearchVsURL(JNIEnv* env,
-                                     int first_index,
-                                     int last_index);
-
-  // Compares the set of AutocompleteMatch references held by Java with the
-  // AutocompleteMatch objects held by this instance of the AutocompleteResult
-  // and returns true if the two sets are same.
-  // The |match_index|, when different than -1 (|kNoMatchIndex|), specifies the
-  // index of a match of particular interest; this index helps identify cases
-  // where an action is planned on suggestion at an index that falls outside of
-  // bounds of valid AutocompleteResult indices, where every other aspect of the
-  // AutocompleteResult is correct.
-  bool VerifyCoherency(JNIEnv* env,
-                       const base::android::JavaRef<jlongArray>& matches,
-                       int32_t match_index,
-                       int32_t verification_point);
-#endif
 
   // Moves matches from |old_matches| to provide a consistent result set.
   // |old_matches| is mutated during this, and should not be used afterwards.
@@ -463,13 +419,7 @@ class AutocompleteResult {
 
   typedef std::map<AutocompleteProvider*, ACMatches> ProviderToMatches;
 
-#if BUILDFLAG(IS_ANDROID)
-  // iterator::difference_type is not defined in the STL that we compile with on
-  // Android.
-  typedef int matches_difference_type;
-#else
   typedef ACMatches::iterator::difference_type matches_difference_type;
-#endif
 
   // Swaps this result set - i.e., `matches_`, `suggestion_groups_map_`, and
   // `smart_compose_inline_hint_` - with `other`. Called in
@@ -582,18 +532,6 @@ class AutocompleteResult {
   // refreshed by calling `RefreshReadyState()` whenever the content of this
   // result is updated.
   base::TimeTicks result_ready_time_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Corresponding Java object.
-  // This object should be ignored when AutocompleteResult is copied or moved.
-  // This object should never be accessed directly. To acquire a reference to
-  // java object, call the GetOrCreateJavaObject().
-  // Note that this object is lazily constructed to avoid creating Java matches
-  // for throw away AutocompleteMatch objects, eg. during Classify() or
-  // QualifyPartialUrlQuery() calls.
-  // See AutocompleteControllerAndroid for more details.
-  mutable base::android::ScopedJavaGlobalRef<jobject> java_result_;
-#endif
 
   // For LOG debugging.
   friend std::ostream& operator<<(std::ostream& os,

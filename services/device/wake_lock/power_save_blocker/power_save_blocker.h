@@ -14,10 +14,6 @@
 #include "build/build_config.h"
 #include "services/device/public/mojom/wake_lock.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/view_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace device {
 
 // A RAII-style class to block the system from entering low-power (sleep) mode.
@@ -38,15 +34,6 @@ class PowerSaveBlocker {
   PowerSaveBlocker& operator=(const PowerSaveBlocker&) = delete;
 
   virtual ~PowerSaveBlocker();
-
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, the mojom::WakeLockType::kPreventDisplaySleep type of
-  // PowerSaveBlocker should associated with a View, so the blocker can be
-  // removed by the platform. Note that |view_android| is guaranteed to be
-  // valid only for the lifetime of this call; hence it should not be cached
-  // internally.
-  void InitDisplaySleepBlocker(ui::ViewAndroid* view_android);
-#endif
 
  private:
   class Delegate;

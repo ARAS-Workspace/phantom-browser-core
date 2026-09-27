@@ -34,11 +34,6 @@ class PasswordManagerDelegate {
       const Suggestion& suggestion,
       const AutofillSuggestionDelegate::SuggestionMetadata& metadata) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  virtual void ShowKeyboardReplacingSurface(
-      const PasswordSuggestionRequest& request) = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Returns a suggestion to sign in with a passkey from another device.
   // Returns `std::nullopt` if the suggestion is not available.
   virtual std::optional<Suggestion>

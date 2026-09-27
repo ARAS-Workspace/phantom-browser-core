@@ -125,33 +125,6 @@ class CC_EXPORT RenderFrameMetadata {
   // Screen-space rectangles of tracked elements (see Element
   // setTrackedElementSubRect).
   viz::TrackedElementRects tracked_element_rects;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Used to position Android bottom bar, whose position is computed by the
-  // renderer compositor.
-  float bottom_controls_height = 0.f;
-  float bottom_controls_shown_ratio = 0.f;
-
-  // Used to offset views that need to be positioned according to the current
-  // min-height. These offsets follow the min-height change animations.
-  float top_controls_min_height_offset = 0.f;
-  float bottom_controls_min_height_offset = 0.f;
-
-  // These limits can be used together with the scroll/scale fields above to
-  // determine if scrolling/scaling in a particular direction is possible.
-  float min_page_scale_factor = 0.f;
-  float max_page_scale_factor = 0.f;
-  bool root_overflow_y_hidden = false;
-
-  gfx::SizeF scrollable_viewport_size;
-  gfx::SizeF root_layer_size;
-
-  // Returns whether the root RenderPass of the CompositorFrame has a
-  // transparent background color.
-  bool has_transparent_background = false;
-
-  bool has_offset_tag = false;
-#endif
 };
 
 }  // namespace cc

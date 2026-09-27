@@ -49,32 +49,6 @@ BASE_EXPORT BASE_DECLARE_FEATURE_PARAM(
     int,
     kStackScanMaxFramePointerToStackEndGapThresholdMB);
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_EXPORT BASE_DECLARE_FEATURE(kPartialLowEndModeOn3GbDevices);
-BASE_EXPORT BASE_DECLARE_FEATURE(kPartialLowEndModeOnMidRangeDevices);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_EXPORT BASE_DECLARE_FEATURE(kBackgroundNotPerceptibleBinding);
-BASE_EXPORT BASE_DECLARE_FEATURE(
-    kPostPowerMonitorBroadcastReceiverInitToBackground);
-BASE_EXPORT BASE_DECLARE_FEATURE(kPostGetMyMemoryStateToBackground);
-BASE_EXPORT BASE_DECLARE_FEATURE(kRebindingChildServiceConnectionController);
-BASE_EXPORT BASE_DECLARE_FEATURE(kRebindServiceBatchApi);
-BASE_EXPORT BASE_DECLARE_FEATURE(kUseSharedRebindServiceConnection);
-BASE_EXPORT BASE_DECLARE_FEATURE(kVirtualKeyboardGeometryAndInsetFixes);
-
-BASE_EXPORT BASE_DECLARE_FEATURE(kBackgroundThreadPoolFieldTrial);
-BASE_EXPORT BASE_DECLARE_FEATURE(kShutdownPreNativeThreadPoolAfterStartup);
-BASE_EXPORT BASE_DECLARE_FEATURE_PARAM(int,
-                                       kBackgroundThreadPoolFieldTrialConfig);
-
-BASE_EXPORT BASE_DECLARE_FEATURE(kLibraryPrefetcherMadvise);
-BASE_EXPORT BASE_DECLARE_FEATURE_PARAM(size_t, kLibraryPrefetcherMadviseLength);
-BASE_EXPORT BASE_DECLARE_FEATURE_PARAM(bool, kLibraryPrefetcherMadviseFallback);
-BASE_EXPORT BASE_DECLARE_FEATURE(kLibraryPrefetcherOnlyOrderedText);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 BASE_EXPORT BASE_DECLARE_FEATURE(kUseTerminationStatusMemoryExhaustion);
 
 BASE_EXPORT BASE_DECLARE_FEATURE(kUtfConversionAsciiFastPath);

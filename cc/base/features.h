@@ -193,14 +193,6 @@ CC_BASE_EXPORT BASE_DECLARE_FEATURE_PARAM(
 // frame production to 60Hz.
 CC_BASE_EXPORT BASE_DECLARE_FEATURE(kThrottleMainFrameTo60Hz);
 
-#if BUILDFLAG(IS_ANDROID)
-// Same as above, for WebView.
-CC_BASE_EXPORT BASE_DECLARE_FEATURE(kThrottleMainFrameTo60HzWebView);
-
-// Same as above, for Desktop Android.
-CC_BASE_EXPORT BASE_DECLARE_FEATURE(kThrottleMainFrameTo60HzDesktopAndroid);
-#endif
-
 // When enabled, clients can request a high framerate, which disables
 // throttling. This is intended to be used when the client knows that the
 // current use case likely warrants higher framerates. Examples include gaming
@@ -272,15 +264,6 @@ CC_BASE_EXPORT BASE_DECLARE_FEATURE_PARAM(
 // the same sign.
 CC_BASE_EXPORT BASE_DECLARE_FEATURE(
     kScrollJankV4MetricFastScrollContinuityRequiresSameDirection);
-
-#if BUILDFLAG(IS_ANDROID)
-// When enabled, the V4 scroll jank metric will report statistics via
-// `View.reportAppJankStats()` on Android at the end of each damaging scroll.
-CC_BASE_EXPORT BASE_DECLARE_FEATURE(
-    kScrollJankV4MetricReportAndroidAppJankStats);
-
-bool ShouldScrollJankV4MetricReportAndroidAppJankStats();
-#endif
 
 // When enabled, AsyncLayerTreeFrameSink will generate its own BeginFrameArgs
 // when auto_needs_begin_frame_ is enabled.

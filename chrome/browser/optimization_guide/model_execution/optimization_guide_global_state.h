@@ -22,10 +22,6 @@
 #include "services/on_device_model/public/cpp/buildflags.h"
 #include "services/on_device_model/public/mojom/on_device_model_service.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/optimization_guide/core/model_execution/android/model_broker_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace optimization_guide {
 
 BASE_DECLARE_FEATURE(kOptimizationGuideManifestBroker);

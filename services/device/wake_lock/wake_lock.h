@@ -88,11 +88,6 @@ class WakeLock : public mojom::WakeLock {
   mojom::WakeLockReason reason_;
   std::unique_ptr<std::string> description_;
 
-#if BUILDFLAG(IS_ANDROID)
-  int context_id_;
-  WakeLockContextCallback native_view_getter_;
-#endif
-
   scoped_refptr<base::SequencedTaskRunner> main_task_runner_;
 
   // The actual power save blocker for screen.

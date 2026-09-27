@@ -34,9 +34,6 @@ struct SelectFileDialogParams {
   base::FilePath default_path;
   std::u16string title;
   std::optional<GURL> caller;
-#if BUILDFLAG(IS_ANDROID)
-  std::vector<std::u16string> accept_types;
-#endif
 };
 
 // A fake ui::SelectFileDialog, which will cancel the file selection instead of

@@ -333,16 +333,6 @@ inline constexpr char kChromeUIWebUIToolbarURL[] =
 inline constexpr char kChromeUIWebUIToolbarHost[] = "webui-toolbar.top-chrome";
 inline constexpr char kChromeUIWebNNInternalsHost[] = "webnn-internals";
 
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr char kChromeUIJavaCrashURL[] = "chrome://java-crash/";
-inline constexpr char kChromeUINativeBookmarksURL[] =
-    "chrome-native://bookmarks/";
-inline constexpr char kChromeUINativeNewTabURL[] = "chrome-native://newtab/";
-inline constexpr char kChromeUINotificationsInternalsHost[] =
-    "notifications-internals";
-inline constexpr char kChromeUISnippetsInternalsHost[] = "snippets-internals";
-inline constexpr char kChromeUIWebApksHost[] = "webapks";
-#else
 inline constexpr char kChromeUIAppServiceInternalsHost[] =
     "app-service-internals";
 inline constexpr char kChromeUIAutofillMlInternalsHost[] =
@@ -394,9 +384,8 @@ inline constexpr char kChromeUIWebuiBrowserHost[] = "webui-browser";
 inline constexpr char kChromeUIWebuiBrowserURL[] = "chrome://webui-browser/";
 inline constexpr char kChromeUIWebUIJsErrorHost[] = "webuijserror";
 inline constexpr char kChromeUIWebUIJsErrorURL[] = "chrome://webuijserror/";
-#endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 inline constexpr char kChromeUIDiscardsHost[] = "discards";
 inline constexpr char kChromeUIDiscardsURL[] = "chrome://discards/";
 #endif
@@ -412,11 +401,11 @@ inline constexpr char kChromeUIWhatsNewHost[] = "whats-new";
 inline constexpr char kChromeUIWhatsNewURL[] = "chrome://whats-new/";
 #endif
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 inline constexpr char kChromeUILinuxProxyConfigHost[] = "linux-proxy-config";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 inline constexpr char kChromeUISandboxHost[] = "sandbox";
 #endif
 
@@ -533,7 +522,7 @@ inline constexpr char kSyncSetupAdvancedSubPage[] = "syncSetup/advanced";
 inline constexpr char kTriggeredResetProfileSettingsSubPage[] =
     "triggeredResetProfileSettings";
 
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 inline constexpr char kChromeUICastFeedbackHost[] = "cast-feedback";
 inline constexpr char kChromeUICastFeedbackURL[] = "chrome://cast-feedback";
 #endif

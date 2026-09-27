@@ -21,10 +21,6 @@
 #include "components/signin/public/base/consent_level.h"
 #include "components/web_resource/eula_accepted_notifier.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/application_status_listener.h"
-#endif
-
 namespace base {
 class SequencedTaskRunner;
 }  // namespace base
@@ -151,9 +147,6 @@ class FeedService : public KeyedService {
   class IdentityManagerObserverImpl;
 
   FeedService();
-#if BUILDFLAG(IS_ANDROID)
-  void OnApplicationStateChange(base::android::ApplicationState state);
-#endif
 
   void Shutdown() override;
 
@@ -170,11 +163,6 @@ class FeedService : public KeyedService {
   std::unique_ptr<RefreshTaskScheduler> refresh_task_scheduler_;
   std::unique_ptr<HistoryObserverImpl> history_observer_;
   std::unique_ptr<IdentityManagerObserverImpl> identity_manager_observer_;
-#if BUILDFLAG(IS_ANDROID)
-  bool foregrounded_ = true;
-  std::unique_ptr<base::android::ApplicationStatusListener>
-      application_status_listener_;
-#endif
   std::unique_ptr<FeedStream> stream_;
   raw_ptr<FeedApi> api_;  // Points to `stream_`, overridden for testing.
 };

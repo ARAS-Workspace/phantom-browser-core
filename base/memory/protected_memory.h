@@ -91,7 +91,7 @@
 #include "build/build_config.h"
 
 #if BUILDFLAG(PROTECTED_MEMORY_ENABLED)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // This value is used to align the writers variable. That variable needs to be
 // aligned to ensure that the protected memory section starts on a page
 // boundary.
@@ -311,7 +311,7 @@ class BASE_EXPORT AutoWritableMemoryBase {
     // where an attacker could overwrite it with a large value and invoke code
     // that constructs and destructs an AutoWritableMemory. After such a call
     // protected memory would still be set writable because writers > 0.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
     // On Linux, the protected memory section is not automatically page aligned.
     // This means that attempts to reset the protected memory region to readonly
     // will set some of the preceding section that is on the same page readonly
@@ -325,7 +325,7 @@ class BASE_EXPORT AutoWritableMemoryBase {
 #endif
     static inline size_t writers GUARDED_BY(writers_lock()) = 0;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
     // On Linux, there is no guarantee the section following the protected
     // memory section is page aligned. This can result in attempts to change
     // the access permissions of the end of the protected memory section
@@ -344,7 +344,7 @@ class BASE_EXPORT AutoWritableMemoryBase {
         __attribute__((section("protected_memory_buffer"),
                        aligned(kProtectedMemoryAlignment))) static inline bool
             protected_memory_section_buffer = false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
     // Synchronizes access to the writers variable and the simultaneous actions
     // that need to happen alongside writers changes, e.g. setting the protected
@@ -380,12 +380,12 @@ class BASE_EXPORT AutoWritableMemoryInitializer
     // the variable to something large before the section was read-only.
     WriterData::writers = 0;
     CHECK(SetProtectedSectionReadOnly());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
     // Set the protected_memory_section_buffer to true to ensure the buffer
     // section is created. If a variable is declared but not used the memory
     // section won't be created.
     WriterData::protected_memory_section_buffer = true;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
   }
 };
 #endif  // BUILDFLAG(PROTECTED_MEMORY_ENABLED)

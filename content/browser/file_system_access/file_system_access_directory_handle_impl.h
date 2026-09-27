@@ -85,12 +85,6 @@ class CONTENT_EXPORT FileSystemAccessDirectoryHandleImpl
       storage::FileSystemURL* result);
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  void OnGetFileContentUri(std::string basename,
-                           bool create,
-                           GetFileCallback callback,
-                           base::FilePath child_path);
-#endif
   void GetFileResolved(
       const std::string& basename,
       bool create,
@@ -108,21 +102,10 @@ class CONTENT_EXPORT FileSystemAccessDirectoryHandleImpl
                  GetFileCallback callback,
                  FileSystemAccessPermissionContext::SensitiveEntryResult
                      sensitive_entry_result);
-#if BUILDFLAG(IS_ANDROID)
-  void DidGetFileQueryUri(const std::string& basename,
-                          GetFileCallback callback,
-                          base::FilePath child_path);
-#endif
   void DidGetFile(const std::string& basename,
                   storage::FileSystemURL child_url,
                   GetFileCallback callback,
                   base::File::Error result);
-#if BUILDFLAG(IS_ANDROID)
-  void OnGetDirectoryContentUri(std::string basename,
-                                bool create,
-                                GetDirectoryCallback callback,
-                                base::FilePath child_path);
-#endif
   void GetDirectoryResolved(
       const std::string& basename,
       bool create,
@@ -133,10 +116,6 @@ class CONTENT_EXPORT FileSystemAccessDirectoryHandleImpl
   // is the implementation for passing create=true to GetDirectory.
   void GetDirectoryWithWritePermission(const storage::FileSystemURL& child_url,
                                        GetDirectoryCallback callback);
-#if BUILDFLAG(IS_ANDROID)
-  void DidGetDirectoryQueryUri(GetDirectoryCallback callback,
-                               base::FilePath child_path);
-#endif
   void DidGetDirectory(storage::FileSystemURL child_url,
                        GetDirectoryCallback callback,
                        base::File::Error result);
@@ -146,12 +125,6 @@ class CONTENT_EXPORT FileSystemAccessDirectoryHandleImpl
       base::File::Error result,
       std::vector<filesystem::mojom::DirectoryEntry> file_list,
       bool has_more_entries);
-#if BUILDFLAG(IS_ANDROID)
-  void OnRemoveEntryContentUri(std::string basename,
-                               bool recurse,
-                               RemoveEntryCallback callback,
-                               base::FilePath child_path);
-#endif
   void RemoveEntryResolved(
       const std::string& basename,
       bool recurse,

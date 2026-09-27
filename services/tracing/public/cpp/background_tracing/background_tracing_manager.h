@@ -258,13 +258,8 @@ class COMPONENT_EXPORT(BACKGROUND_TRACING_CPP) BackgroundTracingManager
   virtual std::string RecordSerializedSystemProfileMetrics() = 0;
   virtual std::optional<base::FilePath> GetLocalTracesDirectory() = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // ~1MB compressed size.
-  constexpr static int kDefaultUploadLimitKb = 5 * 1024;
-#else
   // Less than 10MB compressed size.
   constexpr static int kDefaultUploadLimitKb = 30 * 1024;
-#endif
 
   virtual bool RequestActivateScenario();
   void DisableScenarios();

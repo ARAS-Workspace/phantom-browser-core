@@ -637,7 +637,6 @@ class ContentSettingNotificationsBubbleModel
 };
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 // The model for the blocked Framebust bubble.
 class ContentSettingFramebustBlockBubbleModel
     : public ContentSettingSingleRadioGroup,
@@ -668,6 +667,5 @@ class ContentSettingFramebustBlockBubbleModel
                           blocked_content::UrlListManager::Observer>
       url_list_observation_{this};
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // CHROME_BROWSER_UI_CONTENT_SETTINGS_CONTENT_SETTING_BUBBLE_MODEL_H_

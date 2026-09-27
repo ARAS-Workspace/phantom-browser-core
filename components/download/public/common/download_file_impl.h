@@ -81,10 +81,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadFileImpl : public DownloadFile {
   void Pause() override;
   void Resume() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  void PublishDownload(RenameCompletionCallback callback) override;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Wrapper of a ByteStreamReader or ScopedDataPipeConsumerHandle, and the meta
   // data needed to write to a slice of the target file.
   //

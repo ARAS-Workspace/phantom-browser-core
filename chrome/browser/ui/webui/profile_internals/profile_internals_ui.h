@@ -11,12 +11,6 @@
 #include "content/public/browser/web_ui_controller.h"
 #include "content/public/common/url_constants.h"
 
-#if BUILDFLAG(IS_ANDROID)
-// Excluded because at the time the UI was added, Polymer/Lit it relies on
-// was not included on Android.
-#error This file should only be included on desktop.
-#endif
-
 class ProfileInternalsUI;
 
 class ProfileInternalsUIConfig

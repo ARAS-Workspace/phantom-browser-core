@@ -27,10 +27,6 @@
 #include "components/sync_preferences/cross_device_pref_tracker/cross_device_pref_tracker.h"
 #include "components/sync_preferences/pref_service_syncable_observer.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class PrefService;
 
 namespace syncer {
@@ -83,25 +79,6 @@ class CrossDevicePrefTrackerImpl : public CrossDevicePrefTracker,
   // `syncer::SyncServiceObserver` overrides.
   void OnStateChanged(syncer::SyncService* sync) override;
   void OnSyncShutdown(syncer::SyncService* sync) override;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Return the java object that allows access to the SyncService.
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject() override;
-  int GetServiceStatus(JNIEnv* env) const override;
-  // Java versions of query methods.
-  base::android::ScopedJavaLocalRef<jobjectArray> GetValues(
-      JNIEnv* env,
-      const base::android::JavaRef<jstring>& pref_name,
-      std::optional<int> os_type,
-      std::optional<int> form_factor,
-      std::optional<int64_t> max_sync_recency_microseconds) const override;
-  base::android::ScopedJavaLocalRef<jobject> GetMostRecentValue(
-      JNIEnv* env,
-      const base::android::JavaRef<jstring>& pref_name,
-      std::optional<int> os_type,
-      std::optional<int> form_factor,
-      std::optional<int64_t> max_sync_recency_microseconds) const override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Exposed for testing.
   const syncer::SyncService* sync_service() const { return sync_service_; }
@@ -273,10 +250,6 @@ class CrossDevicePrefTrackerImpl : public CrossDevicePrefTracker,
 
   // The current service status.
   ServiceStatus service_status_ = ServiceStatus::kSyncNotConfigured;
-
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaGlobalRef<jobject> java_object_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   base::WeakPtrFactory<CrossDevicePrefTrackerImpl> weak_ptr_factory_{this};
 };

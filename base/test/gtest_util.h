@@ -27,7 +27,7 @@
 // be updated to look at LOGGING_DCHECK's current severity level.
 // Death tests misbehave on Android.
 #if DCHECK_IS_ON() && defined(GTEST_HAS_DEATH_TEST) && \
-    !BUILDFLAG(DCHECK_IS_CONFIGURABLE) && !BUILDFLAG(IS_ANDROID)
+    !BUILDFLAG(DCHECK_IS_CONFIGURABLE)
 
 // EXPECT/ASSERT_DCHECK_DEATH tests verify that a DCHECK is hit ("Check failed"
 // is part of the error message). Optionally you may specify part of the message
@@ -49,10 +49,10 @@
   GTEST_UNSUPPORTED_DEATH_TEST(statement, msg, return)
 
 #endif  // DCHECK_IS_ON() && defined(GTEST_HAS_DEATH_TEST) &&
-        // !BUILDFLAG(DCHECK_IS_CONFIGURABLE) && !BUILDFLAG(IS_ANDROID)
+        // !BUILDFLAG(DCHECK_IS_CONFIGURABLE)
 
 // As above, but for CHECK().
-#if defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#if defined(GTEST_HAS_DEATH_TEST)
 
 #if CHECK_WILL_STREAM()
 #define EXPECT_CHECK_DEATH(statement) EXPECT_DEATH(statement, "Check failed")
@@ -70,7 +70,7 @@
 #define ASSERT_NOTREACHED_DEATH(statement) ASSERT_DEATH(statement, "")
 #endif  // CHECK_WILL_STREAM()
 
-#else  // defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#else
 
 // Note GTEST_UNSUPPORTED_DEATH_TEST takes a |regex| only to see whether it is a
 // valid regex. It is never evaluated.
@@ -85,20 +85,20 @@
 #define ASSERT_NOTREACHED_DEATH(statement) \
   GTEST_UNSUPPORTED_DEATH_TEST(statement, "", return)
 
-#endif  // defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#endif  // defined(GTEST_HAS_DEATH_TEST)
 
 // `BASE_EXPECT_DEATH` is similar to gtest's `EXPECT_DEATH_IF_SUPPORTED`. It
 // takes into account that Android does not support them.
-#if defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#if defined(GTEST_HAS_DEATH_TEST)
 
 #define BASE_EXPECT_DEATH EXPECT_DEATH
 
-#else  // defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#else
 
 #define BASE_EXPECT_DEATH(statement, matcher) \
   GTEST_UNSUPPORTED_DEATH_TEST(statement, "", )
 
-#endif  // defined(GTEST_HAS_DEATH_TEST) && !BUILDFLAG(IS_ANDROID)
+#endif  // defined(GTEST_HAS_DEATH_TEST)
 
 namespace base {
 

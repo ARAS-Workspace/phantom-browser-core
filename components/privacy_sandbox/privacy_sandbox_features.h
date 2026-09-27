@@ -21,13 +21,6 @@ BASE_DECLARE_FEATURE(kEnforcePrivacySandboxAttestations);
 COMPONENT_EXPORT(PRIVACY_SANDBOX_FEATURES)
 BASE_DECLARE_FEATURE(kDefaultAllowPrivacySandboxAttestations);
 
-#if BUILDFLAG(IS_ANDROID)
-// Allow the Privacy Sandbox Attestations component to load the pre-installed
-// attestation list from Android APK assets.
-COMPONENT_EXPORT(PRIVACY_SANDBOX_FEATURES)
-BASE_DECLARE_FEATURE(kPrivacySandboxAttestationsLoadFromAPKAsset);
-#endif
-
 // Enables showing RWS UI.
 COMPONENT_EXPORT(PRIVACY_SANDBOX_FEATURES)
 BASE_DECLARE_FEATURE(kRelatedWebsiteSetsUi);

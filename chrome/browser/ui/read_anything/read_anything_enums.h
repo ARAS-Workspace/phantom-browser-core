@@ -109,9 +109,6 @@ inline ReadAnythingOpenTrigger SidePanelToReadAnythingOpenTrigger(
     case SidePanelOpenTrigger::kNewTabFooter:
     case SidePanelOpenTrigger::kNewTabPageCustomizationPromo:
     case SidePanelOpenTrigger::kNewTabPageAutomaticCustomizeChrome:
-#if BUILDFLAG(IS_ANDROID)
-    case SidePanelOpenTrigger::kWindowResized:
-#endif
     case SidePanelOpenTrigger::kContextualTasks:
     case SidePanelOpenTrigger::kUnknown:
       return ReadAnythingOpenTrigger::kUnknown;

@@ -161,21 +161,6 @@ class COMPONENTS_DOWNLOAD_EXPORT InProgressDownloadManager
     download_start_observer_ = observer;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Callback to generate an intermediate file path from the given target file
-  // path;
-  using IntermediatePathCallback =
-      base::RepeatingCallback<base::FilePath(const base::FilePath&)>;
-  void set_intermediate_path_cb(
-      const IntermediatePathCallback& intermediate_path_cb) {
-    intermediate_path_cb_ = intermediate_path_cb;
-  }
-
-  void set_default_download_dir(base::FilePath default_download_dir) {
-    default_download_dir_ = default_download_dir;
-  }
-#endif
-
   // Called to get all in-progress DownloadItemImpl.
   // TODO(qinmin): remove this method once InProgressDownloadManager owns
   // all in-progress downloads.
@@ -279,14 +264,6 @@ class COMPONENTS_DOWNLOAD_EXPORT InProgressDownloadManager
 
   // callback to check if an origin is secure.
   IsOriginSecureCallback is_origin_secure_cb_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Callback to generate the intermediate file path.
-  IntermediatePathCallback intermediate_path_cb_;
-
-  // Default download directory.
-  base::FilePath default_download_dir_;
-#endif
 
   // A list of in-progress download items, could be null if DownloadManagerImpl
   // is managing all downloads.

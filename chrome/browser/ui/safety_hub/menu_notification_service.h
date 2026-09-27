@@ -20,9 +20,6 @@
 #include "chrome/browser/ui/safety_hub/safety_hub_result.h"
 #include "components/keyed_service/core/keyed_service.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_ANDROID)
-
 struct MenuNotificationEntry {
   int command = 0;
   std::u16string label;

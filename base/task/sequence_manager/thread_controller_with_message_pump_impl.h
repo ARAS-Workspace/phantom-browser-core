@@ -72,9 +72,6 @@ class BASE_EXPORT ThreadControllerWithMessagePumpImpl
   void SetTaskExecutionAllowedInNativeNestedLoop(bool allowed) override;
   bool IsTaskExecutionAllowed() const override;
   MessagePump* GetBoundMessagePump() const override;
-#if BUILDFLAG(IS_ANDROID)
-  void AttachToMessagePump() override;
-#endif
   bool ShouldQuitRunLoopWhenIdle() override;
 
   // RunLoop::NestingObserver:

@@ -23,10 +23,6 @@
 #include "components/safe_browsing/core/common/features.h"
 #include "content/public/browser/download_manager_delegate.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/safe_browsing/android/safe_browsing_api_handler_util.h"  // nogncheck crbug.com/40147906
-#endif
-
 class Profile;
 class DownloadPrefs;
 
@@ -140,9 +136,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
     STATE_DETERMINE_LOCAL_PATH,
     STATE_DETERMINE_MIME_TYPE,
     STATE_CHECK_DOWNLOAD_URL,
-#if BUILDFLAG(IS_ANDROID)
-    STATE_CHECK_APP_VERIFICATION,
-#endif
     STATE_CHECK_VISITED_REFERRER_BEFORE,
     STATE_DETERMINE_INTERMEDIATE_PATH,
     STATE_NONE,
@@ -246,11 +239,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
   void RequestConfirmationDone(DownloadConfirmationResult result,
                                const ui::SelectedFileInfo& selected_file_info);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Callback invoked after the incognito message has been accepted/rejected
-  // from the user.
-  void RequestIncognitoWarningConfirmationDone(bool accepted);
-#endif
   // Up until this point, the path that was used is considered to be a virtual
   // path. This step determines the local file system path corresponding to this
   // virtual path. The translation is done by invoking the DetermineLocalPath()
@@ -288,14 +276,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
   // Callback invoked after the delegate has checked the download URL. Sets the
   // danger type of the download to |danger_type|.
   void CheckDownloadUrlDone(download::DownloadDangerType danger_type);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Checks if app verification by Google Play Protect is enabled.
-  Result DoCheckAppVerification();
-
-  // Callback invoked after checking if app verification is enabled.
-  void CheckAppVerificationDone(safe_browsing::VerifyAppsEnabledResult result);
-#endif
 
   // Checks if the user has visited the referrer URL of the download prior to
   // today. The actual check is only performed if it would be needed to
@@ -389,13 +369,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
   std::string mime_type_;
   bool is_filetype_handled_safely_ = false;
   download::DownloadItem::InsecureDownloadStatus insecure_download_status_;
-#if BUILDFLAG(IS_ANDROID)
-  bool is_checking_dialog_confirmed_path_;
-  // Records whether app verification by Play Protect is enabled. When
-  // enabled, we suppress warning based only on the file type since Play
-  // Protect will give higher quality warnings.
-  bool is_app_verification_enabled_;
-#endif
 #if BUILDFLAG(IS_MAC)
   // A list of tags specified by the user to be set on the file upon the
   // completion of it being written to disk.

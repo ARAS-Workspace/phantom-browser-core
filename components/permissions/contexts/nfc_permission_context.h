@@ -16,11 +16,6 @@ class NfcPermissionContext : public ContentSettingPermissionContextBase {
   class Delegate {
    public:
     virtual ~Delegate() = default;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Returns whether or not this |web_contents| is interactable.
-    virtual bool IsInteractable(content::WebContents* web_contents) = 0;
-#endif
   };
 
   NfcPermissionContext(content::BrowserContext* browser_context,
@@ -36,12 +31,10 @@ class NfcPermissionContext : public ContentSettingPermissionContextBase {
 
  private:
   // ContentSettingPermissionContextBase:
-#if !BUILDFLAG(IS_ANDROID)
   ContentSetting GetContentSettingStatusInternal(
       content::RenderFrameHost* render_frame_host,
       const GURL& requesting_origin,
       const GURL& embedding_origin) const override;
-#endif
 
   // PermissionContextBase:
   void DecidePermission(std::unique_ptr<PermissionRequestData> request_data,

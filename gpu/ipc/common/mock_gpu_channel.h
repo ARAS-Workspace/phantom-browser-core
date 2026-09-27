@@ -57,12 +57,6 @@ class MockGpuChannel : public mojom::GpuChannel {
                     const viz::SharedImageFormat&,
                     gfx::BufferUsage,
                     CreateGpuMemoryBufferCallback));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD3(CopyNativeGmbToSharedMemoryAsync,
-               void(gfx::GpuMemoryBufferHandle,
-                    base::UnsafeSharedMemoryRegion,
-                    CopyNativeGmbToSharedMemoryAsyncCallback));
-#endif  // BUILDFLAG(IS_ANDROID)
   MOCK_METHOD4(WaitForTokenInRange,
                void(int32_t, int32_t, int32_t, WaitForTokenInRangeCallback));
   MOCK_METHOD5(WaitForGetOffsetInRange,

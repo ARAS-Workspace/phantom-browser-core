@@ -13,10 +13,6 @@
 #include "build/blink_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "base/apple/owned_objc.h"
 #endif
@@ -53,7 +49,7 @@
 // TODO(https://crbug.com/40157665): gfx::NativeCursor is ui::Cursor in Aura;
 // perhaps remove gfx::NativeCursor and use ui::Cursor everywhere?
 
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
 namespace ui {
 class Cursor;
 }
@@ -82,14 +78,6 @@ class NSImage;
 #endif  // __OBJC__
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-struct ANativeWindow;
-namespace ui {
-class WindowAndroid;
-class ViewAndroid;
-}  // namespace ui
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 extern "C" {
 struct _AtkObject;
@@ -99,7 +87,7 @@ using AtkObject = struct _AtkObject;
 
 namespace gfx {
 
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
 using NativeCursor = ui::Cursor;
 #endif
 
@@ -150,10 +138,6 @@ class COMPONENT_EXPORT(GFX) NativeWindow : public base::apple::WeakNSWindow {
  private:
   uintptr_t pointer_bits_ = 0;
 };
-#elif BUILDFLAG(IS_ANDROID)
-using NativeView = ui::ViewAndroid*;
-using NativeWindow = ui::WindowAndroid*;
-using NativeEvent = base::android::ScopedJavaGlobalRef<jobject>;
 #else
 #error Unknown build environment.
 #endif
@@ -181,9 +165,6 @@ using NativeViewId = intptr_t;
 #if BUILDFLAG(IS_MAC)
 using AcceleratedWidget = uint64_t;
 inline constexpr AcceleratedWidget kNullAcceleratedWidget = 0;
-#elif BUILDFLAG(IS_ANDROID)
-using AcceleratedWidget = ANativeWindow*;
-constexpr AcceleratedWidget kNullAcceleratedWidget = nullptr;
 #elif BUILDFLAG(IS_OZONE)
 using AcceleratedWidget = uint32_t;
 inline constexpr AcceleratedWidget kNullAcceleratedWidget = 0;

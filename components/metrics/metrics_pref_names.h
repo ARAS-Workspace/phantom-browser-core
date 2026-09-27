@@ -107,21 +107,6 @@ inline constexpr char kMetricsOngoingLogsMetadata[] =
 inline constexpr char kMetricsResetIds[] =
     "user_experience_metrics.reset_metrics_ids";
 
-#if BUILDFLAG(IS_ANDROID)
-// Boolean that determines whether to use the new sampling trial
-// "PostFREFixMetricsAndCrashSampling" and feature "PostFREFixMetricsReporting"
-// to control sampling on Android Chrome. This is set to true when disabling
-// metrics reporting, or on start up if metrics reporting is not consented to
-// (including new users going through their first run). As a result, all new UMA
-// users should have this pref set to true.
-// Note: This exists due to a bug in which the old sampling rate was not being
-// applied correctly. In order for the fix to not affect the overall sampling
-// rate, this pref controls what trial/feature to use to determine whether the
-// client is sampled. See crbug/1306481.
-inline constexpr char kUsePostFREFixSamplingTrial[] =
-    "user_experience_metrics.use_post_fre_fix_sampling_trial";
-#endif  // BUILDFLAG(IS_ANDROID)
-
 
 // For finding out whether metrics and crash reporting is enabled use the
 // relevant embedder-specific subclass of MetricsServiceAccessor instead of
@@ -209,23 +194,6 @@ inline constexpr char kStabilityFileMetricsUnsentFilesCount[] =
 // The GMS core version used in Chrome.
 inline constexpr char kStabilityGmsCoreVersion[] =
     "user_experience_metrics.stability.gms_core_version";
-
-#if BUILDFLAG(IS_ANDROID)
-// Number of times the application was launched since last report. Used on
-// Android platforms as WebView may still be interested in this metric.
-inline constexpr char kStabilityLaunchCount[] =
-    "user_experience_metrics.stability.launch_count";
-
-// Number of times a page load event occurred since the last report.
-inline constexpr char kStabilityPageLoadCount[] =
-    "user_experience_metrics.stability.page_load_count";
-
-// Number of times a renderer process successfully launched since the last
-// report. Used on Android platforms as WebView may still be interested in this
-// metric.
-inline constexpr char kStabilityRendererLaunchCount[] =
-    "user_experience_metrics.stability.renderer_launch_count";
-#endif
 
 // Base64 encoded serialized UMA system profile proto from the previous session.
 inline constexpr char kStabilitySavedSystemProfile[] =

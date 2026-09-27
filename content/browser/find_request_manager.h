@@ -92,28 +92,6 @@ class FindRequestManager {
   // which got run. Returns false if there was no delayed task.
   bool CONTENT_EXPORT RunDelayedFindTaskForTesting();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Selects and zooms to the find result nearest to the point (x, y), defined
-  // in find-in-page coordinates.
-  void ActivateNearestFindResult(float x, float y);
-
-  // Called when a reply is received from a frame in response to the
-  // GetNearestFindResult mojo call.
-  void OnGetNearestFindResultReply(RenderFrameHostImpl* rfh,
-                                   int request_id,
-                                   float distance);
-
-  // Requests the rects of the current find matches from the renderer process.
-  void RequestFindMatchRects(int current_version);
-
-  // Called when a reply is received from a frame in response to a request for
-  // find match rects.
-  void OnFindMatchRectsReply(RenderFrameHost* rfh,
-                             int version,
-                             const std::vector<gfx::RectF>& rects,
-                             const gfx::RectF& active_rect);
-#endif
-
   const std::unordered_set<raw_ptr<RenderFrameHost, CtnExperimental>>
   render_frame_hosts_pending_initial_reply_for_testing() const {
     return pending_initial_replies_;
@@ -227,81 +205,6 @@ class FindRequestManager {
   void EmitFindRequest(int request_id,
                        const std::u16string& search_text,
                        blink::mojom::FindOptionsPtr options);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Called when a nearest find result reply is no longer pending for a frame.
-  void RemoveNearestFindResultPendingReply(RenderFrameHost* rfh);
-
-  // Called when a find match rects reply is no longer pending for a frame.
-  void RemoveFindMatchRectsPendingReply(RenderFrameHost* rfh);
-
-  // State related to ActivateNearestFindResult requests.
-  struct ActivateNearestFindResultState {
-    // An ID to uniquely identify the current nearest find result request and
-    // its replies.
-    int current_request_id = kInvalidId;
-
-    // The value of the requested point, in find-in-page coordinates.
-    gfx::PointF point = gfx::PointF(0.0f, 0.0f);
-
-    float nearest_distance = FLT_MAX;
-
-    // The frame containing the nearest result found so far.
-    raw_ptr<RenderFrameHostImpl> nearest_frame = nullptr;
-
-    // Nearest find result replies are still pending for these frames.
-    std::unordered_set<raw_ptr<RenderFrameHost, CtnExperimental>>
-        pending_replies;
-
-    ActivateNearestFindResultState();
-    ActivateNearestFindResultState(float x, float y);
-    ~ActivateNearestFindResultState();
-
-    static int GetNextID();
-
-  } activate_;
-
-  // Data for find match rects in a single frame.
-  struct FrameRects {
-    // The rects contained in a single frame.
-    std::vector<gfx::RectF> rects;
-
-    // The version number for these rects, as reported by their containing
-    // frame. This version is incremented independently in each frame.
-    int version = kInvalidId;
-
-    FrameRects();
-    FrameRects(const std::vector<gfx::RectF>& rects, int version);
-    ~FrameRects();
-  };
-
-  // State related to FindMatchRects requests.
-  struct FindMatchRectsState {
-    // The latest find match rects version known by the requester. This will be
-    // compared to |known_version_| after polling frames for updates to their
-    // match rects, in order to determine if the requester already has the
-    // latest version of rects or not.
-    int request_version = kInvalidId;
-
-    // The current overall find match rects version known by
-    // FindRequestManager. This version should be incremented whenever
-    // |frame_rects| is updated.
-    int known_version = 0;
-
-    // A map from each frame to its find match rects.
-    std::unordered_map<RenderFrameHost*, FrameRects> frame_rects;
-
-    // The active find match rect.
-    gfx::RectF active_rect;
-
-    // Find match rects replies are still pending for these frames.
-    std::unordered_set<raw_ptr<RenderFrameHost, CtnExperimental>>
-        pending_replies;
-
-    FindMatchRectsState();
-    ~FindMatchRectsState();
-  } match_rects_;
-#endif
 
   // The WebContents that owns this FindRequestManager. This also defines the
   // scope of all find sessions. Only frames in |contents_| and any inner

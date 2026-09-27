@@ -88,9 +88,7 @@ class FeaturePromoControllerImpl : public FeaturePromoController {
                 EndFeaturePromoReason end_promo_reason) override;
   FeaturePromoHandle CloseBubbleAndContinuePromo(
       const base::Feature& iph_feature) final;
-#if !BUILDFLAG(IS_ANDROID)
   void NotifyFeatureUsedIfValid(const base::Feature& feature) override;
-#endif
   base::WeakPtr<FeaturePromoController> GetAsWeakPtr() override;
 
   // Returns whether `iph_feature` is queued to be shown.

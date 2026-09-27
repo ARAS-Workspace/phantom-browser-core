@@ -118,11 +118,11 @@ void RequestSingleCrashUpload(const std::string& local_id);
 
 void DumpWithoutCrashing();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // Logs message and immediately crashes the current process without triggering a
 // crash dump.
 [[noreturn]] void CrashWithoutDumping(const std::string& message);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Returns the Crashpad database path, only valid in the browser. This will
 // return std::nullopt if crashpad has not yet been initialized. On Windows,
@@ -151,12 +151,6 @@ void ClearReportsBetweenImpl(time_t begin, time_t end);
 void DumpProcessWithoutCrashing(task_t task_port);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-// If a CrashReporterClient has enabled sanitization, this function specifies
-// regions of memory which are allowed to be collected by Crashpad.
-void AllowMemoryRange(void* begin, size_t size);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_LINUX)
 // Install a handler that gets a chance to handle faults before Crashpad. This
 // is used by V8 for trap-based bounds checks.
@@ -168,18 +162,6 @@ bool GetHandlerSocket(int* sock, pid_t* pid);
 #endif  // BUILDFLAG(IS_LINUX)
 
 namespace internal {
-
-#if BUILDFLAG(IS_ANDROID)
-// Starts the handler process with an initial client connected on fd,
-// the handler will write minidump to database if write_minidump_to_database is
-// true.
-// Returns `true` on success.
-bool StartHandlerForClient(int fd, bool write_minidump_to_database);
-
-bool GetHandlerTrampoline(std::string* handler_trampoline,
-                          std::string* handler_library);
-bool BuildEnvironmentWithApk(bool use_64_bit, std::vector<std::string>* result);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // The platform-specific portion of InitializeCrashpad(). On Windows, if
 // |user_data_dir| is non-empty, the user data directory will be passed to the

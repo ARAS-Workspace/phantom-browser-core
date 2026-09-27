@@ -26,18 +26,9 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "services/network/test/test_url_loader_factory.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace supervised_user {
 
-using DeviceParentalControlsTestImpl =
-#if BUILDFLAG(IS_ANDROID)
-    AndroidParentalControls;
-#else
-    DeviceParentalControlsNoOpImpl;
-#endif
+using DeviceParentalControlsTestImpl = DeviceParentalControlsNoOpImpl;
 
 // Handy set of initial states of supervision stack, to preset before testing.
 enum class InitialSupervisionState : int {

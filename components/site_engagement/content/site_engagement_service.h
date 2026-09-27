@@ -51,10 +51,6 @@ enum class EngagementType;
 class SiteEngagementObserver;
 class SiteEngagementScore;
 
-#if BUILDFLAG(IS_ANDROID)
-class SiteEngagementServiceAndroid;
-#endif
-
 // Stores and retrieves the engagement score of an origin.
 //
 // An engagement score is a non-negative double that represents how much a user
@@ -185,9 +181,7 @@ class SiteEngagementService : public KeyedService,
   // Update the last time |url| was opened from an installed shortcut (hosted in
   // |web_contents|) to be clock_->Now().
   void SetLastShortcutLaunchTime(content::WebContents* web_contents,
-#if !BUILDFLAG(IS_ANDROID)
                                  const webapps::AppId& app_id,
-#endif
                                  const GURL& url);
 
   // Returns the site engagement details for the specified |url|.
@@ -236,14 +230,6 @@ class SiteEngagementService : public KeyedService,
                            WebAppBannerNeedsEngagement);
   FRIEND_TEST_ALL_PREFIXES(AppBannerSettingsHelperTest, SiteEngagementTrigger);
   FRIEND_TEST_ALL_PREFIXES(HostedAppPWAOnlyTest, EngagementHistogram);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Shim class to expose the service to Java.
-  friend class SiteEngagementServiceAndroid;
-  SiteEngagementServiceAndroid* GetAndroidService() const;
-  void SetAndroidService(
-      std::unique_ptr<SiteEngagementServiceAndroid> android_service);
-#endif
 
   // Adds the specified number of points to the given origin, respecting the
   // maximum limits for the day and overall.
@@ -327,10 +313,6 @@ class SiteEngagementService : public KeyedService,
 
   // The clock used to vend times.
   raw_ptr<base::Clock> clock_;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<SiteEngagementServiceAndroid> android_service_;
-#endif
 
   // Metrics are recorded at non-incognito browser startup, and then
   // approximately once per hour thereafter. Store the local time at which

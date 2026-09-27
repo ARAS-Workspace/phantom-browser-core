@@ -96,11 +96,7 @@ struct NET_EXPORT HttpNetworkSessionParams {
   // attempt to preserve active streams by marking all sessions as going
   // away, rather than explicitly closing them. Streams may still fail due
   // to a generated TCP reset.
-#if BUILDFLAG(IS_ANDROID)
-  bool spdy_go_away_on_ip_change = true;
-#else
   bool spdy_go_away_on_ip_change = false;
-#endif
   // HTTP/2 connection settings.
   // Unknown settings will still be sent to the server.
   // Might contain unknown setting identifiers from a predefined set that

@@ -45,12 +45,6 @@ class FilePath;
 class TimeDelta;
 }  // namespace base
 
-#if BUILDFLAG(IS_ANDROID)
-namespace discardable_memory {
-class DiscardableSharedMemoryManager;
-}
-#endif
-
 namespace gfx {
 class ScopedAnimationDurationScaleMode;
 }
@@ -293,18 +287,6 @@ class BrowserTestBase : public ::testing::Test {
   void SetAllowFeaturesSwitches(bool allow);
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  // Android browser tests need to wait for async initialization in Java code.
-  // This waits for those to complete before we can continue with the test.
-  void WaitUntilJavaIsReady(base::OnceClosure quit_closure,
-                            const base::TimeDelta& wait_retry_left);
-  // Android browser tests need to wait for the Activity to finish after tests
-  // run to properly shut down the browser.
-  void WaitUntilActivityTeardownIsFinished(
-      base::OnceClosure quit_closure,
-      const base::TimeDelta& wait_retry_left);
-
-#endif
   // Performs a bunch of setup, and then runs the browser test body.
   void ProxyRunTestOnMainThreadLoop();
 
@@ -401,16 +383,6 @@ class BrowserTestBase : public ::testing::Test {
 
 #if BUILDFLAG(IS_POSIX)
   bool handle_sigterm_;
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  // Mimic the destruction order of ContentMain:
-  // - ContentMainRunnerImpl::Shutdown() resets ipc support and shuts down the
-  //   BrowserTaskExecutor.
-  // - ContentMainRunnerImpl::~ContentMainRunnerImpl().
-  // - DiscardableSharedMemoryManager, owned by ContentMainRunnerImpl, is reset.
-  std::unique_ptr<discardable_memory::DiscardableSharedMemoryManager>
-      discardable_shared_memory_manager_;
 #endif
 
   // Whether allow tests to provide --enable-features and --disable-features

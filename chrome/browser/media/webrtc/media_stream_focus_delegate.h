@@ -7,10 +7,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error "Unsupported on Android."
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #include "chrome/browser/bad_message.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "content/public/browser/desktop_media_id.h"

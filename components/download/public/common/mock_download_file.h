@@ -69,17 +69,6 @@ class MockDownloadFile : public DownloadFile {
   MOCK_CONST_METHOD0(DebugString, std::string());
   MOCK_METHOD0(Pause, void());
   MOCK_METHOD0(Resume, void());
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD6(RenameToIntermediateUri,
-               void(const GURL& original_url,
-                    const GURL& referrer_url,
-                    const base::FilePath& file_name,
-                    const std::string& mime_type,
-                    const base::FilePath& current_path,
-                    RenameCompletionCallback callback));
-  MOCK_METHOD1(PublishDownload, void(RenameCompletionCallback callback));
-  MOCK_METHOD0(GetDisplayName, base::FilePath());
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace download

@@ -118,11 +118,6 @@ class StubPasswordManagerClient : public PasswordManagerClient {
 
   ukm::SourceId GetUkmSourceId() override;
   PasswordManagerMetricsRecorder* GetMetricsRecorder() override;
-#if BUILDFLAG(IS_ANDROID)
-  FirstCctPageLoadPasswordsUkmRecorder* GetFirstCctPageLoadUkmRecorder()
-      override;
-  void PotentialSaveFormSubmitted() override;
-#endif
   signin::IdentityManager* GetIdentityManager() override;
   const signin::IdentityManager* GetIdentityManager() const override;
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory() override;

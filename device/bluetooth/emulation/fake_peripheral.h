@@ -85,9 +85,9 @@ class FakePeripheral : public device::BluetoothDevice {
 
   // BluetoothDevice overrides:
   uint32_t GetBluetoothClass() const override;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   device::BluetoothTransport GetType() const override;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
   std::string GetIdentifier() const override;
   std::string GetAddress() const override;
   AddressType GetAddressType() const override;

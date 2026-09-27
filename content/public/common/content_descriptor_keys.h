@@ -12,15 +12,8 @@ namespace content {
 // This is a list of global descriptor keys to be used with the
 // base::FileDescriptorStore object (see base/file_descriptor_store.h)
 
-#if BUILDFLAG(IS_ANDROID)
-extern const char kV8Snapshot32DataDescriptor[];
-extern const char kV8Snapshot64DataDescriptor[];
-extern const char kV8ContextSnapshot32DataDescriptor[];
-extern const char kV8ContextSnapshot64DataDescriptor[];
-#else
 extern const char kV8SnapshotDataDescriptor[];
 extern const char kV8ContextSnapshotDataDescriptor[];
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // A list of directories the network service needs (recursive) access to in
 // order to function.

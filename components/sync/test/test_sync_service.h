@@ -25,10 +25,6 @@
 #include "google_apis/gaia/google_service_auth_error.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace syncer {
 
 // A simple test implementation of SyncService that allows direct control over
@@ -123,9 +119,6 @@ class TestSyncService : public SyncService {
   void SetSetupInProgress();
 
   // SyncService implementation.
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject() override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   TestSyncUserSettings* GetUserSettings() override;
   const TestSyncUserSettings* GetUserSettings() const override;

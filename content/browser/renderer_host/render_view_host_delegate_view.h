@@ -27,12 +27,6 @@ class Rect;
 class Vector2d;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-namespace ui {
-class OverscrollRefreshHandler;
-}
-#endif
-
 namespace content {
 class RenderFrameHost;
 class RenderWidgetHostImpl;
@@ -148,10 +142,6 @@ class CONTENT_EXPORT RenderViewHostDelegateView {
       std::vector<blink::mojom::MenuItemPtr> menu_items,
       bool right_aligned,
       bool allow_multiple_selection) {}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  virtual ui::OverscrollRefreshHandler* GetOverscrollRefreshHandler() const;
 #endif
 
  protected:

@@ -71,22 +71,6 @@ class CreditCardCvcAuthenticator
     virtual ~Requester() = default;
     virtual void OnCvcAuthenticationComplete(
         const CvcAuthenticationResponse& response) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Returns whether or not the user, while on the CVC prompt, should be
-    // offered to switch to FIDO authentication for card unmasking. This will
-    // always be false for Desktop since FIDO authentication is offered as a
-    // separate prompt after the CVC prompt. On Android, however, this is
-    // offered through a checkbox on the CVC prompt. This feature does not yet
-    // exist on iOS.
-    virtual bool ShouldOfferFidoAuth() const = 0;
-
-    // This returns true only on Android when the user previously opted-in for
-    // FIDO authentication through the settings page and this is the first card
-    // downstream since. In this case, the opt-in checkbox is not shown and the
-    // opt-in request is sent.
-    virtual bool UserOptedInToFidoFromSettingsPageOnMobile() const = 0;
-#endif
   };
   explicit CreditCardCvcAuthenticator(AutofillClient* client);
 
@@ -119,10 +103,6 @@ class CreditCardCvcAuthenticator
       base::WeakPtr<CardUnmaskDelegate> delegate) override;
   void OnUnmaskVerificationResult(
       payments::PaymentsAutofillClient::PaymentsRpcResult result) override;
-#if BUILDFLAG(IS_ANDROID)
-  bool ShouldOfferFidoAuth() const override;
-  bool UserOptedInToFidoFromSettingsPageOnMobile() const override;
-#endif
 
   payments::FullCardRequest* GetFullCardRequest();
 

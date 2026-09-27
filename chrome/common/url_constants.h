@@ -120,12 +120,6 @@ inline constexpr char kPrivacySandboxAdTopicsURL[] =
 inline constexpr char kPrivacySandboxManageTopicsURL[] =
     "chrome://settings/adPrivacy/interests/manage";
 
-#if BUILDFLAG(IS_ANDROID)
-// "Learn more" URL for unsafe site warnings.
-inline constexpr char kUnsafeSiteWarningHelpCenterURL[] =
-    "https://support.google.com/chrome?p=cpn_safe_browsing_wv";
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // "Learn more" URL for safety tip bubble.
 inline constexpr char kSafetyTipHelpCenterURL[] =
     "https://support.google.com/chrome?p=safety_tip";
@@ -180,14 +174,6 @@ inline constexpr char kUpgradeHelpCenterBaseURL[] =
 // The URL path to Google's Embedded Privacy Policy page.
 inline constexpr char kPrivacyPolicyOnlineURLPath[] =
     "https://policies.google.com/privacy/embedded";
-
-#if BUILDFLAG(IS_ANDROID)
-// "Learn more" URL for the enhanced playback notification dialog.
-inline constexpr char kEnhancedPlaybackNotificationLearnMoreURL[] =
-    // Keep in sync with
-    // chrome/browser/ui/android/strings/android_chrome_strings.grd
-    "https://support.google.com/chrome?p=mobile_protected_content";
-#endif
 
 // Please do not append entries here. See the comments at the top of the file.
 

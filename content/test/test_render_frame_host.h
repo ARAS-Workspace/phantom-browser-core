@@ -32,9 +32,7 @@
 #include "third_party/blink/public/mojom/usb/web_usb_service.mojom-forward.h"
 #include "ui/base/page_transition_types.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 

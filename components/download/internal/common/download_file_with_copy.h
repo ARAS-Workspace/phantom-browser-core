@@ -46,9 +46,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadFileWithCopy : public DownloadFile {
   bool InProgress() const override;
   void Pause() override;
   void Resume() override;
-#if BUILDFLAG(IS_ANDROID)
-  void PublishDownload(RenameCompletionCallback callback) override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
  private:
   // Whether this object has already been initialized.

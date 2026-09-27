@@ -25,10 +25,6 @@
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/messages/android/message_wrapper.h"
-#endif
-
 class GURL;
 class HostContentSettingsMap;
 
@@ -52,13 +48,6 @@ class PermissionPromptAndroid;
 // specific logic.
 class PermissionsClient {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  class PermissionMessageDelegate {
-   public:
-    virtual ~PermissionMessageDelegate() = default;
-  };
-#endif
-
   PermissionsClient(const PermissionsClient&) = delete;
   PermissionsClient& operator=(const PermissionsClient&) = delete;
 
@@ -279,50 +268,12 @@ class PermissionsClient {
   virtual permissions::PermissionIgnoredReason DetermineIgnoreReason(
       content::WebContents* web_contents);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns whether the given origin matches the default search
-  // engine (DSE) origin.
-  virtual bool IsDseOrigin(content::BrowserContext* browser_context,
-                           const url::Origin& origin);
-
-  // Allows the embedder to create a message UI to use as the
-  // permission prompt. Returns the pointer to the message UI if the
-  // message UI is successfully created, nullptr otherwise, e.g. if
-  // the messages-prompt is not supported for `request`.
-  virtual std::unique_ptr<PermissionMessageDelegate> MaybeCreateMessageUI(
-      content::WebContents* web_contents,
-      const PermissionRequest& request,
-      base::WeakPtr<PermissionPromptAndroid> prompt);
-
-  using PermissionsUpdatedCallback = base::OnceCallback<void(bool)>;
-
-  // Prompts the user to accept system permissions for
-  // |content_settings_types|, after they've already been denied. In
-  // Chrome, this shows an infobar. |callback| will be run with
-  // |true| for success and |false| otherwise.
-  virtual void RepromptForAndroidPermissions(
-      content::WebContents* web_contents,
-      const std::vector<ContentSettingsType>& content_settings_types,
-      const std::vector<ContentSettingsType>& filtered_content_settings_types,
-      const std::vector<std::string>& required_permissions,
-      const std::vector<std::string>& optional_permissions,
-      PermissionsUpdatedCallback callback);
-
-  // Converts the given chromium |resource_id| (e.g.
-  // IDR_INFOBAR_TRANSLATE) to an Android drawable resource ID.
-  // Returns 0 if a mapping wasn't found.
-  virtual int MapToJavaDrawableId(int resource_id);
-
-  // Gets the name of the embedder.
-  virtual const std::u16string GetClientApplicationName() const = 0;
-#else
   // Creates a permission prompt.
   // TODO(crbug.com/40107932): Move the desktop permission prompt
   // implementation into //components/permissions and remove this.
   virtual std::unique_ptr<PermissionPrompt> CreatePrompt(
       content::WebContents* web_contents,
       PermissionPrompt::Delegate* delegate);
-#endif
 
   virtual std::unique_ptr<EmbeddedPermissionPromptFlowModel::PromptContentScrim>
   CreatePromptContentScrim(content::WebContents* web_contents,

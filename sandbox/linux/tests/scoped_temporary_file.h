@@ -11,11 +11,7 @@
 
 namespace sandbox {
 
-#if BUILDFLAG(IS_ANDROID)
-static const char kTempDirForTests[] = "/data/local/tmp/";
-#else
 static const char kTempDirForTests[] = "/tmp/";
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Creates and open a temporary file on creation and closes
 // and removes it on destruction.

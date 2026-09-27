@@ -33,13 +33,7 @@ struct VectorIcon;
 // users.
 bool ShouldDisplayManagedUi(Profile* profile);
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 // The icon to use in the Managed UI.
 const gfx::VectorIcon& GetManagedUiIcon(Profile* profile);
-#endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-#if BUILDFLAG(IS_ANDROID)
-std::u16string GetManagementPageSubtitle(Profile* profile);
-#endif
 
 #endif  // CHROME_BROWSER_UI_MANAGED_UI_H_

@@ -12,11 +12,6 @@
 
 namespace plus_addresses::features {
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(PLUS_ADDRESSES_FEATURES)
-BASE_DECLARE_FEATURE(kPlusAddressAndroidOpenGmsCoreManagementPage);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 COMPONENT_EXPORT(PLUS_ADDRESSES_FEATURES)
 BASE_DECLARE_FEATURE(kPlusAddressesEnabled);
 

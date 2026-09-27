@@ -45,23 +45,6 @@ class SerialIoHandler : public base::RefCountedThreadSafe<SerialIoHandler> {
   virtual void Open(const mojom::SerialConnectionOptions& options,
                     OpenCompleteCallback callback);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Signals that the port has been opened.
-  void OnPathOpened(
-      scoped_refptr<base::SingleThreadTaskRunner> io_thread_task_runner,
-      base::ScopedFD fd);
-
-  // Signals that the port opening resulted in an error.
-  void OnPathOpenError(
-      scoped_refptr<base::SingleThreadTaskRunner> io_thread_task_runner,
-      const std::string& error_name,
-      const std::string& error_message);
-
-  // Reports the open error from the permission broker.
-  void ReportPathOpenError(const std::string& error_name,
-                           const std::string& error_message);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Performs an async read operation. Behavior is undefined if this is called
   // while a read is already pending. Otherwise, |callback| will be called
   // (potentially synchronously) with a result. |buffer| must remain valid until

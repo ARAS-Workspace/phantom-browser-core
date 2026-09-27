@@ -33,22 +33,6 @@ POLICY_EXPORT bool CanApplyPoliciesForSignedInUser(
     signin::ConsentLevel consent_level,
     signin::IdentityManager* identity_manager);
 
-#if BUILDFLAG(IS_ANDROID)
-
-// Gets the timestamp representing the last time the registration was done.
-POLICY_EXPORT base::Time GetLastPolicyCheckTimeFromPrefs(PrefService* prefs);
-
-// Updates the timestamp representing the last time the registration was done
-// with the current time.
-POLICY_EXPORT void UpdateLastPolicyCheckTimeInPrefs(PrefService* prefs);
-
-// Gets the delay between each registration try. Used for mobile to throttle
-// network calls.
-POLICY_EXPORT base::TimeDelta GetTryRegistrationDelayFromPrefs(
-    PrefService* prefs);
-
-#endif
-
 }  // namespace policy
 
 #endif  // COMPONENTS_POLICY_CORE_BROWSER_CLOUD_USER_POLICY_SIGNIN_SERVICE_UTIL_H_

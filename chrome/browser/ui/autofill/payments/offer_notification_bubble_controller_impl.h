@@ -85,10 +85,8 @@ class OfferNotificationBubbleControllerImpl
   void OnVisibilityChanged(content::Visibility visibility) override;
   void DoShowBubble() override;
   void UpdatePageActionIcon() override;
-#if !BUILDFLAG(IS_ANDROID)
   std::optional<actions::ActionId> GetActionIdForPageAction() override;
   bool ShouldShowPageAction() override;
-#endif  //! BUILDFLAG(IS_ANDROID)
 
   // Returns whether the web content associated with this controller is active.
   virtual bool IsWebContentsActive();

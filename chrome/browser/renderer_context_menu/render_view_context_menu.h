@@ -84,11 +84,9 @@ namespace ui {
 class DataTransferEndpoint;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace split_tabs {
 enum class SplitTabLayout;
 }
-#endif
 
 class RenderViewContextMenu
     : public RenderViewContextMenuBase,
@@ -388,13 +386,11 @@ class RenderViewContextMenu
   // view and in physical pixels. The device scale factor is supplied to scale
   // the image bounds properly.
 
-#if !BUILDFLAG(IS_ANDROID)
   // Opens the link in a new split view so that the linked page will be visible
   // next to the active tab. If the active tab is already in the split view,
   // then the tab that wasn't the source of the link will be navigated to the
   // link instead.
   void OpenLinkInSplitView(split_tabs::SplitTabLayout layout);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // The destination URL to use if the user tries to search for or navigate to
   // a text selection.

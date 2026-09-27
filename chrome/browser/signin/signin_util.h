@@ -75,7 +75,6 @@ class ScopedForceSigninSetterForTesting {
       const ScopedForceSigninSetterForTesting&) = delete;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Utility class that moves cookies linked to a URL from one profile to the
 // other. This will be mostly used when a new profile is created after a
 // signin interception of an account linked a SAML signin.
@@ -107,7 +106,6 @@ class CookiesMover {
   base::OnceCallback<void()> callback_;
   base::WeakPtrFactory<CookiesMover> weak_pointer_factory_{this};
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Return whether the force sign in policy is enabled or not.
 // The state of this policy will not be changed without relaunch Chrome.
@@ -123,8 +121,6 @@ void ResetForceSigninForTesting();
 
 // Returns true if profile deletion is allowed.
 bool IsProfileDeletionAllowed(Profile* profile);
-
-#if !BUILDFLAG(IS_ANDROID)
 
 // Returns true if managed accounts signin are required to create a new profile
 // by policies set in `profile`. This will check the by default check the
@@ -151,7 +147,6 @@ bool IsAccountExemptedFromEnterpriseProfileSeparation(Profile* profile,
                                                       const std::string& email);
 void RecordEnterpriseProfileCreationUserChoice(bool enforced_by_policy,
                                                bool created);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // TODO(b/339214136): Add a standalone unit for this function.
 // Add an account with `user_email` and `gaia_id` to `profile`, and then set it

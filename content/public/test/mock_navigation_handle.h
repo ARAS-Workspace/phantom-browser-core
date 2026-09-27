@@ -283,12 +283,6 @@ class MockNavigationHandle : public NavigationHandle {
   MOCK_METHOD(void, SetBypassRedirectChecksForNextRedirect, (bool));
   MOCK_METHOD(bool, ConsumeBypassRedirectChecksForNextRedirect, ());
 
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(const base::android::JavaRef<jobject>&,
-              GetJavaNavigationHandle,
-              ());
-#endif
-
   base::SafeRef<NavigationHandle> GetSafeRef() override {
     return weak_factory_.GetSafeRef();
   }

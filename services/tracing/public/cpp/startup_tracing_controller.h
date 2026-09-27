@@ -26,17 +26,7 @@ namespace tracing {
 // the actual logic lives on a background ThreadPool sequence.
 class COMPONENT_EXPORT(TRACING_CPP) StartupTracingController {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  // Signature of the callback used to generate a path on Android.
-  // The callback should return a FilePath matching the given basename.
-  using AndroidPathGeneratorCallback =
-      base::RepeatingCallback<base::FilePath(std::string_view)>;
-#endif
-
   StartupTracingController(
-#if BUILDFLAG(IS_ANDROID)
-      AndroidPathGeneratorCallback android_path_generator_callback,
-#endif
       scoped_refptr<base::SingleThreadTaskRunner> io_task_runner);
   ~StartupTracingController();
 
@@ -116,9 +106,6 @@ class COMPONENT_EXPORT(TRACING_CPP) StartupTracingController {
 
   base::FilePath output_file_;
 
-#if BUILDFLAG(IS_ANDROID)
-  AndroidPathGeneratorCallback android_path_generator_callback_;
-#endif
   scoped_refptr<base::SingleThreadTaskRunner> io_task_runner_;
 
   SEQUENCE_CHECKER(sequence_checker_);

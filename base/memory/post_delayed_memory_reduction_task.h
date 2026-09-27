@@ -37,15 +37,6 @@ void BASE_EXPORT PostDelayedMemoryReductionTask(
     OnceCallback<void(MemoryReductionTaskContext)> task,
     base::TimeDelta delay);
 
-#if BUILDFLAG(IS_ANDROID)
-// Posts a task that will only run when the app is about to be frozen (on
-// Android). On other platforms, this is a no-op.
-void BASE_EXPORT
-PostOnFreezeTask(scoped_refptr<SequencedTaskRunner> task_runner,
-                 const Location& from_here,
-                 OnceClosure task);
-#endif
-
 // Replacement for |OneShotTimer|, that allows the tasks to be run by
 // |OnPreFreeze| (see |PreFreezeBackgroundMemoryTrimmer| above).
 class BASE_EXPORT OneShotDelayedBackgroundTimer final {
@@ -93,9 +84,6 @@ class BASE_EXPORT OneShotDelayedBackgroundTimer final {
         scoped_refptr<SequencedTaskRunner> task_runner) = 0;
   };
 
-#if BUILDFLAG(IS_ANDROID)
-  friend class android::PreFreezeBackgroundMemoryTrimmer;
-#endif
   class TimerImpl;
   class TaskImpl;
 

@@ -133,12 +133,6 @@ class CONTENT_EXPORT NavigationEntryImpl : public NavigationEntry {
   const GURL& GetURL() const override;
   void SetBaseURLForDataURL(const GURL& url) override;
   const GURL& GetBaseURLForDataURL() const override;
-#if BUILDFLAG(IS_ANDROID)
-  void SetDataURLAsString(
-      scoped_refptr<base::RefCountedString> data_url) override;
-  const scoped_refptr<const base::RefCountedString>& GetDataURLAsString()
-      const override;
-#endif
   void SetReferrer(const Referrer& referrer) override;
   const Referrer& GetReferrer() const override;
   void SetVirtualURL(const GURL& url) override;
@@ -620,12 +614,6 @@ class CONTENT_EXPORT NavigationEntryImpl : public NavigationEntry {
   // Used for specifying base URL for pages loaded via data URLs. Only used and
   // persisted by Android WebView.
   GURL base_url_for_data_url_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Used for passing really big data URLs from browser to renderers. Only used
-  // and persisted by Android WebView.
-  scoped_refptr<const base::RefCountedString> data_url_as_string_;
-#endif
 
   // Whether the entry, while loading, was created for a renderer-initiated
   // navigation.  This dictates whether the URL should be displayed before the

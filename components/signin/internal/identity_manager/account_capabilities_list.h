@@ -52,11 +52,9 @@ ACCOUNT_CAPABILITY(kCanHaveEmailAddressDisplayedCapabilityName,
                    CAN_HAVE_EMAIL_ADDRESS_DISPLAYED_CAPABILITY_NAME,
                    "accountcapabilities/haytqlldmfya")
 
-#if !BUILDFLAG(IS_ANDROID)
 ACCOUNT_CAPABILITY(kCanMakeChromeSearchEngineChoiceScreenChoice,
                    CAN_MAKE_CHROME_SEARCH_ENGINE_CHOICE_SCREEN_CHOICE,
                    "accountcapabilities/ge4tenznmnqxa")
-#endif
 
 ACCOUNT_CAPABILITY(kCanRunChromePrivacySandboxTrialsCapabilityName,
                    CAN_RUN_CHROME_PRIVACY_SANDBOX_TRIALS_CAPABILITY_NAME,
@@ -123,7 +121,7 @@ ACCOUNT_CAPABILITY(kIsSubjectToParentalControlsCapabilityName,
                    IS_SUBJECT_TO_PARENTAL_CONTROLS_CAPABILITY_NAME,
                    "accountcapabilities/guydolldmfya")
 
-#if !defined(NDEBUG) && !BUILDFLAG(IS_ANDROID)
+#if !defined(NDEBUG)
 // This is a fake account capability, used for unit tests only.
 // To avoid additional fetches in production code, only define this in debug
 // builds.

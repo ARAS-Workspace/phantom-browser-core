@@ -37,18 +37,6 @@ class CC_EXPORT RenderFrameMetadataObserver {
       const RenderFrameMetadata& render_frame_metadata,
       viz::CompositorFrameMetadata* compositor_frame_metadata,
       bool force_send) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Notification of the scroll end event.
-  virtual void DidEndScroll() = 0;
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  // Report scroll jank statistics to the OS (`View.reportAppJankStats()` on
-  // Android) at the end of a scroll.
-  virtual void ReportScrollJankStats(uint32_t total_frames,
-                                     uint32_t janky_frames) {}
-#endif
 };
 
 }  // namespace cc

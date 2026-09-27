@@ -102,7 +102,6 @@ gfx::Image GetSizedAvatarIcon(const gfx::Image& image, int width, int height);
 // `AvatarShape::SHAPE_CIRCLE`.
 ui::ImageModel GetSizedAvatarImageModel(const ui::ImageModel& image, int size);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Returns a circular avatar with some padding and a dotted ring.
 // The returned image is square-shaped, and not cropped into a circle.
 gfx::ImageSkia GetAvatarWithDottedRing(const ui::ImageModel& image,
@@ -110,7 +109,6 @@ gfx::ImageSkia GetAvatarWithDottedRing(const ui::ImageModel& image,
                                        bool has_padding,
                                        bool has_background,
                                        const ui::ColorProvider& color_provider);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Returns a version of |image| suitable for use in WebUI.
 gfx::Image GetAvatarIconForWebUI(const gfx::Image& image);
@@ -218,12 +216,10 @@ base::ListValue GetCustomProfileAvatarIconsAndLabels(
 size_t GetRandomAvatarIconIndex(
     const absl::flat_hash_set<size_t>& used_icon_indices);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Get all the available profile icons to choose from for a specific profile
 // with |profile_path|.
 base::ListValue GetIconsAndLabelsForProfileAvatarSelector(
     const base::FilePath& profile_path);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Set the default profile avatar icon index to |avatar_icon_index| for a
 // specific |profile|.
@@ -241,7 +237,6 @@ ui::ImageModel EmbedAvatarOntoImage(int resource_id,
                                     const gfx::Point& avatar_position,
                                     size_t avatar_size);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Returns a circular avatar with a decorative linear gradient ring.
 gfx::ImageSkia AddLinearGradientRingToAvatar(
     const ui::ImageModel& avatar_image,
@@ -254,7 +249,6 @@ gfx::ImageSkia AddLinearGradientRingToAvatar(
     int avatar_size,
     int gap_width,
     int ring_thickness);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace profiles
 

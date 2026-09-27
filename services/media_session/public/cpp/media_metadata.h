@@ -12,14 +12,6 @@
 #include "build/build_config.h"
 #include "services/media_session/public/cpp/chapter_information.h"
 
-#if BUILDFLAG(IS_ANDROID)
-
-#include <jni.h>
-
-#include "base/android/scoped_java_ref.h"
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace media_session {
 
 // The MediaMetadata is a structure carrying information associated to a
@@ -31,12 +23,6 @@ struct COMPONENT_EXPORT(MEDIA_SESSION_BASE_CPP) MediaMetadata {
   MediaMetadata(const MediaMetadata& other);
 
   friend bool operator==(const MediaMetadata&, const MediaMetadata&) = default;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Creates a Java MediaMetadata instance and returns the JNI ref.
-  base::android::ScopedJavaLocalRef<jobject> CreateJavaObject(
-      JNIEnv* env) const;
-#endif
 
   // Title associated to the MediaSession.
   std::u16string title;

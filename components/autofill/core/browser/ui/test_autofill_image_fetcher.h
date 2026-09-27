@@ -37,10 +37,6 @@ class TestAutofillImageFetcher : public AutofillImageFetcherBase {
   void FetchValuableImagesForURLs(base::span<const GURL> image_urls) override;
   const gfx::Image* GetCachedImageForUrl(const GURL& image_url,
                                          ImageType image_type) const override;
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetOrCreateJavaImageFetcher()
-      override;
-#endif
 
   // Adds a `url` to `image` mapping to the local `cached_images_`
   // cache.

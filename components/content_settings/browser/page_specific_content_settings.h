@@ -412,11 +412,6 @@ class PageSpecificContentSettings
                               bool blocked,
                               content::Page* originating_page = nullptr);
 
-#if BUILDFLAG(IS_ANDROID)
-  void OnProtectedMediaIdentifierPermissionSet(const GURL& requesting_frame,
-                                               bool allowed);
-#endif
-
   // This method is called to update the status about the microphone and
   // camera stream access.
   void OnMediaStreamPermissionSet(

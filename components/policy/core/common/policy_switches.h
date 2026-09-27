@@ -20,10 +20,6 @@ extern const char kSecureConnectApiUrl[];
 extern const char kFileStorageServerUploadUrl[];
 extern const char kPolicyVerificationKey[];
 
-#if BUILDFLAG(IS_ANDROID)
-extern const char kForceDeviceOwnership[];
-#endif
-
 }  // namespace switches
 }  // namespace policy
 

@@ -19,11 +19,9 @@
 #include "ui/gfx/geometry/rect.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/types/pass_key.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager_uma_helper.h"
 #include "ui/views/bubble/bubble_border.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 enum class PictureInPictureResult;
@@ -35,7 +33,6 @@ namespace display {
 class Display;
 }  // namespace display
 
-#if !BUILDFLAG(IS_ANDROID)
 class AutoPipSettingOverlayView;
 class DocumentPipHost;
 class PictureInPictureOcclusionTracker;
@@ -46,7 +43,6 @@ class ScopedTuckPictureInPicture;
 namespace views {
 class View;
 }  // namespace views
-#endif
 
 struct NavigateParams;
 
@@ -201,7 +197,6 @@ class PictureInPictureWindowManager {
   void NotifyObserversOnEnterPictureInPicture();
   void NotifyObserversOnExitPictureInPicture();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Shows a standalone Document Picture-in-Picture window using a
   // `DocumentPipHost` instead of a `Browser`. Used when the
   // `kDocumentPipStandaloneWindow` feature is enabled. Takes ownership of the
@@ -260,7 +255,6 @@ class PictureInPictureWindowManager {
   // Returns true if picture-in-picture windows are currently force-tucked (e.g.
   // due to a ScopedTuckPictureInPicture object existing).
   bool IsPictureInPictureForceTucked() const;
-#endif
 
   // Returns true if picture-in-picture is currently disabled (e.g. due to a
   // ScopedDisallowPictureInPicture object existing).
@@ -284,12 +278,10 @@ class PictureInPictureWindowManager {
   // example, might result in a misleading window title.
   static bool IsSupportedForDocumentPictureInPicture(const GURL& url);
 
-#if !BUILDFLAG(IS_ANDROID)
   void set_uma_helper_for_testing(
       std::unique_ptr<PictureInPictureWindowManagerUmaHelper> uma_helper) {
     uma_helper_ = std::move(uma_helper);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
  private:
   friend struct base::DefaultSingletonTraits<PictureInPictureWindowManager>;
@@ -313,7 +305,6 @@ class PictureInPictureWindowManager {
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/media/enums.xml:PictureInPictureDisallowedTypeEnum)
 
-#if !BUILDFLAG(IS_ANDROID)
   // These values are persisted to logs. Entries should not be renumbered and
   // numeric values should never be reused.
   //
@@ -330,7 +321,6 @@ class PictureInPictureWindowManager {
     kMaxValue = kNewWindowTucked,
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/media/enums.xml:PictureInPictureTuckedTypeEnum)
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Create a Picture-in-Picture window and register it in order to be closed
   // when needed.
@@ -351,7 +341,6 @@ class PictureInPictureWindowManager {
   // helper class for callbacks, to avoid re-entrant calls during pip set-up.
   static void ExitPictureInPictureSoon();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Creates the `occlusion_tracker_` if it does not already exist and should
   // exist.
   void CreateOcclusionTrackerIfNecessary();
@@ -369,9 +358,7 @@ class PictureInPictureWindowManager {
   // Records whether a new or existing picture-in-picture window was tucked due
   // to an existing ScopedTuckPictureInPicture.
   void RecordPictureInPictureTucked(PictureInPictureTuckedType type);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
   // Records the total time spent on a picture in picture window, regardless of
   // the Picture-in-Picture window type (document vs video) and the reason for
   // closing the window (UI interaction, returning back to opener tab, etc.).
@@ -379,7 +366,6 @@ class PictureInPictureWindowManager {
   // The metric is recorded using the `PictureInPictureWindowManagerUmaHelper`,
   // which this method will create if one does not already exist.
   void MaybeRecordPictureInPictureChanged(bool is_picture_in_picture);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   PictureInPictureWindowManager();
   ~PictureInPictureWindowManager();
@@ -390,7 +376,6 @@ class PictureInPictureWindowManager {
   std::unique_ptr<VideoWebContentsObserver> video_web_contents_observer_;
 
   std::unique_ptr<DocumentWebContentsObserver> document_web_contents_observer_;
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<PictureInPictureOcclusionTracker> occlusion_tracker_;
 
   // The number of `ScopedDisallowPictureInPicture` objects currently in
@@ -418,7 +403,6 @@ class PictureInPictureWindowManager {
   // `kDocumentPipStandaloneWindow` path is active. Non-owning: the host is
   // owned by the opener WebContents as user data.
   base::WeakPtr<DocumentPipHost> document_pip_host_;
-#endif  //! BUILDFLAG(IS_ANDROID)
 
   // The display of the opener window, cached during
   // `CalculateInitialPictureInPictureWindowBounds`.

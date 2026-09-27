@@ -172,11 +172,9 @@ class SearchboxHandler : public searchbox::mojom::PageHandler,
   void GetPageClassification(GetPageClassificationCallback callback) override;
   void StartScreenshare(bool prefer_entire_screen,
                         StartScreenshareCallback callback) override {}
-#if !BUILDFLAG(IS_ANDROID)
   void SetSmartTabSharingActive(bool active) override;
   void GetSmartTabSharingActive(
       GetSmartTabSharingActiveCallback callback) override;
-#endif
   void set_delegate(Delegate* delegate) { omnibox_delegate_ = delegate; }
 
   ~SearchboxHandler() override;

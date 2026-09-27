@@ -91,10 +91,8 @@ class TrackedElementWebUI : public ui::TrackedElement {
   // Returns the bounds of the element in local WebContents DIP coordinates.
   gfx::Rect GetBoundsInWebContents() const;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns the host WebView for this WebUI element, if any.
   views::WebView* GetWebView() const;
-#endif
 
  private:
   friend class TrackedElementHandler;

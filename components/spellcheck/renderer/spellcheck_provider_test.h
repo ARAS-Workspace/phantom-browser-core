@@ -149,10 +149,6 @@ class TestingSpellCheckProvider : public SpellCheckProvider,
 #endif  // BUILDFLAG(ENABLE_SPELLING_SERVICE)
 #endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
-#if BUILDFLAG(IS_ANDROID)
-  void DisconnectSessionBridge() override;
-#endif
-
   // Receiver to receive the SpellCheckHost request flow.
   mojo::Receiver<spellcheck::mojom::SpellCheckHost> receiver_{this};
 };

@@ -27,11 +27,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
 void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsFeatures(
     content::WebUIBrowserInterfaceBrokerRegistry& registry);
 
-#if BUILDFLAG(IS_ANDROID)
-void PopulateChromeWebUIFrameBindersPartsAndroid(
-    mojo::BinderMapWithContext<content::RenderFrameHost*>* map,
-    content::RenderFrameHost* render_frame_host);
-#else
 // These assumes "Desktop" is non-Android.
 void PopulateChromeWebUIFrameBindersPartsDesktop(
     mojo::BinderMapWithContext<content::RenderFrameHost*>* map,
@@ -40,7 +35,6 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
     content::WebUIBrowserInterfaceBrokerRegistry& registry);
 void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(
     content::WebUIBrowserInterfaceBrokerRegistry& registry);
-#endif
 
 }  // namespace chrome::internal
 

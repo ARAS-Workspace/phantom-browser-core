@@ -23,10 +23,6 @@
 #include "components/sync/service/type_status_map_for_debugging.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 struct CoreAccountInfo;
 class GoogleServiceAuthError;
 class GURL;
@@ -222,8 +218,8 @@ class SyncService : public KeyedService {
     // Same as above, but for the case where data loss may affect all
     // encryptable datatypes.
     kTrustedVaultRecoverabilityDegradedForEverything = 6,
-// This enum is parsed by java_cpp_enum.py, which doesn't accept &&ing flags.
-#if !BUILDFLAG(IS_ANDROID)
+    // This enum is parsed by java_cpp_enum.py, which doesn't accept &&ing
+    // flags.
     // Sync settings dialog not confirmed yet.
     kNeedsSettingsConfirmation = 7,
     // Sync has encountered an unrecoverable error. It won't attempt to start
@@ -231,12 +227,6 @@ class SyncService : public KeyedService {
     // and back in again. This error is only shown for syncing users, and will
     // be removed with "Sync The Feature" deprecation.
     kUnrecoverableError = 8,
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-    // Indicates that the Google Play services need to be upgraded.
-    kNeedsUPMBackendUpgrade = 9,
-#endif  // BUILDFLAG(IS_ANDROID)
 
     // Indicates that the version of the client/browser is too old and needs to
     // be upgraded to a more recent version.
@@ -272,11 +262,6 @@ class SyncService : public KeyedService {
 
   SyncService(const SyncService&) = delete;
   SyncService& operator=(const SyncService&) = delete;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Return the java object that allows access to the SyncService.
-  virtual base::android::ScopedJavaLocalRef<jobject> GetJavaObject() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   //////////////////////////////////////////////////////////////////////////////
   // USER SETTINGS

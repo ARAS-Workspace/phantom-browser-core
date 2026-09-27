@@ -73,18 +73,6 @@ class ChromePasswordReuseDetectionManagerClient
       uint64_t reused_password_hash,
       const std::string& domain) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Notifies `PasswordReuseDetectionManager` about passwords selected from
-  // AllPasswordsBottomSheet.
-  void OnPasswordSelected(const std::u16string& text) override;
-
-  // content::RenderWidgetHost::InputEventObserver overrides. Notifies
-  // OnKeyPressed events.
-  void OnImeTextCommittedEvent(const std::u16string& text_str) override;
-  void OnImeSetComposingTextEvent(const std::u16string& text_str) override;
-  void OnImeFinishComposingTextEvent() override;
-#endif
-
  protected:
   explicit ChromePasswordReuseDetectionManagerClient(
       content::WebContents* web_contents,
@@ -131,12 +119,6 @@ class ChromePasswordReuseDetectionManagerClient
   // This reference is only used if a sign-in via the ProfilePickerUI is
   // detected. By observing the IdentityManager we can detect signin events.
   raw_ptr<signin::IdentityManager> identity_manager_;
-#if BUILDFLAG(IS_ANDROID)
-  // Last composing text from ime, this is updated when ime set composing text
-  // event is triggered. It is sent to password reuse detection manager and
-  // reset when ime finish composing text event is triggered.
-  std::u16string last_composing_text_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   base::WeakPtrFactory<ChromePasswordReuseDetectionManagerClient> weak_factory_{
       this};

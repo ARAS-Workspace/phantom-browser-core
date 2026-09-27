@@ -146,13 +146,7 @@ class SecurityInterstitialTabHelper
   void OpenWhitepaperInNewTab() override;
   void ReportPhishingErrorInNewTab() override;
 
-#if !BUILDFLAG(IS_ANDROID)
   void ShowCertificateViewer() override;
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  void OpenAndroidAdvancedProtectionSettings() override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Keeps track of blocking documents for pending navigations that have
   // encountered certificate errors in this WebContents. This map is keyed by

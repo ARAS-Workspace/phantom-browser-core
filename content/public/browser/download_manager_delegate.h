@@ -52,11 +52,6 @@ struct CONTENT_EXPORT SavePackagePathPickedParams {
 #if BUILDFLAG(IS_MAC)
   std::vector<std::string> file_tags;
 #endif
-
-#if BUILDFLAG(IS_ANDROID)
-  // Android file path may be content URI, thus we need display name here.
-  base::FilePath display_name;
-#endif
 };
 using SavePackagePathPickedCallback =
     base::OnceCallback<void(SavePackagePathPickedParams,
@@ -244,17 +239,6 @@ class CONTENT_EXPORT DownloadManagerDelegate {
 
   // Attaches any extra per-DownloadItem info.
   virtual void AttachExtraInfo(download::DownloadItem* item) {}
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns whether download is triggered by an external app.
-  virtual bool IsFromExternalApp(download::DownloadItem* item);
-
-  // Whether to open pdf inline.
-  virtual bool ShouldOpenPdfInline();
-
-  // Whether download is restricted by policy.
-  virtual bool IsDownloadRestrictedByPolicy();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Returns whether the delegate supports history loading. If false,
   // DownloadManager does not wait for history loading to complete before

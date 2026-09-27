@@ -72,10 +72,6 @@ extern const base::FeatureParam<WebAuthnAmbientSigninDisplay>
     kWebAuthnAmbientSigninDisplayParam;
 
 // Enables publishing prelinking information on Android.
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(FIDO_PUBLIC)
-BASE_DECLARE_FEATURE(kWebAuthnPublishPrelinkingInfo);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Enables the WebAuthn Signal API for Windows Hello.
 COMPONENT_EXPORT(FIDO_PUBLIC)

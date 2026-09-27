@@ -17,11 +17,6 @@ class OmniboxActionSiteSearch : public OmniboxAction {
   // OmniboxAction overrides:
   OmniboxActionId ActionId() const override;
 
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetOrCreateJavaObject(
-      JNIEnv* env) const override;
-#endif
-
  private:
   ~OmniboxActionSiteSearch() override;
 

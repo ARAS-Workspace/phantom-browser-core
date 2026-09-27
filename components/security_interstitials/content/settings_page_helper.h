@@ -33,11 +33,6 @@ class SettingsPageHelper {
       content::WebContents* web_contents,
       safe_browsing::SafeBrowsingSettingReferralMethod referral_method)
       const = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Opens Android-OS advanced protection settings page.
-  virtual void OpenAdvancedProtectionSettings(content::WebContents&) = 0;
-#endif  // BUILDFLAG_IS_ANDROID)
 };
 
 }  // namespace security_interstitials

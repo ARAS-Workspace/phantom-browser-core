@@ -21,10 +21,6 @@
 #include "ui/gfx/swap_result.h"
 #include "ui/gfx/vsync_provider.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/gl/android/scoped_a_native_window.h"
-#endif
-
 namespace gpu {
 
 class VulkanDeviceQueue;
@@ -98,9 +94,6 @@ class COMPONENT_EXPORT(VULKAN) VulkanSurface {
 
   const VkInstance vk_instance_;
 
-#if BUILDFLAG(IS_ANDROID)
-  const gl::ScopedANativeWindow a_native_window_;
-#endif
   const gfx::AcceleratedWidget accelerated_widget_;
   VkSurfaceKHR surface_ = VK_NULL_HANDLE;
   VkSurfaceFormatKHR surface_format_ = {};

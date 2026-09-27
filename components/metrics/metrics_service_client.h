@@ -151,15 +151,6 @@ class MetricsServiceClient {
       metrics::MetricsLogUploader::MetricServiceType service_type,
       const MetricsLogUploader::UploadCallback& on_upload_complete) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Determines whether background tasks can be scheduled with the Android OS
-  // through JobScheduler. Currently, "background tasks" only consist of log
-  // uploads (starting from Android 15, network requests while the app is
-  // backgrounded is only supported when the task is scheduled through
-  // JobScheduler).
-  virtual bool IsJobSchedulerSupported() const;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Returns the interval between upload attempts. Checks if debugging flags
   // have been set, if there the is a custom interval, otherwise defaults to
   // GetStandardUploadInterval().

@@ -35,9 +35,7 @@
 #include "ui/base/page_transition_types.h"
 #include "v8/include/v8-forward.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "media/base/speech_recognition_client.h"
-#endif
 
 class GURL;
 class SkBitmap;
@@ -231,20 +229,6 @@ class CONTENT_EXPORT ContentRendererClient {
   virtual blink::ProtocolHandlerSecurityLevel GetProtocolHandlerSecurityLevel(
       const url::Origin& origin);
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(sgurun) This callback is deprecated and will be removed as soon
-  // as android webview completes implementation of a resource throttle based
-  // shouldoverrideurl implementation. See crbug.com/325351
-  //
-  // Returns true if the navigation was handled by the embedder and should be
-  // ignored by WebKit. This method is used by CEF and android_webview.
-  virtual bool HandleNavigation(RenderFrame* render_frame,
-                                blink::WebFrame* frame,
-                                const blink::WebURLRequest& request,
-                                blink::WebNavigationType type,
-                                blink::WebNavigationPolicy default_policy);
-#endif
-
   // Notifies the embedder that the given frame is requesting the resource at
   // `target_url`. If the function returns a valid `new_url`, the request must
   // be updated to use it.
@@ -326,11 +310,9 @@ class CONTENT_EXPORT ContentRendererClient {
   virtual std::unique_ptr<blink::WebContentSettingsClient>
   CreateWorkerContentSettingsClient(RenderFrame* render_frame);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Creates a speech recognition client used to transcribe audio into captions.
   virtual std::unique_ptr<media::SpeechRecognitionClient>
   CreateSpeechRecognitionClient(RenderFrame* render_frame);
-#endif
 
   // Notifies that a document element has been inserted in the frame's document.
   // This may be called multiple times for the same document. This method may

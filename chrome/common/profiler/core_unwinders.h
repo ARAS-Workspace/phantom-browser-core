@@ -56,12 +56,4 @@ bool AreUnwindPrerequisitesAvailable(
 
 base::StackSamplingProfiler::UnwindersFactory CreateCoreUnwindersFactory();
 
-#if BUILDFLAG(IS_ANDROID)
-// Used to gate unwind prerequisites' installation for some unit tests.
-BASE_DECLARE_FEATURE(kInstallAndroidUnwindDfm);
-
-base::StackSamplingProfiler::UnwindersFactory
-CreateLibunwindstackUnwinderFactory();
-#endif
-
 #endif  // CHROME_COMMON_PROFILER_CORE_UNWINDERS_H_

@@ -131,9 +131,7 @@ class BlobUrlRegistry;
 
 namespace content {
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockCapturedSurfaceController;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if defined(USE_AURA)
 class SelectionBoundsWaiter;
@@ -298,13 +296,13 @@ bool WaitForLoadStop(WebContents* web_contents);
 void PrepContentsForBeforeUnloadTest(WebContents* web_contents,
                                      bool trigger_user_activation = true);
 
-#if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA)
 // If WebContent's view is currently being resized, this will wait for the ack
 // from the renderer that the resize is complete and for the
 // WindowEventDispatcher to release the pointer moves. If there's no resize in
 // progress, the method will return right away.
 void WaitForResizeComplete(WebContents* web_contents);
-#endif  // defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
+#endif  // defined(USE_AURA)
 
 void NotifyCopyableViewInWebContents(WebContents* web_contents,
                                      base::OnceClosure done_callback);
@@ -2667,7 +2665,6 @@ bool EnableNativeWindowActivation();
 void HandleMissingKeyWindow();
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Set the length of the window of opportunity for conditional focus.
 void SetConditionalFocusWindowForTesting(base::TimeDelta window);
 
@@ -2676,7 +2673,6 @@ void SetCapturedSurfaceControllerFactoryForTesting(
     base::RepeatingCallback<std::unique_ptr<MockCapturedSurfaceController>(
         GlobalRenderFrameHostId,
         WebContentsMediaCaptureId)> factory);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void InitAndEnableRenderDocumentForAllFrames(
     base::test::ScopedFeatureList* feature_list);
@@ -2756,7 +2752,7 @@ class ShowPopupWidgetWaiter
   void Wait();
 
  private:
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   // Helper that waits for a `ShowPopupMenu()` call and then invokes the
   // observer callback with the requested bounds.  The actual call to show the
   // popup menu is treated as if it were cancelled.
@@ -2800,7 +2796,7 @@ class ShowPopupWidgetWaiter
                  ShowPopupCallback callback) override;
 
   CreateNewPopupWidgetInterceptor create_new_popup_widget_interceptor_;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
   ShowPopupMenuInterceptor show_popup_menu_interceptor_;
 #endif
   base::RunLoop run_loop_;

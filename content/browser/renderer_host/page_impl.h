@@ -33,10 +33,6 @@
 #include "ui/base/ime/mojom/virtual_keyboard_types.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/browser/android/page_proxy.h"
-#endif
-
 namespace cc {
 struct BrowserControlsOffsetTagModifications;
 }  // namespace cc
@@ -72,9 +68,6 @@ class CONTENT_EXPORT PageImpl : public Page {
   base::SafeRef<Page> GetSafeRef() override;
   bool IsPageScaleFactorOne() override;
   const std::string& GetContentsMimeType() const override;
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetJavaPage() override;
-#endif
 
   base::WeakPtr<PageImpl> GetWeakPtrImpl();
 
@@ -423,12 +416,6 @@ class CONTENT_EXPORT PageImpl : public Page {
   // frame is sandboxed. Consumed (reset to nullptr) by
   // `TakeSandboxOriginTokenForPopup()` when building the reply.
   std::unique_ptr<base::UnguessableToken> sandbox_origin_token_for_popup_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // For each C++ Page, there is a Java counterpart. It is the JNI bridge in
-  // between the two.
-  std::unique_ptr<PageProxy> page_proxy_;
-#endif
 
   base::WeakPtrFactory<PageImpl> weak_factory_{this};
 };

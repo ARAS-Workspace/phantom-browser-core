@@ -9,9 +9,6 @@
 
 #include "build/build_config.h"
 // Link errors are tedious to track, raise a compile-time error instead.
-#if BUILDFLAG(IS_ANDROID)
-#error "Android is not supported."
-#endif  // BUILDFLAG(IS_ANDROID).
 
 #include <string>
 #include <vector>

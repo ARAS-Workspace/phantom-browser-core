@@ -10,12 +10,7 @@
 #include "build/buildflag.h"
 #include "components/supervised_user/core/browser/device_parental_controls.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/test/base/android/android_browser_test.h"
-#include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#else
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #include "components/safe_search_api/url_checker_client.h"
 #include "components/supervised_user/core/browser/supervised_user_service.h"
@@ -39,29 +34,10 @@ namespace supervised_user {
 // The main rationale for having this base class is to offer an opportunity to
 // share tests common to both platforms - where implementations differ, but
 // functionalities are expected to remain consistent.
-class SupervisedUserBrowserTestBase :
-#if BUILDFLAG(IS_ANDROID)
-    public AndroidBrowserTest
-#else
-    public MixinBasedInProcessBrowserTest
-#endif  // BUILDFLAG(IS_ANDROID)
-{
+class SupervisedUserBrowserTestBase : public MixinBasedInProcessBrowserTest {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  struct AndroidParentalControlsState {
-    // Android parental controls browser filter state (enabled or disabled).
-    bool browser_filter = false;
-    // Android parental controls search filter state (enabled or disabled).
-    bool search_filter = false;
-  };
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Describes status of the supervised user just before creating the services.
   struct InitialSupervisedUserState {
-#if BUILDFLAG(IS_ANDROID)
-    AndroidParentalControlsState android_parental_controls;
-#endif  // BUILDFLAG(IS_ANDROID)
-    // Family Link parental controls initial state.
     bool family_link_parental_controls = false;
   };
 
@@ -84,11 +60,7 @@ class SupervisedUserBrowserTestBase :
   // experience.
   void SetInitialSupervisedUserState(InitialSupervisedUserState initial_state);
 
-#if BUILDFLAG(IS_ANDROID)
-  AndroidParentalControls& GetDeviceParentalControls();
-#else
   DeviceParentalControls& GetDeviceParentalControls();
-#endif  // BUILDFLAG(IS_ANDROID)
 
  private:
   InitialSupervisedUserState initial_state_;

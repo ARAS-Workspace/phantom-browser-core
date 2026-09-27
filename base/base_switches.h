@@ -150,41 +150,6 @@ inline constexpr char kEnableCrashReporterForTesting[] =
     "enable-crash-reporter-for-testing";
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-// For testing, do not initialize child service process but also do not exit
-// (until requested by browser).
-inline constexpr char kAndroidSkipChildServiceInitForTesting[] =
-    "android-skip-child-service-init-for-testing";
-
-// Default country code to be used for search engine localization.
-inline constexpr char kDefaultCountryCodeAtInstall[] = "default-country-code";
-
-// Adds additional thread idle time information into the trace event output.
-inline constexpr char kEnableIdleTracing[] = "enable-idle-tracing";
-
-// Forces the DeviceInfo.isDesktop() check to return true. Can be used to enable
-// desktop-only features on other form factors.
-inline constexpr char kForceDesktopAndroid[] = "force-desktop-android";
-
-// When we retrieve the package name within the SDK Runtime, we need to use
-// a bit of a hack to do this by taking advantage of the fact that the pid
-// is the same pid as the application's pid + 10000.
-// see:
-// https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/os/Process.java;l=292;drc=47fffdd53115a9af1820e3f89d8108745be4b55d
-// When the render process is created however, it is just a regular isolated
-// process with no particular association so we can't perform the same hack.
-// When creating minidumps, the package name is retrieved from the process
-// meaning the render process minidumps would end up reporting a generic
-// process name not associated with the app.
-// We work around this by feeding through the host package information to the
-// render process when launching it.
-inline constexpr char kHostPackageName[] = "host-package-name";
-inline constexpr char kHostPackageLabel[] = "host-package-label";
-inline constexpr char kHostVersionCode[] = "host-version-code";
-inline constexpr char kPackageName[] = "package-name";
-inline constexpr char kPackageVersionName[] = "package-version-name";
-#endif
-
 }  // namespace switches
 
 #endif  // BASE_BASE_SWITCHES_H_

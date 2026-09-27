@@ -16,10 +16,6 @@
 #include "components/sync_device_info/device_info.h"
 #include "components/sync_preferences/cross_device_pref_tracker/timestamped_pref_value.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace sync_preferences {
 
 // Abstract interface for a keyed service responsible for querying the values of
@@ -123,30 +119,6 @@ class CrossDevicePrefTracker : public KeyedService {
   virtual std::optional<TimestampedPrefValue> GetMostRecentValue(
       std::string_view pref_name,
       const DeviceFilter& filter) const = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Return the Java object that allows access to the CrossDevicePrefTracker.
-  virtual base::android::ScopedJavaLocalRef<jobject> GetJavaObject() = 0;
-  // Returns the current status of the service.
-  virtual int GetServiceStatus(JNIEnv* env) const = 0;
-  // Java versions of query methods.
-  // `pref_name` can be either the tracked pref name or the cross-device pref
-  // name.
-  virtual base::android::ScopedJavaLocalRef<jobjectArray> GetValues(
-      JNIEnv* env,
-      const base::android::JavaRef<jstring>& pref_name,
-      std::optional<int> os_type,
-      std::optional<int> form_factor,
-      std::optional<int64_t> max_sync_recency_microseconds) const = 0;
-  // `pref_name` can be either the tracked pref name or the cross-device pref
-  // name.
-  virtual base::android::ScopedJavaLocalRef<jobject> GetMostRecentValue(
-      JNIEnv* env,
-      const base::android::JavaRef<jstring>& pref_name,
-      std::optional<int> os_type,
-      std::optional<int> form_factor,
-      std::optional<int64_t> max_sync_recency_microseconds) const = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 
  protected:
   CrossDevicePrefTracker() = default;

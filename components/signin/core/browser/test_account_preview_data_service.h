@@ -30,10 +30,6 @@ class TestAccountPreviewDataService : public AccountPreviewDataService {
       const GaiaId& gaia_id,
       base::OnceCallback<void(std::optional<AccountPreviewPreference>)>
           callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void UpdateExternalAppAccount(
-      const std::optional<std::string>& email) override;
-#endif
 
   // If `set_defer_callbacks(true)` is set, `GetPreviewPreferenceForAccount`
   // stores the callback instead of immediately invoking it with `preference_`.

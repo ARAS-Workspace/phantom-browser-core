@@ -14,11 +14,6 @@ class Custodian;
 
 int GetInterstitialMessageID(FilteringBehaviorReason reason);
 
-#if BUILDFLAG(IS_ANDROID)
-std::string BuildErrorPageHtmlWithoutApprovals(const GURL& url,
-                                               const std::string& app_locale);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 std::string BuildErrorPageHtmlWithApprovals(
     bool allow_access_requests,
     std::optional<Custodian> custodian,

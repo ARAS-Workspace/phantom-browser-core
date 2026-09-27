@@ -11,9 +11,7 @@
 #include "build/buildflag.h"
 #include "components/signin/public/base/signin_buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/memory/scoped_refptr.h"
-#endif
 
 class AccountTrackerService;
 class PrefService;

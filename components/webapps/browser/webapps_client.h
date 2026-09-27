@@ -139,22 +139,6 @@ class WebappsClient {
       std::unique_ptr<segmentation_platform::SegmentationPlatformService>
           service);
 
-#if BUILDFLAG(IS_ANDROID)
-  virtual bool IsInstallationInProgress(content::WebContents* web_contents,
-                                        const GURL& manifest_id) = 0;
-
-  virtual bool CanShowAppBanners(const content::WebContents* web_contents) = 0;
-
-  virtual void OnWebApkInstallInitiatedFromAppMenu(
-      content::WebContents* web_contents) = 0;
-
-  virtual void InstallWebApk(content::WebContents* web_contents,
-                             const AddToHomescreenParams& params) = 0;
-
-  virtual void InstallShortcut(content::WebContents* web_contents,
-                               const AddToHomescreenParams& params) = 0;
-#endif
-
   // Returns the id of the app that controls the last committed url of the given
   // `web_contents`.
   // Note: On Android this always returns `std::nullopt`.

@@ -97,10 +97,6 @@ class FakeDownloadItem : public download::DownloadItem {
   void DeleteFile(base::OnceCallback<void(bool)> callback) override;
   download::DownloadFile* GetDownloadFile() override;
   download::DownloadItemRenameHandler* GetRenameHandler() override;
-#if BUILDFLAG(IS_ANDROID)
-  bool IsFromExternalApp() override;
-  bool AllowAutoOpenAfterCompletion() override;
-#endif  // BUILDFLAG(IS_ANDROID)
   bool IsDangerous() const override;
   bool IsInsecure() const override;
   bool IsUserConfirmed() const override;

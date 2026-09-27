@@ -13,9 +13,7 @@
 #include "device/bluetooth/bluetooth_local_gatt_service.h"
 #include "device/bluetooth/test/test_bluetooth_local_gatt_service_delegate.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "device/bluetooth/test/bluetooth_test_android.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "device/bluetooth/test/bluetooth_test_mac.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"

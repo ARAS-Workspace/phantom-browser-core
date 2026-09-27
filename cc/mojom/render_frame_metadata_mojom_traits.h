@@ -110,54 +110,6 @@ struct COMPONENT_EXPORT(CC_SHARED_MOJOM_TRAITS)
     return metadata.tracked_element_rects;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  static float bottom_controls_height(const cc::RenderFrameMetadata& metadata) {
-    return metadata.bottom_controls_height;
-  }
-
-  static float bottom_controls_shown_ratio(
-      const cc::RenderFrameMetadata& metadata) {
-    return metadata.bottom_controls_shown_ratio;
-  }
-
-  static float top_controls_min_height_offset(
-      const cc::RenderFrameMetadata& metadata) {
-    return metadata.top_controls_min_height_offset;
-  }
-
-  static float bottom_controls_min_height_offset(
-      const cc::RenderFrameMetadata& metadata) {
-    return metadata.bottom_controls_min_height_offset;
-  }
-
-  static float min_page_scale_factor(const cc::RenderFrameMetadata& metadata) {
-    return metadata.min_page_scale_factor;
-  }
-
-  static float max_page_scale_factor(const cc::RenderFrameMetadata& metadata) {
-    return metadata.max_page_scale_factor;
-  }
-
-  static bool root_overflow_y_hidden(const cc::RenderFrameMetadata& metadata) {
-    return metadata.root_overflow_y_hidden;
-  }
-
-  static const gfx::SizeF& scrollable_viewport_size(
-      const cc::RenderFrameMetadata& metadata) {
-    return metadata.scrollable_viewport_size;
-  }
-
-  static const gfx::SizeF& root_layer_size(
-      const cc::RenderFrameMetadata& metadata) {
-    return metadata.root_layer_size;
-  }
-
-  static bool has_transparent_background(
-      const cc::RenderFrameMetadata& metadata) {
-    return metadata.has_transparent_background;
-  }
-#endif
-
   static bool Read(cc::mojom::RenderFrameMetadataDataView data,
                    cc::RenderFrameMetadata* out);
 };

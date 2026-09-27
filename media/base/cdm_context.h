@@ -85,14 +85,6 @@ class MEDIA_EXPORT CdmContext {
 
   static std::string CdmIdToString(const base::UnguessableToken* cdm_id);
 
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a MediaCryptoContext that can be used by MediaCodec based decoders.
-  virtual MediaCryptoContext* GetMediaCryptoContext();
-#endif
-
-
-
  protected:
   CdmContext();
 };

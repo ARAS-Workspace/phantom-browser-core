@@ -25,14 +25,12 @@ class FakeContentBrowserClientForQueryInstalledWebApps
       std::vector<std::string> installed_web_app_ids);
   ~FakeContentBrowserClientForQueryInstalledWebApps() override;
 
-#if !BUILDFLAG(IS_ANDROID)
   void QueryInstalledWebAppsByManifestId(
       const GURL&,
       const GURL& id,
       content::BrowserContext*,
       base::OnceCallback<void(std::optional<blink::mojom::RelatedApplication>)>
           callback) override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
  private:
   std::vector<GURL> installed_web_app_ids_;

@@ -78,13 +78,6 @@ class GpuChildThread : public ChildThreadImpl,
   static void QuitSafelyHelper(
       scoped_refptr<base::SingleThreadTaskRunner> task_runner);
 
-#if BUILDFLAG(IS_ANDROID)
-  static std::unique_ptr<media::AndroidOverlay> CreateAndroidOverlay(
-      scoped_refptr<base::SingleThreadTaskRunner> main_task_runner,
-      const base::UnguessableToken& routing_token,
-      media::AndroidOverlayConfig);
-#endif
-
   viz::VizMainImpl viz_main_;
 
   // ServiceFactory for Mojo service hosting.

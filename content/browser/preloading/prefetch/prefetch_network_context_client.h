@@ -32,14 +32,6 @@ class PrefetchNetworkContextClient
   void OnCanSendDomainReliabilityUpload(
       const url::Origin& origin,
       OnCanSendDomainReliabilityUploadCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void OnGenerateHttpNegotiateAuthToken(
-      const std::string& server_auth_token,
-      bool can_delegate,
-      const std::string& auth_negotiate_android_account_type,
-      const std::string& spn,
-      OnGenerateHttpNegotiateAuthTokenCallback callback) override;
-#endif
 #if BUILDFLAG(IS_CT_SUPPORTED)
   void OnCanSendSCTAuditingReport(
       OnCanSendSCTAuditingReportCallback callback) override;

@@ -23,13 +23,6 @@ class MockPasswordManagerDelegate : public PasswordManagerDelegate {
 
   MOCK_METHOD((void), ShowSuggestions, (const TriggeringField&), (override));
 
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD((void),
-              ShowKeyboardReplacingSurface,
-              (const PasswordSuggestionRequest&),
-              (override));
-#endif  // BUILDFLAG(IS_ANDROID)
-
   MOCK_METHOD(std::optional<Suggestion>,
               GetWebauthnSignInWithAnotherDeviceSuggestion,
               (),

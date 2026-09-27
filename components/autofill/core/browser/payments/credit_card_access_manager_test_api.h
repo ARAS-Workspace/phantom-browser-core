@@ -28,12 +28,6 @@ class CreditCardAccessManagerTestApi {
     return credit_card_access_manager_->ShouldOfferFidoOptInDialog(response);
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  bool ShouldOfferFidoAuth() {
-    return credit_card_access_manager_->ShouldOfferFidoAuth();
-  }
-#endif
-
   void OnVcn3dsAuthenticationComplete(
       payments::PaymentsWindowManager::Vcn3dsAuthenticationResponse response) {
     credit_card_access_manager_->OnVcn3dsAuthenticationComplete(

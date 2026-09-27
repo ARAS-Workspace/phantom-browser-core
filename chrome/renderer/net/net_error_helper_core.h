@@ -17,10 +17,6 @@
 #include "net/base/net_errors.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/renderer/net/page_auto_fetcher_helper_android.h"
-#endif
-
 namespace content {
 class RenderFrame;
 }
@@ -105,13 +101,6 @@ class NetErrorHelperCore {
     // Returns the render frame associated with NetErrorHelper.
     virtual content::RenderFrame* GetRenderFrame() = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-    // Called after an attempt to automatically schedule a background fetch for
-    // a page with a network error.
-    virtual void SetAutoFetchState(
-        chrome::mojom::OfflinePageAutoFetcherScheduleResult result) = 0;
-#endif
-
    protected:
     virtual ~Delegate() = default;
   };
@@ -146,11 +135,6 @@ class NetErrorHelperCore {
   // Notifies |this| about the current high score that's saved in the user's
   // synced preferences.
   void OnEasterEggHighScoreReceived(int high_score);
-
-#if BUILDFLAG(IS_ANDROID)
-  void SetPageAutoFetcherHelperForTesting(
-      std::unique_ptr<PageAutoFetcherHelper> page_auto_fetcher_helper);
-#endif
 
   // Execute the effect of pressing the specified button.
   // Note that the visual effects of the 'MORE' button are taken
@@ -206,10 +190,6 @@ class NetErrorHelperCore {
   // the error page.  It is used to detect when such navigations result
   // in errors.
   Button navigation_from_button_;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<PageAutoFetcherHelper> page_auto_fetcher_helper_;
-#endif
 };
 
 #endif  // CHROME_RENDERER_NET_NET_ERROR_HELPER_CORE_H_

@@ -21,10 +21,6 @@
 #include "components/sync/test/sync_user_settings_mock.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace syncer {
 
 // Mock implementation of SyncService. You probably don't need this; look at
@@ -41,12 +37,6 @@ class MockSyncService : public SyncService {
   // SyncService implementation.
   syncer::SyncUserSettings* GetUserSettings() override;
   const syncer::SyncUserSettings* GetUserSettings() const override;
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(base::android::ScopedJavaLocalRef<jobject>,
-              GetJavaObject,
-              (),
-              (override));
-#endif  // BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(void,
               AcknowledgeBookmarksLimitExceededError,
               (BookmarksLimitExceededHelpClickedSource source),

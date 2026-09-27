@@ -41,15 +41,12 @@ namespace ui_controls {
 // tests.
 void EnableUIControls();
 
-#if !BUILDFLAG(IS_ANDROID)
 // Reset the state in ui controls logic that are updated by the test to the
 // initial state.
 void ResetUIControlsIfEnabled();
 
 // Generates keyboard accelerator state in bitmap from each key boolean.
 int GenerateAcceleratorState(bool control, bool shift, bool alt, bool command);
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool IsUIControlsEnabled();
 
@@ -99,8 +96,6 @@ bool SendKeyEventsNotifyWhenDone(gfx::NativeWindow window,
                                  int key_event_types,
                                  base::OnceClosure task,
                                  int accelerator_state = kNoAccelerator);
-
-#if !BUILDFLAG(IS_ANDROID)
 
 // A default value for a window hint specifies that no window hint is given and
 // an appropriate target window should be deduced from the target or current
@@ -183,8 +178,6 @@ void ForceUseScreenCoordinatesOnce();
 // traverse more elements for accessibility reasons.
 bool IsFullKeyboardAccessEnabled();
 #endif
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace ui_controls
 

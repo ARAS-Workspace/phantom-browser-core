@@ -50,10 +50,6 @@ class RenderFrameHostImpl;
 class SiteInstance;
 struct LoadCommittedDetails;
 
-#if BUILDFLAG(IS_ANDROID)
-class NavigationEntryScreenshotCache;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // NavigationControllerImpl is 1:1 with FrameTree. See comments on the base
 // class.
 class CONTENT_EXPORT NavigationControllerImpl : public NavigationController {
@@ -169,14 +165,6 @@ class CONTENT_EXPORT NavigationControllerImpl : public NavigationController {
   // what this means.
   void CreateInitialEntry();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Gets the `NavigationEntryScreenshotCache` for this `NavigationController`.
-  // Due to MPArch there can be multiple `FrameTree`s within a single tab. This
-  // should only be called for the primary FrameTree.  This cache is
-  // lazy-initialized when this method is first called.
-  NavigationEntryScreenshotCache* GetNavigationEntryScreenshotCache();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Starts a navigation in a newly created subframe as part of a history
   // navigation. Returns true if the history navigation could start, false
   // otherwise.  If this returns false, the caller should do a regular
@@ -210,15 +198,6 @@ class CONTENT_EXPORT NavigationControllerImpl : public NavigationController {
   // vector is empty.
   std::vector<base::WeakPtr<NavigationRequest>> GoToIndexAndReturnAllRequests(
       int index);
-
-#if BUILDFLAG(IS_ANDROID)
-  // The difference between (Can)GoToOffsetWithSkipping and
-  // (Can)GoToOffset/(Can)GoToOffsetInSandboxedFrame is that this respects the
-  // history manipulation intervention and will exclude skippable entries.
-  // These should only be used for browser-initiated navigaitons.
-  bool CanGoToOffsetWithSkipping(int offset);
-  void GoToOffsetWithSkipping(int offset);
-#endif
 
   // Called when a document requests a navigation through a
   // RenderFrameProxyHost.
@@ -427,12 +406,8 @@ class CONTENT_EXPORT NavigationControllerImpl : public NavigationController {
   // navigation failed due to an SSL error.
   void SetPendingNavigationSSLError(bool error);
 
-// Returns true if the string corresponds to a valid data URL, false
-// otherwise.
-#if BUILDFLAG(IS_ANDROID)
-  static bool ValidateDataURLAsString(
-      const scoped_refptr<const base::RefCountedString>& data_url_as_string);
-#endif
+  // Returns true if the string corresponds to a valid data URL, false
+  // otherwise.
 
   // Invoked when a user activation occurs within the page, so that relevant
   // entries can be updated as needed.
@@ -967,22 +942,6 @@ class CONTENT_EXPORT NavigationControllerImpl : public NavigationController {
                                           Direction direction,
                                           bool performing_navigation);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Helper used by CanGoToOffsetWithSkipping()` and GoToOffsetWithSkipping().
-  //
-  // Returns the index of the entry at the specified `offset` from the current
-  // entry, skipping entries that are marked to be skipped on back/forward UI
-  // (e.g., due to the history manipulation intervention).
-  //
-  // Returns std::nullopt if the offset cannot be traversed (e.g., if there are
-  // not enough non-skippable entries).
-  //
-  // `performing_navigation` indicates if this calculation is part of an active
-  // navigation attempt, rather than a capability check.
-  std::optional<int> GetIndexForOffsetWithSkipping(int offset,
-                                                   bool performing_navigation);
-#endif
-
   // History Manipulation intervention:
   // The previous document that started this navigation needs to be skipped in
   // subsequent back/forward UI navigations if it never received any user
@@ -1217,13 +1176,6 @@ class CONTENT_EXPORT NavigationControllerImpl : public NavigationController {
   // the wrong order in the history view.
   TimeSmoother time_smoother_;
 
-
-#if BUILDFLAG(IS_ANDROID)
-  // Stores captured screenshots for this `NavigationController`. The
-  // screenshots are used to present the user with the previews of the
-  // previously visited pages when the back/forward navigations occur.
-  std::unique_ptr<NavigationEntryScreenshotCache> nav_entry_screenshot_cache_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Holds the entry that was committed at the time an error page was triggered
   // due to a call to LoadPostCommitErrorPage. The error entry will take its

@@ -32,17 +32,11 @@
 #include "chrome/common/buildflags.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/scoped_observation.h"
 #include "chrome/browser/profiles/delete_profile_helper.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"  // nogncheck
 
 class GlobalBrowserCollection;
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-class ProfileManagerAndroid;
-#endif
 
 class DeleteProfileHelper;
 class ProfileAttributesStorage;
@@ -114,45 +108,6 @@ class ProfileManager : public Profile::Delegate {
   // Note: The list returned might contain on-the-record irregular profiles
   // like the System profile.
   static std::vector<Profile*> GetLastOpenedProfiles();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Get the profile for the user which created the current session.
-  // Note that in case of a guest account this will return a 'suitable' profile.
-  static Profile* GetPrimaryUserProfile(
-  );
-
-  // Get the profile for the currently active user.
-  // Note that in case of a guest account this will return a 'suitable' profile.
-  //
-  // DEPRECATED on ChromeOS because of known issues that it may return non User
-  // Profile instance. Please use:
-  //   ash::BrowserContextHelper::Get()->GetBrowserContextByAccountId(
-  //       session_manager::SessionManager::Get()->GetActiveSession()
-  //           ->account_id());
-  // or simpler code if you need only limited parts of Profile.
-  // E.g., if you need only PrefService of the Profile, you can take it from
-  // user_manager::User::GetProfilePrefs(), e.g.:
-  //   user_manager::UserManager::Get()->FindUser(
-  //       session_manager::SessionManager::Get()->GetActiveSession()
-  //           ->account_id())->GetProfilePrefs();
-  // Note that, due to the current implementation, despite of its name, this
-  // may return non-user profile or null depending on the current session
-  // state. For migration, we must take care of when this is called from the
-  // callers. Specifically, if this may be called before login or during login
-  // process, the extra check is needed. Otherwise, we may want CHECK for
-  // the session state.
-  // For the safer migration, we record the callers of unexpected use via
-  // location. It should be always called FROM_HERE as default value.
-  // TODO(crbug.com/40227502): Remove this.
-  static Profile* GetActiveUserProfile(
-  );
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  // Load and return the initial profile for browser. This returns the default
-  // profile.
-  static Profile* CreateInitialProfile();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   void AddObserver(ProfileManagerObserver* observer);
   void RemoveObserver(ProfileManagerObserver* observer);
@@ -236,7 +191,6 @@ class ProfileManager : public Profile::Delegate {
   // otherwise return null.
   Profile* GetProfileByPath(const base::FilePath& path) const;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Asynchronously creates a new profile in the next available multiprofile
   // directory. Directories are named "profile_1", "profile_2", etc., in
   // sequence of creation. (Because directories can be deleted, however, it may
@@ -258,15 +212,12 @@ class ProfileManager : public Profile::Delegate {
       bool is_hidden,
       base::OnceCallback<void(Profile*)> initialized_callback,
       base::OnceCallback<void(Profile*)> created_callback = {});
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Returns the full path to be used for guest profiles.
   static base::FilePath GetGuestProfilePath();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns the full path to be used for system profiles.
   static base::FilePath GetSystemProfilePath();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Get the path of the next profile directory and increment the internal
   // count.
@@ -290,7 +241,6 @@ class ProfileManager : public Profile::Delegate {
   // profile specfic desktop shortcuts.
   ProfileShortcutManager* profile_shortcut_manager();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Searches for the latest active profile that respects |predicate|, already
   // loaded preferably. Returns nullopt if no existing profile respects all the
   // conditions.
@@ -298,7 +248,6 @@ class ProfileManager : public Profile::Delegate {
       base::RepeatingCallback<bool(ProfileAttributesEntry*)> predicate);
 
   DeleteProfileHelper& GetDeleteProfileHelper();
-#endif
 
   // Autoloads profiles if they are running background apps.
   void AutoloadProfiles();
@@ -498,12 +447,10 @@ class ProfileManager : public Profile::Delegate {
   // The profile used can be overridden by using --login-profile on cros.
   Profile* GetActiveUserOrOffTheRecordProfile();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Unloads the `Profile` at `profile_dir` from the manager and destroys the
   // `Profile` C++ object. If it's an ephemeral profile, also deletes the
   // profile permanently and nukes the `profile_dir` directory from disk.
   void UnloadProfile(const base::FilePath& profile_dir);
-#endif
 
   // Synchronously creates and returns a profile. This handles both the full
   // creation and adds it to the set managed by this ProfileManager. Returns
@@ -555,7 +502,6 @@ class ProfileManager : public Profile::Delegate {
   // run any callbacks that were queued to run after the profile was destroyed.
   void OnProfileDestructionComplete(const base::FilePath& profile_path);
 
-#if !BUILDFLAG(IS_ANDROID)
   void OnBrowserOpened(BrowserWindowInterface* browser);
   void OnBrowserClosed(BrowserWindowInterface* browser);
 
@@ -580,7 +526,6 @@ class ProfileManager : public Profile::Delegate {
   };
 
   void OnClosingAllBrowsersChanged(bool closing);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Destroy after |profile_attributes_storage_| since Profile destruction may
   // trigger some observers to unregister themselves.
@@ -599,11 +544,6 @@ class ProfileManager : public Profile::Delegate {
   // to an access to this member.
   std::unique_ptr<ProfileAttributesStorage> profile_attributes_storage_;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Handles the communication with the Java ProfileManager.
-  std::unique_ptr<ProfileManagerAndroid> profile_manager_android_;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   base::CallbackListSubscription closing_all_browsers_subscription_;
 
   // The path to the user data directory (DIR_USER_DATA).
@@ -614,11 +554,9 @@ class ProfileManager : public Profile::Delegate {
   // default.
   bool logged_in_ = false;
 
-#if !BUILDFLAG(IS_ANDROID)
   BrowserCollectionObserver browser_collection_observer_{this};
 
   std::unique_ptr<DeleteProfileHelper> delete_profile_helper_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Maps profile path to `ProfileInfo` (if profile has been loaded). Use
   // `RegisterProfile()` to add into this map. This map owns all loaded profile

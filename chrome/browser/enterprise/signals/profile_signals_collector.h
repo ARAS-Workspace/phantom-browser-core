@@ -48,9 +48,6 @@ class ProfileSignalsCollector : public BaseSignalsCollector {
   const raw_ptr<PolicyBlocklistService, DisableDanglingPtrDetection> policy_blocklist_service_;
   const raw_ptr<PrefService, DisableDanglingPtrDetection> profile_prefs_;
   const raw_ptr<policy::CloudPolicyManager, DisableDanglingPtrDetection> policy_manager_;
-#if BUILDFLAG(IS_ANDROID)
-  const raw_ptr<enterprise_connectors::ConnectorsService, DisableDanglingPtrDetection> connectors_service_;
-#endif
   const raw_ptr<enterprise::ProfileIdService, DisableDanglingPtrDetection> profile_id_service_;
   base::WeakPtrFactory<ProfileSignalsCollector> weak_factory_{this};
 };

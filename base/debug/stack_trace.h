@@ -60,15 +60,9 @@ BASE_EXPORT uintptr_t GetStackEnd();
 class BASE_EXPORT StackTrace {
  public:
   // LINT.IfChange(max_stack_frames)
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/41437515): Testing indicates that Android has issues
-  // with a larger value here, so leave Android at 62.
-  static constexpr size_t kMaxTraces = 62;
-#else
   // For other platforms, use 250. This seems reasonable without
   // being huge.
   static constexpr size_t kMaxTraces = 250;
-#endif
   // LINT.ThenChange(dwarf_line_no.cc:max_stack_frames)
 
   // Creates a stacktrace from the current location.
@@ -258,7 +252,7 @@ class BASE_EXPORT ScopedStackFrameLinker {
 
 namespace internal {
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
 // POSIX doesn't define any async-signal safe function for converting
 // an integer to ASCII. We'll have to define our own version.
 // itoa_r() converts a (signed) integer to ASCII. It returns "buf", if the
@@ -269,7 +263,7 @@ BASE_EXPORT void itoa_r(intptr_t i,
                         int base,
                         size_t padding,
                         base::span<char> buf);
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace internal
 

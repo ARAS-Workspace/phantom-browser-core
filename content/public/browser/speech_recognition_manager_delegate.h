@@ -7,11 +7,9 @@
 
 #include "base/functional/callback_forward.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace media::mojom {
 class SpeechRecognitionContext;
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 
@@ -36,7 +34,6 @@ class SpeechRecognitionManagerDelegate {
   // This is called on the IO thread.
   virtual SpeechRecognitionEventListener* GetEventListener() = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
   // This interfaces is used to bind the On-Device Speech Recognition Service on
   // the non-android platforms.
   // This is called on the IO thread.
@@ -44,7 +41,6 @@ class SpeechRecognitionManagerDelegate {
       mojo::PendingReceiver<media::mojom::SpeechRecognitionContext> receiver,
       const std::string& language,
       const GlobalRenderFrameHostId& render_frame_host_id) = 0;
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace content

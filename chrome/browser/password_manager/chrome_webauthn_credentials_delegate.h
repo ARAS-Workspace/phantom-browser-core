@@ -18,9 +18,7 @@
 #include "components/password_manager/core/browser/passkey_credential.h"
 #include "components/password_manager/core/browser/webauthn_credentials_delegate.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/webauthn/authenticator_request_dialog_model.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace base {
 class ElapsedTimer;
@@ -32,11 +30,9 @@ class WebContents;
 }
 
 // Chrome implementation of WebAuthnCredentialsDelegate.
-class ChromeWebAuthnCredentialsDelegate final :
-#if !BUILDFLAG(IS_ANDROID)
-    public AuthenticatorRequestDialogModel::Observer,
-#endif  //! BUILDFLAG(IS_ANDROID)
-    public password_manager::WebAuthnCredentialsDelegate {
+class ChromeWebAuthnCredentialsDelegate final
+    : public AuthenticatorRequestDialogModel::Observer,
+      public password_manager::WebAuthnCredentialsDelegate {
  public:
   using SecurityKeyOrHybridFlowAvailable =
       base::StrongAlias<struct SecurityKeyOrHybridFlowAvailableTag, bool>;
@@ -66,10 +62,8 @@ class ChromeWebAuthnCredentialsDelegate final :
   bool HasPendingPasskeySelection() override;
   base::WeakPtr<WebAuthnCredentialsDelegate> AsWeakPtr() override;
 
-#if !BUILDFLAG(IS_ANDROID)
   // AuthenticatorRequestDialogModel::Observer:
   void OnStepTransition() override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Method for providing a list of WebAuthn user entities that can be provided
   // as autofill suggestions. This is called when a WebAuthn Conditional UI
@@ -103,16 +97,11 @@ class ChromeWebAuthnCredentialsDelegate final :
   // SecurityKeyOrHybridFlowAvailable flows are always available on desktop
   // platforms, they still require a conditional request from the RP.
   SecurityKeyOrHybridFlowAvailable security_key_or_hybrid_flow_available_ =
-#if !BUILDFLAG(IS_ANDROID)
       SecurityKeyOrHybridFlowAvailable(true);
-#else
-      SecurityKeyOrHybridFlowAvailable(false);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   std::vector<base::OnceClosure> passkeys_available_callbacks_;
   std::unique_ptr<base::ElapsedTimer> passkey_retrieval_timer_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Callback to be run to dismiss the autofill popup. The popup will be shown
   // while the observed model displays no UI or until the request is completed.
   OnPasskeySelectedCallback passkey_selected_callback_;
@@ -120,7 +109,6 @@ class ChromeWebAuthnCredentialsDelegate final :
                           AuthenticatorRequestDialogModel::Observer>
       authenticator_observation_{this};
   base::OneShotTimer flickering_timer_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Set to true when an autofill surface that could have contained passkeys
   // has been displayed for the current page. Used for the

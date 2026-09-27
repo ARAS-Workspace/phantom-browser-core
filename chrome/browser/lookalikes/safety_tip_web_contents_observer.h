@@ -21,11 +21,7 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/lookalikes/safety_tip_message_delegate_android.h"
-#else
 #include "ui/views/widget/widget.h"
-#endif
 
 class Profile;
 
@@ -114,10 +110,6 @@ class SafetyTipWebContentsObserver
   bool safety_tip_check_pending_for_testing_ = true;
 
   base::OnceClosure safety_tip_close_callback_for_testing_;
-
-#if BUILDFLAG(IS_ANDROID)
-  SafetyTipMessageDelegateAndroid delegate_;
-#endif
 
   base::WeakPtrFactory<SafetyTipWebContentsObserver> weak_factory_{this};
   WEB_CONTENTS_USER_DATA_KEY_DECL();

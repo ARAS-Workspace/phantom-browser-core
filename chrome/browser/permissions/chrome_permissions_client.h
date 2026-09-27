@@ -82,10 +82,8 @@ class ChromePermissionsClient : public permissions::PermissionsClient {
       base::OnceCallback<void()> hats_shown_callback,
       PromptOptions prompt_options) override;
 
-#if !BUILDFLAG(IS_ANDROID)
   permissions::PermissionIgnoredReason DetermineIgnoreReason(
       content::WebContents* web_contents) override;
-#endif
 
   void OnPromptResolved(
       const permissions::PermissionRequest* request,
@@ -131,25 +129,6 @@ class ChromePermissionsClient : public permissions::PermissionsClient {
   bool IsPrivilegedInternalWebUIForUIRouting(
       content::WebContents* web_contents) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  bool IsDseOrigin(content::BrowserContext* browser_context,
-                   const url::Origin& origin) override;
-  std::unique_ptr<PermissionMessageDelegate> MaybeCreateMessageUI(
-      content::WebContents* web_contents,
-      const permissions::PermissionRequest& request,
-      base::WeakPtr<permissions::PermissionPromptAndroid> prompt) override;
-  void RepromptForAndroidPermissions(
-      content::WebContents* web_contents,
-      const std::vector<ContentSettingsType>& content_settings_types,
-      const std::vector<ContentSettingsType>& filtered_content_settings_types,
-      const std::vector<std::string>& required_permissions,
-      const std::vector<std::string>& optional_permissions,
-      PermissionsUpdatedCallback callback) override;
-  int MapToJavaDrawableId(int resource_id) override;
-  favicon::FaviconService* GetFaviconService(
-      content::BrowserContext* browser_context) override;
-  const std::u16string GetClientApplicationName() const override;
-#else
   std::unique_ptr<permissions::PermissionPrompt> CreatePrompt(
       content::WebContents* web_contents,
       permissions::PermissionPrompt::Delegate* delegate) override;
@@ -158,7 +137,6 @@ class ChromePermissionsClient : public permissions::PermissionsClient {
   CreatePromptContentScrim(
       content::WebContents* web_contents,
       permissions::EmbeddedPermissionPromptFlowModel* flow_model) override;
-#endif
 
   bool HasDevicePermission(ContentSettingsType type) const override;
   bool CanRequestDevicePermission(ContentSettingsType type) const override;

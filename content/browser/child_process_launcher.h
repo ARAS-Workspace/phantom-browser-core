@@ -27,10 +27,6 @@
 #include "mojo/public/cpp/system/invitation.h"
 #include "third_party/perfetto/include/perfetto/tracing/traced_proto.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/child_process_importance.h"
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 #include "base/files/scoped_file.h"
 #endif
@@ -44,11 +40,6 @@ namespace base {
 class CommandLine;
 class UnsafeSharedMemoryRegion;
 class ReadOnlySharedMemoryRegion;
-#if BUILDFLAG(IS_ANDROID)
-namespace android {
-enum class ChildBindingState;
-}
-#endif
 }  // namespace base
 
 namespace perfetto {
@@ -77,22 +68,17 @@ enum LaunchResultCode {
 };
 
 struct RenderProcessPriority {
-  RenderProcessPriority(bool visible,
-                        bool has_media_stream,
-                        bool has_immersive_xr_session,
-                        bool has_foreground_service_worker,
-                        unsigned int frame_depth,
-                        bool intersects_viewport,
-                        bool boost_for_pending_views,
-                        bool boost_for_loading,
-                        bool boost_for_discard,
-#if BUILDFLAG(IS_ANDROID)
-                        bool is_spare_renderer,
-                        ChildProcessImportance importance
-#else
-                        std::optional<base::Process::Priority> priority_override
-#endif
-  );
+  RenderProcessPriority(
+      bool visible,
+      bool has_media_stream,
+      bool has_immersive_xr_session,
+      bool has_foreground_service_worker,
+      unsigned int frame_depth,
+      bool intersects_viewport,
+      bool boost_for_pending_views,
+      bool boost_for_loading,
+      bool boost_for_discard,
+      std::optional<base::Process::Priority> priority_override);
 
   RenderProcessPriority(const RenderProcessPriority&);
 
@@ -159,20 +145,9 @@ struct RenderProcessPriority {
   // discard logic.
   bool boost_for_discard;
 
-#if BUILDFLAG(IS_ANDROID)
-  // |is_spare_renderer| is true if this process should be treated as a spare
-  // renderer. The process will be given a moderate priority even it is not
-  // visible and used.
-  bool is_spare_renderer;
-
-  ChildProcessImportance importance;
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
   // If this is set then the built-in process priority calculation system is
   // ignored, and an externally computed process priority is used.
   std::optional<base::Process::Priority> priority_override;
-#endif
 };
 
 // Data to pass as file descriptors.
@@ -220,22 +195,6 @@ class CONTENT_EXPORT ChildProcessLauncher
     virtual void OnProcessLaunched() = 0;
 
     virtual void OnProcessLaunchFailed(int error_code) {}
-
-#if BUILDFLAG(IS_ANDROID)
-    // Whether the process can use pre-warmed up connection.
-    virtual bool CanUseWarmUpConnection();
-    // Whether the process should be set to the priority of a spare renderer.
-    virtual bool HasSpareRendererPriority();
-    // The callback function triggered when the spare renderer priority has been
-    // successfully updated to normal renderer priority.
-    // If the child process is dead when trying to update
-    // the priority, is_alive will be false. The callback will be triggered
-    // after calling
-    // RenderProcessHostImpl::GraduateSpareToNormalRendererPriority.
-    virtual void OnSpareRendererPriorityGraduated(bool is_alive) {}
-    // Whether the process is being allocated for an outermost main frame.
-    virtual bool IsForOutermostMainFrame();
-#endif
 
    protected:
     virtual ~Client() {}
@@ -290,15 +249,9 @@ class CONTENT_EXPORT ChildProcessLauncher
   // more discussion of Linux implementation details.
   ChildProcessTerminationInfo GetChildTerminationInfo(bool known_dead);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Changes whether the render process runs in the background or not.  Only
-  // call this after the process has started.
-  void SetRenderProcessPriority(const RenderProcessPriority& priority);
-#else
   // Changes whether the process runs in the background or not.  Only call
   // this after the process has started.
   void SetProcessPriority(base::Process::Priority priority);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Terminates the process associated with this ChildProcessLauncher.
   // Returns true if the process was stopped, false if the process had not been
@@ -315,13 +268,6 @@ class CONTENT_EXPORT ChildProcessLauncher
   // previous client.
   Client* ReplaceClientForTest(Client* client);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the highest binding state for the ChildProcessConnection.
-  base::android::ChildBindingState GetEffectiveChildBindingState();
-
-  // Dumps the stack of the child process without crashing it.
-  void DumpProcessStack();
-#endif
  private:
   friend class internal::ChildProcessLauncherHelper;
 
@@ -329,18 +275,12 @@ class CONTENT_EXPORT ChildProcessLauncher
   void Notify(internal::ChildProcessLauncherHelper::Process process,
               int error_code);
 
-#if BUILDFLAG(IS_ANDROID)
-  void OnSpareRendererPriorityGraduated(bool is_alive);
-#endif
-
 #if BUILDFLAG(IS_MAC)
   // base::PortProvider::Observer:
   void OnReceivedTaskPort(base::ProcessHandle process_handle) override;
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   void SetProcessPriorityImpl(base::Process::Priority priority);
-#endif
 
   raw_ptr<Client> client_;
 

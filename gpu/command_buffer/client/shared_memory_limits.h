@@ -73,35 +73,9 @@ struct SharedMemoryLimits {
     return limits;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  static SharedMemoryLimits ForDisplayCompositor(const gfx::Size& screen_size) {
-    DCHECK(!screen_size.IsEmpty());
-
-    SharedMemoryLimits limits;
-    constexpr uint32_t kBytesPerPixel = 4;
-    const uint32_t full_screen_texture_size_in_bytes =
-        screen_size.width() * screen_size.height() * kBytesPerPixel;
-
-    // Android uses a smaller command buffer for the display compositor. Meant
-    // to hold the contents of the display compositor drawing the scene. See
-    // discussion here: https://goo.gl/s23m5j
-    limits.command_buffer_size = 64 * 1024;
-    // These limits are meant to hold the uploads for the browser UI without
-    // any excess space.
-    limits.start_transfer_buffer_size = 64 * 1024;
-    limits.min_transfer_buffer_size = 64 * 1024;
-    limits.max_transfer_buffer_size = full_screen_texture_size_in_bytes;
-    // Texture uploads may use mapped memory so give a reasonable limit for
-    // them.
-    limits.mapped_memory_reclaim_limit = full_screen_texture_size_in_bytes;
-
-    return limits;
-  }
-#else
   static SharedMemoryLimits ForDisplayCompositor() {
     return SharedMemoryLimits();
   }
-#endif
 };
 
 }  // namespace gpu

@@ -16,11 +16,6 @@
 #include "content/public/test/content_browser_test.h"
 #include "services/network/test/trust_token_request_handler.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/java_interfaces.h"
-#include "services/service_manager/public/cpp/interface_provider.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 using network::test::TrustTokenRequestHandler;

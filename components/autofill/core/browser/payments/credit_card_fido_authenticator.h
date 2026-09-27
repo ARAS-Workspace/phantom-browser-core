@@ -139,13 +139,11 @@ class CreditCardFidoAuthenticator
   // and in the FullCardRequest if any.
   void CancelVerification();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Invoked when a Webauthn offer dialog is about to be shown.
   void OnWebauthnOfferDialogRequested(std::string card_authorization_token);
 
   // Invoked when the WebAuthn offer dialog is accepted or declined/cancelled.
   void OnWebauthnOfferDialogUserResponse(bool did_accept);
-#endif
 
   // Retrieves the strike database for offering FIDO authentication. This can
   // return nullptr so check before using.

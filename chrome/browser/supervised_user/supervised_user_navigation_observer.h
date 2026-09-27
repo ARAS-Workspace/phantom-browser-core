@@ -129,9 +129,6 @@ class SupervisedUserNavigationObserver
   void GoBack() override;
   void RequestUrlAccessRemote(RequestUrlAccessRemoteCallback callback) override;
   void RequestUrlAccessLocal(RequestUrlAccessLocalCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void LearnMore(LearnMoreCallback callback) override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // When a remote URL approval request is successfully created, this method is
   // called asynchronously.
@@ -148,12 +145,6 @@ class SupervisedUserNavigationObserver
   supervised_user::SupervisedUserService* supervised_user_service() const;
   supervised_user::SupervisedUserUrlFilteringService*
   supervised_user_url_filtering_service() const;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Observes changes to the force google safe search pref and reloads the
-  // current page if client-side safe search was turned on for supervised users.
-  void OnForceGoogleSafeSearchChanged(std::string_view safe_search_pref_name);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   base::ScopedObservation<
       supervised_user::SupervisedUserUrlFilteringService,
@@ -174,11 +165,6 @@ class SupervisedUserNavigationObserver
   content::RenderFrameHostReceiverSet<
       supervised_user::mojom::SupervisedUserCommands>
       receivers_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Observes safe search feature driver in pref service.
-  PrefChangeRegistrar pref_change_registrar_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   base::WeakPtrFactory<SupervisedUserNavigationObserver> weak_ptr_factory_{
       this};

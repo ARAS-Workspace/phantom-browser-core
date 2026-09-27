@@ -163,21 +163,6 @@ class SHELL_DIALOGS_EXPORT SelectFileDialog
   // selection dialog will fail to open if the file name exceeds 255 characters.
   static base::FilePath GetShortenedFilePath(const base::FilePath& path);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Set the list of acceptable MIME types for the file picker; this will apply
-  // to any subsequent SelectFile() calls.
-  virtual void SetAcceptTypes(std::vector<std::u16string> types);
-
-  // Set whether the media picker should try to use media capture, meaning
-  // offering whatever means the system has of recording media (audio, video,
-  // etc) as a "file" choice.
-  virtual void SetUseMediaCapture(bool use_media_capture);
-
-  // Set whether files should be opened as writable using the
-  // ACTION_OPEN_DOCUMENT Intent rather than ACTION_GET_CONTENT.
-  virtual void SetOpenWritable(bool open_writable);
-#endif
-
   // Selects a File.
   // Before doing anything this function checks if FileBrowsing is forbidden
   // by the SelectFilePolicy supplied at creation time. If so, it tries to show

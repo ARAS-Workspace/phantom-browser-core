@@ -8,10 +8,6 @@
 #include "build/build_config.h"
 #include "build/buildflag.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <optional>
-#endif
-
 namespace password_manager {
 
 // List of constants describing the types of Android backend errors.
@@ -58,13 +54,6 @@ struct PasswordStoreBackendError {
 
   // The type of the error.
   PasswordStoreBackendErrorType type;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Android API Error.
-  // TODO(crbug.com/342993480) Remove this once UPM migration errors are no
-  // longer needed.
-  std::optional<int> android_backend_api_error;
-#endif
 };
 
 }  // namespace password_manager

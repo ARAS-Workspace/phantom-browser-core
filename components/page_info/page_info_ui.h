@@ -19,9 +19,7 @@
 #include "components/safe_browsing/buildflags.h"
 #include "ui/base/models/image_model.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/image/image_skia.h"
-#endif
 
 class PageInfo;
 class PageInfoUiDelegate;
@@ -141,12 +139,6 @@ class PageInfoUI {
     // Textual description of the Safe Browsing status.
     std::u16string safe_browsing_details;
 
-#if BUILDFLAG(IS_ANDROID)
-    // Textual description of the site's identity status that is displayed to
-    // the user.
-    std::string identity_status_description_android;
-#endif
-
     // The server certificate if a secure connection.
     scoped_refptr<net::X509Certificate> certificate;
     // The 2-QWAC certificate if the site has a valid 2-QWAC.
@@ -230,17 +222,6 @@ class PageInfoUI {
 
   // Returns the color to use for the permission decision reason strings.
   static SkColor GetSecondaryTextColor();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the identity icon ID for the given identity |status|.
-  static int GetIdentityIconID(PageInfo::SiteIdentityStatus status);
-
-  // Returns the identity icon color ID for the given identity |status|.
-  static int GetIdentityIconColorID(PageInfo::SiteIdentityStatus status);
-
-  // Returns the connection icon color ID for the given connection |status|.
-  static int GetConnectionIconColorID(PageInfo::SiteConnectionStatus status);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Return true if the given ContentSettingsType is in PageInfoUI.
   static bool ContentSettingsTypeInPageInfo(ContentSettingsType type);

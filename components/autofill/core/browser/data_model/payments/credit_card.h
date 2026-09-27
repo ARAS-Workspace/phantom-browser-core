@@ -393,11 +393,6 @@ class CreditCard : public FormGroup {
   std::u16string CardNameForAutofillDisplay(
       const std::u16string& customized_nickname = std::u16string()) const;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Label for the card to be displayed in the manual filling view on Android.
-  std::u16string CardIdentifierStringForManualFilling() const;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // A label for this card formatted as 'Nickname - ****2345, expires on MM/YY'
   // if nickname experiment is turned on and nickname is available; otherwise,
   // formatted as 'IssuerNetwork - ****2345, expires on MM/YY'.

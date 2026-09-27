@@ -115,10 +115,8 @@ class ControllerClient {
   // Reload the blocked page to see if it succeeds now.
   virtual void Reload() = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Shows the platform-specific certificate viewer.
   virtual void ShowCertificateViewer() = 0;
-#endif
 
   MetricsHelper* metrics_helper() const;
 
@@ -127,10 +125,6 @@ class ControllerClient {
   virtual void OpenUrlInNewForegroundTab(const GURL& url) = 0;
 
   virtual void OpenEnhancedProtectionSettings() = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  virtual void OpenAdvancedProtectionSettings() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   virtual PrefService* GetPrefService() = 0;
 

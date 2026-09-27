@@ -34,10 +34,7 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#else
 #include "extensions/browser/install_verifier.h"
-#endif
 
 // The E2E tests are designed to run against real backend servers. To identify
 // those tests we use *E2ETest* test name filter and run disabled tests.
@@ -160,7 +157,6 @@ class SyncTest : public PlatformBrowserTest,
   // their lifetime.
   std::vector<raw_ptr<Profile, VectorExperimental>> GetAllProfiles();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns a pointer to a particular browser. Callee owns the object
   // and manages its lifetime. The called browser must not be closed before.
   Browser* GetBrowser(int index);
@@ -172,7 +168,6 @@ class SyncTest : public PlatformBrowserTest,
   // the same index as it. Tests typically use browser indexes and profile
   // indexes interchangeably; this allows them to do so freely.
   Browser* AddBrowser(int profile_index);
-#endif
 
   // Returns a pointer to a particular sync client. Callee owns the object
   // and manages its lifetime.
@@ -322,13 +317,11 @@ class SyncTest : public PlatformBrowserTest,
   // determined at runtime based on server type.
   bool CreateProfile(int index);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Called when the |browser| was removed externally. This just marks the
   // |browser| in the |browsers_| list as nullptr to keep indexes in |browsers_|
   // and |profiles_| in sync. It is used when the |browser| is removed within a
   // test (e.g. when the last tab is closed for the |browser|).
   void OnBrowserRemoved(Browser* browser);
-#endif
 
   // Helper to block the current thread while the data models sync depends on
   // finish loading.
@@ -399,7 +392,6 @@ class SyncTest : public PlatformBrowserTest,
   // completed, used for two-client tests with external server.
   std::vector<std::unique_ptr<base::ScopedTempDir>> scoped_temp_dirs_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Collection of pointers to the browser objects used by a test. One browser
   // instance is created for each sync profile. Browser object lifetime is
   // managed by BrowserList, so we don't use a std::vector<std::unique_ptr<>>
@@ -408,7 +400,6 @@ class SyncTest : public PlatformBrowserTest,
 
   class ClosedBrowserObserver;
   std::unique_ptr<ClosedBrowserObserver> browser_list_observer_;
-#endif
 
   // Collection of sync clients used by a test. A sync client is associated
   // with a sync profile, and implements methods that sync the contents of the
@@ -417,10 +408,8 @@ class SyncTest : public PlatformBrowserTest,
 
   syncer::DataTypeSet excluded_types_from_check_for_data_type_failures_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Disable extension install verification.
   extensions::ScopedInstallVerifierBypassForTest ignore_install_verification_;
-#endif
 
   std::unique_ptr<content::URLLoaderInterceptor> url_loader_interceptor_;
   content::NetworkConnectionChangeSimulator connection_change_simulator_;

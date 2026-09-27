@@ -19,9 +19,6 @@
 
 namespace features {
 
-#if BUILDFLAG(IS_ANDROID)
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kAndroidDumpForBadCompositedUiState);
-#endif  // BUILDFLAG(IS_ANDROID)
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kBufferQueuePerRenderPass);
 
 // On Windows, this may interact badly with partial delegation and kBufferQueue,
@@ -47,20 +44,11 @@ extern const VIZ_COMMON_EXPORT base::FeatureParam<DelegatedCompositingMode>
     kDelegatedCompositingModeParam;
 
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kUseDrmBlackFullscreenOptimization);
-#if BUILDFLAG(IS_ANDROID)
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(
-    kUseFrameIntervalDeciderAdaptiveFrameRate);
-#endif
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kUseMultipleOverlays);
 VIZ_COMMON_EXPORT extern const char kMaxOverlaysParam[];
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kVizFrameSubmissionForWebView);
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kWebRtcLogCapturePipeline);
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kWebViewVulkanIntermediateBuffer);
-#if BUILDFLAG(IS_ANDROID)
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kWebViewEnableADPF);
-VIZ_COMMON_EXPORT extern const base::FeatureParam<std::string>
-    kWebViewADPFSocManufacturerAllowlist;
-#endif
 #if BUILDFLAG(IS_APPLE)
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kCALayerNewLimit);
 VIZ_COMMON_EXPORT extern const base::FeatureParam<int> kCALayerNewLimitDefault;
@@ -98,18 +86,6 @@ enum class FrameDeadlineDeciderSequenceStrategy {
   kMaxValue = kOsPreferredDeltaLocking,
 };
 
-#if BUILDFLAG(IS_ANDROID)
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kUseAndroidCustomFrameDeadlines);
-VIZ_COMMON_EXPORT extern const base::FeatureParam<
-    FrameDeadlineDeciderSequenceStrategy>
-    kAndroidCustomFrameDeadlineSequenceStrategy;
-VIZ_COMMON_EXPORT extern const base::FeatureParam<int>
-    kAndroidCustomFrameDeadlinePresentationOffset;
-VIZ_COMMON_EXPORT extern const base::FeatureParam<base::TimeDelta>
-    kAndroidCustomFrameDeadlineMaxNonInteractiveIdleDuration;
-VIZ_COMMON_EXPORT extern const base::FeatureParam<base::TimeDelta>
-    kAndroidCustomFrameDeadlineMaxInteractionIdleDuration;
-#endif
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kUseDisplaySDRMaxLuminanceNits);
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kHideDelegatedFrameHostMac);
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kEvictionUnlocksResources);
@@ -167,16 +143,6 @@ NumCooldownFramesForAckOnSurfaceActivationDuringInteraction();
 VIZ_COMMON_EXPORT extern const base::FeatureParam<int>
     kNumCooldownFramesForAckOnSurfaceActivationDuringInteraction;
 VIZ_COMMON_EXPORT bool ShouldAckOnSurfaceActivationWhenInteractive();
-#if BUILDFLAG(IS_ANDROID)
-VIZ_COMMON_EXPORT bool IsBrowserControlsInVizEnabled();
-
-// If the allowlist is non-empty, the soc must be in the allowlist. Blocklist
-// is ignored in this case.
-// If the allowlist is empty, soc must be absent from the blocklist.
-VIZ_COMMON_EXPORT bool ShouldUseAdpfForSoc(std::string_view soc_allowlist,
-                                           std::string_view soc);
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace features
 

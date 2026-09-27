@@ -20,10 +20,6 @@
 #include "extensions/browser/extension_function.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 class BrowserWindowInterface;
@@ -65,10 +61,6 @@ class SessionsGetRecentlyClosedFunction : public ExtensionFunction {
       const sessions::tab_restore::Group& group);
   api::sessions::Session CreateSessionModel(
       const sessions::tab_restore::Entry& entry);
-#if BUILDFLAG(IS_ANDROID)
-  void OnGetRecentlyClosedWindow(
-      const base::android::JavaRef<jobject>& j_tab_model);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   size_t max_results_ = api::sessions::MAX_SESSION_RESULTS;
   std::vector<api::sessions::Session> result_;
@@ -122,23 +114,6 @@ class SessionsRestoreFunction : public ExtensionFunction {
                                        BrowserWindowInterface* browser);
   void OnRestoreForeignSessionWindows(
       std::vector<BrowserWindowInterface*> browsers);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Uses JNI to query Java `RecentlyClosedEntitiesManager` for recently closed
-  // windows. If instance_id is kInvalidWindowId it returns the most closed.
-  // Otherwise it only returns a window with a matching instance id.
-  ResponseAction QueryRecentlyClosedEntitiesManager(int instance_id);
-
-  // Callback for `QueryRecentlyClosedEntitiesManager()`.
-  void OnGetRecentlyClosedWindow(
-      const base::android::JavaRef<jobject>& j_tab_model);
-
-  // Callback for browser window creation.
-  void OnBrowserWindowCreated(BrowserWindowInterface* browser);
-
-  // A global reference to `TabModel` so it stays alive across callbacks.
-  base::android::ScopedJavaGlobalRef<jobject> global_ref_tab_model_;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 class SessionsEventRouter : public sessions::TabRestoreServiceObserver {
@@ -161,11 +136,6 @@ class SessionsEventRouter : public sessions::TabRestoreServiceObserver {
       sessions::TabRestoreService* service) override;
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  // Callback for when the recently closed list is updated on the Java side.
-  void OnRecentlyClosedUpdated(int64_t j_browser_context);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Broadcasts the API OnChanged event to JS.
   static void BroadcastOnChangedEvent(Profile* profile);
 

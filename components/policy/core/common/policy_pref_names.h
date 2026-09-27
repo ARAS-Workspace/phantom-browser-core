@@ -43,16 +43,6 @@ namespace policy_prefs {
 // Integer pref that stores the Mac enterprise MDM management authority.
 inline constexpr char kEnterpriseMDMManagementMac[] =
     "management.platform.enterprise_mdm_mac";
-#elif BUILDFLAG(IS_ANDROID)
-// Integer pref that stores the Android enterprise MDM/ownership management authority.
-inline constexpr char kEnterpriseMDMManagementAndroid[] =
-    "management.platform.enterprise_mdm_android";
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-// Boolean pref indicating whether protected content identifiers are allowed.
-inline constexpr char kProtectedContentIdentifiersAllowed[] =
-    "policy.protected_content_identifiers.allowed";
 #endif
 
 // Enterprise policy controlled value representing whether the user may be shown
@@ -110,23 +100,6 @@ inline constexpr char kNativeWindowOcclusionEnabled[] =
 // IntensiveWakeUpThrottling web feature. Only applied if the policy is managed.
 inline constexpr char kIntensiveWakeUpThrottlingEnabled[] =
     "policy.intensive_wake_up_throttling_enabled";
-
-#if BUILDFLAG(IS_ANDROID)
-// Boolean policy preference to disable the BackForwardCache feature.
-inline constexpr char kBackForwardCacheEnabled[] =
-    "policy.back_forward_cache_enabled";
-
-// Boolean policy preference to disable the Read Aloud feature.
-inline constexpr char kReadAloudEnabled[] = "policy.read_aloud_enabled";
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-// Last time that a check for cloud policy management was done. This time is
-// recorded on Android and iOS so that retries aren't attempted on every
-// startup. Instead the cloud policy registration is retried at least 1 or 3
-// days later.
-inline constexpr char kLastPolicyCheckTime[] = "policy.last_policy_check_time";
-#endif
 
 // Boolean controlling whether SafeSearch is mandatory for Google Web Searches.
 inline constexpr char kForceGoogleSafeSearch[] =

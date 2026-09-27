@@ -66,7 +66,6 @@ class OmniboxView {
   // the field is empty.
   bool IsEditingOrEmpty() const;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns the icon to display as the location icon. If a favicon is
   // available, `on_icon_fetched` may be called later asynchronously.
   // `color_current_page_icon` is used for the page icon (i.e. when the popup is
@@ -87,7 +86,6 @@ class OmniboxView {
                          SkColor color_vectors_with_background,
                          IconFetchedCallback on_icon_fetched,
                          bool dark_mode) const;
-#endif
 
   // The user text is the text the user has manually keyed in.  When present,
   // this is shown in preference to the permanent text; hitting escape will

@@ -343,12 +343,6 @@ class BnplManager : public AutofillManager::Observer {
   // suggestions into `cached_suggestions_`.
   void UpdateAndCacheSuggestions(std::vector<Suggestion> updated_suggestions);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Callback triggered when Issuer selection is cancelled during Touch To Fill
-  // flow.
-  void OnTouchToFillIssuerSelectionCancelled();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   const PaymentsAutofillClient& payments_autofill_client() const {
     return const_cast<BnplManager*>(this)->payments_autofill_client();
   }

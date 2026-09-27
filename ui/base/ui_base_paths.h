@@ -21,10 +21,6 @@ enum {
   // Valid only in development environment; TODO(darin): move this
   UI_DIR_TEST_DATA,  // Directory where unit test data resides.
 
-#if BUILDFLAG(IS_ANDROID)
-  DIR_RESOURCE_PAKS_ANDROID,
-#endif
-
   UI_TEST_PAK,
 
   PATH_END

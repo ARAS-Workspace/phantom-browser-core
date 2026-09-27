@@ -12,14 +12,6 @@
 
 namespace content_settings {
 
-#if BUILDFLAG(IS_ANDROID)
-// Enables auto dark feature in theme settings.
-COMPONENT_EXPORT(CONTENT_SETTINGS_FEATURES)
-BASE_DECLARE_FEATURE(kDarkenWebsitesCheckboxInThemesSetting);
-COMPONENT_EXPORT(CONTENT_SETTINGS_FEATURES)
-extern const base::FeatureParam<bool> kDarkenWebsitesCheckboxOptOut;
-#endif
-
 namespace features {
 
 // Feature to enable the unused site permissions module of Safety Check.

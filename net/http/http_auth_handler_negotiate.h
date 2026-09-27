@@ -19,9 +19,7 @@
 #include "net/http/http_auth_handler_factory.h"
 #include "net/http/http_auth_mechanism.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/android/http_auth_negotiate_android.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include "net/http/http_auth_gssapi_posix.h"
 #endif
 
@@ -40,7 +38,7 @@ class HttpAuthPreferences;
 
 class NET_EXPORT_PRIVATE HttpAuthHandlerNegotiate : public HttpAuthHandler {
  public:
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   typedef GSSAPILibrary AuthLibrary;
 #endif
 
@@ -49,7 +47,6 @@ class NET_EXPORT_PRIVATE HttpAuthHandlerNegotiate : public HttpAuthHandler {
     explicit Factory(HttpAuthMechanismFactory negotiate_auth_system_factory);
     ~Factory() override;
 
-#if !BUILDFLAG(IS_ANDROID)
     // Sets the system library to use, thereby assuming ownership of
     // |auth_library|.
     void set_library(std::unique_ptr<AuthLibrary> auth_provider) {
@@ -59,7 +56,6 @@ class NET_EXPORT_PRIVATE HttpAuthHandlerNegotiate : public HttpAuthHandler {
 #if BUILDFLAG(IS_POSIX)
     const std::string& GetLibraryNameForTesting() const;
 #endif  // BUILDFLAG(IS_POSIX)
-#endif  // !BUILDFLAG(IS_ANDROID)
 
     // HttpAuthHandlerFactory overrides
     int CreateAuthHandler(
@@ -77,9 +73,7 @@ class NET_EXPORT_PRIVATE HttpAuthHandlerNegotiate : public HttpAuthHandler {
    private:
     HttpAuthMechanismFactory negotiate_auth_system_factory_;
     bool is_unsupported_ = false;
-#if !BUILDFLAG(IS_ANDROID)
     std::unique_ptr<AuthLibrary> auth_library_;
-#endif  // !BUILDFLAG(IS_ANDROID)
   };
 
   HttpAuthHandlerNegotiate(std::unique_ptr<HttpAuthMechanism> auth_system,

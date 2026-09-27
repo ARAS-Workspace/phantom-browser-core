@@ -8,10 +8,6 @@
 #include "build/build_config.h"
 #include "components/data_sharing/public/share_url_interception_context.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class GURL;
 
 namespace data_sharing {
@@ -26,12 +22,6 @@ class DataSharingUIDelegate {
   virtual void HandleShareURLIntercepted(
       const GURL& url,
       std::unique_ptr<ShareURLInterceptionContext> context) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a Java object of the type DataSharingService for the given
-  // DataSharingService.
-  virtual base::android::ScopedJavaLocalRef<jobject> GetJavaObject() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace data_sharing

@@ -32,7 +32,7 @@
 #include <mach/mach_vm.h>
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 #include <string>
 #include <utility>
 #include <vector>
@@ -42,7 +42,7 @@
 
 namespace base {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // Minor and major page fault counts since the process creation.
 // Both counts are process-wide, and exclude child processes.
 //
@@ -52,7 +52,7 @@ struct PageFaultCounts {
   int64_t minor;
   int64_t major;
 };
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Convert a POSIX timeval to microseconds.
 BASE_EXPORT int64_t TimeValToMicroseconds(const struct timeval& tv);
@@ -78,10 +78,10 @@ struct ProcessMemoryInfo {
   uint64_t compressed_bytes = 0;
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   uint64_t rss_anon_bytes = 0;
   uint64_t vm_swap_bytes = 0;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // On iOS,
   //   TBD: https://crbug.com/41315025
@@ -164,7 +164,7 @@ class BASE_EXPORT ProcessMetrics {
   // wall-clock second.
   base::expected<TimeDelta, ProcessCPUUsageError> GetCumulativeCPUUsage();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   // Emits the cumulative CPU usage for all currently active threads since they
   // were started into the output parameter (replacing its current contents).
   // Threads that have already terminated will not be reported. Thus, the sum of
@@ -175,7 +175,7 @@ class BASE_EXPORT ProcessMetrics {
   // NOTE: Currently only supported on Linux/Android.
   using CPUUsagePerThread = std::vector<std::pair<PlatformThreadId, TimeDelta>>;
   bool GetCumulativeCPUUsagePerThread(CPUUsagePerThread&);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 
   // Returns the number of average idle cpu wakeups per second since the last
   // call.
@@ -208,11 +208,11 @@ class BASE_EXPORT ProcessMetrics {
   int GetOpenFdSoftLimit() const;
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // Minor and major page fault count as reported by /proc/[pid]/stat.
   // Returns true for success.
   bool GetPageFaultCounts(PageFaultCounts* counts) const;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // Returns total memory usage of malloc.
   size_t GetMallocUsage();
@@ -285,8 +285,7 @@ BASE_EXPORT size_t GetHandleLimit();
 BASE_EXPORT void IncreaseFdLimitTo(unsigned int max_descriptors);
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 // Data about system-wide memory consumption. Available on Mac, Linux, Android
 // and Chrome OS.
 //
@@ -308,7 +307,7 @@ struct BASE_EXPORT SystemMemoryInfo {
 
   ByteSize free;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   // This provides an estimate of available memory as described here:
   // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=34e431b0ae398fc54ea69ff85ec700722c9da773
   // NOTE: this is ONLY valid in kernels 3.14 and up.  Its value will always
@@ -322,7 +321,7 @@ struct BASE_EXPORT SystemMemoryInfo {
   ByteSize swap_free;
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   ByteSize buffers;
   ByteSize cached;
   ByteSize active_anon;
@@ -331,7 +330,7 @@ struct BASE_EXPORT SystemMemoryInfo {
   ByteSize inactive_file;
   ByteSize dirty;
   ByteSize reclaimable;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 
 #if BUILDFLAG(IS_APPLE)
   ByteSize speculative;
@@ -353,10 +352,9 @@ struct BASE_EXPORT SystemMemoryInfo {
 // Exposed for memory debugging widget.
 BASE_EXPORT bool GetSystemMemoryInfo(SystemMemoryInfo* meminfo);
 
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
-        // || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 // Parse the data found in /proc/<pid>/stat and return the sum of the
 // CPU-related ticks.  Returns -1 on parse error.
 // Exposed for testing.
@@ -431,7 +429,7 @@ BASE_EXPORT bool GetSystemDiskInfo(SystemDiskInfo* diskinfo);
 // Returns the amount of time spent in user space since boot across all CPUs.
 BASE_EXPORT TimeDelta GetUserCpuTimeSinceBoot();
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 
 struct BASE_EXPORT SystemPerformanceInfo {
   SystemPerformanceInfo();
@@ -482,7 +480,7 @@ class BASE_EXPORT SystemMetrics {
   FRIEND_TEST_ALL_PREFIXES(SystemMetricsTest, SystemMetrics);
 
   size_t committed_memory_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   SystemMemoryInfo memory_info_;
   VmStatInfo vmstat_info_;
   SystemDiskInfo disk_info_;

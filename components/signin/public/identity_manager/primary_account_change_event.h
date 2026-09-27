@@ -14,10 +14,6 @@
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/identity_manager/account_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace signin {
 
 class PrimaryAccountChangeEvent {
@@ -90,13 +86,6 @@ std::ostream& operator<<(std::ostream& os,
                          const PrimaryAccountChangeEvent::State& state);
 std::ostream& operator<<(std::ostream& os,
                          const PrimaryAccountChangeEvent& event);
-
-#if BUILDFLAG(IS_ANDROID)
-base::android::ScopedJavaLocalRef<jobject>
-ConvertToJavaPrimaryAccountChangeEvent(
-    JNIEnv* env,
-    const PrimaryAccountChangeEvent& event_details);
-#endif
 
 }  // namespace signin
 

@@ -48,9 +48,7 @@ class BrowserExtensionWindowController : public WindowController {
   void SetFullscreenMode(bool is_fullscreen,
                          const GURL& extension_url) const override;
   BrowserWindowInterface* GetBrowserWindowInterface() override;
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindowInterface* GetBrowser() const override;
-#endif
   content::WebContents* GetActiveTab() const override;
   int GetTabCount() const override;
   content::WebContents* GetWebContentsAt(int i) const override;

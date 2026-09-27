@@ -139,12 +139,6 @@ struct InstanceManipulations {
   const bool delta_compressed;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// Records the result of importing a seed during Android first run.
-COMPONENT_EXPORT(VARIATIONS)
-void RecordFirstRunSeedImportResult(FirstRunSeedImportResult result);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Records the result of attempting to load the latest variations seed on
 // startup.
 COMPONENT_EXPORT(VARIATIONS) void RecordLoadSeedResult(LoadSeedResult state);

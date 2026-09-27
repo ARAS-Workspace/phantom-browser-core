@@ -66,13 +66,6 @@ class InterfaceFactoryImpl final
   void CreateDefaultRenderer(
       const std::string& audio_device_id,
       mojo::PendingReceiver<mojom::Renderer> receiver) final;
-#if BUILDFLAG(IS_ANDROID)
-  void CreateFlingingRenderer(
-      const std::string& presentation_id,
-      mojo::PendingRemote<mojom::FlingingRendererClientExtension>
-          client_extension,
-      mojo::PendingReceiver<mojom::Renderer> receiver) final;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   void CreateCdm(const CdmConfig& cdm_config, CreateCdmCallback callback) final;
 

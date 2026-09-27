@@ -28,13 +28,11 @@ class BackgroundSyncDelegate {
  public:
   virtual ~BackgroundSyncDelegate() = default;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Keeps the browser and profile alive to allow a one-shot Background Sync
   // registration to finish firing one sync event.
   virtual std::unique_ptr<
       content::BackgroundSyncController::BackgroundSyncEventKeepAlive>
   CreateBackgroundSyncEventKeepAlive() = 0;
-#endif
 
   // Gets the source_ID to log the UKM event for, and calls |callback| with that
   // source_id, or with std::nullopt if UKM recording is not allowed.
@@ -62,24 +60,6 @@ class BackgroundSyncDelegate {
   // periodic sync events will be fired.
   // Returns 0 if the engagement level is blink::mojom::EngagementLevel::NONE.
   virtual int GetSiteEngagementPenalty(const GURL& url) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Schedules the browser to be woken up when the device is online to process
-  // registrations of type |sync| after a minimum delay |delay|.
-  virtual void ScheduleBrowserWakeUpWithDelay(
-      blink::mojom::BackgroundSyncType sync_type,
-      base::TimeDelta delay) = 0;
-
-  // Cancels browser wakeup for registrations of type |sync_type|.
-  virtual void CancelBrowserWakeup(
-      blink::mojom::BackgroundSyncType sync_type) = 0;
-
-  // Whether Background Sync should be disabled.
-  virtual bool ShouldDisableBackgroundSync() = 0;
-
-  // Whether to disable Android network detection for connectivity checks.
-  virtual bool ShouldDisableAndroidNetworkDetection() = 0;
-#endif
 };
 
 }  // namespace background_sync

@@ -26,14 +26,12 @@ class MockLeakDetectionCheckFactory : public LeakDetectionCheckFactory {
                version_info::Channel),
               (const, override));
 
-#if !BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(std::unique_ptr<BulkLeakCheck>,
               TryCreateBulkLeakCheck,
               (BulkLeakCheckDelegateInterface*,
                signin::IdentityManager*,
                scoped_refptr<network::SharedURLLoaderFactory>),
               (const, override));
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace password_manager

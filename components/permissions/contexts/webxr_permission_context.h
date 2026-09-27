@@ -29,31 +29,6 @@ class WebXrPermissionContext : public ContentSettingPermissionContextBase {
 
  private:
   // PermissionContextBase:
-#if BUILDFLAG(IS_ANDROID)
-  // On Android we need to do some additional checking for OS level permissions,
-  // which do not need to happen on Desktop. Note that NotifyPermissionSet is
-  // only called after a "RequestPermission" call (and not if we are just
-  // checking the state of the permission), however, the requestSession flow
-  // requires checking the permission as one of it's steps: (5.6 as of 03/10/20)
-  // https://immersive-web.github.io/webxr/#dom-xrsystem-requestsession
-  // When implementing navigator.xr.permission methods, we should ensure that
-  // GetPermissionStatus is also updated to check these permissions.
-  void NotifyPermissionSet(
-      const PermissionRequestData& request_data,
-      BrowserPermissionCallback callback,
-      bool persist,
-      const content::PermissionResult* permission_result,
-      const permissions::PermissionPromptDecision& decision) override;
-
-  void UpdateTabContext(const PermissionRequestData& request_data,
-                        bool allowed) override;
-
-  void OnAndroidPermissionDecided(
-      const PermissionRequestData& request_data,
-      const content::PermissionResult& website_permission_result,
-      BrowserPermissionCallback callback,
-      bool permission_granted);
-#endif
 
   ContentSettingsType content_settings_type_;
 

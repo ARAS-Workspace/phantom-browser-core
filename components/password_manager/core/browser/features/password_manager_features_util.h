@@ -74,8 +74,6 @@ PasswordAccountStorageUserState ComputePasswordAccountStorageUserState(
 PasswordAccountStorageUsageLevel ComputePasswordAccountStorageUsageLevel(
     const syncer::SyncService* sync_service);
 
-#if !BUILDFLAG(IS_ANDROID)
-
 // Password change HaTS product-specific data fields.
 //
 // Note: Counts and runtime should use bucketing.
@@ -89,8 +87,6 @@ inline constexpr char kPasswordChangeRuntime[] =
     "Password change feature runtime, in milliseconds";
 inline constexpr char kPasswordChangeBlockingChallengeDetected[] =
     "Was there a blocking challenge (e.g. OTP) in the flow";
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager::features_util
 

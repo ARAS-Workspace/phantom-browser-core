@@ -176,11 +176,9 @@ class FeaturePromoController {
   // Returns a weak pointer to this object.
   virtual base::WeakPtr<FeaturePromoController> GetAsWeakPtr() = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
   // If `feature` has a registered promo, notifies the tracker that the feature
   // has been used.
   virtual void NotifyFeatureUsedIfValid(const base::Feature& feature) = 0;
-#endif
 
   // Posts `result` to `callback` on a fresh call stack. Requires a functioning
   // message pump.

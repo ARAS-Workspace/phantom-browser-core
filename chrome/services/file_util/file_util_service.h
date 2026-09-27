@@ -25,7 +25,7 @@ class FileUtilService : public chrome::mojom::FileUtilService {
  private:
   // chrome::mojom::FileUtilService implementation:
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   void BindSafeArchiveAnalyzer(
       mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver)
       override;

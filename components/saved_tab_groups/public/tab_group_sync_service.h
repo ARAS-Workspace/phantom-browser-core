@@ -26,10 +26,6 @@
 #include "components/tab_groups/tab_group_visual_data.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace tab_groups {
 class CollaborationFinder;
 class TabGroupSyncDelegate;
@@ -145,13 +141,6 @@ class TabGroupSyncService : public KeyedService, public base::SupportsUserData {
   using TabGroupSharingCallback =
       base::OnceCallback<void(TabGroupSharingResult)>;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a Java object of the type TabGroupSyncService for the given
-  // TabGroupSyncService.
-  static base::android::ScopedJavaLocalRef<jobject> GetJavaObject(
-      TabGroupSyncService* tab_group_sync_service);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   TabGroupSyncService() = default;
   ~TabGroupSyncService() override = default;
 
@@ -238,10 +227,8 @@ class TabGroupSyncService : public KeyedService, public base::SupportsUserData {
 
   // SaveGroup / UnsaveGroup are temporary solutions used during desktop's
   // migration. Other clients should use AddGroup / RemoveGroup.
-#if !BUILDFLAG(IS_ANDROID)
   virtual void SaveGroup(SavedTabGroup group) = 0;
   virtual void UnsaveGroup(const LocalTabGroupID& local_id) = 0;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Mutator methods for shared tab groups.
   // Converts the saved tab group to shared tab group and associates it with the

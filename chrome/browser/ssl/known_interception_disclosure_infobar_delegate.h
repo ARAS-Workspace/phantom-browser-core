@@ -61,9 +61,7 @@ class KnownInterceptionDisclosureCooldown {
   std::unique_ptr<base::Clock> clock_ = std::make_unique<base::DefaultClock>();
   bool has_seen_known_interception_ = false;
 
-#if !BUILDFLAG(IS_ANDROID)
   base::Time last_dismissal_time_;
-#endif
 };
 
 // Shows the known interception disclosure UI if it has not been recently
@@ -88,10 +86,6 @@ class KnownInterceptionDisclosureInfoBarDelegate
   std::u16string GetMessageText() const override;
   int GetButtons() const override;
   bool Accept() override;
-
-#if BUILDFLAG(IS_ANDROID)
-  static void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry);
-#endif
 
  private:
   raw_ptr<Profile> profile_;

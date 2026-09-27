@@ -542,11 +542,11 @@ class TestAutofillClientTemplate : public T {
     if (device_authenticator_) {
       return std::move(device_authenticator_);
     }
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
     return std::make_unique<device_reauth::MockDeviceAuthenticator>();
 #else
     return nullptr;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC)
   }
 
   OtpPhishGuardDelegate* GetOtpPhishGuardDelegate() override {
@@ -574,26 +574,6 @@ class TestAutofillClientTemplate : public T {
   GetPersonalContextFirstRunService() override {
     return &personal_context_first_run_service_;
   }
-
-#if BUILDFLAG(IS_ANDROID)
-  bool ShowAmbientAutoFillNotice(
-      base::WeakPtr<TouchToFillAutofillDelegate> delegate) override {
-    show_ambient_autofill_notice_called_ = true;
-    return show_ambient_autofill_notice_result_;
-  }
-  bool show_ambient_autofill_notice_called() const {
-    return show_ambient_autofill_notice_called_;
-  }
-  void set_show_ambient_autofill_notice_result(bool result) {
-    show_ambient_autofill_notice_result_ = result;
-  }
-  void HideAmbientAutoFillNotice() override {
-    hide_ambient_autofill_notice_called_ = true;
-  }
-  bool hide_ambient_autofill_notice_called() const {
-    return hide_ambient_autofill_notice_called_;
-  }
-#endif
 
   personal_context::PersonalContextEligibilityService*
   GetPersonalContextEligibilityService() const override {

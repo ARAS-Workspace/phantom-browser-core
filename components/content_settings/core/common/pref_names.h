@@ -261,22 +261,6 @@ inline constexpr char kQuietNotificationPermissionUiDisabledTime[] =
 inline constexpr char kInContextCookieControlsOpened[] =
     "profile.content_settings.in_content_cookies_controls_opened";
 
-#if BUILDFLAG(IS_ANDROID)
-// Enable vibration for web notifications.
-inline constexpr char kNotificationsVibrateEnabled[] =
-    "notifications.vibrate_enabled";
-
-// Boolean that indicates whether the desktop site global setting was enabled by
-// the user.
-inline constexpr char kRequestDesktopSiteGlobalSettingUserEnabled[] =
-    "Chrome.RequestDesktopSiteGlobalSetting.UserEnabled";
-
-// Window setting for request desktop site. When enabled, we will request
-// mobile site if the window is narrow.
-inline constexpr char kDesktopSiteWindowSettingEnabled[] =
-    "desktop_site.window_setting";
-#endif
-
 }  // namespace prefs
 
 #endif  // COMPONENTS_CONTENT_SETTINGS_CORE_COMMON_PREF_NAMES_H_

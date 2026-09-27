@@ -17,11 +17,7 @@
 namespace safe_browsing {
 
 // Exposed for unittests.
-#if BUILDFLAG(IS_ANDROID)
-constexpr int kTokenFetchTimeoutDelayFromMilliseconds = 50;
-#else
 constexpr int kTokenFetchTimeoutDelayFromMilliseconds = 1000;
-#endif
 
 // Helper class for use by implementations of SafeBrowsingTokenFetcher:
 // tracks a set of outstanding access token fetches, timing out a fetch after a

@@ -72,12 +72,10 @@ class MockFeaturePromoController : public FeaturePromoController {
               HasPromoBeenDismissed,
               (const FeaturePromoParams&, FeaturePromoClosedReason*),
               (const, override));
-#if !BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(void,
               NotifyFeatureUsedIfValid,
               (const base::Feature&),
               (override));
-#endif
 
   base::WeakPtr<FeaturePromoController> GetAsWeakPtr() override;
 

@@ -23,9 +23,6 @@ class MetricsStateManager;
 // Used only for testing.
 namespace internal {
 BASE_DECLARE_FEATURE(kMetricsReportingFeature);
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kPostFREFixMetricsReportingFeature);
-#endif  // BUILDFLAG(IS_ANDROID)
 extern const char kRateParamName[];
 }  // namespace internal
 }  // namespace metrics
@@ -52,11 +49,6 @@ class ChromeMetricsServicesManagerClient
   // Determines if this client is eligible to send metrics. If they are, and
   // there was user consent, then metrics and crashes would be reported.
   static bool IsClientInSampleForMetrics();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Same as above, but specifically just for crash reporting.
-  static bool IsClientInSampleForCrashes();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Gets the sample rate for in-sample clients. If the sample rate is not
   // defined, returns false, and |rate| is unchanged, otherwise returns true,

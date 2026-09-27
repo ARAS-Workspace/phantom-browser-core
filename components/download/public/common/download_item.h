@@ -461,17 +461,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadItem : public base::SupportsUserData {
   // if no special rename handling is required.
   virtual DownloadItemRenameHandler* GetRenameHandler() = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Gets whether the download is triggered from external app.
-  virtual bool IsFromExternalApp() = 0;
-
-  // Whether the original URL can be auto opened after download. Certain
-  // download shouldn't be auto-opened after completion, e.g. triggered by
-  // context menu or from the download service, or has "content-disposition:
-  // attachment" in header.
-  virtual bool AllowAutoOpenAfterCompletion() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   //    Progress State accessors -----------------------------------------------
 
   // Simple calculation of the amount of time remaining to completion. Fills

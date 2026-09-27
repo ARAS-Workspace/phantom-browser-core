@@ -26,9 +26,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 #include "components/media_router/browser/issue_manager.h"
-#endif
 
 namespace content {
 class BrowserContext;
@@ -108,7 +106,6 @@ class MockMediaRouter : public MediaRouterBase {
                std::unique_ptr<media::FlingingController>(
                    const MediaRoute::Id& route_id));
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
   MOCK_METHOD1(GetMirroringMediaControllerHost,
                MirroringMediaControllerHost*(const MediaRoute::Id& route_id));
   IssueManager* GetIssueManager() override { return &issue_manager_; }
@@ -124,7 +121,6 @@ class MockMediaRouter : public MediaRouterBase {
   MOCK_CONST_METHOD0(GetState, base::DictValue());
   MOCK_METHOD0(GetLogger, LoggerImpl*());
   MOCK_METHOD(MediaRouterDebugger&, GetDebugger, (), (override));
-#endif
 
   MOCK_METHOD1(OnAddPresentationConnectionStateChangedCallbackInvoked,
                void(const content::PresentationConnectionStateChangedCallback&
@@ -152,9 +148,7 @@ class MockMediaRouter : public MediaRouterBase {
   base::ObserverList<MediaRoutesObserver> routes_observers_;
 
  private:
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
   IssueManager issue_manager_;
-#endif
 };
 
 }  // namespace media_router

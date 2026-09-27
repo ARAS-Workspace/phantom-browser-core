@@ -113,7 +113,6 @@ bool IsSyncingAutosignSetting(Profile* profile);
 // Returns a string URL to the Google Password Manager's passwords subpage
 std::string GetGooglePasswordManagerSubPageURLStr();
 
-#if !BUILDFLAG(IS_ANDROID)
 // Navigates to the Google Password Manager page.
 void NavigateToManagePasswordsPage(
     BrowserWindowInterface* browser,
@@ -125,8 +124,6 @@ void NavigateToPasswordDetailsPage(
     BrowserWindowInterface* browser,
     const std::string& password_domain_name,
     password_manager::ManagePasswordsReferrer referrer);
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 mojo::Remote<network::mojom::URLLoaderFactory> GetURLLoaderForMainFrame(
     content::WebContents* web_contents);

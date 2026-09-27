@@ -45,7 +45,7 @@ struct CONTENT_EXPORT MainFunctionParams {
 #if BUILDFLAG(IS_MAC)
   STACK_ALLOCATED_IGNORE("https://crbug.com/1424190")
   base::apple::ScopedNSAutoreleasePool* autorelease_pool = nullptr;
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_POSIX)
   bool zygote_child = false;
 #endif
 

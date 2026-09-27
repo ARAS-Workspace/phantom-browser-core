@@ -34,12 +34,6 @@
 #include "components/signin/public/base/binding_key_registration_token_result.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/containers/flat_map.h"
-#include "base/time/time.h"
-#endif
-
 namespace network {
 class SharedURLLoaderFactory;
 class TestURLLoaderFactory;
@@ -493,50 +487,6 @@ class IdentityManager : public KeyedService,
   // new account is later added.
   void PrepareForAddingNewAccount();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Get the reference on the java IdentityManager.
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject() const;
-
-  // Get the reference on the java IdentityManager.
-  static IdentityManager* FromJavaObject(
-      JNIEnv* env,
-      const base::android::JavaRef<jobject>& j_identity_manager);
-
-  // Provide the reference on the java IdentityMutator.
-  base::android::ScopedJavaLocalRef<jobject> GetIdentityMutatorJavaObject();
-
-  // This method refreshes the AccountInfo associated with |account_id| when
-  // the existing account info is stale. Otherwise it's a no-op.
-  // This method triggers an OnExtendedAccountInfoUpdated() callback if the
-  // info was successfully fetched.
-  void RefreshAccountInfoIfStale(const CoreAccountId& account_id);
-
-  // Overloads for calls from java:
-  bool HasPrimaryAccount(JNIEnv* env) const;
-
-  base::android::ScopedJavaLocalRef<jobject> GetPrimaryAccountInfo(
-      JNIEnv* env) const;
-
-  base::android::ScopedJavaLocalRef<jobject> GetPrimaryAccountId(
-      JNIEnv* env) const;
-
-  base::android::ScopedJavaLocalRef<jobject> FindExtendedAccountInfoByAccountId(
-      JNIEnv* env,
-      const base::android::JavaRef<jobject>& j_account_id) const;
-
-  base::android::ScopedJavaLocalRef<jobject>
-  FindExtendedAccountInfoByEmailAddress(
-      JNIEnv* env,
-      const base::android::JavaRef<jstring>& j_email) const;
-
-  // Refreshes all accounts with refresh tokens if they are stale. See
-  // RefreshAccountInfoIfStale(const CoreAccountId&).
-  void RefreshAccountInfoIfStale(JNIEnv* env);
-
-  // Returns true if the browser allows the primary account to be cleared.
-  bool IsClearPrimaryAccountAllowed(JNIEnv* env) const;
-#endif
-
   // Returns a weak pointer of this.
   base::WeakPtr<IdentityManager> GetWeakPtr();
 
@@ -756,10 +706,6 @@ class IdentityManager : public KeyedService,
   base::ObserverList<DiagnosticsObserver, true>::Unchecked
       diagnostics_observation_list_;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Java-side IdentityManager object.
-  base::android::ScopedJavaGlobalRef<jobject> java_identity_manager_;
-#endif
   base::WeakPtrFactory<IdentityManager> weak_pointer_factory_;
 };
 
@@ -783,23 +729,5 @@ struct ScopedObservationTraits<signin::IdentityManager,
 };
 
 }  // namespace base
-
-#if BUILDFLAG(IS_ANDROID)
-namespace jni_zero {
-template <>
-inline signin::IdentityManager* FromJniType<signin::IdentityManager*>(
-    JNIEnv* env,
-    const JavaRef<jobject>& j_identity_manager) {
-  return signin::IdentityManager::FromJavaObject(env, j_identity_manager);
-}
-
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType(
-    JNIEnv* env,
-    signin::IdentityManager* identity_manager) {
-  return identity_manager ? identity_manager->GetJavaObject() : nullptr;
-}
-}  // namespace jni_zero
-#endif
 
 #endif  // COMPONENTS_SIGNIN_PUBLIC_IDENTITY_MANAGER_IDENTITY_MANAGER_H_

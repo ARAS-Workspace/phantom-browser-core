@@ -14,9 +14,7 @@
 #include "extensions/common/mojom/view_type.mojom.h"  // nogncheck
 #endif  // !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if !BUILDFLAG(IS_ANDROID)
 class BackgroundContents;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 class WebContents;
@@ -36,7 +34,6 @@ class WebContentsTags {
   WebContentsTags(const WebContentsTags&) = delete;
   WebContentsTags& operator=(const WebContentsTags&) = delete;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Tags a BackgroundContents so that it shows up in the task manager. Calling
   // this function creates a BackgroundContentsTag, and attaches it to
   // |web_contents|. If an instance is already attached, this does nothing. The
@@ -45,7 +42,6 @@ class WebContentsTags {
   static void CreateForBackgroundContents(
       content::WebContents* web_contents,
       BackgroundContents* background_contents);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Tags a DevTools WebContents so that it shows up in the task manager.
   // Calling this function creates a DevToolsTag, and attaches it to

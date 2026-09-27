@@ -33,10 +33,8 @@ std::optional<std::string> TryGetEnrollmentDomain(
 
 bool GetSiteIsolationEnabled();
 
-#if !BUILDFLAG(IS_ANDROID)
 // Returns the hostname of the current machine.
 std::string GetHostName();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Returns the hostname of the current machine.
@@ -50,12 +48,6 @@ SettingValue GetOSFirewall();
 // Returns the path to the ufw configuration file.
 const char** GetUfwConfigPath();
 #endif  // BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_ANDROID)
-// Get the last date a security patch is applied on the device, in the format of
-// milliseconds since epoch.
-std::optional<int64_t> GetSecurityPatchLevelEpoch();
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace device_signals
 

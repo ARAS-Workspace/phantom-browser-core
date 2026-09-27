@@ -28,11 +28,9 @@ namespace gpu {
 
 class Buffer;
 
-#if !BUILDFLAG(IS_ANDROID)
 #define CMD_HELPER_PERIODIC_FLUSH_CHECK
 const int kCommandsPerFlushCheck = 100;
 const int kPeriodicFlushDelayInMicroseconds = 500;
-#endif
 
 const int kAutoFlushSmall = 16;  // 1/16 of the buffer
 const int kAutoFlushBig = 2;     // 1/2 of the buffer

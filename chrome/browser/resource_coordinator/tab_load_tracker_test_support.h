@@ -29,7 +29,6 @@ bool WaitForTransitionToLoading(content::WebContents* contents);
 bool WaitForTransitionToLoaded(content::WebContents* contents);
 bool WaitUntilNoLongerTracked(content::WebContents* contents);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Waits until all tabs in a TabStripModel have transitioned to a given state.
 bool WaitForTransitionToLoadingState(
     TabStripModel* tab_strip,
@@ -37,7 +36,6 @@ bool WaitForTransitionToLoadingState(
 bool WaitForTransitionToUnloaded(TabStripModel* tab_strip);
 bool WaitForTransitionToLoading(TabStripModel* tab_strip);
 bool WaitForTransitionToLoaded(TabStripModel* tab_strip);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace resource_coordinator
 

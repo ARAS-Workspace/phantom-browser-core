@@ -17,38 +17,22 @@
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/user_education/product_messaging/product_messaging_controller.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/tailored_security/consented_message_android.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_list_observer.h"
-#include "chrome/browser/ui/android/tab_model/tab_model_observer.h"
-#else
 #include "chrome/browser/ui/views/safe_browsing/tailored_security_desktop_dialog_manager.h"
-#endif
 
 class BrowserWindowInterface;
 class Profile;
 
-#if !BUILDFLAG(IS_ANDROID)
 DECLARE_PRODUCT_MESSAGE_KEY(
     kEnabledEnhancedBrowsingNotice,
     user_education::ProductMessageType::kLegalOrComplianceNotice);
 DECLARE_PRODUCT_MESSAGE_KEY(
     kDisabledEnhancedBrowsingNotice,
     user_education::ProductMessageType::kLegalOrComplianceNotice);
-#endif
 
 namespace safe_browsing {
 
-#if BUILDFLAG(IS_ANDROID)
 class ChromeTailoredSecurityService : public TailoredSecurityService,
-                                      public TailoredSecurityServiceObserver,
-                                      public TabModelObserver,
-                                      public TabModelListObserver
-#else
-class ChromeTailoredSecurityService : public TailoredSecurityService,
-                                      public TailoredSecurityServiceObserver
-#endif
-{
+                                      public TailoredSecurityServiceObserver {
  public:
   // The amount of time to wait after construction before checking if a retry is
   // needed.
@@ -66,31 +50,20 @@ class ChromeTailoredSecurityService : public TailoredSecurityService,
   ~ChromeTailoredSecurityService() override;
 
   void OnSyncNotificationMessageRequest(bool is_enabled) override;
-#if BUILDFLAG(IS_ANDROID)
-  // TabModelObserver::
-  void DidAddTab(TabAndroid* tab, TabModel::TabLaunchType type) override;
-  // TabModelListObserver::
-  void OnTabModelAdded(TabModel* tab_model) override;
-  void OnTabModelRemoved(TabModel* tab_model) override;
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
   void TriggerDialogDisplay(
       bool is_enabled,
       user_education::ProductMessagingHandle messaging_priority_handle);
   void ReleaseEnabledQueueHandle();
   void ReleaseDisabledQueueHandle();
   void QueueNotice(bool is_enabled);
-#endif
 
  protected:
-#if !BUILDFLAG(IS_ANDROID)
   // Shows a dialog on the provided `browser`. If `show_enable_dialog` is
   // true, display the enabled dialog; otherwise show the disabled dialog.
   // This method is virtual to support testing.
   virtual void DisplayDesktopDialog(BrowserWindowInterface* browser,
                                     bool show_enable_dialog);
-#endif
 
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory() override;
 
@@ -128,25 +101,7 @@ class ChromeTailoredSecurityService : public TailoredSecurityService,
       ChromeTailoredSecurityService::TailoredSecurityShouldRetryOutcome
           outcome);
 
-#if BUILDFLAG(IS_ANDROID)
-  void MessageDismissed();
-
-  // Registers this as an observer on the TabModelList and, if possible, on a
-  // TabModel.
-  void RegisterObserver();
-  void AddTabModelListObserver();
-  void AddTabModelObserver();
-  void RemoveTabModelListObserver();
-  void RemoveTabModelObserver();
-  // This tab model is used for the observer based retry mechanism.
-  // We can't depend on this being set as a tab can be deleted at
-  // any time.
-  raw_ptr<TabModel> observed_tab_model_ = nullptr;
-  bool observing_tab_model_list_ = false;
-  std::unique_ptr<TailoredSecurityConsentedModalAndroid> message_;
-#else
   TailoredSecurityDesktopDialogManager dialog_manager_;
-#endif
 
   void MaybeRetryForSyncUsers();
   bool ShouldRetryForSyncUsers();
@@ -157,11 +112,9 @@ class ChromeTailoredSecurityService : public TailoredSecurityService,
   // The retry handler used to manage retry logic.
   std::unique_ptr<MessageRetryHandler> retry_handler_;
 
-#if !BUILDFLAG(IS_ANDROID)
   user_education::ProductMessagingHandle enabled_notice_handle_;
   user_education::ProductMessagingHandle disabled_notice_handle_;
   base::WeakPtrFactory<ChromeTailoredSecurityService> weak_factory_{this};
-#endif
 };
 
 }  // namespace safe_browsing

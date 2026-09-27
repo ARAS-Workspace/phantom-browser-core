@@ -67,9 +67,7 @@ class SyncSessionsWebContentsRouter : public LocalSessionEventRouter,
   syncer::SyncableService::StartSyncFlare flare_;
   raw_ptr<LocalSessionEventHandler> handler_ = nullptr;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<BrowserListRouterHelper> browser_list_helper_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace sync_sessions

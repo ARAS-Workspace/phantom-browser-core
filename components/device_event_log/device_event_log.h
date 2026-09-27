@@ -86,15 +86,9 @@
   DEVICE_LOG(::device_event_log::LOG_TYPE_FIRMWARE, \
              ::device_event_log::LOG_LEVEL_##level)
 
-#if BUILDFLAG(IS_ANDROID) && defined(OFFICIAL_BUILD)
-// FIDO_LOG is discarded for release Android builds in order to reduce binary
-// size.
-#define FIDO_LOG(level) EAT_CHECK_STREAM_PARAMS()
-#else
 #define FIDO_LOG(level)                         \
   DEVICE_LOG(::device_event_log::LOG_TYPE_FIDO, \
              ::device_event_log::LOG_LEVEL_##level)
-#endif
 
 // Generally prefer the above macros unless |type| or |level| is not constant.
 

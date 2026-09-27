@@ -17,10 +17,6 @@
 #include "components/signin/internal/identity_manager/account_info_util.h"
 #include "components/signin/public/identity_manager/tribool.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace ios {
 class AccountCapabilitiesFetcherIOS;
 }  // namespace ios
@@ -40,15 +36,6 @@ class AccountCapabilities {
   AccountCapabilities& operator=(const AccountCapabilities& other);
   AccountCapabilities& operator=(AccountCapabilities&& other) noexcept;
 
-#if BUILDFLAG(IS_ANDROID)
-  static AccountCapabilities ConvertFromJavaAccountCapabilities(
-      JNIEnv* env,
-      const base::android::JavaRef<jobject>& accountCapabilities);
-
-  base::android::ScopedJavaLocalRef<jobject> ConvertToJavaAccountCapabilities(
-      JNIEnv* env) const;
-#endif
-
   explicit AccountCapabilities(base::flat_map<std::string, bool> capabilities);
 
   // Resets the cached list of supported account capability names.
@@ -65,11 +52,9 @@ class AccountCapabilities {
   // Chrome can display the email address for accounts with this capability.
   signin::Tribool can_have_email_address_displayed() const;
 
-#if !BUILDFLAG(IS_ANDROID)
   // The primary account type is suitable for choice screens. Signals that are
   // not account-type specific should be checked separately.
   signin::Tribool can_make_chrome_search_engine_choice_screen_choice() const;
-#endif
 
   // Chrome can run privacy sandbox trials for accounts with this capability.
   signin::Tribool can_run_chrome_privacy_sandbox_trials() const;

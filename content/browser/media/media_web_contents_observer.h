@@ -38,10 +38,6 @@
 #include "mojo/public/cpp/bindings/remote.h"
 #include "services/device/public/mojom/wake_lock.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/android/view_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace blink {
 enum class WebFullscreenVideoStatus;
 }  // namespace blink

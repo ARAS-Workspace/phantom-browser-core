@@ -29,9 +29,6 @@ namespace features {
 // All features in alphabetical order. The features should be documented
 // alongside the definition of their values in the .cc file.
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kAllowUnmutedAutoplayForTWA);
-#endif  // BUILDFLAG(IS_ANDROID)
 BASE_DECLARE_FEATURE(kAutocompleteActionPredictorConfidenceCutoff);
 BASE_DECLARE_FEATURE(kBookmarkTriggerForPrerender2KillSwitch);
 BASE_DECLARE_FEATURE(kBookmarkTriggerForPreconnect);
@@ -53,9 +50,7 @@ BASE_DECLARE_FEATURE(kFlexOrgManagementDisclosure);
 BASE_DECLARE_FEATURE(kInitialExternalExtensions);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_DECLARE_FEATURE(kMuteNotificationSnoozeAction);
-#endif
 
 BASE_DECLARE_FEATURE(kNetworkAnnotationMonitoring);
 BASE_DECLARE_FEATURE(kNewTabPageTriggerForPrerender2);
@@ -69,9 +64,7 @@ const base::FeatureParam<int>
         &features::kNewTabPageTriggerForPrefetch,
         "prefetch_start_delay_on_mouse_hover_ms", 300};
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_DECLARE_FEATURE(kNotificationOneTapUnsubscribeOnDesktop);
-#endif
 
 BASE_DECLARE_FEATURE(kRestartNetworkServiceUnsandboxedForFailedLaunch);
 BASE_DECLARE_FEATURE(kSandboxExternalProtocolBlocked);

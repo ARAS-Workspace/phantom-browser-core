@@ -55,9 +55,9 @@ inline constexpr char kMimeTypePortalFileTransfer[] =
 inline constexpr char kMimeTypePortalFiles[] = "application/vnd.portal.files";
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 inline constexpr char kMimeTypeSourceUrl[] = "chromium/x-source-url";
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // ----- EVERYTHING EXCEPT FOR APPLE MIME TYPES -----
 
@@ -158,11 +158,6 @@ extern NSString* const kUTTypeChromiumBookmarkDictionaryList;
 #endif  // BUILDFLAG(IS_APPLE)
 
 // ----- ANDROID MIME TYPES -----
-
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr char kMimeTypeImageUri[] = "image-uri";
-inline constexpr char16_t kMimeTypeImageUri16[] = u"image-uri";
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // ----- OTHER RELATED CONSTANTS -----
 

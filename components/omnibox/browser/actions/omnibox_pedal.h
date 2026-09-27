@@ -233,11 +233,6 @@ class OmniboxPedal : public OmniboxAction {
   size_t EstimateMemoryUsage() const override;
   OmniboxActionId ActionId() const override;
 
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetOrCreateJavaObject(
-      JNIEnv* env) const override;
-#endif
-
  protected:
   FRIEND_TEST_ALL_PREFIXES(OmniboxPedalTest, SynonymGroupErasesFirstMatchOnly);
   FRIEND_TEST_ALL_PREFIXES(OmniboxPedalTest, SynonymGroupsDriveConceptMatches);

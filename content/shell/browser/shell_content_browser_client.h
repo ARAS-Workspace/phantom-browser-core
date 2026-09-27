@@ -121,12 +121,12 @@ class ShellContentBrowserClient : public ContentBrowserClient {
       bool is_for_isolated_world,
       bool is_for_service_worker,
       network::mojom::URLLoaderFactoryParams* factory_params) override;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   void GetAdditionalMappedFilesForChildProcess(
       const base::CommandLine& command_line,
       int child_process_id,
       content::PosixFileDescriptorInfo* mappings) override;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
   device::GeolocationSystemPermissionManager*
   GetGeolocationSystemPermissionManager() override;
   void OnNetworkServiceCreated(

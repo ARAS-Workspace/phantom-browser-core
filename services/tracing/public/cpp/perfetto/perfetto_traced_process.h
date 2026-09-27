@@ -232,9 +232,9 @@ class COMPONENT_EXPORT(TRACING_CPP) PerfettoTracedProcess final
     return platform_.get();
   }
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   void DeferOrConnectProducerSocket(perfetto::CreateSocketCallback cb);
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
  private:
   friend class base::NoDestructor<PerfettoTracedProcess>;
@@ -264,9 +264,9 @@ class COMPONENT_EXPORT(TRACING_CPP) PerfettoTracedProcess final
   scoped_refptr<base::SequencedTaskRunner> task_runner_;
 
   bool will_trace_thread_restart_ = false;
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX)
   base::OnceClosure system_tracing_producer_socket_cb_;
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_POSIX)
 
   // Platform implementation for the Perfetto client library.
   std::unique_ptr<base::tracing::PerfettoPlatform> platform_;

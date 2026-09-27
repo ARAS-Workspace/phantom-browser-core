@@ -73,11 +73,7 @@ class COMPONENT_EXPORT(PRINTING_METAFILE) MetafileSkia : public Metafile {
                   bool fit_to_page) const override;
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  bool SaveToFileDescriptor(int fd) const override;
-#else
   bool SaveTo(base::File* file) const override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Unlike FinishPage() or FinishDocument(), this is for out-of-process
   // subframe printing. It will just serialize the content into SkPicture

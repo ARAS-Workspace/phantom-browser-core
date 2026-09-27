@@ -24,11 +24,6 @@ class UIThreadSearchTermsData : public SearchTermsData {
   std::string GetSearchClient() const override;
   std::string GoogleImageSearchSource() const override;
 
-#if BUILDFLAG(IS_ANDROID)
-  std::string GetYandexReferralID() const override;
-  std::string GetMailRUReferralID() const override;
-#endif
-
   // Estimates dynamic memory usage.
   // See base/trace_event/memory_usage_estimator.h for more info.
   size_t EstimateMemoryUsage() const override;

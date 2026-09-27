@@ -18,11 +18,7 @@
 #include "third_party/webrtc/modules/desktop_capture/desktop_frame.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/java_handler_thread.h"
-#else
 #include "base/threading/thread.h"
-#endif
 
 namespace base {
 class TickClock;
@@ -100,11 +96,7 @@ class CONTENT_EXPORT DesktopCaptureDevice : public media::VideoCaptureDevice {
   // thread *should* be stopped by consumers with StopAndDeAllocate, some edge
   // cases may mean that there is either not a chance for it to be called, or it
   // may have been called but not yet scheduled to run.
-#if BUILDFLAG(IS_ANDROID)
-  base::android::JavaHandlerThread thread_;
-#else
   base::Thread thread_;
-#endif
 };
 
 }  // namespace content

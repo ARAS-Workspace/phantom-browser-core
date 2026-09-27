@@ -51,11 +51,9 @@ class StatusTray;
 class SystemNetworkContextManager;
 class WebRtcLogUploader;
 
-#if !BUILDFLAG(IS_ANDROID)
 class HidSystemTrayIcon;
 class UsbSystemTrayIcon;
 class IntranetRedirectDetector;
-#endif
 
 namespace embedder_support {
 class OriginTrialsSettingsStorage;
@@ -224,9 +222,7 @@ class BrowserProcess {
   virtual supervised_user::DeviceParentalControls&
   device_parental_controls() = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
   virtual IntranetRedirectDetector* intranet_redirect_detector() = 0;
-#endif
 
   // Sets or gets the locale used by the application. It is the IETF language
   // tag, defined in BCP 47. The region subtag is not included when it adds no
@@ -303,7 +299,6 @@ class BrowserProcess {
   // through the policy engine.
   virtual SerialPolicyAllowedPorts* serial_policy_allowed_ports() = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns the object which maintains Human Interface Device (HID) system tray
   // icon.
   virtual HidSystemTrayIcon* hid_system_tray_icon() = 0;
@@ -315,7 +310,6 @@ class BrowserProcess {
   virtual UsbSystemTrayIcon* usb_system_tray_icon() = 0;
   virtual void set_usb_system_tray_icon_for_test(
       std::unique_ptr<UsbSystemTrayIcon> icon) = 0;
-#endif
 
   // Obtain the browser instance of OSCryptAsync, which should be used for data
   // encryption.

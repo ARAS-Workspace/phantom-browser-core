@@ -12,6 +12,6 @@
 #include "media/media_buildflags.h"
 #include "services/network/public/cpp/p2p_param_traits.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/services/file_util/public/mojom/safe_archive_analyzer_param_traits.h"
 #endif

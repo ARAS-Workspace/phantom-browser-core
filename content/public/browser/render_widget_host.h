@@ -253,32 +253,11 @@ class CONTENT_EXPORT RenderWidgetHost {
                                  blink::mojom::InputEventResultSource source,
                                  blink::mojom::InputEventResultState state,
                                  const blink::WebInputEvent&) {}
-
-#if BUILDFLAG(IS_ANDROID)
-    // Not all key events are triggered through InputEvent on Android.
-    // InputEvents are only triggered when user typed in through number bar on
-    // Android keyboard. This function is triggered when text is committed in
-    // input form.
-    virtual void OnImeTextCommittedEvent(const std::u16string& text_str) {}
-    // This function is triggered when composing text is updated. Note that
-    // text_str contains all text that is currently under composition rather
-    // than updated text only.
-    virtual void OnImeSetComposingTextEvent(const std::u16string& text_str) {}
-    // This function is triggered when composing text is filled into the input
-    // form.
-    virtual void OnImeFinishComposingTextEvent() {}
-#endif
   };
 
   // Add/remove an input event observer.
   virtual void AddInputEventObserver(InputEventObserver* observer) = 0;
   virtual void RemoveInputEventObserver(InputEventObserver* observer) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Add/remove an Ime input event observer.
-  virtual void AddImeInputEventObserver(InputEventObserver* observer) = 0;
-  virtual void RemoveImeInputEventObserver(InputEventObserver* observer) = 0;
-#endif
 
   // Add and remove observers for widget host events. The order in which
   // notifications are sent to observers is undefined. Observers must be sure to

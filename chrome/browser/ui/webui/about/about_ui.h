@@ -35,13 +35,11 @@ class CreditsUIConfig : public AboutUIConfigBase {
   CreditsUIConfig();
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // chrome://terms
 class TermsUIConfig : public AboutUIConfigBase {
  public:
   TermsUIConfig();
 };
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
 // chrome://linux-proxy-config

@@ -10,18 +10,11 @@
 namespace browsing_data::features {
 
 // Pipes down the BrowsingDataModel to power site settings on Android.
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kBrowsingDataModel);
-BASE_DECLARE_FEATURE(kDbdPasswordRemovalOnAndroid);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 
 // When enabled, calls to browsingData.removePasswords extension API would
 // result in an error response instead of a console warning.
 BASE_DECLARE_FEATURE(kPasswordRemovalExtensionErrorKillSwitch);
 
-#endif  // !BUILDFLAG(IS_ANDROID)
 }  // namespace browsing_data::features
 
 #endif  // COMPONENTS_BROWSING_DATA_CORE_FEATURES_H_

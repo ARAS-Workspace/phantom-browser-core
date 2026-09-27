@@ -38,11 +38,7 @@
 
 // RenderViewTest-based tests crash on Android
 // http://crbug.com/187500
-#if BUILDFLAG(IS_ANDROID)
-#define MAYBE_PrintRenderFrameHelperTest DISABLED_PrintRenderFrameHelperTest
-#else
 #define MAYBE_PrintRenderFrameHelperTest PrintRenderFrameHelperTest
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace blink {
 class WebLocalFrame;

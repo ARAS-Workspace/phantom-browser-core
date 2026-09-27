@@ -61,11 +61,6 @@ class FakeRegionalCapabilitiesServiceClient
       base::OnceCallback<void(CountryId)> on_country_id_fetched) override;
   CountryId GetFallbackCountryId() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  Program GetDeviceProgram() override;
-  FakeRegionalCapabilitiesServiceClient& SetDeviceProgram(Program program);
-#endif
-
   // Internal state setters. They return a reference to the current object for
   // chaining convenience.
   FakeRegionalCapabilitiesServiceClient& SetVariationsLatestCountryId(
@@ -78,9 +73,6 @@ class FakeRegionalCapabilitiesServiceClient
  private:
   CountryId variations_latest_country_id_;
   CountryId fetched_country_id_;
-#if BUILDFLAG(IS_ANDROID)
-  Program device_program_;
-#endif
   CountryId fallback_country_id_;
 };
 

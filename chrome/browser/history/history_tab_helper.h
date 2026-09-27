@@ -64,13 +64,6 @@ class HistoryTabHelper
     force_eligible_tab_for_testing_ = force;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Sets App ID that that goes into visit database.
-  void SetAppId(std::optional<std::string> app_id) { app_id_ = app_id; }
-  void SetClearAppIdAfterFirstCommit();
-  std::optional<std::string> GetAppId() { return app_id_; }
-#endif
-
  private:
   explicit HistoryTabHelper(content::WebContents* web_contents);
   friend class content::WebContentsUserData<HistoryTabHelper>;

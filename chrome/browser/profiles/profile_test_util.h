@@ -22,7 +22,6 @@ namespace profiles::testing {
 Profile& CreateProfileSync(ProfileManager* profile_manager,
                            const base::FilePath& path);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Helper to call `::profiles::SwitchToProfile()` synchronously during tests.
 void SwitchToProfileSync(const base::FilePath& path, bool always_create = true);
 
@@ -40,7 +39,6 @@ class ScopedNonEnterpriseDomainSetterForTesting {
       const char* domain = "example.com");
   virtual ~ScopedNonEnterpriseDomainSetterForTesting();
 };
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Overrides the ProfileSelections that a ProfileKeyedServiceFactory uses to
 // determine which profiles to create a service for.

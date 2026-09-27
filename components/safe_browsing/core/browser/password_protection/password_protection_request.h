@@ -221,11 +221,6 @@ class PasswordProtectionRequest
   virtual void MaybeCollectVisualFeatures() = 0;
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(IS_ANDROID)
-  // Sets the referring app info.
-  virtual void SetReferringAppInfo() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Start a timer to cancel the request if it takes too long.
   void StartTimeout();
 

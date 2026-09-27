@@ -87,13 +87,6 @@ class AccountPreviewDataService : public KeyedService {
       const GaiaId& gaia_id,
       base::OnceCallback<void(std::optional<AccountPreviewPreference>)>
           callback) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Updates the account currently used by the external 1P app. A null/empty
-  // value means that no account is signed-in in the app.
-  virtual void UpdateExternalAppAccount(
-      const std::optional<std::string>& email) = 0;
-#endif
 };
 
 }  // namespace signin

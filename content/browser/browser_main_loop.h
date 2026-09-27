@@ -101,10 +101,6 @@ namespace responsiveness {
 class Watcher;
 }  // namespace responsiveness
 
-#if BUILDFLAG(IS_ANDROID)
-class ScreenOrientationDelegate;
-#endif
-
 // Implements the main browser loop stages called from BrowserMainRunner.
 // See comments in browser_main_parts.h for additional info.
 class CONTENT_EXPORT BrowserMainLoop {
@@ -192,23 +188,11 @@ class CONTENT_EXPORT BrowserMainLoop {
 
   gpu::GpuChannelEstablishFactory* gpu_channel_establish_factory() const;
 
-#if BUILDFLAG(IS_ANDROID)
-  void SynchronouslyFlushStartupTasks(bool was_posted);
-
-  // |enabled| Whether or not CreateStartupTasks() posts any tasks. This is
-  // useful because some javatests want to test native task posting without the
-  // whole browser loaded. In that scenario tasks posted by CreateStartupTasks()
-  // may crash if run.
-  static void EnableStartupTasks(bool enabled);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
   // TODO(fsamuel): We should find an object to own HostFrameSinkManager on all
   // platforms including Android. See http://crbug.com/732507.
   viz::HostFrameSinkManager* host_frame_sink_manager() const {
     return host_frame_sink_manager_.get();
   }
-#endif
 
   // Binds a receiver to the singleton CompositingModeReporter.
   void GetCompositingModeReporter(
@@ -315,10 +299,6 @@ class CONTENT_EXPORT BrowserMainLoop {
   std::unique_ptr<ScreenlockMonitor> screenlock_monitor_;
   // Per-process listener for online state changes.
   std::unique_ptr<BrowserOnlineStateObserver> online_state_observer_;
-#if BUILDFLAG(IS_ANDROID)
-  // Android implementation of ScreenOrientationDelegate
-  std::unique_ptr<ScreenOrientationDelegate> screen_orientation_delegate_;
-#endif
   std::unique_ptr<BrowserAccessibilityStateImpl> browser_accessibility_state_;
 
   // Destroy |parts_| before above members (except the ones that are explicitly
@@ -369,7 +349,6 @@ class CONTENT_EXPORT BrowserMainLoop {
       startup_tracing_controller_;
   std::unique_ptr<tracing::BackgroundTracingManager>
       background_tracing_manager_;
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<viz::HostFrameSinkManager> host_frame_sink_manager_;
 
   // Reports on the compositing mode in the system for clients to submit
@@ -377,7 +356,6 @@ class CONTENT_EXPORT BrowserMainLoop {
   // is not in this process.
   std::unique_ptr<viz::CompositingModeReporterImpl>
       compositing_mode_reporter_impl_;
-#endif
   // ***************************************************************************
   // END Members initialized in |PostCreateThreads()| --------------------------
 

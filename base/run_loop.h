@@ -29,10 +29,6 @@ class ScopedRunLoopTimeout;
 class ScopedDisableRunLoopTimeout;
 }  // namespace test
 
-#if BUILDFLAG(IS_ANDROID)
-class MessagePumpAndroid;
-#endif
-
 class SingleThreadTaskRunner;
 
 // Helper class to run the RunLoop::Delegate associated with the current thread.
@@ -259,12 +255,6 @@ class BASE_EXPORT RunLoop {
  private:
   FRIEND_TEST_ALL_PREFIXES(SingleThreadTaskExecutorTypedTest,
                            RunLoopQuitOrderAfter);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Android doesn't support the blocking RunLoop::Run, so it calls
-  // BeforeRun and AfterRun directly.
-  friend class MessagePumpAndroid;
-#endif
 
   // Support for //base/test/scoped_run_loop_timeout.h.
   friend class test::ScopedRunLoopTimeout;

@@ -54,9 +54,6 @@ class TestMetricsServiceClient : public MetricsServiceClient {
       std::string_view mime_type,
       MetricsLogUploader::MetricServiceType service_type,
       const MetricsLogUploader::UploadCallback& on_upload_complete) override;
-#if BUILDFLAG(IS_ANDROID)
-  bool IsJobSchedulerSupported() const override;
-#endif  // BUILDFLAG(IS_ANDROID)
   base::TimeDelta GetStandardUploadInterval() override;
   bool IsReportingPolicyManaged() override;
   EnableMetricsDefault GetMetricsReportingDefaultState() override;

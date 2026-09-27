@@ -48,12 +48,6 @@ class SafeBrowsingContentUIHandler : public content::WebUIMessageHandler,
   // Get the current referrer chain for a given URL.
   void GetReferrerChain(const base::ListValue& args);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Get the referring app info that launches Chroevent_observer_me on Android.
-  // Always set to null if it's called from platforms other than Android.
-  void GetReferringAppInfo(const base::ListValue& args);
-#endif
-
   // Sets the WebUI for testing
   void SetWebUIForTesting(content::WebUI* web_ui);
 

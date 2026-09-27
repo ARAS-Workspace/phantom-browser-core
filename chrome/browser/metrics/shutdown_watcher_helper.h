@@ -14,7 +14,6 @@
 // ShutdownWatcherHelper is useless on Android because there is no shutdown,
 // Chrome is always killed one way or another (swiped away in the task
 // switcher, OOM-killed, etc.).
-#if !BUILDFLAG(IS_ANDROID)
 // This is a wrapper class for detecting hangs during shutdown.
 class ShutdownWatcherHelper : public base::Watchdog::Delegate {
  public:
@@ -38,7 +37,5 @@ class ShutdownWatcherHelper : public base::Watchdog::Delegate {
   std::optional<base::Watchdog> shutdown_watchdog_;
   THREAD_CHECKER(thread_checker_);
 };
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // CHROME_BROWSER_METRICS_SHUTDOWN_WATCHER_HELPER_H_

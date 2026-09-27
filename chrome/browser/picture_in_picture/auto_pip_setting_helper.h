@@ -13,9 +13,7 @@
 #include "media/base/picture_in_picture_events_info.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/picture_in_picture/auto_pip_setting_view.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 class WebContents;
@@ -25,13 +23,11 @@ namespace permissions {
 class PermissionDecisionAutoBlockerBase;
 }  // namespace permissions
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace views {
 class View;
 }  // namespace views
 
 class AutoPipSettingOverlayView;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class HostContentSettingsMap;
 
@@ -78,10 +74,8 @@ class AutoPipSettingHelper {
     kMaxValue = kNotShownIncognito,
   };
 
-#if !BUILDFLAG(IS_ANDROID)
   using ResultCb =
       base::OnceCallback<void(AutoPipSettingView::UiResult result)>;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Convenience function.
   static std::unique_ptr<AutoPipSettingHelper> CreateForWebContents(
@@ -101,7 +95,6 @@ class AutoPipSettingHelper {
   AutoPipSettingHelper(const AutoPipSettingHelper&) = delete;
   AutoPipSettingHelper(AutoPipSettingHelper&&) = delete;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Notify us that the user has closed the window.  This will cause the embargo
   // to be updated if needed.
   void OnUserClosedWindow(
@@ -118,7 +111,6 @@ class AutoPipSettingHelper {
       std::optional<ukm::SourceId> source_id,
       views::View* anchor_view,
       views::BubbleBorder::Arrow arrow);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Called by the AutoPictureInPictureTabHelper when automatic
   // picture-in-picture has been preemptively blocked. Used to record various
@@ -136,7 +128,6 @@ class AutoPipSettingHelper {
   // Update the content setting to `new_setting`, and clear any embargo.
   void UpdateContentSetting(ContentSetting new_setting);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Notify us that the user has interacted with the content settings UI that's
   // displayed in the pip window.  `close_pip_cb` will be called if the result
   // is 'block'.
@@ -154,7 +145,6 @@ class AutoPipSettingHelper {
       base::OnceClosure close_pip_cb,
       media::PictureInPictureEventsInfo::AutoPipReason auto_pip_reason,
       std::optional<ukm::SourceId> source_id);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Record metrics for the result of the prompt.
   //
@@ -176,7 +166,6 @@ class AutoPipSettingHelper {
   const raw_ptr<permissions::PermissionDecisionAutoBlockerBase> auto_blocker_ =
       nullptr;
 
-#if !BUILDFLAG(IS_ANDROID)
   base::OnceClosure close_pip_cb_;
 
   // If true, then we've shown the UI but the user hasn't picked an option yet.
@@ -184,7 +173,6 @@ class AutoPipSettingHelper {
 
   // Has the user clicked 'allow once' on any permission UI we've created?
   bool already_selected_allow_once_ = false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::WeakPtrFactory<AutoPipSettingHelper> weak_factory_{this};
 };

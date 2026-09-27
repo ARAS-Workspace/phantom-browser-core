@@ -297,7 +297,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kWebrtcMediaCapabilitiesParameters);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kWidevinePersistentLicenseSupport);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kZeroCopyDesktopCapture);
 
-#if !BUILDFLAG(IS_ANDROID)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kFileDialogsBlockPictureInPicture);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kFileDialogsTuckPictureInPicture);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaRemotingWithoutFullscreen);
@@ -305,7 +304,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kPictureInPictureOcclusionTracking);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kVideoPipDisplaySmoothnessOptimization);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(
     kVideoPipForceTrustedForMediaPlaybackForTesting);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseSequencedTaskRunnerForMojoVEAProvider);
 
@@ -342,9 +340,9 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformEncryptedDolbyVision);
 
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformHEVCDecoderSupport);
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformHEVCEncoderSupport);
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE)
 #if BUILDFLAG(IS_APPLE)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformHEVCMain10EncoderSupport);
 #endif  // BUILDFLAG(IS_APPLE)
@@ -356,40 +354,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kSymphoniaMp3Decoding);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kSymphoniaPcmDecoding);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kSymphoniaVorbisDecoding);
 #endif  // BUILDFLAG(ENABLE_SYMPHONIA)
-
-#if BUILDFLAG(IS_ANDROID)
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAllowAudioPlaybackCapture);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAllowDelayedAudioFocusGainAndroid);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAllowEnhancedPipTransition);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAllowMediaCodecSoftwareDecoder);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAndroidEnableBackgroundMediaCapturing);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAndroidZeroCopyVideoCapture);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoDocPiPPermissionPromptAndroid);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoPictureInPictureAndroid);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kContextMenuPictureInPictureAndroid);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kFullscreenVideoPictureInPicture);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaCodecBlockModel);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaCodecBlockModelOutput);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaCodecColorSpaceCleanup);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaCodecLowDelayMode);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaDrmGetStatusForPolicy);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaDrmPersistentLicense);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaDrmPreprovisioning);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaDrmPreprovisioningAtStartup);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaDrmPreprovisioningBackoff);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaDrmQueryInSeparateProcess);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kNdkVideoEncodeAcceleratorBitrateLayering);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kNdkVideoEncodeAcceleratorNativeSvc);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kNoPauseMediaOnHeadphoneUnplug);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kPauseMediaOnSystemSleepAndroid);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kRequestSystemAudioFocus);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kSkipMediaCodecReallocation);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(
-    kUseMediaCryptoRequiresSecureDecoderComponent);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseAudioLatencyFromHAL);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseAudioManagerMaxChannelLayout);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseMediaFormatCodedSize);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_APPLE)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kVTVideoEncodeAcceleratorCalculatePSNR);
@@ -509,11 +473,6 @@ MEDIA_EXPORT bool IsVideoCaptureAcceleratedJpegDecodingEnabled();
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 MEDIA_EXPORT bool IsOutOfProcessVideoDecodingEnabled();
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
-
-#if BUILDFLAG(IS_ANDROID)
-MEDIA_EXPORT bool IsAndroidZeroCopyVideoCaptureEnabled(
-    const gpu::GpuDriverBugWorkarounds& gpu_workarounds);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 MEDIA_EXPORT bool IsMacCatapSystemLoopbackCaptureSupported();

@@ -182,11 +182,6 @@ class MEDIA_EXPORT MimeUtil {
   bool GetDefaultCodec(std::string_view mime_type_lower_case,
                        Codec* default_codec) const;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Indicates the support of various codecs within the platform.
-  PlatformInfo platform_info_;
-#endif
-
   // A map of mime_types and hash map of the supported codecs for the mime_type.
   MediaFormatMappings media_format_map_;
 };

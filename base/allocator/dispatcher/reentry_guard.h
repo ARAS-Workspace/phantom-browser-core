@@ -10,13 +10,13 @@
 #include "base/compiler_specific.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 #include <pthread.h>
 #endif
 
 namespace base::allocator::dispatcher {
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 
 // The macOS implementation of libmalloc sometimes calls malloc recursively,
 // delegating allocations between zones. That causes our hooks being called

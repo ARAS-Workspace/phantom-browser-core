@@ -125,10 +125,8 @@ class TabGroupSyncServiceImpl : public TabGroupSyncService,
                      const LocalTabID& tab_id,
                      const std::u16string& title) override;
 
-#if !BUILDFLAG(IS_ANDROID)
   void SaveGroup(SavedTabGroup group) override;
   void UnsaveGroup(const LocalTabGroupID& local_id) override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void MakeTabGroupShared(const LocalTabGroupID& local_group_id,
                           const syncer::CollaborationId& collaboration_id,
@@ -450,16 +448,7 @@ class TabGroupSyncServiceImpl : public TabGroupSyncService,
       shared_tab_groups_waiting_for_collaboration_;
 
   // Obsevers of the model.
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/484371187): Investigate if reentrancy can be removed.
-  base::ObserverList<
-      TabGroupSyncService::Observer,
-      /*check_empty=*/false,
-      base::ObserverListReentrancyPolicy::kAllowReentrancyUntriaged>
-      observers_;
-#else
   base::ObserverList<TabGroupSyncService::Observer> observers_;
-#endif
 
   // Temporary storage for shared tab groups that were available at startup,
   // before applying local changes. This is retrieved by the

@@ -22,21 +22,14 @@ class ChromeBrowserMainParts;
 class PrefRegistrySimple;
 class PrefService;
 
-#if !BUILDFLAG(IS_ANDROID)
 class BatteryDischargeReporter;
 class PerformanceInterventionMetricsReporter;
 class PowerMetricsReporter;
 class ProcessMonitor;
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 class PressureMetricsReporter;
 #endif  // BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_ANDROID)
-bool IsBundleForMixedDeviceAccordingToVersionCode(
-    const std::string& version_code);
-#endif
 
 namespace web_app {
 class SamplingMetricsProvider;
@@ -109,7 +102,6 @@ class ChromeBrowserMainExtraPartsMetrics : public ChromeBrowserMainExtraParts,
 
   std::optional<display::ScopedDisplayObserver> display_observer_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // The process monitor instance. Allows collecting metrics about every child
   // process.
   std::unique_ptr<ProcessMonitor> process_monitor_;
@@ -124,7 +116,6 @@ class ChromeBrowserMainExtraPartsMetrics : public ChromeBrowserMainExtraParts,
 
   // Reports PWA metrics.
   std::unique_ptr<web_app::SamplingMetricsProvider> web_app_metrics_provider_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX)
   // Reports pressure metrics.

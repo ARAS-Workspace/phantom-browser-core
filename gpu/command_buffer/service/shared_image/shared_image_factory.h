@@ -42,10 +42,6 @@ class SharedImageCopyManager;
 struct GpuFeatureInfo;
 struct GpuPreferences;
 
-#if BUILDFLAG(IS_ANDROID)
-class AHardwareBufferImageBackingFactory;
-#endif
-
 class SharedImageFactory;
 
 // A thread-safe reference holder for SharedImageFactory. This allows
@@ -137,13 +133,11 @@ class GPU_GLES2_EXPORT SharedImageFactory {
   // Creation of native buffer handles is not supported on Android (the
   // only way that a non-null GpuMemoryBufferHandle can be created on
   // Android is by importing an external AHB).
-#if !BUILDFLAG(IS_ANDROID)
   // Creates a native GpuMemoryBufferHandle for MappableSI.
   gfx::GpuMemoryBufferHandle CreateNativeGpuMemoryBufferHandle(
       const gfx::Size& size,
       viz::SharedImageFormat format,
       gfx::BufferUsage usage);
-#endif
 
   // Fills |shared_memory| with the contents of the provided
   // |buffer_handle|. Returns whether the operation succeeded.
@@ -246,10 +240,6 @@ class GPU_GLES2_EXPORT SharedImageFactory {
 #endif
   gpu::GpuDriverBugWorkarounds workarounds_;
 
-#if BUILDFLAG(IS_ANDROID)
-  raw_ptr<AHardwareBufferImageBackingFactory> ahb_factory_ = nullptr;
-#endif
-
   raw_ptr<SharedImageBackingFactory> backing_factory_for_testing_ = nullptr;
 
   scoped_refptr<SharedImageFactoryRef> factory_ref_;
@@ -295,11 +285,6 @@ class GPU_GLES2_EXPORT SharedImageRepresentationFactory {
       const Mailbox& mailbox);
   std::unique_ptr<RasterImageRepresentation> ProduceRaster(
       const Mailbox& mailbox);
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<LegacyOverlayImageRepresentation> ProduceLegacyOverlay(
-      const Mailbox& mailbox);
-#endif
 
 #if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_OZONE)
   std::unique_ptr<VulkanImageRepresentation> ProduceVulkan(

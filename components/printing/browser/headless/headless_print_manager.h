@@ -65,11 +65,6 @@ class HeadlessPrintManager
       int32_t cookie,
       const ui::AXTreeUpdate& accessibility_tree) override;
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  void SetupScriptedPrintAndroid(
-      SetupScriptedPrintAndroidCallback callback) override;
-  void PdfWritingDone(int page_count) override;
-#endif
 
   WEB_CONTENTS_USER_DATA_KEY_DECL();
 };

@@ -26,11 +26,7 @@ struct DefaultApiKeys {
 #if BUILDFLAG(SUPPORT_CDM_SERVER_CERTIFICATE)
   const char* google_cdm_server_certificate;
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  const char* google_api_key_android_non_stable;
-#else
   const char* google_api_key_hats;
-#endif  // BUILDFLAG(IS_ANDROID)
   const char* google_api_key_remoting;
   const char* google_api_key_soda;
   const char* google_api_key_partial_translate;

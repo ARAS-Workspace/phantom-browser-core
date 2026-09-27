@@ -113,15 +113,6 @@ const PrepopulatedEngine* GetPrepopulatedEngineFromBuiltInData(
     const std::vector<raw_ptr<const PrepopulatedEngine>>&
         regional_prepopulated_engines);
 
-#if BUILDFLAG(IS_ANDROID)
-// Returns the prepopulated URLs associated with `country_code`.
-// `country_code` is a two-character uppercase ISO 3166-1 country code.
-// `prefs` is the main profile's preferences.
-std::vector<std::unique_ptr<TemplateURLData>> GetLocalPrepopulatedEngines(
-    const std::string& country_code,
-    PrefService& prefs);
-#endif
-
 // Removes prepopulated engines and their version stored in user prefs.
 void ClearPrepopulatedEnginesInPrefs(PrefService* prefs);
 

@@ -347,12 +347,6 @@ void WaitForErrorStateOfRefreshTokenUpdatedForAccount(
 // Disables internal retries of failed access token fetches.
 void DisableAccessTokenFetchRetries(IdentityManager* identity_manager);
 
-#if BUILDFLAG(IS_ANDROID)
-// Stubs AccountManagerFacade, which requires special initialization of the java
-// subsystems. Uses FakeAccountManagerFacade.
-void SetUpFakeAccountManagerFacade();
-#endif
-
 // Cancels all ongoing operations related to the accounts in the Gaia cookie.
 void CancelAllOngoingGaiaCookieOperations(IdentityManager* identity_manager);
 

@@ -19,7 +19,6 @@ MediaSink CreateDialSink(const std::string& id, const std::string& name);
 MediaSink CreateWiredDisplaySink(const std::string& id,
                                  const std::string& name);
 
-#if !BUILDFLAG(IS_ANDROID)
 class TestMediaSinkService : public MediaSinkServiceBase {
  public:
   TestMediaSinkService();
@@ -36,7 +35,6 @@ class TestMediaSinkService : public MediaSinkServiceBase {
   // Owned by MediaSinkService.
   raw_ptr<base::MockOneShotTimer> timer_;
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace media_router
 

@@ -19,19 +19,15 @@ namespace enterprise_idle {
 // Keep this enum sorted by priority.
 enum class ActionType {
   kShowDialog = 0,  // Not an IdleTimeoutAction value. Added as a side-effect.
-#if !BUILDFLAG(IS_ANDROID)
   kCloseBrowsers = 1,
   kShowProfilePicker = 2,
-#endif  // !BUILDFLAG(IS_ANDROID)
   kClearBrowsingHistory = 3,
   kClearCookiesAndOtherSiteData,
   kClearCachedImagesAndFiles,
   kClearPasswordSignin,
   kClearAutofill,
-#if !BUILDFLAG(IS_ANDROID)
   kClearDownloadHistory,
   kClearHostedAppData,
-#endif  // !BUILDFLAG(IS_ANDROID)
   kClearSiteSettings,
   kReloadPages,
   kShowBubble,  // Not an IdleTimeoutAction value. Added as a side-effect.

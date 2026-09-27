@@ -45,11 +45,9 @@ class DevToolsProtocolTestBindings : public WebContentsObserver,
   void HandleMessageFromTest(base::DictValue message);
 
   scoped_refptr<DevToolsAgentHost> agent_host_;
-#if !BUILDFLAG(IS_ANDROID)
   // DevToolsFrontendHost does not exist on Android and iOS, but we also don't
   // run web tests natively on Android.
   std::unique_ptr<DevToolsFrontendHost> frontend_host_;
-#endif
   // Log of protocol messages, used to script the bindings behavior.
   std::vector<base::DictValue> log_;
   // The index of the next message in the log.

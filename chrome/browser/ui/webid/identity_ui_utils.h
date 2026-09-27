@@ -20,14 +20,8 @@ using IdentityRequestAccountPtr =
 // and Android.
 namespace webid {
 
-#if BUILDFLAG(IS_ANDROID)
-// The desired size of the avatars of user accounts.
-inline constexpr int kDesiredAvatarSize = 40;
-#else
 // The desired size of the avatars of user accounts.
 inline constexpr int kDesiredAvatarSize = 30;
-#endif  // BUILDFLAG(IS_ANDROID)
-// The desired size of the avatars of user accounts in autofill dropdown.
 inline constexpr int kDesiredAvatarSizeInAutofillDropdown = 20;
 // The size of avatars in the modal dialog.
 inline constexpr int kModalAvatarSize = 36;

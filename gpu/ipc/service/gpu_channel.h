@@ -173,10 +173,6 @@ class GPU_IPC_SERVICE_EXPORT GpuChannel : public IPC::Listener,
 
   mojom::GpuChannel& GetGpuChannelForTesting();
 
-#if BUILDFLAG(IS_ANDROID)
-  const CommandBufferStub* GetOneStub() const;
-#endif
-
 
   SharedImageStub* shared_image_stub() const {
     return shared_image_stub_.get();

@@ -38,13 +38,6 @@ enum TerminationStatus : int {
   TERMINATION_STATUS_PROCESS_CRASHED = 3,
   // Child hasn't exited yet.
   TERMINATION_STATUS_STILL_RUNNING = 4,
-#if BUILDFLAG(IS_ANDROID)
-  // On Android processes are spawned from the system Zygote and we do not get
-  // the termination status. We can't know if the termination was a crash or an
-  // oom kill for sure, but we can use status of the strong process bindings as
-  // a hint.
-  TERMINATION_STATUS_OOM_PROTECTED = 6,
-#endif
   // Child process never launched.
   TERMINATION_STATUS_LAUNCH_FAILED = 7,
   // Out of memory.

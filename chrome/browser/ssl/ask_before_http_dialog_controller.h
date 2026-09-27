@@ -20,9 +20,7 @@
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "ui/views/widget/widget.h"
-#endif
 
 namespace content {
 class WebContents;
@@ -74,10 +72,8 @@ class AskBeforeHttpDialogController : public content::WebContentsObserver {
   GetInterstitialReasonForTesting() const;
   void ClickLearnMoreForTesting();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Closes the dialog widget, if one is open.
   void CloseDialogWidget(views::Widget::ClosedReason reason);
-#endif
 
   // content::WebContentsObserver:
   void OnVisibilityChanged(content::Visibility visibility) override;
@@ -99,13 +95,8 @@ class AskBeforeHttpDialogController : public content::WebContentsObserver {
   security_interstitials::https_only_mode::InterstitialReason warning_reason_ =
       security_interstitials::https_only_mode::InterstitialReason::kUnknown;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Pointer to the widget that contains the current open dialog, if any.
   std::unique_ptr<views::Widget> dialog_widget_;
-#else
-  // Pointer to the dialog model, if any.
-  raw_ptr<ui::DialogModel> current_dialog_model_ = nullptr;
-#endif
 
   ui::ScopedUnownedUserData<AskBeforeHttpDialogController>
       scoped_unowned_user_data_;

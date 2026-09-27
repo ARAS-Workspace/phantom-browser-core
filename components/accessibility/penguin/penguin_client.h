@@ -11,11 +11,6 @@
 #include "base/functional/callback_forward.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_string.h"
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace content {
 class BrowserContext;
 class WebContents;
@@ -76,36 +71,6 @@ class PenguinClient {
                       PenguinCompactResponseCallback callback);
   void PerformAPICall(const std::string& text_input,
                       PenguinFullResponseCallback callback);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Android equivalent methods that are called through JNI (cannot be
-  // overloaded).
-  void PerformAPICall_var1(JNIEnv* env,
-                           const base::android::JavaRef<jstring>& j_image_data,
-                           const base::android::JavaRef<jstring>& j_text_input,
-                           const base::android::JavaRef<jobject>& j_callback,
-                           bool j_include_full_response);
-
-  void PerformAPICall_var2(
-      JNIEnv* env,
-      const base::android::JavaRef<jobject>& j_web_contents,
-      const base::android::JavaRef<jstring>& j_text_input,
-      const base::android::JavaRef<jobject>& j_callback,
-      bool j_include_full_response);
-
-  void PerformAPICall_var3(
-      JNIEnv* env,
-      const base::android::JavaRef<jobject>& j_web_contents,
-      const base::android::JavaRef<jstring>& j_text_input,
-      const base::android::JavaRef<jobject>& j_callback,
-      const base::android::JavaRef<jobject>& j_source_rect,
-      bool j_include_full_response);
-
-  void PerformAPICall_var4(JNIEnv* env,
-                           const base::android::JavaRef<jstring>& j_text_input,
-                           const base::android::JavaRef<jobject>& j_callback,
-                           bool j_include_full_response);
-#endif
 };
 
 }  // namespace penguin

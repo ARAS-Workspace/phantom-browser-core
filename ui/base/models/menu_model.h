@@ -109,17 +109,6 @@ class COMPONENT_EXPORT(UI_BASE) MenuModel {
   // Returns the command id of the item at the specified index.
   virtual int GetCommandIdAt(size_t index) const = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the explicit display order of the item at the specified index.
-  // This is primarily used by Android UI bridges (such as MenuModelBridge) to
-  // intersperse and sort C++ menu items among Java-defined menu items in
-  // selection or context dropdown menus. Any non-negative value represents an
-  // explicit sort order (sorted in ascending order), while any negative value
-  // (defaulting to -1) indicates that no specific ordering is set and the item
-  // should fall back to default placement.
-  virtual int GetDisplayOrderAt(size_t index) const;
-#endif
-
   // Returns the label of the item at the specified index.
   virtual std::u16string GetLabelAt(size_t index) const = 0;
 

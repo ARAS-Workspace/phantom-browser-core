@@ -36,10 +36,6 @@
 #include "ui/gfx/image/image.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace autofill {
 
 // The index that will be used to filter suggestions for showing them in tabbed
@@ -105,10 +101,6 @@ struct Suggestion {
     AutofillAiPayload& operator=(AutofillAiPayload&&);
     ~AutofillAiPayload();
 
-#if BUILDFLAG(IS_ANDROID)
-    base::android::ScopedJavaLocalRef<jobject> CreateJavaObject() const;
-#endif  // BUILDFLAG(IS_ANDROID)
-
     friend bool operator==(const AutofillAiPayload&,
                            const AutofillAiPayload&) = default;
 
@@ -131,10 +123,6 @@ struct Suggestion {
     PaymentsPayload& operator=(const PaymentsPayload&);
     PaymentsPayload& operator=(PaymentsPayload&&);
     ~PaymentsPayload();
-
-#if BUILDFLAG(IS_ANDROID)
-    base::android::ScopedJavaLocalRef<jobject> CreateJavaObject() const;
-#endif  // BUILDFLAG(IS_ANDROID)
 
     friend bool operator==(const PaymentsPayload&,
                            const PaymentsPayload&) = default;
@@ -163,10 +151,6 @@ struct Suggestion {
     AutofillProfilePayload& operator=(const AutofillProfilePayload&);
     AutofillProfilePayload& operator=(AutofillProfilePayload&&);
     ~AutofillProfilePayload();
-
-#if BUILDFLAG(IS_ANDROID)
-    base::android::ScopedJavaLocalRef<jobject> CreateJavaObject() const;
-#endif  // BUILDFLAG(IS_ANDROID)
 
     friend bool operator==(const AutofillProfilePayload&,
                            const AutofillProfilePayload&) = default;
@@ -625,10 +609,6 @@ struct Suggestion {
   // The children of this suggestion. If present, the autofill popup will have
   // submenus.
   std::vector<Suggestion> children;
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/346469807): Remove once strings are passed directly.
-  std::u16string iph_description_text;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // This is the icon which is shown on the side of a suggestion.
   // If |custom_icon| is empty, the fallback built-in icon.

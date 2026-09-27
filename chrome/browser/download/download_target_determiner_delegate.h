@@ -117,13 +117,6 @@ class DownloadTargetDeterminerDelegate {
                                    const base::FilePath& virtual_path,
                                    DownloadConfirmationReason reason,
                                    ConfirmationCallback callback) = 0;
-#if BUILDFLAG(IS_ANDROID)
-  // Display a message prompt to the user containing an incognito warning.
-  // Should invoke |callback| upon completion.
-  virtual void RequestIncognitoWarningConfirmation(
-      content::WebContents* web_contents,
-      IncognitoWarningConfirmationCallback callback) = 0;
-#endif
   // If |virtual_path| is not a local path, should return a possibly temporary
   // local path to use for storing the downloaded file. If |virtual_path| is
   // already local, then it should return the same path. |callback| should be

@@ -68,13 +68,11 @@ class SoundContentSettingObserver
   // Determine the reason why audio was blocked on the page.
   MuteReason GetSiteMutedReason();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Update the autoplay policy on the attached |WebContents|.
   void UpdateAutoplayPolicy();
 
   // Manages registration of pref change observers.
   PrefChangeRegistrar pref_change_registrar_;
-#endif
 
   // True if we have already logged a SiteMuted UKM event since last navigation.
   bool logged_site_muted_ukm_ = false;

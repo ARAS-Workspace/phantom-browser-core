@@ -57,9 +57,7 @@
 #include "ui/base/clipboard/clipboard_metadata.h"
 
 class ChromeContentBrowserClientParts;
-#if !BUILDFLAG(IS_ANDROID)
 class FetchKeepAliveProcessManager;
-#endif
 class PrefRegistrySimple;
 class ScopedKeepAlive;
 
@@ -318,9 +316,7 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   bool ShouldUrlUseApplicationIsolationLevel(
       content::BrowserContext* browser_context,
       const GURL& url) override;
-#if !BUILDFLAG(IS_ANDROID)
   bool IsInitialWebUIURL(const GURL& url) override;
-#endif  // !BUILDFLAG(IS_ANDROID)
   bool IsTopChromeWebUIURL(const GURL& url) override;
   bool IsMultiCaptureAllowed(
       content::RenderFrameHost* render_frame_host) override;
@@ -448,9 +444,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   GetGeolocationSystemPermissionManager() override;
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  bool ShouldUseGmsCoreGeolocationProvider() override;
-#endif
   content::GeneratedCodeCacheSettings GetGeneratedCodeCacheSettings(
       content::BrowserContext* context) override;
   std::string GetWebUIHostnameForCodeCacheMetrics(
@@ -467,9 +460,7 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       bool strict_enforcement,
       base::OnceCallback<void(content::CertificateRequestResultType)> callback)
       override;
-#if !BUILDFLAG(IS_ANDROID)
   bool ShouldDenyRequestOnCertificateError(const GURL main_page_url) override;
-#endif
   base::OnceClosure SelectClientCertificate(
       content::BrowserContext* browser_context,
       int process_id,
@@ -740,7 +731,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       const url::Origin& caller_origin) override;
   content::WebAuthenticationDelegate* GetWebAuthenticationDelegate() override;
   content::HidDelegate* GetHidDelegate() override;
-#if !BUILDFLAG(IS_ANDROID)
   void CreateDeviceInfoService(
       content::RenderFrameHost* render_frame_host,
       mojo::PendingReceiver<blink::mojom::DeviceAPIService> receiver) override;
@@ -753,7 +743,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::unique_ptr<content::AuthenticatorRequestClientDelegate>
   GetWebAuthenticationRequestDelegate(
       content::RenderFrameHost* render_frame_host) override;
-#endif
   void CreateSecurePaymentConfirmationService(
       content::RenderFrameHost* render_frame_host,
       mojo::PendingReceiver<payments::mojom::SecurePaymentConfirmationService>
@@ -848,11 +837,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::BrowserContext* context,
       content::RenderFrameHost* render_frame_host) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  ContentBrowserClient::WideColorGamutHeuristic GetWideColorGamutHeuristic()
-      override;
-#endif
-
   base::flat_set<std::string> GetPluginMimeTypesWithExternalHandlers(
       content::BrowserContext* browser_context) override;
 
@@ -946,15 +930,8 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::unique_ptr<content::DigitalIdentityProvider>
   CreateDigitalIdentityProvider() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<content::NativeIdpFetcher> CreateNativeIdpFetcher(
-      const url::Origin& idp_origin) override;
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
   static base::TimeDelta GetKeepaliveTimerTimeout(
       content::BrowserContext* context);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   bool SuppressDifferentOriginSubframeJSDialogs(
       content::BrowserContext* browser_context) override;
@@ -1107,14 +1084,12 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
           language_detection::mojom::ContentLanguageDetectionDriver> receiver)
       override;
 
-#if !BUILDFLAG(IS_ANDROID)
   void QueryInstalledWebAppsByManifestId(
       const GURL& frame_url,
       const GURL& manifest_id,
       content::BrowserContext* browser_context,
       base::OnceCallback<void(std::optional<blink::mojom::RelatedApplication>)>
           callback) override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   bool ShouldDispatchPagehideDuringCommit(
       content::BrowserContext* browser_context,
@@ -1152,10 +1127,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       const ui::ClipboardSequenceNumberToken& seqno) override;
 
   bool UsePrefetchPrerenderIntegration() override;
-
-#if BUILDFLAG(IS_ANDROID)
-  bool ShouldAllowSystemUiPopups(content::WebContents* web_contents) override;
-#endif
 
   std::optional<int> GetCpuPerformanceTierOverride(
       content::BrowserContext* browser_context) override;
@@ -1275,10 +1246,8 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       Profile* profile);
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   void OnKeepaliveTimerFired(
       std::unique_ptr<ScopedKeepAlive> keep_alive_handle);
-#endif
 
   // If `factory_builder` will be backed by the network service
   // (`is_for_network_service` == true), and
@@ -1308,10 +1277,8 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::unique_ptr<ChromeWebAuthenticationDelegateBase>
       web_authentication_delegate_;
   std::unique_ptr<ChromeHidDelegate> hid_delegate_;
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<ChromeDirectSocketsDelegate> direct_sockets_delegate_;
   std::unique_ptr<ChromeSensorDelegate> sensor_delegate_;
-#endif
   std::unique_ptr<ChromeBluetoothDelegate> bluetooth_delegate_;
   std::unique_ptr<ChromeUsbDelegate> usb_delegate_;
   std::unique_ptr<ChromeSerialDelegate> serial_delegate_;
@@ -1327,7 +1294,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   // Handles web-browser implementation of the http auth feature.
   std::unique_ptr<HttpAuthCoordinator> http_auth_coordinator_;
 
-#if !BUILDFLAG(IS_ANDROID)
   uint64_t num_keepalive_requests_ = 0;
   base::OneShotTimer keepalive_timer_;
   base::TimeTicks keepalive_deadline_;
@@ -1337,7 +1303,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   // first request when features::kKeepAliveBrowserProcessAlive is enabled.
   std::unique_ptr<FetchKeepAliveProcessManager>
       fetch_keepalive_process_manager_;
-#endif
 
 #if BUILDFLAG(IS_MAC)
   std::string GetChildProcessSuffix(int child_flags) override;

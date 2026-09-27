@@ -152,10 +152,6 @@ class PasswordProtectionRequestContent final
 
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(IS_ANDROID)
-  void SetReferringAppInfo() override;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // WebContents of the password protection event.
   raw_ptr<content::WebContents, DanglingUntriaged> web_contents_;
 

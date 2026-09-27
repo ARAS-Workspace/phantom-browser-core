@@ -34,11 +34,6 @@
 #include "ui/gfx/overlay_transform.h"
 #include "ui/latency/latency_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/viz/common/quads/selection.h"
-#include "ui/gfx/selection_bound.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace base::trace_event {
 class TracedValue;
 }  // namespace base::trace_event

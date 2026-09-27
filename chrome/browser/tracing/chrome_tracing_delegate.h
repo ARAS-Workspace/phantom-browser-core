@@ -12,11 +12,7 @@
 #include "build/build_config.h"
 #include "content/public/browser/tracing_delegate.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model_list_observer.h"
-#else
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"  // nogncheck crbug.com/40147906
-#endif
 
 class BrowserWindowInterface;
 
@@ -40,12 +36,7 @@ enum class TracingFinalizationDisallowedReason {
 };
 
 class ChromeTracingDelegate : public content::TracingDelegate,
-#if BUILDFLAG(IS_ANDROID)
-                              public TabModelListObserver
-#else
-                              public BrowserCollectionObserver
-#endif
-{
+                              public BrowserCollectionObserver {
  public:
   // Whether system-wide performance trace collection using the external system
   // tracing service is enabled.
@@ -67,15 +58,9 @@ class ChromeTracingDelegate : public content::TracingDelegate,
   CreateChromeMetadataPacketRecorder() const override;
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  // TabModelListObserver implementation.
-  void OnTabModelAdded(TabModel* tab_model) override;
-  void OnTabModelRemoved(TabModel* tab_model) override;
-#else
   // BrowserCollectionObserver:
   void OnBrowserCreated(BrowserWindowInterface* browser) override;
   void OnBrowserClosed(BrowserWindowInterface* browser) override;
-#endif
 
   // Track the most recent OffTheRecord browser creation time. It's ok to update
   // to a newer timestamp when there are multiple OffTheRecord browsers, since

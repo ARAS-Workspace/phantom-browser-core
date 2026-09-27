@@ -48,9 +48,6 @@ class CardUnmaskOtpInputDialogControllerImpl
   void OnNewCodeLinkClicked() override;
   std::u16string GetWindowTitle() const override;
   std::u16string GetTextfieldPlaceholderText() const override;
-#if BUILDFLAG(IS_ANDROID)
-  int GetExpectedOtpLength() const override;
-#endif
   bool IsValidOtp(const std::u16string& otp) const override;
   FooterText GetFooterText(const std::u16string& link_text) const override;
   std::u16string GetNewCodeLinkText() const override;

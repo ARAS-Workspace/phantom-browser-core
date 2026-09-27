@@ -22,15 +22,6 @@
 #include "gpu/ipc/common/surface_handle.h"
 #include "mojo/public/cpp/bindings/associated_receiver_set.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/android_info.h"
-#include "base/cancelable_callback.h"
-#include "components/input/android/input_receiver_data.h"
-#include "components/viz/service/input/android_state_transfer_handler.h"
-#include "components/viz/service/input/render_input_router_support_android.h"
-#include "components/viz/service/input/viz_touch_state_handler.h"
-#endif
-
 namespace input {
 class TouchEmulator;
 }
@@ -60,9 +51,6 @@ struct FrameSinkMetadata {
 class VIZ_SERVICE_EXPORT InputManager
     : public FrameSinkObserver,
       public input::RenderWidgetHostInputEventRouter::Delegate,
-#if BUILDFLAG(IS_ANDROID)
-      public AndroidStateTransferHandlerClient,
-#endif
       public RenderInputRouterSupportBase::Delegate,
       public RenderInputRouterDelegateImpl::Delegate,
       public input::mojom::RenderInputRouterDelegate,
@@ -111,11 +99,6 @@ class VIZ_SERVICE_EXPORT InputManager
       const FrameSinkId& frame_sink_id) override;
   const CompositorFrameMetadata* GetLastActivatedFrameMetadata(
       const FrameSinkId& frame_sink_id) override;
-
-#if BUILDFLAG(IS_ANDROID)
-  // AndroidStateTransferHandlerClient implementation.
-  bool TransferInputBackToBrowser() override;
-#endif
 
   // RenderInputRouterDelegateImpl::Delegate implementation.
   std::unique_ptr<input::RenderInputRouterIterator>
@@ -189,33 +172,6 @@ class VIZ_SERVICE_EXPORT InputManager
   std::unique_ptr<input::FlingSchedulerBase> MakeFlingScheduler(
       input::RenderInputRouter* rir,
       const FrameSinkId& frame_sink_id);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Android input receiver is created only for the very first root compositor
-  // frame sink creation notification that InputManager receives.
-  // Due to an Android platform bug(b/368251173) which causes crash on calling
-  // AInputReceiver_release, the input receiver is reused for any future root
-  // compositors.
-  void CreateOrReuseAndroidInputReceiver(
-      const FrameSinkId& frame_sink_id,
-      const gpu::SurfaceHandle& surface_handle);
-
-  AndroidStateTransferHandler android_state_transfer_handler_;
-  VizTouchStateHandler viz_touch_state_handler_;
-
-  // There's a platform bug on Android 16 which keeps the input surface control
-  // lingering around unless the app explicitly does a `System.gc()` call to
-  // clean it up : https://crbug.com/436302937#comment5.
-  // Since the the input surface control doesn't have any associate buffers
-  // `System.gc()` is called on every 100th destruction.
-  int pending_surface_controls_ = 0;
-  std::unique_ptr<input::InputReceiverData> receiver_data_;
-
-  // Allow cancelling the creation task, since it's possible for
-  // DestroyCompositorFrameSink call to come before the callback is ran.
-  base::flat_map<FrameSinkId, std::unique_ptr<base::CancelableOnceClosure>>
-      pending_create_input_receiver_callback_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   friend class MockInputManager;
 

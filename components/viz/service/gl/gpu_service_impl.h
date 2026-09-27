@@ -120,26 +120,12 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
   void UpdateGPUInfo();
   void UpdateGPUInfoGL();
 
-#if BUILDFLAG(IS_ANDROID)
-  void InitializeWithHost(
-      mojo::PendingRemote<mojom::GpuHost> gpu_host,
-      gpu::GpuProcessShmCount use_shader_cache_shm_count,
-      scoped_refptr<gl::GLSurface> default_offscreen_surface,
-      mojom::GpuServiceCreationParamsPtr creation_params,
-      gpu::SyncPointManager* sync_point_manager = nullptr,
-      gpu::SharedImageManager* shared_image_manager = nullptr,
-      gpu::Scheduler* scheduler = nullptr,
-      base::WaitableEvent* shutdown_event = nullptr,
-      const gpu::SharedContextState::GrContextOptionsProvider*
-          gr_context_options_provider = nullptr);
-#else
   void InitializeWithHost(
       mojo::PendingRemote<mojom::GpuHost> gpu_host,
       gpu::GpuProcessShmCount use_shader_cache_shm_count,
       scoped_refptr<gl::GLSurface> default_offscreen_surface,
       mojom::GpuServiceCreationParamsPtr creation_params,
       base::WaitableEvent* shutdown_event = nullptr);
-#endif
 
   void Bind(mojo::PendingReceiver<mojom::GpuService> pending_receiver);
 
@@ -342,10 +328,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
 #endif
 
   base::ProcessId host_process_id() const { return host_process_id_; }
-
-#if BUILDFLAG(IS_ANDROID)
-  void SetHostProcessId(base::ProcessId pid);
-#endif
 
   using PriorityChangedCallback =
       base::RepeatingCallback<void(base::Process::Priority /*priority*/)>;

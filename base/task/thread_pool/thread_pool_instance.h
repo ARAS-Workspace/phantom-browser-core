@@ -92,12 +92,7 @@ class BASE_EXPORT ThreadPoolInstance {
     // it was suggested that we might want a different reclaim time in
     // renderers. Note that the regression is not present in
     // *TaskLatencyMicroseconds.Renderer* histograms.
-    TimeDelta suggested_reclaim_time =
-#if BUILDFLAG(IS_ANDROID)
-        Minutes(5);
-#else
-        Seconds(30);
-#endif
+    TimeDelta suggested_reclaim_time = Seconds(30);
   };
 
   // Used to restrict the maximum number of concurrent tasks that can run in a

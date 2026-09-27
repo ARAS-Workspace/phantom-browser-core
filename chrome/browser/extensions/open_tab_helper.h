@@ -35,7 +35,6 @@ class OpenTabHelper {
     std::optional<int> split_with_tab_id;
   };
 
-#if !BUILDFLAG(IS_ANDROID)
   // Finds the current browser or creates a new browser that's appropriate to
   // show the given `validated_url`. Returns an error on failure.
   // This variant is only available on non-Android platforms. On Android, window
@@ -44,7 +43,6 @@ class OpenTabHelper {
   FindOrCreateBrowser(const GURL& validated_url,
                       ExtensionFunction& function,
                       bool create_if_needed);
-#endif
 
   // Opens a new tab given an extension function `function` and creation
   // parameters `params`. If a tab can be produced, it will return the newly-

@@ -75,13 +75,6 @@ class SupervisedUserInterstitial {
       WebFilteringResult filtering_result,
       const std::u16string& supervised_user_name);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the HTML contents of the error page without the approvals section.
-  static std::string GetHTMLContentsWithoutApprovals(
-      const GURL& url,
-      const std::string& application_locale);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Returns the HTML contents of the error page with the approvals section.
   static std::string GetHTMLContentsWithApprovals(
       SupervisedUserService* supervised_user_service,
@@ -94,9 +87,6 @@ class SupervisedUserInterstitial {
   void GoBack();
   void RequestUrlAccessRemote(base::OnceCallback<void(bool)> callback);
   void RequestUrlAccessLocal(base::OnceCallback<void(bool)> callback);
-#if BUILDFLAG(IS_ANDROID)
-  void LearnMore(base::OnceClosure open_help_page);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Getter methods.
   WebContentHandler* web_content_handler() {

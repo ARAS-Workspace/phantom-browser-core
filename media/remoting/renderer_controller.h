@@ -165,12 +165,6 @@ class RendererController final : public mojom::RemotingSource,
   // Callback from RpcMessenger when sending message to remote sink.
   void SendMessageToSink(std::vector<uint8_t> message);
 
-#if BUILDFLAG(IS_ANDROID)
-  bool IsAudioRemotePlaybackSupported() const;
-  bool IsVideoRemotePlaybackSupported() const;
-  bool IsRemotePlaybackSupported() const;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_MEDIA_REMOTING_RPC)
   // Handles dispatching of incoming and outgoing RPC messages.
   openscreen::cast::RpcMessenger rpc_messenger_;

@@ -11,10 +11,6 @@
 #include "build/build_config.h"
 #include "third_party/libaddressinput/chromium/chrome_address_validator.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace autofill {
 
 class AutofillProfile;
@@ -45,11 +41,6 @@ class AddressNormalizer : public LoadRulesListener {
   // Normalizes |profile| and returns whether it was successful. Callers should
   // call |AreRulesLoadedForRegion| to ensure success.
   virtual bool NormalizeAddressSync(AutofillProfile* profile) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Return the java object that provides access to the AddressNormalizer.
-  virtual base::android::ScopedJavaLocalRef<jobject> GetJavaObject() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace autofill

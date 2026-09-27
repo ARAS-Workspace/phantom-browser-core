@@ -33,10 +33,6 @@
 #include "storage/browser/quota/quota_manager.h"
 #include "third_party/blink/public/mojom/cache_storage/cache_storage.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/application_status_listener.h"
-#endif
-
 namespace base {
 class SequencedTaskRunner;
 }
@@ -325,10 +321,6 @@ class CONTENT_EXPORT CacheStorage : public CacheStorageCacheObserver {
 
   void FlushIndexIfDirty();
 
-#if BUILDFLAG(IS_ANDROID)
-  void OnApplicationStateChange(base::android::ApplicationState state);
-#endif
-
   // The `BucketLocator` that this CacheStorage is associated with.
   const storage::BucketLocator bucket_locator_;
 
@@ -380,11 +372,6 @@ class CONTENT_EXPORT CacheStorage : public CacheStorageCacheObserver {
   raw_ptr<CacheStorageManager> cache_storage_manager_;
 
   base::CancelableOnceClosure index_write_task_;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<base::android::ApplicationStatusListener>
-      app_status_listener_;
-#endif
 
   // True if running on android and the app is in the background.
   bool app_on_background_ = false;

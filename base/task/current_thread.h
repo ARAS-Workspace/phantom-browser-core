@@ -259,14 +259,6 @@ class BASE_EXPORT CurrentUIThread : public CurrentThread {
                            MessagePumpForUI::FdWatcher* delegate);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  // Forwards to MessagePumpAndroid::Abort().
-  // TODO(crbug.com/40568517): Plumb the actual MessagePumpForUI* to
-  // callers and remove ability to access this method from
-  // CurrentUIThread.
-  void Abort();
-#endif
-
 
  private:
   explicit CurrentUIThread(

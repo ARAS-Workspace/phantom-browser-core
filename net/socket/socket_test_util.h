@@ -1599,15 +1599,6 @@ int64_t CountReadBytes(base::span<const MockRead> reads);
 base::ByteSize CountWriteByteSize(base::span<const MockWrite> writes);
 int64_t CountWriteBytes(base::span<const MockWrite> writes);
 
-#if BUILDFLAG(IS_ANDROID)
-// Returns whether the device supports calling GetTaggedBytes().
-bool CanGetTaggedBytes();
-
-// Query the system to find out how many bytes were received with tag
-// |expected_tag| for our UID.  Return the count of received bytes.
-uint64_t GetTaggedBytes(int32_t expected_tag);
-#endif
-
 // The goal of this test is to walk a pool back and forth between being
 // capped and uncapped, tracking at what point the transition occurs
 // and using that data to validate expected behavior. We take this walk

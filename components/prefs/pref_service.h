@@ -34,18 +34,11 @@
 #include "components/prefs/prefs_export.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 class PrefNotifier;
 class PrefNotifierImpl;
 class PrefObserver;
 class PrefRegistry;
 class PrefStore;
-#if BUILDFLAG(IS_ANDROID)
-class PrefServiceAndroid;
-#endif
 
 namespace base {
 class FilePath;
@@ -398,10 +391,6 @@ class COMPONENTS_PREFS_EXPORT PrefService {
   void AddPrefObserverAllPrefs(PrefObserver* obs);
   void RemovePrefObserverAllPrefs(PrefObserver* obs);
 
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject();
-#endif
-
   // Returns the WriteablePrefStore::PrefWriteFlags for `pref`.
   static uint32_t GetWriteFlags(const PrefService::Preference* pref);
 
@@ -517,12 +506,6 @@ class COMPONENTS_PREFS_EXPORT PrefService {
   // is authoritative with respect to what the types and default values
   // of registered preferences are.
   mutable PreferenceMap prefs_map_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Manage and fetch the java object that wraps this PrefService on
-  // android.
-  std::unique_ptr<PrefServiceAndroid> pref_service_android_;
-#endif
 
   SEQUENCE_CHECKER(sequence_checker_);
 };

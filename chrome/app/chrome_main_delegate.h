@@ -39,10 +39,6 @@ class ChromeMainDelegate : public content::ContentMainDelegate {
  public:
   static base::span<const char* const> GetNonWildcardDomainNonPortSchemes();
 
-#if BUILDFLAG(IS_ANDROID)
-  ChromeMainDelegate();
-#endif
-
   // `timestamps.exe_entry_point_ticks` is the time at which the main function
   // of the executable was entered. On Windows, StartupTimestamps contains
   // timing information for calls to base::PreReadFile. `timestamps`' lifetime
@@ -108,11 +104,9 @@ class ChromeMainDelegate : public content::ContentMainDelegate {
 
   memory_system::MemorySystem memory_system_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // The sampling profiler exists until the `ChromeContentBrowserClient` is
   // created and ownership is passed to it.
   std::unique_ptr<MainThreadStackSamplingProfiler> sampling_profiler_;
-#endif
 };
 
 #endif  // CHROME_APP_CHROME_MAIN_DELEGATE_H_

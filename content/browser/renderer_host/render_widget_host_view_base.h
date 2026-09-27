@@ -179,28 +179,6 @@ class CONTENT_EXPORT RenderWidgetHostViewBase
   // For testing only.
   virtual ui::FilteredGestureProvider* GetFilteredGestureProviderForTesting();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns whethere there's a touch sequence active on Viz.
-  //  false: There's definitely no active touch sequence on Viz.
-  //  true: A touch sequence is likely active on Viz, but could be a false
-  //  positive in some racy conditions.
-  virtual bool IsTouchSequencePotentiallyActiveOnViz() = 0;
-
-  virtual void RequestInputBackForDragAndDrop(
-      WeakDocumentPtr source_document,
-      blink::mojom::DragDataPtr drag_data,
-      blink::DragOperationsMask drag_operations_mask,
-      SkBitmap bitmap,
-      gfx::Vector2d cursor_offset_in_dip,
-      gfx::Rect drag_obj_rect_in_dip,
-      blink::mojom::DragEventSourceInfoPtr event_info) = 0;
-
-  virtual void SetTouchpadOverscrollHistoryNavigation(bool enabled) {}
-
-  virtual void ReportScrollJankStats(uint32_t total_frames,
-                                     uint32_t janky_frames) {}
-#endif
-
   // For HiDPI capture mode, allow applying a render scale multiplier
   // which modifies the effective device scale factor. Use a scale
   // of 1.0f (exactly) to disable the feature after it was used.

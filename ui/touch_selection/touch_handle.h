@@ -19,12 +19,6 @@
 #include "ui/touch_selection/touch_selection_draggable.h"
 #include "ui/touch_selection/ui_touch_selection_export.h"
 
-#if BUILDFLAG(IS_ANDROID)
-namespace cc::slim {
-class Layer;
-}
-#endif
-
 namespace ui {
 
 class TouchHandle;
@@ -58,11 +52,6 @@ class UI_TOUCH_SELECTION_EXPORT TouchHandleDrawable {
 
   // Returns the transparent horizontal padding ratio of the handle drawable.
   virtual float GetDrawableHorizontalPaddingRatio() const = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  virtual void OnUpdateNativeViewTree(gfx::NativeView parent_native_view,
-                                      cc::slim::Layer* parent_layer) {}
-#endif
 };
 
 // Interface through which |TouchHandle| communicates handle manipulation and
@@ -139,11 +128,6 @@ class UI_TOUCH_SELECTION_EXPORT TouchHandle : public TouchSelectionDraggable {
   // Set the handle to transparent. Handle will be set to opaque again in
   // EndDrag() call.
   void SetTransparent();
-
-#if BUILDFLAG(IS_ANDROID)
-  void OnUpdateNativeViewTree(gfx::NativeView parent_native_view,
-                              cc::slim::Layer* parent_layer);
-#endif
 
   const gfx::PointF& focus_bottom() const { return focus_bottom_; }
   TouchHandleOrientation orientation() const { return orientation_; }

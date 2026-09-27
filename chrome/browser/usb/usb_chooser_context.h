@@ -87,11 +87,6 @@ class UsbChooserContext : public permissions::ObjectPermissionContextBase,
       base::span<const uint8_t> blocked_interface_classes,
       mojo::PendingReceiver<device::mojom::UsbDevice> device_receiver,
       mojo::PendingRemote<device::mojom::UsbDeviceClient> device_client);
-#if BUILDFLAG(IS_ANDROID)
-  void RefreshDeviceInfo(
-      const std::string& guid,
-      device::mojom::UsbDeviceManager::RefreshDeviceInfoCallback callback);
-#endif
 
   // This method should only be called when you are sure that |devices_| has
   // been initialized. It will return nullptr if the guid cannot be found.
@@ -123,11 +118,6 @@ class UsbChooserContext : public permissions::ObjectPermissionContextBase,
   void OnDeviceManagerConnectionError();
   void EnsureConnectionWithDeviceManager();
   void SetUpDeviceManagerConnection();
-#if BUILDFLAG(IS_ANDROID)
-  void OnDeviceInfoRefreshed(
-      device::mojom::UsbDeviceManager::RefreshDeviceInfoCallback callback,
-      device::mojom::UsbDeviceInfoPtr device_info);
-#endif
 
   bool is_incognito_;
   bool is_initialized_ = false;

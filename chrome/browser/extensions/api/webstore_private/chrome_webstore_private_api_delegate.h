@@ -31,12 +31,6 @@ class ChromeWebstorePrivateAPIDelegate : public WebstorePrivateAPIDelegate {
   void ShowExtensionInstallFrictionDialog(
       content::WebContents* web_contents,
       base::OnceCallback<void(bool)> callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void ShowExtensionInstallAskParentDialog(
-      content::WebContents* web_contents,
-      base::OnceClosure cancel_callback,
-      base::OnceClosure approve_callback) override;
-#endif  // BUILDFLAG(IS_ANDROID)
   void ReportFrictionAcceptedEvent(content::BrowserContext* context) override;
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   bool IsSafeBrowsingEnabledAndReady(content::BrowserContext* context) override;

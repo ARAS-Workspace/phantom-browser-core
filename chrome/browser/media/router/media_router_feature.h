@@ -28,7 +28,6 @@ bool MediaRouterEnabled(content::BrowserContext* context);
 // process.
 void ClearMediaRouterStoredPrefsForTesting();
 
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 // Enables the media router. Can be disabled in tests unrelated to
 // Media Router where it interferes. Can also be useful to disable for local
 // development on Mac because DIAL local discovery opens a local port
@@ -97,8 +96,6 @@ std::optional<base::TimeDelta> GetCastMirroringPlayoutDelay();
 // chrome://media-router-internals.  These logs can verbose and contain
 // sensitive information, so use with caution.
 bool IsCastMessageLoggingEnabled();
-#endif  // !BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 
 }  // namespace media_router
 

@@ -39,18 +39,12 @@
 #include "components/sync/model/syncable_service.h"
 #include "components/sync/protocol/search_engine_specifics.pb.h"
 #include "components/webdata/common/web_data_service_consumer.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
 
 class GURL;
 class PrefService;
 class TemplateURLServiceClient;
 class TemplateURLServiceObserver;
 struct TemplateURLData;
-#if BUILDFLAG(IS_ANDROID)
-class TemplateUrlServiceAndroid;
-#endif
 
 namespace regional_capabilities {
 class CountryIdHolder;
@@ -161,22 +155,6 @@ class TemplateURLService final : public WebDataServiceConsumer,
     TemplateURLVector inactive_feature_shortcuts;
   };
 
-#if BUILDFLAG(IS_ANDROID)
-  struct PrepopulatedAndRecentlyVisitedTemplateUrls {
-    PrepopulatedAndRecentlyVisitedTemplateUrls();
-    ~PrepopulatedAndRecentlyVisitedTemplateUrls();
-    PrepopulatedAndRecentlyVisitedTemplateUrls(
-        const PrepopulatedAndRecentlyVisitedTemplateUrls& other);
-
-    // All prepopulated engines retrieved from `GetPrepopulatedEngines()`. This
-    // always includes the current default search engine.
-    TemplateURLVector prepopulated_urls;
-    // A limited number of recently visited URLs, defined and sorted through
-    // `SortAndFilterRecentlyVisitedURLs()`
-    TemplateURLVector recently_visited_urls;
-  };
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Values for an enumerated histogram used to track keyword conflicts between
   // search engines created by policy and search engines the user manually
   // edited. Keep in sync with `SearchPolicyConflictType` in
@@ -206,10 +184,6 @@ class TemplateURLService final : public WebDataServiceConsumer,
 
   // Register Profile preferences in |registry|.
   static void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry);
-
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject();
-#endif
 
   // Returns true if there is no TemplateURL that conflicts with the
   // keyword/url pair, or there is one but it can be replaced.
@@ -358,15 +332,6 @@ class TemplateURLService final : public WebDataServiceConsumer,
   TemplateURLService::TemplateURLVector GetFeaturedEnterpriseSiteSearchEngines()
       const;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the list prepopulated template URLs for `country_code`.
-  // `country_code` is a two-character uppercase ISO 3166-1 country code.
-  // Usage restricted to Android. Other platforms should rely on the other
-  // functions that will return this data for the profile's current country.
-  OwnedTemplateURLDataVector GetTemplateURLsForCountry(
-      const std::string& country_code);
-#endif
-
   // Increment the usage count of a keyword.
   // Called when a URL is loaded that was generated from a keyword.
   void IncrementUsageCount(TemplateURL* url);
@@ -382,32 +347,6 @@ class TemplateURLService final : public WebDataServiceConsumer,
   // `kFalse`. Called when a user explicitly activates/deactivates the search
   // engine.
   void SetIsActiveTemplateURL(TemplateURL* url, bool is_active);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Creates a `TemplateURLData` from the provided raw data, and marks it as
-  // coming from an Play / Android OS-level search engine choice screen.
-  static TemplateURLData CreatePlayAPITemplateURLData(
-      const std::u16string& keyword,
-      const std::u16string& name,
-      const std::string& search_url,
-      const std::string& suggest_url = std::string(),
-      const std::string& favicon_url = std::string(),
-      const std::string& new_tab_url = std::string(),
-      const std::string& image_url = std::string(),
-      const std::string& image_url_post_params = std::string(),
-      const std::string& image_translate_url = std::string(),
-      const std::string& image_translate_source_language_param_key =
-          std::string(),
-      const std::string& image_translate_target_language_param_key =
-          std::string());
-
-  // Register a new search provider from `new_play_api_turl_data` and sets
-  // it as the default search provider.
-  //
-  // If there is already existing search provider that was created from Play,
-  // it will be removed.
-  bool ResetPlayAPISearchEngine(const TemplateURLData& new_play_api_turl_data);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Updates any search providers matching |potential_search_url| with the new
   // favicon location |favicon_url|.
@@ -456,19 +395,6 @@ class TemplateURLService final : public WebDataServiceConsumer,
       template_url_starter_pack_data::StarterPackIdSet
           disabled_starter_pack_ids =
               template_url_starter_pack_data::StarterPackIdSet());
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns an object containing two lists. The first one contains engines that
-  // are prepopulated (in the order defined by the prepopulate_data_resolver,
-  // created by policy or the default search engine. The second one contains
-  // recently visited engines.
-  // In contrast to `GetCategorizedTemplateURLs()`, this only creates these two
-  // lists and omits any extension or starter pack shortcuts. Additionally, as
-  // there is no way to activate/deactivate engines on platforms that use this
-  // function, there is no notion of "active" here.
-  PrepopulatedAndRecentlyVisitedTemplateUrls
-  GetPrepopulatedAndRecentlyVisitedTemplateURLs();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Returns the Origin of the user's default search engine. If a default search
   // engine is set and its URL is valid, the Origin of that URL is returned.
@@ -1114,12 +1040,6 @@ class TemplateURLService final : public WebDataServiceConsumer,
       initial_keywords_database_country_;
   std::optional<regional_capabilities::CountryIdHolder>
       updated_keywords_database_country_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Manage and fetch the java object that wraps this TemplateURLService on
-  // android.
-  std::unique_ptr<TemplateUrlServiceAndroid> template_url_service_android_;
-#endif
 
   base::WeakPtrFactory<TemplateURLService> weak_ptr_factory_{this};
 };

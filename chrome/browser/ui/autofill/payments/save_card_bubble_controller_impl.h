@@ -179,10 +179,8 @@ class SaveCardBubbleControllerImpl
   void OnVisibilityChanged(content::Visibility visibility) override;
   std::optional<PageActionIconType> GetPageActionIconType() override;
   void DoShowBubble() override;
-#if !BUILDFLAG(IS_ANDROID)
   std::optional<actions::ActionId> GetActionIdForPageAction() override;
   std::optional<std::u16string> GetPageActionTooltipText() override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
  private:
   friend class content::WebContentsUserData<SaveCardBubbleControllerImpl>;

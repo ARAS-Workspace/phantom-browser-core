@@ -262,10 +262,6 @@ class TestNetworkContext : public mojom::NetworkContext {
                               const std::string& http_method,
                               const net::NetworkIsolationKey& key,
                               bool include_credentials) override {}
-#if BUILDFLAG(IS_ANDROID)
-  void SetHttpCacheMaxSize(base::ByteSize http_cache_max_size,
-                           bool force_initialization) override {}
-#endif  // BUILDFLAG(IS_ANDROID)
   void VerifyCert(const scoped_refptr<net::X509Certificate>& certificate,
                   const net::HostPortPair& host_port,
                   const std::string& ocsp_result,

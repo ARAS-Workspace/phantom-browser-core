@@ -181,9 +181,7 @@ CONTENT_EXPORT extern const char kRendererStartupDialog[];
 CONTENT_EXPORT extern const char kGpuChannelRequestStartTimeTicks[];
 CONTENT_EXPORT extern const char kRunManualTestsFlag[];
 extern const char kSandboxIPCProcess[];
-#if !BUILDFLAG(IS_ANDROID)
 CONTENT_EXPORT extern const char kSharedArrayBufferUnrestrictedAccessAllowed[];
-#endif
 CONTENT_EXPORT extern const char kSharedFiles[];
 CONTENT_EXPORT extern const char kSingleProcess[];
 CONTENT_EXPORT extern const char kSitePerProcess[];
@@ -205,9 +203,6 @@ CONTENT_EXPORT extern const char kUseFakeUIForDigitalIdentity[];
 CONTENT_EXPORT extern const char kUseFakeUIForFedCM[];
 CONTENT_EXPORT extern const char kUseFakeUIForMediaStream[];
 CONTENT_EXPORT extern const char kVideoImageTextureTarget[];
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(INCLUDE_BOTH_V8_SNAPSHOTS)
-CONTENT_EXPORT extern const char kUseContextSnapshotSwitch[];
-#endif
 CONTENT_EXPORT extern const char kUseMockCertVerifierForTesting[];
 extern const char kUtilityCmdPrefix[];
 CONTENT_EXPORT extern const char kUtilityProcess[];
@@ -238,20 +233,6 @@ CONTENT_EXPORT extern const char kWebXrRuntimeOrientationSensors[];
 CONTENT_EXPORT extern const char kWebXrRuntimeOpenXr[];
 CONTENT_EXPORT extern const char kZygoteCmdPrefix[];
 CONTENT_EXPORT extern const char kZygoteProcess[];
-
-#if BUILDFLAG(IS_ANDROID)
-CONTENT_EXPORT extern const char kDisableMediaSessionAPI[];
-CONTENT_EXPORT extern const char kDisableOoprDebugCrashDump[];
-CONTENT_EXPORT extern const char kDisableScreenOrientationLock[];
-CONTENT_EXPORT extern const char kDisableSiteIsolationForPolicy[];
-CONTENT_EXPORT extern const char kDisableTimeoutsForProfiling[];
-CONTENT_EXPORT extern const char kEnableAdaptiveSelectionHandleOrientation[];
-CONTENT_EXPORT extern const char kEnableLongpressDragSelection[];
-CONTENT_EXPORT extern const char kForceOnlineConnectionStateForIndicator[];
-CONTENT_EXPORT extern const char kRemoteDebuggingSocketName[];
-CONTENT_EXPORT extern const char kRendererWaitForJavaDebugger[];
-CONTENT_EXPORT extern const char kJavalessRenderers[];
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 CONTENT_EXPORT extern const char kEnableSpeechDispatcher[];

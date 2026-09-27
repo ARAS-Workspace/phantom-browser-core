@@ -9,16 +9,10 @@
 
 namespace input {
 
-#if BUILDFLAG(IS_ANDROID)
-// The mobile hang timer is shorter than the desktop hang timer because the
-// screen is smaller and more intimate, and therefore requires more nimbleness.
-inline constexpr base::TimeDelta kHungRendererDelay = base::Seconds(5);
-#else
 // It would be nice to lower the desktop delay, but going any further with the
 // modal dialog UI would be disruptive, and while new gentle UI indicating that
 // a page is hung would be great, that UI isn't going to happen any time soon.
 inline constexpr base::TimeDelta kHungRendererDelay = base::Seconds(15);
-#endif
 
 // The time to wait for a ping response from the main thread before declaring
 // the renderer unresponsive.

@@ -70,12 +70,6 @@ class AccountManagedStatusFinder : public signin::IdentityManager::Observer {
   void OnIdentityManagerShutdown(
       signin::IdentityManager* identity_manager) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Implementation for JNI methods.
-  void DestroyNativeObject(JNIEnv* env);
-  int32_t GetOutcomeFromNativeObject(JNIEnv* env) const;
-#endif
-
  private:
   void OnTimeoutReached();
 

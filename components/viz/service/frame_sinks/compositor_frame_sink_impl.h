@@ -55,9 +55,6 @@ class CompositorFrameSinkImpl : public mojom::CompositorFrameSink {
   void NotifyNewLocalSurfaceIdExpectedWhilePaused() override;
   void BindLayerContext(mojom::PendingLayerContextPtr context,
                         mojom::LayerContextSettingsPtr settings) override;
-#if BUILDFLAG(IS_ANDROID)
-  void SetThreads(const std::vector<Thread>& threads) override;
-#endif
 
  private:
   void OnClientConnectionLost();

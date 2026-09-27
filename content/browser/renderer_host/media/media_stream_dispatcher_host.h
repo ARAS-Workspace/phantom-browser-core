@@ -139,7 +139,6 @@ class CONTENT_EXPORT MediaStreamDispatcherHost
       const base::UnguessableToken& session_id,
       const base::UnguessableToken& transfer_id,
       KeepDeviceAliveForTransferCallback callback) override;
-#if !BUILDFLAG(IS_ANDROID)
   void FocusCapturedSurface(const std::string& label, bool focus) override;
   void SendWheel(const base::UnguessableToken& session_id,
                  blink::mojom::CapturedWheelActionPtr action) override;
@@ -149,7 +148,6 @@ class CONTENT_EXPORT MediaStreamDispatcherHost
   void RequestCapturedSurfaceControlPermission(
       const base::UnguessableToken& session_id,
       RequestCapturedSurfaceControlPermissionCallback callback) override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_SCREEN_CAPTURE)
   void ApplySubCaptureTarget(const base::UnguessableToken& session_id,

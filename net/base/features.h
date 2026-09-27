@@ -715,12 +715,6 @@ NET_EXPORT BASE_DECLARE_FEATURE(kExcludeLargeBodyReports);
 // https://github.com/explainers-by-googlers/related-website-partition-api.
 NET_EXPORT BASE_DECLARE_FEATURE(kRelatedWebsitePartitionAPI);
 
-#if BUILDFLAG(IS_ANDROID)
-// If enabled, Android OS's certificate verification (CertVerifyProcAndroid) is
-// done using the certificate transparency aware API.
-NET_EXPORT BASE_DECLARE_FEATURE(kUseCertTransparencyAwareApiForOsCertVerify);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Enables a special interstitial for self signed cert errors in local network
 // URLs.
 NET_EXPORT BASE_DECLARE_FEATURE(kSelfSignedLocalNetworkInterstitial);

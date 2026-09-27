@@ -19,7 +19,7 @@
 
 namespace base::subtle {
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
 // Helper structs to keep two descriptors on POSIX. It's needed to support
 // ConvertToReadOnly().
 struct BASE_EXPORT FDPair {
@@ -51,9 +51,6 @@ struct BASE_EXPORT ScopedFDPair {
 #if BUILDFLAG(IS_APPLE)
 using PlatformSharedMemoryHandle = mach_port_t;
 using ScopedPlatformSharedMemoryHandle = apple::ScopedMachSendRight;
-#elif BUILDFLAG(IS_ANDROID)
-using PlatformSharedMemoryHandle = int;
-using ScopedPlatformSharedMemoryHandle = ScopedFD;
 #else
 using PlatformSharedMemoryHandle = FDPair;
 using ScopedPlatformSharedMemoryHandle = ScopedFDPair;

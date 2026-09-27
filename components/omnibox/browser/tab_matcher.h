@@ -21,10 +21,6 @@ class TabMatcher {
   struct TabInfo {
     // Whether a tab with matching URL exists.
     bool has_matching_tab{};
-
-#if BUILDFLAG(IS_ANDROID)
-    int android_tab_id{};
-#endif
   };
 
   // Mechanism that facilitates hashing of the GURL objects.

@@ -54,11 +54,7 @@
 #include "net/url_request/url_request_job_factory.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "net/dns/dns_platform_attempt_factory_android.h"
-#else
 #include "net/dns/dns_platform_attempt_factory_not_implemented.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace net {
 
@@ -155,12 +151,6 @@ class NET_EXPORT URLRequestContextBuilder {
     // sandboxing in some platforms.
     scoped_refptr<disk_cache::BackendFileOperationsFactory>
         file_operations_factory;
-
-#if BUILDFLAG(IS_ANDROID)
-    // If this is set, will override the default ApplicationStatusListener. This
-    // is useful if the cache will not be in the main process.
-    disk_cache::ApplicationStatusListenerGetter app_status_listener_getter;
-#endif
   };
 
   URLRequestContextBuilder();
@@ -175,13 +165,6 @@ class NET_EXPORT URLRequestContextBuilder {
 
   // Sets whether Zstd compression is enabled. Disabled by default.
   void set_enable_zstd(bool enable_zstd) { enable_zstd_ = enable_zstd; }
-
-#if BUILDFLAG(IS_ANDROID)
-  // Sets whether StaleHostResolver is enabled. Disabled by default.
-  void enable_stale_dns_resolver(bool stale_dns_enabled) {
-    stale_dns_enabled_ = stale_dns_enabled;
-  }
-#endif
 
   // Sets whether Compression Dictionary is enabled. Disabled by default.
   void set_enable_shared_dictionary(bool enable_shared_dictionary) {
@@ -608,11 +591,7 @@ class NET_EXPORT URLRequestContextBuilder {
   //   if interacted with. The expectation is for other platforms to never
   //   specify AttemptMode::kPlatform until they support it.
   std::unique_ptr<DnsPlatformAttemptFactory> dns_platform_attempt_factory_ =
-#if BUILDFLAG(IS_ANDROID)
-      DnsPlatformAttemptFactoryAndroid::Create();
-#else
       std::make_unique<DnsPlatformAttemptFactoryNotImplemented>();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   raw_ptr<ClientSocketFactory> client_socket_factory_raw_ = nullptr;
 };

@@ -66,12 +66,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "content/public/browser/android/child_process_importance.h"
-#include "content/public/browser/android/selection_popup_delegate.h"
-#include "third_party/jni_zero/jni_zero.h"
-#endif
-
 namespace base {
 class FilePath;
 }  // namespace base
@@ -148,9 +142,6 @@ class WebUI;
 struct DropData;
 struct MHTMLGenerationParams;
 class PreloadingAttempt;
-#if BUILDFLAG(IS_ANDROID)
-class SelectionPopupDelegate;
-#endif
 
 // WebContents is the core class in content/. A WebContents renders web content
 // (usually HTML) in a rectangular area.
@@ -345,13 +336,6 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
     // mostly for debugging (e.g. to help attribute specific scenarios or
     // invariant violations to a particular flavor of WebContents).
     base::Location creator_location;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Same as `creator_location`, for WebContents created via Java. This
-    // java.lang.Throwable contains the entire
-    // WebContentsCreator.createWebContents() stack trace.
-    base::android::ScopedJavaGlobalRef<jthrowable> java_creator_location;
-#endif  // BUILDFLAG(IS_ANDROID)
 
     // Enables contents to hold wake locks, for example, to keep the screen on
     // while playing video.
@@ -1385,14 +1369,6 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
   // Returns false if the request is no longer valid, otherwise true.
   virtual bool GotResponseToKeyboardLockRequest(bool allowed) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Called when the user has selected a color in the color chooser.
-  virtual void DidChooseColorInColorChooser(SkColor color) = 0;
-
-  // Called when the color chooser has ended.
-  virtual void DidEndColorChooser() = 0;
-#endif
-
   // Returns true if the location bar should be focused by default rather than
   // the page contents. The view calls this function when the tab is focused
   // to see what it should do.
@@ -1608,62 +1584,6 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
 
   // Tells the WebContents whether the context menu is showing.
   virtual void SetShowingContextMenu(bool showing) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  CONTENT_EXPORT static WebContents* FromJavaWebContents(
-      const base::android::JavaRef<jobject>& jweb_contents_android);
-  virtual base::android::ScopedJavaLocalRef<jobject> GetJavaWebContents() = 0;
-
-  // Returns the value from CreateParams::java_creator_location.
-  virtual base::android::ScopedJavaLocalRef<jthrowable>
-  GetJavaCreatorLocation() = 0;
-
-  // Selects and zooms to the find result nearest to the point (x,y) defined in
-  // find-in-page coordinates.
-  virtual void ActivateNearestFindResult(float x, float y) = 0;
-
-  // Requests the rects of the current find matches from the renderer
-  // process. |current_version| is the version of find rects that the caller
-  // already knows about. This version will be compared to the current find
-  // rects version in the renderer process (which is updated whenever the rects
-  // change), to see which new rect data will need to be sent back.
-  //
-  // TODO(paulmeyer): This process will change slightly once multi-process
-  // find-in-page is implemented. This comment should be updated at that time.
-  virtual void RequestFindMatchRects(int current_version) = 0;
-
-  // Returns an InterfaceProvider for Java-implemented interfaces that are
-  // scoped to this WebContents. This provides access to interfaces implemented
-  // in Java in the browser process to C++ code in the browser process.
-  virtual service_manager::InterfaceProvider* GetJavaInterfaces() = 0;
-
-  // Returns the primary main frame importance. This is for testing only.
-  virtual ChildProcessImportance GetPrimaryMainFrameImportanceForTesting() = 0;
-
-  // Returns the primary page's subframe importance cached. This is for testing
-  // only.
-  virtual ChildProcessImportance
-  GetPrimaryPageSubframeImportanceForTesting() = 0;
-
-  // Set importance for main frame and subframes of the page in the primary
-  // frame tree.
-  //
-  // The subframe importance will be set to new subframes in the primary frame
-  // tree when they are created as well. Also the subframe importance will be
-  // set to subframes when they are restored (e.g. from BFCache) to the primary
-  // frame tree.
-  //
-  // The subframe_importance must be less than or equal to the
-  // main_frame_importance.
-  virtual void SetPrimaryPageImportance(
-      ChildProcessImportance main_frame_importance,
-      ChildProcessImportance subframe_importance) = 0;
-
-  // Set a SelectionPopupDelegate (see documentation of SelectionPopupDelegate
-  // methods).
-  virtual void SetSelectionPopupDelegate(
-      std::unique_ptr<SelectionPopupDelegate> delegate) = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Returns true if the WebContents has completed its first meaningful paint
   // since the last navigation.
@@ -1905,27 +1825,5 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
 };
 
 }  // namespace content
-
-#if BUILDFLAG(IS_ANDROID)
-namespace jni_zero {
-
-// @JniType conversion function.
-template <>
-inline content::WebContents* FromJniType<content::WebContents*>(
-    JNIEnv* env,
-    const JavaRef<jobject>& j_obj) {
-  return content::WebContents::FromJavaWebContents(j_obj);
-}
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType(JNIEnv* env,
-                                             content::WebContents* obj) {
-  if (!obj) {
-    return nullptr;
-  }
-  return obj->GetJavaWebContents();
-}
-
-}  // namespace jni_zero
-#endif
 
 #endif  // CONTENT_PUBLIC_BROWSER_WEB_CONTENTS_H_

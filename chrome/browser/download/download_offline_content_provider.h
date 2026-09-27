@@ -20,10 +20,6 @@
 #include "components/offline_items_collection/core/offline_content_provider.h"
 #include "components/offline_items_collection/core/offline_item.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/download/android/open_download_dialog_bridge_delegate.h"  // nogncheck crbug.com/40147906
-#endif
-
 // TODO(xingliu): Remove using in the header files.
 using DownloadItem = download::DownloadItem;
 using SimpleDownloadManagerCoordinator =
@@ -158,10 +154,6 @@ class DownloadOfflineContentProvider
   base::circular_deque<base::OnceClosure> pending_actions_for_full_browser_;
 
   raw_ptr<Profile> profile_;
-
-#if BUILDFLAG(IS_ANDROID)
-  OpenDownloadDialogBridgeDelegate open_download_dialog_delegate_;
-#endif
 
   base::WeakPtrFactory<DownloadOfflineContentProvider> weak_ptr_factory_{this};
 };

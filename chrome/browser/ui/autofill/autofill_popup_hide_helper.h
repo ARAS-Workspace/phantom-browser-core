@@ -12,9 +12,7 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "ui/gfx/geometry/size.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/zoom/zoom_observer.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace content {
 class RenderFrameHost;
@@ -34,12 +32,8 @@ enum class SuggestionHidingReason;
 // cannot be observed by this class because they are specific to the renderer,
 // to suggestions, etc.
 class AutofillPopupHideHelper : public content::WebContentsObserver,
-                                public PictureInPictureWindowManager::Observer
-#if !BUILDFLAG(IS_ANDROID)
-    ,
-                                public zoom::ZoomObserver
-#endif  // !BUILDFLAG(IS_ANDROID)
-{
+                                public PictureInPictureWindowManager::Observer,
+                                public zoom::ZoomObserver {
  public:
   // This is a `RepeatingCallback` because multiple hiding events can occur at
   // the same time.
@@ -76,12 +70,10 @@ class AutofillPopupHideHelper : public content::WebContentsObserver,
       content::RenderFrameHost::LifecycleState new_state) override;
   void RenderFrameDeleted(content::RenderFrameHost* render_frame_host) override;
 
-#if !BUILDFLAG(IS_ANDROID)
   // ZoomObserver:
   void OnZoomControllerDestroyed(zoom::ZoomController* source) override;
   void OnZoomChanged(
       const zoom::ZoomController::ZoomChangedEventData& data) override;
-#endif
 
   // PictureInPictureWindowManager::Observer
   void OnEnterPictureInPicture() override;
@@ -96,10 +88,8 @@ class AutofillPopupHideHelper : public content::WebContentsObserver,
   // Last known size of the WebContents.
   gfx::Size last_web_contents_size_;
 
-#if !BUILDFLAG(IS_ANDROID)
   base::ScopedObservation<zoom::ZoomController, zoom::ZoomObserver>
       zoom_observation_{this};
-#endif
 
   // Observer needed to check autofill popup overlap with picture-in-picture
   // window. It is guaranteed that there can only be one

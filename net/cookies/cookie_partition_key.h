@@ -168,22 +168,6 @@ class NET_EXPORT CookiePartitionKey {
     return ancestor_chain_bit_ == AncestorChainBit::kCrossSite;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Globally disable cookie partitioning. This must be called before any
-  // CookiePartitionKeys are created.
-  // This is used to disable CHIPS in WebView, and should not be used by any
-  // other embedder.
-  static void DisablePartitioningInWebView();
-
-  // Return whether partitioning has been disabled in WebView.
-  // Other embedders should not use this method.
-  static bool IsPartitioningDisabledInWebView();
-
-  // Disable partitioning in unit tests.
-  [[nodiscard]]
-  static base::AutoReset<bool> DisablePartitioningInScopeForTesting();
-#endif  // BUILDFLAG(IS_ANDROID)
-
  private:
   // Used by DeserializeInternal to determine how strict the context should be
   // about inconsistencies in the input.
@@ -209,13 +193,6 @@ class NET_EXPORT CookiePartitionKey {
       const std::string& top_level_site,
       CookiePartitionKey::AncestorChainBit has_cross_site_ancestor,
       CookiePartitionKey::ParsingMode parsing_mode);
-
-#if BUILDFLAG(IS_ANDROID)
-  static bool g_partitioning_disabled_in_webview_;
-  // Used to assert that no constructors are called before partitioning is
-  // disabled.
-  static bool g_constructor_called_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   SchemefulSite site_;
 

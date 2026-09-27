@@ -25,10 +25,6 @@
 #include "base/trace_event/memory_dump_request_args.h"
 #include "components/viz/client/viz_client_export.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/pre_freeze_background_memory_trimmer.h"
-#endif
-
 namespace ash {
 FORWARD_DECLARE_TEST(LockStateControllerTest, PauseFrameEvictionWhileLocked);
 }  // namespace ash
@@ -105,11 +101,7 @@ class VIZ_CLIENT_EXPORT FrameEvictionManager
 
   void StartFrameCullingTimer();
   void CullUnlockedFrames(size_t saved_frame_limit);
-#if BUILDFLAG(IS_ANDROID)
-  void CullOldUnlockedFrames(base::MemoryReductionTaskContext task_type);
-#else
   void CullOldUnlockedFrames();
-#endif
 
   // Pauses/unpauses frame eviction.
   void Pause();

@@ -34,17 +34,10 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/feature.h"
-#endif
-
 namespace base {
 namespace internal {
 class ThreadTypeManager;
 }
-#if BUILDFLAG(IS_ANDROID)
-BASE_EXPORT BASE_DECLARE_FEATURE(kRestrictBigCoreThreadAffinity);
-#endif
 
 class TimeDelta;
 
@@ -389,21 +382,6 @@ using PlatformThread = PlatformThreadLinux;
 #else
 using PlatformThread = PlatformThreadBase;
 #endif
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_EXPORT void SetMaxFrequencyPerProcessorOverrideForTesting(
-    std::vector<uint64_t>* value);
-
-// Returns whether `SetCanRunOnBigCore()` is a no-op. This is intended to help
-// with experiment targeting, by making sure that the base::Feature is only
-// queried for eligible devices. It is thus intended to be temporary, and to be
-// removed once the experiments conclude.
-BASE_EXPORT bool IsEligibleForBigCoreAffinityChange();
-// Sets whether a thread is allowed to run on the big core cluster, on
-// configurations where this is relevant, i.e. at least 3 distinct
-// clusters. Otherwise this is a no-op.
-BASE_EXPORT void SetCanRunOnBigCore(PlatformThreadId thread_id, bool can_run);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 namespace internal {
 

@@ -18,11 +18,7 @@
 #include "components/policy/core/common/policy_namespace.h"
 #include "components/policy/core/common/policy_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/android/tab_model/tab_model_observer.h"
-#else
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
-#endif
 
 namespace user_manager {
 class User;

@@ -39,11 +39,9 @@ class FakeCommandBufferHelper : public CommandBufferHelper {
   // Complete a pending SyncToken wait.
   void ReleaseSyncToken(gpu::SyncToken sync_token);
 
-#if !BUILDFLAG(IS_ANDROID)
   // CommandBufferHelper implementation.
   gpu::SharedImageStub* GetSharedImageStub() override;
   gpu::MemoryTypeTracker* GetMemoryTypeTracker() override;
-#endif
 
   gpu::SharedImageManager* GetSharedImageManager() override;
 

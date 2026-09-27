@@ -89,13 +89,6 @@ class MediaStreamDevicesController {
       const content::MediaStreamRequest& request,
       blink::mojom::MediaStreamRequestResult* denial_reason) const;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns true if clicking allow on the dialog should give access to the
-  // requested devices.
-  bool IsUserAcceptAllowedOnAndroid(
-      blink::PermissionType permission_descriptor) const;
-#endif
-
   bool PermissionIsBlockedForReason(
       blink::PermissionType permission_descriptor,
       content::PermissionStatusSource reason) const;

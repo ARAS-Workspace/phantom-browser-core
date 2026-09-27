@@ -287,12 +287,6 @@ class HistoryDatabase : public DownloadDatabase,
 
   bool MigrateRemoveTypedUrlMetadata();
 
-#if BUILDFLAG(IS_ANDROID)
-  // The android_urls table ceased usage in 91.0.4438.0. This method drops the
-  // table if it exists.
-  bool DropAndroidUrlsTable();
-#endif
-
   // ---------------------------------------------------------------------------
 
   sql::Database db_;

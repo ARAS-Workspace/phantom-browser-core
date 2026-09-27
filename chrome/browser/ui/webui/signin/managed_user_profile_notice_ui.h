@@ -12,11 +12,9 @@
 #include "content/public/browser/web_contents_user_data.h"
 #include "content/public/browser/web_ui_controller.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/common/webui_url_constants.h"
 #include "content/public/browser/webui_config.h"
 #include "content/public/common/url_constants.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class BrowserWindowInterface;
 class ManagedUserProfileNoticeHandler;
@@ -25,7 +23,6 @@ namespace content {
 class WebUI;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class ManagedUserProfileNoticeUI;
 
 class ManagedUserProfileNoticeUIConfig
@@ -35,7 +32,6 @@ class ManagedUserProfileNoticeUIConfig
       : DefaultWebUIConfig(content::kChromeUIScheme,
                            chrome::kChromeUIManagedUserProfileNoticeHost) {}
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class ManagedUserProfileNoticeUI : public content::WebUIController {
  public:

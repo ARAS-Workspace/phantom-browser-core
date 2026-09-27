@@ -202,13 +202,6 @@ class GPU_IPC_CLIENT_EXPORT GpuChannelHost
                              gfx::BufferUsage buffer_usage,
                              gfx::GpuMemoryBufferHandle* handle);
 
-#if BUILDFLAG(IS_ANDROID)
-  void CopyNativeGmbToSharedMemoryAsync(
-      gfx::GpuMemoryBufferHandle buffer_handle,
-      base::UnsafeSharedMemoryRegion memory_region,
-      base::OnceCallback<void(bool)> callback);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Crashes the GPU process. This functionality is added here because
   // of instability when creating a new tab just to navigate to
   // chrome://gpucrash . This only works when running tests and is

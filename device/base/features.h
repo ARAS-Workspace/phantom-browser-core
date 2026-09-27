@@ -19,15 +19,6 @@ namespace features {
 DEVICE_BASE_EXPORT BASE_DECLARE_FEATURE(kWebBluetoothConfirmPairingSupport);
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_ANDROID)
-DEVICE_BASE_EXPORT BASE_DECLARE_FEATURE(kGmsCoreLocationRequestParamOverride);
-DEVICE_BASE_EXPORT BASE_DECLARE_FEATURE(kGmsCoreFailClosedOnPreciseLeak);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-DEVICE_BASE_EXPORT BASE_DECLARE_FEATURE(kWebSerialWiredDevicesAndroid);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace features
 }  // namespace device
 

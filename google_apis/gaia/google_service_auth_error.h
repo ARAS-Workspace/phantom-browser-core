@@ -19,10 +19,6 @@
 #include "google_apis/gaia/device_management_error_details.h"
 #include "net/base/net_errors.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class COMPONENT_EXPORT(GOOGLE_APIS) GoogleServiceAuthError {
  public:
   // These enumerations are referenced by integer value in HTML login code and
@@ -246,14 +242,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GoogleServiceAuthError {
   const gaia::DeviceManagementErrorDetails& GetDeviceManagementErrorDetails()
       const;
 
-#if BUILDFLAG(IS_ANDROID)
-  static GoogleServiceAuthError FromJavaObject(
-      JNIEnv* env,
-      const base::android::JavaRef<jobject>& j_auth_error);
-
-  jni_zero::ScopedJavaLocalRef<jobject> ToJavaObject(JNIEnv* env) const;
-#endif  // BUILDFLAG(IS_ANDROID)
-
  private:
   // State-specific data structures for the variant.
   struct None {
@@ -332,25 +320,5 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GoogleServiceAuthError {
 
   Details details_;
 };
-
-#if BUILDFLAG(IS_ANDROID)
-namespace jni_zero {
-
-template <>
-inline GoogleServiceAuthError FromJniType<GoogleServiceAuthError>(
-    JNIEnv* env,
-    const base::android::JavaRef<jobject>& j_auth_error) {
-  return GoogleServiceAuthError::FromJavaObject(env, j_auth_error);
-}
-
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType(
-    JNIEnv* env,
-    const GoogleServiceAuthError& auth_error) {
-  return auth_error.ToJavaObject(env);
-}
-
-}  // namespace jni_zero
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #endif  // GOOGLE_APIS_GAIA_GOOGLE_SERVICE_AUTH_ERROR_H_

@@ -115,12 +115,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadFile {
   virtual void Pause() = 0;
   virtual void Resume() = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Publishes the download to public. Once completes, |callback| is called with
-  // the final content URI.
-  virtual void PublishDownload(RenameCompletionCallback callback) = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Whether the file is an in-memory file.
   virtual bool IsMemoryFile();
 };

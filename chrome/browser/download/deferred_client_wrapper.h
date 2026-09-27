@@ -83,15 +83,6 @@ class DeferredClientWrapper : public Client {
   ClientFactory client_factory_;
   raw_ptr<SimpleFactoryKey> key_;
 
-#if BUILDFLAG(IS_ANDROID)
-  // This is needed to record UMA for when DownloadClientWrapper requests a full
-  // browser start while the browser is running in reduced mode. Reduced mode is
-  // only on Android so it is ifdefed out on other platforms to prevent the
-  // compiler from complaining that it is unused.
-  bool full_browser_requested_;
-  void LaunchFullBrowser();
-#endif
-
   base::WeakPtrFactory<DeferredClientWrapper> weak_ptr_factory_{this};
 };
 

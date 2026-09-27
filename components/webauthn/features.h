@@ -12,24 +12,8 @@
 
 namespace webauthn::features {
 
-#if BUILDFLAG(IS_ANDROID)
-// A development feature flag to control the CredMan mode.
-COMPONENT_EXPORT(WEBAUTHN)
-BASE_DECLARE_FEATURE(kWebAuthnAndroidCredManForDev);
-// Parameter for `kWebAuthnAndroidCredManForDev` to specify the mode.
-// Can be "disabled", "full" or "parallel".
-COMPONENT_EXPORT(WEBAUTHN)
-extern const base::FeatureParam<std::string> kWebAuthnAndroidCredManForDevMode;
-
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
-
 // Controls deletion of passkeys that have been hidden for a while.
 BASE_DECLARE_FEATURE(kDeleteOldHiddenPasskeys);
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Reject RP IDs inside the caller's public suffix.
 BASE_DECLARE_FEATURE(kRejectRpIdsInsideCallersPublicSuffix);

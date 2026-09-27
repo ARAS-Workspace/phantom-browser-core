@@ -7,9 +7,6 @@
 
 #include "base/containers/span.h"
 #include "build/buildflag.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
 
 class GURL;
 
@@ -91,13 +88,6 @@ class AutofillImageFetcherBase {
   virtual const gfx::Image* GetCachedImageForUrl(
       const GURL& image_url,
       ImageType image_type) const = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Return the owned AutofillImageFetcher Java object. It is created if it
-  // doesn't already exist.
-  virtual base::android::ScopedJavaLocalRef<jobject>
-  GetOrCreateJavaImageFetcher() = 0;
-#endif
 };
 
 }  // namespace autofill

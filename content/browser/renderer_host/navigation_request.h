@@ -96,11 +96,6 @@
 #include "url/origin.h"
 #include "url/origin_debug.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#include "content/browser/android/navigation_handle_proxy.h"
-#endif
-
 namespace network {
 struct IntegrityPolicy;
 struct URLLoaderCompletionStatus;
@@ -509,9 +504,6 @@ class CONTENT_EXPORT NavigationRequest
   PreloadingTriggerType GetPrerenderTriggerType() override;
   std::string GetPrerenderHistogramSuffix() override;
   bool IsPrerenderHostReused() override;
-#if BUILDFLAG(IS_ANDROID)
-  const base::android::JavaRef<jobject>& GetJavaNavigationHandle() override;
-#endif
   base::SafeRef<NavigationHandle> GetSafeRef() override;
   bool ExistingDocumentWasDiscarded() const override;
   blink::RuntimeFeatureStateContext& GetMutableRuntimeFeatureStateContext()
@@ -2829,11 +2821,6 @@ class CONTENT_EXPORT NavigationRequest
   std::unique_ptr<NavigationURLLoader> loader_;
 
   bool navigation_visible_to_embedder_ = false;
-#if BUILDFLAG(IS_ANDROID)
-  // For each C++ NavigationHandle, there is a Java counterpart. It is the JNI
-  // bridge in between the two.
-  std::unique_ptr<NavigationHandleProxy> navigation_handle_proxy_;
-#endif
 
   // These next items are used in browser-initiated navigations to store
   // information from the NavigationEntryImpl that is required after request
@@ -3282,9 +3269,7 @@ class CONTENT_EXPORT NavigationRequest
   // navigation.
   CrossOriginOpenerPolicyStatus coop_status_{this};
 
-#if !BUILDFLAG(IS_ANDROID)
   bool is_safe_to_delete_ = true;
-#endif
 
   // UKM source associated with the page we are navigated away from.
   const ukm::SourceId previous_page_ukm_source_id_;

@@ -12,10 +12,8 @@
 class PrefService;
 class Profile;
 
-#if !BUILDFLAG(IS_ANDROID)
 struct StartupTab;
 using StartupTabs = std::vector<StartupTab>;
-#endif
 
 namespace user_prefs {
 class PrefRegistrySyncable;
@@ -95,10 +93,8 @@ struct SessionStartupPref {
   // opened.
   bool ShouldOpenUrls() const;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Convert to StartupTabs.
   StartupTabs ToStartupTabs() const;
-#endif
 
   // What to do on startup.
   Type type;

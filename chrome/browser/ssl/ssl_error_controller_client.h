@@ -40,9 +40,7 @@ class SSLErrorControllerClient
   void Proceed() override;
   bool CanLaunchDateAndTimeSettings() override;
   void LaunchDateAndTimeSettings() override;
-#if !BUILDFLAG(IS_ANDROID)
   void ShowCertificateViewer() override;
-#endif
 
  private:
   const net::SSLInfo ssl_info_;

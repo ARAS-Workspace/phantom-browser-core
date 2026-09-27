@@ -228,7 +228,6 @@ TYPED_TEST(ClipboardTest, SvgTest) {
   EXPECT_EQ(markup, markup_result);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/40681589): This test fails with ClipboardAndroid, but passes
 // with the TestClipboard as RTF isn't implemented in ClipboardAndroid.
 TYPED_TEST(ClipboardTest, RTFTest) {
@@ -253,7 +252,6 @@ TYPED_TEST(ClipboardTest, RTFTest) {
                                                     /* data_dst = */ nullptr);
   EXPECT_EQ(rtf, result);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // MultipleBufferTest only ran on Linux because Linux is the only platform that
 // supports the selection buffer by default.
@@ -354,10 +352,6 @@ TYPED_TEST(ClipboardTest, UnicodeHTMLTest) {
   {
     ScopedClipboardWriter clipboard_writer(ClipboardBuffer::kCopyPaste);
     clipboard_writer.WriteHTML(markup, url);
-#if BUILDFLAG(IS_ANDROID)
-    // Android requires HTML and plain text representations to be written.
-    clipboard_writer.WriteText(markup);
-#endif
   }
 
   EXPECT_THAT(this->GetAvailableTypes(ClipboardBuffer::kCopyPaste),
@@ -500,8 +494,7 @@ TYPED_TEST(ClipboardTest, URLTest) {
 
 // TODO(tonikitoo, msisov): enable back for ClipboardOzone implements
 // selection support. https://crbug.com/911992
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_OZONE)
   ascii_text = clipboard_test_util::ReadAsciiText(&this->clipboard(),
                                                   ClipboardBuffer::kSelection,
                                                   /* data_dst = */ nullptr);
@@ -575,7 +568,6 @@ static void TestBitmapWriteAndPngRead(Clipboard* clipboard,
   AssertBitmapMatchesExpected(image, info, expect_data);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/41372437): Re-enable this test once death tests work on
 // Android.
 
@@ -591,7 +583,6 @@ TYPED_TEST(ClipboardTest, BitmapWriteAndPngRead_F16_Premul) {
           &kRGBAF16Premul, &kRGBAPremul),
       "");
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TYPED_TEST(ClipboardTest, BitmapWriteAndPngRead_N32_Premul) {
   constexpr uint32_t b[4 * 3] = {
@@ -919,7 +910,7 @@ TYPED_TEST(ClipboardTest, NonAsciiFormatTest) {
 }
 #endif
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
 TYPED_TEST(ClipboardTest, HyperlinkTest) {
   const std::string kTitle("The <Example> Company's \"home page\"");
   const std::string kUrl("http://www.example.com?x=3&lt=3#\"'<>");
@@ -1000,7 +991,6 @@ TYPED_TEST(ClipboardTest, WriteEverything) {
 // clipboard change listener is posted to the Java message loop, and spinning
 // that loop from C++ to trigger the callback in the test requires a non-trivial
 // amount of additional work.
-#if !BUILDFLAG(IS_ANDROID)
 // Simple test that the sequence number appears to change when the clipboard is
 // written to.
 // TODO(dcheng): Add a version to test ClipboardBuffer::kSelection.
@@ -1022,7 +1012,6 @@ TYPED_TEST(ClipboardTest, GetSequenceNumber) {
 
   EXPECT_NE(first_sequence_number, second_sequence_number);
 }
-#endif
 
 // Test that writing empty parameters doesn't try to dereference an empty data
 // vector. Not crashing = passing.
@@ -1065,37 +1054,6 @@ TYPED_TEST(ClipboardTest, WriteImageEmptyParams) {
   ScopedClipboardWriter scw(ClipboardBuffer::kCopyPaste);
   scw.WriteImage(SkBitmap());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TYPED_TEST(ClipboardTest, BookmarkTestWithoutTitle) {
-  // We're testing platform-specific behavior, so use PlatformClipboardTest.
-  std::string test_suite_name = ::testing::UnitTest::GetInstance()
-                                    ->current_test_info()
-                                    ->test_suite_name();
-  if (test_suite_name != std::string("ClipboardTest/PlatformClipboardTest")) {
-    return;
-  }
-
-  std::u16string title_result;
-  std::string url("http://www.example.com/"), url_result;
-
-  {
-    ScopedClipboardWriter clipboard_writer(ClipboardBuffer::kCopyPaste);
-    clipboard_writer.WriteURL(
-        ui::ClipboardUrlInfo{.url = GURL(url), .title = std::u16string()});
-  }
-
-  EXPECT_TRUE(ui::clipboard_test_util::IsFormatAvailable(
-      &this->clipboard(), ClipboardFormatType::UrlType(),
-      ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr));
-
-  clipboard_test_util::ReadBookmark(&this->clipboard(),
-                                    /* data_dst = */ nullptr, &title_result,
-                                    &url_result);
-  EXPECT_EQ(url, url_result);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_APPLE)
 // Ensures that BookmarkEntriesType can be written to and read from the

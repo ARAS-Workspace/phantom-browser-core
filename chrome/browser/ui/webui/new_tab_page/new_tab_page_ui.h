@@ -46,12 +46,10 @@
 #include "ui/webui/resources/cr_components/most_visited/most_visited.mojom.h"
 #include "ui/webui/resources/js/browser_command/browser_command.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/new_tab_page/ntp_promo/ntp_promo.mojom.h"  // nogncheck
 #include "chrome/browser/ui/webui/new_tab_page/ntp_promo/ntp_promo_handler.h"  // nogncheck
 #include "components/user_education/common/ntp_promo/ntp_promo_controller.h"
 #include "components/user_education/webui/help_bubble_handler.h"  // nogncheck
-#endif
 
 #if !defined(OFFICIAL_BUILD)
 #include "chrome/browser/ui/webui/new_tab_page/foo/foo.mojom.h"  // nogncheck crbug.com/40147906
@@ -98,9 +96,7 @@ class NewTabPageUI
       public most_visited::mojom::MostVisitedPageHandlerFactory,
       public browser_command::mojom::CommandHandlerFactory,
       public help_bubble::mojom::HelpBubbleHandlerFactory,
-#if !BUILDFLAG(IS_ANDROID)
       public ntp_promo::mojom::NtpPromoHandlerFactory,
-#endif
       public NtpCustomBackgroundServiceObserver,
       public searchbox::mojom::PageHandlerFactory,
       content::WebContentsObserver {
@@ -197,11 +193,9 @@ class NewTabPageUI
       mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandlerFactory>
           pending_receiver);
 
-#if !BUILDFLAG(IS_ANDROID)
   void BindInterface(
       mojo::PendingReceiver<ntp_promo::mojom::NtpPromoHandlerFactory>
           pending_receiver);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void ConnectToParentDocument(
       mojo::PendingRemote<new_tab_page::mojom::MicrosoftAuthUntrustedDocument>
@@ -247,13 +241,11 @@ class NewTabPageUI
       mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler)
       override;
 
-#if !BUILDFLAG(IS_ANDROID)
   // ntp_promo::mojom::NtpPromoHandlerFactory:
   void CreateNtpPromoHandler(
       mojo::PendingRemote<ntp_promo::mojom::NtpPromoClient> client,
       mojo::PendingReceiver<ntp_promo::mojom::NtpPromoHandler> handler)
       override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // NtpCustomBackgroundServiceObserver:
   void OnCustomBackgroundImageUpdated() override;
@@ -283,18 +275,10 @@ class NewTabPageUI
   std::unique_ptr<MostVisitedPrefObserver> most_visited_pref_observer_;
   mojo::Receiver<most_visited::mojom::MostVisitedPageHandlerFactory>
       most_visited_page_factory_receiver_;
-#if BUILDFLAG(IS_ANDROID)
-  mojo::PendingRemote<searchbox::mojom::Page> android_stub_searchbox_page_;
-  std::unique_ptr<searchbox::mojom::PageHandler>
-      android_stub_searchbox_handler_;
-  mojo::PendingRemote<searchbox::mojom::Page> android_stub_realbox_page_;
-  std::unique_ptr<searchbox::mojom::PageHandler> android_stub_realbox_handler_;
-#else
   std::unique_ptr<user_education::HelpBubbleHandler> help_bubble_handler_;
   std::unique_ptr<NtpPromoHandler> ntp_promo_handler_;
   mojo::Receiver<ntp_promo::mojom::NtpPromoHandlerFactory>
       ntp_promo_handler_factory_receiver_;
-#endif  // BUILDFLAG(IS_ANDROID)
   std::unique_ptr<BrowserCommandHandler> promo_browser_command_handler_;
   mojo::Receiver<browser_command::mojom::CommandHandlerFactory>
       browser_command_factory_receiver_;

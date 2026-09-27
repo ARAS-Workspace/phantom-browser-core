@@ -83,7 +83,6 @@ std::unique_ptr<BnplTosView> CreateAndShowBnplTos(
     base::WeakPtr<BnplTosController> controller,
     content::WebContents* web_contents);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Factory function for creating the "Save and Fill" dialog. This dialog
 // is triggered when the user has no saved credit cards and clicks on the
 // "Save and Fill" suggestion in the credit card dropdown menu. It presents
@@ -92,7 +91,6 @@ std::unique_ptr<BnplTosView> CreateAndShowBnplTos(
 std::unique_ptr<SaveAndFillDialogView> CreateAndShowSaveAndFillDialog(
     base::WeakPtr<SaveAndFillDialogController> controller,
     content::WebContents* web_contents);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Factory function for creating and showing the BNPL issuer selection dialog.
 // This dialog is triggered when the BNPL payment method has been selected and

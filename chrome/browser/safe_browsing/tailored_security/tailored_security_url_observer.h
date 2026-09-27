@@ -11,10 +11,6 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/browser/web_contents_user_data.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/tailored_security/unconsented_message_android.h"
-#endif
-
 namespace content {
 class RenderWidgetHost;
 }  // namespace content
@@ -56,12 +52,6 @@ class TailoredSecurityUrlObserver
   void UpdateFocusAndURL(bool focused, const GURL& url);
 
   friend class content::WebContentsUserData<TailoredSecurityUrlObserver>;
-
-#if BUILDFLAG(IS_ANDROID)
-  void MessageDismissed();
-
-  std::unique_ptr<TailoredSecurityUnconsentedMessageAndroid> message_;
-#endif
 
   // Reference to the TailoredSecurityService for this profile.
   raw_ptr<TailoredSecurityService> service_;

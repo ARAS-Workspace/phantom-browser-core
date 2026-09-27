@@ -47,10 +47,8 @@ class VersionUI : public content::WebUIController {
   static scoped_refptr<base::RefCountedMemory> GetFaviconResourceBytes(
       ui::ResourceScaleFactor scale_factor);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns a localized version string suitable for displaying in UI.
   static std::u16string GetAnnotatedVersionStringForUi();
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 #endif  // CHROME_BROWSER_UI_WEBUI_VERSION_VERSION_UI_H_

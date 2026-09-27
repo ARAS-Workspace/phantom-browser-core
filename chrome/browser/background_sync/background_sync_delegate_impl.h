@@ -18,9 +18,7 @@
 #include "content/public/browser/browser_thread.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/keep_alive_registry/scoped_keep_alive.h"
-#endif
 
 class Profile;
 class HostContentSettingsMap;
@@ -44,7 +42,6 @@ class BackgroundSyncDelegateImpl
   explicit BackgroundSyncDelegateImpl(Profile* profile);
   ~BackgroundSyncDelegateImpl() override;
 
-#if !BUILDFLAG(IS_ANDROID)
   class BackgroundSyncEventKeepAliveImpl
       : public content::BackgroundSyncController::BackgroundSyncEventKeepAlive {
    public:
@@ -62,7 +59,6 @@ class BackgroundSyncDelegateImpl
   std::unique_ptr<
       content::BackgroundSyncController::BackgroundSyncEventKeepAlive>
   CreateBackgroundSyncEventKeepAlive() override;
-#endif
 
   void GetUkmSourceId(
       const url::Origin& origin,
@@ -73,14 +69,6 @@ class BackgroundSyncDelegateImpl
   void NoteSuspendedPeriodicSyncOrigins(
       std::set<url::Origin> suspended_origins) override;
   int GetSiteEngagementPenalty(const GURL& url) override;
-#if BUILDFLAG(IS_ANDROID)
-  void ScheduleBrowserWakeUpWithDelay(
-      blink::mojom::BackgroundSyncType sync_type,
-      base::TimeDelta delay) override;
-  void CancelBrowserWakeup(blink::mojom::BackgroundSyncType sync_type) override;
-  bool ShouldDisableBackgroundSync() override;
-  bool ShouldDisableAndroidNetworkDetection() override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // SiteEngagementObserver overrides.
   void OnEngagementEvent(content::WebContents* web_contents,

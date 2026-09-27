@@ -53,11 +53,6 @@ class TestPermissionsClient : public PermissionsClient {
                                  bool already_overrode_requester) override;
   void SetIsPrivilegedInternalWebUI(bool is_privileged_internal_web_ui);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Gets the name of the embedder.
-  const std::u16string GetClientApplicationName() const override;
-#endif
-
  private:
   TestPermissionsClient(const TestPermissionsClient&) = delete;
   TestPermissionsClient& operator=(const TestPermissionsClient&) = delete;

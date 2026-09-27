@@ -507,13 +507,9 @@ class Thread;
 
 // NaCL doesn't support stack capture.
 // Android can hang in stack capture (crbug.com/959139).
-#if BUILDFLAG(IS_ANDROID)
-#define CAPTURE_THREAD_RESTRICTIONS_STACK_TRACES() false
-#else
 // Stack capture is slow. Only enable it in developer builds, to avoid user
 // visible jank when thread restrictions are set.
 #define CAPTURE_THREAD_RESTRICTIONS_STACK_TRACES() EXPENSIVE_DCHECKS_ARE_ON()
-#endif
 
 // A boolean and the stack from which it was set. Note: The stack is not
 // captured in all builds, see `CAPTURE_THREAD_RESTRICTIONS_STACK_TRACES()`.

@@ -32,10 +32,6 @@
 #include "third_party/blink/public/mojom/ai/ai_manager.mojom.h"
 #include "third_party/blink/public/mojom/ai/model_streaming_responder.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/optimization_guide/core/model_execution/test/fake_model_broker_android.h"
-#endif
-
 class AITestUtils {
  public:
   class TestStreamingResponder : public blink::mojom::ModelStreamingResponder {
@@ -131,11 +127,7 @@ class AITestUtils {
 
     raw_ptr<MockOptimizationGuideKeyedService>
         mock_optimization_guide_keyed_service_;
-#if BUILDFLAG(IS_ANDROID)
-    std::unique_ptr<optimization_guide::FakeModelBrokerAndroid> fake_broker_;
-#else
     std::unique_ptr<optimization_guide::FakeModelBroker> fake_broker_;
-#endif
     std::unique_ptr<optimization_guide::FakeAdaptationAsset> fake_asset_;
 
     std::unique_ptr<AIManager> ai_manager_;

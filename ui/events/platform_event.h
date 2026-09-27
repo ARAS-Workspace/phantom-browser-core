@@ -13,8 +13,6 @@
 
 #if BUILDFLAG(IS_APPLE)
 #include "base/apple/owned_objc.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "ui/events/android/platform_event_android.h"
 #endif
 
 namespace ui {
@@ -28,8 +26,6 @@ namespace ui {
 using PlatformEvent = ui::Event*;
 #elif BUILDFLAG(IS_MAC)
 using PlatformEvent = base::apple::OwnedNSEvent;
-#elif BUILDFLAG(IS_ANDROID)
-using PlatformEvent = ui::PlatformEventAndroid;
 #else
 using PlatformEvent = void*;
 #endif

@@ -29,10 +29,6 @@
 #include "ui/gfx/surface_origin.h"
 #include "ui/latency/latency_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "ui/gfx/android/surface_control_frame_rate.h"
-#endif
-
 namespace gfx {
 namespace mojom {
 class DelegatedInkPointRenderer;
@@ -236,10 +232,6 @@ class VIZ_SERVICE_EXPORT OutputSurface {
   virtual void SetDisplayTransformHint(gfx::OverlayTransform transform) = 0;
   virtual gfx::OverlayTransform GetDisplayTransform() = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  virtual base::ScopedClosureRunner GetCacheBackBufferCb();
-#endif
-
   // If set to true, the OutputSurface must deliver
   // OutputSurfaceclient::DidSwapWithSize notifications to its client.
   // OutputSurfaces which support delivering swap size notifications should
@@ -254,11 +246,6 @@ class VIZ_SERVICE_EXPORT OutputSurface {
   static void UpdateLatencyInfoOnSwap(
       const gfx::SwapResponse& response,
       std::vector<ui::LatencyInfo>* latency_info);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Notifies the OutputSurface of rate of content updates in frames per second.
-  virtual void SetFrameRate(gfx::SurfaceControlFrameRate frame_rate) {}
-#endif
 
   // Sends the pending delegated ink renderer receiver to GPU Main to allow the
   // browser process to send points directly there.

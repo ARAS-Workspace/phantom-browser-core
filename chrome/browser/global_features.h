@@ -14,11 +14,9 @@
 #include "net/net_buildflags.h"
 #include "ui/base/unowned_user_data/user_data_factory.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace infobars {
 class BrowserInfoBarManager;
 }  // namespace infobars
-#endif
 
 class GlobalBrowserCollection;
 
@@ -55,9 +53,7 @@ namespace safe_browsing {
 class ApplicationAdvancedProtectionStatusDetector;
 }  // namespace safe_browsing
 
-#if !BUILDFLAG(IS_ANDROID)
 class ProfileLaunchObserver;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class GlassFrameService;
 
@@ -144,12 +140,10 @@ class GlobalFeatures {
     return whats_new_registry_.get();
   }
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   omnibox_everywhere::OmniboxEverywhereController*
   omnibox_everywhere_controller() {
     return omnibox_everywhere_controller_.get();
   }
-#endif
 
   ApplicationLocaleStorage* application_locale_storage() {
     return application_locale_storage_.get();
@@ -176,13 +170,11 @@ class GlobalFeatures {
   static ui::UserDataFactoryWithOwner<BrowserProcess>&
   GetUserDataFactoryForTesting();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Prefer using ProfileLaunchObserver::GetInstance() over calling this method
   // directly.
   ProfileLaunchObserver* profile_launch_observer() {
     return profile_launch_observer_.get();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   tabs_api::TabDragSessionManager* tab_drag_session_manager() {
     return tab_drag_session_manager_.get();
@@ -220,10 +212,8 @@ class GlobalFeatures {
       default_browser_manager_;
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<omnibox_everywhere::OmniboxEverywhereController>
       omnibox_everywhere_controller_;
-#endif
 
   std::unique_ptr<ApplicationLocaleStorage> application_locale_storage_;
 
@@ -240,9 +230,7 @@ class GlobalFeatures {
   std::unique_ptr<local_network_access::IPAddressSpaceOverridesPrefsObserver>
       ip_address_space_overrides_prefs_observer_;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<infobars::BrowserInfoBarManager> browser_infobar_manager_;
-#endif
 
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
   std::unique_ptr<
@@ -250,7 +238,6 @@ class GlobalFeatures {
       unexportable_key_obsolete_profile_garbage_collector_;
 #endif  // BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<on_device_translation::OnDeviceTranslationInstaller>
       on_device_translation_installer_;
 
@@ -260,7 +247,6 @@ class GlobalFeatures {
       smart_restart_metrics_observer_;
 
   std::unique_ptr<smart_restart::SmartRestartManager> smart_restart_manager_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   std::unique_ptr<tabs_api::TabDragSessionManager> tab_drag_session_manager_;
 

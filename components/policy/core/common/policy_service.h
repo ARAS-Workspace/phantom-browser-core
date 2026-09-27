@@ -24,12 +24,6 @@ namespace policy {
 
 class ConfigurationPolicyProvider;
 
-#if BUILDFLAG(IS_ANDROID)
-namespace android {
-class PolicyServiceAndroid;
-}
-#endif
-
 // The PolicyService merges policies from all available sources, taking into
 // account their priorities. Policy clients can retrieve policy for their domain
 // and register for notifications on policy updates.
@@ -143,10 +137,6 @@ class POLICY_EXPORT PolicyService {
   virtual void RefreshPolicies(base::OnceClosure callback,
                                PolicyFetchReason reason) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Get the PolicyService JNI bridge instance.
-  virtual android::PolicyServiceAndroid* GetPolicyServiceAndroid() = 0;
-#endif
   virtual void UseLocalTestPolicyProvider(
       ConfigurationPolicyProvider* provider) = 0;
 };

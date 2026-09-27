@@ -101,12 +101,6 @@ class DistilledPagePrefs {
   // admissible based on feature flags enabled.
   bool IsUserPrefFontAvailable(mojom::FontFamily font);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Clamps the default font scaling to properly follow min and max font scaling
-  // for whether the distillation is in-app or CCT.
-  void ClampDefaultFontScaling();
-#endif
-
   // Notifies all Observers of new font family.
   void NotifyOnChangeFontFamily();
   // Notifies all Observers of new theme.

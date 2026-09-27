@@ -100,17 +100,6 @@ class TabGroupsMoveFunction : public ExtensionFunction {
       const gfx::Range& tabs,
       int new_index,
       std::string* error);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Called when a tab group is created in the target window for a cross-window
-  // move.
-  void OnTabGroupCreated(tab_groups::TabGroupId group_id);
-
-  // Tab group moves between windows are asynchronous on Android, so we must
-  // observe for the group being created in the target window.
-  class ObserverHelper;
-  std::unique_ptr<ObserverHelper> observer_helper_;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace extensions

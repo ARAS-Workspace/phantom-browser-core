@@ -41,9 +41,6 @@ enum class SidePanelOpenTrigger {
   kReadAnythingOmniboxChip = 24,
   kReadAnythingTogglePresentationButton = 25,
   kReadAnythingKeyboardShortcut = 26,
-#if BUILDFLAG(IS_ANDROID)
-  kWindowResized = 27,
-#endif
   // kGlicOpened = 28, (deprecated)
   kContextualTasks = 29,
   kReadAnythingListenToThisPageContextMenu = 30,
@@ -76,11 +73,6 @@ enum class SidePanelEntryHideReason {
   // Side panel entry was hidden because it is tab-scoped and the user switched
   // tabs.
   kBackgrounded = 2,
-#if BUILDFLAG(IS_ANDROID)
-  // SidePanel entry was hidden because the window resize resulted in too small
-  // of a range to have it visible.
-  kWindowResized = 3,
-#endif
 };
 
 

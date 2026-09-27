@@ -17,8 +17,6 @@
 
 namespace performance_manager::features {
 
-#if !BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_LINUX)
 #define URGENT_DISCARDING_FROM_PERFORMANCE_MANAGER() false
 #else
@@ -92,8 +90,6 @@ BASE_DECLARE_FEATURE(kPerformanceInterventionNotificationStringImprovements);
 
 // The version string that is used on the performance detection dialog.
 BASE_DECLARE_FEATURE_PARAM(int, kNotificationStringVersion);
-
-#endif
 
 // When enabled, LevelDBSiteDataStore uses BEST_EFFORT priority for its task
 // runner instead of the default USER_BLOCKING, to reduce thread pool contention

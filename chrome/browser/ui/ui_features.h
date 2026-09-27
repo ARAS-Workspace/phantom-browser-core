@@ -189,13 +189,10 @@ BASE_DECLARE_FEATURE(kTabDuplicateMetrics);
 
 BASE_DECLARE_FEATURE(kCollapseTabGroupDuringDrag);
 
-#if !BUILDFLAG(IS_ANDROID)
 BASE_DECLARE_FEATURE(kNewTabButtonContextMenu);
 
 BASE_DECLARE_FEATURE(kTabGroupHoverCards);
 bool IsTabGroupHoverCardsEnabled();
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 BASE_DECLARE_FEATURE(kTabHoverCardImages);
 
@@ -233,14 +230,12 @@ BASE_DECLARE_FEATURE(kTabModalUsesDesktopWidget);
 
 BASE_DECLARE_FEATURE(kTearOffWebAppTabOpensWebAppWindow);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Enables a three-button password save dialog variant (essentially adding a
 // "not now" button alongside "never").
 BASE_DECLARE_FEATURE(kThreeButtonPasswordSaveDialog);
 
 // Enables a split button for the "Cancel" action in the Password Save bubble.
 BASE_DECLARE_FEATURE(kPasswordSaveUpdateDropdownMenuExperiment);
-#endif
 
 // Feature which uses a flyover animation for animating side panels (and
 // expansion/contraction of the Vertical Tab Strip).
@@ -300,8 +295,6 @@ BASE_DECLARE_FEATURE(kTabsFromOtherDevicesSidePanel);
 // default.
 BASE_DECLARE_FEATURE(kTabsFromOtherDevicesSidePanelPinnedByDefault);
 
-#if !BUILDFLAG(IS_ANDROID)
-
 bool IsWebUIReloadButtonEnabled();
 
 bool IsWebUIHomeButtonEnabled();
@@ -335,17 +328,10 @@ bool IsWebUIToolbarEnabled();
 
 // Returns true if all toolbar controls are being handled by WebUI.
 bool IsWebUIToolbarFullyEnabled();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Controls whether to show a toast for Chrome non milestone update.
 BASE_DECLARE_FEATURE(kNonMilestoneUpdateToast);
 
-
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kAndroidAnimatedProgressBarInBrowser);
-
-bool IsAndroidAnimatedProgressBarInBrowserEnabled();
-#endif  // BUILDFLAG(IS_ANDROID)
 
 BASE_DECLARE_FEATURE(kAiOverlayDialog);
 BASE_DECLARE_FEATURE_PARAM(std::string, kAiOverlayDialogApiKey);

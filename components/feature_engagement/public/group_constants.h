@@ -13,10 +13,6 @@ namespace feature_engagement {
 // A feature to ensure all arrays can contain at least one group.
 BASE_DECLARE_FEATURE(kIPHDummyGroup);
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kClankDefaultBrowserPromosGroup);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace feature_engagement
 
 #endif  // COMPONENTS_FEATURE_ENGAGEMENT_PUBLIC_GROUP_CONSTANTS_H_

@@ -45,11 +45,6 @@ class PasswordReuseDetectionManager final
   // Checks reuse for the committed texts.
   void OnKeyPressedCommitted(const std::u16string& text);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Checks reuse for the uncommitted texts.
-  void OnKeyPressedUncommitted(const std::u16string& text);
-#endif
-
   // Performs password reuse check when a string is pasted.
   void OnPaste(std::u16string text);
 

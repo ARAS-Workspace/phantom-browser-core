@@ -21,10 +21,6 @@
 #include "base/memory/raw_span.h"
 #include "base/values.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/cached_flags/android/jni_delegate.h"
-#endif
-
 namespace flags_ui {
 
 // Internal functionality exposed for tests.
@@ -293,17 +289,6 @@ class FlagsState {
   // Delegate used for embedders to control display and application of flags.
   // May be null.
   raw_ptr<Delegate> delegate_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Delegate used by internal code to make JNI calls.
-  std::unique_ptr<cached_flags::JniDelegate> jni_delegate_;
-
- public:
-  void SetJniDelegateForTesting(
-      std::unique_ptr<cached_flags::JniDelegate> delegate) {
-    jni_delegate_ = std::move(delegate);
-  }
-#endif
 };
 
 }  // namespace flags_ui

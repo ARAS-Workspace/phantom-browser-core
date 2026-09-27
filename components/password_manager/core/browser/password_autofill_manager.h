@@ -63,10 +63,6 @@ class PasswordAutofillManager : public autofill::AutofillSuggestionDelegate,
   ~PasswordAutofillManager() override;
 
   // PasswordManagerDelegate:
-#if BUILDFLAG(IS_ANDROID)
-  void ShowKeyboardReplacingSurface(
-      const autofill::PasswordSuggestionRequest& request) override;
-#endif  // BUILDFLAG(IS_ANDROID)
   void ShowSuggestions(
       const autofill::TriggeringField& triggering_field) override;
   void SelectSuggestion(const autofill::Suggestion& suggestion) override;
@@ -303,7 +299,7 @@ class PasswordAutofillManager : public autofill::AutofillSuggestionDelegate,
   base::OneShotTimer wait_for_passkeys_timer_;
 
   // Stores the controller of warning popup UI on cross domain filling.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   std::unique_ptr<PasswordCrossDomainConfirmationPopupController>
       cross_domain_confirmation_controller_;
 #endif

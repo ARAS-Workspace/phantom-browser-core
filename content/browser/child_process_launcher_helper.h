@@ -27,10 +27,6 @@
 
 #include "mojo/public/cpp/platform/named_platform_channel.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 #include "content/public/browser/posix_file_descriptor_info.h"
 
 #if BUILDFLAG(IS_MAC)
@@ -96,11 +92,6 @@ class ChildProcessLauncherHelper
       std::unique_ptr<SandboxedProcessLauncherDelegate> delegate,
       const base::WeakPtr<ChildProcessLauncher>& child_process_launcher,
       bool terminate_on_shutdown,
-#if BUILDFLAG(IS_ANDROID)
-      bool can_use_warm_up_connection,
-      bool is_spare_renderer,
-      bool is_for_outermost_main_frame,
-#endif
       mojo::OutgoingInvitation mojo_invitation,
       const mojo::ProcessErrorCallback& process_error_callback,
       std::unique_ptr<ChildProcessLauncherFileData> file_data,
@@ -155,11 +146,6 @@ class ChildProcessLauncherHelper
   ChildProcessLauncherHelper::Process LaunchProcessOnLauncherThread(
       const base::LaunchOptions* options,
       std::unique_ptr<FileMappedForLaunch> files_to_register,
-#if BUILDFLAG(IS_ANDROID)
-      bool can_use_warm_up_connection,
-      bool is_spare_renderer,
-      bool is_for_outermost_main_frame,
-#endif
       bool* is_synchronous_launch,
       int* launch_result);
 
@@ -197,24 +183,8 @@ class ChildProcessLauncherHelper
   static void ForceNormalProcessTerminationAsync(
       ChildProcessLauncherHelper::Process process);
 
-#if BUILDFLAG(IS_ANDROID)
-  void OnChildProcessStarted(JNIEnv* env, int32_t handle);
-
-  void OnSpareRendererPriorityGraduatedOnClientThread(bool is_alive);
-
-  base::android::ChildBindingState GetEffectiveChildBindingState();
-
-  // Dumps the stack of the child process without crashing it.
-  void DumpProcessStack(const base::Process& process);
-
-  void SetRenderProcessPriorityOnLauncherThread(
-      base::Process process,
-      const RenderProcessPriority& priority,
-      base::TimeTicks post_from_ui_thread_time);
-#else   // !BUILDFLAG(IS_ANDROID)
   void SetProcessPriorityOnLauncherThread(base::Process process,
                                           base::Process::Priority priority);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   std::string GetProcessType();
 
@@ -241,12 +211,6 @@ class ChildProcessLauncherHelper
 
   static void ForceNormalProcessTerminationSync(
       ChildProcessLauncherHelper::Process process);
-
-#if BUILDFLAG(IS_ANDROID)
-  void set_java_peer_available_on_client_thread() {
-    java_peer_avaiable_on_client_thread_ = true;
-  }
-#endif
 
   const ChildProcessId child_process_id_;
   const scoped_refptr<base::SequencedTaskRunner> client_task_runner_;
@@ -277,15 +241,6 @@ class ChildProcessLauncherHelper
   std::unique_ptr<sandbox::SeatbeltExecClient> seatbelt_exec_client_;
   std::string serialized_policy_;
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaGlobalRef<jobject> java_peer_;
-  bool java_peer_avaiable_on_client_thread_ = false;
-  // Whether the process can use warmed up connection.
-  bool can_use_warm_up_connection_;
-  bool is_spare_renderer_;
-  bool is_for_outermost_main_frame_;
-#endif
 
 
 

@@ -21,10 +21,6 @@
 #include "components/segmentation_platform/public/trigger.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class PrefRegistrySimple;
 
 namespace segmentation_platform {
@@ -55,12 +51,6 @@ struct TrainingLabels {
 class SegmentationPlatformService : public KeyedService,
                                     public base::SupportsUserData {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a Java object of the type SegmentationPlatformService for the given
-  // SegmentationPlatformService.
-  static base::android::ScopedJavaLocalRef<jobject> GetJavaObject(
-      SegmentationPlatformService* segmentation_platform_service);
-#endif  // BUILDFLAG(IS_ANDROID)
   using SuccessCallback = base::OnceCallback<void(bool)>;
 
   SegmentationPlatformService() = default;

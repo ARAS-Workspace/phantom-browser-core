@@ -24,7 +24,6 @@
 #include "ui/shell_dialogs/select_file_dialog.h"
 #include "ui/shell_dialogs/selected_file_info.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/files/file.h"
 #include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
@@ -37,7 +36,6 @@
 #include "extensions/common/extension_id.h"
 #include "storage/browser/file_system/file_system_context.h"
 #include "storage/browser/file_system/file_system_operation.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -787,23 +785,6 @@ class DeveloperPrivateUploadExtensionToAccountFunction
   std::optional<bool> accept_bubble_for_testing_;
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// We don't have to port it to desktop android because it's an old API for
-// chromeos, that is kept just in case there's an app still using it.
-DECLARE_UNIMPLEMENTED_EXTENSION_FUNCTION(DeveloperPrivateLoadDirectoryFunction,
-                                         "developerPrivate.loadDirectory",
-                                         DEVELOPERPRIVATE_LOADUNPACKEDCROS);
-
-class DeveloperPrivateShowSiteSettingsFunction : public ExtensionFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("developerPrivate.showSiteSettings",
-                             DEVELOPERPRIVATE_SHOWSITESETTINGS)
-
- protected:
-  ~DeveloperPrivateShowSiteSettingsFunction() override {}
-  ResponseAction Run() override;
-};
-#else   // BUILDFLAG(IS_ANDROID)
 class DeveloperPrivateLoadDirectoryFunction : public ExtensionFunction {
  public:
   DECLARE_EXTENSION_FUNCTION("developerPrivate.loadDirectory",
@@ -862,7 +843,6 @@ class DeveloperPrivateLoadDirectoryFunction : public ExtensionFunction {
   // Error string if `success_` is false.
   std::string error_;
 };
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions::api
 

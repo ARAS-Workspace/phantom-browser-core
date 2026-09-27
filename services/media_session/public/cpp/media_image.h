@@ -13,14 +13,6 @@
 #include "ui/gfx/geometry/size.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-
-#include <jni.h>
-
-#include "base/android/scoped_java_ref.h"
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace media_session {
 
 // Structure representing an MediaImage as per the MediaSession API, see:
@@ -31,17 +23,6 @@ struct COMPONENT_EXPORT(MEDIA_SESSION_BASE_CPP) MediaImage {
   ~MediaImage();
 
   bool operator==(const MediaImage& other) const;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Creates a Java array of MediaImage instances and returns the JNI ref.
-  static base::android::ScopedJavaLocalRef<jobjectArray> ToJavaArray(
-      JNIEnv* env,
-      const std::vector<MediaImage>& images);
-
-  // Creates a Java MediaImage instance and returns the JNI ref.
-  base::android::ScopedJavaLocalRef<jobject> CreateJavaObject(
-      JNIEnv* env) const;
-#endif
 
   // MUST be a valid url. If an icon doesn't have a valid URL, it will not be
   // successfully parsed, thus will not be represented in the Manifest.

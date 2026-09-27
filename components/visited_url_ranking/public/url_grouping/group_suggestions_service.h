@@ -12,23 +12,12 @@
 #include "components/visited_url_ranking/public/url_grouping/group_suggestions_delegate.h"
 #include "components/visited_url_ranking/public/url_grouping/tab_event_tracker.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace visited_url_ranking {
 
 // Service for computing tab group suggestions.
 class GroupSuggestionsService : public KeyedService,
                                 public base::SupportsUserData {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a Java object of the type GroupSuggestionService for the given
-  // GroupSuggestionService.
-  static base::android::ScopedJavaLocalRef<jobject> GetJavaObject(
-      GroupSuggestionsService* group_suggestion_service);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   GroupSuggestionsService() = default;
   ~GroupSuggestionsService() override = default;
 

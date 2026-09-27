@@ -22,10 +22,6 @@
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/optimization_guide/proto/features/common_quality_data.pb.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace base {
 class FilePath;
 }  // namespace base
@@ -113,12 +109,6 @@ class PageContentExtractionService : public KeyedService,
     virtual void OnPageContentExtracted(content::Page& page,
                                         PageContent page_content) {}
   };
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a Java object for the given service.
-  static base::android::ScopedJavaLocalRef<jobject> GetJavaObject(
-      PageContentExtractionService* service);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   PageContentExtractionService(os_crypt_async::OSCryptAsync* os_crypt_async,
                                const base::FilePath& profile_path,

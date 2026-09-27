@@ -21,10 +21,6 @@
 #include "components/offline_pages/core/page_criteria.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/supports_user_data.h"
-#endif
-
 namespace offline_pages {
 
 struct ClientId;
@@ -38,11 +34,7 @@ struct ClientId;
 //
 // TODO(fgorski): Things to describe:
 // * how to cancel requests and what to expect
-class OfflinePageModel :
-#if BUILDFLAG(IS_ANDROID)
-    public base::SupportsUserData,
-#endif
-    public KeyedService {
+class OfflinePageModel : public KeyedService {
  public:
   // Describes the parameters to control how to save a page.
   struct SavePageParams {

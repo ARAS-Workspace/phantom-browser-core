@@ -300,9 +300,7 @@ class ChromeMetricsServiceClient
   // omnibox.
   base::CallbackListSubscription omnibox_url_opened_subscription_;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<BrowserActivityWatcher> browser_activity_watcher_;
-#endif
 
   base::ScopedMultiSourceObservation<content::RenderProcessHost,
                                      content::RenderProcessHostObserver>

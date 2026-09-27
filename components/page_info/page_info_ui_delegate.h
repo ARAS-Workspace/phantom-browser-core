@@ -19,11 +19,9 @@ enum class PermissionType;
 class PageInfoUiDelegate {
  public:
   virtual ~PageInfoUiDelegate() = default;
-#if !BUILDFLAG(IS_ANDROID)
   virtual bool IsBlockAutoPlayEnabled() = 0;
   virtual bool IsMultipleTabsOpen() = 0;
   virtual void OpenSiteSettingsFileSystem() = 0;
-#endif
   virtual content::PermissionResult GetPermissionResult(
       blink::PermissionType permission) = 0;
   virtual std::optional<content::PermissionResult> GetEmbargoResult(

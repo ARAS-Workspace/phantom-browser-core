@@ -17,7 +17,7 @@ namespace base {
 
 namespace internal {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Platforms for which it is possible to track ownership of file descriptors.
 //
 // On Android, fdsan is used.

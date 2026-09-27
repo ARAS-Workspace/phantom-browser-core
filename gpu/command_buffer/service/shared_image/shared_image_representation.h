@@ -47,12 +47,6 @@ class VulkanImplementation;
 #include "ui/gfx/mac/mtl_shared_event_fence.h"
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_hardware_buffer_fence_sync.h"
-
-extern "C" typedef struct AHardwareBuffer AHardwareBuffer;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 typedef unsigned int GLenum;
 namespace skgpu {
 class MutableTextureState;
@@ -950,18 +944,7 @@ class GPU_GLES2_EXPORT OverlayImageRepresentation
                      gfx::GpuFenceHandle acquire_fence);
     ~ScopedReadAccess();
 
-#if BUILDFLAG(IS_ANDROID)
-    AHardwareBuffer* GetAHardwareBuffer() {
-      return representation()->GetAHardwareBuffer();
-    }
-    // Deprecated. All code should use GetAHardwareBuffer() above, this function
-    // will be deleted when GLSurfaceEGLSurface control will be able to deliver
-    // fences via EndAccess.
-    std::unique_ptr<base::android::ScopedHardwareBufferFenceSync>
-    GetAHardwareBufferFenceSync() {
-      return representation()->GetAHardwareBufferFenceSync();
-    }
-#elif BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
     scoped_refptr<gfx::NativePixmap> GetNativePixmap() {
       return representation()->GetNativePixmap();
     }
@@ -1009,11 +992,7 @@ class GPU_GLES2_EXPORT OverlayImageRepresentation
   // |release_fence| will be null in that case.
   virtual void EndReadAccess(gfx::GpuFenceHandle release_fence) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  virtual AHardwareBuffer* GetAHardwareBuffer();
-  virtual std::unique_ptr<base::android::ScopedHardwareBufferFenceSync>
-  GetAHardwareBufferFenceSync();
-#elif BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
   scoped_refptr<gfx::NativePixmap> GetNativePixmap();
 #elif BUILDFLAG(IS_APPLE)
   virtual gfx::ScopedIOSurface GetIOSurface() const;
@@ -1026,25 +1005,6 @@ class GPU_GLES2_EXPORT OverlayImageRepresentation
 
 ///////////////////////////////////////////////////////////////////////////////
 // LegacyOverlayImageRepresentation
-
-#if BUILDFLAG(IS_ANDROID)
-class GPU_GLES2_EXPORT LegacyOverlayImageRepresentation
-    : public SharedImageRepresentation {
- public:
-  LegacyOverlayImageRepresentation(SharedImageManager* manager,
-                                   SharedImageBacking* backing,
-                                   MemoryTypeTracker* tracker)
-      : SharedImageRepresentation(manager, backing, tracker) {}
-
-  // Renders shared image to SurfaceView/Dialog overlay. Should only be called
-  // if the image already promoted to overlay.
-  virtual void RenderToOverlay() = 0;
-
-  // Notifies legacy overlay system about overlay promotion.
-  virtual void NotifyOverlayPromotion(bool promotion,
-                                      const gfx::Rect& bounds) = 0;
-};
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // MemoryImageRepresentation
@@ -1179,12 +1139,6 @@ class GPU_GLES2_EXPORT VideoImageRepresentation
     ScopedReadAccess(base::PassKey<VideoImageRepresentation> pass_key,
                      VideoImageRepresentation* representation);
     ~ScopedReadAccess();
-
-#if BUILDFLAG(IS_ANDROID)
-    AHardwareBuffer* GetAHardwareBuffer() const {
-      return representation()->GetAHardwareBuffer();
-    }
-#endif  // BUILDFLAG(IS_ANDROID)
   };
 
   VideoImageRepresentation(SharedImageManager* manager,
@@ -1197,10 +1151,6 @@ class GPU_GLES2_EXPORT VideoImageRepresentation
 
  protected:
   friend class WrappedVideoCompoundImageRepresentation;
-
-#if BUILDFLAG(IS_ANDROID)
-  virtual AHardwareBuffer* GetAHardwareBuffer() const = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   virtual bool BeginWriteAccess() = 0;
   virtual void EndWriteAccess() = 0;

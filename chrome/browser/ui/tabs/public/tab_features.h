@@ -129,11 +129,9 @@ namespace tab_groups {
 class CollaborationMessagingTabData;
 }  // namespace tab_groups
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace record_replay {
 class RecordReplayClient;
 }  // namespace record_replay
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace wallet {
@@ -234,11 +232,9 @@ class TabFeatures {
     return memory_saver_chip_controller_.get();
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   record_replay::RecordReplayClient* record_replay_client() {
     return record_replay_client_.get();
   }
-#endif
 
   RecordReplayPageActionController* record_replay_page_action_controller() {
     return record_replay_page_action_controller_.get();
@@ -466,9 +462,7 @@ class TabFeatures {
   std::unique_ptr<AskBeforeHttpDialogController>
       ask_before_http_dialog_controller_;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<record_replay::RecordReplayClient> record_replay_client_;
-#endif
 
   // Watches for an opportunity to show the search engine choice dialog.
   // Only created when SearchEngineChoiceTabHelper::IsHelperNeeded().

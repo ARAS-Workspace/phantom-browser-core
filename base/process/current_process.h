@@ -39,10 +39,6 @@ namespace test {
 class CurrentProcessForTest;
 }  // namespace test
 
-#if BUILDFLAG(IS_ANDROID)
-class PlatformThreadPriorityMonitor;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using CurrentProcessType = perfetto::protos::chrome_enums::pbzero::ProcessType;
 
 // These values are persisted to logs. Entries should not be renumbered and
@@ -111,9 +107,6 @@ class BASE_EXPORT CurrentProcess {
   class NameKey {
    private:
     NameKey() = default;
-#if BUILDFLAG(IS_ANDROID)
-    friend class ::base::PlatformThreadPriorityMonitor;
-#endif  // BUILDFLAG(IS_ANDROID)
     friend class ::base::test::CurrentProcessForTest;
     friend class ::tracing::TraceEventDataSource;
     friend class ::tracing::TrackNameRecorder;

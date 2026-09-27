@@ -72,13 +72,6 @@ class SharedImageInterfaceProxy {
   void CopyToGpuMemoryBuffer(const SyncToken& sync_token,
                              const Mailbox& mailbox);
 
-#if BUILDFLAG(IS_ANDROID)
-  void CopyNativeGmbToSharedMemoryAsync(
-      gfx::GpuMemoryBufferHandle buffer_handle,
-      base::UnsafeSharedMemoryRegion memory_region,
-      base::OnceCallback<void(bool)> callback);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   void UpdateSharedImage(const SyncToken& sync_token, const Mailbox& mailbox);
   void UpdateSharedImage(const SyncToken& sync_token,
                          std::unique_ptr<gfx::GpuFence> acquire_fence,

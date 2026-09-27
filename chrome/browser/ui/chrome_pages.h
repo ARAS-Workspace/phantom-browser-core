@@ -19,9 +19,7 @@
 #include "components/signin/public/base/signin_buildflags.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/signin/signin_promo.h"
-#endif
 
 namespace apps {
 enum class LaunchSource;
@@ -35,11 +33,9 @@ namespace signin {
 enum class ConsentLevel;
 }  // namespace signin
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace web_app {
 enum class AppSettingsPageEntryPoint;
 }  // namespace web_app
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class BrowserWindowInterface;
 class Profile;
@@ -130,7 +126,6 @@ void ShowAllSitesSettingsFilteredByRwsOwner(
 // Shows all recent shared tab group activities.
 void ShowSharedTabGroupActivity(Profile* profile);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Show chrome://app-settings/<app-id> page on desktop, or OS Settings on
 // ChromeOS.
 void ShowWebAppSettings(BrowserWindowInterface* browser,
@@ -139,7 +134,6 @@ void ShowWebAppSettings(BrowserWindowInterface* browser,
 void ShowWebAppSettings(Profile* profile,
                         const std::string& app_id,
                         web_app::AppSettingsPageEntryPoint entry_point);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace chrome
 

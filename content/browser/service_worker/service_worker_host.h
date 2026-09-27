@@ -40,9 +40,7 @@
 #include "third_party/blink/public/mojom/webtransport/web_transport_connector.mojom.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
-#endif
 
 namespace content {
 
@@ -95,9 +93,7 @@ class CONTENT_EXPORT ServiceWorkerHost : public BucketContext,
   void BindCacheStorage(
       mojo::PendingReceiver<blink::mojom::CacheStorage> receiver);
 
-#if !BUILDFLAG(IS_ANDROID)
   void BindHidService(mojo::PendingReceiver<blink::mojom::HidService> receiver);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void BindUsbService(
       mojo::PendingReceiver<blink::mojom::WebUsbService> receiver);

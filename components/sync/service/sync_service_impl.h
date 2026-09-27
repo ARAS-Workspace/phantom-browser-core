@@ -66,10 +66,6 @@ class CustomPassphraseBootstrapToken;
 class SyncFeatureStatusForMigrationsRecorder;
 class SyncPrefsPolicyHandler;
 
-#if BUILDFLAG(IS_ANDROID)
-class SyncServiceAndroidBridge;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Look at the SyncService interface for information on how to use this class.
 // You should not need to know about SyncServiceImpl directly.
 class SyncServiceImpl : public SyncService,
@@ -119,9 +115,6 @@ class SyncServiceImpl : public SyncService,
   void Initialize(DataTypeController::TypeVector controllers);
 
   // SyncService implementation
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject() override;
-#endif  // BUILDFLAG(IS_ANDROID)
   SyncUserSettings* GetUserSettings() override;
   const SyncUserSettings* GetUserSettings() const override;
   DisableReasonSet GetDisableReasons() const override;
@@ -273,10 +266,6 @@ class SyncServiceImpl : public SyncService,
   // TODO(crbug.com/41451146): Inject this in the ctor instead. As it is, it's
   // possible that the real callback was already used before the test had a
   // chance to call this.
-#if BUILDFLAG(IS_ANDROID)
-  void OverrideNetworkForTest(const CreateHttpPostProviderFactory&
-                                  create_http_post_provider_factory_cb);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   DataTypeSet GetRegisteredDataTypesForTest() const;
   bool HasAnyModelErrorForTest(DataTypeSet types) const;
@@ -550,12 +539,6 @@ class SyncServiceImpl : public SyncService,
   std::vector<base::OnceClosure> tasks_waiting_for_engine_initialization_;
 
   std::unique_ptr<DeviceStatisticsScheduler> device_statistics_scheduler_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Manage and fetch the java object that wraps this SyncService on
-  // android.
-  std::unique_ptr<SyncServiceAndroidBridge> sync_service_android_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   base::WeakPtrFactory<SyncServiceImpl> weak_factory_{this};
 };

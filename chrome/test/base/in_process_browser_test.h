@@ -179,13 +179,11 @@ class InProcessBrowserTest : public content::BrowserTestBase {
   // created at a later time and `SetBrowser()` is called.
   Browser* browser() const { return browser_; }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Similar to browser(), but it returns BrowserWindowInterface, instead.
   // On Android platform, the compatible API is defined in AndroidBrowserTest.
   BrowserWindowInterface* GetBrowserWindowInterface() const {
     return browser_.get();
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Sets the default `browser_` instance for the fixture.
   void SetBrowser(BrowserWindowInterface* browser);
@@ -295,11 +293,9 @@ class InProcessBrowserTest : public content::BrowserTestBase {
   // is omitted, the currently active profile will be used.
   Browser* CreateIncognitoBrowser(Profile* profile = nullptr);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Similar to |CreateBrowser|, but creates a Guest browser. For an example see
   // AppListClientGuestModeBrowserTest::SetUpCommandLine.
   Browser* CreateGuestBrowser();
-#endif
 
   // Creates a browser for a popup window with a single tab (about:blank), waits
   // for the tab to finish loading, and shows the browser.

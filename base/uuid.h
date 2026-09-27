@@ -18,12 +18,6 @@
 #include "build/robolectric_buildflags.h"
 #include "third_party/abseil-cpp/absl/numeric/int128.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_ROBOLECTRIC)
-#include "base/android/jni_string.h"
-#include "base/system_jni/UUID_jni.h"
-#include "third_party/jni_zero/jni_zero.h"
-#endif
-
 namespace base {
 
 class BASE_EXPORT Uuid {
@@ -105,36 +99,5 @@ struct BASE_EXPORT UuidHash {
 BASE_EXPORT std::ostream& operator<<(std::ostream& out, const Uuid& uuid);
 
 }  // namespace base
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_ROBOLECTRIC)
-
-namespace jni_zero {
-
-template <>
-inline base::Uuid FromJniType<base::Uuid>(
-    JNIEnv* env,
-    const jni_zero::JavaRef<jobject>& obj) {
-  if (!obj) {
-    return base::Uuid();
-  }
-  return base::Uuid::ParseLowercase(
-      FromJniType<std::string>(env, JNI_UUID::Java_UUID_toString(env, obj)));
-}
-
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType<base::Uuid>(
-    JNIEnv* env,
-    const base::Uuid& uuid) {
-  if (!uuid.is_valid()) {
-    return nullptr;
-  }
-  absl::uint128 value = uuid.AsInteger();
-  return JNI_UUID::Java_UUID_Constructor(
-      env, static_cast<jlong>(absl::Uint128High64(value)),
-      static_cast<jlong>(absl::Uint128Low64(value)));
-}
-
-}  // namespace jni_zero
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_ROBOLECTRIC)
 
 #endif  // BASE_UUID_H_

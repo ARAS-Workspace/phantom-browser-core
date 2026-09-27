@@ -77,36 +77,6 @@ inline constexpr char kSplitWithTabIndexNotAdjacentError[] =
     "which is not adjacent to 'index' *.";
 inline constexpr char kSplitViewCreationFailedError[] =
     "Failed to create split view.";
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr char kAndroidCannotMoveTabsWithinCctOrWebAppWindowError[] =
-    "Cannot move tabs within an Android web app or custom tab window.";
-inline constexpr char
-    kAndroidOnlyActiveTabCanBeMovedFromCctOrWebAppWindowError[] =
-        "Only the active tab in an Android web app or custom tab window can be "
-        "moved from it.";
-inline constexpr char kAndroidCanOnlyMoveCctOrWebAppTabsToNormalWindowError[] =
-    "Tabs in an Android web app or custom tab window can only be moved to a "
-    "normal browser window.";
-inline constexpr char kAndroidCannotActivateTabInCctOrWebAppWindowError[] =
-    "Cannot activate a tab in an Android web app or custom tab window.";
-inline constexpr char kAndroidCannotDuplicateTabInCctOrWebAppWindowError[] =
-    "Cannot duplicate a tab in an Android web app or custom tab window.";
-inline constexpr char kAndroidCannotHighlightTabInCctOrWebAppWindowError[] =
-    "Cannot highlight a tab in an Android web app or custom tab window.";
-inline constexpr char kUnableToResizeErrorAndroidSdkTooLow[] =
-    "Unable to resize: unsupported Android API level";
-inline constexpr char kUnableToResizeErrorAndroidBrowserRoleNotHeld[] =
-    "Unable to resize: this Android app is not the primary browser";
-inline constexpr char kUnableToResizeErrorAndroidNotAFreeformWindow[] =
-    "Unable to resize: the Android app isn't in desktop windowing mode";
-inline constexpr char kUnableToResizeErrorAndroidNullAppTask[] =
-    "Unable to resize: the Android Chrome app is being run in another app's "
-    "window";
-inline constexpr char kUnableToResizeErrorAndroidUnsupportedOperation[] =
-    "Unable to resize: operation not supported on this Android configuration";
-inline constexpr char kUnableToEnterFullScreenAndroid[] =
-    "Unable to enter full-screen mode: unsupported on Android";
-#endif
 
 }  // namespace tabs_constants
 }  // namespace extensions

@@ -28,10 +28,6 @@
 #include "google_apis/gaia/oauth2_access_token_manager.h"
 #include "net/base/backoff_entry.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif
-
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "components/signin/internal/identity_manager/token_binding_helper.h"
 #include "components/signin/public/base/binding_key_registration_token_result.h"
@@ -251,22 +247,6 @@ class ProfileOAuth2TokenServiceDelegate {
   // signin happens with a credential provider. See
   // `signin_util::SigninWithCredentialProviderIfPossible()`.
   virtual bool FixAccountErrorIfPossible();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Triggers platform specific implementation to reload accounts from system.
-  virtual void ReloadAllAccountsFromSystemWithPrimaryAccount(
-      const std::optional<CoreAccountId>& primary_account_id) {}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  // Triggers platform specific implementation to reload accounts from system.
-  virtual void SeedAccountsThenReloadAllAccountsWithPrimaryAccount(
-      const std::vector<AccountInfo>& accounts,
-      const std::optional<CoreAccountId>& primary_account_id) {}
-
-  // Returns a reference to the corresponding Java object.
-  virtual base::android::ScopedJavaLocalRef<jobject> GetJavaObject() = 0;
-#endif
 
   // If set, this callback will be invoked when a new refresh token is
   // available. Contains diagnostic information about the source of the update

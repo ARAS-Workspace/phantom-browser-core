@@ -10,10 +10,6 @@
 #include "components/spellcheck/common/spelling_marker.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/spellcheck/browser/spellchecker_session_bridge_android.h"
-#endif
-
 #if !BUILDFLAG(ENABLE_SPELLCHECK)
 #error "Spellcheck should be enabled."
 #endif
@@ -51,16 +47,7 @@ class SpellCheckHostImpl : public spellcheck::mojom::SpellCheckHost {
 #endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER) &&
         // !BUILDFLAG(ENABLE_SPELLING_SERVICE)
 
-#if BUILDFLAG(IS_ANDROID)
-  // spellcheck::mojom::SpellCheckHost:
-  void DisconnectSessionBridge() override;
-#endif
-
  private:
-#if BUILDFLAG(IS_ANDROID)
-  // Android-specific object used to query the Android spellchecker.
-  SpellCheckerSessionBridge session_bridge_;
-#endif
 };
 
 #endif  // COMPONENTS_SPELLCHECK_BROWSER_SPELL_CHECK_HOST_IMPL_H_

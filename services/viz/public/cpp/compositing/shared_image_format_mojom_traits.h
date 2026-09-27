@@ -63,7 +63,7 @@ struct StructTraits<
     return format.channel_format;
   }
 
-#if BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_OZONE)
   static bool prefers_external_sampler(
       viz::SharedImageFormat::SharedImageFormatUnion::MultiplanarFormat
           format) {

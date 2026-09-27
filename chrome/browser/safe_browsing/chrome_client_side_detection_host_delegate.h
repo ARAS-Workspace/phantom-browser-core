@@ -11,10 +11,6 @@
 #include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
 #include "content/public/browser/global_routing_id.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/safe_browsing/core/browser/referring_app_info.h"
-#endif
-
 namespace safe_browsing {
 
 // Delegate class which implements chrome specific bits for configuring
@@ -50,10 +46,6 @@ class ChromeClientSideDetectionHostDelegate
       GURL url,
       ClientSideDetectionType request_type,
       std::optional<bool> did_match_high_confidence_allowlist) override;
-#if BUILDFLAG(IS_ANDROID)
-  internal::ReferringAppInfo GetReferringAppInfo(
-      content::WebContents* web_contents) override;
-#endif
 
   void SetNavigationObserverManagerForTesting(
       SafeBrowsingNavigationObserverManager* navigation_observer_manager) {

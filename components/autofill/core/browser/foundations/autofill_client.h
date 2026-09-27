@@ -125,9 +125,6 @@ class AutofillCrowdsourcingManager;
 class AutofillDriverFactory;
 class AutofillOptimizationGuideDecider;
 class AutofillProfile;
-#if BUILDFLAG(IS_ANDROID)
-class AutofillSnackbarControllerImpl;
-#endif  // BUILDFLAG(IS_ANDROID)
 class AutofillSuggestionDelegate;
 enum class AutofillTriggerSource;
 class IdentityCredentialDelegate;
@@ -747,28 +744,6 @@ class AutofillClient {
   GetFormInteractionsUkmLogger() = 0;
 
   virtual const AutofillAblationStudy& GetAblationStudy() const;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Shows the Personal Context ambient autofill notice. Returns whether the
-  // notice was successfully shown.
-  virtual bool ShowAmbientAutoFillNotice(
-      base::WeakPtr<TouchToFillAutofillDelegate> delegate);
-
-  // Hides the Personal Context ambient autofill notice.
-  virtual void HideAmbientAutoFillNotice();
-
-  // The AutofillSnackbarController is used to show a snackbar notification
-  // on Android.
-  virtual AutofillSnackbarControllerImpl* GetAutofillSnackbarController();
-
-  // Notifies the user that their data is being fetched from the server to fill
-  // the form.
-  virtual void ShowAutofillAiLoadingDialog();
-
-  // Closes the dialog that informs the user that their data is being fetched
-  // from the server to fill the form.
-  virtual void DismissAutofillAiLoadingDialog();
-#endif
 
   // Whether we can add more information to the contents of suggestions text due
   // to the use of a large keyboard accessory view. See b/40942168.

@@ -34,15 +34,6 @@
 #include "ui/gfx/native_ui_types.h"
 #include "ui/shell_dialogs/selected_file_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/download/android/download_dialog_bridge.h"  // nogncheck crbug.com/40147906
-#include "chrome/browser/download/android/download_message_bridge.h"  // nogncheck crbug.com/40147906
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-#include "base/types/expected.h"
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/browser/download/download_completion_blocker.h"
 #endif
@@ -58,12 +49,6 @@ class DownloadManager;
 namespace extensions {
 class CrxInstaller;
 class CrxInstallError;
-}
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-namespace enterprise_obfuscation {
-enum class Error;
 }
 #endif
 
@@ -97,17 +82,6 @@ class ChromeDownloadManagerDelegate
   static bool IsDangerTypeBlocked(download::DownloadDangerType danger_type);
 
   void SetDownloadManager(content::DownloadManager* dm);
-
-#if BUILDFLAG(IS_ANDROID)
-  void ShowDownloadDialog(gfx::NativeWindow native_window,
-                          int64_t total_bytes,
-                          DownloadLocationDialogType dialog_type,
-                          const base::FilePath& suggested_path,
-                          DownloadDialogBridge::DialogCallback callback);
-
-  void SetDownloadDialogBridgeForTesting(DownloadDialogBridge* bridge);
-  void SetDownloadMessageBridgeForTesting(DownloadMessageBridge* bridge);
-#endif
 
   // Callbacks passed to GetNextId() will not be called until the returned
   // callback is called.
@@ -173,13 +147,7 @@ class ChromeDownloadManagerDelegate
       download::DownloadItem* download_item,
       base::flat_map<base::FilePath, base::FilePath> save_package_files,
       content::SavePackageAllowedCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  bool IsFromExternalApp(download::DownloadItem* item) override;
-  bool ShouldOpenPdfInline() override;
-  bool IsDownloadRestrictedByPolicy() override;
-#else
   void AttachExtraInfo(download::DownloadItem* item) override;
-#endif  // BUILDFLAG(IS_ANDROID)
   bool SupportsHistoryLoading() override;
 
   // Opens a download using the platform handler. DownloadItem::OpenDownload,
@@ -265,11 +233,6 @@ class ChromeDownloadManagerDelegate
           conflict_action,
       const base::FilePath& containment_directory,
       ReservedPathCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void RequestIncognitoWarningConfirmation(
-      content::WebContents* web_contents,
-      IncognitoWarningConfirmationCallback) override;
-#endif
   void RequestConfirmation(download::DownloadItem* download,
                            const base::FilePath& suggested_virtual_path,
                            DownloadConfirmationReason reason,
@@ -282,11 +245,6 @@ class ChromeDownloadManagerDelegate
                         CheckDownloadUrlCallback callback) override;
   void GetFileMimeType(const base::FilePath& path,
                        GetFileMimeTypeCallback callback) override;
-
-#if BUILDFLAG(IS_ANDROID)
-  virtual void OnDownloadCanceled(download::DownloadItem* download,
-                                  bool has_no_external_storage);
-#endif
 
   // Called when the file picker returns the confirmation result.
   void OnConfirmationCallbackComplete(
@@ -326,14 +284,6 @@ class ChromeDownloadManagerDelegate
       base::OnceClosure internal_complete_callback);
   void ShouldCompleteDownloadInternal(uint32_t download_id,
                                       base::OnceClosure user_complete_callback);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Called when obfuscated download files are deobfuscated.
-  void OnDeobfuscationComplete(
-      uint32_t download_id,
-      base::OnceClosure callback,
-      base::expected<void, enterprise_obfuscation::Error> deobfuscation_result);
-#endif
 
   // Sets the next download id based on download database records, and runs all
   // cached id callbacks.
@@ -381,33 +331,7 @@ class ChromeDownloadManagerDelegate
   // content::DownloadManager::Observer
   void OnManagerInitialized() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Called after a unique file name is generated in the case that there is a
-  // TARGET_CONFLICT and the new file name should be displayed to the user.
-  void GenerateUniqueFileNameDone(
-      const std::string& download_guid,
-      DownloadTargetDeterminerDelegate::ConfirmationCallback callback,
-      download::PathValidationResult result,
-      const base::FilePath& target_path);
-  // Return true if the mime type is pdf and Chrome supports open this pdf.
-  bool IsPdfAndSupported(const std::string& mime_type,
-                         content::WebContents* web_contents);
-
-  // Called after user interacted on the incognito download confirmation message
-  // before proceeding to save a package.
-  void RequestIncognitoSavePackageConfirmationDone(
-      const GURL& url,
-      const base::FilePath& suggested_path,
-      content::SavePackagePathPickedCallback callback,
-      bool accept);
-#endif
-
   raw_ptr<Profile, DanglingUntriaged> profile_;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<DownloadDialogBridge> download_dialog_bridge_;
-  std::unique_ptr<DownloadMessageBridge> download_message_bridge_;
-#endif
 
   // If history database fails to initialize, this will always be kInvalidId.
   // Otherwise, the first available download id is assigned from history

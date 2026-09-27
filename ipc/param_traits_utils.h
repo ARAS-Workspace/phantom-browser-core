@@ -40,10 +40,6 @@
 #include "mojo/public/cpp/system/message_pipe.h"
 #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_hardware_buffer_handle.h"
-#endif
-
 
 
 namespace base {
@@ -164,7 +160,7 @@ struct ParamTraits<unsigned int> {
 //   2) Android 64 bit also has int64_t typedef'd to long.
 // Since we want to support Android 32<>64 bit IPC, as long as we don't have
 // these traits for 32 bit ARM then that'll catch any errors.
-#if BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_64_BITS))
+#if BUILDFLAG(IS_LINUX)
 template <>
 struct ParamTraits<long> {
   typedef long param_type;
@@ -510,18 +506,6 @@ struct COMPONENT_EXPORT(IPC) ParamTraits<base::ScopedFD> {
 #endif  // BUILDFLAG(IS_POSIX)
 
 
-
-#if BUILDFLAG(IS_ANDROID)
-template <>
-struct COMPONENT_EXPORT(IPC)
-    ParamTraits<base::android::ScopedHardwareBufferHandle> {
-  typedef base::android::ScopedHardwareBufferHandle param_type;
-  static void Write(base::Pickle* m, const param_type& p);
-  static bool Read(const base::Pickle* m,
-                   base::PickleIterator* iter,
-                   param_type* r);
-};
-#endif
 
 template <>
 struct COMPONENT_EXPORT(IPC) ParamTraits<base::ReadOnlySharedMemoryRegion> {

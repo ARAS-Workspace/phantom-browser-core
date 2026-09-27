@@ -32,12 +32,6 @@ namespace policy {
 
 class PolicyMap;
 
-#if BUILDFLAG(IS_ANDROID)
-namespace android {
-class PolicyServiceAndroid;
-}
-#endif
-
 class POLICY_EXPORT PolicyServiceImpl
     : public PolicyService,
       public ConfigurationPolicyProvider::Observer {
@@ -108,9 +102,6 @@ class POLICY_EXPORT PolicyServiceImpl
   bool IsFirstPolicyLoadComplete(PolicyDomain domain) const override;
   void RefreshPolicies(base::OnceClosure callback,
                        PolicyFetchReason reason) override;
-#if BUILDFLAG(IS_ANDROID)
-  android::PolicyServiceAndroid* GetPolicyServiceAndroid() override;
-#endif
 
   // If this PolicyServiceImpl has been created using
   // |CreateWithThrottledInitialization|, calling UnthrottleInitialization will
@@ -239,10 +230,6 @@ class POLICY_EXPORT PolicyServiceImpl
   // policy domains because the owner of this PolicyService is delaying the
   // initialization signal.
   bool initialization_throttled_;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<android::PolicyServiceAndroid> policy_service_android_;
-#endif
 
   // The time when the policy service was created, used for logging a histogram
   // that indicates how long it takes for the service's initialization to be

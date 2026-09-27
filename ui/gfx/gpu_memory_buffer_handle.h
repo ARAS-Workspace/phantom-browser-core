@@ -20,8 +20,6 @@
 #include "ui/gfx/native_pixmap_handle.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "ui/gfx/mac/io_surface.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_hardware_buffer_handle.h"
 #endif
 
 namespace mojo {
@@ -44,8 +42,6 @@ enum GpuMemoryBufferType {
   IO_SURFACE_BUFFER,
 #elif BUILDFLAG(IS_OZONE)
   NATIVE_PIXMAP,
-#elif BUILDFLAG(IS_ANDROID)
-  ANDROID_HARDWARE_BUFFER,
 #endif
 };
 
@@ -57,9 +53,6 @@ struct COMPONENT_EXPORT(GFX) GpuMemoryBufferHandle {
   explicit GpuMemoryBufferHandle(base::UnsafeSharedMemoryRegion region);
 #if BUILDFLAG(IS_OZONE)
   explicit GpuMemoryBufferHandle(gfx::NativePixmapHandle native_pixmap_handle);
-#elif BUILDFLAG(IS_ANDROID)
-  explicit GpuMemoryBufferHandle(
-      base::android::ScopedHardwareBufferHandle handle);
 #elif BUILDFLAG(IS_APPLE)
   explicit GpuMemoryBufferHandle(ScopedIOSurface io_surface);
 #endif
@@ -119,10 +112,6 @@ struct COMPONENT_EXPORT(GFX) GpuMemoryBufferHandle {
 
   uint32_t offset = 0;
   uint32_t stride = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedHardwareBufferHandle android_hardware_buffer;
-#endif  // BUILDFLAG(IS_ANDROID)
 
  private:
   friend mojo::UnionTraits<mojom::GpuMemoryBufferPlatformHandleDataView,

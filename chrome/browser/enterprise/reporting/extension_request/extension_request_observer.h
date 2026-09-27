@@ -45,10 +45,8 @@ class ExtensionRequestObserver
   void ShowNotification(ExtensionRequestNotification::NotifyType type);
   void CloseAllNotifications();
 
-#if !BUILDFLAG(IS_ANDROID)
   void OnNotificationClosed(std::vector<std::string>&& extension_ids,
                             bool by_user);
-#endif
 
   void RemoveExtensionsFromPendingList(
       const std::vector<std::string>& extension_ids);

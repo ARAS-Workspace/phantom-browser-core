@@ -85,14 +85,6 @@ class COMPONENT_EXPORT(TRACING_CPP) MetadataDataSource
   FRIEND_TEST_ALL_PREFIXES(MetadataDataSourceTest,
                            TraceCaptureDatetimeBundleFormatting);
 
-#if BUILDFLAG(IS_ANDROID)
-  static void RecordAndroidMetadata(
-      perfetto::protos::pbzero::ChromeMetadataPacket* chrome_metadata,
-      bool is_system_app,
-      const std::string& installer_package_name,
-      const std::string& host_package_name);
-#endif
-
   static void RecordTraceCaptureDatetime(
       base::Time time,
       perfetto::protos::pbzero::ChromeEventBundle* bundle);

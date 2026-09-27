@@ -22,12 +22,7 @@
 namespace gpu {
 
 // The size to set for the program cache for default and low-end device cases.
-#if !BUILDFLAG(IS_ANDROID)
 const size_t kDefaultMaxProgramCacheMemoryBytes = 6 * 1024 * 1024;
-#else
-const size_t kDefaultMaxProgramCacheMemoryBytes = 2 * 1024 * 1024;
-const size_t kLowEndMaxProgramCacheMemoryBytes = 128 * 1024;
-#endif
 
 GPU_CONFIG_EXPORT size_t GetDefaultGpuDiskCacheSize();
 

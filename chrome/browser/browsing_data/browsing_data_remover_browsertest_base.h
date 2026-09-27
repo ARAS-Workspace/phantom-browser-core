@@ -59,15 +59,11 @@ class BrowsingDataRemoverBrowserTestBase : public PlatformBrowserTest {
   bool WaitForSiteDataCount(int expected_count,
                             content::WebContents* web_contents = nullptr);
 
-// TODO(crbug.com/40169678): Support incognito browser tests on android.
-#if BUILDFLAG(IS_ANDROID)
-  bool IsIncognito() { return false; }
-#else
+  // TODO(crbug.com/40169678): Support incognito browser tests on android.
   BrowserWindowInterface* GetBrowser() const;
   void UseIncognitoBrowser();
   void RestartIncognitoBrowser();
   bool IsIncognito() { return incognito_browser_ != nullptr; }
-#endif  // BUILDFLAG(IS_ANDROID)
   network::mojom::NetworkContext* network_context();
 
  protected:
@@ -75,9 +71,7 @@ class BrowsingDataRemoverBrowserTestBase : public PlatformBrowserTest {
   // window created by tests, more specific behaviour requires other means.
   content::WebContents* GetActiveWebContents();
 
-#if !BUILDFLAG(IS_ANDROID)
   content::WebContents* GetActiveWebContents(BrowserWindowInterface* browser);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Returns the active Profile. On desktop this is in the first browser
   // window created by tests, more specific behaviour requires other means.
@@ -113,10 +107,8 @@ class BrowsingDataRemoverBrowserTestBase : public PlatformBrowserTest {
 
  private:
   base::test::ScopedFeatureList feature_list_;
-#if !BUILDFLAG(IS_ANDROID)
   raw_ptr<BrowserWindowInterface, AcrossTasksDanglingUntriaged>
       incognito_browser_ = nullptr;
-#endif
 };
 
 #endif  // CHROME_BROWSER_BROWSING_DATA_BROWSING_DATA_REMOVER_BROWSERTEST_BASE_H_

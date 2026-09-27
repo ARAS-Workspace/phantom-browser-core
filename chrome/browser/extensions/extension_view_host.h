@@ -14,9 +14,7 @@
 #include "extensions/browser/extension_host_registry.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/extension_view_host_web_modal_handler.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -140,9 +138,7 @@ class ExtensionViewHost
   // View that shows the rendered content in the UI.
   raw_ptr<ExtensionView, DanglingUntriaged> view_ = nullptr;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<ExtensionViewHostWebModalHandler> web_modal_handler_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::ScopedObservation<ExtensionHostRegistry,
                           ExtensionHostRegistry::Observer>

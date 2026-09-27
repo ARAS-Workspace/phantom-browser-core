@@ -404,12 +404,6 @@ class CONTENT_EXPORT RenderWidgetHostDelegate {
   // shouldn't be used to improve typing suggestions for the user.
   virtual bool ShouldDoLearning();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Get the offset for the current touch sequence. e.g. visible top controls or
-  // side UI will result in a nonzero offset being added to touch events.
-  virtual gfx::PointF GetCurrentTouchSequenceOffset();
-#endif
-
  protected:
   virtual ~RenderWidgetHostDelegate() {}
 };

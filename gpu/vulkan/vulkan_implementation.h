@@ -20,10 +20,6 @@
 #include "ui/gfx/gpu_memory_buffer_handle.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_hardware_buffer_handle.h"
-#endif
-
 namespace gfx {
 class GpuFence;
 }  // namespace gfx
@@ -115,14 +111,6 @@ class COMPONENT_EXPORT(VULKAN) VulkanImplementation {
 
   // Returns whether external semaphores are supported by this device.
   virtual bool IsExternalSemaphoreSupported(VulkanDeviceQueue* device_queue);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Get the sampler ycbcr conversion information from the AHB.
-  virtual bool GetSamplerYcbcrConversionInfo(
-      const VkDevice& vk_device,
-      base::android::ScopedHardwareBufferHandle ahb_handle,
-      VulkanYCbCrInfo* ycbcr_info) = 0;
-#endif
 
 
   bool use_swiftshader() const { return use_swiftshader_; }

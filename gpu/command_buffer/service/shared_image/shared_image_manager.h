@@ -131,12 +131,6 @@ class GPU_GLES2_EXPORT SharedImageManager
       bool needs_detiling);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<LegacyOverlayImageRepresentation> ProduceLegacyOverlay(
-      const Mailbox& mailbox,
-      MemoryTypeTracker* ref);
-#endif
-
   bool UpdateSharedImage(const Mailbox& mailbox,
                          std::unique_ptr<gfx::GpuFence> in_fence);
 

@@ -22,17 +22,13 @@
 #include "services/network/public/mojom/url_loader_network_service_observer.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/application_status_listener.h"
-#endif
-
 namespace content {
 
 class WebRtcConnectionsObserver;
 
 class NetworkServiceClient
     : public network::mojom::URLLoaderNetworkServiceObserver,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
       public net::NetworkChangeNotifier::ConnectionTypeObserver,
       public net::NetworkChangeNotifier::MaxBandwidthObserver,
       public net::NetworkChangeNotifier::IPAddressObserver,
@@ -60,11 +56,7 @@ class NetworkServiceClient
   // require low network latency.
   void OnPeerToPeerConnectionsCountChange(uint32_t count);
 
-#if BUILDFLAG(IS_ANDROID)
-  void OnApplicationStateChange(base::android::ApplicationState state);
-#endif
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // net::NetworkChangeNotifier::ConnectionTypeObserver implementation:
   void OnConnectionTypeChanged(
       net::NetworkChangeNotifier::ConnectionType type) override;
@@ -77,7 +69,7 @@ class NetworkServiceClient
   // net::NetworkChangeNotifier::IPAddressObserver implementation:
   void OnIPAddressChanged(
       net::NetworkChangeNotifier::IPAddressChangeType change_type) override;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
  private:
   // network::mojom::URLLoaderNetworkServiceObserver overrides.
@@ -132,14 +124,9 @@ class NetworkServiceClient
 
   std::unique_ptr<WebRtcConnectionsObserver> webrtc_connections_observer_;
 
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<base::android::ApplicationStatusListener>
-      app_status_listener_;
-#endif
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   mojo::Remote<network::mojom::NetworkChangeManager> network_change_manager_;
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
   mojo::ReceiverSet<network::mojom::URLLoaderNetworkServiceObserver>
       url_loader_network_service_observers_;

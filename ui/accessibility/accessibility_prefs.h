@@ -12,13 +12,6 @@
 namespace prefs {
 // Local state prefs.
 
-#if BUILDFLAG(IS_ANDROID)
-// Whether different accessibility filtering modes for performance are allowed.
-// Exposed only to mobile Android.
-AX_BASE_EXPORT extern const char kAccessibilityPerformanceFilteringAllowed[];
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace prefs
 
 #endif  // UI_ACCESSIBILITY_ACCESSIBILITY_PREFS_H_

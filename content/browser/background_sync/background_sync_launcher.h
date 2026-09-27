@@ -11,11 +11,6 @@
 #include "build/build_config.h"
 #include "content/common/content_export.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/android/scoped_java_ref.h"
-#endif
-
 #include "third_party/blink/public/mojom/background_sync/background_sync.mojom.h"
 
 namespace content {
@@ -33,13 +28,6 @@ class CONTENT_EXPORT BackgroundSyncLauncher {
   static base::TimeDelta GetSoonestWakeupDelta(
       blink::mojom::BackgroundSyncType sync_type,
       BrowserContext* browser_context);
-#if BUILDFLAG(IS_ANDROID)
-  static void FireBackgroundSyncEvents(
-      BrowserContext* browser_context,
-      blink::mojom::BackgroundSyncType sync_type,
-      const base::android::JavaRef<jobject>& j_runnable);
-  base::TimeDelta TimeSinceLastBrowserWakeUpForPeriodicSync();
-#endif
 
  private:
   friend struct base::LazyInstanceTraitsBase<BackgroundSyncLauncher>;
@@ -53,12 +41,6 @@ class CONTENT_EXPORT BackgroundSyncLauncher {
   base::TimeDelta GetSoonestWakeupDeltaImpl(
       blink::mojom::BackgroundSyncType sync_type,
       BrowserContext* browser_context);
-#if BUILDFLAG(IS_ANDROID)
-  void FireBackgroundSyncEventsImpl(
-      BrowserContext* browser_context,
-      blink::mojom::BackgroundSyncType sync_type,
-      const base::android::JavaRef<jobject>& j_runnable);
-#endif
   void GetSoonestWakeupDeltaForStoragePartition(
       blink::mojom::BackgroundSyncType sync_type,
       StoragePartition* storage_partition);

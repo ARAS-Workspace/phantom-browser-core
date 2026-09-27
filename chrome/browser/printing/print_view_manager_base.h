@@ -77,10 +77,6 @@ class PrintViewManagerBase : public PrintManager, public PrintJob::Observer {
   // asynchronous, the actual printing will not be completed on the return of
   // this function. Returns false if printing is impossible at the moment.
   virtual bool PrintNow(content::RenderFrameHost* rfh);
-#if BUILDFLAG(IS_ANDROID)
-  virtual bool PrintNow(content::RenderFrameHost* rfh,
-                        bool print_selection_only);
-#endif
 
   // Like PrintNow(), but for the node under the context menu, instead of the
   // entire frame.
@@ -321,10 +317,6 @@ class PrintViewManagerBase : public PrintManager, public PrintJob::Observer {
 
   // Indication that the job is getting canceled.
   bool canceling_job_ = false;
-
-#if BUILDFLAG(IS_ANDROID)
-  bool print_selection_only_ = false;
-#endif
 
   // Set while running an inner message loop inside RenderAllMissingPagesNow().
   // This means we are _blocking_ until all the necessary pages have been

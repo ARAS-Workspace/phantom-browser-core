@@ -24,10 +24,6 @@
 #include "components/feature_engagement/public/default_session_controller.h"
 #include "components/keyed_service/core/keyed_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace base {
 class Clock;
 class CommandLine;
@@ -155,12 +151,6 @@ class Tracker : public KeyedService, public base::SupportsUserData {
     bool should_show_snooze_;
   };
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a Java object of the type Tracker for the given Tracker.
-  static base::android::ScopedJavaLocalRef<jobject> GetJavaObject(
-      Tracker* feature_engagement);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Invoked when the tracker has been initialized. The |success| parameter
   // indicates that the initialization was a success and the tracker is ready to
   // receive calls.
@@ -194,7 +184,6 @@ class Tracker : public KeyedService, public base::SupportsUserData {
   // Must be called whenever an event happens.
   virtual void NotifyEvent(const std::string& event) = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Notifies that the "used" event for `feature` has happened.
   virtual void NotifyUsedEvent(const base::Feature& feature) = 0;
 
@@ -219,7 +208,6 @@ class Tracker : public KeyedService, public base::SupportsUserData {
   // with a feature. The count will reflect the time window in EventConfig.
   using EventList = std::vector<std::pair<EventConfig, int>>;
   virtual EventList ListEvents(const base::Feature& feature) const = 0;
-#endif
 
   // DESKTOP AND SHARED DESKTOP/MOBILE API
 
@@ -330,15 +318,11 @@ class Tracker : public KeyedService, public base::SupportsUserData {
       const base::Feature& feature,
       std::optional<SnoozeAction> snooze_action) = 0;
 
-#if !BUILDFLAG(IS_ANDROID)
-
   // Erases all event data associated with a particular `feature`, including -
   // but not limited to - trigger and used event data.
   //
   // This method is used by specific internals and test code.
   virtual void ClearEventData(const base::Feature& feature) = 0;
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Acquiring a display lock means that no in-product help can be displayed
   // while it is held. To release the lock, delete the handle.

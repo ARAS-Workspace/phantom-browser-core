@@ -30,28 +30,11 @@ class PrintViewManagerBasic
       mojo::PendingAssociatedReceiver<mojom::PrintManagerHost> receiver,
       content::RenderFrameHost* rfh);
 
-#if BUILDFLAG(IS_ANDROID)
-  // printing::PrintManager:
-  void SetupScriptedPrintAndroid(
-      SetupScriptedPrintAndroidCallback callback) override;
-  void PdfWritingDone(int page_count) override;
-#endif
-
  private:
   explicit PrintViewManagerBasic(content::WebContents* web_contents);
   friend class content::WebContentsUserData<PrintViewManagerBasic>;
 
-#if BUILDFLAG(IS_ANDROID)
-  void OnSetupScriptedPrintAndroidDone(
-      SetupScriptedPrintAndroidCallback callback,
-      std::unique_ptr<PrinterQuery> printer_query);
-#endif
-
   WEB_CONTENTS_USER_DATA_KEY_DECL();
-
-#if BUILDFLAG(IS_ANDROID)
-  base::WeakPtrFactory<PrintViewManagerBasic> weak_ptr_factory_{this};
-#endif
 };
 
 }  // namespace printing

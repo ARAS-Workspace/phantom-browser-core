@@ -15,12 +15,6 @@
 #include "mojo/public/cpp/bindings/associated_remote.h"
 #include "printing/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <utility>
-
-#include "base/functional/callback.h"
-#endif
-
 namespace printing {
 
 class PrintManager : public content::WebContentsObserver,
@@ -33,14 +27,6 @@ class PrintManager : public content::WebContentsObserver,
   void BindReceiver(
       mojo::PendingAssociatedReceiver<mojom::PrintManagerHost> receiver,
       content::RenderFrameHost* rfh);
-
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(timvolodine): consider introducing PrintManagerAndroid (crbug/500960)
-  using PdfWritingDoneCallback =
-      base::RepeatingCallback<void(int /* page count */)>;
-
-  virtual void PdfWritingDone(int page_count) = 0;
-#endif
 
   // printing::mojom::PrintManagerHost:
   void DidGetPrintedPagesCount(int32_t cookie, uint32_t number_pages) override;
@@ -85,15 +71,6 @@ class PrintManager : public content::WebContentsObserver,
   int cookie() const { return cookie_; }
   void set_cookie(int cookie) { cookie_ = cookie; }
 
-#if BUILDFLAG(IS_ANDROID)
-  PdfWritingDoneCallback pdf_writing_done_callback() const {
-    return pdf_writing_done_callback_;
-  }
-  void set_pdf_writing_done_callback(PdfWritingDoneCallback callback) {
-    pdf_writing_done_callback_ = std::move(callback);
-  }
-#endif
-
  private:
   uint32_t number_pages_ = 0;  // Number of pages to print in the print job.
   int cookie_ = 0;        // The current document cookie.
@@ -101,11 +78,6 @@ class PrintManager : public content::WebContentsObserver,
   // Holds RenderFrameHost-associated mojo receivers.
   content::RenderFrameHostReceiverSet<printing::mojom::PrintManagerHost>
       print_manager_host_receivers_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Callback to execute when done writing pdf.
-  PdfWritingDoneCallback pdf_writing_done_callback_;
-#endif
 
   // Stores a PrintRenderFrame associated remote with the RenderFrameHost used
   // to bind it. The PrintRenderFrame is used to transmit mojo interface method

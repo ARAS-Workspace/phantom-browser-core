@@ -44,11 +44,6 @@ class WebUIContentInfoSingleton : public WebUIInfoSingleton {
   ReferrerChainProvider* GetReferrerChainProvider(
       content::BrowserContext* browser_context);
 
-#if BUILDFLAG(IS_ANDROID)
-  internal::ReferringAppInfo GetReferringAppInfo(
-      content::WebContents* web_contents);
-#endif
-
   void set_safe_browsing_service(SafeBrowsingServiceInterface* sb_service) {
     sb_service_ = sb_service;
   }

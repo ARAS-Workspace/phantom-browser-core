@@ -47,11 +47,7 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "net/base/schemeful_site.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/autofill/autofill_snackbar_controller_impl.h"
-#else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/autofill/autofill_field_promo_controller.h"
-#endif  // BUILDFLAG(IS_ANDROID)
 
 class ToastController;
 
@@ -68,16 +64,6 @@ class TabInterface;
 }
 
 namespace autofill {
-
-#if BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/364089352): When //c/b/ui/android/autofill gets modularized,
-// //c/b/ui/autofill/ can depend directly on it.
-class AutofillAiSaveUpdateEntityFlowManager;
-class SaveUpdateAddressProfileFlowManager;
-class AutofillMessageController;
-class AutofillDialogController;
-class TouchToFillAutofillController;
-#endif
 
 class AutofillAiPersonalContextAccessManager;
 class AutofillOptimizationGuideDecider;
@@ -127,7 +113,7 @@ class ChromeAutofillClient : public ContentAutofillClient {
   ChromeAutofillClient& operator=(const ChromeAutofillClient&) = delete;
   ~ChromeAutofillClient() override;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Triggers the AtMemory promo bubble.
   void ShowAutofillAtMemoryPromo();
 #endif
@@ -241,35 +227,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
 
   bool IsAndroidLargeFormFactor() const final;
 
-#if BUILDFLAG(IS_ANDROID)
-  // The AutofillSnackbarController is used to show a snackbar notification
-  // on Android.
-  AutofillSnackbarControllerImpl* GetAutofillSnackbarController() final;
-
-  // Notifies the user that their data is being fetched from the server to fill
-  // the form.
-  void ShowAutofillAiLoadingDialog() final;
-
-  // Closes the dialog that informs the user that their data is being fetched
-  // from the server to fill the form.
-  void DismissAutofillAiLoadingDialog() final;
-
-  bool ShowAmbientAutoFillNotice(
-      base::WeakPtr<TouchToFillAutofillDelegate> delegate) override;
-  void HideAmbientAutoFillNotice() override;
-
-  // The AutofillMessageController is used to show native Android messages via
-  // the messages API.
-  AutofillMessageController* GetAutofillMessageController();
-
-  // The AutofillDialogController is used to show Android modal dialogs.
-  AutofillDialogController* GetAutofillDialogController();
-
-  void SetTouchToFillAutofillControllerForTesting(
-      std::unique_ptr<TouchToFillAutofillController>
-          touch_to_fill_autofill_controller);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   std::unique_ptr<device_reauth::DeviceAuthenticator> GetDeviceAuthenticator(
       std::string histogram) const final;
   bool ShowAutofillFieldIphForFeature(const FormFieldData& field,
@@ -322,20 +279,10 @@ class ChromeAutofillClient : public ContentAutofillClient {
           keep_popup_open_for_testing);
     }
   }
-#if !BUILDFLAG(IS_ANDROID)
   void SetAutofillFieldPromoTesting(
       std::unique_ptr<AutofillFieldPromoController> test_controller) {
     autofill_field_promo_controller_ = std::move(test_controller);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_ANDROID)
-  void SetAutofillSnackbarControllerImplForTesting(
-      std::unique_ptr<AutofillSnackbarControllerImpl>
-          autofill_snackbar_controller_impl) {
-    autofill_snackbar_controller_impl_ =
-        std::move(autofill_snackbar_controller_impl);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 #endif  // defined(UNIT_TEST)
 
   // ContentAutofillClient:
@@ -416,24 +363,10 @@ class ChromeAutofillClient : public ContentAutofillClient {
   // If set to true, the popup will stay open regardless of external changes on
   // the test machine, that may normally cause the popup to be hidden
   bool keep_popup_open_for_testing_ = false;
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<AutofillMessageController> autofill_message_controller_;
-  std::unique_ptr<AutofillDialogController> autofill_dialog_controller_impl_;
-  std::unique_ptr<AutofillAiSaveUpdateEntityFlowManager>
-      autofill_ai_save_update_entity_flow_manager_;
-  std::unique_ptr<SaveUpdateAddressProfileFlowManager>
-      save_update_address_profile_flow_manager_;
-  std::unique_ptr<AutofillSnackbarControllerImpl>
-      autofill_snackbar_controller_impl_;
-  std::unique_ptr<TouchToFillAutofillController>
-      touch_to_fill_autofill_controller_;
-#else   // BUILDFLAG(IS_ANDROID)
   std::unique_ptr<AutofillFieldPromoController>
       autofill_field_promo_controller_;
   std::unique_ptr<EmailVerificationPopupController>
       email_verification_popup_controller_;
-#endif  // BUILDFLAG(IS_ANDROID)
-  // Test addresses used to allow developers to test their forms.
   std::vector<AutofillProfile> test_addresses_;
   const AutofillAblationStudy ablation_study_;
 

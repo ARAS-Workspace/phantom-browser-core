@@ -37,12 +37,6 @@ class MockAutofillImageFetcher : public AutofillImageFetcherBase {
               GetCachedImageForUrl,
               (const GURL& image_url, ImageType image_type),
               (const, override));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(base::android::ScopedJavaLocalRef<jobject>,
-              GetOrCreateJavaImageFetcher,
-              (),
-              (override));
-#endif
 };
 }  // namespace autofill
 

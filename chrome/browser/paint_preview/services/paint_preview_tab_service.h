@@ -22,11 +22,6 @@
 #include "components/paint_preview/common/proto/paint_preview.pb.h"
 #include "content/public/browser/global_routing_id.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#include "base/android/scoped_java_ref.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 class WebContents;
 }  // namespace content
@@ -83,27 +78,6 @@ class PaintPreviewTabService : public PaintPreviewBaseService,
   // is required as TabClosed could have been interrupted or an accounting error
   // occurred.
   void AuditArtifacts(const std::vector<int>& active_tab_ids);
-
-#if BUILDFLAG(IS_ANDROID)
-  // JNI wrapped versions of the above methods
-  void CaptureTabAndroid(JNIEnv* env,
-                         int32_t j_tab_id,
-                         const base::android::JavaRef<jobject>& j_web_contents,
-                         bool j_accessibility_enabled,
-                         float j_page_scale_factor,
-                         int32_t j_x,
-                         int32_t j_y,
-                         const base::android::JavaRef<jobject>& j_callback);
-  void TabClosedAndroid(JNIEnv* env, int32_t j_tab_id);
-  bool HasCaptureForTabAndroid(JNIEnv* env, int32_t j_tab_id);
-  void AuditArtifactsAndroid(
-      JNIEnv* env,
-      const base::android::JavaRef<jintArray>& j_tab_ids);
-  bool IsCacheInitializedAndroid(JNIEnv* env);
-  std::string GetPathAndroid(JNIEnv* env);
-
-  base::android::ScopedJavaGlobalRef<jobject> GetJavaRef() { return java_ref_; }
-#endif  // BUILDFLAG(IS_ANDROID)
 
  private:
   class TabServiceTask {
@@ -206,9 +180,6 @@ class PaintPreviewTabService : public PaintPreviewBaseService,
   bool cache_ready_;
   base::flat_set<int> captured_tab_ids_;
   base::flat_map<int, std::unique_ptr<TabServiceTask>> tasks_;
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaGlobalRef<jobject> java_ref_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   base::MemoryConsumerRegistration memory_consumer_registration_;
 

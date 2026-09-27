@@ -12,8 +12,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "base/base_paths_mac.h"
-#elif BUILDFLAG(IS_ANDROID)
-#include "base/base_paths_android.h"
 #endif
 
 #if BUILDFLAG(IS_POSIX)

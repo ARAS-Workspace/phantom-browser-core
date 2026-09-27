@@ -179,9 +179,6 @@ class CONTENT_EXPORT PrerenderHost {
 
   static bool AreHttpRequestHeadersCompatible(
       const std::string& potential_activation_headers_str,
-#if BUILDFLAG(IS_ANDROID)
-      const std::string& potential_activation_additional_headers_str,
-#endif  // BUILDFLAG(IS_ANDROID)
       const std::string& prerender_headers_str,
       PreloadingTriggerType trigger_type,
       const std::string& histogram_suffix,
@@ -508,12 +505,6 @@ class CONTENT_EXPORT PrerenderHost {
     void ActivateAndShowRepostFormWarningDialog() override;
     bool ShouldPreserveAbortedURLs() override;
     void UpdateOverridingUserAgent() override {}
-#if BUILDFLAG(IS_ANDROID)
-    scoped_refptr<viz::RasterContextProvider> GetRasterContextProvider()
-        override;
-    gfx::ColorSpace GetOutputColorSpace(gfx::ContentColorUsage color_usage,
-                                        bool needs_alpha) override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
     LoadingOutcome WaitForLoadStopForTesting();
 

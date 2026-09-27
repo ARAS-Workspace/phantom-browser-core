@@ -33,10 +33,6 @@
 #include "ui/base/buildflags.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/password_manager/android/password_checkup_launcher_helper.h"
-#endif
-
 struct AccountInfo;
 class PrefChangeRegistrar;
 class PrefService;
@@ -59,7 +55,6 @@ using StringProvider = base::RepeatingCallback<std::string()>;
 using password_manager::metrics_util::PasswordType;
 using url::Origin;
 
-#if !BUILDFLAG(IS_ANDROID)
 // Shows the desktop platforms specific password reuse modal dialog.
 // Implemented in password_reuse_modal_warning_dialog.
 void ShowPasswordReuseModalWarningDialog(
@@ -67,7 +62,6 @@ void ShowPasswordReuseModalWarningDialog(
     ChromePasswordProtectionService* service,
     ReusedPasswordAccountType password_type,
     OnWarningDone done_callback);
-#endif
 
 // Called by ChromeContentBrowserClient to create a
 // PasswordProtectionCommitDeferringCondition if appropriate.
@@ -262,10 +256,6 @@ class ChromePasswordProtectionService
       RequestOutcome outcome,
       std::unique_ptr<LoginReputationClientResponse> response) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  ReferringAppInfo GetReferringAppInfo(
-      content::WebContents* web_contents) override;
-#endif
   // Returns the PasswordReuseManager associated with this instance.
   password_manager::PasswordReuseManager* GetPasswordReuseManager() const;
 
@@ -583,16 +573,6 @@ class ChromePasswordProtectionService
       VerdictCacheManager* cache_manager,
       ChangePhishedCredentialsCallback add_phished_credentials,
       ChangePhishedCredentialsCallback remove_phished_credentials);
-#if BUILDFLAG(IS_ANDROID)
-  ChromePasswordProtectionService(
-      Profile* profile,
-      scoped_refptr<SafeBrowsingUIManager> ui_manager,
-      StringProvider sync_password_hash_provider,
-      VerdictCacheManager* cache_manager,
-      ChangePhishedCredentialsCallback add_phished_credentials,
-      ChangePhishedCredentialsCallback remove_phished_credentials,
-      std::unique_ptr<PasswordCheckupLauncherHelper> checkup_launcher);
-#endif
 
   // Code shared by both ctors.
   void Init();
@@ -650,11 +630,6 @@ class ChromePasswordProtectionService
   // member callback rather than a virtual function because it's needed in the
   // constructor.
   StringProvider sync_password_hash_provider_for_testing_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Used on android to launch Password Checkup.
-  std::unique_ptr<PasswordCheckupLauncherHelper> checkup_launcher_;
-#endif
 
   base::CancelableTaskTracker task_tracker_;
 

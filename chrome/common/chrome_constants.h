@@ -125,10 +125,6 @@ inline constexpr base::FilePath::CharType kReportingAndNelStoreFilename[] =
     FILE_PATH_LITERAL("Reporting and NEL");
 
 // directory names
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr base::FilePath::CharType kOTRTempStateDirname[] =
-    FILE_PATH_LITERAL("OTRTempState");
-#endif
 
 // Fraction of the soft process limit that can be consumed by extensions, before
 // additional extension processes are ignored. By allowing this many extension

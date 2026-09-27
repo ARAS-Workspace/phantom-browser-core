@@ -16,9 +16,7 @@
 #include "device/gamepad/public/cpp/gamepad_features.h"
 #include "device/gamepad/simulated_gamepad_data_fetcher.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "device/gamepad/gamepad_platform_data_fetcher_android.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "device/gamepad/game_controller_data_fetcher_mac.h"
 #if BUILDFLAG(IS_MAC)
 #include "device/gamepad/gamepad_platform_data_fetcher_mac.h"
@@ -33,11 +31,7 @@
 namespace device {
 
 void AddGamepadPlatformDataFetchers(GamepadDataFetcherManager* manager) {
-#if BUILDFLAG(IS_ANDROID)
-
-  manager->AddFactory(new GamepadPlatformDataFetcherAndroid::Factory());
-
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 
   manager->AddFactory(new GameControllerDataFetcherMac::Factory());
 #if BUILDFLAG(IS_MAC)

@@ -11,7 +11,7 @@
 #include "base/threading/platform_thread.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include <pthread.h>
 #elif BUILDFLAG(IS_LINUX)
 #include <stdint.h>
@@ -25,7 +25,7 @@ namespace base {
 // functions used to obtain the stack base address.
 struct SamplingProfilerThreadToken {
   PlatformThreadId id;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   pthread_t pthread_id;
 #elif BUILDFLAG(IS_LINUX)
   // Due to the sandbox, we can only retrieve the stack base address for the

@@ -26,9 +26,7 @@
 #include "extensions/common/api/webstore_private.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/browser/promotion/promotion_eligibility_checker.h"  // nogncheck
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -104,13 +102,6 @@ class WebstorePrivateBeginInstallWithManifest3Function
       std::u16string blocked_message);
 
   void RequestExtensionApproval(content::WebContents* web_contents);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Called when the parent access flow on Android desktop completes to show the
-  // browser parent approval permission dialog.
-  void OnParentAuthenticationDone(content::WebContents* web_contents,
-                                  SupervisedExtensionApprovalResult result);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Handles the result of the extension approval flow.
   void OnExtensionApprovalDone(SupervisedExtensionApprovalResult result);
@@ -411,7 +402,6 @@ class WebstorePrivateGetMV2DeprecationStatusFunction
   ExtensionFunction::ResponseAction Run() override;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 class WebstorePrivateShouldShowEnterprisePromotionBannerFunction
     : public ExtensionFunction {
  public:
@@ -481,8 +471,6 @@ class WebstorePrivateOnEnterprisePromoClickFunction : public ExtensionFunction {
 
   ResponseAction Run() override;
 };
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions
 

@@ -87,10 +87,6 @@ class POLICY_EXPORT ConfigurationPolicyProvider
   void OnSchemaRegistryUpdated(bool has_new_schemas) override;
   void OnSchemaRegistryReady() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  void ShutdownForTesting();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   bool is_active() const { return is_active_; }
 
   void set_active(bool active) { is_active_ = active; }

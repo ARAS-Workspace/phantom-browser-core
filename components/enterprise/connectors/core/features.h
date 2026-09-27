@@ -38,11 +38,6 @@ BASE_DECLARE_FEATURE(kEnableEncryptedFileUpload);
 
 BASE_DECLARE_FEATURE(kDlpScanPastedImages);
 
-#if BUILDFLAG(IS_ANDROID)
-// Controls whether WebProtect download on Clank is enabled.
-BASE_DECLARE_FEATURE(kEnableDownloadEnterpriseScanOnClank);
-#endif
-
 // Controls whether cancellation of uploads is enabled for content analysis.
 BASE_DECLARE_FEATURE(kEnableCancelUploadOnContentAnalysis);
 

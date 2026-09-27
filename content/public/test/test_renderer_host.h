@@ -46,9 +46,6 @@ struct WebPreferences;
 }  // namespace blink::web_pref
 
 namespace display {
-#if BUILDFLAG(IS_ANDROID)
-class Screen;
-#endif
 class ScopedNativeScreen;
 }  // namespace display
 
@@ -226,9 +223,6 @@ class RenderViewHostTestEnabler {
 
   friend class RenderViewHostTestHarness;
 
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<display::Screen> screen_;
-#endif
   std::unique_ptr<base::test::SingleThreadTaskEnvironment> task_environment_;
   std::unique_ptr<MockRenderProcessHostFactory> rph_factory_;
   std::unique_ptr<MockAgentSchedulingGroupHostFactory> asgh_factory_;

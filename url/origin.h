@@ -25,12 +25,6 @@
 #include "net/base/cronet_buildflags.h"
 #include "url/scheme_host_port.h"
 
-#if (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_ROBOLECTRIC)) && \
-    !BUILDFLAG(CRONET_BUILD)
-#include "base/android/jni_android.h"
-#include "url/url_jni_headers/Origin_shared_jni.h"
-#endif
-
 class GURL;
 
 namespace blink {
@@ -334,20 +328,6 @@ class COMPONENT_EXPORT(URL) Origin {
   // and precursor information.
   std::string GetDebugString(bool include_nonce = true) const;
 
-#if (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_ROBOLECTRIC)) && \
-    !BUILDFLAG(CRONET_BUILD)
-  jni_zero::ScopedJavaLocalRef<JOrigin> ToJavaObject(JNIEnv* env) const;
-  static Origin FromJavaObject(JNIEnv* env,
-                               const jni_zero::JavaRef<jobject>& java_origin);
-  static int64_t CreateNative(JNIEnv* env,
-                              const jni_zero::JavaRef<jstring>& java_scheme,
-                              const jni_zero::JavaRef<jstring>& java_host,
-                              uint16_t port,
-                              bool is_opaque,
-                              uint64_t tokenHighBits,
-                              uint64_t tokenLowBits);
-#endif
-
   void WriteIntoTrace(perfetto::TracedValue context) const;
 
   // Estimates dynamic memory usage.
@@ -355,14 +335,6 @@ class COMPONENT_EXPORT(URL) Origin {
   size_t EstimateMemoryUsage() const;
 
  private:
-#if (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_ROBOLECTRIC)) && \
-    !BUILDFLAG(CRONET_BUILD)
-  friend Origin CreateOpaqueOriginForAndroid(
-      const std::string& scheme,
-      const std::string& host,
-      uint16_t port,
-      const base::UnguessableToken& nonce_token);
-#endif
   friend class blink::SecurityOrigin;
   friend class blink::SecurityOriginTest;
   friend class blink::StorageKey;
@@ -511,24 +483,5 @@ std::ostream& operator<<(std::ostream& out, const Origin::Nonce& origin);
 COMPONENT_EXPORT(URL) bool IsSameOriginWith(const GURL& a, const GURL& b);
 
 }  // namespace url
-
-#if (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_ROBOLECTRIC)) && \
-    !BUILDFLAG(CRONET_BUILD)
-namespace jni_zero {
-
-// @JniType conversion function.
-template <>
-inline url::Origin FromJniType<url::Origin>(JNIEnv* env,
-                                            const JavaRef<jobject>& j_obj) {
-  return url::Origin::FromJavaObject(env, j_obj);
-}
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType(JNIEnv* env,
-                                             const url::Origin& obj) {
-  return obj.ToJavaObject(env);
-}
-
-}  // namespace jni_zero
-#endif
 
 #endif  // URL_ORIGIN_H_

@@ -9,7 +9,7 @@
 #include "base/compiler_specific.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE)
 // On macOS and Android (before Q), the first use of a `thread_local` variable
 // on a new thread will cause an allocation, leading to infinite recursion.
 // Also, `thread_local` goes through `emutls` on Android, which is slower than

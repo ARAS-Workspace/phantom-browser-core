@@ -118,12 +118,6 @@ class NET_EXPORT HttpCache : public HttpTransactionFactory {
         NetLog* net_log,
         base::OnceCallback<void(disk_cache::BackendResult)> callback) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-    virtual void SetAppStatusListenerGetter(
-        disk_cache::ApplicationStatusListenerGetter
-            app_status_listener_getter) {}
-#endif
-
     virtual std::optional<CacheType> GetCacheType() const;
 
     // Returns true via `callback` if existing cache files are found, indicating
@@ -163,11 +157,6 @@ class NET_EXPORT HttpCache : public HttpTransactionFactory {
         NetLog* net_log,
         base::OnceCallback<void(disk_cache::BackendResult)> callback) override;
 
-#if BUILDFLAG(IS_ANDROID)
-    void SetAppStatusListenerGetter(disk_cache::ApplicationStatusListenerGetter
-                                        app_status_listener_getter) override;
-#endif
-
     std::optional<CacheType> GetCacheType() const override;
     void HasExistingFileToLoad(
         base::OnceCallback<void(bool)> callback) override;
@@ -182,9 +171,6 @@ class NET_EXPORT HttpCache : public HttpTransactionFactory {
     int max_bytes_;
     bool hard_reset_;
     raw_ptr<net::CacheEncryptionDelegate> cache_encryption_delegate_;
-#if BUILDFLAG(IS_ANDROID)
-    disk_cache::ApplicationStatusListenerGetter app_status_listener_getter_;
-#endif
   };
 
   // Whether a transaction can join parallel writing or not is a function of the

@@ -16,8 +16,6 @@ class TimeDelta;
 
 namespace media_router {
 
-#if !BUILDFLAG(IS_ANDROID)
-
 namespace prefs {
 // Pref name that allows the AccessCode/QR code scanning dialog button to be
 // shown.
@@ -64,8 +62,6 @@ bool IsAccessCodeCastTabSwitchingUiEnabled(Profile* profile);
 // Returns true if this user is allowed to use Access Codes to
 // discover cast devices, and AccessCodeCastFreezeUI flag is enabled.
 bool IsAccessCodeCastFreezeUiEnabled(Profile* profile);
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace media_router
 

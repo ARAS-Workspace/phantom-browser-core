@@ -14,14 +14,6 @@
 
 #include "services/media_session/public/cpp/media_image.h"
 
-#if BUILDFLAG(IS_ANDROID)
-
-#include <jni.h>
-
-#include "base/android/scoped_java_ref.h"
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace IPC {
 template <class P>
 struct ParamTraits;

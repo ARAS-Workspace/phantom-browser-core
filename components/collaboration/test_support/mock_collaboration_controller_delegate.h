@@ -70,12 +70,6 @@ class MockCollaborationControllerDelegate
               (override));
   MOCK_METHOD(void, PromoteCurrentScreen, (), (override));
   MOCK_METHOD(void, OnFlowFinished, (), (override));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(base::android::ScopedJavaLocalRef<jobject>,
-              GetJavaObject,
-              (),
-              (override));
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace collaboration

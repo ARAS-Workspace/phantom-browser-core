@@ -72,18 +72,6 @@ class VIZ_SERVICE_EXPORT DisplayResourceProvider
 
   base::WeakPtr<DisplayResourceProvider> GetWeakPtr();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Indicates if this resource is backed by an Android SurfaceView, and thus
-  // can be promoted to an overlay via legacy (SurfaceView/Dialog) overlay
-  // system.
-  bool IsBackedBySurfaceView(ResourceId id) const;
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  // Indicates if this resource wants to receive promotion hints.
-  bool DoesResourceWantPromotionHint(ResourceId id) const;
-#endif
-
   // Returns the size in pixels of the underlying gpu mailbox/software bitmap.
   const gfx::Size GetResourceBackedSize(ResourceId id) const;
 

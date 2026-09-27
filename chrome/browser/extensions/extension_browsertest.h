@@ -439,11 +439,6 @@ class ExtensionBrowserTest : public PlatformBrowserTest,
 
   ExtensionId last_loaded_extension_id_;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Feature flags overrides are only used on Android.
-  base::test::ScopedFeatureList feature_list_;
-#endif
-
   // Used for setting the default scoped current channel for extension browser
   // tests to UNKNOWN (trunk), in order to enable channel restricted features.
   // TODO(crbug.com/40261741): We should remove this and have the current

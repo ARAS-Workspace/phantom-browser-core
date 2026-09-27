@@ -96,11 +96,6 @@ class NavigationController {
     // |virtual_url_for_special_cases|.
     LOAD_TYPE_DATA,
 
-#if BUILDFLAG(IS_ANDROID)
-    // Load a pdf page. Used on Android only.
-    LOAD_TYPE_PDF_ANDROID
-#endif
-
     // Adding new LoadURLType? Also update LoadUrlParams.java static constants.
   };
 
@@ -244,14 +239,6 @@ class NavigationController {
     // Used in LOAD_TYPE_DATA and LOAD_TYPE_PDF_ANDROID loads only. URL
     // displayed to the user for data or pdf loads.
     GURL virtual_url_for_special_cases;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Used in LOAD_TYPE_DATA loads only. The real data URI is represented
-    // as a string to circumvent the restriction on GURL size. This is only
-    // needed to pass URLs that exceed the IPC limit (kMaxURLChars). Short
-    // data: URLs can be passed in the |url| field.
-    scoped_refptr<base::RefCountedString> data_url_as_string;
-#endif
 
     // Used in LOAD_TYPE_HTTP_POST loads only. Carries the post data of the
     // load.  Ownership is transferred to NavigationController after

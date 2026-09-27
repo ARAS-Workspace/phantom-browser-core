@@ -194,11 +194,6 @@ class COMPONENTS_DOWNLOAD_EXPORT BaseFile {
       mojo::PendingRemote<quarantine::mojom::Quarantine> remote_quarantine,
       OnAnnotationDoneCallback on_annotation_done_callback);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Publishes the intermediate download to public download collection.
-  DownloadInterruptReason PublishDownload();
-#endif
-
   // Returns the last known path to the download file. Can be empty if there's
   // no file.
   const base::FilePath& full_path() const { return full_path_; }

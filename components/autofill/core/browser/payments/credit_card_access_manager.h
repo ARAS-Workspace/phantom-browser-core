@@ -227,11 +227,6 @@ class CreditCardAccessManager
   // FIDO auth was suggested.
   void Authenticate(UnmaskAuthFlowType unmask_auth_flow_type);
 
-#if BUILDFLAG(IS_ANDROID)
-  bool ShouldOfferFidoAuth() const override;
-  bool UserOptedInToFidoFromSettingsPageOnMobile() const override;
-#endif
-
   // CreditCardFidoAuthenticator::Requester:
   void OnFIDOAuthenticationComplete(
       const CreditCardFidoAuthenticator::FidoAuthenticationResponse& response)
@@ -280,7 +275,6 @@ class CreditCardAccessManager
   // authenticating future card unmasking.
   void ShowWebauthnOfferDialog(std::string card_authorization_token);
 
-#if !BUILDFLAG(IS_ANDROID)
   // After card verification starts, shows the verify pending dialog if WebAuthn
   // is enabled, indicating some verification steps are in progress.
   void ShowVerifyPendingDialog();
@@ -288,7 +282,6 @@ class CreditCardAccessManager
   // Invokes the corresponding callback on different user's responses on either
   // the Webauthn offer dialog or verify pending dialog.
   void HandleDialogUserResponse(WebauthnDialogCallbackType type);
-#endif
 
   // Returns the key for the given card to be used for inserting or querying the
   // `unmasked_card_cache_`.

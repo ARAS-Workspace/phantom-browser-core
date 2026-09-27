@@ -89,12 +89,6 @@ struct CONTENT_EXPORT PrerenderAttributes {
 
   Referrer referrer;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Additional headers to be attached to prerendering navigation. Currently
-  // this is used only for Android WebView.
-  net::HttpRequestHeaders additional_headers;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Records the No-Vary-Search hint of the corresponding speculation rule.
   // This is std::nullopt when No-Vary-Search hint is not specified.
   std::optional<net::HttpNoVarySearchData> no_vary_search_hint;

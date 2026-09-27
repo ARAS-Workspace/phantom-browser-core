@@ -45,12 +45,6 @@ class Shell : public WebContentsDelegate, public WebContentsObserver {
                            const std::string& data,
                            const GURL& base_url);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Android-only path to allow loading long data strings.
-  void LoadDataAsStringWithBaseURL(const GURL& url,
-                                   const std::string& data,
-                                   const GURL& base_url);
-#endif
   void GoBackOrForward(int offset);
   void Reload();
   void ReloadBypassingCache();
@@ -99,9 +93,7 @@ class Shell : public WebContentsDelegate, public WebContentsObserver {
 
   WebContents* web_contents() const { return web_contents_.get(); }
 
-#if !BUILDFLAG(IS_ANDROID)
   gfx::NativeWindow window();
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // Public to be called by an ObjC bridge object.
@@ -125,9 +117,6 @@ class Shell : public WebContentsDelegate, public WebContentsObserver {
       bool* was_blocked) override;
   void LoadingStateChanged(WebContents* source,
                            bool should_show_loading_ui) override;
-#if BUILDFLAG(IS_ANDROID)
-  void SetOverlayMode(bool use_overlay_mode) override;
-#endif
   void EnterFullscreenModeForTab(
       RenderFrameHost* requesting_frame,
       const blink::mojom::FullscreenOptions& options) override;
@@ -135,7 +124,6 @@ class Shell : public WebContentsDelegate, public WebContentsObserver {
   bool IsFullscreenForTabOrPending(const WebContents* web_contents) override;
   blink::mojom::DisplayMode GetDisplayMode(
       const WebContents* web_contents) override;
-#if !BUILDFLAG(IS_ANDROID)
   void RegisterProtocolHandler(RenderFrameHost* requesting_frame,
                                const std::string& protocol,
                                const GURL& url,
@@ -144,7 +132,6 @@ class Shell : public WebContentsDelegate, public WebContentsObserver {
                                  const std::string& protocol,
                                  const GURL& url,
                                  bool user_gesture) override;
-#endif
   void RequestPointerLock(WebContents* web_contents,
                           bool user_gesture,
                           bool last_unlocked_by_target) override;
@@ -168,13 +155,6 @@ class Shell : public WebContentsDelegate, public WebContentsObserver {
       RenderWidgetHost* render_widget_host,
       base::RepeatingClosure hang_monitor_restarter) override;
   void ActivateContents(WebContents* contents) override;
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<ColorChooser> OpenColorChooser(
-      WebContents* web_contents,
-      SkColor color,
-      const std::vector<blink::mojom::ColorSuggestionPtr>& suggestions)
-      override;
-#endif
   void RunFileChooser(RenderFrameHost* render_frame_host,
                       scoped_refptr<FileSelectListener> listener,
                       const blink::mojom::FileChooserParams& params) override;
@@ -230,9 +210,6 @@ class Shell : public WebContentsDelegate, public WebContentsObserver {
   void ToggleFullscreenModeForTab(WebContents* web_contents,
                                   bool enter_fullscreen);
   // WebContentsObserver
-#if BUILDFLAG(IS_ANDROID)
-  void LoadProgressChanged(double progress) override;
-#endif
   void TitleWasSet(NavigationEntry* entry) override;
   void RenderFrameCreated(RenderFrameHost* frame_host) override;
 #if BUILDFLAG(IS_MAC)

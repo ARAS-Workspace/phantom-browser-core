@@ -59,11 +59,6 @@ class BASE_EXPORT PowerMonitorDeviceSource : public PowerMonitorSource {
   // state hasn't been obtained yet).
   PowerStateObserver::BatteryPowerStatus GetBatteryPowerStatus() const override;
 
-#if BUILDFLAG(IS_ANDROID)
-  PowerThermalObserver::DeviceThermalState GetCurrentThermalState()
-      const override;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_MAC)
   // PowerMonitorSource:
   PowerThermalObserver::DeviceThermalState GetCurrentThermalState()

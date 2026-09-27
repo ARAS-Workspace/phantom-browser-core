@@ -30,14 +30,12 @@ class PointerLockPermissionContext
       const content::PermissionResult* permission_result,
       const permissions::PermissionPromptDecision& decision) override;
 
-#if !BUILDFLAG(IS_ANDROID)
  private:
   // ContentSettingPermissionContextBase:
   ContentSetting GetContentSettingStatusInternal(
       content::RenderFrameHost* render_frame_host,
       const GURL& requesting_origin,
       const GURL& embedding_origin) const override;
-#endif
 };
 
 }  // namespace permissions

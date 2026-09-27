@@ -26,24 +26,9 @@
 #include "third_party/perfetto/include/perfetto/ext/tracing/core/trace_writer.h"
 #include "third_party/perfetto/include/perfetto/tracing/data_source.h"
 
-#if BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARM64) && \
-    BUILDFLAG(CAN_UNWIND_WITH_FRAME_POINTERS)
-#include "base/android/library_loader/anchor_functions_buildflags.h"
-#if BUILDFLAG(SUPPORTS_CODE_ORDERING)
-#define ANDROID_ARM64_UNWINDING_SUPPORTED 1
-#else
 #define ANDROID_ARM64_UNWINDING_SUPPORTED 0
-#endif
-#else
-#define ANDROID_ARM64_UNWINDING_SUPPORTED 0
-#endif
 
-#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(CAN_UNWIND_WITH_CFI_TABLE) && \
-    defined(OFFICIAL_BUILD)
-#define ANDROID_CFI_UNWINDING_SUPPORTED 1
-#else
 #define ANDROID_CFI_UNWINDING_SUPPORTED 0
-#endif
 
 namespace tracing {
 

@@ -16,11 +16,7 @@
 #include "chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/autocomplete/tab_matcher_android.h"
-#else
 #include "chrome/browser/autocomplete/tab_matcher_desktop.h"
-#endif
 
 class AutocompleteScoringModelService;
 class OnDeviceTailModelService;
@@ -158,11 +154,7 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
       url_consent_helper_;
   std::unique_ptr<unified_consent::UrlKeyedDataCollectionConsentHelper>
       personalized_url_consent_helper_;
-#if BUILDFLAG(IS_ANDROID)
-  TabMatcherAndroid tab_matcher_;
-#else
   TabMatcherDesktop tab_matcher_;
-#endif
 
   // Injectable storage partitiion, used for testing.
   raw_ptr<content::StoragePartition> storage_partition_;

@@ -10,7 +10,6 @@
 
 namespace password_manager {
 
-#if !BUILDFLAG(IS_ANDROID)
 class LeakCheckCredential;
 
 // Delegate for BulkLeakCheck. Gets the updates during processing the list.
@@ -37,7 +36,6 @@ class BulkLeakCheckDelegateInterface {
   // BulkLeakCheck can be deleted from this call safely.
   virtual void OnError(LeakDetectionError error) = 0;
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager
 

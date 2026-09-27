@@ -29,9 +29,7 @@ class AccountCapabilitiesTestMutator {
   // keep-sorted start sticky_prefixes=#if,BUILDFLAG group_prefixes=#endif
   void set_can_fetch_family_member_info(bool value);
   void set_can_have_email_address_displayed(bool value);
-#if !BUILDFLAG(IS_ANDROID)
   void set_can_make_chrome_search_engine_choice_screen_choice(bool value);
-#endif
   void set_can_run_chrome_privacy_sandbox_trials(bool value);
   void set_can_show_history_sync_opt_ins_without_minor_mode_restrictions(
       bool value);

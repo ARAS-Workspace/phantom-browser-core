@@ -26,11 +26,6 @@ class OmniboxActionInSuggest : public OmniboxAction {
       omnibox::SuggestTemplateInfo::TemplateAction template_action,
       std::optional<TemplateURLRef::SearchTermsArgs> search_terms_args);
 
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetOrCreateJavaObject(
-      JNIEnv* env) const override;
-#endif
-
   void RecordActionShown(size_t position, bool used) const override;
   void Execute(ExecutionContext& context) const override;
   OmniboxActionId ActionId() const override;

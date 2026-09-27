@@ -47,11 +47,6 @@
 #include "ui/gfx/range/range.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_weak_ref.h"
-#include "base/android/scoped_java_ref.h"
-#endif
-
 class AutocompleteProvider;
 class OmniboxAction;
 class TemplateURL;
@@ -337,45 +332,6 @@ struct AutocompleteMatch {
   AutocompleteMatch& operator=(const AutocompleteMatch& match);
   AutocompleteMatch& operator=(AutocompleteMatch&& match) noexcept;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a corresponding Java object, creating it if necessary.
-  // NOTE: Android specific methods are defined in autocomplete_match_android.cc
-  base::android::ScopedJavaLocalRef<jobject> GetOrCreateJavaObject(
-      JNIEnv* env,
-      const TemplateURLService* template_url_service) const;
-
-  // Update the bond with- or drop the Java AutocompleteMatch instance.
-  // This should be called whenever the native AutocompleteMatch object is
-  // updated for an existing Java object.
-  void UpdateJavaObjectNativeRef();
-
-  // Notify the Java object that its native counterpart is about to be
-  // destroyed.
-  void DestroyJavaObject();
-
-  // Returns a corresponding Java Class object.
-  static jclass GetClazz(JNIEnv* env);
-
-  // Update the clipboard match with the current clipboard data.
-  void UpdateWithClipboardContent(
-      JNIEnv* env,
-      const base::android::JavaRef<jobject>& j_callback);
-
-  // Called when the match is updated with the clipboard content.
-  void OnClipboardSuggestionContentUpdated(
-      const base::android::JavaRef<jobject>& j_callback);
-
-  // Update the Java object with clipboard content.
-  void UpdateClipboardContent(JNIEnv* env);
-  // Update the Java object with new destination URL.
-  void UpdateJavaNavigationDetails();
-  // Update the Java object with new Answer-in-Suggest.
-  void UpdateJavaAnswer();
-  // Update the Java object description.
-  void UpdateJavaDescription();
-#endif
-
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
   // Converts omnibox::AnswerType to an answer vector icon.
   static const gfx::VectorIcon& AnswerTypeToAnswerIcon(
       omnibox::AnswerType type);
@@ -392,7 +348,6 @@ struct AutocompleteMatch {
   // starter pack suggestion (e.g. @tabs, @history, @bookmarks, etc.).
   const gfx::VectorIcon& GetVectorIcon(bool is_bookmark,
                                        const TemplateURL* turl = nullptr) const;
-#endif
 
   // Comparison function for determining whether the first match is better than
   // the second.
@@ -1032,11 +987,6 @@ struct AutocompleteMatch {
   // Unset if it has not been computed yet.
   std::optional<bool> has_tab_match;
 
-#if BUILDFLAG(IS_ANDROID)
-  // The Android tab ID of the matching tab, if `has_tab_match` is true.
-  int android_tab_id = 0;
-#endif
-
   // Set to a `TemplateURL`'s keyword; e.g. 'youtube.com' or '@bookmarks'. Set
   // by the `AutocompleteController`, not individual providers. This determines
   // which keyword to activate if the user focuses this instant-keyword (e.g.
@@ -1169,19 +1119,6 @@ struct AutocompleteMatch {
   }
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  // Corresponding Java object.
-  // This element should not be copied with the rest of the AutocompleteMatch
-  // object to ensure consistent 1:1 relationship between the objects.
-  // This object should never be accessed directly. To acquire a reference to
-  // java object, call the GetOrCreateJavaObject().
-  // Note that this object is lazily constructed to avoid creating Java matches
-  // for throw away AutocompleteMatch objects, eg. during Classify() or
-  // QualifyPartialUrlQuery() calls.
-  // See AutocompleteControllerAndroid for more details.
-  mutable std::unique_ptr<base::android::ScopedJavaGlobalRef<jobject>>
-      java_match_;
-#endif
   base::WeakPtrFactory<AutocompleteMatch> weak_ptr_factory_{this};
 };
 

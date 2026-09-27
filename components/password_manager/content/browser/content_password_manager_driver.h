@@ -98,9 +98,6 @@ class ContentPasswordManagerDriver final
       autofill::AutofillSuggestionTriggerSource suggestion_source) override;
   void FillIntoFocusedField(bool is_password,
                             const std::u16string& credential) override;
-#if BUILDFLAG(IS_ANDROID)
-  void TriggerFormSubmission() override;
-#endif
   void PreviewField(autofill::FieldRendererId field_id,
                     const std::u16string& value) override;
   void PreviewSuggestion(const std::u16string& username,

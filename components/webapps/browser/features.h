@@ -22,12 +22,6 @@ inline constexpr int kTotalDaysToStoreMLGuardrails = 180;
 // Min icon size when using favicon to install webapp.
 inline constexpr int kMinimumFaviconSize = 48;
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kWebApkInstallFailureNotification);
-BASE_DECLARE_FEATURE(kAndroidAutoMintedTWA);
-BASE_DECLARE_FEATURE(kAlwaysShowInstallDisambiguationDialog);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // ML Installability promotion flags and all the feature params.
 BASE_DECLARE_FEATURE(kWebAppsEnableMLModelForPromotion);
 extern const base::FeatureParam<double> kWebAppsMLGuardrailResultReportProb;

@@ -13,9 +13,7 @@
 #include "build/build_config.h"
 #include "components/password_manager/core/browser/password_store/password_store_interface.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/password_manager/core/browser/password_store/login_database.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace network::mojom {
 class NetworkContext;
@@ -27,7 +25,6 @@ namespace password_manager {
 
 class CredentialsCleanerRunner;
 
-#if !BUILDFLAG(IS_ANDROID)
 // Creates a LoginDatabase. Looks in |db_directory| for the database file.
 // Does not call LoginDatabase::Init() -- to avoid UI jank, that needs to be
 // called by PasswordStore::Init() on the background thread.
@@ -35,7 +32,6 @@ std::unique_ptr<LoginDatabase> CreateLoginDatabase(
     password_manager::IsAccountStore is_account_store,
     const base::FilePath& db_directory,
     PrefService* prefs);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // This function handles the following clean-ups of credentials:
 // (1) Removing blocklisted duplicates: if two blocklisted credentials have the

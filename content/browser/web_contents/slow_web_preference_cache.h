@@ -81,11 +81,6 @@ class CONTENT_EXPORT SlowWebPreferenceCache
   int pointer_events_max_touch_points_ = 0;
   int number_of_cpu_cores_ = 1;
 
-#if BUILDFLAG(IS_ANDROID)
-  bool video_fullscreen_orientation_lock_enabled_ = false;
-  bool video_rotate_to_fullscreen_enabled_ = false;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   SEQUENCE_CHECKER(sequence_checker_);
 };
 

@@ -74,12 +74,6 @@ class TestPasswordStore : public PasswordStore {
   // Do NOT enable this method on Desktop; instead, attach a
   // `MockAffiliatedMatchHelper` via `SetAffiliatedMatchHelper()` and use
   // `ExpectCallToGetAffiliatedAndGrouped()`.
-#if BUILDFLAG(IS_ANDROID)
-  void SetAffiliatedAndGroupedRealms(
-      const std::string& realm,
-      const std::vector<std::string>& affiliated_realms,
-      const std::vector<std::string>& grouped_realms = {});
-#endif
 
   void ReturnErrorOnRequest(
       std::optional<PasswordStoreBackendError> password_store_backend_error);

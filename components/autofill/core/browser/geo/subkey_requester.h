@@ -14,10 +14,6 @@
 #include "build/build_config.h"
 #include "third_party/libaddressinput/chromium/chrome_address_validator.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace autofill {
 
 // This receives a region code and the device's language.
@@ -69,27 +65,6 @@ class SubKeyRequester : public LoadRulesListener {
   // Cancels the pending subkey request task.
   void CancelPendingGetSubKeys();
 
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject();
-
-  // Starts loading the rules for the specified |region_code| for the further
-  // subkey request.
-  void LoadRulesForSubKeys(JNIEnv* env,
-                           const base::android::JavaRef<jstring>& region_code);
-
-  // Gets the subkeys for the region with |jregion_code| code, if the
-  // |jregion_code| rules have finished loading. Otherwise, sets up a task to
-  // get the subkeys, when the rules are loaded.
-  void StartRegionSubKeysRequest(
-      JNIEnv* env,
-      const base::android::JavaRef<jstring>& jregion_code,
-      int32_t jtimeout_seconds,
-      const base::android::JavaRef<jobject>& jdelegate);
-
-  // Cancels the pending subkey request task.
-  void CancelPendingGetSubKeys(JNIEnv* env);
-#endif  // BUILDFLAG(IS_ANDROID)
-
  private:
   // Called when the address rules for the |region_code| have finished
   // loading. Implementation of the LoadRulesListener interface.
@@ -104,11 +79,6 @@ class SubKeyRequester : public LoadRulesListener {
   AddressValidator address_validator_;
 
   const std::string language_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Java-side version of the SubKeyRequester.
-  base::android::ScopedJavaGlobalRef<jobject> java_ref_;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace autofill

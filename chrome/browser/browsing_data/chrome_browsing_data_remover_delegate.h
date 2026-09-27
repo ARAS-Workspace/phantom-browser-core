@@ -79,11 +79,6 @@ class ChromeBrowsingDataRemoverDelegate
   void OnStartRemoving() override;
   void OnDoneRemoving() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  void OverrideWebappRegistryForTesting(
-      std::unique_ptr<WebappRegistry> webapp_registry);
-#endif
-
   using DomainReliabilityClearer = base::RepeatingCallback<void(
       content::BrowsingDataFilterBuilder* filter_builder,
       network::mojom::NetworkContext_DomainReliabilityClearMode,
@@ -231,12 +226,6 @@ class ChromeBrowsingDataRemoverDelegate
 
   // Used if we need to clear history.
   base::CancelableTaskTracker history_task_tracker_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // WebappRegistry makes calls across the JNI. In unit tests, the Java side is
-  // not initialised, so the registry must be mocked out.
-  std::unique_ptr<WebappRegistry> webapp_registry_;
-#endif
 
   // PasswordStore::DisableAutoSignInForOrigins() is required when wiping
   // DATA_TYPE_COOKIES, but that must be deferred until any password deletions

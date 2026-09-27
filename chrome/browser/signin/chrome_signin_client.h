@@ -18,9 +18,7 @@
 
 class WaitForNetworkCallbackHelper;
 
-#if !BUILDFLAG(IS_ANDROID)
 class ForceSigninVerifier;
-#endif
 class Profile;
 
 namespace version_info {
@@ -104,11 +102,9 @@ class ChromeSigninClient : public SigninClient {
       const base::FilePath& profile_path);
   void OnCloseBrowsersAborted(const base::FilePath& profile_path);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Used as the `on_token_fetch_complete` callback in the
   // `ForceSigninVerifier`.
   void OnTokenFetchComplete(bool token_is_valid);
-#endif
 
   void RecordOpenTabCount(signin_metrics::AccessPoint access_point,
                           signin::ConsentLevel consent_level);
@@ -121,9 +117,7 @@ class ChromeSigninClient : public SigninClient {
   base::OnceCallback<void(SignoutDecision)> on_signout_decision_reached_;
 
   bool should_display_user_manager_ = true;
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<ForceSigninVerifier> force_signin_verifier_;
-#endif
 
   scoped_refptr<network::SharedURLLoaderFactory>
       url_loader_factory_for_testing_;

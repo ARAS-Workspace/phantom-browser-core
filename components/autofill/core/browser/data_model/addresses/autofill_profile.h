@@ -33,10 +33,6 @@
 #include "components/autofill/core/browser/field_types.h"
 #include "components/signin/public/identity_manager/account_info.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace autofill {
 
 class AutofillProfileComparator;
@@ -163,24 +159,6 @@ class AutofillProfile : public FormGroup {
   void set_guid(std::string_view guid) { guid_ = guid; }
 
   // Android/Java API.
-#if BUILDFLAG(IS_ANDROID)
-  // Create a new Java AutofillProfile instance.
-  base::android::ScopedJavaLocalRef<jobject> CreateJavaObject(
-      std::string_view app_locale) const;
-
-  // Given a Java AutofillProfile object, create an equivalent C++ instance.
-  // Java profile can represent either a new or an existing address profile
-  // depending on whether `existing_profile` is set or not. If this is a new
-  // address profile, Java fields are set to the newly created AutofillProfile.
-  // Otherwise, `existing_profile` is copied and Java fields are set to it.
-  // Setting fields to `existing_profile` is done to avoid loosing address
-  // substructure by creating AutofillProfile from scratch based only on the
-  // available Java fields.
-  static AutofillProfile CreateFromJavaObject(
-      const base::android::JavaRef<jobject>& jprofile,
-      const AutofillProfile* existing_profile,
-      std::string_view app_locale);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // FormGroup:
   void GetMatchingTypes(std::u16string_view text,

@@ -19,10 +19,6 @@
 #include "components/data_sharing/public/share_url_interception_context.h"
 #include "components/keyed_service/core/keyed_service.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace gfx {
 class Image;
 }  // namespace gfx
@@ -120,13 +116,6 @@ class DataSharingService : public KeyedService, public base::SupportsUserData {
       base::expected<std::set<GroupData>, PeopleGroupActionFailure>;
   using SharedDataPreviewOrFailureOutcome =
       base::expected<SharedDataPreview, DataPreviewActionFailure>;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a Java object of the type DataSharingService for the given
-  // DataSharingService.
-  static base::android::ScopedJavaLocalRef<jobject> GetJavaObject(
-      DataSharingService* data_sharing_service);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   DataSharingService() = default;
   ~DataSharingService() override = default;

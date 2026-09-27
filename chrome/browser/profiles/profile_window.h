@@ -13,10 +13,6 @@
 #include "chrome/browser/profiles/profile_observer.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error "Not used on Android"
-#endif
-
 class BrowserWindowInterface;
 class GlobalBrowserCollection;
 class Profile;

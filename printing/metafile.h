@@ -74,17 +74,9 @@ class COMPONENT_EXPORT(PRINTING_METAFILE) MetafilePlayer {
   // Identifies the type of encapsulated.
   virtual mojom::MetafileDataType GetDataType() const = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Similar to bool SaveTo(base::File* file) const, but write the data to the
-  // file descriptor directly. This is because Android doesn't allow file
-  // ownership exchange. This function should ONLY be called after the metafile
-  // is closed. Returns true if writing succeeded.
-  virtual bool SaveToFileDescriptor(int fd) const = 0;
-#else
   // Saves the underlying data to the given file. This function should ONLY be
   // called after the metafile is closed. Returns true if writing succeeded.
   virtual bool SaveTo(base::File* file) const = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 // This class creates a graphics context that renders into a data stream
@@ -138,9 +130,7 @@ class COMPONENT_EXPORT(PRINTING_METAFILE) Metafile : public MetafilePlayer {
   // MetfilePlayer implementation.
   bool GetDataAsVector(std::vector<char>* buffer) const override;
   base::MappedReadOnlyRegion GetDataAsSharedMemoryRegion() const override;
-#if !BUILDFLAG(IS_ANDROID)
   bool SaveTo(base::File* file) const override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace printing

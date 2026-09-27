@@ -14,19 +14,11 @@
 
 namespace themes {
 
-#if BUILDFLAG(IS_ANDROID)
-DeviceThemeInfo<sync_pb::ThemeAndroidSpecifics> TranslateDesktop(
-    const sync_pb::ThemeSpecifics& desktop_specifics);
-
-DeviceThemeInfo<sync_pb::ThemeAndroidSpecifics> TranslateIos(
-    const sync_pb::ThemeIosSpecifics& ios_specifics);
-#else
 DeviceThemeInfo<sync_pb::ThemeSpecifics> TranslateAndroid(
     const sync_pb::ThemeAndroidSpecifics& android_specifics);
 
 DeviceThemeInfo<sync_pb::ThemeSpecifics> TranslateIos(
     const sync_pb::ThemeIosSpecifics& ios_specifics);
-#endif
 
 }  // namespace themes
 

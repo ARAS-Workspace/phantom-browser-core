@@ -13,11 +13,9 @@
 #include "ui/webui/mojo_web_ui_controller.h"
 #include "ui/webui/resources/cr_components/theme_color_picker/theme_color_picker.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/common/webui_url_constants.h"
 #include "content/public/browser/webui_config.h"
 #include "content/public/common/url_constants.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 class WebUI;
@@ -25,7 +23,6 @@ class WebUI;
 
 class ThemeColorPickerHandler;
 
-#if !BUILDFLAG(IS_ANDROID)
 class ProfileCustomizationUI;
 
 class ProfileCustomizationUIConfig
@@ -35,7 +32,6 @@ class ProfileCustomizationUIConfig
       : DefaultWebUIConfig(content::kChromeUIScheme,
                            chrome::kChromeUIProfileCustomizationHost) {}
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // This WebUI uses mojo for the color picker element.
 class ProfileCustomizationUI

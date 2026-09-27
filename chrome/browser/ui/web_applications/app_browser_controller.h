@@ -304,9 +304,7 @@ class AppBrowserController : public ui::ColorProviderKey::InitializerSupplier,
   // Returns whether this app browser was created from a trusted source.
   bool IsTrustedSource() const;
 
-#if !BUILDFLAG(IS_ANDROID)
   BrowserWindowInterface* browser() const { return browser_; }
-#endif
 
   // Gets the url that the app browser controller was created with. Note: This
   // may be empty until the web contents begins navigating.

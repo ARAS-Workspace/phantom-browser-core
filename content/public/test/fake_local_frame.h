@@ -147,10 +147,6 @@ class FakeLocalFrame : public blink::mojom::LocalFrame {
       mojo::PendingAssociatedRemote<blink::mojom::DevToolsAgentHost> host,
       mojo::PendingAssociatedReceiver<blink::mojom::DevToolsAgent> receiver)
       override;
-#if BUILDFLAG(IS_ANDROID)
-  void ExtractSmartClipData(const gfx::Rect& rect,
-                            ExtractSmartClipDataCallback callback) override;
-#endif
   void HandleRendererDebugURL(const GURL& url) override;
   void GetCanonicalUrlForSharing(
       base::OnceCallback<void(const std::optional<GURL>&)> callback) override;
@@ -200,9 +196,6 @@ class FakeLocalFrame : public blink::mojom::LocalFrame {
       InvokeScriptToolForInspectorCallback callback) override;
   void NotifyInspectorOfCrossDocumentScriptToolResult(
       const base::UnguessableToken& invocation_id) override;
-#if BUILDFLAG(IS_ANDROID)
-  void PerformFullContentSpellCheck() override;
-#endif
 
  private:
   void BindFrameHostReceiver(mojo::ScopedInterfaceEndpointHandle handle);

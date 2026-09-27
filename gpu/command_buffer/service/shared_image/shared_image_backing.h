@@ -257,12 +257,6 @@ class GPU_GLES2_EXPORT SharedImageBacking {
   // Returns the GpuMemoryBufferHandle if present.
   virtual gfx::GpuMemoryBufferHandle GetGpuMemoryBufferHandle();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Queries the Vulkan/Dawn YCbCr info for the backing.
-  virtual std::optional<VulkanYCbCrInfo> GetVkCbCrInfo(
-      SharedContextState* context_state);
-#endif
-
   // True for images in Ash that were imported from Exo clients.
   virtual bool IsImportedFromExo();
 
@@ -344,11 +338,6 @@ class GPU_GLES2_EXPORT SharedImageBacking {
       gpu::VulkanDeviceQueue* vulkan_device_queue,
       gpu::VulkanImplementation& vulkan_impl,
       bool needs_detiling);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  virtual std::unique_ptr<LegacyOverlayImageRepresentation>
-  ProduceLegacyOverlay(SharedImageManager* manager, MemoryTypeTracker* tracker);
 #endif
 
   // Updates the estimated size if memory usage changes after creation.

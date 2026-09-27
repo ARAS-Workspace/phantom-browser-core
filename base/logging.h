@@ -233,11 +233,7 @@ int GetVlogLevel(const char (&file)[N]) {
   // the android-binary-size bot in crrev.com/c/6344673. Parts of the code can,
   // and do, override ENABLED_VLOG_LEVEL to collect logs in the wild. The rest
   // is dead-code stripped.
-#if defined(OFFICIAL_BUILD) && !DCHECK_IS_ON() && BUILDFLAG(IS_ANDROID)
-  return -1;
-#else
   return GetVlogLevelHelper(file, N);
-#endif  // defined(OFFICIAL_BUILD) && !DCHECK_IS_ON() && BUILDFLAG(IS_ANDROID)
 }
 
 // Sets the common items you want to be prepended to each log message.

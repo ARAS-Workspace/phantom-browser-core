@@ -19,12 +19,6 @@
 #include "net/base/net_errors.h"
 #include "services/network/public/mojom/content_security_policy.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "mojo/public/cpp/bindings/remote.h"
-#include "services/device/public/mojom/wake_lock.mojom.h"
-#include "ui/android/view_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 
 class BrowserContext;
@@ -175,15 +169,7 @@ class CONTENT_EXPORT RenderFrameDevToolsAgentHost
   void ChangeFrameHostAndObservedProcess(RenderFrameHostImpl* frame_host);
   void UpdateFrameAlive();
 
-#if BUILDFLAG(IS_ANDROID)
-  device::mojom::WakeLock* GetWakeLock();
-#endif
-
   void UpdateResourceLoaderFactories();
-
-#if BUILDFLAG(IS_ANDROID)
-  mojo::Remote<device::mojom::WakeLock> wake_lock_;
-#endif
 
   std::unique_ptr<FrameAutoAttacher> auto_attacher_;
   // The active host we are talking to.

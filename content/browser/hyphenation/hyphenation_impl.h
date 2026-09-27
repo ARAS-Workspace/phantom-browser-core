@@ -25,18 +25,14 @@ class HyphenationImpl : public blink::mojom::Hyphenation {
 
   static scoped_refptr<base::SequencedTaskRunner> GetTaskRunner();
 
-#if !BUILDFLAG(IS_ANDROID)
   static void RegisterGetDictionary();
-#endif
 
   // Hyphenation:
   void OpenDictionary(const std::string& locale,
                       OpenDictionaryCallback callback) override;
 
  private:
-#if !BUILDFLAG(IS_ANDROID)
   static void SetDirectory(const base::FilePath& dir);
-#endif
 };
 
 }  // namespace hyphenation

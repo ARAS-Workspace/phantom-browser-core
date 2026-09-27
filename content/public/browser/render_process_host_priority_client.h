@@ -7,10 +7,6 @@
 
 namespace content {
 
-#if BUILDFLAG(IS_ANDROID)
-enum class ChildProcessImportance;
-#endif
-
 // Interface for a client that contributes Priority to a RenderProcessHost.
 // Clients can call RenderProcessHost::UpdateClientPriority() when their
 // Priority changes.
@@ -25,9 +21,6 @@ class RenderProcessHostPriorityClient {
     unsigned int frame_depth;
     bool intersects_viewport;
     bool is_discarding;
-#if BUILDFLAG(IS_ANDROID)
-    ChildProcessImportance importance;
-#endif
   };
 
   virtual Priority GetPriority() = 0;

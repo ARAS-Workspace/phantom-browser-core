@@ -145,12 +145,6 @@ class PasswordProtectionService : public PasswordProtectionServiceBase {
                                    ReusedPasswordAccountType password_type,
                                    content::WebContents* web_contents) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the referring app info that starts the activity.
-  virtual ReferringAppInfo GetReferringAppInfo(
-      content::WebContents* web_contents) = 0;
-#endif
-
   // Called when a new navigation is starting to create a deferring condition
   // if there is a pending sync password reuse ping or if there is a modal
   // warning dialog showing in the corresponding web contents.

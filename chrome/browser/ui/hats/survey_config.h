@@ -14,7 +14,6 @@
 #include "components/compose/buildflags.h"
 #include "pdf/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 // Trigger identifiers currently used; duplicates not allowed.
 extern const char kHatsSurveyTriggerAutofillAddress[];
 extern const char kHatsSurveyTriggerAutofillAddressUserPerception[];
@@ -94,17 +93,6 @@ extern const char kHatsSurveyTriggerComposeClose[];
 extern const char kHatsSurveyTriggerComposeNudgeClose[];
 #endif  // #if BUILDFLAG(ENABLE_COMPOSE)
 extern const char kHatsSurveyTriggerWhatsNew[];
-#else   // BUILDFLAG(IS_ANDROID)
-extern const char kHatsSurveyTriggerAndroidStartupSurvey[];
-extern const char kHatsSurveyTriggerRedWarningAndroid[];
-extern const char kHatsSurveyTriggerSigninFirstRun[];
-extern const char kHatsSurveyTriggerSigninWeb[];
-extern const char kHatsSurveyTriggerSigninNtpSigninButton[];
-extern const char kHatsSurveyTriggerSigninNtpAccountAvatarTap[];
-extern const char kHatsSurveyTriggerSigninNtpPromo[];
-extern const char kHatsSurveyTriggerSigninBookmarkPromo[];
-extern const char kHatsSurveyTriggerSuspiciousSiteWarning[];
-#endif  // #if !BUILDFLAG(IS_ANDROID)
 
 extern const char kHatsSurveyTriggerAutofillAiFilling[];
 extern const char kHatsSurveyTriggerPermissionsPrompt[];

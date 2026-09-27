@@ -31,12 +31,7 @@ class InstallableEvaluator {
   ~InstallableEvaluator();
 
   // Maximum dimension size in pixels for icons.
-  static const int kMaximumIconSizeInPx =
-#if BUILDFLAG(IS_ANDROID)
-      std::numeric_limits<int>::max();
-#else
-      1024;
-#endif
+  static const int kMaximumIconSizeInPx = 1024;
 
   // Returns the minimum icon size in pixels for a site to be installable.
   static int GetMinimumIconSizeInPx();

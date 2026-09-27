@@ -282,15 +282,6 @@ class MockWidgetInputHandler : public blink::mojom::WidgetInputHandler {
       std::unique_ptr<blink::WebCoalescedInputEvent> event) override;
   void WaitForInputProcessed(WaitForInputProcessedCallback callback) override;
   void PingMainThread(PingMainThreadCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void AttachSynchronousCompositor(
-      mojo::PendingRemote<blink::mojom::SynchronousCompositorControlHost>
-          control_host,
-      mojo::PendingAssociatedRemote<blink::mojom::SynchronousCompositorHost>
-          host,
-      mojo::PendingAssociatedReceiver<blink::mojom::SynchronousCompositor>
-          compositor_request) override;
-#endif
   void GetFrameWidgetInputHandler(
       mojo::PendingAssociatedReceiver<blink::mojom::FrameWidgetInputHandler>
           interface_request) override;

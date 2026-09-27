@@ -26,14 +26,6 @@ enum class MessagePumpType {
   // This type of pump also supports asynchronous IO.
   IO,
 
-#if BUILDFLAG(IS_ANDROID)
-  // This type of pump is backed by a Java message handler which is
-  // responsible for running the tasks added to the ML. This is only for use
-  // on Android. TYPE_JAVA behaves in essence like TYPE_UI, except during
-  // construction where it does not use the main thread specific pump factory.
-  JAVA,
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_APPLE)
   // This type of pump is backed by a NSRunLoop. This is only for use on
   // OSX and IOS.

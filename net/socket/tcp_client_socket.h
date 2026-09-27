@@ -28,7 +28,6 @@
 
 // PowerMonitor doesn't get suspend mode signals on Android, so don't use it to
 // watch for suspend events.
-#if !BUILDFLAG(IS_ANDROID)
 // Define SOCKETS_OBSERVE_SUSPEND if sockets should watch for suspend events so
 // they can fail pending socket operations on suspend. Otherwise, connections
 // hang for varying lengths of time when leaving suspend mode before failing
@@ -37,7 +36,6 @@
 // reasons (experimentally, it doesn't seem to be the differences in the keep
 // alive settings it sets TCP sockets).
 #define TCP_CLIENT_SOCKET_OBSERVES_SUSPEND
-#endif
 
 namespace net {
 

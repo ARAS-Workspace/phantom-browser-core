@@ -56,11 +56,6 @@ extern const char kUsername[];
 // kSafetyHubPasswordCheckOriginsKey: [ {origin: example1.com, username: user1},
 //                                      {origin: example2.com, username: user2}]
 extern const char kSafetyHubPasswordCheckOriginsKey[];
-#if BUILDFLAG(IS_ANDROID)
-// Key to store number of compromied password in the prefs. The data will look
-// like: kSafetyHubCompromiedPasswordOriginsCount: 2
-extern const char kSafetyHubCompromiedPasswordOriginsCount[];
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Name of the histogram which logs how many times the blocklist is checked
 // during an auto-revocation run.

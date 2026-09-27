@@ -13,10 +13,6 @@
 #include "components/sync/base/features.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/jni_android.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace collaboration {
 
 // The class responsible for controlling actions on platform specific UI
@@ -250,11 +246,6 @@ class CollaborationControllerDelegate {
   // Called when the flow is finished so the delegate instance can clean up
   // itself.
   virtual void OnFlowFinished() = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the Java object of the CollaborationControllerDelegate.
-  virtual base::android::ScopedJavaLocalRef<jobject> GetJavaObject() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace collaboration

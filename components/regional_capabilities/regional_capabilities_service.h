@@ -15,10 +15,6 @@
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/regional_capabilities/program_settings.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 class PrefService;
 
 namespace TemplateURLPrepopulateData {
@@ -77,12 +73,6 @@ class RegionalCapabilitiesService : public KeyedService {
     // the service for the current run.
     virtual void FetchCountryId(
         CountryIdCallback country_id_fetched_callback) = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Synchronously reads the device's regional capabilities program
-    // configuration.
-    virtual Program GetDeviceProgram() = 0;
-#endif
   };
 
   // Contains the string IDs for the UI elements on the search engine choice
@@ -155,12 +145,10 @@ class RegionalCapabilitiesService : public KeyedService {
 
   bool ShouldRecordSearchEngineChoicesMadeFromSettings();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns the appropriate choice screen design strings for the active
   // program, if one is required. Returns `std::nullopt` if the region does not
   // require a search engine choice screen.
   std::optional<ChoiceScreenDesign> GetChoiceScreenDesign();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   const std::optional<ChoiceScreenEligibilityConfig>&
   GetChoiceScreenEligibilityConfig();
@@ -223,17 +211,6 @@ class RegionalCapabilitiesService : public KeyedService {
   Client& GetClientForTesting();
 
   // -- JNI Interface ---------------------------------------------------------
-#if BUILDFLAG(IS_ANDROID)
-  // Returns a reference to the Java-side `RegionalCapabilitiesService`, lazily
-  // creating it if needed.
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject();
-
-  // If the Java-side service has been created, commands it to destroy itself.
-  void DestroyJavaObject();
-
-  // See `IsInEeaCountry()`.
-  bool IsInEeaCountry(JNIEnv* env);
-#endif
   // -- JNI Interface End ----------------------------------------------------
 
  private:
@@ -259,11 +236,6 @@ class RegionalCapabilitiesService : public KeyedService {
   std::optional<country_codes::CountryId> country_id_cache_;
   std::optional<raw_ref<const ProgramSettings>> program_settings_cache_;
   // -- cache end --
-
-#if BUILDFLAG(IS_ANDROID)
-  // Corresponding Java object.
-  base::android::ScopedJavaGlobalRef<jobject> java_ref_;
-#endif
 
   base::WeakPtrFactory<RegionalCapabilitiesService> weak_ptr_factory_{this};
 };

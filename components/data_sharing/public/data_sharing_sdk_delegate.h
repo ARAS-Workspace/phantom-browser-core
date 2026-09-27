@@ -11,12 +11,6 @@
 #include "components/data_sharing/public/protocol/data_sharing_sdk.pb.h"
 #include "third_party/abseil-cpp/absl/status/status.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-
-using base::android::ScopedJavaLocalRef;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace data_sharing {
 class DataSharingNetworkLoader;
 
@@ -31,16 +25,6 @@ class DataSharingSDKDelegate {
   DataSharingSDKDelegate& operator=(DataSharingSDKDelegate&&) = delete;
 
   virtual ~DataSharingSDKDelegate() = default;
-
-#if BUILDFLAG(IS_ANDROID)
-  using CreateJavaDelegateCallback =
-      base::OnceCallback<base::android::ScopedJavaLocalRef<jobject>()>;
-
-  // Callback to create the java object. The java object is created only when
-  // the sdk is used to avoid overhead of library loading.
-  static std::unique_ptr<DataSharingSDKDelegate> CreateDelegate(
-      CreateJavaDelegateCallback sdk_delegate);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   virtual void Initialize(
       DataSharingNetworkLoader* data_sharing_network_loader) = 0;

@@ -77,15 +77,6 @@ class WebstorePrivateAPIDelegate {
       content::WebContents* web_contents,
       base::OnceCallback<void(bool)> callback) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Shows a dialog to notify the user that they need to ask their parent for
-  // approval to install an extension.
-  virtual void ShowExtensionInstallAskParentDialog(
-      content::WebContents* web_contents,
-      base::OnceClosure cancel_callback,
-      base::OnceClosure approve_callback) = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Called when the user accepts the extension install friction dialog.
   virtual void ReportFrictionAcceptedEvent(
       content::BrowserContext* context) = 0;

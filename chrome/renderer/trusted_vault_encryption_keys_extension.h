@@ -44,7 +44,6 @@ class TrustedVaultEncryptionKeysExtension
   explicit TrustedVaultEncryptionKeysExtension(content::RenderFrame* frame);
 
   void Install();
-#if !BUILDFLAG(IS_ANDROID)
   void SetSyncEncryptionKeys(gin::Arguments* args);
   void SetSyncEncryptionKeysContinue(
       gin::Arguments* args,
@@ -61,7 +60,6 @@ class TrustedVaultEncryptionKeysExtension
           base::flat_map<std::string,
                          std::vector<chrome::mojom::TrustedVaultKeyPtr>>>
           trusted_vault_keys);
-#endif
   void AddTrustedSyncEncryptionRecoveryMethod(gin::Arguments* args);
   void RunCompletionCallback(
       std::unique_ptr<v8::Global<v8::Function>> callback);

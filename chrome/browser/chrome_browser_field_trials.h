@@ -8,10 +8,6 @@
 #include "base/memory/raw_ptr.h"
 #include "components/variations/platform_field_trials.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/variations/variations_associated_data.h"
-#endif
-
 class PrefService;
 
 namespace base {

@@ -13,9 +13,7 @@
 
 class Profile;
 
-#if !BUILDFLAG(IS_ANDROID)
 class BrowserWindowInterface;
-#endif
 
 namespace syncer {
 class SyncService;
@@ -63,7 +61,6 @@ struct SyncStatusLabels {
 
 extern const char kBookmarksLimitExceededHelpCenter[];
 
-#if !BUILDFLAG(IS_ANDROID)
 SyncStatusLabels GetSyncStatusLabelsForSettings(
     const syncer::SyncService* service);
 
@@ -84,7 +81,6 @@ SyncStatusLabels GetAvatarSyncErrorLabelsForSettings(
 std::u16string GetAvatarSyncErrorDescription(
     syncer::SyncService::UserActionableError error,
     const std::string& user_email);
-#endif
 
 // Whether sync is currently blocked from starting because the sync
 // confirmation dialog hasn't been shown. Note that once the dialog is
@@ -95,13 +91,10 @@ bool ShouldRequestSyncConfirmation(const syncer::SyncService* service);
 // whether a missing passphrase is preventing Sync from fully starting up.
 bool ShouldShowSyncPassphraseError(const syncer::SyncService* service);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Shows the sync passphrase dialog and attempts decrypting the data using the
 // provided passphrase.
 void ShowSyncPassphraseDialogAndDecryptData(BrowserWindowInterface& browser);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
 // Opens a tab for the purpose of retrieving the trusted vault keys, which
 // usually requires a reauth.
 void OpenTabForSyncKeyRetrieval(
@@ -120,6 +113,5 @@ void ShowBookmarksLimitExceededHelp(
     BrowserWindowInterface* browser,
     syncer::SyncService* sync_service,
     syncer::SyncService::BookmarksLimitExceededHelpClickedSource source);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // CHROME_BROWSER_SYNC_SYNC_UI_UTIL_H_

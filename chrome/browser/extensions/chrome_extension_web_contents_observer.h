@@ -59,7 +59,6 @@ class ChromeExtensionWebContentsObserver
 
   // content::WebContentsObserver overrides.
   void RenderFrameCreated(content::RenderFrameHost* render_frame_host) override;
-#if !BUILDFLAG(IS_ANDROID)
   void OnDidAddMessageToConsole(
       content::RenderFrameHost* source_frame,
       blink::mojom::ConsoleMessageLevel log_level,
@@ -67,7 +66,6 @@ class ChromeExtensionWebContentsObserver
       int32_t line_no,
       const std::u16string& source_id,
       const std::optional<std::u16string>& untrusted_stack_trace) override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Reloads an extension if it is on the terminated list.
   void ReloadIfTerminated(content::RenderFrameHost* render_frame_host);

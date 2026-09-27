@@ -129,11 +129,6 @@ class BASE_EXPORT [[maybe_unused, nodiscard]] TaskScope {
 // Returns true if the current task is run synchronously by `RunOrPostTask()`.
 bool BASE_EXPORT CurrentTaskIsRunningSynchronously();
 
-#if BUILDFLAG(IS_ANDROID)
-namespace subtle {
-using SequenceToken = ::base::internal::SequenceToken;
-}  // namespace subtle
-#endif
 }  // namespace base
 
 #endif  // BASE_SEQUENCE_TOKEN_H_

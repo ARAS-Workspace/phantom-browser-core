@@ -10,13 +10,10 @@
 #include "components/password_manager/core/browser/password_form.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/password_manager/core/browser/leak_detection/bulk_leak_check.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace password_manager {
 
-#if !BUILDFLAG(IS_ANDROID)
 class MockBulkLeakCheckDelegateInterface
     : public BulkLeakCheckDelegateInterface {
  public:
@@ -28,7 +25,6 @@ class MockBulkLeakCheckDelegateInterface
                void(LeakCheckCredential credential, IsLeaked is_leaked));
   MOCK_METHOD1(OnError, void(LeakDetectionError));
 };
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager
 

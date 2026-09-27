@@ -49,10 +49,6 @@
 #include "ui/accessibility/ax_node_id_forward.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "third_party/jni_zero/jni_zero.h"
-#endif
-
 class GURL;
 class SkBitmap;
 
@@ -202,15 +198,6 @@ class CONTENT_EXPORT RenderFrameHost : public IPC::Listener {
   static RenderFrameHost* FromPlaceholderToken(
       int render_process_id,
       const blink::RemoteFrameToken& placeholder_frame_token);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the RenderFrameHost object associated with a Java native pointer.
-  // Note: It is recommended to use jni_zero::FromJniType<RenderFrameHost*>()
-  // instead of this method. This enables the use of @JniType for automatic
-  // conversion in Java.
-  static RenderFrameHost* FromJavaRenderFrameHost(
-      const base::android::JavaRef<jobject>& jrender_frame_host_android);
-#endif
 
   // Logs UMA metrics related to isolatable sandboxed iframes.
   static void LogSandboxedIframesIsolationMetrics();
@@ -897,19 +884,6 @@ class CONTENT_EXPORT RenderFrameHost : public IPC::Listener {
   virtual void SetWebUIProperty(const std::string& name,
                                 const std::string& value) = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the Java object of this instance.
-  // Note: It is recommended to use jni_zero::ToJniType() instead. This enables
-  // the use of @JniType for automatic conversion in Java.
-  virtual jni_zero::ScopedJavaLocalRef<jobject> GetJavaRenderFrameHost() = 0;
-
-  // Returns an InterfaceProvider for Java-implemented interfaces that are
-  // scoped to this RenderFrameHost. This provides access to interfaces
-  // implemented in Java in the browser process to C++ code in the browser
-  // process.
-  virtual service_manager::InterfaceProvider* GetJavaInterfaces() = 0;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Returns true if this frame has a beforeunload handler and has received
   // a user activation, which would allow it to display a beforeunload dialog
   // if the user attempted to close the page or navigate away.
@@ -1263,24 +1237,5 @@ class CONTENT_EXPORT RenderFrameHost : public IPC::Listener {
 };
 
 }  // namespace content
-
-#if BUILDFLAG(IS_ANDROID)
-namespace jni_zero {
-
-// @JniType conversion function.
-template <>
-inline content::RenderFrameHost* FromJniType<content::RenderFrameHost*>(
-    JNIEnv* env,
-    const JavaRef<jobject>& j_obj) {
-  return content::RenderFrameHost::FromJavaRenderFrameHost(j_obj);
-}
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType(JNIEnv* env,
-                                             content::RenderFrameHost* obj) {
-  return obj->GetJavaRenderFrameHost();
-}
-
-}  // namespace jni_zero
-#endif
 
 #endif  // CONTENT_PUBLIC_BROWSER_RENDER_FRAME_HOST_H_

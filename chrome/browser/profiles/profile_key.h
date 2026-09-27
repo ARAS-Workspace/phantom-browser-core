@@ -13,10 +13,6 @@
 
 class PrefService;
 
-#if BUILDFLAG(IS_ANDROID)
-class ProfileKeyAndroid;
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // An embryonic Profile with only fields accessible in reduced mode.
 // Used as a SimpleFactoryKey.
 class ProfileKey : public SimpleFactoryKey {
@@ -43,10 +39,6 @@ class ProfileKey : public SimpleFactoryKey {
 
   static ProfileKey* FromSimpleFactoryKey(SimpleFactoryKey* key);
 
-#if BUILDFLAG(IS_ANDROID)
-  ProfileKeyAndroid* GetProfileKeyAndroid();
-#endif  // BUILDFLAG(IS_ANDROID)
-
  private:
   raw_ptr<PrefService> prefs_ = nullptr;
   raw_ptr<leveldb_proto::ProtoDatabaseProvider, AcrossTasksDanglingUntriaged>
@@ -54,10 +46,6 @@ class ProfileKey : public SimpleFactoryKey {
 
   // Points to the original (non off-the-record) ProfileKey.
   raw_ptr<ProfileKey> original_key_ = nullptr;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<ProfileKeyAndroid> profile_key_android_;
-#endif  // BUILDFLAG(IS_ANDROID)
 };
 
 #endif  // CHROME_BROWSER_PROFILES_PROFILE_KEY_H_

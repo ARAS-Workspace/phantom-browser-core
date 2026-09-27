@@ -37,9 +37,7 @@
 #include "third_party/blink/public/web/web_form_control_element.h"
 #include "third_party/blink/public/web/web_input_element.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/autofill/content/renderer/page_passwords_analyser.h"
-#endif
 
 namespace blink {
 class WebInputElement;
@@ -148,9 +146,6 @@ class PasswordAutofillAgent : public content::RenderFrameObserver,
       const ParsingResult& parsing_result) override;
   void CheckViewAreaVisible(FieldRendererId field_id,
                             CheckViewAreaVisibleCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void TriggerFormSubmission() override;
-#endif
 
   // An editing-related call of WebLocalFrameClient forwarded by AutofillAgent.
   // It returns a request that the agent should use to consume the event.
@@ -652,9 +647,7 @@ class PasswordAutofillAgent : public content::RenderFrameObserver,
 
   raw_ptr<PasswordGenerationAgent> password_generation_agent_ = nullptr;
 
-#if !BUILDFLAG(IS_ANDROID)
   PagePasswordsAnalyser page_passwords_analyser_;
-#endif
 
   mojo::AssociatedRemote<mojom::PasswordManagerDriver> password_manager_driver_;
 

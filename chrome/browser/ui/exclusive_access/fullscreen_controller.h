@@ -26,9 +26,7 @@ namespace chrome {
 class BrowserCommandController;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 class PopunderPreventer;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 class WebContents;
@@ -149,11 +147,9 @@ class FullscreenController : public ExclusiveAccessControllerBase {
     return weak_ptr_factory_.GetWeakPtr();
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Called when fullscreen tabs open popups, to track potential popunders.
   void FullscreenTabOpeningPopup(content::WebContents* opener,
                                  content::WebContents* popup);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Platform Fullscreen ///////////////////////////////////////////////////////
 
@@ -273,12 +269,10 @@ class FullscreenController : public ExclusiveAccessControllerBase {
   // Set of parameters used to enter fullscreen
   std::optional<FullscreenTabParams> fullscreen_parameters_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Tracks related popups that lost activation or were shown without activation
   // during content fullscreen sessions. This also activates the popups when
   // fullscreen exits, to prevent sites from creating persistent popunders.
   std::unique_ptr<PopunderPreventer> popunder_preventer_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::RepeatingClosureList fullscreen_state_changed_callbacks_;
 

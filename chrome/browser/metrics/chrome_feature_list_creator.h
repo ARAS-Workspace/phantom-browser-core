@@ -76,9 +76,7 @@ class ChromeFeatureListCreator {
   // Passes ownership of the |network_time_tracker_| to the caller.
   std::unique_ptr<network_time::NetworkTimeTracker> TakeNetworkTimeTracker();
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<installer::InitialPreferences> TakeInitialPrefs();
-#endif
 
   PrefService* local_state() { return local_state_.get(); }
   policy::ChromeBrowserPolicyConnector* browser_policy_connector() {
@@ -137,9 +135,7 @@ class ChromeFeatureListCreator {
 
   std::unique_ptr<ChromeBrowserFieldTrials> browser_field_trials_;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<installer::InitialPreferences> installer_initial_prefs_;
-#endif
 
 };
 

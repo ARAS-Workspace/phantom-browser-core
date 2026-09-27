@@ -31,9 +31,6 @@ class ChromeSupervisedUserWebContentHandlerBase
   int64_t GetInterstitialNavigationId() const override;
   void GoBack() override;
   void MaybeCloseLocalApproval() override;
-#if BUILDFLAG(IS_ANDROID)
-  void LearnMore(base::OnceClosure open_help_page) override;
-#endif  // BUILDFLAG(IS_ANDROID)
 
  protected:
   ChromeSupervisedUserWebContentHandlerBase(content::WebContents* web_contents,

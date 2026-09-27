@@ -56,8 +56,6 @@ constexpr bool IsOfficialBuild() {
 constexpr std::string_view GetOSType() {
 #if BUILDFLAG(IS_MAC)
   return "Mac OS X";
-#elif BUILDFLAG(IS_ANDROID)
-  return "Android";
 #elif BUILDFLAG(IS_LINUX)
   return "Linux";
 #elif BUILDFLAG(IS_FREEBSD)

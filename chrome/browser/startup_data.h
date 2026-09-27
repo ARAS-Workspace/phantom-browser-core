@@ -11,16 +11,6 @@
 #include "build/build_config.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/leveldb_proto/public/proto_database_provider.h"  // nogncheck
-#endif
-
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-namespace extensions {
-class ExtensionsBrowserClient;
-}
-#endif
-
 namespace user_prefs {
 class PrefRegistrySyncable;
 }
@@ -59,74 +49,11 @@ class StartupData {
   // browser mode.
   void RecordCoreSystemProfile();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Early initialization of the profile key for reduced mode startup.
-  void InitProfileKey();
-
-  // Initializes all necessary parameters to create the Profile's PrefService.
-  void CreateProfilePrefService();
-
-  // Returns whether a PrefService has been created.
-  bool HasBuiltProfilePrefService();
-
-  ProfileKey* GetProfileKey();
-
-  // Passes ownership of the |key_| to the caller.
-  std::unique_ptr<ProfileKey> TakeProfileKey();
-
-  // Passes ownership of the |schema_registry_service_| to the caller.
-  std::unique_ptr<policy::SchemaRegistryService> TakeSchemaRegistryService();
-
-  // Passes ownership of the |user_cloud_policy_manager_| to the caller.
-  std::unique_ptr<policy::UserCloudPolicyManager> TakeUserCloudPolicyManager();
-
-  // Passes ownership of the |profile_policy_connector_| to the caller.
-  std::unique_ptr<policy::ProfilePolicyConnector> TakeProfilePolicyConnector();
-
-  // Passes ownership of the |pref_registry_| to the caller.
-  scoped_refptr<user_prefs::PrefRegistrySyncable> TakePrefRegistrySyncable();
-
-  // Passes ownership of the |prefs_| to the caller.
-  std::unique_ptr<sync_preferences::PrefServiceSyncable>
-  TakeProfilePrefService();
-
-  // Passes ownership of the |proto_db_provider_| to the caller.
-  std::unique_ptr<leveldb_proto::ProtoDatabaseProvider>
-  TakeProtoDatabaseProvider();
-#endif
-
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  // Passes ownership of the `extensions_browser_client_` to the caller.
-  std::unique_ptr<extensions::ExtensionsBrowserClient>
-  TakeExtensionsBrowserClient();
-#endif
-
   // TODO(martinkong): Remove this function and replace its usage with
   // ChromeFeatureListCreator::GetInstance()
   ChromeFeatureListCreator* chrome_feature_list_creator();
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  void PreProfilePrefServiceInit();
-  void CreateServicesInternal();
-
-  std::unique_ptr<ProfileKey> key_;
-
-  std::unique_ptr<policy::SchemaRegistryService> schema_registry_service_;
-  std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager_;
-  std::unique_ptr<policy::ProfilePolicyConnector> profile_policy_connector_;
-
-  scoped_refptr<user_prefs::PrefRegistrySyncable> pref_registry_;
-
-  std::unique_ptr<sync_preferences::PrefServiceSyncable> prefs_;
-
-  std::unique_ptr<leveldb_proto::ProtoDatabaseProvider> proto_db_provider_;
-#endif
-
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  std::unique_ptr<extensions::ExtensionsBrowserClient>
-      extensions_browser_client_;
-#endif
 };
 
 #endif  // CHROME_BROWSER_STARTUP_DATA_H_

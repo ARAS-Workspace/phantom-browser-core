@@ -9,7 +9,7 @@
 #include "base/compiler_specific.h"
 #include "base/time/time.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 #include <semaphore.h>
 #else
 #include "base/synchronization/waitable_event.h"
@@ -45,7 +45,7 @@ class BASE_EXPORT CancelableEvent {
 
   void Wait() { TimedWait(TimeDelta::Max()); }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   using NativeHandle = sem_t;
 #else
   using NativeHandle = WaitableEvent;

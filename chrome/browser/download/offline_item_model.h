@@ -83,14 +83,12 @@ class OfflineItemModel : public DownloadUIModel,
   GURL GetOriginalURL() const override;
   bool ShouldPromoteOrigin() const override;
 
-#if !BUILDFLAG(IS_ANDROID)
   bool IsCommandEnabled(const DownloadCommands* download_commands,
                         DownloadCommands::Command command) const override;
   bool IsCommandChecked(const DownloadCommands* download_commands,
                         DownloadCommands::Command command) const override;
   void ExecuteCommand(DownloadCommands* download_commands,
                       DownloadCommands::Command command) override;
-#endif
 
  private:
   OfflineContentProvider* GetProvider() const;

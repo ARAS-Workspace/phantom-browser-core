@@ -285,25 +285,6 @@ GetParallelRequestCreationFailureCountForTesting();
 COMPONENTS_DOWNLOAD_EXPORT void RecordInputStreamReadError(
     MojoResult mojo_result);
 
-#if BUILDFLAG(IS_ANDROID)
-enum class BackgroudTargetDeterminationResultTypes {
-  // Target determination succeeded.
-  kSuccess = 0,
-
-  // Target path doesn't exist.
-  kTargetPathMissing = 1,
-
-  // Path reservation failed.
-  kPathReservationFailed = 2,
-
-  kMaxValue = kPathReservationFailed
-};
-
-COMPONENTS_DOWNLOAD_EXPORT void RecordDuplicatePdfDownloadTriggered(
-    bool open_inline);
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace download
 
 #endif  // COMPONENTS_DOWNLOAD_PUBLIC_COMMON_DOWNLOAD_STATS_H_

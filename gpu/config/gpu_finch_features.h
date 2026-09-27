@@ -29,14 +29,6 @@ namespace features {
 // alongside the definition of their values in the .cc file.
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kAggressiveShaderCacheLimits);
 
-#if BUILDFLAG(IS_ANDROID)
-GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kAndroidSurfaceControl);
-GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebViewSurfaceControl);
-GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebViewSurfaceControlForTV);
-GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kLimitAImageReaderMaxSizeToOne);
-GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebViewThreadSafeMediaDefault);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kDefaultEnableGpuRasterization);
 
 // Enables dynamic allocation of shared image backings at runtime.
@@ -199,13 +191,6 @@ GPU_CONFIG_EXPORT bool IsSkiaGraphitePrecompilationEnabled(
     const base::CommandLine* command_line);
 GPU_CONFIG_EXPORT bool EnablePruneOldTransferCacheEntries();
 GPU_CONFIG_EXPORT bool IsLegacyIpcDisabled();
-
-#if BUILDFLAG(IS_ANDROID)
-GPU_CONFIG_EXPORT bool IsAndroidSurfaceControlEnabled();
-GPU_CONFIG_EXPORT bool LimitAImageReaderMaxSizeToOne();
-GPU_CONFIG_EXPORT bool IncreaseBufferCountForHighFrameRate();
-GPU_CONFIG_EXPORT bool IncreaseBufferCountForWebViewOverlays();
-#endif
 
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kSyncPointGraphValidation);
 

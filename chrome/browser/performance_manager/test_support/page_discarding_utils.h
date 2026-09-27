@@ -60,7 +60,6 @@ class GraphTestHarnessWithDiscardablePage : public GraphTestHarness {
       main_frame_node_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Mock version of a performance_manager::mechanism::PageDiscarder.
 class LenientMockPageDiscarder
     : public performance_manager::mechanism::PageDiscarder {
@@ -121,8 +120,6 @@ class ScopedSetAllPagesDiscardableForTesting {
     policy->set_always_discard_for_testing(false);
   }
 };
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Checks DiscardEligibilityPolicy::CanDiscard() returns kEligible for each
 // discard reason in |discard_reasons|.

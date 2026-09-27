@@ -38,10 +38,6 @@
 #include "third_party/openxr/src/include/openxr/openxr.h"
 #include "ui/gfx/geometry/rect_f.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/java_handler_thread.h"
-#endif
-
 namespace gpu::gles2 {
 class GLES2Interface;
 }  // namespace gpu::gles2
@@ -54,16 +50,7 @@ namespace device {
 
 class OpenXrApiWrapper;
 
-#if BUILDFLAG(IS_ANDROID)
-class XRThread : public base::android::JavaHandlerThread {
- public:
-  explicit XRThread(const char* name)
-      : base::android::JavaHandlerThread(name) {}
-  ~XRThread() override = default;
-};
-#else
 #error "Trying to build OpenXR for an unsupported platform"
-#endif
 
 class OpenXrRenderLoop : public XRThread,
                          public mojom::XRPresentationProvider,

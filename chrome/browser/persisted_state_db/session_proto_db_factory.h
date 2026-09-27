@@ -17,13 +17,9 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/storage_partition.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/commerce/core/proto/cart_db_content.pb.h"
 #include "components/commerce/core/proto/coupon_db_content.pb.h"
 #include "components/commerce/core/proto/discounts_db_content.pb.h"  // nogncheck
-#else
-#include "components/commerce/core/proto/merchant_signal_db_content.pb.h"
-#endif
 
 namespace {
 const char kPersistedStateDBFolder[] = "persisted_state_db";
@@ -42,17 +38,12 @@ GetPersistedStateSessionProtoDBFactory();
 SessionProtoDBFactory<discount_infos_db::DiscountInfosContentProto>*
 GetDiscountInfosSessionProtoDBFactory();
 
-#if !BUILDFLAG(IS_ANDROID)
 SessionProtoDBFactory<cart_db::ChromeCartContentProto>*
 GetChromeCartSessionProtoDBFactory();
 SessionProtoDBFactory<coupon_db::CouponContentProto>*
 GetCouponSessionProtoDBFactory();
 SessionProtoDBFactory<discounts_db::DiscountsContentProto>*
 GetDiscountsSessionProtoDBFactory();
-#else
-SessionProtoDBFactory<merchant_signal_db::MerchantSignalContentProto>*
-GetMerchantSignalSessionProtoDBFactory();
-#endif
 
 SessionProtoDBFactory<
     commerce_subscription_db::CommerceSubscriptionContentProto>*
@@ -158,7 +149,6 @@ SessionProtoDBFactory<T>::BuildServiceInstanceForBrowserContext(
         context->GetPath().AppendASCII(kDiscountInfosDBFolder),
         leveldb_proto::ProtoDbType::DISCOUNT_INFOS_DATABASE,
         content::GetUIThreadTaskRunner({}));
-#if !BUILDFLAG(IS_ANDROID)
   } else if (std::is_base_of<cart_db::ChromeCartContentProto, T>::value) {
     return std::make_unique<SessionProtoDB<T>>(
         proto_database_provider,
@@ -177,15 +167,6 @@ SessionProtoDBFactory<T>::BuildServiceInstanceForBrowserContext(
         context->GetPath().AppendASCII(kDiscountsDBFolder),
         leveldb_proto::ProtoDbType::DISCOUNTS_DATABASE,
         content::GetUIThreadTaskRunner({}));
-#else
-  } else if (std::is_base_of<merchant_signal_db::MerchantSignalContentProto,
-                             T>::value) {
-    return std::make_unique<SessionProtoDB<T>>(
-        proto_database_provider,
-        context->GetPath().AppendASCII(kMerchantTrustSignalDBFolder),
-        leveldb_proto::ProtoDbType::MERCHANT_TRUST_SIGNAL_DATABASE,
-        content::GetUIThreadTaskRunner({}));
-#endif
   } else {
     // Must add in leveldb_proto::ProtoDbType and database directory folder for
     // new protos.

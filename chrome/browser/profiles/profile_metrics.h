@@ -14,12 +14,6 @@ class Profile;
 class ProfileAttributesEntry;
 class ProfileAttributesStorage;
 
-#if BUILDFLAG(IS_ANDROID)
-namespace signin {
-enum GAIAServiceType : int;
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 class ProfileMetrics {
  public:
   // Enum for counting the ways users were added.

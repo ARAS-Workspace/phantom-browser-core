@@ -173,9 +173,7 @@ class CommonControllerBuilder {
       syncer::DataTypeStoreService* data_type_store_service);
   void SetNotebooksService(notebooks::NotebooksService* notebooks_service);
 
-#if !BUILDFLAG(IS_ANDROID)
   void SetPasskeyModel(webauthn::PasskeyModel* passkey_model);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void SetPasswordReceiverService(
       password_manager::PasswordReceiverService* password_receiver_service);
@@ -296,10 +294,8 @@ class CommonControllerBuilder {
   std::unique_ptr<syncer::DataTypeController>
   CreateNotebookDataTypeController();
   std::unique_ptr<syncer::DataTypeController> CreateJourneyDataTypeController();
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<syncer::DataTypeController>
   CreateWebauthnCredentialDataTypeController(syncer::SyncService* sync_service);
-#endif
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
   std::unique_ptr<syncer::DataTypeController>
   CreateFamilyLinkSettingsDataTypeController(syncer::SyncService* sync_service,

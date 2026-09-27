@@ -67,18 +67,6 @@ class MEDIA_EXPORT RendererFactorySelector {
   // NOTE: SetBaseRendererType() must be called before calling this method.
   virtual RendererFactory* GetCurrentFactory();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Starts a request to receive a RemotePlayStateChangeCB, to be fulfilled
-  // later by passing a request via SetRemotePlayStateChangeCB().
-  // NOTE: There should be no pending request (this new one would overwrite it).
-  void StartRequestRemotePlayStateCB(
-      RequestRemotePlayStateChangeCB callback_request);
-
-  // Fulfills a request initiated by StartRequestRemotePlayStateCB().
-  // NOTE: There must be a pending request.
-  void SetRemotePlayStateChangeCB(RemotePlayStateChangeCB callback);
-#endif
-
  private:
   std::optional<RendererType> base_renderer_type_;
 

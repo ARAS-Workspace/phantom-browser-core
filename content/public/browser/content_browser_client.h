@@ -105,9 +105,7 @@
 #include "content/public/browser/posix_file_descriptor_info.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "third_party/blink/public/mojom/installedapp/related_application.mojom-forward.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace net {
 class SiteForCookies;
@@ -287,11 +285,7 @@ struct OpenURLParams;
 struct Referrer;
 struct ServiceWorkerVersionBaseInfo;
 
-#if BUILDFLAG(IS_ANDROID)
-class TtsEnvironmentAndroid;
-#else
 class AuthenticatorRequestClientDelegate;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Embedder API (or SPI) for participating in browser logic, to be implemented
 // by the client of the content browser. See ChromeContentBrowserClient for the
@@ -830,11 +824,9 @@ class CONTENT_EXPORT ContentBrowserClient {
       BrowserContext* browser_context,
       const GURL& url);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns true if the given |url| is for the initial WebUI scheme used
   // by features like the WebUI reload button.
   virtual bool IsInitialWebUIURL(const GURL& url);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Returns true if the given `url` hosts a Top Chrome WebUI.
   // This allows the embedder to identify WebUIs that are part of the browser
@@ -1157,11 +1149,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   virtual device::GeolocationSystemPermissionManager*
   GetGeolocationSystemPermissionManager();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Allows an embedder to decide whether to use the GmsCoreLocationProvider.
-  virtual bool ShouldUseGmsCoreGeolocationProvider();
-#endif
-
   // Allows the embedder to provide a storage partition configuration for a
   // site. A storage partition configuration includes a domain of the embedder's
   // choice, an optional name within that domain, and whether the partition is
@@ -1287,11 +1274,9 @@ class CONTENT_EXPORT ContentBrowserClient {
   // Allows the embedder to return a TTS platform implementation.
   virtual TtsPlatform* GetTtsPlatform();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Allows the embedder to return a DirectSocketsDelegate
   // implementation.
   virtual DirectSocketsDelegate* GetDirectSocketsDelegate();
-#endif
 
   // Called by WebContents to override the web preferences that are used by
   // the renderer. The content layer will add its own settings, and then it's up
@@ -2078,28 +2063,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // convention is to put new constants under a subdict at the key "clientInfo".
   virtual base::DictValue GetNetLogConstants();
 
-#if BUILDFLAG(IS_ANDROID)
-  // Only used by Android WebView.
-  // Returns:
-  //   true  - The check was successfully performed without throwing a
-  //           Java exception. |*ignore_navigation| is set to the
-  //           result of the check in this case.
-  //   false - A Java exception was thrown. It is no longer safe to
-  //           make JNI calls, because of the uncleared exception.
-  //           Callers should return to the message loop as soon as
-  //           possible, so that the exception can be rethrown.
-  virtual bool ShouldOverrideUrlLoading(FrameTreeNodeId frame_tree_node_id,
-                                        bool browser_initiated,
-                                        const GURL& gurl,
-                                        const std::string& request_method,
-                                        bool has_user_gesture,
-                                        bool is_redirect,
-                                        bool is_outermost_main_frame,
-                                        bool is_prerendering,
-                                        ui::PageTransition transition,
-                                        bool* ignore_navigation);
-#endif
-
   // Returns true if navigation can synchronously continue if the frame being
   // navigated (and all child frames) do not have beforeunload handlers.
   //
@@ -2207,7 +2170,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // Authentication API.
   virtual WebAuthenticationDelegate* GetWebAuthenticationDelegate();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns an AuthenticatorRequestClientDelegate subclass instance to provide
   // embedder-specific configuration for a single Web Authentication API request
   // being serviced in a given RenderFrame. The instance is guaranteed to be
@@ -2216,7 +2178,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // now.
   virtual std::unique_ptr<AuthenticatorRequestClientDelegate>
   GetWebAuthenticationRequestDelegate(RenderFrameHost* render_frame_host);
-#endif
 
   // Get platform ClientCertStore. May return nullptr. Called on the UI thread.
   virtual std::unique_ptr<net::ClientCertStore> CreateClientCertStore(
@@ -2422,28 +2383,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   virtual bool ShouldBlockRendererDebugURL(const GURL& url,
                                            BrowserContext* context,
                                            RenderFrameHost* render_frame_host);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Defines the heuristics we can use to enable wide color gamut (WCG).
-  enum class WideColorGamutHeuristic {
-    kUseDisplay,  // Use WCG if display supports it.
-    kUseWindow,   // Use WCG if window is WCG.
-    kNone,        // Never use WCG.
-  };
-
-  // Returns kNone by default.
-  virtual WideColorGamutHeuristic GetWideColorGamutHeuristic();
-
-  // Creates the TtsEnvironmentAndroid. A return value of null results in using
-  // a default implementation.
-  virtual std::unique_ptr<TtsEnvironmentAndroid> CreateTtsEnvironmentAndroid();
-
-  // If enabled, DialogOverlays will observe the container view for location
-  // changes and reposition themselves automatically. Note that this comes with
-  // some overhead and should only be enabled if the embedder itself can be
-  // moved. Defaults to false.
-  virtual bool ShouldObserveContainerViewLocationForDialogOverlays();
-#endif
 
   // Obtains the list of MIME types that are for plugins with external handlers.
   virtual base::flat_set<std::string> GetPluginMimeTypesWithExternalHandlers(
@@ -3082,7 +3021,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       mojo::PendingReceiver<
           language_detection::mojom::ContentLanguageDetectionDriver> receiver);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Given the last committed URL of the RenderFrameHost, |frame_url|, and the
   // |manifest_id| of an app, the embedder should call |callback| with the
   // first matching web app ensuring:
@@ -3098,7 +3036,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       content::BrowserContext* browser_context,
       base::OnceCallback<void(std::optional<blink::mojom::RelatedApplication>)>
           callback);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Indicates whether this client allows paint holding in cross-origin
   // navigations even if there was no user activation.
@@ -3170,12 +3107,10 @@ class CONTENT_EXPORT ContentBrowserClient {
   // allows a prerender fall back to prefetch if available.
   virtual bool UsePrefetchPrerenderIntegration();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Gives the content embedder a chance to disallow a credential request,
   // for example if there's an active actor task in the tab associated with
   // `web_contents`.
   virtual bool ShouldDisallowCredentialRequest(WebContents* web_contents);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Whether to animate back-forward transition gestures with a screenshot of
   // the destination.
@@ -3229,14 +3164,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       content::BrowserContext& browser_context,
       const GURL& url,
       const std::string& embedder_histogram_suffix);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Gives the content embedder a chance to allow a system UI popup request.
-  // System UI popups have the ability to extend beyond the bounds of the web
-  // contents, e.g. date/time pickers, select dropdowns, file choosers, and
-  // color pickers.
-  virtual bool ShouldAllowSystemUiPopups(WebContents* web_contents);
-#endif
 
   // Allows the embedder to modify the request headers for a prefetch request
   // initiated by `content::PrefetchContainer` (not by other prefetches).

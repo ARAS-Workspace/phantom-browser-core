@@ -92,10 +92,6 @@
 #include "gpu/vulkan/vulkan_queue_lock.h"
 #include "ui/gfx/extension_set.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <vulkan/vulkan_android.h>
-#endif
-
 
 #if defined(USE_VULKAN_XCB)
 #include <xcb/xcb.h>
@@ -228,12 +224,6 @@ struct COMPONENT_EXPORT(VULKAN) VulkanFunctionPointers {
       vkGetPhysicalDeviceXcbPresentationSupportKHR;
 #endif  // defined(USE_VULKAN_XCB)
 
-
-#if BUILDFLAG(IS_ANDROID)
-  VulkanFunction<PFN_vkCreateAndroidSurfaceKHR> vkCreateAndroidSurfaceKHR;
-#endif  // BUILDFLAG(IS_ANDROID)
-
-
   // Device functions
   VulkanFunction<PFN_vkAllocateCommandBuffers> vkAllocateCommandBuffers;
   VulkanFunction<PFN_vkAllocateDescriptorSets> vkAllocateDescriptorSets;
@@ -315,11 +305,6 @@ struct COMPONENT_EXPORT(VULKAN) VulkanFunctionPointers {
   VulkanFunction<PFN_vkUnmapMemory> vkUnmapMemory;
   VulkanFunction<PFN_vkUpdateDescriptorSets> vkUpdateDescriptorSets;
   VulkanFunction<PFN_vkWaitForFences> vkWaitForFences;
-
-#if BUILDFLAG(IS_ANDROID)
-  VulkanFunction<PFN_vkGetAndroidHardwareBufferPropertiesANDROID>
-      vkGetAndroidHardwareBufferPropertiesANDROID;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_POSIX)
   VulkanFunction<PFN_vkGetSemaphoreFdKHR> vkGetSemaphoreFdKHR;
@@ -577,19 +562,6 @@ vkGetPhysicalDeviceXcbPresentationSupportKHR(VkPhysicalDevice physicalDevice,
           physicalDevice, queueFamilyIndex, connection, visual_id);
 }
 #endif  // defined(USE_VULKAN_XCB)
-
-
-#if BUILDFLAG(IS_ANDROID)
-ALWAYS_INLINE VkResult
-vkCreateAndroidSurfaceKHR(VkInstance instance,
-                          const VkAndroidSurfaceCreateInfoKHR* pCreateInfo,
-                          const VkAllocationCallbacks* pAllocator,
-                          VkSurfaceKHR* pSurface) {
-  return gpu::GetVulkanFunctionPointers()->vkCreateAndroidSurfaceKHR(
-      instance, pCreateInfo, pAllocator, pSurface);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 
 // Device functions
 ALWAYS_INLINE VkResult
@@ -1146,17 +1118,6 @@ ALWAYS_INLINE VkResult vkWaitForFences(VkDevice device,
   return gpu::GetVulkanFunctionPointers()->vkWaitForFences(
       device, fenceCount, pFences, waitAll, timeout);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-ALWAYS_INLINE VkResult vkGetAndroidHardwareBufferPropertiesANDROID(
-    VkDevice device,
-    const struct AHardwareBuffer* buffer,
-    VkAndroidHardwareBufferPropertiesANDROID* pProperties) {
-  return gpu::GetVulkanFunctionPointers()
-      ->vkGetAndroidHardwareBufferPropertiesANDROID(device, buffer,
-                                                    pProperties);
-}
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_POSIX)
 ALWAYS_INLINE VkResult

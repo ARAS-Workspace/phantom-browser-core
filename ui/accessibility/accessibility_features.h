@@ -157,38 +157,6 @@ AX_BASE_EXPORT bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled();
 
 
 
-#if BUILDFLAG(IS_ANDROID)
-
-// When populating the AccessibilityNodeInfo on Android, Clank will insert Line
-// Separator U+2028 characters in the text to denote soft line breaks.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAccessibilityInlineLineSeparators);
-AX_BASE_EXPORT bool IsAccessibilityInlineLineSeparatorsEnabled();
-
-// Propagate bounding rectangles of cursor moves and input focus changes to the
-// Android platform to allow Magnification to follow them. For compatibility
-// with older behaviour, Android SDK levels before Baklava 36.1 will only be
-// notified on cursor moves. Feature controls behavior for when a keyboard is
-// attached.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(
-    kAccessibilityMagnificationFollowsFocusKeyboardAttached);
-
-// Similar to kAccessibilityMagnificationFollowsFocusKeyboardAttached but
-// controls behavior when no keyboard is attached.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(
-    kAccessibilityMagnificationFollowsFocusNoKeyboard);
-
-// Enables MathML support for Android.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAccessibilityAndroidMath);
-AX_BASE_EXPORT bool IsAccessibilityAndroidMathEnabled();
-
-// Controls the new native C++ implementation for Read Aloud on Android,
-// replacing the previous Speakr service integration.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kReadAloudNative);
-AX_BASE_EXPORT bool IsReadAloudNativeEnabled();
-
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 // Use the AXTree fixing code, which may be an assortment of different
 // tools/methods to fix the AXTree. This is not available on Android.
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAXTreeFixing);
@@ -294,8 +262,6 @@ AX_BASE_EXPORT bool IsScreenAITestModeEnabled();
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(
     kScreenAIPartitionAllocAdvancedChecksEnabled);
 #endif  // BUILDFLAG(IS_LINUX)
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kMacAccessibilityAPIMigration);

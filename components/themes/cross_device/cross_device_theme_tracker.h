@@ -21,11 +21,7 @@
 #include "components/sync/model/data_type_controller_delegate.h"
 #include "components/sync/model/data_type_local_change_processor.h"
 #include "components/sync/model/data_type_sync_bridge.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "components/sync/protocol/theme_android_specifics.pb.h"
-#else
 #include "components/sync/protocol/theme_specifics.pb.h"
-#endif
 #include "components/sync/protocol/theme_types.pb.h"
 #include "components/sync_device_info/device_info.h"
 #include "components/sync_device_info/device_info_tracker.h"
@@ -33,11 +29,7 @@
 
 namespace themes {
 
-#if BUILDFLAG(IS_ANDROID)
-using LocalThemeSpecifics = sync_pb::ThemeAndroidSpecifics;
-#else
 using LocalThemeSpecifics = sync_pb::ThemeSpecifics;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // GENERATED_JAVA_ENUM_PACKAGE: (
 //   org.chromium.chrome.browser.ntp_customization.theme_sync)

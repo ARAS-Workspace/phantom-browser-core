@@ -28,10 +28,6 @@
 #include "ui/gfx/mac/io_surface.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_hardware_buffer_fence_sync.h"
-#endif
-
 namespace gfx {
 class ColorSpace;
 class VSyncProvider;

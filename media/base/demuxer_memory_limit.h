@@ -52,16 +52,6 @@ inline constexpr base::ByteSize kDemuxerStreamVideoMemoryLimitMedium =
 inline constexpr base::ByteSize kDemuxerStreamVideoMemoryLimitLow =
     base::MiBU(30);
 
-#if BUILDFLAG(IS_ANDROID)
-// Special "very low" settings for 512MiB Android Go devices:
-// * audio memory limit: 1MB (30 seconds of 256Kbps content).
-// * video memory limit: 15MB (30 seconds of 4Mbps content).
-inline constexpr base::ByteSize kDemuxerStreamAudioMemoryLimitVeryLow =
-    base::MiBU(1);
-inline constexpr base::ByteSize kDemuxerStreamVideoMemoryLimitVeryLow =
-    base::MiBU(15);
-#endif
-
 }  // namespace internal
 
 }  // namespace media

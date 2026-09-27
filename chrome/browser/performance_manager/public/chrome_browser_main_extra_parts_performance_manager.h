@@ -17,11 +17,9 @@
 
 class Profile;
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace base {
 class BatteryStateSampler;
 }
-#endif
 
 namespace content {
 class FeatureObserverClient;
@@ -134,7 +132,6 @@ class ChromeBrowserMainExtraPartsPerformanceManager
                       ProfileForceForegroundPriorityListHelper>
       profile_force_foreground_priority_list_helper_;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<performance_manager::user_tuning::BatterySaverModeManager>
       battery_saver_mode_manager_;
   std::unique_ptr<
@@ -143,7 +140,6 @@ class ChromeBrowserMainExtraPartsPerformanceManager
   std::unique_ptr<base::BatteryStateSampler> battery_state_sampler_;
   std::unique_ptr<performance_manager::user_tuning::PerformanceDetectionManager>
       performance_detection_manager_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Tracks changes to the MemoryLimitMbEnabled enterprise policy, and
   // starts/stops the EnterpriseMemoryLimitEvaluator accordingly.

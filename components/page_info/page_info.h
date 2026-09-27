@@ -158,11 +158,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
     base::Time last_used;
     // Whether the permission is in use.
     bool is_in_use = false;
-
-#if BUILDFLAG(IS_ANDROID)
-    // Whether the permission was requested in this session.
-    bool is_requested = false;
-#endif  // BUILDFLAG(IS_ANDROID)
   };
 
   // Creates a PageInfo for the passed |url| using the given |ssl| status
@@ -436,13 +431,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   // TODO(markusheintz): Move the creation of all the std::u16string typed UI
   // strings below to the corresponding UI code, in order to prevent
   // unnecessary UTF-8 string conversions.
-
-#if BUILDFLAG(IS_ANDROID)
-  // Details about the website's identity. If the website's identity has been
-  // verified then |identity_status_description_android_| contains who verified
-  // the identity. This string will be displayed in the UI.
-  std::u16string identity_status_description_android_;
-#endif
 
   // Set when the user has explicitly bypassed an SSL error for this host
   // and/or the user has explicitly bypassed an HTTP warning (from HTTPS-First

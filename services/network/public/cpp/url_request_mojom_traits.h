@@ -612,12 +612,6 @@ struct COMPONENT_EXPORT(NETWORK_CPP_BASE)
 template <>
 struct COMPONENT_EXPORT(NETWORK_CPP_BASE)
     StructTraits<network::mojom::SocketTagDataView, net::SocketTag> {
-#if BUILDFLAG(IS_ANDROID)
-  static int32_t tag(const net::SocketTag& params) {
-    return params.traffic_stats_tag();
-  }
-  static uid_t uid(const net::SocketTag& params) { return params.uid(); }
-#endif  // BUILDFLAG(IS_ANDROID)
   static bool Read(network::mojom::SocketTagDataView data, net::SocketTag* out);
 };
 

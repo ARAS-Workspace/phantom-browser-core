@@ -494,23 +494,6 @@ class BASE_EXPORT FilePath {
                                    StringViewType string2);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-  // On android, file selection dialog can return a file with content uri
-  // scheme(starting with content://). Content uri needs to be opened with
-  // ContentResolver to guarantee that the app has appropriate permissions
-  // to access it.
-  // Returns true if the path is a content uri, or false otherwise.
-  bool IsContentUri() const;
-
-  // Checks whether this path looks like a virtual document path. It is a quick
-  // check by a string matching, meaning that returning true does not guarantee
-  // that resolving it to a content URI will succeed. A virtual document path is
-  // a //base abstraction to transparently represent files and directories
-  // managed by Android's Storage Access Framework (SAF). See
-  // //base/android/virtual_document_path.h for details.
-  bool IsVirtualDocumentPath() const;
-#endif
-
   // NOTE: When adding a new public method, consider adding it to
   // file_path_fuzzer.cc as well.
 

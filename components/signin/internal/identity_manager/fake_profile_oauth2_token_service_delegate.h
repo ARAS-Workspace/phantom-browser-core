@@ -114,10 +114,6 @@ class FakeProfileOAuth2TokenServiceDelegate
       const std::string& token,
       const signin::TokenBindingInfo& token_binding_info);
 
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<jobject> GetJavaObject() override;
-#endif
-
   // The account IDs, in the order they were first added.
   // A given account ID appears at most once in this list.
   std::list<CoreAccountId> account_ids_;

@@ -391,88 +391,6 @@ enum class PromoAction : int {
   kMaxValue = PROMO_ACTION_NEW_ACCOUNT_EXISTING_ACCOUNT,
 };
 
-#if BUILDFLAG(IS_ANDROID)
-// This class is used to record user action that was taken after
-// receiving the header from Gaia in the web sign-in flow.
-// GENERATED_JAVA_ENUM_PACKAGE: org.chromium.components.signin.metrics
-// GENERATED_JAVA_CLASS_NAME_OVERRIDE: AccountConsistencyPromoAction
-enum class AccountConsistencyPromoAction : int {
-  // Promo is not shown as there are no accounts on device.
-  SUPPRESSED_NO_ACCOUNTS = 0,
-  // User has dismissed the promo by tapping back button.
-  DISMISSED_BACK = 1,
-  // User has tapped |Add account to device| from expanded account list.
-  ADD_ACCOUNT_STARTED = 2,
-
-  // Deprecated 05/2021, since the Incognito option has been removed from
-  // account picker bottomsheet.
-  // STARTED_INCOGNITO_SESSION = 3,
-
-  // User has selected the default account and signed in with it
-  SIGNED_IN_WITH_DEFAULT_ACCOUNT = 4,
-  // User has selected one of the non default accounts and signed in with it.
-  SIGNED_IN_WITH_NON_DEFAULT_ACCOUNT = 5,
-  // The promo was shown to user.
-  SHOWN = 6,
-  // Promo is not shown due to sign-in being disallowed either by an enterprise
-  // policy
-  // or by |Allow Chrome sign-in| toggle.
-  SUPPRESSED_SIGNIN_NOT_ALLOWED = 7,
-  // User has added an account and signed in with this account.
-  // When this metric is recorded, we won't record
-  // SIGNED_IN_WITH_DEFAULT_ACCOUNT or
-  // SIGNED_IN_WITH_NON_DEFAULT_ACCOUNT.
-  SIGNED_IN_WITH_ADDED_ACCOUNT = 8,
-  // User has dismissed the promo by tapping on the scrim above the bottom
-  // sheet.
-  DISMISSED_SCRIM = 9,
-  // User has dismissed the promo by swiping down the bottom sheet.
-  DISMISSED_SWIPE_DOWN = 10,
-  // User has dismissed the promo by other means.
-  DISMISSED_OTHER = 11,
-  // The auth error screen was shown to the user.
-  AUTH_ERROR_SHOWN = 12,
-  // The generic error screen was shown to the user.
-  GENERIC_ERROR_SHOWN = 13,
-  // User has dismissed the promo by tapping on the dismissal button in the
-  // bottom sheet.
-  DISMISSED_BUTTON = 14,
-  // User has completed the account addition flow triggered from the bottom
-  // sheet.
-  ADD_ACCOUNT_COMPLETED = 15,
-  // The bottom sheet was suppressed as the user hit consecutive active
-  // dismissal limit.
-  SUPPRESSED_CONSECUTIVE_DISMISSALS = 16,
-  // The timeout erreur was shown to the user.
-  TIMEOUT_ERROR_SHOWN = 17,
-  // The web sign-in is not shown because the user is already signed in.
-  SUPPRESSED_ALREADY_SIGNED_IN = 18,
-  // AuthenticationFlow on iOS is cancelled or failed to sign-in.
-  IOS_AUTH_FLOW_CANCELLED_OR_FAILED = 19,
-  // The promo was shown to the user, with no existing on-device account. (i.e.
-  // the no-account menu was shown)
-  SHOWN_WITH_NO_DEVICE_ACCOUNT = 20,
-  // User tapped on "Sign In…" in the no-account menu of the bottom sheet,
-  // starting an add-account flow.
-  ADD_ACCOUNT_STARTED_WITH_NO_DEVICE_ACCOUNT = 21,
-  // User successfully added an account after tapping "Sign In…" from the
-  // no-account menu.
-  ADD_ACCOUNT_COMPLETED_WITH_NO_DEVICE_ACCOUNT = 22,
-  // User started with the bottom sheet without a device-account, and signed in
-  // to chrome by finishing the add-account and sign-in flows.
-  SIGNED_IN_WITH_NO_DEVICE_ACCOUNT = 23,
-  // User was shown the confirm management screen on signin.
-  CONFIRM_MANAGEMENT_SHOWN = 24,
-  // User accepted management on signin.
-  CONFIRM_MANAGEMENT_ACCEPTED = 25,
-  // User started sign-in with a managed account in the consistency promo.
-  SIGNIN_STARTED_WITH_MANAGED_ACCOUNT = 26,
-  // User started sign-in with a non-managed account in the consistency promo.
-  SIGNIN_STARTED_WITH_NON_MANAGED_ACCOUNT = 27,
-  kMaxValue = SIGNIN_STARTED_WITH_NON_MANAGED_ACCOUNT,
-};
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Enum values which enumerates all reasons to start sign in process.
 enum class Reason : int {
   // Used only for the Sync flows, i.e. the user will be proposed to enable Sync
@@ -770,12 +688,6 @@ void RecordSigninUserActionForAccessPoint(AccessPoint access_point);
 
 // Records |Signin_Impression_From*| user action.
 void RecordSigninImpressionUserActionForAccessPoint(AccessPoint access_point);
-
-#if BUILDFLAG(IS_ANDROID)
-// Records |Signin.AccountConsistencyPromoAction.{PromoEvent}| histogram.
-void RecordConsistencyPromoUserAction(AccountConsistencyPromoAction action,
-                                      AccessPoint access_point);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace signin_metrics
 

@@ -19,12 +19,7 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "ui/webui/resources/cr_components/most_visited/most_visited.mojom.h"
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/profiles/profile.h"
-#include "url/gurl.h"
-#else
 #include "chrome/browser/web_applications/preinstalled_web_app_manager.h"
-#endif
 
 class GURL;
 class Profile;
@@ -46,12 +41,9 @@ enum class MostVisitedShowActions {
 // Handles bidirectional communication between MV tiles and the browser.
 class MostVisitedHandler : public most_visited::mojom::MostVisitedPageHandler,
                            public ntp_tiles::MostVisitedSites::Observer
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+    // TODO(b/502297163): Implement for Android.
     ,
-                           public web_app::PreinstalledWebAppManager::Observer
-#endif
-{
+                           public web_app::PreinstalledWebAppManager::Observer {
  public:
   MostVisitedHandler(
       mojo::PendingReceiver<most_visited::mojom::MostVisitedPageHandler>
@@ -121,12 +113,10 @@ class MostVisitedHandler : public most_visited::mojom::MostVisitedPageHandler,
   bool MaybeRemoveStaleShortcuts();
 
   raw_ptr<Profile> profile_;
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   // web_app::PreinstalledWebAppManager::Observer
   void OnMigrationRun() override;
   void OnDestroyed() override;
-#endif
 
   std::unique_ptr<ntp_tiles::MostVisitedSites> most_visited_sites_;
   raw_ptr<content::WebContents> web_contents_;
@@ -137,12 +127,10 @@ class MostVisitedHandler : public most_visited::mojom::MostVisitedPageHandler,
   mojo::Receiver<most_visited::mojom::MostVisitedPageHandler> page_handler_;
   mojo::Remote<most_visited::mojom::MostVisitedPage> page_;
 
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   base::ScopedObservation<web_app::PreinstalledWebAppManager,
                           web_app::PreinstalledWebAppManager::Observer>
       preinstalled_web_app_observer_{this};
-#endif
 
   base::WeakPtrFactory<MostVisitedHandler> weak_ptr_factory_{this};
 };

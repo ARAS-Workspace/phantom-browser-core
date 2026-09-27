@@ -72,10 +72,6 @@ extern const char kGlicOnboardingCompleted[];
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 // Android.
-#if BUILDFLAG(IS_ANDROID)
-// The user has explicitly used the Install menu item under the App Menu.
-extern const char kPwaInstallMenuSelected[];
-#endif  // BUILDFLAG(IS_ANDROID)
 
 extern const char kTabSearchComboButtonUsed[];
 

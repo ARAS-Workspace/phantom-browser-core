@@ -120,11 +120,6 @@ class TestOverlayImageRepresentation : public OverlayImageRepresentation {
   bool BeginReadAccess(gfx::GpuFenceHandle& acquire_fence) override;
   void EndReadAccess(gfx::GpuFenceHandle release_fence) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<base::android::ScopedHardwareBufferFenceSync>
-  GetAHardwareBufferFenceSync() override;
-#endif
-
 #if BUILDFLAG(IS_APPLE)
   void MarkBackingInUse(bool in_use) {
     static_cast<TestImageBacking*>(backing())->set_in_use_by_window_server(

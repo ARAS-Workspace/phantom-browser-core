@@ -12,10 +12,6 @@
 #include "components/sync/base/data_type.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif
-
 namespace syncer {
 
 // Representation of a single item to be displayed in the Batch Upload dialog.
@@ -141,27 +137,6 @@ std::u16string GetDomainsDisplayText(const LocalDataDescription& description);
 void PrintTo(const LocalDataDescription& local_data_description,
              std::ostream* os);
 
-#if BUILDFLAG(IS_ANDROID)
-// Constructs a Java LocalDataDescription from the provided C++
-// LocalDataDescription
-base::android::ScopedJavaLocalRef<jobject> ConvertToJavaLocalDataDescription(
-    JNIEnv* env,
-    const syncer::LocalDataDescription& local_data_description);
-#endif
-
 }  // namespace syncer
-
-#if BUILDFLAG(IS_ANDROID)
-namespace jni_zero {
-
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType<syncer::LocalDataDescription>(
-    JNIEnv* env,
-    const syncer::LocalDataDescription& input) {
-  return syncer::ConvertToJavaLocalDataDescription(env, input);
-}
-
-}  // namespace jni_zero
-#endif
 
 #endif  // COMPONENTS_SYNC_SERVICE_LOCAL_DATA_DESCRIPTION_H_

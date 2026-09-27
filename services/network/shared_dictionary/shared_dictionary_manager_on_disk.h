@@ -47,9 +47,6 @@ class SharedDictionaryManagerOnDisk : public SharedDictionaryManager {
       const base::FilePath& cache_directory_path,
       uint64_t cache_max_size,
       uint64_t cache_max_count,
-#if BUILDFLAG(IS_ANDROID)
-      disk_cache::ApplicationStatusListenerGetter app_status_listener_getter,
-#endif  // BUILDFLAG(IS_ANDROID)
       scoped_refptr<disk_cache::BackendFileOperationsFactory>
           file_operations_factory);
 

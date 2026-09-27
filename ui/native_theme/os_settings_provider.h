@@ -18,10 +18,7 @@
 
 namespace ui {
 
-#if BUILDFLAG(IS_ANDROID)
-class OsSettingsProviderAndroid;
-using OsSettingsProviderImpl = OsSettingsProviderAndroid;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 class OsSettingsProviderMac;
 using OsSettingsProviderImpl = OsSettingsProviderMac;
 #else
@@ -140,10 +137,6 @@ class COMPONENT_EXPORT(NATIVE_THEME) OsSettingsProvider {
   // Returns the interval between caret blinks. If this is zero, the caret will
   // not blink.
   virtual base::TimeDelta CaretBlinkInterval() const;
-
-#if BUILDFLAG(IS_ANDROID)
-  virtual bool IsAndroidProvider() const;
-#endif
 
  protected:
   // Invokes all registered callbacks.

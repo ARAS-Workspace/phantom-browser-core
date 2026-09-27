@@ -566,35 +566,6 @@ enum PasswordChangeFlowStep {
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/password/enums.xml:PasswordChangeFlowStep)
 
-#if BUILDFLAG(IS_ANDROID)
-// Enum specifying the outcome of an attempt to access credentials stored in a
-// SharedPref. These values are persisted to logs. Entries should not be
-// renumbered and numeric values should never be reused. Keep in sync with
-// `SharedPrefCredentialsAccessOutcome` in passwords' enums.xml.
-enum class SharedPrefCredentialsAccessOutcome {
-  kNoCredentials = 0,
-  kParseError = 1,
-  kBadType = 2,
-  kEmptyCredentials = 3,
-  kLoginMatch = 4,
-  kLoginMismatch = 5,
-  kMaxValue = kLoginMismatch,
-};
-
-// Enum that describes different outcomes on the attempt of triggering the
-// Touch-To-Fill bottom sheet for password generation.
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused.
-enum class TouchToFillPasswordGenerationTriggerOutcome {
-  kShown = 0,
-  kHasSavedCredentials = 1,
-  kDismissed4TimesInARow = 2,
-  kShownBefore = 3,
-  kFailedToDisplay = 4,
-  kMaxValue = kFailedToDisplay
-};
-#endif
-
 // Enum to track the reasons of password loss.
 //
 // These values are persisted to logs. Entries should not be renumbered and
@@ -852,14 +823,6 @@ base::OnceCallback<R(Args...)> TimeCallbackMediumTimes(
       },
       histogram, base::ElapsedTimer(), std::move(callback));
 }
-
-#if BUILDFLAG(IS_ANDROID)
-void LogTouchToFillPasswordGenerationTriggerOutcome(
-    TouchToFillPasswordGenerationTriggerOutcome outcome);
-
-void LogSharedPrefCredentialsAccessOutcome(
-    SharedPrefCredentialsAccessOutcome outcome);
-#endif
 
 // Record that password deletion from Chrome settings happened.
 // This will be used in case of suspecting a possible password loss.

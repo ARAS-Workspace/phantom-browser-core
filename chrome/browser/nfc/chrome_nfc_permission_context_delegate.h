@@ -34,9 +34,6 @@ class ChromeNfcPermissionContextDelegate
   ~ChromeNfcPermissionContextDelegate() override;
 
   // NfcPermissionContext::Delegate:
-#if BUILDFLAG(IS_ANDROID)
-  bool IsInteractable(content::WebContents* web_contents) override;
-#endif
 
  private:
   std::unique_ptr<InteractabilityChecker> interactability_checker_;

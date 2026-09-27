@@ -10,9 +10,6 @@
 #include "build/build_config.h"
 #include "content/public/test/content_test_suite_base.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#endif
-
 // Test suite for unit and browser tests. Creates services needed by both.
 // See also ChromeUnitTestSuite for additional services created for unit tests.
 class ChromeTestSuite : public content::ContentTestSuiteBase {
@@ -35,14 +32,6 @@ class ChromeTestSuite : public content::ContentTestSuiteBase {
   base::FilePath browser_dir_;
 
   std::optional<base::AutoReset<bool>> ignore_non_official_keys_reset_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // InstanceID can make network requests which will time out and make tests
-  // slow. Insert a fake one in all tests, as the prefetch service (perhaps
-  // among others in the future) causes us to use the InstanceID in a posted
-  // task which delays test completion.
-  instance_id::ScopedUseFakeInstanceIDAndroid fake_instance_id_android_;
-#endif
 };
 
 #endif  // CHROME_TEST_BASE_CHROME_TEST_SUITE_H_

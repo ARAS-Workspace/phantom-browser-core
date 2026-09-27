@@ -42,13 +42,8 @@ class StorageServiceImpl;
 
 // Limits on the cache size and number of areas in memory, over which the areas
 // are purged.
-#if BUILDFLAG(IS_ANDROID)
-inline constexpr unsigned kMaxLocalStorageAreaCount = 10;
-inline constexpr size_t kMaxLocalStorageCacheSize = 2 * 1024 * 1024;
-#else
 inline constexpr unsigned kMaxLocalStorageAreaCount = 50;
 inline constexpr size_t kMaxLocalStorageCacheSize = 20 * 1024 * 1024;
-#endif
 
 // The Local Storage implementation. An instance of this class exists for each
 // profile directory (within the user data directory) that is using Local

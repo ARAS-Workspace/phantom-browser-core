@@ -153,17 +153,6 @@ BASE_DECLARE_FEATURE(kVoiceSearchCoherenceSearchbox);
 extern const base::FeatureParam<bool>
     kVoiceSearchCoherenceSearchboxWithLiveTranscription;
 
-#if BUILDFLAG(IS_ANDROID)
-BASE_DECLARE_FEATURE(kDiagnostics);
-BASE_DECLARE_FEATURE(kForceAndroidRealbox);
-BASE_DECLARE_FEATURE(kJumpStartOmnibox);
-BASE_DECLARE_FEATURE(kSuppressIntermediateACUpdatesOnLowEndDevices);
-// Delay focusTab to prioritize navigation (https://crbug.com/374852568).
-BASE_DECLARE_FEATURE(kPostDelayedTaskFocusTab);
-BASE_DECLARE_FEATURE(kResetSuggestionsScroll);
-BASE_DECLARE_FEATURE(kOmniboxSessionlessVoiceSearch);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // If enabled, X-Geo headers are sent for all search navigations on all
 // platforms.
 BASE_DECLARE_FEATURE(kPlatformAgnosticXGeo);

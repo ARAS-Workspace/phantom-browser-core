@@ -148,11 +148,6 @@ BASE_DECLARE_FEATURE(kClientSideDetectionLocalResourceCheckFix);
 BASE_DECLARE_FEATURE(kClientSideDetectionNewObservers);
 extern const base::FeatureParam<double> kCsdClassificationDelay;
 
-#if BUILDFLAG(IS_ANDROID)
-// Instead of starting model download on startup, do it lazily during inference.
-BASE_DECLARE_FEATURE(kClientSideDetectionOnDeviceModelLazyDownloadAndroid);
-#endif
-
 // Deprecation of page load triggers for SSB users.
 BASE_DECLARE_FEATURE(kClientSideDetectionOnlyESBClassification);
 
@@ -164,23 +159,6 @@ extern const base::FeatureParam<int> kClientSideDetectionRetryLimitTime;
 
 // Controls whether the scam score is included in IntelligentScanInfo.
 BASE_DECLARE_FEATURE(kClientSideDetectionScamScore);
-#if BUILDFLAG(IS_ANDROID)
-// Inquire the server-side model instead of the on-device model for scam
-// detection.
-BASE_DECLARE_FEATURE(kClientSideDetectionServerModelForScamDetectionAndroid);
-extern const base::FeatureParam<int>
-    kClientSideDetectionServerModelMaxScansPerDay;
-
-// Dedicated long-lived feature flag to control future server model rollout and
-// set the model version. This flag should not be cleaned up after the server
-// model is launched. See go/mes-config-rollouts#roll-out-via-finch on the
-// recommended way to control rollouts.
-BASE_DECLARE_FEATURE(kClientSideDetectionServerModelRolloutAndroid);
-// Note for future finch config: Set an arbitrary integer value associated with
-// the model version (e.g. 1001). Update go/slams-mapping accordingly.
-extern const base::FeatureParam<int>
-    kClientSideDetectionServerModelRolloutVersionAndroid;
-#endif
 
 BASE_DECLARE_FEATURE(kClientSideDetectionSkipErrorPage);
 
@@ -341,25 +319,6 @@ extern const base::FeatureParam<int> kHashPrefixRealTimeLookupsSampleRate;
 // how often the checks are triggered (they are still not in real time).
 BASE_DECLARE_FEATURE(kLocalListsUseSBv5);
 
-#if BUILDFLAG(IS_ANDROID)
-// Enables ClientDownloadRequests for APK downloads on Android.
-BASE_DECLARE_FEATURE(kMaliciousApkDownloadCheck);
-// Sampling percentage for ClientDownloadRequests for APK downloads on Android.
-// If this parameter is N, then a given (supported) download has a N% chance of
-// sending a ClientDownloadRequest. The value should be between 0 and 100, and
-// defaults to 100 (i.e. no downsampling).
-BASE_DECLARE_FEATURE_PARAM(int, kMaliciousApkDownloadCheckSamplePercentage);
-// Allows a fieldtrial config to override the APK download check service URL. If
-// empty (default), the default hardcoded URL will be used.
-extern const base::FeatureParam<std::string>
-    kMaliciousApkDownloadCheckServiceUrlOverride;
-// If true, then ClientDownloadRequests for APK downloads on Android are
-// telemetry-only, and only for Enhanced Protection users. If false (default),
-// then ClientDownloadRequests for APK downloads on Android are active for all
-// Safe Browsing-enabled users, and may show warnings.
-BASE_DECLARE_FEATURE_PARAM(bool, kMaliciousApkDownloadCheckTelemetryOnly);
-#endif
-
 // Enables one-time migration of enhanced-safe-browsing users to the enhanced
 // bundle.
 BASE_DECLARE_FEATURE(kMigrateEnhancedSbUserToEnhancedBundle);
@@ -444,13 +403,6 @@ extern const base::FeatureParam<int>
 BASE_DECLARE_FEATURE(kSafeBrowsingDailyPhishingReportsLimit);
 // Specifies the CSD-Phishing daily reports limit for ESB users
 extern const base::FeatureParam<int> kSafeBrowsingDailyPhishingReportsLimitESB;
-
-#if BUILDFLAG(IS_ANDROID)
-// Enables sync checker to check allowlist first on Chrome on Android. This is
-// an optimization to improve the speed of Safe Browsing checks.
-// See go/skip-sync-hpd-allowlist-android for details.
-BASE_DECLARE_FEATURE(kSafeBrowsingSyncCheckerCheckAllowlist);
-#endif
 
 // Allows Safe Browsing Real-Time URL lookups to wait for DNS resolution of the
 // main frame URL.

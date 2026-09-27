@@ -95,13 +95,8 @@ bool IsReplaceSyncPromosWithSignInPromosEnabled();
 
 // AutofillAi is launched globally on desktop, but restricted to certain
 // countries on mobile.
-#if BUILDFLAG(IS_ANDROID)
-#define DECLARE_SYNC_AUTOFILL_AI_FEATURE(feature_name) \
-  BASE_DECLARE_FEATURE_WITH_COUNTRY_RESTRICTIONS(feature_name)
-#else
 #define DECLARE_SYNC_AUTOFILL_AI_FEATURE(feature_name) \
   BASE_DECLARE_FEATURE(feature_name)
-#endif
 
 // Enables syncing of settings from the user's account.
 DECLARE_SYNC_AUTOFILL_AI_FEATURE(kSyncAccountSettings);
@@ -127,16 +122,10 @@ BASE_DECLARE_FEATURE(kSpellcheckSeparateLocalAndAccountDictionaries);
 
 // Feature flag used for enabling sync (transport mode) for signed-in users that
 // haven't turned on full sync.
-#if !BUILDFLAG(IS_ANDROID)
 BASE_DECLARE_FEATURE(kReadingListEnableSyncTransportModeUponSignIn);
 // Returns whether reading list storage related UI can be enabled, by testing
 // `kReadingListEnableSyncTransportModeUponSignIn`.
 bool IsReadingListAccountStorageEnabled();
-#else
-constexpr bool IsReadingListAccountStorageEnabled() {
-  return true;
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // If enabled, sync-the-transport will auto-start (avoid deferring startup) if
 // sync metadata isn't available (i.e. initial sync never completed).
@@ -166,23 +155,6 @@ inline constexpr base::FeatureParam<double>
     kSyncIncreaseNudgeDelayForSingleClientFactor{
         &kSyncIncreaseNudgeDelayForSingleClient,
         "SyncIncreaseNudgeDelayForSingleClientFactor", 2.0};
-
-#if BUILDFLAG(IS_ANDROID)
-// If enabled, WebAPK data will be synced for Backup&Restore purposes.
-BASE_DECLARE_FEATURE(kWebApkBackupAndRestoreBackend);
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-// Flag to test different alternatives for the passwords sync error message
-// content.
-BASE_DECLARE_FEATURE(kSyncEnablePasswordsSyncErrorMessageAlternative);
-inline constexpr base::FeatureParam<int>
-    kSyncEnablePasswordsSyncErrorMessageAlternativeVersion{
-        &kSyncEnablePasswordsSyncErrorMessageAlternative, "version", 3};
-
-// If enabled, the error message to unlock passwords is shown for longer.
-BASE_DECLARE_FEATURE(kSyncTrustedVaultErrorMessageDuration);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // If enabled, the preferences sync service will use the selected types to
 // determine whether the pref values should be set in the account storage.
@@ -215,17 +187,6 @@ BASE_DECLARE_FEATURE(kSyncUsePropagatedAccessToken);
 
 // If enabled, Sync invalidations will bypass the scheduler on Android.
 BASE_DECLARE_FEATURE(kSyncInvalidationsBypassScheduler);
-
-#if BUILDFLAG(IS_ANDROID)
-// If enabled, search engines and site search will be synced on Android LFF.
-BASE_DECLARE_FEATURE(kSyncSearchEnginesAndroidLFF);
-
-// If enabled, the android.os.Build.FINGERPRINT prefix is uploaded in
-// DeviceInfo.
-// TODO(crbug.com/522788942): Consolidate this with
-// kSyncUseServerDeterminedDeviceName.
-BASE_DECLARE_FEATURE(kSyncUploadAndroidBuildFingerprintPrefix);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // If enabled, computes the web sign-in status based on account in cookies
 // values even if they are stale. This ensures that we log the last known cookie

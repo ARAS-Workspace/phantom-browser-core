@@ -17,9 +17,7 @@
 #include "components/enterprise/idle/action_type.h"
 #include "content/public/browser/browsing_data_remover.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/idle_dialog.h"  // nogncheck crbug.com/40147906
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 class Profile;
 
@@ -89,10 +87,8 @@ class ActionFactory {
       browsing_data_remover_for_testing_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 IdleDialog::ActionSet ActionsToActionSet(
     const base::flat_set<ActionType>& action_types);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace enterprise_idle
 

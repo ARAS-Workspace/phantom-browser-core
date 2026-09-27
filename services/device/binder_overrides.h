@@ -14,10 +14,6 @@
 #include "services/device/public/mojom/time_zone_monitor.mojom.h"
 #include "services/device/public/mojom/usb_manager.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "services/device/public/mojom/nfc_provider.mojom.h"
-#endif
-
 namespace device {
 namespace internal {
 
@@ -35,13 +31,6 @@ using TimeZoneMonitorBinder = base::RepeatingCallback<void(
     mojo::PendingReceiver<device::mojom::TimeZoneMonitor>)>;
 COMPONENT_EXPORT(DEVICE_SERVICE_BINDER_OVERRIDES)
 TimeZoneMonitorBinder& GetTimeZoneMonitorBinderOverride();
-
-#if BUILDFLAG(IS_ANDROID)
-using NFCProviderBinder = base::RepeatingCallback<void(
-    mojo::PendingReceiver<device::mojom::NFCProvider>)>;
-COMPONENT_EXPORT(DEVICE_SERVICE_BINDER_OVERRIDES)
-NFCProviderBinder& GetNFCProviderBinderOverride();
-#endif
 
 using UsbDeviceManagerBinder = base::RepeatingCallback<void(
     mojo::PendingReceiver<device::mojom::UsbDeviceManager>)>;

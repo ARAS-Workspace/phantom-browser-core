@@ -89,7 +89,6 @@
   MULTI_CLASS_BROWSER_TEST_STUB(WebXrVrBrowserTestBase, test_name)
 #endif  // BUILDFLAG(ENABLE_OPENXR)
 
-#if !BUILDFLAG(IS_ANDROID)
 #define IN_PROC_NORMAL_PLUS_INCOGNITO_BROWSER_TEST_F(test_class1, base_class, \
                                                      test_name)               \
   DEFINE_RUN_TEST_IMPL_(test_name, base_class)                                \
@@ -97,15 +96,6 @@
   DEFINE_INCOGNITO_BROWSER_TEST_(test_class1, test_name)                      \
   void MULTI_CLASS_RUNNER_NAME_(test_name)::ActuallyRunTestOnMainThread(      \
       base_class* t)
-#else
-// TODO(https://crbug.com/381000093): ContextualNotificationPermissionRequester
-// needs to be setup in Java before we can run incognito tests on Android. At
-// least one test installs this in a Java Setup step; otherwise, it seems to
-// happen via things that *are* part of chrome_java_sources.
-#define IN_PROC_NORMAL_PLUS_INCOGNITO_BROWSER_TEST_F(test_class1, base_class, \
-                                                     test_name)               \
-  IN_PROC_MULTI_CLASS_BROWSER_TEST_F1(test_class1, base_class, test_name)
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // The same as WEBXR_VR_ALL_RUNTIMES_BROWSER_TEST_F, but runs the tests in
 // incognito mode as well.

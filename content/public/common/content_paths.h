@@ -19,11 +19,6 @@ enum {
   // Path and filename to the executable to use for child processes.
   CHILD_PROCESS_EXE = PATH_START,
 
-#if BUILDFLAG(IS_ANDROID)
-  // Directory for JS FileSystem API swap files.
-  DIR_FILE_SYSTEM_API_SWAP,
-#endif
-
   // Valid only in development environment
   DIR_TEST_DATA,
 

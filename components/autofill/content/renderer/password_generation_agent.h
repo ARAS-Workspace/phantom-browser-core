@@ -162,10 +162,8 @@ class PasswordGenerationAgent : public content::RenderFrameObserver,
   // as a result of the user focusing a password field eligible for generation.
   void AutomaticGenerationAvailable();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Show UI for editing a generated password at |generation_element_|.
   void ShowEditingPopup(const SynchronousFormCache& form_cache);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Stops treating a password as generated.
   void PasswordNoLongerGenerated();

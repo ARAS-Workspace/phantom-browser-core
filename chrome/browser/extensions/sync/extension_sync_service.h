@@ -202,13 +202,11 @@ class ExtensionSyncService : public syncer::SyncableService,
   // asynchronously via MergeDataAndStartSyncing as soon as possible.
   SyncableService::StartSyncFlare flare_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Caches the set of Chrome app IDs undergoing migration to web apps because
   // it is expensive to generate every time (multiple SkBitmap copies).
   // Android does not support Chrome apps.
   std::optional<base::flat_set<std::string>>
       migrating_default_chrome_app_ids_cache_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Tracks extension IDs currently being installed from sync to prevent race
   // conditions in observer notification order. Populated during

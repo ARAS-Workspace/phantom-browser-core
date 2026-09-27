@@ -29,9 +29,6 @@ namespace gpu {
 #if defined(GPU_SURFACE_HANDLE_IS_ACCELERATED_WINDOW)
 using SurfaceHandle = gfx::AcceleratedWidget;
 constexpr SurfaceHandle kNullSurfaceHandle = gfx::kNullAcceleratedWidget;
-#elif BUILDFLAG(IS_ANDROID)
-using SurfaceHandle = int32_t;
-constexpr SurfaceHandle kNullSurfaceHandle = 0;
 #else
 #error Platform not supported.
 #endif

@@ -68,13 +68,6 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
     return &associated_interfaces_;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // This is called on the main thread for subresources or worker threads for
-  // dedicated workers.
-  static std::string GetCCTClientHeader(
-      const blink::LocalFrameToken& frame_token);
-#endif
-
  private:
   friend class ChromeRenderFrameObserverTest;
 
@@ -118,9 +111,6 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
   void FindImageElements(blink::WebElement element,
                          std::vector<blink::WebElement>& images);
   void RequestReloadImageForContextNode() override;
-#if BUILDFLAG(IS_ANDROID)
-  void SetCCTClientHeader(const std::string& header) override;
-#endif
   void GetMediaFeedURL(GetMediaFeedURLCallback callback) override;
   void LoadBlockedPlugins(const std::string& identifier) override;
   void SetShouldDeferMediaLoad(bool should_defer) override;
@@ -183,10 +173,8 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
   // Owned by ChromeContentRendererClient and outlive us.
   raw_ptr<web_cache::WebCacheImpl> web_cache_impl_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Save the JavaScript to preload if ExecuteWebUIJavaScript is invoked.
   std::vector<std::u16string> webui_javascript_;
-#endif
 
   mojo::AssociatedReceiverSet<chrome::mojom::ChromeRenderFrame> receivers_;
 

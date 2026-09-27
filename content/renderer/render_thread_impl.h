@@ -342,11 +342,6 @@ class CONTENT_EXPORT RenderThreadImpl
     run_loop_start_time_ = run_loop_start_time;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Provide private memory footprint for browser process.
-  void SetPrivateMemoryFootprint(uint64_t private_memory_footprint_bytes);
-#endif
-
  private:
   FRIEND_TEST_ALL_PREFIXES(RenderThreadImplBrowserTest,
                            TransferSharedLastForegroundTime);
@@ -361,11 +356,6 @@ class CONTENT_EXPORT RenderThreadImpl
   void RecordAction(const base::UserMetricsAction& action) override;
   void RecordComputedAction(const std::string& action) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  // ChildThreadImpl
-  void OnMemoryPressureFromBrowserReceived(
-      base::MemoryPressureLevel level) override;
-#endif
   void SetBatterySaverMode(bool battery_saver_mode_enabled) override;
 
   bool IsMainThread();
@@ -389,9 +379,6 @@ class CONTENT_EXPORT RenderThreadImpl
                                base::TimeDelta http_rtt,
                                base::TimeDelta transport_rtt,
                                double bandwidth_kbps) override;
-#if BUILDFLAG(IS_ANDROID)
-  void SetWebKitSharedTimersSuspended(bool suspend) override;
-#endif
   void InitializeRenderer(
       const std::string& user_agent,
       const blink::UserAgentMetadata& user_agent_metadata,

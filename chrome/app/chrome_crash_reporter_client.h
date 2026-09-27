@@ -21,7 +21,7 @@ class ChromeCrashReporterClient : public crash_reporter::CrashReporterClient {
       delete;
 
   // crash_reporter::CrashReporterClient implementation.
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_MAC)
   void SetCrashReporterClientIdFromGUID(
       const std::string& client_guid) override;
 #endif

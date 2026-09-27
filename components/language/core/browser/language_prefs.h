@@ -125,15 +125,6 @@ class LanguagePrefs {
   static void GetLanguageInfoList(const std::string& app_locale,
                                   std::vector<LanguageInfo>* languages);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Get the ULP languages from a preference. This is an unfiltered list of
-  // languages and may contain country specific language locales. If you do not
-  // need specific locals always compare base languages from the list.
-  std::vector<std::string> GetULPLanguages();
-  // Clear the previous ULP language pref and set to the new list of languages.
-  void SetULPLanguages(std::vector<base::i18n::LanguageTag> ulp_languages);
-#endif
-
  private:
   // Returns the language settings list as parsed language tags.
   std::vector<base::i18n::LanguageTag> GetLanguageList() const;

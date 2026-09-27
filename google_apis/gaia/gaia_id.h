@@ -12,10 +12,6 @@
 #include "base/component_export.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // A string-like object representing an obfuscated Gaia ID that allows
 // identifying a Google account. This value can be safely persisted to disk as
 // it remains stable over time, but for additional privacy it is generally
@@ -80,33 +76,5 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaId {
 
 COMPONENT_EXPORT(GOOGLE_APIS)
 std::ostream& operator<<(std::ostream& out, const GaiaId& id);
-
-#if BUILDFLAG(IS_ANDROID)
-// Constructs a Java GaiaId from the provided C++ GaiaId.
-COMPONENT_EXPORT(GOOGLE_APIS)
-base::android::ScopedJavaLocalRef<jobject> ConvertToJavaGaiaId(
-    JNIEnv* env,
-    const GaiaId& gaia_id);
-
-// Constructs a C++ GaiaId from the provided Java GaiaId.
-COMPONENT_EXPORT(GOOGLE_APIS)
-GaiaId ConvertFromJavaGaiaId(JNIEnv* env,
-                             const base::android::JavaRef<jobject>& j_gaia_id);
-
-namespace jni_zero {
-template <>
-inline GaiaId FromJniType<GaiaId>(
-    JNIEnv* env,
-    const base::android::JavaRef<jobject>& j_gaia_id) {
-  return ConvertFromJavaGaiaId(env, j_gaia_id);
-}
-
-template <>
-inline ScopedJavaLocalRef<jobject> ToJniType(JNIEnv* env,
-                                             const GaiaId& gaia_id) {
-  return ConvertToJavaGaiaId(env, gaia_id);
-}
-}  // namespace jni_zero
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #endif  // GOOGLE_APIS_GAIA_GAIA_ID_H_

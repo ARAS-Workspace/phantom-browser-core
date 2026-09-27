@@ -13,9 +13,7 @@
 #include "components/signin/public/base/signin_buildflags.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "base/memory/scoped_refptr.h"
-#endif
 
 class AccountFetcherFactory;
 class PrefService;

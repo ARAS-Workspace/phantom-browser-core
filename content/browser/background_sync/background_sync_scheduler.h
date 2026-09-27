@@ -64,11 +64,6 @@ class CONTENT_EXPORT BackgroundSyncScheduler
   void RunDelayedTaskAndPruneInfoMap(blink::mojom::BackgroundSyncType sync_type,
                                      StoragePartitionImpl* storage_partition,
                                      base::OnceClosure delayed_task);
-#if BUILDFLAG(IS_ANDROID)
-  void ScheduleOrCancelBrowserWakeupForSyncType(
-      blink::mojom::BackgroundSyncType sync_type,
-      StoragePartitionImpl* storage_partition);
-#endif
 
   std::map<StoragePartitionImpl*, std::unique_ptr<base::OneShotTimer>>
       delayed_processing_info_one_shot_;

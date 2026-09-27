@@ -53,7 +53,7 @@ class CrashReporterClient {
   CrashReporterClient();
   virtual ~CrashReporterClient();
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE)
   // Sets the crash reporting client ID, a unique identifier for the client
   // that is sending crash reports. After it is set, it should not be changed.
   // |client_guid| may either be a full GUID or a GUID that was already stripped
@@ -108,21 +108,7 @@ class CrashReporterClient {
   // that case, |breakpad_enabled| is set to the value enforced by policies.
   virtual bool ReportingIsEnforcedByPolicy(bool* breakpad_enabled);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Used by WebView to sample crashes without generating the unwanted dumps. If
-  // the returned value is less than 100, crash dumping will be sampled to that
-  // percentage.
-  virtual unsigned int GetCrashDumpPercentage();
-
-  // Returns true if |ptype| was set to a value to override the default `ptype`
-  // annotation used for the browser process.
-  virtual bool GetBrowserProcessType(std::string* ptype);
-
-  // Returns true if minudump should be written to android log.
-  virtual bool ShouldWriteMinidumpToLog();
-#endif
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Configures sanitization of crash dumps.
   // |allowed_annotations| is a nullptr terminated array of NUL-terminated
   // strings of allowed annotation names or nullptr if all annotations are

@@ -23,11 +23,6 @@ struct CONTENT_EXPORT BackgroundSyncParameters {
   // fail.
   bool disable;
 
-#if BUILDFLAG(IS_ANDROID)
-  // True if we should rely on Android's network detection where possible.
-  bool rely_on_android_network_detection;
-#endif
-
   // If true, we keep the browser awake till all (periodic)sync events fired
   // have completed. If false, we only keep the browser awake till all ready
   // (periodic)sync events have been fired.

@@ -14,11 +14,9 @@
 #include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 namespace sync_preferences {
 class TestingPrefServiceSyncable;
 }
-#endif
 
 namespace content {
 class WebContents;
@@ -88,12 +86,6 @@ class PaymentRequestTestController {
   // nonexistent. To guarantee a non-null return, this function should be called
   // only if: 1) PaymentRequest UI is opening. 2) PaymentHandler is opening.
   content::WebContents* GetPaymentHandlerWebContents();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Clicks the security icon on the Expandable Payment Handler toolbar for
-  // testing purpose. Return whether it's succeeded.
-  bool ClickPaymentHandlerSecurityIcon();
-#endif
 
   // Clicks the close button on the Payment Handler toolbar for testing purpose.
   // Return whether it's succeeded.
@@ -169,7 +161,6 @@ class PaymentRequestTestController {
   std::optional<bool> is_contact_section_visible_;
   bool bypass_user_interaction_for_testing_ = false;
 
-#if !BUILDFLAG(IS_ANDROID)
   void UpdateDelegateFactory();
 
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable> prefs_;
@@ -178,7 +169,6 @@ class PaymentRequestTestController {
   std::unique_ptr<ObserverConverter> observer_converter_;
 
   base::WeakPtr<ContentPaymentRequestDelegate> delegate_;
-#endif
 
   base::WeakPtrFactory<PaymentRequestTestController> weak_ptr_factory_{this};
 };

@@ -83,10 +83,8 @@ class PaymentsChurnedUsersBubbleController
   // AutofillBubbleControllerBase:
   void DoShowBubble() override;
 
-#if !BUILDFLAG(IS_ANDROID)
   std::optional<actions::ActionId> GetActionIdForPageAction() override;
   bool ShouldShowPageAction() override;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
  private:
   void OnConfirmationBubbleClosed(PaymentsUiClosedReason closed_reason);

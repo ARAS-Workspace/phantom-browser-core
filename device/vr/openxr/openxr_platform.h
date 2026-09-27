@@ -16,11 +16,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include <EGL/egl.h>
-#include <jni.h>
-#endif
-
 #include "third_party/openxr/src/include/openxr/openxr_platform.h"
 
 #endif  // DEVICE_VR_OPENXR_OPENXR_PLATFORM_H_

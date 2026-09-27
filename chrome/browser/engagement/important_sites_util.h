@@ -27,11 +27,7 @@ namespace site_engagement {
 // All methods should be used on the UI thread.
 class ImportantSitesUtil {
  public:
-#if BUILDFLAG(IS_ANDROID)
-  static const int kMaxImportantSites = 5;
-#else
   static const int kMaxImportantSites = 10;
-#endif
 
   struct ImportantDomainInfo {
     ImportantDomainInfo();

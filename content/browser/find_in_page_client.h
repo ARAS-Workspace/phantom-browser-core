@@ -28,10 +28,6 @@ class CONTENT_EXPORT FindInPageClient : public blink::mojom::FindInPageClient {
 
   ~FindInPageClient() override;
 
-#if BUILDFLAG(IS_ANDROID)
-  void ActivateNearestFindResult(int request_id, const gfx::PointF& point);
-#endif
-
   // Current number of matches for this frame.
   int number_of_matches() { return number_of_matches_; }
 

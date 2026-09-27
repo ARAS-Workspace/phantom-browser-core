@@ -77,28 +77,6 @@ class MediaDrmStorageImpl final
       base::Time start,
       base::Time end);
 
-#if BUILDFLAG(IS_ANDROID)
-  // Clear media licenses and related data if:
-  // 1. Creation time falls in [delete_begin, delete_end], and
-  // 2. |filter| returns true for the origin. |filter| is passed in to allow
-  // licenses under specific origins to be cleared. Empty |filter| means remove
-  // licenses for all origins.
-  //
-  // Media license session data will be removed from persist storage. Removing
-  // the actual license file needs ack response from license server, so it's
-  // hard for Chromium to do that. Since it's difficult to get the real id for
-  // the license without the session data, we can treat the licenses as cleared.
-  //
-  // If all the licenses under the origin are cleared, the origin will be
-  // unprovisioned, a.k.a the cert will be removed.
-  // TODO(yucliu): Add unit test.
-  static void ClearMatchingLicenses(PrefService* pref_service,
-                                    base::Time start,
-                                    base::Time end,
-                                    const ClearMatchingLicensesFilterCB& filter,
-                                    base::OnceClosure complete_cb);
-#endif
-
   // |get_origin_id_cb| must be provided and is used to obtain an origin ID.
   // |allow_empty_origin_id_cb| is used to determine if an empty origin ID is
   // allowed or not. It is called if |get_origin_id_cb| is unable to return an

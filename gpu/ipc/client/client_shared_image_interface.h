@@ -75,13 +75,6 @@ class GPU_IPC_CLIENT_EXPORT ClientSharedImageInterface
   void CopyToGpuMemoryBuffer(const SyncToken& sync_token,
                              const Mailbox& mailbox) override;
 
-#if BUILDFLAG(IS_ANDROID)
-  void CopyNativeGmbToSharedMemoryAsync(
-      gfx::GpuMemoryBufferHandle buffer_handle,
-      base::UnsafeSharedMemoryRegion memory_region,
-      base::OnceCallback<void(bool)> callback) override;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   void DestroySharedImage(const SyncToken& sync_token,
                           const Mailbox& mailbox) override;
   void DestroySharedImage(

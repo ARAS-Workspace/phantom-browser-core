@@ -31,12 +31,6 @@
 #include "components/optimization_guide/proto/models.pb.h"
 #include "components/optimization_guide/public/mojom/model_broker.mojom.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/scoped_java_ref.h"
-#include "chrome/browser/bookmarks/android/bookmark_bridge.h"
-#include "chrome/browser/optimization_guide/android/jni_headers/OptimizationGuideBridge_shared_jni.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace content {
 class BrowserContext;
 }  // namespace content
@@ -65,11 +59,6 @@ class PushNotificationManager;
 class TabUrlProvider;
 class TopHostProvider;
 
-#if BUILDFLAG(IS_ANDROID)
-namespace android {
-class OptimizationGuideBridge;
-}  // namespace android
-#endif  // BUILDFLAG(IS_ANDROID)
 }  // namespace optimization_guide
 
 class GURL;
@@ -104,10 +93,6 @@ class OptimizationGuideKeyedService
       const OptimizationGuideKeyedService&) = delete;
 
   ~OptimizationGuideKeyedService() override;
-
-#if BUILDFLAG(IS_ANDROID)
-  base::android::ScopedJavaLocalRef<JOptimizationGuideBridge> GetJavaObject();
-#endif
 
   // Constructs a ModelBrokerClient with remote fallback capability.
   virtual std::unique_ptr<optimization_guide::ModelBrokerClient>
@@ -283,10 +268,6 @@ class OptimizationGuideKeyedService
   friend class optimization_guide::PredictionModelStoreBrowserTestBase;
   friend class settings::SettingsUI;
 
-#if BUILDFLAG(IS_ANDROID)
-  friend class optimization_guide::android::OptimizationGuideBridge;
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Allows tests to override the value of `version_info::IsOfficialBuild()`.
   static void SetIsOfficialBuildForTesting(bool is_official_build);
 
@@ -384,13 +365,6 @@ class OptimizationGuideKeyedService
   // record profiles.
   std::unique_ptr<optimization_guide::ModelQualityLogsUploaderService>
       model_quality_logs_uploader_service_;
-
-#if BUILDFLAG(IS_ANDROID)
-  // Manage and fetch the java object that wraps this OptimizationGuide on
-  // android.
-  std::unique_ptr<optimization_guide::android::OptimizationGuideBridge>
-      android_bridge_;
-#endif
 
   // Used to observe profile initialization event.
   base::ScopedObservation<Profile, ProfileObserver> profile_observation_{this};

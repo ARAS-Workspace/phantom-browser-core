@@ -54,10 +54,6 @@
 #include "ui/gfx/geometry/rect.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error This file should only be included on desktop.
-#endif
-
 class BrowserInitState;
 class BrowserWindow;
 struct BrowserWindowCreateParams;

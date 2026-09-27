@@ -45,22 +45,8 @@ COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kAutofillCardSurvey);
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kAutofillPasswordSurvey);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kAndroidKeepProfilePartitionDirsInCacheDir);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kBoardingPassDetector);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kBoardingPassDetectorUrlParam;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const char kBoardingPassDetectorUrlParamName[];
-#endif  // BUILDFLAG(IS_ANDROID)
-
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kCaptureHandleForStandalonePwasAndIwas);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kCryptographyComplianceCnsa);
@@ -82,13 +68,11 @@ BASE_DECLARE_FEATURE_PARAM(bool, kStartupDelayStopOnLoadingTimedOut);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE_PARAM(bool, kStartupDelayIncludesSessionRestore);
 
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kPreinstalledWebAppInstallation);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kPreinstalledWebAppAlwaysMigrateForTesting);
-#endif
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kChromeStructuredMetrics);
@@ -111,30 +95,18 @@ BASE_DECLARE_FEATURE(kDesktopPWAsWindowControlsOverlayWithNoToggle);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kDocumentPipStandaloneWindow);
 
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kRemoteActorCredentialSharing);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<std::string>
     kRemoteActorCredentialSharingAllowedHostForTesting;
-#endif
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 bool RemoteActorCredentialSharingEnabled();
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kChromeAppsDeprecation);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kDisplayEdgeToEdgeFullscreen);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kEnableFullscreenToAnyScreenAndroid);
 #endif
 
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGoogleChromeScheme);
@@ -147,7 +119,6 @@ BASE_DECLARE_FEATURE(kPrivacyGuideForceAvailable);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kHappinessTrackingSurveysForDesktopDemo);
 
@@ -232,8 +203,6 @@ BASE_DECLARE_FEATURE(kHaTSDesktopDevToolsIssuesCSP);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kHappinessTrackingSurveysForDesktopSEHijacking);
 
-#endif
-
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kHttpsFirstBalancedMode);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kHttpsFirstBalancedModeAutoEnable);
@@ -262,10 +231,8 @@ BASE_DECLARE_FEATURE(kIncomingCallNotifications);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kInitialWebUIWithoutSpellCheckForNtp);
 
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kInstantUsesSpareRenderer);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // LINT.IfChange
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kIsolatedWebAppDevMode);
@@ -302,17 +269,8 @@ COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kSystemNotifications);
 
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kNoReferrers);
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kOfflineAutoFetch);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kOnConnectNative);
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kOomIntervention);
 #endif
 
 COMPONENT_EXPORT(CHROME_FEATURES)
@@ -387,11 +345,6 @@ extern const base::FeatureParam<base::TimeDelta>
 
 // Timeout in seconds for the Safety Hub OS notification informing users about
 // revoked notification permissions.
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int>
-    kSafetyHubDisruptiveNotificationRevocationNotificationTimeoutSeconds;
-#endif
 
 // The minimum number of days since the revocation until a site can be
 // considered a false positive disruptive notification revocation. The cooldown
@@ -430,21 +383,8 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<int>
     kSafetyHubDisruptiveNotificationRevocationWaitingForMetricsDays;
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kSafetyHubWeakAndReusedPasswords);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kSafetyHubLocalPasswordsModule);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kSafetyHubUnifiedPasswordsModule);
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kSafetyHubTrustSafetySentimentSurvey);
-#endif
 
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kSCTAuditingHashdance);
 COMPONENT_EXPORT(CHROME_FEATURES)
@@ -471,7 +411,6 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kTreatUnsafeDownloadsAsActive);
 
 // TrustSafetySentimentSurvey
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kTrustSafetySentimentSurvey);
 COMPONENT_EXPORT(CHROME_FEATURES)
@@ -513,10 +452,8 @@ extern const base::FeatureParam<base::TimeDelta>
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<base::TimeDelta>
     kTrustSafetySentimentSurveyTransactionsPasswordManagerTime;
-#endif
 
 // TrustSafetySentimentSurveyV2
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kTrustSafetySentimentSurveyV2);
 COMPONENT_EXPORT(CHROME_FEATURES)
@@ -603,9 +540,7 @@ extern const base::FeatureParam<std::string>
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<base::TimeDelta>
     kTrustSafetySentimentSurveyV2TrustedSurfaceTime;
-#endif
 
-#if !BUILDFLAG(IS_ANDROID)
 // Periodically query a preinstalled app for updating, with the intention of
 // doing this for all preinstalled apps with cheap install_urls (that do not
 // redirect etc).
@@ -622,12 +557,10 @@ BASE_DECLARE_FEATURE(kWebAppInstallDialogWinPin);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kWebAppHandleAppMigrationViaSync);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kWebAppUpgradeToDatabaseVersion6);
 
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kWebium);
 COMPONENT_EXPORT(CHROME_FEATURES)
@@ -691,7 +624,6 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kWebUIToolbar);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kWebUIToolbarFrameEvictionOptOut);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kRespectUserAgentOverrideInSearchPrefetch);
@@ -704,7 +636,6 @@ extern const base::FeatureParam<std::string> kRestrictedWebUICodeCacheResources;
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kUserValueDefaultBrowserStrings);
 
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kSmartRestartMetrics);
 
@@ -735,7 +666,6 @@ extern const base::FeatureParam<double>
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kRecordTabWindowDiffOnRestart);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 bool PrefServiceEnabled();
 

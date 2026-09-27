@@ -15,12 +15,6 @@ namespace permissions {
 namespace prefs {
 
 extern const char kPermissionActions[];
-#if BUILDFLAG(IS_ANDROID)
-extern const char kLocationSettingsBackoffLevelDSE[];
-extern const char kLocationSettingsBackoffLevelDefault[];
-extern const char kLocationSettingsNextShowDSE[];
-extern const char kLocationSettingsNextShowDefault[];
-#endif
 
 extern const char kOneTimePermissionPromptsDecidedCount[];
 

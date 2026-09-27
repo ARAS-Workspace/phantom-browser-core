@@ -18,11 +18,6 @@
 #include "ui/gfx/image/image.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/messages/android/message_enums.h"
-#include "components/messages/android/message_wrapper.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace content {
@@ -82,10 +77,6 @@ class ReloadPageDialogController {
 
   // Information for the extensions to be displayed in the dialog.
   std::vector<ExtensionInfo> extensions_info_;
-
-#if BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<messages::MessageWrapper> message_;
-#endif  // BUILDFLAG(IS_ANDROID)
 
   base::WeakPtrFactory<ReloadPageDialogController> weak_ptr_factory_{this};
 };

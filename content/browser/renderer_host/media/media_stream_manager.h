@@ -53,9 +53,7 @@
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "third_party/blink/public/mojom/permissions/permission_status.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "content/browser/media/captured_surface_controller.h"
-#endif
 
 namespace media {
 class AudioSystem;
@@ -141,7 +139,6 @@ class CONTENT_EXPORT MediaStreamManager
   using GenerateStreamTestCallback =
       base::OnceCallback<bool(const blink::StreamControls&)>;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Callback for creating a CapturedSurfaceController. Used to override the
   // default CapturedSurfaceController in tests.
   using CapturedSurfaceControllerFactoryCallback =
@@ -149,7 +146,6 @@ class CONTENT_EXPORT MediaStreamManager
           GlobalRenderFrameHostId,
           WebContentsMediaCaptureId,
           base::RepeatingCallback<void(int)> on_zoom_level_change_callback)>;
-#endif
 
   // Adds |message| to native logs for outstanding device requests, for use by
   // render processes hosts whose corresponding render processes are requesting
@@ -393,12 +389,10 @@ class CONTENT_EXPORT MediaStreamManager
                           blink::mojom::MediaStreamType stream_type,
                           MediaRequestState new_state);
 
-#if !BUILDFLAG(IS_ANDROID)
   void SetConditionalFocusWindowForTesting(base::TimeDelta window);
 
   void SetCapturedSurfaceControllerFactoryForTesting(
       CapturedSurfaceControllerFactoryCallback factory);
-#endif
 
   void SetPreferredAudioOutputDeviceManagerForTesting(
       std::unique_ptr<PreferredAudioOutputDeviceManager> manager);
@@ -444,7 +438,6 @@ class CONTENT_EXPORT MediaStreamManager
                                       bool is_from_timer);
 #endif  // BUILDFLAG(ENABLE_SCREEN_CAPTURE)
 
-#if !BUILDFLAG(IS_ANDROID)
   // Captured Surface Control APIs.
   void SendWheel(
       GlobalRenderFrameHostId capturer_rfh_id,
@@ -465,8 +458,6 @@ class CONTENT_EXPORT MediaStreamManager
       const base::UnguessableToken& session_id,
       base::OnceCallback<void(blink::mojom::CapturedSurfaceControlResult)>
           callback);
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   void RegisterDispatcherHost(
       std::unique_ptr<blink::mojom::MediaStreamDispatcherHost> host,
@@ -619,12 +610,10 @@ class CONTENT_EXPORT MediaStreamManager
                        const GlobalRenderFrameHostId& render_frame_host_id,
                        SessionType expected_type) const;
 
-#if !BUILDFLAG(IS_ANDROID)
   CapturedSurfaceController* GetCapturedSurfaceController(
       GlobalRenderFrameHostId capturer_rfh_id,
       const base::UnguessableToken& session_id,
       blink::mojom::CapturedSurfaceControlResult& result);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Clones an existing device identified by |existing_device_session_id| and
   // returns it. If no such device is found, it returns std::nullopt.
@@ -847,7 +836,6 @@ class CONTENT_EXPORT MediaStreamManager
   void OnVideoCaptureHostConnectionError();
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
   // Defines a window of opportunity for the Web-application to decide
   // whether a display-surface which it's capturing should be focused.
   // After |kConditionalFocusWindow| past the beginning of the capture,
@@ -857,7 +845,6 @@ class CONTENT_EXPORT MediaStreamManager
   base::TimeDelta conditional_focus_window_ = base::Seconds(1);
 
   CapturedSurfaceControllerFactoryCallback captured_surface_controller_factory_;
-#endif
 
   const raw_ptr<media::AudioSystem, DanglingUntriaged>
       audio_system_;  // not owned

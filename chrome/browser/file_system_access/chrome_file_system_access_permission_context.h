@@ -27,10 +27,8 @@
 #include "components/permissions/object_permission_context_base.h"
 #include "content/public/browser/file_system_access_permission_context.h"
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_manager.mojom-forward.h"
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_install_manager_observer.h"
-#endif
 
 class HostContentSettingsMap;
 class OneTimePermissionsTracker;
@@ -62,12 +60,8 @@ class RenderFrameHost;
 class ChromeFileSystemAccessPermissionContext
     : public content::FileSystemAccessPermissionContext,
       public permissions::ObjectPermissionContextBase,
-      public OneTimePermissionsTrackerObserver
-#if !BUILDFLAG(IS_ANDROID)
-    ,
-      public web_app::WebAppInstallManagerObserver
-#endif
-{
+      public OneTimePermissionsTrackerObserver,
+      public web_app::WebAppInstallManagerObserver {
  public:
   using FileCreatedFromShowSaveFilePickerCallbackList =
       base::RepeatingCallbackList<void(const GURL&,
@@ -263,7 +257,6 @@ class ChromeFileSystemAccessPermissionContext
   void OnLastPageFromOriginClosed(const url::Origin& origin) override;
   void OnShutdown() override;
 
-#if !BUILDFLAG(IS_ANDROID)
   // WebAppInstallManagerObserver:
   void OnWebAppInstalled(const webapps::AppId& app_id) override;
   // TODO(crbug.com/340952100): Remove after the InstallState is saved in the
@@ -271,7 +264,6 @@ class ChromeFileSystemAccessPermissionContext
   void OnWebAppInstalledWithOsHooks(const webapps::AppId& app_id) override;
   void OnWebAppInstallManagerDestroyed() override;
   void OnWebAppWillBeUninstalled(const webapps::AppId& app_id) override;
-#endif
 
   // content::FileSystemAccessPermissionContext:
   scoped_refptr<content::FileSystemAccessPermissionGrant>
@@ -664,14 +656,12 @@ class ChromeFileSystemAccessPermissionContext
   base::ScopedObservation<OneTimePermissionsTracker,
                           OneTimePermissionsTrackerObserver>
       one_time_permissions_tracker_{this};
-#if !BUILDFLAG(IS_ANDROID)
   base::ScopedObservation<web_app::WebAppInstallManager,
                           web_app::WebAppInstallManagerObserver>
       install_manager_observation_{this};
 
   // Updates the File System Access page action icon for the given tab.
   void UpdatePageAction(FileSystemAccessPageActionController* controller);
-#endif
 
   // Number of custom IDs an origin can specify.
   size_t max_ids_per_origin_ = 32u;

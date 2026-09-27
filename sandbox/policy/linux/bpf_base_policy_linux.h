@@ -13,10 +13,6 @@
 #include "sandbox/linux/seccomp-bpf-helpers/baseline_policy.h"
 #include "sandbox/policy/export.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "sandbox/linux/seccomp-bpf-helpers/baseline_policy_android.h"
-#endif
-
 namespace sandbox::policy {
 
 // The "baseline" BPF policy. Any other seccomp-bpf policy should inherit
@@ -27,8 +23,6 @@ class SANDBOX_POLICY_EXPORT BPFBasePolicy : public bpf_dsl::Policy {
  public:
 #if BUILDFLAG(IS_LINUX)
   BPFBasePolicy();
-#elif BUILDFLAG(IS_ANDROID)
-  explicit BPFBasePolicy(const BaselinePolicyAndroid::RuntimeOptions& options);
 #endif
 
   BPFBasePolicy(const BPFBasePolicy&) = delete;

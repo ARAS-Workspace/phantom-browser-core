@@ -125,7 +125,6 @@ enum class WindowResizePrecheckResult {
   // The window can be successfully resized.
   kOk = 0,
 
-#if !BUILDFLAG(IS_ANDROID)
   // Window has size controls preventing resize. See
   // ui/views/widget/widget_delegate.h for more detail.
   kHasWindowSizeControls = 1,
@@ -137,31 +136,6 @@ enum class WindowResizePrecheckResult {
   // Window has a hit-test mask. See ui/views/widget/widget_delegate.h for more
   // detail.
   kWindowHasHitTestMask = 3,
-#else
-  // The app must hold the browser role to change window bounds.
-  kAndroidBrowserRoleNotHeld = 4,
-
-  // The Android API to change window bounds is available on BAKLAVA+. Also
-  // returned if calling R+ methods like maximize/restore on earlier versions.
-  kAndroidSdkTooLow = 5,
-
-  // Only free-form windows can change bounds (the app must be in desktop
-  // windowing mode).
-  kAndroidNotAFreeformWindow = 6,
-
-  // The Android API to change window bounds is accessed via AppTask, which can
-  // be null when ChromeAndroidTask is for a Custom Tab (CCT) window.
-  kAndroidNullAppTask = 7,
-
-  // The Android API to change window bounds is accessed via the top
-  // Activity of an Android Task, but it's possible for a Task to
-  // contain no Activity.
-  kAndroidNoActivity = 8,
-
-  // Chrome wraps the Android window resizing API in AconfigFlaggedApiDelegate,
-  // so it must be non-null.
-  kAndroidNullAconfigFlaggedApiDelegate = 9,
-#endif
 };
 
 // Distinguishes browser from non-browser windows for frame decoration styling.

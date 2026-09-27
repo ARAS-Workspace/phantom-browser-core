@@ -98,11 +98,7 @@ class GESTURE_DETECTION_EXPORT GestureDetector {
 
     // Whether a longpress should be generated immediately when a pointer is
     // deep-pressing, given that the longpress timeout is still active.
-#if BUILDFLAG(IS_ANDROID)
-    bool deep_press_accelerated_longpress_enabled = true;
-#else
     bool deep_press_accelerated_longpress_enabled = false;
-#endif
 
     VelocityTracker::Strategy velocity_tracker_strategy =
         VelocityTracker::Strategy::STRATEGY_DEFAULT;

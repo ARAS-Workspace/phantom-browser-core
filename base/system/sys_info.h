@@ -74,7 +74,7 @@ class BASE_EXPORT SysInfo {
   // under/overestimate in case of CPU hotplug.
   static int NumberOfEfficientProcessors();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   // Returns the maximum frequency of all the processors in Hz, if
   // available. The data may not be available in virtual machines for
   // instance. In this case, the returned value is empty.
@@ -148,13 +148,6 @@ class BASE_EXPORT SysInfo {
   // e.g. "Google" on Pixel 8 Pro. Only implemented on Android, returns an
   // empty string on other platforms.
   static std::string SocManufacturer();
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the hardware manufacturer name of the current machine
-  // synchronously. This is only supported on Android as Windows and Linux
-  // would require IO operations and other platforms are static.
-  static std::string HardwareManufacturer();
-#endif
 
 #if BUILDFLAG(IS_MAC)
   struct HardwareModelNameSplit {
@@ -262,33 +255,6 @@ class BASE_EXPORT SysInfo {
   static size_t VMAllocationGranularity();
 
 
-#if BUILDFLAG(IS_ANDROID)
-  // Returns the Android build's codename.
-  static std::string GetAndroidBuildCodename();
-
-  // Returns the Android build ID.
-  static std::string GetAndroidBuildID();
-
-  // Returns the Android hardware system property, equivalent to Java's
-  // Build.HARDWARE.
-  static std::string GetAndroidHardware();
-
-  // Returns the Android hardware EGL system property.
-  static std::string GetAndroidHardwareEGL();
-
-  // Returns the Android hardware class system property. Unlike individual
-  // component Hardware ID, this is at a device level to capture a class of
-  // devices with similar hardware components.
-  static std::string GetAndroidHardwareClass();
-
-  // Returns the SDK API level that the device initially launched with.
-  static std::string GetAndroidFirstApiLevel();
-
-  // Returns the android.os.Build.FINGERPRINT. This corresponds to the
-  // ro.build.fingerprint system property.
-  static std::string GetAndroidBuildFingerprint();
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Returns true for low-end devices that may require extreme tradeoffs,
   // including user-visible changes, for acceptable performance.
   // For general memory optimizations, consider |AmountOfTotalPhysicalMemory|.
@@ -307,19 +273,6 @@ class BASE_EXPORT SysInfo {
   static bool IsLowEndDeviceOrPartialLowEndModeEnabled();
   static bool IsLowEndDeviceOrPartialLowEndModeEnabled(
       const FeatureParam<bool>& param_for_exclusion);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Returns true for Android devices whose memory is X GB, considering
-  // carveouts. The carveouts is memory reserved by the system, e.g. for
-  // drivers, MTE, etc. It's very common for querying app to see hundreds MBs
-  // less than actual physical memory installed on the system.
-  static bool Is3GbDevice();
-  static bool Is4GbDevice();
-  static bool Is6GbDevice();
-  // Returns true for Android devices whose memory is 4GB or 6GB, considering
-  // carveouts.
-  static bool Is4GbOr6GbDevice();
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
   // Indicates that CPU security mitigations are enabled for the current
@@ -342,7 +295,7 @@ class BASE_EXPORT SysInfo {
   static bool IsLowEndDeviceImpl();
   static HardwareInfo GetHardwareInfoSync();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   static ByteSize AmountOfAvailablePhysicalMemory(
       const SystemMemoryInfo& meminfo);
 #endif

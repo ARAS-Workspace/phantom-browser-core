@@ -23,26 +23,11 @@ BASE_DECLARE_FEATURE(kActorLogin);
 BASE_DECLARE_FEATURE(kActorLoginConflictingPermissionCleanup);
 BASE_DECLARE_FEATURE(kActorLoginLocalClassificationModel);
 
-#if BUILDFLAG(IS_ANDROID)
-// When enabled, it completely ignores existing permanent permissions
-// and does not store new ones.
-// TODO(crbug.com/507403760): Remove once the permissions management UI is
-// available.
-BASE_DECLARE_FEATURE(kActorLoginNoPermanentPermissionsAndroid);
-// Enables the Actor Login Permissions Settings UI on Android.
-BASE_DECLARE_FEATURE(kActorLoginPermissionsUi);
-#endif
-
 // Enables syncing password permissions.
 BASE_DECLARE_FEATURE(kActorLoginSyncsPasswordPermissions);
 
 // Enables logging quality for actor login.
 BASE_DECLARE_FEATURE(kActorLoginQualityLogs);
-
-#if BUILDFLAG(IS_ANDROID)
-// Enables filling of OTPs received via SMS on Android.
-BASE_DECLARE_FEATURE(kAndroidSmsOtpFilling);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Enables using clientside form classifier predictions for password forms.
 BASE_DECLARE_FEATURE(kApplyClientsideModelPredictionsForPasswordTypes);
@@ -51,7 +36,6 @@ BASE_DECLARE_FEATURE(kApplyClientsideModelPredictionsForPasswordTypes);
 // auto-approved.
 BASE_DECLARE_FEATURE(kAutoApproveSharedPasswordUpdatesFromSameSender);
 
-#if !BUILDFLAG(IS_ANDROID)  // Desktop
 // Feature flag to control the displaying of an ongoing hats survey that
 // measures users perception of autofilling password forms. Differently from
 // other surveys, the Autofill user perception surveys will not have a specific
@@ -65,7 +49,6 @@ BASE_DECLARE_FEATURE(kAutofillPasswordUserPerceptionSurvey);
 // actions.
 BASE_DECLARE_FEATURE(kAwaitPageStabilityForPasswordChange);
 extern const base::FeatureParam<base::TimeDelta> kAwaitPageStabilityTimeout;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables Biometrics for the Touch To Fill feature. This only effects Android.
 BASE_DECLARE_FEATURE(kBiometricTouchToFill);
@@ -85,10 +68,8 @@ BASE_DECLARE_FEATURE(kClearUndecryptablePasswords);
 // Delete undecryptable passwords from the store when Sync is active.
 BASE_DECLARE_FEATURE(kClearUndecryptablePasswordsOnSync);
 
-#if !BUILDFLAG(IS_ANDROID)  // Desktop
 // Enables the Unified UI for the Password Manager.
 BASE_DECLARE_FEATURE(kCredentialManagementUnifiedUi);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables debug data popups on OTP fields for manual testing of
 // one-time-passwords. Only for OTP detection testing, not intended to be
@@ -99,7 +80,6 @@ BASE_DECLARE_FEATURE(kDebugUiForOtps);
 // contains new password field.
 BASE_DECLARE_FEATURE(kDisablePasswordChangeFromNewPasswordFields);
 
-#if !BUILDFLAG(IS_ANDROID)  // Desktop
 // Enables the Mojo JavaScript API for the password manager, replacing the
 // legacy passwordsPrivate extension API.
 BASE_DECLARE_FEATURE(kEnablePasswordManagerMojoApi);
@@ -110,7 +90,6 @@ BASE_DECLARE_FEATURE(kEnablePasswordManagerMojoApiPhase2);
 
 // Enables the Desktop Trusted Vault unlock UI flow.
 BASE_DECLARE_FEATURE(kTrustedVaultDesktopUnlock);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Cross domain credential data is not previewed by the manual fallback
 // suggestion popup.
@@ -129,23 +108,9 @@ BASE_DECLARE_FEATURE(kFillOnAccountSelect);
 // leak dialog.
 BASE_DECLARE_FEATURE(kMarkAllCredentialsAsLeaked);
 
-#if BUILDFLAG(IS_ANDROID)
-// Enables OTP phishing checks.
-BASE_DECLARE_FEATURE(kOtpPhishGuard);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // PasswordManagerClient::IsFillingEnabled returns `false` for opaque origins.
 // Intended as a kill-switch.
 BASE_DECLARE_FEATURE(kPasswordBlockOpaqueOrigins);
-
-#if BUILDFLAG(IS_ANDROID)
-// When enabled, DeletionOrigin is sent to Android Backend for password
-// deletions.
-BASE_DECLARE_FEATURE(kPassDeletionOriginToAndroidBackend);
-
-// The minimum GMS version required to send deletion origin to Android Backend.
-extern const base::FeatureParam<int> kPassDeletionOriginMinGmsVersion;
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // Populate the `date_last_filled` timestamp for passwords.
 BASE_DECLARE_FEATURE(kPasswordDateLastFilled);

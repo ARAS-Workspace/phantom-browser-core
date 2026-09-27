@@ -23,10 +23,6 @@
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/hdr_metadata.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "gpu/vulkan/vulkan_ycbcr_info.h"
-#endif
-
 namespace base::trace_event {
 class TracedValue;
 }  // namespace base::trace_event
@@ -210,10 +206,6 @@ struct VIZ_COMMON_EXPORT TransferableResource {
            GetColorSpace() == o.GetColorSpace() &&
            hdr_metadata == o.hdr_metadata &&
            GetIsOverlayCandidate() == o.GetIsOverlayCandidate() &&
-#if BUILDFLAG(IS_ANDROID)
-           is_backed_by_surface_view == o.is_backed_by_surface_view &&
-           wants_promotion_hint == o.wants_promotion_hint &&
-#endif
            synchronization_type == o.synchronization_type &&
            resource_source == o.resource_source;
   }
@@ -235,22 +227,6 @@ struct VIZ_COMMON_EXPORT TransferableResource {
   // This defines when the display compositor returns resources. Clients may use
   // different synchronization types based on their needs.
   SynchronizationType synchronization_type = SynchronizationType::kSyncToken;
-
-#if BUILDFLAG(IS_ANDROID)
-  // YCbCr info for resources backed by YCbCr Vulkan images.
-  std::optional<gpu::VulkanYCbCrInfo> ycbcr_info;
-
-  // Indicates whether this resource may be overlaid on Android via legacy
-  // overlay flow, since it's backed by a SurfaceView. It's good to find this
-  // out in advance, since one has no fallback path for displaying a
-  // SurfaceView except via promoting it to an overlay.
-  bool is_backed_by_surface_view = false;
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  // Indicates that this resource would like a promotion hint.
-  bool wants_promotion_hint = false;
-#endif
 
   // If true, we need to run a detiling image processor on the quad before we
   // can scan it out.

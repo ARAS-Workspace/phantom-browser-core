@@ -13,9 +13,6 @@
 
 // As of 2022-03 there is no plan to sandbox the network service in any special
 // way on Android.
-#if BUILDFLAG(IS_ANDROID)
-#error "Sandboxing disk access to a subdirectory is not implemented on Android"
-#endif
 
 namespace content {
 

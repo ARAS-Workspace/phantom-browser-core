@@ -685,25 +685,6 @@ BASE_EXPORT int GetMaximumPathComponentLength(const base::FilePath& path);
 BASE_EXPORT bool GetShmemTempDir(bool executable, FilePath* path);
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-// Resolves this FilePath to a content URI if it represents a virtual
-// document path or is already a content URI. Returns std::nullopt otherwise.
-BASE_EXPORT std::optional<FilePath> ResolveToContentUri(const FilePath& path);
-
-// Resolves this FilePath to a virtual document path if it's a content URI
-// representing a document tree or is already a virtual document path. Returns
-// std::nullopt otherwise.
-BASE_EXPORT std::optional<FilePath> ResolveToVirtualDocumentPath(
-    const FilePath& path);
-
-// Copies a file from app-private storage into the public Downloads collection.
-// Returns the public content URI string on success, or std::nullopt on failure.
-BASE_EXPORT std::optional<std::string> CopyFileToDownloadsCollection(
-    const FilePath& file_path,
-    const std::string& mime_type);
-
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 // Returns whether the specified file name is a reserved name on Windows.
 // This includes names like "com2.zip" (which correspond to devices) and
@@ -722,7 +703,7 @@ namespace internal {
 // Use only with extreme care.
 BASE_EXPORT bool MoveUnsafe(const FilePath& from_path, const FilePath& to_path);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
 // CopyFileContentsWithSendfile will use the sendfile(2) syscall to perform a
 // file copy without moving the data between kernel and userspace. This is much
 // more efficient than sequences of read(2)/write(2) calls. The |retry_slow|
@@ -734,7 +715,7 @@ BASE_EXPORT bool MoveUnsafe(const FilePath& from_path, const FilePath& to_path);
 BASE_EXPORT bool CopyFileContentsWithSendfile(File& infile,
                                               File& outfile,
                                               bool& retry_slow);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace internal
 }  // namespace base

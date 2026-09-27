@@ -85,13 +85,6 @@ class AccountPreviewDataServiceImpl : public AccountPreviewDataService,
   std::optional<AccountPreviewData> GetAccountPreviewData(
       const GaiaId& gaia_id) const;
 
-#if BUILDFLAG(IS_ANDROID)
-  void UpdateExternalAppAccount(
-      const std::optional<std::string>& email) override;
-
-  std::optional<GaiaId> GetExternalAppAccountForTesting() const;
-#endif
-
   bool HasActiveFetcherForTesting(const GaiaId& gaia_id) const;
   AccountPreviewDataFetcher* GetFetcherForTesting(const GaiaId& gaia_id) const;
 
@@ -153,15 +146,6 @@ class AccountPreviewDataServiceImpl : public AccountPreviewDataService,
   // Writing `std::nullopt` as `preference` clears the pref.
   void WritePreferredAccountToPrefs(
       std::optional<AccountPreviewPreference> preference);
-
-#if BUILDFLAG(IS_ANDROID)
-  std::optional<GaiaId> ReadExternalAppAccountFromPrefs() const;
-  void WriteExternalAppAccountToPrefs(const GaiaId& gaia_id,
-                                      base::Time timestamp);
-  void ClearExternalAppAccount();
-  void CleanUpExternalAppAccountIfExpired();
-  void CleanUpExternalAppAccountIfNotOnDevice();
-#endif
 
   raw_ptr<IdentityManager> identity_manager_ = nullptr;
   raw_ptr<syncer::SyncService> sync_service_ = nullptr;

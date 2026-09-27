@@ -88,16 +88,14 @@ enum {
                                // files and images).
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID))
+    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC))
   DIR_NATIVE_MESSAGING,       // System directory where native messaging host
                               // manifest files are stored.
   DIR_USER_NATIVE_MESSAGING,  // Directory with Native Messaging Hosts
                               // installed per-user.
 #endif
-#if !BUILDFLAG(IS_ANDROID)
   DIR_GLOBAL_GCM_STORE,  // Directory where the global GCM instance
                          // stores its data.
-#endif
 
   // Valid only in development environment; TODO(darin): move these
   DIR_GEN_TEST_DATA,  // Directory where generated test data resides.

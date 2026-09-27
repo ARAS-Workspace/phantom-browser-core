@@ -55,12 +55,6 @@ class CardUnmaskOtpInputDialogController {
   // for the OTP, and it can change based on OTP length.
   virtual std::u16string GetTextfieldPlaceholderText() const = 0;
 
-#if BUILDFLAG(IS_ANDROID)
-  // The length of the OTP that the user is expected to fill into the text
-  // field.
-  virtual int GetExpectedOtpLength() const = 0;
-#endif
-
   // Checks if the given text is a possible valid OTP before sending a request
   // to the backend to see if the otp is correct.
   virtual bool IsValidOtp(const std::u16string& otp) const = 0;

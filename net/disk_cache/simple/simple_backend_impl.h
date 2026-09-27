@@ -146,16 +146,6 @@ class NET_EXPORT_PRIVATE SimpleBackendImpl final : public Backend,
       base::TaskPriority::USER_BLOCKING,
       base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN};
 
-#if BUILDFLAG(IS_ANDROID)
-  // Note: null callback is OK, and will make the cache use a
-  // base::android::ApplicationStatusListener. Callback returning nullptr
-  // means to not use an app status listener at all.
-  void set_app_status_listener_getter(
-      ApplicationStatusListenerGetter app_status_listener_getter) {
-    app_status_listener_getter_ = std::move(app_status_listener_getter);
-  }
-#endif
-
   base::WeakPtr<SimpleBackendImpl> AsWeakPtr() {
     return weak_ptr_factory_.GetWeakPtr();
   }
@@ -299,10 +289,6 @@ class NET_EXPORT_PRIVATE SimpleBackendImpl final : public Backend,
 
   const raw_ptr<net::NetLog> net_log_;
   uint32_t entry_count_ = 0;
-
-#if BUILDFLAG(IS_ANDROID)
-  ApplicationStatusListenerGetter app_status_listener_getter_;
-#endif
 
   base::WeakPtrFactory<SimpleBackendImpl> weak_ptr_factory_{this};
 };

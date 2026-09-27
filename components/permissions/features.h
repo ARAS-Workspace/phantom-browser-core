@@ -13,14 +13,6 @@
 namespace permissions {
 namespace features {
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(PERMISSIONS_COMMON)
-BASE_DECLARE_FEATURE(kAndroidWindowManagementWebApi);
-
-COMPONENT_EXPORT(PERMISSIONS_COMMON)
-BASE_DECLARE_FEATURE(kAndroidItemChooserCancelButton);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 BASE_DECLARE_FEATURE(kBackForwardCacheUnblockPermissionRequest);
 
@@ -73,17 +65,8 @@ BASE_DECLARE_FEATURE(kPermissionOnDeviceNotificationPredictions);
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 BASE_DECLARE_FEATURE(kPermissionOnDeviceGeolocationPredictions);
 
-#if BUILDFLAG(IS_ANDROID)
-
-COMPONENT_EXPORT(PERMISSIONS_COMMON)
-BASE_DECLARE_FEATURE(kPermissionDedicatedCpssSettingAndroid);
-
-#else
-
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 BASE_DECLARE_FEATURE(kRecordChooserPermissionLastVisitedTimestamps);
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 BASE_DECLARE_FEATURE(kShowRelatedWebsiteSetsPermissionGrants);
@@ -94,21 +77,11 @@ BASE_DECLARE_FEATURE(kCpssUseTfliteSignatureRunner);
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 BASE_DECLARE_FEATURE(kSafetyHubUnusedPermissionRevocationForAllSurfaces);
 
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(PERMISSIONS_COMMON)
-BASE_DECLARE_FEATURE(kReturnDeniedForNotificationsWhenNoAppLevelSettings);
-#endif
-
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 BASE_DECLARE_FEATURE(kPermissionPredictionsGeolocationAccuracy);
 
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 BASE_DECLARE_FEATURE(kPermissionsGestureGatedPrompts);
-
-#if BUILDFLAG(IS_ANDROID)
-COMPONENT_EXPORT(PERMISSIONS_COMMON)
-BASE_DECLARE_FEATURE(kPermanentNotificationSubscribeInPageInfo);
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace features
 
@@ -197,10 +170,8 @@ COMPONENT_EXPORT(PERMISSIONS_COMMON)
 extern const base::FeatureParam<bool>
     kPermissionsGestureGatedPromptsExcludeSameOriginNavigations;
 
-#if !BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(PERMISSIONS_COMMON)
 extern const base::FeatureParam<bool> kKeyboardLockPromptUIStyle;
-#endif
 }  // namespace feature_params
 }  // namespace permissions
 

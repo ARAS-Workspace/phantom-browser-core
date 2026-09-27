@@ -9,10 +9,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/webapps/chrome_webapps_client.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#error "Desktop implementation should not be included in Android builds."
-#endif
-
 namespace webapps {
 
 class WebappsClientDesktop : public ChromeWebappsClient {

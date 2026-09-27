@@ -12,16 +12,7 @@
 
 namespace permissions {
 struct PermissionRequestData;
-#if BUILDFLAG(IS_ANDROID)
-struct PermissionPromptDecision;
-#endif
 }  // namespace permissions
-
-#if BUILDFLAG(IS_ANDROID)
-namespace content {
-struct PermissionResult;
-}
-#endif
 
 // Common class which handles the mic and camera permissions.
 class MediaStreamDevicePermissionContext
@@ -41,14 +32,6 @@ class MediaStreamDevicePermissionContext
   void DecidePermission(
       std::unique_ptr<permissions::PermissionRequestData> request_data,
       permissions::BrowserPermissionCallback callback) override;
-#if BUILDFLAG(IS_ANDROID)
-  void NotifyPermissionSet(
-      const permissions::PermissionRequestData& request_data,
-      permissions::BrowserPermissionCallback callback,
-      bool persist,
-      const content::PermissionResult* permission_result,
-      const permissions::PermissionPromptDecision& decision) override;
-#endif
   void ResetPermission(const GURL& requesting_origin,
                        const GURL& embedding_origin) override;
 
@@ -62,18 +45,6 @@ class MediaStreamDevicePermissionContext
       const GURL& embedding_origin) const override;
 
  private:
-#if BUILDFLAG(IS_ANDROID)
-  // ContentSettingPermissionContextBase:
-  void UpdateTabContext(const permissions::PermissionRequestData& request_data,
-                        bool allowed) override;
-
-  void OnAndroidPermissionDecided(
-      const permissions::PermissionRequestData& request_data,
-      const content::PermissionResult& website_permission_result,
-      permissions::BrowserPermissionCallback callback,
-      bool permission_granted);
-#endif
-
   ContentSettingsType content_settings_type_;
 
   // Must be the last member.

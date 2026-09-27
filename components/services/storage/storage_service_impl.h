@@ -43,11 +43,9 @@ class StorageServiceImpl : public mojom::StorageService {
 
   // mojom::StorageService implementation:
   void EnableAggressiveDomStorageFlushing() override;
-#if !BUILDFLAG(IS_ANDROID)
   void SetDataDirectory(
       const base::FilePath& path,
       mojo::PendingRemote<mojom::Directory> directory) override;
-#endif
   void BindLocalStorageControl(
       const std::optional<base::FilePath>& path,
       mojo::PendingReceiver<mojom::LocalStorageControl> receiver) override;
@@ -66,23 +64,19 @@ class StorageServiceImpl : public mojom::StorageService {
   void ShutDownAndRemoveLocalStorage(LocalStorageImpl* storage);
 
  private:
-#if !BUILDFLAG(IS_ANDROID)
   // Binds a Directory receiver to the same remote implementation to which
   // |remote_data_directory_| is bound. It is invalid to call this when
   // |remote_data_directory_| is unbound.
   void BindDataDirectoryReceiver(
       mojo::PendingReceiver<mojom::Directory> receiver);
-#endif
 
   const mojo::Receiver<mojom::StorageService> receiver_;
   const scoped_refptr<base::SequencedTaskRunner> io_task_runner_;
 
-#if !BUILDFLAG(IS_ANDROID)
   // If bound, the service will assume it should not perform certain filesystem
   // operations directly and will instead go through this interface.
   base::FilePath remote_data_directory_path_;
   mojo::Remote<mojom::Directory> remote_data_directory_;
-#endif
 
   // Sets of all isolated local and session storages owned by the service. This
   // includes both persistent and in-memory storages.

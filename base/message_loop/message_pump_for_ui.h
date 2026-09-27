@@ -10,9 +10,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/message_loop/message_pump_android.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "base/message_loop/message_pump.h"
 #elif BUILDFLAG(IS_AIX)
 // No MessagePumpForUI, see below.
@@ -24,9 +22,7 @@
 
 namespace base {
 
-#if BUILDFLAG(IS_ANDROID)
-using MessagePumpForUI = MessagePumpAndroid;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 // MessagePumpForUI isn't bound to a specific impl on Mac. While each impl can
 // be represented by a plain MessagePump: message_pump_apple::Create() must be
 // used to instantiate the right impl.

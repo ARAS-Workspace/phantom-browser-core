@@ -138,7 +138,6 @@ class SpellcheckHunspellDictionary : public SpellcheckDictionary {
   // Attempt to download the dictionary.
   void DownloadDictionary(GURL url);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Figures out the location for the dictionary, verifies its contents, and
   // opens it.
   static DictionaryFile OpenDictionaryFile(base::TaskRunner* task_runner,
@@ -151,7 +150,6 @@ class SpellcheckHunspellDictionary : public SpellcheckDictionary {
   // The reply point for PostTaskAndReplyWithResult, called after the dictionary
   // file has been initialized.
   void InitializeDictionaryLocationComplete(DictionaryFile file);
-#endif
 
 #if BUILDFLAG(USE_BROWSER_SPELLCHECKER)
   void SpellCheckPlatformSetLanguageComplete(bool result);

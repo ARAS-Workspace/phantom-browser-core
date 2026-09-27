@@ -17,10 +17,8 @@
 #include "ui/base/mojom/window_show_state.mojom.h"
 #include "ui/gfx/geometry/rect.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/tab_groups/tab_group_id.h"
 #include "third_party/blink/public/mojom/picture_in_picture_window_options/picture_in_picture_window_options.mojom.h"
-#endif
 
 namespace content {
 
@@ -28,10 +26,8 @@ class WebContents;
 
 }  // namespace content
 
-#if !BUILDFLAG(IS_ANDROID)
 class Browser;
 class BrowserWindow;
-#endif
 
 // Parameters used when creating a new browser window.
 struct BrowserWindowCreateParams {
@@ -53,7 +49,6 @@ struct BrowserWindowCreateParams {
   BrowserWindowCreateParams& operator=(BrowserWindowCreateParams&&);
   ~BrowserWindowCreateParams();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Provides explicit cloning for desktop test suites without violating
   // move-only semantics on Android (satisfies crbug.com/413168662).
   BrowserWindowCreateParams Clone() const;
@@ -79,7 +74,6 @@ struct BrowserWindowCreateParams {
       bool user_gesture);
 
   static BrowserWindowCreateParams CreateForDevTools(Profile* profile);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // The type of browser window to create.
   // See BrowserWindowInterface::Type for more details.
@@ -106,7 +100,6 @@ struct BrowserWindowCreateParams {
   ui::mojom::WindowShowState initial_show_state =
       ui::mojom::WindowShowState::kDefault;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Represents whether a value was known to be explicitly specified.
   enum class ValueSpecified { kUnknown, kSpecified, kUnspecified };
 
@@ -190,14 +183,6 @@ struct BrowserWindowCreateParams {
   // system.
   int32_t restore_id = kDefaultRestoreId;
 #endif
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_ANDROID)
-  // An optional WebContents to be used when creating the browser window.
-  // Note: On Android, calls to CreateBrowserWindow will release this
-  // WebContent's ownership to an AndroidBrowserWindowCreateParams object.
-  std::unique_ptr<content::WebContents> web_contents;
-#endif
 };
 
 // Creates a new browser window according to the given `create_params`.
@@ -251,14 +236,12 @@ void CreateBrowserWindow(
     BrowserWindowCreateParams create_params,
     base::OnceCallback<void(BrowserWindowInterface*)> callback);
 
-#if !BUILDFLAG(IS_ANDROID)
 // WARNING: Use of this is DEPRECATED and exists only to support pre-existing
 // browser unittests.
 // TODO(crbug.com/417766643): Remove this once all use of Browser in unittests
 // has been eliminated.
 std::unique_ptr<Browser> DeprecatedCreateOwnedBrowserWindowForTesting(
     BrowserWindowCreateParams create_params);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Returns whether a browser window can currently be created for the specified
 // // profile. This condition may change during runtime for a given `profile`

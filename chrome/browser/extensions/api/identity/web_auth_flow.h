@@ -130,11 +130,6 @@ class WebAuthFlow : public content::WebContentsObserver,
   // Returns nullptr if the InfoBar is not displayed.
   base::WeakPtr<WebAuthFlowInfoBarDelegate> GetInfoBarDelegateForTesting();
 
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  void OnBrowserWindowInterfaceInitialized(BrowserWindowInterface* browser);
-  void SetPopupDisplayedCallbackForTesting(base::OnceClosure callback);
-#endif
-
  private:
   // WebContentsObserver implementation.
   void DidStopLoading() override;
@@ -198,10 +193,6 @@ class WebAuthFlow : public content::WebContentsObserver,
   // the error code when the flow times out.
   bool initial_url_loaded_ = false;
   base::ScopedObservation<Profile, ProfileObserver> profile_observation_{this};
-#if BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
-  base::OnceClosure popup_displayed_callback_for_testing_;
-  base::WeakPtrFactory<WebAuthFlow> weak_factory_{this};
-#endif
 };
 
 }  // namespace extensions

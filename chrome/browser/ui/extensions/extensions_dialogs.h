@@ -145,15 +145,6 @@ void ShowExtensionInstallBlockedByParentDialog(
     content::WebContents* web_contents,
     base::OnceClosure done_callback);
 
-#if BUILDFLAG(IS_ANDROID)
-// Shows a dialog to notify the user that they need to ask their parent for
-// approval to install an extension. This is the first of a set of dialogs for
-// supervised user accounts on Android.
-void ShowExtensionInstallAskParentDialog(content::WebContents* web_contents,
-                                         base::OnceClosure cancel_callback,
-                                         base::OnceClosure approve_callback);
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // Shows a dialog when the user tries to upload an extension to their account.
 void ShowUploadExtensionToAccountDialog(Profile* profile,
                                         gfx::NativeWindow parent,
@@ -161,7 +152,6 @@ void ShowUploadExtensionToAccountDialog(Profile* profile,
                                         base::OnceClosure accept_callback,
                                         base::OnceClosure cancel_callback);
 
-#if !BUILDFLAG(IS_ANDROID)
 // Shows a dialog when the user tries to perform a navigation and the target url
 // has a protocol handler registered by an extension to handle the url's scheme.
 void ShowConfirmProtocolHandlerDialog(
@@ -170,7 +160,6 @@ void ShowConfirmProtocolHandlerDialog(
     const std::optional<url::Origin>& initiating_origin,
     base::OnceCallback<void(bool)> granted_callback,
     base::OnceCallback<void()> denied_callback);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions
 

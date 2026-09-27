@@ -12,9 +12,7 @@
 #include "components/page_info/page_info_ui_delegate.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "components/page_info/core/proto/about_this_site_metadata.pb.h"
-#endif
 
 class Profile;
 
@@ -42,7 +40,6 @@ class ChromePageInfoUiDelegate : public PageInfoUiDelegate {
   // If "allow" option is not available, return the reason why.
   std::u16string GetAutomaticallyBlockedReason(ContentSettingsType type);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Returns "About this site" info for the active page.
   std::optional<page_info::proto::SiteInfo> GetAboutThisSiteInfo();
 
@@ -82,7 +79,6 @@ class ChromePageInfoUiDelegate : public PageInfoUiDelegate {
   void OpenSiteSettingsFileSystem() override;
 
   void OpenMerchantTrustSidePanel(const GURL& url);
-#endif  // !BUILDFLAG(IS_ANDROID)
   content::PermissionResult GetPermissionResult(
       blink::PermissionType permission) override;
   std::optional<content::PermissionResult> GetEmbargoResult(

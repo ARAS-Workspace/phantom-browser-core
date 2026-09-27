@@ -194,20 +194,6 @@ class HostZoomMap {
 
   // On Android only, set a callback for when the Java-side UI sets a default
   // zoom level so the HostZoomMapImpl does not depend on Prefs or //chrome/.
-#if BUILDFLAG(IS_ANDROID)
-  using DefaultZoomChangedCallback =
-      base::RepeatingCallback<void(double new_level)>;
-
-  virtual void SetDefaultZoomLevelPrefCallback(
-      DefaultZoomChangedCallback callback) = 0;
-
-  // TODO(crbug.com/40898422): Make an Android-specific impl of host_zoom_map,
-  // or
-  //                          combine method with GetZoomLevelForHostAndScheme.
-  virtual double GetZoomLevelForHostAndSchemeAndroid(
-      const std::string& scheme,
-      const std::string& host) = 0;
-#endif
 
   // Allows lookup and setting of ZoomLevel for the content currently displayed
   // in the indicated FrameTreeNode. `ftn_id` must refer to a RenderFrameHost
