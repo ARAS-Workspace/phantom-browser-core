@@ -27,14 +27,7 @@
 #include "components/variations/variations_features.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-// ZSTD is not supported on Android due to binary size increase. See
-// crbug.com/40196713.
-// Note: When changing this, seed file migration logic will need to be added.
-#define USE_ZSTD_FOR_SEEDS !BUILDFLAG(IS_ANDROID)
-
-#if USE_ZSTD_FOR_SEEDS
 #include "third_party/zstd/src/lib/zstd.h"  // nogncheck
-#endif
 
 namespace variations {
 namespace {
@@ -56,18 +49,15 @@ struct PermanentCountryVersion {
 // information.
 constexpr char kSeedWriterHistogramSuffix[] = "VariationsSeedsV2";
 
-#if USE_ZSTD_FOR_SEEDS
 // The compression level to use for ZSTD.
 // TODO(crbug.com/453558393): A locally run benchmark was performed to determine
 // the initial compression level. Run an experiment to determine the optimal
 // compression level.
 constexpr int kZstdCompressionLevel = 2;
-#endif  // USE_ZSTD_FOR_SEEDS
 
 bool Compress(std::string_view uncompressed_data,
               std::string* compressed_data) {
   CHECK(compressed_data) << "compressed_data is null";
-#if USE_ZSTD_FOR_SEEDS
   size_t buff_size = ZSTD_compressBound(uncompressed_data.size());
   if (ZSTD_isError(buff_size)) {
     return false;
@@ -82,11 +72,6 @@ bool Compress(std::string_view uncompressed_data,
   }
   compressed_data->resize(seed_compressed_size);
   return true;
-#else   // !USE_ZSTD_FOR_SEEDS
-  // Android does not support ZSTD because of binary size increase, so use gzip
-  // compression instead.
-  return compression::GzipCompress(uncompressed_data, compressed_data);
-#endif  // USE_ZSTD_FOR_SEEDS
 }
 
 base::expected<std::string, LoadSeedResult> Uncompress(
@@ -94,7 +79,6 @@ base::expected<std::string, LoadSeedResult> Uncompress(
     std::string_view histogram_suffix) {
   std::string uncompressed_contents;
   const base::TimeTicks start_time = base::TimeTicks::Now();
-#if USE_ZSTD_FOR_SEEDS
   auto uncompressed_buff_size =
       ZSTD_getFrameContentSize(compressed_data.data(), compressed_data.size());
   if (uncompressed_buff_size == ZSTD_CONTENTSIZE_ERROR ||
@@ -118,18 +102,6 @@ base::expected<std::string, LoadSeedResult> Uncompress(
   if (ZSTD_isError(uncompressed_size)) {
     return base::unexpected(LoadSeedResult::kCorruptZstd);
   }
-#else   // !USE_ZSTD_FOR_SEEDS
-  // Android does not support ZSTD because of binary size increase, so use gzip
-  // compression instead. Migrating to ZSTD will require a migration from the
-  // current gzip format.
-  if (compression::GetUncompressedSize(compressed_data) >
-      kMaxUncompressedSeedSize) {
-    return base::unexpected(LoadSeedResult::kExceedsUncompressedSizeLimit);
-  }
-  if (!compression::GzipUncompress(compressed_data, &uncompressed_contents)) {
-    return base::unexpected(LoadSeedResult::kCorruptGzip);
-  }
-#endif  // USE_ZSTD_FOR_SEEDS
   base::UmaHistogramTimes(
       base::StrCat(
           {"Variations.SeedFile.DecompressionTime.", histogram_suffix}),
@@ -230,15 +202,8 @@ void SetUpSeedFileTrial(
   // Launch seed files on desktop. Continue the experiment on
   // Android Chrome: 50% enabled on pre-Stable and 10%
   // enabled on Stable.
-#if BUILDFLAG(IS_ANDROID)
-  base::FieldTrial::Probability control_probability =
-      channel == version_info::Channel::STABLE ? 10 : 50;
-  base::FieldTrial::Probability seed_files_probability =
-      channel == version_info::Channel::STABLE ? 10 : 50;
-#else
   base::FieldTrial::Probability control_probability = 0;
   base::FieldTrial::Probability seed_files_probability = 100;
-#endif
 
   scoped_refptr<base::FieldTrial> trial(
       base::FieldTrialList::FactoryGetFieldTrial(

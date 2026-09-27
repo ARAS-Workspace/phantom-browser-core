@@ -85,7 +85,7 @@ TEST_F(PasswordManagerFeaturesUtilTest,
 TEST_F(PasswordManagerFeaturesUtilTest, IsAccountStorageActive_Syncing) {
   sync_service_.SetSignedIn(signin::ConsentLevel::kSync);
 
-  EXPECT_EQ(IsAccountStorageActive(&sync_service_), BUILDFLAG(IS_ANDROID));
+  EXPECT_FALSE(IsAccountStorageActive(&sync_service_));
 }
 
 }  // namespace

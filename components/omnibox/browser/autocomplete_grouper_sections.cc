@@ -21,7 +21,6 @@
 
 namespace {
 constexpr size_t kMobileMostVisitedTilesLimit = 10;
-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
 constexpr size_t kMaxSuggestionsPerUnscopedExtension = 4;
 constexpr size_t kMaxExtensions = 2;
 }  // namespace
@@ -798,9 +797,7 @@ void ZpsSectionWithMVTiles::InitFromMatches(ACMatches& matches) {
         return m.suggestion_group_id.value_or(omnibox::GROUP_INVALID) ==
                omnibox::GROUP_MOBILE_MOST_VISITED;
       });
-  const size_t max_most_visited_tiles =
-      is_android ? OmniboxFieldTrial::kOmniboxNumWebZpsMostVisitedUrls.Get()
-                 : kMobileMostVisitedTilesLimit;
+  const size_t max_most_visited_tiles = kMobileMostVisitedTilesLimit;
   // In the event we find more MV tiles than we can accommodate, trim the limit.
   limit_ += std::min(tile_count, max_most_visited_tiles);
   // Note that the horizontal render group takes a single slot in vertical list:

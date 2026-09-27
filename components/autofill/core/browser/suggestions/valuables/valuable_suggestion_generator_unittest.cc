@@ -39,16 +39,9 @@ using testing::Matcher;
 
 // Custom matcher to verify the icon image expectations.
 MATCHER_P2(SuggestionIconHasImageOrUrl, expected_image, expected_url, "") {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    auto* custom_icon_url =
-        std::get_if<Suggestion::CustomIconUrl>(&arg.custom_icon);
-    GURL url = custom_icon_url ? **custom_icon_url : GURL();
-    return url == expected_url;
-  } else {
-    CHECK(std::holds_alternative<gfx::Image>(arg.custom_icon));
-    return gfx::test::AreImagesEqual(std::get<gfx::Image>(arg.custom_icon),
-                                     expected_image);
-  }
+  CHECK(std::holds_alternative<gfx::Image>(arg.custom_icon));
+  return gfx::test::AreImagesEqual(std::get<gfx::Image>(arg.custom_icon),
+                                   expected_image);
 }
 
 Matcher<Suggestion> EqualsLoyaltyCardSuggestion(
@@ -61,7 +54,6 @@ Matcher<Suggestion> EqualsLoyaltyCardSuggestion(
       {{Suggestion::Text(merchant_name)}}, Suggestion::Guid(id));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 Matcher<Suggestion> EqualsLoyaltyCardSuggestion(
     const std::u16string& number,
     const std::u16string& merchant_name,
@@ -70,7 +62,6 @@ Matcher<Suggestion> EqualsLoyaltyCardSuggestion(
   return AllOf(EqualsLoyaltyCardSuggestion(number, merchant_name, id),
                Field(&Suggestion::custom_icon, letter_icon));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 Matcher<Suggestion> EqualsManageLoyaltyCardsSuggestion() {
   return EqualsSuggestion(
@@ -185,17 +176,14 @@ TEST_F(ValuableSuggestionGeneratorTest, WithMatchingDomain) {
                                       "loyalty_card_id_2"),
           EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
                                       "loyalty_card_id_3"),
-#if !BUILDFLAG(IS_ANDROID)
           EqualsSuggestion(SuggestionType::kSeparator),
           EqualsSuggestion(
               SuggestionType::kAllLoyaltyCardsEntry,
               l10n_util::GetStringUTF16(
                   IDS_AUTOFILL_LOYALTY_CARDS_ALL_YOUR_CARDS_SUBMENU_TITLE)),
-#endif  // !BUILDFLAG(IS_ANDROID)
           EqualsSuggestion(SuggestionType::kSeparator),
           EqualsManageLoyaltyCardsSuggestion()));
 
-#if !BUILDFLAG(IS_ANDROID)
   const Suggestion& lc_submenu_suggestion = suggestions_with_matching_domain[3];
   EXPECT_EQ(lc_submenu_suggestion.acceptability,
             Suggestion::Acceptability::kSelectableButUnacceptable);
@@ -208,7 +196,6 @@ TEST_F(ValuableSuggestionGeneratorTest, WithMatchingDomain) {
                                       "loyalty_card_id_2"),
           EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
                                       "loyalty_card_id_3")));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ValuableSuggestionGeneratorTest, WithMatchingDomainAndFieldAutofilled) {
@@ -226,18 +213,15 @@ TEST_F(ValuableSuggestionGeneratorTest, WithMatchingDomainAndFieldAutofilled) {
                                       "loyalty_card_id_2"),
           EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
                                       "loyalty_card_id_3"),
-#if !BUILDFLAG(IS_ANDROID)
           EqualsSuggestion(SuggestionType::kSeparator),
           EqualsSuggestion(
               SuggestionType::kAllLoyaltyCardsEntry,
               l10n_util::GetStringUTF16(
                   IDS_AUTOFILL_LOYALTY_CARDS_ALL_YOUR_CARDS_SUBMENU_TITLE)),
-#endif  // !BUILDFLAG(IS_ANDROID)
           EqualsSuggestion(SuggestionType::kSeparator),
           EqualsSuggestion(SuggestionType::kUndo),
           EqualsManageLoyaltyCardsSuggestion()));
 
-#if !BUILDFLAG(IS_ANDROID)
   const Suggestion& lc_submenu_suggestion = suggestions_with_matching_domain[3];
   EXPECT_EQ(lc_submenu_suggestion.acceptability,
             Suggestion::Acceptability::kSelectableButUnacceptable);
@@ -250,7 +234,6 @@ TEST_F(ValuableSuggestionGeneratorTest, WithMatchingDomainAndFieldAutofilled) {
                                       "loyalty_card_id_2"),
           EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
                                       "loyalty_card_id_3")));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ValuableSuggestionGeneratorTest, AllMatchDomain) {
@@ -346,23 +329,6 @@ TEST_F(ValuableSuggestionGeneratorTest,
   MergeLoyaltyCardsAndAddressSuggestions(email_suggestions,
                                          std::move(loyalty_card_suggestions));
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(
-      email_suggestions,
-      testing::ElementsAre(
-          EqualsSuggestion(SuggestionType::kAddressEntry,
-                           u"test-email1@domain1.example"),
-          EqualsSuggestion(SuggestionType::kAddressEntry,
-                           u"test-email2@domain2.example"),
-          EqualsSuggestion(SuggestionType::kSeparator),
-          EqualsSuggestion(
-              SuggestionType::kManageAddress,
-              l10n_util::GetStringUTF16(IDS_AUTOFILL_MANAGE_ADDRESSES)),
-          EqualsLoyaltyCardSuggestion(u"987654321987654321", u"CVS Pharmacy",
-                                      "loyalty_card_id_1"),
-          EqualsLoyaltyCardSuggestion(u"37262999281", u"Ticket Maester",
-                                      "loyalty_card_id_2")));
-#else
   EXPECT_THAT(
       email_suggestions,
       testing::ElementsAre(
@@ -396,7 +362,6 @@ TEST_F(ValuableSuggestionGeneratorTest,
   EXPECT_THAT(lc_submenu_suggestion,
               HasIcon(Suggestion::Icon::kGoogleWalletMonochrome));
 #endif
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(ValuableSuggestionGeneratorTest,
@@ -473,26 +438,6 @@ TEST_F(ValuableSuggestionGeneratorTest,
   MergeLoyaltyCardsAndAddressSuggestions(email_suggestions,
                                          std::move(loyalty_card_suggestions));
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(
-      email_suggestions,
-      testing::ElementsAre(
-          EqualsSuggestion(SuggestionType::kAddressEntry,
-                           u"test-email1@domain1.example"),
-          EqualsSuggestion(SuggestionType::kAddressEntry,
-                           u"test-email2@domain2.example"),
-          EqualsSuggestion(SuggestionType::kSeparator),
-          EqualsSuggestion(
-              SuggestionType::kUndo,
-              l10n_util::GetStringUTF16(IDS_AUTOFILL_UNDO_MENU_ITEM)),
-          EqualsSuggestion(
-              SuggestionType::kManageAddress,
-              l10n_util::GetStringUTF16(IDS_AUTOFILL_MANAGE_ADDRESSES)),
-          EqualsLoyaltyCardSuggestion(u"987654321987654321", u"CVS Pharmacy",
-                                      "loyalty_card_id_1"),
-          EqualsLoyaltyCardSuggestion(u"37262999281", u"Ticket Maester",
-                                      "loyalty_card_id_2")));
-#else
   EXPECT_THAT(
       email_suggestions,
       testing::ElementsAre(
@@ -525,7 +470,6 @@ TEST_F(ValuableSuggestionGeneratorTest,
                                       Suggestion::LetterMonochromeIcon(u"T")),
           EqualsSuggestion(SuggestionType::kSeparator),
           EqualsManageLoyaltyCardsSuggestion()));
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // TODO(crbug.com/431155933): Remove this test when cleaning up the feature.
@@ -634,7 +578,6 @@ TEST_F(
       PasswordFormClassification{
           .type = PasswordFormClassification::Type::kNoPasswordForm},
       client());
-#if !BUILDFLAG(IS_ANDROID)
   ASSERT_FALSE(suggestions.empty());
   const Suggestion& lc_submenu_suggestion = suggestions[0];
   EXPECT_EQ(lc_submenu_suggestion.acceptability,
@@ -650,10 +593,6 @@ TEST_F(
                                       "loyalty_card_id_3")));
   EXPECT_THAT(suggestions[1], EqualsSuggestion(SuggestionType::kSeparator));
   EXPECT_THAT(suggestions[2], EqualsManageLoyaltyCardsSuggestion());
-#else  // !BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(suggestions, testing::ElementsAre(EqualsSuggestion(
-                               SuggestionType::kAllLoyaltyCardsEntry)));
-#endif
 }
 
 TEST_F(
@@ -666,16 +605,6 @@ TEST_F(
                                     &field(), PasswordFormClassification(),
                                     client());
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(suggestions_with_matching_domain,
-              testing::ElementsAre(
-                  EqualsLoyaltyCardSuggestion(u"37262999281", u"Ticket Maester",
-                                              "loyalty_card_id_2"),
-                  EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
-                                              "loyalty_card_id_3"),
-                  EqualsSuggestion(SuggestionType::kSeparator),
-                  EqualsManageLoyaltyCardsSuggestion()));
-#else  // BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(
       suggestions_with_matching_domain,
       testing::ElementsAre(
@@ -703,7 +632,6 @@ TEST_F(
                                       "loyalty_card_id_2"),
           EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
                                       "loyalty_card_id_3")));
-#endif
 }
 
 TEST_F(
@@ -737,16 +665,6 @@ TEST_F(ValuableSuggestionGeneratorWithNonAffiliationSupportTest,
               .type = PasswordFormClassification::Type::kLoginForm},
           client());
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_THAT(suggestions_with_matching_domain,
-              testing::ElementsAre(
-                  EqualsLoyaltyCardSuggestion(u"37262999281", u"Ticket Maester",
-                                              "loyalty_card_id_2"),
-                  EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
-                                              "loyalty_card_id_3"),
-                  EqualsSuggestion(SuggestionType::kSeparator),
-                  EqualsManageLoyaltyCardsSuggestion()));
-#else  // BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(
       suggestions_with_matching_domain,
       testing::ElementsAre(
@@ -774,7 +692,6 @@ TEST_F(ValuableSuggestionGeneratorWithNonAffiliationSupportTest,
                                       "loyalty_card_id_2"),
           EqualsLoyaltyCardSuggestion(u"998766823", u"Walgreens",
                                       "loyalty_card_id_3")));
-#endif
 }
 
 TEST_F(ValuableSuggestionGeneratorWithNonAffiliationSupportTest,

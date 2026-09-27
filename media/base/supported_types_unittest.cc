@@ -296,13 +296,11 @@ TEST(SupportedTypesTest, XHE_AACSupported) {
   UpdateDefaultDecoderSupportedAudioTypes({aac});
 
   EXPECT_EQ(
-#if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && \
-    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && BUILDFLAG(IS_MAC)
       kPropCodecsEnabled,
 #else
       false,
-#endif  // BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && (BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(IS_MAC))
+#endif  // BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && BUILDFLAG(IS_MAC)
       IsDecoderSupportedAudioType(aac));
 }
 
@@ -514,8 +512,7 @@ TEST(SupportedTypesTest, MayHaveAndAllowSelectOSSoftwareEncoder) {
   EXPECT_EQ(MayHaveAndAllowSelectOSSoftwareEncoder(VideoCodec::kHEVC),
             BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER));
   EXPECT_EQ(MayHaveAndAllowSelectOSSoftwareEncoder(VideoCodec::kH264),
-            (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)) &&
-                !IsOpenH264SoftwareEncoderEnabled());
+            BUILDFLAG(IS_MAC) && !IsOpenH264SoftwareEncoderEnabled());
 }
 
 TEST(SupportedTypesTest, ColorSpaceSupport_UnusualButValid_VP9) {

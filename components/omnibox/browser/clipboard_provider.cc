@@ -46,7 +46,6 @@
 #include "ui/base/clipboard/clipboard.h"  // nogncheck
 
 namespace {
-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
 
 const size_t kMaxClipboardSuggestionShownNumTimesSimpleSize = 20;
 
@@ -215,14 +214,8 @@ void ClipboardProvider::AddCreatedMatchWithTracking(
                                            matches_.empty(), match.type,
                                            clipboard_contents_age);
 
-  if (is_android && omnibox::IsNTPPage(input.current_page_classification())) {
-    // Assign the Clipboard to the PZPS group on NTP pages to improve the use
-    // of the suggest space.
-    match.suggestion_group_id = omnibox::GROUP_PERSONALIZED_ZERO_SUGGEST;
-  } else {
-    // Leave the clipboard in its dedicated section otherwise.
-    match.suggestion_group_id = omnibox::GROUP_MOBILE_CLIPBOARD;
-  }
+  // Leave the clipboard in its dedicated section.
+  match.suggestion_group_id = omnibox::GROUP_MOBILE_CLIPBOARD;
 
   matches_.push_back(match);
 }
@@ -568,20 +561,6 @@ bool ClipboardProvider::UpdateClipboardTextContent(
   // The text in the clipboard is a url. We don't want to prompt the user to
   // search for a url.
   if (GURL(text).is_valid()) {
-    // Note: on Android, the clipboard content is evaluated by Android
-    // Framework. The Framework is familiar with only a handful of URL schemes,
-    // and any non-explicitly annotated URL with scheme not recognized by the
-    // Android is immediately annotated as Text. Additionally, any application
-    // setting clipboard content may supply its own annotation, which may be
-    // inaccurate.
-    // we do not have the control over all sources from where such URLs can come
-    // from. The change below allows us to still open these URLs. Without this
-    // change Clipboard suggestions may be non interactable, if the clipboard
-    // contains an unannotated or mis-classified URL not recognized by Android.
-    if constexpr (is_android) {
-      UpdateClipboardURLContent(GURL(text), match);
-      return true;
-    }
     return false;
   }
 

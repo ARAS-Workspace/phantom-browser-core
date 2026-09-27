@@ -31,13 +31,11 @@ AutofillPopupHideHelper::AutofillPopupHideHelper(
       rfh_id_(rfh_id),
       last_web_contents_size_(web_contents ? web_contents->GetSize()
                                            : gfx::Size()) {
-#if !BUILDFLAG(IS_ANDROID)
   // There may not always be a ZoomController, e.g., in tests.
   if (auto* zoom_controller =
           zoom::ZoomController::FromWebContents(web_contents)) {
     zoom_observation_.Observe(zoom_controller);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   picture_in_picture_window_observation_.Observe(
       PictureInPictureWindowManager::GetInstance());
@@ -57,11 +55,6 @@ void AutofillPopupHideHelper::OnWebContentsLostFocus(
 }
 
 void AutofillPopupHideHelper::PrimaryMainFrameWasResized(bool width_changed) {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    // Ignore virtual keyboard showing and hiding a strip of suggestions.
-    return;
-  }
-
   // To prevent closing the popup when the content hasn't actually moved, ignore
   // events where the WebContents size is unchanged.
   const gfx::Size current_size =
@@ -122,7 +115,6 @@ void AutofillPopupHideHelper::RenderFrameDeleted(
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void AutofillPopupHideHelper::OnZoomControllerDestroyed(
     zoom::ZoomController* source) {
   zoom_observation_.Reset();
@@ -138,7 +130,6 @@ void AutofillPopupHideHelper::OnZoomChanged(
   }
   hiding_callback_.Run(SuggestionHidingReason::kContentAreaMoved);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void AutofillPopupHideHelper::OnEnterPictureInPicture() {
   if (pip_detection_callback_.Run()) {

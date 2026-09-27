@@ -113,26 +113,6 @@ void OnCreditCardFetched(base::WeakPtr<BrowserAutofillManager> manager,
   }
 }
 
-#if BUILDFLAG(IS_ANDROID)
-bool ShouldShowLoadingDialog(EntityInstance::RecordType record_type,
-                             bool reauth_attempted,
-                             bool will_fetch_from_server) {
-  if (!reauth_attempted || !will_fetch_from_server) {
-    return false;
-  }
-  switch (record_type) {
-    case EntityInstance::RecordType::kLocal:
-      return false;
-    case EntityInstance::RecordType::kServerWallet:
-      return base::FeatureList::IsEnabled(
-          features::kAutofillAiShowServerWalletFillingYourInfoDialog);
-    case EntityInstance::RecordType::kPersonalContext:
-      return base::FeatureList::IsEnabled(
-          features::kAutofillAiShowPersonalContextFillingYourInfoDialog);
-  }
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 void OnAuthenticationComplete(base::WeakPtr<BrowserAutofillManager> manager,
                               EntityInstance::RecordType record_type,
                               bool reauth_attempted,
@@ -140,12 +120,6 @@ void OnAuthenticationComplete(base::WeakPtr<BrowserAutofillManager> manager,
   if (!manager) {
     return;
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (ShouldShowLoadingDialog(record_type, reauth_attempted,
-                              will_fetch_from_server)) {
-    manager->client().ShowAutofillAiLoadingDialog();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Fills the queried form with the provided `EntityInstance` in `result`,
@@ -166,14 +140,6 @@ void OnEntityInstanceFetched(
     return;
   }
   base::OnceClosure dismiss_closure = loading_dialog_dismiss_closure.Release();
-#if BUILDFLAG(IS_ANDROID)
-  if (ShouldShowLoadingDialog(record_type, reauth_attempted,
-                              did_fetch_from_server)) {
-    if (dismiss_closure) {
-      std::move(dismiss_closure).Run();
-    }
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   if (reauth_attempted) {
     const bool auth_succeeded =
         result.has_value() ||
@@ -553,12 +519,7 @@ void AutofillExternalDelegate::AttemptToDisplayAutofillSuggestions(
   const bool should_use_caret_bounds =
       (show_proactive_nudge_at_caret || is_at_memory) && are_caret_bounds_valid;
 
-  const PopupAnchorType default_anchor_type =
-#if BUILDFLAG(IS_ANDROID)
-      PopupAnchorType::kKeyboardAccessory;
-#else
-      PopupAnchorType::kField;
-#endif
+  const PopupAnchorType default_anchor_type = PopupAnchorType::kField;
 
   const bool show_tabbed_popup = ShouldShowPayNowPayLaterTabs();
   if (show_tabbed_popup) {
@@ -575,11 +536,6 @@ void AutofillExternalDelegate::AttemptToDisplayAutofillSuggestions(
 
   PopupAnchorType anchor_type =
       should_use_caret_bounds ? PopupAnchorType::kCaret : default_anchor_type;
-#if BUILDFLAG(IS_ANDROID)
-  if (is_at_memory) {
-    anchor_type = PopupAnchorType::kAtMemoryBottomSheet;
-  }
-#endif
 
   AutofillClient::PopupOpenArgs open_args(
       trigger_field->global_id().frame_token,
@@ -930,12 +886,6 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kManageLoyaltyCard:
     case SuggestionType::kManageEnhancedAutofill: {
       manager_->client().ShowAutofillSettings(suggestion.type);
-      // Keep the bottom sheet open on Android if triggered from AtMemory.
-      if constexpr (BUILDFLAG(IS_ANDROID)) {
-        if (IsAtMemoryTriggerSource(trigger_source_)) {
-          return;
-        }
-      }
       break;
     }
     case SuggestionType::kUndo:
@@ -1010,11 +960,6 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
       // either the `OnAuthenticationCompleteCallback` callback is invoked or
       // the AutofillAiAccessManager is reset.
       base::OnceClosure dismiss_dialog_closure;
-#if BUILDFLAG(IS_ANDROID)
-      dismiss_dialog_closure =
-          base::BindOnce(&AutofillClient::DismissAutofillAiLoadingDialog,
-                         manager_->client().GetWeakPtr());
-#endif  // BUILDFLAG(IS_ANDROID)
       const bool is_async =
           manager_->GetAutofillAiAccessManager().FetchEntityInstance(
               *entity, will_fill_sensitive_info,
@@ -1522,13 +1467,11 @@ void AutofillExternalDelegate::InsertDataListValues(
            datalist_values.contains(suggestion.main_text.value);
   });
 
-  if constexpr (!BUILDFLAG(IS_ANDROID)) {
-    // Insert the separator between the datalist and Autofill/Autocomplete
-    // values (if there are any).
-    if (!suggestions.empty()) {
-      suggestions.insert(suggestions.begin(),
-                         Suggestion(SuggestionType::kSeparator));
-    }
+  // Insert the separator between the datalist and Autofill/Autocomplete
+  // values (if there are any).
+  if (!suggestions.empty()) {
+    suggestions.insert(suggestions.begin(),
+                       Suggestion(SuggestionType::kSeparator));
   }
 
   // Insert the datalist elements at the beginning.
@@ -1596,7 +1539,6 @@ void AutofillExternalDelegate::DidAcceptAddressSuggestion(
     default:
       NOTREACHED();  // Should be handled elsewhere.
   }
-#if !BUILDFLAG(IS_ANDROID)
   // The user having accepted an address suggestion on this field, all strikes
   // previously recorded for this field are cleared so that address suggestions
   // can be automatically shown again if needed.
@@ -1606,7 +1548,6 @@ void AutofillExternalDelegate::DidAcceptAddressSuggestion(
       .ClearStrikesToBlockAddressSuggestions(
           form->form_signature(),
           CalculateFieldSignatureForField(*trigger_field), form->source_url());
-#endif
 }
 
 void AutofillExternalDelegate::DidAcceptPaymentsSuggestion(

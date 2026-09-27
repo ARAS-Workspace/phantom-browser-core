@@ -27,8 +27,6 @@
 #include "ui/base/device_form_factor.h"
 
 namespace {
-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
-constexpr bool is_desktop_android = !!BUILDFLAG(IS_DESKTOP_ANDROID);
 
 // Returns whether specific context is eligible for a verbatim match.
 // Offers verbatim match for:
@@ -42,10 +40,6 @@ bool IsVerbatimMatchEligible(
       context == OEP::ANDROID_SHORTCUTS_WIDGET ||
       omnibox::IsComposebox(context)) {
     return true;
-  }
-
-  if (is_desktop_android) {
-    return false;
   }
 
   return context == OEP::SEARCH_RESULT_PAGE_DOING_SEARCH_TERM_REPLACEMENT ||
@@ -177,49 +171,6 @@ void ZeroSuggestVerbatimMatchProvider::CreateVerbatimMatch(
   // If the URL suggestion comes from the default search engine, extract the
   // original search query and place it in fill_into_edit, to permit re-use of
   // the query for manual refinement.
-  if constexpr (is_android) {
-    auto* const url_service = client_->GetTemplateURLService();
-    if (url_service->IsSearchResultsPageFromDefaultSearchProvider(
-            match.destination_url)) {
-      auto* const dse = url_service->GetDefaultSearchProvider();
-      if (dse->url_ref().SupportsReplacement(
-              url_service->search_terms_data())) {
-        dse->ExtractSearchTermsFromURL(match.destination_url,
-                                       url_service->search_terms_data(),
-                                       &match.contents);
-        match.contents = AutocompleteInput::SanitizeString(match.contents);
-        // Upgrade Verbatim Match to a SEARCH_WHAT_YOU_TYPED.
-        match.type = AutocompleteMatchType::SEARCH_WHAT_YOU_TYPED;
-        match.keyword = dse->keyword();
-        match.fill_into_edit = match.contents;
-        if (match.description.empty() ||
-            match.description ==
-                base::UTF8ToUTF16(match.destination_url.spec())) {
-          match.description = match.fill_into_edit;
-          if (match.description_class.empty()) {
-            match.description_class.push_back({0, ACMatchClassification::NONE});
-          }
-        }
-      }
-    } else {
-      // URL suggestion here does not come from the default search engine.
-      // Ensure that distilled URL is transformed to original URL for
-      // fill_into_edit and contents fields of the suggestion.
-      if (dom_distiller::url_utils::IsDistilledPage(match.destination_url)) {
-        GURL original_url =
-            dom_distiller::url_utils::GetOriginalUrlFromDistillerUrl(
-                match.destination_url);
-        match.fill_into_edit = base::UTF8ToUTF16(original_url.spec());
-        match.contents = url_formatter::FormatUrl(
-            original_url,
-            url_formatter::kFormatUrlOmitDefaults |
-                url_formatter::kFormatUrlOmitHTTPS |
-                url_formatter::kFormatUrlOmitTrivialSubdomains,
-            base::UnescapeRule::SPACES, nullptr, nullptr, nullptr);
-      }
-    }
-  }
-
   match.provider = this;
   matches_.push_back(std::move(match));
 }

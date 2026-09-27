@@ -60,15 +60,9 @@
 #include "url/third_party/mozilla/url_parse.h"
 #include "url/url_util.h"
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 #include "components/omnibox/browser/suggestion_answer.h"
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/vector_icons/vector_icons.h"     // nogncheck
-#endif
-
-constexpr bool kIsAndroid = BUILDFLAG(IS_ANDROID);
-constexpr bool kIsDesktopAndroid = BUILDFLAG(IS_DESKTOP_ANDROID);
-constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID) || kIsDesktopAndroid;
 
 namespace {
 
@@ -130,7 +124,7 @@ int GetDeduplicationProviderPreferenceScore(
           {AutocompleteProvider::TYPE_BOOKMARK, 1},
           // Don't let bookmarks override builtins, as that interferes with
           // starter pack matches when user has bookmarked their destination.
-          {AutocompleteProvider::TYPE_BUILTIN, kIsDesktop ? 1 : 0},
+          {AutocompleteProvider::TYPE_BUILTIN, 1},
           // Prefer non-shorcut matches over shortcuts, the latter of which may
           // have stale or missing URL titles (the latter from what-you-typed
           // matches).
@@ -289,9 +283,6 @@ AutocompleteMatch::AutocompleteMatch(const AutocompleteMatch& match)
       suggest_type(match.suggest_type),
       subtypes(match.subtypes),
       has_tab_match(match.has_tab_match),
-#if BUILDFLAG(IS_ANDROID)
-      android_tab_id(match.android_tab_id),
-#endif
       associated_keyword(match.associated_keyword),
       keyword(match.keyword),
       from_keyword(match.from_keyword),
@@ -320,8 +311,7 @@ AutocompleteMatch::AutocompleteMatch(const AutocompleteMatch& match)
       history_embeddings_answer_header_loading(
           match.history_embeddings_answer_header_loading),
       feedback_type(match.feedback_type),
-      matching_tab_group_uuid(match.matching_tab_group_uuid) {
-}
+      matching_tab_group_uuid(match.matching_tab_group_uuid) {}
 
 AutocompleteMatch::AutocompleteMatch(AutocompleteMatch&& match) noexcept {
   *this = std::move(match);
@@ -393,20 +383,10 @@ AutocompleteMatch& AutocompleteMatch::operator=(
       std::move(match.history_embeddings_answer_header_loading);
   feedback_type = std::move(match.feedback_type);
   matching_tab_group_uuid = std::move(match.matching_tab_group_uuid);
-#if BUILDFLAG(IS_ANDROID)
-  android_tab_id = std::move(match.android_tab_id);
-  DestroyJavaObject();
-  std::swap(java_match_, match.java_match_);
-  UpdateJavaObjectNativeRef();
-#endif
   return *this;
 }
 
-AutocompleteMatch::~AutocompleteMatch() {
-#if BUILDFLAG(IS_ANDROID)
-  DestroyJavaObject();
-#endif
-}
+AutocompleteMatch::~AutocompleteMatch() {}
 
 AutocompleteMatch& AutocompleteMatch::operator=(
     const AutocompleteMatch& match) {
@@ -479,22 +459,9 @@ AutocompleteMatch& AutocompleteMatch::operator=(
   feedback_type = match.feedback_type;
   matching_tab_group_uuid = match.matching_tab_group_uuid;
 
-#if BUILDFLAG(IS_ANDROID)
-  android_tab_id = match.android_tab_id;
-  // In case the target element previously held a java object, release it.
-  // This happens, when in an expression "match1 = match2;" match1 already
-  // is initialized and linked to a Java object: we rewrite the contents of the
-  // match1 object and it would be desired to either update its corresponding
-  // Java element, or drop it and construct it lazily the next time it is
-  // needed.
-  // Note that because Java<>C++ AutocompleteMatch relation is 1:1, we do not
-  // want to copy the object here.
-  DestroyJavaObject();
-#endif
   return *this;
 }
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 // static
 const gfx::VectorIcon& AutocompleteMatch::AnswerTypeToAnswerIcon(
     omnibox::AnswerType type) {
@@ -779,7 +746,6 @@ const gfx::VectorIcon& AutocompleteMatch::GetVectorIcon(
                  : omnibox::kPageChromeRefreshOldIcon;
   }
 }
-#endif
 
 // static
 bool AutocompleteMatch::MoreRelevant(const AutocompleteMatch& match1,
@@ -795,26 +761,24 @@ bool AutocompleteMatch::MoreRelevant(const AutocompleteMatch& match1,
 // static
 bool AutocompleteMatch::BetterDuplicate(const AutocompleteMatch& match1,
                                         const AutocompleteMatch& match2) {
-  if (kIsDesktop) {
-    // Prefer featured Enterprise site search matches.
-    if (match1.type == AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH &&
-        match2.type != AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH) {
-      return true;
-    }
-    if (match1.type != AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH &&
-        match2.type == AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH) {
-      return false;
-    }
+  // Prefer featured Enterprise site search matches.
+  if (match1.type == AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH &&
+      match2.type != AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH) {
+    return true;
+  }
+  if (match1.type != AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH &&
+      match2.type == AutocompleteMatchType::FEATURED_ENTERPRISE_SEARCH) {
+    return false;
+  }
 
-    // Prefer starter pack matches.
-    if (match1.type == AutocompleteMatchType::STARTER_PACK &&
-        match2.type != AutocompleteMatchType::STARTER_PACK) {
-      return true;
-    }
-    if (match1.type != AutocompleteMatchType::STARTER_PACK &&
-        match2.type == AutocompleteMatchType::STARTER_PACK) {
-      return false;
-    }
+  // Prefer starter pack matches.
+  if (match1.type == AutocompleteMatchType::STARTER_PACK &&
+      match2.type != AutocompleteMatchType::STARTER_PACK) {
+    return true;
+  }
+  if (match1.type != AutocompleteMatchType::STARTER_PACK &&
+      match2.type == AutocompleteMatchType::STARTER_PACK) {
+    return false;
   }
 
   // Prefer entity and answer matches over non-entity & non-answer matches, if
@@ -1694,12 +1658,6 @@ int AutocompleteMatch::GetSortingOrder() const {
 
   if (IsStarterPackType(type)) {
     return 1;
-  }
-
-  if constexpr (kIsAndroid && !kIsDesktopAndroid) {
-    if (IsClipboardType(type)) {
-      return 1;
-    }
   }
 
   // Group history cluster suggestions with searches.

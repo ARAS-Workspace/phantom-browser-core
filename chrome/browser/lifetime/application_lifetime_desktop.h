@@ -15,8 +15,6 @@ class FilePath;
 
 class Profile;
 
-static_assert(!BUILDFLAG(IS_ANDROID), "For non-Android Chrome only");
-
 namespace chrome {
 
 using ProfileBrowsersCloseCallback =

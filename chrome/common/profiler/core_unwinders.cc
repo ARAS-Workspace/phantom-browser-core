@@ -7,9 +7,6 @@
 #include "base/profiler/core_unwinders.h"
 #include "build/build_config.h"
 
-static_assert(!BUILDFLAG(IS_ANDROID),
-              "Android platform should use core_unwinders_android.cc instead");
-
 bool AreUnwindPrerequisitesAvailable(
     version_info::Channel channel,
     UnwindPrerequisitesDelegate* prerequites_delegate) {

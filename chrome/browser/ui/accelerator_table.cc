@@ -28,9 +28,6 @@
 #include "chrome/browser/global_keyboard_shortcuts_mac.h"
 #endif
 
-// Android chrome shortcuts are implemented in KeyboardShortcuts.java.
-static_assert(!BUILDFLAG(IS_ANDROID));
-
 namespace {
 
 // For ChromeOS only: If you plan on adding a new accelerator and want it

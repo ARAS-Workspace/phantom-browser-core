@@ -389,15 +389,6 @@ enum class FieldChangeSource {
 // changes while others do not, finding the exact number of expected calls on
 // Android is tedious. Using GMock's checkpoint pattern would help with that.
 auto NumShowSuggestionsCalls() {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    return base::FeatureList::IsEnabled(
-               features::kAutofillAndroidDisableSuggestionsOnJSFocus)
-               // Called solely by
-               // `AutofillAgent::DidReceiveLeftMouseDownOrGestureTapInNode`.
-               ? testing::Exactly(1)
-               // Potentially also by `AutofillAgent::FocusedElementChanged`.
-               : testing::AtLeast(1);
-  }
   // Called solely by `AutofillAgent::DidCompleteFocusChangeInFrame`.
   return testing::Exactly(1);
 }
@@ -657,24 +648,6 @@ class PasswordAutofillAgentTest : public ChromeRenderViewTest {
     GetMainFrame()->AutofillClient()->DidCompleteFocusChangeInFrame();
   }
 
-  // A workaround to focus an element that doesn't have an id attribute.
-  void FocusFirstInputElement() {
-    ExecuteJavaScriptForTests("document.forms[0].elements[0].focus();");
-    GetMainFrame()->NotifyUserActivation(
-        blink::mojom::UserActivationNotificationType::kTest);
-    auto first_form_element =
-        GetMainFrame()->GetDocument().GetOutermostForms()[0];
-    GetMainFrame()->Client()->FocusedElementChanged(
-        first_form_element.GetFormControlElements()[0]);
-    GetMainFrame()->AutofillClient()->DidCompleteFocusChangeInFrame();
-  }
-
-  void BlurElement(const std::string& element_id) {
-    std::string script = "document.getElementById('" + element_id + "').blur()";
-    ExecuteJavaScriptForTests(script.c_str());
-    ChangeFocusToNull(GetMainFrame()->GetDocument());
-  }
-
   void ConfigurePasswordSuggestionFiltering(bool enabled) {
     if (enabled) {
       scoped_feature_list_.InitAndEnableFeature(
@@ -782,18 +755,10 @@ class PasswordAutofillAgentTest : public ChromeRenderViewTest {
 
   void SimulateUsernameTyping(const std::string& username) {
     SimulatePointClick(gfx::Point(1, 1));
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(crbug.com/40820173): User typing doesn't send focus events properly.
-    FocusElement(kUsernameName);
-#endif
     SimulateUserInputChangeForElement(username_element_, username);
   }
 
   void SimulatePasswordTyping(const std::string& password) {
-#if BUILDFLAG(IS_ANDROID)
-    // TODO(crbug.com/40820173): User typing doesn't send focus events properly.
-    FocusElement(kPasswordName);
-#endif
     SimulateUserInputChangeForElement(password_element_, password);
   }
 
@@ -847,9 +812,6 @@ class PasswordAutofillAgentTest : public ChromeRenderViewTest {
   // test regular popups.
   void SimulateClosingKeyboardReplacingSurfaceIfAndroid(
       const std::string& element_id) {
-#if BUILDFLAG(IS_ANDROID)
-    FocusElement(element_id);
-#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // TODO(crbug.com/40278548): Only expect one of IsPreviewed()/IsAutofilled().
@@ -3336,10 +3298,8 @@ TEST_F(PasswordAutofillAgentTest, PasswordGenerationTriggered_TypedPassword) {
       /*new_password_id=*/"password", /*confirm_password_id=*/nullptr);
 
   // Generation event is triggered due to focus events.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus())
       .Times(testing::AnyNumber());
-#endif  // !BUILDFLAG(IS_ANDROID)
   SimulateUsernameTyping("NewGuy");
   SimulatePasswordTyping("NewPassword");
 
@@ -3458,10 +3418,8 @@ TEST_F(PasswordAutofillAgentTest, PasswordGenerationSupersedesAutofill) {
   CheckSuggestionsNotShown();
 
   // On destruction the state is updated.
-#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(fake_pw_client_, GenerationElementLostFocus())
       .Times(testing::AnyNumber());
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 // Tests the following scenario: 1) user triggers manual generation, 2) user
@@ -3897,97 +3855,6 @@ TEST_F(PasswordAutofillAgentTest, DriverIsInformedAboutFillableTextArea) {
   EXPECT_EQ(FocusedFieldType::kFillableTextArea, last_focused_field_type_);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Tests that when kAutofillAtMemorySupportContenteditableOnAndroid is disabled,
-// focusing a contenteditable element is not treated as kContenteditableField.
-TEST_F(PasswordAutofillAgentTest, ContentEditableIgnoredWhenFeatureDisabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndDisableFeature(
-      features::kAutofillAtMemorySupportContenteditableOnAndroid);
-
-  const char kContentEditableHTML[] =
-      "<div id='editable_div' contenteditable='true'>Hello world</div>";
-  LoadHTML(kContentEditableHTML);
-
-  FocusElement("editable_div");
-  fake_driver_.Flush();
-  EXPECT_EQ(FocusedFieldType::kUnknown, last_focused_field_type_);
-}
-
-// Tests that focusing a contenteditable element informs the password manager
-// driver about the focused input with FocusedFieldType::kContenteditableField
-// and its correct FieldRendererId.
-TEST_F(PasswordAutofillAgentTest, DriverIsInformedAboutContentEditable) {
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillAtMemorySupportContenteditableOnAndroid);
-
-  const char kContentEditableHTML[] =
-      "<div id='editable_div' contenteditable='true'>Hello world</div>";
-  LoadHTML(kContentEditableHTML);
-
-  FocusElement("editable_div");
-  fake_driver_.Flush();
-  EXPECT_EQ(FocusedFieldType::kContenteditableField, last_focused_field_type_);
-  WebElement editable_element = GetMainFrame()->GetDocument().GetElementById(
-      WebString::FromAscii("editable_div"));
-  ASSERT_TRUE(editable_element);
-  EXPECT_EQ(form_util::GetFieldRendererId(editable_element),
-            last_focused_field_id_);
-  EXPECT_FALSE(last_focused_field_id_.is_null());
-}
-
-// Tests that multiple contenteditable elements receive distinct FieldRendererId
-// values, that focus switches update the driver accordingly, and that focusing
-// an unfillable field or blurring resets/updates the state appropriately.
-TEST_F(PasswordAutofillAgentTest, ContentEditableFieldRendererIds) {
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kAutofillAtMemorySupportContenteditableOnAndroid);
-
-  const char kMultipleContentEditablesHTML[] =
-      "<div id='editable1' contenteditable='true'>First</div>"
-      "<p id='editable2' contenteditable='true'>Second</p>"
-      "<input id='readonly_input' readonly value='test'/>";
-  LoadHTML(kMultipleContentEditablesHTML);
-
-  WebElement elem1 = GetMainFrame()->GetDocument().GetElementById(
-      WebString::FromAscii("editable1"));
-  WebElement elem2 = GetMainFrame()->GetDocument().GetElementById(
-      WebString::FromAscii("editable2"));
-  WebElement readonly_input = GetMainFrame()->GetDocument().GetElementById(
-      WebString::FromAscii("readonly_input"));
-  ASSERT_TRUE(elem1);
-  ASSERT_TRUE(elem2);
-  ASSERT_TRUE(readonly_input);
-
-  FieldRendererId id1 = form_util::GetFieldRendererId(elem1);
-  FieldRendererId id2 = form_util::GetFieldRendererId(elem2);
-  FieldRendererId id_ro = form_util::GetFieldRendererId(readonly_input);
-  EXPECT_FALSE(id1.is_null());
-  EXPECT_FALSE(id2.is_null());
-  EXPECT_FALSE(id_ro.is_null());
-  EXPECT_NE(id1, id2);
-  EXPECT_NE(id1, id_ro);
-  EXPECT_NE(id2, id_ro);
-
-  FocusElement("editable1");
-  fake_driver_.Flush();
-  EXPECT_EQ(FocusedFieldType::kContenteditableField, last_focused_field_type_);
-  EXPECT_EQ(id1, last_focused_field_id_);
-
-  FocusElement("editable2");
-  fake_driver_.Flush();
-  EXPECT_EQ(FocusedFieldType::kContenteditableField, last_focused_field_type_);
-  EXPECT_EQ(id2, last_focused_field_id_);
-
-  FocusElement("readonly_input");
-  fake_driver_.Flush();
-  EXPECT_EQ(FocusedFieldType::kUnfillableElement, last_focused_field_type_);
-  EXPECT_EQ(id_ro, last_focused_field_id_);
-
-  BlurElement("readonly_input");
-  fake_driver_.Flush();
-}
-#else
 // Tests that focusing a contenteditable element on desktop is ignored by
 // PasswordAutofillAgent and does not report kContenteditableField.
 TEST_F(PasswordAutofillAgentTest, ContentEditableIgnoredOnDesktop) {
@@ -4002,7 +3869,6 @@ TEST_F(PasswordAutofillAgentTest, ContentEditableIgnoredOnDesktop) {
   fake_driver_.Flush();
   EXPECT_EQ(FocusedFieldType::kUnknown, last_focused_field_type_);
 }
-#endif
 
 // Tests that credential suggestions are autofilled on a password (and change
 // password) forms having either ambiguous or empty name.
@@ -4317,7 +4183,6 @@ TEST_F(PasswordAutofillAgentTest, SuggestPasswordWhenUsernameFieldDisabled) {
 
 // TODO(crbug.com/40819370): Amend the test to port it on Android if possible.
 // Otherwise, remove the TODO and add the reason why it is excluded.
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that a suggestion dropdown is shown on each password field. But when a
 // user chose one of the fields to autofill, a suggestion dropdown will be shown
 // only on this field.
@@ -4372,7 +4237,6 @@ TEST_F(PasswordAutofillAgentTest, SuggestMultiplePasswordFields) {
   ASSERT_TRUE(SimulateElementClick("password"));
   CheckSuggestions(u"", true);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(PasswordAutofillAgentTest, ShowAutofillSignaturesFlag) {
   // Tests that form signature is set iff the flag is enabled.
@@ -4987,10 +4851,6 @@ TEST_F(PasswordAutofillAgentTest, ModifyNonPasswordFieldShortName) {
   username_element_.SetAttribute("id", "i");
   ASSERT_TRUE(username_element_.NameForAutofill().length() == 1);
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40820173): User typing doesn't send focus events properly.
-  FocusFirstInputElement();
-#endif
   EXPECT_CALL(fake_driver_, UserModifiedNonPasswordField).Times(0);
   SimulateUserInputChangeForElement(username_element_, kAliceUsername);
 }
@@ -5002,10 +4862,6 @@ TEST_F(PasswordAutofillAgentTest, ModifySearchField) {
   UpdateOnlyUsernameElement();
   username_element_.SetAttribute("name", "thesearchfield");
 
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/40820173): User typing doesn't send focus events properly.
-  FocusFirstInputElement();
-#endif
   EXPECT_CALL(fake_driver_, UserModifiedNonPasswordField).Times(0);
   SimulateUserInputChangeForElement(username_element_, kAliceUsername);
 }
@@ -5192,21 +5048,9 @@ TEST_F(PasswordAutofillAgentTest,
   scoped_feature_list_.InitAndEnableFeature(
       password_manager::features::kShowSuggestionsOnAutofocus);
 
-#if BUILDFLAG(IS_ANDROID)
-  // The method above leaves the field focused, which is not needed for this
-  // test.
-  BlurElement(kUsernameName);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   FocusElement(kUsernameName);
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(fake_autofill_driver_,
-              AskForValuesToFill(_, _, _, _, Eq(std::nullopt)))
-      .Times(1);
-#else
   CheckSuggestionsNotShown();
-#endif
 
   base::RunLoop().RunUntilIdle();
   task_environment_.FastForwardBy(base::Seconds(1));
@@ -5216,11 +5060,7 @@ TEST_F(PasswordAutofillAgentTest,
   // suggestions are shown to the user.
   fill_data_.wait_for_username = true;
   SimulateOnFillPasswordForm(fill_data_);
-#if BUILDFLAG(IS_ANDROID)
-  CheckSuggestionsNotShown();
-#else
   CheckSuggestions(/*typed_username=*/u"", true);
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Tests that if a password form supporting WebAuthn was focused before parsing
@@ -5235,22 +5075,9 @@ TEST_F(PasswordAutofillAgentTest,
   UpdateUsernameAndPasswordElements();
   UpdateRendererIDsInFillData();
 
-#if BUILDFLAG(IS_ANDROID)
-  // The method above leaves the field focused, which is not needed for this
-  // test.
-  BlurElement(kUsernameName);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   FocusElement(kUsernameName);
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_CALL(fake_autofill_driver_,
-              AskForValuesToFill(_, _, _, _, Eq(std::nullopt)))
-      .Times(1);
-  task_environment_.FastForwardBy(base::Seconds(1));
-#else
   CheckSuggestionsNotShown();
-#endif  // BUILDFLAG(IS_ANDROID)
 
   testing::Mock::VerifyAndClearExpectations(&fake_autofill_driver_);
 
@@ -5267,12 +5094,6 @@ TEST_F(PasswordAutofillAgentTest,
        DoNotShowSuggestionsOnParsingFocusedFormSecondTime) {
   scoped_feature_list_.InitAndEnableFeature(
       password_manager::features::kShowSuggestionsOnAutofocus);
-
-#if BUILDFLAG(IS_ANDROID)
-  // The method above leaves the field focused, which is not needed for this
-  // test.
-  BlurElement(kUsernameName);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Simulate receiving fill data from the browser and user focusing the field
   // to see suggestions.
@@ -5294,12 +5115,6 @@ TEST_F(PasswordAutofillAgentTest,
        DoNotShowSuggestionsOnParsingFormWithoutFocus) {
   scoped_feature_list_.InitAndEnableFeature(
       password_manager::features::kShowSuggestionsOnAutofocus);
-
-#if BUILDFLAG(IS_ANDROID)
-  // The method above leaves the field focused, which is not needed for this
-  // test.
-  BlurElement(kUsernameName);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Simulate receiving credentials for filling from the browser.
   fill_data_.wait_for_username = true;
@@ -5471,89 +5286,6 @@ TEST_F(PasswordAutofillAgentTest, FillChangePasswordFormFailed) {
   EXPECT_EQ(u"", new_password.Value().Utf16());
   EXPECT_EQ(u"", confirmation_password.Value().Utf16());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-// If a password field is hidden, the field unlikely has an Enter listener. So,
-// trigger a form submission on the username field.
-TEST_F(PasswordAutofillAgentTest, TriggerFormSubmission_HiddenPasswordField) {
-  const char kUsernameFirstFormHTML[] =
-      "<script>"
-      "  function on_keypress(event) {"
-      "    if (event.which === 13) {"
-      "      var field = document.getElementById('password');"
-      "      field.parentElement.removeChild(field);"
-      "    }"
-      "  }"
-      "</script>"
-      "<INPUT type='text' id='username' onkeypress='on_keypress(event)'/>"
-      "<INPUT type='password' id='password' style='display:none'/>";
-  LoadHTML(kUsernameFirstFormHTML);
-  base::RunLoop().RunUntilIdle();
-  UpdateUsernameAndPasswordElements();
-
-  // Simulate the browser sending the login info, but set `wait_for_username`
-  // to prevent the form from being immediately filled because the test
-  // simulates filling with `FillSuggestion`, the function that
-  // KeyboardReplacingSurface uses.
-  fill_data_.wait_for_username = true;
-  SimulateOnFillPasswordForm(fill_data_);
-
-  // Fill the form.
-  SimulateElementClick(username_element_);
-  password_autofill_agent_->FillPasswordSuggestion(
-      kAliceUsername16, kAlicePassword16, base::DoNothing());
-  base::RunLoop().RunUntilIdle();
-
-  // Trigger a form submission.
-  password_autofill_agent_->TriggerFormSubmission();
-  base::RunLoop().RunUntilIdle();
-
-  // Verify that the driver actually has seen a submission.
-  EXPECT_TRUE(called_dynamic_form_submission_);
-}
-
-class PasswordAutofillAgentFormPresenceVariationTest
-    : public PasswordAutofillAgentTest,
-      public testing::WithParamInterface<bool> {};
-
-TEST_P(PasswordAutofillAgentFormPresenceVariationTest, TriggerFormSubmission) {
-  bool has_form_tag = GetParam();
-
-  LoadHTML(has_form_tag ? kFormHTML : kNoFormHTML);
-  base::RunLoop().RunUntilIdle();
-  UpdateUsernameAndPasswordElements();
-
-  // Simulate the browser sending the login info, but set `wait_for_username`
-  // to prevent the form from being immediately filled because the test
-  // simulates filling with `FillSuggestion`, the function that
-  // KeyboardReplacingSurface uses.
-  fill_data_.wait_for_username = true;
-  SimulateOnFillPasswordForm(fill_data_);
-
-  // Fill the form.
-  SimulateElementClick(username_element_);
-  password_autofill_agent_->FillPasswordSuggestion(
-      kAliceUsername16, kAlicePassword16, base::DoNothing());
-  base::RunLoop().RunUntilIdle();
-
-  // Trigger a form submission.
-  password_autofill_agent_->TriggerFormSubmission();
-  base::RunLoop().RunUntilIdle();
-
-  // Verify that the driver actually has seen a submission.
-  if (has_form_tag)
-    EXPECT_TRUE(form_data_submitted_.has_value());
-  else
-    EXPECT_TRUE(called_dynamic_form_submission_);
-
-  ResetPasswordFormsCalls();
-}
-
-INSTANTIATE_TEST_SUITE_P(FormPresenceVariation,
-                         PasswordAutofillAgentFormPresenceVariationTest,
-                         testing::Bool());
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 

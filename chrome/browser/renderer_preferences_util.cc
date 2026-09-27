@@ -108,7 +108,7 @@ namespace renderer_preferences_util {
 void UpdateFromSystemSettings(blink::RendererPreferences* prefs,
                               Profile* profile) {
   const PrefService* pref_service = profile->GetPrefs();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   content::UpdateFontRendererPreferencesFromSystemSettings(prefs);
 #endif
   prefs->focus_ring_color = BUILDFLAG(IS_MAC) ? SkColorSetRGB(0x00, 0x5F, 0xCC)
@@ -188,36 +188,28 @@ void UpdateFromSystemSettings(blink::RendererPreferences* prefs,
   prefs->plugin_fullscreen_allowed =
       pref_service->GetBoolean(prefs::kFullscreenAllowed);
 #endif
-#if BUILDFLAG(IS_ANDROID)
-  prefs->uses_platform_autofill =
-      pref_service->GetBoolean(autofill::prefs::kAutofillUsingPlatformAutofill);
-#endif
   prefs->caret_browsing_enabled =
       pref_service->GetBoolean(prefs::kCaretBrowsingEnabled);
 
-  // Trigger strings (e.g. "@@") and keyboard shortcuts for AtMemory are not
-  // supported on Android.
-  if constexpr (!BUILDFLAG(IS_ANDROID)) {
-    const base::DictValue& autofill_trigger_info =
-        pref_service->GetDict(autofill::prefs::kAutofillAtMemoryTriggerInfo);
-    if (autofill_trigger_info.FindBool("is_shortcut").value_or(false)) {
-      if (const std::string* trigger_string =
-              autofill_trigger_info.FindString("trigger")) {
-        ui::Accelerator accelerator =
-            ui::Command::StringToAccelerator(*trigger_string);
-        prefs->autofill_shortcut_key_code = accelerator.key_code();
-        prefs->autofill_shortcut_modifiers = accelerator.modifiers();
-        prefs->autofill_trigger_string = u"";
-      }
+  const base::DictValue& autofill_trigger_info =
+      pref_service->GetDict(autofill::prefs::kAutofillAtMemoryTriggerInfo);
+  if (autofill_trigger_info.FindBool("is_shortcut").value_or(false)) {
+    if (const std::string* trigger_string =
+            autofill_trigger_info.FindString("trigger")) {
+      ui::Accelerator accelerator =
+          ui::Command::StringToAccelerator(*trigger_string);
+      prefs->autofill_shortcut_key_code = accelerator.key_code();
+      prefs->autofill_shortcut_modifiers = accelerator.modifiers();
+      prefs->autofill_trigger_string = u"";
+    }
+  } else {
+    prefs->autofill_shortcut_key_code = ui::VKEY_UNKNOWN;
+    prefs->autofill_shortcut_modifiers = 0;
+    if (const std::string* trigger_string =
+            autofill_trigger_info.FindString("trigger")) {
+      prefs->autofill_trigger_string = base::UTF8ToUTF16(*trigger_string);
     } else {
-      prefs->autofill_shortcut_key_code = ui::VKEY_UNKNOWN;
-      prefs->autofill_shortcut_modifiers = 0;
-      if (const std::string* trigger_string =
-              autofill_trigger_info.FindString("trigger")) {
-        prefs->autofill_trigger_string = base::UTF8ToUTF16(*trigger_string);
-      } else {
-        prefs->autofill_trigger_string = u"";
-      }
+      prefs->autofill_trigger_string = u"";
     }
   }
 

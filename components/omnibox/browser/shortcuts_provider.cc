@@ -51,8 +51,6 @@
 
 #include "components/history_clusters/core/config.h"  // nogncheck
 
-constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID);
-
 namespace {
 
 using ShortcutMatch = ShortcutsProvider::ShortcutMatch;
@@ -301,8 +299,7 @@ void ShortcutsProvider::DoAutocomplete(const AutocompleteInput& input,
     if (shortcut_match.relevance == 0)
       continue;
 
-    if (kIsDesktop &&
-        AutocompleteMatch::IsFeaturedSearchType(shortcut_match.type)) {
+    if (AutocompleteMatch::IsFeaturedSearchType(shortcut_match.type)) {
       // Let FeaturedSearchProvider win for feature search shortcuts (e.g.
       // starter pack and feature site search created by policy); they should
       // not allow default or inline autocomplete for the keyword mode refresh.

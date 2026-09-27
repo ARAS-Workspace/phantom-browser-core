@@ -168,15 +168,6 @@ std::vector<const char*> GetEnabledToggles(
   enabled_toggles.push_back("dump_shaders_on_failure");
 
   if (backend_type == wgpu::BackendType::Vulkan) {
-#if BUILDFLAG(IS_ANDROID)
-    // Enable this toggle for all Android devices suspecting vulkan image size
-    // mismatch causing SharedTextureMemory creation failures, leading to
-    // promise image creation failures. See https://crbug.com/377935752 for
-    // details.
-    enabled_toggles.push_back(
-        "ignore_imported_ahardwarebuffer_vulkan_image_size");
-#endif
-
     // Use a single VkPipelineCache inside dawn.
     enabled_toggles.push_back("vulkan_monolithic_pipeline_cache");
   }
@@ -200,16 +191,9 @@ std::vector<wgpu::FeatureName> GetRequiredFeatures(
   std::vector<wgpu::FeatureName> features = {
       wgpu::FeatureName::DawnInternalUsages,
       wgpu::FeatureName::ImplicitDeviceSynchronization,
-#if BUILDFLAG(IS_ANDROID)
-      wgpu::FeatureName::TextureCompressionETC2,
-#endif
   };
 
   if (backend_type == wgpu::BackendType::Vulkan) {
-#if BUILDFLAG(IS_ANDROID)
-    features.push_back(wgpu::FeatureName::StaticSamplers);
-    features.push_back(wgpu::FeatureName::YCbCrVulkanSamplers);
-#endif
     features.push_back(wgpu::FeatureName::DawnDeviceAllocatorControl);
   }
 
@@ -330,7 +314,7 @@ wgpu::BackendType DawnContextProvider::GetDefaultBackendType() {
   if (gl::GetANGLEImplementation() == gl::ANGLEImplementation::kSwiftShader) {
     return wgpu::BackendType::Vulkan;
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX)
   return wgpu::BackendType::Vulkan;
 #elif BUILDFLAG(IS_APPLE)
   return wgpu::BackendType::Metal;
@@ -696,18 +680,14 @@ bool DawnSharedContext::Initialize(
   }
 
   if (adapters.empty()) {
-    // On Android, it's expected that some devices might not support Dawn atm.
-    // So don't generate report for it.
-    LogInitFailure("No adapters found.",
-                   /*generate_crash_report=*/!BUILDFLAG(IS_ANDROID),
+    LogInitFailure("No adapters found.", /*generate_crash_report=*/true,
                    backend_type, force_fallback_adapter);
     return false;
   }
   adapter_ = wgpu::Adapter(adapters[0].Get());
 
   if (!validate_adapter_fn(backend_type, adapter_)) {
-    LogInitFailure("Validate adapter failed.",
-                   /*generate_crash_report=*/!BUILDFLAG(IS_ANDROID),
+    LogInitFailure("Validate adapter failed.", /*generate_crash_report=*/true,
                    backend_type, force_fallback_adapter);
     return false;
   }

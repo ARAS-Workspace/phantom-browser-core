@@ -1351,25 +1351,14 @@ TEST_F(AutofillPopupControllerImplTest,
       "Autofill.ProfileDeleted.Any.LocalOrSyncable", 1, 1);
   histogram_tester.ExpectUniqueSample(
       "Autofill.ProfileDeleted.Any.LocalOrSyncable", 1, 1);
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    histogram_tester.ExpectUniqueSample("Autofill.ProfileDeleted.Popup.Total",
-                                        1, 0);
-    histogram_tester.ExpectUniqueSample(
-        "Autofill.ProfileDeleted.Popup.LocalOrSyncable", 1, 0);
-    histogram_tester.ExpectUniqueSample(
-        "Autofill.ProfileDeleted.KeyboardAccessory.Total", 1, 1);
-    histogram_tester.ExpectUniqueSample(
-        "Autofill.ProfileDeleted.KeyboardAccessory.LocalOrSyncable", 1, 1);
-  } else {
-    histogram_tester.ExpectUniqueSample("Autofill.ProfileDeleted.Popup.Total",
-                                        1, 1);
-    histogram_tester.ExpectUniqueSample(
-        "Autofill.ProfileDeleted.Popup.LocalOrSyncable", 1, 1);
-    histogram_tester.ExpectUniqueSample(
-        "Autofill.ProfileDeleted.KeyboardAccessory.Total", 1, 0);
-    histogram_tester.ExpectUniqueSample(
-        "Autofill.ProfileDeleted.KeyboardAccessory.LocalOrSyncable", 1, 0);
-  }
+  histogram_tester.ExpectUniqueSample("Autofill.ProfileDeleted.Popup.Total", 1,
+                                      1);
+  histogram_tester.ExpectUniqueSample(
+      "Autofill.ProfileDeleted.Popup.LocalOrSyncable", 1, 1);
+  histogram_tester.ExpectUniqueSample(
+      "Autofill.ProfileDeleted.KeyboardAccessory.Total", 1, 0);
+  histogram_tester.ExpectUniqueSample(
+      "Autofill.ProfileDeleted.KeyboardAccessory.LocalOrSyncable", 1, 0);
   // No autocomplete deletion metrics are emitted.
   histogram_tester.ExpectUniqueSample(
       "Autofill.Autocomplete.SingleEntryRemovalMethod",

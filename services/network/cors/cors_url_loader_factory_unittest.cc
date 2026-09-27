@@ -548,13 +548,9 @@ class NetworkBoundCorsURLLoaderFactoryTest : public CorsURLLoaderFactoryTest {
 
 // Regression test for crbug.com/366242716.
 TEST_F(NetworkBoundCorsURLLoaderFactoryTest, CorsPreflightRequestAreAllowed) {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    EXPECT_TRUE(GetCorsURLLoaderFactory()->IsCorsPreflighLoadOptionAllowed());
-  } else {
-    GTEST_SKIP() << "Network bound NetworkContext/URLRequestContext is "
-                    "supported only on "
-                    "Android, see URLRequestContextBuilder::BindToNetwork";
-  }
+  GTEST_SKIP() << "Network bound NetworkContext/URLRequestContext is "
+                  "supported only on "
+                  "Android, see URLRequestContextBuilder::BindToNetwork";
 }
 
 TEST_F(CorsURLLoaderFactoryTest, ForbiddenSecHeader_NoDump) {

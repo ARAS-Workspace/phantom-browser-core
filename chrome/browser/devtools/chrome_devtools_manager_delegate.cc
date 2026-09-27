@@ -66,9 +66,6 @@
 #include "ui/gfx/switches.h"
 #include "ui/views/controls/webview/webview.h"
 
-static_assert(!BUILDFLAG(IS_ANDROID),
-              "This file should not be included in Android build");
-
 using content::DevToolsAgentHost;
 
 const char ChromeDevToolsManagerDelegate::kTypeApp[] = "app";

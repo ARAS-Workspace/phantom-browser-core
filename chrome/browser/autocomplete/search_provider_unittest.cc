@@ -86,10 +86,6 @@
 #include "third_party/omnibox_proto/navigational_intent.pb.h"
 #include "ui/base/device_form_factor.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/location/android/mock_location_settings.h"
-#endif
-
 using base::ASCIIToUTF16;
 using testing::_;
 
@@ -819,7 +815,7 @@ TEST_F(SearchProviderTest, QueryKeywordProvider) {
 }
 
 TEST_F(SearchProviderTest, SendDataToSuggestAtAppropriateTimes) {
-  constexpr bool file_name_treated_as_query = BUILDFLAG(IS_ANDROID);
+  constexpr bool file_name_treated_as_query = false;
   struct {
     std::string_view input;
     const bool expect_to_send_to_default_provider;
@@ -4437,21 +4433,6 @@ class SearchProviderInlineLocationSignalingConfigurableTest
                                const std::string& wording,
                                bool site_permission_allowed = false,
                                bool precise = false) {
-#if BUILDFLAG(IS_ANDROID)
-    GeolocationHeaderServiceFactory::GetInstance()->SetTestingFactory(
-        profile_.get(),
-        base::BindRepeating([](content::BrowserContext* context)
-                                -> std::unique_ptr<KeyedService> {
-          Profile* profile = Profile::FromBrowserContext(context);
-          auto mock_location_settings =
-              std::make_unique<MockLocationSettings>();
-          MockLocationSettings::SetLocationStatus(true, true, true);
-          return std::make_unique<GeolocationHeaderService>(
-              HostContentSettingsMapFactory::GetForProfile(profile),
-              TemplateURLServiceFactory::GetForProfile(profile),
-              std::move(mock_location_settings));
-        }));
-#endif
     scoped_feature_list_.Reset();
     scoped_feature_list_.InitWithFeaturesAndParameters(
         {{omnibox::kInlineLocationSignaling,

@@ -11,10 +11,6 @@
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "third_party/omnibox_proto/groups.pb.h"
 
-namespace {
-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
-}  // namespace
-
 Group::Group(size_t limit,
              std::map<omnibox::GroupId, size_t> group_id_limits,
              bool is_zps,
@@ -57,14 +53,7 @@ void Group::Add(const AutocompleteMatch& match) {
 void Group::GroupMatches() {
   if (is_zps_) {
     GroupMatchesByGroupId();
-  } else if (is_android) {
-    GroupMatchesBySearchVsUrl();
   }
-}
-
-void Group::GroupMatchesBySearchVsUrl() {
-  std::ranges::stable_sort(matches_.begin(), matches_.end(), {},
-                           [](const auto& m) { return m->GetSortingOrder(); });
 }
 
 void Group::GroupMatchesByGroupId() {

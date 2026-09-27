@@ -202,16 +202,10 @@ std::string GetUserActionableErrorString(
     case SyncService::UserActionableError::
         kTrustedVaultRecoverabilityDegradedForEverything:
       return "Trusted vault recoverability degraded for everything";
-#if !BUILDFLAG(IS_ANDROID)
     case SyncService::UserActionableError::kNeedsSettingsConfirmation:
       return "Needs settings confirmation";
     case SyncService::UserActionableError::kUnrecoverableError:
       return "Unrecoverable error";
-#endif  // !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_ANDROID)
-    case SyncService::UserActionableError::kNeedsUPMBackendUpgrade:
-      return "Needs UPM backend upgrade";
-#endif  // BUILDFLAG(IS_ANDROID)
     case SyncService::UserActionableError::kNeedsClientUpgrade:
       return "Client version is too old and needs upgrade";
     case SyncService::UserActionableError::kBookmarksLimitExceeded:
@@ -690,12 +684,7 @@ base::DictValue ConstructAboutInformation(
   about_info.Set("unrecoverable_error_detected",
                  base::Value(service->HasUnrecoverableError()));
 
-  // Sync-the-feature should not be enabled on mobile platforms, where the
-  // sync-to-signin migration is completed.
-  const bool allow_enabling_sync_the_feature = !BUILDFLAG(IS_ANDROID);
-
-  about_info.Set("allow_enabling_sync_the_feature",
-                 base::Value(allow_enabling_sync_the_feature));
+  about_info.Set("allow_enabling_sync_the_feature", base::Value(true));
 
   if (service->HasUnrecoverableError()) {
     std::string unrecoverable_error_message =

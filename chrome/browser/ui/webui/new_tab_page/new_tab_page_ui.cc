@@ -124,12 +124,10 @@
 #include "url/origin.h"
 #include "url/url_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/customize_chrome_utils.h"
 #include "chrome/browser/ui/webui/new_tab_page/ntp_promo/ntp_promo_handler.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(OPTIMIZE_WEBUI)
 #include "chrome/grit/new_tab_shared_resources.h"
@@ -287,11 +285,7 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
           ntp_features::kNtpMostRelevantTabResumptionModuleFallbackToHost));
   source->AddBoolean("footerEnabled",
                      base::FeatureList::IsEnabled(ntp_features::kNtpFooter));
-  source->AddBoolean(
-      "showCustomizeButton",
-      base::FeatureList::IsEnabled(ntp_features::kNtpCustomizeWebUiAndroid) ||
-          !BUILDFLAG(IS_ANDROID));
-  source->AddBoolean("isAndroid", BUILDFLAG(IS_ANDROID));
+  source->AddBoolean("showCustomizeButton", true);
 
   source->AddBoolean("ntpRealboxNextEnabled", false);
   source->AddBoolean("isFuseboxEnabled", false);
@@ -657,10 +651,8 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(Profile* profile) {
 // that empty means that promos would have been shown, whereas disabled
 // indicates that no promo is allowed for the current page.
 // TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
 constexpr std::string_view kSimpleBrowserPromo = "simple";
 constexpr std::string_view kEmptyBrowserPromo = "empty";
-#endif
 constexpr std::string_view kDisabledBrowserPromo = "disabled";
 
 }  // namespace
@@ -676,20 +668,14 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
       page_factory_receiver_(this),
       customize_buttons_factory_receiver_(this),
       most_visited_page_factory_receiver_(this),
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+      // TODO(b/502297163): Implement for Android.
       ntp_promo_handler_factory_receiver_(this),
-#endif
       browser_command_factory_receiver_(this),
       searchbox_page_factory_receiver_(this),
       help_bubble_handler_factory_receiver_(this),
       profile_(Profile::FromWebUI(web_ui)),
-// TODO(b/502297163): Implement for Android.
-#if BUILDFLAG(IS_ANDROID)
-      theme_service_(nullptr),
-#else
+      // TODO(b/502297163): Implement for Android.
       theme_service_(ThemeServiceFactory::GetForProfile(profile_)),
-#endif
       ntp_custom_background_service_(
           NtpCustomBackgroundServiceFactory::GetForProfile(profile_)),
       ntp_custom_background_service_observation_(this),
@@ -701,24 +687,16 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
       module_id_details_(
           ntp::MakeModuleIdDetails(NewTabPageUI::IsManagedProfile(profile_),
                                    profile_)) {
-
   instance_count_++;
   base::UmaHistogramCounts100("NewTabPage.Count", instance_count_);
   auto* source = CreateAndAddNewTabPageUiHtmlSource(profile_);
-// TODO(b/502297163): Implement for Android.
-#if BUILDFLAG(IS_ANDROID)
-  bool wallpaper_search_button_enabled = false;
-#else
+  // TODO(b/502297163): Implement for Android.
   bool wallpaper_search_button_enabled =
       base::FeatureList::IsEnabled(ntp_features::kNtpWallpaperSearchButton) &&
       customize_chrome::IsWallpaperSearchEnabledForProfile(profile_);
-#endif
   source->AddBoolean("wallpaperSearchButtonEnabled",
                      wallpaper_search_button_enabled);
-// TODO(b/502297163): Implement for Android.
-#if BUILDFLAG(IS_ANDROID)
-  bool should_animate_wallpaper_search_button = false;
-#else
+  // TODO(b/502297163): Implement for Android.
   int wallpaper_search_animation_shown_threshold =
       ntp_features::GetWallpaperSearchButtonAnimationShownThreshold();
   // Animate the button if the threshold is negative (unconditional) or if the
@@ -728,7 +706,6 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
       wallpaper_search_animation_shown_threshold >=
           profile_->GetPrefs()->GetInteger(
               prefs::kNtpWallpaperSearchButtonShownCount);
-#endif
   source->AddBoolean(
       "wallpaperSearchButtonAnimationEnabled",
       wallpaper_search_button_enabled &&
@@ -756,11 +733,7 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
   content::URLDataSource::Add(
       profile_,
       std::make_unique<ThemeSource>(profile_, /*serve_untrusted=*/true));
-// TODO(b/502297163): Implement for Android.
-#if BUILDFLAG(IS_ANDROID)
-  content::URLDataSource::Add(profile_,
-                              std::make_unique<ThemeSource>(profile_));
-#endif
+  // TODO(b/502297163): Implement for Android.
 
   web_ui->AddRequestableScheme(content::kChromeUIUntrustedScheme);
 
@@ -772,15 +745,13 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
           ContentSettingsPattern::FromURL(GURL("https://corp.google.com")),
       });
 
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   // Store basic theme info in load time data to make the background color and
   // background image available as soon as the page loads to prevent a potential
   // white flicker.
 
   ntp_custom_background_service_observation_.Observe(
       ntp_custom_background_service_.get());
-#endif
 
   // Populates the load time data with basic info.
   OnColorProviderChanged();
@@ -881,11 +852,6 @@ void NewTabPageUI::BindInterface(
     mojo::PendingReceiver<
         customize_buttons::mojom::CustomizeButtonsHandlerFactory>
         pending_receiver) {
-#if BUILDFLAG(IS_ANDROID)
-  if (!base::FeatureList::IsEnabled(ntp_features::kNtpCustomizeWebUiAndroid)) {
-    return;
-  }
-#endif
   if (customize_buttons_factory_receiver_.is_bound()) {
     customize_buttons_factory_receiver_.reset();
   }
@@ -968,7 +934,6 @@ void NewTabPageUI::BindInterface(
 }
 
 // TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
 void NewTabPageUI::BindInterface(
     mojo::PendingReceiver<ntp_promo::mojom::NtpPromoHandlerFactory>
         pending_receiver) {
@@ -977,7 +942,6 @@ void NewTabPageUI::BindInterface(
   }
   ntp_promo_handler_factory_receiver_.Bind(std::move(pending_receiver));
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void NewTabPageUI::CreatePageHandler(
     mojo::PendingRemote<new_tab_page::mojom::Page> pending_page,
@@ -1005,8 +969,7 @@ void NewTabPageUI::ConnectToParentDocument(
 void NewTabPageUI::CreateBrowserCommandHandler(
     mojo::PendingReceiver<browser_command::mojom::CommandHandler>
         pending_handler) {
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   using browser_command::mojom::Command;
   std::vector<Command> supported_commands = {
       Command::kNoOpCommand,
@@ -1014,7 +977,6 @@ void NewTabPageUI::CreateBrowserCommandHandler(
   promo_browser_command_handler_ = std::make_unique<BrowserCommandHandler>(
       std::move(pending_handler), profile_, supported_commands,
       web_ui()->GetWebContents());
-#endif
 }
 
 void NewTabPageUI::CreateCustomizeButtonsHandler(
@@ -1023,9 +985,7 @@ void NewTabPageUI::CreateCustomizeButtonsHandler(
     mojo::PendingReceiver<customize_buttons::mojom::CustomizeButtonsHandler>
         pending_page_handler) {
   std::unique_ptr<NewTabPageFeaturePromoHelper> promo_helper;
-#if !BUILDFLAG(IS_ANDROID)
   promo_helper = std::make_unique<NewTabPageFeaturePromoHelper>();
-#endif
   customize_buttons_handler_ = std::make_unique<CustomizeButtonsHandler>(
       std::move(pending_page_handler), std::move(pending_page), web_ui(),
       webui::GetTabInterface(web_contents()), std::move(promo_helper));
@@ -1058,24 +1018,20 @@ void NewTabPageUI::CreatePageHandler(
 void NewTabPageUI::CreateHelpBubbleHandler(
     mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,
     mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler) {
-// TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
+  // TODO(b/502297163): Implement for Android.
   help_bubble_handler_ = std::make_unique<user_education::HelpBubbleHandler>(
       std::move(handler), std::move(client),
       ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(
           web_ui()->GetRenderFrameHost()));
-#endif
 }
 
 // TODO(b/502297163): Implement for Android.
-#if !BUILDFLAG(IS_ANDROID)
 void NewTabPageUI::CreateNtpPromoHandler(
     mojo::PendingRemote<ntp_promo::mojom::NtpPromoClient> client,
     mojo::PendingReceiver<ntp_promo::mojom::NtpPromoHandler> handler) {
   ntp_promo_handler_ = NtpPromoHandler::Create(
       std::move(client), std::move(handler), web_contents());
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // OnColorProviderChanged can be called during the destruction process and
 // should not directly access any member variables.
@@ -1159,10 +1115,7 @@ scoped_refptr<base::RefCountedMemory> NewTabPageUI::GetFaviconResourceBytes(
 }
 
 std::string_view NewTabPageUI::GetNtpPromoType() {
-// TODO(b/502297163): Implement for Android.
-#if BUILDFLAG(IS_ANDROID)
-  return kDisabledBrowserPromo;
-#else
+  // TODO(b/502297163): Implement for Android.
   auto* controller = UserEducationServiceFactory::GetForBrowserContext(profile_)
                          ->ntp_promo_controller();
   if (!controller) {
@@ -1184,5 +1137,4 @@ std::string_view NewTabPageUI::GetNtpPromoType() {
     case user_education::features::NtpBrowserPromoType::kNone:
       return kDisabledBrowserPromo;
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }

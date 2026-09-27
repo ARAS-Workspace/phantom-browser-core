@@ -9,19 +9,17 @@
 
 namespace history {
 namespace {
-constexpr auto is_android = !!BUILDFLAG(IS_ANDROID);
 constexpr auto kOrganicRepeatableQueriesDefaultValue =
     base::FEATURE_DISABLED_BY_DEFAULT;
 
 // Specifies the scaling behavior, i.e. whether the relevance scales of the
 // top sites and repeatable queries should be first aligned.
 // The default behavior is to mix the two lists as is.
-constexpr bool kScaleRepeatableQueriesScoresDefaultValue = is_android;
+constexpr bool kScaleRepeatableQueriesScoresDefaultValue = false;
 
 // Defines the maximum number of repeatable queries that can be shown.
 // The default behavior is having no limit, i.e., the number of the tiles.
-constexpr int kMaxNumRepeatableQueriesDefaultValue =
-    BUILDFLAG(IS_ANDROID) ? 4 : kTopSitesNumber;
+constexpr int kMaxNumRepeatableQueriesDefaultValue = kTopSitesNumber;
 }  // namespace
 
 // If enabled, the most repeated queries from the user browsing history are
@@ -55,7 +53,7 @@ const base::FeatureParam<bool> kPrivilegeRepeatableQueries(
 const base::FeatureParam<bool> kRepeatableQueriesIgnoreDuplicateVisits(
     &kOrganicRepeatableQueries,
     "RepeatableQueriesIgnoreDuplicateVisits",
-    is_android);
+    false);
 
 // The maximum number of days since the last visit (in days) in order for a
 // search query to considered as a repeatable query.
@@ -69,7 +67,7 @@ const base::FeatureParam<int> kRepeatableQueriesMaxAgeDays(
 const base::FeatureParam<int> kRepeatableQueriesMinVisitCount(
     &kOrganicRepeatableQueries,
     "RepeatableQueriesMinVisitCount",
-    is_android ? 6 : 1);
+    1);
 
 BASE_FEATURE(kPopulateVisitedLinkDatabase, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -78,9 +76,7 @@ BASE_FEATURE(kPopulateVisitedLinkDatabase, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kVisitedLinksOn404, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // If enabled, uses new scoring function for Most Visited Tiles computation.
-BASE_FEATURE(kMostVisitedTilesNewScoring,
-             is_android ? base::FEATURE_ENABLED_BY_DEFAULT
-                        : base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kMostVisitedTilesNewScoring, base::FEATURE_DISABLED_BY_DEFAULT);
 
 constexpr char kMvtScoringParamRecencyFactor_Classic[] = "default";
 constexpr char kMvtScoringParamRecencyFactor_Decay[] = "decay";
@@ -90,11 +86,7 @@ constexpr char kMvtScoringParamRecencyFactor_DecayStaircase[] =
 // The name of the recency factor strategy to use for MVT computation.
 constexpr base::FeatureParam<std::string> kMvtScoringParamRecencyFactor{
     &kMostVisitedTilesNewScoring, "recency_factor",
-#if BUILDFLAG(IS_ANDROID)
-    kMvtScoringParamRecencyFactor_DecayStaircase};
-#else
     kMvtScoringParamRecencyFactor_Classic};
-#endif  // BUILDFLAG(IS_ANDROID)
 
 // The per-day decay factor for each visit, used by "decay" only.
 constexpr base::FeatureParam<double> kMvtScoringParamDecayPerDay{
@@ -103,12 +95,7 @@ constexpr base::FeatureParam<double> kMvtScoringParamDecayPerDay{
 // The cap to daily visit count for each segment, used by {"decay",
 // "decay_staircase"}.
 constexpr base::FeatureParam<int> kMvtScoringParamDailyVisitCountCap{
-    &kMostVisitedTilesNewScoring, "daily_visit_count_cap",
-#if BUILDFLAG(IS_ANDROID)
-    10};
-#else
-    INT_MAX};
-#endif  // BUILDFLAG(IS_ANDROID)
+    &kMostVisitedTilesNewScoring, "daily_visit_count_cap", INT_MAX};
 
 // If enabled, very old history databases that cannot be migrated are deleted.
 BASE_FEATURE(kRazeOldHistoryDatabase,
@@ -119,13 +106,10 @@ bool IsBrowsingHistoryActorIntegrationM3Enabled() {
   return base::FeatureList::IsEnabled(kBrowsingHistoryActorIntegrationM3);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-
 // Enables improved chrome://history de-duplication logic, this includes
 // grouping entries by hostname and title per day.
 BASE_FEATURE(kBrowsingHistorySimilarVisitsGrouping,
              base::FeatureState::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables Milestone 3 of History-Actor integration, this includes improvements
 // in history entry grouping and filtering.

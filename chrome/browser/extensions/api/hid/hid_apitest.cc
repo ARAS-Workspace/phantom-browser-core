@@ -21,9 +21,6 @@
 #include "services/device/public/cpp/test/fake_hid_manager.h"
 #include "services/device/public/mojom/hid.mojom.h"
 
-// This API is not supported on Android.
-static_assert(!BUILDFLAG(IS_ANDROID));
-
 namespace extensions {
 
 namespace {

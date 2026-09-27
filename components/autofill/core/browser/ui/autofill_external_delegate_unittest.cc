@@ -158,9 +158,6 @@ constexpr auto kDefaultSuggestionTriggerSource =
     AutofillSuggestionTriggerSource::kFormControlElementClicked;
 
 constexpr AutofillTriggerSource DefaultTriggerSource() {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    return AutofillTriggerSource::kKeyboardAccessoryOrBottomSheet;
-  }
   return AutofillTriggerSource::kPopup;
 }
 
@@ -299,12 +296,6 @@ class MockAutofillClient : public TestAutofillClient {
               GetDeviceAuthenticator,
               (std::string),
               (const, override));
-
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(void, ShowAutofillAiLoadingDialog, (), (override));
-  MOCK_METHOD(void, DismissAutofillAiLoadingDialog, (), (override));
-#endif
-
 };
 
 class TestCreditCardAccessManager : public CreditCardAccessManager {
@@ -764,12 +755,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryUsesCaretAnchorWithValidCaret) {
   IssueOnQuery(form, caret_bounds,
                AutofillSuggestionTriggerSource::kAtMemoryTriggerString);
 
-  const PopupAnchorType expected_anchor_type =
-#if BUILDFLAG(IS_ANDROID)
-      PopupAnchorType::kAtMemoryBottomSheet;
-#else
-      PopupAnchorType::kCaret;
-#endif
+  const PopupAnchorType expected_anchor_type = PopupAnchorType::kCaret;
 
   EXPECT_CALL(autofill_client(),
               ShowAutofillSuggestions(
@@ -793,12 +779,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryUsesBottomSheetAnchor) {
   IssueOnQuery(form, empty_caret_bounds,
                AutofillSuggestionTriggerSource::kAtMemoryTriggerString);
 
-  const PopupAnchorType expected_anchor_type =
-#if BUILDFLAG(IS_ANDROID)
-      PopupAnchorType::kAtMemoryBottomSheet;
-#else
-      PopupAnchorType::kField;
-#endif
+  const PopupAnchorType expected_anchor_type = PopupAnchorType::kField;
 
   EXPECT_CALL(autofill_client(),
               ShowAutofillSuggestions(
@@ -823,12 +804,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryContextMenuUsesCaretAnchor) {
   IssueOnQuery(form, caret_bounds,
                AutofillSuggestionTriggerSource::kAtMemoryContextMenu);
 
-  const PopupAnchorType expected_anchor_type =
-#if BUILDFLAG(IS_ANDROID)
-      PopupAnchorType::kAtMemoryBottomSheet;
-#else
-      PopupAnchorType::kCaret;
-#endif
+  const PopupAnchorType expected_anchor_type = PopupAnchorType::kCaret;
 
   EXPECT_CALL(autofill_client(),
               ShowAutofillSuggestions(
@@ -1553,12 +1529,9 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegateDataList) {
   IssueOnQuery(data_list_items);
 
   // This should call ShowAutofillSuggestions.
-  const auto kExpectedSuggestions =
-      SuggestionVectorIdsAre(SuggestionType::kDatalistEntry,
-#if !BUILDFLAG(IS_ANDROID)
-                             SuggestionType::kSeparator,
-#endif
-                             SuggestionType::kAddressEntry);
+  const auto kExpectedSuggestions = SuggestionVectorIdsAre(
+      SuggestionType::kDatalistEntry, SuggestionType::kSeparator,
+      SuggestionType::kAddressEntry);
   EXPECT_CALL(
       autofill_client(),
       ShowAutofillSuggestions(PopupOpenArgsAre(kExpectedSuggestions), _));
@@ -1589,12 +1562,9 @@ TEST_F(AutofillExternalDelegateTest, UpdateDataListWhileShowingPopup) {
   IssueOnQuery(data_list_items);
 
   // Ensure the popup is displayed.
-  const auto kExpectedSuggestions =
-      SuggestionVectorIdsAre(SuggestionType::kDatalistEntry,
-#if !BUILDFLAG(IS_ANDROID)
-                             SuggestionType::kSeparator,
-#endif
-                             SuggestionType::kAddressEntry);
+  const auto kExpectedSuggestions = SuggestionVectorIdsAre(
+      SuggestionType::kDatalistEntry, SuggestionType::kSeparator,
+      SuggestionType::kAddressEntry);
   EXPECT_CALL(
       autofill_client(),
       ShowAutofillSuggestions(PopupOpenArgsAre(kExpectedSuggestions), _));
@@ -1628,10 +1598,7 @@ TEST_F(AutofillExternalDelegateTest, DuplicateAutofillDatalistValues) {
 
   const auto kExpectedSuggestions = SuggestionVectorIdsAre(
       SuggestionType::kDatalistEntry, SuggestionType::kDatalistEntry,
-#if !BUILDFLAG(IS_ANDROID)
-      SuggestionType::kSeparator,
-#endif
-      SuggestionType::kAddressEntry);
+      SuggestionType::kSeparator, SuggestionType::kAddressEntry);
   EXPECT_CALL(
       autofill_client(),
       ShowAutofillSuggestions(PopupOpenArgsAre(kExpectedSuggestions), _));
@@ -1661,10 +1628,7 @@ TEST_F(AutofillExternalDelegateTest, DuplicateAutocompleteDatalistValues) {
   const auto kExpectedSuggestions = SuggestionVectorIdsAre(
       // We are expecting only two data list entries.
       SuggestionType::kDatalistEntry, SuggestionType::kDatalistEntry,
-#if !BUILDFLAG(IS_ANDROID)
-      SuggestionType::kSeparator,
-#endif
-      SuggestionType::kAutocompleteEntry);
+      SuggestionType::kSeparator, SuggestionType::kAutocompleteEntry);
   EXPECT_CALL(
       autofill_client(),
       ShowAutofillSuggestions(PopupOpenArgsAre(kExpectedSuggestions), _));
@@ -2169,13 +2133,9 @@ TEST_F(AutofillExternalDelegateTest,
   IssueOnQuery(AutofillSuggestionTriggerSource::kAtMemoryTriggerString);
   const Suggestion suggestion{SuggestionType::kManageAddress};
 
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    EXPECT_CALL(autofill_client(), HideSuggestions).Times(0);
-  } else {
-    EXPECT_CALL(autofill_client(),
-                HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
-                                Eq(std::nullopt)));
-  }
+  EXPECT_CALL(autofill_client(),
+              HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
+                              Eq(std::nullopt)));
 
   external_delegate().DidAcceptSuggestion(
       suggestion, SuggestionPosition{.multi_index = {0}});
@@ -2713,7 +2673,7 @@ TEST_F(AutofillExternalDelegateTest, FillAutofillAiFillsFullForm) {
                                           {.multi_index = {0}});
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 // Tests that when accepting a `kFillAutofillAi` suggestion that requires
 // re-authentication, the re-authentication flow is triggered and the form is
 // filled upon success.
@@ -3050,9 +3010,6 @@ class AutofillExternalDelegateWithWalletPrivatePassesTest
             features::kAutofillAiWithDataSchema,
             features::kAutofillAiWalletPrivatePasses,
             features::kAutofillAiReauthRequired,
-#if BUILDFLAG(IS_ANDROID)
-            features::kAutofillAiShowServerWalletFillingYourInfoDialog,
-#endif  // BUILDFLAG(IS_ANDROID)
         },
         {});
   }
@@ -3116,13 +3073,6 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
                                 std::optional(FillingProduct::kAutofillAi)));
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog should not be shown if the user doesn't need to
-  // authenticate.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog()).Times(0);
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog()).Times(0);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   external_delegate().DidAcceptSuggestion(fill_suggestion,
                                           {.multi_index = {0}});
 }
@@ -3162,13 +3112,6 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
               HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
                               std::optional(FillingProduct::kAutofillAi)));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog should not be shown if the user doesn't need to
-  // authenticate.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog()).Times(0);
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog()).Times(0);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   external_delegate().DidAcceptSuggestion(fill_suggestion,
                                           {.multi_index = {0}});
 }
@@ -3206,18 +3149,11 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
               HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
                               std::optional(FillingProduct::kAutofillAi)));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog should not be shown if the user doesn't need to
-  // authenticate.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog()).Times(0);
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog()).Times(0);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   external_delegate().DidAcceptSuggestion(fill_suggestion,
                                           {.multi_index = {0}});
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 // Tests that when attempting to fill a masked server entity and re-auth fails,
 // no failure notification is displayed.
 TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
@@ -3260,12 +3196,6 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
   EXPECT_CALL(autofill_client(),
               HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
                               std::optional(FillingProduct::kAutofillAi)));
-
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog should not be shown if the authentication fails.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog()).Times(0);
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog()).Times(0);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   external_delegate().DidAcceptSuggestion(fill_suggestion,
                                           {.multi_index = {0}});
@@ -3327,20 +3257,9 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
               GetUnmaskedWalletEntityInstance(masked_passport.guid(), _))
       .WillOnce(MoveArg<1>(&get_unmasked_entity_callback));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog is shown only on Android after successful
-  // authentication.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Simulate successful authentication.
   ASSERT_FALSE(reauth_callback.is_null());
   std::move(reauth_callback).Run(true);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Dismiss the loading dialog after the entity is fetched.
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Simulate the async response.
   ASSERT_FALSE(get_unmasked_entity_callback.is_null());
@@ -3397,21 +3316,9 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
               GetUnmaskedWalletEntityInstance(masked_passport.guid(), _))
       .WillOnce(MoveArg<1>(&get_unmasked_entity_callback));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog is shown only on Android after successful
-  // authentication.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Simulate successful authentication.
   ASSERT_FALSE(reauth_callback.is_null());
   std::move(reauth_callback).Run(true);
-
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog must be dismissed even if the AutofillAiAccessManager
-  // is reset.
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Reset the access manager before the server request is complete.
   test_api(autofill_manager()).set_autofill_ai_access_manager(nullptr);
@@ -3431,9 +3338,6 @@ class AutofillExternalDelegateWithAmbientAutofillTest
             features::kAutofillAiReauthRequired,
             features::kAutofillAmbientAutofill,
             features::kAutofillAiWalletPrivatePasses,
-#if BUILDFLAG(IS_ANDROID)
-            features::kAutofillAiShowPersonalContextFillingYourInfoDialog,
-#endif  // BUILDFLAG(IS_ANDROID)
         },
         {});
   }
@@ -3532,13 +3436,6 @@ TEST_F(AutofillExternalDelegateWithAmbientAutofillTest,
               HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
                               std::optional(FillingProduct::kAutofillAi)));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog should not be shown if the user doesn't need to
-  // authenticate.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog()).Times(0);
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog()).Times(0);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   ASSERT_FALSE(callback.is_null());
   std::move(callback).Run(full_passport);
 }
@@ -3620,19 +3517,9 @@ TEST_F(AutofillExternalDelegateWithAmbientAutofillTest,
               GetUnmaskedSpiiEntity(masked_passport.guid(), _))
       .WillOnce(MoveArg<1>(&get_unmasked_entity_callback));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog is shown only on Android.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Simulate successful authentication.
   ASSERT_FALSE(reauth_callback.is_null());
   std::move(reauth_callback).Run(true);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Dismiss the loading dialog after the entity is fetched.
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Simulate the async response.
   ASSERT_FALSE(get_unmasked_entity_callback.is_null());
@@ -3710,13 +3597,6 @@ TEST_F(AutofillExternalDelegateWithAmbientAutofillTest,
   // The `AutofillAiAccessManager` will return the unmaskes entity immediately,
   // no call to the `PersonalContextAccessManager will be made.
   EXPECT_CALL(personal_context_manager(), GetUnmaskedSpiiEntity).Times(0);
-
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog won't be shown because no request to the
-  // `PersonalContextAccessManager` is made.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog()).Times(0);
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog()).Times(0);
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Simulate the successful authentication.
   ASSERT_FALSE(reauth_callback.is_null());
@@ -3796,19 +3676,9 @@ TEST_F(
               GetUnmaskedSpiiEntity(masked_passport.guid(), _))
       .WillOnce(MoveArg<1>(&get_unmasked_entity_callback));
 
-#if BUILDFLAG(IS_ANDROID)
-  // The loading dialog is shown only on Android.
-  EXPECT_CALL(autofill_client(), ShowAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // Simulate successful authentication.
   ASSERT_FALSE(reauth_callback.is_null());
   std::move(reauth_callback).Run(true);
-
-#if BUILDFLAG(IS_ANDROID)
-  // Dismiss the loading dialog after the entity is fetched.
-  EXPECT_CALL(autofill_client(), DismissAutofillAiLoadingDialog());
-#endif  // BUILDFLAG(IS_ANDROID)
 
   // Reset the access manager before the server request is complete.
   test_api(autofill_manager()).set_autofill_ai_access_manager(nullptr);
@@ -3941,12 +3811,7 @@ TEST_F(
     NonComposeSuggestion_NonComposeProactiveNudge_DoNotForwardsCaretBoundsToClient) {
   IssueOnQuery(gfx::Rect(/*width=*/123, /*height=*/123));
 
-  const PopupAnchorType default_anchor_type =
-#if BUILDFLAG(IS_ANDROID)
-      PopupAnchorType::kKeyboardAccessory;
-#else
-      PopupAnchorType::kField;
-#endif
+  const PopupAnchorType default_anchor_type = PopupAnchorType::kField;
   EXPECT_CALL(autofill_client(),
               ShowAutofillSuggestions(
                   AllOf(Field(&AutofillClient::PopupOpenArgs::element_bounds,

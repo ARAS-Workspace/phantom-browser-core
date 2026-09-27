@@ -34,9 +34,6 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "services/network/test/test_dns_util.h"
 
-// This API is not supported on Android.
-static_assert(!BUILDFLAG(IS_ANDROID));
-
 namespace extensions {
 namespace {
 

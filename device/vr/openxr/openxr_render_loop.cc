@@ -893,7 +893,6 @@ void OpenXrRenderLoop::SubmitFrame(int16_t frame_index,
                                    base::TimeDelta time_waited) {
   DVLOG(3) << __func__ << " frame_index=" << frame_index;
   CHECK(!graphics_binding_->IsUsingSharedImages());
-  DCHECK(BUILDFLAG(IS_ANDROID));
   // The sync token passed here is unused by OpenXR backend's implementation of
   // SubmitFrameMissing.
   // TODO(crbug.com/476100354): Android OpenXR only supports Shared Buffer

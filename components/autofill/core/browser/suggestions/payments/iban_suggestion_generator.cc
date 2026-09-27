@@ -73,25 +73,13 @@ std::vector<Suggestion> GetSuggestionsForIbans(const std::vector<Iban>& ibans) {
 
     std::u16string iban_identifier =
         iban.GetIdentifierStringForAutofillDisplay();
-    if constexpr (BUILDFLAG(IS_ANDROID)) {
-      // For Android keyboard accessory, the displayed value will be nickname +
-      // identifier string, if the nickname is too long to fit due to bubble
-      // width limitation, it will be truncated.
-      if (!iban.nickname().empty()) {
-        suggestion.main_text.value = iban.nickname();
-        suggestion.minor_texts.emplace_back(iban_identifier);
-      } else {
-        suggestion.main_text.value = std::move(iban_identifier);
-      }
+    if (iban.nickname().empty()) {
+      suggestion.main_text =
+          Suggestion::Text(iban_identifier, Suggestion::Text::IsPrimary(true));
     } else {
-      if (iban.nickname().empty()) {
-        suggestion.main_text = Suggestion::Text(
-            iban_identifier, Suggestion::Text::IsPrimary(true));
-      } else {
-        suggestion.main_text = Suggestion::Text(
-            iban.nickname(), Suggestion::Text::IsPrimary(true));
-        suggestion.labels = {{Suggestion::Text(iban_identifier)}};
-      }
+      suggestion.main_text =
+          Suggestion::Text(iban.nickname(), Suggestion::Text::IsPrimary(true));
+      suggestion.labels = {{Suggestion::Text(iban_identifier)}};
     }
     suggestions.push_back(suggestion);
   }

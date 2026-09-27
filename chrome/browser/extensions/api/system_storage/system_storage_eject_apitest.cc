@@ -23,9 +23,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/test/extension_test_message_listener.h"
 
-// This API is not supported on Android.
-static_assert(!BUILDFLAG(IS_ANDROID));
-
 namespace {
 
 using extensions::test::kRemovableStorageData;

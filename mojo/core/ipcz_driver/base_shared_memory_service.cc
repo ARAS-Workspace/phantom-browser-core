@@ -28,7 +28,7 @@
 #include "third_party/ipcz/include/ipcz/ipcz.h"
 
 #define SHARED_MEMORY_SERVICE_REQUIRED() \
-  BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+  BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
 
 namespace mojo::core::ipcz_driver {
 

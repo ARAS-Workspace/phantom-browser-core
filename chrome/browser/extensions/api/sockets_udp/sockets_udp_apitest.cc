@@ -20,9 +20,6 @@
 #include "extensions/test/result_catcher.h"
 #include "net/dns/mock_host_resolver.h"
 
-// This API is not supported on Android.
-static_assert(!BUILDFLAG(IS_ANDROID));
-
 namespace extensions {
 namespace {
 

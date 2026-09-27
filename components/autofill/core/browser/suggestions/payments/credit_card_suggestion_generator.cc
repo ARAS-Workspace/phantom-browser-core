@@ -394,16 +394,9 @@ std::vector<Suggestion> GenerateVirtualCardStandaloneCvcFieldSuggestionsSync(
         u" " +
         CreditCard::GetObfuscatedStringForCardDigits(
             GetCreditCardObfuscationLength(), virtual_card_last_four);
-    if constexpr (BUILDFLAG(IS_ANDROID)) {
-      // For Android keyboard accessory, we concatenate all the content to the
-      // `main_text` to prevent the suggestion descriptor from being cut off.
-      suggestion.main_text.value = base::StrCat(
-          {main_text, u"  ", credit_card.CardNameForAutofillDisplay()});
-    } else {
-      suggestion.main_text.value = main_text;
-      suggestion.labels = {
-          {Suggestion::Text(credit_card.CardNameForAutofillDisplay())}};
-    }
+    suggestion.main_text.value = main_text;
+    suggestion.labels = {
+        {Suggestion::Text(credit_card.CardNameForAutofillDisplay())}};
     suggestions.push_back(suggestion);
   }
 

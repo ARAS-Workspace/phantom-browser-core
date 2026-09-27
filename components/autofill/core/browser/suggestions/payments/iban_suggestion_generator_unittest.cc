@@ -40,20 +40,6 @@ Matcher<Suggestion> EqualsIbanSuggestion(
     const std::u16string& identifier_string,
     const Suggestion::Payload& payload,
     const std::u16string& nickname) {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    if (nickname.empty()) {
-      return AllOf(
-          Field(&Suggestion::type, SuggestionType::kIbanEntry),
-          Field(&Suggestion::main_text, Suggestion::Text(identifier_string)),
-          Field(&Suggestion::payload, payload));
-    }
-    return AllOf(Field(&Suggestion::type, SuggestionType::kIbanEntry),
-                 Field(&Suggestion::main_text, Suggestion::Text(nickname)),
-                 Field(&Suggestion::minor_texts,
-                       std::vector<Suggestion::Text>{
-                           Suggestion::Text(identifier_string)}),
-                 Field(&Suggestion::payload, payload));
-  }
   if (nickname.empty()) {
     return AllOf(Field(&Suggestion::type, SuggestionType::kIbanEntry),
                  Field(&Suggestion::main_text,
@@ -131,14 +117,6 @@ class IbanSuggestionGeneratorTest : public testing::Test {
     Suggestion iban_suggestion(SuggestionType::kIbanEntry);
     const std::u16string iban_identifier =
         iban.GetIdentifierStringForAutofillDisplay();
-#if BUILDFLAG(IS_ANDROID)
-    if (!iban.nickname().empty()) {
-      iban_suggestion.main_text.value = iban.nickname();
-      iban_suggestion.minor_texts.emplace_back(iban_identifier);
-    } else {
-      iban_suggestion.main_text.value = iban_identifier;
-    }
-#else
     if (iban.nickname().empty()) {
       iban_suggestion.main_text =
           Suggestion::Text(iban_identifier, Suggestion::Text::IsPrimary(true));
@@ -147,7 +125,6 @@ class IbanSuggestionGeneratorTest : public testing::Test {
           Suggestion::Text(iban.nickname(), Suggestion::Text::IsPrimary(true));
       iban_suggestion.labels = {{Suggestion::Text(iban_identifier)}};
     }
-#endif
 
     if (iban.record_type() == Iban::kServerIban) {
       iban_suggestion.payload = Suggestion::InstrumentId(iban.instrument_id());

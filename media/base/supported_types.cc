@@ -25,14 +25,6 @@
 #include "third_party/libvpx/source/libvpx/vpx/vpx_codec.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-
-// TODO(dalecurtis): This include is not allowed by media/base since
-// media/base/android is technically a different component. We should move
-// supported_types*.{cc,h} out of media/base to fix this.
-#include "media/base/android/media_codec_util.h"  // nogncheck
-#endif
-
 namespace media {
 
 namespace {
@@ -242,10 +234,7 @@ bool IsDecoderHevcProfileSupported(const VideoType& type) {
 }
 
 bool IsDecoderVp9ProfileSupported(const VideoType& type) {
-#if BUILDFLAG(IS_ANDROID)
-  // After Q, all VP9 profiles are required by Android
-  return IsColorSpaceSupported(type.color_space);
-#elif BUILDFLAG(ENABLE_LIBVPX)
+#if BUILDFLAG(ENABLE_LIBVPX)
   // High bit depth capabilities may be toggled via LibVPX config flags.
   static const bool vpx_supports_hbd = (vpx_codec_get_caps(vpx_codec_vp9_dx()) &
                                         VPX_CODEC_CAP_HIGHBITDEPTH) != 0;
@@ -275,10 +264,6 @@ bool IsDecoderAV1Supported(const VideoType& type) {
   // If the AV1 decoder is enabled, or if we're on Q or later, yes.
 #if BUILDFLAG(ENABLE_AV1_DECODER)
   return IsColorSpaceSupported(type.color_space);
-#elif BUILDFLAG(IS_ANDROID)
-  return base::android::android_info::sdk_int() >=
-             base::android::android_info::SDK_VERSION_Q &&
-         IsColorSpaceSupported(type.color_space);
 #else
   return false;
 #endif
@@ -288,8 +273,7 @@ bool IsDecoderAACSupported(const AudioType& type) {
   if (type.profile != AudioCodecProfile::kXHE_AAC) {
     return true;
   }
-#if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && \
-    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && BUILDFLAG(IS_MAC)
   return GetSupplementalDecoderAudioTypeCache()->IsProfileSupported(type);
 #else
   return false;
@@ -584,8 +568,7 @@ bool MayHaveAndAllowSelectOSSoftwareEncoder(VideoCodec codec) {
   // Allow OS software encoding when we don't have an equivalent
   // software encoder.
   const bool kHasBundledH264Encoder = IsOpenH264SoftwareEncoderEnabled();
-  constexpr bool kHasOSSoftwareH264Encoder =
-      BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID);
+  constexpr bool kHasOSSoftwareH264Encoder = BUILDFLAG(IS_MAC);
   constexpr bool kHasOSSoftwareHEVCEncoder =
       BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER);
 

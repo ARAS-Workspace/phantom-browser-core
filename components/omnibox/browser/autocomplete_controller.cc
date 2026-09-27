@@ -119,10 +119,6 @@ using ScoringSignals = ::metrics::OmniboxScoringSignals;
 using ProviderType = AutocompleteProvider::Type;
 using OEP = metrics::OmniboxEventProto;
 
-constexpr bool kIsDesktop =
-    !(BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID));
-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
-
 void RecordMlScoreCoverage(size_t matches_with_non_null_scores,
                            size_t total_scored_matches) {
   int percent_score_coverage =
@@ -1030,9 +1026,6 @@ void AutocompleteController::SetMatchDestinationURL(
   if (url.is_valid()) {
     match->destination_url = std::move(url);
   }
-#if BUILDFLAG(IS_ANDROID)
-  match->UpdateJavaNavigationDetails();
-#endif
 }
 
 void AutocompleteController::GroupSuggestionsBySearchVsURL(size_t begin,
@@ -1091,21 +1084,10 @@ bool AutocompleteController::ShouldRunProvider(
            provider->type() == AutocompleteProvider::TYPE_VERBATIM_MATCH;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
   // Should only be run for the composebox.
   if (provider->type() == AutocompleteProvider::TYPE_VERBATIM_MATCH) {
     return false;
   }
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  if (omnibox::IsAndroidHubOrTabSearch(input_.current_page_classification())) {
-    return provider->type() == AutocompleteProvider::TYPE_SEARCH ||
-           provider->type() == AutocompleteProvider::TYPE_OPEN_TAB ||
-           provider->type() == AutocompleteProvider::TYPE_BOOKMARK ||
-           provider->type() == AutocompleteProvider::TYPE_HISTORY_QUICK;
-  }
-#endif
 
   // Always let the `ContextualSearchProvider` generate the toolbelt match,
   // even when in keyword modes. Note this comes after above checks
@@ -1406,12 +1388,6 @@ void AutocompleteController::InitializeSyncProviders(int provider_types) {
     providers_.push_back(
         base::MakeRefCounted<CrossDeviceTabProvider>(provider_client_.get()));
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (provider_types & AutocompleteProvider::TYPE_TAB_GROUP) {
-    providers_.push_back(
-        base::MakeRefCounted<TabGroupProvider>(provider_client_.get()));
-  }
-#endif
 }
 
 void AutocompleteController::UpdateResult(UpdateType update_type,
@@ -1735,27 +1711,13 @@ void AutocompleteController::AttachActions() {
   // shown there.
   if (!input_.IsZeroSuggest() ||
       omnibox::IsAndroidHubOrTabSearch(input_.current_page_classification())) {
-    // Do not look for matching tabs on Android unless we collected all the
-    // suggestions. Tab matching is an expensive process with multiple JNI calls
-    // involved. Run it only when all the suggestions are collected.
-    bool perform_tab_match = is_android ? done() : true;
-    if (perform_tab_match) {
-      internal_result_.ConvertOpenTabMatches(provider_client_.get(), &input_);
-    }
+    internal_result_.ConvertOpenTabMatches(provider_client_.get(), &input_);
 
     internal_result_.AttachPedalsToMatches(input_, *provider_client_);
   }
 
   internal_result_.TrimOmniboxActions(input_.IsZeroSuggest());
-#if !BUILDFLAG(IS_ANDROID)
   internal_result_.SplitActionsToSuggestions();
-#endif
-
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(omnibox::kOmniboxSiteSearch)) {
-    internal_result_.AttachSiteSearchActionToMatches(template_url_service_);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void AutocompleteController::UpdateAssociatedKeywords(
@@ -1864,23 +1826,12 @@ void AutocompleteController::UpdateKeywordDescriptions(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID)
-  // Do not include search engine name for the DSE.
-  auto* default_engine = template_url_service_->GetDefaultSearchProvider();
-#endif
-
   std::u16string last_keyword;
   for (auto i(result->begin()); i != result->end(); ++i) {
     if (AutocompleteMatch::IsSearchType(i->type)) {
       if (i->HasCustomDescription() || IsUnscopedExtensionMatch(*i)) {
         continue;
       }
-
-#if BUILDFLAG(IS_ANDROID)
-      if (default_engine && i->keyword == default_engine->keyword()) {
-        continue;
-      }
-#endif
 
       i->description.clear();
       i->description_class.clear();
@@ -2755,7 +2706,7 @@ void AutocompleteController::MaybeRemoveCompanyEntityImages(
 void AutocompleteController::MaybeCleanSuggestionsForKeywordMode(
     const AutocompleteInput& input,
     AutocompleteResult* result) {
-  if (!kIsDesktop || input.current_page_classification() == OEP::NTP_REALBOX) {
+  if (input.current_page_classification() == OEP::NTP_REALBOX) {
     // Realbox doesn't support keyword mode yet, so keep original list intact.
     return;
   }

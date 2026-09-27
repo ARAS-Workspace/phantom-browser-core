@@ -18,9 +18,6 @@
 #include "extensions/test/extension_test_message_listener.h"
 #include "extensions/test/result_catcher.h"
 
-// This API is not supported on Android.
-static_assert(!BUILDFLAG(IS_ANDROID));
-
 namespace {
 
 using extensions::StorageUnitInfoList;

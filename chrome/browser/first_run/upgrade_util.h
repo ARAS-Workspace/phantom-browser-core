@@ -10,8 +10,6 @@
 #include "base/functional/callback_forward.h"
 #include "build/build_config.h"
 
-static_assert(!BUILDFLAG(IS_ANDROID), "Not used on Android");
-
 namespace base {
 class CommandLine;
 }

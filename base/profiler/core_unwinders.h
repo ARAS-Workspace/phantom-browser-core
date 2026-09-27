@@ -9,10 +9,6 @@
 #include "base/profiler/stack_sampling_profiler.h"
 #include "build/build_config.h"
 
-static_assert(
-    !BUILDFLAG(IS_ANDROID),
-    "Android platform is not supported by CreateCoreUnwindersFactory()");
-
 namespace base {
 
 BASE_EXPORT StackSamplingProfiler::UnwindersFactory

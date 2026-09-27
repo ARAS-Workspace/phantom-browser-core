@@ -59,21 +59,11 @@ auto FieldsAre(Args&&... matchers) {
 // Returns the expected number of calls to AskForValuesToFill when focusing a
 // text field without left clicking or tapping it.
 int NumCallsToAskForValuesToFillOnTextfieldFocusWithoutLeftClick() {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    return base::FeatureList::IsEnabled(
-               features::kAutofillAndroidDisableSuggestionsOnJSFocus)
-               ? 0
-               // Called by `AutofillAgent::FocusElementChanged`.
-               : 1;
-  }
   return 0;
 }
 
 // Returns the expected number of calls to HidePopup when unfocusing a field.
 int NumCallsToHidePopupOnFocusLoss() {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    return 0;  // The accessory allows to fill on focus loss.
-  }
   return 1;  // Any dropdown should disappear on focus loss.
 }
 
@@ -239,19 +229,10 @@ TEST_F(AutofillAgentFormInteractionTest, TextareaFocusAndLeftClick) {
   {
     InSequence s;
     using enum AutofillSuggestionTriggerSource;
-    if constexpr (!BUILDFLAG(IS_ANDROID)) {
-      EXPECT_CALL(
-          autofill_driver(),
-          AskForValuesToFill(_, GetFieldRendererIdById("textarea"), _,
-                             kTextareaFocusedWithoutClick, Eq(std::nullopt)));
-    } else {
-      EXPECT_CALL(
-          autofill_driver(),
-          AskForValuesToFill(_, GetFieldRendererIdById("textarea"), _,
-                             kFormControlElementClicked, Eq(std::nullopt)))
-          .Times(
-              NumCallsToAskForValuesToFillOnTextfieldFocusWithoutLeftClick());
-    }
+    EXPECT_CALL(
+        autofill_driver(),
+        AskForValuesToFill(_, GetFieldRendererIdById("textarea"), _,
+                           kTextareaFocusedWithoutClick, Eq(std::nullopt)));
     EXPECT_CALL(check, Call(1));
     EXPECT_CALL(
         autofill_driver(),
@@ -408,7 +389,6 @@ TEST_F(AutofillAgentContentEditableInteractionTest,
 }
 
 // Scrolling doesn't hide the popup on Android.
-#if !BUILDFLAG(IS_ANDROID)
 // Tests that scrolling triggers a call to `AutofillDriver::HidePopup()`.
 TEST_F(AutofillAgentContentEditableInteractionTest,
        ScrollingHidesAutofillPopup) {
@@ -421,7 +401,6 @@ TEST_F(AutofillAgentContentEditableInteractionTest,
   SimulateElementFocusAndWait("ce");
   SimulateScrollingAndWait();
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that clicking on a contenteditable form is ignored.
 TEST_F(AutofillAgentContentEditableInteractionTest,

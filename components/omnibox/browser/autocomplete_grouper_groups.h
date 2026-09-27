@@ -61,7 +61,6 @@ class Group {
 
  private:
   // Performs semantic grouping by Search vs URL.
-  void GroupMatchesBySearchVsUrl();
   // Performs semantic grouping by GroupId.
   void GroupMatchesByGroupId();
 

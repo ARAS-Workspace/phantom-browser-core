@@ -14,8 +14,6 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/search_engines/template_url_service.h"
 
-constexpr bool kIsDesktop = !BUILDFLAG(IS_ANDROID);
-
 constexpr size_t OmniboxPopupSelection::kNoMatch = static_cast<size_t>(-1);
 
 #if DCHECK_ALWAYS_ON
@@ -173,9 +171,7 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
     case kStateOrLine:
       all_states.push_back(NORMAL);
       all_states.push_back(KEYWORD_MODE);
-#if !BUILDFLAG(IS_ANDROID)
       all_states.push_back(FOCUSED_BUTTON_ACTION);
-#endif
       all_states.push_back(FOCUSED_BUTTON_THUMBS_UP);
       all_states.push_back(FOCUSED_BUTTON_THUMBS_DOWN);
       all_states.push_back(FOCUSED_BUTTON_REMOVE_SUGGESTION);
@@ -202,7 +198,7 @@ OmniboxPopupSelection::GetAllAvailableSelectionsSorted(
             break;
           }
         }
-      } else if (line_state == KEYWORD_MODE && kIsDesktop) {
+      } else if (line_state == KEYWORD_MODE) {
         OmniboxPopupSelection selection(line_number, line_state);
         if (selection.IsControlPresentOnMatch(result)) {
           if (result.match_at(line_number)

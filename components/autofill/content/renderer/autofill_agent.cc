@@ -337,7 +337,7 @@ AutofillAgent::Config CreateConfig(bool uses_platform_autofill) {
       AutofillAgent::QueryPasswordSuggestions(false),
       AutofillAgent::SecureContextRequired(false),
       AutofillAgent::UserGestureRequired(true),
-      AutofillAgent::UsesKeyboardAccessoryForSuggestions(BUILDFLAG(IS_ANDROID)),
+      AutofillAgent::UsesKeyboardAccessoryForSuggestions(false),
   };
 }
 }  // namespace
@@ -2107,17 +2107,7 @@ void AutofillAgent::DidReceiveLeftMouseDownOrGestureTapInNode(
   const bool is_focused =
       node.Focused() || ((contenteditable = node.RootEditableElement()) &&
                          contenteditable.Focused());
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          features::kAutofillAndroidKeyboardAccessoryDynamicPositioning)) {
-    last_left_mouse_down_or_gesture_tap_in_node_caused_focus_ = is_focused;
-  } else {
-    HandleFocusChangeComplete(/*focused_node_was_last_clicked=*/is_focused,
-                              /*form_cache=*/{});
-  }
-#else
   last_left_mouse_down_or_gesture_tap_in_node_caused_focus_ = is_focused;
-#endif
 }
 
 void AutofillAgent::DidReceiveLeftPointerDownBeforeDispatch(
@@ -2256,14 +2246,12 @@ void AutofillAgent::HandleFocusChangeComplete(
           AutofillSuggestionTriggerSource::kFormControlElementClicked,
           form_cache, password_request);
     } else if (form_util::IsTextAreaElement(focused_control)) {
-#if !BUILDFLAG(IS_ANDROID)
       // Compose reacts to tab area focus even when not triggered by a click -
       // therefore call `ShowSuggestions` with a separate trigger source.
       ShowSuggestions(
           focused_control,
           AutofillSuggestionTriggerSource::kTextareaFocusedWithoutClick,
           form_cache, password_request);
-#endif
     }
   }
 

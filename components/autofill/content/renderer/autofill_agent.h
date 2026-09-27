@@ -129,7 +129,7 @@ class AutofillAgent : public content::RenderFrameObserver,
     // Is true iff the platform doesn't show any popups but renders the same
     // information in or near the keyboard instead.
     UsesKeyboardAccessoryForSuggestions uses_keyboard_accessory_for_suggestions{
-        BUILDFLAG(IS_ANDROID)};
+        false};
   };
 
   // `PasswordAutofillAgent` and `PasswordGenerationAgent` may be `nullptr`. If

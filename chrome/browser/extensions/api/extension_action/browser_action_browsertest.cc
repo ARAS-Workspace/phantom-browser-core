@@ -19,11 +19,6 @@
 #include "extensions/test/extension_test_message_listener.h"
 #include "third_party/skia/include/core/SkColor.h"
 
-// Desktop Android only supports manifest v3 extensions, and MV3 extensions
-// don't persist their action badge state (e.g. color) across browser restarts.
-// Therefore this test isn't relevant on Android.
-static_assert(!BUILDFLAG(IS_ANDROID));
-
 namespace extensions {
 
 namespace {

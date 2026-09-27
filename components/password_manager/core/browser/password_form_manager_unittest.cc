@@ -71,11 +71,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "components/webauthn/android/cred_man_support.h"
-#include "components/webauthn/android/webauthn_cred_man_delegate.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 namespace password_manager {
 
 namespace {
@@ -260,13 +255,6 @@ class MockPasswordManagerClient : public StubPasswordManagerClient {
               OnPasswordFilled,
               (PasswordManagerDriver*, const GURL&, PasswordFillTrigger),
               (override));
-#if BUILDFLAG(IS_ANDROID)
-  MOCK_METHOD(void,
-              ShowPasswordManagerErrorMessage,
-              (password_manager::ErrorMessageFlowType,
-               password_manager::PasswordStoreBackendErrorType),
-              (override));
-#endif
 };
 
 class MockPasswordFormManagerObserver : public PasswordFormManagerObserver {
@@ -556,10 +544,6 @@ class PasswordFormManagerTestBase : public testing::Test {
         .WillByDefault(Return(base::ok(&passkeys_)));
     ON_CALL(webauthn_credentials_delegate_, IsSecurityKeyOrHybridFlowAvailable)
         .WillByDefault(Return(true));
-#if BUILDFLAG(IS_ANDROID)
-    webauthn::WebAuthnCredManDelegate::override_cred_man_support_for_testing(
-        webauthn::CredManSupport::DISABLED);
-#endif  // BUILDFLAG(IS_ANDROID)
 
     field_info_manager_ = std::make_unique<FieldInfoManager>(task_runner_);
     ON_CALL(client_, GetFieldInfoManager())
@@ -792,11 +776,7 @@ TEST_P(PasswordFormManagerTest, Autofill) {
   EXPECT_EQ(observed_form_.url(), fill_data.url);
 
   // On Android Touch To Fill will prevent autofilling credentials on page load.
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(fill_data.wait_for_username);
-#else
   EXPECT_FALSE(fill_data.wait_for_username);
-#endif
 
   EXPECT_EQ(saved_match_.username_value,
             fill_data.preferred_login.username_value);
@@ -3316,10 +3296,8 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlow) {
     testing::InSequence in_sequence;
 
     // Upload username first flow votes on the username form.
-    if constexpr (!BUILDFLAG(IS_ANDROID)) {
-      EXPECT_CALL(crowdsourcing_manager(),
-                  StartUploadRequest(IsSingleUsernameUpload(), _, _));
-    }
+    EXPECT_CALL(crowdsourcing_manager(),
+                StartUploadRequest(IsSingleUsernameUpload(), _, _));
 
     // Upload for the password form.
     auto password_upload_matcher = IsPasswordUpload(
@@ -3335,13 +3313,8 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlow) {
 
     form_manager_->Save();
 
-#if !BUILDFLAG(IS_ANDROID)
     histogram_tester.ExpectUniqueSample(
         "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 0, 1);
-#else
-    histogram_tester.ExpectTotalCount(
-        "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 0);
-#endif
     Mock::VerifyAndClearExpectations(&crowdsourcing_manager());
   }
 }
@@ -3371,10 +3344,8 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlowWithPrefilledUsername) {
   testing::InSequence in_sequence;
 
   // Upload username first flow vote on the single username form.
-  if constexpr (!BUILDFLAG(IS_ANDROID)) {
-    EXPECT_CALL(crowdsourcing_manager(),
-                StartUploadRequest(IsSingleUsernameUpload(), _, _));
-  }
+  EXPECT_CALL(crowdsourcing_manager(),
+              StartUploadRequest(IsSingleUsernameUpload(), _, _));
 
   // Upload for the password form.
   auto password_upload_matcher = IsPasswordUpload(
@@ -3387,13 +3358,8 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlowWithPrefilledUsername) {
   base::HistogramTester histogram_tester;
   form_manager_->Save();
 
-#if !BUILDFLAG(IS_ANDROID)
   histogram_tester.ExpectUniqueSample(
       "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 1, 1);
-#else
-  histogram_tester.ExpectTotalCount(
-      "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 0);
-#endif
   Mock::VerifyAndClearExpectations(&crowdsourcing_manager());
 }
 
@@ -3430,13 +3396,11 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlowInFormOverruleVotes) {
   form_manager_->OnUpdateUsernameFromPrompt(
       submitted_form_.fields()[kUsernameFieldIndex].value());
 
-#if !BUILDFLAG(IS_ANDROID)
   // Expect a negative `IN_FORM_OVERRULE` vote on the username form.
   ExpectIsSingleUsernameUpload(
       kSingleUsernameFormSignature, Field::IN_FORM_OVERRULE,
       FieldType::NOT_USERNAME,
       IsMostRecentSingleUsernameCandidate::kMostRecentCandidate);
-#endif
 
   // Expect upload for the password form. This upload is unrelated to UFF: it
   // is a result of saving a new password on the password form.
@@ -3483,13 +3447,11 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlowPositiveInFormOverruleVote) {
   // Check that uploads for both single username and sign-up form happen.
   testing::InSequence in_sequence;
 
-#if !BUILDFLAG(IS_ANDROID)
   // Expect a positive `IN_FORM_OVERRULE` vote on the username form.
   ExpectIsSingleUsernameUpload(
       kSingleUsernameFormSignature, Field::IN_FORM_OVERRULE,
       FieldType::SINGLE_USERNAME,
       IsMostRecentSingleUsernameCandidate::kMostRecentCandidate);
-#endif
 
   // Expect upload for the password form. This upload is unrelated to UFF: it
   // is a result of saving a new password on the password form.
@@ -3591,10 +3553,8 @@ TEST_P(PasswordFormManagerTest,
   testing::InSequence in_sequence;
 
   // Upload username first flow vote on the single username form.
-  if constexpr (!BUILDFLAG(IS_ANDROID)) {
-    EXPECT_CALL(crowdsourcing_manager(),
-                StartUploadRequest(IsSingleUsernameUpload(), _, _));
-  }
+  EXPECT_CALL(crowdsourcing_manager(),
+              StartUploadRequest(IsSingleUsernameUpload(), _, _));
 
   // Upload for the password form.
   auto password_upload_matcher = IsPasswordUpload(
@@ -3609,13 +3569,8 @@ TEST_P(PasswordFormManagerTest,
 
   form_manager_->Save();
 
-#if !BUILDFLAG(IS_ANDROID)
   histogram_tester.ExpectUniqueSample(
       "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 1, 1);
-#else
-  histogram_tester.ExpectTotalCount(
-      "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 0);
-#endif
   Mock::VerifyAndClearExpectations(&crowdsourcing_manager());
 }
 
@@ -3677,7 +3632,6 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlowSendVotesOnRecentFields) {
   // Simulate the user modifying the username in the prompt.
   form_manager_->OnUpdateUsernameFromPrompt(kPossibleUsername);
 
-#if !BUILDFLAG(IS_ANDROID)
   // Expect a strong positive vote on the single username form.
   ExpectIsSingleUsernameUpload(
       kSingleUsernameFormSignature, Field::STRONG, FieldType::SINGLE_USERNAME,
@@ -3687,7 +3641,6 @@ TEST_P(PasswordFormManagerTest, UsernameFirstFlowSendVotesOnRecentFields) {
   ExpectIsSingleUsernameUpload(
       kOtherFormSignature, Field::STRONG, FieldType::NOT_USERNAME,
       IsMostRecentSingleUsernameCandidate::kHasIntermediateValuesInBetween);
-#endif
 
   // Expect upload for the password form. This upload is unrelated to UFF: it
   // is a result of saving a new password on the password form.
@@ -3774,16 +3727,12 @@ TEST_P(PasswordFormManagerTest, NegativeUsernameFirstFlowVotes) {
 
   // Upload for the username form. Ensure that we send `NOT_USERNAME` for the
   // username field.
-  if constexpr (!BUILDFLAG(IS_ANDROID)) {
-    auto upload_contents_matcher = IsPasswordUpload(
-        FormSignatureIs(kUsernameFormSignature),
-        FieldsContain(AllOf(FieldSignatureIs(kUsernameFieldSignature),
-                            FieldAutofillTypeIs({FieldType::NOT_USERNAME}))));
-    EXPECT_CALL(crowdsourcing_manager(),
-                StartUploadRequest(upload_contents_matcher, _, _));
-  } else {
-    EXPECT_CALL(crowdsourcing_manager(), StartUploadRequest).Times(0);
-  }
+  auto upload_contents_matcher = IsPasswordUpload(
+      FormSignatureIs(kUsernameFormSignature),
+      FieldsContain(AllOf(FieldSignatureIs(kUsernameFieldSignature),
+                          FieldAutofillTypeIs({FieldType::NOT_USERNAME}))));
+  EXPECT_CALL(crowdsourcing_manager(),
+              StartUploadRequest(upload_contents_matcher, _, _));
 
   // Upload for the password form.
   auto password_upload_matcher =
@@ -3794,13 +3743,8 @@ TEST_P(PasswordFormManagerTest, NegativeUsernameFirstFlowVotes) {
   base::HistogramTester histogram_tester;
   form_manager_->Save();
 
-#if !BUILDFLAG(IS_ANDROID)
   histogram_tester.ExpectUniqueSample(
       "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 0, 1);
-#else
-  histogram_tester.ExpectTotalCount(
-      "PasswordManager.SingleUsername.PasswordFormHadUsernameField", 0);
-#endif
 }
 
 // Tests that no votes are sent for an OTP field.
@@ -3897,7 +3841,6 @@ TEST_P(PasswordFormManagerTest, NoSingleUsernameVotingOnUnrelatedWebsite) {
 
   form_manager_->SaveSuggestedUsernameValueToVotesUploader();
 
-#if !BUILDFLAG(IS_ANDROID)
   // Expect a strong positive vote on the single username form.
   ExpectIsSingleUsernameUpload(
       kSingleUsernameFormSignature, Field::WEAK, FieldType::SINGLE_USERNAME,
@@ -3907,7 +3850,6 @@ TEST_P(PasswordFormManagerTest, NoSingleUsernameVotingOnUnrelatedWebsite) {
               StartUploadRequest(
                   IsPasswordUpload(FormSignatureIs(kOtherFormSignature)), _, _))
       .Times(0);
-#endif
 
   // Expect upload for the password form. This upload is unrelated to UFF: it
   // is a result of saving a new password on the password form.
@@ -4616,115 +4558,6 @@ TEST_P(PasswordFormManagerTest, NoVotesUploaderForHTTPAuth) {
       std::make_unique<PasswordSaveManagerImpl>(&client_));
   EXPECT_FALSE(form_manager->votes_uploader());
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(PasswordFormManagerTest,
-       ClientShouldShowErrorMessageForAuthErrorResolvable) {
-  fetcher_->SetProfileStoreBackendError(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kAuthErrorResolvable));
-
-  EXPECT_CALL(client_,
-              ShowPasswordManagerErrorMessage(
-                  password_manager::ErrorMessageFlowType::kFillFlow,
-                  PasswordStoreBackendErrorType::kAuthErrorResolvable));
-  fetcher_->NotifyFetchCompleted();
-}
-
-TEST_P(PasswordFormManagerTest,
-       ClientShouldShowErrorMessageForAuthErrorForAccountStore) {
-  fetcher_->SetAccountStoreBackendError(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kAuthErrorResolvable));
-
-  EXPECT_CALL(client_,
-              ShowPasswordManagerErrorMessage(
-                  password_manager::ErrorMessageFlowType::kFillFlow,
-                  PasswordStoreBackendErrorType::kAuthErrorResolvable));
-  fetcher_->NotifyFetchCompleted();
-}
-
-TEST_P(PasswordFormManagerTest,
-       ClientShouldShowErrorMessageForKeyRetrivalError) {
-  fetcher_->SetProfileStoreBackendError(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kKeyRetrievalRequired));
-
-  EXPECT_CALL(client_,
-              ShowPasswordManagerErrorMessage(
-                  password_manager::ErrorMessageFlowType::kFillFlow,
-                  PasswordStoreBackendErrorType::kKeyRetrievalRequired));
-  fetcher_->NotifyFetchCompleted();
-}
-
-TEST_P(PasswordFormManagerTest,
-       ClientShouldShowErrorMessageForEmptySecurityDomainError) {
-  fetcher_->SetProfileStoreBackendError(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kEmptySecurityDomain));
-
-  EXPECT_CALL(client_,
-              ShowPasswordManagerErrorMessage(
-                  password_manager::ErrorMessageFlowType::kFillFlow,
-                  PasswordStoreBackendErrorType::kEmptySecurityDomain));
-  fetcher_->NotifyFetchCompleted();
-}
-
-TEST_P(PasswordFormManagerTest,
-       ClientShouldShowErrorMessageForIrretrievableSecurityDomainError) {
-  fetcher_->SetProfileStoreBackendError(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kIrretrievableSecurityDomain));
-
-  EXPECT_CALL(client_,
-              ShowPasswordManagerErrorMessage(
-                  password_manager::ErrorMessageFlowType::kFillFlow,
-                  PasswordStoreBackendErrorType::kIrretrievableSecurityDomain));
-  fetcher_->NotifyFetchCompleted();
-}
-
-// Tests that the error message is displayed in the case when both account and
-// profile store are requested and the result is the following:
-// - account store replies with an authentication error,
-// - profile store replies with another backend error.
-TEST_P(PasswordFormManagerTest,
-       ClientShouldShowErrorMessageWhenBothStoresHaveDifferentErrors) {
-  fetcher_->SetAccountStoreBackendError(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kAuthErrorResolvable));
-  fetcher_->SetProfileStoreBackendError(
-      PasswordStoreBackendError(PasswordStoreBackendErrorType::kUncategorized));
-
-  EXPECT_CALL(client_,
-              ShowPasswordManagerErrorMessage(
-                  password_manager::ErrorMessageFlowType::kFillFlow,
-                  PasswordStoreBackendErrorType::kAuthErrorResolvable));
-  fetcher_->NotifyFetchCompleted();
-}
-
-TEST_P(PasswordFormManagerTest,
-       ClientShouldShowErrorMessageForAuthErrorUnresolvable) {
-  fetcher_->SetProfileStoreBackendError(PasswordStoreBackendError(
-      PasswordStoreBackendErrorType::kAuthErrorUnresolvable));
-
-  EXPECT_CALL(client_,
-              ShowPasswordManagerErrorMessage(
-                  password_manager::ErrorMessageFlowType::kFillFlow,
-                  PasswordStoreBackendErrorType::kAuthErrorUnresolvable));
-  fetcher_->NotifyFetchCompleted();
-}
-
-TEST_P(PasswordFormManagerTest,
-       ClientShouldNotShowErrorMessageWhenThereIsNoError) {
-  fetcher_->SetProfileStoreBackendError(std::nullopt);
-
-  EXPECT_CALL(client_, ShowPasswordManagerErrorMessage).Times(0);
-  fetcher_->NotifyFetchCompleted();
-}
-
-TEST_P(PasswordFormManagerTest,
-       ClientShouldNotShowErrorMessageWhenErrorIsNotAuthError) {
-  fetcher_->SetProfileStoreBackendError(
-      PasswordStoreBackendError(PasswordStoreBackendErrorType::kUncategorized));
-
-  EXPECT_CALL(client_, ShowPasswordManagerErrorMessage).Times(0);
-  fetcher_->NotifyFetchCompleted();
-}
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_P(PasswordFormManagerTest, ClientShouldShowKeychainErrorMessage) {
@@ -5464,10 +5297,6 @@ class PasswordFormManagerWebAuthnCredentialsTest : public testing::Test {
   PasswordFormManagerWebAuthnCredentialsTest() = default;
   void SetUp() override {
     PasswordFormManager::set_wait_for_server_predictions_for_filling(false);
-#if BUILDFLAG(IS_ANDROID)
-    webauthn::WebAuthnCredManDelegate::override_cred_man_support_for_testing(
-        webauthn::CredManSupport::DISABLED);
-#endif
     auto password_save_manager = std::make_unique<PasswordSaveManagerImpl>(
         /*profile_form_saver=*/std::make_unique<NiceMock<MockFormSaver>>(),
         /*account_form_saver=*/nullptr);
@@ -5524,7 +5353,6 @@ TEST_F(PasswordFormManagerWebAuthnCredentialsTest,
   EXPECT_TRUE(form_manager().WebAuthnCredentialsAvailable());
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordFormManagerWebAuthnCredentialsTest,
        NoPasskeysFromConditionalRequest_ThenNoWebauthnCredentials) {
   ON_CALL(webauthn_credentials_delegate(), GetPasskeys)
@@ -5532,15 +5360,5 @@ TEST_F(PasswordFormManagerWebAuthnCredentialsTest,
 
   EXPECT_FALSE(form_manager().WebAuthnCredentialsAvailable());
 }
-#else
-
-TEST_F(PasswordFormManagerWebAuthnCredentialsTest,
-       NoPasskeysFromConditionalRequest_ThenWebauthnCredentials) {
-  ON_CALL(webauthn_credentials_delegate(), GetPasskeys)
-      .WillByDefault(Return(base::ok(&kNoPasskeys)));
-
-  EXPECT_TRUE(form_manager().WebAuthnCredentialsAvailable());
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager

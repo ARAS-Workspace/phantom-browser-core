@@ -262,10 +262,6 @@ std::u16string GetBnplIssuerSelectionOptionText(
       switch (issuer_id) {
         case BnplIssuer::IssuerId::kBnplAffirm:
         case BnplIssuer::IssuerId::kBnplAfterpay:
-#if BUILDFLAG(IS_ANDROID)
-          return l10n_util::GetStringUTF16(
-              IDS_AUTOFILL_BNPL_ISSUER_SELECTION_TEXT_AFFIRM_BOTTOM_SHEET);
-#else
           if (base::FeatureList::IsEnabled(
                   features::kAutofillEnablePayNowPayLaterTabs)) {
             return l10n_util::GetStringUTF16(
@@ -274,12 +270,7 @@ std::u16string GetBnplIssuerSelectionOptionText(
             return l10n_util::GetStringUTF16(
                 IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_PAYMENT_OPTION_AFFIRM_AND_AFTERPAY);
           }
-#endif  // BUILDFLAG(IS_ANDROID)
         case BnplIssuer::IssuerId::kBnplZip:
-#if BUILDFLAG(IS_ANDROID)
-          return l10n_util::GetStringUTF16(
-              IDS_AUTOFILL_BNPL_ISSUER_SELECTION_TEXT_ZIP_BOTTOM_SHEET);
-#else
           if (base::FeatureList::IsEnabled(
                   features::kAutofillEnablePayNowPayLaterTabs)) {
             return l10n_util::GetStringUTF16(
@@ -289,12 +280,7 @@ std::u16string GetBnplIssuerSelectionOptionText(
                 IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_PAYMENT_OPTION_ZIP);
           }
 
-#endif  // BUILDFLAG(IS_ANDROID)
         case BnplIssuer::IssuerId::kBnplKlarna:
-#if BUILDFLAG(IS_ANDROID)
-          return l10n_util::GetStringUTF16(
-              IDS_AUTOFILL_BNPL_ISSUER_SELECTION_TEXT_KLARNA_BOTTOM_SHEET);
-#else
           if (base::FeatureList::IsEnabled(
                   features::kAutofillEnablePayNowPayLaterTabs)) {
             return l10n_util::GetStringUTF16(
@@ -303,7 +289,6 @@ std::u16string GetBnplIssuerSelectionOptionText(
             return l10n_util::GetStringUTF16(
                 IDS_AUTOFILL_CARD_BNPL_SELECT_PROVIDER_PAYMENT_OPTION_KLARNA);
           }
-#endif  // BUILDFLAG(IS_ANDROID)
       }
       NOTREACHED();
     case BnplIssuerEligibilityForPage::kNotEligibleIssuerDoesNotSupportMerchant:
@@ -410,11 +395,6 @@ TextWithLink GetBnplUiFooterTextForAi(
 
 bool ShouldShowBnplSuggestions(const AutofillClient& client,
                                FieldType trigger_field_type) {
-  // If this is called on Chrome Android, it must be called due to attempting to
-  // add BNPL to the keyboard accessory suggestions, which is not supported.
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    return false;
-  }
   // BNPL suggestions should not be shown for CVC fields.
   if (kCvcFieldTypes.contains(trigger_field_type)) {
     return false;

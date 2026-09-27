@@ -96,21 +96,13 @@ bool ShouldSplitCardNameAndLastFourDigitsForMetadata() {
 }
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
   return true;
-#endif
 }
 
 // The number of obfuscation dots we use as a prefix when showing a credit
 // card's last four.
 int ObfuscationLengthForCreditCardLastFourDigits() {
-#if BUILDFLAG(IS_ANDROID)
-  return 2;
-#else
   return ShouldUseNewFopDisplay() ? 2 : 4;
-#endif
 }
 
 Suggestion GenerateSuggestionFromCardDetails(
@@ -157,12 +149,10 @@ Suggestion GenerateSuggestionFromCardDetails(
             /*label=*/expiration_date_label, icon,
             SuggestionType::kCreditCardEntry);
       } else {
-#if !BUILDFLAG(IS_ANDROID)
         if (!ShouldUseNewFopDisplay()) {
           // We use a longer label on desktop platforms.
           expiration_date_label = u"Expires on " + expiration_date_label;
         }
-#endif
         return Suggestion(
             /*main_text=*/base::StrCat(
                 {network_or_nickname, u"  ", obfuscated_card_digits}),
@@ -171,10 +161,7 @@ Suggestion GenerateSuggestionFromCardDetails(
       }
     } else if (type == CREDIT_CARD_NAME_FULL) {
       std::vector<std::vector<Suggestion::Text>> labels;
-      if constexpr (BUILDFLAG(IS_ANDROID)) {
-        // The label is formatted as either "••••1234" or "••1234".
-        labels.push_back({Suggestion::Text(obfuscated_card_digits)});
-      } else if (ShouldUseNewFopDisplay()) {
+      if (ShouldUseNewFopDisplay()) {
         labels = network_last_four_and_exp_labels;
       } else if (ShouldSplitCardNameAndLastFourDigitsForMetadata()) {
         // The label is formatted as "Product Description/Nickname/Network
@@ -238,20 +225,6 @@ Suggestion GenerateVirtualCardSuggestionFromCreditCardSuggestion(
   virtual_card_suggestion.type = SuggestionType::kVirtualCreditCardEntry;
   const std::u16string& virtual_card_label = l10n_util::GetStringUTF16(
       IDS_AUTOFILL_VIRTUAL_CARD_SUGGESTION_OPTION_VALUE);
-#if BUILDFLAG(IS_ANDROID)
-  if (field_type == CREDIT_CARD_NUMBER) {
-    virtual_card_suggestion.labels.clear();
-  }
-  if (ShouldSplitCardNameAndLastFourDigitsForMetadata()) {
-    virtual_card_suggestion.main_text.value = base::StrCat(
-        {virtual_card_label, u"  ", virtual_card_suggestion.main_text.value});
-  } else {
-    virtual_card_suggestion.minor_texts = {};
-    virtual_card_suggestion.minor_texts.emplace_back(
-        virtual_card_suggestion.main_text.value);
-    virtual_card_suggestion.main_text.value = virtual_card_label;
-  }
-#else
   if (field_type == CREDIT_CARD_NUMBER) {
     virtual_card_suggestion.labels.clear();
   }
@@ -262,14 +235,11 @@ Suggestion GenerateVirtualCardSuggestionFromCreditCardSuggestion(
     virtual_card_suggestion.labels.push_back(std::vector<Suggestion::Text>{
         Suggestion::Text(suggestion.labels[0][0].value)});
   }
-#endif
   return virtual_card_suggestion;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 // A dot ("•") separator.
 inline constexpr char16_t kEllipsisDotSeparator[] = u"\u2022";
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 Matcher<Suggestion> EqualLabels(
     const std::vector<std::vector<Suggestion::Text>>& suggestion_objects) {
@@ -302,13 +272,6 @@ Matcher<Suggestion> EqualsSuggestion(const Suggestion& suggestion) {
 }
 
 Matcher<Suggestion> EqualsManagePaymentsMethodsSuggestion(bool with_gpay_logo) {
-#if BUILDFLAG(IS_ANDROID)
-  return EqualsSuggestion(
-      SuggestionType::kManageCreditCard,
-      l10n_util::GetStringUTF16(IDS_AUTOFILL_MANAGE_PAYMENT_METHODS),
-      with_gpay_logo ? Suggestion::Icon::kGooglePay
-                     : Suggestion::Icon::kSettings);
-#else
   return AllOf(EqualsSuggestion(SuggestionType::kManageCreditCard,
                                 l10n_util::GetStringUTF16(
                                     IDS_AUTOFILL_MANAGE_PAYMENT_METHODS),
@@ -316,7 +279,6 @@ Matcher<Suggestion> EqualsManagePaymentsMethodsSuggestion(bool with_gpay_logo) {
                Field(&Suggestion::trailing_icon,
                      with_gpay_logo ? Suggestion::Icon::kGooglePay
                                     : Suggestion::Icon::kNoIcon));
-#endif
 }
 
 testing::Matcher<const std::vector<Suggestion>&>
@@ -455,16 +417,9 @@ class CreditCardSuggestionGeneratorTest
   bool VerifyCardArtImageExpectation(Suggestion& suggestion,
                                      const GURL& expected_url,
                                      const gfx::Image& expected_image) {
-    if constexpr (BUILDFLAG(IS_ANDROID)) {
-      auto* custom_icon_url =
-          std::get_if<Suggestion::CustomIconUrl>(&suggestion.custom_icon);
-      GURL url = custom_icon_url ? **custom_icon_url : GURL();
-      return url == expected_url;
-    } else {
-      CHECK(std::holds_alternative<gfx::Image>(suggestion.custom_icon));
-      return AreImagesEqual(std::get<gfx::Image>(suggestion.custom_icon),
-                            expected_image);
-    }
+    CHECK(std::holds_alternative<gfx::Image>(suggestion.custom_icon));
+    return AreImagesEqual(std::get<gfx::Image>(suggestion.custom_icon),
+                          expected_image);
   }
 
   struct FormBundle {
@@ -583,13 +538,9 @@ class AutofillCreditCardBenefitsLabelTest
       NOTREACHED();
     }
 
-#if !BUILDFLAG(IS_ANDROID)
     expected_benefit_text_ = l10n_util::GetStringFUTF16(
         IDS_AUTOFILL_CREDIT_CARD_BENEFIT_TEXT_FOR_SUGGESTIONS,
         benefit_description);
-#else
-    expected_benefit_text_ = benefit_description;
-#endif  // !BUILDFLAG(IS_ANDROID)
     card_ = CreateServerCard(
         /*guid=*/"00000000-0000-0000-0000-000000000001",
         /*server_id=*/"server_id1",
@@ -644,7 +595,6 @@ INSTANTIATE_TEST_SUITE_P(
                                      &test::GetActiveCreditCardMerchantBenefit),
                      ::testing::Values("amex", "bmo", "curinos")));
 
-#if !BUILDFLAG(IS_ANDROID)
 // Checks that for FPAN suggestions that the benefit description is displayed.
 TEST_P(AutofillCreditCardBenefitsLabelTest, BenefitSuggestionLabel_Fpan) {
   Suggestion suggestion = CreateCreditCardSuggestionForTest(
@@ -839,193 +789,6 @@ TEST_P(AutofillCreditCardBenefitsLabelTest,
     EXPECT_FALSE(suggestion.labels.empty());
   }
 }
-
-#else
-
-TEST_P(AutofillCreditCardBenefitsLabelTest,
-       GetCreditCardSuggestionsForTouchToFill_BenefitsAdded_RealCard) {
-  std::vector<CreditCard> cards = {card()};
-  base::flat_map<
-      int64_t,
-      autofill_metrics::CardMetadataLoggingContext::CardBenefitLoggingContext>
-      expected_instrument_ids_to_available_benefit_context = {
-          {cards[0].instrument_id(),
-           {cards[0].benefit_source(), GetTypeForCardBenefit(GetBenefit())}}};
-  EXPECT_CALL(credit_card_form_event_logger(),
-              OnMetadataLoggingContextReceived(
-                  Field(&autofill_metrics::CardMetadataLoggingContext::
-                            instrument_ids_to_available_benefit_context,
-                        expected_instrument_ids_to_available_benefit_context)))
-      .Times(1);
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      cards, autofill_manager(), test::MakeFormGlobalId());
-
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kCreditCardEntry);
-  if (GetBenefitSource() == "curinos" &&
-      !std::holds_alternative<CreditCardFlatRateBenefit>(GetBenefit())) {
-    EXPECT_THAT(suggestions[0],
-                EqualLabels({{card().GetInfo(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR,
-                                             app_locale())}}));
-    EXPECT_FALSE(suggestions[0]
-                     .GetPayload<Suggestion::PaymentsPayload>()
-                     .should_display_terms_available);
-  } else {
-    EXPECT_THAT(suggestions[0],
-                EqualLabels({{expected_benefit_text()},
-                             {card().GetInfo(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR,
-                                             app_locale())}}));
-    EXPECT_TRUE(suggestions[0]
-                    .GetPayload<Suggestion::PaymentsPayload>()
-                    .should_display_terms_available);
-  }
-}
-
-TEST_P(AutofillCreditCardBenefitsLabelTest,
-       GetCreditCardSuggestionsForTouchToFill_BenefitsAdded_VirtualCard) {
-  CreditCard virtual_card = CreditCard::CreateVirtualCard(card());
-  std::vector<CreditCard> cards = {virtual_card};
-  base::flat_map<
-      int64_t,
-      autofill_metrics::CardMetadataLoggingContext::CardBenefitLoggingContext>
-      expected_instrument_ids_to_available_benefit_context = {
-          {cards[0].instrument_id(),
-           {cards[0].benefit_source(), GetTypeForCardBenefit(GetBenefit())}}};
-  EXPECT_CALL(credit_card_form_event_logger(),
-              OnMetadataLoggingContextReceived(
-                  Field(&autofill_metrics::CardMetadataLoggingContext::
-                            instrument_ids_to_available_benefit_context,
-                        expected_instrument_ids_to_available_benefit_context)))
-      .Times(1);
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      cards, autofill_manager(), test::MakeFormGlobalId());
-
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kVirtualCreditCardEntry);
-  if (GetBenefitSource() == "curinos" &&
-      !std::holds_alternative<CreditCardFlatRateBenefit>(GetBenefit())) {
-    EXPECT_THAT(suggestions[0],
-                EqualLabels({{l10n_util::GetStringUTF16(
-                    IDS_AUTOFILL_VIRTUAL_CARD_SUGGESTION_OPTION_VALUE)}}));
-    EXPECT_FALSE(suggestions[0]
-                     .GetPayload<Suggestion::PaymentsPayload>()
-                     .should_display_terms_available);
-  } else {
-    EXPECT_THAT(
-        suggestions[0],
-        EqualLabels({{expected_benefit_text()},
-                     {l10n_util::GetStringUTF16(
-                         IDS_AUTOFILL_VIRTUAL_CARD_SUGGESTION_OPTION_VALUE)}}));
-    EXPECT_TRUE(suggestions[0]
-                    .GetPayload<Suggestion::PaymentsPayload>()
-                    .should_display_terms_available);
-  }
-}
-
-// Checks that the merchant benefit description is not displayed for suggestions
-// where the webpage's URL is different from the benefit's applicable URL.
-TEST_P(
-    AutofillCreditCardBenefitsLabelTest,
-    GetCreditCardSuggestionsForTouchToFill_BenefitsNotAdded_NonApplicableUrl) {
-  if (!std::holds_alternative<CreditCardMerchantBenefit>(GetBenefit())) {
-    GTEST_SKIP() << "This test should not run for non-merchant benefits.";
-  }
-  autofill_client().set_last_committed_primary_main_frame_url(
-      GURL("https://random-url.com"));
-  std::vector<CreditCard> cards = {card()};
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      cards, autofill_manager(), test::MakeFormGlobalId());
-
-  // Merchant benefit description is not returned.
-  EXPECT_THAT(suggestions[0],
-              EqualLabels({{card().GetInfo(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR,
-                                           app_locale())}}));
-  EXPECT_FALSE(suggestions[0]
-                   .GetPayload<Suggestion::PaymentsPayload>()
-                   .should_display_terms_available);
-}
-
-// Checks that the category benefit description is not displayed for suggestions
-// where the webpage's category in the optimization guide is different from the
-// benefit's applicable category.
-TEST_P(
-    AutofillCreditCardBenefitsLabelTest,
-    GetCreditCardSuggestionsForTouchToFill_BenefitsNotAdded_DifferentCategory) {
-  if (!std::holds_alternative<CreditCardCategoryBenefit>(GetBenefit())) {
-    GTEST_SKIP() << "This test should not run for non-category benefits.";
-  }
-
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          AttemptToGetEligibleCreditCardBenefitCategory)
-      .WillByDefault(testing::Return(
-          CreditCardCategoryBenefit::BenefitCategory::kUnknownBenefitCategory));
-  std::vector<CreditCard> cards = {card()};
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      cards, autofill_manager(), test::MakeFormGlobalId());
-
-  // Category benefit description is not returned.
-  EXPECT_THAT(suggestions[0],
-              EqualLabels({{card().GetInfo(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR,
-                                           app_locale())}}));
-  EXPECT_FALSE(suggestions[0]
-                   .GetPayload<Suggestion::PaymentsPayload>()
-                   .should_display_terms_available);
-}
-
-// Checks that the benefit description is not displayed when benefit suggestions
-// are disabled for the given card and url.
-TEST_P(AutofillCreditCardBenefitsLabelTest,
-       GetCreditCardSuggestionsForTouchToFill_BenefitsNotAdded_BlockedUrl) {
-  if (!std::holds_alternative<CreditCardFlatRateBenefit>(GetBenefit())) {
-    GTEST_SKIP() << "This test should not run for non-flat-rate benefits.";
-  }
-
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          ShouldBlockFlatRateBenefitSuggestionLabelsForUrl)
-      .WillByDefault(testing::Return(true));
-  std::vector<CreditCard> cards = {card()};
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      cards, autofill_manager(), test::MakeFormGlobalId());
-
-  // Benefit description is not returned for flat rate benefits.
-  EXPECT_THAT(suggestions[0],
-              EqualLabels({{card().GetInfo(CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR,
-                                           app_locale())}}));
-  EXPECT_FALSE(suggestions[0]
-                   .GetPayload<Suggestion::PaymentsPayload>()
-                   .should_display_terms_available);
-}
-
-TEST_P(
-    AutofillCreditCardBenefitsLabelTest,
-    GetCreditCardSuggestionsForTouchToFill_OnMetadataLoggingContextReceivedCalled) {
-  std::vector<CreditCard> cards = {card(),
-                                   CreditCard::CreateVirtualCard(card())};
-  base::flat_map<
-      int64_t,
-      autofill_metrics::CardMetadataLoggingContext::CardBenefitLoggingContext>
-      expected_instrument_ids_to_available_benefit_context = {
-          {cards[0].instrument_id(),
-           {cards[0].benefit_source(), GetTypeForCardBenefit(GetBenefit())}},
-          {cards[1].instrument_id(),
-           {cards[1].benefit_source(), GetTypeForCardBenefit(GetBenefit())}}};
-  EXPECT_CALL(credit_card_form_event_logger(),
-              OnMetadataLoggingContextReceived(
-                  Field(&autofill_metrics::CardMetadataLoggingContext::
-                            instrument_ids_to_available_benefit_context,
-                        expected_instrument_ids_to_available_benefit_context)))
-      .Times(1);
-
-  GetCreditCardSuggestionsForTouchToFill(cards, autofill_manager(),
-                                         test::MakeFormGlobalId());
-}
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(CreditCardSuggestionGeneratorTest,
        RemoveExpiredCreditCardsNotUsedSinceTimestamp) {
@@ -1245,7 +1008,6 @@ TEST_F(CreditCardSuggestionGeneratorTest,
               ContainsCreditCardFooterSuggestions(/*with_gpay_logo=*/true));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(CreditCardSuggestionGeneratorTest,
        GetVirtualCardStandaloneCvcFieldSuggestions_UndoAutofill) {
   // Set up a virtual card enrolled server card.
@@ -1292,7 +1054,6 @@ TEST_F(CreditCardSuggestionGeneratorTest,
               Suggestion::Icon::kUndo),
           EqualsManagePaymentsMethodsSuggestion(/*with_gpay_logo=*/true)));
 }
-#endif
 
 // Ensures we appropriately generate suggestions for credit saved with CVC.
 TEST_F(CreditCardSuggestionGeneratorTest, GetCardSuggestionsWithCvc) {
@@ -1653,7 +1414,6 @@ TEST_F(CreditCardSuggestionGeneratorTest, ScanCreditCardBasedOnIsFormSecure) {
       *http_form_bundle.form_structure->field(0), autofill_client()));
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 TEST_F(CreditCardSuggestionGeneratorTest,
        FieldWasAutofilled_UndoAutofillOnCreditCardForm) {
   payments_data().AddCreditCard(test::GetCreditCard());
@@ -1681,7 +1441,6 @@ TEST_F(CreditCardSuggestionGeneratorTest,
                           EqualsManagePaymentsMethodsSuggestion(
                               /*with_gpay_logo=*/false)));
 }
-#endif
 
 // Test that the virtual card option is shown when all of the prerequisites are
 // met.
@@ -1726,7 +1485,7 @@ TEST_F(CreditCardSuggestionGeneratorTest, IsCreditCardFooterSuggestion) {
 }
 
 // BNPL is currently only available for desktop and android platforms.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class CreditCardSuggestionGeneratorBnplTest
     : public CreditCardSuggestionGeneratorTest {
  public:
@@ -1748,7 +1507,6 @@ class CreditCardSuggestionGeneratorBnplTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if !BUILDFLAG(IS_ANDROID)
 // Ensures that the pay over time option is generated with expected content
 // and inserted as the last entry before the footer suggestions.
 TEST_F(CreditCardSuggestionGeneratorBnplTest,
@@ -2940,7 +2698,6 @@ TEST_P(CreditCardSuggestionGeneratorPnplTabTestForIssuer,
   EXPECT_EQ(std::get<Suggestion::BnplIssuer>(bnpl_it->payload).value(), issuer);
   EXPECT_EQ(bnpl_it->tab_index, kPayLaterSuggestionTabIndex);
 }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Ensures that `GetBnplPriceLowerBound()` returns the minimum lower price
 // bound among all given issuers.
@@ -3068,264 +2825,7 @@ TEST_F(CreditCardSuggestionGeneratorBnplTest,
   EXPECT_EQ(loading_suggestion.expected_number_of_suggestions, 2u);
 }
 
-#if BUILDFLAG(IS_ANDROID)
-// Verifies that a BNPL suggestion is added to Touch to Fill suggestions when
-// BNPL is eligible and there are credit card suggestions.
-TEST_F(CreditCardSuggestionGeneratorBnplTest,
-       GetCreditCardSuggestionsForTouchToFill_BnplSuggestionAdded) {
-  BnplIssuer bnpl_issuer = test::GetTestUnlinkedBnplIssuer();
-  payments_data().AddBnplIssuer(bnpl_issuer);
-
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      {CreateServerCard(), CreateLocalCard()}, autofill_manager(),
-      test::MakeFormGlobalId());
-
-  ASSERT_EQ(suggestions.size(), 3U);
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kCreditCardEntry);
-  EXPECT_EQ(suggestions[1].type, SuggestionType::kCreditCardEntry);
-  EXPECT_EQ(suggestions[2].type, SuggestionType::kBnplEntry);
-  EXPECT_THAT(
-      suggestions[2],
-      EqualsSuggestion(
-          SuggestionType::kBnplEntry,
-          l10n_util::GetStringUTF16(IDS_AUTOFILL_BNPL_PAY_LATER_OPTIONS_TEXT),
-          Suggestion::Icon::kBnplGeneric,
-          {{Suggestion::Text(bnpl_issuer.GetDisplayName())}}));
-  EXPECT_TRUE(payments_data().IsAutofillHasSeenBnplPrefEnabled());
-}
-
-// Verifies that a BNPL suggestion is not added to Touch to Fill suggestions
-// when BNPL is not eligible.
-TEST_F(
-    CreditCardSuggestionGeneratorBnplTest,
-    GetCreditCardSuggestionsForTouchToFill_BnplSuggestionNotAdded_BnplNotEligible) {
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(false));
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      {CreateServerCard()}, autofill_manager(), test::MakeFormGlobalId());
-
-  ASSERT_EQ(suggestions.size(), 1U);
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kCreditCardEntry);
-}
-
-// Verifies that a BNPL suggestion is not added to Touch to Fill suggestions
-// when `kAutofillEnableBuyNowPayLater` is disabled.
-TEST_F(
-    CreditCardSuggestionGeneratorBnplTest,
-    GetCreditCardSuggestionsForTouchToFill_BnplSuggestionNotAdded_FlagDisabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndDisableFeature(
-      features::kAutofillEnableBuyNowPayLater);
-
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      {CreateServerCard()}, autofill_manager(), test::MakeFormGlobalId());
-
-  ASSERT_EQ(suggestions.size(), 1U);
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kCreditCardEntry);
-}
-
-// Verifies that OnBnplSuggestionShown is called when a BNPL suggestion is added
-// to Touch to Fill suggestions.
-TEST_F(CreditCardSuggestionGeneratorBnplTest,
-       GetCreditCardSuggestionsForTouchToFill_OnBnplSuggestionShownCalled) {
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  EXPECT_CALL(credit_card_form_event_logger(), OnBnplSuggestionShown(false))
-      .Times(1);
-
-  GetCreditCardSuggestionsForTouchToFill(/*credit_cards=*/{CreateServerCard()},
-                                         autofill_manager(),
-                                         test::MakeFormGlobalId());
-}
-
-TEST_F(
-    CreditCardSuggestionGeneratorBnplTest,
-    GetCreditCardSuggestionsForTouchToFill_OnBnplSuggestionShownCalled_PayLaterTabsEnabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      features::kAutofillEnablePayNowPayLaterTabs);
-
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  EXPECT_CALL(credit_card_form_event_logger(), OnBnplSuggestionShown(true))
-      .Times(1);
-
-  GetCreditCardSuggestionsForTouchToFill(/*credit_cards=*/{CreateServerCard()},
-                                         autofill_manager(),
-                                         test::MakeFormGlobalId());
-}
-
-// Verifies that OnBnplSuggestionShown is not called when a BNPL suggestion is
-// not added to Touch to Fill suggestions.
-TEST_F(
-    CreditCardSuggestionGeneratorBnplTest,
-    GetCreditCardSuggestionsForTouchToFill_BnplSuggestionNotShown_NotLogged) {
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(false));
-
-  EXPECT_CALL(credit_card_form_event_logger(), OnBnplSuggestionShown(_))
-      .Times(0);
-
-  GetCreditCardSuggestionsForTouchToFill(/*credit_cards=*/{CreateServerCard()},
-                                         autofill_manager(),
-                                         test::MakeFormGlobalId());
-}
-
-// Verifies that OnBnplSuggestionShown is not called when a BNPL suggestion is
-// not added to Touch to Fill suggestions because the
-// `kAutofillEnableBuyNowPayLater` feature flag is disabled.
-TEST_F(
-    CreditCardSuggestionGeneratorBnplTest,
-    GetCreditCardSuggestionsForTouchToFill_BnplSuggestionNotShown_NotLogged_FlagDisabled) {
-  scoped_feature_list_.Reset();
-  scoped_feature_list_.InitWithFeatures(
-      /*enabled_features=*/{},
-      /*disabled_features=*/{features::kAutofillEnableBuyNowPayLater});
-
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  EXPECT_CALL(credit_card_form_event_logger(), OnBnplSuggestionShown(_))
-      .Times(0);
-
-  GetCreditCardSuggestionsForTouchToFill(/*credit_cards=*/{CreateServerCard()},
-                                         autofill_manager(),
-                                         test::MakeFormGlobalId());
-}
-
-TEST_F(
-    CreditCardSuggestionGeneratorBnplTest,
-    GetCreditCardSuggestionsForTouchToFill_EmptyCardNumberField_IncludesBnpl) {
-  scoped_feature_list_.Reset();
-  scoped_feature_list_.InitWithFeatures(
-      /*enabled_features=*/
-      {features::kAutofillEnableBuyNowPayLater,
-       features::kAutofillEnableAmountExtraction,
-       features::kAutofillEnableAiBasedAmountExtraction},
-      /*disabled_features=*/{});
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-  FormData form = test::GetFormData(
-      {.fields = {{.role = CREDIT_CARD_NAME_FULL,
-                   .value = u"Card Name",
-                   .is_autofilled_according_to_renderer = true},
-                  {.role = CREDIT_CARD_NUMBER, .value = u""}}});
-  autofill_manager().AddSeenForm(form,
-                                 {CREDIT_CARD_NAME_FULL, CREDIT_CARD_NUMBER});
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      {CreateServerCard(), CreateLocalCard()}, autofill_manager(),
-      form.global_id());
-
-  ASSERT_EQ(suggestions.size(), 3U);
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kCreditCardEntry);
-  EXPECT_EQ(suggestions[1].type, SuggestionType::kCreditCardEntry);
-  EXPECT_EQ(suggestions[2].type, SuggestionType::kBnplEntry);
-  EXPECT_TRUE(payments::test_api(*autofill_manager().GetPaymentsBnplManager())
-                  .GetIsCardNumberFieldEmpty());
-}
-
-TEST_F(
-    CreditCardSuggestionGeneratorBnplTest,
-    GetCreditCardSuggestionsForTouchToFill_NonEmptyCardNumberField_ExcludesBnpl) {
-  scoped_feature_list_.Reset();
-  scoped_feature_list_.InitWithFeatures(
-      /*enabled_features=*/
-      {features::kAutofillEnableBuyNowPayLater,
-       features::kAutofillEnableAmountExtraction,
-       features::kAutofillEnableAiBasedAmountExtraction},
-      /*disabled_features=*/{});
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-  FormData form = test::GetFormData(
-      {.fields = {{.role = CREDIT_CARD_NAME_FULL,
-                   .value = u"Card Name",
-                   .is_autofilled_according_to_renderer = true},
-                  {.role = CREDIT_CARD_NUMBER, .value = u"01230123012399"}}});
-  autofill_manager().AddSeenForm(form,
-                                 {CREDIT_CARD_NAME_FULL, CREDIT_CARD_NUMBER});
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      {CreateServerCard(), CreateLocalCard()}, autofill_manager(),
-      form.global_id());
-
-  ASSERT_EQ(suggestions.size(), 2U);
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kCreditCardEntry);
-  EXPECT_EQ(suggestions[1].type, SuggestionType::kCreditCardEntry);
-}
-
-TEST_F(CreditCardSuggestionGeneratorBnplTest,
-       GetCreditCardSuggestionsForTouchToFill_TabsEnabled_IncludesBnpl) {
-  scoped_feature_list_.Reset();
-  scoped_feature_list_.InitWithFeatures(
-      /*enabled_features=*/
-      {features::kAutofillEnableBuyNowPayLater,
-       features::kAutofillEnableAmountExtraction,
-       features::kAutofillEnableAiBasedAmountExtraction,
-       features::kAutofillEnablePayNowPayLaterTabs},
-      /*disabled_features=*/{});
-  payments_data().AddBnplIssuer(test::GetTestUnlinkedBnplIssuer());
-  FormData form = test::GetFormData(
-      {.fields = {{.role = CREDIT_CARD_NAME_FULL,
-                   .value = u"Card Name",
-                   .is_autofilled_according_to_renderer = true},
-                  {.role = CREDIT_CARD_NUMBER, .value = u"01230123012399"}}});
-  autofill_manager().AddSeenForm(form,
-                                 {CREDIT_CARD_NAME_FULL, CREDIT_CARD_NUMBER});
-  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
-              autofill_client().GetAutofillOptimizationGuideDecider()),
-          IsUrlEligibleForBnplIssuer)
-      .WillByDefault(testing::Return(true));
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      {CreateServerCard(), CreateLocalCard()}, autofill_manager(),
-      form.global_id());
-
-  ASSERT_EQ(suggestions.size(), 3U);
-  EXPECT_EQ(suggestions[0].type, SuggestionType::kCreditCardEntry);
-  EXPECT_EQ(suggestions[1].type, SuggestionType::kCreditCardEntry);
-  EXPECT_EQ(suggestions[2].type, SuggestionType::kBnplEntry);
-}
-
-#endif  // BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 TEST_F(CreditCardSuggestionGeneratorTest, CreateBnplSuggestion_OneIssuer) {
   base::test::ScopedFeatureList scoped_feature_list{
@@ -3954,32 +3454,17 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
                                         CREDIT_CARD_NAME_FULL,
                                         /*virtual_card_option=*/true);
 
-#if BUILDFLAG(IS_ANDROID)
-  // For the keyboard accessory, the "Virtual card" label is added as a prefix
-  // to the cardholder name.
-  EXPECT_EQ(virtual_card_name_field_suggestion.main_text.value,
-            u"Virtual card  Elvis Presley");
-  EXPECT_TRUE(virtual_card_name_field_suggestion.minor_texts.empty());
-#else
   // On other platforms, the cardholder name is shown on the first line.
   EXPECT_EQ(virtual_card_name_field_suggestion.main_text.value,
             u"Elvis Presley");
   EXPECT_TRUE(virtual_card_name_field_suggestion.minor_texts.empty());
-#endif
 
-#if BUILDFLAG(IS_ANDROID)
-  // There should be only 1 line of label: obfuscated last 4 digits "..1111".
-  EXPECT_THAT(virtual_card_name_field_suggestion,
-              EqualLabels({{CreditCard::GetObfuscatedStringForCardDigits(
-                  /*obfuscation_length=*/2, u"1111")}}));
-#else
   // The label for virtual card suggestion should be:
   // Card Network + last 4 digits.
   EXPECT_THAT(
       virtual_card_name_field_suggestion,
       EqualLabels(
           {{server_card.NetworkAndLastFourDigits(/*obfuscation_length=*/2)}}));
-#endif
   EXPECT_EQ(virtual_card_name_field_suggestion.IsAcceptable(), true);
   EXPECT_EQ(virtual_card_name_field_suggestion.iph_metadata.feature,
             &feature_engagement::kIPHAutofillVirtualCardSuggestionFeature);
@@ -3997,16 +3482,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
                                         CREDIT_CARD_NUMBER,
                                         /*virtual_card_option=*/true);
 
-#if BUILDFLAG(IS_ANDROID)
-  // For the keyboard accessory, the "Virtual card" label is added as a prefix
-  // to the card number. The obfuscated last four digits are shown in a
-  // separate view.
-  EXPECT_EQ(virtual_card_number_field_suggestion.main_text.value,
-            u"Virtual card  Visa");
-  EXPECT_EQ(virtual_card_number_field_suggestion.minor_texts[0].value,
-            CreditCard::GetObfuscatedStringForCardDigits(
-                /*obfuscation_length=*/2, u"1111"));
-#else
   // For Desktop, display the card name and the last 4 digits, followed
   // by a dot separator and expiration date.
   EXPECT_EQ(virtual_card_number_field_suggestion.main_text.value,
@@ -4015,14 +3490,9 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
             kEllipsisDotSeparator);
   EXPECT_EQ(virtual_card_number_field_suggestion.minor_texts[1].value,
             server_card.AbbreviatedExpirationDateForDisplay(false));
-#endif
   EXPECT_EQ(virtual_card_number_field_suggestion.IsAcceptable(), true);
   EXPECT_EQ(virtual_card_number_field_suggestion.iph_metadata.feature,
             &feature_engagement::kIPHAutofillVirtualCardSuggestionFeature);
-#if BUILDFLAG(IS_ANDROID)
-  // For the keyboard accessory, there is no label.
-  ASSERT_TRUE(virtual_card_number_field_suggestion.labels.empty());
-#endif
 }
 
 // Verify that the suggestion's texts are populated correctly for a masked
@@ -4041,12 +3511,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   EXPECT_EQ(real_card_name_field_suggestion.main_text.value, u"Elvis Presley");
   EXPECT_TRUE(real_card_name_field_suggestion.minor_texts.empty());
 
-#if BUILDFLAG(IS_ANDROID)
-  // For the keyboard accessory, the label is "..1111".
-  EXPECT_THAT(real_card_name_field_suggestion,
-              EqualLabels({{CreditCard::GetObfuscatedStringForCardDigits(
-                  /*obfuscation_length=*/2, u"1111")}}));
-#else
   // For Desktop, the label is "Visa ..1111 • 02/29". Network name and
   // last four followed by expiration date.
   EXPECT_THAT(
@@ -4055,7 +3519,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
           {{server_card.NetworkAndLastFourDigits(/*obfuscation_length=*/2),
             kEllipsisDotSeparator,
             server_card.AbbreviatedExpirationDateForDisplay(false)}}));
-#endif
 }
 
 // Verify that the suggestion's texts are populated correctly for a masked
@@ -4070,19 +3533,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
                                         CREDIT_CARD_NUMBER,
                                         /*virtual_card_option=*/false);
 
-#if BUILDFLAG(IS_ANDROID)
-  // For Android, split the first line and populate the card name and
-  // the last 4 digits separately.
-  EXPECT_EQ(real_card_number_field_suggestion.main_text.value, u"Visa");
-  EXPECT_EQ(real_card_number_field_suggestion.minor_texts[0].value,
-            CreditCard::GetObfuscatedStringForCardDigits(2, u"1111"));
-  // The label is the expiration date formatted as mm/yy.
-  EXPECT_THAT(
-      real_card_number_field_suggestion,
-      EqualLabels(
-          {{base::StrCat({base::UTF8ToUTF16(test::NextMonth()), u"/",
-                          base::UTF8ToUTF16(test::NextYear().substr(2))})}}));
-#else
   // For Desktop, display the card name and the last 4 digits, followed
   // by a dot separator and expiration date.
   EXPECT_EQ(real_card_number_field_suggestion.main_text.value,
@@ -4093,7 +3543,6 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
             server_card.AbbreviatedExpirationDateForDisplay(false));
   // The label is empty.
   EXPECT_TRUE(real_card_number_field_suggestion.labels.empty());
-#endif
 }
 
 // Verify that the suggestion's texts are populated correctly for a local and
@@ -4124,17 +3573,10 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   // Both local card and server card suggestion should be shown when CVC field
   // is focused.
   ASSERT_EQ(suggestions.size(), 4U);
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(suggestions[0].main_text.value, u"CVC for Visa");
-  EXPECT_EQ(suggestions[1].main_text.value, u"CVC for Mastercard");
-  EXPECT_TRUE(suggestions[0].minor_texts.empty());
-  EXPECT_TRUE(suggestions[1].minor_texts.empty());
-#else  // For all other platforms
   EXPECT_EQ(suggestions[0].main_text.value, u"CVC");
   EXPECT_EQ(suggestions[1].main_text.value, u"CVC");
   EXPECT_TRUE(suggestions[0].minor_texts.empty());
   EXPECT_TRUE(suggestions[1].minor_texts.empty());
-#endif
   EXPECT_THAT(suggestions,
               ContainsCreditCardFooterSuggestions(/*with_gpay_logo=*/false));
 }
@@ -4191,17 +3633,10 @@ TEST_F(AutofillCreditCardSuggestionContentTest,
   // Both FPAN and VCN suggestion should be shown when CVC field is focused.
   ASSERT_EQ(suggestions.size(), 4U);
 
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_EQ(suggestions[0].main_text.value, u"Virtual card  CVC for Visa");
-  EXPECT_EQ(suggestions[1].main_text.value, u"CVC for Visa");
-  EXPECT_TRUE(suggestions[0].minor_texts.empty());
-  EXPECT_TRUE(suggestions[1].minor_texts.empty());
-#else
   EXPECT_EQ(suggestions[0].main_text.value, u"CVC");
   EXPECT_EQ(suggestions[1].main_text.value, u"CVC");
   EXPECT_TRUE(suggestions[0].minor_texts.empty());
   EXPECT_TRUE(suggestions[1].minor_texts.empty());
-#endif
   EXPECT_THAT(suggestions,
               ContainsCreditCardFooterSuggestions(/*with_gpay_logo=*/true));
 }
@@ -4292,13 +3727,6 @@ TEST_P(
           ? &feature_engagement::
                 kIPHAutofillDisabledVirtualCardSuggestionFeature
           : &feature_engagement::kIPHAutofillVirtualCardSuggestionFeature);
-#if BUILDFLAG(IS_ANDROID)
-  // Android: There should be only 1 line of label: obfuscated last 4 digits
-  // "..4444".
-  EXPECT_THAT(virtual_card_name_field_suggestion,
-              EqualLabels({{CreditCard::GetObfuscatedStringForCardDigits(
-                  /*obfuscation_length=*/2, u"4444")}}));
-#else
   // Desktop: There should be one line for network and last four, and one line
   // if merchant opt-out virtual card text.
   ASSERT_EQ(virtual_card_name_field_suggestion.labels.size(),
@@ -4314,7 +3742,6 @@ TEST_P(
                 EqualLabels({{server_card.NetworkAndLastFourDigits(
                     /*obfuscation_length=*/2)}}));
   }
-#endif
 }
 
 // Verify that the suggestion's texts are populated correctly for a virtual
@@ -4346,14 +3773,9 @@ TEST_P(
                 kIPHAutofillDisabledVirtualCardSuggestionFeature
           : &feature_engagement::kIPHAutofillVirtualCardSuggestionFeature);
 
-#if BUILDFLAG(IS_ANDROID)
-  // In Android, when filling card number, the labels are removed.
-  ASSERT_TRUE(virtual_card_number_field_suggestion.labels.empty());
-#else
   // Desktop, the label should be one-line message if it's merchant opt out.
   EXPECT_EQ(virtual_card_number_field_suggestion.labels.size(),
             is_merchant_opted_out() ? 1U : 0U);
-#endif
 }
 
 class CreditCardSuggestionGeneratorTestForMetadata
@@ -4729,17 +4151,6 @@ TEST_P(SuggestionIphBubbleTest,
       card_info_retrieval_enrollment_state() ==
           CreditCard::CardInfoRetrievalEnrollmentState::kRetrievalEnrolled,
       card_number_field_suggestion.iph_metadata.iph_params == kDiplayName);
-
-#if BUILDFLAG(IS_ANDROID)
-  std::u16string expected_description =
-      u"You can autofill this card because your PayPay account is linked to "
-      u"Google Pay";
-  EXPECT_EQ(
-      card_info_retrieval_enrollment_state() ==
-          CreditCard::CardInfoRetrievalEnrollmentState::kRetrievalEnrolled,
-      expected_description ==
-          card_number_field_suggestion.iph_description_text);
-#endif
 }
 
 // Verify that the card info retrieval enrolled suggestion `feature` and
@@ -4760,17 +4171,6 @@ TEST_P(SuggestionIphBubbleTest,
           CreditCard::CardInfoRetrievalEnrollmentState::kRetrievalEnrolled,
       card_number_field_suggestion.iph_metadata.feature ==
           &feature_engagement::kIPHAutofillCardInfoRetrievalSuggestionFeature);
-
-#if BUILDFLAG(IS_ANDROID)
-  std::u16string expected_description =
-      u"You can autofill this card because your account is linked to "
-      u"Google Pay";
-  EXPECT_EQ(
-      card_info_retrieval_enrollment_state() ==
-          CreditCard::CardInfoRetrievalEnrollmentState::kRetrievalEnrolled,
-      expected_description ==
-          card_number_field_suggestion.iph_description_text);
-#endif
 }
 
 // Params of DownstreamCardAwarenessIphTest:
@@ -5499,24 +4899,6 @@ TEST_P(AutofillCreditCardSuggestionContentForTouchToFillTest,
   ASSERT_EQ(suggestions.size(), 1U);
   EXPECT_EQ(suggestions[0].icon, Suggestion::Icon::kCardVisa);
 }
-
-#if BUILDFLAG(IS_ANDROID)
-TEST_P(AutofillCreditCardSuggestionContentForTouchToFillTest,
-       GetCreditCardSuggestionsForTouchToFill_CustomIcon) {
-  CreditCard server_card = CreateServerCard();
-  GURL expected_custom_icon_url("https://www.example.com/card-art");
-  server_card.set_card_art_url(expected_custom_icon_url);
-  std::vector<CreditCard> cards = {server_card};
-
-  std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
-      cards, autofill_manager(), test::MakeFormGlobalId());
-
-  ASSERT_EQ(suggestions.size(), 1U);
-  const Suggestion::CustomIconUrl* custom_icon_url =
-      std::get_if<Suggestion::CustomIconUrl>(&suggestions[0].custom_icon);
-  EXPECT_EQ(**custom_icon_url, expected_custom_icon_url);
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Verify that the suggestion's payment payload includes credit card guid.
 TEST_P(AutofillCreditCardSuggestionContentForTouchToFillTest,

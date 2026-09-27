@@ -318,8 +318,7 @@ void AmountExtractionManager::OnCheckoutAmountReceived(
   std::move(result_callback)
       .Run(parsed_extracted_amount,
            /*timeout_reached=*/false);
-  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-                BUILDFLAG(IS_ANDROID)) {
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)) {
     if (base::FeatureList::IsEnabled(
             features::kAutofillEnableAmountExtractionTesting)) {
       VLOG(3) << "The result of amount extraction on domain "
@@ -388,8 +387,7 @@ void AmountExtractionManager::OnTimeoutReached(
     has_logged_amount_extraction_result_ = true;
   }
 
-  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-                BUILDFLAG(IS_ANDROID)) {
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)) {
     if (base::FeatureList::IsEnabled(
             features::kAutofillEnableAmountExtractionTesting)) {
       VLOG(3) << "The amount extraction on domain "
@@ -413,8 +411,7 @@ void AmountExtractionManager::OnTimeoutReachedWithAi(
   LogAiAmountExtractionResultIfApplicable(result, /*latency=*/std::nullopt);
   std::move(callback).Run(std::move(result));
 
-  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-                BUILDFLAG(IS_ANDROID)) {
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)) {
     if (base::FeatureList::IsEnabled(
             features::kAutofillEnableAmountExtractionTesting)) {
       VLOG(3) << "The amount extraction on domain "
@@ -433,8 +430,7 @@ AmountExtractionManager::CheckEligibilityForFeaturesRequiringAmountExtraction()
   DenseSet<EligibleFeature> eligible_features;
 
   // Check eligibility of BNPL feature.
-  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-                BUILDFLAG(IS_ANDROID)) {
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)) {
     if (IsEligibleForBnpl(autofill_manager_->client())) {
       eligible_features.insert(EligibleFeature::kBnpl);
     }

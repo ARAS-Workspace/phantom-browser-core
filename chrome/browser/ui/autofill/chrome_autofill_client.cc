@@ -173,27 +173,6 @@
 #include "ui/gfx/geometry/rect.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/android/preferences/autofill/settings_navigation_helper.h"
-#include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/autofill/android/android_sms_otp_backend_factory.h"
-#include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/keyboard_accessory/android/manual_filling_controller.h"
-#include "chrome/browser/signin/android/signin_bridge.h"
-#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_autofill_controller.h"
-#include "chrome/browser/touch_to_fill/autofill/android/touch_to_fill_autofill_view_impl.h"
-#include "chrome/browser/ui/android/autofill/autofill_ai_save_update_entity_flow_manager.h"
-#include "chrome/browser/ui/android/autofill/save_update_address_profile_flow_manager.h"
-#include "chrome/browser/ui/autofill/autofill_message_controller_impl.h"
-#include "chrome/browser/ui/autofill/autofill_snackbar_type.h"
-#include "chrome/browser/ui/autofill/payments/offer_notification_controller_android.h"
-#include "components/autofill/core/browser/payments/autofill_save_card_infobar_delegate_mobile.h"
-#include "components/infobars/content/content_infobar_manager.h"
-#include "components/infobars/core/infobar.h"
-#include "components/messages/android/message_enums.h"
-#include "components/messages/android/messages_feature.h"
-#include "components/strings/grit/components_strings.h"
-#else  // !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/autofill/autofill_ai/autofill_ai_import_data_controller.h"
 #include "chrome/browser/ui/autofill/autofill_field_promo_controller_impl.h"
 #include "chrome/browser/ui/autofill/delete_address_profile_dialog_controller_impl.h"
@@ -213,8 +192,6 @@
 #include "chrome/browser/ui/webui/signin/login_ui_service_factory.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"  // nogncheck
-
-#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_COMPOSE)
 #include "chrome/browser/compose/chrome_compose_client.h"
@@ -243,7 +220,6 @@ std::string GetStringRepresentatioOfSavedEntitiesTypes(
       ",");
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 const base::Feature& GetFeature(AutofillClient::IphFeature iph_feature) {
   switch (iph_feature) {
     case AutofillClient::IphFeature::kAutofillAi:
@@ -259,8 +235,6 @@ ui::ElementIdentifier GetElementId(AutofillClient::IphFeature iph_feature) {
   }
   NOTREACHED();
 }
-
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -335,10 +309,6 @@ void ChromeAutofillClient::AtMemoryCopyPasteObserver::OnPaste() {
 // hash to the pasted value hash effectively prevents most false positives.
 void ChromeAutofillClient::AtMemoryCopyPasteObserver::DidGetUserInteraction(
     const blink::WebInputEvent& event) {
-  if constexpr (BUILDFLAG(IS_ANDROID)) {
-    return;
-  }
-
   if (event.GetType() != blink::WebInputEvent::Type::kRawKeyDown &&
       event.GetType() != blink::WebInputEvent::Type::kKeyDown) {
     return;
@@ -727,25 +697,6 @@ profile_metrics::BrowserProfileType ChromeAutofillClient::GetProfileType()
 
 void ChromeAutofillClient::ShowAutofillSettings(
     SuggestionType suggestion_type) {
-#if BUILDFLAG(IS_ANDROID)
-  switch (suggestion_type) {
-    case SuggestionType::kManageAddress:
-      ShowAutofillProfileSettings(web_contents());
-      return;
-    case SuggestionType::kManageCreditCard:
-    case SuggestionType::kManageIban:
-      ShowAutofillCreditCardSettings(web_contents());
-      return;
-    case SuggestionType::kManageAutofillAi:
-    case SuggestionType::kManageEnhancedAutofill:
-      ShowAutofillPersonalContextSettings(
-          web_contents(),
-          AutofillOptionsReferrer::kPersonalContextAtmemoryNotice);
-      return;
-    default:
-      break;
-  }
-#else
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
           web_contents());
@@ -807,7 +758,6 @@ void ChromeAutofillClient::ShowAutofillSettings(
         NOTREACHED();
     }
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::ConfirmSaveAddressProfile(
@@ -815,19 +765,10 @@ void ChromeAutofillClient::ConfirmSaveAddressProfile(
     const AutofillProfile* original_profile,
     SaveAddressBubbleType save_address_bubble_type,
     AddressProfileSavePromptCallback callback) {
-#if BUILDFLAG(IS_ANDROID)
-  save_update_address_profile_flow_manager_->OfferSave(
-      profile, original_profile,
-      save_address_bubble_type == SaveAddressBubbleType::kMigrateToAccount
-          ? SaveUpdateAddressProfilePromptMode::kMigrateProfile
-          : SaveUpdateAddressProfilePromptMode::kSaveNewProfile,
-      std::move(callback));
-#else
   AddressBubblesController::SetUpAndShowSaveOrUpdateAddressBubble(
       web_contents(), profile, original_profile, save_address_bubble_type,
       !GetPersonalDataManager().address_data_manager().GetProfiles().empty(),
       std::move(callback));
-#endif
 }
 
 AutofillClient::SuggestionUiSessionId
@@ -918,7 +859,6 @@ void ChromeAutofillClient::HideSuggestions(
 void ChromeAutofillClient::TriggerUserPerceptionOfAutofillSurvey(
     FillingProduct filling_product,
     const std::map<std::string, std::string>& field_filling_stats_data) {
-#if !BUILDFLAG(IS_ANDROID)
   CHECK(filling_product == FillingProduct::kAddress ||
         filling_product == FillingProduct::kCreditCard);
   Profile* profile =
@@ -940,11 +880,9 @@ void ChromeAutofillClient::TriggerUserPerceptionOfAutofillSurvey(
         /*timeout_ms=*/5000, /*product_specific_bits_data=*/
         {}, field_filling_stats_data);
   }
-#endif
 }
 
 void ChromeAutofillClient::TriggerDeclinedSaveAddressReasonSurvey() {
-#if !BUILDFLAG(IS_ANDROID)
   Profile* profile =
       Profile::FromBrowserContext(web_contents()->GetBrowserContext());
   auto* hats_service =
@@ -953,7 +891,6 @@ void ChromeAutofillClient::TriggerDeclinedSaveAddressReasonSurvey() {
   hats_service->LaunchDelayedSurveyForWebContents(
       kHatsSurveyTriggerAutofillAddressUserDeclinedSave, web_contents(),
       /*timeout_ms=*/5000);
-#endif
 }
 
 void ChromeAutofillClient::TriggerAutofillAiFillingJourneySurvey(
@@ -1073,82 +1010,12 @@ const AutofillAblationStudy& ChromeAutofillClient::GetAblationStudy() const {
 }
 
 bool ChromeAutofillClient::IsAndroidLargeFormFactor() const {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::WeakPtr<ManualFillingController> controller =
-          ManualFillingController::Get(web_contents())) {
-    return controller->IsLargeFormFactor();
-  }
-#endif
   return false;
 }
 
-#if BUILDFLAG(IS_ANDROID)
-AutofillSnackbarControllerImpl*
-ChromeAutofillClient::GetAutofillSnackbarController() {
-  if (!autofill_snackbar_controller_impl_) {
-    autofill_snackbar_controller_impl_ =
-        std::make_unique<AutofillSnackbarControllerImpl>(web_contents());
-  }
-
-  return autofill_snackbar_controller_impl_.get();
-}
-
-void ChromeAutofillClient::ShowAutofillAiLoadingDialog() {
-  GetAutofillDialogController()->ShowLoadingDialog(
-      l10n_util::GetStringUTF16(IDS_AUTOFILL_AI_LOADING_DIALOG_LABEL),
-      base::Seconds(1));
-}
-
-void ChromeAutofillClient::DismissAutofillAiLoadingDialog() {
-  GetAutofillDialogController()->Dismiss();
-}
-
-AutofillDialogController* ChromeAutofillClient::GetAutofillDialogController() {
-  if (!autofill_dialog_controller_impl_) {
-    autofill_dialog_controller_impl_ =
-        std::make_unique<AutofillDialogControllerImpl>(web_contents());
-  }
-
-  return autofill_dialog_controller_impl_.get();
-}
-
-AutofillMessageController*
-ChromeAutofillClient::GetAutofillMessageController() {
-  if (!autofill_message_controller_) {
-    autofill_message_controller_ =
-        std::make_unique<AutofillMessageControllerImpl>(web_contents());
-  }
-
-  return autofill_message_controller_.get();
-}
-
-void ChromeAutofillClient::SetTouchToFillAutofillControllerForTesting(
-    std::unique_ptr<TouchToFillAutofillController>
-        touch_to_fill_autofill_controller) {
-  touch_to_fill_autofill_controller_ =
-      std::move(touch_to_fill_autofill_controller);
-}
-
-bool ChromeAutofillClient::ShowAmbientAutoFillNotice(
-    base::WeakPtr<TouchToFillAutofillDelegate> delegate) {
-  if (!touch_to_fill_autofill_controller_) {
-    return false;
-  }
-  return touch_to_fill_autofill_controller_->ShowPersonalContextNotice(
-      std::make_unique<TouchToFillAutofillViewImpl>(web_contents()),
-      std::move(delegate));
-}
-
-void ChromeAutofillClient::HideAmbientAutoFillNotice() {
-  if (touch_to_fill_autofill_controller_) {
-    touch_to_fill_autofill_controller_->Hide();
-  }
-}
-#endif
-
 std::unique_ptr<device_reauth::DeviceAuthenticator>
 ChromeAutofillClient::GetDeviceAuthenticator(std::string histogram) const {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   device_reauth::DeviceAuthParams params(
       base::Seconds(60), device_reauth::DeviceAuthSource::kAutofill,
       std::move(histogram));
@@ -1164,7 +1031,6 @@ ChromeAutofillClient::GetDeviceAuthenticator(std::string histogram) const {
 bool ChromeAutofillClient::ShowAutofillFieldIphForFeature(
     const FormFieldData& field,
     IphFeature autofill_feature) {
-#if !BUILDFLAG(IS_ANDROID)
   if (autofill_field_promo_controller_ &&
       autofill_field_promo_controller_->IsMaybeShowing()) {
     return true;
@@ -1183,22 +1049,16 @@ bool ChromeAutofillClient::ShowAutofillFieldIphForFeature(
 
   autofill_field_promo_controller_->Show(field.bounds());
   return autofill_field_promo_controller_->IsMaybeShowing();
-#else
-  return false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::HideAutofillFieldIph() {
-#if !BUILDFLAG(IS_ANDROID)
   if (autofill_field_promo_controller_) {
     autofill_field_promo_controller_->Hide();
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::NotifyIphFeatureUsed(
     AutofillClient::IphFeature feature) {
-#if !BUILDFLAG(IS_ANDROID)
   // Based on the feature config, the IPH will not be shown ever again once the
   // user has used the `feature`. If the user is aware of it, then they
   // shouldn't be spammed with IPHs. The IPH code cannot know if the feature was
@@ -1210,7 +1070,6 @@ void ChromeAutofillClient::NotifyIphFeatureUsed(
         GetFeature(feature),
         FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 ChromeAutofillClient::ChromeAutofillClient(content::WebContents* web_contents)
@@ -1232,19 +1091,6 @@ ChromeAutofillClient::ChromeAutofillClient(content::WebContents* web_contents)
   if (base::FeatureList::IsEnabled(features::kAutofillAtMemory)) {
     at_memory_manager_ = std::make_unique<AtMemoryManager>(this);
   }
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kAutofillAiWithDataSchema)) {
-    autofill_ai_save_update_entity_flow_manager_ =
-        std::make_unique<AutofillAiSaveUpdateEntityFlowManager>(
-            web_contents, GetAutofillMessageController(),
-            GetAutofillDialogController(), GetAppLocale());
-  }
-  save_update_address_profile_flow_manager_ =
-      std::make_unique<SaveUpdateAddressProfileFlowManager>(
-          this, GetAutofillMessageController());
-  touch_to_fill_autofill_controller_ =
-      TouchToFillAutofillController::Create(this);
-#endif
 
   form_predictions_tracker_ = std::make_unique<FormPredictionsTracker>(this);
 
@@ -1275,7 +1121,6 @@ tabs::TabInterface* ChromeAutofillClient::GetTabInterface() {
 }
 
 void ChromeAutofillClient::ShowEmailVerifiedToast(const GURL& issuer) {
-#if !BUILDFLAG(IS_ANDROID)
   // The toast is only supported on desktop for now, since Android uses
   // snackbars instead.
   if (ToastController* toast_controller = GetToastController()) {
@@ -1286,7 +1131,6 @@ void ChromeAutofillClient::ShowEmailVerifiedToast(const GURL& issuer) {
         GetTabInterface()->GetBrowserWindowInterface());
     toast_controller->MaybeShowToast(std::move(params));
   }
-#endif
 }
 
 void ChromeAutofillClient::ShowEmailVerificationPopup(
@@ -1294,9 +1138,6 @@ void ChromeAutofillClient::ShowEmailVerificationPopup(
     const net::SchemefulSite& issuer_site,
     const std::u16string& email,
     base::OnceCallback<void(EmailVerificationPermissionUiStatus)> callback) {
-#if BUILDFLAG(IS_ANDROID)
-  std::move(callback).Run(EmailVerificationPermissionUiStatus::kOther);
-#else
   if (!email_verification_popup_controller_) {
     email_verification_popup_controller_ =
         std::make_unique<EmailVerificationPopupController>(web_contents());
@@ -1307,7 +1148,6 @@ void ChromeAutofillClient::ShowEmailVerificationPopup(
 
   email_verification_popup_controller_->Show(
       element_bounds_in_screen_space, issuer_site, email, std::move(callback));
-#endif
 }
 
 void ChromeAutofillClient::ShowAutofillSuggestionsImpl(
@@ -1373,12 +1213,6 @@ OtpFieldDetector* ChromeAutofillClient::GetOtpFieldDetector() {
 }
 
 OtpPhishGuardDelegate* ChromeAutofillClient::GetOtpPhishGuardDelegate() {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          password_manager::features::kOtpPhishGuard)) {
-    return otp_phish_guard_delegate_.get();
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   return nullptr;
 }
 
@@ -1388,14 +1222,6 @@ FormPredictionsTracker* ChromeAutofillClient::GetFormPredictionsTracker() {
 
 one_time_tokens::OneTimeTokenService*
 ChromeAutofillClient::GetOneTimeTokenService() const {
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          password_manager::features::kAndroidSmsOtpFilling)) {
-    Profile* profile =
-        Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-    return OneTimeTokenServiceFactory::GetForProfile(profile);
-  }
-#endif  // BUILDFLAG(IS_ANDROID)
   return nullptr;
 }
 
@@ -1418,7 +1244,6 @@ PasswordFormClassification ChromeAutofillClient::ClassifyAsPasswordForm(
 
 optimization_guide::ModelQualityLogsUploaderService*
 ChromeAutofillClient::GetMqlsUploadService() {
-#if !BUILDFLAG(IS_ANDROID)
   Profile* profile =
       Profile::FromBrowserContext(web_contents()->GetBrowserContext());
   OptimizationGuideKeyedService* optimization_guide_keyed_service =
@@ -1427,9 +1252,6 @@ ChromeAutofillClient::GetMqlsUploadService() {
     return nullptr;
   }
   return optimization_guide_keyed_service->GetModelQualityLogsUploaderService();
-#else
-  return nullptr;
-#endif
 }
 
 void ChromeAutofillClient::ShowEntityImportBubble(
@@ -1437,12 +1259,6 @@ void ChromeAutofillClient::ShowEntityImportBubble(
     std::optional<EntityInstance> old_entity,
     bool save_is_synchronous,
     EntityImportPromptResultCallback prompt_result_callback) {
-#if BUILDFLAG(IS_ANDROID)
-  if (autofill_ai_save_update_entity_flow_manager_) {
-    autofill_ai_save_update_entity_flow_manager_->OfferSave(
-        new_entity, std::move(old_entity), std::move(prompt_result_callback));
-  }
-#else
   if (auto* controller = AutofillAiImportDataController::GetOrCreate(
           web_contents(), GetAppLocale())) {
     controller->ShowPrompt(std::move(new_entity), std::move(old_entity),
@@ -1453,115 +1269,52 @@ void ChromeAutofillClient::ShowEntityImportBubble(
         .Run(AutofillClient::AutofillAiBubbleResult::kUnknown, std::nullopt,
              {});
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::CloseEntityImportBubble() {
-#if !BUILDFLAG(IS_ANDROID)
   AutofillAiImportDataController::Hide(CHECK_DEREF(web_contents()));
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::ShowAutofillAiLocalSaveNotification() {
-#if BUILDFLAG(IS_ANDROID)
-  if (autofill_ai_save_update_entity_flow_manager_) {
-    autofill_ai_save_update_entity_flow_manager_->ShowLocalSaveNotification();
-  }
-#else
   if (auto* controller = AutofillAiImportDataController::GetOrCreate(
           web_contents(), GetAppLocale())) {
     controller->ShowLocalSaveNotification();
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::ShowAutofillAiSaveToWalletFailureNotification() {
-#if BUILDFLAG(IS_ANDROID)
-  GetAutofillSnackbarController()->Show(
-      AutofillSnackbarType::kAutofillAiSaveToWalletFailure, base::DoNothing());
-#else
   if (ToastController* toast_controller = GetToastController()) {
     ToastParams params(ToastId::kAutofillAiSaveToWalletErrorMessage);
     toast_controller->MaybeShowToast(std::move(params));
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::ShowAutofillAiFetchEntityFailureNotification() {
-#if BUILDFLAG(IS_ANDROID)
-  GetAutofillSnackbarController()->Show(
-      AutofillSnackbarType::kAutofillAiFetchEntityFailure, base::DoNothing());
-#else
   if (ToastController* toast_controller = GetToastController()) {
     ToastParams params(ToastId::kAutofillAiFetchEntityErrorMessage);
     toast_controller->MaybeShowToast(std::move(params));
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::ShowAtMemoryFetchFailureNotification(
     std::optional<std::u16string> message_override) {
-#if BUILDFLAG(IS_ANDROID)
-  // TODO(crbug.com/540713368): Implement support on Android.
-#else
   if (ToastController* toast_controller = GetToastController()) {
     ToastParams params(ToastId::kAtMemorySpiiFetchErrorMessage);
     params.body_string_override = std::move(message_override);
     toast_controller->MaybeShowToast(std::move(params));
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeAutofillClient::ShowAutofillAiPreFetchFailureNotification() {
-#if BUILDFLAG(IS_ANDROID)
-  GetAutofillMessageController()->Show(
-      AutofillMessageModel::CreateForPersonalContextFetchingFailure());
-#else
   if (ToastController* toast_controller = GetToastController()) {
     ToastParams params(ToastId::kAutofillAiPreFetchErrorMessage);
     toast_controller->MaybeShowToast(std::move(params));
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
-void ChromeAutofillClient::ShowAutofillAiPrivateInferenceNotice() {
-#if BUILDFLAG(IS_ANDROID)
-  base::OnceClosure action_callback = base::BindOnce(
-      [](base::WeakPtr<AutofillClient> client) {
-        if (client && client->GetPrefs()) {
-          client->GetPrefs()->SetTime(
-              prefs::kAutofillAiPrivateInferenceNoticeAcknowledgedTimestamp,
-              base::Time::Now());
-        }
-        AutofillMetrics::LogAutofillAiPrivateInferenceNoticeInteraction(
-            AutofillMetrics::PopupNoticeInteractions::kAcknowledged);
-      },
-      GetWeakPtr());
-  messages::MessageWrapper::DismissCallback dismiss_callback =
-      base::BindOnce([](messages::DismissReason unused) {
-        AutofillMetrics::LogAutofillAiPrivateInferenceNoticeInteraction(
-            AutofillMetrics::PopupNoticeInteractions::kDismissed);
-      });
-  base::RepeatingClosure secondary_action_callback = base::BindRepeating(
-      [](content::WebContents* web_contents) {
-        AutofillMetrics::LogAutofillAiPrivateInferenceNoticeInteraction(
-            AutofillMetrics::PopupNoticeInteractions::kLinkButtonClicked);
-        ShowAutofillSettingsPage(web_contents);
-      },
-      web_contents());
-  GetAutofillMessageController()->Show(
-      AutofillMessageModel::CreateForPrivateInferenceNotice(
-          std::move(action_callback), std::move(dismiss_callback),
-          std::move(secondary_action_callback)));
-  AutofillMetrics::LogAutofillAiPrivateInferenceNoticeInteraction(
-      AutofillMetrics::PopupNoticeInteractions::kShown);
-#endif  // BUILDFLAG(IS_ANDROID)
-}
+void ChromeAutofillClient::ShowAutofillAiPrivateInferenceNotice() {}
 
 ToastController* ChromeAutofillClient::GetToastController() {
-#if BUILDFLAG(IS_ANDROID)
-  return nullptr;
-#else
   tabs::TabInterface* tab_interface = GetTabInterface();
   if (!tab_interface) {
     return nullptr;
@@ -1570,7 +1323,6 @@ ToastController* ChromeAutofillClient::GetToastController() {
       tab_interface->GetBrowserWindowInterface();
   return window_interface ? window_interface->GetFeatures().toast_controller()
                           : nullptr;
-#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace autofill

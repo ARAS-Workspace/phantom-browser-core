@@ -17,7 +17,7 @@
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
 #define ENABLE_BEHAVIOUR_OVERRIDE_PROVIDER \
-  (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID))
+  (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE))
 
 namespace base {
 
@@ -28,8 +28,6 @@ bool PathProvider(int key, FilePath* result);
 
 #if BUILDFLAG(IS_MAC)
 bool PathProviderMac(int key, FilePath* result);
-#elif BUILDFLAG(IS_ANDROID)
-bool PathProviderAndroid(int key, FilePath* result);
 #elif BUILDFLAG(IS_POSIX)
 // PathProviderPosix is the default path provider on POSIX OSes other than
 // Mac and Android.
@@ -72,16 +70,7 @@ Provider base_provider_mac = {PathProviderMac, &base_provider,
                               true};
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
-Provider base_provider_android = {PathProviderAndroid, &base_provider,
-#ifndef NDEBUG
-                                  PATH_ANDROID_START, PATH_ANDROID_END,
-#endif
-                                  true};
-#endif
-
-
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
 Provider posix_provider = {PathProviderPosix, &base_provider,
 #ifndef NDEBUG
                            PATH_POSIX_START, PATH_POSIX_END,
@@ -104,8 +93,6 @@ struct PathData {
   PathData() {
 #if BUILDFLAG(IS_MAC)
     providers = &base_provider_mac;
-#elif BUILDFLAG(IS_ANDROID)
-    providers = &base_provider_android;
 #elif BUILDFLAG(IS_POSIX)
     providers = &base_provider_posix;
 #endif

@@ -47,7 +47,6 @@
 #include "url/origin.h"
 
 namespace {
-constexpr bool is_android = !!BUILDFLAG(IS_ANDROID);
 
 bool MatchTypeAndContentsAreEqual(const AutocompleteMatch& lhs,
                                   const AutocompleteMatch& rhs) {
@@ -233,42 +232,6 @@ AutocompleteMatch BaseSearchProvider::CreateSearchSuggestion(
   // Search results don't look like URLs.
   match.transition = suggestion.from_keyword() ? ui::PAGE_TRANSITION_KEYWORD
                                                : ui::PAGE_TRANSITION_GENERATED;
-
-  // Attach Actions in Suggest to the newly created match on Android if Google
-  // is the default search engine.
-  if (is_android && is_google) {
-    if (suggest_template_info &&
-        suggest_template_info->action_suggestions_size() > 0) {
-      for (const omnibox::SuggestTemplateInfo_TemplateAction& action :
-           suggest_template_info->action_suggestions()) {
-        auto suggest_action = CreateActionInSuggest(
-            action, search_url, *match.search_terms_args, search_terms_data);
-        if (suggest_action) {
-          match.actions.emplace_back(std::move(suggest_action));
-        }
-      }
-    } else {
-      // TODO(crbug.com/417745802): Remove once actions are migrated from
-      // EntityInfo to SuggestTemplateInfo.
-      for (const omnibox::ActionInfo& action_info :
-           suggestion.entity_info().action_suggestions()) {
-        omnibox::SuggestTemplateInfo::TemplateAction template_action;
-        template_action.set_action_uri(action_info.action_uri());
-        template_action.set_logs_action_type(action_info.logs_action_type());
-        template_action.set_action_type(
-            static_cast<omnibox::SuggestTemplateInfo_TemplateAction_ActionType>(
-                action_info.action_type()));
-        *template_action.mutable_search_parameters() =
-            action_info.search_parameters();
-        auto suggest_action =
-            CreateActionInSuggest(template_action, search_url,
-                                  *match.search_terms_args, search_terms_data);
-        if (suggest_action) {
-          match.actions.emplace_back(std::move(suggest_action));
-        }
-      }
-    }
-  }
 
   match.navigational_intent = suggestion.navigational_intent();
 
