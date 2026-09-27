@@ -475,14 +475,12 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
 
   // (p)valloc() are not defined on Android. pvalloc() is a GNU extension,
   // valloc() is not in POSIX.
-#if !PA_BUILDFLAG(IS_ANDROID)
   const size_t kPageSize = partition_alloc::internal::base::GetPageSize();
   void* valloc_ptr = valloc(61);
   ASSERT_NE(nullptr, valloc_ptr);
   ASSERT_EQ(0u, reinterpret_cast<uintptr_t>(valloc_ptr) % kPageSize);
   ASSERT_GE(allocs_intercepted_by_alignment[kPageSize], 1u);
   ASSERT_GE(allocs_intercepted_by_size[61], 1u);
-#endif  // !PA_BUILDFLAG(IS_ANDROID)
 
 #if !PA_BUILDFLAG(IS_APPLE)
   void* memalign_ptr = memalign(128, 53);
@@ -491,14 +489,14 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   ASSERT_GE(allocs_intercepted_by_alignment[128], 1u);
   ASSERT_GE(allocs_intercepted_by_size[53], 1u);
 
-#if PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_ANDROID)
+#if PA_BUILDFLAG(IS_POSIX)
   void* pvalloc_ptr = pvalloc(67);
   ASSERT_NE(nullptr, pvalloc_ptr);
   ASSERT_EQ(0u, reinterpret_cast<uintptr_t>(pvalloc_ptr) % kPageSize);
   ASSERT_GE(allocs_intercepted_by_alignment[kPageSize], 1u);
   // pvalloc rounds the size up to the next page.
   ASSERT_GE(allocs_intercepted_by_size[kPageSize], 1u);
-#endif  // PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_ANDROID)
+#endif  // PA_BUILDFLAG(IS_POSIX)
 
 #endif  // !PA_BUILDFLAG(IS_APPLE)
 
@@ -545,20 +543,18 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   free(memalign_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(memalign_ptr)], 1u);
 
-#if PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_ANDROID)
+#if PA_BUILDFLAG(IS_POSIX)
   free(pvalloc_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(pvalloc_ptr)], 1u);
-#endif  // PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_ANDROID)
+#endif  // PA_BUILDFLAG(IS_POSIX)
 
 #endif  // !PA_BUILDFLAG(IS_APPLE)
 
   free(posix_memalign_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(posix_memalign_ptr)], 1u);
 
-#if !PA_BUILDFLAG(IS_ANDROID)
   free(valloc_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(valloc_ptr)], 1u);
-#endif  // !PA_BUILDFLAG(IS_ANDROID)
 
 #if PA_BUILDFLAG(PA_LIBC_GLIBC) && PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
   free(libc_memalign_ptr);
@@ -673,7 +669,7 @@ TEST_F(AllocatorShimTest, NewHandlerConcurrency) {
 static size_t GetUsableSize(void* ptr) {
   return malloc_size(ptr);
 }
-#elif PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
+#elif PA_BUILDFLAG(IS_LINUX)
 static size_t GetUsableSize(void* ptr) {
   return malloc_usable_size(ptr);
 }
@@ -700,108 +696,6 @@ TEST_F(AllocatorShimTest, ShimDoesntChangeMallocSizeWhenEnabled) {
   free(alloc);
 }
 #endif  // !defined(NO_MALLOC_SIZE)
-
-#if PA_BUILDFLAG(IS_ANDROID)
-TEST_F(AllocatorShimTest, InterceptCLibraryFunctions) {
-  auto total_counts = [](const std::vector<size_t>& counts) {
-    size_t total = 0;
-    for (const auto count : counts) {
-      total += count;
-    }
-    return total;
-  };
-  size_t counts_before;
-  size_t counts_after = total_counts(allocs_intercepted_by_size);
-  void* ptr;
-
-  InsertAllocatorDispatch(&g_mock_dispatch);
-
-  // <cstdlib>
-  counts_before = counts_after;
-  ptr = realpath(".", nullptr);
-  EXPECT_NE(nullptr, ptr);
-  free(ptr);
-  counts_after = total_counts(allocs_intercepted_by_size);
-  EXPECT_GT(counts_after, counts_before);
-
-  // <cstring>
-  counts_before = counts_after;
-  ptr = strdup("hello, world");
-  EXPECT_NE(nullptr, ptr);
-  free(ptr);
-  counts_after = total_counts(allocs_intercepted_by_size);
-  EXPECT_GT(counts_after, counts_before);
-
-  counts_before = counts_after;
-  ptr = PA_UNSAFE_TODO(strndup("hello, world", 5));
-  EXPECT_NE(nullptr, ptr);
-  free(ptr);
-  counts_after = total_counts(allocs_intercepted_by_size);
-  EXPECT_GT(counts_after, counts_before);
-
-  // <unistd.h>
-  counts_before = counts_after;
-  ptr = getcwd(nullptr, 0);
-  EXPECT_NE(nullptr, ptr);
-  free(ptr);
-  counts_after = total_counts(allocs_intercepted_by_size);
-  EXPECT_GT(counts_after, counts_before);
-
-  // With component builds on Android, we cannot intercept calls to functions
-  // inside another component, in this instance the call to vasprintf() inside
-  // libc++. This is not necessarily an issue for allocator shims, as long as we
-  // accept that allocations and deallocations will not be matched at all times.
-  // It is however essential for PartitionAlloc, which is exercized in the test
-  // below.
-#if !PA_BUILDFLAG(IS_COMPONENT_BUILD)
-  // Calls vasprintf() indirectly, see below.
-  counts_before = counts_after;
-  std::stringstream stream;
-  stream << std::setprecision(1) << std::showpoint << std::fixed << 1.e38;
-  EXPECT_GT(stream.view().size(), 30u);
-  counts_after = total_counts(allocs_intercepted_by_size);
-  EXPECT_GT(counts_after, counts_before);
-#endif  // !PA_BUILDFLAG(IS_COMPONENT_BUILD)
-
-  RemoveAllocatorDispatchForTesting(&g_mock_dispatch);
-}
-
-#if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
-// Non-regression test for crbug.com/1166558.
-TEST_F(AllocatorShimTest, InterceptVasprintf) {
-  // Printing a float which expands to >=30 characters calls vasprintf() in
-  // libc, which we should intercept.
-  std::stringstream stream;
-  stream << std::setprecision(1) << std::showpoint << std::fixed << 1.e38;
-  EXPECT_GT(stream.view().size(), 30u);
-  // Should not crash.
-}
-
-TEST_F(AllocatorShimTest, InterceptLongVasprintf) {
-  char* str = nullptr;
-  std::string lorem_ipsum =
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. "
-      "Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, "
-      "ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula "
-      "massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci "
-      "nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit "
-      "amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat "
-      "in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero "
-      "pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo "
-      "in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue "
-      "blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus "
-      "et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed "
-      "pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales "
-      "hendrerit.";
-  int err = asprintf(&str, "%s", lorem_ipsum.c_str());
-  EXPECT_EQ(err, static_cast<int>(lorem_ipsum.length()));
-  EXPECT_TRUE(str);
-  free(str);
-}
-
-#endif  // PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
-
-#endif  // PA_BUILDFLAG(IS_ANDROID)
 
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) && PA_BUILDFLAG(IS_APPLE)
 

@@ -95,8 +95,7 @@
 // This value is used to align the writers variable. That variable needs to be
 // aligned to ensure that the protected memory section starts on a page
 // boundary.
-#if (PA_BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(PA_ARCH_CPU_64_BITS)) || \
-    (PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_ARM64))
+#if PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_ARM64)
 // arm64 supports 4kb, 16kb, and 64kb pages. Set to the largest of 64kb as that
 // will guarantee the section is page aligned regardless of the choice.
 inline constexpr int kProtectedMemoryAlignment = 65536;

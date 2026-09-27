@@ -41,7 +41,7 @@
 
 #if PA_BUILDFLAG(HAS_MEMORY_TAGGING)
 #include <arm_acle.h>
-#if PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX)
+#if PA_BUILDFLAG(IS_LINUX)
 #define MTE_KILLED_BY_SIGNAL_AVAILABLE
 #endif
 #endif  // PA_BUILDFLAG(HAS_MEMORY_TAGGING)
@@ -306,15 +306,9 @@ TEST(PartitionAllocPageAllocatorTest,
       GetMemoryTaggingModeForCurrentThread();
   EXPECT_EXIT(
       {
-  // Switch to synchronous mode.
-#if PA_BUILDFLAG(IS_ANDROID)
-        bool success = ChangeMemoryTaggingModeForAllThreadsPerProcess(
-            TagViolationReportingMode::kSynchronous);
-        EXPECT_TRUE(success);
-#else
+        // Switch to synchronous mode.
         ChangeMemoryTaggingModeForCurrentThread(
             TagViolationReportingMode::kSynchronous);
-#endif  // PA_BUILDFLAG(IS_ANDROID)
         EXPECT_EQ(GetMemoryTaggingModeForCurrentThread(),
                   TagViolationReportingMode::kSynchronous);
         // Write to the buffer using its previous tag. A segmentation fault
@@ -362,15 +356,9 @@ TEST(PartitionAllocPageAllocatorTest,
       GetMemoryTaggingModeForCurrentThread();
   EXPECT_EXIT(
       {
-  // Switch to asynchronous mode.
-#if PA_BUILDFLAG(IS_ANDROID)
-        bool success = ChangeMemoryTaggingModeForAllThreadsPerProcess(
-            TagViolationReportingMode::kAsynchronous);
-        EXPECT_TRUE(success);
-#else
+        // Switch to asynchronous mode.
         ChangeMemoryTaggingModeForCurrentThread(
             TagViolationReportingMode::kAsynchronous);
-#endif  // PA_BUILDFLAG(IS_ANDROID)
         EXPECT_EQ(GetMemoryTaggingModeForCurrentThread(),
                   TagViolationReportingMode::kAsynchronous);
         // Write to the buffer using its previous tag. A fault should be
@@ -511,9 +499,6 @@ TEST(PartitionAllocPageAllocatorTest, PageTagging) {
   DecommitAndZeroSystemPages(buffer, size);
   bool after = is_region_named(buffer);
 
-#if PA_BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(before) << "VMA tagging should always work on Android";
-#endif
   // When not running on Android, the prctl() command may be defined in the
   // headers, but not be implemented by the host kernel.
   EXPECT_EQ(before, after);

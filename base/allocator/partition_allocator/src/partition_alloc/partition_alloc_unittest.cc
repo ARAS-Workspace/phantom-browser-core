@@ -94,9 +94,9 @@
 #include <unistd.h>
 #endif
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
+#if PA_BUILDFLAG(IS_LINUX)
 #include "partition_alloc/partition_alloc_base/debug/proc_maps_linux.h"  // nogncheck
-#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
+#endif  // PA_BUILDFLAG(IS_LINUX)
 
 // In the MTE world, the upper bits of a pointer can be decorated with a tag,
 // thus allowing many versions of the same pointer to exist. These macros take
@@ -2704,9 +2704,8 @@ TEST_P(PartitionAllocTest, CheckMetadataIntegrityPass) {
 //
 // Disable these tests on Android because, due to the allocation-heavy behavior,
 // they tend to get OOM-killed rather than pass.
-#if (!PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) || \
-     (PA_BUILDFLAG(IS_POSIX) &&            \
-      !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID))))
+#if !PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) || \
+    (PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_APPLE))
 #define MAYBE_RepeatedAllocReturnNullDirect RepeatedAllocReturnNullDirect
 #define MAYBE_RepeatedReallocReturnNullDirect RepeatedReallocReturnNullDirect
 #else
@@ -4185,7 +4184,7 @@ TEST_P(PartitionAllocTest, ZapOnFree) {
   branch.Purge();
 }
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
+#if PA_BUILDFLAG(IS_LINUX)
 
 TEST_P(PartitionAllocTest, InaccessibleRegionAfterSlotSpans) {
   // There is inaccessible space only when this setting is not enabled,
@@ -4317,7 +4316,7 @@ TEST_P(PartitionAllocTest, FewerMemoryRegions) {
   root->Free(ptr);
 }
 
-#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
+#endif  // PA_BUILDFLAG(IS_LINUX)
 
 TEST_P(PartitionAllocTest, ZeroFreedMemory) {
   auto* root = allocator.root();

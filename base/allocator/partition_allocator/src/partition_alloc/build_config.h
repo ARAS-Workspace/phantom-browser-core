@@ -56,15 +56,7 @@
 // IWYU pragma: always_keep
 
 // A set of macros to use for platform detection.
-#if PA_BUILDFLAG(IS_ANDROID)
-// The IS_ANDROID PA_BUILDFLAG macro is defined in buildflags.h.
-//
-// PartitionAlloc's embedders (Chromium, Dawn, Pdfium, Skia) define different
-// macros for Android builds: "ANDROID" or "SK_BUILD_FOR_ANDROID".
-//
-// To avoid relying on these external definitions, PartitionAlloc uses its own
-// dedicated build flag.
-#elif defined(__APPLE__)
+#if defined(__APPLE__)
 // Only include TargetConditionals after testing ANDROID as some Android builds
 // on the Mac have this header available and it's not needed unless the target
 // is really an Apple platform.
@@ -115,7 +107,7 @@
 #if defined(PA_IS_AIX) || defined(PA_IS_ASMJS) || defined(PA_IS_FREEBSD) ||  \
     defined(PA_IS_IOS) || defined(PA_IS_LINUX) || defined(PA_IS_CHROMEOS) || \
     defined(PA_IS_MAC) || defined(PA_IS_NETBSD) || defined(PA_IS_OPENBSD) || \
-    defined(PA_IS_QNX) || defined(PA_IS_SOLARIS) || PA_BUILDFLAG(IS_ANDROID)
+    defined(PA_IS_QNX) || defined(PA_IS_SOLARIS)
 #define PA_IS_POSIX
 #endif
 

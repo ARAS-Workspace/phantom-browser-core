@@ -103,17 +103,6 @@ AslrMask(uintptr_t bits) {
         return AslrAddress(0);
       }
 
-    #elif PA_BUILDFLAG(IS_ANDROID) && (PA_BUILDFLAG(PA_ARCH_CPU_ARM64) || PA_BUILDFLAG(PA_ARCH_CPU_RISCV64))
-      // Restrict the address range on Android to avoid a large performance
-      // regression in single-process WebViews. See https://crbug.com/837640.
-      PA_ALWAYS_INLINE PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR uintptr_t
-      ASLRMask() {
-        return AslrMask(30);
-      }
-      PA_ALWAYS_INLINE PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR uintptr_t
-      ASLROffset() {
-        return AslrAddress(0x20000000ULL);
-      }
     #elif PA_BUILDFLAG(PA_ARCH_CPU_ARM64)
       #if PA_BUILDFLAG(IS_LINUX)
 

@@ -25,9 +25,8 @@
 // elimination.
 #define PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR __attribute__((const))
 
-#elif (PA_BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(PA_ARCH_CPU_64_BITS)) || \
-    (PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_ARM64)) ||       \
-    (PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_PPC64)) ||       \
+#elif (PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_ARM64)) || \
+    (PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_PPC64)) ||   \
     (PA_BUILDFLAG(IS_LINUX) && PA_BUILDFLAG(PA_ARCH_CPU_LOONGARCH64))
 // This should work for all POSIX (if needed), but currently all other
 // supported OS/architecture combinations use either hard-coded values
@@ -71,7 +70,7 @@ extern PageCharacteristics page_characteristics;
 
 // Ability to name anonymous VMAs is available on some, but not all Linux-based
 // systems.
-#if PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX)
+#if PA_BUILDFLAG(IS_LINUX)
 #include <sys/prctl.h>
 
 #if PA_BUILDFLAG(IS_LINUX) && \
@@ -98,7 +97,7 @@ extern PageCharacteristics page_characteristics;
 #define LINUX_NAME_REGION 1
 #endif
 
-#endif  // PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX)
+#endif  // PA_BUILDFLAG(IS_LINUX)
 
 namespace partition_alloc {
 namespace internal {

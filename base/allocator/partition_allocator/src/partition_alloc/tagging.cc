@@ -45,14 +45,6 @@
 #endif
 #endif
 
-#if PA_BUILDFLAG(IS_ANDROID)
-#include "partition_alloc/partition_alloc_base/files/file_path.h"
-#include "partition_alloc/partition_alloc_base/native_library.h"
-#if PA_BUILDFLAG(HAS_MEMORY_TAGGING)
-#include <malloc.h>
-#endif  // BUILDFLAGS(HAS_MEMORY_TAGGING)
-#endif  // PA_BUILDFLAG(IS_ANDROID)
-
 namespace partition_alloc {
 void ChangeMemoryTaggingModeForCurrentThreadNoOp(TagViolationReportingMode m) {}
 
@@ -97,46 +89,6 @@ void ChangeMemoryTaggingModeForCurrentThread(TagViolationReportingMode m)
 #endif
 
 namespace internal {
-
-#if PA_BUILDFLAG(IS_ANDROID)
-bool ChangeMemoryTaggingModeForAllThreadsPerProcess(
-    TagViolationReportingMode m) {
-#if PA_BUILDFLAG(HAS_MEMORY_TAGGING)
-  // In order to support Android NDK API level below 26, we need to call
-  // mallopt via dynamic linker.
-  // int mallopt(int param, int value);
-  using MalloptSignature = int (*)(int, int);
-
-  static MalloptSignature mallopt_fnptr = [] {
-    base::FilePath module_path;
-    base::NativeLibraryLoadError load_error;
-    base::FilePath library_path = module_path.Append("libc.so");
-    base::NativeLibrary library =
-        base::LoadNativeLibrary(library_path, &load_error);
-    PA_CHECK(library);
-    void* func_ptr =
-        base::GetFunctionPointerFromNativeLibrary(library, "mallopt");
-    PA_CHECK(func_ptr);
-    return reinterpret_cast<MalloptSignature>(func_ptr);
-  }();
-
-  int status = 0;
-  if (m == TagViolationReportingMode::kSynchronous) {
-    status = mallopt_fnptr(M_BIONIC_SET_HEAP_TAGGING_LEVEL,
-                           M_HEAP_TAGGING_LEVEL_SYNC);
-  } else if (m == TagViolationReportingMode::kAsynchronous) {
-    status = mallopt_fnptr(M_BIONIC_SET_HEAP_TAGGING_LEVEL,
-                           M_HEAP_TAGGING_LEVEL_ASYNC);
-  } else {
-    status = mallopt_fnptr(M_BIONIC_SET_HEAP_TAGGING_LEVEL,
-                           M_HEAP_TAGGING_LEVEL_NONE);
-  }
-  return status != 0;
-#else
-  return false;
-#endif  // PA_BUILDFLAG(HAS_MEMORY_TAGGING)
-}
-#endif  // PA_BUILDFLAG(IS_ANDROID)
 
 namespace {
 [[maybe_unused]] static bool CheckTagRegionParameters(void* ptr, size_t sz) {
@@ -289,32 +241,6 @@ TagViolationReportingMode GetMemoryTaggingModeForCurrentThread()
 #endif
 
 }  // namespace internal
-
-#if PA_BUILDFLAG(HAS_MEMORY_TAGGING) && PA_BUILDFLAG(IS_ANDROID)
-bool PermissiveMte::enabled_ = false;
-
-// static
-void PermissiveMte::SetEnabled(bool enabled) {
-  PermissiveMte::enabled_ = enabled;
-}
-
-// static
-bool PermissiveMte::HandleCrash(int signo,
-                                siginfo_t* siginfo,
-                                ucontext_t* context) {
-  if (siginfo->si_signo == SIGSEGV &&
-      (siginfo->si_code == SEGV_MTESERR || siginfo->si_code == SEGV_MTEAERR) &&
-      PermissiveMte::enabled_) {
-    // In MTE permissive mode, do not crash the process. Instead, disable MTE
-    // and let the failing instruction be retried. The second time should
-    // succeed (except if there is another non-MTE fault).
-    internal::ChangeMemoryTaggingModeForAllThreadsPerProcess(
-        partition_alloc::TagViolationReportingMode::kDisabled);
-    return true;
-  }
-  return false;
-}
-#endif  // PA_BUILDFLAG(HAS_MEMORY_TAGGING) && PA_BUILDFLAG(IS_ANDROID)
 
 SuspendTagCheckingScope::SuspendTagCheckingScope() noexcept {
 #if PA_BUILDFLAG(HAS_MEMORY_TAGGING)

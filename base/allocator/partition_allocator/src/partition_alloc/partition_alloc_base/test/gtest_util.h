@@ -45,10 +45,10 @@
   GTEST_UNSUPPORTED_DEATH_TEST(statement, msg, return)
 
 #endif  // PA_BUILDFLAG(DCHECKS_ARE_ON) && defined(GTEST_HAS_DEATH_TEST) &&
-        // !PA_BUILDFLAG(DCHECK_IS_CONFIGURABLE) && !PA_BUILDFLAG(IS_ANDROID)
+        // !PA_BUILDFLAG(DCHECK_IS_CONFIGURABLE)
 
 // As above, but for CHECK().
-#if defined(GTEST_HAS_DEATH_TEST) && !PA_BUILDFLAG(IS_ANDROID)
+#if defined(GTEST_HAS_DEATH_TEST)
 
 #if PA_BASE_CHECK_WILL_STREAM()
 #define PA_EXPECT_CHECK_DEATH(statement) EXPECT_DEATH(statement, "Check failed")
@@ -66,7 +66,7 @@
 #define PA_ASSERT_NOTREACHED_DEATH(statement) ASSERT_DEATH(statement, "")
 #endif  // PA_BASE_CHECK_WILL_STREAM()
 
-#else  // defined(GTEST_HAS_DEATH_TEST) && !PA_BUILDFLAG(IS_ANDROID)
+#else
 
 // Note GTEST_UNSUPPORTED_DEATH_TEST takes a |regex| only to see whether it is a
 // valid regex. It is never evaluated.
@@ -81,6 +81,6 @@
 #define PA_ASSERT_NOTREACHED_DEATH(statement) \
   GTEST_UNSUPPORTED_DEATH_TEST(statement, "", return)
 
-#endif  // defined(GTEST_HAS_DEATH_TEST) && !PA_BUILDFLAG(IS_ANDROID)
+#endif  // defined(GTEST_HAS_DEATH_TEST)
 
 #endif  // PARTITION_ALLOC_PARTITION_ALLOC_BASE_TEST_GTEST_UTIL_H_

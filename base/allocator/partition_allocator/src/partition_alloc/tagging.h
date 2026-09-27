@@ -17,10 +17,6 @@
 #include "partition_alloc/partition_alloc_base/component_export.h"
 #include "partition_alloc/partition_alloc_config.h"
 
-#if PA_BUILDFLAG(HAS_MEMORY_TAGGING) && PA_BUILDFLAG(IS_ANDROID)
-#include <csignal>
-#endif
-
 namespace partition_alloc {
 
 // Enum configures Arm's MTE extension to operate in different modes
@@ -53,15 +49,6 @@ inline constexpr uint64_t kPtrTagMask = 0;
 inline constexpr size_t kPtrTagShift = 0;
 #endif  // PA_BUILDFLAG(HAS_MEMORY_TAGGING)
 inline constexpr uint64_t kPtrUntagMask = ~kPtrTagMask;
-
-#if PA_BUILDFLAG(IS_ANDROID)
-// Changes the memory tagging mode for all threads in the current process.
-// Returns true on success. Most likely reason for failure is because heap
-// tagging may not be re-enabled after being disabled.
-// https://android.googlesource.com/platform/bionic/+/446b4dde724ee64a336a78188c3c9a15aebca87c/libc/include/malloc.h#235
-PA_COMPONENT_EXPORT(PARTITION_ALLOC)
-bool ChangeMemoryTaggingModeForAllThreadsPerProcess(TagViolationReportingMode);
-#endif
 
 // Gets the memory tagging mode for the calling thread. Returns kUndefined if
 // MTE support is not available.
@@ -153,17 +140,6 @@ template <typename T>
 PA_ALWAYS_INLINE constexpr uintptr_t UntagPtr(T* ptr) {
   return internal::UntagAddr(reinterpret_cast<uintptr_t>(ptr));
 }
-
-#if PA_BUILDFLAG(HAS_MEMORY_TAGGING) && PA_BUILDFLAG(IS_ANDROID)
-class PA_COMPONENT_EXPORT(PARTITION_ALLOC) PermissiveMte {
- public:
-  static void SetEnabled(bool enabled);
-  static bool HandleCrash(int signo, siginfo_t* siginfo, ucontext_t* context);
-
- private:
-  static bool enabled_;
-};
-#endif  // PA_BUILDFLAG(HAS_MEMORY_TAGGING)
 
 // Stops MTE tag checking for the current thread while this is alive. This does
 // not affect the return value for GetMemoryTaggingModeForCurrentThread().

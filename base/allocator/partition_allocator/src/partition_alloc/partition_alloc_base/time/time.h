@@ -84,10 +84,6 @@
 #undef TYPE_BOOL
 #endif
 
-#if PA_BUILDFLAG(IS_ANDROID)
-#include <jni.h>
-#endif
-
 #if PA_BUILDFLAG(IS_POSIX)
 #include <sys/time.h>
 #include <unistd.h>
@@ -857,7 +853,8 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) ThreadTicks
 
   // Returns true if ThreadTicks::Now() is supported on this system.
   [[nodiscard]] static bool IsSupported() {
-#if (defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME >= 0) || PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID)
+#if (defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME >= 0) || \
+    PA_BUILDFLAG(IS_APPLE)
     return true;
 #else
     return false;

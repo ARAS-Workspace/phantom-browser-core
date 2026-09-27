@@ -148,7 +148,7 @@ DEFINE_ALLOC_TOKEN_STDLIB(1)
                              allocator_shim::AllocToken(id));               \
   }
 
-#endif  // !PA_BUILDFLAG(IS_ANDROID)
+#endif  // __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 
 extern "C" {
 DEFINE_ALLOC_TOKEN_NEW(0)

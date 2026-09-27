@@ -14,7 +14,7 @@
 #include "partition_alloc/partition_alloc_base/posix/eintr_wrapper.h"
 #include "partition_alloc/partition_alloc_check.h"
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
+#if PA_BUILDFLAG(IS_LINUX)
 #include <inttypes.h>
 #endif
 

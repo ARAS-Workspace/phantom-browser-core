@@ -957,15 +957,6 @@ void PartitionAllocSupport::ReconfigureEarlyish(std::string_view process_type) {
     ReconfigurePartitionForKnownProcess(process_type);
   }
 
-#if PA_BUILDFLAG(ENABLE_PARTITION_LOCK_PRIORITY_INHERITANCE) && \
-    PA_BUILDFLAG(IS_ANDROID)
-  if (base::android::BackgroundThreadPoolFieldTrial::
-          ShouldUsePriorityInheritanceLocks()) {
-    partition_alloc::internal::SpinningMutex::EnableUsePriorityInheritance();
-  }
-#endif  // PA_BUILDFLAG(ENABLE_PARTITION_LOCK_PRIORITY_INHERITANCE) &&
-        // PA_BUILDFLAG(IS_ANDROID)
-
   // These initializations are only relevant for PartitionAlloc-Everywhere
   // builds.
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)

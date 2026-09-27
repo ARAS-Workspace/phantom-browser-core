@@ -14,7 +14,7 @@
 #include "partition_alloc/partition_alloc_base/posix/eintr_wrapper.h"
 #include "partition_alloc/partition_alloc_base/strings/safe_sprintf.h"
 
-#if !PA_BUILDFLAG(IS_ANDROID) && !PA_BUILDFLAG(IS_APPLE)
+#if !PA_BUILDFLAG(IS_APPLE)
 #include <link.h>  // For ElfW() macro.
 #endif
 
@@ -204,8 +204,6 @@ bool ParseMapsLine(const char* line_start,
   return true;
 }
 
-#if !PA_BUILDFLAG(IS_ANDROID)
-
 ssize_t ReadFromOffset(const int fd,
                        void* buf,
                        const size_t count,
@@ -284,8 +282,6 @@ void UpdateBaseAddress(unsigned permissions,
   close(mem_fd);
 }
 
-#endif  // !PA_BUILDFLAG(IS_ANDROID)
-
 void PrintStackTraceInternal(const void** trace, size_t count) {
   int fd = WrapEINTR(OpenFile)("/proc/self/maps", O_RDONLY);
   if (fd == -1) {
@@ -296,7 +292,7 @@ void PrintStackTraceInternal(const void** trace, size_t count) {
   char buffer[kBufferSize];
   char* dest = buffer;
   char* buffer_end = PA_UNSAFE_TODO(buffer + kBufferSize);
-#if !PA_BUILDFLAG(IS_ANDROID) && !PA_BUILDFLAG(IS_APPLE)
+#if !PA_BUILDFLAG(IS_APPLE)
   uintptr_t base_address = 0u;
 #endif
 
@@ -331,21 +327,11 @@ void PrintStackTraceInternal(const void** trace, size_t count) {
             ParseMapsLine(line_start, line_end, &start_address, &end_address,
                           &permissions, &offset, &module_name);
         if (ok) {
-#if !PA_BUILDFLAG(IS_ANDROID)
           UpdateBaseAddress(permissions, start_address, &base_address);
-#endif
           if (module_name && *module_name != '\0') {
             for (size_t i = 0; i < count; i++) {
-#if PA_BUILDFLAG(IS_ANDROID)
-              // Subtract one as return address of function may be in the next
-              // function when a function is annotated as noreturn.
-              uintptr_t address =
-                  reinterpret_cast<uintptr_t>(PA_UNSAFE_TODO(trace[i])) - 1;
-              uintptr_t base_address = start_address;
-#else
               uintptr_t address =
                   reinterpret_cast<uintptr_t>(PA_UNSAFE_TODO(trace[i]));
-#endif
               if (start_address <= address && address < end_address) {
                 OutputStackTrace(i, address, base_address, module_name, offset);
               }
@@ -414,7 +400,6 @@ void PrintStackTrace(const void** trace, size_t count) {
 }
 
 // stack_trace_android.cc defines its own OutputStackTrace.
-#if !PA_BUILDFLAG(IS_ANDROID)
 void OutputStackTrace(unsigned index,
                       uintptr_t address,
                       uintptr_t base_address,
@@ -425,6 +410,5 @@ void OutputStackTrace(unsigned index,
                        module_name, address - base_address);
   PA_RAW_LOG(INFO, buffer);
 }
-#endif  // !PA_BUILDFLAG(IS_ANDROID)
 
 }  // namespace partition_alloc::internal::base::debug

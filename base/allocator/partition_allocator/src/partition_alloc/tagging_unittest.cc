@@ -146,36 +146,6 @@ TEST(PartitionAllocMemoryTaggingTest, TagMemoryRangeIncrementBadAlign) {
 #endif  // PA_BUILDFLAG(PA_ARCH_CPU_64_BITS)
 
 #if PA_BUILDFLAG(HAS_MEMORY_TAGGING)
-#if PA_BUILDFLAG(IS_ANDROID)
-TEST(PartitionAllocMemoryTaggingTest,
-     ChangeMemoryTaggingModeForAllThreadsPerProcess) {
-  base::CPU cpu;
-  // If the underlying platform does not support MTE, skip this test to avoid
-  // hiding failures.
-  if (!cpu.has_mte()) {
-    GTEST_SKIP();
-  }
-
-  // The mode should be set to synchronous on startup by AndroidManifest.xml
-  // for base_unittests.
-  EXPECT_EQ(GetMemoryTaggingModeForCurrentThread(),
-            TagViolationReportingMode::kSynchronous);
-
-  // Skip changing to kDisabled, because scudo does not support enabling MTE
-  // once it is disabled.
-  bool success = ChangeMemoryTaggingModeForAllThreadsPerProcess(
-      TagViolationReportingMode::kAsynchronous);
-  EXPECT_TRUE(success);
-  EXPECT_EQ(GetMemoryTaggingModeForCurrentThread(),
-            TagViolationReportingMode::kAsynchronous);
-  success = ChangeMemoryTaggingModeForAllThreadsPerProcess(
-      TagViolationReportingMode::kSynchronous);
-  EXPECT_TRUE(success);
-  // End with mode changed back to synchronous.
-  EXPECT_EQ(GetMemoryTaggingModeForCurrentThread(),
-            TagViolationReportingMode::kSynchronous);
-}
-#endif  // PA_BUILDFLAG(IS_ANDROID)
 
 TEST(PartitionAllocMemoryTaggingTest, ChangeMemoryTaggingModeForCurrentThread) {
   base::CPU cpu;

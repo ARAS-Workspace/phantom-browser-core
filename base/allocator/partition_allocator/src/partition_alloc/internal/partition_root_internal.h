@@ -1265,13 +1265,6 @@ PA_ALWAYS_INLINE void* PartitionRoot::AllocInternal(size_t requested_size,
     if constexpr (ContainsFlags(flags, AllocFlags::kAlignedAlloc)) {
 #if PA_BUILDFLAG(PA_COMPILER_MSVC)
       result = _aligned_malloc(requested_size, slot_span_alignment);
-#elif PA_BUILDFLAG(IS_ANDROID)
-      // Android technically supports posix_memalign(), but does not expose it
-      // in the current version of the library headers used by Chromium.
-      // Luckily, memalign() on Android returns pointers which can safely be
-      // used with free(), so we can use it instead.  Issue filed to document
-      // this: http://code.google.com/p/android/issues/detail?id=35391
-      result = memalign(slot_span_alignment, requested_size);
 #else
       int ret = posix_memalign(&result, slot_span_alignment, requested_size);
       if (ret != 0) {

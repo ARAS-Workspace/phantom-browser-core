@@ -148,15 +148,6 @@ void PartitionAddressSpace::Init() {
   }
 #endif
 
-#if PA_BUILDFLAG(IS_ANDROID)
-  // On Android, Adreno-GSL library fails to mmap if we snatch address
-  // 0x400000000. Find a different address instead.
-  if (setup_.regular_pool_base_address_ == 0x400000000) {
-    uintptr_t new_base_address = map_base_pages(glued_pool_sizes);
-    FreePages(setup_.regular_pool_base_address_, glued_pool_sizes);
-    setup_.regular_pool_base_address_ = new_base_address;
-  }
-#endif  // PA_BUILDFLAG(IS_ANDROID)
   if (!setup_.regular_pool_base_address_) {
     HandlePoolAllocFailure();
   }
