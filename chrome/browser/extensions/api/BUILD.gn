@@ -198,7 +198,6 @@ source_set("keyed_service_factories") {
     "//chrome/browser/extensions",
     "//chrome/common:buildflags",
     "//components/safe_browsing:buildflags",
-    "//components/spellcheck:buildflags",
     "//extensions/buildflags",
     "//pdf:buildflags",
     "//printing/buildflags",

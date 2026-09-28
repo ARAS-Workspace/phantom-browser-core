@@ -24,7 +24,6 @@ import("//components/offline_pages/buildflags/features.gni")
 import("//components/on_device_translation/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
 import("//components/safe_browsing/buildflags.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//content/browser/devtools/features.gni")
 import("//content/public/common/features.gni")
 import("//crypto/features.gni")
@@ -97,7 +96,6 @@ static_library("test_support") {
     "//components/activity_reporter",
     "//components/affiliations/core/browser:test_support",
     "//components/record_replay/core/common",
-    "//components/spellcheck:buildflags",
     "//components/supervised_user/core/browser:device_parental_controls",
     "//components/supervised_user/core/browser:test_support",
     "//ui/base/unowned_user_data",
@@ -1632,7 +1630,6 @@ test("browser_tests") {
     "//components/signin/public/identity_manager:test_support",
     "//components/site_engagement/content",
     "//components/site_isolation",
-    "//components/spellcheck:buildflags",
     "//components/strings",
     "//components/subresource_filter/core/browser",
     "//components/subresource_filter/core/browser:test_support",
@@ -3687,7 +3684,6 @@ test("unit_tests") {
     "//components/site_engagement/content",
     "//components/site_engagement/core",
     "//components/site_isolation",
-    "//components/spellcheck:buildflags",
     "//components/sqlite_proto",
     "//components/strings",
     "//components/subresource_filter/core/browser",
@@ -3962,10 +3958,7 @@ test("unit_tests") {
     ldflags = [ "-Wl,-ObjC" ]
   } else {
     # !is_mac
-    deps += [
-      "//chrome/tools/convert_dict:lib",
-      "//third_party/hunspell",
-    ]
+    deps += [ "//chrome/tools/convert_dict:lib" ]
   }
 
   if (enable_paint_preview) {
@@ -5757,7 +5750,6 @@ test("interactive_ui_tests") {
     "//skia",
     "//testing/gmock",
     "//testing/gtest",
-    "//third_party/hunspell",
     "//third_party/icu",
     "//third_party/libpng:libpng_for_testonly",
     "//ui/base:base_interactive_ui_tests",
@@ -6118,7 +6110,6 @@ test("interactive_ui_tests") {
       "//chrome/browser/lifetime:termination_notification",
       "//chrome/browser/web_applications/extensions",
       "//components/remote_cocoa/app_shim",
-      "//components/spellcheck:buildflags",
     ]
   }
 
@@ -6398,7 +6389,6 @@ test("captured_sites_interactive_tests") {
     "//skia",
     "//testing/gmock",
     "//testing/gtest",
-    "//third_party/hunspell",
     "//third_party/icu",
     "//third_party/libpng:libpng_for_testonly",
     "//ui/base:test_support",

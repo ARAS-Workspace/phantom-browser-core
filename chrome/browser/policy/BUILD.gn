@@ -6,7 +6,6 @@ import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/on_device_translation/buildflags/features.gni")
 import("//components/safe_browsing/buildflags.gni")
 import("//components/signin/features.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
@@ -922,7 +921,6 @@ source_set("impl") {
     "//components/reporting/util:task_runner_context",
     "//components/safe_browsing/core/common:safe_browsing_policy_handler",
     "//components/site_isolation",
-    "//components/spellcheck:buildflags",
     "//components/unified_consent",
     "//components/user_manager",
     "//components/variations/service",

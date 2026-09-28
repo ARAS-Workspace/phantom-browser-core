@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/spellcheck/spellcheck_build_features.gni")
-
 if (is_linux) {
   import("//components/policy/tools/generate_policy_source.gni")
   import("//third_party/protobuf/proto_library.gni")
@@ -91,6 +89,5 @@ source_set("privacy") {
     "//chrome/common:constants",
     "//components/content_settings/core/browser",
     "//components/prefs",
-    "//components/spellcheck:buildflags",
   ]
 }

@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//third_party/blink/renderer/modules/modules.gni")
 
 blink_modules_sources("spell_check_custom_dictionary") {
@@ -16,10 +15,6 @@ blink_modules_sources("spell_check_custom_dictionary") {
 
 source_set("unit_tests") {
   testonly = true
-  if (enable_spellcheck && !is_mac && !is_android) {
-    sources = [ "spell_check_custom_dictionary_test.cc" ]
-  }
-
   deps = [
     "//testing/gmock",
     "//testing/gtest",
@@ -27,11 +22,4 @@ source_set("unit_tests") {
     "//third_party/blink/renderer/core:unit_test_support",
     "//third_party/blink/renderer/modules",
   ]
-
-  if (enable_spellcheck) {
-    deps += [
-      "//components/spellcheck/renderer",
-      "//components/spellcheck/renderer:unit_tests",
-    ]
-  }
 }

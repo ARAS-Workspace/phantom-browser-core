@@ -13,7 +13,6 @@ import("//components/captive_portal/core/features.gni")
 import("//components/compose/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//content/browser/devtools/features.gni")
 import("//crypto/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
@@ -171,7 +170,6 @@ source_set("browser_actions_impl") {
     "//components/commerce/core:metrics",
     "//components/multistep_filter/core:features",
     "//components/omnibox/common:features",
-    "//components/spellcheck:buildflags",
     "//components/undo",
   ]
   if (is_mac) {

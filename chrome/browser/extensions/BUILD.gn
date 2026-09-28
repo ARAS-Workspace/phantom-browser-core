@@ -10,7 +10,6 @@ import("//chrome/common/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/safe_browsing/buildflags.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//content/browser/devtools/features.gni")
 import("//content/public/common/features.gni")
 import("//extensions/buildflags/buildflags.gni")
@@ -594,7 +593,6 @@ source_set("extensions") {
     "//components/saved_tab_groups/public",
     "//components/services/patch/content",
     "//components/services/unzip/content",
-    "//components/spellcheck:buildflags",
     "//components/supervised_user/core/browser",
     "//components/tabs:public",
     "//components/update_client",

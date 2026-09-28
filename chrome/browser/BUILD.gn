@@ -21,7 +21,6 @@ import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/on_device_translation/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//content/public/common/features.gni")
 import("//crypto/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
@@ -890,7 +889,6 @@ source_set("core") {
     "//components/sessions",
     "//components/site_engagement/core/mojom:mojo_bindings",
     "//components/site_isolation",
-    "//components/spellcheck:buildflags",
     "//components/startup_metric_utils",
     "//components/strike_database:features",
     "//components/subresource_filter/content/browser",

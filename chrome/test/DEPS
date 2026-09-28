@@ -100,7 +100,6 @@ include_rules = [
   "+components/signin/core/browser",
   "+components/signin/public",
   "+components/site_engagement/content",
-  "+components/spellcheck",
   "+components/startup_metric_utils/common",
   "+components/storage_monitor",
   "+components/subscription_eligibility",

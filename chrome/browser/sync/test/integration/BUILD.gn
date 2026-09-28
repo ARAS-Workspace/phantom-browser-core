@@ -4,7 +4,6 @@
 
 import("//build/config/ui.gni")
 import("//chrome/common/features.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//printing/buildflags/buildflags.gni")
 

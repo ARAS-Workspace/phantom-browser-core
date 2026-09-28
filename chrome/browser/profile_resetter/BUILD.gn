@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/spellcheck/spellcheck_build_features.gni")
-
 source_set("profile_resetter") {
   sources = [
     "brandcode_config_fetcher.h",
@@ -71,7 +69,6 @@ source_set("impl") {
     "//components/prefs",
     "//components/proxy_config",
     "//components/search_engines",
-    "//components/spellcheck:buildflags",
     "//components/strings",
     "//components/version_info",
     "//content/public/browser",

@@ -8,7 +8,6 @@ import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
 import("//components/signin/features.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//content/public/common/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//media/media_options.gni")
@@ -179,7 +178,6 @@ static_library("renderer") {
     "//components/security_interstitials/content/renderer",
     "//components/security_interstitials/core:",
     "//components/security_interstitials/core/common/mojom:",
-    "//components/spellcheck:buildflags",
     "//components/subresource_filter/content/renderer",
     "//components/subresource_filter/core/common",
     "//components/supervised_user/core/common:buildflags",
@@ -282,10 +280,6 @@ static_library("renderer") {
 
   if (enable_extensions) {
     deps += [ "//chrome/renderer/controlled_frame" ]
-  }
-
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/renderer" ]
   }
 
   if (enable_printing) {

@@ -9,7 +9,6 @@ import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/on_device_translation/buildflags/features.gni")
 import("//components/signin/features.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 # This target should be the default place for adding public interface things
@@ -135,7 +134,6 @@ source_set("misc") {
     "//components/signin/public/base",
     "//components/signin/public/identity_manager",
     "//components/site_isolation",
-    "//components/spellcheck:buildflags",
     "//components/supervised_user/core/browser",
     "//components/user_prefs",
     "//components/webui/flags",
@@ -742,7 +740,6 @@ source_set("profiles_extra_parts_impl") {
     "//components/signin/public/base",
     "//components/site_engagement/content",
     "//components/site_token_provider",
-    "//components/spellcheck:buildflags",
     "//components/sync/base:features",
     "//media",
     "//services/network/public/cpp",
