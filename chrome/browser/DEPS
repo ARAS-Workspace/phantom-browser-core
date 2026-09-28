@@ -345,7 +345,6 @@ include_rules = [
   "+components/site_engagement",
   "+components/site_isolation",
   "+components/skills",
-  "+components/spellcheck",
   "+components/split_tabs",
   "+components/sqlite_proto",
   "+components/startup_metric_utils/browser",
@@ -641,8 +640,5 @@ specific_include_rules = {
     "+components/saved_tab_groups",
   ],
   r"android/omnibox/composebox_query_controller_bridge\.cc": [
-  ],
-  "spellcheck_service.cc": [
-    "+chrome/browser/search/search.h",
   ],
 }

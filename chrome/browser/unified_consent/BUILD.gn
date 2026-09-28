@@ -29,10 +29,6 @@ source_set("impl") {
     "//components/sync_preferences",
     "//components/unified_consent",
   ]
-
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/browser" ]
-  }
 }
 
 source_set("browser_tests") {

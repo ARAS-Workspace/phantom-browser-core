@@ -224,10 +224,6 @@ source_set("browser_tests") {
     "//net:test_support",
   ]
 
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/browser" ]
-  }
-
   if (enable_compose) {
     sources += [ "compose/compose_browsertest.cc" ]
     deps += [ "//components/compose/core/browser:features" ]

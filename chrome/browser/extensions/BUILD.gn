@@ -647,18 +647,6 @@ source_set("extensions") {
   if (is_mac) {
     deps += [ "//chrome/browser/mac" ]
   }
-  if (enable_spellcheck) {
-    sources += [
-      "api/language_settings_private/language_settings_private_delegate.cc",
-      "api/language_settings_private/language_settings_private_delegate.h",
-      "api/language_settings_private/language_settings_private_delegate_factory.cc",
-      "api/language_settings_private/language_settings_private_delegate_factory.h",
-    ]
-    deps += [
-      "//chrome/browser/spellchecker",
-      "//components/spellcheck/browser",
-    ]
-  }
   sources += [
     "api/chrome_extensions_api_client_non_android.cc",
     "api/tabs/tabs_event_router_platform_delegate_non_android.cc",
@@ -1634,14 +1622,6 @@ source_set("unit_tests") {
   ]
 
   sources += [ "preinstalled_extensions_unittest.cc" ]
-
-  if (enable_spellcheck) {
-    sources += [
-      "api/language_settings_private/language_settings_private_api_unittest.cc",
-      "api/language_settings_private/language_settings_private_delegate_unittest.cc",
-    ]
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
 
   if (enable_extensions) {
     sources += [

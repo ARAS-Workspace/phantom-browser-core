@@ -929,15 +929,6 @@ source_set("core") {
     "//ui/webui/tracked_element",
   ]
 
-  if (enable_spellcheck) {
-    deps += [
-      "//chrome/browser/spellchecker",
-      "//components/spellcheck/browser",
-      "//components/spellcheck/common",
-      "//components/spellcheck/common:interfaces",
-    ]
-  }
-
   public_deps = [
     "//chrome/browser/ui/omnibox/omnibox_everywhere:impl",
     "//chrome/browser/ui/webui/omnibox_everywhere",
@@ -2564,13 +2555,6 @@ source_set("browser") {
 
   if (is_linux || is_mac) {
     deps += [ "//chrome/browser/gapis" ]
-  }
-
-  if (enable_spellcheck) {
-    deps += [
-      "//chrome/browser/spellchecker",
-      "//chrome/browser/spellchecker:impl",
-    ]
   }
 
   if (enable_vr) {

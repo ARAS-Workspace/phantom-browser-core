@@ -74,10 +74,6 @@ if (is_mac) {
       "//chrome/browser/devtools",
       "//chrome/browser/ui",
     ]
-
-    if (enable_spellcheck) {
-      deps += [ "//components/spellcheck/browser" ]
-    }
   }
 }
 

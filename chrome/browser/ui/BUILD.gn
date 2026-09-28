@@ -174,14 +174,6 @@ source_set("browser_actions_impl") {
     "//components/spellcheck:buildflags",
     "//components/undo",
   ]
-
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/browser" ]
-  }
-
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
   if (is_mac) {
     deps += [ "//chrome/browser:global_keyboard_shortcuts_mac" ]
   }

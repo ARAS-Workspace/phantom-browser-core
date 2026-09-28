@@ -45,8 +45,6 @@
 #include "chrome/browser/profiles/guest_mode_policy_handler.h"
 #include "chrome/browser/search/ntp_custom_background_enabled_policy_handler.h"
 #include "chrome/browser/sessions/restore_on_startup_policy_handler.h"
-#include "chrome/browser/spellchecker/spellcheck_language_blocklist_policy_handler.h"
-#include "chrome/browser/spellchecker/spellcheck_language_policy_handler.h"
 #include "chrome/browser/ssl/secure_origin_policy_handler.h"
 #include "chrome/browser/webauthn/webauthn_pref_names.h"
 #include "chrome/common/buildflags.h"

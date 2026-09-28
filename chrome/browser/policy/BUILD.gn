@@ -929,14 +929,6 @@ source_set("impl") {
     "//services/device/public/cpp:device_features",
   ]
 
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/browser" ]
-  }
-
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
-
   if (enable_extensions_core) {
     sources += [
       "cloud/extension_install_policy_service.cc",

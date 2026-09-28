@@ -84,10 +84,6 @@ source_set("impl") {
     "//url",
   ]
 
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/browser" ]
-  }
-
   sources += [ "triggered_profile_resetter_stub.cc" ]
 }
 

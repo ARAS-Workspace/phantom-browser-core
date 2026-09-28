@@ -300,10 +300,6 @@ static_library("test_support") {
     "//ui/webui",
   ]
 
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/renderer" ]
-  }
-
   # New deps should go in the non-iOS section below.
   public_deps += [
     "//base/test:test_support",
@@ -2793,12 +2789,6 @@ test("browser_tests") {
     deps += [ "//chrome/browser/ui/webui/tab_strip_internals:browser_tests" ]
   }
 
-  if (enable_spellcheck) {
-    # Other browser_tests in this target (e.g. the mac
-    # render_view_context_menu browsertest) include spellchecker headers.
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
-
   sources += [ "//chrome/browser/enterprise/data_protection/view_source_navigation_throttle_browsertest.cc" ]
 
   if (is_mac || is_linux) {
@@ -4467,10 +4457,6 @@ test("unit_tests") {
 
   if (enable_background_mode) {
     deps += [ "//chrome/browser/background/extensions:unit_tests" ]
-  }
-
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
   }
 
   # Unit tests that run on Win/Mac/Linux and Android desktop. Note that most
@@ -6279,7 +6265,6 @@ test("sync_performance_tests") {
   sources = [
     "../browser/sync/test/integration/performance/autofill_sync_perf_test.cc",
     "../browser/sync/test/integration/performance/bookmarks_sync_perf_test.cc",
-    "../browser/sync/test/integration/performance/dictionary_sync_perf_test.cc",
     "../browser/sync/test/integration/performance/extensions_sync_perf_test.cc",
     "../browser/sync/test/integration/performance/passwords_sync_perf_test.cc",
     "../browser/sync/test/integration/performance/sessions_sync_perf_test.cc",
@@ -6308,9 +6293,6 @@ test("sync_performance_tests") {
   data_deps = [ "//chrome:packed_resources" ]
 
   if (is_mac) {
-    # Dictionary sync is disabled on Mac.
-    sources -= [ "../browser/sync/test/integration/performance/dictionary_sync_perf_test.cc" ]
-
     # The sync_performance_tests do not run on mac without this flag.
     # Search for comments about "xcode_settings" elsewhere in this file.
     ldflags = [ "-Wl,-ObjC" ]

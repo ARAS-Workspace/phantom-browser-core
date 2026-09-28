@@ -185,10 +185,6 @@ source_set("misc") {
     deps += [ "//components/guest_view/browser" ]
   }
 
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
-
   if (enable_extensions_core) {
     deps += [ "//chrome/browser/extensions" ]
   }
@@ -820,10 +816,6 @@ source_set("profiles_extra_parts_impl") {
       "//chrome/browser/browser_switcher",
       "//chrome/browser/search_integrity",
     ]
-  }
-
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
   }
 
   if (enable_extensions_core) {

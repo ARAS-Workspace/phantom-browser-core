@@ -169,10 +169,6 @@ source_set("impl") {
     "//ui/strings:ui_strings__strings_grit",
   ]
 
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
-
   if (enable_webui_ntp) {
     deps += [ "//chrome/browser/new_tab_page" ]
   }
@@ -272,10 +268,6 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
 
   if (enable_extensions) {
     sources += [ "counters/hosted_apps_counter_unittest.cc" ]

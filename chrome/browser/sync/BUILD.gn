@@ -160,15 +160,7 @@ source_set("sync") {
     "//components/webauthn/core/browser:passkey_model",
   ]
 
-  if (enable_spellcheck) {
-    deps += [ "//components/spellcheck/browser" ]
-  }
-
   allow_circular_includes_from = []
-
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
 
   if (enable_extensions) {
     deps += [ "//chrome/browser/web_applications" ]
@@ -271,10 +263,6 @@ source_set("unit_tests") {
     "//ui/webui:buildflags",
     "//url",
   ]
-
-  if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
-  }
 
   sources += [
     "prefs/chrome_syncable_prefs_database_unittest.cc",

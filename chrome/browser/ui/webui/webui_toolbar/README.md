@@ -323,17 +323,6 @@ initialization for Top Chrome processes. Furthermore, during navigation,
 ensuring that no extension frames, bindings, or content scripts are loaded in
 the renderer, which drastically reduces CPU and memory usage.
 
-### Spellcheck Bypass
-
-In a similar vein of startup optimization, Chrome implements a spellcheck bypass
-gated by the `features::kInitialWebUIWithoutSpellCheck` feature flag. During
-renderer initialization,
-[`SpellcheckService::InitForRenderer()`][Spellcheck_Init] checks this flag and
-returns early, entirely skipping Hunspell dictionary loading, custom word list
-compilation, and the associated IPC messages to the renderer. By bypassing these
-setup steps, the main thread avoids potential blocking operations, ensuring a
-swifter path to rendering the toolbar UI.
-
 --------------------------------------------------------------------------------
 
 ## Navigation Lifecycle
@@ -917,7 +906,6 @@ revert to a native C++ views button view, this fallback is not yet implemented.
 [OnRenderProcessHostCreated]: https://crsrc.org/c/extensions/browser/renderer_startup_helper.cc
 [OnRenderProcessLaunched]: https://crsrc.org/c/extensions/browser/renderer_startup_helper.cc
 [ExtensionWebContentsObserver]: https://crsrc.org/c/extensions/browser/extension_web_contents_observer.h
-[Spellcheck_Init]: https://crsrc.org/c/chrome/browser/spellchecker/spellcheck_service.cc
 [NTR_RegisterThrottles]: https://crsrc.org/c/content/browser/renderer_host/navigation_throttle_registry_impl.cc
 [NavReq_Start]: https://crsrc.org/c/content/browser/renderer_host/navigation_request.cc
 [InitialWebUINavigationURLLoader]: https://crsrc.org/c/content/browser/webui/initial_webui_navigation_url_loader.h
