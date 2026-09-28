@@ -399,7 +399,6 @@ void PrintStackTrace(const void** trace, size_t count) {
   PrintStackTraceInternal(trace, count);
 }
 
-// stack_trace_android.cc defines its own OutputStackTrace.
 void OutputStackTrace(unsigned index,
                       uintptr_t address,
                       uintptr_t base_address,

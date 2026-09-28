@@ -2701,9 +2701,6 @@ TEST_P(PartitionAllocTest, CheckMetadataIntegrityPass) {
 // On 64-bit systems we need to restrict the address space to force allocation
 // failure, so these tests run only on POSIX systems that provide setrlimit(),
 // and use it to limit address space to 6GB.
-//
-// Disable these tests on Android because, due to the allocation-heavy behavior,
-// they tend to get OOM-killed rather than pass.
 #if !PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) || \
     (PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_APPLE))
 #define MAYBE_RepeatedAllocReturnNullDirect RepeatedAllocReturnNullDirect

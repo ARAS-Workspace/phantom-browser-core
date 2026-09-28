@@ -106,10 +106,6 @@ TEST(HardeningTest, MetadataPointerCrashing) {
 }
 #endif  // PA_USE_DEATH_TESTS() && PA_CONFIG(HAS_FREELIST_SHADOW_ENTRY)
 
-// Below test also misbehaves on Android; as above, death tests don't
-// quite work (crbug.com/1240184), and having free slot bitmaps enabled
-// force the expectations below to crash.
-
 TEST(HardeningTest, SuccessfulCorruption) {
   PartitionOptions opts;
   PartitionRoot root(opts);

@@ -17,9 +17,6 @@
 #include "partition_alloc/partition_alloc_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-// Death tests on Android are currently very flaky. No need to add more flaky
-// tests, as they just make it hard to spot real problems.
-// TODO(markus): See if the restrictions on Android can eventually be lifted.
 #if defined(GTEST_HAS_DEATH_TEST)
 #define ALLOW_DEATH_TEST
 #endif

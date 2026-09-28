@@ -473,8 +473,7 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   ASSERT_GE(allocs_intercepted_by_alignment[256], 1u);
   ASSERT_GE(allocs_intercepted_by_size[59], 1u);
 
-  // (p)valloc() are not defined on Android. pvalloc() is a GNU extension,
-  // valloc() is not in POSIX.
+  // pvalloc() is a GNU extension, valloc() is not in POSIX.
   const size_t kPageSize = partition_alloc::internal::base::GetPageSize();
   void* valloc_ptr = valloc(61);
   ASSERT_NE(nullptr, valloc_ptr);

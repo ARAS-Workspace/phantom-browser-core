@@ -94,8 +94,6 @@
 
 #endif
 
-// alignas(16) DebugKv causes breakpad_unittests and sandbox_linux_unittests
-// failures on android-marshmallow-x86-rel because of SIGSEGV.
 #define PA_DEBUGKV_ALIGN alignas(16)
 
 namespace partition_alloc::internal {
