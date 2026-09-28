@@ -2,6 +2,12 @@
 # Checks the tree against a linux configuration. This tree is built for mac;
 # linux is verified, not built. gn gen resolves every label and gn check reads
 # every include, which is where a deletion only linux would notice shows up.
+#
+# The gen stage rebuilds its directory rather than writing over it. gn gen leaves
+# behind the .ninja file of a target that has been taken out, and out/dev carries
+# 761 of those among 13469; a survey that asks which sources the graph names reads
+# them too. Nothing is compiled here, so the directory costs one gn gen to make
+# again and the leftovers cannot collect.
 set -euo pipefail
 
 STAGES=(gen check)
@@ -57,6 +63,12 @@ stage_gen() {
     [ -f "$FLAGS" ] || die "no linux gate flags at $FLAGS"
     require_sysroot
 
+    if [ -d "$out" ]; then
+        [ -z "$(find "$out" -name '*.o' -print -quit 2>/dev/null)" ] \
+            || die "out/$OUT_NAME holds object files, so it is not the directory \
+this gate owns; check OUT_NAME before running again"
+        rm -rf "$out"
+    fi
     mkdir -p "$out"
     { cat "$FLAGS"; echo "target_cpu = \"$TARGET_CPU\""; } > "$out/args.gn"
     ( cd "$ROOT" && env -u VPYTHON_BYPASS -u VIRTUAL_ENV -u PYTHONPATH -u PYTHONHOME \
