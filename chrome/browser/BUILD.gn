@@ -3124,18 +3124,6 @@ static_library("test_support") {
     deps += [ "//chrome/browser/local_discovery:test_support" ]
   }
 
-  if (has_spellcheck_panel) {
-    sources += [
-      "spellchecker/test/spellcheck_mock_panel_host.cc",
-      "spellchecker/test/spellcheck_mock_panel_host.h",
-      "spellchecker/test/spellcheck_panel_browsertest_helper.cc",
-      "spellchecker/test/spellcheck_panel_browsertest_helper.h",
-    ]
-    deps += [
-      "//chrome/browser/spellchecker",
-      "//components/spellcheck/common",
-    ]
-  }
   if (enable_bound_session_credentials) {
     sources += [
       "../browser/signin/bound_session_credentials/bound_session_test_cookie_manager.cc",

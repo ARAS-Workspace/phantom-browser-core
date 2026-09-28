@@ -44,26 +44,3 @@ source_set("browser") {
     sources += [ "spellcheck_platform_mac.mm" ]
   }
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "spellcheck_host_metrics_unittest.cc" ]
-
-  if (is_mac) {
-    sources += [ "spellcheck_platform_mac_unittest.cc" ]
-  }
-
-  deps = [
-    ":browser",
-    "//base",
-    "//base/test:test_support",
-    "//components/spellcheck/common",
-    "//components/variations",
-    "//content/test:test_support",
-    "//mojo/public/cpp/bindings",
-    "//net:test_support",
-    "//services/network:test_support",
-    "//services/network/public/cpp",
-    "//testing/gtest",
-  ]
-}

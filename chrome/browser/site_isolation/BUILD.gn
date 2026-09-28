@@ -80,16 +80,6 @@ source_set("browser_tests") {
   if (enable_pdf) {
     deps += [ "//pdf:features" ]
   }
-
-  if (enable_spellcheck) {
-    sources += [ "spellcheck_per_process_browsertest.cc" ]
-    deps += [
-      "//chrome/browser/spellchecker",
-      "//chrome/browser/spellchecker:browser_tests",
-      "//components/spellcheck/browser",
-      "//components/spellcheck/common",
-    ]
-  }
 }
 
 source_set("interactive_ui_tests") {

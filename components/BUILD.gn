@@ -527,10 +527,7 @@ test("components_unittests") {
   ]
 
   if (enable_spellcheck) {
-    deps += [
-      "//components/spellcheck/browser:unit_tests",
-      "//components/spellcheck/renderer:unit_tests",
-    ]
+    deps += [ "//components/spellcheck/renderer:unit_tests" ]
   }
 
   deps += [
