@@ -46,7 +46,6 @@
 #include "components/security_state/content/content_utils.h"
 #include "components/security_state/core/security_state.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_process_host.h"
@@ -103,10 +102,6 @@
 #include "third_party/blink/public/mojom/printing/web_printing.mojom.h"
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "chrome/browser/spellchecker/spell_check_host_chrome_impl.h"
-#include "components/spellcheck/common/spellcheck.mojom.h"
-#endif
 
 namespace chrome::internal {
 
@@ -358,14 +353,6 @@ void PopulateChromeFrameBinders(
       &printing::CreateWebPrintingServiceForFrame);
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  map->Add<spellcheck::mojom::SpellCheckHost>(
-      [](content::RenderFrameHost* frame_host,
-         mojo::PendingReceiver<spellcheck::mojom::SpellCheckHost> receiver) {
-        SpellCheckHostChromeImpl::Create(
-            frame_host->GetProcess()->GetDeprecatedID(), std::move(receiver));
-      });
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }
 
 }  // namespace chrome::internal

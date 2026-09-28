@@ -23,7 +23,6 @@
 #include "chrome/browser/extensions/api/web_navigation/web_navigation_api.h"
 #include "chrome/browser/extensions/commands/command_service.h"
 #include "chrome/common/buildflags.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "extensions/buildflags/buildflags.h"
 #include "printing/buildflags/buildflags.h"
 
@@ -63,9 +62,6 @@
 #include "chrome/browser/extensions/api/mdns/mdns_api.h"
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "chrome/browser/extensions/api/language_settings_private/language_settings_private_delegate_factory.h"
-#endif
 
 namespace chrome_extensions {
 
@@ -102,9 +98,6 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   extensions::BrailleDisplayPrivateAPI::GetFactoryInstance();
   extensions::EnterpriseReportingPrivateEventRouterFactory::GetInstance();
   extensions::image_writer::OperationManager::GetFactoryInstance();
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  extensions::LanguageSettingsPrivateDelegateFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_MAC)
   auto networking_private_ui_delegate_factory =
       std::make_unique<extensions::NetworkingPrivateUIDelegateFactoryImpl>();

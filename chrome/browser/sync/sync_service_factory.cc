@@ -73,7 +73,6 @@
 #include "components/saved_tab_groups/public/features.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/sync/base/command_line_switches.h"
 #include "components/sync/base/features.h"
 #include "components/sync/engine/net/http_bridge.h"
@@ -102,10 +101,6 @@
 
 #include "chrome/browser/webauthn/passkey_model_factory.h"
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "chrome/browser/spellchecker/spellcheck_factory.h"
-#include "components/spellcheck/browser/pref_names.h"
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 namespace {
 
@@ -252,12 +247,6 @@ syncer::DataTypeController::TypeVector CreateChromeControllers(
           : nullptr);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  builder.SetSpellcheckService(
-      profile->GetPrefs()->GetBoolean(spellcheck::prefs::kSpellCheckEnable)
-          ? SpellcheckServiceFactory::GetForContext(profile)
-          : nullptr);
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
   builder.SetCrossDeviceThemeTracker(
       CrossDeviceThemeTrackerFactory::GetForProfile(profile));
@@ -460,9 +449,6 @@ SyncServiceFactory::SyncServiceFactory()
 
   DependsOn(SecurityEventRecorderFactory::GetInstance());
   DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  DependsOn(SpellcheckServiceFactory::GetInstance());
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
   DependsOn(supervised_user::FamilyLinkSettingsServiceFactory::GetInstance());
   DependsOn(SessionSyncServiceFactory::GetInstance());
   DependsOn(TabContextSyncServiceFactory::GetInstance());

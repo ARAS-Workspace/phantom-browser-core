@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "build/buildflag.h"
 #include "components/prefs/pref_service.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/themes/cross_device/cross_device_theme_tracker.h"
 #include "extensions/buildflags/buildflags.h"
 
@@ -50,9 +49,6 @@ class WebAppProvider;
 }  // namespace web_app
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-class SpellcheckService;
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 
 
@@ -91,9 +87,6 @@ class ChromeSyncControllerBuilder {
   void SetWebAppProvider(web_app::WebAppProvider* web_app_provider);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  void SetSpellcheckService(SpellcheckService* spellcheck_service);
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 
 
@@ -146,9 +139,6 @@ class ChromeSyncControllerBuilder {
   SafeOptional<raw_ptr<web_app::WebAppProvider>> web_app_provider_;
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  SafeOptional<raw_ptr<SpellcheckService>> spellcheck_service_;
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 };
 

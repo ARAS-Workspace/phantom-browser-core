@@ -19,7 +19,6 @@
 #include "components/autofill/content/renderer/test_password_autofill_agent.h"
 #include "components/input/native_web_keyboard_event.h"
 #include "components/spellcheck/renderer/spellcheck.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "extensions/buildflags/buildflags.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "third_party/blink/public/common/input/web_input_event.h"
@@ -149,7 +148,4 @@ void ChromeRenderViewTest::InitChromeContentRendererClient(
               const extensions::ExtensionsRendererAPIProvider>>()));
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  client->InitSpellCheck();
-#endif
 }

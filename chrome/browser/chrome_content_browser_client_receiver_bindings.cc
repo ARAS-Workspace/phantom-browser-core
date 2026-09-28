@@ -36,7 +36,6 @@
 #include "components/safe_browsing/content/browser/mojo_safe_browsing_impl.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/surface_embed/browser/surface_embed_host.h"
 #include "components/surface_embed/common/features.h"
@@ -72,10 +71,6 @@
 #include "services/metrics/ukm_recorder_factory_impl.h"
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "chrome/browser/spellchecker/spell_check_initialization_host_impl.h"
-#include "components/spellcheck/common/spellcheck.mojom.h"
-#endif
 
 #include "chrome/browser/badging/badge_manager.h"
 #include "chrome/browser/password_manager/remote_actor/remote_actor_credential_sharing_impl.h"
@@ -614,12 +609,4 @@ void ChromeContentBrowserClient::BindHostReceiverForRenderer(
     return;
   }
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  if (auto host_receiver =
-          receiver.As<spellcheck::mojom::SpellCheckInitializationHost>()) {
-    SpellCheckInitializationHostImpl::Create(
-        render_process_host->GetDeprecatedID(), std::move(host_receiver));
-    return;
-  }
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }

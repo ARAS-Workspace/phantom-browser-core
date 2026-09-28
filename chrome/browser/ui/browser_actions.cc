@@ -168,7 +168,6 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
@@ -195,10 +194,6 @@
 #include "components/prefs/pref_service.h"
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK) && !BUILDFLAG(IS_MAC)
-#include "chrome/browser/spellchecker/spellcheck_service.h"
-#include "components/spellcheck/browser/pref_names.h"
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK) && !BUILDFLAG(IS_MAC)
 
 namespace {
 
@@ -3422,71 +3417,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionPerformance)
           .Build());
 
-#if BUILDFLAG(ENABLE_SPELLCHECK) && !BUILDFLAG(IS_MAC)
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                Profile* const profile = bwi->GetProfile();
-                if (!profile) {
-                  return;
-                }
-                PrefService* prefs = profile->GetPrefs();
-                bool spellcheck_enabled =
-                    prefs->GetBoolean(spellcheck::prefs::kSpellCheckEnable);
-                bool enhanced_spellcheck_enabled = prefs->GetBoolean(
-                    spellcheck::prefs::kSpellCheckUseSpellingService);
-
-                if (spellcheck_enabled && !enhanced_spellcheck_enabled) {
-                  // User is turning off spell check.
-                  prefs->SetBoolean(spellcheck::prefs::kSpellCheckEnable,
-                                    false);
-                } else if (enhanced_spellcheck_enabled) {
-                  // User is choosing 'basic' over 'enhanced'.
-                  prefs->SetBoolean(spellcheck::prefs::kSpellCheckEnable, true);
-                  prefs->SetBoolean(
-                      spellcheck::prefs::kSpellCheckUseSpellingService, false);
-                } else {
-                  // User is turning on spell check.
-                  prefs->SetBoolean(spellcheck::prefs::kSpellCheckEnable, true);
-                }
-              },
-              bwi))
-          .SetText(l10n_util::GetStringUTF16(
-              IDS_CONTENT_CONTEXT_CHECK_SPELLING_WHILE_TYPING))
-          .SetActionId(kActionCheckSpellingWhileTyping)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                Profile* const profile = bwi->GetProfile();
-                if (!profile) {
-                  return;
-                }
-                std::vector<SpellcheckService::Dictionary> dictionaries;
-                SpellcheckService::GetDictionaries(profile, &dictionaries);
-
-                std::vector<std::string> all_languages;
-                for (const auto& dictionary : dictionaries) {
-                  all_languages.push_back(dictionary.language);
-                }
-
-                StringListPrefMember dictionaries_pref;
-                dictionaries_pref.Init(
-                    spellcheck::prefs::kSpellCheckDictionaries,
-                    profile->GetPrefs());
-                dictionaries_pref.SetValue(all_languages);
-              },
-              bwi))
-          .SetText(l10n_util::GetStringUTF16(
-              IDS_CONTENT_CONTEXT_SPELLCHECK_MULTI_LINGUAL))
-          .SetActionId(kActionSpellcheckMultiLingual)
-          .Build());
-#endif
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(

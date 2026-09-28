@@ -18,7 +18,6 @@
 #include "build/build_config.h"
 #include "chrome/common/media/webrtc_logging.mojom.h"
 #include "components/safe_browsing/buildflags.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "content/public/common/buildflags.h"
 #include "content/public/renderer/content_renderer_client.h"
 #include "content/public/renderer/render_thread.h"
@@ -41,9 +40,6 @@
 #endif
 
 class ChromeRenderThreadObserver;
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-class SpellCheck;
-#endif
 
 namespace sampling_profiler {
 class ThreadProfiler;
@@ -210,17 +206,11 @@ class ChromeContentRendererClient
       const chrome::mojom::PluginInfo& plugin_info);
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  void InitSpellCheck();
-#endif
 
   ChromeRenderThreadObserver* GetChromeObserver() const;
   web_cache::WebCacheImpl* GetWebCache();
   chrome::WebRtcLoggingAgentImpl* GetWebRtcLoggingAgent();
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  SpellCheck* GetSpellCheck();
-#endif
 
  private:
   FRIEND_TEST_ALL_PREFIXES(ChromeContentRendererClientTest, NaClRestriction);
@@ -241,9 +231,6 @@ class ChromeContentRendererClient
   std::unique_ptr<web_cache::WebCacheImpl> web_cache_impl_;
   std::unique_ptr<chrome::WebRtcLoggingAgentImpl> webrtc_logging_agent_impl_;
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  std::unique_ptr<SpellCheck> spellcheck_;
-#endif
   std::unique_ptr<subresource_filter::UnverifiedRulesetDealer>
       subresource_filter_ruleset_dealer_;
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)

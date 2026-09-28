@@ -127,7 +127,6 @@
 #include "components/security_interstitials/core/pref_names.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "components/signin/public/base/signin_pref_names.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/sync/base/pref_names.h"
 #include "components/sync/service/sync_policy_handler.h"
 #include "components/themes/theme_color_policy_handler.h"
@@ -195,9 +194,6 @@
 #include "chrome/browser/policy/printing_restrictions_policy_handler.h"
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "components/spellcheck/browser/pref_names.h"
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/browser_switcher/browser_switcher_prefs.h"
@@ -755,14 +751,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kSitePerProcess,
     prefs::kSitePerProcess,
     base::Value::Type::BOOLEAN },
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  { key::kSpellCheckServiceEnabled,
-    spellcheck::prefs::kSpellCheckUseSpellingService,
-    base::Value::Type::BOOLEAN },
-  { key::kSpellcheckEnabled,
-    spellcheck::prefs::kSpellCheckEnable,
-    base::Value::Type::BOOLEAN },
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
   { key::kSuppressUnsupportedOSWarning,
     prefs::kSuppressUnsupportedOSWarning,
     base::Value::Type::BOOLEAN },
@@ -2018,14 +2006,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   handlers->AddHandler(std::make_unique<PrintPdfAsImageDefaultPolicyHandler>());
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#if BUILDFLAG(IS_LINUX)
-  handlers->AddHandler(std::make_unique<SpellcheckLanguagePolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<SpellcheckLanguageBlocklistPolicyHandler>(
-          key::kSpellcheckLanguageBlocklist));
-#endif  // BUILDFLAG(IS_LINUX)
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 #if BUILDFLAG(IS_LINUX)
   handlers->AddHandler(std::make_unique<SimplePolicyHandler>(

@@ -13,16 +13,12 @@
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/security_events/security_event_recorder.h"
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "chrome/browser/spellchecker/spellcheck_service.h"
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 #include "chrome/browser/themes/theme_local_data_batch_uploader.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_syncable_service.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/channel_info.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/pref_names.h"
@@ -92,12 +88,6 @@ void ChromeSyncControllerBuilder::SetWebAppProvider(
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-void ChromeSyncControllerBuilder::SetSpellcheckService(
-    SpellcheckService* spellcheck_service) {
-  spellcheck_service_.Set(spellcheck_service);
-}
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 
 
@@ -211,26 +201,6 @@ ChromeSyncControllerBuilder::Build(syncer::SyncService* sync_service) {
     }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-    // Chrome prefers OS provided spell checkers where they exist. So only sync
-    // the custom dictionary on platforms that typically don't provide one.
-#if BUILDFLAG(IS_LINUX)
-    // Dictionary sync is enabled by default.
-    if (spellcheck_service_.value()) {
-      controllers.push_back(
-          std::make_unique<syncer::SyncableServiceBasedDataTypeController>(
-              syncer::DICTIONARY, data_type_store_factory,
-              spellcheck_service_.value()->GetCustomDictionary()->AsWeakPtr(),
-              dump_stack,
-              base::FeatureList::IsEnabled(
-                  syncer::kSpellcheckSeparateLocalAndAccountDictionaries)
-                  ? syncer::SyncableServiceBasedDataTypeController::
-                        DelegateMode::kTransportModeWithSingleModel
-                  : syncer::SyncableServiceBasedDataTypeController::
-                        DelegateMode::kLegacyFullSyncModeOnly));
-    }
-#endif  // BUILDFLAG(IS_LINUX)
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 
     if (auto tracker = cross_device_theme_tracker_.value()) {

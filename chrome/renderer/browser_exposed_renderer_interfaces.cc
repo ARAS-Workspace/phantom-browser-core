@@ -12,14 +12,10 @@
 #include "chrome/renderer/chrome_content_renderer_client.h"
 #include "chrome/renderer/chrome_render_thread_observer.h"
 #include "chrome/renderer/media/webrtc_logging_agent_impl.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/visitedlink/renderer/visitedlink_reader.h"
 #include "components/web_cache/renderer/web_cache_impl.h"
 #include "mojo/public/cpp/bindings/binder_map.h"
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "components/spellcheck/renderer/spellcheck.h"
-#endif
 
 namespace {
 
@@ -29,14 +25,6 @@ void BindWebRTCLoggingAgent(
   client->GetWebRtcLoggingAgent()->AddReceiver(std::move(receiver));
 }
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-void BindSpellChecker(
-    ChromeContentRendererClient* client,
-    mojo::PendingReceiver<spellcheck::mojom::SpellChecker> receiver) {
-  if (client->GetSpellCheck())
-    client->GetSpellCheck()->BindReceiver(std::move(receiver));
-}
-#endif
 
 }  // namespace
 
@@ -56,10 +44,5 @@ void ExposeChromeRendererInterfacesToBrowser(
       base::BindRepeating(&BindWebRTCLoggingAgent, client),
       base::SequencedTaskRunner::GetCurrentDefault());
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  binders->Add<spellcheck::mojom::SpellChecker>(
-      base::BindRepeating(&BindSpellChecker, client),
-      base::SequencedTaskRunner::GetCurrentDefault());
-#endif
 
 }

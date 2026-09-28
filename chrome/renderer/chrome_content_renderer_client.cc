@@ -115,7 +115,6 @@
 #include "components/sampling_profiler/process_type.h"
 #include "components/sampling_profiler/thread_profiler.h"
 #include "components/security_interstitials/content/renderer/security_interstitial_page_controller_delegate_impl.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/subresource_filter/content/renderer/subresource_filter_agent.h"
 #include "components/subresource_filter/content/renderer/unverified_ruleset_dealer.h"
 #include "components/subresource_filter/core/common/common_features.h"
@@ -237,10 +236,6 @@
 #include "components/paint_preview/renderer/paint_preview_recorder_impl.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "components/spellcheck/renderer/spellcheck.h"
-#include "components/spellcheck/renderer/spellcheck_provider.h"
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 #include "chrome/renderer/media/chrome_key_systems.h"
@@ -409,10 +404,6 @@ void ChromeContentRendererClient::RenderThreadStarted() {
       WebString::FromAscii(extensions::kExtensionScheme));
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  if (!spellcheck_)
-    InitSpellCheck();
-#endif
 
   subresource_filter_ruleset_dealer_ =
       std::make_unique<subresource_filter::UnverifiedRulesetDealer>();
@@ -695,9 +686,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
     new SearchBox(render_frame);
   }
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  new SpellCheckProvider(render_frame, spellcheck_.get());
-#endif
 
 
   if (render_frame->IsMainFrame()) {
@@ -1231,11 +1219,6 @@ ChromeContentRendererClient::CreatePrescientNetworking(
       render_frame);
 }
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-void ChromeContentRendererClient::InitSpellCheck() {
-  spellcheck_ = std::make_unique<SpellCheck>(this);
-}
-#endif
 
 ChromeRenderThreadObserver* ChromeContentRendererClient::GetChromeObserver()
     const {
@@ -1255,11 +1238,6 @@ ChromeContentRendererClient::GetWebRtcLoggingAgent() {
   return webrtc_logging_agent_impl_.get();
 }
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-SpellCheck* ChromeContentRendererClient::GetSpellCheck() {
-  return spellcheck_.get();
-}
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 std::unique_ptr<blink::WebSocketHandshakeThrottleProvider>
 ChromeContentRendererClient::CreateWebSocketHandshakeThrottleProvider() {

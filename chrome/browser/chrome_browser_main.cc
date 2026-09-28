@@ -116,7 +116,6 @@
 #include "components/sampling_profiler/thread_profiler.h"
 #include "components/sessions/content/content_serialized_navigation_driver.h"
 #include "components/site_isolation/site_isolation_policy.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/startup_metric_utils/browser/startup_metric_utils.h"
 #include "components/startup_metric_utils/common/startup_metric_utils.h"
 #include "components/tracing/common/background_tracing_utils.h"

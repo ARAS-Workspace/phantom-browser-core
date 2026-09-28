@@ -22,7 +22,6 @@
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/data_sharing/public/features.h"
 #include "components/saved_tab_groups/public/features.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/sync/base/command_line_switches.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
@@ -32,10 +31,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/webui/buildflags.h"
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "chrome/browser/spellchecker/spellcheck_factory.h"
-#include "chrome/browser/spellchecker/spellcheck_service.h"
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 class SyncServiceFactoryTest : public testing::Test {
  public:
@@ -56,15 +51,6 @@ class SyncServiceFactoryTest : public testing::Test {
     builder.AddTestingFactory(WebDataServiceFactory::GetInstance(),
                               WebDataServiceFactory::GetDefaultFactory());
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-    builder.AddTestingFactory(
-        SpellcheckServiceFactory::GetInstance(),
-        base::BindRepeating(base::BindLambdaForTesting(
-            [](content::BrowserContext* browser_context) {
-              return std::unique_ptr<KeyedService>(
-                  std::make_unique<SpellcheckService>(browser_context));
-            })));
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
     profile_ = builder.Build();
   }

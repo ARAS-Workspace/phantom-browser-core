@@ -280,7 +280,6 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "components/site_token_provider/features.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/sync/base/features.h"
 #include "content/public/common/buildflags.h"
 #include "crypto/crypto_buildflags.h"
@@ -460,9 +459,6 @@
 #include "components/gapis/features.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "chrome/browser/spellchecker/spellcheck_factory.h"
-#endif
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
 #include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_factory.h"
@@ -1009,9 +1005,6 @@ void ChromeBrowserMainExtraPartsProfiles::
           site_token_provider::features::kSiteTokenProviderEnabled)) {
     site_token_provider::SiteTokenProviderServiceFactory::GetInstance();
   }
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-  SpellcheckServiceFactory::GetInstance();
-#endif
   StartupPasswordsImportServiceFactory::GetInstance();
   StatefulSSLHostStateDelegateFactory::GetInstance();
   StorageAccessAPIServiceFactory::GetInstance();

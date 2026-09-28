@@ -20,11 +20,7 @@
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/proxy_config/proxy_config_pref_names.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-#include "components/spellcheck/browser/pref_names.h"
-#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 #include "components/language/core/browser/pref_names.h"
 #include "extensions/browser/pref_transformer_interface.h"
 #include "extensions/buildflags/buildflags.h"
@@ -75,10 +71,6 @@ const PrefMappingEntry kMappings[] = {
      APIPermissionID::kPrivacy},
     {"searchSuggestEnabled", prefs::kSearchSuggestEnabled,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
-#if BUILDFLAG(ENABLE_SPELLCHECK)
-    {"spellingServiceEnabled", spellcheck::prefs::kSpellCheckUseSpellingService,
-     APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
-#endif
     {"thirdPartyCookiesAllowed", prefs::kCookieControlsMode,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
     {"topicsEnabled", prefs::kPrivacySandboxM1TopicsEnabled,
