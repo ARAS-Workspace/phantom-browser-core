@@ -27,10 +27,6 @@ source_set("spellchecker") {
     ]
   }
 
-  if (has_spellcheck_panel) {
-    public += [ "spell_check_panel_host_impl.h" ]
-  }
-
   public_deps = [
     "//base",
     "//chrome/browser/profiles",
@@ -68,10 +64,6 @@ source_set("impl") {
       "spellcheck_language_blocklist_policy_handler.cc",
       "spellcheck_language_policy_handler.cc",
     ]
-  }
-
-  if (has_spellcheck_panel) {
-    sources += [ "spell_check_panel_host_impl.cc" ]
   }
 
   public_deps = [ ":spellchecker" ]

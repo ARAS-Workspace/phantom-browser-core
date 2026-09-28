@@ -75,9 +75,6 @@
 #if BUILDFLAG(ENABLE_SPELLCHECK)
 #include "chrome/browser/spellchecker/spell_check_initialization_host_impl.h"
 #include "components/spellcheck/common/spellcheck.mojom.h"
-#if BUILDFLAG(HAS_SPELLCHECK_PANEL)
-#include "chrome/browser/spellchecker/spell_check_panel_host_impl.h"
-#endif
 #endif
 
 #include "chrome/browser/badging/badge_manager.h"
@@ -624,14 +621,5 @@ void ChromeContentBrowserClient::BindHostReceiverForRenderer(
         render_process_host->GetDeprecatedID(), std::move(host_receiver));
     return;
   }
-
-#if BUILDFLAG(HAS_SPELLCHECK_PANEL)
-  if (auto host_receiver =
-          receiver.As<spellcheck::mojom::SpellCheckPanelHost>()) {
-    SpellCheckPanelHostImpl::Create(render_process_host->GetDeprecatedID(),
-                                    std::move(host_receiver));
-    return;
-  }
-#endif  // BUILDFLAG(HAS_SPELLCHECK_PANEL)
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }

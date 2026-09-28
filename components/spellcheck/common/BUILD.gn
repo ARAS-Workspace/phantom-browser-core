@@ -61,10 +61,6 @@ source_set("spellcheck_result") {
 mojom("interfaces") {
   sources = [ "spellcheck.mojom" ]
 
-  if (has_spellcheck_panel) {
-    sources += [ "spellcheck_panel.mojom" ]
-  }
-
   public_deps = [ "//mojo/public/mojom/base" ]
 
   enabled_features = []

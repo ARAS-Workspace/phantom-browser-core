@@ -29,13 +29,6 @@ source_set("renderer") {
     ]
   }
 
-  if (has_spellcheck_panel) {
-    sources += [
-      "spellcheck_panel.cc",
-      "spellcheck_panel.h",
-    ]
-  }
-
   sources += [
     "hunspell_engine.cc",
     "hunspell_engine.h",

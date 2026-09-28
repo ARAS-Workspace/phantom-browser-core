@@ -240,10 +240,6 @@
 #if BUILDFLAG(ENABLE_SPELLCHECK)
 #include "components/spellcheck/renderer/spellcheck.h"
 #include "components/spellcheck/renderer/spellcheck_provider.h"
-
-#if BUILDFLAG(HAS_SPELLCHECK_PANEL)
-#include "components/spellcheck/renderer/spellcheck_panel.h"
-#endif  // BUILDFLAG(HAS_SPELLCHECK_PANEL)
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
@@ -701,10 +697,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
 
 #if BUILDFLAG(ENABLE_SPELLCHECK)
   new SpellCheckProvider(render_frame, spellcheck_.get());
-
-#if BUILDFLAG(HAS_SPELLCHECK_PANEL)
-  new SpellCheckPanel(render_frame, registry, this);
-#endif  // BUILDFLAG(HAS_SPELLCHECK_PANEL)
 #endif
 
 
