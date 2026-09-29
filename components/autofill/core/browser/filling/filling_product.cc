@@ -164,8 +164,6 @@ FillingProduct GetFillingProductFromSuggestionDataSource(
       return FillingProduct::kIdentityCredential;
     case SuggestionGenerator::SuggestionDataSource::kPasskey:
       return FillingProduct::kPasskey;
-    case SuggestionGenerator::SuggestionDataSource::kCompose:
-      return FillingProduct::kCompose;
     case SuggestionGenerator::SuggestionDataSource::kOneTimePassword:
       return FillingProduct::kOneTimePassword;
     case SuggestionGenerator::SuggestionDataSource::kAtMemoryInactivityNudge:
