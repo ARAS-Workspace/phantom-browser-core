@@ -171,10 +171,6 @@ static_library("utility") {
     ]
   }
 
-  if (enable_media_remoting_redirection) {
-    deps += [ "//chrome/services/redirection:redirection_service" ]
-  }
-
   if (enable_extensions) {
     deps += [ "//chrome/services/media_gallery_util:lib" ]
   }

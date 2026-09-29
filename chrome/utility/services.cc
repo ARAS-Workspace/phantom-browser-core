@@ -51,10 +51,6 @@
 #include "services/screen_ai/public/mojom/screen_ai_factory.mojom.h"  // nogncheck
 #include "services/screen_ai/screen_ai_service_impl.h"  // nogncheck
 
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
-#include "chrome/services/redirection/redirection_service.h"
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
-
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/services/file_util/file_util_service.h"  // nogncheck
 #endif
@@ -173,13 +169,6 @@ auto RunMirroringService(
       std::move(receiver), content::UtilityThread::Get()->GetIOTaskRunner());
 }
 
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
-auto RunRedirectionService(
-    mojo::PendingReceiver<redirection::mojom::RedirectionService> receiver) {
-  return std::make_unique<redirection::RedirectionService>(std::move(receiver));
-}
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
-
 auto RunPassageEmbeddingsService(
     mojo::PendingReceiver<passage_embeddings::mojom::PassageEmbeddingsService>
         receiver) {
@@ -290,10 +279,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunMirroringService);
   services.Add(RunReadingModeMetricsService);
   services.Add(RunScreenAIServiceFactory);
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
-  services.Add(RunRedirectionService);
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

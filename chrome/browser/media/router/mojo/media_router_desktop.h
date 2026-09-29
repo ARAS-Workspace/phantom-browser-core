@@ -34,7 +34,6 @@
 #include "components/media_router/common/mojom/media_router.mojom.h"
 #include "components/media_router/common/route_request_result.h"
 #include "content/public/browser/browser_thread.h"
-#include "media/media_buildflags.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/receiver_set.h"
@@ -56,7 +55,6 @@ namespace media_router {
 
 class CastMediaRouteProvider;
 class DualMediaSinkService;
-class RedirectionMediaRouteProvider;
 class WiredDisplayMediaRouteProvider;
 
 // MediaRouter implementation that uses the desktop MediaRouteProviders.
@@ -195,7 +193,6 @@ class MediaRouterDesktop : public MediaRouterBase, public mojom::MediaRouter {
   void InitializeWiredDisplayMediaRouteProvider();
   void InitializeCastMediaRouteProvider();
   void InitializeDialMediaRouteProvider();
-  void InitializeRedirectionMediaRouteProvider();
 
   // Gets the per-profile Cast SDK hash token used by Cast and DIAL MRPs.
   std::string GetHashToken();
@@ -458,11 +455,6 @@ class MediaRouterDesktop : public MediaRouterBase, public mojom::MediaRouter {
 
   // MediaRouteProvider for casting to local screens.
   std::unique_ptr<WiredDisplayMediaRouteProvider> wired_display_provider_;
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
-  // MediaRouteProvider for redirection (MMR) sinks.
-  std::unique_ptr<RedirectionMediaRouteProvider> redirection_provider_;
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 
   // MediaRouteProvider for casting to Cast devices.
   std::unique_ptr<CastMediaRouteProvider, base::OnTaskRunnerDeleter>

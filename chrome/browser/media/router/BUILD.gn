@@ -177,20 +177,6 @@ static_library("router") {
     "//third_party/openscreen/src/cast/common/channel/proto:channel_proto",
   ]
 
-  if (enable_media_remoting_redirection) {
-    sources += [
-      "providers/redirection/redirection_media_route_provider.cc",
-      "providers/redirection/redirection_media_route_provider.h",
-      "providers/redirection/redirection_service_host.cc",
-      "providers/redirection/redirection_service_host.h",
-    ]
-
-    deps += [
-      "//chrome/services/redirection/public/mojom",
-      "//media/mojo/mojom:remoting",
-    ]
-  }
-
   if (enable_openscreen_protocol) {
     sources += [
       "providers/openscreen/discovery/open_screen_listener_delegate.cc",
@@ -377,10 +363,6 @@ source_set("unittests") {
     "providers/dial/dial_media_route_provider_unittest.cc",
     "providers/wired_display/wired_display_media_route_provider_unittest.cc",
   ]
-  if (enable_media_remoting_redirection) {
-    sources +=
-        [ "providers/redirection/redirection_media_route_provider_unittest.cc" ]
-  }
   deps += [
     ":logger_list",
     ":test_support",
