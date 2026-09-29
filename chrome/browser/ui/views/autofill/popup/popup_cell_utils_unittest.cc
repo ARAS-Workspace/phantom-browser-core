@@ -45,19 +45,6 @@ const char* GetExpandableMenuIconNameFromSuggestionType(SuggestionType type) {
 }
 
 TEST(PopupCellUtilsTest,
-     GetExpandableMenuIcon_ComposeSuggestions_ReturnThreeDotsMenuIcon) {
-  EXPECT_EQ(GetExpandableMenuIconNameFromSuggestionType(
-                SuggestionType::kComposeProactiveNudge),
-            ::features::IsRoundedIconsEnabled()
-                ? kMoreVertIcon.name
-                : kBrowserToolsChromeRefreshOldIcon.name);
-  // No other Compose type should allow an expandable menu.
-  EXPECT_FALSE(IsExpandableSuggestionType(SuggestionType::kComposeResumeNudge));
-  EXPECT_FALSE(IsExpandableSuggestionType(
-      SuggestionType::kComposeSavedStateNotification));
-}
-
-TEST(PopupCellUtilsTest,
      GetExpandableMenuIcon_NonComposeSuggestions_ReturnSubMenuArrowIcon) {
   EXPECT_EQ(GetExpandableMenuIconNameFromSuggestionType(
                 SuggestionType::kPasswordEntry),

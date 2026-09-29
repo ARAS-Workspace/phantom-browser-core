@@ -756,10 +756,6 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
           a11y_selection_delegate, selection_delegate, controller, line_number,
           CreateSaveAndFillRowContentView(suggestion));
     }
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeSavedStateNotification:
-    case SuggestionType::kComposeProactiveNudge:
-      NOTREACHED();
     case SuggestionType::kIbanEntry:
     case SuggestionType::kVirtualCreditCardEntry: {
       return std::make_unique<PopupRowView>(
@@ -806,9 +802,6 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
     case SuggestionType::kAutofillAiOtherShipments:
     case SuggestionType::kAutofillAiPrivateInferenceNotice:
     case SuggestionType::kBnplFootnote:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
     case SuggestionType::kCreditCardEntry:
     case SuggestionType::kDatalistEntry:
     case SuggestionType::kDevtoolsTestAddressByCountry:

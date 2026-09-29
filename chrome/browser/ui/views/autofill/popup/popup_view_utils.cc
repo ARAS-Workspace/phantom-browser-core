@@ -592,9 +592,6 @@ bool IsExpandableSuggestionType(SuggestionType type) {
   switch (type) {
     // This opens the non-affiliated loyalty cards submenu.
     case SuggestionType::kAllLoyaltyCardsEntry:
-    // This opens a submenu with footer-like suggestions around the compose
-    // nudge (e.g., Go to settings).
-    case SuggestionType::kComposeProactiveNudge:
     // This opens the submenu where one of many test addresses can be selected.
     case SuggestionType::kDevtoolsTestAddresses:
     // This opens a submenu, only during password manual fallback, so that the
@@ -627,11 +624,6 @@ bool IsExpandableSuggestionType(SuggestionType type) {
     case SuggestionType::kBackupPasswordEntry:
     case SuggestionType::kBnplEntry:
     case SuggestionType::kBnplFootnote:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeSavedStateNotification:
     case SuggestionType::kCreditCardEntry:
     case SuggestionType::kDatalistEntry:
     case SuggestionType::kDevtoolsTestAddressByCountry:
@@ -705,12 +697,6 @@ bool IsSuggestionTypeAutoselected(SuggestionType type) {
     case SuggestionType::kBackupPasswordEntry:
     case SuggestionType::kBnplEntry:
     case SuggestionType::kBnplFootnote:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-    case SuggestionType::kComposeProactiveNudge:
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeSavedStateNotification:
     case SuggestionType::kCreditCardEntry:
     case SuggestionType::kDatalistEntry:
     case SuggestionType::kDevtoolsTestAddressByCountry:

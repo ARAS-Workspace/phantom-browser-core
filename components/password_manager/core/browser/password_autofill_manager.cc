@@ -107,12 +107,6 @@ bool IsSuggestionHandledInPasswordManager(SuggestionType type) {
     case SuggestionType::kUndo:
     case SuggestionType::kDatalistEntry:
     case SuggestionType::kAutocompleteEntry:
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeProactiveNudge:
-    case SuggestionType::kComposeSavedStateNotification:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
     case SuggestionType::kFillAutofillAi:
     case SuggestionType::kInsecureContextPaymentDisabledMessage:
     case SuggestionType::kMixedFormMessage:

@@ -89,13 +89,6 @@ FillingProduct GetFillingProductFromSuggestionType(SuggestionType type) {
     case SuggestionType::kTroubleSigningInEntry:
     case SuggestionType::kViewPasswordDetails:
       return FillingProduct::kPassword;
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-    case SuggestionType::kComposeProactiveNudge:
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeSavedStateNotification:
-      return FillingProduct::kCompose;
     case SuggestionType::kDatalistEntry:
       return FillingProduct::kDataList;
     case SuggestionType::kAtMemoryAiDisclosure:

@@ -571,12 +571,6 @@ const PosInSetTestdata kPosInSetTestcases[] = {
         .line_number = 1,
         .set_size = 3,
         .set_index = 2,
-    },
-    PosInSetTestdata{
-        .types = {SuggestionType::kComposeResumeNudge},
-        .line_number = 0,
-        .set_size = 1,
-        .set_index = 1,
     }};
 
 class PopupRowPosInSetViewTest

@@ -53,16 +53,12 @@ enum class SuggestionType {
   // kManagePlusAddress = 13, // DEPRECATED
   kManageLoyaltyCard = 68,
 
-  // Compose popup suggestion shown when no Compose session exists.
-  kComposeProactiveNudge = 14,
-  // Compose popup suggestion shown when there is an existing Compose session.
-  kComposeResumeNudge = 15,
-  // Compose popup suggestion shown after the Compose dialog closes.
-  kComposeSavedStateNotification = 16,
-  // Compose sub-menu suggestions
-  kComposeDisable = 17,
-  kComposeGoToSettings = 18,
-  kComposeNeverShowOnThisSiteAgain = 19,
+  // kComposeProactiveNudge = 14, // DEPRECATED
+  // kComposeResumeNudge = 15, // DEPRECATED
+  // kComposeSavedStateNotification = 16, // DEPRECATED
+  // kComposeDisable = 17, // DEPRECATED
+  // kComposeGoToSettings = 18, // DEPRECATED
+  // kComposeNeverShowOnThisSiteAgain = 19, // DEPRECATED
 
   // Datalist suggestions.
   kDatalistEntry = 20,

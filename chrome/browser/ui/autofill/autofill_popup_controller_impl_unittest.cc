@@ -596,25 +596,6 @@ INSTANTIATE_TEST_SUITE_P(
         AutofillSuggestionTriggerSource::kAtMemoryContextMenu,
         AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge));
 
-// Tests that Compose saved state notification popup gets hidden after 2
-// seconds, but not after 1 second.
-TEST_F(AutofillPopupControllerImplTest,
-       TimedHideComposeSavedStateNotification) {
-  ShowSuggestions(manager(), {SuggestionType::kComposeSavedStateNotification});
-  test::GenerateTestAutofillPopup(&manager().external_delegate());
-  ::testing::MockFunction<void()> check;
-  {
-    ::testing::InSequence s;
-    EXPECT_CALL(check, Call);
-    EXPECT_CALL(client().suggestion_controller(manager()),
-                Hide(SuggestionHidingReason::kFadeTimerExpired));
-  }
-  task_environment()->FastForwardBy(base::Seconds(1));
-  check.Call();
-  task_environment()->FastForwardBy(base::Seconds(1));
-  Mock::VerifyAndClearExpectations(&client().suggestion_controller(manager()));
-}
-
 TEST_F(AutofillPopupControllerImplTest,
        PopupHidesOnWebContentsFocusLossIfViewIsNotFocused) {
   ShowSuggestions(manager(), {SuggestionType::kAddressEntry});

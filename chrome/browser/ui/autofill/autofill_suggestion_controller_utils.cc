@@ -79,12 +79,6 @@ SuggestionSection GetSuggestionSection(SuggestionType type) {
     case SuggestionType::kAutofillAiPrivateInferenceNotice:
     case SuggestionType::kBackupPasswordEntry:
     case SuggestionType::kBnplEntry:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-    case SuggestionType::kComposeProactiveNudge:
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeSavedStateNotification:
     case SuggestionType::kCreditCardEntry:
     case SuggestionType::kDatalistEntry:
     case SuggestionType::kDevtoolsTestAddressByCountry:
@@ -187,12 +181,6 @@ bool ShouldApplyDeactivatedStyle(const Suggestion& suggestion) {
     case SuggestionType::kBackupPasswordEntry:
     case SuggestionType::kBnplEntry:
     case SuggestionType::kBnplFootnote:
-    case SuggestionType::kComposeDisable:
-    case SuggestionType::kComposeGoToSettings:
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-    case SuggestionType::kComposeProactiveNudge:
-    case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeSavedStateNotification:
     case SuggestionType::kCreditCardEntry:
     case SuggestionType::kDatalistEntry:
     case SuggestionType::kDevtoolsTestAddressByCountry:

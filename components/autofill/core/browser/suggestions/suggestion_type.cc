@@ -41,18 +41,6 @@ std::string_view SuggestionTypeToStringView(SuggestionType type) {
       return "kManageIban";
     case SuggestionType::kManageLoyaltyCard:
       return "kManageLoyaltyCard";
-    case SuggestionType::kComposeResumeNudge:
-      return "kComposeResumeNudge";
-    case SuggestionType::kComposeDisable:
-      return "kComposeDisable";
-    case SuggestionType::kComposeGoToSettings:
-      return "kComposeGoToSettings";
-    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-      return "kComposeNeverShowOnThisSiteAgain";
-    case SuggestionType::kComposeProactiveNudge:
-      return "kComposeProactiveNudge";
-    case SuggestionType::kComposeSavedStateNotification:
-      return "kComposeSavedStateNotification";
     case SuggestionType::kDatalistEntry:
       return "kDatalistEntry";
     case SuggestionType::kPasswordEntry:

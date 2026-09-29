@@ -86,15 +86,6 @@ content::RenderFrameHost* NavigateAndCommitFrame(content::RenderFrameHost* rfh,
 using AutofillSuggestionControllerTest = AutofillSuggestionControllerTestBase<
     TestAutofillSuggestionControllerAutofillClient>;
 
-// Regression test for (crbug.com/41486145): Showing an Autofill Compose
-// suggestion twice does not crash.
-TEST_F(AutofillSuggestionControllerTest, ShowTwice) {
-  ShowSuggestions(manager(), {Suggestion(u"Help me write",
-                                         SuggestionType::kComposeResumeNudge)});
-  ShowSuggestions(manager(), {Suggestion(u"Help me write",
-                                         SuggestionType::kComposeResumeNudge)});
-}
-
 // Tests that the AED is informed when suggestions were shown.
 TEST_F(AutofillSuggestionControllerTest, ShowInformsDelegate) {
   EXPECT_CALL(manager().external_delegate(), OnSuggestionsShown);

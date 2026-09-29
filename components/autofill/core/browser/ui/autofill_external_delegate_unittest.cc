@@ -665,14 +665,6 @@ TEST_F(AutofillExternalDelegateTest, GetMainFillingProduct) {
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
             FillingProduct::kPassword);
 
-  // Show compose suggestion in the popup.
-  OnSuggestionsReturned(
-      queried_field(),
-      {CreateAutofillSuggestion(SuggestionType::kComposeResumeNudge,
-                                u"generated text")});
-  EXPECT_EQ(external_delegate().GetMainFillingProduct(),
-            FillingProduct::kCompose);
-
   // Show only autocomplete suggestion in the popup.
   OnSuggestionsReturned(queried_field(), {CreateAutofillSuggestion(
                                              SuggestionType::kAutocompleteEntry,
