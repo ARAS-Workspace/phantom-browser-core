@@ -190,16 +190,6 @@ source_set("cocoa") {
     "//ui/views",
   ]
 
-  if (enable_updater) {
-    public += [ "keystone_infobar_delegate.h" ]
-    sources += [ "keystone_infobar_delegate.cc" ]
-    deps += [
-      "//chrome/browser/infobars",
-      "//chrome/browser/updater",
-      "//components/infobars/content",
-    ]
-  }
-
   if (is_mac) {
     # tab_group_menu_bridge.mm includes chrome/browser/ui/chrome_pages.h.
     deps += [ "//chrome/browser/ui:chrome_pages" ]

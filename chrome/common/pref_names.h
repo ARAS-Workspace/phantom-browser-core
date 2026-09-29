@@ -591,14 +591,6 @@ inline constexpr char kPageColorsBlockList[] =
 inline constexpr char kPrefersDefaultScrollbarStyles[] =
     "settings.a11y.prefers_default_scrollbar_styles";
 
-#if BUILDFLAG(IS_MAC)
-// Boolean that indicates whether the application should show the info bar
-// asking the user to set up automatic updates when Keystone promotion is
-// required.
-inline constexpr char kShowUpdatePromotionInfoBar[] =
-    "browser.show_update_promotion_info_bar";
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 // Boolean that is false if we should show window manager decorations.  If
 // true, we draw a custom chrome frame (thicker title bar and blue border).

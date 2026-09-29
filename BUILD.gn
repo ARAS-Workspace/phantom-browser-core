@@ -126,10 +126,6 @@ group("gn_all") {
 
   deps += [ "//chrome/installer" ]
 
-  if (enable_updater) {
-    deps += [ "//chrome/updater" ]
-  }
-
   if (enable_enterprise_companion) {
     deps += [ "//chrome/enterprise_companion" ]
   }

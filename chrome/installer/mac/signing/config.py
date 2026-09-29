@@ -90,11 +90,6 @@ class CodeSignConfig(object):
         return self._invoker
 
     @property
-    def enable_updater(self):
-        """Returns True if the build should use updater-related resources."""
-        raise ConfigError('enable_updater')
-
-    @property
     def use_static_angle(self):
         """Returns True if ANGLE is statically linked."""
         raise ConfigError('use_static_angle')

@@ -19,7 +19,6 @@ chrome_pgo_phase = 0
 symbol_level = 2
 blink_symbol_level = 1
 enable_iterator_debugging = false
-enable_updater = false
 proprietary_codecs = true
 ffmpeg_branding = "Chrome"
 enable_swiftshader = true

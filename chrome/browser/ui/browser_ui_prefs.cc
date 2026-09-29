@@ -143,7 +143,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   // late: we need the pref to be already initialized. Doing it here also saves
   // us from having to hard-code pref registration in the several unit tests
   // that use this preference.
-  registry->RegisterBooleanPref(prefs::kShowUpdatePromotionInfoBar, true);
   registry->RegisterBooleanPref(
       prefs::kShowFullscreenToolbar, true,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);

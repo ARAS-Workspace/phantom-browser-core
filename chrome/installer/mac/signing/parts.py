@@ -162,17 +162,6 @@ def get_parts(config):
         ),
     }
 
-    if config.enable_updater:
-        parts['privileged-helper'] = CodeSignedProduct(
-            (
-                '{.app_product}.app/Contents/Library/LaunchServices/'
-                + '{}.UpdaterPrivilegedHelper'
-            ).format(config, uncustomized_bundle_id),
-            '{}.UpdaterPrivilegedHelper'.format(uncustomized_bundle_id),
-            options=CodeSignOptions.FULL_HARDENED_RUNTIME_OPTIONS,
-            verify_options=verify_options,
-        )
-
     dylibs = [
         'libaperitif.dylib',
         'libvk_swiftshader.dylib',

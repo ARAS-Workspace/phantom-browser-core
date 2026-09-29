@@ -419,42 +419,6 @@ class TestSignChrome(unittest.TestCase):
         )
 
     @mock.patch('signing.parts._sanity_check_version_keys')
-    def test_sign_chrome_updater(self, *args, **kwargs):
-        kwargs['run_command_all_output_async'].return_value = ('', 0, '', '')
-
-        class Config(test_config.TestConfig):
-            @property
-            def enable_updater(self):
-                return True
-
-        config = model.Distribution().to_config(Config())
-        asyncio.run(parts.sign_chrome(self.paths, config, sign_framework=True))
-        # Ensure that the privileged helper is signed.
-        self.assertIn(
-            'App Product.app/Contents/Library/LaunchServices'
-            + '/test.signing.bundle_id.UpdaterPrivilegedHelper',
-            [call[1][2].path for call in kwargs['sign_part'].mock_calls],
-        )
-
-    @mock.patch('signing.parts._sanity_check_version_keys')
-    def test_sign_chrome_no_updater(self, *args, **kwargs):
-        kwargs['run_command_all_output_async'].return_value = ('', 0, '', '')
-
-        class Config(test_config.TestConfig):
-            @property
-            def enable_updater(self):
-                return False
-
-        config = model.Distribution().to_config(Config())
-        asyncio.run(parts.sign_chrome(self.paths, config, sign_framework=True))
-        # Ensure that the privileged helper not is signed.
-        self.assertNotIn(
-            'App Product.app/Contents/Library/LaunchServices'
-            + '/test.signing.bundle_id.UpdaterPrivilegedHelper',
-            [call[1][2].path for call in kwargs['sign_part'].mock_calls],
-        )
-
-    @mock.patch('signing.parts._sanity_check_version_keys')
     @mock.patch(
         'signing.signing._binary_architectures_offsets',
         return_value=(('arch_1', 123), ('arch_2', 456)),

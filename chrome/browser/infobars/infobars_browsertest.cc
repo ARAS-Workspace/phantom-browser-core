@@ -73,10 +73,6 @@
 
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_infobar_delegate.h"
 
-#if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
-#include "chrome/browser/ui/cocoa/keystone_infobar_delegate.h"
-#endif
-
 using extensions::InstallPromptData;
 
 class InfoBarsTest : public InProcessBrowserTest {
@@ -283,11 +279,7 @@ void InfoBarUiTest::ShowUi(const std::string& name) {
       break;
 
     case IBD::KEYSTONE_PROMOTION_INFOBAR_DELEGATE_MAC:
-#if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
-      KeystonePromotionInfoBarDelegate::Create(GetWebContents());
-#else
       ADD_FAILURE() << "This infobar is not supported on this OS.";
-#endif
       break;
 
     case IBD::COLLECTED_COOKIES_INFOBAR_DELEGATE:
@@ -424,12 +416,6 @@ IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_reload_plugin) {
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_file_access_disabled) {
   ShowAndVerifyUi();
 }
-
-#if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
-IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_keystone_promotion) {
-  ShowAndVerifyUi();
-}
-#endif
 
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_collected_cookies) {
   ShowAndVerifyUi();

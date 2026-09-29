@@ -3430,7 +3430,6 @@ test("unit_tests") {
     "//chrome/browser/update_client",
     "//chrome/browser/update_client:unit_tests",
     "//chrome/browser/updater",
-    "//chrome/browser/updater:unit_tests",
     "//chrome/browser/updates/announcement_notification:unit_tests",
     "//chrome/browser/upgrade_detector:unit_tests",
     "//chrome/browser/usb",

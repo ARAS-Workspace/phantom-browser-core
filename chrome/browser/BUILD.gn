@@ -56,7 +56,6 @@ declare_args() {
 buildflag_header("buildflags") {
   header = "buildflags.h"
   flags = [
-    "ENABLE_UPDATER=$enable_updater",
     "USE_MINIKIN_HYPHENATION=$use_minikin_hyphenation",
     "USE_THIN_LTO=$use_thin_lto",
   ]

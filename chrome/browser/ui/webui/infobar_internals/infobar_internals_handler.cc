@@ -70,10 +70,6 @@
 #include "extensions/common/extension.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
-#include "chrome/browser/ui/cocoa/keystone_infobar_delegate.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"  // nogncheck
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_prefs.h"  // nogncheck
@@ -159,16 +155,6 @@ void InfoBarInternalsHandler::GetInfoBars(GetInfoBarsCallback callback) {
       "The Incognito Connectability infobar is used to ask the user if they "
       "want to allow an extension to communicate with a website in "
       "incognito mode. This trigger shows the infobar."));
-#endif
-
-#if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
-  infobar_list.emplace_back(InfoBarEntry::New(
-      /*type=*/InfoBarType::kKeystone, /*name=*/"Keystone",
-      /*description=*/
-      "The Keystone infobar asks the user to promote the updater to "
-      "system scope. This trigger resets any browser state that "
-      "prevents the infobar from being shown, then shows the infobar. "
-      "This can only be triggered on Mac."));
 #endif
 
   infobar_list.emplace_back(InfoBarEntry::New(
@@ -450,17 +436,7 @@ bool InfoBarInternalsHandler::TriggerInfoBarInternal(InfoBarType type) {
 #endif
 #if BUILDFLAG(IS_MAC)
     case InfoBarType::kKeystone: {
-#if BUILDFLAG(ENABLE_UPDATER)
-      if (!profile) {
-        return false;
-      }
-
-      profile->GetPrefs()->SetBoolean(prefs::kShowUpdatePromotionInfoBar, true);
-      ShowUpdaterPromotionInfoBar();
-      return true;
-#else
       return false;
-#endif
     }
 #endif
 #if BUILDFLAG(IS_MAC)

@@ -23,7 +23,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #include "chrome/browser/metrics/chrome_metrics_service_client.h"
-#include "chrome/browser/updater/browser_updater_client_testutils.h"  // nogncheck
 #include "chrome/browser/updater/updater.h"
 #include "chrome/updater/constants.h"       // nogncheck
 #include "chrome/updater/update_service.h"  // nogncheck

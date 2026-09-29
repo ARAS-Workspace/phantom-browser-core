@@ -385,13 +385,9 @@ source_set("unit_tests") {
   ]
 
   if (is_mac) {
-    sources += [
-      "google_update_metrics_provider_mac_unittest.cc",
-      "task_info_metrics_provider_mac_unittest.cc",
-    ]
+    sources += [ "task_info_metrics_provider_mac_unittest.cc" ]
     deps += [
       "//chrome/browser/updater",
-      "//chrome/browser/updater:test_support",
       "//chrome/updater:public_sources",
       "//chrome/updater:public_util",
     ]

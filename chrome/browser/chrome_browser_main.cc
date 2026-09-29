@@ -193,7 +193,6 @@
 #include <Security/Security.h>
 
 #include "chrome/browser/mac/chrome_browser_main_extra_parts_mac.h"
-#include "chrome/browser/ui/cocoa/keystone_infobar_delegate.h"
 #include "chrome/browser/ui/ui_features.h"
 
 #if defined(ARCH_CPU_X86_64)
@@ -864,13 +863,7 @@ void ChromeBrowserMainParts::PreCreateMainMessageLoop() {
       command_line->HasSwitch(switches::kEnableBenchmarking)) {
     return;
   }
-  updater::SchedulePeriodicTasks(
-#if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
-      base::BindRepeating(&ShowUpdaterPromotionInfoBar)
-#else
-      base::DoNothing()
-#endif
-  );
+  updater::SchedulePeriodicTasks(base::DoNothing());
 }
 
 void ChromeBrowserMainParts::PostCreateMainMessageLoop() {

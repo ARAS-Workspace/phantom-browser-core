@@ -22,10 +22,6 @@ class TestConfig(config.CodeSignConfig):
         return True
 
     @property
-    def enable_updater(self):
-        return True
-
-    @property
     def use_static_angle(self):
         return False
 
@@ -61,10 +57,6 @@ class TestConfig(config.CodeSignConfig):
 class TestConfigNonChromeBranded(TestConfig):
     @staticmethod
     def is_chrome_branded():
-        return False
-
-    @property
-    def enable_updater(self):
         return False
 
 
