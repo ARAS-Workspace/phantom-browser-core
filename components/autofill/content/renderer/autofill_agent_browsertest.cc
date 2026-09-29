@@ -1037,7 +1037,7 @@ TEST_F(AutofillAgentTest, TriggerSuggestionsForContenteditable) {
   EXPECT_CALL(autofill_driver(), AskForValuesToFill);
   autofill_agent().TriggerSuggestions(
       FieldRendererId(form_id.value()),
-      AutofillSuggestionTriggerSource::kComposeDialogLostFocus);
+      AutofillSuggestionTriggerSource::kAtMemoryContextMenu);
 }
 
 // Tests that AutofillAgent::ApplyFormAction(kFill, kPreview) and

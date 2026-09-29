@@ -291,8 +291,6 @@ void AtMemoryMetricsRecorder::OnPopupShown(
     case AutofillSuggestionTriggerSource::kPasswordManager:
     case AutofillSuggestionTriggerSource::kiOS:
     case AutofillSuggestionTriggerSource::kManualFallbackPasswords:
-    case AutofillSuggestionTriggerSource::kComposeDialogLostFocus:
-    case AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge:
     case AutofillSuggestionTriggerSource::kPasswordManagerProcessedFocusedField:
     case AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
     case AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge:

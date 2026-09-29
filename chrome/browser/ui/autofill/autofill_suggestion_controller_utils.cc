@@ -248,8 +248,6 @@ bool ShouldResetIdleBarrier(AutofillSuggestionTriggerSource trigger_source) {
     case AutofillSuggestionTriggerSource::kPasswordManager:
     case AutofillSuggestionTriggerSource::kiOS:
     case AutofillSuggestionTriggerSource::kManualFallbackPasswords:
-    case AutofillSuggestionTriggerSource::kComposeDialogLostFocus:
-    case AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge:
     case AutofillSuggestionTriggerSource::kPasswordManagerProcessedFocusedField:
     case AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
       return true;

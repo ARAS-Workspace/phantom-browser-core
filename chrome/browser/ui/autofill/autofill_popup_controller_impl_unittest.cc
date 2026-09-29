@@ -347,11 +347,6 @@ TEST_F(
   ShowSuggestions(manager(), {SuggestionType::kAddressEntry},
                   AutofillSuggestionTriggerSource::kTextFieldValueChanged);
   assert_popup_interaction_metrics_are_empty();
-
-  ShowSuggestions(
-      manager(), {SuggestionType::kAddressEntry},
-      AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge);
-  assert_popup_interaction_metrics_are_empty();
 }
 
 TEST_F(AutofillPopupControllerImplTest,

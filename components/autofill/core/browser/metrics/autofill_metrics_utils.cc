@@ -280,7 +280,6 @@ bool ShouldLogAutofillSuggestionShown(
     case AutofillSuggestionTriggerSource::kContentEditableClicked:
     case AutofillSuggestionTriggerSource::kTextFieldDidReceiveKeyDown:
     case AutofillSuggestionTriggerSource::kOpenTextDataListChooser:
-    case AutofillSuggestionTriggerSource::kComposeDialogLostFocus:
     case AutofillSuggestionTriggerSource::kPasswordManager:
     case AutofillSuggestionTriggerSource::kiOS:
     case AutofillSuggestionTriggerSource::kPasswordManagerProcessedFocusedField:
@@ -289,7 +288,6 @@ bool ShouldLogAutofillSuggestionShown(
     case AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge:
       return true;
     case AutofillSuggestionTriggerSource::kTextFieldValueChanged:
-    case AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge:
     // Initial trigger of @memory shows a search bar rather than actual
     // suggestions. Logging it would skew the standard Autofill funnel metrics.
     case AutofillSuggestionTriggerSource::kAtMemoryContextMenu:

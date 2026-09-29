@@ -422,7 +422,6 @@ bool CanReplaceCurrentSuggestions(AutofillSuggestionTriggerSource source) {
     case mojom::AutofillSuggestionTriggerSource::kPasswordManager:
     case mojom::AutofillSuggestionTriggerSource::kiOS:
     case mojom::AutofillSuggestionTriggerSource::kManualFallbackPasswords:
-    case mojom::AutofillSuggestionTriggerSource::kComposeDialogLostFocus:
     case mojom::AutofillSuggestionTriggerSource::
         kPasswordManagerProcessedFocusedField:
     case mojom::AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
@@ -430,7 +429,6 @@ bool CanReplaceCurrentSuggestions(AutofillSuggestionTriggerSource source) {
     case mojom::AutofillSuggestionTriggerSource::kAtMemoryKeyboardShortcut:
     case mojom::AutofillSuggestionTriggerSource::kAtMemoryTriggerString:
       return true;
-    case mojom::AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge:
     case mojom::AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge:
       return false;
   }
@@ -483,8 +481,6 @@ FillingProductSet GetFillingProductsToSuggest(
   switch (trigger_source) {
     case kUnspecified:
     case kTextareaFocusedWithoutClick:
-    case kComposeDialogLostFocus:
-    case kComposeDelayedProactiveNudge:
     case kContentEditableClicked:
       return {};
     case kPasswordManager:

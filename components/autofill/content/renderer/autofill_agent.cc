@@ -1285,8 +1285,6 @@ void AutofillAgent::TriggerSuggestions(
   bool may_trigger_on_contenteditable = [&]() {
     using enum AutofillSuggestionTriggerSource;
     switch (trigger_source) {
-      case kComposeDialogLostFocus:
-      case kComposeDelayedProactiveNudge:
       case kAtMemoryContextMenu:
       case kAtMemoryKeyboardShortcut:
       case kAtMemoryTriggerString:

@@ -1444,33 +1444,6 @@ TEST_F(BrowserAutofillManagerAtMemoryTest, TriggerDroppedWhenToggleOff) {
   EXPECT_FALSE(external_delegate()->on_suggestions_returned_seen());
 }
 
-TEST_F(BrowserAutofillManagerAtMemoryTest,
-       ComposeDelayedNudgeDoesNotHideAtMemory) {
-  const FormData form = CreateTestAddressFormData();
-  FormsSeen({form});
-
-  // Trigger suggestions with AtMemory.
-  OnAskForValuesToFill(form, form.fields()[0],
-                       AutofillSuggestionTriggerSource::kAtMemoryTriggerString);
-
-  // Verify that suggestions were shown (empty suggestions for AtMemory).
-  EXPECT_TRUE(autofill_client().IsShowingAutofillPopup());
-  EXPECT_EQ(external_delegate()->trigger_source(),
-            AutofillSuggestionTriggerSource::kAtMemoryTriggerString);
-
-  // Trigger suggestions with ComposeDelayedProactiveNudge.
-  // This should be ignored because AtMemory suggestions are already showing.
-  OnAskForValuesToFill(
-      form, form.fields()[0],
-      AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge);
-
-  // Verify that the AtMemory suggestions are still showing (popup is not hidden
-  // or replaced by the nudge).
-  EXPECT_TRUE(autofill_client().IsShowingAutofillPopup());
-  EXPECT_EQ(external_delegate()->trigger_source(),
-            AutofillSuggestionTriggerSource::kAtMemoryTriggerString);
-}
-
 // Tests that if the main frame URL is blocked, AtMemory is blocked.
 TEST_F(BrowserAutofillManagerAtMemoryTest,
        TriggerDroppedWhenMainFrameUrlBlocked) {
