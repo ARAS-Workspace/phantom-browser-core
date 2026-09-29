@@ -28,8 +28,6 @@
 
 namespace {
 
-#if !BUILDFLAG(USE_FAKE_SCREEN_AI)
-
 const constexpr char* kTestPageRelativeURL =
     "/main_content_extraction/sidebar_and_main_content.html";
 
@@ -67,8 +65,6 @@ bool HasExpectedText(const std::vector<ui::AXNodeData>& tree_nodes,
 
   return false;
 }
-
-#endif
 
 }  // namespace
 
@@ -184,7 +180,6 @@ IN_PROC_BROWSER_TEST_F(MainContentExtractionTest, EmptyInput) {
 }
 
 // Fake library always returns empty.
-#if !BUILDFLAG(USE_FAKE_SCREEN_AI)
 
 // Tests main content extraction on a simple page with content.
 IN_PROC_BROWSER_TEST_F(MainContentExtractionTest, RequestWithContent) {
@@ -237,6 +232,5 @@ IN_PROC_BROWSER_TEST_F(MainContentExtractionTest, MultipleRequests) {
         << "Unexpected result for request " << i;
   }
 }
-#endif  //! BUILDFLAG(USE_FAKE_SCREEN_AI)
 
 }  // namespace screen_ai

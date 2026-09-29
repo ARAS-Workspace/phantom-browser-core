@@ -20,14 +20,12 @@ namespace screen_ai {
 
 namespace {
 
-#if !BUILDFLAG(USE_FAKE_SCREEN_AI)
 NO_SANITIZE("cfi-icall")
 void CallPresandboxInitFunction(void* presandbox_init_function) {
   DCHECK(presandbox_init_function);
   typedef void (*PresandboxInitFn)();
   (*reinterpret_cast<PresandboxInitFn>(presandbox_init_function))();
 }
-#endif
 
 }  // namespace
 
@@ -51,10 +49,8 @@ bool ScreenAIPreSandboxHook(base::FilePath binary_path,
         VLOG(0) << "PresandboxInit function of Screen AI library not found.";
         binary_path.clear();
       } else {
-#if !BUILDFLAG(USE_FAKE_SCREEN_AI)
         VLOG(2) << "Screen AI library loaded pre-sandboxing: " << binary_path;
         CallPresandboxInitFunction(presandbox_init);
-#endif
       }
     }
   }

@@ -40,11 +40,7 @@
 #endif
 #endif
 
-#if BUILDFLAG(USE_FAKE_SCREEN_AI)
-#include "services/screen_ai/screen_ai_library_wrapper_fake.h"
-#else
 #include "services/screen_ai/screen_ai_library_wrapper_impl.h"
-#endif
 
 namespace screen_ai {
 
@@ -225,11 +221,7 @@ ScreenAIService::~ScreenAIService() = default;
 void ScreenAIService::LoadLibrary(const base::FilePath& library_path) {
   // The ScopedBlockingCall in LoadLibrary guarantees that this is not run on
   // the UI thread.
-#if BUILDFLAG(USE_FAKE_SCREEN_AI)
-  library_ = std::make_unique<ScreenAILibraryWrapperFake>();
-#else
   library_ = std::make_unique<ScreenAILibraryWrapperImpl>();
-#endif
 
   bool load_sucessful = library_->Load(library_path);
   base::UmaHistogramBoolean("Accessibility.ScreenAI.Library.Initialized",

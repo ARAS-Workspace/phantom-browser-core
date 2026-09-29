@@ -72,7 +72,7 @@
 
 // Fake ScreenAI library returns empty results for all queries, so testing with
 // it is not helpful.
-#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) && !BUILDFLAG(USE_FAKE_SCREEN_AI)
+#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 #define PDF_SEARCHIFY_INTEGRATION_TEST_ENABLED
 #endif
 

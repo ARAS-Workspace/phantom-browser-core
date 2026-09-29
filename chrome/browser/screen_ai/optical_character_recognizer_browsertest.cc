@@ -45,7 +45,7 @@ namespace {
 constexpr base::TimeDelta kServiceIdleCheckingDelay = base::Seconds(3);
 // LINT.ThenChange(//services/screen_ai/screen_ai_service_impl.cc:kIdleCheckingDelay)
 
-#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) && !BUILDFLAG(USE_FAKE_SCREEN_AI)
+#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 // LINT.IfChange(kResourceMeasurementInterval)
 constexpr base::TimeDelta kResourceMeasurementInterval = base::Seconds(1);
 // LINT.ThenChange(//chrome/browser/screen_ai/resource_monitor.cc:kSampleInterval)
@@ -126,7 +126,7 @@ struct OpticalCharacterRecognizerTestParamsToString {
   }
 };
 
-#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) && !BUILDFLAG(USE_FAKE_SCREEN_AI)
+#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 
 // Name of files which have results.
 const int kTestFilenamesCount = 7;
@@ -183,8 +183,7 @@ double StringMatch(std::string_view expected, std::string_view extracted) {
              static_cast<double>(std::max(expected_size, extracted_size));
 }
 
-#endif  // BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) &&
-        // !BUILDFLAG(USE_FAKE_SCREEN_AI)
+#endif  // BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 
 }  // namespace
 
@@ -447,12 +446,7 @@ IN_PROC_BROWSER_TEST_P(OpticalCharacterRecognizerTest, PerformOCR_Simple) {
       base::FilePath(FILE_PATH_LITERAL("ocr/just_one_letter.png")));
   mojom::VisualAnnotationPtr results = PerformOCR(bitmap);
 
-// Fake library always returns empty.
-#if BUILDFLAG(USE_FAKE_SCREEN_AI)
-  bool expected_call_success = false;
-#else
   bool expected_call_success = true;
-#endif
   unsigned expected_lines_count =
       (expected_call_success && IsOcrAvailable()) ? 1 : 0;
   ASSERT_EQ(expected_lines_count, results->lines.size());
@@ -511,12 +505,7 @@ IN_PROC_BROWSER_TEST_P(OpticalCharacterRecognizerTest, PerformOCR_PdfMetrics) {
       base::FilePath(FILE_PATH_LITERAL("ocr/just_one_letter.png")));
   mojom::VisualAnnotationPtr results = PerformOCR(bitmap);
 
-// Fake library always returns empty.
-#if BUILDFLAG(USE_FAKE_SCREEN_AI)
-  bool expected_call_success = false;
-#else
   bool expected_call_success = true;
-#endif
 
   metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
 
@@ -584,9 +573,7 @@ IN_PROC_BROWSER_TEST_P(OpticalCharacterRecognizerTest,
   mojom::VisualAnnotationPtr results = PerformOCR(bitmap);
 
   // Fake library always returns empty results.
-#if !BUILDFLAG(USE_FAKE_SCREEN_AI)
   ASSERT_FALSE(results->lines.empty());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(OpticalCharacterRecognizerTest,
@@ -604,9 +591,7 @@ IN_PROC_BROWSER_TEST_P(OpticalCharacterRecognizerTest,
   mojom::VisualAnnotationPtr results = PerformOCR(bitmap);
 
   // Fake library always returns empty results.
-#if !BUILDFLAG(USE_FAKE_SCREEN_AI)
   ASSERT_FALSE(results->lines.empty());
-#endif
 
   ocr()->DisconnectAnnotator();
 
@@ -614,9 +599,7 @@ IN_PROC_BROWSER_TEST_P(OpticalCharacterRecognizerTest,
   mojom::VisualAnnotationPtr results2 = PerformOCR(bitmap);
 
   // Fake library always returns empty results.
-#if !BUILDFLAG(USE_FAKE_SCREEN_AI)
   ASSERT_FALSE(results2->lines.empty());
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(All,
@@ -624,7 +607,7 @@ INSTANTIATE_TEST_SUITE_P(All,
                          ::testing::Combine(testing::Bool(), testing::Bool()),
                          OpticalCharacterRecognizerTestParamsToString());
 
-#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) && !BUILDFLAG(USE_FAKE_SCREEN_AI)
+#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 
 TEST(OpticalCharacterRecognizer, StringMatchTest) {
   ASSERT_EQ(StringMatch("ABC", ""), 0);
@@ -1066,6 +1049,5 @@ IN_PROC_BROWSER_TEST_F(OpticalCharacterRecognizerResultsTest,
       0);
 }
 
-#endif  // BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) && !
-        // BUILDFLAG(USE_FAKE_SCREEN_AI)
+#endif  // BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 }  // namespace screen_ai

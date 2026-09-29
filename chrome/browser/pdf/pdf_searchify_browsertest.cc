@@ -139,14 +139,7 @@ class PDFSearchifyTest
 };
 
 // If a working library does not exist, just try when library is not available.
-INSTANTIATE_TEST_SUITE_P(All,
-                         PDFSearchifyTest,
-#if BUILDFLAG(USE_FAKE_SCREEN_AI)
-                         testing::Values(false)
-#else
-                         testing::Bool()
-#endif
-);
+INSTANTIATE_TEST_SUITE_P(All, PDFSearchifyTest, testing::Bool());
 
 IN_PROC_BROWSER_TEST_P(PDFSearchifyTest, HelloWorld) {
   base::HistogramTester histograms;

@@ -320,10 +320,8 @@ INSTANTIATE_TEST_SUITE_P(
     CanvasAccessibilityBrowserTest,
     ::testing::Combine(
 // ENABLE_SCREEN_AI_BROWSERTESTS ensures the ChromeScreenAI library is available
-// for this test configuration. USE_FAKE_SCREEN_AI indicates that the library is
-// just a stub without actual implementation (which is used for sanitizer tests)
-// and hence does not produce OCR results.
-#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) && !BUILDFLAG(USE_FAKE_SCREEN_AI)
+// for this test configuration.
+#if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
         // Test both OCR service available and unavailable states when it is
         // available.
         ::testing::Values(true, false),

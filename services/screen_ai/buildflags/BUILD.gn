@@ -10,6 +10,5 @@ buildflag_header("buildflags") {
   flags = [
     "ENABLE_SCREEN_AI_BROWSERTESTS=$enable_screen_ai_browsertests",
     "ENABLE_SCREEN_AI_SERVICE=$enable_screen_ai_service",
-    "USE_FAKE_SCREEN_AI=$use_fake_screen_ai",
   ]
 }
