@@ -441,33 +441,6 @@ bool PopupViewViews::Show(
   if (!controller_) {
     return false;
   }
-  // Compose has separate on show announcements.
-  // TODO(crbug.com/340359989): Replace with AutofillComposeDelegate::OnShow
-  if (controller_->GetMainFillingProduct() == FillingProduct::kCompose) {
-    switch (controller_->GetSuggestionAt(0).type) {
-      case SuggestionType::kComposeResumeNudge:
-      case SuggestionType::kComposeSavedStateNotification: {
-        const std::u16string saved_state_message = l10n_util::GetStringUTF16(
-            IDS_COMPOSE_SUGGESTION_AX_MESSAGE_ON_SHOW_RESUME);
-        a11y_announcer_.Run(saved_state_message, /*polite=*/true);
-        break;
-      }
-      case SuggestionType::kComposeProactiveNudge: {
-        const std::u16string proactive_message = l10n_util::GetStringUTF16(
-            IDS_COMPOSE_SUGGESTION_AX_MESSAGE_ON_SHOW_PROACTIVE);
-        a11y_announcer_.Run(proactive_message, /*polite=*/true);
-        break;
-      }
-      case SuggestionType::kComposeDisable:
-      case SuggestionType::kComposeGoToSettings:
-      case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-        break;
-      default:
-        // All Compose SuggestionTypes should already be handled.
-        NOTREACHED();
-    }
-  }
-
   MaybeAnnounceCurrentTabAndFootnote();
   MaybeAnnouncePasswordRecoveryPopup();
   MaybeAnnounceLoadingState();
@@ -564,10 +537,6 @@ bool PopupViewViews::HandleKeyPressEvent(
     }
   }
 
-  if (controller_->GetMainFillingProduct() == FillingProduct::kCompose) {
-    return HandleKeyPressEventForCompose(event);
-  }
-
   if (controller_->GetMainFillingProduct() == FillingProduct::kAtMemory) {
     return HandleKeyPressEventForAtMemory(event);
   }
@@ -644,94 +613,6 @@ bool PopupViewViews::HandleKeyPressEvent(
         }
       }
       return false;
-    default:
-      return false;
-  }
-}
-
-bool PopupViewViews::HandleKeyPressEventForCompose(
-    const input::NativeWebKeyboardEvent& event) {
-  CHECK_EQ(controller_->GetMainFillingProduct(), FillingProduct::kCompose);
-  const bool kHasShiftModifier =
-      (event.GetModifiers() & blink::WebInputEvent::kShiftKey);
-  switch (event.windows_key_code) {
-    case ui::VKEY_ESCAPE:
-      controller_->Hide(SuggestionHidingReason::kUserAborted);
-      return true;
-    case ui::VKEY_UP:
-      if (GetSelectedCell()) {
-        SelectPreviousRow();
-        return true;
-      }
-      return false;
-    case ui::VKEY_DOWN:
-      if (GetSelectedCell()) {
-        SelectNextRow(PopupCellSelectionSource::kKeyboard);
-        return true;
-      }
-      return false;
-    case ui::VKEY_LEFT:
-    case ui::VKEY_RIGHT:
-      return HandlePopupHorizontalNavigation(event);
-    case ui::VKEY_TAB: {
-      const bool is_root_popup = !parent_;
-      // TAB should only be handled by the root popup. The subpopup only deals
-      // with selection (ENTER) and arrow navigation.
-      if (!is_root_popup) {
-        return false;
-      }
-      std::optional<CellIndex> selected_cell = GetSelectedCell();
-      // The `!row_with_open_sub_popup_` check is to make sure that we only
-      // select the content cell if there is no subpopup open. This is because
-      // if one presses TAB from the subpopup, we also want to close the root
-      // popup (and navigate to the next HTML element).
-      const bool tab_pressed_popup_unselected =
-          !selected_cell && !kHasShiftModifier && !row_with_open_sub_popup_;
-      if (tab_pressed_popup_unselected) {
-        // If there is no selected cell in the compose popup, TAB should select
-        // the single compose nudge entry.
-        SetSelectedCell(CellIndex(0, PopupRowView::CellType::kContent),
-                        PopupCellSelectionSource::kKeyboard);
-        return true;
-      }
-
-      const bool tab_pressed_popup_selected =
-          selected_cell && !kHasShiftModifier;
-      if (tab_pressed_popup_selected) {
-        // TAB should close the popup and focus the next HTML element if the
-        // Compose entry is selected.
-        controller_->Hide(SuggestionHidingReason::kUserAborted);
-        return false;
-      }
-
-      const bool shift_tab_pressed_popup_unselected_no_subpopup =
-          !selected_cell && kHasShiftModifier && !row_with_open_sub_popup_;
-      if (shift_tab_pressed_popup_unselected_no_subpopup) {
-        // If the Compose suggestion is not selected, Shift+TAB should not be
-        // handled.
-        return false;
-      }
-
-      const bool shift_tab_pressed_has_subpopup =
-          kHasShiftModifier && row_with_open_sub_popup_;
-      if (shift_tab_pressed_has_subpopup) {
-        // In this case, focus on the root/parent popup content area. This
-        // closes the sub-popup.
-        SetSelectedCell(CellIndex(0, PopupRowView::CellType::kContent),
-                        PopupCellSelectionSource::kKeyboard);
-        return true;
-      }
-
-      const bool shift_tab_pressed_root_popup_selected =
-          selected_cell && kHasShiftModifier && is_root_popup;
-      if (shift_tab_pressed_root_popup_selected) {
-        // Shift+TAB should remove the selection when the root popup is
-        // selected, but keep the popup open.
-        SetSelectedCell(std::nullopt, PopupCellSelectionSource::kKeyboard);
-        return true;
-      }
-      return false;
-    }
     default:
       return false;
   }

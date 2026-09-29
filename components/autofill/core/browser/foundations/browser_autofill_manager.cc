@@ -83,7 +83,6 @@
 #include "components/autofill/core/browser/form_types.h"
 #include "components/autofill/core/browser/foundations/autofill_client.h"
 #include "components/autofill/core/browser/geo/phone_number_i18n.h"
-#include "components/autofill/core/browser/integrators/compose/autofill_compose_delegate.h"
 #include "components/autofill/core/browser/integrators/identity_credential/identity_credential_delegate.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_manager_impl.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_suggestion.h"
@@ -122,7 +121,6 @@
 #include "components/autofill/core/browser/suggestions/at_memory/at_memory_nudge_generator.h"
 #include "components/autofill/core/browser/suggestions/autocomplete_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/autofill_ai/autofill_ai_suggestion_generator.h"
-#include "components/autofill/core/browser/suggestions/compose/compose_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/one_time_passwords/otp_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/passkeys/passkey_suggestion_generator.h"
 #include "components/autofill/core/browser/suggestions/payments/credit_card_suggestion_generator.h"
@@ -416,37 +414,9 @@ bool ShouldFetchCreditCard(
              CREDIT_CARD_STANDALONE_VERIFICATION_CODE;
 }
 
-// Returns true if the source is only relevant for Compose.
-bool IsTriggerSourceOnlyRelevantForCompose(
-    AutofillSuggestionTriggerSource source) {
-  switch (source) {
-    case AutofillSuggestionTriggerSource::kTextareaFocusedWithoutClick:
-    case AutofillSuggestionTriggerSource::kComposeDialogLostFocus:
-    case AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge:
-      return true;
-    case AutofillSuggestionTriggerSource::kUnspecified:
-    case AutofillSuggestionTriggerSource::kFormControlElementClicked:
-    case AutofillSuggestionTriggerSource::kContentEditableClicked:
-    case AutofillSuggestionTriggerSource::kTextFieldValueChanged:
-    case AutofillSuggestionTriggerSource::kTextFieldDidReceiveKeyDown:
-    case AutofillSuggestionTriggerSource::kOpenTextDataListChooser:
-    case AutofillSuggestionTriggerSource::kPasswordManager:
-    case AutofillSuggestionTriggerSource::kiOS:
-    case AutofillSuggestionTriggerSource::kManualFallbackPasswords:
-    case AutofillSuggestionTriggerSource::kPasswordManagerProcessedFocusedField:
-    case AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
-    case AutofillSuggestionTriggerSource::kAtMemoryContextMenu:
-    case AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge:
-    case AutofillSuggestionTriggerSource::kAtMemoryKeyboardShortcut:
-    case AutofillSuggestionTriggerSource::kAtMemoryTriggerString:
-      return false;
-  }
-  NOTREACHED();
-}
-
 // Returns `true` if this suggestion trigger source should replace the currently
 // showing suggestions. `true` for everything but IPH-like nudges to start using
-// a product (Compose, AtMemory).
+// a product (AtMemory).
 bool CanReplaceCurrentSuggestions(AutofillSuggestionTriggerSource source) {
   switch (source) {
     case mojom::AutofillSuggestionTriggerSource::kUnspecified:
@@ -523,7 +493,7 @@ FillingProductSet GetFillingProductsToSuggest(
     case kComposeDialogLostFocus:
     case kComposeDelayedProactiveNudge:
     case kContentEditableClicked:
-      return {FillingProduct::kCompose};
+      return {};
     case kPasswordManager:
     case kProactivePasswordRecovery:
     case kPasswordManagerProcessedFocusedField:
@@ -554,12 +524,6 @@ SuggestionsContext BuildSuggestionsContext(
     AutofillSuggestionTriggerSource trigger_source,
     AutocompleteUnrecognizedBehavior ac_unrecognized_behavior) {
   SuggestionsContext context;
-
-  // When Compose suggestions are requested, there is no need to load Autofill
-  // suggestions.
-  if (IsTriggerSourceOnlyRelevantForCompose(trigger_source)) {
-    context.do_not_generate_autofill_suggestions = true;
-  }
 
   // Don't send suggestions or track forms that should not be parsed.
   if (!form_structure || !autofill_field ||
@@ -610,36 +574,6 @@ void MaybeImportFromSubmittedForm(AutofillClient& client,
         ukm_source_id);
   }
   client.GetSingleFieldFillRouter().OnWillSubmitForm(form.ToFormData(), &form);
-}
-
-// Generates a compose suggestion for the given `form` and `field` if conditions
-// are met, returns `std::nullopt` otherwise.
-// TODO(crbug.com/409962888): Remove once new suggestion generator architecture
-// is launched.
-std::optional<Suggestion> GenerateComposeSuggestion(
-    const FormData& form,
-    const FormFieldData& field,
-    AutofillSuggestionTriggerSource trigger_source,
-    AutofillClient& client) {
-  ComposeSuggestionGenerator suggestion_generator(trigger_source);
-  std::vector<Suggestion> suggestions;
-
-  auto on_suggestions_generated =
-      [&suggestions](
-          SuggestionGenerator::ReturnedSuggestions returned_suggestions) {
-        suggestions = std::move(returned_suggestions.second);
-      };
-
-  // Since the `on_suggestions_generated` callback is called synchronously, we
-  // can assume that `suggestions` will hold the correct value.
-  suggestion_generator.GenerateSuggestions(
-      form, field, /*form_structure=*/nullptr,
-      /*trigger_autofill_field=*/nullptr, client, on_suggestions_generated);
-  if (suggestions.empty()) {
-    return std::nullopt;
-  }
-  CHECK_EQ(suggestions.size(), 1u);
-  return suggestions[0];
 }
 
 bool ShouldShowWebauthnHybridEntryPoint(const FormFieldData& field) {
@@ -1527,21 +1461,6 @@ void BrowserAutofillManager::GenerateSuggestionsAndMaybeShowUIPhase2(
     // credit card suggestions. Additionally, warnings about mixed content might
     // be present.
     std::move(callback).Run(/*show_suggestions=*/true, std::move(suggestions));
-    return;
-  }
-
-  if (field.form_control_type() == FormControlType::kTextArea ||
-      field.form_control_type() == FormControlType::kContentEditable) {
-    std::optional<Suggestion> maybe_compose_suggestion =
-        GenerateComposeSuggestion(form, field, trigger_source, client());
-    if (maybe_compose_suggestion) {
-      std::move(callback).Run(/*show_suggestions=*/true,
-                              {*std::move(maybe_compose_suggestion)});
-      return;
-    }
-  } else if (IsTriggerSourceOnlyRelevantForCompose(trigger_source)) {
-    std::move(callback).Run(/*show_suggestions=*/true,
-                            /*suggestions=*/{});
     return;
   }
 
@@ -3475,11 +3394,6 @@ void BrowserAutofillManager::InitializeSuggestionGenerators(
     suggestion_generators_.push_back(
         std::make_unique<LoyaltyCardSuggestionGenerator>(
             password_form_classification));
-  }
-  if (relevant_filling_products.contains(FillingProduct::kCompose) &&
-      client().GetComposeDelegate()) {
-    suggestion_generators_.push_back(
-        std::make_unique<ComposeSuggestionGenerator>(trigger_source));
   }
   if (relevant_filling_products.contains(FillingProduct::kIdentityCredential)) {
     if (IdentityCredentialDelegate* delegate =

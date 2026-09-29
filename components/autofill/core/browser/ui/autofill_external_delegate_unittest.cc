@@ -52,8 +52,6 @@
 #include "components/autofill/core/browser/integrators/at_memory/mock_at_memory_query_service.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/metrics/autofill_ai_metrics.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/mock_autofill_ai_manager.h"
-#include "components/autofill/core/browser/integrators/compose/autofill_compose_delegate.h"
-#include "components/autofill/core/browser/integrators/compose/mock_autofill_compose_delegate.h"
 #include "components/autofill/core/browser/integrators/identity_credential/mock_identity_credential_delegate.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/mock_otp_manager.h"
 #include "components/autofill/core/browser/metrics/autofill_in_devtools_metrics.h"
@@ -275,7 +273,6 @@ class MockAutofillClient : public TestAutofillClient {
               (override));
   MOCK_METHOD(void, OpenGeminiInSidebar, (const std::u16string&), (override));
   MOCK_METHOD(void, ShowAutofillSettings, (SuggestionType), (override));
-  MOCK_METHOD(AutofillComposeDelegate*, GetComposeDelegate, (), (override));
   MOCK_METHOD(IdentityCredentialDelegate*,
               GetIdentityCredentialDelegate,
               (),
@@ -3690,208 +3687,11 @@ TEST_F(
 
 #endif
 
-TEST_F(AutofillExternalDelegateTest,
-       ComposeSuggestion_ComposeProactiveNudge_ForwardsCaretBoundsToClient) {
-  const gfx::Rect caret_bounds = gfx::Rect(/*width=*/1, /*height=*/3);
-  FormGlobalId form_id = test::MakeFormGlobalId();
-  FieldGlobalId field_id = test::MakeFieldGlobalId();
-  FormData form_data = test::GetFormData({
-      .fields = {{.role = NAME_FIRST,
-                  .host_frame = field_id.frame_token,
-                  .renderer_id = field_id.renderer_id,
-                  .autocomplete_attribute = "given-name"}},
-      .host_frame = form_id.frame_token,
-      .renderer_id = form_id.renderer_id,
-  });
-  // make sure the field bounds contain the caret.
-  test_api(form_data).field(0).set_bounds(gfx::RectF(
-      /*x=*/0, /*y=*/0, caret_bounds.width() * 2, caret_bounds.height() * 2));
-
-  IssueOnQuery(std::move(form_data), caret_bounds);
-
-  EXPECT_CALL(autofill_client(),
-              ShowAutofillSuggestions(
-                  AllOf(Field(&AutofillClient::PopupOpenArgs::element_bounds,
-                              gfx::RectF(caret_bounds)),
-                        Field(&AutofillClient::PopupOpenArgs::anchor_type,
-                              PopupAnchorType::kCaret)),
-                  _));
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-  ON_CALL(compose_delegate, ShouldAnchorNudgeOnCaret)
-      .WillByDefault(Return(true));
-
-  // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field(),
-                        {Suggestion(SuggestionType::kComposeProactiveNudge)});
-}
-
 // Even though the `SuggestionType` is correct and the bounds are valid. The
 // caret bounds are not used because the
 // `ComposeDelegate::ShouldAnchorNudgeOnCaret()` is returning false.
-TEST_F(
-    AutofillExternalDelegateTest,
-    ComposeSuggestion_ComposeProactiveNudge_ShouldAnchorNudgeOnCaretReturnsFalse_DoNotForwardsCaretBoundsToClient) {
-  const gfx::Rect caret_bounds = gfx::Rect(/*width=*/1, /*height=*/3);
-  FormGlobalId form_id = test::MakeFormGlobalId();
-  FieldGlobalId field_id = test::MakeFieldGlobalId();
-  FormData form_data = test::GetFormData({
-      .fields = {{.role = NAME_FIRST,
-                  .host_frame = field_id.frame_token,
-                  .renderer_id = field_id.renderer_id,
-                  .autocomplete_attribute = "given-name"}},
-      .host_frame = form_id.frame_token,
-      .renderer_id = form_id.renderer_id,
-  });
-  // make sure the field bounds contain the caret.
-  const gfx::RectF field_bounds = gfx::RectF(
-      /*x=*/0, /*y=*/0, caret_bounds.width() * 2, caret_bounds.height() * 2);
-  test_api(form_data).field(0).set_bounds(field_bounds);
-
-  IssueOnQuery(std::move(form_data), caret_bounds);
-
-  EXPECT_CALL(
-      autofill_client(),
-      ShowAutofillSuggestions(
-          Field(&AutofillClient::PopupOpenArgs::element_bounds, field_bounds),
-          _));
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-  ON_CALL(compose_delegate, ShouldAnchorNudgeOnCaret)
-      .WillByDefault(Return(false));
-
-  // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field(),
-                        {Suggestion(SuggestionType::kComposeProactiveNudge)});
-}
-
-TEST_F(
-    AutofillExternalDelegateTest,
-    ComposeSuggestion_ComposeProactiveNudge_CaretOutsideField_DoNotSendCaretBoundsToClient) {
-  const gfx::Rect caret_bounds = gfx::Rect(/*width=*/1, /*height=*/3);
-  FormGlobalId form_id = test::MakeFormGlobalId();
-  FieldGlobalId field_id = test::MakeFieldGlobalId();
-  FormData form_data = test::GetFormData({
-      .fields = {{.role = NAME_FIRST,
-                  .host_frame = field_id.frame_token,
-                  .renderer_id = field_id.renderer_id,
-                  .autocomplete_attribute = "given-name"}},
-      .host_frame = form_id.frame_token,
-      .renderer_id = form_id.renderer_id,
-  });
-  // make sure the field bounds do not contain the caret.
-  const gfx::RectF field_bounds = gfx::RectF(
-      /*x=*/caret_bounds.x() + caret_bounds.width() + 1,
-      /*y=*/caret_bounds.y() + caret_bounds.height() + 1, caret_bounds.width(),
-      caret_bounds.height());
-  test_api(form_data).field(0).set_bounds(field_bounds);
-
-  IssueOnQuery(std::move(form_data), caret_bounds);
-
-  EXPECT_CALL(
-      autofill_client(),
-      ShowAutofillSuggestions(
-          Field(&AutofillClient::PopupOpenArgs::element_bounds, field_bounds),
-          _));
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-  ON_CALL(compose_delegate, ShouldAnchorNudgeOnCaret)
-      .WillByDefault(Return(true));
-
-  // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field(),
-                        {Suggestion(SuggestionType::kComposeProactiveNudge)});
-}
-
-TEST_F(
-    AutofillExternalDelegateTest,
-    NonComposeSuggestion_NonComposeProactiveNudge_DoNotForwardsCaretBoundsToClient) {
-  IssueOnQuery(gfx::Rect(/*width=*/123, /*height=*/123));
-
-  const PopupAnchorType default_anchor_type = PopupAnchorType::kField;
-  EXPECT_CALL(autofill_client(),
-              ShowAutofillSuggestions(
-                  AllOf(Field(&AutofillClient::PopupOpenArgs::element_bounds,
-                              gfx::RectF(/*width=*/0, /*height=*/0)),
-                        Field(&AutofillClient::PopupOpenArgs::anchor_type,
-                              default_anchor_type)),
-                  _));
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-  ON_CALL(compose_delegate, ShouldAnchorNudgeOnCaret)
-      .WillByDefault(Return(true));
-
-  // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field(),
-                        {Suggestion(SuggestionType::kAutocompleteEntry)});
-}
-
 // Tests that accepting a Compose suggestion returns a callback that, when run,
 // fills the trigger field.
-TEST_F(AutofillExternalDelegateTest, ExternalDelegateOpensComposeAndFills) {
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-
-  IssueOnQuery();
-
-  // Simulate receiving a Compose suggestion.
-  EXPECT_CALL(autofill_client(),
-              ShowAutofillSuggestions(PopupOpenArgsAre(SuggestionVectorIdsAre(
-                                          SuggestionType::kComposeResumeNudge)),
-                                      _));
-  std::vector<Suggestion> suggestions = {
-      Suggestion(SuggestionType::kComposeResumeNudge)};
-  OnSuggestionsReturned(queried_field(), suggestions);
-
-  // Simulate accepting a Compose suggestion.
-  EXPECT_CALL(
-      compose_delegate,
-      OpenCompose(_, queried_field().global_id(),
-                  AutofillComposeDelegate::UiEntryPoint::kAutofillPopup));
-  EXPECT_CALL(autofill_client(),
-              HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
-                              Eq(std::nullopt)));
-  external_delegate().DidAcceptSuggestion(
-      suggestions[0], SuggestionPosition{.multi_index = {0}});
-}
-
-TEST_F(AutofillExternalDelegateTest,
-       Compose_AcceptDisable_CallsComposeDelegate) {
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-
-  IssueOnQuery();
-
-  // Simulate accepting a Compose `SuggestionType::kComposeDisable`
-  // suggestion.
-  EXPECT_CALL(compose_delegate, DisableCompose);
-  external_delegate().DidAcceptSuggestion(
-      Suggestion(SuggestionType::kComposeDisable),
-      SuggestionPosition{.multi_index = {0}});
-}
-
-TEST_F(AutofillExternalDelegateTest,
-       Compose_AcceptGoToSettings_CallsComposeDelegate) {
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-
-  IssueOnQuery();
-
-  // Simulate accepting a Compose `SuggestionType::kComposeGoToSettings`
-  // suggestion.
-  EXPECT_CALL(compose_delegate, GoToSettings);
-  external_delegate().DidAcceptSuggestion(
-      Suggestion(SuggestionType::kComposeGoToSettings),
-      SuggestionPosition{.multi_index = {0}});
-}
-
 TEST_F(AutofillExternalDelegateTest,
        AcceptSaveAndFillCreditCardSuggestion_CallsSaveAndFillManager) {
   IssueOnQuery();
@@ -3934,22 +3734,6 @@ TEST_F(AutofillExternalDelegateTest, SaveAndFillMetrics_SuggestionAccepted) {
   histogram.ExpectBucketCount(
       "Autofill.FormEvents.CreditCard.SaveAndFill",
       autofill_metrics::SaveAndFillFormEvent::kSuggestionAccepted, 1);
-}
-
-TEST_F(AutofillExternalDelegateTest,
-       Compose_AcceptNeverShowOnThisWebsiteAgain_CallsComposeDelegate) {
-  NiceMock<MockAutofillComposeDelegate> compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-
-  IssueOnQuery();
-
-  // Simulate accepting a Compose
-  // `SuggestionType::kComposeNeverShowOnThisSiteAgain` suggestion.
-  EXPECT_CALL(compose_delegate, NeverShowComposeForOrigin);
-  external_delegate().DidAcceptSuggestion(
-      Suggestion(SuggestionType::kComposeNeverShowOnThisSiteAgain),
-      SuggestionPosition{.multi_index = {0}});
 }
 
 // Test that the driver is directed to clear or undo the form after being

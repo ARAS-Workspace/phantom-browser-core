@@ -244,9 +244,6 @@ class AutofillPopupControllerImpl : public AutofillPopupController {
   // the machine that would normally cause the popup to be hidden.
   bool keep_popup_open_for_testing_ = false;
 
-  // Timer to close a fading popup.
-  base::OneShotTimer fading_popup_timer_;
-
   // Whether the popup should ignore mouse observed outside check.
   bool should_ignore_mouse_observed_outside_item_bounds_check_ = false;
 

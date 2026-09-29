@@ -90,8 +90,6 @@
 #include "components/autofill/core/browser/integrators/at_memory/memory_search_result.h"
 #include "components/autofill/core/browser/integrators/at_memory/mock_at_memory_query_service.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/mock_autofill_ai_manager.h"
-#include "components/autofill/core/browser/integrators/compose/autofill_compose_delegate.h"
-#include "components/autofill/core/browser/integrators/compose/mock_autofill_compose_delegate.h"
 #include "components/autofill/core/browser/integrators/identity_credential/identity_credential_delegate.h"
 #include "components/autofill/core/browser/integrators/identity_credential/mock_identity_credential_delegate.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/mock_otp_manager.h"
@@ -225,8 +223,6 @@ using upload_contents_matchers::FieldsAre;
 using upload_contents_matchers::FormSignatureIs;
 using upload_contents_matchers::ObservedSubmissionIs;
 using UkmAutofillKeyMetricsType = ukm::builders::Autofill_KeyMetrics;
-
-constexpr Suggestion::Icon kAddressEntryIcon = Suggestion::Icon::kAccount;
 
 // Action `SaveArgElementsTo<k>(pointer)` saves the value pointed to by the
 // `k`th (0-based) argument of the mock function by moving it to `*pointer`.
@@ -630,7 +626,6 @@ class MockAutofillClient : public TestAutofillClient {
               TriggerUserPerceptionOfAutofillSurvey,
               (FillingProduct, (const std::map<std::string, std::string>&)),
               (override));
-  MOCK_METHOD(AutofillComposeDelegate*, GetComposeDelegate, (), (override));
   MOCK_METHOD(bool,
               ShowAutofillFieldIphForFeature,
               (const FormFieldData& field, AutofillClient::IphFeature feature),
@@ -5819,98 +5814,12 @@ TEST_F(BrowserAutofillManagerTest,
 
 // Tests that compose suggestions are not queried if Autofill has suggestions
 // itself.
-TEST_F(BrowserAutofillManagerTest, NoComposeSuggestionsByDefault) {
-  MockAutofillComposeDelegate compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-
-  FormData form = CreateTestAddressFormData();
-  test_api(form).field(3).set_form_control_type(FormControlType::kTextArea);
-  FormsSeen({form});
-
-  // The third field is meant to correspond to address line 1. For that (unlike
-  // for first and last name), parsing also derives that type if it is a
-  // textarea.
-  EXPECT_CALL(compose_delegate, GetSuggestion).Times(0);
-  OnAskForValuesToFill(form, form.fields()[3]);
-  external_delegate()->CheckSuggestions(
-      form.fields()[3].global_id(),
-      {Suggestion(u"123 Apple St., unit 6", u"123 Apple St.", kAddressEntryIcon,
-                  SuggestionType::kAddressEntry),
-       Suggestion(u"3734 Elvis Presley Blvd., Apt. 10",
-                  u"3734 Elvis Presley Blvd.", kAddressEntryIcon,
-                  SuggestionType::kAddressEntry),
-       Suggestion(SuggestionType::kSeparator),
-       CreateManageAddressesSuggestion()});
-}
-
 // Tests that Compose suggestions are queried if the trigger source indicates
 // that the focus change happened without click/tap interaction. It also
 // verifies that neither Autofill nor single form fill suggestions are queried.
-TEST_F(BrowserAutofillManagerTest, ComposeSuggestionsOnFocusWithoutClick) {
-  MockAutofillComposeDelegate compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-
-  FormData form = CreateTestAddressFormData();
-  test_api(form).field(3).set_form_control_type(FormControlType::kTextArea);
-  FormsSeen({form});
-
-  EXPECT_CALL(merchant_promo_code_manager(), OnGetSingleFieldSuggestions)
-      .Times(0);
-  EXPECT_CALL(iban_manager(), OnGetSingleFieldSuggestions).Times(0);
-  EXPECT_CALL(autocomplete_history_manager(), OnGetSingleFieldSuggestions)
-      .Times(0);
-  EXPECT_CALL(compose_delegate, ShouldTriggerComposePopup)
-      .WillOnce(Return(true));
-  EXPECT_CALL(
-      compose_delegate,
-      GetSuggestion(
-          _,
-          Property(&FormFieldData::global_id, Eq(form.fields()[3].global_id())),
-          AutofillSuggestionTriggerSource::kTextareaFocusedWithoutClick))
-      .WillOnce(Return(
-          Suggestion(u"Help me write", SuggestionType::kComposeResumeNudge)));
-  OnAskForValuesToFill(
-      form, form.fields()[3],
-      AutofillSuggestionTriggerSource::kTextareaFocusedWithoutClick);
-  external_delegate()->CheckSuggestionCount(form.fields()[3].global_id(), 1);
-}
-
 // Tests that compose suggestions are queried and shown for textareas if
 // Autofill does not have suggestions of its own and the OS is not Android, iOS
 // or ChromeOS.
-TEST_F(BrowserAutofillManagerTest, ComposeSuggestionsAreQueriedForTextareas) {
-  MockAutofillComposeDelegate compose_delegate;
-  ON_CALL(autofill_client(), GetComposeDelegate)
-      .WillByDefault(Return(&compose_delegate));
-
-  FormData form = test::GetFormData(
-      {.fields = {{.form_control_type = FormControlType::kTextArea}}});
-  form.set_name(u"MyForm");
-  form.set_url(GURL("https://myform.com/form.html"));
-  form.set_action(GURL("https://myform.com/submit.html"));
-  FormsSeen({form});
-
-  EXPECT_CALL(merchant_promo_code_manager(), OnGetSingleFieldSuggestions)
-      .Times(0);
-  EXPECT_CALL(iban_manager(), OnGetSingleFieldSuggestions).Times(0);
-  EXPECT_CALL(autocomplete_history_manager(), OnGetSingleFieldSuggestions)
-      .Times(0);
-  EXPECT_CALL(compose_delegate, ShouldTriggerComposePopup)
-      .WillOnce(Return(true));
-  EXPECT_CALL(
-      compose_delegate,
-      GetSuggestion(
-          _,
-          Property(&FormFieldData::global_id, Eq(form.fields()[0].global_id())),
-          AutofillSuggestionTriggerSource::kTextFieldValueChanged))
-      .WillOnce(Return(
-          Suggestion(u"Help me write", SuggestionType::kComposeResumeNudge)));
-  OnAskForValuesToFill(form, form.fields()[0]);
-  external_delegate()->CheckSuggestionCount(form.fields()[0].global_id(), 1);
-}
-
 class BrowserAutofillManagerTest_AutofillAi
     : public BrowserAutofillManagerTest {
  public:

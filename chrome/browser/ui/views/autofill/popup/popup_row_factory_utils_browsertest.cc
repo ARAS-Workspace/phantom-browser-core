@@ -27,7 +27,6 @@
 #include "components/autofill/core/browser/suggestions/suggestion.h"
 #include "components/autofill/core/browser/suggestions/suggestion_type.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
-#include "components/compose/core/browser/compose_features.h"
 #include "components/user_education/common/new_badge/new_badge_controller.h"
 #include "components/user_education/common/user_education_features.h"
 #include "content/public/test/browser_test.h"
@@ -468,19 +467,6 @@ class CreatePopupRowViewWithNoUserEducationRateLimitTest
         user_education::features::kDisableRateLimitingCommandLine);
   }
 };
-
-IN_PROC_BROWSER_TEST_F(CreatePopupRowViewWithNoUserEducationRateLimitTest,
-                       ComposeWithNewBadge) {
-  Suggestion suggestion(u"Compose with a badge", minor_texts, u"label",
-                        Suggestion::Icon::kMagic,
-                        SuggestionType::kComposeProactiveNudge);
-  suggestion.feature_for_new_badge =
-      &compose::features::kEnableComposeProactiveNudge;
-
-  CreateRowView(std::move(suggestion), /*selected_cell=*/std::nullopt,
-                /*filter_match=*/std::nullopt);
-  ShowAndVerifyUi();
-}
 
 }  // namespace
 }  // namespace autofill

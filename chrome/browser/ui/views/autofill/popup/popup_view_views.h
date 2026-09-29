@@ -297,11 +297,6 @@ class PopupViewViews : public PopupBaseView,
   bool RemoveSelectedCell();
 
   // Reacts to key events under the assumption that the currently shown popup
-  // contains Compose content.
-  bool HandleKeyPressEventForCompose(
-      const input::NativeWebKeyboardEvent& event);
-
-  // Reacts to key events under the assumption that the currently shown popup
   // contains @memory content.
   bool HandleKeyPressEventForAtMemory(
       const input::NativeWebKeyboardEvent& event);

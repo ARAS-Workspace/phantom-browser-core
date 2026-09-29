@@ -56,7 +56,6 @@
 #include "components/autofill/core/browser/foundations/browser_autofill_manager.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/metrics/autofill_ai_metrics.h"
-#include "components/autofill/core/browser/integrators/compose/autofill_compose_delegate.h"
 #include "components/autofill/core/browser/integrators/identity_credential/identity_credential_delegate.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_suggestion.h"
 #include "components/autofill/core/browser/metrics/autofill_in_devtools_metrics.h"
@@ -507,17 +506,11 @@ void AutofillExternalDelegate::AttemptToDisplayAutofillSuggestions(
   }
 
   CHECK(trigger_field);
-  AutofillComposeDelegate* delegate = manager_->client().GetComposeDelegate();
-  const bool show_proactive_nudge_at_caret =
-      shown_suggestion_types_.size() == 1 &&
-      shown_suggestion_types_[0] == SuggestionType::kComposeProactiveNudge &&
-      (delegate && delegate->ShouldAnchorNudgeOnCaret());
   const bool are_caret_bounds_valid =
       caret_bounds_ != gfx::Rect() &&
       trigger_field->bounds().Contains(gfx::RectF(caret_bounds_));
   const bool is_at_memory = IsAtMemoryTriggerSource(trigger_source_);
-  const bool should_use_caret_bounds =
-      (show_proactive_nudge_at_caret || is_at_memory) && are_caret_bounds_valid;
+  const bool should_use_caret_bounds = is_at_memory && are_caret_bounds_valid;
 
   const PopupAnchorType default_anchor_type = PopupAnchorType::kField;
 
@@ -913,31 +906,12 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kComposeProactiveNudge:
     case SuggestionType::kComposeResumeNudge:
     case SuggestionType::kComposeSavedStateNotification:
-      if (AutofillComposeDelegate* delegate =
-              manager_->client().GetComposeDelegate()) {
-        delegate->OpenCompose(
-            manager_->driver(), last_query_.field_id,
-            AutofillComposeDelegate::UiEntryPoint::kAutofillPopup);
-      }
       break;
     case SuggestionType::kComposeDisable:
-      if (AutofillComposeDelegate* delegate =
-              manager_->client().GetComposeDelegate()) {
-        delegate->DisableCompose();
-      }
       break;
     case SuggestionType::kComposeGoToSettings:
-      if (AutofillComposeDelegate* delegate =
-              manager_->client().GetComposeDelegate()) {
-        delegate->GoToSettings();
-      }
       break;
     case SuggestionType::kComposeNeverShowOnThisSiteAgain:
-      if (AutofillComposeDelegate* delegate =
-              manager_->client().GetComposeDelegate()) {
-        delegate->NeverShowComposeForOrigin(
-            manager_->client().GetLastCommittedPrimaryMainFrameOrigin());
-      }
       break;
     case SuggestionType::kFillAutofillAi: {
       autofill_metrics::LogSuggestionAcceptedIndex(

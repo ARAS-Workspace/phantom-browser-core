@@ -1022,12 +1022,7 @@ ui::ImageModel ImageModelFromVectorIcon(const gfx::VectorIcon& vector_icon,
 
 const gfx::VectorIcon& GetExpandableMenuIcon(SuggestionType type) {
   CHECK(IsExpandableSuggestionType(type));
-  // Only compose suggestions have a different expandable icon.
-  return GetFillingProductFromSuggestionType(type) == FillingProduct::kCompose
-             ? ::features::IsRoundedIconsEnabled()
-                   ? kMoreVertIcon
-                   : kBrowserToolsChromeRefreshOldIcon
-         : ::features::IsRoundedIconsEnabled()
+  return ::features::IsRoundedIconsEnabled()
              ? vector_icons::kKeyboardArrowRightFlippableIcon
              : vector_icons::kSubmenuArrowChromeRefreshOldIcon;
 }

@@ -42,7 +42,6 @@ source_set("browser_dialogs") {
   deps = [
     "//chrome/browser/task_manager",
     "//components/autofill/core/common",
-    "//components/compose/core/browser",
     "//content/public/browser",
     "//extensions/buildflags",
     "//skia",

@@ -184,8 +184,6 @@ source_set("impl") {
     "//components/account_settings",
     "//components/autofill/content/browser",
     "//components/autofill/content/browser:risk_proto",
-    "//components/compose/core/browser",
-    "//components/compose/core/browser:features",
     "//components/device_reauth",
     "//components/embedder_support:user_agent",
     "//components/feature_engagement/public",

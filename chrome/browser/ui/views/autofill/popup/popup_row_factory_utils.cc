@@ -508,27 +508,6 @@ std::unique_ptr<PopupRowContentView> CreatePasswordPopupRowContentView(
   return view;
 }
 
-std::unique_ptr<PopupRowContentView> CreateComposePopupRowContentView(
-    const Suggestion& suggestion,
-    std::optional<user_education::DisplayNewBadge> show_new_badge) {
-  auto view = std::make_unique<PopupRowContentView>();
-  auto main_text_label = std::make_unique<user_education::NewBadgeLabel>(
-      suggestion.main_text.value, views::style::CONTEXT_DIALOG_BODY_TEXT,
-      views::style::STYLE_BODY_3_MEDIUM);
-  if (show_new_badge.has_value()) {
-    main_text_label->SetDisplayNewBadge(show_new_badge.value());
-    main_text_label->SetPadAfterNewBadge(false);
-  }
-  popup_cell_utils::AddSuggestionContentToView(
-      suggestion, std::move(main_text_label),
-      /*minor_text_labels=*/{},
-      /*description_label=*/nullptr, /*subtext_views=*/
-      CreateSubtextViews(*view, suggestion, FillingProduct::kCompose),
-      popup_cell_utils::GetIconImageView(suggestion), *view);
-
-  return view;
-}
-
 std::unique_ptr<PopupRowContentView> CreateBnplPopupRowContentView(
     const Suggestion& suggestion,
     FillingProduct main_filling_product) {
@@ -778,16 +757,9 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
           CreateSaveAndFillRowContentView(suggestion));
     }
     case SuggestionType::kComposeResumeNudge:
-    case SuggestionType::kComposeSavedStateNotification: {
-      return std::make_unique<PopupRowView>(
-          a11y_selection_delegate, selection_delegate, controller, line_number,
-          CreateComposePopupRowContentView(suggestion, show_new_badge));
-    }
-    case SuggestionType::kComposeProactiveNudge: {
-      return std::make_unique<PopupRowView>(
-          a11y_selection_delegate, selection_delegate, controller, line_number,
-          CreateComposePopupRowContentView(suggestion, show_new_badge));
-    }
+    case SuggestionType::kComposeSavedStateNotification:
+    case SuggestionType::kComposeProactiveNudge:
+      NOTREACHED();
     case SuggestionType::kIbanEntry:
     case SuggestionType::kVirtualCreditCardEntry: {
       return std::make_unique<PopupRowView>(

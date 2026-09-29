@@ -136,10 +136,9 @@ DenseSet<FormTypeNameForLogging> GetCreditCardFormTypesForLogging(
 bool IsPostalAddress(const AutofillProfile& profile);
 
 // Returns whether the caller should log autofill suggestions shown metrics.
-// Some suggestions can be "displayed" without a direct user action (i.e. typing
-// into a field or unfocusing a text area with a previous
-// `FillingProduct::kCompose` suggestion). We do not want to log suggestion
-// shown logs for them since they defeat the purpose of the metric.
+// Some suggestions can be "displayed" without a direct user action. We do not
+// want to log suggestion shown logs for them since they defeat the purpose of
+// the metric.
 bool ShouldLogAutofillSuggestionShown(
     AutofillSuggestionTriggerSource trigger_source);
 

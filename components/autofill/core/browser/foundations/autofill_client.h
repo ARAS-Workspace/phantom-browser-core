@@ -120,7 +120,6 @@ class AutofillAblationStudy;
 class AutofillAiManager;
 class AutofillAiModelCache;
 class AutofillAiModelExecutor;
-class AutofillComposeDelegate;
 class AutofillCrowdsourcingManager;
 class AutofillDriverFactory;
 class AutofillOptimizationGuideDecider;
@@ -448,10 +447,6 @@ class AutofillClient {
 
   // Gets the AutocompleteHistoryManager instance associated with the client.
   virtual AutocompleteHistoryManager* GetAutocompleteHistoryManager() = 0;
-
-  // Returns the `AutofillComposeDelegate` instance for the tab of this client.
-  virtual AutofillComposeDelegate* GetComposeDelegate();
-  const AutofillComposeDelegate* GetComposeDelegate() const;
 
   // Attempts to the annotated page content for the current tab and calls
   // `callback` with the results.

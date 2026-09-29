@@ -465,10 +465,6 @@ ChromeAutofillClient::GetAutocompleteHistoryManager() {
   return AutocompleteHistoryManagerFactory::GetForProfile(profile);
 }
 
-AutofillComposeDelegate* ChromeAutofillClient::GetComposeDelegate() {
-  return nullptr;
-}
-
 AtMemoryQueryService* ChromeAutofillClient::GetAtMemoryQueryService() {
   Profile* profile =
       Profile::FromBrowserContext(web_contents()->GetBrowserContext());

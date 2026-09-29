@@ -142,7 +142,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
   personal_context::PersonalContextFirstRunService*
   GetPersonalContextFirstRunService() override;
   AutocompleteHistoryManager* GetAutocompleteHistoryManager() final;
-  AutofillComposeDelegate* GetComposeDelegate() final;
   AtMemoryQueryService* GetAtMemoryQueryService() override;
   AtMemoryManager* GetAtMemoryManager() override;
   personal_context::PersonalContextEligibilityState
