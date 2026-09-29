@@ -93,22 +93,6 @@ class ManagePasswordsState {
   // Move to KEYCHAIN_ERROR_STATE.
   void OnKeychainError();
 
-  // Move to PASSKEY_SAVED_CONFIRMATION_STATE. Stores whether GPM pin was
-  // created in the same flow and the passkey's RP ID.
-  void OnPasskeySaved(bool gpm_pin_created, std::string passkey_rp_id);
-
-  // Move to PASSKEY_DELETED_CONFIRMATION_STATE.
-  void OnPasskeyDeleted();
-
-  // Move to PASSKEY_UPDATED_CONFIRMATION_STATE. Stores the passkey's RP ID.
-  void OnPasskeyUpdated(std::string passkey_rp_id);
-
-  // Move to PASSKEY_NOT_ACCEPTED_STATE. Stores the passkey's RP ID.
-  void OnPasskeyNotAccepted(std::string passkey_rp_id);
-
-  // Move to PASSKEY_UPGRADE_STATE. Stores the passkey's RP ID.
-  void OnPasskeyUpgrade(std::string passkey_rp_id);
-
   // Move to MOVE_CREDENTIAL_AFTER_LOG_IN_STATE. Triggers a bubble to move the
   // just submitted form to the user's account store.
   void OnPasswordMovable(
@@ -162,12 +146,6 @@ class ManagePasswordsState {
     return single_credential_mode_credential_;
   }
 
-  bool gpm_pin_created_during_recent_passkey_creation() const {
-    return gpm_pin_created_during_recent_passkey_creation_;
-  }
-
-  const std::string& passkey_rp_id() const { return passkey_rp_id_; }
-
   // Current local forms. ManagePasswordsState is responsible for the forms.
   const std::vector<std::unique_ptr<password_manager::PasswordForm>>&
   GetCurrentForms() const {
@@ -187,8 +165,7 @@ class ManagePasswordsState {
   }
 
  private:
-  // Removes all the PasswordForms and resets passkey state stored in this
-  // object.
+  // Removes all the PasswordForms stored in this object.
   void ClearData();
 
   // Adds |form| to the internal state if it's relevant.
@@ -222,12 +199,6 @@ class ManagePasswordsState {
 
   // The client used for logging.
   raw_ptr<password_manager::PasswordManagerClient> client_;
-
-  // Whether GPM pin was created in the same flow as recent passkey creation.
-  bool gpm_pin_created_during_recent_passkey_creation_ = false;
-
-  // The passkey relying party identifier used during a recent passkey flow.
-  std::string passkey_rp_id_;
 
   // Username and password of a credential that has been updated in a recent
   // password change flow.

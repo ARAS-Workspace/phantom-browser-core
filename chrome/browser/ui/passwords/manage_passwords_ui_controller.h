@@ -125,11 +125,6 @@ class ManagePasswordsUIController
       const std::u16string& username,
       const password_manager::PasswordForm& form_to_update) override;
   void OnKeychainError() override;
-  void OnPasskeySaved(bool gpm_pin_created, std::string passkey_rp_id) override;
-  void OnPasskeyDeleted() override;
-  void OnPasskeyUpdated(std::string passkey_rp_id) override;
-  void OnPasskeyNotAccepted(std::string passkey_rp_id) override;
-  void OnPasskeyUpgrade(std::string passkey_rp_id) override;
 
   // PasswordStoreInterface::Observer:
   void OnLoginsChanged(
@@ -175,8 +170,6 @@ class ManagePasswordsUIController
       const override;
   size_t GetTotalNumberCompromisedPasswords() const override;
   bool BubbleIsManualFallbackForSaving() const override;
-  bool GpmPinCreatedDuringRecentPasskeyCreation() const override;
-  const std::string& PasskeyRpId() const override;
   const std::u16string& PasswordChangeUsername() const override;
   const std::u16string& PasswordChangeNewPassword() const override;
   void OnBubbleShown() override;

@@ -27,11 +27,6 @@
 #include "chrome/browser/ui/views/passwords/post_save_compromised_bubble_view.h"
 #include "chrome/browser/ui/views/passwords/shared_passwords_notification_view.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions_container.h"
-#include "chrome/browser/ui/views/webauthn/passkey_deleted_confirmation_view.h"
-#include "chrome/browser/ui/views/webauthn/passkey_not_accepted_bubble_view.h"
-#include "chrome/browser/ui/views/webauthn/passkey_saved_confirmation_view.h"
-#include "chrome/browser/ui/views/webauthn/passkey_updated_confirmation_view.h"
-#include "chrome/browser/ui/views/webauthn/passkey_upgrade_bubble_view.h"
 #include "components/password_manager/core/common/password_manager_ui.h"
 #include "components/tabs/public/tab_interface.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
@@ -165,24 +160,6 @@ PasswordBubbleViewBase* PasswordBubbleViewBase::CreateBubble(
         Profile::FromBrowserContext(web_contents->GetBrowserContext())
             ->GetPrefs());
 #endif
-  } else if (model_state ==
-             password_manager::ui::PASSKEY_SAVED_CONFIRMATION_STATE) {
-    view = new PasskeySavedConfirmationView(web_contents, anchor_view,
-                                            delegate->PasskeyRpId());
-  } else if (model_state ==
-             password_manager::ui::PASSKEY_DELETED_CONFIRMATION_STATE) {
-    view =
-        new PasskeyDeletedConfirmationView(web_contents, anchor_view, reason);
-  } else if (model_state ==
-             password_manager::ui::PASSKEY_UPDATED_CONFIRMATION_STATE) {
-    view = new PasskeyUpdatedConfirmationView(web_contents, anchor_view, reason,
-                                              delegate->PasskeyRpId());
-  } else if (model_state == password_manager::ui::PASSKEY_NOT_ACCEPTED_STATE) {
-    view = new PasskeyNotAcceptedBubbleView(web_contents, anchor_view, reason,
-                                            delegate->PasskeyRpId());
-  } else if (model_state == password_manager::ui::PASSKEY_UPGRADE_STATE) {
-    view = new PasskeyUpgradeBubbleView(web_contents, anchor_view, reason,
-                                        delegate->PasskeyRpId());
   } else if (model_state == password_manager::ui::PASSWORD_CHANGE_STATE) {
     view = new SuccessfulPasswordChangeView(web_contents, anchor_view);
   } else {

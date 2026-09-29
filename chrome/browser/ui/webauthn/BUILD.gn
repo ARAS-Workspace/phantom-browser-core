@@ -16,10 +16,6 @@ source_set("webauthn") {
       "authenticator_request_window.h",
       "context_menu_helper.h",
       "hover_list_model.h",
-      "passkey_deleted_confirmation_controller.h",
-      "passkey_not_accepted_bubble_controller.h",
-      "passkey_saved_confirmation_controller.h",
-      "passkey_updated_confirmation_controller.h",
       "passkey_upgrade_request_controller.h",
       "sheet_models.h",
       "transport_hover_list_model.h",
@@ -50,10 +46,6 @@ source_set("impl") {
       "authenticator_request_sheet_model.cc",
       "authenticator_request_window.cc",
       "context_menu_helper.cc",
-      "passkey_deleted_confirmation_controller.cc",
-      "passkey_not_accepted_bubble_controller.cc",
-      "passkey_saved_confirmation_controller.cc",
-      "passkey_updated_confirmation_controller.cc",
       "passkey_upgrade_request_controller.cc",
       "sheet_models.cc",
       "transport_hover_list_model.cc",
@@ -123,10 +115,6 @@ source_set("unit_tests") {
   sources = [
     "ambient/ambient_signin_controller_unittest.cc",
     "context_menu_helper_unittest.cc",
-    "passkey_deleted_confirmation_controller_unittest.cc",
-    "passkey_not_accepted_bubble_controller_unittest.cc",
-    "passkey_saved_confirmation_controller_unittest.cc",
-    "passkey_updated_confirmation_controller_unittest.cc",
     "sheet_models_unittest.cc",
   ]
   deps = [

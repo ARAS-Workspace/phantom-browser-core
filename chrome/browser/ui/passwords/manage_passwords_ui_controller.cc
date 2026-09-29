@@ -625,38 +625,6 @@ void ManagePasswordsUIController::OnKeychainError() {
 #endif
 }
 
-void ManagePasswordsUIController::OnPasskeySaved(bool gpm_pin_created,
-                                                 std::string passkey_rp_id) {
-  passwords_data_.OnPasskeySaved(gpm_pin_created, std::move(passkey_rp_id));
-  bubble_status_ = BubbleStatus::SHOULD_POP_UP;
-  UpdateBubbleAndIconVisibility();
-}
-
-void ManagePasswordsUIController::OnPasskeyDeleted() {
-  passwords_data_.OnPasskeyDeleted();
-  bubble_status_ = BubbleStatus::SHOULD_POP_UP;
-  UpdateBubbleAndIconVisibility();
-}
-
-void ManagePasswordsUIController::OnPasskeyUpdated(std::string passkey_rp_id) {
-  passwords_data_.OnPasskeyUpdated(std::move(passkey_rp_id));
-  bubble_status_ = BubbleStatus::SHOULD_POP_UP;
-  UpdateBubbleAndIconVisibility();
-}
-
-void ManagePasswordsUIController::OnPasskeyNotAccepted(
-    std::string passkey_rp_id) {
-  passwords_data_.OnPasskeyNotAccepted(std::move(passkey_rp_id));
-  bubble_status_ = BubbleStatus::SHOULD_POP_UP;
-  UpdateBubbleAndIconVisibility();
-}
-
-void ManagePasswordsUIController::OnPasskeyUpgrade(std::string passkey_rp_id) {
-  passwords_data_.OnPasskeyUpgrade(std::move(passkey_rp_id));
-  bubble_status_ = BubbleStatus::SHOULD_POP_UP;
-  UpdateBubbleAndIconVisibility();
-}
-
 void ManagePasswordsUIController::OnAddUsernameSaveClicked(
     const std::u16string& username,
     const password_manager::PasswordForm& form_to_update) {
@@ -804,16 +772,6 @@ size_t ManagePasswordsUIController::GetTotalNumberCompromisedPasswords() const {
 
 bool ManagePasswordsUIController::BubbleIsManualFallbackForSaving() const {
   return save_fallback_timer_.IsRunning();
-}
-
-bool ManagePasswordsUIController::GpmPinCreatedDuringRecentPasskeyCreation()
-    const {
-  CHECK_EQ(GetState(), password_manager::ui::PASSKEY_SAVED_CONFIRMATION_STATE);
-  return passwords_data_.gpm_pin_created_during_recent_passkey_creation();
-}
-
-const std::string& ManagePasswordsUIController::PasskeyRpId() const {
-  return passwords_data_.passkey_rp_id();
 }
 
 const std::u16string& ManagePasswordsUIController::PasswordChangeUsername()

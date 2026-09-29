@@ -45,11 +45,6 @@ ManagePasswordsPageActionController::GetManagePasswordsTooltipText(
     case password_manager::ui::PASSWORD_UPDATED_SAFE_STATE:
     case password_manager::ui::PASSWORD_UPDATED_MORE_TO_FIX:
     case password_manager::ui::PASSWORD_CHANGE_STATE:
-    case password_manager::ui::PASSKEY_SAVED_CONFIRMATION_STATE:
-    case password_manager::ui::PASSKEY_DELETED_CONFIRMATION_STATE:
-    case password_manager::ui::PASSKEY_UPDATED_CONFIRMATION_STATE:
-    case password_manager::ui::PASSKEY_NOT_ACCEPTED_STATE:
-    case password_manager::ui::PASSKEY_UPGRADE_STATE:
       result = l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_TOOLTIP_MANAGE);
       break;
     case password_manager::ui::PENDING_PASSWORD_UPDATE_STATE:

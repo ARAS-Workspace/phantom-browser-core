@@ -240,37 +240,6 @@ void ManagePasswordsState::OnKeychainError() {
   SetState(password_manager::ui::KEYCHAIN_ERROR_STATE);
 }
 
-void ManagePasswordsState::OnPasskeySaved(bool gpm_pin_created,
-                                          std::string passkey_rp_id) {
-  ClearData();
-  gpm_pin_created_during_recent_passkey_creation_ = gpm_pin_created;
-  passkey_rp_id_ = std::move(passkey_rp_id);
-  SetState(password_manager::ui::PASSKEY_SAVED_CONFIRMATION_STATE);
-}
-
-void ManagePasswordsState::OnPasskeyDeleted() {
-  ClearData();
-  SetState(password_manager::ui::PASSKEY_DELETED_CONFIRMATION_STATE);
-}
-
-void ManagePasswordsState::OnPasskeyUpdated(std::string passkey_rp_id) {
-  ClearData();
-  passkey_rp_id_ = std::move(passkey_rp_id);
-  SetState(password_manager::ui::PASSKEY_UPDATED_CONFIRMATION_STATE);
-}
-
-void ManagePasswordsState::OnPasskeyNotAccepted(std::string passkey_rp_id) {
-  ClearData();
-  passkey_rp_id_ = std::move(passkey_rp_id);
-  SetState(password_manager::ui::PASSKEY_NOT_ACCEPTED_STATE);
-}
-
-void ManagePasswordsState::OnPasskeyUpgrade(std::string passkey_rp_id) {
-  ClearData();
-  passkey_rp_id_ = std::move(passkey_rp_id);
-  SetState(password_manager::ui::PASSKEY_UPGRADE_STATE);
-}
-
 void ManagePasswordsState::TransitionToState(
     password_manager::ui::State state) {
   CHECK_NE(password_manager::ui::INACTIVE_STATE, state_);
@@ -358,8 +327,6 @@ void ManagePasswordsState::ClearData() {
   local_credentials_forms_.clear();
   credentials_callback_.Reset();
   single_credential_mode_credential_.reset();
-  gpm_pin_created_during_recent_passkey_creation_ = false;
-  passkey_rp_id_.clear();
   password_change_username_.clear();
   password_change_new_password_.clear();
 }

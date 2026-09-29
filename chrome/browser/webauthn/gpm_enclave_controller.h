@@ -427,7 +427,6 @@ class GPMEnclaveController : public AuthenticatorRequestDialogModel::Observer,
   bool setting_new_pin_for_uv_ = false;
 
   // Whether the user confirmed GPM PIN creation in the flow.
-  bool gpm_pin_creation_confirmed_ = false;
 
   bool is_state_stale_ = false;
 

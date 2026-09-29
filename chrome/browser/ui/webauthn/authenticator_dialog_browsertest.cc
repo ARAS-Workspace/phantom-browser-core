@@ -32,7 +32,6 @@
 #include "chrome/browser/signin/signin_browser_test_base.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
-#include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/test/test_browser_dialog.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_controller.h"
@@ -1353,45 +1352,4 @@ IN_PROC_BROWSER_TEST_F(AuthenticatorWindowTest, MultiAccountPinReset) {
   model_->SetStep(AuthenticatorRequestDialogModel::Step::kGPMReauthForPinReset);
   navigation_observer.Wait();
   EXPECT_EQ(last_authuser_parameter_, "1");
-}
-
-// Run with:
-//
-// browser_tests
-//   --gtest_filter=BrowserUiTest.Invoke --test-launcher-interactive \
-//   --ui=PasskeyUpgradeConfirmationBubbleTest.InvokeUi_${test_name}
-//
-// where test_name is the second arg to IN_PROC_BROWSER_TEST_F().
-class PasskeyUpgradeConfirmationBubbleTest : public DialogBrowserTest {
- public:
-  PasskeyUpgradeConfirmationBubbleTest() = default;
-  PasskeyUpgradeConfirmationBubbleTest(
-      const PasskeyUpgradeConfirmationBubbleTest&) = delete;
-  PasskeyUpgradeConfirmationBubbleTest& operator=(
-      const PasskeyUpgradeConfirmationBubbleTest&) = delete;
-
-  void SetUpOnMainThread() override {
-    DialogBrowserTest::SetUpOnMainThread();
-    host_resolver()->AddRule("*", "127.0.0.1");
-    signin::MakePrimaryAccountAvailable(
-        IdentityManagerFactory::GetForProfile(browser()->GetProfile()),
-        "user@gmail.com", signin::ConsentLevel::kSync);
-  }
-
-  // DialogBrowserTest:
-  void ShowUi(const std::string& name) override {
-    // Bubble can only show on webby URLs
-    ASSERT_TRUE(embedded_test_server()->Start());
-    EXPECT_TRUE(ui_test_utils::NavigateToURL(
-        browser(), embedded_test_server()->GetURL("a.test", "/empty.html")));
-    content::WebContents* web_contents =
-        browser()->tab_strip_model()->GetActiveWebContents();
-    auto* controller =
-        ManagePasswordsUIController::FromWebContents(web_contents);
-    controller->OnPasskeyUpgrade("example.com");
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(PasskeyUpgradeConfirmationBubbleTest, InvokeUi_default) {
-  ShowAndVerifyUi();
 }

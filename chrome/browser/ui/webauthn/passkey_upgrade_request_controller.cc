@@ -24,7 +24,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/ui/passwords/passwords_client_ui_delegate.h"
 #include "chrome/browser/webauthn/cmtg_device_key_provider_factory.h"
 #include "chrome/browser/webauthn/cmtg_key_fetcher.h"
 #include "chrome/browser/webauthn/enclave_manager_factory.h"
@@ -49,7 +48,6 @@
 #include "components/trusted_vault/trusted_vault_connection.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/render_frame_host.h"
-#include "content/public/browser/web_contents.h"
 #include "device/fido/fido_discovery_base.h"
 #include "device/fido/fido_discovery_factory.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
@@ -250,17 +248,6 @@ void PasskeyUpgradeRequestController::HandlePINValidationResult(
 void PasskeyUpgradeRequestController::OnPasskeyCreated(
     const sync_pb::WebauthnCredentialSpecifics& passkey) {
   FinishRequest(PasskeyUpgradeResult::kSuccess);
-
-  // Show the confirmation bubble.
-  content::RenderFrameHost* rfh = MaybeGetRenderFrameHost();
-  if (rfh) {
-    PasswordsClientUIDelegate* manage_passwords_ui_controller =
-        PasswordsClientUIDelegateFromWebContents(
-            content::WebContents::FromRenderFrameHost(rfh));
-    if (manage_passwords_ui_controller) {
-      manage_passwords_ui_controller->OnPasskeyUpgrade(rp_id_);
-    }
-  }
 }
 
 EnclaveUserVerificationMethod PasskeyUpgradeRequestController::GetUvMethod() {

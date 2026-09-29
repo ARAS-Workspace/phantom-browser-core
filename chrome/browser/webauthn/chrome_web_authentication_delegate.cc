@@ -32,7 +32,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/ui/passwords/passwords_client_ui_delegate.h"
 #include "chrome/browser/webauthn/passkey_model_factory.h"
 #include "chrome/browser/webauthn/unexportable_key_utils.h"
 #include "chrome/browser/webauthn/webauthn_pref_names.h"
@@ -167,24 +166,9 @@ void HideAndRestorePasskeys(
       PasskeyModelFactory::GetInstance()->GetForProfile(
           Profile::FromBrowserContext(web_contents->GetBrowserContext()));
 
-  webauthn::SignalAllAcceptedCredentialsResult result =
-      webauthn::UpdatePasskeyModelForSignalAllAcceptedCredentials(
-          origin, relying_party_id, user_id, all_accepted_credentials_ids,
-          *passkey_store);
-
-  PasswordsClientUIDelegate* manage_passwords_ui_controller =
-      PasswordsClientUIDelegateFromWebContents(web_contents);
-  if (!manage_passwords_ui_controller) {
-    return;
-  }
-
-  if (result ==
-      webauthn::SignalAllAcceptedCredentialsResult::kPasskeyRestored) {
-    manage_passwords_ui_controller->OnPasskeyUpdated(relying_party_id);
-  } else if (result ==
-             webauthn::SignalAllAcceptedCredentialsResult::kPasskeyHidden) {
-    manage_passwords_ui_controller->OnPasskeyNotAccepted(relying_party_id);
-  }
+  webauthn::UpdatePasskeyModelForSignalAllAcceptedCredentials(
+      origin, relying_party_id, user_id, all_accepted_credentials_ids,
+      *passkey_store);
 }
 
 }  // namespace
@@ -338,14 +322,8 @@ void ChromeWebAuthenticationDelegate::PasskeyUnrecognized(
       PasskeyModelFactory::GetInstance()->GetForProfile(
           Profile::FromBrowserContext(web_contents->GetBrowserContext()));
 
-  bool passkey_hidden = webauthn::UpdatePasskeyModelForSignalUnknownCredential(
+  webauthn::UpdatePasskeyModelForSignalUnknownCredential(
       origin, relying_party_id, passkey_credential_id, *passkey_store);
-
-  PasswordsClientUIDelegate* manage_passwords_ui_controller =
-      PasswordsClientUIDelegateFromWebContents(web_contents);
-  if (manage_passwords_ui_controller && passkey_hidden) {
-    manage_passwords_ui_controller->OnPasskeyDeleted();
-  }
 }
 
 void ChromeWebAuthenticationDelegate::SignalAllAcceptedCredentials(
@@ -369,16 +347,8 @@ void ChromeWebAuthenticationDelegate::UpdateUserPasskeys(
       PasskeyModelFactory::GetInstance()->GetForProfile(
           Profile::FromBrowserContext(web_contents->GetBrowserContext()));
 
-  bool passkey_updated =
-      webauthn::UpdatePasskeyModelForSignalCurrentUserDetails(
-          origin, relying_party_id, user_id, name, display_name,
-          *passkey_store);
-
-  PasswordsClientUIDelegate* manage_passwords_ui_controller =
-      PasswordsClientUIDelegateFromWebContents(web_contents);
-  if (manage_passwords_ui_controller && passkey_updated) {
-    manage_passwords_ui_controller->OnPasskeyUpdated(relying_party_id);
-  }
+  webauthn::UpdatePasskeyModelForSignalCurrentUserDetails(
+      origin, relying_party_id, user_id, name, display_name, *passkey_store);
 }
 
 #if BUILDFLAG(IS_MAC)

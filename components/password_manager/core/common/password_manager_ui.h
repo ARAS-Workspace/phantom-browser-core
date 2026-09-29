@@ -75,23 +75,6 @@ enum State {
   // Move credential bubble opened from the footer in manage bubble.
   MOVE_CREDENTIAL_FROM_MANAGE_BUBBLE_STATE,
 
-  // Passkey was successfully created and saved.
-  PASSKEY_SAVED_CONFIRMATION_STATE,
-
-  // Passkey was successfully deleted.
-  PASSKEY_DELETED_CONFIRMATION_STATE,
-
-  // Passkey was successfully updated.
-  PASSKEY_UPDATED_CONFIRMATION_STATE,
-
-  // Passkey was successfully deleted because it was not present on an all
-  // accepted credentials report.
-  PASSKEY_NOT_ACCEPTED_STATE,
-
-  // A passkey was created automatically to "upgrade" an existing password for
-  // the same website and user.
-  PASSKEY_UPGRADE_STATE,
-
   // Password change flow ended successfully. User can trigger this state
   // from the password change success toast.
   PASSWORD_CHANGE_STATE,

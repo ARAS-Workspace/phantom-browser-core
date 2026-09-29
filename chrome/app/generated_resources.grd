@@ -17725,12 +17725,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
           =1 {Wrong PIN. 1 attempt remaining.}
           other {Wrong PIN. # attempts remaining.}}
       </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_SAVED_TITLE" desc="The title of a bubble that is displayed as a confirmation that a passkey was created and saved in Google Password Manager. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        Passkey saved
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_SAVED_PIN_CREATED_TITLE" desc="The title of a bubble that is displayed as a confirmation that a passkey was saved in Google Password Manager and the recovery PIN for Google Password Manager was also created in the same flow. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        Passkey saved and PIN created
-      </message>
       <message name="IDS_WEBAUTHN_SHOW_PIN" desc="The tooltip of a button that is used to show the PIN.">
         Show PIN
       </message>
@@ -17752,36 +17746,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
       <message name="IDS_WEBAUTHN_GPM_PIN_LENGTH_HINT" desc="The hint that is displayed during the creation of an alphanumeric Google Password Manager PIN, explaining its minimal length requirement whenever the currently typed length is not enough.">
         Your PIN can be 4 characters or more
       </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_SAVED_LABEL" desc="The label in a bubble that is displayed as a confirmation that a passkey was created and saved in Google Password Manager, explaining that the passkeys can be managed in Google Password Manager. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        You can view and manage your passkeys saved in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph>
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_SAVED_LINK" desc="Link text within a bubble that is displayed as a confirmation that a passkey was created and saved in Google Password Manager. See IDS_WEBAUTHN_GPM_PASSKEY_SAVED_LABEL for more details.">
-        Google Password Manager
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_UPDATE_NEEDED_TITLE" desc="The title of a bubble that is displayed to notify that the passkey the user tried to use was deleted from the site, explaining to the user that they need to sign in with some other method. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        This passkey was deleted from this site
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_UPDATE_NEEDED_LABEL" desc="The label in a bubble that is displayed to notify that the passkey the user tried to use was deleted from the site, explaining to the user that they need to sign in with some other method. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        Sign in using a password or other recovery method
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_UPDATED_TITLE" desc="The title of a bubble that is displayed as a confirmation that a passkey was updated with the current user details in Google Password Manager. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        Updated passkey
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_UPDATED_LABEL" desc="The label in a bubble that is displayed as a confirmation that a passkey was updated with the current user details in Google Password Manager, explaining that the passkeys can be managed in Google Password Manager. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        Manage your passwords &amp; passkeys in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph>
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_UPDATED_LINK" desc="Link text that directs the user to the Google Password Manager passwords page within a bubble that is displayed as a confirmation that a passkey was updated with the current user details in Google Password Manager. See IDS_WEBAUTHN_GPM_PASSKEY_UPDATED_LABEL for more details.">
-        Google Password Manager
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_DELETED_TITLE" desc="The title of a bubble that is displayed as a confirmation that a passkey was deleted in Google Password Manager. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        Deleted passkey
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_DOESNT_WORK_LABEL" desc="The label in a bubble that is displayed after a passkey is deleted from a site. Since the passkey is now useless, it will be automatically removed from Google Password Manager after about 30 days. Refer to Glossary for the meaning of 'passkey'; do not translate it as 'password'">
-        This passkey doesn't work anymore. It will get deleted soon from <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph>.
-      </message>
-      <message name="IDS_WEBAUTHN_GPM_PASSKEY_DELETED_LINK" desc="Link text that directs the user to the Google Password Manager passwords page within a bubble that is displayed as a confirmation that a passkey was deleted in Google Password Manager. See IDS_WEBAUTHN_GPM_PASSKEY_DELETED_LABEL for more details.">
-        Google Password Manager
-      </message>
       <message name="IDS_WEBAUTHN_GPM_SETTINGS" desc="The label in a button that opens Google Password Manager settings.">
         Settings
       </message>
@@ -17795,22 +17759,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
       </message>
 
       <!-- WebAuthn Automatic Passkey Upgrades -->
-      <message name="IDS_PASSKEY_UPGRADE_BUBBLE_TITLE" desc="The title of a bubble that informs the user a passkey was created for them automatically. Refer to Glossary for the meaning of 'passkey'.">
-        Sign in faster next time
-      </message>
-
-      <message name="IDS_PASSKEY_UPGRADE_BUBBLE_DESCRIPTION" desc="The body of a bubble that informs the user a passkey was created for them automatically. Refer to Glossary for the meaning of 'passkey'.">
-        <ph name="RP_ID">$1<ex>example.com</ex></ph> just created a passkey for your account. Passkeys offer a faster and safer way to sign in and are saved in Google Password Manager for <ph name="USER">$2<ex>elisa.beckett@gmail.com</ex></ph>. <ph name="LEARN_MORE">$3<ex>Learn more about passkeys</ex></ph>
-      </message>
-
-      <message name="IDS_PASSKEY_UPGRADE_BUBBLE_LEARN_MORE" desc="A link in the body of a bubble that informs the user a passkey was created for them automatically. The link opens a Google help center article on passkeys. Refer to Glossary for the meaning of 'passkey'.">
-        Learn more about passkeys
-      </message>
-
-      <message name="IDS_PASSKEY_UPGRADE_BUBBLE_MANAGE_BUTTON" desc="The label of a button that opens Google Password Manager settings. Refer to Glossary for the meaning of 'passkey'.">
-        Manage passwords and passkeys
-      </message>
-
       <!-- Web-modal dialog shown during Digital Credential request -->
       <message name="IDS_WEB_DIGITAL_CREDENTIALS_BLUETOOTH_POWER_ON_MANUAL_TITLE">
         Turn on Bluetooth?

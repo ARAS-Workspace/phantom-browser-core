@@ -40,7 +40,6 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/passwords/passwords_client_ui_delegate.h"
 #include "chrome/browser/ui/webauthn/user_actions.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_model.h"
 #include "chrome/browser/webauthn/change_pin_controller_impl.h"
@@ -544,16 +543,7 @@ void GPMEnclaveController::BuildUVKeyOptions(
 }
 
 void GPMEnclaveController::OnPasskeyCreated(
-    const sync_pb::WebauthnCredentialSpecifics& passkey) {
-  PasswordsClientUIDelegate* manage_passwords_ui_controller =
-      PasswordsClientUIDelegateFromWebContents(web_contents());
-  if (manage_passwords_ui_controller) {
-    bool gpm_pin_created_in_this_request =
-        gpm_pin_creation_confirmed_ && enclave_manager_->has_wrapped_pin();
-    manage_passwords_ui_controller->OnPasskeySaved(
-        gpm_pin_created_in_this_request, rp_id_);
-  }
-}
+    const sync_pb::WebauthnCredentialSpecifics& passkey) {}
 
 EnclaveUserVerificationMethod GPMEnclaveController::GetUvMethod() {
   uv_method_ = PickEnclaveUserVerificationMethod(
@@ -1299,13 +1289,6 @@ void GPMEnclaveController::OnGPMPinEntered(const std::u16string& pin) {
 
   // Disable the pin entry view while waiting for the response from enclave.
   model_->DisableUiOrShowLoadingDialog();
-
-  if (model_->step() == Step::kGPMChangeArbitraryPin ||
-      model_->step() == Step::kGPMChangePin ||
-      model_->step() == Step::kGPMCreateArbitraryPin ||
-      model_->step() == Step::kGPMCreatePin) {
-    gpm_pin_creation_confirmed_ = true;
-  }
 
   if (account_state_ == AccountState::kRecoverable) {
     CHECK(enclave_manager_->has_pending_keys());

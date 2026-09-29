@@ -30,12 +30,7 @@ source_set("webauthn") {
     "combined_selector_sheet_view.h",
     "combined_selector_views.h",
     "hover_list_view.h",
-    "passkey_deleted_confirmation_view.h",
     "passkey_detail_view.h",
-    "passkey_not_accepted_bubble_view.h",
-    "passkey_saved_confirmation_view.h",
-    "passkey_updated_confirmation_view.h",
-    "passkey_upgrade_bubble_view.h",
     "pin_options_button.h",
     "pin_textfield.h",
     "reveal_button_util.h",
@@ -67,12 +62,7 @@ source_set("webauthn") {
     "combined_selector_sheet_view.cc",
     "combined_selector_views.cc",
     "hover_list_view.cc",
-    "passkey_deleted_confirmation_view.cc",
     "passkey_detail_view.cc",
-    "passkey_not_accepted_bubble_view.cc",
-    "passkey_saved_confirmation_view.cc",
-    "passkey_updated_confirmation_view.cc",
-    "passkey_upgrade_bubble_view.cc",
     "pin_options_button.cc",
     "pin_textfield.cc",
     "reveal_button_util.cc",
@@ -159,11 +149,6 @@ source_set("test_support") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "passkey_deleted_confirmation_view_unittest.cc",
-    "passkey_not_accepted_bubble_view_unittest.cc",
-    "passkey_saved_confirmation_view_unittest.cc",
-    "passkey_updated_confirmation_view_unittest.cc",
-    "passkey_upgrade_bubble_view_unittest.cc",
     "pin_textfield_unittest.cc",
     "ring_progress_bar_unittest.cc",
   ]

@@ -30,7 +30,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ssl/cert_verifier_browser_test.h"
 #include "chrome/browser/ui/page_action/action_ids.h"
-#include "chrome/browser/ui/passwords/passwords_model_delegate.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/location_bar/location_bar_view.h"
 #include "chrome/browser/ui/views/page_action/page_action_container_view.h"
@@ -53,7 +52,6 @@
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/password_manager/core/browser/features/password_features.h"
 #include "components/password_manager/core/browser/password_form.h"
-#include "components/password_manager/core/common/password_manager_ui.h"
 #include "components/sync/protocol/webauthn_credential_specifics.pb.h"
 #include "components/webauthn/core/browser/passkey_change_quota_tracker.h"
 #include "components/webauthn/core/browser/test_passkey_model.h"
@@ -411,15 +409,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest,
           ShadowedCredentials::kExclude));
   ASSERT_TRUE(credential);
   EXPECT_FALSE(credential->hidden());
-
-  password_manager::ui::State model_state =
-      PasswordsModelDelegateFromWebContents(
-          browser()->tab_strip_model()->GetActiveWebContents())
-          ->GetState();
-
-  // If the model_state is INACTIVE_STATE, it means that DeletePasskey didn't
-  // run, and hence the Passkey Not Accepted bubble did not show up.
-  EXPECT_EQ(model_state, password_manager::ui::INACTIVE_STATE);
 }
 
 IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest,
@@ -453,14 +442,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest,
           ShadowedCredentials::kExclude));
   ASSERT_TRUE(credential);
   EXPECT_TRUE(credential->hidden());
-
-  password_manager::ui::State model_state =
-      PasswordsModelDelegateFromWebContents(
-          browser()->tab_strip_model()->GetActiveWebContents())
-          ->GetState();
-
-  // Check if the Passkey Not Accepted bubble showed up.
-  EXPECT_EQ(model_state, password_manager::ui::PASSKEY_NOT_ACCEPTED_STATE);
 }
 
 IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest, ReportInvalidStrings) {
@@ -553,15 +534,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest,
   // Check if the name and displayName of the passkey reported was updated.
   EXPECT_EQ(passkey->user_name(), "Pepito");
   EXPECT_EQ(passkey->user_display_name(), "Pepito The Cat");
-
-  password_manager::ui::State model_state =
-      PasswordsModelDelegateFromWebContents(
-          browser()->tab_strip_model()->GetActiveWebContents())
-          ->GetState();
-
-  // Check if the Passkey Updated bubble showed up.
-  EXPECT_EQ(model_state,
-            password_manager::ui::PASSKEY_UPDATED_CONFIRMATION_STATE);
 }
 
 IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest, SignalCurrentUserDetailsQuota) {
@@ -640,15 +612,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest,
   // Check if the name and displayName of the passkey reported did not change.
   EXPECT_EQ(passkey->user_name(), kUsername1);
   EXPECT_EQ(passkey->user_display_name(), kDisplayName1);
-
-  password_manager::ui::State model_state =
-      PasswordsModelDelegateFromWebContents(
-          browser()->tab_strip_model()->GetActiveWebContents())
-          ->GetState();
-
-  // If the model_state is INACTIVE_STATE, it means that UpdatePasskey didn't
-  // run, and hence the Passkey Updated bubble did not show up.
-  EXPECT_EQ(model_state, password_manager::ui::INACTIVE_STATE);
 }
 
 class WebAuthnHintsTest : public WebAuthnBrowserTest {

@@ -62,21 +62,6 @@ std::string StateToString(State state) {
     case MOVE_CREDENTIAL_FROM_MANAGE_BUBBLE_STATE:
       state_name = "MOVE_CREDENTIAL_FROM_MANAGE_BUBBLE_STATE";
       break;
-    case PASSKEY_SAVED_CONFIRMATION_STATE:
-      state_name = "PASSKEY_SAVED_CONFIRMATION_STATE";
-      break;
-    case PASSKEY_DELETED_CONFIRMATION_STATE:
-      state_name = "PASSKEY_DELETED_CONFIRMATION_STATE";
-      break;
-    case PASSKEY_UPDATED_CONFIRMATION_STATE:
-      state_name = "PASSKEY_UPDATED_CONFIRMATION_STATE";
-      break;
-    case PASSKEY_NOT_ACCEPTED_STATE:
-      state_name = "PASSKEY_NOT_ACCEPTED_STATE";
-      break;
-    case PASSKEY_UPGRADE_STATE:
-      state_name = "PASSKEY_UPGRADE_STATE";
-      break;
     case PASSWORD_CHANGE_STATE:
       state_name = "PASSWORD_CHANGE_STATE";
       break;
