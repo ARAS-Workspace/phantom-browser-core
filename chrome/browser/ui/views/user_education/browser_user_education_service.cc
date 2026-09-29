@@ -83,7 +83,6 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/bookmarks/common/bookmark_bar_visibility_state.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
-#include "components/compose/core/browser/compose_features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/desktop_to_mobile_promos/features.h"
 #include "components/desktop_to_mobile_promos/promos_types.h"
@@ -142,10 +141,6 @@
 #endif
 
 namespace {
-
-using Platforms = user_education::Metadata::Platforms;
-constexpr std::initializer_list<Platforms> kComposePlatforms{
-    Platforms::kWindows, Platforms::kMac, Platforms::kLinux};
 
 constexpr char kTabGroupHeaderElementName[] = "TabGroupHeader";
 constexpr char kChromeThemeBackElementName[] = "ChromeThemeBackElement";
@@ -2013,24 +2008,6 @@ void MaybeRegisterChromeNewBadges(user_education::NewBadgeRegistry& registry) {
       user_education::features::kNewBadgeTestFeature,
       user_education::Metadata(124, "Frizzle Team",
                                "Used to test \"New\" Badge logic.")));
-
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      compose::features::kEnableCompose,
-      user_education::Metadata(124, "dewittj@chromium.org",
-                               "Shown in Help Me Write context menu item.", {},
-                               kComposePlatforms)));
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      compose::features::kEnableComposeSavedStateNudge,
-      user_education::Metadata(124, "dewittj@chromium.org",
-                               "Shown in autofill-style suggestion UI to "
-                               "resume an ongoing Compose session.",
-                               {}, kComposePlatforms)));
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      compose::features::kEnableComposeProactiveNudge,
-      user_education::Metadata(126, "dewittj@chromium.org",
-                               "Shown in autofill-style suggestion UI when "
-                               "Compose proactive nudge is shown.",
-                               {}, kComposePlatforms)));
 
   registry.RegisterFeature(user_education::NewBadgeSpecification(
       tabs::kVerticalTabsPreviewBadge,
