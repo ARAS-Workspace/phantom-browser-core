@@ -124,13 +124,6 @@ component("services") {
     ]
   }
 
-  if (enable_media_drm_storage) {
-    sources += [
-      "mojo_media_drm_storage.cc",
-      "mojo_media_drm_storage.h",
-    ]
-  }
-
   if (enable_library_cdms) {
     sources += [
       "cdm_service.cc",

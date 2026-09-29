@@ -34,10 +34,6 @@
 #include "media/media_buildflags.h"
 #include "third_party/blink/public/platform/web_fullscreen_video_status.h"
 
-#if BUILDFLAG(ENABLE_MEDIA_DRM_STORAGE)
-#include "media/base/media_drm_key_type.h"
-#endif  // BUILDFLAG(ENABLE_MEDIA_DRM_STORAGE)
-
 // Note that this file historically used the default value and
 // not `COMPONENT_EXPORT(MEDIA)`.
 #undef IPC_MESSAGE_EXPORT
@@ -131,12 +127,6 @@ IPC_ENUM_TRAITS_MAX_VALUE(media::VideoRotation, media::VIDEO_ROTATION_MAX)
 IPC_ENUM_TRAITS_MAX_VALUE(
     media::container_names::MediaContainerName,
     media::container_names::MediaContainerName::kMaxValue)
-
-#if BUILDFLAG(ENABLE_MEDIA_DRM_STORAGE)
-IPC_ENUM_TRAITS_MIN_MAX_VALUE(media::MediaDrmKeyType,
-                              media::MediaDrmKeyType::MIN,
-                              media::MediaDrmKeyType::MAX)
-#endif  // BUILDFLAG(ENABLE_MEDIA_DRM_STORAGE)
 
 IPC_ENUM_TRAITS_VALIDATE(
     media::VideoColorSpace::PrimaryID,

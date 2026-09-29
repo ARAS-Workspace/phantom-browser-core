@@ -121,7 +121,6 @@ declare_args() {
 
   # Enable browser managed persistent metadata storage for EME persistent
   # session.
-  enable_media_drm_storage = false
 
   # Enable HLS manifest parser and demuxer.
   enable_hls_demuxer = proprietary_codecs

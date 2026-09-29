@@ -44,10 +44,6 @@ mojom("mojom") {
     "webrtc_video_perf.mojom",
   ]
 
-  if (enable_media_drm_storage) {
-    sources += [ "media_drm_storage.mojom" ]
-  }
-
   sources += [ "speech_recognition_service.mojom" ]
 
   # TODO(crbug.com/1293520): Revisit this after the cast renderer has been
@@ -308,24 +304,6 @@ mojom("mojom") {
       traits_public_deps = [ "//media" ]
     },
   ]
-
-  if (enable_media_drm_storage) {
-    cpp_typemaps += [
-      {
-        types = [
-          {
-            mojom = "media.mojom.SessionData.KeyType"
-            cpp = "::media::MediaDrmKeyType"
-          },
-        ]
-        traits_headers = [ "//media/base/ipc/media_param_traits_macros.h" ]
-        traits_public_deps = [
-          "//media",
-          "//media/base/ipc",
-        ]
-      },
-    ]
-  }
 
   cpp_typemaps += shared_typemaps
   blink_cpp_typemaps = shared_typemaps
