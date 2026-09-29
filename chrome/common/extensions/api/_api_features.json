@@ -746,10 +746,6 @@
     "dependencies": ["permission:pageCapture"],
     "contexts": ["privileged_extension"]
   },
-  "passwordsPrivate": {
-    "dependencies": ["permission:passwordsPrivate"],
-    "contexts": ["privileged_extension"]
-  },
   "permissions": {
     "channel": "stable",
     "extension_types": [

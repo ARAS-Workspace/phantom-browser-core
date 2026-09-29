@@ -38,8 +38,6 @@
 #include "chrome/browser/extensions/api/enterprise_reporting_private/enterprise_reporting_private_event_router.h"
 #include "chrome/browser/extensions/api/image_writer_private/operation_manager.h"
 #include "chrome/browser/extensions/api/networking_private/networking_private_ui_delegate_factory_impl.h"
-#include "chrome/browser/extensions/api/passwords_private/passwords_private_delegate_factory.h"
-#include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_factory.h"
 #include "chrome/browser/extensions/api/settings_overrides/settings_overrides_api.h"
 #include "chrome/browser/extensions/api/settings_private/settings_private_event_router_factory.h"
 #include "chrome/browser/extensions/api/side_panel/side_panel_service.h"
@@ -104,8 +102,6 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   extensions::NetworkingPrivateDelegateFactory::GetInstance()
       ->SetUIDelegateFactory(std::move(networking_private_ui_delegate_factory));
 #endif
-  extensions::PasswordsPrivateDelegateFactory::GetInstance();
-  extensions::PasswordsPrivateEventRouterFactory::GetInstance();
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   extensions::SafeBrowsingPrivateEventRouterFactory::GetInstance();
 #endif

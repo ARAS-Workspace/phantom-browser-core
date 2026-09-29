@@ -5453,9 +5453,6 @@ are declared in tools/grit/grit_args.gni.
         <message name="IDS_EXTENSION_PROMPT_WARNING_AUTOFILL_PRIVATE" desc="Permission string for access to autofill settings.">
           Read and change autofill settings
         </message>
-        <message name="IDS_EXTENSION_PROMPT_WARNING_PASSWORDS_PRIVATE" desc="Permission string for access to passwords settings.">
-          Read and change saved password settings
-        </message>
         <message name="IDS_EXTENSION_PROMPT_WARNING_USERS_PRIVATE" desc="Permission string for access to user accounts.">
           Read and change allowlisted users
         </message>
