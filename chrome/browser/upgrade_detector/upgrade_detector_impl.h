@@ -13,8 +13,6 @@
 #include "base/time/time.h"
 #include "base/timer/timer.h"
 #include "base/version.h"
-#include "chrome/browser/upgrade_detector/build_state_observer.h"
-#include "chrome/browser/upgrade_detector/installed_version_poller.h"
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
 #include "components/variations/service/variations_service.h"
 
@@ -25,7 +23,6 @@ class TickClock;
 
 // This class contains the non-CrOS desktop implementation of the detector.
 class UpgradeDetectorImpl : public UpgradeDetector,
-                            public BuildStateObserver,
                             public variations::VariationsService::Observer {
  public:
   // Returns the global instance.
@@ -39,9 +36,6 @@ class UpgradeDetectorImpl : public UpgradeDetector,
   void Shutdown() override;
   base::Time GetAnnoyanceLevelDeadline(
       UpgradeNotificationAnnoyanceLevel level) override;
-
-  // BuildStateObserver:
-  void OnUpdate(const BuildState* build_state) override;
 
  protected:
   UpgradeDetectorImpl(const base::Clock* clock,
@@ -94,20 +88,12 @@ class UpgradeDetectorImpl : public UpgradeDetector,
   void CalculateThresholds();
   void DoCalculateThresholds();
 
-  void StartOutdatedBuildDetector();
-  void DetectOutdatedInstall();
-
   // The function that sends out a notification (after a certain time has
   // elapsed) that lets the rest of the UI know we should start notifying the
   // user that a new version is available.
   void NotifyOnUpgrade();
 
   SEQUENCE_CHECKER(sequence_checker_);
-
-  std::optional<InstalledVersionPoller> installed_version_poller_;
-
-  // A timer used to periodically check if the build has become outdated.
-  base::OneShotTimer outdated_build_timer_;
 
   // A timer used to move through the various upgrade notification stages and
   // schedule calls to NotifyUpgrade.

@@ -138,14 +138,4 @@ source_set("interactive_ui_tests") {
     "//testing/gtest",
     "//ui/views",
   ]
-
-  if (enable_update_notifications) {
-    sources += [ "relaunch_notification_controller_interactive_uitest.cc" ]
-    deps += [
-      "//chrome/browser",
-      "//chrome/browser/policy:test_support",
-      "//chrome/browser/upgrade_detector",
-      "//chrome/common:version_header",
-    ]
-  }
 }

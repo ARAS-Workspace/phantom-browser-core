@@ -19,8 +19,6 @@
 #include "base/time/time.h"
 #include "base/values.h"
 #include "build/build_config.h"
-#include "chrome/browser/google/google_brand.h"
-#include "chrome/browser/upgrade_detector/installed_version_poller.h"
 #include "chrome/browser/upgrade_detector/upgrade_observer.h"
 #include "chrome/browser/upgrade_detector/version_history_client.h"
 #include "chrome/common/pref_names.h"
@@ -132,9 +130,7 @@ class MockUpgradeObserver : public UpgradeObserver {
 class UpgradeDetectorImplTest : public ::testing::Test {
  protected:
   UpgradeDetectorImplTest()
-      : task_environment_(base::test::TaskEnvironment::TimeSource::MOCK_TIME),
-        scoped_poller_disabler_(
-            InstalledVersionPoller::MakeScopedDisableForTesting()) {
+      : task_environment_(base::test::TaskEnvironment::TimeSource::MOCK_TIME) {
     TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(
         url_loader_factory_.GetSafeWeakWrapper());
     // Disable the detector's check to see if autoupdates are enabled.
@@ -214,12 +210,8 @@ class UpgradeDetectorImplTest : public ::testing::Test {
   }
 
  private:
-  // Override the brand code so that the test appears to be a non-organic brand
-  // in order to suppress the outdated build detector.
-  google_brand::BrandForTesting non_organic_{"BBBB"};
   content::BrowserTaskEnvironment task_environment_;
   network::TestURLLoaderFactory url_loader_factory_;
-  InstalledVersionPoller::ScopedDisableForTesting scoped_poller_disabler_;
 
   policy::FakeBrowserDMTokenStorage dm_token_storage_;
 };

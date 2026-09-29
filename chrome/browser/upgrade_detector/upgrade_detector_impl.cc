@@ -28,17 +28,11 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/buildflags.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/google/google_brand.h"
-#include "chrome/browser/obsolete_system/obsolete_system.h"
-#include "chrome/browser/upgrade_detector/build_state.h"
 #include "chrome/browser/upgrade_detector/get_installed_version.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
 #include "components/network_time/network_time_tracker.h"
 #include "components/prefs/pref_service.h"
-#include "components/version_info/version_info.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 
@@ -57,33 +51,6 @@ constexpr auto kNotifyCycleTime = base::Minutes(20);
 
 // Same as kNotifyCycleTimeMs but only used during testing.
 constexpr auto kNotifyCycleTimeForTesting = base::Milliseconds(500);
-
-// How often to check to see if the build has become outdated.
-constexpr auto kOutdatedBuildDetectorPeriod = base::Days(1);
-
-// The number of days after which we identify a build/install as outdated.
-constexpr auto kOutdatedBuildAge = base::Days(7) * 8;
-
-bool ShouldDetectOutdatedBuilds() {
-#if BUILDFLAG(ENABLE_UPDATE_NOTIFICATIONS)
-  // Don't show the bubble if we have a brand code that is NOT organic
-  std::string brand;
-  if (google_brand::GetBrand(&brand) && !google_brand::IsOrganic(brand)) {
-    return false;
-  }
-
-  // Don't show the bubble for Enterprise users.
-  if (policy::ManagementServiceFactory::GetForPlatform()->IsManaged()) {
-    return false;
-  }
-
-  return true;
-#else
-  // Outdated build detection is not relevant on ChromeOS platforms where
-  // updates are handled differently than on other desktop platforms.
-  return false;
-#endif
-}
 
 // Check if one of the outdated simulation switches was present on the command
 // line.
@@ -107,7 +74,6 @@ bool IsTesting() {
 UpgradeDetectorImpl::UpgradeDetectorImpl(const base::Clock* clock,
                                          const base::TickClock* tick_clock)
     : UpgradeDetector(clock, tick_clock),
-      outdated_build_timer_(this->tick_clock()),
       upgrade_notification_timer_(this->tick_clock()),
       is_auto_update_enabled_(true),
       simulating_outdated_(SimulatingOutdated()),
@@ -211,56 +177,6 @@ void UpgradeDetectorImpl::DoCalculateThresholds() {
     constexpr int64_t scale_factor = base::Days(1) / base::Seconds(10);
     for (auto& stage : stages_)
       stage /= scale_factor;
-  }
-}
-
-void UpgradeDetectorImpl::StartOutdatedBuildDetector() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  static BASE_FEATURE(kOutdatedBuildDetector, base::FEATURE_ENABLED_BY_DEFAULT);
-
-  if (!base::FeatureList::IsEnabled(kOutdatedBuildDetector))
-    return;
-
-  // Don't detect outdated builds for obsolete operating systems when new builds
-  // are no longer available.
-  if (ObsoleteSystem::IsObsoleteNowOrSoon() &&
-      ObsoleteSystem::IsEndOfTheLine()) {
-    return;
-  }
-
-  // Don't show the bubble for certain conditions unless an outdated build is
-  // being simulated by command line switches.
-  if (!simulating_outdated_) {
-    if (!ShouldDetectOutdatedBuilds())
-      return;
-
-  }
-
-  DetectOutdatedInstall();
-}
-
-void UpgradeDetectorImpl::DetectOutdatedInstall() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  base::Time current_time;
-  bool is_network_time = GetNetworkTimeWithFallback(current_time);
-
-  CHECK(!build_date_.is_null());
-
-  if (!simulating_outdated_ && is_network_time && build_date_ > current_time) {
-    // Sometimes unexpected things happen with clocks; ignore these edge cases.
-    // See https://crbug.com/40062693 for related discussions.
-    return;
-  }
-
-  if (current_time - build_date_ > kOutdatedBuildAge) {
-    UpgradeDetected(is_auto_update_enabled_
-                        ? UPGRADE_NEEDED_OUTDATED_INSTALL
-                        : UPGRADE_NEEDED_OUTDATED_INSTALL_NO_AU);
-  } else {
-    outdated_build_timer_.Start(
-        FROM_HERE, kOutdatedBuildDetectorPeriod,
-        base::BindOnce(&UpgradeDetectorImpl::DetectOutdatedInstall,
-                       base::Unretained(this)));
   }
 }
 
@@ -466,19 +382,6 @@ void UpgradeDetectorImpl::Init() {
   if (variations_service) {
     variations_service->AddObserver(this);
   }
-
-#if BUILDFLAG(ENABLE_UPDATE_NOTIFICATIONS)
-  // Start checking for outdated builds sometime after startup completes.
-  content::GetUIThreadTaskRunner({base::TaskPriority::BEST_EFFORT})
-      ->PostTask(
-          FROM_HERE,
-          base::BindOnce(&UpgradeDetectorImpl::StartOutdatedBuildDetector,
-                         weak_factory_.GetWeakPtr()));
-
-  auto* const build_state = g_browser_process->GetBuildState();
-  build_state->AddObserver(this);
-  installed_version_poller_.emplace(build_state);
-#endif  // BUILDFLAG(ENABLE_UPDATE_NOTIFICATIONS)
 }
 
 void UpgradeDetectorImpl::Shutdown() {
@@ -488,9 +391,6 @@ void UpgradeDetectorImpl::Shutdown() {
       g_browser_process->variations_service();
   if (variations_service)
     variations_service->RemoveObserver(this);
-  installed_version_poller_.reset();
-  g_browser_process->GetBuildState()->RemoveObserver(this);
-  outdated_build_timer_.Stop();
   stages_.fill(base::TimeDelta());
 
   UpgradeDetector::Shutdown();
@@ -515,29 +415,6 @@ base::Time UpgradeDetectorImpl::GetAnnoyanceLevelDeadline(
       return upgrade_notification_stage() == UPGRADE_ANNOYANCE_CRITICAL
                  ? detected_time
                  : base::Time();
-  }
-}
-
-void UpgradeDetectorImpl::OnUpdate(const BuildState* build_state) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  if (build_state->update_type() == BuildState::UpdateType::kNone) {
-    // An update was available, but seemingly no longer is. Perhaps an update
-    // was followed by a rollback. Back off if nothing more important was
-    // previously noticed (e.g., a critical experiment config change or an
-    // outdated build).
-    if (upgrade_available() == UPGRADE_AVAILABLE_REGULAR ||
-        upgrade_available() == UPGRADE_AVAILABLE_CRITICAL) {
-      UpgradeDetected(UPGRADE_AVAILABLE_NONE);
-    }
-  } else {
-    // build_state->installed_version() will not have a value in case of an
-    // error fetching the installed version. This is generally an indication
-    // that something has gone wrong, so behave as if a normal update is
-    // available in the hopes that a restart will make everything alright.
-    UpgradeDetected(build_state->critical_version() > version_info::GetVersion()
-                        ? UPGRADE_AVAILABLE_CRITICAL
-                        : UPGRADE_AVAILABLE_REGULAR);
   }
 }
 
