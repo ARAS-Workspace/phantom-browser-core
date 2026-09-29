@@ -986,7 +986,7 @@ void MediaRouterDesktop::RecordPresentationRequestUrlBySink(
       }
       break;
     case mojom::MediaRouteProviderId::ANDROID_CAF:
-    case mojom::MediaRouteProviderId::REDIRECTION:
+    case mojom::MediaRouteProviderId::DEPRECATED_REDIRECTION:
     case mojom::MediaRouteProviderId::TEST:
       break;
   }

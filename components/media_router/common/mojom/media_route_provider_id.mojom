@@ -12,6 +12,6 @@ enum MediaRouteProviderId {
   CAST,
   DIAL,
   ANDROID_CAF,
-  REDIRECTION,
+  DEPRECATED_REDIRECTION,  // Deprecated.
   TEST,
 };

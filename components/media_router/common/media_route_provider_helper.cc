@@ -29,7 +29,7 @@ const char* ProviderIdToString(mojom::MediaRouteProviderId provider_id) {
       return kDial;
     case mojom::MediaRouteProviderId::ANDROID_CAF:
       return kAndroidCaf;
-    case mojom::MediaRouteProviderId::REDIRECTION:
+    case mojom::MediaRouteProviderId::DEPRECATED_REDIRECTION:
       return kRedirection;
     case mojom::MediaRouteProviderId::TEST:
       return kTest;
@@ -49,7 +49,7 @@ std::optional<mojom::MediaRouteProviderId> ProviderIdFromString(
   } else if (provider_id == kAndroidCaf) {
     return mojom::MediaRouteProviderId::ANDROID_CAF;
   } else if (provider_id == kRedirection) {
-    return mojom::MediaRouteProviderId::REDIRECTION;
+    return mojom::MediaRouteProviderId::DEPRECATED_REDIRECTION;
   } else if (provider_id == kTest) {
     return mojom::MediaRouteProviderId::TEST;
   } else {
