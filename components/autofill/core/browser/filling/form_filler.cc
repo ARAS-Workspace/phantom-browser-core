@@ -217,7 +217,6 @@ bool ShouldRecordFillingHistory(FillingProduct filling_product) {
     case FillingProduct::kAutocomplete:
     case FillingProduct::kPasskey:
     case FillingProduct::kPassword:
-    case FillingProduct::kCompose:
     case FillingProduct::kIdentityCredential:
     case FillingProduct::kDataList:
     case FillingProduct::kAtMemory:
@@ -341,7 +340,6 @@ struct FormFiller::AugmentedFillingPayload {
         return true;
       case FillingProduct::kAutocomplete:
       case FillingProduct::kAutofillAi:
-      case FillingProduct::kCompose:
       case FillingProduct::kIban:
       case FillingProduct::kLoyaltyCard:
       case FillingProduct::kMerchantPromoCode:

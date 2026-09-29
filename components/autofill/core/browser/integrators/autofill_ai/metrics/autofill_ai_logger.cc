@@ -363,7 +363,6 @@ void AutofillAiLogger::RecordNumberOfFieldsFilled(
           case FillingProduct::kOneTimePassword:
             return true;
           case FillingProduct::kAutocomplete:
-          case FillingProduct::kCompose:
           case FillingProduct::kDataList:
           case FillingProduct::kPasskey:
           case FillingProduct::kAtMemory:

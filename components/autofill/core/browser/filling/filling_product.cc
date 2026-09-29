@@ -33,8 +33,6 @@ std::string_view FillingProductToString(FillingProduct filling_product) {
       return "Passkey";
     case FillingProduct::kPassword:
       return "Password";
-    case FillingProduct::kCompose:
-      return "Compose";
     case FillingProduct::kAutofillAi:
       return "AutofillAi";
     case FillingProduct::kLoyaltyCard:

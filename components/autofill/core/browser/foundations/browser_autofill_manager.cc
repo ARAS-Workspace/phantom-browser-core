@@ -244,7 +244,6 @@ bool IsSingleFieldFillerFillingProduct(FillingProduct filling_product) {
     case FillingProduct::kLoyaltyCard:
       return true;
     case FillingProduct::kAutofillAi:
-    case FillingProduct::kCompose:
     case FillingProduct::kPasskey:
     case FillingProduct::kPassword:
     case FillingProduct::kCreditCard:

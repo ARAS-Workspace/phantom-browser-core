@@ -132,7 +132,6 @@ bool IsDeactivatedPasswordOrPasskey(const Suggestion& suggestion) {
     case FillingProduct::kIban:
     case FillingProduct::kAutocomplete:
     case FillingProduct::kMerchantPromoCode:
-    case FillingProduct::kCompose:
     case FillingProduct::kAutofillAi:
     case FillingProduct::kLoyaltyCard:
     case FillingProduct::kIdentityCredential:
@@ -190,7 +189,6 @@ void FormatLabel(views::Label& label,
         label.SetMaximumWidthSingleLine(maximum_width_single_line);
       }
       break;
-    case FillingProduct::kCompose:
     case FillingProduct::kIban:
     case FillingProduct::kMerchantPromoCode:
     case FillingProduct::kPasskey:

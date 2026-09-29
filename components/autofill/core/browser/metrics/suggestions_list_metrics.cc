@@ -86,7 +86,6 @@ void LogSuggestionAcceptedIndex(
       break;
     case FillingProduct::kIban:
     case FillingProduct::kLoyaltyCard:
-    case FillingProduct::kCompose:
     case FillingProduct::kMerchantPromoCode:
     case FillingProduct::kIdentityCredential:
     case FillingProduct::kPassword:

@@ -713,7 +713,6 @@ bool AutofillPopupControllerImpl::RemoveSuggestion(
     case FillingProduct::kLoyaltyCard:
     case FillingProduct::kPasskey:
     case FillingProduct::kPassword:
-    case FillingProduct::kCompose:
     case FillingProduct::kAutofillAi:
     case FillingProduct::kIdentityCredential:
     case FillingProduct::kDataList:

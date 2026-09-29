@@ -173,7 +173,6 @@ void AutofillAiUkmLogger::LogKeyMetrics(ukm::SourceId ukm_source_id,
           case FillingProduct::kOneTimePassword:
             return true;
           case FillingProduct::kAutocomplete:
-          case FillingProduct::kCompose:
           case FillingProduct::kDataList:
           case FillingProduct::kPasskey:
           case FillingProduct::kAtMemory:

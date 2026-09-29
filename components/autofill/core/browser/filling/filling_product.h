@@ -31,7 +31,7 @@ enum class FillingProduct {
   kIban = 4,
   kAutocomplete = 5,
   kPassword = 6,
-  kCompose = 7,
+  // DEPRECATED 7,
   // DEPRECATED 8,
   kAutofillAi = 9,
   kLoyaltyCard = 10,
