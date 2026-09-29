@@ -20,7 +20,6 @@ static_library("device_management_storage") {
     ":unit_tests",
     "//chrome/enterprise_companion:*",
     "//chrome/updater:*",
-    "//chrome/updater/tools:*",
   ]
 
   if (is_linux) {

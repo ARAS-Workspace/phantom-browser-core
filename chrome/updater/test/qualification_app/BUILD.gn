@@ -1,9 +1,0 @@
-# Copyright 2021 The Chromium Authors
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
-
-import("//chrome/updater/updater_process_version_rc_template.gni")
-
-executable("qualification_app") {
-  sources = [ "main.cc" ]
-}
