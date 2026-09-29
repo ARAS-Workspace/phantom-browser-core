@@ -225,24 +225,6 @@
                 "include_events": ["deviceRequestPrompted"]
             },
             {
-                "domain": "BluetoothEmulation",
-                "async": [
-                    "setSimulatedCentralState",
-                    "simulatePreconnectedPeripheral",
-                    "simulateAdvertisement",
-                    "simulateGATTOperationResponse",
-                    "simulateCharacteristicOperationResponse",
-                    "simulateDescriptorOperationResponse",
-                    "addService",
-                    "removeService",
-                    "addCharacteristic",
-                    "removeCharacteristic",
-                    "addDescriptor",
-                    "removeDescriptor",
-                    "simulateGATTDisconnection"
-                ]
-            },
-            {
                 "domain": "SmartCardEmulation"
             },
             {

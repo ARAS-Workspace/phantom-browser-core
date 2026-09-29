@@ -5,15 +5,8 @@
 import("//build/buildflag_header.gni")
 import("//build/config/features.gni")
 import("//device/bluetooth/cast_bluetooth.gni")
-import("//device/bluetooth/emulation/buildflags.gni")
 
 config("bluetooth_config") {
-}
-
-config("bluetooth_emulation_config") {
-  if (enable_bluetooth_emulation) {
-    defines = [ "ENABLE_BLUETOOTH_EMULATION" ]
-  }
 }
 
 # Experimental implementation not ready for production use yet. See
@@ -98,8 +91,6 @@ source_set("fake_bluetooth") {
     "//mojo/public/cpp/bindings",
     "//net",
   ]
-
-  public_configs = [ ":bluetooth_emulation_config" ]
 }
 
 component("bluetooth") {

@@ -33,10 +33,6 @@
 #include "content/browser/renderer_host/frame_tree_node.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 
-#ifdef ENABLE_BLUETOOTH_EMULATION
-#include "content/browser/devtools/protocol/bluetooth_emulation_handler.h"
-#endif
-
 #if BUILDFLAG(USE_VIZ_DEBUGGER)
 #include "content/browser/devtools/protocol/visual_debugger_handler.h"
 #endif
@@ -230,10 +226,6 @@ bool BrowserDevToolsAgentHost::AttachSession(DevToolsSession* session) {
       auto_attacher_.get(), session);
   if (only_discovery_)
     return true;
-
-#ifdef ENABLE_BLUETOOTH_EMULATION
-  session->CreateAndAddHandler<protocol::BluetoothEmulationHandler>();
-#endif
   session->CreateAndAddHandler<protocol::BrowserHandler>(
       session->GetClient()->MayWriteLocalFiles());
 #if BUILDFLAG(USE_VIZ_DEBUGGER)
