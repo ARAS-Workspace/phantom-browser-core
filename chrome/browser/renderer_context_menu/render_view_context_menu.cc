@@ -141,7 +141,6 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/password_generation_util.h"
 #include "components/autofill/core/common/unique_ids.h"
-#include "components/compose/core/browser/compose_features.h"
 #include "components/content_extraction/content/browser/inner_text.h"
 #include "components/custom_handlers/protocol_handler.h"
 #include "components/download/public/common/download_url_parameters.h"
@@ -487,7 +486,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        // Removed: {IDC_CONTENT_CONTEXT_ORCA, 136},
        // Removed: {IDC_CONTENT_CONTEXT_RUN_LAYOUT_EXTRACTION, 137},
        {IDC_CONTENT_PASTE_FROM_CLIPBOARD, 138},
-       {IDC_CONTEXT_COMPOSE, 139},
+       // Removed: {IDC_CONTEXT_COMPOSE, 139},
        // Removed: {IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PAYMENTS, 140},
        {IDC_CONTENT_CONTEXT_SAVEVIDEOFRAMEAS, 141},
        // Removed: {IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME, 142},
@@ -827,7 +826,6 @@ bool RenderViewContextMenu::IsDevToolsURL(const GURL& url) {
 
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
                                       kExitFullscreenMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu, kComposeMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
                                       kOpenLinkInSplitMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu, kRegionSearchItem);
@@ -2557,8 +2555,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
                 ContextMenuData::kMediaCanPictureInPicture);
 
     case IDC_CONTENT_CONTEXT_EMOJI:
-      return params_.is_editable;
-    case IDC_CONTEXT_COMPOSE:
       return params_.is_editable;
 
     case IDC_CONTENT_CONTEXT_START_SMART_SELECTION_ACTION1:

@@ -89,7 +89,6 @@ class RenderViewContextMenu
       public custom_handlers::ProtocolHandlerRegistry::Observer {
  public:
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kExitFullscreenMenuItem);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kComposeMenuItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kOpenLinkInSplitMenuItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kRegionSearchItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kSearchForImageItem);

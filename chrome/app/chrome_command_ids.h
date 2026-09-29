@@ -380,7 +380,6 @@
 // Context menu items that provide fast access to input methods.
 #define IDC_CONTENT_CONTEXT_EMOJI 50220
 #define IDC_CONTENT_CONTEXT_DICTATION  50229
-#define IDC_CONTEXT_COMPOSE 50230
 // Context menu items in the bookmark bar
 #define IDC_BOOKMARK_BAR_OPEN_ALL 51000
 #define IDC_BOOKMARK_BAR_OPEN_ALL_NEW_WINDOW 51001

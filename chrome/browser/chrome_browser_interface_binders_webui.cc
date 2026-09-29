@@ -250,8 +250,6 @@ void PopulateTrustedChromeWebUIFrameInterfaceBrokers(
 
 void PopulateUntrustedChromeWebUIFrameInterfaceBrokers(
     content::WebUIBrowserInterfaceBrokerRegistry& registry) {
-  PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsFeatures(registry);
-
   PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(registry);
 
   registry.AddGlobal<color_change_listener::mojom::PageHandler>(

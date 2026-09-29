@@ -97,7 +97,4 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
 #endif
 }
 
-void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsFeatures(
-    content::WebUIBrowserInterfaceBrokerRegistry& registry) {}
-
 }  // namespace chrome::internal

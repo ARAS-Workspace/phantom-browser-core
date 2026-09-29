@@ -107,9 +107,6 @@ const char kDesktopNtpModuleUmaName[] = "DesktopNtpModule";
 const char kOptimizationTargetSegmentationDummyKey[] = "segmentation_dummy";
 const char kOptimizationTargetSegmentationDummyUmaName[] = "SegmentationDummy";
 
-const char kComposePromotionKey[] = "compose_promotion";
-const char kComposePromotionUmaName[] = "ComposePromotion";
-
 const char kEphemeralHomeModuleBackendKey[] = "ephemeral_home_module_backend";
 
 const char kIosDefaultBrowserPromoKey[] = "ios_default_browser_promo";
@@ -264,9 +261,6 @@ const char kContextualPageActionModelInputPriceInsights[] =
 const char kContextualPageActionModelInputDiscounts[] = "has_discounts";
 const char kContextualPageActionModelInputTabGrouping[] =
     "has_tab_grouping_suggestion";
-
-const char kComposePrmotionLabelShow[] = "Show";
-const char kComposePrmotionLabelDontShow[] = "DontShow";
 
 // Finch parameter key for sampling rate of the model execution results.
 constexpr char kModelExecutionSamplingRateKey[] =

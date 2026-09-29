@@ -24,8 +24,6 @@ namespace chrome::internal {
 void PopulateChromeWebUIFrameBindersPartsFeatures(
     mojo::BinderMapWithContext<content::RenderFrameHost*>* map,
     content::RenderFrameHost* render_frame_host);
-void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsFeatures(
-    content::WebUIBrowserInterfaceBrokerRegistry& registry);
 
 // These assumes "Desktop" is non-Android.
 void PopulateChromeWebUIFrameBindersPartsDesktop(
