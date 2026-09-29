@@ -108,7 +108,6 @@ export function getLocalizationStringForContentType(
     case ContentSettingsTypes.PDF_DOCUMENTS:
     case ContentSettingsTypes.PERFORMANCE:
     case ContentSettingsTypes.SITE_DATA:
-    case ContentSettingsTypes.OFFER_WRITING_HELP:
     case ContentSettingsTypes.SMART_CARD_READERS:
       return null;
     default:

@@ -40,7 +40,6 @@ export interface SettingsRoutes {
   INLINE_CUE_MENU: Route;
   LANGUAGES: Route;
   MANAGE_PROFILE: Route;
-  OFFER_WRITING_HELP: Route;
   ON_STARTUP: Route;
   PASSKEYS: Route;
   PAYMENTS: Route;

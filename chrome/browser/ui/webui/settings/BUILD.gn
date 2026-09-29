@@ -241,7 +241,6 @@ source_set("impl") {
     "//components/browsing_data/content",
     "//components/browsing_data/core",
     "//components/browsing_data/core:cookie_or_cache_deletion_choice",
-    "//components/compose/core/browser:features",
     "//components/content_settings/core/browser",
     "//components/custom_handlers",
     "//components/desktop_to_mobile_promos",

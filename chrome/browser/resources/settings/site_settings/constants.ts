@@ -67,7 +67,6 @@ export enum ContentSettingsTypes {
   // are used everywhere where ContentSettingsTypes is used in JS.
   PDF_DOCUMENTS = 'pdfDocuments',
   SITE_DATA = 'site-data',
-  OFFER_WRITING_HELP = 'offer-writing-help',
 }
 
 /**

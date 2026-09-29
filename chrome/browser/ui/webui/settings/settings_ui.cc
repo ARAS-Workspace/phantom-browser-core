@@ -87,7 +87,6 @@
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/commerce/core/feature_utils.h"
 #include "components/commerce/core/shopping_service.h"
-#include "components/compose/core/browser/compose_features.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/favicon_base/favicon_url_parser.h"
 #include "components/history/core/browser/features.h"
@@ -262,13 +261,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   html_source->AddBoolean(
       "enableKeyboardLockPrompt",
       base::FeatureList::IsEnabled(permissions::features::kKeyboardLockPrompt));
-
-  const bool compose_enabled = false;
-
-  html_source->AddBoolean(
-      "enableComposeProactiveNudge",
-      compose_enabled && base::FeatureList::IsEnabled(
-                             compose::features::kEnableComposeProactiveNudge));
 
   const bool download_bubble_controlled_by_pref = true;
   html_source->AddBoolean("downloadBubblePartialViewControlledByPref",

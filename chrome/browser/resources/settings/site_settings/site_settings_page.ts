@@ -290,13 +290,6 @@ function getCategoryItemMap(): Map<ContentSettingsTypes, CategoryListItem> {
       icon: 'privacy:notifications',
     },
     {
-      route: routes.OFFER_WRITING_HELP,
-      id: Id.OFFER_WRITING_HELP,
-      label: 'siteSettingsOfferWritingHelp',
-      icon: 'settings:pen-spark',
-      shouldShow: () => loadTimeData.getBoolean('enableComposeProactiveNudge'),
-    },
-    {
       route: routes.SITE_SETTINGS_PAYMENT_HANDLER,
       id: Id.PAYMENT_HANDLER,
       label: 'siteSettingsPaymentHandler',
@@ -561,7 +554,6 @@ export class SettingsSiteSettingsPageElement extends
               Id.PERFORMANCE,
               Id.JAVASCRIPT_OPTIMIZER,
               Id.AUTOMATIC_FULLSCREEN,
-              Id.OFFER_WRITING_HELP,
             ]),
           };
         },
