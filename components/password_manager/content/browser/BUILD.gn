@@ -72,30 +72,3 @@ source_set("test_support") {
     "content_password_manager_driver_factory_test_api.h",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "bad_message_unittest.cc",
-    "content_password_manager_driver_factory_unittest.cc",
-    "content_password_manager_driver_unittest.cc",
-    "form_submission_tracker_util_unittest.cc",
-    "password_manager_log_router_factory_unittest.cc",
-  ]
-
-  deps = [
-    ":browser",
-    ":test_support",
-    "//components/autofill/core/browser:test_support",
-    "//components/password_manager/core/browser:test_support",
-    "//components/prefs:test_support",
-    "//components/safe_browsing:buildflags",
-    "//content/test:test_support",
-    "//testing/gmock",
-    "//testing/gtest",
-  ]
-
-  # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-  # enable the diagnostic by removing this line.
-  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}

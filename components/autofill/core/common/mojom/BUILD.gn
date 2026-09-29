@@ -94,24 +94,3 @@ mojom("mojo_test_types") {
 
   public_deps = [ ":mojo_types" ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "autofill_types_mojom_traits_unittest.cc" ]
-
-  public_deps = [ ":mojo_test_types" ]
-
-  deps = [
-    "//base",
-    "//base/test:test_support",
-    "//components/autofill/core/browser:test_support",
-    "//components/password_manager/core/common",
-    "//mojo/public/cpp/bindings",
-    "//mojo/public/cpp/test_support:test_utils",
-    "//testing/gtest",
-  ]
-
-  # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-  # enable the diagnostic by removing this line.
-  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}

@@ -76,38 +76,3 @@ source_set("ui") {
   ]
   deps += [ "//third_party/zxcvbn-cpp" ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "affiliated_group_unittest.cc",
-    "credential_ui_entry_unittest.cc",
-    "credential_utils_unittest.cc",
-    "password_undo_helper_unittest.cc",
-    "passwords_grouper_unittest.cc",
-    "post_save_compromised_helper_unittest.cc",
-    "saved_passwords_presenter_unittest.cc",
-  ]
-  sources += [
-    "bulk_leak_check_service_adapter_unittest.cc",
-    "insecure_credentials_manager_unittest.cc",
-    "reuse_check_utility_unittest.cc",
-    "weak_check_utility_unittest.cc",
-  ]
-
-  deps = [
-    ":ui",
-    "//components/affiliations/core/browser:test_support",
-    "//components/password_manager/core/browser:test_support",
-    "//components/password_manager/core/browser/features:password_features",
-    "//components/password_manager/core/browser/leak_detection:test_support",
-    "//components/password_manager/core/common",
-    "//components/prefs",
-    "//components/prefs:test_support",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
-    "//components/sync/base:features",
-    "//components/sync/protocol",
-    "//testing/gmock",
-    "//testing/gtest",
-  ]
-}

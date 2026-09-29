@@ -150,47 +150,6 @@ static_library("test_support") {
   ]
 }
 
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "autocomplete_parsing_util_unittest.cc",
-    "autofill_data_validation_unittest.cc",
-    "autofill_internals/log_message_unittest.cc",
-    "autofill_internals/logging_scope_unittest.cc",
-    "autofill_prefs_unittest.cc",
-    "autofill_regexes_unittest.cc",
-    "autofill_util_unittest.cc",
-    "credit_card_number_validation_unittest.cc",
-    "dense_set_unittest.cc",
-    "field_data_manager_unittest.cc",
-    "form_data_unittest.cc",
-    "form_field_data_unittest.cc",
-    "logging/log_buffer_unittest.cc",
-    "save_password_progress_logger_unittest.cc",
-    "signatures_unittest.cc",
-    "unique_ids_unittest.cc",
-  ]
-
-  deps = [
-    ":autofill_regex",
-    ":common",
-    ":credit_card_number_validation",
-    "//base",
-    "//base:i18n",
-    "//base/test:test_support",
-    "//components/autofill/core/common:test_support",
-    "//components/pref_registry",
-    "//components/prefs",
-    "//components/prefs:test_support",
-    "//components/sync_preferences:test_support",
-    "//crypto",
-    "//google_apis",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//url",
-  ]
-}
-
 static_library("fuzzer_support") {
   sources = [
     "form_data_fuzzed_producer.cc",

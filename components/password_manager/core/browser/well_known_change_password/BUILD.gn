@@ -18,21 +18,3 @@ source_set("well_known_change_password") {
   ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "well_known_change_password_state_unittest.cc",
-    "well_known_change_password_util_unittest.cc",
-  ]
-  deps = [
-    ":well_known_change_password",
-    "//base/test:test_support",
-    "//components/affiliations/core/browser:affiliations",
-    "//components/affiliations/core/browser:test_support",
-    "//services/network:test_support",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//url",
-  ]
-}

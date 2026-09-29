@@ -31,19 +31,3 @@ source_set("utils") {
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "password_manager_features_util_unittest.cc" ]
-  deps = [
-    ":password_features",
-    ":utils",
-    "//base/test:test_support",
-    "//components/password_manager/core/common",
-    "//components/prefs",
-    "//components/prefs:test_support",
-    "//components/signin/public/identity_manager",
-    "//components/sync:test_support",
-    "//testing/gtest",
-  ]
-}

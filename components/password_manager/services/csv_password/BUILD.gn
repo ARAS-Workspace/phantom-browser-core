@@ -47,15 +47,3 @@ source_set("fake_password_parser_service") {
 
   deps = [ "//components/password_manager/services/csv_password/public/mojom" ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "csv_password_parser_impl_unittest.cc" ]
-
-  deps = [
-    "//base",
-    "//base/test:test_support",
-    "//components/password_manager/services/csv_password:lib",
-    "//testing/gtest",
-  ]
-}

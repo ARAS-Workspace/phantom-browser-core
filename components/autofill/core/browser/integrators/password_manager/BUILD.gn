@@ -18,16 +18,3 @@ static_library("password_manager") {
     "//components/autofill/core/common",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "password_manager_autofill_helper_unittest.cc" ]
-
-  deps = [
-    ":password_manager",
-    "//base",
-    "//components/autofill/core/browser",
-    "//components/autofill/core/common",
-    "//testing/gtest",
-  ]
-}

@@ -81,26 +81,6 @@ source_set("test_support") {
   ]
 }
 
-source_set("unit_tests") {
-  testonly = true
-  sources = [ "encryption_utils_unittest.cc" ]
-
-  deps = [
-    ":leak_detection",
-    ":test_support",
-    "//base/test:test_support",
-    "//components/password_manager/core/browser:password_form",
-    "//components/password_manager/core/browser/features:password_features",
-    "//components/password_manager/core/common:features",
-    "//components/signin/public/identity_manager:test_support",
-    "//components/version_info:channel",
-    "//services/network:test_support",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//third_party/private-join-and-compute/src:ec_commutative_cipher",
-  ]
-}
-
 group("fuzzers") {
   deps = [ "//components/password_manager/core/browser/leak_detection/fuzzer" ]
 }

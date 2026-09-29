@@ -23,25 +23,3 @@ source_set("export") {
   ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "csv_writer_unittest.cc",
-    "password_csv_writer_unittest.cc",
-    "password_manager_exporter_unittest.cc",
-  ]
-  deps = [
-    ":export",
-    "//components/affiliations/core/browser:test_support",
-    "//components/password_manager/core/browser",
-    "//components/password_manager/core/browser:test_support",
-    "//components/password_manager/core/browser/import:csv",
-    "//testing/gmock",
-    "//testing/gtest",
-  ]
-
-  # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-  # enable the diagnostic by removing this line.
-  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}

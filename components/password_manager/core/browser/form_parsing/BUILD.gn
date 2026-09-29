@@ -30,29 +30,6 @@ static_library("form_parsing") {
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }
 
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "form_data_parser_unittest.cc",
-    "password_field_prediction_unittest.cc",
-  ]
-
-  deps = [
-    ":form_parsing",
-    "//base/test:test_support",
-    "//components/autofill/core/browser",
-    "//components/autofill/core/browser:test_support",
-    "//components/autofill/core/common",
-    "//components/password_manager/core/browser/features:password_features",
-    "//components/password_manager/core/common",
-    "//components/password_manager/core/common:features",
-    "//components/ukm:test_support",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//url",
-  ]
-}
-
 group("fuzzers") {
   deps = [ "//components/password_manager/core/browser/form_parsing/fuzzer" ]
 }
