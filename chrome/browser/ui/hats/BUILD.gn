@@ -18,7 +18,6 @@ source_set("hats") {
     "//chrome/browser/download",
     "//chrome/browser/profiles:profile",
     "//components/browsing_data/core",
-    "//components/compose:buildflags",
     "//components/download/public/common:public",
     "//components/keyed_service/core",
     "//components/pref_registry",

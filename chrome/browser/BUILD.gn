@@ -15,7 +15,6 @@ import("//chrome/browser/buildflags.gni")
 import("//chrome/browser/downgrade/buildflags.gni")
 import("//chrome/common/features.gni")
 import("//components/captive_portal/core/features.gni")
-import("//components/compose/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
@@ -120,7 +119,6 @@ source_set("flags") {
     "//build:branding_buildflags",
     "//build:buildflag_header_h",
     "//chrome/common:buildflags",
-    "//components/compose:buildflags",
     "//components/enterprise/buildflags",
     "//components/paint_preview/buildflags",
     "//components/signin/public/base:signin_buildflags",

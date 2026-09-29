@@ -39,7 +39,6 @@ source_set("impl") {
     "//chrome/browser/sync",
     "//chrome/browser/ui/browser_window",
     "//components/commerce/core:feature_list",
-    "//components/compose:buildflags",
     "//components/metrics_services_manager",
     "//components/search",
     "//components/segmentation_platform/embedder",

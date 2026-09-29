@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/compose/features.gni")
-
 static_library("default_model") {
   sources = [
     "android_home_module_ranker.cc",
@@ -53,7 +51,6 @@ static_library("default_model") {
   ]
   deps = [
     "//base",
-    "//components/compose:buildflags",
     "//components/prefs",
     "//components/segmentation_platform/embedder",
     "//components/segmentation_platform/internal",

@@ -17,7 +17,6 @@ import("//chrome/common/features.gni")
 import("//chrome/test/include_js_tests.gni")
 import("//components/allocation_recorder/testing/testing.gni")
 import("//components/captive_portal/core/features.gni")
-import("//components/compose/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
@@ -1445,7 +1444,6 @@ test("browser_tests") {
     "//components/commerce/core:feature_list",
     "//components/commerce/core:shopping_service_test_support",
     "//components/component_updater/installer_policies:installer_policies_no_content_deps",
-    "//components/compose:buildflags",
     "//components/compose/core/browser:features",
     "//components/consent_auditor",
     "//components/consent_auditor:test_support",

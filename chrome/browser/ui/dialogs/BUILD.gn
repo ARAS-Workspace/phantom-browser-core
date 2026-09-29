@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/ui.gni")
-import("//components/compose/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 source_set("dialogs") {
@@ -43,7 +42,6 @@ source_set("browser_dialogs") {
   deps = [
     "//chrome/browser/task_manager",
     "//components/autofill/core/common",
-    "//components/compose:buildflags",
     "//components/compose/core/browser",
     "//content/public/browser",
     "//extensions/buildflags",

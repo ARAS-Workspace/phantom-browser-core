@@ -6,7 +6,6 @@ import("//build/config/chrome_build.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/dcheck_always_on.gni")
 import("//build/config/features.gni")
-import("//components/compose/features.gni")
 import("//components/safe_browsing/buildflags.gni")
 import("//components/signin/features.gni")
 import("//components/supervised_user/buildflags.gni")
@@ -84,7 +83,6 @@ use_brlapi = false
 chrome_grit_defines = [
   "enable_arcore=$enable_arcore",
   "enable_cardboard=$enable_cardboard",
-  "enable_compose=$enable_compose",
   "enable_openxr=$enable_openxr",
   "enable_printing=$enable_printing",
   "enable_extensions=$enable_extensions",

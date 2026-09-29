@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/compose/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
@@ -33,7 +32,6 @@ source_set("renderer_context_menu") {
     "//chrome/app:command_ids",
     "//chrome/browser/ui/autofill",
     "//chrome/common:mojo_bindings",
-    "//components/compose:buildflags",
     "//components/custom_handlers",
     "//components/renderer_context_menu",
     "//components/supervised_user/core/browser",

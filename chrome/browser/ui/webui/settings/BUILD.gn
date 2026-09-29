@@ -4,7 +4,6 @@
 
 import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
-import("//components/compose/features.gni")
 import("//components/signin/features.gni")
 
 assert(is_mac || is_linux)
