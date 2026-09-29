@@ -132,8 +132,6 @@ source_set("impl") {
     "//chrome/browser/ui/webui/history",
     "//chrome/browser/user_education",
     "//chrome/common:mojo_bindings",
-    "//components/compose/core/browser",
-    "//components/compose/core/browser:features",
     "//components/guest_view/browser",
     "//components/media_router/browser",
     "//components/password_manager/content/browser",

@@ -72,7 +72,6 @@ source_set("impl") {
     "//chrome/common:constants",
     "//components/application_locale_storage",
     "//components/autofill/core/common:features",
-    "//components/compose/core/browser:features",
     "//components/content_settings/core/browser",
     "//components/content_settings/core/browser:cookie_settings",
     "//components/content_settings/core/common",

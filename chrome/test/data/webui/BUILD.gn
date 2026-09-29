@@ -195,7 +195,6 @@ source_set("browser_tests") {
     "//components/commerce/core:account_checker_test_support",
     "//components/commerce/core:feature_list",
     "//components/commerce/core:shopping_service_test_support",
-    "//components/compose/core/browser:features",
     "//components/data_sharing:test_support",
     "//components/history/core/common",
     "//components/history_clusters/core",
