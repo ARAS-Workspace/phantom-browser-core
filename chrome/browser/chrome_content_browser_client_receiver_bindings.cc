@@ -73,11 +73,9 @@
 
 
 #include "chrome/browser/badging/badge_manager.h"
-#include "chrome/browser/password_manager/remote_actor/remote_actor_credential_sharing_impl.h"
 #include "chrome/browser/record_replay/chrome_record_replay_client.h"
 #include "chrome/browser/ui/search/search_tab_helper.h"
 #include "chrome/browser/ui/webui_browser/webui_browser_ui.h"
-#include "chrome/common/password_manager/remote_actor_credential_sharing_policy.h"
 #include "components/record_replay/core/common/record_replay.mojom.h"
 
 #if BUILDFLAG(ENABLE_PDF)
@@ -384,17 +382,6 @@ void ChromeContentBrowserClient::
             BindPasswordManagerDriver(std::move(receiver), render_frame_host);
       },
       &render_frame_host));
-  if (features::RemoteActorCredentialSharingEnabled()) {
-    associated_registry.AddInterface<
-        chrome::mojom::RemoteActorCredentialSharing>(base::BindRepeating(
-        [](content::RenderFrameHost* render_frame_host,
-           mojo::PendingAssociatedReceiver<
-               chrome::mojom::RemoteActorCredentialSharing> receiver) {
-          password_manager::RemoteActorCredentialSharingImpl::BindReceiver(
-              std::move(receiver), render_frame_host);
-        },
-        &render_frame_host));
-  }
   associated_registry.AddInterface<record_replay::mojom::RecordReplayDriver>(
       base::BindRepeating(&ChromeRecordReplayClient::BindRecordReplayDriver,
                           &render_frame_host));

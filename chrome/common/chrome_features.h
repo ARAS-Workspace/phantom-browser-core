@@ -95,16 +95,6 @@ BASE_DECLARE_FEATURE(kDesktopPWAsWindowControlsOverlayWithNoToggle);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kDocumentPipStandaloneWindow);
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kRemoteActorCredentialSharing);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kRemoteActorCredentialSharingAllowedHostForTesting;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-bool RemoteActorCredentialSharingEnabled();
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kChromeAppsDeprecation);
 #endif

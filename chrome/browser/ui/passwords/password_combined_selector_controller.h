@@ -21,7 +21,6 @@ class PasswordCombinedSelectorController : public PasswordBaseDialogController {
  public:
   enum class DisplayType {
     kCredentialManager,
-    kRemoteActor,
   };
 
   using FormsVector =
@@ -31,8 +30,6 @@ class PasswordCombinedSelectorController : public PasswordBaseDialogController {
   ~PasswordCombinedSelectorController() override = default;
 
   virtual DisplayType GetDisplayType() const = 0;
-  virtual bool ShouldShowTopIllustration() const = 0;
-
   virtual std::u16string GetTitle() const = 0;
   virtual std::u16string GetSubtitle() const = 0;
   virtual std::u16string GetOkButtonLabel() const = 0;

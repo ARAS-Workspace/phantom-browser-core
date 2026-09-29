@@ -119,17 +119,6 @@ BASE_FEATURE(kPreinstalledWebAppInstallation,
 BASE_FEATURE(kPreinstalledWebAppAlwaysMigrateForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kRemoteActorCredentialSharing, base::FEATURE_DISABLED_BY_DEFAULT);
-// This parameter is for testing purposes only and must not be used in
-// production. It overrides the whitelisted origins with the specified host.
-const base::FeatureParam<std::string>
-    kRemoteActorCredentialSharingAllowedHostForTesting{
-        &kRemoteActorCredentialSharing, "allowed_host_for_testing", ""};
-
-bool RemoteActorCredentialSharingEnabled() {
-  return base::FeatureList::IsEnabled(features::kRemoteActorCredentialSharing);
-}
-
 // Controls the enablement of structured metrics on Windows, Linux, and Mac.
 BASE_FEATURE(kChromeStructuredMetrics, base::FEATURE_ENABLED_BY_DEFAULT);
 

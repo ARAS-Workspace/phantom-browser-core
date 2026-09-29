@@ -129,7 +129,7 @@ enum class OAuthConsumerId {
   kSyncPreview = 102,
   kFpopService = 103,
   kNotebooksService = 104,
-  kRemoteActorLoginCredentialsService = 105,
+  // kRemoteActorLoginCredentialsService = 105, // Removed due to deprecation.
   kBrowserActuator = 106,
   kTabContextContainersService = 107,
   kSiteTokenProvider = 108,

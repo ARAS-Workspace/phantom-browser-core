@@ -66,7 +66,6 @@ class CredentialManagerDialogController : public PasswordCombinedSelectorControl
 
   // PasswordCombinedSelectorController:
   DisplayType GetDisplayType() const override = 0;
-  bool ShouldShowTopIllustration() const override = 0;
   std::u16string GetTitle() const override = 0;
   std::u16string GetSubtitle() const override = 0;
   std::u16string GetOkButtonLabel() const override = 0;

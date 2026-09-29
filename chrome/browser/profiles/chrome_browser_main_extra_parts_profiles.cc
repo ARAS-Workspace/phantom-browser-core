@@ -315,7 +315,6 @@
 #include "chrome/browser/new_tab_page/chrome_colors/chrome_colors_factory.h"
 #include "chrome/browser/password_manager/factories/bulk_leak_check_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_counter_factory.h"
-#include "chrome/browser/password_manager/remote_actor/remote_actor_credential_sharing_service_factory.h"
 #include "chrome/browser/payments/payment_request_display_manager_factory.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
 #include "chrome/browser/prefs/persistent_renderer_prefs_manager_factory.h"
@@ -861,9 +860,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   PasswordManagerSettingsServiceFactory::GetInstance();
   PasswordReuseManagerFactory::GetInstance();
-  if (base::FeatureList::IsEnabled(features::kRemoteActorCredentialSharing)) {
-    password_manager::RemoteActorCredentialSharingServiceFactory::GetInstance();
-  }
   payments::BrowserBoundKeyDeleterServiceFactory::GetInstance();
   payments::HasEnrolledInstrumentQueryFactory::GetInstance();
   payments::PaymentRequestDisplayManagerFactory::GetInstance();

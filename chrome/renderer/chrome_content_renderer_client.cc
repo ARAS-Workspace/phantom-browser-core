@@ -188,7 +188,6 @@
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#include "chrome/renderer/password_manager/remote_actor_credential_sharing_extension.h"
 #include "chrome/renderer/searchbox/searchbox.h"
 #include "chrome/renderer/searchbox/searchbox_extension.h"
 #include "components/record_replay/content/renderer/record_replay_agent.h"
@@ -593,10 +592,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
 #endif
 
   TrustedVaultEncryptionKeysExtension::Create(render_frame);
-  if (features::RemoteActorCredentialSharingEnabled() &&
-      render_frame->IsMainFrame()) {
-    RemoteActorCredentialSharingExtension::Create(render_frame);
-  }
   GoogleAccountsPrivateApiExtension::Create(render_frame);
 
   if (render_frame->IsMainFrame())

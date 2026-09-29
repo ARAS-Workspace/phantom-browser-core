@@ -298,8 +298,6 @@ static_library("renderer") {
   }
 
   sources += [
-    "password_manager/remote_actor_credential_sharing_extension.cc",
-    "password_manager/remote_actor_credential_sharing_extension.h",
     "searchbox/searchbox.cc",
     "searchbox/searchbox.h",
     "searchbox/searchbox_extension.cc",

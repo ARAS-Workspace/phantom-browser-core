@@ -265,10 +265,6 @@ CredentialManagerDialogControllerImpl::GetDisplayType() const {
   return DisplayType::kCredentialManager;
 }
 
-bool CredentialManagerDialogControllerImpl::ShouldShowTopIllustration() const {
-  return false;
-}
-
 std::u16string CredentialManagerDialogControllerImpl::GetTitle() const {
   return l10n_util::GetStringFUTF16(
       IDS_WEBAUTHN_SIGN_IN_TO_WEBSITE_DIALOG_TITLE,

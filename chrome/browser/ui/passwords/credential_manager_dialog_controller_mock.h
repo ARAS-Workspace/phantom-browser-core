@@ -39,7 +39,6 @@ class CredentialManagerDialogControllerMock
   MOCK_METHOD(void, OnCloseDialog, (), (override));
 
   MOCK_METHOD(DisplayType, GetDisplayType, (), (const, override));
-  MOCK_METHOD(bool, ShouldShowTopIllustration, (), (const, override));
   MOCK_METHOD(std::u16string, GetTitle, (), (const, override));
   MOCK_METHOD(std::u16string, GetSubtitle, (), (const, override));
   MOCK_METHOD(std::u16string, GetOkButtonLabel, (), (const, override));

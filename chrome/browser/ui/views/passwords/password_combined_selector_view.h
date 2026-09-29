@@ -59,7 +59,6 @@ class PasswordCombinedSelectorView
   // views::DialogDelegate:
   bool Accept() override;
   bool ShouldAllowKeyEventsDuringInputProtection() const override;
-  void OnWidgetInitialized() override;
 
  private:
   std::u16string GetWindowTitle() const override;
