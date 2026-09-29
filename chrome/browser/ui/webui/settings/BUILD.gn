@@ -276,9 +276,6 @@ source_set("impl") {
     "//ui/webui/tracked_element",
     "//v8:v8_version",
   ]
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose" ]
-  }
 
   if (is_mac || is_linux) {
     sources += [

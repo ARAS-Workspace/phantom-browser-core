@@ -9,10 +9,6 @@
 #include "content/public/browser/web_contents.h"
 #include "ui/base/models/menu_model.h"
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/compose/chrome_compose_client.h"
-#endif
-
 TestRenderViewContextMenu::TestRenderViewContextMenu(
     content::RenderFrameHost& render_frame_host,
     content::ContextMenuParams params)
@@ -105,16 +101,4 @@ BrowserWindowInterface* TestRenderViewContextMenu::GetBrowser() const {
   return RenderViewContextMenu::GetBrowser();
 }
 
-void TestRenderViewContextMenu::Show() {
-}
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-ChromeComposeClient* TestRenderViewContextMenu::GetChromeComposeClient() const {
-  return compose_client_;
-}
-
-void TestRenderViewContextMenu::SetChromeComposeClient(
-    ChromeComposeClient* compose_client) {
-  compose_client_ = compose_client;
-}
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
+void TestRenderViewContextMenu::Show() {}

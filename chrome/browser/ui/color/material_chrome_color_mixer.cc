@@ -9,7 +9,6 @@
 #include "chrome/browser/ui/color/chrome_color_provider_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/grit/theme_resources.h"
-#include "components/compose/buildflags.h"
 #include "ui/color/color_id.h"
 #include "ui/color/color_mixer.h"
 #include "ui/color/color_provider.h"
@@ -291,36 +290,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
   mixer[kColorWebAuthnProgressRingBackground] = ui::SetAlpha(
       kColorWebAuthnProgressRingForeground, gfx::kGoogleGreyAlpha400);
   mixer[kColorWebAuthnProgressRingForeground] = {ui::kColorSysPrimary};
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-  // Compose colors.
-  mixer[kColorComposeDialogBackground] = {ui::kColorSysSurface};
-  mixer[kColorComposeDialogDivider] = {ui::kColorSysDivider};
-  mixer[kColorComposeDialogError] = {ui::kColorSysError};
-  mixer[kColorComposeDialogForegroundSubtle] = {ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorComposeDialogLink] = {ui::kColorSysPrimary};
-  mixer[kColorComposeDialogLogo] = {ui::kColorSysOnTonalContainer};
-  mixer[kColorComposeDialogScrollbarThumb] = {ui::kColorSysPrimary};
-  mixer[kColorComposeDialogResultBackground] = {ui::kColorSysSurface5};
-  mixer[kColorComposeDialogResultForeground] = {ui::kColorSysOnSurface};
-  mixer[kColorComposeDialogResultForegroundWhileLoading] = {
-      ui::kColorSysPrimary};
-  mixer[kColorComposeDialogResultIcon] = {ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorComposeDialogResultContainerScrollbarThumb] = {
-      ui::kColorSysTonalOutline};
-  mixer[kColorComposeDialogTitle] = {ui::kColorSysOnSurface};
-  mixer[kColorComposeDialogTextarea] = {ui::kColorSysOnSurface};
-  mixer[kColorComposeDialogTextareaOutline] = {ui::kColorSysNeutralOutline};
-  mixer[kColorComposeDialogTextareaPlaceholder] = {
-      ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorComposeDialogTextareaReadonlyBackground] = {
-      ui::kColorSysNeutralContainer};
-  mixer[kColorComposeDialogTextareaReadonlyForeground] = {
-      ui::kColorSysOnSurface};
-  mixer[kColorComposeDialogTextareaIcon] = {ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorComposeDialogSelectOptionDisabled] = {
-      ui::kColorLabelForegroundDisabled};
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
   // History colors.
   mixer[kColorHistoryPageBookmarkStar] = {ui::kColorSysPrimary};

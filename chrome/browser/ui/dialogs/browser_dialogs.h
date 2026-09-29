@@ -15,7 +15,6 @@
 #include "chrome/browser/task_manager/task_manager_metrics_recorder.h"
 #include "chrome/browser/ui/bookmarks/bookmark_editor.h"
 #include "components/autofill/core/common/unique_ids.h"
-#include "components/compose/buildflags.h"
 #include "components/compose/core/browser/compose_client.h"
 #include "extensions/buildflags/buildflags.h"
 #include "third_party/skia/include/core/SkBitmap.h"
@@ -60,12 +59,6 @@ struct SelectedFileInfo;
 namespace views {
 class Widget;
 }  // namespace views
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-namespace compose {
-class ComposeDialogController;
-}  // namespace compose
-#endif
 
 namespace chrome {
 
@@ -149,13 +142,6 @@ bool IsDeviceChooserShowingForTesting(Browser* browser);
 void ShowWindowNamePrompt(Browser* browser);
 std::unique_ptr<ui::DialogModel> CreateWindowNamePromptDialogModelForTesting(
     Browser* browser);
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-std::unique_ptr<compose::ComposeDialogController> ShowComposeDialog(
-    content::WebContents& web_contents,
-    const gfx::RectF& element_bounds_in_screen,
-    compose::ComposeClient::FieldIdentifier field_ids);
-#endif
 
 // Shows the 'Create Shortcut' dialog to create fire and forget entities on the
 // desktop of the OS. Before the dialog is shown, the necessary metadata is

@@ -11,7 +11,6 @@
 
 #include "base/feature_list.h"
 #include "base/time/time.h"
-#include "components/compose/buildflags.h"
 #include "pdf/buildflags.h"
 
 // Trigger identifiers currently used; duplicates not allowed.
@@ -87,11 +86,6 @@ extern const char kHatsSurveyTriggerTrustSafetyV2TrustedSurface[];
 extern const char kHatsSurveyTriggerTrustSafetyV2PrivacyGuide[];
 extern const char kHatsSurveyTriggerTrustSafetyV2SafeBrowsingInterstitial[];
 extern const char kHatsSurveyTriggerWallpaperSearch[];
-#if BUILDFLAG(ENABLE_COMPOSE)
-extern const char kHatsSurveyTriggerComposeAcceptance[];
-extern const char kHatsSurveyTriggerComposeClose[];
-extern const char kHatsSurveyTriggerComposeNudgeClose[];
-#endif  // #if BUILDFLAG(ENABLE_COMPOSE)
 extern const char kHatsSurveyTriggerWhatsNew[];
 
 extern const char kHatsSurveyTriggerAutofillAiFilling[];

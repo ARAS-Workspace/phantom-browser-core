@@ -204,10 +204,6 @@ source_set("configs") {
     deps += [ "//chrome/browser/ui/webui/extensions_zero_state_promo" ]
   }
 
-  if (enable_compose) {
-    deps += [ "//chrome/browser/ui/webui/compose" ]
-  }
-
   if (enable_webui_certificate_viewer) {
     deps += [ "//chrome/browser/ui/webui/certificate_viewer" ]
   }

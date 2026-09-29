@@ -33,7 +33,6 @@
 #include "components/browsing_data/core/pref_names.h"
 #include "components/commerce/core/pref_names.h"
 #include "components/component_updater/pref_names.h"
-#include "components/compose/buildflags.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/dom_distiller/core/pref_names.h"
 #include "components/embedder_support/pref_names.h"
@@ -384,13 +383,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kNumber;
   (*s_allowlist)[::prefs::kEnableQuietNotificationPermissionUi] =
       settings_api::PrefType::kBoolean;
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-  (*s_allowlist)[prefs::kEnableProactiveNudge] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[prefs::kProactiveNudgeDisabledSitesWithTime] =
-      settings_api::PrefType::kDictionary;
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
   // Clear browsing data settings.
   (*s_allowlist)[browsing_data::prefs::kDeleteBrowsingHistory] =

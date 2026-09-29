@@ -262,10 +262,6 @@ source_set("impl") {
     sources += [ "autofill_popup_controller_impl_mac.mm" ]
     deps += [ "//chrome/browser/ui/cocoa" ]
   }
-
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose" ]
-  }
 }
 
 source_set("unit_tests") {

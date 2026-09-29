@@ -65,13 +65,6 @@ static_library("default_model") {
     "//services/metrics/public/cpp:ukm_builders",
     "//ui/base",
   ]
-  if (enable_compose) {
-    sources += [
-      "compose_promotion.cc",
-      "compose_promotion.h",
-    ]
-    deps += [ "//components/compose/core/browser" ]
-  }
 }
 
 source_set("unit_tests") {
@@ -121,11 +114,6 @@ source_set("unit_tests") {
     "//components/visited_url_ranking/public",
     "//testing/gtest",
   ]
-
-  if (enable_compose) {
-    sources += [ "compose_promotion_unittest.cc" ]
-    deps += [ "//components/compose/core/browser" ]
-  }
 }
 
 source_set("default_model_test_base") {

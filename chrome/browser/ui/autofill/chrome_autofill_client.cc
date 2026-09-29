@@ -133,7 +133,6 @@
 #include "components/autofill/core/common/autofill_switches.h"
 #include "components/autofill/core/common/form_field_data.h"
 #include "components/autofill/core/common/unique_ids.h"
-#include "components/compose/buildflags.h"
 #include "components/device_reauth/device_authenticator.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
@@ -192,11 +191,6 @@
 #include "chrome/browser/ui/webui/signin/login_ui_service_factory.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_manager.h"  // nogncheck
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/compose/chrome_compose_client.h"
-#include "components/compose/core/browser/compose_manager.h"
-#endif
 
 namespace autofill {
 
@@ -472,12 +466,7 @@ ChromeAutofillClient::GetAutocompleteHistoryManager() {
 }
 
 AutofillComposeDelegate* ChromeAutofillClient::GetComposeDelegate() {
-#if BUILDFLAG(ENABLE_COMPOSE)
-  auto* client = ChromeComposeClient::FromWebContents(web_contents());
-  return client ? &client->GetManager() : nullptr;
-#else
   return nullptr;
-#endif
 }
 
 AtMemoryQueryService* ChromeAutofillClient::GetAtMemoryQueryService() {

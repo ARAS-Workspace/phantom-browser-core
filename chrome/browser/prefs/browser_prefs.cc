@@ -1473,12 +1473,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   data_controls::RegisterProfilePrefs(registry);
 #endif  // BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-  registry->RegisterBooleanPref(prefs::kPrefHasCompletedComposeFRE, false);
-  registry->RegisterBooleanPref(prefs::kEnableProactiveNudge, true);
-  registry->RegisterDictionaryPref(prefs::kProactiveNudgeDisabledSitesWithTime);
-#endif
-
   registry->RegisterIntegerPref(prefs::kChromeDataRegionSetting, 0);
 
   registry->RegisterIntegerPref(prefs::kLensOverlayStartCount, 0);

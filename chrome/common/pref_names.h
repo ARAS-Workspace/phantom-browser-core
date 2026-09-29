@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/pref_font_webkit_names.h"
-#include "components/compose/buildflags.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "content/public/common/buildflags.h"
@@ -23,7 +22,6 @@
 #include "pdf/buildflags.h"
 #include "printing/buildflags/buildflags.h"
 #include "rlz/buildflags/buildflags.h"
-
 
 namespace prefs {
 
@@ -121,7 +119,6 @@ inline constexpr char kProfileCreationTime[] = "profile.creation_time";
 
 // Preference which stores randomly generated profile ID for LOM.
 inline constexpr char kLomProfileId[] = "private_metrics.lom.profile_id";
-
 
 // The URL to open the new tab page to. Only set by Group Policy.
 inline constexpr char kNewTabPageLocationOverride[] =
@@ -366,7 +363,6 @@ inline constexpr char kPreinstalledExtensionsInstallState[] =
 inline constexpr char kMandatoryExtensionsForIncognitoNavigation[] =
     "mandatory_extensions_for_incognito_navigation";
 #endif
-
 
 // A boolean pref set to true if a Home button to open the Home pages should be
 // visible on the toolbar.
@@ -839,7 +835,6 @@ inline constexpr char kManagedAccountsSigninRestrictionScopeMachine[] =
 inline constexpr char kEnterpriseProfileCreationKeepBrowsingData[] =
     "profile.enterprise_profile_creation.keep_existing_data_by_default";
 
-
 // Boolean indicating whether, as part of the adaptive activation quiet UI dry
 // run experiment, the user has accumulated three notification permission
 // request denies in a row.
@@ -939,30 +934,6 @@ inline constexpr char kVerticalTabsCollapsedState[] =
 // width. Only used during startup when session restore is not used.
 inline constexpr char kVerticalTabsUncollapsedWidth[] =
     "vertical_tabs.uncollapsed_width";
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-// Boolean indicating whether or not the Compose FRE has been completed.
-inline constexpr char kPrefHasCompletedComposeFRE[] =
-    "compose_has_completed_fre";
-
-// Boolean that is true when the writing help proactive nudge UI is globally
-// enabled. When false, the UI will never be shown.
-inline constexpr char kEnableProactiveNudge[] =
-    "compose.proactive_nudge_enabled";
-
-// Dictionary of domains mapped to the time that they are added. A domain can be
-// added through the proactive nudge UI, and can be removed through the "Offer
-// writing help" settings page. When a domain is on the disabled list, the
-// proactive nudge is prevented from being shown on all pages under that domain.
-// The recorded time tracks when the domain was added to the disabled list and
-// is used for integrating with the Chrome settings "Clear browsing data"
-// feature.
-// TODO(b/339524210): Refactor the stored dictionary value to track a second
-// timestamp, `last_visit`, that can be used for re-surfacing the nudge after an
-// elapsed time.
-inline constexpr char kProactiveNudgeDisabledSitesWithTime[] =
-    "compose.proactive_nudge_disabled_sites_with_time";
-#endif
 
 // Integer value controlling the data region to store covered data from Chrome.
 // By default, no preference is selected.
@@ -1513,7 +1484,6 @@ inline constexpr char kWebAppsUninstalledDefaultChromeApps[] =
 // outlive the app installation and uninstallation.
 inline constexpr char kWebAppsPreferences[] = "web_apps.web_app_ids";
 
-
 #if BUILDFLAG(IS_MAC)
 // A boolean that indicates whether ad-hoc code signing should be used for
 // PWA app shims. This is managed by enterprise policy.
@@ -1807,12 +1777,10 @@ inline constexpr char kSameOriginTabCaptureAllowedByOrigins[] =
 // Boolean determining whether the glass frame is enabled.
 inline constexpr char kGlassFrameEnabled[] = "glass_frame.enabled";
 
-
 // String which specifies where to store the disk cache.
 inline constexpr char kDiskCacheDir[] = "browser.disk_cache_dir";
 // Pref name for the policy specifying the maximal cache size.
 inline constexpr char kDiskCacheSize[] = "browser.disk_cache_size";
-
 
 // Pref name for the policy controlling whether to enable Media Router.
 inline constexpr char kEnableMediaRouter[] = "media_router.enable_media_router";
@@ -1838,7 +1806,6 @@ inline constexpr char kRelaunchWindow[] = "browser.relaunch_window";
 inline constexpr char kRelaunchFastIfOutdated[] =
     "browser.relaunch_fast_if_outdated";
 
-
 #if BUILDFLAG(IS_MAC)
 // Counts how many times prominent call-to-actions have occurred as part of the
 // Mac restore permissions experiment. https://crbug.com/1211052
@@ -1851,11 +1818,9 @@ inline constexpr char kMacRestoreLocationPermissionsExperimentCount[] =
 inline constexpr char kChromeForTestingAllowed[] = "chrome_for_testing.allowed";
 #endif
 
-
 // A boolean pref which determines whether the QR Code generator feature is
 // enabled. Controlled by QRCodeGeneratorEnabled policy.
 inline constexpr char kQRCodeGeneratorEnabled[] = "qr_code_generator_enabled";
-
 
 // An enum that controls what level of toasts we show to the user.
 inline constexpr char kToastAlertLevel[] = "settings.toast.alert_level";
@@ -1885,11 +1850,9 @@ inline constexpr char kBackgroundModeEnabled[] = "background_mode.enabled";
 inline constexpr char kHardwareAccelerationModeEnabled[] =
     "hardware_acceleration_mode.enabled";
 
-
 // Hardware acceleration mode from previous browser launch.
 inline constexpr char kHardwareAccelerationModePrevious[] =
     "hardware_acceleration_mode_previous";
-
 
 // A boolean where true means that the browser has previously attempted to
 // enable autoupdate and failed, so the next out-of-date browser start should
@@ -1905,7 +1868,6 @@ inline constexpr char kMediaGalleriesUniqueId[] = "media_galleries.gallery_id";
 // gallery.
 inline constexpr char kMediaGalleriesRememberedGalleries[] =
     "media_galleries.remembered_galleries";
-
 
 // An integer that is incremented whenever changes are made to app shortcuts.
 // Increasing this causes all app shortcuts to be recreated.
@@ -1979,7 +1941,6 @@ inline constexpr char kBrowserShowProfilePickerOnStartup[] =
 inline constexpr char kSigninInterceptionEnabled[] =
     "signin.interception_enabled";
 
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 // Policy that indicates how to handle animated images.
 inline constexpr char kAnimationPolicy[] = "settings.a11y.animation_policy";
@@ -2014,7 +1975,6 @@ inline constexpr char kAllowDinosaurEasterEgg[] = "allow_dinosaur_easter_egg";
 // value.
 inline constexpr char kWebShareVisitedTargets[] =
     "profile.web_share.visited_targets";
-
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
 
@@ -2181,7 +2141,6 @@ inline constexpr char kSignedHTTPExchangeEnabled[] =
 inline constexpr char kSilentPrintingEnabled[] =
     "printing.silent_printing_enabled";
 
-
 // Enum that specifies CA certificate management permissions for user. It
 // can have one of the following values.
 // 0: Users can manage all certificates.
@@ -2298,7 +2257,6 @@ inline constexpr char kOriginAgentClusterDefaultEnabled[] =
 inline constexpr char kSCTAuditingHashdanceReportCount[] =
     "sct_auditing.hashdance_report_count";
 
-
 // An integer count of how many times the user has seen the memory saver mode
 // page action chip in the expanded size. While the feature was renamed to
 // "Memory Saver" the pref cannot be changed without migration.
@@ -2380,7 +2338,6 @@ inline constexpr char kHappyEyeballsV3Enabled[] =
 // Boolean that specifies whether IPv6 reachability check override is enabled.
 inline constexpr char kIPv6ReachabilityOverrideEnabled[] =
     "net.ipv6_reachability_override_enabled";
-
 
 // A boolean pref indicating whether elements detected as ads should be visually
 // highlighted across all web pages. This is a global diagnostic setting managed

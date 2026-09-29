@@ -828,10 +828,6 @@ static_library("ui") {
     deps += [ "//chrome/browser/offline_pages" ]
   }
 
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose" ]
-  }
-
   if (enable_rlz) {
     deps += [ "//chrome/browser/rlz" ]
   }
@@ -2842,15 +2838,6 @@ static_library("ui") {
       # - c/b/ui/browser.h
       "//chrome/browser/ui/views/shortcuts:impl",
     ]
-
-    if (enable_compose) {
-      deps += [
-        "//chrome/browser/ui/views/compose",
-        "//chrome/browser/ui/views/compose:impl",
-      ]
-      allow_circular_includes_from +=
-          [ "//chrome/browser/ui/views/compose:impl" ]
-    }
 
     if (enable_dice_support) {
       deps +=

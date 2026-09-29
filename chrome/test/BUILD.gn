@@ -496,10 +496,6 @@ static_library("test_support") {
 
   deps += [ "//chrome/browser/ui/webui/signin:profile" ]
 
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose" ]
-  }
-
   sources += [
     "../test/base/browser_with_test_window_test.cc",
     "../test/base/browser_with_test_window_test.h",
@@ -584,10 +580,6 @@ static_library("test_support") {
 
   if (enable_offline_pages) {
     public_deps += [ "//components/offline_pages/core:test_support" ]
-  }
-
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose:test_support" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -1806,10 +1798,6 @@ test("browser_tests") {
     deps += [ "//chrome/browser/background/extensions" ]
   }
 
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose:test_support" ]
-  }
-
   # Runtime dependencies
   data_deps = [
     "//chrome:browser_tests_pak",
@@ -2092,10 +2080,6 @@ test("browser_tests") {
   }
 
   deps += [ "//chrome/browser/ui/webui/support_tool:browser_tests" ]
-
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose:browser_tests" ]
-  }
 
   if (is_mac || is_linux) {
     sources += [
@@ -3847,21 +3831,6 @@ test("unit_tests") {
 
   if (chrome_root_store_cert_management_ui) {
     deps += [ "//chrome/browser/ui/webui/certificate_manager:unit_tests" ]
-  }
-
-  if (enable_compose) {
-    sources += [
-      "../browser/ui/views/compose/compose_dialog_view_unittest.cc",
-      "../common/compose/type_conversions_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/compose:unit_tests",
-      "//chrome/browser/ui/views/compose",
-      "//chrome/common/compose",
-      "//components/compose/core/browser",
-      "//components/optimization_guide/core",
-      "//components/optimization_guide/proto:optimization_guide_proto",
-    ]
   }
 
   if (is_mac) {
@@ -6199,16 +6168,6 @@ test("interactive_ui_tests") {
         "//printing:test_support",
       ]
     }
-  }
-
-  if (enable_compose) {
-    sources += [ "../browser/ui/views/compose/compose_interactive_uitest.cc" ]
-
-    deps += [
-      "//chrome/browser/ui/views/compose",
-      "//components/compose/core/browser",
-      "//components/compose/core/browser:features",
-    ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

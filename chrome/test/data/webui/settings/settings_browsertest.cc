@@ -15,7 +15,6 @@
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/browsing_data/core/features.h"
-#include "components/compose/buildflags.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/history/core/browser/features.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"

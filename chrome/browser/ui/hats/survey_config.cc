@@ -36,10 +36,6 @@
 #include "components/performance_manager/public/features.h"  // nogncheck
 #include "components/permissions/constants.h"                // nogncheck
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "components/compose/core/browser/compose_features.h"
-#endif  // #if !BUILDFLAG(ENABLE_COMPOSE)
-
 #if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
 #include "pdf/pdf_features.h"  // nogncheck
 #endif                         // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
@@ -167,12 +163,6 @@ constexpr char kHatsSurveyTriggerTrustSafetyV2PrivacyGuide[] =
 constexpr char kHatsSurveyTriggerTrustSafetyV2SafeBrowsingInterstitial[] =
     "ts-v2-safe-browsing-interstitial";
 constexpr char kHatsSurveyTriggerWallpaperSearch[] = "wallpaper-search";
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-constexpr char kHatsSurveyTriggerComposeAcceptance[] = "compose-acceptance";
-constexpr char kHatsSurveyTriggerComposeClose[] = "compose-close";
-constexpr char kHatsSurveyTriggerComposeNudgeClose[] = "compose-nudge-close";
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
 constexpr char kHatsHistogramPrefix[] = "Feedback.HappinessTrackingSurvey.";
 
@@ -655,39 +645,6 @@ std::vector<hats::SurveyConfig> GetAllSurveyConfigs() {
       hats::SurveyConfig::ProfileAgeRequirement::kAnyAge);
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-  // Compose surveys.
-  survey_configs.emplace_back(
-      &compose::features::kHappinessTrackingSurveysForComposeAcceptance,
-      kHatsSurveyTriggerComposeAcceptance,
-      /*presupplied_trigger_id=*/std::nullopt,
-      std::vector<std::string>{
-          "Session used a modifier, like elaborate or formal",
-          "A safety filter edited a response in this session",
-          "Any error appeared in this session",
-          "This session started with nudge"},
-      std::vector<std::string>{
-          "Execution ID linked to your recent input and page context", "Url",
-          "Locale"});
-
-  survey_configs.emplace_back(
-      &compose::features::kHappinessTrackingSurveysForComposeClose,
-      kHatsSurveyTriggerComposeClose,
-      /*presupplied_trigger_id=*/std::nullopt,
-      std::vector<std::string>{
-          "Session used a modifier, like elaborate or formal",
-          "A safety filter edited a response in this session",
-          "Any error appeared in this session",
-          "This session started with nudge"},
-      std::vector<std::string>{
-          "Execution ID linked to your recent input and page context", "Url",
-          "Locale"});
-
-  survey_configs.emplace_back(
-      &compose::features::kHappinessTrackingSurveysForComposeNudgeClose,
-      kHatsSurveyTriggerComposeNudgeClose);
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
   // What's New survey.2
   survey_configs.emplace_back(

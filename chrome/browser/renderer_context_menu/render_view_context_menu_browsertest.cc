@@ -102,7 +102,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "chrome/test/supervised_user/embedded_test_server_setup_mixin.h"
 #include "chrome/test/supervised_user/supervision_mixin.h"
-#include "components/compose/buildflags.h"
 #include "components/enterprise/data_controls/core/browser/features.h"
 #include "components/enterprise/data_controls/core/browser/rule.h"
 #include "components/enterprise/data_controls/core/browser/test_utils.h"
@@ -181,10 +180,6 @@
 #include "ui/gfx/codec/jpeg_codec.h"
 #include "ui/gfx/codec/png_codec.h"
 #include "url/gurl.h"
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/compose/mock_chrome_compose_client.h"
-#endif
 
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
@@ -1541,67 +1536,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
   menu.Init();
   menu.ExecuteCommand(IDC_CONTENT_CONTEXT_EMOJI, 0);
 }
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-struct ContextMenuForComposeTestCase {
-  std::string test_name;
-  bool is_editable;
-  std::optional<blink::mojom::FormControlType> form_control_type;
-  uint64_t form_renderer_id;
-  uint64_t field_renderer_id;
-  bool should_trigger_compose_context_menu;
-  bool expected;
-};
-
-class ContextMenuForComposeBrowserTest
-    : public ContextMenuBrowserTestBase,
-      public ::testing::WithParamInterface<ContextMenuForComposeTestCase> {};
-
-IN_PROC_BROWSER_TEST_P(ContextMenuForComposeBrowserTest,
-                       TestComposeItemPresent) {
-  const ContextMenuForComposeTestCase& test_case = GetParam();
-
-  content::ContextMenuParams params;
-  params.is_editable = test_case.is_editable;
-  MockChromeComposeClient compose_client(
-      browser()->tab_strip_model()->GetActiveWebContents());
-  ON_CALL(compose_client, ShouldTriggerContextMenu(_, _))
-      .WillByDefault(Return(test_case.should_trigger_compose_context_menu));
-
-  auto menu =
-      std::make_unique<TestRenderViewContextMenu>(*browser()
-                                                       ->tab_strip_model()
-                                                       ->GetActiveWebContents()
-                                                       ->GetPrimaryMainFrame(),
-                                                  params);
-  menu->SetChromeComposeClient(&compose_client);
-  menu->Init();
-
-  ASSERT_EQ(menu->IsItemPresent(IDC_CONTEXT_COMPOSE), test_case.expected);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ContextMenuBrowserTests,
-    ContextMenuForComposeBrowserTest,
-    ::testing::ValuesIn<ContextMenuForComposeTestCase>({
-        {.test_name = "Enabled",
-         .is_editable = true,
-         .should_trigger_compose_context_menu = true,
-         .expected = true},
-        {.test_name = "NotEditable",
-         .is_editable = false,
-         .should_trigger_compose_context_menu = true,
-         .expected = false},
-        {.test_name = "ShouldNotOffer",
-         .is_editable = true,
-         .should_trigger_compose_context_menu = false,
-         .expected = false},
-    }),
-    [](const testing::TestParamInfo<
-        ContextMenuForComposeBrowserTest::ParamType>& info) {
-      return info.param.test_name;
-    });
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
 IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, CopyLinkTextMouse) {
   std::unique_ptr<TestRenderViewContextMenu> menu = CreateContextMenu(

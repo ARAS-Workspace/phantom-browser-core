@@ -153,9 +153,6 @@ source_set("impl") {
     "//ui/menus",
     "//url",
   ]
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose" ]
-  }
 
   if (enable_print_preview) {
     deps += [ "//chrome/browser/printing" ]
@@ -215,9 +212,6 @@ static_library("test_support") {
     "render_view_context_menu_test_util.cc",
   ]
   public_deps += [ "//extensions/buildflags" ]
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose" ]
-  }
 }
 
 static_library("mock_test_support") {
@@ -327,9 +321,6 @@ source_set("browser_tests") {
     "//ui/events:test_support",
     "//url",
   ]
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose:test_support" ]
-  }
 
   if (enable_pdf) {
     deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]

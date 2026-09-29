@@ -13,7 +13,6 @@
 #include "base/metrics/field_trial_params.h"
 #include "build/build_config.h"
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
-#include "components/compose/buildflags.h"
 #include "components/segmentation_platform/embedder/default_model/chrome_user_engagement.h"
 #include "components/segmentation_platform/embedder/default_model/cross_device_user_segment.h"
 #include "components/segmentation_platform/embedder/default_model/database_api_clients.h"
@@ -39,10 +38,6 @@
 #include "components/segmentation_platform/public/proto/segmentation_platform.pb.h"
 #include "components/webapps/browser/features.h"
 #include "content/public/browser/browser_context.h"
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "components/segmentation_platform/embedder/default_model/compose_promotion.h"
-#endif
 
 namespace segmentation_platform {
 
@@ -87,10 +82,6 @@ std::vector<std::unique_ptr<Config>> GetSegmentationPlatformConfig(
     configs.emplace_back(home_modules::EphemeralHomeModuleBackend::GetConfig(
         home_modules_card_registry));
   }
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-  configs.emplace_back(ComposePromotion::GetConfig());
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
   // Model used for testing.
   configs.emplace_back(OptimizationTargetSegmentationDummy::GetConfig());

@@ -141,7 +141,6 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/password_generation_util.h"
 #include "components/autofill/core/common/unique_ids.h"
-#include "components/compose/buildflags.h"
 #include "components/compose/core/browser/compose_features.h"
 #include "components/content_extraction/content/browser/inner_text.h"
 #include "components/custom_handlers/protocol_handler.h"
@@ -244,12 +243,6 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/compose/chrome_compose_client.h"
-#include "components/compose/core/browser/compose_manager.h"
-#include "components/compose/core/browser/compose_metrics.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/context_menu_helpers.h"
@@ -737,7 +730,6 @@ bool DoesFormControlTypeSupportEmoji(
   }
 }
 
-
 bool IsFrameInPdfViewer(content::RenderFrameHost* rfh) {
   if (!rfh) {
     return false;
@@ -879,7 +871,6 @@ RenderViewContextMenu::RenderViewContextMenu(
   }
   set_content_type(
       ContextMenuContentTypeFactory::Create(&render_frame_host, params));
-
 
   observers_.AddObserver(&autofill_context_menu_manager_);
 }
@@ -1185,7 +1176,6 @@ void RenderViewContextMenu::InitMenu() {
     AppendCurrentExtensionItems();
   }
 
-
   if (content_type_->SupportsGroup(
           ContextMenuContentType::ITEM_GROUP_DEVELOPER)) {
     AppendDeveloperItems();
@@ -1207,7 +1197,6 @@ void RenderViewContextMenu::InitMenu() {
       menu_model_.GetTypeAt(count - 1) == ui::MenuModel::TYPE_SEPARATOR) {
     menu_model_.RemoveItemAt(count - 1);
   }
-
 
   // Always add read write cards UI last, as it is rendered next to the context
   // menu, meaning that each menu item added/removed in this function will cause
@@ -1425,12 +1414,6 @@ const Extension* RenderViewContextMenu::GetExtension() const {
       ->GetExtensionForWebContents(source_web_contents_);
 }
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-ChromeComposeClient* RenderViewContextMenu::GetChromeComposeClient() const {
-  return ChromeComposeClient::FromWebContents(source_web_contents_);
-}
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
-
 void RenderViewContextMenu::AppendDeveloperItems() {
   // Do not Show Inspect Element for DevTools unless DevTools runs with the
   // debugFrontend query param.
@@ -1491,7 +1474,6 @@ void RenderViewContextMenu::AppendLinkItems() {
     if (in_app) {
       show_open_in_new_window = false;
     }
-
 
     const bool is_link_to_iwa = IsLinkToIsolatedWebApp();
     // Opening links to IWAs in Chrome windows is not supported - opening in
@@ -1738,7 +1720,6 @@ void RenderViewContextMenu::AppendOpenInWebAppLinkItems() {
   if (!link_app_id) {
     return;
   }
-
 
   // Only applies to apps that open in an app window.
   if (provider->registrar_unsafe().GetAppUserDisplayMode(*link_app_id) ==
@@ -2202,33 +2183,6 @@ void RenderViewContextMenu::AppendSpellingAndSearchSuggestionItems() {
                                       IDS_CONTENT_CONTEXT_EMOJI);
     }
   }
-#if BUILDFLAG(ENABLE_COMPOSE)
-  RenderFrameHost* render_frame_host = GetRenderFrameHost();
-  if (render_frame_host) {
-    auto* compose_client = GetChromeComposeClient();
-    if (compose_client &&
-        compose_client->ShouldTriggerContextMenu(render_frame_host, params_)) {
-      compose::LogComposeContextMenuCtr(
-          compose::ComposeContextMenuCtrEvent::kMenuItemDisplayed);
-      base::RecordAction(
-          base::UserMetricsAction("Compose.ContextMenu.ItemSeen"));
-      menu_model_.AddItemWithStringId(IDC_CONTEXT_COMPOSE,
-                                      IDS_COMPOSE_CONTEXT_MENU_TEXT);
-      menu_model_.SetElementIdentifierAt(
-          menu_model_.GetIndexOfCommandId(IDC_CONTEXT_COMPOSE).value(),
-          kComposeMenuItem);
-
-      // TODO(b/303646344): Remove new feature tag when no longer new.
-      menu_model_.SetIsNewFeatureAt(
-          menu_model_.GetItemCount() - 1,
-          UserEducationService::MaybeShowNewBadge(
-              GetBrowserContext(), compose::features::kEnableCompose));
-      render_separator = true;
-    }
-
-    AppendDictationItems();
-  }
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
   if (render_separator) {
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
   }
@@ -2273,7 +2227,6 @@ void RenderViewContextMenu::AppendOtherEditableItems() {
                                     IDS_CONTENT_CONTEXT_PASTE_AND_MATCH_STYLE);
   }
 
-
   if (!has_misspelled_word) {
     menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_SELECTALL,
                                     IDS_CONTENT_CONTEXT_SELECTALL);
@@ -2302,7 +2255,6 @@ void RenderViewContextMenu::AppendLanguageSettings() {
   menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_LANGUAGE_SETTINGS,
                                   IDS_CONTENT_CONTEXT_LANGUAGE_SETTINGS);
 }
-
 
 void RenderViewContextMenu::AppendDictationItems() {
   if (!base::FeatureList::IsEnabled(dictation::kDictation)) {
@@ -3118,13 +3070,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       break;
     }
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-    case IDC_CONTEXT_COMPOSE: {
-      ExecOpenCompose();
-      break;
-    }
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
-
     default:
       DUMP_WILL_BE_NOTREACHED() << "Unhandled id: " << id;
       break;
@@ -3189,7 +3134,6 @@ std::u16string RenderViewContextMenu::GetElidedSelectionText(
 void RenderViewContextMenu::EscapeAmpersands(std::u16string* text) {
   base::ReplaceChars(*text, u"&", u"&&", text);
 }
-
 
 bool RenderViewContextMenu::IsSaveAsItemAllowedByPolicy(
     const GURL& item_url) const {
@@ -3637,38 +3581,6 @@ void RenderViewContextMenu::ExecOpenLinkInProfile(int profile_index) {
       profile_path, false,
       base::BindOnce(OnBrowserCreated, params_.link_url, params_.frame_origin));
 }
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-void RenderViewContextMenu::ExecOpenCompose() {
-  ChromeComposeClient* client = GetChromeComposeClient();
-  if (!client) {
-    compose::LogOpenComposeDialogResult(
-        compose::OpenComposeDialogResult::kNoChromeComposeClient);
-    return;
-  }
-  RenderFrameHost* render_frame_host = GetRenderFrameHost();
-  if (!render_frame_host) {
-    compose::LogOpenComposeDialogResult(
-        compose::OpenComposeDialogResult::kNoRenderFrameHost);
-    return;
-  }
-  if (auto* driver = autofill::ContentAutofillDriver::GetForRenderFrameHost(
-          render_frame_host)) {
-    autofill::LocalFrameToken frame_token = driver->GetFrameToken();
-    client->GetManager().OpenCompose(
-        *driver,
-        autofill::FieldGlobalId(
-            frame_token,
-            autofill::FieldRendererId(params_.field_renderer_id.value())),
-        compose::ComposeManagerImpl::UiEntryPoint::kContextMenu);
-    BrowserUserEducationInterface::From(GetBrowser())
-        ->NotifyNewBadgeFeatureUsed(compose::features::kEnableCompose);
-  } else {
-    compose::LogOpenComposeDialogResult(
-        compose::OpenComposeDialogResult::kNoContentAutofillDriver);
-  }
-}
-#endif
 
 void RenderViewContextMenu::ExecSaveToMemoryBanks() {
   context_hub::ContextHubService* context_hub_service =

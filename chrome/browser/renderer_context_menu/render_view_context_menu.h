@@ -18,7 +18,6 @@
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/ui/autofill/autofill_context_menu_manager.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
-#include "components/compose/buildflags.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
 #include "components/renderer_context_menu/context_menu_content_type.h"
 #include "components/renderer_context_menu/render_view_context_menu_base.h"
@@ -43,9 +42,6 @@
 #endif
 
 class BrowserWindowInterface;
-#if BUILDFLAG(ENABLE_COMPOSE)
-class ChromeComposeClient;
-#endif
 class LinkToTextMenuObserver;
 class PrintPreviewContextMenuObserver;
 class Profile;
@@ -184,10 +180,6 @@ class RenderViewContextMenu
   // Returns true if keyboard lock is active and requires the user to press and
   // hold escape to exit exclusive access mode.
   bool IsPressAndHoldEscRequiredToExitFullscreen() const;
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-  virtual ChromeComposeClient* GetChromeComposeClient() const;
-#endif
 
   // RenderViewContextMenuBase:
   // The |initiator| parameter is the origin that supplied the URL being
@@ -349,9 +341,6 @@ class RenderViewContextMenu
   void ExecLanguageSettings(int event_flags);
   void ExecProtocolHandlerSettings(int event_flags);
   void ExecPictureInPicture();
-#if BUILDFLAG(ENABLE_COMPOSE)
-  void ExecOpenCompose();
-#endif
   void ExecSaveToMemoryBanks();
 
   void MediaPlayerAction(const blink::mojom::MediaPlayerAction& action);

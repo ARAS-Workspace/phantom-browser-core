@@ -152,10 +152,6 @@ group("resources") {
     public_deps += [ "certificate_viewer:resources" ]
   }
 
-  if (enable_compose) {
-    public_deps += [ "compose:resources" ]
-  }
-
   if (enterprise_watermark) {
     public_deps += [ "watermark:resources" ]
   }

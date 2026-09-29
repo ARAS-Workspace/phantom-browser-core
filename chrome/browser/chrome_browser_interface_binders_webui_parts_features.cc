@@ -5,7 +5,6 @@
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
-#include "components/compose/buildflags.h"
 #include "components/enterprise/buildflags/buildflags.h"
 #include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/safe_browsing/buildflags.h"
@@ -19,11 +18,6 @@
 #include "chrome/browser/resources/certificate_manager/certificate_manager.mojom.h"
 #include "chrome/browser/ui/webui/certificate_manager/certificate_manager_ui.h"
 #endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/ui/webui/compose/compose_untrusted_ui.h"
-#include "chrome/common/compose/compose.mojom.h"
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "chrome/browser/ui/webui/signin/cross_device_signin_qr_bubble/cross_device_signin_qr_bubble.mojom.h"
@@ -39,7 +33,6 @@
 #if !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "components/guest_view/browser/slim_web_view/slim_web_view.mojom.h"  // nogncheck
 #endif
-
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 #include "chrome/browser/ui/webui/tab_strip_internals/tab_strip_internals_ui.h"
@@ -88,7 +81,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
 #if !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #endif
 
-
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   RegisterWebUIControllerInterfaceBinder<
       tab_strip_internals::mojom::PageHandlerFactory, TabStripInternalsUI>(map);
@@ -106,11 +98,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
 }
 
 void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsFeatures(
-    content::WebUIBrowserInterfaceBrokerRegistry& registry) {
-#if BUILDFLAG(ENABLE_COMPOSE)
-  registry.ForWebUI<ComposeUntrustedUI>()
-      .Add<compose::mojom::ComposeSessionUntrustedPageHandlerFactory>();
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
-}
+    content::WebUIBrowserInterfaceBrokerRegistry& registry) {}
 
 }  // namespace chrome::internal

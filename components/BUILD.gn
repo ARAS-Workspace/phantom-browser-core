@@ -687,10 +687,6 @@ test("components_unittests") {
     ]
   }
 
-  if (enable_compose) {
-    deps += [ "//components/compose/core/browser:unit_tests" ]
-  }
-
   # Only supported on cast-enabled platforms.
 
   if (is_mac) {

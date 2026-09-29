@@ -87,7 +87,6 @@
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/commerce/core/feature_utils.h"
 #include "components/commerce/core/shopping_service.h"
-#include "components/compose/buildflags.h"
 #include "components/compose/core/browser/compose_features.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/favicon_base/favicon_url_parser.h"
@@ -126,10 +125,6 @@
 #include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/compose/compose_enabling.h"
-#endif
-
 #if !BUILDFLAG(OPTIMIZE_WEBUI)
 #include "chrome/grit/settings_shared_resources.h"
 #include "chrome/grit/settings_shared_resources_map.h"
@@ -150,7 +145,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/webui/settings/mac_system_settings_handler.h"
 #endif
-
 
 #if BUILDFLAG(ENABLE_VR)
 #include "device/vr/public/cpp/features.h"
@@ -195,7 +189,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   AddSettingsPageUIHandler(std::make_unique<ImportDataHandler>());
   AddSettingsPageUIHandler(std::make_unique<HatsHandler>());
 
-
   AddSettingsPageUIHandler(
       std::make_unique<MediaDevicesSelectionHandler>(profile));
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -216,7 +209,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   AddSettingsPageUIHandler(std::make_unique<DefaultBrowserHandler>());
   AddSettingsPageUIHandler(std::make_unique<ManageProfileHandler>(profile));
   AddSettingsPageUIHandler(std::make_unique<SystemHandler>());
-
 
 #if BUILDFLAG(IS_MAC)
   AddSettingsPageUIHandler(std::make_unique<MacSystemSettingsHandler>());
@@ -256,7 +248,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       "showSearchAggregatorSuggest",
       template_url_service->GetEnterpriseSearchAggregatorEngine());
 
-
   html_source->AddBoolean("enableHandTrackingContentSetting",
 #if BUILDFLAG(ENABLE_VR)
                           device::features::IsHandTrackingEnabled());
@@ -272,17 +263,12 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       "enableKeyboardLockPrompt",
       base::FeatureList::IsEnabled(permissions::features::kKeyboardLockPrompt));
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-  const bool compose_enabled = ComposeEnabling::IsEnabledForProfile(profile);
-#else
   const bool compose_enabled = false;
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
   html_source->AddBoolean(
       "enableComposeProactiveNudge",
       compose_enabled && base::FeatureList::IsEnabled(
                              compose::features::kEnableComposeProactiveNudge));
-
 
   const bool download_bubble_controlled_by_pref = true;
   html_source->AddBoolean("downloadBubblePartialViewControlledByPref",

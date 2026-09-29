@@ -23,10 +23,6 @@ class ContextMenuMatcher;
 }
 #endif
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-class ChromeComposeClient;
-#endif
-
 namespace custom_handlers {
 class ProtocolHandlerRegistry;
 }
@@ -110,9 +106,6 @@ class TestRenderViewContextMenu : public RenderViewContextMenu {
   // RenderViewContextMenu:
   void Show() override;
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-  void SetChromeComposeClient(ChromeComposeClient* compose_client);
-#endif
   // If `browser` is not null, sets it as the return value of GetBrowser(),
   // overriding the base class behavior. If the Browser object is destroyed
   // before this class is, then SetBrowser(nullptr) should be called. If
@@ -123,16 +116,8 @@ class TestRenderViewContextMenu : public RenderViewContextMenu {
   // RenderViewContextMenu:
   BrowserWindowInterface* GetBrowser() const override;
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-  ChromeComposeClient* GetChromeComposeClient() const override;
-#endif
-
  private:
   raw_ptr<BrowserWindowInterface> browser_ = nullptr;
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-  raw_ptr<ChromeComposeClient> compose_client_ = nullptr;
-#endif
 };
 
 #endif  // CHROME_BROWSER_RENDERER_CONTEXT_MENU_RENDER_VIEW_CONTEXT_MENU_TEST_UTIL_H_

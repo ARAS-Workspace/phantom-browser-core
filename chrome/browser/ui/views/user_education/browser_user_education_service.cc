@@ -83,7 +83,6 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/bookmarks/common/bookmark_bar_visibility_state.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
-#include "components/compose/buildflags.h"
 #include "components/compose/core/browser/compose_features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/desktop_to_mobile_promos/features.h"
@@ -130,11 +129,9 @@
 #include "ui/views/vector_icons.h"
 #include "ui/views/view_utils.h"
 
-
 #if BUILDFLAG(IS_MAC)
 #include "components/user_education/views/help_bubble_factory_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
-
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/ui/webui/extensions_zero_state_promo/zero_state_promo_ui.h"
@@ -571,7 +568,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "Triggered after autofill popup appears featuring an "
                        "externally-saved card.")));
 
-
   // TODO(crbug.com/404437008): Update with final IPH strings.
   // kIPHAutofillEnableLoyaltyCardsFeature:
   registry.RegisterFeature(std::move(
@@ -923,7 +919,6 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(131, "nguyenbryan@google.com",
                        "Triggered by certain URLs to start the Lens Overlay "
                        "tutorial.")));
-
 
   // kIPHPowerBookmarksSidePanelFeature:
   registry.RegisterFeature(
@@ -1664,18 +1659,6 @@ void MaybeRegisterChromeFeaturePromos(
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-  // kIPHComposeMSBBSettingsFeature:
-  registry.RegisterFeature(
-      std::move(FeaturePromoSpecification::CreateForToastPromo(
-                    feature_engagement::kIPHComposeMSBBSettingsFeature,
-                    kAnonymizedUrlCollectionPersonalizationSettingId,
-                    IDS_COMPOSE_MSBB_IPH_BUBBLE_TEXT,
-                    IDS_COMPOSE_MSBB_IPH_BUBBLE_TEXT_SCREENREADER,
-                    FeaturePromoSpecification::AcceleratorInfo())
-                    .SetBubbleArrow(HelpBubbleArrow::kBottomRight)));
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
-
   // kIPHVerticalTabstripTutorialFeature:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForTutorialPromo(
@@ -1706,7 +1689,6 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(148, "charlesmeng@chromium.org",
                        "Triggered when the vertical tabs is enabled and the "
                        "user has not enabled expand on hover before.")));
-
 
   // kIPHSplitViewHorizontalIndirectAccessFeature:
   if (tabs::IsSplitViewHorizontalIndirectAccessEnabled()) {

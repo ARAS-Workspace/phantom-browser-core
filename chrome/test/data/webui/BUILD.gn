@@ -116,10 +116,6 @@ source_set("browser_tests") {
     sources += [ "media_router/cast_feedback_ui_browsertest.cc" ]
   }
 
-  if (enable_compose) {
-    deps += [ "//chrome/browser/compose" ]
-  }
-
   sources += [ "cr_components/cr_components_browsertest.cc" ]
   deps += [
     "//components/history_clusters/core",
@@ -223,11 +219,6 @@ source_set("browser_tests") {
     "//net:test_support",
   ]
 
-  if (enable_compose) {
-    sources += [ "compose/compose_browsertest.cc" ]
-    deps += [ "//components/compose/core/browser:features" ]
-  }
-
   if (enable_webui_certificate_viewer) {
     sources +=
         [ "certificate_viewer_dialog/certificate_viewer_dialog_browsertest.cc" ]
@@ -307,14 +298,6 @@ source_set("interactive_ui_tests") {
     "//components/search",
     "//third_party/omnibox_proto",
   ]
-
-  if (enable_compose) {
-    sources += [ "compose/compose_focus_interactive_uitest.cc" ]
-    deps += [
-      "//chrome/browser/compose",
-      "//components/compose/core/browser:features",
-    ]
-  }
 }
 
 grit("resources") {
@@ -637,11 +620,6 @@ generate_grd("build_grd") {
       "$target_gen_dir/intro/resources.grdp",
       "$target_gen_dir/signin/signout_confirmation/resources.grdp",
     ]
-  }
-
-  if (enable_compose) {
-    deps += [ "compose:build_grdp" ]
-    grdp_files += [ "$target_gen_dir/compose/resources.grdp" ]
   }
 
   if (is_mac) {

@@ -11,10 +11,6 @@
 
 #if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/ui/webui/data_sharing/data_sharing_ui.h"
-#include "components/compose/buildflags.h"
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/ui/webui/compose/compose_untrusted_ui.h"
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 #endif  // defined(TOOLKIT_VIEWS)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
@@ -30,10 +26,6 @@ void RegisterChromeUntrustedWebUIConfigs() {
 
 #if defined(TOOLKIT_VIEWS)
   map.AddUntrustedWebUIConfig(std::make_unique<DataSharingUIConfig>());
-
-#if BUILDFLAG(ENABLE_COMPOSE)
-  map.AddUntrustedWebUIConfig(std::make_unique<ComposeUIUntrustedConfig>());
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
 #endif  // defined(TOOLKIT_VIEWS)
 
