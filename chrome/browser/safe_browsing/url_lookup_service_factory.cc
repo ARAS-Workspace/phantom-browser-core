@@ -9,7 +9,6 @@
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/safe_browsing/chrome_user_population_helper.h"
-#include "chrome/browser/safe_browsing/client_side_detection_intelligent_scan_delegate_factory.h"
 #include "chrome/browser/safe_browsing/network_context_service_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
@@ -61,7 +60,6 @@ RealTimeUrlLookupServiceFactory::RealTimeUrlLookupServiceFactory()
   DependsOn(SafeBrowsingNavigationObserverManagerFactory::GetInstance());
 #if BUILDFLAG(FULL_SAFE_BROWSING)
 #endif
-  DependsOn(ClientSideDetectionIntelligentScanDelegateFactory::GetInstance());
   DependsOn(NetworkContextServiceFactory::GetInstance());
 }
 
@@ -95,7 +93,7 @@ RealTimeUrlLookupServiceFactory::BuildServiceInstanceForBrowserContext(
       SafeBrowsingNavigationObserverManagerFactory::GetForBrowserContext(
           profile),
       WebUIContentInfoSingleton::GetInstance(),
-      ClientSideDetectionIntelligentScanDelegateFactory::GetForProfile(profile),
+      /*intelligent_scan_delegate=*/nullptr,
       base::BindRepeating(&RealTimeUrlLookupServiceFactory::GetNetworkContext,
                           profile));
 }

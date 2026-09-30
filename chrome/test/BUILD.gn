@@ -2604,8 +2604,6 @@ test("browser_tests") {
   # NOTE: This is the main "browser_tests" section for |is_chromeos|.
   if (safe_browsing_mode == 1) {
     sources += [
-      "../browser/safe_browsing/chrome_client_side_detection_host_delegate_browsertest.cc",
-      "../browser/safe_browsing/client_side_detection_host_browsertest.cc",
       "../browser/safe_browsing/ohttp_key_service_browsertest.cc",
       "../browser/safe_browsing/safe_browsing_blocking_page_test.cc",
       "../browser/safe_browsing/safe_browsing_navigation_observer_browsertest.cc",

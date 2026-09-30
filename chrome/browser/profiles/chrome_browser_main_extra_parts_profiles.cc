@@ -477,8 +477,6 @@
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/chrome_enterprise_url_lookup_service_factory.h"
 #include "chrome/browser/safe_browsing/chrome_ping_manager_factory.h"
-#include "chrome/browser/safe_browsing/client_side_detection_intelligent_scan_delegate_factory.h"
-#include "chrome/browser/safe_browsing/client_side_detection_service_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
 #include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
@@ -921,9 +919,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::GetInstance();
   safe_browsing::ChromePingManagerFactory::GetInstance();
-  safe_browsing::ClientSideDetectionIntelligentScanDelegateFactory::
-      GetInstance();
-  safe_browsing::ClientSideDetectionServiceFactory::GetInstance();
 #endif
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   safe_browsing::HashRealTimeServiceFactory::GetInstance();
