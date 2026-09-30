@@ -35,7 +35,6 @@
 #include "chrome/browser/download/download_ui_model.h"
 #include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/offline_item_utils.h"
-#include "chrome/browser/enterprise/connectors/common.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/grit/generated_resources.h"

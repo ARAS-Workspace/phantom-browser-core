@@ -27,7 +27,6 @@
 #include "chrome/browser/download/download_query.h"
 #include "chrome/browser/download/download_stats.h"
 #include "chrome/browser/download/download_ui_safe_browsing_util.h"
-#include "chrome/browser/enterprise/connectors/common.h"
 #include "chrome/browser/extensions/api/downloads/downloads_api.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"

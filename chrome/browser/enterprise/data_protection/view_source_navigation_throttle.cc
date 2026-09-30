@@ -9,7 +9,6 @@
 #include "chrome/browser/devtools/devtools_availability_checker.h"
 #include "chrome/browser/devtools/devtools_policy_dialog.h"
 #include "chrome/browser/devtools/features.h"
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/policy/developer_tools_policy_checker.h"
 #include "chrome/browser/policy/developer_tools_policy_checker_factory.h"
 #include "chrome/browser/profiles/profile.h"
@@ -46,20 +45,6 @@ bool IsViewSourceAllowedByPolicy(Profile* profile,
   // the URL being viewed, not the "view-source:" URL itself.
   return IsInspectionAllowed(profile->GetOriginalProfile(),
                              navigation_handle->GetURL());
-}
-
-bool IsEnterpriseLookupEnabled(Profile* profile) {
-  // Some tests return a non-null pointer for the enterprise lookup service,
-  // so we need to defensively check if enterprise lookup is enabled.
-  auto* connectors_service =
-      enterprise_connectors::ConnectorsServiceFactory::GetForBrowserContext(
-          profile);
-  bool has_valid_dm_token =
-      connectors_service &&
-      connectors_service->GetDMTokenForRealTimeUrlCheck().has_value();
-  return safe_browsing::RealTimePolicyEngine::CanPerformEnterpriseFullURLLookup(
-      profile->GetPrefs(), has_valid_dm_token, profile->IsOffTheRecord(),
-      profile->IsGuestSession());
 }
 
 // Helper function to create an UnsafeResource from an RTLookupResponse.

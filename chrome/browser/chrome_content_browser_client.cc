@@ -574,7 +574,6 @@
 #endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "components/safe_browsing/core/browser/realtime/chrome_enterprise_url_lookup_service.h"
 #endif
@@ -4639,24 +4638,6 @@ ChromeContentBrowserClient::MaybeCreateSafeBrowsingURLLoaderThrottle(
     return nullptr;
   }
   bool has_valid_dm_token = false;
-  auto* connectors_service =
-      enterprise_connectors::ConnectorsServiceFactory::GetForBrowserContext(
-          browser_context);
-  if (connectors_service) {
-    base::expected<std::string, enterprise_connectors::ConnectorsServiceBase::
-                                    NoDMTokenForRealTimeUrlCheckReason>
-        dm_token = connectors_service->GetDMTokenForRealTimeUrlCheck();
-    has_valid_dm_token = dm_token.has_value();
-    if (dm_token.has_value()) {
-      base::UmaHistogramBoolean(
-          "SafeBrowsing.RT.EnterpriseRealTimePolicyEnabled.HasDmToken", true);
-    } else if (dm_token.error() ==
-               enterprise_connectors::ConnectorsServiceBase::
-                   NoDMTokenForRealTimeUrlCheckReason::kNoDmToken) {
-      base::UmaHistogramBoolean(
-          "SafeBrowsing.RT.EnterpriseRealTimePolicyEnabled.HasDmToken", false);
-    }
-  }
   bool is_enterprise_lookup_enabled =
       safe_browsing::RealTimePolicyEngine::CanPerformEnterpriseFullURLLookup(
           profile->GetPrefs(), has_valid_dm_token, profile->IsOffTheRecord(),

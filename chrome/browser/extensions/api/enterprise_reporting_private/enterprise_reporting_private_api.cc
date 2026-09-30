@@ -19,7 +19,6 @@
 #include "base/task/thread_pool.h"
 #include "base/values.h"
 #include "build/build_config.h"
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/enterprise/signals/device_info_fetcher.h"
 #include "chrome/browser/enterprise/util/affiliation.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"

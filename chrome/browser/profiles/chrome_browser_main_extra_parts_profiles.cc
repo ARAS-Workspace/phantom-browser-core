@@ -77,7 +77,6 @@
 #include "chrome/browser/download/download_core_service_factory.h"
 #include "chrome/browser/engagement/site_engagement_service_factory.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_url_lookup_service_factory.h"
 #include "chrome/browser/enterprise/identifiers/profile_id_service_factory.h"
 #include "chrome/browser/enterprise/net/enterprise_network_auth_service_factory.h"
@@ -654,7 +653,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   EnclaveManagerFactory::GetInstance();
   enterprise::ProfileIdServiceFactory::GetInstance();
   enterprise_commands::UserRemoteCommandsServiceFactory::GetInstance();
-  enterprise_connectors::ConnectorsServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (enterprise_custom_headers::IsHttpHeaderInjectionEnabled()) {
     enterprise_custom_headers::HttpHeaderInjectionServiceFactory::GetInstance();

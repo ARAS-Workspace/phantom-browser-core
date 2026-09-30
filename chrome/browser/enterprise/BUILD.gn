@@ -12,9 +12,6 @@ source_set("enterprise") {
     "browser_management/browser_management_status_provider.h",
     "browser_management/management_service_factory.h",
     "chrome_browser_main_extra_parts_enterprise.h",
-    "connectors/connectors_manager.h",
-    "connectors/connectors_service.h",
-    "connectors/referrer_cache_utils.h",
     "core/dependency_factory_impl.h",
     "encryption/cache_encryption_provider_impl.h",
     "identifiers/profile_id_delegate_impl.h",
@@ -222,10 +219,6 @@ source_set("enterprise") {
     public_deps += [ "//components/enterprise/idle" ]
   }
 
-  if (safe_browsing_mode == 1) {
-    public += [ "connectors/common.h" ]
-  }
-
   if (is_linux || is_mac) {
     public += [
       "idle/dialog_manager.h",
@@ -296,9 +289,6 @@ source_set("impl") {
     "browser_management/browser_management_status_provider.cc",
     "browser_management/management_service_factory.cc",
     "chrome_browser_main_extra_parts_enterprise.cc",
-    "connectors/connectors_manager.cc",
-    "connectors/connectors_service.cc",
-    "connectors/referrer_cache_utils.cc",
     "core/dependency_factory_impl.cc",
     "data_protection/data_protection_features.cc",
     "data_protection/data_protection_navigation_controller.cc",
@@ -534,7 +524,6 @@ source_set("impl") {
   }
 
   if (safe_browsing_mode == 1) {
-    sources += [ "connectors/common.cc" ]
     deps += [ "//components/enterprise/common/proto:chrome_reporting_entity" ]
   }
 

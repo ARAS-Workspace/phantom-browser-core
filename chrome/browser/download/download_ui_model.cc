@@ -20,7 +20,6 @@
 #include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/download/status_text_builder_utils.h"
-#include "chrome/browser/enterprise/connectors/common.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/grit/branded_strings.h"

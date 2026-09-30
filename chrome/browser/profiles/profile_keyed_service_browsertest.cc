@@ -427,7 +427,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 
     "BtmBrowserSigninDetector",
     "ClientHints",
-    "ConnectorsService",
     "DataControlsRulesService",
     "DownloadBubbleUpdateService",
     "EnterpriseManagementService",

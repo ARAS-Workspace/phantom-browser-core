@@ -17,7 +17,6 @@
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/download/download_core_service.h"
 #include "chrome/browser/download/download_core_service_factory.h"
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"

@@ -11,7 +11,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/enterprise/data_controls/chrome_rules_service.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_features.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_url_lookup_service_factory.h"
@@ -142,14 +141,7 @@ bool SkipUrl(const GURL& url) {
 
 bool IsEnterpriseLookupEnabled(Profile* profile) {
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // Some tests return a non-null pointer for the enterprise lookup service,
-  // so we need to defensively check if enterprise lookup is enabled.
-  auto* connectors_service =
-      enterprise_connectors::ConnectorsServiceFactory::GetForBrowserContext(
-          profile);
-  bool has_valid_dm_token =
-      connectors_service &&
-      connectors_service->GetDMTokenForRealTimeUrlCheck().has_value();
+  bool has_valid_dm_token = false;
   return safe_browsing::RealTimePolicyEngine::CanPerformEnterpriseFullURLLookup(
       profile->GetPrefs(), has_valid_dm_token, profile->IsOffTheRecord(),
       profile->IsGuestSession());
@@ -183,9 +175,7 @@ void DoLookup(safe_browsing::RealTimeUrlLookupServiceBase* lookup_service,
 }
 
 std::string GetIdentifier(content::BrowserContext* browser_context) {
-  return enterprise_connectors::ConnectorsServiceFactory::GetForBrowserContext(
-             browser_context)
-      ->GetRealTimeUrlCheckIdentifier();
+  return std::string();
 }
 
 void LogVerdictSource(
