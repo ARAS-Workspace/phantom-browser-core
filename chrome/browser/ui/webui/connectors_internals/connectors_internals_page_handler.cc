@@ -16,8 +16,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "chrome/browser/enterprise/client_certificates/certificate_provisioning_service_factory.h"
-#include "chrome/browser/enterprise/connectors/device_trust/device_trust_connector_service_factory.h"
-#include "chrome/browser/enterprise/connectors/device_trust/device_trust_service_factory.h"
 #include "chrome/browser/enterprise/reporting/cloud_profile_reporting_service.h"
 #include "chrome/browser/enterprise/reporting/cloud_profile_reporting_service_factory.h"
 #include "chrome/browser/enterprise/signals/signals_aggregator_factory.h"
@@ -41,11 +39,6 @@
 #include "net/cert/x509_certificate.h"
 
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
-#include "components/enterprise/device_trust/core/device_trust_connector_service.h"  // nogncheck
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/enterprise/connectors/device_trust/key_management/core/mac/secure_enclave_client.h"
-#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
 #include "chrome/browser/browser_process.h"
@@ -61,15 +54,6 @@ namespace {
 constexpr char kProfile[] = "Profile";
 constexpr char kBrowser[] = "Browser";
 #endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
-
-std::string ConvertPolicyLevelToString(DTCPolicyLevel level) {
-  switch (level) {
-    case DTCPolicyLevel::kBrowser:
-      return "Browser";
-    case DTCPolicyLevel::kUser:
-      return "User";
-  }
-}
 
 std::string GetStringFromTimestamp(base::Time timestamp) {
   using base::i18n::DateTimeFormatterOptions;
@@ -99,45 +83,21 @@ ConnectorsInternalsPageHandler::~ConnectorsInternalsPageHandler() = default;
 
 void ConnectorsInternalsPageHandler::GetDeviceTrustState(
     GetDeviceTrustStateCallback callback) {
-  auto* device_trust_service =
-      DeviceTrustServiceFactory::GetForProfile(profile_);
-
-  // The factory will not return a service if the profile is off-the-record, or
-  // if the current management configuration is not supported.
-  if (!device_trust_service) {
-    auto state = connectors_internals::mojom::DeviceTrustState::New(
-        false, std::vector<std::string>(),
-        connectors_internals::mojom::KeyInfo::New(
-            connectors_internals::mojom::KeyManagerInitializedValue::
-                UNSUPPORTED,
-            nullptr,
-            connectors_internals::mojom::KeyManagerPermanentFailure::
-                UNSPECIFIED),
-        std::string(), nullptr);
-    std::move(callback).Run(std::move(state));
-    return;
-  }
-
-  // Since this page is used for debugging purposes, show the signals regardless
-  // of the policy value (i.e. even if service->IsEnabled is false).
-  device_trust_service->GetSignals(
-      base::BindOnce(&ConnectorsInternalsPageHandler::OnSignalsCollected,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(callback),
-                     device_trust_service->IsEnabled()));
+  auto state = connectors_internals::mojom::DeviceTrustState::New(
+      false, std::vector<std::string>(),
+      connectors_internals::mojom::KeyInfo::New(
+          connectors_internals::mojom::KeyManagerInitializedValue::
+              UNSUPPORTED,
+          nullptr,
+          connectors_internals::mojom::KeyManagerPermanentFailure::
+              UNSPECIFIED),
+      std::string(), nullptr);
+  std::move(callback).Run(std::move(state));
 }
 
 void ConnectorsInternalsPageHandler::DeleteDeviceTrustKey(
     DeleteDeviceTrustKeyCallback callback) {
-#if BUILDFLAG(IS_MAC)
-  auto client = SecureEnclaveClient::Create();
-
-  // Delete both the permanent and temporary keys.
-  client->DeleteKey(SecureEnclaveClient::KeyType::kTemporary);
-  client->DeleteKey(SecureEnclaveClient::KeyType::kPermanent);
-  std::move(callback).Run();
-#else
   NOTIMPLEMENTED();
-#endif  // BUILDFLAG(IS_MAC)
 }
 
 void ConnectorsInternalsPageHandler::GetClientCertificateState(
@@ -294,14 +254,6 @@ void ConnectorsInternalsPageHandler::OnSignalsCollected(
   }
 
   std::vector<std::string> policy_enabled_levels;
-  auto* device_trust_connector_service =
-      DeviceTrustConnectorServiceFactory::GetForProfile(profile_);
-  if (device_trust_connector_service) {
-    for (const auto& level :
-         device_trust_connector_service->GetSignalsPolicyScope()) {
-      policy_enabled_levels.push_back(ConvertPolicyLevelToString(level));
-    }
-  }
 
   auto state = connectors_internals::mojom::DeviceTrustState::New(
       is_device_trust_enabled, policy_enabled_levels, utils::GetKeyInfo(),

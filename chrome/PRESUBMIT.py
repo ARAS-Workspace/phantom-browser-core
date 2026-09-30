@@ -230,7 +230,6 @@ def _CheckNoBaseRunLoopInChrome(input_api, output_api):
         'chrome/browser/btm/btm_browser_signin_detector_factory.h',
         'chrome/browser/chrome_browser_main.cc',
         'chrome/browser/chrome_browser_main.h',
-        'chrome/browser/enterprise/connectors/device_trust/key_management/installer/management_service/rotate_util.cc',
         'chrome/browser/extensions/blocked_action_waiter.h',
         'chrome/browser/extensions/load_error_waiter.h',
         'chrome/browser/extensions/startup_helper.cc',

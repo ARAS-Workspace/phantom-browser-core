@@ -15,7 +15,6 @@ PROGNAME=chrome
 INSTALLDIR=/opt/google/chrome
 
 # Directory for device policy enrollments.
-ENROLLMENTDIR=/etc/opt/chrome/policies/enrollment
 
 # Display string for desktop menu/icon.
 MENUNAME="Google Chrome"

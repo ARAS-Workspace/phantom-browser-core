@@ -1069,7 +1069,6 @@ source_set("core") {
       ":global_keyboard_shortcuts_mac",
       "//chrome/app_shim",
       "//chrome/browser/apps/app_shim",
-      "//chrome/browser/enterprise/connectors/device_trust/key_management/core/mac",
       "//chrome/browser/mac",
       "//chrome/browser/mac:impl",
       "//chrome/browser/renderer_host:delegate",
@@ -2279,7 +2278,6 @@ source_set("browser") {
 
   if (is_linux || is_mac) {
     deps += [
-      "//chrome/browser/enterprise/connectors/device_trust/key_management/core/persistence",
       "//chrome/browser/headless:metrics",
       "//chrome/browser/search_integrity",
       "//chrome/browser/ui/views/session_restore_infobar",

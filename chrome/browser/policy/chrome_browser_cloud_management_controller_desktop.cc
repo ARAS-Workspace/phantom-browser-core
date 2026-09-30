@@ -19,7 +19,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/key_loader.h"
 #include "chrome/browser/enterprise/remote_commands/cbcm_remote_commands_factory.h"
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
@@ -52,8 +51,6 @@
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/client_certificates/browser_context_delegate.h"
 #include "chrome/browser/enterprise/client_certificates/cert_utils.h"
-#include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/device_trust_key_manager_impl.h"
-#include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/key_rotation_launcher.h"
 #include "components/enterprise/browser/reporting/saas_usage/saas_usage_reporting_delegate_factory.h"
 #include "components/enterprise/client_certificates/core/browser_cloud_management_delegate.h"
 #include "components/enterprise/client_certificates/core/certificate_provisioning_service.h"
@@ -220,27 +217,6 @@ bool ChromeBrowserCloudManagementControllerDesktop::ReadyToInit() {
 std::unique_ptr<ClientDataDelegate>
 ChromeBrowserCloudManagementControllerDesktop::CreateClientDataDelegate() {
   return std::make_unique<ClientDataDelegateDesktop>();
-}
-
-std::unique_ptr<enterprise_connectors::DeviceTrustKeyManager>
-ChromeBrowserCloudManagementControllerDesktop::CreateDeviceTrustKeyManager() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  auto* browser_dm_token_storage = BrowserDMTokenStorage::Get();
-  auto* device_management_service = GetDeviceManagementService();
-  auto shared_url_loader_factory = GetSharedURLLoaderFactory();
-
-  auto key_rotation_launcher =
-      enterprise_connectors::KeyRotationLauncher::Create(
-          browser_dm_token_storage, device_management_service,
-          shared_url_loader_factory);
-  auto key_loader = enterprise_connectors::KeyLoader::Create(
-      device_management_service, shared_url_loader_factory);
-
-  return std::make_unique<enterprise_connectors::DeviceTrustKeyManagerImpl>(
-      std::move(key_rotation_launcher), std::move(key_loader));
-#else
-  return nullptr;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 }
 
 std::unique_ptr<client_certificates::CertificateProvisioningService>

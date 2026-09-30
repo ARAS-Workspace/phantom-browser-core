@@ -62,8 +62,6 @@ class ChromeBrowserCloudManagementControllerDesktop
   bool ReadyToCreatePolicyManager() override;
   bool ReadyToInit() override;
   std::unique_ptr<ClientDataDelegate> CreateClientDataDelegate() override;
-  std::unique_ptr<enterprise_connectors::DeviceTrustKeyManager>
-  CreateDeviceTrustKeyManager() override;
   std::unique_ptr<client_certificates::CertificateProvisioningService>
   CreateCertificateProvisioningService() override;
 

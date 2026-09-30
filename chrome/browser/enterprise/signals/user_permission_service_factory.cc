@@ -20,9 +20,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "content/public/browser/browser_context.h"
 
-#include "chrome/browser/enterprise/connectors/device_trust/device_trust_connector_service_factory.h"
-#include "components/enterprise/device_trust/core/device_trust_connector_service.h"  // nogncheck
-
 namespace enterprise_signals {
 
 // static
@@ -49,8 +46,6 @@ UserPermissionServiceFactory::UserPermissionServiceFactory()
               .Build()) {
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(policy::ManagementServiceFactory::GetInstance());
-  DependsOn(
-      enterprise_connectors::DeviceTrustConnectorServiceFactory::GetInstance());
 }
 
 UserPermissionServiceFactory::~UserPermissionServiceFactory() = default;
@@ -62,15 +57,6 @@ UserPermissionServiceFactory::BuildServiceInstanceForBrowserContext(
 
   device_signals::UserDelegate::SignalsDependencyDelegate*
       signals_dependency_delegate = nullptr;
-  signals_dependency_delegate =
-      enterprise_connectors::DeviceTrustConnectorServiceFactory::GetForProfile(
-          profile);
-
-  if (!signals_dependency_delegate) {
-    // Unsupported configuration (e.g. CrOS login Profile supported, but not
-    // incognito).
-    return nullptr;
-  }
 
   auto* management_service =
       policy::ManagementServiceFactory::GetForProfile(profile);

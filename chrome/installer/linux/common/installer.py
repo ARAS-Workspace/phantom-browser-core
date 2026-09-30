@@ -507,12 +507,6 @@ class InstallerConfig:
                 StandardPermissions.EXECUTABLE,
             ),
             Artifact(
-                "chrome_management_service.stripped",
-                "chrome-management-service",
-                ArtifactType.BINARY,
-                StandardPermissions.EXECUTABLE,
-            ),
-            Artifact(
                 "lib/libc++.so",
                 "lib/libc++.so",
                 ArtifactType.BINARY,
@@ -1227,9 +1221,7 @@ class Installer:
                 except subprocess.CalledProcessError:
                     file_type = ""
 
-                if base_name == "chrome-management-service":
-                    expected_perms = StandardPermissions.EXECUTABLE
-                elif base_name == "chrome-sandbox":
+                if base_name == "chrome-sandbox":
                     expected_perms = StandardPermissions.SANDBOX
                 elif "shell script" in file_type:
                     expected_perms = StandardPermissions.EXECUTABLE

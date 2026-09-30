@@ -951,7 +951,6 @@ source_set("impl") {
   # is enabled there.
   if (enterprise_client_certificates) {
     deps += [
-      "//chrome/browser/enterprise/connectors/device_trust/key_management/browser",
       "//components/enterprise/client_certificates/core:management_delegate",
     ]
   }

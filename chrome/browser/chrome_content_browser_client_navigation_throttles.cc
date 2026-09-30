@@ -137,8 +137,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/enterprise/connectors/device_trust/navigation_throttle.h"
-
 #include "chrome/browser/enterprise/incognito/incognito_navigation_throttle.h"
 #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"
 #include "chrome/browser/extensions/user_script_listener.h"
@@ -360,11 +358,6 @@ void CreateAndAddChromeThrottlesForNavigation(
         std::make_unique<enterprise_webstore::ChromeWebStoreNavigationThrottle>(
             registry));
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  enterprise_connectors::DeviceTrustNavigationThrottle::MaybeCreateAndAdd(
-      registry);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   // AimEligibilityRefreshNavigationThrottle must be registered before

@@ -2186,11 +2186,7 @@ source_set("browser_tests") {
     }
 
     if (is_linux || is_mac) {
-      sources += [ "//chrome/browser/enterprise/connectors/device_trust/device_trust_browsertest.cc" ]
-
       deps += [
-        "//chrome/browser/enterprise/connectors/device_trust:features",
-        "//chrome/browser/enterprise/connectors/device_trust/test:test_support",
         "//chrome/browser/enterprise/network_header_injection:browser_tests",
         "//components/device_signals/core/common",
         "//components/device_signals/core/common:features",
@@ -2202,8 +2198,6 @@ source_set("browser_tests") {
 
     if (is_linux || is_mac) {
       deps += [
-        "//chrome/browser/enterprise/connectors/device_trust/key_management/browser/commands:test_support",
-        "//chrome/browser/enterprise/connectors/device_trust/key_management/core/persistence:test_support",
         "//chrome/browser/ui/webui/app_home:mojo_bindings",
         "//components/device_signals/core/browser",
       ]
