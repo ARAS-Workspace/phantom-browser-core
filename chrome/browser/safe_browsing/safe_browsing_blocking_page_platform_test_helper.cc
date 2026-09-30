@@ -29,7 +29,6 @@
 #include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/browser/safe_browsing/chrome_safe_browsing_blocking_page_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "components/enterprise/connectors/core/common.h"
 #include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "components/policy/policy_constants.h"
@@ -392,26 +391,6 @@ void SafeBrowsingBlockingPageRealTimeUrlCheckTest::CreatedBrowserMainParts(
   SafeBrowsingService::RegisterFactory(&factory_);
 }
 
-void SafeBrowsingBlockingPageRealTimeUrlCheckTest::
-    SetupUrlRealTimeVerdictInCacheManager(
-        GURL url,
-        Profile* profile,
-        RTLookupResponse::ThreatInfo::VerdictType verdict_type,
-        std::optional<RTLookupResponse::ThreatInfo::ThreatType> threat_type) {
-  safe_browsing::VerdictCacheManagerFactory::GetForProfile(profile)
-      ->CacheArtificialRealTimeUrlVerdict(url.spec(), verdict_type,
-                                          threat_type);
-}
-void SafeBrowsingBlockingPageRealTimeUrlCheckTest::SetupUnsafeVerdict(
-    GURL url,
-    Profile* profile) {
-  auto* command_line = base::CommandLine::ForCurrentProcess();
-  command_line->AppendSwitchASCII(
-      "mark_as_real_time_phishing",
-      embedded_test_server()->GetURL("/empty.html").spec());
-  safe_browsing::VerdictCacheManagerFactory::GetForProfile(profile)
-      ->CacheArtificialUnsafeRealTimeUrlVerdictFromSwitch();
-}
 void SafeBrowsingBlockingPageRealTimeUrlCheckTest::NavigateToURL(
     GURL url,
     bool expect_success) {

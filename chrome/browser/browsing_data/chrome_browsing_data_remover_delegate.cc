@@ -75,7 +75,6 @@
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -566,8 +565,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
           base::BindOnce(
               &ChromeBrowsingDataRemoverDelegate::CreateTaskCompletionClosure,
               base::Unretained(this), TracingDataType::kCookies));
-      safe_browsing::VerdictCacheManagerFactory::GetForProfile(profile_)
-          ->OnCookiesDeleted();
     }
 
     if (filter_builder->MatchesMostOriginsAndDomains()) {

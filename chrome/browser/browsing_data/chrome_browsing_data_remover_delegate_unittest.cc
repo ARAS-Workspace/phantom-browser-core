@@ -72,7 +72,6 @@
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service.h"
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
 #include "chrome/browser/segmentation_platform/ukm_data_manager_test_utils.h"
 #include "chrome/browser/segmentation_platform/ukm_database_client.h"
@@ -3815,26 +3814,6 @@ TEST_F(
 
   BlockUntilBrowsingDataRemoved(AnHourAgo(), base::Time::Max(),
                                 constants::DATA_TYPE_FORM_DATA, false);
-}
-
-// Verify that clearing cookies will also clear page load tokens.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       PageLoadTokenClearedOnCookieDeleted) {
-  GURL url("https://www.example.com/path");
-  safe_browsing::VerdictCacheManager* sb_cache_manager =
-      safe_browsing::VerdictCacheManagerFactory::GetForProfile(GetProfile());
-  sb_cache_manager->CreatePageLoadToken(url);
-  safe_browsing::ChromeUserPopulation::PageLoadToken token =
-      sb_cache_manager->GetPageLoadToken(url);
-  ASSERT_TRUE(token.has_token_value());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                                false);
-
-  token = sb_cache_manager->GetPageLoadToken(url);
-  // Token is not found because cookies are deleted.
-  ASSERT_FALSE(token.has_token_value());
 }
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest,

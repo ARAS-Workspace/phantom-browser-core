@@ -14,7 +14,6 @@
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/safe_browsing/user_interaction_observer.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/content/browser/client_side_detection_host.h"
@@ -43,7 +42,7 @@ ChromeClientSideDetectionHostDelegate::CreateHost(content::WebContents* tab) {
   return ClientSideDetectionHost::Create(
       tab, std::make_unique<ChromeClientSideDetectionHostDelegate>(tab),
       ClientSideDetectionIntelligentScanDelegateFactory::GetForProfile(profile),
-      profile->GetPrefs(), VerdictCacheManagerFactory::GetForProfile(profile),
+      profile->GetPrefs(), /*cache_manager=*/nullptr,
       HistoryServiceFactory::GetForProfile(profile,
                                            ServiceAccessType::IMPLICIT_ACCESS),
       csd_service ? csd_service->GetWeakPtr() : nullptr,

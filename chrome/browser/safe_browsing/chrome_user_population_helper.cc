@@ -10,7 +10,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "components/safe_browsing/buildflags.h"
@@ -101,18 +100,7 @@ ChromeUserPopulation::PageLoadToken GetPageLoadTokenForURL(Profile* profile,
   if (!profile) {
     return ChromeUserPopulation::PageLoadToken();
   }
-  VerdictCacheManager* cache_manager =
-      VerdictCacheManagerFactory::GetForProfile(profile);
-  if (!cache_manager) {
-    return ChromeUserPopulation::PageLoadToken();
-  }
-
-  ChromeUserPopulation::PageLoadToken token =
-      cache_manager->GetPageLoadToken(url);
-  if (token.has_token_value()) {
-    return token;
-  }
-  return cache_manager->CreatePageLoadToken(url);
+  return ChromeUserPopulation::PageLoadToken();
 }
 
 }  // namespace safe_browsing

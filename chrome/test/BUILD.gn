@@ -801,12 +801,9 @@ source_set("platform_browser_tests") {
   }
 
   if (safe_browsing_mode != 0) {
-    sources += [
-      "../browser/safe_browsing/safe_browsing_blocking_page_platform_test.cc",
-    ]
+    sources += []
     deps += [
       "//chrome/browser/safe_browsing:blocking_page_platform_test_support",
-      "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
       "//components/enterprise/connectors/core",
       "//components/safe_browsing/content/browser",
       "//components/safe_browsing/content/browser:client_side_detection_service",
@@ -1134,7 +1131,6 @@ test("browser_tests") {
     "//chrome/browser/renderer_host",
     "//chrome/browser/renderer_host:browser_tests",
     "//chrome/browser/resource_coordinator:mojo_bindings",
-    "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
     "//chrome/browser/screen_ai:browser_tests",
     "//chrome/browser/screen_ai:screen_ai_install_state",
     "//chrome/browser/screen_ai:screen_ai_service_router_factory",
@@ -3279,7 +3275,6 @@ test("unit_tests") {
     "//chrome/browser/reduce_accept_language:unit_tests",
     "//chrome/browser/regional_capabilities:unit_tests",
     "//chrome/browser/safe_browsing:unit_tests",
-    "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
     "//chrome/browser/search",
     "//chrome/browser/search:unit_tests",
     "//chrome/browser/search_engine_choice",

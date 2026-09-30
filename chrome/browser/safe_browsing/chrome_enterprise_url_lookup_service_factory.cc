@@ -15,7 +15,6 @@
 #include "chrome/browser/safe_browsing/client_side_detection_intelligent_scan_delegate_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/enterprise/connectors/core/content_area_user_provider.h"
 #include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
@@ -80,7 +79,6 @@ ChromeEnterpriseRealTimeUrlLookupServiceFactory::
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kOriginalOnly)
               .Build()) {
-  DependsOn(VerdictCacheManagerFactory::GetInstance());
   DependsOn(enterprise_connectors::ConnectorsServiceFactory::GetInstance());
   DependsOn(SafeBrowsingNavigationObserverManagerFactory::GetInstance());
   DependsOn(IdentityManagerFactory::GetInstance());
@@ -106,7 +104,7 @@ std::unique_ptr<KeyedService> ChromeEnterpriseRealTimeUrlLookupServiceFactory::
           profile->GetURLLoaderFactory());
   return std::make_unique<ChromeEnterpriseRealTimeUrlLookupService>(
       network::SharedURLLoaderFactory::Create(std::move(url_loader_factory)),
-      VerdictCacheManagerFactory::GetForProfile(profile),
+      /*cache_manager=*/nullptr,
       base::BindRepeating(&safe_browsing::GetUserPopulationForProfile, profile),
       std::make_unique<SafeBrowsingPrimaryAccountTokenFetcher>(
           IdentityManagerFactory::GetForProfile(profile)),

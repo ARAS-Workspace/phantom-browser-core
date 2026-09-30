@@ -182,12 +182,6 @@ class SafeBrowsingBlockingPageRealTimeUrlCheckTest
       content::BrowserMainParts* browser_main_parts) override;
 
  protected:
-  void SetupUrlRealTimeVerdictInCacheManager(
-      GURL url,
-      Profile* profile,
-      RTLookupResponse::ThreatInfo::VerdictType verdict_type,
-      std::optional<RTLookupResponse::ThreatInfo::ThreatType> threat_type);
-  void SetupUnsafeVerdict(GURL url, Profile* profile);
   void NavigateToURL(GURL url, bool expect_success = true);
   void SetReportSentCallback(base::OnceClosure callback);
 

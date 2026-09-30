@@ -187,7 +187,6 @@
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/reduce_accept_language/reduce_accept_language_factory.h"
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_factory.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_service_factory.h"
@@ -935,7 +934,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   safe_browsing::V5GetHashProtocolManagerFactory::GetInstance();
   safe_browsing::V5SearchHashesCacheFactory::GetInstance();
 #endif
-  safe_browsing::VerdictCacheManagerFactory::GetInstance();
   if (features::IsMainNodeAnnotationsEnabled()) {
     screen_ai::AXMainNodeAnnotatorControllerFactory::GetInstance();
   }

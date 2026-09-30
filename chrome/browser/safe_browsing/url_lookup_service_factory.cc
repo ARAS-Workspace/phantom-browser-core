@@ -13,7 +13,6 @@
 #include "chrome/browser/safe_browsing/network_context_service_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "components/safe_browsing/buildflags.h"
@@ -59,7 +58,6 @@ RealTimeUrlLookupServiceFactory::RealTimeUrlLookupServiceFactory()
               .Build()) {
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(SyncServiceFactory::GetInstance());
-  DependsOn(VerdictCacheManagerFactory::GetInstance());
   DependsOn(SafeBrowsingNavigationObserverManagerFactory::GetInstance());
 #if BUILDFLAG(FULL_SAFE_BROWSING)
 #endif
@@ -79,7 +77,7 @@ RealTimeUrlLookupServiceFactory::BuildServiceInstanceForBrowserContext(
 
   return std::make_unique<RealTimeUrlLookupService>(
       GetURLLoaderFactory(context),
-      VerdictCacheManagerFactory::GetForProfile(profile),
+      /*cache_manager=*/nullptr,
       base::BindRepeating(&safe_browsing::GetUserPopulationForProfile, profile),
       profile->GetPrefs(),
       std::make_unique<SafeBrowsingPrimaryAccountTokenFetcher>(

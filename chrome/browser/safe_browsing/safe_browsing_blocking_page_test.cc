@@ -48,7 +48,6 @@
 #include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
 #include "chrome/browser/safe_browsing/user_interaction_observer.h"
 #include "chrome/browser/safe_browsing/v5_search_hashes_cache_factory.h"
-#include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/ssl/cert_verifier_browser_test.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -2892,15 +2891,6 @@ class SafeBrowsingBlockingPageAsyncChecksTestBase
   }
 
  protected:
-  void SetupUrlRealTimeVerdictInCacheManager(
-      GURL url,
-      Profile* profile,
-      RTLookupResponse::ThreatInfo::VerdictType verdict_type,
-      std::optional<RTLookupResponse::ThreatInfo::ThreatType> threat_type) {
-    safe_browsing::VerdictCacheManagerFactory::GetForProfile(profile)
-        ->CacheArtificialRealTimeUrlVerdict(url.spec(), verdict_type,
-                                            threat_type);
-  }
   void SetUpEnterpriseUrlCheck() {
     browser()->GetProfile()->GetPrefs()->SetInteger(
         enterprise_connectors::kEnterpriseRealTimeUrlCheckMode,
@@ -2923,52 +2913,6 @@ class SafeBrowsingBlockingPageAsyncChecksTestBase
 
 using SafeBrowsingBlockingPageAsyncChecksTest =
     SafeBrowsingBlockingPageAsyncChecksTestBase;
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingBlockingPageAsyncChecksTest,
-                       EnterpriseRealTimeUrlCheck) {
-  base::HistogramTester histogram_tester;
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-  SetUpEnterpriseUrlCheck();
-
-  GURL url = embedded_test_server()->GetURL(kEmptyPage);
-  SetupUrlRealTimeVerdictInCacheManager(url, browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  NavigateToURLAndWaitForAsyncChecks(url);
-  ASSERT_FALSE(chrome_browser_interstitials::IsShowingInterstitial(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-
-  // Whether or not async checks are enabled, only a sync check is performed
-  // (the enterprise URT check).
-  histogram_tester.ExpectTotalCount(
-      "SafeBrowsing.BrowserThrottle.TotalDelay2.EnterpriseFullUrlLookup",
-      /*expected_count=*/1);
-}
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingBlockingPageAsyncChecksTest,
-                       ConsumerRealTimeUrlCheck) {
-  base::HistogramTester histogram_tester;
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-  browser()->GetProfile()->GetPrefs()->SetBoolean(
-      unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled, true);
-
-  GURL url = embedded_test_server()->GetURL(kEmptyPage);
-  SetupUrlRealTimeVerdictInCacheManager(url, browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  NavigateToURLAndWaitForAsyncChecks(url);
-  ASSERT_FALSE(chrome_browser_interstitials::IsShowingInterstitial(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-
-  // When async checks are enabled, the sync check is an HPD check.
-  histogram_tester.ExpectTotalCount(
-      "SafeBrowsing.BrowserThrottle.TotalDelay2.HashPrefixDatabaseCheck",
-      /*expected_count=*/1);
-}
 
 class SafeBrowsingBlockingPageAsyncChecksTimingTestBase
     : public SafeBrowsingBlockingPageAsyncChecksTestBase {
@@ -3219,13 +3163,6 @@ class SafeBrowsingBlockingPageAsyncChecksTimingTest
   GURL SetupPostCommitInterstitialAndNavigate(
       std::vector<UrlAndIsUnsafe> url_and_server_redirects,
       base::OnceClosure report_sent_callback) {
-    // Call SetupUrlRealTimeVerdictInCacheManager with a random URL to ensure
-    // RealTimeUrlLookupServiceBase::CanCheckUrl returns true so the real time
-    // check is performed.
-    SetupUrlRealTimeVerdictInCacheManager(GURL("https://random.url"),
-                                          browser()->GetProfile(),
-                                          RTLookupResponse::ThreatInfo::SAFE,
-                                          /*threat_type=*/std::nullopt);
     SetReportSentCallback(std::move(report_sent_callback));
     bool check_complete_after_navigation_finish = GetParam();
     if (check_complete_after_navigation_finish) {
@@ -3273,70 +3210,6 @@ class SafeBrowsingBlockingPageAsyncChecksPrerenderingTest
   std::unique_ptr<content::test::PrerenderTestHelper> prerender_helper_;
 };
 
-// Test that prerendering doesn't affect the primary frame's threat report.
-IN_PROC_BROWSER_TEST_F(
-    SafeBrowsingBlockingPageAsyncChecksPrerenderingTest,
-    PostCommitInterstitialReportThreatDetails_DontContainPrerenderingInfo) {
-  EnableAsyncCheck();
-
-  // Navigate to unsafe page, but don't yet return unsafe for the Safe Browsing
-  // lookup.
-  auto threat_report_sent_runner = std::make_unique<base::RunLoop>();
-  SetReportSentCallback(threat_report_sent_runner->QuitClosure());
-  // Call SetupUrlRealTimeVerdictInCacheManager with a random URL to ensure
-  // RealTimeUrlLookupServiceBase::CanCheckUrl returns true so the real time
-  // check is performed.
-  SetupUrlRealTimeVerdictInCacheManager(GURL("https://random.url"),
-                                        browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  std::vector<UrlAndIsUnsafe> url_and_server_redirects = {
-      {kMaliciousPage, /* is_unsafe */ true}};
-  NavigateAndAwaitNavigationFinished(
-      url_and_server_redirects.front().relative_url);
-
-  // Set up prerendering.
-  GURL prerender_url = embedded_test_server()->GetURL("/title1.html");
-  SetupUrlRealTimeVerdictInCacheManager(prerender_url, browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  prerender_helper().AddPrerenderAsync(prerender_url);
-
-  // Return unsafe for the Safe Browsing lookup, which displays a post-commit
-  // interstitial.
-  GURL url = ReturnUrlRealTimeVerdictsForUnsafeChain(url_and_server_redirects);
-
-  ThreatDetails* threat_details = details_factory_.get_details();
-  EXPECT_TRUE(threat_details != nullptr);
-
-  // Proceed through the warning.
-  EXPECT_TRUE(ClickAndWaitForDetach(browser(), "proceed-link"));
-  AssertNoInterstitial(browser());  // Assert the interstitial is gone
-
-  EXPECT_TRUE(IsExtendedReportingEnabled(*browser()->GetProfile()->GetPrefs()));
-  EXPECT_EQ(url, browser()
-                     ->tab_strip_model()
-                     ->GetActiveWebContents()
-                     ->GetLastCommittedURL());
-
-  threat_report_sent_runner->Run();
-  std::string serialized = GetReportSent();
-  ClientSafeBrowsingReportRequest report;
-  ASSERT_TRUE(report.ParseFromString(serialized));
-  // Verify the report is complete.
-  EXPECT_TRUE(report.complete());
-  // The threat report should not contain the prerender information.
-  EXPECT_NE(prerender_url.spec(), report.page_url());
-  EXPECT_NE(prerender_url.spec(), report.url());
-  for (const auto& resource : report.resources()) {
-    EXPECT_NE(prerender_url.spec(), resource.url());
-  }
-  // We don't check the specific size of resources here. The size can be either
-  // 1 or 2 depending on whether DOM details have been collected when we
-  // proceed.
-  ASSERT_NE(0, report.resources_size());
-}
-
 INSTANTIATE_TEST_SUITE_P(CheckCompleteAfterNavigationFinish,
                          SafeBrowsingBlockingPageAsyncChecksTimingTest,
                          testing::Bool());
@@ -3357,38 +3230,13 @@ IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageAsyncChecksTimingTest,
       /*expected_bucket_count=*/1);
 }
 
-// Confirm that duplicate client reports aren't sent in the case where URT falls
-// back to HPD due to a high-confidence allowlist match.
-IN_PROC_BROWSER_TEST_P(
-    SafeBrowsingBlockingPageAsyncChecksTimingTest,
-    NoDuplicateClientReports_FallbackFromHighConfidenceAllowlistMatch) {
-  EnableAsyncCheck();
-  // Call SetupUrlRealTimeVerdictInCacheManager with a random URL to ensure
-  // RealTimeUrlLookupServiceBase::CanCheckUrl returns true so the real time
-  // check is performed.
-  SetupUrlRealTimeVerdictInCacheManager(GURL("https://random.url"),
-                                        browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  GURL url = embedded_test_server()->GetURL(kEmptyPage);
-  SetURLHighConfidenceAllowlistMatch(url, true);
-  SetURLThreatType(url, SBThreatType::SB_THREAT_TYPE_URL_PHISHING);
-  NavigateToURLAndWaitForAsyncChecks(url);
-
-  auto threat_report_sent_runner = std::make_unique<base::RunLoop>();
-  SetReportSentCallback(threat_report_sent_runner->QuitClosure());
-
-  EXPECT_FALSE(shown_report_sent_is_async_check().value());
-}
-
 // Confirm that duplicate client reports aren't sent in the case where URT is
 // not eligible and HPD is used instead for the async check.
 IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageAsyncChecksTimingTest,
                        NoDuplicateClientReports_UrlRealTimeUncheckable) {
   EnableAsyncCheck();
-  // Do not call |SetupUrlRealTimeVerdictInCacheManager| with a random URL,
-  // that way the real-time URL lookup will instead fall back to hash database
-  // checks instead, since the URL is not eligible for real-time lookups.
+  // The real-time URL lookup falls back to hash database checks here, since
+  // the URL is not eligible for real-time lookups.
   GURL url = embedded_test_server()->GetURL(kEmptyPage);
   SetURLThreatType(url, SBThreatType::SB_THREAT_TYPE_URL_PHISHING);
   NavigateToURLAndWaitForAsyncChecks(url);
@@ -3537,34 +3385,6 @@ IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageAsyncChecksTimingTest,
   ASSERT_NE(0, report.resources_size());
 }
 
-IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageAsyncChecksTimingTest,
-                       PostCommitInterstitialAllowlistRevisit) {
-  EnableAsyncCheck();
-  auto threat_report_sent_runner = std::make_unique<base::RunLoop>();
-  GURL url = SetupPostCommitInterstitialAndNavigate(
-      {{kMaliciousPage, /* is_unsafe */ true}},
-      threat_report_sent_runner->QuitClosure());
-
-  EXPECT_TRUE(ClickAndWaitForDetach(browser(), "proceed-link"));
-  AssertNoInterstitial(browser());  // Assert the interstitial is gone.
-  EXPECT_EQ(url, browser()
-                     ->tab_strip_model()
-                     ->GetActiveWebContents()
-                     ->GetLastCommittedURL());
-
-  // Navigate to an unrelated page and revisit the allowlisted URL.
-  SetupUrlRealTimeVerdictInCacheManager(GURL(kUnrelatedUrl),
-                                        browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  NavigateToURLAndWaitForAsyncChecks(GURL(kUnrelatedUrl));
-  AssertNoInterstitial(browser());
-
-  // The allowlisted page should remain allowlisted.
-  NavigateToURLAndWaitForAsyncChecks(url);
-  AssertNoInterstitial(browser());
-}
-
 // Test that the security indicator gets updated on a Safe Browsing
 // interstitial triggered post commit. Regression test for
 // https://crbug.com/41283180.
@@ -3635,44 +3455,6 @@ IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageAsyncChecksTimingTest,
   ExpectNoSecurityIndicatorDowngrade(post_tab);
 }
 
-IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageAsyncChecksTimingTest,
-                       SecurityStateGoBackFlaggedByBothChecks) {
-  EnableAsyncCheck();
-
-  // Navigate to a page so that there is somewhere to go back to.
-  GURL start_url = embedded_test_server()->GetURL(kEmptyPage);
-  NavigateToURLAndWaitForAsyncChecks(start_url);
-
-  auto threat_report_sent_runner = std::make_unique<base::RunLoop>();
-  SetReportSentCallback(threat_report_sent_runner->QuitClosure());
-  GURL url = embedded_test_server()->GetURL(kMaliciousPage);
-
-  // Mark the URL as dangerous for both checks.
-  SetupUrlRealTimeVerdictInCacheManager(
-      url, browser()->GetProfile(), RTLookupResponse::ThreatInfo::DANGEROUS,
-      RTLookupResponse::ThreatInfo::SOCIAL_ENGINEERING);
-  SetURLThreatType(url, SBThreatType::SB_THREAT_TYPE_URL_PHISHING);
-  NavigateToURLAndWaitForAsyncChecks(url);
-
-  // The security indicator should be downgraded while the interstitial
-  // shows.
-  WebContents* error_tab = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(error_tab);
-  ExpectSecurityIndicatorDowngrade(error_tab, 0u);
-
-  // Go back.
-  EXPECT_TRUE(ClickAndWaitForDetach(browser(), "primary-button"));
-
-  // The security indicator should *not* still be downgraded after going back.
-  AssertNoInterstitial(browser());
-  WebContents* post_tab = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(post_tab);
-  content::NavigationEntry* entry = post_tab->GetController().GetVisibleEntry();
-  ASSERT_TRUE(entry);
-  EXPECT_EQ(start_url, entry->GetURL());
-  ExpectNoSecurityIndicatorDowngrade(post_tab);
-}
-
 // Tests that commands work in a post commit interstitial if a pre commit
 // interstitial has been shown previously on the same webcontents. Regression
 // test for crbug.com/40657015
@@ -3709,134 +3491,6 @@ IN_PROC_BROWSER_TEST_P(
                           ->tab_strip_model()
                           ->GetActiveWebContents()
                           ->GetLastCommittedURL());
-}
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingBlockingPageRealTimeUrlCheckTest,
-                       WarningShown_EnhancedProtectionEnabled) {
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-  GURL url = embedded_test_server()->GetURL("/empty.html");
-  SetupUnsafeVerdict(url, browser()->GetProfile());
-  auto threat_report_sent_runner = std::make_unique<base::RunLoop>();
-  SetReportSentCallback(threat_report_sent_runner->QuitClosure());
-
-  NavigateToURL(url);
-  ASSERT_TRUE(chrome_browser_interstitials::IsShowingInterstitial(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-}
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingBlockingPageRealTimeUrlCheckTest,
-                       WarningShown_MbbEnabled) {
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-  browser()->GetProfile()->GetPrefs()->SetBoolean(
-      unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled, true);
-  GURL url = embedded_test_server()->GetURL("/empty.html");
-  SetupUnsafeVerdict(url, browser()->GetProfile());
-
-  NavigateToURL(url);
-  ASSERT_TRUE(chrome_browser_interstitials::IsShowingInterstitial(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-}
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingBlockingPageRealTimeUrlCheckTest,
-                       WarningNotShown_MbbDisabled) {
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-  browser()->GetProfile()->GetPrefs()->SetBoolean(
-      unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled, false);
-  GURL url = embedded_test_server()->GetURL("/empty.html");
-  SetupUnsafeVerdict(url, browser()->GetProfile());
-
-  NavigateToURL(url);
-  ASSERT_FALSE(chrome_browser_interstitials::IsShowingInterstitial(
-      browser()->tab_strip_model()->GetActiveWebContents()));
-}
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingBlockingPageRealTimeUrlCheckTest,
-                       EnterpriseRealTimeUrlCheck_HistogramHasDmToken) {
-  base::HistogramTester histogram_tester;
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-
-  // Set up enterprise lookup, including DM token.
-  browser()->GetProfile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckMode,
-      enterprise_connectors::REAL_TIME_CHECK_FOR_MAINFRAME_ENABLED);
-  browser()->GetProfile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckScope,
-      policy::POLICY_SCOPE_MACHINE);
-  SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-
-  GURL url = embedded_test_server()->GetURL(kEmptyPage);
-  SetupUrlRealTimeVerdictInCacheManager(url, browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  NavigateToURL(url);
-
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.RT.EnterpriseRealTimePolicyEnabled.HasDmToken",
-      /*sample=*/true,
-      /*expected_bucket_count=*/1);
-}
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingBlockingPageRealTimeUrlCheckTest,
-                       EnterpriseRealTimeUrlCheck_HistogramHasNoDmToken) {
-  base::HistogramTester histogram_tester;
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-
-  // Set up enterprise lookup, but no DM token.
-  browser()->GetProfile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckMode,
-      enterprise_connectors::REAL_TIME_CHECK_FOR_MAINFRAME_ENABLED);
-  browser()->GetProfile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckScope,
-      policy::POLICY_SCOPE_MACHINE);
-
-  GURL url = embedded_test_server()->GetURL(kEmptyPage);
-  SetupUrlRealTimeVerdictInCacheManager(url, browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  NavigateToURL(url);
-
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.RT.EnterpriseRealTimePolicyEnabled.HasDmToken",
-      /*sample=*/false,
-      /*expected_bucket_count=*/1);
-}
-
-IN_PROC_BROWSER_TEST_F(
-    SafeBrowsingBlockingPageRealTimeUrlCheckTest,
-    EnterpriseRealTimeUrlCheck_NoHistogramBecausePolicyDisabled) {
-  base::HistogramTester histogram_tester;
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-
-  // Set up enterprise lookup so that the policy is disabled.
-  browser()->GetProfile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckMode,
-      enterprise_connectors::REAL_TIME_CHECK_DISABLED);
-  browser()->GetProfile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckScope,
-      policy::POLICY_SCOPE_MACHINE);
-  SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-
-  GURL url = embedded_test_server()->GetURL(kEmptyPage);
-  SetupUrlRealTimeVerdictInCacheManager(url, browser()->GetProfile(),
-                                        RTLookupResponse::ThreatInfo::SAFE,
-                                        /*threat_type=*/std::nullopt);
-  NavigateToURL(url);
-
-  histogram_tester.ExpectTotalCount(
-      "SafeBrowsing.RT.EnterpriseRealTimePolicyEnabled.HasDmToken",
-      /*expected_count=*/0);
 }
 
 // Tests for hash-prefix real-time check. To avoid redundant testing of the

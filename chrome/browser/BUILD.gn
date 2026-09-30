@@ -1554,7 +1554,6 @@ source_set("browser") {
     "//chrome/browser/resource_coordinator:impl",
     "//chrome/browser/resources/accessibility:resources",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
     "//chrome/browser/search",
     "//chrome/browser/search/background",
     "//chrome/browser/search_engine_choice",
