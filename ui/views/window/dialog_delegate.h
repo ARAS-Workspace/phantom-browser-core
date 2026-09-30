@@ -149,12 +149,6 @@ namespace remoting {
 class MessageBoxCore;
 }
 
-namespace safe_browsing {
-class PasswordReuseModalWarningDialog;
-class PromptForScanningModalDialog;
-class TailoredSecurityUnconsentedModal;
-}  // namespace safe_browsing
-
 namespace task_manager {
 class TaskManagerView;
 }
@@ -794,9 +788,6 @@ class VIEWS_EXPORT DialogDelegateView : public DialogDelegate, public View {
   friend class ::policy::IdleDialogView;
   friend class ::policy::PolicyDialogBase;
   friend class ::remoting::MessageBoxCore;
-  friend class ::safe_browsing::PasswordReuseModalWarningDialog;
-  friend class ::safe_browsing::PromptForScanningModalDialog;
-  friend class ::safe_browsing::TailoredSecurityUnconsentedModal;
   friend class ::task_manager::TaskManagerView;
   friend class DialogClientViewTestDelegate;
   friend class InitialFocusTestDialog;

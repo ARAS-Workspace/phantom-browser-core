@@ -430,8 +430,6 @@ constexpr base::FeatureParam<std::string>
 
 BASE_FEATURE(kSuspiciousSiteWarnings, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kTailoredSecurityIntegration, base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kThreatDomDetailsTagAndAttributeFeature,
              "ThreatDomDetailsTagAttributes",
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -473,7 +471,6 @@ base::ListValue GetFeatureStatusList() {
       &kShowManualNotificationRevocationsSafetyHub,
       &kShowWarningsForSuspiciousNotifications,
       &kSuspiciousSiteTriggerQuotaFeature,
-      &kTailoredSecurityIntegration,
       &kVisualFeaturesSizes,
       // keep-sorted end
   };

@@ -685,7 +685,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "SafeBrowsingNetworkContextService",
 
     "SafeBrowsingPrivateEventRouter",
-    "SafeBrowsingTailoredSecurityService",
     "SearchEngineChoiceServiceFactory",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "ServerCertificateDatabaseService",

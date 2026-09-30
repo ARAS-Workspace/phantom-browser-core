@@ -39,7 +39,6 @@
 #include "chrome/browser/default_browser/default_browser_features.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/tailored_security/notification_handler_desktop.h"
 #endif
 
 // static
@@ -66,13 +65,6 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
         std::make_unique<NonPersistentNotificationHandler>());
     AddNotificationHandler(NotificationHandler::Type::WEB_PERSISTENT,
                            std::make_unique<PersistentNotificationHandler>());
-
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && \
-    BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-    AddNotificationHandler(
-        NotificationHandler::Type::TAILORED_SECURITY,
-        std::make_unique<safe_browsing::TailoredSecurityNotificationHandler>());
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     AddNotificationHandler(

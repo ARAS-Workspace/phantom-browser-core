@@ -485,7 +485,6 @@
 #include "chrome/browser/safe_browsing/client_side_detection_service_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
-#include "chrome/browser/safe_browsing/tailored_security/tailored_security_service_factory.h"
 #include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
 #include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "chrome/browser/safe_browsing/v5_search_hashes_cache_factory.h"
@@ -944,7 +943,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   safe_browsing::RealTimeUrlLookupServiceFactory::GetInstance();
   safe_browsing::SafeBrowsingMetricsCollectorFactory::GetInstance();
   safe_browsing::SafeBrowsingNavigationObserverManagerFactory::GetInstance();
-  safe_browsing::TailoredSecurityServiceFactory::GetInstance();
   safe_browsing::V5GetHashProtocolManagerFactory::GetInstance();
   safe_browsing::V5SearchHashesCacheFactory::GetInstance();
 #endif

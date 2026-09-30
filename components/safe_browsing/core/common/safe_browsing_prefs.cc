@@ -316,28 +316,12 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
       prefs::kAccountTailoredSecurityUpdateTimestamp, base::Time(),
       user_prefs::PrefRegistrySyncable::SYNCABLE_PRIORITY_PREF);
   registry->RegisterBooleanPref(
-      prefs::kAccountTailoredSecurityShownNotification, false);
-  registry->RegisterBooleanPref(
       prefs::kEnhancedProtectionEnabledViaTailoredSecurity, false);
   registry->RegisterBooleanPref(
       prefs::kSafeBrowsingSyncedEnhancedProtectionSetLocally, false);
   registry->RegisterTimePref(
       prefs::kSafeBrowsingSyncedEnhancedProtectionUpdateTimestamp,
       base::Time());
-  registry->RegisterTimePref(prefs::kTailoredSecuritySyncFlowLastRunTime,
-                             base::Time());
-  registry->RegisterTimePref(prefs::kTailoredSecurityNextSyncFlowTimestamp,
-                             base::Time());
-  // TODO(crbug.com/40925236): remove sync flow last user interaction pref.
-  registry->RegisterIntegerPref(
-      prefs::kTailoredSecuritySyncFlowLastUserInteractionState,
-      TailoredSecurityRetryState::UNSET);
-  registry->RegisterIntegerPref(prefs::kTailoredSecuritySyncFlowRetryState,
-                                TailoredSecurityRetryState::UNSET);
-  registry->RegisterTimePref(
-      prefs::kTailoredSecuritySyncFlowObservedOutcomeUnsetTimestamp,
-      base::Time());
-
   registry->RegisterTimePref(prefs::kExtensionTelemetryLastUploadTime,
                              base::Time());
   registry->RegisterDictionaryPref(prefs::kExtensionTelemetryConfig);

@@ -6,10 +6,8 @@
 
 #include "base/feature_list.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/tailored_security/tailored_security_service_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/browser/tailored_security_service/tailored_security_service.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/sync/base/features.h"
@@ -35,13 +33,6 @@ SafeBrowsingPrefChangeHandler::SafeBrowsingPrefChangeHandler(Profile* profile)
 }
 
 SafeBrowsingPrefChangeHandler::~SafeBrowsingPrefChangeHandler() {}
-
-bool SafeBrowsingPrefChangeHandler::SuppressNotificationForTailoredSecurity() {
-  TailoredSecurityService* tailored_security_service =
-      TailoredSecurityServiceFactory::GetForProfile(profile_);
-  return TailoredSecurityService::IsResponsibleForNotification(
-      profile_->GetPrefs(), tailored_security_service);
-}
 
 // TODO(crbug.com/378888301): Add tests for Chrome Toast and Android modal
 // logic.
@@ -77,10 +68,6 @@ void SafeBrowsingPrefChangeHandler::
         return;
       }
     }
-  }
-
-  if (SuppressNotificationForTailoredSecurity()) {
-    return;
   }
 
   // Do not show a notification toast if the setting is managed by enterprise

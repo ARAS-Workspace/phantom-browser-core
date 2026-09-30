@@ -60,7 +60,6 @@ class SafeBrowsingPrefChangeHandler {
  private:
   // Returns true if the notification should be suppressed for Tailored
   // Security.
-  bool SuppressNotificationForTailoredSecurity();
 
   // Member variable to store the Profile*.
   raw_ptr<Profile> profile_;
