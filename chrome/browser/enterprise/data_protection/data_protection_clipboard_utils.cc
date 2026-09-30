@@ -53,10 +53,6 @@
 #include "chrome/browser/enterprise/data_controls/desktop_data_controls_dialog_factory.h"
 #endif  // BUILDFLAG(ENTERPRISE_DATA_PROTECTION)
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/enterprise/connectors/reporting/reporting_event_router_factory.h"
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
 namespace enterprise_data_protection {
 
 namespace {
@@ -108,119 +104,6 @@ data_controls::DataControlsDialogFactory* GetDialogFactory() {
 #endif
 }
 
-void MaybeReportDataControlsPaste(const FullPasteSource& source,
-                                  const content::ClipboardEndpoint& destination,
-                                  const ui::ClipboardMetadata& metadata,
-                                  const data_controls::Verdict& verdict,
-                                  bool bypassed = false) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  auto* router =
-      enterprise_connectors::ReportingEventRouterFactory::GetForBrowserContext(
-          destination.browser_context());
-
-  // `router` can be null for incognito browser contexts, so since there's no
-  // reporting in that case we just return early.
-  if (!router) {
-    return;
-  }
-
-  data_controls::ChromeClipboardContext context(source, destination, metadata);
-
-  if (bypassed) {
-    router->ReportPasteWarningBypassed(context, verdict);
-  } else {
-    router->ReportPaste(context, verdict);
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-}
-
-void MaybeReportDataControlsCopy(const content::ClipboardEndpoint& source,
-                                 const ui::ClipboardMetadata& metadata,
-                                 const data_controls::Verdict& verdict,
-                                 bool bypassed = false) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  auto* router =
-      enterprise_connectors::ReportingEventRouterFactory::GetForBrowserContext(
-          source.browser_context());
-
-  // `router` can be null for incognito browser contexts, so since there's no
-  // reporting in that case we just return early.
-  if (!router) {
-    return;
-  }
-
-  data_controls::ChromeClipboardContext context(source, metadata);
-
-  if (bypassed) {
-    router->ReportCopyWarningBypassed(context, verdict);
-  } else {
-    router->ReportCopy(context, verdict);
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-}
-
-void ReportDragData(const content::ClipboardEndpoint& source,
-                    const content::DropData& drop_data,
-                    const data_controls::Verdict& verdict) {
-  if (drop_data.text) {
-    MaybeReportDataControlsCopy(
-        source,
-        {.size = drop_data.text->size() * sizeof(std::u16string::value_type),
-         .format_type = ui::ClipboardFormatType::PlainTextType()},
-        verdict);
-  }
-  if (drop_data.html) {
-    MaybeReportDataControlsCopy(
-        source,
-        {.size = drop_data.html->size() * sizeof(std::u16string::value_type),
-         .format_type = ui::ClipboardFormatType::HtmlType()},
-        verdict);
-  }
-  if (!drop_data.file_contents.empty()) {
-    // Map `file_contents` to PNG if the image is accessible,
-    // otherwise report it as a generic custom type.
-    auto type = drop_data.file_contents_image_accessible
-                    ? ui::ClipboardFormatType::PngType()
-                    : ui::ClipboardFormatType::DataTransferCustomType();
-    MaybeReportDataControlsCopy(
-        source, {.size = drop_data.file_contents.size(), .format_type = type},
-        verdict);
-  }
-  if (!drop_data.url_infos.empty()) {
-    size_t size = 0;
-    for (const auto& url_info : drop_data.url_infos) {
-      size += url_info.url.spec().size();
-    }
-    MaybeReportDataControlsCopy(
-        source,
-        {.size = size, .format_type = ui::ClipboardFormatType::UrlType()},
-        verdict);
-  }
-  if (!drop_data.custom_data.empty()) {
-    size_t size = 0;
-    for (const auto& item : drop_data.custom_data) {
-      size += (item.first.size() + item.second.size()) *
-              sizeof(std::u16string::value_type);
-    }
-    MaybeReportDataControlsCopy(
-        source,
-        {.size = size,
-         .format_type = ui::ClipboardFormatType::DataTransferCustomType()},
-        verdict);
-  }
-  if (!drop_data.file_system_files.empty()) {
-    size_t fs_size = 0;
-    for (const auto& fs_file : drop_data.file_system_files) {
-      fs_size += fs_file.size;
-    }
-    MaybeReportDataControlsCopy(
-        source,
-        {.size = fs_size,
-         .format_type = ui::ClipboardFormatType::FilenamesType()},
-        verdict);
-  }
-}
-
 // Replaces `clipboard_paste_data` with the original clipboard data if it was
 // replaced by a warning message. Returns true if the paste should proceed to
 // content analysis, or false if content analysis should be skipped and the
@@ -262,11 +145,6 @@ void OnDataControlsPasteWarning(
   if (!bypassed || SkipDataControlOrContentAnalysisChecks(destination)) {
     std::move(callback).Run(std::nullopt);
     return;
-  }
-
-  if (bypassed && verdict.level() == data_controls::Rule::Level::kWarn) {
-    MaybeReportDataControlsPaste(source, destination, metadata, verdict,
-                                 /*bypassed=*/true);
   }
 
   if (!ReplaceClipboardDataIfRequired(source, metadata, clipboard_paste_data)) {
@@ -314,7 +192,6 @@ void PasteIfAllowedByDataControls(
   auto* factory = GetDialogFactory();
   switch (verdict.level()) {
     case data_controls::Rule::Level::kBlock:
-      MaybeReportDataControlsPaste(source, destination, metadata, verdict);
       if (factory) {
         factory->ShowDialogIfNeeded(
             destination.web_contents(),
@@ -323,7 +200,6 @@ void PasteIfAllowedByDataControls(
       std::move(callback).Run(std::nullopt);
       return;
     case data_controls::Rule::Level::kWarn:
-      MaybeReportDataControlsPaste(source, destination, metadata, verdict);
       if (factory) {
         factory->ShowDialogIfNeeded(
             destination.web_contents(),
@@ -337,7 +213,6 @@ void PasteIfAllowedByDataControls(
       }
       return;
     case data_controls::Rule::Level::kReport:
-      MaybeReportDataControlsPaste(source, destination, metadata, verdict);
       break;
     case data_controls::Rule::Level::kAllow:
     case data_controls::Rule::Level::kNotSet:
@@ -421,7 +296,6 @@ void OnDataControlsCopyWarning(
     content::ContentBrowserClient::IsClipboardCopyAllowedCallback callback,
     bool bypassed) {
   if (bypassed) {
-    MaybeReportDataControlsCopy(source, metadata, verdict, /*bypassed=*/true);
     IsCopyToOSClipboardRestricted(source, metadata, data, std::move(callback));
     return;
   }
@@ -453,7 +327,6 @@ void IsCopyRestrictedByDialog(
 
   auto* factory = GetDialogFactory();
   if (source_only_verdict.level() == data_controls::Rule::Level::kBlock) {
-    MaybeReportDataControlsCopy(source, metadata, source_only_verdict);
     if (factory) {
       factory->ShowDialogIfNeeded(source.web_contents(), block_dialog_type);
     }
@@ -473,7 +346,6 @@ void IsCopyRestrictedByDialog(
       os_clipboard_verdict.level() == data_controls::Rule::Level::kWarn) {
     auto verdict = data_controls::Verdict::MergeCopyWarningVerdicts(
         std::move(source_only_verdict), std::move(os_clipboard_verdict));
-    MaybeReportDataControlsCopy(source, metadata, verdict);
     if (factory) {
       factory->ShowDialogIfNeeded(
           source.web_contents(), warn_dialog_type,
@@ -485,10 +357,6 @@ void IsCopyRestrictedByDialog(
                               /*replacement_data=*/std::nullopt);
     }
     return;
-  }
-
-  if (source_only_verdict.level() == data_controls::Rule::Level::kReport) {
-    MaybeReportDataControlsCopy(source, metadata, source_only_verdict);
   }
 
   IsCopyToOSClipboardRestricted(source, metadata, data, std::move(callback));
@@ -748,12 +616,6 @@ bool IsDragAllowedByPolicy(const content::ClipboardEndpoint& source,
                      ->GetForBrowserContext(source.browser_context())
                      ->GetCopyToOSClipboardVerdict(GetUrlFromEndpoint(source));
 
-  if (verdict.level() == data_controls::Rule::Level::kBlock ||
-      verdict.level() == data_controls::Rule::Level::kWarn ||
-      verdict.level() == data_controls::Rule::Level::kReport) {
-    ReportDragData(source, drop_data, verdict);
-  }
-
   bool blocked = verdict.level() == data_controls::Rule::Level::kBlock ||
                  verdict.level() == data_controls::Rule::Level::kWarn;
 
@@ -914,8 +776,6 @@ void ShouldAllowSearchWith(content::WebContents* web_contents,
 
   switch (verdict.level()) {
     case data_controls::Rule::Level::kReport:
-      MaybeReportDataControlsCopy(*source, metadata, verdict);
-      [[fallthrough]];
     case data_controls::Rule::Level::kNotSet:
     case data_controls::Rule::Level::kAllow:
       std::move(on_allowed_callback).Run();
@@ -936,12 +796,7 @@ void ShouldAllowSearchWith(content::WebContents* web_contents,
                  data_controls::Verdict verdict,
                  base::OnceClosure on_allowed_callback, bool bypassed) {
                 if (bypassed) {
-                  MaybeReportDataControlsCopy(source, metadata, verdict,
-                                              /*bypassed=*/true);
                   std::move(on_allowed_callback).Run();
-                } else {
-                  MaybeReportDataControlsCopy(source, metadata, verdict,
-                                              /*bypassed=*/false);
                 }
               },
               *source, metadata, std::move(verdict),

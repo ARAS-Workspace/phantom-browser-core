@@ -111,12 +111,10 @@ source_set("unit_tests") {
 
   sources = [
     "chrome_rules_service_unittest.cc",
-    "reporting_unittest.cc",
   ]
   deps = [
     ":data_controls",
     ":test_support",
-    "//chrome/browser/enterprise/connectors/test:test_support",
     "//chrome/browser/policy:test_support",
     "//chrome/browser/profiles:profile",
     "//chrome/test:test_support",

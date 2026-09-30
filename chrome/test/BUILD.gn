@@ -985,7 +985,6 @@ test("browser_tests") {
     "//chrome/browser/enterprise:browser_tests",
     "//chrome/browser/enterprise/browser_management:browser_tests",
     "//chrome/browser/enterprise/browser_management:management_identity",
-    "//chrome/browser/enterprise/connectors/test:test_support",
     "//chrome/browser/enterprise/data_protection:data_protection_view_lib",
     "//chrome/browser/enterprise/incognito",
     "//chrome/browser/enterprise/platform_auth:browser_tests",
@@ -2707,7 +2706,6 @@ test("browser_tests") {
     sources += [ "../browser/ui/supervised_user/extension_install_blocked_by_parent_dialog_browsertest.cc" ]
 
     deps += [
-      "../browser/enterprise/connectors/test:test_support",
       "//chrome/browser:main_extra_parts",
       "//chrome/browser/ui/supervised_user",
       "//chrome/browser/ui/views/supervised_user",
@@ -2716,7 +2714,6 @@ test("browser_tests") {
 
   if (enterprise_data_controls) {
     sources += [
-      "//chrome/browser/enterprise/data_protection/data_protection_clipboard_utils_browsertest.cc",
     ]
     deps += [ "//components/enterprise/connectors/core:test_support" ]
   }
@@ -4521,7 +4518,6 @@ test("unit_tests") {
 
   if (is_mac || is_linux) {
     deps += [
-      "../browser/enterprise/connectors/test:test_support",
       "../services/system_signals:unit_tests",
       "../services/system_signals/public/cpp/browser:unit_tests",
     ]

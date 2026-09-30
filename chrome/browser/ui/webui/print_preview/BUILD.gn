@@ -157,7 +157,6 @@ source_set("unit_tests") {
     "//chrome/browser",
     "//chrome/browser:test_support",
     "//chrome/browser/enterprise",
-    "//chrome/browser/enterprise/connectors/test:test_support",
     "//chrome/browser/extensions",
     "//chrome/browser/policy:test_support",
     "//chrome/browser/printing",

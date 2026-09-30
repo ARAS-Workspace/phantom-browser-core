@@ -39,7 +39,6 @@ source_set("unit_tests") {
   deps = [
     "//base",
     "//chrome/browser/enterprise:impl",
-    "//chrome/browser/enterprise/connectors/test:test_support",
     "//chrome/test:test_support",
     "//components/enterprise/data_controls/core/browser:test_support",
     "//testing/gtest",
@@ -57,7 +56,6 @@ source_set("unit_tests") {
 
   if (enterprise_screenshot_protection || enterprise_watermark) {
     sources += [
-      "data_protection_navigation_observer_unittest.cc",
       "data_protection_page_user_data_unittest.cc",
     ]
     deps += [

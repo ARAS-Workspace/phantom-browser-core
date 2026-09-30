@@ -102,7 +102,6 @@ source_set("impl") {
     "//chrome/browser/autofill",
     "//chrome/browser/critical_actions",
     "//chrome/browser/device_reauth",
-    "//chrome/browser/enterprise/connectors/reporting",
     "//chrome/browser/favicon",
     "//chrome/browser/history",
     "//chrome/browser/metrics",

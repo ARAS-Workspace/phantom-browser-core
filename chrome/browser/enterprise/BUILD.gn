@@ -349,8 +349,6 @@ source_set("impl") {
     "//chrome/browser/devtools",
     "//chrome/browser/enterprise/browser_management:management_identity",
     "//chrome/browser/enterprise/browser_management:management_identity_impl",
-    "//chrome/browser/enterprise/connectors/reporting",
-    "//chrome/browser/enterprise/connectors/reporting:impl",
     "//chrome/browser/enterprise/core",
     "//chrome/browser/enterprise/platform_auth:features",
     "//chrome/browser/image_fetcher",
