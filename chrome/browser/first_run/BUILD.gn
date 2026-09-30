@@ -137,6 +137,7 @@ source_set("browser_tests") {
     "//base/test:test_support",
     "//chrome/browser",
     "//chrome/browser/bookmarks",
+    "//chrome/browser/metrics",
     "//chrome/browser/prefs",
     "//chrome/common:constants",
     "//chrome/test:test_support",

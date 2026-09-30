@@ -47,7 +47,6 @@ source_set("impl") {
     "//chrome/app:branded_strings",
     "//chrome/app:generated_resources",
     "//chrome/app/vector_icons",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ui/color:color_headers",
     "//components/prefs",
     "//components/safe_browsing/core/common:features",
@@ -72,7 +71,6 @@ source_set("unit_tests") {
   deps = [
     ":download",
     "//base/test:test_support",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/signin",
     "//chrome/test:test_support",
     "//components/download/public/common:test_support",

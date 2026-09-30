@@ -17,15 +17,12 @@
 #include "base/test/bind.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_database_helper.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "components/blocked_content/safe_browsing_triggered_popup_blocker.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
-#include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"
-#include "components/safe_browsing/core/browser/db/v4_test_util.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
@@ -165,18 +162,6 @@ bool SubresourceFilterBrowserTest::AdsBlockedInContentSettings(
   return content_settings->IsContentBlocked(ContentSettingsType::ADS);
 }
 
-void SubresourceFilterBrowserTest::SetUp() {
-  database_helper_ = CreateTestDatabase();
-  SubresourceFilterSharedBrowserTest::SetUp();
-}
-
-void SubresourceFilterBrowserTest::TearDown() {
-  SubresourceFilterSharedBrowserTest::TearDown();
-  // Unregister test factories after PlatformBrowserTest::TearDown
-  // (which destructs SafeBrowsingService).
-  database_helper_.reset();
-}
-
 void SubresourceFilterBrowserTest::SetUpOnMainThread() {
   SubresourceFilterSharedBrowserTest::SetUpOnMainThread();
   // Add content/test/data for cross_site_iframe_factory.html
@@ -189,37 +174,6 @@ void SubresourceFilterBrowserTest::SetUpOnMainThread() {
   auto* web_contents = chrome_test_utils::GetActiveWebContents(this);
   profile_context_ = SubresourceFilterProfileContextFactory::GetForProfile(
       Profile::FromBrowserContext(web_contents->GetBrowserContext()));
-}
-
-std::unique_ptr<TestSafeBrowsingDatabaseHelper>
-SubresourceFilterBrowserTest::CreateTestDatabase() {
-  return std::make_unique<TestSafeBrowsingDatabaseHelper>();
-}
-
-void SubresourceFilterBrowserTest::ConfigureAsPhishingURL(const GURL& url) {
-  safe_browsing::ThreatMetadata metadata;
-  database_helper_->AddFullHashToDbAndFullHashCache(
-      url, safe_browsing::GetUrlSocEngId(), metadata);
-}
-
-void SubresourceFilterBrowserTest::ConfigureAsSubresourceFilterOnlyURL(
-    const GURL& url) {
-  safe_browsing::ThreatMetadata metadata;
-  database_helper_->AddFullHashToDbAndFullHashCache(
-      url, safe_browsing::GetUrlSubresourceFilterId(), metadata);
-}
-
-void SubresourceFilterBrowserTest::ConfigureURLWithWarning(
-    const GURL& url,
-    std::vector<safe_browsing::SubresourceFilterType> filter_types) {
-  safe_browsing::ThreatMetadata metadata;
-
-  for (auto type : filter_types) {
-    metadata.subresource_filter_match[type] =
-        safe_browsing::SubresourceFilterLevel::WARN;
-  }
-  database_helper_->AddFullHashToDbAndFullHashCache(
-      url, safe_browsing::GetUrlSubresourceFilterId(), metadata);
 }
 
 bool SubresourceFilterBrowserTest::IsDynamicScriptElementLoaded(
@@ -307,29 +261,6 @@ void SubresourceFilterBrowserTest::ResetConfigurationToEnableOnPhishingSites(
   config.activation_options.performance_measurement_rate =
       measure_performance ? 1.0 : 0.0;
   ResetConfiguration(std::move(config));
-}
-
-std::unique_ptr<TestSafeBrowsingDatabaseHelper>
-SubresourceFilterListInsertingBrowserTest::CreateTestDatabase() {
-  std::vector<safe_browsing::ListIdentifier> list_ids = {
-      safe_browsing::GetUrlSubresourceFilterId()};
-  return std::make_unique<TestSafeBrowsingDatabaseHelper>(
-      std::make_unique<safe_browsing::TestV4GetHashProtocolManagerFactory>(),
-      std::move(list_ids));
-}
-
-SubresourceFilterPrerenderingBrowserTest::
-    SubresourceFilterPrerenderingBrowserTest()
-    : prerender_helper_(base::BindRepeating(
-          &SubresourceFilterPrerenderingBrowserTest::web_contents,
-          base::Unretained(this))) {}
-
-SubresourceFilterPrerenderingBrowserTest::
-    ~SubresourceFilterPrerenderingBrowserTest() = default;
-
-void SubresourceFilterPrerenderingBrowserTest::SetUp() {
-  prerender_helper_.RegisterServerRequestMonitor(embedded_test_server());
-  SubresourceFilterListInsertingBrowserTest::SetUp();
 }
 
 }  // namespace subresource_filter

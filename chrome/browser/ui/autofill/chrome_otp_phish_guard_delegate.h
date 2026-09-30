@@ -17,10 +17,6 @@ class WebContents;
 
 namespace autofill {
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-class OtpFillingSafeBrowsingCheckerClient;
-#endif
-
 class ChromeOtpPhishGuardDelegate : public OtpPhishGuardDelegate {
  public:
   explicit ChromeOtpPhishGuardDelegate(content::WebContents* web_contents);
@@ -33,17 +29,8 @@ class ChromeOtpPhishGuardDelegate : public OtpPhishGuardDelegate {
       base::OnceCallback<void(bool)> callback) override;
 
  private:
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  void OnSafeBrowsingCheckComplete(const GURL& main_frame_url,
-                                   base::OnceCallback<void(bool)> callback,
-                                   bool is_malicious);
-#endif
 
   const raw_ref<content::WebContents> web_contents_;
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  std::unique_ptr<OtpFillingSafeBrowsingCheckerClient>
-      safe_browsing_checker_client_;
-#endif
 
   base::WeakPtrFactory<ChromeOtpPhishGuardDelegate> weak_factory_{this};
 };

@@ -169,6 +169,7 @@ source_set("browser_tests") {
   deps = [
     ":feedback_impl",
     "//base",
+    "//chrome/browser/metrics",
     "//chrome/browser/ui",
     "//chrome/browser/updater",
     "//chrome/test:test_support",

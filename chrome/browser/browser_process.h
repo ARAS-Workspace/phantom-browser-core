@@ -64,12 +64,6 @@ class NetworkQualityTracker;
 class SharedURLLoaderFactory;
 }  // namespace network
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-namespace safe_browsing {
-class SafeBrowsingService;
-}
-#endif
-
 namespace signin {
 class ActivePrimaryAccountsMetricsRecorder;
 }
@@ -253,11 +247,6 @@ class BrowserProcess {
   // in the system status tray. Returns NULL if status icons are not supported
   // on this platform (or this is a unit test).
   virtual StatusTray* status_tray() = 0;
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // Returns the SafeBrowsing service.
-  virtual safe_browsing::SafeBrowsingService* safe_browsing_service() = 0;
-#endif
 
   // Returns the service providing versioned storage for rules used by the Safe
   // Browsing subresource filter.

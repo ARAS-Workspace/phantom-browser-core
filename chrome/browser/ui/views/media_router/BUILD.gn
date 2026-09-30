@@ -78,7 +78,6 @@ source_set("impl") {
     "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
     "//chrome/browser/password_manager",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ssl",
     "//chrome/browser/subresource_filter",
     "//chrome/browser/ui:accelerator_table",

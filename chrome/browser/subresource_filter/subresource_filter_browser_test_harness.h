@@ -43,7 +43,6 @@ class RenderFrameHost;
 class WebContents;
 }  // namespace content
 
-class TestSafeBrowsingDatabaseHelper;
 
 namespace subresource_filter {
 
@@ -165,19 +164,7 @@ class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
 
  protected:
   // InProcessBrowserTest:
-  void SetUp() override;
-  void TearDown() override;
   void SetUpOnMainThread() override;
-
-  virtual std::unique_ptr<TestSafeBrowsingDatabaseHelper> CreateTestDatabase();
-
-  void ConfigureAsPhishingURL(const GURL& url);
-
-  void ConfigureAsSubresourceFilterOnlyURL(const GURL& url);
-
-  void ConfigureURLWithWarning(
-      const GURL& url,
-      std::vector<safe_browsing::SubresourceFilterType> filter_types);
 
   SubresourceFilterContentSettingsManager* settings_manager() const {
     return profile_context_->settings_manager();
@@ -210,54 +197,15 @@ class SubresourceFilterBrowserTest : public SubresourceFilterSharedBrowserTest {
   void ResetConfigurationToEnableOnPhishingSites(
       bool measure_performance = false);
 
-  TestSafeBrowsingDatabaseHelper* database_helper() {
-    return database_helper_.get();
-  }
-
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 
   TestRulesetCreator ruleset_creator_;
   ScopedSubresourceFilterConfigurator scoped_configuration_;
 
-  std::unique_ptr<TestSafeBrowsingDatabaseHelper> database_helper_;
-
   // Owned by the profile.
   raw_ptr<SubresourceFilterProfileContext, AcrossTasksDanglingUntriaged>
       profile_context_;
-};
-
-// This class automatically syncs the SubresourceFilter SafeBrowsing list
-// without needing a chrome branded build.
-class SubresourceFilterListInsertingBrowserTest
-    : public SubresourceFilterBrowserTest {
-  std::unique_ptr<TestSafeBrowsingDatabaseHelper> CreateTestDatabase() override;
-};
-
-class SubresourceFilterPrerenderingBrowserTest
-    : public SubresourceFilterListInsertingBrowserTest {
- public:
-  SubresourceFilterPrerenderingBrowserTest();
-  ~SubresourceFilterPrerenderingBrowserTest() override;
-
-  void SetUp() override;
-
- protected:
-  content::test::PrerenderTestHelper prerender_helper_;
-};
-
-class SubresourceFilterFencedFrameBrowserTest
-    : public SubresourceFilterListInsertingBrowserTest {
- public:
-  SubresourceFilterFencedFrameBrowserTest() = default;
-  ~SubresourceFilterFencedFrameBrowserTest() override = default;
-
-  content::test::FencedFrameTestHelper& fenced_frame_test_helper() {
-    return fenced_frame_test_helper_;
-  }
-
- private:
-  content::test::FencedFrameTestHelper fenced_frame_test_helper_;
 };
 
 }  // namespace subresource_filter

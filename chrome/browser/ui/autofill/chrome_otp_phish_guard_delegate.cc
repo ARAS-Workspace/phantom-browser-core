@@ -8,20 +8,9 @@
 #include "base/task/sequenced_task_runner.h"
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/autofill/otp_filling_safe_browsing_checker_client.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
-#endif
-
 namespace autofill {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 ChromeOtpPhishGuardDelegate::ChromeOtpPhishGuardDelegate(
     content::WebContents* web_contents)
     : web_contents_(CHECK_DEREF(web_contents)) {}
@@ -32,37 +21,6 @@ void ChromeOtpPhishGuardDelegate::StartOtpPhishGuardCheck(
     const GURL& main_frame_url,
     const GURL& frame_to_fill_url,
     base::OnceCallback<void(bool)> callback) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents_->GetBrowserContext());
-  auto database_manager =
-      g_browser_process->safe_browsing_service()
-          ? g_browser_process->safe_browsing_service()->database_manager()
-          : nullptr;
-  if (safe_browsing::IsSafeBrowsingEnabled(*profile->GetPrefs()) &&
-      database_manager) {
-    // First, check both the main frame URL and target frame-to-fill URL
-    // against local Safe Browsing blocklists covering various threat types.
-    // This provides fast, local multi-frame protection for both human and
-    // actor workflows.
-    auto* v5_get_hash_protocol_manager =
-        safe_browsing::V5GetHashProtocolManagerFactory::GetForProfile(profile);
-    safe_browsing_checker_client_ =
-        OtpFillingSafeBrowsingCheckerClient::CreateAndCheck(
-            database_manager,
-            v5_get_hash_protocol_manager
-                ? v5_get_hash_protocol_manager->GetWeakPtr()
-                : nullptr,
-            OtpFillingSafeBrowsingCheckerClient::kDefaultCheckDelay,
-            main_frame_url, frame_to_fill_url,
-            base::BindOnce(
-                &ChromeOtpPhishGuardDelegate::OnSafeBrowsingCheckComplete,
-                weak_factory_.GetWeakPtr(), main_frame_url,
-                std::move(callback)));
-    return;
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
   auto* password_manager_client =
       ChromePasswordManagerClient::FromWebContents(&web_contents_.get());
   bool is_actor_task_ongoing =
@@ -74,16 +32,5 @@ void ChromeOtpPhishGuardDelegate::StartOtpPhishGuardCheck(
   base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
       FROM_HERE, base::BindOnce(std::move(callback), is_actor_task_ongoing));
 }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-void ChromeOtpPhishGuardDelegate::OnSafeBrowsingCheckComplete(
-    const GURL& main_frame_url,
-    base::OnceCallback<void(bool)> callback,
-    bool is_malicious) {
-  safe_browsing_checker_client_.reset();
-
-  std::move(callback).Run(is_malicious);
-}
-#endif
 
 }  // namespace autofill

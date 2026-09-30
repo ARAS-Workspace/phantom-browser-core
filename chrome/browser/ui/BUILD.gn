@@ -628,7 +628,6 @@ static_library("ui") {
     "//chrome/browser/renderer_host",
     "//chrome/browser/resources",
     "//chrome/browser/resources:dev_ui_resources",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search_engine_choice",
     "//chrome/browser/search_engine_choice:impl",
     "//chrome/browser/search_engines",
@@ -937,7 +936,6 @@ static_library("ui") {
     # c/b/ui/browser.h, browser_commands.h, browser_window.h
     # c/b/ui/scoped_tabbed_browser_displayer.h
     # c/b/ui/views/frame/browser_view.h
-    "//chrome/browser/safe_browsing",
 
     # TODO(crbug.com/364667551): Remove this circular dependency when
     # c/b/ui/webui/feedback/feedback_dialog.h gets componentized.
@@ -1273,7 +1271,6 @@ static_library("ui") {
     "//chrome/browser/metrics/desktop_session_duration",
     "//chrome/browser/reading_list",
     "//chrome/browser/regional_capabilities",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/screen_ai:screen_ai_service_router_factory",
     "//chrome/browser/smart_card",
     "//chrome/browser/support_tool",

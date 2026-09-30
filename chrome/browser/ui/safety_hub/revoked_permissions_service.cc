@@ -52,8 +52,6 @@
 #include "url/origin.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #endif
 
@@ -164,21 +162,9 @@ RevokedPermissionsService::RevokedPermissionsService(
         notification_display_manager =
             RevokedPermissionsOSNotificationDisplayManagerFactory::
                 GetForProfile(Profile::FromBrowserContext(browser_context_));
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-    auto* v5_manager =
-        safe_browsing::V5GetHashProtocolManagerFactory::GetForBrowserContext(
-            browser_context_);
-#endif
     abusive_notification_manager_ =
         std::make_unique<AbusiveNotificationPermissionsManager>(
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-            g_browser_process->safe_browsing_service()
-                ? g_browser_process->safe_browsing_service()->database_manager()
-                : nullptr,
-            v5_manager ? v5_manager->GetWeakPtr() : nullptr,
-#else
             nullptr, nullptr,
-#endif
             hcsm(), pref_change_registrar_->prefs());
 
   pref_change_registrar_->Add(

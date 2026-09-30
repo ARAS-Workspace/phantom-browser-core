@@ -134,7 +134,6 @@ source_set("configs") {
   }
 
   if (safe_browsing_mode != 0) {
-    deps += [ "//chrome/browser/ui/webui/safe_browsing" ]
   }
 
   if (is_mac || is_linux) {

@@ -100,7 +100,6 @@
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #endif
 
 namespace {
@@ -481,18 +480,6 @@ void ChromePermissionsClient::OnPromptResolved(
       PermissionRevocationRequest::ExemptOriginFromFutureRevocations(profile,
                                                                      origin);
     }
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-    if (action == permissions::PermissionAction::GRANTED) {
-      if (g_browser_process->safe_browsing_service()) {
-        g_browser_process->safe_browsing_service()
-            ->MaybeSendNotificationsAcceptedReport(
-                web_contents->GetPrimaryMainFrame(), profile,
-                web_contents->GetLastCommittedURL(),
-                web_contents->GetController().GetLastCommittedEntry()->GetURL(),
-                origin, prompt_display_duration);
-      }
-    }
-#endif
   }
 
   // We're interested only in the granted prompts as in case of a permission

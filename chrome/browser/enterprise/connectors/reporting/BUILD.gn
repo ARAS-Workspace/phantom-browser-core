@@ -59,7 +59,6 @@ source_set("impl") {
     "//chrome/browser:browser_process",
     "//chrome/browser/enterprise",
     "//chrome/browser/profiles:profile_util",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/signin",
     "//components/crash/core/app",
     "//components/device_signals/core/browser",

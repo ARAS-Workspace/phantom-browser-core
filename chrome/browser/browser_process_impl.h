@@ -185,9 +185,6 @@ class BrowserProcessImpl : public BrowserProcess,
       std::unique_ptr<BackgroundModeManager> manager) override;
 #endif
   StatusTray* status_tray() override;
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::SafeBrowsingService* safe_browsing_service() override;
-#endif
   subresource_filter::RulesetService* subresource_filter_ruleset_service()
       override;
 
@@ -241,9 +238,6 @@ class BrowserProcessImpl : public BrowserProcess,
   void CreateNotificationUIManager();
   void CreatePrintPreviewDialogController();
   void CreateBackgroundPrintingManager();
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  void CreateSafeBrowsingService();
-#endif
   void CreateSubresourceFilterRulesetService();
   void CreateFingerprintingProtectionRulesetService();
   void CreateOptimizationGuideService();
@@ -343,11 +337,6 @@ class BrowserProcessImpl : public BrowserProcess,
   // Must be destroyed after the profile manager, because it doesn't remove
   // itself as a profile attributes storage observer on destruction.
   std::unique_ptr<BackgroundModeManager> background_mode_manager_;
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  bool created_safe_browsing_service_ = false;
-  scoped_refptr<safe_browsing::SafeBrowsingService> safe_browsing_service_;
 #endif
 
   bool created_subresource_filter_ruleset_service_ = false;

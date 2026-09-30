@@ -162,7 +162,6 @@ source_set("impl") {
 
   if (enable_extensions_core) {
     sources += [ "observers/serp_page_load_metrics_observer.cc" ]
-    deps += [ "//chrome/browser/safe_browsing" ]
   }
 }
 
@@ -261,6 +260,7 @@ source_set("browser_tests") {
     "//chrome/browser:after_startup_task_utils",
     "//chrome/browser/lookalikes",
     "//chrome/browser/lookalikes:test_support",
+    "//chrome/browser/metrics",
     "//chrome/browser/prefs:util",
     "//chrome/browser/preloading",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",

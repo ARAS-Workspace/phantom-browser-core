@@ -148,7 +148,6 @@ source_set("impl") {
     "//chrome/browser/notifications/scheduler:factory",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/permissions",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/exclusive_access",
     "//chrome/browser/updates/announcement_notification",

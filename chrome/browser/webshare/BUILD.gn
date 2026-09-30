@@ -61,7 +61,6 @@ if (is_mac) {
     if (safe_browsing_mode != 0) {
       sources += [ "safe_browsing_request.cc" ]
       deps += [
-        "//chrome/browser/safe_browsing",
         "//components/safe_browsing/content/common:file_type_policies",
         "//components/safe_browsing/core/browser/db",
         "//components/safe_browsing/core/browser/db:database_manager",
@@ -92,7 +91,6 @@ if (is_mac) {
       ":webshare",
       "//base/test:test_support",
       "//chrome/browser",
-      "//chrome/browser/safe_browsing:test_support",
       "//chrome/test:test_support",
       "//components/safe_browsing/core/browser/db:test_database_manager",
       "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",

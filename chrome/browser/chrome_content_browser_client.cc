@@ -575,12 +575,6 @@
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/enterprise/connectors/connectors_service.h"
-#include "chrome/browser/safe_browsing/chrome_enterprise_url_lookup_service_factory.h"
-#include "chrome/browser/safe_browsing/chrome_ping_manager_factory.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/url_checker_delegate_impl.h"
-#include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "components/safe_browsing/core/browser/realtime/chrome_enterprise_url_lookup_service.h"
 #endif
@@ -4569,10 +4563,6 @@ bool ChromeContentBrowserClient::IsSystemWideTracingEnabled() {
 void ChromeContentBrowserClient::InitOnUIThread() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing_service_ = g_browser_process->safe_browsing_service();
-#endif
-
   // Initialize `network_contexts_parent_directory_`.
   base::FilePath user_data_dir;
   base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir);
@@ -4680,14 +4670,7 @@ ChromeContentBrowserClient::MaybeCreateSafeBrowsingURLLoaderThrottle(
   safe_browsing::RealTimeUrlLookupServiceBase* url_lookup_service =
       GetUrlLookupService(browser_context, is_enterprise_lookup_enabled,
                           is_consumer_lookup_enabled);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::HashRealTimeService* hash_realtime_service =
-      safe_browsing_service_
-          ? safe_browsing_service_->GetHashRealTimeService(profile)
-          : nullptr;
-#else
   safe_browsing::HashRealTimeService* hash_realtime_service = nullptr;
-#endif
   safe_browsing::hash_realtime_utils::HashRealTimeSelection
       hash_realtime_selection =
           safe_browsing::hash_realtime_utils::DetermineHashRealTimeSelection(
@@ -4702,8 +4685,7 @@ ChromeContentBrowserClient::MaybeCreateSafeBrowsingURLLoaderThrottle(
 
   std::optional<safe_browsing::internal::ReferringAppInfo> referring_app_info =
       std::nullopt;
-  safe_browsing::V5GetHashProtocolManager* v5_get_hash_protocol_manager =
-      safe_browsing::V5GetHashProtocolManagerFactory::GetForProfile(profile);
+  safe_browsing::V5GetHashProtocolManager* v5_get_hash_protocol_manager = nullptr;
   return safe_browsing::BrowserURLLoaderThrottle::Create(
       base::BindRepeating(
           &ChromeContentBrowserClient::GetSafeBrowsingUrlCheckerDelegate,
@@ -6034,16 +6016,6 @@ ChromeContentBrowserClient::GetSafeBrowsingUrlCheckerDelegate(
     return nullptr;
   }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // |safe_browsing_service_| may be unavailable in tests.
-  if (safe_browsing_service_ && !safe_browsing_url_checker_delegate_) {
-    safe_browsing_url_checker_delegate_ =
-        base::MakeRefCounted<safe_browsing::UrlCheckerDelegateImpl>(
-            safe_browsing_service_->database_manager(),
-            safe_browsing_service_->ui_manager());
-  }
-#endif
-
   // Update allowlist domains.
   if (safe_browsing_url_checker_delegate_) {
     safe_browsing_url_checker_delegate_->SetPolicyAllowlistDomains(
@@ -6058,21 +6030,6 @@ ChromeContentBrowserClient::GetUrlLookupService(
     content::BrowserContext* browser_context,
     bool is_enterprise_lookup_enabled,
     bool is_consumer_lookup_enabled) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // |safe_browsing_service_| may be unavailable in tests.
-  if (!safe_browsing_service_) {
-    return nullptr;
-  }
-  Profile* profile = Profile::FromBrowserContext(browser_context);
-  if (is_enterprise_lookup_enabled) {
-    return safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::
-        GetForProfile(profile);
-  }
-  if (is_consumer_lookup_enabled) {
-    return safe_browsing::RealTimeUrlLookupServiceFactory::GetForProfile(
-        profile);
-  }
-#endif
   return nullptr;
 }
 
@@ -6084,34 +6041,7 @@ ChromeContentBrowserClient::GetAsyncCheckTracker(
     safe_browsing::hash_realtime_utils::HashRealTimeSelection
         hash_realtime_selection,
     content::FrameTreeNodeId frame_tree_node_id) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  content::WebContents* contents = wc_getter.Run();
-  if (!contents || !safe_browsing_service_ ||
-      !safe_browsing_service_->ui_manager()) {
-    return nullptr;
-  }
-  if (is_enterprise_lookup_enabled) {
-    // No async checks for enterprise real-time checks. URL filtering rules
-    // need to be applied before the navigation is completed.
-    return nullptr;
-  }
-  if (!is_consumer_lookup_enabled &&
-      hash_realtime_selection ==
-          safe_browsing::hash_realtime_utils::HashRealTimeSelection::kNone) {
-    return nullptr;
-  }
-  if (prerender::ChromeNoStatePrefetchContentsDelegate::FromWebContents(
-          contents) ||
-      contents->IsPrerenderedFrame(frame_tree_node_id)) {
-    return nullptr;
-  }
-  return safe_browsing::AsyncCheckTracker::GetOrCreateForWebContents(
-      contents, safe_browsing_service_->ui_manager().get(),
-      safe_browsing::AsyncCheckTracker::
-          IsPlatformEligibleForSyncCheckerCheckAllowlist());
-#else
   return nullptr;
-#endif
 }
 
 void ChromeContentBrowserClient::ReportLegacyTechEvent(

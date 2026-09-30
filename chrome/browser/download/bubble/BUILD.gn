@@ -55,7 +55,6 @@ source_set("impl") {
     "//chrome/browser/feature_engagement",
     "//chrome/browser/headless",
     "//chrome/browser/offline_items_collection",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/exclusive_access",
     "//chrome/browser/ui/hats",

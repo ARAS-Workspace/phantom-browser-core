@@ -150,7 +150,6 @@
 #include "chrome/browser/ui/webui/signin/signin_error_ui.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/ui/webui/safe_browsing/chrome_safe_browsing_ui.h"
 #endif
 
 #if BUILDFLAG(ENTERPRISE_WATERMARK)
@@ -308,11 +307,6 @@ void RegisterChromeWebUIConfigs() {
   map.AddWebUIConfig(std::make_unique<ProfilePickerUIConfig>());
   map.AddWebUIConfig(std::make_unique<SigninErrorUIConfig>());
   map.AddWebUIConfig(std::make_unique<SigninEmailConfirmationUIConfig>());
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  map.AddWebUIConfig(
-      std::make_unique<safe_browsing::ChromeSafeBrowsingUIConfig>());
-#endif
 
 #if BUILDFLAG(ENTERPRISE_WATERMARK)
   map.AddWebUIConfig(std::make_unique<WatermarkUIConfig>());

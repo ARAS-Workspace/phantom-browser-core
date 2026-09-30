@@ -94,7 +94,6 @@ source_set("impl") {
     "//chrome/browser/media/webrtc",
     "//chrome/browser/permissions",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ui:recently_audible_helper",
     "//chrome/browser/ui/navigator",
     "//components/content_settings/browser",
@@ -183,7 +182,6 @@ source_set("unit_tests") {
   ]
 
   sources += [
-    "auto_picture_in_picture_safe_browsing_checker_client_unittest.cc",
     "auto_pip_setting_helper_unittest.cc",
     "auto_pip_setting_overlay_view_unittest.cc",
     "auto_pip_setting_view_unittest.cc",

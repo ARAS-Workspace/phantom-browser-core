@@ -155,7 +155,6 @@ source_set("impl") {
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/profiles/keep_alive",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/signin",
     "//chrome/browser/tab_contents",
     "//chrome/browser/tab_group_sync",

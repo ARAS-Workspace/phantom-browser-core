@@ -35,6 +35,7 @@ static_library("test_support") {
     "test/structured_metrics_mixin.h",
   ]
   deps = [
+    "//chrome/browser/metrics",
     "//chrome/test:test_support",
     "//components/metrics/structured",
     "//components/metrics/structured:structured_metrics_features",

@@ -10,8 +10,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/browser/site_protection/site_familiarity_fetcher.h"
 #include "chrome/browser/site_protection/site_familiarity_utils.h"
 #include "chrome/browser/ui/views/infobars/confirm_infobar.h"
@@ -849,17 +847,6 @@ class JavascriptOptimizerBrowserTest_UseSiteFamiliarityBase
     }
   }
 
-  void CreatedBrowserMainParts(
-      content::BrowserMainParts* browser_main_parts) override {
-    JavascriptOptimizerBrowserTest::CreatedBrowserMainParts(browser_main_parts);
-    // Test UI manager and test database manager should be set before
-    // the browser is started but after threads are created.
-    factory_.SetTestDatabaseManager(
-        new safe_browsing::FakeSafeBrowsingDatabaseManager(
-            content::GetUIThreadTaskRunner({})));
-    safe_browsing::SafeBrowsingService::RegisterFactory(&factory_);
-  }
-
   void SetUpOnMainThread() override {
     JavascriptOptimizerBrowserTest::SetUpOnMainThread();
 
@@ -927,7 +914,6 @@ class JavascriptOptimizerBrowserTest_UseSiteFamiliarityBase
   virtual bool ShouldForceSitePerProcess() { return true; }
 
  private:
-  safe_browsing::TestSafeBrowsingServiceFactory factory_;
   base::test::ScopedFeatureList feature_list_;
 };
 

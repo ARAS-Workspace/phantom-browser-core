@@ -340,6 +340,7 @@ source_set("interactive_ui_tests") {
     "//components/search_engines",
     "//components/send_tab_to_self",
     "//components/send_tab_to_self:test_support",
+    "//components/unified_consent",
     "//content/public/browser",
     "//content/test:test_support",
     "//testing/gmock",

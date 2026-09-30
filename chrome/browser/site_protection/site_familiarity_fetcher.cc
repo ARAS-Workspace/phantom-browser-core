@@ -8,7 +8,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/site_protection/site_familiarity_process_selection_user_data.h"
 #include "chrome/browser/site_protection/site_familiarity_utils.h"
 #include "components/history/core/browser/history_service.h"
@@ -152,20 +151,6 @@ void SiteFamiliarityFetcher::Start(const GURL& url,
 
 void SiteFamiliarityFetcher::
     StartFetchingSafeBrowsingHighConfidenceAllowlist() {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (g_browser_process->safe_browsing_service()) {
-    if (auto database_manager =
-            g_browser_process->safe_browsing_service()->database_manager()) {
-      database_manager->CheckUrlForHighConfidenceAllowlist(
-          fetch_url_,
-          base::BindOnce(
-              &SiteFamiliarityFetcher::OnGotHighConfidenceAllowlistResult,
-              weak_factory_.GetWeakPtr()));
-      return;
-    }
-  }
-#endif
-
   OnGotHighConfidenceAllowlistResult(
       /*url_on_safe_browsing_high_confidence_allowlist=*/true,
       /*logging_details=*/std::nullopt);

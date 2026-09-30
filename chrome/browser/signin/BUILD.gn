@@ -487,6 +487,7 @@ source_set("unit_tests") {
   deps = [
     ":signin",
     ":test_support",
+    "//chrome/browser/metrics",
     "//chrome/browser/prefs",
     "//chrome/browser/profiles:profile_util",
     "//chrome/common:constants",

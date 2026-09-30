@@ -1540,33 +1540,7 @@ IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, Jpeg) {
 }
 
 // If the main resource is unsafe, the whole prefetch is cancelled.
-IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest,
-                       PrerenderSafeBrowsingTopLevel) {
-  GURL url = src_server()->GetURL(kPrefetchPage);
-  GetFakeSafeBrowsingDatabaseManager()->AddDangerousUrl(
-      url, safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_MALWARE);
 
-  std::unique_ptr<TestPrerender> prerender =
-      PrefetchFromFile(kPrefetchPage, FINAL_STATUS_SAFE_BROWSING);
-
-  // The frame request may have been started, but SafeBrowsing must have already
-  // blocked it. Verify that the page load did not happen.
-  prerender->WaitForLoads(0);
-
-  // The frame resource has been blocked by SafeBrowsing, the subresource on
-  // the page shouldn't be requested at all.
-  WaitForRequestCount(src_server()->GetURL(kPrefetchScript), 0);
-}
-
-// Ensures that server redirects to a malware page will cancel prerenders.
-IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, ServerRedirect) {
-  GURL url = src_server()->GetURL("/prerender/prerender_page.html");
-  GetFakeSafeBrowsingDatabaseManager()->AddDangerousUrl(
-      url, safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_PHISHING);
-  PrefetchFromURL(src_server()->GetURL(
-                      CreateServerRedirect("/prerender/prerender_page.html")),
-                  FINAL_STATUS_SAFE_BROWSING, 0);
-}
 
 // Checks that prefetching a page does not add it to browsing history.
 IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, HistoryUntouchedByPrefetch) {

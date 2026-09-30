@@ -120,10 +120,6 @@
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/enterprise/data_protection/view_source_navigation_throttle.h"
-#include "chrome/browser/safe_browsing/delayed_warning_navigation_throttle.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "components/safe_browsing/content/browser/safe_browsing_navigation_throttle.h"
 #include "components/safe_browsing/content/browser/ui_manager.h"
 #include "components/safe_browsing/core/common/features.h"
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
@@ -390,24 +386,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   web_app::WebUIWebAppNavigationThrottle::MaybeCreateAndAdd(registry);
 
   ImageNavigationThrottle::MaybeCreateAndAdd(registry);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // g_browser_process->safe_browsing_service() may be null in unittests.
-  safe_browsing::SafeBrowsingUIManager* ui_manager =
-      g_browser_process->safe_browsing_service()
-          ? g_browser_process->safe_browsing_service()->ui_manager().get()
-          : nullptr;
-  safe_browsing::SafeBrowsingNavigationThrottle::MaybeCreateAndAdd(registry,
-                                                                   ui_manager);
-
-  if (base::FeatureList::IsEnabled(safe_browsing::kDelayedWarnings)) {
-    registry.AddThrottle(
-        std::make_unique<safe_browsing::DelayedWarningNavigationThrottle>(
-            registry));
-  }
-  enterprise_data_protection::ViewSourceNavigationThrottle::MaybeCreateAndAdd(
-      registry, ui_manager);
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   browser_switcher::BrowserSwitcherNavigationThrottle::MaybeCreateAndAdd(

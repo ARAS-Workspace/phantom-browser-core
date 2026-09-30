@@ -20,7 +20,6 @@
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
 #endif
 
@@ -36,11 +35,6 @@ ChromeWebstorePrivateAPIDelegate::GetWebStoreAPIFactoryDependencies() {
   dependencies.push_back(ExtensionAllowlistFactory::GetInstance());
   dependencies.push_back(IdentityManagerFactory::GetInstance());
   dependencies.push_back(InstallTrackerFactory::GetInstance());
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  dependencies.push_back(
-      safe_browsing::SafeBrowsingNavigationObserverManagerFactory::
-          GetInstance());
-#endif
   return dependencies;
 }
 
@@ -80,16 +74,13 @@ void ChromeWebstorePrivateAPIDelegate::ReportFrictionAcceptedEvent(
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 bool ChromeWebstorePrivateAPIDelegate::IsSafeBrowsingEnabledAndReady(
     content::BrowserContext* context) {
-  PrefService* prefs = Profile::FromBrowserContext(context)->GetPrefs();
-  return safe_browsing::SafeBrowsingNavigationObserverManager::
-      IsEnabledAndReady(prefs, g_browser_process->safe_browsing_service());
+  return false;
 }
 
 safe_browsing::SafeBrowsingNavigationObserverManager*
 ChromeWebstorePrivateAPIDelegate::GetSafeBrowsingNavigationObserverManager(
     content::BrowserContext* context) {
-  return safe_browsing::SafeBrowsingNavigationObserverManagerFactory::
-      GetForBrowserContext(context);
+  return nullptr;
 }
 #endif
 

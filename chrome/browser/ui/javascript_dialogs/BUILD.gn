@@ -28,7 +28,6 @@ source_set("impl") {
   deps = [
     ":javascript_dialogs",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ui:url_identity",
     "//components/navigation_metrics",
     "//components/strings:components_strings",

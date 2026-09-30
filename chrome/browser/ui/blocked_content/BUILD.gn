@@ -75,7 +75,6 @@ source_set("browser_tests") {
   sources = [
     "popup_opener_tab_helper_browsertest.cc",
     "popup_tracker_browsertest.cc",
-    "safe_browsing_triggered_popup_blocker_browsertest.cc",
   ]
   deps = [
     ":blocked_content",

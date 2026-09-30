@@ -25,7 +25,6 @@
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
@@ -1016,9 +1015,7 @@ class AutoPictureInPictureWithVideoPlaybackBrowserTest
     : public AutoPictureInPictureTabHelperBrowserTest {
  public:
   AutoPictureInPictureWithVideoPlaybackBrowserTest()
-      : safe_browsing_factory_(
-            std::make_unique<safe_browsing::TestSafeBrowsingServiceFactory>()),
-        dependency_manager_subscription_(
+      : dependency_manager_subscription_(
             BrowserContextDependencyManager::GetInstance()
                 ->RegisterCreateServicesCallbackForTesting(base::BindRepeating(
                     &AutoPictureInPictureWithVideoPlaybackBrowserTest::
@@ -1063,15 +1060,7 @@ class AutoPictureInPictureWithVideoPlaybackBrowserTest
 
  protected:
   void CreatedBrowserMainParts(
-      content::BrowserMainParts* browser_main_parts) override {
-    fake_safe_browsing_database_manager_ =
-        base::MakeRefCounted<safe_browsing::FakeSafeBrowsingDatabaseManager>(
-            content::GetUIThreadTaskRunner({}));
-    safe_browsing_factory_->SetTestDatabaseManager(
-        fake_safe_browsing_database_manager_.get());
-    safe_browsing::SafeBrowsingService::RegisterFactory(
-        safe_browsing_factory_.get());
-  }
+      content::BrowserMainParts* browser_main_parts) override {}
 
   void SetTestingFactory(content::BrowserContext* context) {
     MediaEngagementServiceFactory::GetInstance()->SetTestingFactory(
@@ -1079,10 +1068,6 @@ class AutoPictureInPictureWithVideoPlaybackBrowserTest
   }
 
  private:
-  scoped_refptr<safe_browsing::FakeSafeBrowsingDatabaseManager>
-      fake_safe_browsing_database_manager_;
-  std::unique_ptr<safe_browsing::TestSafeBrowsingServiceFactory>
-      safe_browsing_factory_;
   base::CallbackListSubscription dependency_manager_subscription_;
 };
 

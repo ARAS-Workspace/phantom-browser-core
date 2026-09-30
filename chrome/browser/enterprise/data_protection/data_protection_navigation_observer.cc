@@ -32,7 +32,6 @@
 #include "url/gurl.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/chrome_enterprise_url_lookup_service_factory.h"
 #include "components/enterprise/data_protection/features.h"
 #include "components/safe_browsing/core/browser/realtime/chrome_enterprise_url_lookup_service.h"
 #include "components/safe_browsing/core/browser/realtime/policy_engine.h"
@@ -231,30 +230,8 @@ DataProtectionNavigationObserver::CreateForNavigationIfNeeded(
   VLOG(1) << "enterprise.data_protection: URL to scan: "
           << navigation_handle->GetURL();
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // The Data protection settings need to be cleared if:
-  // 1. This is a skipped URL. This is needed to handle for example navigating
-  // from a watermarked page to the NTP.
-  // 2. Data protection is disabled. This is needed to prevent stale data
-  // protection settings if the enabled state is changed mid session.
-  if (SkipUrl(navigation_handle->GetURL())) {
-    std::move(callback).Run(UrlSettings::None());
-    return nullptr;
-  }
-
-  // ChromeEnterpriseRealTimeUrlLookupServiceFactory::GetForProfile() return
-  // nullptr if enterprise policies are not set.  In this case data protections
-  // will be based on data controls alone,
-  return std::make_unique<
-      enterprise_data_protection::DataProtectionNavigationObserver>(
-      *navigation_handle,
-      safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::
-          GetForProfile(profile),
-      navigation_handle->GetWebContents(), delegate, std::move(callback));
-#else
   std::move(callback).Run(UrlSettings::None());
   return nullptr;
-#endif
 }
 
 // static
@@ -295,12 +272,7 @@ void DataProtectionNavigationObserver::ApplyDataProtectionSettings(
   auto* lookup_service =
       g_lookup_service
           ? g_lookup_service
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-          : safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::
-                GetForProfile(profile);
-#else
           : nullptr;
-#endif
   if (lookup_service && IsEnterpriseLookupEnabled(profile)) {
     auto lookup_callback = base::BindOnce(
         [](const std::string& identifier,

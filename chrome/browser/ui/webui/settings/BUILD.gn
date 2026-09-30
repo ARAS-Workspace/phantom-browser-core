@@ -436,8 +436,6 @@ source_set("unit_tests") {
     "//chrome/browser/profile_resetter",
     "//chrome/browser/profile_resetter:fake_profile_resetter",
     "//chrome/browser/regional_capabilities",
-    "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:test_support",
     "//chrome/browser/search_engine_choice",
     "//chrome/browser/search_engines",
     "//chrome/browser/serial",

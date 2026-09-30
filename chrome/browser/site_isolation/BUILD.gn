@@ -65,6 +65,7 @@ source_set("browser_tests") {
   deps = [
     ":site_isolation",
     "//chrome/browser:chrome_content_browser_client",
+    "//chrome/browser/metrics",
     "//chrome/browser/subresource_filter:test_support",
     "//chrome/common:chrome_features",
     "//chrome/test:test_support",

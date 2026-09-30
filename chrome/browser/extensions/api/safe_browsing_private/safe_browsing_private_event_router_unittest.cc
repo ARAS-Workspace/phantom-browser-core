@@ -17,7 +17,6 @@
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router_factory.h"
-#include "chrome/browser/safe_browsing/test_extension_event_observer.h"
 #include "chrome/common/extensions/api/safe_browsing_private.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
@@ -85,9 +84,6 @@ class SafeBrowsingPrivateEventRouterTestBase : public testing::Test {
   void SetUp() override {
     profile_ = profile_manager_.CreateTestingProfile("test-user");
     event_router_ = extensions::CreateAndUseTestEventRouter(profile_);
-    SafeBrowsingPrivateEventRouterFactory::GetInstance()->SetTestingFactory(
-        profile_, base::BindRepeating(
-                      &safe_browsing::BuildSafeBrowsingPrivateEventRouter));
     identity_test_environment_ =
         std::make_unique<signin::IdentityTestEnvironment>();
     extensions::SafeBrowsingPrivateEventRouterFactory::GetForProfile(profile_)

@@ -15,10 +15,6 @@
 class PrefService;
 class Profile;
 
-namespace safe_browsing {
-class SafeBrowsingService;
-}
-
 namespace network::mojom {
 enum class SCTAuditingMode;
 }  // namespace network::mojom
@@ -43,8 +39,7 @@ class SCTReportingService : public KeyedService {
   // track a browser-wide report count.
   static void OnNewSCTAuditingReportSent();
 
-  SCTReportingService(safe_browsing::SafeBrowsingService* safe_browsing_service,
-                      Profile* profile);
+  explicit SCTReportingService(Profile* profile);
   ~SCTReportingService() override;
 
   SCTReportingService(const SCTReportingService&) = delete;
@@ -54,13 +49,8 @@ class SCTReportingService : public KeyedService {
   network::mojom::SCTAuditingMode GetReportingMode();
 
  private:
-  void OnPreferenceChanged();
-
-  raw_ptr<safe_browsing::SafeBrowsingService, DanglingUntriaged>
-      safe_browsing_service_;
   const raw_ref<const PrefService> pref_service_;
   raw_ptr<Profile> profile_;
-  base::CallbackListSubscription safe_browsing_state_subscription_;
 };
 
 #endif  // CHROME_BROWSER_SSL_SCT_REPORTING_SERVICE_H_

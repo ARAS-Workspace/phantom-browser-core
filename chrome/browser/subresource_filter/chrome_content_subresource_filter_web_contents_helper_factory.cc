@@ -12,23 +12,14 @@
 #include "components/subresource_filter/content/browser/ruleset_service.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #endif
 
 namespace {
 
-// Returns a scoped refptr to the SafeBrowsingService's database manager, if
-// available. Otherwise returns nullptr.
+// Returns nullptr; no database manager is available to this build.
 const scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
 GetDatabaseManagerFromSafeBrowsingService() {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::SafeBrowsingService* safe_browsing_service =
-      g_browser_process->safe_browsing_service();
-  return safe_browsing_service ? safe_browsing_service->database_manager()
-                               : nullptr;
-#else
   return nullptr;
-#endif
 }
 
 }  // namespace

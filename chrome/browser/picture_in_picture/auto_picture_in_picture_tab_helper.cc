@@ -37,8 +37,6 @@
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #endif
 
@@ -756,39 +754,7 @@ void AutoPictureInPictureTabHelper::OnUrlSafetyResult(bool has_safe_url) {
 }
 
 void AutoPictureInPictureTabHelper::ScheduleUrlSafetyCheck() {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  CHECK(!is_in_picture_in_picture_);
-  CHECK(g_browser_process);
-  CHECK(g_browser_process->safe_browsing_service());
-
-  std::optional<content::RenderFrameHost*> rfh = GetPrimaryMainRoutedFrame();
-  if (!rfh) {
-    return;
-  }
-
-  if (!safe_browsing_checker_client_) {
-    // Create the AutoPiP safe browsing checker client, which will be used for
-    // determining URL safety.
-    auto* v5_manager =
-        (web_contents() && web_contents()->GetBrowserContext())
-            ? safe_browsing::V5GetHashProtocolManagerFactory::
-                  GetForBrowserContext(web_contents()->GetBrowserContext())
-            : nullptr;
-    safe_browsing_checker_client_ = std::make_unique<
-        AutoPictureInPictureSafeBrowsingCheckerClient>(
-        g_browser_process->safe_browsing_service()->database_manager().get(),
-        v5_manager ? v5_manager->GetWeakPtr()
-                   : /*v5_get_hash_protocol_manager=*/nullptr,
-        kSafeBrowsingCheckDelay,
-        base::BindRepeating(&AutoPictureInPictureTabHelper::OnUrlSafetyResult,
-                            async_tasks_weak_factory_.GetWeakPtr()));
-  }
-
-  safe_browsing_checker_client_->CheckUrlSafety(
-      rfh.value()->GetLastCommittedURL());
-#else
   OnUrlSafetyResult(/*has_safe_url=*/true);
-#endif
 }
 
 void AutoPictureInPictureTabHelper::EnsureAutoPipSettingHelper() {

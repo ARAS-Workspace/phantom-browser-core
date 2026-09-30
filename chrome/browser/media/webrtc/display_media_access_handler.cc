@@ -52,7 +52,6 @@
 #endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/user_interaction_observer.h"
 #endif
 
 
@@ -194,23 +193,6 @@ void DisplayMediaAccessHandler::HandleRequest(
         /*ui=*/nullptr);
     return;
   }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // SafeBrowsing Delayed Warnings experiment can delay some SafeBrowsing
-  // warnings until user interaction. If the current page has a delayed warning,
-  // it'll have a user interaction observer attached. Show the warning
-  // immediately in that case.
-  safe_browsing::SafeBrowsingUserInteractionObserver* observer =
-      safe_browsing::SafeBrowsingUserInteractionObserver::FromWebContents(
-          web_contents);
-  if (observer) {
-    std::move(callback).Run(blink::mojom::StreamDevicesSet(),
-                            MediaStreamRequestResult::SAFE_BROWSING_OBSERVER,
-                            /*ui=*/nullptr);
-    observer->OnDesktopCaptureRequest();
-    return;
-  }
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // Do not allow picker UI to be shown on a page that isn't in the foreground

@@ -12,7 +12,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_database_helper.h"
 #include "chrome/browser/subresource_filter/subresource_filter_browser_test_harness.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -70,7 +69,7 @@ void RoundTripAndVerifyLogMessages(
 // Tests that subresource_filter interacts well with the abusive enforcement in
 // chrome/browser/ui/blocked_content/safe_browsing_triggered_popup_blocker.
 class SubresourceFilterPopupBrowserTest
-    : public SubresourceFilterListInsertingBrowserTest {
+    : public SubresourceFilterBrowserTest {
  public:
   void SetUpOnMainThread() override {
     SubresourceFilterBrowserTest::SetUpOnMainThread();
@@ -114,31 +113,6 @@ class SubresourceFilterPopupBrowserTest
   }
 };
 
-IN_PROC_BROWSER_TEST_F(SubresourceFilterPopupBrowserTest,
-                       NoConfiguration_AllowCreatingNewWindows) {
-  ResetConfiguration(Configuration::MakePresetForLiveRunOnPhishingSites());
-  base::HistogramTester tester;
-  const char kWindowOpenPath[] = "/subresource_filter/window_open.html";
-  GURL a_url(embedded_test_server()->GetURL("a.com", kWindowOpenPath));
-  // Only configure |a_url| as a phishing URL.
-  ConfigureAsPhishingURL(a_url);
-
-  // Navigate to a_url, should not trigger the popup blocker.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), a_url));
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  EXPECT_EQ(true, content::EvalJs(web_contents, "openWindow()"));
-  EXPECT_FALSE(content_settings::PageSpecificContentSettings::GetForFrame(
-                   web_contents->GetPrimaryMainFrame())
-                   ->IsContentBlocked(ContentSettingsType::POPUPS));
-
-  // Navigate again to trigger histogram logging. Make sure the navigation
-  // happens in the original WebContents.
-  browser()->tab_strip_model()->ActivateTabAt(
-      browser()->tab_strip_model()->GetIndexOfWebContents(web_contents));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL("/title1.html")));
-}
 
 class SubresourceFilterPopupBrowserTestWithParam
     : public SubresourceFilterPopupBrowserTest,

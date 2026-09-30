@@ -144,7 +144,6 @@
 #include "ui/base/l10n/l10n_util.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/user_interaction_observer.h"
 #endif
 
 #include "chrome/browser/password_manager/factories/password_counter_factory.h"
@@ -1399,18 +1398,6 @@ bool ChromePasswordManagerClient::IsPasswordManagementEnabledForCurrentPage(
       GURL(password_manager::kPasswordManagerAccountDashboardURL)) {
     is_enabled = false;
   }
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // SafeBrowsing Delayed Warnings experiment can delay some SafeBrowsing
-  // warnings until user interaction. If the current page has a delayed warning,
-  // it'll have a user interaction observer attached. Disable password
-  // management in that case.
-  if (auto* observer =
-          safe_browsing::SafeBrowsingUserInteractionObserver::FromWebContents(
-              web_contents())) {
-    observer->OnPasswordSaveOrAutofillDenied();
-    is_enabled = false;
-  }
-#endif
 
   autofill::LogManager* log_manager = GetOrCreateLogManager();
   if (log_manager && log_manager->IsLoggingActive()) {

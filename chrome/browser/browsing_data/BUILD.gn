@@ -122,7 +122,6 @@ source_set("impl") {
     "//chrome/browser/private_verification_tokens",
     "//chrome/browser/profiles/keep_alive",
     "//chrome/browser/reading_list",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search_engine_choice",
     "//chrome/browser/search_engines",
     "//chrome/browser/sessions",

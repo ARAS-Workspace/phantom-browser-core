@@ -20,7 +20,6 @@
 #include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/browser/preloading/scoped_prewarm_feature_list.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/chrome_enterprise_url_lookup_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands_mac.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
@@ -105,7 +104,6 @@
 #endif
 
 
-
 class BrowserViewTest : public InProcessBrowserTest {
  public:
   BrowserViewTest() : devtools_(nullptr) {}
@@ -175,9 +173,6 @@ class BrowserViewTest : public InProcessBrowserTest {
 
   raw_ptr<DevToolsWindow> devtools_;
 };
-
-
-
 
 
 namespace {
@@ -1209,115 +1204,8 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, SplitViewTabRevealFullscreen) {
 
 namespace {
 
-class FakeRealTimeUrlLookupService
-    : public safe_browsing::testing::FakeRealTimeUrlLookupService {
- public:
-  FakeRealTimeUrlLookupService() = default;
-
-  // RealTimeUrlLookupServiceBase:
-  void StartMaybeCachedLookup(
-      const GURL& url,
-      safe_browsing::RTLookupResponseCallback response_callback,
-      scoped_refptr<base::SequencedTaskRunner> callback_task_runner,
-      SessionID session_id,
-      std::optional<safe_browsing::internal::ReferringAppInfo>
-          referring_app_info,
-      bool use_cache) override {
-    auto response = std::make_unique<safe_browsing::RTLookupResponse>();
-
-    callback_task_runner->PostTask(
-        FROM_HERE,
-        base::BindOnce(std::move(response_callback),
-                       /*is_rt_lookup_successful=*/true,
-                       /*is_cached_response=*/true, std::move(response)));
-  }
-};
-
-class BrowserViewDataProtectionTest : public InProcessBrowserTest {
- public:
-  BrowserViewDataProtectionTest()
-      : scoped_prewarm_feature_list_(test::ScopedPrewarmFeatureList::
-                                         PrewarmState::kEnabledWithNoTrigger) {}
-  BrowserViewDataProtectionTest(const BrowserViewDataProtectionTest&) = delete;
-  BrowserViewDataProtectionTest& operator=(
-      const BrowserViewDataProtectionTest&) = delete;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // Set a DM token since the enterprise real-time URL service expects one.
-    policy::SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-
-    auto create_service_callback =
-        base::BindRepeating([](content::BrowserContext* context) {
-          Profile* profile = Profile::FromBrowserContext(context);
-
-          // Enable real-time URL checks.
-          profile->GetPrefs()->SetInteger(
-              enterprise_connectors::kEnterpriseRealTimeUrlCheckMode,
-              enterprise_connectors::REAL_TIME_CHECK_FOR_MAINFRAME_ENABLED);
-          profile->GetPrefs()->SetInteger(
-              enterprise_connectors::kEnterpriseRealTimeUrlCheckScope,
-              policy::POLICY_SCOPE_MACHINE);
-
-          auto testing_factory =
-              base::BindRepeating([](content::BrowserContext* context)
-                                      -> std::unique_ptr<KeyedService> {
-                return std::make_unique<FakeRealTimeUrlLookupService>();
-              });
-          safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::
-              GetInstance()
-                  ->SetTestingFactory(context, testing_factory);
-        });
-
-    create_services_subscription_ =
-        BrowserContextDependencyManager::GetInstance()
-            ->RegisterCreateServicesCallbackForTesting(create_service_callback);
-  }
-
-  content::WebContents* NavigateAsync(const GURL& url) {
-    NavigateParams params(browser(), url, ui::PAGE_TRANSITION_LINK);
-    Navigate(&params);
-    return params.navigated_or_inserted_contents;
-  }
-
-  void NavigateToAndWait(const GURL& url) {
-    content::WaitForLoadStop(NavigateAsync(url));
-  }
-
- private:
-  base::CallbackListSubscription create_services_subscription_;
-  // TODO(https://crbug.com/458274323): browser()->GetWidget() seems returning
-  // a wrong Widget, one for the prewarm page, unexpectedly, might be due to
-  // missing MPArch support?
-  // Investigate details, and fix it to remove this workaround so that
-  // DC_Screenshot test can pass stably.
-  test::ScopedPrewarmFeatureList scoped_prewarm_feature_list_;
-};
 
 }  // namespace
-
-#if BUILDFLAG(IS_MAC)
-
-IN_PROC_BROWSER_TEST_F(BrowserViewDataProtectionTest, DC_Screenshot) {
-  data_controls::SetDataControls(browser()->GetProfile()->GetPrefs(), {R"(
-        {
-          "name":"block",
-          "rule_id":"1234",
-          "sources":{"urls":["noscreenshot.com"]},
-          "restrictions":[{"class": "SCREENSHOT", "level": "BLOCK"} ]
-        }
-      )"});
-
-  auto* widget = BrowserView::GetBrowserViewForBrowser(browser())->GetWidget();
-  ASSERT_TRUE(widget);
-
-  NavigateToAndWait(GURL("https://noscreenshot.com"));
-  EXPECT_FALSE(widget->AreScreenshotsAllowed());
-
-  NavigateToAndWait(GURL("https://screenshot.com"));
-  EXPECT_TRUE(widget->AreScreenshotsAllowed());
-}
-
-#endif  // BUILDFLAG(IS_MAC)
 
 
 namespace {

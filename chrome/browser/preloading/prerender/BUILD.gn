@@ -134,7 +134,6 @@ source_set("interactive_ui_tests") {
     "//chrome/browser/preloading/prefetch/search_prefetch",
     "//chrome/browser/preloading/prefetch/search_prefetch:field_trial_settings",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing:test_support",
     "//chrome/browser/search_engines",
     "//chrome/browser/ui",
     "//chrome/browser/ui/browser_window",

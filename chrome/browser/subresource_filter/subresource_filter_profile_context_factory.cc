@@ -16,7 +16,6 @@
 #include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #endif
 
@@ -48,9 +47,6 @@ SubresourceFilterProfileContextFactory::SubresourceFilterProfileContextFactory()
               .Build()) {
   DependsOn(HostContentSettingsMapFactory::GetInstance());
   DependsOn(HistoryServiceFactory::GetInstance());
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  DependsOn(safe_browsing::V5GetHashProtocolManagerFactory::GetInstance());
-#endif
 }
 
 std::unique_ptr<KeyedService>
@@ -58,21 +54,11 @@ SubresourceFilterProfileContextFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  auto* v5_manager =
-      safe_browsing::V5GetHashProtocolManagerFactory::GetForBrowserContext(
-          context);
-#endif
-
   auto subresource_filter_profile_context =
       std::make_unique<subresource_filter::SubresourceFilterProfileContext>(
           HostContentSettingsMapFactory::GetForProfile(profile),
           CookieSettingsFactory::GetForProfile(profile),
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-          v5_manager ? v5_manager->GetWeakPtr() : nullptr
-#else
           /*v5_get_hash_protocol_manager=*/nullptr
-#endif
       );
 
   // Create and attach a SubresourceFilterHistoryObserver instance if possible.

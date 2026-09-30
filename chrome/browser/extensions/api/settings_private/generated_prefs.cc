@@ -14,7 +14,6 @@
 #include "chrome/browser/content_settings/generated_permission_prompting_behavior_pref.h"
 #include "chrome/browser/extensions/api/settings_private/generated_pref.h"
 #include "chrome/browser/extensions/api/settings_private/prefs_util_enums.h"
-#include "chrome/browser/safe_browsing/generated_safe_browsing_pref.h"
 #include "chrome/browser/ssl/generated_https_first_mode_pref.h"
 #include "chrome/common/extensions/api/settings_private.h"
 #include "components/content_settings/core/common/content_settings_types.h"
@@ -94,8 +93,6 @@ void GeneratedPrefs::CreatePrefs() {
       content_settings::GeneratedCookieDefaultContentSettingPref>(profile_);
   prefs_[content_settings::kThirdPartyCookieBlockingSetting] = std::make_unique<
       content_settings::GeneratedThirdPartyCookieBlockingSettingPref>(profile_);
-  prefs_[safe_browsing::kGeneratedSafeBrowsingPref] =
-      std::make_unique<safe_browsing::GeneratedSafeBrowsingPref>(profile_);
   prefs_[content_settings::kGeneratedNotificationPref] = std::make_unique<
       content_settings::GeneratedPermissionPromptingBehaviorPref>(
       profile_, ContentSettingsType::NOTIFICATIONS);

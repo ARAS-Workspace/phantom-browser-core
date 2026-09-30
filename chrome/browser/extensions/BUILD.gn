@@ -508,6 +508,7 @@ source_set("extensions") {
     "//chrome/browser/infobars",
     "//chrome/browser/lifetime:termination_notification",
     "//chrome/browser/net",
+    "//chrome/browser/notifications",
     "//chrome/browser/password_manager",
     "//chrome/browser/password_manager:impl",
     "//chrome/browser/password_manager/factories",
@@ -523,7 +524,6 @@ source_set("extensions") {
     "//chrome/browser/renderer_host",
     "//chrome/browser/resource_coordinator:utils",
     "//chrome/browser/resources:component_extension_resources",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search",
     "//chrome/browser/sessions",
     "//chrome/browser/signin",
@@ -809,7 +809,6 @@ source_set("extensions") {
       "//chrome/browser/web_applications/extensions",
 
       # TODO(crbug.com/41437292): Remove this circular dependency.
-      "//chrome/browser/safe_browsing",
 
       # TODO(crbug.com/343037853): Remove this circular dependency.
       "//chrome/browser/themes",
@@ -1338,7 +1337,6 @@ source_set("chrome_extensions_browser_client") {
     "//chrome/browser/prefetch",
     "//chrome/browser/profiles:profile_manager",
     "//chrome/browser/profiles/keep_alive",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search_engines",
     "//chrome/browser/task_manager",
     "//chrome/browser/ui",
@@ -1396,10 +1394,7 @@ source_set("chrome_extensions_browser_client") {
   if (safe_browsing_mode == 1) {
     sources += []
 
-    deps += [
-      "//chrome/browser/safe_browsing",
-      "//components/safe_browsing/core/common:features",
-    ]
+    deps += [ "//components/safe_browsing/core/common:features" ]
   }
 }
 
@@ -2072,7 +2067,6 @@ source_set("browser_tests") {
       "api/printer_provider/printer_provider_apitest.cc",
       "api/protocol_handlers/protocol_handlers_manager_browsertest.cc",
       "api/resources_private/resources_private_apitest.cc",
-      "api/safe_browsing_private/safe_browsing_private_api_browsertest.cc",
       "api/settings_private/settings_private_apitest.cc",
       "api/side_panel/side_panel_apitest.cc",
       "api/socket/socket_apitest.cc",

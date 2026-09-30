@@ -29,28 +29,9 @@
 #include "ui/views/view_class_properties.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #endif
 
 using offline_items_collection::ContentId;
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-namespace {
-
-void MaybeSendDownloadReport(content::BrowserContext* browser_context,
-                             download::DownloadItem* download) {
-  if (safe_browsing::SafeBrowsingService* service =
-          g_browser_process->safe_browsing_service()) {
-    service->SendDownloadReport(download,
-                                safe_browsing::ClientSafeBrowsingReportRequest::
-                                    DANGEROUS_DOWNLOAD_RECOVERY,
-                                /*did_proceed=*/true,
-                                /*show_download_in_folder=*/std::nullopt);
-  }
-}
-
-}  // namespace
-#endif
 
 DownloadBubbleContentsView::DownloadBubbleContentsView(
     BrowserWindowInterface* browser,

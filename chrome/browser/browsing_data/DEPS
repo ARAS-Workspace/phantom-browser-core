@@ -106,7 +106,6 @@ include_rules = [
   "+chrome/browser/profiles/profile_keyed_service_factory.h",
   "+chrome/browser/profiles/profile_manager.h",
   "+chrome/browser/reading_list/reading_list_model_factory.h",
-  "+chrome/browser/safe_browsing/safe_browsing_service.h",
   "+chrome/browser/search_engine_choice/search_engine_choice_service_factory.h",
   "+chrome/browser/search_engines/template_url_service_factory.h",
   "+chrome/browser/segmentation_platform/segmentation_platform_service_factory.h",

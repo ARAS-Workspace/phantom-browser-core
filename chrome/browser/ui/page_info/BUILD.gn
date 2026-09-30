@@ -72,7 +72,6 @@ source_set("impl") {
     "//chrome/browser/permissions/system",
     "//chrome/browser/picture_in_picture",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ssl",
     "//chrome/browser/subresource_filter",
     "//chrome/browser/ui:ui_features",

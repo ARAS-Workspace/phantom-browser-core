@@ -143,7 +143,6 @@ source_set("impl") {
     "//chrome/browser/preloading/search_preload",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/resources/omnibox_popup:resources_grit",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/ssl",
     "//chrome/browser/ui:layout_constants",
     "//chrome/browser/ui:ui_features",

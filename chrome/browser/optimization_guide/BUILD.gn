@@ -137,6 +137,7 @@ source_set("browser_tests") {
     ":test_support",
     "//base/test:test_proto",
     "//base/test:test_support",
+    "//chrome/browser/metrics",
     "//chrome/browser/preloading/prefetch:test_support",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
     "//chrome/browser/signin/e2e_tests:test_support",

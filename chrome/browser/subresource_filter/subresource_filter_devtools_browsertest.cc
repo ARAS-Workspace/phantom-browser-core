@@ -106,44 +106,6 @@ IN_PROC_BROWSER_TEST_F(SubresourceFilterDevtoolsBrowserTest,
       WasParsedScriptElementLoaded(web_contents()->GetPrimaryMainFrame()));
 }
 
-IN_PROC_BROWSER_TEST_F(SubresourceFilterListInsertingBrowserTest,
-                       WarningSiteWithForceActivation_LogsWarning) {
-  const GURL url(
-      GetTestUrl("subresource_filter/frame_with_included_script.html"));
-  ASSERT_NO_FATAL_FAILURE(
-      SetRulesetToDisallowURLsWithPathSuffix("included_script.js"));
-  ConfigureURLWithWarning(url,
-                          {safe_browsing::SubresourceFilterType::BETTER_ADS});
-
-  Configuration config(subresource_filter::mojom::ActivationLevel::kEnabled,
-                       subresource_filter::ActivationScope::ACTIVATION_LIST,
-                       subresource_filter::ActivationList::BETTER_ADS);
-  ResetConfiguration(std::move(config));
-
-  // Should not trigger activation, the URL is not on the blocklist.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  EXPECT_TRUE(
-      WasParsedScriptElementLoaded(web_contents()->GetPrimaryMainFrame()));
-
-  content::WebContentsConsoleObserver console_observer(web_contents());
-  console_observer.SetPattern(kActivationWarningConsoleMessage);
-
-  // Open up devtools and trigger forced activation.
-  {
-    ScopedDevtoolsOpener devtools(web_contents());
-    devtools.EnableAdBlocking(true);
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-    EXPECT_FALSE(
-        WasParsedScriptElementLoaded(web_contents()->GetPrimaryMainFrame()));
-    ASSERT_TRUE(console_observer.Wait());
-    EXPECT_EQ(kActivationWarningConsoleMessage,
-              console_observer.GetMessageAt(0u));
-    // Close devtools, should stop forced activation.
-  }
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  EXPECT_TRUE(
-      WasParsedScriptElementLoaded(web_contents()->GetPrimaryMainFrame()));
-}
 
 IN_PROC_BROWSER_TEST_F(SubresourceFilterDevtoolsBrowserTest,
                        ForceActivation_SubresourceLogging) {

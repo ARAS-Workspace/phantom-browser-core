@@ -117,7 +117,6 @@ static_library("test_support") {
     "//chrome/browser/performance_manager:test_support",
     "//chrome/browser/profiles:profile_test_util",
     "//chrome/browser/renderer_context_menu:test_support",
-    "//chrome/browser/safe_browsing:test_database_helper",
     "//chrome/browser/search_engines:test_support",
     "//chrome/browser/signin:identity_test_support",
     "//chrome/test/base:browser_feature_test_waiters",
@@ -309,7 +308,6 @@ static_library("test_support") {
     "//chrome/browser/media/webrtc",
     "//chrome/browser/net:test_support",
     "//chrome/browser/profiles:profile_util",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search_engine_choice",
     "//chrome/browser/supervised_user",
     "//chrome/browser/supervised_user:test_support",
@@ -644,7 +642,6 @@ source_set("platform_browser_tests") {
     "//chrome/browser/private_ai:browser_tests",
     "//chrome/browser/profiles:misc",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search_engines",
     "//chrome/browser/search_engines:platform_browser_tests",
     "//chrome/browser/segmentation_platform",
@@ -803,7 +800,6 @@ source_set("platform_browser_tests") {
   if (safe_browsing_mode != 0) {
     sources += []
     deps += [
-      "//chrome/browser/safe_browsing:blocking_page_platform_test_support",
       "//components/enterprise/connectors/core",
       "//components/safe_browsing/content/browser",
       "//components/safe_browsing/content/browser:client_side_detection_service",
@@ -1728,11 +1724,6 @@ test("browser_tests") {
     "//ui/webui/resources/cr_components/history_clusters:mojo_bindings",
   ]
 
-  if (safe_browsing_mode != 0) {
-    deps +=
-        [ "//chrome/browser/safe_browsing:blocking_page_platform_test_support" ]
-  }
-
   # TODO(crbug.com/428666921): Remove this dependency when
   # chrome/browser/ui/tab_ui_helper_browsertest.cc gets modularized.
   deps += [ "//chrome/browser/ui/performance_controls/test_support" ]
@@ -2603,15 +2594,7 @@ test("browser_tests") {
 
   # NOTE: This is the main "browser_tests" section for |is_chromeos|.
   if (safe_browsing_mode == 1) {
-    sources += [
-      "../browser/safe_browsing/ohttp_key_service_browsertest.cc",
-      "../browser/safe_browsing/safe_browsing_blocking_page_test.cc",
-      "../browser/safe_browsing/safe_browsing_navigation_observer_browsertest.cc",
-      "../browser/safe_browsing/safe_browsing_service_browsertest.cc",
-      "../browser/safe_browsing/url_lookup_service_browsertest.cc",
-      "../browser/safe_browsing/v4_embedded_test_server_browsertest.cc",
-      "../renderer/safe_browsing/threat_dom_details_browsertest.cc",
-    ]
+    sources += [ "../renderer/safe_browsing/threat_dom_details_browsertest.cc" ]
     deps += [
       "//chrome/browser/metrics/desktop_session_duration",
       "//chrome/browser/password_manager/factories",
@@ -2707,7 +2690,6 @@ test("browser_tests") {
     deps += [ "//chrome/browser/ui/webui/tab_strip_internals:browser_tests" ]
   }
 
-  sources += [ "//chrome/browser/enterprise/data_protection/view_source_navigation_throttle_browsertest.cc" ]
 
   if (is_mac || is_linux) {
     sources += [
@@ -2735,7 +2717,6 @@ test("browser_tests") {
   if (enterprise_data_controls) {
     sources += [
       "//chrome/browser/enterprise/data_protection/data_protection_clipboard_utils_browsertest.cc",
-      "//chrome/browser/enterprise/data_protection/data_protection_navigation_controller_browsertest.cc",
     ]
     deps += [ "//components/enterprise/connectors/core:test_support" ]
   }
@@ -3272,7 +3253,6 @@ test("unit_tests") {
     "//chrome/browser/reading_list",
     "//chrome/browser/reduce_accept_language:unit_tests",
     "//chrome/browser/regional_capabilities:unit_tests",
-    "//chrome/browser/safe_browsing:unit_tests",
     "//chrome/browser/search",
     "//chrome/browser/search:unit_tests",
     "//chrome/browser/search_engine_choice",
@@ -4449,8 +4429,6 @@ test("unit_tests") {
 
   if (safe_browsing_mode > 0) {
     sources += [
-      "../browser/safe_browsing/v5_get_hash_protocol_manager_factory_unittest.cc",
-      "../browser/safe_browsing/v5_search_hashes_cache_factory_unittest.cc",
       "../common/safe_browsing/binary_feature_extractor_unittest.cc",
       "../common/safe_browsing/download_type_util_unittest.cc",
     ]
@@ -6021,10 +5999,6 @@ test("interactive_ui_tests") {
   sources += [ "../browser/media/router/discovery/access_code/access_code_cast_sink_service_browsertest.cc" ]
 
   deps += [ "//components/on_device_translation:public" ]
-
-  if (safe_browsing_mode == 1) {
-    sources += [ "../browser/safe_browsing/safe_browsing_navigation_observer_interactive_test.cc" ]
-  }
 
   if (enterprise_data_controls) {
     sources += [ "//chrome/browser/enterprise/data_protection/clipboard_interactive_uitest.cc" ]

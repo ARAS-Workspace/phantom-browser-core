@@ -67,7 +67,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_key.h"
 #include "chrome/browser/resource_coordinator/tab_helper.h"
-#include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sessions/session_tab_helper_factory.h"
 #include "chrome/browser/site_protection/site_protection_metrics_observer.h"
@@ -219,9 +218,6 @@
 #endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/chrome_safe_browsing_tab_observer_delegate.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/trigger_creator.h"
 #include "components/safe_browsing/content/browser/safe_browsing_tab_observer.h"
 #endif
 
@@ -414,39 +410,8 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   RecentlyAudibleHelper::CreateForWebContents(web_contents);
   resource_coordinator::ResourceCoordinatorTabHelper::CreateForWebContents(
       web_contents);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::SafeBrowsingNavigationObserver::MaybeCreateForWebContents(
-      web_contents, HostContentSettingsMapFactory::GetForProfile(profile),
-      safe_browsing::SafeBrowsingNavigationObserverManagerFactory::
-          GetForBrowserContext(profile),
-      profile->GetPrefs(), g_browser_process->safe_browsing_service());
-#endif
   site_protection::SiteProtectionMetricsObserver::CreateForWebContents(
       web_contents);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (g_browser_process->safe_browsing_service()) {
-    safe_browsing::AsyncCheckTracker::CreateForWebContents(
-        web_contents, g_browser_process->safe_browsing_service()->ui_manager(),
-        safe_browsing::AsyncCheckTracker::
-            IsPlatformEligibleForSyncCheckerCheckAllowlist());
-  }
-  // SafeBrowsingTabObserver creates a ClientSideDetectionHost, which observes
-  // events from PermissionRequestManager and AsyncCheckTracker in its
-  // constructor. Therefore, PermissionRequestManager and AsyncCheckTracker need
-  // to be created before SafeBrowsingTabObserver is created.
-  // ClientSideDetectionHost uses ScopedAutofillManagersObservation which
-  // expects ContentAutofillClient (gated by enable_browser_autofill) to be
-  // created.
-  if (enable_browser_autofill) {
-    safe_browsing::SafeBrowsingTabObserver::CreateForWebContents(
-        web_contents,
-        std::make_unique<
-            safe_browsing::ChromeSafeBrowsingTabObserverDelegate>());
-  }
-  safe_browsing::TriggerCreator::MaybeCreateTriggersForWebContents(
-      profile, web_contents);
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   SafetyTipWebContentsObserver::CreateForWebContents(web_contents);
   SearchEngineTabHelper::CreateForWebContents(web_contents);
   if (site_engagement::SiteEngagementService::IsEnabled()) {

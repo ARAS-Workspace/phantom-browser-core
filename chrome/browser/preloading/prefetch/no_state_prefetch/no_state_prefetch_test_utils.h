@@ -20,7 +20,6 @@
 #include "base/synchronization/lock.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_contents.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_contents_delegate.h"
@@ -275,9 +274,6 @@ class PrerenderInProcessBrowserTest : virtual public InProcessBrowserTest {
 
   ~PrerenderInProcessBrowserTest() override;
 
-  void CreatedBrowserMainParts(
-      content::BrowserMainParts* browser_main_parts) override;
-  void TearDownInProcessBrowserTestFixture() override;
   void SetUpOnMainThread() override;
   content::SessionStorageNamespace* GetSessionStorageNamespace() const;
 
@@ -303,13 +299,6 @@ class PrerenderInProcessBrowserTest : virtual public InProcessBrowserTest {
 
   // Returns the currently active server. See |UseHttpsSrcServer|.
   net::EmbeddedTestServer* src_server();
-
-  safe_browsing::TestSafeBrowsingServiceFactory* safe_browsing_factory() const {
-    return safe_browsing_factory_.get();
-  }
-
-  safe_browsing::FakeSafeBrowsingDatabaseManager*
-  GetFakeSafeBrowsingDatabaseManager();
 
   TestNoStatePrefetchContentsFactory* no_state_prefetch_contents_factory()
       const {
@@ -372,8 +361,6 @@ class PrerenderInProcessBrowserTest : virtual public InProcessBrowserTest {
   void MonitorResourceRequest(const net::test_server::HttpRequest& request);
   std::unique_ptr<ExternalProtocolHandler::Delegate>
       external_protocol_handler_delegate_;
-  std::unique_ptr<safe_browsing::TestSafeBrowsingServiceFactory>
-      safe_browsing_factory_;
   raw_ptr<TestNoStatePrefetchContentsFactory, AcrossTasksDanglingUntriaged>
       no_state_prefetch_contents_factory_;
   raw_ptr<BrowserWindowInterface, AcrossTasksDanglingUntriaged>

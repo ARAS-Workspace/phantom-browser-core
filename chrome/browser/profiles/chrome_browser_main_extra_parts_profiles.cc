@@ -470,19 +470,6 @@
 #include "chrome/browser/enterprise/data_controls/chrome_rules_service.h"
 #endif
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/safe_browsing/hash_realtime_service_factory.h"
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/chrome_enterprise_url_lookup_service_factory.h"
-#include "chrome/browser/safe_browsing/chrome_ping_manager_factory.h"
-#include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
-#include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
-#include "chrome/browser/safe_browsing/v5_search_hashes_cache_factory.h"
-#endif
-
 #if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/bookmarks/bookmark_expanded_state_tracker_factory.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
@@ -911,19 +898,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   regional_capabilities::RegionalCapabilitiesServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX)
   reporting::ManualTestHeartbeatEventFactory::GetInstance();
-#endif
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::GetInstance();
-  safe_browsing::ChromePingManagerFactory::GetInstance();
-#endif
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  safe_browsing::HashRealTimeServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::RealTimeUrlLookupServiceFactory::GetInstance();
-  safe_browsing::SafeBrowsingNavigationObserverManagerFactory::GetInstance();
-  safe_browsing::V5GetHashProtocolManagerFactory::GetInstance();
-  safe_browsing::V5SearchHashesCacheFactory::GetInstance();
 #endif
   if (features::IsMainNodeAnnotationsEnabled()) {
     screen_ai::AXMainNodeAnnotatorControllerFactory::GetInstance();

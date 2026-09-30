@@ -330,6 +330,7 @@ source_set("test_support") {
   deps = [
     "//base",
     "//chrome/browser:browser_process",
+    "//chrome/browser/metrics",
     "//chrome/browser/sync",
     "//chrome/browser/sync/test/integration:sync_integration_test_support",
     "//components/metrics_services_manager",

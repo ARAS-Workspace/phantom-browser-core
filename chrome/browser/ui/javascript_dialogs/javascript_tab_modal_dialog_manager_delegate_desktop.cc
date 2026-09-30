@@ -27,7 +27,6 @@
 #include "ui/gfx/text_elider.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/user_interaction_observer.h"
 #endif
 
 JavaScriptTabModalDialogManagerDelegateDesktop::
@@ -43,19 +42,6 @@ JavaScriptTabModalDialogManagerDelegateDesktop::
 void JavaScriptTabModalDialogManagerDelegateDesktop::WillRunDialog() {
   browser_collection_observer_.Observe(ProfileBrowserCollection::GetForProfile(
       Profile::FromBrowserContext(web_contents_->GetBrowserContext())));
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // SafeBrowsing Delayed Warnings experiment can delay some SafeBrowsing
-  // warnings until user interaction. If the current page has a delayed warning,
-  // it'll have a user interaction observer attached. Show the warning
-  // immediately in that case.
-  safe_browsing::SafeBrowsingUserInteractionObserver* observer =
-      safe_browsing::SafeBrowsingUserInteractionObserver::FromWebContents(
-          web_contents_);
-  if (observer) {
-    observer->OnJavaScriptDialog();
-  }
-#endif
 }
 
 void JavaScriptTabModalDialogManagerDelegateDesktop::DidCloseDialog() {

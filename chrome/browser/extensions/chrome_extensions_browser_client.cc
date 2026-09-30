@@ -77,7 +77,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_selections.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/task_manager/web_contents_tags.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -957,25 +956,12 @@ void ChromeExtensionsBrowserClient::CheckManagementPolicy(
 
 scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
 ChromeExtensionsBrowserClient::GetSafeBrowsingDatabaseManager() const {
-#if BUILDFLAG(SAFE_BROWSING_DB_LOCAL)
-  return g_browser_process && g_browser_process->safe_browsing_service()
-             ? g_browser_process->safe_browsing_service()->database_manager()
-             : nullptr;
-#else
   return nullptr;
-#endif
 }
 
 std::optional<safe_browsing::V4ProtocolConfig>
 ChromeExtensionsBrowserClient::GetV4ProtocolConfig() const {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  return g_browser_process && g_browser_process->safe_browsing_service()
-             ? std::optional(g_browser_process->safe_browsing_service()
-                                 ->GetV4ProtocolConfig())
-             : std::nullopt;
-#else
   return std::nullopt;
-#endif
 }
 
 void ChromeExtensionsBrowserClient::OnActiveTabPermissionGranted(

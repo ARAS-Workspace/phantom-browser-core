@@ -93,7 +93,6 @@ source_set("browser_tests") {
       "file_system_access_usage_bubble_view_browsertest.cc",
     ]
     deps += [
-      "//chrome/browser/safe_browsing",
       "//chrome/browser/ui/test:dialog",
       "//chrome/browser/ui/views:file_system_access_test_support",
     ]

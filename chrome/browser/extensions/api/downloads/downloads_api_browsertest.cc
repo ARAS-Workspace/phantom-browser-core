@@ -111,7 +111,6 @@
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "components/safe_browsing/content/common/file_type_policies_test_util.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
@@ -4568,25 +4567,11 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 class DownloadsSafeBrowsingTest : public DownloadExtensionTest {
  public:
-  DownloadsSafeBrowsingTest()
-      : test_safe_browsing_factory_(
-            std::make_unique<safe_browsing::TestSafeBrowsingServiceFactory>()) {
-  }
+  DownloadsSafeBrowsingTest() = default;
   DownloadsSafeBrowsingTest(const DownloadsSafeBrowsingTest&) = delete;
   DownloadsSafeBrowsingTest& operator=(const DownloadsSafeBrowsingTest&) =
       delete;
   ~DownloadsSafeBrowsingTest() override = default;
-
-  void SetUp() override {
-    safe_browsing::SafeBrowsingService::RegisterFactory(
-        test_safe_browsing_factory_.get());
-    DownloadExtensionTest::SetUp();
-  }
-
-  void TearDown() override {
-    DownloadExtensionTest::TearDown();
-    safe_browsing::SafeBrowsingService::RegisterFactory(nullptr);
-  }
 
   // Downloads a file that will be marked dangerous.
   DownloadItem* DownloadDangerousFile(int* out_result_id) {
@@ -4631,10 +4616,6 @@ class DownloadsSafeBrowsingTest : public DownloadExtensionTest {
       EXPECT_TRUE(report_str.empty());
     }
   }
-
- protected:
-  std::unique_ptr<safe_browsing::TestSafeBrowsingServiceFactory>
-      test_safe_browsing_factory_;
 };
 
 IN_PROC_BROWSER_TEST_F(DownloadsSafeBrowsingTest, AcceptDanger) {

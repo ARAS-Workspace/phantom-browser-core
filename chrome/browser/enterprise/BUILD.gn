@@ -123,7 +123,7 @@ source_set("enterprise") {
     ]
   }
 
-  # Circular deps: //chrome/browser/safe_browsing, //chrome/browser/extensions,
+  # Circular deps: //chrome/browser/extensions,
   # //chrome/browser/ui, //chrome/browser/ui/webui/signin, and
   # //chrome/browser/ash/policy/core all depend on :enterprise via
   # browser_public_dependencies. Unconditional includes from those targets are
@@ -380,7 +380,6 @@ source_set("impl") {
     "//chrome/browser/notifications",
     "//chrome/browser/policy:policy_util",
     "//chrome/browser/profiles:profile_util",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/signin",
     "//chrome/browser/ui:managed_ui",
     "//chrome/browser/ui:ui_features",

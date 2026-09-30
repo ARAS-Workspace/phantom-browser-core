@@ -30,7 +30,6 @@
 #include "chrome/browser/printing/print_job_manager.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/resource_coordinator/resource_coordinator_parts.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/serial/serial_policy_allowed_ports.h"
 #include "chrome/browser/status_icons/status_tray.h"
 #include "chrome/common/chrome_paths.h"
@@ -432,13 +431,6 @@ StatusTray* TestingBrowserProcess::status_tray() {
   return status_tray_.get();
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-safe_browsing::SafeBrowsingService*
-TestingBrowserProcess::safe_browsing_service() {
-  return sb_service_.get();
-}
-#endif
-
 WebRtcLogUploader* TestingBrowserProcess::webrtc_log_uploader() {
   return webrtc_log_uploader_.get();
 }
@@ -715,13 +707,6 @@ TestingBrowserProcessPlatformPart*
 TestingBrowserProcess::GetTestPlatformPart() {
   return platform_part_.get();
 }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-void TestingBrowserProcess::SetSafeBrowsingService(
-    safe_browsing::SafeBrowsingService* sb_service) {
-  sb_service_ = sb_service;
-}
-#endif
 
 void TestingBrowserProcess::SetWebRtcLogUploader(
     std::unique_ptr<WebRtcLogUploader> uploader) {

@@ -34,7 +34,6 @@
 #include "url/origin.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #endif
 
 namespace site_protection {
@@ -226,21 +225,6 @@ void SiteProtectionMetricsObserver::OnKnowIfAnyVisitOlderThanADayAgo(
     metrics_data->most_strict_matched_history_heuristic =
         SiteFamiliarityHistoryHeuristicName::kNoVisitsToAnySiteMoreThanADayAgo;
   }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (g_browser_process->safe_browsing_service()) {
-    if (auto database_manager =
-            g_browser_process->safe_browsing_service()->database_manager()) {
-      GURL last_committed_url = metrics_data->last_committed_url;
-      database_manager->CheckUrlForHighConfidenceAllowlist(
-          last_committed_url,
-          base::BindOnce(&SiteProtectionMetricsObserver::
-                             OnGotHighConfidenceAllowlistResult,
-                         weak_factory_.GetWeakPtr(), std::move(metrics_data)));
-      return;
-    }
-  }
-#endif
 
   OnGotHighConfidenceAllowlistResult(
       std::move(metrics_data),

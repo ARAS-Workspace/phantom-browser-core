@@ -59,6 +59,7 @@ source_set("unit_tests") {
   deps = [
     ":regional_capabilities",
     "//base/test:test_support",
+    "//chrome/browser/metrics",
     "//chrome/test:test_support",
     "//components/country_codes",
     "//components/metrics",

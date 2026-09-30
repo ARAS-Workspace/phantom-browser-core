@@ -27,7 +27,6 @@ source_set("safe_browsing_private") {
     "//chrome/browser:browser_process",
     "//chrome/browser/extensions",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//content/public/browser",
   ]
 }

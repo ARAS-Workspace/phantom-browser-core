@@ -167,7 +167,6 @@ source_set("impl") {
     "//chrome/browser/personal_context",
     "//chrome/browser/personal_context/first_run",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/signin",
     "//chrome/browser/ssl",
     "//chrome/browser/strike_database",

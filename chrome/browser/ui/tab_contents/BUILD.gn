@@ -52,7 +52,6 @@ source_set("impl") {
     "//chrome/app:generated_resources",
     "//chrome/browser:browser_process",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search_engines",
     "//chrome/browser/tab_list",
     "//chrome/browser/ui:ui_features",

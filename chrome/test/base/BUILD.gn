@@ -176,6 +176,7 @@ static_library("chrome_test_launcher") {
     "//chrome/browser:chrome_browser_main",
     "//chrome/browser:chrome_content_browser_client",
     "//chrome/browser:main_extra_parts",
+    "//chrome/browser/metrics",
     "//chrome/test:test_support",
     "//testing/libfuzzer:fuzztest_init_support",
   ]
@@ -385,7 +386,6 @@ source_set("testing_browser_process") {
     "//chrome/browser/prefs",
     "//chrome/browser/profiles:profile_manager",
     "//chrome/browser/resource_coordinator",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/serial",
     "//chrome/browser/status_icons",
     "//components/application_locale_storage",

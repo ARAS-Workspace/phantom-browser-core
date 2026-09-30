@@ -397,17 +397,11 @@ TestNoStatePrefetchContentsFactory::ExpectedContents::~ExpectedContents() =
 PrerenderInProcessBrowserTest::PrerenderInProcessBrowserTest()
     : external_protocol_handler_delegate_(
           std::make_unique<NeverRunsExternalProtocolHandlerDelegate>()),
-      safe_browsing_factory_(
-          std::make_unique<safe_browsing::TestSafeBrowsingServiceFactory>()),
       no_state_prefetch_contents_factory_(nullptr),
       explicitly_set_browser_(nullptr),
       autostart_test_server_(true) {}
 
 PrerenderInProcessBrowserTest::~PrerenderInProcessBrowserTest() = default;
-
-void PrerenderInProcessBrowserTest::TearDownInProcessBrowserTestFixture() {
-  safe_browsing::SafeBrowsingService::RegisterFactory(nullptr);
-}
 
 content::SessionStorageNamespace*
 PrerenderInProcessBrowserTest::GetSessionStorageNamespace() const {
@@ -466,25 +460,6 @@ net::EmbeddedTestServer* PrerenderInProcessBrowserTest::src_server() {
   return embedded_test_server();
 }
 
-safe_browsing::FakeSafeBrowsingDatabaseManager*
-PrerenderInProcessBrowserTest::GetFakeSafeBrowsingDatabaseManager() {
-  return static_cast<safe_browsing::FakeSafeBrowsingDatabaseManager*>(
-      safe_browsing_factory()
-          ->test_safe_browsing_service()
-          ->database_manager()
-          .get());
-}
-
-void PrerenderInProcessBrowserTest::CreatedBrowserMainParts(
-    content::BrowserMainParts* browser_main_parts) {
-  InProcessBrowserTest::CreatedBrowserMainParts(browser_main_parts);
-  safe_browsing_factory_->SetTestDatabaseManager(
-      new safe_browsing::FakeSafeBrowsingDatabaseManager(
-          content::GetUIThreadTaskRunner({})));
-  safe_browsing::SafeBrowsingService::RegisterFactory(
-      safe_browsing_factory_.get());
-}
-
 void PrerenderInProcessBrowserTest::SetUpOnMainThread() {
   current_browser()->GetProfile()->GetPrefs()->SetBoolean(
       prefs::kPromptForDownload, false);
@@ -517,7 +492,6 @@ void PrerenderInProcessBrowserTest::SetUpOnMainThread() {
   no_state_prefetch_contents_factory_ = new TestNoStatePrefetchContentsFactory;
   no_state_prefetch_manager->SetNoStatePrefetchContentsFactoryForTest(
       no_state_prefetch_contents_factory_);
-  CHECK(safe_browsing_factory_->test_safe_browsing_service());
 }
 
 void PrerenderInProcessBrowserTest::UseHttpsSrcServer() {

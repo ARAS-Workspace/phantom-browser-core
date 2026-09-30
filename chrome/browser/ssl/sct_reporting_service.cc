@@ -14,7 +14,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/net/system_network_context_manager.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
@@ -192,11 +191,8 @@ void SCTReportingService::OnNewSCTAuditingReportSent() {
                           ++report_count);
 }
 
-SCTReportingService::SCTReportingService(
-    safe_browsing::SafeBrowsingService* safe_browsing_service,
-    Profile* profile)
-    : safe_browsing_service_(safe_browsing_service),
-      pref_service_(*profile->GetPrefs()),
+SCTReportingService::SCTReportingService(Profile* profile)
+    : pref_service_(*profile->GetPrefs()),
       profile_(profile) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
@@ -204,12 +200,6 @@ SCTReportingService::SCTReportingService(
   // need to subscribe to the prefs.
   if (profile_->IsOffTheRecord())
     return;
-
-  // Subscribe to SafeBrowsing preference change notifications. The initial Safe
-  // Browsing state gets emitted to subscribers during Profile creation.
-  safe_browsing_state_subscription_ =
-      safe_browsing_service_->RegisterStateCallback(base::BindRepeating(
-          &SCTReportingService::OnPreferenceChanged, base::Unretained(this)));
 }
 
 SCTReportingService::~SCTReportingService() = default;
@@ -230,18 +220,4 @@ network::mojom::SCTAuditingMode SCTReportingService::GetReportingMode() {
     }
   }
   return network::mojom::SCTAuditingMode::kDisabled;
-}
-
-void SCTReportingService::OnPreferenceChanged() {
-  network::mojom::SCTAuditingMode mode = GetReportingMode();
-
-  // Iterate over StoragePartitions for this Profile, and for each get the
-  // NetworkContext and set the SCT auditing mode.
-  profile_->ForEachLoadedStoragePartition(
-      [mode](content::StoragePartition* partition) {
-        partition->GetNetworkContext()->SetSCTAuditingMode(mode);
-      });
-
-  if (mode == network::mojom::SCTAuditingMode::kDisabled)
-    content::GetNetworkService()->ClearSCTAuditingCache();
 }

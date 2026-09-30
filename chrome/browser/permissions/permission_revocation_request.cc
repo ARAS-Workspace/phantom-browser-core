@@ -21,8 +21,6 @@
 #include "components/safe_browsing/buildflags.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "components/safe_browsing/core/browser/db/database_manager.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
@@ -214,65 +212,7 @@ void PermissionRevocationRequest::OnSiteReputationReady(
         base::TimeTicks::Now() - crowd_deny_request_start_time_.value();
   }
 
-  if (site_reputation && !site_reputation->warning_only()) {
-    bool should_revoke_permission = false;
-    switch (site_reputation->notification_ux_quality()) {
-      case CrowdDenyPreloadData::SiteReputation::ABUSIVE_PROMPTS:
-      case CrowdDenyPreloadData::SiteReputation::ABUSIVE_CONTENT:
-        should_revoke_permission = NotificationsPermissionRevocationConfig::
-            IsAbusiveOriginPermissionRevocationEnabled();
-        break;
-      case CrowdDenyPreloadData::SiteReputation::DISRUPTIVE_BEHAVIOR:
-        should_revoke_permission = true;
-        break;
-      default:
-        should_revoke_permission = false;
-    }
-    DCHECK(g_browser_process->safe_browsing_service());
-    if (should_revoke_permission &&
-        g_browser_process->safe_browsing_service()) {
-      safe_browsing::V5GetHashProtocolManager* v5_manager =
-          safe_browsing::V5GetHashProtocolManagerFactory::GetForProfile(
-              profile_);
-      safe_browsing_request_.emplace(
-          g_browser_process->safe_browsing_service()->database_manager(),
-          v5_manager ? v5_manager->GetWeakPtr() : nullptr,
-          base::DefaultClock::GetInstance(), url::Origin::Create(origin_),
-          base::BindOnce(
-              &PermissionRevocationRequest::OnSafeBrowsingVerdictReceived,
-              weak_factory_.GetWeakPtr(), site_reputation));
-      return;
-    }
-  }
   NotifyCallback(Outcome::PERMISSION_NOT_REVOKED);
-}
-
-void PermissionRevocationRequest::OnSafeBrowsingVerdictReceived(
-    const CrowdDenyPreloadData::SiteReputation* site_reputation,
-    CrowdDenySafeBrowsingRequest::Verdict verdict) {
-  DCHECK(safe_browsing_request_);
-  DCHECK(profile_);
-  DCHECK(callback_);
-
-  if (verdict == CrowdDenySafeBrowsingRequest::Verdict::kUnacceptable) {
-    RevokePermission(origin_, profile_);
-    if (site_reputation->notification_ux_quality() ==
-            CrowdDenyPreloadData::SiteReputation::ABUSIVE_PROMPTS ||
-        site_reputation->notification_ux_quality() ==
-            CrowdDenyPreloadData::SiteReputation::ABUSIVE_CONTENT) {
-      NotifyCallback(Outcome::PERMISSION_REVOKED_DUE_TO_ABUSE);
-    } else if (site_reputation->notification_ux_quality() ==
-               CrowdDenyPreloadData::SiteReputation::DISRUPTIVE_BEHAVIOR) {
-      NotifyCallback(Outcome::PERMISSION_REVOKED_DUE_TO_DISRUPTIVE_BEHAVIOR);
-    }
-
-    safe_browsing::SafeBrowsingMetricsCollector::
-        LogSafeBrowsingNotificationRevocationSourceHistogram(
-            safe_browsing::NotificationRevocationSource::
-                kSafeBrowsingUnwantedRevocation);
-  } else {
-    NotifyCallback(Outcome::PERMISSION_NOT_REVOKED);
-  }
 }
 #endif
 

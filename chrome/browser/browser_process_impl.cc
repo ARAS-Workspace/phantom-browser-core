@@ -124,7 +124,6 @@
 #include "components/prefs/json_pref_store.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/content/browser/safe_browsing_service_interface.h"
 #include "components/sessions/core/session_id_generator.h"
 #include "components/signin/core/browser/active_primary_accounts_metrics_recorder.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
@@ -237,7 +236,6 @@
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "base/memory/scoped_refptr.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "components/os_crypt/async/common/encryptor.h"
 #endif
 
@@ -450,11 +448,6 @@ void BrowserProcessImpl::StartTearDown() {
   metrics_services_manager_client_ = nullptr;
   metrics_services_manager_.reset();
   intranet_redirect_detector_.reset();
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (safe_browsing_service_.get()) {
-    safe_browsing_service()->ShutDown();
-  }
-#endif
   network_time_tracker_.reset();
 
   // Initial cleanup for ChromeBrowserCloudManagement, shutdown components that
@@ -1095,17 +1088,6 @@ StatusTray* BrowserProcessImpl::status_tray() {
   return status_tray_.get();
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-safe_browsing::SafeBrowsingService*
-BrowserProcessImpl::safe_browsing_service() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!created_safe_browsing_service_) {
-    CreateSafeBrowsingService();
-  }
-  return safe_browsing_service_.get();
-}
-#endif
-
 subresource_filter::RulesetService*
 BrowserProcessImpl::subresource_filter_ruleset_service() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -1403,29 +1385,6 @@ void BrowserProcessImpl::CreateBackgroundPrintingManager() {
   NOTIMPLEMENTED();
 #endif
 }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-void BrowserProcessImpl::CreateSafeBrowsingService() {
-  DCHECK(!safe_browsing_service_);
-  // Set this flag to true so that we don't retry indefinitely to
-  // create the service class if there was an error.
-  created_safe_browsing_service_ = true;
-
-  // The factory can be overridden in tests.
-  if (!safe_browsing::SafeBrowsingServiceInterface::HasFactory()) {
-    safe_browsing::SafeBrowsingServiceInterface::RegisterFactory(
-        safe_browsing::GetSafeBrowsingServiceFactory());
-  }
-
-  // TODO(crbug.com/41437292): Port consumers of the |safe_browsing_service_| to
-  // use the interface in components/safe_browsing, and remove this cast.
-  safe_browsing_service_ = static_cast<safe_browsing::SafeBrowsingService*>(
-      safe_browsing::SafeBrowsingServiceInterface::CreateSafeBrowsingService());
-  if (safe_browsing_service_) {
-    safe_browsing_service_->Initialize();
-  }
-}
-#endif
 
 void BrowserProcessImpl::CreateSubresourceFilterRulesetService() {
   DCHECK(!subresource_filter_ruleset_service_);

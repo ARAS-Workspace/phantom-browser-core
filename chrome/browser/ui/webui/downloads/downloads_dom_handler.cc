@@ -40,7 +40,6 @@
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -716,17 +715,7 @@ void DownloadsDOMHandler::IsEligibleForEsbPromo(
     return;
   }
 
-  content::BrowserContext* browser_context = manager->GetBrowserContext();
-
-  if (!safe_browsing::SafeBrowsingService::IsUserEligibleForESBPromo(
-          Profile::FromBrowserContext(browser_context))) {
-    std::move(callback).Run(false);
-    return;
-  }
-  const bool should_show_esb_promo =
-      feature_engagement::NonIphPromo::RequestPermissionToShow(
-          browser_context, feature_engagement::kEsbDownloadRowPromoFeature);
-  std::move(callback).Run(should_show_esb_promo);
+  std::move(callback).Run(false);
 }
 
 void DownloadsDOMHandler::LogEsbPromotionRowViewed() {

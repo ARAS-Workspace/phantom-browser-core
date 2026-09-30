@@ -29,7 +29,6 @@
 #include "chrome/browser/preloading/prerender/prerender_utils.h"
 #include "chrome/browser/preloading/scoped_prewarm_feature_list.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_navigation_observer_manager.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -985,80 +984,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderOmniboxSearchSuggestionUIBrowserTest,
       PrerenderPredictionStatus::kHitFinished, 1);
 }
 
-class PrerenderOmniboxReferrerChainUIBrowserTest
-    : public PrerenderOmniboxUIBrowserTest {
- public:
-  void SetUpOnMainThread() override {
-    // Disable Safe Browsing service so we can directly control when
-    // SafeBrowsingNavigationObserverManager and SafeBrowsingNavigationObserver
-    // are instantiated.
-    browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled,
-                                                    false);
-    PrerenderOmniboxUIBrowserTest::SetUpOnMainThread();
-    observer_manager_ = std::make_unique<
-        safe_browsing::TestSafeBrowsingNavigationObserverManager>(browser());
-    observer_manager_->ObserveContents(
-        browser()->tab_strip_model()->GetActiveWebContents());
-  }
 
-  std::optional<size_t> FindNavigationEventIndex(
-      const GURL& target_url,
-      content::GlobalRenderFrameHostId outermost_main_frame_id) {
-    return observer_manager_->navigation_event_list()->FindNavigationEvent(
-        base::Time::Now(), target_url, GURL(), SessionID::InvalidValue(),
-        outermost_main_frame_id,
-        (observer_manager_->navigation_event_list()->NavigationEventsSize() -
-         1));
-  }
-
-  safe_browsing::NavigationEvent* GetNavigationEvent(size_t index) {
-    return observer_manager_->navigation_event_list()
-        ->navigation_events()[index]
-        .get();
-  }
-
-  void TearDownOnMainThread() override { observer_manager_.reset(); }
-
- private:
-  std::unique_ptr<safe_browsing::TestSafeBrowsingNavigationObserverManager>
-      observer_manager_;
-};
-
-IN_PROC_BROWSER_TEST_F(PrerenderOmniboxReferrerChainUIBrowserTest,
-                       PrerenderHasNoInitiator) {
-  Observe(GetActiveWebContents());
-  base::HistogramTester histogram_tester;
-  const GURL kInitialUrl = embedded_test_server()->GetURL("/empty.html");
-  ASSERT_TRUE(GetActiveWebContents());
-  ASSERT_TRUE(content::NavigateToURL(GetActiveWebContents(), kInitialUrl));
-
-  content::test::PrerenderHostRegistryObserver registry_observer(
-      *GetActiveWebContents());
-
-  // Attempt to prerender a direct URL input.
-  ASSERT_TRUE(GetAutocompleteActionPredictor());
-  const GURL kPrerenderingUrl =
-      embedded_test_server()->GetURL("/empty.html?prerender");
-  GetAutocompleteActionPredictor()->StartPrerendering(kPrerenderingUrl,
-                                                      *GetActiveWebContents());
-
-  registry_observer.WaitForTrigger(kPrerenderingUrl);
-  content::PrerenderHostId host_id =
-      prerender_helper().GetHostForUrl(kPrerenderingUrl);
-  ASSERT_TRUE(host_id);
-  prerender_helper().WaitForPrerenderLoadCompletion(host_id);
-  // By using no id, we should get the most recent navigation event.
-  auto index = FindNavigationEventIndex(kPrerenderingUrl,
-                                        content::GlobalRenderFrameHostId());
-  ASSERT_TRUE(index);
-
-  // Since this was triggered by the omnibox (and hence by the user), we should
-  // have no initiator outermost main frame id. I.e., it would be incorrect to
-  // attribute this load to the document previously loaded in the outermost main
-  // frame.
-  auto* nav_event = GetNavigationEvent(*index);
-  EXPECT_FALSE(nav_event->initiator_outermost_main_frame_id);
-}
 
 class PrewarmOmniboxUIBrowserTest
     : public PrerenderOmniboxUIBrowserTest,

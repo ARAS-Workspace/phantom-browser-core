@@ -74,13 +74,9 @@ class PermissionRevocationRequest {
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   void OnSiteReputationReady(
       const CrowdDenyPreloadData::SiteReputation* reputation);
-  void OnSafeBrowsingVerdictReceived(
-      const CrowdDenyPreloadData::SiteReputation* reputation,
-      CrowdDenySafeBrowsingRequest::Verdict verdict);
 #endif
   void NotifyCallback(Outcome outcome);
 
-  std::optional<CrowdDenySafeBrowsingRequest> safe_browsing_request_;
   raw_ptr<Profile> profile_;
   const GURL origin_;
   OutcomeCallback callback_;
