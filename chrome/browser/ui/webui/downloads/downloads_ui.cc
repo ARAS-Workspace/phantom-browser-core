@@ -19,8 +19,6 @@
 #include "chrome/browser/download/download_core_service_factory.h"
 #include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"
 #include "chrome/browser/ui/webui/downloads/downloads_dom_handler.h"
@@ -65,11 +63,7 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
   webui::SetupWebUIDataSource(source, kDownloadsResources,
                               IDR_DOWNLOADS_DOWNLOADS_HTML);
 
-  bool requests_ap_verdicts =
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          profile)
-          ->IsUnderAdvancedProtection();
-  source->AddBoolean("requestsApVerdicts", requests_ap_verdicts);
+  source->AddBoolean("requestsApVerdicts", false);
 
   static constexpr webui::LocalizedString kStrings[] = {
       {"title", IDS_DOWNLOAD_HISTORY_TITLE},

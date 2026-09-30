@@ -20,8 +20,6 @@
 #include "chrome/browser/interstitials/security_interstitial_page_test_utils.h"
 #include "chrome/browser/preloading/scoped_prewarm_feature_list.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/browser/ssl/ask_before_http_dialog_controller.h"
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
@@ -196,9 +194,6 @@ enum class HttpsUpgradesTestType {
   // Enables HFM in balanced mode.
   kHttpsFirstBalancedMode,
 
-  // Enables HFM for Advanced Protection users.
-  kHttpsFirstModeAdvancedProtection,
-
   // Enables HFM pref, HFM with Site Engagement heuristic, HFM for typically
   // secure users, HFM in incognito, and balanced HFM feature flags.
   kAll,
@@ -229,11 +224,7 @@ struct ExpectedInterstitialReasons {
   size_t typically_secure_user = 0;
   // The number of times the interstitial was shown because of being in balanced
   // mode.
-  size_t balanced = 0;
-  // The number of times the interstitial was shown because of Advanced
-  // Protection.
-  size_t advanced_protection = 0;
-};
+  size_t balanced = 0;};
 
 // A very low site engagement score.
 constexpr int kLowSiteEngagementScore = 1;
@@ -334,17 +325,6 @@ class HttpsUpgradesBrowserTest
                 features::kHttpsFirstModeV2ForEngagedSites});
         break;
 
-      case HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection:
-        feature_list_.InitWithFeatures(
-            /*enabled_features=*/
-            {features::kHttpsFirstModeForAdvancedProtectionUsers,
-             features::kHttpsFirstBalancedModeAutoEnable,
-             security_interstitials::features::kHttpsFirstDialogUi},
-            /*disabled_features=*/{
-                features::kHttpsFirstModeV2ForTypicallySecureUsers,
-                features::kHttpsFirstModeV2ForEngagedSites});
-        break;
-
       // Enable HFM, HFM with Site Engagement heuristic, HFM for typically
       // secure users, and HFM in Incognito.
       case HttpsUpgradesTestType::kAll:
@@ -354,7 +334,6 @@ class HttpsUpgradesBrowserTest
             {
                 features::kHttpsFirstModeV2ForEngagedSites,
                 features::kHttpsFirstModeV2ForTypicallySecureUsers,
-                features::kHttpsFirstModeForAdvancedProtectionUsers,
                 features::kHttpsFirstModeIncognito,
                 features::kHttpsFirstBalancedMode,
                 features::kHttpsFirstBalancedModeAutoEnable,
@@ -385,7 +364,6 @@ class HttpsUpgradesBrowserTest
                 features::kHttpsFirstModeV2ForTypicallySecureUsers,
                 features::kHttpsFirstBalancedMode,
                 features::kHttpsFirstBalancedModeAutoEnable,
-                features::kHttpsFirstModeForAdvancedProtectionUsers,
                 security_interstitials::features::kHttpsFirstDialogUi});
         break;
     }
@@ -437,13 +415,6 @@ class HttpsUpgradesBrowserTest
         HttpsUpgradesTestType::kHttpsFirstModeIncognito) {
       UseIncognitoBrowser();
       SetPref(false);
-    }
-
-    if (https_upgrades_test_type() ==
-        HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection) {
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          browser()->GetProfile())
-          ->SetAdvancedProtectionStatusForTesting(true);
     }
 
     // Only enable the HTTPS-First Mode pref when the test config calls for it.
@@ -553,20 +524,14 @@ class HttpsUpgradesBrowserTest
 
   // Whether HFM strict mode is enabled.
   bool IsStrictInterstitialEnabledForTest() const {
-    return IsHttpsFirstModePrefEnabled() ||
-           safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-               browser()->GetProfile())
-               ->IsUnderAdvancedProtection();
+    return IsHttpsFirstModePrefEnabled();
   }
 
   // Whether HFM is enabled for many sites, and thus the tests should run steps
   // that assume the HTTP interstitial will trigger (i.e., for fallback HTTP
   // navigations when HTTPS-First Mode is enabled).
   bool IsHttpsFirstModeInterstitialEnabledAcrossSites() const {
-    return IsHttpsFirstModePrefEnabled() || InBalancedMode() || IsIncognito() ||
-           safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-               browser()->GetProfile())
-               ->IsUnderAdvancedProtection();
+    return IsHttpsFirstModePrefEnabled() || InBalancedMode() || IsIncognito();
   }
 
   // Whether HTTPS-First Mode with Site Engagement Heuristic is enabled. When
@@ -609,7 +574,7 @@ class HttpsUpgradesBrowserTest
     histograms()->ExpectTotalCount(
         kInterstitialReasonHistogram,
         expected_reasons.pref + expected_reasons.typically_secure_user +
-            expected_reasons.balanced + expected_reasons.advanced_protection);
+            expected_reasons.balanced);
     histograms()->ExpectBucketCount(kInterstitialReasonHistogram,
                                     static_cast<int>(InterstitialReason::kPref),
                                     expected_reasons.pref);
@@ -621,10 +586,6 @@ class HttpsUpgradesBrowserTest
         kInterstitialReasonHistogram,
         static_cast<int>(InterstitialReason::kTypicallySecureUserHeuristic),
         expected_reasons.typically_secure_user);
-    histograms()->ExpectBucketCount(
-        kInterstitialReasonHistogram,
-        static_cast<int>(InterstitialReason::kAdvancedProtection),
-        expected_reasons.advanced_protection);
   }
 
   // Verifies that an HFM interstitial is shown.
@@ -776,7 +737,6 @@ INSTANTIATE_TEST_SUITE_P(
         HttpsUpgradesTestType::kAllAutoHFM,
         HttpsUpgradesTestType::kHttpsFirstModeIncognito,
         HttpsUpgradesTestType::kHttpsFirstBalancedMode,
-        HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection,
         HttpsUpgradesTestType::kAll,
         HttpsUpgradesTestType::kHttpsFirstBalancedModeWithOldUi,
         HttpsUpgradesTestType::kNone),
@@ -796,8 +756,6 @@ INSTANTIATE_TEST_SUITE_P(
           return "HttpsFirstModeIncognito";
         case HttpsUpgradesTestType::kHttpsFirstBalancedMode:
           return "HttpsFirstBalancedMode";
-        case HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection:
-          return "HttpsFirstModeAdvancedProtection";
         case HttpsUpgradesTestType::kAll:
           return "AllFeatures";
         case HttpsUpgradesTestType::kHttpsFirstBalancedModeWithOldUi:
@@ -1423,13 +1381,6 @@ IN_PROC_BROWSER_TEST_P(
   if (IsIncognito()) {
     return;
   }
-  // Advanced Protection users have HFM enabled unconditionally, which does not
-  // exempt non-default ports. This test assumes the heuristic decides whether
-  // to upgrade, which is not the case when AP is active.
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection) {
-    return;
-  }
   // Disable the testing port configuration, as this test doesn't use the
   // EmbeddedTestServer.
   HttpsUpgradesInterceptor::SetHttpsPortForTesting(0);
@@ -1536,10 +1487,6 @@ IN_PROC_BROWSER_TEST_P(
   if (IsIncognito()) {
     return;
   }
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection) {
-    return;
-  }
 
   content::WebContents* contents =
       GetBrowser()->tab_strip_model()->GetActiveWebContents();
@@ -1584,11 +1531,6 @@ IN_PROC_BROWSER_TEST_P(
   } else if (InBalancedMode()) {
     ExpectInterstitial(contents);
     expected_reasons.balanced++;
-  } else if (safe_browsing::AdvancedProtectionStatusManagerFactory::
-                 GetForProfile(browser()->GetProfile())
-                     ->IsUnderAdvancedProtection()) {
-    ExpectInterstitial(contents);
-    expected_reasons.advanced_protection++;
   } else {
     EXPECT_FALSE(IsShowingHttpsFirstModeInterstitial(contents));
   }
@@ -1607,11 +1549,6 @@ IN_PROC_BROWSER_TEST_P(
   } else if (InBalancedMode()) {
     ExpectInterstitial(contents);
     expected_reasons.balanced++;
-  } else if (safe_browsing::AdvancedProtectionStatusManagerFactory::
-                 GetForProfile(browser()->GetProfile())
-                     ->IsUnderAdvancedProtection()) {
-    ExpectInterstitial(contents);
-    expected_reasons.advanced_protection++;
   } else {
     EXPECT_FALSE(IsShowingHttpsFirstModeInterstitial(contents));
   }
@@ -1638,10 +1575,6 @@ IN_PROC_BROWSER_TEST_P(
     MAYBE_UrlWithHttpScheme_BrokenSSL_ShouldInterstitial_TypicallySecureUser) {
   // HFM-for-Typically-Secure-Users is not enabled in Incognito.
   if (IsIncognito()) {
-    return;
-  }
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection) {
     return;
   }
 
@@ -1698,10 +1631,6 @@ IN_PROC_BROWSER_TEST_P(
       expected_reasons.pref++;
     } else if (InBalancedMode()) {
       expected_reasons.balanced++;
-    } else if (safe_browsing::AdvancedProtectionStatusManagerFactory::
-                   GetForProfile(browser()->GetProfile())
-                       ->IsUnderAdvancedProtection()) {
-      expected_reasons.advanced_protection++;
     } else {
       NOTREACHED();
     }
@@ -1730,10 +1659,6 @@ IN_PROC_BROWSER_TEST_P(
       expected_reasons.pref++;
     } else if (InBalancedMode()) {
       expected_reasons.balanced++;
-    } else if (safe_browsing::AdvancedProtectionStatusManagerFactory::
-                   GetForProfile(browser()->GetProfile())
-                       ->IsUnderAdvancedProtection()) {
-      expected_reasons.advanced_protection++;
     } else {
       NOTREACHED();
     }
@@ -1776,10 +1701,6 @@ IN_PROC_BROWSER_TEST_P(
     TypicallySecure_NonUniqueHostname_ShouldNotShowInterstitial) {
   // HFM-for-Typically-Secure-Users is not enabled in Incognito.
   if (IsIncognito()) {
-    return;
-  }
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection) {
     return;
   }
   // Disable the testing port configuration, as this test doesn't use the
@@ -1832,10 +1753,6 @@ IN_PROC_BROWSER_TEST_P(
   HttpsUpgradesInterceptor::SetHttpPortForTesting(0);
   auto url_loader_interceptor = MakeInterceptorForSiteEngagementHeuristic();
 
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection) {
-    return;
-  }
   SatisfyTypicallySecureHeuristicRequirements();
 
   // Before running the heuristic checks, also navigate to a non-unique
@@ -3485,12 +3402,6 @@ IN_PROC_BROWSER_TEST_P(HttpsUpgradesBrowserTest,
     return;
   }
 
-  // Advanced Protection users have HFM enabled regardless of the pref.
-  if (https_upgrades_test_type() ==
-      HttpsUpgradesTestType::kHttpsFirstModeAdvancedProtection) {
-    return;
-  }
-
   auto http_url = http_server()->GetURL("bad-https.com", "/simple.html");
   auto* contents = GetBrowser()->tab_strip_model()->GetActiveWebContents();
 
@@ -4829,57 +4740,6 @@ IN_PROC_BROWSER_TEST_F(HttpsUpgradesSecureOriginAllowlistBrowserTest,
   content::WebContents* contents =
       browser()->tab_strip_model()->GetActiveWebContents();
   EXPECT_FALSE(NavigateToURLWithLinkTransition(contents, url_not_in_allowlist));
-  EXPECT_TRUE(IsShowingHttpsFirstModeInterstitial(contents));
-}
-
-// A separate test fixture for Advanced Protection to ensure that HFM triggers
-// properly, even if balanced mode is enabled by default.
-class HttpsUpgradesAdvancedProtectionBrowserTest : public InProcessBrowserTest {
- public:
-  HttpsUpgradesAdvancedProtectionBrowserTest() {
-    feature_list_.InitWithFeatures(
-        /*enabled_features=*/{features::
-                                  kHttpsFirstModeForAdvancedProtectionUsers,
-                              features::kHttpsFirstBalancedModeAutoEnable},
-        /*disabled_features=*/{
-            security_interstitials::features::kHttpsFirstDialogUi});
-  }
-  ~HttpsUpgradesAdvancedProtectionBrowserTest() override = default;
-
-  void SetUp() override {
-    ChromeSecurityBlockingPageFactory::SetEnterpriseManagedForTesting(false);
-    InProcessBrowserTest::SetUp();
-  }
-
-  void SetUpOnMainThread() override {
-    // Enable Advanced Protection for the profile via the testing API
-    safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-        browser()->GetProfile())
-        ->SetAdvancedProtectionStatusForTesting(true);
-
-    host_resolver()->AddRule("*", "127.0.0.1");
-    http_server_.AddDefaultHandlers(GetChromeTestDataDir());
-    ASSERT_TRUE(http_server_.Start());
-  }
-
-  net::EmbeddedTestServer* http_server() { return &http_server_; }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  net::EmbeddedTestServer http_server_{net::EmbeddedTestServer::TYPE_HTTP};
-};
-
-// Verifies that Advanced Protection users get HFM warnings for non-default
-// ports and it does not get incorrectly bypassed by the Balanced Mode
-// exclusion. Regression test for crbug.com/501741117.
-IN_PROC_BROWSER_TEST_F(HttpsUpgradesAdvancedProtectionBrowserTest,
-                       UrlWithNonDefaultPort_ShouldUpgradeAndShowInterstitial) {
-  GURL http_url = http_server()->GetURL("foo.com", "/simple.html");
-  EXPECT_NE(http_url.IntPort(), 80);  // Ensure it's not the default port
-
-  auto* contents = browser()->tab_strip_model()->GetActiveWebContents();
-
-  EXPECT_FALSE(NavigateToURLWithLinkTransition(contents, http_url));
   EXPECT_TRUE(IsShowingHttpsFirstModeInterstitial(contents));
 }
 

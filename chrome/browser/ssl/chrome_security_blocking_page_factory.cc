@@ -16,8 +16,6 @@
 #include "chrome/browser/net/stub_resolver_config_reader.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/ssl/https_only_mode_controller_client.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
@@ -317,11 +315,6 @@ ChromeSecurityBlockingPageFactory::CreateHttpsOnlyModeBlockingPage(
       interstitial_state.enabled_by_incognito = true;
     }
   } else {
-    interstitial_state.enabled_by_advanced_protection =
-        profile &&
-        safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-            profile)
-            ->IsUnderAdvancedProtection();
     // HFM interstitial with Site Engagement heuristic is only shown if the
     // feature flag is enabled, so update the relevant flag here.
     interstitial_state.enabled_by_engagement_heuristic =

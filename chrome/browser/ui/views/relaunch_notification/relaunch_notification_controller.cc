@@ -14,7 +14,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/global_features.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
-#include "chrome/browser/safe_browsing/application_advanced_protection_status_detector.h"
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 
@@ -86,7 +85,6 @@ RelaunchNotificationController::RelaunchNotificationController(
   // Need to register with the UpgradeDetector right at the start to observe any
   // calls to override the preference value controlling the notification style.
   StartObservingUpgrades();
-  StartObservingAPStatus();
   // Synchronize the instance with the current state of the preference and
   // Advanced Protection status.
   HandleCurrentStyle();
@@ -147,11 +145,6 @@ void RelaunchNotificationController::OnRelaunchOverriddenToRequired(
   HandleCurrentStyle();
 }
 
-void RelaunchNotificationController::
-    OnApplicationAdvancedProtectionStatusChanged(bool enabled) {
-  HandleCurrentStyle();
-}
-
 void RelaunchNotificationController::HandleCurrentStyle() {
   NotificationStyle notification_style = NotificationStyle::kNone;
 
@@ -169,18 +162,6 @@ void RelaunchNotificationController::HandleCurrentStyle() {
         notification_style = NotificationStyle::kRequired;
         break;
     }
-  }
-
-  // Force the style to `kRequired` if Advanced Protection is enabled and the
-  // relaunch required policy is not already in effect.
-  if (notification_style != NotificationStyle::kRequired &&
-      advanced_protection_observation_.IsObserving() &&
-      advanced_protection_observation_.GetSource()
-          ->IsUnderAdvancedProtection()) {
-    notification_style_overridden_for_advanced_protection_ = true;
-    notification_style = NotificationStyle::kRequired;
-  } else {
-    notification_style_overridden_for_advanced_protection_ = false;
   }
 
   // Nothing to do if there has been no change in the notification style.
@@ -214,16 +195,6 @@ void RelaunchNotificationController::StartObservingUpgrades() {
 
 void RelaunchNotificationController::StopObservingUpgrades() {
   upgrade_detector_->RemoveObserver(this);
-}
-
-void RelaunchNotificationController::StartObservingAPStatus() {
-  // advanced_protection_detector is available when
-  // `safe_browsing::kRelaunchNotificationForAdvancedProtection` is enabled.
-  if (auto* advanced_protection_detector =
-          g_browser_process->GetFeatures()
-              ->application_advanced_protection_status_detector()) {
-    advanced_protection_observation_.Observe(advanced_protection_detector);
-  }
 }
 
 void RelaunchNotificationController::ShowRelaunchNotification(
@@ -371,7 +342,7 @@ void RelaunchNotificationController::NotifyRelaunchRequired() {
   DCHECK(timer_.IsRunning());
   DCHECK(!timer_.desired_run_time().is_null());
   DoNotifyRelaunchRequired(
-      notification_style_overridden_for_advanced_protection_,
+      /*is_advanced_protection_override=*/false,
       timer_.desired_run_time(),
       base::BindOnce(
           &RelaunchNotificationController::IncreaseRelaunchDeadlineOnShow,

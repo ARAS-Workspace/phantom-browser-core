@@ -12,8 +12,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "chrome/browser/download/download_danger_prompt.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ui/extensions/extension_dialog_utils.h"
 #include "chrome/browser/ui/extensions/extensions_dialogs.h"
 #include "chrome/grit/branded_strings.h"
@@ -97,13 +95,8 @@ std::u16string DownloadDangerDialogDelegate::GetMessageBody(
       return l10n_util::GetStringFUTF16(IDS_PROMPT_MALICIOUS_DOWNLOAD_CONTENT,
                                         filename);
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
-      return l10n_util::GetStringFUTF16(
-          safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-              profile)
-                  ->IsUnderAdvancedProtection()
-              ? IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT_IN_ADVANCED_PROTECTION
-              : IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT,
-          filename);
+      return l10n_util::GetStringFUTF16(IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT,
+                                        filename);
     case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
       return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_CHANGES_SETTINGS,
                                         filename);

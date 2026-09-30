@@ -11,8 +11,6 @@
 #include "chrome/browser/download/download_ui_enterprise_util.h"
 #include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/offline_item_utils.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
@@ -331,24 +329,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForInProgressOrComplete(
       return;
 
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
-      bool request_ap_verdicts = false;
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-      request_ap_verdicts =
-          safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-              model.profile())
-              ->IsUnderAdvancedProtection();
-#endif
-      if (request_ap_verdicts) {
-        warning_summary_ = l10n_util::GetStringUTF16(
-            IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_ADVANCED_PROTECTION);
-        PopulatePrimarySubpageButton(
-            l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_DELETE),
-            DownloadCommands::Command::DISCARD);
-        PopulateSecondarySubpageButton(
-            l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_CONTINUE),
-            DownloadCommands::Command::KEEP, kColorDownloadItemTextWarning);
-        return;
-      }
       PopulateForSuspiciousUi(
           l10n_util::GetStringUTF16(
               IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_UNCOMMON_FILE),

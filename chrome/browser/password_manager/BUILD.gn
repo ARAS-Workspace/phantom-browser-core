@@ -108,7 +108,6 @@ source_set("impl") {
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:advanced_protection",
     "//chrome/browser/signin",
     "//chrome/browser/sync",
     "//chrome/browser/sync:factories",

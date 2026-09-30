@@ -49,10 +49,6 @@ namespace optimization_guide {
 class OptimizationGuideGlobalFeature;
 }  // namespace optimization_guide
 
-namespace safe_browsing {
-class ApplicationAdvancedProtectionStatusDetector;
-}  // namespace safe_browsing
-
 class ProfileLaunchObserver;
 
 class GlassFrameService;
@@ -158,11 +154,6 @@ class GlobalFeatures {
     return audio_process_ml_model_forwarder_.get();
   }
 
-  safe_browsing::ApplicationAdvancedProtectionStatusDetector*
-  application_advanced_protection_status_detector() {
-    return application_advanced_protection_status_detector_.get();
-  }
-
   GlobalBrowserCollection* global_browser_collection() {
     return global_browser_collection_.get();
   }
@@ -223,9 +214,6 @@ class GlobalFeatures {
   // Must be outlived by `optimization_guide_global_feature_`.
   std::unique_ptr<AudioProcessMlModelForwarder>
       audio_process_ml_model_forwarder_;
-
-  std::unique_ptr<safe_browsing::ApplicationAdvancedProtectionStatusDetector>
-      application_advanced_protection_status_detector_;
 
   std::unique_ptr<local_network_access::IPAddressSpaceOverridesPrefsObserver>
       ip_address_space_overrides_prefs_observer_;

@@ -21,8 +21,6 @@
 #include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/download/status_text_builder_utils.h"
 #include "chrome/browser/enterprise/connectors/common.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/grit/branded_strings.h"
@@ -295,18 +293,8 @@ std::u16string DownloadUIModel::GetWarningText(const std::u16string& filename,
       return l10n_util::GetStringFUTF16(IDS_PROMPT_MALICIOUS_DOWNLOAD_CONTENT,
                                         filename, offset);
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
-      bool request_ap_verdicts = false;
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-      request_ap_verdicts =
-          safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-              profile())
-              ->IsUnderAdvancedProtection();
-#endif
-      return l10n_util::GetStringFUTF16(
-          request_ap_verdicts
-              ? IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT_IN_ADVANCED_PROTECTION
-              : IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT,
-          filename, offset);
+      return l10n_util::GetStringFUTF16(IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT,
+                                        filename, offset);
     }
     case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
       return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_CHANGES_SETTINGS,
@@ -859,19 +847,9 @@ DownloadUIModel::BubbleStatusTextBuilder::GetBubbleWarningStatusText() const {
       // "Blocked • Too big"
       return get_blocked_warning(IDS_DOWNLOAD_BUBBLE_STATUS_TOO_BIG);
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
-      bool request_ap_verdicts = false;
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-      request_ap_verdicts =
-          safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-              model_->profile())
-              ->IsUnderAdvancedProtection();
-#endif
-      // "Blocked by Advanced Protection" or "Suspicious download blocked"
-      return request_ap_verdicts
-                 ? l10n_util::GetStringUTF16(
-                       IDS_DOWNLOAD_BUBBLE_STATUS_ADVANCED_PROTECTION)
-                 : l10n_util::GetStringUTF16(
-                       IDS_DOWNLOAD_BUBBLE_STATUS_WARNING_SUSPICIOUS);
+      // "Suspicious download blocked"
+      return l10n_util::GetStringUTF16(
+          IDS_DOWNLOAD_BUBBLE_STATUS_WARNING_SUSPICIOUS);
     }
 
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:

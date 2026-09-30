@@ -1274,7 +1274,6 @@ static_library("ui") {
     "//chrome/browser/reading_list",
     "//chrome/browser/regional_capabilities",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:advanced_protection",
     "//chrome/browser/screen_ai:screen_ai_service_router_factory",
     "//chrome/browser/smart_card",
     "//chrome/browser/support_tool",

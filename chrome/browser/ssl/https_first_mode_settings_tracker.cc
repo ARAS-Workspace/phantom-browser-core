@@ -19,8 +19,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
@@ -194,16 +192,6 @@ std::string GetSyntheticFieldTrialGroupName(HttpsFirstModeSetting setting) {
 HttpsFirstModeStartupState GetStartupDetailedState(Profile* profile) {
   PrefService* prefs = profile->GetPrefs();
 
-  if (base::FeatureList::IsEnabled(
-          features::kHttpsFirstModeForAdvancedProtectionUsers)) {
-    auto* ap_manager =
-        safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-            profile);
-    if (ap_manager && ap_manager->IsUnderAdvancedProtection()) {
-      return HttpsFirstModeStartupState::kEnabledFull;
-    }
-  }
-
   if (prefs->GetBoolean(prefs::kHttpsOnlyModeEnabled)) {
     return HttpsFirstModeStartupState::kEnabledFull;
   }
@@ -310,17 +298,6 @@ void HttpsFirstModeService::MigrateEnhancedBundleUsersAndMaybeShowToast() {
   auto bundle_setting = safe_browsing::GetSecurityBundleSetting(*prefs);
   if (bundle_setting !=
       safe_browsing::SecuritySettingsBundleSetting::ENHANCED) {
-    return;
-  }
-
-  // Advanced Protection Program users are opted into the Enhanced bundle by
-  // default but shouldn't have their secure connections settings modified or
-  // show the toast since HFM is managed by AP.
-  auto* advanced_protection_manager =
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          profile_);
-  if (advanced_protection_manager &&
-      advanced_protection_manager->IsUnderAdvancedProtection()) {
     return;
   }
 
@@ -677,17 +654,6 @@ void HttpsFirstModeService::ProcessEngagedSitesList(
 }
 
 HttpsFirstModeSetting HttpsFirstModeService::GetCurrentSetting() const {
-  if (base::FeatureList::IsEnabled(
-          features::kHttpsFirstModeForAdvancedProtectionUsers)) {
-    auto* advanced_protection_manager =
-        safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-            profile_);
-    if (advanced_protection_manager &&
-        advanced_protection_manager->IsUnderAdvancedProtection()) {
-      return HttpsFirstModeSetting::kEnabledFull;
-    }
-  }
-
   if (profile_->GetPrefs()->GetBoolean(prefs::kHttpsOnlyModeEnabled)) {
     return HttpsFirstModeSetting::kEnabledFull;
   }
@@ -808,8 +774,6 @@ HttpsFirstModeServiceFactory::HttpsFirstModeServiceFactory()
               .WithAshInternals(ProfileSelection::kOriginalOnly)
               .WithGuest(ProfileSelection::kOffTheRecordOnly)
               .Build()) {
-  DependsOn(
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetInstance());
 }
 
 HttpsFirstModeServiceFactory::~HttpsFirstModeServiceFactory() = default;

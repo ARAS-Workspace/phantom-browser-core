@@ -10,8 +10,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
@@ -75,14 +73,6 @@ ChromeUserPopulation GetUserPopulationForProfile(Profile* profile) {
       identity_manager && SyncUtils::IsPrimaryAccountSignedIn(identity_manager);
 
   bool is_under_advanced_protection = false;
-
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  AdvancedProtectionStatusManager* advanced_protection_manager =
-      AdvancedProtectionStatusManagerFactory::GetForProfile(profile);
-  is_under_advanced_protection =
-      advanced_protection_manager &&
-      advanced_protection_manager->IsUnderAdvancedProtection();
-#endif
 
   std::optional<size_t> num_profiles;
   std::optional<size_t> num_loaded_profiles;

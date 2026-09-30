@@ -8,8 +8,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/safe_browsing/chrome_user_population_helper.h"
 #include "chrome/browser/safe_browsing/client_side_detection_intelligent_scan_delegate_factory.h"
 #include "chrome/browser/safe_browsing/network_context_service_factory.h"
@@ -64,7 +62,6 @@ RealTimeUrlLookupServiceFactory::RealTimeUrlLookupServiceFactory()
   DependsOn(VerdictCacheManagerFactory::GetInstance());
   DependsOn(SafeBrowsingNavigationObserverManagerFactory::GetInstance());
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-  DependsOn(AdvancedProtectionStatusManagerFactory::GetInstance());
 #endif
   DependsOn(ClientSideDetectionIntelligentScanDelegateFactory::GetInstance());
   DependsOn(NetworkContextServiceFactory::GetInstance());

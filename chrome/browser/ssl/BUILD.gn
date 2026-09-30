@@ -65,10 +65,7 @@ source_set("ssl") {
     "generated_https_first_mode_pref.h",
     "ssl_client_auth_observer.h",
   ]
-  public_deps += [
-    "//chrome/browser/safe_browsing:advanced_protection",
-    "//ui/views",
-  ]
+  public_deps += [ "//ui/views" ]
 }
 
 source_set("impl") {
@@ -116,7 +113,6 @@ source_set("impl") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/renderer_host",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:advanced_protection",
     "//chrome/browser/safe_browsing:metrics_collector",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/browser_window:create_browser_window",
@@ -221,7 +217,6 @@ source_set("unit_tests") {
     ":ssl",
     "//base",
     "//chrome/browser/content_settings:content_settings_factory",
-    "//chrome/browser/safe_browsing:advanced_protection",
     "//chrome/test:test_support",
     "//components/prefs:test_support",
     "//components/site_engagement/core",

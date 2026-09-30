@@ -160,7 +160,6 @@ BASE_FEATURE(kDocumentPipStandaloneWindow, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kChromeAppsDeprecation, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-
 // Enables the `google-chrome://` URI scheme.
 BASE_FEATURE(kGoogleChromeScheme, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -305,11 +304,6 @@ BASE_FEATURE(kHttpsFirstBalancedMode, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kHttpsFirstBalancedModeAutoEnable,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Kill switch for crbug.com/40892208.
-BASE_FEATURE(kHttpsFirstModeForAdvancedProtectionUsers,
-             "HttpsOnlyModeForAdvancedProtectionUsers",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kHttpsFirstModeDefaultSettingPairsWithEsb,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -416,10 +410,8 @@ BASE_FEATURE(kNoReferrers, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kOnConnectNative, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
-
 // Allows Chrome to do preconnect when prerender fails.
 BASE_FEATURE(kPrerenderFallbackToPreconnect, base::FEATURE_DISABLED_BY_DEFAULT);
-
 
 BASE_FEATURE(kUserValueDefaultBrowserStrings,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -591,7 +583,6 @@ BASE_FEATURE(kProcessPerSiteForDSE, base::FEATURE_ENABLED_BY_DEFAULT);
 // (SRP), for the purpose of applying the "process per site for DSE SRP" policy
 // (`kProcessPerSiteForDSE`).
 BASE_FEATURE(kConsiderDSEWarmUpPageAsSRP, base::FEATURE_ENABLED_BY_DEFAULT);
-
 
 // Disable downloads of unsafe file types over insecure transports if initiated
 // from a secure page. As of M89, mixed downloads are blocked on all platforms.
@@ -929,9 +920,6 @@ BASE_FEATURE(kRestrictedWebUICodeCache, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<std::string> kRestrictedWebUICodeCacheResources{
     &kRestrictedWebUICodeCache, "RestrictedWebUICodeCacheResources", ""};
 
-
-
-
 // A feature to enable smart restart metrics collection. The collected metrics
 // will be used to make informed decisions about the future of the smart restart
 // feature.
@@ -955,7 +943,6 @@ const base::FeatureParam<base::TimeDelta> kSmartRestartLockScreenDelay{
 
 const base::FeatureParam<double> kSmartRestartLockBypassBeforeUnloadThreshold{
     &kSmartRestartLockScreen, "lock_bypass_beforeunload_threshold", -1.0};
-
 
 // A feature to record the difference in the number of tabs and windows between
 // the last session and the current session on restart.

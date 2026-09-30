@@ -52,7 +52,6 @@ source_set("downloads") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/resources/downloads:resources",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:advanced_protection",
     "//chrome/browser/ui:browser_element_identifiers",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/webui",

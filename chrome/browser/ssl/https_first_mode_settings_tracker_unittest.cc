@@ -9,8 +9,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/simple_test_clock.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
@@ -53,10 +51,6 @@ class HttpsFirstModeSettingsTrackerTest : public testing::Test {
     builder.AddTestingFactory(
         StatefulSSLHostStateDelegateFactory::GetInstance(),
         StatefulSSLHostStateDelegateFactory::GetDefaultFactoryForTesting());
-    builder.AddTestingFactory(
-        safe_browsing::AdvancedProtectionStatusManagerFactory::GetInstance(),
-        safe_browsing::AdvancedProtectionStatusManagerFactory::
-            GetDefaultFactoryForTesting());
     builder.AddTestingFactory(
         HttpsFirstModeServiceFactory::GetInstance(),
         HttpsFirstModeServiceFactory::GetDefaultFactoryForTesting());
@@ -1231,38 +1225,6 @@ TEST_F(HttpsFirstModeSettingsTrackerTest, StartupBalancedModeAutoEnabled) {
       HttpsFirstModeSetting::kEnabledBalanced, 1);
 }
 
-// Tests that Advanced Protection status changes do not affect the synced
-// preference, but do correctly update the current setting.
-// Regression test for crbug.com/480099712.
-TEST_F(HttpsFirstModeSettingsTrackerTest, AdvancedProtectionStatusChange) {
-  feature_list()->InitAndEnableFeature(
-      features::kHttpsFirstModeForAdvancedProtectionUsers);
-
-  HttpsFirstModeService* service =
-      HttpsFirstModeServiceFactory::GetForProfile(profile());
-  ASSERT_TRUE(service);
-
-  safe_browsing::AdvancedProtectionStatusManager* aps_manager =
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          profile());
-  ASSERT_TRUE(aps_manager);
-
-  // Initially, the Strict HFM pref is disabled.
-  EXPECT_FALSE(profile()->GetPrefs()->GetBoolean(prefs::kHttpsOnlyModeEnabled));
-  EXPECT_EQ(service->GetCurrentSetting(), HttpsFirstModeSetting::kDisabled);
-
-  // Enable Advanced Protection. This should not change the pref, but
-  // GetCurrentSetting should now return kEnabledFull.
-  aps_manager->SetAdvancedProtectionStatusForTesting(true);
-  EXPECT_FALSE(profile()->GetPrefs()->GetBoolean(prefs::kHttpsOnlyModeEnabled));
-  EXPECT_EQ(service->GetCurrentSetting(), HttpsFirstModeSetting::kEnabledFull);
-
-  // Disable Advanced Protection. GetCurrentSetting should return to kDisabled.
-  aps_manager->SetAdvancedProtectionStatusForTesting(false);
-  EXPECT_FALSE(profile()->GetPrefs()->GetBoolean(prefs::kHttpsOnlyModeEnabled));
-  EXPECT_EQ(service->GetCurrentSetting(), HttpsFirstModeSetting::kDisabled);
-}
-
 TEST_F(HttpsFirstModeSettingsTrackerTest, StartupDetailedState_Disabled) {
   base::HistogramTester histograms;
   HttpsFirstModeService* service =
@@ -1338,27 +1300,6 @@ TEST_F(HttpsFirstModeSettingsTrackerTest,
   histograms.ExpectUniqueSample(
       "Security.HttpsFirstMode.SettingEnabledAtStartupDetailed",
       HttpsFirstModeStartupState::kEnabledBalancedAutoEnable, 1);
-}
-
-TEST_F(HttpsFirstModeSettingsTrackerTest,
-       StartupDetailedState_AdvancedProtection) {
-  feature_list()->InitAndEnableFeature(
-      features::kHttpsFirstModeForAdvancedProtectionUsers);
-
-  safe_browsing::AdvancedProtectionStatusManager* aps_manager =
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          profile());
-  ASSERT_TRUE(aps_manager);
-  aps_manager->SetAdvancedProtectionStatusForTesting(true);
-
-  base::HistogramTester histograms;
-  HttpsFirstModeService* service =
-      HttpsFirstModeServiceFactory::GetForProfile(profile());
-  ASSERT_TRUE(service);
-
-  histograms.ExpectUniqueSample(
-      "Security.HttpsFirstMode.SettingEnabledAtStartupDetailed",
-      HttpsFirstModeStartupState::kEnabledFull, 1);
 }
 
 TEST_F(HttpsFirstModeSettingsTrackerTest, GuestOTRProfileHasService) {

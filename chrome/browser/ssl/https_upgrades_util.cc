@@ -7,8 +7,6 @@
 #include "base/feature_list.h"
 #include "base/values.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/https_first_mode_settings_tracker.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
@@ -118,16 +116,6 @@ ComputeInterstitialState(content::WebContents* web_contents, const GURL& url) {
   if (state && state->IsHttpsEnforcedForUrl(url, storage_partition) &&
       !MustDisableSiteEngagementHeuristic(profile)) {
     interstitial_state.enabled_by_engagement_heuristic = true;
-  }
-
-  auto* advanced_protection_manager =
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          profile);
-  if (advanced_protection_manager &&
-      base::FeatureList::IsEnabled(
-          features::kHttpsFirstModeForAdvancedProtectionUsers)) {
-    interstitial_state.enabled_by_advanced_protection =
-        advanced_protection_manager->IsUnderAdvancedProtection();
   }
 
   return interstitial_state;

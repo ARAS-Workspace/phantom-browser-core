@@ -22,7 +22,6 @@ source_set("relaunch_notification") {
 
   public_deps = [
     "//base",
-    "//chrome/browser/safe_browsing:advanced_protection",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/upgrade_detector",
     "//ui/views",

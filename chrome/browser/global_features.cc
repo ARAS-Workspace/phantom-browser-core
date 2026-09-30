@@ -21,7 +21,6 @@
 #include "chrome/browser/optimization_guide/model_execution/optimization_guide_global_state.h"
 #include "chrome/browser/permissions/system/platform_handle.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/safe_browsing/application_advanced_protection_status_detector.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/views/frame/glass_frame_service.h"
 #include "components/application_locale_storage/application_locale_storage.h"
@@ -170,13 +169,6 @@ void GlobalFeatures::PostBrowserProcessInitCore() {
     audio_process_ml_model_forwarder_ =
         AudioProcessMlModelForwarder::Create(g_browser_process->local_state());
   }
-
-  if (base::FeatureList::IsEnabled(
-          safe_browsing::kRelaunchNotificationForAdvancedProtection)) {
-    application_advanced_protection_status_detector_ = std::make_unique<
-        safe_browsing::ApplicationAdvancedProtectionStatusDetector>(
-        g_browser_process->profile_manager());
-  }
 }
 
 void GlobalFeatures::Init() {
@@ -202,7 +194,6 @@ void GlobalFeatures::PostMainMessageLoopRun() {
   audio_process_ml_model_forwarder_.reset();
   optimization_guide_global_feature_.reset();
 
-  application_advanced_protection_status_detector_.reset();
   tab_drag_session_manager_.reset();
 
   glass_frame_service_.reset();

@@ -10,8 +10,6 @@
 #include "chrome/browser/extensions/api/settings_private/generated_pref.h"
 #include "chrome/browser/extensions/api/settings_private/prefs_util_enums.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ssl/https_first_mode_settings_tracker.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/common/chrome_features.h"
@@ -48,32 +46,11 @@ GeneratedHttpsFirstModePref::GeneratedHttpsFirstModePref(Profile* profile)
       prefs::kSecuritySettingsBundle,
       base::BindRepeating(&GeneratedHttpsFirstModePref::OnSettingsBundleChanged,
                           base::Unretained(this)));
-
-  // Track Advanced Protection status.
-  if (base::FeatureList::IsEnabled(
-          features::kHttpsFirstModeForAdvancedProtectionUsers)) {
-    obs_.Observe(
-        safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-            profile_));
-    // On startup, AdvancedProtectionStatusManager runs before this class so we
-    // don't get called back. Run the callback to get the AP setting.
-    OnAdvancedProtectionStatusChanged(
-        safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-            profile_)
-            ->IsUnderAdvancedProtection());
-  }
 }
 
 GeneratedHttpsFirstModePref::~GeneratedHttpsFirstModePref() = default;
 
 void GeneratedHttpsFirstModePref::OnSourcePreferencesChanged() {
-  NotifyObservers(kGeneratedHttpsFirstModePref);
-}
-
-void GeneratedHttpsFirstModePref::OnAdvancedProtectionStatusChanged(
-    bool enabled) {
-  DCHECK(base::FeatureList::IsEnabled(
-      features::kHttpsFirstModeForAdvancedProtectionUsers));
   NotifyObservers(kGeneratedHttpsFirstModePref);
 }
 
@@ -86,13 +63,6 @@ GeneratedHttpsFirstModePref::SetPref(const base::Value* value) {
   }
 
   auto selection = static_cast<HttpsFirstModeSetting>(value->GetInt());
-
-  // If the user is under Advanced Protection, they cannot change the setting.
-  if (safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          profile_)
-          ->IsUnderAdvancedProtection()) {
-    return extensions::settings_private::SetPrefResult::PREF_NOT_MODIFIABLE;
-  }
 
   // If the enterprise policy is enforced, then the kHttpsOnlyModeEnabled pref
   // will not be modifiable (for all policy values).
@@ -114,16 +84,10 @@ GeneratedHttpsFirstModePref::SetPref(const base::Value* value) {
 
 // Convert the underlying boolean prefs into the setting selection.
 settings_api::PrefObject GeneratedHttpsFirstModePref::GetPrefObject() const {
-  bool is_advanced_protection_enabled =
-      safe_browsing::AdvancedProtectionStatusManagerFactory::GetForProfile(
-          profile_)
-          ->IsUnderAdvancedProtection();
-
   auto* hfm_fully_enabled_pref =
       profile_->GetPrefs()->FindPreference(prefs::kHttpsOnlyModeEnabled);
 
-  bool fully_enabled = hfm_fully_enabled_pref->GetValue()->GetBool() ||
-                       is_advanced_protection_enabled;
+  bool fully_enabled = hfm_fully_enabled_pref->GetValue()->GetBool();
 
   // Balanced Mode can be enabled by the user or automatically. In both cases,
   // the UI setting should look the same.
@@ -143,11 +107,6 @@ settings_api::PrefObject GeneratedHttpsFirstModePref::GetPrefObject() const {
   } else {
     pref_object.value =
         base::Value(static_cast<int>(HttpsFirstModeSetting::kDisabled));
-  }
-
-  pref_object.user_control_disabled = is_advanced_protection_enabled;
-  if (is_advanced_protection_enabled) {
-    pref_object.enforcement = settings_api::Enforcement::kEnforced;
   }
 
   if (IsBalancedModeAvailable()) {

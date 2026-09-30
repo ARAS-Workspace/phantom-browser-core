@@ -48,7 +48,6 @@ source_set("impl") {
     "//chrome/app:generated_resources",
     "//chrome/app/vector_icons",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:advanced_protection",
     "//chrome/browser/ui/color:color_headers",
     "//components/prefs",
     "//components/safe_browsing/core/common:features",
