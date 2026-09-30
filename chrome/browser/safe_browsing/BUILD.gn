@@ -67,7 +67,6 @@ static_library("safe_browsing") {
     "//components/resources:components_resources_grit",
     "//components/safe_browsing:buildflags",
     "//components/safe_browsing/content/browser",
-    "//components/safe_browsing/content/browser/notification_content_detection",
     "//components/safe_browsing/content/browser/triggers:suspicious_site_trigger",
     "//components/safe_browsing/content/browser/web_ui",
     "//components/safe_browsing/core/browser",
@@ -157,8 +156,6 @@ static_library("safe_browsing") {
       "external_app_redirect_checking.h",
       "network_context_service.h",
       "network_context_service_factory.h",
-      "notification_content_detection/notification_content_detection_service_factory.h",
-      "notification_content_detection/notification_content_detection_util.h",
       "phishy_interaction_tracker.h",
       "safe_browsing_navigation_observer_manager_factory.h",
       "safe_browsing_pref_change_handler.h",
@@ -210,8 +207,6 @@ static_library("safe_browsing") {
       "external_app_redirect_checking.cc",
       "network_context_service.cc",
       "network_context_service_factory.cc",
-      "notification_content_detection/notification_content_detection_service_factory.cc",
-      "notification_content_detection/notification_content_detection_util.cc",
       "phishy_interaction_tracker.cc",
       "safe_browsing_navigation_observer_manager_factory.cc",
       "safe_browsing_pref_change_handler.cc",
@@ -267,7 +262,6 @@ static_library("safe_browsing") {
       "//components/safe_browsing/content/browser:safe_browsing_blocking_page",
       "//components/safe_browsing/content/browser:safe_browsing_service",
       "//components/safe_browsing/content/browser/download:download_stats",
-      "//components/safe_browsing/content/browser/notification_content_detection:notifications_global_cache_list",
       "//components/safe_browsing/content/browser/triggers",
       "//components/safe_browsing/content/browser/triggers:ad_sampler_trigger",
       "//components/safe_browsing/content/browser/triggers:suspicious_site_trigger",
@@ -480,7 +474,6 @@ static_library("safe_browsing") {
     } else if (safe_browsing_mode == 2) {
       public += [
         "android/download_protection_metrics_data.h",
-        "android/notification_content_detection_manager_android.h",
         "android/password_reuse_controller_android.h",
         "android/safe_browsing_referring_app_bridge_android.h",
         "android/safe_browsing_settings_navigation_android.h",
@@ -494,7 +487,6 @@ static_library("safe_browsing") {
       ]
       sources += [
         "android/download_protection_metrics_data.cc",
-        "android/notification_content_detection_manager_android.cc",
         "android/password_reuse_controller_android.cc",
         "android/safe_browsing_referring_app_bridge_android.cc",
         "android/safe_browsing_settings_navigation_android.cc",
@@ -644,7 +636,6 @@ source_set("unit_tests") {
       "download_protection/download_item_metadata_unittest.cc",
       "download_protection/file_analyzer_unittest.cc",
       "download_protection/file_system_access_metadata_unittest.cc",
-      "notification_content_detection/notification_content_detection_util_unittest.cc",
       "threat_details_unittest.cc",
     ]
     deps += [
@@ -669,9 +660,6 @@ source_set("unit_tests") {
       "//components/safe_browsing/content/browser:client_side_detection_service",
       "//components/safe_browsing/content/browser:safe_browsing_blocking_page",
       "//components/safe_browsing/content/browser:safe_browsing_service",
-      "//components/safe_browsing/content/browser/notification_content_detection",
-      "//components/safe_browsing/content/browser/notification_content_detection:notifications_global_cache_list",
-      "//components/safe_browsing/content/browser/notification_content_detection:test_utils",
       "//components/safe_browsing/content/browser/web_ui",
       "//components/safe_browsing/content/common:file_type_policies",
       "//components/safe_browsing/content/common:file_type_policies_test_support",
@@ -701,8 +689,6 @@ source_set("unit_tests") {
     deps += [
       "//chrome/browser/optimization_guide",
       "//chrome/browser/optimization_guide:test_support",
-      "//components/safe_browsing/content/browser/notification_content_detection:notifications_global_cache_list",
-      "//components/safe_browsing/content/browser/notification_content_detection:test_utils",
     ]
   }
 
@@ -808,15 +794,11 @@ source_set("test_support") {
   sources = [
     "mock_safe_browsing_database_manager.cc",
     "mock_safe_browsing_database_manager.h",
-    "notification_content_detection/mock_notification_content_detection_service.cc",
-    "notification_content_detection/mock_notification_content_detection_service.h",
   ]
   deps = [
     "//chrome/browser/profiles:profile",
     "//components/keyed_service/core",
     "//components/optimization_guide/core:test_support",
-    "//components/safe_browsing/content/browser/notification_content_detection",
-    "//components/safe_browsing/content/browser/notification_content_detection:test_utils",
     "//components/safe_browsing/core/browser/db:database_manager",
     "//components/safe_browsing/core/browser/db:test_database_manager",
     "//content/public/browser",

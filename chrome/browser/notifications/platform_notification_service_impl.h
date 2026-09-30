@@ -100,24 +100,6 @@ class PlatformNotificationServiceImpl
                            RecordNotificationUkmEvent);
   FRIEND_TEST_ALL_PREFIXES(PlatformNotificationServiceTest_WebApps,
                            IncomingCallWebApp);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_ReportNotificationContentDetectionData,
-      UpdateNotificationDatabaseMetadata);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-      RecordSuspiciousNotification);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-      NotSuspiciousNoEngagementRecorded);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-      RevokeNotificationPermission);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-      DoNotRevokeWhenFeatureDisabled);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
-      RevokeNotificationPermission_UpdateNotificationDatabaseMetadata);
 
   // KeyedService implementation.
   void Shutdown() override;
@@ -160,44 +142,11 @@ class PlatformNotificationServiceImpl
   void ClearClosedNotificationsForTesting() { closed_notifications_.clear(); }
 
   // Update the notification entry in the `NotificationDatabase` with
-  // `serialized_content_detection_metadata` for possible MQLS logging later.
-  // Update `persistent_metadata`, given the value of `should_show_warning`, to
-  // tell the front end whether to display the notification or the warning.
-  // Increment warning shown count based on `should_show_warning` and revoke
-  // notification permission if applicable.
-  void HandleOnDeviceModelResponseThenMaybeDisplay(
-      const message_center::Notification& notification,
-      std::unique_ptr<PersistentNotificationMetadata> persistent_metadata,
-      bool should_show_warning,
-      std::optional<std::string> serialized_content_detection_metadata);
-
   // Logs metrics when displaying a persistent notification.
   void LogPersistentNotificationShownMetrics(
       const blink::PlatformNotificationData& notification_data,
       const GURL& origin,
       const GURL& notification_origin);
-
-  // Returns true if the user tapped "Always allow" on a notification warning
-  // for `origin`.
-  bool AreSuspiciousNotificationsAllowlistedByUser(const GURL& origin);
-
-  // `WriteResourcesResultCallback` callback that updates the
-  // `persistent_metadata` and displays the notification with a call to
-  // `DoUpdatePersistentMetadataThenDisplay`, after updating the notification
-  // database with serialized metadata. Note the `success` value is currently
-  // unused.
-  void DidUpdatePersistentMetadata(
-      std::unique_ptr<PersistentNotificationMetadata> persistent_metadata,
-      message_center::Notification notification,
-      bool should_show_warning,
-      bool success);
-
-  // Helper method for updating `persistent_metadata`, given the value of
-  // `should_show_warning` then displaying the notification.
-  void DoUpdatePersistentMetadataThenDisplay(
-      std::unique_ptr<PersistentNotificationMetadata> persistent_metadata,
-      message_center::Notification notification,
-      bool should_show_warning);
 
   // The profile for this instance or NULL if the initial profile has been
   // shutdown already.

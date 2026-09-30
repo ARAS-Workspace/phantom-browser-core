@@ -48,13 +48,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/notification_content_detection/notification_content_detection_util.h"
-#include "components/safe_browsing/content/browser/notification_content_detection/notification_content_detection_constants.h"
-#include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"
-#include "components/safe_browsing/core/common/features.h"
-#endif
-
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
@@ -63,6 +56,9 @@
 using content::BrowserThread;
 
 namespace {
+// Key of the stored dict for the suspicious notification user allowlist.
+constexpr char kIsAllowlistedByUserKey[] = "is-allowlisted-by-user";
+
 
 void RecordCloseResult(content::PersistentNotificationStatus status) {
   base::UmaHistogramEnumeration(
@@ -310,7 +306,7 @@ void PersistentNotificationHandler::DisableNotifications(
         ContentSettingsPattern::Wildcard(),
         ContentSettingsType::ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER,
         base::Value(base::DictValue().Set(
-            safe_browsing::kIsAllowlistedByUserKey, false)));
+            kIsAllowlistedByUserKey, false)));
   }
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 }
@@ -327,80 +323,10 @@ void PersistentNotificationHandler::OpenSettings(Profile* profile,
           NOTIFICATION_ACTION_COUNT);
 }
 
-void PersistentNotificationHandler::ReportNotificationAsSafe(
-    const std::string& notification_id,
-    const GURL& url,
-    Profile* profile) {
-  OnMaybeReport(notification_id, url, profile, /*did_show_warning=*/true,
-                /*did_user_unsubscribe=*/false);
-}
-
-void PersistentNotificationHandler::ReportWarnedNotificationAsSpam(
-    const std::string& notification_id,
-    const GURL& url,
-    Profile* profile) {
-  OnMaybeReport(notification_id, url, profile, /*did_show_warning=*/true,
-                /*did_user_unsubscribe=*/true);
-}
-
-void PersistentNotificationHandler::ReportUnwarnedNotificationAsSpam(
-    const std::string& notification_id,
-    const GURL& url,
-    Profile* profile) {
-  OnMaybeReport(notification_id, url, profile, /*did_show_warning=*/false,
-                /*did_user_unsubscribe=*/true);
-}
-
 void PersistentNotificationHandler::OnShowOriginalNotification(
     const GURL& url,
     const std::string& notification_id,
     Profile* profile) {}
-
-void PersistentNotificationHandler::OnMaybeReport(
-    const std::string& notification_id,
-    const GURL& url,
-    Profile* profile,
-    bool did_show_warning,
-    bool did_user_unsubscribe) {
-  CHECK(profile);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // In case the data volume becomes excessive, logging should happen at a
-  // sampled rate. This rate is defined by the
-  // `kReportNotificationContentDetectionDataRate` feature parameter.
-  if (base::RandDouble() * 100 >
-      safe_browsing::kReportNotificationContentDetectionDataRate.Get()) {
-    return;
-  }
-
-  scoped_refptr<content::PlatformNotificationContext> notification_context =
-      profile->GetStoragePartitionForUrl(url)->GetPlatformNotificationContext();
-  if (!notification_context ||
-      !OptimizationGuideKeyedServiceFactory::GetForProfile(profile)) {
-    return;
-  }
-
-  blink::mojom::EngagementLevel engagement_level =
-      blink::mojom::EngagementLevel::NONE;
-  if (site_engagement::SiteEngagementService::Get(profile)) {
-    engagement_level = site_engagement::SiteEngagementService::Get(profile)
-                           ->GetEngagementLevel(url);
-  }
-
-  // Read notification data from database and upload as log to model quality
-  // service.
-  notification_context->ReadNotificationDataAndRecordInteraction(
-      notification_id, url,
-      content::PlatformNotificationContext::Interaction::NONE,
-      base::BindOnce(
-          &safe_browsing::SendNotificationContentDetectionDataToMQLSServer,
-          OptimizationGuideKeyedServiceFactory::GetForProfile(profile)
-              ->GetModelQualityLogsUploaderService()
-              ->GetWeakPtr(),
-          safe_browsing::NotificationContentDetectionMQLSMetadata(
-              did_show_warning, did_user_unsubscribe, engagement_level)));
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-}
 
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 

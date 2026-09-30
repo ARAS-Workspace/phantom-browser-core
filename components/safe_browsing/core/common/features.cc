@@ -378,13 +378,6 @@ constexpr base::FeatureParam<std::string> kRedWarningSurveyAndroidHeedTriggerId{
 BASE_FEATURE(kRelaunchNotificationForAdvancedProtection,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kReportNotificationContentDetectionData,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-constexpr base::FeatureParam<int> kReportNotificationContentDetectionDataRate{
-    &kReportNotificationContentDetectionData,
-    "ReportNotificationContentDetectionDataRate",
-    /*default_value=*/100};
-
 BASE_FEATURE(kSafeBrowsingDailyPhishingReportsLimit,
              base::FEATURE_ENABLED_BY_DEFAULT);
 constexpr base::FeatureParam<int> kSafeBrowsingDailyPhishingReportsLimitESB{
@@ -476,7 +469,6 @@ base::ListValue GetFeatureStatusList() {
       &kLocalListsUseSBv5,
       &kMigrateEnhancedSbUserToEnhancedBundle,
       &kProactivePasswordProtection,
-      &kReportNotificationContentDetectionData,
       &kSafeBrowsingWaitForDnsForRealTimeLookup,
       &kShowManualNotificationRevocationsSafetyHub,
       &kShowWarningsForSuspiciousNotifications,

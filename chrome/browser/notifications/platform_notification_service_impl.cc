@@ -43,7 +43,6 @@
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/browser/notification_content_detection/notification_content_detection_constants.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/platform_notification_context.h"
@@ -75,10 +74,6 @@
 #include "extensions/common/constants.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/notification_content_detection/notification_content_detection_service_factory.h"
-#include "components/safe_browsing/content/browser/notification_content_detection/notification_content_detection_service.h"
-#endif
 
 using content::BrowserContext;
 using content::BrowserThread;
@@ -86,11 +81,6 @@ using content::NotificationDatabaseData;
 using message_center::NotifierId;
 
 namespace {
-
-constexpr char
-    kNotificationContentDetectionDisplayPersistentNotificationEventHistogram[] =
-        "SafeBrowsing.NotificationContentDetection."
-        "DisplayPersistentNotificationEvent";
 
 // Whether a web notification should be displayed when chrome is in full
 // screen mode.
@@ -159,18 +149,6 @@ class RevokeDeleteCountRecorder
   }
 
   size_t total_deleted_count_;
-};
-
-// The type of event when displaying a persistent notification. These values
-// are persisted to logs. Entries should not be renumbered and numeric values
-// should never be reused.
-enum class DisplayPersistentNotificationEvents {
-  // The event logged when requesting to display a persistent notification.
-  kRequested = 0,
-  // The event logged when model checking and displaying the persistent
-  // notification have completed.
-  kFinished = 1,
-  kMaxValue = kFinished,
 };
 
 }  // namespace
@@ -294,41 +272,6 @@ void PlatformNotificationServiceImpl::DisplayPersistentNotification(
                                  notification_resources, service_worker_scope);
   auto metadata = std::make_unique<PersistentNotificationMetadata>();
   metadata->service_worker_scope = service_worker_scope;
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (safe_browsing::IsSafeBrowsingEnabled(*profile_->GetPrefs()) &&
-      !safe_browsing::IsURLAllowlistedByPolicy(origin, *profile_->GetPrefs())) {
-    auto* notification_content_service = safe_browsing::
-        NotificationContentDetectionServiceFactory::GetForProfile(profile_);
-    if (notification_content_service) {
-      bool is_show_warnings_for_suspicious_notifications_enabled =
-          base::FeatureList::IsEnabled(
-              safe_browsing::kShowWarningsForSuspiciousNotifications);
-      notification_content_service->MaybeCheckNotificationContentDetectionModel(
-          notification_data, origin,
-          AreSuspiciousNotificationsAllowlistedByUser(origin),
-          is_show_warnings_for_suspicious_notifications_enabled
-              ? base::BindOnce(&PlatformNotificationServiceImpl::
-                                   HandleOnDeviceModelResponseThenMaybeDisplay,
-                               weak_ptr_factory_.GetWeakPtr(), notification,
-                               std::move(metadata))
-              : base::DoNothing());
-      // When this feature is enabled, the
-      // `MaybeCheckNotificationContentDetectionModel` method will also include
-      // displaying the notification. In this case, the metrics should be logged
-      // and the method should return without calling `Display`. Otherwise, the
-      // notification should be displayed below.
-      if (is_show_warnings_for_suspicious_notifications_enabled) {
-        base::UmaHistogramEnumeration(
-            kNotificationContentDetectionDisplayPersistentNotificationEventHistogram,
-            DisplayPersistentNotificationEvents::kRequested);
-        LogPersistentNotificationShownMetrics(notification_data, origin,
-                                              notification.origin_url());
-        return;
-      }
-    }
-  }
-#endif
 
   NotificationDisplayServiceFactory::GetForProfile(profile_)->Display(
       NotificationHandler::Type::WEB_PERSISTENT, notification,
@@ -657,62 +600,6 @@ bool PlatformNotificationServiceImpl::IsActivelyInstalledWebAppScope(
   return app_id.has_value();
 }
 
-void PlatformNotificationServiceImpl::
-    HandleOnDeviceModelResponseThenMaybeDisplay(
-        const message_center::Notification& notification,
-        std::unique_ptr<PersistentNotificationMetadata> persistent_metadata,
-        bool should_show_warning,
-        std::optional<std::string> serialized_content_detection_metadata) {
-  bool suspicious_notification_revoked = false;
-  if (base::FeatureList::IsEnabled(
-          safe_browsing::kAutoRevokeSuspiciousNotification) &&
-      should_show_warning) {
-    auto* service =
-        NotificationsEngagementServiceFactory::GetForProfile(profile_);
-    // This service might be missing for incognito profiles and in tests.
-    if (!suspicious_notification_revoked && service) {
-      // Increment suspicious count if the notification permission has not been
-      // revoked.
-      service->RecordNotificationSuspicious(notification.origin_url());
-    }
-  }
-  if (base::FeatureList::IsEnabled(
-          safe_browsing::kReportNotificationContentDetectionData)) {
-    // If the notification permission has been revoked, we do still want to
-    // record the notification in the database for re-grant scenario; however;
-    // there is no need to trigger `DidUpdatePersistentMetadata` callback.
-    content::PlatformNotificationContext::WriteResourcesResultCallback
-        callback = suspicious_notification_revoked
-                       ? base::DoNothing()
-                       : base::BindOnce(&PlatformNotificationServiceImpl::
-                                            DidUpdatePersistentMetadata,
-                                        weak_ptr_factory_.GetWeakPtr(),
-                                        std::move(persistent_metadata),
-                                        notification, should_show_warning);
-    if (serialized_content_detection_metadata.has_value()) {
-      scoped_refptr<content::PlatformNotificationContext> notification_context =
-          profile_->GetStoragePartitionForUrl(notification.origin_url())
-              ->GetPlatformNotificationContext();
-      if (notification_context) {
-        notification_context->WriteNotificationMetadata(
-            notification.id(), notification.origin_url(),
-            safe_browsing::kNotificationContentDetectionMetadataDictionaryKey,
-            serialized_content_detection_metadata.value(), std::move(callback));
-        return;
-      }
-    }
-    std::move(callback).Run(/*success=*/false);
-  } else {
-    // Notification permission has been revoked due to suspicious content; do
-    // not show notification.
-    if (suspicious_notification_revoked) {
-      return;
-    }
-    DoUpdatePersistentMetadataThenDisplay(std::move(persistent_metadata),
-                                          notification, should_show_warning);
-  }
-}
-
 void PlatformNotificationServiceImpl::LogPersistentNotificationShownMetrics(
     const blink::PlatformNotificationData& notification_data,
     const GURL& origin,
@@ -730,49 +617,4 @@ void PlatformNotificationServiceImpl::LogPersistentNotificationShownMetrics(
   permissions::PermissionUmaUtil::RecordPermissionUsage(
       ContentSettingsType::NOTIFICATIONS, profile_, nullptr,
       notification_origin);
-}
-
-bool PlatformNotificationServiceImpl::
-    AreSuspiciousNotificationsAllowlistedByUser(const GURL& origin) {
-  auto* hcsm = HostContentSettingsMapFactory::GetForProfile(profile_);
-  if (!hcsm || !origin.is_valid()) {
-    return false;
-  }
-  content_settings::SettingInfo info;
-  base::Value stored_value(hcsm->GetWebsiteSetting(
-      origin, origin,
-      ContentSettingsType::ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER,
-      &info));
-  if (stored_value.is_none()) {
-    return false;
-  }
-  if (!stored_value.is_dict() || !stored_value.GetDict().contains(
-                                     safe_browsing::kIsAllowlistedByUserKey)) {
-    return false;
-  }
-  return stored_value.GetDict()
-      .FindBool(safe_browsing::kIsAllowlistedByUserKey)
-      .value_or(false);
-}
-
-void PlatformNotificationServiceImpl::DidUpdatePersistentMetadata(
-    std::unique_ptr<PersistentNotificationMetadata> persistent_metadata,
-    message_center::Notification notification,
-    bool should_show_warning,
-    bool success) {
-  DoUpdatePersistentMetadataThenDisplay(std::move(persistent_metadata),
-                                        notification, should_show_warning);
-}
-
-void PlatformNotificationServiceImpl::DoUpdatePersistentMetadataThenDisplay(
-    std::unique_ptr<PersistentNotificationMetadata> persistent_metadata,
-    message_center::Notification notification,
-    bool should_show_warning) {
-  base::UmaHistogramEnumeration(
-      kNotificationContentDetectionDisplayPersistentNotificationEventHistogram,
-      DisplayPersistentNotificationEvents::kFinished);
-  persistent_metadata->is_suspicious = should_show_warning;
-  NotificationDisplayServiceFactory::GetForProfile(profile_)->Display(
-      NotificationHandler::Type::WEB_PERSISTENT, notification,
-      std::move(persistent_metadata));
 }

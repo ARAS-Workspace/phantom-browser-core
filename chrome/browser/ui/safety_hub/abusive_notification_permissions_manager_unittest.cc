@@ -30,7 +30,6 @@
 #include "components/content_settings/core/test/content_settings_test_utils.h"
 #include "components/permissions/constants.h"
 #include "components/permissions/notifications_engagement_service.h"
-#include "components/safe_browsing/content/browser/notification_content_detection/notification_content_detection_constants.h"
 #include "components/safe_browsing/core/browser/db/util.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"
@@ -1486,7 +1485,7 @@ TEST_F(SuspiciousNotificationRevocationTest,
       GURL(url1), GURL(url1),
       ContentSettingsType::SUSPICIOUS_NOTIFICATION_SHOW_ORIGINAL,
       base::Value(base::DictValue().Set(
-          safe_browsing::kSuspiciousNotificationShowOriginalKey, true)),
+          "suspicious-notification-show-original", true)),
       constraint);
 
   ASSERT_FALSE(

@@ -25,7 +25,6 @@
 #include "components/content_settings/core/common/features.h"
 #include "components/permissions/notifications_engagement_service.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/content/browser/notification_content_detection/notification_content_detection_constants.h"
 #include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"
@@ -38,6 +37,10 @@
 #include "url/origin.h"
 
 namespace {
+// Key of the stored dict for the suspicious notification show original setting.
+constexpr char kSuspiciousNotificationShowOriginalKey[] =
+    "suspicious-notification-show-original";
+
 // Histogram names.
 constexpr char kAbusiveNotificationPermissionRevocationHistogram[] =
     "Settings.SafetyHub.AbusiveNotificationPermissionRevocation";
@@ -119,9 +122,9 @@ bool HasShowOriginalSuspiciousNotification(HostContentSettingsMap* hcsm,
   }
   DCHECK(stored_value.is_dict());
   DCHECK(stored_value.GetDict().contains(
-      safe_browsing::kSuspiciousNotificationShowOriginalKey));
+      kSuspiciousNotificationShowOriginalKey));
   return stored_value.GetDict()
-      .FindBool(safe_browsing::kSuspiciousNotificationShowOriginalKey)
+      .FindBool(kSuspiciousNotificationShowOriginalKey)
       .value_or(false);
 }
 
