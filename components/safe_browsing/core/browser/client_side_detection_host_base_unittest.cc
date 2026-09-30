@@ -75,12 +75,6 @@ class TestClientSideDetectionHostBase : public ClientSideDetectionHostBase {
   MOCK_METHOD(bool, IsAccountSignedIn, (), (override));
   MOCK_METHOD(bool, IsErrorDocument, (), (override));
   MOCK_METHOD(ChromeUserPopulation, GetUserPopulation, (), (override));
-  MOCK_METHOD(void,
-              MaybeStartGeminiAntiscamProtection,
-              (GURL url,
-               ClientSideDetectionType request_type,
-               std::optional<bool> did_match_high_confidence_allowlist),
-              (override));
   GURL GetCurrentUrl() const override { return current_url(); }
   MOCK_METHOD(void,
               ClassifyPhishingThroughThresholds,
@@ -460,11 +454,6 @@ TEST_F(ClientSideDetectionHostBaseTest, SendRequest) {
   verdict->set_url(url.spec());
   verdict->set_client_score(0.9f);
   verdict->set_client_side_detection_type(TRIGGER_MODELS);
-
-  // Verify that Gemini Antiscam protection is potentially started.
-  EXPECT_CALL(*host_,
-              MaybeStartGeminiAntiscamProtection(url, TRIGGER_MODELS, _))
-      .Times(1);
 
   // Verify that the request is forwarded to the service.
   EXPECT_CALL(mock_csd_service, SendClientReportPhishingRequest(_, _, "token"))

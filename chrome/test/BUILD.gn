@@ -2228,8 +2228,6 @@ test("browser_tests") {
       "//components/safe_browsing/content/renderer/phishing_classifier",
       "//components/safe_browsing/core/common/phishing_classifier",
     ]
-
-    sources += [ "../browser/safe_browsing/gemini_antiscam_protection/gemini_antiscam_protection_service_browsertest.cc" ]
   }
 
   if (is_linux) {

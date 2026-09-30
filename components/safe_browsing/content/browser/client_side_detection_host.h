@@ -76,10 +76,6 @@ class ClientSideDetectionHost
       bool is_invalid_ip,
       PhishingDetectorResult result) override;
   void MaybeRunUserReportCallback() override;
-  void MaybeStartGeminiAntiscamProtection(
-      GURL url,
-      ClientSideDetectionType request_type,
-      std::optional<bool> did_match_high_confidence_allowlist) override;
   void MaybeStartPreClassification(
       safe_browsing::ClientSideDetectionType request_type) override;
 
@@ -121,11 +117,6 @@ class ClientSideDetectionHost
     // then used to provide the intelligent scan delegate the information about
     // the page.
     virtual void GetInnerText(HostInnerTextCallback callback) = 0;
-    // Triggers Gemini Antiscam Protection if conditions are met.
-    virtual void MaybeStartGeminiAntiscamProtection(
-        GURL url,
-        ClientSideDetectionType request_type,
-        std::optional<bool> did_match_high_confidence_allowlist) = 0;
   };
 
   static const int kMaxHighResScreenshotWidth;
@@ -222,7 +213,6 @@ class ClientSideDetectionHost
   friend class ClientSideDetectionHostScamDetectionTest;
   friend class ClientSideDetectionHostCreditCardFormTest;
   friend class ClientSideDetectionHostClipboardDataTest;
-  friend class ClientSideDetectionHostGeminiAntiscamProtectionTest;
   friend class ClientSideDetectionHostPriorityTest;
   friend class ClientSideDetectionHostPrerenderBrowserTest;
   friend class ClientSideDetectionHostPrerenderBrowserTest_Screenshot;
@@ -319,8 +309,6 @@ class ClientSideDetectionHost
                            CreditCardFormClassificationTriggersCSDPing);
   FRIEND_TEST_ALL_PREFIXES(ClientSideDetectionHostBrowserTest,
                            NavigateTo404PageLogsErrorDocument);
-  FRIEND_TEST_ALL_PREFIXES(ClientSideDetectionHostGeminiAntiscamProtectionTest,
-                           GeminiAntiscamProtectionServiceCalledWithInnerText);
   FRIEND_TEST_ALL_PREFIXES(
       ClientSideDetectionHostCreditCardFormTriggerDisabledTest,
       InteractionTriggerDisabledDoesNotTrigger);

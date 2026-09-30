@@ -161,12 +161,6 @@ class ClientSideDetectionHostBase : public autofill::AutofillManager::Observer,
   // Helper method to run the callback.
   virtual void MaybeRunUserReportCallback() = 0;
 
-  // Triggers Gemini Antiscam Protection if conditions are met.
-  virtual void MaybeStartGeminiAntiscamProtection(
-      GURL url,
-      ClientSideDetectionType request_type,
-      std::optional<bool> did_match_high_confidence_allowlist) = 0;
-
   // Helper function to create preclassification check once requirements are
   // met.
   virtual void MaybeStartPreClassification(
