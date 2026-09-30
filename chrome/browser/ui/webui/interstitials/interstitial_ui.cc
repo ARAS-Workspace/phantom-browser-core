@@ -15,10 +15,6 @@
 #include "base/strings/string_util.h"
 #include "base/time/time.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/connectors/interstitials/enterprise_block_controller_client.h"
-#include "chrome/browser/enterprise/connectors/interstitials/enterprise_block_page.h"
-#include "chrome/browser/enterprise/connectors/interstitials/enterprise_warn_controller_client.h"
-#include "chrome/browser/enterprise/connectors/interstitials/enterprise_warn_page.h"
 #include "chrome/browser/enterprise/signin/interstitials/managed_profile_required_controller_client.h"
 #include "chrome/browser/enterprise/signin/interstitials/managed_profile_required_page.h"
 #include "chrome/browser/lookalikes/lookalike_url_blocking_page.h"
@@ -33,8 +29,6 @@
 #include "components/captive_portal/core/buildflags.h"
 #include "components/grit/dev_ui_components_resources.h"
 #include "components/lookalikes/core/lookalike_url_util.h"
-#include "components/safe_browsing/content/browser/content_unsafe_resource_util.h"
-#include "components/safe_browsing/content/browser/safe_browsing_blocking_page.h"
 #include "components/security_interstitials/content/bad_clock_blocking_page.h"
 #include "components/security_interstitials/content/blocked_interception_blocking_page.h"
 #include "components/security_interstitials/content/https_only_mode_blocking_page.h"
@@ -44,8 +38,6 @@
 #include "components/security_interstitials/core/https_only_mode_metrics.h"
 #include "components/security_interstitials/core/ssl_error_options_mask.h"
 #include "components/security_interstitials/core/ssl_error_ui.h"
-#include "components/security_interstitials/core/unsafe_resource.h"
-#include "components/security_interstitials/core/unsafe_resource_locator.h"
 #include "components/supervised_user/core/browser/supervised_user_error_page.h"  // nogncheck
 #include "components/supervised_user/core/browser/supervised_user_interstitial.h"
 #include "components/supervised_user/core/browser/supervised_user_service.h"
@@ -76,8 +68,6 @@
 #include "chrome/browser/supervised_user/supervised_user_verification_page_blocked_sites.h"
 #include "chrome/browser/supervised_user/supervised_user_verification_page_youtube.h"
 #endif
-
-using security_interstitials::UnsafeResourceLocator;
 
 InterstitialUIConfig::InterstitialUIConfig()
     : DefaultInternalWebUIConfig(chrome::kChromeUIInterstitialHost) {}
@@ -279,16 +269,6 @@ CreateHttpsOnlyModePage(content::WebContents* web_contents) {
       /*metrics_callback=*/base::DoNothing());
 }
 
-std::unique_ptr<EnterpriseBlockPage> CreateEnterpriseBlockPage(
-    content::WebContents* web_contents) {
-  const GURL kRequestUrl("https://enterprise-block.example.net");
-  return std::make_unique<EnterpriseBlockPage>(
-      web_contents, kRequestUrl,
-      safe_browsing::SafeBrowsingBlockingPage::UnsafeResourceList(),
-      std::make_unique<EnterpriseBlockControllerClient>(web_contents,
-                                                        kRequestUrl));
-}
-
 std::unique_ptr<ManagedProfileRequiredPage> CreateManagedProfileRequiredPage(
     content::WebContents* web_contents) {
   const GURL kRequestUrl("https://example.com");
@@ -442,8 +422,6 @@ void InterstitialHTMLSource::StartDataRequest(
     interstitial_delegate = CreateMITMSoftwareBlockingPage(web_contents);
   } else if (path_without_query == "/blocked-interception") {
     interstitial_delegate = CreateBlockedInterceptionBlockingPage(web_contents);
-  } else if (path_without_query == "/enterprise-block") {
-    interstitial_delegate = CreateEnterpriseBlockPage(web_contents);
   } else if (path_without_query == "/clock") {
     interstitial_delegate = CreateBadClockBlockingPage(web_contents);
   } else if (path_without_query == "/lookalike") {

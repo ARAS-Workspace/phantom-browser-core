@@ -3133,7 +3133,6 @@ test("unit_tests") {
     "//chrome/browser/engagement",
     "//chrome/browser/engagement:unit_tests",
     "//chrome/browser/enterprise:unit_tests",
-    "//chrome/browser/enterprise/connectors:unit_tests",
     "//chrome/browser/enterprise/core:unit_tests",
     "//chrome/browser/enterprise/data_protection:unit_tests",
     "//chrome/browser/enterprise/encryption:unit_tests",
