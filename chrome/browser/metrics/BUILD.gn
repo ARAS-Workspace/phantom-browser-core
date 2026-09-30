@@ -211,6 +211,7 @@ source_set("impl") {
     "//chrome/browser/upgrade_detector",
     "//components/activity_reporter",
     "//components/crash/core/app",
+    "//components/keep_alive_registry",
     "//components/language/core/browser",
     "//components/metrics:component_metrics",
     "//components/metrics/demographics",
