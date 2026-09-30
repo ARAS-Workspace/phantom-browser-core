@@ -113,7 +113,6 @@ source_set("impl") {
     "//chrome/browser/sync",
     "//chrome/browser/sync:factories",
     "//chrome/browser/tab_contents",
-    "//chrome/browser/touch_to_fill/password_manager:public",
     "//chrome/browser/ui/autofill",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/hats",
