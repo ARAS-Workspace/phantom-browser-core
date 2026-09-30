@@ -7,17 +7,9 @@ import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 static_library("safe_browsing") {
-  public = [
-    "chrome_controller_client.h",
-    "metrics/bundled_settings_metrics_provider.h",
-    "metrics/safe_browsing_metrics_provider.h",
-  ]
+  public = [ "chrome_controller_client.h" ]
 
-  sources = [
-    "chrome_controller_client.cc",
-    "metrics/bundled_settings_metrics_provider.cc",
-    "metrics/safe_browsing_metrics_provider.cc",
-  ]
+  sources = [ "chrome_controller_client.cc" ]
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
