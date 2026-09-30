@@ -35,7 +35,6 @@
 #include "services/network/public/mojom/network_context.mojom-forward.h"
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/safe_browsing/incident_reporting/delayed_analysis_callback.h"
 #include "chrome/browser/safe_browsing/phishy_interaction_tracker.h"
 #endif
 
@@ -58,12 +57,6 @@ class NetworkContext;
 }
 class SharedURLLoaderFactory;
 }  // namespace network
-
-namespace prefs {
-namespace mojom {
-class TrackedPreferenceValidationDelegate;
-}
-}  // namespace prefs
 
 namespace extensions {
 class SafeBrowsingPrivateApiUnitTest;
@@ -167,17 +160,6 @@ class SafeBrowsingServiceImpl : public SafeBrowsingServiceInterface,
 
   TriggerManager* trigger_manager() const;
 
-  // Returns a preference validation delegate that adds incidents to the
-  // incident reporting service for validation failures. Returns NULL if the
-  // service is not applicable for the given profile.
-  std::unique_ptr<prefs::mojom::TrackedPreferenceValidationDelegate>
-  CreatePreferenceValidationDelegate(Profile* profile) const;
-
-  // Registers |callback| to be run after some delay following process launch.
-  // |callback| will be dropped if the service is not applicable for the
-  // process.
-  void RegisterDelayedAnalysisCallback(DelayedAnalysisCallback callback);
-
   // Adds |download_manager| to the set monitored by safe browsing.
   void AddDownloadManager(content::DownloadManager* download_manager);
 
@@ -256,10 +238,6 @@ class SafeBrowsingServiceImpl : public SafeBrowsingServiceInterface,
   ~SafeBrowsingServiceImpl() override;
 
   virtual SafeBrowsingUIManager* CreateUIManager();
-
-  // Registers all the delayed analysis with the incident reporting service.
-  // This is where you register your process-wide, profile-independent analysis.
-  virtual void RegisterAllDelayedAnalysis();
 
   std::unique_ptr<ServicesDelegate> services_delegate_;
 

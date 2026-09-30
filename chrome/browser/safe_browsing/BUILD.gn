@@ -320,25 +320,6 @@ static_library("safe_browsing") {
         "extension_telemetry/tabs_execute_script_signal.h",
         "extension_telemetry/tabs_execute_script_signal_processor.h",
         "hash_realtime_service_factory.h",
-        "incident_reporting/binary_integrity_analyzer.h",
-        "incident_reporting/binary_integrity_incident.h",
-        "incident_reporting/delayed_analysis_callback.h",
-        "incident_reporting/delayed_callback_runner.h",
-        "incident_reporting/download_metadata_manager.h",
-        "incident_reporting/environment_data_collection.h",
-        "incident_reporting/extension_data_collection.h",
-        "incident_reporting/incident.h",
-        "incident_reporting/incident_handler_util.h",
-        "incident_reporting/incident_receiver.h",
-        "incident_reporting/incident_report_uploader.h",
-        "incident_reporting/incident_report_uploader_impl.h",
-        "incident_reporting/incident_reporting_service.h",
-        "incident_reporting/last_download_finder.h",
-        "incident_reporting/platform_state_store.h",
-        "incident_reporting/preference_validation_delegate.h",
-        "incident_reporting/resource_request_incident.h",
-        "incident_reporting/state_store.h",
-        "incident_reporting/tracked_preference_incident.h",
         "ohttp_key_service_factory.h",
         "services_delegate_desktop.h",
       ]
@@ -375,44 +356,15 @@ static_library("safe_browsing") {
         "extension_telemetry/tabs_execute_script_signal.cc",
         "extension_telemetry/tabs_execute_script_signal_processor.cc",
         "hash_realtime_service_factory.cc",
-        "incident_reporting/binary_integrity_analyzer.cc",
-        "incident_reporting/binary_integrity_incident.cc",
-        "incident_reporting/delayed_callback_runner.cc",
-        "incident_reporting/download_metadata_manager.cc",
-        "incident_reporting/environment_data_collection.cc",
-        "incident_reporting/extension_data_collection.cc",
-        "incident_reporting/incident.cc",
-        "incident_reporting/incident_handler_util.cc",
-        "incident_reporting/incident_report_uploader.cc",
-        "incident_reporting/incident_report_uploader_impl.cc",
-        "incident_reporting/incident_reporting_service.cc",
-        "incident_reporting/last_download_finder.cc",
-        "incident_reporting/platform_state_store.cc",
-        "incident_reporting/preference_validation_delegate.cc",
-        "incident_reporting/resource_request_incident.cc",
-        "incident_reporting/state_store.cc",
-        "incident_reporting/tracked_preference_incident.cc",
         "ohttp_key_service_factory.cc",
         "services_delegate_desktop.cc",
       ]
-      if (is_mac) {
-        public += [
-          "incident_reporting/binary_integrity_analyzer_mac.h",
-          "signature_evaluator_mac.h",
-        ]
-        sources += [
-          "incident_reporting/binary_integrity_analyzer_mac.cc",
-          "signature_evaluator_mac.mm",
-        ]
-      }
-
       deps += [
         ":advanced_protection",
         ":verdict_cache_manager_factory",
         "//build:branding_buildflags",
         "//build:chromeos_buildflags",
         "//chrome/app/vector_icons",
-        "//chrome/browser/safe_browsing/incident_reporting:state_store_data_proto",
         "//chrome/browser/ui/tabs:tab_strip",
         "//chrome/common",
         "//chrome/common/extensions",
@@ -699,16 +651,6 @@ source_set("unit_tests") {
       "extension_telemetry/tabs_api_signal_unittest.cc",
       "extension_telemetry/tabs_execute_script_signal_processor_unittest.cc",
       "hash_realtime_service_factory_unittest.cc",
-      "incident_reporting/binary_integrity_incident_unittest.cc",
-      "incident_reporting/delayed_callback_runner_unittest.cc",
-      "incident_reporting/download_metadata_manager_unittest.cc",
-      "incident_reporting/incident_report_uploader_impl_unittest.cc",
-      "incident_reporting/mock_incident_receiver.cc",
-      "incident_reporting/mock_incident_receiver.h",
-      "incident_reporting/platform_state_store_unittest.cc",
-      "incident_reporting/preference_validation_delegate_unittest.cc",
-      "incident_reporting/state_store_unittest.cc",
-      "incident_reporting/tracked_preference_incident_unittest.cc",
       "ohttp_key_service_factory_unittest.cc",
       "verdict_cache_manager_factory_unittest.cc",
     ]
@@ -719,7 +661,6 @@ source_set("unit_tests") {
       "//chrome/browser/enterprise/connectors/test:test_support",
       "//chrome/browser/prefs",
       "//chrome/browser/safe_browsing:test_support",
-      "//chrome/browser/safe_browsing/incident_reporting:state_store_data_proto",
       "//chrome/browser/search_engines",
       "//chrome/browser/ui/browser_window",
       "//components/enterprise/common/proto:connectors_proto",
@@ -739,10 +680,6 @@ source_set("unit_tests") {
     ]
 
     if (is_mac) {
-      sources += [
-        "incident_reporting/binary_integrity_analyzer_mac_unittest.cc",
-        "signature_evaluator_mac_unittest.cc",
-      ]
       deps += [ "//chrome/common:constants" ]
     }
   }

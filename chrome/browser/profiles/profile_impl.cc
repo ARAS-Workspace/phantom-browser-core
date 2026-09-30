@@ -539,19 +539,6 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
 
   mojo::PendingRemote<prefs::mojom::TrackedPreferenceValidationDelegate>
       pref_validation_delegate;
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  scoped_refptr<safe_browsing::SafeBrowsingService> safe_browsing_service(
-      g_browser_process->safe_browsing_service());
-  if (safe_browsing_service.get()) {
-    auto pref_validation_delegate_impl =
-        safe_browsing_service->CreatePreferenceValidationDelegate(this);
-    if (pref_validation_delegate_impl) {
-      mojo::MakeSelfOwnedReceiver(
-          std::move(pref_validation_delegate_impl),
-          pref_validation_delegate.InitWithNewPipeAndPassReceiver());
-    }
-  }
-#endif
 
   prefs_ = CreateProfilePrefService(
       pref_registry_, CreateExtensionPrefStore(this, false),

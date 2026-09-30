@@ -99,12 +99,10 @@ class TestSafeBrowsingService : public SafeBrowsingService,
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   bool CanCreateDownloadProtectionService() override;
 #endif
-  bool CanCreateIncidentReportingService() override;
   SafeBrowsingDatabaseManager* CreateDatabaseManager() override;
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   DownloadProtectionService* CreateDownloadProtectionService() override;
 #endif
-  IncidentReportingService* CreateIncidentReportingService() override;
 
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory(
       content::BrowserContext* browser_context) override;

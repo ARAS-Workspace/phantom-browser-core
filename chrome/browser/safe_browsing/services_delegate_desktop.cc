@@ -12,7 +12,6 @@
 #include "base/strings/string_util.h"
 #include "chrome/browser/safe_browsing/download_protection/download_protection_delegate_desktop.h"
 #include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "chrome/browser/safe_browsing/incident_reporting/incident_reporting_service.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/core/browser/db/sb_local_database_manager.h"
@@ -75,11 +74,6 @@ void ServicesDelegateDesktop::Initialize() {
        services_creator_->CanCreateDownloadProtectionService())
           ? services_creator_->CreateDownloadProtectionService()
           : CreateDownloadProtectionService());
-  incident_service_.reset(
-      (services_creator_ &&
-       services_creator_->CanCreateIncidentReportingService())
-          ? services_creator_->CreateIncidentReportingService()
-          : CreateIncidentReportingService());
 }
 
 void ServicesDelegateDesktop::SetDatabaseManagerForTest(
@@ -103,18 +97,6 @@ void ServicesDelegateDesktop::RefreshState(bool enable) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   if (download_service_)
     download_service_->SetEnabled(enable);
-}
-
-std::unique_ptr<prefs::mojom::TrackedPreferenceValidationDelegate>
-ServicesDelegateDesktop::CreatePreferenceValidationDelegate(Profile* profile) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  return incident_service_->CreatePreferenceValidationDelegate(profile);
-}
-
-void ServicesDelegateDesktop::RegisterDelayedAnalysisCallback(
-    DelayedAnalysisCallback callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  incident_service_->RegisterDelayedAnalysisCallback(std::move(callback));
 }
 
 void ServicesDelegateDesktop::AddDownloadManager(
@@ -144,11 +126,6 @@ ServicesDelegateDesktop::CreateDownloadProtectionService() {
   auto download_service = std::make_unique<DownloadProtectionService>(
       safe_browsing_service_, std::move(delegate));
   return download_service.release();
-}
-
-IncidentReportingService*
-ServicesDelegateDesktop::CreateIncidentReportingService() {
-  return new IncidentReportingService(safe_browsing_service_);
 }
 
 void ServicesDelegateDesktop::StartOnUIThread(

@@ -24,7 +24,6 @@
 #endif
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/safe_browsing/incident_reporting/incident_reporting_service.h"
 #endif
 
 namespace safe_browsing {
@@ -138,10 +137,6 @@ bool TestSafeBrowsingService::CanCreateDownloadProtectionService() {
   return false;
 }
 #endif
-bool TestSafeBrowsingService::CanCreateIncidentReportingService() {
-  return true;
-}
-
 SafeBrowsingDatabaseManager* TestSafeBrowsingService::CreateDatabaseManager() {
   DCHECK(!use_sb_local_db_manager_);
 #if BUILDFLAG(FULL_SAFE_BROWSING)
@@ -160,16 +155,6 @@ TestSafeBrowsingService::CreateDownloadProtectionService() {
   return nullptr;
 }
 #endif
-IncidentReportingService*
-TestSafeBrowsingService::CreateIncidentReportingService() {
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  return new IncidentReportingService(nullptr);
-#else
-  NOTIMPLEMENTED();
-  return nullptr;
-#endif  // BUILDFLAG(FULL_SAFE_BROWSING)
-}
-
 scoped_refptr<network::SharedURLLoaderFactory>
 TestSafeBrowsingService::GetURLLoaderFactory(
     content::BrowserContext* browser_context) {
