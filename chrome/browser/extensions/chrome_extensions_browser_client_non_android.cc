@@ -25,9 +25,6 @@
 #include "content/public/browser/site_instance.h"
 #include "ipc/constants.mojom.h"
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
-
 namespace extensions {
 
 void ChromeExtensionsBrowserClient::Init() {

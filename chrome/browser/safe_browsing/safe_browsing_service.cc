@@ -81,9 +81,6 @@
 #include "chrome/browser/safe_browsing/security_settings_bundle_toast_helper.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 #if BUILDFLAG(FULL_SAFE_BROWSING)
 #include "chrome/browser/safe_browsing/hash_realtime_service_factory.h"
 #endif

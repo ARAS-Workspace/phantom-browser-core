@@ -141,9 +141,6 @@
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
-
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal_ui.h"
 #include "chrome/browser/ui/webui/intro/intro_ui.h"
 #include "chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.h"
@@ -303,9 +300,6 @@ void RegisterChromeWebUIConfigs() {
   map.AddWebUIConfig(std::make_unique<SignoutConfirmationUIConfig>());
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
 
   map.AddWebUIConfig(std::make_unique<DefaultBrowserModalUIConfig>());
   map.AddWebUIConfig(std::make_unique<ManagedUserProfileNoticeUIConfig>());

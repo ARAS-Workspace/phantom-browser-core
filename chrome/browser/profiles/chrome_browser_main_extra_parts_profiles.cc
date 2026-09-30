@@ -643,8 +643,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   ContextHubServiceFactory::GetInstance();
 
   ContentIndexProviderFactory::GetInstance();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#endif
   CookieSettingsFactory::GetInstance();
   metrics::CriticalUserJourneyServiceFactory::GetInstance();
   critical_actions::CriticalActionFactory::GetInstance();
@@ -913,8 +911,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   regional_capabilities::RegionalCapabilitiesServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX)
   reporting::ManualTestHeartbeatEventFactory::GetInstance();
-#endif
-#if BUILDFLAG(FULL_SAFE_BROWSING)
 #endif
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::GetInstance();

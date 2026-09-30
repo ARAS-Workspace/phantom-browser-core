@@ -48,9 +48,6 @@
 #include "ui/views/controls/webview/web_contents_set_background_color.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 namespace {
 
 constexpr char kProfilePickerSignInProviderStepHistogram[] =

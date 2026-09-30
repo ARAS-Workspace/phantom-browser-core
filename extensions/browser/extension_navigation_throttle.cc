@@ -46,8 +46,6 @@
 #include "extensions/browser/guest_view/mime_handler_view/mime_handler_view_embedder.h"
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
 
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-#endif
 #endif
 
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)

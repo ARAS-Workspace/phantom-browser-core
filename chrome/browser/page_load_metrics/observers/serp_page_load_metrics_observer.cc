@@ -13,9 +13,6 @@
 #include "content/public/browser/web_contents.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE) && BUILDFLAG(ENABLE_EXTENSIONS)
-#endif
-
 SerpPageLoadMetricsObserver::SerpPageLoadMetricsObserver() = default;
 
 SerpPageLoadMetricsObserver::~SerpPageLoadMetricsObserver() = default;

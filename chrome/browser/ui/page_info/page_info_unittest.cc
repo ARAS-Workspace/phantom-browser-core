@@ -1045,9 +1045,6 @@ TEST_F(PageInfoTest, UnwantedSoftware) {
             page_info()->safe_browsing_status());
 }
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
-
 TEST_F(PageInfoTest, HTTPConnection) {
   SetDefaultUIExpectations(mock_ui());
   EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,

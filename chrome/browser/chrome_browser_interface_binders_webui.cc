@@ -57,9 +57,6 @@
 #include "ui/webui/resources/cr_components/help_bubble/help_bubble.mojom.h"
 #endif
 
-#if BUILDFLAG(ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX)
-#endif
-
 #include "ui/webui/color_change_listener/color_change_handler.h"
 #include "ui/webui/resources/cr_components/color_change_listener/color_change_listener.mojom.h"
 

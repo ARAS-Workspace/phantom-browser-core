@@ -50,9 +50,6 @@
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/browser/download_manager.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 namespace {
 
 using DownloadCreationType = ::download::DownloadItem::DownloadCreationType;

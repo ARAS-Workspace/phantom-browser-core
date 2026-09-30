@@ -27,8 +27,6 @@
 #include "content/public/test/test_navigation_observer.h"
 #include "google_apis/gaia/gaia_urls.h"
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 namespace signin::test {
 
 signin::IdentityManager* identity_manager(Browser* browser) {

@@ -27,9 +27,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 SearchboxOmniboxClient::SearchboxOmniboxClient(
     Profile* profile,
     content::WebContents* web_contents)

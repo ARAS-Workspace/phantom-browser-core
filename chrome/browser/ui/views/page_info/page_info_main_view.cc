@@ -61,9 +61,6 @@
 #include "ui/views/view_class_properties.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
-
 namespace {
 
 constexpr int kMinPermissionRowHeight = 40;

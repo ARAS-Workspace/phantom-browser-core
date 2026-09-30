@@ -58,8 +58,6 @@ RealTimeUrlLookupServiceFactory::RealTimeUrlLookupServiceFactory()
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(SyncServiceFactory::GetInstance());
   DependsOn(SafeBrowsingNavigationObserverManagerFactory::GetInstance());
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
   DependsOn(NetworkContextServiceFactory::GetInstance());
 }
 

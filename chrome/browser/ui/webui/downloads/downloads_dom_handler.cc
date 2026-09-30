@@ -81,9 +81,6 @@
 #include "ui/gfx/image/image.h"
 #include "ui/views/interaction/element_tracker_views.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 
 using content::BrowserThread;

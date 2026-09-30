@@ -42,9 +42,6 @@
 #include "chrome/browser/ui/webui/watermark/watermark_ui.h"
 #endif
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif  // BUILDFLAG(FULL_SAFE_BROWSING)
-
 namespace chrome::internal {
 
 using content::RegisterWebUIControllerInterfaceBinder;
@@ -76,9 +73,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
       extensions::ZeroStatePromoController>(map);
 #endif
 
-#if !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#endif
-
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   RegisterWebUIControllerInterfaceBinder<
       tab_strip_internals::mojom::PageHandlerFactory, TabStripInternalsUI>(map);
@@ -89,8 +83,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
                                          WatermarkUI>(map);
 #endif
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
 }
 
 }  // namespace chrome::internal

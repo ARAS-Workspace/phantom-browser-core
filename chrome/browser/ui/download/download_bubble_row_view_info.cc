@@ -15,9 +15,6 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/views/vector_icons.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 using download::DownloadItem;
 using offline_items_collection::FailState;
 using TailoredVerdict = safe_browsing::ClientDownloadResponse::TailoredVerdict;

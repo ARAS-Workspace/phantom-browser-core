@@ -67,8 +67,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUITabSearchHost,
       kChromeUITabsFromOtherDevicesSidePanelHost,
       kChromeUITermsHost,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#endif
       kChromeUIUserActionsHost,
       kChromeUIVersionHost,
       content::kChromeUIBlobInternalsHost,
@@ -98,8 +96,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIWhatsNewHost,
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       kChromeUIDiscardsHost,
-#endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
       kChromeUILinuxProxyConfigHost,

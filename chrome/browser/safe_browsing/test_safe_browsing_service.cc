@@ -18,9 +18,6 @@
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#endif
-
 namespace safe_browsing {
 
 // TestSafeBrowsingService functions:

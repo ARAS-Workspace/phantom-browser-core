@@ -30,16 +30,10 @@
 #include "chrome/browser/extensions/api/notifications/extension_notification_handler.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#endif
-
 #include "chrome/browser/notifications/muted_notification_handler.h"
 #include "chrome/browser/notifications/screen_capture_notification_blocker.h"
 #include "chrome/browser/default_browser/default_browser_changed_notification_handler.h"
 #include "chrome/browser/default_browser/default_browser_features.h"
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
 
 // static
 NotificationDisplayServiceImpl* NotificationDisplayServiceImpl::GetForProfile(

@@ -44,9 +44,6 @@ std::unique_ptr<CompositorGpuThread> CompositorGpuThread::Create(
     const CreateParams& params) {
   DCHECK(params.gpu_channel_manager);
 
-#if DCHECK_IS_ON()
-#endif  // DCHECK_IS_ON()
-
   auto compositor_gpu_thread = base::WrapUnique(new CompositorGpuThread(
       params.gpu_channel_manager, params.display, params.enable_watchdog));
 
