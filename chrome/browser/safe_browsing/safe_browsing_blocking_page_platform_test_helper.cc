@@ -28,7 +28,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/browser/safe_browsing/chrome_safe_browsing_blocking_page_factory.h"
-#include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "components/enterprise/connectors/core/common.h"
@@ -87,8 +86,7 @@ TestSafeBrowsingBlockingPage::TestSafeBrowsingBlockingPage(
               ServiceAccessType::EXPLICIT_ACCESS),
           SafeBrowsingNavigationObserverManagerFactory::GetForBrowserContext(
               web_contents->GetBrowserContext()),
-          SafeBrowsingMetricsCollectorFactory::GetForProfile(
-              Profile::FromBrowserContext(web_contents->GetBrowserContext())),
+          /*metrics_collector=*/nullptr,
           g_browser_process->safe_browsing_service()->trigger_manager(),
           is_proceed_anyway_disabled,
           is_safe_browsing_surveys_enabled,

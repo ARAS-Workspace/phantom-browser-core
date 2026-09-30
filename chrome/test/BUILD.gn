@@ -806,7 +806,6 @@ source_set("platform_browser_tests") {
     ]
     deps += [
       "//chrome/browser/safe_browsing:blocking_page_platform_test_support",
-      "//chrome/browser/safe_browsing:metrics_collector",
       "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
       "//components/enterprise/connectors/core",
       "//components/safe_browsing/content/browser",
@@ -2622,7 +2621,6 @@ test("browser_tests") {
     deps += [
       "//chrome/browser/metrics/desktop_session_duration",
       "//chrome/browser/password_manager/factories",
-      "//chrome/browser/safe_browsing:metrics_collector",
       "//chrome/browser/ui/exclusive_access:test_support",
       "//chrome/browser/ui/hats",
       "//components/safe_browsing/content/browser:safe_browsing_blocking_page",
@@ -3280,7 +3278,6 @@ test("unit_tests") {
     "//chrome/browser/reading_list",
     "//chrome/browser/reduce_accept_language:unit_tests",
     "//chrome/browser/regional_capabilities:unit_tests",
-    "//chrome/browser/safe_browsing:metrics_collector",
     "//chrome/browser/safe_browsing:unit_tests",
     "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
     "//chrome/browser/search",

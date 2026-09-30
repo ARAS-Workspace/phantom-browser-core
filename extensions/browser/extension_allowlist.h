@@ -96,9 +96,7 @@ class ExtensionAllowlist : public KeyedService, public ExtensionPrefsObserver {
 
   // `browser_context` must outlive this object and the ownership remains at
   // caller.
-  ExtensionAllowlist(
-      content::BrowserContext* browser_context,
-      safe_browsing::SafeBrowsingMetricsCollector* metrics_collector);
+  explicit ExtensionAllowlist(content::BrowserContext* browser_context);
 
   // Set if the allowlist should be enforced or not.
   void SetAllowlistEnforcementFields();
@@ -131,7 +129,6 @@ class ExtensionAllowlist : public KeyedService, public ExtensionPrefsObserver {
   // Adds extension acknowledged events to Safe Browsing metrics collector for
   // further metrics logging. Called when a user decides to re-enable an
   // extension that is not on the allowlist.
-  void ReportExtensionReEnabledEvent();
 
   base::ObserverList<Observer> observers_;
 
@@ -139,8 +136,6 @@ class ExtensionAllowlist : public KeyedService, public ExtensionPrefsObserver {
   raw_ptr<ExtensionPrefs> extension_prefs_ = nullptr;
   raw_ptr<ExtensionRegistrar> extension_registrar_ = nullptr;
   raw_ptr<ExtensionRegistry> registry_ = nullptr;
-  raw_ptr<safe_browsing::SafeBrowsingMetricsCollector> metrics_collector_ =
-      nullptr;
 
   bool init_done_ = false;
 

@@ -480,7 +480,6 @@
 #include "chrome/browser/safe_browsing/chrome_ping_manager_factory.h"
 #include "chrome/browser/safe_browsing/client_side_detection_intelligent_scan_delegate_factory.h"
 #include "chrome/browser/safe_browsing/client_side_detection_service_factory.h"
-#include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
 #include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
@@ -932,7 +931,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   safe_browsing::RealTimeUrlLookupServiceFactory::GetInstance();
-  safe_browsing::SafeBrowsingMetricsCollectorFactory::GetInstance();
   safe_browsing::SafeBrowsingNavigationObserverManagerFactory::GetInstance();
   safe_browsing::V5GetHashProtocolManagerFactory::GetInstance();
   safe_browsing::V5SearchHashesCacheFactory::GetInstance();

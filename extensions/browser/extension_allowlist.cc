@@ -7,7 +7,6 @@
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/observer_list.h"
-#include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/user_prefs/user_prefs.h"
 #include "content/public/browser/browser_context.h"
@@ -61,13 +60,11 @@ constexpr PrefMap kPrefAllowlistAcknowledge = {
 }  // namespace
 
 ExtensionAllowlist::ExtensionAllowlist(
-    content::BrowserContext* browser_context,
-    safe_browsing::SafeBrowsingMetricsCollector* metrics_collector)
+    content::BrowserContext* browser_context)
     : browser_context_(browser_context),
       extension_prefs_(ExtensionPrefs::Get(browser_context)),
       extension_registrar_(ExtensionRegistrar::Get(browser_context)),
-      registry_(ExtensionRegistry::Get(browser_context)),
-      metrics_collector_(metrics_collector) {
+      registry_(ExtensionRegistry::Get(browser_context)) {
   SetAllowlistEnforcementFields();
 
   // Relies on ExtensionSystem dependency on ExtensionPrefs to ensure
@@ -401,7 +398,6 @@ void ExtensionAllowlist::OnExtensionStateChanged(
   // The extension was enabled even though it's not on the allowlist. Consider
   // this an acknowledgement from the user, and ensure we don't disable the
   // extension again.
-  ReportExtensionReEnabledEvent();
   SetExtensionAllowlistAcknowledgeState(extension_id,
                                         ALLOWLIST_ACKNOWLEDGE_ENABLED_BY_USER);
 }
@@ -413,13 +409,6 @@ void ExtensionAllowlist::NotifyExtensionAllowlistWarningStateChanged(
     observer.OnExtensionAllowlistWarningStateChanged(extension_id,
                                                      show_warning);
   }
-}
-
-void ExtensionAllowlist::ReportExtensionReEnabledEvent() {
-  DCHECK(metrics_collector_);
-  metrics_collector_->AddSafeBrowsingEventToPref(
-      safe_browsing::SafeBrowsingMetricsCollector::EventType::
-          NON_ALLOWLISTED_EXTENSION_RE_ENABLED);
 }
 
 }  // namespace extensions

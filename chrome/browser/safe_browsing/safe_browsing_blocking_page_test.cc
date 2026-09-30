@@ -44,7 +44,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/renderer_context_menu/render_view_context_menu_test_util.h"
 #include "chrome/browser/safe_browsing/safe_browsing_blocking_page_platform_test_helper.h"
-#include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
 #include "chrome/browser/safe_browsing/user_interaction_observer.h"
@@ -1148,13 +1147,6 @@ IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageBrowserTest,
   ukm::TestAutoSetUkmRecorder test_ukm_recorder;
   WebContents* web_contents =
       browser()->tab_strip_model()->GetActiveWebContents();
-  SafeBrowsingMetricsCollector* metrics_collector =
-      SafeBrowsingMetricsCollectorFactory::GetForProfile(
-          Profile::FromBrowserContext(web_contents->GetBrowserContext()));
-  EXPECT_EQ(std::nullopt,
-            metrics_collector->GetLatestEventTimestamp(
-                SafeBrowsingMetricsCollector::EventType::
-                    SECURITY_SENSITIVE_SAFE_BROWSING_INTERSTITIAL));
   base::HistogramTester histograms;
   SBThreatType threat_type = GetThreatType();
   std::string prefix = GetHistogramPrefix(threat_type);
@@ -1195,12 +1187,6 @@ IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageBrowserTest,
   histograms.ExpectBucketCount(
       interaction_histogram,
       security_interstitials::MetricsHelper::SHOW_ENHANCED_PROTECTION, 1);
-
-  // Check if security sensitive event is added to prefs.
-  EXPECT_NE(std::nullopt,
-            metrics_collector->GetLatestEventTimestamp(
-                SafeBrowsingMetricsCollector::EventType::
-                    SECURITY_SENSITIVE_SAFE_BROWSING_INTERSTITIAL));
 
   // Decision should be recorded.
   EXPECT_TRUE(ClickAndWaitForDetach("primary-button"));

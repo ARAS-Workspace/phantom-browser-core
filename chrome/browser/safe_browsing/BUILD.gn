@@ -186,7 +186,6 @@ static_library("safe_browsing") {
     public += [ "client_side_detection_intelligent_scan_delegate_desktop.h" ]
     sources += [ "client_side_detection_intelligent_scan_delegate_desktop.cc" ]
     deps += [
-      ":metrics_collector",
       ":verdict_cache_manager_factory",
       "//build:branding_buildflags",
       "//build:chromeos_buildflags",
@@ -373,28 +372,6 @@ source_set("verdict_cache_manager_factory") {
     "//components/prefs",
     "//components/safe_browsing/core/browser:verdict_cache_manager",
     "//components/safe_browsing/core/browser/sync",
-    "//content/public/browser",
-  ]
-}
-
-source_set("metrics_collector") {
-  sources = [
-    "safe_browsing_metrics_collector_factory.cc",
-    "safe_browsing_metrics_collector_factory.h",
-  ]
-
-  configs += [ "//build/config/compiler:wexit_time_destructors" ]
-
-  deps = [
-    "//chrome/browser:browser_process",
-    "//chrome/browser/profiles:profile",
-    "//chrome/common",
-    "//components/keyed_service/content",
-    "//components/prefs",
-    "//components/safe_browsing/content/browser",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//content/public/browser",
   ]
 }
@@ -651,7 +628,6 @@ if (safe_browsing_mode != 0) {
       "//chrome/browser/enterprise",
       "//chrome/browser/history",
       "//chrome/browser/policy:test_support",
-      "//chrome/browser/safe_browsing:metrics_collector",
       "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
       "//components/safe_browsing/core/browser:verdict_cache_manager",
       "//components/security_interstitials/content:security_interstitial_page",

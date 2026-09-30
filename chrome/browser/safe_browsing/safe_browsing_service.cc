@@ -38,7 +38,6 @@
 #include "chrome/browser/safe_browsing/external_app_redirect_checking.h"
 #include "chrome/browser/safe_browsing/network_context_service.h"
 #include "chrome/browser/safe_browsing/network_context_service_factory.h"
-#include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_pref_change_handler.h"
 #include "chrome/browser/safe_browsing/security_settings_bundle_pref_change_handler.h"
@@ -548,8 +547,6 @@ void SafeBrowsingServiceImpl::OnProfileAdded(Profile* profile) {
       std::make_unique<SafeBrowsingPrefChangeHandler>(profile);
   bundled_settings_pref_change_handlers_map_[profile] =
       std::make_unique<SecuritySettingsBundlePrefChangeHandler>(profile);
-
-  SafeBrowsingMetricsCollectorFactory::GetForProfile(profile)->StartLogging();
 
   CreateServicesForProfile(profile);
 

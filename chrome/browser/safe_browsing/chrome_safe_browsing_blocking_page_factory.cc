@@ -14,7 +14,6 @@
 #include "chrome/browser/interstitials/chrome_settings_page_helper.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/safe_browsing/chrome_controller_client.h"
-#include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "components/prefs/pref_service.h"
@@ -86,7 +85,7 @@ ChromeSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
                                            ServiceAccessType::EXPLICIT_ACCESS),
       SafeBrowsingNavigationObserverManagerFactory::GetForBrowserContext(
           web_contents->GetBrowserContext()),
-      SafeBrowsingMetricsCollectorFactory::GetForProfile(profile),
+      /*metrics_collector=*/nullptr,
       trigger_manager, is_proceed_anyway_disabled,
       is_safe_browsing_surveys_enabled,
       trust_safety_sentiment_service == nullptr ||

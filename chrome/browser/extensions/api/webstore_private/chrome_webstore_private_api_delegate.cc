@@ -20,10 +20,8 @@
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
-#include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"
 #endif
 
 namespace extensions {
@@ -39,8 +37,6 @@ ChromeWebstorePrivateAPIDelegate::GetWebStoreAPIFactoryDependencies() {
   dependencies.push_back(IdentityManagerFactory::GetInstance());
   dependencies.push_back(InstallTrackerFactory::GetInstance());
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  dependencies.push_back(
-      safe_browsing::SafeBrowsingMetricsCollectorFactory::GetInstance());
   dependencies.push_back(
       safe_browsing::SafeBrowsingNavigationObserverManagerFactory::
           GetInstance());
@@ -79,17 +75,6 @@ void ChromeWebstorePrivateAPIDelegate::ShowExtensionInstallFrictionDialog(
 
 void ChromeWebstorePrivateAPIDelegate::ReportFrictionAcceptedEvent(
     content::BrowserContext* context) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  auto* metrics_collector =
-      safe_browsing::SafeBrowsingMetricsCollectorFactory::GetForProfile(
-          Profile::FromBrowserContext(context));
-  // `metrics_collector` can be null in incognito.
-  if (metrics_collector) {
-    metrics_collector->AddSafeBrowsingEventToPref(
-        safe_browsing::SafeBrowsingMetricsCollector::EventType::
-            EXTENSION_ALLOWLIST_INSTALL_BYPASS);
-  }
-#endif
 }
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)

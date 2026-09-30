@@ -113,7 +113,6 @@ source_set("impl") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/renderer_host",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing:metrics_collector",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/browser_window:create_browser_window",
     "//chrome/browser/ui/navigator",
