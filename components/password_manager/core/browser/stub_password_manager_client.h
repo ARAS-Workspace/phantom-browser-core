@@ -106,16 +106,6 @@ class StubPasswordManagerClient : public PasswordManagerClient {
       bool show_warning_text,
       base::OnceClosure confirmation_callback) override;
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::PasswordProtectionService* GetPasswordProtectionService()
-      const override;
-#endif
-
-#if defined(ON_FOCUS_PING_ENABLED) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  void CheckSafeBrowsingReputation(const GURL& form_action,
-                                   const GURL& frame_url) override;
-#endif
-
   ukm::SourceId GetUkmSourceId() override;
   PasswordManagerMetricsRecorder* GetMetricsRecorder() override;
   signin::IdentityManager* GetIdentityManager() override;

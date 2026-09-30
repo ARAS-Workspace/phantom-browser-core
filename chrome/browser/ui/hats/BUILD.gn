@@ -22,7 +22,6 @@ source_set("hats") {
     "//components/keyed_service/core",
     "//components/pref_registry",
     "//components/safe_browsing/core/browser/db:v4_protocol_manager_util",
-    "//components/safe_browsing/core/browser/password_protection:password_protection_metrics_util",
     "//content/public/browser",
     "//pdf:buildflags",
   ]

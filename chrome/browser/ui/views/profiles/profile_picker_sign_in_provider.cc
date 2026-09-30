@@ -49,7 +49,6 @@
 #include "url/gurl.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/chrome_password_reuse_detection_manager_client.h"
 #endif
 
 namespace {
@@ -452,8 +451,4 @@ void AddCommonSigninWebContentUserData(
   // instantiate TrustedVaultEncryptionKeysTabHelper.
   TrustedVaultEncryptionKeysTabHelper::CreateForWebContents(web_contents);
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  ChromePasswordReuseDetectionManagerClient::CreateForProfilePickerWebContents(
-      web_contents);
-#endif
 }

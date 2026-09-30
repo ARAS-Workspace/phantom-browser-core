@@ -167,10 +167,6 @@ class SafeBrowsingServiceImpl : public SafeBrowsingServiceInterface,
 
   TriggerManager* trigger_manager() const;
 
-  // Gets PasswordProtectionService by profile.
-  PasswordProtectionService* GetPasswordProtectionService(
-      Profile* profile) const;
-
   // Returns a preference validation delegate that adds incidents to the
   // incident reporting service for validation failures. Returns NULL if the
   // service is not applicable for the given profile.

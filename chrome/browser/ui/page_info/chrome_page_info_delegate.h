@@ -28,11 +28,6 @@ class PermissionDecisionAutoBlocker;
 class PermissionActionsHistory;
 }  // namespace permissions
 
-namespace safe_browsing {
-class PasswordProtectionService;
-class ChromePasswordProtectionService;
-}  // namespace safe_browsing
-
 namespace infobars {
 class BrowserInfoBarManager;
 }
@@ -64,12 +59,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
   // PageInfoDelegate implementation
   permissions::ObjectPermissionContextBase* GetChooserContext(
       ContentSettingsType type) override;
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  safe_browsing::PasswordProtectionService* GetPasswordProtectionService()
-      const override;
-  void OnUserActionOnPasswordUi(safe_browsing::WarningAction action) override;
-  std::u16string GetWarningDetailText() override;
-#endif
   content::PermissionResult GetPermissionResult(
       blink::PermissionType permission,
       const url::Origin& origin,
@@ -124,11 +113,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
 
  private:
   Profile* GetProfile() const;
-
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  safe_browsing::ChromePasswordProtectionService*
-  GetChromePasswordProtectionService() const;
-#endif
 
   // Focus the window and tab for the web contents.
   void FocusWebContents();

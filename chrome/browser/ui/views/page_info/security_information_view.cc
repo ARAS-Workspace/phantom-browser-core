@@ -91,10 +91,6 @@ SecurityInformationView::SecurityInformationView(int side_margin) {
       std::make_unique<views::BoxLayout>(
           views::BoxLayout::Orientation::kHorizontal));
 
-  start_secondary_row();
-  password_reuse_button_container_ =
-      AddChildView(std::make_unique<views::View>());
-
   const int end_padding =
       layout_provider->GetDistanceMetric(views::DISTANCE_CONTROL_LIST_VERTICAL);
   layout->AddPaddingRow(views::TableLayout::kFixedSize, end_padding);
@@ -158,79 +154,6 @@ void SecurityInformationView::AddResetDecisionsLabel(
           views::DISTANCE_RELATED_CONTROL_VERTICAL);
   reset_decisions_label_container_->SetBorder(views::CreateEmptyBorder(
       gfx::Insets::TLBR(between_paragraphs_distance, 0, 0, 0)));
-
-  InvalidateLayout();
-}
-
-void SecurityInformationView::AddPasswordReuseButtons(
-    PageInfo::SafeBrowsingStatus safe_browsing_status,
-    views::Button::PressedCallback change_password_callback,
-    views::Button::PressedCallback password_reuse_callback) {
-  if (!password_reuse_button_container_->children().empty()) {
-    // Ensure all old content is removed from the container before re-adding it.
-    password_reuse_button_container_->RemoveAllChildViews();
-  }
-
-  int change_password_template = 0;
-  switch (safe_browsing_status) {
-    case PageInfo::SafeBrowsingStatus::
-        SAFE_BROWSING_STATUS_SAVED_PASSWORD_REUSE:
-      change_password_template = IDS_PAGE_INFO_CHECK_PASSWORDS_BUTTON;
-      break;
-    case PageInfo::SafeBrowsingStatus::
-        SAFE_BROWSING_STATUS_ENTERPRISE_PASSWORD_REUSE:
-      change_password_template = IDS_PAGE_INFO_CHANGE_PASSWORD_BUTTON;
-      break;
-    case PageInfo::SafeBrowsingStatus::
-        SAFE_BROWSING_STATUS_SIGNED_IN_NON_SYNC_PASSWORD_REUSE:
-    case PageInfo::SafeBrowsingStatus::
-        SAFE_BROWSING_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE:
-      change_password_template = IDS_PAGE_INFO_PROTECT_ACCOUNT_BUTTON;
-      break;
-    default:
-      NOTREACHED();
-  }
-
-  std::unique_ptr<views::MdTextButton> change_password_button;
-  if (change_password_template) {
-    change_password_button = std::make_unique<views::MdTextButton>(
-        std::move(change_password_callback),
-        l10n_util::GetStringUTF16(change_password_template));
-    change_password_button->SetStyle(ui::ButtonStyle::kProminent);
-    change_password_button->SetID(
-        PageInfoViewFactory::VIEW_ID_PAGE_INFO_BUTTON_CHANGE_PASSWORD);
-  }
-  auto allowlist_password_reuse_button = std::make_unique<views::MdTextButton>(
-      std::move(password_reuse_callback),
-      l10n_util::GetStringUTF16(IDS_PAGE_INFO_ALLOWLIST_PASSWORD_REUSE_BUTTON));
-  allowlist_password_reuse_button->SetID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_BUTTON_ALLOWLIST_PASSWORD_REUSE);
-
-  int kSpacingBetweenButtons = 8;
-  // TODO(crbug.com/40800258): Fix alignment if the buttons don't fit in one
-  // row.
-  auto layout = std::make_unique<views::BoxLayout>(
-      views::BoxLayout::Orientation::kHorizontal, gfx::Insets(),
-      kSpacingBetweenButtons);
-  // Make buttons left-aligned. For RTL languages, buttons will automatically
-  // become right-aligned.
-  layout->set_main_axis_alignment(views::BoxLayout::MainAxisAlignment::kStart);
-  password_reuse_button_container_->SetLayoutManager(std::move(layout));
-
-  password_reuse_button_container_->AddChildView(
-      std::move(allowlist_password_reuse_button));
-  if (change_password_button) {
-    password_reuse_button_container_->AddChildView(
-        std::move(change_password_button));
-  }
-
-  // Add padding at the top.
-  password_reuse_button_container_->SetBorder(
-      views::CreateEmptyBorder(gfx::Insets::TLBR(8, 0, 0, 0)));
-  int w = password_reuse_button_container_->GetPreferredSize().width();
-  if (w > min_label_width_) {
-    AdjustContentWidth(w);
-  }
 
   InvalidateLayout();
 }

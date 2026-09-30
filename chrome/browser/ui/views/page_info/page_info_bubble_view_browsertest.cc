@@ -26,7 +26,6 @@
 #include "chrome/browser/privacy_sandbox/mock_privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
-#include "chrome/browser/safe_browsing/chrome_password_protection_service.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -71,7 +70,6 @@
 #include "components/permissions/permission_decision_auto_blocker.h"
 #include "components/permissions/permissions_client.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/safe_browsing/content/browser/password_protection/password_protection_test_util.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "components/security_interstitials/core/features.h"
@@ -470,158 +468,8 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
 
 // Test opening page info bubble that matches
 // SB_THREAT_TYPE_ENTERPRISE_PASSWORD_REUSE threat type.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
-                       VerifyEnterprisePasswordReusePageInfoBubble) {
-  base::HistogramTester histograms;
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL("/")));
-
-  // Update security state of the current page to match
-  // SB_THREAT_TYPE_ENTERPRISE_PASSWORD_REUSE.
-  safe_browsing::ChromePasswordProtectionService* service =
-      safe_browsing::ChromePasswordProtectionService::
-          GetPasswordProtectionService(browser()->GetProfile());
-  safe_browsing::ReusedPasswordAccountType reused_password_account_type;
-  reused_password_account_type.set_account_type(
-      safe_browsing::ReusedPasswordAccountType::NON_GAIA_ENTERPRISE);
-  service->set_reused_password_account_type_for_last_shown_warning(
-      reused_password_account_type);
-
-  scoped_refptr<safe_browsing::PasswordProtectionRequest> request =
-      safe_browsing::CreateDummyRequest(web_contents());
-  service->ShowModalWarning(
-      request.get(),
-      safe_browsing::LoginReputationClientResponse::VERDICT_TYPE_UNSPECIFIED,
-      "unused_token", reused_password_account_type);
-
-  OpenPageInfoBubble(browser());
-  views::View* change_password_button =
-      GetView(PageInfoViewFactory::VIEW_ID_PAGE_INFO_BUTTON_CHANGE_PASSWORD);
-  views::View* allowlist_password_reuse_button = GetView(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_BUTTON_ALLOWLIST_PASSWORD_REUSE);
-
-  std::unique_ptr<security_state::VisibleSecurityState> visible_security_state =
-      chrome_security_state::GetVisibleSecurityState(web_contents());
-  ASSERT_EQ(security_state::MALICIOUS_CONTENT_STATUS_ENTERPRISE_PASSWORD_REUSE,
-            visible_security_state->malicious_content_status);
-  ASSERT_EQ(l10n_util::GetStringUTF16(
-                IDS_PAGE_INFO_CHANGE_PASSWORD_DETAILS_ENTERPRISE) +
-                u" " + l10n_util::GetStringUTF16(IDS_LEARN_MORE),
-            GetPageInfoBubbleViewDetailText());
-
-  // Verify these two buttons are showing.
-  EXPECT_TRUE(change_password_button->GetVisible());
-  EXPECT_TRUE(allowlist_password_reuse_button->GetVisible());
-
-  // Verify clicking on button will increment corresponding bucket
-  // PasswordProtection.PageInfoAction.NonGaiaEnterprisePasswordEntry histogram.
-  PerformMouseClickOnView(change_password_button);
-  EXPECT_THAT(
-      histograms.GetAllSamples(
-          safe_browsing::kEnterprisePasswordPageInfoHistogram),
-      testing::ElementsAre(
-          base::Bucket(static_cast<int>(safe_browsing::WarningAction::SHOWN),
-                       1),
-          base::Bucket(
-              static_cast<int>(safe_browsing::WarningAction::CHANGE_PASSWORD),
-              1)));
-
-  PerformMouseClickOnView(allowlist_password_reuse_button);
-  EXPECT_THAT(
-      histograms.GetAllSamples(
-          safe_browsing::kEnterprisePasswordPageInfoHistogram),
-      testing::ElementsAre(
-          base::Bucket(static_cast<int>(safe_browsing::WarningAction::SHOWN),
-                       1),
-          base::Bucket(
-              static_cast<int>(safe_browsing::WarningAction::CHANGE_PASSWORD),
-              1),
-          base::Bucket(static_cast<int>(
-                           safe_browsing::WarningAction::MARK_AS_LEGITIMATE),
-                       1)));
-  // Security state will change after allowlisting.
-  visible_security_state =
-      chrome_security_state::GetVisibleSecurityState(web_contents());
-  EXPECT_EQ(security_state::MALICIOUS_CONTENT_STATUS_NONE,
-            visible_security_state->malicious_content_status);
-}
-
 // Test opening page info bubble that matches
 // SB_THREAT_TYPE_SAVED_PASSWORD_REUSE threat type.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
-                       VerifySavedPasswordReusePageInfoBubble) {
-  base::HistogramTester histograms;
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL("/")));
-
-  // Update security state of the current page to match
-  // SB_THREAT_TYPE_SAVED_PASSWORD_REUSE.
-  safe_browsing::ChromePasswordProtectionService* service =
-      safe_browsing::ChromePasswordProtectionService::
-          GetPasswordProtectionService(browser()->GetProfile());
-  safe_browsing::ReusedPasswordAccountType reused_password_account_type;
-  reused_password_account_type.set_account_type(
-      safe_browsing::ReusedPasswordAccountType::SAVED_PASSWORD);
-  service->set_reused_password_account_type_for_last_shown_warning(
-      reused_password_account_type);
-
-  scoped_refptr<safe_browsing::PasswordProtectionRequest> request =
-      safe_browsing::CreateDummyRequest(web_contents());
-  service->ShowModalWarning(
-      request.get(),
-      safe_browsing::LoginReputationClientResponse::VERDICT_TYPE_UNSPECIFIED,
-      "unused_token", reused_password_account_type);
-
-  OpenPageInfoBubble(browser());
-  views::View* change_password_button =
-      GetView(PageInfoViewFactory::VIEW_ID_PAGE_INFO_BUTTON_CHANGE_PASSWORD);
-  views::View* allowlist_password_reuse_button = GetView(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_BUTTON_ALLOWLIST_PASSWORD_REUSE);
-
-  std::unique_ptr<security_state::VisibleSecurityState> visible_security_state =
-      chrome_security_state::GetVisibleSecurityState(web_contents());
-  ASSERT_EQ(security_state::MALICIOUS_CONTENT_STATUS_SAVED_PASSWORD_REUSE,
-            visible_security_state->malicious_content_status);
-
-  // Verify these two buttons are showing.
-  EXPECT_TRUE(change_password_button->GetVisible());
-  EXPECT_TRUE(allowlist_password_reuse_button->GetVisible());
-
-  // Verify clicking on each button will both inform the sentiment service,
-  // and increment the corresponding bucket of
-  // PasswordProtection.PageInfoAction.NonGaiaEnterprisePasswordEntry
-  // histogram.
-  EXPECT_CALL(*mock_sentiment_service_, InteractedWithPageInfo).Times(2);
-
-  PerformMouseClickOnView(change_password_button);
-  EXPECT_THAT(
-      histograms.GetAllSamples(safe_browsing::kSavedPasswordPageInfoHistogram),
-      testing::ElementsAre(
-          base::Bucket(static_cast<int>(safe_browsing::WarningAction::SHOWN),
-                       1),
-          base::Bucket(
-              static_cast<int>(safe_browsing::WarningAction::CHANGE_PASSWORD),
-              1)));
-
-  PerformMouseClickOnView(allowlist_password_reuse_button);
-  EXPECT_THAT(
-      histograms.GetAllSamples(safe_browsing::kSavedPasswordPageInfoHistogram),
-      testing::ElementsAre(
-          base::Bucket(static_cast<int>(safe_browsing::WarningAction::SHOWN),
-                       1),
-          base::Bucket(
-              static_cast<int>(safe_browsing::WarningAction::CHANGE_PASSWORD),
-              1),
-          base::Bucket(static_cast<int>(
-                           safe_browsing::WarningAction::MARK_AS_LEGITIMATE),
-                       1)));
-  // Security state will change after allowlisting.
-  visible_security_state =
-      chrome_security_state::GetVisibleSecurityState(web_contents());
-  EXPECT_EQ(security_state::MALICIOUS_CONTENT_STATUS_NONE,
-            visible_security_state->malicious_content_status);
-}
-
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
                        ClosesOnUserNavigateToSamePage) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetSimplePageUrl()));
@@ -1162,24 +1010,6 @@ class PageInfoBubbleViewAboutThisSiteBrowserTest : public InProcessBrowserTest {
 
   content::WebContents* web_contents() {
     return browser()->tab_strip_model()->GetActiveWebContents();
-  }
-
-  void TriggerSafeBrowsingWarning() {
-    safe_browsing::ChromePasswordProtectionService* service =
-        safe_browsing::ChromePasswordProtectionService::
-            GetPasswordProtectionService(browser()->GetProfile());
-    safe_browsing::ReusedPasswordAccountType reused_password_account_type;
-    reused_password_account_type.set_account_type(
-        safe_browsing::ReusedPasswordAccountType::NON_GAIA_ENTERPRISE);
-    service->set_reused_password_account_type_for_last_shown_warning(
-        reused_password_account_type);
-
-    scoped_refptr<safe_browsing::PasswordProtectionRequest> request =
-        safe_browsing::CreateDummyRequest(web_contents());
-    service->ShowModalWarning(
-        request.get(),
-        safe_browsing::LoginReputationClientResponse::VERDICT_TYPE_UNSPECIFIED,
-        "unused_token", reused_password_account_type);
   }
 
  protected:

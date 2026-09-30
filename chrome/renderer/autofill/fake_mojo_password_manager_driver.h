@@ -63,10 +63,6 @@ class FakeMojoPasswordManagerDriver
               (const std::string&),
               (override));
   MOCK_METHOD(void,
-              CheckSafeBrowsingReputation,
-              (const GURL& form_action, const GURL& frame_url),
-              (override));
-  MOCK_METHOD(void,
               InformAboutUserInput,
               (const autofill::FormData& form_data),
               (override));

@@ -131,7 +131,6 @@ source_set("configs") {
   ]
 
   if (safe_browsing_mode == 1) {
-    deps += [ "//chrome/browser/ui/webui/reset_password" ]
   }
 
   if (safe_browsing_mode != 0) {

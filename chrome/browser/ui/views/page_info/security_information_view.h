@@ -41,15 +41,6 @@ class SecurityInformationView : public views::View {
   // the label.
   void AddResetDecisionsLabel(base::RepeatingClosure reset_decisions_callback);
 
-  // Adds the change password and mark site as legitimate buttons and sets
-  // passed callbacks to them. Based on |safe_browsing_status|, the label of
-  // "change password" button will be chosen (Change password, Check password
-  // or Protect account).
-  void AddPasswordReuseButtons(
-      PageInfo::SafeBrowsingStatus safe_browsing_status,
-      views::Button::PressedCallback change_password_callback,
-      views::Button::PressedCallback password_reuse_callback);
-
  private:
   void AdjustContentWidth(int w);
 
@@ -73,9 +64,6 @@ class SecurityInformationView : public views::View {
   // where to place it (if needed).
   raw_ptr<views::View> reset_decisions_label_container_ = nullptr;
 
-  // A container for the label buttons used to change password or mark the site
-  // as safe.
-  raw_ptr<views::View> password_reuse_button_container_ = nullptr;
 };
 
 #endif  // CHROME_BROWSER_UI_VIEWS_PAGE_INFO_SECURITY_INFORMATION_VIEW_H_

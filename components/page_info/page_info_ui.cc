@@ -43,9 +43,6 @@
 #include "ui/gfx/color_utils.h"
 #include "ui/native_theme/native_theme.h"  // nogncheck
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "components/safe_browsing/content/browser/password_protection/password_protection_service.h"
-#endif
 
 namespace {
 
@@ -365,8 +362,7 @@ PageInfoUI::IdentityInfo::IdentityInfo()
       safe_browsing_status(PageInfo::SAFE_BROWSING_STATUS_NONE),
       safety_tip_info({security_state::SafetyTipStatus::kUnknown, GURL()}),
       connection_status(PageInfo::SITE_CONNECTION_STATUS_UNKNOWN),
-      show_ssl_decision_revoke_button(false),
-      show_change_password_buttons(false) {}
+      show_ssl_decision_revoke_button(false) {}
 
 PageInfoUI::IdentityInfo::~IdentityInfo() = default;
 
@@ -393,31 +389,6 @@ PageInfoUI::GetSecurityDescription(const IdentityInfo& identity_info) const {
                                        IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY,
                                        IDS_PAGE_INFO_UNWANTED_SOFTWARE_DETAILS,
                                        SecurityDescriptionType::SAFE_BROWSING);
-    case PageInfo::SAFE_BROWSING_STATUS_SAVED_PASSWORD_REUSE: {
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-      auto security_description = CreateSecurityDescription(
-          SecuritySummaryColor::RED,
-          IDS_PAGE_INFO_CHANGE_PASSWORD_SAVED_PASSWORD_SUMMARY, 0,
-          SecurityDescriptionType::SAFE_BROWSING);
-      security_description->details = identity_info.safe_browsing_details;
-      return security_description;
-#else
-      NOTREACHED();
-#endif
-    }
-    case PageInfo::SAFE_BROWSING_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE:
-    case PageInfo::SAFE_BROWSING_STATUS_SIGNED_IN_NON_SYNC_PASSWORD_REUSE:
-    case PageInfo::SAFE_BROWSING_STATUS_ENTERPRISE_PASSWORD_REUSE: {
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-      auto security_description = CreateSecurityDescription(
-          SecuritySummaryColor::RED, IDS_PAGE_INFO_CHANGE_PASSWORD_SUMMARY, 0,
-          SecurityDescriptionType::SAFE_BROWSING);
-      security_description->details = identity_info.safe_browsing_details;
-      return security_description;
-#else
-      NOTREACHED();
-#endif
-    }
     case PageInfo::SAFE_BROWSING_STATUS_BILLING:
       return CreateSecurityDescription(SecuritySummaryColor::RED,
                                        IDS_PAGE_INFO_BILLING_SUMMARY,

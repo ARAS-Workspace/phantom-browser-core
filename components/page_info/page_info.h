@@ -107,10 +107,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
     SAFE_BROWSING_STATUS_MALWARE,
     SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING,
     SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE,
-    SAFE_BROWSING_STATUS_SAVED_PASSWORD_REUSE,
-    SAFE_BROWSING_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE,
-    SAFE_BROWSING_STATUS_SIGNED_IN_NON_SYNC_PASSWORD_REUSE,
-    SAFE_BROWSING_STATUS_ENTERPRISE_PASSWORD_REUSE,
     SAFE_BROWSING_STATUS_BILLING,
     SAFE_BROWSING_STATUS_MANAGED_POLICY_WARN,
     SAFE_BROWSING_STATUS_MANAGED_POLICY_BLOCK,
@@ -248,12 +244,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   // Handles opening the settings page for a permission.
   void OpenContentSettingsExceptions(ContentSettingsType content_settings_type);
 
-  // This method is called when the user pressed "Change password" button.
-  void OnChangePasswordButtonPressed();
-
-  // This method is called when the user pressed "Mark as legitimate" button.
-  void OnAllowlistPasswordReuseButtonPressed();
-
   // This method is called when the user opens the Cookies & Site Data subpage.
   void OnCookiesPageOpened();
 
@@ -350,12 +340,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   // presented in a headset.
   void PresentPageFeatureInfo();
 
-
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  // Records a password reuse event. If FULL_SAFE_BROWSING is defined, this
-  // function WILL record an event. Callers should check conditions beforehand.
-  void RecordPasswordReuseEvent();
-#endif
 
   // Helper function to get the |HostContentSettingsMap| associated with
   // |PageInfo|.
@@ -458,10 +442,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   security_state::VisibleSecurityState visible_security_state_for_metrics_;
 
   // Set when the user ignored the password reuse modal warning dialog. When
-  // |show_change_password_buttons_| is true, the page identity area of the page
-  // info will include buttons to change corresponding password, and to
-  // whitelist current site.
-  bool show_change_password_buttons_;
 
   // The time the Page Info UI is opened, for measuring total time open.
   base::TimeTicks start_time_;

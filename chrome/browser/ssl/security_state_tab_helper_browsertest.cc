@@ -32,7 +32,6 @@
 #include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_window.h"
-#include "chrome/browser/safe_browsing/chrome_password_protection_service.h"
 #include "chrome/browser/ssl/cert_verifier_browser_test.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
@@ -47,9 +46,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/content/browser/password_protection/password_protection_request_content.h"
-#include "components/safe_browsing/content/browser/password_protection/password_protection_test_util.h"
-#include "components/safe_browsing/core/browser/password_protection/metrics_util.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
@@ -849,99 +845,8 @@ IN_PROC_BROWSER_TEST_F(SecurityStateTabHelperTest,
 
 // Tests the security level and malicious content status for sign-in password
 // reuse threat type.
-IN_PROC_BROWSER_TEST_F(
-    SecurityStateTabHelperTest,
-    VerifySignInPasswordReuseMaliciousContentAndSecurityLevel) {
-  // Setup https server. This makes sure that the DANGEROUS security level is
-  // not caused by any certificate error rather than the password reuse SB
-  // threat type.
-  SetUpMockCertVerifierForHttpsServer(0, net::OK);
-  content::WebContents* contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(contents);
-
-  SecurityStyleTestObserver observer(contents);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("/ssl/google.html")));
-  // Update security state of the current page to match
-  // SB_THREAT_TYPE_GAIA_PASSWORD_REUSE.
-  safe_browsing::ChromePasswordProtectionService* service =
-      safe_browsing::ChromePasswordProtectionService::
-          GetPasswordProtectionService(browser()->GetProfile());
-  safe_browsing::ReusedPasswordAccountType account_type;
-  account_type.set_account_type(
-      safe_browsing::ReusedPasswordAccountType::GSUITE);
-  account_type.set_is_account_syncing(true);
-  scoped_refptr<safe_browsing::PasswordProtectionRequest> request =
-      safe_browsing::CreateDummyRequest(contents);
-  service->ShowModalWarning(
-      request.get(), LoginReputationClientResponse::VERDICT_TYPE_UNSPECIFIED,
-      "unused_token", account_type);
-  observer.WaitForDidChangeVisibleSecurityState();
-
-  std::unique_ptr<security_state::VisibleSecurityState> visible_security_state =
-      chrome_security_state::GetVisibleSecurityState(contents);
-
-  EXPECT_EQ(security_state::DANGEROUS,
-            chrome_security_state::GetSecurityLevel(contents));
-  EXPECT_EQ(
-      security_state::MALICIOUS_CONTENT_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE,
-      visible_security_state->malicious_content_status);
-
-  // Simulates a Gaia password change, then malicious content status will
-  // change to MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING.
-  service->OnGaiaPasswordChanged(/*username=*/"", false);
-  base::RunLoop().RunUntilIdle();
-  visible_security_state =
-      chrome_security_state::GetVisibleSecurityState(contents);
-  EXPECT_EQ(security_state::DANGEROUS,
-            chrome_security_state::GetSecurityLevel(contents));
-  EXPECT_EQ(security_state::MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING,
-            visible_security_state->malicious_content_status);
-}
-
 // Tests the security level and malicious content status for enterprise password
 // reuse threat type.
-IN_PROC_BROWSER_TEST_F(
-    SecurityStateTabHelperTest,
-    VerifyEnterprisePasswordReuseMaliciousContentAndSecurityLevel) {
-  // Setup https server. This makes sure that the DANGEROUS security level is
-  // not caused by any certificate error rather than the password reuse SB
-  // threat type.
-  SetUpMockCertVerifierForHttpsServer(0, net::OK);
-  content::WebContents* contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  SecurityStyleTestObserver observer(contents);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("/ssl/google.html")));
-  // Update security state of the current page to match
-  // SB_THREAT_TYPE_ENTERPRISE_PASSWORD_REUSE.
-  safe_browsing::ChromePasswordProtectionService* service =
-      safe_browsing::ChromePasswordProtectionService::
-          GetPasswordProtectionService(browser()->GetProfile());
-  scoped_refptr<safe_browsing::PasswordProtectionRequest> request =
-      safe_browsing::CreateDummyRequest(contents);
-  service->ShowModalWarning(
-      request.get(), LoginReputationClientResponse::VERDICT_TYPE_UNSPECIFIED,
-      "unused_token",
-      service->GetPasswordProtectionReusedPasswordAccountType(
-          PasswordType::ENTERPRISE_PASSWORD, /*username=*/""));
-  observer.WaitForDidChangeVisibleSecurityState();
-
-  std::unique_ptr<security_state::VisibleSecurityState> visible_security_state =
-      chrome_security_state::GetVisibleSecurityState(contents);
-  EXPECT_EQ(security_state::DANGEROUS,
-            chrome_security_state::GetSecurityLevel(contents));
-  EXPECT_EQ(security_state::MALICIOUS_CONTENT_STATUS_ENTERPRISE_PASSWORD_REUSE,
-            visible_security_state->malicious_content_status);
-
-  // Since these are non-Gaia enterprise passwords, Gaia password change won't
-  // have any impact here.
-}
-
 class PKPModelClientTest : public SecurityStateTabHelperTest {
  public:
   static constexpr const char* kPKPHost = "example.test";

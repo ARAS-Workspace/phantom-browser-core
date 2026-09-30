@@ -910,9 +910,6 @@ void ManagePasswordsUIController::SavePassword(const std::u16string& username,
               Profile::FromBrowserContext(
                   web_contents()->GetBrowserContext()))) {
     sentiment_service->SavedPassword();
-    if (IsPendingPasswordPhished()) {
-      sentiment_service->PhishedPasswordUpdateFinished();
-    }
   }
 
   if (GetPasswordFormMetricsRecorder() && BubbleIsManualFallbackForSaving()) {

@@ -662,17 +662,6 @@ void ContentPasswordManagerDriver::UserModifiedNonPasswordField(
   client_->ResetSubmissionTrackingAfterTouchToFill();
 }
 
-void ContentPasswordManagerDriver::CheckSafeBrowsingReputation(
-    const GURL& form_action,
-    const GURL& frame_url) {
-  if (!CheckFrameActiveAndNotPrerendering(render_frame_host_)) {
-    return;
-  }
-#if defined(ON_FOCUS_PING_ENABLED) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  client_->CheckSafeBrowsingReputation(form_action, frame_url);
-#endif
-}
-
 void ContentPasswordManagerDriver::FocusedInputChanged(
     autofill::FieldRendererId focused_field_id,
     FocusedFieldType focused_field_type) {

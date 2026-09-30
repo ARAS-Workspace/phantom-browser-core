@@ -167,52 +167,6 @@ bool IsOtherSBInterstitialCategory(safe_browsing::SBThreatType threat_type) {
   }
 }
 
-// Generates the Product Specific Data which accompanies survey results for the
-// Password Protection UI product area.
-std::map<std::string, bool> BuildProductSpecificDataForPasswordProtection(
-    Profile* profile,
-    PasswordProtectionUIType ui_type,
-    PasswordProtectionUIAction action) {
-  std::map<std::string, bool> product_specific_data;
-  product_specific_data["Enhanced protection enabled"] =
-      safe_browsing::IsEnhancedProtectionEnabled(*profile->GetPrefs());
-  product_specific_data["Is page info UI"] = false;
-  product_specific_data["Is modal dialog UI"] = false;
-  product_specific_data["Is interstitial UI"] = false;
-  switch (ui_type) {
-    case PasswordProtectionUIType::PAGE_INFO:
-      product_specific_data["Is page info UI"] = true;
-      break;
-    case PasswordProtectionUIType::MODAL_DIALOG:
-      product_specific_data["Is modal dialog UI"] = true;
-      break;
-    case PasswordProtectionUIType::INTERSTITIAL:
-      product_specific_data["Is interstitial UI"] = true;
-      break;
-    default:
-      NOTREACHED();
-  }
-  product_specific_data["User completed password change"] = false;
-  product_specific_data["User clicked change password"] = false;
-  product_specific_data["User ignored warning"] = false;
-  product_specific_data["User marked as legitimate"] = false;
-  switch (action) {
-    case PasswordProtectionUIAction::CHANGE_PASSWORD:
-      product_specific_data["User clicked change password"] = true;
-      break;
-    case PasswordProtectionUIAction::IGNORE_WARNING:
-    case PasswordProtectionUIAction::CLOSE:
-      product_specific_data["User ignored warning"] = true;
-      break;
-    case PasswordProtectionUIAction::MARK_AS_LEGITIMATE:
-      product_specific_data["User marked as legitimate"] = true;
-      break;
-    default:
-      NOTREACHED();
-  }
-  return product_specific_data;
-}
-
 }  // namespace
 
 TrustSafetySentimentService::TrustSafetySentimentService(Profile* profile)
@@ -496,39 +450,6 @@ void TrustSafetySentimentService::InteractedWithDownloadWarningUI(
   TriggerOccurred(FeatureArea::kDownloadWarningUI, product_specific_data);
 }
 
-void TrustSafetySentimentService::ProtectResetOrCheckPasswordClicked(
-    PasswordProtectionUIType ui_type) {
-  // Only one Phished Password Change should ever be open.
-  DCHECK(!phished_password_change_state_);
-  phished_password_change_state_ =
-      std::make_unique<PhishedPasswordChangeState>();
-  phished_password_change_state_->ui_type_ = ui_type;
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(
-          &TrustSafetySentimentService::MaybeTriggerPasswordProtectionSurvey,
-          weak_ptr_factory_.GetWeakPtr(), ui_type,
-          PasswordProtectionUIAction::CHANGE_PASSWORD),
-      kPasswordChangeInactivity);
-}
-
-void TrustSafetySentimentService::PhishedPasswordUpdateNotClicked(
-    PasswordProtectionUIType ui_type,
-    PasswordProtectionUIAction action) {
-  DCHECK(action != PasswordProtectionUIAction::CHANGE_PASSWORD);
-  MaybeTriggerPasswordProtectionSurvey(ui_type, action);
-}
-
-void TrustSafetySentimentService::PhishedPasswordUpdateFinished() {
-  if (!phished_password_change_state_) {
-    return;
-  }
-  phished_password_change_state_->finished_action = true;
-  MaybeTriggerPasswordProtectionSurvey(
-      phished_password_change_state_->ui_type_,
-      PasswordProtectionUIAction::CHANGE_PASSWORD);
-}
-
 void TrustSafetySentimentService::OnOffTheRecordProfileCreated(
     Profile* off_the_record) {
   // Only interested in the primary OTR profile i.e. the one used for incognito
@@ -616,11 +537,6 @@ void TrustSafetySentimentService::SettingsWatcher::TimerComplete() {
 TrustSafetySentimentService::PageInfoState::PageInfoState()
     : opened_time(base::Time::Now()) {}
 
-TrustSafetySentimentService::PhishedPasswordChangeState::
-    PhishedPasswordChangeState()
-    : password_change_click_ts_(base::Time::Now()),
-      ui_type_(PasswordProtectionUIType::NOT_USED) {}
-
 void TrustSafetySentimentService::SettingsWatcherComplete() {
   settings_watcher_.reset();
 }
@@ -658,31 +574,6 @@ void TrustSafetySentimentService::PerformedIneligibleAction() {
          trigger.remaining_ntps_to_open > 0;
 }
 
-// Checks inactivity delay and finished_action (change psd field to true)
-void TrustSafetySentimentService::MaybeTriggerPasswordProtectionSurvey(
-    PasswordProtectionUIType ui_type,
-    PasswordProtectionUIAction action) {
-  DCHECK(ui_type != PasswordProtectionUIType::NOT_USED);
-  std::map<std::string, bool> product_specific_data =
-      BuildProductSpecificDataForPasswordProtection(profile_, ui_type, action);
-  if (action == PasswordProtectionUIAction::CHANGE_PASSWORD) {
-    if (!phished_password_change_state_) {
-      return;
-    }
-    if (!phished_password_change_state_->finished_action &&
-        base::Time::Now() -
-                phished_password_change_state_->password_change_click_ts_ <
-            kPasswordChangeInactivity) {
-      return;
-    }
-    if (phished_password_change_state_->finished_action) {
-      product_specific_data["User completed password change"] = true;
-    }
-    phished_password_change_state_.reset();
-  }
-  TriggerOccurred(FeatureArea::kPasswordProtectionUI, product_specific_data);
-}
-
 // static
 bool TrustSafetySentimentService::VersionCheck(FeatureArea feature_area) {
   bool isV2 =
@@ -702,7 +593,6 @@ bool TrustSafetySentimentService::VersionCheck(FeatureArea feature_area) {
     case (FeatureArea::kControlGroup):
     case (FeatureArea::kSafeBrowsingInterstitial):
     case (FeatureArea::kDownloadWarningUI):
-    case (FeatureArea::kPasswordProtectionUI):
       return isV2 == true;
     // Both Versions
     case (FeatureArea::kTrustedSurface):
@@ -740,8 +630,6 @@ std::string TrustSafetySentimentService::GetHatsTriggerForFeatureArea(
         return kHatsSurveyTriggerTrustSafetyV2SafeBrowsingInterstitial;
       case (FeatureArea::kDownloadWarningUI):
         return kHatsSurveyTriggerTrustSafetyV2DownloadWarningUI;
-      case (FeatureArea::kPasswordProtectionUI):
-        return kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI;
       default:
         NOTREACHED();
     }
@@ -809,11 +697,6 @@ bool TrustSafetySentimentService::ProbabilityCheck(FeatureArea feature_area) {
         return base::RandDouble() <
                features::
                    kTrustSafetySentimentSurveyV2DownloadWarningUIProbability
-                       .Get();
-      case (FeatureArea::kPasswordProtectionUI):
-        return base::RandDouble() <
-               features::
-                   kTrustSafetySentimentSurveyV2PasswordProtectionUIProbability
                        .Get();
       default:
         NOTREACHED();

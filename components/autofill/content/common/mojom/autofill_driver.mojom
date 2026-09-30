@@ -212,11 +212,6 @@ interface PasswordManagerDriver {
     bool autocomplete_attribute_has_username,
     bool is_likely_otp);
 
-  // Checks the safe browsing reputation of the website where the focused
-  // username/password field is on.
-  CheckSafeBrowsingReputation(
-      url.mojom.Url form_action, url.mojom.Url frame_url);
-
   // The focus changed to a different input in the same frame (e.g. tabbed from
   // email to password field).
   FocusedInputChanged(FieldRendererId focused_field_id,

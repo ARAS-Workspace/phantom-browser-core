@@ -221,17 +221,8 @@ class ChromePasswordManagerClient
   autofill::LogManager* GetCurrentLogManager() override;
   void AnnotateNavigationEntry(bool has_password_field) override;
   autofill::LanguageCode GetPageLanguage() const override;
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::PasswordProtectionService* GetPasswordProtectionService()
-      const override;
-#endif
   void TriggerUserPerceptionOfPasswordManagerSurvey(
       const std::string& filling_assistance) override;
-
-#if defined(ON_FOCUS_PING_ENABLED) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  void CheckSafeBrowsingReputation(const GURL& form_action,
-                                   const GURL& frame_url) override;
-#endif
 
   ukm::SourceId GetUkmSourceId() override;
   password_manager::PasswordManagerMetricsRecorder* GetMetricsRecorder()

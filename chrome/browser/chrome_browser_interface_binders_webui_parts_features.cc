@@ -43,8 +43,6 @@
 #endif
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/ui/webui/reset_password/reset_password.mojom.h"
-#include "chrome/browser/ui/webui/reset_password/reset_password_ui.h"
 #endif  // BUILDFLAG(FULL_SAFE_BROWSING)
 
 namespace chrome::internal {
@@ -92,8 +90,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
 #endif
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-  RegisterWebUIControllerInterfaceBinder<::mojom::ResetPasswordHandler,
-                                         ResetPasswordUI>(map);
 #endif
 }
 

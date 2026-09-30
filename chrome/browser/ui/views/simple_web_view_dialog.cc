@@ -49,7 +49,6 @@
 #include "ui/views/widget/widget_delegate.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/chrome_password_reuse_detection_manager_client.h"
 #endif
 
 namespace {
@@ -289,7 +288,6 @@ void SimpleWebViewDialog::StartLoad(const GURL& url) {
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   // Create the password reuse detection manager for simple web view dialog.
-  ChromePasswordReuseDetectionManagerClient::CreateForWebContents(web_contents);
 #endif
 
   web_view_->LoadInitialURL(url,

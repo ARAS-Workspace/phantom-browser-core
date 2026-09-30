@@ -7,11 +7,6 @@ import("//build/config/features.gni")
 import("//components/password_manager/core/browser/buildflags.gni")
 import("//third_party/libprotobuf-mutator/fuzzable_proto_library.gni")
 
-config("password_reuse_detection_config") {
-  defines = []
-  defines += [ "ON_FOCUS_PING_ENABLED" ]
-}
-
 static_library("browser") {
   sources = [
     "browser_save_password_progress_logger.cc",
@@ -160,7 +155,6 @@ static_library("browser") {
     "webauthn_credentials_delegate.h",
   ]
 
-  all_dependent_configs = [ ":password_reuse_detection_config" ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
   public_deps = [

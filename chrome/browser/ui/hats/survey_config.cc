@@ -148,8 +148,6 @@ constexpr char kHatsSurveyTriggerTrustSafetyV2DownloadWarningUI[] =
     "ts-v2-download-warning-ui";
 constexpr char kHatsSurveyTriggerTrustSafetyV2PasswordCheck[] =
     "ts-v2-password-check";
-constexpr char kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI[] =
-    "ts-v2-password-protection-ui";
 constexpr char kHatsSurveyTriggerTrustSafetyV2SafetyCheck[] =
     "ts-v2-safety-check";
 constexpr char kHatsSurveyTriggerTrustSafetyV2SafetyHubNotification[] =
@@ -354,16 +352,6 @@ std::vector<hats::SurveyConfig> GetAllSurveyConfigs() {
       &features::kTrustSafetySentimentSurveyV2,
       kHatsSurveyTriggerTrustSafetyV2PasswordCheck,
       features::kTrustSafetySentimentSurveyV2PasswordCheckTriggerId.Get());
-  survey_configs.emplace_back(
-      &features::kTrustSafetySentimentSurveyV2,
-      kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI,
-      features::kTrustSafetySentimentSurveyV2PasswordProtectionUITriggerId
-          .Get(),
-      std::vector<std::string>{
-          "Enhanced protection enabled", "Is page info UI",
-          "Is modal dialog UI", "Is interstitial UI",
-          "User completed password change", "User clicked change password",
-          "User ignored warning", "User marked as legitimate"});
   survey_configs.emplace_back(
       &features::kTrustSafetySentimentSurveyV2,
       kHatsSurveyTriggerTrustSafetyV2SafetyCheck,

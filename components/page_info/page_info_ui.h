@@ -154,11 +154,6 @@ class PageInfoUI {
     // connection area of the page info UI will include an option for the user
     // to revoke their decision to bypass warnings for this host.
     bool show_ssl_decision_revoke_button;
-    // Set when the user ignored the password reuse modal warning dialog. When
-    // |show_change_password_buttons| is true, the page identity area of the
-    // page info will include buttons to change corresponding password, and
-    // to whitelist current site.
-    bool show_change_password_buttons;
   };
 
   struct PageFeatureInfo {

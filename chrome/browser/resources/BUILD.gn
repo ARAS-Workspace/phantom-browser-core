@@ -154,10 +154,6 @@ group("resources") {
   if (enterprise_watermark) {
     public_deps += [ "watermark:resources" ]
   }
-
-  if (safe_browsing_mode == 1) {
-    public_deps += [ "reset_password:resources" ]
-  }
 }
 
 if (enable_webui_generate_code_cache) {

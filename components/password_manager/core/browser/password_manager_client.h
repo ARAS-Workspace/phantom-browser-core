@@ -430,12 +430,6 @@ class PasswordManagerClient {
   // Returns the current best guess as to the page's display language.
   virtual autofill::LanguageCode GetPageLanguage() const;
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // Return the PasswordProtectionService associated with this instance.
-  virtual safe_browsing::PasswordProtectionService*
-  GetPasswordProtectionService() const = 0;
-#endif
-
   // Maybe triggers a hats survey that measures the user's perception of
   // Autofill for passwords. When triggering happens, the survey dialog will be
   // displayed with a 5s delay. This survey should be triggered after form
@@ -445,14 +439,6 @@ class PasswordManagerClient {
   // `FillingAssistance` enum, i.e "Manually filled".
   virtual void TriggerUserPerceptionOfPasswordManagerSurvey(
       const std::string& filling_assistance);
-
-#if defined(ON_FOCUS_PING_ENABLED) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // Checks the safe browsing reputation of the webpage when the
-  // user focuses on a username/password field. This is used for reporting
-  // only, and won't trigger a warning.
-  virtual void CheckSafeBrowsingReputation(const GURL& form_action,
-                                           const GURL& frame_url) = 0;
-#endif
 
   // If the feature is enabled send an event to the enterprise reporting
   // connector server indicating that the user signed in to a website.

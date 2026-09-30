@@ -273,8 +273,6 @@ source_set("browser_tests") {
     "//components/captive_portal/content",
     "//components/embedder_support",
     "//components/error_page/content/browser",
-    "//components/safe_browsing/content/browser/password_protection",
-    "//components/safe_browsing/content/browser/password_protection:test_support",
     "//components/security_interstitials/content:proto_gen",
     "//content/test:browsertest_support",
     "//content/test:test_support",

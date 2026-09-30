@@ -142,7 +142,6 @@
 
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/ui/webui/reset_password/reset_password_ui.h"
 #endif
 
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal_ui.h"
@@ -306,7 +305,6 @@ void RegisterChromeWebUIConfigs() {
 
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-  map.AddWebUIConfig(std::make_unique<ResetPasswordUIConfig>());
 #endif
 
   map.AddWebUIConfig(std::make_unique<DefaultBrowserModalUIConfig>());

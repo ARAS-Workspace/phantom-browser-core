@@ -173,10 +173,6 @@ class PasswordAutofillAgent : public content::RenderFrameObserver,
   // Clears all the previously previewed fields.
   void ClearPreviewedForm();
 
-  // Sends a reputation check request in case if `element` has type password and
-  // no check request were sent from this frame load.
-  void MaybeCheckSafeBrowsingReputation(const blink::WebInputElement& element);
-
   // Performs necessary feasibility checks to trigger password suggestions
   // for the current domain on the `element`. `trigger_source` is used to
   // distinguish between the ways of how Autofill was triggered.
@@ -641,7 +637,6 @@ class PasswordAutofillAgent : public content::RenderFrameObserver,
   bool sent_request_to_store_ = false;
 
   // True indicates that a safe browsing reputation check has been triggered.
-  bool checked_safe_browsing_reputation_ = false;
 
   raw_ptr<AutofillAgent> autofill_agent_ = nullptr;
 

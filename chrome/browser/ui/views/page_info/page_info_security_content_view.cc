@@ -249,21 +249,6 @@ void PageInfoSecurityContentView::SetIdentityInfo(
         views::style::STYLE_BODY_4, kColorPageInfoSubtitleForeground);
   }
 
-  if (identity_info.show_change_password_buttons) {
-    security_view_->AddPasswordReuseButtons(
-        identity_info.safe_browsing_status,
-        base::BindRepeating(
-            [](PageInfoSecurityContentView* view) {
-              view->presenter_->OnChangePasswordButtonPressed();
-            },
-            this),
-        base::BindRepeating(
-            [](PageInfoSecurityContentView* view) {
-              view->GetWidget()->Close();
-              view->presenter_->OnAllowlistPasswordReuseButtonPressed();
-            },
-            this));
-  }
   PreferredSizeChanged();
 }
 

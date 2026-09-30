@@ -168,19 +168,6 @@ StubPasswordManagerClient::GetPasswordFeatureManager() {
   return &password_feature_manager_;
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-safe_browsing::PasswordProtectionService*
-StubPasswordManagerClient::GetPasswordProtectionService() const {
-  return nullptr;
-}
-#endif
-
-#if defined(ON_FOCUS_PING_ENABLED) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-void StubPasswordManagerClient::CheckSafeBrowsingReputation(
-    const GURL& form_action,
-    const GURL& frame_url) {}
-#endif
-
 ukm::SourceId StubPasswordManagerClient::GetUkmSourceId() {
   return ukm_source_id_;
 }

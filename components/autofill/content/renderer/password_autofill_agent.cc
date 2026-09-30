@@ -576,11 +576,6 @@ class PasswordAutofillAgent::DeferringPasswordManagerDriver
              renderer_id, value, autocomplete_attribute_has_username,
              is_likely_otp);
   }
-  void CheckSafeBrowsingReputation(const GURL& form_action,
-                                   const GURL& frame_url) override {
-    DeferMsg(&mojom::PasswordManagerDriver::CheckSafeBrowsingReputation,
-             form_action, frame_url);
-  }
   void FocusedInputChanged(
       FieldRendererId focused_field_id,
       mojom::FocusedFieldType focused_field_type) override {
@@ -1298,36 +1293,6 @@ bool PasswordAutofillAgent::HasElementsToFill(
                                       *password_info);
 }
 
-void PasswordAutofillAgent::MaybeCheckSafeBrowsingReputation(
-    const WebInputElement& element) {
-  // Enabled on desktop and Android
-#if BUILDFLAG(FULL_SAFE_BROWSING) || BUILDFLAG(SAFE_BROWSING_DB_REMOTE)
-  // Note: A site may use a Password field to collect a CVV or a Credit Card
-  // number, but showing a slightly misleading warning here is better than
-  // showing no warning at all.
-  if (element.FormControlTypeForAutofill() != kInputPassword) {
-    return;
-  }
-  if (checked_safe_browsing_reputation_)
-    return;
-
-  checked_safe_browsing_reputation_ = true;
-  if (!unsafe_render_frame()) {
-    return;
-  }
-  WebLocalFrame* frame = unsafe_render_frame()->GetWebFrame();
-  GURL frame_url = GURL(frame->GetDocument().Url());
-  WebFormElement form_element = element.GetOwningFormForAutofill();
-  GURL action_url = form_element
-                        ? form_util::GetCanonicalActionForForm(form_element)
-                        : GURL();
-  if (auto* driver = unsafe_driver()) {
-    driver->CheckSafeBrowsingReputation(action_url, frame_url);
-  }
-#endif
-}
-
-bool PasswordAutofillAgent::FrameCanAccessPasswordManager() {
   if (!unsafe_render_frame()) {
     return false;
   }
@@ -1550,7 +1515,6 @@ void PasswordAutofillAgent::DidFinishLoad() {
 
 void PasswordAutofillAgent::DidCommitProvisionalLoad(
     ui::PageTransition transition) {
-  checked_safe_browsing_reputation_ = false;
   recorded_first_filling_result_ = false;
 }
 
@@ -1798,7 +1762,6 @@ PasswordAutofillAgent::CreateRequestForDomain(
                              &password_element, &password_info);
 
   if (!password_info) {
-    MaybeCheckSafeBrowsingReputation(element);
     if (!CanShowPopupWithoutPasswords(password_element)) {
       return std::nullopt;
     }
@@ -1858,13 +1821,9 @@ PasswordAutofillAgent::CreateManualFallbackRequest(
   WebInputElement username_element;
   WebInputElement password_element;
   PasswordInfo* password_info = nullptr;
-  if (!FindPasswordInfoForElement(element, UseFallbackData(false),
-                                  &username_element, &password_element,
-                                  &password_info)) {
-    // Perform this action only if there's no passwords saved for the triggering
-    // field. Manual fallback suggestions can be shown on any field.
-    MaybeCheckSafeBrowsingReputation(element);
-  }
+  FindPasswordInfoForElement(element, UseFallbackData(false),
+                             &username_element, &password_element,
+                             &password_info);
 
   if (!FrameCanAccessPasswordManager()) {
     return std::nullopt;
@@ -1898,7 +1857,6 @@ void PasswordAutofillAgent::CleanupOnDocumentShutdown() {
   field_data_manager().ClearData();
   previewed_elements_.clear();
   sent_request_to_store_ = false;
-  checked_safe_browsing_reputation_ = false;
   username_detector_cache_.clear();
   forms_structure_cache_.clear();
   autofilled_elements_cache_.clear();

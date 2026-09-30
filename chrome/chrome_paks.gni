@@ -344,8 +344,6 @@ template("chrome_extra_paks") {
     }
 
     if (safe_browsing_mode == 1) {
-      sources += [ "$root_gen_dir/chrome/reset_password_resources.pak" ]
-      deps += [ "//chrome/browser/resources/reset_password:resources" ]
     }
   }
 }

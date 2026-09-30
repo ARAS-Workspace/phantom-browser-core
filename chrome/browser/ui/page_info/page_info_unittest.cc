@@ -1046,41 +1046,6 @@ TEST_F(PageInfoTest, UnwantedSoftware) {
 }
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-TEST_F(PageInfoTest, SignInPasswordReuse) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE;
-  SetDefaultUIExpectations(mock_ui());
-
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE,
-            page_info()->safe_browsing_status());
-}
-
-TEST_F(PageInfoTest, SavedPasswordReuse) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_SAVED_PASSWORD_REUSE;
-  SetDefaultUIExpectations(mock_ui());
-
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_SAVED_PASSWORD_REUSE,
-            page_info()->safe_browsing_status());
-}
-
-TEST_F(PageInfoTest, EnterprisePasswordReuse) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_ENTERPRISE_PASSWORD_REUSE;
-  SetDefaultUIExpectations(mock_ui());
-
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_ENTERPRISE_PASSWORD_REUSE,
-            page_info()->safe_browsing_status());
-}
 #endif
 
 TEST_F(PageInfoTest, HTTPConnection) {

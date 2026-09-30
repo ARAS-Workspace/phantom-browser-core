@@ -30,8 +30,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profiles_state.h"
-#include "chrome/browser/safe_browsing/chrome_password_protection_service.h"
-#include "chrome/browser/safe_browsing/chrome_password_protection_service_factory.h"
 #include "chrome/browser/safe_browsing/chrome_ping_manager_factory.h"
 #include "chrome/browser/safe_browsing/chrome_safe_browsing_blocking_page_factory.h"
 #include "chrome/browser/safe_browsing/chrome_ui_manager_delegate.h"
@@ -86,7 +84,6 @@
 
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/browser/password_protection/password_protection_service.h"
 #endif
 
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
@@ -438,14 +435,6 @@ SafeBrowsingServiceImpl::GetReferrerChainProviderFromBrowserContext(
 TriggerManager* SafeBrowsingServiceImpl::trigger_manager() const {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   return trigger_manager_.get();
-}
-
-PasswordProtectionService*
-SafeBrowsingServiceImpl::GetPasswordProtectionService(Profile* profile) const {
-  if (IsSafeBrowsingEnabled(*profile->GetPrefs())) {
-    return ChromePasswordProtectionServiceFactory::GetForProfile(profile);
-  }
-  return nullptr;
 }
 
 std::unique_ptr<prefs::mojom::TrackedPreferenceValidationDelegate>

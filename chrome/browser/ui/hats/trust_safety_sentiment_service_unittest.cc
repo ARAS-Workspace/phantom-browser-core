@@ -115,7 +115,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
     std::string control_group_probability = "0.4";
     std::string download_warning_ui_probability = "0.0";
     std::string password_check_probability = "0.4";
-    std::string password_protection_ui_probability = "0.0";
     std::string safety_check_probability = "0.4";
     std::string safety_hub_notification_probability = "0.4";
     std::string safety_hub_interaction_probability = "0.4";
@@ -130,8 +129,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
     std::string control_group_trigger_id = "control-group-test";
     std::string download_warning_ui_trigger_id = "download-warning-ui-test";
     std::string password_check_trigger_id = "password-check-test";
-    std::string password_protection_ui_trigger_id =
-        "password-protection-ui-test";
     std::string safety_check_trigger_id = "safety-check-test";
     std::string trusted_surface_trigger_id = "trusted-surface-test";
     std::string privacy_guide_trigger_id = "privacy-guide-test";
@@ -154,8 +151,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
             {"download-warning-ui-probability",
              params.download_warning_ui_probability},
             {"password-check-probability", params.password_check_probability},
-            {"password-protection-ui-probability",
-             params.password_protection_ui_probability},
             {"safety-check-probability", params.safety_check_probability},
             {"safety-hub-notification-probability",
              params.safety_hub_notification_probability},
@@ -170,8 +165,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
             {"download-warning-ui-trigger-id",
              params.download_warning_ui_trigger_id},
             {"password-check-trigger-id", params.password_check_trigger_id},
-            {"password-protection-ui-trigger-id",
-             params.password_protection_ui_trigger_id},
             {"safety-check-trigger-id", params.safety_check_trigger_id},
             {"trusted-surface-trigger-id", params.trusted_surface_trigger_id},
             {"privacy-guide-trigger-id", params.privacy_guide_trigger_id},
@@ -807,43 +800,6 @@ TEST_F(TrustSafetySentimentServiceTest, AllFeatureAreasHaveProbabilities) {
   }
 }
 
-TEST_F(TrustSafetySentimentServiceTest, V2_AllFeatureAreasHaveProbabilities) {
-  // Check that for every feature with a probability of 1 and the correct
-  // version, the dice roll always succeeds.
-  FeatureParamsV2 params;
-  params.browsing_data_probability = "1.0";
-  params.control_group_probability = "1.0";
-  params.download_warning_ui_probability = "1.0";
-  params.password_check_probability = "1.0";
-  params.password_protection_ui_probability = "1.0";
-  params.safety_check_probability = "1.0";
-  params.trusted_surface_probability = "1.0";
-  params.privacy_guide_probability = "1.0";
-  params.privacy_sandbox_4_consent_accept_probability = "1.0";
-  params.privacy_sandbox_4_consent_decline_probability = "1.0";
-  params.privacy_sandbox_4_notice_ok_probability = "1.0";
-  params.privacy_sandbox_4_notice_settings_probability = "1.0";
-  params.safe_browsing_interstitial_probability = "1.0";
-  params.safety_hub_notification_probability = "1.0";
-  params.safety_hub_interaction_probability = "1.0";
-
-  SetupFeatureParametersV2(params);
-  for (int enum_value = 0;
-       enum_value <=
-       static_cast<int>(TrustSafetySentimentService::FeatureArea::kMaxValue);
-       ++enum_value) {
-    if (IsDeprecatedFeatureArea(enum_value)) {
-      continue;
-    }
-    auto feature_area =
-        static_cast<TrustSafetySentimentService::FeatureArea>(enum_value);
-    if (TrustSafetySentimentService::VersionCheck(feature_area)) {
-      EXPECT_TRUE(TrustSafetySentimentService::ProbabilityCheck(feature_area))
-          << "Feature area: " << static_cast<int>(feature_area);
-    }
-  }
-}
-
 TEST_F(TrustSafetySentimentServiceTest, Eligibility_V1FeatureWhileV2Enabled) {
   // A survey from V1 only is not shown because V2 is enabled.
   FeatureParams params;
@@ -1156,134 +1112,4 @@ TEST_F(TrustSafetySentimentServiceTest, V2_DownloadWarningUI) {
       {TrustSafetySentimentService::FeatureArea::kDownloadWarningUI});
   CheckCallTriggerOccurredHistogram(
       {{TrustSafetySentimentService::FeatureArea::kDownloadWarningUI, 1}});
-}
-
-TEST_F(TrustSafetySentimentServiceTest, PasswordProtectionUINonPasswordChange) {
-  // Making a final decision on a password protection UI is considered a
-  // trigger, and should make a user eligible to receive a survey.
-  FeatureParamsV2 params;
-  params.password_protection_ui_probability = "1.0";
-  params.min_time_to_prompt = "0s";
-  params.ntp_visits_min_range = "0";
-  params.ntp_visits_max_range = "0";
-  SetupFeatureParametersV2(params);
-
-  // The correct survey should be launched.
-  EXPECT_CALL(*mock_hats_service(),
-              LaunchSurvey(kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI,
-                           _, _, _, _, _, _));
-  service()->PhishedPasswordUpdateNotClicked(
-      PasswordProtectionUIType::PAGE_INFO,
-      PasswordProtectionUIAction::IGNORE_WARNING);
-  service()->OpenedNewTabPage();
-  CheckHistograms(
-      {TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI},
-      {TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI});
-  CheckCallTriggerOccurredHistogram(
-      {{TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI, 1}});
-}
-
-TEST_F(TrustSafetySentimentServiceTest,
-       PasswordProtectionUIPasswordChangeClickedNotCompleted) {
-  // Making a final decision on a password protection UI is considered a
-  // trigger, and should make a user eligible to receive a survey.
-  FeatureParamsV2 params;
-  params.password_protection_ui_probability = "1.0";
-  params.min_time_to_prompt = "0s";
-  params.ntp_visits_min_range = "0";
-  params.ntp_visits_max_range = "0";
-  SetupFeatureParametersV2(params);
-
-  // The correct survey should be launched.
-  EXPECT_CALL(*mock_hats_service(),
-              LaunchSurvey(kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI,
-                           _, _, _, _, _, _));
-  service()->ProtectResetOrCheckPasswordClicked(
-      PasswordProtectionUIType::PAGE_INFO);
-  task_environment()->AdvanceClock(kPasswordChangeInactivity);
-  task_environment()->RunUntilIdle();
-  service()->OpenedNewTabPage();
-
-  CheckHistograms(
-      {TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI},
-      {TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI});
-  CheckCallTriggerOccurredHistogram(
-      {{TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI, 1}});
-}
-
-TEST_F(TrustSafetySentimentServiceTest,
-       PasswordProtectionUIPasswordChangeClickedAndCompleted) {
-  // Making a final decision on a password protection UI is considered a
-  // trigger, and should make a user eligible to receive a survey.
-  FeatureParamsV2 params;
-  params.password_protection_ui_probability = "1.0";
-  params.min_time_to_prompt = "0s";
-  params.ntp_visits_min_range = "0";
-  params.ntp_visits_max_range = "0";
-  SetupFeatureParametersV2(params);
-
-  // The correct survey should be launched.
-  EXPECT_CALL(*mock_hats_service(),
-              LaunchSurvey(kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI,
-                           _, _, _, _, _, _));
-  service()->ProtectResetOrCheckPasswordClicked(
-      PasswordProtectionUIType::PAGE_INFO);
-  service()->PhishedPasswordUpdateFinished();
-  service()->OpenedNewTabPage();
-  CheckHistograms(
-      {TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI},
-      {TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI});
-  CheckCallTriggerOccurredHistogram(
-      {{TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI, 1}});
-}
-
-TEST_F(TrustSafetySentimentServiceTest,
-       PasswordProtectionUIPasswordChangeThenNonPasswordChange) {
-  // Making a final decision on a password protection UI is considered a
-  // trigger, and should make a user eligible to receive a survey.
-  FeatureParamsV2 params;
-  params.password_protection_ui_probability = "1.0";
-  params.min_time_to_prompt = "0s";
-  params.ntp_visits_min_range = "0";
-  params.ntp_visits_max_range = "0";
-  SetupFeatureParametersV2(params);
-
-  // The correct survey should be launched.
-  EXPECT_CALL(*mock_hats_service(),
-              LaunchSurvey(kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI,
-                           _, _, _, _, _, _));
-  service()->ProtectResetOrCheckPasswordClicked(
-      PasswordProtectionUIType::PAGE_INFO);
-  service()->PhishedPasswordUpdateNotClicked(
-      PasswordProtectionUIType::PAGE_INFO, PasswordProtectionUIAction::CLOSE);
-  service()->PhishedPasswordUpdateFinished();
-  service()->OpenedNewTabPage();
-  CheckCallTriggerOccurredHistogram(
-      {{TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI, 2}});
-}
-
-TEST_F(TrustSafetySentimentServiceTest,
-       PasswordProtectionUIPasswordChangeThenNonPasswordChange2) {
-  // Making a final decision on a password protection UI is considered a
-  // trigger, and should make a user eligible to receive a survey.
-  FeatureParamsV2 params;
-  params.password_protection_ui_probability = "1.0";
-  params.min_time_to_prompt = "0s";
-  params.ntp_visits_min_range = "0";
-  params.ntp_visits_max_range = "0";
-  SetupFeatureParametersV2(params);
-
-  // The correct survey should be launched.
-  EXPECT_CALL(*mock_hats_service(),
-              LaunchSurvey(kHatsSurveyTriggerTrustSafetyV2PasswordProtectionUI,
-                           _, _, _, _, _, _));
-  service()->ProtectResetOrCheckPasswordClicked(
-      PasswordProtectionUIType::PAGE_INFO);
-  service()->PhishedPasswordUpdateNotClicked(
-      PasswordProtectionUIType::PAGE_INFO, PasswordProtectionUIAction::CLOSE);
-  service()->PhishedPasswordUpdateFinished();
-  task_environment()->AdvanceClock(kPasswordChangeInactivity);
-  service()->OpenedNewTabPage();
-  CheckCallTriggerOccurredHistogram(
-      {{TrustSafetySentimentService::FeatureArea::kPasswordProtectionUI, 2}});
 }

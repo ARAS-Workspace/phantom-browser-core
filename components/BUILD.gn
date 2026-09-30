@@ -603,7 +603,6 @@ test("components_unittests") {
       "//components/safe_browsing/core/browser:suspicious_site_warning_allowlist_unittest",
       "//components/safe_browsing/core/browser:token_fetcher_unit_tests",
       "//components/safe_browsing/core/browser/hashprefix_realtime:unit_tests",
-      "//components/safe_browsing/core/browser/password_protection:unit_tests",
       "//components/safe_browsing/core/browser/realtime:unit_tests",
       "//components/safe_browsing/core/browser/tailored_security_service:unit_tests",
       "//components/safe_browsing/core/browser/utils:unit_tests",
@@ -617,7 +616,6 @@ test("components_unittests") {
     deps += [
       # TODO(chromium: 1169835) components / reporting / storage / resources:
       # unit_tests can't be run on iOS until they are updated.
-      "//components/safe_browsing/content/browser/password_protection:password_protection_unittest",
       "//components/safe_browsing/content/browser/triggers:unit_tests",
       "//components/safe_browsing/content/browser/web_ui:unit_tests",
       "//components/safe_browsing/content/common:file_type_policies_policy_util_unittest",
@@ -634,7 +632,6 @@ test("components_unittests") {
       "//components/safe_browsing/core/browser:verdict_cache_manager_unittest",
       "//components/safe_browsing/core/browser/db:unit_tests_local_db",
       "//components/safe_browsing/core/browser/db:v4_test_util",
-      "//components/safe_browsing/core/browser/password_protection:unit_tests",
       "//components/safe_browsing/core/browser/sync:unittests",
       "//components/safe_browsing/core/common:unit_tests",
     ]
