@@ -49,7 +49,6 @@ class EventRouterForwarder;
 class ExtensionCache;
 class ExtensionsAPIClient;
 class ProcessManagerDelegate;
-class SafeBrowsingDelegate;
 class ScopedBrowserContextKeepAlive;
 class UserScriptListener;
 
@@ -201,7 +200,6 @@ class ChromeExtensionsBrowserClient : public ExtensionsBrowserClient {
                                        int* tab_id,
                                        int* window_id) override;
   KioskDelegate* GetKioskDelegate() override;
-  SafeBrowsingDelegate* GetSafeBrowsingDelegate() override;
   std::string GetApplicationLocale() override;
   bool IsExtensionEnabled(const ExtensionId& extension_id,
                           content::BrowserContext* context) const override;
@@ -364,8 +362,6 @@ class ChromeExtensionsBrowserClient : public ExtensionsBrowserClient {
   std::unique_ptr<ExtensionCache> extension_cache_;
 
   std::unique_ptr<KioskDelegate> kiosk_delegate_;
-
-  std::unique_ptr<SafeBrowsingDelegate> safe_browsing_delegate_;
 
   std::unique_ptr<UserScriptListener> user_script_listener_;
 

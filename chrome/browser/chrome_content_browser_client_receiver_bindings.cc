@@ -20,7 +20,6 @@
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/predictors/loading_predictor.h"
 #include "chrome/browser/predictors/loading_predictor_factory.h"
-#include "chrome/browser/safe_browsing/extension_telemetry/extension_web_request_reporter_impl.h"
 #include "chrome/browser/signin/google_accounts_private_api_host.h"
 #include "chrome/browser/supervised_user/supervised_user_navigation_observer.h"
 #include "chrome/browser/trusted_vault/trusted_vault_encryption_keys_tab_helper.h"
@@ -70,7 +69,6 @@
 #include "chrome/browser/media/output_protection_impl.h"
 #include "services/metrics/ukm_recorder_factory_impl.h"
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
-
 
 #include "chrome/browser/badging/badge_manager.h"
 #include "chrome/browser/record_replay/chrome_record_replay_client.h"
@@ -141,26 +139,6 @@ void MaybeCreateSafeBrowsingForRenderer(
                           allowlist_domains),
       std::move(receiver));
 }
-
-// TODO(crbug.com/486154580): Switch to ENABLE_EXTENSIONS_CORE when safe
-// browsing is better supported on desktop Android.
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-void MaybeCreateExtensionWebRequestReporterForRenderer(
-    int process_id,
-    mojo::PendingReceiver<safe_browsing::mojom::ExtensionWebRequestReporter>
-        receiver) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  content::RenderProcessHost* render_process_host =
-      content::RenderProcessHost::FromID(process_id);
-  if (!render_process_host) {
-    return;
-  }
-
-  safe_browsing::ExtensionWebRequestReporterImpl::Create(render_process_host,
-                                                         std::move(receiver));
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
 void BindBadgeServiceForServiceWorker(
@@ -211,14 +189,6 @@ void ChromeContentBrowserClient::ExposeInterfacesToRenderer(
                 &ChromeContentBrowserClient::GetSafeBrowsingUrlCheckerDelegate,
                 base::Unretained(this))),
         ui_task_runner);
-// TODO(crbug.com/486154580): Switch to ENABLE_EXTENSIONS_CORE when safe
-// browsing is better supported on desktop Android.
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-    registry->AddInterface<safe_browsing::mojom::ExtensionWebRequestReporter>(
-        base::BindRepeating(&MaybeCreateExtensionWebRequestReporterForRenderer,
-                            render_process_host->GetDeprecatedID()),
-        ui_task_runner);
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
   }
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 

@@ -35,7 +35,6 @@
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/browser/quota_service.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "extensions/common/api/declarative_net_request.h"
 #include "extensions/common/api/declarative_net_request/constants.h"
 #include "extensions/common/api/declarative_net_request/dnr_manifest_data.h"
@@ -132,14 +131,6 @@ DeclarativeNetRequestUpdateDynamicRulesFunction::Run() {
   // Early return if there is nothing to do.
   if (rule_ids_to_remove.empty() && rules_to_add.empty()) {
     return RespondNow(NoArguments());
-  }
-
-  // Collect rules to add in the Extension Telemetry Service.
-  if (!rules_to_add.empty()) {
-    ExtensionsBrowserClient::Get()
-        ->GetSafeBrowsingDelegate()
-        ->NotifyExtensionApiDeclarativeNetRequest(browser_context(),
-                                                  extension_id(), rules_to_add);
   }
 
   auto* rules_monitor_service =
@@ -247,14 +238,6 @@ DeclarativeNetRequestUpdateSessionRulesFunction::Run() {
   // Early return if there is nothing to do.
   if (rule_ids_to_remove.empty() && rules_to_add.empty()) {
     return RespondNow(NoArguments());
-  }
-
-  // Collect rules to add in the Extension Telemetry Service.
-  if (!rules_to_add.empty()) {
-    ExtensionsBrowserClient::Get()
-        ->GetSafeBrowsingDelegate()
-        ->NotifyExtensionApiDeclarativeNetRequest(browser_context(),
-                                                  extension_id(), rules_to_add);
   }
 
   auto* rules_monitor_service =

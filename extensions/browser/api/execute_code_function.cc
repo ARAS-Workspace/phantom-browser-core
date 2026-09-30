@@ -14,7 +14,6 @@
 #include "extensions/browser/extension_api_frame_id_map.h"
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/browser/load_and_localize_file.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "extensions/common/error_utils.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_resource.h"
@@ -175,13 +174,6 @@ ExtensionFunction::ResponseAction ExecuteCodeFunction::Run() {
     return RespondNow(Error(std::move(error)));
 
   if (details_->code) {
-    if (!IsWebView() && extension()) {
-      ExtensionsBrowserClient::Get()
-          ->GetSafeBrowsingDelegate()
-          ->NotifyExtensionApiTabExecuteScript(browser_context(),
-                                               extension_id(), *details_->code);
-    }
-
     if (!Execute(*details_->code, &error))
       return RespondNow(Error(std::move(error)));
     return did_respond() ? AlreadyResponded() : RespondLater();

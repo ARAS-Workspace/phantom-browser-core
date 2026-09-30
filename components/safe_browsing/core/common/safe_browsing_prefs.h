@@ -215,37 +215,6 @@ inline constexpr char kSafeBrowsingSyncedEnhancedProtectionUpdateTimestamp[] =
     "safebrowsing.esb_as_a_synced_setting_enhanced_protection_update_epoch_"
     "micros";
 
-// The last time the Extension Telemetry Service successfully
-// uploaded its data.
-inline constexpr char kExtensionTelemetryLastUploadTime[] =
-    "safebrowsing.extension_telemetry_last_upload_time";
-
-// The saved copy of the current configuration that will be used by
-// the Extension Telemetry Service.
-inline constexpr char kExtensionTelemetryConfig[] =
-    "safebrowsing.extension_telemetry_configuration";
-
-// A dictionary of extension ids and their file data from the
-// Telemetry Service's file processor.
-inline constexpr char kExtensionTelemetryFileData[] =
-    "safebrowsing.extension_telemetry_file_data";
-
-// The last time the search hijacking heuristic was checked.
-inline constexpr char kExtensionTelemetrySearchHijackingLastCheckTime[] =
-    "safebrowsing.extension_telemetry.search_hijacking_last_check_time";
-
-// The data associated with a search hijacking signal.
-inline constexpr char kExtensionTelemetrySearchHijackingSignalData[] =
-    "safebrowsing.extension_telemetry.search_hijacking_signal_data";
-
-// The number of omnibox searches observed.
-inline constexpr char kExtensionTelemetrySearchHijackingOmniboxSearchCount[] =
-    "safebrowsing.extension_telemetry.search_hijacking_omnibox_search_count";
-
-// The number of SERP landings observed.
-inline constexpr char kExtensionTelemetrySearchHijackingSerpLandingCount[] =
-    "safebrowsing.extension_telemetry.search_hijacking_serp_landing_count";
-
 // A boolean indicating if hash-prefix real-time lookups are allowed by policy.
 // If false, the lookups will instead be hash-prefix database lookups. If true,
 // there is no such override; the hash-prefix real-time lookups might still not
@@ -436,7 +405,6 @@ bool IsExtendedReportingOptInAllowed(const PrefService& prefs);
 // regardless of which specific one is set.
 bool IsExtendedReportingEnabled(const PrefService& prefs);
 
-
 // Returns whether the active Extended Reporting pref is currently managed by
 // enterprise policy, meaning the user can't change it.
 bool IsExtendedReportingPolicyManaged(const PrefService& prefs);
@@ -484,25 +452,6 @@ void SetExtendedReportingPrefAndMetric(PrefService* prefs,
 
 // This variant is used to simplify test code by omitting the location.
 void SetExtendedReportingPrefForTests(PrefService* prefs, bool value);
-
-// Set the current configuration being used by the Extension Telemetry Service
-void SetExtensionTelemetryConfig(PrefService& prefs,
-                                 const base::DictValue& config);
-
-// Get the current configuration being used by the Extension Telemetry Service
-const base::DictValue& GetExtensionTelemetryConfig(const PrefService& prefs);
-
-// Get the current processed file data stored in the Extension Telemetry
-// Service.
-const base::DictValue& GetExtensionTelemetryFileData(const PrefService& prefs);
-
-// Sets the last time the Extension Telemetry Service successfully uploaded
-// its data.
-void SetLastUploadTimeForExtensionTelemetry(PrefService& prefs,
-                                            const base::Time& time);
-
-// Returns the `kExtensionTelemetryLastUploadTime` user preference.
-base::Time GetLastUploadTimeForExtensionTelemetry(PrefService& prefs);
 
 // Sets the currently active Safe Browsing Enhanced Protection to the specified
 // value.

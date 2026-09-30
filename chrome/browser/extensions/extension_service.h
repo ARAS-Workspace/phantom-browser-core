@@ -21,7 +21,6 @@
 #include "base/scoped_observation.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/extensions/extension_management.h"
-#include "chrome/browser/extensions/extension_telemetry_service_verdict_handler.h"
 #include "chrome/browser/extensions/forced_extensions/force_installed_metrics.h"
 #include "chrome/browser/extensions/forced_extensions/force_installed_tracker.h"
 #include "chrome/browser/extensions/omaha_attributes_handler.h"
@@ -173,11 +172,6 @@ class ExtensionService : public ExtensionServiceInterface,
   // Performs action based on Omaha attributes for the extension.
   void PerformActionBasedOnOmahaAttributes(const std::string& extension_id,
                                            const base::DictValue& attributes);
-
-  // Performs action based on verdicts received from the Extension Telemetry
-  // server. Currently, these verdicts are limited to off-store extensions.
-  void PerformActionBasedOnExtensionTelemetryServiceVerdicts(
-      const Blocklist::BlocklistStateMap& blocklist_state_map);
 
   // Disable non-default and non-managed extensions with ids not in
   // `except_ids`. Default extensions are those from the Web Store with
@@ -382,10 +376,6 @@ class ExtensionService : public ExtensionServiceInterface,
 
   // Needs `extension_registrar_` during construction.
   SafeBrowsingVerdictHandler safe_browsing_verdict_handler_;
-
-  // Needs `extension_registrar_` during construction.
-  ExtensionTelemetryServiceVerdictHandler
-      extension_telemetry_service_verdict_handler_;
 
   // Needs `extension_registrar_` during construction.
   OmahaAttributesHandler omaha_attributes_handler_;

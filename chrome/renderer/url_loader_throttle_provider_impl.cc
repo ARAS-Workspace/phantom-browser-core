@@ -100,18 +100,9 @@ URLLoaderThrottleProviderImpl::Create(
     blink::ThreadSafeBrowserInterfaceBrokerProxy* broker) {
   mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing> pending_safe_browsing;
   broker->GetInterface(pending_safe_browsing.InitWithNewPipeAndPassReceiver());
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
-      pending_extension_web_request_reporter;
-  broker->GetInterface(
-      pending_extension_web_request_reporter.InitWithNewPipeAndPassReceiver());
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   return std::make_unique<URLLoaderThrottleProviderImpl>(
       type, chrome_content_renderer_client, std::move(pending_safe_browsing),
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-      std::move(pending_extension_web_request_reporter),
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
       /*main_thread_task_runner=*/
       content::RenderThread::IsMainThread()
           ? base::SequencedTaskRunner::GetCurrentDefault()
@@ -124,19 +115,11 @@ URLLoaderThrottleProviderImpl::URLLoaderThrottleProviderImpl(
     ChromeContentRendererClient* chrome_content_renderer_client,
     mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
         pending_safe_browsing,
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-    mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
-        pending_extension_web_request_reporter,
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
     scoped_refptr<base::SequencedTaskRunner> main_thread_task_runner,
     base::PassKey<URLLoaderThrottleProviderImpl>)
     : type_(type),
       chrome_content_renderer_client_(chrome_content_renderer_client),
       pending_safe_browsing_(std::move(pending_safe_browsing)),
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-      pending_extension_web_request_reporter_(
-          std::move(pending_extension_web_request_reporter)),
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
       main_thread_task_runner_(std::move(main_thread_task_runner)) {
   DETACH_FROM_SEQUENCE(sequence_checker_);
 }
@@ -150,9 +133,6 @@ URLLoaderThrottleProviderImpl::Clone() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return std::make_unique<URLLoaderThrottleProviderImpl>(
       type_, chrome_content_renderer_client_, CloneSafeBrowsingPendingRemote(),
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-      CloneExtensionWebRequestReporterPendingRemote(),
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
       main_thread_task_runner_, base::PassKey<URLLoaderThrottleProviderImpl>());
 }
 
@@ -179,23 +159,6 @@ URLLoaderThrottleProviderImpl::CreateThrottles(
 
   DCHECK(!is_frame_resource ||
          type_ == blink::URLLoaderThrottleProviderType::kFrame);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (!is_frame_resource) {
-    if (pending_safe_browsing_) {
-      safe_browsing_.Bind(std::move(pending_safe_browsing_));
-    }
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-    auto throttle = std::make_unique<safe_browsing::RendererURLLoaderThrottle>(
-        safe_browsing_.get(), local_frame_token,
-        CloneExtensionWebRequestReporterPendingRemote());
-#else
-    auto throttle = std::make_unique<safe_browsing::RendererURLLoaderThrottle>(
-        safe_browsing_.get(), local_frame_token);
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-    throttles.emplace_back(std::move(throttle));
-  }
-#endif
 
   if (type_ == blink::URLLoaderThrottleProviderType::kFrame &&
       !is_frame_resource && local_frame_token.has_value()) {
@@ -291,21 +254,3 @@ URLLoaderThrottleProviderImpl::CloneSafeBrowsingPendingRemote() {
   return new_pending_safe_browsing;
 }
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
-URLLoaderThrottleProviderImpl::CloneExtensionWebRequestReporterPendingRemote() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
-      new_pending_extension_web_request_reporter;
-  if (pending_extension_web_request_reporter_) {
-    extension_web_request_reporter_.Bind(
-        std::move(pending_extension_web_request_reporter_));
-  }
-  if (extension_web_request_reporter_) {
-    extension_web_request_reporter_->Clone(
-        new_pending_extension_web_request_reporter
-            .InitWithNewPipeAndPassReceiver());
-  }
-  return new_pending_extension_web_request_reporter;
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)

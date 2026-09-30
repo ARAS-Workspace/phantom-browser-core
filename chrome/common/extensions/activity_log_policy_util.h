@@ -16,11 +16,8 @@ namespace extensions::activity_log_policy_util {
 // A shared utility namespace for identifying and normalizing high-risk
 // extension activities for enterprise telemetry.
 //
-// This logic is shared between:
-// 1. The Renderer (ChromePolicyActivityLogFilterDelegate): To decide which
-//    activities are important enough to send over IPC to the browser.
-// 2. The Browser (ActivityLogIngester): To verify renderer IPCs and
-//    transform them into structured telemetry signals.
+// The Renderer (ChromePolicyActivityLogFilterDelegate) uses it to decide which
+// activities are important enough to send over IPC to the browser.
 
 // Defines the categories of high-risk activity signals.
 enum class TelemetrySignalType {

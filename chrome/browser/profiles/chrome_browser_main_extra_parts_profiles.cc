@@ -458,7 +458,6 @@
 #include "components/gapis/features.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
 #include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_factory.h"
 #endif
@@ -474,7 +473,6 @@
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
 #include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
-#include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service_factory.h"
 #include "chrome/browser/safe_browsing/hash_realtime_service_factory.h"
 #endif
 
@@ -930,11 +928,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   safe_browsing::ClientSideDetectionIntelligentScanDelegateFactory::
       GetInstance();
   safe_browsing::ClientSideDetectionServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  safe_browsing::ExtensionTelemetryServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #endif
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   safe_browsing::HashRealTimeServiceFactory::GetInstance();

@@ -247,24 +247,6 @@ BASE_FEATURE(kExtendedReportingRemovePrefDependency,
 BASE_FEATURE(kExtensionBlocklistSkipNetworkQuery,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kExtensionTelemetryConfiguration,
-             "SafeBrowsingExtensionTelemetryConfiguration",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kExtensionTelemetryEnterpriseShortReportingInterval,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kExtensionTelemetrySearchHijackingSignal,
-             "SafeBrowsingExtensionTelemetrySearchHijackingSignal",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-constexpr base::FeatureParam<int>
-    kExtensionTelemetrySearchHijackingSignalHeuristicCheckIntervalSeconds{
-        &kExtensionTelemetrySearchHijackingSignal,
-        "HeuristicCheckIntervalSeconds", 28800 /* 8 hours */};
-constexpr base::FeatureParam<int>
-    kExtensionTelemetrySearchHijackingSignalHeuristicThreshold{
-        &kExtensionTelemetrySearchHijackingSignal, "HeuristicThreshold", 2};
-
 BASE_FEATURE(kExternalAppRedirectTelemetry,
              "SafeBrowsingExternalAppRedirectTelemetry",
              base::FEATURE_DISABLED_BY_DEFAULT);

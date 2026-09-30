@@ -43,18 +43,6 @@ RendererURLLoaderThrottle::RendererURLLoaderThrottle(
     : safe_browsing_(safe_browsing),
       frame_token_(local_frame_token.CopyAsOptional()) {}
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-RendererURLLoaderThrottle::RendererURLLoaderThrottle(
-    mojom::SafeBrowsing* safe_browsing,
-    base::optional_ref<const blink::LocalFrameToken> local_frame_token,
-    mojo::PendingRemote<mojom::ExtensionWebRequestReporter>
-        extension_web_request_reporter)
-    : safe_browsing_(safe_browsing),
-      frame_token_(local_frame_token.CopyAsOptional()),
-      extension_web_request_reporter_(
-          std::move(extension_web_request_reporter)) {}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
 RendererURLLoaderThrottle::~RendererURLLoaderThrottle() {
   if (deferred_) {
     TRACE_EVENT_END("safe_browsing",
@@ -70,14 +58,6 @@ void RendererURLLoaderThrottle::DetachFromCurrentSequence() {
       safe_browsing_pending_remote_.InitWithNewPipeAndPassReceiver());
   safe_browsing_ = nullptr;
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  // Pass the pipe to the ExtensionWebRequestReporter interface to be bound to
-  // a different sequence.
-  if (extension_web_request_reporter_) {
-    pending_extension_web_request_reporter_ =
-        extension_web_request_reporter_.Unbind();
-  }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 }
 
 void RendererURLLoaderThrottle::WillStartRequest(
@@ -86,10 +66,6 @@ void RendererURLLoaderThrottle::WillStartRequest(
   DCHECK_EQ(0u, pending_checks_);
   DCHECK(!blocked_);
   DCHECK(!url_checker_);
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  MaybeSendExtensionWebRequestData(request);
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   base::UmaHistogramEnumeration(
       "SafeBrowsing.RendererThrottle.RequestDestination", request->destination);
@@ -111,21 +87,6 @@ void RendererURLLoaderThrottle::WillRedirectRequest(
   // If |blocked_| is true, the resource load has been canceled and there
   // shouldn't be such a notification.
   DCHECK(!blocked_);
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  BindExtensionWebRequestReporterPipeIfDetached();
-  // Send redirected request data to the browser if request originated from an
-  // extension and the redirected url is HTTP/HTTPS scheme only.
-  if (!origin_extension_id_.empty() &&
-      redirect_info->new_url.SchemeIsHTTPOrHTTPS()) {
-    extension_web_request_reporter_->SendWebRequestData(
-        origin_extension_id_, redirect_info->new_url,
-        mojom::WebRequestProtocolType::kHttpHttps,
-        initiated_from_content_script_
-            ? mojom::WebRequestContactInitiatorType::kContentScript
-            : mojom::WebRequestContactInitiatorType::kExtension);
-  }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   if (!url_checker_) {
     DCHECK_EQ(0u, pending_checks_);
@@ -218,47 +179,5 @@ void RendererURLLoaderThrottle::OnMojoDisconnect() {
     delegate_->Resume();
   }
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-void RendererURLLoaderThrottle::
-    BindExtensionWebRequestReporterPipeIfDetached() {
-  if (pending_extension_web_request_reporter_) {
-    extension_web_request_reporter_.Bind(
-        std::move(pending_extension_web_request_reporter_));
-  }
-}
-
-void RendererURLLoaderThrottle::MaybeSendExtensionWebRequestData(
-    network::ResourceRequest* request) {
-  BindExtensionWebRequestReporterPipeIfDetached();
-  // Skip if request destination isn't HTTP/HTTPS (ex. extension scheme).
-  if (!request->url.SchemeIsHTTPOrHTTPS()) {
-    return;
-  }
-
-  // Populate |origin_extension_id_| if request is initiated from an extension
-  // page/service worker or content script.
-  if (request->request_initiator &&
-      request->request_initiator->scheme() == extensions::kExtensionScheme) {
-    origin_extension_id_ = request->request_initiator->host();
-  } else if (request->isolated_world_origin &&
-             request->isolated_world_origin->scheme() ==
-                 extensions::kExtensionScheme) {
-    origin_extension_id_ = request->isolated_world_origin->host();
-    initiated_from_content_script_ = true;
-  }
-
-  // Send data only if |origin_extension_id_| is populated, which means the
-  // request originated from an extension.
-  if (!origin_extension_id_.empty()) {
-    extension_web_request_reporter_->SendWebRequestData(
-        origin_extension_id_, request->url,
-        mojom::WebRequestProtocolType::kHttpHttps,
-        initiated_from_content_script_
-            ? mojom::WebRequestContactInitiatorType::kContentScript
-            : mojom::WebRequestContactInitiatorType::kExtension);
-  }
-}
-#endif
 
 }  // namespace safe_browsing

@@ -214,9 +214,6 @@ ExtensionService::ExtensionService(
       safe_browsing_verdict_handler_(extension_prefs,
                                      registry_,
                                      extension_registrar_),
-      extension_telemetry_service_verdict_handler_(extension_prefs,
-                                                   registry_,
-                                                   extension_registrar_),
       omaha_attributes_handler_(extension_prefs,
                                 registry_,
                                 extension_registrar_),
@@ -450,15 +447,6 @@ void ExtensionService::PerformActionBasedOnOmahaAttributes(
                                                                 attributes);
   allowlist_->PerformActionBasedOnOmahaAttributes(extension_id, attributes);
   // Show an error for the newly blocklisted extension.
-  error_controller_->ShowErrorIfNeeded();
-}
-
-void ExtensionService::PerformActionBasedOnExtensionTelemetryServiceVerdicts(
-    const Blocklist::BlocklistStateMap& blocklist_state_map) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  extension_telemetry_service_verdict_handler_.PerformActionBasedOnVerdicts(
-      blocklist_state_map);
   error_controller_->ShowErrorIfNeeded();
 }
 

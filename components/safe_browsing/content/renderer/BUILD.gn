@@ -33,13 +33,6 @@ source_set("throttles") {
       "renderer_url_loader_throttle.h",
     ]
 
-    if (enable_extensions) {
-      sources += [
-        "websocket_sb_extensions_handshake_throttle.cc",
-        "websocket_sb_extensions_handshake_throttle.h",
-      ]
-    }
-
     configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
     deps = [
@@ -65,10 +58,6 @@ source_set("throttles_unittest") {
   if (safe_browsing_mode != 0) {
     testonly = true
     sources = [ "renderer_url_loader_throttle_unittest.cc" ]
-    if (enable_extensions) {
-      sources += [ "websocket_sb_extensions_handshake_throttle_unittest.cc" ]
-    }
-
     deps = [
       ":throttles",
       "//base",

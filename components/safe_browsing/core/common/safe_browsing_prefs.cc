@@ -322,18 +322,6 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterTimePref(
       prefs::kSafeBrowsingSyncedEnhancedProtectionUpdateTimestamp,
       base::Time());
-  registry->RegisterTimePref(prefs::kExtensionTelemetryLastUploadTime,
-                             base::Time());
-  registry->RegisterDictionaryPref(prefs::kExtensionTelemetryConfig);
-  registry->RegisterDictionaryPref(prefs::kExtensionTelemetryFileData);
-  registry->RegisterTimePref(
-      prefs::kExtensionTelemetrySearchHijackingLastCheckTime, base::Time());
-  registry->RegisterDictionaryPref(
-      prefs::kExtensionTelemetrySearchHijackingSignalData);
-  registry->RegisterIntegerPref(
-      prefs::kExtensionTelemetrySearchHijackingOmniboxSearchCount, 0);
-  registry->RegisterIntegerPref(
-      prefs::kExtensionTelemetrySearchHijackingSerpLandingCount, 0);
   registry->RegisterBooleanPref(prefs::kHashPrefixRealTimeChecksAllowedByPolicy,
                                 true);
   registry->RegisterBooleanPref(prefs::kSafeBrowsingSurveysEnabled, true);
@@ -341,28 +329,6 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(
       prefs::kSafeBrowsingScoutReportingEnabledWhenDeprecated, false);
   registry->RegisterDictionaryPref(prefs::kExternalAppRedirectTimestamps);
-}
-
-const base::DictValue& GetExtensionTelemetryConfig(const PrefService& prefs) {
-  return prefs.GetDict(prefs::kExtensionTelemetryConfig);
-}
-
-const base::DictValue& GetExtensionTelemetryFileData(const PrefService& prefs) {
-  return prefs.GetDict(prefs::kExtensionTelemetryFileData);
-}
-
-void SetExtensionTelemetryConfig(PrefService& prefs,
-                                 const base::DictValue& config) {
-  prefs.SetDict(prefs::kExtensionTelemetryConfig, config.Clone());
-}
-
-base::Time GetLastUploadTimeForExtensionTelemetry(PrefService& prefs) {
-  return (prefs.GetTime(prefs::kExtensionTelemetryLastUploadTime));
-}
-
-void SetLastUploadTimeForExtensionTelemetry(PrefService& prefs,
-                                            const base::Time& time) {
-  prefs.SetTime(prefs::kExtensionTelemetryLastUploadTime, time);
 }
 
 void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {

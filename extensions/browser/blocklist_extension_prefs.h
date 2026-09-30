@@ -94,19 +94,6 @@ BitMapBlocklistState GetSafeBrowsingExtensionBlocklistState(
     const ExtensionId& extension_id,
     const ExtensionPrefs* extension_prefs);
 
-// Sets the `bitmap_blocklist_state` to the Extension Telemetry service
-// blocklist state pref.
-void SetExtensionTelemetryServiceBlocklistState(
-    const ExtensionId& extension_id,
-    BitMapBlocklistState bitmap_blocklist_state,
-    ExtensionPrefs* extension_prefs);
-
-// Returns the current Extension Telemetry service blocklist state of the
-// `extension_id`.
-BitMapBlocklistState GetExtensionTelemetryServiceBlocklistState(
-    const ExtensionId& extension_id,
-    const ExtensionPrefs* extension_prefs);
-
 }  // namespace blocklist_prefs
 }  // namespace extensions
 

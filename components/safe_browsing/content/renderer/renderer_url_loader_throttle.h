@@ -37,15 +37,6 @@ class RendererURLLoaderThrottle : public blink::URLLoaderThrottle {
   RendererURLLoaderThrottle(
       mojom::SafeBrowsing* safe_browsing,
       base::optional_ref<const blink::LocalFrameToken> local_frame_token);
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  // |extension_web_request_reporter| is used for sending
-  // extension web requests to the browser.
-  RendererURLLoaderThrottle(
-      mojom::SafeBrowsing* safe_browsing,
-      base::optional_ref<const blink::LocalFrameToken> local_frame_token,
-      mojo::PendingRemote<mojom::ExtensionWebRequestReporter>
-          extension_web_request_reporter);
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
   ~RendererURLLoaderThrottle() override;
 
  private:
@@ -98,25 +89,6 @@ class RendererURLLoaderThrottle : public blink::URLLoaderThrottle {
   bool deferred_ = false;
 
   GURL original_url_;
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  // Bind the pipe created in DetachFromCurrentSequence to the current
-  // sequence.
-  void BindExtensionWebRequestReporterPipeIfDetached();
-
-  // Send web request data to the browser if the request
-  // originated from an extension and destination is HTTP/HTTPS scheme only.
-  void MaybeSendExtensionWebRequestData(network::ResourceRequest* request);
-
-  mojo::Remote<mojom::ExtensionWebRequestReporter>
-      extension_web_request_reporter_;
-  mojo::PendingRemote<mojom::ExtensionWebRequestReporter>
-      pending_extension_web_request_reporter_;
-  // Tracks if the request originated from an extension, used during redirects
-  // to send web request data to the telemetry service.
-  std::string origin_extension_id_;
-  bool initiated_from_content_script_ = false;
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   base::WeakPtrFactory<RendererURLLoaderThrottle> weak_factory_{this};
 };

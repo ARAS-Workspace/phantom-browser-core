@@ -13,7 +13,6 @@
 #include "content/public/browser/browser_context.h"
 #include "extensions/browser/extension_host_delegate.h"
 #include "extensions/browser/kiosk/kiosk_delegate.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "extensions/browser/test_runtime_api_delegate.h"
 #include "extensions/browser/updater/null_extension_cache.h"
 #include "extensions/buildflags/buildflags.h"
@@ -109,7 +108,6 @@ class TestKioskDelegate : public KioskDelegate {
 TestExtensionsBrowserClient::TestExtensionsBrowserClient(
     BrowserContext* main_context)
     : extension_cache_(std::make_unique<NullExtensionCache>()),
-      safe_browsing_delegate_(std::make_unique<SafeBrowsingDelegate>()),
       extension_management_client_(
           std::make_unique<TestExtensionManagementClient>()),
       kiosk_delegate_(std::make_unique<TestKioskDelegate>()) {
@@ -368,10 +366,6 @@ TestExtensionsBrowserClient::GetExtensionWebContentsObserver(
 
 KioskDelegate* TestExtensionsBrowserClient::GetKioskDelegate() {
   return kiosk_delegate_.get();
-}
-
-SafeBrowsingDelegate* TestExtensionsBrowserClient::GetSafeBrowsingDelegate() {
-  return safe_browsing_delegate_.get();
 }
 
 UserScriptListener* TestExtensionsBrowserClient::GetUserScriptListener() {

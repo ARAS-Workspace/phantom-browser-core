@@ -34,7 +34,6 @@
 #include "extensions/browser/extension_web_contents_observer.h"
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/browser/process_manager.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "extensions/browser/view_type_utils.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_urls.h"

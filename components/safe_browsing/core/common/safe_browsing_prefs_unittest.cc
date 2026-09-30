@@ -234,13 +234,6 @@ TEST_F(SafeBrowsingPrefsTest, VerifyHashPrefixRealTimeChecksAllowedByPolicy) {
   EXPECT_FALSE(AreHashPrefixRealTimeLookupsAllowedByPolicy(prefs_));
 }
 
-TEST_F(SafeBrowsingPrefsTest, InitializesExtensionTelemetryLastUploadTime) {
-  TestingPrefServiceSimple prefs;
-  safe_browsing::RegisterProfilePrefs(prefs.registry());
-  EXPECT_EQ(prefs.GetTime(prefs::kExtensionTelemetryLastUploadTime),
-            base::Time());
-}
-
 struct SetSafeBrowsingStateTestParams {
   bool initial_tailored_security_enabled;
   bool initial_enhanced_protection_enabled;

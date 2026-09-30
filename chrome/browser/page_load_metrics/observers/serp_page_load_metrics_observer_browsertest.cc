@@ -6,8 +6,6 @@
 
 #include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service.h"
-#include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -19,29 +17,6 @@
 #include "content/public/test/browser_test.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
-#include "testing/gmock/include/gmock/gmock.h"
-
-using testing::_;
-
-namespace {
-
-class MockExtensionTelemetryService
-    : public safe_browsing::ExtensionTelemetryService {
- public:
-  explicit MockExtensionTelemetryService(Profile* profile)
-      : safe_browsing::ExtensionTelemetryService(profile, nullptr) {}
-  ~MockExtensionTelemetryService() override = default;
-
-  MOCK_METHOD(void, OnDseSerpLoaded, (), (override));
-};
-
-std::unique_ptr<KeyedService> BuildMockExtensionTelemetryService(
-    content::BrowserContext* context) {
-  return std::make_unique<MockExtensionTelemetryService>(
-      static_cast<Profile*>(context));
-}
-
-}  // namespace
 
 class SerpPageLoadMetricsObserverBrowserTest : public InProcessBrowserTest {
  public:
@@ -80,18 +55,10 @@ IN_PROC_BROWSER_TEST_F(SerpPageLoadMetricsObserverBrowserTest, NotSerp) {
 
 IN_PROC_BROWSER_TEST_F(SerpPageLoadMetricsObserverBrowserTest, Serp) {
   base::HistogramTester histogram_tester;
-  auto* telemetry_service = static_cast<MockExtensionTelemetryService*>(
-      safe_browsing::ExtensionTelemetryServiceFactory::GetInstance()
-          ->SetTestingFactoryAndUse(
-              browser()->GetProfile(),
-              base::BindRepeating(&BuildMockExtensionTelemetryService)));
-
   auto waiter = std::make_unique<page_load_metrics::PageLoadMetricsTestWaiter>(
       browser()->tab_strip_model()->GetActiveWebContents());
   waiter->AddPageExpectation(page_load_metrics::PageLoadMetricsTestWaiter::
                                  TimingField::kFirstContentfulPaint);
-  EXPECT_CALL(*telemetry_service, OnDseSerpLoaded()).Times(1);
-
   ASSERT_TRUE(ui_test_utils::NavigateToURL(
       browser(), embedded_test_server()->GetURL("/simple.html?q=test")));
   waiter->Wait();

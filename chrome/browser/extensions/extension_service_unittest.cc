@@ -5137,32 +5137,6 @@ TEST_F(ExtensionServiceTest, CanAddDisableReasonToBlocklistedExtension) {
       prefs()->HasDisableReason(kGood1, disable_reason::DISABLE_USER_ACTION));
 }
 
-// Tests the Extension Telemetry service verdict to remotely disable an
-// extension for malware.
-TEST_F(ExtensionServiceTest,
-       DisableRemotelyForMalwareFromExtensionTelemetryServiceVerdict) {
-  InitializeEmptyExtensionService();
-
-  InstallCRX(data_dir().AppendASCII("good.crx"), INSTALL_NEW);
-  EXPECT_TRUE(registry()->enabled_extensions().GetByID(kGoodCrx));
-  EXPECT_EQ(1u, registry()->enabled_extensions().size());
-
-  Blocklist::BlocklistStateMap state_map;
-  state_map[kGoodCrx] = BlocklistState::BLOCKLISTED_MALWARE;
-  service()->PerformActionBasedOnExtensionTelemetryServiceVerdicts(state_map);
-
-  EXPECT_EQ(blocklist_prefs::GetExtensionTelemetryServiceBlocklistState(
-                kGoodCrx, prefs()),
-            BitMapBlocklistState::BLOCKLISTED_MALWARE);
-  EXPECT_TRUE(blocklist_prefs::IsExtensionBlocklisted(kGoodCrx, prefs()));
-
-  state_map[kGoodCrx] = BlocklistState::NOT_BLOCKLISTED;
-  service()->PerformActionBasedOnExtensionTelemetryServiceVerdicts(state_map);
-  EXPECT_EQ(1u, registry()->enabled_extensions().size());
-  EXPECT_TRUE(prefs()->GetDisableReasons(kGoodCrx).empty());
-  EXPECT_FALSE(blocklist_prefs::IsExtensionBlocklisted(kGoodCrx, prefs()));
-}
-
 TEST_F(ExtensionServiceTest,
        DisableAndReenableUnpackedExtensionBasedOnDeveloperMode) {
   base::test::ScopedFeatureList feature_list(

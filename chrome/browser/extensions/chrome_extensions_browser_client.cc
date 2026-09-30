@@ -126,7 +126,6 @@
 #include "extensions/browser/permissions/site_permissions_helper.h"
 #include "extensions/browser/pref_names.h"
 #include "extensions/browser/process_manager_delegate.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "extensions/browser/scoped_extension_keep_alive.h"
 #include "extensions/browser/screenshot_access.h"
 #include "extensions/browser/unpacked_installer.h"
@@ -694,10 +693,6 @@ KioskDelegate* ChromeExtensionsBrowserClient::GetKioskDelegate() {
     kiosk_delegate_ = std::make_unique<ChromeKioskDelegate>();
   }
   return kiosk_delegate_.get();
-}
-
-SafeBrowsingDelegate* ChromeExtensionsBrowserClient::GetSafeBrowsingDelegate() {
-  return safe_browsing_delegate_.get();
 }
 
 std::string ChromeExtensionsBrowserClient::GetApplicationLocale() {

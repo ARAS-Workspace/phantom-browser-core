@@ -314,8 +314,6 @@ source_set("extensions") {
     "extension_special_storage_policy.h",
     "extension_tab_util.cc",
     "extension_tab_util.h",
-    "extension_telemetry_service_verdict_handler.cc",
-    "extension_telemetry_service_verdict_handler.h",
     "extension_ui_util.cc",
     "extension_ui_util.h",
     "extension_uninstall_dialog.cc",
@@ -1398,10 +1396,7 @@ source_set("chrome_extensions_browser_client") {
   # TODO(crbug.com/417279245): Add extensions safe browsing to desktop Android,
   # then enable this for safe_browsing_mode == 2 as well.
   if (safe_browsing_mode == 1) {
-    sources += [
-      "chrome_safe_browsing_delegate.cc",
-      "chrome_safe_browsing_delegate.h",
-    ]
+    sources += []
 
     deps += [
       "//chrome/browser/safe_browsing",
@@ -1503,7 +1498,6 @@ source_set("unit_tests") {
     "extension_service_unittest.cc",
     "extension_special_storage_policy_unittest.cc",
     "extension_tab_util_unittest.cc",
-    "extension_telemetry_service_verdict_handler_unittest.cc",
     "extension_ui_util_unittest.cc",
     "extension_url_overrides_unittest.cc",
     "extension_user_script_loader_unittest.cc",
@@ -2049,7 +2043,6 @@ source_set("browser_tests") {
       "//chrome/browser/chrome_service_worker_browsertest.cc",
       "//chrome/browser/notifications/notification_permission_context_apitest.cc",
       "//chrome/browser/page_load_metrics/observers/serp_page_load_metrics_observer_browsertest.cc",
-      "//chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service_browsertest.cc",
       "//chrome/browser/ui/views/user_education/recent_session_observer_impl_browsertest.cc",
       "//chrome/renderer/controlled_frame/web_url_pattern_natives_browsertest.cc",
       "ai_language_model_browsertest.cc",

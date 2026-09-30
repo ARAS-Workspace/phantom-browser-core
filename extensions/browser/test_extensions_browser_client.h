@@ -19,7 +19,6 @@
 #include "components/update_client/update_client.h"
 #include "extensions/browser/extension_management_client.h"
 #include "extensions/browser/extensions_browser_client.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "extensions/browser/updater/extension_cache.h"
 #include "extensions/common/extension_id.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
@@ -169,7 +168,6 @@ class TestExtensionsBrowserClient : public ExtensionsBrowserClient {
   ExtensionWebContentsObserver* GetExtensionWebContentsObserver(
       content::WebContents* web_contents) override;
   KioskDelegate* GetKioskDelegate() override;
-  SafeBrowsingDelegate* GetSafeBrowsingDelegate() override;
   UserScriptListener* GetUserScriptListener() override;
   scoped_refptr<update_client::UpdateClient> CreateUpdateClient(
       scoped_refptr<update_client::Configurator> configurator) override;
@@ -200,7 +198,6 @@ class TestExtensionsBrowserClient : public ExtensionsBrowserClient {
   base::RepeatingCallback<update_client::UpdateClient*(void)>
       update_client_factory_;
 
-  std::unique_ptr<SafeBrowsingDelegate> safe_browsing_delegate_;
   std::unique_ptr<ExtensionManagementClient> extension_management_client_;
   std::unique_ptr<KioskDelegate> kiosk_delegate_;
 };

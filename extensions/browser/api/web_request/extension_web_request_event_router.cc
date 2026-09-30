@@ -53,7 +53,6 @@
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/browser/process_map.h"
 #include "extensions/browser/rules_registry_ids.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/api/web_request/web_request_activity_log_constants.h"
 #include "extensions/common/api/web_request/web_request_constants.h"
@@ -1073,14 +1072,6 @@ int WebRequestEventRouter::OnBeforeRequest(
           DCHECK(action.redirect_url);
           OnDNRActionMatched(browser_context, *request, action);
           *new_url = GetNewUrl(action.redirect_url.value(), browser_context);
-          // Collect redirect action data for the Extension Telemetry Service.
-          if (action.type == DNRRequestAction::Type::REDIRECT) {
-            ExtensionsBrowserClient::Get()
-                ->GetSafeBrowsingDelegate()
-                ->NotifyExtensionDeclarativeNetRequestRedirectAction(
-                    browser_context, action.extension_id, request->url,
-                    action.redirect_url.value());
-          }
           RecordThatNavigationWasInitiatedByExtension(
               request, browser_context, new_url, action.extension_id);
           return net::OK;

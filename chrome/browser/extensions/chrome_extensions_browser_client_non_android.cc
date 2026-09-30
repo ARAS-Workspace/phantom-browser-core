@@ -23,11 +23,9 @@
 #include "components/webapps/isolated_web_apps/url_loading/url_loader_factory.h"
 #include "content/public/browser/security_principal.h"
 #include "content/public/browser/site_instance.h"
-#include "extensions/browser/safe_browsing_delegate.h"
 #include "ipc/constants.mojom.h"
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/extensions/chrome_safe_browsing_delegate.h"
 #endif
 
 namespace extensions {
@@ -37,14 +35,6 @@ void ChromeExtensionsBrowserClient::Init() {
 
   // Must occur after g_browser_process is initialized.
   user_script_listener_ = std::make_unique<UserScriptListener>();
-
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  // Full safe browsing is supported so use the Chrome delegate.
-  safe_browsing_delegate_ = std::make_unique<ChromeSafeBrowsingDelegate>();
-#else
-  // Safe browsing is not available, use a noop delegate.
-  safe_browsing_delegate_ = std::make_unique<SafeBrowsingDelegate>();
-#endif
 }
 
 void ChromeExtensionsBrowserClient::StartTearDown() {

@@ -242,27 +242,8 @@ BASE_DECLARE_FEATURE(kExtendedReportingRemovePrefDependency);
 // because a subsequent check will retrieve the blocklist state.
 BASE_DECLARE_FEATURE(kExtensionBlocklistSkipNetworkQuery);
 
-// Allows the Extension Telemetry Service to accept and use configurations
-// sent by the server.
-BASE_DECLARE_FEATURE(kExtensionTelemetryConfiguration);
-
-// Reduces the extension telemetry service's enterprise telemetry reporting
-// interval to 30 seconds.
-BASE_DECLARE_FEATURE(kExtensionTelemetryEnterpriseShortReportingInterval);
-
-// Enables the search hijacking signal in extension telemetry.
-BASE_DECLARE_FEATURE(kExtensionTelemetrySearchHijackingSignal);
-// The default interval between heuristic checks.
-extern const base::FeatureParam<int>
-    kExtensionTelemetrySearchHijackingSignalHeuristicCheckIntervalSeconds;
-// The default threshold value (omnibox searches - SERP landings) that
-// results in a heuristic match.
-extern const base::FeatureParam<int>
-    kExtensionTelemetrySearchHijackingSignalHeuristicThreshold;
-
 // Enables reporting of external app redirects
 BASE_DECLARE_FEATURE(kExternalAppRedirectTelemetry);
-
 
 // Replace the high confidence allowlist check gating notification warnings with
 // a check of the global cache list specific to safe notification sites.

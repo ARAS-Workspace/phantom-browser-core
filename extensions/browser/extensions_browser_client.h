@@ -126,7 +126,6 @@ class PermissionSet;
 class ProcessManagerDelegate;
 class ProcessMap;
 class RuntimeAPIDelegate;
-class SafeBrowsingDelegate;
 class ScopedBrowserContextKeepAlive;
 class ScriptExecutor;
 class SharedModuleService;
@@ -451,7 +450,6 @@ class ExtensionsBrowserClient {
   virtual KioskDelegate* GetKioskDelegate() = 0;
 
   // Returns a delegate that provides safe browsing functionality.
-  virtual SafeBrowsingDelegate* GetSafeBrowsingDelegate() = 0;
 
   // Returns the locale used by the application.
   virtual std::string GetApplicationLocale() = 0;

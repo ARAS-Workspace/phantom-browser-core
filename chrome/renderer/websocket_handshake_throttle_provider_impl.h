@@ -42,13 +42,6 @@ class WebSocketHandshakeThrottleProviderImpl final
   WebSocketHandshakeThrottleProviderImpl(
       const WebSocketHandshakeThrottleProviderImpl& other);
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  mojo::PendingRemote<safe_browsing::mojom::ExtensionWebRequestReporter>
-      pending_extension_web_request_reporter_;
-  mojo::Remote<safe_browsing::mojom::ExtensionWebRequestReporter>
-      extension_web_request_reporter_;
-#endif
-
   THREAD_CHECKER(thread_checker_);
 };
 
