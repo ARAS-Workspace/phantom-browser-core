@@ -58,11 +58,6 @@ class WebUIInfoSingletonEventObserverImpl
   void NotifyReportingEventJsListener(
       const ::chrome::cros::reporting::proto::UploadEventsRequest& event,
       const base::DictValue& result) override;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  void NotifyDeepScanJsListener(
-      const std::string& token,
-      const web_ui::DeepScanDebugData& request) override;
-#endif
   void NotifyTailoredVerdictOverrideJsListener() override;
 
  private:

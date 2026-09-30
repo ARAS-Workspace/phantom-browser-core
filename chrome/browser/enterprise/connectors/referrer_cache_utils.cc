@@ -17,7 +17,6 @@
 #include "content/public/browser/web_contents.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
 #endif

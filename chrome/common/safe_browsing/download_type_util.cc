@@ -25,12 +25,9 @@ ClientDownloadRequest::DownloadType GetDownloadType(
     return ClientDownloadRequest::CHROME_EXTENSION;
   }
   if (base::EqualsCaseInsensitiveASCII(ext, FILE_PATH_LITERAL(".zip"))) {
-    // DownloadProtectionService doesn't send a ClientDownloadRequest for ZIP
-    // files unless they contain either executables or archives. The resulting
-    // DownloadType is either ZIPPED_EXECUTABLE or ZIPPED_ARCHIVE respectively.
-    // This function will return ZIPPED_EXECUTABLE for ZIP files as a
-    // placeholder. The correct DownloadType will be determined based on the
-    // result of analyzing the ZIP file.
+    // A ZIP file's DownloadType is either ZIPPED_EXECUTABLE or ZIPPED_ARCHIVE,
+    // according to what the archive holds. This function returns
+    // ZIPPED_EXECUTABLE as a placeholder.
     return ClientDownloadRequest::ZIPPED_EXECUTABLE;
   }
   if (base::EqualsCaseInsensitiveASCII(ext, FILE_PATH_LITERAL(".rar"))) {

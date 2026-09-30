@@ -11,10 +11,6 @@
 #include "components/download/public/common/download_danger_type.h"
 #include "components/safe_browsing/buildflags.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
-#endif
-
 class Profile;
 
 namespace download {
@@ -45,18 +41,5 @@ bool CanUserTurnOnSafeBrowsing(Profile* profile);
 void RecordDownloadDangerPromptHistogram(
     const std::string& proceed_or_shown_suffix,
     const download::DownloadItem& item);
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-// Sends download recovery report to safe browsing backend.
-// Since it only records download url (DownloadItem::GetURL()), user's
-// action (click through or not) and its download danger type, it isn't gated
-// by user's extended reporting preference (i.e.
-// prefs::kSafeBrowsingExtendedReportingEnabled). We should not put any extra
-// information in this report.
-void SendSafeBrowsingDownloadReport(
-    safe_browsing::ClientSafeBrowsingReportRequest::ReportType report_type,
-    bool did_proceed,
-    download::DownloadItem* item);
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 #endif  // CHROME_BROWSER_DOWNLOAD_DOWNLOAD_UI_SAFE_BROWSING_UTIL_H_

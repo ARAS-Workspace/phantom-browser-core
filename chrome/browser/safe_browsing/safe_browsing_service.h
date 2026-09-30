@@ -63,9 +63,6 @@ class SafeBrowsingPrivateApiUnitTest;
 }  // namespace extensions
 
 namespace safe_browsing {
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-class DownloadProtectionService;
-#endif
 class HashRealTimeService;
 class PasswordProtectionService;
 class SafeBrowsingDatabaseManager;
@@ -122,14 +119,6 @@ class SafeBrowsingServiceImpl : public SafeBrowsingServiceInterface,
     return enabled_by_prefs_;
   }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // The DownloadProtectionService is not valid after the
-  // SafeBrowsingServiceImpl is destroyed.
-  DownloadProtectionService* download_protection_service() const {
-    return services_delegate_->GetDownloadService();
-  }
-#endif
-
   // Get the NetworkContext or URLLoaderFactory attached to |browser_context|.
   // Called on UI thread.
   network::mojom::NetworkContext* GetNetworkContext(
@@ -172,25 +161,6 @@ class SafeBrowsingServiceImpl : public SafeBrowsingServiceInterface,
   // Should only be called on the UI thread.
   virtual base::CallbackListSubscription RegisterStateCallback(
       const base::RepeatingClosure& callback);
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Sends download report to backend.
-  // TODO(crbug.com/355577227): Rename to MaybeSendDownloadReport.
-  virtual void SendDownloadReport(
-      download::DownloadItem* download,
-      ClientSafeBrowsingReportRequest::ReportType report_type,
-      bool did_proceed,
-      std::optional<bool> show_download_in_folder);
-
-  // Persists download report on disk and sends it to backend on next startup.
-  // TODO(crbug.com/355577227): Rename to
-  // MaybePersistDownloadReportAndSendOnNextStartup.
-  virtual void PersistDownloadReportAndSendOnNextStartup(
-      download::DownloadItem* download,
-      ClientSafeBrowsingReportRequest::ReportType report_type,
-      bool did_proceed,
-      std::optional<bool> show_download_in_folder);
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   // Sends phishy site report to backend. Returns true if the report is sent

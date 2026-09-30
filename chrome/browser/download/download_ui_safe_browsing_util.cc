@@ -13,22 +13,11 @@
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/safe_browsing/content/common/file_type_policies.h"
 #endif
 
 namespace {
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-using safe_browsing::ClientDownloadResponse;
-using safe_browsing::ClientSafeBrowsingReportRequest;
-#endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 std::string GetDangerPromptHistogramName(const std::string& suffix,
@@ -45,13 +34,7 @@ std::string GetDangerPromptHistogramName(const std::string& suffix,
 }  // namespace
 
 bool WasSafeBrowsingVerdictObtained(const download::DownloadItem* item) {
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  return item &&
-         safe_browsing::DownloadProtectionService::HasDownloadProtectionVerdict(
-             item);
-#else
   return false;
-#endif
 }
 
 bool ShouldShowWarningForNoSafeBrowsing(Profile* profile) {
@@ -84,15 +67,3 @@ void RecordDownloadDangerPromptHistogram(
 #endif
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void SendSafeBrowsingDownloadReport(
-    ClientSafeBrowsingReportRequest::ReportType report_type,
-    bool did_proceed,
-    download::DownloadItem* item) {
-  if (safe_browsing::SafeBrowsingService* sb_service =
-          g_browser_process->safe_browsing_service()) {
-    sb_service->SendDownloadReport(item, report_type, did_proceed,
-                                   /*show_download_in_folder=*/std::nullopt);
-  }
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)

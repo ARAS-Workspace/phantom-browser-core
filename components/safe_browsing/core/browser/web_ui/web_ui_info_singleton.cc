@@ -357,116 +357,6 @@ void WebUIInfoSingleton::ClearReportingEvents() {
       .swap(upload_event_requests_);
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void WebUIInfoSingleton::AddToDeepScanRequests(
-    bool per_profile_request,
-    const std::string& access_token,
-    const std::string& upload_info,
-    const std::string& upload_url,
-    const enterprise_connectors::ContentAnalysisRequest& request) {
-  if (!HasListener()) {
-    return;
-  }
-
-  // Only update the request time the first time we see a token.
-  if (deep_scan_requests_.find(request.request_token()) ==
-      deep_scan_requests_.end()) {
-    deep_scan_requests_[request.request_token()].request_time =
-        base::Time::Now();
-  }
-
-  auto& deep_scan_request = deep_scan_requests_[request.request_token()];
-  deep_scan_request.per_profile_request = per_profile_request;
-  deep_scan_request.request = request;
-
-  if (access_token.empty()) {
-    deep_scan_request.access_token_truncated = "NONE";
-  } else {
-    // Only show the first few bytes of `access_token` as it's sensitive.
-    deep_scan_request.access_token_truncated =
-        base::StrCat({access_token.substr(0, std::min(access_token.size(),
-                                                      static_cast<size_t>(6))),
-                      "..."});
-  }
-
-  deep_scan_request.upload_info = upload_info;
-  deep_scan_request.upload_url = upload_url;
-
-  for (safe_browsing::WebUIInfoSingletonEventObserver* webui_listener :
-       webui_instances_) {
-    webui_listener->NotifyDeepScanJsListener(
-        request.request_token(), deep_scan_requests_[request.request_token()]);
-  }
-}
-
-void WebUIInfoSingleton::AddHeadersToDeepScanRequests(
-    const std::string& request_token,
-    const net::HttpRequestHeaders& headers) {
-  if (!HasListener()) {
-    return;
-  }
-
-  // Only update the request time the first time we see a token.
-  if (deep_scan_requests_.find(request_token) == deep_scan_requests_.end()) {
-    deep_scan_requests_[request_token].request_time = base::Time::Now();
-  }
-
-  deep_scan_requests_[request_token].request_headers = headers;
-}
-
-void WebUIInfoSingleton::AddToDeepScanResponses(
-    const std::string& token,
-    const std::string& status,
-    const enterprise_connectors::ContentAnalysisResponse& response) {
-  if (!HasListener()) {
-    return;
-  }
-
-  deep_scan_requests_[token].response_time = base::Time::Now();
-  deep_scan_requests_[token].response_status = status;
-  deep_scan_requests_[token].response = response;
-
-  for (safe_browsing::WebUIInfoSingletonEventObserver* webui_listener :
-       webui_instances_) {
-    webui_listener->NotifyDeepScanJsListener(token, deep_scan_requests_[token]);
-  }
-}
-
-void WebUIInfoSingleton::ClearDeepScans() {
-  base::flat_map<std::string, web_ui::DeepScanDebugData>().swap(
-      deep_scan_requests_);
-}
-
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void WebUIInfoSingleton::SetTailoredVerdictOverride(
-    ClientDownloadResponse::TailoredVerdict new_value,
-    const WebUIInfoSingletonEventObserver* new_source) {
-  tailored_verdict_override_.Set(std::move(new_value), new_source);
-
-  // Notify other listeners of the change. The source itself is notified by the
-  // caller.
-  for (WebUIInfoSingletonEventObserver* listener : webui_instances()) {
-    if (!tailored_verdict_override_.IsFromSource(listener)) {
-      listener->NotifyTailoredVerdictOverrideJsListener();
-    }
-  }
-}
-
-void WebUIInfoSingleton::ClearTailoredVerdictOverride() {
-  tailored_verdict_override_.Clear();
-
-  // Notify other listeners of the change. The source itself is notified by the
-  // caller.
-  for (WebUIInfoSingletonEventObserver* listener : webui_instances()) {
-    if (!tailored_verdict_override_.IsFromSource(listener)) {
-      listener->NotifyTailoredVerdictOverrideJsListener();
-    }
-  }
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
 void WebUIInfoSingleton::RegisterWebUIInstance(
     WebUIInfoSingletonEventObserver* webui) {
   webui_instances_.push_back(webui);
@@ -475,17 +365,6 @@ void WebUIInfoSingleton::RegisterWebUIInstance(
 void WebUIInfoSingleton::UnregisterWebUIInstance(
     WebUIInfoSingletonEventObserver* webui) {
   std::erase(webui_instances_, webui);
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Notify other WebUIs that the source of the tailored verdict override is
-  // going away.
-  if (tailored_verdict_override_.IsFromSource(webui)) {
-    tailored_verdict_override_.Clear();
-    for (WebUIInfoSingletonEventObserver* listener : webui_instances()) {
-      listener->NotifyTailoredVerdictOverrideJsListener();
-    }
-  }
-#endif
 
   MaybeClearData();
 }
@@ -523,12 +402,6 @@ void WebUIInfoSingleton::MaybeClearData() {
     ClearLogMessages();
     ClearReportingEvents();
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-    ClearDeepScans();
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-    ClearTailoredVerdictOverride();
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   }
 }
 

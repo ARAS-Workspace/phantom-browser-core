@@ -468,14 +468,6 @@ class DownloadUIModel {
   // of warning?
   virtual bool IsEphemeralWarning() const;
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Complete the Safe Browsing scan early.
-  virtual void CompleteSafeBrowsingScan();
-
-  // Open a dialog to review a scan verdict.
-  virtual void ReviewScanningVerdict(content::WebContents* web_contents);
-#endif
-
   // Whether the dropdown menu button should be shown or not.
   virtual bool ShouldShowDropdown() const;
 

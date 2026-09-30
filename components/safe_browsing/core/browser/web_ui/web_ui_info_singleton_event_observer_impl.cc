@@ -159,16 +159,6 @@ void WebUIInfoSingletonEventObserverImpl::NotifyReportingEventJsListener(
                                 web_ui::SerializeReportingEvent(event));
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void WebUIInfoSingletonEventObserverImpl::NotifyDeepScanJsListener(
-    const std::string& token,
-    const web_ui::DeepScanDebugData& deep_scan_data) {
-  delegate_->SendEventToHandler(
-      "deep-scan-request-update",
-      SerializeDeepScanDebugData(token, deep_scan_data));
-}
-#endif
-
 void WebUIInfoSingletonEventObserverImpl::
     NotifyTailoredVerdictOverrideJsListener() {
   delegate_->SendEventToHandler(

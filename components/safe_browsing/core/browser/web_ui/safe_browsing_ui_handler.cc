@@ -444,13 +444,6 @@ void SafeBrowsingUIHandler::GetLogMessages(const base::ListValue& args) {
 
 void SafeBrowsingUIHandler::GetDeepScans(const base::ListValue& args) {
   base::ListValue pings_sent;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  for (const auto& token_and_data :
-       web_ui_info_singleton()->deep_scan_requests()) {
-    pings_sent.Append(SerializeDeepScanDebugData(token_and_data.first,
-                                                 token_and_data.second));
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
   DCHECK(!args.empty());
   const std::string& callback_id = args[0].GetString();
@@ -459,51 +452,12 @@ void SafeBrowsingUIHandler::GetDeepScans(const base::ListValue& args) {
 
 base::DictValue SafeBrowsingUIHandler::GetFormattedTailoredVerdictOverride() {
   base::DictValue override_dict;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  const char kStatusKey[] = "status";
-  const char kOverrideValueKey[] = "override_value";
-  const web_ui::TailoredVerdictOverrideData& override_data =
-      web_ui_info_singleton()->tailored_verdict_override();
-  if (!override_data.override_value) {
-    override_dict.Set(kStatusKey, base::Value("No override set."));
-  } else {
-    if (override_data.IsFromSource(event_observer())) {
-      override_dict.Set(kStatusKey, base::Value("Override set from this tab."));
-    } else {
-      override_dict.Set(kStatusKey,
-                        base::Value("Override set from another tab."));
-    }
-    override_dict.Set(kOverrideValueKey,
-                      ToValue(*override_data.override_value));
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   return override_dict;
 }
 
 void SafeBrowsingUIHandler::SetTailoredVerdictOverride(
     const base::ListValue& args) {
   DCHECK_GE(args.size(), 2U);
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  ClientDownloadResponse::TailoredVerdict tv;
-  const base::DictValue& input = args[1].GetDict();
-
-  const std::string* tailored_verdict_type =
-      input.FindString("tailored_verdict_type");
-  CHECK(tailored_verdict_type);
-  if (*tailored_verdict_type == "VERDICT_TYPE_UNSPECIFIED") {
-    tv.set_tailored_verdict_type(
-        ClientDownloadResponse::TailoredVerdict::VERDICT_TYPE_UNSPECIFIED);
-  } else if (*tailored_verdict_type == "COOKIE_THEFT") {
-    tv.set_tailored_verdict_type(
-        ClientDownloadResponse::TailoredVerdict::COOKIE_THEFT);
-  } else if (*tailored_verdict_type == "SUSPICIOUS_ARCHIVE") {
-    tv.set_tailored_verdict_type(
-        ClientDownloadResponse::TailoredVerdict::SUSPICIOUS_ARCHIVE);
-  }
-
-  web_ui_info_singleton()->SetTailoredVerdictOverride(std::move(tv),
-                                                      event_observer());
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
   ResolveTailoredVerdictOverrideCallback(args[0].GetString());
 }
@@ -515,9 +469,6 @@ void SafeBrowsingUIHandler::GetTailoredVerdictOverride(
 
 void SafeBrowsingUIHandler::ClearTailoredVerdictOverride(
     const base::ListValue& args) {
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  web_ui_info_singleton()->ClearTailoredVerdictOverride();
-#endif
 
   ResolveTailoredVerdictOverrideCallback(args[0].GetString());
 }

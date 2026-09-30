@@ -27,10 +27,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#endif
-
 namespace {
 
 using download::DownloadItem;
@@ -142,17 +138,6 @@ class DownloadWarningDesktopHatsUtilsTest : public ::testing::Test {
         DownloadItemWarningData::WarningAction::CLOSE);
 
     ON_CALL(*item, IsDone()).WillByDefault(Return(false));
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-    // Set tailored verdict for cookie theft.
-    safe_browsing::ClientDownloadResponse::TailoredVerdict tailored_verdict;
-    tailored_verdict.set_tailored_verdict_type(
-        safe_browsing::ClientDownloadResponse::TailoredVerdict::COOKIE_THEFT);
-    safe_browsing::DownloadProtectionService::SetDownloadProtectionData(
-        item, "token",
-        safe_browsing::ClientDownloadResponse::DANGEROUS_ACCOUNT_COMPROMISE,
-        std::move(tailored_verdict));
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
     ON_CALL(*item, HasUserGesture()).WillByDefault(Return(true));
   }

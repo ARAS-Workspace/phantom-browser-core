@@ -157,45 +157,6 @@ class WebUIInfoSingleton : public RealTimeUrlLookupServiceBase::WebUIDelegate,
   // Clear |reporting_events_| & |upload_event_requests_|.
   void ClearReportingEvents();
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Add the new request to |deep_scan_requests_| and send it to all the open
-  // chrome://safe-browsing tabs. Uses |request.request_token()| as an
-  // identifier that can be used in |AddToDeepScanResponses| to correlate a ping
-  // and response.
-  void AddToDeepScanRequests(
-      bool per_profile_request,
-      const std::string& access_token,
-      const std::string& upload_info,
-      const std::string& upload_url,
-      const enterprise_connectors::ContentAnalysisRequest& request);
-
-  // Add the http headers of the new request to |deep_scan_requests_| and send
-  // it to all the open chrome://safe-browsing tabs. Uses |request_token| as an
-  // identifier, as `AddToDeepScanRequests()` does.
-  void AddHeadersToDeepScanRequests(const std::string& request_token,
-                                    const net::HttpRequestHeaders& headers);
-
-  // Add the new response to |deep_scan_requests_| and send it to all the open
-  // chrome://safe-browsing tabs.
-  void AddToDeepScanResponses(
-      const std::string& token,
-      const std::string& status,
-      const enterprise_connectors::ContentAnalysisResponse& response);
-
-  // Clear the list of deep scan requests and responses.
-  void ClearDeepScans();
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Overwrites any existing override.
-  void SetTailoredVerdictOverride(
-      ClientDownloadResponse::TailoredVerdict new_value,
-      const WebUIInfoSingletonEventObserver* new_source);
-
-  // Clears any registered tailored verdict override.
-  void ClearTailoredVerdictOverride();
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
   // Register the new WebUI listener object.
   void RegisterWebUIInstance(WebUIInfoSingletonEventObserver* observer);
 
@@ -304,23 +265,6 @@ class WebUIInfoSingleton : public RealTimeUrlLookupServiceBase::WebUIDelegate,
   const std::map<int, V5::SearchHashesResponse>& hprt_lookup_responses() const {
     return hprt_lookup_responses_;
   }
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Get the collection of deep scanning requests since the oldest currently
-  // open chrome://safe-browsing tab was opened. Returns a map from a unique
-  // token to the request proto.
-  const base::flat_map<std::string, web_ui::DeepScanDebugData>&
-  deep_scan_requests() const {
-    return deep_scan_requests_;
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Gets the currently registered override data.
-  const web_ui::TailoredVerdictOverrideData& tailored_verdict_override() const {
-    return tailored_verdict_override_;
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
   const std::vector<std::pair<base::Time, std::string>>& log_messages() {
     return log_messages_;
@@ -442,18 +386,6 @@ class WebUIInfoSingleton : public RealTimeUrlLookupServiceBase::WebUIDelegate,
   std::vector<std::pair<::chrome::cros::reporting::proto::UploadEventsRequest,
                         base::DictValue>>
       upload_event_requests_;
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Map of deep scan requests sent since the oldest currently open
-  // chrome://safe-browsing tab was opened. Maps from the unique token per
-  // request to the data about the request.
-  base::flat_map<std::string, web_ui::DeepScanDebugData> deep_scan_requests_;
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Local override of download TailoredVerdict.
-  web_ui::TailoredVerdictOverrideData tailored_verdict_override_;
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
   // Whether there is a test listener.
   bool has_test_listener_ = false;

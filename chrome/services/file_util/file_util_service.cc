@@ -12,12 +12,7 @@
 #include "base/task/thread_pool.h"
 #include "build/build_config.h"
 #include "chrome/services/file_util/buildflags.h"
-#include "components/safe_browsing/buildflags.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/services/file_util/safe_archive_analyzer.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTRACTORS)
 #include "chrome/services/file_util/single_file_tar_file_extractor.h"
@@ -29,28 +24,6 @@ FileUtilService::FileUtilService(
     : receiver_(this, std::move(receiver)) {}
 
 FileUtilService::~FileUtilService() = default;
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void FileUtilService::BindSafeArchiveAnalyzer(
-    mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver) {
-  scoped_refptr<base::SequencedTaskRunner> runner =
-      base::ThreadPool::CreateSequencedTaskRunner(
-          {base::MayBlock(), base::TaskPriority::USER_VISIBLE,
-           // CONTINUE_ON_SHUTDOWN will continue shutting down even if
-           // tasks are running. This is the only appropriate shutdown
-           // behavior for tasks you don't want blocking shutdown.
-           base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN});
-  runner->PostTask(
-      FROM_HERE,
-      base::BindOnce(
-          [](mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer>
-                 receiver) {
-            mojo::MakeSelfOwnedReceiver(std::make_unique<SafeArchiveAnalyzer>(),
-                                        std::move(receiver));
-          },
-          std::move(receiver)));
-}
-#endif
 
 #if BUILDFLAG(ENABLE_EXTRACTORS)
 void FileUtilService::BindSingleFileTarFileExtractor(

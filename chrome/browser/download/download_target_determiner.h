@@ -267,8 +267,7 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
   // the MIME type can involve disk access, it is done in the blocking pool.
   void DetermineMimeTypeDone(const std::string& mime_type);
 
-  // Checks whether the downloaded URL is malicious. Invokes the
-  // DownloadProtectionService via the delegate.
+  // Checks whether the downloaded URL is malicious, via the delegate.
   // Next state:
   // - STATE_CHECK_VISITED_REFERRER_BEFORE.
   Result DoCheckDownloadUrl();

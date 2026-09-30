@@ -47,10 +47,6 @@
 #include "ui/base/l10n/time_format.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
-#endif
-
 using content::BrowserContext;
 using content::DownloadManager;
 using download::DownloadItem;
@@ -138,20 +134,7 @@ downloads::mojom::TailoredWarningType GetTailoredWarningType(
 }
 
 downloads::mojom::SafeBrowsingState GetSafeBrowsingState(Profile* profile) {
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  safe_browsing::SafeBrowsingState state =
-      safe_browsing::GetSafeBrowsingState(*profile->GetPrefs());
-  switch (state) {
-    case safe_browsing::SafeBrowsingState::NO_SAFE_BROWSING:
-      return downloads::mojom::SafeBrowsingState::kNoSafeBrowsing;
-    case safe_browsing::SafeBrowsingState::STANDARD_PROTECTION:
-      return downloads::mojom::SafeBrowsingState::kStandardProtection;
-    case safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION:
-      return downloads::mojom::SafeBrowsingState::kStandardProtection;
-  }
-#else
   return downloads::mojom::SafeBrowsingState::kNoSafeBrowsing;
-#endif
 }
 
 // TODO(dbeam): if useful elsewhere, move to base/i18n/time_formatting.h?
@@ -162,8 +145,6 @@ std::string TimeFormatLongDate(const base::Time& time) {
   formatter->format(time.InMillisecondsFSinceUnixEpoch(), date_string);
   return base::UTF16ToUTF8(base::i18n::UnicodeStringToString16(date_string));
 }
-
-
 
 // Returns a formatted string representing the initiator origin of the download
 // request. May return empty string if there is no suitable origin to display.

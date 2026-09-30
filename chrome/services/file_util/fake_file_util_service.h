@@ -11,83 +11,10 @@
 #include "build/build_config.h"
 #include "chrome/services/file_util/buildflags.h"
 #include "chrome/services/file_util/public/mojom/file_util_service.mojom.h"
-#include "components/safe_browsing/buildflags.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/receiver_set.h"
 #include "testing/gmock/include/gmock/gmock.h"
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/services/file_util/public/mojom/safe_archive_analyzer.mojom.h"
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-// An implementation of the SafeArchiveAnalyzer interface that delegates all the
-// Mojo methods to mocks.
-class MockSafeArchiveAnalyzer : public chrome::mojom::SafeArchiveAnalyzer {
- public:
-  MockSafeArchiveAnalyzer();
-
-  MockSafeArchiveAnalyzer(const MockSafeArchiveAnalyzer&) = delete;
-  MockSafeArchiveAnalyzer& operator=(const MockSafeArchiveAnalyzer&) = delete;
-
-  ~MockSafeArchiveAnalyzer() override;
-
-  void Bind(mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver);
-
-  MOCK_METHOD(
-      void,
-      AnalyzeZipFile,
-      (base::File zip_file,
-       const std::optional<std::string>& password,
-       mojo::PendingRemote<chrome::mojom::TemporaryFileGetter> temp_file_getter,
-       AnalyzeZipFileCallback callback),
-      (override));
-  MOCK_METHOD(
-      void,
-      AnalyzeDmgFile,
-      (base::File dmg_file,
-       mojo::PendingRemote<chrome::mojom::TemporaryFileGetter> temp_file_getter,
-       AnalyzeDmgFileCallback callback),
-      (override));
-  MOCK_METHOD(
-      void,
-      AnalyzeRarFile,
-      (base::File rar_file,
-       const std::optional<std::string>& password,
-       mojo::PendingRemote<chrome::mojom::TemporaryFileGetter> temp_file_getter,
-       AnalyzeRarFileCallback callback),
-      (override));
-  MOCK_METHOD(
-      void,
-      AnalyzeSevenZipFile,
-      (base::File seven_zip_file,
-       mojo::PendingRemote<chrome::mojom::TemporaryFileGetter> temp_file_getter,
-       AnalyzeSevenZipFileCallback callback),
-      (override));
-  MOCK_METHOD(
-      void,
-      AnalyzeObfuscatedZipFile,
-      (base::File zip_file,
-       const std::optional<std::string>& password,
-       chrome::mojom::ObfuscatedFileUtilHeaderDataPtr header_data,
-       mojo::PendingRemote<chrome::mojom::TemporaryFileGetter> temp_file_getter,
-       AnalyzeObfuscatedZipFileCallback callback),
-      (override));
-  MOCK_METHOD(
-      void,
-      AnalyzeObfuscatedRarFile,
-      (base::File rar_file,
-       const std::optional<std::string>& password,
-       chrome::mojom::ObfuscatedFileUtilHeaderDataPtr header_data,
-       mojo::PendingRemote<chrome::mojom::TemporaryFileGetter> temp_file_getter,
-       AnalyzeObfuscatedRarFileCallback callback),
-      (override));
-
- private:
-  mojo::ReceiverSet<chrome::mojom::SafeArchiveAnalyzer> receivers_;
-};
-#endif
 
 // An implementation of chrome::mojom::FileUtilService that binds and exposes
 // mock interfaces, for use in tests.
@@ -101,18 +28,8 @@ class FakeFileUtilService : public chrome::mojom::FileUtilService {
 
   ~FakeFileUtilService() override;
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  MockSafeArchiveAnalyzer& GetSafeArchiveAnalyzer();
-#endif
-
  private:
   // chrome::mojom::FileUtilService implementation
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  void BindSafeArchiveAnalyzer(
-      mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver)
-      override;
-#endif
 
 #if BUILDFLAG(ENABLE_EXTRACTORS)
   void BindSingleFileTarXzFileExtractor(
@@ -125,9 +42,6 @@ class FakeFileUtilService : public chrome::mojom::FileUtilService {
 
   mojo::Receiver<chrome::mojom::FileUtilService> receiver_;
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  MockSafeArchiveAnalyzer safe_archive_analyzer_;
-#endif
 };
 
 #endif  // CHROME_SERVICES_FILE_UTIL_FAKE_FILE_UTIL_SERVICE_H_

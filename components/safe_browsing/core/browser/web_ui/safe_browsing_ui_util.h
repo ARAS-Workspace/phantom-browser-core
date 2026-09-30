@@ -29,48 +29,6 @@ class WebUIInfoSingletonEventObserver;
 
 namespace safe_browsing::web_ui {
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-struct DeepScanDebugData {
-  DeepScanDebugData();
-  DeepScanDebugData(const DeepScanDebugData&);
-  ~DeepScanDebugData();
-
-  base::Time request_time;
-  net::HttpRequestHeaders request_headers;
-  std::optional<enterprise_connectors::ContentAnalysisRequest> request;
-  bool per_profile_request;
-  std::string access_token_truncated;
-  std::string upload_info;
-  std::string upload_url;
-
-  base::Time response_time;
-  std::string response_status;
-  std::optional<enterprise_connectors::ContentAnalysisResponse> response;
-};
-#endif  //  BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-// Local override of a download TailoredVerdict.
-struct TailoredVerdictOverrideData {
-  // Identifies the SafeBrowsingUIHandler it was set from, it is derived from
-  // a SafeBrowsingUIHandler* pointer but is only used in comparison and never
-  // dereferenced, to avoid dangling pointer.
-  using SourceId = std::uintptr_t;
-
-  TailoredVerdictOverrideData();
-  TailoredVerdictOverrideData(const TailoredVerdictOverrideData&) = delete;
-  ~TailoredVerdictOverrideData();
-
-  void Set(ClientDownloadResponse::TailoredVerdict new_value,
-           const WebUIInfoSingletonEventObserver* new_source);
-  bool IsFromSource(const WebUIInfoSingletonEventObserver* maybe_source) const;
-  void Clear();
-
-  std::optional<ClientDownloadResponse::TailoredVerdict> override_value;
-  SourceId source = 0u;
-};
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
 // The struct to combine a PhishGuard request and the token associated
 // with it. The token is not part of the request proto because it is sent in the
 // header. The token will be displayed along with the request in the safe
@@ -162,19 +120,6 @@ base::DictValue SerializeUploadEventsRequest(
     const ::chrome::cros::reporting::proto::UploadEventsRequest&
         upload_events_request,
     const base::DictValue& result);
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-std::string SerializeRequestHeaders(const net::HttpRequestHeaders& headers);
-std::string SerializeContentAnalysisRequest(
-    bool per_profile_request,
-    const std::string& access_token_truncated,
-    const std::string& upload_info,
-    const std::string& upload_url,
-    const enterprise_connectors::ContentAnalysisRequest& request);
-std::string SerializeContentAnalysisResponse(
-    const enterprise_connectors::ContentAnalysisResponse& response);
-base::DictValue SerializeDeepScanDebugData(const std::string& token,
-                                           const DeepScanDebugData& data);
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 }  // namespace safe_browsing::web_ui
 

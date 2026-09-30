@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "build/build_config.h"
+#include "chrome/services/file_util/buildflags.h"
 #include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/paint_preview/buildflags/buildflags.h"
 #include "components/password_manager/core/common/password_manager_features.h"
@@ -51,7 +52,7 @@
 #include "services/screen_ai/public/mojom/screen_ai_factory.mojom.h"  // nogncheck
 #include "services/screen_ai/screen_ai_service_impl.h"  // nogncheck
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
+#if BUILDFLAG(ENABLE_EXTRACTORS)
 #include "chrome/services/file_util/file_util_service.h"  // nogncheck
 #endif
 
@@ -176,7 +177,6 @@ auto RunPassageEmbeddingsService(
       std::move(receiver));
 }
 
-
 auto RunReadingModeMetricsService(
     mojo::PendingReceiver<reading_mode::mojom::DistillationEvaluator>
         receiver) {
@@ -189,7 +189,7 @@ auto RunScreenAIServiceFactory(
   return std::make_unique<screen_ai::ScreenAIService>(std::move(receiver));
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
+#if BUILDFLAG(ENABLE_EXTRACTORS)
 auto RunFileUtil(
     mojo::PendingReceiver<chrome::mojom::FileUtilService> receiver) {
   return std::make_unique<FileUtilService>(std::move(receiver));
@@ -280,7 +280,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunReadingModeMetricsService);
   services.Add(RunScreenAIServiceFactory);
 
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   services.Add(RunSystemSignalsService);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -289,7 +288,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunMacNotificationService);
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
+#if BUILDFLAG(ENABLE_EXTRACTORS)
   services.Add(RunFileUtil);
 #endif
 

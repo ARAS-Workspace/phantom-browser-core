@@ -19,42 +19,9 @@
 
 #include "components/enterprise/common/proto/upload_request_response.to_value.h"  // nogncheck crbug.com/40147906
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "components/enterprise/common/proto/connectors.pb.h"
-#include "components/enterprise/common/proto/connectors.to_value.h"
-#endif
-
 using sync_pb::GaiaPasswordReuse;
 
 namespace safe_browsing::web_ui {
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-DeepScanDebugData::DeepScanDebugData() = default;
-DeepScanDebugData::DeepScanDebugData(const DeepScanDebugData&) = default;
-DeepScanDebugData::~DeepScanDebugData() = default;
-#endif  //  BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-TailoredVerdictOverrideData::TailoredVerdictOverrideData() = default;
-TailoredVerdictOverrideData::~TailoredVerdictOverrideData() = default;
-
-void TailoredVerdictOverrideData::Set(
-    ClientDownloadResponse::TailoredVerdict new_value,
-    const WebUIInfoSingletonEventObserver* new_source) {
-  override_value = std::move(new_value);
-  source = reinterpret_cast<SourceId>(new_source);
-}
-
-bool TailoredVerdictOverrideData::IsFromSource(
-    const WebUIInfoSingletonEventObserver* maybe_source) const {
-  return reinterpret_cast<SourceId>(maybe_source) == source;
-}
-
-void TailoredVerdictOverrideData::Clear() {
-  override_value.reset();
-  source = 0u;
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 #if BUILDFLAG(SAFE_BROWSING_DB_LOCAL)
 
@@ -447,74 +414,5 @@ base::DictValue SerializeUploadEventsRequest(
               result.FindBool("uploaded_successfully").value_or(false));
   return wrapper;
 }
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-std::string SerializeRequestHeaders(const net::HttpRequestHeaders& headers) {
-  std::ostringstream string_stream;
-  for (net::HttpRequestHeaders::Iterator it(headers); it.GetNext();) {
-    string_stream << it.name() << ": " << it.value() << "\r\n";
-  }
-
-  return string_stream.str();
-}
-
-std::string SerializeContentAnalysisRequest(
-    bool per_profile_request,
-    const std::string& access_token_truncated,
-    const std::string& upload_info,
-    const std::string& upload_url,
-    const enterprise_connectors::ContentAnalysisRequest& request) {
-  base::Value request_value = ToValue(request);
-  CHECK(request_value.is_dict());
-  base::DictValue& request_dict = request_value.GetDict();
-  request_dict.Set("access_token", access_token_truncated);
-  request_dict.Set("upload_info", upload_info);
-  request_dict.Set("upload_url", upload_url);
-  return SerializeJson(request_dict);
-}
-
-std::string SerializeContentAnalysisResponse(
-    const enterprise_connectors::ContentAnalysisResponse& response) {
-  return SerializeJson(ToValue(response));
-}
-
-base::DictValue SerializeDeepScanDebugData(const std::string& token,
-                                           const DeepScanDebugData& data) {
-  base::DictValue value;
-  value.Set("token", token);
-
-  if (!data.request_time.is_null()) {
-    value.Set("request_time",
-              data.request_time.InMillisecondsFSinceUnixEpoch());
-  }
-
-  if (!data.request_headers.IsEmpty()) {
-    value.Set("http_headers", SerializeRequestHeaders(data.request_headers));
-  }
-
-  if (data.request.has_value()) {
-    value.Set("request",
-              SerializeContentAnalysisRequest(
-                  data.per_profile_request, data.access_token_truncated,
-                  data.upload_info, data.upload_url, data.request.value()));
-  }
-
-  if (!data.response_time.is_null()) {
-    value.Set("response_time",
-              data.response_time.InMillisecondsFSinceUnixEpoch());
-  }
-
-  if (!data.response_status.empty()) {
-    value.Set("response_status", data.response_status);
-  }
-
-  if (data.response.has_value()) {
-    value.Set("response",
-              SerializeContentAnalysisResponse(data.response.value()));
-  }
-
-  return value;
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 }  // namespace safe_browsing::web_ui

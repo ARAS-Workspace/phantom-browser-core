@@ -1892,7 +1892,6 @@ test("browser_tests") {
     "../app/chrome_main_delegate_browsertest.cc",
     "../browser/os_crypt/os_crypt_async_browsertest.cc",
     "../browser/renderer_host/javascript_optimizer_feature_browsertest.cc",
-    "../browser/safe_browsing/download_protection/download_protection_service_browsertest.cc",
     "../browser/signin/e2e_tests/live_sign_in_test.cc",
     "../browser/ui/breadcrumb_manager_browser_agent_browsertest.cc",
     "../browser/ui/browser_actions_browsertest.cc",
@@ -3837,8 +3836,6 @@ test("unit_tests") {
       "//chrome/common/notifications",
       "//chrome/services/mac_notifications:unit_tests",
       "//chrome/services/mac_notifications/public/mojom",
-      "//chrome/utility/safe_browsing",
-      "//chrome/utility/safe_browsing/mac:dmg_common",
       "//components/enterprise/platform_auth:enterprise_platform_auth",
       "//components/power_metrics",
       "//media/capture:test_support",
@@ -4498,17 +4495,10 @@ test("unit_tests") {
         "../common/safe_browsing/binary_feature_extractor_mac_unittest.cc",
         "../common/safe_browsing/disk_image_type_sniffer_mac_unittest.cc",
         "../common/safe_browsing/mach_o_image_reader_mac_unittest.cc",
-        "../utility/safe_browsing/mac/dmg_analyzer_unittest.cc",
-        "../utility/safe_browsing/mac/dmg_test_utils.cc",
-        "../utility/safe_browsing/mac/dmg_test_utils.h",
-        "../utility/safe_browsing/mac/hfs_unittest.cc",
-        "../utility/safe_browsing/mac/read_stream_unittest.cc",
-        "../utility/safe_browsing/mac/udif_unittest.cc",
       ]
     }
     deps += [
       ":test_proto",
-      "//chrome/services/file_util/public/cpp:unit_tests",
       "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
       "//ipc:protobuf_support",
     ]

@@ -138,14 +138,6 @@ class WebUIInfoSingletonEventObserver {
       const ::chrome::cros::reporting::proto::UploadEventsRequest& event,
       const base::DictValue& result) = 0;
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // Called when any deep scans are updated while one or more WebUI
-  // tabs are open.
-  virtual void NotifyDeepScanJsListener(
-      const std::string& token,
-      const web_ui::DeepScanDebugData& request) = 0;
-#endif
-
   // Notifies the WebUI instance that a change in tailored verdict override
   // occurred if the change did not originate from the instance.
   virtual void NotifyTailoredVerdictOverrideJsListener() = 0;

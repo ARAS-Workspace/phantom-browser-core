@@ -86,23 +86,10 @@ class TestSafeBrowsingService : public SafeBrowsingService,
   // SafeBrowsingService overrides
   ~TestSafeBrowsingService() override;
   SafeBrowsingUIManager* CreateUIManager() override;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  void SendDownloadReport(
-      download::DownloadItem* download,
-      ClientSafeBrowsingReportRequest::ReportType report_type,
-      bool did_proceed,
-      std::optional<bool> show_download_in_folder) override;
-#endif
 
   // ServicesDelegate::ServicesCreator:
   bool CanCreateDatabaseManager() override;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  bool CanCreateDownloadProtectionService() override;
-#endif
   SafeBrowsingDatabaseManager* CreateDatabaseManager() override;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  DownloadProtectionService* CreateDownloadProtectionService() override;
-#endif
 
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory(
       content::BrowserContext* browser_context) override;

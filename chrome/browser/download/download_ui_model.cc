@@ -1224,12 +1224,6 @@ DownloadUIModel::BubbleStatusTextBuilder::GetInterruptedStatusText(
   return l10n_util::GetStringUTF16(string_id);
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void DownloadUIModel::CompleteSafeBrowsingScan() {}
-void DownloadUIModel::ReviewScanningVerdict(
-    content::WebContents* web_contents) {}
-#endif
-
 bool DownloadUIModel::ShouldShowDropdown() const {
   return true;
 }

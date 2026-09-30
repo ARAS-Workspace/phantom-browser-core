@@ -51,7 +51,6 @@
 #include "content/public/browser/download_manager.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
 #endif
 
 namespace {

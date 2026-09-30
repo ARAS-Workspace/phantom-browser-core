@@ -8,7 +8,6 @@
 #include "build/build_config.h"
 #include "chrome/services/file_util/buildflags.h"
 #include "chrome/services/file_util/public/mojom/file_util_service.mojom.h"
-#include "components/safe_browsing/buildflags.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 
@@ -24,12 +23,6 @@ class FileUtilService : public chrome::mojom::FileUtilService {
 
  private:
   // chrome::mojom::FileUtilService implementation:
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  void BindSafeArchiveAnalyzer(
-      mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver)
-      override;
-#endif
 
 #if BUILDFLAG(ENABLE_EXTRACTORS)
   void BindSingleFileTarXzFileExtractor(

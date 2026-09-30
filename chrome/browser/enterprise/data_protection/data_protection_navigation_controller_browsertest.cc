@@ -10,7 +10,6 @@
 #include "chrome/browser/enterprise/connectors/test/deep_scanning_test_utils.h"
 #include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -133,60 +132,6 @@ IN_PROC_BROWSER_TEST_F(DataProtectionNavigationControllerTest, PolicyUnset) {
   ASSERT_EQ(chain.size(), 2u);
   ASSERT_EQ(chain[0].url(), main_url());
   ASSERT_EQ(chain[1].url(), secondary_url());
-}
-
-IN_PROC_BROWSER_TEST_F(DataProtectionNavigationControllerTest, DownloadItem) {
-  auto chain = enterprise_connectors::GetReferrerChain(
-      main_url(), *browser()->tab_strip_model()->GetActiveWebContents());
-  ASSERT_TRUE(chain.empty());
-
-  enterprise_connectors::test::SetAnalysisConnector(
-      browser()->GetProfile()->GetPrefs(),
-      enterprise_connectors::AnalysisConnector::FILE_DOWNLOADED,
-      GetAnalysisPolicy());
-  AddFakeNavigationsToChain();
-  ASSERT_FALSE(enterprise_connectors::HasCachedChainForTesting(*contents()));
-
-  GURL download_url("https://fake.download/");
-  GURL download_tab_url = main_url();
-  std::vector<GURL> download_redirects = {
-      GURL("https://foo.com"),
-      GURL("https://bar.com"),
-  };
-  download::MockDownloadItem download;
-  EXPECT_CALL(download, GetURL()).WillRepeatedly(ReturnRef(download_url));
-  EXPECT_CALL(download, GetTabUrl())
-      .WillRepeatedly(ReturnRef(download_tab_url));
-  EXPECT_CALL(download, GetUrlChain())
-      .WillRepeatedly(ReturnRef(download_redirects));
-
-  auto contents_chain =
-      enterprise_connectors::GetReferrerChain(GURL(), *contents());
-  ASSERT_TRUE(contents_chain.empty());
-
-  // Since the contents have no chain, the download's chain only consists of its
-  // own URL.
-  auto download_chain =
-      safe_browsing::GetOrIdentifyReferrerChainForEnterprise(download);
-  ASSERT_EQ(download_chain.size(), 1u);
-  ASSERT_EQ(download_chain[0].url(), download_url);
-  ASSERT_TRUE(enterprise_connectors::HasCachedChainForTesting(download));
-
-  // Navigating shouldn't affect the already-cached download chain, even though
-  // the contents's chain itself will be updated.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), main_url()));
-
-  download_chain =
-      safe_browsing::GetOrIdentifyReferrerChainForEnterprise(download);
-  ASSERT_EQ(download_chain.size(), 1u);
-  ASSERT_EQ(download_chain[0].url(), download_url);
-  ASSERT_TRUE(enterprise_connectors::HasCachedChainForTesting(download));
-
-  contents_chain =
-      enterprise_connectors::GetReferrerChain(main_url(), *contents());
-  ASSERT_EQ(contents_chain.size(), 2u);
-  ASSERT_EQ(contents_chain[0].url(), main_url());
-  ASSERT_EQ(contents_chain[1].url(), secondary_url());
 }
 
 class DataProtectionNavigationControllerPolicyTest

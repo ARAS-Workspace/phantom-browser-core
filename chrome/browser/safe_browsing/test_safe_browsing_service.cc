@@ -18,11 +18,6 @@
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
-#endif
-
 #if BUILDFLAG(FULL_SAFE_BROWSING)
 #endif
 
@@ -92,31 +87,6 @@ SafeBrowsingUIManager* TestSafeBrowsingService::CreateUIManager() {
   return SafeBrowsingService::CreateUIManager();
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void TestSafeBrowsingService::SendDownloadReport(
-    download::DownloadItem* download,
-    ClientSafeBrowsingReportRequest::ReportType report_type,
-    bool did_proceed,
-    std::optional<bool> show_download_in_folder) {
-  auto report = std::make_unique<ClientSafeBrowsingReportRequest>();
-  report->set_type(report_type);
-  report->set_download_verdict(
-      DownloadProtectionService::GetDownloadProtectionVerdict(download));
-  report->set_url(download->GetURL().spec());
-  report->set_did_proceed(did_proceed);
-  if (show_download_in_folder) {
-    report->set_show_download_in_folder(show_download_in_folder.value());
-  }
-
-  std::string token = DownloadProtectionService::GetDownloadPingToken(download);
-  if (!token.empty()) {
-    report->set_token(token);
-  }
-  report->SerializeToString(&serialized_download_report_);
-  return;
-}
-#endif
-
 const scoped_refptr<SafeBrowsingDatabaseManager>&
 TestSafeBrowsingService::database_manager() const {
   if (test_database_manager_)
@@ -132,11 +102,6 @@ void TestSafeBrowsingService::SetV4ProtocolConfig(
 bool TestSafeBrowsingService::CanCreateDatabaseManager() {
   return !use_sb_local_db_manager_;
 }
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-bool TestSafeBrowsingService::CanCreateDownloadProtectionService() {
-  return false;
-}
-#endif
 SafeBrowsingDatabaseManager* TestSafeBrowsingService::CreateDatabaseManager() {
   DCHECK(!use_sb_local_db_manager_);
 #if BUILDFLAG(FULL_SAFE_BROWSING)
@@ -148,13 +113,6 @@ SafeBrowsingDatabaseManager* TestSafeBrowsingService::CreateDatabaseManager() {
 #endif  // BUILDFLAG(FULL_SAFE_BROWSING)
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-DownloadProtectionService*
-TestSafeBrowsingService::CreateDownloadProtectionService() {
-  NOTIMPLEMENTED();
-  return nullptr;
-}
-#endif
 scoped_refptr<network::SharedURLLoaderFactory>
 TestSafeBrowsingService::GetURLLoaderFactory(
     content::BrowserContext* browser_context) {

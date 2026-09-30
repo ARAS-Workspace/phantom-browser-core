@@ -82,7 +82,6 @@
 #include "ui/views/interaction/element_tracker_views.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
 #endif
 
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
@@ -620,9 +619,6 @@ void DownloadsDOMHandler::OpenDuringScanningRequiringGesture(
   if (download) {
     DownloadItemModel model(download);
     model.SetOpenWhenComplete(true);
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-    model.CompleteSafeBrowsingScan();
-#endif
   }
 }
 
@@ -640,10 +636,6 @@ void DownloadsDOMHandler::DeepScan(const std::string& id) {
     return;
   }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  LogDeepScanEvent(download,
-                   safe_browsing::DeepScanEvent::kPromptAcceptedFromWebUI);
-#endif
   DownloadItemWarningData::AddWarningActionEvent(
       download, DownloadItemWarningData::WarningSurface::DOWNLOADS_PAGE,
       DownloadItemWarningData::WarningAction::ACCEPT_DEEP_SCAN);

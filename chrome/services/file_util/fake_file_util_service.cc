@@ -12,19 +12,6 @@ FakeFileUtilService::FakeFileUtilService(
 
 FakeFileUtilService::~FakeFileUtilService() = default;
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-MockSafeArchiveAnalyzer& FakeFileUtilService::GetSafeArchiveAnalyzer() {
-  return safe_archive_analyzer_;
-}
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void FakeFileUtilService::BindSafeArchiveAnalyzer(
-    mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver) {
-  safe_archive_analyzer_.Bind(std::move(receiver));
-}
-#endif
-
 #if BUILDFLAG(ENABLE_EXTRACTORS)
 void FakeFileUtilService::BindSingleFileTarXzFileExtractor(
     mojo::PendingReceiver<chrome::mojom::SingleFileExtractor> receiver) {
@@ -37,11 +24,3 @@ void FakeFileUtilService::BindSingleFileTarFileExtractor(
 }
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-MockSafeArchiveAnalyzer::MockSafeArchiveAnalyzer() = default;
-MockSafeArchiveAnalyzer::~MockSafeArchiveAnalyzer() = default;
-void MockSafeArchiveAnalyzer::Bind(
-    mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver) {
-  receivers_.Add(this, std::move(receiver));
-}
-#endif

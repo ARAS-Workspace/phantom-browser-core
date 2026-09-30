@@ -131,7 +131,6 @@ class SafeBrowsingDatabaseManager
     // safe_browsing clients:
     friend class AllowlistCheckerClient;
     friend class DatabaseManagerMechanism;
-    friend class DownloadUrlSBClient;
 
     // External clients:
     friend class ::AbusiveNotificationPermissionsManager;

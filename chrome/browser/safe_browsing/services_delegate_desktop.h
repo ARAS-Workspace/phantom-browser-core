@@ -13,7 +13,6 @@
 
 namespace safe_browsing {
 
-class DownloadProtectionService;
 class SafeBrowsingDatabaseManager;
 struct V4ProtocolConfig;
 
@@ -39,14 +38,11 @@ class ServicesDelegateDesktop : public ServicesDelegate {
   void ShutdownServices() override;
   void RefreshState(bool enable) override;
   void AddDownloadManager(content::DownloadManager* download_manager) override;
-  DownloadProtectionService* GetDownloadService() override;
 
   void StartOnUIThread(
       scoped_refptr<network::SharedURLLoaderFactory> browser_url_loader_factory,
       const V4ProtocolConfig& v4_config) override;
   void StopOnUIThread(bool shutdown) override;
-
-  void OnProfileWillBeDestroyed(Profile* profile) override;
 
   // Reports the current extended reporting level. Note that this is an
   // estimation and may not always be correct. It is possible that the
@@ -57,9 +53,6 @@ class ServicesDelegateDesktop : public ServicesDelegate {
   ExtendedReportingLevel GetEstimatedExtendedReportingLevel() const;
 
   scoped_refptr<SafeBrowsingDatabaseManager> CreateDatabaseManager();
-  DownloadProtectionService* CreateDownloadProtectionService();
-
-  std::unique_ptr<DownloadProtectionService> download_service_;
 
   // The database manager that handles the database checking and update logic
   // Accessed on both UI and IO thread.

@@ -127,11 +127,6 @@ class DownloadItemModel : public DownloadUIModel,
 
   bool IsEphemeralWarning() const override;
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  void CompleteSafeBrowsingScan() override;
-  void ReviewScanningVerdict(content::WebContents* web_contents) override;
-#endif
-
   bool ShouldShowDropdown() const override;
   void DetermineAndSetShouldPreferOpeningInBrowser(
       const base::FilePath& target_path,

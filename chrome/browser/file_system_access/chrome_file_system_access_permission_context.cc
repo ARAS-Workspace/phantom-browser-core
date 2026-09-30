@@ -93,13 +93,7 @@
 #include "extensions/common/extension.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
 #include "chrome/browser/ui/file_system_access/file_system_access_dangerous_file_dialog.h"
 #include "components/safe_browsing/content/common/file_type_policies.h"
 #endif
@@ -557,40 +551,7 @@ void DoSafeBrowsingCheckOnUIThread(
     std::unique_ptr<content::FileSystemAccessWriteItem> item,
     safe_browsing::CheckDownloadCallback callback) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  safe_browsing::SafeBrowsingService* sb_service =
-      g_browser_process->safe_browsing_service();
-  if (!sb_service || !sb_service->download_protection_service() ||
-      !sb_service->download_protection_service()->enabled()) {
-    std::move(callback).Run(safe_browsing::DownloadCheckResult::UNKNOWN);
-    return;
-  }
-
-  if (!item->browser_context) {
-    content::RenderProcessHost* rph =
-        content::RenderProcessHost::FromID(frame_id.child_id);
-    if (!rph) {
-      std::move(callback).Run(safe_browsing::DownloadCheckResult::UNKNOWN);
-      return;
-    }
-    item->browser_context = rph->GetBrowserContext();
-  }
-
-  if (!item->web_contents) {
-    content::RenderFrameHost* rfh = content::RenderFrameHost::FromID(frame_id);
-    if (rfh) {
-      DCHECK_NE(rfh->GetLifecycleState(),
-                content::RenderFrameHost::LifecycleState::kPrerendering);
-      item->web_contents =
-          content::WebContents::FromRenderFrameHost(rfh)->GetWeakPtr();
-    }
-  }
-
-  sb_service->download_protection_service()->CheckFileSystemAccessWrite(
-      std::move(item), std::move(callback));
-#else
   std::move(callback).Run(safe_browsing::DownloadCheckResult::UNKNOWN);
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 }
 
 ChromeFileSystemAccessPermissionContext::AfterWriteCheckResult

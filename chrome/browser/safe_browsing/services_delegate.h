@@ -26,13 +26,10 @@ namespace prefs {
 namespace mojom {
 class TrackedPreferenceValidationDelegate;
 }
-}
+}  // namespace prefs
 
 namespace safe_browsing {
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-class DownloadProtectionService;
-#endif
 class SafeBrowsingServiceImpl;
 class SafeBrowsingDatabaseManager;
 struct V4ProtocolConfig;
@@ -40,8 +37,7 @@ struct V4ProtocolConfig;
 // Abstraction to help organize code for mobile vs full safe browsing modes.
 // This helper class should be owned by a SafeBrowsingServiceImpl, and it
 // handles responsibilities for safe browsing service classes that may or may
-// not exist for a given build config. e.g. No DownloadProtectionService on
-// mobile. ServicesDelegate lives on the UI thread.
+// not exist for a given build config. ServicesDelegate lives on the UI thread.
 class ServicesDelegate {
  public:
   // Used for tests to override service creation. If CanCreateFooService()
@@ -51,16 +47,10 @@ class ServicesDelegate {
   class ServicesCreator {
    public:
     virtual bool CanCreateDatabaseManager() = 0;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-    virtual bool CanCreateDownloadProtectionService() = 0;
-#endif
 
     // Caller takes ownership of the returned object. Cannot use std::unique_ptr
     // because services may not be implemented for some build configs.
     virtual SafeBrowsingDatabaseManager* CreateDatabaseManager() = 0;
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-    virtual DownloadProtectionService* CreateDownloadProtectionService() = 0;
-#endif
   };
 
   // Creates the ServicesDelegate using its's default ServicesCreator.
@@ -96,9 +86,6 @@ class ServicesDelegate {
       content::DownloadManager* download_manager) = 0;
 
   // Returns nullptr for any service that is not available.
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  virtual DownloadProtectionService* GetDownloadService() = 0;
-#endif
 
   // Takes a SharedURLLoaderFactory from the BrowserProcess, for use in the
   // database manager.

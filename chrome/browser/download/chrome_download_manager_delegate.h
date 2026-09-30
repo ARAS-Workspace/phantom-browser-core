@@ -34,10 +34,6 @@
 #include "ui/gfx/native_ui_types.h"
 #include "ui/shell_dialogs/selected_file_info.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/download/download_completion_blocker.h"
-#endif
-
 class DownloadPrefs;
 class Profile;
 
@@ -49,13 +45,6 @@ class DownloadManager;
 namespace extensions {
 class CrxInstaller;
 class CrxInstallError;
-}
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-namespace safe_browsing {
-class DownloadProtectionService;
-enum class DownloadCheckResult;
 }
 #endif
 
@@ -157,31 +146,6 @@ class ChromeDownloadManagerDelegate
 
   DownloadPrefs* download_prefs() { return download_prefs_.get(); }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // The state of a safebrowsing check.
-  class SafeBrowsingState : public DownloadCompletionBlocker {
-   public:
-    SafeBrowsingState() = default;
-
-    SafeBrowsingState(const SafeBrowsingState&) = delete;
-    SafeBrowsingState& operator=(const SafeBrowsingState&) = delete;
-
-    ~SafeBrowsingState() override;
-
-    // String pointer used for identifying safebrowsing data associated with
-    // a download item.
-    static const char kSafeBrowsingUserDataKey[];
-  };
-
-  // Callback function after the DownloadProtectionService completes.
-  void CheckClientDownloadDone(uint32_t download_id,
-                               safe_browsing::DownloadCheckResult result);
-
-  // Callback function after scanning completes for a save package.
-  void CheckSavePackageScanningDone(uint32_t download_id,
-                                    safe_browsing::DownloadCheckResult result);
-#endif  // SAFE_BROWSING_DOWNLOAD_PROTECTION
-
   base::WeakPtr<ChromeDownloadManagerDelegate> GetWeakPtr();
 
   static void ConnectToQuarantineService(
@@ -206,10 +170,6 @@ class ChromeDownloadManagerDelegate
   virtual bool IsOpenInBrowserPreferredForFile(const base::FilePath& path);
 
  protected:
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  virtual safe_browsing::DownloadProtectionService*
-      GetDownloadProtectionService();
-#endif
 
   // Show file picker for |download|.
   virtual void ShowFilePickerForDownload(

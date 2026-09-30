@@ -82,13 +82,7 @@
 #include "chrome/browser/safe_browsing/security_settings_bundle_toast_helper.h"
 #endif
 
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
 #endif
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
@@ -105,53 +99,6 @@ namespace {
 
 // The number of user gestures to trace back for the referrer chain.
 const int kReferrerChainUserGestureLimit = 2;
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void PopulateDownloadWarningActions(download::DownloadItem* download,
-                                    ClientSafeBrowsingReportRequest* report) {
-  for (auto& event :
-       DownloadItemWarningData::GetWarningActionEvents(download)) {
-    report->mutable_download_warning_actions()->Add(
-        DownloadItemWarningData::ConstructCsbrrDownloadWarningAction(event));
-  }
-  base::UmaHistogramCounts100(
-      "SafeBrowsing.ClientSafeBrowsingReport.DownloadWarningActionSize",
-      report->download_warning_actions_size());
-}
-
-std::unique_ptr<ClientSafeBrowsingReportRequest> CreateDownloadReport(
-    download::DownloadItem* download,
-    ClientSafeBrowsingReportRequest::ReportType report_type,
-    bool did_proceed,
-    std::optional<bool> show_download_in_folder) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  Profile* profile = Profile::FromBrowserContext(
-      content::DownloadItemUtils::GetBrowserContext(download));
-  auto report = std::make_unique<ClientSafeBrowsingReportRequest>();
-  report->set_type(report_type);
-  report->set_download_verdict(
-      DownloadProtectionService::GetDownloadProtectionVerdict(download));
-  report->set_url(download->GetURL().spec());
-  report->set_did_proceed(did_proceed);
-  if (show_download_in_folder.has_value()) {
-    report->set_show_download_in_folder(show_download_in_folder.value());
-  }
-  std::string token = DownloadProtectionService::GetDownloadPingToken(download);
-  if (!token.empty()) {
-    report->set_token(std::move(token));
-  }
-  if (IsExtendedReportingEnabled(*profile->GetPrefs())) {
-    PopulateDownloadWarningActions(download, report.get());
-    base::Time warning_first_shown_time =
-        DownloadItemWarningData::WarningFirstShownTime(download);
-    if (!warning_first_shown_time.is_null()) {
-      report->set_warning_shown_timestamp_msec(
-          warning_first_shown_time.InMillisecondsSinceUnixEpoch());
-    }
-  }
-  return report;
-}
-#endif
 
 void TriggerSecuritySettingsBundleToastIfNeeded(
     base::WeakPtr<Profile> profile) {
@@ -750,48 +697,6 @@ void SafeBrowsingServiceImpl::RefreshState() {
   services_delegate_->RefreshState(enabled_by_prefs_);
 }
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-void SafeBrowsingServiceImpl::SendDownloadReport(
-    download::DownloadItem* download,
-    ClientSafeBrowsingReportRequest::ReportType report_type,
-    bool did_proceed,
-    std::optional<bool> show_download_in_folder) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  if (!ShouldSendDangerousDownloadReport(download, report_type)) {
-    return;
-  }
-  auto report = CreateDownloadReport(download, report_type, did_proceed,
-                                     show_download_in_folder);
-  Profile* profile = Profile::FromBrowserContext(
-      content::DownloadItemUtils::GetBrowserContext(download));
-  ChromePingManagerFactory::GetForBrowserContext(profile)->ReportThreatDetails(
-      std::move(report));
-  return;
-}
-
-void SafeBrowsingServiceImpl::PersistDownloadReportAndSendOnNextStartup(
-    download::DownloadItem* download,
-    ClientSafeBrowsingReportRequest::ReportType report_type,
-    bool did_proceed,
-    std::optional<bool> show_download_in_folder) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  if (!ShouldSendDangerousDownloadReport(download, report_type)) {
-    return;
-  }
-  auto report = CreateDownloadReport(download, report_type, did_proceed,
-                                     show_download_in_folder);
-  Profile* profile = Profile::FromBrowserContext(
-      content::DownloadItemUtils::GetBrowserContext(download));
-  PingManager::PersistThreatDetailsResult result =
-      ChromePingManagerFactory::GetForBrowserContext(profile)
-          ->PersistThreatDetailsAndReportOnNextStartup(std::move(report));
-  base::UmaHistogramEnumeration(
-      "SafeBrowsing.ClientSafeBrowsingReport.PersistDownloadReportResult",
-      result);
-  return;
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
 #if BUILDFLAG(FULL_SAFE_BROWSING)
 bool SafeBrowsingServiceImpl::SendPhishyInteractionsReport(
     Profile* profile,
@@ -891,8 +796,6 @@ SafeBrowsingServiceImpl::CreateNetworkContextParams() {
   proxy_config_monitor_->AddToNetworkContextParams(params.get());
   return params;
 }
-
-
 
 void SafeBrowsingServiceImpl::FillReferrerChain(
     Profile* profile,

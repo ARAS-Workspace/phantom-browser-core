@@ -18,7 +18,6 @@
 #include "ui/views/vector_icons.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
 #endif
 
 using download::DownloadItem;
