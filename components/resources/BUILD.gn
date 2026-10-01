@@ -5,7 +5,6 @@
 import("//build/buildflag_header.gni")
 import("//build/config/android/config.gni")
 import("//build/config/features.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//components/site_isolation/site_isolation.gni")
 import("//components/supervised_user/buildflags.gni")
 import("//pdf/features.gni")
@@ -66,8 +65,6 @@ grit("components_resources") {
     "enable_print_preview=$enable_print_preview",
     "enable_private_insights=true",
     "enable_supervised_users=$enable_supervised_users",
-    "safe_browsing_mode=$safe_browsing_mode",
-    "safe_browsing_use_internal_notifications_global_cache_origins=$safe_browsing_use_internal_notifications_global_cache_origins",
     "is_fuchsia=$is_fuchsia",
     "optimize_webui=$optimize_webui",
     "use_blink=$use_blink",
@@ -89,12 +86,6 @@ grit("components_resources") {
 
   if (use_blink) {
     deps += [ "//components/resources/ssl/ssl_error_assistant:make_ssl_error_assistant_protobuf" ]
-  }
-
-  if (safe_browsing_mode > 0) {
-    deps += [
-      "//components/safe_browsing/content/resources:make_file_types_protobuf",
-    ]
   }
 }
 

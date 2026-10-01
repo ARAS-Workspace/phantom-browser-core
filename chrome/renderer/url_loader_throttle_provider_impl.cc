@@ -42,10 +42,6 @@
 #include "extensions/renderer/extension_throttle_manager.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/renderer/renderer_url_loader_throttle.h"
-#endif
-
 namespace {
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -98,11 +94,7 @@ URLLoaderThrottleProviderImpl::Create(
     blink::URLLoaderThrottleProviderType type,
     ChromeContentRendererClient* chrome_content_renderer_client,
     blink::ThreadSafeBrowserInterfaceBrokerProxy* broker) {
-  mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing> pending_safe_browsing;
-  broker->GetInterface(pending_safe_browsing.InitWithNewPipeAndPassReceiver());
-
   return std::make_unique<URLLoaderThrottleProviderImpl>(
-      type, chrome_content_renderer_client, std::move(pending_safe_browsing),
       /*main_thread_task_runner=*/
       content::RenderThread::IsMainThread()
           ? base::SequencedTaskRunner::GetCurrentDefault()
@@ -113,13 +105,10 @@ URLLoaderThrottleProviderImpl::Create(
 URLLoaderThrottleProviderImpl::URLLoaderThrottleProviderImpl(
     blink::URLLoaderThrottleProviderType type,
     ChromeContentRendererClient* chrome_content_renderer_client,
-    mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
-        pending_safe_browsing,
     scoped_refptr<base::SequencedTaskRunner> main_thread_task_runner,
     base::PassKey<URLLoaderThrottleProviderImpl>)
     : type_(type),
       chrome_content_renderer_client_(chrome_content_renderer_client),
-      pending_safe_browsing_(std::move(pending_safe_browsing)),
       main_thread_task_runner_(std::move(main_thread_task_runner)) {
   DETACH_FROM_SEQUENCE(sequence_checker_);
 }
@@ -132,7 +121,6 @@ std::unique_ptr<blink::URLLoaderThrottleProvider>
 URLLoaderThrottleProviderImpl::Clone() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return std::make_unique<URLLoaderThrottleProviderImpl>(
-      type_, chrome_content_renderer_client_, CloneSafeBrowsingPendingRemote(),
       main_thread_task_runner_, base::PassKey<URLLoaderThrottleProviderImpl>());
 }
 
@@ -238,19 +226,3 @@ void URLLoaderThrottleProviderImpl::SetOnline(bool is_online) {
   }
 #endif
 }
-
-mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
-URLLoaderThrottleProviderImpl::CloneSafeBrowsingPendingRemote() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
-      new_pending_safe_browsing;
-  if (pending_safe_browsing_) {
-    safe_browsing_.Bind(std::move(pending_safe_browsing_));
-  }
-  if (safe_browsing_) {
-    safe_browsing_->Clone(
-        new_pending_safe_browsing.InitWithNewPipeAndPassReceiver());
-  }
-  return new_pending_safe_browsing;
-}
-

@@ -23,7 +23,6 @@ source_set("interstitials") {
     "//components/lookalikes/core",
     "//components/resources:dev_ui_components_resources",
     "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/content/browser",
     "//components/safe_browsing/core/browser/db:database_manager",
     "//components/safe_browsing/core/browser/db:util",
     "//components/security_interstitials/content:security_interstitial_page",

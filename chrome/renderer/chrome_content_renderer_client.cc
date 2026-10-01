@@ -111,7 +111,6 @@
 #include "components/pdf/common/pdf_util.h"
 #include "components/permissions/features.h"
 #include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/renderer/threat_dom_details.h"
 #include "components/sampling_profiler/process_type.h"
 #include "components/sampling_profiler/thread_profiler.h"
 #include "components/security_interstitials/content/renderer/security_interstitial_page_controller_delegate_impl.h"
@@ -407,16 +406,8 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   subresource_filter_ruleset_dealer_ =
       std::make_unique<subresource_filter::UnverifiedRulesetDealer>();
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  phishing_model_setter_ =
-      std::make_unique<safe_browsing::PhishingModelSetterImpl>();
-#endif
-
   thread->AddObserver(chrome_observer_.get());
   thread->AddObserver(subresource_filter_ruleset_dealer_.get());
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  thread->AddObserver(phishing_model_setter_.get());
-#endif
 
   // chrome: is also to be permitted to embeds https:// things and have them
   // treated as first-party.
@@ -576,10 +567,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   extensions::ExtensionsRendererClient::Get()->RenderFrameCreated(render_frame,
                                                                   registry);
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_DB_LOCAL) || BUILDFLAG(SAFE_BROWSING_DB_REMOTE)
-  safe_browsing::ThreatDOMDetails::Create(render_frame, registry);
 #endif
 
 #if BUILDFLAG(ENABLE_PRINTING)

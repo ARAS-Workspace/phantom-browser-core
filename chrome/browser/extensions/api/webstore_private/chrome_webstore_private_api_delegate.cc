@@ -18,11 +18,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "extensions/browser/extension_allowlist.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/browser_process.h"
-#include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
-#endif
-
 namespace extensions {
 
 ChromeWebstorePrivateAPIDelegate::ChromeWebstorePrivateAPIDelegate() = default;
@@ -75,12 +70,6 @@ void ChromeWebstorePrivateAPIDelegate::ReportFrictionAcceptedEvent(
 bool ChromeWebstorePrivateAPIDelegate::IsSafeBrowsingEnabledAndReady(
     content::BrowserContext* context) {
   return false;
-}
-
-safe_browsing::SafeBrowsingNavigationObserverManager*
-ChromeWebstorePrivateAPIDelegate::GetSafeBrowsingNavigationObserverManager(
-    content::BrowserContext* context) {
-  return nullptr;
 }
 #endif
 

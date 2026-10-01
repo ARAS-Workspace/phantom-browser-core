@@ -18,7 +18,6 @@ source_set("safe_browsing_private") {
 
   public_deps = [
     "//chrome/common/extensions/api",
-    "//components/safe_browsing/content/browser",
     "//extensions/browser",
   ]
 

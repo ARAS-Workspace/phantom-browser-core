@@ -136,7 +136,6 @@ components/policy/proto
 components/policy/resources
 components/policy/resources/templates
 components/rlz
-components/safe_browsing/content/browser
 components/safe_browsing/core/common
 components/security_interstitials/content/android/java/src/org/chromium/components/security_interstitials
 components/signin/public/base

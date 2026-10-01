@@ -37,7 +37,6 @@ source_set("impl") {
     "//chrome/browser/profiles:profile",
     "//components/enterprise/connectors/core",
     "//components/prefs",
-    "//components/safe_browsing/content/browser",
     "//components/safe_browsing/core/common:features",
     "//components/sessions",
     "//content/public/browser",

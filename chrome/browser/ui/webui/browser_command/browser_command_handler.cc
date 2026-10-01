@@ -41,7 +41,6 @@
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/performance_manager/public/features.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/content/browser/web_ui/safe_browsing_ui.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/tabs/public/tab_interface.h"

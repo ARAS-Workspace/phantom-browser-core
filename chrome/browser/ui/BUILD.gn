@@ -750,7 +750,6 @@ static_library("ui") {
     "//components/policy/core/browser",
     "//components/qr_code_generator:bitmap_generator",
     "//components/resources",
-    "//components/safe_browsing/content/browser",
     "//components/search_engines",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/signin/public/identity_manager",
@@ -2997,11 +2996,6 @@ static_library("ui") {
     # browser_tabstrip.h) that can't be split out yet.
     allow_circular_includes_from +=
         [ "//chrome/browser/ui/webui/print_preview:impl" ]
-  }
-
-  if (safe_browsing_mode > 0) {
-    deps +=
-        [ "//components/safe_browsing/content/browser:client_side_detection" ]
   }
 
   if (chrome_root_store_cert_management_ui) {

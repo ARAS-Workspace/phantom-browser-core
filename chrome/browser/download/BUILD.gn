@@ -176,8 +176,6 @@ source_set("impl") {
     "//components/pdf/common:util",
     "//components/pref_registry",
     "//components/profile_metrics",
-    "//components/safe_browsing/content/browser",
-    "//components/safe_browsing/content/browser/web_ui",
     "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
     "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//components/security_state/content",
@@ -250,10 +248,7 @@ source_set("impl") {
   }
 
   if (safe_browsing_mode != 0) {
-    deps += [
-      "//components/safe_browsing/content/browser/download:download_stats",
-      "//components/safe_browsing/content/common:file_type_policies",
-    ]
+    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
   }
 
   if (enable_offline_pages) {
@@ -409,7 +404,6 @@ source_set("browser_tests") {
     "//components/lookalikes/core:safety_tips",
     "//components/page_load_metrics/browser:test_support",
     "//components/pdf/browser",
-    "//components/safe_browsing/content/browser:safe_browsing_service",
     "//components/services/quarantine:test_support",
     "//content/public/browser",
     "//content/test:test_support",

@@ -8,7 +8,6 @@ group("resources") {
     "flags/resources",
     "internal_debug_pages_disabled/resources",
     "regional_capabilities_internals/resources",
-    "safe_browsing/resources",
     "user_actions/resources",
     "version/resources",
   ]

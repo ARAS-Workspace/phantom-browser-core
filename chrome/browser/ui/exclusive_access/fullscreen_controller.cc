@@ -50,10 +50,6 @@
 
 #include "chrome/browser/ui/blocked_content/popunder_preventer.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/browser/safe_browsing_service_interface.h"  // nogncheck
-#endif
-
 using content::WebContents;
 
 namespace {

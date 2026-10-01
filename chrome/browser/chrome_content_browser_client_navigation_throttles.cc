@@ -120,7 +120,6 @@
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/browser/ui_manager.h"
 #include "components/safe_browsing/core/common/features.h"
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 

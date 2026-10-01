@@ -801,9 +801,6 @@ source_set("platform_browser_tests") {
     sources += []
     deps += [
       "//components/enterprise/connectors/core",
-      "//components/safe_browsing/content/browser",
-      "//components/safe_browsing/content/browser:client_side_detection_service",
-      "//components/safe_browsing/content/browser:safe_browsing_blocking_page",
       "//components/safe_browsing/core/browser:verdict_cache_manager",
       "//components/security_interstitials/content:security_interstitial_page",
       "//components/unified_consent",
@@ -1552,13 +1549,8 @@ test("browser_tests") {
     "//components/record_replay/core/common:mojom",
     "//components/resources",
     "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/content/browser",
-    "//components/safe_browsing/content/browser:client_side_detection_images_cache",
-    "//components/safe_browsing/content/browser:safe_browsing_service",
-    "//components/safe_browsing/content/browser/web_ui",
     "//components/safe_browsing/content/common:interfaces",
     "//components/safe_browsing/content/common:interfaces_shared_cpp_sources",
-    "//components/safe_browsing/content/renderer",
     "//components/safe_browsing/core/browser:client_side_detection_service_base",
     "//components/safe_browsing/core/browser:verdict_cache_manager",
     "//components/safe_browsing/core/browser/db:sb_database",
@@ -2204,12 +2196,7 @@ test("browser_tests") {
   }
 
   if (safe_browsing_mode != 0) {
-    deps += [
-      "//components/safe_browsing/content/browser:client_side_detection",
-      "//components/safe_browsing/content/browser:client_side_detection_service",
-      "//components/safe_browsing/content/renderer/phishing_classifier",
-      "//components/safe_browsing/core/common/phishing_classifier",
-    ]
+    deps += [ "//components/safe_browsing/core/common/phishing_classifier" ]
   }
 
   if (is_linux) {
@@ -2593,13 +2580,11 @@ test("browser_tests") {
 
   # NOTE: This is the main "browser_tests" section for |is_chromeos|.
   if (safe_browsing_mode == 1) {
-    sources += [ "../renderer/safe_browsing/threat_dom_details_browsertest.cc" ]
     deps += [
       "//chrome/browser/metrics/desktop_session_duration",
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/ui/exclusive_access:test_support",
       "//chrome/browser/ui/hats",
-      "//components/safe_browsing/content/browser:safe_browsing_blocking_page",
       "//components/safe_browsing/content/common:file_type_policies_test_support",
       "//components/safe_browsing/core/browser",
       "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
@@ -2611,16 +2596,6 @@ test("browser_tests") {
       "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
       "//components/safe_browsing/core/common/phishing_classifier",
     ]
-
-    if (!is_mac) {
-      sources += [
-        # single-process mode hangs on Mac sometimes because of multiple UI
-        # message loops. See 306348
-        "../renderer/safe_browsing/content_phishing_classifier_delegate_browsertest.cc",
-        "../renderer/safe_browsing/phishing_classifier_browsertest.cc",
-        "../renderer/safe_browsing/phishing_dom_utils_browsertest.cc",
-      ]
-    }
   }
 
   if (enable_captive_portal_detection) {
@@ -3520,9 +3495,6 @@ test("unit_tests") {
     "//components/reporting/util:test_callbacks_support",
     "//components/resources",
     "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/content/browser",
-    "//components/safe_browsing/content/browser:client_side_detection_images_cache",
-    "//components/safe_browsing/content/browser/web_ui",
     "//components/safe_browsing/content/common:interfaces",
     "//components/safe_browsing/content/common:interfaces_shared_cpp_sources",
     "//components/safe_browsing/core/browser",
@@ -4361,11 +4333,6 @@ test("unit_tests") {
     ]
   }
 
-  if (safe_browsing_mode == 1) {
-    deps +=
-        [ "//components/safe_browsing/content/browser:client_side_detection" ]
-  }
-
   if (is_mac || is_linux) {
     sources +=
         [ "../browser/ui/extensions/settings_overridden_dialog_unittest.cc" ]
@@ -4430,9 +4397,6 @@ test("unit_tests") {
       "//chrome/common/safe_browsing:binary_feature_extractor",
       "//chrome/common/safe_browsing:download_type_util",
       "//components/file_access:test_support",
-      "//components/safe_browsing/content/browser:client_side_detection_service",
-      "//components/safe_browsing/content/browser:safe_browsing_blocking_page",
-      "//components/safe_browsing/content/browser:safe_browsing_service",
       "//components/safe_browsing/content/common:file_type_policies",
       "//components/safe_browsing/content/common:file_type_policies_test_support",
       "//components/safe_browsing/core/browser:intelligent_scan_delegate",
@@ -5562,11 +5526,6 @@ test("interactive_ui_tests") {
     "//ui/views",
     "//ui/web_dialogs:test_support",
   ]
-
-  if (safe_browsing_mode != 0) {
-    deps +=
-        [ "//components/safe_browsing/content/browser:client_side_detection" ]
-  }
 
   if (is_linux) {
     deps += [ "//ui/linux:display_server_utils" ]

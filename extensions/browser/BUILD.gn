@@ -1191,8 +1191,6 @@ source_set("unit_tests") {
 
   if (safe_browsing_mode == 1) {
     sources += [ "../browser/blocklist_unittest.cc" ]
-    deps +=
-        [ "//components/safe_browsing/content/browser:client_side_detection" ]
   }
 
   data = [

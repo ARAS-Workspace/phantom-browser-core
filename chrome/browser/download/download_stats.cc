@@ -14,10 +14,6 @@
 #include "components/profile_metrics/browser_profile_type.h"
 #include "components/safe_browsing/buildflags.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/browser/download/download_stats.h"
-#endif
-
 void RecordDownloadSource(ChromeDownloadSource source) {
   base::UmaHistogramEnumeration("Download.SourcesChrome", source,
                                 CHROME_DOWNLOAD_SOURCE_LAST_ENTRY);
@@ -35,11 +31,6 @@ void MaybeRecordDangerousDownloadWarningShown(DownloadUIModel& model) {
                                 download::DOWNLOAD_DANGER_TYPE_MAX);
   base::UmaHistogramEnumeration("SBClientDownload.TailoredWarningType",
                                 model.GetTailoredWarningType());
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::RecordDangerousDownloadWarningShown(
-      model.GetDangerType(), model.GetTargetFilePath(),
-      model.GetURL().SchemeIs(url::kHttpsScheme), model.HasUserGesture());
-#endif
 
   model.SetWasUIWarningShown(true);
 }

@@ -12,8 +12,6 @@
 #include "chrome/browser/site_protection/site_familiarity_fetcher.h"
 #include "chrome/browser/site_protection/site_familiarity_process_selection_user_data.h"
 #include "chrome/browser/site_protection/site_familiarity_utils.h"
-#include "components/safe_browsing/content/browser/web_ui/safe_browsing_ui.h"
-#include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/render_frame_host.h"
@@ -86,12 +84,6 @@ void SiteFamiliarityProcessSelectionDeferringCondition::StartFetching() {
           verdict_ = v8_opts_disabled.value()
                          ? SiteFamiliarityFetcher::Verdict::kUnfamiliar
                          : SiteFamiliarityFetcher::Verdict::kFamiliar;
-          CRSBLOG
-              << "SiteFamiliarityProcessSelectionDeferringCondition "
-                 "decision [URL]: "
-              << navigation_handle().GetURL()
-              << " [Verdict]: Not-evaluated (Same-site with main frame origin: "
-              << main_frame->GetLastCommittedOrigin() << ")";
           return;
         }
       }

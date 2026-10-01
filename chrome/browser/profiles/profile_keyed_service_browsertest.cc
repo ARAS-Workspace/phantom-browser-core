@@ -676,9 +676,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "RulesMonitorService",
     "RulesRegistryService",
     "RuntimeAPI",
-    "SafeBrowsingMetricsCollector",
-    "SafeBrowsingNetworkContextService",
-
     "SafeBrowsingPrivateEventRouter",
     "SearchEngineChoiceServiceFactory",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

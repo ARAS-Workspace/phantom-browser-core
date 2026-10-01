@@ -133,9 +133,6 @@
 #include "components/permissions/features.h"
 #include "components/permissions/permission_recovery_success_rate_tracker.h"
 #include "components/permissions/permission_request_manager.h"
-#include "components/safe_browsing/content/browser/async_check_tracker.h"
-#include "components/safe_browsing/content/browser/safe_browsing_navigation_observer.h"
-#include "components/safe_browsing/content/browser/ui_manager.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/search/ntp_features.h"
 #include "components/sessions/content/session_tab_helper.h"
@@ -215,10 +212,6 @@
 
 #if BUILDFLAG(ENABLE_RLZ)
 #include "chrome/browser/rlz/chrome_rlz_tracker_web_contents_observer.h"
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/browser/safe_browsing_tab_observer.h"
 #endif
 
 using content::WebContents;

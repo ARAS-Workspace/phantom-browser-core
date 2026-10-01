@@ -35,10 +35,6 @@
 #include "chrome/common/plugin.mojom.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/renderer/phishing_classifier/phishing_model_setter_impl.h"
-#endif
-
 class ChromeRenderThreadObserver;
 
 namespace sampling_profiler {
@@ -233,10 +229,6 @@ class ChromeContentRendererClient
 
   std::unique_ptr<subresource_filter::UnverifiedRulesetDealer>
       subresource_filter_ruleset_dealer_;
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  std::unique_ptr<safe_browsing::PhishingModelSetterImpl>
-      phishing_model_setter_;
-#endif
 
   scoped_refptr<blink::ThreadSafeBrowserInterfaceBrokerProxy>
       browser_interface_broker_;

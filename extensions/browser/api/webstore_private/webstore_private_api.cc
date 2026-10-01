@@ -39,7 +39,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/user_prefs/user_prefs.h"
 #include "content/public/browser/browser_context.h"
@@ -84,8 +83,6 @@
 #endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
-
-using safe_browsing::SafeBrowsingNavigationObserverManager;
 
 namespace extensions {
 
@@ -265,11 +262,6 @@ const char kWebstoreBlockByPolicy[] =
     "Extension installation is blocked by policy";
 const char kIncognitoError[] =
     "Apps cannot be installed in guest/incognito mode";
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-// The number of user gestures to trace back for the referrer chain.
-const int kExtensionReferrerUserGestureLimit = 2;
-#endif
 
 WebstorePrivateApi::Delegate* test_delegate = nullptr;
 
@@ -1310,62 +1302,8 @@ WebstorePrivateGetReferrerChainFunction::
 
 ExtensionFunction::ResponseAction
 WebstorePrivateGetReferrerChainFunction::Run() {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (!ExtensionsAPIClient::Get()
-           ->GetWebstorePrivateAPIDelegate()
-           ->IsSafeBrowsingEnabledAndReady(browser_context())) {
-    return RespondNow(ArgumentList(
-        api::webstore_private::GetReferrerChain::Results::Create("")));
-  }
-
-  content::RenderFrameHost* outermost_render_frame_host =
-      render_frame_host() ? render_frame_host()->GetOutermostMainFrame()
-                          : nullptr;
-
-  if (!outermost_render_frame_host) {
-    return RespondNow(ErrorWithArgumentsDoNotUse(
-        api::webstore_private::GetReferrerChain::Results::Create(""),
-        kWebstoreUserCancelledError));
-  }
-
-  SafeBrowsingNavigationObserverManager* navigation_observer_manager =
-      ExtensionsAPIClient::Get()
-          ->GetWebstorePrivateAPIDelegate()
-          ->GetSafeBrowsingNavigationObserverManager(browser_context());
-
-  safe_browsing::ReferrerChain referrer_chain;
-  SafeBrowsingNavigationObserverManager::AttributionResult result =
-      navigation_observer_manager->IdentifyReferrerChainByRenderFrameHost(
-          outermost_render_frame_host, kExtensionReferrerUserGestureLimit,
-          &referrer_chain);
-
-  // If the referrer chain is incomplete we'll append the most recent
-  // navigations to referrer chain for diagnostic purposes. This only happens if
-  // the user is not in incognito mode and has opted into extended reporting or
-  // Scout reporting. Otherwise, |CountOfRecentNavigationsToAppend| returns 0.
-  int recent_navigations_to_collect =
-      SafeBrowsingNavigationObserverManager::CountOfRecentNavigationsToAppend(
-          browser_context(), user_prefs::UserPrefs::Get(browser_context()),
-          result);
-  if (recent_navigations_to_collect > 0) {
-    navigation_observer_manager->AppendRecentNavigations(
-        recent_navigations_to_collect, &referrer_chain);
-  }
-
-  safe_browsing::ExtensionWebStoreInstallRequest request;
-  request.mutable_referrer_chain()->Swap(&referrer_chain);
-  request.mutable_referrer_chain_options()->set_recent_navigations_to_collect(
-      recent_navigations_to_collect);
-
-  // Base64 encode the request to avoid issues with base::Value rejecting
-  // strings which are not valid UTF8.
-  return RespondNow(
-      ArgumentList(api::webstore_private::GetReferrerChain::Results::Create(
-          base::Base64Encode(request.SerializeAsString()))));
-#else
   return RespondNow(ArgumentList(
       api::webstore_private::GetReferrerChain::Results::Create("")));
-#endif
 }
 
 WebstorePrivateGetExtensionStatusFunction::

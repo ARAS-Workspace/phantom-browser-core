@@ -31,9 +31,6 @@
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
 #include "components/password_manager/content/browser/content_password_manager_driver_factory.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/browser/mojo_safe_browsing_impl.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/surface_embed/browser/surface_embed_host.h"
@@ -100,47 +97,6 @@
 
 namespace {
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-// Helper method for ExposeInterfacesToRenderer() that checks the latest
-// SafeBrowsing pref value on the UI thread before hopping over to the IO
-// thread.
-void MaybeCreateSafeBrowsingForRenderer(
-    int process_id,
-    base::RepeatingCallback<scoped_refptr<safe_browsing::UrlCheckerDelegate>(
-        bool safe_browsing_enabled,
-        bool should_check_on_sb_disabled,
-        const std::vector<std::string>& allowlist_domains)>
-        get_checker_delegate,
-    mojo::PendingReceiver<safe_browsing::mojom::SafeBrowsing> receiver) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  content::RenderProcessHost* render_process_host =
-      content::RenderProcessHost::FromID(process_id);
-  if (!render_process_host)
-    return;
-
-  PrefService* pref_service =
-      Profile::FromBrowserContext(render_process_host->GetBrowserContext())
-          ->GetPrefs();
-
-  std::vector<std::string> allowlist_domains =
-      safe_browsing::GetURLAllowlistByPolicy(pref_service);
-
-  bool safe_browsing_enabled =
-      safe_browsing::IsSafeBrowsingEnabled(*pref_service);
-
-  safe_browsing::MojoSafeBrowsingImpl::MaybeCreate(
-      process_id,
-      base::BindRepeating(get_checker_delegate, safe_browsing_enabled,
-                          // Navigation initiated from renderer should never
-                          // check when safe browsing is disabled, because
-                          // enterprise check only supports mainframe URL.
-                          /*should_check_on_sb_disabled=*/false,
-                          allowlist_domains),
-      std::move(receiver));
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
 void BindBadgeServiceForServiceWorker(
     const content::ServiceWorkerVersionBaseInfo& info,
     mojo::PendingReceiver<blink::mojom::BadgeService> receiver) {
@@ -178,19 +134,6 @@ void ChromeContentBrowserClient::ExposeInterfacesToRenderer(
             render_process_host->GetDeprecatedID()),
         ui_task_runner);
   }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (safe_browsing_service_) {
-    registry->AddInterface<safe_browsing::mojom::SafeBrowsing>(
-        base::BindRepeating(
-            &MaybeCreateSafeBrowsingForRenderer,
-            render_process_host->GetDeprecatedID(),
-            base::BindRepeating(
-                &ChromeContentBrowserClient::GetSafeBrowsingUrlCheckerDelegate,
-                base::Unretained(this))),
-        ui_task_runner);
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
   for (auto& ep : extra_parts_) {
     ep->ExposeInterfacesToRenderer(registry, associated_registry,

@@ -588,7 +588,6 @@ template("build_webui") {
         "//components/sync/service/resources",
         "//components/ukm/debug",
         "//components/webui/flags/resources",
-        "//components/webui/safe_browsing/resources",
         "//components/webui/user_actions/resources",
         "//components/webui/version/resources",
         "//content/browser/resources/gpu",

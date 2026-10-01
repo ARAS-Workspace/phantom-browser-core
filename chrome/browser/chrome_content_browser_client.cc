@@ -295,9 +295,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/privacy_sandbox/privacy_sandbox_settings.h"
-#include "components/safe_browsing/content/browser/async_check_tracker.h"
-#include "components/safe_browsing/content/browser/browser_url_loader_throttle.h"
-#include "components/safe_browsing/content/browser/ui_manager.h"
 #include "components/safe_browsing/core/browser/hashprefix_realtime/hash_realtime_service.h"
 #include "components/safe_browsing/core/browser/realtime/policy_engine.h"
 #include "components/safe_browsing/core/browser/realtime/url_lookup_service.h"
@@ -4623,69 +4620,6 @@ base::FilePath ChromeContentBrowserClient::GetLoggingFileName(
   return logging::GetLogFileName(command_line);
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-std::unique_ptr<blink::URLLoaderThrottle>
-ChromeContentBrowserClient::MaybeCreateSafeBrowsingURLLoaderThrottle(
-    const network::ResourceRequest& request,
-    content::BrowserContext* browser_context,
-    const base::RepeatingCallback<content::WebContents*()>& wc_getter,
-    content::FrameTreeNodeId frame_tree_node_id,
-    std::optional<int64_t> navigation_id,
-    Profile* profile) {
-  if (safe_browsing::IsURLAllowlistedByPolicy(request.url,
-                                              *profile->GetPrefs())) {
-    // Don't run checks if it matches the enterprise allowlist.
-    return nullptr;
-  }
-  bool has_valid_dm_token = false;
-  bool is_enterprise_lookup_enabled =
-      safe_browsing::RealTimePolicyEngine::CanPerformEnterpriseFullURLLookup(
-          profile->GetPrefs(), has_valid_dm_token, profile->IsOffTheRecord(),
-          profile->IsGuestSession());
-  bool is_consumer_lookup_enabled =
-      safe_browsing::RealTimePolicyEngine::CanPerformFullURLLookup(
-          profile->GetPrefs(), profile->IsOffTheRecord(),
-          g_browser_process->variations_service());
-
-  // |url_lookup_service| is used when real time url check is enabled.
-  safe_browsing::RealTimeUrlLookupServiceBase* url_lookup_service =
-      GetUrlLookupService(browser_context, is_enterprise_lookup_enabled,
-                          is_consumer_lookup_enabled);
-  safe_browsing::HashRealTimeService* hash_realtime_service = nullptr;
-  safe_browsing::hash_realtime_utils::HashRealTimeSelection
-      hash_realtime_selection =
-          safe_browsing::hash_realtime_utils::DetermineHashRealTimeSelection(
-              profile->IsOffTheRecord(), profile->GetPrefs(),
-              safe_browsing::hash_realtime_utils::GetCountryCode(
-                  g_browser_process->variations_service()),
-              /*log_usage_histograms=*/true,
-              /*are_background_lookups_allowed=*/true);
-  safe_browsing::AsyncCheckTracker* async_check_tracker = GetAsyncCheckTracker(
-      wc_getter, is_enterprise_lookup_enabled, is_consumer_lookup_enabled,
-      hash_realtime_selection, frame_tree_node_id);
-
-  std::optional<safe_browsing::internal::ReferringAppInfo> referring_app_info =
-      std::nullopt;
-  safe_browsing::V5GetHashProtocolManager* v5_get_hash_protocol_manager = nullptr;
-  return safe_browsing::BrowserURLLoaderThrottle::Create(
-      base::BindRepeating(
-          &ChromeContentBrowserClient::GetSafeBrowsingUrlCheckerDelegate,
-          base::Unretained(this),
-          safe_browsing::IsSafeBrowsingEnabled(*profile->GetPrefs()),
-          // Should check for enterprise when safe browsing is disabled.
-          /*should_check_on_sb_disabled=*/is_enterprise_lookup_enabled,
-          safe_browsing::GetURLAllowlistByPolicy(profile->GetPrefs())),
-      wc_getter, frame_tree_node_id, navigation_id,
-      url_lookup_service ? url_lookup_service->GetWeakPtr() : nullptr,
-      hash_realtime_service ? hash_realtime_service->GetWeakPtr() : nullptr,
-      hash_realtime_selection,
-      async_check_tracker ? async_check_tracker->GetWeakPtr() : nullptr,
-      std::move(referring_app_info),
-      v5_get_hash_protocol_manager ? v5_get_hash_protocol_manager->GetWeakPtr()
-                                   : nullptr);
-}
-#endif
-
 std::unique_ptr<blink::URLLoaderThrottle> CreateGoogleURLLoaderThrottle(
     Profile* profile) {
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
@@ -4740,15 +4674,6 @@ ChromeContentBrowserClient::CreateURLLoaderThrottles(
 
   ChromeNavigationUIData* chrome_navigation_ui_data =
       static_cast<ChromeNavigationUIData*>(navigation_ui_data);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (auto safe_browsing_throttle = MaybeCreateSafeBrowsingURLLoaderThrottle(
-          request, browser_context, wc_getter, frame_tree_node_id,
-          navigation_id, profile);
-      safe_browsing_throttle) {
-    result.push_back(std::move(safe_browsing_throttle));
-  }
-#endif
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
   result.push_back(
@@ -6011,17 +5936,6 @@ ChromeContentBrowserClient::GetUrlLookupService(
     content::BrowserContext* browser_context,
     bool is_enterprise_lookup_enabled,
     bool is_consumer_lookup_enabled) {
-  return nullptr;
-}
-
-safe_browsing::AsyncCheckTracker*
-ChromeContentBrowserClient::GetAsyncCheckTracker(
-    const base::RepeatingCallback<content::WebContents*()>& wc_getter,
-    bool is_enterprise_lookup_enabled,
-    bool is_consumer_lookup_enabled,
-    safe_browsing::hash_realtime_utils::HashRealTimeSelection
-        hash_realtime_selection,
-    content::FrameTreeNodeId frame_tree_node_id) {
   return nullptr;
 }
 

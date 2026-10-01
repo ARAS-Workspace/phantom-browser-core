@@ -75,8 +75,6 @@
 #include "components/prefs/pref_member.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
-#include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_search_api/safe_search_util.h"
 #include "components/saved_tab_groups/public/features.h"
@@ -119,7 +117,6 @@
 #endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/browser/download/download_stats.h"
 #include "components/safe_browsing/content/common/file_type_policies.h"
 #endif
 
@@ -128,7 +125,6 @@ using content::DownloadManager;
 using download::DownloadItem;
 using download::DownloadPathReservationTracker;
 using download::PathValidationResult;
-using safe_browsing::DownloadFileType;
 using ConnectionType = net::NetworkChangeNotifier::ConnectionType;
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -398,17 +394,6 @@ bool ChromeDownloadManagerDelegate::ShouldAutomaticallyOpenFile(
 #endif
 
   bool should_open = download_prefs_->IsAutoOpenEnabled(url, path);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  int64_t file_type_uma_value =
-      safe_browsing::FileTypePolicies::GetInstance()->UmaValueForFile(path);
-  if (should_open) {
-    base::UmaHistogramSparse("SBClientDownload.AutoOpenEnabledFileType",
-                             file_type_uma_value);
-  } else {
-    base::UmaHistogramSparse("SBClientDownload.AutoOpenDisabledFileType",
-                             file_type_uma_value);
-  }
-#endif
 
   return should_open;
 }
@@ -587,25 +572,6 @@ void ChromeDownloadManagerDelegate::ChooseSavePath(
   new SavePackageFilePicker(web_contents, suggested_path, default_extension,
                             can_save_as_complete, download_prefs_.get(),
                             std::move(callback));
-}
-
-void ChromeDownloadManagerDelegate::SanitizeSavePackageResourceName(
-    base::FilePath* filename,
-    const GURL& source_url) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::FileTypePolicies* file_type_policies =
-      safe_browsing::FileTypePolicies::GetInstance();
-
-  const PrefService* prefs = profile_->GetPrefs();
-  if (file_type_policies->GetFileDangerLevel(*filename, source_url, prefs) ==
-      safe_browsing::DownloadFileType::NOT_DANGEROUS) {
-    return;
-  }
-
-  base::FilePath default_filename = base::FilePath::FromUTF8Unsafe(
-      l10n_util::GetStringUTF8(IDS_DEFAULT_DOWNLOAD_FILENAME));
-  *filename = filename->AddExtension(default_filename.BaseName().value());
-#endif
 }
 
 void ChromeDownloadManagerDelegate::SanitizeDownloadParameters(

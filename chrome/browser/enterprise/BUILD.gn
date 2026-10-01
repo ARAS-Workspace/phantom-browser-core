@@ -109,13 +109,6 @@ source_set("enterprise") {
     "signals/device_info_fetcher.h",
   ]
 
-  if (safe_browsing_mode != 0) {
-    public += [ "data_protection/view_source_navigation_throttle.h" ]
-    public_deps += [
-      "//components/safe_browsing/content/browser:safe_browsing_blocking_page",
-    ]
-  }
-
   # Circular deps: //chrome/browser/extensions,
   # //chrome/browser/ui, //chrome/browser/ui/webui/signin, and
   # //chrome/browser/ash/policy/core all depend on :enterprise via
@@ -319,10 +312,6 @@ source_set("impl") {
     "util/managed_browser_utils.cc",
   ]
 
-  if (safe_browsing_mode != 0) {
-    sources += [ "data_protection/view_source_navigation_throttle.cc" ]
-  }
-
   sources += [ "remote_commands/cbcm_remote_commands_factory.cc" ]
   public_deps = [
     ":enterprise",
@@ -382,8 +371,6 @@ source_set("impl") {
     "//components/reporting/storage:storage_configuration",
     "//components/reporting/storage:storage_module",
     "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/content/browser",
-    "//components/safe_browsing/content/browser/web_ui",
     "//components/safe_browsing/core/browser:referrer_chain_provider",
     "//components/safe_browsing/core/browser/db:util",
     "//components/safe_browsing/core/browser/realtime:enterprise_url_lookup_service",
