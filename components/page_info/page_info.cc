@@ -93,7 +93,6 @@ using base::UTF16ToUTF8;
 using base::UTF8ToUTF16;
 using content::BrowserThread;
 using safe_browsing::LoginReputationClientResponse;
-using safe_browsing::RequestOutcome;
 
 namespace {
 

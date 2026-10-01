@@ -858,7 +858,7 @@ void ChromeDownloadManagerDelegate::OnInstallerDone(
 void ChromeDownloadManagerDelegate::OnDownloadTargetDetermined(
     uint32_t download_id,
     download::DownloadTargetCallback callback,
-    download::DownloadTargetInfo target_info,
+    download::DownloadTargetInfo target_info) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DownloadItem* item = download_manager_->GetDownload(download_id);
   if (item) {

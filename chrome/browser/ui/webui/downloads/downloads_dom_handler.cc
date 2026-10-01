@@ -671,13 +671,6 @@ void DownloadsDOMHandler::ReviewDangerousRequiringGesture(
   }
 
   CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_REVIEW_DANGEROUS);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  download::DownloadItem* download = GetDownloadByStringId(id);
-  if (download) {
-    DownloadItemModel model(download);
-    model.ReviewScanningVerdict(GetWebUIWebContents());
-  }
-#endif
 }
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)

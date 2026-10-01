@@ -302,10 +302,6 @@ void DownloadBubbleUIController::ProcessDownloadButtonPress(
       break;
     }
     case DownloadCommands::REVIEW:
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-      model->ReviewScanningVerdict(
-          browser_->GetTabStripModel()->GetActiveWebContents());
-#endif
       break;
     case DownloadCommands::RETRY:
       RetryDownload(model.get(), command);

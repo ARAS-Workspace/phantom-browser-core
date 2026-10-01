@@ -160,9 +160,6 @@ void DownloadTargetDeterminer::DoLoop() {
       case STATE_CHECK_DOWNLOAD_URL:
         result = DoCheckDownloadUrl();
         break;
-      case STATE_CHECK_VISITED_REFERRER_BEFORE:
-        result = DoCheckVisitedReferrerBefore();
-        break;
       case STATE_DETERMINE_INTERMEDIATE_PATH:
         result = DoDetermineIntermediatePath();
         break;
@@ -655,7 +652,7 @@ DownloadTargetDeterminer::Result
     DownloadTargetDeterminer::DoCheckDownloadUrl() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DCHECK(!virtual_path_.empty());
-  next_state_ = STATE_CHECK_VISITED_REFERRER_BEFORE;
+  next_state_ = STATE_DETERMINE_INTERMEDIATE_PATH;
 
   // If user has validated a dangerous download, don't check.
   if (danger_type_ == download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED)
@@ -672,7 +669,7 @@ void DownloadTargetDeterminer::CheckDownloadUrlDone(
     download::DownloadDangerType danger_type) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DVLOG(20) << "URL Check Result:" << danger_type;
-  DCHECK_EQ(STATE_CHECK_VISITED_REFERRER_BEFORE, next_state_);
+  DCHECK_EQ(STATE_DETERMINE_INTERMEDIATE_PATH, next_state_);
   danger_type_ = danger_type;
   DoLoop();
 }
@@ -782,8 +779,8 @@ void DownloadTargetDeterminer::ScheduleCallbackAndDeleteSelf(
   target_info.insecure_download_status = insecure_download_status_;
 
   base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-      FROM_HERE, base::BindOnce(std::move(completion_callback_),
-                                std::move(target_info), danger_level_));
+      FROM_HERE,
+      base::BindOnce(std::move(completion_callback_), std::move(target_info)));
   delete this;
 }
 

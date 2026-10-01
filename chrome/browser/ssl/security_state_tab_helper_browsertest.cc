@@ -104,7 +104,6 @@ namespace {
 
 using password_manager::metrics_util::PasswordType;
 using safe_browsing::LoginReputationClientResponse;
-using safe_browsing::RequestOutcome;
 
 const char kCreateFilesystemUrlJavascript[] =
     "new Promise(resolve => {"
