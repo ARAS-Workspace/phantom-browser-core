@@ -754,7 +754,6 @@ source_set("core") {
     "//chrome/browser/ui/webui/chrome_finds_internals",
     "//chrome/browser/ui/webui/chrome_finds_internals:mojo_bindings",
     "//chrome/browser/ui/webui/chrome_urls",
-    "//chrome/browser/ui/webui/connectors_internals",
     "//chrome/browser/ui/webui/content_settings",
     "//chrome/browser/ui/webui/context_hub",
     "//chrome/browser/ui/webui/data_sharing_internals",
@@ -2691,7 +2690,6 @@ group("browser_generated_files") {
     "//chrome/browser/ui/webui/user_education_internals:mojo_bindings",
     "//chrome/browser/web_applications/mojom:mojom_web_apps_enum",
     "//components/autofill/core/browser/ml_model/logging:mojo_bindings",
-    "//components/enterprise/connectors:mojom",
     "//components/webui/chrome_urls/mojom:mojo_bindings",
   ]
   public_deps += [

@@ -113,10 +113,9 @@ class ClientCertsTest(ChromeEnterpriseTestCase):
     self.assertEqual(auto_select_cert_policy['source'], 'Cloud')
 
     fingerprints = results['fingerprints']
-    self.assertEqual(fingerprints['connectors'], fingerprints['cert-manager'])
     raw_client_cert = base64.b64decode(fingerprints['server'])
     self.assertEqual(
-      fingerprints['connectors'], self.get_fingerprint_from_der(raw_client_cert)
+      fingerprints['cert-manager'], self.get_fingerprint_from_der(raw_client_cert)
     )
 
   def disable_domain_firewall(self, instance_name: str):

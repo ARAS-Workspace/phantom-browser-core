@@ -98,7 +98,6 @@ def main(argv):
     # To aid diagnosis, try to get fingerprints from all sources, even if one of
     # the retrievals fails.
     for key, get_fingerprint in [
-      ('connectors', get_fingerprint_from_connector_internals),
       ('cert-manager', get_fingerprint_from_cert_manager),
       ('server', lambda driver: get_cert_sent_to_server(driver, host, port)),
     ]:
@@ -112,24 +111,6 @@ def main(argv):
       json.dump(results, results_file)
   finally:
     driver.quit()
-
-
-def get_fingerprint_from_connector_internals(driver: webdriver.Chrome) -> str:
-  driver.get('chrome://connectors-internals/#managed-client-certificate')
-  root = descend_shadow_roots(
-    driver,
-    [
-      'connectors-internals-app',
-      'connectors-tabs',
-      'managed-client-certificate',
-    ],
-  )
-  for div in root.find_elements(
-    By.CSS_SELECTOR, '#managed-identities > div > div'
-  ):
-    if 'SHA-256 Fingerprint' in div.text:
-      return div.find_element(By.CSS_SELECTOR, 'span').text.strip()
-  raise Exception('Fingerprint not found in chrome://connectors-internals')
 
 
 def get_fingerprint_from_cert_manager(driver: webdriver.Chrome) -> str:

@@ -37,7 +37,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://components",
       "chrome://connection-help",
       "chrome://connection-monitoring-detected",
-      "chrome://connectors-internals",
       "chrome://content-settings",
       "chrome://crashes",
 // TODO(crbug.com/40913109): Re-enable this test

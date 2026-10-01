@@ -11,7 +11,6 @@
 #include "chrome/browser/ui/webui/chrome_finds_internals/chrome_finds_internals.mojom.h"
 #include "chrome/browser/ui/webui/chrome_finds_internals/chrome_finds_internals_ui.h"
 #include "chrome/browser/ui/webui/chrome_urls/chrome_urls_ui.h"
-#include "chrome/browser/ui/webui/connectors_internals/connectors_internals_ui.h"
 #include "chrome/browser/ui/webui/content_settings/content_settings_internals.mojom.h"
 #include "chrome/browser/ui/webui/content_settings/content_settings_ui.h"
 #include "chrome/browser/ui/webui/data_sharing_internals/data_sharing_internals_ui.h"
@@ -23,7 +22,6 @@
 #include "chrome/browser/ui/webui/segmentation_internals/segmentation_internals_ui.h"
 #include "chrome/browser/ui/webui/subresource_filter/subresource_filter_internals_ui.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/enterprise/connectors/connectors_internals.mojom.h"
 #include "components/history_clusters/history_clusters_internals/webui/history_clusters_internals_ui.h"
 #include "components/policy/core/common/features.h"
 #include "components/site_engagement/core/mojom/site_engagement_details.mojom.h"
@@ -159,9 +157,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
       data_sharing_internals::mojom::PageHandlerFactory,
       DataSharingInternalsUI>(map);
 
-  RegisterWebUIControllerInterfaceBinder<
-      connectors_internals::mojom::PageHandler,
-      enterprise_connectors::ConnectorsInternalsUI>(map);
 
   if (base::FeatureList::IsEnabled(
           policy::features::kPolicyPageMojoMigration)) {

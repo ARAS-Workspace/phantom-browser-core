@@ -72,8 +72,6 @@ inline constexpr char kChromeUIColorPipelineInternalsHost[] =
     "color-pipeline-internals";
 inline constexpr char kChromeUIComponentsHost[] = "components";
 inline constexpr char kChromeUIConflictsHost[] = "conflicts";
-inline constexpr char kChromeUIConnectorsInternalsHost[] =
-    "connectors-internals";
 inline constexpr char kChromeUIConstrainedHTMLTestHost[] = "constrained-test";
 inline constexpr char kChromeUIConstrainedHTMLTestURL[] =
     "chrome://constrained-test/";
