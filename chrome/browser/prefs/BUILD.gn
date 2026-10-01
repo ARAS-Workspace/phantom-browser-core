@@ -143,6 +143,7 @@ source_set("impl") {
     "//components/language/content/browser",
     "//components/language/content/browser/ulp_language_code_locator",
     "//components/language/core/browser",
+    "//components/live_caption:constants",
     "//components/lookalikes/core",
     "//components/media_device_salt",
     "//components/metrics/demographics",
