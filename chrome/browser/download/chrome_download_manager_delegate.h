@@ -27,7 +27,6 @@
 #include "components/download/public/common/download_path_reservation_tracker.h"
 #include "components/download/public/common/download_target_info.h"
 #include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/common/proto/download_file_types.pb.h"
 #include "content/public/browser/download_manager.h"
 #include "content/public/browser/download_manager_delegate.h"
 #include "extensions/buildflags/buildflags.h"
@@ -111,8 +110,6 @@ class ChromeDownloadManagerDelegate
                       const base::FilePath::StringType& default_extension,
                       bool can_save_as_complete,
                       content::SavePackagePathPickedCallback callback) override;
-  void SanitizeSavePackageResourceName(base::FilePath* filename,
-                                       const GURL& source_url) override;
   void SanitizeDownloadParameters(
       download::DownloadUrlParameters* params) override;
   void OpenDownload(download::DownloadItem* download) override;
@@ -255,8 +252,7 @@ class ChromeDownloadManagerDelegate
   void OnDownloadTargetDetermined(
       uint32_t download_id,
       download::DownloadTargetCallback callback,
-      download::DownloadTargetInfo target_info,
-      safe_browsing::DownloadFileType::DangerLevel danger_level);
+      download::DownloadTargetInfo target_info);
 
   // Sends a download report when the dangerous download is opened. This action
   // can be performed multiple times after the warning is bypassed, so this

@@ -1976,10 +1976,6 @@ source_set("browser_tests") {
 
   data_deps = []
 
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
-  }
-
   if (is_mac) {
     sources += [
       "api/networking_private/networking_private_apitest.cc",

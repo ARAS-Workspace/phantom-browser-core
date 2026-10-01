@@ -16,9 +16,7 @@
 #include "build/build_config.h"
 #include "chrome/common/safe_browsing/binary_feature_extractor.h"
 #include "chrome/common/safe_browsing/download_type_util.h"
-#include "components/safe_browsing/content/common/file_type_policies.h"
 #include "crypto/hash.h"
-#include "url/gurl.h"
 
 #if BUILDFLAG(IS_MAC)
 #include <mach-o/fat.h>
@@ -80,11 +78,7 @@ void UpdateArchiveAnalyzerResultsWithFile(base::FilePath path,
   uint8_t dmg_header[DiskImageTypeSnifferMac::kAppleDiskImageTrailerSize];
   file->Read(0, dmg_header);
 
-  bool is_checked =
-      FileTypePolicies::GetInstance()->IsCheckedBinaryFile(path) &&
-      !is_directory;
   current_entry_is_executable =
-      is_checked || MachOImageReader::IsMachOMagicValue(magic) ||
       DiskImageTypeSnifferMac::IsAppleDiskImageTrailer(dmg_header);
 
   // We can skip checking the trailer if we already know the file is executable.
@@ -98,25 +92,9 @@ void UpdateArchiveAnalyzerResultsWithFile(base::FilePath path,
   }
 
 #else
-  current_entry_is_executable =
-      FileTypePolicies::GetInstance()->IsCheckedBinaryFile(path) &&
-      !is_directory;
+  current_entry_is_executable = false;
 #endif  // BUILDFLAG(IS_MAC)
 
-  if (FileTypePolicies::GetInstance()->IsArchiveFile(path)) {
-    DVLOG(2) << "Downloaded a zipped archive: " << path.value();
-    results->has_archive = true;
-    results->archived_archive_filenames.push_back(path.BaseName());
-    ClientDownloadRequest::ArchivedBinary* archived_archive =
-        results->archived_binary.Add();
-    archived_archive->set_download_type(ClientDownloadRequest::ARCHIVE);
-    archived_archive->set_is_encrypted(is_encrypted);
-    archived_archive->set_is_archive(true);
-    SetNameForContainedFile(path, archived_archive);
-    if (contents_valid) {
-      SetLengthAndDigestForContainedFile(file, file_length, archived_archive);
-    }
-  } else {
 #if BUILDFLAG(IS_MAC)
     // This check prevents running analysis on .app files since they are
     // really just directories and will cause binary feature extraction
@@ -143,14 +121,6 @@ void UpdateArchiveAnalyzerResultsWithFile(base::FilePath path,
 #if BUILDFLAG(IS_MAC)
     }
 #endif  // BUILDFLAG(IS_MAC)
-  }
-}
-
-safe_browsing::DownloadFileType_InspectionType GetFileType(
-    base::FilePath path) {
-  return FileTypePolicies::GetInstance()
-      ->PolicyForFile(path, GURL{}, nullptr)
-      .inspection_type();
 }
 
 void SetNameForContainedFile(

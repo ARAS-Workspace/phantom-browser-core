@@ -9,7 +9,6 @@
 
 #include "base/task/single_thread_task_runner.h"
 #include "base/threading/thread_checker.h"
-#include "components/safe_browsing/content/common/safe_browsing.mojom.h"
 #include "extensions/buildflags/buildflags.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/remote.h"

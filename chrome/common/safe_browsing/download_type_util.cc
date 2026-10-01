@@ -6,7 +6,6 @@
 
 #include "base/files/file_path.h"
 #include "base/strings/string_util.h"
-#include "components/safe_browsing/content/common/file_type_policies.h"
 
 namespace safe_browsing {
 namespace download_type_util {
@@ -56,9 +55,6 @@ ClientDownloadRequest::DownloadType GetDownloadType(
       base::EqualsCaseInsensitiveASCII(ext,
                                        FILE_PATH_LITERAL(".sparseimage"))) {
     return ClientDownloadRequest::MAC_EXECUTABLE;
-  }
-  if (FileTypePolicies::GetInstance()->IsArchiveFile(file_name)) {
-    return ClientDownloadRequest::ARCHIVE;
   }
   if (base::EqualsCaseInsensitiveASCII(ext, FILE_PATH_LITERAL(".pdf")) ||
       base::EqualsCaseInsensitiveASCII(ext, FILE_PATH_LITERAL(".doc")) ||

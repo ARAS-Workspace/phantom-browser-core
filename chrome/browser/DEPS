@@ -301,7 +301,6 @@ include_rules = [
   "+components/rlz",
   "+components/safe_browsing/android",
   "+components/safe_browsing/buildflags.h",
-  "+components/safe_browsing/content/common",
   "+components/safe_browsing/core/browser",
   "+components/safe_browsing/core/common",
   "+components/themes",

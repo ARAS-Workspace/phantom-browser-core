@@ -62,9 +62,6 @@
 #include "content/public/common/webplugininfo.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies.h"
-#endif
 
 using content::BrowserThread;
 using download::DownloadItem;
@@ -520,7 +517,6 @@ DownloadTargetDeterminer::DoRequestConfirmation() {
               &DownloadTargetDeterminer::RequestConfirmationDone,
               weak_ptr_factory_.GetWeakPtr()));
       return QUIT_DOLOOP;
-    } else {
     }
   }
 

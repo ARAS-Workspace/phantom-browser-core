@@ -99,13 +99,8 @@ class ModelBrokerClient;
 }  // namespace optimization_guide
 
 namespace safe_browsing {
-class AsyncCheckTracker;
 class RealTimeUrlLookupServiceBase;
 class UrlCheckerDelegate;
-
-namespace hash_realtime_utils {
-enum class HashRealTimeSelection;
-}
 }  // namespace safe_browsing
 
 namespace url {
@@ -1206,18 +1201,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       bool is_enterprise_lookup_enabled,
       bool is_consumer_lookup_enabled);
 
-  // Returns an AsyncCheckTracker object used for holding URL checkers for async
-  // Safe Browsing check. It may return nullptr if the WebContents is null,
-  // the ui_manager is null, the real-time check is not enabled, or the loader
-  // is for no-state prefetch or frame prerender.
-  safe_browsing::AsyncCheckTracker* GetAsyncCheckTracker(
-      const base::RepeatingCallback<content::WebContents*()>& wc_getter,
-      bool is_enterprise_lookup_enabled,
-      bool is_consumer_lookup_enabled,
-      safe_browsing::hash_realtime_utils::HashRealTimeSelection
-          hash_realtime_selection,
-      content::FrameTreeNodeId frame_tree_node_id);
-
   // Try to upload an enterprise legacy tech event to the enterprise management
   // server for admins.
   void ReportLegacyTechEvent(
@@ -1230,17 +1213,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       uint64_t column,
       std::optional<content::LegacyTechCookieIssueDetails> cookie_issue_details)
       override;
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  std::unique_ptr<blink::URLLoaderThrottle>
-  MaybeCreateSafeBrowsingURLLoaderThrottle(
-      const network::ResourceRequest& request,
-      content::BrowserContext* browser_context,
-      const base::RepeatingCallback<content::WebContents*()>& wc_getter,
-      content::FrameTreeNodeId frame_tree_node_id,
-      std::optional<int64_t> navigation_id,
-      Profile* profile);
-#endif
 
   void OnKeepaliveTimerFired(
       std::unique_ptr<ScopedKeepAlive> keep_alive_handle);

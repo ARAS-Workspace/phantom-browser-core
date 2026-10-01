@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/safe_browsing/buildflags.gni")
-
 assert(is_mac || is_linux)
 
 source_set("file_system_access") {
@@ -13,10 +11,6 @@ source_set("file_system_access") {
     "file_system_access_restricted_directory_dialog.h",
     "file_system_access_ui_helpers.h",
   ]
-
-  if (safe_browsing_mode != 0) {
-    sources += [ "file_system_access_dangerous_file_dialog.h" ]
-  }
 
   public_deps = [
     "//base",
@@ -39,11 +33,6 @@ source_set("impl") {
     "//ui/base/interaction",
   ]
 
-  if (safe_browsing_mode != 0) {
-    sources += [ "file_system_access_dangerous_file_dialog.cc" ]
-    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
-  }
-
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
 
@@ -62,10 +51,6 @@ source_set("browser_tests") {
     "//content/test:test_support",
     "//url",
   ]
-
-  if (safe_browsing_mode != 0) {
-    sources += [ "file_system_access_dangerous_file_dialog_browsertest.cc" ]
-  }
 }
 
 source_set("unit_tests") {
@@ -83,10 +68,6 @@ source_set("unit_tests") {
     "//ui/base:test_support",
     "//url",
   ]
-
-  if (safe_browsing_mode != 0) {
-    sources += [ "file_system_access_dangerous_file_dialog_unittest.cc" ]
-  }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.

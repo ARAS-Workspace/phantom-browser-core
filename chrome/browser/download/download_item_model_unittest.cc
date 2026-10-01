@@ -51,7 +51,6 @@
 
 using download::DownloadItem;
 using offline_items_collection::FailState;
-using safe_browsing::DownloadFileType;
 using ::testing::_;
 using ::testing::Mock;
 using ::testing::NiceMock;
@@ -758,16 +757,6 @@ TEST_F(DownloadItemModelTest, ShouldShowInUi) {
 
   model().SetShouldShowInUi(false);
   EXPECT_FALSE(model().ShouldShowInUi());
-}
-
-TEST_F(DownloadItemModelTest, DangerLevel) {
-  SetupDownloadItemDefaults();
-
-  // Default danger level is NOT_DANGEROUS.
-  EXPECT_EQ(DownloadFileType::NOT_DANGEROUS, model().GetDangerLevel());
-
-  model().SetDangerLevel(DownloadFileType::ALLOW_ON_USER_GESTURE);
-  EXPECT_EQ(DownloadFileType::ALLOW_ON_USER_GESTURE, model().GetDangerLevel());
 }
 
 TEST_F(DownloadItemModelTest, HasSupportedImageMimeType) {

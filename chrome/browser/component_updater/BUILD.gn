@@ -81,7 +81,6 @@ source_set("component_updater") {
   }
 
   if (safe_browsing_mode != 0) {
-    public += [ "file_type_policies_component_installer.h" ]
   }
 }
 
@@ -166,9 +165,6 @@ source_set("impl") {
     deps +=
         [ "//components/safe_browsing/android:real_time_url_checks_allowlist" ]
   }
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
-  }
 
   sources += [
     "dictation_connector_component_installer.cc",
@@ -224,7 +220,6 @@ source_set("impl") {
   }
 
   if (safe_browsing_mode != 0) {
-    sources += [ "file_type_policies_component_installer.cc" ]
   }
 
   if (is_chrome_for_testing) {

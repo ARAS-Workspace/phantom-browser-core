@@ -39,22 +39,13 @@
 #include "components/policy/core/browser/url_list/url_blocklist_manager.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/download_manager.h"
 #include "content/public/browser/save_page_type.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies.h"
-#endif
-
 using content::BrowserContext;
 using content::BrowserThread;
 using content::DownloadManager;
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-using safe_browsing::FileTypePolicies;
-#endif
 
 namespace {
 
@@ -186,22 +177,6 @@ DownloadPrefs::DownloadPrefs(Profile* profile) : profile_(profile) {
         *extension.begin() == base::FilePath::kExtensionSeparator) {
       continue;
     }
-    // Construct something like ".<extension>", since
-    // IsAllowedToOpenAutomatically() needs a filename.
-    base::FilePath filename_with_extension = base::FilePath(
-        base::FilePath::StringType(1, base::FilePath::kExtensionSeparator) +
-        extension);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-    // Note that the list of file types that are not allowed to open
-    // automatically can change in the future. When the list is tightened, it is
-    // expected that some entries in the users' auto open list will get dropped
-    // permanently as a result.
-    if (!FileTypePolicies::GetInstance()->IsAllowedToOpenAutomatically(
-            filename_with_extension)) {
-      continue;
-    }
-#endif
     auto_open_by_user_.insert(extension);
   }
 }
@@ -348,18 +323,9 @@ bool DownloadPrefs::IsAutoOpenByPolicy(const GURL& url,
 bool DownloadPrefs::EnableAutoOpenByUserBasedOnExtension(
     const base::FilePath& file_name) {
   base::FilePath::StringType extension = file_name.Extension();
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (!FileTypePolicies::GetInstance()->IsAllowedToOpenAutomatically(
-          file_name)) {
-    return false;
-  }
-
-  DCHECK(extension[0] == base::FilePath::kExtensionSeparator);
-#else
   if (extension[0] != base::FilePath::kExtensionSeparator) {
     return false;
   }
-#endif
   extension.erase(0, 1);
 
   auto_open_by_user_.insert(extension);

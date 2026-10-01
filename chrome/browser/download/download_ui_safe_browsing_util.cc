@@ -13,26 +13,6 @@
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies.h"
-#endif
-
-namespace {
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-std::string GetDangerPromptHistogramName(const std::string& suffix,
-                                         const download::DownloadItem& item) {
-  const char kPrefix[] = "Download.DownloadDangerPrompt";
-  download::DownloadDangerType danger_type = item.GetDangerType();
-  return base::StringPrintf("%s.%s.%s", kPrefix,
-                            download::GetDownloadDangerTypeString(danger_type),
-                            // "Proceed" or "Shown".
-                            suffix.c_str());
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
-}  // namespace
-
 bool WasSafeBrowsingVerdictObtained(const download::DownloadItem* item) {
   return false;
 }
@@ -57,13 +37,5 @@ bool CanUserTurnOnSafeBrowsing(Profile* profile) {
 void RecordDownloadDangerPromptHistogram(
     const std::string& proceed_or_shown_suffix,
     const download::DownloadItem& item) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  int64_t file_type_uma_value =
-      safe_browsing::FileTypePolicies::GetInstance()->UmaValueForFile(
-          item.GetTargetFilePath());
-  base::UmaHistogramSparse(
-      GetDangerPromptHistogramName(proceed_or_shown_suffix, item),
-      file_type_uma_value);
-#endif
 }
 

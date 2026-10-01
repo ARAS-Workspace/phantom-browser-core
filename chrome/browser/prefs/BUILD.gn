@@ -5,7 +5,6 @@
 import("//chrome/common/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/on_device_translation/buildflags/features.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//rlz/buildflags/buildflags.gni")
@@ -274,10 +273,6 @@ source_set("impl") {
 
   if (enable_pdf) {
     deps += [ "//chrome/browser/pdf:pdf_pref_names" ]
-  }
-
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
   }
 
   if (is_mac) {

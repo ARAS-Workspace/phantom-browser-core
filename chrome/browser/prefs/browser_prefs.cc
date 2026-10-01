@@ -341,9 +341,6 @@
 #include "components/enterprise/data_controls/core/browser/prefs.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies_prefs.h"
-#endif
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
 #include "chrome/browser/chrome_for_testing/prefs.h"
@@ -1266,9 +1263,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #endif
 
   RegisterPrefersDefaultScrollbarStylesPrefs(registry);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing::file_type::RegisterProfilePrefs(registry);
-#endif
   safe_browsing::RegisterProfilePrefs(registry);
   safety_check::prefs::RegisterProfilePrefs(registry);
   SearchPrefetchService::RegisterProfilePrefs(registry);

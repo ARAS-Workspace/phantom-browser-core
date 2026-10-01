@@ -5,7 +5,6 @@
 import("//build/config/ui.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 
@@ -66,7 +65,6 @@ source_set("download") {
     "//components/policy/core/common",
     "//components/prefs",
     "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/content/common/proto:download_file_types_proto",
     "//components/safe_browsing/core/common",
     "//components/safe_browsing/core/common/proto:csd_proto",
     "//content/public/browser",
@@ -247,10 +245,6 @@ source_set("impl") {
     sources += [ "download_crx_util.cc" ]
   }
 
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
-  }
-
   if (enable_offline_pages) {
     deps += [ "//components/offline_pages/core" ]
   }
@@ -358,13 +352,6 @@ source_set("unit_tests") {
     "//url",
   ]
 
-  if (safe_browsing_mode != 0) {
-    deps += [
-      "//components/safe_browsing/content/common:file_type_policies",
-      "//components/safe_browsing/content/common:file_type_policies_test_support",
-    ]
-  }
-
   sources += [
     "download_commands_unittest.cc",
     "download_dir_policy_handler_unittest.cc",
@@ -411,13 +398,6 @@ source_set("browser_tests") {
     "//testing/gtest",
     "//ui/shell_dialogs:test_support",
   ]
-
-  if (safe_browsing_mode != 0) {
-    deps += [
-      "//components/safe_browsing/content/common:file_type_policies",
-      "//components/safe_browsing/content/common:file_type_policies_test_support",
-    ]
-  }
 
   deps += [
     "//chrome/browser/download/bubble",

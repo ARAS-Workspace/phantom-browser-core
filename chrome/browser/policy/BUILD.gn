@@ -4,7 +4,6 @@
 
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/on_device_translation/buildflags/features.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//components/signin/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
@@ -961,10 +960,6 @@ source_set("impl") {
 
   if (enable_pdf) {
     deps += [ "//chrome/browser/pdf:pdf_pref_names" ]
-  }
-
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
   }
 
   sources += [ "managed_account_policy_handler.cc" ]

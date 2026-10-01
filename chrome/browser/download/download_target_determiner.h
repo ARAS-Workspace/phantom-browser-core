@@ -19,7 +19,6 @@
 #include "components/download/public/common/download_item.h"
 #include "components/download/public/common/download_path_reservation_tracker.h"
 #include "components/download/public/common/download_target_info.h"
-#include "components/safe_browsing/content/common/proto/download_file_types.pb.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "content/public/browser/download_manager_delegate.h"
 
@@ -80,9 +79,8 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
   //       UNKNOWN, the file will still be considered a DANGEROUS_FILE. However,
   //       SafeBrowsing may flag the file as being malicious, in which case the
   //       malicious classification should take precedence.
-  using CompletionCallback = base::OnceCallback<void(
-      download::DownloadTargetInfo target_info,
-      safe_browsing::DownloadFileType::DangerLevel danger_level)>;
+  using CompletionCallback =
+      base::OnceCallback<void(download::DownloadTargetInfo target_info)>;
 
   DownloadTargetDeterminer(const DownloadTargetDeterminer&) = delete;
   DownloadTargetDeterminer& operator=(const DownloadTargetDeterminer&) = delete;
@@ -136,7 +134,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
     STATE_DETERMINE_LOCAL_PATH,
     STATE_DETERMINE_MIME_TYPE,
     STATE_CHECK_DOWNLOAD_URL,
-    STATE_CHECK_VISITED_REFERRER_BEFORE,
     STATE_DETERMINE_INTERMEDIATE_PATH,
     STATE_NONE,
   };
@@ -156,13 +153,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
 
     // Target determination is complete.
     COMPLETE
-  };
-
-  // Used with GetDangerLevel to indicate whether the user has visited the
-  // referrer URL for the download prior to today.
-  enum PriorVisitsToReferrer {
-    NO_VISITS_TO_REFERRER,
-    VISITED_REFERRER,
   };
 
   // Construct a DownloadTargetDeterminer object. Constraints on the arguments
@@ -269,23 +259,11 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
 
   // Checks whether the downloaded URL is malicious, via the delegate.
   // Next state:
-  // - STATE_CHECK_VISITED_REFERRER_BEFORE.
   Result DoCheckDownloadUrl();
 
   // Callback invoked after the delegate has checked the download URL. Sets the
   // danger type of the download to |danger_type|.
   void CheckDownloadUrlDone(download::DownloadDangerType danger_type);
-
-  // Checks if the user has visited the referrer URL of the download prior to
-  // today. The actual check is only performed if it would be needed to
-  // determine the danger type of the download.
-  // Next state:
-  // - STATE_DETERMINE_INTERMEDIATE_PATH.
-  Result DoCheckVisitedReferrerBefore();
-
-  // Callback invoked after completion of history check for prior visits to
-  // referrer URL.
-  void CheckVisitedReferrerBeforeDone(bool visited_referrer_before);
 
   // Determines the intermediate path. Once this step completes, downloads
   // target determination is complete. The determination assumes that the
@@ -329,19 +307,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
   // operation.
   bool HasPromptedForPath() const;
 
-  // Returns true if this download should show the "dangerous file" warning.
-  // Various factors are considered, such as the type of the file, whether a
-  // user action initiated the download, and whether the user has explicitly
-  // marked the file type as "auto open". Protected virtual for testing.
-  //
-  // If |require_explicit_consent| is non-null then the pointed bool will be set
-  // to true if the download requires explicit user consent.
-  safe_browsing::DownloadFileType::DangerLevel GetDangerLevel(
-      PriorVisitsToReferrer visits) const;
-
-  // Returns the timestamp of the last download bypass.
-  std::optional<base::Time> GetLastDownloadBypassTimestamp() const;
-
   // Generates the download file name based on information from URL, response
   // headers and sniffed mime type.
   base::FilePath GenerateFileName() const;
@@ -357,7 +322,6 @@ class DownloadTargetDeterminer : public download::DownloadItem::Observer {
   download::DownloadPathReservationTracker::FilenameConflictAction
       conflict_action_;
   download::DownloadDangerType danger_type_;
-  safe_browsing::DownloadFileType::DangerLevel danger_level_;
   base::FilePath virtual_path_;
   base::FilePath local_path_;
   base::FilePath intermediate_path_;

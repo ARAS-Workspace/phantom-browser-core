@@ -214,10 +214,6 @@
 #include "components/enterprise/watermarking/watermark_style_policy_handler.h"  // nogncheck crbug.com/40147906
 #endif  // BUILDFLAG(ENTERPRISE_WATERMARK)
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies_prefs.h"
-#endif
-
 namespace policy {
 namespace {
 
@@ -1654,16 +1650,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           chrome_schema.GetValidationSchema(),
           SimpleSchemaValidatingPolicyHandler::RECOMMENDED_ALLOWED,
           SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  handlers->AddHandler(std::make_unique<SimpleSchemaValidatingPolicyHandler>(
-      key::kExemptDomainFileTypePairsFromFileTypeDownloadWarnings,
-      safe_browsing::file_type::prefs::
-          kExemptDomainFileTypePairsFromFileTypeDownloadWarnings,
-      chrome_schema, SCHEMA_ALLOW_UNKNOWN,
-      SimpleSchemaValidatingPolicyHandler::RECOMMENDED_PROHIBITED,
-      SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
-#endif
 
   handlers->AddHandler(std::make_unique<SimpleSchemaValidatingPolicyHandler>(
       key::kManagedConfigurationPerOrigin,

@@ -135,7 +135,6 @@ browser_exposed_mojom_targets = [
   "//components/payments/mojom:mojom",
   "//components/performance_manager/public/mojom:mojom",
   "//components/printing/common:mojo_interfaces",
-  "//components/safe_browsing/content/common:interfaces",
   "//components/safe_browsing/core/common:interfaces",
   "//components/tabs/public/mojom:mojom",
   "//components/on_device_translation/public/mojom:mojom",

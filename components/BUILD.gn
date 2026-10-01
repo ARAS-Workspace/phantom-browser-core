@@ -591,7 +591,6 @@ test("components_unittests") {
 
   if (safe_browsing_mode != 0) {
     deps += [
-      "//components/safe_browsing/content/common:file_type_policies_unittest",
       "//components/safe_browsing/core/browser:intelligent_scan_delegate_unittest",
       "//components/safe_browsing/core/browser:referring_app_info_unittest",
       "//components/safe_browsing/core/browser:safe_browsing_hats_delegate_unittest",
@@ -605,14 +604,6 @@ test("components_unittests") {
       "//components/safe_browsing/core/common:unit_tests",
       "//components/safe_browsing/core/common/hashprefix_realtime:unit_tests",
       "//components/safe_browsing/core/common/phishing_classifier:unit_tests",
-    ]
-  }
-
-  if (safe_browsing_mode != 0) {
-    deps += [
-      # TODO(chromium: 1169835) components / reporting / storage / resources:
-      # unit_tests can't be run on iOS until they are updated.
-      "//components/safe_browsing/content/common:file_type_policies_policy_util_unittest",
     ]
   }
 

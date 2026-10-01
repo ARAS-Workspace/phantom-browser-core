@@ -13,8 +13,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/download/download_ui_model.h"
 #include "components/download/public/common/download_item.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/common/proto/download_file_types.pb.h"
 
 namespace content {
 class WebContents;
@@ -77,9 +75,6 @@ class DownloadItemModel : public DownloadUIModel,
   void SetEphemeralWarningUiShownTime(std::optional<base::Time> time) override;
   bool ShouldPreferOpeningInBrowser() override;
   void SetShouldPreferOpeningInBrowser(bool preference) override;
-  safe_browsing::DownloadFileType::DangerLevel GetDangerLevel() const override;
-  void SetDangerLevel(
-      safe_browsing::DownloadFileType::DangerLevel danger_level) override;
   download::DownloadItem::InsecureDownloadStatus GetInsecureDownloadStatus()
       const override;
   void OpenUsingPlatformHandler() override;

@@ -4,7 +4,6 @@
 
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 assert(is_mac || is_linux)
@@ -60,10 +59,6 @@ source_set("impl") {
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/views/file_system_access",
   ]
-
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
-  }
 
   if (enable_platform_apps) {
     deps += [
@@ -138,10 +133,6 @@ source_set("unit_tests") {
     "//ui/shell_dialogs",
     "//ui/webui",
   ]
-
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
-  }
 
   deps += [ "//chrome/browser/web_applications:web_applications_test_support" ]
 }

@@ -116,10 +116,6 @@
 #include "components/offline_pages/core/client_namespace_constants.h"  // nogncheck crbug.com/40147906
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies.h"
-#endif
-
 using content::BrowserThread;
 using content::DownloadManager;
 using download::DownloadItem;
@@ -863,14 +859,12 @@ void ChromeDownloadManagerDelegate::OnDownloadTargetDetermined(
     uint32_t download_id,
     download::DownloadTargetCallback callback,
     download::DownloadTargetInfo target_info,
-    safe_browsing::DownloadFileType::DangerLevel danger_level) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DownloadItem* item = download_manager_->GetDownload(download_id);
   if (item) {
     DownloadItemModel model(item);
     model.DetermineAndSetShouldPreferOpeningInBrowser(
         target_info.target_path, target_info.is_filetype_handled_safely);
-    model.SetDangerLevel(danger_level);
   }
   if (ShouldBlockFile(item, target_info.danger_type)) {
     MaybeReportDangerousDownloadBlocked(
@@ -935,9 +929,7 @@ bool ChromeDownloadManagerDelegate::ShouldBlockFile(
     return true;
   }
 
-  bool file_type_dangerous =
-      (item && DownloadItemModel(item).GetDangerLevel() !=
-                   DownloadFileType::NOT_DANGEROUS);
+  bool file_type_dangerous = false;
 
   switch (download_restriction) {
     case (policy::DownloadRestriction::NONE):

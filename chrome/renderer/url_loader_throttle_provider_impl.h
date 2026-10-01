@@ -11,7 +11,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/sequence_checker.h"
 #include "base/types/pass_key.h"
-#include "components/safe_browsing/content/common/safe_browsing.mojom.h"
 #include "extensions/buildflags/buildflags.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/remote.h"
@@ -35,14 +34,11 @@ class URLLoaderThrottleProviderImpl : public blink::URLLoaderThrottleProvider {
  public:
   static std::unique_ptr<blink::URLLoaderThrottleProvider> Create(
       blink::URLLoaderThrottleProviderType type,
-      ChromeContentRendererClient* chrome_content_renderer_client,
-      blink::ThreadSafeBrowserInterfaceBrokerProxy* broker);
+      ChromeContentRendererClient* chrome_content_renderer_client);
 
   URLLoaderThrottleProviderImpl(
       blink::URLLoaderThrottleProviderType type,
       ChromeContentRendererClient* chrome_content_renderer_client,
-      mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
-          pending_safe_browsing,
       scoped_refptr<base::SequencedTaskRunner> main_thread_task_runner,
       base::PassKey<URLLoaderThrottleProviderImpl>);
 
@@ -59,15 +55,8 @@ class URLLoaderThrottleProviderImpl : public blink::URLLoaderThrottleProvider {
   void SetOnline(bool is_online) override;
 
  private:
-  mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
-  CloneSafeBrowsingPendingRemote();
-
   blink::URLLoaderThrottleProviderType type_;
   const raw_ptr<ChromeContentRendererClient> chrome_content_renderer_client_;
-
-  mojo::PendingRemote<safe_browsing::mojom::SafeBrowsing>
-      pending_safe_browsing_;
-  mojo::Remote<safe_browsing::mojom::SafeBrowsing> safe_browsing_;
 
 // TODO(crbug.com/513231260): Convert to ENABLE_EXTENSIONS_CORE when safe
 // browsing supports extensions on desktop Android.

@@ -93,11 +93,6 @@
 #include "extensions/common/extension.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/ui/file_system_access/file_system_access_dangerous_file_dialog.h"
-#include "components/safe_browsing/content/common/file_type_policies.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE) && BUILDFLAG(ENABLE_GUEST_VIEW)
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && BUILDFLAG(ENABLE_GUEST_VIEW)
@@ -178,37 +173,6 @@ void ShowFileSystemAccessRestrictedDirectoryDialogOnUIThread(
   ShowFileSystemAccessRestrictedDirectoryDialog(
       origin, handle_type, std::move(callback), web_contents);
 }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-void ShowFileSystemAccessDangerousFileDialogOnUIThread(
-    content::GlobalRenderFrameHostId frame_id,
-    const url::Origin& origin,
-    const content::PathInfo& path_info,
-    base::OnceCallback<
-        void(ChromeFileSystemAccessPermissionContext::SensitiveEntryResult)>
-        callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  content::RenderFrameHost* rfh = content::RenderFrameHost::FromID(frame_id);
-  if (!rfh || !rfh->IsActive()) {
-    // Requested from a no longer valid RenderFrameHost.
-    std::move(callback).Run(
-        ChromeFileSystemAccessPermissionContext::SensitiveEntryResult::kAbort);
-    return;
-  }
-
-  content::WebContents* web_contents =
-      content::WebContents::FromRenderFrameHost(rfh);
-  if (!web_contents) {
-    // Requested from a worker, or a no longer existing tab.
-    std::move(callback).Run(
-        ChromeFileSystemAccessPermissionContext::SensitiveEntryResult::kAbort);
-    return;
-  }
-
-  ShowFileSystemAccessDangerousFileDialog(origin, path_info,
-                                          std::move(callback), web_contents);
-}
-#endif
 
 // A wrapper around `base::NormalizeFilePath` that returns its result instead of
 // using an out parameter.
@@ -611,17 +575,6 @@ std::string_view GetGrantKeyFromGrantType(GrantType type) {
   return type == GrantType::kWrite ? kPermissionWritableKey
                                    : kPermissionReadableKey;
 }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-safe_browsing::DownloadFileType::DangerLevel GetFileTypeDangerLevel(
-    const base::FilePath& path) {
-  // Passing an empty source URL and null prefs ensures the result reflects
-  // only the configured danger level for the file type, without applying any
-  // download-specific overrides.
-  return safe_browsing::FileTypePolicies::GetInstance()->GetFileDangerLevel(
-      path, GURL(), /*prefs=*/nullptr);
-}
-#endif
 
 std::string StringOrEmpty(const std::string* s) {
   return s ? *s : std::string();
@@ -1905,12 +1858,7 @@ bool ChromeFileSystemAccessPermissionContext::CanObtainWritePermission(
 
 bool ChromeFileSystemAccessPermissionContext::IsFileTypeDangerous(
     const base::FilePath& path) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  return GetFileTypeDangerLevel(path) ==
-         safe_browsing::DownloadFileType::DANGEROUS;
-#else
   return false;
-#endif
 }
 
 void ChromeFileSystemAccessPermissionContext::ConfirmSensitiveEntryAccess(
@@ -2117,29 +2065,6 @@ void ChromeFileSystemAccessPermissionContext::DidCheckPathAgainstBlocklist(
                        std::move(result_callback)));
     return;
   }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // If attempting to save a file with a dangerous extension, prompt the user
-  // to make them confirm they actually want to save the file.
-  if (handle_type == HandleType::kFile && user_action == UserAction::kSave) {
-    // See https://crbug.com/40059513#comment5 for justification for why we show
-    // the prompt if `danger_level` is ALLOW_ON_USER_GESTURE as well as
-    // DANGEROUS.
-    auto danger_level = GetFileTypeDangerLevel(path_info.path);
-    if (danger_level == safe_browsing::DownloadFileType::DANGEROUS ||
-        danger_level ==
-            safe_browsing::DownloadFileType::ALLOW_ON_USER_GESTURE) {
-      auto result_callback =
-          base::BindPostTaskToCurrentDefault(std::move(callback));
-      content::GetUIThreadTaskRunner({})->PostTask(
-          FROM_HERE,
-          base::BindOnce(&ShowFileSystemAccessDangerousFileDialogOnUIThread,
-                         frame_id, origin, path_info,
-                         std::move(result_callback)));
-      return;
-    }
-  }
-#endif
 
   std::move(callback).Run(SensitiveEntryResult::kAllowed);
 }

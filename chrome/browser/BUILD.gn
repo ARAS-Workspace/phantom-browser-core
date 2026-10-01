@@ -1794,7 +1794,6 @@ source_set("browser") {
     "//components/reporting/util:status",
     "//components/reporting/util:status_macros",
     "//components/resources",
-    "//components/safe_browsing/content/common/proto:download_file_types_proto",
     "//components/safe_browsing/core/browser",
     "//components/safe_browsing/core/browser:referring_app_info",
     "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
@@ -2536,10 +2535,6 @@ source_set("browser") {
 
   if (use_udev) {
     deps += [ "//device/udev_linux" ]
-  }
-
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
   }
 
   if (is_chrome_for_testing) {

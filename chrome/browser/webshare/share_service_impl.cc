@@ -26,12 +26,6 @@
 #include "chrome/browser/webshare/mac/sharing_service_operation.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies.h"
-#include "components/safe_browsing/core/browser/db/database_manager.h"
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
-#endif
-
 // IsDangerousFilename() and IsDangerousMimeType() should be kept in sync with
 // //third_party/blink/renderer/modules/webshare/FILE_TYPES.md
 // //components/browser_ui/webshare/android/java/src/org/chromium/components/browser_ui/webshare/ShareServiceImpl.java
@@ -195,9 +189,6 @@ void ShareServiceImpl::Share(const std::string& title,
     return;
   }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  bool should_check_url = false;
-#endif
   for (auto& file : files) {
     if (!file || !file->blob || !file->blob->blob) {
       mojo::ReportBadMessage("Invalid file to share()");
@@ -212,16 +203,6 @@ void ShareServiceImpl::Share(const std::string& title,
       std::move(callback).Run(blink::mojom::ShareError::PERMISSION_DENIED);
       return;
     }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-    // Check if at least one file is marked by the download protection service
-    // to send a ping to check this file type.
-    if (!should_check_url &&
-        safe_browsing::FileTypePolicies::GetInstance()->IsCheckedBinaryFile(
-            path)) {
-      should_check_url = true;
-    }
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
     // In the case where the original blob handle was to a native file (of
     // unknown size), the serialized data does not contain an accurate file

@@ -17,26 +17,13 @@
 #include "components/download/public/common/download_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
-#include "components/safe_browsing/content/common/file_type_policies.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-using safe_browsing::FileTypePolicies;
-
 namespace {
-
-TEST(DownloadPrefsTest, Prerequisites) {
-  // Most of the tests below are based on the assumption that .swf files are not
-  // allowed to open automatically, and that .txt files are allowed. If this
-  // assumption changes, then we need to update the tests to match.
-  ASSERT_FALSE(FileTypePolicies::GetInstance()->IsAllowedToOpenAutomatically(
-      base::FilePath(FILE_PATH_LITERAL("a.swf"))));
-  ASSERT_TRUE(FileTypePolicies::GetInstance()->IsAllowedToOpenAutomatically(
-      base::FilePath(FILE_PATH_LITERAL("a.txt"))));
-}
 
 // Verifies prefs are registered correctly.
 TEST(DownloadPrefsTest, RegisterPrefs) {

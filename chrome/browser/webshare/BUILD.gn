@@ -61,7 +61,6 @@ if (is_mac) {
     if (safe_browsing_mode != 0) {
       sources += [ "safe_browsing_request.cc" ]
       deps += [
-        "//components/safe_browsing/content/common:file_type_policies",
         "//components/safe_browsing/core/browser/db",
         "//components/safe_browsing/core/browser/db:database_manager",
         "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
@@ -100,10 +99,6 @@ if (is_mac) {
       "//testing/gtest",
       "//ui/base",
     ]
-
-    if (safe_browsing_mode != 0) {
-      deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
-    }
 
     if (is_mac) {
       sources += [ "mac/sharing_service_operation_browsertest.cc" ]

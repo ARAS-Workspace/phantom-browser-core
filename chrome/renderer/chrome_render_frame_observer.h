@@ -121,9 +121,6 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
                        const GURL& page_url) override;
 #endif
 
-  // Initialize a |phishing_classifier_delegate_|.
-  void SetClientSidePhishingDetection();
-
   void OnRenderFrameObserverRequest(
       mojo::PendingAssociatedReceiver<chrome::mojom::ChromeRenderFrame>
           receiver);

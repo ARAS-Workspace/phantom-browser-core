@@ -58,7 +58,6 @@
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/common/file_type_policies_test_util.h"
 #include "components/safe_search_api/safe_search_util.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/browser/download_item_utils.h"
@@ -82,7 +81,6 @@ using download::DownloadItem;
 using download::DownloadPathReservationTracker;
 using download::PathValidationResult;
 using ConnectionType = net::NetworkChangeNotifier::ConnectionType;
-using safe_browsing::DownloadFileType;
 using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::AtMost;
@@ -575,91 +573,6 @@ TEST_F(ChromeDownloadManagerDelegateTest, ConflictAction) {
   EXPECT_EQ(kExpectedPath, target_info.target_path);
 
   VerifyAndClearExpectations();
-}
-
-TEST_F(ChromeDownloadManagerDelegateTest, MaybeDangerousContent) {
-#if BUILDFLAG(ENABLE_PLUGINS)
-  content::PluginService::GetInstance()->Init();
-#endif
-
-  GURL url("http://example.com/foo");
-
-  std::unique_ptr<download::MockDownloadItem> download_item =
-      CreateActiveDownloadItem(0);
-  EXPECT_CALL(*download_item, GetURL()).WillRepeatedly(ReturnRef(url));
-  EXPECT_CALL(*download_item, GetTargetDisposition())
-      .WillRepeatedly(Return(DownloadItem::TARGET_DISPOSITION_OVERWRITE));
-  EXPECT_CALL(*delegate(), MockCheckDownloadUrl(_, _))
-      .WillRepeatedly(
-          Return(download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT));
-
-  {
-    const std::string kDangerousContentDisposition(
-        "attachment; filename=\"foo.swf\"");
-    EXPECT_CALL(*download_item, GetContentDisposition())
-        .WillRepeatedly(Return(kDangerousContentDisposition));
-    download::DownloadTargetInfo target_info =
-        DetermineDownloadTarget(download_item.get());
-
-    EXPECT_EQ(DownloadFileType::ALLOW_ON_USER_GESTURE,
-              DownloadItemModel(download_item.get()).GetDangerLevel());
-    EXPECT_EQ(download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT,
-              target_info.danger_type);
-  }
-
-  {
-    const std::string kSafeContentDisposition(
-        "attachment; filename=\"foo.txt\"");
-    EXPECT_CALL(*download_item, GetContentDisposition())
-        .WillRepeatedly(Return(kSafeContentDisposition));
-    download::DownloadTargetInfo target_info =
-        DetermineDownloadTarget(download_item.get());
-    EXPECT_EQ(DownloadFileType::NOT_DANGEROUS,
-              DownloadItemModel(download_item.get()).GetDangerLevel());
-    EXPECT_EQ(download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT,
-              target_info.danger_type);
-  }
-
-  {
-    const std::string kModerateContentDisposition(
-        "attachment; filename=\"foo.crx\"");
-    EXPECT_CALL(*download_item, GetContentDisposition())
-        .WillRepeatedly(Return(kModerateContentDisposition));
-    download::DownloadTargetInfo target_info =
-        DetermineDownloadTarget(download_item.get());
-    EXPECT_EQ(DownloadFileType::ALLOW_ON_USER_GESTURE,
-              DownloadItemModel(download_item.get()).GetDangerLevel());
-    EXPECT_EQ(download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT,
-              target_info.danger_type);
-  }
-}
-
-TEST_F(ChromeDownloadManagerDelegateTest, DragAndDropDangerous) {
-#if BUILDFLAG(ENABLE_PLUGINS)
-  content::PluginService::GetInstance()->Init();
-#endif
-
-  GURL url("http://example.com/foo");
-  base::FilePath path(GetPathInDownloadDir("foo.evil_file_type"));
-  safe_browsing::FileTypePoliciesTestOverlay scoped_dangerous =
-      safe_browsing::ScopedMarkAllFilesDangerousForTesting();
-
-  std::unique_ptr<download::MockDownloadItem> download_item =
-      CreateActiveDownloadItem(0);
-  EXPECT_CALL(*download_item, GetURL()).WillRepeatedly(ReturnRef(url));
-  EXPECT_CALL(*download_item, GetDownloadSource())
-      .WillRepeatedly(Return(download::DownloadSource::DRAG_AND_DROP));
-  EXPECT_CALL(*download_item, GetForcedFilePath())
-      .WillRepeatedly(ReturnRef(path));
-  EXPECT_CALL(*delegate(), MockCheckDownloadUrl(_, _))
-      .WillRepeatedly(
-          Return(download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT));
-
-  download::DownloadTargetInfo target_info =
-      DetermineDownloadTarget(download_item.get());
-
-  EXPECT_EQ(DownloadFileType::DANGEROUS,
-            DownloadItemModel(download_item.get()).GetDangerLevel());
 }
 
 TEST_F(ChromeDownloadManagerDelegateTest, BlockedByPolicy) {

@@ -65,10 +65,6 @@
 #include "chrome/browser/web_applications/test/web_app_test_utils.h"
 #include "chrome/browser/web_applications/web_app_install_info.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/content/common/file_type_policies_test_util.h"
-#endif
-
 using content::BrowserContext;
 using content::PathInfo;
 using content::PathType;
@@ -1011,16 +1007,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   // setting here because `ALLOW` is not an acceptable option.
   EXPECT_TRUE(permission_context()->CanObtainWritePermission(kChromeOrigin));
 }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-TEST_F(ChromeFileSystemAccessPermissionContextTest, IsFileTypeDangerous) {
-  safe_browsing::FileTypePoliciesTestOverlay scoped_dangerous =
-      safe_browsing::ScopedMarkAllFilesDangerousForTesting();
-
-  const base::FilePath kPath(FILE_PATH_LITERAL("/foo/bar.dll"));
-  EXPECT_TRUE(permission_context()->IsFileTypeDangerous(kPath));
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest, PolicyReadGuardPermission) {
   auto* prefs = profile()->GetTestingPrefService();

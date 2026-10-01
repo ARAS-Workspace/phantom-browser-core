@@ -11,10 +11,7 @@
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/memory/ptr_util.h"
-#include "base/task/sequenced_task_runner.h"
 #include "build/build_config.h"
-#include "chrome/common/chrome_features.h"
-#include "chrome/common/google_url_loader_throttle.h"
 #include "chrome/renderer/chrome_content_renderer_client.h"
 #include "chrome/renderer/chrome_render_frame_observer.h"
 #include "chrome/renderer/chrome_render_thread_observer.h"
@@ -42,8 +39,6 @@
 #include "extensions/renderer/extension_throttle_manager.h"
 #endif
 
-namespace {
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 std::unique_ptr<extensions::ExtensionThrottleManager>
 CreateExtensionThrottleManager() {
@@ -59,15 +54,8 @@ void SetExtensionThrottleManagerTestPolicy(
   std::unique_ptr<net::BackoffEntry::Policy> policy(
       new net::BackoffEntry::Policy{
           // Number of initial errors (in sequence) to ignore before
-          // applying exponential back-off rules.
-          1,
-
           // Initial delay for exponential back-off in ms.
           10 * 60 * 1000,
-
-          // Factor by which the waiting time will be multiplied.
-          10,
-
           // Fuzzing percentage. ex: 10% will spread requests randomly
           // between 90%-100% of the calculated time.
           0.1,
@@ -92,9 +80,9 @@ void SetExtensionThrottleManagerTestPolicy(
 std::unique_ptr<blink::URLLoaderThrottleProvider>
 URLLoaderThrottleProviderImpl::Create(
     blink::URLLoaderThrottleProviderType type,
-    ChromeContentRendererClient* chrome_content_renderer_client,
-    blink::ThreadSafeBrowserInterfaceBrokerProxy* broker) {
+    ChromeContentRendererClient* chrome_content_renderer_client) {
   return std::make_unique<URLLoaderThrottleProviderImpl>(
+      type, chrome_content_renderer_client,
       /*main_thread_task_runner=*/
       content::RenderThread::IsMainThread()
           ? base::SequencedTaskRunner::GetCurrentDefault()
@@ -121,7 +109,8 @@ std::unique_ptr<blink::URLLoaderThrottleProvider>
 URLLoaderThrottleProviderImpl::Clone() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return std::make_unique<URLLoaderThrottleProviderImpl>(
-      main_thread_task_runner_, base::PassKey<URLLoaderThrottleProviderImpl>());
+      type_, chrome_content_renderer_client_, main_thread_task_runner_,
+      base::PassKey<URLLoaderThrottleProviderImpl>());
 }
 
 std::vector<std::unique_ptr<blink::URLLoaderThrottle>>

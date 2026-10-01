@@ -100,7 +100,6 @@
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/content/common/file_type_policies_test_util.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/security_state/core/security_state.h"
 #include "components/services/quarantine/test_support.h"
@@ -3184,32 +3183,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadErrorReadonlyFolder) {
        download::DOWNLOAD_INTERRUPT_REASON_NONE, true, true}};
 
   DownloadFilesToReadonlyFolder(download_info);
-}
-
-// Test that we show a dangerous downloads warning for a dangerous file
-// downloaded through a blob: URL.
-IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadDangerousBlobData) {
-  safe_browsing::FileTypePoliciesTestOverlay scoped_dangerous =
-      safe_browsing::ScopedMarkAllFilesDangerousForTesting();
-
-  // The dangerous download warning is shown for any file considered
-  // dangerous.
-  std::string path("downloads/download-dangerous-blob.html?filename=foo.evil");
-
-  // Need to use http urls because the blob js doesn't work on file urls for
-  // security reasons.
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url = embedded_test_server()->GetURL("/" + path);
-
-  content::DownloadTestObserver* observer(DangerousDownloadWaiter(
-      browser(), 1,
-      content::DownloadTestObserver::ON_DANGEROUS_DOWNLOAD_ACCEPT));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  observer->WaitForFinished();
-
-  EXPECT_EQ(1u, observer->NumDownloadsSeenInState(DownloadItem::COMPLETE));
-  EXPECT_EQ(1u, observer->NumDangerousDownloadsSeen());
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadTest, OverrideLocalFileUrlAsNotDangerous) {
