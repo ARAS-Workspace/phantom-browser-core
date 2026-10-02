@@ -78,8 +78,6 @@ static_library("security_interstitial_page") {
     "//components/pref_registry",
     "//components/prefs",
     "//components/resources",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//components/security_interstitials/core",
     "//components/security_interstitials/core:insecure_form_util",
     "//components/security_interstitials/core:unsafe_resource",

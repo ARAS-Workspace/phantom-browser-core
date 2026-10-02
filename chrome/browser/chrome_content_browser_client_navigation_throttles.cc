@@ -52,7 +52,6 @@
 #include "components/page_load_metrics/browser/metrics_navigation_throttle.h"
 #include "components/payments/content/payment_handler_navigation_throttle.h"
 #include "components/policy/content/policy_blocklist_navigation_throttle.h"
-#include "components/safe_browsing/buildflags.h"
 #include "components/security_interstitials/content/insecure_form_navigation_throttle.h"
 #include "components/security_interstitials/content/ssl_error_handler.h"
 #include "components/security_interstitials/content/ssl_error_navigation_throttle.h"
@@ -120,7 +119,6 @@
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/core/common/features.h"
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
 #if BUILDFLAG(IS_MAC)

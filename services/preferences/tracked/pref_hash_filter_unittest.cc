@@ -35,7 +35,6 @@
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/prefs/testing_pref_store.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/receiver_set.h"
 #include "services/preferences/public/cpp/tracked/configuration.h"

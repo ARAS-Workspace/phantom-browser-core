@@ -142,7 +142,6 @@ source_set("interactive_ui_tests") {
     "//chrome/test:test_support_ui",
     "//components/omnibox/browser",
     "//components/performance_manager",
-    "//components/safe_browsing/core/common",
     "//components/search_engines",
     "//content/public/browser",
     "//content/public/common",

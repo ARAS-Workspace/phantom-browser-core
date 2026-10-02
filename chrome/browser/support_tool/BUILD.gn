@@ -102,6 +102,7 @@ source_set("unit_tests") {
     "//content/test:test_support",
     "//testing/gmock",
     "//testing/gtest",
+    "//third_party/zlib/google:zip",
   ]
 
   if (is_linux || is_mac) {

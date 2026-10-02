@@ -47,8 +47,6 @@ DEFINE_USER_DATA(DownloadToolbarUIController);
 #include "components/autofill/content/browser/content_autofill_client.h"
 #include "components/autofill/core/browser/suggestions/suggestion_hiding_reason.h"
 #include "components/feature_engagement/public/feature_constants.h"
-#include "components/safe_browsing/core/common/safe_browsing_policy_handler.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "content/public/browser/browser_thread.h"
 #include "ui/base/interaction/element_tracker.h"
 #include "ui/base/l10n/l10n_util.h"

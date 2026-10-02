@@ -5,7 +5,6 @@
 import("//chrome/common/features.gni")
 import("//chrome/test/include_js_tests.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//components/signin/features.gni")
 import("//content/browser/devtools/features.gni")
 import("//extensions/buildflags/buildflags.gni")
@@ -128,12 +127,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/app_home",
     "//chrome/browser/ui/webui/default_browser:default_browser_modal",
   ]
-
-  if (safe_browsing_mode == 1) {
-  }
-
-  if (safe_browsing_mode != 0) {
-  }
 
   if (is_mac || is_linux) {
     deps += [

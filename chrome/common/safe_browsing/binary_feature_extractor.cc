@@ -16,7 +16,6 @@
 #include "base/files/memory_mapped_file.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/string_view_util.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "crypto/hash.h"
 
 namespace safe_browsing {

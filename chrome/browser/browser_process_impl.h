@@ -30,7 +30,6 @@
 #include "components/metrics_services_manager/metrics_services_manager.h"
 #include "components/prefs/persistent_pref_store.h"
 #include "components/prefs/pref_change_registrar.h"
-#include "components/safe_browsing/buildflags.h"
 #include "extensions/buildflags/buildflags.h"
 #include "media/media_buildflags.h"
 #include "printing/buildflags/buildflags.h"

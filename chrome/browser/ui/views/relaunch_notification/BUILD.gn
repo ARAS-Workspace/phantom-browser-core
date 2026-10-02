@@ -92,7 +92,6 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//components/constrained_window",
     "//components/prefs",
-    "//components/safe_browsing/core/common:features",
     "//content/test:test_support",
     "//testing/gmock",
     "//testing/gtest",

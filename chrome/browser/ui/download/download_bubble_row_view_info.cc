@@ -9,8 +9,6 @@
 #include "chrome/browser/ui/download/download_item_mode.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/views/vector_icons.h"

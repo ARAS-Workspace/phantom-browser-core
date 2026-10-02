@@ -6,7 +6,6 @@
 
 #include "base/feature_list.h"
 #include "base/metrics/histogram_functions.h"
-#include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "components/enterprise/encryption/core/features.h"
 #include "components/prefs/pref_service.h"
 

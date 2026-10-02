@@ -17,7 +17,6 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/multistep_filter/core/features.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "content/public/test/browser_test.h"
 
 namespace {

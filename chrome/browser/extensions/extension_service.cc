@@ -70,7 +70,6 @@
 #include "chrome/common/url_constants.h"
 #include "components/crx_file/id_util.h"
 #include "components/policy/core/common/policy_pref_names.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/supervised_user/core/browser/supervised_user_preferences.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_process_host.h"

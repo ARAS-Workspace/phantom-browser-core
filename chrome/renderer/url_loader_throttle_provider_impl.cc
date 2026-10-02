@@ -16,7 +16,6 @@
 #include "chrome/renderer/chrome_render_frame_observer.h"
 #include "chrome/renderer/chrome_render_thread_observer.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_helper.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "content/public/common/content_features.h"
 #include "content/public/common/content_switches.h"

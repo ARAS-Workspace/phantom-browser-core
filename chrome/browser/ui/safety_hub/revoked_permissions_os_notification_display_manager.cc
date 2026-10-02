@@ -10,7 +10,6 @@
 #include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_util.h"
 #include "components/content_settings/core/common/content_settings_types.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/url_formatter/url_formatter.h"
 
 namespace {

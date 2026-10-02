@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/download_interrupt_reasons.h"
-#include "components/safe_browsing/buildflags.h"
 #include "net/http/http_content_disposition.h"
 #include "net/http/http_util.h"
 

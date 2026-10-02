@@ -11,7 +11,6 @@
 #include "base/no_destructor.h"
 #include "build/build_config.h"
 #include "components/history_clusters/history_clusters_internals/webui/url_constants.h"
-#include "components/safe_browsing/core/common/web_ui_constants.h"
 #include "device/vr/buildflags/buildflags.h"
 #include "extensions/buildflags/buildflags.h"
 #include "third_party/blink/public/common/chrome_debug_urls.h"

@@ -6,7 +6,6 @@
 #define EXTENSIONS_BROWSER_SCOPED_DATABASE_MANAGER_FOR_TEST_H_
 
 #include "base/memory/scoped_refptr.h"
-#include "components/safe_browsing/core/browser/db/database_manager.h"
 #include "extensions/buildflags/buildflags.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));

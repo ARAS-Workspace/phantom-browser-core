@@ -34,7 +34,6 @@
 #include "components/download/public/common/download_interrupt_reasons.h"
 #include "components/download/public/common/download_item_rename_handler.h"
 #include "components/download/public/common/mock_download_item.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/test/browser_task_environment.h"
@@ -45,7 +44,6 @@
 
 #include "base/strings/pattern.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "ui/views/vector_icons.h"
 

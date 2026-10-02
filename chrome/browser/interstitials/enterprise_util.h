@@ -7,12 +7,9 @@
 
 #include <string>
 
-#include "components/safe_browsing/buildflags.h"
 #include "url/gurl.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"
-#include "components/safe_browsing/core/common/proto/realtimeapi.pb.h"
 #endif
 
 namespace content {

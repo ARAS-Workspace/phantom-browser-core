@@ -24,8 +24,6 @@
 #include "components/permissions/permission_manager.h"
 #include "components/permissions/permission_util.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/security_interstitials/core/common_string_util.h"
 #include "components/strings/grit/components_branded_strings.h"
 #include "components/strings/grit/components_strings.h"

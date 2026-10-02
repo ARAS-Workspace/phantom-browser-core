@@ -8,7 +8,6 @@
 
 #include "base/functional/bind.h"
 #include "base/run_loop.h"
-#include "components/safe_browsing/core/common/proto/crx_info.pb.h"
 #include "content/public/test/browser_task_environment.h"
 #include "extensions/browser/test_blocklist_state_fetcher.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"

@@ -7,8 +7,6 @@ include_rules = [
   "+components/resources",
   "+components/strings",
   "+components/keyed_service/core",
-  "+components/safe_browsing/core/browser/db",
-  "+components/safe_browsing/core/common",
   "+components/sync_preferences",
   "+components/ukm",
   "+components/user_prefs",

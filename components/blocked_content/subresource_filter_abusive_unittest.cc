@@ -9,7 +9,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/test/scoped_feature_list.h"
 #include "components/blocked_content/safe_browsing_triggered_popup_blocker.h"
-#include "components/safe_browsing/core/browser/db/util.h"
 #include "components/subresource_filter/content/browser/fake_safe_browsing_database_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_content_settings_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_test_harness.h"
@@ -21,7 +20,6 @@
 
 namespace blocked_content {
 
-using safe_browsing::SubresourceFilterLevel;
 
 namespace {
 

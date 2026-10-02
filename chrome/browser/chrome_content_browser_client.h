@@ -30,7 +30,6 @@
 #include "components/file_access/scoped_file_access.h"
 #include "components/guest_view/buildflags/buildflags.h"
 #include "components/on_device_translation/buildflags/buildflags.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/digital_identity_provider.h"

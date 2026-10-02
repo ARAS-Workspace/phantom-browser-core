@@ -6,7 +6,6 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "components/omnibox/browser/vector_icons.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/security_interstitials/core/features.h"
 #include "components/security_state/core/security_state.h"
 #include "components/vector_icons/vector_icons.h"

@@ -20,7 +20,6 @@
 #include "components/content_settings/browser/ui/javascript_optimizer_setting.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_types.h"
-#include "components/safe_browsing/core/browser/db/database_manager.h"
 #include "components/site_engagement/content/engagement_type.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "content/public/browser/navigation_handle.h"

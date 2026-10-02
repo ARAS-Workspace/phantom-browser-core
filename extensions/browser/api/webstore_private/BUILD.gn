@@ -34,7 +34,6 @@ source_set("webstore_private") {
     "//components/policy/core/common",
     "//components/policy/proto",
     "//components/prefs",
-    "//components/safe_browsing:buildflags",
     "//components/signin/public/identity_manager",
     "//components/supervised_user/core/common",
     "//components/user_prefs",

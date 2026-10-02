@@ -12,7 +12,6 @@
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/page_info/page_info.h"
-#include "components/safe_browsing/buildflags.h"
 #include "components/security_state/core/security_state.h"
 #include "content/public/browser/permission_result.h"
 

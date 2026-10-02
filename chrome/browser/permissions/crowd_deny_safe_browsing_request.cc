@@ -14,9 +14,6 @@
 #include "base/task/task_traits.h"
 #include "base/time/clock.h"
 #include "base/timer/timer.h"
-#include "components/safe_browsing/core/browser/db/database_manager.h"
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "content/public/browser/browser_thread.h"
 #include "url/origin.h"
 

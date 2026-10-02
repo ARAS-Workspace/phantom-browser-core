@@ -72,7 +72,6 @@ source_set("internal") {
     "//components/download/public/common:interfaces",
     "//components/filename_generation",
     "//components/leveldb_proto",
-    "//components/safe_browsing:buildflags",
     "//components/services/quarantine",
     "//mojo/public/c/system",
     "//net",

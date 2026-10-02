@@ -59,8 +59,6 @@ include_rules = [
   "+components/printing/common",
   "+components/printing/renderer",
   "+components/search/ntp_features.h",
-  "+components/safe_browsing/buildflags.h",
-  "+components/safe_browsing/core/common",
   "+components/sampling_profiler",
   "+components/security_interstitials/content/renderer",
   "+components/signin/public/base/signin_buildflags.h",

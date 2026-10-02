@@ -44,7 +44,6 @@
 #include "components/permissions/permission_decision_auto_blocker.h"
 #include "components/permissions/permissions_client.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/webapps/common/web_app_id.h"
 #include "content/public/common/content_features.h"

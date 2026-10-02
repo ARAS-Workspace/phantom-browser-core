@@ -12,8 +12,6 @@
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
 #include "components/device_signals/core/common/common_types.h"
-#include "components/enterprise/connectors/core/common.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 namespace content {
 class BrowserContext;

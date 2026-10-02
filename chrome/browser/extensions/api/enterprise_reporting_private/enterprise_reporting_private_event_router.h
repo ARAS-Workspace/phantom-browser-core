@@ -9,7 +9,6 @@
 #include "base/no_destructor.h"
 #include "chrome/browser/profiles/profile_keyed_service_factory.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/safe_browsing/core/common/proto/realtimeapi.pb.h"
 #include "url/gurl.h"
 
 namespace extensions {

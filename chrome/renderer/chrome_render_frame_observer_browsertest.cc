@@ -25,8 +25,6 @@
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_helper.h"
 #include "components/optimization_guide/content/renderer/page_text_agent.h"
-#include "components/safe_browsing/core/common/phishing_classifier/scorer.h"
-#include "components/safe_browsing/core/common/proto/client_model.pb.h"
 #include "components/variations/variations_switches.h"
 #include "content/public/common/content_features.h"
 #include "content/public/common/content_switches.h"

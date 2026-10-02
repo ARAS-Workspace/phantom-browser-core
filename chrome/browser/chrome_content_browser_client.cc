@@ -295,14 +295,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/privacy_sandbox/privacy_sandbox_settings.h"
-#include "components/safe_browsing/core/browser/hashprefix_realtime/hash_realtime_service.h"
-#include "components/safe_browsing/core/browser/realtime/policy_engine.h"
-#include "components/safe_browsing/core/browser/realtime/url_lookup_service.h"
-#include "components/safe_browsing/core/browser/referring_app_info.h"
-#include "components/safe_browsing/core/browser/url_checker_delegate.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/hashprefix_realtime/hash_realtime_utils.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/search/ntp_features.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/search_engines/template_url_service.h"
@@ -571,8 +563,6 @@
 #endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
-#include "components/safe_browsing/core/browser/realtime/chrome_enterprise_url_lookup_service.h"
 #endif
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)

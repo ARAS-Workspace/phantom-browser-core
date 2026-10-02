@@ -10,7 +10,6 @@
 
 #include "base/supports_user_data.h"
 #include "base/time/time.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 
 namespace download {
 class DownloadItem;

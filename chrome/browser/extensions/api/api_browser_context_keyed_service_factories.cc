@@ -41,7 +41,6 @@
 #include "chrome/browser/extensions/api/settings_overrides/settings_overrides_api.h"
 #include "chrome/browser/extensions/api/settings_private/settings_private_event_router_factory.h"
 #include "chrome/browser/extensions/api/side_panel/side_panel_service.h"
-#include "components/safe_browsing/buildflags.h"
 #include "extensions/browser/api/networking_private/networking_private_delegate_factory.h"
 #include "pdf/buildflags.h"
 

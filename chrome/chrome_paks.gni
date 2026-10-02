@@ -7,7 +7,6 @@ import("//build/config/locales.gni")
 import("//chrome/browser/buildflags.gni")
 import("//chrome/common/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//ui/base/ui_features.gni")
@@ -340,9 +339,6 @@ template("chrome_extra_paks") {
           [ "$root_gen_dir/chrome/unexportable_keys_internals_resources.pak" ]
       deps +=
           [ "//chrome/browser/resources/unexportable_keys_internals:resources" ]
-    }
-
-    if (safe_browsing_mode == 1) {
     }
   }
 }

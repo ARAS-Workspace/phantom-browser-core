@@ -20,7 +20,6 @@
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/content_settings/core/common/cookie_controls_state.h"
 #include "components/page_info/core/page_info_action.h"
-#include "components/safe_browsing/buildflags.h"
 #include "components/security_state/core/security_state.h"
 #include "content/public/browser/reload_type.h"
 #include "content/public/browser/web_contents.h"

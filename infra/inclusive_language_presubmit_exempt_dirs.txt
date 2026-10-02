@@ -100,8 +100,6 @@ chrome/test/data/dromaeo/lib
 chrome/test/data/extensions/good
 chrome/test/data/extensions/manifest_tests
 chrome/test/data/mac_installer
-chrome/test/data/safe_browsing
-chrome/test/data/safe_browsing/download_protection
 chrome/test/data/third_party/spaceport
 chrome/test/data/updater
 chrome/test/data/webui
@@ -118,7 +116,6 @@ components/cbor
 components/certificate_transparency
 components/cronet/gn2bp/templates
 components/domain_reliability
-components/enterprise/obfuscation/core
 components/gcm_driver
 components/input
 components/media_router/common/providers/cast/channel
@@ -136,7 +133,6 @@ components/policy/proto
 components/policy/resources
 components/policy/resources/templates
 components/rlz
-components/safe_browsing/core/common
 components/security_interstitials/content/android/java/src/org/chromium/components/security_interstitials
 components/signin/public/base
 components/signin/public/identity_manager

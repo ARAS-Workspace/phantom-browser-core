@@ -21,7 +21,6 @@
 #include "base/files/scoped_temp_dir.h"
 #include "base/path_service.h"
 #include "base/test/scoped_path_override.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "crypto/sha2.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"

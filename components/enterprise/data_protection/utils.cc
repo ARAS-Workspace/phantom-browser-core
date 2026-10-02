@@ -11,7 +11,6 @@
 #include "base/strings/strcat.h"
 #include "base/strings/stringprintf.h"
 #include "base/time/time.h"
-#include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "components/enterprise/data_protection/features.h"
 
 namespace enterprise_data_protection {

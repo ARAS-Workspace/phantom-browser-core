@@ -13,7 +13,6 @@
 #include "base/sequence_checker.h"
 #include "base/time/time.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/safe_browsing/core/browser/realtime/url_lookup_service_base.h"
 #include "components/sessions/core/session_id.h"
 #include "url/gurl.h"
 

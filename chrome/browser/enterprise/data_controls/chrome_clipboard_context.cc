@@ -9,7 +9,6 @@
 #include "components/enterprise/data_controls/core/browser/prefs.h"
 #include "components/policy/core/common/policy_types.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/buildflags.h"
 
 namespace data_controls {
 

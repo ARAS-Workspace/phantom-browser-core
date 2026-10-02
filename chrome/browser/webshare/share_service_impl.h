@@ -13,7 +13,6 @@
 #include "base/files/file_path.h"
 #include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/document_service.h"
 #include "third_party/blink/public/mojom/webshare/webshare.mojom.h"
 

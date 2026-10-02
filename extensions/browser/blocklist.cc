@@ -19,10 +19,6 @@
 #include "base/observer_list.h"
 #include "base/task/single_thread_task_runner.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/core/browser/db/database_manager.h"
-#include "components/safe_browsing/core/browser/db/util.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
@@ -40,7 +36,6 @@ class V5GetHashProtocolManager;
 }
 
 using content::BrowserThread;
-using safe_browsing::SafeBrowsingDatabaseManager;
 
 namespace extensions {
 

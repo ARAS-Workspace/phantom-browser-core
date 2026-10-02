@@ -8,7 +8,6 @@
 #include <stdint.h>
 
 #include "chrome/common/safe_browsing/mach_o_image_reader_mac.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 
 namespace safe_browsing {
 

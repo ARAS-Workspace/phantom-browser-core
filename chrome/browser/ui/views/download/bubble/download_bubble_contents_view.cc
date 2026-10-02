@@ -21,7 +21,6 @@
 #include "chrome/browser/ui/views/download/bubble/download_bubble_security_view.h"
 #include "chrome/browser/ui/views/download/bubble/download_dialog_view.h"
 #include "components/offline_items_collection/core/offline_item.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "content/public/browser/download_item_utils.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/views/layout/flex_layout.h"

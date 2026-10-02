@@ -6,8 +6,6 @@ static_library("core") {
   sources = [
     "bad_clock_ui.cc",
     "bad_clock_ui.h",
-    "base_safe_browsing_error_ui.cc",
-    "base_safe_browsing_error_ui.h",
     "common_string_util.cc",
     "common_string_util.h",
     "controller_client.cc",
@@ -28,10 +26,6 @@ static_library("core") {
     "omnibox_https_upgrade_metrics.h",
     "pref_names.cc",
     "pref_names.h",
-    "safe_browsing_loud_error_ui.cc",
-    "safe_browsing_loud_error_ui.h",
-    "safe_browsing_quiet_error_ui.cc",
-    "safe_browsing_quiet_error_ui.h",
     "ssl_error_options_mask.cc",
     "ssl_error_options_mask.h",
     "ssl_error_ui.cc",
@@ -63,7 +57,6 @@ static_library("core") {
     "//components/policy/core/common",
     "//components/prefs",
     "//components/resources",
-    "//components/safe_browsing/core/common",
     "//components/ssl_errors",
     "//components/strings",
     "//components/url_formatter",
@@ -87,9 +80,6 @@ static_library("unsafe_resource") {
 
   deps = [
     "//base",
-    "//components/safe_browsing/core/browser/db:util",
-    "//components/safe_browsing/core/common:threat_enums",
-    "//components/safe_browsing/core/common/proto:realtimeapi_proto",
     "//net",
     "//services/network/public/mojom",
   ]

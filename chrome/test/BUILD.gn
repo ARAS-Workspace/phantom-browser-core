@@ -22,7 +22,6 @@ import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/on_device_translation/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//content/browser/devtools/features.gni")
 import("//content/public/common/features.gni")
 import("//crypto/features.gni")
@@ -277,8 +276,6 @@ static_library("test_support") {
     "//components/reporting/storage:test_support",
     "//components/reporting/util:status_macros",
     "//components/reporting/util:test_callbacks_support",
-    "//components/safe_browsing/core/browser/db:sb_database",
-    "//components/safe_browsing/core/common",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/security_interstitials/core:unsafe_resource",
     "//components/segmentation_platform/public",
@@ -351,8 +348,6 @@ static_library("test_support") {
     "//components/prefs:test_support",
     "//components/privacy_sandbox:test_support",
     "//components/profile_metrics",
-    "//components/safe_browsing/core/browser/db:database_manager",
-    "//components/safe_browsing/core/browser/db:v4_test_util",
     "//components/search_engines:test_support",
     "//components/services/storage",
     "//components/services/storage:test_support",
@@ -692,9 +687,6 @@ source_set("platform_browser_tests") {
     "//components/privacy_sandbox/privacy_sandbox_attestations",
     "//components/privacy_sandbox/privacy_sandbox_attestations:test_support",
     "//components/qr_code_generator:bitmap_generator",
-    "//components/safe_browsing/core/browser:client_side_detection_service_base",
-    "//components/safe_browsing/core/common:features",
-    "//components/safe_browsing/core/common/proto:client_model_proto",
     "//components/security_state/content",
     "//components/segmentation_platform/embedder/default_model",
     "//components/segmentation_platform/internal",
@@ -794,22 +786,6 @@ source_set("platform_browser_tests") {
       "//extensions/browser/mime_handler",
       "//pdf:features",
     ]
-  }
-
-  if (safe_browsing_mode != 0) {
-    sources += []
-    deps += [
-      "//components/enterprise/connectors/core",
-      "//components/safe_browsing/core/browser:verdict_cache_manager",
-      "//components/security_interstitials/content:security_interstitial_page",
-      "//components/unified_consent",
-    ]
-    if (safe_browsing_mode == 1) {
-      deps += [
-        "//chrome/browser/ui/hats",
-        "//chrome/browser/ui/hats:test_support",
-      ]
-    }
   }
 
   if (enable_devtools_frontend) {
@@ -1441,10 +1417,8 @@ test("browser_tests") {
     "//components/enterprise/browser/identifiers",
     "//components/enterprise/browser/promotion",
     "//components/enterprise/common/proto:connectors_proto",
-    "//components/enterprise/connectors/core",
     "//components/enterprise/data_protection",
     "//components/enterprise/encryption/core:features",
-    "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     "//components/error_page/content/browser",
     "//components/favicon/content",
     "//components/favicon/core",
@@ -1547,16 +1521,6 @@ test("browser_tests") {
     "//components/record_replay/core/common",
     "//components/record_replay/core/common:mojom",
     "//components/resources",
-    "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/core/browser:client_side_detection_service_base",
-    "//components/safe_browsing/core/browser:verdict_cache_manager",
-    "//components/safe_browsing/core/browser/db:sb_database",
-    "//components/safe_browsing/core/browser/db:test_database_manager",
-    "//components/safe_browsing/core/browser/db:v4_get_hash_protocol_manager",
-    "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
-    "//components/safe_browsing/core/browser/realtime:url_lookup_service_base",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common/proto:client_model_proto",
     "//components/saved_tab_groups/internal",
     "//components/saved_tab_groups/internal:service_test_utils",
     "//components/saved_tab_groups/internal:tab_group_sync_bridge",
@@ -2191,10 +2155,6 @@ test("browser_tests") {
     }
   }
 
-  if (safe_browsing_mode != 0) {
-    deps += [ "//components/safe_browsing/core/common/phishing_classifier" ]
-  }
-
   if (is_linux) {
     deps += [
       "//ui/linux:linux_ui",
@@ -2542,7 +2502,6 @@ test("browser_tests") {
       "//components/commerce/core:shopping_service_test_support",
       "//components/commerce/core:utils",
       "//components/page_info/core:proto",
-      "//components/safe_browsing/core/browser/realtime:test_support",
       "//components/send_tab_to_self",
       "//components/send_tab_to_self:test_support",
       "//components/ui_devtools",
@@ -2575,23 +2534,6 @@ test("browser_tests") {
   }
 
   # NOTE: This is the main "browser_tests" section for |is_chromeos|.
-  if (safe_browsing_mode == 1) {
-    deps += [
-      "//chrome/browser/metrics/desktop_session_duration",
-      "//chrome/browser/password_manager/factories",
-      "//chrome/browser/ui/exclusive_access:test_support",
-      "//chrome/browser/ui/hats",
-      "//components/safe_browsing/core/browser",
-      "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
-      "//components/safe_browsing/core/browser:suspicious_site_warning_allowlist",
-      "//components/safe_browsing/core/browser/db:v5_search_hashes_cache",
-      "//components/safe_browsing/core/browser/hashprefix_realtime:hash_realtime_service",
-      "//components/safe_browsing/core/browser/realtime:url_lookup_service",
-      "//components/safe_browsing/core/common/fbs:client_model",
-      "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
-      "//components/safe_browsing/core/common/phishing_classifier",
-    ]
-  }
 
   if (enable_captive_portal_detection) {
     deps += [ "//chrome/browser/captive_portal:browser_tests" ]
@@ -2659,7 +2601,6 @@ test("browser_tests") {
     deps += [ "//chrome/browser/ui/webui/tab_strip_internals:browser_tests" ]
   }
 
-
   if (is_mac || is_linux) {
     sources += [
       "../browser/ui/views/profiles/profile_picker_sign_in_provider_browsertest.cc",
@@ -2682,11 +2623,6 @@ test("browser_tests") {
     ]
   }
 
-  if (enterprise_data_controls) {
-    sources += [
-    ]
-    deps += [ "//components/enterprise/connectors/core:test_support" ]
-  }
   if (enterprise_data_controls) {
     sources += [
       "//chrome/browser/enterprise/data_controls/desktop_data_controls_dialog_browsertest.cc",
@@ -3386,7 +3322,6 @@ test("unit_tests") {
     "//components/enterprise/common/proto:connectors_proto",
     "//components/enterprise/common/proto:extensions_workflow_events_proto",
     "//components/enterprise/common/proto:legacy_tech_events_proto",
-    "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     "//components/favicon/core/test:test_support",
     "//components/feature_engagement/public",
     "//components/feature_engagement/test:test_support",
@@ -3489,19 +3424,6 @@ test("unit_tests") {
     "//components/reporting/util:task_runner_context",
     "//components/reporting/util:test_callbacks_support",
     "//components/resources",
-    "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/core/browser",
-    "//components/safe_browsing/core/browser:referrer_chain_provider",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
-    "//components/safe_browsing/core/browser:verdict_cache_manager",
-    "//components/safe_browsing/core/browser/db",
-    "//components/safe_browsing/core/browser/db:sb_local_database_manager",
-    "//components/safe_browsing/core/browser/db:test_database_manager",
-    "//components/safe_browsing/core/browser/sync",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common:threat_enums",
-    "//components/safe_browsing/core/common/proto:client_model_proto",
-    "//components/safe_browsing/core/common/proto:csd_proto",
     "//components/safe_search_api",
     "//components/safe_search_api:test_support",
     "//components/saved_tab_groups/internal",
@@ -3768,13 +3690,6 @@ test("unit_tests") {
       "//ui/events/devices:test_support",
     ]
 
-    if (safe_browsing_mode != 0) {
-      deps += [
-        "//chrome/common/safe_browsing:archive_analyzer_results",
-        "//chrome/common/safe_browsing:disk_image_type_sniffer_mac",
-      ]
-    }
-
     # The test fetches resources which means Mac need the app bundle to exist
     # on disk so it can pull from it.
     deps += [ "//third_party/ocmock" ]
@@ -3984,7 +3899,6 @@ test("unit_tests") {
     "//components/passage_embeddings/core",
     "//components/passage_embeddings/core:test_support",
     "//components/record_replay/core/browser:unit_tests",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
     "//components/sync_preferences:features",
     "//components/tab_groups",
     "//components/webapps/isolated_web_apps",
@@ -4168,7 +4082,6 @@ test("unit_tests") {
     "//components/endpoint_fetcher:test_support",
     "//components/enterprise",
     "//components/enterprise:test_support",
-    "//components/enterprise/connectors/core",
     "//components/favicon/content",
     "//components/feature_engagement/test:test_support",
     "//components/fullscreen_control",
@@ -4187,8 +4100,6 @@ test("unit_tests") {
     "//components/policy/core/common:common_constants",
     "//components/power_bookmarks/core",
     "//components/prefs",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
-    "//components/safe_browsing/core/common:safe_browsing_policy_handler",
     "//components/safety_check:test_support",
     "//components/send_tab_to_self:test_support",
     "//components/services/app_service",
@@ -4375,44 +4286,6 @@ test("unit_tests") {
       "//chrome/browser/local_discovery",
       "//chrome/browser/local_discovery:test_support",
       "//chrome/browser/local_discovery:unit_tests",
-    ]
-  }
-
-  if (safe_browsing_mode > 0) {
-    sources += [
-      "../common/safe_browsing/binary_feature_extractor_unittest.cc",
-      "../common/safe_browsing/download_type_util_unittest.cc",
-    ]
-
-    deps += [
-      "../common/safe_browsing:archive_analyzer_results",
-      "../common/safe_browsing:mock_binary_feature_extractor",
-      "//chrome/common/safe_browsing:binary_feature_extractor",
-      "//chrome/common/safe_browsing:download_type_util",
-      "//components/file_access:test_support",
-      "//components/safe_browsing/core/browser:intelligent_scan_delegate",
-      "//components/safe_browsing/core/browser:token_fetcher",
-      "//components/safe_browsing/core/browser:token_fetcher_testing_helper",
-    ]
-  }
-
-  if (safe_browsing_mode == 1) {
-    # TODO(sgurun): enable tests for safe_browsing==2.
-    sources += [
-      "../common/safe_browsing/ipc_protobuf_message_test_messages.h",
-      "../common/safe_browsing/ipc_protobuf_message_unittest.cc",
-    ]
-    if (is_mac) {
-      sources += [
-        "../common/safe_browsing/binary_feature_extractor_mac_unittest.cc",
-        "../common/safe_browsing/disk_image_type_sniffer_mac_unittest.cc",
-        "../common/safe_browsing/mach_o_image_reader_mac_unittest.cc",
-      ]
-    }
-    deps += [
-      ":test_proto",
-      "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
-      "//ipc:protobuf_support",
     ]
   }
 
@@ -4657,9 +4530,6 @@ test("unit_tests") {
       "//components/media_router/browser:test_support",
       "//components/media_router/common:test_support",
       "//components/omnibox/browser:vector_icons",
-      "//components/safe_browsing/core/browser:referring_app_info",
-      "//components/safe_browsing/core/browser/realtime:test_support",
-      "//components/safe_browsing/core/browser/realtime:url_lookup_service_base",
       "//components/saved_tab_groups/test_support",
       "//components/user_education/views",
       "//components/user_education/views:test_support",
@@ -5463,8 +5333,6 @@ test("interactive_ui_tests") {
     "//components/privacy_sandbox:privacy_sandbox_prefs",
     "//components/reading_list/core",
     "//components/resources",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common:safe_browsing_policy_handler",
     "//components/search",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/shared_highlighting/core/common",
@@ -5956,7 +5824,6 @@ test("chrome_app_unittests") {
     "//chrome/gpu",
     "//components/crash/core/common",
     "//components/heap_profiling/in_process",
-    "//components/safe_browsing:buildflags",
     "//components/webui/flags:switches",
   ]
   if (is_linux) {

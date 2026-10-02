@@ -95,6 +95,7 @@ if (enable_extensions) {
       "//components/prefs",
       "//extensions/browser",
       "//extensions/browser:test_support",
+      "//third_party/zlib/google:zip",
     ]
   }
 }
@@ -248,7 +249,6 @@ source_set("policy_specific_browser_tests") {
     "//components/policy/core/common",
     "//components/prefs",
     "//components/proxy_config",
-    "//components/safe_browsing/core/common",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/site_isolation",
     "//components/unified_consent",
@@ -918,7 +918,6 @@ source_set("impl") {
     "//components/reporting/util:status",
     "//components/reporting/util:status_macros",
     "//components/reporting/util:task_runner_context",
-    "//components/safe_browsing/core/common:safe_browsing_policy_handler",
     "//components/site_isolation",
     "//components/unified_consent",
     "//components/user_manager",

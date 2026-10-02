@@ -211,7 +211,6 @@ static_library("common_lib") {
     "//components/policy:generated",
     "//components/policy/core/common",
     "//components/prefs",
-    "//components/safe_browsing:buildflags",
     "//components/safe_search_api",
     "//components/sampling_profiler",
     "//components/services/app_service",
@@ -357,10 +356,6 @@ static_library("common_lib") {
     }
   }
 
-  if (safe_browsing_mode != 0) {
-    public_deps += [ "//chrome/common/safe_browsing" ]
-  }
-
   if (is_linux) {
     sources += [
       "auto_start_linux.cc",
@@ -479,7 +474,6 @@ static_library("url_constants") {
     "//components/history_clusters/history_clusters_internals/webui:constants",
     "//components/optimization_guide/optimization_guide_internals/webui:url_constants",
     "//components/password_manager/content/common",
-    "//components/safe_browsing/core/common",
     "//device/vr/buildflags",
   ]
 }
@@ -655,10 +649,6 @@ mojom("mojo_bindings") {
       "//chrome/services/mac_notifications/public/mojom",
       "//components/remote_cocoa/common:mojo",
     ]
-  }
-
-  if (safe_browsing_mode == 1) {
-    public_deps += [ "//chrome/services/file_util/public/mojom" ]
   }
 
   overridden_deps = [

@@ -9,7 +9,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "components/enterprise/data_protection/features.h"
-#include "components/safe_browsing/core/browser/realtime/fake_url_lookup_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 

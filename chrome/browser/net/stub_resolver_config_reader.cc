@@ -30,7 +30,6 @@
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/webui/flags/pref_service_flags_storage.h"
 #include "content/public/browser/network_service_instance.h"
 #include "net/base/features.h"

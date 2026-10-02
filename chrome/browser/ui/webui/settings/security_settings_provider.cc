@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/webui/settings/security_settings_provider.h"
 
 #include "base/feature_list.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "content/public/browser/web_ui_data_source.h"
 
 namespace settings {

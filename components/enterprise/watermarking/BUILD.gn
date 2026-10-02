@@ -29,7 +29,6 @@ source_set("watermarking_handler") {
     ]
 
     deps += [
-      "//components/enterprise/connectors/core",
       "//components/policy/core/browser",
       "//components/policy/core/common",
       "//components/prefs",
@@ -55,7 +54,6 @@ source_set("unit_tests") {
   ]
 
   deps = [
-    "//components/enterprise/connectors/core",
     "//components/policy/core/browser",
     "//components/policy/core/common",
     "//components/prefs",

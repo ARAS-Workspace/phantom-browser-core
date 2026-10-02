@@ -234,7 +234,6 @@ source_set("impl") {
     "//components/omnibox/browser",
     "//components/password_manager/content/common",
     "//components/performance_manager",
-    "//components/safe_browsing/core/common",
     "//components/send_tab_to_self",
     "//components/sessions",
     "//components/signin/public/base:signin_buildflags",

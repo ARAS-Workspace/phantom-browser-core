@@ -520,7 +520,6 @@ static_library("location_bar") {
   deps = [
     ":buildflags",
     "//components/dom_distiller/core",
-    "//components/safe_browsing/core/common",
     "//components/search_engines",
     "//components/security_interstitials/core",
     "//components/strings",
@@ -735,7 +734,6 @@ source_set("unit_tests") {
     "//components/passage_embeddings/core:test_support",
     "//components/prefs:test_support",
     "//components/query_parser",
-    "//components/safe_browsing/core/common",
     "//components/saved_tab_groups/test_support",
     "//components/search",
     "//components/search_engines",

@@ -4,7 +4,6 @@
 
 import("//build/config/chrome_build.gni")
 import("//build/config/ui.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//components/signin/features.gni")
 
 assert(is_mac || is_linux)
@@ -199,18 +198,12 @@ source_set("impl") {
     "//components/personal_context/core",
     "//components/personal_context/first_run",
     "//components/profile_metrics",
-    "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//components/security_state/content",
     "//components/strings:components_strings_grit",
     "//components/unified_consent",
     "//components/variations/service",
     "//components/vector_icons",
   ]
-
-  if (safe_browsing_mode != 0) {
-  }
 
   sources += [
     "address_bubbles_controller.cc",

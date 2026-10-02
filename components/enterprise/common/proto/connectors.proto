@@ -9,7 +9,6 @@ package enterprise_connectors;
 option optimize_for = LITE_RUNTIME;
 
 // For ClientDownloadRequest.
-import "components/safe_browsing/core/common/proto/csd.proto";
 
 // Which connector is calling BinaryUploadService so that the proper rules can
 // be triggered.  BinaryUploadService also uses this value to find the URL that
@@ -40,7 +39,6 @@ message ContentMetaData {
   optional string digest = 3;
 
   // Specifically for the download case.
-  optional safe_browsing.ClientDownloadRequest csd = 4;
 
   // Optional email address of user.  This field may be empty if the user
   // is not signed in.
@@ -95,7 +93,6 @@ message ContentMetaData {
   }
   optional CopiedTextSource copied_text_source = 13;
 
-  repeated safe_browsing.ReferrerChainEntry referrer_chain = 14;
 
   // The email of the currently active user in the content area. Only populated
   // for Workspace sites.

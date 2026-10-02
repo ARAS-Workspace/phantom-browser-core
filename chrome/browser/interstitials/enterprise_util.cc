@@ -5,9 +5,7 @@
 #include "chrome/browser/interstitials/enterprise_util.h"
 
 #include "chrome/browser/profiles/profile.h"
-#include "components/enterprise/connectors/core/reporting_utils.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/buildflags/buildflags.h"

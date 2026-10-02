@@ -53,7 +53,6 @@ include_rules = [
   "+components/password_manager/core/common",
   "+components/password_manager/services/csv_password",
   "+components/payments/content/utility",
-  "+components/safe_browsing/buildflags.h",
   "+components/sampling_profiler",
   "+components/on_device_translation/service",
   "+components/services/paint_preview_compositor",

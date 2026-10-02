@@ -19,7 +19,6 @@
 #include "chrome/common/extensions/api/tabs.h"
 #include "chrome/common/extensions/api/windows.h"
 #include "components/language_detection/core/language_detection_driver.h"
-#include "components/safe_browsing/buildflags.h"
 #include "components/zoom/zoom_controller.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "extensions/browser/api/execute_code_function.h"

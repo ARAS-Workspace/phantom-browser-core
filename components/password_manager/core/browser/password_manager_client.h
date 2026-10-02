@@ -28,7 +28,6 @@
 #include "components/password_manager/core/browser/undo_password_change_controller.h"
 #include "components/password_manager/core/browser/webauthn_credentials_delegate.h"
 #include "components/profile_metrics/browser_profile_type.h"
-#include "components/safe_browsing/buildflags.h"
 #include "net/cert/cert_status_flags.h"
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

@@ -16,7 +16,6 @@ source_set("cache") {
 
   deps = [
     "//base",
-    "//components/enterprise/connectors/core",
     "//components/enterprise/encryption/core:features",
     "//components/prefs",
   ]

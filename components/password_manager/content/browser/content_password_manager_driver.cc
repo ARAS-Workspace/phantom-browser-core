@@ -29,7 +29,6 @@
 #include "components/password_manager/core/browser/password_manager_metrics_recorder.h"
 #include "components/password_manager/core/browser/password_suggestion_generator.h"
 #include "components/password_manager/core/common/password_manager_features.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/back_forward_cache.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/context_menu_params.h"

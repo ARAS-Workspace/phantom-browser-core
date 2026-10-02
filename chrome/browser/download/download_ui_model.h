@@ -19,7 +19,6 @@
 #include "build/build_config.h"
 #include "components/download/public/common/download_item.h"
 #include "components/offline_items_collection/core/offline_item.h"
-#include "components/safe_browsing/buildflags.h"
 #include "ui/base/models/image_model.h"
 #include "ui/color/color_id.h"
 #include "ui/gfx/vector_icon_types.h"

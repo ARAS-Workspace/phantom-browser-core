@@ -36,7 +36,6 @@ source_set("safety_check") {
 
   deps = [
     "//components/prefs",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//net",
   ]
 }

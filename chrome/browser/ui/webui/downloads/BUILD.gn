@@ -63,7 +63,6 @@ source_set("downloads") {
     "//components/history/core/common",
     "//components/prefs",
     "//components/profile_metrics",
-    "//components/safe_browsing:buildflags",
     "//components/strings:components_strings",
     "//content/public/browser",
     "//mojo/public/cpp/bindings",
@@ -111,7 +110,6 @@ source_set("interactive_ui_tests") {
     "//chrome/common",
     "//chrome/test:test_support",
     "//components/download/public/common:public",
-    "//components/safe_browsing:buildflags",
     "//content/test:test_support",
     "//ui/base/interaction",
   ]

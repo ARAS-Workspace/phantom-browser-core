@@ -32,7 +32,6 @@ source_set("test_support") {
 
   deps = [
     "//chrome/browser",
-    "//components/enterprise/connectors/core",
     "//components/policy/core/browser",
     "//components/policy/core/common",
   ]

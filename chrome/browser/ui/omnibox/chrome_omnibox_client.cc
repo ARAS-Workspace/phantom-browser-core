@@ -93,7 +93,6 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/page_load_metrics/browser/navigation_handle_user_data.h"
 #include "components/profile_metrics/browser_profile_type.h"
-#include "components/safe_browsing/buildflags.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/search_engines/template_url_starter_pack_data.h"
 #include "components/sessions/content/session_tab_helper.h"

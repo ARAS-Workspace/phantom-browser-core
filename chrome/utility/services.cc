@@ -15,7 +15,6 @@
 #include "components/password_manager/services/csv_password/csv_password_parser_impl.h"
 #include "components/password_manager/services/csv_password/public/mojom/csv_password_parser.mojom.h"
 #include "components/private_ai/oak_session_service/oak_session_service.h"  // nogncheck
-#include "components/safe_browsing/buildflags.h"
 #include "components/services/patch/file_patcher_impl.h"
 #include "components/services/patch/public/mojom/file_patcher.mojom.h"
 #include "components/services/unzip/public/mojom/unzipper.mojom.h"

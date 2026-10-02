@@ -17,7 +17,6 @@
 #include "components/password_manager/core/browser/password_manager_settings_service.h"
 #include "components/password_manager/core/browser/password_store/password_store_interface.h"
 #include "components/password_manager/core/browser/store_metrics_reporter.h"
-#include "components/safe_browsing/buildflags.h"
 
 namespace password_manager {
 class PasswordStoreInterface;

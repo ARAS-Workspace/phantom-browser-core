@@ -29,9 +29,6 @@ source_set("picture_in_picture") {
   public_deps = [
     "//base",
     "//chrome/browser/profiles:profile",
-    "//components/safe_browsing/core/browser/db:database_manager",
-    "//components/safe_browsing/core/browser/db:util",
-    "//components/safe_browsing/core/browser/db:v4_protocol_manager_util",
     "//content/public/browser",
     "//third_party/blink/public/common",
     "//ui/gfx/geometry",
@@ -99,7 +96,6 @@ source_set("impl") {
     "//components/content_settings/browser",
     "//components/content_settings/core/browser",
     "//components/permissions",
-    "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
     "//content/public/browser",
     "//content/public/common",
     "//extensions/buildflags",
@@ -197,7 +193,6 @@ source_set("unit_tests") {
   deps += [
     "//chrome/browser",
     "//chrome/browser/ui/hats:test_support",
-    "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
     "//components/unified_consent",
     "//ui/events:test_support",
   ]

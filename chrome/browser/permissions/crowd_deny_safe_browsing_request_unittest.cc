@@ -9,7 +9,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/mock_callback.h"
 #include "chrome/browser/permissions/crowd_deny_fake_safe_browsing_database_manager.h"
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "content/public/test/browser_task_environment.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"

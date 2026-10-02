@@ -13,7 +13,6 @@
 #include "components/commerce/core/pref_names.h"
 #include "components/embedder_support/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "components/unified_consent/unified_consent_metrics.h"

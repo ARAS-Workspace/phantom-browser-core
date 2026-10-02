@@ -11,7 +11,6 @@
 #include "base/functional/callback_forward.h"
 #include "build/build_config.h"
 #include "components/keyed_service/core/keyed_service_base_factory.h"
-#include "components/safe_browsing/buildflags.h"
 #include "extensions/buildflags/buildflags.h"
 
 namespace content {

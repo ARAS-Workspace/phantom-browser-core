@@ -19,7 +19,6 @@
 #include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/proxy_config/proxy_config_pref_names.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 #include "components/language/core/browser/pref_names.h"
 #include "extensions/browser/pref_transformer_interface.h"

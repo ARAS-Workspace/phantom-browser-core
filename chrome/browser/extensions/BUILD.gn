@@ -9,7 +9,6 @@ import("//build/config/ui.gni")
 import("//chrome/common/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//content/browser/devtools/features.gni")
 import("//content/public/common/features.gni")
 import("//extensions/buildflags/buildflags.gni")
@@ -580,11 +579,6 @@ source_set("extensions") {
     "//components/privacy_sandbox:privacy_sandbox_prefs",
     "//components/proxy_config",
     "//components/renderer_context_menu",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
-    "//components/safe_browsing/core/browser/db:database_manager",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
-    "//components/safe_browsing/core/common/proto:crx_info_proto",
     "//components/saved_tab_groups/public",
     "//components/services/patch/content",
     "//components/services/unzip/content",
@@ -627,7 +621,6 @@ source_set("extensions") {
     "//chrome/browser/ui/tab_contents",
     "//chrome/browser/ui/webui/extensions:headers",
     "//chrome/browser/upgrade_detector",
-    "//components/safe_browsing/core/browser/db:util",
     "//components/signin/core/browser",
     "//extensions/buildflags",
   ]
@@ -786,15 +779,6 @@ source_set("extensions") {
       "webstore_install_with_prompt.h",
     ]
 
-    if (safe_browsing_mode != 0) {
-      sources += [
-        "api/safe_browsing_private/safe_browsing_private_event_router.cc",
-        "api/safe_browsing_private/safe_browsing_private_event_router.h",
-        "api/safe_browsing_private/safe_browsing_private_event_router_factory.cc",
-        "api/safe_browsing_private/safe_browsing_private_event_router_factory.h",
-      ]
-    }
-
     allow_circular_includes_from += [
       # autofill generated pref includes
       # extensions/api/settings_private/generated_pref.h.
@@ -832,8 +816,6 @@ source_set("extensions") {
       "//chrome/common",
       "//chrome/common/extensions/api",
       "//components/omnibox/browser",
-      "//components/safe_browsing/core/common/proto:csd_proto",
-      "//components/safe_browsing/core/common/proto:realtimeapi_proto",
       "//content/public/browser",
       "//mojo/public/cpp/bindings",
     ]
@@ -935,7 +917,6 @@ source_set("extensions") {
       "//components/download/public/common:public",
       "//components/embedder_support:user_agent",
       "//components/enterprise/buildflags",
-      "//components/enterprise/connectors/core",
       "//components/favicon/content",
       "//components/feedback",
       "//components/history/core/browser",
@@ -964,8 +945,6 @@ source_set("extensions") {
       "//components/policy:generated",
       "//components/reading_list/core",
       "//components/resources",
-      "//components/safe_browsing:buildflags",
-      "//components/safe_browsing/core/common/proto:csd_proto",
       "//components/search_engines",
       "//components/services/unzip/public/cpp",
       "//components/sessions",
@@ -1239,7 +1218,6 @@ static_library("test_support") {
     "//components/crx_file",
     "//components/feed:feature_list",
     "//components/policy/core/common:test_support",
-    "//components/safe_browsing/core/browser/db:database_manager",
     "//components/services/unzip:in_process",
     "//components/services/unzip/content",
     "//components/sessions",
@@ -1287,7 +1265,6 @@ static_library("test_support") {
       "//chrome/browser/ui",
       "//chrome/browser/ui/tabs:tab_strip",
       "//components/crx_file",
-      "//components/safe_browsing/core/browser/db:v4_test_util",
       "//content/public/browser",
       "//extensions:test_support",
       "//extensions/browser",
@@ -1344,7 +1321,6 @@ source_set("chrome_extensions_browser_client") {
     "//components/embedder_support:user_agent",
     "//components/privacy_sandbox:privacy_sandbox_prefs",
     "//components/proxy_config",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
     "//components/sessions",
     "//components/update_client",
     "//extensions/browser:crx_installer",
@@ -1383,14 +1359,6 @@ source_set("chrome_extensions_browser_client") {
       "//chrome/browser/web_applications",
       "//components/webapps/isolated_web_apps",
     ]
-  }
-
-  # TODO(crbug.com/417279245): Add extensions safe browsing to desktop Android,
-  # then enable this for safe_browsing_mode == 2 as well.
-  if (safe_browsing_mode == 1) {
-    sources += []
-
-    deps += [ "//components/safe_browsing/core/common:features" ]
   }
 }
 
@@ -1597,6 +1565,7 @@ source_set("unit_tests") {
     "//services/service_manager/public/cpp/test:test_support",
     "//testing/gmock",
     "//testing/gtest",
+    "//third_party/zlib/google:zip",
     "//ui/base/accelerators/global_accelerator_listener",
     "//ui/display:test_support",
     "//ui/menus",
@@ -1948,6 +1917,7 @@ source_set("browser_tests") {
     "//extensions/browser/updater",
     "//extensions/renderer",
     "//extensions/strings",
+    "//third_party/zlib/google:zip",
     "//ui/base:ozone_buildflags",
     "//ui/base/idle",
     "//ui/base/idle:test_support",
@@ -2183,7 +2153,6 @@ source_set("browser_tests") {
         "//components/device_signals/core/common",
         "//components/device_signals/core/common:features",
         "//components/device_signals/test:test_support",
-        "//components/enterprise/connectors/core",
         "//components/enterprise/device_trust/core:metrics",
       ]
     }

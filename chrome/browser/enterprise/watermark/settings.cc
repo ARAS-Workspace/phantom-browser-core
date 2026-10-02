@@ -11,7 +11,6 @@
 #include "base/strings/string_number_conversions.h"
 #include "chrome/browser/enterprise/watermark/watermark_features.h"
 #include "chrome/common/channel_info.h"
-#include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "components/enterprise/data_protection/features.h"
 #include "components/prefs/pref_service.h"
 #include "components/version_info/version_info.h"

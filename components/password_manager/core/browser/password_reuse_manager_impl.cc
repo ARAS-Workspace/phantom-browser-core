@@ -25,7 +25,6 @@
 #include "components/password_manager/core/browser/password_reuse_manager_signin_notifier.h"
 #include "components/password_manager/core/browser/password_store/password_form_converters.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/signin/public/base/consent_level.h"
 #include "google_apis/gaia/gaia_auth_util.h"
 

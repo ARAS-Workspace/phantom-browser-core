@@ -1226,7 +1226,6 @@
                   'chrome/browser/enterprise/data_controls/|' \
                   'chrome/browser/enterprise/data_protection/|' \
                   'chrome/browser/enterprise/watermark/|' \
-                  'chrome/browser/safe_browsing/cloud_content_scanning/|' \
                   'components/enterprise/common/|' \
                   'components/enterprise/data_controls/'
     },
@@ -1395,9 +1394,6 @@
       'filepath': 'components/gwp_asan|'\
                   'components/memory_system',
     },
-    'hashprefix_realtime': {
-      'filepath': 'components/safe_browsing/core/browser/hashprefix_realtime/'
-    },
     'headless': {
       'filepath': 'headless/'
     },
@@ -1418,9 +1414,6 @@
     'i18n': {
       'filepath': 'base/i18n/|base/string|l10n|icu|'\
                   'locale_settings|encoding',
-    },
-    'incident_reporting': {
-      'filepath': 'chrome/browser/safe_browsing/incident_reporting',
     },
     'incognito': {
       'filepath':  'chrome/android/java/src/org/chromium/chrome/browser/customtabs/CustomTabIncognitoManager.java'\
@@ -2054,10 +2047,6 @@
     },
     'runtime_enabled_features': {
       'filepath' : 'third_party/blink/renderer/platform/runtime_enabled_features.json5'
-    },
-    'safe_browsing': {
-      'filepath': 'chrome/(browser|common|renderer)/safe_browsing/|'\
-                  'components/safe_browsing/',
     },
     'sampling_profiler': {
       'filepath': 'base/profiler/'\
@@ -3079,13 +3068,11 @@
                    'wjmaclean@chromium.org'],
     'gwp_asan': ['mpdenton+watch@chromium.org',
                  'glazunov+watch@chromium.org'],
-    'hashprefix_realtime': ['thefrog+watch@chromium.org'],
     'headless': ['headless-reviews@chromium.org'],
     'heap_mojo': ['chikamune+watch@chromium.org'],
     'holding_space': ['tote-eng+reviews@google.com'],
     'hsts': ['jdeblasio+watch@chromium.org'],
     'i18n': ['jshin+watch@chromium.org'],
-    'incident_reporting': ['grt+watch@chromium.org'],
     'incognito': ['roagarwal+watch@chromium.org'],
     'indexed_db': ['dmurph+watching-idb@chromium.org',
                    'edgestoragedev@microsoft.com',
@@ -3297,10 +3284,6 @@
     'rlz_id': ['gab+watch@chromium.org',
                'robertshield+watch@chromium.org'],
     'runtime_enabled_features': ['jmedley+watch@chromium.org'],
-      'safe_browsing': ['nwokedi+watch@chromium.org',
-                      'vakh+safe_browsing_watch@chromium.org',
-                      'xinghuilu+watch@chromium.org',
-                      'zackhan+watch@chromium.org'],
     'sampling_profiler': ['thiabaud@google.com', 'spvm@chromium.org'],
     'screen_ai': ['rhalavati+watch@chromium.org'],
     'search_engine_choice_screen': ['chrome-regionalcapabilities+watch@google.com'],

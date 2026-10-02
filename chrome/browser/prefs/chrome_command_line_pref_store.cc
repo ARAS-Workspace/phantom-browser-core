@@ -24,8 +24,6 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/proxy_config/proxy_config_dictionary.h"
 #include "components/proxy_config/proxy_config_pref_names.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
-#include "components/safe_browsing/core/common/safebrowsing_switches.h"
 #include "components/sync/base/pref_names.h"
 #include "content/public/common/content_switches.h"
 #include "net/base/port_util.h"

@@ -20,7 +20,6 @@
 #include "chrome/common/webui_url_constants.h"
 #include "components/enterprise/data_protection/data_protection_url_lookup_service.h"
 #include "components/enterprise/data_protection/utils.h"
-#include "components/safe_browsing/buildflags.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_frame_host.h"
@@ -32,9 +31,6 @@
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/enterprise/data_protection/features.h"
-#include "components/safe_browsing/core/browser/realtime/chrome_enterprise_url_lookup_service.h"
-#include "components/safe_browsing/core/browser/realtime/policy_engine.h"
-#include "components/safe_browsing/core/browser/realtime/url_lookup_service_base.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)

@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//components/enterprise/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 source_set("interstitials") {
@@ -13,12 +12,9 @@ source_set("interstitials") {
   ]
 
   public_deps = [
-    "//components/safe_browsing/core/browser/db:v4_protocol_manager_util",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common/proto:realtimeapi_proto",
     "//components/security_interstitials/content:security_interstitial_page",
+    "//url",
   ]
-  deps = [ "//components/safe_browsing:buildflags" ]
 }
 
 source_set("impl") {
@@ -35,9 +31,7 @@ source_set("impl") {
   deps = [
     "//base",
     "//chrome/browser/profiles:profile",
-    "//components/enterprise/connectors/core",
     "//components/prefs",
-    "//components/safe_browsing/core/common:features",
     "//components/sessions",
     "//content/public/browser",
   ]

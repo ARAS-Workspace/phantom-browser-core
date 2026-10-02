@@ -9,7 +9,6 @@ package chrome.cros.reporting.proto;
 // Used for annotating sensitive fields in google3.
 // ${COPYBARA_DATAPOL_IMPORT}
 
-import "components/safe_browsing/core/common/proto/csd.proto";
 
 option optimize_for = LITE_RUNTIME;
 
@@ -1356,7 +1355,6 @@ message UrlFilteringInterstitialEvent {
 // Next ID: 5
 message ExtensionTelemetryEvent {
   // Protobuf for uploading Chrome extension telemetry reports.
-  safe_browsing.ExtensionTelemetryReportRequest extension_telemetry_report = 1;
 
   // Username of the profile. This will be an email address.
   string profile_user_name = 2

@@ -579,8 +579,6 @@ static_library("common") {
     "//components/crx_file",
     "//components/custom_handlers",
     "//components/pdf/common:util",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
     "//components/url_formatter",
     "//components/url_matcher",
     "//components/version_info",

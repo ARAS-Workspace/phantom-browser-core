@@ -86,7 +86,6 @@ source_set("browser_process") {
   public_deps = [
     "//build:chromeos_buildflags",
     "//chrome/common:buildflags",
-    "//components/safe_browsing:buildflags",
     "//media:media_buildflags",
     "//ui/base/unowned_user_data",
   ]
@@ -170,7 +169,6 @@ source_set("browser_process_impl") {
     "//components/activity_reporter",
     "//components/metrics_services_manager",
     "//components/prefs",
-    "//components/safe_browsing:buildflags",
     "//extensions/buildflags",
     "//media:media_buildflags",
     "//printing/buildflags",
@@ -236,7 +234,6 @@ source_set("chrome_content_browser_client") {
     "//components/file_access",
     "//components/guest_view/buildflags",
     "//components/on_device_translation/buildflags",
-    "//components/safe_browsing:buildflags",
     "//content/public/browser",
     "//content/public/common",
     "//media",
@@ -863,14 +860,6 @@ source_set("core") {
     "//components/privacy_sandbox:privacy_sandbox_settings_headers",
     "//components/private_ai",
     "//components/private_ai/private_ai_internals/webui:mojo_bindings",
-    "//components/safe_browsing/core/browser",
-    "//components/safe_browsing/core/browser:referring_app_info",
-    "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
-    "//components/safe_browsing/core/browser/hashprefix_realtime:hash_realtime_service",
-    "//components/safe_browsing/core/browser/realtime:enterprise_url_lookup_service",
-    "//components/safe_browsing/core/browser/realtime:policy_engine",
-    "//components/safe_browsing/core/browser/realtime:url_lookup_service",
-    "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
     "//components/safety_check:features",
     "//components/search",
     "//components/security_state/content",
@@ -908,6 +897,7 @@ source_set("core") {
     "//services/device/public/cpp/geolocation",
     "//services/device/public/cpp/geolocation:buildflags",
     "//services/metrics",
+    "//third_party/zlib/google:zip",
     "//ui/base:ozone_buildflags",
     "//ui/display/util",
     "//ui/gl:buildflags",
@@ -1302,9 +1292,6 @@ source_set("core") {
 
   if (is_chrome_for_testing) {
     deps += [ "//chrome/browser/chrome_for_testing:browser" ]
-  }
-
-  if (safe_browsing_mode == 1) {
   }
 }
 
@@ -1794,22 +1781,6 @@ source_set("browser") {
     "//components/reporting/util:status",
     "//components/reporting/util:status_macros",
     "//components/resources",
-    "//components/safe_browsing/core/browser",
-    "//components/safe_browsing/core/browser:referring_app_info",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
-    "//components/safe_browsing/core/browser:verdict_cache_manager",
-    "//components/safe_browsing/core/browser/db:database_manager",
-    "//components/safe_browsing/core/browser/hashprefix_realtime:hash_realtime_service",
-    "//components/safe_browsing/core/browser/realtime:enterprise_url_lookup_service",
-    "//components/safe_browsing/core/browser/realtime:policy_engine",
-    "//components/safe_browsing/core/browser/realtime:url_lookup_service",
-    "//components/safe_browsing/core/browser/realtime:url_lookup_service_base",
-    "//components/safe_browsing/core/browser/sync",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common:safe_browsing_policy_handler",
-    "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
-    "//components/safe_browsing/core/common/proto:csd_proto",
-    "//components/safe_browsing/core/common/proto:realtimeapi_proto",
     "//components/safe_search_api",
     "//components/saved_tab_groups/delegate",
     "//components/saved_tab_groups/internal",
@@ -2171,7 +2142,6 @@ source_set("browser") {
     "//components/payments/content:utils",
     "//components/record_replay/content/browser",
     "//components/record_replay/core/browser",
-    "//components/safe_browsing/core/browser/realtime:url_lookup_service_base",
     "//components/services/app_service",
     "//components/shared_highlighting/core/common",
     "//components/ukm/content",
@@ -2261,12 +2231,6 @@ source_set("browser") {
       "//components/power_metrics",
       "//services/data_decoder/public/cpp",
     ]
-  }
-
-  if (safe_browsing_mode == 1) {
-    deps += [ "//components/enterprise/connectors/core" ]
-    public_deps +=
-        [ "//components/enterprise/common/proto:browser_events_proto" ]
   }
 
   if (is_linux || is_mac) {
@@ -2613,7 +2577,6 @@ group("browser_public_dependencies") {
     "//components/payments/core:error_strings",
     "//components/policy/proto",
     "//components/reporting/proto:configuration_file_proto",
-    "//components/safe_browsing:buildflags",
     "//components/saved_tab_groups/proto",
     "//components/search_engines",
     "//components/services/storage:storage_features",
@@ -2751,8 +2714,6 @@ group("browser_generated_files") {
   if (is_mac || is_linux) {
     public_deps +=
         [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
-  }
-  if (safe_browsing_mode == 1) {
   }
   if (enable_bound_session_credentials) {
     public_deps += [
@@ -2971,8 +2932,6 @@ static_library("test_support") {
     "//components/reporting/util:status",
     "//components/reporting/util:status_macros",
     "//components/reporting/util:task_runner_context",
-    "//components/safe_browsing/core/common/proto:crx_info_proto",
-    "//components/safe_browsing/core/common/proto:csd_proto",
     "//components/search_engines:test_support",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/security_state/content",

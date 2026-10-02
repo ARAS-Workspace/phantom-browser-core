@@ -25,8 +25,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/privacy_sandbox/privacy_sandbox_settings.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "content/public/test/test_web_ui.h"
 #include "services/metrics/public/cpp/metrics_utils.h"
 #include "testing/gmock/include/gmock/gmock.h"

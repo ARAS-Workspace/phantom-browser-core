@@ -10,7 +10,6 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/values.h"
 #include "components/device_signals/core/common/signals_features.h"
-#include "components/enterprise/connectors/core/reporting_constants.h"
 #include "crypto/sha2.h"
 
 namespace {

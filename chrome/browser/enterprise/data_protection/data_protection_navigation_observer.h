@@ -13,7 +13,6 @@
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_page_user_data.h"
 #include "components/enterprise/data_protection/utils.h"
-#include "components/safe_browsing/core/common/proto/realtimeapi.pb.h"
 #include "content/public/browser/navigation_handle_user_data.h"
 #include "content/public/browser/web_contents_observer.h"
 

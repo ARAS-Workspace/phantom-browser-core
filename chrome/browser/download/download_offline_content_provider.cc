@@ -26,7 +26,6 @@
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/download_features.h"
 #include "components/download/public/common/download_item.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/browser_context.h"
 #include "extensions/buildflags/buildflags.h"
 #include "third_party/skia/include/core/SkBitmap.h"

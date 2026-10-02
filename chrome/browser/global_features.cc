@@ -26,7 +26,6 @@
 #include "components/application_locale_storage/application_locale_storage.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_manager.h"
 #include "components/on_device_translation/buildflags/buildflags.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "media/base/media_switches.h"
 #include "net/net_buildflags.h"
 #include "ui/base/ui_base_features.h"

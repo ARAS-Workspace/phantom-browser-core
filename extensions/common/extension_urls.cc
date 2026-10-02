@@ -11,8 +11,6 @@
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/hashprefix_realtime/hash_realtime_utils.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension_id.h"
 #include "extensions/common/extensions_client.h"

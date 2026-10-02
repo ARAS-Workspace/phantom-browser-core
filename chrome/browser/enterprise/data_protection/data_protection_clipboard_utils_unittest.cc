@@ -15,7 +15,6 @@
 #include "chrome/test/base/testing_profile_manager.h"
 #include "components/dom_distiller/core/url_constants.h"
 #include "components/dom_distiller/core/url_utils.h"
-#include "components/enterprise/connectors/core/features.h"
 #include "components/enterprise/data_controls/content/browser/last_replaced_clipboard_data.h"
 #include "components/enterprise/data_controls/core/browser/features.h"
 #include "components/enterprise/data_controls/core/browser/test_utils.h"

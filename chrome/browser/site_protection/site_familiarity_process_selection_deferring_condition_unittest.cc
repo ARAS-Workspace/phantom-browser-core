@@ -26,8 +26,6 @@
 #include "components/history/core/browser/history_types.h"
 #include "components/history/core/test/test_history_database.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/site_engagement/content/site_engagement_service.h"

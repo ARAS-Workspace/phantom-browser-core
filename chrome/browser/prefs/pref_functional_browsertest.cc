@@ -29,7 +29,6 @@
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/embedder_support/pref_names.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/search/ntp_features.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "content/public/browser/web_contents.h"

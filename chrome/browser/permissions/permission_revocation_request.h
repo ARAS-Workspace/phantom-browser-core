@@ -14,7 +14,6 @@
 #include "chrome/browser/permissions/crowd_deny_preload_data.h"
 #include "chrome/browser/permissions/crowd_deny_safe_browsing_request.h"
 #include "components/content_settings/core/common/content_settings_types.h"
-#include "components/safe_browsing/buildflags.h"
 #include "url/gurl.h"
 
 class HostContentSettingsMap;

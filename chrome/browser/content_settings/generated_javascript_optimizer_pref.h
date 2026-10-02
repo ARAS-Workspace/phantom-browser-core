@@ -12,7 +12,6 @@
 #include "components/content_settings/browser/ui/javascript_optimizer_setting.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/prefs/pref_change_registrar.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 namespace content_settings {
 

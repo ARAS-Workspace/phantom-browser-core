@@ -26,7 +26,6 @@
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "extensions/browser/api/content_settings/content_settings_service.h"
 #include "extensions/browser/extension_function_registry.h"
 #include "extensions/browser/extension_pref_value_map.h"

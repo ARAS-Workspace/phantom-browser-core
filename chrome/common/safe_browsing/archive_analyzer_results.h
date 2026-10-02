@@ -12,7 +12,6 @@
 
 #include "base/files/file_path.h"
 #include "build/build_config.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 
 namespace base {
 class File;

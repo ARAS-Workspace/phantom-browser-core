@@ -4,10 +4,8 @@
 
 #include "extensions/browser/scoped_database_manager_for_test.h"
 
-#include "components/safe_browsing/core/browser/db/database_manager.h"
 #include "extensions/browser/blocklist.h"
 
-using safe_browsing::SafeBrowsingDatabaseManager;
 
 namespace extensions {
 

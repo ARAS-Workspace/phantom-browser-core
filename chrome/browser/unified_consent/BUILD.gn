@@ -23,7 +23,6 @@ source_set("impl") {
     "//components/commerce/core:pref_names",
     "//components/embedder_support",
     "//components/prefs",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//components/sync_preferences",
     "//components/unified_consent",
   ]
@@ -50,7 +49,6 @@ source_set("browser_tests") {
       "//chrome/browser/ui/browser_window",
       "//chrome/common",
       "//components/prefs",
-      "//components/safe_browsing/core/common:safe_browsing_prefs",
       "//components/signin/public/identity_manager",
       "//components/signin/public/identity_manager:test_support",
       "//components/sync:test_support",

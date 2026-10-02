@@ -19,7 +19,6 @@
 #include "components/download/public/common/mock_download_item.h"
 #include "components/download/public/common/mock_simple_download_manager.h"
 #include "components/offline_items_collection/core/test_support/scoped_mock_offline_content_provider.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/test/browser_task_environment.h"
 #include "extensions/buildflags/buildflags.h"
 #include "testing/gmock/include/gmock/gmock.h"

@@ -8,7 +8,6 @@
 #include <string>
 
 #include "components/enterprise/data_protection/utils.h"
-#include "components/safe_browsing/core/common/proto/realtimeapi.pb.h"
 #include "content/public/browser/page_user_data.h"
 
 namespace enterprise_data_protection {

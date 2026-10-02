@@ -55,9 +55,6 @@
 #include "components/permissions/permissions_client.h"
 #include "components/permissions/request_type.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/ssl_errors/error_info.h"
 #include "components/strings/grit/components_strings.h"
@@ -92,7 +89,6 @@ using base::ASCIIToUTF16;
 using base::UTF16ToUTF8;
 using base::UTF8ToUTF16;
 using content::BrowserThread;
-using safe_browsing::LoginReputationClientResponse;
 
 namespace {
 

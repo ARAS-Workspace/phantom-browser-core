@@ -12,11 +12,9 @@
 #include "chrome/browser/subresource_filter/subresource_filter_history_observer.h"
 #include "components/content_settings/core/browser/cookie_settings.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/safe_browsing/buildflags.h"
 #include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #endif
 
 // static

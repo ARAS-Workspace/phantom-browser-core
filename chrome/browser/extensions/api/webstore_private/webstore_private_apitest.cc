@@ -38,7 +38,6 @@
 #include "components/policy/policy_constants.h"
 #include "components/policy/proto/device_management_backend.pb.h"
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/supervised_user/core/common/features.h"
 #include "components/supervised_user/core/common/pref_names.h"
 #include "components/supervised_user/core/common/supervised_user_constants.h"

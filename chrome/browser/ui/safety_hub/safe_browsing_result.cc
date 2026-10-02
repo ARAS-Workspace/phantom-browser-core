@@ -12,7 +12,6 @@
 #include "chrome/browser/ui/safety_hub/safety_hub_result.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "ui/base/l10n/l10n_util.h"
 
 SafetyHubSafeBrowsingResult::SafetyHubSafeBrowsingResult(

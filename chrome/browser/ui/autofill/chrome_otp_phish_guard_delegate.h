@@ -9,7 +9,6 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "components/autofill/core/browser/integrators/one_time_tokens/otp_phish_guard_delegate.h"
-#include "components/safe_browsing/buildflags.h"
 
 namespace content {
 class WebContents;

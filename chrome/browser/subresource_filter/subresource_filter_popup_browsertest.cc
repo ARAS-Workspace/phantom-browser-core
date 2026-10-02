@@ -21,7 +21,6 @@
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_types.h"
-#include "components/safe_browsing/core/browser/db/util.h"
 #include "components/subresource_filter/core/browser/subresource_filter_constants.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/url_pattern_index/proto/rules.pb.h"
@@ -34,8 +33,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-using safe_browsing::SubresourceFilterType;
-using safe_browsing::SubresourceFilterLevel;
 
 namespace subresource_filter {
 

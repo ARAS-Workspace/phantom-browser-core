@@ -133,7 +133,6 @@
 #include "components/permissions/features.h"
 #include "components/permissions/permission_recovery_success_rate_tracker.h"
 #include "components/permissions/permission_request_manager.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/search/ntp_features.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/site_engagement/content/site_engagement_helper.h"

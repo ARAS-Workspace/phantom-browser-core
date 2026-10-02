@@ -55,8 +55,6 @@
 #include "components/data_sharing/public/features.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/safe_browsing/core/common/safe_browsing_settings_metrics.h"
-#include "components/safe_browsing/core/common/safebrowsing_referral_methods.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/signin/public/base/consent_level.h"
 #include "components/version_info/version_info.h"

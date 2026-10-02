@@ -5,13 +5,11 @@
 #include "chrome/browser/interstitials/chrome_settings_page_helper.h"
 
 #include "build/build_config.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/web_contents.h"
 
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "components/safe_browsing/core/common/safebrowsing_referral_methods.h"
 
 namespace security_interstitials {
 

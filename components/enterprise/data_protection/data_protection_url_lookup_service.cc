@@ -9,7 +9,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "components/enterprise/data_protection/features.h"
-#include "components/safe_browsing/core/common/proto/realtimeapi.pb.h"
 
 namespace {
 

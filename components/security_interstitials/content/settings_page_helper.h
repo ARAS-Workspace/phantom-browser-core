@@ -6,7 +6,6 @@
 #define COMPONENTS_SECURITY_INTERSTITIALS_CONTENT_SETTINGS_PAGE_HELPER_H_
 
 #include "build/build_config.h"
-#include "components/safe_browsing/core/common/safebrowsing_referral_methods.h"
 
 namespace content {
 class WebContents;

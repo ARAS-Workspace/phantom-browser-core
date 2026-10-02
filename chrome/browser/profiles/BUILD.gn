@@ -730,7 +730,6 @@ source_set("profiles_extra_parts_impl") {
     "//components/payments/content",
     "//components/permissions:permissions_common",
     "//components/policy/content",
-    "//components/safe_browsing/core/common:features",
     "//components/signin/public/base",
     "//components/site_engagement/content",
     "//components/site_token_provider",

@@ -3025,7 +3025,6 @@ group("ui_public_dependencies") {
     "//components/dom_distiller/core",
     "//components/enterprise/buildflags",
     "//components/paint_preview/buildflags",
-    "//components/safe_browsing:buildflags",
     "//components/segmentation_platform/public",
     "//components/sync",
     "//components/sync_user_events",

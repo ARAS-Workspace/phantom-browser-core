@@ -64,7 +64,6 @@ source_set("password_store_impl") {
     "//components/password_manager/core/common",
     "//components/password_manager/core/common:features",
     "//components/prefs",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//components/sync/base",
     "//components/sync/base:features",
     "//components/sync/engine",

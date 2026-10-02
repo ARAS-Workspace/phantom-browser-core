@@ -18,7 +18,6 @@
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"
 #include "components/download/content/public/all_download_item_notifier.h"
 #include "components/download/public/common/download_item.h"
-#include "components/safe_browsing/buildflags.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/remote.h"
 

@@ -13,7 +13,6 @@
 #include "base/time/clock.h"
 #include "chrome/browser/site_protection/site_familiarity_heuristic_name.h"
 #include "components/history/core/browser/history_types.h"
-#include "components/safe_browsing/core/browser/db/database_manager.h"
 #include "components/site_engagement/content/engagement_type.h"
 #include "components/site_engagement/content/site_engagement_observer.h"
 #include "components/site_engagement/content/site_engagement_service.h"

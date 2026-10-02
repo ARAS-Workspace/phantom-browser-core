@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//components/guest_view/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//rlz/buildflags/buildflags.gni")
@@ -626,13 +625,6 @@ source_set("browser_sources") {
     "//components/pref_registry",
     "//components/prefs",
     "//components/proxy_config",
-    "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
-    "//components/safe_browsing/core/browser/db:database_manager",
-    "//components/safe_browsing/core/browser/db:util",
-    "//components/safe_browsing/core/browser/db:v4_protocol_manager_util",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common/proto:crx_info_proto",
     "//components/services/unzip/content",
     "//components/services/unzip/public/cpp",
     "//components/sessions",
@@ -694,7 +686,6 @@ source_set("browser_sources") {
 
   public_deps = [
     "//base",
-    "//components/safe_browsing/core/browser/db:v4_protocol_config",
     "//components/url_matcher",
     "//components/url_pattern_index",
     "//components/user_prefs",
@@ -951,11 +942,6 @@ source_set("test_support") {
     "//base",
     "//base/test:test_support",
     "//components/pref_registry",
-    "//components/safe_browsing/core/browser/db:database_manager",
-    "//components/safe_browsing/core/browser/db:util",
-    "//components/safe_browsing/core/browser/db:v4_protocol_manager_util",
-    "//components/safe_browsing/core/browser/db:v4_test_util",
-    "//components/safe_browsing/core/common/proto:crx_info_proto_gen",
     "//components/sync/model",
     "//components/sync_preferences",
     "//components/sync_preferences:test_support",
@@ -976,17 +962,6 @@ source_set("test_support") {
     "//testing/gtest",
     "//ui/base/idle",
   ]
-
-  if (safe_browsing_mode == 1 || safe_browsing_mode == 2) {
-    sources += [
-      "fake_safe_browsing_database_manager.cc",
-      "fake_safe_browsing_database_manager.h",
-    ]
-    deps += [
-      "//components/safe_browsing/core/browser/db:test_database_manager",
-      "//components/safe_browsing/core/browser/db:v4_test_util",
-    ]
-  }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
@@ -1119,9 +1094,6 @@ source_set("unit_tests") {
     "//components/pref_registry",
     "//components/prefs:test_support",
     "//components/proxy_config",
-    "//components/safe_browsing/core/common",
-    "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
-    "//components/safe_browsing/core/common/proto:crx_info_proto_gen",
     "//components/services/unzip:in_process",
     "//components/services/unzip/content",
     "//components/signin/public/identity_manager:test_support",
@@ -1187,10 +1159,6 @@ source_set("unit_tests") {
   }
 
   if (enable_platform_apps) {
-  }
-
-  if (safe_browsing_mode == 1) {
-    sources += [ "../browser/blocklist_unittest.cc" ]
   }
 
   data = [

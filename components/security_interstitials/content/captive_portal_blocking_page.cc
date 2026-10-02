@@ -14,7 +14,6 @@
 #include "build/build_config.h"
 #include "components/captive_portal/core/captive_portal_detector.h"
 #include "components/captive_portal/core/captive_portal_metrics.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/security_interstitials/content/security_interstitial_controller_client.h"
 #include "components/security_interstitials/core/controller_client.h"
 #include "components/security_interstitials/core/metrics_helper.h"

@@ -27,7 +27,6 @@
 #include "base/types/optional_util.h"
 #include "base/values.h"
 #include "components/guest_view/buildflags/buildflags.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_frame_host.h"

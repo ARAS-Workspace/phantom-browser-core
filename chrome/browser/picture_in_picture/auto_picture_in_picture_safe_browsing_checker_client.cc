@@ -5,8 +5,6 @@
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_safe_browsing_checker_client.h"
 
 #include "base/metrics/histogram_functions.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "content/public/browser/browser_thread.h"
 
 AutoPictureInPictureSafeBrowsingCheckerClient::

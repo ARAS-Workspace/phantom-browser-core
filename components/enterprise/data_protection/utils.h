@@ -9,7 +9,6 @@
 #include <string>
 
 #include "base/time/time.h"
-#include "components/safe_browsing/core/common/proto/realtimeapi.pb.h"
 
 namespace enterprise_data_protection {
 

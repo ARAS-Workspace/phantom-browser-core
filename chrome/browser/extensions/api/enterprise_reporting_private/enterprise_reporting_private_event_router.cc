@@ -8,7 +8,6 @@
 
 #include "base/check_is_test.h"
 #include "chrome/common/extensions/api/enterprise_reporting_private.h"
-#include "components/safe_browsing/core/common/proto/realtimeapi.pb.h"
 #include "extensions/browser/event_router.h"
 #include "extensions/browser/event_router_factory.h"
 

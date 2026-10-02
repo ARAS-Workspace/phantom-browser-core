@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//components/enterprise/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 source_set("enterprise") {
@@ -53,7 +52,6 @@ source_set("enterprise") {
     "//components/enterprise/common:files_scan_data",
     "//components/enterprise/common/proto:connectors_proto",
     "//components/enterprise/common/proto:legacy_tech_events_proto",
-    "//components/enterprise/connectors/core",
     "//components/enterprise/content",
     "//components/enterprise/core",
     "//components/enterprise/data_controls/core/browser",
@@ -69,12 +67,6 @@ source_set("enterprise") {
     "//components/policy/core/common",
     "//components/prefs",
     "//components/reporting/client:report_queue_provider",
-    "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/core/browser:referrer_chain_provider",
-    "//components/safe_browsing/core/browser/realtime:url_lookup_service_base",
-    "//components/safe_browsing/core/common:safe_browsing_prefs",
-    "//components/safe_browsing/core/common/proto:csd_proto",
-    "//components/safe_browsing/core/common/proto:realtimeapi_proto",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/security_interstitials/core",
     "//components/security_interstitials/core:unsafe_resource",
@@ -357,7 +349,6 @@ source_set("impl") {
     "//components/enterprise/common:files_scan_data",
     "//components/enterprise/common/proto:connectors_proto",
     "//components/enterprise/common/proto:extensions_workflow_events_proto",
-    "//components/enterprise/connectors/core",
     "//components/enterprise/content",
     "//components/enterprise/core",
     "//components/enterprise/data_protection",
@@ -370,13 +361,6 @@ source_set("impl") {
     "//components/pref_registry",
     "//components/reporting/storage:storage_configuration",
     "//components/reporting/storage:storage_module",
-    "//components/safe_browsing:buildflags",
-    "//components/safe_browsing/core/browser:referrer_chain_provider",
-    "//components/safe_browsing/core/browser/db:util",
-    "//components/safe_browsing/core/browser/realtime:enterprise_url_lookup_service",
-    "//components/safe_browsing/core/browser/realtime:policy_engine",
-    "//components/safe_browsing/core/common:features",
-    "//components/safe_browsing/core/common/proto:csd_proto",
     "//components/sessions",
     "//components/user_prefs",
     "//ui/base/unowned_user_data",
@@ -508,10 +492,6 @@ source_set("impl") {
       "signals/signals_aggregator_factory.cc",
     ]
     deps += [ "//components/enterprise/idle" ]
-  }
-
-  if (safe_browsing_mode == 1) {
-    deps += [ "//components/enterprise/common/proto:chrome_reporting_entity" ]
   }
 
   if (is_linux || is_mac) {

@@ -7,7 +7,6 @@
 
 #include <memory>
 
-#include "components/safe_browsing/core/common/safebrowsing_referral_methods.h"
 #include "components/security_interstitials/content/settings_page_helper.h"
 
 namespace content {

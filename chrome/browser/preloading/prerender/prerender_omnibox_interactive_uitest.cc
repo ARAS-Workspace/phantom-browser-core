@@ -46,7 +46,6 @@
 #include "components/omnibox/browser/base_search_provider.h"
 #include "components/page_load_metrics/browser/navigation_handle_user_data.h"
 #include "components/performance_manager/public/features.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/search_engines/template_url_data.h"
 #include "components/search_engines/template_url_service.h"
 #include "content/public/browser/global_routing_id.h"

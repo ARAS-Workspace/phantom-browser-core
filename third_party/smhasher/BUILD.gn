@@ -29,7 +29,6 @@ static_library("murmurhash3") {
   configs += [ "//build/config/compiler:no_chromium_code" ]
   visibility = [
     "//components/optimization_guide/core:bloomfilter",
-    "//components/safe_browsing/content/renderer/phishing_classifier",
     "//components/variations:unit_tests",
     "//third_party/nearby:connections_implementation_mediums",
   ]

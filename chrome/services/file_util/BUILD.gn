@@ -19,7 +19,6 @@ source_set("file_util") {
     ":buildflags",
     "//base",
     "//build:chromeos_buildflags",
-    "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     "//extensions/buildflags",
     "//mojo/public/cpp/bindings",
     "//third_party/zlib",

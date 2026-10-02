@@ -16,7 +16,6 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "base/supports_user_data.h"
-#include "components/safe_browsing/core/browser/db/database_manager.h"
 #include "components/subresource_filter/content/browser/safe_browsing_child_navigation_throttle.h"
 #include "components/subresource_filter/content/mojom/subresource_filter.mojom.h"
 #include "components/subresource_filter/core/browser/verified_ruleset_dealer.h"

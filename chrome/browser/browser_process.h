@@ -29,7 +29,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "build/build_config.h"
 #include "chrome/common/buildflags.h"
-#include "components/safe_browsing/buildflags.h"
 #include "media/media_buildflags.h"
 
 class BackgroundModeManager;

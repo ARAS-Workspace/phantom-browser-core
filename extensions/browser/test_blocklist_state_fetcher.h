@@ -8,7 +8,6 @@
 #include <string>
 
 #include "base/memory/raw_ptr.h"
-#include "components/safe_browsing/core/common/proto/crx_info.pb.h"
 #include "extensions/browser/blocklist_state_fetcher.h"
 
 namespace extensions {

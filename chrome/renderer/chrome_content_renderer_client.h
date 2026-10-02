@@ -17,7 +17,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
 #include "chrome/common/media/webrtc_logging.mojom.h"
-#include "components/safe_browsing/buildflags.h"
 #include "content/public/common/buildflags.h"
 #include "content/public/renderer/content_renderer_client.h"
 #include "content/public/renderer/render_thread.h"

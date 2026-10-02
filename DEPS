@@ -1644,17 +1644,6 @@ deps = {
   'src/chrome/test/data/perf/frame_rate/content':
     Var('chromium_git') + '/chromium/frame_rate/content.git' + '@' + 'c10272c88463efeef6bb19c9ec07c42bc8fe22b9',
 
-  'src/chrome/test/data/safe_browsing/dmg': {
-    'packages': [
-      {
-        'package': 'chromium/chrome/test/data/safe_browsing/dmg',
-        'version': '03TLfNQgc59nHmyWtYWJfFaUrEW8QDJJzXwm-672m-QC',
-      },
-    ],
-    'condition': 'checkout_mac',
-    'dep_type': 'cipd',
-  },
-
   'src/components/variations/test_data/cipd': {
     'packages': [
       {

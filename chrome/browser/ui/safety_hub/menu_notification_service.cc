@@ -21,7 +21,6 @@
 #include "chrome/browser/ui/safety_hub/safety_hub_service.h"
 #include "chrome/common/chrome_features.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 namespace {
 

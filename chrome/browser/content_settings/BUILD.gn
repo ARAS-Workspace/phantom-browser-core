@@ -304,7 +304,6 @@ source_set("unit_tests") {
     "//components/pref_registry",
     "//components/prefs",
     "//components/prefs:test_support",
-    "//components/safe_browsing/core/common:features",
     "//components/sync_preferences",
     "//components/sync_preferences:test_support",
     "//components/ukm:test_support",

@@ -47,7 +47,6 @@
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/permissions/permission_decision_auto_blocker.h"
-#include "components/safe_browsing/core/browser/db/fake_database_manager.h"
 #include "components/ukm/test_ukm_recorder.h"
 #include "components/zoom/zoom_controller.h"
 #include "content/public/browser/media_session.h"

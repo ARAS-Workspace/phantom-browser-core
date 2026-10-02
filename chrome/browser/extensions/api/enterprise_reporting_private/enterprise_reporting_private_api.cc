@@ -24,7 +24,6 @@
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/device_signals/core/common/common_types.h"
-#include "components/enterprise/connectors/core/reporting_constants.h"
 #include "google_apis/gaia/gaia_id.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

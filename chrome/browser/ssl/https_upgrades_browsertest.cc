@@ -42,8 +42,6 @@
 #include "components/embedder_support/pref_names.h"
 #include "components/omnibox/browser/omnibox_client.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/browser/db/fake_database_manager.h"
-#include "components/safe_browsing/core/common/threat_enums.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/security_interstitials/core/features.h"
 #include "components/security_interstitials/core/https_only_mode_metrics.h"

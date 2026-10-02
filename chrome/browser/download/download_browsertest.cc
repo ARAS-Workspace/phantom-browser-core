@@ -100,7 +100,6 @@
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/security_state/core/security_state.h"
 #include "components/services/quarantine/test_support.h"
 #include "content/public/browser/browser_task_traits.h"

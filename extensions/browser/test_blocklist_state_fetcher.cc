@@ -4,7 +4,6 @@
 
 #include "extensions/browser/test_blocklist_state_fetcher.h"
 
-#include "components/safe_browsing/core/browser/db/v4_test_util.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"

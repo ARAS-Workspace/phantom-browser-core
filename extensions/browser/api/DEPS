@@ -12,7 +12,6 @@ include_rules = [
   "+components/policy/core/common",
   "+components/policy/proto",
   "+components/proxy_config",
-  "+components/safe_browsing/core/common",
   "+components/ukm",
   "+components/viz/common",
   "+services/device/public",

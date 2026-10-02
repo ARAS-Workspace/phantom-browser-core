@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/safe_browsing/buildflags.gni")
-
 if (is_mac) {
   static_library("storage") {
     sources = [
@@ -33,13 +31,8 @@ if (is_mac) {
 
     public_deps = [
       "//base",
-      "//components/safe_browsing:buildflags",
       "//content/public/browser",
     ]
-
-    if (safe_browsing_mode != 0) {
-      public += [ "safe_browsing_request.h" ]
-    }
 
     if (is_mac) {
       public += [ "mac/sharing_service_operation.h" ]
@@ -57,16 +50,6 @@ if (is_mac) {
       "//chrome/browser:browser_public_dependencies",
       "//mojo/public/cpp/bindings",
     ]
-
-    if (safe_browsing_mode != 0) {
-      sources += [ "safe_browsing_request.cc" ]
-      deps += [
-        "//components/safe_browsing/core/browser/db",
-        "//components/safe_browsing/core/browser/db:database_manager",
-        "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
-        "//components/safe_browsing/core/common",
-      ]
-    }
 
     if (is_mac) {
       sources += [ "mac/sharing_service_operation.mm" ]
@@ -91,8 +74,6 @@ if (is_mac) {
       "//base/test:test_support",
       "//chrome/browser",
       "//chrome/test:test_support",
-      "//components/safe_browsing/core/browser/db:test_database_manager",
-      "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
       "//content/public/browser",
       "//content/test:test_support",
       "//net:test_support",

@@ -9,9 +9,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "components/download/public/common/download_item.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 bool WasSafeBrowsingVerdictObtained(const download::DownloadItem* item) {
   return false;

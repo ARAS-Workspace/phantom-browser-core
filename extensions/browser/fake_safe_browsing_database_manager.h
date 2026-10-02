@@ -8,7 +8,6 @@
 #include <set>
 #include <string>
 
-#include "components/safe_browsing/core/browser/db/test_database_manager.h"
 
 namespace extensions {
 

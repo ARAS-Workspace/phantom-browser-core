@@ -4,7 +4,6 @@
 
 import("//chrome/common/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
-import("//components/safe_browsing/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 assert(enterprise_data_controls)
@@ -32,7 +31,6 @@ source_set("data_controls") {
     "//chrome/browser/enterprise",
     "//chrome/browser/profiles:profile",
     "//components/enterprise/common/proto:dlp_policy_event_proto",
-    "//components/enterprise/connectors/core:constants",
     "//components/enterprise/content",
     "//components/keyed_service/core",
     "//components/policy/core/browser",
@@ -52,14 +50,6 @@ source_set("data_controls") {
     "dlp_reporting_manager.cc",
     "dlp_reporting_manager.h",
   ]
-  if (safe_browsing_mode != 0) {
-    sources += [
-      # TODO(crbug.com/435459809): Uncomment these lines to compile these
-      # files in the proper long-term target.
-      # "reporting_service.cc",
-      # "reporting_service.h",
-    ]
-  }
   deps += [
     "//components/constrained_window",
     "//components/guest_view/browser",
@@ -109,9 +99,7 @@ source_set("unit_tests") {
   testonly = true
   configs += [ "//components/enterprise:extra_warnings" ]
 
-  sources = [
-    "chrome_rules_service_unittest.cc",
-  ]
+  sources = [ "chrome_rules_service_unittest.cc" ]
   deps = [
     ":data_controls",
     ":test_support",

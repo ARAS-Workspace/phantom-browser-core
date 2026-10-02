@@ -1,6 +1,5 @@
 include_rules = [
   "+components/enterprise/buildflags",
-  "+components/enterprise/obfuscation/core/download_obfuscator.h",
   "+components/keyed_service/core",
   "+components/services/quarantine/public/mojom/quarantine.mojom.h",
   "+crypto",

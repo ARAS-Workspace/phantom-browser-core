@@ -4,7 +4,6 @@
 
 #include "components/safety_check/safety_check.h"
 
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 namespace {
 

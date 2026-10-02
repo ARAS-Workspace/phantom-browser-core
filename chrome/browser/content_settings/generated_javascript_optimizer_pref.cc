@@ -13,7 +13,6 @@
 #include "components/content_settings/browser/ui/javascript_optimizer_setting.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
 using extensions::api::settings_private::Enforcement;
 using extensions::api::settings_private::PrefObject;

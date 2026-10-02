@@ -46,8 +46,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
 #include "components/security_interstitials/content/ssl_blocking_page.h"
 #include "components/security_interstitials/core/pref_names.h"
@@ -103,7 +101,6 @@
 namespace {
 
 using password_manager::metrics_util::PasswordType;
-using safe_browsing::LoginReputationClientResponse;
 
 const char kCreateFilesystemUrlJavascript[] =
     "new Promise(resolve => {"

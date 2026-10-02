@@ -12,7 +12,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "components/download/public/common/download_stats.h"
 #include "components/profile_metrics/browser_profile_type.h"
-#include "components/safe_browsing/buildflags.h"
 
 void RecordDownloadSource(ChromeDownloadSource source) {
   base::UmaHistogramEnumeration("Download.SourcesChrome", source,

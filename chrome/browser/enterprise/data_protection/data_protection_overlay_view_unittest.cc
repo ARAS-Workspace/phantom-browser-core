@@ -4,7 +4,6 @@
 
 #include "chrome/browser/enterprise/data_protection/data_protection_overlay_view.h"
 
-#include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/skia/include/core/SkColor.h"

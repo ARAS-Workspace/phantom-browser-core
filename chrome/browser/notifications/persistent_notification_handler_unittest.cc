@@ -31,8 +31,6 @@
 #include "chrome/test/base/testing_profile_manager.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/optimization_guide/core/model_quality/test_model_quality_logs_uploader_service.h"
-#include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/ukm/test_ukm_recorder.h"
 #include "content/public/browser/notification_database_data.h"
