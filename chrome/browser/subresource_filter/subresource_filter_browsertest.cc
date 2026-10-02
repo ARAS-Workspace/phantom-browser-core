@@ -6,7 +6,6 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <string_view>
 #include <utility>
 
 #include "base/command_line.h"
@@ -44,7 +43,6 @@
 #include "components/subresource_filter/core/browser/subresource_filter_features_test_support.h"
 #include "components/subresource_filter/core/common/activation_decision.h"
 #include "components/subresource_filter/core/common/common_features.h"
-#include "components/subresource_filter/core/common/scoped_timers.h"
 #include "components/subresource_filter/core/common/test_ruleset_creator.h"
 #include "components/subresource_filter/core/common/test_ruleset_utils.h"
 #include "components/subresource_filter/core/mojom/subresource_filter.mojom.h"
@@ -79,19 +77,6 @@ namespace proto = url_pattern_index::proto;
 // The path to a multi-frame document used for tests.
 static constexpr const char kTestFrameSetPath[] =
     "/subresource_filter/frame_set.html";
-
-GURL GetURLWithFragment(const GURL& url, std::string_view fragment) {
-  GURL::Replacements replacements;
-  replacements.SetRefStr(fragment);
-  return url.ReplaceComponents(replacements);
-}
-
-// This string comes from GetErrorStringForDisallowedLoad() in
-// blink/renderer/core/loader/subresource_filter.cc
-constexpr const char kBlinkDisallowChildFrameConsoleMessageFormat[] =
-    "Chrome blocked resource %s on this site because this site tends to show "
-    "ads that interrupt, distract, mislead, or prevent user control. Learn "
-    "more at https://www.chromestatus.com/feature/5738264052891648";
 
 }  // namespace
 
@@ -404,44 +389,6 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // Tests checking how histograms are recorded. ---------------------------------
-
-namespace {
-
-void ExpectHistogramsAreRecordedForTestFrameSet(
-    const base::HistogramTester& tester,
-    bool expect_performance_measurements) {
-  const bool time_recorded =
-      expect_performance_measurements && ScopedThreadTimers::IsSupported();
-
-  // The following histograms are generated on the browser side.
-  tester.ExpectUniqueSample(
-      SubresourceFilterBrowserTest::kSubresourceLoadsTotalForPage, 6, 1);
-  tester.ExpectUniqueSample(
-      SubresourceFilterBrowserTest::kSubresourceLoadsEvaluatedForPage, 6, 1);
-  tester.ExpectUniqueSample(
-      SubresourceFilterBrowserTest::kSubresourceLoadsMatchedRulesForPage, 4, 1);
-  tester.ExpectUniqueSample(
-      SubresourceFilterBrowserTest::kSubresourceLoadsDisallowedForPage, 4, 1);
-  tester.ExpectTotalCount(
-      SubresourceFilterBrowserTest::kEvaluationTotalWallDurationForPage,
-      time_recorded);
-  tester.ExpectTotalCount(
-      SubresourceFilterBrowserTest::kEvaluationTotalCPUDurationForPage,
-      time_recorded);
-
-  // The rest is produced by renderers, therefore needs to be merged here.
-  content::FetchHistogramsFromChildProcesses();
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-
-  // 5 subframes, each with an include.js, plus a top level include.js.
-  int num_subresource_checks = 5 + 5 + 1;
-  tester.ExpectTotalCount(SubresourceFilterBrowserTest::kEvaluationWallDuration,
-                          time_recorded ? num_subresource_checks : 0);
-  tester.ExpectTotalCount(SubresourceFilterBrowserTest::kEvaluationCPUDuration,
-                          time_recorded ? num_subresource_checks : 0);
-}
-
-}  // namespace
 
 #if BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40236757): Flaky on Mac.

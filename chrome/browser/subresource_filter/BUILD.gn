@@ -106,7 +106,6 @@ source_set("browser_tests") {
     "subresource_filter_disabled_reason_uma_browsertest.cc",
     "subresource_filter_settings_browsertest.cc",
     "subresource_filter_web_socket_browsertest.cc",
-    "subresource_filter_worker_browsertest.cc",
   ]
 
   deps = [

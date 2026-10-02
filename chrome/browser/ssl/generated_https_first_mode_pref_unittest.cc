@@ -25,8 +25,6 @@
 namespace settings_api = extensions::api::settings_private;
 namespace settings_private = extensions::settings_private;
 
-constexpr char kEmail[] = "test@example.com";
-
 // The test parameter controls whether the user is signed in.
 class GeneratedHttpsFirstModePrefTest : public testing::Test {
  protected:
