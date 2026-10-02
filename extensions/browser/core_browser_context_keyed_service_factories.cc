@@ -12,6 +12,7 @@
 #include "extensions/browser/event_router_factory.h"
 #include "extensions/browser/extension_action_manager.h"
 #include "extensions/browser/extension_function.h"
+#include "extensions/browser/extension_mojo_binder_registry_factory.h"
 #include "extensions/browser/extension_navigation_registry.h"
 #include "extensions/browser/extension_prefs_factory.h"
 #include "extensions/browser/extension_prefs_helper_factory.h"
@@ -54,6 +55,7 @@ void EnsureCoreBrowserContextKeyedServiceFactoriesBuilt() {
   EventRouterFactory::GetInstance();
   ExtensionActionManager::GetFactory();
   ExtensionFunction::EnsureShutdownNotifierFactoryBuilt();
+  ExtensionMojoBinderRegistryFactory::GetInstance();
   ExtensionPrefsFactory::GetInstance();
   ExtensionNavigationRegistry::GetFactoryInstance();
   ExtensionUserActivationServiceFactory::GetInstance();
