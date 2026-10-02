@@ -25,9 +25,6 @@
 #include "services/metrics/public/cpp/ukm_recorder.h"
 #include "ui/gfx/text_elider.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 JavaScriptTabModalDialogManagerDelegateDesktop::
     JavaScriptTabModalDialogManagerDelegateDesktop(
         content::WebContents* web_contents)

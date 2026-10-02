@@ -182,9 +182,6 @@
 #include "extensions/common/constants.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 using base::UserMetricsAction;
 using content::BrowserContext;
 using content::BrowserThread;

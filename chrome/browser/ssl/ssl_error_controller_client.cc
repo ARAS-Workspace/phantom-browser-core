@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/certificate_viewer.h"
-#include "chrome/browser/interstitials/enterprise_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
 #include "chrome/common/pref_names.h"
@@ -62,8 +61,6 @@ void SSLErrorControllerClient::GoBack() {
 
 void SSLErrorControllerClient::Proceed() {
   content::WebContents* const web_contents = this->web_contents();
-  MaybeTriggerSecurityInterstitialProceededEvent(web_contents, request_url_,
-                                                 "SSL_ERROR", cert_error_);
   // Web Apps should not be allowed to run if there is a problem with their
   // certificate. So, when users click proceed on an interstitial, move the tab
   // to a regular Chrome window and proceed as usual there.

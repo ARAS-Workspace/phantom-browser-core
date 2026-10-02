@@ -73,12 +73,6 @@ class Origin;
 
 class GURL;
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-namespace safe_browsing {
-class PasswordProtectionService;
-}
-#endif
-
 namespace device_reauth {
 class DeviceAuthenticator;
 }

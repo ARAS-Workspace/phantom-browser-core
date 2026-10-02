@@ -27,9 +27,6 @@
 #include "ui/views/layout/layout_types.h"
 #include "ui/views/view_class_properties.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 using offline_items_collection::ContentId;
 
 DownloadBubbleContentsView::DownloadBubbleContentsView(

@@ -234,11 +234,6 @@
 #include "components/os_crypt/async/browser/keychain_key_provider.h"
 #endif
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "base/memory/scoped_refptr.h"
-#include "components/os_crypt/async/common/encryptor.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 // How often to check if the persistent instance of Chrome needs to restart
 // to install an update.

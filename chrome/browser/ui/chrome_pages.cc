@@ -30,7 +30,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/account_consistency_mode_manager.h"
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
@@ -47,7 +46,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
-#include "chrome/grit/generated_resources.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_node.h"
@@ -63,7 +61,6 @@
 #include "extensions/common/constants.h"
 #include "extensions/common/extension_urls.h"
 #include "net/base/url_util.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/window_open_disposition.h"
 #include "url/url_util.h"
 
@@ -447,22 +444,6 @@ void ShowSafeBrowsingEnhancedProtection(BrowserWindowInterface* browser) {
 
 void ShowSafeBrowsingEnhancedProtectionWithIph(
     BrowserWindowInterface* browser) {
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  ShowPromoInPage::Params params;
-  params.target_url =
-      chrome::GetSettingsUrl(chrome::kSafeBrowsingEnhancedProtectionSubPage);
-  params.bubble_anchor_id = kEnhancedProtectionSettingElementId;
-  params.bubble_arrow = user_education::HelpBubbleArrow::kBottomLeft;
-  params.bubble_text = l10n_util::GetStringUTF16(
-      IDS_SETTINGS_SAFEBROWSING_ENHANCED_IPH_BUBBLE_TEXT);
-  params.close_button_alt_text_id =
-      IDS_SETTINGS_SAFEBROWSING_ENHANCED_IPH_BUBBLE_CLOSE_BUTTON_ARIA_LABEL_TEXT;
-  base::UmaHistogramEnumeration("SafeBrowsing.EsbPromotionFlow.IphShown",
-                                referral_method);
-  safe_browsing::LogShowEnhancedProtectionAction();
-  ShowPromoInPage::Start(browser->GetBrowserForMigrationOnly(),
-                         std::move(params));
-#endif
 }
 
 void ShowImportDialog(BrowserWindowInterface* browser) {

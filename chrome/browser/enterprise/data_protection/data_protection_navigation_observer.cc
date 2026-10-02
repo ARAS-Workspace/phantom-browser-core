@@ -13,7 +13,6 @@
 #include "base/time/time.h"
 #include "chrome/browser/enterprise/data_controls/chrome_rules_service.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_features.h"
-#include "chrome/browser/interstitials/enterprise_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
@@ -26,10 +25,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
 #include "url/gurl.h"
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "components/enterprise/data_protection/features.h"
-#endif
 
 namespace enterprise_data_protection {
 
@@ -54,24 +49,6 @@ DataProtectionPageUserData* GetUserData(content::WebContents* web_contents) {
       GetPageFromWebContents(web_contents));
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-// Returns whether a URL filtering event should be reported for safe verdicts.
-// For warn/block+watermark verdicts, a security event is reported as part
-// of the interstitial page appearing, so we only need to report in this class
-// for SAFE verdicts where no interstitial was shown, only if a rule was
-// triggered.
-bool ShouldReportSafeUrlFilteringEvents(DataProtectionPageUserData* user_data) {
-  DCHECK(user_data);
-  return user_data->rt_lookup_response() &&
-         !user_data->rt_lookup_response()->threat_info().empty() &&
-         user_data->rt_lookup_response()->threat_info(0).verdict_type() ==
-             safe_browsing::RTLookupResponse::ThreatInfo::SAFE &&
-         user_data->rt_lookup_response()
-             ->threat_info(0)
-             .has_matched_url_navigation_rule();
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
 void RunPendingNavigationCallback(
     content::WebContents* web_contents,
     DataProtectionNavigationObserver::Callback callback) {
@@ -80,14 +57,6 @@ void RunPendingNavigationCallback(
   auto* user_data = GetUserData(web_contents);
   DCHECK(user_data);
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  if (ShouldReportSafeUrlFilteringEvents(user_data)) {
-    MaybeTriggerUrlFilteringInterstitialEvent(
-        web_contents, web_contents->GetLastCommittedURL(),
-        /*threat_type=*/"", *user_data->rt_lookup_response());
-  }
-#endif
-
   std::move(callback).Run(user_data->settings());
 }
 
@@ -95,17 +64,6 @@ bool SkipUrl(const GURL& url) {
   return !url.is_valid() || url.SchemeIs(content::kChromeUIScheme) ||
          url.SchemeIs(extensions::kExtensionScheme) ||
          url.SchemeIs(chrome::kChromeNativeScheme);
-}
-
-bool IsEnterpriseLookupEnabled(Profile* profile) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  bool has_valid_dm_token = false;
-  return safe_browsing::RealTimePolicyEngine::CanPerformEnterpriseFullURLLookup(
-      profile->GetPrefs(), has_valid_dm_token, profile->IsOffTheRecord(),
-      profile->IsGuestSession());
-#else
-  return false;
-#endif
 }
 
 std::string GetIdentifier(content::BrowserContext* browser_context) {

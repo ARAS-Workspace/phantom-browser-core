@@ -135,7 +135,7 @@ void PromptForScanningInBubble(content::WebContents* web_contents,
           OfflineItemUtils::GetContentIdForDownload(download));
 }
 
-// Records DownloadItemWarningData and maybe sends the Safe Browsing report.
+// Records DownloadItemWarningData.
 // This should be called when the user takes a bypass action (either proceed or
 // cancel).
 void MaybeReportBypassAction(download::DownloadItem* file,
@@ -154,20 +154,7 @@ void MaybeReportBypassAction(download::DownloadItem* file,
   CHECK(surface != WarningSurface::DOWNLOADS_PAGE ||
         action != WarningAction::CANCEL);
 
-  // The warning action event needs to be added before Safe Browsing report is
-  // sent, because this event should be included in the report.
   DownloadItemWarningData::AddWarningActionEvent(file, surface, action);
-
-  // Do not send cancel or keep report since it's not a terminal action.
-  if (action != WarningAction::PROCEED && action != WarningAction::DISCARD) {
-    return;
-  }
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  SendSafeBrowsingDownloadReport(
-      safe_browsing::ClientSafeBrowsingReportRequest::
-          DANGEROUS_DOWNLOAD_RECOVERY,
-      /*did_proceed=*/action == WarningAction::PROCEED, file);
-#endif
 }
 
 // Triggers a Trust and Safety sentiment survey (if enabled). Should be called

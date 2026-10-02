@@ -9,9 +9,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ssl/sct_reporting_service.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 // static
 SCTReportingServiceFactory* SCTReportingServiceFactory::GetInstance() {
   static base::NoDestructor<SCTReportingServiceFactory> instance;

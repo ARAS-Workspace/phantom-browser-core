@@ -508,57 +508,6 @@ bool IsPathOrDescendantIgnoreCase(
                     base::FilePath::CompareEqualIgnoreCase);
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-void DoSafeBrowsingCheckOnUIThread(
-    content::GlobalRenderFrameHostId frame_id,
-    std::unique_ptr<content::FileSystemAccessWriteItem> item,
-    safe_browsing::CheckDownloadCallback callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  std::move(callback).Run(safe_browsing::DownloadCheckResult::UNKNOWN);
-}
-
-ChromeFileSystemAccessPermissionContext::AfterWriteCheckResult
-InterpretSafeBrowsingResult(safe_browsing::DownloadCheckResult result) {
-  using Result = safe_browsing::DownloadCheckResult;
-  switch (result) {
-    // Only allow downloads that are marked as SAFE or UNKNOWN by SafeBrowsing.
-    // All other types are going to be blocked. UNKNOWN could be the result of a
-    // failed safe browsing ping or if Safe Browsing is not enabled.
-    case Result::UNKNOWN:
-    case Result::SAFE:
-    case Result::ALLOWLISTED_BY_POLICY:
-    case Result::SENSITIVE_CONTENT_WARNING:
-    case Result::DEEP_SCANNED_SAFE:
-      return ChromeFileSystemAccessPermissionContext::AfterWriteCheckResult::
-          kAllow;
-
-    case Result::DANGEROUS:
-    case Result::UNCOMMON:
-    case Result::DANGEROUS_HOST:
-    case Result::POTENTIALLY_UNWANTED:
-    case Result::BLOCKED_PASSWORD_PROTECTED:
-    case Result::BLOCKED_TOO_LARGE:
-    case Result::DANGEROUS_ACCOUNT_COMPROMISE:
-    case Result::BLOCKED_SCAN_FAILED:
-    case Result::SENSITIVE_CONTENT_BLOCK:
-    case Result::FORCE_SAVE_TO_GDRIVE:
-    case Result::FORCE_SAVE_TO_ONEDRIVE:
-      return ChromeFileSystemAccessPermissionContext::AfterWriteCheckResult::
-          kBlock;
-
-    // This shouldn't be returned for File System Access write checks.
-    case Result::ASYNC_SCANNING:
-    case Result::ASYNC_LOCAL_PASSWORD_SCANNING:
-    case Result::PROMPT_FOR_SCANNING:
-    case Result::PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-    case Result::DEEP_SCANNED_FAILED:
-    case Result::IMMEDIATE_DEEP_SCAN:
-      NOTREACHED();
-  }
-  NOTREACHED();
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
 std::string GenerateLastPickedDirectoryKey(const std::string& id) {
   return id.empty() ? kDefaultLastPickedDirectoryKey
                     : base::StrCat({kCustomLastPickedDirectoryKey, "-", id});
@@ -1962,24 +1911,6 @@ void ChromeFileSystemAccessPermissionContext::PerformAfterWriteChecks(
     content::GlobalRenderFrameHostId frame_id,
     base::OnceCallback<void(AfterWriteCheckResult)> callback) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  content::GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE,
-      base::BindOnce(
-          &DoSafeBrowsingCheckOnUIThread, frame_id, std::move(item),
-          base::BindOnce(
-              [](scoped_refptr<base::TaskRunner> task_runner,
-                 base::OnceCallback<void(AfterWriteCheckResult result)>
-                     callback,
-                 safe_browsing::DownloadCheckResult result) {
-                task_runner->PostTask(
-                    FROM_HERE,
-                    base::BindOnce(std::move(callback),
-                                   InterpretSafeBrowsingResult(result)));
-              },
-              base::SequencedTaskRunner::GetCurrentDefault(),
-              std::move(callback))));
-#else
   base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
       FROM_HERE,
       base::BindOnce(
@@ -1987,7 +1918,6 @@ void ChromeFileSystemAccessPermissionContext::PerformAfterWriteChecks(
             std::move(callback).Run(AfterWriteCheckResult::kAllow);
           },
           std::move(callback)));
-#endif
 }
 
 base::expected<void, std::string>

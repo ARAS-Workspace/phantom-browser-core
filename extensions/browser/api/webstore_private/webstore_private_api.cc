@@ -77,10 +77,6 @@
 #include "components/enterprise/browser/promotion/promotion_prefs.h"
 #include "components/enterprise/promotion_types.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "base/time/time.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {

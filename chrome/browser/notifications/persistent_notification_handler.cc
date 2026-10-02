@@ -12,7 +12,6 @@
 #include "base/rand_util.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/lifetime/termination_notification.h"
 #include "chrome/browser/notifications/metrics/notification_metrics_logger.h"
@@ -25,9 +24,7 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings.h"
-#include "components/content_settings/core/common/content_settings_pattern.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_uma_util.h"
@@ -55,9 +52,6 @@
 using content::BrowserThread;
 
 namespace {
-// Key of the stored dict for the suspicious notification user allowlist.
-constexpr char kIsAllowlistedByUserKey[] = "is-allowlisted-by-user";
-
 
 void RecordCloseResult(content::PersistentNotificationStatus status) {
   base::UmaHistogramEnumeration(
@@ -293,21 +287,6 @@ void PersistentNotificationHandler::DisableNotifications(
           permissions::PermissionSourceUI::INLINE_SETTINGS);
   NotificationPermissionContext::UpdatePermission(profile, origin,
                                                   CONTENT_SETTING_BLOCK);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // Remove `origin` from user allowlisted sites when user unsubscribes. On
-  // Android, log the suspicious notification unsubscribe ukm event if the
-  // notification was suspicious.
-  auto* hcsm = HostContentSettingsMapFactory::GetForProfile(profile);
-  if (hcsm && origin.is_valid()) {
-    hcsm->SetWebsiteSettingCustomScope(
-        ContentSettingsPattern::FromURLNoWildcard(origin),
-        ContentSettingsPattern::Wildcard(),
-        ContentSettingsType::ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER,
-        base::Value(base::DictValue().Set(
-            kIsAllowlistedByUserKey, false)));
-  }
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 }
 
 void PersistentNotificationHandler::OpenSettings(Profile* profile,

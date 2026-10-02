@@ -154,12 +154,6 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
   // A self owned RenderFrameObserver of the same frame.
   raw_ptr<language_detection::LanguageDetectionAgent> language_detection_agent_;
   raw_ptr<optimization_guide::PageTextAgent> page_text_agent_;
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  raw_ptr<safe_browsing::ContentPhishingClassifierDelegate>
-      phishing_classifier_ = nullptr;
-  raw_ptr<safe_browsing::ContentPhishingImageEmbedderDelegate>
-      phishing_image_embedder_ = nullptr;
-#endif
 
   // Owned by ChromeContentRendererClient and outlive us.
   raw_ptr<web_cache::WebCacheImpl> web_cache_impl_;

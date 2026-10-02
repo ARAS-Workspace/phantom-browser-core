@@ -26,12 +26,6 @@ namespace signin {
 class IdentityManager;
 }  // namespace signin
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-namespace safe_browsing {
-class SafeBrowsingNavigationObserverManager;
-}  // namespace safe_browsing
-#endif
-
 namespace enterprise_promotion {
 class PromotionEligibilityChecker;
 }  // namespace enterprise_promotion
@@ -79,18 +73,6 @@ class WebstorePrivateAPIDelegate {
   // Called when the user accepts the extension install friction dialog.
   virtual void ReportFrictionAcceptedEvent(
       content::BrowserContext* context) = 0;
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // Returns true if safe browsing is enabled and the safe browsing service is
-  // present in the embedder.
-  virtual bool IsSafeBrowsingEnabledAndReady(
-      content::BrowserContext* context) = 0;
-
-  // Returns SafeBrowsingNavigationObserverManager associated with `context`.
-  virtual safe_browsing::SafeBrowsingNavigationObserverManager*
-  GetSafeBrowsingNavigationObserverManager(
-      content::BrowserContext* context) = 0;
-#endif
 
   // Maybe create promotion eligibility checker.
   virtual std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>

@@ -227,15 +227,7 @@ TEST_F(PersistentNotificationHandlerTest, DisableNotifications) {
                 .status,
             PermissionStatus::ASK);
 
-  // Set `ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER` to true for
-  // `origin_`.
   auto* hcsm = HostContentSettingsMapFactory::GetForProfile(profile_.get());
-  hcsm->SetWebsiteSettingCustomScope(
-      ContentSettingsPattern::FromURLNoWildcard(origin_),
-      ContentSettingsPattern::Wildcard(),
-      ContentSettingsType::ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER,
-      base::Value(
-          base::DictValue().Set("is-allowlisted-by-user", true)));
 
   // Set non-null `SUSPICIOUS_NOTIFICATION_IDS` value.
   base::ListValue suspicious_notification_ids;
@@ -254,17 +246,6 @@ TEST_F(PersistentNotificationHandlerTest, DisableNotifications) {
       profile_.get(), origin_,
       /*notification_id=*/"non-suspicious-notification-id",
       /*is_suspicious=*/false);
-
-  // Disabling the permission should set
-  // `ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER` to false.
-  content_settings::SettingInfo info;
-  base::Value value = hcsm->GetWebsiteSetting(
-      origin_, origin_,
-      ContentSettingsType::ARE_SUSPICIOUS_NOTIFICATIONS_ALLOWLISTED_BY_USER,
-      &info);
-  EXPECT_EQ(
-      false,
-      value.GetDict().FindBool("is-allowlisted-by-user").value());
 
   PermissionStatus kExpectedDisabledStatus = PermissionStatus::DENIED;
   ASSERT_EQ(permission_context

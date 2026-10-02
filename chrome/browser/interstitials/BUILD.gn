@@ -6,10 +6,7 @@ import("//components/enterprise/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 source_set("interstitials") {
-  sources = [
-    "chrome_settings_page_helper.h",
-    "enterprise_util.h",
-  ]
+  sources = [ "chrome_settings_page_helper.h" ]
 
   public_deps = [
     "//components/security_interstitials/content:security_interstitial_page",
@@ -18,10 +15,7 @@ source_set("interstitials") {
 }
 
 source_set("impl") {
-  sources = [
-    "chrome_settings_page_helper.cc",
-    "enterprise_util.cc",
-  ]
+  sources = [ "chrome_settings_page_helper.cc" ]
 
   public_deps = [
     ":interstitials",

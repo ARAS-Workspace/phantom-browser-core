@@ -131,10 +131,6 @@
 #endif
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "base/time/time.h"
-#endif
-
 namespace {
 
 using ExtensionControlledDialogResult =

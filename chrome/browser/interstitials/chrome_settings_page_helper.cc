@@ -4,7 +4,6 @@
 
 #include "chrome/browser/interstitials/chrome_settings_page_helper.h"
 
-#include "build/build_config.h"
 #include "content/public/browser/web_contents.h"
 
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -35,18 +34,6 @@ void ChromeSettingsPageHelper::OpenEnhancedProtectionSettings(
 
 void ChromeSettingsPageHelper::OpenEnhancedProtectionSettingsWithIph(
     content::WebContents* web_contents) const {
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-  // In rare circumstances, this happens outside of a Browser, better ignore
-  // than crash.
-  // TODO(crbug.com/40772284): Remove and find a better way, e.g. not showing
-  // the enhanced protection promo at all.
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(web_contents);
-  if (!browser) {
-    return;
-  }
-  chrome::ShowSafeBrowsingEnhancedProtectionWithIph(browser, referral_method);
-#endif
 }
 
 }  // namespace security_interstitials

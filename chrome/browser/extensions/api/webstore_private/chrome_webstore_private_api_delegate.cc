@@ -66,13 +66,6 @@ void ChromeWebstorePrivateAPIDelegate::ReportFrictionAcceptedEvent(
     content::BrowserContext* context) {
 }
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-bool ChromeWebstorePrivateAPIDelegate::IsSafeBrowsingEnabledAndReady(
-    content::BrowserContext* context) {
-  return false;
-}
-#endif
-
 std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
 ChromeWebstorePrivateAPIDelegate::CreatePromotionEligibilityChecker(
     content::BrowserContext* context,

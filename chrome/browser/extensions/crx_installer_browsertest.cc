@@ -660,30 +660,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionCrxInstallerTest,
   ASSERT_EQ("3.0", extension->version().GetString());
 }
 
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-IN_PROC_BROWSER_TEST_F(ExtensionCrxInstallerTest, Blocklist) {
-  scoped_refptr<FakeSafeBrowsingDatabaseManager> blocklist_db(
-      new FakeSafeBrowsingDatabaseManager(true));
-  ScopedDatabaseManagerForTest scoped_blocklist_db(blocklist_db);
-
-  const extensions::ExtensionId extension_id =
-      "gllekhaobjnhgeagipipnkpmmmpchacm";
-  blocklist_db->SetUnsafe(extension_id);
-
-  base::FilePath crx_path = test_data_dir_.AppendASCII("theme_hidpi_crx")
-                                .AppendASCII("theme_hidpi.crx");
-  EXPECT_FALSE(InstallExtension(crx_path, 0));
-
-  auto installation_failure =
-      InstallStageTrackerFactory::GetForBrowserContext(profile())->Get(
-          extension_id);
-  EXPECT_EQ(InstallStageTracker::FailureReason::CRX_INSTALL_ERROR_DECLINED,
-            installation_failure.failure_reason);
-  EXPECT_EQ(CrxInstallErrorDetail::EXTENSION_IS_BLOCKLISTED,
-            installation_failure.install_error_detail);
-}
-#endif
-
 // Tests that extension disable reasons are properly updated after a delayed
 // extension update is finalized.
 // Regression test for crbug.com/474530434

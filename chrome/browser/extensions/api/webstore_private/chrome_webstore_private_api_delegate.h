@@ -32,9 +32,6 @@ class ChromeWebstorePrivateAPIDelegate : public WebstorePrivateAPIDelegate {
       content::WebContents* web_contents,
       base::OnceCallback<void(bool)> callback) override;
   void ReportFrictionAcceptedEvent(content::BrowserContext* context) override;
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  bool IsSafeBrowsingEnabledAndReady(content::BrowserContext* context) override;
-#endif
   std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
   CreatePromotionEligibilityChecker(content::BrowserContext* context,
                                     bool dismissed_banner_pref,

@@ -50,10 +50,6 @@
 #include "chrome/browser/media/webrtc/system_media_capture_permissions_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
-
 namespace {
 using ::blink::mojom::MediaStreamRequestResult;
 using ::content::DesktopMediaID;

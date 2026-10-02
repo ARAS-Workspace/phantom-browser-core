@@ -96,7 +96,6 @@
 #include "chrome/browser/headless/headless_mode_util.h"
 #include "chrome/browser/hid/chrome_hid_delegate.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/interstitials/enterprise_util.h"
 #include "chrome/browser/language_detection/language_detection_model_service_factory.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/loader/keep_alive_request_tracker.h"
@@ -575,10 +574,6 @@
 
 #if BUILDFLAG(USE_MINIKIN_HYPHENATION)
 #include "chrome/browser/component_updater/hyphenation_component_installer.h"
-#endif
-
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "components/enterprise/common/files_scan_data.h"
 #endif
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
@@ -1096,17 +1091,6 @@ void MaybeAppendSecureOriginsAllowlistSwitch(base::CommandLine* cmdline) {
         base::JoinString(allowlist, ","));
   }
 }
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-void MaybeAddCondition(
-    std::unique_ptr<content::CommitDeferringCondition> maybe_condition,
-    std::vector<std::unique_ptr<content::CommitDeferringCondition>>*
-        conditions) {
-  if (maybe_condition) {
-    conditions->push_back(std::move(maybe_condition));
-  }
-}
-#endif
 
 std::unique_ptr<blocked_content::PopupNavigationDelegate>
 CreatePopupNavigationDelegate(NavigateParams params) {
@@ -4420,12 +4404,6 @@ ChromeContentBrowserClient::CreateCommitDeferringConditionsForNavigation(
     content::CommitDeferringCondition::NavigationType navigation_type) {
   auto conditions =
       std::vector<std::unique_ptr<content::CommitDeferringCondition>>();
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  MaybeAddCondition(
-      safe_browsing::MaybeCreateCommitDeferringCondition(*navigation_handle),
-      &conditions);
-#endif
 
   return conditions;
 }

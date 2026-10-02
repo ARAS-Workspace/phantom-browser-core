@@ -192,11 +192,6 @@
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
-// The blocklist tests rely on the safe-browsing database.
-#if BUILDFLAG(SAFE_BROWSING_DB_LOCAL)
-#define ENABLE_BLOCKLIST_TESTS
-#endif
-
 using base::ScopedObservation;
 using content::BrowserContext;
 using content::BrowserThread;

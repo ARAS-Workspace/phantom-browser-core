@@ -109,9 +109,6 @@
 #include "chrome/browser/ui/download/download_display.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 ////////////////////////////////////////////////////////////////////////////////

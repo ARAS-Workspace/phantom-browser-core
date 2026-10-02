@@ -43,10 +43,6 @@
 #include "extensions/browser/api/networking_private/networking_private_delegate_factory.h"
 #include "pdf/buildflags.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router_factory.h"
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -98,9 +94,6 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
       std::make_unique<extensions::NetworkingPrivateUIDelegateFactoryImpl>();
   extensions::NetworkingPrivateDelegateFactory::GetInstance()
       ->SetUIDelegateFactory(std::move(networking_private_ui_delegate_factory));
-#endif
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  extensions::SafeBrowsingPrivateEventRouterFactory::GetInstance();
 #endif
   extensions::SettingsPrivateEventRouterFactory::GetInstance();
   extensions::SettingsOverridesAPI::GetFactoryInstance();

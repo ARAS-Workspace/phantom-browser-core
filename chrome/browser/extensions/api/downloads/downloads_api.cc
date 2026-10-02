@@ -1538,15 +1538,6 @@ void DownloadsAcceptDangerFunction::DangerPromptCallback(
       RecordDownloadDangerPromptHistogram("Proceed", *download_item);
     }
     DownloadDangerPrompt::RecordDownloadWarningEvent(action, download_item);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-    // Do not send cancel report since it's not a terminal action.
-    if (accept) {
-      SendSafeBrowsingDownloadReport(
-          safe_browsing::ClientSafeBrowsingReportRequest::
-              DANGEROUS_DOWNLOAD_BY_API,
-          accept, download_item);
-    }
-#endif
   }
 
   switch (action) {

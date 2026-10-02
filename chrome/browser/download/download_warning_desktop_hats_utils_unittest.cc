@@ -144,10 +144,6 @@ class DownloadWarningDesktopHatsUtilsTest : public ::testing::Test {
     EXPECT_THAT(psd, StringDataMatches(Fields::kSecondsSinceWarningShown, "2"));
     EXPECT_THAT(psd, StringDataMatches(Fields::kDangerType,
                                        HasSubstr("AccountCompromise")));
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-    EXPECT_THAT(
-        psd, StringDataMatches(Fields::kDangerType, HasSubstr("Cookie theft")));
-#endif
     EXPECT_THAT(psd, StringDataMatches(Fields::kWarningType, "Dangerous"));
     EXPECT_THAT(psd, BitsDataMatches(Fields::kUserGesture, true));
     EXPECT_THAT(psd, BitsDataMatches(Fields::kPartialViewEnabled, true));

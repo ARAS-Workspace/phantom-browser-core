@@ -211,8 +211,7 @@ void ShareServiceImpl::Share(const std::string& title,
   }
 
   RunShareOperation(title, text, share_url, std::move(files),
-                    std::move(callback),
-                    /*is_url_safe=*/true);
+                    std::move(callback));
 }
 
 void ShareServiceImpl::RunShareOperation(
@@ -220,22 +219,11 @@ void ShareServiceImpl::RunShareOperation(
     const std::string& text,
     const GURL& share_url,
     std::vector<blink::mojom::SharedFilePtr> files,
-    ShareCallback callback,
-    bool is_url_safe) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  safe_browsing_request_.reset();
-#endif
-
+    ShareCallback callback) {
   content::WebContents* const web_contents =
       content::WebContents::FromRenderFrameHost(&render_frame_host());
   if (!web_contents) {
     VLOG(1) << "Cannot share after navigating away";
-    std::move(callback).Run(blink::mojom::ShareError::PERMISSION_DENIED);
-    return;
-  }
-
-  if (!is_url_safe) {
-    VLOG(1) << "File not safe to share from this website";
     std::move(callback).Run(blink::mojom::ShareError::PERMISSION_DENIED);
     return;
   }

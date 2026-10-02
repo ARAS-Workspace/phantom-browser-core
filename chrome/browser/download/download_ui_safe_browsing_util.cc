@@ -8,27 +8,17 @@
 #include "base/strings/stringprintf.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/download/public/common/download_item.h"
-#include "components/prefs/pref_service.h"
 
 bool WasSafeBrowsingVerdictObtained(const download::DownloadItem* item) {
   return false;
 }
 
 bool ShouldShowWarningForNoSafeBrowsing(Profile* profile) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  return safe_browsing::GetSafeBrowsingState(*profile->GetPrefs()) ==
-         safe_browsing::SafeBrowsingState::NO_SAFE_BROWSING;
-#else
   return true;
-#endif
 }
 
 bool CanUserTurnOnSafeBrowsing(Profile* profile) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  return !safe_browsing::IsSafeBrowsingPolicyManaged(*profile->GetPrefs());
-#else
   return false;
-#endif
 }
 
 void RecordDownloadDangerPromptHistogram(

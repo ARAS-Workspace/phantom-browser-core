@@ -282,10 +282,6 @@ void SimpleWebViewDialog::StartLoad(const GURL& url) {
   autofill::ChromeAutofillClient::CreateForWebContents(web_contents);
   ChromePasswordManagerClient::CreateForWebContents(web_contents);
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  // Create the password reuse detection manager for simple web view dialog.
-#endif
-
   web_view_->LoadInitialURL(url,
                             views::WebView::HttpsUpgradePolicy::kNoUpgrade);
 }

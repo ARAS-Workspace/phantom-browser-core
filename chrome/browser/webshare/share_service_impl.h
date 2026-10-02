@@ -5,20 +5,14 @@
 #ifndef CHROME_BROWSER_WEBSHARE_SHARE_SERVICE_IMPL_H_
 #define CHROME_BROWSER_WEBSHARE_SHARE_SERVICE_IMPL_H_
 
-#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "base/files/file_path.h"
 #include "base/memory/weak_ptr.h"
-#include "build/build_config.h"
 #include "content/public/browser/document_service.h"
 #include "third_party/blink/public/mojom/webshare/webshare.mojom.h"
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/webshare/safe_browsing_request.h"
-#endif
 
 class GURL;
 
@@ -59,16 +53,11 @@ class ShareServiceImpl
                          const std::string& text,
                          const GURL& share_url,
                          std::vector<blink::mojom::SharedFilePtr> files,
-                         ShareCallback callback,
-                         bool is_safe);
+                         ShareCallback callback);
 
   ShareServiceImpl(content::RenderFrameHost& render_frame_host,
                    mojo::PendingReceiver<blink::mojom::ShareService> receiver);
   ~ShareServiceImpl() override;
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  std::optional<SafeBrowsingRequest> safe_browsing_request_;
-#endif
 
   base::WeakPtrFactory<ShareServiceImpl> weak_factory_{this};
 };
