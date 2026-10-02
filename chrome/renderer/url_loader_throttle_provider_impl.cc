@@ -12,6 +12,8 @@
 #include "base/functional/bind.h"
 #include "base/memory/ptr_util.h"
 #include "build/build_config.h"
+#include "chrome/common/chrome_features.h"
+#include "chrome/common/google_url_loader_throttle.h"
 #include "chrome/renderer/chrome_content_renderer_client.h"
 #include "chrome/renderer/chrome_render_frame_observer.h"
 #include "chrome/renderer/chrome_render_thread_observer.h"
@@ -38,6 +40,8 @@
 #include "extensions/renderer/extension_throttle_manager.h"
 #endif
 
+namespace {
+
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 std::unique_ptr<extensions::ExtensionThrottleManager>
 CreateExtensionThrottleManager() {
@@ -53,8 +57,15 @@ void SetExtensionThrottleManagerTestPolicy(
   std::unique_ptr<net::BackoffEntry::Policy> policy(
       new net::BackoffEntry::Policy{
           // Number of initial errors (in sequence) to ignore before
+          // applying exponential back-off rules.
+          1,
+
           // Initial delay for exponential back-off in ms.
           10 * 60 * 1000,
+
+          // Factor by which the waiting time will be multiplied.
+          10,
+
           // Fuzzing percentage. ex: 10% will spread requests randomly
           // between 90%-100% of the calculated time.
           0.1,

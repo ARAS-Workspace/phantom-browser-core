@@ -4,9 +4,7 @@
 
 #include "chrome/browser/ui/safety_hub/revoked_permissions_os_notification_display_manager.h"
 
-#include "base/test/scoped_feature_list.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_constants.h"
 #include "chrome/test/base/testing_browser_process.h"
@@ -50,11 +48,6 @@ class MockSafetyHubNotificationWrapper
 class RevokedPermissionsOSNotificationDisplayManagerTest
     : public ::testing::Test {
  public:
-  RevokedPermissionsOSNotificationDisplayManagerTest() {
-    feature_list_.InitAndEnableFeature(
-        safe_browsing::kAutoRevokeSuspiciousNotification);
-  }
-
   void SetUp() override {
     auto mock_wrapper = std::make_unique<MockSafetyHubNotificationWrapper>();
     mock_wrapper_ = mock_wrapper.get();
@@ -64,14 +57,6 @@ class RevokedPermissionsOSNotificationDisplayManagerTest
 
   HostContentSettingsMap* hcsm() {
     return HostContentSettingsMapFactory::GetForProfile(profile());
-  }
-
-  void AddAbusiveRevocation(
-      const GURL& url,
-      safe_browsing::NotificationRevocationSource source) {
-    AbusiveNotificationPermissionsManager::
-        SetRevokedAbusiveNotificationPermission(hcsm(), url,
-                                                /*is_ignored=*/false, source);
   }
 
   void AddDisruptiveRevocation(const GURL& url) {
@@ -88,25 +73,10 @@ class RevokedPermissionsOSNotificationDisplayManagerTest
 
  protected:
   content::BrowserTaskEnvironment task_environment_;
-  base::test::ScopedFeatureList feature_list_;
   std::unique_ptr<RevokedPermissionsOSNotificationDisplayManager> manager_;
   raw_ptr<MockSafetyHubNotificationWrapper> mock_wrapper_;
   TestingProfile profile_;
 };
-
-TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest,
-       OnlySuspiciousRevocationsCounted) {
-  AddAbusiveRevocation(GURL(kUrl1),
-                       safe_browsing::NotificationRevocationSource::
-                           kSuspiciousContentAutoRevocation);
-  AddAbusiveRevocation(
-      GURL(kUrl2),
-      safe_browsing::NotificationRevocationSource::kSocialEngineeringBlocklist);
-
-  EXPECT_CALL(*mock_wrapper_,
-              DisplayNotification(1, testing::_, testing::_, testing::_));
-  manager_->DisplayNotification();
-}
 
 TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest,
        DisruptiveRevocationsCounted) {
@@ -118,40 +88,11 @@ TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest,
   manager_->DisplayNotification();
 }
 
-TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest,
-       CombinedRevocationsCounted) {
-  AddAbusiveRevocation(GURL(kUrl1),
-                       safe_browsing::NotificationRevocationSource::
-                           kSuspiciousContentAutoRevocation);
-  AddDisruptiveRevocation(GURL(kUrl2));
-  AddDisruptiveRevocation(GURL(kUrl3));
-
-  EXPECT_CALL(*mock_wrapper_,
-              DisplayNotification(3, testing::_, testing::_, testing::_));
-  manager_->DisplayNotification();
-}
-
-TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest,
-       CombinedRevocationsWithOverlap) {
-  AddAbusiveRevocation(GURL(kUrl1),
-                       safe_browsing::NotificationRevocationSource::
-                           kSuspiciousContentAutoRevocation);
-  AddDisruptiveRevocation(GURL(kUrl1));
-  AddDisruptiveRevocation(GURL(kUrl2));
-
-  EXPECT_CALL(*mock_wrapper_,
-              DisplayNotification(2, testing::_, testing::_, testing::_));
-  manager_->DisplayNotification();
-}
-
 TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest, UpdateNotification) {
-  AddAbusiveRevocation(GURL(kUrl1),
-                       safe_browsing::NotificationRevocationSource::
-                           kSuspiciousContentAutoRevocation);
   AddDisruptiveRevocation(GURL(kUrl2));
 
   EXPECT_CALL(*mock_wrapper_,
-              DisplayNotification(2, testing::_, testing::_, testing::_));
+              DisplayNotification(1, testing::_, testing::_, testing::_));
   manager_->DisplayNotification();
 
   testing::Mock::VerifyAndClearExpectations(mock_wrapper_);
@@ -159,19 +100,6 @@ TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest, UpdateNotification) {
   AddDisruptiveRevocation(GURL(kUrl3));
 
   EXPECT_CALL(*mock_wrapper_,
-              UpdateNotification(3, testing::_, testing::_, testing::_));
+              UpdateNotification(2, testing::_, testing::_, testing::_));
   manager_->UpdateNotification();
-}
-
-TEST_F(RevokedPermissionsOSNotificationDisplayManagerTest, FeatureDisabled) {
-  feature_list_.Reset();
-  AddAbusiveRevocation(GURL(kUrl1),
-                       safe_browsing::NotificationRevocationSource::
-                           kSuspiciousContentAutoRevocation);
-  AddDisruptiveRevocation(GURL(kUrl2));
-
-  // Both disruptive and suspicious revocations should be counted.
-  EXPECT_CALL(*mock_wrapper_,
-              DisplayNotification(2, testing::_, testing::_, testing::_));
-  manager_->DisplayNotification();
 }

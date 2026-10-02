@@ -246,15 +246,6 @@ PasswordReuseDetectorImpl::CheckNonGaiaEnterprisePasswordReuse(
     return std::nullopt;
   }
 
-  // Skips password reuse check if |domain| matches enterprise login URL or
-  // enterprise change password URL.
-  GURL page_url(domain);
-  if (enterprise_password_urls_.has_value() &&
-      safe_browsing::MatchesURLList(page_url,
-                                    enterprise_password_urls_.value())) {
-    return std::nullopt;
-  }
-
   return FindPasswordReuse(input, enterprise_password_hash_data_list_.value());
 }
 

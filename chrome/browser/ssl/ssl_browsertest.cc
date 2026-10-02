@@ -75,7 +75,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
-#include "chrome/common/extensions/api/safe_browsing_private.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/test_launcher_utils.h"
@@ -1837,62 +1836,6 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestDisplaysInsecureForm) {
   ssl_test_util::CheckSecurityState(
       browser()->tab_strip_model()->GetActiveWebContents(), CertError::NONE,
       expected_level, AuthState::DISPLAYED_FORM_WITH_INSECURE_ACTION);
-}
-
-// Verifies that an SSL interstitial generates SafeBrowsing extension api
-// events.
-IN_PROC_BROWSER_TEST_F(SSLUITest, TestExtensionEvents) {
-  class ExtensionEventObserver : public extensions::EventRouter::TestObserver {
-   public:
-    ExtensionEventObserver() = default;
-
-    ExtensionEventObserver(const ExtensionEventObserver&) = delete;
-    ExtensionEventObserver& operator=(const ExtensionEventObserver&) = delete;
-
-    ~ExtensionEventObserver() override = default;
-
-    // extensions::EventRouter::TestObserver:
-    void OnWillDispatchEvent(const extensions::Event& event) override {
-      event_names_.push_back(event.event_name);
-    }
-
-    void OnDidDispatchEventToProcess(const extensions::Event& event,
-                                     int process_id) override {}
-
-    const std::vector<std::string>& event_names() const { return event_names_; }
-
-   private:
-    std::vector<std::string> event_names_;
-  };
-
-  ExtensionEventObserver observer;
-  extensions::EventRouter::Get(browser()->GetProfile())
-      ->AddObserverForTesting(&observer);
-
-  ASSERT_TRUE(https_server_expired_.Start());
-
-  GURL request_url = https_server_expired_.GetURL("/title1.html");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), request_url));
-
-  WebContents* tab = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(tab != nullptr);
-  ssl_test_util::CheckAuthenticationBrokenState(
-      tab, net::CERT_STATUS_DATE_INVALID, AuthState::SHOWING_INTERSTITIAL);
-
-  // Verifies that security interstitial shown event is observed.
-  EXPECT_TRUE(std::ranges::contains(
-      observer.event_names(), extensions::api::safe_browsing_private::
-                                  OnSecurityInterstitialShown::kEventName));
-
-  ProceedThroughInterstitial(tab);
-
-  // Verifies that security interstitial proceeded event is observed.
-  EXPECT_TRUE(std::ranges::contains(
-      observer.event_names(), extensions::api::safe_browsing_private::
-                                  OnSecurityInterstitialProceeded::kEventName));
-
-  extensions::EventRouter::Get(browser()->GetProfile())
-      ->RemoveObserverForTesting(&observer);
 }
 
 // Visits a page that runs insecure content and tries to suppress the insecure
@@ -7118,11 +7061,6 @@ IN_PROC_BROWSER_TEST_F(SSLUITestWithEnhancedProtectionMessage,
   const std::string interaction_histogram =
       "interstitial.ssl_overridable.interaction";
 
-  safe_browsing::SetExtendedReportingPrefForTests(
-      browser()->GetProfile()->GetPrefs(), true);
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
   ASSERT_TRUE(https_server_expired_.Start());
   WebContents* contents = browser()->tab_strip_model()->GetActiveWebContents();
   ASSERT_TRUE(contents);
@@ -7139,43 +7077,6 @@ IN_PROC_BROWSER_TEST_F(SSLUITestWithEnhancedProtectionMessage,
   histograms.ExpectBucketCount(
       interaction_histogram,
       security_interstitials::MetricsHelper::SHOW_ENHANCED_PROTECTION, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(SSLUITestWithEnhancedProtectionMessage,
-                       VerifyEnhancedProtectionMessageNotShownAlreadyInEp) {
-  safe_browsing::SetExtendedReportingPrefForTests(
-      browser()->GetProfile()->GetPrefs(), true);
-  safe_browsing::SetSafeBrowsingState(
-      browser()->GetProfile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-  ASSERT_TRUE(https_server_expired_.Start());
-  WebContents* contents = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(contents);
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_expired_.GetURL("/ssl/google.html")));
-  ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(contents));
-  ExpectInterstitialElementHidden(contents, "extended-reporting-opt-in",
-                                  true /* expect_hidden */);
-  ExpectInterstitialElementHidden(contents, "enhanced-protection-message",
-                                  true /* expect_hidden */);
-}
-
-IN_PROC_BROWSER_TEST_F(SSLUITestWithEnhancedProtectionMessage,
-                       VerifyEnhancedProtectionMessageNotShownManaged) {
-  policy::PolicyMap policies;
-  policies.Set(policy::key::kSafeBrowsingProtectionLevel,
-               policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
-               policy::POLICY_SOURCE_CLOUD,
-               base::Value(/* standard protection */ 1), nullptr);
-  UpdateChromePolicy(policies);
-  ASSERT_TRUE(https_server_expired_.Start());
-  WebContents* contents = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(contents);
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_expired_.GetURL("/ssl/google.html")));
-  ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(contents));
-  ExpectInterstitialElementHidden(contents, "enhanced-protection-message",
-                                  true /* expect_hidden */);
 }
 
 class InsecureFormNavigationThrottleFencedFrameBrowserTest

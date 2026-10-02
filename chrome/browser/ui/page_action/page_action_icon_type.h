@@ -50,7 +50,7 @@ enum class PageActionIconType {
   kAiMode = 35,
   kReadingMode = 36,
   kContextualSidePanel = 37,
-  kJsOptimizations = 38,
+  // DEPRECATED: kJsOptimizations = 38,
   kRecordReplay = 39,
   kIndigo = 40,
   kFederation = 41,

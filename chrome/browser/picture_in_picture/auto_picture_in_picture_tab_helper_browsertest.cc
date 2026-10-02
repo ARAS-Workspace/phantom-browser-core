@@ -1035,16 +1035,6 @@ class AutoPictureInPictureWithVideoPlaybackBrowserTest
     return features;
   }
 
-  void AddDangerousUrl(const GURL& dangerous_url) {
-    fake_safe_browsing_database_manager_->AddDangerousUrl(
-        dangerous_url,
-        safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_PHISHING);
-  }
-
-  void ClearDangerousUrl(const GURL& dangerous_url) {
-    fake_safe_browsing_database_manager_->ClearDangerousUrl(dangerous_url);
-  }
-
   MediaEngagementService* GetMediaEngagementService() const {
     return MediaEngagementServiceFactory::GetForProfile(
         browser()->GetProfile());
@@ -1279,63 +1269,6 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
   WaitForWasRecentlyAudible(web_contents, /*expected_recently_audible=*/false);
 
   SwitchToNewTabAndDontExpectAutopip();
-}
-
-IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
-                       DoesNotVideoAutopip_DangerousURL) {
-  // Load a page that registers for autopip and start video playback.
-  LoadAutoVideoPipPage(browser());
-  auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
-  PlayVideo(web_contents);
-  WaitForAudioFocusGained();
-  WaitForMediaSessionPlaying(web_contents);
-  AddDangerousUrl(web_contents->GetLastCommittedURL());
-  SetExpectedHasHighEngagement(true);
-  WaitForWasRecentlyAudible(web_contents);
-
-  SwitchToNewTabAndDontExpectAutopip();
-}
-
-IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
-                       DoesNotVideoAutopip_FromSafeToDangerousURL) {
-  // Load a page that registers for autopip and start video playback.
-  LoadAutoVideoPipPage(browser());
-  auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
-  PlayVideo(web_contents);
-  WaitForAudioFocusGained();
-  WaitForMediaSessionPlaying(web_contents);
-  SetExpectedHasHighEngagement(true);
-  WaitForWasRecentlyAudible(web_contents);
-
-  // Expect AutoPiP since URL is safe.
-  SwitchToNewTabAndBackAndExpectAutopip(/*should_video_pip=*/true,
-                                        /*should_document_pip=*/false);
-
-  // Do not expect AutoPiP since URL is unsafe.
-  AddDangerousUrl(web_contents->GetLastCommittedURL());
-  SwitchToNewTabAndDontExpectAutopip();
-}
-
-IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
-                       DoesVideoAutopip_FromDangerousToSafeURL) {
-  // Load a page that registers for autopip and start video playback.
-  LoadAutoVideoPipPage(browser());
-  auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
-  PlayVideo(web_contents);
-  WaitForAudioFocusGained();
-  WaitForMediaSessionPlaying(web_contents);
-  AddDangerousUrl(web_contents->GetLastCommittedURL());
-  SetExpectedHasHighEngagement(true);
-  WaitForWasRecentlyAudible(web_contents);
-
-  // Do not expect AutoPiP since URL is unsafe.
-  SwitchToNewTabAndDontExpectAutopip();
-  SwitchToExistingTab(web_contents);
-
-  // Expect AutoPiP since URL is safe.
-  ClearDangerousUrl(web_contents->GetLastCommittedURL());
-  SwitchToNewTabAndBackAndExpectAutopip(/*should_video_pip=*/true,
-                                        /*should_document_pip=*/false);
 }
 
 IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,

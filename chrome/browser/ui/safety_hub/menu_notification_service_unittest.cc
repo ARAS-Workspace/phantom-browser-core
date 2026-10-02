@@ -94,20 +94,6 @@ class SafetyHubMenuNotificationServiceTest
         revoked_permissions_service());
   }
 
-  void ShowNotificationEnoughTimes(
-      int remainingImpressionCount =
-          kSafetyHubMenuNotificationMinImpressionCount) {
-    std::optional<MenuNotificationEntry> notification;
-    AdvanceClockBy(base::Days(90));
-    for (int i = 0; i < remainingImpressionCount; ++i) {
-      notification = menu_notification_service()->GetNotificationToShow();
-      EXPECT_TRUE(notification.has_value());
-    }
-    AdvanceClockBy(kSafetyHubMenuNotificationMinNotificationDuration);
-    notification = menu_notification_service()->GetNotificationToShow();
-    EXPECT_FALSE(notification.has_value());
-  }
-
   RevokedPermissionsService* revoked_permissions_service() {
     return RevokedPermissionsServiceFactory::GetForProfile(profile());
   }
@@ -284,67 +270,6 @@ TEST_F(SafetyHubMenuNotificationServiceTest, TwoNotificationsNoOverride) {
   // should be shown.
   notification = menu_notification_service()->GetNotificationToShow();
   EXPECT_FALSE(notification.has_value());
-}
-
-TEST_F(SafetyHubMenuNotificationServiceTest, SafeBrowsingOverride) {
-  // Create a notification for a module that has low priority notifications.
-  CreateMockUnusedSitePermissionsEntry("https://example1.com:443");
-  std::optional<MenuNotificationEntry> notification;
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_TRUE(notification.has_value());
-  ExpectPluralString(
-      IDS_SETTINGS_SAFETY_HUB_REVOKED_PERMISSIONS_MENU_NOTIFICATION, 1,
-      notification->label);
-
-  // Disable safe browsing, which generates a medium-priority Safe Browsing
-  // notification that should override the low priority notification.
-  prefs()->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-  AdvanceClockBy(base::Days(1));
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_TRUE(notification.has_value());
-  EXPECT_EQ(l10n_util::GetStringUTF16(
-                IDS_SETTINGS_SAFETY_HUB_SAFE_BROWSING_MENU_NOTIFICATION),
-            notification.value().label);
-
-  // Re-enabling Safe Browsing should clear the notification. Because the unused
-  // site permission notification was dismissed, it will not be shown either.
-  prefs()->SetBoolean(prefs::kSafeBrowsingEnabled, true);
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_FALSE(notification.has_value());
-}
-
-TEST_F(SafetyHubMenuNotificationServiceTest, SafeBrowsingTriggerLogic) {
-  std::optional<MenuNotificationEntry> notification;
-  // Disabling Safe Browsing should only trigger a menu notification after one
-  // day.
-  prefs()->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_FALSE(notification.has_value());
-
-  AdvanceClockBy(base::Hours(12));
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_FALSE(notification.has_value());
-  AdvanceClockBy(base::Hours(12));
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_TRUE(notification.has_value());
-
-  // A notification for Safe Browsing should only be shown three times in total.
-  ShowNotificationEnoughTimes(kSafetyHubMenuNotificationMinImpressionCount - 1);
-  AdvanceClockBy(base::Days(90));
-  ShowNotificationEnoughTimes();
-  AdvanceClockBy(base::Days(90));
-  ShowNotificationEnoughTimes();
-  AdvanceClockBy(base::Days(90));
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_FALSE(notification.has_value());
-
-  // When the user toggles the SB prefs, the notification can be shown again,
-  // after one day.
-  prefs()->SetBoolean(prefs::kSafeBrowsingEnabled, true);
-  prefs()->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-  AdvanceClockBy(base::Days(1));
-  notification = menu_notification_service()->GetNotificationToShow();
-  EXPECT_TRUE(notification.has_value());
 }
 
 TEST_F(SafetyHubMenuNotificationServiceTest, DismissNotifications) {

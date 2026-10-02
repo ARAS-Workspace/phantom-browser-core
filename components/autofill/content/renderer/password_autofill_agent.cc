@@ -1292,6 +1292,7 @@ bool PasswordAutofillAgent::HasElementsToFill(
                                       *password_info);
 }
 
+bool PasswordAutofillAgent::FrameCanAccessPasswordManager() {
   if (!unsafe_render_frame()) {
     return false;
   }

@@ -55,8 +55,6 @@ namespace user_prefs {
 class PrefRegistrySyncable;
 }
 
-FORWARD_DECLARE_TEST(ExtensionSyncServiceTest, ProcessSyncDataEnableDisable);
-
 namespace extensions {
 
 class AppSorting;
@@ -201,8 +199,6 @@ class ExtensionPrefs : public KeyedService {
     friend class UpdateDataProviderTest;
     FRIEND_TEST_ALL_PREFIXES(ExtensionPrefsSimpleTest,
                              DisableReasonsRawManipulation);
-    FRIEND_TEST_ALL_PREFIXES(::ExtensionSyncServiceTest,
-                             ProcessSyncDataEnableDisable);
   };
 
   // Creates an ExtensionPrefs object.
@@ -808,10 +804,6 @@ class ExtensionPrefs : public KeyedService {
   // TODO(blee@igalia.com) Need to move all the DNR related codes to the helper.
   //                       (DeclarativeNetRequestPrefsHelper)
   static const char kDNRStaticRulesetPref[];
-
-  // When called before the ExtensionService is created, alerts that are
-  // normally suppressed in first run will still trigger.
-  static void SetRunAlertsInFirstRunForTest();
 
   static const char kFakeObsoletePrefForTesting[];
 

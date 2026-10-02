@@ -59,8 +59,6 @@ constexpr char kNotificationCountHistogram[] =
     "NotificationCount";
 constexpr char kRevokedWebsitesCountHistogram[] =
     "Settings.SafetyHub.DisruptiveNotificationRevocations.RevokedWebsitesCount";
-constexpr char kSafeBrowsingNotificationRevocationSourceHistogram[] =
-    "SafeBrowsing.NotificationRevocationSource";
 
 class SafetyHubNotificationWrapperForTesting
     : public RevokedPermissionsOSNotificationDisplayManager::
@@ -479,10 +477,6 @@ TEST_F(DisruptiveNotificationPermissionsManagerRevocationTest,
       "Settings.SafetyHub.DisruptiveNotificationRevocations."
       "HasReportedMetricsBeforeRevocation",
       true, 1);
-  t.ExpectBucketCount(
-      kSafeBrowsingNotificationRevocationSourceHistogram,
-      safe_browsing::NotificationRevocationSource::kDisruptiveAutoRevocation,
-      1);
 
   // After that, no new metrics are reported since there is no notification
   // content setting exception.

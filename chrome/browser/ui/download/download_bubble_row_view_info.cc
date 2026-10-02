@@ -15,7 +15,6 @@
 
 using download::DownloadItem;
 using offline_items_collection::FailState;
-using TailoredVerdict = safe_browsing::ClientDownloadResponse::TailoredVerdict;
 using TailoredWarningType = DownloadUIModel::TailoredWarningType;
 
 DownloadBubbleRowViewInfoObserver::DownloadBubbleRowViewInfoObserver() =
@@ -136,7 +135,6 @@ void DownloadBubbleRowViewInfo::PopulateForInProgressOrComplete() {
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
       PopulateSuspiciousUiPattern();
       return;
-      }
     }
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING: {
       has_subpage_ = true;

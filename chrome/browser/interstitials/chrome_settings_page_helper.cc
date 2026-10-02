@@ -34,8 +34,7 @@ void ChromeSettingsPageHelper::OpenEnhancedProtectionSettings(
 }
 
 void ChromeSettingsPageHelper::OpenEnhancedProtectionSettingsWithIph(
-    content::WebContents* web_contents,
-    safe_browsing::SafeBrowsingSettingReferralMethod referral_method) const {
+    content::WebContents* web_contents) const {
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   // In rare circumstances, this happens outside of a Browser, better ignore
   // than crash.

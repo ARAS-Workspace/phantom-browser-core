@@ -933,12 +933,6 @@ void InstalledLoader::RecordExtensionsMetrics(Profile* profile) {
                               enabled_not_allowlisted_count);
   base::UmaHistogramCounts100("Extensions.NotAllowlistedDisabled2",
                               disabled_not_allowlisted_count);
-  if (safe_browsing::IsEnhancedProtectionEnabled(*profile->GetPrefs())) {
-    base::UmaHistogramCounts100("Extensions.NotAllowlistedEnabledAndEsbUser2",
-                                enabled_not_allowlisted_count);
-    base::UmaHistogramCounts100("Extensions.NotAllowlistedDisabledAndEsbUser2",
-                                disabled_not_allowlisted_count);
-  }
 }
 
 int InstalledLoader::GetCreationFlags(

@@ -29,13 +29,7 @@ namespace content {
 class BrowserContext;
 }
 
-namespace safe_browsing {
-class SafeBrowsingDatabaseManager;
-}
-
 namespace extensions {
-
-class BlocklistStateFetcher;
 
 // The blocklist of extensions backed by safe browsing.
 class Blocklist : public KeyedService {
@@ -61,8 +55,6 @@ class Blocklist : public KeyedService {
 
   using IsBlocklistedCallback = base::OnceCallback<void(BlocklistState)>;
 
-  using DatabaseReadyCallback = base::OnceCallback<void(bool)>;
-
   explicit Blocklist(content::BrowserContext* context);
 
   Blocklist(const Blocklist&) = delete;
@@ -85,77 +77,14 @@ class Blocklist : public KeyedService {
   void IsBlocklisted(const ExtensionId& extension_id,
                      IsBlocklistedCallback callback);
 
-  // Used to mock BlocklistStateFetcher in unit tests. Blocklist owns the
-  // `fetcher`.
-  void SetBlocklistStateFetcherForTest(BlocklistStateFetcher* fetcher);
-
-  // Reset the owned BlocklistStateFetcher to null and return the current
-  // BlocklistStateFetcher.
-  BlocklistStateFetcher* ResetBlocklistStateFetcherForTest();
-
-  // Reset the listening for an updated database.
-  void ResetDatabaseUpdatedListenerForTest();
-
-  // Reset blocklist state cache to make sure the blocklist state is
-  // fetched from the blocklist state fetcher.
-  void ResetBlocklistStateCacheForTest();
-
   // Adds/removes an observer to the blocklist.
   void AddObserver(Observer* observer);
   void RemoveObserver(Observer* observer);
 
-  // Invokes the callback method with a boolean indicating
-  // whether the database is ready.
-  void IsDatabaseReady(DatabaseReadyCallback callback);
-
  private:
-  friend class ScopedDatabaseManagerForTest;
-
-  // Use via ScopedDatabaseManagerForTest.
-  static void SetDatabaseManager(
-      scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-          database_manager);
-  static scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-  GetDatabaseManager();
-
-  void ObserveNewDatabase();
-
-  void NotifyObservers();
-
-  void GetBlocklistStateForIDs(GetBlocklistedIDsCallback callback,
-                               const std::set<ExtensionId>& blocklisted_ids);
-
-  void RequestExtensionsBlocklistState(const std::set<ExtensionId>& ids,
-                                       base::OnceClosure callback);
-
-  void OnBlocklistStateReceived(const ExtensionId& id, BlocklistState state);
-
-  void ReturnBlocklistStateMap(GetBlocklistedIDsCallback callback,
-                               const std::set<ExtensionId>& blocklisted_ids);
-
   raw_ptr<content::BrowserContext> context_;
 
   base::ObserverList<Observer> observers_;
-
-  base::CallbackListSubscription database_updated_subscription_;
-  base::CallbackListSubscription database_changed_subscription_;
-
-  // The cached BlocklistState's, received from BlocklistStateFetcher.
-  BlocklistStateMap blocklist_state_cache_;
-
-  std::unique_ptr<BlocklistStateFetcher> state_fetcher_;
-
-  // The list of ongoing requests for blocklist states that couldn't be
-  // served directly from the cache. A new request is created in
-  // GetBlocklistedIDs and deleted when the callback is called from
-  // OnBlocklistStateReceived.
-  //
-  // This is a list of requests. Each item in the list is a request. A request
-  // is a pair of [vector of string ids to check, response closure].
-  std::list<std::pair<std::vector<std::string>, base::OnceClosure>>
-      state_requests_;
-
-  base::WeakPtrFactory<Blocklist> weak_ptr_factory_{this};
 };
 
 }  // namespace extensions

@@ -269,8 +269,6 @@ const base::flat_map<const gfx::VectorIcon*, IconInfo>& KnownIcons() {
            {"webui-toolbar:search", IconType::kIconSet}},
           {{&vector_icons::kSearchOldIcon},
            {"webui-toolbar:search_old", IconType::kIconSet}},
-          {{&vector_icons::kShieldIcon},
-           {"webui-toolbar:shield", IconType::kIconSet}},
           {{&vector_icons::kShoppingBagIcon},
            {"webui-toolbar:shopping_bag", IconType::kIconSet}},
           {{&vector_icons::kShoppingBagOldIcon},

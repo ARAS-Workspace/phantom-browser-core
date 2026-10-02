@@ -153,13 +153,6 @@ class DownloadWarningDesktopHatsUtilsTest : public ::testing::Test {
     EXPECT_THAT(psd, BitsDataMatches(Fields::kPartialViewEnabled, true));
   }
 
-  void ExpectDefaultPsdForSafeBrowsing(
-      const DownloadWarningHatsProductSpecificData& psd) {
-    EXPECT_THAT(psd, StringDataMatches(Fields::kUrlDownload, kUrl));
-    EXPECT_THAT(psd, StringDataMatches(Fields::kUrlReferrer, kReferrerUrl));
-    EXPECT_THAT(psd, StringDataMatches(Fields::kFilename, "my_file.pdf"));
-  }
-
   void ExpectPlaceholderForSafeBrowsing(
       const DownloadWarningHatsProductSpecificData& psd) {
     EXPECT_THAT(psd, StringDataMatches(Fields::kUrlDownload,
@@ -168,14 +161,6 @@ class DownloadWarningDesktopHatsUtilsTest : public ::testing::Test {
                                        HasSubstr(kPlaceholderPrefix)));
     EXPECT_THAT(psd, StringDataMatches(Fields::kFilename,
                                        HasSubstr(kPlaceholderPrefix)));
-  }
-
-  void ExpectDefaultPsdForEnhancedSafeBrowsing(
-      const DownloadWarningHatsProductSpecificData& psd) {
-    EXPECT_THAT(
-        psd, StringDataMatches(Fields::kWarningInteractions,
-                               "BUBBLE_MAINPAGE:SHOWN:0,BUBBLE_MAINPAGE:OPEN_"
-                               "SUBPAGE:1000,BUBBLE_SUBPAGE:CLOSE:2000"));
   }
 
   void ExpectPlaceholderForEnhancedSafeBrowsing(
@@ -195,9 +180,6 @@ class DownloadWarningDesktopHatsUtilsTest : public ::testing::Test {
 
 TEST_F(DownloadWarningDesktopHatsUtilsTest,
        ProductSpecificData_NoSafeBrowsing) {
-  safe_browsing::SetSafeBrowsingState(
-      profile_->GetPrefs(), safe_browsing::SafeBrowsingState::NO_SAFE_BROWSING);
-
   auto psd = DownloadWarningHatsProductSpecificData::Create(
       DownloadWarningHatsType::kDownloadBubbleBypass, item_.get());
 
@@ -230,105 +212,7 @@ TEST_F(DownloadWarningDesktopHatsUtilsTest,
 }
 
 TEST_F(DownloadWarningDesktopHatsUtilsTest,
-       ProductSpecificData_StandardSafeBrowsing) {
-  safe_browsing::SetSafeBrowsingState(
-      profile_->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-
-  auto psd = DownloadWarningHatsProductSpecificData::Create(
-      DownloadWarningHatsType::kDownloadsPageHeed, item_.get());
-
-  // Test the PSD fields added afterwards.
-  psd.AddNumPageWarnings(10);
-  // This shouldn't do anything because this is a download page trigger.
-  psd.AddPartialViewInteraction(true);
-
-  // All fields for downloads page are included.
-  EXPECT_THAT(psd.bits_data(),
-              UnorderedKeysAre(
-                  DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-                      DownloadWarningHatsType::kDownloadsPageHeed)));
-  EXPECT_THAT(psd.string_data(),
-              UnorderedKeysAre(
-                  DownloadWarningHatsProductSpecificData::GetStringDataFields(
-                      DownloadWarningHatsType::kDownloadsPageHeed)));
-
-  ExpectDefaultPsd(psd);
-  ExpectDefaultPsdForSafeBrowsing(psd);
-  ExpectPlaceholderForEnhancedSafeBrowsing(psd);
-
-  EXPECT_THAT(psd, StringDataMatches(Fields::kSafeBrowsingState,
-                                     "Standard Protection"));
-  EXPECT_THAT(psd, StringDataMatches(Fields::kOutcome, HasSubstr("Heed")));
-  EXPECT_THAT(psd, StringDataMatches(Fields::kSurface, HasSubstr("page")));
-
-  EXPECT_THAT(psd, StringDataMatches(Fields::kNumPageWarnings, "10"));
-  EXPECT_THAT(psd, Not(BitsDataMatches(Fields::kPartialViewInteraction, _)));
-}
-
-TEST_F(DownloadWarningDesktopHatsUtilsTest,
-       ProductSpecificData_EnhancedSafeBrowsing) {
-  safe_browsing::SetSafeBrowsingState(
-      profile_->GetPrefs(),
-      safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-
-  auto psd = DownloadWarningHatsProductSpecificData::Create(
-      DownloadWarningHatsType::kDownloadBubbleIgnore, item_.get());
-
-  // Test the PSD fields added afterwards.
-  // This shouldn't do anything because this is a download bubble trigger.
-  psd.AddNumPageWarnings(10);
-  psd.AddPartialViewInteraction(true);
-
-  // All fields for download bubble are included.
-  EXPECT_THAT(psd.bits_data(),
-              UnorderedKeysAre(
-                  DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-                      DownloadWarningHatsType::kDownloadBubbleIgnore)));
-  EXPECT_THAT(psd.string_data(),
-              UnorderedKeysAre(
-                  DownloadWarningHatsProductSpecificData::GetStringDataFields(
-                      DownloadWarningHatsType::kDownloadBubbleIgnore)));
-
-  ExpectDefaultPsd(psd);
-  ExpectDefaultPsdForSafeBrowsing(psd);
-  ExpectDefaultPsdForEnhancedSafeBrowsing(psd);
-
-  EXPECT_THAT(psd, StringDataMatches(Fields::kSafeBrowsingState,
-                                     "Enhanced Protection"));
-  EXPECT_THAT(psd, StringDataMatches(Fields::kOutcome, HasSubstr("Ignore")));
-  EXPECT_THAT(psd, StringDataMatches(Fields::kSurface, HasSubstr("bubble")));
-
-  EXPECT_THAT(psd, BitsDataMatches(Fields::kPartialViewInteraction, true));
-  EXPECT_THAT(psd, Not(StringDataMatches(Fields::kNumPageWarnings, _)));
-}
-
-TEST_F(DownloadWarningDesktopHatsUtilsTest,
-       DelayedDownloadWarningHatsLauncher_LaunchesSurvey) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeatureWithParameters(
-      safe_browsing::kDownloadWarningSurvey,
-      {{safe_browsing::kDownloadWarningSurveyType.name,
-        "2" /*kDownloadBubbleIgnore*/}});
-
-  DelayedDownloadWarningHatsLauncher launcher{profile_.get(), kIgnoreDelay};
-  EXPECT_TRUE(launcher.TryScheduleTask(
-      DownloadWarningHatsType::kDownloadBubbleIgnore, item_.get()));
-  launcher.RecordBrowserActivity();
-  EXPECT_CALL(*mock_hats_service_,
-              LaunchSurvey(kHatsSurveyTriggerDownloadWarningBubbleIgnore, _, _,
-                           _, _, _, _));
-  task_environment_.FastForwardBy(kIgnoreDelay);
-}
-
-TEST_F(DownloadWarningDesktopHatsUtilsTest,
        DelayedDownloadWarningHatsLauncher_DoesntScheduleDuplicateSurvey) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeatureWithParameters(
-      safe_browsing::kDownloadWarningSurvey,
-      {{safe_browsing::kDownloadWarningSurveyType.name,
-        "2" /*kDownloadBubbleIgnore*/}});
-
   DelayedDownloadWarningHatsLauncher launcher{profile_.get(), kIgnoreDelay};
   EXPECT_TRUE(launcher.TryScheduleTask(
       DownloadWarningHatsType::kDownloadBubbleIgnore, item_.get()));
@@ -337,76 +221,7 @@ TEST_F(DownloadWarningDesktopHatsUtilsTest,
 }
 
 TEST_F(DownloadWarningDesktopHatsUtilsTest,
-       DelayedDownloadWarningHatsLauncher_MultipleSurveys) {
-  safe_browsing::SetSafeBrowsingState(
-      profile_->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeatureWithParameters(
-      safe_browsing::kDownloadWarningSurvey,
-      {{safe_browsing::kDownloadWarningSurveyType.name,
-        "2" /*kDownloadBubbleIgnore*/}});
-
-  std::unique_ptr<NiceMock<MockDownloadItem>> other_item =
-      SetUpMockDownloadItem();
-  ON_CALL(*other_item, GetFileNameToReportUser())
-      .WillByDefault(
-          Return(base::FilePath(FILE_PATH_LITERAL("other_file.pdf"))));
-
-  DelayedDownloadWarningHatsLauncher launcher{profile_.get(), kIgnoreDelay};
-  EXPECT_TRUE(launcher.TryScheduleTask(
-      DownloadWarningHatsType::kDownloadBubbleIgnore, item_.get()));
-  launcher.RecordBrowserActivity();
-  task_environment_.FastForwardBy(kIgnoreDelay / 2);
-  EXPECT_TRUE(launcher.TryScheduleTask(
-      DownloadWarningHatsType::kDownloadBubbleIgnore, other_item.get()));
-  {
-    EXPECT_CALL(
-        *mock_hats_service_,
-        LaunchSurvey(
-            kHatsSurveyTriggerDownloadWarningBubbleIgnore, _, _, _,
-            Contains(Pair(Fields::kFilename, HasSubstr("my_file.pdf"))), _, _));
-    task_environment_.FastForwardBy(kIgnoreDelay / 2);
-  }
-  launcher.RecordBrowserActivity();
-  {
-    EXPECT_CALL(
-        *mock_hats_service_,
-        LaunchSurvey(
-            kHatsSurveyTriggerDownloadWarningBubbleIgnore, _, _, _,
-            Contains(Pair(Fields::kFilename, HasSubstr("other_file.pdf"))), _,
-            _));
-    task_environment_.FastForwardBy(kIgnoreDelay / 2);
-  }
-}
-
-TEST_F(DownloadWarningDesktopHatsUtilsTest,
-       DelayedDownloadWarningHatsLauncher_WithholdsSurveyIfNoUserActivity) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeatureWithParameters(
-      safe_browsing::kDownloadWarningSurvey,
-      {{safe_browsing::kDownloadWarningSurveyType.name,
-        "2" /*kDownloadBubbleIgnore*/}});
-
-  DelayedDownloadWarningHatsLauncher launcher{profile_.get(), kIgnoreDelay};
-  launcher.TryScheduleTask(DownloadWarningHatsType::kDownloadBubbleIgnore,
-                           item_.get());
-  EXPECT_CALL(*mock_hats_service_,
-              LaunchSurvey(kHatsSurveyTriggerDownloadWarningBubbleIgnore, _, _,
-                           _, _, _, _))
-      .Times(0);
-  task_environment_.FastForwardBy(2 * kIgnoreDelay);
-}
-
-TEST_F(DownloadWarningDesktopHatsUtilsTest,
        DelayedDownloadWarningHatsLauncher_DeletesTaskWhenItemDeleted) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeatureWithParameters(
-      safe_browsing::kDownloadWarningSurvey,
-      {{safe_browsing::kDownloadWarningSurveyType.name,
-        "2" /*kDownloadBubbleIgnore*/}});
-
   DelayedDownloadWarningHatsLauncher launcher{profile_.get(), kIgnoreDelay};
   EXPECT_TRUE(launcher.TryScheduleTask(
       DownloadWarningHatsType::kDownloadBubbleIgnore, item_.get()));
@@ -427,9 +242,6 @@ TEST_F(DownloadWarningDesktopHatsUtilsTest,
 
 TEST_F(DownloadWarningDesktopHatsUtilsTest,
        MaybeGetDownloadWarningHatsTrigger_FeatureDisabled) {
-  base::test::ScopedFeatureList features;
-  features.InitAndDisableFeature(safe_browsing::kDownloadWarningSurvey);
-
   for (DownloadWarningHatsType type :
        {DownloadWarningHatsType::kDownloadBubbleBypass,
         DownloadWarningHatsType::kDownloadBubbleHeed,
@@ -438,49 +250,6 @@ TEST_F(DownloadWarningDesktopHatsUtilsTest,
         DownloadWarningHatsType::kDownloadsPageHeed,
         DownloadWarningHatsType::kDownloadsPageIgnore}) {
     EXPECT_FALSE(MaybeGetDownloadWarningHatsTrigger(type));
-  }
-}
-
-TEST_F(DownloadWarningDesktopHatsUtilsTest,
-       MaybeGetDownloadWarningHatsTrigger_ParamOutOfRange) {
-  for (DownloadWarningHatsType type :
-       {DownloadWarningHatsType::kDownloadBubbleBypass,
-        DownloadWarningHatsType::kDownloadBubbleHeed,
-        DownloadWarningHatsType::kDownloadBubbleIgnore,
-        DownloadWarningHatsType::kDownloadsPageBypass,
-        DownloadWarningHatsType::kDownloadsPageHeed,
-        DownloadWarningHatsType::kDownloadsPageIgnore}) {
-    for (const std::string& param_value : {"", "-1", "6"}) {
-      base::test::ScopedFeatureList features;
-      features.InitAndEnableFeatureWithParameters(
-          safe_browsing::kDownloadWarningSurvey,
-          {{safe_browsing::kDownloadWarningSurveyType.name, param_value}});
-
-      EXPECT_FALSE(MaybeGetDownloadWarningHatsTrigger(type));
-    }
-  }
-}
-
-TEST_F(DownloadWarningDesktopHatsUtilsTest,
-       MaybeGetDownloadWarningHatsTrigger_OnlyReturnsTriggerIfEligible) {
-  for (DownloadWarningHatsType type :
-       {DownloadWarningHatsType::kDownloadBubbleBypass,
-        DownloadWarningHatsType::kDownloadBubbleHeed,
-        DownloadWarningHatsType::kDownloadBubbleIgnore,
-        DownloadWarningHatsType::kDownloadsPageBypass,
-        DownloadWarningHatsType::kDownloadsPageHeed,
-        DownloadWarningHatsType::kDownloadsPageIgnore}) {
-    for (int param_value = 0; param_value < 6; ++param_value) {
-      std::string param_value_string = base::NumberToString(param_value);
-      base::test::ScopedFeatureList features;
-      features.InitAndEnableFeatureWithParameters(
-          safe_browsing::kDownloadWarningSurvey,
-          {{safe_browsing::kDownloadWarningSurveyType.name,
-            param_value_string}});
-
-      bool eligible = param_value == static_cast<int>(type);
-      EXPECT_EQ(MaybeGetDownloadWarningHatsTrigger(type).has_value(), eligible);
-    }
   }
 }
 

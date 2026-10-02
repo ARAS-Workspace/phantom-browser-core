@@ -288,10 +288,6 @@ IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,
                        OpenSecurityDialog) {
-  // Disable SafeBrowsing and make a download dangerous so that showing the
-  // security view is valid.
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled,
-                                                  false);
   embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
   ASSERT_TRUE(embedded_test_server()->Start());
   GURL download_url =

@@ -25,7 +25,6 @@
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/subresource_filter/content/browser/child_frame_navigation_test_utils.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_web_contents_helper.h"
-#include "components/subresource_filter/content/browser/fake_safe_browsing_database_manager.h"
 #include "components/subresource_filter/content/browser/profile_interaction_manager.h"
 #include "components/subresource_filter/content/browser/subresource_filter_observer_manager.h"
 #include "components/subresource_filter/content/browser/throttle_manager_test_support.h"
@@ -234,7 +233,7 @@ class ContentSubresourceFilterThrottleManagerTest
 
     ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
         web_contents, throttle_manager_test_support_->profile_context(),
-        /*database_manager=*/nullptr, dealer_handle_.get());
+        dealer_handle_.get());
 
     Observe(web_contents);
 
@@ -353,9 +352,6 @@ class ContentSubresourceFilterThrottleManagerTest
     ContentSubresourceFilterThrottleManager::FromNavigationHandle(
         registry.GetNavigationHandle())
         ->MaybeCreateAndAddNavigationThrottles(registry);
-
-    created_safe_browsing_throttle_for_last_navigation_ =
-        registry.HasThrottle("SafeBrowsingPageActivationThrottle");
   }
 
   void CreateAgentForHost(content::RenderFrameHost* host) {
@@ -373,28 +369,11 @@ class ContentSubresourceFilterThrottleManagerTest
         RenderViewHostTestHarness::web_contents()->GetPrimaryPage());
   }
 
-  bool created_safe_browsing_throttle_for_current_navigation() const {
-    return created_safe_browsing_throttle_for_last_navigation_;
-  }
-
-  void CreateSafeBrowsingDatabaseManager() {
-    scoped_refptr<FakeSafeBrowsingDatabaseManager> database_manager =
-        base::MakeRefCounted<FakeSafeBrowsingDatabaseManager>();
-
-    web_contents_helper()->SetDatabaseManagerForTesting(
-        std::move(database_manager));
-  }
-
   VerifiedRulesetDealer::Handle* dealer_handle() {
     return dealer_handle_.get();
   }
 
  private:
-  ContentSubresourceFilterWebContentsHelper* web_contents_helper() {
-    return ContentSubresourceFilterWebContentsHelper::FromWebContents(
-        RenderViewHostTestHarness::web_contents());
-  }
-
   std::unique_ptr<content::TestNavigationThrottleInserter>
       test_navigation_throttle_inserter_;
 
@@ -409,8 +388,6 @@ class ContentSubresourceFilterThrottleManagerTest
       agent_map_;
 
   std::unique_ptr<content::NavigationSimulator> navigation_simulator_;
-
-  bool created_safe_browsing_throttle_for_last_navigation_ = false;
 };
 
 INSTANTIATE_TEST_SUITE_P(All,
@@ -852,7 +829,7 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
     // CreateForWebContents() should not do anything if the subresource filter
     // feature is not enabled.
     ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
-        web_contents.get(), profile_context, /*database_manager=*/nullptr,
+        web_contents.get(), profile_context,
         dealer_handle());
     EXPECT_EQ(ContentSubresourceFilterWebContentsHelper::FromWebContents(
                   web_contents.get()),
@@ -863,7 +840,7 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   // CreateForWebContents() should create and attach an instance.
   ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
       web_contents.get(), profile_context,
-      /*database_manager=*/nullptr, dealer_handle());
+      dealer_handle());
   auto* helper = ContentSubresourceFilterWebContentsHelper::FromWebContents(
       web_contents.get());
   EXPECT_NE(helper, nullptr);
@@ -871,7 +848,7 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest,
   // A second call should not attach a different instance.
   ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
       web_contents.get(), profile_context,
-      /*database_manager=*/nullptr, dealer_handle());
+      dealer_handle());
   EXPECT_EQ(ContentSubresourceFilterWebContentsHelper::FromWebContents(
                 web_contents.get()),
             helper);
@@ -1347,37 +1324,6 @@ TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest,
                                    fenced_frame2);
   EXPECT_EQ(content::NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE,
             SimulateStartAndGetResult(navigation_simulator()));
-}
-
-TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest,
-       SafeBrowsingThrottleCreation) {
-  // If no safe browsing database is present, the throttle should not be
-  // created on a navigation.
-  NavigateAndCommitMainFrame(GURL(kTestURLWithNoActivation));
-  EXPECT_FALSE(created_safe_browsing_throttle_for_current_navigation());
-
-  CreateSafeBrowsingDatabaseManager();
-
-  // With a safe browsing database present, the throttle should be created on
-  // a main frame navigation.
-  NavigateAndCommitMainFrame(GURL(kTestURLWithNoActivation));
-  EXPECT_TRUE(created_safe_browsing_throttle_for_current_navigation());
-
-  // However, it still should not be created on a subframe navigation.
-  CreateSubframeWithTestNavigation(
-      GURL("https://www.example.com/disallowed.html"), main_rfh());
-  EXPECT_EQ(content::NavigationThrottle::PROCEED,
-            SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_FALSE(created_safe_browsing_throttle_for_current_navigation());
-
-  // It should also not be created on a fenced frame navigation.
-  CreateFencedFrameWithTestNavigation(
-      GURL("https://www.example.com/disallowed.html"), main_rfh());
-  EXPECT_EQ(content::NavigationThrottle::PROCEED,
-            SimulateStartAndGetResult(navigation_simulator()));
-
-  EXPECT_FALSE(created_safe_browsing_throttle_for_current_navigation());
 }
 
 TEST_P(ContentSubresourceFilterThrottleManagerFencedFrameTest, LogActivation) {

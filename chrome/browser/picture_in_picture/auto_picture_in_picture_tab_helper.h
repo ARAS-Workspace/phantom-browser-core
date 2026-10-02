@@ -31,7 +31,6 @@ class PermissionDecisionAutoBlockerBase;
 }  // namespace permissions
 
 class AutoPictureInPictureHatsService;
-class AutoPictureInPictureSafeBrowsingCheckerClient;
 class AutoPictureInPictureTabObserverHelperBase;
 class AutoPipSettingHelper;
 class AutoPipSettingOverlayView;
@@ -52,12 +51,6 @@ class AutoPictureInPictureTabHelper
       public media_session::mojom::AudioFocusObserver,
       public media_session::mojom::MediaSessionObserver {
  public:
-  // Delay used by `AutoPictureInPictureSafeBrowsingCheckerClient` to check
-  // URL safety. If a check takes longer than `kSafeBrowsingCheckDelay`, the URL
-  // will be considered not safe and enter AutoPiP requests will be denied.
-  static constexpr base::TimeDelta kSafeBrowsingCheckDelay =
-      base::Milliseconds(500);
-
   ~AutoPictureInPictureTabHelper() override;
   AutoPictureInPictureTabHelper(const AutoPictureInPictureTabHelper&) = delete;
   AutoPictureInPictureTabHelper& operator=(
@@ -200,7 +193,6 @@ class AutoPictureInPictureTabHelper
 
   // Stops any pending URL safety task. Also reset relevant member variables:
   //   * Sets `has_safe_url_` to false.
-  //   * Resets `safe_browsing_checker_client_`.
   //   * Invalidates async tasks weak ptr factory.
   void StopAndResetAsyncTasks();
 
@@ -213,8 +205,7 @@ class AutoPictureInPictureTabHelper
   // Returns true if the tab:
   //   * Has audio focus
   //   * Is playing unmuted playback
-  //   * Has a safe URL as reported by
-  //   `AutoPictureInPictureSafeBrowsingCheckerClient`
+  //   * Has a safe URL
   bool MeetsVideoPlaybackConditions() const;
 
   // Returns true if the tab is currently using the camera or microphone.
@@ -239,8 +230,7 @@ class AutoPictureInPictureTabHelper
   // `MaybeEnterAutoPictureInPicture` will be called if the URL is safe.
   void OnUrlSafetyResult(bool has_safe_url);
 
-  // Schedules a URL safety check. Before scheduling a URL safety check,
-  // initializes the `safe_browsing_checker_client_` if needed.
+  // Schedules a URL safety check.
   void ScheduleUrlSafetyCheck();
 
   // Creates the `auto_pip_setting_helper_` if it does not already exist.
@@ -358,8 +348,7 @@ class AutoPictureInPictureTabHelper
   // TODO(crbug.com/40250017): Reword to reference the "MediaSession routed
   // frame last committed URL".
   //
-  // True if the observed WebContents last committed URL is safe, as reported by
-  // `AutoPictureInPictureSafeBrowsingCheckerClient`.
+  // True if the observed WebContents last committed URL is safe.
   bool has_safe_url_ = false;
 
   // Connections with the media session service to listen for audio focus
@@ -371,11 +360,6 @@ class AutoPictureInPictureTabHelper
 
   // If non-null, this is the setting helper for the permission setting UI.
   std::unique_ptr<AutoPipSettingHelper> auto_pip_setting_helper_;
-
-  // Implementation of the Safe Browsing client, used to check and report URL
-  // safety.
-  std::unique_ptr<AutoPictureInPictureSafeBrowsingCheckerClient>
-      safe_browsing_checker_client_;
 
   // The `MediaEngagementService` is used by `this` to determine whether or not
   // the web contents origin has high media engagement.

@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "base/no_destructor.h"
+#include "components/lookalikes/core/url_pattern_util.h"
 #include "third_party/re2/src/re2/re2.h"
 #include "url/gurl.h"
 
@@ -42,19 +43,17 @@ void UrlToSafetyTipPatterns(const GURL& url,
   std::string canon_host;
   std::string canon_path;
   std::string canon_query;
-  SBProtocolManagerUtil::CanonicalizeUrl(url, &canon_host, &canon_path,
-                                         &canon_query);
+  CanonicalizeUrl(url, &canon_host, &canon_path, &canon_query);
 
   std::vector<std::string> hosts;
   if (url.HostIsIPAddress()) {
     hosts.push_back(url.GetHost());
   } else {
-    SBProtocolManagerUtil::GenerateHostVariantsToCheck(canon_host, &hosts);
+    GenerateHostVariantsToCheck(canon_host, &hosts);
   }
 
   std::vector<std::string> paths;
-  SBProtocolManagerUtil::GeneratePathVariantsToCheck(canon_path, canon_query,
-                                                     &paths);
+  GeneratePathVariantsToCheck(canon_path, canon_query, &paths);
 
   for (const std::string& host : hosts) {
     for (const std::string& path : paths) {

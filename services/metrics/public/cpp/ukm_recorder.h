@@ -17,7 +17,6 @@
 #include "services/metrics/public/mojom/ukm_interface.mojom-forward.h"
 #include "url/gurl.h"
 
-class AbusiveNotificationPermissionsManager;
 class ChromePermissionsClient;
 class PermissionUmaUtil;
 class PlatformNotificationServiceImpl;
@@ -211,12 +210,6 @@ class METRICS_EXPORT UkmRecorder {
   // for recording nonpersistent notification UKM events.
   static SourceId GetSourceIdForNotificationEvent(
       base::PassKey<NonPersistentNotificationHandler>,
-      const GURL& url);
-
-  // Gets a new SourceId of NOTIFICATION_ID type. This should only be used
-  // for recording abusive notification Safety Hub interaction UKM events.
-  static SourceId GetSourceIdForNotificationEvent(
-      base::PassKey<AbusiveNotificationPermissionsManager>,
       const GURL& url);
 
   // This method should be called when the system is about to shutdown, but

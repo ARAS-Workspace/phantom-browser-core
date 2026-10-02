@@ -144,9 +144,7 @@ void SecurityInterstitialControllerClient::OpenUrlInNewForegroundTab(
 }
 
 void SecurityInterstitialControllerClient::OpenEnhancedProtectionSettings() {
-  settings_page_helper_->OpenEnhancedProtectionSettingsWithIph(
-      &*web_contents_,
-      safe_browsing::SafeBrowsingSettingReferralMethod::kSecurityInterstitial);
+  settings_page_helper_->OpenEnhancedProtectionSettingsWithIph(&*web_contents_);
 }
 
 const std::string& SecurityInterstitialControllerClient::GetApplicationLocale()
@@ -160,7 +158,7 @@ PrefService* SecurityInterstitialControllerClient::GetPrefService() {
 
 const std::string
 SecurityInterstitialControllerClient::GetExtendedReportingPrefName() const {
-  return prefs::kSafeBrowsingScoutReportingEnabled;
+  return std::string();
 }
 
 bool SecurityInterstitialControllerClient::CanLaunchDateAndTimeSettings() {

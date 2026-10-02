@@ -3467,13 +3467,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, AllTypesAreGettingDeleted) {
   auto* map = HostContentSettingsMapFactory::GetForProfile(profile);
   auto* registry = content_settings::WebsiteSettingsRegistry::GetInstance();
 
-  auto* history_service =
-      HistoryServiceFactory::GetForProfileWithoutCreating(profile);
-  // Create a safe_browsing::VerdictCacheManager that will handle deletion of
-  // ContentSettingsType::PASSWORD_PROTECTION entries.
-  safe_browsing::VerdictCacheManager sb_cache_manager(
-      history_service, map, profile->GetPrefs(), /*sync_observer=*/nullptr);
-
   GURL url("https://example.com");
 
   // List of types that don't have to be deletable.
@@ -3484,6 +3477,9 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, AllTypesAreGettingDeleted) {
       // TODO(crbug.com/41312665): Make sure that these get fixed:
       // Not deleted but should be deleted with history?
       ContentSettingsType::IMPORTANT_SITE_INFO,
+
+      // No remaining code writes or clears this type.
+      ContentSettingsType::PASSWORD_PROTECTION,
   };
 
   // Set a value for every WebsiteSetting.

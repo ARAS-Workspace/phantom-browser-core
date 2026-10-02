@@ -25,10 +25,6 @@ class RenderFrameHost;
 class WebContents;
 }  // namespace content
 
-namespace safe_browsing {
-class SafeBrowsingDatabaseManager;
-}  // namespace safe_browsing
-
 namespace subresource_filter {
 
 class ContentSubresourceFilterThrottleManager;
@@ -59,8 +55,6 @@ class ContentSubresourceFilterWebContentsHelper
   static void CreateForWebContents(
       content::WebContents* web_contents,
       SubresourceFilterProfileContext* profile_context,
-      scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-          database_manager,
       VerifiedRulesetDealer::Handle* dealer_handle);
 
   // Will get the helper from the given `page`'s WebContents.
@@ -70,8 +64,6 @@ class ContentSubresourceFilterWebContentsHelper
   explicit ContentSubresourceFilterWebContentsHelper(
       content::WebContents* web_contents,
       SubresourceFilterProfileContext* profile_context,
-      scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-          database_manager,
       VerifiedRulesetDealer::Handle* dealer_handle);
   ~ContentSubresourceFilterWebContentsHelper() override;
 
@@ -83,13 +75,6 @@ class ContentSubresourceFilterWebContentsHelper
       content::NavigationHandle& handle);
   static ContentSubresourceFilterThrottleManager* GetThrottleManager(
       content::Page& page);
-
-  // Sets the SafeBrowsingDatabaseManager instance to use on new throttle
-  // managers. Note, this will not update the database_manager_ value on
-  // existing ContentSubresourceFilterThrottleManagers.
-  void SetDatabaseManagerForTesting(
-      scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-          database_manager);
 
   void WillDestroyThrottleManager(
       ContentSubresourceFilterThrottleManager* throttle_manager);
@@ -119,7 +104,6 @@ class ContentSubresourceFilterWebContentsHelper
  private:
   raw_ptr<SubresourceFilterProfileContext, DanglingUntriaged> profile_context_;
 
-  scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager> database_manager_;
   raw_ptr<VerifiedRulesetDealer::Handle, DanglingUntriaged> dealer_handle_;
 
   // Set of frames across all pages in this WebContents that have had at least

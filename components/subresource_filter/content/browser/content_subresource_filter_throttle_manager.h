@@ -123,8 +123,6 @@ class ContentSubresourceFilterThrottleManager
   static std::unique_ptr<ContentSubresourceFilterThrottleManager>
   CreateForNewPage(
       SubresourceFilterProfileContext* profile_context,
-      scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-          database_manager,
       VerifiedRulesetDealer::Handle* dealer_handle,
       ContentSubresourceFilterWebContentsHelper& web_contents_helper,
       content::NavigationHandle& initiating_navigation_handle);
@@ -154,8 +152,6 @@ class ContentSubresourceFilterThrottleManager
 
   ContentSubresourceFilterThrottleManager(
       SubresourceFilterProfileContext* profile_context,
-      scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-          database_manager,
       VerifiedRulesetDealer::Handle* dealer_handle,
       ContentSubresourceFilterWebContentsHelper& web_contents_helper,
       content::NavigationHandle& initiating_navigation_handle);
@@ -404,8 +400,6 @@ class ContentSubresourceFilterThrottleManager
 
   // This member outlives this class.
   raw_ptr<VerifiedRulesetDealer::Handle> dealer_handle_;
-
-  scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager> database_manager_;
 
   std::unique_ptr<ProfileInteractionManager> profile_interaction_manager_;
 

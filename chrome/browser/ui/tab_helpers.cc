@@ -69,7 +69,6 @@
 #include "chrome/browser/resource_coordinator/tab_helper.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sessions/session_tab_helper_factory.h"
-#include "chrome/browser/site_protection/site_protection_metrics_observer.h"
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/connection_help_tab_helper.h"
 #include "chrome/browser/ssl/https_only_mode_tab_helper.h"
@@ -401,8 +400,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   prerender::NoStatePrefetchTabHelper::CreateForWebContents(web_contents);
   RecentlyAudibleHelper::CreateForWebContents(web_contents);
   resource_coordinator::ResourceCoordinatorTabHelper::CreateForWebContents(
-      web_contents);
-  site_protection::SiteProtectionMetricsObserver::CreateForWebContents(
       web_contents);
   SafetyTipWebContentsObserver::CreateForWebContents(web_contents);
   SearchEngineTabHelper::CreateForWebContents(web_contents);

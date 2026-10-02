@@ -72,9 +72,7 @@ bool IsGaiaCredentialPage(const std::string& signon_realm) {
 
 bool ShouldSaveEnterprisePasswordHash(const PasswordForm& form,
                                       const PrefService& prefs) {
-  return safe_browsing::MatchesPasswordProtectionLoginURL(form.url, prefs) ||
-         safe_browsing::MatchesPasswordProtectionChangePasswordURL(form.url,
-                                                                   prefs);
+  return false;
 }
 
 bool HasChosenToSyncPasswords(const syncer::SyncService* sync_service) {

@@ -442,13 +442,11 @@ void ShowPasswordCheck(BrowserWindowInterface* browser) {
 }
 
 void ShowSafeBrowsingEnhancedProtection(BrowserWindowInterface* browser) {
-  safe_browsing::LogShowEnhancedProtectionAction();
   ShowSettingsSubPage(browser, kSafeBrowsingEnhancedProtectionSubPage);
 }
 
 void ShowSafeBrowsingEnhancedProtectionWithIph(
-    BrowserWindowInterface* browser,
-    safe_browsing::SafeBrowsingSettingReferralMethod referral_method) {
+    BrowserWindowInterface* browser) {
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   ShowPromoInPage::Params params;
   params.target_url =

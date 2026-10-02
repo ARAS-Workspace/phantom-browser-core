@@ -159,8 +159,7 @@ class DataProtectionClipboardDistilledURLTest
   void SetUp() override {
     DataProtectionClipboardTest::SetUp();
     scoped_features_.InitWithFeatures(
-        {data_controls::kDataControlsSearchWith,
-         enterprise_connectors::kContentAnalysisClipboardCopy},
+        {data_controls::kDataControlsSearchWith},
         {});
     test_web_contents_ =
         content::WebContentsTester::CreateTestWebContents(profile_, nullptr);

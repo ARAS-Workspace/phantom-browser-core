@@ -29,9 +29,7 @@ class SettingsPageHelper {
   // triggering of an in-product-help bubble over the Enhanced Safe
   // Browsing radio button.
   virtual void OpenEnhancedProtectionSettingsWithIph(
-      content::WebContents* web_contents,
-      safe_browsing::SafeBrowsingSettingReferralMethod referral_method)
-      const = 0;
+      content::WebContents* web_contents) const = 0;
 };
 
 }  // namespace security_interstitials

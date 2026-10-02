@@ -35,15 +35,6 @@ GeneratedHttpsFirstModePref::GeneratedHttpsFirstModePref(Profile* profile)
       base::BindRepeating(
           &GeneratedHttpsFirstModePref::OnSourcePreferencesChanged,
           base::Unretained(this)));
-  user_prefs_registrar_.Add(
-      prefs::kSafeBrowsingEnhanced,
-      base::BindRepeating(
-          &GeneratedHttpsFirstModePref::OnSourcePreferencesChanged,
-          base::Unretained(this)));
-  user_prefs_registrar_.Add(
-      prefs::kSecuritySettingsBundle,
-      base::BindRepeating(&GeneratedHttpsFirstModePref::OnSettingsBundleChanged,
-                          base::Unretained(this)));
 }
 
 GeneratedHttpsFirstModePref::~GeneratedHttpsFirstModePref() = default;
@@ -190,27 +181,5 @@ void GeneratedHttpsFirstModePref::ApplyManagementState(
       pref_object.recommended_value =
           base::Value(static_cast<int>(HttpsFirstModeSetting::kDisabled));
     }
-  }
-}
-
-void GeneratedHttpsFirstModePref::OnSettingsBundleChanged() {
-  if (!base::FeatureList::IsEnabled(
-          safe_browsing::kBundledSecuritySettingsAskBeforeHttp)) {
-    return;
-  }
-  auto bundle = safe_browsing::GetSecurityBundleSetting(*profile_->GetPrefs());
-  switch (bundle) {
-    case safe_browsing::SecuritySettingsBundleSetting::STANDARD:
-      SetPref(std::make_unique<base::Value>(
-                  static_cast<int>(HttpsFirstModeSetting::kDisabled))
-                  .get());
-      break;
-    case safe_browsing::SecuritySettingsBundleSetting::ENHANCED:
-      SetPref(std::make_unique<base::Value>(
-                  static_cast<int>(IsBalancedModeAvailable()
-                                       ? HttpsFirstModeSetting::kEnabledBalanced
-                                       : HttpsFirstModeSetting::kDisabled))
-                  .get());
-      break;
   }
 }

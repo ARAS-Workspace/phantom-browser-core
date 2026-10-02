@@ -71,7 +71,6 @@ FirstRunFeatureShowcasePixelTest.*
 FirstRunFinishOrContinuePixelTest.*
 FirstRunIntroPixelTest.*
 FirstRunSignInCelebrationPixelTest.*
-GlobalErrorBubbleTest.*
 HatsBubbleTest.*
 HomeButtonUiTest.*
 HungRendererDialogViewBrowserTest.*
@@ -85,7 +84,6 @@ InteractionTestUtilBrowserTest.CompareScreenshot_*
 InteractionTestUtilBrowserUiTest.CompareScreenshot_*
 *IOSPromoBubbleBrowserTest.*
 IsolatedWebAppInstallerViewUiPixelTest.*
-JavascriptOptimizerUiTest.*
 *ContextualTasks*PixelTest*
 *LensSidePanel*PixelTest*
 LHSIndicatorsInteractiveUITest.*

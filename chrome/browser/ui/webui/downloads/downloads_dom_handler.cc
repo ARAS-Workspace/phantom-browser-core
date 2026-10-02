@@ -180,17 +180,6 @@ void MaybeTriggerTrustSafetySurvey(download::DownloadItem* file,
   CHECK(surface == WarningSurface::DOWNLOADS_PAGE ||
         surface == WarningSurface::DOWNLOAD_PROMPT);
   CHECK(action == WarningAction::PROCEED || action == WarningAction::DISCARD);
-  if (Profile* profile = Profile::FromBrowserContext(
-          content::DownloadItemUtils::GetBrowserContext(file));
-      profile &&
-      safe_browsing::IsSafeBrowsingSurveysEnabled(*profile->GetPrefs())) {
-    TrustSafetySentimentService* trust_safety_sentiment_service =
-        TrustSafetySentimentServiceFactory::GetForProfile(profile);
-    if (trust_safety_sentiment_service) {
-      trust_safety_sentiment_service->InteractedWithDownloadWarningUI(surface,
-                                                                      action);
-    }
-  }
 }
 
 void RecordDownloadsPageValidatedHistogram(download::DownloadItem* item) {
@@ -682,9 +671,7 @@ void DownloadsDOMHandler::OpenEsbSettings() {
   if (!browser) {
     return;
   }
-  chrome::ShowSafeBrowsingEnhancedProtectionWithIph(
-      browser,
-      safe_browsing::SafeBrowsingSettingReferralMethod::kDownloadPageRowPromo);
+  chrome::ShowSafeBrowsingEnhancedProtectionWithIph(browser);
 
   feature_engagement::Tracker* tracker =
       feature_engagement::TrackerFactory::GetForBrowserContext(

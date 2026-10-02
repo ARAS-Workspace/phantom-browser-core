@@ -78,6 +78,7 @@
 #include "components/enterprise/data_controls/core/browser/data_controls_policy_handler.h"
 #include "components/enterprise/data_controls/core/browser/prefs.h"
 #include "components/enterprise/device_trust/prefs.h"
+#include "components/enterprise/encryption/cache/prefs.h"
 #include "components/enterprise/isolated_mode/prefs.h"
 #include "components/enterprise/net/core/prefs.h"
 #include "components/feed/core/shared_prefs/pref_names.h"
@@ -259,9 +260,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kForcePermissionPolicyUnloadDefaultEnabled,
     policy_prefs::kForcePermissionPolicyUnloadDefaultEnabled,
     base::Value::Type::BOOLEAN},
-  { key::kDisableSafeBrowsingProceedAnyway,
-    prefs::kSafeBrowsingProceedAnywayDisabled,
-    base::Value::Type::BOOLEAN },
   { key::kDomainReliabilityAllowed,
     domain_reliability::prefs::kDomainReliabilityAllowedByPolicy,
     base::Value::Type::BOOLEAN },
@@ -301,15 +299,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kOopPrintDriversAllowedByPolicy,
     base::Value::Type::BOOLEAN },
 #endif
-  { key::kSafeBrowsingAllowlistDomains,
-    prefs::kSafeBrowsingAllowlistDomains,
-    base::Value::Type::LIST },
-  { key::kSafeBrowsingEnabled,
-    prefs::kSafeBrowsingEnabled,
-    base::Value::Type::BOOLEAN },
-  { key::kSafeBrowsingProxiedRealTimeChecksAllowed,
-    prefs::kHashPrefixRealTimeChecksAllowedByPolicy,
-    base::Value::Type::BOOLEAN },
   { key::kSavingBrowserHistoryDisabled,
     prefs::kSavingBrowserHistoryDisabled,
     base::Value::Type::BOOLEAN },
@@ -453,9 +442,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     base::Value::Type::BOOLEAN },
   { key::kAccessibilityImageLabelsEnabled,
     prefs::kAccessibilityImageLabelsEnabled,
-    base::Value::Type::BOOLEAN },
-  { key::kAdvancedProtectionAllowed,
-    prefs::kAdvancedProtectionAllowed,
     base::Value::Type::BOOLEAN },
   { key::kAllowCrossOriginAuthPrompt,
     prefs::kAllowCrossOriginAuthPrompt,
@@ -653,15 +639,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kPasswordDismissCompromisedAlertEnabled,
     password_manager::prefs::kPasswordDismissCompromisedAlertEnabled,
     base::Value::Type::BOOLEAN },
-  { key::kPasswordProtectionChangePasswordURL,
-    prefs::kPasswordProtectionChangePasswordURL,
-    base::Value::Type::STRING },
-  { key::kPasswordProtectionLoginURLs,
-    prefs::kPasswordProtectionLoginURLs,
-    base::Value::Type::LIST },
-  { key::kPasswordProtectionWarningTrigger,
-    prefs::kPasswordProtectionWarningTrigger,
-    base::Value::Type::INTEGER },
 #if BUILDFLAG(ENABLE_PDF)
   { key::kPdfLocalFileAccessAllowedForDomains,
     prefs::kPdfLocalFileAccessAllowedForDomains,
@@ -791,9 +768,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kAdditionalDnsQueryTypesEnabled,
     prefs::kAdditionalDnsQueryTypesEnabled,
     base::Value::Type::BOOLEAN },
-  { key::kSafeBrowsingExtendedReportingEnabled,
-    prefs::kSafeBrowsingScoutReportingEnabled,
-    base::Value::Type::BOOLEAN },
   { key::kForceGoogleSafeSearch,
     policy_prefs::kForceGoogleSafeSearch,
     base::Value::Type::BOOLEAN },
@@ -862,9 +836,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   { key::kRequireOnlineRevocationChecksForLocalAnchors,
     prefs::kCertRevocationCheckingRequiredLocalAnchors,
-    base::Value::Type::BOOLEAN },
-  { key::kSafeBrowsingSurveysEnabled,
-    prefs::kSafeBrowsingSurveysEnabled,
     base::Value::Type::BOOLEAN },
   { key::kPasswordManagerBlocklist,
     password_manager::prefs::kPasswordManagerBlocklist,
@@ -1266,9 +1237,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kGoogleSearchSidePanelEnabled,
     prefs::kGoogleSearchSidePanelEnabled,
     base::Value::Type::BOOLEAN },
-  { key::kSafeBrowsingDeepScanningEnabled,
-    prefs::kSafeBrowsingDeepScanningEnabled,
-    base::Value::Type::BOOLEAN },
   { key::kAllowBackForwardCacheForCacheControlNoStorePageEnabled,
     policy_prefs::kAllowBackForwardCacheForCacheControlNoStorePageEnabled,
     base::Value::Type::BOOLEAN},
@@ -1490,44 +1458,13 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   handlers->AddHandler(
       std::make_unique<bookmarks::ManagedBookmarksPolicyHandler>(
           chrome_schema));
-  handlers->AddHandler(
-      std::make_unique<safe_browsing::SafeBrowsingPolicyHandler>());
   handlers->AddHandler(std::make_unique<syncer::SyncPolicyHandler>());
   handlers->AddHandler(
       std::make_unique<URLAllowlistPolicyHandler>(key::kURLAllowlist));
   handlers->AddHandler(
       std::make_unique<URLBlocklistPolicyHandler>(key::kURLBlocklist));
 
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kOnSecurityEventEnterpriseConnector,
-          enterprise_connectors::kOnSecurityEventPref,
-          enterprise_connectors::kOnSecurityEventScopePref, chrome_schema));
-
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kOnFileDownloadedEnterpriseConnector,
-          enterprise_connectors::kOnFileDownloadedPref,
-          enterprise_connectors::kOnFileDownloadedScopePref, chrome_schema));
-
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kOnNetworkRequestEnterpriseConnector,
-          enterprise_connectors::kOnNetworkRequestPref,
-          enterprise_connectors::kOnNetworkRequestScopePref, chrome_schema));
-
   handlers->AddHandler(std::make_unique<DeveloperToolsPolicyHandler>());
-
-#if BUILDFLAG(ENTERPRISE_PROXY)
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kProxyProvisioningDomains,
-          enterprise_net::kProxyProvisioningDomains, chrome_schema));
-#endif
 
   handlers->AddHandler(std::make_unique<IsolateOriginsPolicyHandler>());
 
@@ -1588,13 +1525,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 #endif  // BUILDFLAG(ENTERPRISE_WATERMARK)
 
   handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kEnterpriseRealTimeUrlCheckMode,
-          enterprise_connectors::kEnterpriseRealTimeUrlCheckMode,
-          enterprise_connectors::kEnterpriseRealTimeUrlCheckScope,
-          chrome_schema));
-  handlers->AddHandler(
       std::make_unique<SimpleJsonStringSchemaValidatingPolicyHandler>(
           key::kAutoSelectCertificateForUrls,
           prefs::kManagedAutoSelectCertificateForUrls,
@@ -1617,12 +1547,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       enterprise::content::kCopyPreventionSettings, chrome_schema));
   handlers->AddHandler(std::make_unique<DefaultDownloadDirPolicyHandler>());
   handlers->AddHandler(std::make_unique<DownloadDirPolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kUserContextAwareAccessSignalsAllowlist,
-          enterprise_connectors::kUserContextAwareAccessSignalsAllowlistPref,
-          chrome_schema));
   handlers->AddHandler(std::make_unique<SimpleDeprecatingPolicyHandler>(
       std::make_unique<SimplePolicyHandler>(key::kPromotionalTabsEnabled,
                                             prefs::kPromotionsEnabled,
@@ -1652,31 +1576,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       SCHEMA_ALLOW_UNKNOWN,
       SimpleSchemaValidatingPolicyHandler::RECOMMENDED_PROHIBITED,
       SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
-
-  // Handlers for Chrome Enterprise Connectors policies.
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kOnBulkDataEntryEnterpriseConnector,
-          enterprise_connectors::kOnBulkDataEntryPref,
-          enterprise_connectors::kOnBulkDataEntryScopePref, chrome_schema));
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kOnDataCopiedEnterpriseConnector,
-          enterprise_connectors::kOnDataCopiedPref,
-          enterprise_connectors::kOnDataCopiedScopePref, chrome_schema));
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kOnFileAttachedEnterpriseConnector,
-          enterprise_connectors::kOnFileAttachedPref,
-          enterprise_connectors::kOnFileAttachedScopePref, chrome_schema));
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kOnPrintEnterpriseConnector, enterprise_connectors::kOnPrintPref,
-          enterprise_connectors::kOnPrintScopePref, chrome_schema));
 
   handlers->AddHandler(
       std::make_unique<web_app::WebAppSettingsPolicyHandler>(chrome_schema));
@@ -1812,12 +1711,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   handlers->AddHandler(std::make_unique<GuestModePolicyHandler>());
   handlers->AddHandler(std::make_unique<LocalSyncPolicyHandler>());
   handlers->AddHandler(std::make_unique<ThemeColorPolicyHandler>());
-  handlers->AddHandler(
-      std::make_unique<
-          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
-          key::kBrowserContextAwareAccessSignalsAllowlist,
-          enterprise_connectors::kBrowserContextAwareAccessSignalsAllowlistPref,
-          chrome_schema));
   handlers->AddHandler(
       std::make_unique<SingleDeprecatedPolicyToMultipleNewPolicyHandler>(
           std::make_unique<ManagedAccountRestrictionsPolicyHandler>(

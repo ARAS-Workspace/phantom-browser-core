@@ -97,11 +97,6 @@ namespace optimization_guide {
 class ModelBrokerClient;
 }  // namespace optimization_guide
 
-namespace safe_browsing {
-class RealTimeUrlLookupServiceBase;
-class UrlCheckerDelegate;
-}  // namespace safe_browsing
-
 namespace url {
 class Origin;
 }  // namespace url
@@ -1177,29 +1172,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       bool allow);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && BUILDFLAG(ENABLE_GUEST_VIEW)
 
-  // Returns the existing UrlCheckerDelegate object if it is already created.
-  // Otherwise, creates a new one and returns it. Updates the
-  // |allowlist_domains| in the UrlCheckerDelegate object before returning. It
-  // returns nullptr if |safe_browsing_enabled_for_profile| is false, because it
-  // should bypass safe browsing check when safe browsing is disabled. Set
-  // |should_check_on_sb_disabled| to true if you still want to perform safe
-  // browsing check when safe browsing is disabled(e.g. for enterprise real time
-  // URL check).
-  scoped_refptr<safe_browsing::UrlCheckerDelegate>
-  GetSafeBrowsingUrlCheckerDelegate(
-      bool safe_browsing_enabled_for_profile,
-      bool should_check_on_sb_disabled,
-      const std::vector<std::string>& allowlist_domains);
-
-  // Returns a RealTimeUrlLookupServiceBase object used for real time URL check.
-  // Returns an enterprise version if |is_enterprise_lookup_enabled| is true.
-  // Returns a consumer version if |is_enterprise_lookup_enabled| is false and
-  // |is_consumer_lookup_enabled| is true. Returns nullptr if both are false.
-  safe_browsing::RealTimeUrlLookupServiceBase* GetUrlLookupService(
-      content::BrowserContext* browser_context,
-      bool is_enterprise_lookup_enabled,
-      bool is_consumer_lookup_enabled);
-
   // Try to upload an enterprise legacy tech event to the enterprise management
   // server for admins.
   void ReportLegacyTechEvent(
@@ -1232,9 +1204,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   // Vector of additional ChromeContentBrowserClientParts.
   // Parts are deleted in the reverse order they are added.
   std::vector<std::unique_ptr<ChromeContentBrowserClientParts>> extra_parts_;
-
-  scoped_refptr<safe_browsing::UrlCheckerDelegate>
-      safe_browsing_url_checker_delegate_;
 
   StartupData startup_data_;
 

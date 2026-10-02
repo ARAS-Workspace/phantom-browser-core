@@ -132,11 +132,6 @@ class TrustSafetySentimentService
     kMaxValue = kSafetyHubInteracted,
   };
 
-  // Called when the user interacts with a safe browsing blocking page.
-  virtual void InteractedWithSafeBrowsingInterstitial(
-      bool did_proceed,
-      safe_browsing::SBThreatType threat_type);
-
   // Called when the user completes terminal action within a download warning.
   // These actions can include: DISCARD, and PROCEED.
   virtual void InteractedWithDownloadWarningUI(

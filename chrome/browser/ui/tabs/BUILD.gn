@@ -552,7 +552,6 @@ source_set("impl") {
 
   deps += [
     "//chrome/browser/record_replay:impl",
-    "//chrome/browser/ui/views/js_optimization:impl",
     "//chrome/browser/ui/views/zoom",
   ]
 

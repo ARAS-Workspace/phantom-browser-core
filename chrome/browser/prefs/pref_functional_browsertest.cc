@@ -264,9 +264,6 @@ IN_PROC_BROWSER_TEST_F(PrefsFunctionalTest, PRE_TestPrivacySecurityPrefs) {
   prefetch::SetPreloadPagesState(prefs,
                                  prefetch::PreloadPagesState::kNoPreloading);
 
-  EXPECT_TRUE(prefs->GetBoolean(prefs::kSafeBrowsingEnabled));
-  prefs->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-
   EXPECT_TRUE(prefs->GetBoolean(embedder_support::kAlternateErrorPagesEnabled));
   prefs->SetBoolean(embedder_support::kAlternateErrorPagesEnabled, false);
 
@@ -280,7 +277,6 @@ IN_PROC_BROWSER_TEST_F(PrefsFunctionalTest, TestPrivacySecurityPrefs) {
 
   EXPECT_EQ(prefetch::PreloadPagesState::kNoPreloading,
             prefetch::GetPreloadPagesState(*prefs));
-  EXPECT_FALSE(prefs->GetBoolean(prefs::kSafeBrowsingEnabled));
   EXPECT_FALSE(
       prefs->GetBoolean(embedder_support::kAlternateErrorPagesEnabled));
   EXPECT_FALSE(prefs->GetBoolean(prefs::kSearchSuggestEnabled));

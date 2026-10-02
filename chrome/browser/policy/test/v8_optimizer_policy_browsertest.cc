@@ -9,7 +9,6 @@
 #include "base/values.h"
 #include "chrome/browser/content_settings/generated_javascript_optimizer_pref.h"
 #include "chrome/browser/policy/policy_test_utils.h"
-#include "chrome/browser/site_protection/site_familiarity_utils.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/policy/core/common/policy_map.h"
@@ -211,50 +210,6 @@ INSTANTIATE_TEST_SUITE_P(DefaultEnabled,
                          testing::Values(ENABLED_BY_DEFAULT));
 INSTANTIATE_TEST_SUITE_P(DefaultNotSet,
                          V8OptimizerPolicyTest,
-                         testing::Values(NOT_SET));
-
-class V8OptimizerPolicyTest_UseSiteFamiliarity : public V8OptimizerPolicyTest {
- public:
-  V8OptimizerPolicyTest_UseSiteFamiliarity() {
-    feature_list_
-        .InitWithFeatures(/*enabled_features=*/
-                          {features::kProcessSelectionDeferringConditions},
-                          /*disabled_features=*/{});
-  }
-
-  ~V8OptimizerPolicyTest_UseSiteFamiliarity() override = default;
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-// Test that the default v8-optimizer value set by enterprise policy takes
-// precedence over any heuristics related to "unfamiliar sites".
-// When there is no policy, v8-optimizers should be disabled because the site
-// has never been visited and is not on the
-// safe-browsing-high-confidence-allowlist.
-IN_PROC_BROWSER_TEST_P(V8OptimizerPolicyTest_UseSiteFamiliarity,
-                       PolicyTakesPrecedence) {
-  ASSERT_TRUE(embedded_https_test_server().Start());
-
-  profile()->GetPrefs()->SetBoolean(
-      prefs::kJavascriptOptimizerBlockedForUnfamiliarSites, true);
-  EXPECT_TRUE(
-      site_protection::AreV8OptimizationsDisabledOnUnfamiliarSites(profile()));
-
-  PolicyMap policies;
-  AddDefaultPolicy(&policies);
-  provider_.UpdateChromePolicy(policies);
-
-  bool expect_v8_disabled = (GetParam() == NOT_SET);
-  NavigateAndExpectPolicyResult("foo.com", expect_v8_disabled);
-}
-
-INSTANTIATE_TEST_SUITE_P(DefaultEnabled,
-                         V8OptimizerPolicyTest_UseSiteFamiliarity,
-                         testing::Values(ENABLED_BY_DEFAULT));
-INSTANTIATE_TEST_SUITE_P(DefaultNotSet,
-                         V8OptimizerPolicyTest_UseSiteFamiliarity,
                          testing::Values(NOT_SET));
 
 }  // namespace policy

@@ -64,6 +64,7 @@
 #include "components/embedder_support/pref_names.h"
 #include "components/embedder_support/switches.h"
 #include "components/enterprise/buildflags/buildflags.h"
+#include "components/enterprise/encryption/cache/prefs.h"
 #include "components/language/core/browser/language_prefs.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/metrics/metrics_pref_names.h"

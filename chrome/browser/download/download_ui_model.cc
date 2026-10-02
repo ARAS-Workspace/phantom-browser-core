@@ -665,9 +665,7 @@ void DownloadUIModel::ExecuteCommand(DownloadCommands* download_commands,
       NOTREACHED();
     case DownloadCommands::OPEN_SAFE_BROWSING_SETTING:
       chrome::ShowSafeBrowsingEnhancedProtectionWithIph(
-          download_commands->GetBrowser(),
-          safe_browsing::SafeBrowsingSettingReferralMethod::
-              kDownloadBubbleSubpage);
+          download_commands->GetBrowser());
       break;
     case DownloadCommands::PAUSE:
       Pause();

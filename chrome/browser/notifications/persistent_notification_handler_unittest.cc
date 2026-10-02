@@ -113,9 +113,6 @@ class PersistentNotificationHandlerTest : public ::testing::Test {
 
   // ::testing::Test overrides:
   void SetUp() override {
-    scoped_feature_list_.InitWithFeatures(
-        {}, {safe_browsing::kShowWarningsForSuspiciousNotifications});
-
     HistoryServiceFactory::GetInstance()->SetTestingFactory(
         profile_.get(), HistoryServiceFactory::GetDefaultFactory());
 
@@ -285,12 +282,3 @@ TEST_F(PersistentNotificationHandlerTest, DisableNotifications) {
       ukm::builders::SuspiciousNotificationInteraction::kEntryName);
   EXPECT_EQ(0u, ukm_entries.size());
 }
-
-class PersistentNotificationHandlerWithAutoRevokeSuspiciousNotificationTest
-    : public PersistentNotificationHandlerTest {
- public:
-  void SetUp() override {
-    scoped_feature_list_.InitWithFeatures(
-        {safe_browsing::kAutoRevokeSuspiciousNotification}, {});
-  }
-};

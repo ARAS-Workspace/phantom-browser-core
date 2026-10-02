@@ -954,16 +954,6 @@ void ChromeExtensionsBrowserClient::CheckManagementPolicy(
   ExtensionSystem::Get(context)->extension_service()->CheckManagementPolicy();
 }
 
-scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-ChromeExtensionsBrowserClient::GetSafeBrowsingDatabaseManager() const {
-  return nullptr;
-}
-
-std::optional<safe_browsing::V4ProtocolConfig>
-ChromeExtensionsBrowserClient::GetV4ProtocolConfig() const {
-  return std::nullopt;
-}
-
 void ChromeExtensionsBrowserClient::OnActiveTabPermissionGranted(
     const Extension* extension,
     content::WebContents* web_contents) const {

@@ -8,7 +8,6 @@
 #include <memory>
 
 #include "base/files/scoped_temp_dir.h"
-#include "components/subresource_filter/content/browser/fake_safe_browsing_database_manager.h"
 #include "components/subresource_filter/content/browser/throttle_manager_test_support.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features_test_support.h"
@@ -66,18 +65,10 @@ class SubresourceFilterTestHarness : public content::RenderViewHostTestHarness {
   content::RenderFrameHost* CreateAndNavigateDisallowedSubframe(
       content::RenderFrameHost* parent);
 
-  void ConfigureAsSubresourceFilterOnlyURL(const GURL& url);
-
-  void RemoveURLFromBlocklist(const GURL& url);
-
   SubresourceFilterContentSettingsManager* GetSettingsManager();
 
   testing::ScopedSubresourceFilterConfigurator& scoped_configuration() {
     return scoped_configuration_;
-  }
-
-  FakeSafeBrowsingDatabaseManager* fake_safe_browsing_database() {
-    return database_manager_.get();
   }
 
   void SetIsAdFrame(content::RenderFrameHost* render_frame_host,
@@ -102,7 +93,6 @@ class SubresourceFilterTestHarness : public content::RenderViewHostTestHarness {
   base::ScopedTempDir ruleset_service_dir_;
   sync_preferences::TestingPrefServiceSyncable pref_service_;
   testing::ScopedSubresourceFilterConfigurator scoped_configuration_;
-  scoped_refptr<FakeSafeBrowsingDatabaseManager> database_manager_;
   std::unique_ptr<ThrottleManagerTestSupport> throttle_manager_test_support_;
   std::unique_ptr<infobars::ContentInfoBarManager> infobar_manager_;
   std::unique_ptr<RulesetService> ruleset_service_;

@@ -45,7 +45,6 @@ class FocusTabAfterNavigationHelper;
 class FromGWSNavigationAndKeepAliveRequestObserver;
 class HttpAuthCacheStatus;
 class IntentPickerViewPageActionController;
-class JsOptimizationsPageActionController;
 class MemorySaverChipTabHelper;
 class NewTabPagePreloadPipelineManager;
 class Profile;
@@ -209,11 +208,6 @@ class TabFeatures {
     return page_action_controller_.get();
   }
 
-  JsOptimizationsPageActionController*
-  js_optimizations_page_action_controller() {
-    return js_optimizations_page_action_controller_.get();
-  }
-
   IntentPickerViewPageActionController*
   intent_picker_view_page_action_controller() {
     return intent_picker_view_page_action_controller_.get();
@@ -368,10 +362,6 @@ class TabFeatures {
   // Responsible for managing the "Record/Replay" page action.
   std::unique_ptr<RecordReplayPageActionController>
       record_replay_page_action_controller_;
-
-  // Responsible for managing the "JS Optimizations" page action.
-  std::unique_ptr<JsOptimizationsPageActionController>
-      js_optimizations_page_action_controller_;
 
   // Responsible for managing the commerce "Price insights" page action.
   std::unique_ptr<commerce::PriceInsightsPageActionViewController>

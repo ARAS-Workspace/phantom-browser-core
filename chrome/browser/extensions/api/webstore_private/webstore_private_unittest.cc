@@ -756,7 +756,6 @@ TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
 
 struct FrictionDialogTestCase {
   const char* test_name;
-  bool esb_user;
   const char* esb_allowlist;
   bool expected_friction_shown;
   ScopedTestDialogAutoConfirm::AutoConfirm dialog_action =
@@ -770,30 +769,16 @@ std::ostream& operator<<(std::ostream& out,
 }
 
 const FrictionDialogTestCase kFrictionDialogTestCases[] = {
-    {/*test_name=*/"EsbUserAndNotAllowlisted",
-     /*esb_user=*/true,
-     /*esb_allowlist=*/"false",
-     /*expected_friction_shown=*/true},
-
     {/*test_name=*/"EsbUserAndAllowlisted",
-     /*esb_user=*/true,
      /*esb_allowlist=*/"true",
      /*expected_friction_shown=*/false},
 
     {/*test_name=*/"EsbUserAndUndefined",
-     /*esb_user=*/true,
      /*esb_allowlist=*/"undefined",
      /*expected_friction_shown=*/false},
     {/*test_name=*/"NonEsbUserAndNotAllowlisted",
-     /*esb_user=*/false,
      /*esb_allowlist=*/"false",
-     /*expected_friction_shown=*/false},
-
-    {/*test_name=*/"CancelFrictionDialog",
-     /*esb_user=*/true,
-     /*esb_allowlist=*/"false",
-     /*expected_friction_shown=*/true,
-     /*dialog_action=*/ScopedTestDialogAutoConfirm::CANCEL}};
+     /*expected_friction_shown=*/false}};
 
 class WebstorePrivateBeginInstallWithManifest3FrictionDialogTest
     : public WebstorePrivateBeginInstallWithManifest3Test,
@@ -814,13 +799,6 @@ class WebstorePrivateBeginInstallWithManifest3FrictionDialogTest
 TEST_P(WebstorePrivateBeginInstallWithManifest3FrictionDialogTest,
        FrictionDialogTests) {
   FrictionDialogTestCase test_case = GetParam();
-
-  if (test_case.esb_user) {
-    // Enable Enhanced Protection
-    safe_browsing::SetSafeBrowsingState(
-        profile()->GetPrefs(),
-        safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-  }
 
   std::unique_ptr<content::WebContents> web_contents =
       content::WebContentsTester::CreateTestWebContents(profile(), nullptr);

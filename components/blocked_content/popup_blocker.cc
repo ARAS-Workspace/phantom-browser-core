@@ -10,7 +10,6 @@
 #include "base/command_line.h"
 #include "components/blocked_content/popup_blocker_tab_helper.h"
 #include "components/blocked_content/popup_navigation_delegate.h"
-#include "components/blocked_content/safe_browsing_triggered_popup_blocker.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/embedder_support/switches.h"
@@ -21,23 +20,6 @@
 
 namespace blocked_content {
 namespace {
-
-content::Page& GetSourcePageForPopup(
-    const content::OpenURLParams* open_url_params,
-    content::WebContents* web_contents) {
-  if (open_url_params) {
-    content::RenderFrameHost* source = content::RenderFrameHost::FromID(
-
-        open_url_params->source_render_process_id,
-        open_url_params->source_render_frame_id);
-    if (source)
-      return source->GetPage();
-  }
-
-  // When there's no source RenderFrameHost, attribute the popup to the primary
-  // page.
-  return web_contents->GetPrimaryPage();
-}
 
 // If the popup should be blocked, returns the reason why it was blocked.
 // Otherwise returns kNotBlocked.
@@ -81,13 +63,6 @@ PopupBlockType ShouldBlockPopup(content::WebContents* web_contents,
     return PopupBlockType::kNotBlocked;
   }
 
-  auto* safe_browsing_blocker =
-      SafeBrowsingTriggeredPopupBlocker::FromWebContents(web_contents);
-  if (safe_browsing_blocker &&
-      safe_browsing_blocker->ShouldApplyAbusivePopupBlocker(
-          GetSourcePageForPopup(open_url_params, web_contents))) {
-    return PopupBlockType::kAbusive;
-  }
   return PopupBlockType::kNotBlocked;
 }
 

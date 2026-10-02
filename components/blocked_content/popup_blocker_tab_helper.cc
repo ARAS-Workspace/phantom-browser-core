@@ -13,7 +13,6 @@
 #include "components/blocked_content/list_item_position.h"
 #include "components/blocked_content/popup_navigation_delegate.h"
 #include "components/blocked_content/popup_tracker.h"
-#include "components/blocked_content/safe_browsing_triggered_popup_blocker.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "content/public/browser/back_forward_cache.h"
 #include "content/public/browser/navigation_controller.h"
@@ -43,7 +42,6 @@ struct PopupBlockerTabHelper::BlockedRequest {
 PopupBlockerTabHelper::PopupBlockerTabHelper(content::WebContents* web_contents)
     : content::WebContentsObserver(web_contents),
       content::WebContentsUserData<PopupBlockerTabHelper>(*web_contents) {
-  blocked_content::SafeBrowsingTriggeredPopupBlocker::MaybeCreate(web_contents);
 }
 
 PopupBlockerTabHelper::~PopupBlockerTabHelper() = default;

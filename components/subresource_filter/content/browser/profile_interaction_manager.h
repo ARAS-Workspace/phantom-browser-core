@@ -6,8 +6,8 @@
 #define COMPONENTS_SUBRESOURCE_FILTER_CONTENT_BROWSER_PROFILE_INTERACTION_MANAGER_H_
 
 #include "base/memory/raw_ptr.h"
+#include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
-#include "components/subresource_filter/content/browser/safe_browsing_page_activation_throttle.h"
 #include "components/subresource_filter/core/common/activation_decision.h"
 #include "components/subresource_filter/core/mojom/subresource_filter.mojom.h"
 
@@ -28,12 +28,11 @@ class SubresourceFilterProfileContext;
 // Class that manages interaction between the per-navigation/per-page
 // subresource filter objects (i.e., the throttles and throttle manager) and
 // the per-profile objects (e.g., content settings).
-class ProfileInteractionManager
-    : public SafeBrowsingPageActivationThrottle::Delegate {
+class ProfileInteractionManager {
  public:
   explicit ProfileInteractionManager(
       SubresourceFilterProfileContext* profile_context);
-  ~ProfileInteractionManager() override;
+  ~ProfileInteractionManager();
 
   ProfileInteractionManager(const ProfileInteractionManager&) = delete;
   ProfileInteractionManager& operator=(const ProfileInteractionManager&) =
@@ -59,17 +58,6 @@ class ProfileInteractionManager
   // infobar if appropriate and if an infobar::ContentInfoBarManager instance
   // has been installed in web_contents() by the embedder.
   void MaybeShowNotification();
-
-  // SafeBrowsingPageActivationThrottle::Delegate:
-  mojom::ActivationLevel OnPageActivationComputed(
-      content::NavigationHandle* navigation_handle,
-      mojom::ActivationLevel initial_activation_level,
-      ActivationDecision* decision) override;
-
-  // Returns a weak pointer to the V5GetHashProtocolManager used for Safe
-  // Browsing v5 lookups.
-  base::WeakPtr<safe_browsing::V5GetHashProtocolManager>
-  GetV5GetHashProtocolManager() override;
 
   content_settings::CookieSettings* GetCookieSettings();
 

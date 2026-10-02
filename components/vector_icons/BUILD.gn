@@ -414,7 +414,6 @@ if (current_toolchain == default_toolchain) {
       "settings_filled.icon",
       "settings_old.icon",
       "settings_outline_old.icon",
-      "shield.icon",
       "shield_question.icon",
       "shopping_bag.icon",
       "shopping_bag_old.icon",

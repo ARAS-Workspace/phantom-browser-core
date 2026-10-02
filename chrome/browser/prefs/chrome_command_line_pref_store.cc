@@ -63,8 +63,6 @@ const CommandLinePrefStore::BooleanSwitchToPreferenceMapEntry
         {switches::kAllowCrossOriginAuthPrompt,
          prefs::kAllowCrossOriginAuthPrompt, true},
         {switches::kDisablePrintPreview, prefs::kPrintPreviewDisabled, true},
-        {safe_browsing::switches::kSbEnableEnhancedProtection,
-         prefs::kSafeBrowsingEnhanced, true},
         {switches::kEnableLocalSyncBackend,
          syncer::prefs::kEnableLocalSyncBackend, true},
         {switches::kUseSystemDefaultPrinter,

@@ -13,10 +13,6 @@
 
 class HostContentSettingsMap;
 
-namespace safe_browsing {
-class V5GetHashProtocolManager;
-}  // namespace safe_browsing
-
 namespace content_settings {
 class CookieSettings;
 }  // namespace content_settings
@@ -41,9 +37,7 @@ class SubresourceFilterProfileContext : public KeyedService {
 
   SubresourceFilterProfileContext(
       HostContentSettingsMap* settings_map,
-      scoped_refptr<content_settings::CookieSettings> cookie_settings,
-      base::WeakPtr<safe_browsing::V5GetHashProtocolManager>
-          v5_get_hash_protocol_manager);
+      scoped_refptr<content_settings::CookieSettings> cookie_settings);
 
   SubresourceFilterProfileContext(const SubresourceFilterProfileContext&) =
       delete;
@@ -59,11 +53,6 @@ class SubresourceFilterProfileContext : public KeyedService {
   AdsInterventionManager* ads_intervention_manager();
   content_settings::CookieSettings* cookie_settings();
 
-  // Returns a weak pointer to the V5GetHashProtocolManager used for Safe
-  // Browsing v5 lookups.
-  base::WeakPtr<safe_browsing::V5GetHashProtocolManager>
-  GetV5GetHashProtocolManager() const;
-
   // Can be used to attach an embedder-level object to this object. Can only be
   // invoked once. |embedder_data| will be destroyed before the other objects
   // owned by this object, and thus it can safely depend on those other objects.
@@ -78,10 +67,6 @@ class SubresourceFilterProfileContext : public KeyedService {
   class Storage;
 
   std::unique_ptr<Storage> storage_;
-
-  // The protocol manager used for Safe Browsing v5 get hash requests.
-  base::WeakPtr<safe_browsing::V5GetHashProtocolManager>
-      v5_get_hash_protocol_manager_;
 };
 
 }  // namespace subresource_filter

@@ -51,7 +51,6 @@ const char kUkmEngagementTime[] = "EngagementTime";
 const char kUkmUserInitiatedClose[] = "UserInitiatedClose";
 const char kUkmTrusted[] = "Trusted";
 const char kUkmNumInteractions[] = "NumInteractions";
-const char kUkmSafeBrowsingStatus[] = "SafeBrowsingStatus";
 const char kUkmWindowOpenDisposition[] = "WindowOpenDisposition";
 const char kUkmNumActivationInteractions[] = "NumActivationInteractions";
 const char kUkmNumGestureScrollBeginInteractions[] =

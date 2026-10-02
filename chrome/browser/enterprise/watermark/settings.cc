@@ -12,6 +12,7 @@
 #include "chrome/browser/enterprise/watermark/watermark_features.h"
 #include "chrome/common/channel_info.h"
 #include "components/enterprise/data_protection/features.h"
+#include "components/enterprise/watermarking/watermark_prefs.h"
 #include "components/prefs/pref_service.h"
 #include "components/version_info/version_info.h"
 #include "third_party/icu/source/i18n/unicode/timezone.h"

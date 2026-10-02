@@ -97,9 +97,4 @@ TestSubresourceFilterObserver::GetPageActivationForLastCommittedLoad() const {
   return last_committed_activation_;
 }
 
-std::optional<TestSubresourceFilterObserver::SafeBrowsingCheck>
-TestSubresourceFilterObserver::GetSafeBrowsingResult(const GURL& url) const {
-  return base::OptionalFromPtr(base::FindOrNull(safe_browsing_checks_, url));
-}
-
 }  // namespace subresource_filter

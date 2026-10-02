@@ -13,10 +13,6 @@
 #include "build/build_config.h"
 #include "components/device_signals/core/common/common_types.h"
 
-namespace enterprise_connectors {
-enum EnterpriseRealTimeUrlCheckMode : int;
-}  // namespace enterprise_connectors
-
 namespace device_signals {
 
 // Possible values for the trigger which generated the device signals.
@@ -237,15 +233,11 @@ struct ProfileSignalsResponse : BaseSignalResponse {
 
   bool built_in_dns_client_enabled;
   bool chrome_remote_desktop_app_blocked;
-  std::optional<safe_browsing::PasswordProtectionTrigger>
-      password_protection_warning_trigger = std::nullopt;
   std::optional<std::string> profile_enrollment_domain = std::nullopt;
-  safe_browsing::SafeBrowsingState safe_browsing_protection_level;
   bool site_isolation_enabled;
   std::optional<std::string> profile_id = std::nullopt;
 
   // Enterprise cloud content analysis exclusives
-  enterprise_connectors::EnterpriseRealTimeUrlCheckMode realtime_url_check_mode;
   std::vector<std::string> file_downloaded_providers{};
   std::vector<std::string> file_attached_providers{};
   std::vector<std::string> bulk_data_entry_providers{};

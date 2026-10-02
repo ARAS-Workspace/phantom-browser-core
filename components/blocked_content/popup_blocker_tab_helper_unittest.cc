@@ -6,9 +6,7 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
-#include "base/test/scoped_feature_list.h"
 #include "components/blocked_content/popup_navigation_delegate.h"
-#include "components/blocked_content/safe_browsing_triggered_popup_blocker.h"
 #include "components/blocked_content/test/test_popup_navigation_delegate.h"
 #include "components/blocked_content/url_list_manager.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
@@ -52,10 +50,6 @@ class BlockedUrlListObserver : public UrlListManager::Observer {
 class PopupBlockerTabHelperTest : public content::RenderViewHostTestHarness {
  public:
   PopupBlockerTabHelperTest() {
-    // Make sure the SafeBrowsingTriggeredPopupBlocker is not created.
-    // This needs to be done as early as possible to avoid tsan data races
-    // caused by other threads trying to access the feature list.
-    feature_list_.InitAndDisableFeature(kAbusiveExperienceEnforce);
   }
   ~PopupBlockerTabHelperTest() override { settings_map_->ShutdownOnUIThread(); }
 
@@ -85,7 +79,6 @@ class PopupBlockerTabHelperTest : public content::RenderViewHostTestHarness {
   PopupBlockerTabHelper* helper() { return helper_; }
 
  private:
-  base::test::ScopedFeatureList feature_list_;
   raw_ptr<PopupBlockerTabHelper> helper_ = nullptr;
   sync_preferences::TestingPrefServiceSyncable pref_service_;
   scoped_refptr<HostContentSettingsMap> settings_map_;

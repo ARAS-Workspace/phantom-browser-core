@@ -25,10 +25,6 @@ class WebContents;
 
 }  // namespace content
 
-namespace safe_browsing {
-class RealTimeUrlLookupServiceBase;
-}  // namespace safe_browsing
-
 namespace enterprise_data_protection {
 
 class DataProtectionNavigationDelegate {
@@ -100,27 +96,14 @@ class DataProtectionNavigationObserver : public content::WebContentsObserver {
   // public for testing
   DataProtectionNavigationObserver(
       content::NavigationHandle& navigation_handle,
-      safe_browsing::RealTimeUrlLookupServiceBase* lookup_service,
       content::WebContents* web_contents,
       DataProtectionNavigationDelegate* delegate,
       Callback callback);
 
   ~DataProtectionNavigationObserver() override;
 
-  static void SetLookupServiceForTesting(
-      safe_browsing::RealTimeUrlLookupServiceBase* lookup_service);
-
  private:
-  void OnLookupComplete(
-      std::unique_ptr<safe_browsing::RTLookupResponse> rt_lookup_response);
-
   void MaybeCleanup();
-
-  // Returns true when the "EnterpriseRealTimeUrlCheckMode" policy is enabled
-  // for `browser_context`, and when a `lookup_service_` is available to make
-  // URL filtering checks.
-  bool ShouldPerformRealTimeUrlCheck(
-      content::BrowserContext* browser_context) const;
 
   // content::WebContentsObserver:
   void DidRedirectNavigation(
@@ -139,16 +122,9 @@ class DataProtectionNavigationObserver : public content::WebContentsObserver {
   // Screenshots are allowed unless explicitly blocked.
   bool allow_screenshot_ = true;
 
-  // The verdict indicating what watermark should be shown, if populated. Used
-  // for reporting as well.
-  std::unique_ptr<safe_browsing::RTLookupResponse> rt_lookup_response_;
-
   // Identifier string to show in the watermark if needed. This is either a user
   // email or a device ID.
   std::string identifier_;
-
-  raw_ptr<safe_browsing::RealTimeUrlLookupServiceBase> lookup_service_ =
-      nullptr;
 
   // `this` is owned by delegate_
   raw_ptr<DataProtectionNavigationDelegate> delegate_;

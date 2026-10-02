@@ -30,9 +30,6 @@ class GeneratedHttpsFirstModePref
   // Fired when preferences used to generate this preference are changed.
   void OnSourcePreferencesChanged();
 
-  // Fired when the security settings bundle preference is changed.
-  void OnSettingsBundleChanged();
-
  private:
   // Applies the effective management state of HTTPS-First Mode for `profile` to
   // `pref_object`.

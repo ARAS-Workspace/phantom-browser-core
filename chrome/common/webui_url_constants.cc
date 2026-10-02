@@ -60,7 +60,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUISkillsHost,
       kChromeUISubresourceFilterInternalsHost,
       kChromeUINTPTilesInternalsHost,
-      safe_browsing::kChromeUISafeBrowsingHost,
       kChromeUISyncInternalsHost,
       kChromeUITabSearchHost,
       kChromeUITabsFromOtherDevicesSidePanelHost,

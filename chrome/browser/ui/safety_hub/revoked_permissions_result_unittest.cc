@@ -10,7 +10,6 @@
 #include "base/run_loop.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/values.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "components/content_settings/core/browser/permission_settings_registry.h"

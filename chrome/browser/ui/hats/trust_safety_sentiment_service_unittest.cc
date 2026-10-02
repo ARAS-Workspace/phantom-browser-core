@@ -1063,32 +1063,6 @@ TEST_F(TrustSafetySentimentServiceTest, V2_ControlGroup) {
   service()->OpenedNewTabPage();
 }
 
-TEST_F(TrustSafetySentimentServiceTest, V2_SafeBrowsingInterstitial) {
-  // Making a final decision on a safe browsing interstitial is considered a
-  // trigger, and should make a user eligible to receive a survey.
-  FeatureParamsV2 params;
-  params.safe_browsing_interstitial_probability = "1.0";
-  params.min_time_to_prompt = "0s";
-  params.ntp_visits_min_range = "0";
-  params.ntp_visits_max_range = "0";
-  SetupFeatureParametersV2(params);
-
-  // The correct survey should be launched.
-  EXPECT_CALL(
-      *mock_hats_service(),
-      LaunchSurvey(kHatsSurveyTriggerTrustSafetyV2SafeBrowsingInterstitial, _,
-                   _, _, _, _, _));
-  service()->InteractedWithSafeBrowsingInterstitial(
-      true, safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_PHISHING);
-  service()->OpenedNewTabPage();
-  CheckHistograms(
-      {TrustSafetySentimentService::FeatureArea::kSafeBrowsingInterstitial},
-      {TrustSafetySentimentService::FeatureArea::kSafeBrowsingInterstitial});
-  CheckCallTriggerOccurredHistogram(
-      {{TrustSafetySentimentService::FeatureArea::kSafeBrowsingInterstitial,
-        1}});
-}
-
 TEST_F(TrustSafetySentimentServiceTest, V2_DownloadWarningUI) {
   // Making a final decision on a download warning is considered a
   // trigger, and should make a user eligible to receive a survey.

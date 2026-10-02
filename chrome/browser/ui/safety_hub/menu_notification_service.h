@@ -119,9 +119,6 @@ class SafetyHubMenuNotificationService : public KeyedService {
           result_getter,
       const base::DictValue& stored_notifications);
 
-  // Called when the pref for Safe Browsing has been updated.
-  void OnSafeBrowsingPrefUpdate();
-
   // Returns if any safety hub notification has been shown in the menu so far.
   bool HasAnyNotificationBeenShown() const;
 
@@ -136,9 +133,6 @@ class SafetyHubMenuNotificationService : public KeyedService {
   std::map<safety_hub::SafetyHubModuleType,
            std::unique_ptr<SafetyHubModuleInfoElement>>
       module_info_map_;
-
-  // Registrar to record the pref changes to Safe Browsing.
-  PrefChangeRegistrar registrar_;
 };
 
 #endif  // CHROME_BROWSER_UI_SAFETY_HUB_MENU_NOTIFICATION_SERVICE_H_

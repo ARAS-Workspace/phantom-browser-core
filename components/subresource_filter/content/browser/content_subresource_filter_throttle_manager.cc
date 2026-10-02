@@ -23,7 +23,6 @@
 #include "components/subresource_filter/content/browser/page_load_statistics.h"
 #include "components/subresource_filter/content/browser/profile_interaction_manager.h"
 #include "components/subresource_filter/content/browser/safe_browsing_child_navigation_throttle.h"
-#include "components/subresource_filter/content/browser/safe_browsing_page_activation_throttle.h"
 #include "components/subresource_filter/content/browser/utils.h"
 #include "components/subresource_filter/content/common/utils.h"
 #include "components/subresource_filter/content/mojom/subresource_filter.mojom.h"
@@ -70,7 +69,6 @@ void ContentSubresourceFilterThrottleManager::BindReceiver(
 std::unique_ptr<ContentSubresourceFilterThrottleManager>
 ContentSubresourceFilterThrottleManager::CreateForNewPage(
     SubresourceFilterProfileContext* profile_context,
-    scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager> database_manager,
     VerifiedRulesetDealer::Handle* dealer_handle,
     ContentSubresourceFilterWebContentsHelper& web_contents_helper,
     content::NavigationHandle& initiating_navigation_handle) {
@@ -81,7 +79,7 @@ ContentSubresourceFilterThrottleManager::CreateForNewPage(
   }
 
   return std::make_unique<ContentSubresourceFilterThrottleManager>(
-      profile_context, database_manager, dealer_handle, web_contents_helper,
+      profile_context, dealer_handle, web_contents_helper,
       initiating_navigation_handle);
 }
 
@@ -102,14 +100,11 @@ ContentSubresourceFilterThrottleManager::FromNavigationHandle(
 ContentSubresourceFilterThrottleManager::
     ContentSubresourceFilterThrottleManager(
         SubresourceFilterProfileContext* profile_context,
-        scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-            database_manager,
         VerifiedRulesetDealer::Handle* dealer_handle,
         ContentSubresourceFilterWebContentsHelper& web_contents_helper,
         content::NavigationHandle& initiating_navigation_handle)
     : receiver_(initiating_navigation_handle.GetWebContents(), this),
       dealer_handle_(dealer_handle),
-      database_manager_(std::move(database_manager)),
       profile_interaction_manager_(
           std::make_unique<subresource_filter::ProfileInteractionManager>(
               profile_context)),
@@ -559,11 +554,6 @@ void ContentSubresourceFilterThrottleManager::
   content::NavigationHandle& navigation_handle = registry.GetNavigationHandle();
   CHECK(!navigation_handle.IsSameDocument());
   CHECK(!ShouldInheritActivation(navigation_handle.GetURL()));
-
-  if (IsInSubresourceFilterRoot(&navigation_handle) && database_manager_) {
-    registry.AddThrottle(std::make_unique<SafeBrowsingPageActivationThrottle>(
-        registry, profile_interaction_manager_.get(), database_manager_));
-  }
 
   if (!dealer_handle_) {
     return;

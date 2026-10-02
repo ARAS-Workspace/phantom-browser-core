@@ -28,7 +28,6 @@
 #include "chrome/browser/permissions/origin_keyed_permission_action_service_factory.h"
 #include "chrome/browser/permissions/permission_actions_history_factory.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
-#include "chrome/browser/permissions/permission_revocation_request.h"
 #include "chrome/browser/permissions/pref_based_quiet_permission_ui_selector.h"
 #include "chrome/browser/permissions/quiet_notification_permission_ui_config.h"
 #include "chrome/browser/permissions/system/system_permission_settings.h"
@@ -98,9 +97,6 @@
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/browser/mime_handler/mime_handler_stream_manager.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
 
 namespace {
 
@@ -460,27 +456,12 @@ void ChromePermissionsClient::OnPromptResolved(
     ContentSetting initial_permission_status,
     content::WebContents* web_contents) {
   permissions::RequestType request_type = request->request_type();
-  const GURL& origin = request->requesting_origin();
   PermissionRequestGestureType gesture_type = request->GetGestureType();
 
   Profile* profile =
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
   PermissionActionsHistoryFactory::GetForProfile(profile)->RecordAction(
       action, request_type, prompt_disposition);
-
-  if (request_type == permissions::RequestType::kNotifications) {
-    if (action == permissions::PermissionAction::GRANTED &&
-        quiet_ui_reason.has_value() &&
-        (quiet_ui_reason.value() ==
-             QuietUiReason::kTriggeredDueToAbusiveRequests ||
-         quiet_ui_reason.value() ==
-             QuietUiReason::kTriggeredDueToAbusiveContent ||
-         quiet_ui_reason.value() ==
-             QuietUiReason::kTriggeredDueToDisruptiveBehavior)) {
-      PermissionRevocationRequest::ExemptOriginFromFutureRevocations(profile,
-                                                                     origin);
-    }
-  }
 
   // We're interested only in the granted prompts as in case of a permission
   // grant, Chrome needs to inform the page about a permission status change.
@@ -545,9 +526,7 @@ std::optional<bool> ChromePermissionsClient::HasPreviouslyAutoRevokedPermission(
     return std::nullopt;
   }
 
-  Profile* profile = Profile::FromBrowserContext(browser_context);
-  return PermissionRevocationRequest::HasPreviouslyRevokedPermission(profile,
-                                                                     origin);
+  return false;
 }
 
 std::optional<url::Origin> ChromePermissionsClient::GetAutoApprovalOrigin(

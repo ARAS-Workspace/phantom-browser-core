@@ -588,24 +588,6 @@ base::DictValue CreateZoomLevelException(const std::string& host_or_spec,
   return exception;
 }
 
-void MaybeLogSafeBrowsingNotificationRevocationSource(
-    ContentSettingsType permission_type,
-    ContentSetting previous_setting_value,
-    ContentSetting new_setting_value) {
-  // If notification permission changes from allowed to not allowed, log the
-  // histogram.
-  if (permission_type == ContentSettingsType::NOTIFICATIONS &&
-      previous_setting_value == CONTENT_SETTING_ALLOW &&
-      (new_setting_value == CONTENT_SETTING_BLOCK ||
-       new_setting_value == CONTENT_SETTING_DEFAULT ||
-       new_setting_value == CONTENT_SETTING_ASK)) {
-    safe_browsing::SafeBrowsingMetricsCollector::
-        LogSafeBrowsingNotificationRevocationSourceHistogram(
-            safe_browsing::NotificationRevocationSource::
-                kUserManuallyChangedSiteSetting);
-  }
-}
-
 void ResetHeuristicData(Profile* profile,
                         const GURL& url,
                         ContentSettingsType permission) {
@@ -1700,12 +1682,6 @@ void SiteSettingsHandler::HandleSetOriginPermissions(
       constraints.set_track_last_visit_for_autoexpiration(true);
     }
 
-    MaybeLogSafeBrowsingNotificationRevocationSource(
-        content_type, /*previous_setting_value=*/
-        map->GetContentSetting(origin, origin,
-                               ContentSettingsType::NOTIFICATIONS),
-        /*new_setting_value=*/setting);
-
     map->SetContentSettingDefaultScope(origin, origin, content_type, setting,
                                        constraints);
 
@@ -1830,15 +1806,6 @@ void SiteSettingsHandler::HandleResetCategoryPermissionForPattern(
   HostContentSettingsMap* map =
       HostContentSettingsMapFactory::GetForProfile(profile);
 
-  GURL origin(primary_pattern_string);
-  if (origin.is_valid()) {
-    MaybeLogSafeBrowsingNotificationRevocationSource(
-        content_type, /*previous_setting_value=*/
-        map->GetContentSetting(origin, origin,
-                               ContentSettingsType::NOTIFICATIONS),
-        CONTENT_SETTING_DEFAULT);
-  }
-
   ContentSettingsPattern primary_pattern =
       ContentSettingsPattern::FromString(primary_pattern_string);
   ContentSettingsPattern secondary_pattern =
@@ -1916,16 +1883,6 @@ void SiteSettingsHandler::HandleSetCategoryPermissionForPattern(
       secondary_pattern_string.empty()
           ? ContentSettingsPattern::Wildcard()
           : ContentSettingsPattern::FromString(secondary_pattern_string);
-
-  GURL primary_url(primary_pattern.ToString());
-  if (primary_url.is_valid()) {
-    MaybeLogSafeBrowsingNotificationRevocationSource(
-        content_type,
-        /*previous_setting_value=*/
-        map->GetContentSetting(primary_url, primary_url,
-                               ContentSettingsType::NOTIFICATIONS),
-        /*new_setting_value=*/setting);
-  }
 
   // Clear any existing embargo status if the new setting isn't block.
   if (setting != CONTENT_SETTING_BLOCK) {

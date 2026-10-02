@@ -64,10 +64,6 @@ class TestSubresourceFilterObserver : public SubresourceFilterObserver,
   std::optional<mojom::ActivationLevel> GetPageActivationForLastCommittedLoad()
       const;
 
-  using SafeBrowsingCheck =
-      std::pair<safe_browsing::SBThreatType, safe_browsing::ThreatMetadata>;
-  std::optional<SafeBrowsingCheck> GetSafeBrowsingResult(const GURL& url) const;
-
  private:
   std::map<GURL, LoadPolicy> child_frame_load_evaluations_;
 
@@ -75,7 +71,6 @@ class TestSubresourceFilterObserver : public SubresourceFilterObserver,
   std::set<content::FrameTreeNodeId> ad_frames_;
 
   std::map<GURL, mojom::ActivationLevel> page_activations_;
-  std::map<GURL, SafeBrowsingCheck> safe_browsing_checks_;
   std::map<content::NavigationHandle*, mojom::ActivationLevel>
       pending_activations_;
   std::optional<mojom::ActivationLevel> last_committed_activation_;

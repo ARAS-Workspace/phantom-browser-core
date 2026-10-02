@@ -75,7 +75,6 @@ WEB_CONTENTS_USER_DATA_KEY_IMPL(ContentSubresourceFilterWebContentsHelper);
 void ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
     content::WebContents* web_contents,
     SubresourceFilterProfileContext* profile_context,
-    scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager> database_manager,
     VerifiedRulesetDealer::Handle* dealer_handle) {
   if (!base::FeatureList::IsEnabled(kSafeBrowsingSubresourceFilter)) {
     return;
@@ -86,7 +85,7 @@ void ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
   }
 
   content::WebContentsUserData<ContentSubresourceFilterWebContentsHelper>::
-      CreateForWebContents(web_contents, profile_context, database_manager,
+      CreateForWebContents(web_contents, profile_context,
                            dealer_handle);
 }
 
@@ -101,14 +100,11 @@ ContentSubresourceFilterWebContentsHelper::
     ContentSubresourceFilterWebContentsHelper(
         content::WebContents* web_contents,
         SubresourceFilterProfileContext* profile_context,
-        scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-            database_manager,
         VerifiedRulesetDealer::Handle* dealer_handle)
     : content::WebContentsUserData<ContentSubresourceFilterWebContentsHelper>(
           *web_contents),
       content::WebContentsObserver(web_contents),
       profile_context_(profile_context),
-      database_manager_(database_manager),
       dealer_handle_(dealer_handle) {
   SubresourceFilterObserverManager::CreateForWebContents(web_contents);
   scoped_observation_.Observe(
@@ -171,12 +167,6 @@ ContentSubresourceFilterWebContentsHelper::GetThrottleManager(
   return throttle_manager;
 }
 
-void ContentSubresourceFilterWebContentsHelper::SetDatabaseManagerForTesting(
-    scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-        database_manager) {
-  database_manager_ = std::move(database_manager);
-}
-
 void ContentSubresourceFilterWebContentsHelper::WillDestroyThrottleManager(
     ContentSubresourceFilterThrottleManager* throttle_manager) {
   bool was_erased = throttle_managers_.erase(throttle_manager);
@@ -217,7 +207,7 @@ void ContentSubresourceFilterWebContentsHelper::DidStartNavigation(
 
   std::unique_ptr<ContentSubresourceFilterThrottleManager> new_manager =
       ContentSubresourceFilterThrottleManager::CreateForNewPage(
-          profile_context_, database_manager_, dealer_handle_, *this,
+          profile_context_, dealer_handle_, *this,
           *navigation_handle);
 
   throttle_managers_.insert(new_manager.get());

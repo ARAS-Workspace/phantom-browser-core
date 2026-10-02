@@ -652,65 +652,6 @@ std::vector<hats::SurveyConfig> GetAllSurveyConfigs() {
       /*log_responses_to_uma=*/true,
       /*log_responses_to_ukm=*/true);
 
-  // Red Warning surveys.
-  survey_configs.emplace_back(
-      &safe_browsing::kRedWarningSurvey, kHatsSurveyTriggerRedWarning,
-      safe_browsing::kRedWarningSurveyTriggerId.Get(),
-      std::vector<std::string>{},
-      std::vector<std::string>{
-          safe_browsing::kFlaggedUrl, safe_browsing::kMainFrameUrl,
-          safe_browsing::kReferrerUrl, safe_browsing::kUserActivityWithUrls});
-
-  // Desktop download warning surveys.
-  survey_configs.emplace_back(
-      &safe_browsing::kDownloadWarningSurvey,
-      kHatsSurveyTriggerDownloadWarningBubbleBypass,
-      /*presupplied_trigger_id=*/std::nullopt,
-      DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-          DownloadWarningHatsType::kDownloadBubbleBypass),
-      DownloadWarningHatsProductSpecificData::GetStringDataFields(
-          DownloadWarningHatsType::kDownloadBubbleBypass));
-  survey_configs.emplace_back(
-      &safe_browsing::kDownloadWarningSurvey,
-      kHatsSurveyTriggerDownloadWarningBubbleHeed,
-      /*presupplied_trigger_id=*/std::nullopt,
-      DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-          DownloadWarningHatsType::kDownloadBubbleHeed),
-      DownloadWarningHatsProductSpecificData::GetStringDataFields(
-          DownloadWarningHatsType::kDownloadBubbleHeed));
-  survey_configs.emplace_back(
-      &safe_browsing::kDownloadWarningSurvey,
-      kHatsSurveyTriggerDownloadWarningBubbleIgnore,
-      /*presupplied_trigger_id=*/std::nullopt,
-      DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-          DownloadWarningHatsType::kDownloadBubbleIgnore),
-      DownloadWarningHatsProductSpecificData::GetStringDataFields(
-          DownloadWarningHatsType::kDownloadBubbleIgnore));
-  survey_configs.emplace_back(
-      &safe_browsing::kDownloadWarningSurvey,
-      kHatsSurveyTriggerDownloadWarningPageBypass,
-      /*presupplied_trigger_id=*/std::nullopt,
-      DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-          DownloadWarningHatsType::kDownloadsPageBypass),
-      DownloadWarningHatsProductSpecificData::GetStringDataFields(
-          DownloadWarningHatsType::kDownloadsPageBypass));
-  survey_configs.emplace_back(
-      &safe_browsing::kDownloadWarningSurvey,
-      kHatsSurveyTriggerDownloadWarningPageHeed,
-      /*presupplied_trigger_id=*/std::nullopt,
-      DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-          DownloadWarningHatsType::kDownloadsPageHeed),
-      DownloadWarningHatsProductSpecificData::GetStringDataFields(
-          DownloadWarningHatsType::kDownloadsPageHeed));
-  survey_configs.emplace_back(
-      &safe_browsing::kDownloadWarningSurvey,
-      kHatsSurveyTriggerDownloadWarningPageIgnore,
-      /*presupplied_trigger_id=*/std::nullopt,
-      DownloadWarningHatsProductSpecificData::GetBitsDataFields(
-          DownloadWarningHatsType::kDownloadsPageIgnore),
-      DownloadWarningHatsProductSpecificData::GetStringDataFields(
-          DownloadWarningHatsType::kDownloadsPageIgnore));
-
   survey_configs.emplace_back(
       &metrics::kHappinessTrackingSurveysForDownloadJourney,
       metrics::kHatsSurveyTriggerDownloadJourney,

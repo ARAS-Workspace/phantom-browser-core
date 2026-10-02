@@ -77,7 +77,6 @@ IN_PROC_BROWSER_TEST_F(
 IN_PROC_BROWSER_TEST_F(UnifiedConsentBrowserTest,
                        SettingsOptInTakeOverServicePrefChanges) {
   std::string pref_A = prefs::kSearchSuggestEnabled;
-  std::string pref_B = prefs::kSafeBrowsingEnabled;
 
   // First client: Enable sync.
   EnableSync(0);
@@ -88,22 +87,18 @@ IN_PROC_BROWSER_TEST_F(UnifiedConsentBrowserTest,
   // First client: Turn off both prefs while sync is on, so the synced state of
   // both prefs will be "off".
   pref_service0->SetBoolean(pref_A, false);
-  pref_service0->SetBoolean(pref_B, false);
   // Make sure the updates are committed before proceeding with the test.
   ASSERT_TRUE(UpdatedProgressMarkerChecker(GetSyncService(0)).Wait());
 
   // Second client: Turn off both prefs while sync is off.
   pref_service1->SetBoolean(pref_A, false);
-  pref_service1->SetBoolean(pref_B, false);
 
   // Second client: Turn on pref A while sync is off.
   pref_service1->SetBoolean(pref_A, true);
 
-  // Second client: Turn on pref B while sync setup is in progress.
   ASSERT_TRUE(GetClient(1)->SetupSyncWithCustomSettings(
       base::BindLambdaForTesting([=](syncer::SyncUserSettings* settings) {
         ASSERT_FALSE(settings->IsInitialSyncFeatureSetupComplete());
-        pref_service1->SetBoolean(pref_B, true);
         settings->SetInitialSyncFeatureSetupComplete();
       })));
 
@@ -111,16 +106,12 @@ IN_PROC_BROWSER_TEST_F(UnifiedConsentBrowserTest,
   // at the second client.
   ASSERT_TRUE(AwaitQuiescence());
 
-  // Both clients: Expect that pref A is off and pref B is on.
+  // Both clients: Expect that pref A is off.
   // Reason:
   // - Pref A was turned on before sync was enabled, hence it is overridden by
   // the value of the first client.
-  // - Pref B was turned on while sync setup was in progress, hence it is taken
-  // over.
   EXPECT_FALSE(pref_service0->GetBoolean(pref_A));
-  EXPECT_TRUE(pref_service0->GetBoolean(pref_B));
   EXPECT_FALSE(pref_service1->GetBoolean(pref_A));
-  EXPECT_TRUE(pref_service1->GetBoolean(pref_B));
 }
 
 }  // namespace

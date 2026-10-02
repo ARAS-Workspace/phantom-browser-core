@@ -12,7 +12,6 @@
 #include "base/check_deref.h"
 #include "base/json/json_reader.h"
 #include "base/json/json_writer.h"
-#include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "base/values.h"
@@ -87,7 +86,6 @@ class RealtimeReportingJobConfigurationTest : public testing::Test {
 
  protected:
   const std::vector<std::string> kIds = {"id1", "id2", "id3"};
-  base::HistogramTester histogram_;
 
   static ::chrome::cros::reporting::proto::Event CreateEventProto(
       const std::string& event_id,
@@ -303,18 +301,6 @@ TEST_F(RealtimeReportingJobConfigurationTest, OnBeforeRetry_HttpFailure) {
   configuration_->OnBeforeRetry(DeviceManagementService::kServiceUnavailable,
                                 "");
   EXPECT_EQ(original_payload, configuration_->GetPayload());
-}
-
-TEST_F(RealtimeReportingJobConfigurationTest, GetPayloadRecordsUmaMetrics) {
-  // GetPayload should record the payload size as an UMA metric.
-  std::string payload = configuration_->GetPayload();
-  histogram_.ExpectUniqueSample(
-      enterprise_connectors::kAllUploadSizeUmaMetricName, payload.size(), 1);
-
-  histogram_.ExpectUniqueSample(
-      enterprise_connectors::GetPayloadSizeUmaMetricName(
-          enterprise_connectors::kExtensionInstallEvent),
-      payload.size(), 1);
 }
 
 TEST_F(RealtimeReportingJobConfigurationTest, OnBeforeRetry_PartialBatch) {

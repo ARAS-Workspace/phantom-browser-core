@@ -255,7 +255,6 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
     ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
     OpenPageInfoBubble(browser());
 
-    safe_browsing::ReusedPasswordAccountType reused_password_account_type;
     PageInfoUI::IdentityInfo identity;
     if (name == kInsecure) {
       identity.identity_status = PageInfo::SITE_IDENTITY_STATUS_NO_CERT;

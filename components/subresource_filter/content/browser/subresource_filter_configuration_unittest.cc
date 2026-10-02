@@ -45,7 +45,6 @@ TEST_P(SubresourceFilterConfigurationTest, OneListActivation) {
   SCOPED_TRACE(::testing::Message("ActivationLevel: ") << level);
 
   const GURL url("https://example.test/");
-  ConfigureAsSubresourceFilterOnlyURL(url);
   scoped_configuration().ResetConfiguration(
       Configuration(level, scope, activation_list));
   SimulateNavigateAndCommit(url, main_rfh());

@@ -210,13 +210,5 @@ network::mojom::SCTAuditingMode SCTReportingService::GetReportingMode() {
   if (profile_->IsOffTheRecord() || !is_sct_auditing_enabled) {
     return network::mojom::SCTAuditingMode::kDisabled;
   }
-  if (safe_browsing::IsSafeBrowsingEnabled(*pref_service_)) {
-    if (safe_browsing::IsExtendedReportingEnabled(*pref_service_)) {
-      return network::mojom::SCTAuditingMode::kEnhancedSafeBrowsingReporting;
-    }
-    if (base::FeatureList::IsEnabled(features::kSCTAuditingHashdance)) {
-      return network::mojom::SCTAuditingMode::kHashdance;
-    }
-  }
   return network::mojom::SCTAuditingMode::kDisabled;
 }

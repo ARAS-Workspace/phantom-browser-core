@@ -19,7 +19,6 @@ class BrowserContext;
 
 namespace enterprise_connectors {
 enum AnalysisConnector : int;
-class ConnectorsService;
 }  // namespace enterprise_connectors
 
 namespace enterprise_signals {
@@ -38,13 +37,9 @@ struct ContextInfo {
   std::vector<std::string> on_bulk_data_entry_providers;
   std::vector<std::string> on_print_providers;
   std::vector<std::string> on_security_event_providers;
-  enterprise_connectors::EnterpriseRealTimeUrlCheckMode realtime_url_check_mode;
   std::string browser_version;
-  safe_browsing::SafeBrowsingState safe_browsing_protection_level;
   bool site_isolation_enabled;
   bool built_in_dns_client_enabled;
-  std::optional<safe_browsing::PasswordProtectionTrigger>
-      password_protection_warning_trigger;
   bool chrome_remote_desktop_app_blocked;
   device_signals::SettingValue os_firewall;
   std::vector<std::string> system_dns_servers;
@@ -57,9 +52,7 @@ struct ContextInfo {
 class ContextInfoFetcher {
  public:
   using ContextInfoCallback = base::OnceCallback<void(ContextInfo)>;
-  ContextInfoFetcher(
-      content::BrowserContext* browser_context,
-      enterprise_connectors::ConnectorsService* connectors_service);
+  explicit ContextInfoFetcher(content::BrowserContext* browser_context);
   virtual ~ContextInfoFetcher();
 
   ContextInfoFetcher(const ContextInfoFetcher&) = delete;
@@ -67,8 +60,7 @@ class ContextInfoFetcher {
 
   // Returns a platform specific instance of ContextInfoFetcher.
   static std::unique_ptr<ContextInfoFetcher> CreateInstance(
-      content::BrowserContext* browser_context,
-      enterprise_connectors::ConnectorsService* connectors_service);
+      content::BrowserContext* browser_context);
 
   // Fetches the context information for the current platform. Eventually calls
   // |callback_|. This function takes a callback to return a ContextInfo instead
@@ -92,10 +84,6 @@ class ContextInfoFetcher {
   std::vector<std::string> GetDnsServers();
 
   raw_ptr<content::BrowserContext> browser_context_;
-
-  // |connectors_service| is used to obtain the value of each Connector policy.
-  raw_ptr<enterprise_connectors::ConnectorsService, DanglingUntriaged>
-      connectors_service_;
 };
 
 #if BUILDFLAG(IS_LINUX)

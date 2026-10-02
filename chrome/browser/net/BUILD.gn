@@ -392,6 +392,7 @@ source_set("browser_tests") {
     "//components/cookie_config",
     "//components/embedder_support",
     "//components/embedder_support:user_agent",
+    "//components/enterprise/encryption/cache",
     "//components/enterprise/encryption/core:features",
     "//components/error_page/content/browser",
     "//components/language/core/browser",

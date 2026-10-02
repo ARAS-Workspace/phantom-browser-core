@@ -858,17 +858,6 @@
     // "desktop_android" is not supported.
     "platforms": ["chromeos", "linux", "mac", "win"]
   },
-  "safeBrowsingPrivate": {
-    "channel": "stable",
-    "extension_types": ["extension"],
-    // "desktop_android" is not supported.
-    "platforms": ["chromeos", "linux", "mac", "win"],
-    "allowlist": [
-      "B281B98DDD6A379EF50D59BB1135419536C1C353",  // Report site to Safe Browsing Extension, crbug.com/41441421
-      "FD15C63ABA854733FDCBC1D4D34A71E963A12ABD",  // Chrome Reporting Extension
-      "08455FA7CB8734168378F731B00B354CEEE0088F"   // Chrome Reporting Ext. Beta
-    ]
-  },
   "scripting": {
     "channel": "stable",
     "extension_types": ["extension"],

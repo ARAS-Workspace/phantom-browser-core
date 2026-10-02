@@ -98,7 +98,6 @@
 #include "chrome/common/pref_names.h"
 #include "chrome/common/secure_origin_allowlist.h"
 #include "components/autofill/core/common/autofill_prefs.h"
-#include "components/blocked_content/safe_browsing_triggered_popup_blocker.h"
 #include "components/breadcrumbs/core/breadcrumbs_status.h"
 #include "components/browsing_data/core/pref_names.h"
 #include "components/certificate_transparency/pref_names.h"
@@ -114,9 +113,11 @@
 #include "components/enterprise/browser/identifiers/identifiers_prefs.h"
 #include "components/enterprise/browser/promotion/promotion_prefs.h"
 #include "components/enterprise/buildflags/buildflags.h"
+#include "components/enterprise/device_trust/prefs.h"
 #include "components/enterprise/isolated_mode/prefs.h"
 #include "components/enterprise/net/core/prefs.h"
 #include "components/enterprise/network_header_injection/core/network_header_injection_prefs.h"
+#include "components/enterprise/watermarking/watermark_prefs.h"
 #include "components/feature_engagement/public/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/image_fetcher/core/cache/image_cache.h"
@@ -338,6 +339,14 @@
 #include "components/enterprise/data_controls/core/browser/prefs.h"
 #endif
 
+
+#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
+#include "components/enterprise/client_certificates/core/prefs.h"
+#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
+
+#if BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
+#include "components/enterprise/encryption/cache/prefs.h"
+#endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
 #include "chrome/browser/chrome_for_testing/prefs.h"
@@ -998,7 +1007,9 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 #endif
   chrome_urls::RegisterPrefs(registry);
   ChromeMetricsServiceClient::RegisterPrefs(registry);
-  enterprise_connectors::RegisterLocalStatePrefs(registry);
+#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
+  client_certificates::RegisterLocalStatePrefs(registry);
+#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
   enterprise_groups::RegisterLocalStatePrefs(registry);
   enterprise_util::RegisterLocalStatePrefs(registry);
   component_updater::RegisterPrefs(registry);
@@ -1031,7 +1042,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   profiles::RegisterPrefs(registry);
   feature_engagement::RegisterLocalStatePrefs(registry);
   RegisterScreenshotPrefs(registry);
-  safe_browsing::RegisterLocalStatePrefs(registry);
   search_engines::SearchEngineChoiceService::RegisterLocalStatePrefs(registry);
   secure_origin_allowlist::RegisterPrefs(registry);
   segmentation_platform::SegmentationPlatformService::RegisterLocalStatePrefs(
@@ -1191,7 +1201,14 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterBooleanPref(prefs::kCtrlTabMru, false);
   cross_device::RegisterProfilePrefs(registry);
   enterprise::RegisterIdentifiersProfilePrefs(registry);
-  enterprise_connectors::RegisterProfilePrefs(registry);
+  enterprise_connectors::RegisterDeviceTrustConnectorProfilePrefs(registry);
+  enterprise_connectors::RegisterWatermarkProfilePrefs(registry);
+#if BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
+  client_certificates::RegisterProfilePrefs(registry);
+#endif  // BUILDFLAG(ENTERPRISE_CLIENT_CERTIFICATES)
+#if BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
+  enterprise_connectors::RegisterCacheEncryptionProfilePrefs(registry);
+#endif  // BUILDFLAG(ENTERPRISE_CACHE_ENCRYPTION)
   enterprise_isolated_mode::RegisterProfilePrefs(registry);
 #if BUILDFLAG(ENTERPRISE_PROXY)
   enterprise_net::RegisterProfilePrefs(registry);
@@ -1260,11 +1277,8 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #endif
 
   RegisterPrefersDefaultScrollbarStylesPrefs(registry);
-  safe_browsing::RegisterProfilePrefs(registry);
   safety_check::prefs::RegisterProfilePrefs(registry);
   SearchPrefetchService::RegisterProfilePrefs(registry);
-  blocked_content::SafeBrowsingTriggeredPopupBlocker::RegisterProfilePrefs(
-      registry);
   security_interstitials::InsecureFormBlockingPage::RegisterProfilePrefs(
       registry);
   segmentation_platform::SegmentationPlatformService::RegisterProfilePrefs(

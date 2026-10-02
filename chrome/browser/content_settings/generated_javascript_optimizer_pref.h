@@ -40,15 +40,6 @@ class GeneratedJavascriptOptimizerPref
   // Fired when preferences used to generate this preference are changed.
   void OnPreferencesChanged();
 
-  // Fired when the selected bundled setting is changed programmatically.
-  void OnSettingsBundleChanged();
-
-  // Returns the default Javascript Optimizer setting for the passed-in
-  // security-bundle type.
-  static content_settings::JavascriptOptimizerSetting
-  GetDefaultJsOptimizerSetting(
-      safe_browsing::SecuritySettingsBundleSetting bundle_setting);
-
  private:
   // Profile this preference is generated for.
   const raw_ptr<Profile> profile_;

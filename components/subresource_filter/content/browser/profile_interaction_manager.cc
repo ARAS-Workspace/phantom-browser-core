@@ -89,41 +89,6 @@ void ProfileInteractionManager::OnAdsViolationTriggered(
   ads_violation_triggered_for_last_committed_navigation_ = true;
 }
 
-mojom::ActivationLevel ProfileInteractionManager::OnPageActivationComputed(
-    content::NavigationHandle* navigation_handle,
-    mojom::ActivationLevel initial_activation_level,
-    ActivationDecision* decision) {
-  TRACE_EVENT0(TRACE_DISABLED_BY_DEFAULT("loading"),
-               "ProfileInteractionManager::OnPageActivationComputed");
-  CHECK(IsInSubresourceFilterRoot(navigation_handle));
-
-  mojom::ActivationLevel effective_activation_level = initial_activation_level;
-
-  if (profile_context_->ads_intervention_manager()->ShouldActivate(
-          navigation_handle)) {
-    effective_activation_level = mojom::ActivationLevel::kEnabled;
-    *decision = ActivationDecision::ACTIVATED;
-  }
-
-  const GURL& url(navigation_handle->GetURL());
-  if (url.SchemeIsHTTPOrHTTPS()) {
-    profile_context_->settings_manager()->SetSiteMetadataBasedOnActivation(
-        url, effective_activation_level == mojom::ActivationLevel::kEnabled,
-        SubresourceFilterContentSettingsManager::ActivationSource::
-            kSafeBrowsing);
-  }
-
-  if (profile_context_->settings_manager()->GetSitePermission(url) ==
-      CONTENT_SETTING_ALLOW) {
-    if (effective_activation_level == mojom::ActivationLevel::kEnabled) {
-      *decision = ActivationDecision::URL_ALLOWLISTED;
-    }
-    return mojom::ActivationLevel::kDisabled;
-  }
-
-  return effective_activation_level;
-}
-
 void ProfileInteractionManager::MaybeShowNotification() {
   // The caller should make sure this is only called from pages that are
   // currently primary.
@@ -154,12 +119,6 @@ void ProfileInteractionManager::MaybeShowNotification() {
 content_settings::CookieSettings*
 ProfileInteractionManager::GetCookieSettings() {
   return profile_context_->cookie_settings();
-}
-
-base::WeakPtr<safe_browsing::V5GetHashProtocolManager>
-ProfileInteractionManager::GetV5GetHashProtocolManager() {
-  return profile_context_ ? profile_context_->GetV5GetHashProtocolManager()
-                          : nullptr;
 }
 
 content::WebContents* ProfileInteractionManager::GetWebContents() {

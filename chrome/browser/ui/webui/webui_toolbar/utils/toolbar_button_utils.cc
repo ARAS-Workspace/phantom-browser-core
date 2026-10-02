@@ -443,8 +443,6 @@ actions::ActionId MojomPageActionIdToActionId(
       return kActionShowTranslate;
     case MojomPageActionId::kActionShowMemorySaverChip:
       return kActionShowMemorySaverChip;
-    case MojomPageActionId::kActionShowJsOptimizationsIcon:
-      return kActionShowJsOptimizationsIcon;
     case MojomPageActionId::kActionRecordReplay:
       return kActionRecordReplay;
     case MojomPageActionId::kActionShowIntentPicker:
@@ -519,8 +517,6 @@ MojomPageActionId ActionIdToMojomPageActionId(actions::ActionId action_id) {
       return MojomPageActionId::kActionShowTranslate;
     case kActionShowMemorySaverChip:
       return MojomPageActionId::kActionShowMemorySaverChip;
-    case kActionShowJsOptimizationsIcon:
-      return MojomPageActionId::kActionShowJsOptimizationsIcon;
     case kActionRecordReplay:
       return MojomPageActionId::kActionRecordReplay;
     case kActionShowIntentPicker:

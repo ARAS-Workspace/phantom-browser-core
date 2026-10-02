@@ -694,19 +694,6 @@ void PageInfo::OnSitePermissionChanged(
     constraints.set_track_last_visit_for_autoexpiration(true);
   }
 
-  // If notification permission changes from allowed to not allowed, log the
-  // histogram.
-  if (type == ContentSettingsType::NOTIFICATIONS &&
-      setting_old == PermissionSetting(CONTENT_SETTING_ALLOW) &&
-      (!setting ||
-       ToContentSettingForMetrics(info, setting) == CONTENT_SETTING_ASK ||
-       ToContentSettingForMetrics(info, setting) == CONTENT_SETTING_BLOCK)) {
-    safe_browsing::SafeBrowsingMetricsCollector::
-        LogSafeBrowsingNotificationRevocationSourceHistogram(
-            safe_browsing::NotificationRevocationSource::
-                kUserManuallyChangedSiteSetting);
-  }
-
   map->SetNarrowestContentSetting(primary_url, site_url_, type, setting,
                                   constraints);
 

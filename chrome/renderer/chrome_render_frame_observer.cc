@@ -585,7 +585,7 @@ bool ChromeRenderFrameObserver::ShouldCapturePageTextForTranslateOrPhishing(
   // Translate specific checks.
   bool should_capture_for_translate = !!language_detection_agent_;
 
-  return should_capture_for_translate || should_capture_for_phishing;
+  return should_capture_for_translate;
 }
 
 void ChromeRenderFrameObserver::CapturePageText(

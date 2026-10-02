@@ -485,19 +485,9 @@ void ReportPasswordIssuesMetrics(const std::vector<PasswordForm>& forms) {
       count_phished);
 }
 
-void ReportPasswordProtectedMetrics(const std::vector<PasswordForm>& forms) {
-  for (const PasswordForm& form : forms) {
-    if (!form.blocked_by_user && form.password_value.size() > 0) {
-      metrics_util::LogIsPasswordProtected(form.password_value.size() >=
-                                           kMinPasswordLengthToCheck);
-    }
-  }
-}
-
 int ReportStoreMetrics(bool is_account_store,
                        bool custom_passphrase_enabled,
                        const std::string& sync_username,
-                       bool is_safe_browsing_enabled,
                        PasswordStoreResults password_store_results) {
   std::vector<PasswordForm>& results = password_store_results.store_results;
 
@@ -507,9 +497,6 @@ int ReportStoreMetrics(bool is_account_store,
   ReportTimesPasswordUsedMetrics(is_account_store, custom_passphrase_enabled,
                                  results);
   ReportPasswordNotesMetrics(is_account_store, results);
-  if (is_safe_browsing_enabled) {
-    ReportPasswordProtectedMetrics(results);
-  }
 
   // The remaining metrics are not recorded for the account store:
   // - SyncingAccountState2 just doesn't make sense, since syncing users only
@@ -614,7 +601,6 @@ StoreMetricsReporter::CredentialsCount ReportAllMetrics(
     bool custom_passphrase_enabled,
     const std::string& sync_username,
     bool is_account_storage_enabled,
-    bool is_safe_browsing_enabled,
     std::optional<PasswordStoreResults> profile_store_results,
     std::optional<PasswordStoreResults> account_store_results) {
   // Maps from (signon_realm, username) to password.
@@ -652,12 +638,12 @@ StoreMetricsReporter::CredentialsCount ReportAllMetrics(
   if (profile_store_results.has_value()) {
     credentials_count.profile_credentials_count = ReportStoreMetrics(
         /*is_account_store=*/false, custom_passphrase_enabled, sync_username,
-        is_safe_browsing_enabled, std::move(profile_store_results).value());
+        std::move(profile_store_results).value());
   }
   if (account_store_results.has_value()) {
     credentials_count.account_credentials_count = ReportStoreMetrics(
         /*is_account_store=*/true, custom_passphrase_enabled, sync_username,
-        is_safe_browsing_enabled, std::move(account_store_results).value());
+        std::move(account_store_results).value());
   }
 
   // If both stores exist, kick off the MultiStoreMetricsReporter.
@@ -749,8 +735,6 @@ StoreMetricsReporter::StoreMetricsReporter(
   is_account_storage_active_ =
       features_util::IsAccountStorageActive(sync_service);
 
-  is_safe_browsing_enabled_ = safe_browsing::IsSafeBrowsingEnabled(*prefs_);
-
   if (settings) {
     // TODO(crbug.com/358998546): use PasswordManagerSettingsService here.
     base::UmaHistogramEnumeration(
@@ -831,7 +815,6 @@ void StoreMetricsReporter::ProcessPasswordResults(
       FROM_HERE, {base::TaskPriority::BEST_EFFORT, base::MayBlock()},
       base::BindOnce(&ReportAllMetrics, custom_passphrase_enabled_,
                      sync_username_, is_account_storage_active_,
-                     is_safe_browsing_enabled_,
                      std::exchange(profile_store_results_, std::nullopt),
                      std::exchange(account_store_results_, std::nullopt)),
       base::BindOnce(

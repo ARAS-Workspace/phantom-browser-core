@@ -577,10 +577,6 @@ void DisruptiveNotificationPermissionsManager::RevokeNotifications(
       "Settings.SafetyHub.DisruptiveNotificationRevocations."
       "HasReportedMetricsBeforeRevocation",
       revocation_entry.has_reported_proposal);
-  safe_browsing::SafeBrowsingMetricsCollector::
-      LogSafeBrowsingNotificationRevocationSourceHistogram(
-          safe_browsing::NotificationRevocationSource::
-              kDisruptiveAutoRevocation);
 }
 
 void DisruptiveNotificationPermissionsManager::OnPermissionChanged(

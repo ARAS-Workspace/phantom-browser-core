@@ -1,7 +1,0 @@
-# Primary
-file://components/enterprise/connectors/OWNERS
-
-# Secondary
-
-# For password reuse reporting tests
-per-file *unittest.cc=nwokedi@chromium.org

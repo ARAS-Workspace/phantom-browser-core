@@ -2340,10 +2340,6 @@ DisableForRenderFrameHostReasonToProtocol(
         case back_forward_cache::DisabledReasonId::kPopupBlockerTabHelper:
           return Page::BackForwardCacheNotRestoredReasonEnum::
               EmbedderPopupBlockerTabHelper;
-        case back_forward_cache::DisabledReasonId::
-            kSafeBrowsingTriggeredPopupBlocker:
-          return Page::BackForwardCacheNotRestoredReasonEnum::
-              EmbedderSafeBrowsingTriggeredPopupBlocker;
         case back_forward_cache::DisabledReasonId::kSafeBrowsingThreatDetails:
           return Page::BackForwardCacheNotRestoredReasonEnum::
               EmbedderSafeBrowsingThreatDetails;

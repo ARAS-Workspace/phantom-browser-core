@@ -161,9 +161,6 @@
 #include "chrome/browser/signin/chrome_signin_proxying_url_loader_factory.h"
 #include "chrome/browser/signin/chrome_signin_url_loader_throttle.h"
 #include "chrome/browser/signin/header_modification_delegate_impl.h"
-#include "chrome/browser/site_protection/site_familiarity_process_selection_deferring_condition.h"
-#include "chrome/browser/site_protection/site_familiarity_process_selection_user_data.h"
-#include "chrome/browser/site_protection/site_familiarity_utils.h"
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
@@ -560,9 +557,6 @@
 #if BUILDFLAG(ENABLE_MEDIA_REMOTING)
 #include "chrome/browser/media/cast_remoting_connector.h"
 #include "chrome/browser/media/remoting_bridge.h"
-#endif
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #endif
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
@@ -4442,15 +4436,6 @@ ChromeContentBrowserClient::
         content::NavigationHandle& navigation_handle) {
   std::vector<std::unique_ptr<content::ProcessSelectionDeferringCondition>>
       conditions;
-  Profile* profile = Profile::FromBrowserContext(
-      navigation_handle.GetWebContents()->GetBrowserContext());
-  if (site_protection::AreV8OptimizationsDisabledOnUnfamiliarSites(profile)) {
-    auto condition = std::unique_ptr<
-        content::ProcessSelectionDeferringCondition>(
-        new site_protection::SiteFamiliarityProcessSelectionDeferringCondition(
-            navigation_handle));
-    conditions.push_back(std::move(condition));
-  }
   return conditions;
 }
 
@@ -5899,36 +5884,6 @@ ChromeContentBrowserClient::CreateHttpAuthCoordinator() {
   return std::make_unique<HttpAuthCoordinator>();
 }
 
-scoped_refptr<safe_browsing::UrlCheckerDelegate>
-ChromeContentBrowserClient::GetSafeBrowsingUrlCheckerDelegate(
-    bool safe_browsing_enabled_for_profile,
-    bool should_check_on_sb_disabled,
-    const std::vector<std::string>& allowlist_domains) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  // Should not bypass safe browsing check if the check is for enterprise
-  // lookup.
-  if (!safe_browsing_enabled_for_profile && !should_check_on_sb_disabled) {
-    return nullptr;
-  }
-
-  // Update allowlist domains.
-  if (safe_browsing_url_checker_delegate_) {
-    safe_browsing_url_checker_delegate_->SetPolicyAllowlistDomains(
-        allowlist_domains);
-  }
-
-  return safe_browsing_url_checker_delegate_;
-}
-
-safe_browsing::RealTimeUrlLookupServiceBase*
-ChromeContentBrowserClient::GetUrlLookupService(
-    content::BrowserContext* browser_context,
-    bool is_enterprise_lookup_enabled,
-    bool is_consumer_lookup_enabled) {
-  return nullptr;
-}
-
 void ChromeContentBrowserClient::ReportLegacyTechEvent(
     content::RenderFrameHost* render_frame_host,
     const std::string& type,
@@ -6469,76 +6424,10 @@ bool ChromeContentBrowserClient::AreV8OptimizationsEnabledForSite(
       site_url, site_url, ContentSettingsType::JAVASCRIPT_OPTIMIZER,
       &content_setting_info);
 
-  content_settings::ProviderType default_content_setting_provider;
-  map->GetDefaultContentSetting(ContentSettingsType::JAVASCRIPT_OPTIMIZER,
-                                &default_content_setting_provider);
-  auto default_content_setting_source =
-      content_settings::GetSettingSourceFromProviderType(
-          default_content_setting_provider);
-
-  // `default_javascript_optimizer_setting` is determined based on the user's
-  // selection in chrome://settings, whether the site-familiarity-feature is
-  // enabled, and enterprise policy. `default_javascript_optimizer_setting`
-  // ignores content setting exceptions. "Disable v8 optimizers for unfamiliar
-  // sites" cannot be applied via content-setting exceptions or enterprise
-  // policy; it can only be enabled globally via
-  // `default_javascript_optimizer_setting`.
-  JavascriptOptimizerSetting default_javascript_optimizer_setting =
-      site_protection::ComputeDefaultJavascriptOptimizerSetting(profile);
-  // Invariant guaranteed by ComputeDefaultJavascriptOptimizerSetting().
-  CHECK(default_javascript_optimizer_setting !=
-            JavascriptOptimizerSetting::kBlockedForUnfamiliarSites ||
-        default_content_setting_source ==
-            content_settings::SettingSource::kUser);
-
-  if (default_javascript_optimizer_setting !=
-          JavascriptOptimizerSetting::kBlockedForUnfamiliarSites ||
-      site_protection::IsV8OptimizerBlockingDryRun(profile)) {
-    // If site familiarity is turned off or we are in dry-run mode, use content
-    // settings to set v8 optimization. Use `site_content_setting` to honor
-    // exceptions for specific sites over a default policy that applies to all
-    // sites.
-    return site_content_setting == CONTENT_SETTING_ALLOW;
-  }
-
-  if (content_setting_info.primary_pattern !=
-          ContentSettingsPattern::Wildcard() ||
-      content_setting_info.secondary_pattern !=
-          ContentSettingsPattern::Wildcard()) {
-    // There is a site-specific rule. The rule has precedence over
-    // kBlockedForUnfamiliarSites.
-    return site_content_setting == CONTENT_SETTING_ALLOW;
-  }
-
-  // At this point, "block for unfamiliar sites" is turned on, and site-specific
-  // exceptions have been handled by the Wildcard() check above, so
-  // `site_content_setting` must reflect the default content setting. Enforce
-  // that "block for unfamiliar sites" can only be turned on when that default
-  // content setting is set to "Allow". If it was set to "Blocked",
-  // default_javascript_optimizer_setting would have also been "Blocked" rather
-  // than "Blocked for unfamiliar sites".
-  CHECK_EQ(site_content_setting, CONTENT_SETTING_ALLOW);
-
-  const site_protection::SiteFamiliarityProcessSelectionUserData*
-      site_familiarity_user_data = nullptr;
-  if (process_selection_user_data) {
-    site_familiarity_user_data =
-        site_protection::SiteFamiliarityProcessSelectionUserData::
-            FromProcessSelectionUserData(*process_selection_user_data);
-  }
-
-  // Lookup site-familiarity previously computed for this navigation by
-  // SiteFamiliarityProcessSelectionDeferringCondition.
-  // For now, enable v8 optimizations if there is no site_familiarity_user_data.
-  // This might be called when creating a SiteInstance and process for a new
-  // speculative RenderFrameHost, when the navigation is just starting and site
-  // familiarity hasn't been computed yet. When the navigation receives a
-  // response, this will be called a second time to determine the final
-  // SiteInstance and process, and site familiarity should be available then.
-  // TODO(https://issues.chromium.org/452130797): Determine desired behavior
-  // for speculative RenderFrameHosts.
-  return !site_familiarity_user_data ||
-         site_familiarity_user_data->is_site_familiar();
+  // Use content settings to set v8 optimization. Use `site_content_setting`
+  // to honor exceptions for specific sites over a default policy that applies
+  // to all sites.
+  return site_content_setting == CONTENT_SETTING_ALLOW;
 }
 
 bool ChromeContentBrowserClient::DisallowV8FeatureFlagOverridesForSite(

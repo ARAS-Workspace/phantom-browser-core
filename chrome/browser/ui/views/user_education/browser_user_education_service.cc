@@ -1484,9 +1484,7 @@ void MaybeRegisterChromeFeaturePromos(
               [](ContextPtr ctx,
                  user_education::FeaturePromoHandle promo_handle) {
                 chrome::ShowSafeBrowsingEnhancedProtectionWithIph(
-                    GetBrowser(ctx),
-                    safe_browsing::SafeBrowsingSettingReferralMethod::
-                        kDownloadButtonIphPromo);
+                    GetBrowser(ctx));
               }))
           .SetCustomActionIsDefault(true)
           .SetBubbleArrow(HelpBubbleArrow::kTopRight)

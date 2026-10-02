@@ -26,10 +26,6 @@ namespace content {
 class BrowserContext;
 }  // namespace content
 
-namespace safe_browsing {
-class SafeBrowsingMetricsCollector;
-}  // namespace safe_browsing
-
 namespace extensions {
 class ExtensionRegistrar;
 class ExtensionRegistry;
@@ -112,9 +108,6 @@ class ExtensionAllowlist : public KeyedService, public ExtensionPrefsObserver {
   // `ALLOWLIST_NOT_ALLOWLISTED`.
   void DeactivateAllowlistEnforcement();
 
-  // Called when the 'Enhanced Safe Browsing' setting changes.
-  void OnSafeBrowsingEnhancedChanged();
-
   // ExtensionPrefsObserver:
   // Observes extension state changes to set
   // `ALLOWLIST_ACKNOWLEDGE_ENABLED_BY_USER` when a not allowlisted extension is
@@ -148,9 +141,6 @@ class ExtensionAllowlist : public KeyedService, public ExtensionPrefsObserver {
   // automatically disabled on this browser context (considers ESB setting and
   // finch feature).
   bool should_auto_disable_extensions_ = false;
-
-  // Used to subscribe to browser context preferences updates.
-  PrefChangeRegistrar pref_change_registrar_;
 
   base::ScopedObservation<ExtensionPrefs, ExtensionPrefsObserver>
       extension_prefs_observation_{this};

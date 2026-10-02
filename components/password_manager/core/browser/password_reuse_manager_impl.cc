@@ -426,10 +426,7 @@ void PasswordReuseManagerImpl::ScheduleEnterprisePasswordURLUpdate() {
     return;
   }
   std::vector<GURL> enterprise_login_urls;
-  safe_browsing::GetPasswordProtectionLoginURLsPref(*prefs_,
-                                                    &enterprise_login_urls);
-  GURL enterprise_change_password_url =
-      safe_browsing::GetPasswordProtectionChangePasswordURLPref(*prefs_);
+  GURL enterprise_change_password_url;
   if (!reuse_detector_) {
     return;
   }

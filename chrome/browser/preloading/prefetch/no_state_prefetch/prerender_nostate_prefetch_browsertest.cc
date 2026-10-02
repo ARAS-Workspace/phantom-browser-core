@@ -1666,35 +1666,7 @@ void NoStatePrefetchBrowserTest::RunServiceWorkerInterceptTest(
 #define MAYBE_ServiceWorkerIntercept ServiceWorkerIntercept
 IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest,
                        MAYBE_ServiceWorkerIntercept) {
-  bool expect_two_hosts = base::FeatureList::IsEnabled(
-      safe_browsing::kMigrateToBlockV8OptimizerOnUnfamiliarSites);
-  RunServiceWorkerInterceptTest(expect_two_hosts);
-}
-
-class NoStatePrefetchBrowserTestWithEsbBlockV8
-    : public NoStatePrefetchBrowserTest {
- public:
-  NoStatePrefetchBrowserTestWithEsbBlockV8() {
-    feature_list_.InitAndEnableFeature(
-        safe_browsing::kEnableBlockV8OptimizerOnUnfamiliarSitesForEsbClients);
-  }
-
-  void SetUpOnMainThread() override {
-    NoStatePrefetchBrowserTest::SetUpOnMainThread();
-    safe_browsing::SetSafeBrowsingState(
-        current_browser()->GetProfile()->GetPrefs(),
-        safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-// TODO(crbug.com/500524504): Enable the test.
-#define MAYBE_ServiceWorkerInterceptWithEsb ServiceWorkerInterceptWithEsb
-IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTestWithEsbBlockV8,
-                       MAYBE_ServiceWorkerInterceptWithEsb) {
-  RunServiceWorkerInterceptTest(true);
+  RunServiceWorkerInterceptTest(/*expect_two_hosts=*/false);
 }
 
 // Checks that when the history is cleared, NoStatePrefetch history is cleared.

@@ -72,6 +72,8 @@ static_library("core") {
 
 static_library("unsafe_resource") {
   sources = [
+    "threat_enums.cc",
+    "threat_enums.h",
     "unsafe_resource.cc",
     "unsafe_resource.h",
     "unsafe_resource_locator.cc",

@@ -10,19 +10,6 @@
 #include "components/subresource_filter/content/browser/content_subresource_filter_web_contents_helper.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
-namespace {
-
-// Returns nullptr; no database manager is available to this build.
-const scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-GetDatabaseManagerFromSafeBrowsingService() {
-  return nullptr;
-}
-
-}  // namespace
-
 void CreateSubresourceFilterWebContentsHelper(
     content::WebContents* web_contents) {
   subresource_filter::RulesetService* ruleset_service =
@@ -34,5 +21,5 @@ void CreateSubresourceFilterWebContentsHelper(
           web_contents,
           SubresourceFilterProfileContextFactory::GetForProfile(
               Profile::FromBrowserContext(web_contents->GetBrowserContext())),
-          GetDatabaseManagerFromSafeBrowsingService(), dealer);
+          dealer);
 }

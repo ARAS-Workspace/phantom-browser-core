@@ -1072,26 +1072,6 @@ bool IsDownloadDeltaField(const std::string& field) {
           (field == kFileSizeKey) || (field == kExistsKey));
 }
 
-// Maybe triggers a trust-and-safety survey on the new tab page. `profile` is
-// the current profile. `accept` is whether the user chose to keep a
-// dangerous download.
-// NOTE: Android does not support the TrustSafetySentimentService.
-void MaybeTriggerTrustSafetySentimentSurvey(Profile* profile, bool accept) {
-  // Survey triggered on ACCEPT action, since this is where the user
-  // confirms their choice to keep a dangerous download, rather than
-  // triggering a survey after selecting to KEEP in the downloads page UI.
-  if (safe_browsing::IsSafeBrowsingSurveysEnabled(*profile->GetPrefs()) &&
-      accept) {
-    TrustSafetySentimentService* trust_safety_sentiment_service =
-        TrustSafetySentimentServiceFactory::GetForProfile(profile);
-    if (trust_safety_sentiment_service) {
-      trust_safety_sentiment_service->InteractedWithDownloadWarningUI(
-          DownloadItemWarningData::WarningSurface::DOWNLOAD_PROMPT,
-          DownloadItemWarningData::WarningAction::PROCEED);
-    }
-  }
-}
-
 }  // namespace
 
 const char DownloadedByExtension::kKey[] = "DownloadItem DownloadedByExtension";
@@ -1547,11 +1527,9 @@ void DownloadsAcceptDangerFunction::DangerPromptCallback(
   }
 
   const bool accept = action == DownloadDangerPrompt::ACCEPT;
-  Profile* profile = Profile::FromBrowserContext(browser_context());
   // If this download is no longer dangerous, is already canceled or
   // completed, don't send any report.
   if (download_item->IsDangerous() && !download_item->IsDone()) {
-    MaybeTriggerTrustSafetySentimentSurvey(profile, accept);
     // Log here for "Shown" unconditionally, and for "Proceed" iff the dialog
     // was accepted. This assumes the dialog cannot be dismissed once it is
     // shown without taking some action on it.

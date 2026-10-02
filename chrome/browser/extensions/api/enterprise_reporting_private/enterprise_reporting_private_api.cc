@@ -24,6 +24,7 @@
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/device_signals/core/common/common_types.h"
+#include "components/prefs/pref_service.h"
 #include "google_apis/gaia/gaia_id.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -84,58 +85,16 @@ api::enterprise_reporting_private::ContextInfo ToContextInfo(
       signals.chrome_remote_desktop_app_blocked;
   info.os_firewall = ToInfoSettingValue(signals.os_firewall);
   info.system_dns_servers = std::move(signals.system_dns_servers);
-  switch (signals.realtime_url_check_mode) {
-    case enterprise_connectors::REAL_TIME_CHECK_DISABLED:
-      info.realtime_url_check_mode = extensions::api::
-          enterprise_reporting_private::RealtimeUrlCheckMode::kDisabled;
-      break;
-    case enterprise_connectors::REAL_TIME_CHECK_FOR_MAINFRAME_ENABLED:
-      info.realtime_url_check_mode = extensions::api::
-          enterprise_reporting_private::RealtimeUrlCheckMode::kEnabledMainFrame;
-      break;
-  }
+  info.realtime_url_check_mode = extensions::api::
+      enterprise_reporting_private::RealtimeUrlCheckMode::kDisabled;
   info.browser_version = std::move(signals.browser_version);
   info.built_in_dns_client_enabled = signals.built_in_dns_client_enabled;
   info.enterprise_profile_id = signals.enterprise_profile_id;
 
-  switch (signals.safe_browsing_protection_level) {
-    case safe_browsing::SafeBrowsingState::NO_SAFE_BROWSING:
-      info.safe_browsing_protection_level = extensions::api::
-          enterprise_reporting_private::SafeBrowsingLevel::kDisabled;
-      break;
-    case safe_browsing::SafeBrowsingState::STANDARD_PROTECTION:
-      info.safe_browsing_protection_level = extensions::api::
-          enterprise_reporting_private::SafeBrowsingLevel::kStandard;
-      break;
-    case safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION:
-      info.safe_browsing_protection_level = extensions::api::
-          enterprise_reporting_private::SafeBrowsingLevel::kEnhanced;
-      break;
-  }
-  if (!signals.password_protection_warning_trigger.has_value()) {
-    info.password_protection_warning_trigger = extensions::api::
-        enterprise_reporting_private::PasswordProtectionTrigger::kPolicyUnset;
-  } else {
-    switch (signals.password_protection_warning_trigger.value()) {
-      case safe_browsing::PASSWORD_PROTECTION_OFF:
-        info.password_protection_warning_trigger =
-            extensions::api::enterprise_reporting_private::
-                PasswordProtectionTrigger::kPasswordProtectionOff;
-        break;
-      case safe_browsing::PASSWORD_REUSE:
-        info.password_protection_warning_trigger =
-            extensions::api::enterprise_reporting_private::
-                PasswordProtectionTrigger::kPasswordReuse;
-        break;
-      case safe_browsing::PHISHING_REUSE:
-        info.password_protection_warning_trigger =
-            extensions::api::enterprise_reporting_private::
-                PasswordProtectionTrigger::kPhishingReuse;
-        break;
-      case safe_browsing::PASSWORD_PROTECTION_TRIGGER_MAX:
-        NOTREACHED();
-    }
-  }
+  info.safe_browsing_protection_level = extensions::api::
+      enterprise_reporting_private::SafeBrowsingLevel::kDisabled;
+  info.password_protection_warning_trigger = extensions::api::
+      enterprise_reporting_private::PasswordProtectionTrigger::kPolicyUnset;
 
   return info;
 }

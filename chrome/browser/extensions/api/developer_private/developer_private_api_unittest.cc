@@ -3216,62 +3216,6 @@ TEST_F(DeveloperPrivateApiUnitTest,
       api::developer_private::EventType::kPinnedActionsChanged));
 }
 
-TEST_F(DeveloperPrivateApiUnitTest,
-       ExtensionUpdatedEventOnAllowlistWarningChange) {
-  // We need to call DeveloperPrivateAPI::Get() in order to instantiate the
-  // keyed service, since it's not created by default in unit tests.
-  DeveloperPrivateAPI::Get(profile());
-  const ExtensionId listener_id = crx_file::id_util::GenerateId("listener");
-  EventRouter* event_router = EventRouter::Get(profile());
-
-  // The DeveloperPrivateEventRouter will only dispatch events if there's at
-  // least one listener to dispatch to. Create one.
-  const char* kEventName =
-      api::developer_private::OnItemStateChanged::kEventName;
-  event_router->AddEventListener(kEventName, render_process_host(),
-                                 listener_id);
-
-  scoped_refptr<const Extension> dummy_extension = LoadSimpleExtension();
-  base::RunLoop().RunUntilIdle();
-
-  TestEventRouterObserver test_observer(event_router);
-  EXPECT_FALSE(WasItemChangedEventDispatched(
-      test_observer, dummy_extension->id(),
-      api::developer_private::EventType::kPrefsChanged));
-
-  safe_browsing::SetSafeBrowsingState(
-      profile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-
-  base::RunLoop().RunUntilIdle();
-  // The warning state should not have changed since the allowlist state is not
-  // set yet.
-  EXPECT_FALSE(WasItemChangedEventDispatched(
-      test_observer, dummy_extension->id(),
-      api::developer_private::EventType::kPrefsChanged));
-
-  service()->allowlist()->SetExtensionAllowlistState(dummy_extension->id(),
-                                                     ALLOWLIST_NOT_ALLOWLISTED);
-
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(WasItemChangedEventDispatched(
-      test_observer, dummy_extension->id(),
-      api::developer_private::EventType::kPrefsChanged));
-
-  test_observer.ClearEvents();
-
-  safe_browsing::SetSafeBrowsingState(
-      profile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
-
-  base::RunLoop().RunUntilIdle();
-  // The warning is now hidden because the profile is no longer Enhanced
-  // Protection.
-  EXPECT_TRUE(WasItemChangedEventDispatched(
-      test_observer, dummy_extension->id(),
-      api::developer_private::EventType::kPrefsChanged));
-}
-
 class DeveloperPrivateApiSupervisedUserUnitTest
     : public DeveloperPrivateApiUnitTest {
  public:

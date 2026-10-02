@@ -865,7 +865,6 @@ TEST(PermissionsTest, PermissionMessages) {
   skip.insert(APIPermissionID::kProxyOverrideRulesPrivate);
   skip.insert(APIPermissionID::kImageWriterPrivate);
   skip.insert(APIPermissionID::kResourcesPrivate);
-  skip.insert(APIPermissionID::kSafeBrowsingPrivate);
   skip.insert(APIPermissionID::kSmartCardProviderPrivate);
   skip.insert(APIPermissionID::kSystemPrivate);
   skip.insert(APIPermissionID::kTabCaptureForTab);

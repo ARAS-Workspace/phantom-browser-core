@@ -6,7 +6,6 @@
 
 #include "base/memory/scoped_refptr.h"
 #include "base/strings/stringprintf.h"
-#include "base/test/scoped_feature_list.h"
 #include "content/public/common/child_process_id.h"
 #include "content/public/test/browser_task_environment.h"
 #include "extensions/browser/api/extensions_api_client.h"
@@ -35,41 +34,7 @@ namespace extensions {
 
 using ExtensionWebRequestPermissionsTest = ExtensionsTest;
 
-constexpr char kTestRelayUrl[] = "https://ohttp.endpoint.test/";
-
-class ExtensionWebRequestPermissionsWithHashRealTimeDependenceTest
-    : public ExtensionsTest,
-      public testing::WithParamInterface<bool> {
- public:
-  void SetUp() override {
-    ExtensionsTest::SetUp();
-    if (GetParam()) {
-      feature_list_.InitWithFeaturesAndParameters(
-          /*enabled_features=*/
-          {{safe_browsing::kHashPrefixRealTimeLookups,
-            {{"SafeBrowsingHashPrefixRealTimeLookupsRelayUrl",
-              kTestRelayUrl}}}},
-          /*disabled_features=*/{});
-    } else {
-      feature_list_.InitWithFeatures(
-          /*enabled_features=*/{},
-          /*disabled_features=*/{safe_browsing::kHashPrefixRealTimeLookups});
-    }
-  }
-
- private:
-  safe_browsing::hash_realtime_utils::GoogleChromeBrandingPretenderForTesting
-      apply_branding_;
-  base::test::ScopedFeatureList feature_list_;
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    ExtensionWebRequestPermissionsWithHashRealTimeDependenceTest,
-    testing::Bool());
-
-TEST_P(ExtensionWebRequestPermissionsWithHashRealTimeDependenceTest,
-       TestHideRequestForURL) {
+TEST_F(ExtensionWebRequestPermissionsTest, TestHideRequestForURL) {
   enum HideRequestMask {
     HIDE_NONE = 0,
     HIDE_RENDERER_REQUEST = 1,
@@ -156,17 +121,8 @@ TEST_P(ExtensionWebRequestPermissionsWithHashRealTimeDependenceTest,
        "kcnhkahnjcbndmmehfkdnkjomaanaooo:fetchItemSnippet",
        HIDE_ALL},
   };
-  std::vector<TestCase> additional_cases;
-  if (GetParam()) {
-    additional_cases = {
-        {"https://ohttp.endpoint.test", HIDE_ALL},
-        {"https://ohttp.endpoint.test/", HIDE_ALL},
-        {"https://ohttp.endpoint.test/path", HIDE_BROWSER_SUB_RESOURCE_REQUEST},
-        {"https://endpoint.test/", HIDE_BROWSER_SUB_RESOURCE_REQUEST}};
-  } else {
-    additional_cases = {
-        {"https://ohttp.endpoint.test/", HIDE_BROWSER_SUB_RESOURCE_REQUEST}};
-  }
+  std::vector<TestCase> additional_cases = {
+      {"https://ohttp.endpoint.test/", HIDE_BROWSER_SUB_RESOURCE_REQUEST}};
   cases.insert(cases.end(), additional_cases.begin(), additional_cases.end());
 
   const content::ChildProcessId kRendererProcessId(1);

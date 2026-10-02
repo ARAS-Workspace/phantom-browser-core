@@ -10,6 +10,8 @@ source_set("cache") {
   configs += [ "//components/enterprise:extra_warnings" ]
 
   sources = [
+    "prefs.cc",
+    "prefs.h",
     "utils.cc",
     "utils.h",
   ]

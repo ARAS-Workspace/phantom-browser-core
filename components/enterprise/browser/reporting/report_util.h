@@ -33,17 +33,6 @@ std::string ObfuscateFilePath(const std::string& file_path);
 enterprise_management::SettingValue TranslateSettingValue(
     device_signals::SettingValue setting_value);
 
-enterprise_management::ProfileSignalsReport::PasswordProtectionTrigger
-TranslatePasswordProtectionTrigger(
-    std::optional<safe_browsing::PasswordProtectionTrigger> trigger);
-
-enterprise_management::ProfileSignalsReport::RealtimeUrlCheckMode
-TranslateRealtimeUrlCheckMode(
-    enterprise_connectors::EnterpriseRealTimeUrlCheckMode mode);
-
-enterprise_management::ProfileSignalsReport::SafeBrowsingLevel
-TranslateSafeBrowsingLevel(safe_browsing::SafeBrowsingState level);
-
 // Utility function to convert report proto to readable, JSON format that
 // contains security signals-related fields only. Only
 // `ChromeProfileReportRequest` is currently supported.

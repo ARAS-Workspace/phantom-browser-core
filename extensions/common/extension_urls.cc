@@ -175,10 +175,7 @@ bool IsSafeBrowsingUrl(const GURL& url) {
          origin.DomainIs("safebrowsing.googleapis.com") ||
          (origin.DomainIs("safebrowsing.google.com") &&
           base::StartsWith(path, "/safebrowsing",
-                           base::CompareCase::SENSITIVE)) ||
-         (safe_browsing::hash_realtime_utils::
-              IsHashRealTimeLookupEligibleInSession() &&
-          url == safe_browsing::kHashPrefixRealTimeLookupsRelayUrl.Get());
+                           base::CompareCase::SENSITIVE));
 }
 
 }  // namespace extension_urls

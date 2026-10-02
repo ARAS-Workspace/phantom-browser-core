@@ -35,7 +35,6 @@
 #include "chrome/browser/extensions/api/autofill_private/autofill_private_event_router_factory.h"
 #include "chrome/browser/extensions/api/bookmark_manager_private/bookmark_manager_private_api.h"
 #include "chrome/browser/extensions/api/braille_display_private/braille_display_private_api.h"
-#include "chrome/browser/extensions/api/enterprise_reporting_private/enterprise_reporting_private_event_router.h"
 #include "chrome/browser/extensions/api/image_writer_private/operation_manager.h"
 #include "chrome/browser/extensions/api/networking_private/networking_private_ui_delegate_factory_impl.h"
 #include "chrome/browser/extensions/api/settings_overrides/settings_overrides_api.h"
@@ -93,7 +92,6 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   extensions::AutofillPrivateEventRouterFactory::GetInstance();
   extensions::BookmarkManagerPrivateAPI::GetFactoryInstance();
   extensions::BrailleDisplayPrivateAPI::GetFactoryInstance();
-  extensions::EnterpriseReportingPrivateEventRouterFactory::GetInstance();
   extensions::image_writer::OperationManager::GetFactoryInstance();
 #if BUILDFLAG(IS_MAC)
   auto networking_private_ui_delegate_factory =

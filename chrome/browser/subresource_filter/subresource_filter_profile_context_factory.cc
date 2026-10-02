@@ -14,9 +14,6 @@
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 // static
 subresource_filter::SubresourceFilterProfileContext*
 SubresourceFilterProfileContextFactory::GetForProfile(Profile* profile) {
@@ -55,9 +52,7 @@ SubresourceFilterProfileContextFactory::BuildServiceInstanceForBrowserContext(
   auto subresource_filter_profile_context =
       std::make_unique<subresource_filter::SubresourceFilterProfileContext>(
           HostContentSettingsMapFactory::GetForProfile(profile),
-          CookieSettingsFactory::GetForProfile(profile),
-          /*v5_get_hash_protocol_manager=*/nullptr
-      );
+          CookieSettingsFactory::GetForProfile(profile));
 
   // Create and attach a SubresourceFilterHistoryObserver instance if possible.
   auto* history_service = HistoryServiceFactory::GetForProfile(

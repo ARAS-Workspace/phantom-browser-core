@@ -33,6 +33,7 @@
 #include "components/enterprise/data_controls/core/browser/test_utils.h"
 #include "components/enterprise/data_protection/features.h"
 #include "components/enterprise/data_protection/utils.h"
+#include "components/enterprise/watermarking/watermark_prefs.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/policy/core/common/policy_types.h"
 #include "components/prefs/pref_service.h"

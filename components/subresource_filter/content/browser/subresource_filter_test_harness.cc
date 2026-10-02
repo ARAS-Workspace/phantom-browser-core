@@ -96,11 +96,10 @@ void SubresourceFilterTestHarness::SetUp() {
       ruleset_service_.get()->GetRulesetDealer();
   throttle_manager_test_support_ =
       std::make_unique<ThrottleManagerTestSupport>(web_contents());
-  database_manager_ = base::MakeRefCounted<FakeSafeBrowsingDatabaseManager>();
   infobars::ContentInfoBarManager::CreateForWebContents(web_contents());
   ContentSubresourceFilterWebContentsHelper::CreateForWebContents(
       web_contents(), throttle_manager_test_support_->profile_context(),
-      database_manager_, dealer);
+      dealer);
 
   // Setup the inserter to add subresource filter navigation throttles at the
   // start of navigations.
@@ -159,16 +158,6 @@ SubresourceFilterTestHarness::CreateAndNavigateDisallowedSubframe(
   auto* subframe =
       content::RenderFrameHostTester::For(parent)->AppendChild("subframe");
   return SimulateNavigateAndCommit(GURL(kDefaultDisallowedUrl), subframe);
-}
-
-void SubresourceFilterTestHarness::ConfigureAsSubresourceFilterOnlyURL(
-    const GURL& url) {
-  fake_safe_browsing_database()->AddBlocklistedUrl(
-      url, safe_browsing::SBThreatType::SB_THREAT_TYPE_SUBRESOURCE_FILTER);
-}
-
-void SubresourceFilterTestHarness::RemoveURLFromBlocklist(const GURL& url) {
-  fake_safe_browsing_database()->RemoveBlocklistedUrl(url);
 }
 
 SubresourceFilterContentSettingsManager*

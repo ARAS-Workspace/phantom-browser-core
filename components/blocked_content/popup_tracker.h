@@ -31,15 +31,6 @@ class PopupTracker : public content::WebContentsObserver,
                      public content::WebContentsUserData<PopupTracker>,
                      public subresource_filter::SubresourceFilterObserver {
  public:
-  // These values are persisted to logs. Entries should not be renumbered and
-  // numeric values should never be reused.
-  enum class PopupSafeBrowsingStatus {
-    kNoValue = 0,
-    kSafe = 1,
-    kUnsafe = 2,
-    kMaxValue = kUnsafe,
-  };
-
   static PopupTracker* CreateForWebContents(content::WebContents* contents,
                                             content::WebContents* opener,
                                             WindowOpenDisposition disposition);
@@ -70,10 +61,6 @@ class PopupTracker : public content::WebContentsObserver,
   void DidGetUserInteraction(const blink::WebInputEvent& event) override;
 
   // subresource_filter::SubresourceFilterObserver:
-  void OnSafeBrowsingChecksComplete(
-      content::NavigationHandle* navigation_handle,
-      const subresource_filter::SubresourceFilterSafeBrowsingClient::
-          CheckResult& result) override;
   void OnSubresourceFilterGoingAway() override;
 
   base::ScopedObservation<subresource_filter::SubresourceFilterObserverManager,
@@ -106,11 +93,6 @@ class PopupTracker : public content::WebContentsObserver,
   const ukm::SourceId opener_source_id_;
 
   bool is_trusted_ = false;
-
-  // Whether the pop-up navigated to a site on the safe browsing list. Set when
-  // the safe browsing checks complete.
-  PopupSafeBrowsingStatus safe_browsing_status_ =
-      PopupSafeBrowsingStatus::kNoValue;
 
   // The window open disposition used when creating the popup.
   const WindowOpenDisposition window_open_disposition_;

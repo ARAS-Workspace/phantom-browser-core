@@ -19,21 +19,6 @@ base::TimeDelta GetUnusedSitePermissionsRevocationCleanUpThreshold() {
 }
 
 SafeBrowsingStatus CheckSafeBrowsing(PrefService* pref_service) {
-  const PrefService::Preference* enabled_pref =
-      pref_service->FindPreference(prefs::kSafeBrowsingEnabled);
-  bool is_sb_enabled = pref_service->GetBoolean(prefs::kSafeBrowsingEnabled);
-  bool is_sb_managed = enabled_pref->IsManaged();
-
-  if (is_sb_enabled && pref_service->GetBoolean(prefs::kSafeBrowsingEnhanced))
-    return SafeBrowsingStatus::kEnabledEnhanced;
-  if (is_sb_enabled && is_sb_managed)
-    return SafeBrowsingStatus::kEnabledStandard;
-  if (is_sb_enabled && !is_sb_managed)
-    return SafeBrowsingStatus::kEnabledStandardAvailableEnhanced;
-  if (is_sb_managed)
-    return SafeBrowsingStatus::kDisabledByAdmin;
-  if (enabled_pref->IsExtensionControlled())
-    return SafeBrowsingStatus::kDisabledByExtension;
   return SafeBrowsingStatus::kDisabled;
 }
 

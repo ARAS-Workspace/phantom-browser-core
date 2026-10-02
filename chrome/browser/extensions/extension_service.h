@@ -24,7 +24,6 @@
 #include "chrome/browser/extensions/forced_extensions/force_installed_metrics.h"
 #include "chrome/browser/extensions/forced_extensions/force_installed_tracker.h"
 #include "chrome/browser/extensions/omaha_attributes_handler.h"
-#include "chrome/browser/extensions/safe_browsing_verdict_handler.h"
 #include "chrome/browser/policy/cloud/extension_install_policy_service.h"
 #include "chrome/browser/profiles/profile_manager_observer.h"
 #include "chrome/browser/upgrade_detector/upgrade_observer.h"
@@ -49,7 +48,6 @@
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
-class BlocklistedExtensionSyncServiceTest;
 class Profile;
 class ProfileManager;
 
@@ -57,9 +55,6 @@ namespace base {
 class CommandLine;
 class OneShotEvent;
 }  // namespace base
-
-FORWARD_DECLARE_TEST(BlocklistedExtensionSyncServiceTest,
-                     SyncBlocklistedExtension);
 
 namespace extensions {
 class ChromeExtensionRegistrarDelegate;
@@ -375,9 +370,6 @@ class ExtensionService : public ExtensionServiceInterface,
   raw_ptr<ExtensionRegistrar> extension_registrar_ = nullptr;
 
   // Needs `extension_registrar_` during construction.
-  SafeBrowsingVerdictHandler safe_browsing_verdict_handler_;
-
-  // Needs `extension_registrar_` during construction.
   OmahaAttributesHandler omaha_attributes_handler_;
 
   // Tracker of enterprise policy forced installation.
@@ -411,54 +403,12 @@ class ExtensionService : public ExtensionServiceInterface,
 
   FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
                            DestroyingProfileClearsExtensions);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest, SetUnsetBlocklistInPrefs);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest, NoUnsetBlocklistInPrefs);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
-                           BlocklistedExtensionWillNotInstall);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
-                           UnloadBlocklistedExtensionPolicy);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
-                           WillNotLoadBlocklistedExtensionsFromDirectory);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest, ReloadBlocklistedExtension);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest, RemoveExtensionFromBlocklist);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest, BlocklistedInPrefsFromStartup);
   FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
                            ManagementPolicyProhibitsEnableOnInstalled);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
-                           BlockAndUnblockBlocklistedExtension);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
-                           CanAddDisableReasonToBlocklistedExtension);
-  FRIEND_TEST_ALL_PREFIXES(::BlocklistedExtensionSyncServiceTest,
-                           SyncBlocklistedExtension);
   FRIEND_TEST_ALL_PREFIXES(ExtensionAllowlistUnitTest,
                            ExtensionsNotAllowlistedThenBlocklisted);
   FRIEND_TEST_ALL_PREFIXES(ExtensionAllowlistUnitTest,
                            ExtensionsBlocklistedThenNotAllowlisted);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           GreylistedExtensionDisabled);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           GreylistDontEnableManuallyDisabled);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           GreylistUnknownDontChange);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           UnblocklistedExtensionStillGreylisted);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           GreylistedExtensionDoesNotDisableAgain);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           GreylistedExtensionDisableAgainIfReAdded);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           DisableExtensionForDifferentGreylistState);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           DisableExtensionWhenSwitchingBetweenGreylistStates);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           AcknowledgedStateBackFilled);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           ExtensionUninstalledWhenBlocklisted);
-  FRIEND_TEST_ALL_PREFIXES(SafeBrowsingVerdictHandlerUnitTest,
-                           ExtensionUninstalledWhenBlocklistFetching);
-  friend class ::BlocklistedExtensionSyncServiceTest;
-  friend class SafeBrowsingVerdictHandlerUnitTest;
-  friend class BlocklistStatesInteractionUnitTest;
 };
 
 }  // namespace extensions

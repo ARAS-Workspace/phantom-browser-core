@@ -392,24 +392,7 @@ void ChromePageInfoDelegate::OnSuspiciousSiteBackToSafety() {
       GURL(chrome::kChromeUINewTabURL)));
 }
 
-void ChromePageInfoDelegate::OnSuspiciousSiteMarkAsSafe() {
-  if (!web_contents_) {
-    return;
-  }
-  const GURL& current_url = web_contents_->GetLastCommittedURL();
-  if (!current_url.is_valid() || current_url.host().empty()) {
-    return;
-  }
-  Profile* profile = GetProfile();
-  if (profile) {
-    HostContentSettingsMap* hcsm =
-        HostContentSettingsMapFactory::GetForProfile(profile);
-    if (hcsm) {
-      safe_browsing::SuspiciousSiteWarningAllowlist(hcsm).AllowSiteForHost(
-          std::string(current_url.host()));
-    }
-  }
-}
+void ChromePageInfoDelegate::OnSuspiciousSiteMarkAsSafe() {}
 
 std::u16string ChromePageInfoDelegate::GetSubjectName(const GURL& url) {
   CHECK(web_contents_);

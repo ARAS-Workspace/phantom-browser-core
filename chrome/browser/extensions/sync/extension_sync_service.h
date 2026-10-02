@@ -80,9 +80,6 @@ class ExtensionSyncService : public syncer::SyncableService,
   // extensions::ExtensionManagement::Observer:
   void OnExtensionManagementSettingsChanged() override;
 
-  void SetSyncStartFlareForTesting(
-      const syncer::SyncableService::StartSyncFlare& flare);
-
   // Returns true if the extension with `extension_id` is pending installation
   // from sync.
   bool IsPendingSyncInstall(const std::string& extension_id) const;

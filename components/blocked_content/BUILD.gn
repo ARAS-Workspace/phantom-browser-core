@@ -17,8 +17,6 @@ source_set("blocked_content") {
     "popup_tracker.h",
     "pref_names.cc",
     "pref_names.h",
-    "safe_browsing_triggered_popup_blocker.cc",
-    "safe_browsing_triggered_popup_blocker.h",
     "url_list_manager.cc",
     "url_list_manager.h",
   ]
@@ -54,11 +52,7 @@ source_set("test_support") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [
-    "popup_blocker_tab_helper_unittest.cc",
-    "safe_browsing_triggered_popup_blocker_unittest.cc",
-    "subresource_filter_abusive_unittest.cc",
-  ]
+  sources = [ "popup_blocker_tab_helper_unittest.cc" ]
   deps = [
     ":blocked_content",
     ":test_support",

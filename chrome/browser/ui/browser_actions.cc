@@ -120,7 +120,6 @@
 #include "chrome/browser/ui/views/file_system_access/file_system_access_bubble_controller.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
-#include "chrome/browser/ui/views/js_optimization/js_optimizations_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/record_replay_page_action_controller.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
@@ -495,34 +494,6 @@ void BrowserActions::InitializePageActionIconActions() {
               },
               bwi))
           .SetActionId(kActionWebAuthnAmbientSignin)
-          .SetEnabled(true)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                if (!bwi) {
-                  return;
-                }
-                auto anchor =
-                    CHECK_DEREF(BrowserView::GetBrowserViewForBrowser(bwi))
-                        .toolbar_button_provider()
-                        ->GetBubbleAnchor(kActionShowJsOptimizationsIcon);
-
-                bwi->GetActiveTabInterface()
-                    ->GetTabFeatures()
-                    ->js_optimizations_page_action_controller()
-                    ->ShowBubble(anchor, item);
-              },
-              bwi))
-          .SetActionId(kActionShowJsOptimizationsIcon)
-          .SetTooltipText(l10n_util::GetStringUTF16(
-              IDS_JS_OPTIMIZATIONS_DISABLED_ICON_TOOLTIP))
-          .SetImage(ui::ImageModel::FromVectorIcon(
-              vector_icons::kShieldIcon, ui::kColorIcon,
-              ui::SimpleMenuModel::kDefaultIconSize))
           .SetEnabled(true)
           .Build());
 

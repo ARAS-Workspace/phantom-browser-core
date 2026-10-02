@@ -1112,8 +1112,6 @@ test("browser_tests") {
     "//chrome/browser/signin:browser_tests",
     "//chrome/browser/signin/e2e_tests:test_support",
     "//chrome/browser/site_isolation:browser_tests",
-    "//chrome/browser/site_protection",
-    "//chrome/browser/site_protection:utils",
     "//chrome/browser/ssl",
     "//chrome/browser/ssl:browser_tests",
     "//chrome/browser/ssl:cert_verifier_test_support",
@@ -2069,7 +2067,6 @@ test("browser_tests") {
     "//chrome/browser/ui/views/accessibility:browser_tests",
     "//chrome/browser/ui/views/animations",
     "//chrome/browser/ui/views/infobars:browser_tests",
-    "//chrome/browser/ui/views/js_optimization",
     "//chrome/browser/ui/views/location_bar",
     "//chrome/browser/ui/views/location_bar/cookie_controls:browser_tests",
     "//chrome/browser/ui/views/tabs/tab",
@@ -3168,8 +3165,6 @@ test("unit_tests") {
     "//chrome/browser/share:unit_tests",
     "//chrome/browser/signin:unit_tests",
     "//chrome/browser/site_isolation:unit_tests",
-    "//chrome/browser/site_protection",
-    "//chrome/browser/site_protection:utils",
     "//chrome/browser/site_token_provider:unit_tests",
     "//chrome/browser/ssl",
     "//chrome/browser/ssl:impl",
@@ -3595,7 +3590,6 @@ test("unit_tests") {
     "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
     "//chrome/browser/new_tab_page/chrome_colors:generate_colors_info",
     "//chrome/browser/record_replay:unit_tests",
-    "//chrome/browser/site_protection:unit_tests",
     "//chrome/browser/ui:browser_actions",
     "//chrome/browser/ui/browser_active_state_manager:unit_tests",
     "//chrome/browser/ui/fullscreen",
@@ -5027,10 +5021,6 @@ static_library("test_support_ui") {
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}
-
-proto_library("test_proto") {
-  sources = [ "../common/safe_browsing/ipc_protobuf_message_test.proto" ]
 }
 
 test("interactive_ui_tests") {

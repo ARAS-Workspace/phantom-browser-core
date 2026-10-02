@@ -166,10 +166,6 @@ class DownloadItemWarningData : public base::SupportsUserData::Data {
   static void SetHasIncorrectPassword(download::DownloadItem* download,
                                       bool has_incorrect_password);
 
-  // Converts an `event` to the Safe Browsing report proto format.
-  static safe_browsing::ClientSafeBrowsingReportRequest::DownloadWarningAction
-  ConstructCsbrrDownloadWarningAction(const WarningActionEvent& event);
-
   // Returns whether we have shown a local password decryption prompt for this
   // download.
   static bool HasShownLocalDecryptionPrompt(

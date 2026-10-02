@@ -39,10 +39,7 @@ source_set("test_support") {
 source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  sources = [
-    "global_error_browsertest.cc",
-    "global_error_service_browsertest.cc",
-  ]
+  sources = [ "global_error_service_browsertest.cc" ]
   deps = [
     ":global_error",
     "//chrome/browser:browser_process",

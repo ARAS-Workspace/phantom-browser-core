@@ -53,21 +53,15 @@ ContextInfo::ContextInfo(ContextInfo&&) = default;
 ContextInfo::~ContextInfo() = default;
 
 ContextInfoFetcher::ContextInfoFetcher(
-    content::BrowserContext* browser_context,
-    enterprise_connectors::ConnectorsService* connectors_service)
-    : browser_context_(browser_context),
-      connectors_service_(connectors_service) {
-  DCHECK(connectors_service_);
-}
+    content::BrowserContext* browser_context)
+    : browser_context_(browser_context) {}
 
 ContextInfoFetcher::~ContextInfoFetcher() = default;
 
 // static
 std::unique_ptr<ContextInfoFetcher> ContextInfoFetcher::CreateInstance(
-    content::BrowserContext* browser_context,
-    enterprise_connectors::ConnectorsService* connectors_service) {
-  return std::make_unique<ContextInfoFetcher>(browser_context,
-                                              connectors_service);
+    content::BrowserContext* browser_context) {
+  return std::make_unique<ContextInfoFetcher>(browser_context);
 }
 
 ContextInfo ContextInfoFetcher::FetchAsyncSignals(ContextInfo info) {
@@ -95,10 +89,6 @@ void ContextInfoFetcher::Fetch(ContextInfoCallback callback) {
               Profile::FromBrowserContext(browser_context_)));
 
   Profile* profile = Profile::FromBrowserContext(browser_context_);
-  info.safe_browsing_protection_level =
-      device_signals::GetSafeBrowsingProtectionLevel(profile->GetPrefs());
-  info.password_protection_warning_trigger =
-      device_signals::GetPasswordProtectionWarningTrigger(profile->GetPrefs());
   info.enterprise_profile_id = GetEnterpriseProfileId(profile);
 
   base::ThreadPool::CreateTaskRunner({base::MayBlock()})

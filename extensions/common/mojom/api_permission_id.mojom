@@ -236,7 +236,7 @@ enum APIPermissionID {
   kWebrtcLoggingPrivateAudioDebug = 209,
   kEnterpriseReportingPrivate = 210,
   kCecPrivate = 211,
-  kSafeBrowsingPrivate = 212,
+  kDeleted_SafeBrowsingPrivate = 212,
   kDeleted_FileSystemRequestDownloads = 213,
   kDeleted_SystemPowerSource = 214,
   kArcAppsPrivate = 215,

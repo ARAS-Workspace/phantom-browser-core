@@ -323,10 +323,6 @@ class ScopedExtensionPrefUpdate : public prefs::ScopedDictionaryPrefUpdate {
   const ExtensionId extension_id_;
 };
 
-// Whether SetAlertSystemFirstRun() should always return true, so that alerts
-// are triggered, even in first run.
-bool g_run_alerts_in_first_run_for_testing = false;
-
 }  // namespace
 
 //
@@ -1025,7 +1021,7 @@ bool ExtensionPrefs::SetAlertSystemFirstRun() {
     return true;
   }
   prefs_->SetBoolean(pref_names::kAlertsInitialized, true);
-  return g_run_alerts_in_first_run_for_testing;  // Note: normally false.
+  return false;
 }
 
 bool ExtensionPrefs::DidExtensionEscalatePermissions(
@@ -2122,11 +2118,6 @@ void ExtensionPrefs::SetNeedsSync(const ExtensionId& extension_id,
     value = base::Value(true);
   }
   UpdateExtensionPref(extension_id, kPrefNeedsSync, std::move(value));
-}
-
-// static
-void ExtensionPrefs::SetRunAlertsInFirstRunForTest() {
-  g_run_alerts_in_first_run_for_testing = true;
 }
 
 const char ExtensionPrefs::kFakeObsoletePrefForTesting[] =

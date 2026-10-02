@@ -488,7 +488,6 @@ class AdsPageLoadMetricsObserverTest
         web_contents(), this,
         base::BindRepeating(&AdsPageLoadMetricsObserverTest::RegisterObservers,
                             base::Unretained(this)));
-    ConfigureAsSubresourceFilterOnlyURL(GURL(kAdUrl));
 
     // Run all sites in dry run mode, so that AdTagging works as expected. In
     // browser environments, all sites activate with dry run by default.
@@ -1491,7 +1490,6 @@ TEST_P(AdsPageLoadMetricsObserverTest, FilterAds_DoNotLogMetrics) {
       subresource_filter::ActivationScope::ACTIVATION_LIST,
       subresource_filter::ActivationList::SUBRESOURCE_FILTER));
 
-  ConfigureAsSubresourceFilterOnlyURL(GURL(kNonAdUrl));
   NavigateMainFrame(kNonAdUrl);
 
   ResourceDataUpdate(main_rfh(), ResourceCached::kNotCached, base::KiBU(10),

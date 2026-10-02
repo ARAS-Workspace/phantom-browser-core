@@ -452,18 +452,6 @@ ExtensionFunction::ResponseAction SetPreferenceFunction::Run() {
         base::Value(browser_pref_value->GetBool()));
   }
 
-  // Whenever an extension takes control of the |kSafeBrowsingEnabled|
-  // preference, it must also set |kSafeBrowsingEnhanced| to false.
-  // See crbug.com/40681445 for more background.
-  //
-  // TODO(crbug.com/40681445): Consider extending
-  // chrome.privacy.services.safeBrowsingEnabled to a three-state enum.
-  if (prefs::kSafeBrowsingEnabled == browser_pref) {
-    prefs_helper->SetExtensionControlledPref(extension_id(),
-                                             prefs::kSafeBrowsingEnhanced,
-                                             scope, base::Value(false));
-  }
-
   prefs_helper->SetExtensionControlledPref(extension_id(), browser_pref, scope,
                                            browser_pref_value->Clone());
 
@@ -513,16 +501,6 @@ ExtensionFunction::ResponseAction ClearPreferenceFunction::Run() {
   prefs_helper->RemoveExtensionControlledPref(extension_id(), browser_pref,
                                               scope);
 
-  // Whenever an extension clears the |kSafeBrowsingEnabled| preference,
-  // it must also clear |kSafeBrowsingEnhanced|. See crbug.com/40681445 for
-  // more background.
-  //
-  // TODO(crbug.com/40681445): Consider extending
-  // chrome.privacy.services.safeBrowsingEnabled to a three-state enum.
-  if (prefs::kSafeBrowsingEnabled == browser_pref) {
-    prefs_helper->RemoveExtensionControlledPref(
-        extension_id(), prefs::kSafeBrowsingEnhanced, scope);
-  }
   return RespondNow(NoArguments());
 }
 

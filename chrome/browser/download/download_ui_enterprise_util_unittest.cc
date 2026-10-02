@@ -21,25 +21,6 @@
 namespace download {
 namespace {
 
-constexpr char kDownloadConnectorEnabledNonBlockingPref[] = R"([
-  {
-    "service_provider": "google",
-    "enable": [
-      {"url_list": ["*"], "tags": ["malware"]}
-    ]
-  }
-])";
-
-constexpr char kDownloadConnectorEnabledBlockingPref[] = R"([
-  {
-    "service_provider": "google",
-    "block_until_verdict":1,
-    "enable": [
-      {"url_list": ["*"], "tags": ["malware"]}
-    ]
-  }
-])";
-
 class DownloadUiEnterpriseUtilTest : public ::testing::Test {
  public:
   DownloadUiEnterpriseUtilTest()
@@ -54,10 +35,6 @@ class DownloadUiEnterpriseUtilTest : public ::testing::Test {
     profile_ = testing_profile_manager_.CreateTestingProfile("testing_profile");
     policy::SetDMTokenForTesting(
         policy::DMToken::CreateValidToken("fake-token"));
-    profile_->GetPrefs()->SetInteger(
-        AnalysisConnectorScopePref(
-            enterprise_connectors::AnalysisConnector::FILE_DOWNLOADED),
-        policy::POLICY_SCOPE_MACHINE);
   }
 
   void TearDown() override { profile_ = nullptr; }
@@ -71,18 +48,6 @@ class DownloadUiEnterpriseUtilTest : public ::testing::Test {
 };
 
 TEST_F(DownloadUiEnterpriseUtilTest, DoesDownloadConnectorBlock) {
-  EXPECT_FALSE(DoesDownloadConnectorBlock(profile_, GURL()));
-  profile_->GetPrefs()->Set(
-      enterprise_connectors::AnalysisConnectorPref(
-          enterprise_connectors::FILE_DOWNLOADED),
-      *base::JSONReader::Read(kDownloadConnectorEnabledNonBlockingPref,
-                              base::JSON_PARSE_CHROMIUM_EXTENSIONS));
-  EXPECT_FALSE(DoesDownloadConnectorBlock(profile_, GURL()));
-  profile_->GetPrefs()->Set(
-      enterprise_connectors::AnalysisConnectorPref(
-          enterprise_connectors::FILE_DOWNLOADED),
-      *base::JSONReader::Read(kDownloadConnectorEnabledBlockingPref,
-                              base::JSON_PARSE_CHROMIUM_EXTENSIONS));
   EXPECT_FALSE(DoesDownloadConnectorBlock(profile_, GURL()));
 }
 

@@ -35,11 +35,6 @@ namespace page_content_annotations {
 class PageStabilityMonitor;
 }
 
-namespace safe_browsing {
-class ContentPhishingClassifierDelegate;
-class ContentPhishingImageEmbedderDelegate;
-}  // namespace safe_browsing
-
 namespace language_detection {
 class LanguageDetectionAgent;
 }

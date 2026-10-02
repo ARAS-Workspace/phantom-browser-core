@@ -96,10 +96,6 @@ namespace custom_handlers {
 class ProtocolHandlerRegistry;
 }  // namespace custom_handlers
 
-namespace safe_browsing {
-class SafeBrowsingDatabaseManager;
-}  // namespace safe_browsing
-
 namespace extensions {
 
 class Blocklist;
@@ -596,14 +592,6 @@ class ExtensionsBrowserClient {
   // management policy providers (ie. network admin and Google-managed
   // blocklist).
   virtual void CheckManagementPolicy(content::BrowserContext* context);
-
-  // Get the locally-managed database manager of the safe browsing service.
-  virtual scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-  GetSafeBrowsingDatabaseManager() const;
-
-  // Get the default v4 protocol config struct from the safe browsing service.
-  virtual std::optional<safe_browsing::V4ProtocolConfig> GetV4ProtocolConfig()
-      const;
 
   // Notifies the ExtensionActionRunner that an extension has been granted
   // active tab permissions. This will run any pending injections for that

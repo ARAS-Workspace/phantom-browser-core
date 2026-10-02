@@ -57,15 +57,6 @@ bool ShouldUseDohFallback(net::SecureDnsMode secure_dns_mode,
     return false;
   }
 
-  // If the feature is enabled then return the boolean value of the pref.
-  // DoH fallback is a new setting introduced in the Bundled Security Settings
-  // for Secure DNS. If the new UI is enabled to make the setting available,
-  // then just check user choice in the pref.
-  if (base::FeatureList::IsEnabled(
-          safe_browsing::kBundledSecuritySettingsSecureDnsV2)) {
-    return doh_config_source.AutomaticModeFallbackToDohEnabled();
-  }
-
   return false;
 }
 

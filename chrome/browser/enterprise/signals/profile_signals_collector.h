@@ -17,10 +17,6 @@ namespace policy {
 class CloudPolicyManager;
 }  // namespace policy
 
-namespace enterprise_connectors {
-class ConnectorsService;
-}  // namespace enterprise_connectors
-
 namespace enterprise {
 class ProfileIdService;
 }  // namespace enterprise

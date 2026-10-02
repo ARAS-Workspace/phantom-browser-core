@@ -345,7 +345,6 @@ test("components_unittests") {
     "//components/browser_sync:unit_tests",
     "//components/enterprise:unit_tests",
     "//components/enterprise/common:unit_tests",
-    "//components/enterprise/data_protection:unit_tests",
     "//components/enterprise/isolated_mode:unit_tests",
     "//components/send_tab_to_self:unit_tests",
     "//components/sync_sessions:unit_tests",

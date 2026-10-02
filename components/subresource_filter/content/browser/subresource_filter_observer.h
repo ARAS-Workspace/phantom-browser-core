@@ -5,7 +5,6 @@
 #ifndef COMPONENTS_SUBRESOURCE_FILTER_CONTENT_BROWSER_SUBRESOURCE_FILTER_OBSERVER_H_
 #define COMPONENTS_SUBRESOURCE_FILTER_CONTENT_BROWSER_SUBRESOURCE_FILTER_OBSERVER_H_
 
-#include "components/subresource_filter/content/browser/subresource_filter_safe_browsing_client.h"
 #include "components/subresource_filter/core/common/activation_decision.h"
 #include "components/subresource_filter/core/common/load_policy.h"
 
@@ -35,18 +34,6 @@ class SubresourceFilterObserver {
   // Called before the observer manager is destroyed. Observers must unregister
   // themselves by this point.
   virtual void OnSubresourceFilterGoingAway() {}
-
-  // The results from a set of safe browsing checks, stored as a vector.
-  using SafeBrowsingCheckResults =
-      std::vector<SubresourceFilterSafeBrowsingClient::CheckResult>;
-
-  // Called when the SubresourceFilter Safe Browsing checks are available for
-  // this root frame navigation. Will be called at WillProcessResponse time at
-  // the latest. Right now it will only include phishing and subresource filter
-  // threat types.
-  virtual void OnSafeBrowsingChecksComplete(
-      content::NavigationHandle* navigation_handle,
-      const SubresourceFilterSafeBrowsingClient::CheckResult& result) {}
 
   // Called at most once per navigation when page activation is computed. This
   // will be called before ReadyToCommitNavigation.

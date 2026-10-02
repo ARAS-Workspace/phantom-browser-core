@@ -274,8 +274,6 @@ ChromeSecurityBlockingPageFactory::CreateHttpsOnlyModeBlockingPage(
   std::unique_ptr<HttpsOnlyModeControllerClient> client =
       std::make_unique<HttpsOnlyModeControllerClient>(
           web_contents, request_url, CreateSettingsPageHelper());
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
 
   if (url_type_param) {
     if (*url_type_param == "advanced_protection") {

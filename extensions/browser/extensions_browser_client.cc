@@ -285,16 +285,6 @@ ExtensionsBrowserClient::GetProtocolHandlerRegistry(
 void ExtensionsBrowserClient::CheckManagementPolicy(
     content::BrowserContext* context) {}
 
-scoped_refptr<safe_browsing::SafeBrowsingDatabaseManager>
-ExtensionsBrowserClient::GetSafeBrowsingDatabaseManager() const {
-  return nullptr;
-}
-
-std::optional<safe_browsing::V4ProtocolConfig>
-ExtensionsBrowserClient::GetV4ProtocolConfig() const {
-  return std::nullopt;
-}
-
 void ExtensionsBrowserClient::OnActiveTabPermissionGranted(
     const Extension* extension,
     content::WebContents* web_contents) const {}

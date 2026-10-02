@@ -10,12 +10,16 @@ source_set("watermarking") {
   sources = [
     "watermark.cc",
     "watermark.h",
+    "watermark_prefs.cc",
+    "watermark_prefs.h",
   ]
 
   public_deps = [
     "//skia",
     "//ui/gfx",
   ]
+
+  deps = [ "//components/prefs" ]
 }
 
 source_set("watermarking_handler") {
@@ -29,6 +33,7 @@ source_set("watermarking_handler") {
     ]
 
     deps += [
+      ":watermarking",
       "//components/policy/core/browser",
       "//components/policy/core/common",
       "//components/prefs",

@@ -183,16 +183,11 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
   };
   source->AddLocalizedStrings(kStrings);
 
-  source->AddLocalizedString(
-      "dangerUncommonDesc",
-      requests_ap_verdicts
-          ? IDS_BLOCK_REASON_UNCOMMON_DOWNLOAD_IN_ADVANCED_PROTECTION
-          : IDS_BLOCK_DOWNLOAD_REASON_UNCOMMON);
+  source->AddLocalizedString("dangerUncommonDesc",
+                             IDS_BLOCK_DOWNLOAD_REASON_UNCOMMON);
   source->AddLocalizedString(
       "dangerUncommonSuspiciousArchiveDesc",
-      requests_ap_verdicts
-          ? IDS_BLOCK_REASON_UNCOMMON_DOWNLOAD_IN_ADVANCED_PROTECTION
-          : IDS_BLOCK_DOWNLOAD_REASON_UNCOMMON_SUSPICIOUS_ARCHIVE);
+      IDS_BLOCK_DOWNLOAD_REASON_UNCOMMON_SUSPICIOUS_ARCHIVE);
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   // Download Row ESB Promo:

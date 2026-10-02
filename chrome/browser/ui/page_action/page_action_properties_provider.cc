@@ -66,14 +66,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionShowJsOptimizationsIcon,
-        {
-            .histogram_name = "JsOptimizations",
-            .type = PageActionIconType::kJsOptimizations,
-            .element_identifier = kJsOptimizationsIconElementId,
-        },
-    },
-    {
         kActionRecordReplay,
         {
             .histogram_name = "RecordReplay",

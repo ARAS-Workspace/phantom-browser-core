@@ -33,8 +33,7 @@ namespace {
 
 std::vector<std::string> GetSyncedServicePrefNames() {
   return {
-    prefs::kSearchSuggestEnabled, prefs::kSafeBrowsingEnabled,
-        prefs::kSafeBrowsingScoutReportingEnabled,
+    prefs::kSearchSuggestEnabled,
         commerce::kPriceEmailNotificationsEnabled,
   };
 }

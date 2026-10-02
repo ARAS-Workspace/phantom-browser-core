@@ -119,8 +119,6 @@ TEST_F(GeneratedJavascriptOptimizerPrefTest, GetPrefObject_FeatureDisabled) {
   host_content_settings_map()->SetDefaultContentSetting(
       ContentSettingsType::JAVASCRIPT_OPTIMIZER,
       ContentSetting::CONTENT_SETTING_ALLOW);
-  prefs()->SetBoolean(prefs::kJavascriptOptimizerBlockedForUnfamiliarSites,
-                      true);
 
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndDisableFeature(
@@ -133,8 +131,6 @@ TEST_F(GeneratedJavascriptOptimizerPrefTest, GetPrefObject_FeatureDisabled) {
 // kJavascriptOptimizerBlockedForUnfamiliarSites is updated by
 // non generated-pref code.
 TEST_F(GeneratedJavascriptOptimizerPrefTest, GetPrefObject_SafeBrowsingOff) {
-  profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-
   PrefObject pref_object =
       GeneratedJavascriptOptimizerPref(profile()).GetPrefObject();
   EXPECT_EQ(static_cast<int>(JavascriptOptimizerSetting::kAllowed),
@@ -149,10 +145,6 @@ TEST_F(GeneratedJavascriptOptimizerPrefTest,
        GetPrefObject_PolicyDisablesFeature) {
   base::test::ScopedFeatureList scoped_feature_list;
   EnableFeature(&scoped_feature_list);
-  // Could be set by the user via chrome://settings prior to policy being set by
-  // administrator.
-  prefs()->SetBoolean(prefs::kJavascriptOptimizerBlockedForUnfamiliarSites,
-                      true);
 
   ContentSettingsRegistry::GetInstance();
   profile()->GetTestingPrefService()->SetManagedPref(
@@ -167,14 +159,13 @@ TEST_F(GeneratedJavascriptOptimizerPrefTest, SetPrefResult) {
   const struct TestCase {
     JavascriptOptimizerSetting setting;
     ContentSetting expected_content_setting;
-    bool expected_pref_blocked_for_unfamiliar_sites;
   } kTestCases[] = {
       {JavascriptOptimizerSetting::kAllowed,
-       ContentSetting::CONTENT_SETTING_ALLOW, false},
+       ContentSetting::CONTENT_SETTING_ALLOW},
       {JavascriptOptimizerSetting::kBlockedForUnfamiliarSites,
-       ContentSetting::CONTENT_SETTING_ALLOW, true},
+       ContentSetting::CONTENT_SETTING_ALLOW},
       {JavascriptOptimizerSetting::kBlocked,
-       ContentSetting::CONTENT_SETTING_BLOCK, false},
+       ContentSetting::CONTENT_SETTING_BLOCK},
   };
 
   for (const auto& test_case : kTestCases) {
@@ -185,9 +176,6 @@ TEST_F(GeneratedJavascriptOptimizerPrefTest, SetPrefResult) {
     EXPECT_EQ(host_content_settings_map()->GetDefaultContentSetting(
                   ContentSettingsType::JAVASCRIPT_OPTIMIZER),
               test_case.expected_content_setting);
-    EXPECT_EQ(prefs()->GetBoolean(
-                  prefs::kJavascriptOptimizerBlockedForUnfamiliarSites),
-              test_case.expected_pref_blocked_for_unfamiliar_sites);
   }
 }
 

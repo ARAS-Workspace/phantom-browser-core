@@ -826,10 +826,6 @@
       "chrome://print/*"
     ]
   }],
-  "safeBrowsingPrivate": {
-    "dependencies": ["permission:safeBrowsingPrivate"],
-    "contexts": ["privileged_extension"]
-  },
   "search": {
     "dependencies": ["permission:search"],
     "contexts": ["privileged_extension"]

@@ -15,7 +15,6 @@
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/media/webrtc/media_stream_capture_indicator.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
-#include "chrome/browser/picture_in_picture/auto_picture_in_picture_safe_browsing_checker_client.h"
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_tab_observer_helper_base.h"
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_window_occlusion_helper_base.h"
 #include "chrome/browser/picture_in_picture/auto_pip_setting_helper.h"
@@ -35,9 +34,6 @@
 #include "chrome/browser/picture_in_picture/auto_pip_setting_overlay_view.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
 
 using OcclusionState =
     AutoPictureInPictureWindowOcclusionHelperBase::OcclusionState;
@@ -581,7 +577,6 @@ void AutoPictureInPictureTabHelper::MaybeReportAutoPictureInPictureInfoChanged()
 
 void AutoPictureInPictureTabHelper::StopAndResetAsyncTasks() {
   async_tasks_weak_factory_.InvalidateWeakPtrs();
-  safe_browsing_checker_client_.reset();
 
   has_safe_url_ = false;
 }

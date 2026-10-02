@@ -15,8 +15,6 @@ std::string ReasonIdToString(DisabledReasonId reason_id) {
       return "Unknown";
     case DisabledReasonId::kPopupBlockerTabHelper:
       return "PopupBlockerTabHelper";
-    case DisabledReasonId::kSafeBrowsingTriggeredPopupBlocker:
-      return "SafeBrowsingTriggeredPopupBlocker";
     case DisabledReasonId::kSafeBrowsingThreatDetails:
       return "safe_browsing::ThreatDetails";
     case DisabledReasonId::kDomDistillerViewerSource:

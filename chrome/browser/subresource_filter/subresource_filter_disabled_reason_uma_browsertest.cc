@@ -125,13 +125,6 @@ IN_PROC_BROWSER_TEST_F(
   base::HistogramTester histogram_tester;
   GURL url = GetURL("subresource_filter/frame_with_no_subresources.html");
 
-  // Null out the database manager. With no database manager, the activation
-  // computing throttle is created but never told to activate, so it never
-  // creates an AsyncDocumentSubresourceFilter. This is the scenario for
-  // kFilterNeverCreated.
-  auto* helper = subresource_filter::ContentSubresourceFilterWebContentsHelper::
-      FromWebContents(browser()->tab_strip_model()->GetActiveWebContents());
-  helper->SetDatabaseManagerForTesting(nullptr);
 
   ASSERT_NO_FATAL_FAILURE(SetRulesetToDisallowURLsWithPathSuffix(
       "suffix-that-does-not-match-anything"));

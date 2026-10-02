@@ -397,7 +397,7 @@ TEST_F(EnterpriseReportingPrivateGetContextInfoTest, NoSpecialContext) {
             info.realtime_url_check_mode);
   EXPECT_TRUE(info.on_security_event_providers.empty());
   EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
+  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kDisabled,
             info.safe_browsing_protection_level);
   EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
             info.built_in_dns_client_enabled);
@@ -407,57 +407,6 @@ TEST_F(EnterpriseReportingPrivateGetContextInfoTest, NoSpecialContext) {
   EXPECT_FALSE(info.chrome_remote_desktop_app_blocked);
   EXPECT_TRUE(info.enterprise_profile_id);
 }
-
-class EnterpriseReportingPrivateGetContextInfoSafeBrowsingTest
-    : public EnterpriseReportingPrivateGetContextInfoTest,
-      public testing::WithParamInterface<std::tuple<bool, bool>> {};
-
-TEST_P(EnterpriseReportingPrivateGetContextInfoSafeBrowsingTest, Test) {
-  std::tuple<bool, bool> params = GetParam();
-
-  bool safe_browsing_enabled = std::get<0>(params);
-  bool safe_browsing_enhanced_enabled = std::get<1>(params);
-
-  profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled,
-                                    safe_browsing_enabled);
-  profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnhanced,
-                                    safe_browsing_enhanced_enabled);
-  enterprise_reporting_private::ContextInfo info = GetContextInfo();
-
-  EXPECT_TRUE(info.browser_affiliation_ids.empty());
-  EXPECT_TRUE(info.profile_affiliation_ids.empty());
-  EXPECT_TRUE(info.on_file_attached_providers.empty());
-  EXPECT_TRUE(info.on_file_downloaded_providers.empty());
-  EXPECT_TRUE(info.on_bulk_data_entry_providers.empty());
-  EXPECT_EQ(enterprise_reporting_private::RealtimeUrlCheckMode::kDisabled,
-            info.realtime_url_check_mode);
-  EXPECT_TRUE(info.on_security_event_providers.empty());
-  EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-
-  if (!safe_browsing_enabled) {
-    EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kDisabled,
-              info.safe_browsing_protection_level);
-  } else if (safe_browsing_enhanced_enabled) {
-    EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kEnhanced,
-              info.safe_browsing_protection_level);
-  } else {
-    EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
-              info.safe_browsing_protection_level);
-  }
-  EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
-            info.built_in_dns_client_enabled);
-  EXPECT_EQ(
-      enterprise_reporting_private::PasswordProtectionTrigger::kPolicyUnset,
-      info.password_protection_warning_trigger);
-  EXPECT_TRUE(info.enterprise_profile_id);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    EnterpriseReportingPrivateGetContextInfoSafeBrowsingTest,
-    testing::Values(std::make_tuple(false, false),
-                    std::make_tuple(true, false),
-                    std::make_tuple(true, true)));
 
 class EnterpriseReportingPrivateGetContextInfoBuiltInDnsClientTest
     : public EnterpriseReportingPrivateGetContextInfoTest,
@@ -480,7 +429,7 @@ TEST_P(EnterpriseReportingPrivateGetContextInfoBuiltInDnsClientTest, Test) {
             info.realtime_url_check_mode);
   EXPECT_TRUE(info.on_security_event_providers.empty());
   EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
+  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kDisabled,
             info.safe_browsing_protection_level);
   EXPECT_EQ(policyValue, info.built_in_dns_client_enabled);
   EXPECT_EQ(
@@ -493,66 +442,6 @@ INSTANTIATE_TEST_SUITE_P(
     ,
     EnterpriseReportingPrivateGetContextInfoBuiltInDnsClientTest,
     testing::Bool());
-
-class EnterpriseReportingPrivateGetContextPasswordProtectionWarningTrigger
-    : public EnterpriseReportingPrivateGetContextInfoTest,
-      public testing::WithParamInterface<
-          enterprise_reporting_private::PasswordProtectionTrigger> {
- public:
-  safe_browsing::PasswordProtectionTrigger MapPasswordProtectionTriggerToPolicy(
-      enterprise_reporting_private::PasswordProtectionTrigger enumValue) {
-    switch (enumValue) {
-      case enterprise_reporting_private::PasswordProtectionTrigger::
-          kPasswordProtectionOff:
-        return safe_browsing::PASSWORD_PROTECTION_OFF;
-      case enterprise_reporting_private::PasswordProtectionTrigger::
-          kPasswordReuse:
-        return safe_browsing::PASSWORD_REUSE;
-      case enterprise_reporting_private::PasswordProtectionTrigger::
-          kPhishingReuse:
-        return safe_browsing::PHISHING_REUSE;
-      default:
-        NOTREACHED();
-    }
-  }
-};
-
-TEST_P(EnterpriseReportingPrivateGetContextPasswordProtectionWarningTrigger,
-       Test) {
-  enterprise_reporting_private::PasswordProtectionTrigger passwordTriggerValue =
-      GetParam();
-
-  profile()->GetPrefs()->SetInteger(
-      prefs::kPasswordProtectionWarningTrigger,
-      MapPasswordProtectionTriggerToPolicy(passwordTriggerValue));
-  enterprise_reporting_private::ContextInfo info = GetContextInfo();
-
-  EXPECT_TRUE(info.browser_affiliation_ids.empty());
-  EXPECT_TRUE(info.profile_affiliation_ids.empty());
-  EXPECT_TRUE(info.on_file_attached_providers.empty());
-  EXPECT_TRUE(info.on_file_downloaded_providers.empty());
-  EXPECT_TRUE(info.on_bulk_data_entry_providers.empty());
-  EXPECT_EQ(enterprise_reporting_private::RealtimeUrlCheckMode::kDisabled,
-            info.realtime_url_check_mode);
-  EXPECT_TRUE(info.on_security_event_providers.empty());
-  EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
-            info.safe_browsing_protection_level);
-  EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
-            info.built_in_dns_client_enabled);
-  EXPECT_EQ(passwordTriggerValue, info.password_protection_warning_trigger);
-  EXPECT_TRUE(info.enterprise_profile_id);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    EnterpriseReportingPrivateGetContextPasswordProtectionWarningTrigger,
-    testing::Values(
-        enterprise_reporting_private::PasswordProtectionTrigger::
-            kPasswordProtectionOff,
-        enterprise_reporting_private::PasswordProtectionTrigger::kPasswordReuse,
-        enterprise_reporting_private::PasswordProtectionTrigger::
-            kPhishingReuse));
 
 #if BUILDFLAG(IS_LINUX)
 class EnterpriseReportingPrivateGetContextOSFirewallLinuxTest
@@ -577,7 +466,7 @@ class EnterpriseReportingPrivateGetContextOSFirewallLinuxTest
               info.realtime_url_check_mode);
     EXPECT_TRUE(info.on_security_event_providers.empty());
     EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-    EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
+    EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kDisabled,
               info.safe_browsing_protection_level);
     EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
               info.built_in_dns_client_enabled);
@@ -685,7 +574,7 @@ class EnterpriseReportingPrivateGetContextInfoChromeRemoteDesktopAppBlockedTest
               info.realtime_url_check_mode);
     EXPECT_TRUE(info.on_security_event_providers.empty());
     EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-    EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
+    EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kDisabled,
               info.safe_browsing_protection_level);
     EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
               info.built_in_dns_client_enabled);
@@ -740,61 +629,6 @@ INSTANTIATE_TEST_SUITE_P(
                     "corp.google.com",
                     "google.com",
                     "https://*"));
-
-
-class EnterpriseReportingPrivateGetContextInfoRealTimeURLCheckTest
-    : public EnterpriseReportingPrivateGetContextInfoTest,
-      public testing::WithParamInterface<bool> {
- public:
-  EnterpriseReportingPrivateGetContextInfoRealTimeURLCheckTest() {
-    policy::SetDMTokenForTesting(
-        policy::DMToken::CreateValidToken("fake-token"));
-  }
-
-  bool url_check_enabled() const { return GetParam(); }
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    EnterpriseReportingPrivateGetContextInfoRealTimeURLCheckTest,
-    testing::Bool());
-
-TEST_P(EnterpriseReportingPrivateGetContextInfoRealTimeURLCheckTest, Test) {
-  profile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckMode,
-      url_check_enabled()
-          ? enterprise_connectors::REAL_TIME_CHECK_FOR_MAINFRAME_ENABLED
-          : enterprise_connectors::REAL_TIME_CHECK_DISABLED);
-  profile()->GetPrefs()->SetInteger(
-      enterprise_connectors::kEnterpriseRealTimeUrlCheckScope,
-      policy::POLICY_SCOPE_MACHINE);
-  enterprise_reporting_private::ContextInfo info = GetContextInfo();
-
-  if (url_check_enabled()) {
-    EXPECT_EQ(
-        enterprise_reporting_private::RealtimeUrlCheckMode::kEnabledMainFrame,
-        info.realtime_url_check_mode);
-  } else {
-    EXPECT_EQ(enterprise_reporting_private::RealtimeUrlCheckMode::kDisabled,
-              info.realtime_url_check_mode);
-  }
-
-  EXPECT_TRUE(info.browser_affiliation_ids.empty());
-  EXPECT_TRUE(info.profile_affiliation_ids.empty());
-  EXPECT_TRUE(info.on_file_attached_providers.empty());
-  EXPECT_TRUE(info.on_file_downloaded_providers.empty());
-  EXPECT_TRUE(info.on_bulk_data_entry_providers.empty());
-  EXPECT_TRUE(info.on_security_event_providers.empty());
-  EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
-            info.safe_browsing_protection_level);
-  EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
-            info.built_in_dns_client_enabled);
-  EXPECT_EQ(
-      enterprise_reporting_private::PasswordProtectionTrigger::kPolicyUnset,
-      info.password_protection_warning_trigger);
-  EXPECT_TRUE(info.enterprise_profile_id);
-}
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 

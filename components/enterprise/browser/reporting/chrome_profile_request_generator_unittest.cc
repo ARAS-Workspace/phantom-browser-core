@@ -87,21 +87,14 @@ device_signals::SignalsAggregationResponse CreateFilledResponse(
   device_signals::ProfileSignalsResponse profile_signals;
   profile_signals.built_in_dns_client_enabled = true;
   profile_signals.chrome_remote_desktop_app_blocked = false;
-  profile_signals.password_protection_warning_trigger =
-      safe_browsing::PasswordProtectionTrigger::PHISHING_REUSE;
   // Test that there is no issue if domain can't be collected.
   profile_signals.profile_enrollment_domain = std::nullopt;
-  profile_signals.safe_browsing_protection_level =
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION;
   profile_signals.site_isolation_enabled = true;
 
   profile_signals.profile_id = kFakeProfileId;
   if (nullify_profile_id) {
     profile_signals.profile_id = std::nullopt;
   }
-
-  profile_signals.realtime_url_check_mode = enterprise_connectors::
-      EnterpriseRealTimeUrlCheckMode::REAL_TIME_CHECK_FOR_MAINFRAME_ENABLED;
 
   response.profile_signals_response = profile_signals;
 
@@ -297,18 +290,12 @@ class ChromeProfileRequestGeneratorTest
       EXPECT_EQ(profile_signals_report.built_in_dns_client_enabled(), true);
       EXPECT_EQ(profile_signals_report.chrome_remote_desktop_app_blocked(),
                 false);
-      EXPECT_EQ(profile_signals_report.password_protection_warning_trigger(),
-                em::ProfileSignalsReport::PHISHING_REUSE);
       // If a value cannot be collected, this report field will be empty.
       EXPECT_EQ(profile_signals_report.profile_enrollment_domain(),
                 std::string());
-      EXPECT_EQ(profile_signals_report.safe_browsing_protection_level(),
-                em::ProfileSignalsReport::STANDARD_PROTECTION);
       EXPECT_EQ(profile_signals_report.site_isolation_enabled(), true);
       EXPECT_EQ(chrome_user_profile_info.profile_id(),
                 is_profile_id_null ? std::string() : kFakeProfileId);
-      EXPECT_EQ(profile_signals_report.realtime_url_check_mode(),
-                em::ProfileSignalsReport::ENABLED_MAIN_FRAME);
 
       if (expect_cert_signals) {
         EXPECT_EQ(1, chrome_user_profile_info.certificates_size());

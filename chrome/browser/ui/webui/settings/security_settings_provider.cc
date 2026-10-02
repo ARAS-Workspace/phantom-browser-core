@@ -12,8 +12,7 @@ namespace settings {
 void AddSecurityData(content::WebUIDataSource* html_source) {
   html_source->AddBoolean(
       "enableBundledSecuritySettingsSecureDnsV2",
-      base::FeatureList::IsEnabled(
-          safe_browsing::kBundledSecuritySettingsSecureDnsV2));
+      false);
 }
 
 }  // namespace settings

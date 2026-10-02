@@ -4,6 +4,7 @@
 
 #include "components/enterprise/watermarking/watermark_style_policy_handler.h"
 
+#include "components/enterprise/watermarking/watermark_prefs.h"
 #include "components/policy/core/browser/policy_error_map.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/policy_constants.h"

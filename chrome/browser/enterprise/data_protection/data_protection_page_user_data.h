@@ -23,15 +23,6 @@ namespace enterprise_data_protection {
 class DataProtectionPageUserData
     : public content::PageUserData<DataProtectionPageUserData> {
  public:
-  // Sets the RT URL lookup response for the page of the WebContents' primary
-  // main RFH.  During navigations this should only be called after the page is
-  // ready to be committed, otherwise the state will be saved to an intermediate
-  // Page.
-  static void UpdateRTLookupResponse(
-      content::Page& page,
-      const std::string& identifier,
-      std::unique_ptr<safe_browsing::RTLookupResponse> rt_lookup_response);
-
   // Sets whether screenshots are allowed for the page of the WebContents'
   // primary main RFH.  During navigations this should only be called after the
   // page is ready to be committed, otherwise the state will be saved to an
@@ -47,22 +38,13 @@ class DataProtectionPageUserData
   // Data Controls rules.
   UrlSettings settings() const;
 
-  void set_rt_lookup_response(
-      std::unique_ptr<safe_browsing::RTLookupResponse> rt_lookup_response) {
-    rt_lookup_response_ = std::move(rt_lookup_response);
-  }
-  const safe_browsing::RTLookupResponse* rt_lookup_response() {
-    return rt_lookup_response_.get();
-  }
-
  private:
   friend class content::PageUserData<DataProtectionPageUserData>;
 
   DataProtectionPageUserData(
       content::Page& page,
       const std::string& identifier,
-      UrlSettings settings,
-      std::unique_ptr<safe_browsing::RTLookupResponse> rt_lookup_response);
+      UrlSettings settings);
 
   // There are two sources for data protection settings as of this writing: data
   // controls and URL filtering. data_controls_settings_, as the name suggests,
@@ -71,7 +53,6 @@ class DataProtectionPageUserData
   // rt_lookup_response_.
   std::string identifier_;
   UrlSettings data_controls_settings_;
-  std::unique_ptr<safe_browsing::RTLookupResponse> rt_lookup_response_;
 
   PAGE_USER_DATA_KEY_DECL();
 };

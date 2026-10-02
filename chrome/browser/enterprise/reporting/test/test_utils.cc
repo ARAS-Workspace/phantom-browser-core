@@ -37,17 +37,9 @@ void VerifyProfileSignalsReport(
   EXPECT_EQ(profile_signals_report.chrome_remote_desktop_app_blocked(),
             device_signals::GetChromeRemoteDesktopAppBlocked(
                 ChromePolicyBlocklistServiceFactory::GetForProfile(profile)));
-  EXPECT_EQ(profile_signals_report.password_protection_warning_trigger(),
-            TranslatePasswordProtectionTrigger(
-                device_signals::GetPasswordProtectionWarningTrigger(
-                    profile->GetPrefs())));
   CheckReportMatchSignal(
       profile_signals_report.profile_enrollment_domain(),
       device_signals::TryGetEnrollmentDomain(profile->GetCloudPolicyManager()));
-  EXPECT_EQ(
-      profile_signals_report.safe_browsing_protection_level(),
-      TranslateSafeBrowsingLevel(
-          device_signals::GetSafeBrowsingProtectionLevel(profile->GetPrefs())));
   EXPECT_EQ(profile_signals_report.site_isolation_enabled(),
             device_signals::GetSiteIsolationEnabled());
 }

@@ -273,14 +273,6 @@ void DownloadBubbleUIController::ProcessDownloadButtonPress(
   switch (command) {
     case DownloadCommands::KEEP:
     case DownloadCommands::DISCARD: {
-      if (safe_browsing::IsSafeBrowsingSurveysEnabled(*profile_->GetPrefs())) {
-        TrustSafetySentimentService* trust_safety_sentiment_service =
-            TrustSafetySentimentServiceFactory::GetForProfile(profile_);
-        if (trust_safety_sentiment_service) {
-          trust_safety_sentiment_service->InteractedWithDownloadWarningUI(
-              warning_surface, warning_action);
-        }
-      }
       DownloadItemWarningData::AddWarningActionEvent(item, warning_surface,
                                                      warning_action);
       // Launch a HaTS survey. Note this needs to come before the command is

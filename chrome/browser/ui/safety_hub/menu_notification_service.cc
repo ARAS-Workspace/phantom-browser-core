@@ -14,7 +14,6 @@
 #include "chrome/browser/ui/safety_hub/menu_notification.h"
 #include "chrome/browser/ui/safety_hub/notification_permission_review_service.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_service.h"
-#include "chrome/browser/ui/safety_hub/safe_browsing_result.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_constants.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_prefs.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_result.h"
@@ -32,9 +31,6 @@ const base::TimeDelta kRevokedPermissionsNotificationInterval = base::Days(10);
 // notifications.
 const base::TimeDelta kNotificationPermissionsNotificationInterval =
     base::Days(10);
-
-// Interval to show notification for safe browsing in Safety Hub notifications.
-const base::TimeDelta kSafeBrowsingNotificationInterval = base::Days(90);
 
 SafetyHubModuleInfoElement::SafetyHubModuleInfoElement() = default;
 SafetyHubModuleInfoElement::~SafetyHubModuleInfoElement() = default;
@@ -63,7 +59,6 @@ SafetyHubMenuNotificationService::SafetyHubMenuNotificationService(
   pref_dict_key_map_ = {
       {safety_hub::SafetyHubModuleType::UNUSED_SITE_PERMISSIONS,
        "unused-site-permissions"},
-      {safety_hub::SafetyHubModuleType::SAFE_BROWSING, "safe-browsing"},
   };
 
   // The Safety Hub services will be available whenever the |GetCachedResult|
@@ -88,12 +83,6 @@ SafetyHubMenuNotificationService::SafetyHubMenuNotificationService(
                             base::Unretained(notification_permissions_service)),
         stored_notifications);
   }
-  SetInfoElement(safety_hub::SafetyHubModuleType::SAFE_BROWSING,
-                 MenuNotificationPriority::MEDIUM,
-                 kSafeBrowsingNotificationInterval,
-                 base::BindRepeating(&SafetyHubSafeBrowsingResult::GetResult,
-                                     base::Unretained(pref_service)),
-                 stored_notifications);
 
   // Passwords are handled by GMS Core on Android.
   pref_dict_key_map_.emplace(safety_hub::SafetyHubModuleType::PASSWORDS,
@@ -104,15 +93,6 @@ SafetyHubMenuNotificationService::SafetyHubMenuNotificationService(
       base::BindRepeating(&PasswordStatusCheckResultAndroid::GetResult,
                           base::Unretained(pref_service)),
       stored_notifications);
-
-  // Listen for changes to the Safe Browsing pref to accommodate the trigger
-  // logic.
-  registrar_.Init(pref_service);
-  registrar_.Add(
-      prefs::kSafeBrowsingEnabled,
-      base::BindRepeating(
-          &SafetyHubMenuNotificationService::OnSafeBrowsingPrefUpdate,
-          base::Unretained(this)));
 }
 
 void SafetyHubMenuNotificationService::UpdateResultGetterForTesting(
@@ -122,9 +102,7 @@ void SafetyHubMenuNotificationService::UpdateResultGetterForTesting(
   module_info_map_[type]->result_getter = result_getter;
 }
 
-SafetyHubMenuNotificationService::~SafetyHubMenuNotificationService() {
-  registrar_.RemoveAll();
-}
+SafetyHubMenuNotificationService::~SafetyHubMenuNotificationService() = default;
 
 std::optional<MenuNotificationEntry>
 SafetyHubMenuNotificationService::GetNotificationToShow() {
@@ -238,14 +216,6 @@ void SafetyHubMenuNotificationService::SetInfoElement(
   module_info_map_[type] = std::make_unique<SafetyHubModuleInfoElement>(
       priority, interval, result_getter,
       GetNotificationFromDict(stored_notifications, type));
-}
-
-void SafetyHubMenuNotificationService::OnSafeBrowsingPrefUpdate() {
-  module_info_map_[safety_hub::SafetyHubModuleType::SAFE_BROWSING]
-      ->notification->SetOnlyShowAfter(base::Time::Now() + base::Days(1));
-  module_info_map_[safety_hub::SafetyHubModuleType::SAFE_BROWSING]
-      ->notification->ResetAllTimeNotificationCount();
-  SaveNotificationsToPrefs();
 }
 
 void SafetyHubMenuNotificationService::DismissActiveNotification() {

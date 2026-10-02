@@ -1557,10 +1557,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, MAYBE_DownloadHistoryCheck) {
 
 // Make sure a dangerous file shows up properly in the history.
 IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadHistoryDangerCheck) {
-  // Disable SafeBrowsing so that danger will be determined by downloads system.
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled,
-                                                  false);
-
   // .swf file so that it's dangerous on all platforms (including CrOS).
   embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
   ASSERT_TRUE(embedded_test_server()->Start());

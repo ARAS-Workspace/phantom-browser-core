@@ -1089,19 +1089,6 @@ void DownloadToolbarUIController::ShowIphPromo() {
     button->SetProperty(views::kElementIdentifierKey,
                         kToolbarDownloadButtonElementId);
   }
-  Profile* profile = browser_view_->GetProfile();
-  // Don't show IPH Promo if safe browsing level is set by policy.
-  if (safe_browsing::SafeBrowsingPolicyHandler::
-          IsSafeBrowsingProtectionLevelSetByPolicy(profile->GetPrefs())) {
-    return;
-  }
-  if (safe_browsing::GetSafeBrowsingState(*profile->GetPrefs()) ==
-          safe_browsing::SafeBrowsingState::STANDARD_PROTECTION &&
-      !profile->IsOffTheRecord()) {
-    BrowserUserEducationInterface::From(browser_view_->browser())
-        ->MaybeShowFeaturePromo(
-            feature_engagement::kIPHDownloadEsbPromoFeature);
-  }
 #endif
 }
 

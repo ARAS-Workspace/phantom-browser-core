@@ -73,9 +73,6 @@ bool HasNonDefaultPrivacySetting(Profile* profile) {
   auto* prefs = profile->GetPrefs();
 
   std::vector<std::string> prefs_to_check = {
-      prefs::kSafeBrowsingEnabled,
-      prefs::kSafeBrowsingEnhanced,
-      prefs::kSafeBrowsingScoutReportingEnabled,
       prefs::kEnableDoNotTrack,
       password_manager::prefs::kPasswordLeakDetectionEnabled,
       prefs::kCookieControlsMode,
@@ -148,21 +145,6 @@ std::map<std::string, bool> GetPrivacySettingsProductSpecificData(
       HasNonDefaultPrivacySetting(profile);
   product_specific_data["Ran safety check"] = ran_safety_check;
   return product_specific_data;
-}
-
-// Returns true if the threat_type is not in the phishing, malware, unwanted
-// software, or billing threat categories.
-bool IsOtherSBInterstitialCategory(safe_browsing::SBThreatType threat_type) {
-  switch (threat_type) {
-    case safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_PHISHING:
-    case safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_CLIENT_SIDE_PHISHING:
-    case safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_MALWARE:
-    case safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_UNWANTED:
-    case safe_browsing::SBThreatType::SB_THREAT_TYPE_BILLING:
-      return false;
-    default:
-      return true;
-  }
 }
 
 }  // namespace
@@ -386,34 +368,11 @@ void TrustSafetySentimentService::FinishedPrivacyGuide() {
   TriggerOccurred(FeatureArea::kPrivacyGuide, {});
 }
 
-void TrustSafetySentimentService::InteractedWithSafeBrowsingInterstitial(
-    bool did_proceed,
-    safe_browsing::SBThreatType threat_type) {
-  std::map<std::string, bool> product_specific_data;
-  product_specific_data["User proceeded past interstitial"] = did_proceed;
-  product_specific_data["Enhanced protection enabled"] =
-      safe_browsing::IsEnhancedProtectionEnabled(*profile_->GetPrefs());
-  product_specific_data["Threat is phishing"] =
-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_PHISHING ||
-      threat_type ==
-          safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_CLIENT_SIDE_PHISHING;
-  product_specific_data["Threat is malware"] =
-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_MALWARE;
-  product_specific_data["Threat is unwanted software"] =
-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_UNWANTED;
-  product_specific_data["Threat is billing"] =
-      threat_type == safe_browsing::SBThreatType::SB_THREAT_TYPE_BILLING;
-  DCHECK(!IsOtherSBInterstitialCategory(threat_type));
-  TriggerOccurred(FeatureArea::kSafeBrowsingInterstitial,
-                  product_specific_data);
-}
-
 void TrustSafetySentimentService::InteractedWithDownloadWarningUI(
     DownloadItemWarningData::WarningSurface surface,
     DownloadItemWarningData::WarningAction action) {
   std::map<std::string, bool> product_specific_data;
-  product_specific_data["Enhanced protection enabled"] =
-      safe_browsing::IsEnhancedProtectionEnabled(*profile_->GetPrefs());
+  product_specific_data["Enhanced protection enabled"] = false;
   product_specific_data["Is mainpage UI"] = false;
   product_specific_data["Is downloads page UI"] = false;
   product_specific_data["Is download prompt UI"] = false;

@@ -712,8 +712,6 @@ source_set("core") {
     "//chrome/browser/share",
     "//chrome/browser/signin:google_accounts_private_api",
     "//chrome/browser/site_isolation",
-    "//chrome/browser/site_protection",
-    "//chrome/browser/site_protection:utils",
     "//chrome/browser/speech",
     "//chrome/browser/ssl",
     "//chrome/browser/status_icons",

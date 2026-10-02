@@ -25,10 +25,6 @@ namespace apps {
 enum class LaunchSource;
 }
 
-namespace safe_browsing {
-enum class SafeBrowsingSettingReferralMethod;
-}
-
 namespace signin {
 enum class ConsentLevel;
 }  // namespace signin
@@ -105,8 +101,7 @@ void ShowPasswordDetailsPage(BrowserWindowInterface* browser,
 void ShowPasswordCheck(BrowserWindowInterface* browser);
 void ShowSafeBrowsingEnhancedProtection(BrowserWindowInterface* browser);
 void ShowSafeBrowsingEnhancedProtectionWithIph(
-    BrowserWindowInterface* browser,
-    safe_browsing::SafeBrowsingSettingReferralMethod referral_method);
+    BrowserWindowInterface* browser);
 void ShowImportDialog(BrowserWindowInterface* browser);
 void ShowAboutChrome(BrowserWindowInterface* browser);
 void ShowSearchEngineSettings(BrowserWindowInterface* browser);

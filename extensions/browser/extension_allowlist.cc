@@ -69,15 +69,6 @@ ExtensionAllowlist::ExtensionAllowlist(
   // Relies on ExtensionSystem dependency on ExtensionPrefs to ensure
   // extension_prefs outlives this object.
   extension_prefs_observation_.Observe(extension_prefs_);
-
-  // Register to Enhanced Safe Browsing setting changes for allowlist
-  // enforcements.
-  PrefService* prefs = user_prefs::UserPrefs::Get(browser_context_);
-  pref_change_registrar_.Init(prefs);
-  pref_change_registrar_.Add(
-      prefs::kSafeBrowsingEnhanced,
-      base::BindRepeating(&ExtensionAllowlist::OnSafeBrowsingEnhancedChanged,
-                          base::Unretained(this)));
 }
 
 ExtensionAllowlist::~ExtensionAllowlist() = default;
@@ -250,15 +241,8 @@ void ExtensionAllowlist::OnExtensionInstalled(const ExtensionId& extension_id,
 }
 
 void ExtensionAllowlist::SetAllowlistEnforcementFields() {
-  PrefService* prefs = user_prefs::UserPrefs::Get(browser_context_);
-  if (safe_browsing::IsEnhancedProtectionEnabled(*prefs)) {
-    warnings_enabled_ = true;
-    should_auto_disable_extensions_ = base::FeatureList::IsEnabled(
-        extensions_features::kSafeBrowsingCrxAllowlistAutoDisable);
-  } else {
-    warnings_enabled_ = false;
-    should_auto_disable_extensions_ = false;
-  }
+  warnings_enabled_ = false;
+  should_auto_disable_extensions_ = false;
 }
 
 // `ApplyEnforcement` can be called when an extension becomes not allowlisted or
@@ -328,36 +312,6 @@ void ExtensionAllowlist::DeactivateAllowlistEnforcement() {
           extension->id(), disable_reason::DISABLE_NOT_ALLOWLISTED);
       SetExtensionAllowlistAcknowledgeState(extension->id(),
                                             ALLOWLIST_ACKNOWLEDGE_NONE);
-    }
-  }
-}
-
-void ExtensionAllowlist::OnSafeBrowsingEnhancedChanged() {
-  bool previous_auto_disable = should_auto_disable_extensions_;
-  bool previous_warnings_enabled = warnings_enabled_;
-
-  // Note that `should_auto_disable_extensions_` could remain `false` even if
-  // the ESB setting was turned on if the feature flag is disabled.
-  SetAllowlistEnforcementFields();
-
-  if (previous_auto_disable != should_auto_disable_extensions_) {
-    if (should_auto_disable_extensions_) {
-      ActivateAllowlistEnforcement();
-    } else {
-      DeactivateAllowlistEnforcement();
-    }
-  }
-
-  if (previous_warnings_enabled != warnings_enabled_) {
-    const ExtensionSet all_extensions =
-        registry_->GenerateInstalledExtensionsSet();
-
-    for (const auto& extension : all_extensions) {
-      if (GetExtensionAllowlistState(extension->id()) ==
-          ALLOWLIST_NOT_ALLOWLISTED) {
-        NotifyExtensionAllowlistWarningStateChanged(
-            extension->id(), /*show_warning=*/warnings_enabled_);
-      }
     }
   }
 }

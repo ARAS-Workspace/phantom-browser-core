@@ -17,7 +17,6 @@
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
-#include "extensions/browser/test_blocklist.h"
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/extension_features.h"
 #include "extensions/common/extension_id.h"
@@ -57,20 +56,11 @@ class ExtensionAllowlistUnitTestBase : public ExtensionServiceTestBase {
         params.ConfigureByTestDataDirectory(data_dir().AppendASCII("good")));
     InitializeExtensionService(std::move(params));
     extension_prefs_ = ExtensionPrefs::Get(profile());
-
-    if (enhanced_protection_enabled) {
-      safe_browsing::SetSafeBrowsingState(
-          profile()->GetPrefs(),
-          safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-    }
   }
 
   void CreateEmptyExtensionService() {
     InitializeExtensionService(ExtensionServiceInitParams());
     extension_prefs_ = ExtensionPrefs::Get(profile());
-    safe_browsing::SetSafeBrowsingState(
-        profile()->GetPrefs(),
-        safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
   }
 
   void PerformActionBasedOnOmahaAttributes(const ExtensionId& extension_id,

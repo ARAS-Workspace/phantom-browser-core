@@ -80,7 +80,6 @@
 #include "chrome/browser/ui/views/commerce/price_insights_page_action_view_controller.h"
 #include "chrome/browser/ui/views/file_system_access/file_system_access_page_action_controller.h"
 #include "chrome/browser/ui/views/intent_picker/intent_picker_view_page_action_controller.h"
-#include "chrome/browser/ui/views/js_optimization/js_optimizations_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/side_panel_controller_views.h"
 #include "chrome/browser/ui/views/side_panel/extensions/extension_side_panel_manager.h"
@@ -202,12 +201,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
     record_replay_page_action_controller_ =
         GetUserDataFactory().CreateInstance<RecordReplayPageActionController>(
             tab, tab, *page_action_controller_);
-  }
-
-  if (page_action_controller_->ActionExists(kActionShowJsOptimizationsIcon)) {
-    js_optimizations_page_action_controller_ =
-        std::make_unique<JsOptimizationsPageActionController>(
-            tab, *page_action_controller_);
   }
 
   // Features that are only enabled for normal browser windows. By default most

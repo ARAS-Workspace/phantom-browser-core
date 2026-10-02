@@ -28,7 +28,9 @@ using ToastIdEnumSet = base::EnumSet<ToastId>;
 constexpr auto kDeprecatedToastIds =
     std::to_array<std::underlying_type_t<ToastId>>(
         {/*kLensOverlay=*/4, /*kAddedToComparisonTable=*/6,
-         /*kPlusAddressOverride=*/8, /*kGlicShareImageFailed=*/21,
+         /*kPlusAddressOverride=*/8, /*kSyncEsbOn=*/9,
+         /*kSyncEsbOnWithoutActionButton=*/10, /*kSyncEsbOff=*/11,
+         /*kGlicShareImageFailed=*/21,
          /*kMultistepFilterSuggestion=*/31,
          /*kMultistepFilterSuggestionRecent=*/32,
          /*kGlicSelectionHiddenForSite=*/50});
@@ -46,7 +48,6 @@ class ToastServiceBrowserTest : public InProcessBrowserTest {
   void SetUp() override {
     feature_list_.InitWithFeaturesAndParameters(
         {{autofill::features::kAutofillAiWalletPrivatePasses, {}},
-         {safe_browsing::kEsbAsASyncedSetting, {}},
          {data_sharing::features::kDataSharingFeature, {}},
          {multistep_filter::kMultistepFilter, {}},
          {autofill::features::kAutofillAmbientAutofill, {}},

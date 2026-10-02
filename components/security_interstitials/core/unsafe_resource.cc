@@ -4,6 +4,7 @@
 
 #include "components/security_interstitials/core/unsafe_resource.h"
 
+#include "components/security_interstitials/core/threat_enums.h"
 
 namespace security_interstitials {
 

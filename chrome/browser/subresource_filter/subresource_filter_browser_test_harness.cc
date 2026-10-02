@@ -21,7 +21,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/chrome_test_utils.h"
-#include "components/blocked_content/safe_browsing_triggered_popup_blocker.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"

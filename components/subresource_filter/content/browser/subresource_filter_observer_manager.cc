@@ -31,17 +31,6 @@ void SubresourceFilterObserverManager::RemoveObserver(
   observers_.RemoveObserver(observer);
 }
 
-void SubresourceFilterObserverManager::NotifySafeBrowsingChecksComplete(
-    content::NavigationHandle* navigation_handle,
-    const SubresourceFilterSafeBrowsingClient::CheckResult& result) {
-  TRACE_EVENT0(
-      TRACE_DISABLED_BY_DEFAULT("loading"),
-      "SubresourceFilterObserverManager::NotifySafeBrowsingChecksComplete");
-  for (auto& observer : observers_) {
-    observer.OnSafeBrowsingChecksComplete(navigation_handle, result);
-  }
-}
-
 void SubresourceFilterObserverManager::NotifyPageActivationComputed(
     content::NavigationHandle* navigation_handle,
     const mojom::ActivationState& activation_state) {

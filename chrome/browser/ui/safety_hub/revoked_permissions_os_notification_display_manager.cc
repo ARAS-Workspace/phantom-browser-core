@@ -6,7 +6,6 @@
 
 #include "base/strings/escape.h"
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_util.h"
 #include "components/content_settings/core/common/content_settings_types.h"
@@ -61,23 +60,6 @@ void RevokedPermissionsOSNotificationDisplayManager::UpdateNotification() {
 std::set<GURL>
 RevokedPermissionsOSNotificationDisplayManager::GetRevocationUrls() {
   std::set<GURL> revoked_urls;
-  if (base::FeatureList::IsEnabled(
-          safe_browsing::kAutoRevokeSuspiciousNotification)) {
-    ContentSettingsForOneType revoked_abusive_notification_settings =
-        safety_hub_util::GetRevokedAbusiveNotificationPermissions(hcsm_.get());
-    for (const auto& revoked_abusive_notification_permission :
-         revoked_abusive_notification_settings) {
-      const GURL abusive_url = GURL(
-          revoked_abusive_notification_permission.primary_pattern.ToString());
-      // Only suspicious notification should be count. Other Abusive
-      // notification revocations are not included in the revocation
-      // notification due to stronger confidence of sites being dangerous.
-      if (AbusiveNotificationPermissionsManager::
-              IsUrlRevokedDueToSuspiciousContent(hcsm_.get(), abusive_url)) {
-        revoked_urls.insert(abusive_url);
-      }
-    }
-  }
   ContentSettingsForOneType revoked_disruptive_notifications =
       DisruptiveNotificationPermissionsManager::GetRevokedNotifications(
           hcsm_.get());
@@ -92,12 +74,7 @@ RevokedPermissionsOSNotificationDisplayManager::GetRevocationUrls() {
 
 bool RevokedPermissionsOSNotificationDisplayManager::
     IsAnyRevocationDueToSuspiciousContent(const std::set<GURL>& revoked_urls) {
-  return std::any_of(revoked_urls.begin(), revoked_urls.end(),
-                     [this](const GURL& revoked_url) {
-                       return AbusiveNotificationPermissionsManager::
-                           IsUrlRevokedDueToSuspiciousContent(hcsm_.get(),
-                                                              revoked_url);
-                     });
+  return false;
 }
 
 bool RevokedPermissionsOSNotificationDisplayManager::

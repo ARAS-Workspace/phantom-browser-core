@@ -134,6 +134,7 @@ source_set("impl") {
     "//components/enterprise/browser/groups:prefs",
     "//components/enterprise/browser/identifiers",
     "//components/enterprise/browser/promotion:prefs",
+    "//components/enterprise/device_trust",
     "//components/enterprise/net",
     "//components/enterprise/network_header_injection/core",
     "//components/feature_engagement/public:prefs",
@@ -267,6 +268,10 @@ source_set("impl") {
 
   if (enterprise_data_controls) {
     deps += [ "//components/enterprise/data_controls/core/browser" ]
+  }
+
+  if (enterprise_client_certificates) {
+    deps += [ "//components/enterprise/client_certificates/core" ]
   }
 
   if (enable_pdf) {

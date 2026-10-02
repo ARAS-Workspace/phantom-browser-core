@@ -12,6 +12,7 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/unguessable_token.h"
+#include "components/security_interstitials/core/threat_enums.h"
 #include "components/security_interstitials/core/unsafe_resource_locator.h"
 #include "url/gurl.h"
 
@@ -82,7 +83,6 @@ struct UnsafeResource {
   safe_browsing::ThreatSubtype threat_subtype =
       safe_browsing::ThreatSubtype::UNKNOWN;
   safe_browsing::ThreatMetadata threat_metadata;
-  safe_browsing::RTLookupResponse rt_lookup_response;
   // A callback to deliver the |UrlCheckResult| back to the creator of the
   // object. Setting this field is optional to the creator, depending on whether
   // it is interested in knowing the result.

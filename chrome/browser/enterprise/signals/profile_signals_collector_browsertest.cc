@@ -65,17 +65,11 @@ class ProfileSignalsCollectorTest : public PlatformBrowserTest {
 
     g_browser_process->local_state()->SetBoolean(
         prefs::kBuiltInDnsClientEnabled, true);
-
-    // Give the testing profile a safe browsing level of "STANDARD_PROTECTION"
-    profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled, true);
-    profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnhanced, false);
   }
 
   // Helper function to check the profile level signals are collected correctly.
   void CheckSignalsCollected(ProfileSignalsResponse& response) {
     EXPECT_EQ(response.profile_enrollment_domain, kFakeUserEnrollmentDomain);
-    EXPECT_EQ(response.safe_browsing_protection_level,
-              safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
     EXPECT_TRUE(response.built_in_dns_client_enabled);
   }
 

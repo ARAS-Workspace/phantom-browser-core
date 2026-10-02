@@ -82,7 +82,6 @@ if (enable_extensions) {
     "image_writer_private.webidl",
     "language_settings_private.webidl",
     "resources_private.idl",
-    "safe_browsing_private.idl",
     "settings_private.idl",
     "side_panel.idl",
     "system_private.json",

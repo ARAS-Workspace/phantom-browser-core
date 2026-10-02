@@ -1423,8 +1423,7 @@ GURL ChromeContentRendererClient::OverrideFlashEmbedWithHTML(const GURL& url) {
 std::unique_ptr<blink::URLLoaderThrottleProvider>
 ChromeContentRendererClient::CreateURLLoaderThrottleProvider(
     blink::URLLoaderThrottleProviderType provider_type) {
-  return URLLoaderThrottleProviderImpl::Create(provider_type, this,
-                                               browser_interface_broker_.get());
+  return URLLoaderThrottleProviderImpl::Create(provider_type, this);
 }
 
 blink::WebFrame* ChromeContentRendererClient::FindFrame(

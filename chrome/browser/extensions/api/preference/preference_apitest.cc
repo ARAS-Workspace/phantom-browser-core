@@ -99,7 +99,6 @@ class ExtensionPreferenceApiTest : public extensions::ExtensionApiTest {
               prefs->GetInteger(prefetch::prefs::kNetworkPredictionOptions));
     EXPECT_TRUE(
         prefs->GetBoolean(password_manager::prefs::kCredentialsEnableService));
-    EXPECT_TRUE(prefs->GetBoolean(prefs::kSafeBrowsingEnabled));
     EXPECT_TRUE(prefs->GetBoolean(prefs::kSearchSuggestEnabled));
     VerifyPrefValueAndControlledState(prefs::kPrivacySandboxM1TopicsEnabled,
                                       base::Value(false),
@@ -138,7 +137,6 @@ class ExtensionPreferenceApiTest : public extensions::ExtensionApiTest {
               prefs->GetInteger(prefetch::prefs::kNetworkPredictionOptions));
     EXPECT_FALSE(
         prefs->GetBoolean(password_manager::prefs::kCredentialsEnableService));
-    EXPECT_FALSE(prefs->GetBoolean(prefs::kSafeBrowsingEnabled));
     EXPECT_FALSE(prefs->GetBoolean(prefs::kSearchSuggestEnabled));
     VerifyPrefValueAndControlledState(prefs::kPrivacySandboxM1TopicsEnabled,
                                       base::Value(true),
@@ -217,7 +215,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, Standard) {
       prefetch::prefs::kNetworkPredictionOptions,
       static_cast<int>(prefetch::NetworkPredictionOptions::kDisabled));
   prefs->SetBoolean(password_manager::prefs::kCredentialsEnableService, false);
-  prefs->SetBoolean(prefs::kSafeBrowsingEnabled, false);
   prefs->SetBoolean(prefs::kSearchSuggestEnabled, false);
   prefs->SetString(prefs::kWebRTCIPHandlingPolicy,
                    blink::kWebRTCIPHandlingDefaultPublicInterfaceOnly);
@@ -522,71 +519,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest,
 
   EXPECT_TRUE(catcher.GetNextResult()) << catcher.message();
   EXPECT_FALSE(loaded_incognito_test_listener.was_satisfied());
-}
-
-// Tests the behavior of the Safe Browsing API as described in
-// crbug.com/40681445.
-IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, SafeBrowsing_SetTrue) {
-  ExtensionTestMessageListener listener_true("set to true",
-                                             ReplyBehavior::kWillReply);
-  ExtensionTestMessageListener listener_clear("cleared",
-                                              ReplyBehavior::kWillReply);
-  ExtensionTestMessageListener listener_false("set to false",
-                                              ReplyBehavior::kWillReply);
-  ExtensionTestMessageListener listener_done("done");
-
-  const base::FilePath extension_path =
-      test_data_dir_.AppendASCII("preference").AppendASCII("safe_browsing");
-  const extensions::Extension* extension = LoadExtension(extension_path);
-  ASSERT_TRUE(extension);
-
-  // Step 1. of the test sets the API to TRUE.
-  // Both preferences are now controlled by extension. |kSafeBrowsingEnabled| is
-  // set to TRUE, while |kSafeBrowsingEnhanced| is always FALSE.
-  ASSERT_TRUE(listener_true.WaitUntilSatisfied());
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnabled,
-                                    base::Value(true),
-                                    /* expected_controlled */ true);
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnhanced,
-                                    base::Value(false),
-                                    /* expected_controlled */ true);
-  listener_true.Reply("ok");
-
-  // Step 2. of the test clears the value.
-  // Neither preference is now controlled by extension, and they take on their
-  // default values - TRUE and FALSE, respectively.
-  ASSERT_TRUE(listener_clear.WaitUntilSatisfied());
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnabled,
-                                    base::Value(true),
-                                    /* expected_controlled */ false);
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnhanced,
-                                    base::Value(false),
-                                    /* expected_controlled */ false);
-  listener_clear.Reply("ok");
-
-  // Step 3. of the test sets the API to FALSE.
-  // Both preferences are now controlled by extension. |kSafeBrowsingEnabled| is
-  // set to FALSE, and |kSafeBrowsingEnhanced| is also FALSE.
-  ASSERT_TRUE(listener_false.WaitUntilSatisfied());
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnabled,
-                                    base::Value(false),
-                                    /* expected_controlled */ true);
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnhanced,
-                                    base::Value(false),
-                                    /* expected_controlled */ true);
-  listener_false.Reply("ok");
-
-  // Step 4. of the test uninstalls the extension.
-  // Neither preference is now controlled by extension, and they take on their
-  // default values - TRUE and FALSE, respectively.
-  ASSERT_TRUE(listener_done.WaitUntilSatisfied());
-  UninstallExtension(extension->id());
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnabled,
-                                    base::Value(true),
-                                    /* expected_controlled */ false);
-  VerifyPrefValueAndControlledState(prefs::kSafeBrowsingEnhanced,
-                                    base::Value(false),
-                                    /* expected_controlled */ false);
 }
 
 // Tests the behavior of the ThirdPartyCookies preference API.

@@ -85,7 +85,6 @@
   E(kActionVirtualCardEnroll, IDC_VIRTUAL_CARD_ENROLL) \
   E(kActionAutofillMandatoryReauth, IDC_AUTOFILL_MANDATORY_REAUTH) \
   E(kActionShowMemorySaverChip) \
-  E(kActionShowJsOptimizationsIcon) \
   E(kActionShowCookieControls) \
   E(kActionShowZoomBubble) \
   E(kActionUnfocusTabGroup, IDC_UNFOCUS_TAB_GROUP) \

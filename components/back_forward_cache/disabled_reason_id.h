@@ -17,7 +17,7 @@ enum class DisabledReasonId : uint16_t {
   // BackForwardCache::DisabledSource).
   kUnknown = 0,
   kPopupBlockerTabHelper = 1,
-  kSafeBrowsingTriggeredPopupBlocker = 2,
+  // kSafeBrowsingTriggeredPopupBlocker = 2. Removed
   kSafeBrowsingThreatDetails = 3,
   // Unblocked by https://crbug.com/1276864
   // kAppBannerManager = 4,

@@ -310,14 +310,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
 
   // Security page
-  (*s_allowlist)[::prefs::kSafeBrowsingEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::prefs::kSafeBrowsingEnhanced] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::prefs::kSafeBrowsingScoutReportingEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::safe_browsing::kGeneratedSafeBrowsingPref] =
-      settings_api::PrefType::kNumber;
   (*s_allowlist)[::prefs::kHttpsOnlyModeEnabled] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::kGeneratedHttpsFirstModePref] =

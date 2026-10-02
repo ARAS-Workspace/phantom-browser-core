@@ -210,9 +210,6 @@ ExtensionService::ExtensionService(
       extension_registrar_delegate_(
           std::make_unique<ChromeExtensionRegistrarDelegate>(profile_)),
       extension_registrar_(ExtensionRegistrar::Get(profile)),
-      safe_browsing_verdict_handler_(extension_prefs,
-                                     registry_,
-                                     extension_registrar_),
       omaha_attributes_handler_(extension_prefs,
                                 registry_,
                                 extension_registrar_),
@@ -359,8 +356,6 @@ void ExtensionService::Init() {
 
   LogExtensionsOnChromeUrlsSwitchWarningIfNeeded();
 
-  safe_browsing_verdict_handler_.Init();
-
   // Must be called after extensions are loaded.
   allowlist_->Init();
 
@@ -393,11 +388,6 @@ void ExtensionService::LoadExtensionsFromCommandLineFlag(
         << "--load-extension is not allowed in Google Chrome, ignoring.";
     return;
 #else
-    if (safe_browsing::IsEnhancedProtectionEnabled(*profile_->GetPrefs())) {
-      VLOG(1) << "--load-extension is not allowed for users opted into "
-              << "Enhanced Safe Browsing, ignoring.";
-      return;
-    }
     if (ShouldBlockCommandLineExtension(*profile_)) {
       // TODO(crbug.com/401529219): Deprecate this restriction once
       // --load-extension removal on Chrome builds is fully launched.
@@ -855,7 +845,6 @@ void ExtensionService::ManageBlocklist(
     const Blocklist::BlocklistStateMap& state_map) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-  safe_browsing_verdict_handler_.ManageBlocklist(state_map);
   error_controller_->ShowErrorIfNeeded();
 }
 
@@ -900,23 +889,6 @@ void ExtensionService::OnInstalledExtensionsLoaded() {
   for (const auto& extension : to_enable) {
     extension_registrar_->EnableExtension(extension->id());
   }
-
-  // Check installed extensions against the blocklist if and only if the
-  // database is ready; otherwise, the database is effectively empty and we'll
-  // re-enable all blocked extensions.
-
-  blocklist_->IsDatabaseReady(base::BindOnce(
-      [](base::WeakPtr<ExtensionService> service, bool is_ready) {
-        DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));
-        if (!service || !is_ready) {
-          // Either the service was torn down or the database isn't
-          // ready yet (and is effectively empty). Either way, no need
-          // to update the blocklisted extensions.
-          return;
-        }
-        service->OnBlocklistUpdated();
-      },
-      AsExtensionServiceWeakPtr()));
 
 #if BUILDFLAG(IS_MAC)
   PolicyDseNtpOverrideMetricsReporter::ReportMetrics(profile_);

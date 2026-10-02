@@ -31,7 +31,6 @@
 #include "chrome/browser/notifications/platform_notification_service_factory.h"
 #include "chrome/browser/notifications/platform_notification_service_impl.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_util.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
@@ -113,8 +112,6 @@ const char kTimeUntilLastClickMillis[] = "TimeUntilLastClick";
 class PlatformNotificationServiceTest : public testing::Test {
  public:
   void SetUp() override {
-    scoped_feature_list_.InitWithFeatures(
-        {}, {safe_browsing::kAutoRevokeSuspiciousNotification});
     TestingProfile::Builder profile_builder;
     profile_builder.AddTestingFactory(
         HistoryServiceFactory::GetInstance(),

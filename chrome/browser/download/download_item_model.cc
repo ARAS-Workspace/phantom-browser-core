@@ -65,7 +65,6 @@
 using DangerUiPattern = DownloadUIModel::DangerUiPattern;
 using download::DownloadItem;
 using InsecureDownloadStatus = download::DownloadItem::InsecureDownloadStatus;
-using TailoredVerdict = safe_browsing::ClientDownloadResponse::TailoredVerdict;
 using TailoredWarningType = DownloadUIModel::TailoredWarningType;
 
 namespace {

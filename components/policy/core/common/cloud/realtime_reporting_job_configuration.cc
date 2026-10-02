@@ -10,7 +10,6 @@
 
 #include "base/check_op.h"
 #include "base/json/json_reader.h"
-#include "base/metrics/histogram_functions.h"
 #include "components/enterprise/common/strings.h"
 #include "components/policy/core/common/cloud/cloud_policy_client.h"
 #include "google_apis/google_api_keys.h"
@@ -62,14 +61,6 @@ RealtimeReportingJobConfiguration::~RealtimeReportingJobConfiguration() =
 std::string RealtimeReportingJobConfiguration::GetPayload() {
   std::string payload;
   upload_request_.SerializeToString(&payload);
-  const auto& event_case = upload_request_.events(0).event_case();
-  const std::string metric_name =
-      enterprise_connectors::GetPayloadSizeUmaMetricName(event_case);
-  base::UmaHistogramCounts100000(
-      enterprise_connectors::kAllUploadSizeUmaMetricName, payload.size());
-  if (!metric_name.empty()) {
-    base::UmaHistogramCounts100000(metric_name, payload.size());
-  }
   return payload;
 }
 

@@ -156,7 +156,6 @@ source_set("enterprise") {
       "data_protection/data_protection_navigation_controller.h",
       "data_protection/data_protection_navigation_observer.h",
       "data_protection/data_protection_page_user_data.h",
-      "data_protection/data_protection_url_lookup_service_factory.h",
     ]
 
     public += [
@@ -279,7 +278,6 @@ source_set("impl") {
     "data_protection/data_protection_navigation_controller.cc",
     "data_protection/data_protection_navigation_observer.cc",
     "data_protection/data_protection_page_user_data.cc",
-    "data_protection/data_protection_url_lookup_service_factory.cc",
     "encryption/cache_encryption_provider_impl.cc",
     "identifiers/profile_id_delegate_impl.cc",
     "identifiers/profile_id_service_factory.cc",

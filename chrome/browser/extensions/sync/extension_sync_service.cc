@@ -656,11 +656,6 @@ void ExtensionSyncService::ApplySyncData(
   }
 }
 
-void ExtensionSyncService::SetSyncStartFlareForTesting(
-    const syncer::SyncableService::StartSyncFlare& flare) {
-  flare_ = flare;
-}
-
 void ExtensionSyncService::DeleteThemeDoNotUse(const Extension& theme) {
   DCHECK(theme.is_theme());
   GetSyncBundle(syncer::EXTENSIONS)

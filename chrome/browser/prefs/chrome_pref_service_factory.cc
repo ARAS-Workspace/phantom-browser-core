@@ -137,8 +137,6 @@ const auto kTrackedPrefs = std::to_array<prefs::TrackedPreferenceMetadata>({
      PrefTrackingStrategy::ATOMIC, ValueType::IMPERSONAL},
     // kSyncRemainingRollbackTries is deprecated and will be removed a few
     // releases after M50.
-    {18, prefs::kSafeBrowsingIncidentsSent, EnforcementLevel::ENFORCE_ON_LOAD,
-     PrefTrackingStrategy::ATOMIC, ValueType::IMPERSONAL},
     {23, prefs::kGoogleServicesAccountId, EnforcementLevel::ENFORCE_ON_LOAD,
      PrefTrackingStrategy::ATOMIC, ValueType::PERSONAL},
     {29, prefs::kMediaStorageIdSalt, EnforcementLevel::ENFORCE_ON_LOAD,

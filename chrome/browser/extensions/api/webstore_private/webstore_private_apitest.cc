@@ -725,11 +725,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateGetReferrerChainApiTest,
 // opted out of SafeBrowsing.
 IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateGetReferrerChainApiTest,
                        GetReferrerChainForNonSafeBrowsingUser) {
-  PrefService* pref_service = profile()->GetPrefs();
-  EXPECT_TRUE(pref_service->GetBoolean(prefs::kSafeBrowsingEnabled));
-  // Disable SafeBrowsing.
-  pref_service->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-
   GURL page_url = GetTestServerURLWithReferrers("empty_referrer_chain.html");
   ASSERT_TRUE(OpenTestURL(page_url));
 }
@@ -751,25 +746,7 @@ class ExtensionWebstorePrivateApiAllowlistEnforcementTest
 };
 
 IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateApiAllowlistEnforcementTest,
-                       EnhancedSafeBrowsingNotAllowlisted) {
-  safe_browsing::SetSafeBrowsingState(
-      profile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-  ASSERT_TRUE(
-      RunInstallTest("safebrowsing_not_allowlisted.html", "extension.crx"));
-
-  EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
-            GetAllowlist()->GetExtensionAllowlistState(kExtensionId));
-  EXPECT_EQ(
-      ALLOWLIST_ACKNOWLEDGE_ENABLED_BY_USER,
-      GetAllowlist()->GetExtensionAllowlistAcknowledgeState(kExtensionId));
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateApiAllowlistEnforcementTest,
                        EnhancedSafeBrowsingAllowlisted) {
-  safe_browsing::SetSafeBrowsingState(
-      profile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
   ASSERT_TRUE(RunInstallTest("safebrowsing_allowlisted.html", "extension.crx"));
 
   EXPECT_EQ(ALLOWLIST_UNDEFINED,
@@ -778,9 +755,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateApiAllowlistEnforcementTest,
 
 IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateApiAllowlistEnforcementTest,
                        StandardSafeBrowsingNotAllowlisted) {
-  safe_browsing::SetSafeBrowsingState(
-      profile()->GetPrefs(),
-      safe_browsing::SafeBrowsingState::STANDARD_PROTECTION);
   ASSERT_TRUE(
       RunInstallTest("safebrowsing_not_allowlisted.html", "extension.crx"));
 

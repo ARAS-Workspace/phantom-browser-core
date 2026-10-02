@@ -89,9 +89,9 @@ enum {
   // kSyncedLastTimePasswordCheckCompleted = 43, (deprecated)
   kWasAutoSignInFirstRunExperienceShown = 44,
   kCanMakePaymentEnabled = 45,
-  kAccountTailoredSecurityUpdateTimestamp = 46,
+  // kAccountTailoredSecurityUpdateTimestamp = 46, (no longer synced)
   kCookieControlsMode = 47,
-  kSafeBrowsingEnabled = 48,
+  // kSafeBrowsingEnabled = 48, (no longer synced)
   // kSyncedDefaultSearchProviderGUID = 49, (deprecated)
   kPrefForceTriggerTranslateCount = 50,
   // kPrefNeverPromptSitesDeprecated = 51, (deprecated)
@@ -122,7 +122,7 @@ enum {
   // kSharingVapidKey = 76, (deprecated)
   // kFirstPlusAddressCreationTime = 77, (deprecated)
   // kLastPlusAddressFillingTime = 78, (deprecated)
-  kSafeBrowsingEnhanced = 79,
+  // kSafeBrowsingEnhanced = 79, (no longer synced)
   kFacilitatedPaymentsEwallet = 80,
   kAutofillBnplEnabled = 81,
   kAutofillHasSeenBnpl = 82,
@@ -291,10 +291,6 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {payments::kCanMakePaymentEnabled,
          {syncable_prefs_ids::kCanMakePaymentEnabled, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {prefs::kAccountTailoredSecurityUpdateTimestamp,
-         {syncable_prefs_ids::kAccountTailoredSecurityUpdateTimestamp,
-          syncer::PRIORITY_PREFERENCES, PrefSensitivity::kNone,
-          MergeBehavior::kNone}},
         {prefs::kCookieControlsMode,
          {syncable_prefs_ids::kCookieControlsMode, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
@@ -330,9 +326,6 @@ constexpr auto kCommonSyncablePrefsAllowlist =
          {syncable_prefs_ids::kCrossDeviceTipsHomeModuleEnabled,
           syncer::PREFERENCES, PrefSensitivity::kNone,
           MergeBehavior::kMergeableDict}},
-        {prefs::kSafeBrowsingEnabled,
-         {syncable_prefs_ids::kSafeBrowsingEnabled, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
         {tab_groups::prefs::kAutoPinNewTabGroups,
          {syncable_prefs_ids::kAutoPinNewTabGroups, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
@@ -390,9 +383,6 @@ constexpr auto kCommonSyncablePrefsAllowlist =
           sync_preferences::MergeBehavior::kNone}},
         {autofill::prefs::kAutofillPaymentCardBenefits,
          {syncable_prefs_ids::kAutofillPaymentCardBenefits, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {prefs::kSafeBrowsingEnhanced,
-         {syncable_prefs_ids::kSafeBrowsingEnhanced, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
         {autofill::prefs::kAutofillBnplEnabled,
          {syncable_prefs_ids::kAutofillBnplEnabled, syncer::PREFERENCES,

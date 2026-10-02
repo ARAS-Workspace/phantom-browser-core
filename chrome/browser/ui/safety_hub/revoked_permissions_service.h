@@ -12,7 +12,6 @@
 #include "base/time/clock.h"
 #include "base/time/time.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_result.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_result.h"
@@ -151,10 +150,6 @@ class RevokedPermissionsService final : public SafetyHubService,
   // Returns if the permissions auto-revocation is enabled for unused sites.
   bool IsUnusedSiteAutoRevocationEnabled();
 
-  // Returns true if all features are enabled to automatically revoke abusive
-  // notification permissions.
-  bool IsAbusiveNotificationAutoRevocationEnabled();
-
   raw_ptr<content::BrowserContext> browser_context_;
 
   // Observer to watch for content settings changed.
@@ -165,11 +160,6 @@ class RevokedPermissionsService final : public SafetyHubService,
   std::unique_ptr<PrefChangeRegistrar> pref_change_registrar_;
 
   raw_ptr<base::Clock> clock_;
-
-  // Object for managing Safe Browsing blocklist checks and notification
-  // revocation for abusive sites.
-  std::unique_ptr<AbusiveNotificationPermissionsManager>
-      abusive_notification_manager_;
 
   // Object for notification revocation for disruptive sites.
   std::unique_ptr<DisruptiveNotificationPermissionsManager>

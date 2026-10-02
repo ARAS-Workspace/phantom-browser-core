@@ -50,9 +50,6 @@
 #include "revoked_permissions_service.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#endif
-
 namespace {
 
 // Determines the frequency at which permissions of sites are checked whether
@@ -74,14 +71,6 @@ bool IsUnusedPermissionRevocation(PermissionsRevocationType revocation_type) {
                                 kUnusedPermissionsAndAbusiveNotifications ||
          revocation_type == PermissionsRevocationType::
                                 kUnusedPermissionsAndDisruptiveNotifications;
-}
-
-bool IsAbusiveNotificationPermissionRevocation(
-    PermissionsRevocationType revocation_type) {
-  return revocation_type ==
-             PermissionsRevocationType::kAbusiveNotificationPermissions ||
-         revocation_type == PermissionsRevocationType::
-                                kUnusedPermissionsAndAbusiveNotifications;
 }
 
 bool IsDisruptiveNotificationPermissionRevocation(
@@ -160,16 +149,6 @@ RevokedPermissionsService::RevokedPermissionsService(
         notification_display_manager =
             RevokedPermissionsOSNotificationDisplayManagerFactory::
                 GetForProfile(Profile::FromBrowserContext(browser_context_));
-    abusive_notification_manager_ =
-        std::make_unique<AbusiveNotificationPermissionsManager>(
-            nullptr, nullptr,
-            hcsm(), pref_change_registrar_->prefs());
-
-  pref_change_registrar_->Add(
-      prefs::kSafeBrowsingEnabled,
-      base::BindRepeating(
-          &RevokedPermissionsService::OnPermissionsAutorevocationControlChanged,
-          base::Unretained(this)));
 
   if (base::FeatureList::IsEnabled(
           features::kSafetyHubDisruptiveNotificationRevocation)) {
@@ -186,8 +165,7 @@ RevokedPermissionsService::RevokedPermissionsService(
 
   InitializeLatestResult();
 
-  if (IsUnusedSiteAutoRevocationEnabled() ||
-      IsAbusiveNotificationAutoRevocationEnabled()) {
+  if (IsUnusedSiteAutoRevocationEnabled()) {
     hcsm()->EnsureSettingsUpToDate(
         base::BindOnce(&RevokedPermissionsService::MaybeStartRepeatedUpdates,
                        weak_factory_.GetWeakPtr()));
@@ -197,8 +175,7 @@ RevokedPermissionsService::RevokedPermissionsService(
 RevokedPermissionsService::~RevokedPermissionsService() = default;
 
 void RevokedPermissionsService::MaybeStartRepeatedUpdates() {
-  if (IsUnusedSiteAutoRevocationEnabled() ||
-      IsAbusiveNotificationAutoRevocationEnabled()) {
+  if (IsUnusedSiteAutoRevocationEnabled()) {
     StartRepeatedUpdates();
   }
 }
@@ -228,8 +205,6 @@ void RevokedPermissionsService::OnContentSettingChanged(
   const bool is_revocation_running =
       (unused_site_permissions_manager_ &&
        unused_site_permissions_manager_->IsRevocationRunning()) ||
-      (IsAbusiveNotificationAutoRevocationEnabled() &&
-       abusive_notification_manager_->IsRevocationRunning()) ||
       (disruptive_notification_manager_ &&
        disruptive_notification_manager_->IsChangingContentSettings());
   if (is_revocation_running) {
@@ -246,10 +221,6 @@ void RevokedPermissionsService::OnContentSettingChanged(
   if (content_type_set.GetType() == ContentSettingsType::NOTIFICATIONS) {
     // There should be at most one active revocation per site: either abusive or
     // disruptive.
-    if (IsAbusiveNotificationAutoRevocationEnabled()) {
-      abusive_notification_manager_->OnPermissionChanged(primary_pattern,
-                                                         secondary_pattern);
-    }
     if (disruptive_notification_manager_) {
       disruptive_notification_manager_->OnPermissionChanged(primary_pattern,
                                                             secondary_pattern);
@@ -277,11 +248,6 @@ void RevokedPermissionsService::Shutdown() {
 
 void RevokedPermissionsService::RegrantPermissionsForOrigin(
     const url::Origin& origin) {
-  if (IsAbusiveNotificationAutoRevocationEnabled()) {
-    abusive_notification_manager_->RegrantPermissionForOriginIfNecessary(
-        origin.GetURL());
-  }
-
   if (disruptive_notification_manager_) {
     disruptive_notification_manager_->RegrantPermissionForUrl(origin.GetURL());
   }
@@ -295,12 +261,6 @@ void RevokedPermissionsService::UndoRegrantPermissionsForOrigin(
   for (const auto& [type, value] : permissions_data.permissions) {
     permission_types.insert(type);
   }
-  if (IsAbusiveNotificationAutoRevocationEnabled()) {
-    abusive_notification_manager_->UndoRegrantPermissionForOriginIfNecessary(
-        GURL(permissions_data.primary_pattern.ToString()), permission_types,
-        permissions_data.constraints.Clone());
-  }
-
   if (disruptive_notification_manager_) {
     disruptive_notification_manager_->UndoRegrantPermissionForUrl(
         GURL(permissions_data.primary_pattern.ToString()), permission_types,
@@ -312,10 +272,6 @@ void RevokedPermissionsService::UndoRegrantPermissionsForOrigin(
 }
 
 void RevokedPermissionsService::ClearRevokedPermissionsList() {
-  if (IsAbusiveNotificationAutoRevocationEnabled()) {
-    abusive_notification_manager_->ClearRevokedPermissionsList();
-  }
-
   if (disruptive_notification_manager_) {
     disruptive_notification_manager_->ClearRevokedPermissionsList();
   }
@@ -354,9 +310,6 @@ std::unique_ptr<SafetyHubResult> RevokedPermissionsService::UpdateOnUIThread(
       disruptive_notification_manager_->RevokeDisruptiveNotifications();
     }
   }
-  if (IsAbusiveNotificationAutoRevocationEnabled()) {
-    abusive_notification_manager_->CheckNotificationPermissionOrigins();
-  }
   return GetRevokedPermissions();
 }
 
@@ -383,37 +336,8 @@ RevokedPermissionsService::GetRevokedPermissions() {
     // If the origin has a revoked notification, add `NOTIFICATIONS` to
     // the list of revoked permissions.
     const GURL& url = GURL(revoked_permissions.primary_pattern.ToString());
-    if (safety_hub_util::IsUrlRevokedAbusiveNotification(hcsm(), url)) {
-      CHECK(IsAbusiveNotificationAutoRevocationEnabled());
-      permissions_data.permissions.insert(std::make_pair(
-          static_cast<ContentSettingsType>(ContentSettingsType::NOTIFICATIONS),
-          base::Value()));
-
-      // Update `constraints` to one with the latest expiration.
-      content_settings::SettingInfo info;
-      base::Value stored_abusive_value(hcsm()->GetWebsiteSetting(
-          url, url,
-          ContentSettingsType::REVOKED_ABUSIVE_NOTIFICATION_PERMISSIONS,
-          &info));
-      CHECK(!stored_abusive_value.is_none());
-      if (revoked_permissions.metadata.expiration() <
-          info.metadata.expiration()) {
-        permissions_data.constraints = GetConstraintFromInfo(info);
-      }
-      // Suspicious content revocation is considered abusive notification
-      // permission but revocation should be displayed with it own string
-      // explanation.
-      if (AbusiveNotificationPermissionsManager::
-              IsUrlRevokedDueToSuspiciousContent(hcsm(), url)) {
-        permissions_data.revocation_type = PermissionsRevocationType::
-            kUnusedPermissionsAndSuspiciousNotifications;
-      } else {
-        permissions_data.revocation_type = PermissionsRevocationType::
-            kUnusedPermissionsAndAbusiveNotifications;
-      }
-
-    } else if (DisruptiveNotificationPermissionsManager::
-                   IsUrlRevokedDisruptiveNotification(hcsm(), url)) {
+    if (DisruptiveNotificationPermissionsManager::
+            IsUrlRevokedDisruptiveNotification(hcsm(), url)) {
       // If the origin has a revoked disruptive notification, add
       // `NOTIFICATIONS` to the list of revoked permissions.
       permissions_data.permissions.insert(std::make_pair(
@@ -440,42 +364,6 @@ RevokedPermissionsService::GetRevokedPermissions() {
     result->AddRevokedPermission(std::move(permissions_data));
   }
 
-  ContentSettingsForOneType revoked_abusive_notification_settings =
-      safety_hub_util::GetRevokedAbusiveNotificationPermissions(hcsm());
-  for (const auto& revoked_abusive_notification_permission :
-       revoked_abusive_notification_settings) {
-    const GURL& abusive_url = GURL(
-        revoked_abusive_notification_permission.primary_pattern.ToString());
-    // Skip origins with revoked unused site permissions, since these were
-    // handled above.
-    if (safety_hub_util::IsUrlRevokedUnusedSite(hcsm(), abusive_url)) {
-      continue;
-    }
-    PermissionsData permissions_data;
-    permissions_data.primary_pattern =
-        revoked_abusive_notification_permission.primary_pattern;
-    permissions_data.permissions.insert(std::make_pair(
-        static_cast<ContentSettingsType>(ContentSettingsType::NOTIFICATIONS),
-        base::Value()));
-
-    permissions_data.constraints = content_settings::ContentSettingConstraints(
-        revoked_abusive_notification_permission.metadata.expiration() -
-        revoked_abusive_notification_permission.metadata.lifetime());
-    permissions_data.constraints.set_lifetime(
-        revoked_abusive_notification_permission.metadata.lifetime());
-
-    if (AbusiveNotificationPermissionsManager::
-            IsUrlRevokedDueToSuspiciousContent(hcsm(), abusive_url)) {
-      permissions_data.revocation_type =
-          PermissionsRevocationType::kSuspiciousNotificationPermissions;
-    } else {
-      permissions_data.revocation_type =
-          PermissionsRevocationType::kAbusiveNotificationPermissions;
-    }
-
-    result->AddRevokedPermission(std::move(permissions_data));
-  }
-
   if (disruptive_notification_manager_) {
     ContentSettingsForOneType revoked_disruptive_notifications =
         disruptive_notification_manager_->GetRevokedNotifications(hcsm());
@@ -483,14 +371,6 @@ RevokedPermissionsService::GetRevokedPermissions() {
       // Skip origins with revoked unused site permissions, since these were
       // handled above.
       if (safety_hub_util::IsUrlRevokedUnusedSite(
-              hcsm(), GURL(permission.primary_pattern.ToString()))) {
-        continue;
-      }
-      // Skip origins with revoked abusive site permissions as these were
-      // handled above. This is generally unlikely but it is possible if abusive
-      // notification auto-revocation outside of Safety Hub was triggered in
-      // between disruptive revocation run.
-      if (safety_hub_util::IsUrlRevokedAbusiveNotification(
               hcsm(), GURL(permission.primary_pattern.ToString()))) {
         continue;
       }
@@ -532,14 +412,6 @@ void RevokedPermissionsService::RestoreDeletedRevokedPermissionsList(
               ContentSettingsPattern::Wildcard());
     }
 
-    if (IsAbusiveNotificationAutoRevocationEnabled() &&
-        IsAbusiveNotificationPermissionRevocation(
-            permissions_data.revocation_type)) {
-      abusive_notification_manager_->RestoreDeletedRevokedPermission(
-          permissions_data.primary_pattern,
-          permissions_data.constraints.Clone());
-    }
-
     if (disruptive_notification_manager_ &&
         IsDisruptiveNotificationPermissionRevocation(
             permissions_data.revocation_type)) {
@@ -552,8 +424,7 @@ void RevokedPermissionsService::RestoreDeletedRevokedPermissionsList(
 
 void RevokedPermissionsService::OnPermissionsAutorevocationControlChanged() {
   // TODO(crbug.com/40250875): Clean up these checks.
-  if (IsUnusedSiteAutoRevocationEnabled() ||
-      IsAbusiveNotificationAutoRevocationEnabled()) {
+  if (IsUnusedSiteAutoRevocationEnabled()) {
     StartRepeatedUpdates();
   } else {
     StopTimer();
@@ -577,9 +448,6 @@ void RevokedPermissionsService::SetClockForTesting(base::Clock* clock) {
   if (disruptive_notification_manager_) {
     disruptive_notification_manager_->SetClockForTesting(clock);  // IN-TEST
   }
-  if (IsAbusiveNotificationAutoRevocationEnabled()) {
-    abusive_notification_manager_->SetClockForTesting(clock);  // IN-TEST
-  }
   unused_site_permissions_manager_->SetClockForTesting(clock);  // IN-TEST
 }
 
@@ -590,8 +458,4 @@ base::WeakPtr<SafetyHubService> RevokedPermissionsService::GetAsWeakRef() {
 bool RevokedPermissionsService::IsUnusedSiteAutoRevocationEnabled() {
   return pref_change_registrar_->prefs()->GetBoolean(
       safety_hub_prefs::kUnusedSitePermissionsRevocationEnabled);
-}
-
-bool RevokedPermissionsService::IsAbusiveNotificationAutoRevocationEnabled() {
-  return safe_browsing::IsSafeBrowsingEnabled(*pref_change_registrar_->prefs());
 }

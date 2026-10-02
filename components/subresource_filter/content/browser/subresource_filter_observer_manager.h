@@ -46,14 +46,6 @@ class SubresourceFilterObserverManager
   void AddObserver(SubresourceFilterObserver* observer);
   void RemoveObserver(SubresourceFilterObserver* observer);
 
-  // Called when the SubresourceFilter Safe Browsing checks are available for
-  // this root frame navigation. Will be called at WillProcessResponse time at
-  // the latest. Right now it will only include phishing and subresource filter
-  // threat types.
-  virtual void NotifySafeBrowsingChecksComplete(
-      content::NavigationHandle* navigation_handle,
-      const SubresourceFilterSafeBrowsingClient::CheckResult& result);
-
   // Will be called at the latest in the WillProcessResponse stage from a
   // NavigationThrottle that was registered before the throttle manager's
   // throttles created in MaybeAppendNavigationThrottles().
