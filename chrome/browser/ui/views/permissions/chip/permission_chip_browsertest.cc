@@ -489,10 +489,12 @@ IN_PROC_BROWSER_TEST_F(PermissionChipBrowserTest,
   EXPECT_FALSE(delegate.IsRequestInProgress());
 }
 
-IN_PROC_BROWSER_TEST_F(PermissionChipBrowserTest, DisplayQuietChipAbusiveTest) {
+IN_PROC_BROWSER_TEST_F(PermissionChipBrowserTest,
+                       DisplayQuietChipAlreadyDisplayedTest) {
   auto& delegate = *test::MockPermissionRequestManager::CreateForWebContents(
       GURL("https://test.origin"), {permissions::RequestType::kNotifications},
-      true, QuietUiReason::kTriggeredDueToAbusiveRequests, web_contents_);
+      true, QuietUiReason::kEnabledInPrefs, web_contents_);
+  delegate.SetAlreadyDisplayed();
   EXPECT_CALL(delegate, PreIgnoreQuietPrompt()).WillOnce([&delegate]() {
     return delegate.PermissionRequestManager::PreIgnoreQuietPrompt();
   });
@@ -502,8 +504,8 @@ IN_PROC_BROWSER_TEST_F(PermissionChipBrowserTest, DisplayQuietChipAbusiveTest) {
 
   EXPECT_FALSE(chip_controller->IsBubbleShowing());
 
-  // The quiet abusive chip does not have animation and will start the
-  // dismiss timer immediately after displaying.
+  // An already displayed quiet chip does not have animation and will start
+  // the dismiss timer immediately after displaying.
   EXPECT_FALSE(chip_controller->IsAnimating());
   EXPECT_FALSE(chip_controller->is_collapse_timer_running_for_testing());
   EXPECT_TRUE(chip_controller->is_dismiss_timer_running_for_testing());
@@ -518,10 +520,12 @@ IN_PROC_BROWSER_TEST_F(PermissionChipBrowserTest, DisplayQuietChipAbusiveTest) {
   EXPECT_FALSE(delegate.IsRequestInProgress());
 }
 
-IN_PROC_BROWSER_TEST_F(PermissionChipBrowserTest, ClickOnQuietChipAbusiveTest) {
+IN_PROC_BROWSER_TEST_F(PermissionChipBrowserTest,
+                       ClickOnQuietChipAlreadyDisplayedTest) {
   auto& delegate = *test::MockPermissionRequestManager::CreateForWebContents(
       GURL("https://test.origin"), {permissions::RequestType::kNotifications},
-      true, QuietUiReason::kTriggeredDueToAbusiveRequests, web_contents_);
+      true, QuietUiReason::kEnabledInPrefs, web_contents_);
+  delegate.SetAlreadyDisplayed();
   EXPECT_CALL(delegate, PreIgnoreQuietPrompt()).WillOnce([&delegate]() {
     return delegate.PermissionRequestManager::PreIgnoreQuietPrompt();
   });
@@ -593,12 +597,8 @@ INSTANTIATE_TEST_SUITE_P(
     Combine(Values(permissions::RequestType::kGeolocation,
                    permissions::RequestType::kNotifications),
             Values(QuietUiReason::kEnabledInPrefs,
-                   QuietUiReason::kTriggeredByCrowdDeny,
-                   QuietUiReason::kTriggeredDueToAbusiveRequests,
-                   QuietUiReason::kTriggeredDueToAbusiveContent,
                    QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                   QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant,
-                   QuietUiReason::kTriggeredDueToDisruptiveBehavior)),
+                   QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant)),
     /*name_generator=*/
     TestNameGenerator<QuietUiPreignoreTest::ParamType>);
 

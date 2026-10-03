@@ -1036,8 +1036,8 @@ IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
   ASSERT_TRUE(
       base::FeatureList::IsEnabled(features::kQuietNotificationPrompts));
 
-  SetCannedUiDecision(Decision::UseQuietUi(
-      QuietUiReason::kTriggeredDueToAbusiveContent, Decision::ShowNoWarning()));
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
+                                           Decision::ShowNoWarning()));
 
   RequestPermission(permissions::RequestType::kCameraStream);
 
@@ -1050,8 +1050,7 @@ IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
 
   EXPECT_EQ(
       test_api_->manager()->current_request_prompt_disposition_for_testing(),
-      permissions::PermissionPromptDisposition::
-          LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
+      permissions::PermissionPromptDisposition::LOCATION_BAR_LEFT_QUIET_CHIP);
 
   test_api_->manager()->Accept(/*prompt_options=*/std::monostate());
   base::RunLoop().RunUntilIdle();
@@ -1060,8 +1059,7 @@ IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
 
   EXPECT_EQ(
       test_api_->manager()->current_request_prompt_disposition_for_testing(),
-      permissions::PermissionPromptDisposition::
-          LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
+      permissions::PermissionPromptDisposition::LOCATION_BAR_LEFT_QUIET_CHIP);
 
   test_api_->manager()->Accept(/*prompt_options=*/std::monostate());
   base::RunLoop().RunUntilIdle();
@@ -1084,7 +1082,6 @@ class QuietChipFailFastInteractiveTest
 
  protected:
   using QuietUiReason = permissions::PermissionUiSelector::QuietUiReason;
-  using WarningReason = permissions::PermissionUiSelector::WarningReason;
   using Decision = permissions::PermissionUiSelector::Decision;
 
   void SetCannedUiDecision(const Decision& decision) {
@@ -1184,9 +1181,8 @@ IN_PROC_BROWSER_TEST_F(QuietChipFailFastInteractiveTest,
                        EventListenerAddedTest) {
   base::HistogramTester histograms;
 
-  SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
-                           WarningReason::kAbusiveRequests));
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
+                                           Decision::ShowNoWarning()));
 
   ASSERT_TRUE(embedded_test_server()->Start());
   const GURL url(embedded_test_server()->GetURL("/title1.html"));

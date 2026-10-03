@@ -39,7 +39,7 @@ TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithDangerousLevel) {
   base::test::ScopedFeatureList scoped_feature_list_;
   security_state::VisibleSecurityState visible_security_state;
   visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING;
+      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::DANGEROUS, &visible_security_state);
   EXPECT_EQ(icon.name, features::IsRoundedIconsEnabled()
@@ -63,7 +63,7 @@ TEST(LocationBarModelUtilTest,
 TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithWarningLevel) {
   security_state::VisibleSecurityState visible_security_state;
   visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING;
+      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::WARNING, &visible_security_state);
   EXPECT_EQ(icon.name,

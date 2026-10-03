@@ -281,22 +281,13 @@ class DownloadBubbleUIControllerTest : public InProcessBrowserTest {
     controller().OnDownloadItemAdded(&item(index), may_show_animation);
   }
 
-  void UpdateDownloadItem(
-      int item_index,
-      DownloadState state,
-      bool is_paused = false,
-      DownloadDangerType danger_type =
-          DownloadDangerType::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS) {
+  void UpdateDownloadItem(int item_index,
+                          DownloadState state,
+                          bool is_paused = false) {
     DCHECK_GT(items_.size(), static_cast<size_t>(item_index));
     EXPECT_CALL(item(item_index), GetState()).WillRepeatedly(Return(state));
     EXPECT_CALL(item(item_index), IsDone())
         .WillRepeatedly(Return(state == DownloadState::COMPLETE));
-    EXPECT_CALL(item(item_index), IsDangerous())
-        .WillRepeatedly(
-            Return(danger_type !=
-                   DownloadDangerType::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS));
-    EXPECT_CALL(item(item_index), GetDangerType())
-        .WillRepeatedly(Return(danger_type));
     EXPECT_CALL(item(item_index), IsPaused()).WillRepeatedly(Return(is_paused));
     controller().OnDownloadItemUpdated(&item(item_index));
   }
@@ -365,15 +356,13 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest, ProcessesUpdatedItems) {
   UpdateOfflineItem(/*item_index=*/0, OfflineItemState::COMPLETE);
 }
 
-IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
-                       UpdatedItemIsPendingDeepScanning) {
+IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest, UpdatedItemIsInsecure) {
   EXPECT_CALL(display_controller(), OnNewItem(true)).Times(1);
   InitDownloadItem(FILE_PATH_LITERAL("/foo/bar.pdf"),
                    download::DownloadItem::IN_PROGRESS, "Download 1");
   EXPECT_CALL(display_controller(), OnUpdatedItem(true, true)).Times(1);
-  UpdateDownloadItem(
-      /*item_index=*/0, DownloadState::IN_PROGRESS, false,
-      DownloadDangerType::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING);
+  EXPECT_CALL(item(0), IsInsecure()).WillRepeatedly(Return(true));
+  UpdateDownloadItem(/*item_index=*/0, DownloadState::IN_PROGRESS);
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,

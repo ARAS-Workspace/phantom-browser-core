@@ -26,7 +26,6 @@
 #include "chrome/browser/privacy_sandbox/mock_privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
-#include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/file_system_access/file_system_access_ui_helpers.h"
@@ -65,7 +64,6 @@
 #include "components/page_info/core/features.h"
 #include "components/page_info/core/proto/about_this_site_metadata.pb.h"
 #include "components/page_info/page_info.h"
-#include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_decision_auto_blocker.h"
 #include "components/permissions/permissions_client.h"
@@ -443,10 +441,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
             OpenSiteSettingsForUrl(browser(), GURL(url::kAboutBlankURL)));
 }
 
-// Test opening page info bubble that matches
-// SB_THREAT_TYPE_ENTERPRISE_PASSWORD_REUSE threat type.
-// Test opening page info bubble that matches
-// SB_THREAT_TYPE_SAVED_PASSWORD_REUSE threat type.
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
                        ClosesOnUserNavigateToSamePage) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetSimplePageUrl()));
@@ -639,9 +633,9 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTestWithAutoupgradesDisabled,
             l10n_util::GetStringUTF16(IDS_PAGE_INFO_MIXED_CONTENT_SUMMARY));
 }
 
-// Ensure a page can both have an invalid certificate *and* be blocked by Safe
-// Browsing.  Regression test for bug 869925.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, BlockedAndInvalidCert) {
+// Ensure a page with an invalid certificate shows the not secure summary and a
+// "Certificate Details" button.
+IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, InvalidCert) {
   SetupSentimentServiceExpectations(/*interacted=*/true);
 
   net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
@@ -652,19 +646,18 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, BlockedAndInvalidCert) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(
       browser(), https_server.GetURL("/simple.html")));
 
-  // Setup the bogus identity with an expired cert and SB flagging.
+  // Setup the bogus identity with an expired cert.
   PageInfoUI::IdentityInfo identity;
   identity.identity_status = PageInfo::SITE_IDENTITY_STATUS_ERROR;
   identity.certificate = net::ImportCertFromFile(net::GetTestCertsDirectory(),
                                                  kExpiredCertificateFile);
-  identity.safe_browsing_status = PageInfo::SAFE_BROWSING_STATUS_MALWARE;
   OpenPageInfoBubble(browser());
 
   SetPageInfoBubbleIdentityInfo(identity);
 
-  // Verify bubble complains of malware...
+  // Verify bubble shows the not secure summary...
   EXPECT_EQ(GetPageInfoBubbleViewSummaryText(),
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY));
+            l10n_util::GetStringUTF16(IDS_PAGE_INFO_NOT_SECURE_SUMMARY));
 
   // ...and has a "Certificate Details" button.
   std::u16string invalid_text;

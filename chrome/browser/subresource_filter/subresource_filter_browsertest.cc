@@ -12,42 +12,31 @@
 #include "base/functional/bind.h"
 #include "base/location.h"
 #include "base/memory/ref_counted.h"
-#include "base/strings/pattern.h"
 #include "base/strings/string_util.h"
-#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/simple_test_clock.h"
-#include "build/branding_buildflags.h"
-#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/subresource_filter/subresource_filter_browser_test_harness.h"
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_commands.h"
-#include "chrome/browser/ui/navigator/browser_navigator.h"
-#include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/security_interstitials/core/unsafe_resource.h"
-#include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
 #include "components/subresource_filter/content/browser/test_ruleset_publisher.h"
 #include "components/subresource_filter/core/browser/async_document_subresource_filter.h"
 #include "components/subresource_filter/core/browser/async_document_subresource_filter_test_utils.h"
-#include "components/subresource_filter/core/browser/subresource_filter_constants.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features_test_support.h"
-#include "components/subresource_filter/core/common/activation_decision.h"
 #include "components/subresource_filter/core/common/common_features.h"
 #include "components/subresource_filter/core/common/test_ruleset_creator.h"
 #include "components/subresource_filter/core/common/test_ruleset_utils.h"
 #include "components/subresource_filter/core/mojom/subresource_filter.mojom.h"
 #include "components/url_pattern_index/proto/rules.pb.h"
-#include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/page_navigator.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
@@ -58,8 +47,6 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/no_renderer_crashes_assertion.h"
-#include "content/public/test/test_navigation_observer.h"
-#include "content/public/test/test_utils.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -72,8 +59,6 @@ using subresource_filter::testing::TestRulesetPair;
 
 namespace {
 
-namespace proto = url_pattern_index::proto;
-
 // The path to a multi-frame document used for tests.
 static constexpr const char kTestFrameSetPath[] =
     "/subresource_filter/frame_set.html";
@@ -81,30 +66,6 @@ static constexpr const char kTestFrameSetPath[] =
 }  // namespace
 
 // Tests -----------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-IN_PROC_BROWSER_TEST_F(SubresourceFilterBrowserTest,
-                       PRE_MainFrameActivationOnStartup) {
-  SetRulesetToDisallowURLsWithPathSuffix("included_script.js");
-}
-
-
-
-
 
 // Disable the test as it's flaky on Win7 dbg.
 // crbug.com/40125372
@@ -335,7 +296,6 @@ IN_PROC_BROWSER_TEST_F(SubresourceFilterBrowserTest,
   }
 }
 
-
 // Test that resources in a popup with an aborted initial load due to a
 // doc.write are still blocked when disallowed, even if the opener is
 // immediately closed after writing.
@@ -390,15 +350,6 @@ IN_PROC_BROWSER_TEST_F(
 
 // Tests checking how histograms are recorded. ---------------------------------
 
-#if BUILDFLAG(IS_MAC)
-// TODO(crbug.com/40236757): Flaky on Mac.
-#define MAYBE_ExpectPerformanceHistogramsAreRecorded \
-  DISABLED_ExpectPerformanceHistogramsAreRecorded
-#else
-#define MAYBE_ExpectPerformanceHistogramsAreRecorded \
-  ExpectPerformanceHistogramsAreRecorded
-#endif
-
 class SubresourceFilterBrowserTestWithoutAdTagging
     : public SubresourceFilterBrowserTest {
  public:
@@ -441,7 +392,5 @@ IN_PROC_BROWSER_TEST_F(SubresourceFilterBrowserTestWithoutAdTagging,
 
   // Although SubresourceFilterAgents still record the activation decision.
 }
-
-
 
 }  // namespace subresource_filter

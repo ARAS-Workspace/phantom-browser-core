@@ -49,7 +49,12 @@ TEST(ExtensionAPIPermissionTest, CheckEnums) {
     // expecting to find the string "ENTRY = <value>" somewhere in the file.
     std::string expected_string =
         base::StringPrintf("%s = %d", entry.second.c_str(), entry.first);
-    EXPECT_TRUE(file_contents.contains(expected_string))
+    // A removed permission keeps its enums.xml label and is renamed to
+    // kDeleted_<Name> in the mojom.
+    std::string deleted_string = base::StringPrintf(
+        "kDeleted_%s = %d", entry.second.substr(1).c_str(), entry.first);
+    EXPECT_TRUE(file_contents.contains(expected_string) ||
+                file_contents.contains(deleted_string))
         << "Failed to find entry " << entry.second << " with value "
         << entry.first;
   }

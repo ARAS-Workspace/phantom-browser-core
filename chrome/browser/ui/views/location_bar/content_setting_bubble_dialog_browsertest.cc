@@ -30,11 +30,6 @@
 #include "components/content_settings/core/common/features.h"
 #include "components/content_settings/core/test/content_settings_mock_provider.h"
 #include "components/content_settings/core/test/content_settings_test_utils.h"
-#include "components/permissions/permission_request_manager.h"
-#include "components/permissions/permission_ui_selector.h"
-#include "components/permissions/request_type.h"
-#include "components/permissions/test/mock_permission_request.h"
-#include "components/permissions/test/mock_permission_ui_selector.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -43,9 +38,6 @@
 #include "url/gurl.h"
 
 namespace {
-
-using QuietUiReason = permissions::PermissionUiSelector::QuietUiReason;
-using Decision = permissions::PermissionUiSelector::Decision;
 
 // An override that returns a fake URL for every blocked popup, so the UI
 // displays consistent strings for pixel tests.
@@ -91,8 +83,6 @@ class ContentSettingBubbleDialogTest
 
   void ApplyMediastreamSettings(bool mic_accessed, bool camera_accessed);
   void ApplyContentSettingsForType(ContentSettingsType content_type);
-  void TriggerQuietNotificationPermissionRequest(
-      QuietUiReason simulated_reason_for_quiet_ui);
   void OverrideContentSettingsProvider(
       const std::vector<ContentSettingsType>& types);
   void NavigateToContentTab();
@@ -185,24 +175,6 @@ void ContentSettingBubbleDialogTest::ApplyContentSettingsForType(
   BrowserWindow::FromBrowser(browser())->UpdateToolbar(web_contents);
 }
 
-void ContentSettingBubbleDialogTest::TriggerQuietNotificationPermissionRequest(
-    QuietUiReason simulated_reason_for_quiet_ui) {
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  auto* permission_request_manager =
-      permissions::PermissionRequestManager::FromWebContents(web_contents);
-  permission_request_manager->set_permission_ui_selector_for_testing(
-      std::make_unique<MockPermissionUiSelector>(
-          Decision::UseQuietUi(simulated_reason_for_quiet_ui, std::nullopt)));
-
-  permission_request_manager->AddRequest(
-      web_contents->GetPrimaryMainFrame(),
-      std::make_unique<permissions::MockPermissionRequest>(
-          GURL("https://example.com"),
-          permissions::RequestType::kNotifications));
-  base::RunLoop().RunUntilIdle();
-}
-
 void ContentSettingBubbleDialogTest::OverrideContentSettingsProvider(
     const std::vector<ContentSettingsType>& types) {
   auto provider = std::make_unique<content_settings::MockProvider>();
@@ -273,28 +245,6 @@ void ContentSettingBubbleDialogTest::ShowUi(const std::string& name) {
     OverrideContentSettingsProvider(types);
     ApplyMediastreamSettings(apply_mic_settings, apply_camera_settings);
     ShowDialogBubble(ImageType::kMediaStream);
-    return;
-  }
-
-  if (base::StartsWith(name, "notifications_quiet",
-                       base::CompareCase::SENSITIVE)) {
-    QuietUiReason reason = QuietUiReason::kEnabledInPrefs;
-    if (base::StartsWith(name, "notifications_quiet_crowd_deny",
-                         base::CompareCase::SENSITIVE)) {
-      reason = QuietUiReason::kTriggeredByCrowdDeny;
-    } else if (base::StartsWith(name, "notifications_quiet_abusive",
-                                base::CompareCase::SENSITIVE)) {
-      reason = QuietUiReason::kTriggeredDueToAbusiveRequests;
-    } else if (base::StartsWith(name, "notifications_quiet_abusive_content",
-                                base::CompareCase::SENSITIVE)) {
-      reason = QuietUiReason::kTriggeredDueToAbusiveContent;
-    } else if (base::StartsWith(name,
-                                "notifications_quiet_predicted_very_unlikely",
-                                base::CompareCase::SENSITIVE)) {
-      reason = QuietUiReason::kServicePredictedVeryUnlikelyGrant;
-    }
-    TriggerQuietNotificationPermissionRequest(reason);
-    ShowDialogBubble(ImageType::kNotifications);
     return;
   }
 

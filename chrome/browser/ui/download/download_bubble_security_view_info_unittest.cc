@@ -4,7 +4,6 @@
 
 #include "chrome/browser/ui/download/download_bubble_security_view_info.h"
 
-#include "base/strings/pattern.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/download/download_item_model.h"
@@ -15,7 +14,6 @@
 #include "components/download/public/common/mock_download_item.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
-#include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/test/browser_task_environment.h"
@@ -49,8 +47,6 @@ class DownloadBubbleSecurityViewInfoTest
 
   NiceMock<download::MockDownloadItem>& item() { return *item_; }
   DownloadBubbleSecurityViewInfo& info() { return *info_; }
-  Profile* profile() { return &profile_; }
-  TestingProfile& testing_profile() { return profile_; }
 
   void RefreshInfo() { info_->PopulateForDownload(item_.get()); }
 

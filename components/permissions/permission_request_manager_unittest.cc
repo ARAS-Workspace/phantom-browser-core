@@ -1304,76 +1304,54 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
   } kTests[] = {
       // Simple sync selectors, first one should take priority.
       {
-          {Decision::UseQuietUi(QuietUiReason::kTriggeredByCrowdDeny,
+          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
                                 Decision::ShowNoWarning()),
            Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                                 Decision::ShowNoWarning())},
           {false, false},
-          QuietUiReason::kTriggeredByCrowdDeny,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       {
-          {Decision::UseQuietUi(
-               QuietUiReason::kTriggeredDueToDisruptiveBehavior,
-               Decision::ShowNoWarning()),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
-          {false, false},
-          QuietUiReason::kTriggeredDueToDisruptiveBehavior,
-          GeolocationAccuracy::kPrecise,
-      },
-      {
-          {Decision::UseQuietUi(
-               QuietUiReason::kTriggeredDueToDisruptiveBehavior,
-               Decision::ShowNoWarning()),
+          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
+                                Decision::ShowNoWarning()),
            Decision::UseQuietUi(
                QuietUiReason::kServicePredictedVeryUnlikelyGrant,
                Decision::ShowNoWarning())},
           {false, false},
-          QuietUiReason::kTriggeredDueToDisruptiveBehavior,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       {
-          {Decision::UseQuietUi(
-               QuietUiReason::kTriggeredDueToDisruptiveBehavior,
-               Decision::ShowNoWarning()),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredByCrowdDeny,
+          {Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
+                                Decision::ShowNoWarning()),
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
                                 Decision::ShowNoWarning())},
           {false, false},
-          QuietUiReason::kTriggeredDueToDisruptiveBehavior,
+          QuietUiReason::kEnabledInPrefs,
           GeolocationAccuracy::kPrecise,
       },
       // First selector is async but should still take priority even if it
       // returns later.
       {
-          {Decision::UseQuietUi(QuietUiReason::kTriggeredByCrowdDeny,
+          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
                                 Decision::ShowNoWarning()),
            Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                                 Decision::ShowNoWarning())},
           {true, false},
-          QuietUiReason::kTriggeredByCrowdDeny,
-          GeolocationAccuracy::kPrecise,
-      },
-      {
-          {Decision::UseQuietUi(
-               QuietUiReason::kTriggeredDueToDisruptiveBehavior,
-               Decision::ShowNoWarning()),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
-          {true, false},
-          QuietUiReason::kTriggeredDueToDisruptiveBehavior,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       // The first selector that has a quiet ui decision should be used.
       {
           {Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveContent,
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
                                 Decision::ShowNoWarning()),
            Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                                 Decision::ShowNoWarning())},
           {false, true, true, false},
-          QuietUiReason::kTriggeredDueToAbusiveContent,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       // If all selectors return a normal ui, it should use a normal ui.
@@ -1423,13 +1401,13 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
                                 Decision::ShowNoWarning()),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                                 Decision::ShowNoWarning())},
           {false, true, false, true, true, true, false, false},
-          QuietUiReason::kTriggeredDueToAbusiveRequests,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       // Use a bunch of selectors all sync.
@@ -1439,13 +1417,13 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
                                 Decision::ShowNoWarning()),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                                 Decision::ShowNoWarning())},
           {false, false, false, false, false, false, false, false},
-          QuietUiReason::kTriggeredDueToAbusiveRequests,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       // Use a bunch of selectors all async.
@@ -1455,13 +1433,13 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
                                 Decision::ShowNoWarning()),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                                 Decision::ShowNoWarning())},
           {true, true, true, true, true, true, true, true},
-          QuietUiReason::kTriggeredDueToAbusiveRequests,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       // Use a bunch of selectors both async and sync.
@@ -1471,14 +1449,13 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(
-               QuietUiReason::kTriggeredDueToDisruptiveBehavior,
-               Decision::ShowNoWarning()),
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
+                                Decision::ShowNoWarning()),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                                 Decision::ShowNoWarning())},
           {true, false, false, true, true, true, false, false},
-          QuietUiReason::kTriggeredDueToDisruptiveBehavior,
+          QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
   };
@@ -1626,7 +1603,7 @@ TEST_F(PermissionRequestManagerTest, NewHighPriorityRequestDuringUIDecision) {
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
+      Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
                            Decision::ShowNoWarning()),
       std::make_optional<base::TimeDelta>(base::Seconds(2)));
   MockPermissionRequest::MockPermissionRequestState request1_state;
@@ -1692,7 +1669,7 @@ class PermissionRequestManagerAlsoWithApproximateGeolocationTest
 // Verifies that the quiet UI chip is not ignored if another request came in
 // less than 8.5 seconds after.
 // Permissions requested in order:
-// 1. Notification (abusive)
+// 1. Notification (quiet UI)
 // 2. After less than 8.5 seconds Geolocation
 //
 // Prompt display order:
@@ -1700,12 +1677,11 @@ class PermissionRequestManagerAlsoWithApproximateGeolocationTest
 // 2. Geolocation request shown
 // 3. Notifications request shown again
 TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
-       AbusiveNotificationsGeolocationQuietUIChipRequest) {
+       QuietNotificationsGeolocationQuietUIChipRequest) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(
-          PermissionUiSelector::QuietUiReason::kTriggeredDueToAbusiveRequests,
-          Decision::ShowNoWarning()),
+      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
+                           Decision::ShowNoWarning()),
       std::nullopt /* async_delay */);
 
   auto request_notifications = CreateAndAddRequest(RequestType::kNotifications,
@@ -1728,19 +1704,18 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
 // than 8.5 seconds after.
 //
 // Permissions requested in order:
-// 1. Notification (abusive)
+// 1. Notification (quiet UI)
 // 2. After more than 8.5 seconds Geolocation
 //
 // Prompt display order:
 // 1. Notifications request shown but is preempted because of quiet UI.
 // 2. Geolocation request shown
 TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
-       AbusiveNotificationsShownLongEnough) {
+       QuietNotificationsShownLongEnough) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(
-          PermissionUiSelector::QuietUiReason::kTriggeredDueToAbusiveRequests,
-          Decision::ShowNoWarning()),
+      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
+                           Decision::ShowNoWarning()),
       std::nullopt /* async_delay */);
 
   auto request_notifications = CreateAndAddRequest(RequestType::kNotifications,
@@ -1754,7 +1729,7 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
                                                  /*should_be_seen=*/true, 2);
 
   // The second permission was requested after 8.5 second window, the quiet UI
-  // Notifiations request for an abusive origin is automatically ignored.
+  // Notifiations request is automatically ignored.
   EXPECT_FALSE(request_notifications->granted);
   EXPECT_TRUE(request_notifications->finished);
 
@@ -1768,7 +1743,7 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
 // request is shown despite being requested last.
 //
 // Permissions requested in order:
-// 1. Notification (abusive)
+// 1. Notification (quiet UI)
 // 2. After less than 8.5 seconds Geolocation
 // 3. Camera
 //
@@ -1779,12 +1754,11 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
 // 4. Geolocation request shown again
 // 5. Notifications quiet UI request shown again
 TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
-       AbusiveNotificationsShownLongEnoughCamera) {
+       QuietNotificationsShownLongEnoughCamera) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(
-          PermissionUiSelector::QuietUiReason::kTriggeredDueToAbusiveRequests,
-          Decision::ShowNoWarning()),
+      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
+                           Decision::ShowNoWarning()),
       std::nullopt /* async_delay */);
 
   auto request_notifications = CreateAndAddRequest(RequestType::kNotifications,
@@ -1799,7 +1773,7 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
                                             /*should_be_seen=*/true, 3);
 
   // The second permission was requested in 8.5 second window, the quiet UI
-  // Notifiations request for an abusive origin is not automatically ignored.
+  // Notifiations request is not automatically ignored.
   EXPECT_FALSE(request_notifications->granted);
   EXPECT_FALSE(request_notifications->finished);
 
@@ -1820,19 +1794,18 @@ INSTANTIATE_TEST_SUITE_P(
 //
 // Permissions requested in order:
 // 1. Camera
-// 2. Notification (abusive)
+// 2. Notification (quiet UI)
 // 3. After less than 8.5 seconds Geolocation
 //
 // Prompt display order:
 // 1. Camera request shown
 // 2. Geolocation request shown
 // 3. Camera request shown
-TEST_F(PermissionRequestManagerTest, CameraAbusiveNotificationsGeolocation) {
+TEST_F(PermissionRequestManagerTest, CameraQuietNotificationsGeolocation) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(
-          PermissionUiSelector::QuietUiReason::kTriggeredDueToAbusiveRequests,
-          Decision::ShowNoWarning()),
+      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
+                           Decision::ShowNoWarning()),
       std::nullopt /* async_delay */);
 
   auto request_camera = CreateAndAddRequest(RequestType::kCameraStream,
@@ -1850,8 +1823,7 @@ TEST_F(PermissionRequestManagerTest, CameraAbusiveNotificationsGeolocation) {
                                                  /*should_be_seen=*/false, 1);
 
   // The second permission after quiet UI was requested in 8.5 second window,
-  // the quiet UI Notifiations request for an abusive origin is not
-  // automatically ignored.
+  // the quiet UI Notifiations request is not automatically ignored.
   EXPECT_FALSE(request_notifications->granted);
   EXPECT_FALSE(request_notifications->finished);
 
@@ -1868,7 +1840,7 @@ TEST_F(PermissionRequestManagerTest, CameraAbusiveNotificationsGeolocation) {
 //
 // Permissions requested in order:
 // 1. Camera
-// 2. Notification (abusive)
+// 2. Notification (quiet UI)
 // 3. After less than 8.5 seconds Geolocation
 // 4. MIDI
 //
@@ -1880,13 +1852,11 @@ TEST_F(PermissionRequestManagerTest, CameraAbusiveNotificationsGeolocation) {
 // 4. Notifications request shown
 // If Chip is enabled MIDI will replace Camera, hence 5 prompts will be
 // shown. Otherwise 4.
-TEST_F(PermissionRequestManagerTest,
-       CameraAbusiveNotificationsGeolocationMIDI) {
+TEST_F(PermissionRequestManagerTest, CameraQuietNotificationsGeolocationMIDI) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(
-          PermissionUiSelector::QuietUiReason::kTriggeredDueToAbusiveRequests,
-          Decision::ShowNoWarning()),
+      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
+                           Decision::ShowNoWarning()),
       std::nullopt /* async_delay */);
 
   auto request_camera = CreateAndAddRequest(RequestType::kCameraStream,
@@ -1908,8 +1878,7 @@ TEST_F(PermissionRequestManagerTest,
                                           /*should_be_seen=*/true, 2);
 
   // The second permission after quiet UI was requested in 8.5 second window,
-  // the quiet UI Notifiations request for an abusive origin is not
-  // automatically ignored.
+  // the quiet UI Notifiations request is not automatically ignored.
   EXPECT_FALSE(request_notifications->granted);
   EXPECT_FALSE(request_notifications->finished);
 
@@ -1960,8 +1929,7 @@ TEST_F(PermissionRequestManagerTest,
                                           /*should_be_seen=*/true, 2);
 
   // The second permission after quiet UI was requested in 8.5 second window,
-  // the quiet UI Notifiations request for an abusive origin is not
-  // automatically ignored.
+  // the quiet UI Notifiations request is not automatically ignored.
   EXPECT_FALSE(request_notifications->granted);
   EXPECT_FALSE(request_notifications->finished);
 

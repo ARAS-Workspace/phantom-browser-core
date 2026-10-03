@@ -124,7 +124,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
     std::string privacy_sandbox_4_consent_decline_probability = "0.1";
     std::string privacy_sandbox_4_notice_ok_probability = "0.1";
     std::string privacy_sandbox_4_notice_settings_probability = "0.1";
-    std::string safe_browsing_interstitial_probability = "0.4";
     std::string browsing_data_trigger_id = "browsing-data-test";
     std::string control_group_trigger_id = "control-group-test";
     std::string download_warning_ui_trigger_id = "download-warning-ui-test";
@@ -132,8 +131,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
     std::string safety_check_trigger_id = "safety-check-test";
     std::string trusted_surface_trigger_id = "trusted-surface-test";
     std::string privacy_guide_trigger_id = "privacy-guide-test";
-    std::string safe_browsing_interstitial_trigger_id =
-        "safe-browsing-interstitial";
   };
 
   void SetupFeatureParametersV2(FeatureParamsV2 params) {
@@ -158,8 +155,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
              params.safety_hub_interaction_probability},
             {"trusted-surface-probability", params.trusted_surface_probability},
             {"privacy-guide-probability", params.privacy_guide_probability},
-            {"safe-browsing-interstitial-probability",
-             params.safe_browsing_interstitial_probability},
             {"browsing-data-trigger-id", params.browsing_data_trigger_id},
             {"control-group-trigger-id", params.control_group_trigger_id},
             {"download-warning-ui-trigger-id",
@@ -168,8 +163,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
             {"safety-check-trigger-id", params.safety_check_trigger_id},
             {"trusted-surface-trigger-id", params.trusted_surface_trigger_id},
             {"privacy-guide-trigger-id", params.privacy_guide_trigger_id},
-            {"safe-browsing-interstitial-trigger-id",
-             params.safe_browsing_interstitial_trigger_id},
         });
   }
 

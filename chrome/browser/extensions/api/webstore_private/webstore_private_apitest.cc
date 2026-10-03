@@ -714,17 +714,9 @@ class ExtensionWebstorePrivateGetReferrerChainApiTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Tests that the GetReferrerChain API returns the redirect information.
+// Tests that the GetReferrerChain API returns an empty string.
 IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateGetReferrerChainApiTest,
-                       GetReferrerChain) {
-  GURL page_url = GetTestServerURLWithReferrers("referrer_chain.html");
-  ASSERT_TRUE(OpenTestURL(page_url));
-}
-
-// Tests that the GetReferrerChain API returns an empty string for profiles
-// opted out of SafeBrowsing.
-IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateGetReferrerChainApiTest,
-                       GetReferrerChainForNonSafeBrowsingUser) {
+                       GetReferrerChainReturnsEmpty) {
   GURL page_url = GetTestServerURLWithReferrers("empty_referrer_chain.html");
   ASSERT_TRUE(OpenTestURL(page_url));
 }

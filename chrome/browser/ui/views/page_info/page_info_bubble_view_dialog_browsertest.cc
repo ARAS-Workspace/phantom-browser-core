@@ -191,7 +191,7 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
     constexpr char kMalware[] = "Malware";
     constexpr char kDeceptive[] = "Deceptive";
     constexpr char kUnwantedSoftware[] = "UnwantedSoftware";
-    constexpr char kMalwareAndBadCert[] = "MalwareAndBadCert";
+    constexpr char kBadCert[] = "BadCert";
     constexpr char kMixedContentForm[] = "MixedContentForm";
     constexpr char kMixedContent[] = "MixedContent";
     constexpr char kAllowAllPermissions[] = "AllowAllPermissions";
@@ -211,7 +211,7 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
     GURL url = http_url;
     if (name == kSecure || name == kEvSecure || name == kMixedContentForm ||
         name == kMixedContent || name == kAllowAllPermissions ||
-        name == kBlockAllPermissions || name == kMalwareAndBadCert ||
+        name == kBlockAllPermissions || name == kBadCert ||
         name == kNotificationsEmbargoed) {
       url = https_url;
     }
@@ -283,11 +283,10 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
     } else if (name == kUnwantedSoftware) {
       identity.safe_browsing_status =
           PageInfo::SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE;
-    } else if (name == kMalwareAndBadCert) {
+    } else if (name == kBadCert) {
       identity.identity_status = PageInfo::SITE_IDENTITY_STATUS_ERROR;
       identity.certificate = net::ImportCertFromFile(
           net::GetTestCertsDirectory(), kExpiredCertificateFile);
-      identity.safe_browsing_status = PageInfo::SAFE_BROWSING_STATUS_MALWARE;
     } else if (name == kMixedContentForm) {
       identity.identity_status = PageInfo::SITE_IDENTITY_STATUS_CERT;
       identity.connection_status =
@@ -452,10 +451,8 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest,
   ShowAndVerifyUi();
 }
 
-// Shows the Page Info bubble for a site flagged for malware that also has a bad
-// certificate.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest,
-                       InvokeUi_MalwareAndBadCert) {
+// Shows the Page Info bubble for a site with a bad certificate.
+IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest, InvokeUi_BadCert) {
   ShowAndVerifyUi();
 }
 
@@ -497,17 +494,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest,
   ShowAndVerifyUi();
 }
 
-// Shows the Page Info bubble Safe Browsing warning after detecting the user has
-// re-used an existing password on a site, e.g. due to phishing.
-// Shows the Page Info bubble Safe Browsing warning after detecting the
-// signed-in syncing user has re-used an existing password on a site, e.g. due
-// to phishing.
-// Shows the Page Info bubble Safe Browsing warning after detecting the
-// signed-in not syncing user has re-used an existing password on a site, e.g.
-// due to phishing.
-// Shows the Page Info bubble Safe Browsing warning after detecting the
-// enterprise user has re-used an existing password on a site, e.g. due to
-// phishing.
 class PageInfoBubbleViewAboutThisSiteDialogBrowserTest
     : public DialogBrowserTest {
  public:

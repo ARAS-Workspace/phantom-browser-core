@@ -4,20 +4,18 @@
 
 #include "chrome/browser/ui/download/download_bubble_row_view_info.h"
 
+#include "base/functional/callback_helpers.h"
 #include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/download/download_item_model.h"
 #include "chrome/browser/download/download_ui_model.h"
 #include "chrome/browser/download/offline_item_utils.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/mock_download_item.h"
 #include "components/offline_items_collection/core/offline_item.h"
 #include "components/prefs/pref_service.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/test/browser_task_environment.h"
@@ -59,8 +57,6 @@ class DownloadBubbleRowViewInfoTest : public testing::Test,
   void DestroyItem() { item_.reset(); }
 
   NiceMock<download::MockDownloadItem>& item() { return *item_; }
-
-  Profile* profile() { return &profile_; }
 
   ContentId content_id() {
     return OfflineItemUtils::GetContentIdForDownload(item_.get());

@@ -19,7 +19,6 @@ namespace {
 
 TEST(NotificationTipsUtilsTest, GetTipsNotificationData) {
   const std::vector<TipsNotificationsFeatureType> tips_list = {
-      TipsNotificationsFeatureType::kEnhancedSafeBrowsing,
       TipsNotificationsFeatureType::kQuickDelete,
       TipsNotificationsFeatureType::kGoogleLens,
       TipsNotificationsFeatureType::kBottomOmnibox,
@@ -35,12 +34,6 @@ TEST(NotificationTipsUtilsTest, GetTipsNotificationData) {
     std::u16string expected_message;
 
     switch (type) {
-      case TipsNotificationsFeatureType::kEnhancedSafeBrowsing:
-        expected_title = l10n_util::GetStringUTF16(
-            IDS_TIPS_NOTIFICATIONS_ENHANCED_SAFE_BROWSING_TITLE);
-        expected_message = l10n_util::GetStringUTF16(
-            IDS_TIPS_NOTIFICATIONS_ENHANCED_SAFE_BROWSING_SUBTITLE);
-        break;
       case TipsNotificationsFeatureType::kQuickDelete:
         expected_title = l10n_util::GetStringUTF16(
             IDS_TIPS_NOTIFICATIONS_QUICK_DELETE_TITLE);

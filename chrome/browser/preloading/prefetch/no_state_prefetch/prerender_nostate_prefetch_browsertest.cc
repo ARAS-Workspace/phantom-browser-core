@@ -1537,9 +1537,6 @@ IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, Jpeg) {
   WaitForRequestCount(src_server()->GetURL(kPrefetchJpeg), 1);
 }
 
-// If the main resource is unsafe, the whole prefetch is cancelled.
-
-
 // Checks that prefetching a page does not add it to browsing history.
 IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, HistoryUntouchedByPrefetch) {
   // Initialize.
@@ -1629,20 +1626,6 @@ void NoStatePrefetchBrowserTest::RunServiceWorkerInterceptTest(
     iter.GetCurrentValue()->Shutdown(content::RESULT_CODE_KILLED);
     process_exit_observer.Wait();
   }
-  // We expect two render_process_hosts for the service worker when
-  // kMigrateToBlockV8OptimizerOnUnfamiliarSites is enabled. This happens
-  // due to a BrowsingInstance swap triggered by mismatched V8 settings:
-  //
-  // 1. Initial State: On test startup, a navigation to about:blank occurs.
-  //    The BlockV8OptimizersOnUnfamiliarSites policy considers about:blank
-  //    a "familiar" site, so V8 optimizers remain enabled.
-  // 2. Navigation: The test navigates to the kServiceWorkerLoader URL.
-  //    The policy marks this URL as "unfamiliar," requiring V8 optimizers
-  //    to be disabled.
-  // 3. Result: This transition from a familiar site (V8 ON) to an unfamiliar
-  //    site (V8 OFF) forces a BrowsingInstance swap. Consequently, 2 hosts
-  //    are created instead of the previously expected 1.
-  // TODO(crbug.com/493200120): Find a better way to handle this situation.
   if (expect_two_hosts) {
     EXPECT_EQ(2, host_count);
   } else {

@@ -7,7 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/files/file_path.h"
 #include "base/memory/raw_ptr.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/download/download_item_model.h"
@@ -17,8 +16,6 @@
 #include "chrome/test/base/testing_profile.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/mock_download_item.h"
-#include "components/prefs/pref_service.h"
-#include "content/public/browser/download_item_utils.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/mock_download_manager.h"
 #include "content/public/test/test_renderer_host.h"
@@ -30,10 +27,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace {
-
-using ::testing::Return;
-using ::testing::ReturnRef;
-using ::testing::ReturnRefOfCopy;
 
 class TestDownloadsDOMHandler : public DownloadsDOMHandler {
  public:

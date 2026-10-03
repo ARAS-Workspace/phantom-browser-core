@@ -77,8 +77,6 @@ class StubResolverConfigReaderTest : public testing::Test {
 
   const net::DnsOverHttpsConfig expected_doh_config_ =
       *net::DnsOverHttpsConfig::FromString(kDohConfigString);
-  const std::vector<net::IPEndPoint> expected_fallback_doh_nameservers_ =
-      StubResolverConfigReader::GetFallbackDohNameservers();
 };
 
 TEST_F(StubResolverConfigReaderTest, GetSecureDnsConfiguration) {
@@ -137,7 +135,7 @@ TEST_F(StubResolverConfigReaderTest,
   local_state_.SetString(prefs::kDnsOverHttpsMode,
                          SecureDnsConfig::kModeAutomatic);
   // Setting the pref value to true but it should be ignored because
-  // `safe_browsing::kBundledSecuritySettingsSecureDnsV2` is disabled.
+  // the DoH fallback upgrade is turned off.
   local_state_.SetBoolean(prefs::kDnsOverHttpsAutomaticModeFallbackToDoh, true);
 
   config_reader_->UpdateNetworkService(/*record_metrics=*/true);

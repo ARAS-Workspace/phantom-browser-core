@@ -1067,7 +1067,7 @@ TEST_F(DownloadBubbleUpdateServiceTest,
   EXPECT_FALSE(info.has_content_check);
 }
 
-TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfo_UpdateForDangerous) {
+TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfo_UpdateForInsecure) {
   base::Time now = base::Time::Now();
   base::Time two_hours_ago = now - base::Hours(2);
   InitDownloadItem(DownloadState::IN_PROGRESS, "now_download",
@@ -1080,10 +1080,9 @@ TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfo_UpdateForDangerous) {
                    {"now_offline_item", "two_hours_ago_offline_item"},
                    {now, two_hours_ago});
 
-  // Make the download dangerous to update the last_completed_time.
-  UpdateDownloadItem(
-      0, DownloadState::IN_PROGRESS, /*is_paused=*/false,
-      DownloadDangerType::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT);
+  // Make the download insecure to update the last_completed_time.
+  EXPECT_CALL(GetDownloadItem(0), IsInsecure()).WillRepeatedly(Return(true));
+  UpdateDownloadItem(0, DownloadState::IN_PROGRESS, /*is_paused=*/false);
 
   DownloadBubbleDisplayInfo info =
       update_service_->GetDisplayInfo(/*web_app_id=*/nullptr);

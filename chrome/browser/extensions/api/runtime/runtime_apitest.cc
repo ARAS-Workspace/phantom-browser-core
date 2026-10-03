@@ -784,7 +784,7 @@ IN_PROC_BROWSER_TEST_F(RuntimeApiTest,
   ASSERT_TRUE(extension_registrar()->IsExtensionEnabled(extension->id()));
 
   // Blocklist extension.
-  blocklist_prefs::SetSafeBrowsingExtensionBlocklistState(
+  blocklist_prefs::AddOmahaBlocklistState(
       extension->id(), BitMapBlocklistState::BLOCKLISTED_MALWARE,
       ExtensionPrefs::Get(profile()));
 

@@ -4,7 +4,6 @@
 
 #include "extensions/browser/extension_allowlist.h"
 
-#include "base/memory/raw_ptr.h"
 #include "chrome/browser/extensions/extension_management_test_util.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_service_test_base.h"
@@ -12,9 +11,7 @@
 #include "chrome/test/base/testing_profile.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "extensions/browser/allowlist_state.h"
-#include "extensions/browser/blocklist_extension_prefs.h"
 #include "extensions/browser/crx_installer.h"
-#include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension_builder.h"
@@ -44,23 +41,16 @@ using ManagementPrefUpdater = ExtensionManagementPrefUpdater<
 // DisableMalwareExtensionsRemotely are enabled.
 class ExtensionAllowlistUnitTestBase : public ExtensionServiceTestBase {
  protected:
-  void TearDown() override {
-    extension_prefs_ = nullptr;
-    ExtensionServiceTestBase::TearDown();
-  }
-
   // Creates a test extension service with 3 installed extensions.
   void CreateExtensionService(bool enhanced_protection_enabled) {
     ExtensionServiceInitParams params;
     ASSERT_TRUE(
         params.ConfigureByTestDataDirectory(data_dir().AppendASCII("good")));
     InitializeExtensionService(std::move(params));
-    extension_prefs_ = ExtensionPrefs::Get(profile());
   }
 
   void CreateEmptyExtensionService() {
     InitializeExtensionService(ExtensionServiceInitParams());
-    extension_prefs_ = ExtensionPrefs::Get(profile());
   }
 
   void PerformActionBasedOnOmahaAttributes(const ExtensionId& extension_id,
@@ -78,20 +68,7 @@ class ExtensionAllowlistUnitTestBase : public ExtensionServiceTestBase {
     return registry()->enabled_extensions().Contains(extension_id);
   }
 
-  bool IsDisabled(const ExtensionId& extension_id) {
-    return registry()->disabled_extensions().Contains(extension_id);
-  }
-
-  bool IsBlocklisted(const ExtensionId& extension_id) {
-    return registry()->blocklisted_extensions().Contains(extension_id);
-  }
-
   ExtensionAllowlist* allowlist() { return service()->allowlist(); }
-
-  ExtensionPrefs* extension_prefs() { return extension_prefs_; }
-
- private:
-  raw_ptr<ExtensionPrefs> extension_prefs_ = nullptr;
 };
 
 class ExtensionAllowlistUnitTest : public ExtensionAllowlistUnitTestBase {

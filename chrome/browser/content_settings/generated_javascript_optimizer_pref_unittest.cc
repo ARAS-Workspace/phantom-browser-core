@@ -4,7 +4,6 @@
 
 #include "chrome/browser/content_settings/generated_javascript_optimizer_pref.h"
 
-#include "base/run_loop.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/download/download_item_warning_data.h"
 #include "chrome/browser/extensions/api/settings_private/generated_pref.h"
@@ -22,7 +21,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace settings_private_api = extensions::api::settings_private;
-using extensions::settings_private::GeneratedPref;
 using extensions::settings_private::SetPrefResult;
 using settings_private_api::PrefObject;
 
@@ -49,39 +47,6 @@ extensions::settings_private::SetPrefResult SetPref(
   return pref.SetPref(&value);
 }
 
-// GeneratedPref::Observer which exposes method for waiting till generated pref
-// has changed.
-class TestObserver : public GeneratedPref::Observer {
- public:
-  TestObserver() {
-    base::RunLoop run_loop;
-    quit_closure_ = run_loop.QuitClosure();
-  }
-
-  ~TestObserver() override = default;
-
-  void WaitForGeneratedPrefChange() {
-    if (was_pref_changed_) {
-      return;
-    }
-
-    base::RunLoop run_loop;
-    quit_closure_ = run_loop.QuitClosure();
-    run_loop.Run();
-  }
-
-  void OnGeneratedPrefChanged(const std::string&) override {
-    was_pref_changed_ = true;
-    if (quit_closure_) {
-      std::move(quit_closure_).Run();
-    }
-  }
-
- private:
-  bool was_pref_changed_ = false;
-  base::OnceClosure quit_closure_;
-};
-
 }  // anonymous namespace
 
 class GeneratedJavascriptOptimizerPrefTest : public testing::Test {
@@ -96,7 +61,6 @@ class GeneratedJavascriptOptimizerPrefTest : public testing::Test {
   }
 
   TestingProfile* profile() { return profile_.get(); }
-  PrefService* prefs() { return profile()->GetPrefs(); }
 
   HostContentSettingsMap* host_content_settings_map() {
     return host_content_settings_map_.get();
@@ -127,9 +91,6 @@ TEST_F(GeneratedJavascriptOptimizerPrefTest, GetPrefObject_FeatureDisabled) {
             GetGeneratedPrefValue(profile()));
 }
 
-// Test potential future scenario where
-// kJavascriptOptimizerBlockedForUnfamiliarSites is updated by
-// non generated-pref code.
 TEST_F(GeneratedJavascriptOptimizerPrefTest, GetPrefObject_SafeBrowsingOff) {
   PrefObject pref_object =
       GeneratedJavascriptOptimizerPref(profile()).GetPrefObject();
