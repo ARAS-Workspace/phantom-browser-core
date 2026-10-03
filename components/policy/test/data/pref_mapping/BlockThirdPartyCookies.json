@@ -34,7 +34,7 @@
         "policies": {},
         "prefs": {
           "profile.cookie_controls_mode": {
-            "default_value": 2
+            "default_value": 1
           }
         }
       }

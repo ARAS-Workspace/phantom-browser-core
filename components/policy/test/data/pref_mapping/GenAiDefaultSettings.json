@@ -14,12 +14,6 @@
           "devtools.gen_ai_settings": {
             "value": 0
           },
-          "omnibox.ai_mode_settings": {
-            "value": 0
-          },
-          "contextual_search.search_content_sharing_settings": {
-            "value": 0
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 0
           },
@@ -38,13 +32,7 @@
           "browser.gemini_settings": {
             "value": 0
           },
-          "lens.policy.lens_overlay_settings": {
-            "value": 0
-          },
           "optimization_guide.model_execution.password_change_submission_enterprise_policy_allowed": {
-            "value": 0
-          },
-          "omnibox.third_party_ai_chat_settings": {
             "value": 0
           }
         }
@@ -57,12 +45,6 @@
           "devtools.gen_ai_settings": {
             "value": 1
           },
-          "omnibox.ai_mode_settings": {
-            "value": 0
-          },
-          "contextual_search.search_content_sharing_settings": {
-            "value": 0
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 1
           },
@@ -81,14 +63,8 @@
           "browser.gemini_settings": {
             "value": 0
           },
-          "lens.policy.lens_overlay_settings": {
-            "value": 0
-          },
           "optimization_guide.model_execution.password_change_submission_enterprise_policy_allowed": {
             "value": 1
-          },
-          "omnibox.third_party_ai_chat_settings": {
-            "value": 0
           }
         }
       },
@@ -100,12 +76,6 @@
           "devtools.gen_ai_settings": {
             "value": 2
           },
-          "omnibox.ai_mode_settings": {
-            "value": 1
-          },
-          "contextual_search.search_content_sharing_settings": {
-            "value": 1
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "value": 2
           },
@@ -124,14 +94,8 @@
           "browser.gemini_settings": {
             "value": 1
           },
-          "lens.policy.lens_overlay_settings": {
-            "value": 1
-          },
           "optimization_guide.model_execution.password_change_submission_enterprise_policy_allowed": {
             "value": 2
-          },
-          "omnibox.third_party_ai_chat_settings": {
-            "value": 1
           }
         }
       },
@@ -141,12 +105,6 @@
           "devtools.gen_ai_settings": {
             "default_value": 0
           },
-          "omnibox.ai_mode_settings": {
-            "default_value": 0
-          },
-          "contextual_search.search_content_sharing_settings": {
-            "default_value": 0
-          },
           "optimization_guide.model_execution.autofill_prediction_improvements_enterprise_policy_allowed": {
             "default_value": 0
           },
@@ -165,13 +123,7 @@
           "browser.gemini_settings": {
             "default_value": 0
           },
-          "lens.policy.lens_overlay_settings": {
-            "default_value": 0
-          },
           "optimization_guide.model_execution.password_change_submission_enterprise_policy_allowed": {
-            "default_value": 0
-          },
-          "omnibox.third_party_ai_chat_settings": {
             "default_value": 0
           }
         }
@@ -214,20 +166,8 @@
           "browser.gemini_settings": {
             "value": 1
           },
-          "omnibox.ai_mode_settings": {
-            "value": 1
-          },
-          "lens.policy.lens_overlay_settings": {
-            "value": 1
-          },
           "optimization_guide.model_execution.password_change_submission_enterprise_policy_allowed": {
             "value": 2
-          },
-          "contextual_search.search_content_sharing_settings": {
-            "value": 1
-          },
-          "omnibox.third_party_ai_chat_settings": {
-            "value": 1
           }
         }
       }
