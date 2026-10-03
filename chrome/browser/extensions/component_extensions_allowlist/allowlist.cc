@@ -14,10 +14,8 @@
 #include "build/chromeos_buildflags.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/extensions/extension_constants.h"
-#include "chrome/grit/aim_eligibility_extension_resources.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/grit/component_extension_resources.h"
-#include "chrome/grit/contextual_tasks_extension_resources.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
 #include "printing/buildflags/buildflags.h"
@@ -28,7 +26,6 @@ namespace extensions {
 
 bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
   constexpr auto kAllowed = base::MakeFixedFlatSet<std::string_view>({
-      extension_misc::kContextualTasksExtensionId,
       extension_misc::kGlicExtensionId,
       extension_misc::kInAppPaymentsSupportAppId,
       extension_misc::kPdfExtensionId,
@@ -57,8 +54,6 @@ bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
     case IDR_HANGOUT_SERVICES_MANIFEST_V2:
     case IDR_HANGOUT_SERVICES_MANIFEST_V3:
 #endif
-    case IDR_AIM_ELIGIBILITY_EXTENSION_MANIFEST_JSON:
-    case IDR_CONTEXTUAL_TASKS_EXTENSION_MANIFEST_JSON:
     case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST:
     case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST_MV3:
     case IDR_READING_MODE_GDOCS_HELPER_MANIFEST:

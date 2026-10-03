@@ -9,7 +9,6 @@ source_set("searchbox") {
   sources = [
     "searchbox_handler.h",
     "searchbox_omnibox_client.h",
-    "searchbox_utils.h",
   ]
   public_deps = [
     "//components/tabs:public",
@@ -35,7 +34,6 @@ source_set("searchbox_impl") {
   sources = [
     "searchbox_handler.cc",
     "searchbox_omnibox_client.cc",
-    "searchbox_utils.cc",
   ]
   deps = [
     ":searchbox",

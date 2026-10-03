@@ -15,7 +15,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "base/base64url.h"
 #include "base/check_is_test.h"
 #include "base/check_op.h"
 #include "base/debug/crash_logging.h"
@@ -23,13 +22,11 @@
 #include "base/i18n/case_conversion.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/not_fatal_until.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "components/country_codes/country_codes.h"
-#include "components/google/core/common/google_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/regional_capabilities/regional_capabilities_switches.h"
 #include "components/regional_capabilities/regional_capabilities_utils.h"
@@ -45,16 +42,11 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/search_engines/template_url_starter_pack_data.h"
 #include "components/url_formatter/url_fixer.h"
-#include "net/base/url_util.h"
 #include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 
 namespace {
 
 using ::TemplateURLPrepopulateData::PrepopulatedEngine;
-
-constexpr char kClientUploadDurationQueryParameter[] = "cud";
-constexpr char kMultimodalUdmQueryParameterValue[] = "24";
-constexpr char kUnimodalUdmQueryParameterValue[] = "26";
 
 // Computes whether updates to the search engines database are needed.
 //
@@ -86,58 +78,6 @@ WDKeywordsResult::Metadata ComputeMergeEnginesRequirements(
   }
 
   return out_metadata;
-}
-
-GURL GetBaseSearchUrl(TemplateURLService* turl_service,
-                      omnibox::ChromeAimEntryPoint aim_entrypoint,
-                      bool is_aim_search,
-                      const base::Time& query_start_time,
-                      const std::u16string& query_text,
-                      std::map<std::string, std::string> additional_params) {
-  const TemplateURLRef& url_ref =
-      turl_service->GetDefaultSearchProvider()->url_ref();
-  TemplateURLRef::SearchTermsArgs search_term_args =
-      TemplateURLRef::SearchTermsArgs(query_text);
-  search_term_args.append_extra_query_params_from_command_line = true;
-  GURL result_url = GURL(url_ref.ReplaceSearchTerms(
-      search_term_args, turl_service->search_terms_data()));
-
-  if (is_aim_search) {
-    // For AIM queries, add udm=50 as a fallback if no udm or nem param is
-    // present.
-    if (additional_params.count("udm") == 0 &&
-        additional_params.count("nem") == 0) {
-    }
-  }
-
-  // Append all additional params.
-  for (auto const& param : additional_params) {
-    result_url = net::AppendOrReplaceQueryParameter(result_url, param.first,
-                                                    param.second);
-  }
-
-  if (!is_aim_search) {
-    std::string udm_value = query_text.empty()
-                                ? kUnimodalUdmQueryParameterValue
-                                : kMultimodalUdmQueryParameterValue;
-    result_url =
-        net::AppendOrReplaceQueryParameter(result_url, "udm", udm_value);
-  }
-
-  // Don't override the aep param from `additional_params`. This value could be
-  // given alongside the match from the server. This should keep precedence
-  // over the generic entrypoint value.
-  if (!additional_params.contains("aep")) {
-    result_url = net::AppendOrReplaceQueryParameter(
-        result_url, "aep",
-        base::NumberToString(static_cast<int>(aim_entrypoint)));
-  }
-  base::Time query_submission_time = base::Time::Now();
-  result_url = net::AppendOrReplaceQueryParameter(
-      result_url, kClientUploadDurationQueryParameter,
-      base::NumberToString(
-          (query_submission_time - query_start_time).InMilliseconds()));
-  return result_url;
 }
 
 std::string StringifyDuplicates(
@@ -1118,16 +1058,4 @@ TemplateURLService::OwnedTemplateURLVector::iterator FindTemplateURL(
     TemplateURLService::OwnedTemplateURLVector* urls,
     const TemplateURL* url) {
   return std::ranges::find(*urls, url, &std::unique_ptr<TemplateURL>::get);
-}
-
-GURL GetUrlForAim(
-    TemplateURLService* turl_service,
-    omnibox::ChromeAimEntryPoint aim_entrypoint,
-    const base::Time& query_start_time,
-    const std::u16string& query_text,
-    std::map<std::string, std::string> additional_params) {
-  GURL result_url = GetBaseSearchUrl(turl_service, aim_entrypoint,
-                                     /*is_aim_search=*/true, query_start_time,
-                                     query_text, additional_params);
-  return result_url;
 }

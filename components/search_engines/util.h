@@ -13,11 +13,9 @@
 #include <string>
 #include <vector>
 
-#include "base/time/time.h"
 #include "components/search_engines/keyword_web_data_service.h"
 #include "components/search_engines/template_url_prepopulate_data_resolver.h"
 #include "components/search_engines/template_url_service.h"
-#include "third_party/omnibox_proto/chrome_aim_entry_point.pb.h"
 #include "third_party/omnibox_proto/model_mode.pb.h"
 
 class KeywordWebDataService;
@@ -234,10 +232,6 @@ TemplateURLService::OwnedTemplateURLVector::iterator FindTemplateURL(
     TemplateURLService::OwnedTemplateURLVector* urls,
     const TemplateURL* url);
 
-// Returns whether the provided `url` leads to the AIM web page.
-
-// Returns whether the provided `url` leads to the AIM Zero State web page.
-
 // TODO(crbug.com/488962351): Consider moving validation logic to
 // template_url.cc or template_url_service.cc.
 // Returns true if |name_input| is a valid search engine name to use.
@@ -266,15 +260,5 @@ bool IsSearchEngineURLValidToUse(const std::string& url_input,
 // TemplateURL.
 std::string GetFixedUpSearchEngineUrl(const std::string& url_input,
                                       const SearchTermsData& search_terms_data);
-
-// Retrieves the URL for the AIM web page.
-// `aim_entrypoint` (aep) is required as it identifies the source of the
-// request. `query_start_time` is the time that the user clicked the submit
-// button.
-GURL GetUrlForAim(TemplateURLService* turl_service,
-                  omnibox::ChromeAimEntryPoint aim_entrypoint,
-                  const base::Time& query_start_time,
-                  const std::u16string& query_text,
-                  std::map<std::string, std::string> additional_params = {});
 
 #endif  // COMPONENTS_SEARCH_ENGINES_UTIL_H_

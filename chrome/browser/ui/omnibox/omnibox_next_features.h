@@ -9,7 +9,6 @@
 #include "base/metrics/field_trial_params.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
-#include "third_party/omnibox_proto/ntp_composebox_config.pb.h"
 
 class Profile;
 

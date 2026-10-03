@@ -310,12 +310,6 @@ inline constexpr char kMimeHandlerPrivateTestExtensionId[] =
 inline constexpr char kChromeResourcesTestExtensionId[] =
     "gappgneknoemdkoefaaiaefeamkamdpf";
 
-// The extension id of the AIM Eligibility component extension.
-
-// The extension id of the Contextual Tasks component extension.
-inline constexpr char kContextualTasksExtensionId[] =
-    "glbjnfimcajjenihimblfaponejbkoph";
-
 // The extension id of the Files Manager application.
 inline constexpr char kFilesManagerAppId[] = "hhaomjibdihmijegdhdafkllkbggdgoj";
 

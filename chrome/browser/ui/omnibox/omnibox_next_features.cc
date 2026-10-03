@@ -4,18 +4,13 @@
 
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 
-#include <string>
-
-#include "base/base64.h"
 #include "base/feature_list.h"
 #include "base/metrics/field_trial_params.h"
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/grit/generated_resources.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/search/search.h"
-#include "ui/base/l10n/l10n_util.h"
 
 namespace {
 constexpr base::FeatureState DISABLED = base::FEATURE_DISABLED_BY_DEFAULT;
@@ -76,28 +71,6 @@ BASE_FEATURE(kWebUIOmniboxDynamicAiModeButton, DISABLED);
 // If enabled, prevents closing the AIM popup while file chooser is open.
 // Disabled due to focus restoration and popup deactivation issues.
 BASE_FEATURE(kOmniboxKeepOpenOnFileSelection, DISABLED);
-
-// Decodes a proto object from its serialized Base64 string representation.
-// Returns true if decoding and parsing succeed, false otherwise.
-bool ParseProtoFromBase64String(const std::string& input,
-                                google::protobuf::MessageLite& output) {
-  if (input.empty()) {
-    return false;
-  }
-
-  std::string decoded_input;
-  // Decode the Base64-encoded input string into decoded_input.
-  if (!base::Base64Decode(input, &decoded_input)) {
-    return false;
-  }
-
-  if (decoded_input.empty()) {
-    return false;
-  }
-
-  // Parse the decoded string into the proto object.
-  return output.ParseFromString(decoded_input);
-}
 
 bool IsWebUIOmniboxPopupEnabled() {
   return base::FeatureList::IsEnabled(internal::kWebUIOmniboxPopup);
