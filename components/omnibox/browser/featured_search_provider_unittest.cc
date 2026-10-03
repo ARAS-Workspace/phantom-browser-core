@@ -45,7 +45,6 @@ namespace {
 constexpr char16_t kBookmarksKeyword[] = u"@bookmarks";
 constexpr char16_t kHistoryKeyword[] = u"@history";
 constexpr char16_t kTabsKeyword[] = u"@tabs";
-constexpr char16_t kGeminiKeyword[] = u"@gemini";
 
 const std::string kBookmarksUrl =
     template_url_starter_pack_data::bookmarks.destination_url;
@@ -53,12 +52,8 @@ const std::string kHistoryUrl =
     template_url_starter_pack_data::history.destination_url;
 const std::string kTabsUrl =
     template_url_starter_pack_data::tabs.destination_url;
-const std::string kGeminiUrl =
-    template_url_starter_pack_data::gemini.destination_url;
 const std::string kPageUrl =
     template_url_starter_pack_data::page.destination_url;
-const std::string kAiModeUrl =
-    template_url_starter_pack_data::ai_mode.destination_url;
 
 struct TestData {
   const std::u16string input;
@@ -230,8 +225,7 @@ TEST_F(FeaturedSearchProviderTest, DoesNotSupportMatchesOnFocus) {
 
 TEST_F(FeaturedSearchProviderTest, StarterPack) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures({omnibox::kAiModeStartPack},
-                            {omnibox::kStarterPackExpansion});
+  features.InitWithFeatures({}, {omnibox::kStarterPackExpansion});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -246,12 +240,8 @@ TEST_F(FeaturedSearchProviderTest, StarterPack) {
       {u"@bookmarksasld", {}},
       {u"tabs", {}},
 
-      // With the expansion flag disabled, typing the `@gemini` keyword should
-      // not provide the Gemini suggestion.
-      {u"@gemini", {}},
-
       // Typing '@' should give all the starter pack suggestions.
-      {u"@", {kAiModeUrl, kBookmarksUrl, kHistoryUrl, kTabsUrl}},
+      {u"@", {kBookmarksUrl, kHistoryUrl, kTabsUrl}},
 
       // Typing a portion of "@bookmarks" should give the bookmarks suggestion.
       {std::u16string(kBookmarksKeyword, 0, 3), {kBookmarksUrl}},
@@ -271,8 +261,7 @@ TEST_F(FeaturedSearchProviderTest, StarterPack) {
 
 TEST_F(FeaturedSearchProviderTest, StarterPackExpansion) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures(
-      {omnibox::kStarterPackExpansion, omnibox::kAiModeStartPack}, {});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion}, {});
 
   AddStarterPackEntriesToTemplateUrlService();
   std::vector<TestData> typing_scheme_cases = {
@@ -285,10 +274,9 @@ TEST_F(FeaturedSearchProviderTest, StarterPackExpansion) {
       {u"@historyasdjflk", {}},
       {u"@bookmarksasld", {}},
       {u"tabs", {}},
-      {u"gemi", {}},
 
       // Typing '@' should give all the starter pack suggestions.
-      {u"@", {kAiModeUrl, kBookmarksUrl, kGeminiUrl, kHistoryUrl, kTabsUrl}},
+      {u"@", {kBookmarksUrl, kHistoryUrl, kTabsUrl}},
 
       // Typing a portion of "@bookmarks" should give the bookmarks suggestion.
       {std::u16string(kBookmarksKeyword, 0, 3), {kBookmarksUrl}},
@@ -301,10 +289,6 @@ TEST_F(FeaturedSearchProviderTest, StarterPackExpansion) {
       // Typing a portion of "@tabs" should give the default urls.
       {std::u16string(kTabsKeyword, 0, 3), {kTabsUrl}},
       {kTabsKeyword, {kTabsUrl}},
-
-      // Typing a portion of "@gemini" should give the default urls.
-      {std::u16string(kGeminiKeyword, 0, 3), {kGeminiUrl}},
-      {kGeminiKeyword, {kGeminiUrl}},
   };
 
   RunTest(typing_scheme_cases);
@@ -312,8 +296,7 @@ TEST_F(FeaturedSearchProviderTest, StarterPackExpansion) {
 
 TEST_F(FeaturedSearchProviderTest, StarterPackExpansionRelevance) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures(
-      {omnibox::kStarterPackExpansion, omnibox::kAiModeStartPack}, {});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion}, {});
   omnibox_feature_configs::ScopedConfigForTesting<
       omnibox_feature_configs::ContextualSearch>
       scoped_config;
@@ -337,7 +320,10 @@ TEST_F(FeaturedSearchProviderTest, StarterPackExpansionRelevance) {
   });
 
   auto expected_match_order = std::vector<std::string>{
-      kAiModeUrl, kGeminiUrl, kHistoryUrl, kBookmarksUrl, kPageUrl, kTabsUrl,
+      kHistoryUrl,
+      kBookmarksUrl,
+      kPageUrl,
+      kTabsUrl,
   };
   ASSERT_EQ(matches.size(), expected_match_order.size());
   for (size_t i = 0; i < matches.size(); i++) {
@@ -347,8 +333,7 @@ TEST_F(FeaturedSearchProviderTest, StarterPackExpansionRelevance) {
 
 TEST_F(FeaturedSearchProviderTest, FeaturedEnterpriseSearch) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures(
-      {omnibox::kStarterPackExpansion, omnibox::kAiModeStartPack}, {});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion}, {});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -386,8 +371,8 @@ TEST_F(FeaturedSearchProviderTest, FeaturedEnterpriseSearch) {
       // alphabetical order). Re-ordering by relevance will be made
       // later on.
       {u"@",
-       {kAiModeUrl, kBookmarksUrl, FeaturedUrlN(1), FeaturedUrlN(2),
-        FeaturedUrlN(4), FeaturedUrlN(5), kGeminiUrl, kHistoryUrl, kTabsUrl}},
+       {kBookmarksUrl, FeaturedUrlN(1), FeaturedUrlN(2), FeaturedUrlN(4),
+        FeaturedUrlN(5), kHistoryUrl, kTabsUrl}},
 
       // Typing a portion of "@featured" should give the featured engine
       // suggestions.
@@ -402,9 +387,7 @@ TEST_F(FeaturedSearchProviderTest, FeaturedEnterpriseSearch) {
 TEST_F(FeaturedSearchProviderTest, ZeroSuggestStarterPackIPHSuggestion) {
   base::test::ScopedFeatureList features;
   features.InitWithFeatures(
-      {omnibox::kStarterPackExpansion, omnibox::kStarterPackIPH,
-       omnibox::kAiModeStartPack},
-      {});
+      {omnibox::kStarterPackExpansion, omnibox::kStarterPackIPH}, {});
 
   // "Focus" omnibox with zero input to put us in Zero suggest mode.
   AutocompleteInput input;
@@ -428,7 +411,7 @@ TEST_F(FeaturedSearchProviderTest, ZeroSuggestStarterPackIPHSuggestion) {
   AddStarterPackEntriesToTemplateUrlService();
   std::vector<TestData> typing_scheme_cases = {
       // Typing '@' should give all the starter pack suggestions, and no IPH.
-      {u"@", {kAiModeUrl, kBookmarksUrl, kGeminiUrl, kHistoryUrl, kTabsUrl}}};
+      {u"@", {kBookmarksUrl, kHistoryUrl, kTabsUrl}}};
   RunTest(typing_scheme_cases);
 }
 
@@ -477,9 +460,8 @@ TEST_F(FeaturedSearchProviderTest,
 TEST_F(FeaturedSearchProviderTest,
        ZeroSuggestFeaturedEnterpriseSiteSearchIPHSuggestion) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures(
-      {omnibox::kStarterPackExpansion, omnibox::kAiModeStartPack},
-      {omnibox::kStarterPackIPH});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion},
+                            {omnibox::kStarterPackIPH});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -517,8 +499,8 @@ TEST_F(FeaturedSearchProviderTest,
   std::vector<TestData> typing_scheme_cases = {
       // Typing '@' should give all the starter pack suggestions, and no IPH.
       {u"@",
-       {kAiModeUrl, kBookmarksUrl, FeaturedUrlN(1), FeaturedUrlN(2), kGeminiUrl,
-        kHistoryUrl, kTabsUrl}}};
+       {kBookmarksUrl, FeaturedUrlN(1), FeaturedUrlN(2), kHistoryUrl,
+        kTabsUrl}}};
   RunTest(typing_scheme_cases);
 }
 
@@ -654,9 +636,8 @@ TEST_F(FeaturedSearchProviderTest,
 TEST_F(FeaturedSearchProviderTest,
        ZeroSuggestEnterpriseSearchAggregatorIPHSuggestion) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures(
-      {omnibox::kStarterPackExpansion, omnibox::kAiModeStartPack},
-      {omnibox::kStarterPackIPH});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion},
+                            {omnibox::kStarterPackIPH});
 
   AddStarterPackEntriesToTemplateUrlService();
 
@@ -688,8 +669,8 @@ TEST_F(FeaturedSearchProviderTest,
   std::vector<TestData> typing_scheme_cases = {
       // Typing '@' should give all the starter pack suggestions, and no IPH.
       {u"@",
-       {kAiModeUrl, kBookmarksUrl, FeaturedUrlN(1), FeaturedUrlN(4), kGeminiUrl,
-        kHistoryUrl, kTabsUrl}}};
+       {kBookmarksUrl, FeaturedUrlN(1), FeaturedUrlN(4), kHistoryUrl,
+        kTabsUrl}}};
   RunTest(typing_scheme_cases);
 }
 
@@ -1029,9 +1010,8 @@ TEST_F(FeaturedSearchProviderTest, OffTheRecord_HistoryEmbeddings) {
 
 TEST_F(FeaturedSearchProviderTest, OffTheRecord_FeaturedEnterpriseSearch) {
   base::test::ScopedFeatureList features;
-  features.InitWithFeatures(
-      {omnibox::kStarterPackExpansion, omnibox::kAiModeStartPack},
-      {omnibox::kStarterPackIPH});
+  features.InitWithFeatures({omnibox::kStarterPackExpansion},
+                            {omnibox::kStarterPackIPH});
   AddStarterPackEntriesToTemplateUrlService();
   AddFeaturedEnterpriseSearchEngine(FeaturedKeywordN(1), FeaturedUrlN(1),
                                     TemplateURLData::PolicyOrigin::kSiteSearch);
@@ -1052,7 +1032,6 @@ TEST_F(FeaturedSearchProviderTest, OffTheRecord_FeaturedEnterpriseSearch) {
   std::vector<TestData> typing_scheme_cases = {
       // Typing '@' should give all the starter pack suggestions (excluding
       // history), featured site search engine, and no IPH.
-      {u"@",
-       {kAiModeUrl, kBookmarksUrl, FeaturedUrlN(1), kGeminiUrl, kTabsUrl}}};
+      {u"@", {kBookmarksUrl, FeaturedUrlN(1), kTabsUrl}}};
   RunTest(typing_scheme_cases);
 }

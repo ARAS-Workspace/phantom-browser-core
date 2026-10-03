@@ -1643,9 +1643,6 @@ class DummyOmniboxPopupWebUIContent : public OmniboxPopupWebUIBaseContent {
 
   void Clear() override {}
   std::string_view GetMetricPrefix() const override { return "Dummy"; }
-
- protected:
-  void OnContextMenuClosed() override {}
 };
 
 BEGIN_METADATA(DummyOmniboxPopupWebUIContent)

@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "base/run_loop.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
@@ -15,13 +14,8 @@
 #include "build/build_config.h"
 #include "components/omnibox/browser/remote_suggestions_service.h"
 #include "components/omnibox/browser/test_scheme_classifier.h"
-#include "components/optimization_guide/core/hints/optimization_guide_decision.h"
 #include "components/optimization_guide/core/hints/test_optimization_guide_decider.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
-#include "components/optimization_guide/core/optimization_guide_proto_util.h"
-#include "components/optimization_guide/proto/common_types.pb.h"
-#include "components/optimization_guide/proto/hints.pb.h"
-#include "components/optimization_guide/proto/salient_image_metadata.pb.h"
 #include "components/page_image_service/metrics_util.h"
 #include "components/page_image_service/mojom/page_image_service.mojom.h"
 #include "components/search_engines/search_engines_test_environment.h"
@@ -31,14 +25,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-using testing::ElementsAre;
-
-namespace optimization_guide {
-namespace {
-
-}  // namespace
-}  // namespace optimization_guide
 
 namespace page_image_service {
 
@@ -52,7 +38,7 @@ class ImageServiceImplTest : public testing::Test {
         /*enterprise_search_aggregator_suggestions_service=*/nullptr,
         test_url_loader_factory_.GetSafeWeakWrapper());
     test_opt_guide_ =
-        std::make_unique<optimization_guide::ImageServiceTestOptGuide>();
+        std::make_unique<optimization_guide::TestOptimizationGuideDecider>();
     test_sync_service_ = std::make_unique<syncer::TestSyncService>();
     image_service_ = std::make_unique<ImageServiceImpl>(
         search_engines_test_environment_.template_url_service(),
@@ -87,18 +73,13 @@ class ImageServiceImplTest : public testing::Test {
 
   search_engines::SearchEnginesTestEnvironment search_engines_test_environment_;
   std::unique_ptr<RemoteSuggestionsService> remote_suggestions_service_;
-  std::unique_ptr<optimization_guide::ImageServiceTestOptGuide> test_opt_guide_;
+  std::unique_ptr<optimization_guide::TestOptimizationGuideDecider>
+      test_opt_guide_;
   std::unique_ptr<syncer::TestSyncService> test_sync_service_;
   std::unique_ptr<ImageServiceImpl> image_service_;
 
   base::HistogramTester histogram_tester_;
 };
-
-// Helper method that stores `image_url` into `out_image_url`.
-void StoreImageUrlResponse(GURL* out_image_url, const GURL& image_url) {
-  DCHECK(out_image_url);
-  *out_image_url = image_url;
-}
 
 // Stores an image response and exits out of `loop` if it is defined.
 void QuitLoopAndStoreImageUrlResponse(base::RunLoop* loop,
@@ -176,17 +157,23 @@ TEST_F(ImageServiceImplTest, SyncInitialization) {
   options.suggest_images = false;
   options.optimization_guide_images = true;
 
+  // Requests that pass the consent throttle record a backend selection.
+  auto backend_requests = [&] {
+    return histogram_tester_.GetBucketCount(
+        "PageImageService.Backend", PageImageServiceBackend::kNoValidBackend);
+  };
+
   std::vector<GURL> responses;
   image_service_->FetchImageFor(mojom::ClientId::Journeys,
                                 GURL("https://page-url.com"), options,
                                 base::BindOnce(&AppendResponse, &responses));
-  EXPECT_EQ(test_opt_guide_->requests_received_, 0U)
+  EXPECT_EQ(backend_requests(), 0)
       << "Expect no immediate requests, because the consent should be "
          "throttling it.";
   EXPECT_TRUE(responses.empty());
 
   task_environment.FastForwardBy(base::Seconds(10));
-  EXPECT_EQ(test_opt_guide_->requests_received_, 0U)
+  EXPECT_EQ(backend_requests(), 0)
       << "After 10 seconds, the throttle should have killed the request, never "
          "passing it to the backend.";
   ASSERT_EQ(responses.size(), 1U);
@@ -197,7 +184,7 @@ TEST_F(ImageServiceImplTest, SyncInitialization) {
                                 GURL("https://page-url.com"), options,
                                 base::BindOnce(&AppendResponse, &responses));
   task_environment.FastForwardBy(base::Seconds(3));
-  EXPECT_EQ(test_opt_guide_->requests_received_, 0U) << "Still throttled.";
+  EXPECT_EQ(backend_requests(), 0) << "Still throttled.";
 
   // Now set the test sync service to active.
   test_sync_service_->SetDownloadStatusFor(
@@ -205,15 +192,11 @@ TEST_F(ImageServiceImplTest, SyncInitialization) {
        syncer::DataType::HISTORY_DELETE_DIRECTIVES},
       syncer::SyncService::DataTypeDownloadStatus::kUpToDate);
   test_sync_service_->FireStateChanged();
-  task_environment.FastForwardBy(kOptimizationGuideBatchingTimeout);
-  EXPECT_EQ(test_opt_guide_->requests_received_, 1U)
-      << "The test backend should immediately get the request after Sync "
-         "activates, and the consent throttle unthrottles, and after the "
-         "short aggregation timeout expires.";
+  EXPECT_EQ(backend_requests(), 1)
+      << "The request should immediately reach backend selection after Sync "
+         "activates and the consent throttle unthrottles.";
 
-  // This test only covers sync unthrottling, so we don't care about fulfilling
-  // the actual request. That's covered by
-  // OptimizationGuideSalientImagesEndToEnd.
+  // This test only covers sync unthrottling.
 }
 
 TEST_F(ImageServiceImplTest, SuggestBackendEndToEnd) {
@@ -297,6 +280,4 @@ TEST_F(ImageServiceImplTest, SuggestBackendEndToEnd) {
             1);
 }
 
-// This also tests batching, because it's an integral part of how Optimization
-// Guide backend works.
 }  // namespace page_image_service

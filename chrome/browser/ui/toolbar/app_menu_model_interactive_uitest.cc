@@ -16,7 +16,6 @@
 #include "build/build_config.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
 #include "chrome/browser/ui/accelerator_utils.h"
@@ -187,30 +186,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelInteractiveTest, IncognitoAccelerator) {
   RunTestSequence(
       SendAccelerator(kToolbarAppMenuButtonElementId, incognito_accelerator),
       CheckIncognitoWindowOpened(browser()));
-}
-
-IN_PROC_BROWSER_TEST_F(AppMenuModelInteractiveTest,
-                       CastSaveShareSubMenuItemText) {
-  // TODO(crbug.com/445214951): Flaky on mac-vm builder for macOS 15.
-#if BUILDFLAG(IS_MAC)
-  if (kTestDisabledForVirtualMachineMac) {
-    GTEST_SKIP() << "Disabled on macOS Sequoia for virtual machines.";
-  }
-#endif  // BUILDFLAG(IS_MAC)
-
-  if (!media_router::MediaRouterEnabled(browser()->GetProfile())) {
-    GTEST_SKIP() << "The cast item only exists if cast is enabled.";
-  }
-  RunTestSequence(
-      InstrumentTab(kPrimaryTabPageElementId),
-      PressButton(kToolbarAppMenuButtonElementId),
-      EnsurePresent(AppMenuModel::kSaveAndShareMenuItem),
-      CheckViewProperty(
-          AppMenuModel::kSaveAndShareMenuItem, &views::MenuItemView::title,
-          l10n_util::GetStringUTF16(IDS_CAST_SAVE_AND_SHARE_MENU)),
-      ScrollIntoView(AppMenuModel::kSaveAndShareMenuItem),
-      SelectMenuItem(AppMenuModel::kSaveAndShareMenuItem),
-      EnsurePresent(AppMenuModel::kCastTitleItem));
 }
 
 #if BUILDFLAG(IS_MAC)

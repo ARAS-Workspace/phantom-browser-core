@@ -387,13 +387,8 @@ TEST_F(OrderTemplateUrlsByPrepopulatedAndManagedAndAlphabetically,
 class GetDisabledStarterPackIdsTest : public testing::Test {};
 
 TEST_F(GetDisabledStarterPackIdsTest, AiMode) {
-  auto disabled_ids_with_ai = internal::GetDisabledStarterPackIds(
-      /*ai_mode_enabled=*/true, /*gemini_enabled=*/true);
-  EXPECT_FALSE(disabled_ids_with_ai.Has(
-      template_url_starter_pack_data::StarterPackId::kAiMode));
-
   auto disabled_ids_without_ai = internal::GetDisabledStarterPackIds(
-      /*ai_mode_enabled=*/false, /*gemini_enabled=*/true);
+      /*gemini_enabled=*/true);
   EXPECT_TRUE(disabled_ids_without_ai.Has(
       template_url_starter_pack_data::StarterPackId::kAiMode));
 }
@@ -402,7 +397,7 @@ TEST_F(GetDisabledStarterPackIdsTest, GeminiWithStarterPackExpansion) {
   base::test::ScopedFeatureList feature_list{omnibox::kStarterPackExpansion};
 
   auto disabled_ids = internal::GetDisabledStarterPackIds(
-      /*ai_mode_enabled=*/true, /*gemini_enabled=*/true);
+      /*gemini_enabled=*/true);
   EXPECT_FALSE(
       disabled_ids.Has(template_url_starter_pack_data::StarterPackId::kGemini));
 }
@@ -412,7 +407,7 @@ TEST_F(GetDisabledStarterPackIdsTest, GeminiWithoutStarterPackExpansion) {
   feature_list.InitAndDisableFeature(omnibox::kStarterPackExpansion);
 
   auto disabled_ids = internal::GetDisabledStarterPackIds(
-      /*ai_mode_enabled=*/true, /*gemini_enabled=*/false);
+      /*gemini_enabled=*/false);
   EXPECT_TRUE(
       disabled_ids.Has(template_url_starter_pack_data::StarterPackId::kGemini));
 }
@@ -424,7 +419,7 @@ TEST_F(GetDisabledStarterPackIdsTest, PageWithStarterPackPage) {
   scoped_config.Get().starter_pack_page = true;
 
   auto disabled_ids = internal::GetDisabledStarterPackIds(
-      /*ai_mode_enabled=*/true, /*gemini_enabled=*/true);
+      /*gemini_enabled=*/true);
   EXPECT_FALSE(
       disabled_ids.Has(template_url_starter_pack_data::StarterPackId::kPage));
 }
@@ -436,7 +431,7 @@ TEST_F(GetDisabledStarterPackIdsTest, PageWithoutStarterPackPage) {
   scoped_config.Get().starter_pack_page = false;
 
   auto disabled_ids = internal::GetDisabledStarterPackIds(
-      /*ai_mode_enabled=*/true, /*gemini_enabled=*/true);
+      /*gemini_enabled=*/true);
   EXPECT_TRUE(
       disabled_ids.Has(template_url_starter_pack_data::StarterPackId::kPage));
 }

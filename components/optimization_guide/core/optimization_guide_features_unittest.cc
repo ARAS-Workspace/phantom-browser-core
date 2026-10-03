@@ -101,18 +101,6 @@ TEST_F(OptimizationGuideFeaturesTest, ModelQualityLoggingDisabled) {
 }
 
 TEST_F(OptimizationGuideFeaturesTest,
-       OptimizationGuidePersonalizedFetchingDefaultBehaviour) {
-  features::RequestContextSet allowedContexts =
-      features::GetAllowedContextsForPersonalizedMetadata();
-
-  // Check contexts.
-  EXPECT_FALSE(
-      allowedContexts.Has(optimization_guide::proto::CONTEXT_UNSPECIFIED));
-  EXPECT_TRUE(allowedContexts.Has(
-      optimization_guide::proto::CONTEXT_PAGE_INSIGHTS_HUB));
-}
-
-TEST_F(OptimizationGuideFeaturesTest,
        OptimizationGuideProactivePersonalizedHintsFetchingPopulatedParam) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeatureWithParameters(

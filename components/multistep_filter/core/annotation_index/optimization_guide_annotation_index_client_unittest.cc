@@ -48,7 +48,6 @@ using ::testing::WithArgs;
 
 constexpr int64_t kTestNavigationId = 12345;
 constexpr char kTestUrl[] = "https://example.com/test";
-constexpr char kTestCandidateId[] = "12345678-1234-5678-1234-567812345678";
 constexpr char kTestTaskType1[] = "TASK_TYPE_1";
 constexpr char kTestTaskType2[] = "TASK_TYPE_2";
 constexpr char kTestTaskTypeShopping[] = "SHOPPING";
@@ -58,8 +57,6 @@ constexpr char kGetSupportedTasksResponseUrl[] =
     "type.googleapis.com/multistep_filter.GetSupportedTasksResponse";
 constexpr char kExtractTaskAttributesResponseUrl[] =
     "type.googleapis.com/multistep_filter.ExtractTaskAttributesResponse";
-constexpr char kGetTaskExecutionStrategiesResponseUrl[] =
-    "type.googleapis.com/multistep_filter.GetTaskExecutionStrategiesResponse";
 
 OptimizationMetadata CreateMalformedOptimizationMetadata(
     std::string_view type_url) {

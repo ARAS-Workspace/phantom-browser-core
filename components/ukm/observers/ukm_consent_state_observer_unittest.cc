@@ -53,7 +53,7 @@ class MockSyncService : public syncer::TestSyncService {
     SetLastCycleSnapshot(syncer::SyncCycleSnapshot(
         /*birthday=*/std::string(), /*bag_of_chips=*/std::string(),
         syncer::ModelNeutralState(), syncer::ProgressMarkerMap(), false, 0,
-        true, base::Time::Now(), base::Time::Now(),
+        base::Time::Now(), base::Time::Now(),
         sync_pb::SyncEnums::UNKNOWN_ORIGIN, base::Minutes(1), false));
 
     NotifyObserversOfStateChanged();

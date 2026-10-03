@@ -54,7 +54,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "third_party/omnibox_proto/groups.pb.h"
-#include "third_party/omnibox_proto/suggest_template_info.pb.h"
 #include "third_party/omnibox_proto/types.pb.h"
 #include "ui/base/device_form_factor.h"
 
@@ -3411,52 +3410,6 @@ TEST_F(AutocompleteResultTest, ContextualSearchAblateOthers_AblateUrlOnly) {
       {5, 2, 500, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group3},
   }};
   AssertResultMatches(result, expected_data);
-}
-
-TEST_F(AutocompleteResultTest, AttachContextualSearchOpenLensActionToMatches) {
-  AutocompleteResult result;
-  ACMatches matches;
-
-  // Match 1: Contextual search suggestion with Lens action.
-  AutocompleteMatch match1;
-  match1.subtypes.insert(omnibox::SuggestSubtype::SUBTYPE_CONTEXTUAL_SEARCH);
-  match1.suggest_template = omnibox::SuggestTemplateInfo();
-  auto* action1 = match1.suggest_template->add_action_suggestions();
-  action1->set_action_type(
-      omnibox::SuggestTemplateInfo_TemplateAction_ActionType_CHROME_LENS);
-  matches.push_back(match1);
-
-  // Match 2: Contextual search suggestion without Lens action.
-  AutocompleteMatch match2;
-  match2.subtypes.insert(omnibox::SuggestSubtype::SUBTYPE_CONTEXTUAL_SEARCH);
-  matches.push_back(match2);
-
-  // Match 3: Non-contextual search suggestion with Lens action.
-  AutocompleteMatch match3;
-  match3.suggest_template = omnibox::SuggestTemplateInfo();
-  auto* action3 = match3.suggest_template->add_action_suggestions();
-  action3->set_action_type(
-      omnibox::SuggestTemplateInfo_TemplateAction_ActionType_CHROME_LENS);
-  matches.push_back(match3);
-
-  // Match 4: Non-contextual search suggestion without Lens action.
-  AutocompleteMatch match4;
-  matches.push_back(match4);
-
-  result.AppendMatches(matches);
-  result.AttachContextualSearchOpenLensActionToMatches();
-
-  ASSERT_EQ(4u, result.size());
-
-  // Match 1 should have the takeover action.
-  EXPECT_TRUE(result.match_at(0)->takeover_action);
-  EXPECT_EQ(result.match_at(0)->takeover_action->ActionId(),
-            OmniboxActionId::CONTEXTUAL_SEARCH_OPEN_LENS);
-
-  // Others should not.
-  EXPECT_FALSE(result.match_at(1)->takeover_action);
-  EXPECT_FALSE(result.match_at(2)->takeover_action);
-  EXPECT_FALSE(result.match_at(3)->takeover_action);
 }
 
 TEST_F(AutocompleteResultTest, AttachSiteSearchActionToMatches) {

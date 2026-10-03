@@ -49,4 +49,7 @@ AffiliationFetcherInterface::ParsedFetchResponse::operator=(
 AffiliationFetcherInterface::ParsedFetchResponse::~ParsedFetchResponse() =
     default;
 
+bool operator==(const AffiliationFetcherInterface::RequestInfo& lhs,
+                const AffiliationFetcherInterface::RequestInfo& rhs) = default;
+
 }  // namespace affiliations

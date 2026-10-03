@@ -24,7 +24,6 @@
 #include "build/branding_buildflags.h"
 #include "components/google/core/common/google_util.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
-#include "components/omnibox/common/omnibox_features.h"
 #include "components/search_engines/regulatory_extension_type.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/search_engines/search_terms_data.h"
@@ -1532,7 +1531,6 @@ TEST_F(TemplateURLTest, SuggestClient) {
 }
 
 TEST_F(TemplateURLTest, ComposeboxSuggestClient) {
-  base::test::ScopedFeatureList features;
   const std::string base_url_str("http://google.com/?");
   const std::string query_params_str("client={google:suggestClient}");
   const std::string full_url_str = base_url_str + query_params_str;
@@ -1547,10 +1545,9 @@ TEST_F(TemplateURLTest, ComposeboxSuggestClient) {
 
   search_terms_args.request_source = RequestSource::COMPOSEBOX;
   // Check that the URL is correct for `RequestSource::COMPOSEBOX`.
-  features.InitAndEnableFeature(omnibox::kComposeboxUsesChromeComposeClient);
   GURL result(
       url.url_ref().ReplaceSearchTerms(search_terms_args, search_terms_data_));
-  EXPECT_EQ("http://google.com/?client=chrome-compose", result.spec());
+  EXPECT_EQ("http://google.com/?client=chrome-omni", result.spec());
 }
 
 TEST_F(TemplateURLTest, CoBrowseComposeboxSuggestClient) {

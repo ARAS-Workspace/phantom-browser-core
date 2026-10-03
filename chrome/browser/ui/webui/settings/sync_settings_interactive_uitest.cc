@@ -51,8 +51,6 @@ namespace {
 
 using DeepQuery = ::WebContentsInteractionTestUtil::DeepQuery;
 
-const char kTestEmail[] = "kTestEmail@email.com";
-
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kSignoutDialogWebContentsId);
 
 std::unique_ptr<net::test_server::HttpResponse> HandleSigninPageResponse(

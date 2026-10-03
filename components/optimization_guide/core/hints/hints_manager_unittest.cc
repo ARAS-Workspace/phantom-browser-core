@@ -13,7 +13,6 @@
 #include "base/files/file_util.h"
 #include "base/functional/callback_helpers.h"
 #include "base/strings/string_number_conversions.h"
-#include "base/strings/to_string.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/test/gtest_util.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -47,16 +46,10 @@
 #include "google_apis/gaia/google_service_auth_error.h"
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "services/metrics/public/cpp/ukm_source.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
-#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
-#include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace optimization_guide {
 namespace {
-
-// Allows for default hour to pass + random delay between 30 and 60 seconds.
-constexpr int kUpdateFetchHintsTimeSecs = 61 * 60;  // 1 hours and 1 minutes.
 
 const int kDefaultHostBloomFilterNumHashFunctions = 7;
 const int kDefaultHostBloomFilterNumBits = 511;
@@ -86,61 +79,12 @@ void AddBloomFilterToConfig(proto::OptimizationType optimization_type,
   of_proto->set_allocated_bloom_filter(bloom_filter_proto.release());
 }
 
-std::unique_ptr<proto::GetHintsResponse> BuildHintsResponse(
-    const std::vector<std::string>& hosts,
-    const std::vector<std::string>& urls) {
-  std::unique_ptr<proto::GetHintsResponse> get_hints_response =
-      std::make_unique<proto::GetHintsResponse>();
-
-  for (const auto& host : hosts) {
-    proto::Hint* hint = get_hints_response->add_hints();
-    hint->set_key_representation(proto::HOST);
-    hint->set_key(host);
-    hint->add_allowlisted_optimizations()->set_optimization_type(
-        proto::NOSCRIPT);
-    proto::PageHint* page_hint = hint->add_page_hints();
-    page_hint->set_page_pattern("page pattern");
-    proto::Optimization* opt = page_hint->add_allowlisted_optimizations();
-    opt->set_optimization_type(proto::DEFER_ALL_SCRIPT);
-  }
-  for (const auto& url : urls) {
-    proto::Hint* hint = get_hints_response->add_hints();
-    hint->set_key_representation(proto::FULL_URL);
-    hint->set_key(url);
-    hint->mutable_max_cache_duration()->set_seconds(60 * 60);
-    proto::PageHint* page_hint = hint->add_page_hints();
-    page_hint->set_page_pattern(url);
-    proto::Optimization* opt = page_hint->add_allowlisted_optimizations();
-    opt->set_optimization_type(proto::COMPRESS_PUBLIC_IMAGES);
-    opt->mutable_any_metadata()->set_type_url("someurl");
-  }
-  return get_hints_response;
-}
-
-void RunHintsFetchedCallbackWithResponse(
-    HintsFetchedCallback hints_fetched_callback,
-    std::unique_ptr<proto::GetHintsResponse> response) {
-  std::move(hints_fetched_callback).Run(std::move(response));
-}
-
 // Returns the default params used for the kOptimizationHints feature.
 base::FieldTrialParams GetOptimizationHintsDefaultFeatureParams() {
   return {{
       "max_host_keyed_hint_cache_size",
       "1",
   }};
-}
-
-std::unique_ptr<base::test::ScopedFeatureList>
-SetUpDeferStartupActiveTabsHintsFetch(bool is_enabled) {
-  std::unique_ptr<base::test::ScopedFeatureList> scoped_feature_list =
-      std::make_unique<base::test::ScopedFeatureList>();
-  auto params = GetOptimizationHintsDefaultFeatureParams();
-
-  params["defer_startup_active_tabs_hints_fetch"] = base::ToString(is_enabled);
-  scoped_feature_list->InitAndEnableFeatureWithParameters(
-      features::kOptimizationHints, params);
-  return scoped_feature_list;
 }
 
 }  // namespace
@@ -222,10 +166,6 @@ class HintsManagerTest : public ProtoDatabaseProviderTestBase {
       ResetHintsManager();
     }
 
-    url_loader_factory_ =
-        base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
-            &test_url_loader_factory_);
-
     hint_store_ = std::make_unique<OptimizationGuideStore>(
         db_provider_.get(), temp_dir(),
         task_environment_.GetMainThreadTaskRunner());
@@ -237,7 +177,7 @@ class HintsManagerTest : public ProtoDatabaseProviderTestBase {
     hints_manager_ = std::make_unique<HintsManager>(
         /*is_off_the_record=*/false, /*application_locale=*/"en-US",
         pref_service(), hint_store_->AsWeakPtr(), top_host_provider_.get(),
-        tab_url_provider_.get(), url_loader_factory_,
+        tab_url_provider_.get(),
         /*push_notification_manager=*/nullptr,
         /*identity_manager=*/identity_manager, &optimization_guide_logger_);
     hints_manager_->SetClockForTesting(task_environment_.GetMockClock());
@@ -346,20 +286,12 @@ class HintsManagerTest : public ProtoDatabaseProviderTestBase {
 
   HintsManager* hints_manager() const { return hints_manager_.get(); }
 
-  int32_t num_batch_update_hints_fetches_initiated() const {
-    return hints_manager()->num_batch_update_hints_fetches_initiated();
-  }
-
   GURL url_with_hints() const {
     return GURL("https://somedomain.org/news/whatever");
   }
 
   GURL url_with_url_keyed_hint() const {
     return GURL("https://somedomain.org/news/whatever");
-  }
-
-  GURL url_without_hints() const {
-    return GURL("https://url_without_hints.org/");
   }
 
   base::FilePath temp_dir() const { return temp_dir_.GetPath(); }
@@ -398,8 +330,6 @@ class HintsManagerTest : public ProtoDatabaseProviderTestBase {
   std::unique_ptr<FakeTabUrlProvider> tab_url_provider_;
   std::unique_ptr<FakeTopHostProvider> top_host_provider_;
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable> pref_service_;
-  scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
-  network::TestURLLoaderFactory test_url_loader_factory_;
 };
 
 TEST_F(HintsManagerTest, ProcessHintsWithValidCommandLineOverride) {
@@ -1398,57 +1328,6 @@ TEST_F(HintsManagerTest,
 
   EXPECT_EQ(OptimizationTypeDecision::kAllowedByOptimizationFilter,
             optimization_type_decision);
-}
-
-TEST_F(HintsManagerTest,
-       CanApplyOptimizationAsyncReturnsRightAwayIfNotAllowedToFetch) {
-  base::HistogramTester histogram_tester;
-
-  hints_manager()->RegisterOptimizationTypes({proto::COMPRESS_PUBLIC_IMAGES});
-  InitializeWithDefaultConfig("1.0.0.0");
-
-  auto navigation_data = CreateTestNavigationData(
-      url_without_hints(), {proto::COMPRESS_PUBLIC_IMAGES});
-  hints_manager()->CanApplyOptimizationAsync(
-      url_without_hints(), proto::COMPRESS_PUBLIC_IMAGES,
-      base::BindOnce([](OptimizationGuideDecision decision,
-                        const OptimizationMetadata& metadata) {
-        EXPECT_EQ(OptimizationGuideDecision::kFalse, decision);
-      }));
-  RunUntilIdle();
-
-  histogram_tester.ExpectUniqueSample(
-      "OptimizationGuide.ApplyDecision.CompressPublicImages",
-      OptimizationTypeDecision::kNoHintAvailable, 1);
-}
-
-TEST_F(
-    HintsManagerTest,
-    CanApplyOptimizationAsyncReturnsRightAwayIfNotAllowedToFetchAndNotAllowlistedByAvailableHint) {
-  base::HistogramTester histogram_tester;
-
-  hints_manager()->RegisterOptimizationTypes({proto::COMPRESS_PUBLIC_IMAGES});
-  InitializeWithDefaultConfig("1.0.0.0");
-
-  auto navigation_data = CreateTestNavigationData(
-      url_with_hints(), {proto::COMPRESS_PUBLIC_IMAGES});
-  // Wait for hint to be loaded.
-  base::RunLoop run_loop;
-  CallOnNavigationStartOrRedirect(navigation_data.get(),
-                                  run_loop.QuitClosure());
-  run_loop.Run();
-
-  hints_manager()->CanApplyOptimizationAsync(
-      url_with_hints(), proto::COMPRESS_PUBLIC_IMAGES,
-      base::BindOnce([](OptimizationGuideDecision decision,
-                        const OptimizationMetadata& metadata) {
-        EXPECT_EQ(OptimizationGuideDecision::kFalse, decision);
-      }));
-  RunUntilIdle();
-
-  histogram_tester.ExpectUniqueSample(
-      "OptimizationGuide.ApplyDecision.CompressPublicImages",
-      OptimizationTypeDecision::kNotAllowedByHint, 1);
 }
 
 TEST_F(HintsManagerTest, RemoveFetchedEntriesByHintKeys_Host) {

@@ -4,7 +4,6 @@
 
 #include "components/optimization_guide/core/optimization_guide_permissions_util.h"
 
-#include "base/command_line.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
@@ -21,9 +20,6 @@ class OptimizationGuidePermissionsUtilTest : public testing::Test {
   void SetUp() override {
     unified_consent::UnifiedConsentService::RegisterPrefs(
         pref_service_.registry());
-
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        kGoogleApiKeyConfigurationCheckOverrideSwitch);
   }
 
   void SetUrlKeyedAnonymizedDataCollectionEnabled(bool enabled) {
@@ -46,10 +42,10 @@ TEST_F(OptimizationGuidePermissionsUtilTest,
 }
 
 TEST_F(OptimizationGuidePermissionsUtilTest,
-       IsUserPermittedToFetchHintsDefaultUserAnonymousDataCollectionEnabled) {
+       IsUserNotPermittedToFetchHintsAnonymousDataCollectionEnabled) {
   SetUrlKeyedAnonymizedDataCollectionEnabled(true);
 
-  EXPECT_TRUE(IsUserPermittedToFetchFromRemoteOptimizationGuide(
+  EXPECT_FALSE(IsUserPermittedToFetchFromRemoteOptimizationGuide(
       /*is_off_the_record=*/false, pref_service()));
 }
 
