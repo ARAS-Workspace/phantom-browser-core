@@ -4312,6 +4312,7 @@ hooks = [
     'name': 'lastchange',
     'pattern': '.',
     'action': ['python3', 'src/build/util/lastchange.py',
+               '--filter', '.',
                '-o', 'src/build/util/LASTCHANGE'],
   },
   {
@@ -4329,6 +4330,7 @@ hooks = [
     'name': 'gpu_lists_version',
     'pattern': '.',
     'action': ['python3', 'src/build/util/lastchange.py',
+               '--filter', '.',
                '-m', 'GPU_LISTS_VERSION',
                '--revision-id-only',
                '--header', 'src/gpu/config/gpu_lists_version.h'],
