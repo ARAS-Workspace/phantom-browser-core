@@ -356,9 +356,6 @@ void ExtensionService::Init() {
 
   LogExtensionsOnChromeUrlsSwitchWarningIfNeeded();
 
-  // Must be called after extensions are loaded.
-  allowlist_->Init();
-
   // Check for updates especially for corrupted user installed extension from
   // the webstore. This will do nothing if an extension update check was
   // triggered before and is still running.

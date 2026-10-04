@@ -96,18 +96,6 @@ export function getHtml(this: ItemElement) {
           </span>
         </div>
       ` : ''}
-      ${this.showAllowlistWarning_() ? html`
-        <div id="allowlist-warning">
-          <cr-icon class="message-icon"
-              icon="${this.webuiRoundedIconsEnabled_ ?
-                  'extensions-icons:android-security-privacy-alert' :
-                  'extensions-icons:safebrowsing_warning-old'}">
-          </cr-icon>
-          <span class="cr-secondary-text" aria-describedby="a11yAssociation">
-            $i18n{itemAllowlistWarning}
-          </span>
-        </div>
-      ` : ''}
       ${this.inDevMode ? html`
         <div id="extension-id" class="bounded-text cr-secondary-text">
           ${this.getIdElementText_()}

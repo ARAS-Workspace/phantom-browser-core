@@ -4,18 +4,17 @@
 
 #include "extensions/browser/extension_allowlist.h"
 
+#include "base/test/metrics/histogram_tester.h"
+#include "chrome/browser/extensions/extension_allowlist_factory.h"
 #include "chrome/browser/extensions/extension_management_test_util.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_service_test_base.h"
-#include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "extensions/browser/allowlist_state.h"
-#include "extensions/browser/crx_installer.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/extension_builder.h"
-#include "extensions/common/extension_features.h"
 #include "extensions/common/extension_id.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -28,21 +27,17 @@ namespace {
 // Extension ids used during testing.
 constexpr char kExtensionId1[] = "behllobkkfkfnphdnhnkndlbkcpglgmj";
 constexpr char kExtensionId2[] = "hpiknbiabeeppbpihjehijgoemciehgk";
-constexpr char kInstalledCrx[] = "ldnnhddmnhbkjipkidpdiheffobcpfmf";
 
 using ManagementPrefUpdater = ExtensionManagementPrefUpdater<
     sync_preferences::TestingPrefServiceSyncable>;
 
 }  // namespace
 
-// Test suite to test safe browsing allowlist enforcement.
-//
-// Features EnforceSafeBrowsingExtensionAllowlist and
-// DisableMalwareExtensionsRemotely are enabled.
+// Test suite for the Safe Browsing allowlist state set from Omaha attributes.
 class ExtensionAllowlistUnitTestBase : public ExtensionServiceTestBase {
  protected:
   // Creates a test extension service with 3 installed extensions.
-  void CreateExtensionService(bool enhanced_protection_enabled) {
+  void CreateExtensionService() {
     ExtensionServiceInitParams params;
     ASSERT_TRUE(
         params.ConfigureByTestDataDirectory(data_dir().AppendASCII("good")));
@@ -68,132 +63,48 @@ class ExtensionAllowlistUnitTestBase : public ExtensionServiceTestBase {
     return registry()->enabled_extensions().Contains(extension_id);
   }
 
-  ExtensionAllowlist* allowlist() { return service()->allowlist(); }
-};
-
-class ExtensionAllowlistUnitTest : public ExtensionAllowlistUnitTestBase {
- public:
-  ExtensionAllowlistUnitTest() {
-    feature_list_.InitAndEnableFeature(
-        extensions_features::kSafeBrowsingCrxAllowlistAutoDisable);
+  ExtensionAllowlist* allowlist() {
+    return ExtensionAllowlistFactory::GetForBrowserContext(profile());
   }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
 };
 
-TEST_F(ExtensionAllowlistUnitTest, ReenabledExtensionsAreNotReenforced) {
-  CreateExtensionService(/*enhanced_protection_enabled=*/true);
+TEST_F(ExtensionAllowlistUnitTestBase, ReenabledExtensionsAreNotReenforced) {
+  CreateExtensionService();
 
-  // Start with a not allowlisted extension that was re-enabled by user.
+  // Start with a not allowlisted extension.
   allowlist()->SetExtensionAllowlistState(kExtensionId1,
                                           ALLOWLIST_NOT_ALLOWLISTED);
-  allowlist()->SetExtensionAllowlistAcknowledgeState(
-      kExtensionId1, ALLOWLIST_ACKNOWLEDGE_ENABLED_BY_USER);
 
-  // And an extension that became allowlisted after it was re-enabled by user.
+  // And an allowlisted extension.
   allowlist()->SetExtensionAllowlistState(kExtensionId2, ALLOWLIST_ALLOWLISTED);
-  allowlist()->SetExtensionAllowlistAcknowledgeState(
-      kExtensionId2, ALLOWLIST_ACKNOWLEDGE_ENABLED_BY_USER);
 
   service()->Init();
-  // Even though ExtensionId1 is not allowlisted, it should stay enabled because
-  // it was re-enabled by user.
+  // Even though ExtensionId1 is not allowlisted, it should stay enabled.
   EXPECT_TRUE(IsEnabled(kExtensionId1));
   // Assert that ExtensionId2 is enabled before testing the allowlist state
   // change.
   EXPECT_TRUE(IsEnabled(kExtensionId2));
 
-  // If `kExtensionId2` becomes not allowlisted again, it should stay enabled
-  // because the user already chose to re-enable it in the past.
+  // If `kExtensionId2` becomes not allowlisted, it should stay enabled.
   PerformActionBasedOnOmahaAttributes(kExtensionId2,
                                       /*is_malware=*/false,
                                       /*is_allowlisted=*/false);
   EXPECT_TRUE(IsEnabled(kExtensionId2));
-  EXPECT_EQ(ALLOWLIST_ACKNOWLEDGE_ENABLED_BY_USER,
-            allowlist()->GetExtensionAllowlistAcknowledgeState(kExtensionId2));
   EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
+            allowlist()->GetExtensionAllowlistState(kExtensionId2));
+
+  // If `kExtensionId2` becomes allowlisted again, the state follows the Omaha
+  // attribute.
+  PerformActionBasedOnOmahaAttributes(kExtensionId2,
+                                      /*is_malware=*/false,
+                                      /*is_allowlisted=*/true);
+  EXPECT_EQ(ALLOWLIST_ALLOWLISTED,
             allowlist()->GetExtensionAllowlistState(kExtensionId2));
 }
 
-TEST_F(ExtensionAllowlistUnitTest, BypassFrictionSetAckowledgeEnabledByUser) {
-  CreateExtensionService(/*enhanced_protection_enabled=*/true);
-
-  scoped_refptr<CrxInstaller> installer(CrxInstaller::CreateSilent(profile()));
-  installer->set_allow_silent_install(true);
-  installer->set_bypassed_safebrowsing_friction_for_testing(true);
-
-  base::RunLoop run_loop;
-  installer->AddInstallerCallback(base::BindOnce(
-      [](base::OnceClosure quit_closure,
-         const std::optional<CrxInstallError>& error) {
-        ASSERT_FALSE(error) << error->message();
-        std::move(quit_closure).Run();
-      },
-      run_loop.QuitWhenIdleClosure()));
-
-  installer->InstallCrx(data_dir().AppendASCII("good.crx"));
-  run_loop.Run();
-
-  EXPECT_TRUE(registry()->enabled_extensions().GetByID(kInstalledCrx));
-  EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
-            allowlist()->GetExtensionAllowlistState(kInstalledCrx));
-  EXPECT_EQ(ALLOWLIST_ACKNOWLEDGE_ENABLED_BY_USER,
-            allowlist()->GetExtensionAllowlistAcknowledgeState(kInstalledCrx));
-}
-
-TEST_F(ExtensionAllowlistUnitTest, NoEnforcementOnPolicyForceInstall) {
-  // Mark as enterprise managed.
-  policy::ScopedDomainEnterpriseManagement scoped_domain;
-  CreateEmptyExtensionService();
-  service()->Init();
-
-  // Add a policy installed extension.
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("policy_installed")
-          .SetPath(data_dir().AppendASCII("good.crx"))
-          .SetLocation(mojom::ManifestLocation::kExternalPolicyDownload)
-          .Build();
-  registrar()->AddExtension(extension.get());
-
-  {
-    ManagementPrefUpdater pref(testing_profile()->GetTestingPrefService());
-    pref.SetIndividualExtensionAutoInstalled(
-        extension->id(), "http://example.com/update_url", true);
-  }
-
-  EXPECT_TRUE(IsEnabled(extension->id()));
-
-  // On next update check, the extension is now marked as not allowlisted.
-  PerformActionBasedOnOmahaAttributes(extension->id(),
-                                      /*is_malware=*/false,
-                                      /*is_allowlisted=*/false);
-
-  EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
-            allowlist()->GetExtensionAllowlistState(extension->id()));
-  // A policy installed extension is not disabled by allowlist enforcement.
-  EXPECT_TRUE(IsEnabled(extension->id()));
-  // No warnings are shown for policy installed extensions.
-  EXPECT_FALSE(allowlist()->ShouldDisplayWarning(extension->id()));
-}
-
-class ExtensionAllowlistWithFeatureDisabledUnitTest
-    : public ExtensionAllowlistUnitTestBase {
- public:
-  ExtensionAllowlistWithFeatureDisabledUnitTest() {
-    // Test with warnings enabled but auto disable disabled.
-    feature_list_.InitAndDisableFeature(
-        extensions_features::kSafeBrowsingCrxAllowlistAutoDisable);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-TEST_F(ExtensionAllowlistWithFeatureDisabledUnitTest,
-       NoEnforcementWhenFeatureDisabled) {
+TEST_F(ExtensionAllowlistUnitTestBase, NoEnforcementWhenFeatureDisabled) {
   // Created with 3 installed extensions.
-  CreateExtensionService(/*enhanced_protection_enabled=*/true);
+  CreateExtensionService();
 
   allowlist()->SetExtensionAllowlistState(kExtensionId1,
                                           ALLOWLIST_NOT_ALLOWLISTED);
@@ -204,11 +115,12 @@ TEST_F(ExtensionAllowlistWithFeatureDisabledUnitTest,
                                       /*is_malware=*/false,
                                       /*is_allowlisted=*/false);
   EXPECT_TRUE(IsEnabled(kExtensionId1));
+  EXPECT_TRUE(IsEnabled(kExtensionId2));
+  EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
+            allowlist()->GetExtensionAllowlistState(kExtensionId2));
 }
 
-// TODO(jeffcyr): Test with auto-disablement enabled when the enforcement is
-// skipped for policy recommended and policy allowed extensions.
-TEST_F(ExtensionAllowlistWithFeatureDisabledUnitTest,
+TEST_F(ExtensionAllowlistUnitTestBase,
        NoEnforcementOnPolicyRecommendedInstall) {
   CreateEmptyExtensionService();
   service()->Init();
@@ -229,6 +141,7 @@ TEST_F(ExtensionAllowlistWithFeatureDisabledUnitTest,
 
   EXPECT_TRUE(IsEnabled(extension->id()));
 
+  base::HistogramTester histogram_tester;
   // On next update check, the extension is now marked as not allowlisted.
   PerformActionBasedOnOmahaAttributes(extension->id(),
                                       /*is_malware=*/false,
@@ -236,14 +149,15 @@ TEST_F(ExtensionAllowlistWithFeatureDisabledUnitTest,
 
   EXPECT_EQ(ALLOWLIST_NOT_ALLOWLISTED,
             allowlist()->GetExtensionAllowlistState(extension->id()));
+  // 2 == ExtensionAllowlistOmahaAttributeValue::kNotAllowlisted.
+  histogram_tester.ExpectUniqueSample("Extensions.EsbAllowlistOmahaAttribute",
+                                      /*sample=*/2,
+                                      /*expected_bucket_count=*/1);
   // A policy installed extension is not disabled by allowlist enforcement.
   EXPECT_TRUE(IsEnabled(extension->id()));
-  // No warnings are shown for policy installed extensions.
-  EXPECT_FALSE(allowlist()->ShouldDisplayWarning(extension->id()));
 }
 
-TEST_F(ExtensionAllowlistWithFeatureDisabledUnitTest,
-       NoEnforcementOnPolicyAllowedInstall) {
+TEST_F(ExtensionAllowlistUnitTestBase, NoEnforcementOnPolicyAllowedInstall) {
   CreateEmptyExtensionService();
   service()->Init();
 
@@ -271,10 +185,6 @@ TEST_F(ExtensionAllowlistWithFeatureDisabledUnitTest,
             allowlist()->GetExtensionAllowlistState(extension->id()));
   // An extension allowed by policy is not disabled by allowlist enforcement.
   EXPECT_TRUE(IsEnabled(extension->id()));
-  // No warnings are shown for policy allowed extensions.
-  EXPECT_FALSE(allowlist()->ShouldDisplayWarning(extension->id()));
 }
-
-// TODO(crbug.com/40175473): Add more ExtensionAllowlist::Observer coverage
 
 }  // namespace extensions

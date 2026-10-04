@@ -418,18 +418,9 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
     return this.data.disableReasons.unsupportedManifestVersion;
   }
 
-  /**
-   * @return Whether the extension has an allowlist warning. Doesn't determine
-   *     the warning's visibility.
-   */
-  private hasAllowlistWarning_(): boolean {
-    return this.data.showSafeBrowsingAllowlistWarning;
-  }
-
   protected showDescription_(): boolean {
     // Description is only visible iff no warnings are visible.
-    return !this.hasSevereWarnings_() && !this.hasMv2DeprecationWarning_() &&
-        !this.hasAllowlistWarning_();
+    return !this.hasSevereWarnings_() && !this.hasMv2DeprecationWarning_();
   }
 
   protected showSevereWarnings(): boolean {
@@ -443,16 +434,6 @@ export class ExtensionsItemElement extends ExtensionsItemElementBase {
     // Note: The item card has a fixed height and the content might get cropped
     // if too many warnings are displayed.
     return this.hasMv2DeprecationWarning_() && !this.hasSevereWarnings_();
-  }
-
-  protected showAllowlistWarning_(): boolean {
-    // Allowlist warning is visible, if existent, if there are no severe
-    // warnings or mv2 deprecation warnings visible.
-    // Note: The item card has a fixed height and the content might get cropped
-    // if too many warnings are displayed. This should be a rare edge case and
-    // the allowlist warning will still be shown in the item detail view.
-    return this.hasAllowlistWarning_() && !this.hasSevereWarnings_() &&
-        !this.hasMv2DeprecationWarning_();
   }
 
   protected showErrorsAsWarningsButtonLabel_(): boolean {

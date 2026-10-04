@@ -190,18 +190,6 @@ this text can be found by Ctrl + F because it isn't hidden. -->
         </div>
       </div>
     ` : ''}
-    ${this.showAllowlistWarning_() ? html`
-      <div id="allowlist-warning" class="cr-row continuation">
-        <cr-icon class="warning-icon"
-            icon="${this.webuiRoundedIconsEnabled_ ?
-                'extensions-icons:android-security-privacy-alert' :
-                'extensions-icons:safebrowsing_warning-old'}">
-        </cr-icon>
-        <span class="cr-secondary-text">
-          $i18n{itemAllowlistWarning}
-        </span>
-      </div>
-    ` : ''}
     <div class="section">
       <div class="section-title" role="heading" aria-level="2">
         $i18n{itemDescriptionLabel}

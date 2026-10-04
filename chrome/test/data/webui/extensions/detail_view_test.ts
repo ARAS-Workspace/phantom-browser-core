@@ -580,15 +580,6 @@ suite('ExtensionDetailViewTest', function() {
     testWarningVisible('#update-required-warning', false);
     testWarningVisible('#published-in-store-required-warning', false);
 
-    await updateItemData({showSafeBrowsingAllowlistWarning: true});
-    testWarningVisible('#runtime-warnings', false);
-    testWarningVisible('#corrupted-warning', false);
-    testWarningVisible('#suspicious-warning', false);
-    testWarningVisible('#blocklisted-warning', false);
-    testWarningVisible('#update-required-warning', false);
-    testWarningVisible('#published-in-store-required-warning', false);
-    testWarningVisible('#allowlist-warning', true);
-
     await updateItemDisableReasons({suspiciousInstall: true});
     testWarningVisible('#runtime-warnings', false);
     testWarningVisible('#corrupted-warning', false);
@@ -596,11 +587,7 @@ suite('ExtensionDetailViewTest', function() {
     testWarningVisible('#blocklisted-warning', false);
     testWarningVisible('#update-required-warning', false);
     testWarningVisible('#published-in-store-required-warning', false);
-    testWarningVisible('#allowlist-warning', true);
 
-    // Test that the allowlist warning is not shown when there is already a
-    // blocklist message. It would be redundant since all blocklisted extension
-    // are necessarily not included in the Safe Browsing allowlist.
     await updateItemData({blocklistText: 'This item is blocklisted'});
     testWarningVisible('#runtime-warnings', false);
     testWarningVisible('#corrupted-warning', false);
@@ -608,7 +595,6 @@ suite('ExtensionDetailViewTest', function() {
     testWarningVisible('#blocklisted-warning', true);
     testWarningVisible('#update-required-warning', false);
     testWarningVisible('#published-in-store-required-warning', false);
-    testWarningVisible('#allowlist-warning', false);
   });
 
   test('UnsupportedDeveloperExtensionWarning', async () => {

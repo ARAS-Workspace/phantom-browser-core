@@ -23,7 +23,6 @@
 #include "chrome/browser/extensions/error_console/error_console.h"
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_safety_check_utils.h"
-#include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/extensions/shared_module_service_factory.h"
 #include "chrome/browser/extensions/sync/account_extension_tracker.h"
@@ -38,7 +37,6 @@
 #include "content/public/browser/render_frame_host.h"
 #include "extensions/browser/blocklist_extension_prefs.h"
 #include "extensions/browser/blocklist_state.h"
-#include "extensions/browser/extension_allowlist.h"
 #include "extensions/browser/extension_error.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
@@ -582,10 +580,6 @@ void ExtensionInfoGenerator::FillExtensionInfo(const Extension& extension,
     info.blocklist_text = l10n_util::GetStringUTF8(blocklist_text);
   }
 
-  if (extension_system_->extension_service()->allowlist()->ShouldDisplayWarning(
-          extension.id())) {
-    info.show_safe_browsing_allowlist_warning = true;
-  }
   ExtensionManagement* extension_management =
       ExtensionManagementFactory::GetForBrowserContext(browser_context_);
 

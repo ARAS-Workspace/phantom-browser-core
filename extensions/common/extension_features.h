@@ -189,11 +189,6 @@ BASE_DECLARE_FEATURE(kLaunchWindowsNativeHostsDirectly);
 BASE_DECLARE_FEATURE(kExperimentalOmniboxLabs);
 
 // Reports Extensions.WebRequest.KeepaliveRequestFinished when enabled.
-// Automatically disable extensions not included in the Safe Browsing CRX
-// allowlist if the user has turned on Enhanced Safe Browsing (ESB). The
-// extensions can be disabled at ESB opt-in time or when an extension is moved
-// out of the allowlist.
-BASE_DECLARE_FEATURE(kSafeBrowsingCrxAllowlistAutoDisable);
 
 // Controls whether the component webstore hosted app is loaded.
 BASE_DECLARE_FEATURE(kWebstoreHostedApp);

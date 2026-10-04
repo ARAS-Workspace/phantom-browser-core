@@ -10,8 +10,6 @@
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "extensions/browser/extension_allowlist.h"
 #include "extensions/browser/extension_prefs_factory.h"
-#include "extensions/browser/extension_registrar_factory.h"
-#include "extensions/browser/extension_registry_factory.h"
 #include "extensions/buildflags/buildflags.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
@@ -46,8 +44,6 @@ ExtensionAllowlistFactory::ExtensionAllowlistFactory()
               .WithAshInternals(ProfileSelection::kRedirectedToOriginal)
               .Build()) {
   DependsOn(ExtensionPrefsFactory::GetInstance());
-  DependsOn(ExtensionRegistrarFactory::GetInstance());
-  DependsOn(ExtensionRegistryFactory::GetInstance());
 }
 
 ExtensionAllowlistFactory::~ExtensionAllowlistFactory() = default;

@@ -309,14 +309,6 @@ suite('ExtensionItemTest', function() {
     item.data = data;
     await microtasksFinished();
     assertFalse(isChildVisible(item, '#description'));
-
-    // Description is hidden if there is an allowlist warning.
-    data = createExtensionInfo(item.data);
-    data.disableReasons.unsupportedManifestVersion = false;
-    data.showSafeBrowsingAllowlistWarning = true;
-    item.data = data;
-    await microtasksFinished();
-    assertFalse(isChildVisible(item, '#description'));
   });
 
   test('Warnings', async () => {
@@ -325,8 +317,6 @@ suite('ExtensionItemTest', function() {
     const kSuspicious = 1 << 1;
     const kBlocklisted = 1 << 2;
     const kRuntime = 1 << 3;
-    // Allowlist warning.
-    const kSafeBrowsingAllowlist = 1 << 4;
     // MV2 deprecation warning.
     const kMv2Deprecation = 1 << 5;
 
@@ -340,9 +330,6 @@ suite('ExtensionItemTest', function() {
           isChildVisible(item, '#blocklisted-warning'));
       assertEquals(
           !!(mask & kRuntime), isChildVisible(item, '#runtime-warnings'));
-      assertEquals(
-          !!(mask & kSafeBrowsingAllowlist),
-          isChildVisible(item, '#allowlist-warning'));
       assertEquals(
           !!(mask & kMv2Deprecation),
           isChildVisible(item, '#mv2-deprecation-warning'));
@@ -412,19 +399,13 @@ suite('ExtensionItemTest', function() {
     await microtasksFinished();
     assertWarnings(0);
 
-    // Show allowlist warning.
-    data = createExtensionInfo(item.data);
-    data.showSafeBrowsingAllowlistWarning = true;
-    item.data = data;
-    await microtasksFinished();
-    assertWarnings(kSafeBrowsingAllowlist);
-    // Allowlist warning is not visible if there are any severe warnings.
+    // Show a severe warning.
     data = createExtensionInfo(item.data);
     data.disableReasons.suspiciousInstall = true;
     item.data = data;
     await microtasksFinished();
     assertWarnings(kSuspicious);
-    // Allowlist warning is not visible if there is a MV2 deprecation warning
+    // Show MV2 deprecation warning.
     data = createExtensionInfo(item.data);
     data.disableReasons.suspiciousInstall = false;
     data.disableReasons.unsupportedManifestVersion = true;

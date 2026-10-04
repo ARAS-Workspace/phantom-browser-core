@@ -757,7 +757,8 @@ TEST_F(WebstorePrivateBeginInstallWithManifest3Test,
 struct FrictionDialogTestCase {
   const char* test_name;
   const char* esb_allowlist;
-  bool expected_friction_shown;
+  // Expected Extensions.WebStoreInstall.EsbAllowlistParameter bucket.
+  int expected_esb_bucket;
   ScopedTestDialogAutoConfirm::AutoConfirm dialog_action =
       ScopedTestDialogAutoConfirm::ACCEPT;
 };
@@ -771,14 +772,18 @@ std::ostream& operator<<(std::ostream& out,
 const FrictionDialogTestCase kFrictionDialogTestCases[] = {
     {/*test_name=*/"EsbUserAndAllowlisted",
      /*esb_allowlist=*/"true",
-     /*expected_friction_shown=*/false},
+     /*expected_esb_bucket=*/1},
 
     {/*test_name=*/"EsbUserAndUndefined",
      /*esb_allowlist=*/"undefined",
-     /*expected_friction_shown=*/false},
+     /*expected_esb_bucket=*/0},
     {/*test_name=*/"NonEsbUserAndNotAllowlisted",
      /*esb_allowlist=*/"false",
-     /*expected_friction_shown=*/false}};
+     /*expected_esb_bucket=*/2},
+    {/*test_name=*/"NonEsbUserNotAllowlistedCancelled",
+     /*esb_allowlist=*/"false",
+     /*expected_esb_bucket=*/2,
+     /*dialog_action=*/ScopedTestDialogAutoConfirm::CANCEL}};
 
 class WebstorePrivateBeginInstallWithManifest3FrictionDialogTest
     : public WebstorePrivateBeginInstallWithManifest3Test,
@@ -800,6 +805,7 @@ TEST_P(WebstorePrivateBeginInstallWithManifest3FrictionDialogTest,
        FrictionDialogTests) {
   FrictionDialogTestCase test_case = GetParam();
 
+  base::HistogramTester histogram_tester;
   std::unique_ptr<content::WebContents> web_contents =
       content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
   auto function =
@@ -829,15 +835,27 @@ TEST_P(WebstorePrivateBeginInstallWithManifest3FrictionDialogTest,
     VerifyUserCancelledFunctionResult(function.get());
   }
 
-  EXPECT_EQ(test_case.expected_friction_shown,
-            function->GetFrictionDialogShownForTesting());
+  // The esbAllowlist parameter received from the Web Store is recorded.
+  histogram_tester.ExpectUniqueSample(
+      "Extensions.WebStoreInstall.EsbAllowlistParameter",
+      test_case.expected_esb_bucket, 1);
+  // Installs and cancellations of not allowlisted extensions are recorded
+  // without friction.
+  if (esb_allowlist == "false") {
+    histogram_tester.ExpectUniqueSample(
+        "Extensions.WebStoreInstall.NotAllowlistedInstalledWithoutFriction",
+        test_case.dialog_action == ScopedTestDialogAutoConfirm::ACCEPT, 1);
+  } else {
+    histogram_tester.ExpectTotalCount(
+        "Extensions.WebStoreInstall.NotAllowlistedInstalledWithoutFriction", 0);
+  }
+  histogram_tester.ExpectTotalCount(
+      "Extensions.WebStoreInstall.NotAllowlistedInstalledWithFriction", 0);
 
   std::unique_ptr<InstallApproval> approval =
       WebstorePrivateApi::PopApprovalForTesting(profile(), kExtensionId);
   if (test_case.dialog_action == ScopedTestDialogAutoConfirm::ACCEPT) {
     ASSERT_TRUE(approval);
-    EXPECT_EQ(test_case.expected_friction_shown,
-              approval->bypassed_safebrowsing_friction);
   } else {
     EXPECT_FALSE(approval);
   }

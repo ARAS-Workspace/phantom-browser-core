@@ -248,7 +248,6 @@ dictionary ExtensionInfo {
   required DOMString version;
   required sequence<ExtensionView> views;
   required DOMString webStoreUrl;
-  required boolean showSafeBrowsingAllowlistWarning;
   SafetyCheckWarningReason safetyCheckWarningReason;
   required boolean showAccessRequestsInToolbar;
   boolean pinnedToToolbar;

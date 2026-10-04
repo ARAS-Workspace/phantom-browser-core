@@ -209,6 +209,10 @@ IN_PROC_BROWSER_TEST_F(CrExtensionsItemsTest, FailedReloadFiresLoadError) {
   RunTestCase("FailedReloadFiresLoadError");
 }
 
+IN_PROC_BROWSER_TEST_F(CrExtensionsItemsTest, Description) {
+  RunTestCase("Description");
+}
+
 IN_PROC_BROWSER_TEST_F(CrExtensionsItemsTest, Warnings) {
   RunTestCase("Warnings");
 }

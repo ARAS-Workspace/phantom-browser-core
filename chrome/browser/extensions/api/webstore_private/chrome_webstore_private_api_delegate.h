@@ -18,8 +18,6 @@ class ChromeWebstorePrivateAPIDelegate : public WebstorePrivateAPIDelegate {
   // WebstorePrivateAPIDelegate:
   std::vector<KeyedServiceBaseFactory*> GetWebStoreAPIFactoryDependencies()
       override;
-  ExtensionAllowlist* GetExtensionAllowlist(
-      content::BrowserContext* context) override;
   signin::IdentityManager* GetIdentityManager(
       content::BrowserContext* context) override;
   void ShowExtensionInstallBlockedDialog(
@@ -28,10 +26,6 @@ class ChromeWebstorePrivateAPIDelegate : public WebstorePrivateAPIDelegate {
       const std::u16string& custom_error_message,
       const gfx::ImageSkia& icon,
       base::OnceClosure done_callback) override;
-  void ShowExtensionInstallFrictionDialog(
-      content::WebContents* web_contents,
-      base::OnceCallback<void(bool)> callback) override;
-  void ReportFrictionAcceptedEvent(content::BrowserContext* context) override;
   std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
   CreatePromotionEligibilityChecker(content::BrowserContext* context,
                                     bool dismissed_banner_pref,

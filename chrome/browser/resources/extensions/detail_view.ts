@@ -556,14 +556,6 @@ export class ExtensionsDetailViewElement extends
         enableControl === EnableControl.REPAIR;
   }
 
-  protected showAllowlistWarning_(): boolean {
-    // Only show the allowlist warning if there is no blocklist warning. It
-    // would be redundant since all blocklisted items are necessarily not
-    // included in the Safe Browsing allowlist.
-    return this.data.showSafeBrowsingAllowlistWarning &&
-        !this.data.blocklistText;
-  }
-
   /** Opens the action menu for the extension. */
   protected onActionMenuButtonClick_(event: MouseEvent): void {
     this.$.actionMenu.showAt(

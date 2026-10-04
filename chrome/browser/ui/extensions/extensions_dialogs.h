@@ -59,7 +59,6 @@ class Extension;
 DECLARE_ELEMENT_IDENTIFIER_VALUE(kControlledHomeDialogCancelButtonElementId);
 DECLARE_ELEMENT_IDENTIFIER_VALUE(kDownloadDangerDialogCancelButtonElementId);
 DECLARE_ELEMENT_IDENTIFIER_VALUE(kDownloadDangerDialogKeepButtonElementId);
-DECLARE_ELEMENT_IDENTIFIER_VALUE(kExtensionInstallFrictionLearnMoreLink);
 DECLARE_ELEMENT_IDENTIFIER_VALUE(kMv2KeepDialogOkButtonElementId);
 DECLARE_ELEMENT_IDENTIFIER_VALUE(kParentBlockedDialogMessage);
 DECLARE_ELEMENT_IDENTIFIER_VALUE(
@@ -105,14 +104,6 @@ void ShowDownloadDangerDialog(
     download::DownloadItem* download_item,
     content::WebContents* web_contents,
     base::OnceCallback<void(DownloadDangerPrompt::Action)> done_callback);
-
-// Shows a modal dialog to Enhanced Safe Browsing users before the extension
-// install dialog if the extension is not included in the Safe Browsing CRX
-// allowlist. `callback` will be invoked with `true` if the user accepts or
-// `false` if the user cancels the dialog.
-void ShowExtensionInstallFrictionDialog(
-    content::WebContents* contents,
-    base::OnceCallback<void(bool)> callback);
 
 // Shows a model dialog to users when they uninstall multiple extensions.
 // When the dialog is accepted, `accept_callback` is invoked.

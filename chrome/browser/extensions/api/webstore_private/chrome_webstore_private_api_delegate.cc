@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "chrome/browser/enterprise/util/affiliation.h"
-#include "chrome/browser/extensions/extension_allowlist_factory.h"
 #include "chrome/browser/extensions/install_tracker_factory.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
@@ -16,7 +15,7 @@
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "extensions/browser/extension_allowlist.h"
+#include "extensions/common/extension.h"
 
 namespace extensions {
 
@@ -27,15 +26,9 @@ ChromeWebstorePrivateAPIDelegate::~ChromeWebstorePrivateAPIDelegate() = default;
 std::vector<KeyedServiceBaseFactory*>
 ChromeWebstorePrivateAPIDelegate::GetWebStoreAPIFactoryDependencies() {
   std::vector<KeyedServiceBaseFactory*> dependencies;
-  dependencies.push_back(ExtensionAllowlistFactory::GetInstance());
   dependencies.push_back(IdentityManagerFactory::GetInstance());
   dependencies.push_back(InstallTrackerFactory::GetInstance());
   return dependencies;
-}
-
-ExtensionAllowlist* ChromeWebstorePrivateAPIDelegate::GetExtensionAllowlist(
-    content::BrowserContext* context) {
-  return ExtensionAllowlistFactory::GetForBrowserContext(context);
 }
 
 signin::IdentityManager* ChromeWebstorePrivateAPIDelegate::GetIdentityManager(
@@ -53,17 +46,6 @@ void ChromeWebstorePrivateAPIDelegate::ShowExtensionInstallBlockedDialog(
   ::extensions::ShowExtensionInstallBlockedDialog(
       extension->id(), extension->name(), custom_error_message, icon,
       web_contents, std::move(done_callback));
-}
-
-void ChromeWebstorePrivateAPIDelegate::ShowExtensionInstallFrictionDialog(
-    content::WebContents* web_contents,
-    base::OnceCallback<void(bool)> callback) {
-  ::extensions::ShowExtensionInstallFrictionDialog(web_contents,
-                                                   std::move(callback));
-}
-
-void ChromeWebstorePrivateAPIDelegate::ReportFrictionAcceptedEvent(
-    content::BrowserContext* context) {
 }
 
 std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>

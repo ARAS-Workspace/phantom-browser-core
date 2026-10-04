@@ -111,11 +111,6 @@ cr-tooltip-icon {
   margin-bottom: 8px;
 }
 
-#allowlist-warning {
-  flex: 1;
-  margin-bottom: 8px;
-}
-
 .message-icon {
   color: var(--error-color);
   height: 18px;
@@ -123,10 +118,6 @@ cr-tooltip-icon {
   vertical-align: top;
   width: 18px;
   flex-shrink: 0;
-}
-
-#allowlist-warning .message-icon {
-  --iron-icon-fill-color: var(--warning-color);
 }
 
 #extension-id {

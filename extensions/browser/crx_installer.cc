@@ -204,10 +204,6 @@ CrxInstaller::CrxInstaller(content::BrowserContext* context,
   if (approval->minimum_version.get()) {
     minimum_version_ = base::Version(*approval->minimum_version);
   }
-
-  if (approval->bypassed_safebrowsing_friction) {
-    install_flags_ = kInstallFlagBypassedSafeBrowsingFriction;
-  }
 }
 
 CrxInstaller::~CrxInstaller() {

@@ -163,14 +163,6 @@
   margin-inline-start: 6px;
 }
 
-#allowlist-warning {
-  flex: 1;
-}
-
-#allowlist-warning .warning-icon {
-  --iron-icon-fill-color: var(--warning-color);
-}
-
 ul {
   margin: 0;
   padding-inline-start: 20px;

@@ -248,7 +248,6 @@ declare global {
         version: string;
         views: ExtensionView[];
         webStoreUrl: string;
-        showSafeBrowsingAllowlistWarning: boolean;
         showAccessRequestsInToolbar: boolean;
         safetyCheckWarningReason: SafetyCheckWarningReason;
         pinnedToToolbar?: boolean;

@@ -54,6 +54,9 @@ TEST_F(OmahaAttributesHandlerUnitTest, LogPolicyViolationUWSMetrics) {
       "Extensions.ExtensionAddDisabledRemotelyReason2",
       /*sample=*/ExtensionUpdateCheckDataKey::kPolicyViolation,
       /*expected_count=*/1);
+  // A missing `_esbAllowlist` attribute is recorded as undefined (0).
+  histograms.ExpectUniqueSample("Extensions.EsbAllowlistOmahaAttribute",
+                                /*sample=*/0, /*expected_bucket_count=*/1);
 }
 
 TEST_F(OmahaAttributesHandlerUnitTest, LogMalwareMetrics) {

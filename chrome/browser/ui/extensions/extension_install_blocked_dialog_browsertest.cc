@@ -6,12 +6,14 @@
 
 #include "base/functional/callback_helpers.h"
 #include "base/strings/utf_string_conversions.h"
+#include "chrome/browser/extensions/api/webstore_private/chrome_webstore_private_api_delegate.h"
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/extensions/extensions_dialogs.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/test/test_browser_dialog.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/browser_test.h"
+#include "extensions/common/extension.h"
+#include "extensions/common/extension_builder.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/gfx/image/image_skia.h"
 
@@ -21,9 +23,14 @@ class ExtensionInstallBlockedDialogTest : public DialogBrowserTest {
   ~ExtensionInstallBlockedDialogTest() override = default;
 
   void ShowUi(const std::string& name) override {
-    extensions::ShowExtensionInstallBlockedDialog(
-        "extension_id", "extension_name", message_, CreateExtensionIcon(),
-        browser()->tab_strip_model()->GetWebContentsAt(0), base::DoNothing());
+    scoped_refptr<const extensions::Extension> extension =
+        extensions::ExtensionBuilder("extension_name").Build();
+    // Show the dialog through the webstorePrivate delegate, the path used by
+    // webstorePrivate.beginInstallWithManifest3.
+    extensions::ChromeWebstorePrivateAPIDelegate delegate;
+    delegate.ShowExtensionInstallBlockedDialog(
+        browser()->tab_strip_model()->GetWebContentsAt(0), extension.get(),
+        message_, CreateExtensionIcon(), base::DoNothing());
   }
 
   // Creates a big icon so that dialog will downscale it.

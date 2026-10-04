@@ -195,10 +195,6 @@ class ExtensionService : public ExtensionServiceInterface,
     return &force_installed_tracker_;
   }
 
-  // TODO(crbug.com/404941806): Delete this method and use the KeyedService
-  // directly.
-  ExtensionAllowlist* allowlist() { return allowlist_; }
-
   //////////////////////////////////////////////////////////////////////////////
   // For Testing
 
@@ -405,10 +401,6 @@ class ExtensionService : public ExtensionServiceInterface,
                            DestroyingProfileClearsExtensions);
   FRIEND_TEST_ALL_PREFIXES(ExtensionServiceTest,
                            ManagementPolicyProhibitsEnableOnInstalled);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionAllowlistUnitTest,
-                           ExtensionsNotAllowlistedThenBlocklisted);
-  FRIEND_TEST_ALL_PREFIXES(ExtensionAllowlistUnitTest,
-                           ExtensionsBlocklistedThenNotAllowlisted);
 };
 
 }  // namespace extensions

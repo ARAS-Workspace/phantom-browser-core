@@ -724,17 +724,9 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateGetReferrerChainApiTest,
 class ExtensionWebstorePrivateApiAllowlistEnforcementTest
     : public ExtensionWebstorePrivateApiTest {
  public:
-  ExtensionWebstorePrivateApiAllowlistEnforcementTest() {
-    feature_list_.InitAndEnableFeature(
-        extensions_features::kSafeBrowsingCrxAllowlistAutoDisable);
-  }
-
   ExtensionAllowlist* GetAllowlist() {
     return ExtensionAllowlistFactory::GetForBrowserContext(profile());
   }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
 };
 
 IN_PROC_BROWSER_TEST_F(ExtensionWebstorePrivateApiAllowlistEnforcementTest,

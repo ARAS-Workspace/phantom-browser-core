@@ -31,6 +31,7 @@
 #include "chrome/browser/extensions/api/developer_private/extension_info_generator.h"
 #include "chrome/browser/extensions/api/developer_private/profile_info_generator.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
+#include "chrome/browser/extensions/commands/command_service.h"
 #include "chrome/browser/extensions/error_console/error_console.h"
 #include "chrome/browser/extensions/extension_action_test_util.h"
 #include "chrome/browser/extensions/extension_install_prompt_show_params.h"
@@ -3214,6 +3215,14 @@ TEST_F(DeveloperPrivateApiUnitTest,
   EXPECT_TRUE(WasItemChangedEventDispatched(
       test_observer, extension->id(),
       api::developer_private::EventType::kPinnedActionsChanged));
+
+  // Adding a command for the extension dispatches a command-added event.
+  CommandService::Get(profile())->UpdateKeybindingPrefs(
+      extension->id(), "test_command", "Ctrl+Shift+Y");
+  base::RunLoop().RunUntilIdle();
+  EXPECT_TRUE(WasItemChangedEventDispatched(
+      test_observer, extension->id(),
+      api::developer_private::EventType::kCommandAdded));
 }
 
 class DeveloperPrivateApiSupervisedUserUnitTest

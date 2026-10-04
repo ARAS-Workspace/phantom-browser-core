@@ -248,9 +248,6 @@ class CrxInstaller : public SandboxedUnpackerClient {
   void set_do_not_sync(bool val) {
     set_install_flag(kInstallFlagDoNotSync, val);
   }
-  void set_bypassed_safebrowsing_friction_for_testing(bool val) {
-    set_install_flag(kInstallFlagBypassedSafeBrowsingFriction, val);
-  }
 
   // Callback to be invoked when the crx file has passed the expectations check
   // after unpack success and the ownership of the crx file lies with the

@@ -187,7 +187,6 @@ source_set("interactive_ui_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   sources = [
     "dialogs/confirm_protocol_handler_dialog_interactive_uitest.cc",
-    "dialogs/extension_install_friction_dialog_interactive_uitest.cc",
     "extension_popup_interactive_uitest.cc",
     "extensions_menu_main_page_view_interactive_uitest.cc",
     "extensions_menu_site_permissions_page_view_interactive_uitest.cc",
@@ -210,7 +209,6 @@ source_set("interactive_ui_tests") {
     "//chrome/browser/ui/extensions",
     "//chrome/browser/ui/extensions:test_support",
     "//chrome/browser/ui/interaction",
-    "//chrome/browser/ui/tabs:tab_enums",
     "//chrome/browser/ui/toolbar",
     "//chrome/browser/ui/views/controls",
     "//chrome/browser/ui/views/toolbar",

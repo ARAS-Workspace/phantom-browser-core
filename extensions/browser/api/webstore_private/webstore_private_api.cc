@@ -16,7 +16,6 @@
 #include "base/auto_reset.h"
 #include "base/base64.h"
 #include "base/callback_list.h"
-#include "base/check_is_test.h"
 #include "base/functional/bind.h"
 #include "base/json/json_reader.h"
 #include "base/json/values_util.h"
@@ -48,9 +47,9 @@
 #include "extensions/browser/api/extensions_api_client.h"
 #include "extensions/browser/api/management/management_api.h"
 #include "extensions/browser/api/webstore_private/webstore_private_api_delegate.h"
-#include "extensions/browser/extension_allowlist.h"
 #include "extensions/browser/extension_dialog_auto_confirm.h"
 #include "extensions/browser/extension_function_constants.h"
+#include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/browser/extensions_browser_client.h"
@@ -407,17 +406,10 @@ void ReportWebStoreInstallEsbAllowlistParameter(
 }
 
 // Track if a user accepts to install a not allowlisted extensions.
-void ReportWebStoreInstallNotAllowlistedInstalled(bool installed,
-                                                  bool friction_dialog_shown) {
-  if (friction_dialog_shown) {
-    base::UmaHistogramBoolean(
-        "Extensions.WebStoreInstall.NotAllowlistedInstalledWithFriction",
-        installed);
-  } else {
-    base::UmaHistogramBoolean(
-        "Extensions.WebStoreInstall.NotAllowlistedInstalledWithoutFriction",
-        installed);
-  }
+void ReportWebStoreInstallNotAllowlistedInstalled(bool installed) {
+  base::UmaHistogramBoolean(
+      "Extensions.WebStoreInstall.NotAllowlistedInstalledWithoutFriction",
+      installed);
 }
 
 // Returns whether the app launcher has been enabled.
@@ -610,11 +602,7 @@ void WebstorePrivateBeginInstallWithManifest3Function::OnInstallStatusCheckDone(
   } else {
     ReportWebStoreInstallEsbAllowlistParameter(details().esb_allowlist);
 
-    if (ShouldShowFrictionDialog(browser_context_)) {
-      ShowInstallFrictionDialog(web_contents);
-    } else {
-      ShowInstallDialog(web_contents);
-    }
+    ShowInstallDialog(web_contents);
   }
   // Control flow finishes up in OnInstallPromptDone, OnRequestPromptDone,
   // OnBlockByPolicyPromptDone, or OnRequestParentApprovalPromptCancelled.
@@ -745,34 +733,6 @@ bool WebstorePrivateBeginInstallWithManifest3Function::
   return true;
 }
 
-void WebstorePrivateBeginInstallWithManifest3Function::OnFrictionPromptDone(
-    bool result) {
-  content::WebContents* web_contents = GetSenderWebContents();
-  if (!result || !web_contents) {
-    ReportWebStoreInstallNotAllowlistedInstalled(
-        /*installed=*/false, /*friction_dialog_shown=*/true);
-
-    Respond(BuildResponse(api::webstore_private::Result::kUserCancelled,
-                          kWebstoreUserCancelledError));
-
-    return;
-  }
-
-  ReportFrictionAcceptedEvent();
-  ShowInstallDialog(web_contents);
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::
-    ReportFrictionAcceptedEvent() {
-  if (!browser_context_) {
-    return;
-  }
-
-  ExtensionsAPIClient::Get()
-      ->GetWebstorePrivateAPIDelegate()
-      ->ReportFrictionAcceptedEvent(browser_context_);
-}
-
 void WebstorePrivateBeginInstallWithManifest3Function::OnInstallPromptDone(
     ExtensionInstallPromptClient::DoneCallbackPayload payload) {
   switch (payload.result) {
@@ -876,7 +836,6 @@ void WebstorePrivateBeginInstallWithManifest3Function::HandleInstallProceed(
   approval->skip_post_install_ui = !!details().enable_launcher;
   approval->dummy_extension = dummy_extension_.get();
   approval->installing_icon = gfx::ImageSkia::CreateFrom1xBitmap(icon_);
-  approval->bypassed_safebrowsing_friction = friction_dialog_shown_;
   approval->withhold_permissions = withhold_permissions;
   if (details().authuser) {
     approval->authuser = *details().authuser;
@@ -888,8 +847,7 @@ void WebstorePrivateBeginInstallWithManifest3Function::HandleInstallProceed(
 
   // Record when the user accepted to install a not allowlisted extension.
   if (details().esb_allowlist && !*details().esb_allowlist) {
-    ReportWebStoreInstallNotAllowlistedInstalled(
-        /*installed=*/true, friction_dialog_shown_);
+    ReportWebStoreInstallNotAllowlistedInstalled(/*installed=*/true);
   }
   Respond(
       BuildResponse(api::webstore_private::Result::kSuccess, std::string()));
@@ -898,8 +856,7 @@ void WebstorePrivateBeginInstallWithManifest3Function::HandleInstallProceed(
 void WebstorePrivateBeginInstallWithManifest3Function::HandleInstallAbort(
     bool user_initiated) {
   if (details().esb_allowlist && !*details().esb_allowlist) {
-    ReportWebStoreInstallNotAllowlistedInstalled(
-        /*installed=*/false, friction_dialog_shown_);
+    ReportWebStoreInstallNotAllowlistedInstalled(/*installed=*/false);
   }
 
   Respond(BuildResponse(api::webstore_private::Result::kUserCancelled,
@@ -930,65 +887,6 @@ WebstorePrivateBeginInstallWithManifest3Function::BuildResponse(
   // this can be changed over.
   return ArgumentList(BeginInstallWithManifest3::Results::Create(
       api::webstore_private::Result::kEmptyString));
-}
-
-bool WebstorePrivateBeginInstallWithManifest3Function::ShouldShowFrictionDialog(
-    content::BrowserContext* browser_context) {
-  // Consider an extension to be allowlisted if either we have no indication in
-  // the `esb_allowlist` param or if the param is explicitly set.
-  bool consider_allowlisted =
-      !details().esb_allowlist || *details().esb_allowlist;
-
-  // Never show friction if the extension is considered allowlisted.
-  if (consider_allowlisted) {
-    return false;
-  }
-
-  // Only show friction if the allowlist warnings are enabled for the browser
-  // context.
-  return ExtensionsAPIClient::Get()
-      ->GetWebstorePrivateAPIDelegate()
-      ->GetExtensionAllowlist(browser_context)
-      ->warnings_enabled();
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::
-    ShowInstallFrictionDialog(content::WebContents* contents) {
-  friction_dialog_shown_ = true;
-
-  // Tests can auto confirm the dialog.
-  auto auto_confirm_value = ScopedTestDialogAutoConfirm::GetAutoConfirmValue();
-  switch (auto_confirm_value) {
-    case ScopedTestDialogAutoConfirm::NONE:
-      // Continue, auto confirm has not been set.
-      break;
-    case ScopedTestDialogAutoConfirm::ACCEPT:
-      CHECK_IS_TEST();
-      base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-          FROM_HERE,
-          base::BindOnce(&WebstorePrivateBeginInstallWithManifest3Function::
-                             OnFrictionPromptDone,
-                         this, true));
-      return;
-    case ScopedTestDialogAutoConfirm::CANCEL:
-      CHECK_IS_TEST();
-      base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-          FROM_HERE,
-          base::BindOnce(&WebstorePrivateBeginInstallWithManifest3Function::
-                             OnFrictionPromptDone,
-                         this, false));
-      return;
-    case ScopedTestDialogAutoConfirm::AutoConfirm::ACCEPT_AND_OPTION:
-      NOTREACHED();
-  }
-
-  ExtensionsAPIClient::Get()
-      ->GetWebstorePrivateAPIDelegate()
-      ->ShowExtensionInstallFrictionDialog(
-          contents,
-          base::BindOnce(&WebstorePrivateBeginInstallWithManifest3Function::
-                             OnFrictionPromptDone,
-                         this));
 }
 
 void WebstorePrivateBeginInstallWithManifest3Function::ShowInstallDialog(

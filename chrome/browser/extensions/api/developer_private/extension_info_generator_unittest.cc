@@ -1142,6 +1142,9 @@ TEST_F(ExtensionInfoGeneratorUnitTest, Blocklisted) {
   auto info3 = GenerateExtensionInfo(id1);
   ASSERT_NE(nullptr, info3);
   EXPECT_EQ(developer::ExtensionState::kBlocklisted, info3->state);
+  // The blocklist reason is reported for blocklisted extensions.
+  EXPECT_EQ(l10n_util::GetStringUTF8(IDS_EXTENSIONS_BLOCKLISTED_MALWARE),
+            info3->blocklist_text);
 }
 
 // Test generating extension action commands properly.

@@ -97,11 +97,6 @@ struct InstallApproval : public base::SupportsUserData::Data {
   // the empty string, in which case no authuser parameter is used.
   std::string authuser;
 
-  // Whether the user clicked through the install friction dialog when the
-  // extension is not included in the Enhanced Safe Browsing CRX allowlist and
-  // the user has enabled Enhanced Protection.
-  bool bypassed_safebrowsing_friction = false;
-
   // Whether to withhold permissions at installation. By default, permissions
   // are granted at installation.
   bool withhold_permissions = false;

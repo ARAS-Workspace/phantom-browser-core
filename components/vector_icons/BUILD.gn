@@ -207,8 +207,6 @@ if (current_toolchain == default_toolchain) {
       "globe.icon",
       "globe_old.icon",
       "google_color.icon",
-      "gpp_maybe.icon",
-      "gpp_maybe_old.icon",
       "hand_gesture.icon",
       "hand_gesture_off.icon",
       "hand_gesture_off_old.icon",

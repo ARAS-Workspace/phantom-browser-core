@@ -33,7 +33,6 @@ class PromotionEligibilityChecker;
 namespace extensions {
 
 class Extension;
-class ExtensionAllowlist;
 
 // Delegate class for WebstorePrivate API that provides embedder-specific
 // functionality. This allows the WebstorePrivate API implementation in
@@ -45,10 +44,6 @@ class WebstorePrivateAPIDelegate {
   // Gets keyed service factories required by the Web Store private API.
   virtual std::vector<KeyedServiceBaseFactory*>
   GetWebStoreAPIFactoryDependencies() = 0;
-
-  // Returns ExtensionAllowlist associated with `context`.
-  virtual ExtensionAllowlist* GetExtensionAllowlist(
-      content::BrowserContext* context) = 0;
 
   // Returns IdentityManager associated with `context`.
   virtual signin::IdentityManager* GetIdentityManager(
@@ -62,17 +57,6 @@ class WebstorePrivateAPIDelegate {
       const std::u16string& custom_error_message,
       const gfx::ImageSkia& icon,
       base::OnceClosure done_callback) = 0;
-
-  // Shows a modal dialog to Enhanced Safe Browsing users before the extension
-  // install dialog if the extension is not included in the Safe Browsing CRX
-  // allowlist.
-  virtual void ShowExtensionInstallFrictionDialog(
-      content::WebContents* web_contents,
-      base::OnceCallback<void(bool)> callback) = 0;
-
-  // Called when the user accepts the extension install friction dialog.
-  virtual void ReportFrictionAcceptedEvent(
-      content::BrowserContext* context) = 0;
 
   // Maybe create promotion eligibility checker.
   virtual std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>

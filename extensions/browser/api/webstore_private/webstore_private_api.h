@@ -82,9 +82,6 @@ class WebstorePrivateBeginInstallWithManifest3Function
   WebstorePrivateBeginInstallWithManifest3Function();
 
   std::u16string GetBlockedByPolicyErrorMessageForTesting() const;
-  bool GetFrictionDialogShownForTesting() const {
-    return friction_dialog_shown_;
-  }
 
  private:
   using Params = api::webstore_private::BeginInstallWithManifest3::Params;
@@ -118,7 +115,6 @@ class WebstorePrivateBeginInstallWithManifest3Function
   // an error showing it.
   bool PromptForParentApproval();
 
-  void OnFrictionPromptDone(bool result);
   void OnInstallPromptDone(
       ExtensionInstallPromptClient::DoneCallbackPayload payload);
   void OnRequestPromptDone(
@@ -134,8 +130,6 @@ class WebstorePrivateBeginInstallWithManifest3Function
       api::webstore_private::Result result,
       const std::string& error);
 
-  bool ShouldShowFrictionDialog(content::BrowserContext* browser_context);
-  void ShowInstallFrictionDialog(content::WebContents* contents);
   void ShowInstallDialog(content::WebContents* contents);
 
   // Shows block dialog when `extension` is blocked by policy on the Window that
@@ -146,11 +140,6 @@ class WebstorePrivateBeginInstallWithManifest3Function
                                  const SkBitmap& icon,
                                  content::WebContents* contents,
                                  base::OnceClosure done_callback);
-
-  // Adds friction accepted events to Safe Browsing metrics collector for
-  // further metrics logging. Called when a user decides to accept the friction
-  // prompt. Note that the extension may not be eventually installed.
-  void ReportFrictionAcceptedEvent();
 
   const Params::Details& details() const { return params_->details; }
 
@@ -170,8 +159,6 @@ class WebstorePrivateBeginInstallWithManifest3Function
   std::u16string blocked_by_policy_error_message_;
 
   std::unique_ptr<ExtensionInstallPromptClient> install_prompt_;
-
-  bool friction_dialog_shown_ = false;
 };
 
 class WebstorePrivateCompleteInstallFunction : public ExtensionFunction {

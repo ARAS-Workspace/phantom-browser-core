@@ -22,7 +22,6 @@
 #include "components/prefs/pref_change_registrar.h"
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/event_router.h"
-#include "extensions/browser/extension_allowlist.h"
 #include "extensions/browser/extension_error.h"
 #include "extensions/browser/extension_prefs_observer.h"
 #include "extensions/browser/extension_registry_observer.h"
@@ -51,7 +50,6 @@ class DeveloperPrivateEventRouter : public ExtensionRegistryObserver,
                                     public WarningService::Observer,
                                     public PermissionsManager::Observer,
                                     public ExtensionManagement::Observer,
-                                    public ExtensionAllowlist::Observer,
                                     public CommandService::Observer,
                                     public AccountExtensionTracker::Observer,
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
@@ -137,10 +135,6 @@ class DeveloperPrivateEventRouter : public ExtensionRegistryObserver,
   // ExtensionManagement::Observer:
   void OnExtensionManagementSettingsChanged() override;
 
-  // ExtensionAllowlist::Observer:
-  void OnExtensionAllowlistWarningStateChanged(const ExtensionId& extension_id,
-                                               bool show_warning) override;
-
   // CommandService::Observer:
   void OnExtensionCommandAdded(const ExtensionId& extension_id,
                                const std::string& command_name) override;
@@ -193,8 +187,6 @@ class DeveloperPrivateEventRouter : public ExtensionRegistryObserver,
       permissions_manager_observation_{this};
   base::ScopedObservation<ExtensionManagement, ExtensionManagement::Observer>
       extension_management_observation_{this};
-  base::ScopedObservation<ExtensionAllowlist, ExtensionAllowlist::Observer>
-      extension_allowlist_observer_{this};
   base::ScopedObservation<CommandService, CommandService::Observer>
       command_service_observation_{this};
   base::ScopedObservation<AccountExtensionTracker,
