@@ -15,7 +15,6 @@
 #include "base/run_loop.h"
 #include "base/synchronization/waitable_event.h"
 #include "base/task/single_thread_task_runner.h"
-#include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/extensions/activity_log/activity_action_constants.h"
 #include "chrome/browser/extensions/activity_log/activity_log_task_runner.h"
@@ -47,7 +46,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/dom_action_types.h"
 #include "extensions/common/extension_builder.h"
-#include "extensions/common/extension_features.h"
 #include "extensions/common/mojom/host_id.mojom.h"
 #include "extensions/common/mojom/renderer.mojom.h"
 #include "mojo/public/cpp/bindings/associated_receiver_set.h"
@@ -99,7 +97,6 @@ class InterceptingRendererStartupHelper : public RendererStartupHelper,
   // mojom::Renderer implementation:
   void ActivateExtension(const std::string& extension_id) override {}
   void SetActivityLoggingEnabled(bool enabled) override {}
-  void SetPolicyActivityLoggingEnabled(bool enabled) override {}
   void LoadExtensions(
       std::vector<mojom::ExtensionLoadedParamsPtr> loaded_extensions) override {
   }
@@ -640,71 +637,6 @@ TEST_F(ActivityLogTestWithoutSwitch, TestShouldLog) {
   // Disabling the watchdog app means that we're back to never logging anything.
   EXPECT_FALSE(activity_log->ShouldLog(empty_extension->id(),
                                        Action::ACTION_API_CALL, "tabs.query"));
-}
-
-TEST_F(ActivityLogTestWithoutSwitch, TelemetryActivation) {
-  ActivityLog* activity_log = ActivityLog::GetInstance(profile());
-  base::test::ScopedFeatureList feature_list;
-
-  // 1. Initially false.
-  EXPECT_FALSE(activity_log->IsTelemetryLoggingActive());
-
-  // 2. Register callback + Enable flag -> true.
-  feature_list.InitAndEnableFeature(
-      extensions_features::kEnterpriseExtensionDOMActivityTelemetry);
-  activity_log->SetTelemetryLoggingEnabled(
-      true, base::BindRepeating([](scoped_refptr<Action> action) {}));
-  EXPECT_TRUE(activity_log->IsTelemetryLoggingActive());
-
-  // 3. Unregister -> false.
-  activity_log->SetTelemetryLoggingEnabled(false, base::NullCallback());
-  EXPECT_FALSE(activity_log->IsTelemetryLoggingActive());
-
-  // 4. Register with flag OFF -> false.
-  base::test::ScopedFeatureList feature_list2;
-  feature_list2.InitAndDisableFeature(
-      extensions_features::kEnterpriseExtensionDOMActivityTelemetry);
-  activity_log->SetTelemetryLoggingEnabled(
-      true, base::BindRepeating([](scoped_refptr<Action> action) {}));
-  EXPECT_FALSE(activity_log->IsTelemetryLoggingActive());
-  activity_log->SetTelemetryLoggingEnabled(false, base::NullCallback());
-}
-
-TEST_F(ActivityLogTestWithoutSwitch, TelemetryShouldLog) {
-  ActivityLog* activity_log = ActivityLog::GetInstance(profile());
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(
-      extensions_features::kEnterpriseExtensionDOMActivityTelemetry);
-
-  const char kExtensionId[] = "ext-1";
-  EXPECT_FALSE(activity_log->ShouldLog(kExtensionId, Action::ACTION_API_CALL,
-                                       "tabs.query"));
-
-  activity_log->SetTelemetryLoggingEnabled(
-      true, base::BindRepeating([](scoped_refptr<Action> action) {}));
-
-  // 1. DOM access should always be logged.
-  EXPECT_TRUE(activity_log->ShouldLog(kExtensionId, Action::ACTION_DOM_ACCESS,
-                                      "Document.cookie"));
-
-  // 2. High-risk APIs should be logged.
-  EXPECT_TRUE(activity_log->ShouldLog(kExtensionId, Action::ACTION_API_CALL,
-                                      "scripting.executeScript"));
-
-  // 3. Low-risk APIs and Content Scripts should be dropped.
-  EXPECT_FALSE(activity_log->ShouldLog(
-      kExtensionId, Action::ACTION_CONTENT_SCRIPT, std::string()));
-  EXPECT_FALSE(activity_log->ShouldLog(kExtensionId, Action::ACTION_API_CALL,
-                                       "storage.get"));
-  EXPECT_FALSE(activity_log->ShouldLog(kExtensionId, Action::ACTION_API_EVENT,
-                                       "tabs.onUpdated"));
-
-  // Verify database is NOT enabled.
-  EXPECT_FALSE(GetDatabaseEnabled());
-
-  activity_log->SetTelemetryLoggingEnabled(false, base::NullCallback());
-  EXPECT_FALSE(activity_log->ShouldLog(kExtensionId, Action::ACTION_API_CALL,
-                                       "scripting.executeScript"));
 }
 
 }  // namespace extensions

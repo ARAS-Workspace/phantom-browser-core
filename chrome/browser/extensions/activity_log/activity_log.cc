@@ -32,7 +32,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_switches.h"
-#include "chrome/common/extensions/activity_log_policy_util.h"
 #include "chrome/common/pref_names.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/sync_preferences/pref_service_syncable.h"
@@ -48,7 +47,6 @@
 #include "extensions/browser/renderer_startup_helper.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/extension.h"
-#include "extensions/common/extension_features.h"
 #include "extensions/common/features/feature.h"
 #include "extensions/common/features/feature_provider.h"
 #include "extensions/common/hashed_extension_id.h"
@@ -715,31 +713,6 @@ void ActivityLog::RemoveObserver(ActivityLog::Observer* observer) {
   observers_->RemoveObserver(observer);
 }
 
-void ActivityLog::SetTelemetryLoggingEnabled(bool enabled,
-                                             TelemetryCallback callback) {
-  if (enabled) {
-    CHECK(!callback.is_null());
-  }
-
-  bool was_active = IsTelemetryLoggingActive();
-
-  if (enabled &&
-      base::FeatureList::IsEnabled(
-          extensions_features::kEnterpriseExtensionDOMActivityTelemetry)) {
-    telemetry_callback_ = std::move(callback);
-  } else {
-    telemetry_callback_.Reset();
-  }
-
-  if (was_active != IsTelemetryLoggingActive()) {
-    NotifyRenderersOfTelemetryLogging();
-  }
-}
-
-bool ActivityLog::IsTelemetryLoggingActive() const {
-  return !telemetry_callback_.is_null();
-}
-
 // static
 void ActivityLog::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
@@ -770,9 +743,6 @@ void ActivityLog::LogAction(scoped_refptr<Action> action) {
     database_policy_->ProcessAction(action);
   if (has_listeners_)
     observers_->Notify(FROM_HERE, &Observer::OnExtensionActivity, action);
-  if (!telemetry_callback_.is_null()) {
-    telemetry_callback_.Run(action);
-  }
   if (testing_mode_)
     VLOG(1) << action->PrintForDebug();
 }
@@ -782,7 +752,7 @@ bool ActivityLog::ShouldLog(const std::string& extension_id,
                             const std::string& api_name) const {
   // 1. Early exit if NO logging is active at all.
   // This avoids expensive allowlist lookups for most users.
-  if (!is_active_ && !IsTelemetryLoggingActive()) {
+  if (!is_active_) {
     return false;
   }
 
@@ -793,40 +763,13 @@ bool ActivityLog::ShouldLog(const std::string& extension_id,
   }
 
   // 3. If standard Activity Log is active, log everything.
-  if (is_active_) {
-    return true;
-  }
-
-  // 4. Telemetry-specific filtering.
-  // Map browser-side ActionType to common ActivityType.
-  activity_log_policy_util::ActivityType activity_type;
-  switch (type) {
-    case Action::ACTION_DOM_ACCESS:
-      activity_type = activity_log_policy_util::ActivityType::kDomAccess;
-      break;
-    case Action::ACTION_API_CALL:
-      activity_type = activity_log_policy_util::ActivityType::kApiCall;
-      break;
-    case Action::ACTION_API_EVENT:
-      activity_type = activity_log_policy_util::ActivityType::kApiEvent;
-      break;
-    case Action::ACTION_WEB_REQUEST:
-      activity_type = activity_log_policy_util::ActivityType::kWebRequest;
-      break;
-    case Action::ACTION_CONTENT_SCRIPT:
-      activity_type = activity_log_policy_util::ActivityType::kContentScript;
-      break;
-    default:
-      return false;
-  }
-  return activity_log_policy_util::IsActivityIncludedInTelemetry(api_name,
-                                                                 activity_type);
+  return true;
 }
 
 void ActivityLog::OnScriptsExecuted(content::WebContents* web_contents,
                                     const ExecutingScriptsMap& extension_ids,
                                     const GURL& on_url) {
-  if (!is_active_ && !IsTelemetryLoggingActive()) {
+  if (!is_active_) {
     return;
   }
   ExtensionRegistry* registry = ExtensionRegistry::Get(profile_);
@@ -974,29 +917,6 @@ void ActivityLog::OnExtensionSystemReady() {
   if (active_consumers_ != cached_consumer_count_) {
     CheckActive(false);
     UpdateCachedConsumerCount();
-  }
-}
-
-void ActivityLog::NotifyRenderersOfTelemetryLogging() {
-  for (content::RenderProcessHost::iterator iter(
-           content::RenderProcessHost::AllHostsIterator());
-       !iter.IsAtEnd(); iter.Advance()) {
-    content::RenderProcessHost* host = iter.GetCurrentValue();
-    if (host->IsInitializedAndNotDead()) {
-      Profile* host_profile =
-          Profile::FromBrowserContext(host->GetBrowserContext());
-      // Don't gather telemetry from incognito profiles.
-      if (!host_profile->IsOffTheRecord() &&
-          profile_->IsSameOrParent(host_profile)) {
-        mojom::Renderer* renderer =
-            RendererStartupHelperFactory::GetForBrowserContext(
-                host->GetBrowserContext())
-                ->GetRenderer(host);
-        if (renderer) {
-          renderer->SetPolicyActivityLoggingEnabled(IsTelemetryLoggingActive());
-        }
-      }
-    }
   }
 }
 

@@ -177,9 +177,6 @@ class TestExtensionsBrowserClient : public ExtensionsBrowserClient {
   ExtensionManagementClient* GetExtensionManagementClient(
       content::BrowserContext* context) override;
 
-  bool IsTelemetryLoggingEnabled(content::BrowserContext* context) override;
-  void SetTelemetryLoggingEnabled(bool enabled);
-
   ExtensionSystemProvider* extension_system_factory() {
     return extension_system_factory_;
   }
@@ -192,8 +189,6 @@ class TestExtensionsBrowserClient : public ExtensionsBrowserClient {
   raw_ptr<ExtensionSystemProvider> extension_system_factory_ = nullptr;
 
   std::unique_ptr<ExtensionCache> extension_cache_;
-
-  bool telemetry_logging_enabled_ = false;
 
   base::RepeatingCallback<update_client::UpdateClient*(void)>
       update_client_factory_;

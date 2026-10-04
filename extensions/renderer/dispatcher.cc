@@ -1364,13 +1364,6 @@ void Dispatcher::SetActivityLoggingEnabled(bool enabled) {
   user_script_set_manager_->set_activity_logging_enabled(enabled);
 }
 
-void Dispatcher::SetPolicyActivityLoggingEnabled(bool enabled) {
-  ExtensionsRendererClient::Get()->SetPolicyActivityLoggingEnabled(enabled);
-  if (enabled) {
-    UpdateDOMActivityLogging();
-  }
-}
-
 void Dispatcher::UpdateDOMActivityLogging() {
   for (const ExtensionId& id : active_extension_ids_) {
     DOMActivityLogger::AttachToWorldIfEnabled(DOMActivityLogger::kMainWorldId,

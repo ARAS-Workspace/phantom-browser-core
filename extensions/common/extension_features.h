@@ -209,11 +209,6 @@ BASE_DECLARE_FEATURE(kDeclarativeNetRequestResponseHeaderMatching);
 // limit.
 BASE_DECLARE_FEATURE(kDeclarativeNetRequestSafeRuleLimits);
 
-// If enabled, include JS call stack data in the extension API request
-// sent to the browser process. This data is used for telemetry purpose
-// only.
-BASE_DECLARE_FEATURE(kIncludeJSCallStackInExtensionApiRequest);
-
 // If enabled, use the new CWS itemSnippets API to fetch extension info.
 BASE_DECLARE_FEATURE(kUseItemSnippetsAPI);
 
@@ -232,10 +227,6 @@ BASE_DECLARE_FEATURE(kDisableDisableExtensionsExceptCommandLineSwitch);
 // `chrome://` URLs. Extension can still run on extension URLs using the new
 // flag `--extensions-on-extension-urls` flag.
 BASE_DECLARE_FEATURE(kDisableExtensionsOnChromeUrlsSwitch);
-
-// If enabled, high-risk extension DOM activity is collected and reported
-// for enterprise auditing.
-BASE_DECLARE_FEATURE(kEnterpriseExtensionDOMActivityTelemetry);
 
 // Forces the debugger API/feature to always be restricted by developer mode.
 // This ensures we're always testing the developer mode API/feature restriction

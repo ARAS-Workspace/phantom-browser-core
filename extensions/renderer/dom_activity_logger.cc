@@ -16,7 +16,6 @@
 #include "extensions/renderer/dispatcher.h"
 #include "extensions/renderer/extension_frame_helper.h"
 #include "extensions/renderer/extensions_renderer_client.h"
-#include "extensions/renderer/policy_activity_log_filter.h"
 #include "extensions/renderer/script_context.h"
 #include "extensions/renderer/script_context_set.h"
 #include "third_party/blink/public/platform/web_string.h"
@@ -61,8 +60,7 @@ void DOMActivityLogger::AttachToWorldIfEnabled(
     int32_t world_id,
     const ExtensionId& extension_id) {
   ExtensionsRendererClient* client = ExtensionsRendererClient::Get();
-  if (client->IsActivityLoggingEnabled() ||
-      client->IsPolicyActivityLoggingEnabled()) {
+  if (client->IsActivityLoggingEnabled()) {
     AttachToWorld(world_id, extension_id);
   }
 }
@@ -164,12 +162,6 @@ void DOMActivityLogger::LogInternal(mojom::RendererHost* renderer_host,
 
   ExtensionsRendererClient* client = ExtensionsRendererClient::Get();
   bool should_log = client->IsActivityLoggingEnabled();
-
-  if (!should_log && client->IsPolicyActivityLoggingEnabled()) {
-    PolicyActivityLogFilter* filter = client->GetPolicyActivityLogFilter();
-    should_log = filter && filter->IsHighRiskEvent(extension_id_, type,
-                                                   api_name, args, url);
-  }
 
   if (should_log) {
     renderer_host->AddDOMActionToActivityLog(extension_id_, api_name,

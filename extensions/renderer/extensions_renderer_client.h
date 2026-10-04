@@ -46,7 +46,6 @@ namespace extensions {
 class Extension;
 class ExtensionsRendererAPIProvider;
 class Dispatcher;
-class PolicyActivityLogFilter;
 
 // Interface to allow the extensions module to make render-process-specific
 // queries of the embedder. Should be Set() once in the render process.
@@ -69,19 +68,6 @@ class ExtensionsRendererClient {
 
   // Returns true if activity logging is currently enabled.
   virtual bool IsActivityLoggingEnabled() const;
-
-  // Returns true if policy-driven activity logging is currently enabled.
-  // This state is used to gate the attachment of DOMActivityLoggers to
-  // extension V8 contexts.
-  virtual bool IsPolicyActivityLoggingEnabled() const;
-
-  // Updates the policy-driven activity logging state.
-  virtual void SetPolicyActivityLoggingEnabled(bool enabled);
-
-  // Returns the filter used to identify high-risk events for enterprise
-  // telemetry. Returns nullptr if policy-driven logging is disabled or
-  // if the embedder does not provide a filter.
-  virtual PolicyActivityLogFilter* GetPolicyActivityLogFilter();
 
   // Notifies the client when an extension is added or removed.
   // TODO(devlin): Make a RendererExtensionRegistryObserver?

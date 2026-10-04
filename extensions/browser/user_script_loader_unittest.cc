@@ -65,7 +65,6 @@ class TestRendererStartupHelper : public RendererStartupHelper,
   // mojom::Renderer:
   void ActivateExtension(const ExtensionId& extension_id) override {}
   void SetActivityLoggingEnabled(bool enabled) override {}
-  void SetPolicyActivityLoggingEnabled(bool enabled) override {}
   void LoadExtensions(
       std::vector<mojom::ExtensionLoadedParamsPtr> loaded_extensions) override {
   }

@@ -30,7 +30,6 @@
 #include "extensions/common/error_utils.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/permissions/permissions_data.h"
-#include "extensions/common/stack_frame.h"
 #include "mojo/public/cpp/bindings/callback_helpers.h"
 #include "net/cookies/canonical_cookie.h"
 #include "net/cookies/cookie_constants.h"
@@ -360,8 +359,6 @@ ExtensionFunction::ResponseAction CookiesGetFunction::Run() {
       net::CookiePartitionKeyCollection(std::move(partition_key).value()),
       base::BindOnce(&CookiesGetFunction::GetCookieListCallback, this));
 
-  // Extension telemetry signal intercept
-
   // Will finish asynchronously.
   return RespondLater();
 }
@@ -442,8 +439,6 @@ ExtensionFunction::ResponseAction CookiesGetAllFunction::Run() {
         cookie_manager, url_, cookie_partition_key_collection,
         base::BindOnce(&CookiesGetAllFunction::GetCookieListCallback, this));
   }
-
-  // Extension telemetry signal intercept
 
   return RespondLater();
 }

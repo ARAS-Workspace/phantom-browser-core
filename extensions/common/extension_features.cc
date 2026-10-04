@@ -144,9 +144,6 @@ BASE_FEATURE(kExperimentalOmniboxLabs, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kDeclarativeNetRequestResponseHeaderMatching,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kIncludeJSCallStackInExtensionApiRequest,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kUseNewServiceWorkerTaskQueue, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kDeclarativeNetRequestHeaderSubstitution,
@@ -167,9 +164,6 @@ BASE_FEATURE(kDisableExtensionsOnChromeUrlsSwitch,
              base::FEATURE_DISABLED_BY_DEFAULT
 #endif
 );
-
-BASE_FEATURE(kEnterpriseExtensionDOMActivityTelemetry,
-             base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kDebuggerAPIRestrictedToDevMode,
              base::FEATURE_DISABLED_BY_DEFAULT);

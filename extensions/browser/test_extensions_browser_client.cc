@@ -396,13 +396,4 @@ TestExtensionsBrowserClient::GetExtensionManagementClient(
   return extension_management_client_.get();
 }
 
-bool TestExtensionsBrowserClient::IsTelemetryLoggingEnabled(
-    content::BrowserContext* context) {
-  return telemetry_logging_enabled_;
-}
-
-void TestExtensionsBrowserClient::SetTelemetryLoggingEnabled(bool enabled) {
-  telemetry_logging_enabled_ = enabled;
-}
-
 }  // namespace extensions

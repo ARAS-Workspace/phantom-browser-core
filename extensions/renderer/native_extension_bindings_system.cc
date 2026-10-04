@@ -4,7 +4,6 @@
 
 #include "extensions/renderer/native_extension_bindings_system.h"
 
-#include <algorithm>
 #include <optional>
 #include <string_view>
 #include <utility>
@@ -409,26 +408,6 @@ const std::string_view kWebAvailableFeatures[] = {
     "webstorePrivate",
     "management",
 };
-
-// Determines if a JS stack trace capture should happen just before
-// sending an API request to the browser.
-bool ShouldCollectJSStackTrace(const APIRequestHandler::Request& request) {
-  // NOTE: Please consider throttling the stack collection if you add any
-  // methods here that may be expected to be called very frequently to reduce
-  // any performance impacts.
-  static constexpr const char* kApiMethods[] = {
-      "tabs.create", "tabs.update", "tabs.remove", "tabs.captureVisibleTab",
-      "cookies.get", "cookies.getAll"};
-
-  if (!base::FeatureList::IsEnabled(
-          extensions_features::kIncludeJSCallStackInExtensionApiRequest)) {
-    return false;
-  }
-  if (!std::ranges::contains(kApiMethods, request.method_name)) {
-    return false;
-  }
-  return true;
-}
 
 // A custom accessor for the `browser.devtools` property.
 // The `devtools` API is special because it is injected by the DevTools frontend
@@ -1121,10 +1100,6 @@ void NativeExtensionBindingsSystem::SendRequest(
       blink::mojom::kInvalidServiceWorkerVersionId;
   CHECK_NE(mojom::ContextType::kUnspecified, script_context->context_type())
       << script_context->GetDebugString();
-
-  if (!params->extension_id.empty() && ShouldCollectJSStackTrace(*request)) {
-    params->js_callstack = script_context->GetStackTrace(/*frame_limit=*/5);
-  }
 
   ipc_message_sender_->SendRequestIPC(script_context, std::move(params));
 }

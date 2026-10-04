@@ -8,7 +8,6 @@
 #include "extensions/common/dom_action_types.h"
 #include "extensions/common/mojom/renderer_host.mojom.h"
 #include "extensions/renderer/extensions_renderer_client.h"
-#include "extensions/renderer/policy_activity_log_filter.h"
 #include "extensions/renderer/test_extensions_renderer_client.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -17,18 +16,6 @@
 #include "url/gurl.h"
 
 namespace extensions {
-
-class MockPolicyActivityLogFilter : public PolicyActivityLogFilter {
- public:
-  MOCK_METHOD(bool,
-              IsHighRiskEvent,
-              (const ExtensionId&,
-               DomActionType::Type,
-               const std::string&,
-               const base::ListValue&,
-               const GURL&),
-              (override));
-};
 
 class MockRendererHost : public mojom::RendererHost {
  public:
@@ -76,24 +63,8 @@ class MockExtensionsRendererClient : public TestExtensionsRendererClient {
     activity_logging_enabled_ = enabled;
   }
 
-  bool IsPolicyActivityLoggingEnabled() const override {
-    return policy_activity_logging_enabled_;
-  }
-
-  void set_policy_activity_logging_enabled(bool enabled) {
-    policy_activity_logging_enabled_ = enabled;
-  }
-
-  PolicyActivityLogFilter* GetPolicyActivityLogFilter() override {
-    return filter_;
-  }
-
-  void set_filter(PolicyActivityLogFilter* filter) { filter_ = filter; }
-
  private:
   bool activity_logging_enabled_ = false;
-  bool policy_activity_logging_enabled_ = false;
-  raw_ptr<PolicyActivityLogFilter> filter_ = nullptr;
 };
 
 // A test subclass to inject a mock RendererHost and expose Log methods.
@@ -140,7 +111,6 @@ class DOMActivityLoggerTest : public testing::Test {
 
 TEST_F(DOMActivityLoggerTest, LogGetter_ActivityLoggingEnabledLogsEverything) {
   client()->set_activity_logging_enabled(true);
-  client()->set_policy_activity_logging_enabled(false);
 
   testing::StrictMock<MockRendererHost> renderer_host;
   logger()->set_renderer_host(&renderer_host);
@@ -158,43 +128,19 @@ TEST_F(DOMActivityLoggerTest, LogGetter_ActivityLoggingEnabledLogsEverything) {
                       blink::WebString("title"));
 }
 
-TEST_F(DOMActivityLoggerTest, LogGetter_PolicyDrivenCheck) {
+TEST_F(DOMActivityLoggerTest, LogGetter_ActivityLoggingDisabledLogsNothing) {
   client()->set_activity_logging_enabled(false);
-  client()->set_policy_activity_logging_enabled(true);
-
-  testing::StrictMock<MockPolicyActivityLogFilter> filter;
-  client()->set_filter(&filter);
 
   testing::StrictMock<MockRendererHost> renderer_host;
   logger()->set_renderer_host(&renderer_host);
 
+  // Activity logging is disabled: no DOM action reaches the renderer host.
+  EXPECT_CALL(renderer_host, AddDOMActionToActivityLog).Times(0);
+
   v8::Local<v8::Context> dummy_context;
-  const GURL kUrl("https://example.com");
-
-  // 1. Benign event -> No IPC.
-  EXPECT_CALL(filter, IsHighRiskEvent(testing::Eq("test_extension"),
-                                      testing::Eq(DomActionType::GETTER),
-                                      testing::Eq("benign_api"), testing::_,
-                                      testing::Eq(kUrl)))
-      .WillOnce(testing::Return(false));
-
-  logger()->LogGetter(nullptr, dummy_context, blink::WebString("benign_api"),
-                      blink::WebURL(kUrl), blink::WebString("title"));
-
-  // 2. Risky event -> IPC sent.
-  EXPECT_CALL(filter, IsHighRiskEvent(testing::Eq("test_extension"),
-                                      testing::Eq(DomActionType::GETTER),
-                                      testing::Eq("risky_api"), testing::_,
-                                      testing::Eq(kUrl)))
-      .WillOnce(testing::Return(true));
-  EXPECT_CALL(renderer_host,
-              AddDOMActionToActivityLog(
-                  testing::Eq("test_extension"), testing::Eq("risky_api"),
-                  testing::_, testing::Eq(kUrl), testing::_,
-                  testing::Eq(static_cast<int32_t>(DomActionType::GETTER))));
-
-  logger()->LogGetter(nullptr, dummy_context, blink::WebString("risky_api"),
-                      blink::WebURL(kUrl), blink::WebString("title"));
+  logger()->LogGetter(nullptr, dummy_context, blink::WebString("api_name"),
+                      blink::WebURL(GURL("https://example.com")),
+                      blink::WebString("title"));
 }
 
 }  // namespace extensions
