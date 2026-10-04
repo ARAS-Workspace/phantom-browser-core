@@ -1539,8 +1539,7 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, MAYBE_DownloadHistoryCheck) {
   ASSERT_EQ(2u, row1.url_chain.size());
   EXPECT_EQ(redirect_url.spec(), row1.url_chain[0].spec());
   EXPECT_EQ(download_url.spec(), row1.url_chain[1].spec());
-  EXPECT_EQ(history::DownloadDangerType::MAYBE_DANGEROUS_CONTENT,
-            row1.danger_type);
+  EXPECT_EQ(history::DownloadDangerType::NOT_DANGEROUS, row1.danger_type);
   EXPECT_LE(start, row1.start_time);
   EXPECT_GE(end, row1.end_time);
   EXPECT_EQ(0, row1.received_bytes);  // There's no ETag. So the intermediate

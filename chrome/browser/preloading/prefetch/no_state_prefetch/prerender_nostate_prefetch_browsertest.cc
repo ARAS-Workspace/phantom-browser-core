@@ -327,6 +327,12 @@ class NoStatePrefetchBrowserTest
 
   void SetUpOnMainThread() override {
     test_utils::PrerenderInProcessBrowserTest::SetUpOnMainThread();
+    // Phantom starts the cookie controls mode at kBlockThirdParty, and the
+    // prefetch manager skips the prefetch while third-party cookies are
+    // blocked. The fixture switches the profile to the mode that allows them.
+    current_browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
     test_ukm_recorder_ = std::make_unique<ukm::TestAutoSetUkmRecorder>();
     link_rel_attempt_entry_builder_ =
         std::make_unique<content::test::PreloadingAttemptUkmEntryBuilder>(

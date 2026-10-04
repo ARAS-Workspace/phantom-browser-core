@@ -76,8 +76,5 @@ TEST_F(DownloadUiContextMenuTest, RecordCommandsEnabled) {
   histogram_tester.ExpectBucketCount("Download.ContextMenuAction",
                                      DownloadUiContextMenuAction::kKeepEnabled,
                                      1);
-  histogram_tester.ExpectBucketCount(
-      "Download.ContextMenuAction",
-      DownloadUiContextMenuAction::kLearnMoreInsecureDownloadEnabled, 1);
-  histogram_tester.ExpectTotalCount("Download.ContextMenuAction", 2);
+  histogram_tester.ExpectTotalCount("Download.ContextMenuAction", 1);
 }

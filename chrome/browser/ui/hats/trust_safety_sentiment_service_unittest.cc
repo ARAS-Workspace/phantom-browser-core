@@ -70,10 +70,10 @@ class TrustSafetySentimentServiceTest : public testing::Test {
     std::string transactions_password_manager_time = "20s";
   };
 
-  // Skip deprecated PrivacySandbox3 and 4 values.
+  // Skip the FeatureArea values that are commented out in the enum.
   bool IsDeprecatedFeatureArea(int enum_value) {
     return ((enum_value >= 4 && enum_value <= 9) ||
-            (enum_value >= 15 && enum_value <= 18));
+            (enum_value >= 15 && enum_value <= 18) || enum_value == 21);
   }
 
   void SetupFeatureParameters(FeatureParams params) {

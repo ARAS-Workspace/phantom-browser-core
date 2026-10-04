@@ -66,6 +66,8 @@
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
+#include "components/content_settings/core/common/pref_names.h"
 #include "components/embedder_support/user_agent_utils.h"
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
@@ -292,6 +294,13 @@ class PageLoadMetricsBrowserTest : public InProcessBrowserTest {
 
   // Triggers nostate prefetch of |url|.
   void TriggerNoStatePrefetch(const GURL& url) {
+    // Phantom starts the cookie controls mode at kBlockThirdParty, and the
+    // prefetch manager skips the prefetch while third-party cookies are
+    // blocked. The helper switches the profile to the mode that allows them.
+    browser()->GetProfile()->GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
+
     prerender::NoStatePrefetchManager* no_state_prefetch_manager =
         prerender::NoStatePrefetchManagerFactory::GetForBrowserContext(
             browser()->GetProfile());

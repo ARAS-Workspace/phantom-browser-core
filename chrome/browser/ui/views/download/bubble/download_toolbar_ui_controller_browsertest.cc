@@ -290,27 +290,30 @@ IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,
                        OpenSecurityDialog) {
   embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
   ASSERT_TRUE(embedded_test_server()->Start());
-  GURL download_url =
-      embedded_test_server()->GetURL(DownloadTestBase::kDangerousMockFilePath);
+  // The security subpage is reached through an insecure download: plain
+  // HTTP from a host other than localhost (DownloadTestBase maps a.test to
+  // 127.0.0.1).
+  GURL download_url = embedded_test_server()->GetURL(
+      "a.test", DownloadTestBase::kDangerousMockFilePath);
 
-  std::unique_ptr<content::DownloadTestObserver> dangerous_observer(
-      DangerousDownloadWaiter(
-          browser(), 1,
-          content::DownloadTestObserver::ON_DANGEROUS_DOWNLOAD_QUIT));
+  // An insecure download stays in progress until it is kept or discarded.
+  std::unique_ptr<content::DownloadTestObserver> insecure_observer(
+      CreateInProgressWaiter(browser(), 1));
   ui_test_utils::NavigateToURLWithDisposition(
       browser(), download_url, WindowOpenDisposition::NEW_BACKGROUND_TAB,
       ui_test_utils::BROWSER_TEST_NO_WAIT);
-  dangerous_observer->WaitForFinished();
+  insecure_observer->WaitForFinished();
   std::vector<raw_ptr<download::DownloadItem, VectorExperimental>>
       download_items;
   GetDownloads(browser(), &download_items);
   ASSERT_EQ(1UL, download_items.size());
+  ASSERT_TRUE(download_items[0]->IsInsecure());
   views::test::WaitForAnimatingLayoutManager(toolbar_container(browser()));
 
   offline_items_collection::ContentId content_id =
       OfflineItemUtils::GetContentIdForDownload(download_items[0].get());
   controller(browser())->OpenSecuritySubpage(content_id);
-  EXPECT_EQ(controller(browser())->bubble_contents_for_testing()->VisiblePage(),
+  ASSERT_EQ(controller(browser())->bubble_contents_for_testing()->VisiblePage(),
             DownloadBubbleContentsView::Page::kSecurity);
   EXPECT_EQ(controller(browser())
                 ->bubble_contents_for_testing()

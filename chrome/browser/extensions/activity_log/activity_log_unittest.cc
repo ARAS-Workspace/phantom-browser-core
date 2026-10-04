@@ -29,8 +29,11 @@
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_profile.h"
+#include "components/content_settings/core/browser/cookie_settings.h"
+#include "components/content_settings/core/common/pref_names.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_handle.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
+#include "components/prefs/pref_service.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/web_contents.h"
@@ -346,6 +349,13 @@ TEST_F(ActivityLogTest, LogPrerender) {
                                       Action::ACTION_CONTENT_SCRIPT, ""));
   ASSERT_TRUE(GetDatabaseEnabled());
   GURL url("http://www.google.com");
+
+  // Phantom starts the cookie controls mode at kBlockThirdParty, and the
+  // prefetch manager skips the prefetch while third-party cookies are
+  // blocked. The test switches the profile to the mode that allows them.
+  profile()->GetPrefs()->SetInteger(
+      prefs::kCookieControlsMode,
+      static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
 
   prerender::NoStatePrefetchManager* no_state_prefetch_manager =
       prerender::NoStatePrefetchManagerFactory::GetForBrowserContext(profile());

@@ -135,6 +135,15 @@ class NoStatePrefetchTest : public testing::Test {
     no_state_prefetch_manager_->Shutdown();
   }
 
+  void SetUp() override {
+    // Phantom starts the cookie controls mode at kBlockThirdParty, and the
+    // prefetch manager skips the prefetch while third-party cookies are
+    // blocked. The fixture switches the profile to the mode that allows them.
+    profile_.GetPrefs()->SetInteger(
+        prefs::kCookieControlsMode,
+        static_cast<int>(content_settings::CookieControlsMode::kIncognitoOnly));
+  }
+
   void TearDown() override {
     base::FieldTrialParamAssociator::GetInstance()->ClearAllParamsForTesting();
   }
@@ -281,6 +290,22 @@ TEST_F(NoStatePrefetchTest, RespectsThirdPartyCookiesPref) {
   profile()->GetPrefs()->SetInteger(
       prefs::kCookieControlsMode,
       static_cast<int>(content_settings::CookieControlsMode::kBlockThirdParty));
+  EXPECT_FALSE(AddSimpleLinkTrigger(url));
+  histogram_tester().ExpectUniqueSample(
+      "Prerender.FinalStatus", FINAL_STATUS_BLOCK_THIRD_PARTY_COOKIES, 1);
+}
+
+// Phantom registers the cookie controls mode at kBlockThirdParty. With the
+// registered value restored, a link-rel prefetch stops at the third-party
+// cookie check.
+TEST_F(NoStatePrefetchTest, DefaultCookieControlsModeBlocksPrefetch) {
+  GURL url("http://www.google.com/");
+  no_state_prefetch_manager()->CreateNextNoStatePrefetchContents(
+      url, FINAL_STATUS_PROFILE_DESTROYED);
+  profile()->GetPrefs()->ClearPref(prefs::kCookieControlsMode);
+  EXPECT_EQ(
+      static_cast<int>(content_settings::CookieControlsMode::kBlockThirdParty),
+      profile()->GetPrefs()->GetInteger(prefs::kCookieControlsMode));
   EXPECT_FALSE(AddSimpleLinkTrigger(url));
   histogram_tester().ExpectUniqueSample(
       "Prerender.FinalStatus", FINAL_STATUS_BLOCK_THIRD_PARTY_COOKIES, 1);

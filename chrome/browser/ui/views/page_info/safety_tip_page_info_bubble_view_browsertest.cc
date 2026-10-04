@@ -41,7 +41,6 @@
 #include "chrome/browser/ui/views/page_info/page_info_bubble_view_base.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/lookalikes/core/lookalike_url_util.h"
@@ -348,13 +347,14 @@ class SafetyTipPageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
       case security_state::SafetyTipStatus::kNone:
         NOTREACHED();
     }
-    content::WebContentsAddedObserver new_tab_observer;
-    static_cast<views::StyledLabel*>(
-        page_info->GetViewByID(
-            PageInfoViewFactory::VIEW_ID_PAGE_INFO_SECURITY_DETAILS_LABEL))
-        ->ClickFirstLinkForTesting();
-    EXPECT_EQ(chrome::kSafetyTipHelpCenterURL,
-              new_tab_observer.GetWebContents()->GetVisibleURL());
+    // Phantom sets the security details without a Help Center link.
+    auto* details_label =
+        static_cast<views::StyledLabel*>(page_info->GetViewByID(
+            PageInfoViewFactory::VIEW_ID_PAGE_INFO_SECURITY_DETAILS_LABEL));
+    ASSERT_TRUE(details_label);
+    EXPECT_EQ(details_label->GetText(),
+              l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFETY_TIP_DESCRIPTION));
+    EXPECT_FALSE(details_label->GetFirstLinkForTesting());
   }
 
   void CheckPageInfoDoesNotShowSafetyTipInfo(Browser* browser) {
@@ -475,6 +475,11 @@ IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest, ShowOnBlock) {
   NavigateToURL(browser(), kNavigatedUrl, WindowOpenDisposition::CURRENT_TAB);
   EXPECT_TRUE(IsUIShowing());
 
+  // Page Info opens over the Safety Tip, which stays open until the page
+  // changes and records its UKM when it closes.
+  views::test::WidgetDestroyedWaiter waiter(
+      PageInfoBubbleViewBase::GetPageInfoBubbleForTesting()->GetWidget());
+
   ASSERT_NO_FATAL_FAILURE(CheckPageInfoShowsSafetyTipInfo(
       browser(), security_state::SafetyTipStatus::kLookalike,
       GURL("https://google.com")));
@@ -482,6 +487,7 @@ IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest, ShowOnBlock) {
   // Navigate away to record UKM.
   NavigateToURL(browser(), GURL("about:blank"),
                 WindowOpenDisposition::CURRENT_TAB);
+  waiter.Wait();
   EXPECT_FALSE(IsUIShowing());
   test_helper()->CheckSafetyTipUkmCount(1);
   test_helper()->CheckInterstitialUkmCount(0);
@@ -540,6 +546,11 @@ IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest,
                 WindowOpenDisposition::CURRENT_TAB);
   EXPECT_TRUE(IsUIShowing());
 
+  // Page Info opens over the Safety Tip, which stays open until the page
+  // changes and records its UKM when it closes.
+  views::test::WidgetDestroyedWaiter waiter(
+      PageInfoBubbleViewBase::GetPageInfoBubbleForTesting()->GetWidget());
+
   ASSERT_NO_FATAL_FAILURE(CheckPageInfoShowsSafetyTipInfo(
       browser(), security_state::SafetyTipStatus::kLookalike,
       GURL("https://google.com")));
@@ -547,6 +558,7 @@ IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest,
   // Navigate away to record metrics.
   NavigateToURL(browser(), GURL("about:blank"),
                 WindowOpenDisposition::CURRENT_TAB);
+  waiter.Wait();
   test_helper()->CheckSafetyTipUkmCount(1);
   test_helper()->CheckInterstitialUkmCount(0);
 }
@@ -777,6 +789,11 @@ IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest,
   NavigateToURL(browser(), kNavigatedUrl, WindowOpenDisposition::CURRENT_TAB);
   EXPECT_TRUE(IsUIShowing());
 
+  // Page Info opens over the Safety Tip, which stays open until the page
+  // changes and records its UKM when it closes.
+  views::test::WidgetDestroyedWaiter waiter(
+      PageInfoBubbleViewBase::GetPageInfoBubbleForTesting()->GetWidget());
+
   ASSERT_NO_FATAL_FAILURE(CheckPageInfoShowsSafetyTipInfo(
       browser(), security_state::SafetyTipStatus::kLookalike,
       GURL("https://google.com")));
@@ -786,6 +803,7 @@ IN_PROC_BROWSER_TEST_F(SafetyTipPageInfoBubbleViewBrowserTest,
   NavigateToURL(browser(), GURL("about:blank"),
                 WindowOpenDisposition::CURRENT_TAB);
 
+  waiter.Wait();
   test_helper()->CheckSafetyTipUkmCount(1);
   test_helper()->CheckInterstitialUkmCount(0);
 }
