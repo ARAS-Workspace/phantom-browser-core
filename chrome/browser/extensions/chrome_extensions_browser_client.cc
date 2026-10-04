@@ -186,9 +186,7 @@ std::unique_ptr<ScopedBrowserContextKeepAlive> CreateExtensionKeepAlive(
 }
 
 bool ShouldLogExtensionAction(content::BrowserContext* browser_context,
-                              const ExtensionId& extension_id,
-                              Action::ActionType action_type,
-                              const std::string& api_name) {
+                              const ExtensionId& extension_id) {
   // We only send these IPCs if activity logging is enabled, but due to race
   // conditions (e.g. logging gets disabled but the renderer sends the message
   // before it gets updated), we still need this check here.
@@ -197,8 +195,7 @@ bool ShouldLogExtensionAction(content::BrowserContext* browser_context,
          g_browser_process->profile_manager()->IsValidProfile(
              browser_context) &&
          ActivityLog::GetInstance(browser_context) &&
-         ActivityLog::GetInstance(browser_context)
-             ->ShouldLog(extension_id, action_type, api_name);
+         ActivityLog::GetInstance(browser_context)->ShouldLog(extension_id);
 }
 
 // Logs an action to the extension activity log for the specified profile.
@@ -888,8 +885,7 @@ void ChromeExtensionsBrowserClient::AddDOMActionToActivityLog(
     const GURL& url,
     const std::u16string& url_title,
     int call_type) {
-  if (!ShouldLogExtensionAction(browser_context, extension_id,
-                                Action::ACTION_DOM_ACCESS, call_name)) {
+  if (!ShouldLogExtensionAction(browser_context, extension_id)) {
     return;
   }
 
@@ -910,8 +906,7 @@ void ChromeExtensionsBrowserClient::AddAPIActionOrEventToActivityLog(
     const std::string& call_name,
     base::ListValue args,
     const std::string& extra) {
-  if (!ShouldLogExtensionAction(browser_context, extension_id, action_type,
-                                call_name)) {
+  if (!ShouldLogExtensionAction(browser_context, extension_id)) {
     return;
   }
 

@@ -461,8 +461,7 @@ void LogApiActivity(content::BrowserContext* browser_context,
     return;
 
   ActivityLog* activity_log = SafeGetActivityLog(browser_context);
-  if (!activity_log ||
-      !activity_log->ShouldLog(extension_id, type, activity_name)) {
+  if (!activity_log || !activity_log->ShouldLog(extension_id)) {
     return;
   }
 
@@ -502,9 +501,7 @@ void LogWebRequestActivity(content::BrowserContext* browser_context,
     return;
 
   ActivityLog* activity_log = SafeGetActivityLog(browser_context);
-  if (!activity_log ||
-      !activity_log->ShouldLog(extension_id, Action::ACTION_WEB_REQUEST,
-                               api_call)) {
+  if (!activity_log || !activity_log->ShouldLog(extension_id)) {
     return;
   }
 
@@ -722,8 +719,7 @@ void ActivityLog::RegisterProfilePrefs(
 // LOG ACTIONS. ----------------------------------------------------------------
 
 void ActivityLog::LogAction(scoped_refptr<Action> action) {
-  DCHECK(ShouldLog(action->extension_id(), action->action_type(),
-                   action->api_name()));
+  DCHECK(ShouldLog(action->extension_id()));
 
   // Perform some preprocessing of the Action data: convert tab IDs to URLs and
   // mask out incognito URLs if appropriate.
@@ -747,9 +743,7 @@ void ActivityLog::LogAction(scoped_refptr<Action> action) {
     VLOG(1) << action->PrintForDebug();
 }
 
-bool ActivityLog::ShouldLog(const std::string& extension_id,
-                            Action::ActionType type,
-                            const std::string& api_name) const {
+bool ActivityLog::ShouldLog(const std::string& extension_id) const {
   // 1. Early exit if NO logging is active at all.
   // This avoids expensive allowlist lookups for most users.
   if (!is_active_) {
@@ -776,8 +770,7 @@ void ActivityLog::OnScriptsExecuted(content::WebContents* web_contents,
   for (const auto& extension_id : extension_ids) {
     const Extension* extension =
         registry->enabled_extensions().GetByID(extension_id.first);
-    if (!extension || !ShouldLog(extension->id(), Action::ACTION_CONTENT_SCRIPT,
-                                 std::string())) {
+    if (!extension || !ShouldLog(extension->id())) {
       continue;
     }
 

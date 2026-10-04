@@ -342,8 +342,7 @@ TEST_F(ActivityLogTest, LogPrerender) {
           .Build();
   ExtensionRegistrar::Get(profile())->AddExtension(extension);
   ActivityLog* activity_log = ActivityLog::GetInstance(profile());
-  EXPECT_TRUE(activity_log->ShouldLog(extension->id(),
-                                      Action::ACTION_CONTENT_SCRIPT, ""));
+  EXPECT_TRUE(activity_log->ShouldLog(extension->id()));
   ASSERT_TRUE(GetDatabaseEnabled());
   GURL url("http://www.google.com");
 
@@ -386,8 +385,7 @@ TEST_F(ActivityLogTest, ArgUrlExtraction) {
 
   // Submit a DOM API call which should have its URL extracted into the arg_url
   // field.
-  EXPECT_TRUE(activity_log->ShouldLog(kExtensionId, Action::ACTION_DOM_ACCESS,
-                                      "XMLHttpRequest.open"));
+  EXPECT_TRUE(activity_log->ShouldLog(kExtensionId));
   scoped_refptr<Action> action = new Action(kExtensionId,
                                             now,
                                             Action::ACTION_DOM_ACCESS,
@@ -615,28 +613,23 @@ TEST_F(ActivityLogTestWithoutSwitch, TestShouldLog) {
   ExtensionRegistrar::Get(profile())->AddExtension(empty_extension);
   // Since the command line switch for logging isn't enabled and there's no
   // watchdog app active, the activity log shouldn't log anything.
-  EXPECT_FALSE(activity_log->ShouldLog(empty_extension->id(),
-                                       Action::ACTION_API_CALL, "tabs.query"));
+  EXPECT_FALSE(activity_log->ShouldLog(empty_extension->id()));
   const char kAllowlistedExtensionId[] = "eplckmlabaanikjjcgnigddmagoglhmp";
   scoped_refptr<const Extension> activity_log_extension =
       ExtensionBuilder("Test").SetID(kAllowlistedExtensionId).Build();
   ExtensionRegistrar::Get(profile())->AddExtension(activity_log_extension);
   // Loading a watchdog app means the activity log should log other extension
   // activities...
-  EXPECT_TRUE(activity_log->ShouldLog(empty_extension->id(),
-                                      Action::ACTION_API_CALL, "tabs.query"));
+  EXPECT_TRUE(activity_log->ShouldLog(empty_extension->id()));
   // ... but not those of the watchdog app...
-  EXPECT_FALSE(activity_log->ShouldLog(activity_log_extension->id(),
-                                       Action::ACTION_API_CALL, "tabs.query"));
+  EXPECT_FALSE(activity_log->ShouldLog(activity_log_extension->id()));
   // ... or activities from the browser/extensions page, represented by an empty
   // extension ID.
-  EXPECT_FALSE(activity_log->ShouldLog(std::string(), Action::ACTION_API_CALL,
-                                       "tabs.query"));
+  EXPECT_FALSE(activity_log->ShouldLog(std::string()));
   ExtensionRegistrar::Get(profile())->DisableExtension(
       activity_log_extension->id(), {disable_reason::DISABLE_USER_ACTION});
   // Disabling the watchdog app means that we're back to never logging anything.
-  EXPECT_FALSE(activity_log->ShouldLog(empty_extension->id(),
-                                       Action::ACTION_API_CALL, "tabs.query"));
+  EXPECT_FALSE(activity_log->ShouldLog(empty_extension->id()));
 }
 
 }  // namespace extensions
