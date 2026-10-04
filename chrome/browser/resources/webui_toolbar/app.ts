@@ -437,7 +437,6 @@ export class ToolbarAppElement extends AppElementBase {
             description: '',
           },
           isClickable: false,
-          isTextDangerous: false,
           isVisible: true,
         },
         activityIndicators: [],

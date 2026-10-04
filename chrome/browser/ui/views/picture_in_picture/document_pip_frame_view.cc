@@ -786,8 +786,8 @@ void DocumentPipFrameView::UpdateOriginAndSecurity() {
       kSecurityIconImageSize));
 
   // Set the omnibox-style security chip text ("File"/extension/chrome
-  // product/"Not secure"/"Dangerous") via the shared helper, animating the
-  // change for the same level transitions the omnibox animates.
+  // product/"Not secure") via the shared helper, animating the change for the
+  // same level transitions the omnibox animates.
   const std::u16string chip_text = location_bar::GetSecurityChipText(
       location_bar_model_.get(), opener_web_contents,
       /*is_editing_or_empty=*/false);

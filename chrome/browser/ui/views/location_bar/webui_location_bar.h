@@ -187,8 +187,7 @@ class WebUILocationBar : public LocationBar,
   bool UpdateContentSettingModels();
 
   ui::ImageModel UpdateLocationIcon(
-      toolbar_ui_api::mojom::SecurityLevel security_level,
-      bool is_text_dangerous);
+      toolbar_ui_api::mojom::SecurityLevel security_level);
 
   void OnIconFetched(const gfx::Image& image);
 

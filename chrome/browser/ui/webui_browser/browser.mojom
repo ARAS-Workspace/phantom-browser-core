@@ -102,7 +102,6 @@ enum SecurityIcon {
   SecurePageInfoChromeRefresh,
   NoEncryption,
   NotSecureWarningChromeRefresh,
-  BusinessChromeRefresh,
   DangerousChromeRefresh,
   ProductChromeRefresh,
   ExtensionChromeRefresh,

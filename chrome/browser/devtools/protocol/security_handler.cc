@@ -24,7 +24,6 @@ namespace {
 const char kInsecureOriginSecurityStateIssueId[] = "insecure-origin";
 const char kSchemeIsNotCryptographicSecurityStateIssueId[] =
     "scheme-is-not-cryptographic";
-const char kMalicousContentSecurityStateIssueId[] = "malicious-content";
 const char kDisplayedMixedContentSecurityStateIssueId[] =
     "displayed-mixed-content";
 const char kContainedMixedFormSecurityStateIssueId[] = "contained-mixed-form";
@@ -171,8 +170,6 @@ CreateVisibleSecurityState(content::WebContents* web_contents) {
 
   bool scheme_is_cryptographic =
       security_state::IsSchemeCryptographic(state->url);
-  bool malicious_content = state->malicious_content_status !=
-                           security_state::MALICIOUS_CONTENT_STATUS_NONE;
 
   bool secure_origin = scheme_is_cryptographic;
   if (!scheme_is_cryptographic) {
@@ -190,9 +187,6 @@ CreateVisibleSecurityState(content::WebContents* web_contents) {
   if (!scheme_is_cryptographic) {
     security_state_issue_ids.push_back(
         kSchemeIsNotCryptographicSecurityStateIssueId);
-  }
-  if (malicious_content) {
-    security_state_issue_ids.push_back(kMalicousContentSecurityStateIssueId);
   }
   if (state->displayed_mixed_content) {
     security_state_issue_ids.push_back(

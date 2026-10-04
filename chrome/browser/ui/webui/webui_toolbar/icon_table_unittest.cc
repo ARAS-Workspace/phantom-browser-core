@@ -464,14 +464,6 @@ TEST_F(IconTableTest, AllSecurityIconsAreMapped) {
         location_bar_model::GetSecurityVectorIcon(level, &state);
     EXPECT_TRUE(icon_table_.RegisterVectorIcon(https_upgraded_icon).has_value())
         << "Missing HTTPS upgraded icon for SecurityLevel: " << level;
-
-    // Enterprise block (DANGEROUS triggers domain/business)
-    state.malicious_content_status =
-        security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_BLOCK;
-    const gfx::VectorIcon& enterprise_icon =
-        location_bar_model::GetSecurityVectorIcon(level, &state);
-    EXPECT_TRUE(icon_table_.RegisterVectorIcon(enterprise_icon).has_value())
-        << "Missing enterprise block icon for SecurityLevel: " << level;
   }
 }
 

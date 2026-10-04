@@ -26,11 +26,9 @@
 #include "components/omnibox/browser/location_bar_model.h"
 #include "components/omnibox/browser/vector_icons.h"
 #include "components/security_state/core/security_state.h"
-#include "components/strings/grit/components_strings.h"
 #include "content/public/browser/web_contents.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/accessibility/ax_enums.mojom.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/color/color_id.h"
@@ -94,14 +92,6 @@ bool LocationIconView::OnMouseDragged(const ui::MouseEvent& event) {
 }
 
 SkColor LocationIconView::GetForegroundColor() const {
-  const std::u16string& display_text = GetText();
-  const bool is_text_dangerous =
-      display_text == l10n_util::GetStringUTF16(IDS_DANGEROUS_VERBOSE_STATE);
-
-  if (is_text_dangerous) {
-    return GetColorProvider()->GetColor(kColorOmniboxSecurityChipText);
-  }
-
   SecurityLevel security_level = SecurityLevel::NONE;
   if (!delegate_->IsEditingOrEmpty()) {
     security_level = GetSecurityLevel();
@@ -335,24 +325,14 @@ void LocationIconView::UpdateIcon() {
 
 void LocationIconView::UpdateBackground() {
   CHECK(GetColorProvider());
-  const std::u16string& display_text = GetText();
-  const bool is_text_dangerous =
-      display_text == l10n_util::GetStringUTF16(IDS_DANGEROUS_VERBOSE_STATE);
-
   const ui::ColorId id =
       delegate_->GetLocationIconBackgroundColorOverride().value_or(
-          is_text_dangerous ? kColorOmniboxSecurityChipDangerousBackground
-                            : kColorOmniboxIconBackground);
+          kColorOmniboxIconBackground);
 
   SetBackgroundColor(GetColorProvider()->GetColor(id));
 
-  if (is_text_dangerous) {
-    ConfigureInkDropForRefresh2023(this, kColorOmniboxSecurityChipInkDropHover,
-                                   kColorOmniboxSecurityChipInkDropRipple);
-  } else {
-    ConfigureInkDropForRefresh2023(this, kColorOmniboxIconHover,
-                                   kColorOmniboxIconPressed);
-  }
+  ConfigureInkDropForRefresh2023(this, kColorOmniboxIconHover,
+                                 kColorOmniboxIconPressed);
 }
 
 void LocationIconView::OnIconFetched(const gfx::Image& image) {

@@ -55,11 +55,6 @@ export class LocationIconElement extends LocationIconElementBase {
         reflect: true,
         attribute: 'has-text',
       },
-      isTextDangerous: {
-        type: Boolean,
-        reflect: true,
-        attribute: 'is-text-dangerous',
-      },
     };
   }
 
@@ -73,7 +68,6 @@ export class LocationIconElement extends LocationIconElementBase {
       description: '',
     },
     isClickable: false,
-    isTextDangerous: false,
     isVisible: true,
   };
 
@@ -86,10 +80,6 @@ export class LocationIconElement extends LocationIconElementBase {
   // True if the chip should display text alongside the icon. This drives CSS
   // rules that manage the expanded pill shape and padding.
   accessor hasText: boolean = false;
-
-  // True specifically when the text is exactly "Dangerous" (e.g. Malware).
-  // This is a higher alert state than just isDangerous.
-  accessor isTextDangerous: boolean = false;
 
   private dragStartX_: number = 0;
   private dragStartY_: number = 0;
@@ -122,7 +112,6 @@ export class LocationIconElement extends LocationIconElementBase {
       this.clickable = this.state.isClickable;
       this.isDangerous = this.state.securityLevel === SecurityLevel.kDangerous;
       this.hasText = !!this.state.text;
-      this.isTextDangerous = this.state.isTextDangerous;
     }
   }
 

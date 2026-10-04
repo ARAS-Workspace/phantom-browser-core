@@ -62,7 +62,6 @@ suite('LocationIconTest', function() {
       text: 'Not secure',
       tooltip: '',
       isClickable: true,
-      isTextDangerous: false,
       isVisible: true,
       accessibilityState: {
         label: '',
@@ -75,7 +74,6 @@ suite('LocationIconTest', function() {
     assertTrue(!!textEl);
     assertEquals('Not secure', textEl.textContent);
     assertTrue(locationIcon.hasAttribute('clickable'));
-    assertFalse(locationIcon.hasAttribute('is-text-dangerous'));
 
     const iconContainer =
         locationIcon.shadowRoot.querySelector<IconFromTableElement>(
@@ -91,7 +89,6 @@ suite('LocationIconTest', function() {
       text: '',
       tooltip: 'View site information',
       isClickable: true,
-      isTextDangerous: false,
       isVisible: true,
       accessibilityState: {
         label: '',
@@ -104,35 +101,6 @@ suite('LocationIconTest', function() {
     assertEquals('View site information', container.title);
   });
 
-  test('Dangerous text', async function() {
-    locationIcon.style.setProperty(
-        '--color-omnibox-security-chip-dangerous-background', 'rgb(0, 0, 255)');
-    locationIcon.style.setProperty(
-        '--color-omnibox-security-chip-text', 'rgb(0, 255, 0)');
-
-    locationIcon.state = {
-      icon: {handleId: 0n},
-      securityLevel: 3,  // DANGEROUS
-      text: 'Dangerous',
-      tooltip: '',
-      isClickable: true,
-      isTextDangerous: true,
-      isVisible: true,
-      accessibilityState: {
-        label: '',
-        description: '',
-      },
-    };
-    await microtasksFinished();
-
-    assertTrue(locationIcon.hasAttribute('is-text-dangerous'));
-    assertTrue(locationIcon.hasAttribute('is-dangerous'));
-
-    const container = locationIcon.$.container;
-    assertTrue(hasStyle(container, 'background-color', 'rgb(0, 0, 255)'));
-    assertTrue(hasStyle(container, 'color', 'rgb(0, 255, 0)'));
-  });
-
   test('Dangerous level, Not secure text', async function() {
     locationIcon.style.setProperty(
         '--color-omnibox-security-chip-dangerous', 'rgb(255, 0, 0)');
@@ -143,7 +111,6 @@ suite('LocationIconTest', function() {
       text: 'Not secure',
       tooltip: '',
       isClickable: true,
-      isTextDangerous: false,
       isVisible: true,
       accessibilityState: {
         label: '',
@@ -152,7 +119,6 @@ suite('LocationIconTest', function() {
     };
     await microtasksFinished();
 
-    assertFalse(locationIcon.hasAttribute('is-text-dangerous'));
     assertTrue(locationIcon.hasAttribute('is-dangerous'));
 
     const container = locationIcon.$.container;
@@ -166,7 +132,6 @@ suite('LocationIconTest', function() {
       text: 'Not secure',
       tooltip: '',
       isClickable: true,
-      isTextDangerous: false,
       isVisible: true,
       accessibilityState: {
         label: '',
@@ -175,7 +140,6 @@ suite('LocationIconTest', function() {
     };
     await microtasksFinished();
 
-    assertFalse(locationIcon.hasAttribute('is-text-dangerous'));
     assertFalse(locationIcon.hasAttribute('is-dangerous'));
   });
 
@@ -186,7 +150,6 @@ suite('LocationIconTest', function() {
       text: '',
       tooltip: '',
       isClickable: false,
-      isTextDangerous: false,
       isVisible: true,
       accessibilityState: {
         label: '',
@@ -212,7 +175,6 @@ suite('LocationIconTest', function() {
       text: '',
       tooltip: '',
       isClickable: true,
-      isTextDangerous: false,
       isVisible: true,
       accessibilityState: {
         label: '',
@@ -262,7 +224,6 @@ suite('LocationIconTest', function() {
         description: '',
       },
       isClickable: true,
-      isTextDangerous: false,
       isVisible: true,
     };
     await microtasksFinished();

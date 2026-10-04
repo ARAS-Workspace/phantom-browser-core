@@ -148,7 +148,6 @@ export class WebuiBrowserAppElement extends CrLitElement {
       SecurityIcon.NotSecureWarningChromeRefresh,
       'warning',
     ],
-    [SecurityIcon.BusinessChromeRefresh, 'domain'],
     [SecurityIcon.DangerousChromeRefresh, 'dangerous-filled'],
     [SecurityIcon.ProductChromeRefresh, 'chrome-product'],
     [SecurityIcon.ExtensionChromeRefresh, 'chrome-extension'],

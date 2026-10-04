@@ -689,10 +689,6 @@ struct SecurityChipState {
   mojo_base.mojom.String16 tooltip;
   SecurityChipAccessibilityState accessibility_state;
   bool is_clickable;
-  // True specifically when the text is exactly "Dangerous" (e.g. Malware). This
-  // represents a higher alert state than the standard kDangerous security
-  // level, and generally receives a more prominent visual treatment.
-  bool is_text_dangerous;
   // Whether the security chip is visible. It might be hidden if it is
   // overridden by permission chips.
   bool is_visible;

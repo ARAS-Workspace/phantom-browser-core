@@ -121,11 +121,6 @@
   opacity: 1;
 }
 
-:host([is-text-dangerous]) #container::before {
-  background-color:
-      var(--color-omnibox-security-chip-ink-drop-hover, transparent);
-}
-
 /* --- PRESSED LAYER (RIPPLE) ---
    Native Views composites the ripple on top of the hover highlight. */
 :host([clickable]:active) #container::after,
@@ -135,24 +130,12 @@
   transition: none; /* Instant press */
 }
 
-:host([is-text-dangerous]) #container::after {
-  background-color:
-      var(--color-omnibox-security-chip-ink-drop-ripple, transparent);
-}
-
 icon-from-table {
   --icon-size: var(--location-bar-leading-icon-size);
 }
 
 :host([is-dangerous]) #container {
   color: var(--color-omnibox-security-chip-dangerous, currentColor);
-}
-
-:host([is-text-dangerous]) #container {
-  background-color: var(
-      --color-omnibox-security-chip-dangerous-background,
-      var(--color-omnibox-icon-background));
-  color: var(--color-omnibox-security-chip-text, currentColor);
 }
 
 #text {

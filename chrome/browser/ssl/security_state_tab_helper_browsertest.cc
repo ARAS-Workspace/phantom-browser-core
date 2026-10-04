@@ -44,7 +44,6 @@
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
 #include "components/security_interstitials/content/ssl_blocking_page.h"
@@ -99,8 +98,6 @@
 #include "third_party/boringssl/src/include/openssl/ssl.h"
 
 namespace {
-
-using password_manager::metrics_util::PasswordType;
 
 const char kCreateFilesystemUrlJavascript[] =
     "new Promise(resolve => {"
@@ -839,10 +836,6 @@ IN_PROC_BROWSER_TEST_F(SecurityStateTabHelperTest,
   EXPECT_EQ(content::SSLStatus::NORMAL_CONTENT, entry->GetSSL().content_status);
 }
 
-// Tests the security level and malicious content status for sign-in password
-// reuse threat type.
-// Tests the security level and malicious content status for enterprise password
-// reuse threat type.
 class PKPModelClientTest : public SecurityStateTabHelperTest {
  public:
   static constexpr const char* kPKPHost = "example.test";

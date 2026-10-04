@@ -141,10 +141,6 @@ class WebUIBrowserGuestHandler
       icon_type =
           webui_browser::mojom::SecurityIcon::NotSecureWarningChromeRefresh;
     } else if (icon == &(features::IsRoundedIconsEnabled()
-                             ? vector_icons::kDomainIcon
-                             : vector_icons::kBusinessChromeRefreshOldIcon)) {
-      icon_type = webui_browser::mojom::SecurityIcon::BusinessChromeRefresh;
-    } else if (icon == &(features::IsRoundedIconsEnabled()
                              ? vector_icons::kDangerousFilledIcon
                              : vector_icons::kDangerousChromeRefreshOldIcon)) {
       icon_type = webui_browser::mojom::SecurityIcon::DangerousChromeRefresh;

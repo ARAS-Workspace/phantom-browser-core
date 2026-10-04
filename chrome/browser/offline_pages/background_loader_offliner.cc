@@ -518,12 +518,6 @@ Offliner::RequestStatus BackgroundLoaderOffliner::CanSavePageInBackground(
     return Offliner::RequestStatus::LOADED_PAGE_HAS_CERTIFICATE_ERROR;
   }
 
-  // Checks if the page is blocked by SafeBrowsing.
-  if (visible_security_state->malicious_content_status !=
-      security_state::MaliciousContentStatus::MALICIOUS_CONTENT_STATUS_NONE) {
-    return Offliner::RequestStatus::LOADED_PAGE_IS_BLOCKED;
-  }
-
   // Don't save Chrome error or interstitial pages.
   if (GetPageType(web_contents) != content::PageType::PAGE_TYPE_NORMAL) {
     return Offliner::RequestStatus::LOADED_PAGE_IS_CHROME_INTERNAL;

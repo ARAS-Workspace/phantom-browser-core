@@ -375,8 +375,7 @@ WebUIToolbarWebView::WebUIToolbarWebView(
               toolbar_ui_api::mojom::SecurityChipAccessibilityState::New(
                   /*label=*/std::u16string(),
                   /*description=*/std::u16string()),
-              /*is_clickable=*/false, /*is_text_dangerous=*/false,
-              /*is_visible=*/true),
+              /*is_clickable=*/false, /*is_visible=*/true),
           /*activity_indicators=*/
           std::vector<toolbar_ui_api::mojom::ContentSettingImageStatePtr>(),
           /*permission_dashboard=*/nullptr);

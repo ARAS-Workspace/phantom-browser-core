@@ -54,13 +54,6 @@ std::string GetHistogramSuffixForSafetyTipStatus(
 
 SecurityLevel GetSecurityLevel(
     const VisibleSecurityState& visible_security_state) {
-  // Override the connection security information if the website failed the
-  // browser's malware checks.
-  if (visible_security_state.malicious_content_status !=
-      MALICIOUS_CONTENT_STATUS_NONE) {
-    return DANGEROUS;
-  }
-
   // If the navigation was upgraded to HTTPS because of HTTPS-First Mode, but
   // did not succeed and is showing the HTTPS-First Mode interstitial, set the
   // security level to WARNING. The HTTPS-First Mode interstitial warning is
@@ -179,8 +172,7 @@ bool HasMajorCertificateError(
 }
 
 VisibleSecurityState::VisibleSecurityState()
-    : malicious_content_status(MALICIOUS_CONTENT_STATUS_NONE),
-      connection_info_initialized(false),
+    : connection_info_initialized(false),
       cert_status(0),
       connection_status(0),
       key_exchange_group(0),

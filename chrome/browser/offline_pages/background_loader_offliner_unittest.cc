@@ -783,34 +783,6 @@ TEST_F(BackgroundLoaderOfflinerTest, SucceedsOnHttp) {
   EXPECT_FALSE(completion_callback_called());
 }
 
-TEST_F(BackgroundLoaderOfflinerTest, FailsOnUnwantedContent) {
-  base::Time creation_time = base::Time::Now();
-  SavePageRequest request(kRequestId, GURL(kHttpUrl), GetClientId(),
-                          creation_time, kUserRequested);
-  EXPECT_TRUE(offliner()->LoadAndSave(request, completion_callback(),
-                                      progress_callback()));
-
-  // Sets the page as containing SafeBrowsing unwanted content.
-  std::unique_ptr<VisibleSecurityState> visible_security_state =
-      BaseVisibleSecurityState();
-  visible_security_state->malicious_content_status = security_state::
-      MaliciousContentStatus::MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING;
-  offliner()->set_custom_visible_security_state(
-      std::move(visible_security_state));
-  // Called after calling LoadAndSave so we have web_contents to work with.
-  content::MockNavigationHandle handle(
-      GURL(kHttpUrl), offliner()->web_contents()->GetPrimaryMainFrame());
-  handle.set_has_committed(true);
-  offliner()->DidFinishNavigation(&handle);
-
-  CompleteLoading();
-  PumpLoop();
-
-  EXPECT_FALSE(SaveInProgress());
-  EXPECT_TRUE(completion_callback_called());
-  EXPECT_EQ(Offliner::RequestStatus::LOADED_PAGE_IS_BLOCKED, request_status());
-}
-
 TEST_F(BackgroundLoaderOfflinerTest, FailsOnInternetDisconnected) {
   base::Time creation_time = base::Time::Now();
   SavePageRequest request(kRequestId, GURL(kHttpUrl), GetClientId(),

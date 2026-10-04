@@ -119,7 +119,6 @@ source_set("impl") {
     "//chrome/browser/ui/tabs:tabs_public",
     "//components/captive_portal/content",
     "//components/guest_view/browser",
-    "//components/password_manager/core/browser:metrics_util",
     "//components/pref_registry",
   ]
 

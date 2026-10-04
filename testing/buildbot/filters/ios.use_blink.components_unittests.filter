@@ -181,10 +181,6 @@
 -SharedPasswordControllerTest.SelectPasskeySuggestion
 -SharedPasswordControllerTest.SelectPasswordSuggestionWithAutoSubmission
 
-# TODO(crbug.com/40945948): Test currently fails on iOS blink.
--SecurityStateUtilsTest.GetMaliciousContentStatus
--SecurityStateUtilsTest.GetSecurityLevelForWebStateMaliciousContent
-
 # TODO(crbug.com/40945952): Test currently fails on iOS blink.
 -AccountConsistencyServiceTest.SigninAddCookieOnMainDomains
 -AccountConsistencyServiceTest.AddChromeConnectedCookiesOnCookiesRemoved

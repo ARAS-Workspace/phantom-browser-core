@@ -159,7 +159,6 @@ function createMockNavigationState() {
           text: '',
           tooltip: '',
           isClickable: false,
-          isTextDangerous: false,
           isVisible: true,
           accessibilityState: {
             label: '',

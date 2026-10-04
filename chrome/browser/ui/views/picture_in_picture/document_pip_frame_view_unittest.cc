@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_frame_view.h"
 
 #include <memory>
-#include <optional>
 #include <string>
 
 #include "base/functional/callback_helpers.h"
@@ -15,7 +14,6 @@
 #include "chrome/browser/content_settings/page_specific_content_settings_delegate.h"
 #include "chrome/browser/picture_in_picture/auto_pip_setting_overlay_view.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
-#include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/layout_constants.h"
 #include "chrome/browser/ui/views/location_bar/content_setting_image_view.h"
@@ -27,7 +25,6 @@
 #include "chrome/test/views/chrome_views_test_base.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/permissions/permission_recovery_success_rate_tracker.h"
-#include "components/security_state/core/security_state.h"
 #include "components/strings/grit/components_strings.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/test_renderer_host.h"
@@ -229,13 +226,6 @@ class DocumentPipFrameViewTest : public ChromeViewsTestBase {
     }
   }
 
-  // Overrides the computed malicious-content status, so the chip is
-  // computed at DANGEROUS level.
-  void SeedFakeSecurityState(
-      security_state::MaliciousContentStatus malicious_content_status) {
-    scoped_malicious_content_status_.emplace(malicious_content_status);
-  }
-
   AutoPipSettingOverlayView* GetAutoPipOverlay(
       DocumentPipFrameView* frame_view) {
     return frame_view->auto_pip_setting_overlay_;
@@ -266,8 +256,6 @@ class DocumentPipFrameViewTest : public ChromeViewsTestBase {
   content::RenderViewHostTestEnabler test_render_host_factories_;
   TestingProfile profile_;
   std::unique_ptr<views::Widget> opener_host_widget_;
-  std::optional<chrome_security_state::ScopedMaliciousContentStatusForTesting>
-      scoped_malicious_content_status_;
   std::unique_ptr<content::WebContents> opener_web_contents_;
 };
 
@@ -566,47 +554,6 @@ TEST_F(DocumentPipFrameViewTest, HttpWarningUrlChipSaysNotSecure) {
 
   EXPECT_EQ(l10n_util::GetStringUTF16(IDS_NOT_SECURE_VERBOSE_STATE),
             GetOriginChip(frame_view)->GetText());
-}
-
-// A DANGEROUS page that fails the malware check shows the "Dangerous" verbose
-// text on the chip.
-TEST_F(DocumentPipFrameViewTest, DangerousMalwareUrlChipSaysDangerous) {
-  content::WebContentsTester::For(opener())->NavigateAndCommit(
-      GURL("https://malware.test/"));
-  SeedFakeSecurityState(security_state::MALICIOUS_CONTENT_STATUS_MALWARE);
-
-  auto* frame_view =
-      CreatePipAndGetFrameView(/*disallow_return_to_opener=*/false);
-
-  EXPECT_EQ(l10n_util::GetStringUTF16(IDS_DANGEROUS_VERBOSE_STATE),
-            GetOriginChip(frame_view)->GetText());
-}
-
-// A DANGEROUS page on the billing interstitial list carries its own UI, so the
-// chip stays empty.
-TEST_F(DocumentPipFrameViewTest, DangerousBillingUrlHasEmptyChipText) {
-  content::WebContentsTester::For(opener())->NavigateAndCommit(
-      GURL("https://billing.test/"));
-  SeedFakeSecurityState(security_state::MALICIOUS_CONTENT_STATUS_BILLING);
-
-  auto* frame_view =
-      CreatePipAndGetFrameView(/*disallow_return_to_opener=*/false);
-
-  EXPECT_TRUE(GetOriginChip(frame_view)->GetText().empty());
-}
-
-// A DANGEROUS page blocked by enterprise policy carries its own UI, so the chip
-// stays empty.
-TEST_F(DocumentPipFrameViewTest, DangerousManagedPolicyUrlHasEmptyChipText) {
-  content::WebContentsTester::For(opener())->NavigateAndCommit(
-      GURL("https://policy.test/"));
-  SeedFakeSecurityState(
-      security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_BLOCK);
-
-  auto* frame_view =
-      CreatePipAndGetFrameView(/*disallow_return_to_opener=*/false);
-
-  EXPECT_TRUE(GetOriginChip(frame_view)->GetText().empty());
 }
 
 // The recompute after Widget::Init() grows the outer window by the non-client

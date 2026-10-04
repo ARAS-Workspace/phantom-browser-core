@@ -513,12 +513,8 @@
   E_CPONLY(kColorOmniboxResultsUrl) \
   E_CPONLY(kColorOmniboxResultsUrlSelected) \
   E_CPONLY(kColorOmniboxSecurityChipDangerous) \
-  E_CPONLY(kColorOmniboxSecurityChipDangerousBackground) \
   E_CPONLY(kColorOmniboxSecurityChipDefault) \
-  E_CPONLY(kColorOmniboxSecurityChipInkDropHover) \
-  E_CPONLY(kColorOmniboxSecurityChipInkDropRipple) \
   E_CPONLY(kColorOmniboxSecurityChipSecure) \
-  E_CPONLY(kColorOmniboxSecurityChipText) \
   E_CPONLY(kColorOmniboxSelectionBackground) \
   E_CPONLY(kColorOmniboxSelectionForeground) \
   E_CPONLY(kColorOmniboxText) \

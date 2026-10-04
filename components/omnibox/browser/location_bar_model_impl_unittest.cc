@@ -12,19 +12,21 @@
 #include "components/dom_distiller/core/url_utils.h"
 #include "components/omnibox/browser/location_bar_model_delegate.h"
 #include "components/omnibox/browser/test_omnibox_client.h"
+#include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/omnibox/common/omnibox_focus_state.h"
 #include "components/search_engines/template_url_service.h"
+#include "components/strings/grit/components_strings.h"
+#include "components/vector_icons/vector_icons.h"  // nogncheck
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/color_palette.h"
 #include "ui/gfx/favicon_size.h"
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/paint_vector_icon.h"
 #include "url/gurl.h"
-#include "components/omnibox/browser/vector_icons.h"  // nogncheck
-#include "components/vector_icons/vector_icons.h"     // nogncheck
 
 using metrics::OmniboxEventProto;
 using testing::_;
@@ -198,6 +200,18 @@ TEST_F(LocationBarModelImplTest, GetVectorIcon) {
       model()->GetVectorIcon(), gfx::kFaviconSize, gfx::kPlaceholderColor);
 
   EXPECT_EQ(icon.bitmap(), expected_icon.bitmap());
+}
+
+// Tests that the DANGEROUS security level, which comes from a major
+// certificate error or active mixed content, shows the "Not secure" text.
+TEST_F(LocationBarModelImplTest, DangerousLevelShowsNotSecureText) {
+  delegate()->SetSecurityLevel(security_state::SecurityLevel::DANGEROUS);
+
+  const std::u16string not_secure_text =
+      l10n_util::GetStringUTF16(IDS_NOT_SECURE_VERBOSE_STATE);
+  ASSERT_FALSE(not_secure_text.empty());
+  EXPECT_EQ(not_secure_text, model()->GetSecureDisplayText());
+  EXPECT_EQ(not_secure_text, model()->GetSecureAccessibilityText());
 }
 
 // Test that the expected page classification is returned.

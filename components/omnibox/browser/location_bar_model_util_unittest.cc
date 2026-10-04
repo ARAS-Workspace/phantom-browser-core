@@ -15,8 +15,6 @@
 
 TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithNoneLevel) {
   security_state::VisibleSecurityState visible_security_state;
-  visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::NONE, &visible_security_state);
   EXPECT_EQ(icon.name, features::IsRoundedIconsEnabled()
@@ -26,8 +24,6 @@ TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithNoneLevel) {
 
 TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithSecureLevel) {
   security_state::VisibleSecurityState visible_security_state;
-  visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::SECURE, &visible_security_state);
   EXPECT_EQ(icon.name, features::IsRoundedIconsEnabled()
@@ -38,8 +34,6 @@ TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithSecureLevel) {
 TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithDangerousLevel) {
   base::test::ScopedFeatureList scoped_feature_list_;
   security_state::VisibleSecurityState visible_security_state;
-  visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::DANGEROUS, &visible_security_state);
   EXPECT_EQ(icon.name, features::IsRoundedIconsEnabled()
@@ -47,23 +41,8 @@ TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithDangerousLevel) {
                            : vector_icons::kDangerousChromeRefreshOldIcon.name);
 }
 
-TEST(LocationBarModelUtilTest,
-     GetSecurityVectorIconBillingInterstitialWithDangerousLevel) {
-  security_state::VisibleSecurityState visible_security_state;
-  visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_BILLING;
-  const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
-      security_state::SecurityLevel::DANGEROUS, &visible_security_state);
-  EXPECT_EQ(icon.name,
-            features::IsRoundedIconsEnabled()
-                ? vector_icons::kWarningIcon.name
-                : vector_icons::kNotSecureWarningChromeRefreshOldIcon.name);
-}
-
 TEST(LocationBarModelUtilTest, GetSecurityVectorIconWithWarningLevel) {
   security_state::VisibleSecurityState visible_security_state;
-  visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::WARNING, &visible_security_state);
   EXPECT_EQ(icon.name,
@@ -79,8 +58,6 @@ TEST(
   features.InitAndEnableFeature(
       security_interstitials::features::kHttpsFirstDialogUi);
   security_state::VisibleSecurityState visible_security_state;
-  visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   visible_security_state.is_https_only_mode_upgraded = true;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::WARNING, &visible_security_state);
@@ -96,8 +73,6 @@ TEST(
   features.InitAndDisableFeature(
       security_interstitials::features::kHttpsFirstDialogUi);
   security_state::VisibleSecurityState visible_security_state;
-  visible_security_state.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_NONE;
   visible_security_state.is_https_only_mode_upgraded = true;
   const gfx::VectorIcon& icon = location_bar_model::GetSecurityVectorIcon(
       security_state::SecurityLevel::WARNING, &visible_security_state);

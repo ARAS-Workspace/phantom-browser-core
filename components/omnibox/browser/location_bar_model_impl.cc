@@ -234,33 +234,8 @@ std::u16string LocationBarModelImpl::GetSecureDisplayText() const {
       return l10n_util::GetStringUTF16(IDS_NOT_SECURE_VERBOSE_STATE);
     case security_state::SECURE:
       return std::u16string();
-    case security_state::DANGEROUS: {
-      std::unique_ptr<security_state::VisibleSecurityState>
-          visible_security_state = delegate_->GetVisibleSecurityState();
-
-      // Don't show any text in the security indicator for sites on the billing
-      // interstitial list or blocked by the enterprise administrator.
-      if (visible_security_state->malicious_content_status ==
-              security_state::MALICIOUS_CONTENT_STATUS_BILLING ||
-          visible_security_state->malicious_content_status ==
-              security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_BLOCK ||
-          visible_security_state->malicious_content_status ==
-              security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_WARN) {
-        return std::u16string();
-      }
-
-      if (visible_security_state->malicious_content_status ==
-          security_state::MALICIOUS_CONTENT_STATUS_WARNABLE_SUSPICIOUS_SITE) {
-        return l10n_util::GetStringUTF16(IDS_SUSPICIOUS_VERBOSE_STATE);
-      }
-
-      bool fails_malware_check =
-          visible_security_state->malicious_content_status !=
-          security_state::MALICIOUS_CONTENT_STATUS_NONE;
-      return l10n_util::GetStringUTF16(fails_malware_check
-                                           ? IDS_DANGEROUS_VERBOSE_STATE
-                                           : IDS_NOT_SECURE_VERBOSE_STATE);
-    }
+    case security_state::DANGEROUS:
+      return l10n_util::GetStringUTF16(IDS_NOT_SECURE_VERBOSE_STATE);
     default:
       return std::u16string();
   }

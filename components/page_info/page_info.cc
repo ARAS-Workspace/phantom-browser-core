@@ -1058,13 +1058,8 @@ void PageInfo::ComputeUIInputs(const GURL& url) {
       (has_http_allow_exception && is_https_enforced);
 
   // Only show a warning decision revocation button if the user has chosen to
-  // bypass SSL host errors / HTTP warnings for this host in the past, and we're
-  // not presently on a Safe Browsing error (since otherwise it's confusing
-  // which warning you're re-enabling).
-  show_ssl_decision_revoke_button_ =
-      has_warning_bypass_exception &&
-      visible_security_state.malicious_content_status ==
-          security_state::MALICIOUS_CONTENT_STATUS_NONE;
+  // bypass SSL host errors / HTTP warnings for this host in the past.
+  show_ssl_decision_revoke_button_ = has_warning_bypass_exception;
 }
 
 void PageInfo::PopulatePermissionInfo(PermissionInfo& permission_info,

@@ -4,37 +4,18 @@
 
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 
-#include <optional>
-#include <utility>
-
-#include "base/check.h"
-#include "base/notreached.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/lookalikes/safety_tip_web_contents_observer.h"
 #include "chrome/browser/net/qwac_web_contents_observer.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ssl/https_only_mode_tab_helper.h"
-#include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/core/pref_names.h"
 #include "components/security_state/content/content_utils.h"
 #include "content/public/browser/browser_context.h"
-#include "content/public/browser/navigation_controller.h"
-#include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
 namespace chrome_security_state {
-
-using password_manager::metrics_util::PasswordType;
-
-namespace {
-std::optional<security_state::MaliciousContentStatus>&
-GetMaliciousContentStatusOverrideForTesting() {
-  static std::optional<security_state::MaliciousContentStatus> override;
-  return override;
-}
-}  // namespace
 
 std::unique_ptr<security_state::VisibleSecurityState> GetVisibleSecurityState(
     content::WebContents* web_contents) {
@@ -47,10 +28,6 @@ std::unique_ptr<security_state::VisibleSecurityState> GetVisibleSecurityState(
   if (qwac_status && qwac_status->is_finished()) {
     state->two_qwac = qwac_status->verified_2qwac_cert();
   }
-
-  // Malware status might already be known even if connection security
-  // information is still being initialized, thus no need to check for that.
-  state->malicious_content_status = GetMaliciousContentStatus(web_contents);
 
   SafetyTipWebContentsObserver* safety_tip_web_contents_observer =
       SafetyTipWebContentsObserver::FromWebContents(web_contents);
@@ -90,25 +67,6 @@ security_state::SecurityLevel GetSecurityLevel(
     content::WebContents* web_contents) {
   return security_state::GetSecurityLevel(
       *GetVisibleSecurityState(web_contents));
-}
-
-security_state::MaliciousContentStatus GetMaliciousContentStatus(
-    content::WebContents* web_contents) {
-  if (GetMaliciousContentStatusOverrideForTesting().has_value()) {
-    return *GetMaliciousContentStatusOverrideForTesting();
-  }
-  return security_state::MALICIOUS_CONTENT_STATUS_NONE;
-}
-
-ScopedMaliciousContentStatusForTesting::ScopedMaliciousContentStatusForTesting(
-    security_state::MaliciousContentStatus status) {
-  CHECK(!GetMaliciousContentStatusOverrideForTesting().has_value());
-  GetMaliciousContentStatusOverrideForTesting() = status;
-}
-
-ScopedMaliciousContentStatusForTesting::
-    ~ScopedMaliciousContentStatusForTesting() {
-  GetMaliciousContentStatusOverrideForTesting().reset();
 }
 
 }  // namespace chrome_security_state

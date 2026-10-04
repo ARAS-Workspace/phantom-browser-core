@@ -10,6 +10,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/run_loop.h"
 #include "base/scoped_observation.h"
+#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
@@ -45,6 +46,9 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/permissions/permission_request_manager.h"
+#include "components/security_interstitials/content/security_interstitial_page.h"
+#include "components/security_interstitials/content/security_interstitial_tab_helper.h"
+#include "components/security_interstitials/core/controller_client.h"
 #include "components/security_state/core/security_state.h"
 #include "components/zoom/zoom_controller.h"
 #include "content/public/common/content_features.h"
@@ -374,7 +378,8 @@ class SecurityIndicatorTest : public InProcessBrowserTest {
 };
 
 // Check that the security indicator text is not shown for HTTPS and "Not
-// secure" is shown for HTTP.
+// secure" is shown for HTTP and for a certificate error the user proceeded
+// through (DANGEROUS).
 IN_PROC_BROWSER_TEST_F(SecurityIndicatorTest, CheckIndicatorText) {
   net::EmbeddedTestServer secure_server(net::EmbeddedTestServer::TYPE_HTTPS);
   secure_server.SetSSLConfig(
@@ -400,6 +405,32 @@ IN_PROC_BROWSER_TEST_F(SecurityIndicatorTest, CheckIndicatorText) {
 
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), kMockNonsecureURL));
   EXPECT_EQ(security_state::WARNING,
+            chrome_security_state::GetSecurityLevel(tab));
+  EXPECT_TRUE(location_bar_view->location_icon_view()->ShouldShowLabel());
+  EXPECT_TRUE(base::EqualsCaseInsensitiveASCII(
+      location_bar_view->location_icon_view()->GetText(), "not secure"));
+
+  // A certificate error the user proceeded through is DANGEROUS; its chip
+  // text is "Not secure".
+  net::EmbeddedTestServer expired_server(net::EmbeddedTestServer::TYPE_HTTPS);
+  expired_server.SetSSLConfig(
+      net::test_server::EmbeddedTestServer::CERT_EXPIRED);
+  expired_server.AddDefaultHandlers(GetChromeTestDataDir());
+  ASSERT_TRUE(expired_server.Start());
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(
+      browser(), expired_server.GetURL("/empty.html")));
+  auto* helper =
+      security_interstitials::SecurityInterstitialTabHelper::FromWebContents(
+          tab);
+  ASSERT_TRUE(helper);
+  security_interstitials::SecurityInterstitialPage* interstitial =
+      helper->GetBlockingPageForCurrentlyCommittedNavigationForTesting();
+  ASSERT_TRUE(interstitial);
+  content::TestNavigationObserver proceed_observer(tab, 1);
+  interstitial->CommandReceived(
+      base::NumberToString(security_interstitials::CMD_PROCEED));
+  proceed_observer.Wait();
+  EXPECT_EQ(security_state::DANGEROUS,
             chrome_security_state::GetSecurityLevel(tab));
   EXPECT_TRUE(location_bar_view->location_icon_view()->ShouldShowLabel());
   EXPECT_TRUE(base::EqualsCaseInsensitiveASCII(

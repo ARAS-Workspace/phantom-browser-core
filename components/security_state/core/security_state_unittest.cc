@@ -4,7 +4,6 @@
 
 #include "components/security_state/core/security_state.h"
 
-#include <stdint.h>
 #include <memory>
 #include <utility>
 
@@ -48,7 +47,6 @@ class TestSecurityStateHelper {
         displayed_mixed_content_(false),
         contained_mixed_form_(false),
         ran_mixed_content_(false),
-        malicious_content_status_(MALICIOUS_CONTENT_STATUS_NONE),
         is_error_page_(false),
         is_view_source_(false),
         safety_tip_info_({security_state::SafetyTipStatus::kUnknown, GURL()}),
@@ -57,12 +55,6 @@ class TestSecurityStateHelper {
 
   void SetCertificate(scoped_refptr<net::X509Certificate> cert) {
     cert_ = std::move(cert);
-  }
-  void set_connection_status(int connection_status) {
-    connection_status_ = connection_status;
-  }
-  void SetCipherSuite(uint16_t ciphersuite) {
-    net::SSLConnectionStatusSetCipherSuite(ciphersuite, &connection_status_);
   }
   void AddCertStatus(net::CertStatus cert_status) {
     cert_status_ |= cert_status;
@@ -78,10 +70,6 @@ class TestSecurityStateHelper {
   }
   void set_ran_mixed_content(bool ran_mixed_content) {
     ran_mixed_content_ = ran_mixed_content;
-  }
-  void set_malicious_content_status(
-      MaliciousContentStatus malicious_content_status) {
-    malicious_content_status_ = malicious_content_status;
   }
 
   void set_is_error_page(bool is_error_page) { is_error_page_ = is_error_page; }
@@ -111,7 +99,6 @@ class TestSecurityStateHelper {
     state->displayed_mixed_content = displayed_mixed_content_;
     state->contained_mixed_form = contained_mixed_form_;
     state->ran_mixed_content = ran_mixed_content_;
-    state->malicious_content_status = malicious_content_status_;
     state->is_error_page = is_error_page_;
     state->is_view_source = is_view_source_;
     state->safety_tip_info = safety_tip_info_;
@@ -135,7 +122,6 @@ class TestSecurityStateHelper {
   bool displayed_mixed_content_;
   bool contained_mixed_form_;
   bool ran_mixed_content_;
-  MaliciousContentStatus malicious_content_status_;
   bool is_error_page_;
   bool is_view_source_;
   security_state::SafetyTipInfo safety_tip_info_;
@@ -185,30 +171,6 @@ TEST(SecurityStateTest, SHA1WarningBrokenHTTPS) {
   EXPECT_EQ(DANGEROUS, helper.GetSecurityLevel());
 }
 
-// Tests that the malware/phishing status overrides valid HTTPS.
-TEST(SecurityStateTest, MalwareOverride) {
-  TestSecurityStateHelper helper;
-  // TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 from
-  // http://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-4
-  const uint16_t ciphersuite = 0xc02f;
-  helper.set_connection_status(net::SSL_CONNECTION_VERSION_TLS1_2
-                               << net::SSL_CONNECTION_VERSION_SHIFT);
-  helper.SetCipherSuite(ciphersuite);
-
-  helper.set_malicious_content_status(MALICIOUS_CONTENT_STATUS_MALWARE);
-
-  EXPECT_EQ(DANGEROUS, helper.GetSecurityLevel());
-}
-
-// Tests that the malware/phishing status is set, even if other connection info
-// is not available.
-TEST(SecurityStateTest, MalwareWithoutConnectionState) {
-  TestSecurityStateHelper helper;
-  helper.set_malicious_content_status(
-      MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING);
-  EXPECT_EQ(DANGEROUS, helper.GetSecurityLevel());
-}
-
 // Tests that pseudo URLs always cause an WARNING to be shown.
 TEST(SecurityStateTest, AlwaysWarnOnDataUrls) {
   TestSecurityStateHelper helper;
@@ -236,11 +198,10 @@ TEST(SecurityStateTest, ViewSourceRemovesSecure) {
 }
 
 // Tests that if |is_view_source| is set, DANGEROUS is still returned for a site
-// flagged by SafeBrowsing.
-TEST(SecurityStateTest, ViewSourceKeepsWarning) {
+// with a major certificate error.
+TEST(SecurityStateTest, ViewSourceKeepsCertErrorDangerous) {
   TestSecurityStateHelper helper;
-  helper.set_malicious_content_status(
-      MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING);
+  helper.AddCertStatus(net::CERT_STATUS_DATE_INVALID);
   helper.set_is_view_source(true);
   EXPECT_EQ(DANGEROUS, helper.GetSecurityLevel());
 }
@@ -331,35 +292,6 @@ TEST(SecurityStateTest, ErrorPage) {
   EXPECT_EQ(SecurityLevel::WARNING, helper.GetSecurityLevel());
 }
 
-// Tests that the billing status is set, and it overrides valid HTTPS.
-TEST(SecurityStateTest, BillingOverridesValidHTTPS) {
-  TestSecurityStateHelper helper;
-  // TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 from
-  // http://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-4
-  const uint16_t ciphersuite = 0xc02f;
-  helper.set_connection_status(net::SSL_CONNECTION_VERSION_TLS1_2
-                               << net::SSL_CONNECTION_VERSION_SHIFT);
-  helper.SetCipherSuite(ciphersuite);
-
-  helper.set_malicious_content_status(MALICIOUS_CONTENT_STATUS_BILLING);
-
-  EXPECT_EQ(DANGEROUS, helper.GetSecurityLevel());
-}
-
-// Tests that the billing status overrides HTTP warnings.
-TEST(SecurityStateTest, BillingOverridesHTTPWarning) {
-  TestSecurityStateHelper helper;
-  helper.SetUrl(GURL(kHttpUrl));
-
-  // Expect to see a warning for HTTP first.
-  EXPECT_EQ(security_state::WARNING, helper.GetSecurityLevel());
-
-  // Now mark the URL as matching the billing list.
-  helper.set_malicious_content_status(MALICIOUS_CONTENT_STATUS_BILLING);
-  // Expect to see a warning for billing now.
-  EXPECT_EQ(DANGEROUS, helper.GetSecurityLevel());
-}
-
 // Tests that non-cryptographic schemes are handled as having no certificate
 // errors.
 TEST(SecurityStateTest, NonCryptoHasNoCertificateErrors) {
@@ -430,16 +362,6 @@ TEST(SecurityStateTest, HttpsOnlyModeOverridesCertificateError) {
   helper.set_is_error_page(true);
   helper.set_is_https_only_mode_upgraded(true);
   EXPECT_EQ(SecurityLevel::WARNING, helper.GetSecurityLevel());
-}
-
-// Tests that malicious content status takes precedence over HTTPS-Only Mode.
-TEST(SecurityStateTest, MaliciousContentOverridesHttpsOnlyMode) {
-  TestSecurityStateHelper helper;
-  helper.set_malicious_content_status(
-      MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING);
-  helper.set_is_error_page(true);
-  helper.set_is_https_only_mode_upgraded(true);
-  EXPECT_EQ(DANGEROUS, helper.GetSecurityLevel());
 }
 
 }  // namespace security_state

@@ -65,8 +65,8 @@ enum SecurityLevel {
   // SECURE_WITH_POLICY_INSTALLED_CERT = 4,
 
   // Attempted HTTPS and failed, page not authenticated, HTTPS with
-  // insecure active content on the page, malware, phishing, or any other
-  // serious security issue that could be dangerous.
+  // insecure active content on the page, or any other serious security issue
+  // that could be dangerous.
   DANGEROUS = 5,
 
   // Pages deemed insecure, where we should show a warning indicator. This
@@ -87,27 +87,6 @@ enum ContentStatus {
   CONTENT_STATUS_DISPLAYED,
   CONTENT_STATUS_RAN,
   CONTENT_STATUS_DISPLAYED_AND_RAN,
-};
-
-// Describes whether the page contains malicious resources such as
-// malware or phishing attacks.
-//
-// A Java counterpart will be generated for this enum.
-// GENERATED_JAVA_ENUM_PACKAGE: org.chromium.components.security_state
-// GENERATED_JAVA_CLASS_NAME_OVERRIDE: ConnectionMaliciousContentStatus
-enum MaliciousContentStatus {
-  MALICIOUS_CONTENT_STATUS_NONE,
-  MALICIOUS_CONTENT_STATUS_MALWARE,
-  MALICIOUS_CONTENT_STATUS_UNWANTED_SOFTWARE,
-  MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING,
-  MALICIOUS_CONTENT_STATUS_SAVED_PASSWORD_REUSE,
-  MALICIOUS_CONTENT_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE,
-  MALICIOUS_CONTENT_STATUS_SIGNED_IN_NON_SYNC_PASSWORD_REUSE,
-  MALICIOUS_CONTENT_STATUS_ENTERPRISE_PASSWORD_REUSE,
-  MALICIOUS_CONTENT_STATUS_BILLING,
-  MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_WARN,
-  MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_BLOCK,
-  MALICIOUS_CONTENT_STATUS_WARNABLE_SUSPICIOUS_SITE,
 };
 
 // Describes whether the page triggers any safety tips or reputation
@@ -162,8 +141,6 @@ struct VisibleSecurityState {
   ~VisibleSecurityState();
 
   GURL url;
-
-  MaliciousContentStatus malicious_content_status;
 
   // What type of Safety Tip (if any) triggered on the page. Note that this
   // field will be set even if the Safety Tip UI was not actually shown due to

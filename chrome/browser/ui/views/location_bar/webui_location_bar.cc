@@ -44,14 +44,12 @@
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api_data_model.mojom.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/omnibox/browser/location_bar_model.h"
-#include "components/strings/grit/components_strings.h"
 #include "content/public/browser/navigation_entry.h"
 #include "ui/base/dragdrop/drag_drop_types.h"
 #include "ui/base/dragdrop/mojom/drag_drop_types.mojom.h"
 #include "ui/base/dragdrop/os_exchange_data.h"
 #include "ui/base/interaction/element_events.h"
 #include "ui/base/interaction/element_tracker.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/display/screen.h"
 #include "ui/views/bubble/bubble_border.h"
 #include "ui/views/button_drag_utils.h"
@@ -478,14 +476,9 @@ void WebUILocationBar::UpdateLhsChipsState(bool icon_known) {
 
   auto mojo_security_level = GetMojoSecurityLevel(model->GetSecurityLevel());
 
-  bool is_text_dangerous =
-      security_chip_text ==
-      l10n_util::GetStringUTF16(IDS_DANGEROUS_VERBOSE_STATE);
-
   // `omnibox_view_` is null in some tests.
   if (!icon_known && omnibox_view_) {
-    ui::ImageModel maybe_new_icon =
-        UpdateLocationIcon(mojo_security_level, is_text_dangerous);
+    ui::ImageModel maybe_new_icon = UpdateLocationIcon(mojo_security_level);
     if (!maybe_new_icon.IsEmpty()) {
       bool icon_handled = false;
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -539,7 +532,7 @@ void WebUILocationBar::UpdateLhsChipsState(bool icon_known) {
           location_bar::GetSecurityChipTooltipText(is_editing_or_empty),
           toolbar_ui_api::mojom::SecurityChipAccessibilityState::New(
               accessibility_state.name, accessibility_state.description),
-          is_clickable, is_text_dangerous, !ShouldChipOverrideLocationIcon()),
+          is_clickable, !ShouldChipOverrideLocationIcon()),
       std::vector<toolbar_ui_api::mojom::ContentSettingImageStatePtr>(),
       permission_dashboard_->GetState());
 
@@ -551,24 +544,17 @@ void WebUILocationBar::UpdateLhsChipsState(bool icon_known) {
 }
 
 ui::ImageModel WebUILocationBar::UpdateLocationIcon(
-    toolbar_ui_api::mojom::SecurityLevel security_level,
-    bool is_text_dangerous) {
+    toolbar_ui_api::mojom::SecurityLevel security_level) {
   // TODO(crbug.com/505362587): This duplicates quite some color logic
   // with the JS side, and also quite a bit of LocationBarView's logic.
   auto* color_provider = toolbar_delegate_->GetView()->GetColorProvider();
 
-  const ui::ColorId background_id =
-      is_text_dangerous ? kColorOmniboxSecurityChipDangerousBackground
-                        : kColorOmniboxIconBackground;
-
-  bool dark_mode = color_utils::IsDark(color_provider->GetColor(background_id));
+  bool dark_mode = color_utils::IsDark(
+      color_provider->GetColor(kColorOmniboxIconBackground));
 
   ui::ColorId id = kColorOmniboxText;
   if (security_level == toolbar_ui_api::mojom::SecurityLevel::kDangerous) {
     id = kColorOmniboxSecurityChipDangerous;
-  }
-  if (is_text_dangerous) {
-    id = kColorOmniboxSecurityChipText;
   }
 
   const int dip_size =

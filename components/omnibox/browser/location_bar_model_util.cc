@@ -22,9 +22,6 @@ namespace location_bar_model {
 const gfx::VectorIcon& GetSecurityVectorIcon(
     security_state::SecurityLevel security_level,
     security_state::VisibleSecurityState* visible_security_state) {
-  security_state::MaliciousContentStatus malicious_content_status =
-      visible_security_state->malicious_content_status;
-
   switch (security_level) {
     case security_state::NONE:
       return features::IsRoundedIconsEnabled()
@@ -46,27 +43,9 @@ const gfx::VectorIcon& GetSecurityVectorIcon(
                  ? vector_icons::kWarningIcon
                  : vector_icons::kNotSecureWarningChromeRefreshOldIcon;
     case security_state::DANGEROUS:
-      if (malicious_content_status ==
-              security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_WARN ||
-          malicious_content_status ==
-              security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_BLOCK) {
-        return features::IsRoundedIconsEnabled()
-                   ? vector_icons::kDomainIcon
-                   : vector_icons::kBusinessChromeRefreshOldIcon;
-      }
-      if (malicious_content_status ==
-          security_state::MALICIOUS_CONTENT_STATUS_WARNABLE_SUSPICIOUS_SITE) {
-        return vector_icons::kShieldQuestionIcon;
-      }
-      if (malicious_content_status !=
-          security_state::MALICIOUS_CONTENT_STATUS_BILLING) {
-        return features::IsRoundedIconsEnabled()
-                   ? vector_icons::kDangerousFilledIcon
-                   : vector_icons::kDangerousChromeRefreshOldIcon;
-      }
       return features::IsRoundedIconsEnabled()
-                 ? vector_icons::kWarningIcon
-                 : vector_icons::kNotSecureWarningChromeRefreshOldIcon;
+                 ? vector_icons::kDangerousFilledIcon
+                 : vector_icons::kDangerousChromeRefreshOldIcon;
 
     case security_state::SECURITY_LEVEL_COUNT:
       NOTREACHED();
