@@ -7,7 +7,6 @@
 
 #include <optional>
 #include <utility>
-#include <vector>
 
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
@@ -20,7 +19,6 @@
 
 namespace {
 class WebAppFrameViewChromeOSTest;
-class LocationBarViewQuietNotificationInteractiveUITest;
 }  // namespace
 
 namespace views {
@@ -29,7 +27,6 @@ class View;
 
 class BrowserView;
 class ExtensionsContainerViews;
-class ContentSettingImageView;
 class WebAppNavigationButtonContainer;
 class WebAppToolbarButtonContainer;
 class WebAppFrameToolbarView;
@@ -126,12 +123,6 @@ class WebAppFrameToolbarView : public views::AccessiblePaneView,
   friend class ImmersiveModeControllerChromeosWebAppBrowserTest;
   friend class WebAppAshInteractiveUITest;
   friend class WebAppFrameViewChromeOSTest;
-  friend class LocationBarViewQuietNotificationInteractiveUITest;
-
-  views::View* GetContentSettingContainerForTesting();
-
-  const std::vector<raw_ptr<ContentSettingImageView, VectorExperimental>>&
-  GetContentSettingViewsForTesting() const;
 
   void UpdateCachedColors();
 

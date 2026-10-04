@@ -474,16 +474,6 @@ void WebAppFrameToolbarView::OnThemeChanged() {
   UpdateCaptionColors();
 }
 
-views::View* WebAppFrameToolbarView::GetContentSettingContainerForTesting() {
-  return right_container_->content_settings_container();
-}
-
-const std::vector<raw_ptr<ContentSettingImageView, VectorExperimental>>&
-WebAppFrameToolbarView::GetContentSettingViewsForTesting() const {
-  return right_container_->content_settings_container()
-      ->get_content_setting_views();
-}
-
 void WebAppFrameToolbarView::UpdateCachedColors() {
   const BrowserFrameView* frame_view =
       browser_view_->browser_widget()->GetFrameView();
