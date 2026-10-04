@@ -83,9 +83,6 @@ class PageInfoDelegate {
   virtual void OnPageInfoActionOccurred(page_info::PageInfoAction action) = 0;
   virtual void OnUIClosing() = 0;
 
-  virtual void OpenSafeBrowsingHelpCenterPage(const ui::Event* event,
-                                              bool is_suspicious_site) = 0;
-
   virtual std::u16string GetSubjectName(const GURL& url) = 0;
 
   virtual permissions::PermissionDecisionAutoBlocker*
@@ -119,11 +116,6 @@ class PageInfoDelegate {
   virtual void OnCookiesPageOpened() = 0;
   virtual bool IsHttpsFirstModeEnabledForUrl(const GURL& url) = 0;
   virtual bool IsIncognitoProfile() = 0;
-
-  // Notifies the embedder that the user clicked "Back to safety" or "Mark as
-  // safe" on a Suspicious Site Warning.
-  virtual void OnSuspiciousSiteBackToSafety() {}
-  virtual void OnSuspiciousSiteMarkAsSafe() {}
 };
 
 #endif  // COMPONENTS_PAGE_INFO_PAGE_INFO_DELEGATE_H_

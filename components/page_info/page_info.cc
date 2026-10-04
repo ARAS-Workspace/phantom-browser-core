@@ -293,7 +293,6 @@ PageInfo::PageInfo(std::unique_ptr<PageInfoDelegate> delegate,
       show_info_bar_(false),
       site_url_(url),
       site_identity_status_(SITE_IDENTITY_STATUS_UNKNOWN),
-      safe_browsing_status_(SAFE_BROWSING_STATUS_NONE),
       safety_tip_info_({security_state::SafetyTipStatus::kUnknown, GURL()}),
       site_connection_status_(SITE_CONNECTION_STATUS_UNKNOWN),
       show_ssl_decision_revoke_button_(false),
@@ -852,24 +851,6 @@ void PageInfo::OpenConnectionHelpCenterPage(const ui::Event& event) {
   delegate_->OpenConnectionHelpCenterPage(event);
 }
 
-void PageInfo::OpenSafeBrowsingHelpCenterPage(const ui::Event* event,
-                                              bool is_suspicious_site) {
-  if (is_suspicious_site) {
-    RecordPageInfoAction(page_info::PAGE_INFO_UNSAFE_SITE_HELP_OPENED);
-  } else {
-    RecordPageInfoAction(page_info::PAGE_INFO_SAFE_BROWSING_HELP_OPENED);
-  }
-  delegate_->OpenSafeBrowsingHelpCenterPage(event, is_suspicious_site);
-}
-
-void PageInfo::OnSuspiciousSiteBackToSafety() {
-  delegate_->OnSuspiciousSiteBackToSafety();
-}
-
-void PageInfo::OnSuspiciousSiteMarkAsSafe() {
-  delegate_->OnSuspiciousSiteMarkAsSafe();
-}
-
 void PageInfo::OpenContentSettingsExceptions(
     ContentSettingsType content_settings_type) {
   RecordPageInfoAction(page_info::PAGE_INFO_CONNECTION_HELP_OPENED);
@@ -969,15 +950,6 @@ void PageInfo::ComputeUIInputs(const GURL& url) {
     } else {
       site_identity_status_ = SITE_IDENTITY_STATUS_ERROR;
     }
-  }
-
-  if (visible_security_state.malicious_content_status !=
-      security_state::MALICIOUS_CONTENT_STATUS_NONE) {
-    // The site has been flagged by Safe Browsing. Takes precedence over TLS.
-    GetSafeBrowsingStatusByMaliciousContentStatus(
-        visible_security_state.malicious_content_status, &safe_browsing_status_,
-        &safe_browsing_details_);
-
   }
 
   safety_tip_info_ = visible_security_state.safety_tip_info;
@@ -1426,8 +1398,6 @@ void PageInfo::PresentSiteIdentity() {
   info.connection_status = site_connection_status_;
   info.connection_status_description = UTF16ToUTF8(site_connection_details_);
   info.identity_status = site_identity_status_;
-  info.safe_browsing_status = safe_browsing_status_;
-  info.safe_browsing_details = safe_browsing_details_;
   info.safety_tip_info = safety_tip_info_;
 
   info.certificate = certificate_;
@@ -1460,55 +1430,6 @@ std::vector<ContentSettingsType> PageInfo::GetAllPermissionsForTesting() {
 void PageInfo::SetSiteNameForTesting(const std::u16string& site_name) {
   site_name_for_testing_ = site_name;
   PresentSiteIdentity();
-}
-
-void PageInfo::GetSafeBrowsingStatusByMaliciousContentStatus(
-    security_state::MaliciousContentStatus malicious_content_status,
-    PageInfo::SafeBrowsingStatus* status,
-    std::u16string* details) {
-  switch (malicious_content_status) {
-    case security_state::MALICIOUS_CONTENT_STATUS_NONE:
-      NOTREACHED();
-    case security_state::MALICIOUS_CONTENT_STATUS_MALWARE:
-      *status = PageInfo::SAFE_BROWSING_STATUS_MALWARE;
-      *details = l10n_util::GetStringUTF16(IDS_PAGE_INFO_MALWARE_DETAILS);
-      break;
-    case security_state::MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING:
-      *status = PageInfo::SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING;
-      *details =
-          l10n_util::GetStringUTF16(IDS_PAGE_INFO_SOCIAL_ENGINEERING_DETAILS);
-      break;
-    case security_state::MALICIOUS_CONTENT_STATUS_UNWANTED_SOFTWARE:
-      *status = PageInfo::SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE;
-      *details =
-          l10n_util::GetStringUTF16(IDS_PAGE_INFO_UNWANTED_SOFTWARE_DETAILS);
-      break;
-    case security_state::MALICIOUS_CONTENT_STATUS_SAVED_PASSWORD_REUSE:
-    case security_state::MALICIOUS_CONTENT_STATUS_SIGNED_IN_SYNC_PASSWORD_REUSE:
-    case security_state::
-        MALICIOUS_CONTENT_STATUS_SIGNED_IN_NON_SYNC_PASSWORD_REUSE:
-    case security_state::MALICIOUS_CONTENT_STATUS_ENTERPRISE_PASSWORD_REUSE:
-      break;
-    case security_state::MALICIOUS_CONTENT_STATUS_BILLING:
-      *status = PageInfo::SAFE_BROWSING_STATUS_BILLING;
-      *details = l10n_util::GetStringUTF16(IDS_PAGE_INFO_BILLING_DETAILS);
-      break;
-    case security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_BLOCK:
-      *status = PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_BLOCK;
-      *details =
-          l10n_util::GetStringUTF16(IDS_PAGE_INFO_ENTERPRISE_BLOCK_DETAILS);
-      break;
-    case security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_WARN:
-      *status = PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_WARN;
-      *details =
-          l10n_util::GetStringUTF16(IDS_PAGE_INFO_ENTERPRISE_WARN_DETAILS);
-      break;
-    case security_state::MALICIOUS_CONTENT_STATUS_WARNABLE_SUSPICIOUS_SITE:
-      *status = PageInfo::SAFE_BROWSING_STATUS_WARNABLE_SUSPICIOUS_SITE;
-      *details =
-          l10n_util::GetStringUTF16(IDS_PAGE_INFO_SUSPICIOUS_SITE_DETAILS);
-      break;
-  }
 }
 
 content_settings::PageSpecificContentSettings*

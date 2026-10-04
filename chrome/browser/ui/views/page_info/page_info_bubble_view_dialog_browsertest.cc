@@ -188,9 +188,6 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
     constexpr char kSecureSubpage[] = "SecureSubpage";
     constexpr char kEvSecure[] = "EvSecure";
     constexpr char kEvSecureSubpage[] = "EvSecureSubpage";
-    constexpr char kMalware[] = "Malware";
-    constexpr char kDeceptive[] = "Deceptive";
-    constexpr char kUnwantedSoftware[] = "UnwantedSoftware";
     constexpr char kBadCert[] = "BadCert";
     constexpr char kMixedContentForm[] = "MixedContentForm";
     constexpr char kMixedContent[] = "MixedContent";
@@ -275,14 +272,6 @@ class PageInfoBubbleViewDialogBrowserTest : public DialogBrowserTest {
           net::X509Certificate::CreateFromBytes(thawte_der);
       ASSERT_TRUE(ev_cert);
       identity.certificate = ev_cert;
-    } else if (name == kMalware) {
-      identity.safe_browsing_status = PageInfo::SAFE_BROWSING_STATUS_MALWARE;
-    } else if (name == kDeceptive) {
-      identity.safe_browsing_status =
-          PageInfo::SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING;
-    } else if (name == kUnwantedSoftware) {
-      identity.safe_browsing_status =
-          PageInfo::SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE;
     } else if (name == kBadCert) {
       identity.identity_status = PageInfo::SITE_IDENTITY_STATUS_ERROR;
       identity.certificate = net::ImportCertFromFile(
@@ -429,25 +418,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest,
 
 // Shows the Page Info bubble for a file:// URL.
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest, InvokeUi_File) {
-  ShowAndVerifyUi();
-}
-
-// Shows the Page Info bubble for a site flagged for malware by Safe Browsing.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest, InvokeUi_Malware) {
-  ShowAndVerifyUi();
-}
-
-// Shows the Page Info bubble for a site flagged for social engineering by Safe
-// Browsing.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest,
-                       InvokeUi_Deceptive) {
-  ShowAndVerifyUi();
-}
-
-// Shows the Page Info bubble for a site flagged for distributing unwanted
-// software by Safe Browsing.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewDialogBrowserTest,
-                       InvokeUi_UnwantedSoftware) {
   ShowAndVerifyUi();
 }
 

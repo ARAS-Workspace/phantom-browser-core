@@ -126,7 +126,6 @@ if (current_toolchain == default_toolchain) {
       "crop_free_old.icon",
       "dangerous_chrome_refresh_old.icon",
       "dangerous_filled.icon",
-      "dangerous_old.icon",
       "database.icon",
       "database_off.icon",
       "database_off_old.icon",

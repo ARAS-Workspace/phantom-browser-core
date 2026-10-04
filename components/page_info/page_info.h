@@ -97,21 +97,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
     SITE_IDENTITY_STATUS_ISOLATED_WEB_APP,
   };
 
-  // Safe Browsing status of a website.
-  enum SafeBrowsingStatus {
-    SAFE_BROWSING_STATUS_NONE = 0,
-    // The website has been flagged by Safe Browsing as dangerous for
-    // containing malware, social engineering, unwanted software, or password
-    // reuse on a low reputation site.
-    SAFE_BROWSING_STATUS_MALWARE,
-    SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING,
-    SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE,
-    SAFE_BROWSING_STATUS_BILLING,
-    SAFE_BROWSING_STATUS_MANAGED_POLICY_WARN,
-    SAFE_BROWSING_STATUS_MANAGED_POLICY_BLOCK,
-    SAFE_BROWSING_STATUS_WARNABLE_SUSPICIOUS_SITE,
-  };
-
   // Events for UMA. Do not reorder or change! Exposed in header so enum is
   // accessible from test.
   enum SSLCertificateDecisionsDidRevoke {
@@ -232,14 +217,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   // Handles opening the connection help center page and records the event.
   void OpenConnectionHelpCenterPage(const ui::Event& event);
 
-  // Handles opening the Safe Browsing help center page and records the event.
-  void OpenSafeBrowsingHelpCenterPage(const ui::Event* event = nullptr,
-                                      bool is_suspicious_site = false);
-
-  // Notifies delegate of Suspicious Site Warning user actions.
-  void OnSuspiciousSiteBackToSafety();
-  void OnSuspiciousSiteMarkAsSafe();
-
   // Handles opening the settings page for a permission.
   void OpenContentSettingsExceptions(ContentSettingsType content_settings_type);
 
@@ -260,10 +237,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
 
   const SiteIdentityStatus& site_identity_status() const {
     return site_identity_status_;
-  }
-
-  const SafeBrowsingStatus& safe_browsing_status() const {
-    return safe_browsing_status_;
   }
 
   const GURL& site_url() const { return site_url_; }
@@ -344,14 +317,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   // |PageInfo|.
   HostContentSettingsMap* GetContentSettings() const;
 
-  // Helper function to get the Safe Browsing status and details by malicious
-  // content status.
-  // TODO(jdeblasio): Eliminate this and just use MaliciousContentStatus?
-  void GetSafeBrowsingStatusByMaliciousContentStatus(
-      security_state::MaliciousContentStatus malicious_content_status,
-      PageInfo::SafeBrowsingStatus* status,
-      std::u16string* details);
-
   // Returns PageSpecificContentSettings for the observed WebContents if
   // present, nullptr otherwise.
   content_settings::PageSpecificContentSettings*
@@ -395,9 +360,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   // Status of the website's identity verification check.
   SiteIdentityStatus site_identity_status_;
 
-  // Safe Browsing status of the website.
-  SafeBrowsingStatus safe_browsing_status_;
-
   // Safety tip info of the website. Set regardless of whether the feature is
   // enabled to show the UI.
   security_state::SafetyTipInfo safety_tip_info_;
@@ -440,17 +402,11 @@ class PageInfo : private content_settings::CookieControlsObserver,
 
   security_state::VisibleSecurityState visible_security_state_for_metrics_;
 
-  // Set when the user ignored the password reuse modal warning dialog. When
-
   // The time the Page Info UI is opened, for measuring total time open.
   base::TimeTicks start_time_;
 
   // Records whether the user interacted with the bubble beyond opening it.
   bool did_perform_action_;
-
-  // Description of the Safe Browsing status. Non-empty if
-  // MaliciousContentStatus isn't NONE.
-  std::u16string safe_browsing_details_;
 
   std::u16string site_name_for_testing_;
 

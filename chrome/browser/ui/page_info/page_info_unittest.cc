@@ -967,64 +967,20 @@ TEST_F(PageInfoTest, OnChosenObjectDeleted) {
   EXPECT_EQ(0u, last_chosen_object_info().size());
 }
 
-TEST_F(PageInfoTest, Malware) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_MALWARE;
-  SetDefaultUIExpectations(mock_ui());
+// Tests that the Safety Tip info of the visible security state reaches the
+// identity info that is presented to the UI.
+TEST_F(PageInfoTest, SafetyTipInfoReachesIdentityInfo) {
+  visible_security_state_.safety_tip_info = {
+      security_state::SafetyTipStatus::kLookalike, GURL("https://google.com")};
 
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_MALWARE,
-            page_info()->safe_browsing_status());
-}
+  PageInfoUI::IdentityInfo identity_info;
+  EXPECT_CALL(*mock_ui(), SetIdentityInfo(_))
+      .WillOnce(::testing::SaveArg<0>(&identity_info));
 
-TEST_F(PageInfoTest, ManagedPolicyBlock) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_BLOCK;
-  SetDefaultUIExpectations(mock_ui());
-
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_BLOCK,
-            page_info()->safe_browsing_status());
-}
-
-TEST_F(PageInfoTest, ManagedPolicyWarn) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_MANAGED_POLICY_WARN;
-  SetDefaultUIExpectations(mock_ui());
-
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_WARN,
-            page_info()->safe_browsing_status());
-}
-
-TEST_F(PageInfoTest, SocialEngineering) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_SOCIAL_ENGINEERING;
-  SetDefaultUIExpectations(mock_ui());
-
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING,
-            page_info()->safe_browsing_status());
-}
-
-TEST_F(PageInfoTest, UnwantedSoftware) {
-  security_level_ = security_state::DANGEROUS;
-  visible_security_state_.malicious_content_status =
-      security_state::MALICIOUS_CONTENT_STATUS_UNWANTED_SOFTWARE;
-  SetDefaultUIExpectations(mock_ui());
-
-  EXPECT_EQ(PageInfo::SITE_CONNECTION_STATUS_UNENCRYPTED,
-            page_info()->site_connection_status());
-  EXPECT_EQ(PageInfo::SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE,
-            page_info()->safe_browsing_status());
+  page_info();
+  EXPECT_EQ(security_state::SafetyTipStatus::kLookalike,
+            identity_info.safety_tip_info.status);
+  EXPECT_EQ(GURL("https://google.com"), identity_info.safety_tip_info.safe_url);
 }
 
 TEST_F(PageInfoTest, HTTPConnection) {

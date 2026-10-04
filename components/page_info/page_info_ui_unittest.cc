@@ -52,10 +52,14 @@ TEST(PageInfoUITest, PermissionStateToUIString) {
       PageInfoUI::PermissionStateToUIString(&delegate, permission_info));
 }
 
-TEST(PageInfoUITest, GetSecurityDescriptionWarnableSuspiciousSite) {
+TEST(PageInfoUITest, GetSecurityDescriptionSafetyTipLookalike) {
+  // A valid certificate on an encrypted connection is otherwise described
+  // as secure; the lookalike Safety Tip takes precedence.
   PageInfoUI::IdentityInfo identity_info;
-  identity_info.safe_browsing_status =
-      PageInfo::SAFE_BROWSING_STATUS_WARNABLE_SUSPICIOUS_SITE;
+  identity_info.identity_status = PageInfo::SITE_IDENTITY_STATUS_CERT;
+  identity_info.connection_status = PageInfo::SITE_CONNECTION_STATUS_ENCRYPTED;
+  identity_info.safety_tip_info = {security_state::SafetyTipStatus::kLookalike,
+                                   GURL("https://google.com")};
 
   PageInfoUI page_info_ui;
   std::unique_ptr<PageInfoUI::SecurityDescription> description =
@@ -64,9 +68,9 @@ TEST(PageInfoUITest, GetSecurityDescriptionWarnableSuspiciousSite) {
   ASSERT_NE(description, nullptr);
   EXPECT_EQ(description->summary_style, PageInfoUI::SecuritySummaryColor::RED);
   EXPECT_EQ(description->summary,
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SUSPICIOUS_SITE_SUMMARY));
+            l10n_util::GetStringFUTF16(IDS_PAGE_INFO_SAFETY_TIP_LOOKALIKE_TITLE,
+                                       u"google.com"));
   EXPECT_EQ(description->details,
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SUSPICIOUS_SITE_DETAILS));
-  EXPECT_EQ(description->type,
-            PageInfoUI::SecurityDescriptionType::SAFE_BROWSING);
+            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFETY_TIP_DESCRIPTION));
+  EXPECT_EQ(description->type, PageInfoUI::SecurityDescriptionType::SAFETY_TIP);
 }

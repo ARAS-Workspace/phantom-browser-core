@@ -87,9 +87,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
   void OnPageInfoActionOccurred(page_info::PageInfoAction action) override;
   void OnUIClosing() override;
 
-  void OpenSafeBrowsingHelpCenterPage(const ui::Event* event,
-                                      bool is_suspicious_site) override;
-
   std::u16string GetSubjectName(const GURL& url) override;
   permissions::PermissionDecisionAutoBlocker* GetPermissionDecisionAutoblocker()
       override;
@@ -107,9 +104,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
 
   bool IsHttpsFirstModeEnabledForUrl(const GURL& url) override;
   bool IsIncognitoProfile() override;
-
-  void OnSuspiciousSiteBackToSafety() override;
-  void OnSuspiciousSiteMarkAsSafe() override;
 
  private:
   Profile* GetProfile() const;

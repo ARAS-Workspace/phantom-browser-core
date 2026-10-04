@@ -35,9 +35,8 @@ class X509Certificate;
 // etc.).
 class PageInfoUI {
  public:
-  // Specifies security icons and sections shown for the page info UI. For
-  // ENTERPRISE, a red business icon is shown in the omnibox.
-  enum class SecuritySummaryColor { RED, GREEN, ENTERPRISE };
+  // Specifies security icons and sections shown for the page info UI.
+  enum class SecuritySummaryColor { RED, GREEN };
 
   enum class SecurityDescriptionType {
     // The UI describes whether the connection is secure, e.g. secure
@@ -45,9 +44,6 @@ class PageInfoUI {
     CONNECTION,
     // The UI describes e.g. an internal (chrome://) page or extension page.
     INTERNAL,
-    // The UI describes a Safe Browsing warning, e.g. site deceptive or contains
-    // malware.
-    SAFE_BROWSING,
     // The UI shows a Safety Tip.
     SAFETY_TIP,
   };
@@ -130,13 +126,9 @@ class PageInfoUI {
     std::string site_identity;
     // Status of the site's identity.
     PageInfo::SiteIdentityStatus identity_status;
-    // Site's Safe Browsing status.
-    PageInfo::SafeBrowsingStatus safe_browsing_status;
     // Site's safety tip info. Only set if the feature is enabled to show the
     // Safety Tip UI.
     security_state::SafetyTipInfo safety_tip_info;
-    // Textual description of the Safe Browsing status.
-    std::u16string safe_browsing_details;
 
     // The server certificate if a secure connection.
     scoped_refptr<net::X509Certificate> certificate;

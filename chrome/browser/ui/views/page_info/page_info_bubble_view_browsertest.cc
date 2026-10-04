@@ -671,9 +671,9 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, InvalidCert) {
   PerformMouseClickOnView(certificates_button);
 }
 
-// Ensure a page that has an EV certificate *and* is blocked by Safe Browsing
-// shows the correct PageInfo UI. Regression test for crbug.com/40653067.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, MalwareAndEvCert) {
+// Ensure a page that has an EV certificate *and* triggers a lookalike Safety
+// Tip shows the correct PageInfo UI. Regression test for crbug.com/40653067.
+IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, SafetyTipAndEvCert) {
   net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
   https_server.AddDefaultHandlers(
       base::FilePath(FILE_PATH_LITERAL("chrome/test/data")));
@@ -693,18 +693,19 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, MalwareAndEvCert) {
   ASSERT_TRUE(ev_cert);
   identity.certificate = ev_cert;
 
-  // Have the page also trigger an SB malware warning.
-  identity.safe_browsing_status = PageInfo::SAFE_BROWSING_STATUS_MALWARE;
+  // Have the page also trigger a lookalike Safety Tip.
+  identity.safety_tip_info = {security_state::SafetyTipStatus::kLookalike,
+                              GURL("https://google.com")};
 
   OpenPageInfoBubble(browser());
   SetPageInfoBubbleIdentityInfo(identity);
 
-  // Verify bubble complains of malware...
+  // Verify bubble shows the Safety Tip...
   EXPECT_EQ(GetPageInfoBubbleViewSummaryText(),
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY));
+            l10n_util::GetStringFUTF16(IDS_PAGE_INFO_SAFETY_TIP_LOOKALIKE_TITLE,
+                                       u"google.com"));
   EXPECT_EQ(GetPageInfoBubbleViewDetailText(),
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_MALWARE_DETAILS) + u" " +
-                l10n_util::GetStringUTF16(IDS_LEARN_MORE));
+            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFETY_TIP_DESCRIPTION));
 
   // ...and has the correct organization details in the Certificate button.
   EXPECT_EQ(GetCertificateButtonSubtitle(),
@@ -713,79 +714,7 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, MalwareAndEvCert) {
                 u"Thawte Inc", u"US"));
 }
 
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
-                       SocialEngineeringStrings) {
-  net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
-  https_server.AddDefaultHandlers(
-      base::FilePath(FILE_PATH_LITERAL("chrome/test/data")));
-  ASSERT_TRUE(https_server.Start());
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server.GetURL("/simple.html")));
-
-  // Setup the bogus identity with an expired cert and SB flagging.
-  PageInfoUI::IdentityInfo identity;
-  identity.safe_browsing_status =
-      PageInfo::SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING;
-  OpenPageInfoBubble(browser());
-
-  SetPageInfoBubbleIdentityInfo(identity);
-
-  // Verify bubble uses new malware summary and details strings.
-  EXPECT_EQ(GetPageInfoBubbleViewSummaryText(),
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY));
-  EXPECT_EQ(
-      GetPageInfoBubbleViewDetailText(),
-      l10n_util::GetStringUTF16(IDS_PAGE_INFO_SOCIAL_ENGINEERING_DETAILS) +
-          u" " + l10n_util::GetStringUTF16(IDS_LEARN_MORE));
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest, UnwantedSoftwareStrings) {
-  net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
-  https_server.AddDefaultHandlers(
-      base::FilePath(FILE_PATH_LITERAL("chrome/test/data")));
-  ASSERT_TRUE(https_server.Start());
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server.GetURL("/simple.html")));
-
-  // Setup the bogus identity with an expired cert and SB flagging.
-  PageInfoUI::IdentityInfo identity;
-  identity.safe_browsing_status =
-      PageInfo::SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE;
-  OpenPageInfoBubble(browser());
-
-  SetPageInfoBubbleIdentityInfo(identity);
-
-  // Verify bubble uses new malware summary and details strings.
-  EXPECT_EQ(GetPageInfoBubbleViewSummaryText(),
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY));
-  EXPECT_EQ(GetPageInfoBubbleViewDetailText(),
-            l10n_util::GetStringUTF16(IDS_PAGE_INFO_UNWANTED_SOFTWARE_DETAILS) +
-                u" " + l10n_util::GetStringUTF16(IDS_LEARN_MORE));
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
-                       SuspiciousSiteBannerAndSecurityStatus) {
-  net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
-  https_server.AddDefaultHandlers(
-      base::FilePath(FILE_PATH_LITERAL("chrome/test/data")));
-  ASSERT_TRUE(https_server.Start());
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server.GetURL("/simple.html")));
-
-  PageInfoUI::IdentityInfo identity;
-  identity.safe_browsing_status =
-      PageInfo::SAFE_BROWSING_STATUS_WARNABLE_SUSPICIOUS_SITE;
-  OpenPageInfoBubble(browser());
-
-  SetPageInfoBubbleIdentityInfo(identity);
-
-  EXPECT_TRUE(PageInfoBubbleView::GetPageInfoBubbleForTesting());
-}
-
-// Navigate to a page with an SSL warning (but no malware status) and click
+// Navigate to a page with an SSL warning and click
 // through the SSL warning. The "reset decisions" button should be shown.
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
                        ResetWarningDecisionsButtonCertWarningOnly) {
@@ -804,45 +733,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
   views::View* reset_decisions_label =
       GetView(PageInfoViewFactory::VIEW_ID_PAGE_INFO_RESET_DECISIONS_LABEL);
   EXPECT_TRUE(reset_decisions_label->GetVisible());
-}
-
-// Navigate to a malware page with an SSL warning and click through the warning.
-// The "reset decisions" button should not be displayed (otherwise it's
-// confusing which warning the user is re-enabling).
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTest,
-                       ResetWarningDecisionsButtonCertAndMalwareWarnings) {
-  GURL bad_https_url = bad_https_server()->GetURL("baz.com", "/simple.html");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), bad_https_url));
-  ASSERT_TRUE(
-      chrome_browser_interstitials::IsShowingSSLInterstitial(web_contents()));
-
-  // Proceed through the SSL interstitial.
-  content::TestNavigationObserver nav_observer(web_contents(), 1);
-  std::string javascript = "window.certificateErrorPageController.proceed();";
-  ASSERT_TRUE(content::ExecJs(web_contents(), javascript));
-  nav_observer.Wait();
-
-  // Configure an IdentityInfo for the invalid certificate.
-  PageInfoUI::IdentityInfo identity;
-  identity.identity_status = PageInfo::SITE_IDENTITY_STATUS_ERROR;
-  identity.connection_status = PageInfo::SITE_CONNECTION_STATUS_ENCRYPTED_ERROR;
-  identity.certificate = bad_https_server()->GetCertificate();
-
-  // Have the page also trigger an SB malware warning.
-  identity.safe_browsing_status = PageInfo::SAFE_BROWSING_STATUS_MALWARE;
-
-  OpenPageInfoBubble(browser());
-  SetPageInfoBubbleIdentityInfo(identity);
-
-  // Check that the reset button should not be shown. Can't use GetView()
-  // here because it will fail if the View doesn't exist, so this is a bit
-  // verbose.
-  views::Widget* page_info_bubble =
-      PageInfoBubbleView::GetPageInfoBubbleForTesting()->GetWidget();
-  EXPECT_TRUE(page_info_bubble);
-  views::View* view = page_info_bubble->GetRootView()->GetViewByID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_RESET_DECISIONS_LABEL);
-  EXPECT_FALSE(view);
 }
 
 // Navigate to an HTTP page with HTTPS-First Mode enabled and click through the

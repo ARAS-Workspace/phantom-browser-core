@@ -357,7 +357,6 @@ PageInfoUI::ChosenObjectInfo::~ChosenObjectInfo() = default;
 
 PageInfoUI::IdentityInfo::IdentityInfo()
     : identity_status(PageInfo::SITE_IDENTITY_STATUS_UNKNOWN),
-      safe_browsing_status(PageInfo::SAFE_BROWSING_STATUS_NONE),
       safety_tip_info({security_state::SafetyTipStatus::kUnknown, GURL()}),
       connection_status(PageInfo::SITE_CONNECTION_STATUS_UNKNOWN),
       show_ssl_decision_revoke_button(false) {}
@@ -369,46 +368,6 @@ PageInfoUI::PageFeatureInfo::PageFeatureInfo()
 
 std::unique_ptr<PageInfoUI::SecurityDescription>
 PageInfoUI::GetSecurityDescription(const IdentityInfo& identity_info) const {
-  switch (identity_info.safe_browsing_status) {
-    case PageInfo::SAFE_BROWSING_STATUS_NONE:
-      break;
-    case PageInfo::SAFE_BROWSING_STATUS_MALWARE:
-      return CreateSecurityDescription(SecuritySummaryColor::RED,
-                                       IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY,
-                                       IDS_PAGE_INFO_MALWARE_DETAILS,
-                                       SecurityDescriptionType::SAFE_BROWSING);
-    case PageInfo::SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING:
-      return CreateSecurityDescription(SecuritySummaryColor::RED,
-                                       IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY,
-                                       IDS_PAGE_INFO_SOCIAL_ENGINEERING_DETAILS,
-                                       SecurityDescriptionType::SAFE_BROWSING);
-    case PageInfo::SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE:
-      return CreateSecurityDescription(SecuritySummaryColor::RED,
-                                       IDS_PAGE_INFO_SAFE_BROWSING_SUMMARY,
-                                       IDS_PAGE_INFO_UNWANTED_SOFTWARE_DETAILS,
-                                       SecurityDescriptionType::SAFE_BROWSING);
-    case PageInfo::SAFE_BROWSING_STATUS_BILLING:
-      return CreateSecurityDescription(SecuritySummaryColor::RED,
-                                       IDS_PAGE_INFO_BILLING_SUMMARY,
-                                       IDS_PAGE_INFO_BILLING_DETAILS,
-                                       SecurityDescriptionType::SAFE_BROWSING);
-    case PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_WARN:
-      return CreateSecurityDescription(SecuritySummaryColor::ENTERPRISE,
-                                       IDS_PAGE_INFO_ENTERPRISE_WARN_SUMMARY,
-                                       IDS_PAGE_INFO_ENTERPRISE_WARN_DETAILS,
-                                       SecurityDescriptionType::SAFE_BROWSING);
-    case PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_BLOCK:
-      return CreateSecurityDescription(SecuritySummaryColor::ENTERPRISE,
-                                       IDS_PAGE_INFO_ENTERPRISE_BLOCK_SUMMARY,
-                                       IDS_PAGE_INFO_ENTERPRISE_BLOCK_DETAILS,
-                                       SecurityDescriptionType::SAFE_BROWSING);
-    case PageInfo::SAFE_BROWSING_STATUS_WARNABLE_SUSPICIOUS_SITE:
-      return CreateSecurityDescription(SecuritySummaryColor::RED,
-                                       IDS_PAGE_INFO_SUSPICIOUS_SITE_SUMMARY,
-                                       IDS_PAGE_INFO_SUSPICIOUS_SITE_DETAILS,
-                                       SecurityDescriptionType::SAFE_BROWSING);
-  }
-
   std::unique_ptr<SecurityDescription> safety_tip_security_desc =
       CreateSafetyTipSecurityDescription(identity_info.safety_tip_info);
   if (safety_tip_security_desc) {

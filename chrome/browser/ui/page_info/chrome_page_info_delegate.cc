@@ -47,13 +47,11 @@
 #include "components/subresource_filter/content/browser/subresource_filter_profile_context.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/navigation_controller.h"
-#include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/permission_controller.h"
 #include "content/public/browser/permission_descriptor_util.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/content_features.h"
 #include "media/base/media_switches.h"
-#include "net/base/registry_controlled_domains/registry_controlled_domain.h"
 #include "services/network/public/cpp/features.h"
 #include "third_party/blink/public/common/features.h"
 #include "ui/events/event.h"
@@ -361,38 +359,6 @@ void ChromePageInfoDelegate::OnUIClosing() {
     sentiment_service_->PageInfoClosed();
   }
 }
-
-void ChromePageInfoDelegate::OpenSafeBrowsingHelpCenterPage(
-    const ui::Event* event,
-    bool is_suspicious_site) {}
-
-void ChromePageInfoDelegate::OnSuspiciousSiteBackToSafety() {
-  if (!web_contents_) {
-    return;
-  }
-
-  auto& controller = web_contents_->GetController();
-  const GURL& current_url = web_contents_->GetLastCommittedURL();
-
-  // Find the most recent navigation entry that belongs to a different site.
-  for (int i = controller.GetLastCommittedEntryIndex() - 1; i >= 0; --i) {
-    content::NavigationEntry* entry = controller.GetEntryAtIndex(i);
-    if (entry && !entry->GetURL().is_empty() &&
-        !net::registry_controlled_domains::SameDomainOrHost(
-            current_url, entry->GetURL(),
-            net::registry_controlled_domains::INCLUDE_PRIVATE_REGISTRIES)) {
-      controller.GoToIndex(i);
-      return;
-    }
-  }
-
-  // If there is no previous entry on a different site, navigate to the New Tab
-  // Page.
-  controller.LoadURLWithParams(content::NavigationController::LoadURLParams(
-      GURL(chrome::kChromeUINewTabURL)));
-}
-
-void ChromePageInfoDelegate::OnSuspiciousSiteMarkAsSafe() {}
 
 std::u16string ChromePageInfoDelegate::GetSubjectName(const GURL& url) {
   CHECK(web_contents_);

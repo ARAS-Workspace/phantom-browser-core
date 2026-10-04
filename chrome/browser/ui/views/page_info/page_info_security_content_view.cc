@@ -55,35 +55,12 @@ void PageInfoSecurityContentView::SetIdentityInfo(
 
   const int icon_size = GetLayoutConstant(LayoutConstant::kPageInfoIconSize);
   if (security_description->summary_style == SecuritySummaryColor::RED) {
-    if (identity_info.safe_browsing_status ==
-            PageInfo::SAFE_BROWSING_STATUS_MALWARE ||
-        identity_info.safe_browsing_status ==
-            PageInfo::SAFE_BROWSING_STATUS_SOCIAL_ENGINEERING ||
-        identity_info.safe_browsing_status ==
-            PageInfo::SAFE_BROWSING_STATUS_UNWANTED_SOFTWARE) {
-      security_view_->SetIcon(ui::ImageModel::FromVectorIcon(
-          features::IsRoundedIconsEnabled() ? vector_icons::kDangerousFilledIcon
-                                            : vector_icons::kDangerousOldIcon,
-          ui::kColorAlertHighSeverity, icon_size));
-    } else {
-      security_view_->SetIcon(ui::ImageModel::FromVectorIcon(
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kWarningFilledIcon
-              : vector_icons::kNotSecureWarningOldIcon,
-          ui::kColorAlertHighSeverity, icon_size));
-    }
+    security_view_->SetIcon(ui::ImageModel::FromVectorIcon(
+        features::IsRoundedIconsEnabled()
+            ? vector_icons::kWarningFilledIcon
+            : vector_icons::kNotSecureWarningOldIcon,
+        ui::kColorAlertHighSeverity, icon_size));
     security_view_->SetSummary(security_description->summary, STYLE_RED);
-  } else if (security_description->summary_style ==
-                 SecuritySummaryColor::ENTERPRISE &&
-             (identity_info.safe_browsing_status ==
-                  PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_WARN ||
-              identity_info.safe_browsing_status ==
-                  PageInfo::SAFE_BROWSING_STATUS_MANAGED_POLICY_BLOCK)) {
-    security_view_->SetIcon(PageInfoViewFactory::GetImageModel(
-        features::IsRoundedIconsEnabled() ? vector_icons::kDomainIcon
-                                          : vector_icons::kBusinessOldIcon));
-    security_view_->SetSummary(security_description->summary,
-                               views::style::STYLE_BODY_3_MEDIUM);
   } else {
     security_view_->SetIcon(PageInfoViewFactory::GetConnectionSecureIcon());
     security_view_->SetSummary(security_description->summary,
