@@ -97,17 +97,6 @@ std::u16string GetLoudPermissionMessage(
   }
 }
 
-bool ShouldPermissionBubbleExpand(
-    permissions::PermissionPrompt::Delegate* delegate,
-    PermissionPromptStyle prompt_style) {
-  if (PermissionPromptStyle::kQuietChip == prompt_style) {
-    return !permissions::PermissionUiSelector::ShouldSuppressAnimation(
-        delegate->ReasonForUsingQuietUi());
-  }
-
-  return true;
-}
-
 }  // namespace
 
 PermissionPromptChipModel::PermissionPromptChipModel(
@@ -120,9 +109,7 @@ PermissionPromptChipModel::PermissionPromptChipModel(
     prompt_style_ = PermissionPromptStyle::kQuietChip;
     should_bubble_start_open_ = false;
     should_display_blocked_icon_ = true;
-    should_expand_ =
-        ShouldPermissionBubbleExpand(delegate_.get(), prompt_style_) &&
-        (!delegate_->WasCurrentRequestAlreadyDisplayed());
+    should_expand_ = !delegate_->WasCurrentRequestAlreadyDisplayed();
 
     chip_text_ = GetQuietPermissionMessage(delegate_.get());
     chip_theme_ = PermissionChipTheme::kLowVisibility;

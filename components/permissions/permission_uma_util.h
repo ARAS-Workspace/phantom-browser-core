@@ -15,7 +15,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/time/time.h"
-#include "base/version.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/passage_embeddings/core/passage_embeddings_types.h"
@@ -108,8 +107,7 @@ class PermissionUmaUtil {
       bool show_infobar,
       bool page_reload);
 
-  // This gets recorded during the creation process of a prompt, but only for
-  // prompts that aren't labeled as abusive or disruptive.
+  // This gets recorded during the creation process of a prompt.
   static void RecordPermissionPromptAttempt(
       const std::vector<std::unique_ptr<PermissionRequest>>& requests,
       bool can_display_prompt);
@@ -138,14 +136,8 @@ class PermissionUmaUtil {
       std::optional<permissions::PermissionIgnoredReason> ignored_reason,
       bool did_show_prompt,
       bool did_click_manage,
-      bool did_click_learn_more,
       std::optional<GeolocationAccuracy>
           initial_geolocation_accuracy_selection);
-
-  static void RecordCrowdDenyDelayedPushNotification(base::TimeDelta delay);
-
-  static void RecordCrowdDenyVersionAtAbuseCheckTime(
-      const std::optional<base::Version>& version);
 
   static void RecordElementAnchoredBubbleDismiss(
       const std::vector<std::unique_ptr<PermissionRequest>>& requests,

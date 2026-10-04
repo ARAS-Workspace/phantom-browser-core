@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/views/permissions/permission_prompt_quiet_icon.h"
 
 #include "chrome/browser/content_settings/chrome_content_settings_utils.h"
-#include "components/permissions/permission_ui_selector.h"
 #include "content/public/browser/web_contents.h"
 
 PermissionPromptQuietIcon::PermissionPromptQuietIcon(
@@ -21,10 +20,6 @@ PermissionPromptQuietIcon::~PermissionPromptQuietIcon() {
 
 permissions::PermissionPromptDisposition
 PermissionPromptQuietIcon::GetPromptDisposition() const {
-  return permissions::PermissionUiSelector::ShouldSuppressAnimation(
-             delegate()->ReasonForUsingQuietUi())
-             ? permissions::PermissionPromptDisposition::
-                   LOCATION_BAR_RIGHT_STATIC_ICON
-             : permissions::PermissionPromptDisposition::
-                   LOCATION_BAR_RIGHT_ANIMATED_ICON;
+  return permissions::PermissionPromptDisposition::
+      LOCATION_BAR_RIGHT_ANIMATED_ICON;
 }

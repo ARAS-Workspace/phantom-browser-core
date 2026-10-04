@@ -108,10 +108,6 @@ class PermissionPrompt {
     // that might trigger the current request to use the quiet UI.
     virtual bool ShouldCurrentRequestUseQuietUI() const = 0;
 
-    // If the LocationBar is not visible, there is no place to display a quiet
-    // permission prompt. Abusive prompts will be ignored.
-    virtual bool ShouldDropCurrentRequestIfCannotShowQuietly() const = 0;
-
     // Whether the current request has been shown to the user at least once.
     virtual bool WasCurrentRequestAlreadyDisplayed() = 0;
 
@@ -128,9 +124,6 @@ class PermissionPrompt {
 
     // Set when the user made any decision for manage settings.
     virtual void SetManageClicked() = 0;
-
-    // Set when the user made any decision for clicking on learn more link.
-    virtual void SetLearnMoreClicked() = 0;
 
     // HaTS surveys may display at an inconvenient time, such as when a chip
     // shown collapses after a certain timeout. To prevent affecting

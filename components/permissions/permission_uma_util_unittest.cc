@@ -303,40 +303,6 @@ TEST_F(PermissionUmaUtilTest, ScopedRevocationReporter) {
                                static_cast<int>(PermissionAction::REVOKED), 3);
 }
 
-TEST_F(PermissionUmaUtilTest, CrowdDenyVersionTest) {
-  base::HistogramTester histograms;
-
-  const std::optional<base::Version> empty_version;
-  PermissionUmaUtil::RecordCrowdDenyVersionAtAbuseCheckTime(empty_version);
-  histograms.ExpectBucketCount(
-      "Permissions.CrowdDeny.PreloadData.VersionAtAbuseCheckTime", 0, 1);
-
-  const std::optional<base::Version> valid_version =
-      base::Version({2020, 10, 11, 1234});
-  PermissionUmaUtil::RecordCrowdDenyVersionAtAbuseCheckTime(valid_version);
-  histograms.ExpectBucketCount(
-      "Permissions.CrowdDeny.PreloadData.VersionAtAbuseCheckTime", 20201011, 1);
-
-  const std::optional<base::Version> valid_old_version =
-      base::Version({2019, 10, 10, 1234});
-  PermissionUmaUtil::RecordCrowdDenyVersionAtAbuseCheckTime(valid_old_version);
-  histograms.ExpectBucketCount(
-      "Permissions.CrowdDeny.PreloadData.VersionAtAbuseCheckTime", 1, 1);
-
-  const std::optional<base::Version> valid_future_version =
-      base::Version({2021, 1, 1, 1234});
-  PermissionUmaUtil::RecordCrowdDenyVersionAtAbuseCheckTime(
-      valid_future_version);
-  histograms.ExpectBucketCount(
-      "Permissions.CrowdDeny.PreloadData.VersionAtAbuseCheckTime", 20210101, 1);
-
-  const std::optional<base::Version> invalid_version =
-      base::Version({2020, 10, 11});
-  PermissionUmaUtil::RecordCrowdDenyVersionAtAbuseCheckTime(valid_version);
-  histograms.ExpectBucketCount(
-      "Permissions.CrowdDeny.PreloadData.VersionAtAbuseCheckTime", 1, 1);
-}
-
 TEST_F(PermissionUmaUtilTest, GeolocationPermissionPromptResolved) {
   base::test::ScopedFeatureList enable_approximate_location{
       content_settings::features::kApproximateGeolocationPermission};
@@ -372,7 +338,6 @@ TEST_F(PermissionUmaUtilTest, GeolocationPermissionPromptResolved) {
         /*variants=*/{},
         /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
         /*did_click_manage=*/false,
-        /*did_click_learn_more=*/false,
         /*initial_geolocation_accuracy_selection=*/std::nullopt);
     histograms.ExpectUniqueSample(
         base::StrCat(
@@ -410,7 +375,6 @@ TEST_F(PermissionsDelegationUmaUtilTest, UsageAndPromptInTopLevelFrame) {
       /*variants=*/{},
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
       /*did_click_manage=*/false,
-      /*did_click_learn_more=*/false,
       /*initial_geolocation_accuracy_selection=*/std::nullopt);
   histograms.ExpectTotalCount(kGeolocationPermissionsPolicyActionHistogramName,
                               0);
@@ -811,7 +775,6 @@ TEST_F(PermissionsDelegationUmaUtilTest, SiteLevelAndOSPromptVariantsTest) {
       /*ui_reason=*/std::nullopt, variants,
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/true,
       /*did_click_manage=*/false,
-      /*did_click_learn_more=*/false,
       /*initial_geolocation_accuracy_selection=*/std::nullopt);
 
   const auto entries = ukm_recorder.GetEntriesByName("Permission");
@@ -857,7 +820,6 @@ TEST_F(PermissionsDelegationUmaUtilTest, SameOriginFrame) {
       /*variants=*/{},
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
       /*did_click_manage=*/false,
-      /*did_click_learn_more=*/false,
       /*initial_geolocation_accuracy_selection=*/std::nullopt);
   histograms.ExpectTotalCount(kGeolocationPermissionsPolicyActionHistogramName,
                               0);
@@ -1024,7 +986,6 @@ TEST_P(CrossFramePermissionsDelegationUmaUtilTest, CrossOriginFrame) {
       /*variants=*/{},
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
       /*did_click_manage=*/false,
-      /*did_click_learn_more=*/false,
       /*initial_geolocation_accuracy_selection=*/std::nullopt);
   if (feature.has_value()) {
     EXPECT_THAT(
@@ -1237,11 +1198,29 @@ TEST_P(PredictionServiceActionTest, PredictionServiceAction) {
       /*ignored_reason=*/std::nullopt,
       /*did_show_prompt=*/false,
       /*did_click_manage=*/false,
-      /*did_click_learn_more=*/false,
       /*initial_geolocation_accuracy_selection=*/std::nullopt);
 
   histogram_tester.ExpectUniqueSample(GetParam().histogram_name.Run(),
                                       GetParam().action, 1);
+
+  // DidClickManage is recorded for the quiet chip only; no disposition
+  // records DidClickLearnMore.
+  size_t manage_histogram_count = 0;
+  size_t learn_more_histogram_count = 0;
+  for (const auto& histogram :
+       histogram_tester.GetTotalCountsForPrefix("Permissions.Prompt.")) {
+    if (histogram.first.ends_with(".DidClickManage")) {
+      ++manage_histogram_count;
+    } else if (histogram.first.ends_with(".DidClickLearnMore")) {
+      ++learn_more_histogram_count;
+    }
+  }
+  EXPECT_EQ(GetParam().disposition ==
+                    PermissionPromptDisposition::LOCATION_BAR_LEFT_QUIET_CHIP
+                ? 1u
+                : 0u,
+            manage_histogram_count);
+  EXPECT_EQ(0u, learn_more_histogram_count);
 }
 
 namespace {

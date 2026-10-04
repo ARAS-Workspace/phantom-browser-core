@@ -73,7 +73,6 @@ class TestDelegateTwoOrigins : public permissions::PermissionPrompt::Delegate {
   void OpenHelpCenterLink(const ui::Event& event) override {}
   void PreIgnoreQuietPrompt() override {}
   void SetManageClicked() override {}
-  void SetLearnMoreClicked() override {}
   void SetHatsShownCallback(base::OnceCallback<void()> callback) override {}
   void SwitchToLoudPrompt() override {}
 
@@ -83,9 +82,6 @@ class TestDelegateTwoOrigins : public permissions::PermissionPrompt::Delegate {
   }
 
   bool WasCurrentRequestAlreadyDisplayed() override { return false; }
-  bool ShouldDropCurrentRequestIfCannotShowQuietly() const override {
-    return false;
-  }
   bool ShouldCurrentRequestUseQuietUI() const override { return false; }
   std::optional<permissions::PermissionUiSelector::QuietUiReason>
   ReasonForUsingQuietUi() const override {

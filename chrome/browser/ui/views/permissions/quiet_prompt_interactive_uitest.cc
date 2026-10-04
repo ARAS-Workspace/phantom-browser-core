@@ -163,8 +163,7 @@ class QuietPromptInteractiveUITest : public InteractiveBrowserTest {
 IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
                        CPSSv3Notification1DenyRequestChipTest) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   permissions::PermissionActionsHistory* permission_actions_history =
       GetPermissionActionsHistory();
 
@@ -191,8 +190,7 @@ IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
 IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
                        CPSSv3Notification1DenyPromptTest) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   permissions::PermissionActionsHistory* permission_actions_history =
       GetPermissionActionsHistory();
 
@@ -223,8 +221,7 @@ IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
 IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
                        CPSSv3Notification5DeniesPromptTest) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   permissions::PermissionActionsHistory* permission_actions_history =
       GetPermissionActionsHistory();
 
@@ -257,8 +254,7 @@ IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
 IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
                        CPSSv3Geolocation1DenyRequestChipTest) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   permissions::PermissionActionsHistory* permission_actions_history =
       GetPermissionActionsHistory();
 
@@ -285,8 +281,7 @@ IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
 IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
                        CPSSv3Geolocation1DenyPromptTest) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   permissions::PermissionActionsHistory* permission_actions_history =
       GetPermissionActionsHistory();
 
@@ -317,8 +312,7 @@ IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
 IN_PROC_BROWSER_TEST_F(QuietPromptInteractiveUITest,
                        CPSSv3Geolocation5DeniesPromptTest) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   permissions::PermissionActionsHistory* permission_actions_history =
       GetPermissionActionsHistory();
 
@@ -390,8 +384,7 @@ INSTANTIATE_TEST_SUITE_P(
 IN_PROC_BROWSER_TEST_P(QuietPromptInteractiveParamUITest,
                        AllowQuietPromptAndMaybeShowInfobar) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
 
   auto [test_name, js, should_show] = GetParam();
 

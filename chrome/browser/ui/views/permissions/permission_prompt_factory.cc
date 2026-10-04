@@ -52,28 +52,6 @@ BrowserWindowInterface* GetBrowser(content::WebContents* web_contents) {
   return browser_window_interface;
 }
 
-bool IsFullScreenMode(content::WebContents* web_contents) {
-  BrowserWindowInterface* browser = GetBrowser(web_contents);
-  if (!browser) {
-    return false;
-  }
-
-  // PWA uses the title bar as a substitute for LocationBarView.
-  if (web_app::AppBrowserController::IsWebApp(browser)) {
-    return false;
-  }
-
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
-  if (!browser_view) {
-    return false;
-  }
-
-  LocationBar* location_bar = browser_view->GetLocationBar();
-
-  return !location_bar || !location_bar->IsDrawn() ||
-         location_bar->IsFullscreen();
-}
-
 LocationBar* GetLocationBar(content::WebContents* web_contents) {
   BrowserWindowInterface* browser = GetBrowser(web_contents);
   if (!browser) {
@@ -248,8 +226,7 @@ std::unique_ptr<permissions::PermissionPrompt> CreateQuietPrompt(
       return std::make_unique<PermissionPromptChip>(web_contents, delegate);
     } else {
       // If LocationBar is not displayed (Fullscreen mode), display a default
-      // bubble only for non-abusive origins.
-      DCHECK(!delegate->ShouldDropCurrentRequestIfCannotShowQuietly());
+      // bubble.
       return std::make_unique<PermissionPromptBubble>(web_contents, delegate);
     }
   } else {
@@ -262,11 +239,6 @@ std::unique_ptr<permissions::PermissionPrompt> CreateQuietPrompt(
 std::unique_ptr<permissions::PermissionPrompt> CreatePermissionPrompt(
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate) {
-  if (delegate->ShouldDropCurrentRequestIfCannotShowQuietly() &&
-      IsFullScreenMode(web_contents)) {
-    return nullptr;
-  }
-
   if (ShouldIgnorePermissionRequest(web_contents, delegate)) {
     return nullptr;
   }

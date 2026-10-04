@@ -66,12 +66,6 @@ std::u16string GetDoneButtonText(
              : l10n_util::GetStringUTF16(IDS_SETTINGS_GOT_IT);
 }
 
-std::u16string GetCancelButtonText(
-    const ContentSettingBubbleModel::BubbleContent& content) {
-  return content.is_user_modifiable ? content.cancel_button_text
-                                    : std::u16string();
-}
-
 ui::ImageModel GetSiteSettingsIcon() {
   return ui::ImageModel::FromVectorIcon(
       features::IsRoundedIconsEnabled()
@@ -357,12 +351,7 @@ ContentSettingBubbleContents::ContentSettingBubbleContents(
 
   const std::u16string& done_text =
       GetDoneButtonText(content_setting_bubble_model_->bubble_content());
-  const std::u16string& cancel_text =
-      GetCancelButtonText(content_setting_bubble_model_->bubble_content());
-  SetButtons(cancel_text.empty()
-                 ? static_cast<int>(ui::mojom::DialogButton::kOk)
-                 : static_cast<int>(ui::mojom::DialogButton::kOk) |
-                       static_cast<int>(ui::mojom::DialogButton::kCancel));
+  SetButtons(static_cast<int>(ui::mojom::DialogButton::kOk));
   SetButtonLabel(
       ui::mojom::DialogButton::kOk,
       done_text.empty() ? l10n_util::GetStringUTF16(IDS_DONE) : done_text);
@@ -370,13 +359,6 @@ ContentSettingBubbleContents::ContentSettingBubbleContents(
   SetAcceptCallback(
       base::BindOnce(&ContentSettingBubbleModel::OnDoneButtonClicked,
                      base::Unretained(content_setting_bubble_model_.get())));
-
-  if (!cancel_text.empty()) {
-    SetButtonLabel(ui::mojom::DialogButton::kCancel, cancel_text);
-    SetCancelCallback(
-        base::BindOnce(&ContentSettingBubbleModel::OnCancelButtonClicked,
-                       base::Unretained(content_setting_bubble_model_.get())));
-  }
 
   set_fixed_width(views::LayoutProvider::Get()->GetDistanceMetric(
       views::DISTANCE_BUBBLE_PREFERRED_WIDTH));

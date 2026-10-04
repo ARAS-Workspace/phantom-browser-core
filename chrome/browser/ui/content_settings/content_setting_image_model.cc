@@ -1297,13 +1297,7 @@ bool ContentSettingNotificationsImageModel::UpdateAndGetVisibility(
 
   // |manager| may be null in tests.
   SetIcon(ContentSettingsType::NOTIFICATIONS, /*blocked=*/false);
-  if (permissions::PermissionUiSelector::ShouldSuppressAnimation(
-          manager->ReasonForUsingQuietUi())) {
-    set_accessibility_string_id(IDS_NOTIFICATIONS_OFF_EXPLANATORY_TEXT);
-    set_explanatory_string_id(0);
-  } else {
-    set_explanatory_string_id(IDS_NOTIFICATIONS_OFF_EXPLANATORY_TEXT);
-  }
+  set_explanatory_string_id(IDS_NOTIFICATIONS_OFF_EXPLANATORY_TEXT);
   return true;
 }
 

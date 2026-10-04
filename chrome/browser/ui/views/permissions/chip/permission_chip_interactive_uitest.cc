@@ -760,8 +760,7 @@ IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
   for (QuietUiReason reason :
        {QuietUiReason::kEnabledInPrefs,
         QuietUiReason::kServicePredictedVeryUnlikelyGrant}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
+    SetCannedUiDecision(Decision::UseQuietUi(reason));
 
     RequestPermission(permissions::RequestType::kNotifications);
 
@@ -794,8 +793,7 @@ IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
   for (QuietUiReason reason :
        {QuietUiReason::kEnabledInPrefs,
         QuietUiReason::kServicePredictedVeryUnlikelyGrant}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
+    SetCannedUiDecision(Decision::UseQuietUi(reason));
 
     RequestPermission(permissions::RequestType::kNotifications);
 
@@ -831,213 +829,11 @@ IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
 }
 
 IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
-                       PermissionIgnoredQuietChipAbusiveUmaTest) {
-  base::HistogramTester histograms;
-
-  for (QuietUiReason reason : {QuietUiReason::kTriggeredByCrowdDeny,
-                               QuietUiReason::kTriggeredDueToAbusiveRequests,
-                               QuietUiReason::kTriggeredDueToAbusiveContent}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
-
-    RequestPermission(permissions::RequestType::kNotifications);
-
-    ASSERT_EQ(
-        test_api_->manager()->current_request_prompt_disposition_for_testing(),
-        permissions::PermissionPromptDisposition::
-            LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
-
-    ClickOnChip(GetChip());
-
-    test_api_->manager()->Ignore(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
-  }
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "Ignored."
-      "DidShowBubble",
-      static_cast<int>(true), 3);
-
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "Ignored.DidClickLearnMore",
-      static_cast<int>(false), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
-                       PermissionGrantedQuietChipAbusiveUmaTest) {
-  base::HistogramTester histograms;
-
-  for (QuietUiReason reason : {QuietUiReason::kTriggeredByCrowdDeny,
-                               QuietUiReason::kTriggeredDueToAbusiveRequests,
-                               QuietUiReason::kTriggeredDueToAbusiveContent}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
-
-    RequestPermission(permissions::RequestType::kNotifications);
-
-    ASSERT_EQ(
-        test_api_->manager()->current_request_prompt_disposition_for_testing(),
-        permissions::PermissionPromptDisposition::
-            LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
-
-    ClickOnChip(GetChip());
-
-    test_api_->manager()->Accept(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
-  }
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "Accepted.DidClickLearnMore",
-      static_cast<int>(false), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
-                       PermissionGrantedOnceQuietChipAbusiveUmaTest) {
-  base::HistogramTester histograms;
-
-  for (QuietUiReason reason : {QuietUiReason::kTriggeredByCrowdDeny,
-                               QuietUiReason::kTriggeredDueToAbusiveRequests,
-                               QuietUiReason::kTriggeredDueToAbusiveContent}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
-
-    RequestPermission(permissions::RequestType::kNotifications);
-
-    ASSERT_EQ(
-        test_api_->manager()->current_request_prompt_disposition_for_testing(),
-        permissions::PermissionPromptDisposition::
-            LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
-
-    ClickOnChip(GetChip());
-
-    test_api_->manager()->AcceptThisTime(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
-  }
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "AcceptedOnce.DidClickLearnMore",
-      static_cast<int>(false), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
-                       PermissionDeniedOnceQuietChipAbusiveUmaTest) {
-  base::HistogramTester histograms;
-
-  for (QuietUiReason reason : {QuietUiReason::kTriggeredByCrowdDeny,
-                               QuietUiReason::kTriggeredDueToAbusiveRequests,
-                               QuietUiReason::kTriggeredDueToAbusiveContent}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
-
-    RequestPermission(permissions::RequestType::kNotifications);
-
-    ASSERT_EQ(
-        test_api_->manager()->current_request_prompt_disposition_for_testing(),
-        permissions::PermissionPromptDisposition::
-            LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
-
-    ClickOnChip(GetChip());
-
-    test_api_->manager()->Deny(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
-  }
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "Denied.DidClickLearnMore",
-      static_cast<int>(false), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
-                       PermissionDismissedOnceQuietChipAbusiveUmaTest) {
-  base::HistogramTester histograms;
-
-  for (QuietUiReason reason : {QuietUiReason::kTriggeredByCrowdDeny,
-                               QuietUiReason::kTriggeredDueToAbusiveRequests,
-                               QuietUiReason::kTriggeredDueToAbusiveContent}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
-
-    RequestPermission(permissions::RequestType::kNotifications);
-
-    ASSERT_EQ(
-        test_api_->manager()->current_request_prompt_disposition_for_testing(),
-        permissions::PermissionPromptDisposition::
-            LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
-
-    ClickOnChip(GetChip());
-
-    test_api_->manager()->Dismiss(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
-  }
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "Dismissed.DidClickLearnMore",
-      static_cast<int>(false), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
-                       QuietChipAbusiveClickLearnMoreUmaTest) {
-  base::HistogramTester histograms;
-
-  for (QuietUiReason reason : {QuietUiReason::kTriggeredByCrowdDeny,
-                               QuietUiReason::kTriggeredDueToAbusiveRequests,
-                               QuietUiReason::kTriggeredDueToAbusiveContent}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
-
-    RequestPermission(permissions::RequestType::kNotifications);
-
-    ASSERT_EQ(
-        test_api_->manager()->current_request_prompt_disposition_for_testing(),
-        permissions::PermissionPromptDisposition::
-            LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
-
-    ClickOnChip(GetChip());
-
-    views::View* bubble_view =
-        GetChipController()->get_prompt_bubble_view_for_testing();
-    ContentSettingBubbleContents* permission_prompt_bubble =
-        static_cast<ContentSettingBubbleContents*>(bubble_view);
-
-    ASSERT_TRUE(permission_prompt_bubble != nullptr);
-
-    permission_prompt_bubble->learn_more_button_clicked_for_test();
-
-    test_api_->manager()->Ignore(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
-  }
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "Ignored."
-      "DidShowBubble",
-      static_cast<int>(true), 3);
-
-  histograms.ExpectBucketCount(
-      "Permissions.Prompt.Notifications.LocationBarLeftQuietAbusiveChip."
-      "Ignored.DidClickLearnMore",
-      static_cast<int>(true), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(QuietChipAutoPopupBubbleInteractiveTest,
                        QuietChipAutoPopupBubbleEnabled) {
   ASSERT_TRUE(
       base::FeatureList::IsEnabled(features::kQuietNotificationPrompts));
 
-  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                           Decision::ShowNoWarning()));
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
 
   RequestPermission(permissions::RequestType::kCameraStream);
 
@@ -1181,8 +977,7 @@ IN_PROC_BROWSER_TEST_F(QuietChipFailFastInteractiveTest,
                        EventListenerAddedTest) {
   base::HistogramTester histograms;
 
-  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                           Decision::ShowNoWarning()));
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
 
   ASSERT_TRUE(embedded_test_server()->Start());
   const GURL url(embedded_test_server()->GetURL("/title1.html"));

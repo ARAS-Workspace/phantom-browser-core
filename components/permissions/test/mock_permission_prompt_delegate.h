@@ -49,10 +49,6 @@ class MockPermissionPromptDelegate : public PermissionPrompt::Delegate {
               (),
               (const, override));
   MOCK_METHOD(bool, ShouldCurrentRequestUseQuietUI, (), (const, override));
-  MOCK_METHOD(bool,
-              ShouldDropCurrentRequestIfCannotShowQuietly,
-              (),
-              (const, override));
   MOCK_METHOD(std::optional<GeolocationPromptType>,
               GetGeolocationPromptType,
               (),
@@ -62,7 +58,6 @@ class MockPermissionPromptDelegate : public PermissionPrompt::Delegate {
   MOCK_METHOD(void, SetPromptShown, (), (override));
   MOCK_METHOD(void, SetDecisionTime, (), (override));
   MOCK_METHOD(void, SetManageClicked, (), (override));
-  MOCK_METHOD(void, SetLearnMoreClicked, (), (override));
   MOCK_METHOD(void,
               SetHatsShownCallback,
               (base::OnceCallback<void()>),

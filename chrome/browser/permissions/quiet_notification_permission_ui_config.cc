@@ -22,33 +22,6 @@ const char QuietNotificationPermissionUiConfig::
         "adaptive_activation_windows_size_in_days";
 
 // static
-const char QuietNotificationPermissionUiConfig::kEnableCrowdDenyTriggering[] =
-    "enable_crowd_deny_triggering";
-
-// static
-const char QuietNotificationPermissionUiConfig::kCrowdDenyHoldBackChance[] =
-    "crowd_deny_hold_back_chance";
-
-// static
-const char
-    QuietNotificationPermissionUiConfig::kEnableAbusiveRequestBlocking[] =
-        "enable_abusive_request_triggering";
-
-// static
-const char QuietNotificationPermissionUiConfig::kEnableAbusiveRequestWarning[] =
-    "enable_abusive_request_warning";
-
-// static
-const char QuietNotificationPermissionUiConfig::
-    kEnableAbusiveContentTriggeredRequestBlocking[] =
-        "enable_abusive_content_triggering";
-
-// static
-const char QuietNotificationPermissionUiConfig::
-    kEnableAbusiveContentTriggeredRequestWarning[] =
-        "enable_abusive_content_warning";
-
-// static
 const char QuietNotificationPermissionUiConfig::kMiniInfobarExpandLinkText[] =
     "mini_infobar_expand_link_text";
 
@@ -84,68 +57,10 @@ QuietNotificationPermissionUiConfig::GetAdaptiveActivationWindowSize() {
 }
 
 // static
-bool QuietNotificationPermissionUiConfig::IsCrowdDenyTriggeringEnabled() {
-  if (!base::FeatureList::IsEnabled(features::kQuietNotificationPrompts))
-    return false;
-
-  return base::GetFieldTrialParamByFeatureAsBool(
-      features::kQuietNotificationPrompts, kEnableCrowdDenyTriggering,
-      true /* default */);
-}
-
-// static
-double QuietNotificationPermissionUiConfig::GetCrowdDenyHoldBackChance() {
-  return base::GetFieldTrialParamByFeatureAsDouble(
-      features::kQuietNotificationPrompts, kCrowdDenyHoldBackChance, 0.3);
-}
-
-// static
 QuietNotificationPermissionUiConfig::InfobarLinkTextVariation
 QuietNotificationPermissionUiConfig::GetMiniInfobarExpandLinkText() {
   return base::GetFieldTrialParamByFeatureAsInt(
              features::kQuietNotificationPrompts, kMiniInfobarExpandLinkText, 0)
              ? InfobarLinkTextVariation::kManage
              : InfobarLinkTextVariation::kDetails;
-}
-
-// static
-bool QuietNotificationPermissionUiConfig::IsAbusiveRequestBlockingEnabled() {
-  if (!base::FeatureList::IsEnabled(features::kQuietNotificationPrompts))
-    return false;
-
-  return base::GetFieldTrialParamByFeatureAsBool(
-      features::kQuietNotificationPrompts, kEnableAbusiveRequestBlocking,
-      true /* default */);
-}
-
-// static
-bool QuietNotificationPermissionUiConfig::IsAbusiveRequestWarningEnabled() {
-  if (!base::FeatureList::IsEnabled(features::kQuietNotificationPrompts))
-    return false;
-
-  return base::GetFieldTrialParamByFeatureAsBool(
-      features::kQuietNotificationPrompts, kEnableAbusiveRequestWarning,
-      true /* default */);
-}
-
-// static
-bool QuietNotificationPermissionUiConfig::
-    IsAbusiveContentTriggeredRequestBlockingEnabled() {
-  if (!base::FeatureList::IsEnabled(features::kQuietNotificationPrompts))
-    return false;
-
-  return base::GetFieldTrialParamByFeatureAsBool(
-      features::kQuietNotificationPrompts,
-      kEnableAbusiveContentTriggeredRequestBlocking, true /* default */);
-}
-
-// static
-bool QuietNotificationPermissionUiConfig::
-    IsAbusiveContentTriggeredRequestWarningEnabled() {
-  if (!base::FeatureList::IsEnabled(features::kQuietNotificationPrompts))
-    return false;
-
-  return base::GetFieldTrialParamByFeatureAsBool(
-      features::kQuietNotificationPrompts,
-      kEnableAbusiveContentTriggeredRequestWarning, true /* default */);
 }

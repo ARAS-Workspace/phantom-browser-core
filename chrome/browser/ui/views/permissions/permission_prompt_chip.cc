@@ -74,12 +74,8 @@ bool PermissionPromptChip::UpdateAnchor() {
 permissions::PermissionPromptDisposition
 PermissionPromptChip::GetPromptDisposition() const {
   if (delegate()->ShouldCurrentRequestUseQuietUI()) {
-    return permissions::PermissionUiSelector::ShouldSuppressAnimation(
-               delegate()->ReasonForUsingQuietUi())
-               ? permissions::PermissionPromptDisposition::
-                     LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP
-               : permissions::PermissionPromptDisposition::
-                     LOCATION_BAR_LEFT_QUIET_CHIP;
+    return permissions::PermissionPromptDisposition::
+        LOCATION_BAR_LEFT_QUIET_CHIP;
   }
 
   return permissions::PermissionPromptDisposition::

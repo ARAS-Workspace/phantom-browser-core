@@ -66,38 +66,6 @@
 
 namespace permissions {
 
-const char kAbusiveNotificationRequestsEnforcementMessage[] =
-    "Chrome is blocking notification permission requests on this site because "
-    "the site tends to show permission requests that mislead, trick, or force "
-    "users into allowing notifications. You should fix the issues as soon as "
-    "possible and submit your site for another review. Learn more at "
-    "https://support.google.com/webtools/answer/9799048.";
-
-const char kAbusiveNotificationRequestsWarningMessage[] =
-    "Chrome might start blocking notification permission requests on this site "
-    "in the future because the site tends to show permission requests that "
-    "mislead, trick, or force users into allowing notifications. You should "
-    "fix the issues as soon as possible and submit your site for another "
-    "review. Learn more at https://support.google.com/webtools/answer/9799048.";
-
-constexpr char kAbusiveNotificationContentEnforcementMessage[] =
-    "Chrome is blocking notification permission requests on this site because "
-    "the site tends to show notifications with content that mislead or trick "
-    "users. You should fix the issues as soon as possible and submit your site "
-    "for another review. Learn more at "
-    "https://support.google.com/webtools/answer/9799048";
-
-constexpr char kAbusiveNotificationContentWarningMessage[] =
-    "Chrome might start blocking notification permission requests on this site "
-    "in the future because the site tends to show notifications with content "
-    "that mislead or trick users. You should fix the issues as soon as "
-    "possible and submit your site for another review. Learn more at "
-    "https://support.google.com/webtools/answer/9799048";
-
-constexpr char kDisruptiveNotificationBehaviorEnforcementMessage[] =
-    "Chrome is blocking notification permission requests on this site because "
-    "the site exhibits behaviors that may be disruptive to users.";
-
 const char kGestureGatedNotificationMessage[] =
     "The Notification permission request was suppressed and shown as a quiet "
     "prompt because it was requested without a user gesture. Users are more "
@@ -851,10 +819,6 @@ void PermissionRequestManager::SetManageClicked() {
   set_manage_clicked();
 }
 
-void PermissionRequestManager::SetLearnMoreClicked() {
-  set_learn_more_clicked();
-}
-
 base::WeakPtr<PermissionPrompt::Delegate>
 PermissionRequestManager::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
@@ -885,15 +849,11 @@ bool PermissionRequestManager::RecreateView() {
   if (!view_) {
     current_request_prompt_disposition_ =
         PermissionPromptDisposition::NONE_VISIBLE;
-    if (ShouldDropCurrentRequestIfCannotShowQuietly()) {
-      CurrentRequestsDecided(PermissionAction::IGNORED,
-                             /*prompt_options=*/std::monostate());
-      // Use `ShouldCurrentRequestUsePermissionElementSecondaryUI` to also
-      // include allowlisted surfaces.
-    } else if (PermissionUtil::
-                   ShouldCurrentRequestUsePermissionElementSecondaryUI(
-                       this, web_contents()) ||
-               IsCurrentRequestExclusiveAccess()) {
+    // Use `ShouldCurrentRequestUsePermissionElementSecondaryUI` to also
+    // include allowlisted surfaces.
+    if (PermissionUtil::ShouldCurrentRequestUsePermissionElementSecondaryUI(
+            this, web_contents()) ||
+        IsCurrentRequestExclusiveAccess()) {
       Ignore(/*prompt_options=*/std::monostate());
     }
     NotifyPromptRecreateFailed();
@@ -1087,8 +1047,7 @@ void PermissionRequestManager::DequeueRequestIfNeeded() {
                  kPermissionsGestureGatedPromptsMuteGeolocation.Get())) {
           current_request_ui_to_use_ =
               PermissionUiSelector::Decision::UseQuietUi(
-                  QuietUiReason::kTriggeredDueToLackOfGesture,
-                  PermissionUiSelector::Decision::ShowNoWarning());
+                  QuietUiReason::kTriggeredDueToLackOfGesture);
           ShowPrompt();
           return;
         }
@@ -1199,19 +1158,8 @@ void PermissionRequestManager::ShowPrompt() {
     if (quiet_ui_reason) {
       switch (*quiet_ui_reason) {
         case QuietUiReason::kEnabledInPrefs:
-        case QuietUiReason::kTriggeredByCrowdDeny:
         case QuietUiReason::kServicePredictedVeryUnlikelyGrant:
         case QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant:
-          break;
-        case QuietUiReason::kTriggeredDueToAbusiveRequests:
-          LogWarningToConsole(kAbusiveNotificationRequestsEnforcementMessage);
-          break;
-        case QuietUiReason::kTriggeredDueToAbusiveContent:
-          LogWarningToConsole(kAbusiveNotificationContentEnforcementMessage);
-          break;
-        case QuietUiReason::kTriggeredDueToDisruptiveBehavior:
-          LogWarningToConsole(
-              kDisruptiveNotificationBehaviorEnforcementMessage);
           break;
         case QuietUiReason::kTriggeredDueToLackOfGesture:
           if (requests_[0]->request_type() == RequestType::kNotifications) {
@@ -1290,7 +1238,6 @@ void PermissionRequestManager::ResetViewStateForCurrentRequest() {
   should_dismiss_current_request_ = false;
   did_show_prompt_ = false;
   did_click_manage_ = false;
-  did_click_learn_more_ = false;
   hats_shown_callback_.reset();
   current_request_pepc_prompt_position_.reset();
   current_requests_initial_statuses_.clear();
@@ -1341,7 +1288,6 @@ void PermissionRequestManager::CurrentRequestsDecided(
         DetermineCurrentRequestUIDispositionReasonForUMA(),
         view_ ? std::optional(view_->GetPromptVariants()) : std::nullopt,
         ignore_reason, did_show_prompt_, did_click_manage_,
-        did_click_learn_more_,
         requests_[0]->GetContentSettingsType() ==
                 ContentSettingsType::GEOLOCATION_WITH_OPTIONS
             ? std::make_optional<GeolocationAccuracy>(
@@ -1612,27 +1558,6 @@ void PermissionRequestManager::RestorePrompt() {
   }
 }
 
-bool PermissionRequestManager::ShouldDropCurrentRequestIfCannotShowQuietly()
-    const {
-  std::optional<QuietUiReason> quiet_ui_reason = ReasonForUsingQuietUi();
-  if (quiet_ui_reason.has_value()) {
-    switch (quiet_ui_reason.value()) {
-      case QuietUiReason::kEnabledInPrefs:
-      case QuietUiReason::kServicePredictedVeryUnlikelyGrant:
-      case QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant:
-      case QuietUiReason::kTriggeredByCrowdDeny:
-      case QuietUiReason::kTriggeredDueToLackOfGesture:
-        return false;
-      case QuietUiReason::kTriggeredDueToAbusiveRequests:
-      case QuietUiReason::kTriggeredDueToAbusiveContent:
-      case QuietUiReason::kTriggeredDueToDisruptiveBehavior:
-        return true;
-    }
-  }
-
-  return false;
-}
-
 void PermissionRequestManager::NotifyTabActiveChanged(bool is_active) {
   for (Observer& observer : observer_list_) {
     observer.OnTabActiveChanged(is_active);
@@ -1716,8 +1641,7 @@ PermissionRequestManager::TakePermissionUiDecisionIfReady() {
     }
   }
   // If all selectors are done and none was conclusive, show a normal UI.
-  return UiDecision::UseNormalUi(UiDecision::ShowNoWarning(),
-                                 first_selected_geolocation_accuracy);
+  return UiDecision::UseNormalUi(first_selected_geolocation_accuracy);
 }
 
 void PermissionRequestManager::OnPermissionUiSelectorDone(
@@ -1726,19 +1650,6 @@ void PermissionRequestManager::OnPermissionUiSelectorDone(
   if (current_request_ui_to_use_.has_value()) {
     // We have already made a decision - nothing to do.
     return;
-  }
-
-  if (decision.warning_reason) {
-    switch (*(decision.warning_reason)) {
-      case WarningReason::kAbusiveRequests:
-        LogWarningToConsole(kAbusiveNotificationRequestsWarningMessage);
-        break;
-      case WarningReason::kAbusiveContent:
-        LogWarningToConsole(kAbusiveNotificationContentWarningMessage);
-        break;
-      case WarningReason::kDisruptiveBehavior:
-        break;
-    }
   }
 
   CHECK_LT(selector_index, selector_decisions_.size());
@@ -1753,8 +1664,7 @@ void PermissionRequestManager::OnPermissionUiSelectorDone(
 
 void PermissionRequestManager::SwitchToLoudPrompt() {
   current_request_ui_to_use_ =
-      UiDecision::UseNormalUi(UiDecision::ShowNoWarning(),
-                              current_request_ui_to_use_->geolocation_accuracy);
+      UiDecision::UseNormalUi(current_request_ui_to_use_->geolocation_accuracy);
   view_.reset();
   ShowPrompt();
 }
@@ -1776,11 +1686,6 @@ PermissionRequestManager::DetermineCurrentRequestUIDispositionReasonForUMA() {
   switch (*quiet_ui_reason) {
     case QuietUiReason::kEnabledInPrefs:
       return PermissionPromptDispositionReason::USER_PREFERENCE_IN_SETTINGS;
-    case QuietUiReason::kTriggeredByCrowdDeny:
-    case QuietUiReason::kTriggeredDueToAbusiveRequests:
-    case QuietUiReason::kTriggeredDueToAbusiveContent:
-    case QuietUiReason::kTriggeredDueToDisruptiveBehavior:
-      return PermissionPromptDispositionReason::SAFE_BROWSING_VERDICT;
     case QuietUiReason::kServicePredictedVeryUnlikelyGrant:
       return PermissionPromptDispositionReason::PREDICTION_SERVICE;
     case QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant:

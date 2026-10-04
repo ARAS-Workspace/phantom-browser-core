@@ -551,8 +551,7 @@ IN_PROC_BROWSER_TEST_F(LHSIndicatorsInteractiveUITest,
 IN_PROC_BROWSER_TEST_F(LHSIndicatorsInteractiveUITest,
                        InvokeUi_NotificationsRequest_VeryUnlikelyGrant) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   RequestPermission(permissions::RequestType::kNotifications);
   ShowAndVerifyUi();
 }
@@ -561,35 +560,7 @@ IN_PROC_BROWSER_TEST_F(
     LHSIndicatorsInteractiveUITest,
     InvokeUi_NotificationsRequest_VeryUnlikelyGrant_Confirmation) {
   SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-                           Decision::ShowNoWarning()));
-  RequestPermission(permissions::RequestType::kNotifications);
-  GetLocationBarView(browser())->GetChipController()->DoNotCollapseForTesting();
-
-  test_api()->manager()->Accept(/*prompt_options=*/std::monostate());
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(GetLocationBarView(browser())
-                  ->GetChipController()
-                  ->is_confirmation_showing());
-
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(LHSIndicatorsInteractiveUITest,
-                       InvokeUi_NotificationsRequest_AbusiveRequests) {
-  SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
-                           Decision::ShowNoWarning()));
-  RequestPermission(permissions::RequestType::kNotifications);
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(
-    LHSIndicatorsInteractiveUITest,
-    InvokeUi_NotificationsRequest_AbusiveRequests_Confirmation) {
-  SetCannedUiDecision(
-      Decision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
-                           Decision::ShowNoWarning()));
+      Decision::UseQuietUi(QuietUiReason::kServicePredictedVeryUnlikelyGrant));
   RequestPermission(permissions::RequestType::kNotifications);
   GetLocationBarView(browser())->GetChipController()->DoNotCollapseForTesting();
 
@@ -604,8 +575,7 @@ IN_PROC_BROWSER_TEST_F(
 
 IN_PROC_BROWSER_TEST_F(LHSIndicatorsInteractiveUITest,
                        InvokeUi_NotificationsRequest_EnabledInPrefs) {
-  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                           Decision::ShowNoWarning()));
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
   RequestPermission(permissions::RequestType::kNotifications);
   ShowAndVerifyUi();
 }
@@ -613,8 +583,7 @@ IN_PROC_BROWSER_TEST_F(LHSIndicatorsInteractiveUITest,
 IN_PROC_BROWSER_TEST_F(
     LHSIndicatorsInteractiveUITest,
     InvokeUi_NotificationsRequest_EnabledInPrefs_Confirmation) {
-  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                           Decision::ShowNoWarning()));
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
   RequestPermission(permissions::RequestType::kNotifications);
   GetLocationBarView(browser())->GetChipController()->DoNotCollapseForTesting();
 

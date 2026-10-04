@@ -63,11 +63,6 @@ class ContentSettingBubbleContents : public content::WebContentsObserver,
     content_setting_bubble_model_->OnManageButtonClicked();
   }
 
-  void learn_more_button_clicked_for_test() {
-    content_setting_bubble_model_->is_UMA_for_test = true;
-    content_setting_bubble_model_->OnLearnMoreClicked();
-  }
-
   std::u16string get_message_for_test() const {
     return content_setting_bubble_model_->bubble_content().message;
   }

@@ -16,17 +16,10 @@ std::string_view ToString(
   static constexpr auto map =
       base::MakeFixedFlatMap<QuietUiReason, std::string_view>(
           {{QuietUiReason::kEnabledInPrefs, "EnabledInPrefs"},
-           {QuietUiReason::kTriggeredByCrowdDeny, "TriggeredByCrowdDeny"},
            {QuietUiReason::kServicePredictedVeryUnlikelyGrant,
             "ServicePredictedVeryUnlikelyGrant"},
            {QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant,
-            "OnDevicePredictedVeryUnlikelyGrant"},
-           {QuietUiReason::kTriggeredDueToAbusiveRequests,
-            "TriggeredDueToAbusiveRequests"},
-           {QuietUiReason::kTriggeredDueToAbusiveContent,
-            "TriggeredDueToAbusiveContent"},
-           {QuietUiReason::kTriggeredDueToDisruptiveBehavior,
-            "TriggeredDueToDisruptiveBehavior"}});
+            "OnDevicePredictedVeryUnlikelyGrant"}});
 
   auto it = map.find(ui_reason);
   return (it == map.end()) ? "Unknown" : it->second;

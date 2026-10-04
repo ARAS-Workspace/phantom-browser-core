@@ -33,11 +33,6 @@ bool TestPermissionBubbleViewDelegate::ShouldCurrentRequestUseQuietUI() const {
   return false;
 }
 
-bool TestPermissionBubbleViewDelegate::
-    ShouldDropCurrentRequestIfCannotShowQuietly() const {
-  return false;
-}
-
 bool TestPermissionBubbleViewDelegate::WasCurrentRequestAlreadyDisplayed() {
   return false;
 }

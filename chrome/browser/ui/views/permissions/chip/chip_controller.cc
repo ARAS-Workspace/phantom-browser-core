@@ -787,8 +787,8 @@ void ChipController::StartDismissTimer() {
   dismiss_timer_.Start(FROM_HERE,
                        permission_prompt_model_->ShouldExpand()
                            ? base::Seconds(6)
-                           // Abusive origins do not support expand animation,
-                           // hence the dismiss timer should be longer.
+                           // A quiet prompt that was already displayed does
+                           // not expand, hence the longer dismiss timer.
                            : base::Seconds(18),
                        this, &ChipController::OnPromptExpired);
 }

@@ -1747,45 +1747,6 @@ ContentSettingQuietRequestBubbleModel::ContentSettingQuietRequestBubbleModel(
       base::RecordAction(
           base::UserMetricsAction("Notifications.Quiet.AnimatedIconClicked"));
       break;
-    case QuietUiReason::kTriggeredByCrowdDeny:
-      DCHECK_EQ(request_type, permissions::RequestType::kNotifications);
-      set_message(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_CROWD_DENY_DESCRIPTION));
-      set_done_button_text(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_ALLOW_BUTTON));
-      set_show_learn_more(false);
-      base::RecordAction(
-          base::UserMetricsAction("Notifications.Quiet.StaticIconClicked"));
-      break;
-    case QuietUiReason::kTriggeredDueToAbusiveRequests:
-    case QuietUiReason::kTriggeredDueToAbusiveContent:
-      DCHECK_EQ(request_type, permissions::RequestType::kNotifications);
-      set_message(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_ABUSIVE_DESCRIPTION));
-      // TODO(crbug.com/40131070): It is rather confusing to have the `Cancel`
-      // button allow the permission, but we want the primary to block.
-      set_cancel_button_text(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_COMPACT_ALLOW_BUTTON));
-      set_done_button_text(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_CONTINUE_BLOCKING_BUTTON));
-      set_show_learn_more(true);
-      set_manage_text_style(ManageTextStyle::kNone);
-      base::RecordAction(
-          base::UserMetricsAction("Notifications.Quiet.StaticIconClicked"));
-      break;
-    case QuietUiReason::kTriggeredDueToDisruptiveBehavior:
-      DCHECK_EQ(request_type, permissions::RequestType::kNotifications);
-      set_message(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_DISRUPTIVE_DESCRIPTION));
-      set_cancel_button_text(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_COMPACT_ALLOW_BUTTON));
-      set_done_button_text(l10n_util::GetStringUTF16(
-          IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_CONTINUE_BLOCKING_BUTTON));
-      set_show_learn_more(true);
-      set_manage_text_style(ManageTextStyle::kNone);
-      base::RecordAction(
-          base::UserMetricsAction("Notifications.Quiet.StaticIconClicked"));
-      break;
     case QuietUiReason::kServicePredictedVeryUnlikelyGrant:
     case QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant:
     // TODO(crbug.com/412962300) use custom string
@@ -1853,29 +1814,6 @@ void ContentSettingQuietRequestBubbleModel::OnManageButtonClicked() {
   }
 }
 
-void ContentSettingQuietRequestBubbleModel::OnLearnMoreClicked() {
-  permissions::PermissionRequestManager* manager =
-      permissions::PermissionRequestManager::FromWebContents(web_contents());
-  manager->set_learn_more_clicked();
-  if (is_UMA_for_test) {
-    // `delegate()->ShowLearnMorePage` opens a new tab. It is not needed for UMA
-    // tests.
-    return;
-  }
-
-  if (delegate()) {
-    // We only show learn more button for Notification quiet ui dialog when it
-    // is triggered due to abusive requests or contents. We don't have any learn
-    // more button for the geolocation quiet ui dialogs.
-    DCHECK_EQ(
-        permissions::PermissionRequestManager::FromWebContents(web_contents())
-            ->Requests()[0]
-            ->request_type(),
-        permissions::RequestType::kNotifications);
-    delegate()->ShowLearnMorePage(ContentSettingsType::NOTIFICATIONS);
-  }
-}
-
 void ContentSettingQuietRequestBubbleModel::OnDoneButtonClicked() {
   permissions::PermissionRequestManager* manager =
       permissions::PermissionRequestManager::FromWebContents(web_contents());
@@ -1897,45 +1835,9 @@ void ContentSettingQuietRequestBubbleModel::OnDoneButtonClicked() {
   switch (*quiet_ui_reason) {
     case QuietUiReason::kEnabledInPrefs:
     case QuietUiReason::kTriggeredDueToLackOfGesture:
-    case QuietUiReason::kTriggeredByCrowdDeny:
     case QuietUiReason::kServicePredictedVeryUnlikelyGrant:
     case QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant:
       manager->Accept(/*prompt_options=*/std::monostate());
-      break;
-    case QuietUiReason::kTriggeredDueToAbusiveRequests:
-    case QuietUiReason::kTriggeredDueToAbusiveContent:
-    case QuietUiReason::kTriggeredDueToDisruptiveBehavior:
-      manager->Deny(/*prompt_options=*/std::monostate());
-      base::RecordAction(base::UserMetricsAction(
-          "Notifications.Quiet.ContinueBlockingClicked"));
-      break;
-  }
-}
-
-void ContentSettingQuietRequestBubbleModel::OnCancelButtonClicked() {
-  permissions::PermissionRequestManager* manager =
-      permissions::PermissionRequestManager::FromWebContents(web_contents());
-
-  auto quiet_ui_reason = manager->ReasonForUsingQuietUi();
-  if (!quiet_ui_reason) {
-    return;
-  }
-  switch (*quiet_ui_reason) {
-    case QuietUiReason::kEnabledInPrefs:
-    case QuietUiReason::kTriggeredDueToLackOfGesture:
-    case QuietUiReason::kTriggeredByCrowdDeny:
-    case QuietUiReason::kServicePredictedVeryUnlikelyGrant:
-    case QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant:
-      // No-op.
-      break;
-    case QuietUiReason::kTriggeredDueToAbusiveRequests:
-    case QuietUiReason::kTriggeredDueToAbusiveContent:
-    case QuietUiReason::kTriggeredDueToDisruptiveBehavior:
-      CHECK_EQ(manager->Requests()[0]->request_type(),
-               permissions::RequestType::kNotifications);
-      manager->Accept(/*prompt_options=*/std::monostate());
-      base::RecordAction(
-          base::UserMetricsAction("Notifications.Quiet.ShowForSiteClicked"));
       break;
   }
 }

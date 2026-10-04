@@ -122,7 +122,6 @@ class PermissionChipKombuchaInteractiveUITest : public InteractiveBrowserTest {
 
  protected:
   using QuietUiReason = permissions::PermissionUiSelector::QuietUiReason;
-  using WarningReason = permissions::PermissionUiSelector::WarningReason;
   using Decision = permissions::PermissionUiSelector::Decision;
 
   void SetCannedUiDecision(const Decision& decision) {
@@ -165,8 +164,7 @@ IN_PROC_BROWSER_TEST_F(PermissionChipKombuchaInteractiveUITest,
 // request will be dismissed and the chip will be hidden.
 IN_PROC_BROWSER_TEST_F(PermissionChipKombuchaInteractiveUITest,
                        QuietPermissionChipClickTest) {
-  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                           Decision::ShowNoWarning()));
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
 
   RunTestSequence(
       InstrumentTab(kWebContentsElementId),
@@ -179,40 +177,6 @@ IN_PROC_BROWSER_TEST_F(PermissionChipKombuchaInteractiveUITest,
       SetOnIncompatibleAction(OnIncompatibleAction::kIgnoreAndContinue,
                               "Screenshot not supported in all test modes."),
       Screenshot(kLocationBarView, "QuietNotificationsRequestChip", "7633407"),
-      // There is no auto-popup bubble for the quiet chip.
-      EnsureNotPresent(ContentSettingBubbleContents::kMainElementId),
-      // The first click - open a permission prompt popup bubble.
-      PressButton(PermissionChipView::kPermissionRequestChipElementId),
-      WaitForShow(ContentSettingBubbleContents::kMainElementId),
-      // The second click - hide the permission prompt popup bubble and dismiss
-      // a permission request.
-      PressButton(PermissionChipView::kPermissionRequestChipElementId),
-      WaitForHide(ContentSettingBubbleContents::kMainElementId),
-      // The permission chip is hidden because the permission request was
-      // dismissed instantly after a click.
-      EnsureNotPresent(PermissionChipView::kPermissionRequestChipElementId),
-      EnsureNotPresent(PermissionChipView::kIndicatorChipElementId));
-}
-
-// Tests that after the second click on the quietest permission chip a
-// permission request will be dismissed and the chip will be hidden.
-IN_PROC_BROWSER_TEST_F(PermissionChipKombuchaInteractiveUITest,
-                       QuietestPermissionChipClickTest) {
-  SetCannedUiDecision(Decision::UseQuietUi(
-      QuietUiReason::kTriggeredDueToAbusiveContent, Decision::ShowNoWarning()));
-
-  RunTestSequence(
-      InstrumentTab(kWebContentsElementId),
-      NavigateWebContents(kWebContentsElementId, GetURL()),
-      ExecuteJs(kWebContentsElementId, "requestNotification"),
-      // Make sure the request chip is visible.
-      WaitForShow(PermissionChipView::kPermissionRequestChipElementId),
-      CheckChipIsRequest(true),
-      NameView(kLocationBarView, GetLocationBarView()),
-      SetOnIncompatibleAction(OnIncompatibleAction::kIgnoreAndContinue,
-                              "Screenshot not supported in all test modes."),
-      Screenshot(kLocationBarView, "QuietestNotificationsRequestChip",
-                 "7633407"),
       // There is no auto-popup bubble for the quiet chip.
       EnsureNotPresent(ContentSettingBubbleContents::kMainElementId),
       // The first click - open a permission prompt popup bubble.

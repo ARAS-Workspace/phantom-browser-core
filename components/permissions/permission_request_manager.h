@@ -55,23 +55,6 @@ enum class PermissionAction;
 enum class PermissionPromptDisposition;
 enum class PermissionPromptDispositionReason;
 
-// The message to be printed in the Developer Tools console when the quiet
-// notification permission prompt UI is shown on sites with abusive permission
-// request flows.
-extern const char kAbusiveNotificationRequestsEnforcementMessage[];
-
-// The message to be printed in the Developer Tools console when the site is on
-// the warning list for abusive permission request flows.
-extern const char kAbusiveNotificationRequestsWarningMessage[];
-
-// The message to be printed in the Developer Tools console when the site is on
-// the blocking list for showing abusive notification content.
-extern const char kAbusiveNotificationContentEnforcementMessage[];
-
-// The message to be printed in the Developer Tools console when the site is on
-// the warning list for showing abusive notification content.
-extern const char kAbusiveNotificationContentWarningMessage[];
-
 // The message to be printed in the Developer Tools console when the
 // Notification permission request was suppressed and shown as a quiet prompt
 // because it was not initiated with a user gesture.
@@ -128,7 +111,6 @@ class PermissionRequestManager
 
   using UiDecision = PermissionUiSelector::Decision;
   using QuietUiReason = PermissionUiSelector::QuietUiReason;
-  using WarningReason = PermissionUiSelector::WarningReason;
 
   ~PermissionRequestManager() override;
 
@@ -199,7 +181,6 @@ class PermissionRequestManager
   void OpenHelpCenterLink(const ui::Event& event) override;
   void PreIgnoreQuietPrompt() override;
   bool WasCurrentRequestAlreadyDisplayed() override;
-  bool ShouldDropCurrentRequestIfCannotShowQuietly() const override;
   bool ShouldCurrentRequestUseQuietUI() const override;
   std::optional<PermissionUiSelector::QuietUiReason> ReasonForUsingQuietUi()
       const override;
@@ -210,7 +191,6 @@ class PermissionRequestManager
       const override;
   void SetDecisionTime() override;
   void SetManageClicked() override;
-  void SetLearnMoreClicked() override;
   base::WeakPtr<PermissionPrompt::Delegate> GetWeakPtr() override;
   content::WebContents* GetAssociatedWebContents() override;
   bool RecreateView() override;
@@ -225,7 +205,6 @@ class PermissionRequestManager
   std::optional<gfx::Rect> GetPromptBubbleViewBoundsInScreen() const;
 
   void set_manage_clicked() { did_click_manage_ = true; }
-  void set_learn_more_clicked() { did_click_learn_more_ = true; }
 
   void set_web_contents_supports_permission_requests(
       bool web_contents_supports_permission_requests) {
@@ -636,8 +615,6 @@ class PermissionRequestManager
   base::Time current_request_decision_time_;
 
   bool did_click_manage_ = false;
-
-  bool did_click_learn_more_ = false;
 
   // Whether the current request can be preempted or not. This is set when
   // callbacks are being issued to prevent potential re-entrant behavior of

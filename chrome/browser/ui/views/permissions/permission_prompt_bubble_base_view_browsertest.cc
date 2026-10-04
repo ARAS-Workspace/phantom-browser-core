@@ -594,45 +594,44 @@ IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
-                       QuietChipIsShownForAbusiveRequests) {
-  for (QuietUiReason reason : {QuietUiReason::kTriggeredByCrowdDeny,
-                               QuietUiReason::kTriggeredDueToAbusiveRequests,
-                               QuietUiReason::kTriggeredDueToAbusiveContent}) {
-    SetCannedUiDecision(
-        Decision::UseQuietUi(reason, Decision::ShowNoWarning()));
+                       QuietChipIsShownForQuietRequests) {
+  base::HistogramTester histogram_tester;
+  SetCannedUiDecision(Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
 
-    ShowUi("camera");
+  ShowUi("camera");
 
-    EXPECT_EQ(GetTestApi()
-                  .manager()
-                  ->current_request_prompt_disposition_for_testing(),
-              permissions::PermissionPromptDisposition::
-                  LOCATION_BAR_LEFT_CHIP_AUTO_BUBBLE);
+  EXPECT_EQ(
+      GetTestApi().manager()->current_request_prompt_disposition_for_testing(),
+      permissions::PermissionPromptDisposition::
+          LOCATION_BAR_LEFT_CHIP_AUTO_BUBBLE);
 
-    GetTestApi().manager()->Accept(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
+  GetTestApi().manager()->Accept(/*prompt_options=*/std::monostate());
+  base::RunLoop().RunUntilIdle();
 
-    ShowUi("geolocation");
+  ShowUi("geolocation");
 
-    EXPECT_EQ(GetTestApi()
-                  .manager()
-                  ->current_request_prompt_disposition_for_testing(),
-              permissions::PermissionPromptDisposition::
-                  LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
+  EXPECT_EQ(
+      GetTestApi().manager()->current_request_prompt_disposition_for_testing(),
+      permissions::PermissionPromptDisposition::LOCATION_BAR_LEFT_QUIET_CHIP);
 
-    GetTestApi().manager()->Accept(/*prompt_options=*/std::monostate());
-    base::RunLoop().RunUntilIdle();
+  GetTestApi().manager()->Accept(/*prompt_options=*/std::monostate());
+  base::RunLoop().RunUntilIdle();
 
-    ShowUi("notifications");
+  ShowUi("notifications");
 
-    // Quiet Chip is enabled, that means a quiet chip will be shown even if the
-    // Chip experiment is disabled.
-    EXPECT_EQ(GetTestApi()
-                  .manager()
-                  ->current_request_prompt_disposition_for_testing(),
-              permissions::PermissionPromptDisposition::
-                  LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP);
-  }
+  // Quiet Chip is enabled, that means a quiet chip will be shown even if the
+  // Chip experiment is disabled.
+  EXPECT_EQ(
+      GetTestApi().manager()->current_request_prompt_disposition_for_testing(),
+      permissions::PermissionPromptDisposition::LOCATION_BAR_LEFT_QUIET_CHIP);
+
+  GetTestApi().manager()->Accept(/*prompt_options=*/std::monostate());
+  base::RunLoop().RunUntilIdle();
+
+  histogram_tester.ExpectBucketCount(
+      "Permissions.Prompt.Notifications.LocationBarLeftQuietChip.Accepted."
+      "DidClickManage",
+      false, 1);
 }
 
 class LongOriginPermissionPromptBubbleBaseViewBrowserTest

@@ -25,7 +25,6 @@ namespace {
 using testing::DoAll;
 
 using QuietUiReason = PrefBasedQuietPermissionUiSelector::QuietUiReason;
-using WarningReason = PrefBasedQuietPermissionUiSelector::WarningReason;
 using Decision = PrefBasedQuietPermissionUiSelector::Decision;
 
 ACTION_P(QuitMessageLoop, loop) {
@@ -97,6 +96,5 @@ TEST_F(PrefBasedQuietPermissionUiSelectorTest, FeatureAndPrefCombinations) {
 
     // Check expectations.
     EXPECT_EQ(test_case.expected_reason, actual_decision.quiet_ui_reason);
-    EXPECT_EQ(Decision::ShowNoWarning(), actual_decision.warning_reason);
   }
 }

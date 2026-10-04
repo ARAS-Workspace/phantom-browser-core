@@ -981,7 +981,6 @@ class PermissionRequestManagerQuietUiBrowserTest
  protected:
   using UiDecision = permissions::PermissionUiSelector::Decision;
   using QuietUiReason = permissions::PermissionUiSelector::QuietUiReason;
-  using WarningReason = permissions::PermissionUiSelector::WarningReason;
 
   MockPermissionUiSelector* SetUiSelectorWithCannedDecision(
       const UiDecision& decision) {
@@ -1031,8 +1030,7 @@ IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
 IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
                        PermissionPromptDisposition) {
   SetUiSelectorWithCannedDecision(
-      UiDecision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveContent,
-                             WarningReason::kAbusiveContent));
+      UiDecision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
 
   auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
   auto request_quiet = std::make_unique<permissions::MockPermissionRequest>(
@@ -1058,8 +1056,7 @@ IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
 IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
                        PermissionPromptDispositionHidden) {
   SetUiSelectorWithCannedDecision(
-      UiDecision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveContent,
-                             WarningReason::kAbusiveContent));
+      UiDecision::UseQuietUi(QuietUiReason::kEnabledInPrefs));
 
   ASSERT_TRUE(embedded_test_server()->Start());
 
@@ -1103,22 +1100,7 @@ IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
     const char* expected_message;
   } kTestCases[] = {
       {UiDecision::UseNormalUiAndShowNoWarning(), nullptr},
-      {UiDecision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                              UiDecision::ShowNoWarning()),
-       nullptr},
-      {UiDecision::UseQuietUi(QuietUiReason::kTriggeredByCrowdDeny,
-                              UiDecision::ShowNoWarning()),
-       nullptr},
-      {UiDecision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveRequests,
-                              UiDecision::ShowNoWarning()),
-       permissions::kAbusiveNotificationRequestsEnforcementMessage},
-      {UiDecision::UseNormalUi(WarningReason::kAbusiveRequests),
-       permissions::kAbusiveNotificationRequestsWarningMessage},
-      {UiDecision::UseQuietUi(QuietUiReason::kTriggeredDueToAbusiveContent,
-                              UiDecision::ShowNoWarning()),
-       permissions::kAbusiveNotificationContentEnforcementMessage},
-      {UiDecision::UseNormalUi(WarningReason::kAbusiveContent),
-       permissions::kAbusiveNotificationContentWarningMessage},
+      {UiDecision::UseQuietUi(QuietUiReason::kEnabledInPrefs), nullptr},
   };
 
   constexpr char kCounterVerificationPattern[] = "NOTHING";

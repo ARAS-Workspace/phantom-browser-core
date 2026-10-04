@@ -91,8 +91,7 @@ class LocationBarViewQuietNotificationInteractiveUITest
         std::make_unique<MockPermissionUiSelector>(
             permissions::PermissionUiSelector::Decision::UseQuietUi(
                 permissions::PermissionUiSelector::QuietUiReason::
-                    kEnabledInPrefs,
-                std::nullopt)));
+                    kEnabledInPrefs)));
   }
 
  private:

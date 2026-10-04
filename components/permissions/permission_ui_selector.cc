@@ -8,33 +8,10 @@
 
 namespace permissions {
 
-// static
-bool PermissionUiSelector::ShouldSuppressAnimation(
-    std::optional<QuietUiReason> reason) {
-  if (!reason) {
-    return true;
-  }
-
-  switch (*reason) {
-    case QuietUiReason::kEnabledInPrefs:
-    case QuietUiReason::kServicePredictedVeryUnlikelyGrant:
-    case QuietUiReason::kOnDevicePredictedVeryUnlikelyGrant:
-    case QuietUiReason::kTriggeredDueToLackOfGesture:
-      return false;
-    case QuietUiReason::kTriggeredByCrowdDeny:
-    case QuietUiReason::kTriggeredDueToAbusiveRequests:
-    case QuietUiReason::kTriggeredDueToAbusiveContent:
-    case QuietUiReason::kTriggeredDueToDisruptiveBehavior:
-      return true;
-  }
-}
-
 PermissionUiSelector::Decision::Decision(
     std::optional<QuietUiReason> quiet_ui_reason,
-    std::optional<WarningReason> warning_reason,
     GeolocationAccuracy geolocation_accuracy)
     : quiet_ui_reason(quiet_ui_reason),
-      warning_reason(warning_reason),
       geolocation_accuracy(geolocation_accuracy) {}
 PermissionUiSelector::Decision::~Decision() = default;
 
@@ -48,22 +25,19 @@ bool PermissionUiSelector::Decision::operator==(const Decision&) const =
 // static
 PermissionUiSelector::Decision
 PermissionUiSelector::Decision::UseNormalUiAndShowNoWarning() {
-  return Decision::UseNormalUi(std::nullopt);
+  return Decision::UseNormalUi();
 }
 
 // static
 PermissionUiSelector::Decision PermissionUiSelector::Decision::UseNormalUi(
-    std::optional<WarningReason> warning_reason,
     GeolocationAccuracy geolocation_accuracy) {
-  return Decision(std::nullopt, warning_reason, geolocation_accuracy);
+  return Decision(std::nullopt, geolocation_accuracy);
 }
 
 // static
 PermissionUiSelector::Decision PermissionUiSelector::Decision::UseQuietUi(
-    QuietUiReason quiet_ui_reason,
-    std::optional<WarningReason> warning_reason) {
-  return Decision(quiet_ui_reason, warning_reason,
-                  GeolocationAccuracy::kUnspecified);
+    QuietUiReason quiet_ui_reason) {
+  return Decision(quiet_ui_reason, GeolocationAccuracy::kUnspecified);
 }
 
 }  // namespace permissions

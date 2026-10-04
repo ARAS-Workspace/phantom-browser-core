@@ -19,11 +19,6 @@ namespace {
 // icon bubble.
 constexpr char kInsecureScriptHelpUrl[] =
     "https://support.google.com/chrome/?p=unauthenticated";
-
-// The URL for when the user clicks the "Learn more" on the quiet notification
-// permission prompt.
-constexpr char kNotificationsHelpUrl[] =
-    "https://support.google.com/chrome/answer/3220216";
 }  // namespace
 
 BrowserContentSettingBubbleModelDelegate::
@@ -65,9 +60,6 @@ void BrowserContentSettingBubbleModelDelegate::ShowLearnMorePage(
       break;
     case ContentSettingsType::MIXEDSCRIPT:
       learn_more_url = GURL(kInsecureScriptHelpUrl);
-      break;
-    case ContentSettingsType::NOTIFICATIONS:
-      learn_more_url = GURL(kNotificationsHelpUrl);
       break;
     default:
       return;

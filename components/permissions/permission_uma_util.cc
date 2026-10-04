@@ -533,40 +533,6 @@ void RecordElementAnchoredPermissionPromptActionUkm(
   builder.Record(ukm::UkmRecorder::Get());
 }
 
-// |full_version| represented in the format `YYYY.M.D.m`, where m is the
-// minute-of-day. Return int represented in the format `YYYYMMDD`.
-// CrowdDeny versions published before 2020 will be reported as 1.
-// Returns 0 if no version available.
-// Returns 1 if a version has invalid format.
-int ConvertCrowdDenyVersionToInt(const std::optional<base::Version>& version) {
-  if (!version.has_value() || !version.value().IsValid()) {
-    return 0;
-  }
-
-  const std::vector<uint32_t>& full_version = version.value().components();
-  if (full_version.size() != 4) {
-    return 1;
-  }
-
-  const int kCrowdDenyMinYearLimit = 2020;
-  const int year = base::checked_cast<int>(full_version.at(0));
-  if (year < kCrowdDenyMinYearLimit) {
-    return 1;
-  }
-
-  const int month = base::checked_cast<int>(full_version.at(1));
-  const int day = base::checked_cast<int>(full_version.at(2));
-
-  int short_version = year;
-
-  short_version *= 100;
-  short_version += month;
-  short_version *= 100;
-  short_version += day;
-
-  return short_version;
-}
-
 void RecordTopLevelPermissionsHeaderPolicy(
     ContentSettingsType content_settings_type,
     const std::string& histogram,
@@ -998,7 +964,6 @@ void PermissionUmaUtil::PermissionPromptResolved(
     std::optional<permissions::PermissionIgnoredReason> ignored_reason,
     bool did_show_prompt,
     bool did_click_managed,
-    bool did_click_learn_more,
     std::optional<GeolocationAccuracy> initial_geolocation_accuracy_selection) {
   switch (permission_action) {
     case PermissionAction::GRANTED:
@@ -1112,15 +1077,6 @@ void PermissionUmaUtil::PermissionPromptResolved(
                         permission_disposition, ".", action_string,
                         ".DidClickManage"}),
           did_click_managed);
-    } else if (ui_disposition == PermissionPromptDisposition::
-                                     LOCATION_BAR_LEFT_QUIET_ABUSIVE_CHIP ||
-               ui_disposition == PermissionPromptDisposition::MESSAGE_UI ||
-               ui_disposition == PermissionPromptDisposition::MINI_INFOBAR) {
-      base::UmaHistogramBoolean(
-          base::StrCat({"Permissions.Prompt.", permission_type, ".",
-                        permission_disposition, ".", action_string,
-                        ".DidClickLearnMore"}),
-          did_click_learn_more);
     }
   }
 
@@ -1164,19 +1120,6 @@ void PermissionUmaUtil::RecordPermissionPromptPriorCount(
       prefix + PermissionUtil::GetPermissionString(permission), 1, 100, 50,
       base::HistogramBase::kUmaTargetedHistogramFlag)
       ->Add(count);
-}
-
-void PermissionUmaUtil::RecordCrowdDenyDelayedPushNotification(
-    base::TimeDelta delay) {
-  base::UmaHistogramTimes(
-      "Permissions.CrowdDeny.PreloadData.DelayedPushNotification", delay);
-}
-
-void PermissionUmaUtil::RecordCrowdDenyVersionAtAbuseCheckTime(
-    const std::optional<base::Version>& version) {
-  base::UmaHistogramSparse(
-      "Permissions.CrowdDeny.PreloadData.VersionAtAbuseCheckTime",
-      ConvertCrowdDenyVersionToInt(version));
 }
 
 void PermissionUmaUtil::RecordMissingPermissionInfobarShouldShow(

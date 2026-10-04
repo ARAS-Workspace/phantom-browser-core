@@ -47,14 +47,12 @@ class TestPermissionBubbleViewDelegate
   void OpenHelpCenterLink(const ui::Event& event) override {}
   void PreIgnoreQuietPrompt() override {}
   void SetManageClicked() override {}
-  void SetLearnMoreClicked() override {}
   void SetHatsShownCallback(base::OnceCallback<void()> callback) override {}
   void SwitchToLoudPrompt() override {}
 
   std::optional<permissions::PermissionUiSelector::QuietUiReason>
   ReasonForUsingQuietUi() const override;
   bool ShouldCurrentRequestUseQuietUI() const override;
-  bool ShouldDropCurrentRequestIfCannotShowQuietly() const override;
   bool WasCurrentRequestAlreadyDisplayed() override;
   void SetDismissOnTabClose() override {}
   void SetPromptShown() override {}

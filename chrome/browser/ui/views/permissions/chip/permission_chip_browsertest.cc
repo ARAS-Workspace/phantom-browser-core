@@ -183,7 +183,6 @@ class MockPermissionRequestManager
 
   void OpenHelpCenterLink(const ui::Event& event) override {}
   void SetManageClicked() override { requests_.clear(); }
-  void SetLearnMoreClicked() override { requests_.clear(); }
   void SetHatsShownCallback(base::OnceCallback<void()> callback) override {}
 
   bool RecreateView() override { return false; }
@@ -193,9 +192,6 @@ class MockPermissionRequestManager
 
   bool WasCurrentRequestAlreadyDisplayed() override {
     return was_current_request_already_displayed_;
-  }
-  bool ShouldDropCurrentRequestIfCannotShowQuietly() const override {
-    return false;
   }
   bool ShouldCurrentRequestUseQuietUI() const override {
     return quiet_ui_reason_.has_value();
@@ -617,48 +613,6 @@ IN_PROC_BROWSER_TEST_P(QuietUiPreignoreTest,
   delegate.ClearRequests();
 }
 
-class QuietUiAbusiveRequestsTest
-    : public PermissionPromiseLifetimeModulationTest,
-      public testing::WithParamInterface<QuietUiReasonsTestCase> {};
-
-INSTANTIATE_TEST_SUITE_P(
-    TestCases,
-    QuietUiAbusiveRequestsTest,
-    Combine(Values(permissions::RequestType::kNotifications),
-            Values(QuietUiReason::kTriggeredDueToAbusiveRequests,
-                   QuietUiReason::kTriggeredDueToAbusiveContent,
-                   QuietUiReason::kTriggeredDueToDisruptiveBehavior)),
-    /*name_generator=*/
-    TestNameGenerator<QuietUiAbusiveRequestsTest::ParamType>);
-
-IN_PROC_BROWSER_TEST_P(QuietUiAbusiveRequestsTest, GetsDenied) {
-  auto [request_type, quiet_ui_reason] = GetParam();
-  InfoBarObserver infobar_observer(web_contents_);
-
-  auto& delegate = *test::MockPermissionRequestManager::CreateForWebContents(
-      GURL("https://test.origin"), {request_type}, true, quiet_ui_reason,
-      web_contents_);
-
-  EXPECT_CALL(delegate, PreIgnoreQuietPrompt()).WillOnce([&delegate]() {
-    return delegate.PermissionRequestManager::PreIgnoreQuietPrompt();
-  });
-  PermissionPromptChip chip_prompt(web_contents_, &delegate);
-  ChipController* chip_controller =
-      chip_prompt.get_chip_controller_for_testing();
-
-  // Open a permission popup bubble.
-  ClickOnChip(chip_controller);
-  ASSERT_TRUE(chip_controller->IsBubbleShowing());
-
-  EXPECT_CALL(delegate, Deny(_)).WillOnce([&delegate]() {
-    delegate.ClearRequests();
-  });
-
-  EXPECT_TRUE(delegate.IsRequestInProgress());
-  ClickOnAcceptPermissionRequestQuietChip(chip_controller);
-  EXPECT_FALSE(delegate.IsRequestInProgress());
-}
-
 class QuietUiNonAbusiveRequestsTest
     : public PermissionPromiseLifetimeModulationTest,
       public testing::WithParamInterface<QuietUiReasonsTestCase> {};
@@ -689,6 +643,17 @@ IN_PROC_BROWSER_TEST_P(QuietUiNonAbusiveRequestsTest, GetsAccepted) {
   // Open a permission popup bubble.
   ClickOnChip(chip_controller);
   ASSERT_TRUE(chip_controller->IsBubbleShowing());
+
+  // The quiet bubble offers a single "Allow" button.
+  ContentSettingBubbleContents* bubble =
+      chip_controller->GetContentSettingBubbleContentsForTesting();
+  ASSERT_NE(bubble, nullptr);
+  EXPECT_EQ(static_cast<int>(ui::mojom::DialogButton::kOk),
+            bubble->AsDialogDelegate()->buttons());
+  EXPECT_EQ(l10n_util::GetStringUTF16(
+                IDS_NOTIFICATIONS_QUIET_PERMISSION_BUBBLE_ALLOW_BUTTON),
+            bubble->AsDialogDelegate()->GetDialogButtonLabel(
+                ui::mojom::DialogButton::kOk));
 
   EXPECT_CALL(delegate, Accept(_)).WillOnce([&delegate]() {
     delegate.ClearRequests();

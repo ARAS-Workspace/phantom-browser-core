@@ -217,8 +217,6 @@ NOTIFICATIONS permission requests.
 A quiet UI prompt can be triggered if any of these conditions are met:
 
 *   The user has enabled quiet prompts in settings.
-*   The site requesting the permissions is marked by Safe Browsing as having a
-    bad reputation.
 
 The
 [PrefBasedQuietPermissionUiSelector][PrefBasedQuietPermissionUiSelector]

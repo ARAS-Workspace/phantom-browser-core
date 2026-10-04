@@ -1048,8 +1048,8 @@ TEST_F(PermissionRequestManagerTest,
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   MockPermissionRequest::MockPermissionRequestState request_camera_state;
@@ -1072,14 +1072,11 @@ TEST_F(PermissionRequestManagerTest, UiSelectorUsedForNotifications) {
     Decision decision;
     std::optional<base::TimeDelta> async_delay;
   } kTests[] = {
-      {Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                            Decision::ShowNoWarning()),
+      {Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
        std::make_optional<base::TimeDelta>()},
       {Decision::UseNormalUiAndShowNoWarning(),
        std::make_optional<base::TimeDelta>()},
-      {Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                            Decision::ShowNoWarning()),
-       std::nullopt},
+      {Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs), std::nullopt},
       {Decision::UseNormalUiAndShowNoWarning(), std::nullopt},
   };
 
@@ -1122,8 +1119,7 @@ TEST_F(PermissionRequestManagerTest, UiSelectorUsedForGeolocation) {
     GeolocationAccuracy expected_accuracy;
   } kTests[] = {
       {
-          Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                               Decision::ShowNoWarning()),
+          Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
           std::make_optional<base::TimeDelta>(),
           GeolocationAccuracy::kPrecise,
       },
@@ -1133,8 +1129,7 @@ TEST_F(PermissionRequestManagerTest, UiSelectorUsedForGeolocation) {
           GeolocationAccuracy::kPrecise,
       },
       {
-          Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                               Decision::ShowNoWarning()),
+          Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
           std::nullopt,
           GeolocationAccuracy::kPrecise,
       },
@@ -1145,14 +1140,12 @@ TEST_F(PermissionRequestManagerTest, UiSelectorUsedForGeolocation) {
       },
       {
           Decision::UseNormalUi(
-              Decision::ShowNoWarning(),
               PermissionUiSelector::GeolocationAccuracy::kApproximate),
           std::nullopt,
           GeolocationAccuracy::kApproximate,
       },
       {
           Decision::UseNormalUi(
-              Decision::ShowNoWarning(),
               PermissionUiSelector::GeolocationAccuracy::kPrecise),
           std::nullopt,
           GeolocationAccuracy::kPrecise,
@@ -1192,6 +1185,12 @@ TEST_F(PermissionRequestManagerTest, UiSelectorUsedForGeolocation) {
     EXPECT_EQ(*ukm_recorder.GetEntryMetric(
                   entry, "InitialGeolocationAccuracySelection"),
               static_cast<int64_t>(test.expected_accuracy));
+    EXPECT_EQ(
+        *ukm_recorder.GetEntryMetric(entry, "PromptDispositionReason"),
+        static_cast<int64_t>(
+            test.decision.quiet_ui_reason
+                ? PermissionPromptDispositionReason::USER_PREFERENCE_IN_SETTINGS
+                : PermissionPromptDispositionReason::DEFAULT_FALLBACK));
   }
 }
 
@@ -1242,9 +1241,7 @@ TEST_F(PermissionRequestManagerTest,
        UiSelectionHappensSeparatelyForEachRequest) {
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
-      manager_,
-      Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      manager_, Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
       std::make_optional<base::TimeDelta>());
   auto request1 = std::make_unique<MockPermissionRequest>(
       RequestType::kNotifications, PermissionRequestGestureType::GESTURE);
@@ -1270,9 +1267,7 @@ TEST_F(PermissionRequestManagerTest,
 TEST_F(PermissionRequestManagerTest, SkipNextUiSelector) {
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
-      manager_,
-      Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      manager_, Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
       /* async_delay */ std::nullopt);
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_, Decision::UseNormalUiAndShowNoWarning(),
@@ -1304,29 +1299,23 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
   } kTests[] = {
       // Simple sync selectors, first one should take priority.
       {
-          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
+          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
+           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs)},
           {false, false},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       {
-          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
+          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
            Decision::UseQuietUi(
-               QuietUiReason::kServicePredictedVeryUnlikelyGrant,
-               Decision::ShowNoWarning())},
+               QuietUiReason::kServicePredictedVeryUnlikelyGrant)},
           {false, false},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
       },
       {
-          {Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning()),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning())},
+          {Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture)},
           {false, false},
           QuietUiReason::kEnabledInPrefs,
           GeolocationAccuracy::kPrecise,
@@ -1334,10 +1323,8 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
       // First selector is async but should still take priority even if it
       // returns later.
       {
-          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
+          {Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
+           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs)},
           {true, false},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
@@ -1346,10 +1333,8 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
       {
           {Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
+           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs)},
           {false, true, true, false},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
@@ -1366,7 +1351,6 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
       // reflect the accuracy returned by the highest priority selection.
       {
           {Decision::UseNormalUi(
-               Decision::ShowNoWarning(),
                PermissionUiSelector::GeolocationAccuracy::kApproximate),
            Decision::UseNormalUiAndShowNoWarning()},
           {false, true},
@@ -1375,10 +1359,8 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
       },
       {
           {Decision::UseNormalUi(
-               Decision::ShowNoWarning(),
                PermissionUiSelector::GeolocationAccuracy::kApproximate),
            Decision::UseNormalUi(
-               Decision::ShowNoWarning(),
                PermissionUiSelector::GeolocationAccuracy::kPrecise)},
           {false, true},
           std::nullopt,
@@ -1387,7 +1369,6 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
       {
           {Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUi(
-               Decision::ShowNoWarning(),
                PermissionUiSelector::GeolocationAccuracy::kApproximate)},
           {false, true},
           std::nullopt,
@@ -1401,11 +1382,9 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
+           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs)},
           {false, true, false, true, true, true, false, false},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
@@ -1417,11 +1396,9 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
+           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs)},
           {false, false, false, false, false, false, false, false},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
@@ -1433,11 +1410,9 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
+           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs)},
           {true, true, true, true, true, true, true, true},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
@@ -1449,11 +1424,9 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture,
-                                Decision::ShowNoWarning()),
+           Decision::UseQuietUi(QuietUiReason::kTriggeredDueToLackOfGesture),
            Decision::UseNormalUiAndShowNoWarning(),
-           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                Decision::ShowNoWarning())},
+           Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs)},
           {true, false, false, true, true, true, false, false},
           QuietUiReason::kTriggeredDueToLackOfGesture,
           GeolocationAccuracy::kPrecise,
@@ -1505,9 +1478,7 @@ TEST_F(PermissionRequestManagerTest, SelectorRequestTypes) {
   };
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
-      manager_,
-      Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      manager_, Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
       std::make_optional<base::TimeDelta>());
   for (const auto& test : kTests) {
     auto request = std::make_unique<MockPermissionRequest>(
@@ -1521,9 +1492,7 @@ TEST_F(PermissionRequestManagerTest, SelectorRequestTypes) {
   }
   // Adding a mock PermissionUiSelector that handles Camera stream.
   MockCameraStreamPermissionUiSelector::CreateForManager(
-      manager_,
-      Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      manager_, Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
       std::make_optional<base::TimeDelta>());
   // Now the RequestType::kCameraStream should show a quiet UI as well
   auto request2 = std::make_unique<MockPermissionRequest>(
@@ -1602,9 +1571,7 @@ TEST_F(PermissionRequestManagerTest,
 TEST_F(PermissionRequestManagerTest, NewHighPriorityRequestDuringUIDecision) {
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
-      manager_,
-      Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      manager_, Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs),
       std::make_optional<base::TimeDelta>(base::Seconds(2)));
   MockPermissionRequest::MockPermissionRequestState request1_state;
   manager_->AddRequest(web_contents()->GetPrimaryMainFrame(),
@@ -1680,8 +1647,8 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
        QuietNotificationsGeolocationQuietUIChipRequest) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   auto request_notifications = CreateAndAddRequest(RequestType::kNotifications,
@@ -1714,8 +1681,8 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
        QuietNotificationsShownLongEnough) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   auto request_notifications = CreateAndAddRequest(RequestType::kNotifications,
@@ -1757,8 +1724,8 @@ TEST_P(PermissionRequestManagerAlsoWithApproximateGeolocationTest,
        QuietNotificationsShownLongEnoughCamera) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   auto request_notifications = CreateAndAddRequest(RequestType::kNotifications,
@@ -1804,8 +1771,8 @@ INSTANTIATE_TEST_SUITE_P(
 TEST_F(PermissionRequestManagerTest, CameraQuietNotificationsGeolocation) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   auto request_camera = CreateAndAddRequest(RequestType::kCameraStream,
@@ -1855,8 +1822,8 @@ TEST_F(PermissionRequestManagerTest, CameraQuietNotificationsGeolocation) {
 TEST_F(PermissionRequestManagerTest, CameraQuietNotificationsGeolocationMIDI) {
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   auto request_camera = CreateAndAddRequest(RequestType::kCameraStream,
@@ -2388,8 +2355,8 @@ TEST_F(PermissionRequestManagerTest, PEPCRequestNeverQuiet) {
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   // PEPC request is not quieted by selector.
@@ -2433,8 +2400,8 @@ TEST_F(PermissionRequestManagerTest,
   manager_->clear_permission_ui_selector_for_testing();
   MockNotificationGeolocationPermissionUiSelector::CreateForManager(
       manager_,
-      Decision::UseQuietUi(PermissionUiSelector::QuietUiReason::kEnabledInPrefs,
-                           Decision::ShowNoWarning()),
+      Decision::UseQuietUi(
+          PermissionUiSelector::QuietUiReason::kEnabledInPrefs),
       std::nullopt /* async_delay */);
 
   // Allowlisted surface request is not quieted by selector and initializes flow
