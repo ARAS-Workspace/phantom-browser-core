@@ -11,7 +11,6 @@
 #include "base/scoped_multi_source_observation.h"
 #include "base/scoped_observation.h"
 #include "base/time/time.h"
-#include "chrome/browser/download/download_item_warning_data.h"
 #include "chrome/browser/metrics/desktop_session_duration/desktop_session_duration_tracker.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_observer.h"
@@ -125,19 +124,12 @@ class TrustSafetySentimentService
     // kPrivacySandbox4NoticeOk = 17, // DEPRECATED.
     // kPrivacySandbox4NoticeSettings = 18, // DEPRECATED.
     kSafeBrowsingInterstitial = 19,
-    kDownloadWarningUI = 20,
+    // kDownloadWarningUI = 20, // DEPRECATED.
     // kPasswordProtectionUI = 21, // DEPRECATED.
     kSafetyHubNotification = 22,
     kSafetyHubInteracted = 23,
     kMaxValue = kSafetyHubInteracted,
   };
-
-  // Called when the user completes terminal action within a download warning.
-  // These actions can include: DISCARD, and PROCEED.
-  virtual void InteractedWithDownloadWarningUI(
-      DownloadItemWarningData::WarningSurface surface,
-      DownloadItemWarningData::WarningAction action);
-
 
   // Checks that this feature area is valid for the current version.
   static bool VersionCheck(FeatureArea feature_area);

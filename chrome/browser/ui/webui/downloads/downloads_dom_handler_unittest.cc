@@ -145,6 +145,38 @@ TEST_F(DownloadsDOMHandlerTest, ClearAll) {
   handler.FinalizeRemovals();
 }
 
+TEST_F(DownloadsDOMHandlerTest, DestructorFinalizesRemovals) {
+  std::vector<raw_ptr<download::DownloadItem, VectorExperimental>> downloads;
+
+  // A completed item is only soft-removed (it can still be revived by Undo).
+  testing::StrictMock<download::MockDownloadItem> completed;
+  EXPECT_CALL(completed, IsDangerous()).WillOnce(testing::Return(false));
+  EXPECT_CALL(completed, IsInsecure()).WillOnce(testing::Return(false));
+  EXPECT_CALL(completed, GetDangerType())
+      .WillOnce(testing::Return(download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS));
+  EXPECT_CALL(completed, IsTransient()).WillRepeatedly(testing::Return(false));
+  EXPECT_CALL(completed, GetState())
+      .WillOnce(testing::Return(download::DownloadItem::COMPLETE));
+  EXPECT_CALL(completed, GetId()).WillOnce(testing::Return(1));
+  EXPECT_CALL(completed, UpdateObservers());
+  downloads.push_back(&completed);
+
+  {
+    TestDownloadsDOMHandler handler(page_.BindAndGetRemote(), manager(),
+                                    web_ui());
+    handler.RemoveDownloads(downloads);
+    EXPECT_FALSE(DownloadItemModel(&completed).ShouldShowInUi());
+
+    // Closing the page (destroying the handler) must finalize the pending
+    // removal without an explicit FinalizeRemovals() call.
+    EXPECT_CALL(*manager(), GetDownload(1))
+        .WillOnce(testing::Return(&completed));
+    EXPECT_CALL(completed, Remove());
+  }
+  testing::Mock::VerifyAndClearExpectations(&completed);
+  testing::Mock::VerifyAndClearExpectations(manager());
+}
+
 TEST_F(DownloadsDOMHandlerTest, RemoveDownloadsAsyncScanning) {
   std::vector<raw_ptr<download::DownloadItem, VectorExperimental>> downloads;
 

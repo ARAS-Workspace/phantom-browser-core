@@ -84,10 +84,6 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/image/image_skia_rep.h"
 
-#include "chrome/browser/download/download_item_warning_data.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service.h"
-#include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 #endif

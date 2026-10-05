@@ -116,8 +116,7 @@ TEST_F(DownloadBubbleSecurityViewInfoTest, DangerousWarningInfo) {
   for (const auto& test_case : kDangerTypeTestCases) {
     SCOPED_TRACE(testing::Message()
                  << "Failed for danger type "
-                 << download::GetDownloadDangerTypeString(test_case.danger_type)
-                 << std::endl);
+                 << static_cast<int>(test_case.danger_type) << std::endl);
     ON_CALL(item(), GetDangerType())
         .WillByDefault(Return(test_case.danger_type));
     RefreshInfo();

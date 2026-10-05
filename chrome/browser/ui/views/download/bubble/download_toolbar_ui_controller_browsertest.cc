@@ -324,6 +324,12 @@ IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,
       ->bubble_contents_for_testing()
       ->ProcessSecuritySubpageButtonPress(content_id,
                                           DownloadCommands::Command::DISCARD);
+  // Discarding from the security subpage removes the download.
+  EXPECT_TRUE(base::test::RunUntil([&]() {
+    std::vector<raw_ptr<download::DownloadItem, VectorExperimental>> items;
+    GetDownloads(browser(), &items);
+    return items.empty();
+  }));
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,

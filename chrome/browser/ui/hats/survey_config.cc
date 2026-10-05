@@ -27,7 +27,6 @@
 #include "media/base/media_switches.h"
 #include "ui/accessibility/accessibility_features.h"
 
-#include "chrome/browser/download/download_warning_desktop_hats_utils.h"
 #include "chrome/browser/metrics/critical_user_journeys/features.h"
 #include "components/password_manager/core/browser/features/password_features.h"  // nogncheck
 #include "components/password_manager/core/browser/features/password_manager_features_util.h"  // nogncheck
@@ -69,18 +68,6 @@ constexpr char kHatsSurveyTriggerAutoPipAllowed[] = "autopip-allowed";
 constexpr char kHatsSurveyTriggerAutoPipBlocked[] = "autopip-blocked";
 constexpr char kHatsSurveyTriggerAutoPipPermissionPromptIgnored[] =
     "autopip-permission-prompt-ignored";
-constexpr char kHatsSurveyTriggerDownloadWarningBubbleBypass[] =
-    "download-warning-bubble-bypass";
-constexpr char kHatsSurveyTriggerDownloadWarningBubbleHeed[] =
-    "download-warning-bubble-heed";
-constexpr char kHatsSurveyTriggerDownloadWarningBubbleIgnore[] =
-    "download-warning-bubble-ignore";
-constexpr char kHatsSurveyTriggerDownloadWarningPageBypass[] =
-    "download-warning-page-bypass";
-constexpr char kHatsSurveyTriggerDownloadWarningPageHeed[] =
-    "download-warning-page-heed";
-constexpr char kHatsSurveyTriggerDownloadWarningPageIgnore[] =
-    "download-warning-page-ignore";
 constexpr char kHatsSurveyTriggerHistoryEmbeddings[] = "history-embeddings";
 constexpr char kHatsSurveyTriggerHistoryPageExperiment[] =
     "history-page-experiment";
@@ -142,8 +129,6 @@ constexpr char kHatsSurveyTriggerTrustSafetyV2BrowsingData[] =
     "ts-v2-browsing-data";
 constexpr char kHatsSurveyTriggerTrustSafetyV2ControlGroup[] =
     "ts-v2-control-group";
-constexpr char kHatsSurveyTriggerTrustSafetyV2DownloadWarningUI[] =
-    "ts-v2-download-warning-ui";
 constexpr char kHatsSurveyTriggerTrustSafetyV2PasswordCheck[] =
     "ts-v2-password-check";
 constexpr char kHatsSurveyTriggerTrustSafetyV2SafetyCheck[] =
@@ -338,14 +323,6 @@ std::vector<hats::SurveyConfig> GetAllSurveyConfigs() {
       &features::kTrustSafetySentimentSurveyV2,
       kHatsSurveyTriggerTrustSafetyV2ControlGroup,
       features::kTrustSafetySentimentSurveyV2ControlGroupTriggerId.Get());
-  survey_configs.emplace_back(
-      &features::kTrustSafetySentimentSurveyV2,
-      kHatsSurveyTriggerTrustSafetyV2DownloadWarningUI,
-      features::kTrustSafetySentimentSurveyV2DownloadWarningUITriggerId.Get(),
-      std::vector<std::string>{"Enhanced protection enabled", "Is mainpage UI",
-                               "Is subpage UI", "Is downloads page UI",
-                               "Is download prompt UI",
-                               "User proceeded past warning"});
   survey_configs.emplace_back(
       &features::kTrustSafetySentimentSurveyV2,
       kHatsSurveyTriggerTrustSafetyV2PasswordCheck,

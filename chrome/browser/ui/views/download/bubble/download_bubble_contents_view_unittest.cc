@@ -311,6 +311,26 @@ TEST_P(DownloadBubbleContentsViewTest, ProcessSecuritySubpageButtonPress) {
       DownloadCommands::Command::DISCARD);
 }
 
+// Keeping an insecure download from the security subpage validates it.
+TEST_P(DownloadBubbleContentsViewTest, ProcessSecuritySubpageButtonPressKeep) {
+  EXPECT_CALL(*download_items_[0], GetDangerType())
+      .WillRepeatedly(Return(
+          download::DownloadDangerType::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS));
+  EXPECT_CALL(*download_items_[0], IsDangerous()).WillRepeatedly(Return(false));
+  EXPECT_CALL(*download_items_[0], IsInsecure()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*download_items_[0], GetInsecureDownloadStatus())
+      .WillRepeatedly(
+          Return(download::DownloadItem::InsecureDownloadStatus::BLOCK));
+  contents_view_->ShowSecurityPage(
+      OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()));
+  EXPECT_TRUE(contents_view_->security_view_for_testing()->IsInitialized());
+
+  EXPECT_CALL(*download_items_[0], ValidateInsecureDownload());
+  contents_view_->ProcessSecuritySubpageButtonPress(
+      OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()),
+      DownloadCommands::Command::KEEP);
+}
+
 TEST_P(DownloadBubbleContentsViewTest, AddSecuritySubpageWarningActionEvent) {
   contents_view_->ShowSecurityPage(
       OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()));

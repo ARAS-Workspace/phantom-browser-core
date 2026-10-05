@@ -368,45 +368,6 @@ void TrustSafetySentimentService::FinishedPrivacyGuide() {
   TriggerOccurred(FeatureArea::kPrivacyGuide, {});
 }
 
-void TrustSafetySentimentService::InteractedWithDownloadWarningUI(
-    DownloadItemWarningData::WarningSurface surface,
-    DownloadItemWarningData::WarningAction action) {
-  std::map<std::string, bool> product_specific_data;
-  product_specific_data["Enhanced protection enabled"] = false;
-  product_specific_data["Is mainpage UI"] = false;
-  product_specific_data["Is downloads page UI"] = false;
-  product_specific_data["Is download prompt UI"] = false;
-  product_specific_data["User proceeded past warning"] = false;
-  product_specific_data["Is subpage UI"] = false;
-  switch (surface) {
-    case DownloadItemWarningData::WarningSurface::BUBBLE_MAINPAGE:
-      product_specific_data["Is mainpage UI"] = true;
-      break;
-    case DownloadItemWarningData::WarningSurface::BUBBLE_SUBPAGE:
-      product_specific_data["Is subpage UI"] = true;
-      break;
-    case DownloadItemWarningData::WarningSurface::DOWNLOADS_PAGE:
-      product_specific_data["Is downloads page UI"] = true;
-      break;
-    case DownloadItemWarningData::WarningSurface::DOWNLOAD_PROMPT:
-      product_specific_data["Is download prompt UI"] = true;
-      break;
-    default:
-      NOTREACHED();
-  }
-  switch (action) {
-    case DownloadItemWarningData::WarningAction::PROCEED:
-      product_specific_data["User proceeded past warning"] = true;
-      break;
-    case DownloadItemWarningData::WarningAction::DISCARD:
-      product_specific_data["User proceeded past warning"] = false;
-      break;
-    default:
-      NOTREACHED();
-  }
-  TriggerOccurred(FeatureArea::kDownloadWarningUI, product_specific_data);
-}
-
 void TrustSafetySentimentService::OnOffTheRecordProfileCreated(
     Profile* off_the_record) {
   // Only interested in the primary OTR profile i.e. the one used for incognito
@@ -549,7 +510,6 @@ bool TrustSafetySentimentService::VersionCheck(FeatureArea feature_area) {
     case (FeatureArea::kPrivacyGuide):
     case (FeatureArea::kControlGroup):
     case (FeatureArea::kSafeBrowsingInterstitial):
-    case (FeatureArea::kDownloadWarningUI):
       return isV2 == true;
     // Both Versions
     case (FeatureArea::kTrustedSurface):
@@ -585,8 +545,6 @@ std::string TrustSafetySentimentService::GetHatsTriggerForFeatureArea(
         return kHatsSurveyTriggerTrustSafetyV2ControlGroup;
       case (FeatureArea::kSafeBrowsingInterstitial):
         return kHatsSurveyTriggerTrustSafetyV2SafeBrowsingInterstitial;
-      case (FeatureArea::kDownloadWarningUI):
-        return kHatsSurveyTriggerTrustSafetyV2DownloadWarningUI;
       default:
         NOTREACHED();
     }
@@ -649,11 +607,6 @@ bool TrustSafetySentimentService::ProbabilityCheck(FeatureArea feature_area) {
         return base::RandDouble() <
                features::
                    kTrustSafetySentimentSurveyV2SafeBrowsingInterstitialProbability
-                       .Get();
-      case (FeatureArea::kDownloadWarningUI):
-        return base::RandDouble() <
-               features::
-                   kTrustSafetySentimentSurveyV2DownloadWarningUIProbability
                        .Get();
       default:
         NOTREACHED();

@@ -73,7 +73,8 @@ class TrustSafetySentimentServiceTest : public testing::Test {
   // Skip the FeatureArea values that are commented out in the enum.
   bool IsDeprecatedFeatureArea(int enum_value) {
     return ((enum_value >= 4 && enum_value <= 9) ||
-            (enum_value >= 15 && enum_value <= 18) || enum_value == 21);
+            (enum_value >= 15 && enum_value <= 18) || enum_value == 20 ||
+            enum_value == 21);
   }
 
   void SetupFeatureParameters(FeatureParams params) {
@@ -113,7 +114,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
     std::string trusted_surface_time = "5s";
     std::string browsing_data_probability = "0.4";
     std::string control_group_probability = "0.4";
-    std::string download_warning_ui_probability = "0.0";
     std::string password_check_probability = "0.4";
     std::string safety_check_probability = "0.4";
     std::string safety_hub_notification_probability = "0.4";
@@ -126,7 +126,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
     std::string privacy_sandbox_4_notice_settings_probability = "0.1";
     std::string browsing_data_trigger_id = "browsing-data-test";
     std::string control_group_trigger_id = "control-group-test";
-    std::string download_warning_ui_trigger_id = "download-warning-ui-test";
     std::string password_check_trigger_id = "password-check-test";
     std::string safety_check_trigger_id = "safety-check-test";
     std::string trusted_surface_trigger_id = "trusted-surface-test";
@@ -145,8 +144,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
             {"trusted-surface-time", params.trusted_surface_time},
             {"browsing-data-probability", params.browsing_data_probability},
             {"control-group-probability", params.control_group_probability},
-            {"download-warning-ui-probability",
-             params.download_warning_ui_probability},
             {"password-check-probability", params.password_check_probability},
             {"safety-check-probability", params.safety_check_probability},
             {"safety-hub-notification-probability",
@@ -157,8 +154,6 @@ class TrustSafetySentimentServiceTest : public testing::Test {
             {"privacy-guide-probability", params.privacy_guide_probability},
             {"browsing-data-trigger-id", params.browsing_data_trigger_id},
             {"control-group-trigger-id", params.control_group_trigger_id},
-            {"download-warning-ui-trigger-id",
-             params.download_warning_ui_trigger_id},
             {"password-check-trigger-id", params.password_check_trigger_id},
             {"safety-check-trigger-id", params.safety_check_trigger_id},
             {"trusted-surface-trigger-id", params.trusted_surface_trigger_id},
@@ -1054,29 +1049,4 @@ TEST_F(TrustSafetySentimentServiceTest, V2_ControlGroup) {
   session_end = base::TimeTicks::Now();
   service()->OnSessionEnded(session_end - session_start, session_end);
   service()->OpenedNewTabPage();
-}
-
-TEST_F(TrustSafetySentimentServiceTest, V2_DownloadWarningUI) {
-  // Making a final decision on a download warning is considered a
-  // trigger, and should make a user eligible to receive a survey.
-  FeatureParamsV2 params;
-  params.download_warning_ui_probability = "1.0";
-  params.min_time_to_prompt = "0s";
-  params.ntp_visits_min_range = "0";
-  params.ntp_visits_max_range = "0";
-  SetupFeatureParametersV2(params);
-
-  // The correct survey should be launched.
-  EXPECT_CALL(*mock_hats_service(),
-              LaunchSurvey(kHatsSurveyTriggerTrustSafetyV2DownloadWarningUI, _,
-                           _, _, _, _, _));
-  service()->InteractedWithDownloadWarningUI(
-      DownloadItemWarningData::WarningSurface::BUBBLE_MAINPAGE,
-      DownloadItemWarningData::WarningAction::PROCEED);
-  service()->OpenedNewTabPage();
-  CheckHistograms(
-      {TrustSafetySentimentService::FeatureArea::kDownloadWarningUI},
-      {TrustSafetySentimentService::FeatureArea::kDownloadWarningUI});
-  CheckCallTriggerOccurredHistogram(
-      {{TrustSafetySentimentService::FeatureArea::kDownloadWarningUI, 1}});
 }

@@ -80,7 +80,6 @@ source_set("download") {
     "download_dir_util.h",
     "download_item_web_app_data.h",
     "download_ui_enterprise_util.h",
-    "download_warning_desktop_hats_utils.h",
     "offline_item_model.h",
     "offline_item_model_data.h",
     "offline_item_model_manager.h",
@@ -184,7 +183,6 @@ source_set("impl") {
     "download_dir_util.cc",
     "download_item_web_app_data.cc",
     "download_ui_enterprise_util.cc",
-    "download_warning_desktop_hats_utils.cc",
     "offline_item_model.cc",
     "offline_item_model_manager.cc",
     "offline_item_model_manager_factory.cc",
@@ -194,7 +192,6 @@ source_set("impl") {
     "//chrome/browser/image_decoder",
     "//chrome/browser/policy:path_parser",
     "//chrome/browser/ui:chrome_pages",
-    "//chrome/browser/ui/hats",
     "//chrome/browser/ui/views/download",
     "//chrome/browser/ui/web_applications",
     "//chrome/browser/ui/window_feature_controller",
@@ -347,9 +344,7 @@ source_set("unit_tests") {
     "download_commands_unittest.cc",
     "download_dir_policy_handler_unittest.cc",
     "download_ui_enterprise_util_unittest.cc",
-    "download_warning_desktop_hats_utils_unittest.cc",
   ]
-  deps += [ "//chrome/browser/ui/hats:test_support" ]
 
   sources += [ "download_ui_context_menu_unittest.cc" ]
   deps += [ "//chrome/browser/download/bubble:unit_tests" ]

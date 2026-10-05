@@ -377,7 +377,6 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
   std::vector<DownloadUIModelPtr> models = controller().GetMainView();
   EXPECT_EQ(models.size(), 1ul);
   EXPECT_EQ(models[0]->GetContentId().id, ids[1]);
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
@@ -405,13 +404,11 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     ASSERT_EQ(partial_view.size(), 1u);
     EXPECT_EQ(partial_view[0]->GetContentId().id, ids[1]);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(partial_view.size(), 0u);
   }
   std::vector<DownloadUIModelPtr> main_view = controller().GetMainView();
   EXPECT_EQ(main_view.size(), 2u);
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
@@ -423,9 +420,7 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
 
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 2ul);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
     EXPECT_EQ(second_controller().GetPartialView().size(), 2ul);
-    EXPECT_TRUE(second_controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0ul);
     EXPECT_EQ(second_controller().GetPartialView().size(), 0ul);
@@ -434,15 +429,9 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
   UpdateDownloadItem(/*item_index=*/0, DownloadState::COMPLETE);
   UpdateOfflineItem(/*item_index=*/0, OfflineItemState::COMPLETE);
   EXPECT_EQ(controller().GetMainView().size(), 2ul);
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
   // Download was removed from partial view because it is completed.
   EXPECT_EQ(controller().GetPartialView().size(), 0ul);
-  // The partial view wasn't actually shown, so this bit is not updated.
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
   EXPECT_EQ(second_controller().GetPartialView().size(), 0ul);
-  EXPECT_EQ(
-      second_controller().last_primary_view_was_partial(),
-      download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile()));
 }
 
 IN_PROC_BROWSER_TEST_F(
@@ -455,7 +444,6 @@ IN_PROC_BROWSER_TEST_F(
 
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 2ul);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0ul);
   }
@@ -463,10 +451,8 @@ IN_PROC_BROWSER_TEST_F(
   // This does not remove the entries from the partial view because the items
   // are in progress.
   EXPECT_EQ(controller().GetMainView().size(), 2ul);
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 2ul);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0ul);
   }
@@ -485,7 +471,6 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
                    download::DownloadItem::COMPLETE, ids[0]);
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 1u);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0u);
   }
@@ -497,10 +482,6 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
   InitDownloadItem(FILE_PATH_LITERAL("/foo/bar2.pdf"),
                    download::DownloadItem::COMPLETE, ids[1]);
   EXPECT_EQ(controller().GetPartialView().size(), 0u);
-  // The partial view wasn't actually shown, so this bit is not updated.
-  EXPECT_EQ(
-      controller().last_primary_view_was_partial(),
-      download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile()));
 
   // Partial view can now be shown, and contains all the items.
   controller().SetLastPartialViewShownTimeForTesting(base::Time::Now() -
@@ -510,7 +491,6 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
                    download::DownloadItem::COMPLETE, ids[1]);
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 3u);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0u);
   }
@@ -519,12 +499,7 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
   controller().SetLastPartialViewShownTimeForTesting(base::Time::Now() -
                                                      base::Seconds(14));
   EXPECT_EQ(controller().GetPartialView().size(), 0u);
-  // The partial view wasn't actually shown, so this bit is not updated.
-  EXPECT_EQ(
-      controller().last_primary_view_was_partial(),
-      download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile()));
   EXPECT_EQ(controller().GetMainView().size(), 3u);
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
 
   // Main view resets the partial view time, so the partial view can now be
   // shown.
@@ -533,7 +508,6 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
                    download::DownloadItem::IN_PROGRESS, ids[3]);
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 1u);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0u);
   }
@@ -544,7 +518,6 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
 IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
                        EmptyPartialViewDoesNotPreventOpening) {
   EXPECT_EQ(controller().GetPartialView().size(), 0u);
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
 
   EXPECT_CALL(display_controller(), OnNewItem(true)).Times(1);
   InitDownloadItem(FILE_PATH_LITERAL("/foo/bar2.pdf"),
@@ -553,7 +526,6 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
   // 15 seconds ago.
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 1u);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0u);
   }
@@ -569,15 +541,29 @@ IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
                    download::DownloadItem::COMPLETE, "Download");
 
   EXPECT_EQ(controller().GetPartialView().size(), 0u);
-  EXPECT_FALSE(controller().last_primary_view_was_partial());
 
   download::SetDownloadBubblePartialViewEnabled(browser()->GetProfile(), true);
   if (download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile())) {
     EXPECT_EQ(controller().GetPartialView().size(), 1u);
-    EXPECT_TRUE(controller().last_primary_view_was_partial());
   } else {
     EXPECT_EQ(controller().GetPartialView().size(), 0u);
   }
+}
+
+// Tests that showing a non-empty partial view starts the minimum interval, so
+// the partial view is not shown again right away.
+IN_PROC_BROWSER_TEST_F(DownloadBubbleUIControllerTest,
+                       PartialViewStartsMinIntervalWhenShown) {
+  download::SetDownloadBubblePartialViewEnabled(browser()->GetProfile(), true);
+  ASSERT_TRUE(
+      download::IsDownloadBubblePartialViewEnabled(browser()->GetProfile()));
+
+  EXPECT_CALL(display_controller(), OnNewItem(true)).Times(1);
+  InitDownloadItem(FILE_PATH_LITERAL("/foo/bar.pdf"),
+                   download::DownloadItem::COMPLETE, "Download");
+  EXPECT_EQ(controller().GetPartialView().size(), 1u);
+  // The partial view was just shown, so it is too soon to show it again.
+  EXPECT_EQ(controller().GetPartialView().size(), 0u);
 }
 
 }  // namespace
