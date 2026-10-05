@@ -2621,10 +2621,7 @@ test("browser_tests") {
   }
 
   if (enterprise_data_controls) {
-    sources += [
-      "//chrome/browser/enterprise/data_controls/desktop_data_controls_dialog_browsertest.cc",
-      "//chrome/browser/enterprise/data_protection/clipboard_toast_tracker_browsertest.cc",
-    ]
+    sources += [ "//chrome/browser/enterprise/data_controls/desktop_data_controls_dialog_browsertest.cc" ]
     deps += [ "//chrome/browser/enterprise/data_controls:test_support" ]
   }
 

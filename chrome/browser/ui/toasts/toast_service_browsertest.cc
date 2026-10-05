@@ -27,13 +27,29 @@ using ToastIdEnumSet = base::EnumSet<ToastId>;
 // specification.
 constexpr auto kDeprecatedToastIds =
     std::to_array<std::underlying_type_t<ToastId>>(
-        {/*kLensOverlay=*/4, /*kAddedToComparisonTable=*/6,
-         /*kPlusAddressOverride=*/8, /*kSyncEsbOn=*/9,
-         /*kSyncEsbOnWithoutActionButton=*/10, /*kSyncEsbOff=*/11,
+        {/*kLensOverlay=*/4,
+         /*kAddedToComparisonTable=*/6,
+         /*kPlusAddressOverride=*/8,
+         /*kSyncEsbOn=*/9,
+         /*kSyncEsbOnWithoutActionButton=*/10,
+         /*kSyncEsbOff=*/11,
+         /*kGeminiWorkingOnTask=*/17,
          /*kGlicShareImageFailed=*/21,
+         /*kSkillSaved=*/24,
+         /*kSkillDeleted=*/25,
+         /*kTranslate=*/27,
          /*kMultistepFilterSuggestion=*/31,
          /*kMultistepFilterSuggestionRecent=*/32,
-         /*kGlicSelectionHiddenForSite=*/50});
+         /*kSkillSavedWithoutInvokeButton=*/33,
+         /*kReportUnsafeSiteConfirmation=*/37,
+         /*kIndigoInvokeError=*/42,
+         /*kEnterpriseCopyAudit=*/46,
+         /*kEnterpriseCopyKeptInManagedChrome=*/47,
+         /*kGlicSelectionHiddenForSite=*/50,
+         /*kEnterpriseCopyWarning=*/51,
+         /*kEnterpriseCopyBlocked=*/52,
+         /*kIndigoDeleteError=*/53,
+         /*kIndigoDeleteSuccess=*/54});
 
 ToastIdEnumSet GetActiveToastIds() {
   auto result = ToastIdEnumSet::All();
