@@ -1,0 +1,166 @@
+name: Full Build Browser
+
+# Manual full build of the development tree on the self-hosted mac runner.
+# The build runs in a detached terminal session (tmux, then screen, then a
+# plain background shell) so it survives a cancelled or dropped job and can be
+# watched on the machine itself. The full log stays on the runner; this job
+# prints phase changes, script status lines and errors, plus one progress line
+# every five minutes.
+#
+#   gh workflow run full-build-browser.yml --ref phantom -f jobs=4
+
+on:
+  workflow_dispatch:
+    inputs:
+      jobs:
+        description: "ninja -j"
+        required: false
+        default: "4"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phantom-full-build
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CORE_DIR: /Users/m1/dev/phantom-browser-core
+  CI_DIR: /Users/m1/dev/phantom-ci
+  REPO_URL: https://github.com/${{ github.repository }}.git
+  BRANCH: phantom
+  BUILD_SHA: ${{ github.sha }}
+  RUN_ID: ${{ github.run_id }}
+  JOBS: ${{ inputs.jobs }}
+  SESSION: phantom-build-${{ github.run_id }}
+  LOG: /Users/m1/dev/phantom-ci/logs/build-${{ github.run_id }}.log
+  RC: /Users/m1/dev/phantom-ci/logs/build-${{ github.run_id }}.rc
+  LOCK: /Users/m1/dev/phantom-ci/build.lock
+  ZIP: /Users/m1/dev/phantom-ci/artifacts/PhantomBrowser-run${{ github.run_id }}.zip
+
+jobs:
+  build:
+    name: Full build (out/dev)
+    runs-on: [self-hosted, macOS, ARM64]
+    timeout-minutes: 2880
+    steps:
+      - name: Start the build session
+        run: |
+          set -euo pipefail
+          case "$JOBS" in ''|*[!0-9]*) echo "::error::jobs must be a number, got '$JOBS'"; exit 1 ;; esac
+          mkdir -p "$CI_DIR/logs" "$CI_DIR/run" "$CI_DIR/artifacts"
+          if [ -f "$LOCK" ] && kill -0 "$(cat "$LOCK")" 2>/dev/null; then
+            echo "::error::another build is running (pid $(cat "$LOCK")); follow it with: tail -f $CI_DIR/logs/latest.log"
+            exit 1
+          fi
+          script="$CI_DIR/run/build-$RUN_ID.sh"
+          # Values are written into the script: a tmux server that is already running
+          # gives new sessions its own environment, not this job's.
+          {
+            echo '#!/bin/bash'
+            echo 'set -uo pipefail'
+            for v in PATH HOME CORE_DIR CI_DIR REPO_URL BRANCH BUILD_SHA JOBS LOG RC LOCK ZIP; do
+              printf 'export %s=%q\n' "$v" "${!v}"
+            done
+            cat <<'EOS'
+          phase() { echo "=== PHASE $1 $(date '+%Y-%m-%d %H:%M:%S')"; }
+          finish() { echo "=== DONE rc=$1 $(date '+%Y-%m-%d %H:%M:%S')"; echo "$1" > "$RC"; rm -f "$LOCK"; exit "$1"; }
+          trap 'finish 130' INT TERM HUP
+          echo $$ > "$LOCK"
+          phase checkout
+          if [ ! -d "$CORE_DIR/.git" ]; then
+            mkdir -p "$(dirname "$CORE_DIR")"
+            git clone --quiet --single-branch --branch "$BRANCH" "$REPO_URL" "$CORE_DIR" || finish 10
+          else
+            git -C "$CORE_DIR" fetch --quiet origin "$BRANCH" || finish 11
+            if [ "$(git -C "$CORE_DIR" rev-parse --abbrev-ref HEAD)" != "$BRANCH" ]; then
+              git -C "$CORE_DIR" checkout --quiet "$BRANCH" || finish 12
+            fi
+          fi
+          git -C "$CORE_DIR" merge --ff-only --quiet "origin/$BRANCH" || finish 13
+          head=$(git -C "$CORE_DIR" rev-parse HEAD)
+          echo "checkout: HEAD ${head:0:10} $(git -C "$CORE_DIR" log -1 --format=%s)"
+          [ "$head" = "$BUILD_SHA" ] || echo "checkout: dispatched ${BUILD_SHA:0:10}, building the newer branch head ${head:0:10}"
+          phase sync
+          "$CORE_DIR/phantom_tools/core-sync.sh" || finish 20
+          phase build
+          "$CORE_DIR/phantom_tools/core-build-mac.sh" -j "$JOBS" chrome || finish 30
+          phase package
+          rm -f "$ZIP"
+          ditto -c -k --sequesterRsrc --keepParent "$CORE_DIR/out/dev/Phantom Browser.app" "$ZIP" || finish 40
+          echo "package: $ZIP $(du -h "$ZIP" | cut -f1)"
+          ls -t "$CI_DIR"/artifacts/*.zip 2>/dev/null | tail -n +4 | while read -r old; do rm -f "$old"; done
+          ls -t "$CI_DIR"/logs/build-*.log 2>/dev/null | tail -n +11 | while read -r old; do rm -f "$old" "${old%.log}.rc"; done
+          finish 0
+          EOS
+          } > "$script"
+          chmod +x "$script"
+          rm -f "$RC"
+          : > "$LOG"
+          ln -sf "$LOG" "$CI_DIR/logs/latest.log"
+          cmd="bash '$script' 2>&1 | tee -a '$LOG'"
+          if command -v tmux >/dev/null 2>&1; then
+            env -u RUNNER_TRACKING_ID tmux new-session -d -s "$SESSION" "$cmd"
+            attach="tmux attach -t $SESSION"
+          elif command -v screen >/dev/null 2>&1; then
+            env -u RUNNER_TRACKING_ID screen -dmS "$SESSION" bash -c "$cmd"
+            attach="screen -r $SESSION"
+          else
+            env -u RUNNER_TRACKING_ID nohup bash -c "$cmd" >/dev/null 2>&1 &
+            attach="tail -f $CI_DIR/logs/latest.log"
+          fi
+          for _ in $(seq 1 20); do [ -f "$LOCK" ] && break; sleep 1; done
+          [ -f "$LOCK" ] || { echo "::error::the build session did not start"; exit 1; }
+          # Best effort: a Terminal window on the runner's desktop for screen sharing.
+          # Backgrounded so an automation permission prompt cannot hold the job.
+          osascript -e "tell application \"Terminal\" to do script \"$attach\"" >/dev/null 2>&1 &
+          echo "session $SESSION (pid $(cat "$LOCK")), -j $JOBS, sha ${BUILD_SHA:0:10}"
+          echo "follow on the runner: $attach"
+          echo "full log: $LOG"
+
+      - name: Follow the build
+        run: |
+          set -uo pipefail
+          pos=0
+          ticks=0
+          while :; do
+            size=$(wc -c < "$LOG" | tr -d ' ')
+            if [ "$size" -gt "$pos" ]; then
+              tail -c +"$((pos + 1))" "$LOG" | head -c "$((size - pos))" \
+                | grep -aE '^(=== |checkout: |package: |core-sync: |core-build-mac: |verify-host: |FAILED: )|: error: ' | head -40
+              pos=$size
+            fi
+            [ -f "$RC" ] && break
+            if [ -f "$LOCK" ] && ! kill -0 "$(cat "$LOCK")" 2>/dev/null; then
+              echo "::error::the build session ended without writing $RC"
+              exit 1
+            fi
+            ticks=$((ticks + 1))
+            if [ $((ticks % 10)) -eq 0 ]; then
+              phase=$(grep -a '^=== PHASE' "$LOG" | tail -1 | cut -d' ' -f3)
+              step=$(grep -aoE '^\[[0-9]+/[0-9]+\]' "$LOG" | tail -1)
+              echo "$(date '+%H:%M') ${phase:-?} ${step}"
+            fi
+            sleep 30
+          done
+          rc=$(cat "$RC")
+          if [ "$rc" != 0 ]; then
+            echo "::group::last 80 lines of $LOG"
+            tail -n 80 "$LOG"
+            echo "::endgroup::"
+            echo "::error::build session failed with rc=$rc (10-13 checkout, 20 sync, 30 build, 40 package, 130 signal)"
+            exit 1
+          fi
+          ls -l "$ZIP"
+
+      - name: Upload Phantom Browser.app
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          path: ${{ env.ZIP }}
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
