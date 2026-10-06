@@ -60,9 +60,18 @@ jobs:
           set -euo pipefail
           case "$JOBS" in ''|*[!0-9]*) echo "::error::jobs must be a number, got '$JOBS'"; exit 1 ;; esac
           mkdir -p "$CI_DIR/logs" "$CI_DIR/run" "$CI_DIR/artifacts"
+          # A session from an earlier, cancelled or dropped run keeps the lock while it
+          # works. This run follows that session instead of starting a second one.
           if [ -f "$LOCK" ] && kill -0 "$(cat "$LOCK")" 2>/dev/null; then
-            echo "::error::another build is running (pid $(cat "$LOCK")); follow it with: tail -f $CI_DIR/logs/latest.log"
-            exit 1
+            log=$(readlink "$CI_DIR/logs/latest.log")
+            base=${log%.log}
+            {
+              echo "FOLLOW_LOG=$log"
+              echo "FOLLOW_RC=$base.rc"
+              echo "FOLLOW_ZIP=$CI_DIR/artifacts/PhantomBrowser-run${base##*build-}.zip"
+            } >> "$GITHUB_ENV"
+            echo "following the running session (pid $(cat "$LOCK")), log $log"
+            exit 0
           fi
           script="$CI_DIR/run/build-$RUN_ID.sh"
           # Values are written into the script: a tmux server that is already running
@@ -125,13 +134,17 @@ jobs:
           # Best effort: a Terminal window on the runner's desktop for screen sharing.
           # Backgrounded so an automation permission prompt cannot hold the job.
           osascript -e "tell application \"Terminal\" to do script \"$attach\"" >/dev/null 2>&1 &
+          { echo "FOLLOW_LOG=$LOG"; echo "FOLLOW_RC=$RC"; echo "FOLLOW_ZIP=$ZIP"; } >> "$GITHUB_ENV"
           echo "session $SESSION (pid $(cat "$LOCK")), -j $JOBS, sha ${BUILD_SHA:0:10}"
           echo "follow on the runner: $attach"
           echo "full log: $LOG"
 
       - name: Follow the build
         run: |
-          set -uo pipefail
+          # The bash shell runs with -e; grep finds no line in most log chunks, so
+          # errexit is off for this loop and the session's rc decides the result.
+          set +e -u -o pipefail
+          LOG=$FOLLOW_LOG RC=$FOLLOW_RC ZIP=$FOLLOW_ZIP
           pos=0
           ticks=0
           while :; do
@@ -167,7 +180,7 @@ jobs:
       - name: Upload Phantom Browser.app
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: ${{ env.ZIP }}
+          path: ${{ env.FOLLOW_ZIP }}
           archive: false
           if-no-files-found: error
           retention-days: 7
