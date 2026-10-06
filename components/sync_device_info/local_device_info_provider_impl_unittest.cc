@@ -59,14 +59,6 @@ class MockDeviceInfoSyncClient : public DeviceInfoSyncClient {
               GetPhoneAsASecurityKeyInfo,
               (),
               (const override));
-  MOCK_METHOD(std::optional<std::string>,
-              GetFCMRegistrationToken,
-              (),
-              (const override));
-  MOCK_METHOD(std::optional<DataTypeSet>,
-              GetInterestedDataTypes,
-              (),
-              (const override));
   MOCK_METHOD(bool, IsUmaEnabledOnCrOSDevice, (), (const override));
   MOCK_METHOD(bool, GetDesktopToIOSPromoReceivingEnabled, (), (const override));
   MOCK_METHOD(MobilePromoOnDesktopPromoTypeSet,
@@ -264,32 +256,6 @@ TEST_F(LocalDeviceInfoProviderImplTest, SharingInfo) {
   EXPECT_EQ(enabled_features, local_sharing_info->enabled_features);
 }
 
-TEST_F(LocalDeviceInfoProviderImplTest, ShouldPopulateFCMRegistrationToken) {
-  InitializeProvider();
-  ASSERT_THAT(provider_->GetLocalDeviceInfo(), NotNull());
-  EXPECT_TRUE(
-      provider_->GetLocalDeviceInfo()->fcm_registration_token().empty());
-
-  const std::string kFCMRegistrationToken = "token";
-  EXPECT_CALL(device_info_sync_client_, GetFCMRegistrationToken())
-      .WillRepeatedly(Return(kFCMRegistrationToken));
-
-  EXPECT_EQ(provider_->GetLocalDeviceInfo()->fcm_registration_token(),
-            kFCMRegistrationToken);
-}
-
-TEST_F(LocalDeviceInfoProviderImplTest, ShouldPopulateInterestedDataTypes) {
-  InitializeProvider();
-  ASSERT_THAT(provider_->GetLocalDeviceInfo(), NotNull());
-  EXPECT_TRUE(provider_->GetLocalDeviceInfo()->interested_data_types().empty());
-
-  const DataTypeSet kTypes = {BOOKMARKS};
-  EXPECT_CALL(device_info_sync_client_, GetInterestedDataTypes())
-      .WillRepeatedly(Return(kTypes));
-
-  EXPECT_EQ(provider_->GetLocalDeviceInfo()->interested_data_types(), kTypes);
-}
-
 TEST_F(LocalDeviceInfoProviderImplTest, ShouldKeepStoredInvalidationFields) {
   const std::string kFCMRegistrationToken = "fcm_token";
   const DataTypeSet kInterestedDataTypes = {BOOKMARKS};
@@ -314,19 +280,15 @@ TEST_F(LocalDeviceInfoProviderImplTest, ShouldKeepStoredInvalidationFields) {
       MobilePromoOnDesktopPromoTypeSet{},
       /*android_os_build_fingerprint_prefix=*/std::nullopt);
 
-  // |kFCMRegistrationToken|, |kInterestedDataTypes|,
-  // and |paask_info| should be taken from |device_info_restored_from_store|
-  // when |device_info_sync_client_| returns nullopt.
+  // |kFCMRegistrationToken| and |kInterestedDataTypes| should be taken from
+  // |device_info_restored_from_store|, and so should |paask_info| while
+  // |device_info_sync_client_| reports it as NotReady.
   provider_->Initialize(kLocalDeviceGuid, kLocalDeviceClientName,
                         kLocalDeviceManufacturerName, kLocalDeviceModelName,
                         kLocalFullHardwareClass,
                         /*android_os_build_fingerprint_prefix=*/std::nullopt,
                         &device_info_restored_from_store);
 
-  EXPECT_CALL(device_info_sync_client_, GetFCMRegistrationToken())
-      .WillRepeatedly(Return(std::nullopt));
-  EXPECT_CALL(device_info_sync_client_, GetInterestedDataTypes())
-      .WillRepeatedly(Return(std::nullopt));
   EXPECT_CALL(device_info_sync_client_, GetPhoneAsASecurityKeyInfo())
       .WillOnce(Return(DeviceInfo::PhoneAsASecurityKeyInfo::NotReady()));
 
