@@ -7,9 +7,16 @@ name: Full Build Browser
 # prints phase changes, script status lines and errors, plus one progress line
 # every five minutes.
 #
-#   gh workflow run full-build-browser.yml --ref phantom -f jobs=4
+# workflow_dispatch looks the file up on the default branch (main), which does
+# not carry it. A push to ci/full-build runs the file from the pushed commit,
+# so the CLI trigger is:
+#
+#   git push --force origin phantom:refs/heads/ci/full-build
 
 on:
+  push:
+    branches:
+      - ci/full-build
   workflow_dispatch:
     inputs:
       jobs:
@@ -35,7 +42,7 @@ env:
   BRANCH: phantom
   BUILD_SHA: ${{ github.sha }}
   RUN_ID: ${{ github.run_id }}
-  JOBS: ${{ inputs.jobs }}
+  JOBS: ${{ inputs.jobs || '4' }}
   SESSION: phantom-build-${{ github.run_id }}
   LOG: /Users/m1/dev/phantom-ci/logs/build-${{ github.run_id }}.log
   RC: /Users/m1/dev/phantom-ci/logs/build-${{ github.run_id }}.rc
