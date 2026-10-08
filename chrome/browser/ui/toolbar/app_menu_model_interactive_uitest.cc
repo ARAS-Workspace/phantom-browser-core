@@ -636,53 +636,6 @@ IN_PROC_BROWSER_TEST_F(UniversalInstallAppMenuModelInteractiveTest,
       EnsurePresent(AppMenuModel::kInstallAppItem));
 }
 
-IN_PROC_BROWSER_TEST_F(AppMenuModelInteractiveTest, ContactInfoNavigation) {
-  base::HistogramTester histograms;
-  RunTestSequence(
-      InstrumentTab(kPrimaryTabPageElementId),
-      PressButton(kToolbarAppMenuButtonElementId),
-      SelectMenuItem(AppMenuModel::kPasswordAndAutofillMenuItem),
-      SelectMenuItem(AppMenuModel::kContactInfoMenuItem),
-      WaitForWebContentsNavigation(
-          kPrimaryTabPageElementId,
-          GURL(chrome::GetSettingsUrl(chrome::kContactInfoSubPage))));
-
-  histograms.ExpectTotalCount("WrenchMenu.TimeToAction.ShowContactInfo", 1);
-  histograms.ExpectBucketCount("WrenchMenu.MenuAction",
-                               MENU_ACTION_SHOW_CONTACT_INFO, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(AppMenuModelInteractiveTest, IdentityDocsNavigation) {
-  base::HistogramTester histograms;
-  RunTestSequence(
-      InstrumentTab(kPrimaryTabPageElementId),
-      PressButton(kToolbarAppMenuButtonElementId),
-      SelectMenuItem(AppMenuModel::kPasswordAndAutofillMenuItem),
-      SelectMenuItem(AppMenuModel::kIdentityDocsMenuItem),
-      WaitForWebContentsNavigation(
-          kPrimaryTabPageElementId,
-          GURL(chrome::GetSettingsUrl(chrome::kIdentityDocsSubPage))));
-
-  histograms.ExpectTotalCount("WrenchMenu.TimeToAction.ShowIdentityDocs", 1);
-  histograms.ExpectBucketCount("WrenchMenu.MenuAction",
-                               MENU_ACTION_SHOW_IDENTITY_DOCS, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(AppMenuModelInteractiveTest, TravelNavigation) {
-  base::HistogramTester histograms;
-  RunTestSequence(InstrumentTab(kPrimaryTabPageElementId),
-                  PressButton(kToolbarAppMenuButtonElementId),
-                  SelectMenuItem(AppMenuModel::kPasswordAndAutofillMenuItem),
-                  SelectMenuItem(AppMenuModel::kTravelMenuItem),
-                  WaitForWebContentsNavigation(
-                      kPrimaryTabPageElementId,
-                      GURL(chrome::GetSettingsUrl(chrome::kTravelSubPage))));
-
-  histograms.ExpectTotalCount("WrenchMenu.TimeToAction.ShowTravel", 1);
-  histograms.ExpectBucketCount("WrenchMenu.MenuAction", MENU_ACTION_SHOW_TRAVEL,
-                               1);
-}
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class SupervisedUserAppMenuModelInteractiveTest
     : public AppMenuModelInteractiveTest {

@@ -177,9 +177,6 @@
   E(kActionShowFullUrls, IDC_SHOW_FULL_URLS) \
   E(kActionRecordReplay) \
   E(kActionShowSearchTools, IDC_SHOW_SEARCH_TOOLS) \
-  E(kActionShowContactInfo, IDC_SHOW_CONTACT_INFO) \
-  E(kActionShowIdentityDocs, IDC_SHOW_IDENTITY_DOCS) \
-  E(kActionShowTravel, IDC_SHOW_TRAVEL) \
   E(kActionCaretBrowsingToggle, IDC_CARET_BROWSING_TOGGLE) \
   E(kActionChromeTips, IDC_CHROME_TIPS) \
   E(kActionChromeWhatsNew, IDC_CHROME_WHATS_NEW) \

@@ -483,11 +483,7 @@ INSTANTIATE_TEST_SUITE_P(
                     IDC_MANAGE_CHROME_PROFILES,
                     IDC_READING_LIST_MENU_ADD_TAB,
                     IDC_READING_LIST_MENU_SHOW_UI,
-                    IDC_SHOW_PASSWORD_MANAGER,
                     IDC_SHOW_PAYMENT_METHODS,
-                    IDC_SHOW_CONTACT_INFO,
-                    IDC_SHOW_IDENTITY_DOCS,
-                    IDC_SHOW_TRAVEL,
                     AppMenuModel::kMinOtherProfileCommandId));
 
 IN_PROC_BROWSER_TEST_F(AppMenuModelTest, ProfileSyncOnTest) {

@@ -985,14 +985,6 @@ TEST_F(ChromeContentSettingsRedirectTest, RedirectDebugURL) {
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-TEST_F(ChromeContentSettingsRedirectTest, RedirectAddressesURL) {
-  TestChromeContentBrowserClient test_content_browser_client;
-  const GURL addresses_url("chrome://settings/addresses");
-  GURL dest_url = addresses_url;
-  test_content_browser_client.HandleWebUI(&dest_url, &profile_);
-  EXPECT_EQ(GURL("chrome://settings/contactInfo"), dest_url);
-}
-
 TEST_F(ChromeContentSettingsRedirectTest, RedirectSearchSettingsURL) {
   base::test::ScopedFeatureList scoped_feature_list{
       switches::kSearchSettingsUpdate};

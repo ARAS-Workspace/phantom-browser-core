@@ -27,7 +27,6 @@ export interface SettingsRoutes {
   CAPTIONS: Route;
   CLEAR_BROWSER_DATA: Route;
   COMPARE: Route;
-  CONTACT_INFO: Route;
   COOKIES: Route;
   DEFAULT_BROWSER: Route;
   DICTATION: Route;
@@ -36,7 +35,6 @@ export interface SettingsRoutes {
   GEMINI: Route;
   GEMINI_LOGIN: Route;
   HISTORY_SEARCH: Route;
-  IDENTITY_DOCS: Route;
   INLINE_CUE_MENU: Route;
   LANGUAGES: Route;
   MANAGE_PROFILE: Route;
@@ -113,7 +111,6 @@ export interface SettingsRoutes {
   SYNC: Route;
   SYNC_ADVANCED: Route;
   SYSTEM: Route;
-  TRAVEL: Route;
   TRIGGERED_RESET_DIALOG: Route;
   ACCOUNT: Route;
 

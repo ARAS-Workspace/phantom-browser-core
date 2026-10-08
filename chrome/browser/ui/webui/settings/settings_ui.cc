@@ -297,7 +297,7 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   html_source->AddResourcePaths(kSettingsSharedResources);
 #endif
 
-  AddLocalizedStrings(html_source, profile, web_ui->GetWebContents());
+  AddLocalizedStrings(html_source, profile);
   AddSecurityData(html_source);
 
   content::URLDataSource::Add(

@@ -486,24 +486,9 @@ void ShowAddresses(BrowserWindowInterface* bwi) {
   ShowSettingsSubPage(bwi, kAddressesSubPage);
 }
 
-void ShowContactInfo(BrowserWindowInterface* bwi) {
-  base::RecordAction(UserMetricsAction("Options_ShowContactInfo"));
-  ShowSettingsSubPage(bwi, kContactInfoSubPage);
-}
-
 void ShowPaymentMethods(BrowserWindowInterface* bwi) {
   base::RecordAction(UserMetricsAction("Options_ShowPaymentMethods"));
   ShowSettingsSubPage(bwi, kPaymentsSubPage);
-}
-
-void ShowIdentityDocs(BrowserWindowInterface* bwi) {
-  base::RecordAction(UserMetricsAction("Options_ShowIdentityDocs"));
-  ShowSettingsSubPage(bwi, kIdentityDocsSubPage);
-}
-
-void ShowTravel(BrowserWindowInterface* bwi) {
-  base::RecordAction(UserMetricsAction("Options_ShowTravel"));
-  ShowSettingsSubPage(bwi, kTravelSubPage);
 }
 
 void ShowAllSitesSettingsFilteredByRwsOwner(

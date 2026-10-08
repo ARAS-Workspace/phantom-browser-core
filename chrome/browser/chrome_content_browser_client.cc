@@ -5775,15 +5775,6 @@ bool ChromeContentBrowserClient::HandleWebUI(
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-  // Rewrite chrome://settings/addresses to chrome://settings/contactInfo.
-  if (url->SchemeIs(content::kChromeUIScheme) &&
-      url->host() == chrome::kChromeUISettingsHost &&
-      (url->path() == chrome::kChromeUIAddressesPath)) {
-    GURL::Replacements replacements;
-    replacements.SetPathStr(chrome::kChromeUIContactInfoPath);
-    *url = url->ReplaceComponents(replacements);
-  }
-
   // Rewrite chrome://settings/searchEngines to chrome://settings/search.
   if (url->SchemeIs(content::kChromeUIScheme) &&
       url->host() == chrome::kChromeUISettingsHost &&

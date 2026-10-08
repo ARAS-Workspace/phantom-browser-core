@@ -2800,53 +2800,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .Build());
 
   root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowContactInfo(bwi);
-              },
-              bwi),
-          kActionShowContactInfo,
-          IDS_YOUR_SAVED_INFO_CONTACT_INFO_SUBMENU_OPTION,
-          IDS_YOUR_SAVED_INFO_CONTACT_INFO_SUBMENU_OPTION,
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kLocationOnIcon
-              : vector_icons::kLocationOnChromeRefreshOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
-
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowIdentityDocs(bwi);
-              },
-              bwi),
-          kActionShowIdentityDocs, IDS_IDENTITY_DOCS_SUBMENU_OPTION,
-          IDS_IDENTITY_DOCS_SUBMENU_OPTION,
-          features::IsRoundedIconsEnabled() ? vector_icons::kIdCardIcon
-                                            : vector_icons::kIdCardOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
-
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowTravel(bwi);
-              },
-              bwi),
-          kActionShowTravel, IDS_TRAVEL_SUBMENU_OPTION,
-          IDS_TRAVEL_SUBMENU_OPTION,
-          features::IsRoundedIconsEnabled() ? vector_icons::kTripIcon
-                                            : vector_icons::kTripOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
-
-  root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,

@@ -149,9 +149,6 @@
 #define IDC_SHOW_ADDRESSES              35043
 #define IDC_ORGANIZE_TABS               35044
 #define IDC_SEND_SHARED_TAB_GROUP_FEEDBACK 35046
-#define IDC_SHOW_IDENTITY_DOCS          35047
-#define IDC_SHOW_TRAVEL                 35048
-#define IDC_SHOW_CONTACT_INFO           35049
 
 // Page-manipulation commands that target a specified tab, which may not be the
 // active one.

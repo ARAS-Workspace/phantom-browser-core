@@ -103,55 +103,6 @@ class OmniboxPedalClearBrowsingData : public OmniboxPedal {
 
 // =============================================================================
 
-class OmniboxPedalUpdateCreditCard : public OmniboxPedal {
- public:
-  OmniboxPedalUpdateCreditCard()
-      : OmniboxPedal(
-            OmniboxPedalId::UPDATE_CREDIT_CARD,
-            LabelStrings(
-                IDS_OMNIBOX_PEDAL_UPDATE_CREDIT_CARD_HINT,
-                IDS_OMNIBOX_PEDAL_UPDATE_CREDIT_CARD_SUGGESTION_CONTENTS,
-                IDS_ACC_OMNIBOX_PEDAL_UPDATE_CREDIT_CARD_SUFFIX,
-                IDS_ACC_OMNIBOX_PEDAL_UPDATE_CREDIT_CARD),
-            GURL("chrome://settings/payments")) {}
-
-  std::vector<SynonymGroupSpec> SpecifySynonymGroups(
-      bool locale_is_english) const override {
-    if (locale_is_english) {
-      return {
-          {
-              false,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_UPDATE_CREDIT_CARD_ONE_OPTIONAL_GOOGLE_CHROME,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_UPDATE_CREDIT_CARD_ONE_REQUIRED_CHANGE,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_UPDATE_CREDIT_CARD_ONE_REQUIRED_CREDIT_CARD_INFORMATION,
-          },
-      };
-    } else {
-      return {
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_UPDATE_CREDIT_CARD_ONE_REQUIRED_MANAGE_PAYMENT_METHODS,
-          },
-      };
-    }
-  }
-
- protected:
-  ~OmniboxPedalUpdateCreditCard() override = default;
-};
-
-// =============================================================================
-
 class OmniboxPedalLaunchIncognito : public OmniboxPedal {
  public:
   OmniboxPedalLaunchIncognito()
@@ -346,54 +297,6 @@ class OmniboxPedalManageCookies : public OmniboxPedal {
 
  protected:
   ~OmniboxPedalManageCookies() override = default;
-};
-
-// =============================================================================
-
-class OmniboxPedalManageAddresses : public OmniboxPedal {
- public:
-  OmniboxPedalManageAddresses()
-      : OmniboxPedal(
-            OmniboxPedalId::MANAGE_ADDRESSES,
-            LabelStrings(IDS_OMNIBOX_PEDAL_MANAGE_ADDRESSES_HINT,
-                         IDS_OMNIBOX_PEDAL_MANAGE_ADDRESSES_SUGGESTION_CONTENTS,
-                         IDS_ACC_OMNIBOX_PEDAL_MANAGE_ADDRESSES_SUFFIX,
-                         IDS_ACC_OMNIBOX_PEDAL_MANAGE_ADDRESSES),
-            GURL("chrome://settings/addresses")) {}
-
-  std::vector<SynonymGroupSpec> SpecifySynonymGroups(
-      bool locale_is_english) const override {
-    if (locale_is_english) {
-      return {
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_MANAGE_ADDRESSES_ONE_REQUIRED_CONTROL,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_MANAGE_ADDRESSES_ONE_REQUIRED_SHIPPING_ADDRESSES,
-          },
-          {
-              false,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_MANAGE_ADDRESSES_ONE_OPTIONAL_GOOGLE_CHROME,
-          },
-      };
-    } else {
-      return {
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_MANAGE_ADDRESSES_ONE_REQUIRED_ADD_ADDRESS,
-          },
-      };
-    }
-  }
-
- protected:
-  ~OmniboxPedalManageAddresses() override = default;
 };
 
 // =============================================================================
@@ -1791,12 +1694,10 @@ GetPedalImplementations(bool incognito, bool guest, bool testing) {
   if (!guest) {
     add(new OmniboxPedalClearBrowsingData(incognito));
   }
-  add(new OmniboxPedalUpdateCreditCard());
   add(new OmniboxPedalLaunchIncognito());
   add(new OmniboxPedalUpdateChrome());
   add(new OmniboxPedalManageSecuritySettings());
   add(new OmniboxPedalManageCookies());
-  add(new OmniboxPedalManageAddresses());
   add(new OmniboxPedalManageSync());
   add(new OmniboxPedalManageSiteSettings());
   add(new OmniboxPedalSeeChromeTips());

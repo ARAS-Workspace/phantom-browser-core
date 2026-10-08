@@ -7,7 +7,6 @@
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
-#include "chrome/browser/ui/autofill/address_bubbles_controller.h"
 #include "chrome/browser/ui/autofill/payments/save_card_bubble_controller.h"
 #include "chrome/browser/ui/autofill/payments/save_card_bubble_controller_impl.h"
 #include "chrome/browser/ui/browser.h"
@@ -19,9 +18,7 @@
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/user_prefs/user_prefs.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/browser_test_utils.h"
 #include "ui/actions/actions.h"
-#include "url/url_constants.h"
 
 namespace chrome {
 
@@ -34,29 +31,6 @@ class BrowserActionsBrowserTest : public InProcessBrowserTest {
     return browser()->tab_strip_model()->GetActiveWebContents();
   }
 };
-
-IN_PROC_BROWSER_TEST_F(BrowserActionsBrowserTest, ShowAddressesBubbleOrPage) {
-  auto& action_manager = actions::ActionManager::GetForTesting();
-  const GURL addresses_url = GURL("chrome://settings/addresses");
-
-  ASSERT_NE(GetActiveWebContents()->GetURL(), addresses_url);
-  action_manager.FindAction(kActionShowAddressesBubbleOrPage)->InvokeAction();
-  EXPECT_EQ(GetActiveWebContents()->GetURL(), addresses_url);
-
-  autofill::AddressBubblesController::CreateForWebContents(
-      GetActiveWebContents());
-  auto* bubble_controller = autofill::AddressBubblesController::FromWebContents(
-      GetActiveWebContents());
-  ASSERT_EQ(bubble_controller->GetBubbleView(), nullptr);
-  action_manager.FindAction(kActionShowAddressesBubbleOrPage)->InvokeAction();
-  EXPECT_EQ(bubble_controller->GetBubbleView(), nullptr);
-
-  ASSERT_TRUE(content::NavigateToURL(GetActiveWebContents(),
-                                     GURL(url::kAboutBlankURL)));
-  ASSERT_NE(GetActiveWebContents()->GetURL(), addresses_url);
-  action_manager.FindAction(kActionShowAddressesBubbleOrPage)->InvokeAction();
-  EXPECT_EQ(GetActiveWebContents()->GetURL(), addresses_url);
-}
 
 IN_PROC_BROWSER_TEST_F(BrowserActionsBrowserTest, ShowPaymentsBubbleOrPage) {
   CHECK(ui_test_utils::BringBrowserWindowToFront(browser()));
@@ -104,12 +78,10 @@ IN_PROC_BROWSER_TEST_F(BrowserActionsBrowserTest, DidCreateBrowserActions) {
   auto& action_manager = actions::ActionManager::GetForTesting();
 
   std::vector<actions::ActionId> browser_action_ids = {
-      kActionNewIncognitoWindow, kActionPrint,
-      kActionClearBrowsingData,  kActionTaskManager,
-      kActionDevTools,           kActionSendTabToSelf,
-      kActionQrCodeGenerator,    kActionShowAddressesBubbleOrPage,
-      kActionFederation,         kActionCycleToNextTab,
-      kActionCycleToPrevTab,     kActionShowReadingModeSidePanel};
+      kActionNewIncognitoWindow, kActionPrint,      kActionClearBrowsingData,
+      kActionTaskManager,        kActionDevTools,   kActionSendTabToSelf,
+      kActionQrCodeGenerator,    kActionFederation, kActionCycleToNextTab,
+      kActionCycleToPrevTab};
 
   ASSERT_NE(browser_actions->root_action_item(), nullptr);
 
@@ -151,9 +123,6 @@ IN_PROC_BROWSER_TEST_F(BrowserActionsBrowserTest,
             CanSendTabToSelf(browser()));
   EXPECT_EQ(action_manager.FindAction(kActionQrCodeGenerator)->GetEnabled(),
             false);
-  EXPECT_EQ(
-      action_manager.FindAction(kActionShowAddressesBubbleOrPage)->GetEnabled(),
-      true);
 }
 
 IN_PROC_BROWSER_TEST_F(BrowserActionsBrowserTest, GetCleanTitleAndTooltipText) {
