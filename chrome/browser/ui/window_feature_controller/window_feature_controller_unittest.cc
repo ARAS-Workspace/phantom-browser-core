@@ -155,27 +155,6 @@ TEST_F(WindowFeatureControllerTest, PopupBrowserFeatures_Untrusted) {
       controller->CanSupportWindowFeature(WindowFeature::kFeatureLocationBar));
 }
 
-TEST_F(WindowFeatureControllerTest, PopupBrowserFeatures_Trusted) {
-  BrowserWindowFullscreenController fullscreen_controller(
-      mock_browser_window_interface_);
-  // Trusted popup (e.g. devtools, or internal chrome popup).
-  auto controller =
-      CreateController(BrowserWindowInterface::Type::TYPE_POPUP,
-                       /*is_trusted_source=*/true, &fullscreen_controller);
-
-  fullscreen_controller.set_should_hide_ui_for_fullscreen_for_testing(false);
-
-  // Trusted popups do not support title bar or location bar.
-  EXPECT_FALSE(
-      controller->SupportsWindowFeature(WindowFeature::kFeatureTitleBar));
-  EXPECT_FALSE(
-      controller->SupportsWindowFeature(WindowFeature::kFeatureLocationBar));
-  EXPECT_TRUE(
-      controller->CanSupportWindowFeature(WindowFeature::kFeatureTitleBar));
-  EXPECT_TRUE(
-      controller->CanSupportWindowFeature(WindowFeature::kFeatureLocationBar));
-}
-
 // Tests for TYPE_PICTURE_IN_PICTURE browser.
 TEST_F(WindowFeatureControllerTest, PictureInPictureBrowserFeatures) {
   BrowserWindowFullscreenController fullscreen_controller(
