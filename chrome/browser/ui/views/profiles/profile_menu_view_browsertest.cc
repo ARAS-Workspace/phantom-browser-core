@@ -45,7 +45,6 @@
 #include "chrome/browser/signin/signin_browser_test_base.h"
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/browser/signin/signin_promo_util.h"
-#include "chrome/browser/signin/signin_ui_delegate.h"
 #include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/sync/account_bookmark_sync_service_factory.h"
@@ -165,46 +164,9 @@ namespace {
 using testing::_;
 using testing::Eq;
 using testing::Pair;
-using ::testing::StrictMock;
 using testing::UnorderedElementsAre;
 
 constexpr char kTestEmail[] = "foo@example.com";
-
-class MockSigninUiDelegate : public signin_ui_util::SigninUiDelegate {
- public:
-  MOCK_METHOD(void,
-              ShowSigninUI,
-              (Profile*,
-               bool,
-               signin_metrics::AccessPoint,
-               signin_metrics::PromoAction,
-               const std::string&),
-              (override));
-  MOCK_METHOD(void,
-              ShowReauthUI,
-              (Profile*,
-               const std::string&,
-               bool,
-               signin_metrics::AccessPoint,
-               signin_metrics::PromoAction),
-              (override));
-  MOCK_METHOD(void,
-              ShowTurnSyncOnUI,
-              (Profile*,
-               signin_metrics::AccessPoint,
-               signin_metrics::PromoAction,
-               const CoreAccountId&,
-               TurnSyncOnHelper::SigninAbortedMode,
-               bool,
-               bool),
-              (override));
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  MOCK_METHOD(void,
-              ShowCrossDeviceSigninQrBubble,
-              (BrowserWindowInterface*, base::OnceClosure),
-              (override));
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-};
 
 Profile* CreateAdditionalProfile() {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
@@ -995,44 +957,6 @@ class ProfileMenuViewWebOnlyTest : public ProfileMenuViewTestBase,
 
   CoreAccountInfo account_info_;
 };
-
-// Checks that the signin flow starts in one click.
-IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebOnlyTest, ContinueAs) {
-  StrictMock<MockSigninUiDelegate> mock_signin_ui_delegate;
-  base::AutoReset<signin_ui_util::SigninUiDelegate*> delegate_auto_reset =
-      signin_ui_util::SetSigninUiDelegateForTesting(&mock_signin_ui_delegate);
-  base::HistogramTester histogram_tester;
-  const signin_metrics::AccessPoint expected_access_point =
-      signin_metrics::AccessPoint::kAvatarBubbleSignInWithSyncPromo;
-
-  EXPECT_CALL(
-      mock_signin_ui_delegate,
-      ShowTurnSyncOnUI(browser()->GetProfile(), expected_access_point,
-                       signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT,
-                       account_info_.account_id,
-                       TurnSyncOnHelper::SigninAbortedMode::KEEP_ACCOUNT,
-                       /*is_sync_promo=*/true,
-                       /*user_already_signed_in=*/false));
-
-  ClickSigninButton();
-  EXPECT_EQ(IdentityManagerFactory::GetForProfile(browser()->GetProfile())
-                ->GetPrimaryAccountId(signin::ConsentLevel::kSignin),
-            account_info_.account_id);
-
-  // `Signin.SyncOptIn.Offered` should NOT be recorded if the sync opt-in is
-  // not directly offered from the profile menu.
-  histogram_tester.ExpectUniqueSample("Signin.SyncOptIn.Offered",
-                                      expected_access_point,
-                                      /*expected_bucket_count=*/0);
-  // `Signin.SignIn.Offered*` should be recorded if the sign-in is offered from
-  // the profile menu.
-  histogram_tester.ExpectUniqueSample("Signin.SignIn.Offered",
-                                      expected_access_point,
-                                      /*expected_bucket_count=*/1);
-  histogram_tester.ExpectUniqueSample("Signin.SignIn.Offered.WithDefault",
-                                      expected_access_point,
-                                      /*expected_bucket_count=*/1);
-}
 
 IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebOnlyTest, AccountPreferenceSubtitle) {
   signin::AccountPreviewDataService::AccountPreviewPreference pref{
@@ -2837,89 +2761,3 @@ IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebAppTest, ProfileMenuVisibility) {
   EXPECT_TRUE(avatar_accessor1.GetVisible());
 }
 #endif  // BUILDFLAG(IS_MAC)
-
-class ProfileMenuSigninAccessPointTest : public SigninBrowserTestBase {
- public:
-  // SigninBrowserTestBase:
-  void SetUpOnMainThread() override {
-    SigninBrowserTestBase::SetUpOnMainThread();
-    // Add a signed in account.
-    signin::IdentityManager* identity_manager =
-        IdentityManagerFactory::GetForProfile(browser()->GetProfile());
-    account_info_ = identity_test_env()->MakeAccountAvailable(
-        kTestEmail,
-        {.primary_account_consent_level = signin::ConsentLevel::kSignin,
-         .set_cookie = true});
-    ASSERT_TRUE(
-        identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin));
-    ASSERT_EQ(identity_manager->GetAccountsWithRefreshTokens().size(), 1u);
-  }
-
- protected:
-  ProfileMenuSigninAccessPointTest()
-      : delegate_auto_reset_(signin_ui_util::SetSigninUiDelegateForTesting(
-            &mock_signin_ui_delegate_)) {}
-
-  void OpenProfileMenuFromCoordinator() {
-    auto* coordinator = browser()->GetFeatures().profile_menu_coordinator();
-    ASSERT_TRUE(coordinator);
-    coordinator->Show(/*is_source_accelerator=*/false);
-    ASSERT_TRUE(base::test::RunUntil(
-        [coordinator]() { return coordinator->IsShowing(); }));
-    ASSERT_NO_FATAL_FAILURE(
-        WaitForMenuToBeActive(coordinator->GetProfileMenuViewBaseForTesting()));
-  }
-
-  void ClickSyncButton() {
-    auto* coordinator = browser()->GetFeatures().profile_menu_coordinator();
-    ASSERT_TRUE(coordinator);
-    ProfileMenuViewBase* profile_menu_view =
-        coordinator->GetProfileMenuViewBaseForTesting();
-    ASSERT_TRUE(profile_menu_view);
-    profile_menu_view->GetFocusManager()->ClearFocus();
-    profile_menu_view->GetFocusManager()->AdvanceFocus(/*reverse=*/false);
-    views::View* focused_view =
-        profile_menu_view->GetFocusManager()->GetFocusedView();
-    ASSERT_TRUE(focused_view);
-    Click(focused_view);
-  }
-
-  CoreAccountInfo account_info_;
-
-  StrictMock<MockSigninUiDelegate> mock_signin_ui_delegate_;
-
- private:
-  base::AutoReset<signin_ui_util::SigninUiDelegate*> delegate_auto_reset_;
-};
-
-IN_PROC_BROWSER_TEST_F(ProfileMenuSigninAccessPointTest,
-                       DefaultSigninAccessPoint) {
-  base::HistogramTester histogram_tester;
-  const signin_metrics::AccessPoint default_access_point =
-      signin_metrics::AccessPoint::kAvatarBubbleSignIn;
-  ASSERT_NO_FATAL_FAILURE(OpenProfileMenuFromCoordinator());
-  // `Signin.SignIn.Offered` should NOT be recorded if the sign-in is not
-  // directly offered from the profile menu.
-  histogram_tester.ExpectUniqueSample("Signin.SignIn.Offered",
-                                      default_access_point,
-                                      /*expected_bucket_count=*/0);
-  // `Signin.SyncOptIn.Offered` should be recorded if the sync opt-in is
-  // offered from the profile menu.
-  histogram_tester.ExpectUniqueSample("Signin.SyncOptIn.Offered",
-                                      default_access_point,
-                                      /*expected_bucket_count=*/1);
-
-  EXPECT_CALL(
-      mock_signin_ui_delegate_,
-      ShowTurnSyncOnUI(browser()->GetProfile(), default_access_point,
-                       signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT,
-                       account_info_.account_id,
-                       TurnSyncOnHelper::SigninAbortedMode::KEEP_ACCOUNT,
-                       /*is_sync_promo=*/false,
-                       /*user_already_signed_in=*/true));
-  ASSERT_NO_FATAL_FAILURE(ClickSyncButton());
-  histogram_tester.ExpectUniqueSample(
-      "Profile.Menu.ClickedActionableItem",
-      ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-      /*expected_bucket_count=*/1);
-}

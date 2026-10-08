@@ -277,7 +277,7 @@ class SigninUiUtilTest_ReplaceSyncPromosWithSignInPromos
                 ShowTurnSyncOnUI(browser()->GetProfile(), access_point,
                                  promo_action, account_id, signin_aborted_mode,
                                  is_sync_promo, user_already_signed_in))
-        .Times(1);
+        .Times(IsReplaceSyncPromosWithSignInPromosEnabled() ? 0 : 1);
   }
 
  protected:

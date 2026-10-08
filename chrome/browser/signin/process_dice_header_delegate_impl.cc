@@ -332,6 +332,11 @@ void ProcessDiceHeaderDelegateImpl::CompleteChromeSignInAfterGaiaSignin(
     tab_helper->OnSyncSigninFlowComplete();
   }
 
+  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
+    Redirect();
+    return;
+  }
+
   if (!ShouldEnableSync()) {
     // No special treatment is needed if the user is not enabling sync.
     return;

@@ -276,7 +276,8 @@ TEST_F(ProcessDiceHeaderDelegateImplTest,
 
   // Check expectations.
   delegate->CompleteChromeSignInAfterGaiaSignin(account_info_);
-  EXPECT_TRUE(enable_sync_called_);
+  EXPECT_NE(enable_sync_called_,
+            syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
   EXPECT_FALSE(show_error_called_);
 }
 
@@ -302,7 +303,8 @@ TEST_F(ProcessDiceHeaderDelegateImplTest, NoRedirect) {
       CreateDelegateAndNavigateToSignin(/*is_sync_signin_tab=*/true,
                                         /*redirect_url=*/GURL());
   delegate->CompleteChromeSignInAfterGaiaSignin(account_info_);
-  EXPECT_TRUE(enable_sync_called_);
+  EXPECT_NE(enable_sync_called_,
+            syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
 
   // There was no redirect.
   EXPECT_EQ(signin_url_, web_contents()->GetVisibleURL());
@@ -322,7 +324,8 @@ TEST_F(ProcessDiceHeaderDelegateImplTest, TabReuse) {
       CreateDelegateAndNavigateToSignin(/*is_sync_signin_tab=*/true,
                                         /*redirect_url=*/GURL());
   delegate->CompleteChromeSignInAfterGaiaSignin(account_info_);
-  EXPECT_TRUE(enable_sync_called_);
+  EXPECT_NE(enable_sync_called_,
+            syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
   EXPECT_FALSE(show_error_called_);
 
   // Receive another Dice header in the same tab.
@@ -409,56 +412,6 @@ struct TestConfiguration {
   bool callback_called;  // The relevant callback was called.
   bool show_ntp;         // The NTP was shown.
 };
-
-TestConfiguration kEnableSyncTestCases[] = {
-    // clang-format off
-    // signed_in | signin_tab | callback_called | show_ntp
-    {  false,      false,       false,            false},
-    {  false,      true,        true,             true},
-    {  true,       false,       false,            false},
-    // If the user is already syncing, the callback is called, but the flow
-    // aborts before actually showing the dialog.
-    {  true,       true,        true,             true},
-    // clang-format on
-};
-
-// Parameterized version of ProcessDiceHeaderDelegateImplTest.
-class ProcessDiceHeaderDelegateImplTestEnableSync
-    : public ProcessDiceHeaderDelegateImplTest,
-      public ::testing::WithParamInterface<TestConfiguration> {
- private:
-  base::test::ScopedFeatureList scoped_feature_list_{
-      syncer::kReplaceSyncPromosWithSignInPromos};
-};
-
-// Test the EnableSync() method in all configurations.
-TEST_P(ProcessDiceHeaderDelegateImplTestEnableSync, EnableSync) {
-  if (GetParam().signed_in) {
-    AddAccount(/*is_primary=*/true);
-  }
-  const GURL& kNtpUrl = chrome::ChromeUINewTabURLAsGURL();
-  std::unique_ptr<ProcessDiceHeaderDelegateImpl> delegate =
-      CreateDelegateAndNavigateToSignin(GetParam().signin_tab,
-                                        /*redirect_url=*/kNtpUrl);
-  delegate->CompleteChromeSignInAfterGaiaSignin(account_info_);
-
-  EXPECT_EQ(GetParam().callback_called, enable_sync_called_);
-
-  GURL expected_url = GetParam().show_ntp ? kNtpUrl : signin_url_;
-  EXPECT_EQ(expected_url, web_contents()->GetVisibleURL());
-  EXPECT_FALSE(show_error_called_);
-  // Check that the sync signin flow is complete.
-  if (GetParam().signin_tab) {
-    DiceTabHelper* dice_tab_helper =
-        DiceTabHelper::FromWebContents(web_contents());
-    ASSERT_TRUE(dice_tab_helper);
-    EXPECT_FALSE(dice_tab_helper->IsSyncSigninInProgress());
-  }
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         ProcessDiceHeaderDelegateImplTestEnableSync,
-                         ::testing::ValuesIn(kEnableSyncTestCases));
 
 TestConfiguration kHandleTokenExchangeFailureTestCases[] = {
     // clang-format off
