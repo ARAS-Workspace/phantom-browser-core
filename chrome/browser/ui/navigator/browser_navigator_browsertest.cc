@@ -185,16 +185,6 @@ Browser* BrowserNavigatorTest::CreateEmptyBrowserForType(Browser::Type type,
   return browser;
 }
 
-Browser* BrowserNavigatorTest::CreateEmptyBrowserForApp(Profile* profile) {
-  Browser* browser =
-      CreateBrowserWindow(BrowserWindowCreateParams::CreateForApp(
-                              "Test", /*trusted_source=*/false, gfx::Rect(),
-                              profile, /*user_gesture=*/true))
-          ->GetBrowserForMigrationOnly();
-  chrome::AddTabAt(browser, GURL(), -1, true);
-  return browser;
-}
-
 std::unique_ptr<WebContents> BrowserNavigatorTest::CreateWebContents(
     bool initialize_renderer) {
   WebContents::CreateParams create_params(browser()->GetProfile());
@@ -586,39 +576,11 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest, Disposition_NewPopupFromPopup) {
 }
 
 // This test verifies that navigating with WindowOpenDisposition = NEW_POPUP
-// from an app frame results in a new Browser with TYPE_APP_POPUP.
-IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
-                       Disposition_NewPopupFromAppWindow) {
-  Browser* app_browser = CreateEmptyBrowserForApp(browser()->GetProfile());
-  NavigateParams params(MakeNavigateParams(app_browser));
-  params.disposition = WindowOpenDisposition::NEW_POPUP;
-  params.window_features.bounds = gfx::Rect(0, 0, 200, 200);
-  Navigate(&params);
-
-  // Navigate() should have opened a new TYPE_APP_POPUP window with no toolbar.
-  EXPECT_NE(app_browser, params.browser);
-  EXPECT_NE(browser(), params.browser);
-  EXPECT_EQ(params.browser->GetType(),
-            BrowserWindowInterface::Type::TYPE_APP_POPUP);
-  EXPECT_FALSE(BrowserWindow::FromBrowser(params.browser)->IsToolbarVisible());
-
-  // We should now have three windows, the app window, the app popup it created,
-  // and the original browser() provided by the framework.
-  EXPECT_EQ(3u, GlobalBrowserCollection::GetInstance()->GetSize());
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-  EXPECT_EQ(
-      1, app_browser->GetBrowserForMigrationOnly()->tab_strip_model()->count());
-  EXPECT_EQ(
-      1,
-      params.browser->GetBrowserForMigrationOnly()->tab_strip_model()->count());
-}
-
-// This test verifies that navigating with WindowOpenDisposition = NEW_POPUP
 // from an app popup results in a new Browser also of TYPE_APP_POPUP.
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest, Disposition_NewPopupFromAppPopup) {
-  Browser* app_browser = CreateEmptyBrowserForApp(browser()->GetProfile());
   // Open an app popup.
-  NavigateParams params1(MakeNavigateParams(app_browser));
+  NavigateParams params1(MakeNavigateParams());
+  params1.app_id = "extensionappid";
   params1.disposition = WindowOpenDisposition::NEW_POPUP;
   params1.window_features.bounds = gfx::Rect(0, 0, 200, 200);
   Navigate(&params1);
@@ -635,11 +597,10 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest, Disposition_NewPopupFromAppPopup) {
             BrowserWindowInterface::Type::TYPE_APP_POPUP);
   EXPECT_FALSE(BrowserWindow::FromBrowser(params2.browser)->IsToolbarVisible());
 
-  // We should now have four windows, the app window, the first app popup,
-  // the second app popup, and the original browser() provided by the framework.
-  EXPECT_EQ(4u, GlobalBrowserCollection::GetInstance()->GetSize());
+  // We should now have three windows, the first app popup, the second app
+  // popup, and the original browser() provided by the framework.
+  EXPECT_EQ(3u, GlobalBrowserCollection::GetInstance()->GetSize());
   EXPECT_EQ(1, browser()->tab_strip_model()->count());
-  EXPECT_EQ(1, app_browser->tab_strip_model()->count());
   EXPECT_EQ(1, params1.browser->GetBrowserForMigrationOnly()
                    ->tab_strip_model()
                    ->count());
@@ -1740,11 +1701,10 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
                                   ui::PAGE_TRANSITION_LINK);
     observer.Wait();
   }
-  Browser* app_browser =
-      CreateBrowserForApp("TestApp", browser()->GetProfile());
+  Browser* popup_browser = CreateBrowserForPopup(browser()->GetProfile());
 
   // This load should cause a window and tab switch.
-  ShowSingletonTab(app_browser, GetSettingsURL());
+  ShowSingletonTab(popup_browser, GetSettingsURL());
 
   EXPECT_EQ(2, browser()->tab_strip_model()->count());
   EXPECT_EQ(GetSettingsURL(),

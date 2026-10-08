@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/interaction/browser_elements.h"
 #include "chrome/browser/ui/side_panel/side_panel_action_callback.h"
 #include "chrome/browser/ui/side_panel/side_panel_entry.h"
@@ -36,8 +35,6 @@
 #include "chrome/browser/ui/views/toolbar/pinned_action_toolbar_button.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions_container.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/web_applications/web_app_launch_utils.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/interaction/interaction_test_util_browser.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
@@ -146,63 +143,6 @@ class SidePanelInteractiveTest : public InteractiveBrowserTest {
                     });
   }
 };
-
-// This test is specifically to guard against this regression
-// (crbug.com/40900604).
-IN_PROC_BROWSER_TEST_F(SidePanelInteractiveTest, SidePanelNotShownOnPwa) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kSecondTabElementId);
-  GURL second_tab_url("https://test.com");
-  auto* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
-
-  RunTestSequence(
-      // Add a second tab to the tab strip
-      AddInstrumentedTab(kSecondTabElementId, second_tab_url),
-      CheckResult(
-          ([&]() { return browser()->tab_strip_model()->active_index(); }), 1),
-      // Ensure the side panel isn't open
-      EnsureNotPresent(kSidePanelElementId),
-      CheckResult(([&]() {
-                    return browser()
-                        ->tab_strip_model()
-                        ->GetActiveWebContents()
-                        ->GetLastCommittedURL();
-                  }),
-                  second_tab_url),
-      Do(([&]() {
-        auto* registry =
-            SidePanelRegistry::From(browser()->GetActiveTabInterface());
-        registry->Register(std::make_unique<SidePanelEntry>(
-            SidePanelEntry::Key(SidePanelEntry::Id::kCustomizeChrome),
-            base::BindRepeating([](SidePanelEntryScope&) {
-              return std::make_unique<views::View>();
-            }),
-            /*default_content_width_callback=*/base::NullCallback()));
-        side_panel_ui->Show(SidePanelEntry::Id::kCustomizeChrome);
-      })),
-      WaitForShow(kSidePanelElementId),
-      CheckResult(([&]() {
-                    return side_panel_ui->IsSidePanelEntryShowing(
-                        SidePanelEntryKey(SidePanelEntryId::kCustomizeChrome));
-                  }),
-                  true));
-
-  // Install an app using second_tab_url.
-  auto app_id = web_app::test::InstallDummyWebApp(browser()->GetProfile(),
-                                                  "App Name", second_tab_url);
-
-  // Move second_tab contents to app, simulating open pwa from omnibox intent
-  // picker.
-  BrowserWindowInterface* app_browser =
-      web_app::ReparentWebContentsIntoAppBrowser(
-          browser()->tab_strip_model()->GetActiveWebContents(), app_id);
-  EXPECT_TRUE(app_browser->GetType() == BrowserWindowInterface::TYPE_APP);
-
-  // App does not show side panel.
-  EXPECT_FALSE(BrowserView::GetBrowserViewForBrowser(
-                   app_browser->GetBrowserForMigrationOnly())
-                   ->side_panel()
-                   ->GetVisible());
-}
 
 IN_PROC_BROWSER_TEST_F(SidePanelInteractiveTest, VisibilityToggleOnHover) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kSidePanelReadyIndicatorId);

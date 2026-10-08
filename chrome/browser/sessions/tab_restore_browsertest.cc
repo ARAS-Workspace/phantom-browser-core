@@ -681,8 +681,8 @@ IN_PROC_BROWSER_TEST_F(TabRestoreTest,
   // Create a browser that does not support groups and try to restore a
   // grouped tab. This should restore the tab and not recreate the group.
   BrowserWindowCreateParams app_browser_params =
-      BrowserWindowCreateParams::CreateForApp(
-          "App Name", /*trusted_source=*/true, gfx::Rect(),
+      BrowserWindowCreateParams::CreateForAppPopup(
+          "App Name", /*trusted_source=*/false, gfx::Rect(),
           browser()->GetProfile(), /*user_gesture=*/false);
   BrowserWindowInterface* app_browser =
       CreateBrowserWindow(std::move(app_browser_params));

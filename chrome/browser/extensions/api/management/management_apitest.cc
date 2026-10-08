@@ -16,7 +16,6 @@
 #include "chrome/browser/extensions/chrome_app_deprecation.h"
 #include "chrome/browser/extensions/extension_apitest.h"
 #include "chrome/browser/extensions/extension_service.h"
-#include "chrome/browser/extensions/launch_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/common/chrome_features.h"
@@ -42,7 +41,6 @@
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
 #include "chrome/browser/apps/intent_helper/preferred_apps_test_util.h"
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/web_applications/web_app_dialogs.h"
 #include "chrome/browser/web_applications/os_integration/os_integration_manager.h"
@@ -120,21 +118,6 @@ class ExtensionManagementApiTest : public extensions::ExtensionApiTest {
     DisableExtension(extension_ids_["disabled_extension"]);
     LoadNamedExtension(basedir, "disabled_app");
     DisableExtension(extension_ids_["disabled_app"]);
-  }
-
-  // Load an app, and wait for a message that it has been launched. This should
-  // be sent by the launched app, to ensure the page is fully loaded.
-  void LoadAndWaitForLaunch(const std::string& app_path,
-                            std::string* out_app_id) {
-    ExtensionTestMessageListener launched_app("launched app");
-    ASSERT_TRUE(LoadExtension(test_data_dir_.AppendASCII(app_path),
-                              {.context_type = ContextType::kFromManifest}));
-
-    if (out_app_id) {
-      *out_app_id = last_loaded_extension_id();
-    }
-
-    ASSERT_TRUE(launched_app.WaitUntilSatisfied());
   }
 
   void LoadNamedExtension(const base::FilePath& path,
@@ -485,116 +468,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, ManagementPolicyProhibited) {
   policy->RegisterProvider(&provider);
   ASSERT_TRUE(RunExtensionTest("management/management_policy",
                                {.custom_arg = "runProhibitedTests"}));
-}
-
-// Skipped on Android because it does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, LaunchPanelApp) {
-  // Load an extension that calls launchApp() on any app that gets
-  // installed.
-  ExtensionTestMessageListener launcher_loaded("launcher loaded");
-  ASSERT_TRUE(LoadExtension(
-      test_data_dir_.AppendASCII("management/launch_on_install")));
-  ASSERT_TRUE(launcher_loaded.WaitUntilSatisfied());
-
-  // Load an app with app.launch.container = "panel".
-  std::string app_id;
-  LoadAndWaitForLaunch("management/launch_app_panel", &app_id);
-  ASSERT_FALSE(HasFatalFailure());  // Stop the test if any ASSERT failed.
-
-  // Find the app's browser.  Check that it is a popup.
-  ASSERT_EQ(2u, extensions::browsertest_util::GetWindowControllerCountInProfile(
-                    profile()));
-  BrowserWindowInterface* app_browser_window =
-      ui_test_utils::GetBrowserNotInSet({browser()});
-  ASSERT_TRUE(app_browser_window->GetType() ==
-              BrowserWindowInterface::TYPE_APP);
-
-  // Close the app panel.
-  CloseBrowserSynchronously(app_browser_window);
-
-  extensions::ExtensionRegistry* registry =
-      extensions::ExtensionRegistry::Get(profile());
-  // Unload the extension.
-  UninstallExtension(app_id);
-  ASSERT_EQ(1u, extensions::browsertest_util::GetWindowControllerCountInProfile(
-                    profile()));
-  ASSERT_FALSE(registry->GetExtensionById(
-      app_id, extensions::ExtensionRegistry::EVERYTHING));
-
-  // Set a pref indicating that the user wants to launch in a regular tab.
-  // This should be ignored, because panel apps always load in a popup.
-  extensions::SetLaunchType(profile(), app_id,
-                            extensions::LaunchType::kRegular);
-
-  // Load the extension again.
-  std::string app_id_new;
-  LoadAndWaitForLaunch("management/launch_app_panel", &app_id_new);
-  ASSERT_FALSE(HasFatalFailure());
-
-  // If the ID changed, then the pref will not apply to the app.
-  ASSERT_EQ(app_id, app_id_new);
-
-  // Find the app's browser.  Apps that should load in a panel ignore
-  // prefs, so we should still see the launch in a popup.
-  ASSERT_EQ(2u, extensions::browsertest_util::GetWindowControllerCountInProfile(
-                    profile()));
-  app_browser_window = ui_test_utils::GetBrowserNotInSet({browser()});
-  ASSERT_TRUE(app_browser_window->GetType() ==
-              BrowserWindowInterface::TYPE_APP);
-}
-
-// Skipped on Android because it does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, LaunchTabApp) {
-  // Load an extension that calls launchApp() on any app that gets
-  // installed.
-  ExtensionTestMessageListener launcher_loaded("launcher loaded");
-  ASSERT_TRUE(LoadExtension(
-      test_data_dir_.AppendASCII("management/launch_on_install")));
-  ASSERT_TRUE(launcher_loaded.WaitUntilSatisfied());
-
-  // Code below assumes that the test starts with a single browser window
-  // hosting one tab.
-  ASSERT_EQ(1u, extensions::browsertest_util::GetWindowControllerCountInProfile(
-                    profile()));
-  ASSERT_EQ(1, browser()->tab_strip_model()->count());
-
-  // Load an app with app.launch.container = "tab".
-  std::string app_id;
-  LoadAndWaitForLaunch("management/launch_app_tab", &app_id);
-  ASSERT_FALSE(HasFatalFailure());
-
-  // Check that the app opened in a new tab of the existing browser.
-  ASSERT_EQ(1u, extensions::browsertest_util::GetWindowControllerCountInProfile(
-                    profile()));
-  ASSERT_EQ(2, browser()->tab_strip_model()->count());
-
-  extensions::ExtensionRegistry* registry =
-      extensions::ExtensionRegistry::Get(profile());
-  // Unload the extension.
-  UninstallExtension(app_id);
-  ASSERT_EQ(1u, extensions::browsertest_util::GetWindowControllerCountInProfile(
-                    profile()));
-  ASSERT_FALSE(registry->GetExtensionById(
-      app_id, extensions::ExtensionRegistry::EVERYTHING));
-
-  // Set a pref indicating that the user wants to launch in a window.
-  extensions::SetLaunchType(profile(), app_id, extensions::LaunchType::kWindow);
-
-  std::string app_id_new;
-  LoadAndWaitForLaunch("management/launch_app_tab", &app_id_new);
-  ASSERT_FALSE(HasFatalFailure());
-
-  // If the ID changed, then the pref will not apply to the app.
-  ASSERT_EQ(app_id, app_id_new);
-
-  // Find the app's browser.  Opening in a new window will create
-  // a new browser.
-  ASSERT_EQ(2u, extensions::browsertest_util::GetWindowControllerCountInProfile(
-                    profile()));
-  BrowserWindowInterface* app_browser_window =
-      ui_test_utils::GetBrowserNotInSet({browser()});
-  ASSERT_TRUE(app_browser_window->GetType() ==
-              BrowserWindowInterface::TYPE_APP);
 }
 
 // Skipped on Android because it does not support Chrome apps.

@@ -23,7 +23,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/metrics/statistics_recorder.h"
 #include "base/path_service.h"
-#include "base/process/launch.h"
 #include "base/run_loop.h"
 #include "base/scoped_observation.h"
 #include "base/strings/stringprintf.h"
@@ -54,7 +53,6 @@
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/sessions/app_session_service.h"
 #include "chrome/browser/sessions/app_session_service_factory.h"
-#include "chrome/browser/sessions/app_session_service_test_helper.h"
 #include "chrome/browser/sessions/exit_type_service.h"
 #include "chrome/browser/sessions/session_restore_test_helper.h"
 #include "chrome/browser/sessions/session_service.h"
@@ -1841,39 +1839,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, ActiveIndexUpdatedAtInsert) {
             new_browser->GetTabStripModel()->GetActiveWebContents()->GetURL());
   ASSERT_EQ(new_browser->GetTabStripModel()->active_index(), 1);
 }
-
-#if !BUILDFLAG(IS_MAC)
-// This test doesn't apply to Mac; see GetCommandLineForRelaunch for details.
-
-// Launches an app window, closes tabbed browser, launches and makes sure
-// we restore the tabbed browser url.
-// If this test flakes, use http://crbug.com/41051840
-IN_PROC_BROWSER_TEST_F(SessionRestoreTest,
-                       RestoreAfterClosingTabbedBrowserWithAppAndLaunching) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetUrl1()));
-
-  // Launch an app.
-  base::CommandLine app_launch_arguments = GetCommandLineForRelaunch();
-  app_launch_arguments.AppendSwitchASCII(switches::kApp, GetUrl2().spec());
-
-  base::LaunchProcess(app_launch_arguments, base::LaunchOptionsForTest());
-  BrowserWindowInterface* app_window = ui_test_utils::WaitForBrowserToOpen();
-  ASSERT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  // Close the first window. The only window left is the App window.
-  CloseBrowserSynchronously(browser());
-
-  // Restore the session, which should bring back the first window with
-  // GetUrl1().
-  BrowserWindowInterface* new_browser = QuitBrowserAndRestore(app_window);
-
-  AssertOneWindowWithOneTab(new_browser);
-
-  ASSERT_EQ(GetUrl1(),
-            new_browser->GetTabStripModel()->GetActiveWebContents()->GetURL());
-}
-
-#endif  // !BUILDFLAG(IS_MAC)
 
 // Creates two windows, closes one, restores, make sure only one window open.
 IN_PROC_BROWSER_TEST_F(SessionRestoreTest, TwoWindowsCloseOneRestoreOnlyOne) {

@@ -5,6 +5,7 @@
 #include "chrome/browser/ui/webui/context_hub/context_hub_tab_provider_desktop.h"
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "base/test/scoped_feature_list.h"
@@ -16,6 +17,7 @@
 #include "chrome/browser/personal_context/personal_context_service_factory.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
 #include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/browser_with_test_window_test.h"
 #include "components/personal_context/core/mock_personal_context_service.h"
@@ -25,6 +27,7 @@
 #include "components/sessions/content/session_tab_helper.h"
 #include "content/public/browser/web_contents.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "ui/gfx/geometry/rect.h"
 #include "url/gurl.h"
 
 namespace context_hub {
@@ -114,9 +117,14 @@ TEST_F(ContextHubTabProviderDesktopTest,
   AddTab(browser(), GURL("https://example.com/pinned"));
   browser()->tab_strip_model()->SetTabPinned(0, true);
 
-  // Window without tab group support (e.g. app window).
+  // Window without tab group support (e.g. extension popup window).
+  BrowserWindowCreateParams params =
+      BrowserWindowCreateParams::CreateForAppPopup(
+          "Test", /*trusted_source=*/false, /*window_bounds=*/gfx::Rect(),
+          profile(), /*user_gesture=*/true);
+  params.window = CreateBrowserWindow().release();
   std::unique_ptr<Browser> app_browser =
-      CreateBrowser(profile(), Browser::TYPE_APP, /*hosted_app=*/true);
+      DeprecatedCreateOwnedBrowserWindowForTesting(std::move(params));
   AddTab(app_browser.get(), GURL("https://example.com/app"));
 
   std::vector<content::WebContents*> tabs = provider_->GetUngroupedTabs();
@@ -184,7 +192,7 @@ TEST_F(ContextHubTabProviderDesktopTest, GetTabs_MultipleWindows) {
   AddTab(browser(), GURL("https://example.com/w1_t2"));
 
   std::unique_ptr<Browser> second_browser =
-      CreateBrowser(profile(), Browser::TYPE_NORMAL, /*hosted_app=*/false);
+      CreateBrowser(profile(), Browser::TYPE_NORMAL);
   AddTab(second_browser.get(), GURL("https://example.com/w2_t1"));
 
   std::vector<content::WebContents*> tabs = provider_->GetTabs();
@@ -222,7 +230,7 @@ TEST_F(ContextHubTabProviderDesktopTest, ConfirmTabGroups_CrossWindow) {
 
   // Window 2 has 2 tabs (majority).
   std::unique_ptr<Browser> second_browser =
-      CreateBrowser(profile(), Browser::TYPE_NORMAL, /*hosted_app=*/false);
+      CreateBrowser(profile(), Browser::TYPE_NORMAL);
   AddTab(second_browser.get(), GURL("https://example.com/2"));
   AddTab(second_browser.get(), GURL("https://example.com/3"));
   int64_t id2 = GetTabId(second_browser.get(), 0);

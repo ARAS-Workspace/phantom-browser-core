@@ -8,16 +8,10 @@
 
 #include "base/command_line.h"
 #include "base/memory/raw_ptr.h"
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/apps/app_service/browser_app_launcher.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "components/permissions/request_type.h"
 #include "components/permissions/test/mock_permission_request.h"
-#include "components/services/app_service/public/cpp/app_launch_params.h"
-#include "components/services/app_service/public/cpp/app_launch_util.h"
 
 PermissionBubbleBrowserTest::PermissionBubbleBrowserTest() = default;
 
@@ -32,23 +26,6 @@ void PermissionBubbleBrowserTest::SetUpOnMainThread() {
       permissions::RequestType::kNotifications, /*request_state=*/nullptr));
 
   test_delegate_.set_requests(std::move(requests));
-}
-
-content::WebContents* PermissionBubbleBrowserTest::OpenExtensionAppWindow() {
-  const extensions::Extension* extension =
-      LoadExtension(test_data_dir_.AppendASCII("app_with_panel_container/"));
-  CHECK(extension);
-
-  apps::AppLaunchParams params(
-      extension->id(), apps::LaunchContainer::kLaunchContainerPanelDeprecated,
-      WindowOpenDisposition::NEW_WINDOW, apps::LaunchSource::kFromTest);
-
-  content::WebContents* app_contents =
-      apps::AppServiceProxyFactory::GetForProfile(browser()->GetProfile())
-          ->BrowserAppLauncher()
-          ->LaunchAppWithParamsForTesting(std::move(params));
-  CHECK(app_contents);
-  return app_contents;
 }
 
 PermissionBubbleKioskBrowserTest::PermissionBubbleKioskBrowserTest() = default;

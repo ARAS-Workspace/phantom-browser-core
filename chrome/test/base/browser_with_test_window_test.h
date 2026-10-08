@@ -75,29 +75,22 @@ class TestingProfileManager;
 // for creating the various objects of this class.
 class BrowserWithTestWindowTest : public testing::Test, public ProfileObserver {
  public:
-  // Trait which requests construction of a hosted app.
-  struct HostedApp {};
-
   // List of traits that are valid inputs for the constructor below.
   using ValidTraits =
       base::ConcatParameterPacks<content::BrowserTaskEnvironment::ValidTraits,
-                                 base::ParameterPack<HostedApp, Browser::Type>>;
+                                 base::ParameterPack<Browser::Type>>;
 
   // Creates a BrowserWithTestWindowTest with zero or more traits. By default
-  // the initial window will be a tabbed browser created on the native desktop,
-  // which is not a hosted app.
+  // the initial window will be a tabbed browser created on the native desktop.
   template <typename... TaskEnvironmentTraits>
     requires base::trait_helpers::AreValidTraits<ValidTraits,
                                                  TaskEnvironmentTraits...>
   NOINLINE explicit BrowserWithTestWindowTest(TaskEnvironmentTraits... traits)
       : BrowserWithTestWindowTest(
             std::make_unique<content::BrowserTaskEnvironment>(
-                base::trait_helpers::Exclude<HostedApp, Browser::Type>::Filter(
-                    traits)...),
+                base::trait_helpers::Exclude<Browser::Type>::Filter(traits)...),
             base::trait_helpers::GetEnum<Browser::Type, Browser::TYPE_NORMAL>(
-                traits...),
-            base::trait_helpers::HasTrait<HostedApp,
-                                          TaskEnvironmentTraits...>()) {}
+                traits...)) {}
 
   BrowserWithTestWindowTest(const BrowserWithTestWindowTest&) = delete;
   BrowserWithTestWindowTest& operator=(const BrowserWithTestWindowTest&) =
@@ -193,18 +186,15 @@ class BrowserWithTestWindowTest : public testing::Test, public ProfileObserver {
   // cleaning it up (usually by NativeWidget destruction).
   virtual std::unique_ptr<BrowserWindow> CreateBrowserWindow();
 
-  // Creates the browser given |profile|, |browser_type|, |hosted_app|, and
-  // |browser_window|.
+  // Creates the browser given |profile|, |browser_type| and |browser_window|.
   virtual std::unique_ptr<Browser> CreateBrowser(Profile* profile,
                                                  Browser::Type browser_type,
-                                                 bool hosted_app,
                                                  BrowserWindow* browser_window);
 
-  // Creates the browser given `profile`, `browser_type` and `hosted_app` and
-  // a window created via `CreateBrowserWindow()`.
+  // Creates the browser given `profile` and `browser_type` and a window created
+  // via `CreateBrowserWindow()`.
   virtual std::unique_ptr<Browser> CreateBrowser(Profile* profile,
-                                                 Browser::Type browser_type,
-                                                 bool hosted_app);
+                                                 Browser::Type browser_type);
 
 #if defined(TOOLKIT_VIEWS)
   views::TestViewsDelegate* test_views_delegate() {
@@ -217,8 +207,7 @@ class BrowserWithTestWindowTest : public testing::Test, public ProfileObserver {
   // constructor to initialize all other members out-of-line.
   BrowserWithTestWindowTest(
       std::unique_ptr<content::BrowserTaskEnvironment> task_environment,
-      Browser::Type browser_type,
-      bool hosted_app);
+      Browser::Type browser_type);
 
   // We need to create a MessageLoop, otherwise a bunch of things fails.
   std::unique_ptr<content::BrowserTaskEnvironment> task_environment_;
@@ -245,9 +234,6 @@ class BrowserWithTestWindowTest : public testing::Test, public ProfileObserver {
 
   // The type of browser to create (tabbed or popup).
   const Browser::Type browser_type_;
-
-  // Whether the browser is part of a hosted app.
-  const bool hosted_app_;
 
   // Initialize the variations provider.
   variations::test::ScopedVariationsIdsProvider scoped_variations_ids_provider_{

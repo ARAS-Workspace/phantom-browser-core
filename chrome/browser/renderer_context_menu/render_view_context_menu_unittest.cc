@@ -445,27 +445,6 @@ class RenderViewContextMenuPrefsTest
     return browser_.get();
   }
 
-  BrowserWindowInterface* GetPwaBrowser() {
-    if (!browser_) {
-      auto mock_browser =
-          std::make_unique<testing::NiceMock<MockBrowserWindowInterface>>();
-      ON_CALL(*mock_browser, GetProfile())
-          .WillByDefault(testing::Return(profile()));
-      ON_CALL(testing::Const(*mock_browser), GetProfile())
-          .WillByDefault(testing::Return(profile()));
-      ON_CALL(testing::Const(*mock_browser), GetUnownedUserDataHost())
-          .WillByDefault(testing::ReturnRef(unowned_user_data_host_));
-      ON_CALL(testing::Const(*mock_browser), GetType())
-          .WillByDefault(testing::Return(BrowserWindowInterface::TYPE_APP));
-      ON_CALL(*mock_browser, GetFeatures())
-          .WillByDefault(testing::ReturnRef(features_));
-      ON_CALL(testing::Const(*mock_browser), GetFeatures())
-          .WillByDefault(testing::ReturnRef(features_));
-      browser_ = std::move(mock_browser);
-    }
-    return browser_.get();
-  }
-
   const GURL& last_preresolved_url() const { return last_preresolved_url_; }
   content::MockRenderProcessHostFactory& mock_rph_factory() {
     return mock_rph_factory_;

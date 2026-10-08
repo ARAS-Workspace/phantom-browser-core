@@ -443,43 +443,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   EXPECT_TRUE(observer->opened_profiles_.empty());
 }
 
-IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, OpenAppUrlShortcut) {
-  // Add --app=<url> to the command line. Tests launching legacy apps which may
-  // have been created by "Add to Desktop" in old versions of Chrome.
-  // TODO(mgiuca): Delete this feature (https://crbug.com/41337042). We are
-  // keeping it for now to avoid disrupting existing workflows.
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  GURL url = chrome_test_utils::GetTestUrl(
-      base::FilePath(base::FilePath::kCurrentDirectory),
-      base::FilePath(FILE_PATH_LITERAL("title2.html")));
-  command_line.AppendSwitchASCII(switches::kApp, url.spec());
-
-  ASSERT_TRUE(StartupBrowserCreator().ProcessCmdLineImpl(
-      command_line, base::FilePath(), chrome::startup::IsProcessStartup::kNo,
-      {browser()->GetProfile(), StartupProfileMode::kBrowserWindow}, {}));
-
-  BrowserWindowInterface* const new_browser =
-      ui_test_utils::GetBrowserNotInSet({browser()});
-  ASSERT_TRUE(new_browser);
-
-  // The new window should be an app window.
-  EXPECT_TRUE(new_browser->GetType() == BrowserWindowInterface::TYPE_APP);
-
-  TabStripModel* const tab_strip = new_browser->GetTabStripModel();
-  ASSERT_EQ(1, tab_strip->count());
-  content::WebContents* web_contents = tab_strip->GetWebContentsAt(0);
-  // At this stage, the web contents' URL should be the one passed in to --app
-  // (but it will not yet be committed into the navigation controller).
-  EXPECT_EQ("title2.html", web_contents->GetVisibleURL().ExtractFileName());
-
-  // Wait until the navigation is complete. Then the URL will be committed to
-  // the navigation controller.
-  content::TestNavigationObserver observer(web_contents, 1);
-  observer.Wait();
-  EXPECT_EQ("title2.html",
-            web_contents->GetLastCommittedURL().ExtractFileName());
-}
-
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
                        KSameTabSwitchReplacesActiveTab) {
   // Use a couple of arbitrary URLs.
@@ -527,53 +490,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   EXPECT_EQ(3, tab_strip->count());  // Verify total tabs.
   EXPECT_EQ(urls[1], tab_strip->GetWebContentsAt(1)->GetVisibleURL());
   EXPECT_EQ(urls[2], tab_strip->GetWebContentsAt(2)->GetVisibleURL());
-}
-
-IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, OpenAppUrlIncognitoShortcut) {
-  // Add --app=<url> and --incognito to the command line. Tests launching
-  // legacy apps which may have been created by "Add to Desktop" in old versions
-  // of Chrome. Some existing workflows (especially testing scenarios) also
-  // use the --incognito command line.
-  // TODO(mgiuca): Delete this feature (https://crbug.com/41337042). We are
-  // keeping it for now to avoid disrupting existing workflows.
-  // IMPORTANT NOTE: This is being committed because it is an easy fix, but
-  // this use case is not officially supported. If a future refactor or
-  // feature launch causes this to break again, we have no formal
-  // responsibility to make this continue working. If you rely on the
-  // combination of these two flags, you WILL be broken in the future.
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  GURL url = chrome_test_utils::GetTestUrl(
-      base::FilePath(base::FilePath::kCurrentDirectory),
-      base::FilePath(FILE_PATH_LITERAL("title2.html")));
-  command_line.AppendSwitchASCII(switches::kApp, url.spec());
-  command_line.AppendSwitch(switches::kIncognito);
-
-  Browser* incognito = CreateIncognitoBrowser();
-
-  ASSERT_TRUE(StartupBrowserCreator().ProcessCmdLineImpl(
-      command_line, base::FilePath(), chrome::startup::IsProcessStartup::kNo,
-      {incognito->GetProfile(), StartupProfileMode::kBrowserWindow}, {}));
-
-  BrowserWindowInterface* const new_browser =
-      ui_test_utils::GetBrowserNotInSet({incognito});
-  ASSERT_TRUE(new_browser);
-
-  // The new window should be an app window.
-  EXPECT_TRUE(new_browser->GetType() == BrowserWindowInterface::TYPE_APP);
-
-  TabStripModel* const tab_strip = new_browser->GetTabStripModel();
-  ASSERT_EQ(1, tab_strip->count());
-  content::WebContents* web_contents = tab_strip->GetWebContentsAt(0);
-  // At this stage, the web contents' URL should be the one passed in to --app
-  // (but it will not yet be committed into the navigation controller).
-  EXPECT_EQ("title2.html", web_contents->GetVisibleURL().ExtractFileName());
-
-  // Wait until the navigation is complete. Then the URL will be committed to
-  // the navigation controller.
-  content::TestNavigationObserver observer(web_contents, 1);
-  observer.Wait();
-  EXPECT_EQ("title2.html",
-            web_contents->GetLastCommittedURL().ExtractFileName());
 }
 
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
@@ -3540,33 +3456,6 @@ IN_PROC_BROWSER_TEST_P(StartupBrowserCreatorInfobarsTest,
             policy_ != CommandLineFlagSecurityWarningsPolicy::kDisabled);
 }
 
-IN_PROC_BROWSER_TEST_P(StartupBrowserCreatorInfobarsTest,
-                       CheckInfobarIsShownForAppUrlShortcuts) {
-  // We deliberately set the flag on the process command line instead of on the
-  // command_line passed to the StartupBrowserCreator, because these flags are
-  // all read from CommandLine::ForCurrentProcess and ignore the command line
-  // passed to StartupBrowserCreator. In browser tests, this references the
-  // browser test's instead of the new process.
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(flag_type_.flag);
-
-  // Add --app=<url> to the command line. Tests launching legacy apps which may
-  // have been created by "Add to Desktop" in old versions of Chrome.
-  // TODO(mgiuca): Delete this feature (https://crbug.com/41337042). We are
-  // keeping it for now to avoid disrupting existing workflows.
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  GURL url = chrome_test_utils::GetTestUrl(
-      base::FilePath(base::FilePath::kCurrentDirectory),
-      base::FilePath(FILE_PATH_LITERAL("title2.html")));
-  command_line.AppendSwitchASCII(switches::kApp, url.spec());
-
-  auto [browser, infobar_manager] =
-      LaunchBrowserAndGetCreatedInfoBarManager(command_line);
-  EXPECT_EQ(browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
-
-  EXPECT_EQ(HasInfoBar(infobar_manager, flag_type_.infobar_identifier),
-            policy_ != CommandLineFlagSecurityWarningsPolicy::kDisabled);
-}
-
 // The trybots set the kNoSandbox flag when running browser tests with the
 // address sanitizer enabled, which contradicts with the assumption of this test
 // that there is no bad flag on the process command line.
@@ -3973,8 +3862,6 @@ INSTANTIATE_TEST_SUITE_P(
         // profile, instead.
         ProfilePickerSetup{/*expected_to_show=*/false,
                            /*switch_name=*/switches::kIncognito},
-        ProfilePickerSetup{/*expected_to_show=*/false,
-                           /*switch_name=*/switches::kApp},
         ProfilePickerSetup{/*expected_to_show=*/false,
                            /*switch_name=*/switches::kAppId},
         ProfilePickerSetup{/*expected_to_show=*/false,

@@ -9,7 +9,6 @@
 
 #include "base/byte_size.h"
 #include "base/memory/scoped_refptr.h"
-#include "base/numerics/safe_conversions.h"
 #include "base/strings/strcat.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -703,63 +702,6 @@ TEST_F(BrowserViewPipTest, CanFullscreenPolicyDoesNotEnableFullscreen) {
 }
 
 #endif  // !BUILDFLAG(IS_MAC)
-
-class BrowserViewHostedAppTest : public TestWithBrowserView {
- public:
-  BrowserViewHostedAppTest()
-      : TestWithBrowserView(Browser::TYPE_POPUP,
-                            BrowserWithTestWindowTest::HostedApp()) {}
-
-  BrowserViewHostedAppTest(const BrowserViewHostedAppTest&) = delete;
-  BrowserViewHostedAppTest& operator=(const BrowserViewHostedAppTest&) = delete;
-
-  ~BrowserViewHostedAppTest() override = default;
-};
-
-// Test basic layout for hosted apps.
-TEST_F(BrowserViewHostedAppTest, Layout) {
-  // Add a tab because the browser starts out without any tabs at all.
-  AddTab(browser(), GURL("about:blank"));
-
-  const int contents_container_y = browser_view()->contents_container()->y();
-
-  // The tabstrip, toolbar and bookmark bar should not be visible for hosted
-  // apps.
-  EXPECT_FALSE(
-      browser_view()->horizontal_tab_strip_for_testing()->GetVisible());
-  EXPECT_FALSE(browser_view()->toolbar()->GetVisible());
-  EXPECT_FALSE(browser_view()->IsBookmarkBarVisible());
-
-  const auto* const frame_view =
-      browser_view()->browser_widget()->GetFrameView();
-
-  gfx::Point header_offset;
-  views::View::ConvertPointToTarget(browser_view(), frame_view, &header_offset);
-
-  const auto params = frame_view->GetBrowserLayoutParams();
-
-#if BUILDFLAG(IS_MAC)
-  // The system paints the caption area, so the contents start at the top of
-  // the layout.
-  const int bottom_of_header = 0;
-#else
-  // The position of the bottom of the header (the bar with the window
-  // controls) in the coordinates of the browser view.
-  const int bottom_of_header = base::ClampCeil(
-      std::max(params.leading_exclusion.ContentWithPadding().height(),
-               params.trailing_exclusion.ContentWithPadding().height()));
-#endif
-
-  // The top of the browser view in the coordinates of the frame.
-  const int top_inset = bottom_of_header + params.visual_client_area.y();
-
-  // The web contents should be flush with the bottom of the header.
-  EXPECT_EQ(bottom_of_header, contents_container_y);
-
-  // The find bar should be aligned with the bottom of the header in the
-  // coordinates of the frame.
-  EXPECT_EQ(top_inset, browser_view()->GetFindBarBoundingBox().y());
-}
 
 using BrowserViewWindowTypeTest = BrowserWithTestWindowTest;
 

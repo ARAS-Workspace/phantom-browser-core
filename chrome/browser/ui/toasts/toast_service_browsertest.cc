@@ -88,9 +88,9 @@ IN_PROC_BROWSER_TEST_F(ToastServiceBrowserTest, RegisterAllToastIds) {
   }
 }
 
-// Verifies that the ToastService and ToastController should exist for normal
-// browser windows, and PWAs. The ToastService and ToastController should be
-// null for other browser types since toasts are not supported on them.
+// Verifies that the ToastService and ToastController exist for normal browser
+// windows and are null for the popup, picture-in-picture and devtools browser
+// types, which do not support toasts.
 IN_PROC_BROWSER_TEST_F(ToastServiceBrowserTest, ServiceExistForBrowserTypes) {
   BrowserWindowFeatures* const normal_window_features =
       &browser()->GetFeatures();
@@ -102,11 +102,6 @@ IN_PROC_BROWSER_TEST_F(ToastServiceBrowserTest, ServiceExistForBrowserTypes) {
       &CreateBrowserForPopup(profile)->GetFeatures();
   EXPECT_FALSE(popup_window_features->toast_service());
   EXPECT_FALSE(popup_window_features->toast_controller());
-
-  BrowserWindowFeatures* const app_window_features =
-      &CreateBrowserForApp("test_app_name", profile)->GetFeatures();
-  EXPECT_TRUE(app_window_features->toast_service());
-  EXPECT_TRUE(app_window_features->toast_controller());
 
   Browser* const pip_browser =
       CreateBrowserWindow(BrowserWindowCreateParams::CreateForPictureInPicture(

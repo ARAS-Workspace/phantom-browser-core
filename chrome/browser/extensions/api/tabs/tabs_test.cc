@@ -11,7 +11,6 @@
 #include <string>
 
 #include "base/feature_list.h"
-#include "base/files/scoped_temp_dir.h"
 #include "base/format_macros.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
@@ -39,7 +38,6 @@
 #include "chrome/browser/extensions/browser_extension_window_controller.h"
 #include "chrome/browser/extensions/extension_apitest.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
-#include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/extensions/window_controller.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
@@ -48,12 +46,10 @@
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/saved_tab_group_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/zoom/chrome_zoom_level_prefs.h"
-#include "chrome/common/chrome_switches.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
@@ -113,21 +109,10 @@
 #include "chrome/browser/ui/tabs/saved_tab_groups/tab_group_sync_service_initialized_observer.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/commands/install_isolated_web_app_command.h"
-#include "chrome/browser/web_applications/isolated_web_apps/install/isolated_web_app_install_source.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_trust_checker.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_command_scheduler.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_provider_factory.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/split_tabs/split_tab_id.h"
 #include "components/split_tabs/split_tab_visual_data.h"
-#include "components/webapps/isolated_web_apps/test_support/signing_keys.h"
 
 #if BUILDFLAG(IS_MAC)
 #include "ui/base/test/scoped_fake_nswindow_fullscreen.h"
@@ -398,13 +383,9 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, GetWindow) {
             GetWindowType(DevToolsWindowTesting::Get(devtools)->browser(),
                           extension));
   DevToolsWindowTesting::CloseDevToolsWindowSync(devtools);
-  test_browser = CreateBrowserWindow(BrowserWindowCreateParams::CreateForApp(
-      "test-app", /*trusted_source=*/true, gfx::Rect(), profile(),
-      /*user_gesture=*/true));
-  EXPECT_EQ("app", GetWindowType(test_browser, extension));
   test_browser =
       CreateBrowserWindow(BrowserWindowCreateParams::CreateForAppPopup(
-          "test-app-popup", /*trusted_source=*/true, gfx::Rect(), profile(),
+          "test-app-popup", /*trusted_source=*/false, gfx::Rect(), profile(),
           /*user_gesture=*/true));
   EXPECT_EQ("popup", GetWindowType(test_browser, extension));
 
@@ -1327,222 +1308,25 @@ IN_PROC_BROWSER_TEST_F(ExtensionWindowCreateTest, CreatePopupWindowFromWebUI) {
   EXPECT_TRUE(error.empty());
 }
 
-struct ExtensionWindowCreateIwaParam {
-  std::string test_name;
-  bool want_success;
-  std::string args;
-};
+using ExtensionApiTabsIwaNavigateTest = ExtensionTabsTest;
 
-class ExtensionIwaTestBase : public InProcessBrowserTest {
- public:
-  ExtensionIwaTestBase() {
-    scoped_feature_list_.InitAndEnableFeature(features::kIsolatedWebApps);
-    set_open_about_blank_on_browser_launch(false);
-  }
+constexpr char kIwaDeepUrl[] =
+    "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/"
+    "deep/page.html";
 
-  void SetUpOnMainThread() override {
-    InProcessBrowserTest::SetUpOnMainThread();
-
-    web_app::test::WaitUntilReady(
-        web_app::WebAppProvider::GetForTest(profile()));
-    ASSERT_TRUE(scoped_temp_dir_.CreateUniqueTempDir());
-  }
-
-  void SetUpDefaultCommandLine(base::CommandLine* command_line) override {
-    InProcessBrowserTest::SetUpDefaultCommandLine(command_line);
-    // Suppress "Welcome to Google Chrome" window
-    command_line->AppendSwitch(switches::kNoFirstRun);
-    command_line->AppendSwitch(switches::kNoStartupWindow);
-    command_line->AppendSwitch(switches::kKeepAliveForTest);
-  }
-
-  void TearDownOnMainThread() override {
-    if (GlobalBrowserCollection::GetInstance()->IsEmpty()) {
-      // Tests crash during teardown if no browser has opened combined with the
-      // command line switches above. Open a browser to avoid the crash.
-      CreateBrowser(profile());
-    }
-    InProcessBrowserTest::TearDownOnMainThread();
-  }
-
-  Profile* profile() {
-    // We cannot use `profile()` here, because `browser()` is
-    // `nullptr` due to the command line switches above.
-    return profile_util::GetLastUsedProfile();
-  }
-
- protected:
-  web_app::IsolatedWebAppUrlInfo InstallAndTrustBundle() {
-    auto bundle = web_app::IsolatedWebAppBuilder(web_app::ManifestBuilder())
-                      .AddHtml("/", "Hello extensions!")
-                      .BuildBundle(web_app::test::GetDefaultEd25519KeyPair());
-    return bundle->InstallChecked(profile());
-  }
-
-  BrowserWindowInterface* OpenIwa(
-      const web_app::IsolatedWebAppUrlInfo& url_info) {
-    scoped_refptr<const Extension> extension =
-        ExtensionBuilder("IwaOpenerExtension").Build();
-    auto function = base::MakeRefCounted<WindowsCreateFunction>();
-    function->set_extension(extension);
-
-    std::string args = base::StringPrintf(
-        R"([{"url": "%s"}])", url_info.origin().GetURL().spec().c_str());
-
-    bool result = api_test_utils::RunFunction(
-        function.get(), args, profile(), api_test_utils::FunctionMode::kNone);
-    EXPECT_TRUE(result) << function->GetError();
-
-    BrowserWindowInterface* iwa_browser =
-        GetLastActiveBrowserWindowInterfaceWithAnyProfile();
-    EXPECT_TRUE(iwa_browser);
-    return iwa_browser;
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-  web_app::OsIntegrationManager::ScopedSuppressForTesting os_hooks_suppress_;
-  base::ScopedTempDir scoped_temp_dir_;
-};
-
-// Test that `windows.create` functions correctly for Isolated Web Apps.
-class ExtensionWindowCreateIwaTest
-    : public ExtensionIwaTestBase,
-      public testing::WithParamInterface<ExtensionWindowCreateIwaParam> {
- public:
-  ExtensionWindowCreateIwaTest() = default;
-};
-
-IN_PROC_BROWSER_TEST_P(ExtensionWindowCreateIwaTest, CreateWindowForIwa) {
-  auto url_info = InstallAndTrustBundle();
-
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 0ul);
-
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("ExtensionWindowCreateIwaTest").Build();
-  auto function = base::MakeRefCounted<WindowsCreateFunction>();
-  function->set_extension(extension);
-  bool result =
-      api_test_utils::RunFunction(function.get(), GetParam().args, profile(),
-                                  api_test_utils::FunctionMode::kNone);
-  if (GetParam().want_success) {
-    EXPECT_TRUE(result) << function->GetError();
-
-    // A single browser for the IWA should now be open.
-    ASSERT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1ul);
-    BrowserWindowInterface* iwa_browser =
-        GetLastActiveBrowserWindowInterfaceWithAnyProfile();
-    ASSERT_TRUE(iwa_browser);
-    TabListInterface* tab_list = TabListInterface::From(iwa_browser);
-    ASSERT_EQ(tab_list->GetTabCount(), 1);
-
-    auto* web_contents = tab_list->GetActiveTab()->GetContents();
-    content::WaitForLoadStop(web_contents);
-    EXPECT_EQ(web_contents->GetURL(), url_info.origin().GetURL());
-
-    static constexpr std::string_view kLaunchQueueScript = R"(
-      new Promise(async (resolve) => {
-        window.launchQueue.setConsumer(launchParams => {
-          resolve(launchParams.targetURL);
-        });
-      });
-    )";
-
-    EXPECT_EQ(content::EvalJs(web_contents, kLaunchQueueScript),
-              url_info.origin().GetURL().Resolve("/index.html"));
-  } else {
-    EXPECT_FALSE(result);
-    // No browser should have opened.
-    EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 0ul);
-  }
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    /* no prefix */,
-    ExtensionWindowCreateIwaTest,
-    testing::Values(
-        ExtensionWindowCreateIwaParam{.test_name = "iwa_and_https",
-                                      .want_success = false,
-                                      .args = R"([{
-            "url": [
-              "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/index.html",
-              "https://example.com"
-            ]
-          }])"},
-        ExtensionWindowCreateIwaParam{.test_name = "https_and_iwa_and_https",
-                                      .want_success = false,
-                                      .args = R"([{
-            "url": [
-              "https://example.com",
-              "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/index.html",
-              "https://example.com"
-            ]
-          }])"},
-        // If we ever support tabbed IWAs, then this test must be updated to
-        // `.want_success true`.
-        ExtensionWindowCreateIwaParam{.test_name = "iwa_and_iwa",
-                                      .want_success = false,
-                                      .args = R"([{
-            "url": [
-              "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/index.html",
-              "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/index.html"
-            ]
-          }])"},
-        ExtensionWindowCreateIwaParam{.test_name = "iwa_and_different_iwa",
-                                      .want_success = false,
-                                      .args = R"([{
-            "url": [
-              "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/index.html",
-              "isolated-app://5dp4lo5h6tpc4vuokowxmlqs5gpbainu2nqvuddccx5mqsnje7fqaaic/index.html"
-            ]
-          }])"},
-        ExtensionWindowCreateIwaParam{.test_name = "invalid_iwa_url",
-                                      .want_success = false,
-                                      .args = R"([{
-            "url": [
-              "isolated-app://invalid-iwa-url"
-            ]
-          }])"},
-        // If we ever support tabbed IWAs, this test must be updated: If `tabId`
-        // refers to the tab of the same IWA origin that is specified in `url`,
-        // it should be allowed.
-        ExtensionWindowCreateIwaParam{.test_name = "iwa_and_tab_id",
-                                      .want_success = false,
-                                      .args = R"([{
-            "url":
-            "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/index.html",
-            "tabId": 1
-          }])"},
-        ExtensionWindowCreateIwaParam{.test_name = "iwa",
-                                      .want_success = true,
-                                      .args = R"([{
-            "url": "isolated-app://4tkrnsmftl4ggvvdkfth3piainqragus2qbhf7rlz2a3wo3rh4wqaaic/index.html",
-          }])"}),
-    [](const testing::TestParamInfo<ExtensionWindowCreateIwaTest::ParamType>&
-           info) { return info.param.test_name; });
-
-using ExtensionApiTabsIwaMoveTest = ExtensionIwaTestBase;
-
-using ExtensionApiTabsIwaNavigateTest = ExtensionIwaTestBase;
-using ExtensionApiTabsIwaDuplicateTest = ExtensionIwaTestBase;
-
-// `tabs.create` does not support `isolated-app:` URLs, even when targeting an
-// existing IWA window. `windows.create` is the supported entry point and
-// always opens IWAs at their `start_url`.
+// `tabs.create` does not support `isolated-app:` URLs. The scheme is rejected
+// before the target window is resolved, so no Isolated Web App needs to be
+// installed or open. `windows.create` is the supported entry point.
 IN_PROC_BROWSER_TEST_F(ExtensionApiTabsIwaNavigateTest,
                        TabsCreateRejectsIwaUrl) {
-  auto url_info = InstallAndTrustBundle();
-  BrowserWindowInterface* iwa_browser = OpenIwa(url_info);
-  int iwa_window_id = ExtensionTabUtil::GetWindowId(iwa_browser);
+  TabListInterface* tab_list = GetTabListInterface();
+  const int tab_count = tab_list->GetTabCount();
+  const size_t browser_count =
+      GlobalBrowserCollection::GetInstance()->GetSize();
+  int window_id = ExtensionTabUtil::GetWindowId(browser_window_interface());
 
-  TabListInterface* iwa_tab_list = TabListInterface::From(iwa_browser);
-  ASSERT_EQ(iwa_tab_list->GetTabCount(), 1);
-  auto* iwa_web_contents = iwa_tab_list->GetActiveTab()->GetContents();
-  content::WaitForLoadStop(iwa_web_contents);
-
-  GURL deep_url = url_info.origin().GetURL().Resolve("/deep/page.html");
   std::string args = base::StringPrintf(R"([{"url": "%s", "windowId": %d}])",
-                                        deep_url.spec().c_str(), iwa_window_id);
+                                        kIwaDeepUrl, window_id);
 
   scoped_refptr<const Extension> extension =
       ExtensionBuilder("ExtensionApiTabsIwaNavigateTest").Build();
@@ -1555,30 +1339,24 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabsIwaNavigateTest,
             "URLs with the 'isolated-app:' scheme cannot be opened with "
             "tabs.create. Use windows.create instead.");
 
-  // Only the original IWA window remains, still showing the start URL.
-  ASSERT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1ul);
-  ASSERT_EQ(iwa_tab_list->GetTabCount(), 1);
-  EXPECT_EQ(iwa_web_contents->GetLastCommittedURL(),
-            url_info.origin().GetURL());
+  // No window or tab was opened.
+  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), browser_count);
+  EXPECT_EQ(tab_list->GetTabCount(), tab_count);
 }
 
-// `tabs.update` cannot be used to navigate any tab (IWA or otherwise) to an
-// `isolated-app:` URL; IWA navigations are only supported via the launch entry
-// point used by `windows.create`.
+// `tabs.update` cannot be used to navigate any tab to an `isolated-app:` URL;
+// IWA navigations are only supported via the launch entry point used by
+// `windows.create`.
 IN_PROC_BROWSER_TEST_F(ExtensionApiTabsIwaNavigateTest,
                        TabsUpdateRejectsIwaUrl) {
-  auto url_info = InstallAndTrustBundle();
-  BrowserWindowInterface* iwa_browser = OpenIwa(url_info);
+  content::WebContents* web_contents = GetActiveWebContents();
+  ASSERT_TRUE(web_contents);
+  content::WaitForLoadStop(web_contents);
+  const GURL original_url = web_contents->GetLastCommittedURL();
+  int tab_id = ExtensionTabUtil::GetTabId(web_contents);
 
-  TabListInterface* iwa_tab_list = TabListInterface::From(iwa_browser);
-  ASSERT_EQ(iwa_tab_list->GetTabCount(), 1);
-  auto* iwa_web_contents = iwa_tab_list->GetActiveTab()->GetContents();
-  content::WaitForLoadStop(iwa_web_contents);
-  int iwa_tab_id = ExtensionTabUtil::GetTabId(iwa_web_contents);
-
-  GURL deep_url = url_info.origin().GetURL().Resolve("/deep/page.html");
-  std::string args = base::StringPrintf(R"([%d, {"url": "%s"}])", iwa_tab_id,
-                                        deep_url.spec().c_str());
+  std::string args =
+      base::StringPrintf(R"([%d, {"url": "%s"}])", tab_id, kIwaDeepUrl);
 
   scoped_refptr<const Extension> extension =
       ExtensionBuilder("ExtensionApiTabsIwaNavigateTest").Build();
@@ -1591,86 +1369,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabsIwaNavigateTest,
             "Cannot navigate to a URL with the 'isolated-app:' scheme via "
             "tabs.update. Use windows.create instead.");
 
-  // The IWA tab is still at its start URL.
-  EXPECT_EQ(iwa_web_contents->GetLastCommittedURL(),
-            url_info.origin().GetURL());
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionApiTabsIwaMoveTest, CannotMoveIwaTab) {
-  auto url_info = InstallAndTrustBundle();
-  BrowserWindowInterface* iwa_browser = OpenIwa(url_info);
-
-  TabListInterface* iwa_tab_list = TabListInterface::From(iwa_browser);
-  ASSERT_EQ(iwa_tab_list->GetTabCount(), 1);
-  int iwa_tab_id =
-      ExtensionTabUtil::GetTabId(iwa_tab_list->GetTab(0)->GetContents());
-
-  BrowserWindowInterface* normal_browser = CreateBrowser(profile());
-  int target_window_id = ExtensionTabUtil::GetWindowId(normal_browser);
-
-  auto function = base::MakeRefCounted<TabsMoveFunction>();
-
-  std::string args = base::StringPrintf(
-      R"([%d, {"windowId": %d, "index": -1}])", iwa_tab_id, target_window_id);
-
-  std::string error = api_test_utils::RunFunctionAndReturnError(
-      function.get(), args, profile());
-
-  EXPECT_EQ(error, "The tab of an Isolated Web App cannot be moved.");
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionApiTabsIwaMoveTest,
-                       CannotGroupIwaTabToOtherWindow) {
-  auto url_info = InstallAndTrustBundle();
-  BrowserWindowInterface* iwa_browser = OpenIwa(url_info);
-
-  TabListInterface* iwa_tab_list = TabListInterface::From(iwa_browser);
-  ASSERT_EQ(iwa_tab_list->GetTabCount(), 1);
-  int iwa_tab_id =
-      ExtensionTabUtil::GetTabId(iwa_tab_list->GetTab(0)->GetContents());
-
-  BrowserWindowInterface* normal_browser = CreateBrowser(profile());
-  int target_window_id = ExtensionTabUtil::GetWindowId(normal_browser);
-
-  auto function = base::MakeRefCounted<TabsGroupFunction>();
-
-  std::string args = base::StringPrintf(
-      R"([{"tabIds": [%d], "createProperties": {"windowId": %d}}])", iwa_tab_id,
-      target_window_id);
-
-  std::string error = api_test_utils::RunFunctionAndReturnError(
-      function.get(), args, profile());
-
-  EXPECT_EQ(error, "The tab of an Isolated Web App cannot be moved.");
-}
-
-// Tests that duplicating an IWA tab via the chrome.tabs.duplicate Extension API
-// is disallowed.
-IN_PROC_BROWSER_TEST_F(ExtensionApiTabsIwaDuplicateTest,
-                       DuplicateTabDisallowed) {
-  web_app::IsolatedWebAppUrlInfo url_info = InstallAndTrustBundle();
-  BrowserWindowInterface* iwa_browser = OpenIwa(url_info);
-  ASSERT_TRUE(iwa_browser);
-
-  TabListInterface* iwa_tab_list = TabListInterface::From(iwa_browser);
-  ASSERT_EQ(iwa_tab_list->GetTabCount(), 1);
-  auto* iwa_web_contents = iwa_tab_list->GetActiveTab()->GetContents();
-  content::WaitForLoadStop(iwa_web_contents);
-  int iwa_tab_id = ExtensionTabUtil::GetTabId(iwa_web_contents);
-
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("ExtensionApiTabsIwaDuplicateTest")
-          .AddAPIPermission("tabs")
-          .Build();
-
-  auto function = base::MakeRefCounted<TabsDuplicateFunction>();
-  function->set_extension(extension);
-
-  std::string args = base::StringPrintf("[%d]", iwa_tab_id);
-  std::string error = api_test_utils::RunFunctionAndReturnError(
-      function.get(), args, profile());
-
-  EXPECT_EQ(error, "The tab of an Isolated Web App cannot be duplicated.");
+  // The tab is still at its original URL.
+  EXPECT_EQ(web_contents->GetLastCommittedURL(), original_url);
 }
 
 IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, DuplicateTab) {

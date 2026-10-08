@@ -108,7 +108,7 @@ TestingProfile::TestingFactories TestWithBrowserView::GetTestingFactories() {
 Browser* TestWithBrowserView::CreateBrowserWithBrowserView(
     Profile* profile,
     Browser::Type browser_type) {
-  additional_browsers_.emplace_back(CreateBrowser(
-      profile, browser_type, /*hosted_app=*/false, /*browser_window=*/nullptr));
+  additional_browsers_.emplace_back(
+      CreateBrowser(profile, browser_type, /*browser_window=*/nullptr));
   return additional_browsers_.back().get();
 }

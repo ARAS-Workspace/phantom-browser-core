@@ -245,37 +245,9 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
-                       OpenDisabledForAppBrowser) {
-  auto params = BrowserWindowCreateParams::CreateForApp(
-      "abcdefghaghpphfffooibmlghaeopach", /*trusted_source=*/true,
-      gfx::Rect(), /* window_bounds */
-      browser()->GetProfile(), /*user_gesture=*/true);
-  Browser* browser =
-      CreateBrowserWindow(std::move(params))->GetBrowserForMigrationOnly();
-
-  chrome::BrowserCommandController* commandController =
-      chrome::BrowserCommandController::From(browser);
-  ASSERT_EQ(false, commandController->IsCommandEnabled(IDC_OPEN_FILE));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
-                       NewTabEnabledForAppBrowser) {
-  auto params = BrowserWindowCreateParams::CreateForApp(
-      "abcdefghaghpphfffooibmlghaeopach", /*trusted_source=*/true,
-      gfx::Rect(), /* window_bounds */
-      browser()->GetProfile(), /*user_gesture=*/true);
-  Browser* app_browser =
-      CreateBrowserWindow(std::move(params))->GetBrowserForMigrationOnly();
-
-  chrome::BrowserCommandController* commandController =
-      app_browser->GetFeatures().browser_command_controller();
-  EXPECT_TRUE(commandController->IsCommandEnabled(IDC_NEW_TAB));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
                        OpenDisabledForAppPopupBrowser) {
   auto params = BrowserWindowCreateParams::CreateForAppPopup(
-      "abcdefghaghpphfffooibmlghaeopach", /*trusted_source=*/true,
+      "abcdefghaghpphfffooibmlghaeopach", /*trusted_source=*/false,
       gfx::Rect(), /* window_bounds */
       browser()->GetProfile(), /*user_gesture=*/true);
   Browser* browser =

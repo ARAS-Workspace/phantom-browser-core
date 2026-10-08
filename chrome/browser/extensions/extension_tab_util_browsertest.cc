@@ -226,8 +226,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabUtilBrowserTest, SupportsTabGroups) {
 }
 
 IN_PROC_BROWSER_TEST_F(ExtensionTabUtilBrowserTest, DoesNotSupportTabGroups) {
-  // Test other platforms with apps, because they are a more typical use case.
-  const auto window_type = BrowserWindowInterface::Type::TYPE_APP;
+  // App popup windows (such as extension popups) don't support tab groups.
+  const auto window_type = BrowserWindowInterface::Type::TYPE_APP_POPUP;
 
   BrowserWindowInterface* browser = CreateBrowserWindowWithType(window_type);
 

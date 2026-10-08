@@ -768,8 +768,9 @@ BrowserWindowInterface* ExtensionBrowserTest::CreateBrowserWindowWithType(
     BrowserWindowInterface::Type type) {
   BrowserWindowCreateParams create_params = BrowserWindowCreateParams(
       type, *GetProfile(), /*from_user_gesture=*/false);
-  if (type == BrowserWindowInterface::Type::TYPE_APP) {
-    // Apps must have an app name.
+  if (type == BrowserWindowInterface::Type::TYPE_APP ||
+      type == BrowserWindowInterface::Type::TYPE_APP_POPUP) {
+    // App and app popup windows must have an app name.
     create_params.app_name = "app_name";
   }
   base::test::TestFuture<BrowserWindowInterface*> future;

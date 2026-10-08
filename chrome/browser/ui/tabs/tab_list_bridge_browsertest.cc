@@ -659,11 +659,12 @@ IN_PROC_BROWSER_TEST_F(TabListBridgeBrowserTest, HighlightTabs) {
 
 IN_PROC_BROWSER_TEST_F(TabListBridgeBrowserTest,
                        ContainsTabGroupWhenTabGroupsNotSupported) {
-  // App windows don't allow tab groups.
-  BrowserWindowCreateParams params = BrowserWindowCreateParams::CreateForApp(
-      "some app",
-      /*trusted_source=*/false, gfx::Rect(), browser()->GetProfile(),
-      /*user_gesture=*/true);
+  // App popup windows (such as extension popups) don't allow tab groups.
+  BrowserWindowCreateParams params =
+      BrowserWindowCreateParams::CreateForAppPopup(
+          "some app",
+          /*trusted_source=*/false, gfx::Rect(), browser()->GetProfile(),
+          /*user_gesture=*/true);
   // params.window = window2.release();
   Browser* browser2 =
       CreateBrowserWindow(std::move(params))->GetBrowserForMigrationOnly();

@@ -46,8 +46,8 @@ IN_PROC_BROWSER_TEST_F(CreateBrowserWindowBrowserTest,
 IN_PROC_BROWSER_TEST_F(CreateBrowserWindowBrowserTest,
                        CreateAppBrowserWindowAndClone) {
   BrowserWindowCreateParams create_params =
-      BrowserWindowCreateParams::CreateForApp(
-          "TestApp", /*trusted_source=*/true, gfx::Rect(0, 0, 800, 600),
+      BrowserWindowCreateParams::CreateForAppPopup(
+          "TestApp", /*trusted_source=*/false, gfx::Rect(0, 0, 800, 600),
           browser()->GetProfile(), /*user_gesture=*/true);
   create_params.omit_from_session_restore = true;
 
@@ -61,7 +61,7 @@ IN_PROC_BROWSER_TEST_F(CreateBrowserWindowBrowserTest,
   BrowserWindowInterface* app_browser =
       CreateBrowserWindow(std::move(create_params));
   ASSERT_TRUE(app_browser);
-  EXPECT_EQ(BrowserWindowInterface::TYPE_APP, app_browser->GetType());
+  EXPECT_EQ(BrowserWindowInterface::TYPE_APP_POPUP, app_browser->GetType());
 }
 
 IN_PROC_BROWSER_TEST_F(CreateBrowserWindowBrowserTest,

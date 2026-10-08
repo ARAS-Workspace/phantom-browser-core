@@ -25,11 +25,9 @@
 #include "chrome/browser/sessions/session_restore_test_helper.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #include "chrome/browser/ui/browser_commands.h"
-#include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
-#include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
@@ -657,19 +655,12 @@ IN_PROC_BROWSER_TEST_F(SearchEngineChoiceDialogBrowserTest,
       static_cast<MockSearchEngineChoiceDialogService*>(
           SearchEngineChoiceDialogServiceFactory::GetForProfile(profile));
 
-  Browser* app_browser =
-      CreateBrowserWindow(BrowserWindowCreateParams::CreateForApp(
-                              "Test", /*trusted_source=*/false, gfx::Rect(),
-                              profile, /*user_gesture=*/true))
-          ->GetBrowserForMigrationOnly();
-  chrome::AddTabAt(app_browser, GURL(), -1, true);
-  EXPECT_EQ(app_browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
-
   GURL url = GURL("https://www.google.com/");
   content::TestNavigationObserver observer(url);
   observer.StartWatchingNewWebContents();
 
-  NavigateParams params(app_browser, url, ui::PAGE_TRANSITION_LINK);
+  NavigateParams params(browser(), url, ui::PAGE_TRANSITION_LINK);
+  params.app_id = "extensionappid";
   params.window_action = NavigateParams::WindowAction::kShowWindow;
   params.disposition = WindowOpenDisposition::NEW_POPUP;
   Navigate(&params);
@@ -692,12 +683,9 @@ IN_PROC_BROWSER_TEST_F(SearchEngineChoiceDialogBrowserTest,
   // Dialog not shown over browser of type `TYPE_APP_POPUP`.
   EXPECT_FALSE(
       search_engine_choice_dialog_service->IsShowingDialog(*app_popup_browser));
-  // Dialog not shown over browser of type `TYPE_APP`
-  EXPECT_FALSE(
-      search_engine_choice_dialog_service->IsShowingDialog(*app_browser));
 
   CheckNavigationConditionRecorded(
-      SearchEngineChoiceScreenConditions::kUnsupportedBrowserType, 2);
+      SearchEngineChoiceScreenConditions::kUnsupportedBrowserType, 1);
 }
 
 IN_PROC_BROWSER_TEST_F(SearchEngineChoiceDialogBrowserTest,

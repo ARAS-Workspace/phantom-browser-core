@@ -42,6 +42,7 @@
 #include "chrome/browser/extensions/api/tab_groups/tab_groups_event_router_factory.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/tab_group_sync_service_initialized_observer.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -202,9 +203,13 @@ class TabGroupsApiBrowserTest : public ExtensionBrowserTest {
 // Tests querying on a TabStripModel that doesn't support tab groups.
 IN_PROC_BROWSER_TEST_F(TabGroupsApiBrowserTest,
                        TabStripModelWithNoTabGroupFails) {
-  // Create a new window that doesn't support groups. App windows don't allow
-  // tab groups.
-  BrowserWindowInterface* browser2 = CreateBrowserForApp("some app", profile());
+  // Create a new window that doesn't support groups. App popup windows (such
+  // as extension popups) don't allow tab groups.
+  BrowserWindowInterface* browser2 =
+      CreateBrowserWindow(BrowserWindowCreateParams::CreateForAppPopup(
+          "some app", /*trusted_source=*/false, gfx::Rect(), profile(),
+          /*user_gesture=*/true));
+  AddBlankTabAndShow(browser2);
   ui_test_utils::DeprecatedFakeActivateBrowser(browser2);
 
   ASSERT_FALSE(browser2->GetTabStripModel()->SupportsTabGroups());

@@ -651,18 +651,6 @@ Browser* InProcessBrowserTest::CreateBrowserForPopup(Profile* profile) {
   AddBlankTabAndShow(browser);
   return browser;
 }
-
-Browser* InProcessBrowserTest::CreateBrowserForApp(const std::string& app_name,
-                                                   Profile* profile) {
-  Browser* browser =
-      CreateBrowserWindow(BrowserWindowCreateParams::CreateForApp(
-                              app_name, /*trusted_source=*/false, gfx::Rect(),
-                              profile,
-                              /*user_gesture=*/true))
-          ->GetBrowserForMigrationOnly();
-  AddBlankTabAndShow(browser);
-  return browser;
-}
 #endif  // !BUILDFLAG(IS_MAC)
 
 Browser* InProcessBrowserTest::CreateGuestBrowser() {

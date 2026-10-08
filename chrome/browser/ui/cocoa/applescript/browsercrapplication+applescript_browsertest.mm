@@ -25,28 +25,22 @@ using BrowserCrApplicationAppleScriptTest = InProcessBrowserTest;
 
 // Create windows of different |Type|.
 IN_PROC_BROWSER_TEST_F(BrowserCrApplicationAppleScriptTest, Creation) {
-  // Create additional |Browser*| objects of different type.
+  // Create an additional |Browser*| object of a different type.
   Profile* profile = browser()->GetProfile();
   Browser* b1 =
       CreateBrowserWindow(
           BrowserWindowCreateParams(BrowserWindowInterface::TYPE_POPUP, profile,
                                     /*from_user_gesture=*/true))
           ->GetBrowserForMigrationOnly();
-  Browser* b2 =
-      CreateBrowserWindow(BrowserWindowCreateParams::CreateForApp(
-                              "Test", /*trusted_source=*/true, gfx::Rect(),
-                              profile, /*user_gesture=*/true))
-          ->GetBrowserForMigrationOnly();
 
-  EXPECT_EQ(3U, [NSApp appleScriptWindows].count);
+  EXPECT_EQ(2U, [NSApp appleScriptWindows].count);
   for (WindowAppleScript* window in [NSApp appleScriptWindows]) {
     EXPECT_NSEQ(AppleScript::kWindowsProperty, window.containerProperty);
     EXPECT_NSEQ(NSApp, window.container);
   }
 
-  // Close the additional browsers.
+  // Close the additional browser.
   b1->tab_strip_model()->CloseAllTabs();
-  b2->tab_strip_model()->CloseAllTabs();
 }
 
 // Insert a new window.

@@ -98,9 +98,9 @@ IN_PROC_BROWSER_TEST_F(MultiContentsViewBrowserTest,
   EXPECT_TRUE(multi_contents_view()->IsDragAndDropEnabled());
 
   BrowserWindowCreateParams app_browser_params =
-      BrowserWindowCreateParams::CreateForApp(
+      BrowserWindowCreateParams::CreateForAppPopup(
           "AppName",
-          /*trusted_source=*/true, gfx::Rect(), browser()->GetProfile(),
+          /*trusted_source=*/false, gfx::Rect(), browser()->GetProfile(),
           /*user_gesture=*/false);
   BrowserWindowInterface* app_browser =
       CreateBrowserWindow(std::move(app_browser_params));

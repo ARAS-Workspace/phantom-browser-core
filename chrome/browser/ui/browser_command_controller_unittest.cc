@@ -68,44 +68,6 @@ TEST_F(BrowserCommandControllerTest, IsReservedCommandOrKey) {
 #endif  // USE_AURA
 }
 
-TEST_F(BrowserCommandControllerTest, IsReservedCommandOrKeyIsApp) {
-  auto browser_window = std::make_unique<TestBrowserWindow>();
-  BrowserWindowCreateParams params = BrowserWindowCreateParams::CreateForApp(
-      "app",
-      /*trusted_source=*/true, browser_window->GetBounds(), profile(),
-      /*user_gesture=*/true);
-  params.window = browser_window.release();
-  auto browser =
-      DeprecatedCreateOwnedBrowserWindowForTesting(std::move(params));
-
-  ASSERT_EQ(browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
-
-  // When GetType() == BrowserWindowInterface::Type::TYPE_APP, no keys are
-  // reserved.
-
-#if defined(USE_AURA)
-  // The input::NativeWebKeyboardEvent constructor is available only when
-  // USE_AURA is #defined.
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser.get())
-          ->IsReservedCommandOrKey(
-              IDC_NEW_WINDOW, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                                  ui::EventType::kKeyPressed, ui::VKEY_N,
-                                  ui::DomCode::US_N, ui::EF_CONTROL_DOWN))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser.get())
-          ->IsReservedCommandOrKey(
-              IDC_CLOSE_TAB, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                                 ui::EventType::kKeyPressed, ui::VKEY_W,
-                                 ui::DomCode::US_W, ui::EF_CONTROL_DOWN))));
-  EXPECT_FALSE(chrome::BrowserCommandController::From(browser.get())
-                   ->IsReservedCommandOrKey(
-                       IDC_FIND, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                                     ui::EventType::kKeyPressed, ui::VKEY_F,
-                                     ui::DomCode::US_F, ui::EF_CONTROL_DOWN))));
-#endif  // USE_AURA
-}
-
 TEST_F(BrowserWithTestWindowTest, IncognitoCommands) {
   EXPECT_TRUE(chrome::IsCommandEnabled(browser(), IDC_OPTIONS));
   EXPECT_TRUE(chrome::IsCommandEnabled(browser(), IDC_IMPORT_SETTINGS));
@@ -131,25 +93,6 @@ TEST_F(BrowserWithTestWindowTest, IncognitoCommands) {
   EXPECT_FALSE(chrome::IsCommandEnabled(browser(), IDC_OPTIONS));
   EXPECT_FALSE(chrome::IsCommandEnabled(browser(), IDC_IMPORT_SETTINGS));
   EXPECT_FALSE(chrome::IsCommandEnabled(browser(), IDC_PERFORMANCE));
-}
-
-TEST_F(BrowserCommandControllerTest, AppFullScreen) {
-  // Enable for tabbed browser.
-  EXPECT_TRUE(chrome::IsCommandEnabled(browser(), IDC_FULLSCREEN));
-
-  // Enabled for app windows.
-  auto browser_window = std::make_unique<TestBrowserWindow>();
-  BrowserWindowCreateParams params = BrowserWindowCreateParams::CreateForApp(
-      "app",
-      /*trusted_source=*/true, browser_window->GetBounds(), profile(),
-      /*user_gesture=*/true);
-  params.window = browser_window.release();
-  auto browser =
-      DeprecatedCreateOwnedBrowserWindowForTesting(std::move(params));
-  ASSERT_EQ(browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
-  chrome::BrowserCommandController::From(browser.get())
-      ->FullscreenStateChanged();
-  EXPECT_TRUE(chrome::IsCommandEnabled(browser.get(), IDC_FULLSCREEN));
 }
 
 TEST_F(BrowserCommandControllerTest, AvatarAcceleratorEnabledOnDesktop) {

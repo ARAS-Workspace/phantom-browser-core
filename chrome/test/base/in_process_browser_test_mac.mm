@@ -92,19 +92,3 @@ Browser* InProcessBrowserTest::CreateBrowserForPopup(Profile* profile) {
     return browser;
   }
 }
-
-Browser* InProcessBrowserTest::CreateBrowserForApp(const std::string& app_name,
-                                                   Profile* profile) {
-  // Making a browser window can cause AppKit to throw objects into the
-  // autorelease pool. Flush the pool when this function returns.
-  @autoreleasepool {
-    Browser* browser =
-        CreateBrowserWindow(BrowserWindowCreateParams::CreateForApp(
-                                app_name, /*trusted_source=*/false, gfx::Rect(),
-                                profile,
-                                /*from_user_gesture=*/true))
-            ->GetBrowserForMigrationOnly();
-    AddBlankTabAndShow(browser);
-    return browser;
-  }
-}

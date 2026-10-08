@@ -154,7 +154,7 @@ TEST_F(PinInfoBarControllerTest, DontCrashIfBrowserNull) {
 
 // Don't show the infobar if the browser type is not normal.
 TEST_F(PinInfoBarControllerTest, DontShowIfBrowserNotNormal) {
-  SetBrowserType(BrowserWindowInterface::TYPE_APP);
+  SetBrowserType(BrowserWindowInterface::TYPE_POPUP);
   PinInfoBarController controller(browser_window_interface());
   EXPECT_FALSE(OnShouldOfferToPinResultAndWait(controller,
                                                /*should_offer_to_pin=*/true));

@@ -829,9 +829,15 @@ IN_PROC_BROWSER_TEST_F(BrowserFocusTest, DISABLED_PopupLocationBar) {
 }
 
 // Tests that the location bar is not focusable when hidden, which is the case
-// in app windows.
+// in app popup windows (such as extension popups).
 IN_PROC_BROWSER_TEST_F(BrowserFocusTest, AppLocationBar) {
-  Browser* app_browser = CreateBrowserForApp("foo", browser()->GetProfile());
+  Browser* app_browser =
+      CreateBrowserWindow(BrowserWindowCreateParams::CreateForAppPopup(
+                              "foo", /*trusted_source=*/false, gfx::Rect(),
+                              browser()->GetProfile(),
+                              /*user_gesture=*/true))
+          ->GetBrowserForMigrationOnly();
+  AddBlankTabAndShow(app_browser);
 
   // Make sure the app window is in the front. Otherwise the test is flaky.
   ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(app_browser));

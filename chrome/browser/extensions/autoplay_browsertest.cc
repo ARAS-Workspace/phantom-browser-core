@@ -2,24 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/strings/stringprintf.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/extensions/browsertest_util.h"
 #include "chrome/browser/extensions/extension_apitest.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/extensions/extension_action_test_helper.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/browser_test_utils.h"
 #include "content/public/test/test_utils.h"
 #include "extensions/test/result_catcher.h"
-#include "extensions/test/test_extension_dir.h"
 #include "media/base/media_switches.h"
 
 // TODO(crbug.com/467442812): Port these tests to desktop Android. This isn't
 // straightforward, as some of the tests rely on manifest V2 behavior, but
-// Android only supports manifest V3. Likewise, Android does not support hosted
-// apps.
+// Android only supports manifest V3.
 class AutoplayExtensionBrowserTest : public extensions::ExtensionApiTest {
  public:
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -54,38 +48,4 @@ IN_PROC_BROWSER_TEST_F(AutoplayExtensionBrowserTest,
   extensions::ResultCatcher catcher;
   browser_action_test_util->Press(extension->id());
   EXPECT_TRUE(catcher.GetNextResult()) << catcher.message();
-}
-
-IN_PROC_BROWSER_TEST_F(AutoplayExtensionBrowserTest,
-                       AutoplayAllowedInHostedApp) {
-  ASSERT_TRUE(StartEmbeddedTestServer());
-  GURL app_url = embedded_test_server()->GetURL(
-      "/extensions/autoplay_hosted_app/main.html");
-
-  constexpr const char kHostedAppManifest[] =
-      R"( { "name": "Hosted App Autoplay Test",
-            "version": "1",
-            "manifest_version": 2,
-            "app": {
-              "launch": {
-                "web_url": "%s"
-              }
-            }
-          } )";
-  extensions::TestExtensionDir test_app_dir;
-  test_app_dir.WriteManifest(
-      base::StringPrintf(kHostedAppManifest, app_url.spec().c_str()));
-
-  const extensions::Extension* extension =
-      LoadExtension(test_app_dir.UnpackedPath());
-  ASSERT_TRUE(extension) << message_;
-
-  BrowserWindowInterface* app_browser =
-      extensions::browsertest_util::LaunchAppBrowser(profile(), extension);
-  content::WebContents* web_contents =
-      app_browser->GetTabStripModel()->GetActiveWebContents();
-  EXPECT_TRUE(content::WaitForLoadStop(web_contents));
-
-  EXPECT_EQ(true, content::EvalJs(web_contents, "runTest();",
-                                  content::EXECUTE_SCRIPT_NO_USER_GESTURE));
 }

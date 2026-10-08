@@ -33,7 +33,6 @@ class BrowserNavigatorTest : public InteractiveBrowserTest {
   NavigateParams MakeNavigateParams(BrowserWindowInterface* browser) const;
 
   Browser* CreateEmptyBrowserForType(Browser::Type type, Profile* profile);
-  Browser* CreateEmptyBrowserForApp(Profile* profile);
 
   std::unique_ptr<content::WebContents> CreateWebContents(
       bool initialize_renderer);

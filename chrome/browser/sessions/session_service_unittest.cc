@@ -31,7 +31,6 @@
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/sessions/session_service_base_observer.h"
-#include "chrome/browser/sessions/session_service_base_test_helper.h"
 #include "chrome/browser/sessions/session_service_log.h"
 #include "chrome/browser/sessions/session_service_test_helper.h"
 #include "chrome/browser/signin/signin_util.h"

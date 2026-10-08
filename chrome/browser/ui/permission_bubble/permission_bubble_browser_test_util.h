@@ -21,17 +21,11 @@ namespace base {
 class CommandLine;
 }  // namespace base
 
-namespace content {
-class WebContents;
-}  // namespace content
-
 namespace permissions {
 class PermissionRequest;
 }
 
-// Use this class to test on a default window or an app window. Inheriting from
-// ExtensionBrowserTest allows us to easily load and launch apps, and doesn't
-// really add any extra work.
+// Use this class to test on a default window.
 class PermissionBubbleBrowserTest : public extensions::ExtensionBrowserTest {
  public:
   PermissionBubbleBrowserTest();
@@ -43,9 +37,6 @@ class PermissionBubbleBrowserTest : public extensions::ExtensionBrowserTest {
   ~PermissionBubbleBrowserTest() override;
 
   void SetUpOnMainThread() override;
-
-  // Opens an app window and returns its WebContents.
-  content::WebContents* OpenExtensionAppWindow();
 
   permissions::PermissionPrompt::Delegate* test_delegate() {
     return &test_delegate_;

@@ -73,8 +73,7 @@ void BrowserWithTestWindowTest::SetUp() {
     auto window = CreateBrowserWindow();
     window_ = window.get();
 
-    browser_ =
-        CreateBrowser(profile(), browser_type_, hosted_app_, window.release());
+    browser_ = CreateBrowser(profile(), browser_type_, window.release());
   }
 }
 
@@ -225,14 +224,9 @@ BrowserWithTestWindowTest::CreateBrowserWindow() {
 std::unique_ptr<Browser> BrowserWithTestWindowTest::CreateBrowser(
     Profile* profile,
     Browser::Type browser_type,
-    bool hosted_app,
     BrowserWindow* browser_window) {
   BrowserWindowCreateParams params(profile, true);
-  if (hosted_app) {
-    params = BrowserWindowCreateParams::CreateForApp(
-        "Test", /*trusted_source=*/true, /*window_bounds=*/gfx::Rect(), profile,
-        /*user_gesture=*/true);
-  } else if (browser_type == BrowserWindowInterface::Type::TYPE_DEVTOOLS) {
+  if (browser_type == BrowserWindowInterface::Type::TYPE_DEVTOOLS) {
     params = BrowserWindowCreateParams::CreateForDevTools(profile);
   } else {
     params.type = browser_type;
@@ -243,17 +237,13 @@ std::unique_ptr<Browser> BrowserWithTestWindowTest::CreateBrowser(
 
 std::unique_ptr<Browser> BrowserWithTestWindowTest::CreateBrowser(
     Profile* profile,
-    Browser::Type browser_type,
-    bool hosted_app) {
+    Browser::Type browser_type) {
   auto browser_window = CreateBrowserWindow();
-  return CreateBrowser(profile, browser_type, hosted_app,
-                       browser_window.release());
+  return CreateBrowser(profile, browser_type, browser_window.release());
 }
 
 BrowserWithTestWindowTest::BrowserWithTestWindowTest(
     std::unique_ptr<content::BrowserTaskEnvironment> task_environment,
-    Browser::Type browser_type,
-    bool hosted_app)
+    Browser::Type browser_type)
     : task_environment_(std::move(task_environment)),
-      browser_type_(browser_type),
-      hosted_app_(hosted_app) {}
+      browser_type_(browser_type) {}

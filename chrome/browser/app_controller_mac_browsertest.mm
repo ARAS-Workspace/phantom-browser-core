@@ -433,34 +433,6 @@ IN_PROC_BROWSER_TEST_F(AppControllerPlatformAppBrowserTest,
             [NSApp.orderedWindows indexOfObject:app_window]);
 }
 
-class AppControllerWebAppBrowserTest : public InProcessBrowserTest {
- protected:
-  // InProcessBrowserTest:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitchASCII(switches::kApp, GetAppURL());
-  }
-
-  std::string GetAppURL() const {
-    return "https://example.com/";
-  }
-};
-
-// Test that in web app mode a reopen event opens the app URL.
-IN_PROC_BROWSER_TEST_F(AppControllerWebAppBrowserTest,
-                       WebAppReopenWithNoWindows) {
-  EXPECT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-  BOOL result =
-      [AppController.sharedController applicationShouldHandleReopen:NSApp
-                                                  hasVisibleWindows:NO];
-
-  EXPECT_FALSE(result);
-  EXPECT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  GURL current_url =
-      browser()->GetTabStripModel()->GetActiveWebContents()->GetURL();
-  EXPECT_EQ(GetAppURL(), current_url.spec());
-}
-
 class AppControllerProfilePickerBrowserTest : public InProcessBrowserTest {
  public:
   // InProcessBrowserTest:
