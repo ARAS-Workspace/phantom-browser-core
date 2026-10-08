@@ -99,8 +99,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://quota-internals",
       "chrome://read-later.top-chrome",
       "chrome://regional-capabilities-internals",
-      "chrome://reset-password",
-      "chrome://safe-browsing",
       "chrome://saved-tab-groups-unsupported",
       "chrome://search-engine-choice",
       "chrome://serviceworker-internals",
