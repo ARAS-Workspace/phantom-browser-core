@@ -357,8 +357,6 @@ test("components_unittests") {
       "//components/browsing_data/content:unit_tests",
       "//components/captive_portal/content:unit_tests",
       "//components/capture_mode:unit_tests",
-      "//components/cast_receiver:unit_tests",
-      "//components/cast_streaming:unit_tests",
       "//components/certificate_transparency:unit_tests",
       "//components/commerce/content/browser:unit_tests",
       "//components/content_capture/browser:unit_tests",
@@ -598,8 +596,6 @@ test("components_unittests") {
       "//components/pdf/renderer:unit_tests",
     ]
   }
-
-  # Only supported on cast-enabled platforms.
 
   if (is_mac) {
     deps += [

@@ -1,6 +1,5 @@
 include_rules = [
   "-components",
-  "+components/cast_streaming",
   "+components/mirroring/mojom",
   "+components/mirroring/service",
   "+components/openscreen_platform",

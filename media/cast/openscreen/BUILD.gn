@@ -4,7 +4,6 @@
 
 visibility = [
   ":*",
-  "//components/cast_streaming/*",
   "//components/mirroring/service/*",
   "//media/remoting/*",
 ]

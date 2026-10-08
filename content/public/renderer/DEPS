@@ -1,5 +1,4 @@
 include_rules = [
-  "+components/cast_streaming/renderer/public",
   "+content/common/media",
   "+content/public/child",
   "+gin",

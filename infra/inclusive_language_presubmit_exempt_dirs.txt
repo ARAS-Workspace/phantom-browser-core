@@ -111,7 +111,6 @@ components/autofill/core/browser/data_model/addresses
 components/autofill/core/browser/filling/payments
 components/autofill/core/browser/form_parsing
 components/browser_ui/util/android/java/src/org/chromium/components/browser_ui/util
-components/cast/named_message_port_connector
 components/cbor
 components/certificate_transparency
 components/cronet/gn2bp/templates

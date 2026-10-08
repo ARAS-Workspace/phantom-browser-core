@@ -21,14 +21,6 @@ class BaseCropAction(abc.ABC):
     """
 
 
-class NoOpCropAction(BaseCropAction):
-  def CropScreenshot(
-    self, screenshot: ct.Screenshot, dpr: float, device_type: str, os_name: str
-  ) -> ct.Screenshot:
-    del dpr, device_type, os_name  # unused
-    return screenshot
-
-
 class FixedRectCropAction(BaseCropAction):
   """Crops screenshots to the given rectangle.
 

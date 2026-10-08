@@ -4162,8 +4162,6 @@ def CheckSpamLogging(input_api, output_api):
             # not depend on base logging.
             r'^chrome/utility/safe_browsing/mac/crdmg\.cc$',
             r'^chromecast/',
-            r'^components/cast',
-            r'^components/media_control/renderer/media_playback_options\.cc$',
             r'^components/policy/core/common/policy_logger\.cc$',
             r'^components/supervised_user/core/browser/android/content_filters_observer_bridge\.cc',
             r'^components/zucchini/.*',

@@ -2190,17 +2190,6 @@ class PixelTestPages:
       ),
     ]
 
-  # This should only be used with the cast_streaming suite.
-  @staticmethod
-  def CastStreamingReceiverPages(base_name) -> list[PixelTestPage]:
-    return [
-      PixelTestPage(
-        'receiver.html',
-        base_name + '_VP8_1Frame',
-        crop_action=ca.NoOpCropAction(),
-      ),
-    ]
-
   @staticmethod
   def MeetEffectsPages(base_name: str) -> list[PixelTestPage]:
     test_cases_path = os.path.join(

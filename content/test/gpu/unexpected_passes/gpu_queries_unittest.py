@@ -34,9 +34,6 @@ class QueryBuilderUnittest(unittest.TestCase):
     # the qualified name of the test class relative to //content/test/gpu. This
     # value is reported to ResultDB as the gpu_test_class tag.
     suites_to_classes = {
-      'cast_streaming': (
-        'gpu_tests.cast_streaming_integration_test.CastStreamingIntegrationTest'
-      ),
       'context_lost': (
         'gpu_tests.context_lost_integration_test.ContextLostIntegrationTest'
       ),
