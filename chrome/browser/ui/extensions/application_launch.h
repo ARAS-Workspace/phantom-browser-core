@@ -57,13 +57,6 @@ content::WebContents* OpenApplicationWindow(Profile* profile,
                                             const apps::AppLaunchParams& params,
                                             const GURL& url);
 
-// Open |url| in an app shortcut window.
-// There are two kinds of app shortcuts: Shortcuts to a URL,
-// and shortcuts that open an installed application.  This function
-// is used to open the former.  To open the latter, use
-// application_launch::OpenApplication().
-content::WebContents* OpenAppShortcutWindow(Profile* profile, const GURL& url);
-
 // Whether the extension can be launched by sending a
 // chrome.app.runtime.onLaunched event.
 bool CanLaunchViaEvent(const extensions::Extension* extension);

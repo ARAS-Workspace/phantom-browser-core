@@ -87,7 +87,6 @@
 #include "components/url_formatter/url_fixer.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
-#include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/common/content_switches.h"
 #include "extensions/browser/extension_registry.h"
@@ -116,7 +115,6 @@
 #include "chrome/browser/ui/startup/focus/focus_handler.h"
 
 using content::BrowserThread;
-using content::ChildProcessSecurityPolicy;
 
 namespace {
 
@@ -190,12 +188,8 @@ StartupProfileMode GetStartupProfileMode(
     return StartupProfileMode::kBrowserWindow;
   }
 
-  // Don't show the picker if an app is explicitly requested to open. This URL
-  // param should be ideally paired with switches::kProfileDirectory but it's
-  // better to err on the side of opening the last profile than to err on the
-  // side of not opening the app directly.
-  if (command_line.HasSwitch(switches::kApp) ||
-      command_line.HasSwitch(switches::kAppId)) {
+  // Don't show the picker if an app is explicitly requested to open.
+  if (command_line.HasSwitch(switches::kAppId)) {
     return StartupProfileMode::kBrowserWindow;
   }
 
@@ -281,48 +275,6 @@ bool IsSilentLaunchEnabled(const base::CommandLine& command_line,
 bool CanOpenWebApp(Profile* profile) {
   return web_app::AreWebAppsEnabled(profile) &&
          apps::AppServiceProxyFactory::IsAppServiceAvailableForProfile(profile);
-}
-
-// Handles the --app switch.
-bool MaybeLaunchAppShortcutWindow(const base::CommandLine& command_line,
-                                  const base::FilePath& cur_dir,
-                                  chrome::startup::IsFirstRun is_first_run,
-                                  Profile* profile) {
-  if (!profile) {
-    return false;
-  }
-
-  if (!command_line.HasSwitch(switches::kApp)) {
-    return false;
-  }
-
-  std::string url_string = command_line.GetSwitchValueASCII(switches::kApp);
-  if (url_string.empty()) {
-    return false;
-  }
-
-  GURL url(url_string);
-
-  // Restrict allowed URLs for --app switch.
-  if (!url.is_empty() && url.is_valid()) {
-    content::ChildProcessSecurityPolicy* policy =
-        content::ChildProcessSecurityPolicy::GetInstance();
-    if (policy->IsWebSafeScheme(url.GetScheme()) ||
-        url.SchemeIs(url::kFileScheme)) {
-      const content::WebContents* web_contents =
-          apps::OpenExtensionAppShortcutWindow(profile, url);
-      if (web_contents) {
-        web_app::startup::FinalizeWebAppLaunch(
-            web_app::startup::OpenMode::kInWindowByUrl, command_line,
-            is_first_run,
-            GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-                web_contents),
-            apps::LaunchContainer::kLaunchContainerWindow);
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 bool MaybeLaunchExtensionApp(const base::CommandLine& command_line,
@@ -993,16 +945,6 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
 
   // TODO(http://crbug.com/40819749): Refactor command line processing logic to
   // validate the flag sets and reliably determine the startup mode.
-  // Try a shortcut app launch (--app is present).
-  // When running in incognito or guest mode, there typically won't be an
-  // AppServiceProxyFactory available. The --app command line switch does not
-  // require the AppServiceProxyFactory. This also allows the --app parameter
-  // to work in conjunction with the --incognito command line parameter.
-  if (MaybeLaunchAppShortcutWindow(command_line, cur_dir, is_first_run,
-                                   privacy_safe_profile)) {
-    return true;
-  }
-
   // Launch the browser if the profile is unable to open web apps.
   if (!CanOpenWebApp(privacy_safe_profile)) {
     LaunchBrowserForLastProfiles(

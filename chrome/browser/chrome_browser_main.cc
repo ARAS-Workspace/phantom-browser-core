@@ -1040,8 +1040,7 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
   browser_process_->browser_policy_connector()->OnResourceBundleCreated();
 
   if (first_run::IsChromeFirstRun()) {
-    if (!base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kApp) &&
-        !base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kAppId)) {
+    if (!base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kAppId)) {
       browser_creator_->AddFirstRunTabs(master_prefs_->new_tabs);
     }
   }

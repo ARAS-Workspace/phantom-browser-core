@@ -55,12 +55,6 @@ bool OpenExtensionApplicationWithReenablePrompt(
     const base::CommandLine& command_line,
     const base::FilePath& current_directory);
 
-// Tries to open an application window by app's |url|.
-// Returns web contents if |url| was successfully opened in a window, and
-// nullptr otherwise.
-content::WebContents* OpenExtensionAppShortcutWindow(Profile* profile,
-                                                     const GURL& url);
-
 // Records the restored app launch for UMA.
 void RecordExtensionAppLaunchOnTabRestored(Profile* profile, const GURL& url);
 

@@ -204,9 +204,6 @@ class StartupBrowserCreator {
                            OpenAppShortcutWindowPref);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTestWithLaunch,
                            OpenPolicyForcedAppShortcut);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest, OpenAppUrlShortcut);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
-                           OpenAppUrlIncognitoShortcut);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserWithRealWebAppTest,
                            LastUsedProfilesWithRealWebApp);
   FRIEND_TEST_ALL_PREFIXES(web_app::WebAppEngagementBrowserTest,
@@ -217,6 +214,8 @@ class StartupBrowserCreator {
                            CommandLineWindowByAppId);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
                            LastUsedProfilesWithWebApp);
+  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
+                           AppSwitchOpensNoAppWindow);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
                            KSameTabSwitchReplacesActiveTab);
 

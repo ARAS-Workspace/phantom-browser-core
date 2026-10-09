@@ -266,6 +266,25 @@ class StartupBrowserCreatorTest : public extensions::ExtensionBrowserTest {
 // Test that when there is a popup as the active browser any requests to
 // StartupBrowserCreatorImpl::OpenURLsInBrowser don't crash because there's no
 // explicit profile given.
+// --app=<url> opens no app window.
+IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, AppSwitchOpensNoAppWindow) {
+  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
+  GURL url = chrome_test_utils::GetTestUrl(
+      base::FilePath(base::FilePath::kCurrentDirectory),
+      base::FilePath(FILE_PATH_LITERAL("title2.html")));
+  command_line.AppendSwitchASCII(switches::kApp, url.spec());
+
+  ASSERT_TRUE(StartupBrowserCreator().ProcessCmdLineImpl(
+      command_line, base::FilePath(), chrome::startup::IsProcessStartup::kNo,
+      {browser()->GetProfile(), StartupProfileMode::kBrowserWindow}, {}));
+
+  BrowserWindowInterface* const new_browser =
+      ui_test_utils::GetBrowserNotInSet({browser()});
+  if (new_browser) {
+    EXPECT_NE(BrowserWindowInterface::TYPE_APP, new_browser->GetType());
+  }
+}
+
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, OpenURLsPopup) {
   std::vector<GURL> urls;
   urls.emplace_back("http://localhost");

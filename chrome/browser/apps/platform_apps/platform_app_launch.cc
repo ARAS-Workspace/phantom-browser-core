@@ -191,27 +191,6 @@ bool OpenExtensionApplicationWithReenablePrompt(
   return true;
 }
 
-content::WebContents* OpenExtensionAppShortcutWindow(Profile* profile,
-                                                     const GURL& url) {
-  const extensions::Extension* app = extensions::ExtensionRegistry::Get(profile)
-                                         ->enabled_extensions()
-                                         .GetAppByURL(url);
-  if (app) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    if (OpenDeprecatedApplicationPrompt(profile, app->id())) {
-      return nullptr;
-    }
-#endif
-    RecordCmdLineAppHistogram(app->GetType());
-  } else {
-    extensions::RecordAppLaunchType(
-        extension_misc::APP_LAUNCH_CMD_LINE_APP_LEGACY,
-        extensions::Manifest::Type::kHostedApp);
-  }
-
-  return ::OpenAppShortcutWindow(profile, url);
-}
-
 void RecordExtensionAppLaunchOnTabRestored(Profile* profile, const GURL& url) {
   const extensions::Extension* extension =
       extensions::ExtensionRegistry::Get(profile)

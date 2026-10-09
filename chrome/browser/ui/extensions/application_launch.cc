@@ -583,16 +583,6 @@ void OpenApplicationWithReenablePrompt(Profile* profile,
   OpenEnabledApplication(profile, std::move(params));
 }
 
-WebContents* OpenAppShortcutWindow(Profile* profile, const GURL& url) {
-  apps::AppLaunchParams launch_params(
-      std::string(),  // this is a URL app. No app id.
-      apps::LaunchContainer::kLaunchContainerWindow,
-      WindowOpenDisposition::NEW_WINDOW, apps::LaunchSource::kFromCommandLine);
-  launch_params.override_url = url;
-
-  return OpenApplicationWindow(profile, launch_params, url);
-}
-
 bool CanLaunchViaEvent(const extensions::Extension* extension) {
   const extensions::Feature* feature =
       extensions::FeatureProvider::GetAPIFeature("app.runtime");
