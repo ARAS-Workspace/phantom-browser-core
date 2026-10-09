@@ -168,7 +168,6 @@
 -TabStatsTrackerBrowserTest.TabSwitch
 -TranslateModelServiceBrowserTest.LanguageDetectionWithBackgroundTab
 -UsbChooserBrowserTest.InvokeUi_NoDevicesBubble
--UsbInternalsTest.WebUIValueRenderTest
 -WebContentsInteractionTestUtilTest.EvaluateString
 -WelcomeAppChooserTest.All
 -WelcomeWelcomeAppTest.All
