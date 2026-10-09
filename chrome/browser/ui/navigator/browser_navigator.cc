@@ -20,7 +20,6 @@
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
 #include "chrome/browser/apps/app_service/web_contents_app_id_utils.h"
-#include "chrome/browser/apps/link_capturing/link_capturing_tab_data.h"
 #include "chrome/browser/browser_about_handler.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
 #include "chrome/browser/platform_util.h"
@@ -795,14 +794,6 @@ base::WeakPtr<content::NavigationHandle> NavigateImpl(
        params->disposition == WindowOpenDisposition::NEW_WINDOW) &&
       (params->tabstrip_add_types & AddTabTypes::ADD_INHERIT_OPENER)) {
     params->source_contents->Focus();
-  }
-
-  if (tab_to_insert) {
-    // Save data needed for link capturing into apps that cannot otherwise be
-    // inferred later in the navigation. These are only needed when the
-    // navigation happens in a different tab to the link click.
-    apps::SetLinkCapturingSourceDisposition(tab_to_insert->GetContents(),
-                                            params->disposition);
   }
 
   if (params->source_contents == contents_to_navigate_or_insert) {

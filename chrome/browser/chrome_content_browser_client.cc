@@ -188,7 +188,6 @@
 #include "chrome/browser/universal_web_contents_observers.h"
 #include "chrome/browser/usb/chrome_usb_delegate.h"
 #include "chrome/browser/vr/vr_tab_helper.h"
-#include "chrome/browser/webapps/web_app_offline.h"
 #include "chrome/browser/webauthn/chrome_web_authentication_delegate_base.h"
 #include "chrome/browser/webauthn/webauthn_pref_names.h"
 #include "chrome/common/buildflags.h"
@@ -6706,19 +6705,6 @@ ChromeContentBrowserClient::GetAlternativeErrorPageOverrideInfo(
     }
   }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-  if (error_code == net::ERR_INTERNET_DISCONNECTED) {
-    content::mojom::AlternativeErrorPageOverrideInfoPtr
-        alternative_error_page_override_info = web_app::GetOfflinePageInfo(
-            url, render_frame_host, browser_context);
-    if (alternative_error_page_override_info) {
-      // Use the alternative error page dictionary to override the error page.
-      alternative_error_page_override_info->alternative_error_page_params.Set(
-          error_page::kOverrideErrorPage, base::Value(true));
-      web_app::TrackOfflinePageVisibility(render_frame_host);
-      return alternative_error_page_override_info;
-    }
-  }
 
   return nullptr;
 }
