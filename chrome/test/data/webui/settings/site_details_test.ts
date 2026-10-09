@@ -171,9 +171,6 @@ suite('SiteDetails', function() {
               ContentSettingsTypes.VR,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(
-              ContentSettingsTypes.WEB_APP_INSTALLATION,
-              [createRawSiteException('https://foo.com:443')]),
-          createContentSettingTypeToValuePair(
               ContentSettingsTypes.WINDOW_MANAGEMENT,
               [createRawSiteException('https://foo.com:443')]),
           createContentSettingTypeToValuePair(

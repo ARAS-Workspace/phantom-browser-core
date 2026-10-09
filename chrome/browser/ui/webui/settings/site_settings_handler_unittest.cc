@@ -891,19 +891,6 @@ class SiteSettingsHandlerBaseTest : public testing::Test {
     }));
   }
 
-  void SetupModelWithIsolatedWebAppData(
-      const std::vector<std::pair<std::string, int64_t>>& iwa_url_and_usage) {
-    SetupModel(base::BindLambdaForTesting([&](const TestModel& model) {
-      for (const auto& url_and_usage : iwa_url_and_usage) {
-        model.browsing_data_model->AddBrowsingData(
-            url::Origin::Create(GURL(url_and_usage.first)),
-            static_cast<BrowsingDataModel::StorageType>(
-                ChromeBrowsingDataModelDelegate::StorageType::kIsolatedWebApp),
-            url_and_usage.second);
-      }
-    }));
-  }
-
   base::ListValue GetOnStorageFetchedSentList() {
     handler()->ClearAllSitesMapForTesting();
 
@@ -6541,90 +6528,6 @@ TEST_F(SiteSettingsHandlerTest, RelatedWebsiteSetsMembership) {
   auto related_website_sets = GetTestRelatedWebsiteSets();
 
   ValidateSitesWithRws(storage_and_cookie_list, related_website_sets);
-}
-
-TEST_F(SiteSettingsHandlerTest, IsolatedWebAppUsageInfo) {
-  std::string iwa_url =
-      "isolated-app://"
-      "aerugqztij5biqquuk3mfwpsaibuegaqcitgfchwuosuofdjabzqaaic/";
-  SetupModelWithIsolatedWebAppData({{iwa_url, 1000}});
-
-  base::ListValue args;
-  args.Append(iwa_url);
-  handler()->HandleFetchUsageTotal(args);
-  handler()->ServicePendingRequests();
-
-  ValidateUsageInfo(
-      /*expected_usage_origin=*/iwa_url, /*expected_usage_string=*/"1,000 B",
-      /*expected_cookie_string=*/"",
-      /*expected_rws_member_count_string=*/"", /*expected_rws_policy=*/false);
-}
-
-TEST_F(SiteSettingsHandlerTest, IsolatedWebAppClearSiteGroupDataAndCookies) {
-  GURL iwa_url1(
-      "isolated-app://"
-      "abcdefztij5biqquuk3mfwpsaibuegaqcitgfchwuosuofdjabzqaaic/");
-  GURL iwa_url2(
-      "isolated-app://"
-      "aerugqztij5biqquuk3mfwpsaibuegaqcitgfchwuosuofdjabzqaaic/");
-  SetupModelWithIsolatedWebAppData(
-      {{iwa_url1.spec(), 1000}, {iwa_url2.spec(), 2000}});
-
-  auto verify_site_group = [](const base::Value& site_group,
-                              const GURL& expected_origin,
-                              int64_t expected_usage) {
-    ASSERT_TRUE(site_group.is_dict());
-    EXPECT_THAT(CHECK_DEREF(site_group.GetDict().FindString("groupingKey")),
-                IsOrigin(expected_origin));
-    ASSERT_EQ(1U, site_group.GetDict().FindList("origins")->size());
-    const base::DictValue& origin_info =
-        site_group.GetDict().FindList("origins")->front().GetDict();
-    EXPECT_EQ(expected_usage, origin_info.FindDouble("usage").value());
-  };
-
-  base::ListValue all_sites_list = GetOnStorageFetchedSentList();
-  EXPECT_EQ(2U, all_sites_list.size());
-  verify_site_group(all_sites_list[0], iwa_url1, 1000);
-  verify_site_group(all_sites_list[1], iwa_url2, 2000);
-
-  base::ListValue args;
-  args.Append(GroupingKey::Create(url::Origin::Create(iwa_url1)).Serialize());
-  handler()->HandleClearSiteGroupDataAndCookies(args);
-
-  all_sites_list = GetOnStorageFetchedSentList();
-  EXPECT_EQ(1U, all_sites_list.size());
-  verify_site_group(all_sites_list[0], iwa_url2, 2000);
-}
-
-TEST_F(SiteSettingsHandlerTest, IsolatedWebAppClearUnpartitionedUsage) {
-  GURL iwa_url(
-      "isolated-app://"
-      "abcdefztij5biqquuk3mfwpsaibuegaqcitgfchwuosuofdjabzqaaic/");
-  SetupModelWithIsolatedWebAppData({{iwa_url.spec(), 1000}});
-
-  base::ListValue usage_args;
-  usage_args.Append(iwa_url.spec());
-  handler()->HandleFetchUsageTotal(usage_args);
-  handler()->ServicePendingRequests();
-
-  ValidateUsageInfo(
-      /*expected_usage_origin=*/iwa_url.spec(),
-      /*expected_usage_string=*/"1,000 B",
-      /*expected_cookie_string=*/"",
-      /*expected_rws_member_count_string=*/"", /*expected_rws_policy=*/false);
-
-  base::ListValue clear_args;
-  clear_args.Append(iwa_url.spec());
-  handler()->HandleClearUnpartitionedUsage(clear_args);
-
-  handler()->HandleFetchUsageTotal(usage_args);
-  handler()->ServicePendingRequests();
-
-  ValidateUsageInfo(
-      /*expected_usage_origin=*/iwa_url.spec(),
-      /*expected_usage_string=*/"",
-      /*expected_cookie_string=*/"",
-      /*expected_rws_member_count_string=*/"", /*expected_rws_policy=*/false);
 }
 
 TEST_F(SiteSettingsHandlerTest, SiteExceptionScopeTypeMetrics) {

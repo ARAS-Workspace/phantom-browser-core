@@ -81,7 +81,6 @@
 #include "chrome/browser/badging/badge_manager.h"
 #include "chrome/browser/payments/payment_request_factory.h"
 #include "chrome/browser/prefs/persistent_renderer_prefs_manager.h"
-#include "chrome/browser/web_applications/web_install_service_impl.h"
 
 #if BUILDFLAG(IS_MAC)
 #if BUILDFLAG(IS_MAC)
@@ -313,12 +312,6 @@ void PopulateChromeFrameBinders(
       &PersistentRendererPrefsManager::BindFrameReceiver);
   if (base::FeatureList::IsEnabled(features::kWebPayments)) {
     map->Add<payments::mojom::PaymentRequest>(&payments::CreatePaymentRequest);
-  }
-  if ((base::FeatureList::IsEnabled(blink::features::kWebAppInstallation) ||
-       base::FeatureList::IsEnabled(blink::features::kInstallElement)) &&
-      !render_frame_host->GetParentOrOuterDocument()) {
-    map->Add<blink::mojom::WebInstallService>(
-        &web_app::WebInstallServiceImpl::CreateIfAllowed);
   }
 
 #if BUILDFLAG(IS_MAC)

@@ -121,7 +121,6 @@ export class TestSiteSettingsBrowserProxy extends TestBrowserProxy implements
       ContentSettingsTypes.SOUND,
       ContentSettingsTypes.USB_DEVICES,
       ContentSettingsTypes.VR,
-      ContentSettingsTypes.WEB_APP_INSTALLATION,
       ContentSettingsTypes.WINDOW_MANAGEMENT,
     ];
 

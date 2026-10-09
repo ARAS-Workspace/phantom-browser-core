@@ -63,11 +63,10 @@ ChromePageInfoUiDelegate::ChromePageInfoUiDelegate(
 
 bool ChromePageInfoUiDelegate::ShouldShowAllow(ContentSettingsType type) {
   switch (type) {
-    // Notifications, idle detection, and web app installation do not support
-    // CONTENT_SETTING_ALLOW in incognito.
+    // Notifications and idle detection do not support CONTENT_SETTING_ALLOW in
+    // incognito.
     case ContentSettingsType::NOTIFICATIONS:
     case ContentSettingsType::IDLE_DETECTION:
-    case ContentSettingsType::WEB_APP_INSTALLATION:
       return !GetProfile()->IsOffTheRecord();
     // Media only supports CONTENT_SETTING_ALLOW for secure origins.
     case ContentSettingsType::MEDIASTREAM_MIC:
@@ -91,11 +90,10 @@ bool ChromePageInfoUiDelegate::ShouldShowAllow(ContentSettingsType type) {
 std::u16string ChromePageInfoUiDelegate::GetAutomaticallyBlockedReason(
     ContentSettingsType type) {
   switch (type) {
-    // Notifications, idle detection, and web app installation do not support
-    // CONTENT_SETTING_ALLOW in incognito.
+    // Notifications and idle detection do not support CONTENT_SETTING_ALLOW in
+    // incognito.
     case ContentSettingsType::NOTIFICATIONS:
-    case ContentSettingsType::IDLE_DETECTION:
-    case ContentSettingsType::WEB_APP_INSTALLATION: {
+    case ContentSettingsType::IDLE_DETECTION: {
       if (GetProfile()->IsOffTheRecord()) {
         return l10n_util::GetStringUTF16(
             GetProfile()->IsGuestSession()

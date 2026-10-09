@@ -495,17 +495,6 @@
     </settings-vr-page>
   </template>
 
-  <template is="dom-if" if="[[enableWebAppInstallation_]]">
-    <template is="dom-if" if="[[renderView_(
-        routes_.SITE_SETTINGS_WEB_APP_INSTALLATION, currentRoute,
-        inSearchMode)]]" update-when-false>
-      <settings-web-applications-page slot="view"
-          id="siteSettingsWebAppInstallation" data-parent-view-id="privacy"
-          route-path$="[[routes_.SITE_SETTINGS_WEB_APP_INSTALLATION.path]]">
-      </settings-web-applications-page>
-    </template>
-  </template>
-
   <template is="dom-if" if="[[renderView_(
       routes_.SITE_SETTINGS_WINDOW_MANAGEMENT, currentRoute, inSearchMode)]]"
       update-when-false>

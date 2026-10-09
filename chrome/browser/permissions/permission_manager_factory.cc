@@ -35,7 +35,6 @@
 #include "components/permissions/contexts/local_fonts_permission_context.h"
 #include "components/permissions/contexts/pointer_lock_permission_context.h"
 #include "components/permissions/contexts/speaker_selection_permission_context.h"
-#include "components/permissions/contexts/web_app_installation_permission_context.h"
 #include "components/permissions/contexts/window_management_permission_context.h"
 #include "components/permissions/permission_manager.h"
 #include "extensions/buildflags/buildflags.h"
@@ -148,10 +147,6 @@ permissions::PermissionManager::PermissionContextMap CreatePermissionContexts(
 
   permission_contexts[ContentSettingsType::CAPTURED_SURFACE_CONTROL] =
       std::make_unique<permissions::CapturedSurfaceControlPermissionContext>(
-          profile);
-
-  permission_contexts[ContentSettingsType::WEB_APP_INSTALLATION] =
-      std::make_unique<permissions::WebAppInstallationPermissionContext>(
           profile);
 
   return permission_contexts;

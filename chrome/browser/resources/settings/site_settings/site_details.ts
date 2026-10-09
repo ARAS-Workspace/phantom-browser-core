@@ -187,11 +187,6 @@ export class SiteDetailsElement extends SiteDetailsElementBase {
         value: () => loadTimeData.getBoolean('enableKeyboardLockPrompt'),
       },
 
-      enableWebAppInstallation_: {
-        type: Boolean,
-        value: () => loadTimeData.getBoolean('enableWebAppInstallation'),
-      },
-
       enableLocalNetworkAccessSetting_: {
         type: Boolean,
         value: () => loadTimeData.getBoolean('enableLocalNetworkAccessSetting'),
@@ -235,7 +230,6 @@ export class SiteDetailsElement extends SiteDetailsElementBase {
   // </if>
   declare private enableCapturedSurfaceControl_: boolean;
   declare private enableHandTrackingContentSetting_: boolean;
-  declare private enableWebAppInstallation_: boolean;
   private websiteUsageProxy_: WebsiteUsageBrowserProxy =
       WebsiteUsageBrowserProxyImpl.getInstance();
   declare private enableKeyboardLockPrompt_: boolean;

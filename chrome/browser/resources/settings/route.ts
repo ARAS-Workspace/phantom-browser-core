@@ -112,10 +112,6 @@ function addPrivacyChildRoutes(r: Partial<SettingsRoutes>) {
   r.SITE_SETTINGS_STORAGE_ACCESS = r.SITE_SETTINGS.createChild('storageAccess');
   r.SITE_SETTINGS_AUTOMATIC_FULLSCREEN =
       r.SITE_SETTINGS.createChild('automaticFullScreen');
-  if (loadTimeData.getBoolean('enableWebAppInstallation')) {
-    r.SITE_SETTINGS_WEB_APP_INSTALLATION =
-        r.SITE_SETTINGS.createChild('webApplications');
-  }
   if (loadTimeData.getBoolean('enableLocalNetworkAccessSetting')) {
     r.SITE_SETTINGS_LOCAL_NETWORK = r.SITE_SETTINGS.createChild('localNetwork');
     r.SITE_SETTINGS_LOOPBACK_NETWORK =

@@ -66,7 +66,6 @@ import './site_settings/storage_access_page.js';
 import './site_settings/usb_devices_page.js';
 import './site_settings/v8_page.js';
 import './site_settings/vr_page.js';
-import './site_settings/web_applications_page.js';
 import './site_settings/window_management_page.js';
 import './site_settings/zoom_levels.js';
 // <if expr="not is_chromeos">

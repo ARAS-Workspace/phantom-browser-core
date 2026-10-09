@@ -163,7 +163,6 @@ constexpr auto kContentSettingsTypeGroupNames = std::to_array<
     {ContentSettingsType::AUTOMATIC_FULLSCREEN, "automatic-fullscreen"},
     {ContentSettingsType::KEYBOARD_LOCK, "keyboard-lock"},
     {ContentSettingsType::TOP_LEVEL_STORAGE_ACCESS, "top-level-storage-access"},
-    {ContentSettingsType::WEB_APP_INSTALLATION, "web-app-installation"},
     {ContentSettingsType::SMART_CARD_GUARD, "smart-card-readers"},
     {ContentSettingsType::SMART_CARD_DATA, kSmartCardChooserDataGroupType},
     {ContentSettingsType::LOCAL_NETWORK, "local-network"},
@@ -256,6 +255,7 @@ constexpr auto kContentSettingsTypeGroupNames = std::to_array<
     {ContentSettingsType::LOCAL_NETWORK_ACCESS, nullptr},
     {ContentSettingsType::SUB_APPS_WITHOUT_PROMPTS, nullptr},
     {ContentSettingsType::SUSPICIOUS_SITE_WARNING_DATA, nullptr},
+    {ContentSettingsType::WEB_APP_INSTALLATION, nullptr},
 });
 
 static_assert(
@@ -632,10 +632,6 @@ std::vector<ContentSettingsType> GetVisiblePermissionCategories(
       base_types->push_back(ContentSettingsType::HAND_TRACKING);
     }
 #endif
-
-    if (base::FeatureList::IsEnabled(blink::features::kWebAppInstallation)) {
-      base_types->push_back(ContentSettingsType::WEB_APP_INSTALLATION);
-    }
 
     if (base::FeatureList::IsEnabled(
             network::features::kLocalNetworkAccessChecks)) {

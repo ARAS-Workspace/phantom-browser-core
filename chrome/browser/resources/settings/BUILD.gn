@@ -126,7 +126,6 @@ build_webui("build") {
     "site_settings/usb_devices_page.ts",
     "site_settings/v8_page.ts",
     "site_settings/vr_page.ts",
-    "site_settings/web_applications_page.ts",
     "site_settings/web_printing_page.ts",
     "site_settings/window_management_page.ts",
     "site_settings/zoom_levels.ts",

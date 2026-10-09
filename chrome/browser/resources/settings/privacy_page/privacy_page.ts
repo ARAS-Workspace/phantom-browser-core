@@ -241,7 +241,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
       case 'siteSettingsStorageAccess':
       case 'siteSettingsUsbDevices':
       case 'siteSettingsVr':
-      case 'siteSettingsWebAppInstallation':
       case 'siteSettingsWindowManagement':
       case 'siteSettingsZoomLevels':
         triggerId = 'siteSettingsLinkRow';

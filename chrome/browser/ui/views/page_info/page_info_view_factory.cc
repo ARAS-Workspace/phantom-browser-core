@@ -574,12 +574,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
                          ? vector_icons::kTouchpadMouseIcon
                          : vector_icons::kTouchpadMouseOldIcon);
       break;
-    case ContentSettingsType::WEB_APP_INSTALLATION:
-      icon = show_blocked_badge ? &vector_icons::kInstallDesktopOffCustomIcon
-                                : &(features::IsRoundedIconsEnabled()
-                                        ? vector_icons::kInstallDesktopIcon
-                                        : vector_icons::kInstallDesktopOldIcon);
-      break;
     case ContentSettingsType::LOCAL_NETWORK:
       icon = show_blocked_badge ? &(features::IsRoundedIconsEnabled()
                                         ? vector_icons::kRouterOffIcon

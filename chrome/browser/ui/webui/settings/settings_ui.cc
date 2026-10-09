@@ -324,10 +324,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
 
   html_source->AddBoolean(
-      "enableWebAppInstallation",
-      base::FeatureList::IsEnabled(blink::features::kWebAppInstallation));
-
-  html_source->AddBoolean(
       "enableLocalNetworkAccessSetting",
       base::FeatureList::IsEnabled(
           network::features::kLocalNetworkAccessChecks) &&

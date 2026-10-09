@@ -141,11 +141,6 @@ export class SettingsPrivacyPageIndexElement extends
         value: () => loadTimeData.getBoolean('enableLocalNetworkAccessSetting'),
       },
 
-      enableWebAppInstallation_: {
-        type: Boolean,
-        value: () => loadTimeData.getBoolean('enableWebAppInstallation'),
-      },
-
       enableWebBluetoothNewPermissionsBackend_: {
         type: Boolean,
         value: () =>
@@ -175,7 +170,6 @@ export class SettingsPrivacyPageIndexElement extends
   declare private enableLocalNetworkAccessSetting_: boolean;
   declare private enablePaymentHandlerContentSetting_: boolean;
   declare private enablePersistentPermissions_: boolean;
-  declare private enableWebAppInstallation_: boolean;
   declare private enableWebBluetoothNewPermissionsBackend_: boolean;
 
   private pendingViewSwitching_: PromiseResolver<void> = new PromiseResolver();

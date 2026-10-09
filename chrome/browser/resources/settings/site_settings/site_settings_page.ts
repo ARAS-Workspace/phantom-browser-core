@@ -418,15 +418,6 @@ function getCategoryItemMap(): Map<ContentSettingsTypes, CategoryListItem> {
       disabledLabel: 'siteSettingsVrBlocked',
     },
     {
-      route: routes.SITE_SETTINGS_WEB_APP_INSTALLATION,
-      id: Id.WEB_APP_INSTALLATION,
-      label: 'siteSettingsWebAppInstallation',
-      icon: 'settings:install-desktop',
-      enabledLabel: 'siteSettingsWebAppInstallationAsk',
-      disabledLabel: 'siteSettingsWebAppInstallationBlock',
-      shouldShow: () => loadTimeData.getBoolean('enableWebAppInstallation'),
-    },
-    {
       route: routes.SITE_SETTINGS_WINDOW_MANAGEMENT,
       id: Id.WINDOW_MANAGEMENT,
       label: 'siteSettingsWindowManagement',
@@ -531,7 +522,6 @@ export class SettingsSiteSettingsPageElement extends
               Id.SMART_CARD_READERS,
               Id.WEB_PRINTING,
               // </if>
-              Id.WEB_APP_INSTALLATION,
               Id.LOCAL_NETWORK,
               Id.LOOPBACK_NETWORK,
             ]),
