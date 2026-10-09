@@ -999,8 +999,6 @@ class ChromeBrowsingDataRemoverDelegateTest : public testing::Test {
     profile_ = profile_manager_->CreateTestingProfile("test_profile",
                                                       GetTestingFactories());
 
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(profile_.get());
-
     remover_ = profile_->GetBrowsingDataRemover();
 
     auto network_context_params = network::mojom::NetworkContextParams::New();

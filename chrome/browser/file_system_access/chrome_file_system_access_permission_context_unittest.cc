@@ -234,7 +234,6 @@ class ChromeFileSystemAccessPermissionContextTest : public testing::Test {
     permission_context_ =
         std::make_unique<TestFileSystemAccessPermissionContext>(
             browser_context(), task_environment_.GetMockClock());
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
   }
 
   void TearDown() override {

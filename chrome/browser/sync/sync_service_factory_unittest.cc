@@ -98,7 +98,6 @@ class SyncServiceFactoryTest : public testing::Test {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     datatypes.Put(syncer::APPS);
     datatypes.Put(syncer::APP_SETTINGS);
-    datatypes.Put(syncer::WEB_APPS);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
     datatypes.Put(syncer::THEMES);

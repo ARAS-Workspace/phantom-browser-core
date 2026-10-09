@@ -204,12 +204,7 @@ constexpr base::FilePath::CharType kTempDirectoryName[] =
     FILE_PATH_LITERAL("Temp");
 
 bool AreWebAppsEnabled(Profile* profile) {
-  if (!profile || profile->IsSystemProfile()) {
-    return false;
-  }
-
-
-  return !profile->IsOffTheRecord();
+  return false;
 }
 
 bool IsWebAppInstallByUserPolicyEnabled(Profile* profile) {

@@ -79,7 +79,6 @@ class PeriodicBackgroundSyncPermissionContextTest
     mock_permission_context_ =
         std::make_unique<MockPeriodicBackgroundSyncPermissionContext>(
             profile());
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
   }
 
   void TearDown() override {

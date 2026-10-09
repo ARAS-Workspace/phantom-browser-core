@@ -482,9 +482,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "AppLoadService",
     "AppRestoreService",
     "AppServiceProxy",
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-    "AppShortcutManager",
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #if BUILDFLAG(IS_LINUX)
     "ManualTestHeartbeatEvent",
 #endif  // BUILDFLAG(IS_LINUX)
@@ -527,7 +524,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "CorruptedExtensionReinstaller",
 #endif
     "CWSInfoService",
-    "DataTypeStoreService",
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     "DelayedInstallManager",
 #endif
@@ -693,7 +689,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "UserScriptWorldConfigurationManager",
     "WarningBadgeService",
     "WarningService",
-    "WebAppProvider",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "WebAuthenticationProxyAPI",
 #endif

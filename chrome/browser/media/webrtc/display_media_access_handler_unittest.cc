@@ -19,7 +19,7 @@
 #include "base/types/expected.h"
 #include "build/build_config.h"
 #include "chrome/browser/media/webrtc/fake_desktop_media_picker_factory.h"
-#include "chrome/browser/web_applications/test/web_app_test.h"
+#include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/browser_context.h"
@@ -36,13 +36,13 @@
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "url/origin.h"
 
-class DisplayMediaAccessHandlerTest : public WebAppTest {
+class DisplayMediaAccessHandlerTest : public ChromeRenderViewHostTestHarness {
  public:
   DisplayMediaAccessHandlerTest() = default;
   ~DisplayMediaAccessHandlerTest() override = default;
 
   void SetUp() override {
-    WebAppTest::SetUp();
+    ChromeRenderViewHostTestHarness::SetUp();
     std::unique_ptr<content::NavigationSimulator> navigation =
         content::NavigationSimulator::CreateBrowserInitiated(
             GURL("http://origin/"), web_contents());
