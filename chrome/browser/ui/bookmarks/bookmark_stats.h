@@ -86,9 +86,6 @@ void RecordBookmarkFolderLaunch(BookmarkLaunchLocation location);
 // Records the user opening a folder of bookmarks for UMA purposes.
 void RecordBookmarkFolderOpen(BookmarkLaunchLocation location);
 
-// Records the user opening the apps page for UMA purposes.
-void RecordBookmarkAppsPageOpen(BookmarkLaunchLocation location);
-
 // Records that the user edited or renamed a bookmark.
 void RecordBookmarkEdited(BookmarkLaunchLocation location);
 

@@ -184,8 +184,7 @@ bool ShouldThemifyFavicon(GURL url) {
   if (!url.SchemeIs(content::kChromeUIScheme)) {
     return false;
   }
-  return url.host() != chrome::kChromeUIAppLauncherPageHost &&
-         url.host() != chrome::kChromeUIHelpHost &&
+  return url.host() != chrome::kChromeUIHelpHost &&
          url.host() != chrome::kChromeUIVersionHost &&
          url.host() != chrome::kChromeUINetExportHost &&
          url.host() != chrome::kChromeUINewTabHost &&

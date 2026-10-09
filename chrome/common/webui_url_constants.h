@@ -47,7 +47,6 @@ inline constexpr char kChromeUIActorOverlayURL[] = "chrome://actor-overlay";
 inline constexpr char kChromeUIAppIconHost[] = "app-icon";
 inline constexpr char kChromeUIAppIconURL[] = "chrome://app-icon/";
 inline constexpr char kChromeUIAppLauncherPageHost[] = "apps";
-inline constexpr char kChromeUIAppsURL[] = "chrome://apps/";
 inline constexpr char kChromeUIAppsWithDeprecationDialogURL[] =
     "chrome://apps?showDeletionDialog=";
 inline constexpr char kChromeUIAppsWithForceInstalledDeprecationDialogURL[] =

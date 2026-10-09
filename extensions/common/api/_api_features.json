@@ -371,7 +371,6 @@
     "channel": "stable",
     "contexts": ["webui"],
     "matches": [
-      "chrome://apps/*",
       "chrome://bookmarks/*",
       "chrome://bookmarks-side-panel.top-chrome/*",
       "chrome://certificate-manager/*",
@@ -401,7 +400,6 @@
       "chrome://tab-search.top-chrome/*",
       "chrome://tab-strip.top-chrome/*",
       "chrome://vc-background/*",
-      "chrome://app-settings/*",
       "chrome://search-engine-choice/*"
     ]
   }, {
@@ -472,7 +470,6 @@
     "channel": "stable",
     "contexts": ["webui_untrusted"],
     "matches": [
-      "chrome://apps/*",
       "chrome-untrusted://demo-mode-app/*"
     ]
   },

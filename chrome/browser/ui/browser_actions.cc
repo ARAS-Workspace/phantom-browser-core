@@ -3081,23 +3081,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                Browser* browser = bwi->GetBrowserForMigrationOnly();
-                auto* controller = web_app::AppBrowserController::From(browser);
-                if (controller) {
-                  chrome::ShowWebAppSettings(
-                      bwi, controller->app_id(),
-                      web_app::AppSettingsPageEntryPoint::kBrowserCommand);
-                }
-              },
-              bwi))
-          .SetActionId(kActionWebAppSettings)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
           base::BindRepeating([](actions::ActionItem* item,
                                  actions::ActionInvocationContext context) {
             ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(

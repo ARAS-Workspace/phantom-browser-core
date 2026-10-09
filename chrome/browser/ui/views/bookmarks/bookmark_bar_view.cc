@@ -80,9 +80,7 @@
 #include "chrome/common/extensions/extension_constants.h"
 #include "chrome/common/extensions/extension_metrics.h"
 #include "chrome/common/pref_names.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/generated_resources.h"
-#include "chrome/grit/theme_resources.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_node.h"
 #include "components/bookmarks/browser/bookmark_utils.h"
@@ -108,9 +106,7 @@
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/models/image_model_utils.h"
 #include "ui/base/mojom/menu_source_type.mojom-forward.h"
-#include "ui/base/page_transition_types.h"
 #include "ui/base/pointer/touch_ui_controller.h"
-#include "ui/base/resource/resource_bundle.h"
 #include "ui/base/theme_provider.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/base/window_open_disposition.h"
@@ -176,32 +172,11 @@ bool animations_enabled = true;
 // Thickness of the separator (|) in dips (density-independent pixels).
 constexpr int kBookmarkBarSeparatorThickness = 2;
 
-gfx::ImageSkia* GetImageSkiaNamed(int id) {
-  return ui::ResourceBundle::GetSharedInstance().GetImageSkiaNamed(id);
-}
-
 std::u16string GetFolderButtonAccessibleName(std::u16string_view folder_title) {
   return folder_title.empty()
              ? l10n_util::GetStringUTF16(IDS_UNNAMED_BOOKMARK_FOLDER)
              : std::u16string(folder_title);
 }
-
-// ShortcutButton -------------------------------------------------------------
-
-// Buttons used for the shortcuts on the bookmark bar.
-
-class ShortcutButton : public BookmarkButtonBase {
-  METADATA_HEADER(ShortcutButton, BookmarkButtonBase)
-
- public:
-  ShortcutButton(PressedCallback callback, const std::u16string& title)
-      : BookmarkButtonBase(std::move(callback), title) {}
-  ShortcutButton(const ShortcutButton&) = delete;
-  ShortcutButton& operator=(const ShortcutButton&) = delete;
-};
-
-BEGIN_METADATA(ShortcutButton)
-END_METADATA
 
 // BookmarkFolderButton -------------------------------------------------------
 
@@ -477,7 +452,6 @@ void BookmarkBarView::RemoveObserver(BookmarkBarViewObserver* observer) {
 }
 
 void BookmarkBarView::SetPageNavigator(content::PageNavigator* navigator) {
-  page_navigator_ = navigator;
   if (saved_tab_group_bar_) {
     saved_tab_group_bar_->SetPageNavigator(navigator);
   }
@@ -708,10 +682,6 @@ gfx::Size BookmarkBarView::GetMinimumSize() const {
     gfx::Size size = saved_tab_groups_separator_view_->GetPreferredSize();
     width += size.width();
   }
-  if (apps_page_shortcut_->GetVisible()) {
-    gfx::Size size = apps_page_shortcut_->GetPreferredSize();
-    width += size.width() + bookmark_bar_button_padding;
-  }
 
   return gfx::Size(width, height);
 }
@@ -760,10 +730,6 @@ void BookmarkBarView::Layout(PassKey) {
   gfx::Size overflow_pref = overflow_button_->GetPreferredSize();
   gfx::Size bookmarks_separator_pref =
       bookmarks_separator_view_->GetPreferredSize();
-  gfx::Size apps_page_shortcut_pref =
-      apps_page_shortcut_->GetVisible()
-          ? apps_page_shortcut_->GetPreferredSize()
-          : gfx::Size();
 
   const int bookmark_bar_button_padding =
       GetLayoutConstant(LayoutConstant::kBookmarkBarButtonPadding);
@@ -772,13 +738,6 @@ void BookmarkBarView::Layout(PassKey) {
               bookmarks_separator_pref.width();
   if (all_bookmarks_button_->GetVisible()) {
     max_x -= all_bookmarks_pref.width() + bookmark_bar_button_padding;
-  }
-
-  // Start with the apps page shortcut button.
-  if (apps_page_shortcut_->GetVisible()) {
-    apps_page_shortcut_->SetBounds(x, y, apps_page_shortcut_pref.width(),
-                                   button_height);
-    x += apps_page_shortcut_pref.width() + bookmark_bar_button_padding;
   }
 
   // Then comes the managed bookmarks folder, if visible.
@@ -979,8 +938,6 @@ void BookmarkBarView::PaintChildren(const views::PaintInfo& paint_info) {
         x = bookmark_buttons_[index - 1].first->bounds().right();
       } else if (managed_bookmarks_button_->GetVisible()) {
         x = managed_bookmarks_button_->bounds().right();
-      } else if (apps_page_shortcut_->GetVisible()) {
-        x = apps_page_shortcut_->bounds().right();
       } else {
         x = GetLeadingMargin();
       }
@@ -1429,16 +1386,6 @@ bool BookmarkBarView::CanStartDragForView(views::View* sender,
   return true;
 }
 
-void BookmarkBarView::AppsPageShortcutPressed(const ui::Event& event) {
-  content::OpenURLParams params(GURL(chrome::kChromeUIAppsURL),
-                                content::Referrer(),
-                                ui::DispositionFromEventFlags(event.flags()),
-                                ui::PAGE_TRANSITION_AUTO_BOOKMARK, false);
-  page_navigator_->OpenURL(params, /*navigation_handle_callback=*/{});
-  RecordBookmarkAppsPageOpen(BookmarkLaunchLocation::kAttachedBar);
-  chrome::UpdateBookmarkBarVisibilityPrefOnUserAction(browser_->GetProfile());
-}
-
 void BookmarkBarView::OnButtonPressed(const bookmarks::BookmarkNode* node,
                                       const ui::Event& event) {
   // Only URL nodes have regular buttons on the bookmarks bar; folder clicks
@@ -1513,10 +1460,9 @@ void BookmarkBarView::ShowContextMenuForViewImpl(
     nodes = bookmark_service_->GetUnderlyingNodes(
         BookmarkParentFolder::ManagedFolder());
     context_menu_source = managed_bookmarks_button_;
-  } else if (source != this && source != apps_page_shortcut_) {
+  } else if (source != this) {
     // User clicked on one of the bookmark buttons, find which one they
-    // clicked on, except for the apps page shortcut, which must behave as if
-    // the user clicked on the bookmark bar background.
+    // clicked on.
     size_t bookmark_button_index = GetIndexForButton(source);
     DCHECK_NE(static_cast<size_t>(-1), bookmark_button_index);
     CHECK_LT(bookmark_button_index, bookmark_buttons_.size());
@@ -1526,9 +1472,6 @@ void BookmarkBarView::ShowContextMenuForViewImpl(
   } else {
     nodes = bookmark_service_->GetUnderlyingNodes(
         BookmarkParentFolder::BookmarkBarFolder());
-    if (source == apps_page_shortcut_) {
-      context_menu_source = apps_page_shortcut_;
-    }
   }
 
   if (context_menu_source) {
@@ -1623,8 +1566,6 @@ void BookmarkBarView::Init() {
 
   // Child views are traversed in the order they are added. Make sure the order
   // they are added matches the visual order.
-  apps_page_shortcut_ = AddChildView(CreateAppsPageShortcutButton());
-
   managed_bookmarks_button_ = AddChildView(CreateManagedBookmarksButton());
   // Also re-enabled when the model is loaded.
   managed_bookmarks_button_->SetEnabled(false);
@@ -1649,12 +1590,6 @@ void BookmarkBarView::Init() {
 
   profile_pref_registrar_.Init(browser_->GetProfile()->GetPrefs());
   profile_pref_registrar_.Add(
-      bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
-      base::BindRepeating(
-          &BookmarkBarView::OnAppsPageShortcutVisibilityPrefChanged,
-          base::Unretained(this)));
-
-  profile_pref_registrar_.Add(
       bookmarks::prefs::kShowTabGroupsInBookmarkBar,
       base::BindRepeating(&BookmarkBarView::OnTabGroupsVisibilityPrefChanged,
                           base::Unretained(this)));
@@ -1663,9 +1598,6 @@ void BookmarkBarView::Init() {
       bookmarks::prefs::kShowManagedBookmarksInBookmarkBar,
       base::BindRepeating(&BookmarkBarView::OnShowManagedBookmarksPrefChanged,
                           base::Unretained(this)));
-
-  apps_page_shortcut_->SetVisible(
-      chrome::ShouldShowAppsShortcutInBookmarkBar(browser_->GetProfile()));
 
   bookmarks_separator_view_ =
       AddChildView(std::make_unique<ButtonSeparatorView>());
@@ -1807,27 +1739,6 @@ void BookmarkBarView::UpdateFirstHiddenNodeIndex() {
     bookmark_menu_->BookmarkStartIndexChanged(
         BookmarkParentFolder::BookmarkBarFolder(), first_hidden_node_idx_);
   }
-}
-
-std::unique_ptr<views::LabelButton>
-BookmarkBarView::CreateAppsPageShortcutButton() {
-  auto button = std::make_unique<ShortcutButton>(
-      base::BindRepeating(&BookmarkBarView::AppsPageShortcutPressed,
-                          base::Unretained(this)),
-      l10n_util::GetStringUTF16(IDS_BOOKMARK_BAR_APPS_SHORTCUT_NAME));
-  button->SetTooltipText(
-      l10n_util::GetStringUTF16(IDS_BOOKMARK_BAR_APPS_SHORTCUT_TOOLTIP));
-  button->SetID(VIEW_ID_BOOKMARK_BAR_ELEMENT);
-
-  ui::ImageModel icon = ui::ImageModel::FromImageSkia(
-      *GetImageSkiaNamed(IDR_BOOKMARK_BAR_APPS_SHORTCUT));
-  button->SetImageModel(views::Button::STATE_NORMAL, icon);
-  button->SetImageModel(
-      views::Button::STATE_DISABLED,
-      ui::GetDefaultDisabledIconFromImageModel(icon, GetColorProvider()));
-
-  button->set_context_menu_controller(this);
-  return button;
 }
 
 void BookmarkBarView::ConfigureButton(const BookmarkNode* node,
@@ -2214,8 +2125,6 @@ void BookmarkBarView::UpdateAppearanceForTheme() {
                                       ui::kColorIconDisabled));
   }
 
-  apps_page_shortcut_->SetEnabledTextColors(color);
-
   const SkColor overflow_color =
       color_provider->GetColor(kColorBookmarkButtonIcon);
   const int overflow_size = 16;
@@ -2259,19 +2168,6 @@ void BookmarkBarView::UpdateBookmarksSeparatorVisibility() {
   bookmarks_separator_view_->SetVisible(all_bookmarks_button_->GetVisible());
 }
 
-void BookmarkBarView::OnAppsPageShortcutVisibilityPrefChanged() {
-  DCHECK(apps_page_shortcut_);
-  // Only perform layout if required.
-  bool visible =
-      chrome::ShouldShowAppsShortcutInBookmarkBar(browser_->GetProfile());
-  if (apps_page_shortcut_->GetVisible() == visible) {
-    return;
-  }
-  apps_page_shortcut_->SetVisible(visible);
-  UpdateBookmarksSeparatorVisibility();
-  LayoutAndPaint();
-}
-
 void BookmarkBarView::OnTabGroupsVisibilityPrefChanged() {
   // Incognito browsers also get triggered if the associated regular profile
   // browser is triggered. Early return because incognito has no
@@ -2302,12 +2198,10 @@ void BookmarkBarView::InsertBookmarkButtonAtIndex(
     std::unique_ptr<views::View> bookmark_button,
     size_t index) {
 // All of the secondary buttons are always in the view hierarchy, even if
-// they're not visible. The order should be: [Apps shortcut] [Managed bookmark
-// button] [saved tab group bar] [..bookmark buttons..] [Overflow chevron]
-// [All bookmarks]
+// they're not visible. The order should be: [Managed bookmark button] [saved
+// tab group bar] [..bookmark buttons..] [Overflow chevron] [All bookmarks]
 #if DCHECK_IS_ON()
   auto i = children().cbegin();
-  DCHECK_EQ(*i++, apps_page_shortcut_);
   DCHECK_EQ(*i++, managed_bookmarks_button_);
   if (saved_tab_group_bar_) {
     DCHECK_EQ(*i++, saved_tab_group_bar_);

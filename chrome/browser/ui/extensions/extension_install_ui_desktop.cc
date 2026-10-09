@@ -21,11 +21,8 @@
 #include "chrome/browser/ui/extensions/extension_post_install_dialog.h"
 #include "chrome/browser/ui/extensions/extension_post_install_dialog_model.h"
 #include "chrome/browser/ui/extensions/installation_error_infobar_delegate.h"
-#include "chrome/browser/ui/navigator/browser_navigator.h"
-#include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/browser/ui/simple_message_box.h"
-#include "chrome/browser/ui/singleton_tabs.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
@@ -42,8 +39,6 @@
 #include "extensions/browser/install/crx_install_error.h"
 #include "extensions/common/extension.h"
 
-#include "chrome/common/url_constants.h"
-
 using content::BrowserThread;
 using content::WebContents;
 using extensions::Extension;
@@ -57,18 +52,6 @@ BrowserWindowInterface* FindOrCreateVisibleBrowser(Profile* profile) {
     chrome::AddTabAt(browser, GURL(), -1, true);
   }
   return browser;
-}
-
-void ShowAppInstalledNotification(
-    scoped_refptr<const extensions::Extension> extension,
-    Profile* profile) {
-  Profile* current_profile = profile->GetOriginalProfile();
-  BrowserWindowInterface* browser_window =
-      FindOrCreateVisibleBrowser(current_profile);
-  CHECK(browser_window);
-  NavigateParams params(GetSingletonTabNavigateParams(
-      browser_window, GURL(chrome::kChromeUIAppsURL)));
-  Navigate(&params);
 }
 
 }  // namespace
@@ -135,11 +118,6 @@ void ExtensionInstallUIDesktop::OnInstallSuccess(
               }
             },
             extension->id()));
-    return;
-  }
-
-  if (!use_app_installed_bubble()) {
-    ShowAppInstalledNotification(extension, profile());
     return;
   }
 }

@@ -81,7 +81,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
 #if BUILDFLAG(ENABLE_VR)
       content::kChromeUIWebXrInternalsHost,
 #endif
-      kChromeUIAppLauncherPageHost,
       kChromeUIBookmarksHost,
       kChromeUIDownloadsHost,
       kChromeUIHelpHost,

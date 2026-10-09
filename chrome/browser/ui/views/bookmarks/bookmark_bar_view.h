@@ -283,7 +283,6 @@ class BookmarkBarView : public views::AccessiblePaneView,
   // calculating the preferred height.
   void Init();
 
-  void AppsPageShortcutPressed(const ui::Event& event);
   void OnButtonPressed(const bookmarks::BookmarkNode* node,
                        const ui::Event& event);
   void OnMenuButtonPressed(const BookmarkParentFolder& folder,
@@ -330,9 +329,6 @@ class BookmarkBarView : public views::AccessiblePaneView,
 
   // Removes all bookmark buttons.
   void RemoveAllBookmarkButtons();
-
-  // Creates the button for rendering the apps page shortcut.
-  std::unique_ptr<views::LabelButton> CreateAppsPageShortcutButton();
 
   // Configures the button from the specified node. This sets the text,
   // and icon.
@@ -397,9 +393,6 @@ class BookmarkBarView : public views::AccessiblePaneView,
   // Updates the visibility of |bookmarks_separator_view_|.
   void UpdateBookmarksSeparatorVisibility();
 
-  // Updates the visibility of the apps shortcut based on the pref value.
-  void OnAppsPageShortcutVisibilityPrefChanged();
-
   // Updates the visibility of the tab groups based on the pref value.
   void OnTabGroupsVisibilityPrefChanged();
 
@@ -451,10 +444,6 @@ class BookmarkBarView : public views::AccessiblePaneView,
   // Needed to react to bookmark bar pref changes.
   PrefChangeRegistrar profile_pref_registrar_;
 
-  // Used for opening urls.
-  raw_ptr<content::PageNavigator, AcrossTasksDanglingUntriaged>
-      page_navigator_ = nullptr;
-
   // `BookmarkMergedSurfaceService` that manages the entries and folders that
   // are shown in this view. This is owned by the Profile.
   raw_ptr<BookmarkMergedSurfaceService> bookmark_service_ = nullptr;
@@ -492,9 +481,6 @@ class BookmarkBarView : public views::AccessiblePaneView,
 
   // Shows the managed bookmarks entries.
   raw_ptr<views::MenuButton> managed_bookmarks_button_ = nullptr;
-
-  // Shows the Apps page shortcut.
-  raw_ptr<views::LabelButton> apps_page_shortcut_ = nullptr;
 
   // Used to track drops on the bookmark bar view.
   std::unique_ptr<DropInfo> drop_info_;

@@ -33,7 +33,6 @@ const char* const kPersistentPrefNames[] = {
     bookmarks::prefs::kEditBookmarksEnabled,
     bookmarks::prefs::kManagedBookmarks,
     bookmarks::prefs::kManagedBookmarksFolderName,
-    bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
     bookmarks::prefs::kShowManagedBookmarksInBookmarkBar,
     bookmarks::prefs::kShowBookmarkBar,
 

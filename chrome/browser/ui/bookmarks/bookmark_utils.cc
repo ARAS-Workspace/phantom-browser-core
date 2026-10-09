@@ -272,16 +272,6 @@ std::u16string FormatBookmarkURLForDisplay(const GURL& url) {
                                   nullptr, nullptr, nullptr);
 }
 
-bool IsAppsShortcutEnabled(Profile* profile) {
-  return search::IsInstantExtendedAPIEnabled() && !profile->IsOffTheRecord();
-}
-
-bool ShouldShowAppsShortcutInBookmarkBar(Profile* profile) {
-  return IsAppsShortcutEnabled(profile) &&
-         profile->GetPrefs()->GetBoolean(
-             bookmarks::prefs::kShowAppsShortcutInBookmarkBar);
-}
-
 bool ShouldShowTabGroupsInBookmarkBar(Profile* profile) {
   return profile->GetPrefs()->GetBoolean(
       bookmarks::prefs::kShowTabGroupsInBookmarkBar);

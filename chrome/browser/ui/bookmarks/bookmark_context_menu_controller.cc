@@ -306,11 +306,6 @@ void BookmarkContextMenuController::BuildMenu() {
           ntp_features::kNtpSimplificationBookmarkBar)) {
     AddSubmenuItems();
   } else {
-    // Use the native host desktop type in tests.
-    if (chrome::IsAppsShortcutEnabled(profile_)) {
-      AddCheckboxItem(IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT,
-                      IDS_BOOKMARK_BAR_SHOW_APPS_SHORTCUT);
-    }
     if (tab_groups::SavedTabGroupUtils::IsEnabledForProfile(profile_)) {
       AddCheckboxItem(IDC_BOOKMARK_BAR_TOGGLE_SHOW_TAB_GROUPS,
                       IDS_BOOKMARK_BAR_SHOW_TAB_GROUPS);
@@ -496,13 +491,6 @@ void BookmarkContextMenuController::ExecuteCommand(int id, int event_flags) {
       chrome::ToggleBookmarkBarWhenVisible(profile_);
       break;
 
-    case IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT: {
-      prefs->SetBoolean(
-          bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
-          !prefs->GetBoolean(bookmarks::prefs::kShowAppsShortcutInBookmarkBar));
-      break;
-    }
-
     case IDC_BOOKMARK_BAR_TOGGLE_SHOW_TAB_GROUPS: {
       base::RecordAction(base::UserMetricsAction(
           "BookmarkBar_ContextMenu_ToggleShowSavedTabGroups"));
@@ -654,8 +642,7 @@ bool BookmarkContextMenuController::IsCommandIdChecked(int command_id) const {
                bookmarks::BookmarkBarVisibilityState::kOnlyShowOnNtp);
   }
 
-  DCHECK_EQ(IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT, command_id);
-  return prefs->GetBoolean(bookmarks::prefs::kShowAppsShortcutInBookmarkBar);
+  return false;
 }
 
 bool BookmarkContextMenuController::IsCommandIdEnabled(int command_id) const {
@@ -744,10 +731,6 @@ bool BookmarkContextMenuController::IsCommandIdEnabled(int command_id) const {
                  bookmarks::prefs::kBookmarkBarVisibilityState) &&
              !prefs->IsManagedPreference(bookmarks::prefs::kShowBookmarkBar);
 
-    case IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT:
-      return !prefs->IsManagedPreference(
-          bookmarks::prefs::kShowAppsShortcutInBookmarkBar);
-
     case IDC_BOOKMARK_BAR_TOGGLE_SHOW_TAB_GROUPS:
       return !prefs->IsManagedPreference(
           bookmarks::prefs::kShowTabGroupsInBookmarkBar);
@@ -824,11 +807,6 @@ void BookmarkContextMenuController::AddSubmenuItems() {
       IDC_BOOKMARK_BAR_SUBMENU_ONLY_ON_NTP,
       IDS_BOOKMARK_BAR_SUBMENU_ONLY_ON_NTP);
   submenu_model_->AddSeparator(ui::NORMAL_SEPARATOR);
-  if (chrome::IsAppsShortcutEnabled(profile_)) {
-    submenu_model_->AddCheckItemWithStringId(
-        IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT,
-        IDS_BOOKMARK_BAR_SHOW_APPS_SHORTCUT);
-  }
   if (tab_groups::SavedTabGroupUtils::IsEnabledForProfile(profile_)) {
     submenu_model_->AddCheckItemWithStringId(
         IDC_BOOKMARK_BAR_TOGGLE_SHOW_TAB_GROUPS,

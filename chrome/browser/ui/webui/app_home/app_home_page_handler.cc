@@ -6,7 +6,6 @@
 
 #include "base/check_deref.h"
 #include "base/containers/flat_set.h"
-#include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ref.h"
@@ -29,7 +28,6 @@
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/extensions/extension_enable_flow.h"
-#include "chrome/browser/ui/tab_dialogs.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/views/apps/app_info_dialog/app_info_dialog_container.h"
 #include "chrome/browser/ui/webui/app_home/app_home.mojom-shared.h"
@@ -46,7 +44,6 @@
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/browser/web_applications/web_app_ui_manager.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/extensions/extension_constants.h"
 #include "chrome/common/extensions/extension_metrics.h"
 #include "chrome/common/extensions/manifest_handlers/app_launch_info.h"
@@ -57,7 +54,6 @@
 #include "extensions/browser/bookmark_app_util.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
-#include "net/base/url_util.h"
 #include "third_party/blink/public/mojom/manifest/display_mode.mojom-shared.h"
 #include "ui/base/base_window.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -76,12 +72,6 @@ namespace webapps {
 namespace {
 
 const int kWebAppIconSize = 64;
-
-// Query string for showing the deprecation dialog with deletion options.
-const char kDeprecationDialogQueryString[] = "showDeletionDialog";
-// Query string for showing the force installed apps deprecation dialog.
-// Should match with kChromeUIAppsWithForceInstalledDeprecationDialogURL.
-const char kForceInstallDialogQueryString[] = "showForceInstallDialog";
 
 }  // namespace
 
@@ -117,36 +107,6 @@ BrowserWindowInterface* AppHomePageHandler::GetCurrentBrowser() {
 }
 
 void AppHomePageHandler::LoadDeprecatedAppsDialogIfRequired() {
-  content::WebContents* web_contents = web_ui_->GetWebContents();
-  std::string app_id;
-  auto event_ptr = app_home::mojom::ClickEvent::New();
-  event_ptr->button = 0.0;
-  event_ptr->alt_key = false;
-  event_ptr->ctrl_key = false;
-  event_ptr->meta_key = false;
-  event_ptr->shift_key = false;
-  if (net::GetValueForKeyInQuery(web_contents->GetLastCommittedURL(),
-                                 kDeprecationDialogQueryString, &app_id)) {
-    if (extensions::IsExtensionUnsupportedDeprecatedApp(profile_, app_id) &&
-        !deprecated_app_ids_.empty()) {
-      TabDialogs::FromWebContents(web_contents)
-          ->ShowDeprecatedAppsDialog(app_id, deprecated_app_ids_, web_contents);
-    }
-  } else if (net::GetValueForKeyInQuery(web_contents->GetLastCommittedURL(),
-                                        kForceInstallDialogQueryString,
-                                        &app_id)) {
-    if (extensions::IsExtensionUnsupportedDeprecatedApp(profile_, app_id) &&
-        extensions::util::IsExtensionForceInstalled(app_id, profile_)) {
-      if (extensions::chrome_app_deprecation::IsPreinstalledAppId(app_id)) {
-        TabDialogs::FromWebContents(web_contents)
-            ->ShowForceInstalledPreinstalledDeprecatedAppDialog(app_id,
-                                                                web_contents);
-      } else {
-        TabDialogs::FromWebContents(web_contents)
-            ->ShowForceInstalledDeprecatedAppsDialog(app_id, web_contents);
-      }
-    }
-  }
   has_maybe_loaded_deprecated_apps_dialog_ = true;
 }
 
@@ -154,27 +114,6 @@ void AppHomePageHandler::LaunchAppInternal(
     const std::string& app_id,
     extension_misc::AppLaunchBucket launch_bucket,
     app_home::mojom::ClickEventPtr click_event) {
-  if (extensions::IsExtensionUnsupportedDeprecatedApp(profile_, app_id) &&
-      base::FeatureList::IsEnabled(features::kChromeAppsDeprecation)) {
-    if (!extensions::util::IsExtensionForceInstalled(app_id, profile_)) {
-      TabDialogs::FromWebContents(web_ui_->GetWebContents())
-          ->ShowDeprecatedAppsDialog(app_id, deprecated_app_ids_,
-                                     web_ui_->GetWebContents());
-      return;
-    } else {
-      if (extensions::chrome_app_deprecation::IsPreinstalledAppId(app_id)) {
-        TabDialogs::FromWebContents(web_ui_->GetWebContents())
-            ->ShowForceInstalledPreinstalledDeprecatedAppDialog(
-                app_id, web_ui_->GetWebContents());
-      } else {
-        TabDialogs::FromWebContents(web_ui_->GetWebContents())
-            ->ShowForceInstalledDeprecatedAppsDialog(app_id,
-                                                     web_ui_->GetWebContents());
-      }
-      return;
-    }
-  }
-
   extensions::Manifest::Type type;
   GURL full_launch_url;
   apps::LaunchContainer launch_container;
@@ -801,11 +740,7 @@ void AppHomePageHandler::SetRunOnOsLoginMode(
       app_id, run_on_os_login_mode, base::DoNothing());
 }
 
-void AppHomePageHandler::LaunchDeprecatedAppDialog() {
-  TabDialogs::FromWebContents(web_ui_->GetWebContents())
-      ->ShowDeprecatedAppsDialog(extensions::ExtensionId(), deprecated_app_ids_,
-                                 web_ui_->GetWebContents());
-}
+void AppHomePageHandler::LaunchDeprecatedAppDialog() {}
 
 void AppHomePageHandler::InstallAppLocally(const std::string& app_id) {
   // TODO(crbug.com/456164619): Grey out web app sync if web app installs are

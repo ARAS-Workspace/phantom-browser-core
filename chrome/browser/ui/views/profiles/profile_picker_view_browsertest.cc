@@ -162,7 +162,6 @@
 #include "content/public/test/test_launcher.h"
 #include "content/public/test/test_navigation_observer.h"
 #include "extensions/browser/extension_registrar.h"
-#include "extensions/common/extension_id.h"
 #include "google_apis/gaia/gaia_id.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "google_apis/gaia/google_service_auth_error.h"
@@ -401,16 +400,6 @@ class TestTabDialogs : public TabDialogs {
 
   void ShowManagePasswordsBubble(bool user_action) override {}
   void HideManagePasswordsBubble() override {}
-  void ShowDeprecatedAppsDialog(
-      const extensions::ExtensionId& optional_launched_extension_id,
-      const std::set<extensions::ExtensionId>& deprecated_app_ids,
-      content::WebContents* web_contents) override {}
-  void ShowForceInstalledDeprecatedAppsDialog(
-      const extensions::ExtensionId& app_id,
-      content::WebContents* web_contents) override {}
-  void ShowForceInstalledPreinstalledDeprecatedAppDialog(
-      const extensions::ExtensionId& app_id,
-      content::WebContents* web_contents) override {}
 
  private:
   raw_ptr<content::WebContents> contents_;

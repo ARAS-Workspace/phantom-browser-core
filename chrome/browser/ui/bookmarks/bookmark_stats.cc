@@ -65,13 +65,6 @@ void RecordBookmarkFolderOpen(BookmarkLaunchLocation location) {
   }
 }
 
-void RecordBookmarkAppsPageOpen(BookmarkLaunchLocation location) {
-  if (IsBookmarkBarLocation(location)) {
-    base::RecordAction(
-        base::UserMetricsAction("ClickedBookmarkBarAppsShortcutButton"));
-  }
-}
-
 void RecordBookmarkEdited(BookmarkLaunchLocation location) {
   UMA_HISTOGRAM_ENUMERATION("Bookmarks.EditLocation", location);
 }

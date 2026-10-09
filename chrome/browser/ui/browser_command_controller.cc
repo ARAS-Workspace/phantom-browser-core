@@ -1258,12 +1258,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_OPEN_IN_CHROME:
       OpenInChrome(browser_);
       break;
-    case IDC_WEB_APP_SETTINGS:
-      CHECK(web_app::AppBrowserController::From(browser_));
-      ShowWebAppSettings(
-          browser_, web_app::AppBrowserController::From(browser_)->app_id(),
-          web_app::AppSettingsPageEntryPoint::kBrowserCommand);
-      break;
     case IDC_WEB_APP_MENU_APP_INFO: {
       content::WebContents* const web_contents =
           browser_->tab_strip_model()->GetActiveWebContents();
