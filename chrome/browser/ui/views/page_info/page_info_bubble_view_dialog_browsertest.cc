@@ -18,10 +18,7 @@
 #include "chrome/browser/ui/views/page_info/page_info_main_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
 #include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/common/chrome_features.h"
@@ -634,71 +631,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewCookiesSubpageBrowserTest,
                        InvokeUi_TemporaryException) {
   is_temporary_exception_ = true;
   controls_state_ = CookieControlsState::kAllowed3pc;
-  ShowAndVerifyUi();
-}
-
-class PageInfoBubbleViewIsolatedWebAppBrowserTest : public DialogBrowserTest {
- public:
-  PageInfoBubbleViewIsolatedWebAppBrowserTest() {
-    feature_list_.InitAndEnableFeature(features::kIsolatedWebApps);
-  }
-
-  void SetUpOnMainThread() override {
-    std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> app =
-        web_app::IsolatedWebAppBuilder(
-            web_app::ManifestBuilder().SetName("Test App"))
-            .BuildBundle();
-    web_app::IsolatedWebAppUrlInfo url_info =
-        app->InstallChecked(browser()->GetProfile());
-
-    start_url_ = url_info.origin().GetURL();
-    app_id_ = url_info.app_id();
-  }
-
-  // DialogBrowserTest:
-  void ShowUi(const std::string& name) override {
-    // Bubble dialogs' bounds may exceed the display's work area.
-    // https://crbug.com/41419544.
-    set_should_verify_dialog_bounds(false);
-
-    Browser* iwa_browser =
-        web_app::LaunchWebAppBrowserAndWait(browser()->GetProfile(), app_id_);
-
-    ASSERT_TRUE(iwa_browser);
-    OpenPageInfoBubble(iwa_browser);
-
-    auto* bubble_view = static_cast<PageInfoBubbleView*>(
-        PageInfoBubbleView::GetPageInfoBubbleForTesting());
-    bubble_view->presenter_for_testing()->UpdateSecurityState();
-
-    // For Isolated Web Apps, normal site name gets overridden by app name.
-    EXPECT_EQ(bubble_view->presenter_for_testing()->GetSubjectNameForDisplay(),
-              u"Test App");
-
-    EXPECT_EQ(bubble_view->presenter_for_testing()->site_identity_status(),
-              PageInfo::SITE_IDENTITY_STATUS_ISOLATED_WEB_APP);
-    EXPECT_EQ(bubble_view->presenter_for_testing()->site_connection_status(),
-              PageInfo::SITE_CONNECTION_STATUS_ISOLATED_WEB_APP);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  GURL start_url_;
-  webapps::AppId app_id_;
-
-  // Stop test from installing OS hooks.
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
-};
-
-// Test renamed, as currently Skia Gold doesn't support resetting test
-// expectation for tests run on windows.
-// crbug.com/40251389
-// Flaky on Win10 Tests x64 (crbug.com/40261456)
-#define MAYBE_InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2 \
-  InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2
-IN_PROC_BROWSER_TEST_F(
-    PageInfoBubbleViewIsolatedWebAppBrowserTest,
-    MAYBE_InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2) {
   ShowAndVerifyUi();
 }
 

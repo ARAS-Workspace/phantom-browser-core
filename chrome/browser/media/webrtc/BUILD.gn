@@ -337,8 +337,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/apps",
     "//chrome/browser/ui/tab_sharing",
     "//chrome/browser/ui/tabs:tab_strip",
-    "//chrome/browser/web_applications:web_applications_test_support",
-    "//chrome/browser/web_applications/isolated_web_apps/test:test_support",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
     "//components/infobars/content",

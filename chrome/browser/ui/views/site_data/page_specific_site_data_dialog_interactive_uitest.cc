@@ -30,10 +30,7 @@
 #include "chrome/browser/ui/views/site_data/related_app_row_view.h"
 #include "chrome/browser/ui/views/site_data/site_data_row_view.h"
 #include "chrome/browser/ui/views/toolbar/app_menu.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
 #include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
@@ -549,109 +546,5 @@ IN_PROC_BROWSER_TEST_F(
       PressButton(RelatedAppRowView::kLinkToAppSettings),
       WaitForWebContentsNavigation(kAppSettingsWebContentsElementId,
                                    GetAppSettingsUrlForApp(app_id)));
-}
-
-class PageSpecificSiteDataDialogIsolatedWebAppInteractiveUiTest
-    : public PageSpecificSiteDataDialogInteractiveUiTest {
- public:
-  PageSpecificSiteDataDialogIsolatedWebAppInteractiveUiTest() = default;
-  ~PageSpecificSiteDataDialogIsolatedWebAppInteractiveUiTest() override =
-      default;
-
- protected:
-  void SetUpFeatureList() override {
-    feature_list_.InitAndEnableFeature(features::kIsolatedWebApps);
-
-    // Initialize `prewarm_feature_list_` after `feature_list_` as they need to
-    // be destroyed in the reverse order, and `prewarm_feature_list_` owned by
-    // this class will be destroyed before `feature_list_` owned by the base
-    // class.
-    prewarm_feature_list_ = std::make_unique<test::ScopedPrewarmFeatureList>(
-        test::ScopedPrewarmFeatureList::PrewarmState::kDisabled);
-  }
-
-  BrowserWindowInterface* InstallAndLaunchIsolatedWebApp() {
-    Profile* profile = browser()->GetProfile();
-
-    std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> app =
-        web_app::IsolatedWebAppBuilder(
-            web_app::ManifestBuilder().SetName("Test App"))
-            .BuildBundle();
-    web_app::IsolatedWebAppUrlInfo iwa_url_info = app->InstallChecked(profile);
-    app_id_ = iwa_url_info.app_id();
-
-    content::RenderFrameHost* iwa_frame =
-        web_app::OpenIsolatedWebApp(profile, app_id_);
-
-    CHECK(content::ExecJs(iwa_frame, "localStorage.setItem('key', 'value')"));
-
-    BrowserWindowInterface* iwa_browser =
-        GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-            content::WebContents::FromRenderFrameHost(iwa_frame));
-    return iwa_browser;
-  }
-
-  // Installs and launches an IWA, then opens the PageSpecificSiteData dialog.
-  MultiStep NavigateAndOpenDialog(BrowserWindowInterface* iwa_browser,
-                                  ui::ElementIdentifier section_id) {
-    return Steps(
-        InstrumentTab(kWebContentsElementId,
-                      /*tab_index=*/std::nullopt, iwa_browser),
-        PressButton(kToolbarAppMenuButtonElementId),
-        WithView(kToolbarAppMenuButtonElementId,
-                 base::BindOnce([](AppMenuButton* button) {
-                   CHECK(button->IsMenuShowing());
-                   button->app_menu()->ExecuteCommand(IDC_WEB_APP_MENU_APP_INFO,
-                                                      0);
-                 })),
-        PressButton(PageInfoMainView::kCookieButtonElementId),
-        PressButton(PageInfoCookiesContentView::kCookieDialogButton),
-        InAnyContext(AfterShow(
-            section_id, ExpectActionCount(kCookiesDialogOpenedActionName, 1))));
-  }
-
-  // Returns a test step that verifies that the hostname for `row` is equal to
-  // `string`.
-  auto CheckHostnameLabel(ElementSpecifier row, const std::u16string& string) {
-    return CheckView(row, base::BindOnce([](SiteDataRowView* row) {
-                       return row->hostname_label_for_testing()->GetText();
-                     }),
-                     string);
-  }
-
- private:
-  // TODO(https://crbug.com/423465927): Explore a better approach to make the
-  // existing tests run with the prewarm feature enabled.
-  std::unique_ptr<test::ScopedPrewarmFeatureList> prewarm_feature_list_;
-  webapps::AppId app_id_;
-  web_app::OsIntegrationTestOverrideImpl::BlockingRegistration
-      override_registration_;
-};
-
-// TODO(crbug.com/40776475): This test fails to pass on Mac with real app shims
-// working.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_AppNameIsDisplayedInsteadOfHostname \
-  DISABLED_AppNameIsDisplayedInsteadOfHostname
-#else
-#define MAYBE_AppNameIsDisplayedInsteadOfHostname \
-  AppNameIsDisplayedInsteadOfHostname
-#endif  // BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(
-    PageSpecificSiteDataDialogIsolatedWebAppInteractiveUiTest,
-    MAYBE_AppNameIsDisplayedInsteadOfHostname) {
-  BrowserWindowInterface* iwa_browser = InstallAndLaunchIsolatedWebApp();
-  RunTestSequenceInContext(
-      BrowserElements::From(iwa_browser)->GetContext(),
-      NavigateAndOpenDialog(iwa_browser,
-                            kPageSpecificSiteDataDialogFirstPartySection),
-      // Name the first row in the first-party section.
-      InAnyContext(NameChildView(kPageSpecificSiteDataDialogFirstPartySection,
-                                 kFirstPartyAllowedRow, 0u)),
-      // Verify no empty state label is present.
-      InAnyContext(
-          EnsureNotPresent(kPageSpecificSiteDataDialogEmptyStateLabel)),
-      // Verify the hostname label.
-      CheckHostnameLabel(kFirstPartyAllowedRow, u"Test App"));
 }
 

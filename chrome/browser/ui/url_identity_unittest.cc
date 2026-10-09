@@ -8,20 +8,11 @@
 
 #include "base/strings/strcat.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/web_package/signed_web_bundles/signed_web_bundle_id.h"
-#include "components/webapps/isolated_web_apps/scheme.h"
 #include "content/public/test/browser_task_environment.h"
 #include "extensions/buildflags/buildflags.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
-
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/test/web_app_test_utils.h"
-#include "components/webapps/common/web_app_id.h"
-#include "components/webapps/isolated_web_apps/test_support/signing_keys.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"
@@ -47,35 +38,14 @@ struct TestCase {
 
 constexpr std::string_view kTestExtensionId =
     "0264075e-fd33-4a20-8484-b834afb0333d";
-
-constexpr std::string_view kTestIsolatedWebAppName = "Test IWA Name";
-const web_package::SignedWebBundleId kTestIsolatedWebAppId =
-    web_app::test::GetDefaultEd25519WebBundleId();
-const std::string kTestIsolatedWebAppUrl =
-    base::StrCat({webapps::kIsolatedAppScheme, url::kStandardSchemeSeparator,
-                  kTestIsolatedWebAppId.id()});
 }  // namespace
 
 class UrlIdentityTest : public testing::Test {
  protected:
   void SetUp() override {
-    InstallIsolatedWebApp();
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     InstallExtension();
 #endif
-  }
-
-  void InstallIsolatedWebApp() {
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(&testing_profile_);
-
-    const std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> bundle =
-        web_app::IsolatedWebAppBuilder(
-            web_app::ManifestBuilder().SetName(kTestIsolatedWebAppName))
-            .BuildBundle(kTestIsolatedWebAppId,
-                         {web_app::test::GetDefaultEd25519KeyPair()});
-    bundle->FakeInstallPageState(&testing_profile_);
-    bundle->TrustSigningKey();
-    bundle->InstallChecked(&testing_profile_);
   }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -109,13 +79,6 @@ TEST_F(UrlIdentityTest, AllowlistedTypesAreAllowed) {
        {
            .type = Type::kDefault,
            .name = u"http://example.com",
-       }},
-      {GURL(kTestIsolatedWebAppUrl),
-       {Type::kIsolatedWebApp},
-       {},
-       {
-           .type = Type::kIsolatedWebApp,
-           .name = u"Test IWA Name",
        }},
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
       {extensions::Extension::GetBaseURLFromExtensionId(extension_id),
@@ -218,39 +181,6 @@ TEST_F(UrlIdentityTest, ChromeExtensionsOptionsTest) {
   }
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-TEST_F(UrlIdentityTest, IsolatedWebAppsOptionsTest) {
-  std::vector<TestCase> test_cases = {
-      {GURL(kTestIsolatedWebAppUrl),
-       {Type::kIsolatedWebApp},
-       {},
-       {
-           .type = Type::kIsolatedWebApp,
-           .name = u"Test IWA Name",
-       }},
-      {GURL("isolated-app://unknown"),
-       {Type::kIsolatedWebApp},
-       {},
-       {
-           .type = Type::kDefault,
-           .name = u"isolated-app://unknown",
-       }},
-      {GURL("isolated-app://unknown"),
-       {Type::kIsolatedWebApp},
-       {.default_options = {DefaultFormatOptions::kHostname}},
-       {
-           .type = Type::kDefault,
-           .name = u"unknown",
-       }},
-  };
-
-  for (const auto& test_case : test_cases) {
-    UrlIdentity result = UrlIdentity::CreateFromUrl(
-        profile(), test_case.url, test_case.allowed_types, test_case.options);
-    EXPECT_EQ(result.name, test_case.expected_result.name);
-    EXPECT_EQ(result.type, test_case.expected_result.type);
-  }
-}
 
 TEST_F(UrlIdentityTest, FileOptionsTest) {
   std::vector<TestCase> test_cases = {

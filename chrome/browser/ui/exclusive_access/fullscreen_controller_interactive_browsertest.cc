@@ -28,11 +28,7 @@
 #include "chrome/browser/ui/exclusive_access/exclusive_access_test.h"
 #include "chrome/browser/ui/fullscreen/browser_window_fullscreen_controller.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/ui/web_modal/browser_window_modal_dialog_delegate.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/interactive_test_utils.h"
@@ -85,6 +81,28 @@ using content::WebContents;
 namespace {
 
 const base::FilePath::CharType* kSimpleFile = FILE_PATH_LITERAL("simple.html");
+
+// Appends an iframe with the given id, src and allow attribute to
+// `parent_frame` and waits for it to load.
+void CreateIframe(content::RenderFrameHost* parent_frame,
+                  const std::string& iframe_id,
+                  const GURL& url,
+                  const std::string& permissions_policy) {
+  EXPECT_EQ(true, content::EvalJs(
+                      parent_frame,
+                      content::JsReplace(R"(
+            new Promise(resolve => {
+              let f = document.createElement('iframe');
+              f.id = $1;
+              f.src = $2;
+              f.allow = $3;
+              f.addEventListener('load', () => resolve(true));
+              document.body.appendChild(f);
+            });
+        )",
+                                         iframe_id, url, permissions_policy),
+                      content::EXECUTE_SCRIPT_NO_USER_GESTURE));
+}
 
 }  // namespace
 
@@ -1032,15 +1050,10 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
             content::FullscreenMode::kPseudoContent);
 }
 
-// Tests the automatic fullscreen content setting in IWA and non-IWA contexts.
+// Tests the automatic fullscreen content setting.
 class AutomaticFullscreenTest : public FullscreenControllerInteractiveTest,
                                 public testing::WithParamInterface<bool> {
  public:
-  AutomaticFullscreenTest() {
-    feature_list_.InitWithFeatures(
-        {features::kIsolatedWebApps, features::kIsolatedWebAppDevMode}, {});
-  }
-
   void SetUpOnMainThread() override {
     FullscreenControllerInteractiveTest::SetUpOnMainThread();
     auto allow_automatic_fullscreen = [&](const GURL& url) {
@@ -1054,25 +1067,10 @@ class AutomaticFullscreenTest : public FullscreenControllerInteractiveTest,
     host_resolver()->AddRule("*", "127.0.0.1");
     ASSERT_TRUE(embedded_https_test_server().Start());
 
-    if (GetParam()) {
-      std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> app =
-          web_app::IsolatedWebAppBuilder(
-              web_app::ManifestBuilder().AddPermissionsPolicyWildcard(
-                  network::mojom::PermissionsPolicyFeature::kFullscreen))
-              .BuildBundle();
-      app->TrustSigningKey();
-      web_app::IsolatedWebAppUrlInfo url_info =
-          app->InstallChecked(browser()->GetProfile());
-      allow_automatic_fullscreen(url_info.origin().GetURL());
-      auto* frame = web_app::OpenIsolatedWebApp(browser()->GetProfile(),
-                                                url_info.app_id());
-      web_contents_ = content::WebContents::FromRenderFrameHost(frame);
-    } else {
-      GURL url = embedded_https_test_server().GetURL("a.com", "/simple.html");
-      allow_automatic_fullscreen(url);
-      ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-      web_contents_ = browser()->tab_strip_model()->GetActiveWebContents();
-    }
+    GURL url = embedded_https_test_server().GetURL("a.com", "/simple.html");
+    allow_automatic_fullscreen(url);
+    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
+    web_contents_ = browser()->tab_strip_model()->GetActiveWebContents();
     ASSERT_TRUE(WaitForRenderFrameReady(web_contents_->GetPrimaryMainFrame()));
   }
 
@@ -1179,17 +1177,9 @@ class AutomaticFullscreenTest : public FullscreenControllerInteractiveTest,
   // existing tests run with the prewarm feature enabled.
   test::ScopedPrewarmFeatureList scoped_prewarm_feature_list_{
       test::ScopedPrewarmFeatureList::PrewarmState::kDisabled};
-  base::test::ScopedFeatureList feature_list_;
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
 };
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, RequestFullscreenNoGesture) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   base::HistogramTester histograms;
   EXPECT_TRUE(RequestFullscreen());
 
@@ -1198,11 +1188,9 @@ IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, RequestFullscreenNoGesture) {
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(web_contents_);
   EXPECT_TRUE(ui_test_utils::NavigateToURL(browser, GURL(url::kAboutBlankURL)));
   metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  if (!GetParam()) {  // TODO(crbug.com/41497058): Test use counter in IWA too.
-    histograms.ExpectBucketCount(
-        "Blink.UseCounter.Features",
-        blink::mojom::WebFeature::kFullscreenAllowedByContentSetting, 1);
-  }
+  histograms.ExpectBucketCount(
+      "Blink.UseCounter.Features",
+      blink::mojom::WebFeature::kFullscreenAllowedByContentSetting, 1);
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, ImmediatelyAfterExit) {
@@ -1214,24 +1202,12 @@ IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, ImmediatelyAfterExit) {
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, WithGestureAfterExit) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   EXPECT_TRUE(RequestFullscreen());
   EXPECT_TRUE(ExitFullscreen());
   EXPECT_TRUE(RequestFullscreen(/*gesture=*/true));
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, EventuallyAfterExit) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   EXPECT_TRUE(RequestFullscreen());
   EXPECT_TRUE(ExitFullscreen());
   base::RunLoop run_loop;
@@ -1255,12 +1231,6 @@ IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, PopupImmediatelyAfterExit) {
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, PopupEventuallyAfterExit) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   EXPECT_TRUE(RequestFullscreen());
   EXPECT_TRUE(ExitFullscreen());
   base::RunLoop run_loop;
@@ -1272,12 +1242,6 @@ IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, PopupEventuallyAfterExit) {
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, ImmediatelyAfterPopupExit) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   auto [success, popup] = OpenPopupAndRequestFullscreenOnLoad();
   EXPECT_TRUE(success);
   ASSERT_TRUE(popup);
@@ -1294,12 +1258,6 @@ IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, ImmediatelyAfterPopupExit) {
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, EventuallyAfterPopupExit) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   auto [success, popup] = OpenPopupAndRequestFullscreenOnLoad();
   EXPECT_TRUE(success);
   ASSERT_TRUE(popup);
@@ -1313,12 +1271,6 @@ IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, EventuallyAfterPopupExit) {
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, BlockingContentsDoesNotExit) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   EXPECT_TRUE(RequestFullscreen());
   EXPECT_TRUE(web_contents_->IsFullscreen());
   // Blocking the tab for a modal dialog does not exit fullscreen if the origin
@@ -1348,39 +1300,27 @@ IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, QueryPermissionWithoutGesture) {
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, CrossOriginIFrameDenied) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   // Append a cross-origin iframe without the permission policy.
   const GURL src = embedded_https_test_server().GetURL("b.com", "/simple.html");
   content::RenderFrameHost* rfh = web_contents_->GetPrimaryMainFrame();
-  web_app::CreateIframe(rfh, "", src, /*permissions_policy=*/"");
+  CreateIframe(rfh, "", src, /*permissions_policy=*/"");
   content::RenderFrameHost* child = ChildFrameAt(rfh, 0);
   EXPECT_EQ("denied", QueryPermission(child));
   EXPECT_FALSE(RequestFullscreen(/*gesture=*/false, child));
 }
 
 IN_PROC_BROWSER_TEST_P(AutomaticFullscreenTest, CrossOriginIFrameGranted) {
-#if BUILDFLAG(IS_MAC)
-  if (GetParam()) {
-    GTEST_SKIP() << "Flaky. See https://crbug.com/404887514";
-  }
-#endif
-
   // Append a cross-origin iframe with the permission policy.
   const GURL src = embedded_https_test_server().GetURL("b.com", "/simple.html");
   content::RenderFrameHost* rfh = web_contents_->GetPrimaryMainFrame();
-  web_app::CreateIframe(rfh, "", src, /*permissions_policy=*/"fullscreen *");
+  CreateIframe(rfh, "", src, /*permissions_policy=*/"fullscreen *");
   content::RenderFrameHost* child = ChildFrameAt(rfh, 0);
   EXPECT_EQ("granted", QueryPermission(child));
   EXPECT_TRUE(RequestFullscreen(child));
   EXPECT_TRUE(ExitFullscreen());
 }
 
-INSTANTIATE_TEST_SUITE_P(, AutomaticFullscreenTest, ::testing::Bool());
+INSTANTIATE_TEST_SUITE_P(, AutomaticFullscreenTest, ::testing::Values(false));
 
 // Tests fullscreen with multi-screen features from the Window Management API.
 // Sites with the Window Management permission can request fullscreen on a

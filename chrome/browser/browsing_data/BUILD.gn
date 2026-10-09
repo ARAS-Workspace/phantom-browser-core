@@ -358,6 +358,4 @@ source_set("browser_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
-  deps += [ "//chrome/browser/web_applications:web_applications_test_support" ]
 }

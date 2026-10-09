@@ -22,13 +22,6 @@
 #include "extensions/common/extension_builder.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#include "base/test/gmock_expected_support.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
-
 namespace {
 
 constexpr int kTitleResourceId = IDS_USB_DEVICE_CHOOSER_PROMPT;
@@ -89,35 +82,5 @@ TEST_F(CreateChooserTitleTest, ExtensionsFrameTree) {
             CreateChooserTitle(subframe, kTitleResourceId));
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-TEST_F(CreateChooserTitleTest, IsolatedWebAppFrameTree) {
-  base::test::ScopedFeatureList scoped_feature_list{features::kIsolatedWebApps};
-  data_decoder::test::InProcessDataDecoder in_process_data_decoder;
-  web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-
-  std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> iwa =
-      web_app::IsolatedWebAppBuilder(web_app::ManifestBuilder().SetName(
-                                         "Chooser Title FrameTree IWA Name"))
-          .BuildBundle();
-  iwa->TrustSigningKey();
-  iwa->FakeInstallPageState(profile());
-  ASSERT_OK_AND_ASSIGN(web_app::IsolatedWebAppUrlInfo url_info,
-                       iwa->Install(profile()));
-  GURL app_url = url_info.origin().GetURL();
-  web_app::SimulateIsolatedWebAppNavigation(web_contents(), app_url);
-
-  content::RenderFrameHost* subframe =
-      content::NavigationSimulator::NavigateAndCommitFromDocument(
-          GURL("data:text/html,"),
-          content::RenderFrameHostTester::For(main_rfh())
-              ->AppendChild("subframe"));
-
-  ASSERT_EQ(app_url, main_rfh()->GetLastCommittedOrigin().GetURL());
-  EXPECT_EQ(u"Chooser Title FrameTree IWA Name wants to connect",
-            CreateChooserTitle(main_rfh(), kTitleResourceId));
-  ASSERT_NE(app_url, subframe->GetLastCommittedOrigin().GetURL());
-  EXPECT_EQ(u"Chooser Title FrameTree IWA Name wants to connect",
-            CreateChooserTitle(subframe, kTitleResourceId));
-}
 
 }  // namespace

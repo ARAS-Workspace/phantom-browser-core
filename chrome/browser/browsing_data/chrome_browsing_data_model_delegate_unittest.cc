@@ -197,31 +197,6 @@ TEST_F(ChromeBrowsingDataModelDelegateTest, GetAllDataKeysAndGetDataOwner) {
   EXPECT_TRUE(expected_keys.empty());
 }
 
-TEST_F(ChromeBrowsingDataModelDelegateTest, RemoveIsolatedWebAppData) {
-  auto testOrigin = url::Origin::Create(
-      GURL("isolated-app://"
-           "aerugqztij5biqquuk3mfwpsaibuegaqcitgfchwuosuofdjabzqaaic/"));
-  std::unique_ptr<ChromeBrowsingDataModelDelegate> delegate =
-      ChromeBrowsingDataModelDelegate::CreateForProfile(profile());
-  ASSERT_TRUE(delegate);
-
-  content::BrowsingDataRemover* remover = profile()->GetBrowsingDataRemover();
-  ASSERT_EQ(~0ULL, remover->GetLastUsedRemovalMaskForTesting());
-
-  base::RunLoop run_loop;
-  delegate->RemoveDataKey(
-      testOrigin,
-      {static_cast<BrowsingDataModel::StorageType>(
-          ChromeBrowsingDataModelDelegate::StorageType::kIsolatedWebApp)},
-      run_loop.QuitClosure());
-  run_loop.Run();
-
-  EXPECT_EQ((chrome_browsing_data_remover::DATA_TYPE_SITE_DATA |
-             content::BrowsingDataRemover::DATA_TYPE_CACHE) &
-                ~content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-            remover->GetLastUsedRemovalMaskForTesting());
-}
-
 TEST_F(ChromeBrowsingDataModelDelegateTest, CookieDeletionFilterChildUser) {
   profile_->SetIsSupervisedProfile(true);
 

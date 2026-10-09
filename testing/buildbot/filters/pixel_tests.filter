@@ -106,7 +106,6 @@ PageInfoBubbleViewAboutThisSiteDialogBrowserTest.*
 PageInfoBubbleViewDialogBrowserTest.*
 PageInfoBubbleViewPrivacySandboxDialogBrowserTest.*
 PageInfoBubbleViewCookiesSubpageBrowserTest.*
-PageInfoBubbleViewIsolatedWebAppBrowserTest.*
 PageInfoBubbleViewMerchantTrustDialogBrowserTest.*
 ParentPermissionDialogViewTest.*
 *PasswordBubbleBrowserTest.*

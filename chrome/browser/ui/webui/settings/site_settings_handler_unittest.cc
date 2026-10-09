@@ -71,17 +71,10 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/ui/webui/settings/site_settings_helper.h"
 #include "chrome/browser/usb/usb_chooser_context.h"
 #include "chrome/browser/usb/usb_chooser_context_factory.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/test/web_app_test_utils.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
-#include "chrome/browser/web_applications/web_app_registry_update.h"
-#include "chrome/browser/web_applications/web_app_sync_bridge.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/testing_browser_process.h"
@@ -373,8 +366,6 @@ class SiteSettingsHandlerBaseTest : public testing::Test {
 
     profile()->SetPermissionControllerDelegate(
         permissions::GetPermissionControllerDelegate(profile()));
-
-    SetUpIsolatedWebApp();
 
     handler_ = std::make_unique<SiteSettingsHandler>(profile());
     handler()->set_web_ui(web_ui());
@@ -1166,9 +1157,6 @@ class SiteSettingsHandlerBaseTest : public testing::Test {
       {{BrowsingDataModel::StorageType::kCookie},
        /*storage_size=*/0,
        /*cookie_count=*/1}};
-
- protected:
-  virtual void SetUpIsolatedWebApp() {}
 
  private:
   content::BrowserTaskEnvironment task_environment_{
@@ -2978,225 +2966,6 @@ TEST_F(SiteSettingsHandlerTest, TemporaryCookieExceptions) {
   EXPECT_EQ(l10n_util::GetPluralStringFUTF8(
                 IDS_SETTINGS_EXPIRES_AFTER_TIME_LABEL, time_diff.InDays()),
             CHECK_DEREF(exception_list[0].GetDict().FindString("description")));
-}
-
-class SiteSettingsHandlerIsolatedWebAppTest
-    : public SiteSettingsHandlerBaseTest {
- protected:
-  static constexpr char kAppName[] = "IWA Name";
-  static constexpr char kSubAppName[] = "Sub App";
-
-  void SetUpIsolatedWebApp() override {
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-    iwa_url_info_ = InstallIsolatedWebApp(kAppName);
-  }
-
-  const base::ListValue& CallHandleGetOriginPermissions(
-      const std::string& url,
-      base::ListValue category_list) {
-    base::ListValue args;
-    args.Append(kCallbackId);
-    args.Append(url);
-    args.Append(std::move(category_list));
-    handler()->HandleGetOriginPermissions(args);
-
-    const content::TestWebUI::CallData& data = *web_ui()->call_data().back();
-    EXPECT_EQ("cr.webUIResponse", data.function_name());
-    return data.arg3()->GetList();
-  }
-
-  const base::DictValue& CallHandleGetSubAppsPermissionExplanation(
-      const std::string& url) {
-    base::ListValue args;
-    args.Append(kCallbackId);
-    args.Append(url);
-    handler()->HandleGetSubAppsPermissionExplanation(args);
-
-    const content::TestWebUI::CallData& data = *web_ui()->call_data().back();
-    EXPECT_EQ("cr.webUIResponse", data.function_name());
-    return data.arg3()->GetDict();
-  }
-
-  void InstallSubApp(const GURL& url, const std::string& name) {
-    auto sub_app =
-        web_app::test::CreateWebApp(url, web_app::WebAppManagement::kSubApp);
-    sub_app->SetName(name);
-    sub_app->SetParentAppId(iwa_url_info_->app_id());
-
-    auto* provider = web_app::WebAppProvider::GetForTest(profile());
-    {
-      web_app::ScopedRegistryUpdate update =
-          provider->sync_bridge_unsafe().BeginUpdate();
-      update->CreateApp(std::move(sub_app));
-    }
-  }
-
- protected:
-  std::optional<web_app::IsolatedWebAppUrlInfo> iwa_url_info_;
-
-  web_app::IsolatedWebAppUrlInfo InstallIsolatedWebApp(
-      const std::string& name) {
-    const std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> bundle =
-        web_app::IsolatedWebAppBuilder(web_app::ManifestBuilder().SetName(name))
-            .BuildBundle();
-    bundle->FakeInstallPageState(profile());
-    bundle->TrustSigningKey();
-    return bundle->InstallChecked(profile());
-  }
-
-  content::HostZoomMap* GetIwaHostZoomMap(
-      const web_app::IsolatedWebAppUrlInfo& url_info) {
-    content::StoragePartition* iwa_partition = profile()->GetStoragePartition(
-        url_info.storage_partition_config(profile()));
-    return content::HostZoomMap::GetForStoragePartition(iwa_partition);
-  }
-
- private:
-  data_decoder::test::InProcessDataDecoder in_process_data_decoder_;
-};
-
-TEST_F(SiteSettingsHandlerIsolatedWebAppTest, GetOriginPermissionsSubApp) {
-  GURL sub_app_url = iwa_url_info_->origin().GetURL().Resolve("/sub-app/");
-  InstallSubApp(sub_app_url, std::string(kSubAppName));
-
-  base::ListValue category_list;
-  category_list.Append(site_settings::ContentSettingsTypeToGroupName(
-      ContentSettingsType::NOTIFICATIONS));
-
-  const base::ListValue& permissions = CallHandleGetOriginPermissions(
-      sub_app_url.spec(), std::move(category_list));
-  ASSERT_EQ(1U, permissions.size());
-
-  const base::DictValue& permission = permissions[0].GetDict();
-  // Append " (ID: <id>)" to the name as per HandleGetOriginPermissions
-  std::string expected_name = l10n_util::GetStringFUTF8(
-      IDS_SETTINGS_EXTENSION_OR_APP_DISPLAY_NAME,
-      base::UTF8ToUTF16(std::string_view(kSubAppName)),
-      base::UTF8ToUTF16(sub_app_url.host()));
-  EXPECT_EQ(expected_name, *permission.FindString("displayName"));
-}
-
-TEST_F(SiteSettingsHandlerIsolatedWebAppTest,
-       GetSubAppsPermissionExplanation_NeitherParentNorSubApp) {
-  const base::DictValue& result = CallHandleGetSubAppsPermissionExplanation(
-      iwa_url_info_->origin().GetURL().spec());
-  EXPECT_FALSE(*result.FindBool("isSubApp"));
-  EXPECT_FALSE(*result.FindBool("hasSubApps"));
-}
-
-TEST_F(SiteSettingsHandlerIsolatedWebAppTest,
-       GetSubAppsPermissionExplanation_SubApp) {
-  GURL sub_app_url = iwa_url_info_->origin().GetURL().Resolve("/sub-app/");
-  InstallSubApp(sub_app_url, std::string(kSubAppName));
-
-  const base::DictValue& result =
-      CallHandleGetSubAppsPermissionExplanation(sub_app_url.spec());
-  EXPECT_TRUE(*result.FindBool("isSubApp"));
-  EXPECT_FALSE(*result.FindBool("hasSubApps"));
-  EXPECT_EQ(kSubAppName, *result.FindString("appName"));
-  EXPECT_EQ(kAppName, *result.FindString("parentAppName"));
-  EXPECT_EQ(iwa_url_info_->origin().GetURL().spec(),
-            *result.FindString("parentAppOrigin"));
-}
-
-TEST_F(SiteSettingsHandlerIsolatedWebAppTest,
-       GetSubAppsPermissionExplanation_ParentApp) {
-  GURL sub_app_url = iwa_url_info_->origin().GetURL().Resolve("/sub-app/");
-  InstallSubApp(sub_app_url, std::string(kSubAppName));
-
-  const base::DictValue& result = CallHandleGetSubAppsPermissionExplanation(
-      iwa_url_info_->origin().GetURL().spec());
-  EXPECT_FALSE(*result.FindBool("isSubApp"));
-  EXPECT_TRUE(*result.FindBool("hasSubApps"));
-  EXPECT_EQ(kAppName, *result.FindString("appName"));
-}
-
-TEST_F(SiteSettingsHandlerIsolatedWebAppTest, AllSitesDisplaysAppName) {
-  GURL https_url("https://" + iwa_url_info_->origin().host());
-  GURL iwa_origin_url = iwa_url_info_->origin().GetURL();
-
-  SetupModelWithIsolatedWebAppData({{iwa_url_info_->origin().Serialize(), 50}});
-  HostContentSettingsMap* map =
-      HostContentSettingsMapFactory::GetForProfile(profile());
-  map->SetContentSettingDefaultScope(iwa_origin_url, iwa_origin_url,
-                                     ContentSettingsType::NOTIFICATIONS,
-                                     CONTENT_SETTING_BLOCK);
-  map->SetContentSettingDefaultScope(https_url, https_url,
-                                     ContentSettingsType::NOTIFICATIONS,
-                                     CONTENT_SETTING_BLOCK);
-
-  base::ListValue site_groups = GetOnStorageFetchedSentList();
-
-  ASSERT_EQ(site_groups.size(), 2u);
-  const base::DictValue& group1 = site_groups[0].GetDict();
-  const base::DictValue& origin1 =
-      CHECK_DEREF(group1.FindList("origins"))[0].GetDict();
-  EXPECT_THAT(CHECK_DEREF(group1.FindString("groupingKey")),
-              IsOrigin(iwa_origin_url));
-  EXPECT_EQ(group1.FindString("etldPlus1"), nullptr);
-  EXPECT_EQ(CHECK_DEREF(group1.FindString("displayName")), kAppName);
-  EXPECT_EQ(CHECK_DEREF(origin1.FindString("origin")), iwa_origin_url);
-  EXPECT_EQ(origin1.FindDouble("usage").value(), 50.0);
-
-  const base::DictValue& group2 = site_groups[1].GetDict();
-  const base::DictValue& origin2 =
-      CHECK_DEREF(group2.FindList("origins"))[0].GetDict();
-  EXPECT_THAT(CHECK_DEREF(group2.FindString("groupingKey")),
-              IsEtldPlus1(iwa_url_info_->origin().host()));
-  EXPECT_EQ(CHECK_DEREF(group2.FindString("etldPlus1")),
-            iwa_url_info_->origin().host());
-  EXPECT_EQ(CHECK_DEREF(group2.FindString("displayName")),
-            iwa_url_info_->origin().host());
-  EXPECT_EQ(CHECK_DEREF(origin2.FindString("origin")), https_url);
-  EXPECT_EQ(origin2.FindDouble("usage").value(), 0.0);
-}
-
-TEST_F(SiteSettingsHandlerIsolatedWebAppTest, ZoomLevel) {
-  content::HostZoomMap* iwa_host_zoom_map = GetIwaHostZoomMap(*iwa_url_info_);
-
-  std::string host_or_spec = iwa_url_info_->origin().Serialize();
-  iwa_host_zoom_map->SetZoomLevelForHost(iwa_url_info_->origin().host(), 1.1);
-  ValidateZoom({{host_or_spec, kAppName, "122%"}}, 1U);
-
-  base::ListValue args;
-  handler()->HandleFetchZoomLevels(args);
-  ValidateZoom({{host_or_spec, kAppName, "122%"}}, 2U);
-
-  args.Append(host_or_spec);
-  handler()->HandleRemoveZoomLevel(args);
-  ValidateZoom({}, 3U);
-
-  double default_level = iwa_host_zoom_map->GetDefaultZoomLevel();
-  double level = iwa_host_zoom_map->GetZoomLevelForHostAndScheme(
-      "isolated-app", iwa_url_info_->origin().host());
-  EXPECT_EQ(default_level, level);
-}
-
-TEST_F(SiteSettingsHandlerIsolatedWebAppTest, ZoomLevelsSortedByAppName) {
-  GetIwaHostZoomMap(*iwa_url_info_)
-      ->SetZoomLevelForHost(iwa_url_info_->origin().host(), 1.1);
-
-  // Install 3 more IWAs.
-  web_app::IsolatedWebAppUrlInfo iwa3_url_info =
-      InstallIsolatedWebApp("IWA Name 3");
-  GetIwaHostZoomMap(iwa3_url_info)
-      ->SetZoomLevelForHost(iwa3_url_info.origin().host(), 1.1);
-
-  web_app::IsolatedWebAppUrlInfo iwa2_url_info =
-      InstallIsolatedWebApp("IWA Name 2");
-  GetIwaHostZoomMap(iwa2_url_info)
-      ->SetZoomLevelForHost(iwa2_url_info.origin().host(), 1.1);
-
-  // Don't set a zoom for this app to make sure it's not in the list.
-  web_app::IsolatedWebAppUrlInfo iwa4_url = InstallIsolatedWebApp("IWA Name 4");
-
-  base::ListValue args;
-  handler()->HandleFetchZoomLevels(args);
-
-  ValidateZoom({{iwa_url_info_->origin().Serialize(), kAppName, "122%"},
-                {iwa2_url_info.origin().Serialize(), "IWA Name 2", "122%"},
-                {iwa3_url_info.origin().Serialize(), "IWA Name 3", "122%"}},
-               2U);
 }
 
 namespace {

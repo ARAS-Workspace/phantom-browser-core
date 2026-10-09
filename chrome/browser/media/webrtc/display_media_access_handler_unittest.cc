@@ -36,19 +36,6 @@
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "url/origin.h"
 
-#include "base/test/gmock_expected_support.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/iwa_permissions_policy_cache.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "components/webapps/isolated_web_apps/types/iwa_origin.h"
-#include "content/public/test/web_contents_tester.h"
-#include "net/http/http_response_headers.h"
-#include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
-#include "services/network/public/cpp/permissions_policy/permissions_policy_declaration.h"
-#include "third_party/blink/public/common/permissions_policy/policy_helper_public.h"
-
 class DisplayMediaAccessHandlerTest : public WebAppTest {
  public:
   DisplayMediaAccessHandlerTest() = default;
@@ -560,85 +547,6 @@ TEST_F(DisplayMediaAccessHandlerTest, CorrectHostAsksForPermissionsNormalURLs) {
       render_process_id, render_frame_id, page_request_id, video_stream_type,
       content::MEDIA_REQUEST_STATE_CLOSING);
   EXPECT_EQ(u"www.google.com", params.app_name);
-}
-
-TEST_F(DisplayMediaAccessHandlerTest, IsolatedWebAppNameAsksForPermissions) {
-  base::test::ScopedFeatureList scoped_feature_list{features::kIsolatedWebApps};
-  data_decoder::test::InProcessDataDecoder in_process_data_decoder;
-  web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-
-  // Create a fresh WebContents to avoid being blocked by the non-IWA state
-  // committed by the default web_contents() in SetUp().
-  std::unique_ptr<content::WebContents> test_web_contents =
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr);
-
-  const std::string app_name("Test IWA Name");
-  std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> iwa =
-      web_app::IsolatedWebAppBuilder(
-          web_app::ManifestBuilder()
-              .SetName(app_name)
-              .AddPermissionsPolicyWildcard(
-                  network::mojom::PermissionsPolicyFeature::kDisplayCapture))
-          .BuildBundle();
-  iwa->TrustSigningKey();
-  iwa->FakeInstallPageState(profile());
-  ASSERT_OK_AND_ASSIGN(web_app::IsolatedWebAppUrlInfo url_info,
-                       iwa->Install(profile()));
-
-  web_app::IwaPermissionsPolicyCache::CacheEntry policy;
-  policy.emplace_back("display-capture", std::vector<std::string>{"*"});
-  web_app::IwaPermissionsPolicyCacheFactory::GetForProfile(profile())
-      ->SetPolicyForTesting(web_app::IwaOrigin(url_info.web_bundle_id()),
-                            std::move(policy));
-
-  auto simulator = content::NavigationSimulator::CreateBrowserInitiated(
-      url_info.origin().GetURL(), test_web_contents.get());
-  simulator->SetTransition(ui::PAGE_TRANSITION_TYPED);
-
-  simulator->SetResponseHeaders(
-      net::HttpResponseHeaders::Builder(net::HttpVersion(1, 1), "200 OK")
-          .AddHeader("Cross-Origin-Opener-Policy", "same-origin")
-          .AddHeader("Cross-Origin-Embedder-Policy", "require-corp")
-          .AddHeader("Cross-Origin-Resource-Policy", "same-origin")
-          .Build());
-
-  network::ParsedPermissionsPolicy parsed_policy;
-  parsed_policy.emplace_back(
-      network::mojom::PermissionsPolicyFeature::kDisplayCapture,
-      std::vector<network::OriginWithPossibleWildcards>{}, url_info.origin(),
-      /*matches_all_origins=*/true, /*matches_opaque_src=*/false);
-  simulator->SetPermissionsPolicyHeader(std::move(parsed_policy));
-
-  simulator->Start();
-  simulator->Commit();
-
-  const int render_process_id =
-      test_web_contents->GetPrimaryMainFrame()->GetProcess()->GetDeprecatedID();
-  const int render_frame_id =
-      test_web_contents->GetPrimaryMainFrame()->GetRoutingID();
-  const int page_request_id = 0;
-  const blink::mojom::MediaStreamType video_stream_type =
-      blink::mojom::MediaStreamType::DISPLAY_VIDEO_CAPTURE;
-  const blink::mojom::MediaStreamType audio_stream_type =
-      blink::mojom::MediaStreamType::DISPLAY_AUDIO_CAPTURE;
-  SetTestFlags({{true /* expect_screens */, true /* expect_windows*/,
-                 true /* expect_tabs */, false /* expect_current_tab */,
-                 true /* expect_audio */, content::DesktopMediaID(),
-                 true /* cancelled */}});
-  content::MediaStreamRequest request(
-      render_process_id, render_frame_id, page_request_id, url_info.origin(),
-      false, blink::MEDIA_GENERATE_STREAM, /*requested_audio_device_ids=*/{},
-      /*requested_video_device_ids=*/{}, audio_stream_type, video_stream_type,
-      /*disable_local_echo=*/false, /*request_pan_tilt_zoom_permission=*/false,
-      /*captured_surface_control_active=*/false);
-  content::MediaResponseCallback callback;
-  access_handler_->HandleRequest(test_web_contents.get(), request,
-                                 std::move(callback), nullptr /* extension */);
-  DesktopMediaPicker::Params params = GetParams();
-  access_handler_->UpdateMediaRequestState(
-      render_process_id, render_frame_id, page_request_id, video_stream_type,
-      content::MEDIA_REQUEST_STATE_CLOSING);
-  EXPECT_EQ(base::UTF8ToUTF16(app_name), params.app_name);
 }
 
 TEST_F(DisplayMediaAccessHandlerTest, WebContentsDestroyed) {

@@ -64,13 +64,6 @@
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#include "base/test/gmock_expected_support.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
-
 using content::WebContentsTester;
 using content_settings::PageSpecificContentSettings;
 using custom_handlers::ProtocolHandler;
@@ -905,44 +898,6 @@ TEST_F(ContentSettingBubbleModelTest, FileURL) {
   std::u16string title =
       content_setting_bubble_model->bubble_content().radio_group.radio_items[0];
   ASSERT_NE(std::u16string::npos, title.find(base::UTF8ToUTF16(file_url)));
-}
-
-class ContentSettingBubbleModelIsolatedWebAppTest
-    : public ContentSettingBubbleModelTest {
- public:
-  void SetUp() override {
-    ContentSettingBubbleModelTest::SetUp();
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-  }
-
- private:
-  data_decoder::test::InProcessDataDecoder in_process_data_decoder_;
-};
-
-TEST_F(ContentSettingBubbleModelIsolatedWebAppTest, IsolatedWebAppUrl) {
-  base::test::ScopedFeatureList scoped_feature_list{features::kIsolatedWebApps};
-  const std::string app_name("Test IWA Name");
-  std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> iwa =
-      web_app::IsolatedWebAppBuilder(
-          web_app::ManifestBuilder().SetName(app_name))
-          .BuildBundle();
-  iwa->TrustSigningKey();
-  iwa->FakeInstallPageState(profile());
-  ASSERT_OK_AND_ASSIGN(web_app::IsolatedWebAppUrlInfo url_info,
-                       iwa->Install(profile()));
-  web_app::SimulateIsolatedWebAppNavigation(web_contents(),
-                                            url_info.origin().GetURL());
-
-  PageSpecificContentSettings::GetForFrame(
-      web_contents()->GetPrimaryMainFrame())
-      ->OnContentBlocked(ContentSettingsType::IMAGES);
-
-  std::unique_ptr<ContentSettingBubbleModel> content_setting_bubble_model(
-      ContentSettingBubbleModel::CreateContentSettingBubbleModel(
-          nullptr, page(), ContentSettingsType::IMAGES));
-  std::u16string title =
-      content_setting_bubble_model->bubble_content().radio_group.radio_items[0];
-  ASSERT_NE(std::u16string::npos, title.find(base::UTF8ToUTF16(app_name)));
 }
 
 TEST_F(ContentSettingBubbleModelTest, RegisterProtocolHandler) {

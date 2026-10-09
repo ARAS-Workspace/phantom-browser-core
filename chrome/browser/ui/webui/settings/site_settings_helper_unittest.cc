@@ -20,11 +20,8 @@
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
 #include "chrome/browser/usb/usb_chooser_context.h"
 #include "chrome/browser/usb/usb_chooser_context_factory.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/test/web_app_test_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
@@ -64,12 +61,9 @@
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/extensions/extension_service_test_base.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/unloaded_extension_reason.h"
 #include "extensions/test/test_extension_dir.h"
-#include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 namespace site_settings {
@@ -1421,91 +1415,5 @@ TEST_F(SiteSettingsHelperExtensionTest,
   EXPECT_EQ(CHECK_DEREF(exception.FindString(kDisplayName)), extension_name);
 }
 #endif  // #if BUILDFLAG(ENABLE_EXTENSIONS)
-
-class SiteSettingsHelperIsolatedWebAppTest : public testing::Test {
- protected:
-  void SetUp() override {
-    TestingBrowserProcess::GetGlobal()->SetUpGlobalFeaturesForTesting(
-        /*profile_manager=*/false);
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(&testing_profile_);
-  }
-
-  void TearDown() override {
-    TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
-  }
-
-  web_app::IsolatedWebAppUrlInfo InstallIsolatedWebApp(
-      const std::string& name) {
-    const std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> bundle =
-        web_app::IsolatedWebAppBuilder(web_app::ManifestBuilder().SetName(name))
-            .BuildBundle();
-    bundle->FakeInstallPageState(profile());
-    bundle->TrustSigningKey();
-    return bundle->InstallChecked(profile());
-  }
-
-  Profile* profile() { return &testing_profile_; }
-
-  const std::string kAppName = "test IWA Name";
-
- private:
-  content::BrowserTaskEnvironment task_environment_;
-  data_decoder::test::InProcessDataDecoder in_process_data_decoder_;
-  TestingProfile testing_profile_;
-};
-
-TEST_F(SiteSettingsHelperIsolatedWebAppTest,
-       IsolatedWebAppsUseAppNameAsDisplayName) {
-  const std::string kUsbChooserGroupName(
-      ContentSettingsTypeToGroupName(ContentSettingsType::USB_CHOOSER_DATA));
-  auto kPreferenceSource = SiteSettingSource::kPreference;
-  const std::u16string& kObjectName = u"Gadget";
-
-  web_app::IsolatedWebAppUrlInfo app_url_info = InstallIsolatedWebApp(kAppName);
-
-  // Create a chooser object for testing.
-  base::DictValue chooser_object;
-  chooser_object.Set("name", kObjectName);
-
-  // Add a user permission for an origin of `app_url_info`.
-  ChooserExceptionDetails exception_details;
-  exception_details.insert(
-      {app_url_info.origin().GetURL(), kPreferenceSource, /*incognito=*/false});
-  {
-    auto exception = CreateChooserExceptionObject(
-        /*display_name=*/kObjectName,
-        /*object=*/base::Value(chooser_object.Clone()),
-        /*chooser_type=*/kUsbChooserGroupName,
-        /*chooser_exception_details=*/exception_details,
-        /*profile=*/profile());
-    ExpectValidChooserExceptionObject(
-        exception, /*expected_chooser_type=*/kUsbChooserGroupName,
-        /*expected_display_name=*/kObjectName, chooser_object);
-
-    const auto& sites_list = exception.Find(kSites)->GetList();
-    ExpectValidSiteExceptionObject(
-        /*actual_site_object=*/sites_list[0],
-        /*display_name=*/kAppName,
-        /*origin=*/app_url_info.origin().GetURL(),
-        /*source=*/kPreferenceSource,
-        /*incognito=*/false);
-  }
-}
-
-TEST_F(SiteSettingsHelperIsolatedWebAppTest, AutomaticFullscreenVisibility) {
-  const ContentSettingsType type = ContentSettingsType::AUTOMATIC_FULLSCREEN;
-  web_app::IsolatedWebAppUrlInfo app_url_info = InstallIsolatedWebApp(kAppName);
-
-  // Automatic Fullscreen is visible for IWAs, even with default BLOCK values.
-  SiteSettingSource source;
-  auto* map = HostContentSettingsMapFactory::GetForProfile(profile());
-  ContentSetting content_setting = GetContentSettingForOrigin(
-      profile(), map, app_url_info.origin().GetURL(), type, &source);
-  EXPECT_EQ(SiteSettingSource::kDefault, source);
-  EXPECT_EQ(CONTENT_SETTING_BLOCK, content_setting);
-  const auto types = GetVisiblePermissionCategories(
-      app_url_info.origin().GetURL().spec(), profile());
-  EXPECT_TRUE(std::ranges::any_of(types, [](auto& t) { return t == type; }));
-}
 
 }  // namespace site_settings

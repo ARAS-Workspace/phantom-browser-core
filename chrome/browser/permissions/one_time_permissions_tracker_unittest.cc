@@ -70,15 +70,6 @@ class OneTimePermissionsTrackerTest : public ChromeRenderViewHostTestHarness {
   std::unique_ptr<OneTimePermissionsTracker> tracker_;
 };
 
-TEST_F(OneTimePermissionsTrackerTest, ShouldIgnoreOrigin_IsolatedWebApp) {
-  GURL isolated_web_app_url(
-      "isolated-app://"
-      "cpt62davrxj4yzauslsummydorzgy2kcnhbayaziceuqlzhaue7qaaic/");
-  url::Origin isolated_web_app_origin =
-      url::Origin::Create(isolated_web_app_url);
-  EXPECT_FALSE(tracker()->ShouldIgnoreOrigin(isolated_web_app_origin));
-}
-
 TEST_F(OneTimePermissionsTrackerTest, ShouldIgnoreOrigin_OpaqueOrigin) {
   url::Origin opaque_origin;
   ASSERT_TRUE(opaque_origin.opaque());

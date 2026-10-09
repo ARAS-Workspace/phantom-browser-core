@@ -83,17 +83,6 @@
 #include "services/network/public/mojom/url_response_head.mojom.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "base/files/file_path.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/os_integration/os_integration_manager.h"
-#include "content/public/common/content_features.h"
-#include "extensions/browser/guest_view/web_view/web_view_guest.h"
-
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
 using captive_portal::CaptivePortalResult;
 using content::BrowserThread;
 using content::WebContents;
@@ -208,30 +197,6 @@ bool IsLoginTab(WebContents* web_contents) {
   return captive_portal::CaptivePortalTabHelper::FromWebContents(web_contents)
       ->IsLoginTab();
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-content::WebContents* GetWebViewContents(content::RenderFrameHost* app_frame) {
-  extensions::WebViewGuest* web_view_guest = nullptr;
-  // Iterate over all frames in the app's WebContents.
-  app_frame->ForEachRenderFrameHostWithAction(
-      [&web_view_guest](content::RenderFrameHost* rfh) {
-        // Find the frame that hosts the WebViewGuest.
-        if (auto* web_view =
-                extensions::WebViewGuest::FromRenderFrameHost(rfh)) {
-          web_view_guest = web_view;
-          return content::RenderFrameHost::FrameIterationAction::kStop;
-        }
-        return content::RenderFrameHost::FrameIterationAction::kContinue;
-      });
-
-  CHECK(web_view_guest);
-
-  content::WebContents* web_contents = web_view_guest->web_contents();
-  CHECK(web_contents);
-
-  return web_contents;
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 // Watch for `DidStopLoading` for one WebContents.
 struct LoadObserver : public WebContentsObserver {
@@ -996,102 +961,6 @@ class CaptivePortalBrowserTest : public InProcessBrowserTest {
     if (run_loop_)
       run_loop_->Quit();
   }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  // TODO(crbug.com/40202416): Parametrize test to run with
-  // features::kGuestViewMPArch.
-  void CertErrorInWebAppWithEmbeddedFrameOpensCaptivePortal(
-      bool should_open_new_browser,
-      int num_navigations_to_wait_for,
-      base::FunctionRef<content::RenderFrameHost*()> install_and_open_web_app,
-      base::FunctionRef<void(content::RenderFrameHost* app_frame,
-                             const GURL& cert_error_url)>
-          create_embedded_frame) {
-    // Setup test server that responds with cert mismatched name error.
-    net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
-    https_server.SetSSLConfig(net::EmbeddedTestServer::CERT_MISMATCHED_NAME);
-    https_server.ServeFilesFromSourceDirectory(GetChromeTestDataDir());
-    ASSERT_TRUE(https_server.Start());
-
-    // The path does not matter.
-    GURL cert_error_url = https_server.GetURL(kTestServerLoginPath);
-
-    content::RenderFrameHost* web_app_frame = install_and_open_web_app();
-
-    MultiNavigationObserver navigation_observer;
-    CaptivePortalObserver portal_observer(browser()->GetProfile());
-
-    int initial_tab_count = 0;
-
-    if (should_open_new_browser) {
-      // New browser is opened if there are no browsers with tab support.
-      // Need to close current browser for it.
-      CloseBrowserSynchronously(browser());
-      browser_closed_ = true;
-      initial_tab_count = 0;
-    } else {
-      TabStripModel* tab_strip_model = browser()->tab_strip_model();
-      ASSERT_FALSE(tab_strip_model->GetActiveWebContents()->IsLoading());
-      initial_tab_count = tab_strip_model->count();
-    }
-
-    size_t initial_browser_count =
-        GlobalBrowserCollection::GetInstance()->GetSize();
-
-    // This starts navigation in embedded frame and waits for it to finish.
-    ui_test_utils::BrowserCreatedObserver browser_created_observer;
-    create_embedded_frame(web_app_frame, cert_error_url);
-
-    // Embedded Frame must have broken page which causes login tab
-    // to be opened in the browser().
-    portal_observer.WaitForResults(1);
-    // Wait for login tab to be opened.
-    navigation_observer.WaitForNavigations(num_navigations_to_wait_for);
-
-    content::WebContents* embedded_frame_web_contents =
-        GetWebViewContents(web_app_frame);
-    // Set the load time to be large, so the timer won't trigger.
-    captive_portal::CaptivePortalTabReloader* tab_reloader =
-        GetTabReloader(embedded_frame_web_contents);
-    ASSERT_TRUE(tab_reloader);
-    SetSlowSSLLoadTime(tab_reloader, base::Hours(1));
-
-    EXPECT_EQ(captive_portal::RESULT_BEHIND_CAPTIVE_PORTAL,
-              portal_observer.captive_portal_result());
-    EXPECT_EQ(1, portal_observer.num_results_received());
-
-    EXPECT_EQ(captive_portal::CaptivePortalTabReloader::STATE_BROKEN_BY_PORTAL,
-              GetStateOfTabReloader(embedded_frame_web_contents));
-
-    TabStripModel* tab_strip_model = nullptr;
-
-    if (should_open_new_browser) {
-      ASSERT_EQ(initial_browser_count + 1,
-                GlobalBrowserCollection::GetInstance()->GetSize());
-      BrowserWindowInterface* const new_browser =
-          browser_created_observer.Wait();
-      ASSERT_TRUE(new_browser);
-
-      tab_strip_model = new_browser->GetTabStripModel();
-    } else {
-      EXPECT_EQ(initial_browser_count,
-                GlobalBrowserCollection::GetInstance()->GetSize());
-      tab_strip_model = browser()->tab_strip_model();
-    }
-
-    EXPECT_EQ(initial_tab_count + 1, tab_strip_model->count());
-    EXPECT_EQ(initial_tab_count, tab_strip_model->active_index());
-
-    WebContents* login_tab =
-        tab_strip_model->GetWebContentsAt(initial_tab_count);
-
-    EXPECT_EQ(captive_portal::CaptivePortalTabReloader::STATE_NONE,
-              GetStateOfTabReloader(login_tab));
-    EXPECT_TRUE(IsLoginTab(login_tab));
-    EXPECT_EQ(1, navigation_observer.NumNavigationsForTab(login_tab));
-  }
-
-#endif  //  BUILDFLAG(ENABLE_EXTENSIONS)
 
  protected:
   std::unique_ptr<content::URLLoaderInterceptor> url_loader_interceptor_;
@@ -2052,81 +1921,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest, HttpsIframeTimeout) {
   GURL url = https_server.GetURL(kTestServerIframeTimeoutPath);
   NavigateToPageExpectNoTest(browser(), url);
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-class IWACaptivePortalBrowserTest : public CaptivePortalBrowserTest {
- public:
-  IWACaptivePortalBrowserTest() {
-    iwa_scoped_feature_list_.InitWithFeatures(
-        {features::kIsolatedWebAppDevMode, features::kIsolatedWebApps}, {});
-  }
-
-  content::RenderFrameHost* InstallAndOpenWebApp() {
-    const std::unique_ptr<web_app::BundledIsolatedWebApp> bundle =
-        web_app::IsolatedWebAppBuilder(
-            web_app::ManifestBuilder().AddPermissionsPolicyWildcard(
-                network::mojom::PermissionsPolicyFeature::kControlledFrame))
-            .BuildBundle();
-    web_app::IsolatedWebAppUrlInfo url_info =
-        bundle->InstallChecked(browser()->GetProfile());
-
-    return web_app::OpenIsolatedWebApp(browser()->GetProfile(),
-                                       url_info.app_id());
-  }
-
-  void CreateControlledFrame(content::RenderFrameHost* app_frame,
-                             const GURL& src) {
-    constexpr static std::string_view kCreateControlledFrame = R"(
-        new Promise((resolve, reject) => {
-          const controlledframe = document.createElement('controlledframe');
-          controlledframe.addEventListener('loadabort', (e) => {
-              resolve();
-          });
-          controlledframe.addEventListener('loadstop', (e) => {
-              reject('must abort load because of cert error');
-          });
-
-          controlledframe.src = $1;
-          document.body.appendChild(controlledframe);
-        });
-      )";
-    CHECK(ExecJs(app_frame, content::JsReplace(kCreateControlledFrame, src)));
-  }
-
-  base::test::ScopedFeatureList iwa_scoped_feature_list_;
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
-};
-
-// Make sure that broken page in Isolated Web App's Controlled Frame
-// causes new tab to be opened in existing browser window.
-IN_PROC_BROWSER_TEST_F(IWACaptivePortalBrowserTest,
-                       HttpsCertErrorControlledFrameNewTab) {
-  CertErrorInWebAppWithEmbeddedFrameOpensCaptivePortal(
-      /*should_open_new_browser=*/false, /*num_navigations_to_wait_for=*/2,
-      [this]() -> content::RenderFrameHost* {
-        return this->InstallAndOpenWebApp();
-      },
-      [this](content::RenderFrameHost* app_frame, const GURL& cert_error_url) {
-        CreateControlledFrame(app_frame, cert_error_url);
-      });
-}
-
-// Make sure that broken page in Isolated Web App's Controlled Frame
-// causes new browser window with login tab to be opened.
-// This happens when there is no current browser opened with tab support.
-IN_PROC_BROWSER_TEST_F(IWACaptivePortalBrowserTest,
-                       HttpsCertErrorControlledFrameNewBrowser) {
-  CertErrorInWebAppWithEmbeddedFrameOpensCaptivePortal(
-      /*should_open_new_browser=*/true, /*num_navigations_to_wait_for=*/2,
-      [this]() -> content::RenderFrameHost* {
-        return this->InstallAndOpenWebApp();
-      },
-      [this](content::RenderFrameHost* app_frame, const GURL& cert_error_url) {
-        CreateControlledFrame(app_frame, cert_error_url);
-      });
-}
-
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 // Check the captive portal result when the test request reports a network
 // error.  The check is triggered by a slow loading page, and the page

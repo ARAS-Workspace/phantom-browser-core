@@ -16,7 +16,6 @@
 #include "base/strings/stringprintf.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/test/bind.h"
-#include "base/test/gmock_expected_support.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_future.h"
@@ -28,10 +27,6 @@
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-#include "chrome/browser/web_applications/isolated_web_apps/test/isolated_web_app_builder.h"
-#include "chrome/browser/web_applications/os_integration/os_integration_manager.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/chrome_test_utils.h"
@@ -339,13 +334,6 @@ void RunFedCm(const content::ToRenderFrameHost& adapter,
   EXPECT_EQ(kToken, EvalJs(adapter, command));
 }
 
-void AddLocalStorageUsage(content::RenderFrameHost* render_frame_host,
-                          int size) {
-  auto command =
-      content::JsReplace("localStorage.setItem('key', '!'.repeat($1))", size);
-  EXPECT_TRUE(ExecJs(render_frame_host, command));
-}
-
 void WaitForModelUpdate(BrowsingDataModel* model, size_t expected_size) {
   ASSERT_TRUE(
       base::test::RunUntil([&]() { return model->size() == expected_size; }));
@@ -383,8 +371,6 @@ class BrowsingDataModelBrowserTest
   BrowsingDataModelBrowserTest() {
     std::vector<FeatureRefAndParams> enabled_features = {
         {features::kPrivacySandboxAdsAPIsOverride, {}},
-        {features::kIsolatedWebApps, {}},
-        {features::kIsolatedWebAppDevMode, {}},
         {blink::features::kFencedFrames, {}},
         {network::features::kBrowsingTopics, {}},
         {net::features::kThirdPartyStoragePartitioning, {}},
@@ -518,7 +504,6 @@ class BrowsingDataModelBrowserTest
   privacy_sandbox::PrivacySandboxAttestationsMixin
       privacy_sandbox_attestations_mixin_{&mixin_host_};
 
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
   base::test::ScopedFeatureList feature_list_;
   std::unique_ptr<IdpTestServer> idp_server_;
   testing::NiceMock<policy::MockConfigurationPolicyProvider> provider_;
@@ -574,50 +559,6 @@ IN_PROC_BROWSER_TEST_F(BrowsingDataModelBrowserTest, TrustTokenIssuance) {
   // Build another model from disk, ensuring the data is no longer present.
   browsing_data_model = BuildBrowsingDataModel();
   ValidateBrowsingDataEntries(browsing_data_model.get(), {});
-}
-
-IN_PROC_BROWSER_TEST_F(BrowsingDataModelBrowserTest,
-                       IsolatedWebAppUsageInDefaultStoragePartitionModel) {
-  // Check that no IWAs are installed at the beginning of the test.
-  std::unique_ptr<BrowsingDataModel> browsing_data_model =
-      BuildBrowsingDataModel();
-  ValidateBrowsingDataEntries(browsing_data_model.get(), {});
-  ASSERT_EQ(browsing_data_model->size(), 0u);
-
-  Profile* profile = browser()->GetProfile();
-
-  std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> app1 =
-      web_app::IsolatedWebAppBuilder(web_app::ManifestBuilder()).BuildBundle();
-  ASSERT_OK_AND_ASSIGN(web_app::IsolatedWebAppUrlInfo iwa_url_info1,
-                       app1->Install(profile));
-  auto* iwa_frame1 =
-      web_app::OpenIsolatedWebApp(profile, iwa_url_info1.app_id());
-  AddLocalStorageUsage(iwa_frame1, 100);
-
-  std::unique_ptr<web_app::ScopedBundledIsolatedWebApp> app2 =
-      web_app::IsolatedWebAppBuilder(web_app::ManifestBuilder()).BuildBundle();
-  ASSERT_OK_AND_ASSIGN(web_app::IsolatedWebAppUrlInfo iwa_url_info2,
-                       app2->Install(profile));
-  auto* iwa_frame2 =
-      web_app::OpenIsolatedWebApp(profile, iwa_url_info2.app_id());
-  AddLocalStorageUsage(iwa_frame2, 500);
-
-  browsing_data_model = BuildBrowsingDataModel();
-
-  ValidateBrowsingDataEntries(
-      browsing_data_model.get(),
-      {{iwa_url_info1.origin(),
-        iwa_url_info1.origin(),
-        {{static_cast<BrowsingDataModel::StorageType>(
-             ChromeBrowsingDataModelDelegate::StorageType::kIsolatedWebApp)},
-         /*storage_size=*/105,
-         /*cookie_count=*/0}},
-       {iwa_url_info2.origin(),
-        iwa_url_info2.origin(),
-        {{static_cast<BrowsingDataModel::StorageType>(
-             ChromeBrowsingDataModelDelegate::StorageType::kIsolatedWebApp)},
-         /*storage_size=*/505,
-         /*cookie_count=*/0}}});
 }
 
 IN_PROC_BROWSER_TEST_F(BrowsingDataModelBrowserTest,

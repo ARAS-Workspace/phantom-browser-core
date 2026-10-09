@@ -257,7 +257,6 @@ source_set("platform_browser_tests") {
   ]
   deps += [
     "//chrome/app:command_ids",
-    "//chrome/browser/web_applications:web_applications_test_support",
   ]
 }
 

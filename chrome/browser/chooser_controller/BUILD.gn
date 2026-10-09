@@ -52,5 +52,4 @@ source_set("unit_tests") {
       "//extensions:test_support",
     ]
   }
-  deps += [ "//chrome/browser/web_applications:web_applications_test_support" ]
 }
