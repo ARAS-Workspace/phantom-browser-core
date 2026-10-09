@@ -24,8 +24,6 @@ browser_exposed_mojom_targets = [
   "//chrome/browser/resource_coordinator:mojo_bindings",
   "//chrome/browser/resources/certificate_manager:mojom",
   "//chrome/browser/ui/webui/access_code_cast:mojo_bindings",
-  "//chrome/browser/ui/webui/app_home:mojo_bindings",
-  "//chrome/browser/ui/webui/app_service_internals:mojo_bindings",
   "//chrome/browser/ui/webui/bluetooth_internals:mojo_bindings",
   "//chrome/browser/ui/webui/chrome_finds_internals:mojo_bindings",
   "//chrome/browser/ui/webui/context_hub:mojo_bindings",
@@ -61,7 +59,6 @@ browser_exposed_mojom_targets = [
   "//chrome/browser/ui/webui/tab_strip_internals:mojo_bindings",
   "//chrome/browser/ui/webui/usb_internals:mojo_bindings",
   "//chrome/browser/ui/webui/watermark:mojo_bindings",
-  "//chrome/browser/ui/webui/web_app_internals:mojo_bindings",
   "//chrome/browser/ui/webui/webnn_internals:mojo_bindings",
   "//chrome/browser/ui/webui/whats_new:mojo_bindings",
   "//chrome/browser/web_applications/mojom:mojom_web_apps_enum",
@@ -307,7 +304,6 @@ browser_exposed_mojom_targets = [
   "//ui/latency/mojom:mojom",
   "//ui/ozone/platform/wayland/mojom:mojom",
   "//ui/ozone/public/mojom:gesture_properties_service",
-  "//ui/webui/resources/cr_components/app_management:mojo_bindings",
   "//ui/webui/resources/cr_components/color_change_listener:mojom",
   "//ui/webui/resources/cr_components/customize_color_scheme_mode:mojom",
   "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
@@ -325,7 +321,6 @@ browser_exposed_mojom_targets = [
 ]
 
 browser_exposed_mojom_targets += [
-  "//chrome/browser/ui/webui/iwa_dev:mojo_bindings",
   "//chrome/browser/ui/webui/omnibox_everywhere/debug:mojo_bindings",
 ]
 

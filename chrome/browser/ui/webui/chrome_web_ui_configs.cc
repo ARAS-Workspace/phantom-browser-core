@@ -63,7 +63,6 @@
 #include "chrome/browser/ui/webui/webui_toolbar/webui_toolbar_ui.h"
 #include "chrome/browser/ui/webui_browser/webui_browser_ui.h"
 #include "chrome/browser/ui/webui/access_code_cast/access_code_cast_ui.h"
-#include "chrome/browser/ui/webui/app_service_internals/app_service_internals_ui.h"
 #include "chrome/browser/ui/webui/bookmarks/bookmarks_ui.h"
 #include "chrome/browser/ui/webui/color_pipeline_internals/color_pipeline_internals_ui.h"
 #include "chrome/browser/ui/webui/commerce/shopping_insights_side_panel_ui.h"
@@ -75,7 +74,6 @@
 #include "chrome/browser/ui/webui/internals/internals_ui.h"
 #include "chrome/browser/ui/webui/tab_strip_internals/tab_strip_internals_ui.h"
 #endif  // BUILDFLAG(ENABLE_SESSION_SERVICE)
-#include "chrome/browser/ui/webui/iwa_dev/iwa_dev_ui.h"
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_ui.h"
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
@@ -208,7 +206,6 @@ void RegisterChromeWebUIConfigs() {
 #endif
 
   map.AddWebUIConfig(std::make_unique<media_router::AccessCodeCastUIConfig>());
-  map.AddWebUIConfig(std::make_unique<AppServiceInternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<BookmarksSidePanelUIConfig>());
   map.AddWebUIConfig(std::make_unique<BookmarksUIConfig>());
   map.AddWebUIConfig(std::make_unique<ColorPipelineInternalsUIConfig>());
@@ -224,7 +221,6 @@ void RegisterChromeWebUIConfigs() {
   map.AddWebUIConfig(std::make_unique<InternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<TabStripInternalsUIConfig>());
 #endif  // BUILDFLAG(ENABLE_SESSION_SERVICE)
-  map.AddWebUIConfig(std::make_unique<IwaDevUIConfig>());
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   map.AddWebUIConfig(std::make_unique<NewTabFooterUIConfig>());
   map.AddWebUIConfig(std::make_unique<NewTabPageThirdPartyUIConfig>());

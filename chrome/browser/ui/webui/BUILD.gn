@@ -99,7 +99,6 @@ source_set("configs") {
 
   deps += [
     "//chrome/browser/ui/webui/access_code_cast",
-    "//chrome/browser/ui/webui/app_service_internals",
     "//chrome/browser/ui/webui/autofill_ml_internals",
     "//chrome/browser/ui/webui/color_pipeline_internals",
     "//chrome/browser/ui/webui/data_sharing",
@@ -107,7 +106,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/history",
     "//chrome/browser/ui/webui/infobar_internals",
     "//chrome/browser/ui/webui/inspect",
-    "//chrome/browser/ui/webui/iwa_dev",
     "//chrome/browser/ui/webui/multistep_filter_internals",
     "//chrome/browser/ui/webui/new_tab_footer",
     "//chrome/browser/ui/webui/new_tab_page_third_party",
@@ -117,14 +115,12 @@ source_set("configs") {
     "//chrome/browser/ui/webui/organizer_panel",
     "//chrome/browser/ui/webui/profile_internals",
     "//chrome/browser/ui/webui/tab_search",
-    "//chrome/browser/ui/webui/web_app_internals",
     "//chrome/browser/ui/webui/webui_js_error",
     "//chrome/browser/ui/webui/webui_toolbar",
     "//chrome/browser/ui/webui_browser",
   ]
 
   deps += [
-    "//chrome/browser/ui/webui/app_home",
     "//chrome/browser/ui/webui/default_browser:default_browser_modal",
   ]
 
@@ -136,7 +132,6 @@ source_set("configs") {
     ]
 
     deps += [
-      "//chrome/browser/ui/webui/app_settings",
       "//chrome/browser/ui/webui/signin:profile",
       "//chrome/browser/ui/webui/whats_new",
     ]
@@ -508,7 +503,6 @@ source_set("chrome_web_ui_controller_factory") {
   ]
 
   deps += [
-    "//chrome/browser/ui/webui/app_service_internals",
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/downloads",
     "//chrome/browser/ui/webui/history",
@@ -523,8 +517,6 @@ source_set("chrome_web_ui_controller_factory") {
       "//chrome/browser/ui/webui/devtools",
     ]
   }
-
-  deps += [ "//chrome/browser/ui/webui/app_home" ]
 
   if (is_linux) {
     deps += [ "//chrome/browser/ui/webui/sandbox" ]
@@ -843,7 +835,6 @@ source_set("browser_tests") {
     deps += [
       ":theme_source",
       "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/webui/iwa_dev",
       "//chrome/browser/ui/webui/whats_new",
       "//chrome/test/data/webui:browser_tests",
       "//components/collaboration/public",

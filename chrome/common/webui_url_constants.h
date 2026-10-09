@@ -171,7 +171,6 @@ inline constexpr char kChromeUIInternalDebugPagesDisabledURL[] =
 inline constexpr char kChromeUIInternalsHost[] = "internals";
 inline constexpr char kChromeUIInterstitialHost[] = "interstitials";
 inline constexpr char kChromeUIInterstitialURL[] = "chrome://interstitials/";
-inline constexpr char kChromeUIIwaDevHost[] = "iwa-dev";
 inline constexpr char kChromeUILocalStateHost[] = "local-state";
 inline constexpr char kChromeUILocalStateURL[] = "chrome://local-state";
 inline constexpr char kChromeUILocationInternalsHost[] = "location-internals";
@@ -328,8 +327,6 @@ inline constexpr char kChromeUIWebUIToolbarURL[] =
 inline constexpr char kChromeUIWebUIToolbarHost[] = "webui-toolbar.top-chrome";
 inline constexpr char kChromeUIWebNNInternalsHost[] = "webnn-internals";
 
-inline constexpr char kChromeUIAppServiceInternalsHost[] =
-    "app-service-internals";
 inline constexpr char kChromeUIAutofillMlInternalsHost[] =
     "autofill-ml-internals";
 inline constexpr char kChromeUIBookmarksSidePanelHost[] =
@@ -374,7 +371,6 @@ inline constexpr char kChromeUIUntrustedReadAnythingSidePanelHost[] =
     "read-anything-side-panel.top-chrome";
 inline constexpr char kChromeUIUntrustedReadAnythingSidePanelURL[] =
     "chrome-untrusted://read-anything-side-panel.top-chrome/";
-inline constexpr char kChromeUIWebAppInternalsHost[] = "web-app-internals";
 inline constexpr char kChromeUIWebuiBrowserHost[] = "webui-browser";
 inline constexpr char kChromeUIWebuiBrowserURL[] = "chrome://webui-browser/";
 inline constexpr char kChromeUIWebUIJsErrorHost[] = "webuijserror";

@@ -8,7 +8,6 @@
 #include "base/test/bind.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/webui_urls_for_test.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -22,7 +21,6 @@
 #include "components/search/ntp_features.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/variations/variations_switches.h"
-#include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "printing/buildflags/buildflags.h"
@@ -52,9 +50,6 @@ WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
 #endif
 
   enable_feature(features::kTabsFromOtherDevicesSidePanel);
-
-  enable_feature(features::kIsolatedWebAppDevUi);
-  enable_feature(features::kIsolatedWebApps);
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   enable_feature(switches::kFirstRunDesktopRefresh);

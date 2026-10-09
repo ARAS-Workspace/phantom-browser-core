@@ -2401,11 +2401,6 @@ test("browser_tests") {
         "../browser/ui/views/task_manager_view_browsertest.cc",
       ]
     }
-    if (is_mac || is_linux) {
-      sources += []
-
-      deps += [ "//chrome/browser/ui/webui/app_home" ]
-    }
     sources += [
       "../browser/ui/views/policy/enterprise_startup_dialog_view_browsertest.cc",
       "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_browsertest.cc",
@@ -4832,9 +4827,7 @@ static_library("test_support_ui") {
     "//chrome/browser/ui/web_applications:launch_utils",
     "//chrome/browser/ui/webui",
     "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
-    "//chrome/browser/ui/webui/app_management",
     "//chrome/browser/ui/webui/signin",
-    "//chrome/browser/ui/webui/web_app_internals",
     "//chrome/browser/ui/webui/whats_new",
     "//chrome/browser/user_education",
     "//chrome/browser/web_applications",
@@ -4950,7 +4943,6 @@ static_library("test_support_ui") {
     deps += [ "//extensions/browser" ]
   }
 
-  public_deps += [ "//chrome/browser/ui/webui/app_home" ]
   public_deps += [ "//chrome/browser/first_run:test_support" ]
   if (enable_dice_support) {
     sources += [
@@ -4967,7 +4959,6 @@ static_library("test_support_ui") {
   if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/sharing_hub:test_support_ui",
-      "//chrome/browser/ui/webui/app_settings",
     ]
   }
 

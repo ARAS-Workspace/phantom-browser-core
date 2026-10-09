@@ -24,9 +24,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       // TODO(crbug.com/487113801): Investigate why tests are flaky on dbg bots.
       "chrome://accessibility",
 #endif
-      // TODO:(https://crbug.com/40265685): Flakily crashes on ChromeOS.
-      "chrome://app-service-internals",
-
       "chrome://bookmarks",
       "chrome://bookmarks-side-panel.top-chrome",
       "chrome://certificate-manager",
@@ -65,7 +62,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://indexeddb-internals",
       "chrome://infobar-internals",
       "chrome://inspect",
-      "chrome://iwa-dev",
       "chrome://internals/session-service",
       "chrome://interstitials",
       "chrome://interstitials/ssl",

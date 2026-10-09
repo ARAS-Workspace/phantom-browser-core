@@ -64,7 +64,6 @@
 #include "base/types/expected_macros.h"
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/webui/app_service_internals/app_service_internals_ui.h"
 #include "chrome/browser/ui/webui/bookmarks/bookmarks_ui.h"
 #include "chrome/browser/ui/webui/downloads/downloads_ui.h"
 #include "chrome/browser/ui/webui/history/history_ui.h"
@@ -83,8 +82,6 @@
 #include "chrome/browser/devtools/devtools_ui_bindings.h"
 #include "chrome/browser/ui/webui/devtools/devtools_ui.h"
 #endif
-
-#include "chrome/browser/ui/webui/app_home/app_home_ui.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
@@ -369,11 +366,6 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
     // Android doesn't have download_ui.cc, so load the resource directly.
     return ui::ResourceBundle::GetSharedInstance()
         .LoadDataResourceBytesForScale(IDR_DOWNLOADS_FAVICON, scale_factor);
-  }
-
-  // The chrome://apps page is not available on Android.
-  if (page_url.host() == chrome::kChromeUIAppLauncherPageHost) {
-    return webapps::AppHomeUI::GetFaviconResourceBytes(scale_factor);
   }
 
   if (page_url.host() == chrome::kChromeUINewTabPageHost ||

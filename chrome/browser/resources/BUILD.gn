@@ -37,7 +37,6 @@ group("resources") {
     ":dev_ui_paks",
     "about_sys:resources",
     "access_code_cast:resources",
-    "app_service_internals:resources",
     "autofill_ml_internals:resources",
     "bookmarks:resources",
     "certificate_manager:resources",
@@ -48,7 +47,6 @@ group("resources") {
     "gaia_auth_host:resources",
     "history:resources",
     "inspect:resources",
-    "iwa_dev:resources",
     "key_value_pair_viewer_shared:resources",
     "new_tab_footer:resources",
     "omnibox_everywhere:resources",
@@ -72,7 +70,6 @@ group("resources") {
     "support_tool:resources",
     "tab_group_home:resources",
     "tab_search:resources",
-    "web_app_internals:resources",
     "webnn_internals:resources",
     "webui_browser:resources",
     "webui_gallery:resources",
@@ -113,8 +110,6 @@ group("resources") {
 
   if (is_mac || is_linux) {
     public_deps += [
-      "app_home:resources",
-      "app_settings:resources",
       "browser_switch:resources",
       "on_device_translation_internals:resources",
     ]

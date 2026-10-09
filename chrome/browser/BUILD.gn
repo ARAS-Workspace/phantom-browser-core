@@ -969,7 +969,6 @@ source_set("core") {
     deps += [
       "//chrome/browser/browser_switcher",
       "//chrome/browser/ui/startup/default_browser_prompt",
-      "//chrome/browser/ui/webui/app_settings",
       "//chrome/browser/ui/webui/on_device_translation_internals",
     ]
   }
@@ -2071,7 +2070,6 @@ source_set("browser") {
     "//chrome/browser/ui/waap:window_metrics_manager",
     "//chrome/browser/ui/web_applications:impl",
     "//chrome/browser/ui/webui:webui_util",
-    "//chrome/browser/ui/webui/app_service_internals",
     "//chrome/browser/ui/webui/autofill_ml_internals",
     "//chrome/browser/ui/webui/color_pipeline_internals",
     "//chrome/browser/ui/webui/commerce",
@@ -2102,7 +2100,6 @@ source_set("browser") {
     "//chrome/browser/ui/webui/top_chrome",
     "//chrome/browser/ui/webui/top_chrome:impl",
     "//chrome/browser/ui/webui/user_education_internals",
-    "//chrome/browser/ui/webui/web_app_internals",
     "//chrome/browser/ui/webui/webui_gallery",
     "//chrome/browser/ui/webui/whats_new",
     "//chrome/browser/ui/webui/whats_new:impl",
@@ -2154,7 +2151,6 @@ source_set("browser") {
     "//ui/views",
     "//ui/web_dialogs",
     "//ui/webui",
-    "//ui/webui/resources/cr_components/app_management:mojo_bindings",
     "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
     "//ui/webui/resources/cr_components/history:mojo_bindings",
     "//ui/webui/resources/cr_components/history_clusters:mojo_bindings",
@@ -2174,8 +2170,6 @@ source_set("browser") {
     # TODO(crbug.com/369883710): Remove this dependency when
     # profiles/profile_manager.h gets componentized.
     "//chrome/browser/ui/startup/default_browser_prompt:impl",
-    "//chrome/browser/ui/webui/app_home",
-    "//chrome/browser/ui/webui/app_home:impl",
     "//chrome/browser/ui/webui/signin:profile",
     "//chrome/browser/ui/webui/signin:profile_impl",
   ]
@@ -2236,8 +2230,6 @@ source_set("browser") {
       "//chrome/browser/headless:metrics",
       "//chrome/browser/search_integrity",
       "//chrome/browser/ui/views/session_restore_infobar",
-      "//chrome/browser/ui/webui/app_settings",
-      "//chrome/browser/ui/webui/app_settings:impl",
       "//chrome/browser/updates:impl",
       "//chrome/browser/updates:update_metrics",
       "//chrome/updater:browser_sources",
@@ -2641,7 +2633,6 @@ group("browser_generated_files") {
     "//chrome/browser/predictors/lcp_critical_path_predictor:lcp_critical_path_predictor_proto",
     "//chrome/browser/regional_capabilities",
     "//chrome/browser/resource_coordinator:mojo_bindings",
-    "//chrome/browser/ui/webui/app_service_internals:mojo_bindings",
     "//chrome/browser/ui/webui/content_settings:mojo_bindings",
     "//chrome/browser/ui/webui/context_hub:mojo_bindings",
     "//chrome/browser/ui/webui/location_internals:mojo_bindings",
@@ -2664,7 +2655,6 @@ group("browser_generated_files") {
     "//chrome/browser/support_tool:support_tool_proto",
     "//chrome/browser/ui:webui_name_variants",
     "//chrome/browser/ui/webui/access_code_cast:mojo_bindings",
-    "//chrome/browser/ui/webui/app_service_internals:mojo_bindings",
     "//chrome/browser/ui/webui/customize_buttons:mojo_bindings",
     "//chrome/browser/ui/webui/data_sharing:mojo_bindings",
     "//chrome/browser/ui/webui/downloads:mojo_bindings",
@@ -2684,7 +2674,6 @@ group("browser_generated_files") {
     "//chrome/browser/ui/webui/side_panel/reading_list:mojo_bindings",
     "//chrome/browser/ui/webui/tab_search:mojo_bindings",
     "//chrome/browser/ui/webui/user_education_internals:mojo_bindings",
-    "//chrome/browser/ui/webui/web_app_internals:mojo_bindings",
     "//chrome/browser/ui/webui/webnn_internals:mojo_bindings",
     "//chrome/browser/ui/webui/whats_new:mojo_bindings",
     "//chrome/browser/ui/webui_browser:browser_mojo_bindings",
@@ -2701,7 +2690,6 @@ group("browser_generated_files") {
 
   if (is_mac || is_linux) {
     public_deps += [
-      "//chrome/browser/ui/webui/app_home:mojo_bindings",
       "//chrome/browser/ui/webui/on_device_translation_internals:mojo_bindings",
       "//chrome/browser/ui/webui/whats_new:mojo_bindings",
       "//components/enterprise/device_trust/core/attestation/proto:attestation_ca_proto",
@@ -3027,12 +3015,7 @@ group("test_support_ui") {
     "//chrome/browser/signin:test_support",
     "//chrome/browser/web_applications/app_service",
     "//net:test_support",
-    "//ui/webui/resources/cr_components/app_management:mojo_bindings",
   ]
-
-  if (is_mac || is_linux) {
-    public_deps += [ "//chrome/browser/ui/webui/app_home:mojo_bindings" ]
-  }
 }
 
 # Browser tests for top-level //chrome/browser code that does not live in a

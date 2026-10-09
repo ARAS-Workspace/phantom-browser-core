@@ -23,10 +23,6 @@ class Extension;
 
 namespace browsertest_util {
 
-// Launches a new app window for `app` in `profile`.
-BrowserWindowInterface* LaunchAppBrowser(Profile* profile,
-                                         const Extension* app);
-
 // Adds a tab to `browser` and returns the newly added WebContents.
 content::WebContents* AddTab(BrowserWindowInterface* browser, const GURL& url);
 

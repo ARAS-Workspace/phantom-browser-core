@@ -770,7 +770,6 @@ source_set("web_applications_test_support") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui",
     "//chrome/browser/ui/web_applications",
-    "//chrome/browser/ui/webui/web_app_internals",
     "//components/base32",
     "//components/keyed_service/content",
     "//components/services/app_service",

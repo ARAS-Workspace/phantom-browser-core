@@ -8,15 +8,7 @@
 
 #include "base/command_line.h"
 #include "base/logging.h"
-#include "base/run_loop.h"
-#include "base/strings/strcat.h"
-#include "base/test/bind.h"
 #include "base/time/time.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/webui/web_app_internals/web_app_internals_handler.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_provider_factory.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
 #if BUILDFLAG(IS_MAC)
 #include <inttypes.h>
 
@@ -37,30 +29,6 @@ void LogDebugInfoToConsole(const std::vector<Profile*>& profiles,
     return;
   }
 
-  // Tell users how to disable this potentially very long log output without
-  // them having to find the code that produces it by themselves.
-  std::string kDisableMessage =
-      base::StrCat({"(you can disable printing this debug info using the --",
-                    kDisableLogDebugInfoToConsole, " command line switch)"});
-
-  for (Profile* profile : profiles) {
-    if (!AreWebAppsEnabled(profile) ||
-        !WebAppProviderFactory::IsServiceCreatedForProfile(profile)) {
-      LOG(INFO) << "No WebAppProvider on profile" << profile->GetDebugName();
-      continue;
-    }
-    base::RunLoop debug_info_loop;
-    WebAppInternalsHandler::BuildDebugInfo(
-        profile, base::BindLambdaForTesting([&](base::Value debug_info) {
-          LOG(INFO) << "chrome://web-app-internals output for profile "
-                    << profile->GetDebugName() << " " << kDisableMessage
-                    << ":\n"
-                    << debug_info.DebugString() << "\n"
-                    << kDisableMessage;
-          debug_info_loop.Quit();
-        }));
-    debug_info_loop.Run();
-  }
   // On Mac OS also include system log output, as that is the only place logs
   // from app shims would end up. Do note that this log will include messages
   // from all tests that were running at the time, not just this test.

@@ -892,10 +892,6 @@ static_library("ui") {
     # downloads includes headers from //chrome/browser/ui (e.g.
     # browser_window.h) that can't be split out yet.
     "//chrome/browser/ui/webui/downloads",
-
-    # web_app_internals includes headers from //chrome/browser/ui (e.g.
-    # browser.h) that can't be split out yet.
-    "//chrome/browser/ui/webui/web_app_internals",
   ]
 
   allow_circular_includes_from += [
@@ -1237,8 +1233,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/access_code_cast:impl",
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/data_sharing:impl",
-    "//chrome/browser/ui/webui/iwa_dev",
-    "//chrome/browser/ui/webui/iwa_dev:mojo_bindings",
     "//chrome/browser/ui/webui/new_tab_page_third_party",
     "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
     "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
@@ -1252,7 +1246,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/tab_search",
     "//chrome/browser/ui/webui/user_education_internals",
     "//chrome/browser/ui/webui/util:impl",
-    "//chrome/browser/ui/webui/web_app_internals",
     "//chrome/browser/ui/window_feature_controller",
     "//chrome/browser/usb",
     "//components/privacy_sandbox:features",
@@ -1322,7 +1315,6 @@ static_library("ui") {
     "//chrome/browser/ui/views/toolbar",
     "//chrome/browser/ui/views/toolbar:impl",
     "//chrome/browser/ui/views/zoom",
-    "//chrome/browser/ui/webui/app_management",
     "//chrome/browser/ui/webui/browser_command",
     "//chrome/browser/ui/webui/color_pipeline_internals",
     "//chrome/browser/ui/webui/commerce",
@@ -1700,10 +1692,6 @@ static_library("ui") {
       "//chrome/browser/ui/startup/default_browser_prompt",
       "//chrome/browser/ui/startup/default_browser_prompt:impl",
       "//chrome/browser/ui/views/profiles:badged_profile_photo",
-      "//chrome/browser/ui/webui/app_home",
-      "//chrome/browser/ui/webui/app_home:impl",
-      "//chrome/browser/ui/webui/app_settings",
-      "//chrome/browser/ui/webui/app_settings:impl",
       "//chrome/browser/ui/webui/browser_switch",
       "//chrome/browser/ui/webui/intro",
       "//chrome/browser/ui/webui/on_device_translation_internals",
@@ -1717,14 +1705,6 @@ static_library("ui") {
     allow_circular_includes_from += [
       "//chrome/browser/ui/startup/default_browser_prompt:impl",
       "//chrome/browser/ui/webui/signin:profile_impl",
-
-      # TODO(crbug.com/364667551): It includes quite a few files from //c/b/ui's
-      # subdirectories such as views and webui which are not modularized yet.
-      "//chrome/browser/ui/webui/app_home:impl",
-
-      # TODO(crbug.com/364667551): It includes quite a few files from //c/b/ui's
-      # such as browser_window.h, browser.h and other files.
-      "//chrome/browser/ui/webui/app_settings:impl",
 
       # TODO(crbug.com/364667551): browser_switch_ui.cc includes browser.h from
       # //chrome/browser/ui:ui.
@@ -2444,7 +2424,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/webid",
       "//chrome/browser/ui/views/zoom",
       "//chrome/browser/ui/webauthn:impl",
-      "//chrome/browser/ui/webui/app_service_internals",
       "//chrome/browser/ui/webui/autofill_ml_internals",
       "//chrome/browser/ui/webui/side_panel/customize_chrome",
       "//chrome/browser/ui/window_metadata",

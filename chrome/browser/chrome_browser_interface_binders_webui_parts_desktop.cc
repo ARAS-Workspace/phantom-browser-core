@@ -19,8 +19,6 @@
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
 #include "chrome/browser/ui/webui/access_code_cast/access_code_cast.mojom.h"
 #include "chrome/browser/ui/webui/access_code_cast/access_code_cast_ui.h"
-#include "chrome/browser/ui/webui/app_service_internals/app_service_internals.mojom.h"
-#include "chrome/browser/ui/webui/app_service_internals/app_service_internals_ui.h"
 #include "chrome/browser/ui/webui/color_pipeline_internals/color_pipeline_internals_ui.h"
 #include "chrome/browser/ui/webui/commerce/shopping_insights_side_panel_ui.h"
 #include "chrome/browser/ui/webui/customize_buttons/customize_buttons.mojom.h"
@@ -31,8 +29,6 @@
 #include "chrome/browser/ui/webui/history/history_ui.h"
 #include "chrome/browser/ui/webui/infobar_internals/infobar_internals.mojom.h"
 #include "chrome/browser/ui/webui/infobar_internals/infobar_internals_ui.h"
-#include "chrome/browser/ui/webui/iwa_dev/iwa_dev.mojom.h"
-#include "chrome/browser/ui/webui/iwa_dev/iwa_dev_ui.h"
 #include "chrome/browser/ui/webui/metrics_reporter/metrics_reporter_service.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_ui.h"
@@ -65,8 +61,6 @@
 #include "chrome/browser/ui/webui/tab_search/tab_search_ui.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals.mojom.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
-#include "chrome/browser/ui/webui/web_app_internals/web_app_internals.mojom.h"
-#include "chrome/browser/ui/webui/web_app_internals/web_app_internals_ui.h"
 #include "chrome/browser/ui/webui/webui_gallery/webui_gallery_ui.h"
 #include "chrome/browser/ui/webui/webui_toolbar/webui_toolbar_ui.h"
 #include "chrome/browser/ui/webui_browser/webui_browser.h"
@@ -97,7 +91,6 @@
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 #include "ui/webui/color_change_listener/color_change_handler.h"
-#include "ui/webui/resources/cr_components/app_management/app_management.mojom.h"
 #include "ui/webui/resources/cr_components/color_change_listener/color_change_listener.mojom.h"
 #include "ui/webui/resources/cr_components/customize_color_scheme_mode/customize_color_scheme_mode.mojom.h"
 #include "ui/webui/resources/cr_components/help_bubble/custom_help_bubble.mojom.h"
@@ -110,9 +103,6 @@
 #include "ui/webui/resources/js/browser_command/browser_command.mojom.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/ui/webui/app_home/app_home.mojom.h"
-#include "chrome/browser/ui/webui/app_home/app_home_ui.h"
-#include "chrome/browser/ui/webui/app_settings/web_app_settings_ui.h"
 // The intro mojom targets exist on ChromeOS but these headers are only
 // compiled on Win/Mac/Linux; gn check is static, so suppress it on ChromeOS.
 #include "chrome/browser/ui/webui/intro/finish_or_continue.mojom.h" // nogncheck
@@ -360,10 +350,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       UserEducationInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
-      ::mojom::app_service_internals::AppServiceInternalsPageHandler,
-      AppServiceInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
       access_code_cast::mojom::PageHandlerFactory,
       media_router::AccessCodeCastUI>(map);
 
@@ -371,10 +357,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   map->Add<metrics_reporter::mojom::PageMetricsHost>(
       &BindMetricsReporterService);
 
-  RegisterWebUIControllerInterfaceBinder<::mojom::PageHandlerFactory,
-                                         WebAppInternalsUI>(map);
-  RegisterWebUIControllerInterfaceBinder<::iwa_dev::mojom::PageHandlerFactory,
-                                         IwaDevUI>(map);
   RegisterWebUIControllerInterfaceBinder<
       guest_contents::mojom::GuestContentsHost, WebUIBrowserUI>(map);
 
@@ -387,9 +369,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   // eliminates the need to account for feature flag combinations.
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  RegisterWebUIControllerInterfaceBinder<
-      app_management::mojom::PageHandlerFactory, WebAppSettingsUI>(map);
-
   RegisterWebUIControllerInterfaceBinder<
       on_device_translation_internals::mojom::PageHandlerFactory,
       OnDeviceTranslationInternalsUI>(map);
@@ -404,8 +383,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       intro::mojom::FinishOrContinuePageHandlerFactory, IntroUI>(map);
   RegisterWebUIControllerInterfaceBinder<
       intro::mojom::WelcomePageHandlerFactory, IntroUI>(map);
-  RegisterWebUIControllerInterfaceBinder<::app_home::mojom::PageHandlerFactory,
-                                         webapps::AppHomeUI>(map);
 #endif
 
   auto prompt_surface = default_browser::GetDefaultBrowserPromptSurface();

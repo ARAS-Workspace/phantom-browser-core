@@ -168,18 +168,6 @@
     "META": {"sizes": {"includes": [10],}},
     "includes": [2740],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/app_home/resources.grd": {
-    "META": {"sizes": {"includes": [20]}},
-    "includes": [2760],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/app_service_internals/resources.grd": {
-    "META": {"sizes": {"includes": [5],}},
-    "includes": [2780],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/app_settings/resources.grd": {
-    "META": {"sizes": {"includes": [45]}},
-    "includes": [2800],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/ash/extended_updates/resources.grd": {
     "META": {"sizes": {"includes": [20]}},
     "includes": [2820],
@@ -488,10 +476,6 @@
     "META": {"sizes": {"includes": [80],}},
     "includes": [4110],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/iwa_dev/resources.grd": {
-    "META": {"sizes": {"includes": [20]}},
-    "includes": [4150],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/key_value_pair_viewer_shared/resources.grd": {
    "META": {"sizes": {"includes": [10]}},
     "includes": [4160],
@@ -754,10 +738,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/user_education_internals/resources.grd": {
     "META": {"sizes": {"includes": [20]}},
     "includes": [5090],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/web_app_internals/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [5100],
   },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/webapks/resources.grd": {
     "META": {"sizes": {"includes": [10]}},
