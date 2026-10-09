@@ -851,17 +851,6 @@ const char kGlicGuestUrlPresetPreprod[] = "glic-guest-url-preset-preprod";
 const char kGlicGuestUrlPresetProd[] = "glic-guest-url-preset-prod";
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-// Writes open and installed web apps for each profile to the specified file
-// without launching a new browser window or tab. Pass a absolute file path
-// to specify where to output the information. Can be used together with
-// optional
-// --profile-base-name switch to only write information for a given profile.
-const char kListApps[] = "list-apps";
-
-// Pass the basename of the profile directory to specify which profile to get
-// information. Only relevant when used with --list-apps switch.
-const char kProfileBaseName[] = "profile-base-name";
-
 // Domains and associated SAML attributes for which third-party profile
 // management should be enabled. Input should be in JSON format.
 const char kProfileManagementAttributes[] = "profile-management-attributes";

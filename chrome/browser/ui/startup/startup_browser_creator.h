@@ -24,15 +24,6 @@ namespace base {
 class CommandLine;
 }
 
-namespace web_app {
-namespace integration_tests {
-class WebAppIntegrationTestDriver;
-}
-FORWARD_DECLARE_TEST(WebAppEngagementBrowserTest, CommandLineTab);
-FORWARD_DECLARE_TEST(WebAppEngagementBrowserTest, CommandLineWindowByUrl);
-FORWARD_DECLARE_TEST(WebAppEngagementBrowserTest, CommandLineWindowByAppId);
-}  // namespace web_app
-
 // Indicates how Chrome should start up the first profile.
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -172,8 +163,6 @@ class StartupBrowserCreator {
   friend class StartupBrowserCreatorInfobarsWithoutStartupWindowTest;
   // TODO(crbug.com/40482804): Remove this when first_run_tabs gets refactored.
   friend class StartupTabProviderImpl;
-  friend class web_app::integration_tests::WebAppIntegrationTestDriver;
-  FRIEND_TEST_ALL_PREFIXES(BrowserTest, AppIdSwitch);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
                            ReadingWasRestartedAfterNormalStart);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
@@ -184,36 +173,6 @@ class StartupBrowserCreator {
                            ValidNotificationLaunchId);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
                            InvalidNotificationLaunchId);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserWithListAppsFeature,
-                           ListAppsForAllProfiles);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserWithListAppsFeature,
-                           ListAppsForGivenProfile);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTest,
-                           OpenAppShortcutNoPref);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTest,
-                           OpenAppShortcutTabPref);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTest,
-                           OpenAppShortcutWindowPref);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTest,
-                           OpenPolicyForcedAppShortcut);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTestWithLaunch,
-                           OpenAppShortcutNoPref);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTestWithLaunch,
-                           OpenAppShortcutTabPref);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTestWithLaunch,
-                           OpenAppShortcutWindowPref);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorChromeAppShortcutTestWithLaunch,
-                           OpenPolicyForcedAppShortcut);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserWithRealWebAppTest,
-                           LastUsedProfilesWithRealWebApp);
-  FRIEND_TEST_ALL_PREFIXES(web_app::WebAppEngagementBrowserTest,
-                           CommandLineTab);
-  FRIEND_TEST_ALL_PREFIXES(web_app::WebAppEngagementBrowserTest,
-                           CommandLineWindowByUrl);
-  FRIEND_TEST_ALL_PREFIXES(web_app::WebAppEngagementBrowserTest,
-                           CommandLineWindowByAppId);
-  FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
-                           LastUsedProfilesWithWebApp);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,
                            AppSwitchOpensNoAppWindow);
   FRIEND_TEST_ALL_PREFIXES(StartupBrowserCreatorTest,

@@ -259,8 +259,6 @@ extern const char kGlicGuestUrlPresetPreprod[];
 extern const char kGlicGuestUrlPresetProd[];
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-extern const char kListApps[];
-extern const char kProfileBaseName[];
 extern const char kProfileManagementAttributes[];
 #endif
 

@@ -35,8 +35,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/app_mode/app_mode_utils.h"
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
 #include "chrome/browser/apps/platform_apps/app_load_service.h"
 #include "chrome/browser/apps/platform_apps/platform_app_launch.h"
 #include "chrome/browser/browser_features.h"
@@ -62,17 +60,12 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#include "chrome/browser/ui/extensions/application_launch.h"
 #include "chrome/browser/ui/startup/launch_mode_recorder.h"
 #include "chrome/browser/ui/startup/profile_launch_observer.h"
 #include "chrome/browser/ui/startup/startup_browser_creator_impl.h"
 #include "chrome/browser/ui/startup/startup_tab_provider.h"
 #include "chrome/browser/ui/startup/startup_types.h"
-#include "chrome/browser/ui/startup/web_app_startup_utils.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/web_applications/web_app_ui_manager_impl.h"
-#include "chrome/browser/web_applications/web_app_ui_manager.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_features.h"
@@ -82,14 +75,12 @@
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/search_engines/util.h"
-#include "components/services/app_service/public/cpp/app_launch_util.h"
 #include "components/startup_metric_utils/browser/startup_metric_utils.h"
 #include "components/url_formatter/url_fixer.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/common/content_switches.h"
-#include "extensions/browser/extension_registry.h"
 #include "extensions/common/switches.h"
 #include "printing/buildflags/buildflags.h"
 
@@ -106,7 +97,6 @@
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/headless/headless_mode_util.h"
-#include "chrome/browser/ui/startup/web_app_info_recorder_utils.h"
 #include "components/headless/policy/headless_mode_policy.h"
 #endif
 
@@ -270,35 +260,6 @@ bool IsSilentLaunchEnabled(const base::CommandLine& command_line,
   }
 
   return false;
-}
-
-bool CanOpenWebApp(Profile* profile) {
-  return web_app::AreWebAppsEnabled(profile) &&
-         apps::AppServiceProxyFactory::IsAppServiceAvailableForProfile(profile);
-}
-
-bool MaybeLaunchExtensionApp(const base::CommandLine& command_line,
-                             const base::FilePath& cur_dir,
-                             chrome::startup::IsFirstRun is_first_run,
-                             Profile* profile) {
-  if (!command_line.HasSwitch(switches::kAppId)) {
-    return false;
-  }
-
-  std::string app_id = command_line.GetSwitchValueASCII(switches::kAppId);
-  const extensions::Extension* extension =
-      extensions::ExtensionRegistry::Get(profile)->GetInstalledExtension(
-          app_id);
-  if (!extension) {
-    return false;
-  }
-
-  LaunchAppWithCallback(
-      profile, app_id, command_line, cur_dir,
-      base::BindOnce(&web_app::startup::FinalizeWebAppLaunch,
-                     web_app::startup::OpenMode::kInWindowByAppId, command_line,
-                     is_first_run));
-  return true;
 }
 
 // These values are persisted to logs. Entries should not be renumbered and
@@ -797,22 +758,6 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     silent_launch = true;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  // Writes open and installed web apps to the specified file without
-  // launching a new browser window or tab.
-  if (base::FeatureList::IsEnabled(features::kListWebAppsSwitch) &&
-      command_line.HasSwitch(switches::kListApps)) {
-    base::FilePath output_file(
-        command_line.GetSwitchValuePath(switches::kListApps));
-    if (!output_file.empty() && output_file.IsAbsolute()) {
-      base::FilePath profile_base_name(
-          command_line.GetSwitchValuePath(switches::kProfileBaseName));
-      chrome::startup::WriteWebAppsToFile(output_file, profile_base_name);
-    }
-    return true;
-  }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-
   if (base::FeatureList::IsEnabled(features::kOnConnectNative) &&
       command_line.HasSwitch(switches::kNativeMessagingConnectHost) &&
       command_line.HasSwitch(switches::kNativeMessagingConnectExtension)) {
@@ -920,63 +865,8 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     }
   }
 
-  if (command_line.HasSwitch(switches::kAppId)) {
-    // `switches::kAppId` presence suppresses the profile picker, see
-    // `ShouldShowProfilePickerAtProcessLaunch()`.
-    // TODO(http://crbug.com/40819749): Refactor command line processing logic
-    // to validate the flag sets and reliably determine the startup mode.
-    CHECK_EQ(profile_info.mode, StartupProfileMode::kBrowserWindow)
-        << "Failed launch with app: couldn't pick a profile";
-    std::string app_id = command_line.GetSwitchValueASCII(switches::kAppId);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-    // If Chrome Apps are deprecated and |app_id| is a Chrome App, display the
-    // deprecation UI instead of launching the app.
-    if (apps::OpenDeprecatedApplicationPrompt(privacy_safe_profile, app_id)) {
-      return true;
-    }
-#endif
-    // If |app_id| is a disabled or terminated platform app we handle it
-    // specially here, otherwise it will be handled below.
-    if (apps::OpenExtensionApplicationWithReenablePrompt(
-            privacy_safe_profile, app_id, command_line, cur_dir)) {
-      return true;
-    }
-  }
-
   // TODO(http://crbug.com/40819749): Refactor command line processing logic to
   // validate the flag sets and reliably determine the startup mode.
-  // Launch the browser if the profile is unable to open web apps.
-  if (!CanOpenWebApp(privacy_safe_profile)) {
-    LaunchBrowserForLastProfiles(
-        command_line, cur_dir, process_startup, is_first_run, profile_info,
-        last_opened_profiles, /*restore_tabbed_browser=*/true);
-    return true;
-  }
-
-  // Try a platform app launch.
-  if (MaybeLaunchExtensionApp(command_line, cur_dir, is_first_run,
-                              privacy_safe_profile)) {
-    return true;
-  }
-
-  // This path is mostly used for Window and Linux.
-  //
-  // On Mac, PWA launch is normally handled in
-  // web_app_shim_manager_delegate_mac.cc, but if an app shim for whatever
-  // reason fails to dlopen chrome we can still end up here. While in that case
-  // the launch behavior here isn't quite the correct behavior for an app launch
-  // on Mac OS, this behavior is better than nothing and should result in the
-  // app shim getting regenerated to hopefully fix future app launches.
-  // TODO(crbug.com/40191242): Some integration tests also rely on this code.
-  // Ideally those would be fixed to test the normal app launch path on Mac
-  // instead, and this code should be changed to make it harder to accidentally
-  // write tests that don't test the normal app launch path.
-  // Try a web app launch.
-  if (web_app::startup::MaybeHandleWebAppLaunch(
-          command_line, cur_dir, privacy_safe_profile, is_first_run)) {
-    return true;
-  }
-
   LaunchBrowserForLastProfiles(command_line, cur_dir, process_startup,
                                is_first_run, profile_info, last_opened_profiles,
                                /*restore_tabbed_browser=*/true);

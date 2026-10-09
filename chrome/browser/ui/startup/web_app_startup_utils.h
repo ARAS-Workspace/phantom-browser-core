@@ -5,20 +5,6 @@
 #ifndef CHROME_BROWSER_UI_STARTUP_WEB_APP_STARTUP_UTILS_H_
 #define CHROME_BROWSER_UI_STARTUP_WEB_APP_STARTUP_UTILS_H_
 
-#include <optional>
-
-#include "base/functional/callback.h"
-#include "chrome/browser/ui/startup/startup_types.h"
-#include "components/services/app_service/public/cpp/app_launch_util.h"
-
-class BrowserWindowInterface;
-class Profile;
-
-namespace base {
-class CommandLine;
-class FilePath;
-}  // namespace base
-
 namespace web_app {
 namespace startup {
 
@@ -35,29 +21,6 @@ enum class OpenMode {
   kInWindowByAppId = 4,  // Launched app by id with --app-id switch.
   kMaxValue = kInWindowByAppId,
 };
-
-// Handles a launch for a `command_line` that includes --app-id. If the app id
-// is invalid, it will fall back to launching a normal browser window. Will
-// return true if the --app-id flag was found, otherwise false.
-bool MaybeHandleWebAppLaunch(const base::CommandLine& command_line,
-                             const base::FilePath& cur_dir,
-                             Profile* profile,
-                             chrome::startup::IsFirstRun is_first_run);
-
-// Final handling after a web app has been launched.
-void FinalizeWebAppLaunch(std::optional<OpenMode> app_open_mode,
-                          const base::CommandLine& command_line,
-                          chrome::startup::IsFirstRun is_first_run,
-                          BrowserWindowInterface* browser,
-                          apps::LaunchContainer container);
-
-// `callback` will be run after the next `MaybeHandleWebAppLaunch()` invocation
-// finishes executing.
-void SetStartupDoneCallbackForTesting(base::OnceClosure callback);
-
-// `callback` will be run after `StartupWebAppCreator::OnBrowserShutdown()`
-// finishes. This method is used ONLY for testing purpose.
-void SetBrowserShutdownCompleteCallbackForTesting(base::OnceClosure callback);
 
 }  // namespace startup
 }  // namespace web_app

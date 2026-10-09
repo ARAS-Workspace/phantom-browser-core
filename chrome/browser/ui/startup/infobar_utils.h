@@ -19,7 +19,6 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
                             Profile* profile,
                             const base::CommandLine& startup_command_line,
                             chrome::startup::IsFirstRun is_first_run,
-                            bool is_web_app,
                             bool is_post_crash_launch,
                             bool was_restarted);
 

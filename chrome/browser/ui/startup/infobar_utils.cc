@@ -96,7 +96,6 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
                             Profile* profile,
                             const base::CommandLine& startup_command_line,
                             chrome::startup::IsFirstRun is_first_run,
-                            bool is_web_app,
                             bool is_post_crash_launch,
                             bool was_restarted) {
   if (!browser || !profile) {
@@ -138,9 +137,8 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
     return;
   }
 
-  // Web apps should not display the session restore bubble (crbug.com/40800614)
   const bool should_display_bubble =
-      !is_web_app && HasPendingUncleanExit(browser->GetProfile());
+      HasPendingUncleanExit(browser->GetProfile());
   base::UmaHistogramBoolean("Startup.CrashBubbleShown", should_display_bubble);
   if (should_display_bubble) {
     SessionCrashedBubble::ShowIfNotOffTheRecordProfile(
@@ -198,8 +196,7 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
 
   OSCryptAsyncAvailabilityInfoBarDelegate::MaybeCreate(browser);
 
-  if (is_web_app ||
-      startup_command_line.HasSwitch(switches::kNoDefaultBrowserCheck) ||
+  if (startup_command_line.HasSwitch(switches::kNoDefaultBrowserCheck) ||
       startup_command_line.HasSwitch(switches::kNoFirstRun)) {
     return;
   }

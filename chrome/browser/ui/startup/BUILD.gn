@@ -80,7 +80,6 @@ source_set("startup") {
   if (is_mac || is_linux) {
     sources += [
       "first_run_service.h",
-      "web_app_info_recorder_utils.h",
     ]
 
     public_deps += [
@@ -266,21 +265,11 @@ source_set("impl") {
   }
 
   if (is_mac || is_linux) {
-    sources += [ "web_app_startup_utils.cc" ]
-    deps += [
-      "//chrome/browser/lifetime:termination_notification",
-      "//components/webapps/common",
-    ]
-  }
-
-  if (is_mac || is_linux) {
     sources += [
       "first_run_service.cc",
-      "web_app_info_recorder_utils.cc",
     ]
     deps += [
       "//chrome/browser/ui/startup/default_browser_prompt",
-      "//chrome/browser/ui/web_applications",
     ]
   }
 

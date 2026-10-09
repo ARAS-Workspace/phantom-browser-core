@@ -460,8 +460,8 @@ void StartupBrowserCreatorImpl::DetermineURLsAndLaunch(
              bool is_post_crash_launch, bool was_restarted, Profile* profile,
              BrowserWindowInterface* browser) {
             AddInfoBarsIfNecessary(browser, profile, startup_command_line,
-                                   is_first_run, /*is_web_app=*/false,
-                                   is_post_crash_launch, was_restarted);
+                                   is_first_run, is_post_crash_launch,
+                                   was_restarted);
           },
           *command_line_, is_first_run_, is_post_crash_launch,
           StartupBrowserCreator::WasRestarted(), base::Unretained(profile_));
