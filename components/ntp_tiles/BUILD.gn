@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//components/supervised_user/buildflags.gni")
-import("//extensions/buildflags/buildflags.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 
 source_set("pref_names") {
@@ -80,17 +79,11 @@ static_library("ntp_tiles") {
     "//components/url_formatter",
     "//components/variations",
     "//components/variations/service",
-    "//components/webapps/common",
-    "//extensions/buildflags",
     "//services/data_decoder/public/cpp",
     "//services/network/public/cpp",
     "//third_party/re2",
     "//ui/base",
   ]
-
-  if (enable_extensions) {
-    deps += [ "//extensions/common:common_constants" ]
-  }
 
   if (enable_supervised_users) {
     deps += [ "//components/supervised_user/core/browser" ]
@@ -139,8 +132,6 @@ source_set("unit_tests") {
     "//components/search",
     "//components/supervised_user/core/common:buildflags",
     "//components/sync_preferences:test_support",
-    "//components/webapps/common",
-    "//extensions/buildflags",
     "//net:test_support",
     "//services/data_decoder/public/cpp:test_support",
     "//services/network:test_support",

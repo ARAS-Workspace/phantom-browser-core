@@ -53,10 +53,6 @@ ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
 
   std::unique_ptr<data_decoder::DataDecoder> data_decoder;
 
-  bool is_default_chrome_app_migrated;
-
-  is_default_chrome_app_migrated = true;
-
   auto most_visited_sites = std::make_unique<ntp_tiles::MostVisitedSites>(
       profile->GetPrefs(), IdentityManagerFactory::GetForProfile(profile),
       supervised_user::SupervisedUserServiceFactory::GetForProfile(profile),
@@ -77,7 +73,6 @@ ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
               std::make_unique<ImageDecoderImpl>(),
               profile->GetDefaultStoragePartition()
                   ->GetURLLoaderFactoryForBrowserProcess()),
-          std::move(data_decoder)),
-      is_default_chrome_app_migrated);
+          std::move(data_decoder)));
   return most_visited_sites;
 }

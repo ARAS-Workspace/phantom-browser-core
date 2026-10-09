@@ -14,10 +14,7 @@
 #include "base/functional/bind.h"
 #include "components/ntp_tiles/constants.h"
 #include "components/ntp_tiles/custom_links_util.h"
-#include "components/ntp_tiles/metrics.h"
-#include "components/ntp_tiles/most_visited_sites.h"
 #include "components/ntp_tiles/pref_names.h"
-#include "components/ntp_tiles/tile_type.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
@@ -37,7 +34,6 @@ CustomLinksManagerImpl::CustomLinksManagerImpl(const Options& options)
   }
   if (IsInitialized()) {
     current_links_ = store_.RetrieveLinks();
-    RemoveCustomLinksForPreinstalledApps();
   }
 
   base::RepeatingClosure callback =
@@ -205,23 +201,6 @@ void CustomLinksManagerImpl::ClearLinks() {
 void CustomLinksManagerImpl::StoreLinks() {
   base::AutoReset<bool> auto_reset(&updating_preferences_, true);
   store_.StoreLinks(current_links_);
-}
-
-void CustomLinksManagerImpl::RemoveCustomLinksForPreinstalledApps() {
-  if (!prefs_->GetBoolean(prefs::kCustomLinksForPreinstalledAppsRemoved)) {
-    bool default_app_links_deleted = false;
-    for (const Link& link : current_links_) {
-      if (MostVisitedSites::IsNtpTileFromPreinstalledApp(link.url) &&
-          MostVisitedSites::WasNtpAppMigratedToWebApp(prefs_, link.url)) {
-        DeleteLink(link.url);
-        default_app_links_deleted = true;
-      }
-    }
-    if (default_app_links_deleted) {
-      metrics::RecordsMigratedDefaultAppDeleted(TileType::kCustomLinks);
-      prefs_->SetBoolean(prefs::kCustomLinksForPreinstalledAppsRemoved, true);
-    }
-  }
 }
 
 base::CallbackListSubscription

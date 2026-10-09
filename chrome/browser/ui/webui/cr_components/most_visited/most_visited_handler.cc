@@ -9,7 +9,6 @@
 
 #include "base/feature_list.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/scoped_observation.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/sequenced_task_runner.h"
 #include "chrome/browser/browser_features.h"
@@ -40,9 +39,6 @@
 #include "content/public/browser/web_contents.h"
 #include "services/network/public/cpp/constants.h"
 #include "ui/base/window_open_disposition_utils.h"
-
-#include "chrome/browser/web_applications/preinstalled_web_app_manager.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
 
 namespace {
 
@@ -85,13 +81,6 @@ MostVisitedHandler::MostVisitedHandler(
   CHECK(logger_);
   most_visited_sites_->AddMostVisitedURLsObserver(
       this, ntp_tiles::kMaxNumMostVisited);
-
-  web_app::WebAppProvider* web_app_provider_ =
-      web_app::WebAppProvider::GetForWebApps(profile);
-  if (web_app_provider_) {
-    preinstalled_web_app_observer_.Observe(
-        &web_app_provider_->preinstalled_web_app_manager());
-  }
 }
 
 MostVisitedHandler::~MostVisitedHandler() = default;
@@ -485,14 +474,4 @@ bool MostVisitedHandler::MaybeRemoveStaleShortcuts() {
           },
           weak_ptr_factory_.GetWeakPtr(), profile_->GetPrefs()));
   return true;
-}
-
-void MostVisitedHandler::OnMigrationRun() {
-  most_visited_sites_->RefreshTiles();
-}
-
-void MostVisitedHandler::OnDestroyed() {
-  if (preinstalled_web_app_observer_.IsObserving()) {
-    preinstalled_web_app_observer_.Reset();
-  }
 }

@@ -41,8 +41,6 @@
 #include "components/search/ntp_features.h"
 #include "components/supervised_user/core/common/buildflags.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
-#include "components/webapps/common/constants.h"
-#include "extensions/buildflags/buildflags.h"
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
@@ -428,13 +426,6 @@ class MostVisitedSitesTest : public ::testing::Test {
     supervised_user::RegisterProfilePrefs(pref_service_.registry());
 #endif
 
-    // Updating list value in pref with default gmail URL for unit testing.
-    // Also adding migration feature to be enabled for unit test.
-    auto defaults =
-        base::ListValue().Append("pjkljhegncpnkpknbcohdijeoejaedia");
-    pref_service_.registry()->RegisterListPref(
-        webapps::kWebAppsMigratedPreinstalledApps, std::move(defaults));
-
     feature_list_.InitAndDisableFeature(
         kNtpMostLikelyFaviconsFromServerFeature);
     popular_sites_factory_.SeedWithSampleData();
@@ -509,8 +500,7 @@ class MostVisitedSitesTest : public ::testing::Test {
         /*supervised_user_service=*/nullptr,
         /*supervised_user_url_filtering_service=*/nullptr, mock_top_sites_,
         popular_sites_factory_.New(), std::move(mock_custom_links_manager),
-        std::move(mock_enterprise_shortcuts_manager), std::move(icon_cacher),
-        /*is_default_chrome_app_migrated=*/true);
+        std::move(mock_enterprise_shortcuts_manager), std::move(icon_cacher));
   }
 
   bool IsCustomLinkMixingEnabled() const {
@@ -739,37 +729,6 @@ TEST_F(MostVisitedSitesTest, ShouldHaveHomepageFirstInListWhenFull) {
   // Assert that the home page is appended as the final tile.
   EXPECT_THAT(tiles[0], MatchesTile(u"", kHomepageUrl, TileSource::HOMEPAGE));
 }
-
-// The following test exercises behavior with a preinstalled chrome app; this
-// is only relevant if extensions and apps are enabled.
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-TEST_F(MostVisitedSitesTest, ShouldNotContainDefaultPreinstalledApp) {
-  const char kTestUrl[] = "http://site1/";
-  const char16_t kTestTitle[] = u"Site 1";
-  const char kGmailUrl[] =
-      "chrome-extension://pjkljhegncpnkpknbcohdijeoejaedia/index.html";
-  const char16_t kGmailTitle[] = u"Gmail";
-
-  EXPECT_CALL(*mock_top_sites_, GetMostVisitedURLs(_))
-      .WillRepeatedly(base::test::RunOnceCallbackRepeatedly<0>(
-          MostVisitedURLList{MakeMostVisitedURL(kGmailTitle, kGmailUrl),
-                             MakeMostVisitedURL(kTestTitle, kTestUrl)}));
-  EXPECT_CALL(*mock_top_sites_, SyncWithHistory());
-  std::map<SectionType, NTPTilesVector> sections;
-  EXPECT_CALL(mock_observer_, OnURLsAvailable(_, _))
-      .WillRepeatedly(SaveArg<1>(&sections));
-
-  most_visited_sites_->AddMostVisitedURLsObserver(&mock_observer_,
-                                                  /*max_num_sites=*/2);
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_THAT(sections.at(SectionType::PERSONALIZED),
-              AllOf(Not(Contains(MatchesTile(kGmailTitle, kGmailUrl,
-                                             TileSource::TOP_SITES))),
-                    Contains(MatchesTile(kTestTitle, kTestUrl,
-                                         TileSource::TOP_SITES))));
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 TEST_F(MostVisitedSitesTest, ShouldHaveHomepageFirstInListWhenNotFull) {
   FakeHomepageClient* homepage_client = RegisterNewHomepageClient();

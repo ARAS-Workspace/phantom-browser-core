@@ -60,10 +60,6 @@
 #include "extensions/common/manifest.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/web_applications/preinstalled_app_install_features.h"
-#endif
-
 #include "chrome/browser/extensions/preinstalled_extensions.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
@@ -88,8 +84,6 @@ const char ExternalProviderImpl::kIsBookmarkApp[] = "is_bookmark_app";
 const char ExternalProviderImpl::kIsFromWebstore[] = "is_from_webstore";
 const char ExternalProviderImpl::kKeepIfPresent[] = "keep_if_present";
 const char ExternalProviderImpl::kWasInstalledByOem[] = "was_installed_by_oem";
-const char ExternalProviderImpl::kWebAppMigrationFlag[] =
-    "web_app_migration_flag";
 const char ExternalProviderImpl::kSupportedLocales[] = "supported_locales";
 const char ExternalProviderImpl::kMayBeUntrusted[] = "may_be_untrusted";
 const char ExternalProviderImpl::kMinProfileCreatedByVersion[] =
@@ -345,25 +339,9 @@ void ExternalProviderImpl::RetrieveExtensionsFromPrefs(
       continue;
     }
 
-    // If the extension is in a web app migration treat it as "keep_if_present"
-    // so it can get uninstalled by WebAppUiManager::UninstallAndReplace() once
-    // the replacement web app has installed and migrated over user preferences.
-    // TODO(crbug.com/1099150): Remove this field after migration is complete.
-    // TODO(crbug.com/409795200): Decide how to handle this on desktop Android.
-    // We can't currently depend on //chrome/browser/web_applications.
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-    const std::string* web_app_migration_flag =
-        extension_dict.FindString(kWebAppMigrationFlag);
-    bool is_migrating_to_web_app =
-        web_app_migration_flag &&
-        web_app::IsPreinstalledAppInstallFeatureEnabled(
-            *web_app_migration_flag);
-#else
-    bool is_migrating_to_web_app = false;
-#endif
     bool keep_if_present =
         extension_dict.FindBool(kKeepIfPresent).value_or(false);
-    if (keep_if_present || is_migrating_to_web_app) {
+    if (keep_if_present) {
       ExtensionRegistry* extension_registry = ExtensionRegistry::Get(profile_);
       const Extension* extension =
           extension_registry ? extension_registry->GetExtensionById(

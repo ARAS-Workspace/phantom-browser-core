@@ -32,9 +32,6 @@ void RecordTileImpression(const NTPTileImpression& impression,
 void RecordTileClick(const NTPTileImpression& impression,
                      std::string_view prefix = "NewTabPage");
 
-// Records when a default app tile is deleted with the type of tile.
-void RecordsMigratedDefaultAppDeleted(const TileType& most_visited_app_type);
-
 }  // namespace metrics
 }  // namespace ntp_tiles
 

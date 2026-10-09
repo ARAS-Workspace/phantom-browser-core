@@ -32,8 +32,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/search/ntp_features.h"
 #include "components/supervised_user/core/common/buildflags.h"
-#include "components/webapps/common/constants.h"
-#include "extensions/buildflags/buildflags.h"
 #include "third_party/re2/src/re2/re2.h"
 
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
@@ -41,11 +39,6 @@
 #include "components/supervised_user/core/browser/supervised_user_service.h"
 #include "components/supervised_user/core/browser/supervised_user_url_filtering_service.h"
 #include "components/supervised_user/core/common/features.h"
-#endif
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-// GN doesn't understand conditional includes, so we need nogncheck here.
-#include "extensions/common/constants.h"  // nogncheck
 #endif
 
 using history::TopSites;
@@ -186,8 +179,7 @@ MostVisitedSites::MostVisitedSites(
     std::unique_ptr<PopularSites> popular_sites,
     std::unique_ptr<CustomLinksManager> custom_links_manager,
     std::unique_ptr<EnterpriseShortcutsManager> enterprise_shortcuts_manager,
-    std::unique_ptr<IconCacher> icon_cacher,
-    bool is_default_chrome_app_migrated)
+    std::unique_ptr<IconCacher> icon_cacher)
     : prefs_(prefs),
       identity_manager_(identity_manager),
       supervised_user_service_(supervised_user_service),
@@ -198,7 +190,6 @@ MostVisitedSites::MostVisitedSites(
       custom_links_manager_(std::move(custom_links_manager)),
       enterprise_shortcuts_manager_(std::move(enterprise_shortcuts_manager)),
       icon_cacher_(std::move(icon_cacher)),
-      is_default_chrome_app_migrated_(is_default_chrome_app_migrated),
       is_observing_(false) {
   DCHECK(prefs_);
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
@@ -940,18 +931,7 @@ void MostVisitedSites::SaveTilesAndNotify(
     bool is_user_triggered,
     NTPTilesVector new_tiles,
     std::map<SectionType, NTPTilesVector> sections) {
-  // TODO(crbug.com/40802205):
-  // Remove this after preinstalled apps are migrated.
-
-  NTPTilesVector fixed_tiles = is_default_chrome_app_migrated_
-                                   ? RemoveInvalidPreinstallApps(new_tiles)
-                                   : new_tiles;
-
-  if (fixed_tiles.size() != new_tiles.size()) {
-    metrics::RecordsMigratedDefaultAppDeleted(TileType::kTopSites);
-  }
-
-  fixed_tiles = ImposeCustomLinks(std::move(fixed_tiles));
+  NTPTilesVector fixed_tiles = ImposeCustomLinks(std::move(new_tiles));
   fixed_tiles = ImposeEnterpriseShortcuts(std::move(fixed_tiles));
 
   if (!current_tiles_.has_value() || (*current_tiles_ != fixed_tiles)) {
@@ -975,37 +955,6 @@ void MostVisitedSites::SaveTilesAndNotify(
   for (auto& observer : observers_) {
     observer.OnURLsAvailable(is_user_triggered, sections);
   }
-}
-
-// static
-bool MostVisitedSites::IsNtpTileFromPreinstalledApp(GURL url) {
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  return url.is_valid() && url.SchemeIs(extensions::kExtensionScheme) &&
-         extension_misc::IsPreinstalledAppId(url.GetHost());
-#else
-  return false;
-#endif
-}
-
-// static
-bool MostVisitedSites::WasNtpAppMigratedToWebApp(PrefService* prefs, GURL url) {
-  const base::ListValue& migrated_apps =
-      prefs->GetList(webapps::kWebAppsMigratedPreinstalledApps);
-  for (const auto& val : migrated_apps) {
-    if (val.is_string() && val.GetString() == url.GetHost()) {
-      return true;
-    }
-  }
-  return false;
-}
-
-NTPTilesVector MostVisitedSites::RemoveInvalidPreinstallApps(
-    NTPTilesVector new_tiles) {
-  std::erase_if(new_tiles, [this](const NTPTile& ntp_tile) {
-    return MostVisitedSites::IsNtpTileFromPreinstalledApp(ntp_tile.url) &&
-           MostVisitedSites::WasNtpAppMigratedToWebApp(prefs_, ntp_tile.url);
-  });
-  return new_tiles;
 }
 
 NTPTilesVector MostVisitedSites::MergeTiles(NTPTilesVector personal_tiles,

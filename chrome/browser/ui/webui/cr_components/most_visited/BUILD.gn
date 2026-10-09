@@ -48,7 +48,6 @@ source_set("most_visited") {
     "//ui/webui/resources/cr_components/most_visited:mojom",
     "//url",
   ]
-  deps += [ "//chrome/browser/web_applications" ]
 }
 
 source_set("unit_tests") {

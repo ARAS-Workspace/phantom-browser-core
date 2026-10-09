@@ -34,7 +34,6 @@
 #include "components/ntp_tiles/tile_source.h"
 #include "components/ntp_tiles/tile_type.h"
 #include "components/supervised_user/core/common/buildflags.h"
-#include "components/webapps/common/constants.h"
 #include "url/gurl.h"
 
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
@@ -141,8 +140,7 @@ class MostVisitedSites :
       std::unique_ptr<PopularSites> popular_sites,
       std::unique_ptr<CustomLinksManager> custom_links,
       std::unique_ptr<EnterpriseShortcutsManager> enterprise_shortcuts,
-      std::unique_ptr<IconCacher> icon_cacher,
-      bool is_default_chrome_app_migrated);
+      std::unique_ptr<IconCacher> icon_cacher);
 
   MostVisitedSites(const MostVisitedSites&) = delete;
   MostVisitedSites& operator=(const MostVisitedSites&) = delete;
@@ -350,12 +348,6 @@ class MostVisitedSites :
   static NTPTilesVector MergeTiles(NTPTilesVector personal_tiles,
                                    NTPTilesVector popular_tiles);
 
-  // Verifies if NTPTile App was migrated to a WebApp.
-  static bool WasNtpAppMigratedToWebApp(PrefService* prefs, GURL url);
-
-  // Verifies if NTPTile App comes from a PreInstalledApp.
-  static bool IsNtpTileFromPreinstalledApp(GURL url);
-
  private:
   FRIEND_TEST_ALL_PREFIXES(MostVisitedSitesTest,
                            ShouldDeduplicateDomainWithNoWwwDomain);
@@ -441,9 +433,6 @@ class MostVisitedSites :
   void MergeMostVisitedTiles(bool is_user_triggered,
                              NTPTilesVector personal_tiles);
 
-  // Removes pre installed apps which turn invalid because of migration.
-  NTPTilesVector RemoveInvalidPreinstallApps(NTPTilesVector new_tiles);
-
   // Creates a new tiles vector consisting of |custom_links_cache_| combined
   // with |tiles|.
   NTPTilesVector ImposeCustomLinks(NTPTilesVector tiles);
@@ -508,7 +497,6 @@ class MostVisitedSites :
       enterprise_shortcuts_manager_;
   std::unique_ptr<IconCacher> const icon_cacher_;
   std::unique_ptr<HomepageClient> homepage_client_;
-  bool is_default_chrome_app_migrated_;
 
   base::ObserverList<Observer> observers_;
 

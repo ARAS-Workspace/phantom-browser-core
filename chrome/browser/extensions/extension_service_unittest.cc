@@ -183,7 +183,6 @@
 #include "chrome/browser/ui/global_error/global_error_service.h"
 #include "chrome/browser/ui/global_error/global_error_service_factory.h"
 #include "chrome/browser/ui/global_error/global_error_waiter.h"
-#include "chrome/browser/web_applications/preinstalled_app_install_features.h"
 #endif
 
 #if BUILDFLAG(ENABLE_PLUGINS)
@@ -6087,32 +6086,6 @@ TEST_F(ExtensionServiceTest, ExternalPrefProvider) {
     ScopedBrowserLocale guard("en-US");
     EXPECT_EQ(2, visitor.Visit(json_data));
   }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  // Test web_app_migration_flag.
-  {
-    json_data = R"(
-      {
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
-          "external_crx": "RandomExtension.crx",
-          "external_version": "1.0",
-          "web_app_migration_flag": "TestFeature"
-        }
-      })";
-
-    {
-      base::AutoReset<bool> testing_scope =
-          web_app::SetPreinstalledAppInstallFeatureAlwaysEnabledForTesting();
-      EXPECT_EQ(0, visitor.Visit(json_data));
-      visitor.provider()->HasExtension("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    }
-
-    {
-      EXPECT_EQ(1, visitor.Visit(json_data));
-      visitor.provider()->HasExtension("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    }
-  }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   // Test keep_if_present.
   json_data =

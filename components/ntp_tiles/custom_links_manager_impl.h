@@ -81,10 +81,6 @@ class CustomLinksManagerImpl : public CustomLinksManager,
   // |OnPreferenceChanged|.
   void StoreLinks();
 
-  // Checks during instantiation to remove custom shortcut links
-  // created through preinstalled apps.
-  void RemoveCustomLinksForPreinstalledApps();
-
   // history::HistoryServiceObserver implementation.
   // Deletes any Most Visited links whose URL is in |deletion_info|. Clears
   // |previous_links_|. Does not delete entries expired by HistoryService.
