@@ -991,10 +991,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
     allowed_types.Put(syncer::SESSIONS);
     allowed_types.Put(syncer::USER_EVENTS);
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-    allowed_types.Put(syncer::WEB_APPS);
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
     if (data_sharing::features::IsDataSharingFunctionalityEnabled()) {
       allowed_types.Put(syncer::SHARED_TAB_GROUP_DATA);
       allowed_types.Put(syncer::COLLABORATION_GROUP);

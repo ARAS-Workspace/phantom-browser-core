@@ -94,9 +94,7 @@
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_provider_factory.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #include "chrome/browser/webauthn/passkey_model_factory.h"
@@ -241,10 +239,6 @@ syncer::DataTypeController::TypeVector CreateChromeControllers(
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   builder.SetThemeService(ThemeServiceFactory::GetForProfile(profile));
-  builder.SetWebAppProvider(
-      web_app::AreWebAppsEnabled(profile)
-          ? web_app::WebAppProvider::GetForWebApps(profile)
-          : nullptr);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 

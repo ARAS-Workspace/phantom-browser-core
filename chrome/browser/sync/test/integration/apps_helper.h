@@ -14,9 +14,7 @@
 #include "base/scoped_multi_source_observation.h"
 #include "chrome/browser/sync/test/integration/status_change_checker.h"
 #include "chrome/browser/sync/test/integration/sync_test.h"
-#include "chrome/browser/web_applications/web_app_install_info.h"
 #include "components/sync/model/string_ordinal.h"
-#include "components/webapps/common/web_app_id.h"
 #include "extensions/browser/extension_prefs_observer.h"
 #include "extensions/browser/extension_registry_observer.h"
 #include "extensions/browser/install_observer.h"
@@ -46,11 +44,6 @@ std::string InstallPlatformApp(Profile* profile, int index);
 // Installs the hosted app for the given index to all profiles, and returns the
 // extension ID of the new app.
 std::string InstallHostedAppForAllProfiles(int index);
-
-// Installs the web app for the given WebAppInstallInfo and profile. This does
-// not download icons or run OS integration installs.
-webapps::AppId InstallWebApp(Profile* profile,
-                             std::unique_ptr<web_app::WebAppInstallInfo> info);
 
 // Uninstalls the app for the given index from |profile|. Assumes that it was
 // previously installed.
@@ -102,11 +95,6 @@ void SetAppLaunchOrdinalForApp(Profile* profile,
 
 // Fix any NTP icon collisions that are currently in |profile|.
 void FixNTPOrdinalCollisions(Profile* profile);
-
-// Flushes pending changes and verifies that the profiles have no pending
-// installs or uninstalls afterwards.
-bool AwaitWebAppQuiescence(
-    std::vector<raw_ptr<Profile, VectorExperimental>> profiles);
 }  // namespace apps_helper
 
 // An app specific version of StatusChangeChecker which checks the exit

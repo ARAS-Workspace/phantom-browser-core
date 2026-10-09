@@ -191,9 +191,6 @@ source_set("sync_integration_tests_impl") {
     "//chrome/browser/ui/tabs/saved_tab_groups",
     "//chrome/browser/ui/views/send_tab_to_self",
     "//chrome/browser/ui/views/toolbar",
-    "//chrome/browser/ui/web_applications",
-    "//chrome/browser/web_applications:features",
-    "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/browser/webdata_services",
     "//chrome/common",
     "//chrome/renderer",
@@ -212,8 +209,6 @@ source_set("sync_integration_tests_impl") {
     "//components/sync",
     "//components/trusted_vault",
     "//components/trusted_vault:test_support",
-    "//components/webapps/browser",
-    "//components/webapps/common",
     "//components/webauthn/core/browser",
     "//components/webauthn/core/browser:passkey_model",
     "//testing/gmock",
@@ -248,8 +243,6 @@ source_set("sync_integration_tests_impl") {
   }
   data += [
     "//chrome/test/data/password/",
-    "//chrome/test/data/web_apps/",
-    "//chrome/test/data/banners/",
     "//net/tools/testserver/",
     "//third_party/pywebsocket3/src/pywebsocket3/",
   ]
@@ -373,7 +366,6 @@ source_set("sync_integration_test_support") {
     "//components/sync_bookmarks",
     "//components/tab_groups",
     "//components/tabs:public",
-    "//components/webapps/common",
     "//content/public/browser",
     "//content/test:test_support",
     "//net",
@@ -409,11 +401,9 @@ source_set("sync_integration_test_support") {
     "//chrome/browser/themes",
     "//chrome/browser/ui/webui/signin:login_ui_service",
     "//chrome/browser/ui/webui/signin:test_support_ui",
-    "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/browser/webauthn",
     "//components/send_tab_to_self",
     "//components/trusted_vault",
-    "//components/webapps/browser",
     "//components/webauthn/core/browser",
     "//components/webauthn/core/browser:passkey_model",
   ]
