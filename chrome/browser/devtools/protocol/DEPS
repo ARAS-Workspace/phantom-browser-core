@@ -12,7 +12,4 @@ specific_include_rules = {
   "pwa_handler\\.cc": [
     "+components/web_package/signed_web_bundles"
   ],
-  "devtools_iwa_browsertest\\.cc": [
-    "+components/web_package/signed_web_bundles"
-  ]
 }

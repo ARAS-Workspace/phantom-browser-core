@@ -709,8 +709,6 @@ source_set("web_applications_test_support") {
     "isolated_web_apps/test/policy_test_utils.h",
     "test/debug_info_printer.cc",
     "test/debug_info_printer.h",
-    "test/external_app_registration_waiter.cc",
-    "test/external_app_registration_waiter.h",
     "test/fake_data_retriever.cc",
     "test/fake_data_retriever.h",
     "test/fake_environment.cc",
@@ -794,28 +792,6 @@ source_set("web_applications_test_support") {
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}
-
-# This has to be a separate target to avoid circular dependencies with
-# `//chrome/test:test_support` target.
-source_set("prevent_close_test_support") {
-  testonly = true
-
-  sources = [
-    "test/prevent_close_test_base.cc",
-    "test/prevent_close_test_base.h",
-  ]
-  deps = [
-    ":web_applications",
-    ":web_applications_test_support",
-    "//chrome/browser/policy:test_support",
-    "//chrome/browser/profiles:profile",
-    "//chrome/browser/ui",
-    "//chrome/test:test_support",
-    "//components/policy/core/common:test_support",
-    "//components/webapps/common",
-    "//ui/base:types",
-  ]
 }
 
 source_set("web_applications_unit_tests") {

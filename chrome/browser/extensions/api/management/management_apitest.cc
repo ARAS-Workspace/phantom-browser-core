@@ -4,11 +4,8 @@
 
 #include <map>
 #include <string>
-#include <string_view>
-#include <utility>
 
 #include "base/auto_reset.h"
-#include "base/strings/string_util.h"
 #include "base/test/gtest_tags.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
@@ -18,7 +15,6 @@
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_commands.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/extensions/extension_constants.h"
 #include "content/public/test/browser_test.h"
@@ -31,30 +27,14 @@
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/manifest.h"
 #include "extensions/test/extension_test_message_listener.h"
-#include "extensions/test/result_catcher.h"
-#include "extensions/test/test_extension_dir.h"
 #include "net/dns/mock_host_resolver.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/apps/intent_helper/preferred_apps_test_util.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/web_applications/web_app_dialogs.h"
 #include "chrome/browser/web_applications/os_integration/os_integration_manager.h"
-#include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"
-#include "chrome/browser/web_applications/test/fake_web_app_ui_manager.h"
 #include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_command_scheduler.h"
-#include "chrome/browser/web_applications/web_app_filter.h"
-#include "chrome/browser/web_applications/web_app_helpers.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
-#include "chrome/test/base/ui_test_utils.h"
-#include "components/services/app_service/public/cpp/app_launch_params.h"
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test_utils.h"
 #endif
@@ -68,18 +48,6 @@ using extensions::mojom::ManifestLocation;
 namespace {
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-// Used in tests for apps, which are not supported on Android.
-constexpr char kManifest[] =
-    R"({
-          "name": "Management API Test",
-          "version": "0.1",
-          "manifest_version": 3,
-          "background": {
-            "service_worker": "background.js"
-          },
-          "replacement_web_app": "%s"
-        })";
-
 bool ExpectChromeAppsDefaultEnabled() {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return false;
@@ -187,244 +155,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, CreateAppShortcut) {
   extensions::ManagementCreateAppShortcutFunction::SetAutoConfirmForTest(true);
   ASSERT_TRUE(RunExtensionTest("management/create_app_shortcut"));
 }
-
-// Skipped on Android because it does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, GenerateAppForLink) {
-  web_app::test::WaitUntilReady(web_app::WebAppProvider::GetForTest(profile()));
-  ASSERT_TRUE(RunExtensionTest("management/generate_app_for_link"));
-}
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-// TODO(crbug.com/371332103): Determine if this needs to be supported on desktop
-// Android. Chrome apps are not supported, but the replacement_web_app key can
-// be used (rarely) by extensions.
-class InstallReplacementWebAppApiTest : public ExtensionManagementApiTest {
- public:
-  InstallReplacementWebAppApiTest()
-      : https_test_server_(net::EmbeddedTestServer::TYPE_HTTPS) {
-    scoped_feature_list_.InitAndDisableFeature(
-        ::features::kWebAppInstallDialog);
-  }
-  ~InstallReplacementWebAppApiTest() override = default;
-
- protected:
-  void SetUpOnMainThread() override {
-    ExtensionManagementApiTest::SetUpOnMainThread();
-    https_test_server_.ServeFilesFromDirectory(test_data_dir_);
-    ASSERT_TRUE(https_test_server_.Start());
-
-    web_app::test::WaitUntilReady(
-        web_app::WebAppProvider::GetForTest(profile()));
-  }
-
-  void RunTest(std::string manifest,
-               std::string_view web_app_path,
-               std::string_view background_script,
-               bool from_webstore) {
-    extensions::TestExtensionDir extension_dir;
-    base::ReplaceFirstSubstringAfterOffset(
-        &manifest, 0, "%s", https_test_server_.GetURL(web_app_path).spec());
-    extension_dir.WriteManifest(manifest);
-    extension_dir.WriteFile(FILE_PATH_LITERAL("background.js"),
-                            background_script);
-    extensions::ResultCatcher catcher;
-    if (from_webstore) {
-      // |expected_change| is the expected change in the number of installed
-      // extensions.
-      ASSERT_TRUE(InstallExtensionFromWebstore(extension_dir.UnpackedPath(),
-                                               1 /* expected_change */));
-    } else {
-      ASSERT_TRUE(LoadExtension(extension_dir.UnpackedPath()));
-    }
-
-    ASSERT_TRUE(catcher.GetNextResult()) << catcher.message();
-  }
-
-  void RunInstallableWebAppTest(std::string manifest,
-                                std::string_view web_app_url,
-                                std::string_view web_app_start_url) {
-    static constexpr char kInstallReplacementWebApp[] =
-        R"(chrome.test.runWithUserGesture(function() {
-             chrome.management.installReplacementWebApp(function() {
-               chrome.test.assertNoLastError();
-               chrome.test.notifyPass();
-             });
-           });)";
-
-    base::AutoReset<web_app::InstallDialogTestResponse> auto_accept_pwa =
-        web_app::SetPwaInstallationAutoRespondForTesting(
-            web_app::InstallDialogTestResponse::kAcceptAndLaunch);
-    const GURL start_url = https_test_server_.GetURL(web_app_start_url);
-    webapps::AppId web_app_id =
-        web_app::GenerateAppId(/*manifest_id_path=*/std::nullopt, start_url);
-    auto* provider = web_app::WebAppProvider::GetForTest(profile());
-    EXPECT_FALSE(
-        provider->registrar_unsafe().GetInstallState(web_app_id).has_value());
-    EXPECT_EQ(0, static_cast<int>(
-                     provider->ui_manager().GetNumWindowsForApp(web_app_id)));
-
-    RunTest(manifest, web_app_url, kInstallReplacementWebApp,
-            true /* from_webstore */);
-    EXPECT_TRUE(provider->registrar_unsafe().AppMatches(
-        web_app_id,
-        web_app::WebAppFilter::InstalledInOperatingSystemForTesting()));
-    EXPECT_EQ(1, static_cast<int>(
-                     provider->ui_manager().GetNumWindowsForApp(web_app_id)));
-
-    // Call API again. It should launch the app.
-    RunTest(std::move(manifest), web_app_url, kInstallReplacementWebApp,
-            true /* from_webstore */);
-    EXPECT_TRUE(provider->registrar_unsafe().AppMatches(
-        web_app_id,
-        web_app::WebAppFilter::InstalledInOperatingSystemForTesting()));
-    EXPECT_EQ(2, static_cast<int>(
-                     provider->ui_manager().GetNumWindowsForApp(web_app_id)));
-  }
-
-  net::EmbeddedTestServer https_test_server_;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(InstallReplacementWebAppApiTest, NotWebstore) {
-  static constexpr char kBackground[] = R"(
-  chrome.management.installReplacementWebApp(function() {
-    chrome.test.assertLastError(
-        'Only extensions from the web store can install replacement web apps.');
-    chrome.test.notifyPass();
-  });)";
-
-  RunTest(
-      kManifest,
-      "/management/install_replacement_web_app/acceptable_web_app/index.html",
-      kBackground, false /* from_webstore */);
-}
-
-IN_PROC_BROWSER_TEST_F(InstallReplacementWebAppApiTest, NoGesture) {
-  static constexpr char kBackground[] = R"(
-  chrome.management.installReplacementWebApp(function() {
-    chrome.test.assertLastError(
-        'chrome.management.installReplacementWebApp requires a user gesture.');
-    chrome.test.notifyPass();
-  });)";
-
-  RunTest(
-      kManifest,
-      "/management/install_replacement_web_app/acceptable_web_app/index.html",
-      kBackground, true /* from_webstore */);
-}
-
-IN_PROC_BROWSER_TEST_F(InstallReplacementWebAppApiTest, NotInstallableWebApp) {
-  static constexpr char kBackground[] =
-      R"(chrome.test.runWithUserGesture(function() {
-           chrome.management.installReplacementWebApp(function() {
-             chrome.test.assertLastError(
-                 'Web app is not a valid installable web app.');
-             chrome.test.notifyPass();
-           });
-         });)";
-
-  RunTest(kManifest,
-          "/management/install_replacement_web_app/bad_web_app/index.html",
-          kBackground, true /* from_webstore */);
-}
-
-IN_PROC_BROWSER_TEST_F(InstallReplacementWebAppApiTest, InstallableWebApp) {
-  static constexpr char kGoodWebAppURL[] =
-      "/management/install_replacement_web_app/acceptable_web_app/index.html";
-
-  RunInstallableWebAppTest(kManifest, kGoodWebAppURL, kGoodWebAppURL);
-}
-
-// Check that web app still installs and launches correctly when start_url does
-// not match replacement_web_app_url.
-IN_PROC_BROWSER_TEST_F(InstallReplacementWebAppApiTest,
-                       InstallableWebAppWithStartUrl) {
-  static constexpr char kGoodWebAppUrl[] =
-      "/management/install_replacement_web_app/"
-      "acceptable_web_app_with_start_url/"
-      "index.html";
-  static constexpr char kGoodWebAppStartUrl[] =
-      "/management/install_replacement_web_app/"
-      "acceptable_web_app_with_start_url/"
-      "pwa_start_url.html";
-
-  RunInstallableWebAppTest(kManifest, kGoodWebAppUrl, kGoodWebAppStartUrl);
-}
-
-IN_PROC_BROWSER_TEST_F(InstallReplacementWebAppApiTest,
-                       InstallableWebAppInPlatformApp) {
-  static constexpr char kAppManifest[] =
-      R"({
-          "name": "Management API Test",
-          "version": "0.1",
-          "manifest_version": 2,
-          "app": {
-            "background": { "scripts": ["background.js"] }
-          },
-          "replacement_web_app": "%s"
-        })";
-  static constexpr char kGoodWebAppURL[] =
-      "/management/install_replacement_web_app/acceptable_web_app/index.html";
-
-  RunInstallableWebAppTest(kAppManifest, kGoodWebAppURL, kGoodWebAppURL);
-}
-
-IN_PROC_BROWSER_TEST_F(InstallReplacementWebAppApiTest, CapturedNavigation) {
-  base::AutoReset<web_app::InstallDialogTestResponse> auto_accept_pwa =
-      web_app::SetPwaInstallationAutoRespondForTesting(
-          web_app::InstallDialogTestResponse::kAcceptAndLaunch);
-
-  static constexpr char kAppBPath[] =
-      "/management/install_replacement_web_app/acceptable_web_app_standalone/"
-      "nested/index.html";
-
-  // Install App A with focus-existing.
-  // Scope will be derived from start_url, which covers kAppBPath.
-  const GURL appA_url = https_test_server_.GetURL(
-      "/management/install_replacement_web_app/acceptable_web_app_standalone/"
-      "index.html");
-  auto appA_info = web_app::WebAppInstallInfo::CreateForTesting(
-      appA_url, blink::mojom::DisplayMode::kStandalone,
-      web_app::mojom::UserDisplayMode::kStandalone,
-      blink::mojom::ManifestLaunchHandler_ClientMode::kFocusExisting);
-
-  webapps::AppId appA_id =
-      web_app::test::InstallWebApp(profile(), std::move(appA_info),
-                                   /*overwrite_existing_manifest_fields=*/true);
-
-  // Explicitly enable link capturing for App A via AppService to ensure it
-  // works on CrOS/AppService intent filtering.
-  apps_util::SetSupportedLinksPreferenceAndWait(profile(), appA_id);
-
-  // Use UrlLoadObserver to wait for the asynchronous app navigation to our
-  // start_url to complete. This handles the case where the window is created
-  // but initially loads about:blank.
-  ui_test_utils::UrlLoadObserver url_observer(appA_url);
-
-  // Launch App A window using AppServiceProxy to hit intent filters.
-  apps::AppServiceProxyFactory::GetForProfile(profile())->LaunchAppWithParams(
-      apps::AppLaunchParams(
-          appA_id, apps::LaunchContainer::kLaunchContainerWindow,
-          WindowOpenDisposition::NEW_WINDOW, apps::LaunchSource::kFromTest));
-
-  url_observer.Wait();
-
-  // We need a custom background script that expects an error because the
-  // navigation will be captured.
-  static constexpr char kExpectErrorScript[] =
-      R"(chrome.test.runWithUserGesture(function() {
-           chrome.management.installReplacementWebApp(function() {
-             chrome.test.assertLastError(
-                 'Failed to install the generated app.');
-             chrome.test.notifyPass();
-           });
-         });)";
-
-  RunTest(kManifest, kAppBPath, kExpectErrorScript, /*from_webstore=*/true);
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 // Tests actions on extensions when no management policy is in place.
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTest, ManagementPolicyAllowed) {

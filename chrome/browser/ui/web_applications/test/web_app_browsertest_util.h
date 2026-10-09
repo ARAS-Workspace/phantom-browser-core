@@ -14,7 +14,7 @@
 #include "base/scoped_observation.h"
 #include "chrome/browser/ui/browser_init_state.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
-#include "chrome/browser/web_applications/externally_managed_app_manager.h"
+#include "chrome/browser/web_applications/external_install_options.h"
 #include "chrome/browser/web_applications/web_app_constants.h"
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_install_manager_observer.h"
@@ -103,11 +103,6 @@ ExternalInstallOptions CreateInstallOptions(
     const ExternalInstallSource& source =
         ExternalInstallSource::kInternalDefault);
 
-// Synchronous version of ExternallyManagedAppManager::Install.
-ExternallyManagedAppManager::InstallResult ExternallyManagedAppManagerInstall(
-    Profile*,
-    ExternalInstallOptions);
-
 // This function simulates loading a given url via a link click.
 // If |proceed_through_interstitial| is true, asserts that a security
 // interstitial is shown, and clicks through it, before returning.
@@ -142,10 +137,6 @@ Browser* FindWebAppBrowser(Profile* profile, const webapps::AppId& app_id);
 void CloseAndWait(BrowserWindowInterface* browser);
 
 bool IsBrowserOpen(const BrowserWindowInterface* test_browser);
-
-// Install a web policy app with |url|.
-// Returns a valid app ID of the installed app or nullopt.
-std::optional<webapps::AppId> ForceInstallWebApp(Profile* profile, GURL url);
 
 // Helper class that lets you await one Browser added and one Browser removed
 // event. Optionally filters to a specific Browser with |filter|. Useful for

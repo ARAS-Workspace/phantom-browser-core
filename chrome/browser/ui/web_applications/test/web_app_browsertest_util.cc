@@ -393,29 +393,6 @@ ExternalInstallOptions CreateInstallOptions(
   return install_options;
 }
 
-ExternallyManagedAppManager::InstallResult ExternallyManagedAppManagerInstall(
-    Profile* profile,
-    ExternalInstallOptions install_options) {
-  DCHECK(profile);
-  auto* provider = WebAppProvider::GetForTest(profile);
-  DCHECK(provider);
-  test::WaitUntilReady(provider);
-  base::RunLoop run_loop;
-  ExternallyManagedAppManager::InstallResult result;
-
-  provider->externally_managed_app_manager().Install(
-      std::move(install_options),
-      base::BindLambdaForTesting(
-          [&result, &run_loop](
-              const GURL& provided_url,
-              ExternallyManagedAppManager::InstallResult install_result) {
-            result = install_result;
-            run_loop.Quit();
-          }));
-  run_loop.Run();
-  return result;
-}
-
 void NavigateViaLinkClickToURLAndWait(BrowserWindowInterface* browser,
                                       const GURL& url,
                                       bool proceed_through_interstitial) {
@@ -511,23 +488,6 @@ bool IsBrowserOpen(const BrowserWindowInterface* test_browser) {
         return !is_open;
       });
   return is_open;
-}
-
-std::optional<webapps::AppId> ForceInstallWebApp(Profile* profile, GURL url) {
-  web_app::ExternalInstallOptions install_options(
-      url, web_app::mojom::UserDisplayMode::kStandalone,
-      web_app::ExternalInstallSource::kExternalPolicy);
-  auto result =
-      ExternallyManagedAppManagerInstall(profile, std::move(install_options));
-  EXPECT_EQ(webapps::InstallResultCode::kSuccessNewInstall, result.code);
-  const auto& registrar =
-      WebAppProvider::GetForTest(profile)->registrar_unsafe();
-  std::optional<webapps::AppId> policy_app_id =
-      registrar.LookupExternalAppId(url);
-  EXPECT_TRUE(policy_app_id.has_value());
-  EXPECT_TRUE(
-      registrar.GetAppById(policy_app_id.value())->IsPolicyInstalledApp());
-  return policy_app_id;
 }
 
 BrowserWaiter::BrowserWaiter(BrowserWindowInterface* filter) : filter_(filter) {

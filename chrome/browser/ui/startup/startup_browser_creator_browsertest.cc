@@ -25,7 +25,6 @@
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/mock_callback.h"
-#include "base/test/mock_log.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_future.h"
@@ -4303,56 +4302,6 @@ INSTANTIATE_TEST_SUITE_P(
           [](unsigned char c) { return !absl::ascii_isalnum(c); }, '_');
       return name;
     });
-
-class StartupBrowserCreatorIwaCommandLineInstallProfilePickerErrorTest
-    : public StartupBrowserCreatorPickerTestBase {
- protected:
-  void SetUp() override {
-    if (!content::IsPreTest()) {
-      EXPECT_CALL(mock_log_, Log(testing::_, testing::_, testing::_, testing::_,
-                                 testing::_))
-          .Times(testing::AnyNumber());
-      EXPECT_CALL(
-          mock_log_,
-          Log(::logging::LOGGING_ERROR, testing::_, testing::_, testing::_,
-              testing::HasSubstr("Command line switches to install IWAs are "
-                                 "incompatible with the Profile Picker")));
-      mock_log_.StartCapturingLogs();
-    }
-
-    StartupBrowserCreatorPickerTestBase::SetUp();
-  }
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    if (!content::IsPreTest()) {
-      command_line->AppendSwitchASCII("install-isolated-web-app-from-url",
-                                      "http://localhost");
-    }
-
-    StartupBrowserCreatorPickerTestBase::SetUpCommandLine(command_line);
-  }
-
-  base::test::MockLog mock_log_;
-};
-
-// Create a secondary profile in a separate PRE run because the existence of
-// profiles is checked during startup in the actual test.
-IN_PROC_BROWSER_TEST_F(
-    StartupBrowserCreatorIwaCommandLineInstallProfilePickerErrorTest,
-    PRE_DoesNotInstallIwaIfProfilePickerOpens) {
-  CreateMultipleProfiles();
-  // Need to close the browser window manually so that the real test does not
-  // treat it as session restore.
-  CloseAllBrowsers();
-}
-
-IN_PROC_BROWSER_TEST_F(
-    StartupBrowserCreatorIwaCommandLineInstallProfilePickerErrorTest,
-    DoesNotInstallIwaIfProfilePickerOpens) {
-  EXPECT_EQ(0u, GlobalBrowserCollection::GetInstance()->GetSize());
-  // The `EXPECT_CALL` call in `SetUp()` will check that an error message about
-  // the IWA not being installable is logged.
-}
 
 class StartupBrowserCreatorOpenUrlsInNextProfileCreatedTest
     : public StartupBrowserCreatorPickerTestBase {

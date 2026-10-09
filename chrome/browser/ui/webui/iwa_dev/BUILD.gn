@@ -38,18 +38,3 @@ source_set("iwa_dev") {
     "//ui/webui",
   ]
 }
-
-source_set("browser_tests") {
-  testonly = true
-  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  deps = [
-    ":iwa_dev",
-    "//base/test:test_support",
-    "//chrome/browser/web_applications:web_applications_test_support",
-    "//chrome/test:test_support",
-    "//content/test:test_support",
-    "//net:test_support",
-    "//testing/gtest",
-    "//ui/shell_dialogs:test_support",
-  ]
-}

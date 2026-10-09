@@ -109,8 +109,6 @@ void CheckServiceWorkerStatus(const GURL& url,
                               content::StoragePartition* storage_partition,
                               content::ServiceWorkerCapability status);
 
-void SetWebAppSettingsListPref(Profile* profile, std::string_view pref);
-
 void AddInstallUrlData(PrefService* pref_service,
                        WebAppSyncBridge* sync_bridge,
                        const webapps::AppId& app_id,

@@ -30,7 +30,6 @@
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/functional/bind.h"
-#include "base/json/json_reader.h"
 #include "base/location.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/memory/weak_ptr.h"
@@ -79,7 +78,6 @@
 #include "chrome/browser/web_applications/web_app_registry_update.h"
 #include "chrome/browser/web_applications/web_app_sync_bridge.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
-#include "chrome/common/pref_names.h"
 #include "components/base32/base32.h"
 #include "components/prefs/pref_service.h"
 #include "components/services/app_service/public/cpp/file_handler.h"
@@ -1413,14 +1411,6 @@ void CheckServiceWorkerStatus(const GURL& url,
             run_loop.Quit();
           }));
   run_loop.Run();
-}
-
-void SetWebAppSettingsListPref(Profile* profile, std::string_view pref) {
-  auto result = base::JSONReader::ReadAndReturnValueWithError(
-      pref, base::JSONParserOptions::JSON_ALLOW_TRAILING_COMMAS);
-  DCHECK(result.has_value()) << result.error().message;
-  DCHECK(result->is_list());
-  profile->GetPrefs()->Set(prefs::kWebAppSettings, std::move(*result));
 }
 
 void AddInstallUrlData(PrefService* pref_service,

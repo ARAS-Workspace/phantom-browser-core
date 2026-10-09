@@ -15,7 +15,6 @@
 #include "base/functional/bind.h"
 #include "base/path_service.h"
 #include "base/run_loop.h"
-#include "base/strings/stringprintf.h"
 #include "base/test/scoped_path_override.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
@@ -23,9 +22,7 @@
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_service_test_base.h"
 #include "chrome/browser/extensions/external_provider_manager.h"
-#include "chrome/browser/extensions/external_testing_loader.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
-#include "chrome/browser/web_applications/preinstalled_app_install_features.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
@@ -301,53 +298,5 @@ TEST_F(ExternalProviderImplTest, NotBlockedExternalUserProviders) {
   EXPECT_TRUE(registry()->GetInstalledExtension(kExternalExtensionId));
 }
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
-// Desktop Android does not support web apps.
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-TEST_F(ExternalProviderImplTest, WebAppMigrationFlag) {
-  InitService(/*autoupdate_enabled=*/true);
-
-  const std::string json = base::StringPrintf(
-      R"(
-        {
-          "%s": {
-            "external_update_url": "%s",
-            "web_app_migration_flag": "TestFeature"
-          }
-        }
-      )",
-      kGoodApp.app_id,
-      test_server_->GetURL(kGoodApp.update_path).spec().c_str());
-  external_provider_manager()->AddProviderForTesting(
-      std::make_unique<ExternalProviderImpl>(
-          external_provider_manager(),
-          base::MakeRefCounted<ExternalTestingLoader>(
-              json, base::FilePath(FILE_PATH_LITERAL("//absolute/path"))),
-          profile(), mojom::ManifestLocation::kExternalPref,
-          mojom::ManifestLocation::kExternalPrefDownload, Extension::NO_FLAGS));
-
-  // App is not installed, we should not install if the flag is enabled.
-  {
-    base::AutoReset<bool> testing_scope =
-        web_app::SetPreinstalledAppInstallFeatureAlwaysEnabledForTesting();
-    AwaitCheckForExternalUpdates();
-    EXPECT_FALSE(registry()->GetInstalledExtension(kGoodApp.app_id));
-  }
-
-  // Disable the flag to install the app.
-  {
-    AwaitCheckForExternalUpdates();
-    EXPECT_TRUE(registry()->GetInstalledExtension(kGoodApp.app_id));
-  }
-
-  // App is now installed, we should not uninstall if the flag is enabled.
-  {
-    base::AutoReset<bool> testing_scope =
-        web_app::SetPreinstalledAppInstallFeatureAlwaysEnabledForTesting();
-    AwaitCheckForExternalUpdates();
-    EXPECT_TRUE(registry()->GetInstalledExtension(kGoodApp.app_id));
-  }
-}
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
 }  // namespace extensions
