@@ -248,7 +248,6 @@ source_set("sync_integration_tests_impl") {
   }
   data += [
     "//chrome/test/data/password/",
-    "//chrome/test/data/webapps_integration/",
     "//chrome/test/data/web_apps/",
     "//chrome/test/data/banners/",
     "//net/tools/testserver/",
