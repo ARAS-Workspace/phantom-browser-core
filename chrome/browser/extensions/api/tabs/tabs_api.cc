@@ -85,12 +85,7 @@
 #include "chrome/browser/ui/browser_init_state.h"
 #include "chrome/browser/ui/unload_controller.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#include "chrome/browser/ui/web_applications/web_app_launch_utils.h"
 #include "chrome/browser/ui/window_sizer/window_sizer.h"
-#include "chrome/browser/web_applications/web_app_filter.h"
-#include "chrome/browser/web_applications/web_app_helpers.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
 #include "components/webapps/isolated_web_apps/scheme.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
@@ -118,14 +113,6 @@ constexpr char kCannotFindTabToDiscard[] = "Cannot find a tab to discard.";
 constexpr char kCannotUnhighlightAllTabsError[] =
     "Cannot unhighlight all tabs.";
 
-constexpr char kWindowCreateSupportsOnlySingleIwaUrlError[] =
-    "When creating a window for a URL with the 'isolated-app:' scheme, only "
-    "one tab can be added to the window.";
-constexpr char kWindowCreateCannotParseIwaUrlError[] =
-    "Unable to parse 'isolated-app:' URL: %s";
-constexpr char kWindowCreateCannotUseTabIdWithIwaError[] =
-    "Creating a new window for an Isolated Web App does not support adding a "
-    "tab by its ID.";
 constexpr char kCannotMoveIwaTabError[] =
     "The tab of an Isolated Web App cannot be moved.";
 constexpr char kTabsCreateIwaUrlNotAllowedError[] =
@@ -189,71 +176,6 @@ bool SetOpenerOfTab(Profile& profile,
   tab_list->SetOpenerForTab(tab.GetHandle(), opener.GetHandle());
 
   return true;
-}
-
-// Returns the IsolatedWebAppUrlInfo for the given call to windows.create() if
-// the call is to create a new IWA window.
-// Populates `error` with an error if the call is invalid.
-// Note that returning std::nullopt *can* be valid (if error is unpopulated);
-// this indicates the call is not for an IWA window.
-std::optional<web_app::IsolatedWebAppUrlInfo> GetIsolatedWebAppInfo(
-    const std::optional<windows::Create::Params::CreateData>& create_data,
-    const std::vector<GURL>& parsed_urls,
-    std::string* error) {
-  if (parsed_urls.size() > 1) {
-    if (std::ranges::any_of(parsed_urls, [](const GURL& url) {
-          return url.SchemeIs(webapps::kIsolatedAppScheme);
-        })) {
-      // Invalid. Can only open a single IWA URL.
-      *error = kWindowCreateSupportsOnlySingleIwaUrlError;
-      return std::nullopt;
-    }
-  }
-
-  if (parsed_urls.empty() ||
-      !parsed_urls[0].SchemeIs(webapps::kIsolatedAppScheme)) {
-    // Valid; not opening an IWA.
-    return std::nullopt;
-  }
-
-  base::expected<web_app::IsolatedWebAppUrlInfo, std::string> maybe_url_info =
-      web_app::IsolatedWebAppUrlInfo::Create(parsed_urls[0]);
-
-  if (!maybe_url_info.has_value()) {
-    // Invalid. Failed to create IWA info.
-    *error = base::StringPrintf(kWindowCreateCannotParseIwaUrlError,
-                                maybe_url_info.error().c_str());
-    return std::nullopt;
-  }
-
-  // Validate `create_data` params to make sure they're compatible with IWAs.
-  if (create_data) {
-    if (create_data->tab_id) {
-      // Invalid. Can't specify tab ID with IWAs.
-      *error = kWindowCreateCannotUseTabIdWithIwaError;
-      return std::nullopt;
-    }
-
-    switch (create_data->type) {
-      case windows::CreateType::kNone:
-      case windows::CreateType::kNormal:
-        break;  // Valid type.
-      case windows::CreateType::kPopup:
-      case windows::CreateType::kPanel:
-        // Invalid window type for IWAs.
-        *error = kInvalidWindowTypeError;
-        return std::nullopt;
-    }
-
-    if (create_data->set_self_as_opener && *create_data->set_self_as_opener) {
-      // Invalid. Can't have openers with IWAs.
-      *error = "Cannot specify setSelfAsOpener for isolated-app:// URLs.";
-      return std::nullopt;
-    }
-  }
-
-  // Valid IWA parameters.
-  return *maybe_url_info;
 }
 
 class ScopedPinBrowserAtFront {
@@ -870,12 +792,6 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
 
   std::string error;
 
-  isolated_web_app_url_info_ =
-      GetIsolatedWebAppInfo(create_data_, urls_, &error);
-  if (!error.empty()) {
-    return RespondNow(Error(std::move(error)));
-  }
-
   // Decide whether we are opening a normal window or an incognito window.
   Profile* calling_profile = Profile::FromBrowserContext(browser_context());
   windows_util::IncognitoResult incognito_result =
@@ -985,17 +901,6 @@ ExtensionFunction::ResponseAction WindowsCreateFunction::Run() {
                                           user_gesture());
 
   bool initialized_type = false;
-  if (isolated_web_app_url_info_.has_value()) {
-    create_params.type = BrowserWindowInterface::TYPE_APP;
-    create_params.app_name = web_app::GenerateApplicationNameFromAppId(
-        isolated_web_app_url_info_->app_id());
-    // For Isolated Web Apps, the actual navigating-to URL will be the app's
-    // start_url to prevent deep-linking attacks, while the original URL will be
-    // accessible via window.launchQueue; for this reason the browser is marked
-    // trusted.
-    create_params.is_trusted_source = true;
-    initialized_type = true;
-  }
 
   if (!initialized_type && !extension_id.empty()) {
     // extension_id is only set for CREATE_TYPE_POPUP.
@@ -1072,46 +977,11 @@ ExtensionFunction::ResponseValue WindowsCreateFunction::OnBrowserWindowCreated(
     return navigate_params;
   };
 
-  bool navigated = false;
-  if (isolated_web_app_url_info_) {
-    CHECK_EQ(urls_.size(), 1U);
-    const GURL& original_url = urls_[0];
-
-    const webapps::AppId& iwa_id = isolated_web_app_url_info_->app_id();
-    web_app::WebAppRegistrar& registrar =
-        web_app::WebAppProvider::GetForWebApps(new_window->GetProfile())
-            ->registrar_unsafe();
-
-    // TODO(crbug.com/424128443): create an dummy tab in the browser so that the
-    // returned window's tab count is always equal to 1 -- this will limit the
-    // extension's ability to figure out which IWAs are installed without the
-    // `tabs` permission.
-    if (registrar.AppMatches(iwa_id, web_app::WebAppFilter::IsIsolatedApp())) {
-      NavigateParams navigate_params = create_nav_params(
-          registrar.GetAppStartUrl(iwa_id), /*is_first_nav=*/true);
-      webapps::LaunchParams launch_params;
-      CHECK(navigate_params.web_app_navigation_data);
-      launch_params.set_app_id(iwa_id);
-      launch_params.set_target_url(original_url);
-      navigate_params.web_app_navigation_data->SetLaunchParams(
-          std::move(launch_params));
-
-      // Navigate() takes care of enqueueing the launch params once the
-      // navigation commits.
-      base::WeakPtr<content::NavigationHandle> handle =
-          Navigate(&navigate_params);
-      CHECK(handle);
-    }
-    navigated = true;
-  }
-
-  if (!navigated) {
-    bool is_first_nav = true;
-    for (const GURL& url : urls_) {
-      NavigateParams navigate_params = create_nav_params(url, is_first_nav);
-      is_first_nav = false;
-      Navigate(&navigate_params);
-    }
+  bool is_first_nav = true;
+  for (const GURL& url : urls_) {
+    NavigateParams navigate_params = create_nav_params(url, is_first_nav);
+    is_first_nav = false;
+    Navigate(&navigate_params);
   }
 
   TabListInterface* tab_list = TabListInterface::From(new_window);

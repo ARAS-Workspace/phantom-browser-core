@@ -30,8 +30,6 @@
 #include "ui/base/mojom/window_show_state.mojom-forward.h"
 #include "url/gurl.h"
 
-#include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 class BrowserWindowInterface;
@@ -54,10 +52,6 @@ class TabInterface;
 
 namespace user_prefs {
 class PrefRegistrySyncable;
-}
-
-namespace web_app {
-class IsolatedWebAppUrlInfo;
 }
 
 namespace extensions {
@@ -193,9 +187,6 @@ class WindowsCreateFunction : public ExtensionFunction {
   // created browser window.
   // Returns the response to pass back to the extension.
   ResponseValue OnBrowserWindowCreated(BrowserWindowInterface* new_window);
-
-  // The info for an isolated web app to open, if any.
-  std::optional<web_app::IsolatedWebAppUrlInfo> isolated_web_app_url_info_;
 
   // The creation data parameters supplied by the extension.
   std::optional<api::windows::Create::Params::CreateData> create_data_;
