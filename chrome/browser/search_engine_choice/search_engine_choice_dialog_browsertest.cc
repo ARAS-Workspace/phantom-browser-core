@@ -31,11 +31,7 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
 #include "chrome/browser/ui/webui/ntp/new_tab_ui.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -55,7 +51,6 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/variations/variations_switches.h"
 #include "components/version_info/version_info.h"
-#include "components/webapps/common/web_app_id.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/browser_test.h"
@@ -127,16 +122,6 @@ class MockSearchEngineChoiceDialogService
  private:
   unsigned int number_of_browsers_with_dialogs_open_ = 0;
 };
-
-webapps::AppId InstallPWA(Profile* profile, const GURL& start_url) {
-  auto web_app_info =
-      web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(start_url);
-  web_app_info->scope = start_url.GetWithoutFilename();
-  web_app_info->user_display_mode =
-      web_app::mojom::UserDisplayMode::kStandalone;
-  web_app_info->title = u"A Web App";
-  return web_app::test::InstallWebApp(profile, std::move(web_app_info));
-}
 
 }  // namespace
 
@@ -289,7 +274,6 @@ class SearchEngineChoiceDialogBrowserTest : public InProcessBrowserTest {
   }
 
  private:
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
   base::AutoReset<bool> scoped_chrome_build_override_ =
       SearchEngineChoiceDialogServiceFactory::
           ScopedChromeBuildOverrideForTesting(
@@ -626,26 +610,6 @@ IN_PROC_BROWSER_TEST_F(
         search_engines::kSearchEngineChoiceScreenNavigationConditionsHistogram,
         SearchEngineChoiceScreenConditions::kExtensionControlled, 1);
   }
-}
-
-IN_PROC_BROWSER_TEST_F(SearchEngineChoiceDialogBrowserTest,
-                       DialogDoesNotShownForWebApp) {
-  Profile* profile = browser()->GetProfile();
-  auto* service = static_cast<MockSearchEngineChoiceDialogService*>(
-      SearchEngineChoiceDialogServiceFactory::GetForProfile(profile));
-
-  const GURL start_url("https://app.site.test/example/index");
-  const webapps::AppId app_id = InstallPWA(profile, start_url);
-
-  // PWA browsers should not show the dialog.
-  Browser* app_browser = web_app::LaunchWebAppBrowserAndWait(profile, app_id);
-  EXPECT_FALSE(service->IsShowingDialog(*app_browser));
-
-  // The same URL in the regular browser shows the dialog.
-  ASSERT_TRUE(ui_test_utils::NavigateToURLWithDisposition(
-      browser(), start_url, WindowOpenDisposition::CURRENT_TAB,
-      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP));
-  EXPECT_TRUE(service->IsShowingDialog(*browser()));
 }
 
 IN_PROC_BROWSER_TEST_F(SearchEngineChoiceDialogBrowserTest,

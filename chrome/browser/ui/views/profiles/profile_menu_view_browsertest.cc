@@ -77,16 +77,7 @@
 #include "chrome/browser/ui/views/toolbar/avatar_toolbar_button_interface.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/ui/views/toolbar/webui_test_utils.h"
-#include "chrome/browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_test_helper.h"
-#include "chrome/browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_view.h"
-#include "chrome/browser/ui/web_applications/web_app_browsertest_base.h"
 #include "chrome/browser/ui/webui/signin/login_ui_test_utils.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/test/web_app_test_utils.h"
-#include "chrome/browser/web_applications/web_app_helpers.h"
-#include "chrome/browser/web_applications/web_app_install_info.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/webauthn/passkey_unlock_manager.h"
 #include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "chrome/common/chrome_paths.h"
@@ -128,7 +119,6 @@
 #include "components/sync_device_info/test_device_info_builder.h"
 #include "components/user_education/common/feature_promo/feature_promo_controller.h"
 #include "components/user_education/common/feature_promo/feature_promo_result.h"
-#include "components/webapps/common/web_app_id.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_navigation_observer.h"
@@ -178,16 +168,6 @@ Profile* CreateAdditionalProfile() {
   EXPECT_EQ(starting_number_of_profiles + 1,
             profile_manager->GetNumberOfProfiles());
   return &profile;
-}
-
-const char kPasswordManagerId[] = "chrome://password-manager/";
-const char kPasswordManagerPWAUrl[] = "chrome://password-manager/?source=pwa";
-
-std::unique_ptr<web_app::WebAppInstallInfo> CreatePasswordManagerWebAppInfo() {
-  auto web_app_info = std::make_unique<web_app::WebAppInstallInfo>(
-      webapps::ManifestId(GURL(kPasswordManagerId)), GURL(kPasswordManagerPWAUrl));
-  web_app_info->title = u"Password Manager";
-  return web_app_info;
 }
 
 void Click(views::View* clickable_view) {
@@ -2340,83 +2320,6 @@ PROFILE_MENU_CLICK_TEST_WITH_FEATURE_STATES_F(
   RunTest();
 }
 
-class ProfileMenuClickTestWebApp : public ProfileMenuClickTest {
- protected:
-  void SetUpOnMainThread() override {
-    ProfileMenuClickTest::SetUpOnMainThread();
-
-    // OS integration is needed to be able to launch web applications. This
-    // override ensures OS integration doesn't leave any traces.
-    override_registration_ =
-        web_app::OsIntegrationTestOverrideImpl::OverrideForTesting();
-  }
-
-  void TearDownOnMainThread() override {
-    for (Profile* profile :
-         g_browser_process->profile_manager()->GetLoadedProfiles()) {
-      web_app::test::UninstallAllWebApps(profile);
-    }
-    override_registration_.reset();
-    ProfileMenuClickTest::TearDownOnMainThread();
-  }
-
-  WebAppFrameToolbarTestHelper& toolbar_helper() {
-    return web_app_frame_toolbar_helper_;
-  }
-
- private:
-  // OS integration is needed to be able to launch web applications. This
-  // override ensures OS integration doesn't leave any traces.
-  std::unique_ptr<web_app::OsIntegrationTestOverrideImpl::BlockingRegistration>
-      override_registration_;
-  WebAppFrameToolbarTestHelper web_app_frame_toolbar_helper_;
-};
-
-// List of actionable items in the correct order as they appear in the menu.
-// If a new button is added to the menu, it should also be added to this list.
-constexpr std::array kActionableItems_PasswordManagerWebApp = {
-    ProfileMenuViewBase::ActionableItem::kOtherProfileButton};
-
-PROFILE_MENU_CLICK_TEST_F(ProfileMenuClickTestWebApp,
-                          kActionableItems_PasswordManagerWebApp,
-                          ProfileMenuClickTest_PasswordManagerWebApp) {
-  // Add an additional profile.
-  CreateAdditionalProfile();
-
-  // Install and launch an application for the first profile.
-  webapps::AppId app_id = toolbar_helper().InstallAndLaunchCustomWebApp(
-      browser(), CreatePasswordManagerWebAppInfo(),
-      GURL(kPasswordManagerPWAUrl));
-  SetTargetBrowser(toolbar_helper().app_browser());
-  RunTest();
-}
-
-#if BUILDFLAG(IS_MAC)
-// List of actionable items in the correct order as they appear in the menu.
-// If a new button is added to the menu, it should also be added to this list.
-// Unfortunately by how Click Tests work we can't verify how many other profile
-// buttons are present, so this test merely verifies that at least one exists.
-constexpr std::array kActionableItems_RegularWebApp = {
-    ProfileMenuViewBase::ActionableItem::kOtherProfileButton};
-PROFILE_MENU_CLICK_TEST_F(ProfileMenuClickTestWebApp,
-                          kActionableItems_RegularWebApp,
-                          ProfileMenuClickTest_RegularWebApp) {
-  // Add an additional profile.
-  Profile* profile1 = GetProfile();
-  Profile* profile2 = CreateAdditionalProfile();
-
-  // Install and launch an application in profile1 and also install the same
-  // app in profile2.
-  webapps::AppId app_id = toolbar_helper().InstallAndLaunchWebApp(
-      profile1, GURL("https://test.org"));
-  SetTargetBrowser(toolbar_helper().app_browser());
-  EXPECT_EQ(app_id,
-            toolbar_helper().InstallWebApp(profile2, GURL("https://test.org")));
-
-  RunTest();
-}
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class ProfileMenuHatsSurveyTest : public ProfileMenuViewTestBase,
                                   public InProcessBrowserTest {
@@ -2635,129 +2538,3 @@ IN_PROC_BROWSER_TEST_F(ProfileMenuHatsSurveyTest,
 }
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-class ProfileMenuViewWebAppTest : public ProfileMenuViewTestBase,
-                                  public web_app::WebAppBrowserTestBase {
- protected:
-  void TearDownOnMainThread() override {
-    for (Profile* profile :
-         g_browser_process->profile_manager()->GetLoadedProfiles()) {
-      web_app::test::UninstallAllWebApps(profile);
-    }
-    web_app::WebAppBrowserTestBase::TearDownOnMainThread();
-  }
-
-  WebAppFrameToolbarTestHelper& toolbar_helper() {
-    return web_app_frame_toolbar_helper_;
-  }
-
- private:
-  WebAppFrameToolbarTestHelper web_app_frame_toolbar_helper_;
-};
-
-IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebAppTest,
-                       SelectingOtherProfilePasswordManager) {
-  // Create a second profile.
-  Profile* second_profile = CreateAdditionalProfile();
-  web_app::test::WaitUntilWebAppProviderAndSubsystemsReady(
-      web_app::WebAppProvider::GetForTest(second_profile));
-  ASSERT_FALSE(ProfileBrowserCollection::GetForProfile(second_profile)
-                   ->GetLastActiveBrowser());
-
-  // Install and launch an application for the first profile.
-  webapps::AppId app_id = toolbar_helper().InstallAndLaunchCustomWebApp(
-      browser(), CreatePasswordManagerWebAppInfo(),
-      GURL(kPasswordManagerPWAUrl));
-  SetTargetBrowser(toolbar_helper().app_browser());
-
-  // Open profile menu.
-  OpenProfileMenu(toolbar_helper().browser_view()->browser());
-
-  // Select other profile by advancing the focus one step forward
-  profile_menu_view()->GetFocusManager()->AdvanceFocus(/*reverse=*/false);
-  auto* focused_item = profile_menu_view()->GetFocusManager()->GetFocusedView();
-  ASSERT_TRUE(focused_item);
-
-  // Wait for the new app window to be open for the second profile.
-  ui_test_utils::AllBrowserTabAddedWaiter waiter;
-  Click(focused_item);
-  content::WebContents* new_web_contents = waiter.Wait();
-  ASSERT_TRUE(new_web_contents);
-  BrowserWindowInterface* new_browser =
-      ProfileBrowserCollection::GetForProfile(second_profile)
-          ->GetLastActiveBrowser();
-  ASSERT_TRUE(new_browser);
-  EXPECT_TRUE(new_browser->GetType() == BrowserWindowInterface::TYPE_APP);
-  EXPECT_EQ(new_browser->GetTabStripModel()->GetActiveWebContents(),
-            new_web_contents);
-  EXPECT_EQ(new_web_contents->GetVisibleURL(), GURL(kPasswordManagerPWAUrl));
-}
-
-#if BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebAppTest, SelectingOtherProfile) {
-  // Add additional profiles.
-  Profile* profile1 = profile();
-  Profile* profile2 = CreateAdditionalProfile();
-  Profile* profile3 = CreateAdditionalProfile();
-
-  // Install an application in first and third profiles, launching only in the
-  // first profile.
-  webapps::AppId app_id = toolbar_helper().InstallAndLaunchWebApp(
-      profile1, GURL("https://test.org"));
-  EXPECT_EQ(app_id,
-            toolbar_helper().InstallWebApp(profile3, GURL("https://test.org")));
-  SetTargetBrowser(toolbar_helper().app_browser());
-  EXPECT_FALSE(ProfileBrowserCollection::GetForProfile(profile3)
-                   ->GetLastActiveBrowser());
-
-  // Open profile menu in first profile.
-  OpenProfileMenu(toolbar_helper().browser_view()->browser());
-
-  // Select third profile by advancing the focus one step forward.
-  profile_menu_view()->GetFocusManager()->AdvanceFocus(/*reverse=*/false);
-  auto* focused_item = profile_menu_view()->GetFocusManager()->GetFocusedView();
-  ASSERT_TRUE(focused_item);
-
-  // Wait for the new app window to be open for the third profile.
-  ui_test_utils::AllBrowserTabAddedWaiter waiter;
-  Click(focused_item);
-  content::WebContents* new_web_contents = waiter.Wait();
-  ASSERT_TRUE(new_web_contents);
-  EXPECT_FALSE(ProfileBrowserCollection::GetForProfile(profile2)
-                   ->GetLastActiveBrowser());
-  BrowserWindowInterface* new_browser =
-      ProfileBrowserCollection::GetForProfile(profile3)->GetLastActiveBrowser();
-  ASSERT_TRUE(new_browser);
-  EXPECT_TRUE(new_browser->GetType() == BrowserWindowInterface::TYPE_APP);
-  EXPECT_EQ(new_browser->GetTabStripModel()->GetActiveWebContents(),
-            new_web_contents);
-  EXPECT_EQ(new_web_contents->GetVisibleURL(), GURL("https://test.org"));
-}
-
-IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebAppTest, ProfileMenuVisibility) {
-  // Add an additional profile.
-  Profile* profile1 = profile();
-  Profile* profile2 = CreateAdditionalProfile();
-
-  // Install and launch an application in first profile.
-  webapps::AppId app_id = toolbar_helper().InstallAndLaunchWebApp(
-      profile1, GURL("https://test.org"));
-
-  // Verify that avatar button is not visible.
-  AvatarToolbarButtonTestAccessor avatar_accessor1(
-      toolbar_helper().browser_view()->browser());
-  ASSERT_TRUE(avatar_accessor1.GetEnabled());
-  EXPECT_FALSE(avatar_accessor1.GetVisible());
-
-  // Now install and launch application in second profile.
-  EXPECT_EQ(app_id, toolbar_helper().InstallAndLaunchWebApp(
-                        profile2, GURL("https://test.org")));
-
-  // Avatar button should be visible in both profiles.
-  EXPECT_TRUE(avatar_accessor1.GetVisible());
-  AvatarToolbarButtonTestAccessor avatar_accessor2(
-      toolbar_helper().browser_view()->browser());
-  ASSERT_TRUE(avatar_accessor1.GetEnabled());
-  EXPECT_TRUE(avatar_accessor1.GetVisible());
-}
-#endif  // BUILDFLAG(IS_MAC)

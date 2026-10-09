@@ -224,7 +224,6 @@ source_set("browser_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   sources = [
     "content_setting_bubble_dialog_browsertest.cc",
-    "custom_tab_bar_view_browsertest.cc",
     "location_bar_view_browsertest.cc",
     "location_icon_view_browsertest.cc",
     "webui_location_bar_browsertest.cc",

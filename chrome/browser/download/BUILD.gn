@@ -282,7 +282,6 @@ source_set("test_support") {
   public_deps += [ "//chrome/test:test_support" ]
   deps += [
     "//chrome/browser/ui/browser_window",
-    "//chrome/browser/web_applications:web_applications_test_support",
     "//content/test:test_support",
   ]
 }
@@ -369,7 +368,6 @@ source_set("browser_tests") {
     "//base",
     "//chrome/browser/subresource_filter:test_support",
     "//chrome/browser/ui:chrome_pages",
-    "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
     "//components/history/content/browser",

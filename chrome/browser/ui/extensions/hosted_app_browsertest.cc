@@ -2514,8 +2514,7 @@ IN_PROC_BROWSER_TEST_P(HostedAppOriginIsolationTest,
 
 INSTANTIATE_TEST_SUITE_P(All,
                          HostedOrWebAppTest,
-                         ::testing::Values(AppType::HOSTED_APP,
-                                           AppType::WEB_APP),
+                         ::testing::Values(AppType::HOSTED_APP),
                          AppTypeParamToString);
 
 INSTANTIATE_TEST_SUITE_P(All,

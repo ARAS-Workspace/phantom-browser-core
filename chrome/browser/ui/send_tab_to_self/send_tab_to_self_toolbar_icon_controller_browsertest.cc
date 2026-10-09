@@ -20,10 +20,6 @@
 #include "chrome/browser/ui/toasts/toast_service.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/send_tab_to_self/send_tab_to_self_toolbar_bubble_controller.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/send_tab_to_self/fake_send_tab_to_self_model.h"
@@ -72,35 +68,11 @@ class SendTabToSelfToolbarIconControllerTest : public InProcessBrowserTest {
   SendTabToSelfToolbarBubbleController* bubble_controller() {
     return SendTabToSelfToolbarBubbleController::From(browser());
   }
-
- private:
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
 };
 
 IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
                        ControllerExists) {
   EXPECT_TRUE(controller());
-}
-
-// Regression test for crbug.com/534231383.
-IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerTest,
-                       OpenPwaInBackgroundDoesNotCrash) {
-  GURL app_url("https://www.example-a.com/app/index.html");
-  auto web_app_info =
-      web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(app_url);
-  web_app_info->display_mode = blink::mojom::DisplayMode::kBrowser;
-
-  webapps::AppId app_id = web_app::test::InstallWebApp(browser()->GetProfile(),
-                                                       std::move(web_app_info));
-
-  SendTabToSelfEntry entry("a", app_url, "PWA site", base::Time(), "device a",
-                           "device b", PageContext(), NavigationHistory());
-
-  base::WeakPtr<content::WebContents> opened_contents =
-      OpenEntryInNewBackgroundTab(browser()->GetProfile(), entry);
-
-  EXPECT_TRUE(opened_contents);
-  EXPECT_EQ(app_url, opened_contents->GetURL());
 }
 
 // Test suite for tests that expect the receiving bubble UI to be shown.
@@ -146,38 +118,6 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
 
   Browser* incognito_browser = CreateIncognitoBrowser();
   WaitUntilBrowserBecomeActiveOrLastActive(incognito_browser);
-
-  SendTabToSelfEntry entry("a", GURL("https://www.example-a.com"), "a site",
-                           base::Time(), "device a", "device b", PageContext(),
-                           NavigationHistory());
-
-  EXPECT_FALSE(browser()->IsActive());
-  controller()->DisplayNewEntries({&entry});
-  EXPECT_FALSE(bubble_controller()->IsBubbleShowing());
-
-  browser_view()->Activate();
-  WaitUntilBrowserBecomeActiveOrLastActive(browser());
-  EXPECT_TRUE(bubble_controller()->IsBubbleShowing());
-}
-
-#define MAYBE_StorePendingNewEntryFromWebApp StorePendingNewEntryFromWebApp
-IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
-                       MAYBE_StorePendingNewEntryFromWebApp) {
-#if BUILDFLAG(IS_OZONE)
-  if (::ui::OzonePlatform::RunningOnWaylandForTest()) {
-    GTEST_SKIP() << "Wayland doesn't support changing window activation "
-                    "programmatically";
-  }
-#endif
-  ASSERT_TRUE(browser()->IsActive());
-  auto web_app_info = web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(
-      GURL("https://example.org/"));
-  webapps::AppId app_id = web_app::test::InstallWebApp(browser()->GetProfile(),
-                                                       std::move(web_app_info));
-  Browser* app_browser =
-      web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  BrowserView::GetBrowserViewForBrowser(app_browser)->Activate();
-  WaitUntilBrowserBecomeActiveOrLastActive(app_browser);
 
   SendTabToSelfEntry entry("a", GURL("https://www.example-a.com"), "a site",
                            base::Time(), "device a", "device b", PageContext(),

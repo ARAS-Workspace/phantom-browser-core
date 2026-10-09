@@ -18,6 +18,7 @@
 #include "base/test/metrics/user_action_tester.h"
 #include "base/test/run_until.h"
 #include "base/time/time.h"
+#include "base/version.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/signin/profile_management_disclaimer_service.h"
 #include "chrome/browser/enterprise/signin/profile_management_disclaimer_service_factory.h"
@@ -50,10 +51,7 @@
 #include "chrome/browser/ui/signin/dice_web_signin_interceptor_delegate.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
 #include "chrome/browser/ui/webui/settings/people_handler.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/profile_waiter.h"
@@ -388,8 +386,6 @@ class DiceWebSigninInterceptorBrowserTest : public SigninBrowserTestBase {
     test_account_preview_data_services_[context] = test_service.get();
     return test_service;
   }
-
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
 
   absl::flat_hash_map<content::BrowserContext*,
                       raw_ptr<FakeDiceWebSigninInterceptorDelegate>>
@@ -3126,7 +3122,6 @@ class DiceWebSigninInterceptorLatePolicyCallbackUAFTest
   base::WeakPtr<CapturingInterceptorDelegate> delegate_;
   metrics::ProfileMetricsService profile_metrics_service_{
       metrics::ProfileMetricsContext(1)};
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
 };
 
 IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptorLatePolicyCallbackUAFTest,

@@ -6,11 +6,9 @@
 
 #include "base/files/file_path.h"
 #include "base/test/run_until.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/download/download_browsertest_utils.h"
 #include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -19,11 +17,6 @@
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions_container.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_button.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_test_helper.h"
-#include "chrome/browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_view.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -47,23 +40,6 @@ class DownloadToolbarUIControllerBrowserTest : public DownloadTestBase {
 
   void SetUp() override { DownloadTestBase::SetUp(); }
 
-  void SetUpOnMainThread() override {
-    // OS integration is needed to be able to launch web applications. This
-    // override ensures OS integration doesn't leave any traces.
-    override_registration_ =
-        web_app::OsIntegrationTestOverrideImpl::OverrideForTesting();
-    DownloadTestBase::SetUpOnMainThread();
-  }
-
-  void TearDownOnMainThread() override {
-    for (Profile* profile :
-         g_browser_process->profile_manager()->GetLoadedProfiles()) {
-      web_app::test::UninstallAllWebApps(profile);
-    }
-    override_registration_.reset();
-    DownloadTestBase::TearDownOnMainThread();
-  }
-
   views::View* toolbar_container(Browser* browser) {
     CHECK(!features::IsWebUIPinnedToolbarActionsEnabled())
         << "Test needs modification to support WebUIPinnedToolbarActions";
@@ -79,10 +55,6 @@ class DownloadToolbarUIControllerBrowserTest : public DownloadTestBase {
         ->GetDownloadButton();
   }
 
-  WebAppFrameToolbarTestHelper& toolbar_helper() {
-    return web_app_frame_toolbar_helper_;
-  }
-
  protected:
   void ClickButton(views::Button* button) {
     button->OnMousePressed(
@@ -92,12 +64,6 @@ class DownloadToolbarUIControllerBrowserTest : public DownloadTestBase {
         ui::EventType::kMouseReleased, gfx::Point(), gfx::Point(),
         ui::EventTimeForNow(), ui::EF_LEFT_MOUSE_BUTTON, 0));
   }
-
-  // OS integration is needed to be able to launch web applications. This
-  // override ensures OS integration doesn't leave any traces.
-  std::unique_ptr<web_app::OsIntegrationTestOverrideImpl::BlockingRegistration>
-      override_registration_;
-  WebAppFrameToolbarTestHelper web_app_frame_toolbar_helper_;
 };
 
 IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest, ShowHide) {
@@ -212,45 +178,6 @@ IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,
   ClickButton(toolbar_button(browser()));
   EXPECT_EQ(controller(browser())->bubble_contents_for_testing()->VisiblePage(),
             DownloadBubbleContentsView::Page::kPrimary);
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,
-                       DownloadsAppearsinWebAppWithRecentDownload) {
-  const GURL app_url("https://example.com/");
-  // Create a web app, download from the web app, and verify the downloads
-  // button appears.
-  auto web_app_info =
-      web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(app_url);
-  web_app_info->scope = GURL();
-
-  webapps::AppId app_id = web_app::test::InstallWebApp(
-      browser()->GetProfile(), std::move(web_app_info),
-      /*overwrite_existing_manifest_fields=*/false,
-      webapps::WebappInstallSource::OMNIBOX_INSTALL_ICON);
-  Browser* app_browser =
-      web_app::LaunchWebAppBrowserAndWait(browser()->GetProfile(), app_id);
-  ui_test_utils::DownloadURL(
-      app_browser, chrome_test_utils::GetTestUrl(
-                       base::FilePath().AppendASCII("downloads"),
-                       base::FilePath().AppendASCII("a_zip_file.zip")));
-  views::test::WaitForAnimatingLayoutManager(toolbar_container(app_browser));
-  EXPECT_NE(toolbar_button(app_browser), nullptr);
-  EXPECT_TRUE(toolbar_button(app_browser)->GetVisible());
-  // Close web app.
-  CloseBrowserSynchronously(app_browser);
-
-  // Reopen web app and verify download button appears.
-  Browser* app_browser2 =
-      web_app::LaunchWebAppBrowserAndWait(browser()->GetProfile(), app_id);
-  views::test::WaitForAnimatingLayoutManager(toolbar_container(app_browser2));
-  EXPECT_NE(toolbar_button(app_browser2), nullptr);
-  EXPECT_TRUE(toolbar_button(app_browser2)->GetVisible());
-
-  // Click the button and verify the bubble opens.
-  ClickButton(toolbar_button(app_browser2));
-  EXPECT_EQ(
-      controller(app_browser2)->bubble_contents_for_testing()->VisiblePage(),
-      DownloadBubbleContentsView::Page::kPrimary);
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadToolbarUIControllerBrowserTest,

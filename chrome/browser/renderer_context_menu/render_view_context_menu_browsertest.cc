@@ -84,14 +84,6 @@
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/os_integration/os_integration_manager.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_command_scheduler.h"
-#include "chrome/browser/web_applications/web_app_install_info.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
@@ -123,8 +115,6 @@
 #include "components/supervised_user/core/common/pref_names.h"
 #include "components/supervised_user/test_support/kids_management_api_server_mock.h"
 #include "components/tabs/public/split_tab_data.h"
-#include "components/webapps/browser/installable/installable_metrics.h"
-#include "components/webapps/browser/uninstall_result_code.h"
 #include "content/public/browser/browser_plugin_guest_manager.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/context_menu_params.h"
@@ -188,8 +178,6 @@
 using content::WebContents;
 using extensions::MimeHandlerViewGuest;
 using extensions::TestMimeHandlerViewGuest;
-using web_app::WebAppProvider;
-using webapps::AppId;
 
 using ::testing::_;
 using ::testing::Return;
@@ -200,9 +188,6 @@ namespace {
 constexpr int kMaxOpenLinkInProfileItems = 100;
 constexpr int IDC_OPEN_LINK_IN_PROFILE_LAST =
     IDC_OPEN_LINK_IN_PROFILE_FIRST + kMaxOpenLinkInProfileItems - 1;
-
-const char kAppUrl1[] = "https://www.google.com/";
-const char kAppUrl2[] = "https://docs.google.com/";
 
 class AllowPreCommitInputFlagMixin : public InProcessBrowserTestMixin {
  public:
@@ -341,24 +326,6 @@ class ContextMenuBrowserTestBase : public MixinBasedInProcessBrowserTest {
     return profile_manager->GetProfile(profile_path);
   }
 
-  AppId InstallTestWebApp(const GURL& start_url,
-                          web_app::mojom::UserDisplayMode display_mode =
-                              web_app::mojom::UserDisplayMode::kStandalone) {
-    auto web_app_info =
-        web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(start_url);
-    web_app_info->scope = start_url;
-    web_app_info->title = u"Test app 🐐";
-    web_app_info->description = u"Test description 🐐";
-    web_app_info->user_display_mode = display_mode;
-
-    return web_app::test::InstallWebApp(browser()->GetProfile(),
-                                        std::move(web_app_info));
-  }
-
-  Browser* OpenTestWebApp(const AppId& app_id) {
-    return web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  }
-
   void OpenImagePageAndContextMenu(std::string image_path) {
     ASSERT_TRUE(embedded_test_server()->Start());
     GURL image_url(embedded_test_server()->GetURL(image_path));
@@ -443,7 +410,6 @@ class ContextMenuBrowserTestBase : public MixinBasedInProcessBrowserTest {
   }
 
  private:
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
   base::test::ScopedFeatureList scoped_feature_list_;
   AllowPreCommitInputFlagMixin allow_pre_commit_input_flag_mixin_{mixin_host_};
 };
@@ -986,172 +952,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenEntryPresentForNormalURLs) {
                                           IDC_OPEN_LINK_IN_PROFILE_LAST));
 }
 
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       OpenInAppPresentForURLsInScopeOfWebApp) {
-  InstallTestWebApp(GURL(kAppUrl1));
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNone(GURL(kAppUrl1), GURL(kAppUrl1));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       OpenInAppAbsentForURLsInScopeOfNonWindowedWebApp) {
-  InstallTestWebApp(GURL(kAppUrl1), web_app::mojom::UserDisplayMode::kBrowser);
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNone(GURL(kAppUrl1), GURL(kAppUrl1));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       OpenEntryInAppAbsentForURLsOutOfScopeOfWebApp) {
-  InstallTestWebApp(GURL(kAppUrl1));
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNone(GURL("http://www.example.com/"),
-                                     GURL("http://www.example.com/"));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       OpenInAppAbsentForURLsInNonLocallyInstalledApp) {
-  const AppId app_id = InstallTestWebApp(GURL(kAppUrl1));
-
-  {
-    WebAppProvider* const provider =
-        WebAppProvider::GetForTest(browser()->GetProfile());
-    base::RunLoop run_loop;
-
-    ASSERT_TRUE(provider->registrar_unsafe().CanUserUninstallWebApp(app_id));
-    provider->scheduler().RemoveUserUninstallableManagements(
-        app_id, webapps::WebappUninstallSource::kAppMenu,
-        base::BindLambdaForTesting([&](webapps::UninstallResultCode code) {
-          EXPECT_EQ(code, webapps::UninstallResultCode::kAppRemoved);
-          run_loop.Quit();
-        }));
-
-    run_loop.Run();
-  }
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNone(GURL(kAppUrl1), GURL(kAppUrl1));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       InAppOpenEntryPresentForRegularURLs) {
-  const AppId app_id = InstallTestWebApp(GURL(kAppUrl1));
-  Browser* app_window = OpenTestWebApp(app_id);
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNoneInWebContents(
-          app_window->tab_strip_model()->GetActiveWebContents(),
-          GURL("http://www.example.com"), GURL("http://www.example.com"));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenInAppAbsentForIncognito) {
-  InstallTestWebApp(GURL(kAppUrl1));
-  Browser* incognito_browser = CreateIncognitoBrowser();
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNoneInWebContents(
-          incognito_browser->tab_strip_model()->GetActiveWebContents(),
-          GURL(kAppUrl1), GURL(kAppUrl1));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       InAppOpenEntryPresentForSameAppURLs) {
-  const AppId app_id = InstallTestWebApp(GURL(kAppUrl1));
-  Browser* app_window = OpenTestWebApp(app_id);
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNoneInWebContents(
-          app_window->tab_strip_model()->GetActiveWebContents(), GURL(kAppUrl1),
-          GURL(kAppUrl1));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       InAppOpenEntryPresentForOtherAppURLs) {
-  const AppId app_id = InstallTestWebApp(GURL(kAppUrl1));
-  InstallTestWebApp(GURL(kAppUrl2));
-
-  Browser* app_window = OpenTestWebApp(app_id);
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNoneInWebContents(
-          app_window->tab_strip_model()->GetActiveWebContents(), GURL(kAppUrl2),
-          GURL(kAppUrl2));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP));
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKINPROFILE));
-  ASSERT_FALSE(menu->IsItemInRangePresent(IDC_OPEN_LINK_IN_PROFILE_FIRST,
-                                          IDC_OPEN_LINK_IN_PROFILE_LAST));
-}
-
 IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenEntryAbsentForFilteredURLs) {
   std::unique_ptr<TestRenderViewContextMenu> menu =
       CreateContextMenuMediaTypeNone(GURL("chrome://history"), GURL());
@@ -1612,101 +1412,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, RealMenu) {
 
   // Verify that it's the correct tab.
   EXPECT_EQ(GURL("about:blank"), tab->GetLastCommittedURL());
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       OpenNewTabInChromeFromWebAppWithAnOpenBrowser) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL title1(embedded_test_server()->GetURL("/title1.html"));
-  GURL title2(embedded_test_server()->GetURL("/title2.html"));
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), title1));
-  TabStripModel* tab_strip_model = browser()->tab_strip_model();
-
-  EXPECT_EQ(tab_strip_model->count(), 1);
-
-  const AppId app_id = InstallTestWebApp(
-      GURL(kAppUrl1), web_app::mojom::UserDisplayMode::kTabbed);
-
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1u);
-  Browser* app_browser = OpenTestWebApp(app_id);
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 2u);
-
-  TabStripModel* app_tab_strip_model = app_browser->tab_strip_model();
-  EXPECT_EQ(app_tab_strip_model->count(), 1);
-
-  // Set up menu with link URL.
-  content::ContextMenuParams params;
-  params.link_url = title2;
-  params.page_url = title1;
-
-  // Select "Open Link in New Tab" and wait for the new tab to be added.
-  TestRenderViewContextMenu menu(*app_browser->tab_strip_model()
-                                      ->GetActiveWebContents()
-                                      ->GetPrimaryMainFrame(),
-                                 params);
-  menu.Init();
-
-  ui_test_utils::AllBrowserTabAddedWaiter add_tab;
-  menu.ExecuteCommand(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB, 0);
-  content::WebContents* tab = add_tab.Wait();
-  EXPECT_TRUE(content::WaitForLoadStop(tab));
-
-  EXPECT_EQ(title2, tab->GetLastCommittedURL());
-  EXPECT_EQ(tab_strip_model->count(), 2);
-  EXPECT_EQ(app_tab_strip_model->count(), 1);
-  EXPECT_TRUE(GlobalBrowserCollection::GetInstance()
-                  ->FindBrowserWithTab(tab)
-                  ->GetType() == BrowserWindowInterface::TYPE_NORMAL);
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
-                       OpenNewTabInChromeFromWebAppWithoutAnOpenBrowser) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL title1(embedded_test_server()->GetURL("/title1.html"));
-
-  const AppId app_id = InstallTestWebApp(
-      GURL(kAppUrl1), web_app::mojom::UserDisplayMode::kTabbed);
-  Browser* app_browser = OpenTestWebApp(app_id);
-
-  browser()->tab_strip_model()->CloseWebContentsAt(/*index=*/0,
-                                                   TabCloseTypes::CLOSE_NONE);
-  CloseBrowserSynchronously(browser());
-  EXPECT_FALSE(web_app::IsBrowserOpen(browser()));
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 1u);
-
-  TabStripModel* app_tab_strip_model = app_browser->tab_strip_model();
-  EXPECT_EQ(app_tab_strip_model->count(), 1);
-
-  // Set up menu with link URL.
-  content::ContextMenuParams params;
-  params.link_url = title1;
-  params.page_url =
-      app_browser->tab_strip_model()->GetActiveWebContents()->GetVisibleURL();
-
-  // Select "Open Link in New Tab" and wait for the new tab to be added.
-  TestRenderViewContextMenu menu(*app_browser->tab_strip_model()
-                                      ->GetActiveWebContents()
-                                      ->GetPrimaryMainFrame(),
-                                 params);
-  menu.Init();
-
-  ui_test_utils::AllBrowserTabAddedWaiter add_tab;
-  menu.ExecuteCommand(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB, 0);
-  content::WebContents* tab = add_tab.Wait();
-  EXPECT_TRUE(content::WaitForLoadStop(tab));
-
-  EXPECT_EQ(title1, tab->GetLastCommittedURL());
-  EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetSize(), 2u);
-  EXPECT_TRUE(GlobalBrowserCollection::GetInstance()
-                  ->FindBrowserWithTab(tab)
-                  ->GetType() == BrowserWindowInterface::TYPE_NORMAL);
-
-  TabStripModel* tab_strip_model = GlobalBrowserCollection::GetInstance()
-                                       ->FindBrowserWithTab(tab)
-                                       ->GetTabStripModel();
-  EXPECT_EQ(app_tab_strip_model->count(), 1);
-  EXPECT_EQ(tab_strip_model->count(), 1);
 }
 
 // Verify that "Open Link in New Tab" doesn't crash for about:blank.
@@ -3348,20 +3053,6 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfNoTargetDeviceBrowserTest,
   ASSERT_TRUE(index.has_value());
   EXPECT_EQ(ui::MenuModel::TYPE_COMMAND,
             page_menu->menu_model().GetTypeAt(index.value()));
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, DoNotShowSplitTabInWebApp) {
-  const GURL test_url("http://www.example.com/");
-  const AppId app_id = InstallTestWebApp(GURL(kAppUrl1));
-  Browser* const app_window = OpenTestWebApp(app_id);
-  ASSERT_NE(app_window->GetType(), BrowserWindowInterface::Type::TYPE_NORMAL);
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNoneInWebContents(
-          app_window->tab_strip_model()->GetActiveWebContents(), test_url,
-          test_url);
-
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW));
 }
 
 IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenLinkInNewSplitTab) {

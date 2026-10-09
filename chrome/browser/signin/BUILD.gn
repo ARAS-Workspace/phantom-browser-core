@@ -674,7 +674,6 @@ source_set("browser_tests") {
       "//chrome/browser/ui/webui/signin:login_ui_service",
       "//chrome/browser/ui/webui/signin:signin_ui_error",
       "//chrome/browser/ui/webui/signin:test_support_ui",
-      "//chrome/browser/web_applications:web_applications_test_support",
       "//chrome/test:test_support",
       "//chrome/test:test_support_ui",
       "//chrome/test/user_education",

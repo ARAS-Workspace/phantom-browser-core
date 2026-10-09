@@ -389,7 +389,6 @@ source_set("interactive_ui_tests") {
     ":test_support",
     "//base",
     "//chrome/browser/permissions",
-    "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
     "//components/infobars/content",

@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/chrome_content_browser_client.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/speech/extension_api/tts_engine_extension_api.h"
@@ -27,7 +26,6 @@
 #include "mojo/public/cpp/bindings/associated_remote.h"
 #include "net/dns/mock_host_resolver.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
-#include "third_party/blink/public/common/web_preferences/web_preferences.h"
 #include "third_party/blink/public/mojom/autoplay/autoplay.mojom.h"
 
 namespace {
@@ -36,30 +34,6 @@ static constexpr char const kFramedTestPagePath[] =
     "/media/autoplay_iframe.html";
 
 static constexpr char const kTestPagePath[] = "/media/unified_autoplay.html";
-
-class ChromeContentBrowserClientOverrideWebAppScope
-    : public ChromeContentBrowserClient {
- public:
-  ChromeContentBrowserClientOverrideWebAppScope() = default;
-  ~ChromeContentBrowserClientOverrideWebAppScope() override = default;
-
-  void OverrideWebPreferences(
-      content::WebContents* web_contents,
-      content::SiteInstance& main_frame_site,
-      blink::web_pref::WebPreferences* web_prefs) override {
-    ChromeContentBrowserClient::OverrideWebPreferences(
-        web_contents, main_frame_site, web_prefs);
-
-    web_prefs->web_app_scope = web_app_scope_;
-  }
-
-  void set_web_app_scope(const GURL& web_app_scope) {
-    web_app_scope_ = web_app_scope;
-  }
-
- private:
-  GURL web_app_scope_;
-};
 
 }  // anonymous namespace
 
@@ -374,69 +348,6 @@ IN_PROC_BROWSER_TEST_F(UnifiedAutoplayBrowserTest,
   EXPECT_TRUE(NavigateInRenderer(GetWebContents(), kTestPageUrl));
   EXPECT_EQ(kTestPageUrl, GetWebContents()->GetLastCommittedURL());
   EXPECT_FALSE(AttemptPlay(GetWebContents()));
-}
-
-IN_PROC_BROWSER_TEST_F(UnifiedAutoplayBrowserTest,
-                       MatchingWebAppScopeAllowsAutoplay_Origin) {
-  GURL kTestPageUrl(
-      embedded_test_server()->GetURL("example.com", kTestPagePath));
-
-  ChromeContentBrowserClientOverrideWebAppScope browser_client;
-  browser_client.set_web_app_scope(kTestPageUrl.DeprecatedGetOriginAsURL());
-
-  content::ContentBrowserClient* old_browser_client =
-      content::SetBrowserClientForTesting(&browser_client);
-
-  GetWebContents()->OnWebPreferencesChanged();
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), kTestPageUrl));
-  EXPECT_TRUE(content::WaitForLoadStop(GetWebContents()));
-
-  EXPECT_TRUE(AttemptPlay(GetWebContents()));
-
-  content::SetBrowserClientForTesting(old_browser_client);
-}
-
-IN_PROC_BROWSER_TEST_F(UnifiedAutoplayBrowserTest,
-                       MatchingWebAppScopeAllowsAutoplay_Path) {
-  GURL kTestPageUrl(
-      embedded_test_server()->GetURL("example.com", kTestPagePath));
-
-  ChromeContentBrowserClientOverrideWebAppScope browser_client;
-  browser_client.set_web_app_scope(kTestPageUrl.GetWithoutFilename());
-
-  content::ContentBrowserClient* old_browser_client =
-      content::SetBrowserClientForTesting(&browser_client);
-
-  GetWebContents()->OnWebPreferencesChanged();
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), kTestPageUrl));
-  EXPECT_TRUE(content::WaitForLoadStop(GetWebContents()));
-
-  EXPECT_TRUE(AttemptPlay(GetWebContents()));
-
-  content::SetBrowserClientForTesting(old_browser_client);
-}
-
-IN_PROC_BROWSER_TEST_F(UnifiedAutoplayBrowserTest,
-                       NotMatchingWebAppScopeDoesNotAllowAutoplay) {
-  GURL kTestPageUrl(
-      embedded_test_server()->GetURL("example.com", kTestPagePath));
-
-  ChromeContentBrowserClientOverrideWebAppScope browser_client;
-  browser_client.set_web_app_scope(GURL("http://www.foobar.com"));
-
-  content::ContentBrowserClient* old_browser_client =
-      content::SetBrowserClientForTesting(&browser_client);
-
-  GetWebContents()->OnWebPreferencesChanged();
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), kTestPageUrl));
-  EXPECT_TRUE(content::WaitForLoadStop(GetWebContents()));
-
-  EXPECT_FALSE(AttemptPlay(GetWebContents()));
-
-  content::SetBrowserClientForTesting(old_browser_client);
 }
 
 // Integration tests for the new unified autoplay sound settings UI.

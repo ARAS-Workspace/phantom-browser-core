@@ -27,15 +27,8 @@
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
 #include "chrome/browser/ui/views/site_data/page_specific_site_data_dialog.h"
 #include "chrome/browser/ui/views/site_data/page_specific_site_data_dialog_controller.h"
-#include "chrome/browser/ui/views/site_data/related_app_row_view.h"
 #include "chrome/browser/ui/views/site_data/site_data_row_view.h"
 #include "chrome/browser/ui/views/toolbar/app_menu.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_command_scheduler.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -45,7 +38,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_attestations/privacy_sandbox_attestations.h"
 #include "components/privacy_sandbox/privacy_sandbox_attestations/scoped_privacy_sandbox_attestations.h"
 #include "components/privacy_sandbox/privacy_sandbox_settings.h"
-#include "components/webapps/common/web_app_id.h"
 #include "content/public/browser/cookie_access_details.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/common/content_features.h"
@@ -74,9 +66,6 @@ DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContentsElementId);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kCookieAccessedEvent);
 const char kFirstPartyAllowedRow[] = "FirstPartyAllowedRow";
 const char kThirdPartyBlockedRow[] = "ThirdPartyBlockedRow";
-DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kAppSettingsWebContentsElementId);
-const char kRelatedAppRow[] = "RelatedAppRow";
-const char kRelatedAppLabel[] = "RelatedAppLabel";
 const char kOnlyPartitionedRow[] = "OnlyPartitionedRow";
 const char kMixedPartitionedRow[] = "MixedPartitionedRow";
 const char kCookiesDialogOpenedActionName[] = "CookiesInUseDialog.Opened";
@@ -381,170 +370,5 @@ IN_PROC_BROWSER_TEST_F(PageSpecificSiteDataDialogInteractiveUiTest,
       // item and the correct histogram was logged.
       CheckRowLabel(kMixedPartitionedRow,
                     IDS_PAGE_SPECIFIC_SITE_DATA_DIALOG_ALLOWED_STATE_SUBTITLE));
-}
-
-class PageSpecificSiteDataDialogWithRelatedWebAppsInteractiveUiTest
-    : public PageSpecificSiteDataDialogInteractiveUiTest {
- public:
-  PageSpecificSiteDataDialogWithRelatedWebAppsInteractiveUiTest() = default;
-  ~PageSpecificSiteDataDialogWithRelatedWebAppsInteractiveUiTest() override =
-      default;
-
-  MultiStep LaunchBrowserForWebAppInTab(const webapps::AppId& app_id,
-                                        ui::ElementIdentifier section_id) {
-    auto* provider =
-        web_app::WebAppProvider::GetForTest(browser()->GetProfile());
-    const GURL target_app_url(
-        provider->registrar_unsafe().GetAppLaunchUrl(app_id));
-
-    auto steps = Steps(
-        std::move(
-            StepBuilder()
-                .SetDescription("LaunchBrowserForWebAppInTab")
-                .SetElementID(kWebContentsElementId)
-                .SetContext(ui::InteractionSequence::ContextMode::kAny)
-                .SetStartCallback(base::BindOnce(
-                    [](Profile* profile, webapps::AppId app_id,
-                       ui::InteractionSequence* seq, ui::TrackedElement* el) {
-                      web_app::WebAppProvider* provider =
-                          web_app::WebAppProvider::GetForLocalAppsUnchecked(
-                              profile);
-                      provider->scheduler().LaunchAppWithCustomParams(
-                          apps::AppLaunchParams(
-                              app_id,
-                              apps::LaunchContainer::kLaunchContainerTab,
-                              WindowOpenDisposition::CURRENT_TAB,
-                              apps::LaunchSource::kFromTest),
-                          base::DoNothing());
-                    },
-                    browser()->GetProfile(), app_id))),
-        WaitForWebContentsNavigation(section_id, target_app_url));
-    AddDescriptionPrefix(
-        steps, base::StrCat({"LaunchBrowserForWebAppInTab( ", app_id, " )"}));
-    return steps;
-  }
-
-  MultiStep LaunchBrowserForWebAppInTabAndOpenDialog(
-      const webapps::AppId& app_id,
-      ui::ElementIdentifier section_id) {
-    return Steps(
-        InstrumentTab(section_id),
-        InParallel(
-            RunSubsequence(
-                WaitForEvent(kBrowserViewElementId, kCookieAccessedEvent)),
-            RunSubsequence(LaunchBrowserForWebAppInTab(app_id, section_id))),
-        PressButton(kLocationIconElementId),
-        PressButton(PageInfoMainView::kCookieButtonElementId),
-        PressButton(PageInfoCookiesContentView::kCookieDialogButton),
-        InAnyContext(AfterShow(
-            section_id, ExpectActionCount(kCookiesDialogOpenedActionName, 1))));
-  }
-
-  const std::string GetDummyAppName() { return "DummyApp"; }
-
-  const GURL GetDummyAppUrl() {
-    return https_server()->GetURL("a.test", GetTestPageRelativeURL());
-  }
-
-  const GURL GetAppSettingsUrlForApp(std::string app_id) {
-    return GURL("chrome://app-settings/" + app_id);
-  }
-
- protected:
-  void SetUpFeatureList() override {
-    feature_list_.InitWithFeatures(
-        {features::kPageSpecificDataDialogRelatedInstalledAppsSection}, {});
-  }
-
- private:
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
-};
-
-IN_PROC_BROWSER_TEST_F(
-    PageSpecificSiteDataDialogWithRelatedWebAppsInteractiveUiTest,
-    RelatedApplicationsSectionInBrowserTab) {
-  // Unrelated to the RelatedApplications tests, but needed to avoid crashing.
-  CookieChangeObserver observer(
-      browser()->tab_strip_model()->GetActiveWebContents(), 6);
-
-  // Install an app so that the related application section will have something
-  // to show. We don't actually care about the app in this test though.
-  auto app_id = web_app::test::InstallDummyWebApp(
-      browser()->GetProfile(), GetDummyAppName(), GetDummyAppUrl());
-
-  RunTestSequence(
-      LaunchBrowserForWebAppInTabAndOpenDialog(app_id, kWebContentsElementId),
-      // Name the first row in the Related Apps section.
-      InAnyContext(NameChildView(kPageSpecificSiteDataDialogRelatedAppsSection,
-                                 kRelatedAppRow, 0u)),
-      // The label is the 2nd child of the row view.
-      InAnyContext(NameChildView(kRelatedAppRow, kRelatedAppLabel, 1u)),
-      // Verify the row label.
-      CheckViewProperty(kRelatedAppLabel, &views::Label::GetText,
-                        base::UTF8ToUTF16(GetDummyAppName())),
-      // TODO(crbug.com/362922563): Update this test once the uninstall button
-      // is implemented.
-      // Verify that row has "Link to app settings".
-      InAnyContext(WaitForShow(RelatedAppRowView::kLinkToAppSettings)),
-      // Prepare to click the link.
-      InstrumentNextTab(kAppSettingsWebContentsElementId, AnyBrowser()),
-      // Click the link, and verify it goes to the app's site settings page.
-      PressButton(RelatedAppRowView::kLinkToAppSettings),
-      WaitForWebContentsNavigation(kAppSettingsWebContentsElementId,
-                                   GetAppSettingsUrlForApp(app_id)));
-}
-
-IN_PROC_BROWSER_TEST_F(
-    PageSpecificSiteDataDialogWithRelatedWebAppsInteractiveUiTest,
-    RelatedApplicationsSectionInAppWindow) {
-  // Unrelated to the RelatedApplications tests, but needed to avoid crashing.
-  CookieChangeObserver observer(
-      browser()->tab_strip_model()->GetActiveWebContents(), 6);
-
-  // Install and launch the web app.
-  auto app_id = web_app::test::InstallDummyWebApp(
-      browser()->GetProfile(), GetDummyAppName(), GetDummyAppUrl());
-
-  Browser* app_browser =
-      web_app::LaunchWebAppBrowserAndWait(browser()->GetProfile(), app_id);
-
-  // Helper for the test sequence.
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kAppWindowId);
-
-  RunTestSequenceInContext(
-      BrowserElements::From(app_browser)->GetContext(),
-      InstrumentTab(kAppWindowId),
-      // Open the ... menu, web app info, cookies & site data, etc.
-      PressButton(kToolbarAppMenuButtonElementId),
-      WithView(kToolbarAppMenuButtonElementId,
-               base::BindOnce([](AppMenuButton* button) {
-                 CHECK(button->IsMenuShowing());
-                 button->app_menu()->ExecuteCommand(IDC_WEB_APP_MENU_APP_INFO,
-                                                    0);
-               })),
-      PressButton(PageInfoMainView::kCookieButtonElementId),
-      PressButton(PageInfoCookiesContentView::kCookieDialogButton),
-      InAnyContext(
-          AfterShow(kPageSpecificSiteDataDialogRelatedAppsSection,
-                    ExpectActionCount(kCookiesDialogOpenedActionName, 1))),
-      // Name the 1st row (ie. the 1st related app) in the related apps section.
-      InAnyContext(NameChildView(kPageSpecificSiteDataDialogRelatedAppsSection,
-                                 kRelatedAppRow, 0u)),
-      // The label is the 2nd child of the row view.
-      InAnyContext(NameChildView(kRelatedAppRow, kRelatedAppLabel, 1u)),
-      // Verify the row label.
-      CheckViewProperty(kRelatedAppLabel, &views::Label::GetText,
-                        base::UTF8ToUTF16(GetDummyAppName())),
-      // TODO(crbug.com/362922563): Update this test once the uninstall button
-      // is implemented.
-      // Verify that row has "Link to app settings".
-      InAnyContext(WaitForShow(RelatedAppRowView::kLinkToAppSettings)),
-      // Prepare to click the link. Must specify `browser()` since the current
-      // context is for `app_browser`.
-      InstrumentNextTab(kAppSettingsWebContentsElementId, AnyBrowser()),
-      // Click the link, and verify it goes to the app's site settings page.
-      PressButton(RelatedAppRowView::kLinkToAppSettings),
-      WaitForWebContentsNavigation(kAppSettingsWebContentsElementId,
-                                   GetAppSettingsUrlForApp(app_id)));
 }
 

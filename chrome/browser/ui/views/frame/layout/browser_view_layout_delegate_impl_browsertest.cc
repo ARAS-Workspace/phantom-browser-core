@@ -16,11 +16,6 @@
 #include "chrome/browser/ui/views/frame/layout/browser_view_layout.h"
 #include "chrome/browser/ui/views/tabs/tab_strip.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_view.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/test/browser_test.h"
@@ -81,10 +76,6 @@ class BrowserViewLayoutDelegateImplBrowsertest
     : public InteractiveBrowserTest,
       public testing::WithParamInterface<WindowState> {
  public:
-  BrowserViewLayoutDelegateImplBrowsertest() {
-    scoped_feature_list_.InitAndDisableFeature(
-        ::features::kWebAppInstallDialog);
-  }
   ~BrowserViewLayoutDelegateImplBrowsertest() override = default;
 
   void ApplyWindowState(BrowserWindowInterface* browser) {
@@ -118,16 +109,7 @@ class BrowserViewLayoutDelegateImplBrowsertest
     InteractiveBrowserTest::TearDownOnMainThread();
   }
 
-  Browser* CreateAppBrowser() {
-    const GURL kAppUrl("https://test.com");
-    const auto app_id = web_app::test::InstallDummyWebApp(
-        browser()->GetProfile(), "App Name", kAppUrl);
-    return web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  }
-
  private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
   std::unique_ptr<ImmersiveRevealedLock> immersive_mode_lock_;
 };
 
@@ -171,36 +153,4 @@ IN_PROC_BROWSER_TEST_P(BrowserViewLayoutDelegateImplBrowsertest,
                }),
       Screenshot(kBrowserViewElementId, "tabstrip_region", "7771971",
                  std::ref(bounds)));
-}
-
-IN_PROC_BROWSER_TEST_P(BrowserViewLayoutDelegateImplBrowsertest,
-                       Screenshot_AppBrowser) {
-  // Setup will actually fail on some non-pixel-test bots due to issues around
-  // waiting for the window to be maximized. For safety's sake, bail out here.
-  if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kVerifyPixels)) {
-    GTEST_SKIP();
-  }
-
-  // App browser can't be created inside RunTestSequence due to RunLoop issues.
-  auto* const app_browser = CreateAppBrowser();
-
-  ApplyWindowState(app_browser);
-
-  gfx::Rect bounds;
-  RunTestSequence(InContext(
-      BrowserElements::From(app_browser)->GetContext(),
-      WaitForShow(kBrowserViewElementId),
-      WithView(kBrowserViewElementId,
-               [&bounds](BrowserView* browser_view) {
-                 WebAppFrameToolbarView* const toolbar =
-                     browser_view->web_app_frame_toolbar_for_testing();
-                 toolbar->InvalidateLayout();
-                 views::test::RunScheduledLayout(browser_view);
-                 bounds = GetBoundsInWindow(toolbar);
-                 bounds.set_x(0);
-                 bounds.set_width(browser_view->width());
-               }),
-      Screenshot(kBrowserViewElementId, "tabstrip_region", "7771971",
-                 std::ref(bounds))));
 }

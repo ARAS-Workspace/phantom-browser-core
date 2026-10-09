@@ -62,12 +62,6 @@
 #include "chrome/browser/ui/views/tabs/dragging/window_finder.h"
 #include "chrome/browser/ui/views/tabs/tab.h"
 #include "chrome/browser/ui/views/tabs/tab_strip.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/model/display_override.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/interactive_test_utils.h"
@@ -1093,7 +1087,6 @@ class DetachToBrowserTabDragControllerTest
 
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
-  std::optional<webapps::AppId> tabbed_app_id_;
 
   // Some of these tests rely on animation being enabled. This forces
   // animation on even if it's turned off in the OS.
@@ -4438,240 +4431,6 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
   EXPECT_EQ(browser2_groups[0], group);
 }
 
-// Detachable tabs are not supported for PWAs on Mac so these tests don't apply.
-#if !BUILDFLAG(IS_MAC)
-using DetachTabWithUrlControlledByWebApp = DetachToBrowserTabDragControllerTest;
-// Test tearing off a tab displaying a url controlled by a web app.
-// The kTearOffWebAppTabOpensWebAppWindow experiment determines whether the new
-// browser window will be a normal browser window or an app window.
-IN_PROC_BROWSER_TEST_P(DetachTabWithUrlControlledByWebApp, TearOffWebApp) {
-  // OS integration is needed to be able to launch web applications. This
-  // override ensures OS integration doesn't leave any traces.
-  std::unique_ptr<web_app::OsIntegrationTestOverrideImpl::BlockingRegistration>
-      override_registration;
-
-  {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    override_registration =
-        web_app::OsIntegrationTestOverrideImpl::OverrideForTesting();
-  }
-
-  // Install tabbed web app.
-  auto web_app_info = web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(
-      GURL("https://www.example.com"));
-  web_app_info->title = u"A tabbed web app";
-  web_app_info->user_display_mode =
-      web_app::mojom::UserDisplayMode::kStandalone;
-  webapps::AppId app_id = web_app::test::InstallWebApp(browser()->GetProfile(),
-                                                       std::move(web_app_info));
-
-  // Load URL controlled by installed web app.
-  AddTabsAndResetBrowser(browser(), 1, GURL("https://www.example.com/"));
-
-  TabStrip* tab_strip = GetTabStripForBrowser(browser());
-  EXPECT_EQ(browser()->GetTabStripModel()->count(), 2);
-
-  // Move to the second tab and drag it enough that it detaches.
-  BrowserWindowInterface* const new_browser = DragTabForDetachAndNotify(
-      browser(),
-      base::BindOnce(&DetachToBrowserTabDragControllerTest::
-                         ReleaseInputAfterWindowDetached,
-                     base::Unretained(this), tab_strip->tab_at(1)->width()),
-      1);
-  ASSERT_TRUE(new_browser);
-
-  // Expect first window is left with just the start tab.
-  TabStripModel* source_tab_strip_model = browser()->GetTabStripModel();
-  EXPECT_EQ(source_tab_strip_model->count(), 1);
-  EXPECT_FALSE(source_tab_strip_model->IsTabPinned(0));
-  EXPECT_EQ(source_tab_strip_model->GetWebContentsAt(0)->GetVisibleURL(),
-            GURL("about:blank"));
-
-  // Expect the newly created window has the dragged tab.
-  TabStripModel* dest_tab_strip_model = new_browser->GetTabStripModel();
-  EXPECT_EQ(dest_tab_strip_model->count(), 1);
-  EXPECT_EQ(dest_tab_strip_model->GetWebContentsAt(0)->GetVisibleURL(),
-            web_app::WebAppProvider::GetForTest(browser()->GetProfile())
-                ->registrar_unsafe()
-                .GetAppStartUrl(app_id));
-  EXPECT_EQ(dest_tab_strip_model->active_index(), 0);
-
-  // Check that right type of browser window is opened, depending on the value
-  // of kTearOffWebAppTabOpensWebAppWindow experiment.
-  EXPECT_EQ(new_browser->GetType(),
-            std::get<0>(GetParam())
-                ? BrowserWindowInterface::Type::TYPE_APP
-                : BrowserWindowInterface::Type::TYPE_NORMAL);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    TabDragging,
-    DetachTabWithUrlControlledByWebApp,
-    ::testing::Combine(
-        /*kTearOffWebAppTabOpensWebAppWindow=*/::testing::Bool(),
-        /*input_source=*/::testing::Values("mouse")));
-
-class DetachToBrowserTabDragControllerTestWithTabbedWebApp
-    : public DetachToBrowserTabDragControllerTest {
- public:
-  DetachToBrowserTabDragControllerTestWithTabbedWebApp() {
-    scoped_feature_list_.InitWithFeatures(
-        {blink::features::kDesktopPWAsTabStrip}, {});
-  }
-
-  webapps::AppId InstallMockApp(bool add_home_tab) {
-    auto web_app_info =
-        web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(
-            GURL("https://www.example.com"));
-    web_app_info->title = u"A tabbed web app";
-    web_app_info->user_display_mode =
-        web_app::mojom::UserDisplayMode::kStandalone;
-    web_app_info->display_override = {
-        web_app::DisplayOverride::Create(blink::mojom::DisplayMode::kTabbed)};
-    if (add_home_tab) {
-      blink::Manifest::TabStrip manifest_tab_strip;
-      manifest_tab_strip.home_tab = blink::Manifest::HomeTabParams();
-      web_app_info->tab_strip = std::move(manifest_tab_strip);
-    }
-
-    return web_app::test::InstallWebApp(browser()->GetProfile(),
-                                        std::move(web_app_info));
-  }
-
- private:
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// Tabbed web apps with the home tab cannot have detachable tabs.
-IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTestWithTabbedWebApp,
-                       HomeTabAddedToEveryWindow) {
-  // Install tabbed web app.
-  webapps::AppId app_id = InstallMockApp(/*add_home_tab=*/true);
-  BrowserWindowInterface* const app_browser =
-      web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  ASSERT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  // Close normal browser since other code expects only 1 browser to start.
-  CloseBrowserSynchronously(browser());
-  ASSERT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  SetBrowser(app_browser);
-  ASSERT_EQ(app_browser, browser());
-
-  AddTabsAndResetBrowser(browser(), 1, GURL("https://www.example.com/newpage"));
-
-  TabStrip* tab_strip = GetTabStripForBrowser(app_browser);
-  EXPECT_EQ(browser()->GetTabStripModel()->count(), 2);
-
-  // Move to the second tab and drag it enough that it detaches.
-  int tab_1_width = tab_strip->tab_at(1)->width();
-  BrowserWindowInterface* const new_browser = DragTabForDetachAndNotify(
-      browser(),
-      base::BindOnce(&DetachToBrowserTabDragControllerTest::
-                         ReleaseInputAfterWindowDetached,
-                     base::Unretained(this), tab_1_width),
-      1);
-  ASSERT_TRUE(new_browser);
-
-  // Expect first window is left with just the home tab.
-  TabStripModel* source_tab_strip_model = browser()->GetTabStripModel();
-  EXPECT_EQ(source_tab_strip_model->count(), 1);
-  EXPECT_TRUE(source_tab_strip_model->IsTabPinned(0));
-  EXPECT_EQ(source_tab_strip_model->GetWebContentsAt(0)->GetVisibleURL(),
-            web_app::WebAppProvider::GetForTest(browser()->GetProfile())
-                ->registrar_unsafe()
-                .GetAppStartUrl(app_id));
-
-  // Expect the newly created window has the dragged tab and a home tab.
-  TabStripModel* dest_tab_strip_model = new_browser->GetTabStripModel();
-  EXPECT_EQ(dest_tab_strip_model->count(), 2);
-  EXPECT_TRUE(dest_tab_strip_model->IsTabPinned(0));
-  EXPECT_EQ(dest_tab_strip_model->GetWebContentsAt(0)->GetVisibleURL(),
-            source_tab_strip_model->GetWebContentsAt(0)->GetVisibleURL());
-  EXPECT_EQ(dest_tab_strip_model->GetWebContentsAt(1)->GetVisibleURL(),
-            GURL("https://www.example.com/newpage"));
-  EXPECT_EQ(dest_tab_strip_model->active_index(), 1);
-}
-
-// Home tab can't be detached.
-// TODO(crbug.com/40245163): Enable this test for Linux.
-#if BUILDFLAG(IS_LINUX)
-#define MAYBE_CantDragHomeTab DISABLED_CantDragHomeTab
-#else
-#define MAYBE_CantDragHomeTab CantDragHomeTab
-#endif
-IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTestWithTabbedWebApp,
-                       MAYBE_CantDragHomeTab) {
-  // Install tabbed web app.
-  webapps::AppId app_id = InstallMockApp(/*add_home_tab=*/true);
-  BrowserWindowInterface* const app_browser =
-      web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  ASSERT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  // Close normal browser since other code expects only 1 browser to start.
-  CloseBrowserSynchronously(browser());
-  ASSERT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  SetBrowser(app_browser);
-  ASSERT_EQ(app_browser, browser());
-
-  AddTabsAndResetBrowser(browser(), 1, GURL("https://www.example.com/newpage"));
-
-  TabStrip* tab_strip = GetTabStripForBrowser(app_browser);
-  EXPECT_EQ(browser()->tab_strip_model()->count(), 2);
-
-  // Try dragging the home tab enough that it would usually detach.
-  const Tab* tab = tab_strip->tab_at(0);
-  ASSERT_TRUE(PressInputAtCenter(tab));
-  ASSERT_TRUE(DragInputToCenter(tab, gfx::Vector2d(0, GetDetachY(tab_strip))));
-
-  ASSERT_TRUE(TabDragController::IsActive());
-
-  ASSERT_TRUE(ReleaseInput());
-
-  // There should only be one browser window containing two tabs.
-  EXPECT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-  EXPECT_EQ(browser()->tab_strip_model()->count(), 2);
-}
-
-// Tabbed web apps without a home tab do not have home tab added.
-IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTestWithTabbedWebApp,
-                       NoHomeTab) {
-  // Install tabbed web app.
-  webapps::AppId app_id = InstallMockApp(/*add_home_tab=*/false);
-  BrowserWindowInterface* const app_browser =
-      web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  ASSERT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  // Close normal browser since other code expects only 1 browser to start.
-  CloseBrowserSynchronously(browser());
-  ASSERT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  SetBrowser(app_browser);
-  ASSERT_EQ(app_browser, browser());
-
-  AddTabsAndResetBrowser(browser(), 1, GURL("https://www.example.com/newpage"));
-
-  TabStrip* tab_strip = GetTabStripForBrowser(app_browser);
-  EXPECT_EQ(browser()->GetTabStripModel()->count(), 2);
-
-  // Move to the second tab and drag it enough that it detaches.
-  int tab_1_width = tab_strip->tab_at(1)->width();
-  BrowserWindowInterface* const new_browser = DragTabForDetachAndNotify(
-      browser(),
-      base::BindOnce(&DetachToBrowserTabDragControllerTest::
-                         ReleaseInputAfterWindowDetached,
-                     base::Unretained(this), tab_1_width),
-      1);
-
-  // Expect 2 app windows with 1 tab each.
-  ASSERT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
-  EXPECT_EQ(browser()->GetTabStripModel()->count(), 1);
-  EXPECT_EQ(new_browser->GetTabStripModel()->count(), 1);
-}
-#endif  // !BUILDFLAG(IS_MAC)
-
 // Creates two browsers, selects all tabs in first, drags into second, then hits
 // escape.
 //
@@ -5330,15 +5089,6 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Combine(
         /*kTearOffWebAppTabOpensWebAppWindow=*/::testing::Bool(),
         /*input_source=*/::testing::Values("mouse")));
-
-#if !BUILDFLAG(IS_MAC)
-INSTANTIATE_TEST_SUITE_P(
-    TabDragging,
-    DetachToBrowserTabDragControllerTestWithTabbedWebApp,
-    ::testing::Combine(
-        /*kTearOffWebAppTabOpensWebAppWindow=*/::testing::Values(false),
-        /*input_source=*/::testing::Values("mouse")));
-#endif
 
 // TODO(crbug.com/409577362) : Fix test flakiness
 class SideBySideTabDragControllerTest

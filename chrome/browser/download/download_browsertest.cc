@@ -51,7 +51,6 @@
 #include "chrome/browser/download/download_crx_util.h"
 #include "chrome/browser/download/download_history.h"
 #include "chrome/browser/download/download_item_model.h"
-#include "chrome/browser/download/download_item_web_app_data.h"
 #include "chrome/browser/download/download_manager_utils.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/download/download_request_limiter.h"
@@ -72,8 +71,6 @@
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/download/download_display.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
@@ -483,15 +480,6 @@ void CreateCompletedDownload(content::DownloadManager* download_manager,
       download::DOWNLOAD_INTERRUPT_REASON_NONE, false /* opened */,
       current_time, false /* transient */,
       std::vector<download::DownloadItem::ReceivedSlice>());
-}
-
-// Whether download UI is visible at all (download toolbar button for download
-// bubble).
-bool IsDownloadUiVisible(BrowserWindow* window) {
-  return window->GetDownloadBubbleUIController()
-      ->GetDownloadDisplayController()
-      ->download_display_for_testing()
-      ->IsShowing();
 }
 
 // Whether download details are visible in the UI (partial view for download
@@ -4840,66 +4828,4 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, CrxDenyInstallClosesSurface) {
   // Download surface should close.
   EXPECT_FALSE(
       IsDownloadDetailedUiVisible(BrowserWindow::FromBrowser(browser())));
-}
-
-// Test that the download UI surface only shows on the appropriate window for a
-// web app.
-IN_PROC_BROWSER_TEST_F(DownloadTest, WebAppDownloadOnlyShowsUiInWebAppWindow) {
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url = embedded_test_server()->GetURL("/downloads/a_zip_file.zip");
-
-  // Load an app.
-  webapps::AppId app_id = web_app::test::InstallDummyWebApp(
-      browser()->GetProfile(), "testapp", embedded_test_server()->GetURL("/"));
-  BrowserWindowInterface* app_browser =
-      web_app::LaunchWebAppBrowserAndWait(browser()->GetProfile(), app_id);
-
-  DownloadAndWait(app_browser, url);
-
-  EXPECT_FALSE(IsDownloadUiVisible(BrowserWindow::FromBrowser(browser())));
-  EXPECT_TRUE(IsDownloadUiVisible(BrowserWindow::FromBrowser(app_browser)));
-}
-
-// Test that the download UI surface only does not show in a web app window
-// for a regular Chrome window's downloads, even if it is the same domain.
-IN_PROC_BROWSER_TEST_F(DownloadTest,
-                       RegularBrowserDownloadDoesNotShowInWebAppWindow) {
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url = embedded_test_server()->GetURL("/downloads/a_zip_file.zip");
-
-  // Load an app.
-  webapps::AppId app_id = web_app::test::InstallDummyWebApp(
-      browser()->GetProfile(), "testapp", embedded_test_server()->GetURL("/"));
-  BrowserWindowInterface* app_browser =
-      web_app::LaunchWebAppBrowserAndWait(browser()->GetProfile(), app_id);
-
-  DownloadAndWait(browser(), url);
-
-  EXPECT_TRUE(IsDownloadUiVisible(BrowserWindow::FromBrowser(browser())));
-  EXPECT_FALSE(IsDownloadUiVisible(BrowserWindow::FromBrowser(app_browser)));
-}
-
-// Test that web app info is properly attached to the download.
-IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadFromWebApp) {
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url = embedded_test_server()->GetURL("/downloads/a_zip_file.zip");
-
-  // Load an app.
-  webapps::AppId app_id = web_app::test::InstallDummyWebApp(
-      browser()->GetProfile(), "testapp", embedded_test_server()->GetURL("/"));
-  BrowserWindowInterface* app_browser =
-      web_app::LaunchWebAppBrowserAndWait(browser()->GetProfile(), app_id);
-
-  DownloadAndWait(app_browser, url);
-
-  DownloadManager* manager = DownloadManagerForBrowser(app_browser);
-  std::vector<raw_ptr<DownloadItem, VectorExperimental>> all_downloads;
-  manager->GetAllDownloads(&all_downloads);
-  ASSERT_EQ(all_downloads.size(), 1u);
-  auto* web_app_data = DownloadItemWebAppData::Get(all_downloads[0]);
-  EXPECT_NE(web_app_data, nullptr);
-  EXPECT_EQ(web_app_data->id(), app_id);
 }

@@ -18,9 +18,6 @@
 #include "chrome/browser/ui/views/page_info/page_info_main_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/url_constants.h"
@@ -42,7 +39,6 @@
 #include "components/permissions/permissions_client.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/webapps/common/web_app_id.h"
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/url_loader_interceptor.h"
@@ -55,10 +51,6 @@
 #include "ui/events/test/test_event.h"
 #include "url/gurl.h"
 #include "url/origin.h"
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
-#endif
 
 namespace {
 
@@ -633,119 +625,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewCookiesSubpageBrowserTest,
   controls_state_ = CookieControlsState::kAllowed3pc;
   ShowAndVerifyUi();
 }
-
-namespace {
-enum class WebAppWindowMode { kBrowserTab, kAppWindow };
-
-std::string WebAppWindowModeToString(
-    const testing::TestParamInfo<WebAppWindowMode>& info) {
-  switch (info.param) {
-    case WebAppWindowMode::kBrowserTab:
-      return "BrowserTab";
-    case WebAppWindowMode::kAppWindow:
-      return "AppWindow";
-  }
-}
-}  // namespace
-
-class PageInfoBubbleViewWebAppBrowserTest
-    : public PageInfoBubbleViewDialogBrowserTest,
-      public testing::WithParamInterface<WebAppWindowMode> {
- public:
-  PageInfoBubbleViewWebAppBrowserTest() {
-    feature_list_.InitWithFeatures(
-        {
-#if BUILDFLAG(IS_MAC)
-            features::kAppShimNotificationAttribution
-#endif
-        },
-        {});
-  }
-
-  void SetUpOnMainThread() override {
-    PageInfoBubbleViewDialogBrowserTest::SetUpOnMainThread();
-
-    override_registration_ =
-        web_app::OsIntegrationTestOverrideImpl::OverrideForTesting();
-
-    https_server_.ServeFilesFromDirectory(
-        base::PathService::CheckedGet(chrome::DIR_TEST_DATA));
-    ASSERT_TRUE(https_server_.Start());
-
-    start_url_ = https_server_.GetURL("/web_apps/basic.html");
-    app_id_ = web_app::InstallWebAppFromPage(browser(), start_url_);
-  }
-
-  void TearDownOnMainThread() override {
-    web_app::test::UninstallAllWebApps(browser()->GetProfile());
-    override_registration_.reset();
-
-    PageInfoBubbleViewDialogBrowserTest::TearDownOnMainThread();
-  }
-
-  // DialogBrowserTest:
-  void ShowUi(const std::string& name_with_param_suffix) override {
-    // Bubble dialogs' bounds may exceed the display's work area.
-    // https://crbug.com/41419544.
-    set_should_verify_dialog_bounds(false);
-
-    const std::string& name =
-        name_with_param_suffix.substr(0, name_with_param_suffix.find("/"));
-
-#if BUILDFLAG(IS_MAC)
-    if (name == "NotificationSystemPermissionDenied") {
-      AppShimRegistry::Get()->SaveNotificationPermissionStatusForApp(
-          app_id_, mac_notifications::mojom::PermissionStatus::kDenied);
-
-      HostContentSettingsMapFactory::GetForProfile(browser()->GetProfile())
-          ->SetContentSettingDefaultScope(
-              start_url_, start_url_, ContentSettingsType::NOTIFICATIONS,
-              ContentSetting::CONTENT_SETTING_ALLOW);
-    }
-#endif
-
-    Browser* app_browser = browser();
-    switch (GetParam()) {
-      case WebAppWindowMode::kBrowserTab:
-        ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), start_url_));
-        break;
-      case WebAppWindowMode::kAppWindow:
-        app_browser = web_app::LaunchWebAppBrowserAndWait(
-            browser()->GetProfile(), app_id_);
-        ASSERT_TRUE(app_browser);
-        break;
-    }
-    OpenPageInfoBubble(app_browser);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  net::EmbeddedTestServer https_server_{net::EmbeddedTestServer::TYPE_HTTPS};
-  GURL start_url_;
-  webapps::AppId app_id_;
-
-  std::unique_ptr<
-      ::web_app::OsIntegrationTestOverrideImpl::BlockingRegistration>
-      override_registration_;
-};
-
-IN_PROC_BROWSER_TEST_P(PageInfoBubbleViewWebAppBrowserTest, InvokeUi_Default) {
-  ShowAndVerifyUi();
-}
-
-#if BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_P(PageInfoBubbleViewWebAppBrowserTest,
-                       InvokeUi_NotificationSystemPermissionDenied) {
-  ShowAndVerifyUi();
-}
-#endif
-
-INSTANTIATE_TEST_SUITE_P(
-    /*no prefix*/,
-    PageInfoBubbleViewWebAppBrowserTest,
-    testing::ValuesIn({WebAppWindowMode::kBrowserTab,
-                       WebAppWindowMode::kAppWindow}),
-    &WebAppWindowModeToString);
 
 class PageInfoBubbleViewMerchantTrustDialogBrowserTest
     : public DialogBrowserTest {

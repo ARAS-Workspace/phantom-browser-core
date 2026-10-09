@@ -102,8 +102,6 @@ if (!is_chrome_for_testing) {
       "//chrome/browser/ui",
       "//chrome/browser/ui/browser_window",
       "//chrome/browser/ui/signin",
-      "//chrome/browser/web_applications",
-      "//chrome/browser/web_applications:web_applications_test_support",
       "//chrome/common",
       "//chrome/common:non_code_constants",
       "//chrome/test:test_support",

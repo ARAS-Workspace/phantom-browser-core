@@ -11,7 +11,6 @@
 #include "base/files/file_path.h"
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/download/download_test_file_activity_observer.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "content/public/test/download_test_observer.h"
 #include "content/public/test/slow_download_http_response.h"
@@ -275,8 +274,6 @@ class DownloadTestBase : public InProcessBrowserTest {
   }
 
  private:
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
-
   // Location of the test data.
   base::FilePath test_dir_;
 

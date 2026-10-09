@@ -19,11 +19,6 @@
 #include "chrome/browser/ui/views/extensions/extensions_toolbar_desktop.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
-#include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -202,57 +197,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplBrowserTest,
   // guarantee that the check in the delegate for double-closed calls catches
   // any cases.
   dialog = nullptr;
-}
-
-// Test that we don't crash when uninstalling an extension from a web app
-// window in Ash. Context: crbug.com/40568607
-// TODO(crbug.com/415937950): Fix and re-enable flaky test.
-IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplBrowserTest,
-                       DISABLED_WebAppWindowAshCrash) {
-  scoped_refptr<const extensions::Extension> extension(BuildTestExtension());
-  extensions::ExtensionRegistrar::Get(browser()->GetProfile())
-      ->AddExtension(extension.get());
-
-  std::unique_ptr<web_app::OsIntegrationTestOverrideBlockingRegistration>
-      faked_os_integration;
-  {
-    base::ScopedAllowBlockingForTesting blocking;
-    faked_os_integration = std::make_unique<
-        web_app::OsIntegrationTestOverrideBlockingRegistration>();
-  }
-  const GURL start_url = GURL("https://test.com/");
-  auto web_app_info =
-      web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(start_url);
-  web_app_info->scope = start_url;
-  web_app_info->user_display_mode =
-      web_app::mojom::UserDisplayMode::kStandalone;
-  webapps::AppId app_id = web_app::test::InstallWebApp(browser()->GetProfile(),
-                                                       std::move(web_app_info));
-  Browser* app_browser =
-      web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-
-  TestExtensionUninstallDialogDelegate delegate{base::DoNothing()};
-  std::unique_ptr<extensions::ExtensionUninstallDialog> dialog;
-  {
-    base::RunLoop run_loop;
-    dialog = extensions::ExtensionUninstallDialog::Create(
-        app_browser->GetProfile(), app_browser->GetWindow()->GetNativeWindow(),
-        &delegate);
-    run_loop.RunUntilIdle();
-  }
-
-  {
-    base::RunLoop run_loop;
-    dialog->ConfirmUninstall(extension.get(),
-                             extensions::UNINSTALL_REASON_FOR_TESTING,
-                             extensions::UNINSTALL_SOURCE_FOR_TESTING);
-    run_loop.RunUntilIdle();
-  }
-
-  {
-    base::ScopedAllowBlockingForTesting blocking;
-    faked_os_integration.reset();
-  }
 }
 
 class ParameterizedExtensionUninstallDialogImplBrowserTest

@@ -34,10 +34,6 @@
 #include "chrome/browser/ui/toasts/api/toast_id.h"
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/web_applications/mojom/user_display_mode.mojom-shared.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/launchservices_utils_mac.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -198,9 +194,6 @@ class ContextMenuFencedFrameTest : public ContextMenuUiTest {
         "content/test/data");
     embedded_https_test_server().SetSSLConfig(
         net::EmbeddedTestServer::CERT_TEST_NAMES);
-
-    override_registration_ =
-        web_app::OsIntegrationTestOverrideImpl::OverrideForTesting();
   }
 
   // Create a fenced frame which is navigated to `url`.
@@ -251,34 +244,12 @@ class ContextMenuFencedFrameTest : public ContextMenuUiTest {
         ->GetPrimaryMainFrame();
   }
 
-  void InstallTestWebApp(const GURL& start_url) {
-    auto web_app_info =
-        web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(start_url);
-    web_app_info->scope = start_url;
-    web_app_info->title = u"Test app";
-    web_app_info->description = u"Test description";
-    web_app_info->user_display_mode =
-        web_app::mojom::UserDisplayMode::kStandalone;
-
-    web_app::test::InstallWebApp(browser()->GetProfile(),
-                                 std::move(web_app_info));
-  }
-
-  void CleanupWebApps() {
-    web_app::test::UninstallAllWebApps(browser()->GetProfile());
-    override_registration_.reset();
-  }
-
   content::test::FencedFrameTestHelper& fenced_frame_test_helper() {
     return fenced_frame_test_helper_;
   }
 
  private:
   content::test::FencedFrameTestHelper fenced_frame_test_helper_;
-  // OS integration is needed to be able to launch web applications. This
-  // override ensures OS integration doesn't leave any traces.
-  std::unique_ptr<web_app::OsIntegrationTestOverrideImpl::BlockingRegistration>
-      override_registration_;
 };
 
 // Check which commands are present after opening the context menu for a
