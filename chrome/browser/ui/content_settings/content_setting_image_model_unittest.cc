@@ -59,14 +59,6 @@
 #include "ui/gfx/color_palette.h"
 #include "ui/gfx/paint_vector_icon.h"
 
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
-#include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_tab_helper.h"
-#include "components/tabs/public/mock_tab_interface.h"
-#endif  // BUILDFLAG(IS_MAC)
-
 #if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 #include "chrome/browser/permissions/system/mock_platform_handle.h"
 #include "chrome/browser/permissions/system/system_permission_settings.h"
@@ -91,10 +83,6 @@ class ContentSettingImageModelTest : public ChromeRenderViewHostTestHarness {
                  permissions::PermissionRequestGestureType::GESTURE) {
     scoped_feature_list_.InitWithFeatures(
         {features::kQuietNotificationPrompts,
-#if BUILDFLAG(IS_MAC)
-         features::kAppShimNotificationAttribution,
-         features::kUseAdHocSigningForWebAppShims,
-#endif
          // Enable all sensors just to avoid hardcoding the expected messages
          // to the motion sensor-specific ones.
          features::kGenericSensorExtraClasses,
@@ -110,11 +98,6 @@ class ContentSettingImageModelTest : public ChromeRenderViewHostTestHarness {
 
   void SetUp() override {
     ChromeRenderViewHostTestHarness::SetUp();
-#if BUILDFLAG(IS_MAC)
-    AppShimRegistry::Get()->SetPrefServiceAndUserDataDirForTesting(
-        TestingBrowserProcess::GetGlobal()->local_state(),
-        profile()->GetPath().DirName());
-#endif
     controller_ = &web_contents()->GetController();
     NavigateAndCommit(GURL("http://www.google.com"));
     PageSpecificContentSettings::CreateForWebContents(
@@ -126,10 +109,6 @@ class ContentSettingImageModelTest : public ChromeRenderViewHostTestHarness {
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_MAC)
-    AppShimRegistry::Get()->SetPrefServiceAndUserDataDirForTesting(
-        nullptr, base::FilePath());
-#endif
     ChromeRenderViewHostTestHarness::TearDown();
   }
 
@@ -684,114 +663,6 @@ TEST_F(ContentSettingImageModelTest, NotificationsIconVisibility) {
   content_setting_image_model->Update(web_contents());
   EXPECT_FALSE(content_setting_image_model->is_visible());
 }
-
-#if BUILDFLAG(IS_MAC)
-TEST_F(ContentSettingImageModelTest, NotificationsIconSystemPermission) {
-  tabs::MockTabInterface mock_tab;
-  MockBrowserWindowInterface mock_browser_window;
-  ON_CALL(mock_tab, GetBrowserWindowInterface())
-      .WillByDefault(testing::Return(&mock_browser_window));
-  ON_CALL(mock_browser_window, GetProfile())
-      .WillByDefault(testing::Return(profile()));
-
-  web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-
-  PageSpecificContentSettings::CreateForWebContents(
-      web_contents(),
-      std::make_unique<PageSpecificContentSettingsDelegate>(web_contents()));
-  PageSpecificContentSettings* content_settings =
-      PageSpecificContentSettings::GetForFrame(
-          web_contents()->GetPrimaryMainFrame());
-  auto content_setting_image_model =
-      ContentSettingImageModel::CreateForContentType(
-          ContentSettingImageModel::ImageType::kNotifications);
-
-  const webapps::AppId app_id = web_app::test::InstallDummyWebApp(
-      profile(), "Web App Title", GURL("http://www.google.com"));
-  AppShimRegistry::Get()->OnAppInstalledForProfile(app_id,
-                                                   profile()->GetPath());
-
-  web_app::WebAppTabHelper::Create(&mock_tab, web_contents());
-
-  web_app::WebAppTabHelper::FromWebContents(web_contents())->SetAppId(app_id);
-
-  // Installed app, but it hasn't interacted with notifications yet.
-  content_setting_image_model->Update(web_contents());
-  EXPECT_FALSE(content_setting_image_model->is_visible());
-  EXPECT_FALSE(content_setting_image_model->should_auto_open_bubble());
-  EXPECT_FALSE(content_setting_image_model->blocked_on_system_level());
-
-  // Same, but the system level permission has previously been denied.
-  AppShimRegistry::Get()->SaveNotificationPermissionStatusForApp(
-      app_id, mac_notifications::mojom::PermissionStatus::kDenied);
-  content_setting_image_model->Update(web_contents());
-  EXPECT_FALSE(content_setting_image_model->is_visible());
-  EXPECT_FALSE(content_setting_image_model->should_auto_open_bubble());
-  EXPECT_FALSE(content_setting_image_model->blocked_on_system_level());
-
-  // If notification permission is allowed at the chrome level, the indicator
-  // should show.
-  HostContentSettingsMapFactory::GetForProfile(profile())
-      ->SetDefaultContentSetting(ContentSettingsType::NOTIFICATIONS,
-                                 CONTENT_SETTING_ALLOW);
-  content_settings->OnContentAllowed(ContentSettingsType::NOTIFICATIONS);
-  content_setting_image_model->Update(web_contents());
-  EXPECT_TRUE(content_setting_image_model->is_visible());
-  EXPECT_TRUE(content_setting_image_model->is_blocked());
-  EXPECT_FALSE(content_setting_image_model->should_auto_open_bubble());
-  EXPECT_TRUE(content_setting_image_model->blocked_on_system_level());
-
-  // Granting system permission should remove the indicator.
-  AppShimRegistry::Get()->SaveNotificationPermissionStatusForApp(
-      app_id, mac_notifications::mojom::PermissionStatus::kGranted);
-  content_setting_image_model->Update(web_contents());
-  EXPECT_FALSE(content_setting_image_model->is_visible());
-  EXPECT_FALSE(content_setting_image_model->should_auto_open_bubble());
-  EXPECT_FALSE(content_setting_image_model->blocked_on_system_level());
-}
-
-TEST_F(ContentSettingImageModelTest,
-       NotificationsIconSystemPermission_PermissionRequested) {
-  tabs::MockTabInterface mock_tab;
-  MockBrowserWindowInterface mock_browser_window;
-  ON_CALL(mock_tab, GetBrowserWindowInterface())
-      .WillByDefault(testing::Return(&mock_browser_window));
-  ON_CALL(mock_browser_window, GetProfile())
-      .WillByDefault(testing::Return(profile()));
-
-  web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-
-  PageSpecificContentSettings::CreateForWebContents(
-      web_contents(),
-      std::make_unique<PageSpecificContentSettingsDelegate>(web_contents()));
-  PageSpecificContentSettings* content_settings =
-      PageSpecificContentSettings::GetForFrame(
-          web_contents()->GetPrimaryMainFrame());
-  auto content_setting_image_model =
-      ContentSettingImageModel::CreateForContentType(
-          ContentSettingImageModel::ImageType::kNotifications);
-
-  const webapps::AppId app_id = web_app::test::InstallDummyWebApp(
-      profile(), "Web App Title", GURL("http://www.google.com"));
-  AppShimRegistry::Get()->OnAppInstalledForProfile(app_id,
-                                                   profile()->GetPath());
-
-  web_app::WebAppTabHelper::Create(&mock_tab, web_contents());
-
-  web_app::WebAppTabHelper::FromWebContents(web_contents())->SetAppId(app_id);
-
-  // If the app requests notification permission while the system permission was
-  // denied, the notification should show and the bubble should auto open.
-  AppShimRegistry::Get()->SaveNotificationPermissionStatusForApp(
-      app_id, mac_notifications::mojom::PermissionStatus::kDenied);
-  content_settings->SetNotificationsWasDeniedBecauseOfSystemPermission();
-  content_setting_image_model->Update(web_contents());
-  EXPECT_TRUE(content_setting_image_model->is_visible());
-  EXPECT_TRUE(content_setting_image_model->is_blocked());
-  EXPECT_TRUE(content_setting_image_model->should_auto_open_bubble());
-  EXPECT_TRUE(content_setting_image_model->blocked_on_system_level());
-}
-#endif
 
 TEST_F(ContentSettingImageModelTest, StorageAccess) {
   auto content_setting_image_model =

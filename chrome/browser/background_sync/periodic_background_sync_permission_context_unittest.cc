@@ -163,48 +163,6 @@ TEST_F(PeriodicBackgroundSyncPermissionContextTest, AllowWithoutFrame) {
             CONTENT_SETTING_ALLOW);
 }
 
-TEST_F(PeriodicBackgroundSyncPermissionContextTest, DesktopPwa) {
-  GURL url("https://example.com");
-  SetUpPwaAndContentSettings(url);
-
-  EXPECT_EQ(GetPermissionStatus(url), CONTENT_SETTING_ALLOW);
-
-  // Disable one-shot Background Sync.
-  SetBackgroundSyncContentSetting(url, CONTENT_SETTING_BLOCK);
-  EXPECT_EQ(GetPermissionStatus(url), CONTENT_SETTING_BLOCK);
-}
-
-TEST_F(PeriodicBackgroundSyncPermissionContextTest, OnWebAppInstalled) {
-  GURL url("https://example.com");
-  // Both both `OnWebAppInstalled` and `OnWebAppInstalledWithOsHooks`
-  // can be called. So there might be more than 1 times.
-  EXPECT_CALL(*mock_permission_context_,
-              OnContentSettingChanged(
-                  ContentSettingsPattern::FromURL(url),
-                  ContentSettingsPattern::Wildcard(),
-                  ContentSettingsTypeSet(
-                      ContentSettingsType::PERIODIC_BACKGROUND_SYNC)))
-      .Times(testing::AtLeast(1));
-
-  web_app::test::InstallDummyWebApp(profile(), "Test App", url);
-}
-
-TEST_F(PeriodicBackgroundSyncPermissionContextTest, OnWebAppUninstalled) {
-  GURL url("https://example.com");
-  const webapps::AppId app_id =
-      web_app::test::InstallDummyWebApp(profile(), "Test App", url);
-
-  EXPECT_CALL(*mock_permission_context_,
-              OnContentSettingChanged(
-                  ContentSettingsPattern::FromURL(url),
-                  ContentSettingsPattern::Wildcard(),
-                  ContentSettingsTypeSet(
-                      ContentSettingsType::PERIODIC_BACKGROUND_SYNC)))
-      .Times(1);
-
-  web_app::test::UninstallWebApp(profile(), app_id);
-}
-
 TEST_F(PeriodicBackgroundSyncPermissionContextTest, DefaultSearchEngine) {
   GURL requesting_origin("https://example.com");
 

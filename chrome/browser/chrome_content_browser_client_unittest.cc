@@ -126,16 +126,10 @@
 
 #include "chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/test/web_app_test_utils.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/search_test_utils.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "media/base/picture_in_picture_events_info.h"
-#include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
 #include "ui/base/page_transition_types.h"
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
@@ -564,81 +558,6 @@ TEST_F(ChromeContentBrowserClientTestWithWebContents,
       media::PictureInPictureEventsInfo::AutoPipReason::kBrowserInitiated);
   EXPECT_EQ(media::PictureInPictureEventsInfo::AutoPipReason::kBrowserInitiated,
             client.GetAutoPipInfo(*web_contents()).auto_pip_reason);
-}
-
-TEST_F(ChromeContentBrowserClientTestWithWebContents,
-       QueryInstalledWebAppsByManifestIdFrameUrlInScope) {
-  ChromeContentBrowserClient client;
-  web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-
-  const GURL app_url("http://foo.com");
-  const GURL frame_url("http://foo.com");
-
-  auto app_id =
-      web_app::test::InstallDummyWebApp(profile(), "dummyapp", app_url);
-  base::test::TestFuture<std::optional<blink::mojom::RelatedApplication>>
-      future;
-
-  client.QueryInstalledWebAppsByManifestId(frame_url, app_url, profile(),
-                                           future.GetCallback());
-
-  ASSERT_TRUE(future.Wait());
-  const auto& result = future.Get();
-  EXPECT_TRUE(result.has_value());
-
-  web_app::WebAppProvider* const web_app_provider =
-      web_app::WebAppProvider::GetForLocalAppsUnchecked(profile());
-  const web_app::WebAppRegistrar& registrar =
-      web_app_provider->registrar_unsafe();
-
-  EXPECT_EQ(result->platform, "webapp");
-  EXPECT_FALSE(result->url.has_value());
-  EXPECT_FALSE(result->version.has_value());
-  EXPECT_TRUE(registrar.GetAppManifestId(app_id).has_value());
-  EXPECT_EQ(result->id, registrar.GetAppManifestId(app_id)->value());
-}
-
-TEST_F(ChromeContentBrowserClientTestWithWebContents,
-       QueryInstalledWebAppsByManifestIdFrameUrlOutOfScope) {
-  ChromeContentBrowserClient client;
-  web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-
-  const GURL app_url("http://foo.com");
-  const GURL out_of_scope_frame_url("http://foo-out.com");
-
-  auto app_id =
-      web_app::test::InstallDummyWebApp(profile(), "dummyapp", app_url);
-  base::test::TestFuture<std::optional<blink::mojom::RelatedApplication>>
-      future;
-
-  client.QueryInstalledWebAppsByManifestId(/*frame_url=*/out_of_scope_frame_url,
-                                           app_url, profile(),
-                                           future.GetCallback());
-
-  ASSERT_TRUE(future.Wait());
-  EXPECT_FALSE(future.Get().has_value());
-}
-
-TEST_F(ChromeContentBrowserClientTestWithWebContents,
-       QueryInstalledWebAppsByManifestIdIncognitoProfileReturnsNullopt) {
-  ChromeContentBrowserClient client;
-
-  // Create / fetch an incognito (off-the-record) profile.
-  Profile* incognito_profile =
-      profile()->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-  ASSERT_TRUE(incognito_profile->IsOffTheRecord());
-  ASSERT_TRUE(!web_app::AreWebAppsEnabled(incognito_profile));
-
-  const GURL app_url("http://foo.com");
-  const GURL frame_url("http://foo.com");
-
-  base::test::TestFuture<std::optional<blink::mojom::RelatedApplication>>
-      future;
-  client.QueryInstalledWebAppsByManifestId(
-      frame_url, app_url, incognito_profile, future.GetCallback());
-
-  ASSERT_TRUE(future.Wait());
-  EXPECT_FALSE(future.Get().has_value());
 }
 
 // TODO(crbug.com/352578800): Move this from

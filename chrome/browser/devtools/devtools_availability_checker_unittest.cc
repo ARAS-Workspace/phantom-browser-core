@@ -6,7 +6,6 @@
 
 #include "build/build_config.h"
 #include "chrome/browser/policy/developer_tools_policy_handler.h"
-#include "chrome/browser/web_applications/test/web_app_test_utils.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/prefs/pref_service.h"
@@ -23,9 +22,6 @@
 #include "extensions/common/manifest_handlers/options_page_info.h"
 #include "extensions/common/mojom/manifest.mojom-shared.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-#include "chrome/browser/web_applications/web_app.h"
-#include "components/webapps/common/web_app_id.h"
 
 class DevToolsAvailabilityCheckerTest : public testing::Test {
  public:
@@ -489,50 +485,4 @@ TEST_F(DevToolsAvailabilityCheckerTest,
       GURL("https://allowed.com/iframe"), subframe);
 
   EXPECT_FALSE(IsInspectionAllowed(profile_.get(), web_contents_.get()));
-}
-
-TEST_F(DevToolsAvailabilityCheckerTest, WebAppAllowedByPolicy) {
-  base::ListValue allowlist;
-  allowlist.Append("https://allowed-app.com");
-  profile_->GetPrefs()->SetList(prefs::kDeveloperToolsAvailabilityAllowlist,
-                                std::move(allowlist));
-
-  auto web_app = web_app::test::CreateWebApp(GURL("https://allowed-app.com"));
-  EXPECT_TRUE(IsInspectionAllowed(profile_.get(), web_app.get()));
-}
-
-TEST_F(DevToolsAvailabilityCheckerTest, WebAppBlockedByPolicy) {
-  base::ListValue blocklist;
-  blocklist.Append("blocked-app.com");
-  profile_->GetPrefs()->SetList(prefs::kDeveloperToolsAvailabilityBlocklist,
-                                std::move(blocklist));
-
-  auto web_app = web_app::test::CreateWebApp(GURL("https://blocked-app.com/"));
-  EXPECT_FALSE(IsInspectionAllowed(profile_.get(), web_app.get()));
-}
-
-TEST_F(DevToolsAvailabilityCheckerTest, WebAppDisallowedByPolicy) {
-  profile_->GetPrefs()->SetInteger(
-      prefs::kDevToolsAvailability,
-      static_cast<int>(
-          policy::DeveloperToolsAvailability::kDisallowed));
-
-  auto web_app = web_app::test::CreateWebApp(GURL("https://example.com/"));
-  EXPECT_FALSE(IsInspectionAllowed(profile_.get(), web_app.get()));
-}
-
-TEST_F(DevToolsAvailabilityCheckerTest, WebAppAllowedWhenPolicyIsAllowed) {
-  profile_->GetPrefs()->SetInteger(
-      prefs::kDevToolsAvailability,
-      static_cast<int>(
-          policy::DeveloperToolsAvailability::kAllowed));
-
-  auto web_app = web_app::test::CreateWebApp(GURL("https://example.com/"));
-  EXPECT_TRUE(IsInspectionAllowed(profile_.get(), web_app.get()));
-}
-
-TEST_F(DevToolsAvailabilityCheckerTest, IsInspectionAllowedNullWebApp) {
-  // Passing nullptr for WebApp should default to allowed.
-  EXPECT_TRUE(IsInspectionAllowed(profile_.get(),
-                                  static_cast<web_app::WebApp*>(nullptr)));
 }

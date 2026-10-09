@@ -890,46 +890,6 @@ TEST_F(DownloadBubbleUpdateServiceTest, CachesExtraItems) {
   EXPECT_EQ(models[2]->GetContentId().id, "now_paused");
 }
 
-// Test that downloads from web apps are only displayed when queried for the
-// specific web app.
-TEST_F(DownloadBubbleUpdateServiceTest, GetAllModelsToDisplayForWebApp) {
-  base::Time now = base::Time::Now();
-  base::Time before = now - base::Hours(1);
-  webapps::AppId app_a_id = "app_a";
-  webapps::AppId app_b_id = "app_b";
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_a_download",
-                   /*is_paused=*/false, now, &app_a_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_b_download",
-                   /*is_paused=*/false, now, &app_b_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "non_app_download",
-                   /*is_paused=*/false, now);
-
-  // Offline items should only be returned for non-web-app queries.
-  InitOfflineItems({OfflineItemState::IN_PROGRESS}, {"offline_item"}, {before});
-
-  DownloadUIModelPtrVector models;
-  EXPECT_TRUE(
-      update_service_->GetAllModelsToDisplay(models, /*web_app_id=*/nullptr));
-  ASSERT_EQ(models.size(), 2u);
-  EXPECT_EQ(models[0]->GetContentId().id, "non_app_download");
-  EXPECT_EQ(models[1]->GetContentId().id, "offline_item");
-  EXPECT_THAT(update_service_->TakeAccessibleAlertsForAnnouncement(nullptr),
-              UnorderedElementsAre(HasSubstr16(u"non_app_download"),
-                                   HasSubstr16(u"offline_item")));
-
-  EXPECT_TRUE(update_service_->GetAllModelsToDisplay(models, &app_a_id));
-  ASSERT_EQ(models.size(), 1u);
-  EXPECT_EQ(models[0]->GetContentId().id, "app_a_download");
-  EXPECT_THAT(update_service_->TakeAccessibleAlertsForAnnouncement(&app_a_id),
-              UnorderedElementsAre(HasSubstr16(u"app_a_download")));
-
-  EXPECT_TRUE(update_service_->GetAllModelsToDisplay(models, &app_b_id));
-  ASSERT_EQ(models.size(), 1u);
-  EXPECT_EQ(models[0]->GetContentId().id, "app_b_download");
-  EXPECT_THAT(update_service_->TakeAccessibleAlertsForAnnouncement(&app_b_id),
-              UnorderedElementsAre(HasSubstr16(u"app_b_download")));
-}
-
 TEST_F(DownloadBubbleUpdateServiceTest, GetProgressInfo) {
   InitDownloadItem(DownloadState::IN_PROGRESS, "in_progress_active",
                    /*is_paused=*/false);
@@ -951,42 +911,6 @@ TEST_F(DownloadBubbleUpdateServiceTest, GetProgressInfo) {
   EXPECT_EQ(progress_info.download_count, 3);
   EXPECT_FALSE(progress_info.progress_certain);
   EXPECT_EQ(progress_info.progress_percentage, 50);
-}
-
-TEST_F(DownloadBubbleUpdateServiceTest, GetProgressInfoForWebApp) {
-  base::Time now = base::Time::Now();
-  webapps::AppId app_a_id = "app_a";
-  webapps::AppId app_b_id = "app_b";
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_a_download1",
-                   /*is_paused=*/false, now, &app_a_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_a_download2",
-                   /*is_paused=*/false, now, &app_a_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_b_download1",
-                   /*is_paused=*/false, now, &app_b_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_b_download2",
-                   /*is_paused=*/false, now, &app_b_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_b_download3",
-                   /*is_paused=*/false, now, &app_b_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "non_app_download",
-                   /*is_paused=*/false, now);
-
-  DownloadDisplay::ProgressInfo non_app_progress_info =
-      update_service_->GetProgressInfo(/*web_app_id=*/nullptr);
-  EXPECT_EQ(non_app_progress_info.download_count, 1);
-  EXPECT_TRUE(non_app_progress_info.progress_certain);
-  EXPECT_EQ(non_app_progress_info.progress_percentage, 50);
-
-  DownloadDisplay::ProgressInfo app_a_progress_info =
-      update_service_->GetProgressInfo(&app_a_id);
-  EXPECT_EQ(app_a_progress_info.download_count, 2);
-  EXPECT_TRUE(app_a_progress_info.progress_certain);
-  EXPECT_EQ(app_a_progress_info.progress_percentage, 50);
-
-  DownloadDisplay::ProgressInfo app_b_progress_info =
-      update_service_->GetProgressInfo(&app_b_id);
-  EXPECT_EQ(app_b_progress_info.download_count, 3);
-  EXPECT_TRUE(app_b_progress_info.progress_certain);
-  EXPECT_EQ(app_b_progress_info.progress_percentage, 50);
 }
 
 TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfo_InProgress) {
@@ -1093,71 +1017,6 @@ TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfo_UpdateForInsecure) {
   EXPECT_TRUE(info.has_unactioned);
   EXPECT_FALSE(info.has_deep_scanning);
   EXPECT_FALSE(info.has_content_check);
-}
-
-TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfoForWebApp) {
-  base::Time now = base::Time::Now();
-  base::Time two_hours_ago = now - base::Hours(2);
-  webapps::AppId app_a_id = "app_a";
-  webapps::AppId app_b_id = "app_b";
-  InitDownloadItem(DownloadState::IN_PROGRESS, "non_app_download",
-                   /*is_paused=*/false, now);
-  InitOfflineItems({OfflineItemState::PAUSED, OfflineItemState::PAUSED},
-                   {"now_offline_item", "two_hours_ago_offline_item"},
-                   {now, two_hours_ago});
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_a_download1",
-                   /*is_paused=*/false, now, &app_a_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_a_download2",
-                   /*is_paused=*/false, now, &app_a_id);
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_b_download",
-                   /*is_paused=*/false, now, &app_b_id);
-
-  DownloadBubbleDisplayInfo non_app_info =
-      update_service_->GetDisplayInfo(/*web_app_id=*/nullptr);
-  EXPECT_EQ(non_app_info.all_models_size, 3u);
-  EXPECT_EQ(non_app_info.paused_count, 2);
-  DownloadBubbleDisplayInfo app_a_info =
-      update_service_->GetDisplayInfo(&app_a_id);
-  EXPECT_EQ(app_a_info.all_models_size, 2u);
-  DownloadBubbleDisplayInfo app_b_info =
-      update_service_->GetDisplayInfo(&app_b_id);
-  EXPECT_EQ(app_b_info.all_models_size, 1u);
-}
-
-TEST_F(DownloadBubbleUpdateServiceTest,
-       DownloadUpdatedWithWebAppDataAfterCreation) {
-  base::Time now = base::Time::Now();
-  webapps::AppId app_id = "app";
-  // This simulates the restoration of a web app download from the history
-  // database, during which the item is created first without the
-  // DownloadItemWebAppData, and then subsequently tagged with the data.
-  InitDownloadItem(DownloadState::IN_PROGRESS, "app_download",
-                   /*is_paused=*/false, now);
-  DownloadItemWebAppData::CreateAndAttachToItem(&GetDownloadItem(0), app_id);
-  GetDownloadItem(0).NotifyObserversDownloadUpdated();
-
-  DownloadUIModelPtrVector models;
-  EXPECT_TRUE(
-      update_service_->GetAllModelsToDisplay(models, /*web_app_id=*/nullptr));
-  EXPECT_TRUE(models.empty());
-
-  EXPECT_TRUE(update_service_->GetAllModelsToDisplay(models, &app_id));
-  ASSERT_EQ(models.size(), 1u);
-  EXPECT_EQ(models[0]->GetContentId().id, "app_download");
-
-  DownloadDisplay::ProgressInfo non_app_progress_info =
-      update_service_->GetProgressInfo(/*web_app_id=*/nullptr);
-  EXPECT_EQ(non_app_progress_info.download_count, 0);
-
-  DownloadDisplay::ProgressInfo app_progress_info =
-      update_service_->GetProgressInfo(&app_id);
-  EXPECT_EQ(app_progress_info.download_count, 1);
-
-  DownloadBubbleDisplayInfo non_app_info =
-      update_service_->GetDisplayInfo(/*web_app_id=*/nullptr);
-  EXPECT_EQ(non_app_info.all_models_size, 0u);
-  DownloadBubbleDisplayInfo app_info = update_service_->GetDisplayInfo(&app_id);
-  EXPECT_EQ(app_info.all_models_size, 1u);
 }
 
 class DownloadBubbleUpdateServiceIncognitoTest

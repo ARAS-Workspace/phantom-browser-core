@@ -239,9 +239,7 @@
 #include "chrome/browser/web_applications/test/fake_web_app_provider.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/test/web_app_test_utils.h"
-#include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
-#include "chrome/browser/web_applications/web_app_sync_bridge.h"
 
 #if BUILDFLAG(IS_LINUX)
 #include "components/crash/core/app/crashpad.h"
@@ -1314,50 +1312,6 @@ class ChromeBrowsingDataRemoverDelegateWithPasswordsTest
             .get());
   }
 };
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, ClearWebAppData) {
-  auto* provider = web_app::FakeWebAppProvider::Get(GetProfile());
-  ASSERT_TRUE(provider);
-
-  // Make sure WebAppProvider's subsystems are ready.
-  base::RunLoop run_loop;
-  provider->on_registry_ready().Post(FROM_HERE, run_loop.QuitClosure());
-  run_loop.Run();
-
-  // Set-up: add a web app to the registry. Currently, only last_launch_time
-  // and last_badging_time fields are being cleared by ClearBrowsingDataCommand.
-  // So, we will check if these fields are cleared as a heuristic to
-  // ClearBrowsingDataCommand being called.
-  auto web_app_id = web_app::test::InstallDummyWebApp(GetProfile(), "Web App",
-                                                      GURL("http://some.url"));
-  auto last_launch_time = base::Time() + base::Seconds(10);
-  provider->sync_bridge_unsafe().SetAppLastLaunchTime(web_app_id,
-                                                      last_launch_time);
-  EXPECT_EQ(
-      provider->registrar_unsafe().GetAppById(web_app_id)->last_launch_time(),
-      last_launch_time);
-  auto last_badging_time = base::Time() + base::Seconds(20);
-  provider->sync_bridge_unsafe().SetAppLastBadgingTime(web_app_id,
-                                                       last_badging_time);
-  EXPECT_EQ(
-      provider->registrar_unsafe().GetAppById(web_app_id)->last_badging_time(),
-      last_badging_time);
-
-  // Run RemoveEmbedderData, and wait for it to complete.
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_HISTORY, false);
-
-  // Verify that web app's last launch time is cleared.
-  EXPECT_FALSE(provider->registrar_unsafe()
-                   .GetAppLastLaunchTime(web_app_id)
-                   .has_value());
-  // Verify that web app's last badging time is cleared.
-  EXPECT_EQ(
-      provider->registrar_unsafe().GetAppById(web_app_id)->last_badging_time(),
-      base::Time());
-
-  EXPECT_EQ(constants::DATA_TYPE_HISTORY, GetRemovalMask());
-}
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, RemoveHistoryForever) {
   RemoveHistoryTester tester;

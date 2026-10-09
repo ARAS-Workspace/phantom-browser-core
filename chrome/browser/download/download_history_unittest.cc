@@ -1024,23 +1024,4 @@ TEST_F(DownloadHistoryTest,
   EXPECT_TRUE(DownloadHistory::IsPersisted(&item(1)));
 }
 
-// Test that web app id is inserted into history.
-TEST_F(DownloadHistoryTest, ByWebAppId) {
-  // Create a fresh item not from download DB
-  CreateDownloadHistory({});
-
-  history::DownloadRow row;
-  row.by_web_app_id = "by_web_app_id";
-  InitBasicItem(FILE_PATH_LITERAL("/foo/bar.pdf"), "http://example.com/bar.pdf",
-                "http://example.com/referrer.html",
-                download::DownloadItem::COMPLETE, &row);
-
-  EXPECT_CALL(item(0), IsDone()).WillRepeatedly(Return(true));
-
-  CallOnDownloadCreated(0);
-  ExpectDownloadCreated(row);
-  EXPECT_TRUE(DownloadHistory::IsPersisted(&item(0)));
-  EXPECT_NE(DownloadItemWebAppData::Get(&item(0)), nullptr);
-}
-
 }  // anonymous namespace

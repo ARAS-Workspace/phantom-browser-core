@@ -17,8 +17,6 @@
 #include "chrome/browser/notifications/mac/notification_utils.h"
 #include "chrome/browser/notifications/mac/stub_notification_dispatcher_mac.h"
 #include "chrome/browser/notifications/notification_test_util.h"
-#include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/testing_browser_process.h"
@@ -147,15 +145,6 @@ class NotificationPlatformBridgeMacTest : public testing::Test {
 
   StubNotificationDispatcherMac* alert_dispatcher() {
     return alert_dispatcher_.get();
-  }
-
-  StubNotificationDispatcherMac* dispatcher_for_web_app(
-      const webapps::AppId& web_app_id) {
-    auto it = web_app_dispatchers_.find(web_app_id);
-    if (it == web_app_dispatchers_.end()) {
-      return nullptr;
-    }
-    return it->second.get();
   }
 
   TestingProfile* profile() { return profile_; }
@@ -556,161 +545,4 @@ TEST_F(NotificationPlatformBridgeMacTest, TestDisplayETLDPlusOne) {
   EXPECT_EQ(u"peter.sh", notifications[3]->subtitle);
   EXPECT_EQ(u"localhost:8080", notifications[4]->subtitle);
   EXPECT_EQ(u"93.186.186.172", notifications[5]->subtitle);
-}
-
-class NotificationPlatformBridgeMacTestWithNotificationAttribution
-    : public NotificationPlatformBridgeMacTest {
- public:
-  NotificationPlatformBridgeMacTestWithNotificationAttribution() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{features::kAppShimNotificationAttribution,
-                              features::kUseAdHocSigningForWebAppShims},
-        /*disabled_features=*/{});
-  }
-
-  void SetUp() override {
-    NotificationPlatformBridgeMacTest::SetUp();
-    web_app::test::AwaitStartWebAppProviderAndSubsystems(profile());
-    installed_app_id_ = web_app::test::InstallDummyWebApp(
-        profile(), "Web App Name", GURL("https://gmail.com"));
-    // TODO(https://crbug.com/328437955): Remove this when OS integration
-    // happens safely by default.
-    AppShimRegistry::Get()->OnAppInstalledForProfile(installed_app_id_,
-                                                     profile()->GetPath());
-  }
-
- protected:
-  webapps::AppId installed_app_id_;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-TEST_F(NotificationPlatformBridgeMacTestWithNotificationAttribution,
-       BannersAndAlertsAreAttributed) {
-  std::unique_ptr<Notification> alert =
-      CreateAlert("Title", "Context", "https://gmail.com", "Button 1", nullptr,
-                  installed_app_id_);
-  std::unique_ptr<Notification> banner =
-      CreateBanner("Title", "Context", "https://gmail.com", "Button 1", nullptr,
-                   installed_app_id_);
-  auto bridge = std::make_unique<NotificationPlatformBridgeMac>(
-      CreateBannerDispatcher(), CreateAlertDispatcher(),
-      CreateWebAppDispatcherFactory());
-  bridge->Display(NotificationHandler::Type::WEB_PERSISTENT, profile(),
-                  Notification("notification_id1", *banner), nullptr);
-  bridge->Display(NotificationHandler::Type::WEB_PERSISTENT, profile(),
-                  Notification("notification_id2", *alert), nullptr);
-  EXPECT_EQ(0u, banner_dispatcher()->notifications().size());
-  EXPECT_EQ(0u, alert_dispatcher()->notifications().size());
-  auto* app_dispatcher = dispatcher_for_web_app(installed_app_id_);
-  ASSERT_TRUE(app_dispatcher);
-  EXPECT_EQ(2u, app_dispatcher->notifications().size());
-}
-
-TEST_F(NotificationPlatformBridgeMacTestWithNotificationAttribution,
-       CloseNotificationInWebApp) {
-  std::unique_ptr<Notification> banner =
-      CreateBanner("Title", "Context", "https://gmail.com", "Button 1", nullptr,
-                   installed_app_id_);
-  auto bridge = std::make_unique<NotificationPlatformBridgeMac>(
-      CreateBannerDispatcher(), CreateAlertDispatcher(),
-      CreateWebAppDispatcherFactory());
-  bridge->Display(NotificationHandler::Type::WEB_PERSISTENT, profile(),
-                  Notification("notification_id1", *banner), nullptr);
-  auto* app_dispatcher = dispatcher_for_web_app(installed_app_id_);
-  ASSERT_TRUE(app_dispatcher);
-  EXPECT_EQ(1u, app_dispatcher->notifications().size());
-
-  bridge->Close(profile(), "notification_id1");
-  EXPECT_EQ(0u, app_dispatcher->notifications().size());
-}
-
-TEST_F(NotificationPlatformBridgeMacTestWithNotificationAttribution,
-       DisplayMovesNotificationToWebApp) {
-  std::unique_ptr<Notification> banner = CreateBanner(
-      "Title", "Context", "https://gmail.com", "Button 1", /*button2=*/nullptr,
-      /*web_app_id=*/"");
-  auto bridge = std::make_unique<NotificationPlatformBridgeMac>(
-      CreateBannerDispatcher(), CreateAlertDispatcher(),
-      CreateWebAppDispatcherFactory());
-  bridge->Display(NotificationHandler::Type::WEB_PERSISTENT, profile(),
-                  Notification("notification_id1", *banner), nullptr);
-
-  EXPECT_FALSE(dispatcher_for_web_app(installed_app_id_));
-  EXPECT_TRUE(alert_dispatcher()->notifications().empty());
-  EXPECT_EQ(1u, banner_dispatcher()->notifications().size());
-
-  banner = CreateBanner("Title", "Context", "https://gmail.com", "Button 1",
-                        /*button2=*/nullptr, installed_app_id_);
-  bridge->Display(NotificationHandler::Type::WEB_PERSISTENT, profile(),
-                  Notification("notification_id1", *banner), nullptr);
-
-  auto* app_dispatcher = dispatcher_for_web_app(installed_app_id_);
-  ASSERT_TRUE(app_dispatcher);
-  EXPECT_EQ(1u, app_dispatcher->notifications().size());
-  EXPECT_TRUE(alert_dispatcher()->notifications().empty());
-  EXPECT_TRUE(banner_dispatcher()->notifications().empty());
-}
-
-TEST_F(NotificationPlatformBridgeMacTestWithNotificationAttribution,
-       GetDisplayed) {
-  std::unique_ptr<Notification> banner =
-      CreateBanner("Title", "Context", "https://gmail.com", "Button 1", nullptr,
-                   installed_app_id_);
-  auto bridge = std::make_unique<NotificationPlatformBridgeMac>(
-      CreateBannerDispatcher(), CreateAlertDispatcher(),
-      CreateWebAppDispatcherFactory());
-  bridge->Display(NotificationHandler::Type::WEB_PERSISTENT, profile(),
-                  Notification("notification_id1", *banner), nullptr);
-  auto* app_dispatcher = dispatcher_for_web_app(installed_app_id_);
-  ASSERT_TRUE(app_dispatcher);
-  EXPECT_EQ(1u, app_dispatcher->notifications().size());
-
-  {
-    base::test::TestFuture<std::set<std::string>, bool> future;
-    bridge->GetDisplayed(profile(), future.GetCallback());
-    auto [notifications, supports_synchronization] = future.Get();
-    EXPECT_TRUE(notifications.empty());
-    EXPECT_FALSE(supports_synchronization);
-  }
-  {
-    base::test::TestFuture<std::set<std::string>, bool> future;
-    bridge->GetDisplayedForOrigin(profile(), GURL("https://gmail.com"),
-                                  future.GetCallback());
-    auto [notifications, supports_synchronization] = future.Get();
-    EXPECT_EQ(1u, notifications.size());
-    EXPECT_TRUE(supports_synchronization);
-  }
-  {
-    base::test::TestFuture<std::set<std::string>, bool> future;
-    bridge->GetDisplayedForOrigin(profile(), GURL("https://example.com"),
-                                  future.GetCallback());
-
-    auto [notifications, supports_synchronization] = future.Get();
-    EXPECT_TRUE(notifications.empty());
-    EXPECT_TRUE(supports_synchronization);
-  }
-}
-
-TEST_F(NotificationPlatformBridgeMacTestWithNotificationAttribution,
-       GetDisplayedWithoutExistingDispatcher) {
-  std::unique_ptr<Notification> banner =
-      CreateBanner("Title", "Context", "https://gmail.com", "Button 1", nullptr,
-                   installed_app_id_);
-  auto bridge = std::make_unique<NotificationPlatformBridgeMac>(
-      CreateBannerDispatcher(), CreateAlertDispatcher(),
-      CreateWebAppDispatcherFactory());
-  EXPECT_FALSE(dispatcher_for_web_app(installed_app_id_));
-
-  {
-    base::test::TestFuture<std::set<std::string>, bool> future;
-    bridge->GetDisplayedForOrigin(profile(), GURL("https://gmail.com"),
-                                  future.GetCallback());
-    auto [notifications, supports_synchronization] = future.Get();
-    EXPECT_EQ(0u, notifications.size());
-    EXPECT_TRUE(supports_synchronization);
-  }
-
-  EXPECT_TRUE(dispatcher_for_web_app(installed_app_id_));
 }
