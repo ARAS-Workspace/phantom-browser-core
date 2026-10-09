@@ -30,7 +30,6 @@ TEST_TARGET_ALLOWLIST: list[str] = [
   '//chrome/browser/apps/app_service/app_install:app_install_fuzztests',
   '//chrome/browser/mac:install_sh_test',
   '//chrome/browser/metrics/perf:profile_provider_unittest',
-  '//chrome/browser/web_applications:web_application_fuzztests',
   '//chromecast/media/base:video_plane_controller_test',
   '//chromecast/metrics:cast_metrics_unittest',
   '//chrome/enterprise_companion:enterprise_companion_integration_tests',

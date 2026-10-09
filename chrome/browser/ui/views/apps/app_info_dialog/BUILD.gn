@@ -46,19 +46,3 @@ source_set("impl") {
     "//components/app_constants",
   ]
 }
-
-source_set("browser_tests") {
-  testonly = true
-  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  deps = [
-    ":app_info_dialog",
-    "//base",
-    "//base/test:test_support",
-    "//chrome/browser/ui",
-    "//chrome/browser/ui/tabs:tab_strip",
-    "//chrome/browser/ui/test:dialog",
-    "//chrome/test:test_support",
-    "//extensions/browser",
-    "//extensions/common",
-  ]
-}

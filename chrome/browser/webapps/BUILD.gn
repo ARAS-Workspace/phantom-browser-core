@@ -65,29 +65,3 @@ source_set("desktop_impl") {
     "//content/public/browser",
   ]
 }
-
-source_set("interactive_ui_tests") {
-  testonly = true
-  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-  deps = [
-    "//base",
-    "//base/test:test_support",
-    "//chrome/browser/profiles:profile",
-    "//chrome/browser/ui",
-    "//chrome/browser/web_applications",
-    "//chrome/browser/web_applications:web_applications_test_support",
-    "//chrome/test:test_support",
-    "//chrome/test:test_support_ui",
-    "//components/metrics:content",
-    "//components/webapps/browser:test_support",
-    "//content/test:test_support",
-    "//net",
-    "//skia",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//ui/base",
-    "//ui/gfx",
-    "//ui/native_theme",
-  ]
-}

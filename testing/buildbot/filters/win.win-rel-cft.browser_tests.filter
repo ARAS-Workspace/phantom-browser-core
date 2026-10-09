@@ -102,10 +102,6 @@ BrowserRootViewBrowserTest.*
 -SessionRestoreTest.RestoredTabsHaveCorrectInitialSize
 -TabSharingUIViewsPreferCurrentTabBrowserTest.VerifyUiWhenCapturingAnotherTab
 -TabSharingUIViewsPreferCurrentTabBrowserTest.VerifyUiWhenSelfCapturing
--WebAppFrameToolbarBrowserTest_WindowControlsOverlay.*
--WebAppGlassBrowserFrameViewWindowControlsOverlayTest.*
--WebAppBrowserFrameViewWinWindowControlsOverlayTest.*
--WebAppIntegration.*
 -WebContentsInteractionTestUtilInteractiveUiTest.*
 -WebRtcDesktopCaptureBrowserTest.CloseAndReopenNonSharedTab
 -WebRtcDesktopCaptureBrowserTest.SwitchSharedTabBackAndForth
@@ -177,7 +173,6 @@ BrowserRootViewBrowserTest.*
 -SingleClientWalletCredentialSyncTest.*
 -SingleClientWalletSecondaryAccountSyncTest.*
 -SingleClientWalletSyncTest.*
--SingleClientWebAppsSyncTest.*
 -SingleClientWebAuthnCredentialsSyncTest.*
 -SingleClientWebAuthnCredentialsSyncTestExplicitParamTest.*
 -SyncAuthTest.*
@@ -203,4 +198,3 @@ BrowserRootViewBrowserTest.*
 -TwoClientSharedTabGroupDataSyncTest.*
 -TwoClientThemesSyncTest.*
 -TwoClientWalletSyncTest.*
--WebAppIntegration.*

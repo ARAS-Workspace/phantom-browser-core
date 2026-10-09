@@ -44,7 +44,6 @@
 -PopupBlockerBrowserTest.ModalPopUnder
 -SameSiteSubframe/DragAndDropBrowserTest.CrossTabDrag/0
 -StartupBrowserCreatorTest.LastUsedProfileActivated
--WebAppProfileSwitcherBrowserTest.SwitchWebAppProfileActivateWindowOnly
 -WidgetInputMethodInteractiveTest.Activation
 -WidgetInputMethodInteractiveTest.OneWindow
 -WidgetInputMethodInteractiveTest.TwoWindows

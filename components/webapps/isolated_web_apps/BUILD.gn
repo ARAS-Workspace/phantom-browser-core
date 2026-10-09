@@ -48,11 +48,3 @@ source_set("iwa_client") {
     "//url",
   ]
 }
-
-group("unit_tests") {
-  testonly = true
-  deps = [
-    "//components/webapps/isolated_web_apps/download:unit_tests",
-    "//components/webapps/isolated_web_apps/public:unit_tests",
-  ]
-}

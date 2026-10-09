@@ -57,8 +57,6 @@ IGNORED_EXTENSIONS = ('dylib',)
 #
 # Case-insensitive, lower-case only.
 EXECUTABLE_PATHS = (
-  'chrome/test/data/app_shim/app_shim_32_bit.app/contents/'
-  'macos/app_mode_loader',
 )
 
 # These files must not have the executable bit set. This is mainly a performance

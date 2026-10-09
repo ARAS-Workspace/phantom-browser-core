@@ -14,7 +14,6 @@
 -All/SearchEnginePreconnectorNoDelaysBrowserTest.PreconnectOnlyInForeground/*
 -All/SoftNavigationTest.LayoutShift/*
 -BackForwardCachePageLoadMetricsObserverBrowserTest.LayoutShiftNormalization_AfterBackForwardCacheRestore
--UnframedIsolatedWebAppBrowserTest.PopupResize_CanSubceedMinimumWindowSize_And_InnerAndOuterSizesAreCorrect
 
 # TODO(crbug.com/40688401) This test requires full Picture-in-Picture support.
 -FedCmAccountSelectionViewBrowserTest.DisabledWhenOccluded
@@ -29,11 +28,6 @@
 -ProfilePickerEnterpriseCreationFlowBrowserTest.CreateSignedInProfileWithSuggestedTwoFactorAuthSetup
 -ReadAnythingReadAloudPhraseHighlightingMochaTest.*
 -SessionRestoreTest.RestoredTabsHaveCorrectInitialSize
--All/WebAppBrowserTest.PWASizeIsCorrectlyRestored/*
--All/WebAppBrowserTest.SetBounds/*
--All/WebAppBrowserTest.WindowOffsetsClampedToScreen/*
-
--WebAppFrameToolbarBrowserTest_WindowControlsOverlay.DownloadIconVisibilityForAppDownload
 
 #################################################
 # Also flaky/failing weston and/or other builders

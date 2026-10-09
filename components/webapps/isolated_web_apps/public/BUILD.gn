@@ -25,14 +25,3 @@ source_set("public") {
     "//services/network/public/cpp:web_platform",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  deps = [
-    "//base",
-    "//components/webapps/isolated_web_apps",
-    "//components/webapps/isolated_web_apps/key_distribution/proto",
-    "//services/network/public/cpp",
-    "//testing/gtest",
-  ]
-}

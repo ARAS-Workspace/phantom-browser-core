@@ -22,7 +22,6 @@
 -PopupBlockerBrowserTest.ModalPopUnder
 -SettingsGlicPageFocusTest.GlicPageFocus
 -StartupBrowserCreatorTest.LastUsedProfileActivated
--WebAppProfileSwitcherBrowserTest.SwitchWebAppProfileActivateWindowOnly
 -WidgetInputMethodInteractiveTest.Activation
 -WidgetInputMethodInteractiveTest.OneWindow
 -WidgetInputMethodInteractiveTest.TwoWindows

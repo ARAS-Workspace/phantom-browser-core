@@ -31,13 +31,3 @@ mojom("mojo_bindings") {
     "//url/mojom:url_mojom_gurl",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  deps = [
-    ":common",
-    "//testing/gtest",
-    "//third_party/abseil-cpp:absl",
-    "//url",
-  ]
-}

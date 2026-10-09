@@ -6,7 +6,6 @@ source_set("test_support") {
   testonly = true
 
   sources = [
-    "fake_iwa_runtime_data_provider_mixin.h",
     "iwa_runtime_data_provider_mixin.cc",
     "iwa_runtime_data_provider_mixin.h",
   ]

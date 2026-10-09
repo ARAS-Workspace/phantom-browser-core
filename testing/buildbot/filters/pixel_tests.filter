@@ -62,7 +62,6 @@ ManagedUserProfileNoticeUIWindowPixelTest.*
 ExtensionInstallDialogViewInteractiveBrowserTest.*
 ExtensionUninstallDialogViewInteractiveBrowserTest.*
 *EyeDropperBrowserTest.*
-FeaturePromoDialogIntentChipTest.InvokeUi_*
 FeaturePromoDialogTest.InvokeUi_*
 FileSystemAccessUsageBubbleViewTest.*
 FirstRunDefaultBrowserPixelTest.*
@@ -178,10 +177,6 @@ VerticalTabStripTopContainerInteractiveUiTest.PixelTest*
 *WatermarkBrowserTest.*
 *WatermarkTestPageBrowserTest.*
 *WatermarkTestPageDynamicBrowserTest.*
-WebAppBlockedMigrationInfoBarDelegateUiTest.*
-WebAppConfirmViewBrowserTest.*
-WebAppInstallDialogBrowserTest.*
-WebAppMenuBrowserTest.*
 WebAppUpdateReviewDialog.*
 WebUIToolbarPixelInteractiveUiTest.*
 ZoomBubbleDialogTest.*

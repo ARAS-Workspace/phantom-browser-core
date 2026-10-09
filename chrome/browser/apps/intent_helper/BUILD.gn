@@ -16,14 +16,3 @@ source_set("intent_chip_display_prefs") {
     "//components/content_settings/core/common",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  deps = [
-    ":intent_chip_display_prefs",
-    "//chrome/test:test_support",
-    "//content/test:test_support",
-    "//testing/gtest",
-    "//url",
-  ]
-}

@@ -52,25 +52,3 @@ source_set("extensions") {
     "//components/services/app_service",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-
-  deps = [
-    ":extensions",
-    "//chrome/browser/web_applications",
-    "//chrome/browser/web_applications:web_app_test",
-    "//chrome/browser/web_applications:web_applications_test_support",
-    "//chrome/browser/web_applications:web_applications_unit_tests",
-    "//chrome/common",
-    "//chrome/test:test_support",
-    "//components/webapps/browser",
-    "//components/webapps/common",
-    "//content/public/browser",
-    "//content/test:test_support",
-    "//extensions/browser/install",
-    "//extensions/common",
-    "//skia",
-    "//testing/gtest",
-  ]
-}

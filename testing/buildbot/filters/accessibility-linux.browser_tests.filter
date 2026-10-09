@@ -70,9 +70,6 @@
 # Flaky on multiple bots: crbug.com/476255536
 -DefaultIsolation/TaskManagerOOPIFBrowserTest.LeavePageWithCrossSiteIframes/0
 
-# Flaky on Linux: crbug.com/483506397
--DiceMigrationServiceBrowserTestWithWebApps.NoDialogShown
-
 # Flaky on Linux: crbug.com/483088604
 -DocumentPictureInPictureWindowControllerBrowserTest.CreateTwice
 -DocumentPictureInPictureWindowControllerBrowserTest.CreationAndVisibilityAndActivation
@@ -107,9 +104,6 @@
 
 # Flaky on most bots: crbug.com/474801547
 -MLPromotionBrowserTest.MLPipelineNoCrashForExistingTracker
-
-# Flaky on Linux: crbug.com/483651796
--NavigationCapturingBrowserNavigatorBrowserTest.FocusExistingUsesLatestActivatedAppWindow
 
 # Flaky on most bots: crbug.com/483506389
 -NewTabPageAppTest.RealboxNext

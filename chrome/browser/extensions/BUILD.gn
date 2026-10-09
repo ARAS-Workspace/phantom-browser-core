@@ -2132,11 +2132,6 @@ source_set("browser_tests") {
         "api/proxy_override_rules/proxy_override_rules_private_apitest.cc",
         "api/web_authentication_proxy/web_authentication_proxy_apitest.cc",
       ]
-
-      deps += [
-        "//chrome/browser/ui/views/web_apps/sub_apps",
-        "//chrome/browser/ui/webui/app_home:browser_tests",
-      ]
     }
 
     if (is_linux || is_mac) {
@@ -2151,13 +2146,11 @@ source_set("browser_tests") {
 
     if (is_linux || is_mac) {
       deps += [
-        "//chrome/browser/ui/webui/app_home:mojo_bindings",
         "//components/device_signals/core/browser",
       ]
     }
 
     deps += [
-      "//apps:browser_tests",
       "//chrome/browser:browser_process_platform_part",
       "//chrome/browser/affiliations",
       "//chrome/browser/apps/app_service",

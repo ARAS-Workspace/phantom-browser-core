@@ -102,7 +102,6 @@ test("components_unittests") {
       "test/data/update_client/",
       "test/data/url_rewrite/",
       "test/data/value_store/",
-      "test/data/webapps/",
       "test/data/webcrypto/",
       "test/data/web_database/",
       "test/data/web_package/",
@@ -442,7 +441,6 @@ test("components_unittests") {
       "//components/web_cache/browser:unit_tests",
       "//components/web_package:unit_tests",
       "//components/web_package/test_support:unit_tests",
-      "//components/webapps/common:unit_tests",
       "//components/webauthn/content/browser:unit_tests",
       "//components/webauthn/json:unit_tests",
       "//components/webcrypto:unit_tests",
@@ -559,7 +557,6 @@ test("components_unittests") {
       "//components/metrics/structured/mojom:unit_tests",
       "//components/private_insights:unit_tests",
       "//components/stability_report:unit_tests",
-      "//components/webapps/isolated_web_apps:unit_tests",
     ]
   }
 

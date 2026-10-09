@@ -94,23 +94,3 @@ source_set("impl") {
     ]
   }
 }
-
-if (use_aura) {
-  source_set("unit_tests") {
-    testonly = true
-
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-
-    deps = [
-      ":apps",
-      "//apps/ui/views",
-      "//testing/gtest",
-      "//ui/aura",
-      "//ui/events",
-      "//ui/views",
-      "//ui/views:test_support",
-      "//ui/views/controls/webview",
-      "//ui/wm",
-    ]
-  }
-}

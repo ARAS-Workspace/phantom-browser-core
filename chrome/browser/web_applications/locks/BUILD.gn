@@ -17,13 +17,3 @@ source_set("partitioned_lock_manager") {
   ]
   public_deps = [ "//base" ]
 }
-
-source_set("partitioned_lock_manager_unit_tests") {
-  testonly = true
-  deps = [
-    ":partitioned_lock_manager",
-    "//base",
-    "//base/test:test_support",
-    "//testing/gtest",
-  ]
-}

@@ -1242,7 +1242,6 @@ test("browser_tests") {
     "//chrome/browser/ui/views:status_bubble",
     "//chrome/browser/ui/views/accessibility",
     "//chrome/browser/ui/views/app_menu:browser_tests",
-    "//chrome/browser/ui/views/apps/app_info_dialog:browser_tests",
     "//chrome/browser/ui/views/bookmarks:test_support",
     "//chrome/browser/ui/views/bubble",
     "//chrome/browser/ui/views/data_sharing",
@@ -1332,14 +1331,11 @@ test("browser_tests") {
     "//chrome/browser/visited_url_ranking:browser_tests",
     "//chrome/browser/wake_lock:browser_tests",
     "//chrome/browser/wallet:browser_tests",
-    "//chrome/browser/web_applications:browser_tests",
     "//chrome/browser/web_applications:features",
     "//chrome/browser/web_applications:prevent_close_test_support",
     "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/browser/web_applications/isolated_web_apps/test:test_support",
     "//chrome/browser/webapps:desktop",
-    "//chrome/browser/webapps/installable:browser_tests",
-    "//chrome/browser/webapps/web_contents:browser_tests",
     "//chrome/browser/webauthn:test_support",
     "//chrome/browser/webid",
     "//chrome/browser/webid:browser_tests",
@@ -2021,7 +2017,6 @@ test("browser_tests") {
 
   deps += [
     "//chrome/browser:flags",
-    "//chrome/browser/apps/link_capturing:app_service_browser_tests",
     "//chrome/browser/autocomplete",
     "//chrome/browser/autocomplete:aim_eligibility_service",
     "//chrome/browser/collaboration/messaging",
@@ -3596,7 +3591,6 @@ test("unit_tests") {
     "//chrome/browser/ui/window_metadata:unit_tests",
     "//chrome/browser/webapps:desktop",
     "//chrome/browser/webapps:desktop_impl",
-    "//chrome/browser/webapps/installable:unit_tests",
   ]
 
   if (enable_captive_portal_detection) {
@@ -3851,7 +3845,6 @@ test("unit_tests") {
     "//chrome/browser/ui/webui:theme_source_unit_tests",
     "//chrome/browser/ui/webui:webui_util",
     "//chrome/browser/ui/webui/access_code_cast:unit_tests",
-    "//chrome/browser/ui/webui/app_management:unit_tests",
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/browser_command:unit_tests",
     "//chrome/browser/ui/webui/commerce:unit_tests",
@@ -3956,7 +3949,6 @@ test("unit_tests") {
     "//chrome/browser/apps/app_service/app_icon:util",
     "//chrome/browser/apps/link_capturing",
     "//chrome/browser/apps/link_capturing:test_support",
-    "//chrome/browser/apps/link_capturing:unit_tests",
     "//chrome/browser/background",
     "//chrome/browser/companion/text_finder:unit_tests",
     "//chrome/browser/content_settings:unit_tests",
@@ -4151,7 +4143,6 @@ test("unit_tests") {
 
   deps += [
     "//chrome/browser/apps/intent_helper:intent_chip_display_prefs",
-    "//chrome/browser/apps/intent_helper:unit_tests",
     "//chrome/browser/ui/search",
     "//chrome/browser/ui/views/location_bar",
     "//chrome/browser/ui/webui/context_hub:unit_tests",
@@ -4202,16 +4193,13 @@ test("unit_tests") {
 
     allow_circular_includes_from = [
       "//chrome/browser/web_applications:web_applications_unit_tests",
-      "//chrome/browser/web_applications/extensions:unit_tests",
     ]
 
     deps += [
-      "//apps:unit_tests",
       "//chrome/browser/affiliations",
       "//chrome/browser/web_applications:unit_tests",
       "//chrome/browser/web_applications:web_app_test",
       "//chrome/browser/web_applications:web_applications_unit_tests",
-      "//chrome/browser/web_applications/extensions:unit_tests",
       "//chrome/utility/image_writer:unit_tests",
       "//components/services/unzip:in_process",
       "//extensions/browser/mime_handler",
@@ -4632,7 +4620,6 @@ test("unit_tests") {
       ]
 
       deps += [
-        "//chrome/browser/ui/views/apps:unit_tests",
         "//ui/aura:test_support",
         "//ui/views:test_support",
         "//ui/wm",
@@ -5271,7 +5258,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/ui/window_metadata",
     "//chrome/browser/web_applications:features",
     "//chrome/browser/web_applications:web_applications_test_support",
-    "//chrome/browser/webapps:interactive_ui_tests",
     "//chrome/browser/webauthn",
     "//chrome/browser/webauthn:interactive_ui_tests",
     "//chrome/browser/webauthn:test_support",
@@ -5414,7 +5400,6 @@ test("interactive_ui_tests") {
 
   if (enable_extensions) {
     deps += [
-      "//chrome/browser/controlled_frame:interactive_ui_tests",
       "//chrome/browser/extensions:interactive_ui_tests",
       "//chrome/browser/guest_view:interactive_ui_tests",
       "//chrome/browser/omnibox",
@@ -5766,7 +5751,6 @@ test("interactive_ui_tests") {
 
   if (enable_print_preview) {
     deps += [
-      "//chrome/browser/webapps:interactive_ui_tests",
       "//chrome/browser/window_management:interactive_ui_tests",
     ]
   }
