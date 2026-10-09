@@ -41,7 +41,6 @@ suite('PrivacyPageIndex', function() {
           enableSmartCardReadersContentSetting: false,
           enableWebPrintingContentSetting: false,
           // </if>
-          enableWebAppInstallation: false,
           enableWebBluetoothNewPermissionsBackend: false,
           isGuest: false,
           isAdPrivacyAvailable: true,
@@ -484,14 +483,5 @@ suite('PrivacyPageIndex', function() {
           'privacy');
     });
     // </if>
-
-    test('RoutingWebAppInstallation', async function() {
-      assertFalse(loadTimeData.getBoolean('enableWebAppInstallation'));
-      await createPrivacyPageIndex({enableWebAppInstallation: true});
-
-      return testViewsForRoute(
-          routes.SITE_SETTINGS_WEB_APP_INSTALLATION,
-          ['siteSettingsWebAppInstallation'], 'privacy');
-    });
   });
 });

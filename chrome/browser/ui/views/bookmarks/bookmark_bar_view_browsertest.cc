@@ -72,10 +72,6 @@ class BookmarkBarTestBase : public InProcessBrowserTest {
     return test_helper_->GetBookmarkButton(index);
   }
 
-  views::LabelButton* GetAppsPageShortCut() {
-    return test_helper_->apps_page_shortcut();
-  }
-
   BrowserView* browser_view() {
     return BrowserView::GetBrowserViewForBrowser(browser());
   }
@@ -1156,11 +1152,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBarTest, BookmarkFolderButtonHighlight) {
   CreateBookmarkFolder();
 
   TestContextMenuHighlight(GetBookmarkButton(0));
-}
-
-#define MAYBE_AppsPageShortcutHighlight AppsPageShortcutHighlight
-IN_PROC_BROWSER_TEST_F(BookmarkBarTest, MAYBE_AppsPageShortcutHighlight) {
-  TestContextMenuHighlight(GetAppsPageShortCut());
 }
 
 namespace {

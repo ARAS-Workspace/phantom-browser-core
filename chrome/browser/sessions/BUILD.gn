@@ -259,7 +259,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/tabs:tab_strip",
     "//chrome/browser/ui/tabs/saved_tab_groups",
     "//chrome/browser/ui/window_metadata",
-    "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
     "//components/infobars/content",

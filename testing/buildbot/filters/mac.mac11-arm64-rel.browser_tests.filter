@@ -57,6 +57,5 @@
 -SitePerProcessWebViewTest.ContentScript/InnerWebContents
 -SitePerProcessWebViewTest.ContentScript/MPArch
 -SSLUITest.BadCertFollowedByGoodCert
--StartupBrowserWithWebAppTest.LastUsedProfilesWithWebApp
 -TabRestoreTest.RestoreTabFromClosedWindowByID
 -WorkerDevToolsTest.PauseInSharedWorkerInitialization

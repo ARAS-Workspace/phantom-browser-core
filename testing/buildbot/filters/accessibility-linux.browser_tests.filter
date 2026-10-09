@@ -170,9 +170,6 @@
 # Flaky on most bots: crbug.com/487944774
 -SkillsInteractiveUiTest.UpdateSkillPreviews
 
-# Flaky on all bots: crbug.com/484997712
--StartupBrowserWithListAppsFeature.ListAppsForAllProfiles
-
 # Flaky on Linux: crbug.com/483092912
 -TabRestoreTest.RestoreGroupWithUnloadHandlerRejected
 

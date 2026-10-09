@@ -13,7 +13,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/scoped_feature_list.h"
-#include "base/values.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
@@ -30,9 +29,9 @@
 #include "components/bookmarks/common/bookmark_bar_visibility_state.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/bookmarks/test/bookmark_test_helpers.h"
+#include "components/prefs/pref_service.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/signin/public/base/signin_switches.h"
-#include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/browser/page_navigator.h"
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -440,34 +439,6 @@ TEST_F(BookmarkContextMenuControllerTest, CutCopyPasteNode) {
   ASSERT_TRUE(bb_node->children()[0]->is_url());
   ASSERT_TRUE(bb_node->children()[1]->is_folder());
   ASSERT_EQ(old_count, bb_node->children().size());
-}
-
-TEST_F(BookmarkContextMenuControllerTest,
-       ManagedShowAppsShortcutInBookmarksBar) {
-  BookmarkContextMenuController controller(
-      gfx::NativeWindow(), nullptr, nullptr, profile_.get(),
-      BookmarkLaunchLocation::kNone, {model_->other_node()},
-      /*can_paste=*/false);
-
-  // By default, the pref is not managed and the command is enabled.
-  sync_preferences::TestingPrefServiceSyncable* prefs =
-      profile_->GetTestingPrefService();
-  EXPECT_FALSE(prefs->IsManagedPreference(
-      bookmarks::prefs::kShowAppsShortcutInBookmarkBar));
-  EXPECT_TRUE(
-      controller.IsCommandIdEnabled(IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT));
-
-  // Disabling the shorcut by policy disables the command.
-  prefs->SetManagedPref(bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
-                        std::make_unique<base::Value>(false));
-  EXPECT_FALSE(
-      controller.IsCommandIdEnabled(IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT));
-
-  // And enabling the shortcut by policy disables the command too.
-  prefs->SetManagedPref(bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
-                        std::make_unique<base::Value>(true));
-  EXPECT_FALSE(
-      controller.IsCommandIdEnabled(IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT));
 }
 
 TEST_F(BookmarkContextMenuControllerTest, ShowTabGroupsPref) {

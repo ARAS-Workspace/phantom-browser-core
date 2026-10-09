@@ -25,8 +25,6 @@ class BookmarkBarViewTestHelper {
     return bbv_->bookmark_buttons_[index].first;
   }
 
-  views::LabelButton* apps_page_shortcut() { return bbv_->apps_page_shortcut_; }
-
   views::MenuButton* overflow_button() { return bbv_->overflow_button_; }
 
   views::MenuButton* managed_bookmarks_button() {

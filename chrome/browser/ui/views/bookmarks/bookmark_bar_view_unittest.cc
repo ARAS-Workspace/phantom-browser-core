@@ -9,7 +9,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/scoped_feature_list.h"
-#include "base/values.h"
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
@@ -19,7 +18,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_test_util.h"
-#include "chrome/browser/ui/bookmarks/bookmark_utils.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bar_view_test_helper.h"
 #include "chrome/browser/ui/views/bookmarks/saved_tab_groups/saved_tab_group_bar.h"
@@ -35,7 +33,6 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/search_engines/template_url_service_client.h"
 #include "components/signin/public/base/signin_switches.h"
-#include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/browser/page_navigator.h"
 #include "ui/base/clipboard/clipboard_format_type.h"
 #include "ui/base/dragdrop/drag_drop_types.h"
@@ -260,29 +257,6 @@ class BookmarkBarViewInWidgetTest : public BookmarkBarViewBaseTest {
   std::unique_ptr<views::Widget> widget_;
   raw_ptr<BookmarkBarView> bookmark_bar_view_ = nullptr;
 };
-
-// Verify that in instant extended mode the visibility of the apps shortcut
-// button properly follows the pref value.
-TEST_F(BookmarkBarViewTest, AppsShortcutVisibility) {
-  profile()->GetPrefs()->SetBoolean(
-      bookmarks::prefs::kShowAppsShortcutInBookmarkBar, false);
-  EXPECT_FALSE(test_helper_->apps_page_shortcut()->GetVisible());
-
-  // Try to make the Apps shortcut visible. Its visibility depends on whether
-  // the Apps shortcut is enabled.
-  profile()->GetPrefs()->SetBoolean(
-      bookmarks::prefs::kShowAppsShortcutInBookmarkBar, true);
-  if (chrome::IsAppsShortcutEnabled(profile())) {
-    EXPECT_TRUE(test_helper_->apps_page_shortcut()->GetVisible());
-  } else {
-    EXPECT_FALSE(test_helper_->apps_page_shortcut()->GetVisible());
-  }
-
-  // Make sure we can also properly transition from true to false.
-  profile()->GetPrefs()->SetBoolean(
-      bookmarks::prefs::kShowAppsShortcutInBookmarkBar, false);
-  EXPECT_FALSE(test_helper_->apps_page_shortcut()->GetVisible());
-}
 
 TEST_F(BookmarkBarViewTest, TabGroupsBarVisibility) {
   // Pref to show by default. Tab group bar is visible by default.
@@ -648,27 +622,6 @@ TEST_F(BookmarkBarViewTest, DropCallback_InvalidatePtrTest) {
                     /*drag_image_layer_owner=*/nullptr);
   EXPECT_EQ("a b c d e f", GetStringForVisibleButtons());
   EXPECT_EQ(output_drag_op, ui::mojom::DragOperation::kNone);
-}
-
-// Verifies that the apps shortcut is shown or hidden following the policy
-// value.
-TEST_F(BookmarkBarViewTest, ManagedShowAppsShortcutInBookmarksBar) {
-  // By default, the pref is not managed and the apps shortcut is not shown.
-  sync_preferences::TestingPrefServiceSyncable* prefs =
-      profile()->GetTestingPrefService();
-  EXPECT_FALSE(prefs->IsManagedPreference(
-      bookmarks::prefs::kShowAppsShortcutInBookmarkBar));
-  EXPECT_FALSE(test_helper_->apps_page_shortcut()->GetVisible());
-
-  // Shows the apps shortcut by policy, via the managed pref.
-  prefs->SetManagedPref(bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
-                        std::make_unique<base::Value>(true));
-  EXPECT_TRUE(test_helper_->apps_page_shortcut()->GetVisible());
-
-  // And try hiding it via policy too.
-  prefs->SetManagedPref(bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
-                        std::make_unique<base::Value>(false));
-  EXPECT_FALSE(test_helper_->apps_page_shortcut()->GetVisible());
 }
 
 // Verifies the SavedTabGroupBar's page navigator is set when the
