@@ -6,28 +6,21 @@
 
 #include <algorithm>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "base/base_switches.h"
 #include "base/memory/weak_ptr.h"
-#include "base/types/expected.h"
-#include "chrome/browser/apps/link_capturing/link_capturing_feature_test_support.h"
 #include "chrome/browser/performance_manager/policies/cannot_discard_reason.h"
 #include "chrome/browser/performance_manager/test_support/page_discarding_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/web_applications/web_app_browsertest_base.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_tab_helper.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/performance_manager/public/graph/graph.h"
 #include "components/performance_manager/public/graph/page_node.h"
 #include "components/performance_manager/public/performance_manager.h"
-#include "components/webapps/common/web_app_id.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -39,8 +32,6 @@
 namespace performance_manager::policies {
 
 using DiscardReason = DiscardEligibilityPolicy::DiscardReason;
-using CanDiscardResult::kEligible;
-using CanDiscardResult::kProtected;
 using performance_manager::testing::ExpectCanDiscardDisallowedAllReasons;
 using performance_manager::testing::ExpectCanDiscardEligibleAllReasons;
 using performance_manager::testing::ExpectCanDiscardProtected;
@@ -120,92 +111,6 @@ IN_PROC_BROWSER_TEST_F(DiscardEligibilityPolicyBrowserTest,
   ExpectCanDiscardEligibleAllReasons(page_node2,
                                      /*ignore_recent_visibility=*/true);
 }
-
-// Test DiscardEligibilityPolicy behavior with web application.
-class DiscardEligibilityPolicyWebAppBrowserTest
-    : public web_app::WebAppBrowserTestBase,
-      public ::testing::WithParamInterface<
-          apps::test::LinkCapturingFeatureVersion> {
- public:
-  constexpr static std::string_view kTestAppUrl =
-      "https://www.example.com/app/";
-
-  DiscardEligibilityPolicyWebAppBrowserTest() {
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        apps::test::GetFeaturesToEnableLinkCapturingUX(GetParam()), {});
-  }
-
-  bool LinkCapturingEnabledByDefault() const {
-    return GetParam() == apps::test::LinkCapturingFeatureVersion::kV2DefaultOn;
-  }
-
-  // Convenience wrappers for DiscardEligibilityPolicy::CanDiscard().
-  CanDiscardResult CanDiscard(
-      const PageNode* page_node,
-      DiscardReason discard_reason,
-      std::vector<CannotDiscardReason>* cannot_discard_reasons = nullptr) {
-    return DiscardEligibilityPolicy::GetFromGraph(page_node->GetGraph())
-        ->CanDiscard(page_node, discard_reason,
-                     /*ignore_recent_visibility=*/false,
-                     cannot_discard_reasons);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_P(DiscardEligibilityPolicyWebAppBrowserTest,
-                       CannotDiscardWebApp) {
-  // Set up the web application.
-  webapps::AppId app_id =
-      web_app::test::InstallDummyWebApp(profile(), "App", GURL(kTestAppUrl));
-
-  if (!LinkCapturingEnabledByDefault()) {
-    ASSERT_EQ(apps::test::EnableLinkCapturingByUser(profile(), app_id),
-              base::ok());
-  }
-
-  content::WebContents* browser_tab =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Wait for and get the web contents that was loaded.
-  ui_test_utils::UrlLoadObserver url_observer((GURL(kTestAppUrl)));
-  std::string script = content::JsReplace(
-      R"(window.open($1, '_blank', 'noopener');)", kTestAppUrl);
-  EXPECT_TRUE(content::ExecJs(browser_tab, script));
-  url_observer.Wait();
-  content::WebContents* contents = url_observer.web_contents();
-
-  EXPECT_TRUE(
-      web_app::WebAppTabHelper::FromWebContents(contents)->is_in_app_window());
-
-  base::WeakPtr<PageNode> page_node =
-      PerformanceManager::GetPrimaryPageNodeForWebContents(contents);
-  ASSERT_TRUE(page_node);
-
-  // Check CanDiscard results.
-  std::vector<CannotDiscardReason> reasons_vec;
-  EXPECT_EQ(kProtected,
-            CanDiscard(page_node.get(), DiscardReason::URGENT, &reasons_vec));
-  EXPECT_TRUE(std::ranges::contains(reasons_vec, CannotDiscardReason::kWebApp));
-
-  reasons_vec.clear();
-  EXPECT_EQ(kProtected, CanDiscard(page_node.get(), DiscardReason::PROACTIVE,
-                                   &reasons_vec));
-  EXPECT_TRUE(std::ranges::contains(reasons_vec, CannotDiscardReason::kWebApp));
-
-  reasons_vec.clear();
-  EXPECT_EQ(kEligible,
-            CanDiscard(page_node.get(), DiscardReason::EXTERNAL, &reasons_vec));
-  EXPECT_TRUE(reasons_vec.empty());
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    DiscardEligibilityPolicyWebAppBrowserTest,
-    ::testing::Values(apps::test::LinkCapturingFeatureVersion::kV2DefaultOff,
-                      apps::test::LinkCapturingFeatureVersion::kV2DefaultOn),
-    apps::test::LinkCapturingVersionToString);
 
 class DiscardEligibilityPolicyCrashBrowserTest
     : public DiscardEligibilityPolicyBrowserTest {

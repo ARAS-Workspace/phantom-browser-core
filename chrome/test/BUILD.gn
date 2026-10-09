@@ -1853,8 +1853,6 @@ test("browser_tests") {
     "../browser/ui/views/hats/hats_browsertest.cc",
     "../browser/ui/views/incognito_clear_browsing_data_dialog_browsertest.cc",
     "../browser/ui/views/infobars/confirm_infobar_custom_layout_browsertest.cc",
-    "../browser/ui/views/intent_picker_bubble_view_browsertest.cc",
-    "../browser/ui/views/intent_picker_dialog_browsertest.cc",
     "../browser/ui/views/side_panel/history_clusters/history_clusters_side_panel_coordinator_browsertest.cc",
     "../browser/ui/views/side_panel/side_panel_coordinator_browsertest.cc",
     "../browser/ui/views/side_panel/side_panel_web_ui_view_browsertest.cc",
@@ -2243,10 +2241,6 @@ test("browser_tests") {
     deps += [ "//chrome/browser/captive_portal" ]
   }
 
-  sources += [
-    # chromeos does not support machine level user cloud policies
-    "../browser/ui/views/enable_link_capturing_infobar_browsertest.cc",
-  ]
   deps += [
     "//chrome/browser/apps/link_capturing",
     "//chrome/browser/external_protocol:browser_tests",
@@ -2430,7 +2424,6 @@ test("browser_tests") {
       "//chrome/browser/ui/views/extensions:extension_post_install_dialog_view_utils",
       "//chrome/browser/ui/views/policy:enterprise_startup_dialog",
       "//chrome/browser/ui/views/relaunch_notification:browser_tests",
-      "//chrome/browser/ui/views/shortcuts:browser_tests",
     ]
     deps += [
       ":test_support_ui",
@@ -3736,7 +3729,6 @@ test("unit_tests") {
     "../browser/ui/color/material_new_tab_page_color_mixer_unittest.cc",
     "../browser/ui/color/new_tab_page_color_mixer_unittest.cc",
     "../browser/ui/incognito_allowed_url_unittest.cc",
-    "../browser/ui/intent_picker_tab_helper_unittest.cc",
     "../browser/ui/recently_audible_helper_unittest.cc",
     "../browser/ui/views/infobars/infobar_view_unittest.cc",
     "../browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_metrics_unittest.cc",
@@ -4546,7 +4538,6 @@ test("unit_tests") {
       "../browser/ui/views/frame/web_contents_close_handler_unittest.cc",
       "../browser/ui/views/hats/hats_next_web_dialog_unittest.cc",
       "../browser/ui/views/hover_button_unittest.cc",
-      "../browser/ui/views/intent_picker_bubble_view_unittest.cc",
       "../browser/ui/views/layout_provider_unittest.cc",
       "../browser/ui/views/location_bar/selected_keyword_view_unittest.cc",
       "../browser/ui/views/location_bar/webui_location_bar_unittest.cc",
@@ -4723,8 +4714,6 @@ static_library("test_support_ui") {
     "../browser/ui/views/page_action/test_support/page_action_interactive_test_mixin.h",
     "../browser/ui/views/tabs/hovercard/tab_hover_card_test_util.cc",
     "../browser/ui/views/tabs/hovercard/tab_hover_card_test_util.h",
-    "../browser/ui/views/web_apps/web_app_link_capturing_test_utils.cc",
-    "../browser/ui/views/web_apps/web_app_link_capturing_test_utils.h",
     "../browser/ui/web_applications/test/web_app_navigation_browsertest.cc",
     "../browser/ui/web_applications/test/web_app_navigation_browsertest.h",
     "base/fake_gaia_mixin.cc",
@@ -5034,11 +5023,6 @@ test("interactive_ui_tests") {
     "//ui/base/clipboard/clipboard_unittest.cc",
     "base/interactive_ui_tests_main.cc",
   ]
-
-  if (is_mac || is_linux) {
-    sources +=
-        [ "../browser/ui/views/default_link_capturing_interactive_uitest.cc" ]
-  }
 
   if (is_mac || is_linux) {
   }
@@ -5634,7 +5618,6 @@ test("interactive_ui_tests") {
       "../browser/ui/views/global_media_controls:test_support",
       "//chrome/browser/ui/global_media_controls",
       "//chrome/browser/ui/views/relaunch_notification:interactive_ui_tests",
-      "//chrome/browser/ui/views/shortcuts:interactive_ui_tests",
       "//components/media_router/browser:test_support",
     ]
 

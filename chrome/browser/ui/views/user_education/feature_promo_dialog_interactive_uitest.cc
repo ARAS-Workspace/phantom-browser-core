@@ -13,8 +13,6 @@
 #include "base/strings/string_split.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
-#include "chrome/browser/apps/app_service/app_registry_cache_waiter.h"
-#include "chrome/browser/banners/test_app_banner_manager_desktop.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/page_action/page_action_controller.h"
@@ -29,12 +27,6 @@
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
-#include "chrome/browser/web_applications/link_capturing_features.h"
-#include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
-#include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
-#include "chrome/browser/web_applications/web_app_ui_manager.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/test/base/interactive_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -64,9 +56,6 @@ namespace {
 // of replacements for the body text of the IPH will cause a DCHECK.
 user_education::FeaturePromoSpecification::FormatParameters
 GetReplacementsForFeature(const base::Feature& feature) {
-  if (&feature == &feature_engagement::kIPHDesktopPwaInstallFeature) {
-    return u"Placeholder Text";
-  }
   return user_education::FeaturePromoSpecification::NoSubstitution();
 }
 
@@ -89,28 +78,10 @@ class FeaturePromoDialogTest : public TestBase {
     // screen and remove this.
     set_should_verify_dialog_bounds(false);
   }
-  void SetUp() override {
-    webapps::TestAppBannerManagerDesktop::SetUp();
-    TestBase::SetUp();
-  }
   void SetUpOnMainThread() override {
     TestBase::SetUpOnMainThread();
     browser()->GetWindow()->Activate();
     ui_test_utils::BrowserActivationWaiter(browser()).WaitForActivation();
-  }
-
-  void TearDownOnMainThread() override {
-    Profile* const profile = browser()->GetProfile();
-    web_app::WebAppRegistrar& registrar =
-        web_app::WebAppProvider::GetForTest(profile)->registrar_unsafe();
-    for (const auto& app_id : registrar.GetAppIds()) {
-      apps::AppReadinessWaiter app_readiness_waiter(
-          profile, app_id, apps::Readiness::kUninstalledByUser);
-      web_app::test::UninstallWebApp(profile, app_id);
-      app_readiness_waiter.Await();
-    }
-
-    TestBase::TearDownOnMainThread();
   }
 
   ~FeaturePromoDialogTest() override = default;
@@ -187,31 +158,6 @@ class FeaturePromoDialogTest : public TestBase {
 //
 // For running your test reference the docs in
 // //chrome/browser/ui/test/test_browser_dialog.h
-
-IN_PROC_BROWSER_TEST_F(FeaturePromoDialogTest, InvokeUi_IPH_DesktopPwaInstall) {
-  set_baseline("2936082");
-  // Navigate to an installable site so PWA install icon shows up.
-  ASSERT_TRUE(embedded_test_server()->Start());
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(),
-      embedded_test_server()->GetURL("/banners/manifest_test_page.html")));
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  auto* app_banner_manager =
-      webapps::TestAppBannerManagerDesktop::FromWebContents(web_contents);
-  app_banner_manager->WaitForInstallableCheck();
-  auto* provider = BrowserView::GetBrowserViewForBrowser(browser())
-                       ->toolbar_button_provider();
-  EXPECT_TRUE(page_actions::GetIconLabelBubbleViewForTesting(
-                  provider->GetPageActionViewInterface(kActionInstallPwa),
-                  kActionInstallPwa)
-                  ->GetVisible());
-
-  browser()->GetWindow()->Activate();
-  ui_test_utils::BrowserActivationWaiter(browser()).WaitForActivation();
-
-  ShowAndVerifyUi();
-}
 
 IN_PROC_BROWSER_TEST_F(FeaturePromoDialogTest, InvokeUi_IPH_ProfileSwitch) {
   set_baseline("3710120");
