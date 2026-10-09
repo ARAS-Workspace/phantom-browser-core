@@ -442,7 +442,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/exit_type_service_factory.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #endif
@@ -530,9 +529,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   AiDataKeyedServiceFactory::GetInstance();
   AnnouncementNotificationServiceFactory::GetInstance();
   apps::AppServiceProxyFactory::GetInstance();
-#if BUILDFLAG(ENABLE_SESSION_SERVICE)
-  AppSessionServiceFactory::GetInstance();
-#endif
   AutocompleteClassifierFactory::GetInstance();
   AutocompleteControllerEmitterFactory::GetInstance();
   AutocompleteDictionaryPreloadServiceFactory::GetInstance();

@@ -544,8 +544,7 @@ bool SessionService::RestoreIfNecessary(const StartupTabs& startup_tabs,
       SessionRestore::RestoreSession(
           profile(), browser,
           SessionRestore::RESTORE_BROWSER |
-              (browser ? 0 : SessionRestore::ALWAYS_CREATE_TABBED_BROWSER) |
-              (restore_apps ? SessionRestore::RESTORE_APPS : 0),
+              (browser ? 0 : SessionRestore::ALWAYS_CREATE_TABBED_BROWSER),
           startup_tabs);
       return true;
     }

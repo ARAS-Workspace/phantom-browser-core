@@ -49,8 +49,6 @@
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/search/search.h"
-#include "chrome/browser/sessions/app_session_service.h"
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/session_restore_delegate.h"
 #include "chrome/browser/sessions/session_service.h"
 #include "chrome/browser/sessions/session_service_factory.h"
@@ -84,7 +82,6 @@
 #include "chrome/browser/ui/waap/initial_webui_window_metrics_manager.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "chrome/browser/ui/window_metadata/window_metadata_controller.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/extensions/extension_metrics.h"
 #include "chrome/common/pref_names.h"
@@ -224,7 +221,6 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
                      bool synchronous,
                      bool clobber_existing_tab,
                      bool always_create_tabbed_browser,
-                     bool restore_apps,
                      bool restore_browser,
                      bool log_event,
                      const StartupTabs& startup_tabs)
@@ -234,12 +230,11 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
         clobber_existing_tab_(clobber_existing_tab),
         always_create_tabbed_browser_(always_create_tabbed_browser),
         log_event_(log_event),
-        restore_apps_(restore_apps),
         restore_browser_(restore_browser),
         startup_tabs_(startup_tabs),
         active_window_id_(SessionID::InvalidValue()),
         restore_started_(base::TimeTicks::Now()) {
-    DCHECK(restore_browser_ || restore_apps_);
+    DCHECK(restore_browser_);
 
     auto& active_restorers = GetActiveSessionRestorers();
     // Only one SessionRestoreImpl should be operating on the profile at the
@@ -267,26 +262,6 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
       service->GetLastSession(base::BindOnce(&SessionRestoreImpl::OnGotSession,
                                              weak_factory_.GetWeakPtr(),
                                              /* for_apps */ false));
-    }
-
-    if (restore_apps_) {
-      SessionServiceBase* app_service =
-          AppSessionServiceFactory::GetForProfileForSessionRestore(profile_);
-      CHECK(app_service);
-      app_service->GetLastSession(base::BindOnce(
-          &SessionRestoreImpl::OnGotSession, weak_factory_.GetWeakPtr(),
-          /* for_apps */ true));
-
-      // Ensure the registry is ready so that when we reopen apps they work
-      // properly. If we don't wait, it's possible that apps are restored in
-      // an incoherent state.
-      web_app::WebAppProvider* provider =
-          web_app::WebAppProvider::GetForLocalAppsUnchecked(profile_);
-      DCHECK(provider);
-
-      provider->on_registry_ready().Post(
-          FROM_HERE, base::BindOnce(&SessionRestoreImpl::WebAppRegistryReady,
-                                    weak_factory_.GetWeakPtr()));
     }
 
     if (synchronous_) {
@@ -503,13 +478,7 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
       SessionID active_window_id,
       bool read_error) {
 
-    // This function could be called twice from both SessionService and
-    // AppSessionService. If one of them returns error, then |read_error_| is
-    // true. So check whether |read_error_| has been set as true to prevent the
-    // result is overwritten.
-    if (!read_error_) {
-      read_error_ = read_error;
-    }
+    read_error_ = read_error;
 
     // Copy windows into windows_ so that we can combine both app and browser
     // windows together before doing a one-pass restore.
@@ -524,28 +493,8 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
     SessionRestore::OnGotSession(profile(), for_apps, windows_view);
     windows.clear();
 
-    // Since we could now be possibly waiting for two |GetSession|s, we need
-    // to track if we're completely finished or not. While we're at it,
-    // store the windows for later merging and restoring.
-    if (for_apps) {
-      got_app_windows_ = true;
-    } else {
-      got_browser_windows_ = true;
-    }
-
-    // Don't let app restores set the active_window_id, or else it will
-    // always bring the app to the forefront.
-    if (!for_apps) {
-      active_window_id_ = active_window_id;
-    }
-
-    ProcessSessionWindowsIfReady();
-  }
-
-  void WebAppRegistryReady() {
-    DCHECK_EQ(web_app_registry_ready_, false);
-    DCHECK(restore_apps_);
-    web_app_registry_ready_ = true;
+    got_browser_windows_ = true;
+    active_window_id_ = active_window_id;
 
     ProcessSessionWindowsIfReady();
   }
@@ -575,23 +524,8 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
     ProcessSessionWindowsAndNotify(&windows_, active_window_id_);
   }
 
-  // This helper, based on the restore_apps_ state tells us if we're ready to
-  // begin restoring windows. There's two ways we are ready to process:
-  // 1. we aren't restoring apps, and have browser_windows.
-  // 2. we are restoring apps, we have both browser and app windows and
-  //   WebAppRegistryReady() has been called.
-  bool IsReadyToProcessSessionWindows() const {
-    if (!restore_apps_) {
-      return got_browser_windows_;
-    }
-
-    if (!restore_browser_) {
-      return got_app_windows_ && web_app_registry_ready_;
-    }
-
-    return (got_app_windows_ && got_browser_windows_ &&
-            web_app_registry_ready_);
-  }
+  // Returns true once the browser session windows have been read.
+  bool IsReadyToProcessSessionWindows() const { return got_browser_windows_; }
 
   BrowserWindowInterface* ProcessSessionWindowsAndNotify(
       std::vector<std::unique_ptr<sessions::SessionWindow>>* windows,
@@ -1312,21 +1246,10 @@ class SessionRestoreImpl : public BrowserCollectionObserver {
   // If true, LogSessionServiceRestoreEvent() is called after restore.
   const bool log_event_;
 
-  // If true, restores apps.
-  const bool restore_apps_;
-
   // If true, restores the normal browser.
   bool restore_browser_ = true;
 
-  // App restores depend on web_app::WebAppProvider on_registry_ready(). This
-  // bool will track that and hold up restores until that's ready too if apps
-  // are being restored.
-  bool web_app_registry_ready_ = false;
-
-  // During app restores, we make two GetLastSession calls to
-  // [App]SessionService, we need to wait till they both return before
-  // processing the windows together in one pass.
-  bool got_app_windows_ = false;
+  // True once the browser session windows have been read.
   bool got_browser_windows_ = false;
 
   // Set of URLs to open in addition to those restored from the session.
@@ -1391,7 +1314,7 @@ BrowserWindowInterface* SessionRestore::RestoreSession(
       profile, browser, (behavior & SYNCHRONOUS) != 0,
       (behavior & CLOBBER_CURRENT_TAB) != 0,
       (behavior & ALWAYS_CREATE_TABBED_BROWSER) != 0,
-      (behavior & RESTORE_APPS) != 0, (behavior & RESTORE_BROWSER) != 0,
+      (behavior & RESTORE_BROWSER) != 0,
       /* log_event */ true, startup_tabs);
   return restorer->Restore();
 }
@@ -1405,8 +1328,6 @@ void SessionRestore::RestoreSessionAfterCrash(BrowserWindowInterface* browser) {
       (browser && HasSingleNewTabPage(browser)
            ? SessionRestore::CLOBBER_CURRENT_TAB
            : 0);
-
-  behavior |= SessionRestore::RESTORE_APPS;
   SessionRestore::RestoreSession(profile, browser, behavior, StartupTabs());
 }
 
@@ -1433,7 +1354,6 @@ void SessionRestore::RestoreForeignSessionWindows(
     base::OnceCallback<void(std::vector<BrowserWindowInterface*>)> callback) {
   StartupTabs startup_tabs;
   SessionRestoreImpl restorer(profile, nullptr, true, false, true,
-                              /* restore_apps */ false,
                               /* restore_browser */ true,
                               /* log_event */ false, startup_tabs);
   std::vector<BrowserWindowInterface*> windows =
@@ -1453,7 +1373,6 @@ WebContents* SessionRestore::RestoreForeignSessionTab(
   Profile* profile = browser->GetProfile();
   StartupTabs startup_tabs;
   SessionRestoreImpl restorer(profile, browser, true, false, false,
-                              /* restore_apps */ false,
                               /* restore_browser */ true,
                               /* log_event */ false, startup_tabs);
   return restorer.RestoreForeignTab(tab, disposition);

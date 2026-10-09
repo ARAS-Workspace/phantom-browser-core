@@ -5,7 +5,6 @@
 #include "chrome/browser/sessions/session_service_lookup.h"
 
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/session_service_base.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -27,7 +26,7 @@ bool IsRelevantToAppSessionService(BrowserWindowInterface* browser) {
 SessionServiceBase* GetAppropriateSessionServiceForProfile(
     BrowserWindowInterface* browser) {
   if (IsRelevantToAppSessionService(browser->GetType())) {
-    return AppSessionServiceFactory::GetForProfile(browser->GetProfile());
+    return nullptr;
   }
 
   return SessionServiceFactory::GetForProfile(browser->GetProfile());
@@ -37,7 +36,7 @@ SessionServiceBase* GetAppropriateSessionServiceForSessionRestore(
     Profile* profile,
     BrowserWindowInterface::Type type) {
   if (IsRelevantToAppSessionService(type)) {
-    return AppSessionServiceFactory::GetForProfileForSessionRestore(profile);
+    return nullptr;
   }
 
   return SessionServiceFactory::GetForProfileForSessionRestore(profile);
@@ -46,8 +45,7 @@ SessionServiceBase* GetAppropriateSessionServiceForSessionRestore(
 SessionServiceBase* GetAppropriateSessionServiceIfExisting(
     BrowserWindowInterface* browser) {
   if (IsRelevantToAppSessionService(browser->GetType())) {
-    return AppSessionServiceFactory::GetForProfileIfExisting(
-        browser->GetProfile());
+    return nullptr;
   }
 
   return SessionServiceFactory::GetForProfileIfExisting(browser->GetProfile());

@@ -7,8 +7,6 @@
 #include "base/check_deref.h"
 #include "base/time/time.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sessions/app_session_service.h"
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/session_service.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #include "chrome/browser/sessions/session_service_lookup.h"
@@ -349,14 +347,14 @@ void SessionServiceBrowserHelper::UpdateSplitTabSessionVisualData(
 
 SessionServiceBase* SessionServiceBrowserHelper::GetSessionService() {
   if (IsRelevantToAppSessionService(browser_type_)) {
-    return AppSessionServiceFactory::GetForProfile(&*profile_);
+    return nullptr;
   }
   return SessionServiceFactory::GetForProfile(&*profile_);
 }
 
 SessionServiceBase* SessionServiceBrowserHelper::GetSessionServiceIfExisting() {
   if (IsRelevantToAppSessionService(browser_type_)) {
-    return AppSessionServiceFactory::GetForProfileIfExisting(&*profile_);
+    return nullptr;
   }
   return SessionServiceFactory::GetForProfileIfExisting(&*profile_);
 }

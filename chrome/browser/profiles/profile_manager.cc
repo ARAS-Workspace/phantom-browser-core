@@ -120,7 +120,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #endif
 
@@ -443,10 +442,6 @@ void ProfileManager::ShutdownSessionServices() {
     // shut them down. If they were never created, just skip.
     if (SessionServiceFactory::GetForProfileIfExisting(profile))
       SessionServiceFactory::ShutdownForProfile(profile);
-#if BUILDFLAG(ENABLE_SESSION_SERVICE)
-    if (AppSessionServiceFactory::GetForProfileIfExisting(profile))
-      AppSessionServiceFactory::ShutdownForProfile(profile);
-#endif
   }
 }
 #endif

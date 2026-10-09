@@ -15,8 +15,6 @@
 #include "base/time/time.h"
 #include "base/values.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sessions/app_session_service.h"
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #include "chrome/browser/sessions/session_service_log.h"
 #include "chrome/common/url_constants.h"
@@ -87,9 +85,6 @@ std::string GetSessionServiceInternalsAsString(Profile* profile) {
 
   base::DictValue internals_output;
 #if DCHECK_IS_ON()
-  internals_output.Set(
-      "AppSessionService",
-      AppSessionServiceFactory::GetForProfile(profile)->ToDebugValue());
   internals_output.Set(
       "SessionService",
       SessionServiceFactory::GetForProfile(profile)->ToDebugValue());

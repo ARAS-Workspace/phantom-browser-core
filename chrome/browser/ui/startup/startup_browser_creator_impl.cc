@@ -709,10 +709,6 @@ BrowserWindowInterface* StartupBrowserCreatorImpl::RestoreOrCreateBrowser(
     // because we want to avoid a crash restore loop, so we don't
     // automatically restore after a crash.
     // Crash restores are triggered via session_crashed_bubble_view.cc
-    if (ShouldRestoreApps(StartupBrowserCreator::WasRestarted(), profile_)) {
-      restore_options |= SessionRestore::RESTORE_APPS;
-    }
-
     BrowserWindowInterface* browser_window = SessionRestore::RestoreSession(
         profile_, nullptr, restore_options, tabs);
     if (browser_window) {

@@ -10,7 +10,6 @@
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/session_service.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #include "chrome/browser/sessions/session_service_lookup.h"
@@ -26,11 +25,8 @@ namespace {
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 sessions::SessionTabHelperDelegate* GetSessionTabHelperDelegate(
     content::WebContents* web_contents) {
-  // With AppSessionService, we now need to know if the WebContents
-  // belongs to an AppSessionService or SessionService.
   if (IsRelevantToAppSessionService(web_contents)) {
-    return AppSessionServiceFactory::GetForProfile(
-        Profile::FromBrowserContext(web_contents->GetBrowserContext()));
+    return nullptr;
   }
   return SessionServiceFactory::GetForProfile(
       Profile::FromBrowserContext(web_contents->GetBrowserContext()));

@@ -31,8 +31,6 @@ source_set("sessions") {
 
   if (enable_session_service) {
     public += [
-      "app_session_service.h",
-      "app_session_service_factory.h",
       "exit_type_service.h",
       "exit_type_service_factory.h",
       "session_data_deleter.h",
@@ -88,8 +86,6 @@ source_set("impl") {
 
   if (enable_session_service) {
     sources += [
-      "app_session_service.cc",
-      "app_session_service_factory.cc",
       "exit_type_service.cc",
       "exit_type_service_factory.cc",
       "session_data_deleter.cc",

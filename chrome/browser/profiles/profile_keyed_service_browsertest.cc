@@ -482,7 +482,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "AppLoadService",
     "AppRestoreService",
     "AppServiceProxy",
-    "AppSessionService",
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     "AppShortcutManager",
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

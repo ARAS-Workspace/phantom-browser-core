@@ -29,7 +29,6 @@
 #include "chrome/browser/metrics/shutdown_watcher_helper.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/sessions/app_session_service_factory.h"
 #include "chrome/browser/sessions/exit_type_service.h"
 #include "chrome/browser/sessions/session_restore.h"
 #include "chrome/browser/sessions/session_service_factory.h"
@@ -471,7 +470,6 @@ void CloseAllBrowsersWithProfile(
     const ProfileBrowsersCloseCallback& on_close_success,
     const ProfileBrowsersCloseCallback& on_close_aborted) {
   SessionServiceFactory::ShutdownForProfile(profile);
-  AppSessionServiceFactory::ShutdownForProfile(profile);
 
   TryToCloseBrowsersForProfile(profile->GetOriginalProfile(),
                                /*match_original_profile=*/true,
