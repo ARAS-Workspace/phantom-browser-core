@@ -72,30 +72,4 @@ IN_PROC_BROWSER_TEST_F(ImageWriterPrivateApiTest, TestListDevices) {
   ASSERT_TRUE(RunExtensionTest("image_writer_private/list_devices"))
       << message_;
 }
-
-IN_PROC_BROWSER_TEST_F(ImageWriterPrivateApiTest, TestWriteFromFile) {
-  FileSystemChooseEntryFunction::RegisterTempExternalFileSystemForTest(
-      "test_temp", test_utils_.GetTempDir());
-
-  base::FilePath selected_image(test_utils_.GetImagePath());
-  const FileSystemChooseEntryFunction::TestOptions test_options{
-      .path_to_be_picked = &selected_image};
-  auto reset_options =
-      FileSystemChooseEntryFunction::SetOptionsForTesting(test_options);
-
-  auto set_up_utility_client_callbacks = [](FakeImageWriterClient* client) {
-    std::vector<int> progress_list{0, 50, 100};
-    client->SimulateProgressOnWrite(progress_list, true);
-    client->SimulateProgressOnVerifyWrite(progress_list, true);
-  };
-
-  // Sets up client for simulating Operation::Progress() on Operation::Write and
-  // Operation::VerifyWrite.
-  test_utils_.RunOnUtilityClientCreation(
-      base::BindOnce(set_up_utility_client_callbacks));
-
-  ASSERT_TRUE(RunExtensionTest("image_writer_private/write_from_file",
-                               {.launch_as_platform_app = true}))
-      << message_;
-}
 }  // namespace extensions

@@ -44,16 +44,3 @@ static_library("apps") {
     "//extensions/common/api",
   ]
 }
-
-static_library("test_support") {
-  testonly = true
-  sources = [
-    "test/app_window_waiter.cc",
-    "test/app_window_waiter.h",
-  ]
-
-  public_deps = [
-    "//content/public/browser",
-    "//extensions/browser",
-  ]
-}

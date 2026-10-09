@@ -67,11 +67,10 @@ constexpr char kBackgroundJS_SabAllowed[] = R"(
   ]);
 )";
 
-// Parameterized on tuple of
-// <is_sab_allowed_unconditionally, is_cross_origin_isolated, is_platform_app>.
+// Parameterized on is_cross_origin_isolated.
 class SharedArrayBufferTest
     : public ExtensionApiTest,
-      public ::testing::WithParamInterface<std::tuple<bool, bool>> {
+      public ::testing::WithParamInterface<bool> {
  public:
 
   TestExtensionDir& test_dir() { return test_dir_; }
@@ -83,9 +82,7 @@ class SharedArrayBufferTest
 IN_PROC_BROWSER_TEST_P(SharedArrayBufferTest, TransferToWorker) {
   ASSERT_TRUE(StartEmbeddedTestServer());
 
-  bool is_cross_origin_isolated;
-  bool is_platform_app;
-  std::tie(is_cross_origin_isolated, is_platform_app) = GetParam();
+  const bool is_cross_origin_isolated = GetParam();
 
   auto builder = base::DictValue()
                      .Set("manifest_version", 2)
@@ -102,12 +99,7 @@ IN_PROC_BROWSER_TEST_P(SharedArrayBufferTest, TransferToWorker) {
   base::DictValue background_builder;
   background_builder.Set("scripts", base::ListValue().Append("background.js"));
 
-  if (is_platform_app) {
-    builder.Set("app", base::DictValue().Set("background",
-                                             std::move(background_builder)));
-  } else {
-    builder.Set("background", std::move(background_builder));
-  }
+  builder.Set("background", std::move(background_builder));
 
   test_dir().WriteManifest(builder);
 
@@ -115,23 +107,17 @@ IN_PROC_BROWSER_TEST_P(SharedArrayBufferTest, TransferToWorker) {
                        kBackgroundJS_SabAllowed);
   test_dir().WriteFile(FILE_PATH_LITERAL("worker.js"), kWorkerJS);
 
-  ASSERT_TRUE(RunExtensionTest(test_dir().Pack(),
-                               {.launch_as_platform_app = is_platform_app},
-                               {} /* load_options */))
+  ASSERT_TRUE(RunExtensionTest(test_dir().Pack(), {}, {} /* load_options */))
       << message_;
 }
 
 INSTANTIATE_TEST_SUITE_P(
     ,
     SharedArrayBufferTest,
-    ::testing::Combine(::testing::Bool(), ::testing::Bool()),
-    [](const testing::TestParamInfo<std::tuple<bool, bool>>& info) {
-      bool is_cross_origin_isolated;
-      bool is_platform_app;
-      std::tie(is_cross_origin_isolated, is_platform_app) = info.param;
-      return base::StringPrintf("%s_%s",
-                                is_cross_origin_isolated ? "COI" : "NonCOI",
-                                is_platform_app ? "App" : "Extension");
+    ::testing::Bool(),
+    [](const testing::TestParamInfo<bool>& info) {
+      return base::StringPrintf("%s_Extension",
+                                info.param ? "COI" : "NonCOI");
     });
 
 }  // namespace extensions

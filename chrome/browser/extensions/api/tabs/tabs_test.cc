@@ -126,12 +126,6 @@
 #include "pdf/pdf_features.h"
 #endif
 
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
-#include "extensions/browser/app_window/app_window.h"
-#include "extensions/browser/app_window/app_window_registry.h"
-#endif
-
 
 namespace extensions {
 
@@ -272,12 +266,6 @@ class ExtensionTabsTest : public ExtensionApiTest {
         function.get(), update_info, profile()));
   }
 };
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-
-using ExtensionTabsTestWithApps = PlatformAppBrowserTest;
-
-#endif
 
 class ExtensionWindowCreateTest : public ExtensionBrowserTest {
  public:
@@ -447,157 +435,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, GetCurrentWindow) {
   // The tab id should not be -1 as this is a browser window.
   EXPECT_GE(*tab0_id, 0);
 }
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-
-// TODO(crbug.com/40745605): Test is flaky on Linux debug builds.
-#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
-#define MAYBE_GetAllWindows DISABLED_GetAllWindows
-#else
-#define MAYBE_GetAllWindows GetAllWindows
-#endif
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTestWithApps, MAYBE_GetAllWindows) {
-  const size_t NUM_WINDOWS = 5;
-  std::set<int> window_ids;
-  std::set<int> result_ids;
-  window_ids.insert(ExtensionTabUtil::GetWindowId(browser_window_interface()));
-
-  for (size_t i = 0; i < NUM_WINDOWS - 1; ++i) {
-    BrowserWindowInterface* new_browser = CreateBrowser(profile());
-    window_ids.insert(ExtensionTabUtil::GetWindowId(new_browser));
-  }
-
-  // Application windows should not be accessible to extensions (app windows are
-  // only accessible to the owning item).
-  AppWindow* app_window = CreateTestAppWindow("{}");
-
-  // Undocked DevTools window should not be accessible, unless included in the
-  // type filter mask.
-  DevToolsWindow* devtools = DevToolsWindowTesting::OpenDevToolsWindowSync(
-      TabListInterface::From(browser_window_interface())
-          ->GetTab(0)
-          ->GetContents(),
-      false /* is_docked */);
-
-  auto function = base::MakeRefCounted<WindowsGetAllFunction>();
-  scoped_refptr<const Extension> extension(ExtensionBuilder("Test").Build());
-  function->set_extension(extension.get());
-  base::ListValue windows = utils::ToList(
-      utils::RunFunctionAndReturnSingleResult(function.get(), "[]", profile()));
-
-  EXPECT_EQ(window_ids.size(), windows.size());
-  for (const base::Value& result_window : windows) {
-    base::DictValue result_window_dict = utils::ToDict(result_window);
-    result_ids.insert(GetWindowId(result_window_dict));
-
-    // "populate" was not passed in so tabs are not populated.
-    const base::ListValue* tabs =
-        result_window_dict.FindList(ExtensionTabUtil::kTabsKey);
-    EXPECT_FALSE(tabs);
-  }
-  // The returned ids should contain all the current browser instance ids.
-  EXPECT_EQ(window_ids, result_ids);
-
-  result_ids.clear();
-  function = base::MakeRefCounted<WindowsGetAllFunction>();
-  function->set_extension(extension.get());
-  windows = utils::ToList(utils::RunFunctionAndReturnSingleResult(
-      function.get(), "[{\"populate\": true}]", profile()));
-
-  EXPECT_EQ(window_ids.size(), windows.size());
-  for (const base::Value& result_window : windows) {
-    base::DictValue result_window_dict = utils::ToDict(result_window);
-    result_ids.insert(GetWindowId(result_window_dict));
-
-    // "populate" was enabled so tabs should be populated.
-    const base::ListValue* tabs =
-        result_window_dict.FindList(ExtensionTabUtil::kTabsKey);
-    EXPECT_TRUE(tabs);
-  }
-  // The returned ids should contain all the current app, browser and
-  // devtools instance ids.
-  EXPECT_EQ(window_ids, result_ids);
-
-  DevToolsWindowTesting::CloseDevToolsWindowSync(devtools);
-
-  CloseAppWindow(app_window);
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTestWithApps, GetAllWindowsAllTypes) {
-  const size_t NUM_WINDOWS = 5;
-  std::set<int> window_ids;
-  std::set<int> result_ids;
-  window_ids.insert(ExtensionTabUtil::GetWindowId(browser_window_interface()));
-
-  for (size_t i = 0; i < NUM_WINDOWS - 1; ++i) {
-    BrowserWindowInterface* new_browser = CreateBrowser(profile());
-    window_ids.insert(ExtensionTabUtil::GetWindowId(new_browser));
-  }
-
-  // Application windows should not be accessible to extensions (app windows are
-  // only accessible to the owning item).
-  AppWindow* app_window = CreateTestAppWindow("{}");
-
-  // Undocked DevTools window should be accessible too, since they have been
-  // explicitly requested as part of the type filter mask.
-  DevToolsWindow* devtools = DevToolsWindowTesting::OpenDevToolsWindowSync(
-      TabListInterface::From(browser_window_interface())
-          ->GetTab(0)
-          ->GetContents(),
-      false /* is_docked */);
-  window_ids.insert(ExtensionTabUtil::GetWindowId(
-      DevToolsWindowTesting::Get(devtools)->browser()));
-
-  auto function = base::MakeRefCounted<WindowsGetAllFunction>();
-  scoped_refptr<const Extension> extension(ExtensionBuilder("Test").Build());
-  function->set_extension(extension.get());
-  base::ListValue windows(utils::ToList(utils::RunFunctionAndReturnSingleResult(
-      function.get(),
-      "[{\"windowTypes\": [\"app\", \"devtools\", \"normal\", \"panel\", "
-      "\"popup\"]}]",
-      profile())));
-
-  EXPECT_EQ(window_ids.size(), windows.size());
-  for (const base::Value& result_window : windows) {
-    base::DictValue result_window_dict = utils::ToDict(result_window);
-    result_ids.insert(GetWindowId(result_window_dict));
-
-    // "populate" was not passed in so tabs are not populated.
-    const base::ListValue* tabs =
-        result_window_dict.FindList(ExtensionTabUtil::kTabsKey);
-    EXPECT_FALSE(tabs);
-  }
-  // The returned ids should contain all the browser and devtools instance ids.
-  EXPECT_EQ(window_ids, result_ids);
-
-  result_ids.clear();
-  function = base::MakeRefCounted<WindowsGetAllFunction>();
-  function->set_extension(extension.get());
-  windows = utils::ToList(utils::RunFunctionAndReturnSingleResult(
-      function.get(),
-      "[{\"populate\": true, \"windowTypes\": [\"app\", \"devtools\", "
-      "\"normal\", \"panel\", \"popup\"]}]",
-      profile()));
-
-  EXPECT_EQ(window_ids.size(), windows.size());
-  for (const base::Value& result_window : windows) {
-    base::DictValue result_window_dict = utils::ToDict(result_window);
-    result_ids.insert(GetWindowId(result_window_dict));
-
-    // "populate" was enabled so tabs should be populated.
-    const base::ListValue* tabs =
-        result_window_dict.FindList(ExtensionTabUtil::kTabsKey);
-    EXPECT_TRUE(tabs);
-  }
-  // The returned ids should contain all the browser and devtools instance ids.
-  EXPECT_EQ(window_ids, result_ids);
-
-  DevToolsWindowTesting::CloseDevToolsWindowSync(devtools);
-
-  CloseAppWindow(app_window);
-}
-
-#endif  // BUIDFLAG(ENABLE_PLATFORM_APPS)
 
 IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, UpdateNoPermissions) {
   // The test empty extension has no permissions, therefore it should not get
@@ -1462,77 +1299,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, NoTabsEventOnDevTools) {
 
   DevToolsWindowTesting::CloseDevToolsWindowSync(devtools);
 }
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTestWithApps, NoTabsAppWindow) {
-  extensions::ResultCatcher catcher;
-  ExtensionTestMessageListener listener("ready", ReplyBehavior::kWillReply);
-  ASSERT_TRUE(
-      LoadExtension(test_data_dir_.AppendASCII("api_test/tabs/no_events")));
-  ASSERT_TRUE(listener.WaitUntilSatisfied());
-
-  AppWindow* app_window = CreateTestAppWindow(
-      "{\"outerBounds\": "
-      "{\"width\": 300, \"height\": 300,"
-      " \"minWidth\": 200, \"minHeight\": 200,"
-      " \"maxWidth\": 400, \"maxHeight\": 400}}");
-
-  listener.Reply("stop");
-
-  ASSERT_TRUE(catcher.GetNextResult());
-
-  CloseAppWindow(app_window);
-}
-
-// Crashes on Mac/Win only.  http://crbug.com/40514319
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_FilteredEvents DISABLED_FilteredEvents
-#else
-#define MAYBE_FilteredEvents FilteredEvents
-#endif
-
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTestWithApps, MAYBE_FilteredEvents) {
-  extensions::ResultCatcher catcher;
-  ExtensionTestMessageListener listener("ready", ReplyBehavior::kWillReply);
-  ASSERT_TRUE(
-      LoadExtension(test_data_dir_.AppendASCII("api_test/windows/events")));
-  ASSERT_TRUE(listener.WaitUntilSatisfied());
-
-  AppWindow* app_window = CreateTestAppWindow(
-      "{\"outerBounds\": "
-      "{\"width\": 300, \"height\": 300,"
-      " \"minWidth\": 200, \"minHeight\": 200,"
-      " \"maxWidth\": 400, \"maxHeight\": 400}}");
-
-  BrowserWindowInterface* browser_window = CreateBrowserWindow(
-      BrowserWindowCreateParams(profile(), /*from_user_gesture=*/true));
-  AddBlankTabAndShow(browser_window);
-
-  DevToolsWindow* devtools_window =
-      DevToolsWindowTesting::OpenDevToolsWindowSync(
-          TabListInterface::From(browser_window_interface())
-              ->GetTab(0)
-              ->GetContents(),
-          false /* is_docked */);
-
-  chrome::CloseWindow(browser_window);
-  DevToolsWindowTesting::CloseDevToolsWindowSync(devtools_window);
-  CloseAppWindow(app_window);
-
-  // TODO(llandwerlin): It seems creating an app window on MacOSX
-  // won't create an activation event whereas it does on all other
-  // platform. Disable focus event tests for now.
-#if BUILDFLAG(IS_MAC)
-  listener.Reply("");
-#else
-  listener.Reply("focus");
-#endif
-
-  ASSERT_TRUE(catcher.GetNextResult());
-}
-
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
 IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, OnBoundsChanged) {
   extensions::ResultCatcher catcher;

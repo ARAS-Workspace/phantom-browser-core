@@ -10,27 +10,19 @@
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
 #include "chrome/browser/extensions/api/notifications/extension_notification_display_helper.h"
 #include "chrome/browser/extensions/api/notifications/extension_notification_display_helper_factory.h"
 #include "chrome/browser/extensions/api/notifications/extension_notification_handler.h"
 #include "chrome/browser/extensions/api/notifications/notifications_api.h"
-#include "chrome/browser/extensions/chrome_app_deprecation.h"
 #include "chrome/browser/extensions/extension_apitest.h"
 #include "chrome/browser/notifications/notification_display_service_tester.h"
 #include "chrome/browser/notifications/notification_handler.h"
 #include "chrome/browser/notifications/notifier_state_tracker.h"
 #include "chrome/browser/notifications/notifier_state_tracker_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/services/app_service/public/cpp/app_launch_params.h"
-#include "components/services/app_service/public/cpp/app_launch_util.h"
 #include "content/public/test/browser_test.h"
 #include "extensions/browser/api/test/test_api.h"
 #include "extensions/browser/api_test_utils.h"
-#include "extensions/browser/app_window/app_window.h"
-#include "extensions/browser/app_window/app_window_registry.h"
-#include "extensions/browser/app_window/native_app_window.h"
 #include "extensions/browser/extension_host.h"
 #include "extensions/browser/extension_host_test_helper.h"
 #include "extensions/buildflags/buildflags.h"
@@ -46,20 +38,8 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "base/auto_reset.h"
-#endif
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
-#include "chrome/browser/ui/browser.h"
-#include "chrome/test/base/interactive_test_utils.h"
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
-using extensions::AppWindow;
-using extensions::AppWindowRegistry;
 using extensions::Extension;
 using extensions::ExtensionNotificationDisplayHelper;
 using extensions::ExtensionNotificationDisplayHelperFactory;
@@ -68,11 +48,6 @@ using extensions::ResultCatcher;
 namespace utils = extensions::api_test_utils;
 
 namespace {
-
-enum class WindowState {
-  FULLSCREEN,
-  NORMAL
-};
 
 class NotificationsApiTest : public extensions::ExtensionApiTest {
  public:
@@ -93,46 +68,6 @@ class NotificationsApiTest : public extensions::ExtensionApiTest {
     }
     return extension;
   }
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-  const Extension* LoadAppWithWindowState(
-      const std::string& test_name, WindowState window_state) {
-    const char* window_state_string = nullptr;
-    switch (window_state) {
-      case WindowState::FULLSCREEN:
-        window_state_string = "fullscreen";
-        break;
-      case WindowState::NORMAL:
-        window_state_string = "normal";
-        break;
-    }
-    const std::string& create_window_options = base::StringPrintf(
-        "{\"state\":\"%s\"}", window_state_string);
-    base::FilePath extdir = test_data_dir_.AppendASCII(test_name);
-    const extensions::Extension* extension = LoadExtension(extdir);
-    EXPECT_TRUE(extension);
-
-    ExtensionTestMessageListener launched_listener("launched",
-                                                   ReplyBehavior::kWillReply);
-    LaunchPlatformApp(extension);
-    EXPECT_TRUE(launched_listener.WaitUntilSatisfied());
-    launched_listener.Reply(create_window_options);
-
-    return extension;
-  }
-
-  AppWindow* GetFirstAppWindow(const std::string& app_id) {
-    AppWindowRegistry::AppWindowList app_windows =
-        AppWindowRegistry::Get(profile())->GetAppWindowsForApp(app_id);
-
-    AppWindowRegistry::const_iterator iter = app_windows.begin();
-    if (iter != app_windows.end()) {
-      return *iter;
-    }
-
-    return nullptr;
-  }
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
   ExtensionNotificationDisplayHelper* GetDisplayHelper() {
     return ExtensionNotificationDisplayHelperFactory::GetForProfile(profile());
@@ -176,20 +111,6 @@ class NotificationsApiTest : public extensions::ExtensionApiTest {
   std::string GetNotificationIdFromDelegateId(const std::string& delegate_id) {
     return GetDisplayHelper()->GetByNotificationId(delegate_id)->id();
   }
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-  void LaunchPlatformApp(const Extension* extension) {
-    apps::AppServiceProxyFactory::GetForProfile(profile())->LaunchAppWithParams(
-        apps::AppLaunchParams(
-            extension->id(), apps::LaunchContainer::kLaunchContainerNone,
-            WindowOpenDisposition::NEW_WINDOW, apps::LaunchSource::kFromTest));
-  }
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  base::AutoReset<bool> enable_chrome_apps_{
-      &extensions::testing::g_enable_chrome_apps_for_testing, true};
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   std::unique_ptr<NotificationDisplayServiceTester> display_service_tester_;
 };
@@ -414,134 +335,3 @@ IN_PROC_BROWSER_TEST_F(NotificationsApiTest, TestRequireInteraction) {
 
   EXPECT_TRUE(notification->never_timeout());
 }
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-// The following tests exercise platform app behavior.
-IN_PROC_BROWSER_TEST_F(NotificationsApiTest, TestShouldDisplayNormal) {
-  ExtensionTestMessageListener notification_created_listener("created");
-  const Extension* extension = LoadAppWithWindowState(
-      "notifications/api/basic_app", WindowState::NORMAL);
-  ASSERT_TRUE(extension) << message_;
-  ASSERT_TRUE(notification_created_listener.WaitUntilSatisfied());
-
-  // We start by making sure the window is actually focused.
-  ASSERT_TRUE(ui_test_utils::ShowAndFocusNativeWindow(
-      GetFirstAppWindow(extension->id())->GetNativeWindow()));
-
-  message_center::Notification* notification =
-      GetNotificationForExtension(extension);
-  ASSERT_TRUE(notification);
-
-  // If the app hasn't created a fullscreen window, then its notifications
-  // shouldn't be displayed when a window is fullscreen.
-  EXPECT_EQ(message_center::FullscreenVisibility::NONE,
-            notification->fullscreen_visibility());
-}
-
-// Full screen related tests don't run on Mac as native notifications full
-// screen decisions are done by the OS directly.
-#if !BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(NotificationsApiTest, TestShouldDisplayFullscreen) {
-  ExtensionTestMessageListener notification_created_listener("created");
-  const Extension* extension = LoadAppWithWindowState(
-      "notifications/api/basic_app", WindowState::FULLSCREEN);
-  ASSERT_TRUE(extension) << message_;
-  ASSERT_TRUE(notification_created_listener.WaitUntilSatisfied());
-
-  // We start by making sure the window is actually focused.
-  ASSERT_TRUE(ui_test_utils::ShowAndFocusNativeWindow(
-      GetFirstAppWindow(extension->id())->GetNativeWindow()));
-
-  ASSERT_TRUE(GetFirstAppWindow(extension->id())->IsFullscreen())
-      << "Not Fullscreen";
-  ASSERT_TRUE(GetFirstAppWindow(extension->id())->GetBaseWindow()->IsActive())
-      << "Not Active";
-
-  message_center::Notification* notification =
-      GetNotificationForExtension(extension);
-  ASSERT_TRUE(notification);
-
-  // If the app has created a fullscreen window, then its notifications should
-  // be displayed when a window is fullscreen.
-  EXPECT_EQ(message_center::FullscreenVisibility::OVER_USER,
-            notification->fullscreen_visibility());
-}
-
-// The Fake OSX fullscreen window doesn't like drawing a second fullscreen
-// window when another is visible.
-IN_PROC_BROWSER_TEST_F(NotificationsApiTest, TestShouldDisplayMultiFullscreen) {
-  // Start a fullscreen app, and then start another fullscreen app on top of the
-  // first. Notifications from the first should not be displayed because it is
-  // not the app actually displaying on the screen.
-  ExtensionTestMessageListener notification_created_listener("created");
-  const Extension* extension1 = LoadAppWithWindowState(
-      "notifications/api/notification_on_blur", WindowState::FULLSCREEN);
-  ASSERT_TRUE(extension1) << message_;
-
-  ExtensionTestMessageListener window_visible_listener("visible");
-  const Extension* extension2 = LoadAppWithWindowState(
-      "notifications/api/other_app", WindowState::FULLSCREEN);
-  ASSERT_TRUE(extension2) << message_;
-
-  ASSERT_TRUE(window_visible_listener.WaitUntilSatisfied());
-  ASSERT_TRUE(notification_created_listener.WaitUntilSatisfied());
-
-  // We start by making sure the window is actually focused.
-  ASSERT_TRUE(ui_test_utils::ShowAndFocusNativeWindow(
-      GetFirstAppWindow(extension2->id())->GetNativeWindow()));
-
-  message_center::Notification* notification =
-      GetNotificationForExtension(extension1);
-  ASSERT_TRUE(notification);
-
-  // The first app window is superseded by the second window, so its
-  // notification shouldn't be displayed.
-  EXPECT_EQ(message_center::FullscreenVisibility::NONE,
-            notification->fullscreen_visibility());
-}
-
-// Verify that a notification is actually displayed when the app window that
-// creates it is fullscreen.
-IN_PROC_BROWSER_TEST_F(NotificationsApiTest,
-                       TestShouldDisplayPopupNotification) {
-  ExtensionTestMessageListener notification_created_listener("created");
-  const Extension* extension = LoadAppWithWindowState(
-      "notifications/api/basic_app", WindowState::FULLSCREEN);
-  ASSERT_TRUE(extension) << message_;
-  ASSERT_TRUE(notification_created_listener.WaitUntilSatisfied());
-
-  // We start by making sure the window is actually focused.
-  ASSERT_TRUE(ui_test_utils::ShowAndFocusNativeWindow(
-      GetFirstAppWindow(extension->id())->GetNativeWindow()));
-
-  ASSERT_TRUE(GetFirstAppWindow(extension->id())->IsFullscreen())
-      << "Not Fullscreen";
-  ASSERT_TRUE(GetFirstAppWindow(extension->id())->GetBaseWindow()->IsActive())
-      << "Not Active";
-
-  message_center::Notification* notification =
-      GetNotificationForExtension(extension);
-  ASSERT_TRUE(notification);
-
-  // The extension's window is being shown and focused, so its expected that
-  // the notification displays on top of it.
-  EXPECT_EQ(message_center::FullscreenVisibility::OVER_USER,
-            notification->fullscreen_visibility());
-}
-#endif  // !BUILDFLAG(IS_MAC)
-
-IN_PROC_BROWSER_TEST_F(NotificationsApiTest, TestSmallImage) {
-  ExtensionTestMessageListener notification_created_listener("created");
-  const Extension* extension = LoadAppWithWindowState(
-      "notifications/api/basic_app", WindowState::NORMAL);
-  ASSERT_TRUE(extension) << message_;
-  ASSERT_TRUE(notification_created_listener.WaitUntilSatisfied());
-
-  message_center::Notification* notification =
-      GetNotificationForExtension(extension);
-  ASSERT_TRUE(notification);
-
-  EXPECT_FALSE(notification->small_image().IsEmpty());
-  EXPECT_TRUE(notification->small_image_needs_additional_masking());
-}
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)

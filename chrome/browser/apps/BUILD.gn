@@ -30,11 +30,9 @@ source_set("user_type_filter") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "icon_standardizer_unittest.cc",
     "user_type_filter_unittest.cc",
   ]
   deps = [
-    ":icon_standardizer",
     ":user_type_filter",
     "//base",
     "//chrome/browser/policy",

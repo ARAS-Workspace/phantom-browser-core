@@ -46,18 +46,6 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 namespace keys = extension_management_api_constants;
 
 namespace extensions {
-namespace {
-
-// This function is unused on Android.
-bool ExpectChromeAppsDefaultEnabled() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  return false;
-#else
-  return true;
-#endif
-}
-
-}  // namespace
 
 namespace test_utils = api_test_utils;
 
@@ -121,86 +109,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
   ASSERT_TRUE(listener2.WaitUntilSatisfied());
 }
 
-// Android does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
-                       LaunchApp) {
-  ExtensionTestMessageListener listener1("app_launched");
-  ExtensionTestMessageListener listener2("got_expected_error");
-  ASSERT_TRUE(
-      LoadExtension(test_data_dir_.AppendASCII("management/simple_extension"),
-                    {.context_type = ContextType::kFromManifest}));
-  ASSERT_TRUE(
-      LoadExtension(test_data_dir_.AppendASCII("management/packaged_app"),
-                    {.context_type = ContextType::kFromManifest}));
-  ASSERT_TRUE(
-      LoadExtension(test_data_dir_.AppendASCII("management/launch_app")));
-  ASSERT_TRUE(listener1.WaitUntilSatisfied());
-  ASSERT_TRUE(listener2.WaitUntilSatisfied());
-}
-
-// Android does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
-                       NoLaunchAppDeprecated) {
-  extensions::testing::g_enable_chrome_apps_for_testing = false;
-  const Extension* packaged_app =
-      LoadExtension(test_data_dir_.AppendASCII("management/packaged_app"),
-                    {.context_type = ContextType::kFromManifest});
-  ASSERT_TRUE(packaged_app);
-  EXPECT_TRUE(packaged_app->is_app());
-
-  ExtensionTestMessageListener error("got_chrome_apps_error");
-  ExtensionTestMessageListener launched("app_launched");
-  ASSERT_TRUE(
-      LoadExtension(test_data_dir_.AppendASCII("management/launch_app")));
-  if (ExpectChromeAppsDefaultEnabled()) {
-    EXPECT_TRUE(launched.WaitUntilSatisfied());
-    EXPECT_FALSE(error.was_satisfied());
-  } else {
-    EXPECT_TRUE(error.WaitUntilSatisfied());
-    EXPECT_FALSE(launched.was_satisfied());
-  }
-}
-
-// Android does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
-                       LaunchAppFromBackground) {
-  ExtensionTestMessageListener listener1("success");
-  ASSERT_TRUE(
-      LoadExtension(test_data_dir_.AppendASCII("management/packaged_app"),
-                    {.context_type = ContextType::kFromManifest}));
-  ASSERT_TRUE(LoadExtension(
-      test_data_dir_.AppendASCII("management/launch_app_from_background")));
-  ASSERT_TRUE(listener1.WaitUntilSatisfied());
-}
-
-// Android does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
-                       NoLaunchAppFromBackgroundDeprecated) {
-  extensions::testing::g_enable_chrome_apps_for_testing = false;
-  const Extension* packaged_app =
-      LoadExtension(test_data_dir_.AppendASCII("management/packaged_app"),
-                    {.context_type = ContextType::kFromManifest});
-  ASSERT_TRUE(packaged_app);
-  EXPECT_TRUE(packaged_app->is_app());
-
-  // Also verify launching from background does not work. This helper is not an
-  // app.
-  ExtensionTestMessageListener error("got_chrome_apps_error");
-  ExtensionTestMessageListener launched_failure("not_launched");
-  ExtensionTestMessageListener success("success");
-  ASSERT_TRUE(LoadExtension(
-      test_data_dir_.AppendASCII("management/launch_app_from_background")));
-  if (ExpectChromeAppsDefaultEnabled()) {
-    EXPECT_TRUE(success.WaitUntilSatisfied());
-    EXPECT_FALSE(error.was_satisfied());
-    EXPECT_FALSE(launched_failure.was_satisfied());
-  } else {
-    EXPECT_TRUE(error.WaitUntilSatisfied());
-    EXPECT_TRUE(launched_failure.WaitUntilSatisfied());
-    EXPECT_FALSE(success.was_satisfied());
-  }
-}
-
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
                        SelfUninstall) {
   // Wait for the helper script to finish before loading the primary
@@ -245,33 +153,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementApiTestWithBackgroundType,
   ExtensionTestMessageListener listener1("success");
   ASSERT_TRUE(LoadExtension(test_data_dir_.AppendASCII("management/get_self")));
   ASSERT_TRUE(listener1.WaitUntilSatisfied());
-}
-
-// Android does not support Chrome apps.
-IN_PROC_BROWSER_TEST_F(ExtensionManagementApiBrowserTest,
-                       CreateAppShortcutConfirmDialog) {
-  const Extension* app = InstallExtension(
-      test_data_dir_.AppendASCII("api_test/management/packaged_app"), 1);
-  ASSERT_TRUE(app);
-
-  const extensions::ExtensionId app_id = app->id();
-
-  scoped_refptr<ManagementCreateAppShortcutFunction> create_shortcut_function(
-      new ManagementCreateAppShortcutFunction());
-  create_shortcut_function->set_user_gesture(true);
-  ManagementCreateAppShortcutFunction::SetAutoConfirmForTest(true);
-  test_utils::RunFunctionAndReturnSingleResult(
-      create_shortcut_function.get(),
-      base::StringPrintf("[\"%s\"]", app_id.c_str()), profile());
-
-  create_shortcut_function = new ManagementCreateAppShortcutFunction();
-  create_shortcut_function->set_user_gesture(true);
-  ManagementCreateAppShortcutFunction::SetAutoConfirmForTest(false);
-  EXPECT_TRUE(base::MatchPattern(
-      test_utils::RunFunctionAndReturnError(
-          create_shortcut_function.get(),
-          base::StringPrintf("[\"%s\"]", app_id.c_str()), profile()),
-      keys::kCreateShortcutCanceledError));
 }
 
 IN_PROC_BROWSER_TEST_F(ExtensionManagementApiBrowserTest,

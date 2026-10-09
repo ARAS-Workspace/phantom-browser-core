@@ -14,7 +14,6 @@
 #include "base/strings/stringprintf.h"
 #include "base/test/bind.h"
 #include "build/buildflag.h"
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/extensions/extension_tab_util.h"
 #include "chrome/browser/extensions/extension_util.h"

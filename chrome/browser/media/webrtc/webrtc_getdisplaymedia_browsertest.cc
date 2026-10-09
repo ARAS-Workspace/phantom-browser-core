@@ -21,11 +21,9 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/config/chromebox_for_meetings/buildflags.h"  // PLATFORM_CFM
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
 #include "chrome/browser/media/webrtc/webrtc_browsertest_base.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/tab_sharing/tab_sharing_infobar_delegate.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
@@ -149,8 +147,6 @@ struct TestConfigForRestrictOwnAudio {
   bool restrict_own_audio;
   bool suppress_local_audio_playback;
 };
-
-constexpr char kAppWindowTitle[] = "AppWindow Display Capture Test";
 
 constexpr char kEmbeddedTestServerOrigin[] = "http://127.0.0.1";
 constexpr char kOtherOrigin[] = "https://other-origin.com";
@@ -629,76 +625,6 @@ IN_PROC_BROWSER_TEST_P(WebRtcScreenCapturePermissionPolicyBrowserTest,
               allowlisted_by_policy_ ? "allowedFrame" : "disallowedFrame")),
       allowlisted_by_policy_ ? "embedded-capture-success"
                              : "embedded-capture-failure");
-}
-
-// Test class used to test WebRTC with App Windows. Unfortunately, due to
-// creating a diamond pattern of inheritance, we can only inherit from one of
-// the PlatformAppBrowserTest and WebRtcBrowserTestBase (or it's children).
-// We need a lot more heavy lifting on creating the AppWindow than we would get
-// from WebRtcBrowserTestBase; so we inherit from PlatformAppBrowserTest to
-// minimize the code duplication.
-class WebRtcAppWindowCaptureBrowserTestWithPicker
-    : public extensions::PlatformAppBrowserTest {
- public:
-  WebRtcAppWindowCaptureBrowserTestWithPicker() = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    PlatformAppBrowserTest::SetUpCommandLine(command_line);
-    command_line->AppendSwitch(
-        switches::kEnableExperimentalWebPlatformFeatures);
-    command_line->AppendSwitchASCII(
-        switches::kAutoSelectTabCaptureSourceByTitle, kAppWindowTitle);
-
-    AdjustCommandLineForZeroCopyCapture(command_line);
-  }
-
-  void SetUpOnMainThread() override {
-    extensions::PlatformAppBrowserTest::SetUpOnMainThread();
-    ASSERT_TRUE(StartEmbeddedTestServer());
-
-    // We will restrict all pages to "Tab Capture" only. This should force App
-    // Windows to show up in the tabs list, and thus make it selectable.
-    base::ListValue matchlist;
-    matchlist.Append("*");
-    browser()->GetProfile()->GetPrefs()->SetList(
-        prefs::kTabCaptureAllowedByOrigins, std::move(matchlist));
-  }
-
-  void TearDownOnMainThread() override {
-    extensions::PlatformAppBrowserTest::TearDownOnMainThread();
-    browser()->GetProfile()->GetPrefs()->SetList(
-        prefs::kTabCaptureAllowedByOrigins, base::ListValue());
-  }
-
-  extensions::AppWindow* CreateAppWindowWithTitle(const std::u16string& title) {
-    extensions::AppWindow* app_window = CreateTestAppWindow("{}");
-    EXPECT_TRUE(app_window);
-    UpdateWebContentsTitle(app_window->web_contents(), title);
-
-    return app_window;
-  }
-
-  // This is mostly lifted from WebRtcBrowserTestBase, with the exception that
-  // because we know we're setting the auto-accept switches, we don't need to
-  // set the PermissionsManager auto accept.
-  content::WebContents* OpenTestPageInNewTab(const std::string& test_url) {
-    chrome::AddTabAt(browser(), GURL(url::kAboutBlankURL), -1, true);
-    GURL url = embedded_test_server()->GetURL(test_url);
-    EXPECT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-    return browser()->tab_strip_model()->GetActiveWebContents();
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(WebRtcAppWindowCaptureBrowserTestWithPicker,
-                       CaptureAppWindow) {
-  extensions::AppWindow* app_window =
-      CreateAppWindowWithTitle(base::UTF8ToUTF16(std::string(kAppWindowTitle)));
-  content::WebContents* capturing_tab = OpenTestPageInNewTab(kMainHtmlPage);
-
-  RunGetDisplayMedia(capturing_tab, "{video: true}", /*is_fake_ui=*/false,
-                     /*expect_success=*/true,
-                     /*is_tab_capture=*/true);
-  CloseAppWindow(app_window);
 }
 
 // Base class for running tests with a SameOrigin policy applied.

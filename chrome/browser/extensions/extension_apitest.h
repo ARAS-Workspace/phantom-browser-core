@@ -55,10 +55,6 @@ class ExtensionApiTest : public ExtensionBrowserTest {
     // Launch the test page in an incognito window.
     bool open_in_incognito = false;
 
-    // Launch the extension as a platform app.
-    // Note: This is unsupported on desktop android builds.
-    bool launch_as_platform_app = false;
-
     // Use //extensions/test/data/ as the root path instead of the default
     // path of //chrome/test/data/extensions/api_test/.
     bool use_extensions_root_dir = false;

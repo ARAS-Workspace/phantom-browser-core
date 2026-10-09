@@ -331,7 +331,6 @@ source_set("browser_tests") {
     "extension_installed_watcher_browsertest.cc",
     "extension_multiple_uninstall_dialog_browsertest.cc",
     "extension_uninstall_dialog_impl_browsertest.cc",
-    "hosted_app_browsertest.cc",
     "notifications_custom_bindings_browsertest.cc",
     "reload_page_dialog_controller_browsertest.cc",
     "settings_overridden_params_providers_browsertest.cc",
@@ -345,7 +344,6 @@ source_set("browser_tests") {
   deps += [
     "//chrome/app:command_ids",
     "//chrome/browser:chrome_content_browser_client",
-    "//chrome/browser/apps/app_service:test_support",
     "//chrome/browser/extensions:test_support",
     "//chrome/browser/preloading/prerender",
     "//chrome/browser/profiles:profile",

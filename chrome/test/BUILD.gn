@@ -209,7 +209,6 @@ static_library("test_support") {
     ]
 
     public_deps += [
-      "//apps:test_support",
       "//chrome/browser/extensions:test_support",
       "//chrome/browser/preloading:test_support",
       "//chrome/browser/task_manager:test_support",
@@ -453,7 +452,6 @@ static_library("test_support") {
     "//components/keep_alive_registry",
     "//components/pref_registry",
     "//components/renderer_context_menu",
-    "//components/services/app_service/public/cpp:test_support",
     "//components/storage_monitor",
     "//components/storage_monitor:test_support",
     "//components/ukm:test_support",
@@ -769,7 +767,6 @@ source_set("platform_browser_tests") {
   deps += [ "//chrome/browser/ui/prefs:browser_tests" ]
   if (enable_extensions) {
     deps += [
-      "//chrome/browser/apps/platform_apps:browser_test_support",
       "//chrome/browser/extensions",
       "//chrome/browser/ui/extensions",
       "//chrome/browser/ui/tabs/alert:tab_alert",
@@ -897,7 +894,6 @@ test("browser_tests") {
     "//chrome/browser/ai:browser_tests",
     "//chrome/browser/apps/app_service",
     "//chrome/browser/apps/app_service:app_registry_cache_waiter",
-    "//chrome/browser/apps/app_service:test_support",
     "//chrome/browser/apps/app_service/app_icon",
     "//chrome/browser/apps/app_service/publishers",
     "//chrome/browser/apps/link_capturing",
@@ -948,7 +944,6 @@ test("browser_tests") {
     "//chrome/browser/devtools:test_support",
     "//chrome/browser/dictation:browser_tests",
     "//chrome/browser/digital_credentials",
-    "//chrome/browser/direct_sockets:browser_tests",
     "//chrome/browser/dom_distiller:browser_tests",
     "//chrome/browser/domain_reliability:browser_tests",
     "//chrome/browser/download:browser_tests",
@@ -1528,7 +1523,6 @@ test("browser_tests") {
     "//components/segmentation_platform/public",
     "//components/segmentation_platform/public:test_support",
     "//components/services/app_service",
-    "//components/services/app_service/public/cpp:test_support",
     "//components/services/patch/content",
     "//components/services/patch/public/cpp",
     "//components/services/patch/public/mojom",
@@ -1695,7 +1689,6 @@ test("browser_tests") {
 
   if (is_mac) {
     deps += [
-      "//chrome/app_shim:browser_tests",
       "//chrome/browser:app_controller_mac",
       "//chrome/browser:chrome_browser_application_mac",
       "//chrome/browser/ui/cocoa",
@@ -2300,7 +2293,6 @@ test("browser_tests") {
 
   if (enable_extensions) {
     deps += [
-      "//chrome/browser/apps/platform_apps:browser_test_support",
       "//chrome/browser/extensions:browser_tests",
       "//chrome/browser/guest_view:browser_tests",
       "//chrome/browser/web_applications/extensions",
@@ -3621,7 +3613,6 @@ test("unit_tests") {
   if (is_mac) {
     sources += [
       "../../testing/gtest_mac_unittest.mm",
-      "../app_shim/app_shim_controller_unittest.mm",
       "../browser/app_controller_mac_unittest.mm",
       "../browser/chrome_browser_application_mac_unittest.mm",
       "../browser/global_keyboard_shortcuts_mac_unittest.mm",
@@ -3931,7 +3922,6 @@ test("unit_tests") {
     "//chrome/browser/apps:icon_standardizer",
     "//chrome/browser/apps/app_service",
     "//chrome/browser/apps/app_service:app_registry_cache_waiter",
-    "//chrome/browser/apps/app_service:test_support",
     "//chrome/browser/apps/app_service/app_icon",
     "//chrome/browser/apps/app_service/app_icon:util",
     "//chrome/browser/apps/link_capturing",
@@ -4074,8 +4064,6 @@ test("unit_tests") {
     "//components/safety_check:test_support",
     "//components/send_tab_to_self:test_support",
     "//components/services/app_service",
-    "//components/services/app_service/public/cpp:test_support",
-    "//components/services/app_service/public/cpp:unit_tests",
     "//components/session_proto_db",
     "//components/signin/public/base:signin_buildflags",
     "//components/supervised_user/core/browser",
@@ -5667,7 +5655,6 @@ test("interactive_ui_tests") {
 
     deps += [
       "//chrome/browser/apps/app_shim",
-      "//chrome/browser/apps/platform_apps:browser_test_support",
       "//chrome/browser/lifetime:termination_notification",
       "//chrome/browser/web_applications/extensions",
       "//components/remote_cocoa/app_shim",

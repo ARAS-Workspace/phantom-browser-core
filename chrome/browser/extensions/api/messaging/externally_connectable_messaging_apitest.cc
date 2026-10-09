@@ -14,7 +14,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/common/chrome_paths.h"
-#include "components/crx_file/id_util.h"
 #include "components/embedder_support/switches.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "content/public/browser/web_contents.h"
@@ -270,29 +269,6 @@ class ExternallyConnectableMessagingTest : public ExtensionApiTest {
                                 connectable_with_tls_channel_id_manifest());
   }
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  // Note: Desktop Android does not support hosted apps.
-  scoped_refptr<const Extension> LoadChromiumHostedApp() {
-    scoped_refptr<const Extension> hosted_app = LoadExtensionIntoDir(
-        &hosted_app_dir_,
-        base::StringPrintf("{"
-                           "  \"name\": \"chromium_hosted_app\","
-                           "  \"version\": \"1.0\","
-                           "  \"manifest_version\": 2,"
-                           "  \"app\": {"
-                           "    \"urls\": [\"%s\"],"
-                           "    \"launch\": {"
-                           "      \"web_url\": \"%s\""
-                           "    }\n"
-                           "  }\n"
-                           "}",
-                           chromium_org_url().spec().c_str(),
-                           chromium_org_url().spec().c_str()));
-    CHECK(hosted_app.get());
-    return hosted_app;
-  }
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
   void SetUpOnMainThread() override {
     ExtensionApiTest::SetUpOnMainThread();
 
@@ -380,7 +356,6 @@ class ExternallyConnectableMessagingTest : public ExtensionApiTest {
   TestExtensionDir web_connectable_dir_app_;
   TestExtensionDir not_connectable_dir_;
   TestExtensionDir tls_channel_id_connectable_dir_;
-  TestExtensionDir hosted_app_dir_;
 
   base::test::ScopedFeatureList feature_list_;
 };
@@ -1055,50 +1030,5 @@ IN_PROC_BROWSER_TEST_F(
   // And the expected value is still retrieved.
   EXPECT_EQ(expected_tls_channel_id_value, tls_channel_id);
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-// Tests that a hosted app on a connectable site doesn't interfere with the
-// connectability of that site.
-// Note: Desktop Android does not support hosted apps.
-IN_PROC_BROWSER_TEST_F(ExternallyConnectableMessagingTest, HostedAppOnWebsite) {
-  scoped_refptr<const Extension> app = LoadChromiumHostedApp();
-
-  // The presence of the hosted app shouldn't give the ability to send messages.
-  ASSERT_TRUE(NavigateToURL(GetActiveWebContents(), chromium_org_url()));
-  EXPECT_EQ(NAMESPACE_NOT_DEFINED,
-            CanConnectAndSendMessagesToMainFrame(app.get()));
-  EXPECT_FALSE(AreAnyNonWebApisDefinedForMainFrame());
-
-  // Once a connectable extension is installed, it should.
-  scoped_refptr<const Extension> extension = LoadChromiumConnectableExtension();
-  EXPECT_EQ(OK, CanConnectAndSendMessagesToMainFrame(extension.get()));
-  EXPECT_FALSE(AreAnyNonWebApisDefinedForMainFrame());
-}
-
-// Tests that an invalid extension ID specified in a hosted app does not crash
-// the hosted app's renderer.
-//
-// This is a regression test for http://crbug.com/40343914#comment13.
-IN_PROC_BROWSER_TEST_F(ExternallyConnectableMessagingTest,
-                       InvalidExtensionIDFromHostedApp) {
-  // The presence of the chromium hosted app triggers this bug. The chromium
-  // connectable extension needs to be installed to set up the runtime bindings.
-  LoadChromiumHostedApp();
-  LoadChromiumConnectableExtension();
-
-  scoped_refptr<const Extension> invalid =
-      ExtensionBuilder()
-          .SetID(crx_file::id_util::GenerateId("invalid"))
-          .SetManifest(base::DictValue()
-                           .Set("name", "Fake extension")
-                           .Set("version", "1")
-                           .Set("manifest_version", 2))
-          .Build();
-
-  ASSERT_TRUE(NavigateToURL(GetActiveWebContents(), chromium_org_url()));
-  EXPECT_EQ(COULD_NOT_ESTABLISH_CONNECTION_ERROR,
-            CanConnectAndSendMessagesToMainFrame(invalid.get()));
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 }  // namespace extensions

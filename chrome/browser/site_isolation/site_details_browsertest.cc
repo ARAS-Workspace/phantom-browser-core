@@ -247,28 +247,6 @@ class SiteDetailsBrowserTest : public extensions::ExtensionBrowserTest {
     return extension;
   }
 
-  const Extension* CreateHostedApp(const std::string& name,
-                                   const GURL& app_url) {
-    TestExtensionDir dir;
-
-    auto manifest =
-        base::DictValue()
-            .Set("name", name)
-            .Set("version", "1.0")
-            .Set("manifest_version", 2)
-            .Set("app",
-                 base::DictValue()
-                     .Set("urls", base::ListValue().Append(app_url.spec()))
-                     .Set("launch",
-                          base::DictValue().Set("web_url", app_url.spec())));
-    dir.WriteManifest(manifest);
-
-    const Extension* extension = LoadExtension(dir.UnpackedPath());
-    EXPECT_TRUE(extension);
-    temp_dirs_.push_back(std::move(dir));
-    return extension;
-  }
-
   int GetRenderProcessCountFromUma(base::HistogramTester* uma) {
     auto buckets = uma->GetAllSamples("Memory.RenderProcessHost.Count2.All");
     EXPECT_EQ(buckets.size(), 1u);
@@ -623,60 +601,6 @@ IN_PROC_BROWSER_TEST_F(SiteDetailsBrowserTest, ExtensionWithTwoWebIframes) {
 
   EXPECT_THAT(details->GetOutOfProcessIframeCount(),
               DependingOnPolicy(0, 2, 2));
-}
-
-// Verifies that --isolate-extensions doesn't isolate hosted apps.
-//
-// Disabled since it's flaky: https://crbug.com/41381593.
-IN_PROC_BROWSER_TEST_F(SiteDetailsBrowserTest,
-                       DISABLED_IsolateExtensionsHostedApps) {
-  GURL app_with_web_iframe_url = embedded_test_server()->GetURL(
-      "app.org", "/cross_site_iframe_factory.html?app.org(b.com)");
-  GURL app_in_web_iframe_url = embedded_test_server()->GetURL(
-      "b.com", "/cross_site_iframe_factory.html?b.com(app.org)");
-
-  // No hosted app is installed: app.org just behaves like a normal domain.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), app_with_web_iframe_url));
-  scoped_refptr<TestMemoryDetails> details =
-      base::MakeRefCounted<TestMemoryDetails>();
-  details->StartFetchAndWait();
-  EXPECT_EQ(GetRenderProcessCountFromUma(details->uma()),
-            GetRenderProcessCount());
-  EXPECT_THAT(GetRenderProcessCount(), DependingOnPolicy(1, 1, 2));
-  EXPECT_THAT(details->GetOutOfProcessIframeCount(),
-              DependingOnPolicy(0, 0, 1));
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), app_in_web_iframe_url));
-  details = base::MakeRefCounted<TestMemoryDetails>();
-  details->StartFetchAndWait();
-  EXPECT_EQ(GetRenderProcessCountFromUma(details->uma()),
-            GetRenderProcessCount());
-  EXPECT_THAT(GetRenderProcessCount(), DependingOnPolicy(1, 1, 2));
-  EXPECT_THAT(details->GetOutOfProcessIframeCount(),
-              DependingOnPolicy(0, 0, 1));
-
-  // Now install app.org as a hosted app.
-  CreateHostedApp("App", GURL("http://app.org"));
-
-  // Reload the same two pages, and verify that the hosted app still is not
-  // isolated by --isolate-extensions, but is isolated by --site-per-process.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), app_with_web_iframe_url));
-  details = base::MakeRefCounted<TestMemoryDetails>();
-  details->StartFetchAndWait();
-  EXPECT_EQ(GetRenderProcessCountFromUma(details->uma()),
-            GetRenderProcessCount());
-  EXPECT_THAT(GetRenderProcessCount(), DependingOnPolicy(1, 1, 2));
-  EXPECT_THAT(details->GetOutOfProcessIframeCount(),
-              DependingOnPolicy(0, 0, 1));
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), app_in_web_iframe_url));
-  details = base::MakeRefCounted<TestMemoryDetails>();
-  details->StartFetchAndWait();
-  EXPECT_EQ(GetRenderProcessCountFromUma(details->uma()),
-            GetRenderProcessCount());
-  EXPECT_THAT(GetRenderProcessCount(), DependingOnPolicy(1, 1, 2));
-  EXPECT_THAT(details->GetOutOfProcessIframeCount(),
-              DependingOnPolicy(0, 0, 1));
 }
 
 // Verifies that the UMA counter for SiteInstances in a BrowsingInstance is

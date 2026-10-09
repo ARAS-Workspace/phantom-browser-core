@@ -11,12 +11,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTest, FileAPI) {
   ASSERT_TRUE(RunExtensionTest("fileapi")) << message_;
 }
 
-IN_PROC_BROWSER_TEST_F(ExtensionApiTest, XHROnPersistentFileSystem) {
-  ASSERT_TRUE(
-      RunExtensionTest("xhr_persistent_fs", {.launch_as_platform_app = true}))
-      << message_;
-}
-
 IN_PROC_BROWSER_TEST_F(ExtensionApiTest, RequestQuotaInBackgroundPage) {
   ASSERT_TRUE(RunExtensionTest("request_quota_background")) << message_;
 }

@@ -328,7 +328,6 @@ source_set("browser_tests") {
     ":webrtc_browser_tests_base",
     "//base",
     "//chrome/browser:test_support",
-    "//chrome/browser/apps/platform_apps:browser_test_support",
     "//chrome/browser/extensions:test_support",
     "//chrome/browser/extensions/api/desktop_capture",
     "//chrome/browser/permissions",

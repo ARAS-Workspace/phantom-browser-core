@@ -32,7 +32,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/threading/thread_restrictions.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
@@ -91,10 +90,8 @@
 #include "content/public/test/no_renderer_crashes_assertion.h"
 #include "content/public/test/prerender_test_util.h"
 #include "content/public/test/test_navigation_observer.h"
-#include "extensions/browser/app_window/app_window_registry.h"
 #include "extensions/browser/extension_dialog_auto_confirm.h"
 #include "extensions/common/extension.h"
-#include "extensions/test/extension_test_message_listener.h"
 #include "net/base/apple/url_conversions.h"
 #include "net/base/filename_util.h"
 #include "net/dns/mock_host_resolver.h"
@@ -380,58 +377,6 @@ class AppControllerKeepAliveBrowserTest : public InProcessBrowserTest {
 
   base::test::ScopedFeatureList features_;
 };
-
-class AppControllerPlatformAppBrowserTest
-    : public extensions::PlatformAppBrowserTest {
- protected:
-  // extensions::PlatformAppBrowserTest:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    PlatformAppBrowserTest::SetUpCommandLine(command_line);
-    command_line->AppendSwitchASCII(switches::kAppId,
-                                    "1234");
-  }
-};
-
-// Test that if only a platform app window is open and no browser windows are
-// open then a reopen event does nothing.
-IN_PROC_BROWSER_TEST_F(AppControllerPlatformAppBrowserTest,
-                       DISABLED_PlatformAppReopenWithWindows) {
-  NSUInteger old_window_count = NSApp.windows.count;
-  EXPECT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-  [AppController.sharedController applicationShouldHandleReopen:NSApp
-                                              hasVisibleWindows:YES];
-  // We do not EXPECT_TRUE the result here because the method
-  // deminiaturizes windows manually rather than return YES and have
-  // AppKit do it.
-
-  EXPECT_EQ(old_window_count, NSApp.windows.count);
-  EXPECT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-}
-
-IN_PROC_BROWSER_TEST_F(AppControllerPlatformAppBrowserTest,
-                       DISABLED_ActivationFocusesBrowserWindow) {
-  ExtensionTestMessageListener listener("Launched");
-  const extensions::Extension* app =
-      InstallAndLaunchPlatformApp("minimal");
-  ASSERT_TRUE(listener.WaitUntilSatisfied());
-
-  NSWindow* app_window = extensions::AppWindowRegistry::Get(profile())
-                             ->GetAppWindowsForApp(app->id())
-                             .front()
-                             ->GetNativeWindow()
-                             .GetNativeNSWindow();
-  NSWindow* browser_window =
-      browser()->GetWindow()->GetNativeWindow().GetNativeNSWindow();
-
-  chrome::testing::NSRunLoopRunAllPending();
-  EXPECT_LE([NSApp.orderedWindows indexOfObject:app_window],
-            [NSApp.orderedWindows indexOfObject:browser_window]);
-  [AppController.sharedController applicationShouldHandleReopen:NSApp
-                                              hasVisibleWindows:YES];
-  chrome::testing::NSRunLoopRunAllPending();
-  EXPECT_LE([NSApp.orderedWindows indexOfObject:browser_window],
-            [NSApp.orderedWindows indexOfObject:app_window]);
-}
 
 class AppControllerProfilePickerBrowserTest : public InProcessBrowserTest {
  public:

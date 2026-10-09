@@ -13,7 +13,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/test_file_util.h"
 #include "base/test/test_future.h"
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
 #include "chrome/browser/file_system_access/file_system_access_features.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_request_manager.h"
 #include "chrome/browser/profiles/profile.h"
@@ -28,7 +27,6 @@
 #include "content/public/test/prerender_test_util.h"
 #include "content/public/test/test_utils.h"
 #include "content/public/test/update_user_activation_state_interceptor.h"
-#include "extensions/test/extension_test_message_listener.h"
 #include "net/dns/mock_host_resolver.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/features_generated.h"
@@ -1478,97 +1476,6 @@ IN_PROC_BROWSER_TEST_F(
 
   // Uninstall fake file picker factory.
   ui::SelectFileDialog::SetFactory(nullptr);
-}
-
-class FileSystemChromeAppTest : public extensions::PlatformAppBrowserTest {
- public:
-  FileSystemChromeAppTest() {
-    scoped_feature_list_.InitWithFeatures(
-        {features::kFileSystemAccessPersistentPermissions}, {});
-  }
-
- protected:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(FileSystemChromeAppTest,
-                       FileSystemAccessPermissionRequestManagerExists) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  ExtensionTestMessageListener launched_listener("Launched");
-
-  // Install Platform App
-  content::CreateAndLoadWebContentsObserver app_loaded_observer;
-  const extensions::Extension* extension =
-      InstallPlatformApp("file_system_test");
-  ASSERT_TRUE(extension);
-
-  // Launch Platform App
-  LaunchPlatformApp(extension);
-  app_loaded_observer.Wait();
-  ASSERT_TRUE(launched_listener.WaitUntilSatisfied());
-
-  content::WebContents* web_contents = GetFirstAppWindowWebContents();
-  EXPECT_TRUE(web_contents);
-  EXPECT_NE(nullptr, FileSystemAccessPermissionRequestManager::FromWebContents(
-                         web_contents));
-}
-
-IN_PROC_BROWSER_TEST_F(FileSystemChromeAppTest,
-                       FileSystemAccessPersistentPermissionsPrompt) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  ExtensionTestMessageListener launched_listener("Launched");
-
-  // Install Platform App.
-  content::CreateAndLoadWebContentsObserver app_loaded_observer;
-  const extensions::Extension* extension =
-      InstallPlatformApp("file_system_test");
-  ASSERT_TRUE(extension);
-
-  // Launch Platform App.
-  LaunchPlatformApp(extension);
-  app_loaded_observer.Wait();
-  ASSERT_TRUE(launched_listener.WaitUntilSatisfied());
-
-  // Initialize permission context.
-  content::WebContents* web_contents = GetFirstAppWindowWebContents();
-  Profile* const profile = browser()->GetProfile();
-  TestFileSystemAccessPermissionContext permission_context(profile);
-  content::SetFileSystemAccessPermissionContext(profile, &permission_context);
-  FileSystemAccessPermissionRequestManager::FromWebContents(web_contents)
-      ->set_auto_response_for_test(permissions::PermissionAction::GRANTED);
-
-  // Initialize file permission grant.
-  const url::Origin kTestOrigin = extension->origin();
-  const content::PathInfo kTestPathInfo(FILE_PATH_LITERAL("/foo/bar"));
-  auto grant = permission_context.GetReadPermissionGrant(
-      kTestOrigin, kTestPathInfo,
-      ChromeFileSystemAccessPermissionContext::HandleType::kFile,
-      ChromeFileSystemAccessPermissionContext::UserAction::kOpen);
-  EXPECT_EQ(grant->GetStatus(), content::PermissionStatus::GRANTED);
-
-  // Dormant grants exist after tabs are backgrounded for the amount of time
-  // specified by the extended permissions policy.
-  permission_context.OnAllTabsInBackgroundTimerExpired(
-      kTestOrigin,
-      OneTimePermissionsTrackerObserver::BackgroundExpiryType::kLongTimeout);
-  EXPECT_EQ(grant->GetStatus(), content::PermissionStatus::ASK);
-
-  // When `requestPermission()` is called on the handle of an existing
-  // dormant grant, the restore prompt is not triggered because there is a
-  // platform app installed.
-  base::test::TestFuture<
-      content::FileSystemAccessPermissionGrant::PermissionRequestOutcome>
-      future;
-  auto* rfh = web_contents->GetPrimaryMainFrame();
-  grant->RequestPermission(
-      content::GlobalRenderFrameHostId(rfh->GetProcess()->GetDeprecatedID(),
-                                       rfh->GetRoutingID()),
-      content::FileSystemAccessPermissionGrant::UserActivationState::
-          kNotRequired,
-      future.GetCallback());
-  auto result = future.Get();
-  EXPECT_NE(result, content::FileSystemAccessPermissionGrant::
-                        PermissionRequestOutcome::kGrantedByRestorePrompt);
 }
 
 class ChromeFileSystemAccessPermissionContextParentWriteRequiredBrowserTest

@@ -60,10 +60,6 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/test/base/ui_test_utils.h"
 
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
-#endif
-
 // Includes used only by the dangling-pointer regression test below.
 #if PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS)
 #include "base/allocator/partition_alloc_features.h"
@@ -236,16 +232,6 @@ IN_PROC_BROWSER_TEST_P(RuntimeGetPlatformInfoTest,
 #endif
 }
 
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-// Tests chrome.runtime.getPackageDirectory with an app.
-IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest,
-                       ChromeRuntimeGetPackageDirectoryEntryApp) {
-  ASSERT_TRUE(RunExtensionTest("api_test/runtime/get_package_directory/app",
-                               {.launch_as_platform_app = true}))
-      << message_;
-}
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
-
 // Tests chrome.runtime.getPackageDirectory with an extension. Note: we use
 // an html page in this test as getPackageDirectory isn't exposed on service
 // workers.
@@ -360,35 +346,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTest, ChromeRuntimeReload) {
   ready_listener_done.Reply("done");
   EXPECT_TRUE(reload_catcher.GetNextResult());
 }
-
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-IN_PROC_BROWSER_TEST_F(RuntimeApiTest, ChromeRuntimeReloadApp) {
-  scoped_refptr<const Extension> extension;
-
-  // Load and launch the app and wait for it to create a window.
-  extension = base::WrapRefCounted(
-      LoadAndLaunchApp(test_data_dir_.AppendASCII("runtime/platform_app")));
-
-  const ExtensionId extension_id = extension->id();
-  ExtensionRegistry* registry = ExtensionRegistry::Get(profile());
-
-  // Reload the extension and wait for a pair of
-  // ExtensionRegistry::OnExtensionUnloaded()/Loaded() calls.
-  TestExtensionRegistryObserver registry_observer(registry, extension_id);
-  ASSERT_TRUE(ExecuteScriptInBackgroundPageNoWait(extension_id,
-                                                  "chrome.runtime.reload();"));
-  ASSERT_EQ(extension, registry_observer.WaitForExtensionUnloaded());
-  EXPECT_TRUE(registry->disabled_extensions().Contains(extension_id));
-  ASSERT_TRUE(extension = registry_observer.WaitForExtensionLoaded());
-  ASSERT_EQ(extension->id(), extension_id);
-  EXPECT_TRUE(registry->enabled_extensions().Contains(extension_id));
-
-  // Reloading the app should launch it again automatically.
-  // Wait for the app to create a new window.
-  ResultCatcher catcher;
-  ASSERT_TRUE(catcher.GetNextResult());
-}
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
 // Tests sending messages from a webpage in the extension using
 // chrome.runtime.sendMessage and responding to those from the extension's

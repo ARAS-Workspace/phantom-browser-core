@@ -112,10 +112,6 @@ source_set("browser_tests") {
     "//ui/shell_dialogs",
     "//url",
   ]
-
-  if (enable_extensions) {
-    deps += [ "//chrome/browser/apps/platform_apps:browser_test_support" ]
-  }
 }
 
 source_set("unit_tests") {

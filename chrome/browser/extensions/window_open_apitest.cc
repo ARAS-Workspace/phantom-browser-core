@@ -169,41 +169,6 @@ IN_PROC_BROWSER_TEST_F(WindowOpenApiTest, PopupBlockingExtension) {
   EXPECT_TRUE(WaitForTabsPopupsApps(browser(), 5, 2, 1));
 }
 
-IN_PROC_BROWSER_TEST_F(WindowOpenApiTest, PopupBlockingHostedApp) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  ASSERT_TRUE(LoadExtension(
-      test_data_dir_.AppendASCII("window_open").AppendASCII("popup_blocking")
-      .AppendASCII("hosted_app")));
-
-  // The app being tested owns the domain a.com .  The test URLs we navigate
-  // to below must be within that domain, so that they fall within the app's
-  // web extent.
-  GURL::Replacements replace_host;
-  replace_host.SetHostStr("a.com");
-
-  const std::string popup_app_contents_path(
-      "/extensions/api_test/window_open/popup_blocking/hosted_app/");
-
-  GURL open_tab = embedded_test_server()
-                      ->GetURL(popup_app_contents_path + "open_tab.html")
-                      .ReplaceComponents(replace_host);
-  GURL open_popup = embedded_test_server()
-                        ->GetURL(popup_app_contents_path + "open_popup.html")
-                        .ReplaceComponents(replace_host);
-
-  browser()->OpenURL(OpenURLParams(open_tab, Referrer(),
-                                   WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                                   ui::PAGE_TRANSITION_TYPED, false),
-                     /*navigation_handle_callback=*/{});
-  browser()->OpenURL(OpenURLParams(open_popup, Referrer(),
-                                   WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                                   ui::PAGE_TRANSITION_TYPED, false),
-                     /*navigation_handle_callback=*/{});
-
-  EXPECT_TRUE(WaitForTabsPopupsApps(browser(), 3, 1, 0));
-}
-
 IN_PROC_BROWSER_TEST_F(WindowOpenApiTest, WindowArgumentsOverflow) {
   ASSERT_TRUE(RunExtensionTest("window_open/argument_overflow")) << message_;
 }

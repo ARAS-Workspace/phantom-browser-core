@@ -88,7 +88,6 @@
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/window_feature_controller/window_feature_controller.h"
 #include "chrome/browser/ui/window_metadata/window_metadata_controller.h"
-#include "chrome/browser/web_applications/test/os_integration_test_override_impl.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
@@ -411,9 +410,6 @@ class BrowserTest : public extensions::ExtensionBrowserTest {
     }
     NOTREACHED();
   }
-
- private:
-  web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
 };
 
 // Launch the app on a page with no title, check that the app title was set
@@ -1228,47 +1224,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest,
                                ->GetController()
                                .GetLastCommittedEntry();
   EXPECT_EQ(expected_favicon_url.spec(), entry->GetFavicon().url.spec());
-}
-
-// Makes sure TabClosing is sent when uninstalling an extension that is an app
-// tab.
-IN_PROC_BROWSER_TEST_F(BrowserTest, TabClosingWhenRemovingExtension) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url(embedded_test_server()->GetURL("/empty.html"));
-  TabStripModel* model = browser()->tab_strip_model();
-
-  ASSERT_TRUE(LoadExtension(test_data_dir_.AppendASCII("app/")));
-
-  const Extension* extension_app = GetExtension();
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  std::unique_ptr<WebContents> app_contents =
-      WebContents::Create(WebContents::CreateParams(browser()->GetProfile()));
-  extensions::AppTabHelper::CreateForWebContents(app_contents.get());
-  extensions::AppTabHelper* extensions_tab_helper =
-      extensions::AppTabHelper::FromWebContents(app_contents.get());
-  ASSERT_TRUE(extensions_tab_helper);
-  extensions_tab_helper->SetExtensionApp(extension_app);
-
-  model->AddWebContents(std::move(app_contents), 0,
-                        ui::PageTransitionFromInt(0), AddTabTypes::ADD_NONE);
-  model->SetTabPinned(0, true);
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  TabClosingObserver observer;
-  model->AddObserver(&observer);
-
-  // Uninstall the extension and make sure TabClosing is sent.
-  extensions::ExtensionRegistrar::Get(browser()->GetProfile())
-      ->UninstallExtension(GetExtension()->id(),
-                           extensions::UNINSTALL_REASON_FOR_TESTING, nullptr);
-  EXPECT_EQ(1, observer.closing_count());
-
-  model->RemoveObserver(&observer);
-
-  // There should only be one tab now.
-  ASSERT_EQ(1, browser()->tab_strip_model()->count());
 }
 
 // Overscroll is only enabled on Aura platforms currently, and even then only

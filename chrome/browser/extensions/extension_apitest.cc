@@ -47,11 +47,6 @@
 #include "net/test/embedded_test_server/request_handler_util.h"
 
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/apps/app_service/browser_app_launcher.h"
-#include "components/services/app_service/public/cpp/app_launch_params.h"
-#include "components/services/app_service/public/cpp/app_launch_util.h"
 #endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
@@ -127,8 +122,6 @@ bool ExtensionApiTest::RunExtensionTest(const base::FilePath& extension_path,
   CHECK(!run_options.open_in_incognito || run_options.page_url ||
         run_options.extension_url)
       << "'open_in_incognito' is only allowed if specifying 'page_url'";
-  CHECK(!(run_options.launch_as_platform_app && run_options.page_url))
-      << "'launch_as_platform_app' and 'page_url' are mutually exclusive.";
 
   if (run_options.custom_arg)
     SetCustomArg(run_options.custom_arg);
@@ -168,19 +161,6 @@ bool ExtensionApiTest::RunExtensionTest(const base::FilePath& extension_path,
   // If there is a page_url to load, navigate it.
   if (!url_to_open.is_empty()) {
     OpenURL(url_to_open, run_options.open_in_incognito);
-  } else if (run_options.launch_as_platform_app) {
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-    apps::AppLaunchParams params(
-        extension->id(), apps::LaunchContainer::kLaunchContainerNone,
-        WindowOpenDisposition::NEW_WINDOW, apps::LaunchSource::kFromTest);
-    params.command_line = *base::CommandLine::ForCurrentProcess();
-    apps::AppServiceProxyFactory::GetForProfile(
-        run_options.profile ? run_options.profile.get() : profile())
-        ->BrowserAppLauncher()
-        ->LaunchAppWithParamsForTesting(std::move(params));
-#else
-    NOTREACHED();
-#endif
   }
 
   {

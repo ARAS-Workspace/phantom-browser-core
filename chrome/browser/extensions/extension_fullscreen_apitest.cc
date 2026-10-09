@@ -14,29 +14,6 @@
 
 namespace extensions {
 
-IN_PROC_BROWSER_TEST_F(ExtensionApiTest,
-                       ExtensionFullscreenAccessFail) {
-  // Test that fullscreen cannot be accessed from an extension without
-  // permission.
-  ASSERT_TRUE(RunExtensionTest("fullscreen/no_permission",
-                               {.launch_as_platform_app = true}))
-      << message_;
-}
-
-#if BUILDFLAG(IS_MAC)
-// TODO(crbug.com/40415216): Fails on MAC.
-#define MAYBE_ExtensionFullscreenAccessPass \
-    DISABLED_ExtensionFullscreenAccessPass
-#else
-#define MAYBE_ExtensionFullscreenAccessPass ExtensionFullscreenAccessPass
-#endif  // BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(ExtensionApiTest, MAYBE_ExtensionFullscreenAccessPass) {
-  // Test that fullscreen can be accessed from an extension with permission.
-  ASSERT_TRUE(RunExtensionTest("fullscreen/has_permission",
-                               {.launch_as_platform_app = true}))
-      << message_;
-}
-
 #if BUILDFLAG(IS_MAC)
 // Entering fullscreen is flaky on Mac: http://crbug.com/41378166
 #define MAYBE_FocusWindowDoesNotExitFullscreen \
@@ -72,21 +49,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTest,
           FullscreenTabParams());
   ASSERT_TRUE(RunExtensionTest("window_update/sizing")) << message_;
   ASSERT_FALSE(browser()->GetWindow()->IsFullscreen());
-}
-
-#if BUILDFLAG(IS_MAC)
-// Fails on MAC: http://crbug.com/40415216
-#define MAYBE_DisplayModeWindowIsInFullscreen \
-  DISABLED_DisplayModeWindowIsInFullscreen
-#else
-#define MAYBE_DisplayModeWindowIsInFullscreen DisplayModeWindowIsInFullscreen
-#endif
-
-IN_PROC_BROWSER_TEST_F(ExtensionApiTest,
-                       MAYBE_DisplayModeWindowIsInFullscreen) {
-  ASSERT_TRUE(RunExtensionTest("fullscreen/mq_display_mode",
-                               {.launch_as_platform_app = true}))
-      << message_;
 }
 
 }  // namespace extensions

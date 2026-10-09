@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 #include "base/feature_list.h"
-#include "base/strings/stringprintf.h"
 #include "build/build_config.h"
 #include "chrome/browser/extensions/extension_apitest.h"
 #include "chrome/browser/profiles/profile.h"
@@ -33,76 +32,7 @@ class ClipboardApiTest : public ExtensionApiTest {
     host_resolver()->AddRule("*", "127.0.0.1");
   }
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  bool LoadHostedApp(const std::string& app_name,
-                     const std::string& launch_page);
-  bool ExecuteCopyInSelectedTab();
-  bool ExecutePasteInSelectedTab();
-  bool ExecuteCommandInIframeInSelectedTab(const char* command);
-
- private:
-  bool ExecuteScriptInSelectedTab(
-      const std::string& script,
-      int options = content::EXECUTE_SCRIPT_DEFAULT_OPTIONS);
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 };
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-bool ClipboardApiTest::LoadHostedApp(const std::string& app_name,
-                                     const std::string& launch_page) {
-  if (!StartEmbeddedTestServer()) {
-    message_ = "Failed to start test server.";
-    return false;
-  }
-
-  if (!LoadExtension(test_data_dir_.AppendASCII("clipboard")
-                                   .AppendASCII(app_name))) {
-    message_ = "Failed to load hosted app.";
-    return false;
-  }
-
-  GURL base_url = embedded_test_server()->GetURL(
-      "/extensions/api_test/clipboard/");
-  GURL::Replacements replace_host;
-  replace_host.SetHostStr("localhost");
-  base_url = base_url.ReplaceComponents(replace_host);
-
-  std::string launch_page_path =
-      base::StringPrintf("%s/%s", app_name.c_str(), launch_page.c_str());
-  EXPECT_TRUE(NavigateToURL(GetActiveWebContents(),
-                            base_url.Resolve(launch_page_path)));
-
-  return true;
-}
-
-bool ClipboardApiTest::ExecuteCopyInSelectedTab() {
-  const char kScript[] = "document.execCommand('copy')";
-  return ExecuteScriptInSelectedTab(kScript);
-}
-
-bool ClipboardApiTest::ExecutePasteInSelectedTab() {
-  const char kScript[] = "document.execCommand('paste')";
-  return ExecuteScriptInSelectedTab(kScript);
-}
-
-bool ClipboardApiTest::ExecuteCommandInIframeInSelectedTab(
-    const char* command) {
-  const char kScript[] =
-      "var ifr = document.createElement('iframe');\n"
-      "document.body.appendChild(ifr);\n"
-      "new Promise(res => {\n"
-      "  window.resolve = res;\n"
-      "  ifr.contentDocument.write('<script>parent.resolve("
-      "    document.execCommand(\"%s\"))</script>');\n"
-      "});";
-  return ExecuteScriptInSelectedTab(base::StringPrintf(kScript, command));
-}
-
-bool ClipboardApiTest::ExecuteScriptInSelectedTab(const std::string& script,
-                                                  int options) {
-  return content::EvalJs(GetActiveWebContents(), script, options).ExtractBool();
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 }  // namespace
 
@@ -190,31 +120,6 @@ IN_PROC_BROWSER_TEST_F(ClipboardApiTest, BrowserPermissionCheck) {
           render_frame_host));
 }
 
-// Desktop Android doesn't support hosted apps.
-IN_PROC_BROWSER_TEST_F(ClipboardApiTest, HostedApp) {
-  ASSERT_TRUE(LoadHostedApp("hosted_app", "main.html")) << message_;
-
-  EXPECT_TRUE(ExecuteCopyInSelectedTab()) << message_;
-  EXPECT_TRUE(ExecutePasteInSelectedTab()) << message_;
-  EXPECT_TRUE(ExecuteCommandInIframeInSelectedTab("copy")) << message_;
-  EXPECT_TRUE(ExecuteCommandInIframeInSelectedTab("paste")) << message_;
-}
-
-// Desktop Android doesn't support hosted apps.
-IN_PROC_BROWSER_TEST_F(ClipboardApiTest, HostedAppNoPermission) {
-  ASSERT_TRUE(LoadHostedApp("hosted_app_no_permission", "main.html"))
-      << message_;
-
-  // TODO(dcheng): The test coverage here is incomplete. The content test utils
-  // for executing script force a user gesture, so it's impossible to test
-  // the no user gesture case without a lot of code duplication.
-  EXPECT_TRUE(ExecuteCopyInSelectedTab()) << message_;
-  EXPECT_FALSE(ExecutePasteInSelectedTab()) << message_;
-
-  // User activation doesn't propagate to a child frame.
-  EXPECT_FALSE(ExecuteCommandInIframeInSelectedTab("copy")) << message_;
-  EXPECT_FALSE(ExecuteCommandInIframeInSelectedTab("paste")) << message_;
-}
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 }  // namespace extensions

@@ -71,23 +71,6 @@ source_set("app_service") {
   }
 }
 
-source_set("test_support") {
-  testonly = true
-
-  sources = [
-    "app_service_test.cc",
-    "app_service_test.h",
-  ]
-
-  public_deps = [ ":app_service" ]
-
-  deps = [
-    "//base/test:test_support",
-    "//components/account_id:test_support",
-    "//ui/gfx:test_support",
-  ]
-}
-
 source_set("app_registry_cache_waiter") {
   testonly = true
 
