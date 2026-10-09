@@ -11,7 +11,6 @@
 #include <string>
 #include <utility>
 
-#include "apps/switches.h"
 #include "base/command_line.h"
 #include "base/debug/dump_without_crashing.h"
 #include "base/feature_list.h"
@@ -28,14 +27,12 @@
 #include "base/metrics/histogram_macros.h"
 #include "base/metrics/statistics_recorder.h"
 #include "base/scoped_multi_source_observation.h"
-#include "base/strings/string_tokenizer.h"
 #include "base/task/thread_pool.h"
 #include "base/threading/scoped_blocking_call.h"
 #include "base/trace_event/trace_event.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/app_mode/app_mode_utils.h"
-#include "chrome/browser/apps/platform_apps/app_load_service.h"
 #include "chrome/browser/apps/platform_apps/platform_app_launch.h"
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/browser_process.h"
@@ -81,7 +78,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/common/content_switches.h"
-#include "extensions/common/switches.h"
 #include "printing/buildflags/buildflags.h"
 
 #include "chrome/browser/extensions/api/messaging/native_messaging_launch_from_native.h"
@@ -381,7 +377,6 @@ std::optional<bool> MaybeHandleFocusRequest(
 struct ProfileSetupResult {
   bool silent_launch;
   bool should_launch_incognito;
-  bool can_use_profile;
   raw_ptr<Profile> privacy_safe_profile;
 };
 
@@ -402,9 +397,6 @@ ProfileSetupResult SetupProfileAndIncognito(
       profile_info.mode != StartupProfileMode::kProfilePicker &&
       IncognitoModePrefs::ShouldLaunchIncognito(
           command_line, profile_info.profile->GetPrefs());
-
-  result.can_use_profile =
-      CanOpenProfileOnStartup(profile_info) && !result.should_launch_incognito;
 
   RecordIncognitoForcedStart(result.should_launch_incognito,
                              command_line.HasSwitch(switches::kIncognito));
@@ -727,7 +719,6 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
   ProfileSetupResult profile_setup =
       SetupProfileAndIncognito(command_line, profile_info);
   bool silent_launch = profile_setup.silent_launch;
-  bool can_use_profile = profile_setup.can_use_profile;
   Profile* privacy_safe_profile = profile_setup.privacy_safe_profile;
 
   // Try to focus an existing window/tab if --focus is present.
@@ -825,46 +816,6 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     return true;
   }
 
-  if (command_line.HasSwitch(extensions::switches::kLoadApps) &&
-      can_use_profile) {
-    if (!ProcessLoadApps(command_line, cur_dir, privacy_safe_profile)) {
-      return false;
-    }
-
-    // Return early here to avoid opening a browser window.
-    // The exception is when there are no browser windows, since we don't want
-    // chrome to shut down.
-    // TODO(jackhou): Do this properly once keep-alive is handled by the
-    // background page of apps. Tracked at http://crbug.com/40301548
-    auto* browser_collection =
-        ProfileBrowserCollection::GetForProfile(privacy_safe_profile);
-    if (browser_collection && browser_collection->GetSize() != 0) {
-      return true;
-    }
-  }
-
-  // Check for --load-and-launch-app.
-  if (command_line.HasSwitch(apps::kLoadAndLaunchApp) && can_use_profile) {
-    base::CommandLine::StringType path =
-        command_line.GetSwitchValueNative(apps::kLoadAndLaunchApp);
-
-    if (!apps::AppLoadService::Get(privacy_safe_profile)
-             ->LoadAndLaunch(base::FilePath(path), command_line, cur_dir)) {
-      return false;
-    }
-
-    // Return early here since we don't want to open a browser window.
-    // The exception is when there are no browser windows, since we don't want
-    // chrome to shut down.
-    // TODO(jackhou): Do this properly once keep-alive is handled by the
-    // background page of apps. Tracked at http://crbug.com/40301548
-    auto* browser_collection =
-        ProfileBrowserCollection::GetForProfile(privacy_safe_profile);
-    if (browser_collection && browser_collection->GetSize() != 0) {
-      return true;
-    }
-  }
-
   // TODO(http://crbug.com/40819749): Refactor command line processing logic to
   // validate the flag sets and reliably determine the startup mode.
   LaunchBrowserForLastProfiles(command_line, cur_dir, process_startup,
@@ -937,41 +888,6 @@ void StartupBrowserCreator::ProcessLastOpenedProfiles(
   {
     ProfileLaunchObserver::set_profile_to_activate(last_used_profile);
   }
-}
-
-// static
-bool StartupBrowserCreator::ProcessLoadApps(
-    const base::CommandLine& command_line,
-    const base::FilePath& cur_dir,
-    Profile* profile) {
-  base::CommandLine::StringType path_list =
-      command_line.GetSwitchValueNative(extensions::switches::kLoadApps);
-
-  base::StringTokenizerT<base::CommandLine::StringType,
-                         base::CommandLine::StringType::const_iterator>
-      tokenizer(path_list, FILE_PATH_LITERAL(","));
-
-  if (!tokenizer.GetNext()) {
-    return false;
-  }
-
-  base::FilePath app_absolute_dir =
-      base::MakeAbsoluteFilePath(base::FilePath(tokenizer.token_piece()));
-  if (!apps::AppLoadService::Get(profile)->LoadAndLaunch(
-          app_absolute_dir, command_line, cur_dir)) {
-    return false;
-  }
-
-  while (tokenizer.GetNext()) {
-    app_absolute_dir =
-        base::MakeAbsoluteFilePath(base::FilePath(tokenizer.token_piece()));
-
-    if (!apps::AppLoadService::Get(profile)->Load(app_absolute_dir)) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 // static

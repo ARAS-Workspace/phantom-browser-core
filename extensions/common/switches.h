@@ -64,10 +64,6 @@ extern const char kExtensionsOnChromeURLs[];
 // URLs in the manifest.
 extern const char kExtensionsOnExtensionURLs[];
 
-// Comma-separated list of paths to apps to load at startup. The first app in
-// the list will be launched.
-extern const char kLoadApps[];
-
 // Comma-separated list of paths to extensions to load at startup.
 extern const char kLoadExtension[];
 

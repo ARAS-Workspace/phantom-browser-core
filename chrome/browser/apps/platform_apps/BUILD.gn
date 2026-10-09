@@ -23,8 +23,6 @@ source_set("platform_apps") {
     "audio_focus_web_contents_observer.h",
     "browser_context_keyed_service_factories.cc",
     "browser_context_keyed_service_factories.h",
-    "install_chrome_app.cc",
-    "install_chrome_app.h",
     "platform_app_launch.cc",
     "platform_app_launch.h",
     "platform_app_navigation_redirector.cc",

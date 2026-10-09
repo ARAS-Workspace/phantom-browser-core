@@ -20,7 +20,6 @@
 #include "base/supports_user_data.h"
 #include "base/version.h"
 #include "build/build_config.h"
-#include "chrome/browser/apps/platform_apps/install_chrome_app.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/defaults.h"
@@ -236,12 +235,6 @@ void StartupBrowserCreatorImpl::Launch(
   if (!browser) {
     LOG(ERROR) << "No browser window found for startup.";
     return;
-  }
-
-  if (command_line_->HasSwitch(switches::kInstallChromeApp)) {
-    install_chrome_app::InstallChromeApp(
-        command_line_->GetSwitchValueASCII(switches::kInstallChromeApp),
-        browser);
   }
 
   MaybeToggleFullscreen(browser);

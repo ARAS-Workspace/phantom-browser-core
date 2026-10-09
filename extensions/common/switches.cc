@@ -31,7 +31,6 @@ const char kExtensionsOnExtensionURLs[] = "extensions-on-extension-urls";
 
 const char kDisableAppContentVerification[] =
     "disable-app-content-verification";
-const char kLoadApps[] = "load-apps";
 const char kLoadExtension[] = "load-extension";
 
 const char kOffscreenDocumentTesting[] = "offscreen-document-testing";
