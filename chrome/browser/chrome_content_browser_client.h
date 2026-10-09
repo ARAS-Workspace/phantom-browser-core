@@ -468,8 +468,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
                        bool* no_javascript_access) override;
   std::unique_ptr<optimization_guide::ModelBrokerClient>
   CreateModelBrokerClient(content::BrowserContext* browser_context) override;
-  void MaybeOverrideManifest(content::RenderFrameHost* render_frame_host,
-                             blink::mojom::ManifestPtr& manifest) override;
   content::TtsPlatform* GetTtsPlatform() override;
   void OverrideWebPreferences(content::WebContents* web_contents,
                               content::SiteInstance& main_frame_site,

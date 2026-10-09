@@ -149,7 +149,6 @@ BASE_FEATURE(kIwaPolicyManagerOnDemandComponentUpdate,
 // static
 void IsolatedWebAppPolicyManager::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
-  registry->RegisterListPref(prefs::kIsolatedWebAppInstallForceList);
   // LINT.IfChange(WebAppPrefs)
   registry->RegisterIntegerPref(
       prefs::kIsolatedWebAppPendingInitializationCount, 0);

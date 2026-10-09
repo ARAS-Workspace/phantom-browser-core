@@ -1334,6 +1334,13 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   ExtensionSettingsOverriddenDialog::RegisterProfilePrefs(registry);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
+  // Targets of the WebAppInstallForceList, WebAppSettings,
+  // WebAppInstallByUserEnabled and IsolatedWebAppInstallForceList policies.
+  registry->RegisterListPref(prefs::kWebAppInstallForceList);
+  registry->RegisterListPref(prefs::kWebAppSettings);
+  registry->RegisterBooleanPref(prefs::kWebAppInstallByUserEnabled, true);
+  registry->RegisterListPref(prefs::kIsolatedWebAppInstallForceList);
+
 #if BUILDFLAG(ENABLE_PDF)
   registry->RegisterListPref(prefs::kPdfLocalFileAccessAllowedForDomains,
                              base::ListValue());

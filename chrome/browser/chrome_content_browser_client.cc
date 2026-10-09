@@ -461,7 +461,6 @@
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/isolated_web_apps/policy/isolated_web_app_policy_manager.h"
 #include "chrome/browser/web_applications/locks/app_lock.h"
-#include "chrome/browser/web_applications/policy/web_app_policy_manager.h"
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"  // nogncheck
 #include "chrome/browser/web_applications/web_app_filter.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
@@ -3807,19 +3806,6 @@ ChromeContentBrowserClient::CreateModelBrokerClient(
   auto* service = OptimizationGuideKeyedServiceFactory::GetForProfile(
       Profile::FromBrowserContext(browser_context));
   return service ? service->CreateModelBrokerClient() : nullptr;
-}
-
-
-void ChromeContentBrowserClient::MaybeOverrideManifest(
-    content::RenderFrameHost* render_frame_host,
-    blink::mojom::ManifestPtr& manifest) {
-  Profile* profile =
-      Profile::FromBrowserContext(render_frame_host->GetBrowserContext());
-  auto* provider = web_app::WebAppProvider::GetForWebApps(profile);
-  if (provider) {
-    provider->policy_manager().MaybeOverrideManifest(render_frame_host,
-                                                     manifest);
-  }
 }
 
 content::TtsPlatform* ChromeContentBrowserClient::GetTtsPlatform() {

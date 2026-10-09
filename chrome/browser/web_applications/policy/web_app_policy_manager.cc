@@ -190,9 +190,6 @@ void WebAppPolicyManager::ReinstallPlaceholderAppIfNecessary(
 // static
 void WebAppPolicyManager::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
-  registry->RegisterListPref(prefs::kWebAppInstallForceList);
-  registry->RegisterListPref(prefs::kWebAppSettings);
-  registry->RegisterBooleanPref(prefs::kWebAppInstallByUserEnabled, true);
 }
 
 // static
