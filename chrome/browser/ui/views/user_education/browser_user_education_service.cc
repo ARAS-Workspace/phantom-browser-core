@@ -933,14 +933,6 @@ void MaybeRegisterChromeFeaturePromos(
       IDS_PROFILE_SWITCH_PROMO_SCREENREADER,
       FeaturePromoSpecification::AcceleratorInfo(IDC_SHOW_AVATAR_MENU)));
 
-  // kIPHPasswordsWebAppProfileSwitchFeature:
-  registry.RegisterFeature(FeaturePromoSpecification::CreateForToastPromo(
-      feature_engagement::kIPHPasswordsWebAppProfileSwitchFeature,
-      kToolbarAvatarButtonElementId,
-      IDS_PASSWORD_MANAGER_IPH_BODY_WEB_APP_PROFILE_SWITCH,
-      IDS_PROFILE_SWITCH_PROMO_SCREENREADER,
-      FeaturePromoSpecification::AcceleratorInfo()));
-
   // kIPHExplicitBrowserSigninPreferenceRememberedFeature:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForToastPromo(

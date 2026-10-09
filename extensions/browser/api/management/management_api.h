@@ -253,15 +253,10 @@ class ManagementGenerateAppForLinkFunction : public ExtensionFunction {
 
   ManagementGenerateAppForLinkFunction();
 
-  void FinishCreateWebApp(const std::string& web_app_id, bool install_success);
-
  protected:
   ~ManagementGenerateAppForLinkFunction() override;
 
   ResponseAction Run() override;
-
- private:
-  std::unique_ptr<AppForLinkDelegate> app_for_link_delegate_;
 };
 
 class ManagementInstallReplacementWebAppFunction : public ExtensionFunction {
@@ -275,10 +270,6 @@ class ManagementInstallReplacementWebAppFunction : public ExtensionFunction {
   ~ManagementInstallReplacementWebAppFunction() override;
 
   ResponseAction Run() override;
-
- private:
-  void FinishResponse(
-      ManagementAPIDelegate::InstallOrLaunchWebAppResult result);
 };
 
 class ManagementEventRouter : public ExtensionRegistryObserver {

@@ -104,7 +104,6 @@ FEATURE_CONSTANTS_DECLARE_FEATURE(
     kIPHPasswordsManagementBubbleAfterSaveFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(
     kIPHPasswordsManagementBubbleDuringSigninFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPasswordsWebAppProfileSwitchFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPasswordManagerShortcutFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPasswordSharingFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHPdfInkSignaturesFeature);

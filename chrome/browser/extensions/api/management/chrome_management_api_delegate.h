@@ -44,18 +44,6 @@ class ChromeManagementAPIDelegate : public ManagementAPIDelegate {
       ManagementCreateAppShortcutFunction* function,
       const Extension* extension,
       std::string* error) const override;
-  std::unique_ptr<AppForLinkDelegate> GenerateAppForLinkFunctionDelegate(
-      ManagementGenerateAppForLinkFunction* function,
-      content::BrowserContext* context,
-      const std::string& title,
-      const GURL& launch_url) const override;
-  bool CanContextInstallWebApps(
-      content::BrowserContext* context) const override;
-  void InstallOrLaunchReplacementWebApp(
-      content::BrowserContext* context,
-      const GURL& web_app_url,
-      ManagementAPIDelegate::InstallOrLaunchWebAppCallback callback)
-      const override;
   void EnableExtension(content::BrowserContext* context,
                        const ExtensionId& extension_id) const override;
   void DisableExtension(

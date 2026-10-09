@@ -21,7 +21,6 @@ class BrowserHandler;
 class CastHandler;
 class ExtensionsHandler;
 class PageHandler;
-class PWAHandler;
 class SecurityHandler;
 class StorageHandler;
 class SystemInfoHandler;
@@ -49,7 +48,6 @@ class ChromeDevToolsSession : public ChromeDevToolsSessionBase {
   std::unique_ptr<CastHandler> cast_handler_;
   std::unique_ptr<EmulationHandler> emulation_handler_;
   std::unique_ptr<PageHandler> page_handler_;
-  std::unique_ptr<PWAHandler> pwa_handler_;
   std::unique_ptr<SecurityHandler> security_handler_;
   std::unique_ptr<StorageHandler> storage_handler_;
   std::unique_ptr<SystemInfoHandler> system_info_handler_;

@@ -937,21 +937,6 @@ class TestManagementAPIDelegate : public ManagementAPIDelegate {
                      const ExtensionId& extension_id,
                      LaunchType launch_type) const override {}
 
-  std::unique_ptr<AppForLinkDelegate> GenerateAppForLinkFunctionDelegate(
-      ManagementGenerateAppForLinkFunction* function,
-      content::BrowserContext* context,
-      const std::string& title,
-      const GURL& launch_url) const override {
-    return nullptr;
-  }
-  bool CanContextInstallWebApps(
-      content::BrowserContext* context) const override {
-    return true;
-  }
-  void InstallOrLaunchReplacementWebApp(
-      content::BrowserContext* context,
-      const GURL& web_app_url,
-      InstallOrLaunchWebAppCallback callback) const override {}
   GURL GetIconURL(const Extension* extension,
                   int icon_size,
                   ExtensionIconSet::Match match,

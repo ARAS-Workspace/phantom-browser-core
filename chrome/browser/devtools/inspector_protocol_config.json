@@ -11,9 +11,9 @@
             },
             {
                 "domain": "Page",
-                "include": [ "enable", "disable", "setAdBlockingEnabled", "getInstallabilityErrors", "getManifestIcons", "printToPDF", "getAppId", "setSPCTransactionMode", "setRPHRegistrationMode" ],
+                "include": [ "enable", "disable", "setAdBlockingEnabled", "printToPDF", "setSPCTransactionMode", "setRPHRegistrationMode" ],
                 "include_events": [],
-                "async": ["getInstallabilityErrors", "getManifestIcons", "printToPDF", "getAppId" ]
+                "async": [ "printToPDF" ]
             },
             {
                 "domain": "Browser",
@@ -58,10 +58,6 @@
             {
                 "domain": "Autofill",
                 "async": [ "setAddresses", "trigger" ]
-            },
-            {
-                "domain": "PWA",
-                "async": [ "changeAppUserSettings", "getOsAppState", "install", "launch", "launchFilesInApp", "uninstall" ]
             },
             {
               "domain": "WebMCP",

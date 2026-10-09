@@ -9,12 +9,9 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
-#include "chrome/browser/web_applications/web_app_helpers.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
 #include "components/payments/content/payment_request_web_contents_manager.h"
 #include "components/subresource_filter/content/browser/devtools_interaction_tracker.h"
-#include "third_party/blink/public/common/manifest/manifest_util.h"
-#include "ui/gfx/image/image.h"
 
 #if BUILDFLAG(ENABLE_PRINTING)
 #include "components/printing/browser/print_to_pdf/pdf_print_utils.h"
@@ -149,78 +146,6 @@ protocol::Response PageHandler::SetRPHRegistrationMode(
   return protocol::Response::Success();
 }
 
-void PageHandler::GetInstallabilityErrors(
-    std::unique_ptr<GetInstallabilityErrorsCallback> callback) {
-  auto errors = std::make_unique<protocol::Array<std::string>>();
-  webapps::InstallableManager* manager =
-      web_contents_
-          ? webapps::InstallableManager::FromWebContents(web_contents_.get())
-          : nullptr;
-  if (!manager) {
-    callback->sendFailure(
-        protocol::Response::ServerError("Unable to fetch errors for target"));
-    return;
-  }
-  manager->GetAllErrors(base::BindOnce(&PageHandler::GotInstallabilityErrors,
-                                       std::move(callback)));
-}
-
-// static
-void PageHandler::GotInstallabilityErrors(
-    std::unique_ptr<GetInstallabilityErrorsCallback> callback,
-    std::vector<content::InstallabilityError> installability_errors) {
-  auto result_installability_errors =
-      std::make_unique<protocol::Array<protocol::Page::InstallabilityError>>();
-  for (const auto& installability_error : installability_errors) {
-    auto installability_error_arguments = std::make_unique<
-        protocol::Array<protocol::Page::InstallabilityErrorArgument>>();
-    for (const auto& error_argument :
-         installability_error.installability_error_arguments) {
-      installability_error_arguments->emplace_back(
-          protocol::Page::InstallabilityErrorArgument::Create()
-              .SetName(error_argument.name)
-              .SetValue(error_argument.value)
-              .Build());
-    }
-    result_installability_errors->emplace_back(
-        protocol::Page::InstallabilityError::Create()
-            .SetErrorId(installability_error.error_id)
-            .SetErrorArguments(std::move(installability_error_arguments))
-            .Build());
-  }
-  callback->sendSuccess(std::move(result_installability_errors));
-}
-
-void PageHandler::GetManifestIcons(
-    std::unique_ptr<GetManifestIconsCallback> callback) {
-  webapps::InstallableManager* manager =
-      web_contents_
-          ? webapps::InstallableManager::FromWebContents(web_contents_.get())
-          : nullptr;
-
-  if (!manager) {
-    callback->sendFailure(
-        protocol::Response::ServerError("Unable to fetch icons for target"));
-    return;
-  }
-
-  manager->GetPrimaryIcon(
-      base::BindOnce(&PageHandler::GotManifestIcons, std::move(callback)));
-}
-
-void PageHandler::GotManifestIcons(
-    std::unique_ptr<GetManifestIconsCallback> callback,
-    const SkBitmap* primary_icon) {
-  std::optional<protocol::Binary> primaryIconAsBinary;
-
-  if (primary_icon && !primary_icon->empty()) {
-    primaryIconAsBinary = protocol::Binary::fromRefCounted(
-        gfx::Image::CreateFrom1xBitmap(*primary_icon).As1xPNGBytes());
-  }
-
-  callback->sendSuccess(std::move(primaryIconAsBinary));
-}
-
 void PageHandler::PrintToPDF(std::optional<bool> landscape,
                              std::optional<bool> display_header_footer,
                              std::optional<bool> print_background,
@@ -301,45 +226,6 @@ void PageHandler::PrintToPDF(std::optional<bool> landscape,
 
   callback->sendFailure(
       protocol::Response::ServerError("Printing is not available"));
-}
-
-void PageHandler::GetAppId(std::unique_ptr<GetAppIdCallback> callback) {
-  webapps::InstallableManager* manager =
-      web_contents_
-          ? webapps::InstallableManager::FromWebContents(web_contents_.get())
-          : nullptr;
-
-  if (!manager) {
-    callback->sendFailure(
-        protocol::Response::ServerError("Unable to fetch app id for target"));
-    return;
-  }
-
-  webapps::InstallableParams params;
-  manager->GetData(params, base::BindOnce(&PageHandler::OnDidGetManifest,
-                                          weak_ptr_factory_.GetWeakPtr(),
-                                          std::move(callback)));
-}
-
-void PageHandler::OnDidGetManifest(std::unique_ptr<GetAppIdCallback> callback,
-                                   const webapps::InstallableData& data) {
-  if (data.manifest_url->is_empty()) {
-    callback->sendSuccess(std::nullopt, std::nullopt);
-    return;
-  }
-  // Either both the id and start_url are present, or they are both empty.
-  std::string current_app_id_str;
-  std::string recommended_manifest_id_path_only;
-  if (data.manifest->id.is_valid()) {
-    CHECK(data.manifest->start_url.is_valid());
-    current_app_id_str = data.manifest->id.spec();
-    recommended_manifest_id_path_only =
-        web_app::GenerateManifestIdFromStartUrlOnly(data.manifest->start_url)
-            .value().PathForRequest();
-  } else {
-    CHECK(!data.manifest->start_url.is_valid());
-  }
-  callback->sendSuccess(current_app_id_str, recommended_manifest_id_path_only);
 }
 
 #if BUILDFLAG(ENABLE_PRINTING)

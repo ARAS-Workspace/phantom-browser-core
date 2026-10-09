@@ -28,7 +28,6 @@ namespace extensions {
 class Extension;
 class ExtensionPrefs;
 class ManagementCreateAppShortcutFunction;
-class ManagementGenerateAppForLinkFunction;
 class ManagementUninstallFunctionBase;
 
 // Manages the lifetime of the install prompt.
@@ -43,27 +42,9 @@ class UninstallDialogDelegate {
   virtual ~UninstallDialogDelegate() {}
 };
 
-// Manages the lifetime of the bookmark app creation.
-class AppForLinkDelegate {
- public:
-  virtual ~AppForLinkDelegate() {}
-
-  virtual extensions::api::management::ExtensionInfo
-  CreateExtensionInfoFromWebApp(const std::string& app_id,
-                                content::BrowserContext* context) = 0;
-};
-
 class ManagementAPIDelegate {
  public:
   virtual ~ManagementAPIDelegate() {}
-
-  enum class InstallOrLaunchWebAppResult {
-    kSuccess,
-    kInvalidWebApp,
-    kUnknownError
-  };
-  using InstallOrLaunchWebAppCallback =
-      base::OnceCallback<void(InstallOrLaunchWebAppResult)>;
 
   // Launches the app `extension`. Returns `false` if the launch was blocked due
   // to chrome apps deprecation, and `true` if it succeeded.
@@ -120,24 +101,6 @@ class ManagementAPIDelegate {
   virtual void SetLaunchType(content::BrowserContext* context,
                              const ExtensionId& extension_id,
                              LaunchType launch_type) const = 0;
-
-  // Creates a bookmark app for `launch_url`.
-  virtual std::unique_ptr<AppForLinkDelegate>
-  GenerateAppForLinkFunctionDelegate(
-      ManagementGenerateAppForLinkFunction* function,
-      content::BrowserContext* context,
-      const std::string& title,
-      const GURL& launch_url) const = 0;
-
-  // Returns whether the current user type can install web apps.
-  virtual bool CanContextInstallWebApps(
-      content::BrowserContext* context) const = 0;
-
-  // Installs a web app for `web_app_url` or launches if already installed.
-  virtual void InstallOrLaunchReplacementWebApp(
-      content::BrowserContext* context,
-      const GURL& web_app_url,
-      InstallOrLaunchWebAppCallback callback) const = 0;
 
   // Forwards the call to ExtensionIconSource::GetIconURL in chrome.
   virtual GURL GetIconURL(const Extension* extension,

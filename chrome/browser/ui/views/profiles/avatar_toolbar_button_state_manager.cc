@@ -2067,16 +2067,6 @@ void AvatarToolbarButtonStateManager::MaybeShowProfileSwitchIPH() {
   if (!web_app::AppBrowserController::IsWebApp(browser_)) {
     BrowserUserEducationInterface::From(browser_)->MaybeShowStartupFeaturePromo(
         feature_engagement::kIPHProfileSwitchFeature);
-  } else {
-    // Installable PasswordManager WebUI is the only web app that has an avatar
-    // toolbar button.
-    auto app_url =
-        web_app::AppBrowserController::From(browser_)->GetAppStartUrl();
-    CHECK(
-        content::HasWebUIScheme(app_url) &&
-        (app_url.GetHost() == password_manager::kChromeUIPasswordManagerHost));
-    BrowserUserEducationInterface::From(browser_)->MaybeShowStartupFeaturePromo(
-        feature_engagement::kIPHPasswordsWebAppProfileSwitchFeature);
   }
 }
 

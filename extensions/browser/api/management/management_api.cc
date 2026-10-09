@@ -969,58 +969,8 @@ ManagementGenerateAppForLinkFunction::ManagementGenerateAppForLinkFunction() =
 ManagementGenerateAppForLinkFunction::~ManagementGenerateAppForLinkFunction() =
     default;
 
-void ManagementGenerateAppForLinkFunction::FinishCreateWebApp(
-    const std::string& web_app_id,
-    bool install_success) {
-  if (install_success) {
-    Respond(ArgumentList(management::GenerateAppForLink::Results::Create(
-        app_for_link_delegate_->CreateExtensionInfoFromWebApp(
-            web_app_id, browser_context()))));
-  } else {
-    Respond(Error(keys::kGenerateAppForLinkInstallError));
-  }
-  Release();  // Balanced in Run().
-}
-
 ExtensionFunction::ResponseAction ManagementGenerateAppForLinkFunction::Run() {
-  if (IsRunningOnAndroid()) {
-    return RespondNow(Error(keys::kGenerateAppForLinkNotSupported));
-  }
-
-  if (ExtensionsBrowserClient::Get()->IsRunningInForcedAppMode()) {
-    return RespondNow(Error(keys::kNotAllowedInKioskError));
-  }
-
-  if (!user_gesture()) {
-    return RespondNow(Error(keys::kGestureNeededForGenerateAppForLinkError));
-  }
-
-  std::optional<management::GenerateAppForLink::Params> params =
-      management::GenerateAppForLink::Params::Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-
-  GURL launch_url(params->url);
-  if (!launch_url.is_valid() || !launch_url.SchemeIsHTTPOrHTTPS()) {
-    return RespondNow(Error(
-        ErrorUtils::FormatErrorMessage(keys::kInvalidURLError, params->url)));
-  }
-
-  if (params->title.empty()) {
-    return RespondNow(Error(keys::kEmptyTitleError));
-  }
-
-  app_for_link_delegate_ =
-      ManagementAPI::GetFactoryInstance()
-          ->Get(browser_context())
-          ->GetDelegate()
-          ->GenerateAppForLinkFunctionDelegate(this, browser_context(),
-                                               params->title, launch_url);
-
-  // Matched with a Release() in FinishCreateWebApp().
-  AddRef();
-
-  // Response is sent async in FinishCreateWebApp().
-  return RespondLater();
+  return RespondNow(Error(keys::kGenerateAppForLinkNotSupported));
 }
 
 ManagementInstallReplacementWebAppFunction::
@@ -1045,44 +995,7 @@ ManagementInstallReplacementWebAppFunction::Run() {
         Error(keys::kGestureNeededForInstallReplacementWebAppError));
   }
 
-  DCHECK(ReplacementAppsInfo::HasReplacementWebApp(extension()));
-  const GURL& web_app_url =
-      ReplacementAppsInfo::GetReplacementWebApp(extension());
-
-  DCHECK(web_app_url.is_valid());
-  DCHECK(web_app_url.SchemeIs(url::kHttpsScheme));
-
-  auto* api_delegate = ManagementAPI::GetFactoryInstance()
-                           ->Get(browser_context())
-                           ->GetDelegate();
-  if (!api_delegate->CanContextInstallWebApps(browser_context())) {
-    return RespondNow(
-        Error(keys::kInstallReplacementWebAppInvalidContextError));
-  }
-
-  // Adds a ref-count.
-  api_delegate->InstallOrLaunchReplacementWebApp(
-      browser_context(), web_app_url,
-      base::BindOnce(
-          &ManagementInstallReplacementWebAppFunction::FinishResponse, this));
-
-  // Response is sent async in FinishResponse().
-  return RespondLater();
-}
-
-void ManagementInstallReplacementWebAppFunction::FinishResponse(
-    ManagementAPIDelegate::InstallOrLaunchWebAppResult result) {
-  switch (result) {
-    case ManagementAPIDelegate::InstallOrLaunchWebAppResult::kSuccess:
-      Respond(NoArguments());
-      break;
-    case ManagementAPIDelegate::InstallOrLaunchWebAppResult::kInvalidWebApp:
-      Respond(Error(keys::kInstallReplacementWebAppInvalidWebAppError));
-      break;
-    case ManagementAPIDelegate::InstallOrLaunchWebAppResult::kUnknownError:
-      Respond(Error(keys::kGenerateAppForLinkInstallError));
-      break;
-  }
+  return RespondNow(Error(keys::kInstallReplacementWebAppInvalidContextError));
 }
 
 ManagementEventRouter::ManagementEventRouter(content::BrowserContext* context)

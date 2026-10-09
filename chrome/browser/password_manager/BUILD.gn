@@ -67,12 +67,9 @@ source_set("password_manager") {
     # TODO(crbug.com/485620841): Make delegate not dependent on client and
     # move this back to /password_change.
     "password_change/password_change_actuator.h",
-    "web_app_profile_switcher.h",
   ]
   public_deps += [
     "//chrome/browser/password_manager/password_change",
-    "//chrome/browser/web_applications",
-    "//components/webapps/common",
   ]
 
   if (enable_dice_support) {
@@ -150,7 +147,6 @@ source_set("impl") {
     "password_change/script_password_change_actuator.h",
     "password_change_delegate_impl.cc",
     "password_change_delegate_impl.h",
-    "web_app_profile_switcher.cc",
   ]
   deps += [
     "//chrome/browser/password_manager/password_change",
@@ -158,8 +154,6 @@ source_set("impl") {
     "//chrome/browser/ui/passwords:impl",
     "//chrome/browser/ui/tabs:tab_strip",
     "//chrome/browser/ui/user_education",
-    "//chrome/browser/ui/web_applications",
-    "//chrome/browser/web_applications",
   ]
 
   if (enable_dice_support) {

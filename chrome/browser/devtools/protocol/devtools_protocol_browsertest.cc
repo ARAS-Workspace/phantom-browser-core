@@ -992,49 +992,6 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Bool(),
         ::testing::Values("none", "storage", "bounce", "stateful_bounce")));
 
-using DevToolsProtocolTest_AppId = DevToolsProtocolTest;
-
-IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest_AppId, ReturnsManifestAppId) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  const GURL url(embedded_test_server()->GetURL(
-      "/banners/manifest_test_page.html?manifest=manifest_with_id.json"));
-  ASSERT_TRUE(content::NavigateToURL(
-      chrome_test_utils::GetActiveWebContents(this), url));
-  Attach();
-
-  const base::DictValue* result = SendCommandSync("Page.getAppId");
-  EXPECT_EQ(*result->FindString("appId"),
-            embedded_test_server()->GetURL("/some_id"));
-}
-
-IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest_AppId,
-                       ReturnsStartUrlAsManifestAppIdIfNotSet) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  const GURL url(
-      embedded_test_server()->GetURL("/web_apps/no_service_worker.html"));
-  ASSERT_TRUE(content::NavigateToURL(
-      chrome_test_utils::GetActiveWebContents(this), url));
-  Attach();
-
-  const base::DictValue* result = SendCommandSync("Page.getAppId");
-  EXPECT_EQ(*result->FindString("appId"),
-            embedded_test_server()->GetURL("/web_apps/no_service_worker.html"));
-  EXPECT_EQ(*result->FindString("recommendedId"),
-            "/web_apps/no_service_worker.html");
-}
-
-IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest_AppId, ReturnsNoAppIdIfNoManifest) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  const GURL url(embedded_test_server()->GetURL("/empty.html"));
-  ASSERT_TRUE(content::NavigateToURL(
-      chrome_test_utils::GetActiveWebContents(this), url));
-  Attach();
-
-  const base::DictValue* result = SendCommandSync("Page.getAppId");
-  EXPECT_FALSE(result->Find("appId"));
-  EXPECT_FALSE(result->Find("recommendedId"));
-}
-
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest, VisibleSecurityStateSecureState) {
   net::EmbeddedTestServer https_server(net::EmbeddedTestServer::TYPE_HTTPS);
   https_server.ServeFilesFromSourceDirectory(GetChromeTestDataDir());
