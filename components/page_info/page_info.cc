@@ -130,7 +130,6 @@ ContentSettingsType kPermissionType[] = {
     ContentSettingsType::AUTOMATIC_FULLSCREEN,
     ContentSettingsType::KEYBOARD_LOCK,
     ContentSettingsType::POINTER_LOCK,
-    ContentSettingsType::WEB_APP_INSTALLATION,
     ContentSettingsType::LOCAL_NETWORK,
     ContentSettingsType::LOOPBACK_NETWORK,
 };

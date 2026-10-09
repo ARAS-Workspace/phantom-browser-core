@@ -109,7 +109,6 @@
 #include "content/browser/guest_page_holder_impl.h"
 #include "content/browser/hid/hid_service.h"
 #include "content/browser/idle/idle_manager_impl.h"
-#include "content/browser/installedapp/installed_app_provider_impl.h"
 #include "content/browser/loader/file_url_loader_factory.h"
 #include "content/browser/loader/keep_alive_url_loader_service.h"
 #include "content/browser/loader/navigation_early_hints_manager.h"
@@ -14996,11 +14995,6 @@ void RenderFrameHostImpl::CreateNotificationService(
       GetGlobalId(),
       RenderProcessHost::NotificationServiceCreatorType::kDocument,
       GetStorageKey(), std::move(receiver));
-}
-
-void RenderFrameHostImpl::CreateInstalledAppProvider(
-    mojo::PendingReceiver<blink::mojom::InstalledAppProvider> receiver) {
-  InstalledAppProviderImpl::Create(*this, std::move(receiver));
 }
 
 void RenderFrameHostImpl::CreateCodeCacheHostWithKeys(

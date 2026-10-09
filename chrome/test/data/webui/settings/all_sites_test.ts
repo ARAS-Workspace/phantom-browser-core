@@ -1402,11 +1402,8 @@ suite('EnableRelatedWebsiteSets', function() {
             testElement.shadowRoot!.querySelector<HTMLElement>('#relatedWebsiteSetsLearnMore');
         assertFalse(relatedWebsiteSetsLearnMore!.hidden);
         assertEquals(
-            [
-              loadTimeData.getStringF(
-                  'siteSettingsRelatedWebsiteSetsLearnMore', 'foo.com'),
-              loadTimeData.getString('learnMore'),
-            ].join(' '),
+            loadTimeData.getStringF(
+                'siteSettingsRelatedWebsiteSetsLearnMore', 'foo.com'),
             relatedWebsiteSetsLearnMore!.innerText.trim());
 
         testElement.filter = 'related:bar.com';

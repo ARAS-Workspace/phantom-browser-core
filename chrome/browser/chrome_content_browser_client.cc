@@ -459,10 +459,8 @@
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_error_page.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/isolated_web_apps/policy/isolated_web_app_policy_manager.h"
-#include "chrome/browser/web_applications/locks/app_lock.h"
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"  // nogncheck
 #include "chrome/browser/web_applications/web_app_filter.h"
-#include "chrome/browser/web_applications/web_app_helpers.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
@@ -476,7 +474,6 @@
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/webapps/isolated_web_apps/url_loading/url_loader_factory.h"
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
-#include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
 
 #if BUILDFLAG(IS_LINUX)
 #include "components/crash/core/app/crash_switches.h"
@@ -3724,12 +3721,6 @@ bool ChromeContentBrowserClient::CanCreateWindow(
   if (web_contents->IsPrivileged()) {
     return false;
   }
-
-  // This block gives the Contextual Tasks feature the opportunity to intercept
-  // tab creation in the event it doesn't go directly through the feature's
-  // navigation throttle. When a new tab/window is created, it is done before
-  // the WebContents is created, so if we only let the navigation throttle
-  // handle it, we would end up with an empty tab or window.
 
   // If the opener is trying to create a background window but doesn't have
   // the appropriate permission, fail the attempt.
@@ -7245,92 +7236,6 @@ void ChromeContentBrowserClient::BindLanguageDetectionDriver(
   language_detection_driver->AddReceiver(std::move(receiver));
   context_user_data->SetUserData(kContentLanguageDetectionDriverUserDataKey,
                                  std::move(language_detection_driver));
-}
-
-void ChromeContentBrowserClient::QueryInstalledWebAppsByManifestId(
-    const GURL& frame_url,
-    const GURL& manifest_id,
-    content::BrowserContext* browser_context,
-    base::OnceCallback<void(std::optional<blink::mojom::RelatedApplication>)>
-        callback) {
-  Profile* profile = Profile::FromBrowserContext(browser_context);
-
-  if (!web_app::AreWebAppsEnabled(profile)) {
-    return std::move(callback).Run(std::nullopt);
-  }
-
-  web_app::WebAppProvider* const provider =
-      web_app::WebAppProvider::GetForLocalAppsUnchecked(profile);
-
-  std::optional<webapps::ManifestId> valid_manifest_id =
-      webapps::ManifestId::Create(manifest_id);
-  if (!valid_manifest_id.has_value()) {
-    return std::move(callback).Run(std::nullopt);
-  }
-
-  webapps::AppId app_id =
-      web_app::GenerateAppIdFromManifestId(*valid_manifest_id);
-
-  if (app_id.empty()) {
-    return std::move(callback).Run(std::nullopt);
-  }
-
-  // arg_for_shutdown must be explicitly defined, otherwise
-  // ScheduleCallbackWithResult cannot infer the optional type the nullopt
-  // is associated with.
-  std::optional<blink::mojom::RelatedApplication> arg_for_shutdown =
-      std::nullopt;
-  web_app::AppLockDescription lock_description(app_id);
-
-  provider->scheduler().ScheduleCallbackWithResult<web_app::AppLock>(
-      "QueryInstalledWebAppsByManifestId", std::move(lock_description),
-      base::BindOnce(
-          [](webapps::AppId app_id, webapps::ManifestId manifest_id,
-             GURL frame_url, web_app::AppLock& lock,
-             base::DictValue& debug_value)
-              -> std::optional<blink::mojom::RelatedApplication> {
-            debug_value.Set("input", base::DictValue()
-                                         .Set("manifest_id", manifest_id.spec())
-                                         .Set("frame_url", frame_url.spec()));
-
-            if (!lock.registrar().AppMatches(
-                    app_id, web_app::WebAppFilter::InstalledInChrome())) {
-              debug_value.Set("did_find_application", false);
-              return std::nullopt;
-            }
-
-            if (!lock.registrar().IsUrlInAppScope(frame_url, app_id)) {
-              debug_value.Set("did_find_application", false);
-              return std::nullopt;
-            }
-
-            blink::mojom::RelatedApplication application;
-            application.platform = "webapp";
-            std::optional<webapps::ManifestId> app_manifest_id =
-                lock.registrar().GetAppManifestId(app_id);
-            if (!app_manifest_id.has_value()) {
-              debug_value.Set("manifest_id", "invalid manifest id");
-              return std::nullopt;
-            }
-            application.id = app_manifest_id->spec();
-            // Note: This url is the manifest_url for purely legacy reasons
-            // where Android used to implement the unique identifier using the
-            // manifest url.
-            if (lock.registrar().GetAppManifestUrl(app_id).is_valid()) {
-              application.url =
-                  lock.registrar().GetAppManifestUrl(app_id).spec();
-            }
-
-            debug_value.Set("did_find_application", true);
-            debug_value.Set(
-                "application",
-                base::DictValue()
-                    .Set("app_id", application.id.value_or(""))
-                    .Set("manifest_url", application.url.value_or("")));
-            return application;
-          },
-          std::move(app_id), *valid_manifest_id, std::move(frame_url)),
-      std::move(callback), std::move(arg_for_shutdown));
 }
 
 void ChromeContentBrowserClient::SetSamplingProfiler(

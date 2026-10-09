@@ -2187,7 +2187,6 @@ source_set("browser_tests") {
       "//chrome/browser/ui/webui/bookmarks",
       "//chrome/browser/ui/webui/extensions_zero_state_promo",
       "//chrome/browser/usb",
-      "//chrome/browser/usb:browser_test_support",
       "//chrome/browser/user_education",
       "//chrome/browser/web_applications/extensions",
       "//chrome/browser/web_applications/isolated_web_apps/window_management",

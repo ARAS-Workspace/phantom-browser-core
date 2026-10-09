@@ -35,9 +35,6 @@ suite('ResetProfileBanner', function() {
       resetAutomatedDialogTitle: 'Chrome reset these settings',
       resetAutomatedDialogBody: 'To protect you, Chrome reset them.',
       gotIt: 'Got it',
-      learnMore: 'Learn more',
-      resetProfileBannerLearnMoreUrl:
-          'https://google.com/zackstestinglink/learnmore',
     });
 
     browserProxy = new TestResetBrowserProxyWithOpen();
@@ -56,7 +53,6 @@ suite('ResetProfileBanner', function() {
     document.body.appendChild(banner);
 
     await browserProxy.whenCalled('getTamperedPreferencePaths');
-    await browserProxy.whenCalled('onShowResetProfileDialog');
     await microtasksFinished();
 
     const dialog = banner.shadowRoot.querySelector('cr-dialog');
@@ -78,11 +74,8 @@ suite('ResetProfileBanner', function() {
     assertEquals(tamperedPrefs[1], listItems[1]!.textContent.trim());
 
     // Verify button text.
-    const learnMoreButton = banner.shadowRoot.querySelector('#learnMore');
     const confirmButton = banner.shadowRoot.querySelector('#confirm');
-    assertTrue(!!learnMoreButton);
     assertTrue(!!confirmButton);
-    assertEquals('Learn more', learnMoreButton.textContent.trim());
     assertEquals('Got it', confirmButton.textContent.trim());
   });
 
@@ -117,22 +110,5 @@ suite('ResetProfileBanner', function() {
     await browserProxy.whenCalled('onHideResetProfileBanner');
     await microtasksFinished();
     assertFalse(dialog.open);
-  });
-
-  test('learnMoreButtonOpensNewWindow', async function() {
-    browserProxy.setTamperedPreferencePaths(['Search engine']);
-    banner = document.createElement('settings-reset-profile-banner');
-    document.body.appendChild(banner);
-    await browserProxy.whenCalled('getTamperedPreferencePaths');
-    await microtasksFinished();
-
-    const learnMoreButton =
-        banner.shadowRoot.querySelector<HTMLElement>('#learnMore');
-    assertTrue(!!learnMoreButton);
-    learnMoreButton.click();
-
-    assertEquals(
-        'https://google.com/zackstestinglink/learnmore',
-        browserProxy.openWindowUrl);
   });
 });

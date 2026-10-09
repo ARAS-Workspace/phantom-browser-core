@@ -28,7 +28,6 @@ suite('SettingsMain', function() {
     loadTimeData.overrideValues(Object.assign(
         {
           isGuest: false,
-          showAiPage: false,
           showResetProfileBanner: false,
         },
         overrides || {}));
@@ -64,10 +63,6 @@ suite('SettingsMain', function() {
       {route: routes.PEOPLE, pluginTag: 'settings-people-page-index'},
       {route: routes.BASIC, pluginTag: 'settings-people-page-index'},
       {route: routes.PRIVACY, pluginTag: 'settings-privacy-page-index'},
-      {
-        route: routes.AUTOFILL,
-        pluginTag: 'settings-autofill-page-index',
-      },
       {route: routes.PERFORMANCE, pluginTag: 'settings-performance-page-index'},
       {route: routes.APPEARANCE, pluginTag: 'settings-appearance-page-index'},
       {route: routes.SEARCH, pluginTag: 'settings-search-page-index'},
@@ -88,7 +83,6 @@ suite('SettingsMain', function() {
       {route: routes.LANGUAGES, pluginTag: 'settings-languages-page-index'},
       // </if>
       {route: routes.DOWNLOADS, pluginTag: 'settings-downloads-page'},
-      {route: routes.ACCESSIBILITY, pluginTag: 'settings-a11y-page-index'},
       // <if expr="not is_chromeos">
       {route: routes.SYSTEM, pluginTag: 'settings-system-page'},
       // </if>
@@ -136,7 +130,7 @@ suite('SettingsMain', function() {
   test('RespectsVisibility', function() {
     function assertVisibilityRespected() {
       const viewIds: string[] = [
-        'a11y', 'about', 'appearance', 'downloads', 'languages', 'onStartup',
+        'about', 'appearance', 'downloads', 'languages', 'onStartup',
         'people', 'performance', 'reset', 'search',
 
         // <if expr='not is_chromeos'>
@@ -165,14 +159,6 @@ suite('SettingsMain', function() {
     // Case2: Guest mode
     createSettingsMain({isGuest: true});
     assertVisibilityRespected();
-  });
-
-  test('RespectsShowAiPage', function() {
-    assertFalse(loadTimeData.getBoolean('showAiPage'));
-    assertFalse(!!queryView('ai'));
-
-    createSettingsMain({showAiPage: true});
-    assertTrue(!!queryView('ai'));
   });
 
   // Test which section is displayed when chrome://settings/ is visited.

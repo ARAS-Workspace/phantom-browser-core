@@ -63,7 +63,6 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
   }
 
  private:
-  friend class ChromeRenderFrameObserverTest;
 
   // RenderFrameObserver implementation.
   void OnInterfaceRequestForFrame(
@@ -90,12 +89,6 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
   void SetWindowFeatures(
       blink::mojom::WindowFeaturesPtr window_features) override;
   void ExecuteWebUIJavaScript(const std::u16string& javascript) override;
-  void RequestImageForContextNode(
-      int32_t thumbnail_min_area_pixels,
-      const gfx::Size& thumbnail_max_size_pixels,
-      chrome::mojom::ImageFormat image_format,
-      int32_t quality,
-      RequestImageForContextNodeCallback callback) override;
   void RequestBitmapForContextNode(
       RequestBitmapForContextNodeCallback callback) override;
   void RequestBitmapForContextNodeWithBoundsHint(
@@ -128,27 +121,6 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
   // Returns true if |CapturePageText| should be run for Translate or Phishing.
   bool ShouldCapturePageTextForTranslateOrPhishing(
       blink::WebMeaningfulLayout layout_type) const;
-
-  // Check if the image need to downscale.
-  static bool NeedsDownscale(const gfx::Size& original_image_size,
-                             int32_t requested_image_min_area_pixels,
-                             const gfx::Size& requested_image_max_size);
-
-  // If the source image is null or occupies less area than
-  // |requested_image_min_area_pixels|, we return the image unmodified.
-  // Otherwise, we scale down the image so that the width and height do not
-  // exceed |requested_image_max_size|, preserving the original aspect ratio.
-  static SkBitmap Downscale(const SkBitmap& image,
-                            int requested_image_min_area_pixels,
-                            const gfx::Size& requested_image_max_size);
-
-  // Check if the image need to encode to fit requested image format.
-  static bool NeedsEncodeImage(const std::string& mime_type,
-                               chrome::mojom::ImageFormat image_format);
-
-  // Check if the image is an animated Webp image by looking for animation
-  // feature flag
-  static bool IsAnimatedWebp(const std::vector<uint8_t>& image_data);
 
   // Has the same lifetime as us.
   // A self owned RenderFrameObserver of the same frame.

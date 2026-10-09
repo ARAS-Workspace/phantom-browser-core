@@ -40,7 +40,6 @@
 #include "third_party/blink/renderer/core/scheduler/task_attribution_tracker_impl.h"
 #include "third_party/blink/renderer/modules/accessibility/ax_object_cache_impl.h"
 #include "third_party/blink/renderer/modules/accessibility/inspector_accessibility_agent.h"
-#include "third_party/blink/renderer/modules/app_banner/app_banner_controller.h"
 #include "third_party/blink/renderer/modules/audio_output_devices/html_media_element_audio_output_device.h"
 #include "third_party/blink/renderer/modules/cache_storage/inspector_cache_storage_agent.h"
 #include "third_party/blink/renderer/modules/canvas/canvas2d/canvas_rendering_context_2d.h"
@@ -233,11 +232,6 @@ void ModulesInitializer::InitLocalFrame(LocalFrame& frame) const {
 
   frame.GetInterfaceRegistry()->AddInterface(BindRepeating(
       &InstallationServiceImpl::BindReceiver, WrapWeakPersistent(&frame)));
-  // TODO(dominickn): This interface should be document-scoped rather than
-  // frame-scoped, as the resulting banner event is dispatched to
-  // frame()->document().
-  frame.GetInterfaceRegistry()->AddInterface(BindRepeating(
-      &AppBannerController::BindReceiver, WrapWeakPersistent(&frame)));
   frame.GetInterfaceRegistry()->AddInterface(BindRepeating(
       &TextSuggestionBackendImpl::Bind, WrapWeakPersistent(&frame)));
 #if BUILDFLAG(IS_ANDROID)

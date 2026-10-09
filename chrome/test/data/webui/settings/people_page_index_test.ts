@@ -192,7 +192,6 @@ suite('PeoplePageIndex', function() {
 
         const childViewsId = [
           'account',
-          'googleServices',
         ];
         for (const id of childViewsId) {
           assertTrue(!!index.$.viewManager.querySelector(

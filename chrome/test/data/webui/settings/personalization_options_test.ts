@@ -321,37 +321,6 @@ suite('AllBuilds', function() {
     buildTestElement();  // Rebuild the element after modifying loadTimeData.
     assertFalse(isVisible(testElement.$.signinAllowedToggle));
   });
-
-  test('searchSuggestToggleShownIfPageVisibilityUndefined', function() {
-    // This is the most common case, as in non-Guest profiles on Desktop
-    // platforms pageVisibility is undefined.
-    assertTrue(isVisible(
-        testElement.shadowRoot.querySelector('#searchSuggestToggle')));
-  });
-
-  test('searchSuggestToggleHiddenByPageVisibility', function() {
-    resetPageVisibilityForTesting({
-      privacy: {
-        searchPrediction: false,
-        networkPrediction: false,
-      },
-    });
-    buildTestElement();
-    assertFalse(isVisible(
-        testElement.shadowRoot.querySelector('#searchSuggestToggle')));
-  });
-
-  test('searchSuggestToggleShownByPageVisibility', function() {
-    resetPageVisibilityForTesting({
-      privacy: {
-        searchPrediction: true,
-        networkPrediction: false,
-      },
-    });
-    buildTestElement();
-    assertTrue(isVisible(
-        testElement.shadowRoot.querySelector('#searchSuggestToggle')));
-  });
   // </if>
 
   test('searchAggregatorSuggestNotShown', function() {

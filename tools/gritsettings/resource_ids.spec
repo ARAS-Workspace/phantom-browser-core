@@ -560,10 +560,6 @@
     "META": {"sizes": {"includes": [40]}},
     "includes": [4500],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/on_device_translation_internals/resources.grd": {
-    "META": {"sizes": {"includes": [5]}},
-    "includes": [4510],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/organizer_panel/resources.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [4515],

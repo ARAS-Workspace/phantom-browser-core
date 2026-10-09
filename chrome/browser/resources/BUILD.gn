@@ -111,7 +111,6 @@ group("resources") {
   if (is_mac || is_linux) {
     public_deps += [
       "browser_switch:resources",
-      "on_device_translation_internals:resources",
     ]
   }
 

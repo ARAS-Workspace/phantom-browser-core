@@ -66,7 +66,7 @@ export {loadTimeData} from './i18n_setup.js';
 // <if expr="not is_chromeos">
 export {convertLanguageCodeForChrome, getBaseLanguage} from './languages_page/languages_util.js';
 // </if>
-export {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, CardBenefitsUserAction, CvcDeletionUserAction, DeleteBrowsingDataAction, MetricsBrowserProxyImpl, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached, SuggestionsFromGeminiAction, SuggestionsFromGeminiEntryPoint, YourSavedInfoDataCategory, YourSavedInfoDataChip, YourSavedInfoRelatedService} from './metrics_browser_proxy.js';
+export {DeleteBrowsingDataAction, MetricsBrowserProxyImpl, PrivacyElementInteractions} from './metrics_browser_proxy.js';
 export type {MetricsBrowserProxy} from './metrics_browser_proxy.js';
 export {OnStartupBrowserProxyImpl} from './on_startup_page/on_startup_browser_proxy.js';
 export type {NtpExtension, OnStartupBrowserProxy} from './on_startup_page/on_startup_browser_proxy.js';
@@ -103,7 +103,6 @@ export {HatsBrowserProxyImpl, TrustSafetyInteraction} from './privacy_page/hats_
 export type {HatsBrowserProxy} from './privacy_page/hats_browser_proxy.js';
 export {SettingsPrivacyPageElement} from './privacy_page/privacy_page.js';
 export {SettingsPrivacyPageIndexElement} from './privacy_page/privacy_page_index.js';
-export {SafeBrowsingSetting} from './privacy_page/security/safe_browsing_types.js';
 export {RelaunchMixin, RestartType} from './relaunch_mixin.js';
 export {ResetBrowserProxyImpl} from './reset_page/reset_browser_proxy.js';
 export type {ResetBrowserProxy} from './reset_page/reset_browser_proxy.js';

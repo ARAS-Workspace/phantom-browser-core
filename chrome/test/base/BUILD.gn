@@ -597,7 +597,7 @@ if (is_mac) {
       "launchservices_utils_mac.mm",
     ]
     public_deps = [ "//base" ]
-    deps = [ "//build:branding_buildflags" ]
+    deps = [ "//chrome/common:constants" ]
   }
 
   source_set("scoped_bundle_swizzler_mac") {

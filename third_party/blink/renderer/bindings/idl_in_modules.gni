@@ -34,10 +34,6 @@ static_idl_files_in_modules = [
   "//third_party/blink/renderer/modules/animationworklet/worklet_animation.idl",
   "//third_party/blink/renderer/modules/animationworklet/worklet_animation_effect.idl",
   "//third_party/blink/renderer/modules/animationworklet/worklet_group_effect.idl",
-  "//third_party/blink/renderer/modules/app_banner/app_banner_prompt_result.idl",
-  "//third_party/blink/renderer/modules/app_banner/before_install_prompt_event.idl",
-  "//third_party/blink/renderer/modules/app_banner/before_install_prompt_event_init.idl",
-  "//third_party/blink/renderer/modules/app_banner/window_installation.idl",
   "//third_party/blink/renderer/modules/audio_output_devices/html_media_element_audio_output_device.idl",
   "//third_party/blink/renderer/modules/background_fetch/background_fetch_event.idl",
   "//third_party/blink/renderer/modules/background_fetch/background_fetch_event_init.idl",
@@ -1355,15 +1351,6 @@ if (!target_os_is_android && !is_ios) {
 }
 
 # Window setShape API for allowlisted Isolated Web Apps (ChromeOS only).
-
-# Installed App (getInstalledRelatedApps) is excluded on iOS because the
-# webapp infrastructure required for this API is not yet implemented.
-if (!is_ios) {
-  static_idl_files_in_modules += [
-    "//third_party/blink/renderer/modules/installedapp/navigator_installed_app.idl",
-    "//third_party/blink/renderer/modules/installedapp/related_application.idl",
-  ]
-}
 
 # Compute Pressure
 if (enable_compute_pressure) {

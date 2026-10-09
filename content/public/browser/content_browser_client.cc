@@ -102,7 +102,6 @@
 #include "url/origin.h"
 
 #include "content/public/browser/authenticator_request_client_delegate.h"
-#include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
 
 namespace content {
 
@@ -1814,15 +1813,6 @@ void ContentBrowserClient::BindLanguageDetectionDriver(
   if (base::FeatureList::IsEnabled(blink::features::kLanguageDetectionAPI)) {
     GetContentLanguageDetectionDriver().AddReceiver(std::move(receiver));
   }
-}
-
-void ContentBrowserClient::QueryInstalledWebAppsByManifestId(
-    const GURL& frame_url,
-    const GURL& manifest_id,
-    content::BrowserContext* browser_context,
-    base::OnceCallback<void(std::optional<blink::mojom::RelatedApplication>)>
-        callback) {
-  std::move(callback).Run(std::nullopt);
 }
 
 bool ContentBrowserClient::AllowNonActivatedCrossOriginPaintHolding() {

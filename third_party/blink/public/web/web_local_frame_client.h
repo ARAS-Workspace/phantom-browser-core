@@ -138,7 +138,6 @@ class WebMediaStreamDeviceObserver;
 class WebNavigationControl;
 class WebPlugin;
 class WebPrescientNetworking;
-class WebRelatedAppsFetcher;
 class WebServiceWorkerProvider;
 class WebSocketHandshakeThrottle;
 class WebString;
@@ -515,11 +514,6 @@ class BLINK_EXPORT WebLocalFrameClient {
   // new navigation, since a document should only have one navigation in-flight
   // at a time.
   virtual void AbortClientNavigation(bool for_new_navigation) {}
-
-  // InstalledApp API ----------------------------------------------------
-
-  // Used to access the embedder for the InstalledApp API.
-  virtual WebRelatedAppsFetcher* GetRelatedAppsFetcher() { return nullptr; }
 
   // Editing -------------------------------------------------------------
 

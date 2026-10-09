@@ -1542,56 +1542,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, MAYBE_DownloadHistoryCheck) {
   EXPECT_FALSE(row1.opened);
 }
 
-// Make sure a dangerous file shows up properly in the history.
-IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadHistoryDangerCheck) {
-  // .swf file so that it's dangerous on all platforms (including CrOS).
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL download_url =
-      embedded_test_server()->GetURL("/downloads/dangerous/dangerous.swf");
-
-  // Download the url and wait until the object has been stored.
-  auto completion_observer =
-      std::make_unique<content::DownloadTestObserverTerminal>(
-          DownloadManagerForBrowser(browser()), 1,
-          content::DownloadTestObserver::ON_DANGEROUS_DOWNLOAD_IGNORE);
-  auto dangerous_observer =
-      std::make_unique<content::DownloadTestObserverTerminal>(
-          DownloadManagerForBrowser(browser()), 1,
-          content::DownloadTestObserver::ON_DANGEROUS_DOWNLOAD_QUIT);
-  base::Time start(base::Time::Now());
-  HistoryObserver observer(browser()->GetProfile());
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), download_url));
-
-  // Validate the download and wait for it to finish.
-  std::vector<raw_ptr<DownloadItem, VectorExperimental>> downloads;
-  dangerous_observer->WaitForFinished();
-  DownloadManagerForBrowser(browser())->GetAllDownloads(&downloads);
-  ASSERT_EQ(1u, downloads.size());
-  downloads[0]->ValidateDangerousDownload();
-  completion_observer->WaitForFinished();
-  EXPECT_EQ(1u, completion_observer->NumDangerousDownloadsSeen());
-
-  // Get history details and confirm it's what you expect.
-  observer.WaitForStored();
-  std::vector<history::DownloadRow> downloads_in_database =
-      DownloadsHistoryDataCollector(browser()->GetProfile())
-          .WaitForDownloadInfo();
-  ASSERT_EQ(1u, downloads_in_database.size());
-  history::DownloadRow& row1(downloads_in_database[0]);
-  base::FilePath file(FILE_PATH_LITERAL("downloads/dangerous/dangerous.swf"));
-  EXPECT_EQ(DestinationFile(browser(), file), row1.target_path);
-  EXPECT_EQ(DestinationFile(browser(), file), row1.current_path);
-  EXPECT_EQ(history::DownloadDangerType::USER_VALIDATED, row1.danger_type);
-  EXPECT_LE(start, row1.start_time);
-  EXPECT_EQ(history::DownloadState::COMPLETE, row1.state);
-  EXPECT_FALSE(row1.opened);
-  // Not checking file size--not relevant to the point of the test, and
-  // the file size is actually different on Windows and other platforms,
-  // because for source control simplicity it's actually a text file, and
-  // there are CRLF transformations for those files.
-}
-
 // Test for crbug.com/40915332. This tests that chrome:// urls are still
 // functional after download of a file while viewing another chrome://.
 IN_PROC_BROWSER_TEST_F(DownloadTest, ChromeURLAfterDownload) {
@@ -1722,38 +1672,7 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, DISABLED_AutoOpenByUser) {
   CheckDownload(browser(), file, file);
 }
 
-// Download an extension. Expect a dangerous download warning.
-// Deny the download.
-IN_PROC_BROWSER_TEST_F(DownloadTest, CrxDenyInstall) {
-  std::unique_ptr<base::AutoReset<bool>> allow_offstore_install =
-      download_crx_util::OverrideOffstoreInstallAllowedForTesting(true);
-
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL extension_url =
-      embedded_test_server()->GetURL("/" + std::string(kGoodCrxPath));
-
-  std::unique_ptr<content::DownloadTestObserver> observer(
-      DangerousDownloadWaiter(
-          browser(), 1,
-          content::DownloadTestObserver::ON_DANGEROUS_DOWNLOAD_DENY));
-
-  NavigateParams params(browser(), extension_url, ui::PAGE_TRANSITION_TYPED);
-  params.user_gesture = false;
-  ui_test_utils::NavigateToURL(&params);
-
-  observer->WaitForFinished();
-  EXPECT_EQ(1u, observer->NumDownloadsSeenInState(DownloadItem::CANCELLED));
-  EXPECT_EQ(1u, observer->NumDangerousDownloadsSeen());
-  EXPECT_TRUE(VerifyNoDownloads());
-
-  // Check that the CRX is not installed.
-  extensions::ExtensionRegistry* extension_registry =
-      extensions::ExtensionRegistry::Get(browser()->GetProfile());
-  ASSERT_FALSE(extension_registry->enabled_extensions().Contains(kGoodCrxId));
-}
-
-// Download an extension.  Expect a dangerous download warning.
+// Download an extension.
 // Allow the download, deny the install.
 IN_PROC_BROWSER_TEST_F(DownloadTest, CrxInstallDenysPermissions) {
   std::unique_ptr<base::AutoReset<bool>> allow_offstore_install =
@@ -1777,7 +1696,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, CrxInstallDenysPermissions) {
   observer->WaitForFinished();
   EXPECT_EQ(1u, observer->NumDownloadsSeenInState(DownloadItem::COMPLETE));
   CheckDownloadStates(1, DownloadItem::COMPLETE);
-  EXPECT_EQ(1u, observer->NumDangerousDownloadsSeen());
 
   content::DownloadManager::DownloadVector downloads;
   DownloadManagerForBrowser(browser())->GetAllDownloads(&downloads);
@@ -1792,7 +1710,7 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, CrxInstallDenysPermissions) {
   ASSERT_FALSE(extension_registry->enabled_extensions().Contains(kGoodCrxId));
 }
 
-// Download an extension.  Expect a dangerous download warning.
+// Download an extension.
 // Allow the download, and the install.
 IN_PROC_BROWSER_TEST_F(DownloadTest, CrxInstallAcceptPermissions) {
   // TODO(https://crbug.com/40804030): Remove this when updated to use MV3.
@@ -1821,7 +1739,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, CrxInstallAcceptPermissions) {
   observer->WaitForFinished();
   EXPECT_EQ(1u, observer->NumDownloadsSeenInState(DownloadItem::COMPLETE));
   CheckDownloadStates(1, DownloadItem::COMPLETE);
-  EXPECT_EQ(1u, observer->NumDangerousDownloadsSeen());
 
   // Download shelf should close from auto-open.
   content::DownloadManager::DownloadVector downloads;
@@ -1889,7 +1806,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, CrxLargeTheme) {
   observer->WaitForFinished();
   EXPECT_EQ(1u, observer->NumDownloadsSeenInState(DownloadItem::COMPLETE));
   CheckDownloadStates(1, DownloadItem::COMPLETE);
-  EXPECT_EQ(1u, observer->NumDangerousDownloadsSeen());
 
   // Download shelf should close from auto-open.
   content::DownloadManager::DownloadVector downloads;
@@ -4800,30 +4716,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, DISABLED_AutoOpenClosesSurface) {
       GetDownloadPrefs(browser())->EnableAutoOpenByUserBasedOnExtension(file));
 
   DownloadAndWait(browser(), url);
-
-  // Download surface should close.
-  EXPECT_FALSE(
-      IsDownloadDetailedUiVisible(BrowserWindow::FromBrowser(browser())));
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadTest, CrxDenyInstallClosesSurface) {
-  std::unique_ptr<base::AutoReset<bool>> allow_offstore_install =
-      download_crx_util::OverrideOffstoreInstallAllowedForTesting(true);
-
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL extension_url =
-      embedded_test_server()->GetURL("/" + std::string(kGoodCrxPath));
-
-  std::unique_ptr<content::DownloadTestObserver> observer(
-      DangerousDownloadWaiter(
-          browser(), 1,
-          content::DownloadTestObserver::ON_DANGEROUS_DOWNLOAD_DENY));
-  NavigateParams params(browser(), extension_url, ui::PAGE_TRANSITION_TYPED);
-  params.user_gesture = false;
-  ui_test_utils::NavigateToURL(&params);
-
-  observer->WaitForFinished();
 
   // Download surface should close.
   EXPECT_FALSE(

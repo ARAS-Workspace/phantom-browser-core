@@ -171,7 +171,6 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
            raw_ref(features::kFractionalScrollOffsets)},
           {wf::EnableSensorExtraClasses,
            raw_ref(features::kGenericSensorExtraClasses)},
-          {wf::EnableInstalledApp, raw_ref(features::kInstalledApp)},
           {wf::EnableIntegrityPolicyScript,
            raw_ref(network::features::kIntegrityPolicyScript)},
           {wf::EnableMediaEngagementBypassAutoplayPolicies,

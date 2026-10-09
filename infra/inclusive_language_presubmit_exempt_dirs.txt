@@ -331,7 +331,6 @@ third_party/blink/renderer/modules/credentialmanagement
 third_party/blink/renderer/modules/csspaint
 third_party/blink/renderer/modules/device_orientation
 third_party/blink/renderer/modules/encryptedmedia
-third_party/blink/renderer/modules/installedapp
 third_party/blink/renderer/modules/launch
 third_party/blink/renderer/modules/manifest
 third_party/blink/renderer/modules/mediarecorder

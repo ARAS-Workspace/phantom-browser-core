@@ -31,8 +31,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
@@ -94,8 +92,6 @@
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/google/core/common/google_util.h"
 #include "components/password_manager/core/common/password_manager_features.h"
-#include "components/policy/core/common/management/management_service.h"
-#include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/core/browser/test_account_preview_data_service.h"
 #include "components/signin/public/base/consent_level.h"
@@ -1398,7 +1394,6 @@ INSTANTIATE_TEST_SUITE_P(,
 // a new button is added to the menu, it should also be added to this list.
 constexpr std::array kActionableItems_SingleProfileWithCustomName = {
     ProfileMenuViewBase::ActionableItem::kSigninButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
     ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
@@ -1415,9 +1410,7 @@ PROFILE_MENU_CLICK_TEST(kActionableItems_SingleProfileWithCustomName,
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 constexpr std::array kActionableItems_SingleProfileWithCrossDevicePromo = {
-    ProfileMenuViewBase::ActionableItem::kHistorySyncButton,
     ProfileMenuViewBase::ActionableItem::kSigninOnPhoneButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kAccountSettingsButton,
@@ -1425,7 +1418,7 @@ constexpr std::array kActionableItems_SingleProfileWithCrossDevicePromo = {
     ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
     ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
     ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
-    ProfileMenuViewBase::ActionableItem::kHistorySyncButton};
+    ProfileMenuViewBase::ActionableItem::kSigninOnPhoneButton};
 
 PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
     kActionableItems_SingleProfileWithCrossDevicePromo,
@@ -1446,39 +1439,8 @@ PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
 
 // List of actionable items in the correct order as they appear in the menu. If
 // a new button is added to the menu, it should also be added to this list.
-constexpr std::array kActionableItems_ManagedProfile = {
-    ProfileMenuViewBase::ActionableItem::kProfileManagementLabel,
-    ProfileMenuViewBase::ActionableItem::kSigninButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
-    ProfileMenuViewBase::ActionableItem::kEditProfileButton,
-    ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
-    ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
-    ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
-    // The first button is added again to finish the cycle and test that
-    // there are no other buttons at the end.
-    ProfileMenuViewBase::ActionableItem::kProfileManagementLabel};
-
-PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
-    kActionableItems_ManagedProfile,
-    ProfileMenuClickTest_ManagedProfile,
-    /*enabled_features=*/{features::kEnterpriseProfileBadgingForMenu},
-    /*disabled_features=*/{}) {
-  enterprise_util::SetUserAcceptedAccountManagement(browser()->GetProfile(),
-                                                    true);
-  std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
-      scoped_browser_management_ =
-          std::make_unique<policy::ScopedManagementServiceOverrideForTesting>(
-              policy::ManagementServiceFactory::GetForProfile(
-                  browser()->GetProfile()),
-              policy::EnterpriseManagementAuthority::CLOUD);
-  RunTest();
-}
-
-// List of actionable items in the correct order as they appear in the menu. If
-// a new button is added to the menu, it should also be added to this list.
 constexpr std::array kActionableItems_MultipleProfiles = {
     ProfileMenuViewBase::ActionableItem::kSigninButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kExitProfileButton,
     ProfileMenuViewBase::ActionableItem::kOtherProfileButton,
@@ -1507,7 +1469,6 @@ PROFILE_MENU_CLICK_TEST(kActionableItems_MultipleProfiles,
 // a new button is added to the menu, it should also be added to this list.
 constexpr std::array kActionableItems_WebOnly_ReplaceSyncPromosEnabled = {
     ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
     ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
@@ -1542,7 +1503,6 @@ PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
 // a new button is added to the menu, it should also be added to this list.
 constexpr std::array kActionableItems_WebOnly_ReplaceSyncPromosDisabled = {
     ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
     ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
@@ -1579,7 +1539,6 @@ PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
 // List of actionable items in the correct order as they appear in the menu. If
 // a new button is added to the menu, it should also be added to this list.
 constexpr std::array kActionableItems_SyncEnabled = {
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
@@ -1588,7 +1547,7 @@ constexpr std::array kActionableItems_SyncEnabled = {
     ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
     // The first button is added again to finish the cycle and test that
     // there are no other buttons at the end.
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton};
+};
 
 PROFILE_MENU_CLICK_TEST(kActionableItems_SyncEnabled,
                         ProfileMenuClickTest_SyncEnabled) {
@@ -1601,7 +1560,6 @@ PROFILE_MENU_CLICK_TEST(kActionableItems_SyncEnabled,
 // this list.
 constexpr std::array kActionableItems_SyncError = {
     ProfileMenuViewBase::ActionableItem::kSyncErrorButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
@@ -1627,7 +1585,6 @@ PROFILE_MENU_CLICK_TEST(kActionableItems_SyncError,
 // this list.
 constexpr std::array kActionableItems_SyncPaused = {
     ProfileMenuViewBase::ActionableItem::kSyncErrorButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
     ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
@@ -1655,15 +1612,13 @@ PROFILE_MENU_CLICK_TEST(kActionableItems_SyncPaused,
 // added to this list.
 constexpr std::array
     kActionableItems_SigninDisallowed_ReplaceSyncPromosEnabled = {
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
-        ProfileMenuViewBase::ActionableItem::kGoogleServicesSettingsButton,
         ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
         ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
         ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
         // The first button is added again to finish the cycle and test that
         // there are no other buttons at the end.
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton};
+    };
 
 PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
     kActionableItems_SigninDisallowed_ReplaceSyncPromosEnabled,
@@ -1689,7 +1644,6 @@ IN_PROC_BROWSER_TEST_P(
 // added to this list.
 constexpr std::array
     kActionableItems_SigninDisallowed_ReplaceSyncPromosDisabled = {
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
         ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
         ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
@@ -1697,7 +1651,7 @@ constexpr std::array
         ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
         // The first button is added again to finish the cycle and test that
         // there are no other buttons at the end.
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton};
+    };
 
 PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
     kActionableItems_SigninDisallowed_ReplaceSyncPromosDisabled,
@@ -1727,7 +1681,6 @@ constexpr std::array
     kActionableItems_SigninPatternDisallowed_ReplaceSyncPromosEnabled = {
         // Non-personalized signin button.
         ProfileMenuViewBase::ActionableItem::kSigninButton,
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
         ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
         ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
@@ -1786,7 +1739,6 @@ constexpr std::array
     kActionableItems_SigninPatternDisallowed_ReplaceSyncPromosDisabled = {
         // Non-personalized signin button.
         ProfileMenuViewBase::ActionableItem::kSigninButton,
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
         ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
         ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
@@ -1849,7 +1801,6 @@ constexpr std::array
         {
             // Personalized signin button.
             ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-            ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
             ProfileMenuViewBase::ActionableItem::kEditProfileButton,
             ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
             ProfileMenuViewBase::ActionableItem::kGuestProfileButton,
@@ -1920,7 +1871,6 @@ constexpr std::array
         {
             // Personalized signin button.
             ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-            ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
             ProfileMenuViewBase::ActionableItem::kEditProfileButton,
             ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
             ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
@@ -1990,8 +1940,6 @@ IN_PROC_BROWSER_TEST_P(
 // List of actionable items in the correct order as they appear in the menu. If
 // a new button is added to the menu, it should also be added to this list.
 constexpr std::array kActionableItems_SignedIn_ReplaceSyncPromosEnabled = {
-    ProfileMenuViewBase::ActionableItem::kHistorySyncButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kAccountSettingsButton,
@@ -2001,7 +1949,7 @@ constexpr std::array kActionableItems_SignedIn_ReplaceSyncPromosEnabled = {
     ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
     // The first button is added again to finish the cycle and test that
     // there are no other buttons at the end.
-    ProfileMenuViewBase::ActionableItem::kHistorySyncButton};
+    ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton};
 
 PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
     kActionableItems_SignedIn_ReplaceSyncPromosEnabled,
@@ -2017,7 +1965,6 @@ PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
 constexpr std::array
     kActionableItems_WithUnconsentedPrimaryAccount_ReplaceSyncPromosDisabled = {
         ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
         ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
@@ -2048,7 +1995,6 @@ PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
 constexpr std::array
     kActionableItems_WithPendingAccount_ReplaceSyncPromosEnabled = {
         ProfileMenuViewBase::ActionableItem::kSigninReauthButton,
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
         ProfileMenuViewBase::ActionableItem::kAccountSettingsButton,
         ProfileMenuViewBase::ActionableItem::kSignoutButton,
@@ -2077,7 +2023,6 @@ PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
 constexpr std::array
     kActionableItems_WithPendingAccount_ReplaceSyncPromosDisabled = {
         ProfileMenuViewBase::ActionableItem::kSigninReauthButton,
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
         ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
         ProfileMenuViewBase::ActionableItem::kSignoutButton,
@@ -2101,82 +2046,6 @@ PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
       GoogleServiceAuthError::FromInvalidGaiaCredentialsReason(
           GoogleServiceAuthError::InvalidGaiaCredentialsReason::
               CREDENTIALS_REJECTED_BY_SERVER));
-  RunTest();
-}
-
-constexpr std::array
-    kActionableItems_GuestProfileButtonNotAvailable_SignedInSupervised_ReplaceSyncPromosEnabled =
-        {
-            ProfileMenuViewBase::ActionableItem::kProfileManagementLabel,
-            ProfileMenuViewBase::ActionableItem::kHistorySyncButton,
-            ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
-            ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
-            ProfileMenuViewBase::ActionableItem::kEditProfileButton,
-            ProfileMenuViewBase::ActionableItem::kAccountSettingsButton,
-            ProfileMenuViewBase::ActionableItem::kSignoutButton,
-            ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
-            // The kGuestProfileButton entry is not present.
-            ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
-            // The first button is added again to finish the cycle and test that
-            // there are no other buttons at the end.
-            ProfileMenuViewBase::ActionableItem::kProfileManagementLabel,
-};
-
-PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
-    kActionableItems_GuestProfileButtonNotAvailable_SignedInSupervised_ReplaceSyncPromosEnabled,
-    ProfileMenuClickTest_GuestProfileButtonNotAvailable_SignedInSupervised_ReplaceSyncPromosEnabled,
-    /*enabled_features=*/
-    std::vector<base::test::FeatureRef>(
-        {features::kEnterpriseProfileBadgingForMenu,
-         syncer::kReplaceSyncPromosWithSignInPromos}),
-    /*disabled_features=*/{}) {
-  AccountInfo account_info = Signin();
-  supervised_user::UpdateSupervisionStatusForAccount(
-      account_info, identity_manager(),
-      /*is_subject_to_parental_controls=*/true);
-
-  // Check setup.
-  ASSERT_FALSE(profiles::IsGuestModeEnabled(*GetProfile()));
-
-  RunTest();
-}
-
-constexpr std::array
-    kActionableItems_GuestProfileButtonNotAvailable_SignedInSupervised_ReplaceSyncPromosDisabled =
-        {
-            ProfileMenuViewBase::ActionableItem::kProfileManagementLabel,
-            ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-            ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
-            ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
-            ProfileMenuViewBase::ActionableItem::kEditProfileButton,
-            ProfileMenuViewBase::ActionableItem::kSyncSettingsButton,
-            ProfileMenuViewBase::ActionableItem::kSignoutButton,
-            ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,
-            // The kGuestProfileButton entry is not present.
-            ProfileMenuViewBase::ActionableItem::kManageProfilesButton,
-            // The first button is added again to finish the cycle and test that
-            // there are no other buttons at the end.
-            ProfileMenuViewBase::ActionableItem::kProfileManagementLabel,
-};
-
-PROFILE_MENU_CLICK_WITH_FEATURE_TEST(
-    kActionableItems_GuestProfileButtonNotAvailable_SignedInSupervised_ReplaceSyncPromosDisabled,
-    ProfileMenuClickTest_GuestProfileButtonNotAvailable_SignedInSupervised_ReplaceSyncPromosDisabled,
-    /*enabled_features=*/
-    std::vector<base::test::FeatureRef>(
-        {features::kEnterpriseProfileBadgingForMenu}),
-    /*disabled_features=*/
-    (std::vector<base::test::FeatureRef>{
-        syncer::kReplaceSyncPromosWithSignInPromos,
-        syncer::kReplaceSyncPromosWithSigninPromosNewSignin})) {
-  AccountInfo account_info = Signin();
-  supervised_user::UpdateSupervisionStatusForAccount(
-      account_info, identity_manager(),
-      /*is_subject_to_parental_controls=*/true);
-
-  // Check setup.
-  ASSERT_FALSE(profiles::IsGuestModeEnabled(*GetProfile()));
-
   RunTest();
 }
 
@@ -2253,7 +2122,6 @@ class ProfileMenuClickTestWithPasskeyError : public ProfileMenuClickTest {
 // added to this list.
 constexpr std::array kActionableItems_PasskeyUnlockError = {
     ProfileMenuViewBase::ActionableItem::kPasskeyUnlockButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kAccountSettingsButton,
@@ -2290,7 +2158,6 @@ PROFILE_MENU_CLICK_TEST_WITH_FEATURE_STATES_F(
 constexpr std::array
     kActionableItems_PasskeyUnlockError_WhenUnconsentedAccountSignedIn = {
         ProfileMenuViewBase::ActionableItem::kPasskeyUnlockButton,
-        ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
         ProfileMenuViewBase::ActionableItem::kManageGoogleAccountButton,
         ProfileMenuViewBase::ActionableItem::kEditProfileButton,
         ProfileMenuViewBase::ActionableItem::kAccountSettingsButton,
@@ -2349,7 +2216,6 @@ class ProfileMenuHatsSurveyTest : public ProfileMenuViewTestBase,
 // "Other Profile" item for selection.
 constexpr std::array kActionableItems_WithAnotherProfile = {
     ProfileMenuViewBase::ActionableItem::kSigninButton,
-    ProfileMenuViewBase::ActionableItem::kAutofillSettingsButton,
     ProfileMenuViewBase::ActionableItem::kEditProfileButton,
     ProfileMenuViewBase::ActionableItem::kOtherProfileButton,
     ProfileMenuViewBase::ActionableItem::kAddNewProfileButton,

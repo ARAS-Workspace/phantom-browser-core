@@ -125,14 +125,14 @@ suite('PerformancePageIndex', function() {
     // Case1: Results only in settings-performance-page
     let result = await index.searchContents('Performance issue alerts');
     assertFalse(result.canceled);
-    assertEquals(2, result.matchCount);
+    assertEquals(1, result.matchCount);
     assertFalse(result.wasClearSearch);
     assertVisibleViews(['performance'], ['memory', 'speed']);
 
     // Case2: Results only in settings-memory-page
     result = await index.searchContents('Memory Saver');
     assertFalse(result.canceled);
-    assertEquals(2, result.matchCount);
+    assertEquals(1, result.matchCount);
     assertFalse(result.wasClearSearch);
     assertVisibleViews(['memory'], ['performance', 'speed']);
 
@@ -142,12 +142,5 @@ suite('PerformancePageIndex', function() {
     assertEquals(1, result.matchCount);
     assertFalse(result.wasClearSearch);
     assertVisibleViews(['speed'], ['performance', 'memory']);
-
-    // Case4: Results in all cards (ignoring 'battery' which is hidden by
-    // default).
-    result = await index.searchContents('Learn more');
-    assertFalse(result.canceled);
-    assertFalse(result.wasClearSearch);
-    assertVisibleViews(['performance', 'memory', 'speed'], []);
   });
 });

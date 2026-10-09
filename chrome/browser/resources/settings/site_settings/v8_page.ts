@@ -13,7 +13,6 @@ import {PrefsMixin} from '/shared/settings/prefs/prefs_mixin.js';
 import {I18nMixin} from 'chrome://resources/cr_elements/i18n_mixin.js';
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
-import {SafeBrowsingSetting} from '../privacy_page/security/safe_browsing_types.js';
 import {SettingsViewMixin} from '../settings_page/settings_view_mixin.js';
 
 import {ContentSettingsTypes, JavascriptOptimizerSetting} from './constants.js';
@@ -53,14 +52,6 @@ export class V8PageElement extends V8PageElementBase {
   // SettingsViewMixin implementation.
   override focusBackButton() {
     this.shadowRoot!.querySelector('settings-subpage')!.focusBackButton();
-  }
-
-  private getBlockForUnfamiliarSitesSubLabel_(): string {
-    const safeBrowsingSetting = this.getPref('generated.safe_browsing').value;
-    return this.i18n(
-        safeBrowsingSetting === SafeBrowsingSetting.DISABLED
-            ? 'siteSettingsJavascriptOptimizerBlockedUnfamiliarSitesSafeBrowsingOffSubLabel'
-            : 'siteSettingsJavascriptOptimizerBlockedUnfamiliarSitesSubLabel');
   }
 }
 

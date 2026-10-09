@@ -155,7 +155,6 @@ source_set("browser_tests") {
 
   if (is_mac || is_linux) {
     sources += [
-      "on_device_translation_internals/on_device_translation_internals_browsertest.cc",
       "whats_new/whats_new_browsertest.cc",
     ]
   }
@@ -560,11 +559,9 @@ generate_grd("build_grd") {
 
   if (is_mac || is_linux) {
     deps += [
-      "on_device_translation_internals:build_grdp",
       "whats_new:build_grdp",
     ]
     grdp_files += [
-      "$target_gen_dir/on_device_translation_internals/resources.grdp",
       "$target_gen_dir/whats_new/resources.grdp",
     ]
   }

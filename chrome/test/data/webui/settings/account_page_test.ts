@@ -6,9 +6,8 @@ import 'chrome://settings/lazy_load.js';
 
 import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 import type {CrCollapseElement, CrExpandButtonElement, SettingsAccountPageElement, SettingsSyncEncryptionOptionsElement} from 'chrome://settings/lazy_load.js';
-import {loadTimeData, OpenWindowProxyImpl, resetRouterForTesting, Router, routes, SignedInState, StatusAction, SyncBrowserProxyImpl} from 'chrome://settings/settings.js';
+import {loadTimeData, resetRouterForTesting, Router, routes, SignedInState, StatusAction, SyncBrowserProxyImpl} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {TestOpenWindowProxy} from 'chrome://webui-test/test_open_window_proxy.js';
 import {isChildVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {getSyncAllPrefs, simulateStoredAccounts} from './sync_test_util.js';
@@ -18,7 +17,6 @@ import {TestSyncBrowserProxy} from './test_sync_browser_proxy.js';
 suite('AccountPage', function() {
   let accountSettingsPage: SettingsAccountPageElement;
   let testSyncBrowserProxy: TestSyncBrowserProxy;
-  let openWindowProxy: TestOpenWindowProxy;
   let encryptionElement: SettingsSyncEncryptionOptionsElement;
 
   setup(async function() {
@@ -26,7 +24,6 @@ suite('AccountPage', function() {
 
     loadTimeData.overrideValues({
       replaceSyncPromosWithSignInPromos: true,
-      isEeaChoiceCountry: false,
       // <if expr="is_chromeos">
       osSettingsAccountsPageUrl: 'chrome://os-settings/osPeople',
       // </if>
@@ -36,8 +33,6 @@ suite('AccountPage', function() {
     testSyncBrowserProxy = new TestSyncBrowserProxy();
     SyncBrowserProxyImpl.setInstance(testSyncBrowserProxy);
 
-    openWindowProxy = new TestOpenWindowProxy();
-    OpenWindowProxyImpl.setInstance(openWindowProxy);
 
     accountSettingsPage = createSettingsAccountPageElement();
     webUIListenerCallback('sync-prefs-changed', getSyncAllPrefs());
@@ -63,17 +58,6 @@ suite('AccountPage', function() {
     return element;
   }
 
-  async function assertElementLinksToUrl(element: string, url: string) {
-    openWindowProxy.resetResolver('openUrl');
-    const linkRow =
-        accountSettingsPage.shadowRoot.querySelector<HTMLElement>(element);
-    assertTrue(!!linkRow);
-    linkRow.click();
-    await microtasksFinished();
-    const openedUrl = await openWindowProxy.whenCalled('openUrl');
-    assertEquals(loadTimeData.getString(url), openedUrl);
-  }
-
   // Tests that all elements are visible.
   test('ShowCorrectRows', function() {
     assertEquals(routes.ACCOUNT, Router.getInstance().getCurrentRoute());
@@ -81,15 +65,12 @@ suite('AccountPage', function() {
     assertTrue(
         isChildVisible(accountSettingsPage, 'settings-sync-account-control'));
     assertTrue(isChildVisible(accountSettingsPage, 'settings-sync-controls'));
-    assertTrue(isChildVisible(accountSettingsPage, '#manage-google-account'));
     // <if expr="is_chromeos">
     assertTrue(isChildVisible(accountSettingsPage, '#manage-device-accounts'));
     // </if>
     // <if expr="not is_chromeos">
     assertFalse(isChildVisible(accountSettingsPage, '#manage-device-accounts'));
     // </if>
-    assertTrue(
-        isChildVisible(accountSettingsPage, '#activityControlsLinkRowV2'));
     assertTrue(isChildVisible(accountSettingsPage, '#encryptionDescription'));
     assertFalse(isChildVisible(accountSettingsPage, '#encryptionCollapse'));
   });
@@ -104,16 +85,6 @@ suite('AccountPage', function() {
     await microtasksFinished();
 
     assertEquals(routes.PEOPLE, Router.getInstance().getCurrentRoute());
-  });
-
-  test('RowsLinkToCorrectUrls', async function() {
-    await assertElementLinksToUrl('#manage-google-account', 'googleAccountUrl');
-    // <if expr="is_chromeos">
-    await assertElementLinksToUrl(
-        '#manage-device-accounts', 'osSettingsAccountsPageUrl');
-    // </if>
-    await assertElementLinksToUrl(
-        '#activityControlsLinkRowV2', 'activityControlsUrl');
   });
 
   // Tests the Advanced Sync Settings
@@ -177,53 +148,5 @@ suite('AccountPage', function() {
             .querySelector<HTMLElement>('#encryptionDescription')!.hidden);
     assertFalse(!!encryptionElement.shadowRoot.querySelector(
         '#encryptionRadioGroupContainer'));
-  });
-
-  test('EEAChoiceCountry', async function() {
-    loadTimeData.overrideValues({
-      isEeaChoiceCountry: true,
-    });
-    resetRouterForTesting();
-    accountSettingsPage = createSettingsAccountPageElement();
-    Router.getInstance().navigateTo(routes.ACCOUNT);
-    await microtasksFinished();
-
-    assertFalse(
-        isChildVisible(accountSettingsPage, '#activityControlsLinkRowV2'));
-    assertTrue(
-        isChildVisible(accountSettingsPage, '#personalizationExpandButton'));
-
-    // The personalization section is collapsed by default.
-    const personalizationCollapse =
-        accountSettingsPage.shadowRoot.querySelector<CrCollapseElement>(
-            '#personalizationCollapse');
-    assertTrue(!!personalizationCollapse);
-    assertFalse(personalizationCollapse.opened);
-
-    // Clicking the expand-button expands the collapse.
-    const expandButton =
-        accountSettingsPage.shadowRoot.querySelector<HTMLElement>(
-            '#personalizationExpandButton');
-    assertTrue(!!expandButton);
-    expandButton.click();
-    await microtasksFinished();
-    assertTrue(personalizationCollapse.opened);
-
-    // Clicking the expand-button again collapses the collapse.
-    expandButton.click();
-    await microtasksFinished();
-    assertFalse(personalizationCollapse.opened);
-
-    // The linkedServices row is only visible when the collapse is expanded.
-    expandButton.click();
-    await microtasksFinished();
-
-    const linkedServicesLinkRow =
-        accountSettingsPage.shadowRoot.querySelector<HTMLElement>(
-            '#linkedServicesLinkRow');
-    assertTrue(!!linkedServicesLinkRow);
-    linkedServicesLinkRow.click();
-    const url = await openWindowProxy.whenCalled('openUrl');
-    assertEquals(loadTimeData.getString('linkedServicesUrl'), url);
   });
 });

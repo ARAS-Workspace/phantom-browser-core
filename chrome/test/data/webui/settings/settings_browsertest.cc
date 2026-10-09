@@ -269,11 +269,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest,
           "runMochaSuite('SyncSettingsWithReplaceSyncPromosWithSignInPromos')");
 }
 
-IN_PROC_BROWSER_TEST_F(SettingsTest, EEAChoiceCountry) {
-  RunTest("settings/people_page_sync_page_test.js",
-          "runMochaSuite('EEAChoiceCountry')");
-}
-
 IN_PROC_BROWSER_TEST_F(SettingsTest, FeatureShortcutsPage) {
   RunTest("settings/feature_shortcuts_page_test.js", "mocha.run()");
 }
@@ -651,10 +646,6 @@ IN_PROC_BROWSER_TEST_F(SettingsPrivacyPageTest,
 
 IN_PROC_BROWSER_TEST_F(SettingsPrivacyPageTest, CookiesSubpage) {
   RunTest("settings/privacy_page_test.js", "runMochaSuite('CookiesSubpage')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyPageTest, PrivacyGuideRow) {
-  RunTest("settings/privacy_page_test.js", "runMochaSuite('PrivacyGuideRow')");
 }
 
 // TODO(crbug.com/40710522): flaky failure on multiple platforms

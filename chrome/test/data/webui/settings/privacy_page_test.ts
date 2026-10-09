@@ -3,14 +3,13 @@
 // found in the LICENSE file.
 
 // clang-format off
-import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {CrToastElement} from 'chrome://settings/lazy_load.js';
 import {ClearBrowsingDataBrowserProxyImpl, CookieControlsMode} from 'chrome://settings/lazy_load.js';
-import type {CrLinkRowElement, SettingsPrefsElement, SettingsPrivacyPageElement, SyncStatus} from 'chrome://settings/settings.js';
-import {CrSettingsPrefs, HatsBrowserProxyImpl, loadTimeData, MetricsBrowserProxyImpl, PrivacyGuideInteractions, resetRouterForTesting, Router, routes, StatusAction, TrustSafetyInteraction} from 'chrome://settings/settings.js';
+import type {CrLinkRowElement, SettingsPrefsElement, SettingsPrivacyPageElement} from 'chrome://settings/settings.js';
+import {CrSettingsPrefs, HatsBrowserProxyImpl, MetricsBrowserProxyImpl, resetRouterForTesting, Router, routes, TrustSafetyInteraction} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {eventToPromise, isChildVisible} from 'chrome://webui-test/test_util.js';
+import {eventToPromise} from 'chrome://webui-test/test_util.js';
 import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
 
 import {TestClearBrowsingDataBrowserProxy} from './test_clear_browsing_data_browser_proxy.js';
@@ -184,102 +183,6 @@ suite('CookiesSubpageRedesignDisabled', function() {
         assertEquals(
             page.i18n('thirdPartyCookiesLinkRowSublabelDisabled'),
             thirdPartyCookiesLinkRow.subLabel);
-  });
-});
-
-suite('PrivacyGuideRow', function() {
-  let page: SettingsPrivacyPageElement;
-  let settingsPrefs: SettingsPrefsElement;
-  let metricsBrowserProxy: TestMetricsBrowserProxy;
-
-  suiteSetup(function() {
-    settingsPrefs = document.createElement('settings-prefs');
-    return CrSettingsPrefs.initialized;
-  });
-
-  setup(function() {
-    loadTimeData.overrideValues({showPrivacyGuide: true});
-    resetRouterForTesting();
-
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-
-    metricsBrowserProxy = new TestMetricsBrowserProxy();
-    MetricsBrowserProxyImpl.setInstance(metricsBrowserProxy);
-
-    page = document.createElement('settings-privacy-page');
-    page.prefs = settingsPrefs.prefs!;
-    document.body.appendChild(page);
-    return flushTasks();
-  });
-
-  test('rowNotShown', async function() {
-    loadTimeData.overrideValues({showPrivacyGuide: false});
-    resetRouterForTesting();
-
-    page.remove();
-    page = document.createElement('settings-privacy-page');
-    document.body.appendChild(page);
-
-    await flushTasks();
-    assertFalse(
-        loadTimeData.getBoolean('showPrivacyGuide'),
-        'showPrivacyGuide was not overwritten');
-    assertFalse(
-        isChildVisible(page, '#privacyGuideLinkRow'),
-        'privacyGuideLinkRow is visible');
-  });
-
-  test('privacyGuideRowVisibleSupervisedAccount', function() {
-    assertTrue(isChildVisible(page, '#privacyGuideLinkRow'));
-
-    // The user signs in to a supervised user account. This hides the privacy
-    // guide entry point.
-    const syncStatus: SyncStatus = {
-      supervisedUser: true,
-      statusAction: StatusAction.NO_ACTION,
-    };
-    webUIListenerCallback('sync-status-changed', syncStatus);
-    flush();
-    assertFalse(isChildVisible(page, '#privacyGuideLinkRow'));
-
-    // The user is no longer signed in to a supervised user account. This
-    // doesn't show the entry point.
-    syncStatus.supervisedUser = false;
-    webUIListenerCallback('sync-status-changed', syncStatus);
-    flush();
-    assertFalse(isChildVisible(page, '#privacyGuideLinkRow'));
-  });
-
-  test('privacyGuideRowVisibleManaged', function() {
-    assertTrue(isChildVisible(page, '#privacyGuideLinkRow'));
-
-    // The user becomes managed. This hides the privacy guide entry point.
-    webUIListenerCallback('is-managed-changed', true);
-    flush();
-    assertFalse(isChildVisible(page, '#privacyGuideLinkRow'));
-
-    // The user is no longer managed. This doesn't show the entry point.
-    webUIListenerCallback('is-managed-changed', false);
-    flush();
-    assertFalse(isChildVisible(page, '#privacyGuideLinkRow'));
-  });
-
-  test('privacyGuideRowClick', async function() {
-    const privacyGuideLinkRow =
-        page.shadowRoot!.querySelector<HTMLElement>('#privacyGuideLinkRow');
-    assertTrue(!!privacyGuideLinkRow);
-    privacyGuideLinkRow.click();
-
-    const result = await metricsBrowserProxy.whenCalled(
-        'recordPrivacyGuideEntryExitHistogram');
-    assertEquals(PrivacyGuideInteractions.SETTINGS_LINK_ROW_ENTRY, result);
-
-    // Ensure the correct route has been navigated to.
-    assertEquals(routes.PRIVACY_GUIDE, Router.getInstance().getCurrentRoute());
-
-    // Ensure the privacy guide dialog is shown.
-    assertTrue(
-        !!page.shadowRoot!.querySelector<HTMLElement>('#privacyGuideDialog'));
   });
 });
 

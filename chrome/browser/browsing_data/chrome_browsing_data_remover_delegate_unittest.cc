@@ -44,7 +44,6 @@
 #include "base/uuid.h"
 #include "build/build_config.h"
 #include "chrome/browser/autocomplete/zero_suggest_cache_service_factory.h"
-#include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_remover_constants.h"
@@ -80,7 +79,6 @@
 
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
 #include "chrome/browser/storage/persistent_storage_permission_context.h"
-#include "chrome/browser/strike_database/strike_database_factory.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/trusted_vault/trusted_vault_service_factory.h"
@@ -96,16 +94,6 @@
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
-#include "components/autofill/core/browser/data_manager/addresses/address_data_manager.h"
-#include "components/autofill/core/browser/data_manager/payments/payments_data_manager.h"
-#include "components/autofill/core/browser/data_manager/personal_data_manager.h"
-#include "components/autofill/core/browser/data_manager/personal_data_manager_test_utils.h"
-#include "components/autofill/core/browser/data_model/addresses/autofill_profile.h"
-#include "components/autofill/core/browser/data_model/payments/credit_card.h"
-#include "components/autofill/core/browser/test_utils/autofill_test_utils.h"
-#include "components/autofill/core/browser/test_utils/test_autofill_clock.h"
-#include "components/autofill/core/common/autofill_constants.h"
-#include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/test/bookmark_test_helpers.h"
@@ -169,7 +157,6 @@
 #include "components/segmentation_platform/public/features.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "components/site_isolation/pref_names.h"
-#include "components/strike_database/strike_database.h"
 #include "components/sync/test/test_sync_service.h"
 #include "components/ukm/test_ukm_recorder.h"
 #include "content/public/browser/background_tracing.h"
@@ -751,39 +738,6 @@ base::RepeatingCallback<bool(const GURL&)> CreateUrlFilterFromOriginFilter(
   });
 }
 
-class RemoveAutofillTester {
- public:
-  explicit RemoveAutofillTester(TestingProfile* profile)
-      : personal_data_manager_(
-            autofill::PersonalDataManagerFactory::GetForBrowserContext(
-                profile)) {}
-
-  RemoveAutofillTester(const RemoveAutofillTester&) = delete;
-  RemoveAutofillTester& operator=(const RemoveAutofillTester&) = delete;
-
-  // Returns true if there is at least one address and one card.
-  bool HasProfileAndCard() const {
-    return !personal_data_manager_->address_data_manager()
-                .GetProfiles()
-                .empty() &&
-           !personal_data_manager_->payments_data_manager()
-                .GetCreditCards()
-                .empty();
-  }
-
-  // Add one profile and one credit cards to the database.
-  void AddProfileAndCard() {
-    personal_data_manager_->address_data_manager().AddProfile(
-        autofill::test::GetFullProfile());
-    personal_data_manager_->payments_data_manager().AddCreditCard(
-        autofill::test::GetCreditCard());
-    autofill::PersonalDataChangedWaiter(*personal_data_manager_).Wait();
-  }
-
- private:
-  raw_ptr<autofill::PersonalDataManager> personal_data_manager_;
-};
-
 std::unique_ptr<KeyedService> BuildSyncService(
     content::BrowserContext* context) {
   // Build with sync disabled by default.
@@ -946,29 +900,6 @@ class MockNetworkErrorLoggingService : public net::NetworkErrorLoggingService {
 };
 
 #endif  // BUILDFLAG(ENABLE_REPORTING)
-
-// StrikeDatabaseTester is in the autofill namespace since
-// StrikeDatabase declares it as a friend in the autofill namespace.
-class StrikeDatabaseTester {
- public:
-  explicit StrikeDatabaseTester(Profile* profile)
-      : strike_database_(StrikeDatabaseFactory::GetForProfile(profile)) {}
-
-  bool IsEmpty() {
-    int num_keys;
-    base::RunLoop run_loop;
-    strike_database_->LoadKeys(base::BindLambdaForTesting(
-        [&](bool success, std::unique_ptr<std::vector<std::string>> keys) {
-          num_keys = keys.get()->size();
-          run_loop.Quit();
-        }));
-    run_loop.Run();
-    return (num_keys == 0);
-  }
-
- private:
-  const raw_ptr<strike_database::StrikeDatabase> strike_database_;
-};
 
 // Test Class -----------------------------------------------------------------
 
@@ -1849,108 +1780,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateEnabledUkmDatabaseTest, RemoveUkmUrls) {
 
   EXPECT_FALSE(tester_->UkmDatabaseContainsURL(kOrigin1));
   EXPECT_FALSE(tester_->UkmDatabaseContainsURL(kOrigin2));
-}
-
-// Verify that clearing autofill form data works.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, AutofillRemovalLastHour) {
-  RemoveAutofillTester tester(GetProfile());
-  // Initialize sync service so that PersonalDatabaseHelper::server_database_
-  // gets initialized:
-  SyncServiceFactory::GetForProfile(GetProfile());
-
-  ASSERT_FALSE(tester.HasProfileAndCard());
-  tester.AddProfileAndCard();
-  ASSERT_TRUE(tester.HasProfileAndCard());
-
-  BlockUntilBrowsingDataRemoved(AnHourAgo(), base::Time::Max(),
-                                constants::DATA_TYPE_FORM_DATA, false);
-
-  EXPECT_EQ(constants::DATA_TYPE_FORM_DATA, GetRemovalMask());
-  EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
-            GetOriginTypeMask());
-  ASSERT_FALSE(tester.HasProfileAndCard());
-}
-
-// Verify the clearing of autofill profiles added / modified more than 30 days
-// ago.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, AutofillRemovalOlderThan30Days) {
-  RemoveAutofillTester tester(GetProfile());
-  // Initialize sync service so that PersonalDatabaseHelper::server_database_
-  // gets initialized:
-  SyncServiceFactory::GetForProfile(GetProfile());
-
-  const base::Time k32DaysOld = base::Time::Now();
-  task_environment()->AdvanceClock(base::Days(1));
-  const base::Time k31DaysOld = base::Time::Now();
-  task_environment()->AdvanceClock(base::Days(1));
-  const base::Time k30DaysOld = base::Time::Now();
-  task_environment()->AdvanceClock(base::Days(30));
-
-  // Add profiles and cards with modification date as 31 days old from now.
-  autofill::TestAutofillClock test_clock;
-  test_clock.SetNow(k31DaysOld);
-
-  ASSERT_FALSE(tester.HasProfileAndCard());
-  tester.AddProfileAndCard();
-  ASSERT_TRUE(tester.HasProfileAndCard());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), k32DaysOld,
-                                constants::DATA_TYPE_FORM_DATA, false);
-  ASSERT_TRUE(tester.HasProfileAndCard());
-
-  BlockUntilBrowsingDataRemoved(k30DaysOld, base::Time::Max(),
-                                constants::DATA_TYPE_FORM_DATA, false);
-  ASSERT_TRUE(tester.HasProfileAndCard());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), k30DaysOld,
-                                constants::DATA_TYPE_FORM_DATA, false);
-  EXPECT_EQ(constants::DATA_TYPE_FORM_DATA, GetRemovalMask());
-  EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
-            GetOriginTypeMask());
-  ASSERT_FALSE(tester.HasProfileAndCard());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, AutofillRemovalEverything) {
-  RemoveAutofillTester tester(GetProfile());
-  // Initialize sync service so that PersonalDatabaseHelper::server_database_
-  // gets initialized:
-  SyncServiceFactory::GetForProfile(GetProfile());
-
-  ASSERT_FALSE(tester.HasProfileAndCard());
-  tester.AddProfileAndCard();
-  ASSERT_TRUE(tester.HasProfileAndCard());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_FORM_DATA, false);
-
-  EXPECT_EQ(constants::DATA_TYPE_FORM_DATA, GetRemovalMask());
-  EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
-            GetOriginTypeMask());
-  ASSERT_FALSE(tester.HasProfileAndCard());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       StrikeDatabaseEmptyOnAutofillRemoveEverything) {
-  RemoveAutofillTester tester(GetProfile());
-  // Initialize sync service so that PersonalDatabaseHelper::server_database_
-  // gets initialized:
-  SyncServiceFactory::GetForProfile(GetProfile());
-
-  ASSERT_FALSE(tester.HasProfileAndCard());
-  tester.AddProfileAndCard();
-  ASSERT_TRUE(tester.HasProfileAndCard());
-
-  StrikeDatabaseTester strike_database_tester(GetProfile());
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_FORM_DATA, false);
-
-  // StrikeDatabase should be empty when DATA_TYPE_FORM_DATA browsing data
-  // gets deleted.
-  ASSERT_TRUE(strike_database_tester.IsEmpty());
-  EXPECT_EQ(constants::DATA_TYPE_FORM_DATA, GetRemovalMask());
-  EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
-            GetOriginTypeMask());
-  ASSERT_FALSE(tester.HasProfileAndCard());
 }
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest,
@@ -3231,6 +3060,7 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, AllTypesAreGettingDeleted) {
 
       // No remaining code writes or clears this type.
       ContentSettingsType::PASSWORD_PROTECTION,
+      ContentSettingsType::SAFE_BROWSING_URL_CHECK_DATA,
   };
 
   // Set a value for every WebsiteSetting.

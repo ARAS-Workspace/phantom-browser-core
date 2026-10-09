@@ -5,8 +5,8 @@
 // clang-format off
 import 'chrome://settings/lazy_load.js';
 
-import type {CrCheckboxElement, SettingsResetPageElement, SettingsResetProfileDialogElement} from 'chrome://settings/lazy_load.js';
-import {ResetBrowserProxyImpl, Router, routes} from 'chrome://settings/settings.js';
+import type {SettingsResetPageElement, SettingsResetProfileDialogElement} from 'chrome://settings/lazy_load.js';
+import {ResetBrowserProxyImpl, routes} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
@@ -17,10 +17,6 @@ import {TestResetBrowserProxy} from './test_reset_browser_proxy.js';
 const TestNames = {
   ResetProfileDialogAction: 'ResetProfileDialogAction',
   ResetProfileDialogOpenClose: 'ResetProfileDialogOpenClose',
-  ResetProfileDialogOriginUnknown: 'ResetProfileDialogOriginUnknown',
-  ResetProfileDialogOriginUserClick: 'ResetProfileDialogOriginUserClick',
-  ResetProfileDialogOriginTriggeredReset:
-      'ResetProfileDialogOriginTriggeredReset',
 };
 
 suite('DialogTests', function() {
@@ -45,8 +41,6 @@ suite('DialogTests', function() {
    */
   async function testOpenCloseResetProfileDialog(
       closeDialogFn: (dialog: SettingsResetProfileDialogElement) => void) {
-    resetPageBrowserProxy.resetResolver('onShowResetProfileDialog');
-    resetPageBrowserProxy.resetResolver('onHideResetProfileDialog');
 
     // Open reset profile dialog.
     resetPage.$.resetProfile.click();
@@ -58,12 +52,8 @@ suite('DialogTests', function() {
 
     const whenDialogClosed = eventToPromise('close', dialog);
 
-    await resetPageBrowserProxy.whenCalled('onShowResetProfileDialog');
     closeDialogFn(dialog);
-    await Promise.all([
-      whenDialogClosed,
-      resetPageBrowserProxy.whenCalled('onHideResetProfileDialog'),
-    ]);
+    await whenDialogClosed;
   }
 
   // Tests that the reset profile dialog opens and closes correctly and that
@@ -90,18 +80,6 @@ suite('DialogTests', function() {
         resetPage.shadowRoot.querySelector('settings-reset-profile-dialog');
     assertTrue(!!dialog);
 
-    const checkbox = dialog.shadowRoot.querySelector<CrCheckboxElement>(
-        '[slot=footer] cr-checkbox')!;
-    assertTrue(checkbox.checked);
-    const showReportedSettingsLink =
-        dialog.shadowRoot.querySelector<HTMLElement>('[slot=footer] a');
-    assertTrue(!!showReportedSettingsLink);
-    showReportedSettingsLink.click();
-
-    await resetPageBrowserProxy.whenCalled('showReportedSettings');
-    // Ensure that the checkbox was not toggled as a result of
-    // clicking the link.
-    assertTrue(checkbox.checked);
     assertFalse(dialog.$.reset.disabled);
     const spinner = dialog.shadowRoot.querySelector('.spinner');
     assertTrue(!!spinner);
@@ -114,35 +92,6 @@ suite('DialogTests', function() {
 
     resetPageBrowserProxy.resolvePerformResetProfileSettings();
     await resetPageBrowserProxy.whenCalled('performResetProfileSettings');
-  });
-
-  async function testResetRequestOrigin(expectedOrigin: string) {
-    const dialog =
-        resetPage.shadowRoot.querySelector('settings-reset-profile-dialog');
-    assertTrue(!!dialog);
-    await microtasksFinished();
-    dialog.$.reset.click();
-    const resetRequest =
-        await resetPageBrowserProxy.whenCalled('performResetProfileSettings');
-    assertEquals(expectedOrigin, resetRequest);
-  }
-
-  test(TestNames.ResetProfileDialogOriginUnknown, async function() {
-    Router.getInstance().navigateTo(routes.RESET_DIALOG);
-    await resetPageBrowserProxy.whenCalled('onShowResetProfileDialog');
-    await testResetRequestOrigin('');
-  });
-
-  test(TestNames.ResetProfileDialogOriginUserClick, async function() {
-    resetPage.$.resetProfile.click();
-    await resetPageBrowserProxy.whenCalled('onShowResetProfileDialog');
-    await testResetRequestOrigin('userclick');
-  });
-
-  test(TestNames.ResetProfileDialogOriginTriggeredReset, async function() {
-    Router.getInstance().navigateTo(routes.TRIGGERED_RESET_DIALOG);
-    await resetPageBrowserProxy.whenCalled('onShowResetProfileDialog');
-    await testResetRequestOrigin('triggeredreset');
   });
 
   test('searchContents', async function() {

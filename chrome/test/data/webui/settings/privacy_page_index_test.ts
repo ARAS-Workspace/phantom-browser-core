@@ -36,7 +36,6 @@ suite('PrivacyPageIndex', function() {
           enablePaymentHandlerContentSetting: false,
           enablePersistentPermissions: false,
           enableSafeBrowsingSubresourceFilter: false,
-          enableSecurityKeysSubpage: false,
           // <if expr="is_chromeos">
           enableSmartCardReadersContentSetting: false,
           enableWebPrintingContentSetting: false,
@@ -92,7 +91,7 @@ suite('PrivacyPageIndex', function() {
 
   suite('Main', function() {
     test('Routing', async function() {
-      const defaultViews = ['privacy', 'privacyGuidePromo'];
+      const defaultViews = ['privacy'];
 
       await testViewsForRoute(routes.PRIVACY, defaultViews);
       await testViewsForRoute(routes.BASIC, defaultViews);
@@ -128,13 +127,6 @@ suite('PrivacyPageIndex', function() {
           !!index.shadowRoot!.querySelector('settings-security-page-v2'));
     });
 
-    test('RoutingSecurityKeys', async function() {
-      assertFalse(loadTimeData.getBoolean('enableSecurityKeysSubpage'));
-      await createPrivacyPageIndex({enableSecurityKeysSubpage: true});
-      return testViewsForRoute(
-          routes.SECURITY_KEYS, ['securityKeys'], 'privacy');
-    });
-
     // <if expr="is_chromeos">
     test('RoutingGuestMode', async function() {
       assertFalse(loadTimeData.getBoolean('isGuest'));
@@ -152,13 +144,7 @@ suite('PrivacyPageIndex', function() {
       await flushTasks();
 
       // Case1: Results within the "Privacy and security" card.
-      let result = await index.searchContents('Privacy and security');
-      assertFalse(result.canceled);
-      assertTrue(result.matchCount > 0);
-      assertFalse(result.wasClearSearch);
-
-      // Case2: Results within the "Safety check" card.
-      result = await index.searchContents('Safety check');
+      const result = await index.searchContents('Privacy and security');
       assertFalse(result.canceled);
       assertTrue(result.matchCount > 0);
       assertFalse(result.wasClearSearch);

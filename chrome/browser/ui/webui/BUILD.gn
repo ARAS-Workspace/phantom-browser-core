@@ -173,7 +173,6 @@ source_set("configs") {
   if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/webui/browser_switch",
-      "//chrome/browser/ui/webui/on_device_translation_internals",
     ]
   }
 

@@ -213,7 +213,6 @@
 #include "media/mojo/mojom/renderer_extensions.mojom.h"
 #include "media/mojo/mojom/speech_recognition.mojom.h"  // nogncheck
 #include "third_party/blink/public/mojom/hid/hid.mojom.h"
-#include "third_party/blink/public/mojom/installedapp/installed_app_provider.mojom.h"
 
 #if BUILDFLAG(IS_P2P_ENABLED)
 #include "services/network/public/mojom/p2p.mojom.h"
@@ -1245,10 +1244,6 @@ void PopulateBinderMapWithContext(
         &BindRenderFrameHostImpl<
             &RenderFrameHostImpl::BindInputInjectorReceiver>);
   }
-
-  map->Add<blink::mojom::InstalledAppProvider>(
-      &BindRenderFrameHostImpl<
-          &RenderFrameHostImpl::CreateInstalledAppProvider>);
 
   map->Add<blink::mojom::HidService>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::GetHidService>);

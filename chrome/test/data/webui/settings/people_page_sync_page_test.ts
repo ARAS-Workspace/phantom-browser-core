@@ -12,10 +12,8 @@ import type {CrDialogElement} from 'chrome://settings/lazy_load.js';
 // </if>
 import type {CrCollapseElement} from 'chrome://settings/lazy_load.js';
 import type {CrButtonElement, CrRadioButtonElement, CrRadioGroupElement} from 'chrome://settings/settings.js';
-import {MetricsBrowserProxyImpl} from 'chrome://settings/settings.js';
-import {loadTimeData, OpenWindowProxyImpl, PageStatus, PrefService, PrefsBrowserProxy, resetRouterForTesting, Router, routes, SignedInState, StatusAction, SyncBrowserProxyImpl} from 'chrome://settings/settings.js';
+import {loadTimeData, PageStatus, PrefService, PrefsBrowserProxy, resetRouterForTesting, Router, routes, SignedInState, StatusAction, SyncBrowserProxyImpl} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {TestOpenWindowProxy} from 'chrome://webui-test/test_open_window_proxy.js';
 import {isChildVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestPrefsBrowserProxy} from './test_prefs_browser_proxy.js';
@@ -27,7 +25,6 @@ import {simulateStoredAccounts} from './sync_test_util.js';
 // </if>
 
 import {getSyncAllPrefs} from './sync_test_util.js';
-import {TestMetricsBrowserProxy} from './test_metrics_browser_proxy.js';
 import {TestSyncBrowserProxy} from './test_sync_browser_proxy.js';
 
 // clang-format on
@@ -189,8 +186,6 @@ suite('SyncSettings', function() {
     assertEquals(otherItems.querySelectorAll('cr-expand-button').length, 1);
 
     assertTrue(isChildVisible(syncPage, '#sync-advanced-row'));
-    assertTrue(isChildVisible(syncPage, '#activityControlsLinkRowV2'));
-    assertFalse(isChildVisible(syncPage, '#personalizationExpandButton'));
 
     // Test sync paused state.
     webUIListenerCallback('sync-status-changed', {
@@ -378,22 +373,6 @@ suite('SyncSettings', function() {
     assertEquals(
         'Your data is encrypted with your sync passphrase. Enter it to start' +
             ' sync.',
-        enterPassphraseLabel.innerText);
-  });
-
-  test('EnterPassphraseLabelWhenHasPassphraseTime', async () => {
-    const prefs = getSyncAllPrefs();
-    prefs.encryptAllData = true;
-    prefs.passphraseRequired = true;
-    prefs.explicitPassphraseTime = 'Jan 01, 1970';
-    webUIListenerCallback('sync-prefs-changed', prefs);
-    await microtasksFinished();
-    const enterPassphraseLabel = syncPage.shadowRoot.querySelector<HTMLElement>(
-        '#enterPassphraseLabel')!;
-
-    assertEquals(
-        `Your data was encrypted with your sync passphrase on ${
-            prefs.explicitPassphraseTime}. Enter it to start sync.`,
         enterPassphraseLabel.innerText);
   });
 
@@ -815,102 +794,6 @@ suite('SyncSettingsWithReplaceSyncPromosWithSignInPromos', function() {
 
   test('DontShowPageWhenReplacingWithSigninPromoAndNotSyncing', function() {
     assertEquals(routes.PEOPLE, Router.getInstance().getCurrentRoute());
-  });
-});
-
-suite('EEAChoiceCountry', function() {
-  let syncPage: SettingsSyncPageElement;
-  let openWindowProxy: TestOpenWindowProxy;
-  let metricsBrowserProxy: TestMetricsBrowserProxy;
-  let browserProxy: TestSyncBrowserProxy;
-
-  suiteSetup(function() {
-    loadTimeData.overrideValues({
-      signinAllowed: true,
-      isEeaChoiceCountry: true,
-    });
-  });
-
-  setup(async function() {
-    const prefsBrowserProxy = new TestPrefsBrowserProxy(getInitialPrefs());
-    PrefsBrowserProxy.setInstance(prefsBrowserProxy);
-    PrefService.resetInstanceForTesting();
-    await PrefService.getInstance().whenInitialized();
-
-    browserProxy = new TestSyncBrowserProxy();
-    SyncBrowserProxyImpl.setInstance(browserProxy);
-
-    metricsBrowserProxy = new TestMetricsBrowserProxy();
-    MetricsBrowserProxyImpl.setInstance(metricsBrowserProxy);
-    openWindowProxy = new TestOpenWindowProxy();
-    OpenWindowProxyImpl.setInstance(openWindowProxy);
-
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    Router.getInstance().navigateTo(Router.getInstance().getRoutes().SYNC);
-    syncPage = document.createElement('settings-sync-page');
-    document.body.appendChild(syncPage);
-
-    // Start with Sync All with no encryption selected. Also, ensure
-    // that this is not a supervised user, so that Sync Passphrase is
-    // enabled.
-    webUIListenerCallback('sync-prefs-changed', getSyncAllPrefs());
-    webUIListenerCallback('sync-status-changed', {
-      signedInState: SignedInState.SYNCING,
-      supervisedUser: false,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    await microtasksFinished();
-  });
-
-  teardown(function() {
-    syncPage.remove();
-  });
-
-  test('personalizationControlsVisibility', function() {
-    assertFalse(isChildVisible(syncPage, '#activityControlsLinkRowV2'));
-    assertTrue(isChildVisible(syncPage, '#personalizationExpandButton'));
-  });
-
-  test('personalizationCollapse', async function() {
-    // The collapse is collapsed by default.
-    const personalizationCollapse =
-        syncPage.shadowRoot.querySelector<CrCollapseElement>(
-            '#personalizationCollapse');
-    assertTrue(!!personalizationCollapse);
-    assertFalse(personalizationCollapse.opened);
-
-    // Clicking the expand-button expands the collapse.
-    const expandButton = syncPage.shadowRoot.querySelector<HTMLElement>(
-        '#personalizationExpandButton');
-    assertTrue(!!expandButton);
-    expandButton.click();
-    await microtasksFinished();
-    assertTrue(personalizationCollapse.opened);
-
-    // Clicking the expand-button again collapses the collapse.
-    expandButton.click();
-    await microtasksFinished();
-    assertFalse(personalizationCollapse.opened);
-  });
-
-  test('linkedServicesClick', async function() {
-    // The linkedServices row is only visible when the collapse is expanded.
-    const expandButton = syncPage.shadowRoot.querySelector<HTMLElement>(
-        '#personalizationExpandButton');
-    assertTrue(!!expandButton);
-    expandButton.click();
-    await microtasksFinished();
-
-    const linkedServicesLinkRow =
-        syncPage.shadowRoot.querySelector<HTMLElement>(
-            '#linkedServicesLinkRow');
-    assertTrue(!!linkedServicesLinkRow);
-    linkedServicesLinkRow.click();
-    assertEquals(
-        'Sync_OpenLinkedServicesPage',
-        await metricsBrowserProxy.whenCalled('recordAction'));
-    const url = await openWindowProxy.whenCalled('openUrl');
-    assertEquals(loadTimeData.getString('linkedServicesUrl'), url);
   });
 });
 

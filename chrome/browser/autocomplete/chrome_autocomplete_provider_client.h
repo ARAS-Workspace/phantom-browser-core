@@ -24,7 +24,6 @@ class Profile;
 class TabMatcher;
 
 namespace content {
-class StoragePartition;
 class WebContents;
 }  // namespace content
 
@@ -119,7 +118,6 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
       history::KeywordID keyword_id,
       const std::u16string& term) override;
   void PrefetchImage(const GURL& url) override;
-  void StartServiceWorker(const GURL& destination_url) override;
   const TabMatcher& GetTabMatcher() const override;
   bool IsIncognitoModeAvailable() const override;
   bool IsSharingHubAvailable() const override;
@@ -137,11 +135,6 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
   void CloseIncognitoWindows() override;
   bool OpenJourneys(const std::string& query) override;
 
-  // For testing.
-  void set_storage_partition(content::StoragePartition* storage_partition) {
-    storage_partition_ = storage_partition;
-  }
-
  private:
   raw_ptr<Profile> profile_;
   // Callback to get the current WebContents. In the context of the Omnibox, it
@@ -155,9 +148,6 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
   std::unique_ptr<unified_consent::UrlKeyedDataCollectionConsentHelper>
       personalized_url_consent_helper_;
   TabMatcherDesktop tab_matcher_;
-
-  // Injectable storage partitiion, used for testing.
-  raw_ptr<content::StoragePartition> storage_partition_;
 
   std::unique_ptr<OmniboxTriggeredFeatureService>
       omnibox_triggered_feature_service_;

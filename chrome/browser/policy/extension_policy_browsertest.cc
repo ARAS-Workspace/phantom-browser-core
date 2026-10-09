@@ -1452,6 +1452,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
 IN_PROC_BROWSER_TEST_F(
     ExtensionPolicyTest,
     MAYBE_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired) {
+  // Mark as enterprise managed.
+  policy::ScopedDomainEnterpriseManagement scoped_domain;
   ignore_content_verifier_.reset();
   ExtensionRequestInterceptor interceptor;
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -2040,7 +2042,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
                        ExtensionMinimumVersionForceInstalled) {
   ExtensionRequestInterceptor interceptor;
 
-// Mark as enterprise managed.
+  // Mark as enterprise managed.
+  policy::ScopedDomainEnterpriseManagement scoped_domain;
   extensions::ExtensionRegistry* registry = extension_registry();
   extensions::ExtensionPrefs* extension_prefs =
       extensions::ExtensionPrefs::Get(profile());

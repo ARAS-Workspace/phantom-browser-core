@@ -8,7 +8,7 @@ import 'chrome://settings/lazy_load.js';
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {SettingsDoNotTrackToggleElement} from 'chrome://settings/lazy_load.js';
 import type {SettingsToggleButtonElement} from 'chrome://settings/settings.js';
-import {loadTimeData, MetricsBrowserProxyImpl, PrivacyElementInteractions} from 'chrome://settings/settings.js';
+import {MetricsBrowserProxyImpl, PrivacyElementInteractions} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 
 import {TestMetricsBrowserProxy} from './test_metrics_browser_proxy.js';
@@ -55,10 +55,6 @@ suite('CrSettingsDoNotTrackToggleTest', function() {
     flush();
     assertTrue(toggle().checked);
 
-    assertEquals(
-        testElement.shadowRoot!.querySelector<HTMLAnchorElement>(
-                                   'a[href]')!.getAttribute('aria-description'),
-        loadTimeData.getString('opensInNewTab'));
     testElement.shadowRoot!.querySelector<HTMLElement>(
                                '.cancel-button')!.click();
     assertFalse(toggle().checked);

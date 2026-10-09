@@ -185,7 +185,6 @@ include_rules = [
   "+components/infobars/content",
   "+components/infobars/core",
   "+components/input",
-  "+components/installedapp",
   "+components/javascript_dialogs",
   "+components/keep_alive_registry",
   "+components/keyed_service/content",

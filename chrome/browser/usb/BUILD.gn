@@ -223,43 +223,6 @@ if (is_linux || is_mac) {
   }
 }
 
-# Shared test support across Win/Mac/Linux/ChromeOS/Android.
-source_set("browser_test_support") {
-  testonly = true
-  sources = [
-    "usb_browser_test_utils.cc",
-    "usb_browser_test_utils.h",
-  ]
-  deps = [
-    ":usb",
-    "//base",
-    "//chrome/browser",
-    "//chrome/browser:chrome_content_browser_client",
-  ]
-}
-
-# Tests that run on Win/Mac/Linux/ChromeOS/Android.
-source_set("platform_browser_tests") {
-  testonly = true
-  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  sources = [ "chrome_usb_browsertest.cc" ]
-  deps = [
-    ":browser_test_support",
-    ":usb",
-    "//base",
-    "//base/test:test_support",
-    "//chrome/browser",
-    "//chrome/browser:browser_process",
-    "//chrome/browser:chrome_content_browser_client",
-    "//chrome/browser/content_settings:content_settings_factory",
-    "//chrome/browser/ui/navigator",
-    "//chrome/test:test_support",
-  ]
-  deps += [
-    "//chrome/app:command_ids",
-  ]
-}
-
 source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
@@ -273,7 +236,6 @@ source_set("browser_tests") {
     "//chrome/browser",
   ]
   deps = [
-    ":browser_test_support",
     ":test_support",
     "//base/test:test_support",
     "//chrome/app:command_ids",

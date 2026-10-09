@@ -461,11 +461,6 @@ bool WebContentsDelegate::IsWaitingForPointerLockPrompt(
   return false;
 }
 
-std::vector<blink::mojom::RelatedApplicationPtr>
-WebContentsDelegate::GetSavedRelatedApplications(WebContents* web_contents) {
-  return {};
-}
-
 WebContents* WebContentsDelegate::GetResponsibleWebContents(
     WebContents* web_contents) {
   return nullptr;

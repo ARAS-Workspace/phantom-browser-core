@@ -36,7 +36,7 @@ std::u16string GetSecurityChipText(const LocationBarModel* model,
 // Returns whether the location bar should display the security chip
 // text for the page state described by `model`. Covers special schemes
 // (chrome://, chrome-extension://, file://, dom-distiller://),
-// contextual-tasks pages, security warnings/errors, and pages rendered
+// security warnings/errors, and pages rendered
 // by a generic MIME handler extension. `is_editing_or_empty` suppresses
 // the chip while the user is interacting with the omnibox.
 // `web_contents` may be nullptr; when non-null it enables checks that

@@ -326,89 +326,6 @@ class ContextMenuBrowserTestBase : public MixinBasedInProcessBrowserTest {
     return profile_manager->GetProfile(profile_path);
   }
 
-  void OpenImagePageAndContextMenu(std::string image_path) {
-    ASSERT_TRUE(embedded_test_server()->Start());
-    GURL image_url(embedded_test_server()->GetURL(image_path));
-    GURL page("data:text/html,<img src='" + image_url.spec() + "'>");
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), page));
-
-    // Open and close a context menu.
-    ContextMenuWaiter waiter;
-    content::WebContents* tab =
-        browser()->tab_strip_model()->GetActiveWebContents();
-    content::SimulateMouseClickAt(tab, 0, blink::WebMouseEvent::Button::kRight,
-                                  gfx::Point(15, 15));
-    waiter.WaitForMenuOpenAndClose();
-  }
-
-  void RequestImageAndVerifyResponse(
-      gfx::Size request_size,
-      chrome::mojom::ImageFormat request_image_format,
-      gfx::Size expected_original_size,
-      gfx::Size expected_size,
-      std::string expected_mime_type) {
-    mojo::AssociatedRemote<chrome::mojom::ChromeRenderFrame>
-        chrome_render_frame;
-    browser()
-        ->tab_strip_model()
-        ->GetActiveWebContents()
-        ->GetPrimaryMainFrame()
-        ->GetRemoteAssociatedInterfaces()
-        ->GetInterface(&chrome_render_frame);
-
-    auto callback =
-        [](std::vector<uint8_t>* response_image_data,
-           gfx::Size* response_original_size,
-           gfx::Size* response_downscaled_size, std::string* response_mime_type,
-           base::OnceClosure quit, const std::vector<uint8_t>& image_data,
-           const gfx::Size& original_size, const gfx::Size& downscaled_size,
-           const std::string& mime_type) {
-          *response_image_data = image_data;
-          *response_original_size = original_size;
-          *response_downscaled_size = downscaled_size;
-          *response_mime_type = mime_type;
-          std::move(quit).Run();
-        };
-
-    base::RunLoop run_loop;
-    std::vector<uint8_t> response_image_data;
-    gfx::Size response_original_size;
-    gfx::Size response_downscaled_size;
-    std::string response_mime_type;
-    chrome_render_frame->RequestImageForContextNode(
-        0, request_size, request_image_format, chrome::mojom::kDefaultQuality,
-        base::BindOnce(callback, &response_image_data, &response_original_size,
-                       &response_downscaled_size, &response_mime_type,
-                       run_loop.QuitClosure()));
-    run_loop.Run();
-
-    ASSERT_EQ(expected_original_size.width(), response_original_size.width());
-    ASSERT_EQ(expected_original_size.height(), response_original_size.height());
-    ASSERT_EQ(expected_size.width(), response_downscaled_size.width());
-    ASSERT_EQ(expected_size.height(), response_downscaled_size.height());
-    ASSERT_EQ(expected_mime_type, response_mime_type);
-
-    SkBitmap decoded_bitmap;
-    if (response_mime_type == "image/png") {
-      decoded_bitmap = gfx::PNGCodec::Decode(response_image_data);
-      ASSERT_FALSE(decoded_bitmap.isNull());
-      ASSERT_EQ(expected_size.width(), decoded_bitmap.width());
-      ASSERT_EQ(expected_size.height(), decoded_bitmap.height());
-    } else if (response_mime_type == "image/jpeg") {
-      decoded_bitmap = gfx::JPEGCodec::Decode(response_image_data);
-      ASSERT_FALSE(decoded_bitmap.isNull());
-      ASSERT_EQ(expected_size.width(), decoded_bitmap.width());
-      ASSERT_EQ(expected_size.height(), decoded_bitmap.height());
-    } else if (response_mime_type == "image/webp") {
-      int width;
-      int height;
-      EXPECT_TRUE(WebPGetInfo(&response_image_data.front(),
-                              response_image_data.size(), &width, &height));
-      ASSERT_EQ(expected_size.width(), width);
-      ASSERT_EQ(expected_size.height(), height);
-    }
-  }
-
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
   AllowPreCommitInputFlagMixin allow_pre_commit_input_flag_mixin_{mixin_host_};
@@ -1311,9 +1228,9 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
                        ShowToastOnSidePanelContextMenus) {
   auto* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
   ASSERT_TRUE(side_panel_ui);
-  side_panel_ui->Show(SidePanelEntryId::kReadAnything);
+  side_panel_ui->Show(SidePanelEntryId::kBookmarks);
   auto* const web_contents =
-      side_panel_ui->GetWebContentsForTest(SidePanelEntryId::kReadAnything);
+      side_panel_ui->GetWebContentsForTest(SidePanelEntryId::kBookmarks);
   ASSERT_TRUE(web_contents);
 
   auto menu = CreateContextMenuInWebContents(
@@ -2564,116 +2481,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, BrowserlessWebContentsCrash) {
                                  GURL("http://www.google.com/"), u"Google",
                                  blink::mojom::ContextMenuDataMediaType::kNone,
                                  ui::mojom::MenuSourceType::kMouse);
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, GifImageShare) {
-  OpenImagePageAndContextMenu("/google/logo.gif");
-  RequestImageAndVerifyResponse(
-      gfx::Size(2048, 2048), chrome::mojom::ImageFormat::ORIGINAL,
-      gfx::Size(276, 110), gfx::Size(276, 110), "image/gif");
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, GifImageDownscaleToJpeg) {
-  OpenImagePageAndContextMenu("/google/logo.gif");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::ORIGINAL,
-      gfx::Size(276, 110), gfx::Size(100, /* 100 / 480 * 320 =  */ 39),
-      "image/jpeg");
-}
-
-// TODO(crbug.com/40273673): Enable the test.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_RequestPngForGifImage DISABLED_RequestPngForGifImage
-#else
-#define MAYBE_RequestPngForGifImage RequestPngForGifImage
-#endif
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, MAYBE_RequestPngForGifImage) {
-  OpenImagePageAndContextMenu("/google/logo.gif");
-  RequestImageAndVerifyResponse(
-      gfx::Size(2048, 2048), chrome::mojom::ImageFormat::PNG,
-      gfx::Size(276, 110), gfx::Size(276, 110), "image/png");
-}
-
-// TODO(crbug.com/40273673): Enable the test.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_PngImageDownscaleToPng DISABLED_PngImageDownscaleToPng
-#else
-#define MAYBE_PngImageDownscaleToPng PngImageDownscaleToPng
-#endif
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, MAYBE_PngImageDownscaleToPng) {
-  OpenImagePageAndContextMenu("/image_search/valid.png");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::PNG, gfx::Size(200, 100),
-      gfx::Size(100, 50), "image/png");
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, PngImageOriginalDownscaleToPng) {
-  OpenImagePageAndContextMenu("/image_search/valid.png");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::ORIGINAL,
-      gfx::Size(200, 100), gfx::Size(100, 50), "image/png");
-}
-
-// TODO(crbug.com/40273673): Enable the test.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_JpgImageDownscaleToJpg DISABLED_JpgImageDownscaleToJpg
-#else
-#define MAYBE_JpgImageDownscaleToJpg JpgImageDownscaleToJpg
-#endif
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, MAYBE_JpgImageDownscaleToJpg) {
-  OpenImagePageAndContextMenu("/android/watch.jpg");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::ORIGINAL,
-      gfx::Size(480, 320), gfx::Size(100, /* 100 / 480 * 320 =  */ 66),
-      "image/jpeg");
-}
-
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, JpgImageDownscaleToWebp) {
-  OpenImagePageAndContextMenu("/android/watch.jpg");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::WEBP,
-      gfx::Size(480, 320), gfx::Size(100, /* 100 / 480 * 320 =  */ 66),
-      "image/webp");
-}
-
-// TODO(crbug.com/40273673): Enable the test.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_PngImageDownscaleToWebp DISABLED_PngImageDownscaleToWebp
-#else
-#define MAYBE_PngImageDownscaleToWebp PngImageDownscaleToWebp
-#endif
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, MAYBE_PngImageDownscaleToWebp) {
-  OpenImagePageAndContextMenu("/image_search/valid.png");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::WEBP,
-      gfx::Size(200, 100), gfx::Size(100, 50), "image/webp");
-}
-
-// TODO(crbug.com/40273673): Enable the test.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_GifImageDownscaleToWebp DISABLED_GifImageDownscaleToWebp
-#else
-#define MAYBE_GifImageDownscaleToWebp GifImageDownscaleToWebp
-#endif
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, MAYBE_GifImageDownscaleToWebp) {
-  OpenImagePageAndContextMenu("/google/logo.gif");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::WEBP,
-      gfx::Size(276, 110), gfx::Size(100, /* 100 / 275 * 110 =  */ 39),
-      "image/webp");
-}
-
-// TODO(crbug.com/40273673): Enable the test.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_WebpImageDownscaleToWebp DISABLED_WebpImageDownscaleToWebp
-#else
-#define MAYBE_WebpImageDownscaleToWebp WebpImageDownscaleToWebp
-#endif
-IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, MAYBE_WebpImageDownscaleToWebp) {
-  OpenImagePageAndContextMenu("/banners/webp-icon.webp");
-  RequestImageAndVerifyResponse(
-      gfx::Size(100, 100), chrome::mojom::ImageFormat::WEBP,
-      gfx::Size(192, 192), gfx::Size(100, 100), "image/webp");
 }
 
 IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,

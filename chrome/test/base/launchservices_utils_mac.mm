@@ -11,7 +11,7 @@
 #include "base/base_paths.h"
 #include "base/files/file_path.h"
 #include "base/path_service.h"
-#include "build/branding_buildflags.h"
+#include "chrome/common/chrome_constants.h"
 
 namespace test {
 
@@ -27,12 +27,6 @@ bool RegisterAppWithLaunchServices() {
 }
 
 base::FilePath GuessAppBundlePath() {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  const char kAppSuffix[] = "Google Chrome.app";
-#else
-  const char kAppSuffix[] = "Chromium.app";
-#endif
-
   // Try to guess the path to the real org.chromium.Chromium and/or
   // org.google.Chrome bundle if the current main bundle's path isn't already a
   // .app directory:
@@ -45,7 +39,8 @@ base::FilePath GuessAppBundlePath() {
   if (!base::PathService::Get(base::DIR_EXE, &exe_path)) {
     return base::FilePath();
   }
-  return exe_path.Append(kAppSuffix);
+  return exe_path.Append(
+      base::FilePath(chrome::kBrowserProcessExecutableName).AddExtension("app"));
 }
 
 }  // namespace test

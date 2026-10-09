@@ -392,15 +392,4 @@ suite('settings system page', function() {
         'recordFeatureNotificationsChange'));
   });
   // </if>
-
-  // <if expr="_google_chrome">
-  test('onDeviceAi', function() {
-    const onDeviceAiLink =
-        systemPage.shadowRoot.querySelector<HTMLElement>('#onDeviceAiLink');
-    assertTrue(!!onDeviceAiLink);
-
-    onDeviceAiLink.click();
-    assertEquals(routes.AI, Router.getInstance().getCurrentRoute());
-  });
-  // </if>
 });

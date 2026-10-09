@@ -154,8 +154,6 @@ class BrowserWebContentsDelegate : public content::WebContentsDelegate {
   void DraggableRegionsChanged(
       const std::vector<blink::mojom::DraggableRegionPtr>& regions,
       content::WebContents* contents) override;
-  std::vector<blink::mojom::RelatedApplicationPtr> GetSavedRelatedApplications(
-      content::WebContents* web_contents) override;
   content::WebContents* GetResponsibleWebContents(
       content::WebContents* web_contents) override;
   std::optional<gfx::Rect> GetWindowBoundsInScreen() override;

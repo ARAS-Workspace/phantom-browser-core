@@ -438,6 +438,9 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagDisabled) {
 TEST_F(ChromeContentBrowserClientTest, AutomaticBeaconCredentials) {
   ChromeContentBrowserClient client;
 
+  profile()->GetPrefs()->SetInteger(
+      prefs::kCookieControlsMode,
+      static_cast<int>(content_settings::CookieControlsMode::kOff));
   EXPECT_TRUE(client.AreDeprecatedAutomaticBeaconCredentialsAllowed(
       profile(), GURL("a.test"), url::Origin::Create(GURL("c.test"))));
   profile()->GetPrefs()->SetInteger(
@@ -1702,32 +1705,6 @@ TEST_F(ChromeContentBrowserClientAIPrefsTest, NonDevToolsScheme) {
   EXPECT_FALSE(web_preferences.ai_ot_apis_enabled);
 }
 
-TEST_F(ChromeContentBrowserClientAIPrefsTest,
-       ContextualTasksScheme_CsParamDark) {
-  const GURL url("chrome://contextual-tasks?cs=1");
-  auto web_contents = CreateTestWebContents();
-  content::WebContentsTester::For(web_contents.get())->NavigateAndCommit(url);
-  blink::web_pref::WebPreferences web_preferences;
-  // Initialize to light mode to verify it changes to dark.
-  web_preferences.preferred_color_scheme =
-      blink::mojom::PreferredColorScheme::kLight;
-  RunOverrideWebPreferences(web_contents.get(), &web_preferences);
-  EXPECT_EQ(web_preferences.preferred_color_scheme,
-            blink::mojom::PreferredColorScheme::kDark);
-}
-TEST_F(ChromeContentBrowserClientAIPrefsTest,
-       ContextualTasksScheme_CsParamLight) {
-  const GURL url("chrome://contextual-tasks?cs=0");
-  auto web_contents = CreateTestWebContents();
-  content::WebContentsTester::For(web_contents.get())->NavigateAndCommit(url);
-  blink::web_pref::WebPreferences web_preferences;
-  // Initialize to dark mode to verify it changes to light.
-  web_preferences.preferred_color_scheme =
-      blink::mojom::PreferredColorScheme::kDark;
-  RunOverrideWebPreferences(web_contents.get(), &web_preferences);
-  EXPECT_EQ(web_preferences.preferred_color_scheme,
-            blink::mojom::PreferredColorScheme::kLight);
-}
 #if BUILDFLAG(ENABLE_PDF)
 class ChromeContentBrowserClientOopifPdfTest
     : public ChromeRenderViewHostTestHarness {

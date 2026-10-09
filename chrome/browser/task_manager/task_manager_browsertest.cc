@@ -2097,7 +2097,7 @@ IN_PROC_BROWSER_TEST_F(TaskManagerBrowserTest,
       WaitForTaskManagerRows(1, MatchTab("Title Of Awesomeness")));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(1, MatchAnySubframe()));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://b.test/")));
+      WaitForTaskManagerRows(1, MatchSubframe("http://b.test:*/")));
 
   HideTaskManager();
   // Get hold of the subframe RFH, and stop it from being deleted.

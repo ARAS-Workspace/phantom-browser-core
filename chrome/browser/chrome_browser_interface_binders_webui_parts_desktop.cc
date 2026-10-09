@@ -111,7 +111,6 @@
 #include "chrome/browser/ui/webui/intro/sign_in_celebration.mojom.h"  // nogncheck
 #include "chrome/browser/ui/webui/intro/sign_in_promo.mojom.h"  // nogncheck
 #include "chrome/browser/ui/webui/intro/welcome.mojom.h"  // nogncheck
-#include "chrome/browser/ui/webui/on_device_translation_internals/on_device_translation_internals_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_customization_ui.h"
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
@@ -369,10 +368,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   // eliminates the need to account for feature flag combinations.
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  RegisterWebUIControllerInterfaceBinder<
-      on_device_translation_internals::mojom::PageHandlerFactory,
-      OnDeviceTranslationInternalsUI>(map);
-
   RegisterWebUIControllerInterfaceBinder<
       intro::mojom::SignInCelebrationPageHandlerFactory, IntroUI>(map);
   RegisterWebUIControllerInterfaceBinder<intro::mojom::IntroPageHandlerFactory,

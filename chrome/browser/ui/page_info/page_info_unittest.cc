@@ -1628,14 +1628,9 @@ TEST_F(PageInfoTest, ShowInfoBarWhenAllowingThirdPartyCookies) {
   // This call is needed to satisfy the default expectations after navigation.
   page_info();
   Mock::VerifyAndClearExpectations(mock_ui());
-  // `SetCookieInfo` is called once through `OnStatusChanged` and another time
-  // through `OnThirdPartyToggleClicked` which calls `OnStatusChanged` down
-  // its call chain.
-  EXPECT_CALL(*mock_ui(), SetCookieInfo(_)).Times(2);
-
-  page_info()->OnStatusChanged(CookieControlsState::kBlocked3pc,
-                               CookieControlsEnforcement::kNoEnforcement,
-                               base::Time());
+  // Third-party cookies start blocked, so `SetCookieInfo` is called once
+  // through `OnThirdPartyToggleClicked`.
+  EXPECT_CALL(*mock_ui(), SetCookieInfo(_)).Times(1);
 
   EXPECT_EQ(0u, infobar_manager()->infobars().size());
   page_info()->OnThirdPartyToggleClicked(/*block_third_party_cookies=*/false);

@@ -182,8 +182,6 @@ CONTENT_EXPORT BASE_DECLARE_FEATURE_PARAM(bool,
                                           kSkipIgnoreBrowserInitiatedNavs);
 CONTENT_EXPORT BASE_DECLARE_FEATURE_PARAM(bool,
                                           kSkipIgnoreRendererInitiatedNavs);
-CONTENT_EXPORT BASE_DECLARE_FEATURE(kInstalledApp);
-CONTENT_EXPORT BASE_DECLARE_FEATURE(kInstalledAppProvider);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kIsolatesPriorityUseProcessPriority);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kIsolatesPriorityBestEffortWhenHidden);
 // LINT.IfChange

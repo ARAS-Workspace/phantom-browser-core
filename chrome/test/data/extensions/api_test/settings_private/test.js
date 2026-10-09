@@ -17,10 +17,6 @@ const kTestPrefValue = true;
 // settings_private_apitest.cc.
 const kTestEnforcedPrefName = 'homepage_is_newtabpage';
 
-// Command line switch is set in settings_private_apitest.cc such that this
-// preference is disabled.
-const kTestDisabledPrefName = 'generated.https_first_mode_enabled';
-
 const kTestPageId = 'pageId';
 
 const kTestSupervisedPrefName = 'signin.allowed_on_next_startup';
@@ -93,14 +89,6 @@ const availableTests = [
                   chrome.test.succeed();
                 });
           });
-    });
-  },
-  function getDisabledPref() {
-    chrome.settingsPrivate.getPref(kTestDisabledPrefName, function(value) {
-      chrome.test.assertEq('object', typeof value);
-      callbackResult(true);
-      chrome.test.assertTrue(value.userControlDisabled);
-      chrome.test.succeed();
     });
   },
   function getPref_CrOSSetting() {

@@ -132,8 +132,6 @@ generated_dictionary_sources_in_modules = [
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_analyser_options.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_android_pay_method_data.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_android_pay_method_data.h",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_app_banner_prompt_result.cc",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_app_banner_prompt_result.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_auction_ad.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_auction_ad.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_auction_ad_config.cc",
@@ -252,8 +250,6 @@ generated_dictionary_sources_in_modules = [
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_background_sync_options.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_barcode_detector_options.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_barcode_detector_options.h",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_before_install_prompt_event_init.cc",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_before_install_prompt_event_init.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_begin_layer_options.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_begin_layer_options.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_biquad_filter_options.cc",
@@ -1502,8 +1498,6 @@ generated_enumeration_sources_in_modules = [
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_availability_status.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_alpha_option.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_alpha_option.h",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_app_banner_prompt_outcome.cc",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_app_banner_prompt_outcome.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_append_mode.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_append_mode.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_audio_context_latency_category.cc",
@@ -2129,8 +2123,6 @@ generated_interface_sources_in_modules = [
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_base_audio_context.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_battery_manager.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_battery_manager.h",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_before_install_prompt_event.cc",
-  "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_before_install_prompt_event.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_biquad_filter_node.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_biquad_filter_node.h",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_blob_event.cc",
@@ -3489,15 +3481,6 @@ generated_union_sources_in_modules = [
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_union_workletanimationeffect_workletgroupeffect.cc",
   "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_union_workletanimationeffect_workletgroupeffect.h",
 ]
-
-# Installed App (getInstalledRelatedApps) is excluded on iOS because the
-# webapp infrastructure required for this API is not yet implemented.
-if (!is_ios) {
-  generated_dictionary_sources_in_modules += [
-    "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_related_application.cc",
-    "$root_gen_dir/third_party/blink/renderer/bindings/modules/v8/v8_related_application.h",
-  ]
-}
 
 # Direct Sockets
 # This uses target_os rather than current_os (which is what is_android is set

@@ -1,4 +1,9 @@
-file://third_party/blink/renderer/modules/app_banner/OWNERS
+dmurph@chromium.org
+msw@chromium.org
+japhet@chromium.org
+
+# Secondary
+dibyapal@chromium.org
 
 per-file *.mojom=set noparent
 per-file *.mojom=file://ipc/SECURITY_OWNERS

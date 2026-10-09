@@ -47,10 +47,6 @@
 #include "chrome/browser/ui/views/frame/contents_web_view.h"
 #include "chrome/browser/ui/views/status_bubble_views.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
-#include "chrome/browser/web_applications/web_app_tab_helper.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/blocked_content/list_item_position.h"
 #include "components/blocked_content/popup_blocker.h"
@@ -88,7 +84,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_features.h"
 #include "extensions/common/manifest_handlers/background_info.h"
-#include "third_party/blink/public/common/manifest/manifest.h"
 #include "third_party/blink/public/common/page/drag_operation.h"
 #include "third_party/blink/public/common/security/protocol_handler_security_level.h"
 #include "third_party/blink/public/mojom/frame/fullscreen.mojom.h"
@@ -912,39 +907,6 @@ void BrowserWebContentsDelegate::DraggableRegionsChanged(
   if (app_browser_controller_) {
     app_browser_controller_->DraggableRegionsChanged(regions, contents);
   }
-}
-
-std::vector<blink::mojom::RelatedApplicationPtr>
-BrowserWebContentsDelegate::GetSavedRelatedApplications(
-    content::WebContents* web_contents) {
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-  CHECK(profile);
-  if (!web_app::AreWebAppsEnabled(profile)) {
-    return {};
-  }
-  const webapps::AppId* app_id =
-      web_app::WebAppTabHelper::GetAppId(web_contents);
-  if (!app_id || app_id->empty()) {
-    return {};
-  }
-  web_app::WebAppProvider* provider =
-      web_app::WebAppProvider::GetForWebApps(profile);
-  CHECK(provider);
-  std::vector<blink::Manifest::RelatedApplication> saved_related_apps =
-      provider->registrar_unsafe().GetRelatedApplications(*app_id);
-  std::vector<blink::mojom::RelatedApplicationPtr> related_apps_ptr;
-  for (const auto& app : saved_related_apps) {
-    auto related_app = blink::mojom::RelatedApplication::New();
-    related_app->platform =
-        base::UTF16ToUTF8(app.platform.value_or(std::u16string()));
-    related_app->id = base::UTF16ToUTF8(app.id.value_or(std::u16string()));
-    if (!app.url.is_empty()) {
-      related_app->url = app.url.spec();
-    }
-    related_apps_ptr.push_back(std::move(related_app));
-  }
-  return related_apps_ptr;
 }
 
 content::WebContents* BrowserWebContentsDelegate::GetResponsibleWebContents(

@@ -60,10 +60,6 @@ suite(`NotificationsPage`, function() {
   });
 
   test('NotificationPage', function() {
-    const notificationRadioGroup =
-        page.shadowRoot!.querySelector('#notificationRadioGroup');
-    assertTrue(!!notificationRadioGroup);
-
     const categorySettingExceptions =
         page.shadowRoot!.querySelector('category-setting-exceptions');
     assertTrue(!!categorySettingExceptions);

@@ -23,7 +23,6 @@
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/testing_profile_manager.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/commerce/core/proto/merchant_trust.pb.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/content_settings/core/browser/content_settings_registry.h"
 #include "components/content_settings/core/browser/permission_settings_registry.h"
@@ -56,8 +55,6 @@ namespace {
 
 constexpr char kExpiredCertificateFile[] = "expired_cert.pem";
 constexpr char kAboutThisSiteUrl[] = "a.test";
-constexpr char kMerchantTrustUrl[] = "b.test";
-constexpr char kMerchantTrustUrlWithoutSummary[] = "c.test";
 
 // Clicks the location icon to open the page info bubble.
 void OpenPageInfoBubble(Browser* browser) {
@@ -109,32 +106,6 @@ optimization_guide::OptimizationMetadata GetAboutThisSiteMetadata() {
 
   auto* more_about = site_info->mutable_more_about();
   more_about->set_url("https://example.com/moreinfo");
-  optimization_metadata.set_any_metadata(
-      optimization_guide::AnyWrapProto(metadata));
-  return optimization_metadata;
-}
-
-optimization_guide::OptimizationMetadata GetMerchantTrustMetadata() {
-  optimization_guide::OptimizationMetadata optimization_metadata;
-  commerce::MerchantTrustSignalsV2 metadata;
-  metadata.set_merchant_star_rating(3.5);
-  metadata.set_merchant_count_rating(23);
-  metadata.set_merchant_details_page_url("https://reviews.test");
-  metadata.set_shopper_voice_summary("Test summary");
-
-  optimization_metadata.set_any_metadata(
-      optimization_guide::AnyWrapProto(metadata));
-  return optimization_metadata;
-}
-
-optimization_guide::OptimizationMetadata
-GetMerchantTrustMetadataWithoutSummary() {
-  optimization_guide::OptimizationMetadata optimization_metadata;
-  commerce::MerchantTrustSignalsV2 metadata;
-  metadata.set_merchant_star_rating(4.8);
-  metadata.set_merchant_count_rating(89);
-  metadata.set_merchant_details_page_url("https://shopper-reviews.test");
-
   optimization_metadata.set_any_metadata(
       optimization_guide::AnyWrapProto(metadata));
   return optimization_metadata;
@@ -623,118 +594,5 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewCookiesSubpageBrowserTest,
                        InvokeUi_TemporaryException) {
   is_temporary_exception_ = true;
   controls_state_ = CookieControlsState::kAllowed3pc;
-  ShowAndVerifyUi();
-}
-
-class PageInfoBubbleViewMerchantTrustDialogBrowserTest
-    : public DialogBrowserTest {
- public:
-  PageInfoBubbleViewMerchantTrustDialogBrowserTest() { SetUpFeatureList(); }
-
-  void SetUpOnMainThread() override {
-    https_server_.SetSSLConfig(net::EmbeddedTestServer::CERT_TEST_NAMES);
-    https_server_.ServeFilesFromSourceDirectory(GetChromeTestDataDir());
-    ASSERT_TRUE(https_server_.Start());
-
-    host_resolver()->AddRule("*", "127.0.0.1");
-
-    auto* optimization_guide_decider =
-        OptimizationGuideKeyedServiceFactory::GetForProfile(
-            browser()->GetProfile());
-    optimization_guide_decider->AddHintForTesting(
-        GetUrl(kAboutThisSiteUrl), optimization_guide::proto::ABOUT_THIS_SITE,
-        GetAboutThisSiteMetadata());
-    optimization_guide_decider->AddHintForTesting(
-        GetUrl(kAboutThisSiteUrl),
-        optimization_guide::proto::MERCHANT_TRUST_SIGNALS_V2,
-        GetMerchantTrustMetadata());
-    optimization_guide_decider->AddHintForTesting(
-        GetUrl(kMerchantTrustUrl),
-        optimization_guide::proto::MERCHANT_TRUST_SIGNALS_V2,
-        GetMerchantTrustMetadata());
-    optimization_guide_decider->AddHintForTesting(
-        GetUrl(kMerchantTrustUrlWithoutSummary),
-        optimization_guide::proto::MERCHANT_TRUST_SIGNALS_V2,
-        GetMerchantTrustMetadataWithoutSummary());
-  }
-
-  void SetUpCommandLine(base::CommandLine* cmd) override {
-    cmd->AppendSwitch(
-        optimization_guide::
-            kDisableCheckingUserPermissionsForTestingSwitch);
-  }
-
-  // DialogBrowserTest:
-  void ShowUi(const std::string& name) override {
-    // Bubble dialogs' bounds may exceed the display's work area.
-    // https://crbug.com/41419544.
-    set_should_verify_dialog_bounds(false);
-
-    if (name == "MerchantTrustMainPage" || name == "MerchantTrustSubpage") {
-      ASSERT_TRUE(
-          ui_test_utils::NavigateToURL(browser(), GetUrl(kMerchantTrustUrl)));
-    } else if (name == "MerchantTrustMainPageWithoutSummary") {
-      ASSERT_TRUE(ui_test_utils::NavigateToURL(
-          browser(), GetUrl(kMerchantTrustUrlWithoutSummary)));
-    } else if (name == "MerchantTrustAndAboutThisSite") {
-      ASSERT_TRUE(
-          ui_test_utils::NavigateToURL(browser(), GetUrl(kAboutThisSiteUrl)));
-    } else {
-      NOTREACHED();
-    }
-
-    OpenPageInfoBubble(browser());
-    // Set static site name to prevent flakes caused by changing port.
-    SetStaticSiteName(u"Example site");
-
-    if (name == "MerchantTrustSubpage") {
-      PageInfoBubbleView* bubble_view = static_cast<PageInfoBubbleView*>(
-          PageInfoBubbleView::GetPageInfoBubbleForTesting());
-      bubble_view->OpenMerchantTrustPage();
-    }
-  }
-
-  GURL GetUrl(const std::string& host) {
-    return https_server_.GetURL(host, "/title1.html");
-  }
-
- protected:
-  base::test::ScopedFeatureList feature_list_;
-
-  virtual void SetUpFeatureList() {
-    std::vector<base::test::FeatureRefAndParams> enabled_features = {
-        {page_info::kMerchantTrust,
-         {{page_info::kMerchantTrustForceShowUIForTestingName, "true"}}},
-        {page_info::kPageInfoAboutThisSiteMoreLangs, {}}};
-    feature_list_.InitWithFeaturesAndParameters(enabled_features, {});
-  }
-
- private:
-  net::EmbeddedTestServer https_server_{net::EmbeddedTestServer::TYPE_HTTPS};
-};
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewMerchantTrustDialogBrowserTest,
-                       InvokeUi_MerchantTrustMainPageWithoutSummary) {
-  set_baseline("6730899");
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewMerchantTrustDialogBrowserTest,
-                       InvokeUi_MerchantTrustMainPage) {
-  set_baseline("6730899");
-  ShowAndVerifyUi();
-}
-
-// TODO(crbug.com/383355629): Optimization guide doesn't support setting hints
-// for two optimization types.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewMerchantTrustDialogBrowserTest,
-                       DISABLED_InvokeUi_MerchantTrustAndAboutThisSite) {
-  set_baseline("6070208");
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewMerchantTrustDialogBrowserTest,
-                       InvokeUi_MerchantTrustSubpage) {
-  set_baseline("6219021");
   ShowAndVerifyUi();
 }

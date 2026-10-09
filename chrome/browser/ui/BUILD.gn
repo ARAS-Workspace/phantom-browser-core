@@ -1693,7 +1693,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/profiles:badged_profile_photo",
       "//chrome/browser/ui/webui/browser_switch",
       "//chrome/browser/ui/webui/intro",
-      "//chrome/browser/ui/webui/on_device_translation_internals",
       "//chrome/browser/ui/webui/signin:profile",
       "//chrome/browser/ui/webui/signin:profile_impl",
     ]

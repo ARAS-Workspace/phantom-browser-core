@@ -6,28 +6,21 @@
 
 #include <string>
 
-#include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/hats/mock_hats_service.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/prefs/pref_service.h"
-#include "components/sync/base/command_line_switches.h"
-#include "components/sync/base/features.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_message_handler.h"
 #include "content/public/common/url_constants.h"
 #include "content/public/test/browser_test.h"
-#include "content/public/test/browser_test_utils.h"
 #include "url/gurl.h"
 
 typedef InProcessBrowserTest SettingsUITest;
@@ -70,47 +63,4 @@ IN_PROC_BROWSER_TEST_F(SettingsUITest, TriggerHappinessTrackingSurveys) {
                                                 _, _, _, _, _, _, _, _));
   ASSERT_TRUE(NavigateToURL(browser(), GURL(chrome::kChromeUISettingsURL)));
   base::RunLoop().RunUntilIdle();
-}
-
-
-IN_PROC_BROWSER_TEST_F(SettingsUITest, GoogleSearchAiModeWorkspaceUrl) {
-  ASSERT_TRUE(NavigateToURL(browser(), GURL(chrome::kChromeUISettingsURL)));
-
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Wait for settings UI to be loaded.
-  ASSERT_TRUE(content::ExecJs(web_contents,
-                              "customElements.whenDefined('settings-ui');"));
-
-  // Evaluate the loadTimeData string in settings page using dynamic import.
-  std::string url_val =
-      content::EvalJs(
-          web_contents,
-          "import('chrome://resources/js/load_time_data.js').then(m => "
-          "m.loadTimeData.getString('googleSearchAiModeWorkspaceUrl'))")
-          .ExtractString();
-
-  EXPECT_EQ(url_val, "https://myactivity.google.com/search-services/apps");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsUITest, GoogleSearchAiModeRestrictedUrl) {
-  ASSERT_TRUE(NavigateToURL(browser(), GURL(chrome::kChromeUISettingsURL)));
-
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Wait for settings UI to be loaded.
-  ASSERT_TRUE(content::ExecJs(web_contents,
-                              "customElements.whenDefined('settings-ui');"));
-
-  // Evaluate the loadTimeData string in settings page using dynamic import.
-  std::string url_val =
-      content::EvalJs(
-          web_contents,
-          "import('chrome://resources/js/load_time_data.js').then(m => "
-          "m.loadTimeData.getString('googleSearchAiModeRestrictedUrl'))")
-          .ExtractString();
-
-  EXPECT_EQ(url_val, "https://myactivity.google.com/myactivity");
 }

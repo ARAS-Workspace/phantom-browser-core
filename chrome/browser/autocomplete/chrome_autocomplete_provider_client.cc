@@ -87,7 +87,6 @@
 #include "components/variations/service/variations_service.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/permission_controller_delegate.h"
-#include "content/public/browser/service_worker_context.h"
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_user_data.h"
@@ -159,7 +158,6 @@ ChromeAutocompleteProviderClient::ChromeAutocompleteProviderClient(
               NewPersonalizedDataCollectionConsentHelper(
                   SyncServiceFactory::GetForProfile(profile_))),
       tab_matcher_(GetTemplateURLService(), profile_),
-      storage_partition_(nullptr),
       omnibox_triggered_feature_service_(
           std::make_unique<OmniboxTriggeredFeatureService>()) {
   pedal_provider_ = std::make_unique<OmniboxPedalProvider>(
@@ -462,35 +460,6 @@ void ChromeAutocompleteProviderClient::PrefetchImage(const GURL& url) {
   BitmapFetcherService* bitmap_fetcher_service =
       BitmapFetcherServiceFactory::GetForBrowserContext(profile_);
   bitmap_fetcher_service->Prefetch(url);
-}
-
-void ChromeAutocompleteProviderClient::StartServiceWorker(
-    const GURL& destination_url) {
-  if (!SearchSuggestEnabled()) {
-    return;
-  }
-
-  if (profile_->IsOffTheRecord()) {
-    return;
-  }
-
-  content::StoragePartition* partition = storage_partition_;
-  if (!partition) {
-    partition = profile_->GetDefaultStoragePartition();
-  }
-  if (!partition) {
-    return;
-  }
-
-  content::ServiceWorkerContext* context = partition->GetServiceWorkerContext();
-  if (!context) {
-    return;
-  }
-
-  context->StartServiceWorkerForNavigationHint(
-      destination_url,
-      blink::StorageKey::CreateFirstParty(url::Origin::Create(destination_url)),
-      base::DoNothing());
 }
 
 const TabMatcher& ChromeAutocompleteProviderClient::GetTabMatcher() const {

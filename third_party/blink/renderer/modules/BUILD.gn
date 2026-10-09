@@ -59,7 +59,6 @@ component("modules") {
     "//third_party/blink/renderer/modules/ad_auction",
     "//third_party/blink/renderer/modules/ai",
     "//third_party/blink/renderer/modules/animationworklet",
-    "//third_party/blink/renderer/modules/app_banner",
     "//third_party/blink/renderer/modules/audio_output_devices",
     "//third_party/blink/renderer/modules/background_fetch",
     "//third_party/blink/renderer/modules/background_sync",
@@ -184,12 +183,6 @@ component("modules") {
   }
   if (!is_ios && !target_os_is_android) {
     sub_modules += [ "//third_party/blink/renderer/modules/awc" ]
-  }
-
-  # Installed App (getInstalledRelatedApps) is excluded on iOS because the
-  # webapp infrastructure required for this API is not yet implemented.
-  if (!is_ios) {
-    sub_modules += [ "//third_party/blink/renderer/modules/installedapp" ]
   }
 
   if (enable_compute_pressure) {
@@ -701,11 +694,6 @@ source_set("unit_tests") {
       # preventing meaningful testing.
       "mediastream/capture_controller_test.cc",
     ]
-  }
-
-  # Installed App is excluded on iOS (see sub_modules above).
-  if (!is_ios) {
-    sources += [ "installedapp/installed_app_controller_test.cc" ]
   }
 
   configs += [

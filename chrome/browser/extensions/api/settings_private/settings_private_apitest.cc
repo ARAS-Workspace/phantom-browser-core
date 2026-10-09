@@ -4,7 +4,6 @@
 
 #include <memory>
 
-#include "base/command_line.h"
 #include "base/memory/ptr_util.h"
 #include "base/run_loop.h"
 #include "base/task/current_thread.h"
@@ -58,12 +57,6 @@ class SettingsPrivateApiTest : public ExtensionApiTest {
   }
 
  protected:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(
-        "safe-browsing-treat-user-as-advanced-protection");
-    ExtensionApiTest::SetUpCommandLine(command_line);
-  }
-
   bool RunSettingsSubtest(const std::string& subtest) {
     return RunExtensionTest("settings_private", {.custom_arg = subtest.c_str()},
                             {.load_as_component = true});
@@ -103,10 +96,6 @@ IN_PROC_BROWSER_TEST_F(SettingsPrivateApiTest, GetRecommendedPref) {
   SetPrefPolicy(policy::key::kHomepageIsNewTabPage,
                 policy::POLICY_LEVEL_RECOMMENDED);
   EXPECT_TRUE(RunSettingsSubtest("getRecommendedPref")) << message_;
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivateApiTest, GetDisabledPref) {
-  EXPECT_TRUE(RunSettingsSubtest("getDisabledPref")) << message_;
 }
 
 IN_PROC_BROWSER_TEST_F(SettingsPrivateApiTest, GetAllPrefs) {

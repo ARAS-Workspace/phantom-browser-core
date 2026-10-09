@@ -969,7 +969,6 @@ source_set("core") {
     deps += [
       "//chrome/browser/browser_switcher",
       "//chrome/browser/ui/startup/default_browser_prompt",
-      "//chrome/browser/ui/webui/on_device_translation_internals",
     ]
   }
 
@@ -2271,7 +2270,6 @@ source_set("browser") {
     deps += [
       "//chrome/browser/browser_switcher",
       "//chrome/browser/browser_switcher:impl",
-      "//chrome/browser/ui/webui/on_device_translation_internals",
     ]
   }
 
@@ -2690,7 +2688,6 @@ group("browser_generated_files") {
 
   if (is_mac || is_linux) {
     public_deps += [
-      "//chrome/browser/ui/webui/on_device_translation_internals:mojo_bindings",
       "//chrome/browser/ui/webui/whats_new:mojo_bindings",
       "//components/enterprise/device_trust/core/attestation/proto:attestation_ca_proto",
       "//components/enterprise/device_trust/core/attestation/proto:google_key_proto",

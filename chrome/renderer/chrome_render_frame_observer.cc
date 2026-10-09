@@ -54,7 +54,6 @@
 #include "content/public/renderer/window_features_converter.h"
 #include "printing/buildflags/buildflags.h"
 #include "services/service_manager/public/cpp/binder_registry.h"
-#include "skia/ext/image_operations.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 #include "third_party/blink/public/platform/browser_interface_broker_proxy.h"
 #include "third_party/blink/public/platform/web_url_request.h"
@@ -68,11 +67,7 @@
 #include "third_party/blink/public/web/web_node.h"
 #include "third_party/blink/public/web/web_security_policy.h"
 #include "third_party/blink/public/web/web_view.h"
-#include "third_party/libwebp/src/src/webp/decode.h"
 #include "third_party/skia/include/core/SkBitmap.h"
-#include "ui/gfx/codec/jpeg_codec.h"
-#include "ui/gfx/codec/png_codec.h"
-#include "ui/gfx/codec/webp_codec.h"
 #include "ui/gfx/geometry/size_f.h"
 #include "url/gurl.h"
 
@@ -102,16 +97,7 @@ static const size_t kMaxIndexChars = 65535;
 // the refresh delay is less than this value (in seconds).
 static constexpr base::TimeDelta kLocationChangeInterval = base::Seconds(10);
 
-// For the context menu, we want to keep transparency as is instead of
-// replacing transparent pixels with black ones
-static const bool kDiscardTransparencyForContextMenu = false;
-
 namespace {
-
-const char kImageGif[] = "image/gif";
-const char kImageJpeg[] = "image/jpeg";
-const char kImagePng[] = "image/png";
-const char kImageWebp[] = "image/webp";
 
 // Renderers can handle multiple pages, especially in low-memory conditions.
 // Record crash keys for a few origins, in the hope of finding more culprit
@@ -328,97 +314,6 @@ void ChromeRenderFrameObserver::ExecuteWebUIJavaScript(
   webui_javascript_.push_back(javascript);
 }
 
-void ChromeRenderFrameObserver::RequestImageForContextNode(
-    int32_t thumbnail_min_area_pixels,
-    const gfx::Size& thumbnail_max_size_pixels,
-    chrome::mojom::ImageFormat image_format,
-    int32_t quality,
-    RequestImageForContextNodeCallback callback) {
-  WebNode context_node = render_frame()->GetWebFrame()->ContextMenuImageNode();
-  std::vector<uint8_t> image_data;
-  gfx::Size original_size;
-  std::string mime_type;
-
-  if (context_node.IsNull() || !context_node.IsElementNode()) {
-    // The downscaled size is the original size, since no downscaling was
-    // required.
-    std::move(callback).Run(image_data, original_size,
-                            /*downscaled_size=*/original_size, mime_type);
-    return;
-  }
-
-  WebElement web_element = context_node.To<WebElement>();
-  original_size = web_element.GetImageSize();
-  mime_type = web_element.ImageMimeType().Utf8();
-  bool needs_downscale = NeedsDownscale(
-      original_size, thumbnail_min_area_pixels, thumbnail_max_size_pixels);
-  bool needs_encode = NeedsEncodeImage(mime_type, image_format) ||
-                      IsAnimatedWebp(web_element.CopyOfImageData());
-  if (!needs_encode && !needs_downscale) {
-    image_data = web_element.CopyOfImageData();
-    // The downscaled size is the original size, since no downscaling was
-    // required.
-    std::move(callback).Run(std::move(image_data), original_size,
-                            /*downscaled_size=*/original_size, mime_type);
-    return;
-  }
-  SkBitmap image = web_element.ImageContents();
-  SkBitmap thumbnail =
-      Downscale(image, thumbnail_min_area_pixels, thumbnail_max_size_pixels);
-  gfx::Size downscaled_size = gfx::Size(thumbnail.width(), thumbnail.height());
-
-  SkBitmap bitmap;
-  if (thumbnail.colorType() == kN32_SkColorType) {
-    bitmap = thumbnail;
-  } else {
-    SkImageInfo info = thumbnail.info().makeColorType(kN32_SkColorType);
-    if (bitmap.tryAllocPixels(info)) {
-      thumbnail.readPixels(info, bitmap.getPixels(), bitmap.rowBytes(), 0, 0);
-    }
-  }
-
-  if (image_format == chrome::mojom::ImageFormat::ORIGINAL) {
-    // ORIGINAL will only fall back to here if the image needs to downscale.
-    // Let's PNG downscale to PNG and JEPG downscale to JPEG.
-    if (mime_type == kImagePng) {
-      image_format = chrome::mojom::ImageFormat::PNG;
-    } else if (mime_type == kImageJpeg) {
-      image_format = chrome::mojom::ImageFormat::JPEG;
-    }
-  }
-
-  std::optional<std::vector<uint8_t>> data;
-  switch (image_format) {
-    case chrome::mojom::ImageFormat::PNG:
-      data = gfx::PNGCodec::EncodeBGRASkBitmap(
-          bitmap, kDiscardTransparencyForContextMenu);
-      if (data) {
-        image_data.swap(data.value());
-        mime_type = kImagePng;
-      }
-      break;
-    case chrome::mojom::ImageFormat::WEBP:
-      data = gfx::WebpCodec::Encode(bitmap, quality);
-      if (data) {
-        image_data.swap(data.value());
-        mime_type = kImageWebp;
-      }
-      break;
-    case chrome::mojom::ImageFormat::ORIGINAL:
-    // Any format other than PNG and JPEG fall back to here.
-    case chrome::mojom::ImageFormat::JPEG:
-      data = gfx::JPEGCodec::Encode(bitmap, quality);
-      if (data) {
-        image_data.swap(data.value());
-        mime_type = kImageJpeg;
-      }
-      break;
-  }
-
-  std::move(callback).Run(image_data, original_size, downscaled_size,
-                          mime_type);
-}
-
 void ChromeRenderFrameObserver::RequestBitmapForContextNode(
     RequestBitmapForContextNodeCallback callback) {
   WebNode context_node = render_frame()->GetWebFrame()->ContextMenuImageNode();
@@ -624,76 +519,4 @@ void ChromeRenderFrameObserver::CapturePageText(
   if (text_callback) {
     std::move(text_callback).Run(contents);
   }
-}
-
-// static
-bool ChromeRenderFrameObserver::NeedsDownscale(
-    const gfx::Size& original_image_size,
-    int32_t requested_image_min_area_pixels,
-    const gfx::Size& requested_image_max_size) {
-  if (original_image_size.GetArea() < requested_image_min_area_pixels)
-    return false;
-  if (original_image_size.width() <= requested_image_max_size.width() &&
-      original_image_size.height() <= requested_image_max_size.height())
-    return false;
-  return true;
-}
-
-// static
-SkBitmap ChromeRenderFrameObserver::Downscale(
-    const SkBitmap& image,
-    int requested_image_min_area_pixels,
-    const gfx::Size& requested_image_max_size) {
-  if (image.isNull())
-    return SkBitmap();
-
-  gfx::Size image_size(image.width(), image.height());
-
-  if (!NeedsDownscale(image_size, requested_image_min_area_pixels,
-                      requested_image_max_size))
-    return image;
-
-  gfx::SizeF scaled_size = gfx::SizeF(image_size);
-
-  if (scaled_size.width() > requested_image_max_size.width()) {
-    scaled_size.Scale(requested_image_max_size.width() / scaled_size.width());
-  }
-
-  if (scaled_size.height() > requested_image_max_size.height()) {
-    scaled_size.Scale(requested_image_max_size.height() / scaled_size.height());
-  }
-
-  return skia::ImageOperations::Resize(image,
-                                       skia::ImageOperations::RESIZE_GOOD,
-                                       static_cast<int>(scaled_size.width()),
-                                       static_cast<int>(scaled_size.height()));
-}
-
-// static
-bool ChromeRenderFrameObserver::NeedsEncodeImage(
-    const std::string& mime_type,
-    chrome::mojom::ImageFormat image_format) {
-  switch (image_format) {
-    case chrome::mojom::ImageFormat::PNG:
-      return mime_type != kImagePng;
-    case chrome::mojom::ImageFormat::WEBP:
-      return mime_type != kImageWebp;
-    case chrome::mojom::ImageFormat::JPEG:
-      return mime_type != kImageJpeg;
-    case chrome::mojom::ImageFormat::ORIGINAL:
-      return mime_type != kImageGif && mime_type != kImageJpeg &&
-             mime_type != kImagePng;
-  }
-
-  // Should never hit this code since all cases were handled above.
-  NOTREACHED();
-}
-
-// static
-bool ChromeRenderFrameObserver::IsAnimatedWebp(
-    const std::vector<uint8_t>& image_data) {
-  WebPBitstreamFeatures features{};
-  VP8StatusCode status =
-      WebPGetFeatures(image_data.data(), image_data.size(), &features);
-  return status == VP8_STATUS_OK && features.has_animation;
 }

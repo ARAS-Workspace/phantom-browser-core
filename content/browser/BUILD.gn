@@ -1085,9 +1085,6 @@ source_set("browser") {
     "in_memory_federated_permission_context.h",
     "indexed_db/indexed_db_internals_ui.cc",
     "indexed_db/indexed_db_internals_ui.h",
-    "installedapp/fetch_related_apps_task.h",
-    "installedapp/installed_app_provider_impl.cc",
-    "installedapp/installed_app_provider_impl.h",
     "isolated_origin_util.cc",
     "isolated_origin_util.h",
     "isolation_context.cc",
@@ -2747,11 +2744,6 @@ source_set("browser") {
     # The Direct Sockets API is not implemented on Android.
     "direct_sockets/direct_sockets_service_impl.cc",
     "direct_sockets/direct_sockets_service_impl.h",
-
-    # These fetch web app tasks, used by getInstalledRelatedApps API, are not
-    # supported in Android.
-    "installedapp/fetch_related_web_apps_task.cc",
-    "installedapp/fetch_related_web_apps_task.h",
 
     # Support for restricting NetworkService disk access to a certain path.
     # Not available on Android.

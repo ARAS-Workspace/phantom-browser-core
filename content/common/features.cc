@@ -224,10 +224,6 @@ BASE_FEATURE(kExperimentalContentSecurityPolicyFeatures,
 // files are served from the canonical domain.
 BASE_FEATURE(kFedCmPreservePortsForTesting, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Enables installed web app matching for getInstalledRelatedApps API.
-BASE_FEATURE(kFilterInstalledAppsWebAppMatching,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // This feature controls whether the renderer should use FontDataManager to
 // fetch fonts from the Browser's FontDataService. It is currently scoped to
 // Linux (via separate features and experiments). See crbug.com/335680565.

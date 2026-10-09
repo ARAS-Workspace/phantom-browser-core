@@ -20,8 +20,6 @@
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_request_manager.h"
 #include "chrome/browser/interstitials/security_interstitial_page_test_utils.h"
-#include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
-#include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/page_info/page_info_features.h"
 #include "chrome/browser/privacy_sandbox/mock_privacy_sandbox_service.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service.h"
@@ -57,12 +55,6 @@
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/optimization_guide/core/optimization_guide_permissions_util.h"
-#include "components/optimization_guide/core/optimization_guide_proto_util.h"
-#include "components/page_info/core/about_this_site_service.h"
-#include "components/page_info/core/about_this_site_validation.h"
-#include "components/page_info/core/features.h"
-#include "components/page_info/core/proto/about_this_site_metadata.pb.h"
 #include "components/page_info/page_info.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_decision_auto_blocker.h"
@@ -71,7 +63,6 @@
 #include "components/security_interstitials/core/features.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/strings/grit/privacy_sandbox_strings.h"
-#include "components/ukm/test_ukm_recorder.h"
 #include "content/public/browser/file_system_access_permission_context.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/render_frame_host.h"
@@ -89,7 +80,6 @@
 #include "net/test/embedded_test_server/http_response.h"
 #include "net/test/test_certificate_data.h"
 #include "net/test/test_data_directory.h"
-#include "services/metrics/public/cpp/ukm_builders.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/features.h"
@@ -101,11 +91,6 @@
 #include "ui/views/controls/button/toggle_button.h"
 #include "ui/views/controls/styled_label.h"
 #include "ui/views/test/widget_test.h"
-
-using AboutThisSiteStatus =
-    page_info::about_this_site_validation::AboutThisSiteStatus;
-using AboutThisSiteInteraction =
-    page_info::AboutThisSiteService::AboutThisSiteInteraction;
 
 namespace {
 using ::testing::IsFalse;
@@ -173,22 +158,6 @@ const GURL OpenSiteSettingsForUrl(Browser* browser, const GURL& url) {
   return browser->tab_strip_model()
       ->GetActiveWebContents()
       ->GetLastCommittedURL();
-}
-
-void AddHintForTesting(Browser* browser,
-                       const GURL& url,
-                       page_info::proto::SiteInfo site_info) {
-  optimization_guide::OptimizationMetadata optimization_metadata;
-  page_info::proto::AboutThisSiteMetadata metadata;
-  *metadata.mutable_site_info() = site_info;
-  optimization_metadata.set_any_metadata(
-      optimization_guide::AnyWrapProto(metadata));
-
-  auto* optimization_guide_decider =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(
-          browser->GetProfile());
-  optimization_guide_decider->AddHintForTesting(
-      url, optimization_guide::proto::ABOUT_THIS_SITE, optimization_metadata);
 }
 
 }  // namespace
@@ -819,242 +788,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewPrerenderBrowserTest,
   // Ensure the bubble is still open after prerender navigation.
   EXPECT_EQ(PageInfoBubbleView::BUBBLE_PAGE_INFO,
             PageInfoBubbleView::GetShownBubbleType());
-}
-
-class PageInfoBubbleViewAboutThisSiteBrowserTest : public InProcessBrowserTest {
- public:
-  PageInfoBubbleViewAboutThisSiteBrowserTest() { InitFeatureList(); }
-
-  void SetUp() override {
-    https_server_.SetSSLConfig(net::EmbeddedTestServer::CERT_TEST_NAMES);
-    https_server_.ServeFilesFromSourceDirectory(GetChromeTestDataDir());
-    ASSERT_TRUE(https_server_.Start());
-
-    InProcessBrowserTest::SetUp();
-  }
-
-  virtual void InitFeatureList() {
-    feature_list_.InitWithFeatures(
-        {
-            page_info::kPageInfoAboutThisSiteMoreLangs,
-        },
-        {});
-  }
-
-  void SetUpOnMainThread() override {
-    host_resolver()->AddRule("*", "127.0.0.1");
-  }
-
-  void SetUpCommandLine(base::CommandLine* cmd) override {
-    cmd->AppendSwitch(
-        optimization_guide::
-            kDisableCheckingUserPermissionsForTestingSwitch);
-  }
-
-  page_info::proto::SiteInfo CreateValidSiteInfo() {
-    page_info::proto::SiteInfo site_info;
-    auto* description = site_info.mutable_description();
-    description->set_description(
-        "A domain used in illustrative examples in documents");
-    description->set_lang("en_US");
-    description->set_name("Example");
-    description->mutable_source()->set_url("https://example.com");
-    description->mutable_source()->set_label("Example source");
-    site_info.mutable_more_about()->set_url(
-        https_server_.GetURL("a.test", "/title2.html").spec());
-    EXPECT_EQ(
-        page_info::about_this_site_validation::ValidateSiteInfo(site_info),
-        AboutThisSiteStatus::kValid);
-    return site_info;
-  }
-
- protected:
-  net::EmbeddedTestServer https_server_{net::EmbeddedTestServer::TYPE_HTTPS};
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewAboutThisSiteBrowserTest,
-                       AboutThisSite) {
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
-  base::HistogramTester histograms;
-
-  auto url = https_server_.GetURL("a.test", "/title1.html");
-  AddHintForTesting(browser(), url, CreateValidSiteInfo());
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  OpenPageInfoBubble(browser());
-
-  auto* page_info = PageInfoBubbleView::GetPageInfoBubbleForTesting();
-  EXPECT_TRUE(page_info->GetViewByID(
-      PageInfoViewFactory::
-          VIEW_ID_PAGE_INFO_LINK_OR_BUTTON_SECURITY_INFORMATION));
-  EXPECT_TRUE(page_info->GetViewByID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_ABOUT_THIS_SITE_BUTTON));
-
-  auto entries = ukm_recorder.GetEntriesByName(
-      ukm::builders::AboutThisSiteStatus::kEntryName);
-  EXPECT_EQ(1u, entries.size());
-  ukm_recorder.ExpectEntrySourceHasUrl(entries[0], url);
-  ukm_recorder.ExpectEntryMetric(
-      entries[0], ukm::builders::AboutThisSiteStatus::kStatusName,
-      static_cast<int>(AboutThisSiteStatus::kValid));
-
-  page_info->GetWidget()->CloseWithReason(
-      views::Widget::ClosedReason::kEscKeyPressed);
-  base::RunLoop().RunUntilIdle();
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewAboutThisSiteBrowserTest,
-                       AboutThisSiteInteraction) {
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
-  base::HistogramTester histograms;
-
-  auto url = https_server_.GetURL("a.test", "/title1.html");
-  AddHintForTesting(browser(), url, CreateValidSiteInfo());
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  OpenPageInfoBubble(browser());
-
-  auto* page_info = PageInfoBubbleView::GetPageInfoBubbleForTesting();
-  views::View* button = page_info->GetViewByID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_ABOUT_THIS_SITE_BUTTON);
-  ASSERT_TRUE(button);
-
-  histograms.ExpectUniqueSample("Security.PageInfo.AboutThisSiteInteraction",
-                                AboutThisSiteInteraction::kShownWithDescription,
-                                1);
-
-  PerformMouseClickOnView(button);
-  histograms.ExpectTotalCount("Security.PageInfo.AboutThisSiteInteraction", 2);
-  histograms.ExpectBucketCount(
-      "Security.PageInfo.AboutThisSiteInteraction",
-      AboutThisSiteInteraction::kClickedWithDescription, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewAboutThisSiteBrowserTest,
-                       AboutThisSiteInteractionWithoutDescription) {
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
-  base::HistogramTester histograms;
-
-  auto url = https_server_.GetURL("a.test", "/title1.html");
-  auto site_info = CreateValidSiteInfo();
-  site_info.clear_description();
-  EXPECT_EQ(page_info::about_this_site_validation::ValidateSiteInfo(site_info),
-            AboutThisSiteStatus::kValid);
-  AddHintForTesting(browser(), url, site_info);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  OpenPageInfoBubble(browser());
-
-  auto* page_info = PageInfoBubbleView::GetPageInfoBubbleForTesting();
-  views::View* button = page_info->GetViewByID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_ABOUT_THIS_SITE_BUTTON);
-  ASSERT_TRUE(button);
-
-  histograms.ExpectUniqueSample(
-      "Security.PageInfo.AboutThisSiteInteraction",
-      AboutThisSiteInteraction::kShownWithoutDescription, 1);
-
-  PerformMouseClickOnView(button);
-  histograms.ExpectTotalCount("Security.PageInfo.AboutThisSiteInteraction", 2);
-  histograms.ExpectBucketCount(
-      "Security.PageInfo.AboutThisSiteInteraction",
-      AboutThisSiteInteraction::kClickedWithoutDescription, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewAboutThisSiteBrowserTest,
-                       AboutThisSiteNotValid) {
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
-  base::HistogramTester histograms;
-
-  auto url = https_server_.GetURL("a.test", "/title1.html");
-  page_info::proto::SiteInfo site_info;
-  // Incomplete description, missing source, name and lang.
-  auto* description = site_info.mutable_description();
-  description->set_description(
-      "A domain used in illustrative examples in documents");
-  AddHintForTesting(browser(), url, site_info);
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  OpenPageInfoBubble(browser());
-
-  auto* page_info = PageInfoBubbleView::GetPageInfoBubbleForTesting();
-  EXPECT_TRUE(page_info->GetViewByID(
-      PageInfoViewFactory::
-          VIEW_ID_PAGE_INFO_LINK_OR_BUTTON_SECURITY_INFORMATION));
-  EXPECT_FALSE(page_info->GetViewByID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_ABOUT_THIS_SITE_BUTTON));
-
-  auto entries = ukm_recorder.GetEntriesByName(
-      ukm::builders::AboutThisSiteStatus::kEntryName);
-  EXPECT_EQ(1u, entries.size());
-  ukm_recorder.ExpectEntrySourceHasUrl(entries[0], url);
-  ukm_recorder.ExpectEntryMetric(
-      entries[0], ukm::builders::AboutThisSiteStatus::kStatusName,
-      static_cast<int>(AboutThisSiteStatus::kMissingDescriptionName));
-
-  page_info->GetWidget()->CloseWithReason(
-      views::Widget::ClosedReason::kEscKeyPressed);
-  base::RunLoop().RunUntilIdle();
-}
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewAboutThisSiteBrowserTest,
-                       AboutThisSiteNotSecure) {
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
-  base::HistogramTester histograms;
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  auto url = embedded_test_server()->GetURL("a.test", "/title1.html");
-  AddHintForTesting(browser(), url, CreateValidSiteInfo());
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  OpenPageInfoBubble(browser());
-  auto* page_info = PageInfoBubbleView::GetPageInfoBubbleForTesting();
-  EXPECT_FALSE(page_info->GetViewByID(
-      PageInfoViewFactory::
-          VIEW_ID_PAGE_INFO_LINK_OR_BUTTON_SECURITY_INFORMATION));
-  // The button isn't shown because connection isn't secure...
-  EXPECT_FALSE(page_info->GetViewByID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_ABOUT_THIS_SITE_BUTTON));
-
-  // ...and no UKM is recoreded.
-  auto entries = ukm_recorder.GetEntriesByName(
-      ukm::builders::AboutThisSiteStatus::kEntryName);
-  EXPECT_EQ(0u, entries.size());
-
-  page_info->GetWidget()->CloseWithReason(
-      views::Widget::ClosedReason::kEscKeyPressed);
-  base::RunLoop().RunUntilIdle();
-}
-
-// Test that no info is shown and "kNotShownOptimizationGuideNotAllowed" is
-// logged when hints fetching is disabled.
-class PageInfoBubbleViewAboutThisSiteDisabledBrowserTest
-    : public PageInfoBubbleViewAboutThisSiteBrowserTest {
-  void SetUpCommandLine(base::CommandLine* cmd) override {
-    // Don't set the flag to enable hints fetching.
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewAboutThisSiteDisabledBrowserTest,
-                       AboutThisSiteWithoutOptin) {
-  base::HistogramTester histograms;
-  auto url = https_server_.GetURL("a.test", "/title1.html");
-  AddHintForTesting(browser(), url, CreateValidSiteInfo());
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  OpenPageInfoBubble(browser());
-
-  auto* page_info = PageInfoBubbleView::GetPageInfoBubbleForTesting();
-  EXPECT_TRUE(page_info->GetViewByID(
-      PageInfoViewFactory::
-          VIEW_ID_PAGE_INFO_LINK_OR_BUTTON_SECURITY_INFORMATION));
-  EXPECT_FALSE(page_info->GetViewByID(
-      PageInfoViewFactory::VIEW_ID_PAGE_INFO_ABOUT_THIS_SITE_BUTTON));
-
-  histograms.ExpectBucketCount(
-      "Security.PageInfo.AboutThisSiteInteraction",
-      AboutThisSiteInteraction::kNotShownOptimizationGuideNotAllowed, 1);
 }
 
 class PageInfoBubbleViewBrowserTestCookiesSubpage

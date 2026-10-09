@@ -52,7 +52,6 @@ const pathToActionMap: Map<string, string> = new Map([
   ['/onStartup', 'SettingsMenu_OnStartupClicked'],
   ['/languages', 'SettingsMenu_LanguagesClicked'],
   ['/downloads', 'SettingsMenu_DownloadsClicked'],
-  ['/accessibility', 'SettingsMenu_AccessibilityClicked'],
   ['/system', 'SettingsMenu_SystemClicked'],
   ['/reset', 'SettingsMenu_ResetClicked'],
   ['/help', 'SettingsMenu_AboutClicked'],
@@ -156,7 +155,6 @@ export class SettingsMenuElement extends SettingsMenuElementBase {
     const visibilities = [
       this.pageVisibility_.languages,
       this.pageVisibility_.downloads,
-      this.pageVisibility_.a11y,
       // <if expr="not is_chromeos">
       this.pageVisibility_.system,
       // </if>

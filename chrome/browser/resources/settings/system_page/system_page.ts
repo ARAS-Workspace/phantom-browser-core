@@ -256,12 +256,6 @@ export class SettingsSystemPageElement extends SettingsSystemPageElementBase
   }
   // </if>
 
-  // <if expr="_google_chrome">
-  protected onOnDeviceAiLinkClick_(): void {
-    Router.getInstance().navigateTo(routes.AI);
-  }
-  // </if>
-
   // <if expr="_google_chrome and is_win">
   protected onFeatureNotificationsSettingsBooleanControlChange_(e: Event) {
     const enabled = (e.target as SettingsToggleButtonElement).checked;

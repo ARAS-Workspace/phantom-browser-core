@@ -68,8 +68,6 @@ const char* kCounterPrefs[] = {
     browsing_data::prefs::kDeleteCache,
     browsing_data::prefs::kDeleteCookies,
     browsing_data::prefs::kDeleteDownloadHistory,
-    browsing_data::prefs::kDeleteFormData,
-    browsing_data::prefs::kDeleteHostedAppsData,
     browsing_data::prefs::kDeleteSiteSettings,
 };
 

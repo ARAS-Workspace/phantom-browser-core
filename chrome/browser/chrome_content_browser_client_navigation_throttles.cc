@@ -347,10 +347,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-  // AimEligibilityRefreshNavigationThrottle must be registered before
-  // ContextualTasksNavigationThrottle so it can detect AIM URL navigations
-  // before ContextualTasksNavigationThrottle intercepts them.
-
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
   DevToolsWindow::MaybeCreateAndAddNavigationThrottle(registry);
 #endif  // BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)

@@ -134,11 +134,11 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
                        ButtonsSetToNotVisibleNotSeenAfterLayout) {
   PinnedToolbarActionsModel* const actions_model =
       PinnedToolbarActionsModel::Get(browser()->GetProfile());
-  actions_model->UpdatePinnedState(kActionShowTranslate, true);
+  actions_model->UpdatePinnedState(kActionPrint, true);
 
-  EXPECT_EQ(container()->IsActionPinned(kActionShowTranslate), true);
+  EXPECT_EQ(container()->IsActionPinned(kActionPrint), true);
 
-  auto* pinned_button = container()->GetButtonFor(kActionShowTranslate);
+  auto* pinned_button = container()->GetButtonFor(kActionPrint);
   EXPECT_EQ(pinned_button->GetVisible(), true);
   pinned_button->SetVisible(false);
   container()->InvalidateLayout();
@@ -248,15 +248,15 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
       PinnedToolbarActionsModel::Get(browser()->GetProfile());
 
   actions::ActionItem* action_item =
-      actions::ActionManager::Get().FindAction(kActionShowTranslate);
+      actions::ActionManager::Get().FindAction(kActionPrint);
 
   // Verify button is visible when pinned.
   action_item->SetProperty(
       actions::kActionItemPinnableKey,
       static_cast<int>(actions::ActionPinnableState::kPinnable));
-  actions_model->UpdatePinnedState(kActionShowTranslate, true);
+  actions_model->UpdatePinnedState(kActionPrint, true);
   views::test::WaitForAnimatingLayoutManager(container());
-  auto* button_before = container()->GetButtonFor(kActionShowTranslate);
+  auto* button_before = container()->GetButtonFor(kActionPrint);
   EXPECT_EQ(button_before->GetVisible(), true);
 
   // Verify button is no longer visible after setting to not pinnable.
@@ -264,7 +264,7 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
       actions::kActionItemPinnableKey,
       static_cast<int>(actions::ActionPinnableState::kNotPinnable));
   views::test::WaitForAnimatingLayoutManager(container());
-  auto* button_during = container()->GetButtonFor(kActionShowTranslate);
+  auto* button_during = container()->GetButtonFor(kActionPrint);
   views::test::WaitForAnimatingLayoutManager(container());
   EXPECT_EQ(button_during->GetVisible(), false);
 
@@ -273,7 +273,7 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
       actions::kActionItemPinnableKey,
       static_cast<int>(actions::ActionPinnableState::kPinnable));
   views::test::WaitForAnimatingLayoutManager(container());
-  auto* button_after = container()->GetButtonFor(kActionShowTranslate);
+  auto* button_after = container()->GetButtonFor(kActionPrint);
   views::test::WaitForAnimatingLayoutManager(container());
   EXPECT_EQ(button_after->GetVisible(), true);
 }

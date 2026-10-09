@@ -163,7 +163,6 @@ source_set("browser_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   sources = [
     "autocomplete_browsertest.cc",
-    "chrome_autocomplete_provider_client_browsertest.cc",
     "tab_matcher_desktop_browsertest.cc",
   ]
   deps = [

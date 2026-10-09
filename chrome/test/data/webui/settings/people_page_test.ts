@@ -271,69 +271,6 @@ suite('SyncStatusTests', function() {
     // The control element should exist when policy allows.
     assertTrue(isChildVisible(peoplePage, 'settings-sync-account-control'));
 
-    // Control element doesn't exist when policy forbids sync.
-    simulateSyncStatus({
-      syncSystemEnabled: false,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
-
-    // Do not show Google Account when sync status could not be retrieved.
-    simulateStoredAccounts([]);
-    simulateSyncStatus(undefined);
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
-
-    simulateStoredAccounts([]);
-    simulateSyncStatus({
-      statusAction: StatusAction.NO_ACTION,
-    });
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
-
-    simulateStoredAccounts([]);
-    simulateSyncStatus({
-      statusAction: StatusAction.NO_ACTION,
-    });
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
-
-    // A stored account with sync off but no error should result in the
-    // Google Account being shown.
-    simulateStoredAccounts([{email: 'foo@foo.com'}]);
-    simulateSyncStatus({
-      signedInState: SignedInState.SIGNED_IN,
-      hasError: false,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    assertTrue(isChildVisible(peoplePage, '#manage-google-account'));
-
-    // A stored account with sync off and error should not result in the
-    // Google Account being shown.
-    simulateStoredAccounts([{email: 'foo@foo.com'}]);
-    simulateSyncStatus({
-      signedInState: SignedInState.SIGNED_IN,
-      hasError: true,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
-
-    // A stored account with sync on but no error should result in the
-    // Google Account being shown.
-    simulateStoredAccounts([{email: 'foo@foo.com'}]);
-    simulateSyncStatus({
-      signedInState: SignedInState.SYNCING,
-      hasError: false,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    assertTrue(isChildVisible(peoplePage, '#manage-google-account'));
-
-    // A stored account with sync on but with error should not result in
-    // the Google Account being shown.
-    simulateStoredAccounts([{email: 'foo@foo.com'}]);
-    simulateSyncStatus({
-      signedInState: SignedInState.SYNCING,
-      hasError: true,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
   });
 
   test('SignOutNavigationNormalProfile', async function() {
@@ -535,7 +472,6 @@ suite('SyncSettings', function() {
   test('ShowCorrectSyncRow', function() {
     assertTrue(isChildVisible(peoplePage, '#sync-setup'));
     assertFalse(isChildVisible(peoplePage, '#sync-status'));
-    assertFalse(isChildVisible(peoplePage, '#google-services'));
 
     // Make sures the subpage opens even when logged out or has errors.
     simulateSyncStatus({
@@ -616,14 +552,12 @@ suite('PeoplePageAccountSettings', function() {
     assertFalse(isChildVisible(peoplePage, '#profile-row'));
     assertTrue(isChildVisible(peoplePage, '#account-subpage-row'));
 
-    // There is a link to the Google services, not to the sync settings.
-    assertTrue(isChildVisible(peoplePage, '#google-services'));
+    // There is no link to the sync settings.
     assertFalse(isChildVisible(peoplePage, '#sync-setup'));
 
     // <if expr="not is_chromeos">
     // The other rows are shown/hidden correctly.
     assertTrue(isChildVisible(peoplePage, '#edit-profile'));
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
     assertTrue(isChildVisible(peoplePage, '#importDataDialogTrigger'));
     // </if>
   });
@@ -643,14 +577,12 @@ suite('PeoplePageAccountSettings', function() {
     // </if>
 
     assertFalse(isChildVisible(peoplePage, '#account-subpage-row'));
-    // There is a link to the sync settings, not to the Google services.
-    assertFalse(isChildVisible(peoplePage, '#google-services'));
+    // There is a link to the sync settings.
     assertTrue(isChildVisible(peoplePage, '#sync-setup'));
 
     // <if expr="not is_chromeos">
     // The other rows are shown correctly.
     assertTrue(isChildVisible(peoplePage, '#edit-profile'));
-    assertTrue(isChildVisible(peoplePage, '#manage-google-account'));
     assertTrue(isChildVisible(peoplePage, '#importDataDialogTrigger'));
     // </if>
   });
@@ -742,13 +674,11 @@ suite('PeoplePageAccountSettings', function() {
     assertFalse(isChildVisible(peoplePage, '#profile-row'));
     assertFalse(isChildVisible(peoplePage, '#account-subpage-row'));
 
-    // There is a link to the Google services, not to the sync settings.
-    assertTrue(isChildVisible(peoplePage, '#google-services'));
+    // There is no link to the sync settings.
     assertFalse(isChildVisible(peoplePage, '#sync-setup'));
 
     // The other rows are shown/hidden correctly.
     assertTrue(isChildVisible(peoplePage, '#edit-profile'));
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
     assertTrue(isChildVisible(peoplePage, '#importDataDialogTrigger'));
   });
 
@@ -760,13 +690,11 @@ suite('PeoplePageAccountSettings', function() {
     assertFalse(isChildVisible(peoplePage, '#profile-row'));
     assertFalse(isChildVisible(peoplePage, '#account-subpage-row'));
 
-    // There is a link to the Google services, not to the sync settings.
-    assertTrue(isChildVisible(peoplePage, '#google-services'));
+    // There is no link to the sync settings.
     assertFalse(isChildVisible(peoplePage, '#sync-setup'));
 
     // The other rows are shown/hidden correctly.
     assertTrue(isChildVisible(peoplePage, '#edit-profile'));
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
     assertTrue(isChildVisible(peoplePage, '#importDataDialogTrigger'));
   });
 
@@ -777,13 +705,11 @@ suite('PeoplePageAccountSettings', function() {
     // The first item should be an account card.
     assertTrue(isChildVisible(peoplePage, 'settings-sync-account-control'));
 
-    // There is a link to the Google services, not to the sync settings.
-    assertTrue(isChildVisible(peoplePage, '#google-services'));
+    // There is no link to the sync settings.
     assertFalse(isChildVisible(peoplePage, '#sync-setup'));
 
     // The other rows are shown/hidden correctly.
     assertTrue(isChildVisible(peoplePage, '#edit-profile'));
-    assertFalse(isChildVisible(peoplePage, '#manage-google-account'));
     assertTrue(isChildVisible(peoplePage, '#importDataDialogTrigger'));
   });
 

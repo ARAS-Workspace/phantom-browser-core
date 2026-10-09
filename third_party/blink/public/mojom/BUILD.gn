@@ -1014,7 +1014,6 @@ mojom("android_mojo_bindings") {
     "input/input_host.mojom",
     "input/input_messages.mojom",
     "installation/installation.mojom",
-    "installedapp/installed_app_provider.mojom",
     "installedapp/related_application.mojom",
     "mediasession/media_session.mojom",
     "payments/payment_app_events.mojom",

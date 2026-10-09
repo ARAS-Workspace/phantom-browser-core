@@ -3684,11 +3684,6 @@
       status: "stable",
     },
     {
-      name: "InstalledApp",
-      public: true,
-      base_feature: "none",
-    },
-    {
       // https://chromestatus.com/feature/5152834368700416
       name: "InstallElement",
       status: {"Android": "", "default": "test"},

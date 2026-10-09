@@ -8,8 +8,6 @@ import {loadTimeData} from './i18n_setup.js';
  * Specifies page visibility based on incognito status and Chrome OS guest mode.
  */
 export interface PageVisibility {
-  a11y?: boolean;
-  ai?: boolean;
   appearance?: boolean|AppearancePageVisibility;
   defaultBrowser?: boolean;
   downloads?: boolean;
@@ -44,8 +42,6 @@ function createPageVisibility(): PageVisibility|undefined {
 
   // <if expr="not is_chromeos">
   const pageVisibility = {
-    a11y: false,
-    ai: false,
     appearance: false,
     defaultBrowser: false,
     downloads: false,
@@ -61,7 +57,6 @@ function createPageVisibility(): PageVisibility|undefined {
   // </if>
   // <if expr="is_chromeos">
   const pageVisibility = {
-    ai: false,
     people: false,
     onStartup: false,
     reset: false,
@@ -78,7 +73,6 @@ function createPageVisibility(): PageVisibility|undefined {
       networkPrediction: false,
     },
     downloads: true,
-    a11y: true,
     extensions: false,
     languages: true,
     performance: false,

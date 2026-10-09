@@ -668,6 +668,7 @@ void AddOnStartupStrings(content::WebUIDataSource* html_source) {
       {"onStartupRemove", IDS_SETTINGS_ON_STARTUP_REMOVE},
       {"onStartupInvalidUrl", IDS_SETTINGS_INVALID_URL},
       {"onStartupUrlTooLong", IDS_SETTINGS_URL_TOOL_LONG},
+      {"moreActionsFor", IDS_SETTINGS_MORE_ACTIONS_BUTTON_ARIA_LABEL},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
@@ -1864,13 +1865,6 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_SITE_SETTINGS_JAVASCRIPT_OPTIMIZER_ALLOWED_SUB_LABEL},
       {"siteSettingsJavascriptOptimizerBlocked",
        IDS_SETTINGS_SITE_SETTINGS_JAVASCRIPT_OPTIMIZER_BLOCKED},
-      {"siteSettingsJavascriptOptimizerBlockedUnfamiliarSites",
-       IDS_SETTINGS_SITE_SETTINGS_JAVASCRIPT_OPTIMIZER_BLOCKED_UNFAMILIAR_SITES},
-      {"siteSettingsJavascriptOptimizerBlockedUnfamiliarSitesSubLabel",
-       IDS_SETTINGS_SITE_SETTINGS_JAVASCRIPT_OPTIMIZER_BLOCKED_UNFAMILIAR_SITES_SUB_LABEL},
-      {"siteSettingsJavascriptOptimizerBlockedUnfamiliarSitesSafeBrowsingOffSub"
-       "Label",
-       IDS_SETTINGS_SITE_SETTINGS_JAVASCRIPT_OPTIMIZER_BLOCKED_UNFAMILIAR_SITES_SAFE_BROWSING_OFF_SUB_LABEL},
       {"siteSettingsJavascriptOptimizerBlockedSubLabel",
        IDS_SETTINGS_SITE_SETTINGS_JAVASCRIPT_OPTIMIZER_BLOCKED_SUB_LABEL},
       {"siteSettingsJavascriptOptimizerAllowedExceptions",

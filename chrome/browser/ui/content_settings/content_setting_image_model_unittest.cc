@@ -203,6 +203,9 @@ TEST_F(ContentSettingImageModelTest, CookieAccessed) {
   content_settings->SetContentSettingDefaultScope(
       web_contents()->GetLastCommittedURL(), GURL(),
       ContentSettingsType::COOKIES, CONTENT_SETTING_ALLOW);
+  profile()->GetPrefs()->SetInteger(
+      prefs::kCookieControlsMode,
+      static_cast<int>(content_settings::CookieControlsMode::kOff));
   auto content_setting_image_model =
       ContentSettingImageModel::CreateForContentType(
           ContentSettingImageModel::ImageType::kCookies);

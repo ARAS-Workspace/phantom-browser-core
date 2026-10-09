@@ -86,9 +86,7 @@ suite('ImportDataDialog', function() {
     return [
       createBooleanPref('import_dialog_history'),
       createBooleanPref('import_dialog_bookmarks'),
-      createBooleanPref('import_dialog_saved_passwords'),
       createBooleanPref('import_dialog_search_engine'),
-      createBooleanPref('import_dialog_autofill_form_data'),
       createBooleanPref('bookmark_bar.show_on_all_tabs'),
     ];
   }
@@ -157,9 +155,7 @@ suite('ImportDataDialog', function() {
   const prefNames = [
     'import_dialog_history',
     'import_dialog_bookmarks',
-    'import_dialog_saved_passwords',
     'import_dialog_search_engine',
-    'import_dialog_autofill_form_data',
   ];
 
   test('ImportButton', async function() {

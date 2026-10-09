@@ -570,12 +570,6 @@ BASE_FEATURE_PARAM(base::TimeDelta,
                    "views_ui_delay_duration",
                    base::Seconds(3));
 
-// Kill switch for the GetInstalledRelatedApps API.
-BASE_FEATURE(kInstalledApp, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Allow Windows specific implementation for the GetInstalledRelatedApps API.
-BASE_FEATURE(kInstalledAppProvider, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // When enabled, derives isolate priority from the more granular process
 // priority (user-blocking, user-visible, best-effort) instead of renderer
 // visibility (visible, hidden).

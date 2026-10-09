@@ -1063,13 +1063,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
           language_detection::mojom::ContentLanguageDetectionDriver> receiver)
       override;
 
-  void QueryInstalledWebAppsByManifestId(
-      const GURL& frame_url,
-      const GURL& manifest_id,
-      content::BrowserContext* browser_context,
-      base::OnceCallback<void(std::optional<blink::mojom::RelatedApplication>)>
-          callback) override;
-
   bool ShouldDispatchPagehideDuringCommit(
       content::BrowserContext* browser_context,
       const GURL& destination_url) override;

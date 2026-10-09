@@ -7,9 +7,9 @@
 // clang-format off
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {SettingsMenuElement, SettingsRoutes} from 'chrome://settings/settings.js';
-import {AutofillSettingsReferrer, resetRouterForTesting, loadTimeData, MetricsBrowserProxyImpl, resetPageVisibilityForTesting, Router} from 'chrome://settings/settings.js';
+import {resetRouterForTesting, loadTimeData, MetricsBrowserProxyImpl, resetPageVisibilityForTesting, Router} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
+import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 import {eventToPromise} from 'chrome://webui-test/test_util.js';
 
 import {TestMetricsBrowserProxy} from './test_metrics_browser_proxy.js';
@@ -93,41 +93,10 @@ suite('SettingsMenu', function() {
     assertFalse(!!selector.selected);
   });
 
-  test('noExperimental', async function() {
-    loadTimeData.overrideValues({showAiPage: false});
-    resetRouterForTesting();
-    createSettingsMenu();
-    await microtasksFinished();
-
-    const entry = settingsMenu.shadowRoot!.querySelector('a[href=\'/ai\']');
-    assertTrue(!!entry);
-    assertFalse(isVisible(entry));
-  });
-
-  test('navigateToExperimental', async function() {
-    loadTimeData.overrideValues({showAiPage: true});
-    resetRouterForTesting();
-    createSettingsMenu();
-    const selector = settingsMenu.$.menu;
-
-    const whenIronSelect = eventToPromise<CustomEvent<{item: HTMLElement}>>(
-        'iron-select', selector);
-    Router.getInstance().navigateTo(routes.AI);
-    const event = await whenIronSelect;
-
-    const entry = settingsMenu.shadowRoot!.querySelector('a[href=\'/ai\']');
-    assertTrue(!!entry);
-    assertTrue(isVisible(entry));
-
-    assertTrue(!!event.detail.item);
-    assertEquals('/ai', selector.selected?.toString());
-    assertEquals('/ai', event.detail.item.getAttribute('href'));
-  });
-
   test('pageVisibility', function() {
     function assertPagesHidden(expectedHidden: boolean) {
       const ids = [
-        'accessibility', 'appearance',
+        'appearance',
         // <if expr="not is_chromeos">
         'defaultBrowser',
         // </if>
@@ -150,7 +119,6 @@ suite('SettingsMenu', function() {
 
     // Set the visibility of the pages under test to "false".
     resetPageVisibilityForTesting({
-      a11y: false,
       appearance: false,
       defaultBrowser: false,
       downloads: false,
@@ -167,61 +135,8 @@ suite('SettingsMenu', function() {
     assertPagesHidden(true);
   });
 
-  test('aiPageMenuClick', async function() {
-    loadTimeData.overrideValues({
-      showAiPage: true,
-    });
-    resetRouterForTesting();
-    createSettingsMenu();
-    await microtasksFinished();
-
-    const entry =
-        settingsMenu.shadowRoot!.querySelector<HTMLElement>('a[href=\'/ai\']');
-    assertTrue(!!entry);
-    assertTrue(isVisible(entry));
-
-    const selector = settingsMenu.$.menu;
-    const whenIronSelect = eventToPromise<CustomEvent<{item: HTMLElement}>>(
-        'iron-select', selector);
-    entry.click();
-    // Ensure UMA is logged.
-    assertEquals(
-        'SettingsMenu_AiPageEntryPointClicked',
-        await metricsBrowserProxy.whenCalled('recordAction'));
-    await whenIronSelect;
-
-    assertEquals(routes.AI, Router.getInstance().getCurrentRoute());
-  });
-
-  test('yourSavedInfoMenuItemClick', async function() {
-    resetRouterForTesting();
-    createSettingsMenu();
-    await microtasksFinished();
-
-    const selector = settingsMenu.$.menu;
-    const whenIronSelect = eventToPromise<CustomEvent<{item: HTMLElement}>>(
-        'iron-select', selector);
-    const entry = settingsMenu.shadowRoot!.querySelector<HTMLElement>(
-        'a[href=\'/autofill\']');
-    assertTrue(!!entry);
-    assertTrue(isVisible(entry));
-
-    entry.click();
-    await whenIronSelect;
-    const [histogramName, referrer] =
-        await metricsBrowserProxy.whenCalled('recordAutofillSettingsReferrer');
-    assertEquals(
-        'Autofill.YourSavedInfoSettingsPage.VisitReferrer', histogramName);
-    assertEquals(AutofillSettingsReferrer.SETTINGS_MENU, referrer);
-    assertTrue(!!selector.selected);
-    assertEquals('/autofill', selector.selected.toString());
-    assertEquals(
-        routes.AUTOFILL, Router.getInstance().getCurrentRoute());
-  });
-
   test('navMenuItemClickActions', async function() {
     loadTimeData.overrideValues({
-      showAiPage: true,
       isGuest: false,
     });
     resetRouterForTesting();
@@ -235,11 +150,6 @@ suite('SettingsMenu', function() {
         route: routes.PEOPLE,
       },
       {
-        selector: '#autofill',
-        action: 'SettingsMenu_AutofillClicked',
-        route: routes.AUTOFILL,
-      },
-      {
         selector: '#privacy',
         action: 'SettingsMenu_PrivacyClicked',
         route: routes.PRIVACY,
@@ -248,11 +158,6 @@ suite('SettingsMenu', function() {
         selector: '#performance',
         action: 'SettingsMenu_PerformanceClicked',
         route: routes.PERFORMANCE,
-      },
-      {
-        selector: '#ai',
-        action: 'SettingsMenu_AiPageEntryPointClicked',
-        route: routes.AI,
       },
       {
         selector: '#appearance',
@@ -278,11 +183,6 @@ suite('SettingsMenu', function() {
         selector: '#downloads',
         action: 'SettingsMenu_DownloadsClicked',
         route: routes.DOWNLOADS,
-      },
-      {
-        selector: '#accessibility',
-        action: 'SettingsMenu_AccessibilityClicked',
-        route: routes.ACCESSIBILITY,
       },
       {
         selector: '#reset',
