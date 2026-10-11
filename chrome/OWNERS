@@ -96,6 +96,5 @@ per-file test/data/perf/frame_rate/content=*
 per-file test/data/perf/frame_rate/private=*
 per-file test/data/perf/private=*
 per-file test/data/xr/webvr_info=*
-per-file test/media_router/internal=*
 per-file test/python_tests=*
 per-file tools/memory=*

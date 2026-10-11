@@ -726,10 +726,6 @@
 	path = chrome/test/data/pdf_private
 	url = https://chrome-internal.googlesource.com/chrome/data/pdf_private
 	gclient-condition = checkout_src_internal
-[submodule "chrome/test/media_router/internal"]
-	path = chrome/test/media_router/internal
-	url = https://chrome-internal.googlesource.com/chrome/test/media_router/internal
-	gclient-condition = checkout_src_internal
 [submodule "chrome/tools/memory"]
 	path = chrome/tools/memory
 	url = https://chrome-internal.googlesource.com/chrome/tools/memory

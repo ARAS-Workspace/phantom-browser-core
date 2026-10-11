@@ -3695,12 +3695,6 @@ deps = {
       'condition': 'checkout_src_internal',
   },
 
-  'src/chrome/test/media_router/internal': {
-      'url': Var('chrome_git') + '/chrome/test/media_router/internal.git' + '@' +
-        '99937b3180700d9fb63eace8c762c7a5977a301f',
-      'condition': 'checkout_src_internal',
-  },
-
   'src/chrome/tools/memory': {
       'url': Var('chrome_git') + '/chrome/tools/memory.git' + '@' +
         '3c9359382236f6d57c91505234a2bc7fd635ba6c',

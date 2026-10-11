@@ -86,7 +86,6 @@ per-file chrome/test/data/perf/frame_rate/content=*
 per-file chrome/test/data/perf/frame_rate/private=*
 per-file chrome/test/data/perf/private=*
 per-file chrome/test/data/xr/webvr_info=*
-per-file chrome/test/media_router/internal=*
 per-file chrome/tools/memory=*
 per-file chrome/updater/internal=*
 per-file chromeos/ash/resources/internal=*

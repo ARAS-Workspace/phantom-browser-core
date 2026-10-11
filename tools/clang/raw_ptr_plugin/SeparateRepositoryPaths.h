@@ -46,7 +46,6 @@ inline constexpr std::array kSeparateRepositoryPaths = {
     "chrome/test/data/perf/frame_rate/private/",
     "chrome/test/data/perf/private/",
     "chrome/test/data/xr/webvr_info/",
-    "chrome/test/media_router/internal/",
     "chrome/test/python_tests/",
     "chrome/tools/memory/",
     "components/autofill/core/browser/form_parsing/internal_resources/",
