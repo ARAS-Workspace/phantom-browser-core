@@ -43,8 +43,6 @@ source_set("download") {
     "bubble/download_bubble_navigation_handler.h",
     "bubble/download_bubble_partial_view.cc",
     "bubble/download_bubble_partial_view.h",
-    "bubble/download_bubble_password_prompt_view.cc",
-    "bubble/download_bubble_password_prompt_view.h",
     "bubble/download_bubble_primary_view.cc",
     "bubble/download_bubble_primary_view.h",
     "bubble/download_bubble_row_list_view.cc",

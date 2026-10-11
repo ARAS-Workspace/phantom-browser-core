@@ -90,11 +90,10 @@ class DownloadBubbleContentsViewTest
           .WillRepeatedly(ReturnRefOfCopy(base::NumberToString(i)));
       EXPECT_CALL(*item, GetURL())
           .WillRepeatedly(ReturnRefOfCopy(GURL("https://chromium.org")));
-      // Make the download dangerous so that showing the security view is valid.
-      EXPECT_CALL(*item, GetDangerType())
-          .WillRepeatedly(Return(download::DownloadDangerType::
-                                     DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE));
-      EXPECT_CALL(*item, IsDangerous()).WillRepeatedly(Return(true));
+      // Make the download insecure so that showing the security view is valid.
+      EXPECT_CALL(*item, GetInsecureDownloadStatus())
+          .WillRepeatedly(
+              Return(download::DownloadItem::InsecureDownloadStatus::WARN));
       EXPECT_CALL(*item, GetReferrerUrl())
           .WillRepeatedly(ReturnRefOfCopy(GURL("https://chromium.org")));
       EXPECT_CALL(*item, GetTargetFilePath())
@@ -329,67 +328,6 @@ TEST_P(DownloadBubbleContentsViewTest, ProcessSecuritySubpageButtonPressKeep) {
   contents_view_->ProcessSecuritySubpageButtonPress(
       OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()),
       DownloadCommands::Command::KEEP);
-}
-
-TEST_P(DownloadBubbleContentsViewTest, AddSecuritySubpageWarningActionEvent) {
-  contents_view_->ShowSecurityPage(
-      OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()));
-  EXPECT_TRUE(contents_view_->security_view_for_testing()->IsInitialized());
-
-  // First action is required to be SHOWN.
-  DownloadItemWarningData::AddWarningActionEvent(
-      download_items_[0].get(),
-      DownloadItemWarningData::WarningSurface::BUBBLE_MAINPAGE,
-      DownloadItemWarningData::WarningAction::SHOWN);
-
-  contents_view_->AddSecuritySubpageWarningActionEvent(
-      OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()),
-      DownloadItemWarningData::WarningAction::BACK);
-
-  std::vector<DownloadItemWarningData::WarningActionEvent> events =
-      DownloadItemWarningData::GetWarningActionEvents(download_items_[0].get());
-  ASSERT_EQ(events.size(), 1u);
-  EXPECT_EQ(events[0].action, DownloadItemWarningData::WarningAction::BACK);
-}
-
-TEST_P(DownloadBubbleContentsViewTest, LogDismissOnDestroyed) {
-  contents_view_->ShowSecurityPage(
-      OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()));
-  EXPECT_TRUE(contents_view_->security_view_for_testing()->IsInitialized());
-
-  // First action is required to be SHOWN.
-  DownloadItemWarningData::AddWarningActionEvent(
-      download_items_[0].get(),
-      DownloadItemWarningData::WarningSurface::BUBBLE_MAINPAGE,
-      DownloadItemWarningData::WarningAction::SHOWN);
-
-  contents_view_.reset();
-
-  std::vector<DownloadItemWarningData::WarningActionEvent> events =
-      DownloadItemWarningData::GetWarningActionEvents(download_items_[0].get());
-  ASSERT_EQ(events.size(), 1u);
-  EXPECT_EQ(events[0].action, DownloadItemWarningData::WarningAction::DISMISS);
-}
-
-TEST_P(DownloadBubbleContentsViewTest,
-       DontLogDismissOnDestroyedIfSecurityViewNotShown) {
-  contents_view_->ShowSecurityPage(
-      OfflineItemUtils::GetContentIdForDownload(download_items_[0].get()));
-  EXPECT_TRUE(contents_view_->security_view_for_testing()->IsInitialized());
-
-  // First action is required to be SHOWN.
-  DownloadItemWarningData::AddWarningActionEvent(
-      download_items_[0].get(),
-      DownloadItemWarningData::WarningSurface::BUBBLE_MAINPAGE,
-      DownloadItemWarningData::WarningAction::SHOWN);
-
-  contents_view_->ShowPrimaryPage();
-
-  contents_view_.reset();
-
-  std::vector<DownloadItemWarningData::WarningActionEvent> events =
-      DownloadItemWarningData::GetWarningActionEvents(download_items_[0].get());
-  EXPECT_TRUE(events.empty());
 }
 
 TEST_P(DownloadBubbleContentsViewTest,

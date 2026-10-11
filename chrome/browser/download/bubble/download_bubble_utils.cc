@@ -75,21 +75,8 @@ bool DownloadUIModelIsRecent(const DownloadUIModel* model,
           model->GetStartTime() > cutoff_time);
 }
 
-bool IsPendingDeepScanning(const download::DownloadItem* item) {
-  return item->GetState() == download::DownloadItem::IN_PROGRESS &&
-         item->GetDangerType() ==
-             download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING;
-}
-
-bool IsPendingDeepScanning(const DownloadUIModel* model) {
-  return model->GetState() == download::DownloadItem::IN_PROGRESS &&
-         model->GetDangerType() ==
-             download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING;
-}
-
 bool IsItemInProgress(const download::DownloadItem* item) {
-  if (item->IsDangerous() || item->IsInsecure() ||
-      IsPendingDeepScanning(item)) {
+  if (item->IsDangerous() || item->IsInsecure()) {
     return false;
   }
   return item->GetState() == download::DownloadItem::IN_PROGRESS;
@@ -107,8 +94,7 @@ bool IsItemInProgress(const offline_items_collection::OfflineItem& item) {
 }
 
 bool IsModelInProgress(const DownloadUIModel* model) {
-  if (model->IsDangerous() || model->IsInsecure() ||
-      IsPendingDeepScanning(model)) {
+  if (model->IsDangerous() || model->IsInsecure()) {
     return false;
   }
   return model->GetState() == download::DownloadItem::IN_PROGRESS;
@@ -154,31 +140,12 @@ DownloadBubbleAccessibleAlertsMap::Alert GetAccessibleAlertForModel(
       }
       break;
     }
-    case download::DownloadItemMode::kDangerous:
-    case download::DownloadItemMode::kMalicious: {
-      if (model.GetDangerType() ==
-          download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING) {
-        return Alert{Alert::Urgency::kAlertSoon,
-                     l10n_util::GetStringFUTF16(
-                         IDS_PROMPT_DEEP_SCANNING_ACCESSIBLE_ALERT, filename)};
-      }
-      size_t ignored;
-      return Alert{Alert::Urgency::kAlertSoon,
-                   model.GetWarningText(filename, &ignored)};
-    }
     case download::DownloadItemMode::kInsecureDownloadWarn:
     case download::DownloadItemMode::kInsecureDownloadBlock:
       return Alert{
           Alert::Urgency::kAlertSoon,
           l10n_util::GetStringFUTF16(
               IDS_PROMPT_DOWNLOAD_INSECURE_BLOCKED_ACCESSIBLE_ALERT, filename)};
-    case download::DownloadItemMode::kDeepScanning:
-      // Note: kAlertSoon (as opposed to kAlertWhenAppropriate) is correct here,
-      // because observers are updated when a deep scan begins, and not
-      // continuously during a deep scan.
-      return Alert{Alert::Urgency::kAlertSoon,
-                   l10n_util::GetStringFUTF16(
-                       IDS_DEEP_SCANNING_ACCESSIBLE_ALERT, filename)};
   }
 
   // An empty alert will not be added.

@@ -270,92 +270,6 @@ std::u16string DownloadUIModel::GetTooltipText() const {
   return tooltip;
 }
 
-std::u16string DownloadUIModel::GetWarningText(const std::u16string& filename,
-                                               size_t* offset) const {
-  *offset = std::string::npos;
-  switch (GetDangerType()) {
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
-      return l10n_util::GetStringUTF16(IDS_PROMPT_MALICIOUS_DOWNLOAD_URL);
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
-      return IsExtensionDownload()
-                 ? l10n_util::GetStringUTF16(
-                       IDS_PROMPT_DANGEROUS_DOWNLOAD_EXTENSION)
-                 : l10n_util::GetStringFUTF16(IDS_PROMPT_DANGEROUS_DOWNLOAD,
-                                              filename, offset);
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
-      return l10n_util::GetStringFUTF16(IDS_PROMPT_MALICIOUS_DOWNLOAD_CONTENT,
-                                        filename, offset);
-    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
-      return l10n_util::GetStringFUTF16(IDS_PROMPT_UNCOMMON_DOWNLOAD_CONTENT,
-                                        filename, offset);
-    }
-    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-      return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_CHANGES_SETTINGS,
-                                        filename, offset);
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
-      return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_BLOCKED_TOO_LARGE,
-                                        filename, offset);
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
-      return l10n_util::GetStringFUTF16(
-          IDS_PROMPT_DOWNLOAD_BLOCKED_PASSWORD_PROTECTED, filename, offset);
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
-      return l10n_util::GetStringUTF16(
-          IDS_PROMPT_DOWNLOAD_SENSITIVE_CONTENT_WARNING);
-    case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_GDRIVE:
-    case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_ONEDRIVE:
-      return l10n_util::GetStringUTF16(
-          IDS_PROMPT_DOWNLOAD_FORCED_SAVE_TO_CLOUD);
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK:
-      return l10n_util::GetStringUTF16(
-          IDS_PROMPT_DOWNLOAD_SENSITIVE_CONTENT_BLOCKED);
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
-      return l10n_util::GetStringFUTF16(IDS_PROMPT_DEEP_SCANNING, filename,
-                                        offset);
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-      return l10n_util::GetStringFUTF16(
-          IDS_DOWNLOAD_LOCAL_DECRYPTION_PROMPT_ALERT, filename, offset);
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_SCAN_FAILED:
-      return l10n_util::GetStringUTF16(IDS_PROMPT_DOWNLOAD_BLOCKED_SCAN_FAILED);
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_SAFE:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_OPENED_DANGEROUS:
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS:
-    case download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED:
-    case download::DOWNLOAD_DANGER_TYPE_ALLOWLISTED_BY_POLICY:
-    case download::DOWNLOAD_DANGER_TYPE_MAX:
-      break;
-  }
-
-  switch (GetInsecureDownloadStatus()) {
-    case download::DownloadItem::InsecureDownloadStatus::BLOCK:
-      return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_INSECURE_BLOCKED,
-                                        filename, offset);
-    case download::DownloadItem::InsecureDownloadStatus::WARN:
-      return l10n_util::GetStringFUTF16(IDS_PROMPT_DOWNLOAD_INSECURE_WARNING,
-                                        filename, offset);
-    case download::DownloadItem::InsecureDownloadStatus::UNKNOWN:
-    case download::DownloadItem::InsecureDownloadStatus::SAFE:
-    case download::DownloadItem::InsecureDownloadStatus::VALIDATED:
-    case download::DownloadItem::InsecureDownloadStatus::SILENT_BLOCK:
-      break;
-  }
-
-  return std::u16string();
-}
-
-std::u16string DownloadUIModel::GetWarningConfirmButtonText() const {
-  const auto kDangerousFile = download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE;
-  return l10n_util::GetStringUTF16(
-      (GetDangerType() == kDangerousFile && IsExtensionDownload())
-          ? IDS_CONTINUE_EXTENSION_DOWNLOAD
-          : IDS_CONFIRM_DOWNLOAD);
-}
-
 std::u16string DownloadUIModel::GetShowInFolderText() const {
   return l10n_util::GetStringUTF16(IDS_DOWNLOAD_LINK_SHOW);
 }
@@ -695,10 +609,6 @@ DownloadUIModel::TailoredWarningType DownloadUIModel::GetTailoredWarningType()
   return TailoredWarningType::kNoTailoredWarning;
 }
 
-DownloadUIModel::DangerUiPattern DownloadUIModel::GetDangerUiPattern() const {
-  return DangerUiPattern::kNormal;
-}
-
 bool DownloadUIModel::ShouldShowInUi() const {
   return true;
 }
@@ -805,39 +715,12 @@ DownloadUIModel::BubbleStatusTextBuilder::GetBubbleWarningStatusText() const {
   }
 
   switch (model_->GetDangerType()) {
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
-      if (model_->IsExtensionDownload()) {
-        // "Blocked • Unknown source"
-        return get_blocked_warning(IDS_DOWNLOAD_BUBBLE_STATUS_UNKNOWN_SOURCE);
-      }
-      if (WasSafeBrowsingVerdictObtained(model_->GetDownloadItem())) {
-        // "Suspicious download blocked"
-        return l10n_util::GetStringUTF16(
-            IDS_DOWNLOAD_BUBBLE_STATUS_WARNING_SUSPICIOUS);
-      }
-      // "Unverified download blocked"
-      return l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_STATUS_WARNING_UNVERIFIED);
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
-    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
-      // "Dangerous download blocked"
-      return l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_STATUS_WARNING_DANGEROUS);
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
       // "Blocked • Encrypted"
       return get_blocked_warning(IDS_DOWNLOAD_BUBBLE_STATUS_ENCRYPTED);
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
       // "Blocked • Too big"
       return get_blocked_warning(IDS_DOWNLOAD_BUBBLE_STATUS_TOO_BIG);
-    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
-      // "Suspicious download blocked"
-      return l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_STATUS_WARNING_SUSPICIOUS);
-    }
-
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
       // "Sensitive content"
       return l10n_util::GetStringUTF16(
@@ -849,46 +732,21 @@ DownloadUIModel::BubbleStatusTextBuilder::GetBubbleWarningStatusText() const {
       // "Blocked by your organization"
       return l10n_util::GetStringUTF16(
           IDS_POLICY_ACTION_BLOCKED_BY_ORGANIZATION);
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
-        // "Scan for malware • Suspicious"
-        return l10n_util::GetStringFUTF16(
-            IDS_DOWNLOAD_BUBBLE_DOWNLOAD_STATUS_MESSAGE_WITH_SEPARATOR,
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_STATUS_DEEP_SCANNING_PROMPT_UPDATED),
-            l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_STATUS_SUSPICIOUS));
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-      // "Suspicious file blocked • Password needed"
-      return l10n_util::GetStringFUTF16(
-          IDS_DOWNLOAD_BUBBLE_DOWNLOAD_STATUS_MESSAGE_WITH_SEPARATOR,
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_STATUS_LOCAL_DECRYPTION_STATUS),
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_STATUS_PASSWORD_NEEDED));
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-      // Either "Checking with your organization's security policies..." or
-      // "Scanning..."
-      if (download::DoesDownloadConnectorBlock(
-              model_->profile(), model_->GetDownloadItem()->GetURL())) {
-        return l10n_util::GetStringUTF16(
-            IDS_DOWNLOAD_BUBBLE_STATUS_ASYNC_SCANNING_ENTERPRISE);
-      } else {
-        return l10n_util::GetStringUTF16(
-            IDS_DOWNLOAD_BUBBLE_STATUS_ASYNC_SCANNING);
-      }
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
-      // "Checking for malware..."
-      return l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_STATUS_LOCAL_DECRYPTING);
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-        // "Scan failed • Suspicious"
-        return l10n_util::GetStringFUTF16(
-            IDS_DOWNLOAD_BUBBLE_DOWNLOAD_STATUS_MESSAGE_WITH_SEPARATOR,
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_STATUS_DEEP_SCANNED_FAILED_UPDATED),
-            l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_STATUS_SUSPICIOUS));
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_SCAN_FAILED:
       // "Blocked • Scan failed"
       return get_blocked_warning(IDS_DOWNLOAD_BUBBLE_STATUS_SCAN_FAILED);
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
+    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
+    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
+    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
+    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
+    case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
+    case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
+    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_SAFE:
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_OPENED_DANGEROUS:
     case download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS:
@@ -1033,24 +891,16 @@ DownloadUIModel::BubbleStatusTextBuilder::GetCompletedStatusText() const {
     // Offline items have these null.
     return l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_STATUS_DONE);
   }
-  std::u16string delta_str;
-  if (model_->GetDangerType() ==
-      download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_SAFE) {
-    // "2 B • Scan is done"
-    delta_str = l10n_util::GetStringUTF16(
-        IDS_DOWNLOAD_BUBBLE_STATUS_DEEP_SCANNING_DONE_UPDATED);
-  } else {
-    base::TimeDelta time_elapsed = base::Time::Now() - model_->GetEndTime();
-    // If less than 1 minute has passed since download completed: "2 B • Done"
-    // Otherwise: e.g. "2 B • 3 minutes ago"
-    // If the elapsed time is negative (could happen if the system time has
-    // been adjusted backwards), also just display "2 B • Done".
-    delta_str =
-        time_elapsed.InMinutes() <= 0
-            ? l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_STATUS_DONE)
-            : ui::TimeFormat::Simple(ui::TimeFormat::FORMAT_ELAPSED,
-                                     ui::TimeFormat::LENGTH_LONG, time_elapsed);
-  }
+  base::TimeDelta time_elapsed = base::Time::Now() - model_->GetEndTime();
+  // If less than 1 minute has passed since download completed: "2 B • Done"
+  // Otherwise: e.g. "2 B • 3 minutes ago"
+  // If the elapsed time is negative (could happen if the system time has
+  // been adjusted backwards), also just display "2 B • Done".
+  std::u16string delta_str =
+      time_elapsed.InMinutes() <= 0
+          ? l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_STATUS_DONE)
+          : ui::TimeFormat::Simple(ui::TimeFormat::FORMAT_ELAPSED,
+                                   ui::TimeFormat::LENGTH_LONG, time_elapsed);
   return StatusTextBuilderUtils::GetBubbleStatusMessageWithBytes(
       ui::FormatBytes(base::ByteSize(
           base::checked_cast<uint64_t>(model_->GetTotalBytes()))),
@@ -1227,8 +1077,4 @@ std::u16string DownloadUIModel::GetInProgressAccessibleAlertText() const {
       ui::FormatBytes(
           base::ByteSize(base::checked_cast<uint64_t>(GetTotalBytes()))),
       GetFileNameToReportUser().LossyDisplayName());
-}
-
-bool DownloadUIModel::IsTopLevelEncryptedArchive() const {
-  return false;
 }

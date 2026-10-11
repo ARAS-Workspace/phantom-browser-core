@@ -115,7 +115,6 @@ class DownloadItemModel : public DownloadUIModel,
   void ExecuteCommand(DownloadCommands* download_commands,
                       DownloadCommands::Command command) override;
   TailoredWarningType GetTailoredWarningType() const override;
-  DangerUiPattern GetDangerUiPattern() const override;
   bool ShouldShowInUi() const override;
   void SetShouldShowInUi(bool should_show) override;
   bool ShouldShowInBubble() const override;
@@ -126,7 +125,6 @@ class DownloadItemModel : public DownloadUIModel,
   void DetermineAndSetShouldPreferOpeningInBrowser(
       const base::FilePath& target_path,
       bool is_filetype_handled_safely) override;
-  bool IsTopLevelEncryptedArchive() const override;
   bool IsExtensionDownload() const override;
 
   // download::DownloadItem::Observer implementation.

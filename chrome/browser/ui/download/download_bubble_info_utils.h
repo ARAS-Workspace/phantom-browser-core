@@ -42,11 +42,9 @@ struct DownloadBubbleQuickAction {
 // progress bar in the download bubble.
 struct DownloadBubbleProgressBar {
   bool is_visible = false;
-  bool is_looping = false;
 
   static DownloadBubbleProgressBar NoProgressBar();
   static DownloadBubbleProgressBar ProgressBar();
-  static DownloadBubbleProgressBar LoopingProgressBar();
 };
 
 // Return the icon shown on both the row view and subpage.

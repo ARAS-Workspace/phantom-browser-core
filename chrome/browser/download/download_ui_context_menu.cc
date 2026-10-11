@@ -69,13 +69,6 @@ ui::SimpleMenuModel* DownloadUiContextMenu::GetMenuModel() {
   } else if (ChromeDownloadManagerDelegate::IsDangerTypeBlocked(
                  download_->GetDangerType())) {
     model = GetInterruptedMenuModel(is_download);
-  } else if (download_->GetDangerType() ==
-             download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING) {
-    model = GetDeepScanningMenuModel(is_download);
-  } else if (download_->IsMalicious()) {
-    model = GetMaliciousMenuModel(is_download);
-  } else if (download_->MightBeMalicious()) {
-    model = GetMaybeMaliciousMenuModel(is_download);
   } else if (download_->GetState() == download::DownloadItem::COMPLETE) {
     model = GetFinishedMenuModel(is_download);
   } else if (download_->GetState() == download::DownloadItem::INTERRUPTED) {
@@ -338,72 +331,6 @@ ui::SimpleMenuModel* DownloadUiContextMenu::GetInterruptedMenuModel(
       DownloadCommands::CANCEL, GetLabelForCommandId(DownloadCommands::CANCEL));
 
   return interrupted_download_menu_model_.get();
-}
-
-ui::SimpleMenuModel* DownloadUiContextMenu::GetMaybeMaliciousMenuModel(
-    bool is_download) {
-  if (maybe_malicious_download_menu_model_) {
-    return maybe_malicious_download_menu_model_.get();
-  }
-
-  maybe_malicious_download_menu_model_ =
-      std::make_unique<ui::SimpleMenuModel>(this);
-
-  maybe_malicious_download_menu_model_->AddItem(
-      DownloadCommands::KEEP, GetLabelForCommandId(DownloadCommands::KEEP));
-  maybe_malicious_download_menu_model_->AddSeparator(ui::NORMAL_SEPARATOR);
-  maybe_malicious_download_menu_model_->AddItem(
-      DownloadCommands::LEARN_MORE_SCANNING,
-      GetLabelForCommandId(DownloadCommands::LEARN_MORE_SCANNING));
-  return maybe_malicious_download_menu_model_.get();
-}
-
-ui::SimpleMenuModel* DownloadUiContextMenu::GetMaliciousMenuModel(
-    bool is_download) {
-  if (malicious_download_menu_model_) {
-    return malicious_download_menu_model_.get();
-  }
-
-  malicious_download_menu_model_ = std::make_unique<ui::SimpleMenuModel>(this);
-  malicious_download_menu_model_->AddItem(
-      DownloadCommands::LEARN_MORE_SCANNING,
-      GetLabelForCommandId(DownloadCommands::LEARN_MORE_SCANNING));
-
-  return malicious_download_menu_model_.get();
-}
-
-ui::SimpleMenuModel* DownloadUiContextMenu::GetDeepScanningMenuModel(
-    bool is_download) {
-  if (deep_scanning_menu_model_) {
-    return deep_scanning_menu_model_.get();
-  }
-
-  deep_scanning_menu_model_ = std::make_unique<ui::SimpleMenuModel>(this);
-  deep_scanning_menu_model_->AddItem(
-      DownloadCommands::DEEP_SCAN,
-      GetLabelForCommandId(DownloadCommands::DEEP_SCAN));
-
-  deep_scanning_menu_model_->AddItem(
-      DownloadCommands::DISCARD,
-      GetLabelForCommandId(DownloadCommands::DISCARD));
-
-  deep_scanning_menu_model_->AddItem(
-      DownloadCommands::BYPASS_DEEP_SCANNING_AND_OPEN,
-      GetLabelForCommandId(DownloadCommands::BYPASS_DEEP_SCANNING_AND_OPEN));
-
-  deep_scanning_menu_model_->AddSeparator(ui::NORMAL_SEPARATOR);
-
-  if (is_download) {
-    deep_scanning_menu_model_->AddItem(
-        DownloadCommands::SHOW_IN_FOLDER,
-        GetLabelForCommandId(DownloadCommands::SHOW_IN_FOLDER));
-    deep_scanning_menu_model_->AddSeparator(ui::NORMAL_SEPARATOR);
-  }
-
-  deep_scanning_menu_model_->AddItem(
-      DownloadCommands::CANCEL, GetLabelForCommandId(DownloadCommands::CANCEL));
-
-  return deep_scanning_menu_model_.get();
 }
 
 ui::SimpleMenuModel* DownloadUiContextMenu::GetInsecureDownloadMenuModel() {

@@ -55,22 +55,6 @@ class DownloadUIModel {
     kMaxValue = kSuspiciousArchive
   };
 
-  // Represents the UI pattern used for the download, based on its danger type.
-  // This should be consistent across the download bubble and
-  // chrome://downloads, wherever download warnings are displayed.
-  enum class DangerUiPattern {
-    // The download has no warning and no error conditions.
-    kNormal,
-    // The download has a warning with a red "dangerous" icon and red text.
-    kDangerous,
-    // The download has a warning with a gray "warning" icon and gray text.
-    // Includes "unverified" and insecure.
-    kSuspicious,
-    // Some other combination of warning colors/icons, including the "download
-    // off" icon for an error or cancellation.
-    kOther,
-  };
-
   // Abstract base class for building StatusText
   // TODO(crbug.com/401528883): Clean up vestiges of the download shelf. Unify
   // the strings/logic as much as possible. Rename StatusTextBuilder to
@@ -189,16 +173,6 @@ class DownloadUIModel {
   //    Report.pdf
   //    Network disconnected
   std::u16string GetTooltipText() const;
-
-  // Get the warning text to display for a dangerous download. |filename| is the
-  // (possibly-elided) filename; if it is present in the resulting string,
-  // |offset| will be set to the starting position of the filename.
-  std::u16string GetWarningText(const std::u16string& filename,
-                                size_t* offset) const;
-
-  // Get the caption text for a button for confirming a dangerous download
-  // warning.
-  std::u16string GetWarningConfirmButtonText() const;
 
   // Get the text to display for the button to show item in folder on download
   // history page.
@@ -448,10 +422,6 @@ class DownloadUIModel {
   // download shouldn't trigger a tailored warning.
   virtual TailoredWarningType GetTailoredWarningType() const;
 
-  // Returns the UI pattern to be used for the download, e.g. dangerous or
-  // suspicious. Returns kNoWarning if the download has no warning.
-  virtual DangerUiPattern GetDangerUiPattern() const;
-
   // Ephemeral warnings are ones that are quickly removed from the UI if the
   // user has not acted on them, and later deleted altogether. Is this that kind
   // of warning?
@@ -472,11 +442,6 @@ class DownloadUIModel {
   // Returns the accessible alert text that should be announced when the
   // download is in progress.
   virtual std::u16string GetInProgressAccessibleAlertText() const;
-
-  // Determines whether the file is an encrypted archive at the top
-  // level (i.e. the encryption is not within a nested archive). This is
-  // used to specialize certain strings.
-  virtual bool IsTopLevelEncryptedArchive() const;
 
   // Returns whether the download is triggered by an extension.
   virtual bool IsExtensionDownload() const;

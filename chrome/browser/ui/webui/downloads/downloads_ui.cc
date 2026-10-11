@@ -89,9 +89,6 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"dangerReview", IDS_REVIEW_DOWNLOAD},
 
       // Deep scanning strings.
-      {"deepScannedFailedDesc", IDS_DEEP_SCANNED_FAILED_DESCRIPTION},
-      {"deepScannedOpenedDangerousDesc",
-       IDS_DEEP_SCANNED_OPENED_DANGEROUS_DESCRIPTION},
       {"sensitiveContentWarningDesc",
        IDS_BLOCK_REASON_SENSITIVE_CONTENT_WARNING},
       {"sensitiveContentBlockedDesc",
@@ -100,14 +97,6 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"blockedTooLargeDesc", IDS_BLOCKED_TOO_LARGE_DESCRIPTION},
       {"blockedPasswordProtectedDesc",
        IDS_BLOCKED_PASSWORD_PROTECTED_DESCRIPTION},
-      {"asyncScanningDownloadDesc", IDS_BLOCK_REASON_DEEP_SCANNING_UPDATED},
-      {"asyncScanningDownloadDescSecond",
-       IDS_BLOCK_REASON_DEEP_SCANNING_SECOND_UPDATED},
-      {"promptForScanningDesc", IDS_BLOCK_REASON_PROMPT_FOR_SCANNING_UPDATED},
-      {"promptForLocalPasswordScanningDesc",
-       IDS_BLOCK_REASON_PROMPT_FOR_LOCAL_PASSWORD_SCANNING},
-      {"controlDeepScan", IDS_DOWNLOAD_DEEP_SCAN_UPDATED},
-      {"controlLocalPasswordScan", IDS_DOWNLOAD_LOCAL_PASSWORD_SCAN},
 
       // Controls.
       {"controlPause", IDS_DOWNLOAD_LINK_PAUSE},
@@ -115,8 +104,6 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"controlResume", IDS_DOWNLOAD_LINK_RESUME},
       {"controlRetry", IDS_DOWNLOAD_LINK_RETRY},
       {"controlledByUrl", IDS_DOWNLOAD_BY_EXTENSION_URL},
-      {"controlOpenNow", IDS_OPEN_DOWNLOAD_NOW},
-      {"controlOpenAnyway", IDS_OPEN_DOWNLOAD_ANYWAY},
       {"toastClearedAll", IDS_DOWNLOAD_TOAST_CLEARED_ALL},
       {"toastDeletedFromHistoryStillOnDevice",
        IDS_DOWNLOADS_TOAST_DELETED_FROM_HISTORY_STILL_ON_DEVICE},

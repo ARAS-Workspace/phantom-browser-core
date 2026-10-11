@@ -671,7 +671,7 @@ void DownloadToolbarUIController::UpdateIcon() {
       is_icon_active ? kColorDownloadToolbarButtonActive
                      : kColorDownloadToolbarButtonInactive);
   bool is_touch_mode = ui::TouchUiController::Get()->touch_ui();
-  if (state_ == IconState::kProgress || state_ == IconState::kDeepScanning ||
+  if (state_ == IconState::kProgress ||
       state_ == IconState::kContentCheckPending) {
     new_icon = is_touch_mode ? &(features::IsRoundedIconsEnabled()
                                      ? kArrowDownwardAltIcon
@@ -1161,8 +1161,7 @@ void DownloadToolbarUIController::CloseAutofillPopup() {
 }
 
 bool DownloadToolbarUIController::ShouldShowScanningAnimation() const {
-  return !is_dormant_ && (state_ == IconState::kDeepScanning ||
-                          state_ == IconState::kContentCheckPending ||
+  return !is_dormant_ && (state_ == IconState::kContentCheckPending ||
                           !progress_info_.progress_certain);
 }
 

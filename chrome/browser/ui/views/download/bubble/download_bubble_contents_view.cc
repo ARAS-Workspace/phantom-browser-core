@@ -156,47 +156,6 @@ void DownloadBubbleContentsView::AddSecuritySubpageWarningActionEvent(
   }
 }
 
-void DownloadBubbleContentsView::ProcessDeepScanPress(
-    const ContentId& id,
-    DownloadItemWarningData::DeepScanTrigger trigger,
-    base::optional_ref<const std::string> password) {
-  if (DownloadUIModel* model = GetDownloadModel(id); model) {
-    DownloadItemWarningData::AddWarningActionEvent(
-        model->GetDownloadItem(),
-        DownloadItemWarningData::WarningSurface::BUBBLE_SUBPAGE,
-        DownloadItemWarningData::WarningAction::ACCEPT_DEEP_SCAN);
-  }
-}
-
-void DownloadBubbleContentsView::ProcessLocalDecryptionPress(
-    const offline_items_collection::ContentId& id,
-    base::optional_ref<const std::string> password) {
-}
-
-void DownloadBubbleContentsView::ProcessLocalPasswordInProgressClick(
-    const offline_items_collection::ContentId& id,
-    DownloadCommands::Command command) {
-}
-
-bool DownloadBubbleContentsView::IsEncryptedArchive(const ContentId& id) {
-  if (DownloadUIModel* model = GetDownloadModel(id); model) {
-    return DownloadItemWarningData::IsTopLevelEncryptedArchive(
-        model->GetDownloadItem());
-  }
-
-  return false;
-}
-
-bool DownloadBubbleContentsView::HasPreviousIncorrectPassword(
-    const ContentId& id) {
-  if (DownloadUIModel* model = GetDownloadModel(id); model) {
-    return DownloadItemWarningData::HasIncorrectPassword(
-        model->GetDownloadItem());
-  }
-
-  return false;
-}
-
 DownloadUIModel* DownloadBubbleContentsView::GetDownloadModel(
     const ContentId& id) {
   return info_->GetDownloadModel(id);

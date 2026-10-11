@@ -16,17 +16,7 @@ DownloadItemMode GetDesiredDownloadItemMode(const DownloadUIModel* download) {
                 : DownloadItemMode::kInsecureDownloadBlock;
   }
 
-  if (download->IsDangerous() &&
-      (download->GetState() != download::DownloadItem::CANCELLED)) {
-    return download->MightBeMalicious() ? DownloadItemMode::kMalicious
-                                        : DownloadItemMode::kDangerous;
-  }
-
-  return ((download->GetDangerType() ==
-           download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING) &&
-          (download->GetState() != download::DownloadItem::CANCELLED))
-             ? DownloadItemMode::kDeepScanning
-             : DownloadItemMode::kNormal;
+  return DownloadItemMode::kNormal;
 }
 
 }  // namespace download

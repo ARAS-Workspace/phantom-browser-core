@@ -33,13 +33,11 @@
 #include "chrome/browser/download/download_query.h"
 #include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/drag_download_item.h"
-#include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/feature_engagement/non_iph_promo.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
-#include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/chrome_pages.h"
@@ -73,8 +71,6 @@
 #include "ui/gfx/image/image.h"
 #include "ui/views/interaction/element_tracker_views.h"
 
-#include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
-
 using content::BrowserThread;
 
 namespace {
@@ -96,10 +92,10 @@ enum DownloadsDOMEvent {
   DOWNLOADS_DOM_EVENT_OPEN_FOLDER = 10,
   DOWNLOADS_DOM_EVENT_RESUME = 11,
   DOWNLOADS_DOM_EVENT_RETRY_DOWNLOAD = 12,
-  DOWNLOADS_DOM_EVENT_OPEN_DURING_SCANNING = 13,
+  // Obsolete: DOWNLOADS_DOM_EVENT_OPEN_DURING_SCANNING = 13,
   DOWNLOADS_DOM_EVENT_REVIEW_DANGEROUS = 14,
-  DOWNLOADS_DOM_EVENT_DEEP_SCAN = 15,
-  DOWNLOADS_DOM_EVENT_BYPASS_DEEP_SCAN = 16,
+  // Obsolete: DOWNLOADS_DOM_EVENT_DEEP_SCAN = 15,
+  // Obsolete: DOWNLOADS_DOM_EVENT_BYPASS_DEEP_SCAN = 16,
   DOWNLOADS_DOM_EVENT_SAVE_SUSPICIOUS = 17,
   DOWNLOADS_DOM_EVENT_OPEN_BYPASS_WARNING_PROMPT = 18,
   DOWNLOADS_DOM_EVENT_SAVE_DANGEROUS_FROM_PROMPT = 19,
@@ -115,20 +111,6 @@ void CountDownloadsDOMEvents(DownloadsDOMEvent event) {
 
 bool CanLogWarningMetrics(download::DownloadItem* file) {
   return file && file->IsDangerous() && !file->IsDone();
-}
-
-void PromptForScanningInBubble(content::WebContents* web_contents,
-                               download::DownloadItem* download) {
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(web_contents);
-  if (!browser) {
-    return;
-  }
-  BrowserWindow::FromBrowser(browser)
-      ->GetDownloadBubbleUIController()
-      ->GetDownloadDisplayController()
-      ->OpenSecuritySubpage(
-          OfflineItemUtils::GetContentIdForDownload(download));
 }
 
 // Records DownloadItemWarningData.
@@ -500,13 +482,6 @@ void DownloadsDOMHandler::RemoveDownloads(const DownloadVector& to_remove) {
 
   for (download::DownloadItem* download : to_remove) {
     bool should_remove = download->IsDangerous() || download->IsInsecure();
-    if (!should_remove) {
-      download::DownloadDangerType danger_type = download->GetDangerType();
-      should_remove =
-          danger_type == download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING ||
-          danger_type ==
-              download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING;
-    }
     if (should_remove) {
       // Don't allow users to revive dangerous downloads; just nuke 'em.
       download->Remove();
@@ -543,63 +518,6 @@ void DownloadsDOMHandler::OpenDownloadsFolderRequiringGesture() {
         Profile::FromBrowserContext(manager->GetBrowserContext()),
         DownloadPrefs::FromDownloadManager(manager)->DownloadPath(),
         platform_util::OPEN_FOLDER, platform_util::OpenOperationCallback());
-  }
-}
-
-void DownloadsDOMHandler::OpenDuringScanningRequiringGesture(
-    const std::string& id) {
-  if (!GetWebUIWebContents()->HasRecentInteraction()) {
-    LOG(ERROR) << "OpenDownloadsFolderRequiringGesture received without recent "
-                  "user interaction";
-    return;
-  }
-
-  CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_OPEN_DURING_SCANNING);
-  download::DownloadItem* download = GetDownloadByStringId(id);
-  if (download) {
-    DownloadItemModel model(download);
-    model.SetOpenWhenComplete(true);
-  }
-}
-
-void DownloadsDOMHandler::DeepScan(const std::string& id) {
-  CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_DEEP_SCAN);
-  download::DownloadItem* download = GetDownloadByStringId(id);
-  if (!download) {
-    return;
-  }
-
-  if (DownloadItemWarningData::IsTopLevelEncryptedArchive(download)) {
-    // For encrypted archives, we need a password from the user. We will request
-    // this in the download bubble.
-    PromptForScanningInBubble(GetWebUIWebContents(), download);
-    return;
-  }
-
-  DownloadItemWarningData::AddWarningActionEvent(
-      download, DownloadItemWarningData::WarningSurface::DOWNLOADS_PAGE,
-      DownloadItemWarningData::WarningAction::ACCEPT_DEEP_SCAN);
-  DownloadItemModel model(download);
-  DownloadCommands commands(model.GetWeakPtr());
-  commands.ExecuteCommand(DownloadCommands::DEEP_SCAN);
-}
-
-void DownloadsDOMHandler::BypassDeepScanRequiringGesture(
-    const std::string& id) {
-  if (!GetWebUIWebContents()->HasRecentInteraction()) {
-    LOG(ERROR) << "BypassDeepScanRequiringGesture received without recent "
-                  "user interaction";
-    return;
-  }
-
-  CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_BYPASS_DEEP_SCAN);
-  download::DownloadItem* download = GetDownloadByStringId(id);
-  if (download) {
-    DownloadItemModel model(download);
-    DownloadCommands commands(model.GetWeakPtr());
-    // The button says "Download suspicious file" which does not imply opening
-    // the file.
-    commands.ExecuteCommand(DownloadCommands::BYPASS_DEEP_SCANNING);
   }
 }
 

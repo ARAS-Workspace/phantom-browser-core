@@ -49,10 +49,6 @@ enum State {
   kDangerous,
   kInterrupted,
   kInsecure,
-  // See download::DownloadDangerType for more details on the scanning States.
-  kAsyncScanning,
-  kPromptForScanning,
-  kPromptForLocalPasswordScanning,
 };
 
 // This corresponds to safe_browsing::SafeBrowsingState.
@@ -166,22 +162,10 @@ interface PageHandler {
   // Logs when the user actually sees the ESB Download Row Promo.
   LogEsbPromotionRowViewed();
 
-  // Opens this download with the given |id| while it is being scanned by Safe
-  // Browsing. This completes the scan early. This requires a user gesture on
-  // the WebUI.
-  OpenDuringScanningRequiringGesture(string id);
-
   // Opens a review dialog for the download with the given |id| after it has
   // received a warning deep scanning verdict. This requires a user gesture on
   // the WebUI.
   ReviewDangerousRequiringGesture(string id);
-
-  // Performs deep scan for the download with the given |id|.
-  DeepScan(string id);
-
-  // Bypass deep scan for download with the given |id|. This requires a user
-  // gesture on the WebUI.
-  BypassDeepScanRequiringGesture(string id);
 
   // Checks whether an ESB Promotion can be shown on this profile.
   IsEligibleForEsbPromo() => (bool result);

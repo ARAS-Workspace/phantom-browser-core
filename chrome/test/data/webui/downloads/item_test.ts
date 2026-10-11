@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import type {CrIconElement, CrToastManagerElement, DownloadsItemElement} from 'chrome://downloads/downloads.js';
+import type {CrToastManagerElement, DownloadsItemElement} from 'chrome://downloads/downloads.js';
 import {browserProxyFactory, DangerType, IconLoaderImpl, loadTimeData, SafeBrowsingState, State, TailoredWarningType} from 'chrome://downloads/downloads.js';
 import {assertEquals, assertFalse, assertNotReached, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
@@ -68,21 +68,6 @@ suite('ItemTest', function() {
       hideDate: true,
       state: State.kDangerous,
       displayInitiatorOrigin: 'https://displaytest.com',
-    });
-    await microtasksFinished();
-
-    assertTrue(isVisible(
-        item.shadowRoot.querySelector<HTMLElement>('#initiator-origin')));
-  });
-
-  test('failed deep scans display initiator origin', async () => {
-    item.data = createDownload({
-      dangerType: DangerType.kDeepScannedFailed,
-      fileExternallyRemoved: false,
-      hideDate: true,
-      state: State.kComplete,
-      url: 'http://evil.com',
-      displayInitiatorOrigin: 'http://display.com',
     });
     await microtasksFinished();
 
@@ -190,20 +175,6 @@ suite('ItemTest', function() {
     item.data = createDownload({
       filePath: 'unique1',
       hideDate: false,
-      dangerType: DangerType.kDeepScannedFailed,
-    });
-    await microtasksFinished();
-
-    assertEquals(
-        'cr:warning-filled', item.shadowRoot.querySelector('cr-icon')!.icon);
-    assertTrue(item.$.fileIcon.hidden);
-    assertEquals(
-        'grey',
-        item.shadowRoot.querySelector('cr-icon')!.getAttribute('icon-color'));
-
-    item.data = createDownload({
-      filePath: 'unique1',
-      hideDate: false,
       dangerType: DangerType.kDangerousUrl,
     });
     await microtasksFinished();
@@ -290,18 +261,6 @@ suite('ItemTest', function() {
       dangerType: DangerType.kDangerousFile,
       safeBrowsingState: SafeBrowsingState.kStandardProtection,
       hasSafeBrowsingVerdict: false,
-    });
-    await microtasksFinished();
-
-    assertEquals(
-        'grey',
-        item.shadowRoot.querySelector('.description')!.getAttribute(
-            'description-color'));
-
-    item.data = createDownload({
-      filePath: 'unique1',
-      hideDate: false,
-      dangerType: DangerType.kDeepScannedFailed,
     });
     await microtasksFinished();
 
@@ -439,57 +398,6 @@ suite('ItemTest', function() {
     // The mojo handler is called directly, no event for the dialog is fired.
     const id = await handler.whenCalled('saveSuspiciousRequiringGesture');
     assertEquals('itemId', id);
-  });
-
-  test('deep scan dropdown buttons shown on correct state', async () => {
-    item.data = createDownload({
-      filePath: 'unique1',
-      hideDate: false,
-      state: State.kPromptForScanning,
-    });
-    await microtasksFinished();
-    const moreActionsButton = item.getMoreActionsButton();
-    assertTrue(!!moreActionsButton);
-    assertTrue(isVisible(moreActionsButton));
-    moreActionsButton.click();
-    assertTrue(
-        isVisible(item.shadowRoot.querySelector<HTMLElement>('#deep-scan')));
-    assertTrue(isVisible(
-        item.shadowRoot.querySelector<HTMLElement>('#bypass-deep-scan')));
-  });
-
-  test('local decryption scan icon and text', async () => {
-    item.data = createDownload({
-      filePath: 'unique1',
-      hideDate: false,
-      state: State.kPromptForLocalPasswordScanning,
-    });
-    await microtasksFinished();
-
-    const icon = item.shadowRoot.querySelector<CrIconElement>(
-        'cr-icon[icon-color=grey]');
-    assertTrue(!!icon);
-    assertEquals('cr:warning-filled', icon.icon);
-    assertEquals(
-        loadTimeData.getString('controlLocalPasswordScan'),
-        item.shadowRoot.querySelector<HTMLElement>(
-                           '#deepScan')!.textContent.trim());
-  });
-
-  test('open anyway dropdown button shown on failed deep scan', async () => {
-    item.data = createDownload({
-      filePath: 'unique1',
-      hideDate: false,
-      state: State.kComplete,
-      dangerType: DangerType.kDeepScannedFailed,
-    });
-    await microtasksFinished();
-    const moreActionsButton = item.getMoreActionsButton();
-    assertTrue(!!moreActionsButton);
-    assertTrue(isVisible(moreActionsButton));
-    moreActionsButton.click();
-    assertTrue(
-        isVisible(item.shadowRoot.querySelector<HTMLElement>('#open-anyway')));
   });
 
   test('undo is shown in toast', async () => {

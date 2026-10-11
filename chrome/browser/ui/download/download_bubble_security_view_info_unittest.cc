@@ -80,38 +80,9 @@ TEST_F(DownloadBubbleSecurityViewInfoTest, DangerousWarningInfo) {
     std::optional<DownloadCommands::Command> primary_button_command;
     std::vector<DownloadCommands::Command> subpage_button_commands;
   } kDangerTypeTestCases[] = {
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD, DownloadCommands::Command::KEEP}},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD}},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD}},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD}},
-      {download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD}},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD}},
       {download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING,
        DownloadCommands::Command::DISCARD,
        {DownloadCommands::Command::DISCARD, DownloadCommands::Command::KEEP}},
-      {download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD, DownloadCommands::Command::KEEP}},
-      {download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING,
-       std::nullopt,
-       {DownloadCommands::Command::DEEP_SCAN,
-        DownloadCommands::Command::BYPASS_DEEP_SCANNING}},
-      {download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING,
-       std::nullopt,
-       {DownloadCommands::Command::DISCARD,
-        DownloadCommands::Command::CANCEL_DEEP_SCAN}},
   };
   for (const auto& test_case : kDangerTypeTestCases) {
     SCOPED_TRACE(testing::Message()
@@ -230,7 +201,6 @@ TEST_F(DownloadBubbleSecurityViewInfoTestGM3, InterruptedInfo) {
       EXPECT_EQ(test_case.expected_icon_model_override,
                 info().icon_model_override());
       EXPECT_EQ(kColorDownloadItemIconDangerous, info().secondary_color());
-      EXPECT_FALSE(info().has_progress_bar());
     }
   }
 }

@@ -25,9 +25,7 @@ using Alert = DownloadBubbleAccessibleAlertsMap::Alert;
 using State = download::DownloadItem::DownloadState;
 
 std::unique_ptr<NiceMock<download::MockDownloadItem>> InitDownloadItem(
-    download::DownloadItem::DownloadState state,
-    download::DownloadDangerType danger_type =
-        download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS) {
+    download::DownloadItem::DownloadState state) {
   auto item = std::make_unique<NiceMock<download::MockDownloadItem>>();
   EXPECT_CALL(*item, GetGuid())
       .WillRepeatedly(ReturnRefOfCopy(std::string("1")));
@@ -35,10 +33,8 @@ std::unique_ptr<NiceMock<download::MockDownloadItem>> InitDownloadItem(
       .WillRepeatedly(
           Return(base::FilePath(FILE_PATH_LITERAL("download.pdf"))));
   EXPECT_CALL(*item, GetState()).WillRepeatedly(Return(state));
-  EXPECT_CALL(*item, IsDangerous())
-      .WillRepeatedly(
-          Return(danger_type != download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS));
-  EXPECT_CALL(*item, GetDangerType()).WillRepeatedly(Return(danger_type));
+  EXPECT_CALL(*item, GetDangerType())
+      .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS));
   EXPECT_CALL(*item, PercentComplete()).WillRepeatedly(Return(50));
 
   return item;
@@ -100,38 +96,6 @@ TEST(DownloadBubbleUtilsTest, GetAccessibleAlertForModel_Cancelled) {
 
   Alert alert = GetAccessibleAlertForModel(model);
   EXPECT_THAT(alert, MatchesAlert(u"cancelled", Alert::Urgency::kAlertSoon));
-}
-
-TEST(DownloadBubbleUtilsTest, GetAccessibleAlertForModel_Dangerous) {
-  auto item = InitDownloadItem(
-      State::IN_PROGRESS, download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT);
-  DownloadItemModel model{
-      item.get(), std::make_unique<DownloadUIModel::BubbleStatusTextBuilder>()};
-
-  Alert alert = GetAccessibleAlertForModel(model);
-  EXPECT_THAT(alert, MatchesAlert(u"dangerous", Alert::Urgency::kAlertSoon));
-}
-
-TEST(DownloadBubbleUtilsTest, GetAccessibleAlertForModel_PromptForScanning) {
-  auto item = InitDownloadItem(
-      State::IN_PROGRESS, download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING);
-  DownloadItemModel model{
-      item.get(), std::make_unique<DownloadUIModel::BubbleStatusTextBuilder>()};
-
-  Alert alert = GetAccessibleAlertForModel(model);
-  EXPECT_THAT(alert, MatchesAlert(u"scanning", Alert::Urgency::kAlertSoon));
-}
-
-TEST(DownloadBubbleUtilsTest, GetAccessibleAlertForModel_DeepScanning) {
-  auto item = InitDownloadItem(State::IN_PROGRESS,
-                               download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING);
-  EXPECT_CALL(*item, IsDangerous()).WillRepeatedly(Return(false));
-  DownloadItemModel model{
-      item.get(), std::make_unique<DownloadUIModel::BubbleStatusTextBuilder>()};
-
-  Alert alert = GetAccessibleAlertForModel(model);
-  EXPECT_THAT(alert,
-              MatchesAlert(u"being scanned", Alert::Urgency::kAlertSoon));
 }
 
 TEST(DownloadBubbleUtilsTest, GetAccessibleAlertForModel_Insecure) {

@@ -109,60 +109,24 @@ void DownloadBubbleRowViewInfo::PopulateForInProgressOrComplete() {
   }
 
   switch (model_->GetDangerType()) {
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
-      if (model_->IsExtensionDownload()) {
-        PopulateSuspiciousUiPattern();
-        return;
-      } else {
-        if (WasSafeBrowsingVerdictObtained(model_->GetDownloadItem())) {
-          PopulateSuspiciousUiPattern();
-          return;
-        }
-        if (ShouldShowWarningForNoSafeBrowsing(model_->profile())) {
-          PopulateForFileTypeWarningNoSafeBrowsing();
-          return;
-        }
-        PopulateSuspiciousUiPattern();
-        return;
-      }
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
-    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
-      PopulateDangerousUiPattern();
-      return;
-    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
-      PopulateSuspiciousUiPattern();
-      return;
-    }
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING: {
       has_subpage_ = true;
       secondary_text_color_ = kColorDownloadItemTextWarning;
       primary_button_command_ = DownloadCommands::Command::DISCARD;
       return;
     }
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING: {
-      secondary_text_color_ = kColorDownloadItemTextWarning;
-      has_subpage_ = true;
-      return;
-    }
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING: {
-      secondary_text_color_ = kColorDownloadItemTextWarning;
-      has_subpage_ = true;
-      return;
-    }
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
+    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
+    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
+    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
+    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-      has_subpage_ = true;
-      return;
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
-      has_subpage_ = true;
-      return;
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-      primary_button_command_ = DownloadCommands::Command::OPEN_WHEN_COMPLETE;
-      secondary_text_color_ = kColorDownloadItemTextWarning;
-      main_button_enabled_ = false;
-      return;
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
     case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_GDRIVE:
@@ -298,10 +262,6 @@ void DownloadBubbleRowViewInfo::PopulateForTailoredWarning(
   }
 }
 
-void DownloadBubbleRowViewInfo::PopulateForFileTypeWarningNoSafeBrowsing() {
-  PopulateSuspiciousUiPattern();
-}
-
 void DownloadBubbleRowViewInfo::PopulateSuspiciousUiPattern() {
   has_subpage_ = true;
   secondary_text_color_ = kColorDownloadItemTextWarning;
@@ -316,7 +276,6 @@ void DownloadBubbleRowViewInfo::Reset() {
   icon_and_color_ = IconAndColor{};
   secondary_text_color_ = std::nullopt;
   quick_actions_.clear();
-  main_button_enabled_ = true;
   has_subpage_ = false;
   primary_button_command_ = std::nullopt;
   progress_bar_ = DownloadBubbleProgressBar::NoProgressBar();

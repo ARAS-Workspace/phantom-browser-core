@@ -90,26 +90,6 @@ class DownloadItemWarningData : public base::SupportsUserData::Data {
     kMaxValue = ACCEPT_DEEP_SCAN
   };
 
-  struct WarningActionEvent {
-    WarningSurface surface;
-    WarningAction action;
-    // The latency between when the warning is shown for the first time and when
-    // this event has happened.
-    int64_t action_latency_msec;
-    // A terminal action means that the warning disappears after this event,
-    // the download is either deleted or saved.
-    bool is_terminal_action = false;
-
-    WarningActionEvent(WarningSurface surface,
-                       WarningAction action,
-                       int64_t action_latency_msec,
-                       bool is_terminal_action);
-
-    // Serializes the surface, action, and action_latency_msec into a string
-    // in a colon-separated format such as "DOWNLOADS_PAGE:DISCARD:10000".
-    std::string ToString() const;
-  };
-
   // Enum representing the trigger of the scan request.
   // These values are persisted to logs. Entries should not be renumbered and
   // numeric values should never be reused.
@@ -139,12 +119,6 @@ class DownloadItemWarningData : public base::SupportsUserData::Data {
 
   ~DownloadItemWarningData() override;
 
-  // Gets all warning actions associated with this `download`. Returns an
-  // empty vector if there's no warning data or there is no warning shown for
-  // this `download`.
-  static std::vector<WarningActionEvent> GetWarningActionEvents(
-      const download::DownloadItem* download);
-
   // Adds an `action` triggered on `surface` for `download`. It may not be
   // added if `download` is not dangerous, null or the length of events
   // associated with this `download` exceeds the limit.
@@ -152,70 +126,17 @@ class DownloadItemWarningData : public base::SupportsUserData::Data {
                                     WarningSurface surface,
                                     WarningAction action);
 
-  // Returns whether the download was an encrypted archive at the
-  // top-level (i.e. the encryption was not within a nested archive).
-  static bool IsTopLevelEncryptedArchive(
-      const download::DownloadItem* download);
-  static void SetIsTopLevelEncryptedArchive(
-      download::DownloadItem* download,
-      bool is_top_level_encrypted_archive);
-
-  // Returns whether the user has entered an incorrect password for the
-  // archive.
-  static bool HasIncorrectPassword(const download::DownloadItem* download);
-  static void SetHasIncorrectPassword(download::DownloadItem* download,
-                                      bool has_incorrect_password);
-
-  // Returns whether we have shown a local password decryption prompt for this
-  // download.
-  static bool HasShownLocalDecryptionPrompt(
-      const download::DownloadItem* download);
-  static void SetHasShownLocalDecryptionPrompt(download::DownloadItem* download,
-                                               bool has_shown);
-
-  // Returns the reason we initiated deep scanning for the download.
-  static DeepScanTrigger DownloadDeepScanTrigger(
-      const download::DownloadItem* download);
-  static void SetDeepScanTrigger(download::DownloadItem* download,
-                                 DeepScanTrigger trigger);
-
-  // Returns whether an encrypted archive was fully extracted.
-  static bool IsFullyExtractedArchive(const download::DownloadItem* download);
-  static void SetIsFullyExtractedArchive(download::DownloadItem* download,
-                                         bool extracted);
-
-  // Time and surface of the first SHOWN event. Time will be null if SHOWN has
-  // not yet been logged. Surface will return nullopt if SHOWN has not yet been
-  // logged.
-  static base::Time WarningFirstShownTime(
-      const download::DownloadItem* download);
-  static std::optional<WarningSurface> WarningFirstShownSurface(
-      const download::DownloadItem* download);
-
  private:
   DownloadItemWarningData();
 
-  template <typename F, typename V>
-  static V GetWithDefault(const download::DownloadItem* download,
-                          F&& f,
-                          V&& default_value);
   static DownloadItemWarningData* GetOrCreate(download::DownloadItem* download);
-
-  std::vector<WarningActionEvent> ActionEvents() const;
 
   static const char kKey[];
 
   base::Time warning_first_shown_time_;
-  std::optional<WarningSurface> warning_first_shown_surface_;
-  std::vector<WarningActionEvent> action_events_;
-  bool is_top_level_encrypted_archive_ = false;
-  bool has_incorrect_password_ = false;
-  bool has_shown_local_decryption_prompt_ = false;
-  bool fully_extracted_archive_ = false;
   // Whether a "shown" event has been logged for the Downloads Page for this
   // download. Not persisted across restarts.
   bool logged_downloads_page_shown_ = false;
-  DeepScanTrigger deep_scan_trigger_ = DeepScanTrigger::TRIGGER_UNKNOWN;
 };
 
 #endif  // CHROME_BROWSER_DOWNLOAD_DOWNLOAD_ITEM_WARNING_DATA_H_

@@ -211,17 +211,8 @@ TEST_F(DownloadBubbleRowViewInfoTest, DangerousWarningInfo) {
     download::DownloadDangerType danger_type;
     std::optional<DownloadCommands::Command> primary_button_command;
   } kDangerTypeTestCases[] = {
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE, std::nullopt},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT, std::nullopt},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST, std::nullopt},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE,
-       std::nullopt},
-      {download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED, std::nullopt},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL, std::nullopt},
       {download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING,
        DownloadCommands::Command::DISCARD},
-      {download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING, std::nullopt},
-      {download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING, std::nullopt},
   };
   for (const auto& test_case : kDangerTypeTestCases) {
     SCOPED_TRACE(testing::Message()

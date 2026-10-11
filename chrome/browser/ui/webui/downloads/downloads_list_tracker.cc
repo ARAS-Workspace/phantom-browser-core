@@ -358,17 +358,7 @@ downloads::mojom::DataPtr DownloadsListTracker::CreateDownloadData(
 
   switch (download_item->GetState()) {
     case download::DownloadItem::IN_PROGRESS: {
-      if (download_item->GetDangerType() ==
-          download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING) {
-        state = downloads::mojom::State::kPromptForScanning;
-      } else if (download_item->GetDangerType() ==
-                 download::
-                     DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING) {
-        state = downloads::mojom::State::kPromptForLocalPasswordScanning;
-      } else if (download_item->GetDangerType() ==
-                 download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING) {
-        state = downloads::mojom::State::kAsyncScanning;
-      } else if (download_item->IsDangerous()) {
+      if (download_item->IsDangerous()) {
         state = downloads::mojom::State::kDangerous;
       } else if (download_item->IsInsecure()) {
         state = downloads::mojom::State::kInsecure;

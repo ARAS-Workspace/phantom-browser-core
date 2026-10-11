@@ -24,25 +24,6 @@ class DownloadBubbleSecurityViewInfo
     : public DownloadBubbleInfo<DownloadBubbleSecurityViewInfoObserver>,
       public download::DownloadItem::Observer {
  public:
-  struct LabelWithLink {
-    struct LinkedRange {
-      // The offset where the link text (i.e. "Chrome blocks some downloads")
-      // starts, with respect to the label string containing it.
-      size_t start_offset = 0;
-      // Link text length.
-      size_t length = 0;
-      // Action to perform when the link is clicked.
-      DownloadCommands::Command command;
-    };
-
-    // The entire label string with link, i.e. "Learn why Chrome blocks some
-    // downloads".
-    std::u16string label_and_link_text;
-    // The link info. Note this assumes that the text contains exactly one
-    // link.
-    LinkedRange linked_range;
-  };
-
   struct SubpageButton {
     DownloadCommands::Command command;
     std::u16string label;
@@ -82,21 +63,10 @@ class DownloadBubbleSecurityViewInfo
   }
   ui::ColorId secondary_color() const { return icon_and_color_.color; }
   const std::u16string& warning_summary() const { return warning_summary_; }
-  const std::u16string& warning_secondary_text() const {
-    return warning_secondary_text_;
-  }
-  const gfx::VectorIcon* warning_secondary_icon() const {
-    return warning_secondary_icon_;
-  }
-  const std::optional<LabelWithLink>& learn_more_link() const {
-    return learn_more_link_;
-  }
   bool has_primary_button() const { return subpage_buttons_.size() > 0; }
   bool has_secondary_button() const { return subpage_buttons_.size() > 1; }
   const SubpageButton& primary_button() const { return subpage_buttons_[0]; }
   const SubpageButton& secondary_button() const { return subpage_buttons_[1]; }
-  bool has_progress_bar() const { return has_progress_bar_; }
-  bool is_progress_bar_looping() const { return is_progress_bar_looping_; }
   bool HasSubpage() const;
 
   // Returns this to an uninitialized state, where this is not associated with
@@ -123,16 +93,10 @@ class DownloadBubbleSecurityViewInfo
   void PopulateForSuspiciousUi(
       const std::u16string& subpage_summary,
       const std::u16string& secondary_subpage_button_label);
-  void PopulateForFileTypeWarningNoSafeBrowsing(const DownloadUIModel& model);
   void PopulateForInterrupted(const DownloadUIModel& model);
   void PopulateForInProgressOrComplete(const DownloadUIModel& model);
   void PopulateForTailoredWarning(const DownloadUIModel& model);
 
-  void PopulateLearnMoreLink(const std::u16string& link_text,
-                             DownloadCommands::Command command);
-  void PopulateLearnMoreLink(int label_text_id,
-                             int link_text_id,
-                             DownloadCommands::Command command);
   // The subpage of the bubble supports at most 2 buttons. The primary one must
   // be populated first, then the secondary.
   void PopulatePrimarySubpageButton(const std::u16string& label,
@@ -161,22 +125,8 @@ class DownloadBubbleSecurityViewInfo
   // Subpage summary of the download warning
   std::u16string warning_summary_;
 
-  // Secondary label for the subpage summary
-  std::u16string warning_secondary_text_;
-
-  // Icon for the secondary text in the subpage
-  raw_ptr<const gfx::VectorIcon> warning_secondary_icon_ = nullptr;
-
-  // Text with link to go at the bottom of the subpage summary, such as "Learn
-  // why Chrome blocks some downloads".
-  std::optional<LabelWithLink> learn_more_link_;
-
   // Subpage buttons
   std::vector<SubpageButton> subpage_buttons_;
-
-  // Has a progress bar
-  bool has_progress_bar_ = false;
-  bool is_progress_bar_looping_ = false;
 
   // Observation of the download item this refers to. Only observes while this
   // is associated with a download item.

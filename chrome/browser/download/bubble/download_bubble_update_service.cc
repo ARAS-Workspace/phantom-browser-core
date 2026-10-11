@@ -169,10 +169,6 @@ void UpdateInfoForModel(const DownloadUIModel& model,
     return;
   }
   ++info.all_models_size;
-  if (model.GetDangerType() == download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING &&
-      model.GetState() != download::DownloadItem::CANCELLED) {
-    info.has_deep_scanning = true;
-  }
   if (model.GetDangerType() ==
           download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT &&
       model.GetState() != download::DownloadItem::CANCELLED) {

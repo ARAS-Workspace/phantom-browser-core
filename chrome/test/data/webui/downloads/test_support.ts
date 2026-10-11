@@ -67,10 +67,7 @@ export class FakePageHandler extends TestBrowserProxy implements
   cancel(_id: string) {}
   clearAll() {}
   openDownloadsFolderRequiringGesture() {}
-  openDuringScanningRequiringGesture(_id: string) {}
   reviewDangerousRequiringGesture(_id: string) {}
-  deepScan(_id: string) {}
-  bypassDeepScanRequiringGesture(_id: string) {}
   isEligibleForEsbPromo(): Promise<{result: boolean}> {
     this.methodCalled('isEligibleForEsbPromo');
     return Promise.resolve({result: this.eligibleForEsbPromo_});

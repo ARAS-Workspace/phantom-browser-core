@@ -88,18 +88,6 @@ class DownloadBubbleContentsView : public views::View,
   void AddSecuritySubpageWarningActionEvent(
       const offline_items_collection::ContentId& id,
       DownloadItemWarningData::WarningAction action) override;
-  void ProcessDeepScanPress(
-      const ContentId& id,
-      DownloadItemWarningData::DeepScanTrigger trigger,
-      base::optional_ref<const std::string> password) override;
-  void ProcessLocalDecryptionPress(
-      const offline_items_collection::ContentId& id,
-      base::optional_ref<const std::string> password) override;
-  void ProcessLocalPasswordInProgressClick(
-      const offline_items_collection::ContentId& id,
-      DownloadCommands::Command command) override;
-  bool IsEncryptedArchive(const ContentId& id) override;
-  bool HasPreviousIncorrectPassword(const ContentId& id) override;
 
   // Gets the row view at the given index.
   DownloadBubbleRowView* GetPrimaryViewRowForTesting(size_t index);

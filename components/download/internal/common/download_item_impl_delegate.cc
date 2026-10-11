@@ -49,8 +49,6 @@ bool DownloadItemImplDelegate::ShouldCompleteDownload(
   // verdict until a delegate that can resolve it takes over.
   switch (download->GetDangerType()) {
     case DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT:
-    case DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-    case DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
       return false;
     default:
       return true;

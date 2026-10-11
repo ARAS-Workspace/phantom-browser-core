@@ -53,11 +53,6 @@ export function getHtml(this: DownloadsItemElement) {
         ${this.computeDescription_()}
       </div>
 
-      <div class="description" role="gridcell"
-          ?hidden="${!this.computeSecondLineVisible_()}">
-        $i18n{asyncScanningDownloadDescSecond}
-      </div>
-
       ${this.showProgress_ ? html`
         <div role="gridcell">
           <cr-progress id="progress" .indeterminate="${this.isIndeterminate_()}"
@@ -66,14 +61,6 @@ export function getHtml(this: DownloadsItemElement) {
         </div>
       ` : ''}
 
-      <div id="safe" class="controls" ?hidden="${this.isDangerous_}">
-        <span role="gridcell" ?hidden="${!this.showDeepScan_}">
-          <cr-button @click="${this.onDeepScanClick_}" id="deepScan"
-              class="action-button" focus-row-control focus-type="open">
-            ${this.computeDeepScanControlText_()}
-          </cr-button>
-        </span>
-      </div>
       <div id="controlledBy" ?hidden="${this.isDangerous_}"><!--
         Text populated dynamically.
       --></div>
@@ -135,21 +122,9 @@ export function getHtml(this: DownloadsItemElement) {
             ?hidden="${!this.data?.retry}" id="retry">
           $i18n{controlRetry}
         </button>
-        <button class="dropdown-item" @click="${this.onDeepScanClick_}"
-            ?hidden="${!this.showDeepScan_}" id="deep-scan">
-          $i18n{controlDeepScan}
-        </button>
-        <button class="dropdown-item" @click="${this.onBypassDeepScanClick_}"
-            ?hidden="${!this.showDeepScan_}" id="bypass-deep-scan">
-          ${this.computeSaveDangerousLabel_()}
-        </button>
         <button class="dropdown-item" @click="${this.onCancelClick_}"
             ?hidden="${!this.showCancel_}" id="cancel">
           $i18n{controlCancel}
-        </button>
-        <button class="dropdown-item" @click="${this.onOpenAnywayClick_}"
-            ?hidden="${!this.showOpenAnyway_}" id="open-anyway">
-          $i18n{controlOpenAnyway}
         </button>
         <button class="dropdown-item" @click="${this.onDiscardDangerousClick_}"
             ?hidden="${!this.isReviewable_}" id="reviewable-discard-dangerous">

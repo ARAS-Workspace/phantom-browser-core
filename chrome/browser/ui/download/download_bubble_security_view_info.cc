@@ -97,12 +97,7 @@ void DownloadBubbleSecurityViewInfo::ClearForUpdate() {
   // `title_text_` cannot change when a download is updated, so we do
   // not need to clear it.
   warning_summary_.clear();
-  warning_secondary_text_.clear();
-  warning_secondary_icon_ = nullptr;
-  learn_more_link_ = std::nullopt;
   subpage_buttons_.clear();
-  has_progress_bar_ = false;
-  is_progress_bar_looping_ = false;
 }
 
 void DownloadBubbleSecurityViewInfo::PopulateForDownload(
@@ -286,56 +281,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForInProgressOrComplete(
   }
 
   switch (model.GetDangerType()) {
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
-      if (model.IsExtensionDownload()) {
-        PopulateForSuspiciousUi(
-            l10n_util::GetStringFUTF16(
-                IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_UNKNOWN_SOURCE,
-                l10n_util::GetStringUTF16(IDS_EXTENSION_WEB_STORE_TITLE)),
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_CONTINUE_SUSPICIOUS_FILE));
-        return;
-      }
-      if (WasSafeBrowsingVerdictObtained(model.GetDownloadItem())) {
-        PopulateForSuspiciousUi(
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_DANGEROUS_FILE_TYPE),
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_CONTINUE_SUSPICIOUS_FILE));
-        return;
-      }
-      if (ShouldShowWarningForNoSafeBrowsing(model.profile())) {
-        PopulateForFileTypeWarningNoSafeBrowsing(model);
-        return;
-      }
-      PopulateForSuspiciousUi(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_DANGEROUS_FILE_TYPE),
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_CONTINUE_UNVERIFIED_FILE));
-      return;
-
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
-      PopulateForDangerousUi(l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_DANGEROUS));
-      return;
-
-    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-      PopulateForDangerousUi(l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_DECEPTIVE));
-      return;
-
-    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT: {
-      PopulateForSuspiciousUi(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_UNCOMMON_FILE),
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_CONTINUE_SUSPICIOUS_FILE));
-      return;
-    }
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
       warning_summary_ = l10n_util::GetStringUTF16(
           IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_SENSITIVE_CONTENT_WARNING);
@@ -346,122 +291,17 @@ void DownloadBubbleSecurityViewInfo::PopulateForInProgressOrComplete(
           l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_CONTINUE),
           DownloadCommands::Command::KEEP, kColorDownloadItemTextWarning);
       return;
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING: {
-      warning_summary_ = l10n_util::GetStringFUTF16(
-          model.IsTopLevelEncryptedArchive()
-              ? IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_DEEP_SCANNING_PROMPT_ENCRYPTED_ARCHIVE
-              : IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_DEEP_SCANNING_PROMPT_UPDATED,
-          u"\n\n");
-      PopulatePrimarySubpageButton(
-          l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_SCAN_UPDATED),
-          DownloadCommands::Command::DEEP_SCAN);
-      PopulateSecondarySubpageButton(
-          l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_OPEN_UPDATED),
-          DownloadCommands::Command::BYPASS_DEEP_SCANNING);
-      PopulateLearnMoreLink(l10n_util::GetStringUTF16(
-                                IDS_DOWNLOAD_BUBBLE_SUBPAGE_DEEP_SCANNING_LINK),
-                            DownloadCommands::LEARN_MORE_SCANNING);
-      return;
-    }
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING: {
-      warning_summary_ = l10n_util::GetStringFUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_DEEP_SCANNING_PROMPT_LOCAL_DECRYPTION,
-          u"\n\n");
-      PopulatePrimarySubpageButton(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_ACCEPT_LOCAL_DECRYPTION),
-          // These download commands are not propagated
-          // to the DownloadItem. Instead they are handled specially in
-          // DownloadBubbleSecurityView::ProcessButtonClick. That makes it
-          // okay that the we aren't really prompting for a deep scan.
-          // TODO(crbug.com/40931768): Remove this by creating a dedicated View
-          // for the local decryption prompt which directly handles the
-          // button presses.
-          DownloadCommands::Command::DEEP_SCAN);
-      PopulateSecondarySubpageButton(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_BYPASS_LOCAL_DECRYPTION),
-          DownloadCommands::Command::KEEP);
-      PopulateLearnMoreLink(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_BLOCKED_LEARN_MORE_LINK),
-          DownloadCommands::LEARN_MORE_SCANNING);
-      return;
-    }
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
+    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
+    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
+    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
+    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-      has_progress_bar_ = true;
-      is_progress_bar_looping_ = true;
-      if (DownloadItemWarningData::DownloadDeepScanTrigger(
-              model.GetDownloadItem()) ==
-          DownloadItemWarningData::DeepScanTrigger::
-              TRIGGER_IMMEDIATE_DEEP_SCAN) {
-        warning_summary_ = l10n_util::GetStringFUTF16(
-            IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_IMMEDIATE_DEEP_SCAN_IN_PROGRESS,
-            u"\n\n");
-        PopulatePrimarySubpageButton(
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_SUBPAGE_IMMEDIATE_DEEP_SCAN_CANCEL),
-            DownloadCommands::Command::DISCARD);
-        PopulateSecondarySubpageButton(
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_SUBPAGE_IMMEDIATE_DEEP_SCAN_BYPASS),
-            DownloadCommands::Command::BYPASS_DEEP_SCANNING);
-        PopulateLearnMoreLink(
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_SUBPAGE_DEEP_SCANNING_LINK),
-            DownloadCommands::LEARN_MORE_SCANNING);
-      } else {
-        warning_summary_ = l10n_util::GetStringUTF16(
-            IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_ASYNC_SCANNING);
-        warning_secondary_icon_ =
-            &(features::IsRoundedIconsEnabled()
-                  ? vector_icons::kDocumentScannerIcon
-                  : vector_icons::kDocumentScannerOldIcon);
-        warning_secondary_text_ =
-            download::DoesDownloadConnectorBlock(model.profile(),
-                                                 model.GetURL())
-                ? l10n_util::GetStringUTF16(
-                      IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_ASYNC_SCANNING_ENTERPRISE_SECONDARY)
-                : l10n_util::GetStringUTF16(
-                      IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_ASYNC_SCANNING_SECONDARY);
-        PopulatePrimarySubpageButton(
-            l10n_util::GetStringUTF16(
-                IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_ASYNC_SCANNING_DISCARD),
-            DownloadCommands::Command::DISCARD,
-            /*is_prominent=*/false);
-        if (!download::DoesDownloadConnectorBlock(model.profile(),
-                                                  model.GetURL())) {
-          PopulateSecondarySubpageButton(
-              l10n_util::GetStringUTF16(
-                  IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_ASYNC_SCANNING_CANCEL),
-              DownloadCommands::Command::CANCEL_DEEP_SCAN);
-        }
-      }
-      return;
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING: {
-      warning_summary_ = l10n_util::GetStringFUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_LOCAL_DECRYPTION_IN_PROGRESS,
-          u"\n\n");
-      has_progress_bar_ = true;
-      is_progress_bar_looping_ = true;
-      // These download commands are not propagated
-      // to the DownloadItem. Instead they are handled specially
-      // in DownloadBubbleSecurityView::ProcessButtonClick. That
-      // means the semantics don't have to line up with the actual
-      // behavior of the download command.
-      // TODO(crbug.com/40931768): Remove this by creating a dedicated
-      // View for the local decryption prompt which directly
-      // handles the button presses.
-      PopulatePrimarySubpageButton(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_LOCAL_DECRYPTION_CANCEL),
-          DownloadCommands::Command::CANCEL);
-      PopulateSecondarySubpageButton(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_BYPASS_LOCAL_DECRYPTION),
-          DownloadCommands::Command::BYPASS_DEEP_SCANNING);
-      return;
-    }
+    case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
@@ -498,43 +338,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForTailoredWarning(
       NOTREACHED();
     }
   }
-}
-
-void DownloadBubbleSecurityViewInfo::PopulateForFileTypeWarningNoSafeBrowsing(
-    const DownloadUIModel& model) {
-  PopulateForSuspiciousUi(
-      l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_NO_SAFE_BROWSING),
-      l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_CONTINUE_UNVERIFIED_FILE));
-  // Clear the "Learn why Chrome..." link. If the user is not capable of turning
-  // on SB, do not show the default link and label.
-  learn_more_link_ = std::nullopt;
-  if (CanUserTurnOnSafeBrowsing(model.profile())) {
-    PopulateLearnMoreLink(
-        IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_SAFE_BROWSING_SETTING_LABEL,
-        IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_SAFE_BROWSING_SETTING_LINK,
-        DownloadCommands::Command::OPEN_SAFE_BROWSING_SETTING);
-  }
-}
-
-void DownloadBubbleSecurityViewInfo::PopulateLearnMoreLink(
-    const std::u16string& link_text,
-    DownloadCommands::Command command) {
-  learn_more_link_ = LabelWithLink{
-      link_text, LabelWithLink::LinkedRange{0u, link_text.length(), command}};
-}
-
-void DownloadBubbleSecurityViewInfo::PopulateLearnMoreLink(
-    int label_text_id,
-    int link_text_id,
-    DownloadCommands::Command command) {
-  size_t link_start_offset = 0;
-  std::u16string link_text = l10n_util::GetStringUTF16(link_text_id);
-  std::u16string label_and_link_text =
-      l10n_util::GetStringFUTF16(label_text_id, link_text, &link_start_offset);
-  learn_more_link_ = LabelWithLink{
-      label_and_link_text, LabelWithLink::LinkedRange{
-                               link_start_offset, link_text.length(), command}};
 }
 
 void DownloadBubbleSecurityViewInfo::PopulatePrimarySubpageButton(

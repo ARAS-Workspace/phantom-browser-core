@@ -64,9 +64,6 @@ class DownloadUiContextMenu : public ui::SimpleMenuModel::Delegate {
   ui::SimpleMenuModel* GetInProgressPausedMenuModel(bool is_download);
   ui::SimpleMenuModel* GetFinishedMenuModel(bool is_download);
   ui::SimpleMenuModel* GetInterruptedMenuModel(bool is_download);
-  ui::SimpleMenuModel* GetMaybeMaliciousMenuModel(bool is_download);
-  ui::SimpleMenuModel* GetMaliciousMenuModel(bool is_download);
-  ui::SimpleMenuModel* GetDeepScanningMenuModel(bool is_download);
   ui::SimpleMenuModel* GetInsecureDownloadMenuModel();
 
   void AddAutoOpenToMenu(ui::SimpleMenuModel* model);
@@ -79,9 +76,6 @@ class DownloadUiContextMenu : public ui::SimpleMenuModel::Delegate {
   std::unique_ptr<ui::SimpleMenuModel> in_progress_download_paused_menu_model_;
   std::unique_ptr<ui::SimpleMenuModel> finished_download_menu_model_;
   std::unique_ptr<ui::SimpleMenuModel> interrupted_download_menu_model_;
-  std::unique_ptr<ui::SimpleMenuModel> maybe_malicious_download_menu_model_;
-  std::unique_ptr<ui::SimpleMenuModel> malicious_download_menu_model_;
-  std::unique_ptr<ui::SimpleMenuModel> deep_scanning_menu_model_;
   std::unique_ptr<ui::SimpleMenuModel> insecure_download_menu_model_;
 
   // Whether or not a histogram has been emitted recording which

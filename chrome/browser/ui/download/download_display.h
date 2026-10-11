@@ -20,7 +20,6 @@ class DownloadDisplay {
   enum class IconState {
     kProgress,
     kComplete,
-    kDeepScanning,
     kContentCheckPending,
   };
 

@@ -40,8 +40,6 @@ source_set("downloads") {
     "//chrome/browser/ui/webui:theme_source",
   ]
 
-  deps += [ "//chrome/browser/download/bubble" ]
-
   deps += [
     "//chrome/app:branded_strings",
     "//chrome/app:generated_resources",

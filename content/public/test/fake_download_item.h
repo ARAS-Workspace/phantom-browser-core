@@ -117,9 +117,6 @@ class FakeDownloadItem : public download::DownloadItem {
   bool GetOpenWhenComplete() const override;
   bool GetAutoOpened() override;
   bool GetOpened() const override;
-  void OnContentCheckCompleted(
-      download::DownloadDangerType danger_type,
-      download::DownloadInterruptReason reason) override;
   void SetOpenWhenComplete(bool open) override;
   void SetOpened(bool opened) override;
   void SetLastAccessTime(base::Time time) override;
@@ -133,8 +130,6 @@ class FakeDownloadItem : public download::DownloadItem {
   void CopyDownload(AcquireFileCallback callback) override;
   void Rename(const base::FilePath& name,
               RenameDownloadCallback callback) override;
-  void OnAsyncScanningCompleted(
-      download::DownloadDangerType danger_type) override;
 
   bool removed() const { return removed_; }
 

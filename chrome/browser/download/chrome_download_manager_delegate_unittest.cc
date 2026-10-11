@@ -1569,8 +1569,9 @@ TEST_F(ChromeDownloadManagerDelegateTest,
 TEST_F(ChromeDownloadManagerDelegateTest, ScheduleCancelForEphemeralWarning) {
   std::unique_ptr<download::MockDownloadItem> download_item =
       CreateActiveDownloadItem(0);
-  EXPECT_CALL(*download_item, GetDangerType())
-      .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT));
+  EXPECT_CALL(*download_item, GetInsecureDownloadStatus())
+      .WillRepeatedly(
+          Return(download::DownloadItem::InsecureDownloadStatus::WARN));
 
   delegate()->ScheduleCancelForEphemeralWarning(download_item->GetGuid());
 
@@ -1601,11 +1602,13 @@ TEST_F(ChromeDownloadManagerDelegateTest, CancelAllEphemeralWarnings) {
   EXPECT_CALL(*safe_item, GetDangerType())
       .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS));
   auto dangerous_item = CreateActiveDownloadItem(0);
-  EXPECT_CALL(*dangerous_item, GetDangerType())
-      .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT));
+  EXPECT_CALL(*dangerous_item, GetInsecureDownloadStatus())
+      .WillRepeatedly(
+          Return(download::DownloadItem::InsecureDownloadStatus::WARN));
   auto canceled_item = CreateActiveDownloadItem(0);
-  EXPECT_CALL(*canceled_item, GetDangerType())
-      .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE));
+  EXPECT_CALL(*canceled_item, GetInsecureDownloadStatus())
+      .WillRepeatedly(
+          Return(download::DownloadItem::InsecureDownloadStatus::WARN));
   EXPECT_CALL(*canceled_item, GetState())
       .WillRepeatedly(Return(DownloadItem::CANCELLED));
   items.push_back(safe_item.get());

@@ -427,10 +427,6 @@ DownloadBubbleRowView::DownloadBubbleRowView(
                     l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_DELETE));
   AddMainPageButton(DownloadCommands::KEEP,
                     l10n_util::GetStringUTF16(IDS_CONFIRM_DOWNLOAD));
-  AddMainPageButton(DownloadCommands::DEEP_SCAN,
-                    l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_SCAN));
-  AddMainPageButton(DownloadCommands::BYPASS_DEEP_SCANNING_AND_OPEN,
-                    l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_OPEN_NOW));
   AddMainPageButton(DownloadCommands::RESUME,
                     l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_RESUME));
   AddMainPageButton(DownloadCommands::REVIEW,
@@ -654,8 +650,7 @@ void DownloadBubbleRowView::Layout(PassKey) {
 }
 
 void DownloadBubbleRowView::OnMainButtonPressed(const ui::Event& event) {
-  if (!bubble_controller_ || !navigation_handler_ ||
-      !info_->main_button_enabled() || !info_->model()) {
+  if (!bubble_controller_ || !navigation_handler_ || !info_->model()) {
     return;
   }
   if (input_protector_->IsPossiblyUnintendedInteraction(
@@ -739,9 +734,7 @@ void DownloadBubbleRowView::UpdateProgressBar() {
       progress_bar_->SetVisible(true);
     }
     progress_bar_->SetValue(
-        info_->is_progress_bar_looping()
-            ? -1
-            : static_cast<double>(info_->model()->PercentComplete()) / 100);
+        static_cast<double>(info_->model()->PercentComplete()) / 100);
     progress_bar_->SetPaused(info_->model()->IsPaused());
   } else if (progress_bar_->GetVisible()) {
     // Hide the progress bar.
@@ -810,8 +803,7 @@ void DownloadBubbleRowView::AddMainPageButton(
   button->SetVisible(false);
   button->SetStyle(ui::ButtonStyle::kText);
 
-  if (command == DownloadCommands::OPEN_WHEN_COMPLETE ||
-      command == DownloadCommands::BYPASS_DEEP_SCANNING_AND_OPEN) {
+  if (command == DownloadCommands::OPEN_WHEN_COMPLETE) {
     button->SetProperty(views::kElementIdentifierKey,
                         kDownloadBubbleOpenButtonId);
   }
@@ -834,8 +826,7 @@ void DownloadBubbleRowView::AddQuickAction(DownloadCommands::Command command) {
       ->SetBaseColor(views::TypographyProvider::Get().GetColorId(
           views::style::CONTEXT_BUTTON, views::style::STYLE_SECONDARY));
 
-  if (command == DownloadCommands::OPEN_WHEN_COMPLETE ||
-      command == DownloadCommands::BYPASS_DEEP_SCANNING_AND_OPEN) {
+  if (command == DownloadCommands::OPEN_WHEN_COMPLETE) {
     quick_action->SetProperty(views::kElementIdentifierKey,
                               kDownloadBubbleOpenButtonId);
   }
@@ -889,14 +880,6 @@ std::u16string DownloadBubbleRowView::GetAccessibleNameForMainPageButton(
     case DownloadCommands::KEEP:
       return l10n_util::GetStringFUTF16(
           IDS_DOWNLOAD_BUBBLE_KEEP_MAIN_BUTTON_ACCESSIBILITY,
-          info_->model()->GetFileNameToReportUser().LossyDisplayName());
-    case DownloadCommands::DEEP_SCAN:
-      return l10n_util::GetStringFUTF16(
-          IDS_DOWNLOAD_BUBBLE_SCAN_MAIN_BUTTON_ACCESSIBILITY,
-          info_->model()->GetFileNameToReportUser().LossyDisplayName());
-    case DownloadCommands::BYPASS_DEEP_SCANNING_AND_OPEN:
-      return l10n_util::GetStringFUTF16(
-          IDS_DOWNLOAD_BUBBLE_OPEN_NOW_MAIN_BUTTON_ACCESSIBILITY,
           info_->model()->GetFileNameToReportUser().LossyDisplayName());
     case DownloadCommands::REVIEW:
       return l10n_util::GetStringFUTF16(

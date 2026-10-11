@@ -62,7 +62,6 @@
 #endif
 
 
-using DangerUiPattern = DownloadUIModel::DangerUiPattern;
 using download::DownloadItem;
 using InsecureDownloadStatus = download::DownloadItem::InsecureDownloadStatus;
 using TailoredWarningType = DownloadUIModel::TailoredWarningType;
@@ -692,11 +691,6 @@ void DownloadItemModel::ExecuteCommand(DownloadCommands* download_commands,
         download_->ValidateInsecureDownload();
         break;
       }
-      if (GetDangerType() == download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING) {
-        break;
-      }
-      DCHECK(IsDangerous());
-      download_->ValidateDangerousDownload();
       break;
     case DownloadCommands::DISCARD:
       DownloadUIModel::ExecuteCommand(download_commands, command);
@@ -730,78 +724,6 @@ void DownloadItemModel::ExecuteCommand(DownloadCommands* download_commands,
 
 TailoredWarningType DownloadItemModel::GetTailoredWarningType() const {
   return TailoredWarningType::kNoTailoredWarning;
-}
-
-DangerUiPattern DownloadItemModel::GetDangerUiPattern() const {
-  // Keep logic here in sync with DownloadBubbleRowViewInfo and
-  // IconAndColor code in download_bubble_info_utils.cc, and
-  // chrome://downloads WebUI frontend code.
-  DownloadItem::DownloadState state = GetState();
-
-  // Error conditions, including cancellations, have a "download off" icon or
-  // some combination of "info" icon and red or gray.
-  if (state == DownloadItem::CANCELLED || state == DownloadItem::INTERRUPTED) {
-    return DangerUiPattern::kOther;
-  } else if (state == DownloadItem::MAX_DOWNLOAD_STATE) {
-    NOTREACHED();
-  }
-
-  switch (GetInsecureDownloadStatus()) {
-    case DownloadItem::InsecureDownloadStatus::BLOCK:
-    case DownloadItem::InsecureDownloadStatus::WARN:
-      return DangerUiPattern::kSuspicious;
-    case DownloadItem::InsecureDownloadStatus::UNKNOWN:
-    case DownloadItem::InsecureDownloadStatus::SAFE:
-    case DownloadItem::InsecureDownloadStatus::VALIDATED:
-    case DownloadItem::InsecureDownloadStatus::SILENT_BLOCK:
-      break;
-  }
-
-  switch (GetTailoredWarningType()) {
-    case TailoredWarningType::kCookieTheft:
-      return DangerUiPattern::kDangerous;
-    case TailoredWarningType::kSuspiciousArchive:
-      return DangerUiPattern::kSuspicious;
-    case TailoredWarningType::kNoTailoredWarning:
-      break;
-  }
-
-  switch (GetDangerType()) {
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
-    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-      return DangerUiPattern::kDangerous;
-    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-      return DangerUiPattern::kSuspicious;
-    case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_GDRIVE:
-    case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_ONEDRIVE:
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK:
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
-      return DangerUiPattern::kOther;
-    // TODO(crbug.com/329254526): The following two may be wrong.
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_OPENED_DANGEROUS:
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_SCAN_FAILED:
-    case download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_SAFE:
-    case download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED:
-    case download::DOWNLOAD_DANGER_TYPE_ALLOWLISTED_BY_POLICY:
-      break;
-    case download::DOWNLOAD_DANGER_TYPE_MAX:
-      NOTREACHED();
-  }
-
-  return DangerUiPattern::kNormal;
 }
 
 bool DownloadItemModel::ShouldShowInUi() const {
@@ -866,6 +788,8 @@ bool DownloadItemModel::IsEphemeralWarning() const {
   }
 
   switch (GetDangerType()) {
+    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
+      return true;
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
@@ -873,11 +797,9 @@ bool DownloadItemModel::IsEphemeralWarning() const {
     case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-      return true;
     case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_GDRIVE:
     case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_ONEDRIVE:
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_OPENED_DANGEROUS:
@@ -963,8 +885,4 @@ void DownloadItemModel::DetermineAndSetShouldPreferOpeningInBrowser(
   }
 #endif
   SetShouldPreferOpeningInBrowser(false);
-}
-
-bool DownloadItemModel::IsTopLevelEncryptedArchive() const {
-  return DownloadItemWarningData::IsTopLevelEncryptedArchive(download_);
 }

@@ -58,13 +58,11 @@ class DownloadBubbleRowViewInfo
   const std::vector<DownloadBubbleQuickAction>& quick_actions() const {
     return quick_actions_;
   }
-  bool main_button_enabled() const { return main_button_enabled_; }
   bool has_subpage() const { return has_subpage_; }
   std::optional<DownloadCommands::Command> primary_button_command() const {
     return primary_button_command_;
   }
   bool has_progress_bar() const { return progress_bar_.is_visible; }
-  bool is_progress_bar_looping() const { return progress_bar_.is_looping; }
 
   void SetQuickActionsForTesting(
       const std::vector<DownloadBubbleQuickAction>& actions);
@@ -82,7 +80,6 @@ class DownloadBubbleRowViewInfo
   void PopulateForInterrupted(offline_items_collection::FailState fail_state);
   void PopulateForTailoredWarning(
       DownloadUIModel::TailoredWarningType tailored_warning_type);
-  void PopulateForFileTypeWarningNoSafeBrowsing();
 
   void PopulateSuspiciousUiPattern();
   void PopulateDangerousUiPattern();
@@ -105,11 +102,6 @@ class DownloadBubbleRowViewInfo
   std::optional<ui::ColorId> secondary_text_color_;
   // List of quick actions
   std::vector<DownloadBubbleQuickAction> quick_actions_;
-  // Whether the main button (clicking the row itself) should be enabled. When
-  // true, the main button will either:
-  // - Open the subpage, if it exists
-  // - Open the download, if no subpage exists
-  bool main_button_enabled_ = true;
   // Whether this row has a subpage.
   bool has_subpage_ = false;
   // The command for the primary button (the button always displayed over the

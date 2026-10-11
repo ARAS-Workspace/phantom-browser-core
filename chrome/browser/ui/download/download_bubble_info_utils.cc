@@ -134,31 +134,23 @@ IconAndColor IconAndColorForInProgressOrComplete(const DownloadUIModel& model) {
   }
 
   switch (model.GetDangerType()) {
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
-    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
-      return IconAndColorForSuspiciousUiPattern();
-
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
-    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-      return IconAndColorForDangerousUiPattern();
-
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
       return IconAndColor{&(features::IsRoundedIconsEnabled()
                                 ? views::kInfoIcon
                                 : views::kInfoChromeRefreshOldIcon),
                           kColorDownloadItemIconWarning};
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
+    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
+    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
+    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-      return IconAndColor{
-          &(features::IsRoundedIconsEnabled() ? kWarningFilledIcon
-                                              : kDownloadWarningOldIcon),
-          kColorDownloadItemIconWarning};
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK:
@@ -182,17 +174,12 @@ IconAndColor IconAndColorForInProgressOrComplete(const DownloadUIModel& model) {
 
 // static
 DownloadBubbleProgressBar DownloadBubbleProgressBar::NoProgressBar() {
-  return DownloadBubbleProgressBar{/*is_visible=*/false, /*is_looping=*/false};
+  return DownloadBubbleProgressBar{/*is_visible=*/false};
 }
 
 // static
 DownloadBubbleProgressBar DownloadBubbleProgressBar::ProgressBar() {
-  return DownloadBubbleProgressBar{/*is_visible=*/true, /*is_looping=*/false};
-}
-
-// static
-DownloadBubbleProgressBar DownloadBubbleProgressBar::LoopingProgressBar() {
-  return DownloadBubbleProgressBar{/*is_visible=*/true, /*is_looping=*/true};
+  return DownloadBubbleProgressBar{/*is_visible=*/true};
 }
 
 IconAndColor IconAndColorForDownload(const DownloadUIModel& model) {
@@ -252,6 +239,8 @@ std::vector<DownloadBubbleQuickAction> QuickActionsForDownload(
   }
 
   switch (model.GetDangerType()) {
+    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
+      return {};
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
@@ -259,13 +248,11 @@ std::vector<DownloadBubbleQuickAction> QuickActionsForDownload(
     case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-      return {};
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK:
@@ -353,6 +340,8 @@ DownloadBubbleProgressBar ProgressBarForDownload(const DownloadUIModel& model) {
   }
 
   switch (model.GetDangerType()) {
+    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
+      return DownloadBubbleProgressBar::NoProgressBar();
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
@@ -360,14 +349,11 @@ DownloadBubbleProgressBar ProgressBarForDownload(const DownloadUIModel& model) {
     case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
     case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
     case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-      return DownloadBubbleProgressBar::NoProgressBar();
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
     case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
-      return DownloadBubbleProgressBar::LoopingProgressBar();
+    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
     case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK:

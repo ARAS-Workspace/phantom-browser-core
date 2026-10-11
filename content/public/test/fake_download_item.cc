@@ -327,11 +327,6 @@ void FakeDownloadItem::Rename(const base::FilePath& name,
   NOTREACHED();
 }
 
-void FakeDownloadItem::OnAsyncScanningCompleted(
-    download::DownloadDangerType danger_type) {
-  NOTREACHED();
-}
-
 bool FakeDownloadItem::IsPaused() const {
   return false;
 }
@@ -517,12 +512,6 @@ bool FakeDownloadItem::GetAutoOpened() {
 }
 
 bool FakeDownloadItem::GetOpened() const {
-  NOTREACHED();
-}
-
-void FakeDownloadItem::OnContentCheckCompleted(
-    download::DownloadDangerType danger_type,
-    download::DownloadInterruptReason reason) {
   NOTREACHED();
 }
 

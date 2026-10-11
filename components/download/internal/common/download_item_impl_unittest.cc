@@ -509,58 +509,6 @@ TEST_F(DownloadItemTest, NotificationAfterRemove) {
   ASSERT_TRUE(observer.download_removed());
 }
 
-TEST_F(DownloadItemTest, NotificationAfterOnContentCheckCompleted) {
-  // Setting to NOT_DANGEROUS does not trigger a notification.
-  DownloadItemImpl* safe_item = CreateDownloadItem();
-  MockDownloadFile* download_file =
-      DoIntermediateRename(safe_item, DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS);
-  TestDownloadItemObserver safe_observer(safe_item);
-
-  safe_item->OnAllDataSaved(0, std::unique_ptr<crypto::SecureHash>());
-  EXPECT_TRUE(safe_observer.CheckAndResetDownloadUpdated());
-  safe_item->OnContentCheckCompleted(DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-                                     DOWNLOAD_INTERRUPT_REASON_NONE);
-  EXPECT_TRUE(safe_observer.CheckAndResetDownloadUpdated());
-  CleanupItem(safe_item, download_file, DownloadItem::IN_PROGRESS);
-
-  // Setting to unsafe url or unsafe file should trigger a notification.
-  DownloadItemImpl* unsafeurl_item = CreateDownloadItem();
-  download_file =
-      DoIntermediateRename(unsafeurl_item, DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS);
-  TestDownloadItemObserver unsafeurl_observer(unsafeurl_item);
-
-  unsafeurl_item->OnAllDataSaved(0, std::unique_ptr<crypto::SecureHash>());
-  EXPECT_TRUE(unsafeurl_observer.CheckAndResetDownloadUpdated());
-  unsafeurl_item->OnContentCheckCompleted(DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-                                          DOWNLOAD_INTERRUPT_REASON_NONE);
-  EXPECT_TRUE(unsafeurl_observer.CheckAndResetDownloadUpdated());
-
-  EXPECT_CALL(*mock_delegate(), ShouldCompleteDownload_(_, _))
-      .WillOnce(Return(true));
-  EXPECT_CALL(*download_file, RenameAndAnnotate(_, _, _, _, _, _, _));
-  unsafeurl_item->ValidateDangerousDownload();
-  EXPECT_TRUE(unsafeurl_observer.CheckAndResetDownloadUpdated());
-  CleanupItem(unsafeurl_item, download_file, DownloadItem::IN_PROGRESS);
-
-  DownloadItemImpl* unsafefile_item = CreateDownloadItem();
-  download_file =
-      DoIntermediateRename(unsafefile_item, DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS);
-  TestDownloadItemObserver unsafefile_observer(unsafefile_item);
-
-  unsafefile_item->OnAllDataSaved(0, std::unique_ptr<crypto::SecureHash>());
-  EXPECT_TRUE(unsafefile_observer.CheckAndResetDownloadUpdated());
-  unsafefile_item->OnContentCheckCompleted(DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE,
-                                           DOWNLOAD_INTERRUPT_REASON_NONE);
-  EXPECT_TRUE(unsafefile_observer.CheckAndResetDownloadUpdated());
-
-  EXPECT_CALL(*mock_delegate(), ShouldCompleteDownload_(_, _))
-      .WillOnce(Return(true));
-  EXPECT_CALL(*download_file, RenameAndAnnotate(_, _, _, _, _, _, _));
-  unsafefile_item->ValidateDangerousDownload();
-  EXPECT_TRUE(unsafefile_observer.CheckAndResetDownloadUpdated());
-  CleanupItem(unsafefile_item, download_file, DownloadItem::IN_PROGRESS);
-}
-
 // DownloadItemImpl::OnDownloadTargetDetermined will schedule a task to run
 // DownloadFile::Rename(). Once the rename
 // completes, DownloadItemImpl receives a notification with the new file
@@ -1960,58 +1908,6 @@ TEST_F(DownloadItemTest, CompleteDelegate_BlockOnce) {
   EXPECT_CALL(*download_file, FullPath())
       .WillOnce(ReturnRefOfCopy(base::FilePath()));
   EXPECT_CALL(*download_file, Detach());
-  task_environment_.RunUntilIdle();
-  EXPECT_EQ(DownloadItem::COMPLETE, item->GetState());
-}
-
-// Delay and set danger.
-TEST_F(DownloadItemTest, CompleteDelegate_SetDanger) {
-  // Test to confirm that if we have a callback that returns true,
-  // we complete immediately.
-  DownloadItemImpl* item = CreateDownloadItem();
-  MockDownloadFile* download_file =
-      DoIntermediateRename(item, DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS);
-
-  // Drive the delegate interaction.
-  base::OnceClosure delegate_callback;
-  EXPECT_CALL(*mock_delegate(), ShouldCompleteDownload_(item, _))
-      .WillOnce(DoAll(MoveArg<1>(&delegate_callback), Return(false)))
-      .WillOnce(Return(true));
-  item->DestinationObserverAsWeakPtr()->DestinationCompleted(
-      0, std::unique_ptr<crypto::SecureHash>());
-  ASSERT_TRUE(delegate_callback);
-  EXPECT_FALSE(item->IsDangerous());
-  item->OnContentCheckCompleted(DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE,
-                                DOWNLOAD_INTERRUPT_REASON_NONE);
-  EXPECT_EQ(DownloadItem::IN_PROGRESS, item->GetState());
-  std::move(delegate_callback).Run();
-  ASSERT_FALSE(delegate_callback);
-  EXPECT_EQ(DownloadItem::IN_PROGRESS, item->GetState());
-  EXPECT_TRUE(item->IsDangerous());
-
-  // Make sure the download doesn't complete until we've validated it.
-  auto task_runner = base::SingleThreadTaskRunner::GetCurrentDefault();
-  EXPECT_CALL(
-      *download_file,
-      RenameAndAnnotate(base::FilePath(kDummyTargetPath), _, _, _, _, _, _))
-      .WillOnce(
-          WithArg<6>([&task_runner](DownloadFile::RenameCompletionCallback cb) {
-            task_runner->PostTask(
-                FROM_HERE,
-                base::BindOnce(std::move(cb), DOWNLOAD_INTERRUPT_REASON_NONE,
-                               base::FilePath(kDummyTargetPath)));
-          }));
-  EXPECT_CALL(*mock_delegate(), ShouldOpenDownload_(item, _))
-      .WillOnce(Return(true));
-  EXPECT_CALL(*download_file, FullPath())
-      .WillOnce(ReturnRefOfCopy(base::FilePath()));
-  EXPECT_CALL(*download_file, Detach());
-  task_environment_.RunUntilIdle();
-  EXPECT_EQ(DownloadItem::IN_PROGRESS, item->GetState());
-  EXPECT_TRUE(item->IsDangerous());
-
-  item->ValidateDangerousDownload();
-  EXPECT_EQ(DOWNLOAD_DANGER_TYPE_USER_VALIDATED, item->GetDangerType());
   task_environment_.RunUntilIdle();
   EXPECT_EQ(DownloadItem::COMPLETE, item->GetState());
 }

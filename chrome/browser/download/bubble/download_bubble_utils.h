@@ -27,10 +27,6 @@ bool ItemIsRecent(const offline_items_collection::OfflineItem& item,
 bool DownloadUIModelIsRecent(const DownloadUIModel* model,
                              base::Time cutoff_time);
 
-// Whether the download is in progress and pending deep scanning.
-bool IsPendingDeepScanning(const download::DownloadItem* item);
-bool IsPendingDeepScanning(const DownloadUIModel* model);
-
 // Whether the download is considered in-progress from the UI's point of view.
 // Consider dangerous downloads as completed, because we don't want to encourage
 // users to interact with them. Items that are paused count as in-progress.

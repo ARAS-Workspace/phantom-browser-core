@@ -243,13 +243,8 @@ TEST_F(DownloadItemModelTest, InterruptedStatus) {
     // Expected bubble status string. This will include the progress as well.
     std::u16string expected_bubble_status_msg;
 
-    // Most types of interrupted downloads have combination of icon and color
-    // that is not the same as "dangerous" or "suspicious" downloads.
-    DownloadUIModel::DangerUiPattern expected_danger_pattern =
-        DownloadUIModel::DangerUiPattern::kOther;
   } kTestCases[] = {
-      {download::DOWNLOAD_INTERRUPT_REASON_NONE, u"1/2 B", u"1/2 B • Resuming…",
-       DownloadUIModel::DangerUiPattern::kNormal},
+      {download::DOWNLOAD_INTERRUPT_REASON_NONE, u"1/2 B", u"1/2 B • Resuming…"},
       {download::DOWNLOAD_INTERRUPT_REASON_FILE_FAILED,
        u"Failed - Download error", u"Something went wrong"},
       {download::DOWNLOAD_INTERRUPT_REASON_FILE_ACCESS_DENIED,
@@ -324,8 +319,6 @@ TEST_F(DownloadItemModelTest, InterruptedStatus) {
 
     SetStatusTextBuilder(/*for_bubble=*/true);
     EXPECT_EQ(test_case.expected_bubble_status_msg, model().GetStatusText());
-
-    EXPECT_EQ(model().GetDangerUiPattern(), test_case.expected_danger_pattern);
   }
 }
 
@@ -495,8 +488,6 @@ TEST_F(DownloadItemModelTest, InProgressStatus) {
                   ? test_case.expected_status_msg
                   : test_case.expected_bubble_status_msg,
               base::UTF16ToUTF8(model().GetStatusText()));
-    EXPECT_EQ(model().GetDangerUiPattern(),
-              DownloadUIModel::DangerUiPattern::kNormal);
   }
 }
 
@@ -542,16 +533,7 @@ TEST_F(DownloadItemModelTest, CompletedStatus) {
     SetStatusTextBuilder(/*for_bubble=*/true);
     EXPECT_EQ(base::UTF16ToUTF8(model().GetStatusText()),
               test_case.expected_bubble_status_msg);
-    EXPECT_EQ(model().GetDangerUiPattern(),
-              DownloadUIModel::DangerUiPattern::kNormal);
   }
-
-  EXPECT_CALL(item(), GetDangerType())
-      .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_SAFE));
-  EXPECT_EQ("2 B \xE2\x80\xA2 Scan is done",
-            base::UTF16ToUTF8(model().GetStatusText()));
-  EXPECT_EQ(model().GetDangerUiPattern(),
-            DownloadUIModel::DangerUiPattern::kNormal);
 
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ("Show in Finder", base::UTF16ToUTF8(model().GetShowInFolderText()));
@@ -579,44 +561,20 @@ TEST_F(DownloadItemModelTest, CompletedBubbleWarningStatusText) {
         .WillByDefault(Return(test_case.insecure_download_status));
     EXPECT_EQ(base::UTF16ToUTF8(model().GetStatusText()),
               test_case.expected_bubble_status_msg);
-    EXPECT_EQ(model().GetDangerUiPattern(),
-              DownloadUIModel::DangerUiPattern::kSuspicious);
   }
 
   const struct DangerTypeTestCase {
     download::DownloadDangerType danger_type;
     std::string expected_bubble_status_msg;
-    DownloadUIModel::DangerUiPattern expected_danger_pattern;
   } kDangerTypeTestCases[] = {
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT,
-       "Dangerous download blocked",
-       DownloadUIModel::DangerUiPattern::kDangerous},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST,
-       "Dangerous download blocked",
-       DownloadUIModel::DangerUiPattern::kDangerous},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE,
-       "Dangerous download blocked",
-       DownloadUIModel::DangerUiPattern::kDangerous},
-      {download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED,
-       "Dangerous download blocked",
-       DownloadUIModel::DangerUiPattern::kDangerous},
       {download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED,
-       "Blocked \xE2\x80\xA2 Encrypted",
-       DownloadUIModel::DangerUiPattern::kOther},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       "Dangerous download blocked",
-       DownloadUIModel::DangerUiPattern::kDangerous},
+       "Blocked \xE2\x80\xA2 Encrypted"},
       {download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE,
-       "Blocked \xE2\x80\xA2 Too big",
-       DownloadUIModel::DangerUiPattern::kOther},
+       "Blocked \xE2\x80\xA2 Too big"},
       {download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING,
-       "Sensitive content", DownloadUIModel::DangerUiPattern::kOther},
+       "Sensitive content"},
       {download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK,
-       "Blocked by your organization",
-       DownloadUIModel::DangerUiPattern::kOther},
-      {download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING,
-       "Scan for malware \xE2\x80\xA2 Suspicious",
-       DownloadUIModel::DangerUiPattern::kSuspicious},
+       "Blocked by your organization"},
   };
   for (const auto& test_case : kDangerTypeTestCases) {
     SCOPED_TRACE(testing::Message()
@@ -627,21 +585,7 @@ TEST_F(DownloadItemModelTest, CompletedBubbleWarningStatusText) {
         .WillByDefault(Return(test_case.danger_type));
     EXPECT_EQ(base::UTF16ToUTF8(model().GetStatusText()),
               test_case.expected_bubble_status_msg);
-    EXPECT_EQ(model().GetDangerUiPattern(), test_case.expected_danger_pattern);
   }
-}
-
-TEST_F(DownloadItemModelTest,
-       CompletedBubbleWarningStatusText_FiletypeWarning) {
-  SetupCompletedDownloadItem(base::Hours(1));
-  SetStatusTextBuilder(/*for_bubble=*/true);
-  SetupDownloadItemDefaults();
-  ON_CALL(item(), GetDangerType())
-      .WillByDefault(Return(download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE));
-  EXPECT_EQ(base::UTF16ToUTF8(model().GetStatusText()),
-            "Unverified download blocked");
-  EXPECT_EQ(model().GetDangerUiPattern(),
-            DownloadUIModel::DangerUiPattern::kSuspicious);
 }
 
 TEST_F(DownloadItemModelTest, ShouldPreferOpeningInBrowser) {
@@ -656,31 +600,31 @@ TEST_F(DownloadItemModelTest, ShouldShowInBubble) {
   auto never = std::optional<base::Time>();
   auto two_mins_ago = base::Time::Now() - base::Minutes(2);
   auto ten_mins_ago = base::Time::Now() - base::Minutes(10);
-  auto dangerous_file = download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE;
-  auto not_dangerous = download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS;
+  auto insecure_warn = DownloadItem::InsecureDownloadStatus::WARN;
+  auto safe = DownloadItem::InsecureDownloadStatus::SAFE;
 
   const struct TestCase {
     DownloadItem::DownloadState state;
-    download::DownloadDangerType danger_type;
+    DownloadItem::InsecureDownloadStatus insecure_download_status;
     std::optional<base::Time> shown_time;
     bool expected_should_show;
   } kTestCases[] = {
-      {in_progress, not_dangerous, two_mins_ago, true},
-      {in_progress, not_dangerous, ten_mins_ago, true},
-      {in_progress, dangerous_file, never, true},
-      {in_progress, dangerous_file, two_mins_ago, true},
-      {in_progress, dangerous_file, ten_mins_ago, false},
-      {canceled, dangerous_file, two_mins_ago, false},
-      {canceled, dangerous_file, ten_mins_ago, false},
-      {canceled, not_dangerous, two_mins_ago, true},
-      {canceled, not_dangerous, ten_mins_ago, true},
+      {in_progress, safe, two_mins_ago, true},
+      {in_progress, safe, ten_mins_ago, true},
+      {in_progress, insecure_warn, never, true},
+      {in_progress, insecure_warn, two_mins_ago, true},
+      {in_progress, insecure_warn, ten_mins_ago, false},
+      {canceled, insecure_warn, two_mins_ago, false},
+      {canceled, insecure_warn, ten_mins_ago, false},
+      {canceled, safe, two_mins_ago, true},
+      {canceled, safe, ten_mins_ago, true},
   };
 
   SetupDownloadItemDefaults();
   for (const auto& test_case : kTestCases) {
     EXPECT_CALL(item(), GetState()).WillRepeatedly(Return(test_case.state));
-    EXPECT_CALL(item(), GetDangerType())
-        .WillRepeatedly(Return(test_case.danger_type));
+    EXPECT_CALL(item(), GetInsecureDownloadStatus())
+        .WillRepeatedly(Return(test_case.insecure_download_status));
     model().SetEphemeralWarningUiShownTime(test_case.shown_time);
 
     EXPECT_EQ(test_case.expected_should_show, model().ShouldShowInBubble());

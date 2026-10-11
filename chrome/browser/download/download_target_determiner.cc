@@ -12,9 +12,7 @@
 #include "base/functional/bind.h"
 #include "base/location.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/rand_util.h"
 #include "base/strings/string_util.h"
-#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/task/thread_pool.h"
@@ -652,10 +650,6 @@ DownloadTargetDeterminer::Result
   DCHECK(!virtual_path_.empty());
   next_state_ = STATE_DETERMINE_INTERMEDIATE_PATH;
 
-  // If user has validated a dangerous download, don't check.
-  if (danger_type_ == download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED)
-    return CONTINUE;
-
   delegate_->CheckDownloadUrl(
       download_, virtual_path_,
       base::BindOnce(&DownloadTargetDeterminer::CheckDownloadUrlDone,
@@ -714,38 +708,8 @@ DownloadTargetDeterminer::Result
     return COMPLETE;
   }
 
-  // Other safe downloads get a .crdownload suffix for their intermediate name.
-  if (danger_type_ == download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS) {
-    intermediate_path_ = GetCrDownloadPath(local_path_);
-    return COMPLETE;
-  }
-
-  // If this is a resumed download, then re-use the existing intermediate path
-  // if one is available. A resumed download shouldn't cause a non-dangerous
-  // download to be considered dangerous upon resumption. Therefore the
-  // intermediate file should already be in the correct form.
-  if (is_resumption_ && !download_->GetFullPath().empty() &&
-      local_path_.DirName() == download_->GetFullPath().DirName()) {
-    DCHECK_NE(download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-              download_->GetDangerType());
-    DCHECK_EQ(kCrdownloadSuffix, download_->GetFullPath().Extension());
-    intermediate_path_ = download_->GetFullPath();
-    return COMPLETE;
-  }
-
-  // Dangerous downloads receive a random intermediate name that looks like:
-  // 'Unconfirmed <random>.crdownload'.
-  static constexpr char kUnconfirmedFormatSuffix[] = " %d.crdownload";
-  // Range of the <random> uniquifier.
-  constexpr int kUnconfirmedUniquifierRange = 1000000;
-
-  std::string file_name =
-      l10n_util::GetStringUTF8(IDS_DOWNLOAD_UNCONFIRMED_PREFIX) +
-      base::StringPrintf(
-          kUnconfirmedFormatSuffix,
-          base::RandIntInclusive(0, kUnconfirmedUniquifierRange));
-  intermediate_path_ =
-      local_path_.DirName().Append(base::FilePath::FromUTF8Unsafe(file_name));
+  // Other downloads get a .crdownload suffix for their intermediate name.
+  intermediate_path_ = GetCrDownloadPath(local_path_);
   return COMPLETE;
 }
 

@@ -136,8 +136,6 @@ class MockDownloadItem : public DownloadItem {
               GetIsolationInfo,
               (),
               (const override));
-  MOCK_METHOD2(OnContentCheckCompleted,
-               void(DownloadDangerType, DownloadInterruptReason));
   MOCK_METHOD1(SetOpenWhenComplete, void(bool));
   MOCK_METHOD1(SetOpened, void(bool));
   MOCK_METHOD1(SetLastAccessTime, void(base::Time));
@@ -146,7 +144,6 @@ class MockDownloadItem : public DownloadItem {
   MOCK_CONST_METHOD1(DebugString, std::string(bool));
   MOCK_METHOD1(SimulateErrorForTesting, void(DownloadInterruptReason));
   MOCK_METHOD2(Rename, void(const base::FilePath&, RenameDownloadCallback));
-  MOCK_METHOD1(OnAsyncScanningCompleted, void(DownloadDangerType));
 
  private:
   base::ObserverList<Observer> observers_;

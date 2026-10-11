@@ -135,7 +135,6 @@ enum TestCaseType {
 // Used with DownloadTestCase. Type of intermediate filename to expect.
 enum TestCaseExpectIntermediate {
   EXPECT_CRDOWNLOAD,   // Expect path/to/target.crdownload.
-  EXPECT_UNCONFIRMED,  // Expect path/to/Unconfirmed xxx.crdownload.
   EXPECT_LOCAL_PATH,   // Expect target path.
   EXPECT_EMPTY,        // Expect empty path. Only for downloads which will be
                        // marked interrupted or cancelled.
@@ -518,24 +517,6 @@ void DownloadTargetDeterminerTest::VerifyDownloadTarget(
           info.intermediate_path.value());
       break;
 
-    case EXPECT_UNCONFIRMED:
-      // The paths (in English) look like: /path/Unconfirmed xxx.crdownload.
-      // Of this, we only check that the path is:
-      // 1. Not "/path/target.crdownload",
-      // 2. Points to the same directory as the target.
-      // 3. Has extension ".crdownload".
-      // 4. Basename starts with "Unconfirmed ".
-      EXPECT_NE(DownloadTargetDeterminer::GetCrDownloadPath(expected_local_path)
-                    .value(),
-                info.intermediate_path.value());
-      EXPECT_EQ(expected_local_path.DirName().value(),
-                info.intermediate_path.DirName().value());
-      EXPECT_TRUE(info.intermediate_path.MatchesExtension(
-          FILE_PATH_LITERAL(".crdownload")));
-      EXPECT_EQ(0u, info.intermediate_path.BaseName().value().find(
-                        FILE_PATH_LITERAL("Unconfirmed ")));
-      break;
-
     case EXPECT_LOCAL_PATH:
       EXPECT_EQ(expected_local_path.value(), info.intermediate_path.value());
       break;
@@ -625,119 +606,6 @@ TEST_F(DownloadTargetDeterminerTest, CancelSaveAs) {
       .WillByDefault(WithArg<3>(ScheduleCallback2(
           DownloadConfirmationResult::CANCELED, ui::SelectedFileInfo())));
   RunTestCasesWithActiveItem(kCancelSaveAsTestCases);
-}
-
-// The SafeBrowsing check is performed early. Make sure that a download item
-// that has been marked as DANGEROUS_URL behaves correctly.
-TEST_F(DownloadTargetDeterminerTest, DangerousUrl) {
-  const DownloadTestCase kSafeBrowsingTestCases[] = {
-      {// 0: Automatic Dangerous URL
-       AUTOMATIC, download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       "http://phishing.example.com/foo.txt",
-       "", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.txt"), DownloadItem::TARGET_DISPOSITION_OVERWRITE,
-
-       EXPECT_UNCONFIRMED},
-
-      {// 1: Save As Dangerous URL
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       "http://phishing.example.com/foo.txt",
-       "", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.txt"), DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_UNCONFIRMED},
-
-      {// 2: Forced Dangerous URL
-       FORCED, download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       "http://phishing.example.com/foo.txt",
-       "", FILE_PATH_LITERAL("forced-foo.txt"),
-
-       FILE_PATH_LITERAL("forced-foo.txt"),
-       DownloadItem::TARGET_DISPOSITION_OVERWRITE,
-
-       EXPECT_UNCONFIRMED},
-
-      {// 3: Automatic Dangerous URL + Dangerous file. Dangerous URL takes
-       // precedence.
-       AUTOMATIC, download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       "http://phishing.example.com/foo.html",
-       "", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.html"),
-       DownloadItem::TARGET_DISPOSITION_OVERWRITE,
-
-       EXPECT_UNCONFIRMED},
-
-      {// 4: Save As Dangerous URL + Dangerous file
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       "http://phishing.example.com/foo.html",
-       "", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.html"), DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_UNCONFIRMED},
-
-      {// 5: Forced Dangerous URL + Dangerous file
-       FORCED, download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       "http://phishing.example.com/foo.html",
-       "", FILE_PATH_LITERAL("forced-foo.html"),
-
-       FILE_PATH_LITERAL("forced-foo.html"),
-       DownloadItem::TARGET_DISPOSITION_OVERWRITE,
-
-       EXPECT_UNCONFIRMED},
-  };
-
-  ON_CALL(*delegate(), CheckDownloadUrl_(_, _, _))
-      .WillByDefault(WithArg<2>(
-          ScheduleCallback(download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL)));
-  RunTestCasesWithActiveItem(kSafeBrowsingTestCases);
-}
-
-// The SafeBrowsing check is performed early. Make sure that a download item
-// that has been marked as MAYBE_DANGEROUS_CONTENT behaves correctly.
-TEST_F(DownloadTargetDeterminerTest, MaybeDangerousContent) {
-  const DownloadTestCase kSafeBrowsingTestCases[] = {
-      {// 0: Automatic Maybe dangerous content
-       AUTOMATIC, download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT,
-       "http://phishing.example.com/foo.kindabad", "", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.kindabad"),
-       DownloadItem::TARGET_DISPOSITION_OVERWRITE, EXPECT_UNCONFIRMED},
-
-      {// 1: Automatic Maybe dangerous content with DANGEROUS type.
-       AUTOMATIC, download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT,
-       "http://phishing.example.com/foo.bad", "",
-       FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.bad"), DownloadItem::TARGET_DISPOSITION_OVERWRITE,
-       EXPECT_UNCONFIRMED},
-
-      {// 2: Save As Maybe dangerous content
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT,
-       "http://phishing.example.com/foo.kindabad", "", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.kindabad"),
-       DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_UNCONFIRMED},
-
-      {// 3: Forced Maybe dangerous content
-       FORCED, download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT,
-       "http://phishing.example.com/foo.kindabad", "",
-       FILE_PATH_LITERAL("forced-foo.kindabad"),
-
-       FILE_PATH_LITERAL("forced-foo.kindabad"),
-       DownloadItem::TARGET_DISPOSITION_OVERWRITE,
-
-       EXPECT_UNCONFIRMED}};
-
-  ON_CALL(*delegate(), CheckDownloadUrl_(_, _, _))
-      .WillByDefault(WithArg<2>(ScheduleCallback(
-          download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT)));
-  RunTestCasesWithActiveItem(kSafeBrowsingTestCases);
 }
 
 // Test whether the last saved directory is used for 'Save As' downloads.
@@ -2062,7 +1930,7 @@ TEST_F(DownloadTargetDeterminerTest, ResumedWithUserValidatedDownload) {
 
   const DownloadTestCase kUserValidatedTestCase = {
       AUTOMATIC,
-      download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED,
+      download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
       "http://example.com/foo.crx",
       "",
       FILE_PATH_LITERAL(""),
@@ -2085,7 +1953,7 @@ TEST_F(DownloadTargetDeterminerTest, ResumedWithUserValidatedDownload) {
   EXPECT_CALL(*delegate(), NotifyExtensions_(_, _, _));
   EXPECT_CALL(*delegate(), ReserveVirtualPath_(_, expected_path, false, _, _));
   EXPECT_CALL(*delegate(), DetermineLocalPath_(_, expected_path, _));
-  EXPECT_CALL(*delegate(), CheckDownloadUrl_(_, expected_path, _)).Times(0);
+  EXPECT_CALL(*delegate(), CheckDownloadUrl_(_, expected_path, _));
   EXPECT_CALL(*delegate(), RequestConfirmation_(_, _, _, _)).Times(0);
   RunTestCase(test_case, GetPathInDownloadDir(kInitialPath), item.get());
 }

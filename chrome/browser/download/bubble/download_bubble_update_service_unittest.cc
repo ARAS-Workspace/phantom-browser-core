@@ -932,7 +932,6 @@ TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfo_InProgress) {
   EXPECT_EQ(info.in_progress_count, 4);
   EXPECT_EQ(info.paused_count, 2);
   EXPECT_TRUE(info.has_unactioned);
-  EXPECT_FALSE(info.has_deep_scanning);
   EXPECT_FALSE(info.has_content_check);
 }
 
@@ -960,7 +959,6 @@ TEST_F(DownloadBubbleUpdateServiceTest,
   EXPECT_EQ(info.in_progress_count, 3);
   EXPECT_EQ(info.paused_count, 2);
   EXPECT_TRUE(info.has_unactioned);
-  EXPECT_FALSE(info.has_deep_scanning);
   EXPECT_FALSE(info.has_content_check);
 }
 
@@ -987,7 +985,6 @@ TEST_F(DownloadBubbleUpdateServiceTest,
   EXPECT_EQ(info.in_progress_count, 4);
   EXPECT_EQ(info.paused_count, 2);
   EXPECT_TRUE(info.has_unactioned);
-  EXPECT_FALSE(info.has_deep_scanning);
   EXPECT_FALSE(info.has_content_check);
 }
 
@@ -1015,7 +1012,6 @@ TEST_F(DownloadBubbleUpdateServiceTest, GetDisplayInfo_UpdateForInsecure) {
   EXPECT_EQ(info.in_progress_count, 3);
   EXPECT_EQ(info.paused_count, 2);
   EXPECT_TRUE(info.has_unactioned);
-  EXPECT_FALSE(info.has_deep_scanning);
   EXPECT_FALSE(info.has_content_check);
 }
 
@@ -1143,9 +1139,11 @@ TEST_F(DownloadBubbleUpdateServiceTest, OnEphemeralWarningExpired) {
       update_service_->GetDisplayInfo(/*web_app_id=*/nullptr);
   EXPECT_EQ(info.all_models_size, 2u);
 
-  // Mark the download with an ephemeral warning.
-  UpdateDownloadItem(1, DownloadState::IN_PROGRESS, /*is_paused=*/false,
-                     DownloadDangerType::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE);
+  // Mark the download with an ephemeral (insecure) warning.
+  EXPECT_CALL(GetDownloadItem(1), GetInsecureDownloadStatus())
+      .WillRepeatedly(
+          Return(download::DownloadItem::InsecureDownloadStatus::WARN));
+  UpdateDownloadItem(1, DownloadState::IN_PROGRESS, /*is_paused=*/false);
 
   // Simulate showing the warning in the UI and waiting past the expiry time.
   DownloadItemModel(&GetDownloadItem(1)).SetEphemeralWarningUiShownTime(now);
@@ -1198,12 +1196,16 @@ TEST_F(DownloadBubbleUpdateServiceIncognitoTest,
   EXPECT_EQ(info.all_models_size, 3u);
 
   // Mark the regular profile ephemeral download with an ephemeral warning.
-  UpdateDownloadItem(1, DownloadState::IN_PROGRESS, /*is_paused=*/false,
-                     DownloadDangerType::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE);
+  EXPECT_CALL(GetDownloadItem(1), GetInsecureDownloadStatus())
+      .WillRepeatedly(
+          Return(download::DownloadItem::InsecureDownloadStatus::WARN));
+  UpdateDownloadItem(1, DownloadState::IN_PROGRESS, /*is_paused=*/false);
   // Mark the incognito profile ephemeral download with an ephemeral warning.
+  EXPECT_CALL(*incognito_download_items_[0], GetInsecureDownloadStatus())
+      .WillRepeatedly(
+          Return(download::DownloadItem::InsecureDownloadStatus::WARN));
   UpdateDownloadItem(*incognito_download_items_[0], DownloadState::IN_PROGRESS,
-                     /*is_paused=*/false,
-                     DownloadDangerType::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE);
+                     /*is_paused=*/false);
 
   // Simulate showing the warning in the UI and waiting past the expiry time.
   DownloadItemModel(&GetDownloadItem(1)).SetEphemeralWarningUiShownTime(now);

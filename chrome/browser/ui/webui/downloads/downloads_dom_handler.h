@@ -84,10 +84,7 @@ class DownloadsDOMHandler : public content::WebContentsObserver,
   void Cancel(const std::string& id) override;
   void ClearAll() override;
   void OpenDownloadsFolderRequiringGesture() override;
-  void OpenDuringScanningRequiringGesture(const std::string& id) override;
   void ReviewDangerousRequiringGesture(const std::string& id) override;
-  void DeepScan(const std::string& id) override;
-  void BypassDeepScanRequiringGesture(const std::string& id) override;
   void OpenEsbSettings() override;
   void IsEligibleForEsbPromo(IsEligibleForEsbPromoCallback callback) override;
   void LogEsbPromotionRowViewed() override;

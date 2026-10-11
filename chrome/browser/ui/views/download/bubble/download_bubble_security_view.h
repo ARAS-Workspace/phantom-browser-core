@@ -32,7 +32,6 @@ class BubbleDialogDelegate;
 
 class DownloadBubbleNavigationHandler;
 class ParagraphsView;
-class DownloadBubblePasswordPromptView;
 
 class DownloadBubbleSecurityView
     : public views::View,
@@ -55,32 +54,6 @@ class DownloadBubbleSecurityView
     virtual void AddSecuritySubpageWarningActionEvent(
         const offline_items_collection::ContentId& id,
         DownloadItemWarningData::WarningAction action) = 0;
-
-    // Processes the deep scan being pressed, when the given password is
-    // provided.
-    virtual void ProcessDeepScanPress(
-        const offline_items_collection::ContentId& id,
-        DownloadItemWarningData::DeepScanTrigger trigger,
-        base::optional_ref<const std::string> password) = 0;
-
-    // Processes the local decryption prompt being accepted/ignored.
-    virtual void ProcessLocalDecryptionPress(
-        const offline_items_collection::ContentId& id,
-        base::optional_ref<const std::string> password) = 0;
-
-    // Processes clicks on the in-progress view for local decryption scans.
-    virtual void ProcessLocalPasswordInProgressClick(
-        const offline_items_collection::ContentId& id,
-        DownloadCommands::Command command) = 0;
-
-    // Return whether the download item is an encrypted archive.
-    virtual bool IsEncryptedArchive(
-        const offline_items_collection::ContentId& id) = 0;
-
-    // Return whether the download item has a previously provided invalid
-    // password.
-    virtual bool HasPreviousIncorrectPassword(
-        const offline_items_collection::ContentId& id) = 0;
   };
 
   DownloadBubbleSecurityView(
@@ -121,48 +94,30 @@ class DownloadBubbleSecurityView
 
  private:
   friend class DownloadBubbleSecurityViewTest;
-  FRIEND_TEST_ALL_PREFIXES(DownloadBubbleSecurityViewTest,
-                           VerifyLogWarningActions);
 
   // Following method calls require this view to be initialized.
   void BackButtonPressed();
   void AddHeader();
   void CloseBubble();
   void AddIconAndContents();
-  void AddSecondaryIconAndText();
-  void AddProgressBar();
-  void AddPasswordPrompt(views::View* parent);
 
   void UpdateViews();
   void UpdateHeader();
   void UpdateIconAndText();
-  void UpdateSecondaryIconAndText();
   // Updates the subpage button. Setting initial state and color for enabled
   // state, if it is a secondary button.
   void UpdateButton(DownloadBubbleSecurityViewInfo::SubpageButton button,
                     bool is_secondary_button);
   void UpdateButtons();
-  void UpdateProgressBar();
-  void UpdatePasswordPrompt();
 
   // Reset fields that increase the width of the bubble.
   void ClearWideFields();
-
-  void RecordWarningActionTime(bool is_secondary_button);
 
   int GetMinimumBubbleWidth() const;
   // Minimum width for the filename in the title.
   int GetMinimumTitleWidth() const;
   // Minimum width for the subpage summary.
   int GetMinimumLabelWidth() const;
-
-  // Deep scanning is complicated enough that this button click is separate from
-  // the others. Returns whether the dialog should close.
-  bool ProcessDeepScanClick();
-
-  // Prompting for local archive decryption is complicated enough that handling
-  // these button presses is handled separately.
-  bool ProcessLocalPasswordDecryptionClick();
 
   // DownloadBubbleSecurityViewInfoObserver:
   void OnInfoChanged() override;
@@ -182,12 +137,7 @@ class DownloadBubbleSecurityView
   raw_ptr<views::StyledLabel> title_ = nullptr;
   raw_ptr<views::ImageView> icon_ = nullptr;
   raw_ptr<ParagraphsView> paragraphs_ = nullptr;
-  raw_ptr<views::ImageView> secondary_icon_ = nullptr;
-  raw_ptr<views::StyledLabel> secondary_styled_label_ = nullptr;
   raw_ptr<views::ImageButton> back_button_ = nullptr;
-  raw_ptr<views::StyledLabel> learn_more_link_ = nullptr;
-  raw_ptr<views::ProgressBar> progress_bar_ = nullptr;
-  raw_ptr<DownloadBubblePasswordPromptView> password_prompt_ = nullptr;
 
   // Tracks whether metrics were logged for this impression, to avoid
   // double-logging.

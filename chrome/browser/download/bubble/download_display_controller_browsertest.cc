@@ -160,11 +160,6 @@ class MockDownloadBubbleUpdateService : public DownloadBubbleUpdateService {
     ++info.all_models_size;
     info.last_completed_time =
         std::max(info.last_completed_time, model.GetEndTime());
-    if (model.GetDangerType() ==
-            download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING &&
-        model.GetState() != download::DownloadItem::CANCELLED) {
-      info.has_deep_scanning = true;
-    }
     if (!model.WasActionedOn()) {
       info.has_unactioned = true;
     }
@@ -384,7 +379,8 @@ class DownloadDisplayControllerTest : public InProcessBrowserTest {
     // TODO(crbug.com/40264271): Don't duplicate this logic.
     bool in_progress_dangerous =
         (state == DownloadState::IN_PROGRESS &&
-         danger_type != download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS);
+         (danger_type != download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS ||
+          is_insecure));
     EXPECT_CALL(item(item_index), GetState()).WillRepeatedly(Return(state));
     EXPECT_CALL(item(item_index), GetDangerType())
         .WillRepeatedly(Return(danger_type));
@@ -670,47 +666,6 @@ IN_PROC_BROWSER_TEST_F(DownloadDisplayControllerTest,
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadDisplayControllerTest,
-                       UpdateToolbarButtonState_DeepScanning) {
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/false, /*detail_shown=*/false,
-                                 /*icon_state=*/DownloadIconState::kComplete,
-                                 /*is_active=*/false));
-
-  InitDownloadItem(FILE_PATH_LITERAL("/foo/bar.pdf"),
-                   download::DownloadItem::IN_PROGRESS);
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/true, /*detail_shown=*/false,
-                                 /*icon_state=*/DownloadIconState::kProgress,
-                                 /*is_active=*/true));
-
-  UpdateDownloadItem(/*item_index=*/0, DownloadState::IN_PROGRESS,
-                     download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING);
-  // Details are shown because the pending deep scan download is considered
-  // complete.
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/true, /*detail_shown=*/true,
-                                 /*icon_state=*/DownloadIconState::kComplete,
-                                 /*is_active=*/false));
-
-  // Reset details_shown while the downloads are in progress. This can happen if
-  // the user clicks somewhere else to dismiss the download bubble.
-  display().HideDetails();
-
-  UpdateDownloadItem(/*item_index=*/0, DownloadState::IN_PROGRESS,
-                     download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING);
-  // Details are not shown because the scan is ongoing.
-  EXPECT_TRUE(
-      VerifyDisplayState(/*shown=*/true, /*detail_shown=*/false,
-                         /*icon_state=*/DownloadIconState::kDeepScanning,
-                         /*is_active=*/true));
-
-  UpdateDownloadItem(/*item_index=*/0, DownloadState::COMPLETE);
-  // Details are shown because all downloads are now complete.
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/true, /*detail_shown=*/true,
-                                 /*icon_state=*/DownloadIconState::kComplete,
-                                 /*is_active=*/true));
-
-  EXPECT_EQ(display().GetAnnouncementCount(), 4);
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadDisplayControllerTest,
                        UpdateToolbarButtonState_EmptyFilePath) {
   EXPECT_TRUE(VerifyDisplayState(/*shown=*/false, /*detail_shown=*/false,
                                  /*icon_state=*/DownloadIconState::kComplete,
@@ -739,36 +694,6 @@ IN_PROC_BROWSER_TEST_F(DownloadDisplayControllerTest,
 }
 
 IN_PROC_BROWSER_TEST_F(DownloadDisplayControllerTest,
-                       UpdateToolbarButtonState_DangerousDownload) {
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/false, /*detail_shown=*/false,
-                                 /*icon_state=*/DownloadIconState::kComplete,
-                                 /*is_active=*/false));
-
-  InitDownloadItem(FILE_PATH_LITERAL("/foo/bar.pdf"),
-                   download::DownloadItem::IN_PROGRESS);
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/true, /*detail_shown=*/false,
-                                 /*icon_state=*/DownloadIconState::kProgress,
-                                 /*is_active=*/true));
-
-  EXPECT_CALL(item(0), IsDangerous()).WillRepeatedly(Return(true));
-  UpdateDownloadItem(/*item_index=*/0, DownloadState::IN_PROGRESS,
-                     download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST);
-  // Dangerous downloads should be considered completed and
-  // should display details if there are no other in-progress downloads.
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/true, /*detail_shown=*/true,
-                                 /*icon_state=*/DownloadIconState::kComplete,
-                                 /*is_active=*/false));
-
-  UpdateDownloadItem(/*item_index=*/0, DownloadState::IN_PROGRESS,
-                     download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING);
-  EXPECT_TRUE(VerifyDisplayState(/*shown=*/true, /*detail_shown=*/true,
-                                 /*icon_state=*/DownloadIconState::kComplete,
-                                 /*is_active=*/false));
-
-  EXPECT_EQ(display().GetAnnouncementCount(), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadDisplayControllerTest,
                        UpdateToolbarButtonState_InsecureDownload) {
   EXPECT_TRUE(VerifyDisplayState(/*shown=*/false, /*detail_shown=*/false,
                                  /*icon_state=*/DownloadIconState::kComplete,
@@ -781,7 +706,7 @@ IN_PROC_BROWSER_TEST_F(DownloadDisplayControllerTest,
                                  /*is_active=*/true));
 
   UpdateDownloadItem(/*item_index=*/0, DownloadState::IN_PROGRESS,
-                     download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST,
+                     download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
                      /*may_show_details=*/true, /*is_insecure=*/true);
   // Insecure downloads should be considered completed and
   // should display details if there are no other in-progress downloads.

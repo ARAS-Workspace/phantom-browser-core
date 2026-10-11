@@ -554,19 +554,6 @@ class COMPONENTS_DOWNLOAD_EXPORT DownloadItem : public base::SupportsUserData {
   // TODO(rdsmith): These should all be removed; the download item should
   // control its own state transitions.
 
-  // Called if a check of the download contents was performed and the results of
-  // the test are available. This should only be called after AllDataSaved() is
-  // true. If |reason| is not DOWNLOAD_INTERRUPT_REASON_NONE, then the download
-  // file should be blocked.
-  // TODO(crbug.com/40525770): Move DownloadInterruptReason out of here and add
-  // a new  Interrupt method instead. Same for other methods supporting
-  // interruptions.
-  virtual void OnContentCheckCompleted(DownloadDangerType danger_type,
-                                       DownloadInterruptReason reason) = 0;
-
-  // Called when async scanning completes with the given |danger_type|.
-  virtual void OnAsyncScanningCompleted(DownloadDangerType danger_type) = 0;
-
   // Mark the download to be auto-opened when completed.
   virtual void SetOpenWhenComplete(bool open) = 0;
 

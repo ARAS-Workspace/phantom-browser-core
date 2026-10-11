@@ -284,8 +284,7 @@ cr-button {
 }
 
 #progress,
-.description:not(:empty),
-.controls {
+.description:not(:empty) {
   margin-top: 16px;
 }
 
@@ -354,10 +353,6 @@ cr-button {
   margin-block-end: 20px;
   margin-block-start: auto;
   width: 16px;
-}
-
-#deepScan {
-  margin-inline-end: 8px;
 }
 
 :host-context([webui-rounded-icons]) {
