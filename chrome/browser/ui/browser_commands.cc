@@ -136,8 +136,6 @@
 #include "components/bookmarks/common/bookmark_bar_visibility_state.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/browsing_data/content/browsing_data_helper.h"
-#include "components/commerce/core/commerce_utils.h"
-#include "components/commerce/core/pref_names.h"
 #include "components/embedder_support/user_agent_utils.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/feature_engagement/public/feature_constants.h"

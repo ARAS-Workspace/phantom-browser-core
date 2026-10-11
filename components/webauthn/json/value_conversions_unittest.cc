@@ -135,13 +135,11 @@ TEST(WebAuthenticationJSONConversionTest,
       /*enforce_protection_policy=*/true,
       /*appid_exclude=*/kAppId,
       /*cred_props=*/true, device::LargeBlobSupport::kRequired,
-      /*is_payment_credential_creation=*/true,
       /*cred_blob=*/ToByteVector("test cred blob"),
       /*min_pin_length_requested=*/true,
       blink::mojom::RemoteDesktopClientOverride::New(
           url::Origin::Create(GURL(kOrigin)),
           /*same_origin_with_ancestors=*/true),
-      /*payment_browser_bound_key_parameters=*/std::nullopt,
       std::vector<std::string>{"attfmt1", "attfmt2"}, /*is_conditional=*/false,
       /*cmtg_key=*/true);
 
@@ -151,7 +149,7 @@ TEST(WebAuthenticationJSONConversionTest,
   ASSERT_TRUE(serializer.Serialize(value));
   EXPECT_EQ(
       json,
-      R"({"attestation":"direct","attestationFormats":["attfmt1","attfmt2"],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required"},"challenge":"dGVzdCBjaGFsbGVuZ2U","excludeCredentials":[{"id":"FBUW","transports":["usb"],"type":"public-key"},{"id":"Hh8g","type":"public-key"}],"extensions":{"appIdExclude":"https://example.test/appid.json","cmtgKey":true,"credBlob":"dGVzdCBjcmVkIGJsb2I","credProps":true,"credentialProtectionPolicy":"userVerificationRequired","enforceCredentialProtectionPolicy":true,"hmacCreateSecret":true,"largeBlob":{"support":"required"},"minPinLength":true,"payment":{"isPayment":true},"prf":{"eval":{"first":"AQIDBA","second":"BQYHCA"}},"remoteDesktopClientOverride":{"origin":"https://login.example.test","sameOriginWithAncestors":true}},"hints":["security-key","client-device","hybrid"],"pubKeyCredParams":[{"alg":-7,"type":"public-key"},{"alg":-257,"type":"public-key"}],"rp":{"id":"example.test","name":"Example LLC"},"timeout":300000,"user":{"displayName":"Example User","id":"dGVzdCB1c2VyIGlk","name":"user@example.test"}})");
+      R"({"attestation":"direct","attestationFormats":["attfmt1","attfmt2"],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required"},"challenge":"dGVzdCBjaGFsbGVuZ2U","excludeCredentials":[{"id":"FBUW","transports":["usb"],"type":"public-key"},{"id":"Hh8g","type":"public-key"}],"extensions":{"appIdExclude":"https://example.test/appid.json","cmtgKey":true,"credBlob":"dGVzdCBjcmVkIGJsb2I","credProps":true,"credentialProtectionPolicy":"userVerificationRequired","enforceCredentialProtectionPolicy":true,"hmacCreateSecret":true,"largeBlob":{"support":"required"},"minPinLength":true,"prf":{"eval":{"first":"AQIDBA","second":"BQYHCA"}},"remoteDesktopClientOverride":{"origin":"https://login.example.test","sameOriginWithAncestors":true}},"hints":["security-key","client-device","hybrid"],"pubKeyCredParams":[{"alg":-7,"type":"public-key"},{"alg":-257,"type":"public-key"}],"rp":{"id":"example.test","name":"Example LLC"},"timeout":300000,"user":{"displayName":"Example User","id":"dGVzdCB1c2VyIGlk","name":"user@example.test"}})");
 }
 
 TEST(WebAuthenticationJSONConversionTest,
@@ -177,11 +175,9 @@ TEST(WebAuthenticationJSONConversionTest,
       /*enforce_protection_policy=*/false,
       /*appid_exclude=*/std::nullopt,
       /*cred_props=*/true, device::LargeBlobSupport::kNotRequested,
-      /*is_payment_credential_creation=*/false,
       /*cred_blob=*/std::nullopt,
       /*min_pin_length_requested=*/false,
       /*remote_desktop_client_override=*/nullptr,
-      /*payment_browser_bound_key_parameters=*/std::nullopt,
       /*attestation_formats=*/std::vector<std::string>(),
       /*is_conditional=*/false,
       /*cmtg_key=*/false);
@@ -237,7 +233,6 @@ TEST(WebAuthenticationJSONConversionTest,
           blink::mojom::RemoteDesktopClientOverride::New(
               url::Origin::Create(GURL(kOrigin)),
               /*same_origin_with_ancestors=*/true),
-          std::vector<device::PublicKeyCredentialParams::CredentialInfo>(),
           /*cmtg_key=*/true,
           /*cross_device_fallback_url=*/GURL("https://example.test/fallback")));
 
@@ -374,7 +369,6 @@ TEST(WebAuthenticationJSONConversionTest,
       /*echo_cred_props=*/true, /*has_cred_props_rk=*/true,
       /*cred_props_rk=*/true, /*echo_large_blob=*/true,
       /*supports_large_blob=*/true,
-      /*payment=*/nullptr,
       /*cmtg_key=*/
       blink::mojom::CmtgKeyResponse::New(ToByteVector("test cmtg key"),
                                          ToByteVector("test cmtg signature")));
@@ -542,7 +536,6 @@ TEST(WebAuthenticationJSONConversionTest,
           /*large_blob=*/kLargeBlob, /*echo_large_blob_written=*/true,
           /*large_blob_written=*/true,
           /*get_cred_blob=*/kCredBlob,
-          /*payment=*/nullptr,
           /*cmtg_key=*/
           blink::mojom::CmtgKeyResponse::New(
               ToByteVector("test cmtg key"),

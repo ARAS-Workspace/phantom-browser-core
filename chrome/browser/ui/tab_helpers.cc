@@ -21,7 +21,6 @@
 #include "chrome/browser/buildflags.h"
 #include "chrome/browser/chained_back_navigation_tracker.h"
 #include "chrome/browser/chrome_content_browser_client.h"
-#include "chrome/browser/commerce/shopping_service_factory.h"
 #include "chrome/browser/complex_tasks/task_tab_helper.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/content_settings/mixed_content_settings_tab_helper.h"
@@ -105,8 +104,6 @@
 #include "components/breadcrumbs/core/breadcrumbs_status.h"
 #include "components/captive_portal/core/buildflags.h"
 #include "components/client_hints/browser/client_hints_web_contents_observer.h"
-#include "components/commerce/content/browser/commerce_tab_helper.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/dom_distiller/core/dom_distiller_features.h"
 #include "components/download/content/factory/navigation_monitor_factory.h"
@@ -298,10 +295,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   UrlLanguageHistogramRecorder::CreateForWebContents(web_contents);
   client_hints::ClientHintsWebContentsObserver::CreateForWebContents(
       web_contents);
-  commerce::CommerceTabHelper::CreateForWebContents(
-      web_contents, profile->IsOffTheRecord(),
-      commerce::ShoppingServiceFactory::GetForBrowserContext(profile),
-      ISOLATED_WORLD_ID_CHROME_INTERNAL);
   ConnectionHelpTabHelper::CreateForWebContents(web_contents);
   content_settings::PageSpecificContentSettings::CreateForWebContents(
       web_contents,

@@ -66,7 +66,6 @@
 #include "third_party/blink/renderer/bindings/modules/v8/v8_background_fetch_event_init.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_content_index_event_init.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_notification_event_init.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_payment_request_event_init.h"
 #include "third_party/blink/renderer/core/core_initializer.h"
 #include "third_party/blink/renderer/core/dom/events/event.h"
 #include "third_party/blink/renderer/core/execution_context/agent.h"
@@ -104,13 +103,6 @@
 #include "third_party/blink/renderer/modules/hid/hid.h"
 #include "third_party/blink/renderer/modules/notifications/notification.h"
 #include "third_party/blink/renderer/modules/notifications/notification_event.h"
-#include "third_party/blink/renderer/modules/payments/abort_payment_event.h"
-#include "third_party/blink/renderer/modules/payments/abort_payment_respond_with_observer.h"
-#include "third_party/blink/renderer/modules/payments/can_make_payment_event.h"
-#include "third_party/blink/renderer/modules/payments/can_make_payment_respond_with_observer.h"
-#include "third_party/blink/renderer/modules/payments/payment_event_data_conversion.h"
-#include "third_party/blink/renderer/modules/payments/payment_request_event.h"
-#include "third_party/blink/renderer/modules/payments/payment_request_respond_with_observer.h"
 #include "third_party/blink/renderer/modules/service_worker/cross_origin_resource_policy_checker.h"
 #include "third_party/blink/renderer/modules/service_worker/extendable_event.h"
 #include "third_party/blink/renderer/modules/service_worker/extendable_message_event.h"
@@ -797,9 +789,6 @@ void ServiceWorkerGlobalScope::Trace(Visitor* visitor) const {
   visitor->Trace(service_worker_objects_);
   visitor->Trace(service_worker_host_);
   visitor->Trace(receiver_);
-  visitor->Trace(abort_payment_result_callbacks_);
-  visitor->Trace(can_make_payment_result_callbacks_);
-  visitor->Trace(payment_response_callbacks_);
   visitor->Trace(fetch_response_callbacks_);
   visitor->Trace(pending_preload_fetch_events_);
   visitor->Trace(pending_streaming_upload_fetch_events_);
@@ -1209,93 +1198,6 @@ void ServiceWorkerGlobalScope::DidHandlePeriodicSyncEvent(
               "status", MojoEnumToString(status));
   RunEventCallback(&periodic_sync_event_callbacks_, event_queue_.get(),
                    event_id, status);
-}
-
-void ServiceWorkerGlobalScope::RespondToAbortPaymentEvent(
-    int event_id,
-    bool payment_aborted) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::RespondToAbortPaymentEvent",
-              perfetto::Flow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope));
-  DCHECK(abort_payment_result_callbacks_.Contains(event_id));
-  payments::mojom::blink::PaymentHandlerResponseCallback* result_callback =
-      abort_payment_result_callbacks_.Take(event_id)->Value().get();
-  result_callback->OnResponseForAbortPayment(payment_aborted);
-}
-
-void ServiceWorkerGlobalScope::DidHandleAbortPaymentEvent(
-    int event_id,
-    mojom::ServiceWorkerEventStatus status) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DidHandleAbortPaymentEvent",
-              perfetto::TerminatingFlow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope),
-              "status", MojoEnumToString(status));
-  if (RunEventCallback(&abort_payment_event_callbacks_, event_queue_.get(),
-                       event_id, status)) {
-    abort_payment_result_callbacks_.erase(event_id);
-  }
-}
-
-void ServiceWorkerGlobalScope::RespondToCanMakePaymentEvent(
-    int event_id,
-    payments::mojom::blink::CanMakePaymentResponsePtr response) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::RespondToCanMakePaymentEvent",
-              perfetto::Flow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope));
-  DCHECK(can_make_payment_result_callbacks_.Contains(event_id));
-  payments::mojom::blink::PaymentHandlerResponseCallback* result_callback =
-      can_make_payment_result_callbacks_.Take(event_id)->Value().get();
-  result_callback->OnResponseForCanMakePayment(std::move(response));
-}
-
-void ServiceWorkerGlobalScope::DidHandleCanMakePaymentEvent(
-    int event_id,
-    mojom::ServiceWorkerEventStatus status) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DidHandleCanMakePaymentEvent",
-              perfetto::TerminatingFlow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope),
-              "status", MojoEnumToString(status));
-  if (RunEventCallback(&can_make_payment_event_callbacks_, event_queue_.get(),
-                       event_id, status)) {
-    can_make_payment_result_callbacks_.erase(event_id);
-  }
-}
-
-void ServiceWorkerGlobalScope::RespondToPaymentRequestEvent(
-    int payment_event_id,
-    payments::mojom::blink::PaymentHandlerResponsePtr response) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::RespondToPaymentRequestEvent",
-              perfetto::Flow::ProcessScoped(
-                  payment_event_id, kServiceWorkerGlobalScopeTraceScope));
-  DCHECK(payment_response_callbacks_.Contains(payment_event_id));
-  payments::mojom::blink::PaymentHandlerResponseCallback* response_callback =
-      payment_response_callbacks_.Take(payment_event_id)->Value().get();
-  response_callback->OnResponseForPaymentRequest(std::move(response));
-}
-
-void ServiceWorkerGlobalScope::DidHandlePaymentRequestEvent(
-    int payment_event_id,
-    mojom::ServiceWorkerEventStatus status) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DidHandlePaymentRequestEvent",
-              perfetto::TerminatingFlow::ProcessScoped(
-                  payment_event_id, kServiceWorkerGlobalScopeTraceScope),
-              "status", MojoEnumToString(status));
-  if (RunEventCallback(&payment_request_event_callbacks_, event_queue_.get(),
-                       payment_event_id, status)) {
-    payment_response_callbacks_.erase(payment_event_id);
-  }
 }
 
 void ServiceWorkerGlobalScope::DidHandleCookieChangeEvent(
@@ -2191,190 +2093,6 @@ void ServiceWorkerGlobalScope::StartPeriodicSyncEvent(String tag,
   Event* event =
       PeriodicSyncEvent::Create(event_type_names::kPeriodicsync, tag, observer);
   DispatchExtendableEvent(event, observer);
-}
-
-void ServiceWorkerGlobalScope::DispatchAbortPaymentEvent(
-    mojo::PendingRemote<payments::mojom::blink::PaymentHandlerResponseCallback>
-        response_callback,
-    DispatchAbortPaymentEventCallback callback) {
-  DCHECK(IsContextThread());
-  const int event_id = event_queue_->NextEventId();
-  abort_payment_event_callbacks_.Set(event_id, std::move(callback));
-
-  event_queue_->EnqueueNormal(
-      event_id,
-      BindOnce(&ServiceWorkerGlobalScope::StartAbortPaymentEvent,
-               WrapWeakPersistent(this), std::move(response_callback)),
-      CreateAbortCallback(&abort_payment_event_callbacks_), std::nullopt);
-}
-
-void ServiceWorkerGlobalScope::StartAbortPaymentEvent(
-    mojo::PendingRemote<payments::mojom::blink::PaymentHandlerResponseCallback>
-        response_callback,
-    int event_id) {
-  DCHECK(IsContextThread());
-  HeapMojoRemote<payments::mojom::blink::PaymentHandlerResponseCallback> remote(
-      this);
-  // Payment task need to be processed on the user interaction task
-  // runner (TaskType::kUserInteraction).
-  // See:
-  // https://www.w3.org/TR/payment-request/#user-aborts-the-payment-request-algorithm
-  remote.Bind(std::move(response_callback),
-              GetThread()->GetTaskRunner(TaskType::kUserInteraction));
-  abort_payment_result_callbacks_.Set(event_id,
-                                      WrapDisallowNew(std::move(remote)));
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DispatchAbortPaymentEvent",
-              perfetto::Flow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope));
-
-  auto* wait_until_observer = MakeGarbageCollected<WaitUntilObserver>(
-      this, WaitUntilObserver::kAbortPayment, event_id);
-  AbortPaymentRespondWithObserver* respond_with_observer =
-      MakeGarbageCollected<AbortPaymentRespondWithObserver>(
-          this, event_id, wait_until_observer);
-
-  Event* event = AbortPaymentEvent::Create(
-      event_type_names::kAbortpayment, ExtendableEventInit::Create(),
-      respond_with_observer, wait_until_observer);
-
-  DispatchExtendableEventWithRespondWith(event, wait_until_observer,
-                                         respond_with_observer);
-}
-
-void ServiceWorkerGlobalScope::DispatchCanMakePaymentEvent(
-    payments::mojom::blink::CanMakePaymentEventDataPtr event_data,
-    mojo::PendingRemote<payments::mojom::blink::PaymentHandlerResponseCallback>
-        response_callback,
-    DispatchCanMakePaymentEventCallback callback) {
-  DCHECK(IsContextThread());
-  const int event_id = event_queue_->NextEventId();
-  can_make_payment_event_callbacks_.Set(event_id, std::move(callback));
-
-  event_queue_->EnqueueNormal(
-      event_id,
-      BindOnce(&ServiceWorkerGlobalScope::StartCanMakePaymentEvent,
-               WrapWeakPersistent(this), std::move(event_data),
-               std::move(response_callback)),
-      CreateAbortCallback(&can_make_payment_event_callbacks_), std::nullopt);
-}
-
-void ServiceWorkerGlobalScope::StartCanMakePaymentEvent(
-    payments::mojom::blink::CanMakePaymentEventDataPtr event_data,
-    mojo::PendingRemote<payments::mojom::blink::PaymentHandlerResponseCallback>
-        response_callback,
-    int event_id) {
-  DCHECK(IsContextThread());
-  HeapMojoRemote<payments::mojom::blink::PaymentHandlerResponseCallback> remote(
-      this);
-  // Payment task need to be processed on the user interaction task
-  // runner (TaskType::kUserInteraction).
-  // See:
-  // https://www.w3.org/TR/payment-request/#canmakepayment-method
-  remote.Bind(std::move(response_callback),
-              GetThread()->GetTaskRunner(TaskType::kUserInteraction));
-  can_make_payment_result_callbacks_.Set(event_id,
-                                         WrapDisallowNew(std::move(remote)));
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DispatchCanMakePaymentEvent",
-              perfetto::Flow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope));
-
-  auto* wait_until_observer = MakeGarbageCollected<WaitUntilObserver>(
-      this, WaitUntilObserver::kCanMakePayment, event_id);
-  CanMakePaymentRespondWithObserver* respond_with_observer =
-      MakeGarbageCollected<CanMakePaymentRespondWithObserver>(
-          this, event_id, wait_until_observer);
-
-  Event* event = CanMakePaymentEvent::Create(
-      event_type_names::kCanmakepayment,
-      PaymentEventDataConversion::ToCanMakePaymentEventInit(
-          ScriptController()->GetScriptState(), std::move(event_data)),
-      respond_with_observer, wait_until_observer);
-
-  DispatchExtendableEventWithRespondWith(event, wait_until_observer,
-                                         respond_with_observer);
-}
-
-void ServiceWorkerGlobalScope::DispatchPaymentRequestEvent(
-    payments::mojom::blink::PaymentRequestEventDataPtr event_data,
-    mojo::PendingRemote<payments::mojom::blink::PaymentHandlerResponseCallback>
-        response_callback,
-    DispatchPaymentRequestEventCallback callback) {
-  DCHECK(IsContextThread());
-  const int event_id = event_queue_->NextEventId();
-  payment_request_event_callbacks_.Set(event_id, std::move(callback));
-
-  event_queue_->EnqueueNormal(
-      event_id,
-      BindOnce(&ServiceWorkerGlobalScope::StartPaymentRequestEvent,
-               WrapWeakPersistent(this), std::move(event_data),
-               std::move(response_callback)),
-      CreateAbortCallback(&payment_request_event_callbacks_), std::nullopt);
-}
-
-void ServiceWorkerGlobalScope::StartPaymentRequestEvent(
-    payments::mojom::blink::PaymentRequestEventDataPtr event_data,
-    mojo::PendingRemote<payments::mojom::blink::PaymentHandlerResponseCallback>
-        response_callback,
-    int event_id) {
-  DCHECK(IsContextThread());
-  HeapMojoRemote<payments::mojom::blink::PaymentHandlerResponseCallback> remote(
-      this);
-  // Payment task need to be processed on the user interaction task
-  // runner (TaskType::kUserInteraction).
-  // See:
-  // https://www.w3.org/TR/payment-request/#user-accepts-the-payment-request-algorithm
-  remote.Bind(std::move(response_callback),
-              GetThread()->GetTaskRunner(TaskType::kUserInteraction));
-  payment_response_callbacks_.Set(event_id, WrapDisallowNew(std::move(remote)));
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DispatchPaymentRequestEvent",
-              perfetto::Flow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope));
-
-  auto* wait_until_observer = MakeGarbageCollected<WaitUntilObserver>(
-      this, WaitUntilObserver::kPaymentRequest, event_id);
-  PaymentRequestRespondWithObserver* respond_with_observer =
-      PaymentRequestRespondWithObserver::Create(this, event_id,
-                                                wait_until_observer);
-
-  // Update respond_with_observer to check for required information specified in
-  // the event_data during response validation.
-  if (event_data->payment_options) {
-    respond_with_observer->set_should_have_payer_name(
-        event_data->payment_options->request_payer_name);
-    respond_with_observer->set_should_have_payer_email(
-        event_data->payment_options->request_payer_email);
-    respond_with_observer->set_should_have_payer_phone(
-        event_data->payment_options->request_payer_phone);
-    respond_with_observer->set_should_have_shipping_info(
-        event_data->payment_options->request_shipping);
-  }
-
-  // Count standardized payment method identifiers, such as "basic-card" or
-  // "tokenized-card". Omit counting the URL-based payment method identifiers,
-  // such as "https://bobpay.xyz".
-  if (std::ranges::any_of(
-          event_data->method_data,
-          [](const payments::mojom::blink::PaymentMethodDataPtr& datum) {
-            return datum && !datum->supported_method.starts_with("http");
-          })) {
-    UseCounter::Count(
-        this, WebFeature::kPaymentHandlerStandardizedPaymentMethodIdentifier);
-  }
-
-  mojo::PendingRemote<payments::mojom::blink::PaymentHandlerHost>
-      payment_handler_host = std::move(event_data->payment_handler_host);
-  Event* event = PaymentRequestEvent::Create(
-      event_type_names::kPaymentrequest,
-      PaymentEventDataConversion::ToPaymentRequestEventInit(
-          ScriptController()->GetScriptState(), std::move(event_data)),
-      std::move(payment_handler_host), respond_with_observer,
-      wait_until_observer, this);
-
-  DispatchExtendableEventWithRespondWith(event, wait_until_observer,
-                                         respond_with_observer);
 }
 
 void ServiceWorkerGlobalScope::DispatchCookieChangeEvent(

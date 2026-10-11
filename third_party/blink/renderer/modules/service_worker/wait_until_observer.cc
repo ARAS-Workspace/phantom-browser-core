@@ -84,13 +84,12 @@ class WaitUntilObserver::ThenRejected final
 void WaitUntilObserver::WillDispatchEvent() {
   DCHECK(GetExecutionContext());
 
-  // When handling a notificationclick, paymentrequest, or backgroundfetchclick
+  // When handling a notificationclick or backgroundfetchclick
   // event, we want to allow one window to be focused or opened. These calls are
   // allowed between the call to willDispatchEvent() and the last call to
   // DecrementPendingPromiseCount(). If waitUntil() isn't called, that means
   // between willDispatchEvent() and didDispatchEvent().
-  if (type_ == kNotificationClick || type_ == kPaymentRequest ||
-      type_ == kBackgroundFetchClick) {
+  if (type_ == kNotificationClick || type_ == kBackgroundFetchClick) {
     GetExecutionContext()->AllowWindowInteraction();
   }
 
@@ -220,16 +219,8 @@ void WaitUntilObserver::MaybeCompleteEvent() {
           ? mojom::ServiceWorkerEventStatus::REJECTED
           : mojom::ServiceWorkerEventStatus::COMPLETED;
   switch (type_) {
-    case kAbortPayment:
-      service_worker_global_scope->DidHandleAbortPaymentEvent(event_id_,
-                                                              status);
-      break;
     case kActivate:
       service_worker_global_scope->DidHandleActivateEvent(event_id_, status);
-      break;
-    case kCanMakePayment:
-      service_worker_global_scope->DidHandleCanMakePaymentEvent(event_id_,
-                                                                status);
       break;
     case kCookieChange:
       service_worker_global_scope->DidHandleCookieChangeEvent(event_id_,
@@ -267,10 +258,6 @@ void WaitUntilObserver::MaybeCompleteEvent() {
     case kPeriodicSync:
       service_worker_global_scope->DidHandlePeriodicSyncEvent(event_id_,
                                                               status);
-      break;
-    case kPaymentRequest:
-      service_worker_global_scope->DidHandlePaymentRequestEvent(event_id_,
-                                                                status);
       break;
     case kBackgroundFetchAbort:
       service_worker_global_scope->DidHandleBackgroundFetchAbortEvent(event_id_,

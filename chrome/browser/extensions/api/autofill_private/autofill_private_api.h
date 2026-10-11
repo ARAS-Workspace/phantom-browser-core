@@ -625,50 +625,6 @@ class AutofillPrivateSetAutofillAiOptInStatusFunction
   ResponseAction Run() override;
 };
 
-class AutofillPrivateGetWalletablePassDetectionOptInStatusFunction
-    : public AutofillPrivateExtensionFunction {
- public:
-  AutofillPrivateGetWalletablePassDetectionOptInStatusFunction() = default;
-  AutofillPrivateGetWalletablePassDetectionOptInStatusFunction(
-      const AutofillPrivateGetWalletablePassDetectionOptInStatusFunction&) =
-      delete;
-  AutofillPrivateGetWalletablePassDetectionOptInStatusFunction& operator=(
-      const AutofillPrivateGetWalletablePassDetectionOptInStatusFunction&) =
-      delete;
-  DECLARE_EXTENSION_FUNCTION(
-      "autofillPrivate.getWalletablePassDetectionOptInStatus",
-      AUTOFILLPRIVATE_GETWALLETABLEPASSDETECTIONOPTINSTATUS)
-
- protected:
-  ~AutofillPrivateGetWalletablePassDetectionOptInStatusFunction() override =
-      default;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
-class AutofillPrivateSetWalletablePassDetectionOptInStatusFunction
-    : public AutofillPrivateExtensionFunction {
- public:
-  AutofillPrivateSetWalletablePassDetectionOptInStatusFunction() = default;
-  AutofillPrivateSetWalletablePassDetectionOptInStatusFunction(
-      const AutofillPrivateSetWalletablePassDetectionOptInStatusFunction&) =
-      delete;
-  AutofillPrivateSetWalletablePassDetectionOptInStatusFunction& operator=(
-      const AutofillPrivateSetWalletablePassDetectionOptInStatusFunction&) =
-      delete;
-  DECLARE_EXTENSION_FUNCTION(
-      "autofillPrivate.setWalletablePassDetectionOptInStatus",
-      AUTOFILLPRIVATE_SETWALLETABLEPASSDETECTIONOPTINSTATUS)
-
- protected:
-  ~AutofillPrivateSetWalletablePassDetectionOptInStatusFunction() override =
-      default;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
 class AutofillPrivateAuthenticateUserBeforeViewingEntityDataFunction
     : public AutofillPrivateExtensionFunction {
  public:

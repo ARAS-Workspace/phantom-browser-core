@@ -100,7 +100,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://serviceworker-internals",
       "chrome://segmentation-internals",
       "chrome://settings",
-      "chrome://shopping-insights-side-panel.top-chrome",
       "chrome://signin-internals",
       "chrome://site-engagement",
       "chrome://subresource-filter-internals",

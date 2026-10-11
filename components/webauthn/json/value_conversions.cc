@@ -462,15 +462,6 @@ base::Value ToValue(
     extensions.Set("cmtgKey", true);
   }
 
-  // On Android, requests with the payments extension should not be forwarded to
-  // CredMan and so shouldn't need to be serialized to JSON. But we might end
-  // up sending such requests to an enclave.
-  if (options->is_payment_credential_creation) {
-    base::DictValue payments_value;
-    payments_value.Set("isPayment", true);
-    extensions.Set("payment", std::move(payments_value));
-  }
-
   if (!extensions.empty()) {
     value.Set("extensions", std::move(extensions));
   }

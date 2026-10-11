@@ -14,7 +14,6 @@
 #include "services/network/public/mojom/fetch_api.mojom.h"
 #include "third_party/blink/public/mojom/background_fetch/background_fetch.mojom.h"
 #include "third_party/blink/public/mojom/fetch/fetch_api_response.mojom.h"
-#include "third_party/blink/public/mojom/payments/payment_app_events.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/dispatch_fetch_event_params.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_fetch_response_callback.mojom.h"
 
@@ -176,40 +175,6 @@ void FakeServiceWorker::DispatchPeriodicSyncEvent(
     const std::string& tag,
     base::TimeDelta timeout,
     DispatchPeriodicSyncEventCallback callback) {
-  std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED);
-}
-
-void FakeServiceWorker::DispatchAbortPaymentEvent(
-    mojo::PendingRemote<payments::mojom::PaymentHandlerResponseCallback>
-        pending_response_callback,
-    DispatchAbortPaymentEventCallback callback) {
-  mojo::Remote<payments::mojom::PaymentHandlerResponseCallback>
-      response_callback(std::move(pending_response_callback));
-  response_callback->OnResponseForAbortPayment(true);
-  std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED);
-}
-
-void FakeServiceWorker::DispatchCanMakePaymentEvent(
-    payments::mojom::CanMakePaymentEventDataPtr event_data,
-    mojo::PendingRemote<payments::mojom::PaymentHandlerResponseCallback>
-        pending_response_callback,
-    DispatchCanMakePaymentEventCallback callback) {
-  mojo::Remote<payments::mojom::PaymentHandlerResponseCallback>
-      response_callback(std::move(pending_response_callback));
-  response_callback->OnResponseForCanMakePayment(
-      payments::mojom::CanMakePaymentResponse::New());
-  std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED);
-}
-
-void FakeServiceWorker::DispatchPaymentRequestEvent(
-    payments::mojom::PaymentRequestEventDataPtr event_data,
-    mojo::PendingRemote<payments::mojom::PaymentHandlerResponseCallback>
-        pending_response_callback,
-    DispatchPaymentRequestEventCallback callback) {
-  mojo::Remote<payments::mojom::PaymentHandlerResponseCallback>
-      response_callback(std::move(pending_response_callback));
-  response_callback->OnResponseForPaymentRequest(
-      payments::mojom::PaymentHandlerResponse::New());
   std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED);
 }
 

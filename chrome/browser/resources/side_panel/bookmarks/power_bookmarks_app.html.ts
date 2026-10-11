@@ -21,7 +21,6 @@ export function getHtml(this: PowerBookmarksAppElement) {
   <div class="label-row" ?hidden="${!this.sectionVisibility_.labels}"
       ?header-hidden="${!this.sectionVisibility_.heading}" id="labelsContainer">
     <power-bookmarks-labels id="labels" ?disabled="${this.editing_}"
-        .trackedProductInfos="${this.trackedProductInfos_}"
         @labels-changed="${this.onLabelsChanged_}">
     </power-bookmarks-labels>
   </div>

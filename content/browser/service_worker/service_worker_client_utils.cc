@@ -37,7 +37,6 @@
 #include "content/public/browser/global_routing_id.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/page_navigator.h"
-#include "content/public/browser/payment_app_provider.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
@@ -576,9 +575,7 @@ void OpenWindow(
       url,
       Referrer::SanitizeForRequest(
           url, Referrer(script_url, network::mojom::ReferrerPolicy::kDefault)),
-      type == WindowType::PAYMENT_HANDLER_WINDOW
-          ? WindowOpenDisposition::NEW_POPUP
-          : WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui::PAGE_TRANSITION_AUTO_TOPLEVEL, true /* is_renderer_initiated */);
 
   // Technically this field is equivalent to (disposition == NEW_FOREGROUND_TAB)

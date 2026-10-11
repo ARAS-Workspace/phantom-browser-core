@@ -798,8 +798,6 @@ class CONTENT_EXPORT ServiceWorkerVersion
     return synthetic_response_head_;
   }
 
-  void OnPaymentHandlerDisconnect();
-
   struct RouterRulesForDevTools {
     std::optional<std::string> legacy_rules;
     std::vector<ServiceWorkerRouterRule> typed_rules;
@@ -1017,9 +1015,6 @@ class CONTENT_EXPORT ServiceWorkerVersion
   void GetClientInternal(const std::string& client_uuid,
                          GetClientCallback callback);
   void OpenNewTab(const GURL& url, OpenNewTabCallback callback) override;
-  void OpenPaymentHandlerWindow(
-      const GURL& url,
-      OpenPaymentHandlerWindowCallback callback) override;
   void PostMessageToClient(const std::string& client_uuid,
                            blink::TransferableMessage message) override;
   void FocusClient(const std::string& client_uuid,
@@ -1133,30 +1128,9 @@ class CONTENT_EXPORT ServiceWorkerVersion
                                  GetClientCallback callback,
                                  bool success);
 
-  // Checks if there is an active and pending PAYMENT_REQUEST event
-  // for the current service worker version.
-  bool HasPendingPaymentRequestEvent();
-
   // Checks if there is an active and pending event that allows the worker to
   // open a new window or focus an existing one.
   bool HasPendingWindowInteractionEvent();
-
-  void DidShowPaymentHandlerWindow(
-      const GURL& url,
-      const blink::StorageKey& key,
-      const base::WeakPtr<ServiceWorkerContextCore>& context,
-      blink::mojom::ServiceWorkerHost::OpenPaymentHandlerWindowCallback
-          callback,
-      bool success,
-      int render_process_id,
-      int render_frame_id);
-
-  // Called when the payment handler timeout timer fires.
-  void OnPaymentHandlerTimeout();
-
-  // Disconnects the payment handler and records UMA.
-  // |is_timeout| indicates whether the disconnect was due to a timeout.
-  void DisconnectPaymentHandler(bool is_timeout);
 
   const int64_t version_id_;
   const int64_t registration_id_;
@@ -1375,13 +1349,6 @@ class CONTENT_EXPORT ServiceWorkerVersion
   bool stop_when_devtools_detached_ = false;
 
   bool is_stopping_warmed_up_worker_ = false;
-
-  bool payment_handler_connected_ = false;
-
-  // Timer for payment handler timeout. When payment_handler_connected_ is set
-  // to true, this timer starts. If it fires before OnPaymentHandlerDisconnect()
-  // is called, the payment handler connection is considered timed out.
-  base::OneShotTimer payment_handler_timeout_timer_;
 
   // This is the set of features that were used up until installation of this
   // version completed, or used during the lifetime of |this|.

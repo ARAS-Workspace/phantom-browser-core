@@ -35,7 +35,6 @@ static_library("webdata_services") {
     ]
     deps += [
       "//components/keyed_service/content",
-      "//components/payments/content:utils",
       "//content/public/browser",
     ]
   }

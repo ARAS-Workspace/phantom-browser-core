@@ -30,7 +30,6 @@
 #include "chrome/browser/ui/views/tab_search_bubble_host.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/commerce/core/pref_names.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/split_tabs/split_tab_id.h"

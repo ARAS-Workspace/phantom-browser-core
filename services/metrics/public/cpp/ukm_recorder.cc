@@ -36,14 +36,6 @@ ukm::SourceId UkmRecorder::GetNewSourceID() {
 }
 
 // static
-ukm::SourceId UkmRecorder::GetSourceIdForPaymentAppFromScope(
-    base::PassKey<content::PaymentAppProviderUtil>,
-    const GURL& service_worker_scope) {
-  return UkmRecorder::GetSourceIdFromScopeImpl(service_worker_scope,
-                                               SourceIdType::PAYMENT_APP_ID);
-}
-
-// static
 ukm::SourceId UkmRecorder::GetSourceIdForWebIdentityFromScope(
     base::PassKey<content::webid::Metrics>,
     const GURL& provider_url) {

@@ -20,7 +20,6 @@
 #include "chrome/browser/ui/webui/access_code_cast/access_code_cast.mojom.h"
 #include "chrome/browser/ui/webui/access_code_cast/access_code_cast_ui.h"
 #include "chrome/browser/ui/webui/color_pipeline_internals/color_pipeline_internals_ui.h"
-#include "chrome/browser/ui/webui/commerce/shopping_insights_side_panel_ui.h"
 #include "chrome/browser/ui/webui/customize_buttons/customize_buttons.mojom.h"
 #include "chrome/browser/ui/webui/data_sharing/data_sharing.mojom.h"
 #include "chrome/browser/ui/webui/data_sharing/data_sharing_ui.h"
@@ -70,7 +69,6 @@
 #include "components/browser_apis/browser_controls/browser_controls_api.mojom.h"
 #include "components/browser_apis/tab_drag/tab_drag_api.mojom.h"
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api.mojom.h"
-#include "components/commerce/core/mojom/shopping_service.mojom.h"  // nogncheck crbug.com/40147906
 #include "components/data_sharing/public/features.h"
 #include "components/guest_contents/common/guest_contents.mojom.h"
 #include "components/history_clusters/core/history_clusters_service.h"
@@ -310,18 +308,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       map);
   RegisterWebUIControllerInterfaceBinder<comments::mojom::PageHandlerFactory,
                                          CommentsSidePanelUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      shopping_service::mojom::ShoppingServiceHandlerFactory,
-      BookmarksSidePanelUI, ShoppingInsightsSidePanelUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      commerce::price_tracking::mojom::PriceTrackingHandlerFactory,
-      ShoppingInsightsSidePanelUI, BookmarksSidePanelUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      commerce::price_insights::mojom::PriceInsightsHandlerFactory,
-      ShoppingInsightsSidePanelUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       side_panel::mojom::CustomizeChromePageHandlerFactory, CustomizeChromeUI>(

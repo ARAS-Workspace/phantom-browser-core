@@ -584,11 +584,6 @@ void AddChromeColorMixer(ui::ColorProvider* provider,
       kColorPaymentsPromoCodeForegroundHovered};
   mixer[kColorPaymentsPromoCodeInkDrop] = {dark_mode ? gfx::kGoogleGreen300
                                                      : gfx::kGoogleGreen600};
-  mixer[kColorPaymentsRequestBackArrowButtonIcon] = {ui::kColorIcon};
-  mixer[kColorPaymentsRequestBackArrowButtonIconDisabled] = {
-      ui::kColorIconDisabled};
-  mixer[kColorPaymentsRequestRowBackgroundHighlighted] = {
-      SkColorSetA(SK_ColorBLACK, 0x0D)};
   mixer[kColorPerformanceInterventionButtonIconActive] =
       ui::PickGoogleColor(ui::kColorThrobber, kColorToolbar,
                           color_utils::kMinimumVisibleContrastRatio);

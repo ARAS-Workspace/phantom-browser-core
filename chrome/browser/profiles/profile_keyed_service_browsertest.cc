@@ -22,7 +22,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/profile_waiter.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/keyed_service/core/dependency_graph.h"
 #include "components/keyed_service/core/keyed_service_base_factory.h"
@@ -244,7 +243,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "AutocompleteControllerEmitter",
     "AutofillInternalsService",
     "DataControlsRulesService",
-    "HasEnrolledInstrumentQuery",
     "LocalPresentationManager",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
@@ -295,7 +293,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     // default, however their creation is still possible.
     "AutocompleteControllerEmitter",
     "DataControlsRulesService",
-    "HasEnrolledInstrumentQuery",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -423,7 +420,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "FindBarState",
     "HistoryClustersService",
     "InstantService",
-    "LanguageDetectionModelService",
     "MediaEngagementServiceFactory",
     "MediaNotificationService",
     "MerchantPromoCodeManager",
@@ -507,9 +503,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "BookmarkUndoService",
     "BookmarksAPI",
     "BrailleDisplayPrivateAPI",
-#if BUILDFLAG(IS_MAC)
-    "BrowserBoundKeyDeleterService",
-#endif
     "ChildAccountService",
     "ChromeSigninClient",
     "CommandService",
@@ -625,7 +618,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "PlatformNotificationService",
     "PluginManager",
     "PluginPrefs",
-    "PowerBookmarkService",
     "PredictorDatabase",
     "PrefWatcher",
     "PreferenceAPI",
@@ -655,15 +647,12 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ServerCertificateDatabaseService",
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "SessionDataService",
-    "SessionProtoDBFactory",
     "SessionsAPI",
-    "sessions::TabRestoreService",
     "SettingsOverridesAPI",
     "SettingsPrivateEventRouter",
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     "SharedModuleService",
 #endif
-    "ShoppingService",
     "SidePanelService",
     "SiteDataCacheFacadeFactory",
     "SiteEngagementService",

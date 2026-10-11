@@ -245,7 +245,6 @@ source_set("unit_tests") {
     "//chrome/browser/webdata_services",
     "//chrome/common:constants",
     "//chrome/test:test_support",
-    "//components/commerce/core:feature_list",
     "//components/metrics",
     "//components/signin/public/base",
     "//components/sync:test_support",

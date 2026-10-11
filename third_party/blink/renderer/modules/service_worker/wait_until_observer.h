@@ -22,9 +22,7 @@ class MODULES_EXPORT WaitUntilObserver final
       public ExecutionContextClient {
  public:
   enum EventType {
-    kAbortPayment,
     kActivate,
-    kCanMakePayment,
     kCookieChange,
     kFetch,
     kInstall,
@@ -32,7 +30,6 @@ class MODULES_EXPORT WaitUntilObserver final
     kMessageerror,
     kNotificationClick,
     kNotificationClose,
-    kPaymentRequest,
     kSync,
     kPeriodicSync,
     kBackgroundFetchAbort,

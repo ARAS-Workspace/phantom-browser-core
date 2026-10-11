@@ -15,7 +15,6 @@
 #include "components/webauthn/core/browser/remote_validation.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/public/browser/web_contents.h"
-#include "content/public/common/content_features.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/navigation_simulator.h"
 #include "content/public/test/test_browser_context.h"
@@ -116,13 +115,6 @@ std::ostream& operator<<(std::ostream& out, const TestCase& test_case) {
     case WebAuthRequestSecurityChecker::RequestType::kGetAssertion:
       out << "Get Assertion";
       break;
-    case WebAuthRequestSecurityChecker::RequestType::
-        kGetPaymentCredentialAssertion:
-      out << "Get Payment Credential Assertion";
-      break;
-    case WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential:
-      out << "Make Payment Credential";
-      break;
     case WebAuthRequestSecurityChecker::RequestType::kMakeCredential:
       out << "Make Credential";
       break;
@@ -144,10 +136,6 @@ class WebAuthRequestSecurityCheckerTest
   content::WebContents* web_contents() const { return web_contents_; }
 
  private:
-  // Must be first because ScopedFeatureList must be initialized before other
-  // threads are started.
-  base::test::ScopedFeatureList features_{
-      /*enable_feature=*/features::kSecurePaymentConfirmation};
   content::BrowserTaskEnvironment task_environment_;
   content::TestBrowserContext context_;
   content::TestWebContentsFactory web_contents_factory_;
@@ -202,19 +190,7 @@ INSTANTIATE_TEST_SUITE_P(
                  network::ParsedPermissionsPolicy(),
                  WebAuthRequestSecurityChecker::RequestType::kMakeCredential,
                  /*expected_is_cross_origin=*/true,
-                 blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR),
-        TestCase(
-            "https://same-origin.com",
-            network::ParsedPermissionsPolicy(),
-            WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential,
-            /*expected_is_cross_origin=*/false,
-            blink::mojom::AuthenticatorStatus::SUCCESS),
-        TestCase(
-            "https://cross-origin.com",
-            network::ParsedPermissionsPolicy(),
-            WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential,
-            /*expected_is_cross_origin=*/true,
-            blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR)));
+                 blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR)));
 
 INSTANTIATE_TEST_SUITE_P(
     AllowCrossOriginWebAuthn,
@@ -239,19 +215,7 @@ INSTANTIATE_TEST_SUITE_P(
                  CreatePolicyToAllowWebAuthn(),
                  WebAuthRequestSecurityChecker::RequestType::kMakeCredential,
                  /*expected_is_cross_origin=*/true,
-                 blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR),
-        TestCase(
-            "https://same-origin.com",
-            CreatePolicyToAllowWebAuthn(),
-            WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential,
-            /*expected_is_cross_origin=*/false,
-            blink::mojom::AuthenticatorStatus::SUCCESS),
-        TestCase(
-            "https://cross-origin.com",
-            CreatePolicyToAllowWebAuthn(),
-            WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential,
-            /*expected_is_cross_origin=*/true,
-            blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR)));
+                 blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR)));
 
 INSTANTIATE_TEST_SUITE_P(
     AllowCrossOriginPay,
@@ -276,19 +240,7 @@ INSTANTIATE_TEST_SUITE_P(
                  CreatePolicyToAllowWebPayments(),
                  WebAuthRequestSecurityChecker::RequestType::kMakeCredential,
                  /*expected_is_cross_origin=*/true,
-                 blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR),
-        TestCase(
-            "https://same-origin.com",
-            CreatePolicyToAllowWebPayments(),
-            WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential,
-            /*expected_is_cross_origin=*/false,
-            blink::mojom::AuthenticatorStatus::SUCCESS),
-        TestCase(
-            "https://cross-origin.com",
-            CreatePolicyToAllowWebPayments(),
-            WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential,
-            /*expected_is_cross_origin=*/true,
-            blink::mojom::AuthenticatorStatus::SUCCESS)));
+                 blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR)));
 
 struct SingleFrameTestCase {
   SingleFrameTestCase(const network::ParsedPermissionsPolicy& policy,
@@ -316,10 +268,6 @@ class WebAuthRequestSecurityCheckerSingleFrameTest
   content::WebContents* web_contents() const { return web_contents_; }
 
  private:
-  // Must be first because ScopedFeatureList must be initialized before other
-  // threads are started.
-  base::test::ScopedFeatureList features_{
-      /*enable_feature=*/features::kSecurePaymentConfirmation};
   content::BrowserTaskEnvironment task_environment_;
   content::TestBrowserContext context_;
   content::TestWebContentsFactory web_contents_factory_;

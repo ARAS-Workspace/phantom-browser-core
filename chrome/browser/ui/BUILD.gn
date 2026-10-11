@@ -129,7 +129,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/autofill",
     "//chrome/browser/ui/autofill/payments",
     "//chrome/browser/ui/bookmarks",
-    "//chrome/browser/ui/commerce",
     "//chrome/browser/ui/customize_chrome",
     "//chrome/browser/ui/interaction",
     "//chrome/browser/ui/page_info",
@@ -147,7 +146,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/toolbar/cast",
     "//chrome/browser/ui/user_education",
     "//chrome/browser/ui/views/bookmarks",
-    "//chrome/browser/ui/views/commerce",
     "//chrome/browser/ui/views/download",
     "//chrome/browser/ui/views/file_system_access",
     "//chrome/browser/ui/views/frame:app_menu_button_observer",
@@ -165,7 +163,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/webui/inspect",
     "//chrome/browser/ui/webui/omnibox_popup",
     "//chrome/browser/undo",
-    "//components/commerce/core:metrics",
     "//components/multistep_filter/core:features",
     "//components/omnibox/common:features",
     "//components/undo",
@@ -555,7 +552,6 @@ static_library("ui") {
     "//chrome/browser/bookmarks",
     "//chrome/browser/bookmarks:impl",
     "//chrome/browser/breadcrumbs",
-    "//chrome/browser/commerce",
     "//chrome/browser/complex_tasks",
     "//chrome/browser/component_updater",
     "//chrome/browser/content_settings",
@@ -603,7 +599,6 @@ static_library("ui") {
     "//chrome/browser/page_load_metrics:impl",
     "//chrome/browser/password_manager",
     "//chrome/browser/password_manager:impl",
-    "//chrome/browser/payments",
     "//chrome/browser/performance_manager",
     "//chrome/browser/performance_manager:impl",
     "//chrome/browser/permissions",
@@ -617,7 +612,6 @@ static_library("ui") {
     "//chrome/browser/prefs:impl",
     "//chrome/browser/preloading",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
-    "//chrome/browser/private_ai",
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:misc",
     "//chrome/browser/profiles:profile",
@@ -715,9 +709,6 @@ static_library("ui") {
     "//components/browser_sync",
     "//components/captive_portal/content",
     "//components/client_hints/browser",
-    "//components/commerce/content/browser",
-    "//components/commerce/core:feature_list",
-    "//components/commerce/core:shopping_service",
     "//components/consent_auditor/",
     "//components/content_capture/common",
     "//components/crash/core/app",
@@ -725,7 +716,6 @@ static_library("ui") {
     "//components/download/content/factory",
     "//components/embedder_support:user_agent",
     "//components/enterprise",
-    "//components/facilitated_payments/core/features",
     "//components/feature_engagement",
     "//components/find_in_page",
     "//components/history/content/browser",
@@ -1269,7 +1259,6 @@ static_library("ui") {
     "//chrome/browser/ui/apps:impl",
     "//chrome/browser/ui/bookmarks",
     "//chrome/browser/ui/bookmarks:impl",
-    "//chrome/browser/ui/commerce",
     "//chrome/browser/ui/content_settings",
     "//chrome/browser/ui/content_settings:impl",
     "//chrome/browser/ui/customize_chrome",
@@ -1316,8 +1305,6 @@ static_library("ui") {
     "//chrome/browser/ui/views/zoom",
     "//chrome/browser/ui/webui/browser_command",
     "//chrome/browser/ui/webui/color_pipeline_internals",
-    "//chrome/browser/ui/webui/commerce",
-    "//chrome/browser/ui/webui/commerce:impl",
     "//chrome/browser/ui/webui/cr_components/history_clusters",
     "//chrome/browser/ui/webui/cr_components/history_embeddings",
     "//chrome/browser/ui/webui/customize_buttons",
@@ -1355,14 +1342,11 @@ static_library("ui") {
     "//chrome/browser/web_applications:features",
     "//components/app_constants",
     "//components/autofill/core/browser",
-    "//components/commerce/core:feature_list",
-    "//components/commerce/core:shopping_service",
     "//components/multistep_filter/core:features",
     "//components/notebooks/internals/webui",
     "//components/paint_preview/public",
     "//components/password_manager/content/common",
     "//components/password_manager/core/browser/leak_detection",
-    "//components/private_ai",
     "//components/services/app_service",
     "//components/ui_metrics",
     "//components/url_formatter",
@@ -1382,7 +1366,6 @@ static_library("ui") {
     "//chrome/browser/importer",
     "//chrome/browser/importer:impl",
     "//chrome/browser/personal_context/first_run",
-    "//chrome/browser/ui/commerce",
     "//chrome/browser/ui/read_anything",
     "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/waap:manager",
@@ -1488,7 +1471,6 @@ static_library("ui") {
     # TODO(crbug.com/382237520): Remove this once NTP code is modularized.
 
     "//chrome/browser/ui/signin:impl",
-    "//chrome/browser/ui/webui/commerce:impl",
     "//chrome/browser/ui/webui/signin:signin_impl",
     "//chrome/browser/ui/webui/webui_toolbar:impl",
     "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
@@ -1643,11 +1625,9 @@ static_library("ui") {
       "//chrome/browser/ui/views/hats",
       "//chrome/browser/ui/views/hats:impl",
       "//chrome/browser/ui/views/profiles:avatar_badge_view",
-      "//chrome/browser/ui/wallet",
     ]
 
     allow_circular_includes_from += [
-      "//chrome/browser/ui/wallet",
       "//chrome/browser/ui/views/hats:impl",
     ]
   }
@@ -2273,8 +2253,6 @@ static_library("ui") {
       "//chrome/browser/ui/actions",
       "//chrome/browser/ui/animation",
       "//chrome/browser/ui/autofill/payments",
-      "//chrome/browser/ui/commerce",
-      "//chrome/browser/ui/commerce:impl",
       "//chrome/browser/ui/desktop_to_mobile_promos:utils",
       "//chrome/browser/ui/dialogs",
       "//chrome/browser/ui/qrcode_generator",
@@ -2335,8 +2313,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/bookmarks/saved_tab_groups:impl",
       "//chrome/browser/ui/views/bubble",
       "//chrome/browser/ui/views/bubble:reopen_suppressor",
-      "//chrome/browser/ui/views/commerce",
-      "//chrome/browser/ui/views/commerce:impl",
       "//chrome/browser/ui/views/desktop_capture",
       "//chrome/browser/ui/views/desktop_capture:impl",
       "//chrome/browser/ui/views/download",
@@ -2375,8 +2351,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/passwords",
       "//chrome/browser/ui/views/passwords:impl",
       "//chrome/browser/ui/views/passwords:password_bubble_view_base",
-      "//chrome/browser/ui/views/payments",
-      "//chrome/browser/ui/views/payments:impl",
       "//chrome/browser/ui/views/performance_controls",
       "//chrome/browser/ui/views/performance_controls:impl",
       "//chrome/browser/ui/views/permissions",
@@ -2427,13 +2401,9 @@ static_library("ui") {
       "//chrome/browser/ui/window_metadata",
       "//chrome/browser/ui/window_name_prompt",
       "//components/collaboration/public",
-      "//components/commerce/core:pref_names",
-      "//components/commerce/core:shopping_service",
-      "//components/commerce/core:utils",
       "//components/input",
       "//components/media_message_center/vector_icons",
       "//components/offline_items_collection/core",
-      "//components/payments/content",
       "//components/prefs",
       "//components/services/app_service",
       "//components/ui_devtools/views",
@@ -2539,7 +2509,6 @@ static_library("ui") {
       # following headers get componentized:
       # c/b/ui/browser.h, browser_tabstrip.h, browser_window.h
       # c/b/ui/views/frame/browser_view.h
-      "//chrome/browser/ui/commerce:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when the
       # following headers get componentized:
@@ -2565,7 +2534,6 @@ static_library("ui") {
       # TODO(crbug.com/353332589): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser_tabstrip.h
-      "//chrome/browser/ui/views/payments:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when the
       # following header gets componentized:
@@ -2684,7 +2652,6 @@ static_library("ui") {
       # TODO(crbug.com/353332589): Remove this circular dependency when
       # the following headers get modularized:
       # - c/b/ui/scoped_tabbed_browser_displayer.h
-      "//chrome/browser/ui/views/commerce:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when
       # the following headers get modularized:
@@ -3019,7 +2986,6 @@ group("ui_public_dependencies") {
     "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
 
     # TODO: Use //chrome/browser after fixing cyclic dependency.
-    "//components/commerce/core:coupon_db_content_proto",
     "//components/feed/core/proto:proto_ios_shared_v2",
     "//components/feed/core/proto:proto_v2",
   ]
@@ -3206,14 +3172,12 @@ static_library("test_support") {
     "//chrome/app/theme:theme_resources",
     "//chrome/browser",
     "//chrome/browser/devtools",
-    "//chrome/browser/payments",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui/autofill/payments:test_support",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/toolbar:test_support",
     "//components/omnibox/browser",
     "//components/password_manager/core/browser",
-    "//components/payments/content",
     "//components/permissions",
     "//components/sessions",
     "//components/url_formatter",

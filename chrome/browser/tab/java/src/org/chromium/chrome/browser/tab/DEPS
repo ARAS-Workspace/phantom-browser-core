@@ -8,8 +8,6 @@ include_rules = [
   "+cc/input/android/java",
   "+chrome/browser/android/crypto/java",
   "+chrome/browser/browser_controls/android/java",
-  '+chrome/browser/commerce/android/java',
-  '+chrome/browser/commerce/price_tracking/android/java',
   "+chrome/browser/tab/java/src/org/chromium/chrome/browser/tab",
   "+chrome/browser/optimization_guide/android/java/src/org/chromium/chrome/browser/optimization_guide",
   "+chrome/browser/preferences/android/java",

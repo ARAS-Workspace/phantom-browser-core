@@ -49,7 +49,6 @@
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/page_load_metrics/browser/metrics_navigation_throttle.h"
-#include "components/payments/content/payment_handler_navigation_throttle.h"
 #include "components/policy/content/policy_blocklist_navigation_throttle.h"
 #include "components/security_interstitials/content/insecure_form_navigation_throttle.h"
 #include "components/security_interstitials/content/ssl_error_handler.h"
@@ -382,8 +381,6 @@ void CreateAndAddChromeThrottlesForNavigation(
     error_page::NetErrorAutoReloader::MaybeCreateAndAddNavigationThrottle(
         registry);
   }
-
-  payments::PaymentHandlerNavigationThrottle::MaybeCreateAndAdd(registry);
 
   NtpMicrosoftAuthResponseCaptureNavigationThrottle::MaybeCreateAndAdd(
       registry);

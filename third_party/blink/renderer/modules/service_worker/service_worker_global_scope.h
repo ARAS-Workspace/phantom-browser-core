@@ -280,27 +280,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
       base::TimeTicks respond_with_settled_time,
       mojom::blink::ServiceWorkerFetchHandlerErrorsPtr errors);
 
-  // RespondToAbortPaymentEvent will be called after the service worker
-  // returns a response to a AbortPaymentEvent, and DidHandleAbortPaymentEvent
-  // will be called after the end of AbortPaymentEvent's lifecycle.
-  // |event_id| is the id that was passed to DispatchAbortPaymentEvent.
-  void RespondToAbortPaymentEvent(int event_id, bool abort_payment);
-  // RespondToCanMakePaymentEvent will be called after the service worker
-  // returns the |response| to a CanMakePaymentEvent, and
-  // DidHandleCanMakePaymentEvent will be called after the end of
-  // CanMakePaymentEvent's lifecycle. |event_id| is the id that was passed to
-  // DispatchCanMakePaymentEvent.
-  void RespondToCanMakePaymentEvent(
-      int event_id,
-      payments::mojom::blink::CanMakePaymentResponsePtr response);
-  // RespondToPaymentRequestEvent will be called after the service worker
-  // returns a response to a PaymentRequestEvent, and
-  // DidHandlePaymentRequestEvent will be called after the end of
-  // PaymentRequestEvent's lifecycle. |event_id| is the id that was passed
-  // to DispatchPaymentRequestEvent.
-  void RespondToPaymentRequestEvent(
-      int event_id,
-      payments::mojom::blink::PaymentHandlerResponsePtr);
   void DidHandleFetchEvent(int fetch_event_id, mojom::ServiceWorkerEventStatus);
   void DidHandleNotificationClickEvent(int event_id,
                                        mojom::ServiceWorkerEventStatus);
@@ -309,12 +288,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
   void DidHandleSyncEvent(int sync_event_id, mojom::ServiceWorkerEventStatus);
   void DidHandlePeriodicSyncEvent(int event_id,
                                   mojom::ServiceWorkerEventStatus status);
-  void DidHandleAbortPaymentEvent(int abort_payment_event_id,
-                                  mojom::ServiceWorkerEventStatus);
-  void DidHandleCanMakePaymentEvent(int payment_request_event_id,
-                                    mojom::ServiceWorkerEventStatus);
-  void DidHandlePaymentRequestEvent(int payment_request_event_id,
-                                    mojom::ServiceWorkerEventStatus);
   void DidHandleCookieChangeEvent(int event_id,
                                   mojom::ServiceWorkerEventStatus);
   void DidHandleContentDeleteEvent(int event_id,
@@ -524,23 +497,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
       const String& tag,
       base::TimeDelta timeout,
       DispatchPeriodicSyncEventCallback callback) override;
-  void DispatchAbortPaymentEvent(
-      mojo::PendingRemote<
-          payments::mojom::blink::PaymentHandlerResponseCallback>
-          response_callback,
-      DispatchAbortPaymentEventCallback callback) override;
-  void DispatchCanMakePaymentEvent(
-      payments::mojom::blink::CanMakePaymentEventDataPtr event_data,
-      mojo::PendingRemote<
-          payments::mojom::blink::PaymentHandlerResponseCallback>
-          response_callback,
-      DispatchCanMakePaymentEventCallback callback) override;
-  void DispatchPaymentRequestEvent(
-      payments::mojom::blink::PaymentRequestEventDataPtr event_data,
-      mojo::PendingRemote<
-          payments::mojom::blink::PaymentHandlerResponseCallback>
-          response_callback,
-      DispatchPaymentRequestEventCallback callback) override;
   void DispatchCookieChangeEvent(
       network::mojom::blink::CookieChangeInfoPtr change,
       DispatchCookieChangeEventCallback callback) override;
@@ -603,23 +559,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
                       int event_id);
   void StartPeriodicSyncEvent(String tag,
                               int event_id);
-  void StartAbortPaymentEvent(
-      mojo::PendingRemote<
-          payments::mojom::blink::PaymentHandlerResponseCallback>
-          response_callback,
-      int event_id);
-  void StartCanMakePaymentEvent(
-      payments::mojom::blink::CanMakePaymentEventDataPtr event_data,
-      mojo::PendingRemote<
-          payments::mojom::blink::PaymentHandlerResponseCallback>
-          response_callback,
-      int event_id);
-  void StartPaymentRequestEvent(
-      payments::mojom::blink::PaymentRequestEventDataPtr event_data,
-      mojo::PendingRemote<
-          payments::mojom::blink::PaymentHandlerResponseCallback>
-          response_callback,
-      int event_id);
   void StartCookieChangeEvent(network::mojom::blink::CookieChangeInfoPtr change,
                               int event_id);
   void StartContentDeleteEvent(String id,
@@ -690,16 +629,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
   HashMap<int, DispatchSyncEventCallback> sync_event_callbacks_;
   HashMap<int, DispatchPeriodicSyncEventCallback>
       periodic_sync_event_callbacks_;
-  HeapHashMap<int,
-              Member<DisallowNewWrapper<HeapMojoRemote<
-                  payments::mojom::blink::PaymentHandlerResponseCallback>>>>
-      abort_payment_result_callbacks_;
-  HashMap<int, DispatchCanMakePaymentEventCallback>
-      abort_payment_event_callbacks_;
-  HashMap<int, DispatchCanMakePaymentEventCallback>
-      can_make_payment_event_callbacks_;
-  HashMap<int, DispatchPaymentRequestEventCallback>
-      payment_request_event_callbacks_;
   HashMap<int, DispatchNotificationClickEventCallback>
       notification_click_event_callbacks_;
   HashMap<int, DispatchNotificationCloseEventCallback>
@@ -713,14 +642,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
   // Maps for response callbacks.
   // These are mapped from an event id to the Mojo interface pointer which is
   // passed from the relevant DispatchSomeEvent() method.
-  HeapHashMap<int,
-              Member<DisallowNewWrapper<HeapMojoRemote<
-                  payments::mojom::blink::PaymentHandlerResponseCallback>>>>
-      can_make_payment_result_callbacks_;
-  HeapHashMap<int,
-              Member<DisallowNewWrapper<HeapMojoRemote<
-                  payments::mojom::blink::PaymentHandlerResponseCallback>>>>
-      payment_response_callbacks_;
   HeapHashMap<int,
               Member<DisallowNewWrapper<HeapMojoRemote<
                   mojom::blink::ServiceWorkerFetchResponseCallback>>>>

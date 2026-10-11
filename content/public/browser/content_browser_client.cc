@@ -25,9 +25,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "components/language_detection/content/browser/content_language_detection_driver.h"
-#include "components/language_detection/content/common/language_detection.mojom.h"
-#include "components/language_detection/core/browser/language_detection_model_provider.h"
 #include "content/browser/ai/echo_ai_manager_impl.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/webauth/default_authenticator_request_client_delegate.h"
@@ -94,7 +91,6 @@
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_cloud_identifier.mojom.h"
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_error.mojom.h"
 #include "third_party/blink/public/mojom/origin_trials/origin_trials_settings.mojom.h"
-#include "third_party/blink/public/mojom/payments/secure_payment_confirmation_service.mojom.h"
 #include "ui/base/clipboard/clipboard_metadata.h"
 #include "ui/gfx/image/image_skia.h"
 #include "ui/shell_dialogs/select_file_policy.h"
@@ -1136,11 +1132,6 @@ void ContentBrowserClient::CreateManagedConfigurationService(
     mojo::PendingReceiver<blink::mojom::ManagedConfigurationService> receiver) {
 }
 
-void ContentBrowserClient::CreateSecurePaymentConfirmationService(
-    RenderFrameHost* render_frame_host,
-    mojo::PendingReceiver<payments::mojom::SecurePaymentConfirmationService>
-        receiver) {}
-
 SerialDelegate* ContentBrowserClient::GetSerialDelegate() {
   return nullptr;
 }
@@ -1163,15 +1154,6 @@ SensorDelegate* ContentBrowserClient::GetSensorDelegate() {
 
 FontAccessDelegate* ContentBrowserClient::GetFontAccessDelegate() {
   return nullptr;
-}
-
-
-bool ContentBrowserClient::ShowPaymentHandlerWindow(
-    content::BrowserContext* browser_context,
-    const GURL& url,
-    base::OnceCallback<void(bool, int, int)> callback) {
-  DCHECK(browser_context);
-  return false;
 }
 
 bool ContentBrowserClient::IsSecurityLevelAcceptableForWebAuthn(
@@ -1759,60 +1741,6 @@ void ContentBrowserClient::BindAIManager(
     RenderFrameHost* rfh,
     mojo::PendingReceiver<blink::mojom::AIManager> receiver) {
   EchoAIManagerImpl::Create(std::move(receiver));
-}
-
-void ContentBrowserClient::BindTranslationManager(
-    RenderProcessHost* process_host,
-    BrowserContext* browser_context,
-    base::SupportsUserData* context_user_data,
-    const url::Origin& origin,
-    mojo::PendingReceiver<blink::mojom::TranslationManager> receiver) {}
-
-namespace {
-// TODO(https://crbug.com/383035345): Use BASE_FEATURE_PARAM.
-const base::FeatureParam<std::string> kLanguageDetectionLocalFileModelPath{
-    &blink::features::kLanguageDetectionAPI,
-    "language_detection_local_file_model_path", ""};
-
-// We need to initialize the provider after it is created. This should not be
-// inside `GetContentLanguageDetectionDriver` or it will be performed on every
-// call.
-language_detection::LanguageDetectionModelProvider*
-CreateLanguageDetectionModelProvider() {
-  auto* provider = new language_detection::LanguageDetectionModelProvider(
-      base::ThreadPool::CreateSequencedTaskRunner(
-          {base::MayBlock(), base::TaskPriority::BEST_EFFORT}));
-  const std::string model_file_path =
-      kLanguageDetectionLocalFileModelPath.Get();
-  if (model_file_path.length()) {
-    provider->ReplaceModelFile(base::FilePath::FromASCII(model_file_path));
-  } else {
-    // There is no model and there's not going to be one. If we don't call this
-    // the provider will queue requests, expecting that some time in the future
-    // a model will become available.
-    provider->UnloadModelFile();
-  }
-  return provider;
-}
-
-// Returns a singleton of `ContentLanguageDetectionDriver`. This will provide
-// the model from a flag-param path.
-language_detection::ContentLanguageDetectionDriver&
-GetContentLanguageDetectionDriver() {
-  static base::NoDestructor<language_detection::ContentLanguageDetectionDriver>
-      driver(CreateLanguageDetectionModelProvider());
-  return *driver.get();
-}
-}  // namespace
-
-void ContentBrowserClient::BindLanguageDetectionDriver(
-    content::BrowserContext* browser_context,
-    base::SupportsUserData* context_user_data,
-    mojo::PendingReceiver<
-        language_detection::mojom::ContentLanguageDetectionDriver> receiver) {
-  if (base::FeatureList::IsEnabled(blink::features::kLanguageDetectionAPI)) {
-    GetContentLanguageDetectionDriver().AddReceiver(std::move(receiver));
-  }
 }
 
 bool ContentBrowserClient::AllowNonActivatedCrossOriginPaintHolding() {

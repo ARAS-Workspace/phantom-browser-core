@@ -9,12 +9,10 @@
 
 #include "build/build_config.h"
 #include "chrome/services/file_util/buildflags.h"
-#include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/paint_preview/buildflags/buildflags.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/password_manager/services/csv_password/csv_password_parser_impl.h"
 #include "components/password_manager/services/csv_password/public/mojom/csv_password_parser.mojom.h"
-#include "components/private_ai/oak_session_service/oak_session_service.h"  // nogncheck
 #include "components/services/patch/file_patcher_impl.h"
 #include "components/services/patch/public/mojom/file_patcher.mojom.h"
 #include "components/services/unzip/public/mojom/unzipper.mojom.h"
@@ -85,10 +83,6 @@
 #include "components/services/paint_preview_compositor/public/mojom/paint_preview_compositor.mojom.h"
 #endif
 
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-#include "components/on_device_translation/service/on_device_translation_service.h"
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-
 namespace {
 
 auto RunFilePatcher(mojo::PendingReceiver<patch::mojom::FilePatcher> receiver) {
@@ -145,11 +139,6 @@ auto RunSystemSignalsService(
 #endif  // BUILDFLAG(IS_MAC)
 }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-auto RunOakSessionService(
-    mojo::PendingReceiver<private_ai::mojom::OakSession> receiver) {
-  return std::make_unique<private_ai::OakSessionService>(std::move(receiver));
-}
 
 auto RunProxyResolver(
     mojo::PendingReceiver<proxy_resolver::mojom::ProxyResolverFactory>
@@ -250,15 +239,6 @@ auto RunPrintCompositor(
 }
 #endif  // BUILDFLAG(ENABLE_PRINTING)
 
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-auto RunOnDeviceTranslationService(
-    mojo::PendingReceiver<
-        on_device_translation::mojom::OnDeviceTranslationService> receiver) {
-  return std::make_unique<on_device_translation::OnDeviceTranslationService>(
-      std::move(receiver));
-}
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-
 }  // namespace
 
 void RegisterElevatedMainThreadServices(mojo::ServiceFactory& services) {
@@ -272,7 +252,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunCSVPasswordParser);
   services.Add(ContentBookmarkParser);
   services.Add(RunPassageEmbeddingsService);
-  services.Add(RunOakSessionService);
 
   services.Add(RunProfileImporter);
   services.Add(RunMirroringService);
@@ -315,10 +294,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
 #if BUILDFLAG(ENABLE_PAINT_PREVIEW)
   services.Add(RunPaintPreviewCompositor);
 #endif
-
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-  services.Add(RunOnDeviceTranslationService);
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 }
 
 void RegisterIOThreadServices(mojo::ServiceFactory& services) {

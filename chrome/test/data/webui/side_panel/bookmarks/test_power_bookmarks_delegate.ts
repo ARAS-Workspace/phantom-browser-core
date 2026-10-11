@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import type {BookmarkProductInfo} from '//resources/cr_components/commerce/shared.mojom-webui.js';
 import type {BookmarksTreeNode} from 'chrome://bookmarks-side-panel.top-chrome/bookmarks.mojom-webui.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
@@ -16,10 +15,7 @@ export class TestPowerBookmarksDelegate extends TestBrowserProxy {
       'onBookmarkAdded',
       'onBookmarkMoved',
       'onBookmarkRemoved',
-      'getTrackedProductInfos',
-      'getAvailableProductInfos',
       'getSelectedBookmarks',
-      'getProductImageUrl',
     ]);
   }
 
@@ -53,23 +49,8 @@ export class TestPowerBookmarksDelegate extends TestBrowserProxy {
     this.methodCalled('onBookmarkRemoved', bookmark);
   }
 
-  getTrackedProductInfos() {
-    this.methodCalled('getTrackedProductInfos');
-    return {};
-  }
-
-  getAvailableProductInfos() {
-    this.methodCalled('getAvailableProductInfos');
-    return new Map<string, BookmarkProductInfo>();
-  }
-
   getSelectedBookmarks() {
     this.methodCalled('getSelectedBookmarks');
     return {};
-  }
-
-  getProductImageUrl(bookmark: BookmarksTreeNode) {
-    this.methodCalled('getProductImageUrl', bookmark);
-    return '';
   }
 }

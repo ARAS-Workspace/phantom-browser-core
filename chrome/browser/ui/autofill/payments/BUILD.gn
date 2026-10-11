@@ -140,7 +140,6 @@ source_set("impl") {
     "//chrome/browser/ui/views/page_action",
     "//chrome/common",
     "//components/autofill/core/common:credit_card_number_validation",
-    "//components/commerce/core:feature_list",
     "//components/prefs",
     "//components/strings:components_strings_grit",
     "//components/sync/service",

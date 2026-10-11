@@ -60,7 +60,6 @@
 #include "components/autofill/core/browser/payments/payments_util.h"
 #include "components/autofill/core/browser/studies/autofill_experiments.h"
 #include "components/autofill/core/common/autofill_prefs.h"
-#include "components/commerce/core/commerce_constants.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/dom_distiller/core/dom_distiller_features.h"
 #include "components/google/core/common/google_util.h"
@@ -782,9 +781,6 @@ void AddPersonalizationOptionsStrings(content::WebUIDataSource* html_source) {
       {"searchAggregatorSuggestPref", IDS_SETTINGS_SEARCH_AGGREGATOR_PREF},
       {"searchAggregatorSuggestPrefDesc",
        IDS_SETTINGS_SEARCH_AGGREGATOR_PREF_DESC},
-      {"priceEmailNotificationsPref", IDS_PRICE_TRACKING_SETTINGS_TITLE},
-      {"priceEmailNotificationsPrefDesc",
-       IDS_PRICE_TRACKING_SETTINGS_EMAIL_DESCRIPTION},
       {"chromeSigninChoiceTitle",
        IDS_SETTINGS_SIGNIN_CHROME_SIGNIN_OPTIONS_TITLE},
       {"chromeSigninChoiceDescription",

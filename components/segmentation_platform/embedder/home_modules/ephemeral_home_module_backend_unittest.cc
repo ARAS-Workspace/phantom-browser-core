@@ -5,7 +5,6 @@
 #include "components/segmentation_platform/embedder/home_modules/ephemeral_home_module_backend.h"
 
 #include "base/test/scoped_feature_list.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/segmentation_platform/embedder/default_model/default_model_test_base.h"
 #include "components/segmentation_platform/embedder/home_modules/card_selection_info.h"

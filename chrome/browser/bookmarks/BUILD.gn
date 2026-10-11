@@ -60,7 +60,6 @@ source_set("impl") {
   deps = [
     ":bookmarks",
     "//chrome/browser:browser_process",
-    "//chrome/browser/commerce",
     "//chrome/browser/enterprise/browser_management:management_identity",
     "//chrome/browser/favicon",
     "//chrome/browser/history",
@@ -68,8 +67,6 @@ source_set("impl") {
     "//chrome/browser/undo",
     "//components/bookmarks/common",
     "//components/bookmarks/managed",
-    "//components/commerce/core:feature_list",
-    "//components/commerce/core:shopping_service",
     "//components/favicon/core",
     "//components/history/core/browser",
     "//components/policy:generated",

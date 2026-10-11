@@ -24,7 +24,6 @@ namespace webauthn {
 enum class ClientDataRequestType {
   kWebAuthnCreate,
   kWebAuthnGet,
-  kPaymentGet,
 };
 
 // ClientDataJsonParams is the parameter struct for `BuildClientDataJson()`.

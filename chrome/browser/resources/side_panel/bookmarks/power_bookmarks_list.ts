@@ -17,8 +17,6 @@ import './power_bookmarks_add_folder_button.js';
 import './power_bookmarks_list_header.js';
 
 import type {SpEmptyStateElement} from '//bookmarks-side-panel.top-chrome/shared/sp_empty_state.js';
-import type {BrowserProxy as PriceTrackingBrowserProxy} from '//resources/cr_components/commerce/price_tracking.mojom-webui.js';
-import {browserProxyFactory as priceTrackingBrowserProxyFactory} from '//resources/cr_components/commerce/price_tracking.mojom-webui.js';
 import {getInstance as getAnnouncerInstance} from '//resources/cr_elements/cr_a11y_announcer/cr_a11y_announcer.js';
 import type {CrLazyListElement} from '//resources/cr_elements/cr_lazy_list/cr_lazy_list.js';
 import {FocusOutlineManager} from '//resources/js/focus_outline_manager.js';
@@ -131,7 +129,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
       },
 
       searchQuery: {type: String},
-      shoppingCollectionFolderId_: {type: String},
 
       updatedElementIds_: {
         type: Array,
@@ -175,8 +172,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
 
   private bookmarksApi_: BookmarksApiProxy =
       BookmarksApiProxyImpl.getInstance();
-  private priceTrackingProxy_: PriceTrackingBrowserProxy =
-      priceTrackingBrowserProxyFactory.getInstance();
   private bookmarksService_: PowerBookmarksService =
       PowerBookmarksService.getInstance();
   private keyArrowNavigationService_: KeyArrowNavigationService;
@@ -208,7 +203,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
   protected accessor sectionVisibility_: ListSectionVisibility = {};
   protected accessor hasFolders_: boolean = false;
   protected accessor scrollTarget_: HTMLElement = document.documentElement;
-  protected accessor shoppingCollectionFolderId_: string = '';
   protected accessor updatedElementIds_: string[] = [];
   protected accessor firstSecondaryIndex_: number = -1;
 
@@ -232,7 +226,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
     this.updateListScrollOffset_();
 
     this.bookmarksDragManager_.startObserving();
-    this.updateShoppingCollectionFolderId_();
     this.recordMetricsOnConnected_();
     this.keyArrowNavigationService_.startListening();
 
@@ -338,8 +331,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
 
   onBookmarkAdded(bookmark: BookmarksTreeNode, parent: BookmarksTreeNode) {
     if (this.bookmarkShouldShow_(bookmark)) {
-      this.updateShoppingCollectionFolderId_();
-
       this.updateDisplayList_();
       if (bookmark.url) {
         getAnnouncerInstance().announce(loadTimeData.getStringF(
@@ -397,9 +388,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
       this.$.scroller.scrollTop = scrollTop;
     });
 
-    if (this.shoppingCollectionFolderId_ === bookmark.id) {
-      this.shoppingCollectionFolderId_ = '';
-    }
     this.updatedElementIds_ = [bookmark.parentId];
   }
 
@@ -531,13 +519,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
 
   protected getBookmarksListRole_(): string {
     return this.editing ? 'listbox' : 'list';
-  }
-
-  private updateShoppingCollectionFolderId_(): void {
-    this.priceTrackingProxy_.handler.getShoppingCollectionBookmarkFolderId()
-        .then(res => {
-          this.shoppingCollectionFolderId_ = res.collectionId.toString();
-        });
   }
 
   protected getActiveFolderLabel_(): string {

@@ -81,7 +81,6 @@ after discussions on the right group.
       <annotation id="openscreen_tls_message"/>
       <annotation id="openscreen_message"/>
       <annotation id="password_requirements_spec_fetch"/>
-      <annotation id="payment_manifest_downloader"/>
       <annotation id="proxy_config_settings"/>
       <annotation id="qr_code_save"/>
       <annotation id="desktop_screenshot_save"/>
@@ -135,8 +134,6 @@ after discussions on the right group.
     </sender>
     <sender name="Recently Added">
       <annotation id="download_bubble_retry_download"/>
-      <annotation id="chrome_commerce_price_email_pref_fetcher"/>
-      <annotation id="chrome_commerce_price_email_pref_sender"/>
       <annotation id="fenced_frame_reporting_beacon"/>
       <annotation id="ntp_custom_background"/>
       <annotation id="iwa_policy_update_manifest"/>
@@ -202,16 +199,13 @@ after discussions on the right group.
       <annotation id="enterprise_logo_fetcher_for_browser"/>
       <annotation id="devtools_gdp_service"/>
       <annotation id="save_to_drive"/>
-      <annotation id="private_ai_client"/>
       <annotation id="webrtc_rtc_transport"/>
       <annotation id="email_verification"/>
       <annotation id="amount_extraction_model_execution"/>
-      <annotation id="private_ai_get_token"/>
       <annotation id="metrics_report_private_metrics"/>
       <annotation id="scam_detection_model_execution"/>
       <annotation id="sync_device_statistics_metrics"/>
       <annotation id="isolated_web_app_throttle"/>
-      <annotation id="wallet_http_request"/>
       <annotation id="gemini_antiscam_protection_model_execution"/>
       <annotation id="skills_service_loader"/>
       <annotation id="skills_model_execution"/>
@@ -301,13 +295,6 @@ after discussions on the right group.
       <annotation id="sct_auditing"/>
       <annotation id="sct_auditing_hashdance"/>
       <annotation id="tailored_security_service"/>
-    </sender>
-  </group>
-  <group name="Chrome Commerce">
-    <sender name="Subscription">
-      <annotation id="chrome_commerce_subscriptions_create"/>
-      <annotation id="chrome_commerce_subscriptions_delete"/>
-      <annotation id="chrome_commerce_subscriptions_get"/>
     </sender>
   </group>
   <group name="Identity and Security">

@@ -5,9 +5,6 @@
 import './power_bookmark_row_item.js';
 import '//bookmarks-side-panel.top-chrome/shared/sp_heading.js';
 
-import type {BrowserProxy as PriceTrackingBrowserProxy} from '//resources/cr_components/commerce/price_tracking.mojom-webui.js';
-import {browserProxyFactory as priceTrackingBrowserProxyFactory} from '//resources/cr_components/commerce/price_tracking.mojom-webui.js';
-import type {BookmarkProductInfo} from '//resources/cr_components/commerce/shared.mojom-webui.js';
 import {CrLitElement} from '//resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
 import {CrUrlListItemSize} from 'chrome://resources/cr_elements/cr_url_list_item/cr_url_list_item.js';
@@ -18,7 +15,6 @@ import {KeyArrowNavigationService} from './keyboard_arrow_navigation_service.js'
 import {getCss} from './power_bookmark_row.css.js';
 import {getHtml} from './power_bookmark_row.html.js';
 import type {PowerBookmarkRowItemElement} from './power_bookmark_row_item.js';
-import {PowerBookmarksService} from './power_bookmarks_service.js';
 
 export const NESTED_BOOKMARKS_BASE_MARGIN = 40;
 export const NESTED_BOOKMARKS_MARGIN_PER_DEPTH = 12;
@@ -53,9 +49,7 @@ export class PowerBookmarkRowElement extends CrLitElement {
       selectedBookmarks: {type: Array},
       renamingId: {type: String},
       imageUrls: {type: Object},
-      isPriceTracked: {type: Boolean},
       searchQuery: {type: String},
-      shoppingCollectionFolderId: {type: String},
       rowAriaDescription: {type: String},
       trailingIconTooltip: {type: String},
       listItemSize: {type: String},
@@ -88,13 +82,11 @@ export class PowerBookmarkRowElement extends CrLitElement {
   accessor selectedBookmarks: BookmarksTreeNode[] = [];
   accessor renamingId: string = '';
   accessor searchQuery: string|undefined;
-  accessor shoppingCollectionFolderId: string = '';
   accessor rowAriaDescription: string = '';
   accessor trailingIconTooltip: string = '';
   accessor toggleExpand: boolean = false;
   accessor imageUrls: {[key: string]: string} = {};
   accessor updatedElementIds: string[] = [];
-  accessor isPriceTracked: boolean = false;
   accessor canDrag: boolean = true;
   accessor hasActiveDrag: boolean = false;
   accessor activeFolderPath: BookmarksTreeNode[] = [];
@@ -103,11 +95,6 @@ export class PowerBookmarkRowElement extends CrLitElement {
   accessor listItemSize: CrUrlListItemSize = CrUrlListItemSize.COMPACT;
   accessor rowHeading: string = '';
 
-  private bookmarksService_: PowerBookmarksService =
-      PowerBookmarksService.getInstance();
-  private priceTrackingProxy_: PriceTrackingBrowserProxy =
-      priceTrackingBrowserProxyFactory.getInstance();
-  private shoppingListenerIds_: number[] = [];
   private keyArrowNavigationService_: KeyArrowNavigationService =
       KeyArrowNavigationService.getInstance();
 
@@ -115,40 +102,12 @@ export class PowerBookmarkRowElement extends CrLitElement {
     super.connectedCallback();
     this.addEventListener('keydown', this.onKeydown_);
     this.addEventListener('focus', this.onFocus_);
-    this.isPriceTracked = this.isPriceTracked_();
-
-    const callbackRouter = this.priceTrackingProxy_.callbackRouter;
-    this.shoppingListenerIds_.push(
-        callbackRouter.priceTrackedForBookmark.addListener(
-            (product: BookmarkProductInfo) =>
-                this.handleBookmarkSubscriptionChange_(product, true)),
-        callbackRouter.priceUntrackedForBookmark.addListener(
-            (product: BookmarkProductInfo) =>
-                this.handleBookmarkSubscriptionChange_(product, false)),
-    );
 
     this.fire(BOOKMARK_ROW_LOAD_EVENT);
   }
 
-  override disconnectedCallback() {
-    super.disconnectedCallback();
-    this.shoppingListenerIds_.forEach(
-        id => this.priceTrackingProxy_.callbackRouter.removeListener(id));
-  }
-
-  private handleBookmarkSubscriptionChange_(
-      product: BookmarkProductInfo, subscribed: boolean): void {
-    if (product.bookmarkId.toString() === this.bookmark.id) {
-      this.isPriceTracked = subscribed;
-    }
-  }
-
   override willUpdate(changedProperties: PropertyValues<this>) {
     super.willUpdate(changedProperties);
-
-    if (changedProperties.has('bookmark')) {
-      this.isPriceTracked = this.isPriceTracked_();
-    }
 
     if (changedProperties.has('compact')) {
       this.listItemSize =
@@ -286,10 +245,6 @@ export class PowerBookmarkRowElement extends CrLitElement {
     event.preventDefault();
     event.stopPropagation();
     this.setExpanded_(event.detail.value);
-  }
-
-  private isPriceTracked_(): boolean {
-    return !!this.bookmarksService_.getPriceTrackedInfo(this.bookmark);
   }
 
   protected canExpand_(): boolean {

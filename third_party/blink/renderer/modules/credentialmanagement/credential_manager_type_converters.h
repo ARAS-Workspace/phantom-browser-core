@@ -27,7 +27,6 @@ class AuthenticationExtensionsClientOutputs;
 class AuthenticationExtensionsCmtgKeyOutputs;
 class AuthenticationExtensionsPRFInputs;
 class AuthenticationExtensionsPRFValues;
-class AuthenticationExtensionsPaymentOutputs;
 class AuthenticatorSelectionCriteria;
 class Credential;
 class CurrentUserDetailsOptions;
@@ -77,14 +76,6 @@ struct MODULES_EXPORT TypeConverter<
     blink::mojom::blink::AuthenticationExtensionsClientOutputsPtr> {
   static blink::AuthenticationExtensionsClientOutputs* Convert(
       const blink::mojom::blink::AuthenticationExtensionsClientOutputsPtr&);
-};
-
-template <>
-struct TypeConverter<
-    blink::AuthenticationExtensionsPaymentOutputs*,
-    blink::mojom::blink::AuthenticationExtensionsPaymentResponsePtr> {
-  static blink::AuthenticationExtensionsPaymentOutputs* Convert(
-      const blink::mojom::blink::AuthenticationExtensionsPaymentResponsePtr&);
 };
 
 template <>

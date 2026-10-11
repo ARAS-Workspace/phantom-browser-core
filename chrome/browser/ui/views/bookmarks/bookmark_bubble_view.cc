@@ -15,7 +15,6 @@
 #include "base/types/pass_key.h"
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
-#include "chrome/browser/commerce/shopping_service_factory.h"
 #include "chrome/browser/favicon/favicon_utils.h"
 #include "chrome/browser/feature_engagement/non_iph_promo.h"
 #include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
@@ -37,18 +36,11 @@
 #include "chrome/browser/ui/page_action/page_action_icon_type.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
-#include "chrome/browser/ui/views/commerce/price_tracking_email_dialog_view.h"
-#include "chrome/browser/ui/views/commerce/price_tracking_view.h"
-#include "chrome/browser/ui/views/commerce/shopping_collection_iph_view.h"
 #include "chrome/browser/ui/views/page_action/page_action_view_interface.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/browser/bookmark_utils.h"
 #include "components/bookmarks/common/bookmark_metrics.h"
-#include "components/commerce/core/commerce_feature_list.h"
-#include "components/commerce/core/metrics/metrics_utils.h"
-#include "components/commerce/core/price_tracking_utils.h"
-#include "components/commerce/core/shopping_service.h"
 #include "components/desktop_to_mobile_promos/features.h"
 #include "components/desktop_to_mobile_promos/promos_types.h"
 #include "components/feature_engagement/public/feature_constants.h"
@@ -75,6 +67,7 @@
 #include "ui/gfx/image/image_skia_operations.h"
 #include "ui/views/bubble/bubble_dialog_model_host.h"
 #include "ui/views/controls/styled_label.h"
+#include "ui/views/view_class_properties.h"
 
 #include "chrome/browser/ui/signin/promos/bubble_signin_promo_view.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_sign_in_promo_bubble_view.h"
@@ -136,24 +129,6 @@ gfx::ImageSkia GetFaviconForWebContents(content::WebContents* web_contents) {
   return centered_favicon;
 }
 
-bool ShouldShowShoppingCollectionFootnote(Profile* profile,
-                                          bookmarks::BookmarkModel* model,
-                                          const bookmarks::BookmarkNode* node) {
-  if (!commerce::IsProductBookmark(model, node)) {
-    return false;
-  }
-
-  // Only show the IPH if the bookmark was saved to the shopping collection.
-  const bookmarks::BookmarkNode* collection =
-      commerce::GetShoppingCollectionBookmarkFolder(model);
-  if (!collection || node->parent()->uuid() != collection->uuid()) {
-    return false;
-  }
-
-  return feature_engagement::NonIphPromo::RequestPermissionToShow(
-      profile, feature_engagement::kIPHShoppingCollectionFeature);
-}
-
 actions::ActionItem& GetBookmarkActionItem(BrowserWindowInterface* bwi) {
   CHECK(bwi);
   actions::ActionItem* action_item = actions::ActionManager::Get().FindAction(
@@ -191,93 +166,6 @@ void MaybeShowSignInPromo(bool already_bookmarked,
 }
 
 }  // namespace
-
-class BookmarkBubbleViewPromoHelper {
- public:
-  BookmarkBubbleViewPromoHelper() = delete;
-
-  static bool ShouldShowIOSPriceTrackingPromo(
-      content::WebContents* web_contents,
-      BrowserWindowInterface* browser) {
-    auto* const interface =
-        BrowserUserEducationInterface::MaybeGetForWebContentsInTab(
-            web_contents);
-    IOSPromoController* controller = IOSPromoController::From(browser);
-    return ((interface &&
-             interface->WouldShowFeaturePromo(
-                 feature_engagement::kIPHiOSPriceTrackingDesktopFeature,
-                 base::PassKey<BookmarkBubbleViewPromoHelper>())) &&
-            (controller &&
-             controller->CanShowIOSPromo(
-                 desktop_to_mobile_promos::PromoType::kPriceTracking)) &&
-            (MobilePromoOnDesktopTypeEnabled(
-                MobilePromoOnDesktopPromoType::kPriceTracking)));
-  }
-
-  static base::OnceCallback<void()> CreatePriceTrackingCallback(
-      BrowserWindowInterface* browser,
-      Profile* profile,
-      views::BubbleAnchor bubble_anchor,
-      content::WebContents* web_contents,
-      const bookmarks::BookmarkNode* bookmark) {
-    if (!profile) {
-      return base::DoNothing();
-    }
-
-    // If it is eligible, the Desktop to Mobile Price Tracking promo should
-    // replace the email promo because they have the same alerting purpose.
-    if (ShouldShowIOSPriceTrackingPromo(web_contents, browser)) {
-      IOSPromoTriggerService* const trigger_service =
-          IOSPromoTriggerServiceFactory::GetForProfile(profile);
-      if (trigger_service) {
-        return base::BindOnce(
-            &IOSPromoTriggerService::NotifyPromoShouldBeShown,
-            base::Unretained(trigger_service),
-            desktop_to_mobile_promos::PromoType::kPriceTracking);
-      }
-    }
-
-    if (commerce::IsEmailNotificationPrefSetByUser(profile->GetPrefs())) {
-      return base::DoNothing();
-    }
-
-    // TODO(https://crbug.com/511194274): Maybe convert this to a scoped handle
-    // that prevents other promos until the promo dialog is closed. This was
-    // previously released in `PriceTrackingEmailDialogView::OnClosed()`.
-    if (!feature_engagement::NonIphPromo::RequestPermissionToShow(
-            profile,
-            feature_engagement::kIPHPriceTrackingEmailConsentFeature)) {
-      return base::DoNothing();
-    }
-
-    base::OnceCallback<void()> show_dialog_callback = base::BindOnce(
-        [](base::WeakPtr<content::WebContents> web_contents, Profile* profile,
-           views::BubbleAnchor anchor) {
-          if (!web_contents || !profile || !anchor) {
-            return;
-          }
-          PriceTrackingEmailDialogCoordinator(anchor).Show(
-              web_contents.get(), profile, base::DoNothing());
-        },
-        web_contents->GetWeakPtr(), profile, bubble_anchor);
-
-    return base::BindOnce(
-        [](Profile* profile, const bookmarks::BookmarkNode* node,
-           base::OnceCallback<void()> show_dialog) {
-          commerce::IsBookmarkPriceTracked(
-              commerce::ShoppingServiceFactory::GetForBrowserContext(profile),
-              BookmarkModelFactory::GetForBrowserContext(profile), node,
-              base::BindOnce(
-                  [](base::OnceCallback<void()> show_dialog, bool is_tracked) {
-                    if (is_tracked) {
-                      std::move(show_dialog).Run();
-                    }
-                  },
-                  std::move(show_dialog)));
-        },
-        profile, bookmark, std::move(show_dialog_callback));
-  }
-};
 
 class BookmarkBubbleView::BookmarkBubbleDelegate
     : public ui::DialogModelDelegate {
@@ -459,13 +347,6 @@ void BookmarkBubbleView::ShowBubble(
   const bookmarks::BookmarkNode* bookmark_node =
       bookmark_model->GetMostRecentlyAddedUserNodeForURL(url);
 
-  commerce::ShoppingService* shopping_service =
-      commerce::ShoppingServiceFactory::GetForBrowserContext(profile);
-
-  base::OnceCallback<void()> post_save_callback =
-      BookmarkBubbleViewPromoHelper::CreatePriceTrackingCallback(
-          browser, profile, bubble_anchor, web_contents, bookmark_node);
-
   tabs::TabInterface& tab =
       CHECK_DEREF(tabs::TabInterface::GetFromContents(web_contents));
 
@@ -476,17 +357,8 @@ void BookmarkBubbleView::ShowBubble(
   auto dialog_model_builder =
       ui::DialogModel::Builder(std::move(bubble_delegate_unique));
 
-  std::optional<commerce::ProductInfo> product_info;
-  if (shopping_service->IsShoppingListEligible()) {
-    product_info = shopping_service->GetAvailableProductInfoForUrl(url);
-  }
-
-  if (product_info.has_value() && !product_info->image_url.is_empty()) {
-    HandleImageUrlResponse(profile, product_info->image_url);
-  } else {
-    // Fetch image from ImageService asynchronously
-    FetchImageForUrl(url, profile);
-  }
+  // Fetch image from ImageService asynchronously
+  FetchImageForUrl(url, profile);
 
   // Display favicon while awaiting one of the above options to load.
   const auto centered_favicon = GetFaviconForWebContents(web_contents);
@@ -539,28 +411,6 @@ void BookmarkBubbleView::ShowBubble(
                                   base::Unretained(bubble_delegate))))
       .SetInitiallyFocusedField(initially_focused_field);
 
-  if (commerce::CanTrackPrice(product_info)) {
-    bool is_price_tracked = shopping_service->IsSubscribedFromCache(
-        commerce::BuildUserSubscriptionForClusterId(
-            product_info->product_cluster_id.value()));
-    dialog_model_builder.AddCustomField(
-        std::make_unique<views::BubbleDialogModelHost::CustomView>(
-            std::make_unique<PriceTrackingView>(profile, url, is_price_tracked,
-                                                product_info.value()),
-            views::BubbleDialogModelHost::FieldType::kControl),
-        kPriceTrackingBookmarkViewElementId);
-
-    // When a user clicks to open bookmark bubble for a product page that is
-    // neither price tracked nor bookmarked, user will track the price of the
-    // product, and we'll record the UKM for this event.
-    // TODO(b/331277578): Move the track-by-default logic here.
-    if (!is_price_tracked && !already_bookmarked) {
-      commerce::metrics::RecordShoppingActionUKM(
-          web_contents->GetPrimaryMainFrame()->GetPageUkmSourceId(),
-          commerce::metrics::ShoppingAction::kPriceTracked);
-    }
-  }
-
   // views:: land below, there's no agnostic reference to arrow / anchors /
   // bubbles.
   auto bubble = std::make_unique<views::BubbleDialogModelHost>(
@@ -569,11 +419,7 @@ void BookmarkBubbleView::ShowBubble(
   bookmark_bubble_ = bubble.get();
   bubble->SetHighlightedElement(kBookmarkStarViewElementId);
 
-  if (ShouldShowShoppingCollectionFootnote(profile, bookmark_model,
-                                           bookmark_node)) {
-    bubble->SetFootnoteView(
-        std::make_unique<commerce::ShoppingCollectionIphView>());
-  } else if (signin::ShouldShowBookmarkSignInPromo(*profile)) {
+  if (signin::ShouldShowBookmarkSignInPromo(*profile)) {
     if (!base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
       // TODO(pbos): Consider adding model support for footnotes so that this
       // does not need to be tied to views.
@@ -585,8 +431,6 @@ void BookmarkBubbleView::ShowBubble(
           ui::ButtonStyle::kDefault));
     }
   }
-
-  bubble_delegate->SetCloseCallback(std::move(post_save_callback));
 
   views::Widget* const widget =
       views::BubbleDialogDelegate::CreateBubbleDeprecated(

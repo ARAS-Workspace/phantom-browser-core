@@ -23,7 +23,6 @@
 #include "base/time/time.h"
 #include "base/timer/hi_res_timer_manager.h"
 #include "build/build_config.h"
-#include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/webrtc/features.h"
 #include "content/child/child_process.h"
 #include "content/common/content_switches_internal.h"
@@ -91,10 +90,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "base/message_loop/message_pump_apple.h"
 #endif
-
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION) && BUILDFLAG(IS_LINUX)
-#include "components/on_device_translation/service/sandbox_hook.h"
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION) && BUILDFLAG(IS_LINUX)
 
 namespace content {
 
@@ -261,12 +256,6 @@ int UtilityMain(MainFunctionParams parameters) {
       on_device_model::AddSandboxLinuxOptions(sandbox_options);
       pre_sandbox_hook = base::BindOnce(&on_device_model::PreSandboxHook);
       break;
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION) && BUILDFLAG(IS_LINUX)
-    case sandbox::mojom::Sandbox::kOnDeviceTranslation:
-      pre_sandbox_hook = base::BindOnce(
-          &on_device_translation::OnDeviceTranslationSandboxHook);
-      break;
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION) && BUILDFLAG(IS_LINUX)
     case sandbox::mojom::Sandbox::kScreenAI:
 #if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
       pre_sandbox_hook =

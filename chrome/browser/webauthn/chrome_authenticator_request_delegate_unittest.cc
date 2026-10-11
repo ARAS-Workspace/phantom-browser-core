@@ -884,14 +884,6 @@ TEST_F(ChromeAuthenticatorRequestDelegatePrivateTest, GetICloudKeychainPref) {
 
 TEST_F(ChromeAuthenticatorRequestDelegatePrivateTest,
        ShouldCreateInICloudKeychain) {
-  // Safety check that SPC requests never default to iCloud Keychain.
-  EXPECT_FALSE(ChromeAuthenticatorRequestDelegate::ShouldCreateInICloudKeychain(
-      ChromeAuthenticatorRequestDelegate::RequestSource::
-          kSecurePaymentConfirmation,
-      /*is_active_profile_authenticator_user=*/false,
-      /*has_icloud_drive_enabled=*/true, /*request_is_for_google_com=*/true,
-      /*preference=*/true));
-
   // For the valid request type, the preference should be controlling if set.
   for (const bool preference : {false, true}) {
     EXPECT_EQ(preference,

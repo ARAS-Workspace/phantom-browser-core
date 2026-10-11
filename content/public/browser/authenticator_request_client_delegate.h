@@ -105,13 +105,11 @@ class CONTENT_EXPORT AuthenticatorRequestClientDelegate
   };
 
   // RequestSource enumerates the source of a request, which is either the Web
-  // Authentication API (https://www.w3.org/TR/webauthn-2/), the Secure Payment
-  // Authentication API (https://www.w3.org/TR/secure-payment-confirmation), or
-  // a browser-internal use (which applies whenever
-  // `AuthenticatorCommon::Create` is used).
+  // Authentication API (https://www.w3.org/TR/webauthn-2/) or a
+  // browser-internal use (which applies whenever `AuthenticatorCommon::Create`
+  // is used).
   enum class RequestSource {
     kWebAuthentication,
-    kSecurePaymentConfirmation,
     kInternal,
   };
 

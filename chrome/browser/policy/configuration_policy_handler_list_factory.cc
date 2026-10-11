@@ -60,7 +60,6 @@
 #include "components/browsing_data/core/pref_names.h"
 #include "components/certificate_transparency/pref_names.h"
 #include "components/collaboration/public/pref_names.h"
-#include "components/commerce/core/pref_names.h"
 #include "components/component_updater/pref_names.h"
 #include "components/content_settings/core/browser/cookie_settings_policy_handler.h"
 #include "components/content_settings/core/common/pref_names.h"
@@ -91,12 +90,10 @@
 #include "components/ntp_tiles/enterprise/ntp_shortcuts_policy_handler.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/omnibox/common/omnibox_features.h"
-#include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/optimization_guide/core/model_execution/model_execution_prefs.h"
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/payments/core/payment_prefs.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/policy/core/browser/boolean_disabling_policy_handler.h"
 #include "components/policy/core/browser/configuration_policy_handler.h"
@@ -175,10 +172,6 @@
 #include "chrome/browser/extensions/api/messaging/native_messaging_policy_handler.h"
 #include "extensions/common/manifest.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-#include "components/on_device_translation/public/pref_names.h"
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
 #if BUILDFLAG(ENABLE_PDF)
 #include "chrome/browser/pdf/pdf_pref_names.h"
@@ -320,11 +313,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kTranslateEnabled,
     language::prefs::kOfferTranslateEnabled,
     base::Value::Type::BOOLEAN },
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-  { key::kTranslatorAPIAllowed,
-    prefs::kTranslatorAPIAllowed,
-    base::Value::Type::BOOLEAN },
-#endif
   { key::kWindowCaptureAllowedByOrigins,
     prefs::kWindowCaptureAllowedByOrigins,
     base::Value::Type::LIST },
@@ -938,9 +926,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kPasswordLeakDetectionEnabled,
     password_manager::prefs::kPasswordLeakDetectionEnabled,
     base::Value::Type::BOOLEAN },
-  { key::kPaymentMethodQueryEnabled,
-    payments::kCanMakePaymentEnabled,
-    base::Value::Type::BOOLEAN },
   { key::kSafeSitesFilterBehavior,
     policy_prefs::kSafeSitesFilterBehavior,
     base::Value::Type::INTEGER },
@@ -1225,9 +1210,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   { key::kStrictMimetypeCheckForWorkerScriptsEnabled,
     prefs::kStrictMimetypeCheckForWorkerScriptsEnabled,
-    base::Value::Type::BOOLEAN},
-  { key::kShoppingListEnabled,
-    commerce::kShoppingListEnabledPrefName,
     base::Value::Type::BOOLEAN},
 #if BUILDFLAG(IS_LINUX)
   { key::kOutOfProcessSystemDnsResolutionEnabled,

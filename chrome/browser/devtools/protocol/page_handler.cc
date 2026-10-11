@@ -10,7 +10,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
-#include "components/payments/content/payment_request_web_contents_manager.h"
 #include "components/subresource_filter/content/browser/devtools_interaction_tracker.h"
 
 #if BUILDFLAG(ENABLE_PRINTING)
@@ -71,7 +70,6 @@ protocol::Response PageHandler::Enable(
 protocol::Response PageHandler::Disable() {
   enabled_ = false;
   ToggleAdBlocking(false /* enable */);
-  SetSPCTransactionMode(protocol::Page::SetSPCTransactionMode::ModeEnum::None);
   // Do not mark the command as handled. Let it fall through instead, so that
   // the handler in content gets a chance to process the command.
   return protocol::Response::FallThrough();
@@ -81,39 +79,6 @@ protocol::Response PageHandler::SetAdBlockingEnabled(bool enabled) {
   if (!enabled_)
     return protocol::Response::ServerError("Page domain is disabled.");
   ToggleAdBlocking(enabled);
-  return protocol::Response::Success();
-}
-
-protocol::Response PageHandler::SetSPCTransactionMode(
-    const protocol::String& mode) {
-  if (!is_trusted_) {
-    return protocol::Response::ServerError(
-        "Permission denied: Page.setSPCTransactionMode requires a trusted "
-        "client");
-  }
-  if (!web_contents_)
-    return protocol::Response::ServerError("No web contents to host a dialog.");
-
-  payments::SPCTransactionMode spc_mode = payments::SPCTransactionMode::kNone;
-  if (mode == protocol::Page::SetSPCTransactionMode::ModeEnum::AutoAccept) {
-    spc_mode = payments::SPCTransactionMode::kAutoAccept;
-  } else if (mode == protocol::Page::SetSPCTransactionMode::ModeEnum::
-                         AutoChooseToAuthAnotherWay) {
-    spc_mode = payments::SPCTransactionMode::kAutoAuthAnotherWay;
-  } else if (mode ==
-             protocol::Page::SetSPCTransactionMode::ModeEnum::AutoReject) {
-    spc_mode = payments::SPCTransactionMode::kAutoReject;
-  } else if (mode ==
-             protocol::Page::SetSPCTransactionMode::ModeEnum::AutoOptOut) {
-    spc_mode = payments::SPCTransactionMode::kAutoOptOut;
-  } else if (mode != protocol::Page::SetSPCTransactionMode::ModeEnum::None) {
-    return protocol::Response::ServerError("Unrecognized mode value");
-  }
-
-  auto* payment_request_manager =
-      payments::PaymentRequestWebContentsManager::GetOrCreateForWebContents(
-          web_contents_.get());
-  payment_request_manager->SetSPCTransactionMode(spc_mode);
   return protocol::Response::Success();
 }
 

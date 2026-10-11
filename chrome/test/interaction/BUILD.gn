@@ -81,6 +81,8 @@ source_set("browser_tests") {
   ]
   deps = [
     ":interaction",
+    "//chrome/browser/ui:browser_element_identifiers",
+    "//chrome/browser/ui/toolbar",
     "//chrome/test/base:in_process_browser_test",
     "//chrome/test/base:test_switches",
     "//ui/base:test_support",

@@ -18,9 +18,7 @@ return html`<!--_html_template_start_-->
     .count="${this.bookmark.children?.length}"
     .title="${this.bookmark.title}"
     .description="${this.getBookmarkDescription_(this.bookmark)}"
-    .descriptionMeta="${this.getBookmarkDescriptionMeta_()}"
     .itemAriaLabel="${this.getBookmarkA11yLabel_()}"
-    .itemAriaDescription="${this.getBookmarkA11yDescription_()}"
     @click="${this.onClick_}"
     @auxclick="${this.onAuxclick_}"
     @contextmenu="${this.onContextmenu_}"
@@ -50,24 +48,10 @@ return html`<!--_html_template_start_-->
         class="stroked"
         @change="${this.onInputChange_}" @blur="${this.onInputBlur_}"
         @keydown="${this.onInputKeydown_}"
-        .ariaLabel="${this.getBookmarkA11yLabel_()}"
-        .ariaDescription="${this.getBookmarkA11yDescription_()}">
+        .ariaLabel="${this.getBookmarkA11yLabel_()}">
     </cr-input>` : ''}
 
   ${this.showTrailingIcon_() ? html`
-    ${this.isPriceTracked ? html`
-    <sp-list-item-badge slot="badges"
-        ?was-updated="${this.showDiscountedPrice_()}">
-      <cr-icon
-          icon="${this.webuiRoundedIconsEnabled_
-              ? 'bookmarks:notifications-active'
-              : 'bookmarks:price-tracking-old'}"></cr-icon>
-      <div>${this.getCurrentPrice_(this.bookmark)}</div>
-      <div slot="previous-badge" ?hidden="${!this.showDiscountedPrice_()}">
-        ${this.getPreviousPrice_(this.bookmark)}
-      </div>
-    </sp-list-item-badge>
-  ` : ''}
     <cr-icon-button slot="suffix" iron-icon="cr:more-vert"
         @click="${this.onTrailingIconClick_}"
         .title="${this.trailingIconTooltip}"
@@ -81,14 +65,6 @@ return html`<!--_html_template_start_-->
             ? 'bookmarks:toolbar'
             : 'bookmarks:bookmarks-bar-old'}"></cr-icon>
   ` :''}
-
-  ${this.isShoppingCollection_() ? html`
-    <cr-icon slot="folder-icon"
-        icon="${this.webuiRoundedIconsEnabled_
-            ? 'bookmarks:shopping-bag'
-            : 'bookmarks:shopping-collection-old'}">
-    </cr-icon>
-  ` : ''}
 </cr-url-list-item>
 <!--_html_template_end_-->`;
 }

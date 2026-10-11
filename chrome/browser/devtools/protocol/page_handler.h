@@ -41,8 +41,6 @@ class PageHandler : public protocol::Page::Backend {
       std::optional<bool> enable_file_chooser_opened_event) override;
   protocol::Response Disable() override;
   protocol::Response SetAdBlockingEnabled(bool enabled) override;
-  protocol::Response SetSPCTransactionMode(
-      const protocol::String& mode) override;
   protocol::Response SetRPHRegistrationMode(
       const protocol::String& mode) override;
   void PrintToPDF(std::optional<bool> landscape,

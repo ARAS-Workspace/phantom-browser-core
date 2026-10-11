@@ -58,11 +58,8 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/features_generated.h"
 #include "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom.h"
-#include "third_party/blink/public/mojom/facilitated_payments/payment_link_handler.mojom.h"
 #include "third_party/blink/public/mojom/lcp_critical_path_predictor/lcp_critical_path_predictor.mojom.h"
 #include "third_party/blink/public/mojom/loader/navigation_predictor.mojom.h"
-#include "third_party/blink/public/mojom/payments/payment_request.mojom.h"
-#include "third_party/blink/public/mojom/payments/secure_payment_confirmation_service.mojom.h"
 #include "third_party/blink/public/mojom/persistent_renderer_prefs.mojom.h"
 #include "third_party/blink/public/mojom/prerender/prerender.mojom.h"
 #include "third_party/blink/public/public_buildflags.h"
@@ -79,7 +76,6 @@
 #endif
 
 #include "chrome/browser/badging/badge_manager.h"
-#include "chrome/browser/payments/payment_request_factory.h"
 #include "chrome/browser/prefs/persistent_renderer_prefs_manager.h"
 
 #if BUILDFLAG(IS_MAC)
@@ -310,9 +306,6 @@ void PopulateChromeFrameBinders(
       &badging::BadgeManager::BindFrameReceiverIfAllowed);
   map->Add<blink::mojom::PersistentRendererPrefsService>(
       &PersistentRendererPrefsManager::BindFrameReceiver);
-  if (base::FeatureList::IsEnabled(features::kWebPayments)) {
-    map->Add<payments::mojom::PaymentRequest>(&payments::CreatePaymentRequest);
-  }
 
 #if BUILDFLAG(IS_MAC)
   map->Add<blink::mojom::ShareService>(&ShareServiceImpl::Create);

@@ -23,7 +23,7 @@ BASE_FEATURE(kLanguageDetectionModelForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<std::string> kLanguageDetectionModelForTestingPath{
     &kLanguageDetectionModelForTesting, "path",
-    "components/test/data/translate/valid_model.tflite"};
+    "components/test/data/language_detection/valid_model.tflite"};
 
 LanguageDetectionModel& GetLanguageDetectionModel() {
   static base::NoDestructor<LanguageDetectionModel> instance;

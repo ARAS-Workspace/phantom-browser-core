@@ -63,8 +63,6 @@
 #include "chrome/browser/media/webrtc/media_device_salt_service_factory.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
-#include "chrome/browser/payments/browser_binding/browser_bound_key_deleter_service_factory.h"
-#include "chrome/browser/payments/browser_binding/mock_browser_bound_key_deleter_service.h"
 #include "chrome/browser/permissions/permission_actions_history_factory.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
@@ -133,7 +131,6 @@
 #include "components/password_manager/core/browser/password_store/mock_smart_bubble_stats_store.h"
 #include "components/password_manager/core/browser/password_store/password_store_consumer.h"
 #include "components/password_manager/core/browser/password_store/password_store_interface.h"
-#include "components/payments/content/mock_web_payments_web_data_service.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_actions_history.h"
@@ -3329,69 +3326,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateWithAccountPasswordsTest,
       "");
 }
 
-class
-    ChromeBrowsingDataRemoverDelegateTest_RemoveSecurePaymentConfirmationCredentials
-    : public ChromeBrowsingDataRemoverDelegateTest {
- public:
-  using MockWrapper = testing::NiceMock<payments::MockWebDataServiceWrapper>;
-  using MockService =
-      testing::NiceMock<payments::MockWebPaymentsWebDataService>;
-
-  TestingProfile::TestingFactories GetTestingFactories() override {
-    TestingProfile::TestingFactories factories =
-        ChromeBrowsingDataRemoverDelegateTest::GetTestingFactories();
-    factories.emplace_back(
-        webdata_services::WebDataServiceWrapperFactory::GetInstance(),
-        base::BindLambdaForTesting([&](content::BrowserContext* context)
-                                       -> std::unique_ptr<KeyedService> {
-          auto wrapper = std::make_unique<MockWrapper>();
-          ON_CALL(*wrapper, GetWebPaymentsWebData)
-              .WillByDefault(Return(service_));
-          return std::move(wrapper);
-        }));
-    return factories;
-  }
-
-  void ExpectCallClearSecurePaymentConfirmationCredentials(int times) {
-    EXPECT_CALL(*service_.get(), ClearSecurePaymentConfirmationCredentials)
-        .Times(times)
-        .WillRepeatedly(testing::WithArg<2>([](base::OnceClosure completion) {
-          base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-              FROM_HERE, std::move(completion));
-        }));
-  }
-
-  void ExpectNoCallsToClearSecurePaymentConfirmationCredentials() {
-    EXPECT_CALL(*service_.get(), ClearSecurePaymentConfirmationCredentials)
-        .Times(0);
-  }
-
- private:
-  scoped_refptr<MockService> service_ = base::MakeRefCounted<MockService>();
-};
-
-// Verify that clearing secure payment confirmation credentials data works when
-// deleting passwords.
-TEST_F(
-    ChromeBrowsingDataRemoverDelegateTest_RemoveSecurePaymentConfirmationCredentials,
-    RemoveSecurePaymentConfirmationCredentials_DeletePasswords) {
-  ExpectCallClearSecurePaymentConfirmationCredentials(1);
-
-  BlockUntilBrowsingDataRemoved(AnHourAgo(), base::Time::Max(),
-                                constants::DATA_TYPE_PASSWORDS, false);
-}
-
-// Verify that clearing secure payment confirmation credentials data works when
-// deleting forms data.
-TEST_F(
-    ChromeBrowsingDataRemoverDelegateTest_RemoveSecurePaymentConfirmationCredentials,
-    RemoveSecurePaymentConfirmationCredentials_DeleteFormData) {
-  ExpectCallClearSecurePaymentConfirmationCredentials(1);
-
-  BlockUntilBrowsingDataRemoved(AnHourAgo(), base::Time::Max(),
-                                constants::DATA_TYPE_FORM_DATA, false);
-}
-
 TEST_F(ChromeBrowsingDataRemoverDelegateTest,
        RevokeActiveFileSystemPermission) {
   ChromeFileSystemAccessPermissionContext* context =
@@ -3479,56 +3413,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, ClearNewTabPageLocalStorage) {
   local_storage_control->GetUsage(usage_future.GetCallback());
   EXPECT_EQ(usage_future.Get().size(), 0u);
   EXPECT_TRUE(auth_service->GetAccessToken().empty());
-}
-
-// Verify that clearing cookies will also trigger removing invalid browser bound
-// keys.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       ClearInvalidBrowserBoundKeyForSecurePaymentConfirmation) {
-  auto* mock_browser_bound_key_deleter =
-      static_cast<payments::MockBrowserBoundKeyDeleterService*>(
-          payments::BrowserBoundKeyDeleterServiceFactory::GetInstance()
-              ->SetTestingFactoryAndUse(
-                  GetProfile(),
-                  base::BindOnce([](content::BrowserContext*)
-                                     -> std::unique_ptr<KeyedService> {
-                    return std::make_unique<
-                        payments::MockBrowserBoundKeyDeleterService>();
-                  })));
-
-  EXPECT_CALL(*mock_browser_bound_key_deleter, RemoveInvalidBBKs());
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                                false);
-}
-
-// Verify that clearing cookies will not trigger removing browser bound keys
-// when most origins and domains do not match.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DoesNotClearBrowserBoundKey_WhenMatchesMostOriginsAndDomainsIsFalse) {
-  auto* mock_browser_bound_key_deleter =
-      static_cast<payments::MockBrowserBoundKeyDeleterService*>(
-          payments::BrowserBoundKeyDeleterServiceFactory::GetInstance()
-              ->SetTestingFactoryAndUse(
-                  GetProfile(),
-                  base::BindOnce([](content::BrowserContext*)
-                                     -> std::unique_ptr<KeyedService> {
-                    return std::make_unique<
-                        payments::MockBrowserBoundKeyDeleterService>();
-                  })));
-
-  // Create a filter builder that results in MatchesMostOriginsAndDomains()
-  // returning false.
-  std::unique_ptr<BrowsingDataFilterBuilder> filter_builder =
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kPreserve);
-  filter_builder->SetPartitionedCookiesOnly(true);
-  ASSERT_FALSE(filter_builder->MatchesMostOriginsAndDomains());
-
-  EXPECT_CALL(*mock_browser_bound_key_deleter, RemoveInvalidBBKs()).Times(0);
-  BlockUntilOriginDataRemoved(base::Time::Min(), base::Time::Max(),
-                              content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                              std::move(filter_builder));
 }
 
 class ChromeBrowsingDataRemoverDelegateOriginTrialsTest

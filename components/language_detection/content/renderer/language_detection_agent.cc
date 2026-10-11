@@ -8,19 +8,12 @@
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/metrics/histogram_macros.h"
-#include "base/no_destructor.h"
 #include "base/task/task_traits.h"
 #include "base/task/thread_pool.h"
 #include "base/trace_event/trace_event.h"
-#include "components/language_detection/content/renderer/language_detection_model_manager.h"
 #include "components/language_detection/core/constants.h"
-#include "components/language_detection/core/features.h"
 #include "components/language_detection/core/language_detection_metrics.h"
-#include "components/language_detection/core/language_detection_model.h"
-#include "components/language_detection/core/language_detection_provider.h"
 #include "components/language_detection/core/language_detection_util.h"
-#include "components/language_detection/core/page_language_detector.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/common/url_constants.h"
 #include "content/public/renderer/render_frame.h"
@@ -39,16 +32,6 @@ namespace {
 
 // The current CLD model version.
 constexpr char kCLDModelVersion[] = "CLD3";
-
-// Returns the page language detector that is shared across the RenderFrames
-// in the renderer. Named apart from
-// language_detection::GetLanguageDetectionModel so that unqualified lookup
-// inside namespace language_detection finds this one.
-language_detection::PageLanguageDetector& GetSharedModelWrapper() {
-  static base::NoDestructor<language_detection::PageLanguageDetector> instance(
-      language_detection::GetLanguageDetectionModel());
-  return *instance;
-}
 
 // Returns if the language detection should be overridden so that a default
 // result is returned immediately.
@@ -79,41 +62,12 @@ namespace language_detection {
 
 LanguageDetectionAgent::LanguageDetectionAgent(
     content::RenderFrame* render_frame)
-    : content::RenderFrameObserver(render_frame),
-      waiting_for_first_foreground_(render_frame->IsHidden()),
-      language_detection_model_(&GetSharedModelWrapper()),
-      language_detection_model_manager_(
-          language_detection_model_->tflite_model()) {
-  if (!features::IsTFLiteLanguageDetectionEnabled()) {
-    return;
-  }
-
-  // If the language detection model is available, we do not
-  // worry about requesting the model.
-  if (language_detection_model_->IsAvailable()) {
-    return;
-  }
-
-  UMA_HISTOGRAM_BOOLEAN("LanguageDetection.TFLiteModel.WasModelRequestDeferred",
-                        waiting_for_first_foreground_);
-
-  // Ensure the render frame is visible, otherwise the browser-side
-  // driver may not exist yet (https://crbug.com/1199397).
-  if (!waiting_for_first_foreground_) {
-    RequestModel();
-  }
-}
+    : content::RenderFrameObserver(render_frame) {}
 
 LanguageDetectionAgent::~LanguageDetectionAgent() = default;
 
 void LanguageDetectionAgent::SetDetectionCallback(DetectionCallback callback) {
   detection_callback_ = std::move(callback);
-}
-
-void LanguageDetectionAgent::SeedLanguageDetectionModelForTesting(
-    base::File model_file) {
-  language_detection_model_->tflite_model().UpdateWithFile(
-      std::move(model_file));
 }
 
 void LanguageDetectionAgent::PrepareForNewDocument() {
@@ -219,26 +173,6 @@ void LanguageDetectionAgent::RunLanguageDetection(
     // only use page-provided languages.
     language = DeterminePageLanguageNoModel(
         content_language, html_lang, LanguageVerificationType::kNoPageContent);
-  } else if (features::IsTFLiteLanguageDetectionEnabled()) {
-    // Use TFLite and page contents to assist with language detection.
-    bool is_available = language_detection_model_->IsAvailable();
-    language = is_available ? language_detection_model_->DeterminePageLanguage(
-                                  content_language, html_lang, contents,
-                                  &model_detected_language, &is_model_reliable,
-                                  model_reliability_score)
-                            // If the model is not available do not run language
-                            // detection and only use page-provided languages.
-                            : DeterminePageLanguageNoModel(
-                                  content_language, html_lang,
-                                  LanguageVerificationType::kModelNotAvailable);
-    UMA_HISTOGRAM_BOOLEAN(
-        "LanguageDetection.TFLiteModel.WasModelAvailableForDetection",
-        is_available);
-    UMA_HISTOGRAM_BOOLEAN(
-        "LanguageDetection.TFLiteModel.WasModelUnavailableDueToDeferredLoad",
-        !is_available && waiting_for_first_foreground_);
-    detection_model_version = language_detection_model_->GetModelVersion();
-    details.has_run_lang_detection = true;
   } else {
     // Use CLD3 and page contents to assist with language detection.
     language = DeterminePageLanguage(
@@ -309,39 +243,8 @@ LanguageDetectionAgent::GetHost() {
   return host_;
 }
 
-void LanguageDetectionAgent::WasShown() {
-  // Check if the the render frame was initially hidden and
-  // the model request was delayed until the frame was in
-  // the foreground.
-  if (!waiting_for_first_foreground_) {
-    return;
-  }
-
-  waiting_for_first_foreground_ = false;
-
-  if (!features::IsTFLiteLanguageDetectionEnabled()) {
-    return;
-  }
-
-  if (language_detection_model_->IsAvailable()) {
-    return;
-  }
-  // The model request was deferred because the frame was hidden
-  // and now the model is visible and the model is still not available.
-  // The browser-side translate driver should always be available at
-  // this point so we should make the request and race to get the
-  // model loaded for when the page content is available.
-  RequestModel();
-}
-
 void LanguageDetectionAgent::OnDestruct() {
   delete this;
-}
-
-void LanguageDetectionAgent::RequestModel() {
-  language_detection_model_manager_.GetLanguageDetectionModel(
-      render_frame()->GetBrowserInterfaceBroker(),
-      base::BindOnce([](LanguageDetectionModel* model) {}));
 }
 
 }  // namespace language_detection

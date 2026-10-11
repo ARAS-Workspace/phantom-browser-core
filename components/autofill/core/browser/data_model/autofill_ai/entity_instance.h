@@ -59,7 +59,6 @@ struct AutofillFormatString;
 class EntityInstance;
 class EntityInstanceTestApi;
 class EntityTable;
-class WalletPassAccessManagerImpl;
 
 // An attribute instance is a typed string value with additional metadata.
 //
@@ -199,7 +198,6 @@ class AttributeInstance final {
    private:
     MarkAsMaskedPasskey() = default;
     friend class EntityTable;
-    friend class WalletPassAccessManagerImpl;
     friend class FakeWalletPassAccessManager;
     friend std::optional<EntityInstance> CreateEntityInstanceFromSpecifics(
         const sync_pb::AutofillValuableSpecifics&);

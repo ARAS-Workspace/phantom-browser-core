@@ -38,10 +38,8 @@
 #include "components/services/storage/public/mojom/service_worker_database.mojom-forward.h"
 #include "content/browser/back_forward_cache/back_forward_cache_can_store_document_result.h"
 #include "content/browser/bad_message.h"
-#include "content/browser/connection_allowlist_utils.h"
 #include "content/browser/renderer_host/local_network_access_util.h"
 #include "content/browser/security/cpsp/child_process_security_policy_impl.h"
-#include "content/browser/service_worker/payment_handler_support.h"
 #include "content/browser/service_worker/service_worker_client.h"
 #include "content/browser/service_worker/service_worker_consts.h"
 #include "content/browser/service_worker/service_worker_container_host.h"
@@ -79,9 +77,6 @@
 
 namespace content {
 namespace {
-
-// Timeout for the payment handler connection.
-constexpr base::TimeDelta kPaymentHandlerTimeout = base::Minutes(20);
 
 // Timeout for an installed worker to start.
 constexpr base::TimeDelta kStartInstalledWorkerTimeout = base::Seconds(60);
@@ -1878,99 +1873,6 @@ void ServiceWorkerVersion::OpenNewTab(const GURL& url,
              std::move(callback));
 }
 
-void ServiceWorkerVersion::OpenPaymentHandlerWindow(
-    const GURL& url,
-    OpenPaymentHandlerWindowCallback callback) {
-  // Just respond failure if we are shutting down.
-  if (!context_) {
-    std::move(callback).Run(
-        false /* success */, nullptr /* client */,
-        std::string("The service worker system is shutting down."));
-    return;
-  }
-
-  if (ancestor_frame_type_ == blink::mojom::AncestorFrameType::kFencedFrame) {
-    associated_interface_receiver_.ReportBadMessage(
-        "Received PaymentRequestEvent#openWindow() request from a fenced "
-        "frame.");
-    receiver_.reset();
-    return;
-  }
-
-  if (!url.is_valid() || !key_.origin().IsSameOriginWith(url)) {
-    associated_interface_receiver_.ReportBadMessage(
-        "Received PaymentRequestEvent#openWindow() request for a cross-origin "
-        "URL.");
-    receiver_.reset();
-    return;
-  }
-
-  if (!HasPendingPaymentRequestEvent()) {
-    associated_interface_receiver_.ReportBadMessage(
-        "Received PaymentRequestEvent#openWindow() request without a pending "
-        "PaymentRequestEvent.");
-    receiver_.reset();
-    return;
-  }
-
-  // `PaymentHandlerSupport::ShowPaymentHandlerWindow` implements API
-  // `PaymentRequestEvent: openWindow()` with two different paths.
-  // - Main path: Uses `PaymentHandlerWebFlowViewController` to open the window.
-  // - Fallback path: If the main path fails, it falls back to use
-  //   `ServiceWorkerVersion::OpenWindow`, which eventually calls
-  //   `service_worker_client_utils::OpenWindow`.
-  //
-  // `service_worker_client_utils::OpenWindow` also performs the
-  // `ConnectionAllowlistAllowsUrlAndReportIfNeeded` check. This means in the
-  // fallback case, the allowlist check might run twice. This redundancy does
-  // not impact performance. It is necessary to have the check here for
-  // covering the main path.
-  network::mojom::NetworkContext* network_context = nullptr;
-  if (context_ && context_->wrapper() &&
-      context_->wrapper()->storage_partition()) {
-    network_context =
-        context_->wrapper()->storage_partition()->GetNetworkContext();
-  }
-
-  if (policy_container_host() &&
-      !ConnectionAllowlistAllowsUrlAndReportIfNeeded(
-          policy_container_host()->policies(), url, network_context,
-          key().ToPartialNetIsolationInfo().network_anonymization_key(),
-          reporting_source())) {
-    // The request URL is not allowed by the Service Worker's Connection
-    // Allowlist. See: https://github.com/WICG/connection-allowlists.
-    std::move(callback).Run(
-        /*success=*/false, /*client=*/nullptr,
-        url.spec() + " is blocked by Connection Allowlist.");
-    return;
-  }
-
-  PaymentHandlerSupport::ShowPaymentHandlerWindow(
-      url, context_.get(),
-      base::BindOnce(&ServiceWorkerVersion::DidShowPaymentHandlerWindow,
-                     weak_factory_.GetWeakPtr(), url, key_, context_),
-      base::BindOnce(
-          &ServiceWorkerVersion::OpenWindow, weak_factory_.GetWeakPtr(), url,
-          service_worker_client_utils::WindowType::PAYMENT_HANDLER_WINDOW),
-      std::move(callback));
-}
-
-bool ServiceWorkerVersion::HasPendingPaymentRequestEvent() {
-  // Despite using a const_iterator, this method cannot be const because
-  // base::IDMap::Iterator always modifies the Map object it is iterating
-  // over (to update bookkeeping state).
-  base::IDMap<std::unique_ptr<InflightRequest>>::const_iterator iter(
-      &inflight_requests_);
-  while (!iter.IsAtEnd()) {
-    if (iter.GetCurrentValue()->event_type ==
-        ServiceWorkerMetrics::EventType::PAYMENT_REQUEST) {
-      return true;
-    }
-    iter.Advance();
-  }
-  return false;
-}
-
 bool ServiceWorkerVersion::HasPendingWindowInteractionEvent() {
   // Despite using a const_iterator, this method cannot be const because
   // base::IDMap::Iterator always modifies the Map object it is iterating
@@ -2018,58 +1920,6 @@ bool ServiceWorkerVersion::HasPendingWindowInteractionEvent() {
     iter.Advance();
   }
   return false;
-}
-
-void ServiceWorkerVersion::DidShowPaymentHandlerWindow(
-    const GURL& url,
-    const blink::StorageKey& key,
-    const base::WeakPtr<ServiceWorkerContextCore>& context,
-    blink::mojom::ServiceWorkerHost::OpenPaymentHandlerWindowCallback callback,
-    bool success,
-    int render_process_id,
-    int render_frame_id) {
-  if (success) {
-    payment_handler_connected_ = true;
-    // Start the timeout timer for the payment handler connection.
-    payment_handler_timeout_timer_.Start(
-        FROM_HERE, kPaymentHandlerTimeout,
-        base::BindOnce(&ServiceWorkerVersion::OnPaymentHandlerTimeout,
-                       weak_factory_.GetWeakPtr()));
-    service_worker_client_utils::DidNavigate(
-        context, url, key,
-        base::BindOnce(&OnOpenWindowFinished, std::move(callback)),
-        GlobalRenderFrameHostId(render_process_id, render_frame_id));
-  } else {
-    OnOpenWindowFinished(std::move(callback),
-                         blink::ServiceWorkerStatusCode::kErrorFailed,
-                         nullptr /* client_info */);
-  }
-}
-
-void ServiceWorkerVersion::OnPaymentHandlerDisconnect() {
-  if (!payment_handler_connected_) {
-    return;
-  }
-  DisconnectPaymentHandler(/*is_timeout=*/false);
-}
-
-void ServiceWorkerVersion::OnPaymentHandlerTimeout() {
-  if (!payment_handler_connected_) {
-    return;
-  }
-  DisconnectPaymentHandler(/*is_timeout=*/true);
-}
-
-void ServiceWorkerVersion::DisconnectPaymentHandler(bool is_timeout) {
-  // Stop the timeout timer if it's running.
-  if (payment_handler_timeout_timer_.IsRunning()) {
-    payment_handler_timeout_timer_.Stop();
-  }
-
-  payment_handler_connected_ = false;
-  // Record UMA indicating whether the disconnect was due to a timeout.
-  base::UmaHistogramBoolean("ServiceWorker.PaymentHandler.DisconnectTimeout",
-                            is_timeout);
 }
 
 void ServiceWorkerVersion::PostMessageToClient(
@@ -2876,13 +2726,6 @@ void ServiceWorkerVersion::OnTimeoutTimer() {
       << static_cast<int>(running_status());
 
   if (!context_) {
-    return;
-  }
-
-  // Suppress timeout while a Payment Handler window is open.
-  if (base::FeatureList::IsEnabled(
-          features::kServiceWorkerSuppressTimeoutWhenPaymentWindowOpen) &&
-      payment_handler_connected_) {
     return;
   }
 

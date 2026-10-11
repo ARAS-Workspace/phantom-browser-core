@@ -60,9 +60,6 @@
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX)
-#include "sandbox/policy/linux/bpf_on_device_translation_policy_linux.h"
-#endif  // BUILDFLAG(IS_LINUX)
 
 using sandbox::bpf_dsl::Allow;
 using sandbox::bpf_dsl::ResultExpr;
@@ -187,8 +184,6 @@ std::unique_ptr<BPFBasePolicy> SandboxSeccompBPF::PolicyForSandboxType(
     case sandbox::mojom::Sandbox::kSpeechRecognition:
       return std::make_unique<SpeechRecognitionProcessPolicy>();
 #if BUILDFLAG(IS_LINUX)
-    case sandbox::mojom::Sandbox::kOnDeviceTranslation:
-      return std::make_unique<OnDeviceTranslationProcessPolicy>();
     case sandbox::mojom::Sandbox::kScreenAI:
       return std::make_unique<ScreenAIProcessPolicy>();
     case sandbox::mojom::Sandbox::kShapeDetection:
@@ -260,7 +255,6 @@ void SandboxSeccompBPF::RunSandboxSanityChecks(
 #if BUILDFLAG(IS_LINUX)
     case sandbox::mojom::Sandbox::kShapeDetection:
     case sandbox::mojom::Sandbox::kScreenAI:
-    case sandbox::mojom::Sandbox::kOnDeviceTranslation:
 #endif  // BUILDFLAG(IS_LINUX)
     case sandbox::mojom::Sandbox::kAudio:
     case sandbox::mojom::Sandbox::kService:

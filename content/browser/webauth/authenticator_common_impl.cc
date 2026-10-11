@@ -1001,7 +1001,6 @@ bool AuthenticatorCommonImpl::IsFocused() const {
 void AuthenticatorCommonImpl::MakeCredential(
     url::Origin caller_origin,
     blink::mojom::PublicKeyCredentialCreationOptionsPtr options,
-    blink::mojom::PaymentOptionsPtr payment_options,
     MakeCredentialCallback callback) {
   base::RecordAction(base::UserMetricsAction("WebAuthn.MakeCredential.Start"));
   callback = base::BindOnce(
@@ -1019,9 +1018,7 @@ void AuthenticatorCommonImpl::MakeCredential(
   req_state_->response_callback = std::move(callback);
   req_state_->hints = options->hints;
 
-  if (options->is_payment_credential_creation) {
-    req_state_->mode = AuthenticationRequestMode::kPayment;
-  } else if (options->is_conditional) {
+  if (options->is_conditional) {
     req_state_->mode = AuthenticationRequestMode::kPasskeyUpgrade;
   } else {
     req_state_->mode = AuthenticationRequestMode::kModalWebAuthn;
@@ -1030,9 +1027,7 @@ void AuthenticatorCommonImpl::MakeCredential(
   BeginRequestTimeout(options->timeout);
 
   WebAuthRequestSecurityChecker::RequestType request_type =
-      options->is_payment_credential_creation
-          ? WebAuthRequestSecurityChecker::RequestType::kMakePaymentCredential
-          : WebAuthRequestSecurityChecker::RequestType::kMakeCredential;
+      WebAuthRequestSecurityChecker::RequestType::kMakeCredential;
   bool is_cross_origin_iframe = false;
   blink::mojom::AuthenticatorStatus status =
       security_checker_->ValidateAncestorOrigins(caller_origin, request_type,
@@ -1080,8 +1075,7 @@ void AuthenticatorCommonImpl::MakeCredential(
           base::BindOnce(
               &AuthenticatorCommonImpl::ContinueMakeCredentialAfterRpIdCheck,
               weak_factory_.GetWeakPtr(), GetRequestKey(), caller_origin,
-              std::move(options), std::move(payment_options),
-              is_cross_origin_iframe));
+              std::move(options), is_cross_origin_iframe));
 
   // If `remote_validation` is nullptr then the request may already have
   // completed.
@@ -1094,7 +1088,6 @@ void AuthenticatorCommonImpl::ContinueMakeCredentialAfterRpIdCheck(
     RequestKey request_key,
     url::Origin caller_origin,
     blink::mojom::PublicKeyCredentialCreationOptionsPtr options,
-    blink::mojom::PaymentOptionsPtr payment_options,
     bool is_cross_origin_iframe,
     blink::mojom::AuthenticatorStatus rp_id_validation_result) {
   if (!CheckRequestKey(request_key)) {
@@ -1288,9 +1281,8 @@ void AuthenticatorCommonImpl::ContinueMakeCredentialAfterRpIdCheck(
     client_data_json_params.is_cross_origin_iframe =
         !options->remote_desktop_client_override->same_origin_with_ancestors;
   }
-  req_state_->client_data_json = BuildClientDataJsonWithPayment(
-      std::move(client_data_json_params), std::move(payment_options),
-      /*payment_rp=*/"");
+  req_state_->client_data_json =
+      BuildClientDataJson(std::move(client_data_json_params));
 
   req_state_->ctap_request = device::CtapMakeCredentialRequest(
       req_state_->client_data_json, options->relying_party, options->user,
@@ -1395,7 +1387,6 @@ void AuthenticatorCommonImpl::ContinueMakeCredentialAfterIsUvpaaOverrideCheck(
 void AuthenticatorCommonImpl::GetCredential(
     url::Origin caller_origin,
     blink::mojom::GetCredentialOptionsPtr options,
-    blink::mojom::PaymentOptionsPtr payment_options,
     GetCredentialCallback callback) {
   if (options->mediation == Mediation::CONDITIONAL) {
     base::RecordAction(
@@ -1437,7 +1428,7 @@ void AuthenticatorCommonImpl::GetCredential(
     }
 
     GetPasswordOnlyCredential(caller_origin, std::move(options),
-                              std::move(payment_options), std::move(callback));
+                              std::move(callback));
     return;
   }
 
@@ -1446,9 +1437,7 @@ void AuthenticatorCommonImpl::GetCredential(
 
   req_state_->response_callback = std::move(callback);
   // TODO(crbug.com/358119268): Add Ambient request mode for logging.
-  if (!payment_options.is_null()) {
-    req_state_->mode = AuthenticationRequestMode::kPayment;
-  } else if (options->mediation == Mediation::CONDITIONAL) {
+  if (options->mediation == Mediation::CONDITIONAL) {
     req_state_->mode = AuthenticationRequestMode::kConditional;
   } else if (options->mediation == Mediation::IMMEDIATE) {
     req_state_->mode = AuthenticationRequestMode::kImmediate;
@@ -1487,19 +1476,7 @@ void AuthenticatorCommonImpl::GetCredential(
   req_state_->mediation_ = options->mediation;
 
   WebAuthRequestSecurityChecker::RequestType request_type =
-      payment_options.is_null()
-          ? WebAuthRequestSecurityChecker::RequestType::kGetAssertion
-          : WebAuthRequestSecurityChecker::RequestType::
-                kGetPaymentCredentialAssertion;
-  if (!payment_options.is_null() &&
-      public_key_options->allow_credentials.empty()) {
-    mojo::ReportBadMessage(
-        "PaymentOptions with empty allow_credentials is invalid");
-    req_state_->request_outcome = GetAssertionOutcome::kOtherFailure;
-    CompleteGetAssertionRequest(
-        blink::mojom::AuthenticatorStatus::NOT_ALLOWED_ERROR);
-    return;
-  }
+      WebAuthRequestSecurityChecker::RequestType::kGetAssertion;
   bool is_cross_origin_iframe = false;
   blink::mojom::AuthenticatorStatus status =
       security_checker_->ValidateAncestorOrigins(caller_origin, request_type,
@@ -1548,8 +1525,7 @@ void AuthenticatorCommonImpl::GetCredential(
           base::BindOnce(
               &AuthenticatorCommonImpl::ContinueGetAssertionAfterRpIdCheck,
               weak_factory_.GetWeakPtr(), GetRequestKey(), caller_origin,
-              std::move(options), std::move(payment_options),
-              is_cross_origin_iframe));
+              std::move(options), is_cross_origin_iframe));
 
   // If `remote_validation` is nullptr then the request may already have
   // completed.
@@ -1561,7 +1537,6 @@ void AuthenticatorCommonImpl::GetCredential(
 void AuthenticatorCommonImpl::GetPasswordOnlyCredential(
     url::Origin caller_origin,
     blink::mojom::GetCredentialOptionsPtr options,
-    blink::mojom::PaymentOptionsPtr payment_options,
     GetCredentialCallback callback) {
   req_state_ = std::make_unique<RequestState>();
   req_state_->request_key = RequestKey(next_request_key_);
@@ -1660,7 +1635,6 @@ void AuthenticatorCommonImpl::ContinueGetAssertionAfterRpIdCheck(
     RequestKey request_key,
     url::Origin caller_origin,
     blink::mojom::GetCredentialOptionsPtr options,
-    blink::mojom::PaymentOptionsPtr payment_options,
     bool is_cross_origin_iframe,
     blink::mojom::AuthenticatorStatus rp_id_validation_result) {
   if (!CheckRequestKey(request_key)) {
@@ -1796,9 +1770,7 @@ void AuthenticatorCommonImpl::ContinueGetAssertionAfterRpIdCheck(
       webauthn::ClientDataRequestType::kWebAuthnGet, caller_origin,
       GetRenderFrameHost()->GetOutermostMainFrame()->GetLastCommittedOrigin(),
       public_key_options->challenge, is_cross_origin_iframe);
-  if (payment_options) {
-    client_data_json_params.type = webauthn::ClientDataRequestType::kPaymentGet;
-  } else if (public_key_options->extensions->remote_desktop_client_override) {
+  if (public_key_options->extensions->remote_desktop_client_override) {
     client_data_json_params.origin =
         public_key_options->extensions->remote_desktop_client_override->origin;
     client_data_json_params.is_cross_origin_iframe =
@@ -1806,9 +1778,8 @@ void AuthenticatorCommonImpl::ContinueGetAssertionAfterRpIdCheck(
              ->same_origin_with_ancestors;
   }
 
-  req_state_->client_data_json = BuildClientDataJsonWithPayment(
-      std::move(client_data_json_params), std::move(payment_options),
-      req_state_->relying_party_id);
+  req_state_->client_data_json =
+      BuildClientDataJson(std::move(client_data_json_params));
 
   if (options->mediation == Mediation::CONDITIONAL ||
       options->mediation == Mediation::AMBIENT ||
@@ -3235,10 +3206,6 @@ AuthenticatorRequestClientDelegate::RequestSource
 AuthenticatorCommonImpl::RequestSource() const {
   if (serving_requests_for_ == ServingRequestsFor::kInternalUses) {
     return AuthenticatorRequestClientDelegate::RequestSource::kInternal;
-  }
-  if (req_state_->mode == AuthenticationRequestMode::kPayment) {
-    return AuthenticatorRequestClientDelegate::RequestSource::
-        kSecurePaymentConfirmation;
   }
   return AuthenticatorRequestClientDelegate::RequestSource::kWebAuthentication;
 }

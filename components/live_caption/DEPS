@@ -5,7 +5,6 @@ include_rules = [
   "+media",
   "+testing/gmock",
   "+testing/gtest",
-  "+third_party/blink/public/mojom/on_device_translation",
   "+ui/base",
   "+ui/native_theme",
 ]

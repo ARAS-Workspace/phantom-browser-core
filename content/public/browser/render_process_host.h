@@ -46,7 +46,6 @@
 #include "third_party/blink/public/mojom/indexeddb/indexeddb.mojom-forward.h"
 #include "third_party/blink/public/mojom/locks/lock_manager.mojom-forward.h"
 #include "third_party/blink/public/mojom/notifications/notification_service.mojom-forward.h"
-#include "third_party/blink/public/mojom/payments/payment_app.mojom-forward.h"
 #include "third_party/blink/public/mojom/permissions/permission.mojom-forward.h"
 #include "third_party/blink/public/mojom/quota/quota_manager_host.mojom-forward.h"
 #include "third_party/blink/public/mojom/websockets/websocket_connector.mojom-forward.h"
@@ -683,9 +682,6 @@ class CONTENT_EXPORT RenderProcessHost : public IPC::Listener,
   virtual void CreatePermissionService(
       const url::Origin& origin,
       mojo::PendingReceiver<blink::mojom::PermissionService> receiver) = 0;
-  virtual void CreatePaymentManagerForOrigin(
-      const url::Origin& origin,
-      mojo::PendingReceiver<payments::mojom::PaymentManager> receiver) = 0;
   // `rfh_id` is the id for RenderFrameHost for the `receiver` if
   // the notification service is created by a document, or the id for the
   // ancestor RenderFrameHost of the worker if the notification service is

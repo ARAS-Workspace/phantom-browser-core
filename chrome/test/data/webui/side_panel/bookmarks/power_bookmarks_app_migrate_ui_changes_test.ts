@@ -8,7 +8,6 @@ import 'chrome://bookmarks-side-panel.top-chrome/power_bookmarks_app.js';
 import {ActionSource, SortOrder, ViewType} from 'chrome://bookmarks-side-panel.top-chrome/bookmarks.mojom-webui.js';
 import {BookmarksApiProxyImpl} from 'chrome://bookmarks-side-panel.top-chrome/bookmarks_api_proxy.js';
 import type {PowerBookmarksAppElement} from 'chrome://bookmarks-side-panel.top-chrome/power_bookmarks_app.js';
-import {browserProxyFactory as priceTrackingBrowserProxyFactory, PriceTrackingHandlerRemote} from 'chrome://resources/cr_components/commerce/price_tracking.mojom-webui.js';
 import {PageImageServiceBrowserProxy} from 'chrome://resources/cr_components/page_image_service/browser_proxy.js';
 import {PageImageServiceHandlerRemote} from 'chrome://resources/cr_components/page_image_service/page_image_service.mojom-webui.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
@@ -22,7 +21,6 @@ import {TestBookmarksApiProxy} from './test_bookmarks_api_proxy.js';
 suite('MigrateUiChangesUseBrowserEditDialog', () => {
   let powerBookmarksApp: PowerBookmarksAppElement;
   let bookmarksApi: TestBookmarksApiProxy;
-  const priceTrackingHandler = TestMock.fromClass(PriceTrackingHandlerRemote);
   let imageServiceHandler: TestMock<PageImageServiceHandlerRemote>&
       PageImageServiceHandlerRemote;
 
@@ -32,20 +30,6 @@ suite('MigrateUiChangesUseBrowserEditDialog', () => {
     bookmarksApi = new TestBookmarksApiProxy();
     bookmarksApi.setAllBookmarks(structuredClone(createTestBookmarks()));
     BookmarksApiProxyImpl.setInstance(bookmarksApi);
-
-    priceTrackingHandler.reset();
-    priceTrackingHandler.setResultFor(
-        'getAllPriceTrackedBookmarkProductInfo',
-        Promise.resolve({productInfos: []}));
-    priceTrackingHandler.setResultFor(
-        'getAllShoppingBookmarkProductInfo',
-        Promise.resolve({productInfos: []}));
-    priceTrackingHandler.setResultFor(
-        'getShoppingCollectionBookmarkFolderId',
-        Promise.resolve({collectionId: BigInt(-1)}));
-    const {instance} =
-        priceTrackingBrowserProxyFactory.createForTest(priceTrackingHandler);
-    priceTrackingBrowserProxyFactory.setInstance(instance);
 
     imageServiceHandler = TestMock.fromClass(PageImageServiceHandlerRemote);
     PageImageServiceBrowserProxy.setInstance(
@@ -78,8 +62,7 @@ suite('MigrateUiChangesUseBrowserEditDialog', () => {
     // Open the context menu.
     contextMenu.showAtPosition(
         new MouseEvent('click'),
-        [getBookmarkWithId(powerBookmarksApp, bookmarkId)!], false, false,
-        false, 1);
+        [getBookmarkWithId(powerBookmarksApp, bookmarkId)!], false, 1);
     await microtasksFinished();
 
     // Get the edit option in the menu.
@@ -114,7 +97,7 @@ suite('MigrateUiChangesUseBrowserEditDialog', () => {
 
     // Open the context menu.
     contextMenu.showAtPosition(
-        new MouseEvent('click'), bookmarks, false, false, false, 1);
+        new MouseEvent('click'), bookmarks, false, 1);
     await microtasksFinished();
 
     // Get the move option in the menu.

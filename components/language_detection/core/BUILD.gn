@@ -13,13 +13,9 @@ component("core") {
   configs = []
   configs = [ "//third_party/tflite:tflite_shim_config" ] + _configs
   sources = [
-    "background_file.cc",
-    "background_file.h",
     "chinese_script_classifier.cc",
     "chinese_script_classifier.h",
     "constants.h",
-    "features.cc",
-    "features.h",
     "language_detection_details.cc",
     "language_detection_details.h",
     "language_detection_driver.cc",
@@ -88,7 +84,6 @@ static_library("internals") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "background_file_unittest.cc",
     "chinese_script_classifier_test.cc",
     "language_detection_metrics_unittest.cc",
     "language_detection_model_unittest.cc",

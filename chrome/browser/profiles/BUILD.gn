@@ -7,7 +7,6 @@ import("//components/captive_portal/core/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/offline_pages/buildflags/features.gni")
-import("//components/on_device_translation/buildflags/features.gni")
 import("//components/signin/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 
@@ -609,7 +608,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/collaboration",
     "//chrome/browser/collaboration/comments",
     "//chrome/browser/collaboration/messaging",
-    "//chrome/browser/commerce",
     "//chrome/browser/consent_auditor",
     "//chrome/browser/content_index",
     "//chrome/browser/content_settings:content_settings_factory",
@@ -633,7 +631,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/history_clusters",
     "//chrome/browser/history_embeddings",
     "//chrome/browser/language",
-    "//chrome/browser/language_detection",
     "//chrome/browser/loader",
     "//chrome/browser/login_detection",
     "//chrome/browser/lookalikes",
@@ -654,8 +651,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/passage_embeddings",
     "//chrome/browser/password_manager",
     "//chrome/browser/password_manager/factories",
-    "//chrome/browser/payments",
-    "//chrome/browser/payments/browser_binding:browser_bound_key_deleter",
     "//chrome/browser/performance_manager",
     "//chrome/browser/permissions",
     "//chrome/browser/persisted_state_db",
@@ -670,7 +665,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/preloading/search_preload",
     "//chrome/browser/privacy",
     "//chrome/browser/privacy_sandbox:headers",
-    "//chrome/browser/private_ai",
     "//chrome/browser/private_insights",
     "//chrome/browser/private_verification_tokens",
     "//chrome/browser/reading_list",
@@ -718,18 +712,14 @@ source_set("profiles_extra_parts_impl") {
     "//components/autofill/content/browser",
     "//components/breadcrumbs/core:status",
     "//components/captive_portal/core:buildflags",
-    "//components/commerce/core:cart_db_content_proto",
-    "//components/commerce/core:commerce_subscription_db_content_proto",
-    "//components/commerce/core:feature_list",
-    "//components/commerce/core:persisted_state_db_content_proto",
     "//components/enterprise/content",
     "//components/manta",
     "//components/omnibox/browser",
     "//components/optimization_guide/core",
     "//components/password_manager/content/browser",
-    "//components/payments/content",
     "//components/permissions:permissions_common",
     "//components/policy/content",
+    "//components/session_proto_db:persisted_state_db_content_proto",
     "//components/signin/public/base",
     "//components/site_engagement/content",
     "//components/site_token_provider",
@@ -829,10 +819,6 @@ source_set("profiles_extra_parts_impl") {
 
   if (enterprise_data_controls) {
     deps += [ "//chrome/browser/enterprise/data_controls" ]
-  }
-
-  if (enable_on_device_translation) {
-    deps += [ "//chrome/browser/on_device_translation" ]
   }
 
   if (enable_dice_support) {
@@ -991,7 +977,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/startup",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
-    "//components/commerce/core:feature_list",
     "//components/universal_optout:features",
     "//components/user_manager",
     "//content/test:test_support",

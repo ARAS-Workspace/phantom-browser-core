@@ -138,7 +138,6 @@
 #include "components/language/core/common/locale_util.h"
 #include "components/metrics/metrics_service.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
-#include "components/payments/core/payment_request_metrics.h"
 #include "components/permissions/permission_manager.h"
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/profile_cloud_policy_manager.h"
@@ -688,8 +687,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   }
 
   NotifyProfileInitializationComplete();
-
-  RecordPrefValuesAfterProfileInitialization();
 
   HttpsFirstModeServiceFactory::GetForProfile(this);
 
@@ -1347,17 +1344,5 @@ void ProfileImpl::UpdateAiSubscriptionTierInStorage() {
     entry->SetAiSubscriptionTier(
         subscription_service ? subscription_service->GetAiSubscriptionTier()
                              : 0);
-  }
-}
-
-void ProfileImpl::RecordPrefValuesAfterProfileInitialization() {
-  // Measure whether users have the "Allow sites to check if you have payment
-  // methods saved" toggle enabled or disabled in chrome://settings/payments
-  //
-  // This is only relevant for regular profiles, as guest and incognito profiles
-  // do not have access to this settings page nor will any changes to the pref
-  // in those profiles affect future browsing sessions.
-  if (IsRegularProfile()) {
-    payments::RecordCanMakePaymentPrefMetrics(*GetPrefs(), "Startup");
   }
 }

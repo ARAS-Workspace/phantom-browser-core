@@ -63,10 +63,6 @@ namespace local_network_access {
 class IPAddressSpaceOverridesPrefsObserver;
 }  // namespace local_network_access
 
-namespace on_device_translation {
-class OnDeviceTranslationInstaller;
-}
-
 namespace smart_restart {
 class SmartRestartManager;
 class SmartRestartMetricsObserver;
@@ -225,9 +221,6 @@ class GlobalFeatures {
       unexportable_keys::UnexportableKeyObsoleteProfileGarbageCollector>
       unexportable_key_obsolete_profile_garbage_collector_;
 #endif  // BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
-
-  std::unique_ptr<on_device_translation::OnDeviceTranslationInstaller>
-      on_device_translation_installer_;
 
   std::unique_ptr<ProfileLaunchObserver> profile_launch_observer_;
 

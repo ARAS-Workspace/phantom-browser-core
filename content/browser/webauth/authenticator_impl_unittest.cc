@@ -227,13 +227,6 @@ TEST_F(AuthenticatorImplTest, ClientDataJSONSerialization) {
           false,
       },
       {
-          webauthn::ClientDataRequestType::kPaymentGet,
-          GetTestOrigin(),
-          GetTestOrigin(),
-          {1, 2, 3},
-          false,
-      },
-      {
           webauthn::ClientDataRequestType::kWebAuthnCreate,
           GetTestOrigin(),
           url::Origin::Create(GURL("https://toplevel.example")),
@@ -263,10 +256,6 @@ TEST_F(AuthenticatorImplTest, ClientDataJSONSerialization) {
       case webauthn::ClientDataRequestType::kWebAuthnGet:
         type_key = "type";
         expected_type = "webauthn.get";
-        break;
-      case webauthn::ClientDataRequestType::kPaymentGet:
-        type_key = "type";
-        expected_type = "payment.get";
         break;
     }
     ASSERT_TRUE(parsed->is_dict());

@@ -14,20 +14,12 @@ source_set("persisted_state_db") {
   deps = [
     "//base",
     "//chrome/browser/profiles:profile",
-    "//components/commerce/core:cart_db_content_proto",
-    "//components/commerce/core:commerce_subscription_db_content_proto",
-    "//components/commerce/core:discount_infos_db_content_proto",
-    "//components/commerce/core:parcel_tracking_db_content_proto",
-    "//components/commerce/core:persisted_state_db_content_proto",
     "//components/keyed_service/content",
     "//components/leveldb_proto",
     "//components/session_proto_db",
+    "//components/session_proto_db:persisted_state_db_content_proto",
     "//content/public/browser",
     "//third_party/leveldatabase",
-  ]
-  deps += [
-    "//components/commerce/core:coupon_db_content_proto",
-    "//components/commerce/core:discounts_db_content_proto",
   ]
 }
 
@@ -40,7 +32,7 @@ source_set("unit_tests") {
     ":persisted_state_db",
     "//base",
     "//chrome/test:test_support",
-    "//components/commerce/core:persisted_state_db_content_proto",
+    "//components/session_proto_db:persisted_state_db_content_proto",
     "//content/test:test_support",
     "//testing/gtest",
   ]

@@ -21,7 +21,7 @@ base::FilePath GetValidModelFilePath() {
   return source_root_dir.AppendASCII("components")
       .AppendASCII("test")
       .AppendASCII("data")
-      .AppendASCII("translate")
+      .AppendASCII("language_detection")
       .AppendASCII("valid_model.tflite");
 }
 

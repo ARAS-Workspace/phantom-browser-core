@@ -8,7 +8,6 @@ import {SortOrder, ViewType} from 'chrome://bookmarks-side-panel.top-chrome/book
 import type {BookmarksTreeNode} from 'chrome://bookmarks-side-panel.top-chrome/bookmarks.mojom-webui.js';
 import {BookmarksApiProxyImpl} from 'chrome://bookmarks-side-panel.top-chrome/bookmarks_api_proxy.js';
 import {NESTED_BOOKMARKS_BASE_MARGIN, NESTED_BOOKMARKS_MARGIN_PER_DEPTH} from 'chrome://bookmarks-side-panel.top-chrome/power_bookmark_row.js';
-import {browserProxyFactory as priceTrackingBrowserProxyFactory, PriceTrackingHandlerRemote} from 'chrome://resources/cr_components/commerce/price_tracking.mojom-webui.js';
 import {PageImageServiceBrowserProxy} from 'chrome://resources/cr_components/page_image_service/browser_proxy.js';
 import {PageImageServiceHandlerRemote} from 'chrome://resources/cr_components/page_image_service/page_image_service.mojom-webui.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
@@ -225,7 +224,6 @@ suite('TreeView', () => {
   const FOLDERS = createTestBookmarks();
   let powerBookmarksApp: PowerBookmarksAppElement;
   let bookmarksApi: TestBookmarksApiProxy;
-  const priceTrackingHandler = TestMock.fromClass(PriceTrackingHandlerRemote);
   let imageServiceHandler: TestMock<PageImageServiceHandlerRemote>&
       PageImageServiceHandlerRemote;
   let metrics: MetricsTracker;
@@ -246,20 +244,6 @@ suite('TreeView', () => {
     bookmarksApi = new TestBookmarksApiProxy();
     bookmarksApi.setAllBookmarks(structuredClone(FOLDERS));
     BookmarksApiProxyImpl.setInstance(bookmarksApi);
-
-    priceTrackingHandler.reset();
-    priceTrackingHandler.setResultFor(
-        'getAllPriceTrackedBookmarkProductInfo',
-        Promise.resolve({productInfos: []}));
-    priceTrackingHandler.setResultFor(
-        'getAllShoppingBookmarkProductInfo',
-        Promise.resolve({productInfos: []}));
-    priceTrackingHandler.setResultFor(
-        'getShoppingCollectionBookmarkFolderId',
-        Promise.resolve({collectionId: BigInt(-1)}));
-    const {instance} =
-        priceTrackingBrowserProxyFactory.createForTest(priceTrackingHandler);
-    priceTrackingBrowserProxyFactory.setInstance(instance);
 
     imageServiceHandler = TestMock.fromClass(PageImageServiceHandlerRemote);
     PageImageServiceBrowserProxy.setInstance(

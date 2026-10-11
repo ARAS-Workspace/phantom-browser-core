@@ -149,7 +149,6 @@ robolectric_library("junit") {
     "//base:tristate_java",
     "//base/test:test_support_java",
     "//build/android:build_java",
-    "//chrome/browser/commerce/price_tracking/android:java",
     "//chrome/browser/flags:java",
     "//chrome/browser/profiles/android:java",
     "//chrome/browser/tab:java",

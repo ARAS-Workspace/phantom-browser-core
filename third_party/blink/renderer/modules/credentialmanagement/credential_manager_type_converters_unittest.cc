@@ -6,7 +6,6 @@
 
 #include "base/compiler_specific.h"
 #include "base/containers/span.h"
-#include "device/fido/public/fido_constants.h"
 #include "mojo/public/cpp/bindings/type_converter.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -19,9 +18,6 @@
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_client_outputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_large_blob_inputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_large_blob_outputs.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_payment_browser_bound_signature.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_payment_inputs.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_payment_outputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_prf_inputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_prf_outputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_prf_values.h"
@@ -29,11 +25,7 @@
 #include "third_party/blink/renderer/bindings/modules/v8/v8_identity_provider_account.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_identity_provider_request_options.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_login_status_options.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_creation_options.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_parameters.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_request_options.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_rp_entity.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_public_key_credential_user_entity.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_remote_desktop_client_override.h"
 #include "third_party/blink/renderer/core/typed_arrays/dom_array_buffer.h"
 #include "third_party/blink/renderer/core/typed_arrays/dom_typed_array.h"
@@ -50,11 +42,6 @@ using blink::Vector;
 using blink::mojom::blink::RpContext;
 
 const uint8_t kSample[] = {1, 2, 3, 4, 5, 6};
-
-const int32_t kCoseAlgorithmEs256 =
-    base::strict_cast<int32_t>(device::CoseAlgorithmIdentifier::kEs256);
-const int32_t kCoseAlgorithmRs256 =
-    base::strict_cast<int32_t>(device::CoseAlgorithmIdentifier::kRs256);
 
 static blink::V8UnionArrayBufferOrArrayBufferView* ArrayBufferOrView(
     base::span<const uint8_t> data) {
@@ -204,23 +191,6 @@ TEST(CredentialManagerTypeConvertersTest,
 
   EXPECT_TRUE(blink_type->hasGetCredBlob());
   EXPECT_THAT(blink_type->getCredBlob(),
-              DOMArrayBufferEqualTo(Vector<uint8_t>{1, 2, 3}));
-}
-
-TEST(CredentialManagerTypeConvertersTest,
-     AuthenticationExtensionsClientOutputs_payment) {
-  auto mojo_type =
-      blink::mojom::blink::AuthenticationExtensionsClientOutputs::New();
-  mojo_type->payment =
-      blink::mojom::blink::AuthenticationExtensionsPaymentResponse::New(
-          /*browser_bound_signature=*/Vector<uint8_t>{1, 2, 3});
-
-  auto* blink_type =
-      ConvertTo<blink::AuthenticationExtensionsClientOutputs*>(mojo_type);
-
-  EXPECT_TRUE(blink_type->hasPayment());
-  EXPECT_TRUE(blink_type->payment()->hasBrowserBoundSignature());
-  EXPECT_THAT(blink_type->payment()->browserBoundSignature()->signature(),
               DOMArrayBufferEqualTo(Vector<uint8_t>{1, 2, 3}));
 }
 
@@ -395,139 +365,6 @@ TEST(CredentialManagerTypeConvertersTest,
   ASSERT_TRUE(
       mojo_type->remote_desktop_client_override->origin->IsSameOriginWith(
           &*expected->origin));
-}
-
-static ::testing::Matcher<const mojo::InlinedStructPtr<
-    blink::mojom::blink::PublicKeyCredentialParameters>>
-EqPublicKeyCredentialParameters(blink::mojom::PublicKeyCredentialType type,
-                                int32_t algorithm_identifier) {
-  return ::testing::Pointee(::testing::AllOf(
-      ::testing::Field(
-          "type", &blink::mojom::blink::PublicKeyCredentialParameters::type,
-          type),
-      ::testing::Field("algorithm_identifier",
-                       &blink::mojom::blink::PublicKeyCredentialParameters::
-                           algorithm_identifier,
-                       algorithm_identifier)));
-}
-
-TEST(CredentialManagerTypeConvertersTest,
-     AuthenticationExtensionsClientInputsTest_browserBoundPublicKeyCredential) {
-  blink::AuthenticationExtensionsClientInputs* blink_type =
-      blink::AuthenticationExtensionsClientInputs::Create();
-  blink::AuthenticationExtensionsPaymentInputs* blink_payment =
-      blink::AuthenticationExtensionsPaymentInputs::Create();
-  auto blink_cred_params =
-      blink::HeapVector<blink::Member<blink::PublicKeyCredentialParameters>>();
-  blink::PublicKeyCredentialParameters* blink_cred_params_1 =
-      blink::PublicKeyCredentialParameters::Create();
-  blink_cred_params_1->setType("public-key");
-  blink_cred_params_1->setAlg(kCoseAlgorithmEs256);
-  blink_cred_params.push_back(blink_cred_params_1);
-  blink_payment->setBrowserBoundPubKeyCredParams(std::move(blink_cred_params));
-  blink_type->setPayment(blink_payment);
-
-  blink::mojom::blink::AuthenticationExtensionsClientInputsPtr mojo_type =
-      ConvertTo<blink::mojom::blink::AuthenticationExtensionsClientInputsPtr>(
-          *blink_type);
-
-  EXPECT_THAT(mojo_type->payment_browser_bound_key_parameters,
-              ::testing::Optional(
-                  ::testing::ElementsAre(EqPublicKeyCredentialParameters(
-                      blink::mojom::PublicKeyCredentialType::PUBLIC_KEY,
-                      kCoseAlgorithmEs256))));
-}
-
-TEST(CredentialManagerTypeConvertersTest,
-     PublicKeyCredentialCreationOptions_browserBoundPublicKeyCredential) {
-  blink::PublicKeyCredentialCreationOptions* blink_creation_options =
-      blink::PublicKeyCredentialCreationOptions::Create();
-  blink::PublicKeyCredentialRpEntity* blink_rp_entity =
-      blink::PublicKeyCredentialRpEntity::Create();
-  blink_rp_entity->setName("rp-name.test");
-  blink_creation_options->setRp(blink_rp_entity);
-  blink::PublicKeyCredentialUserEntity* blink_user =
-      blink::PublicKeyCredentialUserEntity::Create();
-  blink_user->setId(ArrayBufferOrView(kSample));
-  blink_creation_options->setUser(blink_user);
-  blink_creation_options->setChallenge(ArrayBufferOrView(kSample));
-
-  blink::AuthenticationExtensionsClientInputs* blink_extensions =
-      blink::AuthenticationExtensionsClientInputs::Create();
-  blink::AuthenticationExtensionsPaymentInputs* blink_payment =
-      blink::AuthenticationExtensionsPaymentInputs::Create();
-  auto blink_cred_params =
-      blink::HeapVector<blink::Member<blink::PublicKeyCredentialParameters>>();
-  blink::PublicKeyCredentialParameters* blink_cred_params_1 =
-      blink::PublicKeyCredentialParameters::Create();
-  blink_cred_params_1->setType("public-key");
-  blink_cred_params_1->setAlg(kCoseAlgorithmEs256);
-  blink_cred_params.push_back(blink_cred_params_1);
-  blink_payment->setBrowserBoundPubKeyCredParams(std::move(blink_cred_params));
-  blink_extensions->setPayment(blink_payment);
-  blink_creation_options->setExtensions(blink_extensions);
-
-  blink::mojom::blink::PublicKeyCredentialCreationOptionsPtr
-      mojo_creation_options =
-          ConvertTo<blink::mojom::blink::PublicKeyCredentialCreationOptionsPtr>(
-              *blink_creation_options);
-
-  ASSERT_TRUE(mojo_creation_options);
-  EXPECT_THAT(mojo_creation_options->payment_browser_bound_key_parameters,
-              ::testing::Optional(
-                  ::testing::ElementsAre(EqPublicKeyCredentialParameters(
-                      blink::mojom::PublicKeyCredentialType::PUBLIC_KEY,
-                      kCoseAlgorithmEs256))));
-}
-
-TEST(
-    CredentialManagerTypeConvertersTest,
-    AuthenticationExtensionsClientInputsTest_browserBoundPublicKeyCredentialWhenEmpty) {
-  blink::AuthenticationExtensionsClientInputs* blink_type =
-      blink::AuthenticationExtensionsClientInputs::Create();
-  blink::AuthenticationExtensionsPaymentInputs* blink_payment =
-      blink::AuthenticationExtensionsPaymentInputs::Create();
-  blink_payment->setBrowserBoundPubKeyCredParams(
-      blink::HeapVector<blink::Member<blink::PublicKeyCredentialParameters>>());
-  blink_type->setPayment(blink_payment);
-
-  blink::mojom::blink::AuthenticationExtensionsClientInputsPtr mojo_type =
-      ConvertTo<blink::mojom::blink::AuthenticationExtensionsClientInputsPtr>(
-          *blink_type);
-
-  EXPECT_THAT(mojo_type->payment_browser_bound_key_parameters,
-              ::testing::Optional(::testing::ElementsAre(
-                  EqPublicKeyCredentialParameters(
-                      blink::mojom::PublicKeyCredentialType::PUBLIC_KEY,
-                      kCoseAlgorithmEs256),
-                  EqPublicKeyCredentialParameters(
-                      blink::mojom::PublicKeyCredentialType::PUBLIC_KEY,
-                      kCoseAlgorithmRs256))));
-}
-
-TEST(
-    CredentialManagerTypeConvertersTest,
-    AuthenticationExtensionsClientInputsTest_browserBoundPublicKeyCredentialWhenInvalidType) {
-  blink::AuthenticationExtensionsClientInputs* blink_type =
-      blink::AuthenticationExtensionsClientInputs::Create();
-  blink::AuthenticationExtensionsPaymentInputs* blink_payment =
-      blink::AuthenticationExtensionsPaymentInputs::Create();
-  auto blink_cred_params =
-      blink::HeapVector<blink::Member<blink::PublicKeyCredentialParameters>>();
-  blink::PublicKeyCredentialParameters* blink_cred_params_1 =
-      blink::PublicKeyCredentialParameters::Create();
-  blink_cred_params_1->setType("Not a valid public key credential type!");
-  blink_cred_params_1->setAlg(kCoseAlgorithmEs256);
-  blink_cred_params.push_back(blink_cred_params_1);
-  blink_payment->setBrowserBoundPubKeyCredParams(std::move(blink_cred_params));
-  blink_type->setPayment(blink_payment);
-
-  blink::mojom::blink::AuthenticationExtensionsClientInputsPtr mojo_type =
-      ConvertTo<blink::mojom::blink::AuthenticationExtensionsClientInputsPtr>(
-          *blink_type);
-
-  EXPECT_THAT(mojo_type->payment_browser_bound_key_parameters,
-              ::testing::Optional(::testing::IsEmpty()));
 }
 
 TEST(CredentialManagerTypeConvertersTest,

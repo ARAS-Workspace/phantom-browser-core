@@ -46,7 +46,6 @@
 #include "components/autofill/core/browser/data_model/payments/iban.h"
 #include "components/autofill/core/browser/field_types.h"
 #include "components/autofill/core/browser/foundations/browser_autofill_manager.h"
-#include "components/autofill/core/browser/integrators/autofill_ai/autofill_ai_wallet_utils.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/management_utils.h"
 #include "components/autofill/core/browser/integrators/autofill_ai/metrics/autofill_ai_metrics.h"
 #include "components/autofill/core/browser/metrics/address_save_metrics.h"
@@ -71,8 +70,6 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/strings/grit/components_branded_strings.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/wallet/core/browser/walletable_permission_utils.h"
-#include "components/wallet/core/common/wallet_features.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/browser/extension_function.h"
 #include "extensions/browser/extension_function_registry.h"
@@ -1176,20 +1173,7 @@ bool AutofillPrivateAddOrUpdateEntityInstanceFunction::
 
   if (autofill::WalletPassAccessManager* pass_manager =
           autofill_client()->GetWalletPassAccessManager()) {
-    // When WalletApiPrivatePassesConsent is disabled,
-    // `SaveWalletEntityInstance()` doesn't require a valid `session_id`.
     consent_auditor::ConsentAuditor::SessionId session_id;
-    if (base::FeatureList::IsEnabled(
-            wallet::features::kWalletApiPrivatePassesConsent)) {
-      // Sadly, the string IDs are hardcoded here, because the TypeScript code
-      // only has access to the strings themselves, not their IDs.
-      session_id = autofill::RecordWalletPrivatePassConsent(
-          /*accepted_consent_string_id=*/
-          IDS_AUTOFILL_AI_SAVE_ENTITY_TO_WALLET_DIALOG_SUBTITLE_NEW,
-          /*accept_button_string_id=*/IDS_SAVE,
-          *autofill_client()->GetConsentAuditor(),
-          *autofill_client()->GetIdentityManager());
-    }
     pass_manager->SaveWalletEntityInstance(
         entity_instance, session_id,
         base::BindOnce(&AutofillPrivateAddOrUpdateEntityInstanceFunction::
@@ -1491,33 +1475,6 @@ AutofillPrivateSetAutofillAiOptInStatusFunction::Run() {
   return RespondNow(ArgumentList(
       api::autofill_private::SetAutofillAiOptInStatus::Results::Create(
           /*success=*/true)));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// AutofillPrivateGetWalletablePassDetectionOptInStatusFunction
-
-ExtensionFunction::ResponseAction
-AutofillPrivateGetWalletablePassDetectionOptInStatusFunction::Run() {
-  return RespondNow(WithArguments(wallet::GetWalletablePassDetectionOptInStatus(
-      autofill_client()->GetPrefs(), autofill_client()->GetIdentityManager())));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// AutofillPrivateSetWalletablePassDetectionOptInStatusFunction
-
-ExtensionFunction::ResponseAction
-AutofillPrivateSetWalletablePassDetectionOptInStatusFunction::Run() {
-  std::optional<autofill_private::SetWalletablePassDetectionOptInStatus::Params>
-      params = autofill_private::SetWalletablePassDetectionOptInStatus::Params::
-          Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-
-  const bool success = wallet::SetWalletablePassDetectionOptInStatus(
-      autofill_client()->GetPrefs(), autofill_client()->GetIdentityManager(),
-      wallet::GeoIpCountryCode(
-          autofill_client()->GetVariationConfigCountryCode().value()),
-      params->opted_in);
-  return RespondNow(WithArguments(success));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

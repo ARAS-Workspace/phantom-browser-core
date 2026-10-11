@@ -100,12 +100,10 @@ class CONTENT_EXPORT AuthenticatorCommonImpl : public AuthenticatorCommon {
   void MakeCredential(
       url::Origin caller_origin,
       blink::mojom::PublicKeyCredentialCreationOptionsPtr options,
-      blink::mojom::PaymentOptionsPtr payment_options,
       blink::mojom::Authenticator::MakeCredentialCallback callback) override;
   void GetCredential(
       url::Origin caller_origin,
       blink::mojom::GetCredentialOptionsPtr options,
-      blink::mojom::PaymentOptionsPtr payment_options,
       blink::mojom::Authenticator::GetCredentialCallback callback) override;
   void IsUserVerifyingPlatformAuthenticatorAvailable(
       url::Origin caller_origin,
@@ -166,7 +164,6 @@ class CONTENT_EXPORT AuthenticatorCommonImpl : public AuthenticatorCommon {
       RequestKey request_key,
       url::Origin caller_origin,
       blink::mojom::PublicKeyCredentialCreationOptionsPtr options,
-      blink::mojom::PaymentOptionsPtr payment_options,
       bool is_cross_origin_iframe,
       blink::mojom::AuthenticatorStatus rp_id_validation_result);
   void ContinueMakeCredentialAfterBrowserPasskeysAvailabilityCheck(
@@ -180,7 +177,6 @@ class CONTENT_EXPORT AuthenticatorCommonImpl : public AuthenticatorCommon {
       RequestKey request_key,
       url::Origin caller_origin,
       blink::mojom::GetCredentialOptionsPtr options,
-      blink::mojom::PaymentOptionsPtr payment_options,
       bool is_cross_origin_iframe,
       blink::mojom::AuthenticatorStatus rp_id_validation_result);
   void ContinueGetAssertionAfterBrowserPasskeysAvailabilityCheck(
@@ -358,7 +354,6 @@ class CONTENT_EXPORT AuthenticatorCommonImpl : public AuthenticatorCommon {
   void GetPasswordOnlyCredential(
       url::Origin caller_origin,
       blink::mojom::GetCredentialOptionsPtr options,
-      blink::mojom::PaymentOptionsPtr payment_options,
       blink::mojom::Authenticator::GetCredentialCallback callback);
 
   // Get an identifier for the current request. Callbacks that might span a

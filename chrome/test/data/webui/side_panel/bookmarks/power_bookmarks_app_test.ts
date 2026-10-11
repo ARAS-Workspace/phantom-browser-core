@@ -12,8 +12,6 @@ import {BOOKMARK_ROW_LOAD_EVENT} from 'chrome://bookmarks-side-panel.top-chrome/
 import type {PowerBookmarksAddFolderButtonElement} from 'chrome://bookmarks-side-panel.top-chrome/power_bookmarks_add_folder_button.js';
 import type {PowerBookmarksAppElement} from 'chrome://bookmarks-side-panel.top-chrome/power_bookmarks_app.js';
 import type {PowerBookmarksListHeaderElement} from 'chrome://bookmarks-side-panel.top-chrome/power_bookmarks_list_header.js';
-import {browserProxyFactory as priceTrackingBrowserProxyFactory, PriceTrackingHandlerRemote} from 'chrome://resources/cr_components/commerce/price_tracking.mojom-webui.js';
-import type {PageRemote} from 'chrome://resources/cr_components/commerce/price_tracking.mojom-webui.js';
 import {PageImageServiceBrowserProxy} from 'chrome://resources/cr_components/page_image_service/browser_proxy.js';
 import {PageImageServiceHandlerRemote} from 'chrome://resources/cr_components/page_image_service/page_image_service.mojom-webui.js';
 import type {CrButtonElement} from 'chrome://resources/cr_elements/cr_button/cr_button.js';
@@ -37,8 +35,6 @@ suite('General', () => {
   let powerBookmarksApp: PowerBookmarksAppElement;
   let bookmarksApi: TestBookmarksApiProxy;
   let pluralStringProxy: TestPluralStringProxy;
-  const priceTrackingHandler = TestMock.fromClass(PriceTrackingHandlerRemote);
-  let callbackRouterRemote: PageRemote;
   let imageServiceHandler: TestMock<PageImageServiceHandlerRemote>&
       PageImageServiceHandlerRemote;
   let metrics: MetricsTracker;
@@ -115,21 +111,6 @@ suite('General', () => {
 
     pluralStringProxy = new TestPluralStringProxy();
     PluralStringProxyImpl.setInstance(pluralStringProxy);
-
-    priceTrackingHandler.reset();
-    priceTrackingHandler.setResultFor(
-        'getAllPriceTrackedBookmarkProductInfo',
-        Promise.resolve({productInfos: []}));
-    priceTrackingHandler.setResultFor(
-        'getAllShoppingBookmarkProductInfo',
-        Promise.resolve({productInfos: []}));
-    priceTrackingHandler.setResultFor(
-        'getShoppingCollectionBookmarkFolderId',
-        Promise.resolve({collectionId: BigInt(-1)}));
-    const {instance, remote} =
-        priceTrackingBrowserProxyFactory.createForTest(priceTrackingHandler);
-    priceTrackingBrowserProxyFactory.setInstance(instance);
-    callbackRouterRemote = remote;
 
     imageServiceHandler = TestMock.fromClass(PageImageServiceHandlerRemote);
     PageImageServiceBrowserProxy.setInstance(
@@ -774,7 +755,7 @@ suite('General', () => {
 
       // Open the context menu for bookmark '3'.
       contextMenu.showAtPosition(
-          new MouseEvent('click'), [bookmark], false, false, false, 1);
+          new MouseEvent('click'), [bookmark], false, 1);
 
       await microtasksFinished();
       assertTrue(contextMenu.isOpen());
@@ -1042,7 +1023,7 @@ suite('General', () => {
 
       // Open the context menu.
       contextMenu.showAtPosition(
-          new MouseEvent('click'), [bookmark], false, false, false, 1);
+          new MouseEvent('click'), [bookmark], false, 1);
       await microtasksFinished();
 
       // Get the edit option in the menu.
@@ -1076,7 +1057,7 @@ suite('General', () => {
 
       // Open the context menu.
       contextMenu.showAtPosition(
-          new MouseEvent('click'), bookmarks, false, false, false, 1);
+          new MouseEvent('click'), bookmarks, false, 1);
       await microtasksFinished();
 
       // Get the move option in the menu.
@@ -1163,66 +1144,6 @@ suite('General', () => {
       assertTrue(isHidden(bookmarksList));
       assertFalse(isHidden(topLevelEmptyState));
       assertTrue(isHidden(footer));
-
-      // Adding a tracked product shows filter chips.
-      const newProduct = {
-        bookmarkId: BigInt(3),
-        info: {
-          title: 'Product Baz',
-          clusterTitle: 'Product Cluster Baz',
-          domain: 'baz.com',
-          imageUrl: 'https://baz.com/image',
-          productUrl: 'https://baz.com/product',
-          currentPrice: '$56',
-          previousPrice: '$78',
-          clusterId: BigInt(12345),
-          categoryLabels: [],
-          priceSummary: '',
-        },
-      };
-
-      callbackRouterRemote.priceTrackedForBookmark(newProduct);
-      await microtasksFinished();
-      assertFalse(isHidden(labels));
-    });
-
-    test('PriceTrackingChipRemainsVisibleAfterSearch', async () => {
-      const newProduct = {
-        bookmarkId: BigInt(3),
-        info: {
-          title: 'Product Baz',
-          clusterTitle: 'Product Cluster Baz',
-          domain: 'baz.com',
-          imageUrl: 'https://baz.com/image',
-          productUrl: 'https://baz.com/product',
-          currentPrice: '$56',
-          previousPrice: '$78',
-          clusterId: BigInt(12345),
-          categoryLabels: [],
-          priceSummary: '',
-        },
-      };
-
-      callbackRouterRemote.priceTrackedForBookmark(newProduct);
-      await microtasksFinished();
-
-      const rowItem = getPowerBookmarksRowItemElement(powerBookmarksApp, '3');
-      assertTrue(!!rowItem);
-      await rowItem.updateComplete;
-      const badge = rowItem.shadowRoot.querySelector('sp-list-item-badge');
-      assertTrue(!!badge);
-      assertFalse(isHidden(badge));
-
-      await performSearch('first');
-
-      const searchedRowItem =
-          getPowerBookmarksRowItemElement(powerBookmarksApp, '3');
-      assertTrue(!!searchedRowItem);
-      await searchedRowItem.updateComplete;
-      const searchedBadge =
-          searchedRowItem.shadowRoot.querySelector('sp-list-item-badge');
-      assertTrue(!!searchedBadge);
-      assertFalse(isHidden(searchedBadge));
     });
 
     test('PreventsClickDuringDrag', async () => {
@@ -1247,7 +1168,7 @@ suite('General', () => {
 
       // Open context menu.
       powerBookmarksApp.$.contextMenu.showAt(
-          document.body, [bookmark], false, false, false, 0);
+          document.body, [bookmark], false, 0);
       await microtasksFinished();
       assertTrue(powerBookmarksApp.$.contextMenu.isOpen());
 

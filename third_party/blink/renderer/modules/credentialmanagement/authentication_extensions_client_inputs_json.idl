@@ -31,7 +31,6 @@ dictionary AuthenticationExtensionsClientInputsJSON {
   AuthenticationExtensionsLargeBlobInputsJSON largeBlob;
   Base64URLString credBlob;
   boolean getCredBlob;
-  [RuntimeEnabled=SecurePaymentConfirmation] AuthenticationExtensionsPaymentInputs payment;
   [RuntimeEnabled=WebAuthenticationRemoteDesktopSupport] RemoteDesktopClientOverride remoteDesktopClientOverride;
   AuthenticationExtensionsPRFInputsJSON prf;
   [RuntimeEnabled=WebAuthenticationCmtgKey] boolean cmtgKey;

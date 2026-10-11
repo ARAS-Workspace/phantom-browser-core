@@ -146,7 +146,6 @@ ReopenTabPromoControllerDialogBrowserTest.*
 SafetyTipPageInfoBubbleViewDialogTest.*
 ScreenCaptureNotificationUiBrowserTest.*
 SearchEngineChoiceUIPixelTest.*
-SecurePaymentConfirmationDialogViewTest.InvokeUi_*
 *SendTabToSelfBubbleTest.*
 SendTabToSelfInteractiveUiTest.*
 SendTabToSelfToolbarIconControllerInteractiveUiTest.*

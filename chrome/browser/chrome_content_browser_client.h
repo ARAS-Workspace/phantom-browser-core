@@ -29,7 +29,6 @@
 #include "chrome/common/renderer_configuration.mojom.h"
 #include "components/file_access/scoped_file_access.h"
 #include "components/guest_view/buildflags/buildflags.h"
-#include "components/on_device_translation/buildflags/buildflags.h"
 #include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/digital_identity_provider.h"
@@ -51,7 +50,6 @@
 #include "services/network/public/mojom/network_context.mojom.h"
 #include "services/network/public/mojom/url_loader_factory.mojom.h"
 #include "third_party/blink/public/common/tokens/tokens.h"
-#include "third_party/blink/public/mojom/on_device_translation/translation_manager.mojom-forward.h"
 #include "third_party/blink/public/mojom/worker/shared_worker_info.mojom.h"
 #include "ui/base/clipboard/clipboard_metadata.h"
 
@@ -722,14 +720,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::unique_ptr<content::AuthenticatorRequestClientDelegate>
   GetWebAuthenticationRequestDelegate(
       content::RenderFrameHost* render_frame_host) override;
-  void CreateSecurePaymentConfirmationService(
-      content::RenderFrameHost* render_frame_host,
-      mojo::PendingReceiver<payments::mojom::SecurePaymentConfirmationService>
-          receiver) override;
-  bool ShowPaymentHandlerWindow(
-      content::BrowserContext* browser_context,
-      const GURL& url,
-      base::OnceCallback<void(bool, int, int)> callback) override;
   std::unique_ptr<net::ClientCertStore> CreateClientCertStore(
       content::BrowserContext* browser_context) override;
   std::unique_ptr<content::LoginDelegate> CreateLoginDelegate(
@@ -1040,28 +1030,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       base::SupportsUserData* context_user_data,
       content::RenderFrameHost* rfh,
       mojo::PendingReceiver<blink::mojom::AIManager> receiver) override;
-
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-  void BindTranslationManager(
-      content::RenderProcessHost* host,
-      content::BrowserContext* browser_context,
-      base::SupportsUserData* context_user_data,
-      const url::Origin& origin,
-      mojo::PendingReceiver<blink::mojom::TranslationManager> receiver)
-      override;
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-
-  // Binds to a new instance of
-  // `language_detection::ContentLanguageDetectionDriver` which receives the
-  // model from Optimization Guide. The instance becomes owned
-  // `context_user_data` to ensure it does not outlive the execution context for
-  // which it was created.
-  void BindLanguageDetectionDriver(
-      content::BrowserContext* browser_context,
-      base::SupportsUserData* context_user_data,
-      mojo::PendingReceiver<
-          language_detection::mojom::ContentLanguageDetectionDriver> receiver)
-      override;
 
   bool ShouldDispatchPagehideDuringCommit(
       content::BrowserContext* browser_context,

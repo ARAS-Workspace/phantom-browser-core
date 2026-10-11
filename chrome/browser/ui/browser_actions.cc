@@ -84,7 +84,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/bubble_anchor_util.h"
 #include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/browser/ui/commerce/commerce_ui_tab_helper.h"
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/intent_picker_tab_helper.h"
@@ -115,7 +114,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_page_action_controller.h"
-#include "chrome/browser/ui/views/commerce/discounts_page_action_view_controller.h"
 #include "chrome/browser/ui/views/file_system_access/file_system_access_bubble_controller.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
@@ -151,7 +149,6 @@
 #include "components/bookmarks/common/bookmark_bar_visibility_state.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/collaboration/public/messaging/activity_log.h"
-#include "components/commerce/core/metrics/discounts_metric_collector.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/multistep_filter/core/features.h"
@@ -354,15 +351,6 @@ void BrowserActions::InitializeSidePanelActions() {
                           ? kEditIcon
                           : vector_icons::kEditChromeRefreshOldIcon,
                       kActionSidePanelShowCustomizeChrome, bwi, false)
-          .Build());
-  root_action_item_->AddChild(
-      SidePanelAction(SidePanelEntryId::kShoppingInsights,
-                      IDS_SHOPPING_INSIGHTS_SIDE_PANEL_TITLE,
-                      IDS_SHOPPING_INSIGHTS_SIDE_PANEL_TITLE,
-                      features::IsRoundedIconsEnabled()
-                          ? vector_icons::kShoppingBagIcon
-                          : vector_icons::kShoppingBagOldIcon,
-                      kActionSidePanelShowShoppingInsights, bwi, false)
           .Build());
   root_action_item_->AddChild(
       SidePanelAction(
@@ -620,68 +608,6 @@ void BrowserActions::InitializePageActionIconActions() {
               features::IsRoundedIconsEnabled()
                   ? kCreditCardIcon
                   : kCreditCardChromeRefreshOldIcon))
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                auto* tab_helper = bwi->GetActiveTabInterface()
-                                       ->GetTabFeatures()
-                                       ->commerce_ui_tab_helper();
-                CHECK(tab_helper);
-
-                tab_helper->OnPriceInsightsIconClicked();
-              },
-              bwi))
-          .SetActionId(kActionCommercePriceInsights)
-          // The tooltip text is used as a default text. The
-          // PriceInsightsPageActionViewController will override it based on its
-          // state.
-          .SetText(l10n_util::GetStringUTF16(
-              IDS_SHOPPING_INSIGHTS_ICON_TOOLTIP_TEXT))
-          .SetTooltipText(l10n_util::GetStringUTF16(
-              IDS_SHOPPING_INSIGHTS_ICON_TOOLTIP_TEXT))
-          .SetImage(ui::ImageModel::FromVectorIcon(
-              features::IsRoundedIconsEnabled()
-                  ? vector_icons::kShoppingBagIcon
-                  : vector_icons::kShoppingBagRefreshOldIcon))
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                auto* tab_features =
-                    bwi->GetActiveTabInterface()->GetTabFeatures();
-                CHECK(tab_features);
-                auto* page_action_controller =
-                    commerce::DiscountsPageActionViewController::From(
-                        *bwi->GetActiveTabInterface());
-                CHECK(page_action_controller);
-                page_action_controller->MaybeShowBubble(/*from_user=*/true);
-
-                auto* commerce_ui_tab_helper =
-                    tab_features->commerce_ui_tab_helper();
-                CHECK(commerce_ui_tab_helper);
-
-                commerce::metrics::DiscountsMetricCollector::
-                    RecordDiscountsPageActionIconClicked(
-                        commerce_ui_tab_helper->IsPageActionIconExpanded(
-                            PageActionIconType::kDiscounts),
-                        commerce_ui_tab_helper->GetDiscounts());
-              },
-              bwi))
-          .SetActionId(kActionCommerceDiscounts)
-          .SetText(l10n_util::GetStringUTF16(IDS_DISCOUNT_ICON_EXPANDED_TEXT))
-          .SetTooltipText(
-              l10n_util::GetStringUTF16(IDS_DISCOUNT_ICON_EXPANDED_TEXT))
-          .SetImage(ui::ImageModel::FromVectorIcon(
-              features::IsRoundedIconsEnabled()
-                  ? vector_icons::kShoppingmodeIcon
-                  : vector_icons::kShoppingmodeOldIcon))
           .Build());
 
   root_action_item_->AddChild(

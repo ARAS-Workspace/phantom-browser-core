@@ -18,7 +18,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "cc/base/switches.h"
-#include "components/language_detection/content/common/language_detection.mojom.h"
 #include "components/optimization_guide/public/mojom/model_broker.mojom.h"
 #include "components/viz/host/gpu_client.h"
 #include "components/vrp_flags/buildflags.h"
@@ -175,11 +174,7 @@
 #include "third_party/blink/public/mojom/mediastream/media_devices.mojom.h"
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "third_party/blink/public/mojom/notifications/notification_service.mojom.h"
-#include "third_party/blink/public/mojom/on_device_translation/translation_manager.mojom.h"
 #include "third_party/blink/public/mojom/origin_trials/origin_trial_state_host.mojom.h"
-#include "third_party/blink/public/mojom/payments/payment_app.mojom.h"
-#include "third_party/blink/public/mojom/payments/payment_request.mojom.h"
-#include "third_party/blink/public/mojom/payments/secure_payment_confirmation_service.mojom.h"
 #include "third_party/blink/public/mojom/peerconnection/peer_connection_tracker.mojom.h"
 #include "third_party/blink/public/mojom/permissions/permission.mojom.h"
 #include "third_party/blink/public/mojom/picture_in_picture/picture_in_picture.mojom.h"
@@ -843,8 +838,6 @@ void PopulateBinderMapWithContext(
   // production embedder (such as in tests).
   map->Add<blink::mojom::NoStatePrefetchProcessor>(
       &EmptyBinderForFrame<blink::mojom::NoStatePrefetchProcessor>);
-  map->Add<payments::mojom::PaymentRequest>(
-      &EmptyBinderForFrame<payments::mojom::PaymentRequest>);
   map->Add<blink::mojom::AnchorElementMetricsHost>(
       &EmptyBinderForFrame<blink::mojom::AnchorElementMetricsHost>);
   map->Add<blink::mojom::CredentialManager>(
@@ -1082,9 +1075,6 @@ void PopulateBinderMapWithContext(
   map->Add<blink::mojom::WebSensorProvider>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::GetSensorProvider>);
 
-  map->Add<payments::mojom::PaymentManager>(
-      &BindRenderFrameHostImpl<&RenderFrameHostImpl::CreatePaymentManager>);
-
   map->Add<handwriting::mojom::HandwritingRecognitionService>(
       &CreateHandwritingRecognitionService);
 
@@ -1282,27 +1272,6 @@ void PopulateBinderMapWithContext(
       base::Unretained(GetContentClient()->browser())));
 
 
-  map->Add<blink::mojom::TranslationManager>(base::BindRepeating(
-      [](RenderFrameHost* host,
-         mojo::PendingReceiver<blink::mojom::TranslationManager> receiver) {
-        GetContentClient()->browser()->BindTranslationManager(
-            host->GetProcess(), host->GetBrowserContext(),
-            &RenderFrameHostImpl::From(host)->document_associated_data(),
-            host->GetLastCommittedOrigin(), std::move(receiver));
-      }));
-
-  map->Add<language_detection::mojom::ContentLanguageDetectionDriver>(
-      base::BindRepeating(
-          [](RenderFrameHost* host,
-             mojo::PendingReceiver<
-                 language_detection::mojom::ContentLanguageDetectionDriver>
-                 receiver) {
-            GetContentClient()->browser()->BindLanguageDetectionDriver(
-                host->GetBrowserContext(),
-                &RenderFrameHostImpl::From(host)->document_associated_data(),
-                std::move(receiver));
-          }));
-
   map->Add<blink::mojom::BackgroundFetchService>(
       &BackgroundFetchServiceImpl::CreateForFrame);
   map->Add<device::mojom::BatteryMonitor>(&BindBatteryMonitor);
@@ -1354,9 +1323,6 @@ void PopulateBinderMapWithContext(
   map->Add<blink::mojom::FederatedRequestService>(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::BindFederatedRequestServiceReceiver>);
-  map->Add<payments::mojom::SecurePaymentConfirmationService>(
-      &BindRenderFrameHostImpl<
-          &RenderFrameHostImpl::CreateSecurePaymentConfirmationService>);
 
   map->Add<blink::mojom::ClipboardHost>(&ClipboardHostImpl::Create);
   map->Add<blink::mojom::SpeculationHost>(&SpeculationHostImpl::Bind);
@@ -1513,34 +1479,12 @@ void PopulateDedicatedWorkerBinders(DedicatedWorkerHost* host,
                           base::Unretained(GetContentClient()->browser()),
                           host->GetProcessHost()->GetBrowserContext(),
                           base::Unretained(host), /*rfh=*/nullptr));
-  map->Add<blink::mojom::TranslationManager>(base::BindRepeating(
-      [](DedicatedWorkerHost* host,
-         mojo::PendingReceiver<blink::mojom::TranslationManager> receiver) {
-        auto* process_host = host->GetProcessHost();
-        GetContentClient()->browser()->BindTranslationManager(
-            process_host, process_host->GetBrowserContext(), host,
-            host->GetWorkerStorageKey().origin(), std::move(receiver));
-      },
-      base::Unretained(host)));
-  map->Add<language_detection::mojom::ContentLanguageDetectionDriver>(
-      base::BindRepeating(
-          [](DedicatedWorkerHost* host,
-             mojo::PendingReceiver<
-                 language_detection::mojom::ContentLanguageDetectionDriver>
-                 receiver) {
-            GetContentClient()->browser()->BindLanguageDetectionDriver(
-                host->GetProcessHost()->GetBrowserContext(), host,
-                std::move(receiver));
-          },
-          base::Unretained(host)));
 }
 
 void PopulateBinderMapWithContext(
     DedicatedWorkerHost* host,
     mojo::BinderMapWithContext<const url::Origin&>* map) {
   // RenderProcessHost binders taking an origin
-  map->Add<payments::mojom::PaymentManager>(BindWorkerReceiverForOrigin(
-      &RenderProcessHostImpl::CreatePaymentManagerForOrigin, host));
   map->Add<blink::mojom::PermissionService>(BindWorkerReceiverForOrigin(
       &RenderProcessHostImpl::CreatePermissionService, host));
   map->Add<blink::mojom::FileBackedBlobFactory>(BindWorkerReceiverForOrigin(
@@ -1636,26 +1580,6 @@ void PopulateSharedWorkerBinders(SharedWorkerHost* host, mojo::BinderMap* map) {
         &BindWebNNWeightsFileCreatorForWorker<SharedWorkerHost>,
         base::Unretained(host)));
   }
-  map->Add<blink::mojom::TranslationManager>(base::BindRepeating(
-      [](SharedWorkerHost* host,
-         mojo::PendingReceiver<blink::mojom::TranslationManager> receiver) {
-        auto* process_host = host->GetProcessHost();
-        GetContentClient()->browser()->BindTranslationManager(
-            process_host, process_host->GetBrowserContext(), host,
-            host->GetWorkerStorageKey().origin(), std::move(receiver));
-      },
-      base::Unretained(host)));
-  map->Add<language_detection::mojom::ContentLanguageDetectionDriver>(
-      base::BindRepeating(
-          [](SharedWorkerHost* host,
-             mojo::PendingReceiver<
-                 language_detection::mojom::ContentLanguageDetectionDriver>
-                 receiver) {
-            GetContentClient()->browser()->BindLanguageDetectionDriver(
-                host->GetProcessHost()->GetBrowserContext(), host,
-                std::move(receiver));
-          },
-          base::Unretained(host)));
 
   map->Add<blink::mojom::DirectSocketsService>(base::BindRepeating(
       [](SharedWorkerHost* host,
@@ -1691,8 +1615,6 @@ void PopulateBinderMapWithContext(
     SharedWorkerHost* host,
     mojo::BinderMapWithContext<const url::Origin&>* map) {
   // RenderProcessHost binders taking an origin
-  map->Add<payments::mojom::PaymentManager>(BindWorkerReceiverForOrigin(
-      &RenderProcessHostImpl::CreatePaymentManagerForOrigin, host));
   map->Add<blink::mojom::PermissionService>(BindWorkerReceiverForOrigin(
       &RenderProcessHostImpl::CreatePermissionService, host));
   map->Add<blink::mojom::FileBackedBlobFactory>(BindWorkerReceiverForOrigin(
@@ -1775,30 +1697,6 @@ void PopulateServiceWorkerBinders(ServiceWorkerHost* host,
         &BindWebNNWeightsFileCreatorForWorker<ServiceWorkerHost>,
         base::Unretained(host)));
   }
-  map->Add<blink::mojom::TranslationManager>(base::BindRepeating(
-      [](ServiceWorkerHost* host,
-         mojo::PendingReceiver<blink::mojom::TranslationManager> receiver) {
-        if (auto* process_host = static_cast<RenderProcessHostImpl*>(
-                RenderProcessHost::FromID(host->worker_process_id()))) {
-          GetContentClient()->browser()->BindTranslationManager(
-              process_host, process_host->GetBrowserContext(), host,
-              host->GetBucketStorageKey().origin(), std::move(receiver));
-        }
-      },
-      base::Unretained(host)));
-  map->Add<language_detection::mojom::ContentLanguageDetectionDriver>(
-      base::BindRepeating(
-          [](ServiceWorkerHost* host,
-             mojo::PendingReceiver<
-                 language_detection::mojom::ContentLanguageDetectionDriver>
-                 receiver) {
-            if (auto* process_host = static_cast<RenderProcessHostImpl*>(
-                    RenderProcessHost::FromID(host->worker_process_id()))) {
-              GetContentClient()->browser()->BindLanguageDetectionDriver(
-                  process_host->GetBrowserContext(), host, std::move(receiver));
-            }
-          },
-          base::Unretained(host)));
 
   // RenderProcessHost binders
   map->Add<media::mojom::VideoDecodePerfHistory>(BindServiceWorkerReceiver(
@@ -1824,8 +1722,6 @@ void PopulateBinderMapWithContext(
       &CookieStoreManager::BindReceiverForWorker);
 
   // RenderProcessHost binders taking an origin
-  map->Add<payments::mojom::PaymentManager>(BindServiceWorkerReceiverForOrigin(
-      &RenderProcessHostImpl::CreatePaymentManagerForOrigin, host));
   map->Add<blink::mojom::PermissionService>(BindServiceWorkerReceiverForOrigin(
       &RenderProcessHostImpl::CreatePermissionService, host));
   map->Add<network::mojom::RestrictedCookieManager>(

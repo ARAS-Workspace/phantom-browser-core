@@ -72,13 +72,6 @@ class WalletReminderNoticeBubbleController;
 class WalletReminderNoticePageActionController;
 }  // namespace autofill
 
-namespace commerce {
-class CommerceUiTabHelper;
-class DiscountsPageActionViewController;
-class InStockNotificationManager;
-class PriceInsightsPageActionViewController;
-}  // namespace commerce
-
 namespace enterprise_data_protection {
 class DataProtectionNavigationController;
 }  // namespace enterprise_data_protection
@@ -132,12 +125,6 @@ namespace record_replay {
 class RecordReplayClient;
 }  // namespace record_replay
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-namespace wallet {
-class ChromeWalletablePassClient;
-}  // namespace wallet
-#endif
-
 namespace multistep_filter {
 class ChromeFilterNavigationObserver;
 class FilterUiController;
@@ -183,10 +170,6 @@ class TabFeatures {
   SetCustomizeChromeSidePanelControllerForTesting(
       std::unique_ptr<customize_chrome::SidePanelController>
           customize_chrome_side_panel_controller);
-
-  commerce::CommerceUiTabHelper* commerce_ui_tab_helper() {
-    return commerce_ui_tab_helper_.get();
-  }
 
   extensions::ExtensionSidePanelManager* extension_side_panel_manager() {
     return extension_side_panel_manager_.get();
@@ -308,11 +291,6 @@ class TabFeatures {
   std::unique_ptr<customize_chrome::SidePanelController>
       customize_chrome_side_panel_controller_;
 
-  // Responsible for commerce related features.
-  std::unique_ptr<commerce::CommerceUiTabHelper> commerce_ui_tab_helper_;
-  std::unique_ptr<commerce::InStockNotificationManager>
-      in_stock_notification_manager_;
-
   // The tab-scoped extension side-panel manager. There is a separate
   // window-scoped extension side-panel manager.
   std::unique_ptr<extensions::ExtensionSidePanelManager>
@@ -362,14 +340,6 @@ class TabFeatures {
   // Responsible for managing the "Record/Replay" page action.
   std::unique_ptr<RecordReplayPageActionController>
       record_replay_page_action_controller_;
-
-  // Responsible for managing the commerce "Price insights" page action.
-  std::unique_ptr<commerce::PriceInsightsPageActionViewController>
-      commerce_price_insights_page_action_view_controller_;
-
-  // Responsible for managing the commerce "Price insights" page action.
-  std::unique_ptr<commerce::DiscountsPageActionViewController>
-      commerce_discounts_page_action_view_controller_;
 
   // Contains the recent collaboration message for a shared tab.
   std::unique_ptr<tab_groups::CollaborationMessagingTabData>
@@ -469,10 +439,6 @@ class TabFeatures {
 
   std::unique_ptr<tabs::PageContextEligibilityHelper>
       page_context_eligibility_helper_;
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  std::unique_ptr<wallet::ChromeWalletablePassClient> walletable_pass_client_;
-#endif
 
   std::unique_ptr<multistep_filter::FilterUiController> filter_ui_controller_;
   std::unique_ptr<multistep_filter::ChromeFilterNavigationObserver>

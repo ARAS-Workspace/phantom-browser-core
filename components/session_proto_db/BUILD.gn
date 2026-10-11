@@ -5,6 +5,11 @@
 import("//testing/test.gni")
 import("//third_party/protobuf/proto_library.gni")
 
+proto_library("persisted_state_db_content_proto") {
+  proto_in_dir = "//"
+  sources = [ "persisted_state_db_content.proto" ]
+}
+
 source_set("core") {
   sources = [ "session_proto_storage.h" ]
 
@@ -19,7 +24,7 @@ source_set("session_proto_db") {
   deps = [
     ":core",
     "//base",
-    "//components/commerce/core:persisted_state_db_content_proto",
+    ":persisted_state_db_content_proto",
     "//components/keyed_service/core",
     "//components/leveldb_proto",
     "//third_party/leveldatabase",
@@ -39,7 +44,7 @@ if (use_blink) {
       ":session_proto_db_test_proto",
       "//base",
       "//base/test:test_support",
-      "//components/commerce/core:persisted_state_db_content_proto",
+      ":persisted_state_db_content_proto",
       "//components/leveldb_proto:test_support",
       "//content/test:test_support",
       "//testing/gmock",

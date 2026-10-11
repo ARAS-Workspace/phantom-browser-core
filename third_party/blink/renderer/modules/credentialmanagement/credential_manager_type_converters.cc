@@ -24,9 +24,6 @@
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_cmtg_key_outputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_large_blob_inputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_large_blob_outputs.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_payment_browser_bound_signature.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_payment_inputs.h"
-#include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_payment_outputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_prf_inputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_prf_outputs.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_authentication_extensions_prf_values.h"
@@ -251,11 +248,6 @@ TypeConverter<blink::AuthenticationExtensionsClientOutputs*,
     extension_outputs->setGetCredBlob(
         blink::DOMArrayBuffer::Create(std::move(*extensions->get_cred_blob)));
   }
-  if (extensions->payment) {
-    extension_outputs->setPayment(
-        ConvertTo<blink::AuthenticationExtensionsPaymentOutputs*>(
-            extensions->payment));
-  }
   if (extensions->echo_prf) {
     auto* prf_outputs = blink::AuthenticationExtensionsPRFOutputs::Create();
     if (extensions->prf_results) {
@@ -284,25 +276,6 @@ TypeConverter<blink::AuthenticationExtensionsClientOutputs*,
         *extensions->cross_device_fallback_url);
   }
   return extension_outputs;
-}
-
-// static
-blink::AuthenticationExtensionsPaymentOutputs*
-TypeConverter<blink::AuthenticationExtensionsPaymentOutputs*,
-              blink::mojom::blink::AuthenticationExtensionsPaymentResponsePtr>::
-    Convert(
-        const blink::mojom::blink::AuthenticationExtensionsPaymentResponsePtr&
-            payment_response) {
-  auto* payment_outputs =
-      blink::AuthenticationExtensionsPaymentOutputs::Create();
-  if (!payment_response->browser_bound_signature.empty()) {
-    auto* browser_bound_signature =
-        blink::AuthenticationExtensionsPaymentBrowserBoundSignature::Create();
-    browser_bound_signature->setSignature(blink::DOMArrayBuffer::Create(
-        std::move(payment_response->browser_bound_signature)));
-    payment_outputs->setBrowserBoundSignature(browser_bound_signature);
-  }
-  return payment_outputs;
 }
 
 // static
@@ -736,10 +709,6 @@ TypeConverter<PublicKeyCredentialCreationOptionsPtr,
       mojo_options->cred_blob =
           ConvertTo<blink::Vector<uint8_t>>(extensions->credBlob());
     }
-    if (extensions->hasPayment() && extensions->payment()->hasIsPayment() &&
-        extensions->payment()->isPayment()) {
-      mojo_options->is_payment_credential_creation = true;
-    }
     if (extensions->hasMinPinLength() && extensions->minPinLength()) {
       mojo_options->min_pin_length_requested = true;
     }
@@ -747,12 +716,6 @@ TypeConverter<PublicKeyCredentialCreationOptionsPtr,
       mojo_options->remote_desktop_client_override =
           RemoteDesktopClientOverride::From(
               *extensions->remoteDesktopClientOverride());
-    }
-    if (extensions->hasPayment() &&
-        extensions->payment()->hasBrowserBoundPubKeyCredParams()) {
-      mojo_options->payment_browser_bound_key_parameters =
-          ConvertTo<blink::Vector<PublicKeyCredentialParametersPtr>>(
-              extensions->payment()->browserBoundPubKeyCredParams());
     }
     if (extensions->hasPrf()) {
       mojo_options->prf_enable = true;
@@ -851,12 +814,6 @@ TypeConverter<AuthenticationExtensionsClientInputsPtr,
     mojo_inputs->remote_desktop_client_override =
         RemoteDesktopClientOverride::From(
             *inputs.remoteDesktopClientOverride());
-  }
-  if (inputs.hasPayment() &&
-      inputs.payment()->hasBrowserBoundPubKeyCredParams()) {
-    mojo_inputs->payment_browser_bound_key_parameters =
-        ConvertTo<blink::Vector<PublicKeyCredentialParametersPtr>>(
-            inputs.payment()->browserBoundPubKeyCredParams());
   }
   if (inputs.hasPrf()) {
     mojo_inputs->prf = true;

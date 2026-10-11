@@ -45,15 +45,11 @@
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/consent_auditor/consent_auditor.h"
-#include "components/consent_auditor/fake_consent_auditor.h"
 #include "components/device_reauth/mock_device_authenticator.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/sync/test/test_sync_service.h"
-#include "components/wallet/core/browser/walletable_permission_utils.h"
-#include "components/wallet/core/common/wallet_features.h"
-#include "components/wallet/core/common/wallet_prefs.h"
 #include "content/public/test/browser_test.h"
 #include "extensions/browser/api_test_utils.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -240,9 +236,6 @@ class AutofillPrivateApiBrowserTest : public extensions::ExtensionApiTest {
             {autofill::features::kAutofillAiWalletFlightReservation, {}},
             {autofill::features::kAutofillAiWalletVehicleRegistration, {}},
             {autofill::features::kAutofillAiWalletPrivatePasses, {}},
-            {wallet::features::kWalletablePassDetection,
-             {{wallet::features::kWalletablePassDetectionCountryAllowlist.name,
-               "US"}}},
         },
         /*disabled_features=*/
         {});
@@ -438,56 +431,6 @@ IN_PROC_BROWSER_TEST_F(AutofillPrivateApiBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_F(AutofillPrivateApiBrowserTest,
-                       SetWalletablePassDetectionOptInStatus) {
-  autofill_client()->GetPrefs()->registry()->RegisterDictionaryPref(
-      wallet::prefs::kWalletablePassDetectionOptInStatus);
-  autofill_client()->SetUpPrefsAndIdentityForAutofillAi();
-  EXPECT_TRUE(RunAutofillSubtest("optIntoWalletablePassDetection"));
-  EXPECT_TRUE(RunAutofillSubtest("verifyUserOptedIntoWalletablePassDetection"));
-
-  EXPECT_TRUE(RunAutofillSubtest("optOutOfWalletablePassDetection"));
-  EXPECT_TRUE(
-      RunAutofillSubtest("verifyUserOptedOutOfWalletablePassDetection"));
-}
-
-IN_PROC_BROWSER_TEST_F(
-    AutofillPrivateApiBrowserTest,
-    SetWalletablePassDetectionOptInStatus_SwitchEligibility) {
-  autofill_client()->GetPrefs()->registry()->RegisterDictionaryPref(
-      wallet::prefs::kWalletablePassDetectionOptInStatus);
-  autofill_client()->SetUpPrefsAndIdentityForAutofillAi();
-
-  // Ensure we are eligible initially (US is usually supported).
-  autofill_client()->SetVariationConfigCountryCode(
-      autofill::GeoIpCountryCode("US"));
-  ASSERT_TRUE(wallet::IsEligibleForWalletablePassDetection(
-      autofill_client()->GetIdentityManager(),
-      wallet::GeoIpCountryCode(
-          autofill_client()->GetVariationConfigCountryCode().value())));
-
-  EXPECT_TRUE(RunAutofillSubtest("optIntoWalletablePassDetection"));
-  EXPECT_TRUE(RunAutofillSubtest("verifyUserOptedIntoWalletablePassDetection"));
-
-  EXPECT_TRUE(RunAutofillSubtest("optOutOfWalletablePassDetection"));
-  EXPECT_TRUE(
-      RunAutofillSubtest("verifyUserOptedOutOfWalletablePassDetection"));
-
-  // Become ineligible.
-  autofill_client()->SetVariationConfigCountryCode(
-      autofill::GeoIpCountryCode("XX"));
-  ASSERT_FALSE(wallet::IsEligibleForWalletablePassDetection(
-      autofill_client()->GetIdentityManager(),
-      wallet::GeoIpCountryCode(
-          autofill_client()->GetVariationConfigCountryCode().value())));
-
-  // Verify that we cannot opt into Walletable Pass Detection anymore.
-  EXPECT_TRUE(
-      RunAutofillSubtest("optIntoWalletablePassDetectionExpectingFailure"));
-  EXPECT_TRUE(
-      RunAutofillSubtest("verifyUserOptedOutOfWalletablePassDetection"));
-}
-
-IN_PROC_BROWSER_TEST_F(AutofillPrivateApiBrowserTest,
                        AddEntityInstance_SavesToWalletIfEligible) {
   autofill_client()->set_entity_data_manager(
       autofill::AutofillEntityDataManagerFactory::GetForProfile(profile()));
@@ -591,8 +534,7 @@ class AutofillPrivateApiSavePrivatePassToWalletTest
  public:
   AutofillPrivateApiSavePrivatePassToWalletTest() {
     feature_list_.InitWithFeatures(
-        {autofill::features::kAutofillAiWalletPrivatePasses,
-         wallet::features::kWalletApiPrivatePassesConsent},
+        {autofill::features::kAutofillAiWalletPrivatePasses},
         {});
   }
 
@@ -616,8 +558,6 @@ class AutofillPrivateApiSavePrivatePassToWalletTest
         syncer::UserSelectableType::kPayments, true);
     ON_CALL(mock_sync_service_, GetActiveDataTypes())
         .WillByDefault(Return(syncer::DataTypeSet{syncer::AUTOFILL_VALUABLE}));
-    ON_CALL(*autofill_client(), GetConsentAuditor)
-        .WillByDefault(Return(&consent_auditor_));
   }
 
   autofill::MockWalletPassAccessManager& wallet_manager() {
@@ -625,14 +565,9 @@ class AutofillPrivateApiSavePrivatePassToWalletTest
         *autofill_client()->GetWalletPassAccessManager());
   }
 
-  consent_auditor::FakeConsentAuditor& consent_auditor() {
-    return consent_auditor_;
-  }
-
  private:
   base::test::ScopedFeatureList feature_list_;
   testing::NiceMock<MockSyncService> mock_sync_service_;
-  testing::NiceMock<consent_auditor::FakeConsentAuditor> consent_auditor_;
 };
 
 IN_PROC_BROWSER_TEST_F(AutofillPrivateApiSavePrivatePassToWalletTest,
@@ -650,16 +585,9 @@ IN_PROC_BROWSER_TEST_F(AutofillPrivateApiSavePrivatePassToWalletTest,
   std::string json_args;
   base::JSONWriter::Write(args, &json_args);
 
-  // Expect that consent is logged and that the correct session ID if forward
-  // to the Wallet API.
-  consent_auditor::ConsentAuditor::SessionId session_id_consent;
-  consent_auditor::ConsentAuditor::SessionId session_id_api;
-  EXPECT_CALL(consent_auditor(), RecordWalletPrivatePassConsent)
-      .WillOnce(SaveArg<1>(&session_id_consent));
   EXPECT_CALL(wallet_manager(), SaveWalletEntityInstance)
-      .WillOnce(DoAll(SaveArg<1>(&session_id_api),
-                      RunOnceCallback<2>(autofill::test::MaskEntityInstance(
-                          entity_instance))));
+      .WillOnce(RunOnceCallback<2>(
+          autofill::test::MaskEntityInstance(entity_instance)));
 
   auto function = base::MakeRefCounted<
       extensions::AutofillPrivateAddOrUpdateEntityInstanceFunction>();
@@ -673,7 +601,6 @@ IN_PROC_BROWSER_TEST_F(AutofillPrivateApiSavePrivatePassToWalletTest,
       autofill::AutofillEntityDataManagerFactory::GetForProfile(profile());
   autofill::EntityDataChangedWaiter(entity_data_manager).Wait();
 
-  EXPECT_EQ(session_id_consent, session_id_api);
   base::optional_ref<const EntityInstance> saved_entity =
       entity_data_manager->GetEntityInstance(entity_instance.guid());
   ASSERT_TRUE(saved_entity.has_value());

@@ -87,9 +87,6 @@ std::string BuildClientDataJson(ClientDataJsonParams params,
     case ClientDataRequestType::kWebAuthnGet:
       ret.append(R"({"type":"webauthn.get")");
       break;
-    case ClientDataRequestType::kPaymentGet:
-      ret.append(R"({"type":"payment.get")");
-      break;
   }
 
   ret.append(R"(,"challenge":)");

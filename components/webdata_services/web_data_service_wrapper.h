@@ -19,12 +19,6 @@ class KeywordWebDataService;
 class TokenWebData;
 class WebDatabaseService;
 
-#if BUILDFLAG(USE_BLINK)
-namespace payments {
-class WebPaymentsWebDataService;
-}  // namespace payments
-#endif
-
 namespace autofill {
 class AutofillWebDataService;
 }  // namespace autofill
@@ -85,11 +79,6 @@ class WebDataServiceWrapper : public KeyedService {
   scoped_refptr<autofill::AutofillWebDataService> GetAccountAutofillWebData();
   scoped_refptr<KeywordWebDataService> GetKeywordWebData();
   scoped_refptr<TokenWebData> GetTokenWebData();
-#if BUILDFLAG(USE_BLINK)
-  // Virtual for testing.
-  virtual scoped_refptr<payments::WebPaymentsWebDataService>
-  GetWebPaymentsWebData();
-#endif
 
  protected:
   // For testing.
@@ -103,10 +92,6 @@ class WebDataServiceWrapper : public KeyedService {
   scoped_refptr<autofill::AutofillWebDataService> account_autofill_web_data_;
   scoped_refptr<KeywordWebDataService> keyword_web_data_;
   scoped_refptr<TokenWebData> token_web_data_;
-
-#if BUILDFLAG(USE_BLINK)
-  scoped_refptr<payments::WebPaymentsWebDataService> web_payments_web_data_;
-#endif
 };
 
 #endif  // COMPONENTS_WEBDATA_SERVICES_WEB_DATA_SERVICE_WRAPPER_H_

@@ -113,7 +113,7 @@ WebAuthRequestSecurityCheckerImpl::ValidateAncestorOrigins(
   *is_cross_origin = !IsSameOriginWithAncestors(origin);
 
   // Requests in cross-origin iframes are permitted if enabled via permissions
-  // policy and for SPC requests.
+  // policy.
   if (type == RequestType::kMakeCredential &&
       render_frame_host_->IsFeatureEnabled(
           network::mojom::PermissionsPolicyFeature::
@@ -123,24 +123,6 @@ WebAuthRequestSecurityCheckerImpl::ValidateAncestorOrigins(
   if (type == RequestType::kGetAssertion &&
       render_frame_host_->IsFeatureEnabled(
           network::mojom::PermissionsPolicyFeature::kPublicKeyCredentialsGet)) {
-    return blink::mojom::AuthenticatorStatus::SUCCESS;
-  }
-  // For credential creation, SPC credentials (i.e., credentials with the
-  // "payment" extension) may use either the 'publickey-credentials-create' or
-  // 'payment' permissions policy.
-  if (type == RequestType::kMakePaymentCredential) {
-    if (render_frame_host_->IsFeatureEnabled(
-            network::mojom::PermissionsPolicyFeature::
-                kPublicKeyCredentialsCreate) ||
-        render_frame_host_->IsFeatureEnabled(
-            network::mojom::PermissionsPolicyFeature::kPayment)) {
-      return blink::mojom::AuthenticatorStatus::SUCCESS;
-    }
-  }
-
-  if (type == RequestType::kGetPaymentCredentialAssertion &&
-      render_frame_host_->IsFeatureEnabled(
-          network::mojom::PermissionsPolicyFeature::kPayment)) {
     return blink::mojom::AuthenticatorStatus::SUCCESS;
   }
   // TODO(crbug.com/347727501): Add a permissions policy for report.
@@ -190,15 +172,6 @@ WebAuthRequestSecurityCheckerImpl::ValidateDomainAndRelyingPartyID(
       webauthn::OriginAllowedToMakeWebAuthnRequests(caller_origin);
   if (domain_validation != webauthn::ValidationStatus::kSuccess) {
     std::move(callback).Run(ToAuthenticatorStatus(domain_validation));
-    return nullptr;
-  }
-
-  // SecurePaymentConfirmation allows third party payment service provider to
-  // get assertions on behalf of the Relying Parties. Hence it is not required
-  // for the RP ID to be a registrable suffix of the caller origin, as it would
-  // be for WebAuthn requests.
-  if (request_type == RequestType::kGetPaymentCredentialAssertion) {
-    std::move(callback).Run(blink::mojom::AuthenticatorStatus::SUCCESS);
     return nullptr;
   }
 

@@ -20,7 +20,6 @@ class ScopedPromiseResolver {
     kAuthenticator,
     kFedCm,
     kCredentialManager,
-    kPaymentConfirmation,
   };
 
   explicit ScopedPromiseResolver(ScriptPromiseResolverBase* resolver,

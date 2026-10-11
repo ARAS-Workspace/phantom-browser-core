@@ -963,14 +963,6 @@
     'code_health_agents': {
       'filepath': 'agents/projects/code-health/.*',
     },
-    'commerce': {
-      'filepath': 'components/commerce/|'\
-                  'chrome/browser/commerce/|'\
-                  'chrome/browser/ui/commerce/|'\
-                  'chrome/browser/ui/views/commerce/|'\
-                  'chrome/browser/ui/webui/commerce/|'\
-                  'ios/chrome/browser/commerce/',
-    },
     'common_quality_data_proto': {
       'filepath': 'components/optimization_guide/proto/features/common_quality_data.proto'
     },
@@ -1899,24 +1891,6 @@
                   '|components/password_'\
                   '|^ios/chrome/browser/passwords'\
     },
-    'payments': {
-      'filepath': 'chrome/android/java/src/org/chromium/chrome/browser/payments'\
-                  '|chrome/android/javatests/src/org/chromium/chrome/browser/payments'\
-                  '|chrome/browser/payments'\
-                  '|chrome/browser/ui/views/payments'\
-                  '|components/payments/test/data'\
-                  '|components/payments'\
-                  '|content/browser/payments'\
-                  '|content/test/data/payments'\
-                  '|ios/chrome/browser/payments'\
-                  '|ios/web/payments'\
-                  '|ios/web/public/payments'\
-                  '|third_party/blink/web_tests/external/wpt/payment-request'\
-                  '|third_party/blink/web_tests/http/tests/payments'\
-                  '|third_party/blink/web_tests/payments'\
-                  '|third_party/blink/public/platform/modules/payments'\
-                  '|third_party/blink/renderer/modules/payments'
-    },
     'pdf': {
       'filepath': 'components/pdf/'\
                   '|chrome/browser/pdf/'\
@@ -1987,10 +1961,6 @@
     },
     'private_aggregation': {
       'filepath': 'private.?aggregation|aggregation.?service',
-    },
-    'private_ai': {
-      'filepath': 'chrome/browser/private_ai|'\
-                  'components/private_ai'
     },
     'profile_keyed_service': {
       'filepath': 'chrome/browser/profiles/profile_keyed_service_browsertest.cc',
@@ -2334,8 +2304,7 @@
     'translate': {
       'filepath': 'chrome/android/java/src/org/chromium/chrome/browser/translate|'\
                   'chrome/browser/translate|'\
-                  'components/translate|'\
-                  'components/translate_strings_grdp'
+                  'components/translate'
     },
     'turtledove': {
       'filepath': 'content/browser/interest_group/|'\
@@ -2921,9 +2890,6 @@
                      'miketaylr@chromium.org'],
     'clipboard': ['dcheng+clipboard@chromium.org'],
     'code_health_agents': ['agazal@google.com'],
-    'commerce': ['ayman+watch@chromium.org',
-                'mdjones+watch@chromium.org',
-                'yuezhanggg+watch@chromium.org'],
     'common_quality_data_proto': ['bling-alchemy-eng+page-context-watch@google.com'],
     'components_deps': ['droger+watchlist@chromium.org'],
     'compose': ['petewil@chromium.org'],
@@ -3237,7 +3203,6 @@
                         'lizeb+pa@chromium.org',
                         'bartekn+watch@chromium.org'],
     'password_manager': ['gcasto+watchlist@chromium.org'],
-    'payments': ['slobodan+watch@chromium.org'],
     'pdf': ['pdf-reviews@chromium.org'],
     'pdf_ocr': ['kyungjunlee+watch@google.com',
                 'rhalavati+watch@chromium.org'],
@@ -3266,7 +3231,6 @@
     'print_preview': ['print-reviews+preview@chromium.org'],
     'privacy_guide_desktop': ['rainhard+watch@chromium.org'],
     'private_aggregation': ['alexmt+watch@chromium.org'],
-    'private_ai': ['heronyang@google.com', 'mghiware@google.com'],
     'profile_keyed_service': ['rsult@google.com'],
     'psm_libs': ['amraboelkher+watch@chromium.org'],
     'push_messaging': ['peter@chromium.org', 'dibyapal+watch-webapps@chromium.org'],

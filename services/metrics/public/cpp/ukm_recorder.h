@@ -41,7 +41,6 @@ class BtmServiceImpl;
 namespace webid {
 class Metrics;
 }  // namespace webid
-class PaymentAppProviderUtil;
 class RenderFrameHostImpl;
 }  // namespace content
 
@@ -115,13 +114,6 @@ class METRICS_EXPORT UkmRecorder {
   // Get the new SourceId, which is unique for the duration of a browser
   // session.
   static SourceId GetNewSourceID();
-
-  // Gets new source Id for PAYMENT_APP_ID type and updates the source URL to
-  // the scope of the app. This method should only be called by
-  // PaymentAppProviderUtil class when the payment app window is opened.
-  static SourceId GetSourceIdForPaymentAppFromScope(
-      base::PassKey<content::PaymentAppProviderUtil>,
-      const GURL& payment_app_from_scope_url);
 
   // Gets a new SourceId for WEB_IDENTITY_ID type and updates the source URL
   // from the identity provider. This method should only be called in the

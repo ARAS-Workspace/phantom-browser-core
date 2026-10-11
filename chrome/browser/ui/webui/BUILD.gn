@@ -39,7 +39,6 @@ source_set("configs") {
 
   public_deps = [
     "//chrome/browser/ui/tabs/tab_group_home",
-    "//chrome/browser/ui/webui/commerce",
   ]
 
   deps = [
@@ -55,7 +54,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/autofill_and_password_manager_internals",
     "//chrome/browser/ui/webui/bluetooth_internals",
     "//chrome/browser/ui/webui/chrome_urls",
-    "//chrome/browser/ui/webui/commerce:commerce_internals_ui_config",
     "//chrome/browser/ui/webui/components",
     "//chrome/browser/ui/webui/content_settings",
     "//chrome/browser/ui/webui/context_hub",
@@ -78,7 +76,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/omnibox",
     "//chrome/browser/ui/webui/policy",
     "//chrome/browser/ui/webui/predictors",
-    "//chrome/browser/ui/webui/private_ai_internals",
     "//chrome/browser/ui/webui/regional_capabilities_internals",
     "//chrome/browser/ui/webui/saved_tab_groups_unsupported",
     "//chrome/browser/ui/webui/segmentation_internals",
@@ -485,7 +482,6 @@ source_set("chrome_web_ui_controller_factory") {
     "//chrome/browser/ui/webui/version",
     "//chrome/common",
     "//chrome/common:constants",
-    "//components/commerce/core:commerce_constants",
     "//components/favicon/core",
     "//components/feed:feature_list",
     "//components/history/core/browser",

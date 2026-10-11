@@ -4,7 +4,6 @@
 
 // This file contains business logic for power bookmarks side panel content.
 
-import type {BookmarkProductInfo} from '//resources/cr_components/commerce/shared.mojom-webui.js';
 import {PageImageServiceBrowserProxy} from '//resources/cr_components/page_image_service/browser_proxy.js';
 import {ClientId as PageImageServiceClientId} from '//resources/cr_components/page_image_service/page_image_service.mojom-webui.js';
 import {loadTimeData} from '//resources/js/load_time_data.js';
@@ -37,9 +36,6 @@ export interface PowerBookmarksDelegate {
       bookmark: BookmarksTreeNode, oldParent: BookmarksTreeNode,
       newParent: BookmarksTreeNode): void;
   onBookmarkRemoved(bookmark: BookmarksTreeNode): void;
-  getTrackedProductInfos(): {[key: string]: BookmarkProductInfo};
-  getAvailableProductInfos(): Map<string, BookmarkProductInfo>;
-  getProductImageUrl(bookmark: BookmarksTreeNode): string;
 }
 
 export function editingDisabledByPolicy(bookmarks: BookmarksTreeNode[]) {
@@ -165,7 +161,7 @@ export class PowerBookmarksService {
   }
 
   /**
-   * Creates listeners for all relevant bookmark and shopping information.
+   * Creates listeners for all relevant bookmark information.
    * Invoke during setup.
    */
   startListening() {
@@ -351,21 +347,6 @@ export class PowerBookmarksService {
     this.maxImageServiceRequests_ = max;
   }
 
-  getPriceTrackedInfo(bookmark: BookmarksTreeNode): BookmarkProductInfo
-      |undefined {
-    const trackedProductInfos = this.delegate_.getTrackedProductInfos();
-    const priceTrackValue = Object.entries(trackedProductInfos)
-                                .find(([key, _val]) => key === bookmark.id)
-                                ?.[1];
-    return priceTrackValue;
-  }
-
-  getAvailableProductInfo(bookmark: BookmarksTreeNode): BookmarkProductInfo
-      |undefined {
-    const availableProductInfos = this.delegate_.getAvailableProductInfos();
-    return availableProductInfos.get(bookmark.id);
-  }
-
   private applySearchQueryAndLabels_(
       labels: Label[], searchQuery: string|undefined,
       shownBookmarks: BookmarksTreeNode[],
@@ -385,12 +366,7 @@ export class PowerBookmarksService {
   }
 
   private nodeMatchesContentFilters_(
-      bookmark: BookmarksTreeNode, labels: Label[]): boolean {
-    // Price tracking label
-    const isPriceTracked = !!this.getPriceTrackedInfo(bookmark);
-    if (labels[0] && labels[0].active && !isPriceTracked) {
-      return false;
-    }
+      _bookmark: BookmarksTreeNode, _labels: Label[]): boolean {
     return true;
   }
 
@@ -537,17 +513,11 @@ export class PowerBookmarksService {
       // is being fetched.
       this.delegate_.setImageUrl(bookmark, '');
       if (bookmark.url) {
-        const productImageUrl = this.delegate_.getProductImageUrl(bookmark);
-        if (productImageUrl) {
-          this.delegate_.setImageUrl(bookmark, productImageUrl);
-          this.bookmarksWithCachedImages_.add(bookmark.id);
+        if (this.activeImageServiceRequestCount_ <
+            this.maxImageServiceRequests_) {
+          this.findBookmarkImageUrl_(bookmark);
         } else {
-          if (this.activeImageServiceRequestCount_ <
-              this.maxImageServiceRequests_) {
-            this.findBookmarkImageUrl_(bookmark);
-          } else {
-            this.inactiveImageServiceRequests_.set(bookmark.id, bookmark);
-          }
+          this.inactiveImageServiceRequests_.set(bookmark.id, bookmark);
         }
       }
     }

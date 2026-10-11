@@ -84,7 +84,6 @@
 #include "content/browser/network_context_client_base_impl.h"
 #include "content/browser/network_service_instance_impl.h"
 #include "content/browser/notifications/platform_notification_context_impl.h"
-#include "content/browser/payments/payment_app_context_impl.h"
 #include "content/browser/preloading/prerender/prerender_final_status.h"
 #include "content/browser/quota/quota_context.h"
 #include "content/browser/renderer_host/frame_tree_node.h"
@@ -1483,9 +1482,6 @@ void StoragePartitionImpl::Initialize(
   background_sync_context_->Init(service_worker_context_,
                                  *devtools_background_services_context_.get());
 
-  payment_app_context_ = new PaymentAppContextImpl();
-  payment_app_context_->Init(service_worker_context_);
-
   broadcast_channel_service_ = std::make_unique<BroadcastChannelService>();
 
   bluetooth_allowed_devices_map_ =
@@ -1789,11 +1785,6 @@ StoragePartitionImpl::GetPlatformNotificationContext() {
 BackgroundFetchContext* StoragePartitionImpl::GetBackgroundFetchContext() {
   DCHECK(initialized_);
   return background_fetch_context_.get();
-}
-
-PaymentAppContextImpl* StoragePartitionImpl::GetPaymentAppContext() {
-  DCHECK(initialized_);
-  return payment_app_context_.get();
 }
 
 BroadcastChannelService* StoragePartitionImpl::GetBroadcastChannelService() {

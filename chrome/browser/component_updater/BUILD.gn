@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/chrome_build.gni")
-import("//components/on_device_translation/buildflags/features.gni")
 import("//media/media_options.gni")
 import("//net/features.gni")
 import("//third_party/blink/public/public_features.gni")
@@ -16,7 +15,6 @@ source_set("component_updater") {
     "captcha_provider_component_installer.h",
     "chrome_component_updater_configurator.h",
     "chrome_origin_trials_component_installer.h",
-    "commerce_heuristics_component_installer.h",
     "component_installer_errors.h",
     "component_updater_prefs.h",
     "component_updater_utils.h",
@@ -82,7 +80,6 @@ source_set("impl") {
     "captcha_provider_component_installer.cc",
     "chrome_component_updater_configurator.cc",
     "chrome_origin_trials_component_installer.cc",
-    "commerce_heuristics_component_installer.cc",
     "component_updater_prefs.cc",
     "component_updater_utils.cc",
     "crl_set_component_installer.cc",
@@ -120,8 +117,6 @@ source_set("impl") {
     "//chrome/common/platform_runtime",
     "//components/certificate_transparency",
     "//components/certificate_transparency:proto_gen",
-    "//components/commerce/core:commerce_heuristics_data",
-    "//components/commerce/core:feature_list",
     "//components/embedder_support/origin_trials",
     "//components/optimization_guide/core",
     "//components/optimization_guide/proto:optimization_guide_proto",
@@ -192,10 +187,6 @@ source_set("impl") {
       "//media/cdm:cdm_paths",
       "//third_party/widevine/cdm:headers",
     ]
-  }
-
-  if (enable_on_device_translation) {
-    deps += [ "//chrome/browser/on_device_translation" ]
   }
 
   if (chrome_root_store_supported) {

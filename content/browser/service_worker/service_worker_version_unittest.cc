@@ -2704,88 +2704,6 @@ TEST_P(ServiceWorkerVersionTest, RemoveLiveVersion_NoResurrection) {
   helper_->context_wrapper()->RemoveSyncObserver(&sync_observer);
 }
 
-// Verifies that OpenPaymentHandlerWindow() accepts calls for a service worker
-// that has a pending PAYMENT_REQUEST event and opens a window.
-TEST_P(ServiceWorkerVersionTest, OpenPaymentHandlerWindow_WithPendingEvent) {
-  auto* service_worker =
-      helper_->AddNewPendingServiceWorker<FakeServiceWorker>(helper_.get());
-  ASSERT_EQ(blink::ServiceWorkerStatusCode::kOk,
-            StartServiceWorker(version_.get()));
-  service_worker->RunUntilInitializeGlobalScope();
-  version_->SetStatus(ServiceWorkerVersion::ACTIVATED);
-
-  mojo::test::BadMessageObserver bad_message_observer;
-
-  // Simulate a pending PAYMENT_REQUEST event.
-  int request_id = version_->StartRequest(
-      ServiceWorkerMetrics::EventType::PAYMENT_REQUEST, base::DoNothing());
-
-  GURL url = scope_.Resolve("payment_handler.html");
-  base::test::TestFuture<bool, ServiceWorkerClientInfoPtr,
-                         const std::optional<std::string>&>
-      future;
-
-  service_worker->host()->OpenPaymentHandlerWindow(url, future.GetCallback());
-  EXPECT_TRUE(future.Wait());
-
-  EXPECT_FALSE(bad_message_observer.got_bad_message());
-
-  // Clean up the pending request.
-  version_->FinishRequest(request_id, /*was_handled=*/true);
-}
-
-// Verifies that OpenPaymentHandlerWindow() rejects cross-origin URLs and kills
-// the renderer.
-TEST_P(ServiceWorkerVersionTest, OpenPaymentHandlerWindow_CrossOrigin) {
-  auto* service_worker =
-      helper_->AddNewPendingServiceWorker<FakeServiceWorker>(helper_.get());
-  ASSERT_EQ(blink::ServiceWorkerStatusCode::kOk,
-            StartServiceWorker(version_.get()));
-  service_worker->RunUntilInitializeGlobalScope();
-  version_->SetStatus(ServiceWorkerVersion::ACTIVATED);
-
-  mojo::test::BadMessageObserver bad_message_observer;
-
-  // Cross-origin URL.
-  GURL url("https://www.google.com/test/payment_handler.html");
-  base::test::TestFuture<bool, ServiceWorkerClientInfoPtr,
-                         const std::optional<std::string>&>
-      future;
-
-  service_worker->host()->OpenPaymentHandlerWindow(url, future.GetCallback());
-
-  EXPECT_EQ(
-      "Received PaymentRequestEvent#openWindow() request for a cross-origin "
-      "URL.",
-      bad_message_observer.WaitForBadMessage());
-}
-
-// Verifies that OpenPaymentHandlerWindow() rejects calls for a service worker
-// that doesn't have a pending PAYMENT_REQUEST event, and kills the renderer.
-TEST_P(ServiceWorkerVersionTest, OpenPaymentHandlerWindow_NoPendingEvent) {
-  auto* service_worker =
-      helper_->AddNewPendingServiceWorker<FakeServiceWorker>(helper_.get());
-  ASSERT_EQ(blink::ServiceWorkerStatusCode::kOk,
-            StartServiceWorker(version_.get()));
-  service_worker->RunUntilInitializeGlobalScope();
-  version_->SetStatus(ServiceWorkerVersion::ACTIVATED);
-
-  mojo::test::BadMessageObserver bad_message_observer;
-
-  // Same-origin URL but no pending PAYMENT_REQUEST event.
-  GURL url = scope_.Resolve("payment_handler.html");
-  base::test::TestFuture<bool, ServiceWorkerClientInfoPtr,
-                         const std::optional<std::string>&>
-      future;
-
-  service_worker->host()->OpenPaymentHandlerWindow(url, future.GetCallback());
-
-  EXPECT_EQ(
-      "Received PaymentRequestEvent#openWindow() request without a pending "
-      "PaymentRequestEvent.",
-      bad_message_observer.WaitForBadMessage());
-}
-
 class ServiceWorkerVersionFencedFrameTest : public ServiceWorkerVersionTest {
  protected:
   blink::mojom::AncestorFrameType GetAncestorFrameType() const override {
@@ -2847,30 +2765,6 @@ TEST_P(ServiceWorkerVersionFencedFrameTest, OpenNewTab_Rejected) {
 
   EXPECT_EQ("Received Clients#openWindow() request from a fenced frame.",
             bad_message_observer.WaitForBadMessage());
-}
-
-// Verifies that OpenPaymentHandlerWindow() rejects calls for a service worker
-// registered in a fenced frame and reports a bad message.
-TEST_P(ServiceWorkerVersionFencedFrameTest, OpenPaymentHandlerWindow_Rejected) {
-  auto* service_worker =
-      helper_->AddNewPendingServiceWorker<FakeServiceWorker>(helper_.get());
-  ASSERT_EQ(blink::ServiceWorkerStatusCode::kOk,
-            StartServiceWorker(version_.get()));
-  service_worker->RunUntilInitializeGlobalScope();
-  version_->SetStatus(ServiceWorkerVersion::ACTIVATED);
-
-  mojo::test::BadMessageObserver bad_message_observer;
-
-  GURL url = scope_.Resolve("payment_handler.html");
-  base::test::TestFuture<bool, blink::mojom::ServiceWorkerClientInfoPtr,
-                         const std::optional<std::string>&>
-      future;
-
-  service_worker->host()->OpenPaymentHandlerWindow(url, future.GetCallback());
-
-  EXPECT_EQ(
-      "Received PaymentRequestEvent#openWindow() request from a fenced frame.",
-      bad_message_observer.WaitForBadMessage());
 }
 
 // Verifies that OpenNewTab() rejects calls for a service worker that doesn't

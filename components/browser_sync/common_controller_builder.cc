@@ -35,7 +35,6 @@
 #include "components/collaboration/public/data_type_controller/collaboration_group_data_type_controller.h"
 #include "components/collaboration/public/data_type_controller/shared_tab_group_account_data_type_controller.h"
 #include "components/collaboration/public/data_type_controller/shared_tab_group_data_type_controller.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/consent_auditor/consent_auditor.h"
 #include "components/data_sharing/public/data_sharing_service.h"
 #include "components/data_sharing/public/features.h"

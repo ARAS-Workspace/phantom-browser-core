@@ -232,8 +232,6 @@ class OnDemandUpdater {
   friend class ::PluginObserver;
   friend class SwReporterOnDemandFetcher;
   friend class WasmTtsEngineComponentInstallerPolicy;
-  friend class TranslateKitComponentInstallerPolicy;
-  friend class TranslateKitLanguagePackComponentInstallerPolicy;
   friend class ::extensions::AutotestPrivateLoadSmartDimComponentFunction;
   friend class IwaKeyDistributionComponentInstallerPolicy;
   friend class PlatformRuntimeComponentInstallerPolicy;

@@ -389,11 +389,6 @@
       permissions_policy_name: "keyboard-map",
     },
     {
-      name: "LanguageDetector",
-      permissions_policy_name: "language-detector",
-      depends_on: ["LanguageDetectionAPI"],
-    },
-    {
       name: "LanguageModel",
       permissions_policy_name: "language-model",
       depends_on: ["AIPromptAPI"],
@@ -551,11 +546,6 @@
       name: "SyncXHR",
       feature_default: "EnableForAll",
       permissions_policy_name: "sync-xhr",
-    },
-    {
-      name: "Translator",
-      permissions_policy_name: "translator",
-      depends_on: ["TranslationAPI"],
     },
     {
       name: "TrustTokenRedemption",

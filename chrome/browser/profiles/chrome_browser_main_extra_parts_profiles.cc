@@ -59,7 +59,6 @@
 #include "chrome/browser/collaboration/collaboration_service_factory.h"
 #include "chrome/browser/collaboration/comments/comments_service_factory.h"
 #include "chrome/browser/collaboration/messaging/messaging_backend_service_factory.h"
-#include "chrome/browser/commerce/shopping_service_factory.h"
 #include "chrome/browser/consent_auditor/consent_auditor_factory.h"
 #include "chrome/browser/content_index/content_index_provider_factory.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
@@ -105,7 +104,6 @@
 #include "chrome/browser/language/accept_languages_service_factory.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
 #include "chrome/browser/language/url_language_histogram_factory.h"
-#include "chrome/browser/language_detection/language_detection_model_service_factory.h"
 #include "chrome/browser/loader/from_gws_navigation_and_keep_alive_request_tracker_factory.h"
 #include "chrome/browser/login_detection/login_detection_keyed_service_factory.h"
 #include "chrome/browser/lookalikes/lookalike_url_service_factory.h"
@@ -150,7 +148,6 @@
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
 #include "chrome/browser/password_manager/password_change_service_factory.h"
 #include "chrome/browser/password_manager/password_field_classification_model_handler_factory.h"
-#include "chrome/browser/payments/browser_binding/browser_bound_key_deleter_service_factory.h"
 #include "chrome/browser/performance_manager/persistence/site_data/site_data_cache_facade_factory.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
 #include "chrome/browser/permissions/one_time_permissions_tracker_factory.h"
@@ -177,7 +174,6 @@
 #include "chrome/browser/privacy/privacy_metrics_service_factory.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_service_factory.h"
 #include "chrome/browser/privacy_sandbox/privacy_sandbox_settings_factory.h"
-#include "chrome/browser/private_ai/private_ai_service_factory.h"
 #include "chrome/browser/private_insights/private_insights_service_factory.h"
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
 #include "chrome/browser/profile_resetter/triggered_profile_resetter_factory.h"
@@ -261,16 +257,13 @@
 #include "components/autofill/content/browser/autofill_log_router_factory.h"
 #include "components/breadcrumbs/core/breadcrumbs_status.h"
 #include "components/captive_portal/core/buildflags.h"
-#include "components/commerce/core/proto/commerce_subscription_db_content.pb.h"
-#include "components/commerce/core/proto/persisted_state_db_content.pb.h"
+#include "components/session_proto_db/persisted_state_db_content.pb.h"
 #include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/content/clipboard_restriction_service.h"
 #include "components/offline_pages/buildflags/buildflags.h"
-#include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/password_manager/content/browser/password_manager_log_router_factory.h"
 #include "components/password_manager/content/browser/password_requirements_service_factory.h"
 #include "components/password_manager/core/browser/password_manager_blocklist_policy.h"
-#include "components/payments/content/has_enrolled_instrument_query_factory.h"
 #include "components/permissions/features.h"
 #include "components/policy/core/browser/url_list/policy_blocklist_service.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -311,7 +304,6 @@
 #include "chrome/browser/new_tab_page/chrome_colors/chrome_colors_factory.h"
 #include "chrome/browser/password_manager/factories/bulk_leak_check_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_counter_factory.h"
-#include "chrome/browser/payments/payment_request_display_manager_factory.h"
 #include "chrome/browser/picture_in_picture/hats/auto_picture_in_picture_hats_service_factory.h"
 #include "chrome/browser/prefs/persistent_renderer_prefs_manager_factory.h"
 #include "chrome/browser/record_replay/task_parameters_extractor_factory.h"
@@ -335,9 +327,6 @@
 #include "chrome/browser/usb/usb_connection_tracker_factory.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/window_management/isolated_web_apps_window_open_permission_service_factory.h"
-#include "components/commerce/core/proto/cart_db_content.pb.h"
-#include "components/commerce/core/proto/coupon_db_content.pb.h"
-#include "components/commerce/core/proto/discounts_db_content.pb.h"  // nogncheck
 #include "components/optimization_guide/core/model_execution/model_execution_features.h"
 #include "ui/accessibility/accessibility_features.h"
 
@@ -431,10 +420,6 @@
 #include "chrome/browser/speech/extension_api/tts_extension_api.h"
 #include "extensions/browser/browser_context_keyed_service_factories.h"
 #include "extensions/browser/extensions_browser_client.h"
-#endif
-
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-#include "chrome/browser/on_device_translation/service_controller_manager_factory.h"
 #endif
 
 #if BUILDFLAG(ENABLE_PLUGINS)
@@ -611,7 +596,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   tab_groups::CollaborationMessagingObserverFactory::GetInstance();
 #endif
-  commerce::ShoppingServiceFactory::GetInstance();
   ConsentAuditorFactory::GetInstance();
 
   ContextHubServiceFactory::GetInstance();
@@ -718,7 +702,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   visited_url_ranking::VisitedURLRankingServiceFactory::GetInstance();
   InstantServiceFactory::GetInstance();
   IOSPromoTriggerServiceFactory::GetInstance();
-  LanguageDetectionModelServiceFactory::GetInstance();
   LanguageModelManagerFactory::GetInstance();
   LocalOrSyncableBookmarkSyncServiceFactory::GetInstance();
   login_detection::LoginDetectionKeyedServiceFactory::GetInstance();
@@ -774,9 +757,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   OmniboxSuggestionsWatcherFactory::GetInstance();
 #endif
   GeolocationHeaderServiceFactory::GetInstance();
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-  on_device_translation::ServiceControllerManagerFactory::GetInstance();
-#endif
   OnDeviceTailModelServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   OneGoogleBarServiceFactory::GetInstance();
@@ -804,9 +784,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   PasswordManagerSettingsServiceFactory::GetInstance();
   PasswordReuseManagerFactory::GetInstance();
-  payments::BrowserBoundKeyDeleterServiceFactory::GetInstance();
-  payments::HasEnrolledInstrumentQueryFactory::GetInstance();
-  payments::PaymentRequestDisplayManagerFactory::GetInstance();
   if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_DESKTOP) {
     performance_manager::SiteDataCacheFacadeFactory::GetInstance();
   }
@@ -846,7 +823,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   PrivacySandboxServiceFactory::GetInstance();
   PrivacySandboxSettingsFactory::GetInstance();
   PrivateVerificationTokensServiceFactory::GetInstance();
-  private_ai::PrivateAiServiceFactory::GetInstance();
   ProfileNetworkContextServiceFactory::GetInstance();
   ProfilePasswordStoreFactory::GetInstance();
   ProfileStatisticsFactory::GetInstance();
@@ -889,13 +865,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   SessionDataServiceFactory::GetInstance();
 #endif
-  SessionProtoDBFactory<cart_db::ChromeCartContentProto>::GetInstance();
-  SessionProtoDBFactory<commerce_subscription_db::
-                            CommerceSubscriptionContentProto>::GetInstance();
-  SessionProtoDBFactory<coupon_db::CouponContentProto>::GetInstance();
-  SessionProtoDBFactory<discounts_db::DiscountsContentProto>::GetInstance();
-  SessionProtoDBFactory<
-      discount_infos_db::DiscountInfosContentProto>::GetInstance();
   SessionProtoDBFactory<
       persisted_state_db::PersistedStateContentProto>::GetInstance();
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)

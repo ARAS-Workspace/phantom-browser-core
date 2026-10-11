@@ -25,7 +25,6 @@
 #include "content/public/browser/disallow_activation_reason.h"
 #include "content/public/browser/hid_delegate.h"
 #include "content/public/browser/media_session.h"
-#include "content/public/browser/payment_app_provider.h"
 #include "content/public/test/back_forward_cache_util.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -1610,92 +1609,6 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest, DoesNotCacheSMSService) {
   // reason.
   ExpectBlocklistedFeature(
       blink::scheduler::WebSchedulerTrackedFeature::kWebOTPService, FROM_HERE);
-}
-
-namespace {
-
-void OnInstallPaymentApp(base::OnceClosure done_callback,
-                         bool* out_success,
-                         bool success) {
-  *out_success = success;
-  std::move(done_callback).Run();
-}
-
-}  // namespace
-
-IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
-                       DoesNotCachePaymentManager) {
-  ASSERT_TRUE(CreateHttpsServer()->Start());
-
-  base::RunLoop run_loop;
-  GURL service_worker_javascript_file_url =
-      https_server()->GetURL("a.test", "/payments/payment_app.js");
-  bool success = false;
-  PaymentAppProvider::GetOrCreateForWebContents(shell()->web_contents())
-      ->InstallPaymentAppForTesting(
-          /*app_icon=*/SkBitmap(), service_worker_javascript_file_url,
-          /*service_worker_scope=*/
-          service_worker_javascript_file_url.GetWithoutFilename(),
-          /*payment_method_identifier=*/
-          url::Origin::Create(service_worker_javascript_file_url).Serialize(),
-          shell()->web_contents()->GetPrimaryMainFrame()->GetGlobalId(),
-          base::BindOnce(&OnInstallPaymentApp, run_loop.QuitClosure(),
-                         &success));
-  run_loop.Run();
-  ASSERT_TRUE(success);
-
-  // 1) Navigate to a page which includes PaymentManager functionality. Note
-  // that service workers are used, and therefore we use https server instead of
-  // embedded_server()
-  EXPECT_TRUE(NavigateToURL(
-      shell(), https_server()->GetURL(
-                   "a.test", "/payments/payment_app_invocation.html")));
-  RenderFrameHostImpl* rfh_a = current_frame_host();
-  RenderFrameDeletedObserver rfh_a_deleted(rfh_a);
-
-  // Execute functionality that calls PaymentManager.
-  EXPECT_EQ(42, EvalJs(rfh_a, R"(
-    new Promise(async resolve => {
-      const registration = await navigator.serviceWorker.getRegistration(
-          '/payments/payment_app.js');
-      await registration.paymentManager.enableDelegations(['shippingAddress']);
-      resolve(42);
-    });
-  )"));
-
-  // 2) Navigate away.
-  EXPECT_TRUE(
-      NavigateToURL(shell(), https_server()->GetURL("b.test", "/title1.html")));
-
-  // The page uses PaymentManager so it should be deleted.
-  rfh_a_deleted.WaitUntilDeleted();
-
-  // 3) Go back.
-  ASSERT_TRUE(HistoryGoBack(web_contents()));
-  ExpectNotRestored(
-      {NotRestoredReason::kBlocklistedFeatures},
-      {blink::scheduler::WebSchedulerTrackedFeature::kPaymentManager}, {}, {},
-      {}, FROM_HERE);
-
-  // Note that on Mac10.10, there is occasionally blocklisting for network
-  // requests (kOutstandingNetworkRequestOthers). This causes flakiness if we
-  // check against all blocklisted features. As a result, we only check for the
-  // blocklist we care about.
-  base::HistogramBase::Sample32 sample = base::HistogramBase::Sample32(
-      blink::scheduler::WebSchedulerTrackedFeature::kPaymentManager);
-  std::vector<base::Bucket> blocklist_values = histogram_tester().GetAllSamples(
-      "BackForwardCache.HistoryNavigationOutcome."
-      "BlocklistedFeature");
-  EXPECT_TRUE(
-      std::ranges::contains(blocklist_values, sample, &base::Bucket::min));
-
-  std::vector<base::Bucket> all_sites_blocklist_values =
-      histogram_tester().GetAllSamples(
-          "BackForwardCache.AllSites.HistoryNavigationOutcome."
-          "BlocklistedFeature");
-
-  EXPECT_TRUE(std::ranges::contains(all_sites_blocklist_values, sample,
-                                    &base::Bucket::min));
 }
 
 // Pages with acquired keyboard lock should not enter BackForwardCache.

@@ -18,7 +18,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/commerce/shopping_service_factory.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/performance_manager/public/user_tuning/user_performance_tuning_manager.h"
 #include "chrome/browser/performance_manager/public/user_tuning/user_tuning_utils.h"
@@ -84,9 +83,6 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/browsing_data/core/features.h"
-#include "components/commerce/core/commerce_feature_list.h"
-#include "components/commerce/core/feature_utils.h"
-#include "components/commerce/core/shopping_service.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/favicon_base/favicon_url_parser.h"
 #include "components/history/core/browser/features.h"
@@ -230,15 +226,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
   html_source->AddBoolean("hasEnterpriseLabel",
                           entry && !entry->GetEnterpriseProfileLabel().empty());
-
-  commerce::ShoppingService* shopping_service =
-      commerce::ShoppingServiceFactory::GetForBrowserContext(profile);
-  html_source->AddBoolean("changePriceEmailNotificationsEnabled",
-                          shopping_service->IsShoppingListEligible());
-  if (shopping_service->IsShoppingListEligible()) {
-    commerce::ShoppingServiceFactory::GetForBrowserContext(profile)
-        ->FetchPriceEmailPref();
-  }
 
   TemplateURLService* template_url_service =
       TemplateURLServiceFactory::GetForProfile(profile);

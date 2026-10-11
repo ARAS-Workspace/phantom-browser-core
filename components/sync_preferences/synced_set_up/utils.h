@@ -9,7 +9,6 @@
 #include <string_view>
 
 #include "base/containers/fixed_flat_map.h"
-#include "components/commerce/core/pref_names.h"
 #include "components/ntp_tiles/pref_names.h"
 #include "components/omnibox/browser/omnibox_pref_names.h"
 #include "components/safety_check/safety_check_pref_names.h"
@@ -50,7 +49,7 @@ inline constexpr auto kCrossDeviceToProfilePrefMap =
         {prefs::kCrossDeviceMostVisitedHomeModuleEnabled,
          ntp_tiles::prefs::kMostVisitedHomeModuleEnabled},
         {prefs::kCrossDevicePriceTrackingHomeModuleEnabled,
-         commerce::kPriceTrackingHomeModuleEnabled},
+         "home.module.price_tracking.enabled"},
         {prefs::kCrossDeviceSafetyCheckHomeModuleEnabled,
          safety_check::prefs::kSafetyCheckHomeModuleEnabled},
         {prefs::kCrossDeviceTabResumptionHomeModuleEnabled,

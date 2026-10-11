@@ -49,7 +49,6 @@
     "NDEFReader",
     "NetworkInformation",
     "Notification",
-    "PaymentRequest",
     "RTCIceTransport",
     "PermissionStatus",
     "HTMLVideoElementPictureInPicture",

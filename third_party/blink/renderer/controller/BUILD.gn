@@ -299,7 +299,6 @@ source_set("blink_unittests_sources") {
     "//base",
     "//base:i18n",
     "//base/test:test_support",
-    "//components/payments/mojom:mojom_blink",
     "//components/performance_manager/public/mojom:mojom_blink",
     "//content/test:test_support",
     "//gpu:test_support",

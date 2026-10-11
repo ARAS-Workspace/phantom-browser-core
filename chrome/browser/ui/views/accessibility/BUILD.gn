@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/ui.gni")
-import("//components/on_device_translation/buildflags/features.gni")
 
 assert(toolkit_views)
 
@@ -135,13 +134,8 @@ source_set("interactive_ui_tests") {
     "//chrome/browser/preloading:test_support",
     "//chrome/browser/ui",
     "//chrome/test:test_support_ui",
-    "//components/on_device_translation/buildflags",
     "//ui/views:test_support",
   ]
-
-  if (enable_on_device_translation) {
-    deps += [ "//components/on_device_translation:public" ]
-  }
 
   if (use_atk) {
     sources += [ "browser_accessibility_uitest_auralinux.cc" ]

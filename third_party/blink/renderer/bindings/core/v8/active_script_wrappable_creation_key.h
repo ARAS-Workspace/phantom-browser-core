@@ -79,8 +79,6 @@ class ActiveScriptWrappableCreationKey final {
   friend class NDEFReader;
   friend class NetworkInformation;
   friend class Notification;
-  friend class PaymentRequest;
-  friend class PaymentResponse;
   friend class PerformanceObserver;
   friend class PermissionStatus;
   friend class PictureInPictureWindow;

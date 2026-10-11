@@ -41,11 +41,6 @@ void ScopedPromiseResolver::OnConnectionError() {
           DOMExceptionCode::kNotSupportedError,
           "Error connecting to Credential Management service."));
       break;
-    case ConnectionType::kPaymentConfirmation:
-      resolver_->Reject(MakeGarbageCollected<DOMException>(
-          DOMExceptionCode::kNotSupportedError,
-          "Error connecting to Secure Payment Confirmation service."));
-      break;
   }
 }
 

@@ -6,7 +6,7 @@
 
 #include "base/no_destructor.h"
 #include "build/build_config.h"
-#include "components/commerce/core/proto/persisted_state_db_content.pb.h"
+#include "components/session_proto_db/persisted_state_db_content.pb.h"
 
 SessionProtoDBFactory<persisted_state_db::PersistedStateContentProto>*
 GetPersistedStateSessionProtoDBFactory() {
@@ -21,93 +21,4 @@ SessionProtoDBFactory<persisted_state_db::PersistedStateContentProto>*
 SessionProtoDBFactory<
     persisted_state_db::PersistedStateContentProto>::GetInstance() {
   return GetPersistedStateSessionProtoDBFactory();
-}
-
-SessionProtoDBFactory<
-    commerce_subscription_db::CommerceSubscriptionContentProto>*
-GetCommerceSubscriptionSessionProtoDBFactory() {
-  static base::NoDestructor<SessionProtoDBFactory<
-      commerce_subscription_db::CommerceSubscriptionContentProto>>
-      instance;
-  return instance.get();
-}
-
-template <>
-SessionProtoDBFactory<
-    commerce_subscription_db::CommerceSubscriptionContentProto>*
-SessionProtoDBFactory<
-    commerce_subscription_db::CommerceSubscriptionContentProto>::GetInstance() {
-  return GetCommerceSubscriptionSessionProtoDBFactory();
-}
-
-SessionProtoDBFactory<parcel_tracking_db::ParcelTrackingContent>*
-GetParcelTrackingSessionProtoDBFactory() {
-  static base::NoDestructor<
-      SessionProtoDBFactory<parcel_tracking_db::ParcelTrackingContent>>
-      instance;
-  return instance.get();
-}
-
-template <>
-SessionProtoDBFactory<parcel_tracking_db::ParcelTrackingContent>*
-SessionProtoDBFactory<
-    parcel_tracking_db::ParcelTrackingContent>::GetInstance() {
-  return GetParcelTrackingSessionProtoDBFactory();
-}
-
-SessionProtoDBFactory<discount_infos_db::DiscountInfosContentProto>*
-GetDiscountInfosSessionProtoDBFactory() {
-  static base::NoDestructor<
-      SessionProtoDBFactory<discount_infos_db::DiscountInfosContentProto>>
-      instance;
-  return instance.get();
-}
-
-template <>
-SessionProtoDBFactory<discount_infos_db::DiscountInfosContentProto>*
-SessionProtoDBFactory<
-    discount_infos_db::DiscountInfosContentProto>::GetInstance() {
-  return GetDiscountInfosSessionProtoDBFactory();
-}
-
-SessionProtoDBFactory<cart_db::ChromeCartContentProto>*
-GetChromeCartSessionProtoDBFactory() {
-  static base::NoDestructor<
-      SessionProtoDBFactory<cart_db::ChromeCartContentProto>>
-      instance;
-  return instance.get();
-}
-
-template <>
-SessionProtoDBFactory<cart_db::ChromeCartContentProto>*
-SessionProtoDBFactory<cart_db::ChromeCartContentProto>::GetInstance() {
-  return GetChromeCartSessionProtoDBFactory();
-}
-
-SessionProtoDBFactory<coupon_db::CouponContentProto>*
-GetCouponSessionProtoDBFactory() {
-  static base::NoDestructor<
-      SessionProtoDBFactory<coupon_db::CouponContentProto>>
-      instance;
-  return instance.get();
-}
-
-template <>
-SessionProtoDBFactory<coupon_db::CouponContentProto>*
-SessionProtoDBFactory<coupon_db::CouponContentProto>::GetInstance() {
-  return GetCouponSessionProtoDBFactory();
-}
-
-SessionProtoDBFactory<discounts_db::DiscountsContentProto>*
-GetDiscountsSessionProtoDBFactory() {
-  static base::NoDestructor<
-      SessionProtoDBFactory<discounts_db::DiscountsContentProto>>
-      instance;
-  return instance.get();
-}
-
-template <>
-SessionProtoDBFactory<discounts_db::DiscountsContentProto>*
-SessionProtoDBFactory<discounts_db::DiscountsContentProto>::GetInstance() {
-  return GetDiscountsSessionProtoDBFactory();
 }

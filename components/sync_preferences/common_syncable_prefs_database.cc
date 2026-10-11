@@ -13,7 +13,6 @@
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/browsing_data/core/pref_names.h"
-#include "components/commerce/core/pref_names.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/desktop_to_mobile_promos/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
@@ -22,7 +21,6 @@
 #include "components/ntp_tiles/pref_names.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/payments/core/payment_prefs.h"
 #include "components/saved_tab_groups/public/pref_names.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/sync/base/data_type.h"
@@ -243,7 +241,7 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {browsing_data::prefs::kLastClearBrowsingDataTime,
          {syncable_prefs_ids::kLastClearBrowsingDataTime, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {commerce::kPriceEmailNotificationsEnabled,
+        {"price_tracking.email_notifications_enabled",
          {syncable_prefs_ids::kPriceEmailNotificationsEnabled,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
         {language::prefs::kAcceptLanguages,
@@ -288,7 +286,7 @@ constexpr auto kCommonSyncablePrefsAllowlist =
          {syncable_prefs_ids::kWasAutoSignInFirstRunExperienceShown,
           syncer::PRIORITY_PREFERENCES, PrefSensitivity::kNone,
           MergeBehavior::kNone}},
-        {payments::kCanMakePaymentEnabled,
+        {"payments.can_make_payment_enabled",
          {syncable_prefs_ids::kCanMakePaymentEnabled, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
         {prefs::kCookieControlsMode,

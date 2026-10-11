@@ -5,7 +5,6 @@
 #include "components/segmentation_platform/embedder/home_modules/price_tracking_notification_promo.h"
 
 #include "base/metrics/field_trial_params.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/segmentation_platform/embedder/home_modules/constants.h"

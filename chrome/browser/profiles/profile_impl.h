@@ -195,9 +195,6 @@ class ProfileImpl : public Profile {
   void UpdateAvatarInStorage();
   void UpdateIsEphemeralInStorage();
   void UpdateAiSubscriptionTierInStorage();
-  // Called after a profile is initialized, to record 'one per profile creation'
-  // metrics relating to user prefs.
-  void RecordPrefValuesAfterProfileInitialization();
 
   policy::ConfigurationPolicyProvider* configuration_policy_provider();
 

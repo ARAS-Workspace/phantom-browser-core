@@ -62,8 +62,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
-#include "chrome/browser/payments/browser_binding/browser_bound_key_deleter_service.h"
-#include "chrome/browser/payments/browser_binding/browser_bound_key_deleter_service_factory.h"
 #include "chrome/browser/permissions/permission_actions_history_factory.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
 #include "chrome/browser/preloading/prefetch/no_state_prefetch/no_state_prefetch_manager_factory.h"
@@ -120,7 +118,6 @@
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/password_manager/core/browser/password_store/password_store_interface.h"
 #include "components/password_manager/core/browser/password_store/smart_bubble_stats_store.h"
-#include "components/payments/content/web_payments_web_data_service.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_actions_history.h"
@@ -595,16 +592,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
           content::StoragePartition::REMOVE_DATA_MASK_LOCAL_STORAGE,
           chrome::ChromeUINewTabPageURLAsGURL(), base::DoNothing());
     }
-
-    if (filter_builder->MatchesMostOriginsAndDomains()) {
-      if (payments::
-              BrowserBoundKeyDeleterService* browser_bound_key_deleter_service =
-                  payments::BrowserBoundKeyDeleterServiceFactory::GetForProfile(
-                      profile_)) {
-        browser_bound_key_deleter_service->RemoveInvalidBBKs();
-      }
-    }
-
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -934,22 +921,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
       web_data_service->GetDBTaskRunner()->PostTaskAndReply(
           FROM_HERE, base::DoNothing(),
           CreateTaskCompletionClosure(TracingDataType::kAutofillData));
-    }
-  }
-
-  if ((remove_mask & constants::DATA_TYPE_PASSWORDS)
-      || (remove_mask & constants::DATA_TYPE_FORM_DATA)
-  ) {
-    scoped_refptr<payments::WebPaymentsWebDataService>
-        payment_web_data_service =
-            webdata_services::WebDataServiceWrapperFactory::
-                GetWebPaymentsWebDataServiceForBrowserContext(
-                    profile_, ServiceAccessType::EXPLICIT_ACCESS);
-    if (payment_web_data_service) {
-      payment_web_data_service->ClearSecurePaymentConfirmationCredentials(
-          delete_begin_, delete_end_,
-          CreateTaskCompletionClosure(
-              TracingDataType::kSecurePaymentConfirmationCredentials));
     }
   }
 

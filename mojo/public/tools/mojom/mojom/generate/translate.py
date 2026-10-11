@@ -243,9 +243,6 @@ _EXTENSIBLE_ENUMS_MISSING_DEFAULT_CHROMEOS = {
   'x:ml.model_loader.mojom.ComputeResult',
   'x:ml.model_loader.mojom.CreateModelLoaderResult',
   'x:ml.model_loader.mojom.LoadModelResult',
-  'x:payments.mojom.BillingResponseCode',
-  'x:payments.mojom.CreateDigitalGoodsResponseCode',
-  'x:payments.mojom.ItemType',
   'x:printing.mojom.PrinterType',
   'x:test.mojom.ExtensibleEnumForUnitTestsCrOS',
 }

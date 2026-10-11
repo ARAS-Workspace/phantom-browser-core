@@ -1457,14 +1457,6 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(126, "agale@chromium.org",
                        "Triggered when a tab is discarded.")));
 
-  // kIPHPriceTrackingInSidePanelFeature;
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForLegacyPromo(
-          &feature_engagement::kIPHPriceTrackingInSidePanelFeature,
-          kToolbarSidePanelButtonElementId, IDS_PRICE_TRACKING_SIDE_PANEL_IPH)
-          .SetMetadata(120, "yuezhanggg@chromium.org",
-                       "Triggered when a price tracking is enabled.")));
-
   // kIPHBackNavigationMenuFeature:
   registry.RegisterFeature(
       std::move(FeaturePromoSpecification::CreateForSnoozePromo(

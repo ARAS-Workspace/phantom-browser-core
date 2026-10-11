@@ -15,7 +15,6 @@
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
 #include "third_party/blink/renderer/core/frame/local_frame.h"
 #include "third_party/blink/renderer/core/frame/navigator.h"
-#include "third_party/blink/renderer/modules/contacts_picker/contact_address.h"
 #include "third_party/blink/renderer/platform/bindings/exception_state.h"
 #include "third_party/blink/renderer/platform/bindings/script_state.h"
 #include "third_party/blink/renderer/platform/heap/visitor.h"
@@ -66,17 +65,6 @@ TypeConverter<blink::ContactInfo*, blink::mojom::blink::ContactInfoPtr>::
     }
 
     contact_info->setTel(numbers);
-  }
-
-  if (contact->address) {
-    blink::HeapVector<blink::Member<blink::ContactAddress>> addresses;
-    for (auto& address : *contact->address) {
-      auto* blink_address = blink::MakeGarbageCollected<blink::ContactAddress>(
-          std::move(address));
-      addresses.push_back(blink_address);
-    }
-
-    contact_info->setAddress(addresses);
   }
 
   if (contact->icon) {

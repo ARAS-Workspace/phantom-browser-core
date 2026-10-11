@@ -19,7 +19,6 @@ class TestInternalAuthenticator : public webauthn::InternalAuthenticator {
 
   // InternalAuthenticator:
   void SetEffectiveOrigin(const url::Origin& origin) override {}
-  void SetPaymentOptions(blink::mojom::PaymentOptionsPtr payment) override {}
   void MakeCredential(
       blink::mojom::PublicKeyCredentialCreationOptionsPtr options,
       blink::mojom::Authenticator::MakeCredentialCallback callback) override {}
@@ -29,12 +28,6 @@ class TestInternalAuthenticator : public webauthn::InternalAuthenticator {
       blink::mojom::Authenticator::
           IsUserVerifyingPlatformAuthenticatorAvailableCallback callback)
       override;
-  bool IsGetMatchingCredentialIdsSupported() override;
-  void GetMatchingCredentialIds(
-      const std::string& relying_party_id,
-      const std::vector<std::vector<uint8_t>>& credential_ids,
-      bool require_third_party_payment_bit,
-      webauthn::GetMatchingCredentialIdsCallback callback) override {}
   void Cancel() override {}
   content::RenderFrameHost* GetRenderFrameHost() override;
 };

@@ -96,7 +96,6 @@
 #include "chrome/browser/headless/headless_mode_util.h"
 #include "chrome/browser/hid/chrome_hid_delegate.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/language_detection/language_detection_model_service_factory.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/loader/keep_alive_request_tracker.h"
 #include "chrome/browser/media/audio_service_util.h"
@@ -121,7 +120,6 @@
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
-#include "chrome/browser/payments/payment_request_display_manager_factory.h"
 #include "chrome/browser/performance_manager/public/chrome_browser_main_extra_parts_performance_manager.h"
 #include "chrome/browser/performance_manager/public/chrome_content_browser_client_performance_manager_part.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
@@ -255,8 +253,6 @@
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
 #include "components/language/core/browser/pref_names.h"
-#include "components/language_detection/content/browser/content_language_detection_driver.h"
-#include "components/language_detection/content/common/language_detection.mojom.h"
 #include "components/live_caption/caption_util.h"
 #include "components/media_device_salt/media_device_salt_service.h"
 #include "components/media_router/browser/presentation/controller_presentation_service_delegate_impl.h"
@@ -269,12 +265,9 @@
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/no_state_prefetch/common/no_state_prefetch_final_status.h"
 #include "components/no_state_prefetch/common/no_state_prefetch_url_loader_throttle.h"
-#include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
 #include "components/password_manager/core/browser/features/password_features.h"
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
-#include "components/payments/content/payment_request_display_manager.h"
-#include "components/payments/content/secure_payment_confirmation_service_factory.h"
 #include "components/pdf/common/pdf_util.h"
 #include "components/performance_manager/public/graph/frame_node.h"
 #include "components/performance_manager/public/performance_manager.h"
@@ -468,7 +461,6 @@
 #include "chrome/browser/webauthn/chrome_authenticator_request_delegate.h"
 #include "chrome/browser/webauthn/chrome_web_authentication_delegate.h"
 #include "chrome/grit/chrome_unscaled_resources.h"  // nogncheck crbug.com/40147906
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
 #include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/password_manager/core/common/password_manager_features.h"
@@ -558,10 +550,6 @@
 #include "chrome/browser/offline_pages/offline_page_url_loader_request_interceptor.h"
 #endif
 
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-#include "chrome/browser/on_device_translation/translation_manager_impl.h"
-#include "third_party/blink/public/mojom/on_device_translation/translation_manager.mojom.h"
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
 #if BUILDFLAG(ENABLE_VR)
 #include "chrome/browser/vr/chrome_xr_integration_client.h"
@@ -590,9 +578,6 @@
 #include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
 #endif  // BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-#include "components/on_device_translation/component_manager.h"
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/browser/printing/print_preview_dialog_controller.h"
@@ -631,12 +616,6 @@ using web_app::ChromeContentBrowserClientIsolatedWebAppsPart;
 namespace {
 
 const char kAIManagerUserDataKey[] = "ai_manager";
-
-#if BUILDFLAG(IS_MAC)
-constexpr char kSecurePaymentConfirmationKeychainAccessGroup[] =
-    MAC_TEAM_IDENTIFIER_STRING "." MAC_BUNDLE_IDENTIFIER_STRING
-                               ".secure-payment-confirmation";
-#endif  // BUILDFLAG(IS_MAC)
 
 // Whether to disable caching of the advanced-protection state in
 // ShouldEnableStrictSiteIsolation().
@@ -5562,19 +5541,6 @@ ChromeContentBrowserClient::GetWebAuthenticationRequestDelegate(
       render_frame_host);
 }
 
-void ChromeContentBrowserClient::CreateSecurePaymentConfirmationService(
-    content::RenderFrameHost* render_frame_host,
-    mojo::PendingReceiver<payments::mojom::SecurePaymentConfirmationService>
-        receiver) {
-  std::string spc_keychain_access_group;
-#if BUILDFLAG(IS_MAC)
-  spc_keychain_access_group = kSecurePaymentConfirmationKeychainAccessGroup;
-#endif  // BUILDFLAG(IS_MAC)
-  payments::CreateSecurePaymentConfirmationService(
-      render_frame_host, std::move(receiver),
-      std::move(spc_keychain_access_group));
-}
-
 std::unique_ptr<net::ClientCertStore>
 ChromeContentBrowserClient::CreateClientCertStore(
     content::BrowserContext* browser_context) {
@@ -5786,16 +5752,6 @@ bool ChromeContentBrowserClient::HandleWebUI(
     return false;
   }
 
-  return true;
-}
-
-bool ChromeContentBrowserClient::ShowPaymentHandlerWindow(
-    content::BrowserContext* browser_context,
-    const GURL& url,
-    base::OnceCallback<void(bool, int, int)> callback) {
-  payments::PaymentRequestDisplayManagerFactory::GetInstance()
-      ->GetForBrowserContext(browser_context)
-      ->ShowPaymentHandlerWindow(url, std::move(callback));
   return true;
 }
 
@@ -6477,18 +6433,6 @@ bool ChromeContentBrowserClient::SetupEmbedderSandboxParameters(
     return serializer->SetParameter(
         sandbox::policy::kParamScreenAiComponentPath,
         screen_ai_binary_path.value());
-  }
-  if (sandbox_type == sandbox::mojom::Sandbox::kOnDeviceTranslation) {
-    auto translatekit_binary_path =
-        on_device_translation::ComponentManager::GetInstance()
-            .GetTranslateKitComponentPath();
-    if (translatekit_binary_path.empty()) {
-      VLOG(1) << "TranslationKit component not found.";
-      return false;
-    }
-    return serializer->SetParameter(
-        sandbox::policy::kParamTranslatekitComponentPath,
-        translatekit_binary_path.value());
   }
 
   return false;
@@ -7202,40 +7146,6 @@ void ChromeContentBrowserClient::BindAIManager(
   AIManager* ai_manager = static_cast<AIManager*>(
       context_user_data->GetUserData(kAIManagerUserDataKey));
   ai_manager->AddReceiver(std::move(receiver));
-}
-
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-void ChromeContentBrowserClient::BindTranslationManager(
-    content::RenderProcessHost* host,
-    content::BrowserContext* browser_context,
-    base::SupportsUserData* context_user_data,
-    const url::Origin& origin,
-    mojo::PendingReceiver<blink::mojom::TranslationManager> receiver) {
-  on_device_translation::TranslationManagerImpl::Bind(
-      host, browser_context, context_user_data, origin,
-      g_browser_process->component_updater(), std::move(receiver));
-}
-#endif
-
-namespace {
-
-const char kContentLanguageDetectionDriverUserDataKey[] =
-    "ContentLanguageDetectionDriverUserDataKey";
-
-}  // namespace
-
-void ChromeContentBrowserClient::BindLanguageDetectionDriver(
-    content::BrowserContext* browser_context,
-    base::SupportsUserData* context_user_data,
-    mojo::PendingReceiver<
-        language_detection::mojom::ContentLanguageDetectionDriver> receiver) {
-  auto language_detection_driver =
-      std::make_unique<language_detection::ContentLanguageDetectionDriver>(
-          LanguageDetectionModelServiceFactory::GetForProfile(
-              Profile::FromBrowserContext(browser_context)));
-  language_detection_driver->AddReceiver(std::move(receiver));
-  context_user_data->SetUserData(kContentLanguageDetectionDriverUserDataKey,
-                                 std::move(language_detection_driver));
 }
 
 void ChromeContentBrowserClient::SetSamplingProfiler(

@@ -116,9 +116,6 @@ class ChromeBookmarkClient : public power_bookmarks::BookmarkClientBase {
 
   raw_ptr<bookmarks::BookmarkModel> model_ = nullptr;
 
-  std::unique_ptr<power_bookmarks::SuggestedSaveLocationProvider>
-      shopping_save_location_provider_;
-
   std::unique_ptr<signin::PersistentRepeatingTimer> repeating_timer_;
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)

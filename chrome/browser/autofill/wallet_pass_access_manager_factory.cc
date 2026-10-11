@@ -9,16 +9,12 @@
 #include "base/no_destructor.h"
 #include "chrome/browser/autofill/autofill_entity_data_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/autofill/core/browser/foundations/autofill_client.h"
 #include "components/autofill/core/browser/network/autofill_ai/fake_wallet_pass_access_manager.h"
 #include "components/autofill/core/browser/network/autofill_ai/wallet_pass_access_manager.h"
-#include "components/autofill/core/browser/network/autofill_ai/wallet_pass_access_manager_impl.h"
 #include "components/autofill/core/common/autofill_debug_features.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/wallet/core/browser/network/wallet_http_client_impl.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
 
 namespace autofill {
 
@@ -40,7 +36,6 @@ WalletPassAccessManagerFactory::WalletPassAccessManagerFactory()
           "WalletPassAccessManager",
           ProfileSelections::BuildRedirectedInIncognito()) {
   DependsOn(AutofillEntityDataManagerFactory::GetInstance());
-  DependsOn(IdentityManagerFactory::GetInstance());
 }
 
 WalletPassAccessManagerFactory::~WalletPassAccessManagerFactory() = default;
@@ -59,12 +54,7 @@ WalletPassAccessManagerFactory::BuildServiceInstanceForBrowserContext(
     return std::make_unique<FakeWalletPassAccessManager>(data_manager);
   }
 
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(profile);
-  return std::make_unique<WalletPassAccessManagerImpl>(
-      std::make_unique<wallet::WalletHttpClientImpl>(
-          identity_manager, profile->GetURLLoaderFactory()),
-      data_manager);
+  return nullptr;
 }
 
 }  // namespace autofill

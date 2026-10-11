@@ -15,7 +15,6 @@
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
 #include "components/language_detection/core/constants.h"
-#include "components/language_detection/core/features.h"
 #include "components/language_detection/core/language_detection_model.h"
 #include "components/language_detection/core/language_detection_util.h"
 #include "components/language_detection/core/language_matcher.h"

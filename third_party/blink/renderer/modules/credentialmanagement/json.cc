@@ -196,9 +196,6 @@ AuthenticationExtensionsClientInputsFromJSON(
   if (json.hasGetCredBlob()) {
     result->setGetCredBlob(json.getCredBlob());
   }
-  if (json.hasPayment()) {
-    result->setPayment(json.payment());
-  }
   if (json.hasRemoteDesktopClientOverride()) {
     result->setRemoteDesktopClientOverride(json.remoteDesktopClientOverride());
   }

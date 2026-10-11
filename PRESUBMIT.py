@@ -983,7 +983,6 @@ _BANNED_CPP_FUNCTIONS: Sequence[BanRule] = (
             r'base/debug/buffered_dwarf_reader\.h',
 
             # Needed to use QUICHE API.
-            r'components/private_ai/phosphor/.*',
             r'net/third_party/quiche/overrides/quiche_platform_impl/quiche_stack_trace_impl\.*',
             r'services/network/web_transport\.cc',
 

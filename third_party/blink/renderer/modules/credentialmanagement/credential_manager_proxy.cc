@@ -17,7 +17,6 @@ CredentialManagerProxy::CredentialManagerProxy(LocalDOMWindow& window)
       authenticator_(window.GetExecutionContext()),
       credential_manager_(window.GetExecutionContext()),
       webotp_service_(window.GetExecutionContext()),
-      spc_service_(window.GetExecutionContext()),
       federated_request_service_(window.GetExecutionContext()),
       digital_identity_request_(window.GetExecutionContext()) {}
 
@@ -54,18 +53,6 @@ mojom::blink::WebOTPService* CredentialManagerProxy::WebOTPService() {
             frame->GetTaskRunner(TaskType::kMiscPlatformAPI)));
   }
   return webotp_service_.get();
-}
-
-payments::mojom::blink::SecurePaymentConfirmationService*
-CredentialManagerProxy::SecurePaymentConfirmationService() {
-  if (!spc_service_.is_bound()) {
-    LocalFrame* frame = GetSupplementable()->GetFrame();
-    DCHECK(frame);
-    frame->GetBrowserInterfaceBroker().GetInterface(
-        spc_service_.BindNewPipeAndPassReceiver(
-            frame->GetTaskRunner(TaskType::kMiscPlatformAPI)));
-  }
-  return spc_service_.get();
 }
 
 template <typename Interface>
@@ -150,7 +137,6 @@ void CredentialManagerProxy::Trace(Visitor* visitor) const {
   visitor->Trace(authenticator_);
   visitor->Trace(credential_manager_);
   visitor->Trace(webotp_service_);
-  visitor->Trace(spc_service_);
   visitor->Trace(federated_request_service_);
   visitor->Trace(digital_identity_request_);
   Supplement<LocalDOMWindow>::Trace(visitor);

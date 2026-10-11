@@ -61,9 +61,6 @@ constexpr char kHardwareVideoEncodingSandbox[] = "hardware_video_encoding";
 #endif
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-constexpr char kOnDeviceTranslationSandbox[] = "on_device_translation";
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 }  // namespace
 
@@ -125,9 +122,6 @@ void SetCommandLineFlagsForSandboxType(base::CommandLine* command_line,
     case Sandbox::kScreenAI:
 #endif
     case Sandbox::kSpeechRecognition:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-    case Sandbox::kOnDeviceTranslation:
-#endif
       DCHECK(command_line->GetSwitchValueASCII(switches::kProcessType) ==
              switches::kUtilityProcess);
       DCHECK(!command_line->HasSwitch(switches::kServiceSandboxType));
@@ -215,10 +209,6 @@ std::string StringFromUtilitySandboxType(Sandbox sandbox_type) {
       return kPrintBackendSandbox;
     case Sandbox::kScreenAI:
       return kScreenAISandbox;
-#endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-    case Sandbox::kOnDeviceTranslation:
-      return kOnDeviceTranslationSandbox;
 #endif
 #if BUILDFLAG(IS_MAC)
     case Sandbox::kMirroring:
@@ -309,11 +299,6 @@ sandbox::mojom::Sandbox UtilitySandboxTypeFromString(
   }
   if (sandbox_string == kScreenAISandbox) {
     return Sandbox::kScreenAI;
-  }
-#endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-  if (sandbox_string == kOnDeviceTranslationSandbox) {
-    return Sandbox::kOnDeviceTranslation;
   }
 #endif
 #if BUILDFLAG(IS_LINUX)

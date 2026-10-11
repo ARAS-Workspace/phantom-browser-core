@@ -40,8 +40,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/commerce/core/commerce_constants.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/feed/feed_feature_list.h"
 #include "components/send_tab_to_self/features.h"
 #include "components/split_tabs/split_tab_visual_data.h"

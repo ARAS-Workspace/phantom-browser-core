@@ -9,7 +9,6 @@ import("//build/config/ui.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/guest_contents/common/buildflags.gni")
 import("//components/guest_view/buildflags/buildflags.gni")
-import("//components/on_device_translation/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
 import("//components/supervised_user/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
@@ -83,7 +82,6 @@ test("components_unittests") {
       "test/data/paint_preview/",
       "test/data/password_manager/",
       "test/data/patch_service/",
-      "test/data/payments/",
       "test/data/performance_manager/",
       "test/data/printing/",
       "test/data/protocol_handler/",
@@ -96,7 +94,7 @@ test("components_unittests") {
       "test/data/sessions/",
       "test/data/shared_highlighting/",
       "test/data/subresource_filter/",
-      "test/data/translate/",
+      "test/data/language_detection/",
       "test/data/ui_devtools/",
       "test/data/unzip_service/",
       "test/data/update_client/",
@@ -122,6 +120,7 @@ test("components_unittests") {
     "//components/affiliations/core/browser/domain_matching:unit_tests",
     "//components/apdu:unit_tests",
     "//components/application_locale_storage:unit_tests",
+    "//components/autofill/core/browser:currency_formatter_unit_tests",
     "//components/base32:unit_tests",
     "//components/blocklist/opt_out_blocklist:unit_tests",
     "//components/blocklist/opt_out_blocklist/sql:unit_tests",
@@ -138,8 +137,6 @@ test("components_unittests") {
     "//components/client_update_protocol:unit_tests",
     "//components/cloud_devices/common:unit_tests",
     "//components/collaboration:unit_tests",
-    "//components/commerce/core:shopping_service_unit_tests",
-    "//components/commerce/core:utils_unit_tests",
     "//components/component_updater:unit_tests",
     "//components/component_updater/installer_policies:unit_tests",
     "//components/consent_auditor:unit_tests",
@@ -161,7 +158,6 @@ test("components_unittests") {
     "//components/download:unit_tests",
     "//components/encrypted_messages:unit_tests",
     "//components/enterprise/device_trust/core/signals:unit_tests",
-    "//components/facilitated_payments/core/validation:unit_tests",
     "//components/favicon/core:unit_tests",
     "//components/favicon_base:unit_tests",
     "//components/feature_engagement:unit_tests",
@@ -177,7 +173,6 @@ test("components_unittests") {
     "//components/language/core/common:unit_tests",
     "//components/language/core/language_model:unit_tests",
     "//components/language_detection/core:unit_tests",
-    "//components/language_detection/core/browser:unit_tests",
     "//components/leveldb_proto:unit_tests",
     "//components/live_caption:unit_tests",
     "//components/local_state:unit_tests",
@@ -206,7 +201,6 @@ test("components_unittests") {
     "//components/os_crypt/common:unit_tests",
     "//components/page_image_service:unit_tests",
     "//components/page_info/core:unit_tests",
-    "//components/payments/core:unit_tests",
     "//components/persistent_cache:unit_tests",
     "//components/personal_context/core:unit_tests",
     "//components/policy/core/browser:unit_tests",
@@ -295,7 +289,6 @@ test("components_unittests") {
     "//components/variations/field_trial_config:unit_tests",
     "//components/variations/service:unit_tests",
     "//components/vector_icons:unit_tests",
-    "//components/wallet/core/browser:unit_tests",
     "//components/web_resource:unit_tests",
     "//components/webauthn/core/browser:unit_tests",
     "//components/webauthn/core/browser/device_authorization:unit_tests",
@@ -357,7 +350,6 @@ test("components_unittests") {
       "//components/captive_portal/content:unit_tests",
       "//components/capture_mode:unit_tests",
       "//components/certificate_transparency:unit_tests",
-      "//components/commerce/content/browser:unit_tests",
       "//components/content_capture/browser:unit_tests",
       "//components/content_extraction/content/browser:unit_tests",
       "//components/content_relationship_verification:unit_tests",
@@ -411,8 +403,6 @@ test("components_unittests") {
       "//components/paint_preview/player:unit_tests",
       "//components/paint_preview/renderer:unit_tests",
       "//components/passage_embeddings/core:unit_tests",
-      "//components/payments/content:unit_tests",
-      "//components/payments/content/utility:unit_tests",
       "//components/pdf/common:unit_tests",
       "//components/performance_manager:unit_tests",
       "//components/performance_manager/scenario_api:unit_tests",
@@ -437,7 +427,6 @@ test("components_unittests") {
       "//components/visibility_timer:unit_tests",
       "//components/visited_url_ranking/public:unit_tests",
       "//components/visitedlink/test:unit_tests",
-      "//components/wallet/content/browser:unit_tests",
       "//components/web_cache/browser:unit_tests",
       "//components/web_package:unit_tests",
       "//components/web_package/test_support:unit_tests",
@@ -508,11 +497,6 @@ test("components_unittests") {
   }
 
   deps += [
-    "//components/commerce/core:account_checker_unittests",
-    "//components/commerce/core:commerce_heuristics_data_unittests",
-    "//components/commerce/core:feature_list_unittests",
-    "//components/commerce/core/subscriptions:subscriptions_unit_tests",
-    "//components/commerce/core/webui:unit_tests",
     "//components/feedback:unit_tests",
     "//components/feedback/redaction_tool:unit_tests",
     "//components/keep_alive_registry:unit_tests",
@@ -528,8 +512,6 @@ test("components_unittests") {
     "//components/web_modal:unit_tests",
     "//components/zoom:unit_tests",
   ]
-
-  deps += [ "//components/private_ai:unit_tests" ]
 
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser:unit_tests" ]
@@ -603,13 +585,6 @@ test("components_unittests") {
     ]
   }
 
-  if (enable_on_device_translation) {
-    deps += [
-      "//components/on_device_translation:unit_tests",
-      "//components/on_device_translation/service:unit_tests",
-    ]
-  }
-
   # No components should depend on Chrome.
   # Since //chrome depends on //extensions, we also only assert_no_deps on
   # extensions targets.
@@ -617,7 +592,6 @@ test("components_unittests") {
   assert_no_deps += disallowed_extension_deps_
 
   fuzztests = [
-    "AndroidAppDescriptionToolsFuzzTest.MaintainsSingleActivityInvariant",
     "Base32ParityTest.EncodeParity",
     "Base32ParityTest.DecodeParity",
     "CBORReaderFuzzTest.ReadAndWriteIsIdempotentAndDoesNotCrash",
@@ -627,7 +601,6 @@ test("components_unittests") {
     "CupEcdsaFuzzTest.EcdsaCupTestOneInputDoesNotCrash",
     "CupMldsa44FuzzTest.Mldsa44CupTestOneInputDoesNotCrash",
     "CurrencyFormatterFuzzTest.FormatDoesNotCrash",
-    "PaymentCurrencyAmountFuzzTest.FromValueDictDoesNotCrash",
     "PrivacySandboxAttestationsParserFuzzTest.ParseAttestationsFromStringDoesNotCrash",
     "PwgEncoderFuzzTest.EncodeDoesNotCrash",
     "RustStreamFramerFuzzTest.FeedDoesNotCrashOnArbitraryChunks",
@@ -746,7 +719,6 @@ if (use_blink) {
       "//components/ukm:test_support",
       "//components/ukm/content",
       "//components/url_rewrite/browser",
-      "//components/wallet/content/renderer:browser_tests",
       "//content/public/browser",
       "//content/shell:content_shell_lib",
       "//content/test:browsertest_support",

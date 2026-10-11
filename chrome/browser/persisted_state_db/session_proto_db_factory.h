@@ -8,49 +8,18 @@
 #include "base/no_destructor.h"
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile_keyed_service_factory.h"
-#include "components/commerce/core/proto/commerce_subscription_db_content.pb.h"
-#include "components/commerce/core/proto/discount_infos_db_content.pb.h"  // nogncheck
-#include "components/commerce/core/proto/parcel_tracking_db_content.pb.h"
 #include "components/session_proto_db/session_proto_db.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/storage_partition.h"
 
-#include "components/commerce/core/proto/cart_db_content.pb.h"
-#include "components/commerce/core/proto/coupon_db_content.pb.h"
-#include "components/commerce/core/proto/discounts_db_content.pb.h"  // nogncheck
-
 namespace {
 const char kPersistedStateDBFolder[] = "persisted_state_db";
-const char kChromeCartDBFolder[] = "chrome_cart_db";
-const char kMerchantTrustSignalDBFolder[] = "merchant_signal_db";
-const char kCommerceSubscriptionDBFolder[] = "commerce_subscription_db";
-const char kCouponDBFolder[] = "coupon_db";
-const char kDiscountsDBFolder[] = "discounts_db";
-const char kDiscountInfosDBFolder[] = "discount_infos_db";
-const char kParcelTrackingDBFolder[] = "parcel_tracking_db";
 }  // namespace
 
 SessionProtoDBFactory<persisted_state_db::PersistedStateContentProto>*
 GetPersistedStateSessionProtoDBFactory();
-
-SessionProtoDBFactory<discount_infos_db::DiscountInfosContentProto>*
-GetDiscountInfosSessionProtoDBFactory();
-
-SessionProtoDBFactory<cart_db::ChromeCartContentProto>*
-GetChromeCartSessionProtoDBFactory();
-SessionProtoDBFactory<coupon_db::CouponContentProto>*
-GetCouponSessionProtoDBFactory();
-SessionProtoDBFactory<discounts_db::DiscountsContentProto>*
-GetDiscountsSessionProtoDBFactory();
-
-SessionProtoDBFactory<
-    commerce_subscription_db::CommerceSubscriptionContentProto>*
-GetCommerceSubscriptionSessionProtoDBFactory();
-
-SessionProtoDBFactory<parcel_tracking_db::ParcelTrackingContent>*
-GetParcelTrackingSessionProtoDBFactory();
 
 // Factory to create a ProtoDB per browsing session (BrowserContext) and per
 // proto. Incognito is currently not supported and the factory will return
@@ -126,46 +95,6 @@ SessionProtoDBFactory<T>::BuildServiceInstanceForBrowserContext(
         proto_database_provider,
         context->GetPath().AppendASCII(kPersistedStateDBFolder),
         leveldb_proto::ProtoDbType::PERSISTED_STATE_DATABASE,
-        content::GetUIThreadTaskRunner({}));
-  } else if (std::is_base_of<
-                 commerce_subscription_db::CommerceSubscriptionContentProto,
-                 T>::value) {
-    return std::make_unique<SessionProtoDB<T>>(
-        proto_database_provider,
-        context->GetPath().AppendASCII(kCommerceSubscriptionDBFolder),
-        leveldb_proto::ProtoDbType::COMMERCE_SUBSCRIPTION_DATABASE,
-        content::GetUIThreadTaskRunner({}));
-  } else if (std::is_base_of<parcel_tracking_db::ParcelTrackingContent,
-                             T>::value) {
-    return std::make_unique<SessionProtoDB<T>>(
-        proto_database_provider,
-        context->GetPath().AppendASCII(kParcelTrackingDBFolder),
-        leveldb_proto::ProtoDbType::COMMERCE_PARCEL_TRACKING_DATABASE,
-        content::GetUIThreadTaskRunner({}));
-  } else if (std::is_base_of<discount_infos_db::DiscountInfosContentProto,
-                             T>::value) {
-    return std::make_unique<SessionProtoDB<T>>(
-        proto_database_provider,
-        context->GetPath().AppendASCII(kDiscountInfosDBFolder),
-        leveldb_proto::ProtoDbType::DISCOUNT_INFOS_DATABASE,
-        content::GetUIThreadTaskRunner({}));
-  } else if (std::is_base_of<cart_db::ChromeCartContentProto, T>::value) {
-    return std::make_unique<SessionProtoDB<T>>(
-        proto_database_provider,
-        context->GetPath().AppendASCII(kChromeCartDBFolder),
-        leveldb_proto::ProtoDbType::CART_DATABASE,
-        content::GetUIThreadTaskRunner({}));
-  } else if (std::is_base_of<coupon_db::CouponContentProto, T>::value) {
-    return std::make_unique<SessionProtoDB<T>>(
-        proto_database_provider,
-        context->GetPath().AppendASCII(kCouponDBFolder),
-        leveldb_proto::ProtoDbType::COUPON_DATABASE,
-        content::GetUIThreadTaskRunner({}));
-  } else if (std::is_base_of<discounts_db::DiscountsContentProto, T>::value) {
-    return std::make_unique<SessionProtoDB<T>>(
-        proto_database_provider,
-        context->GetPath().AppendASCII(kDiscountsDBFolder),
-        leveldb_proto::ProtoDbType::DISCOUNTS_DATABASE,
         content::GetUIThreadTaskRunner({}));
   } else {
     // Must add in leveldb_proto::ProtoDbType and database directory folder for

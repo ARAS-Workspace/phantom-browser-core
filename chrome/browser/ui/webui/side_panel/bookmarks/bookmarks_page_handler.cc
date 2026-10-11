@@ -24,7 +24,6 @@
 #include "chrome/browser/bookmarks/bookmark_parent_folder.h"
 #include "chrome/browser/bookmarks/bookmark_parent_folder_children.h"
 #include "chrome/browser/bookmarks/managed_bookmark_service_factory.h"
-#include "chrome/browser/commerce/shopping_service_factory.h"
 #include "chrome/browser/extensions/api/bookmark_manager_private/bookmark_manager_private_api.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
@@ -42,7 +41,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/interaction/browser_elements_views.h"
 #include "chrome/browser/ui/webui/bookmarks/bookmark_prefs.h"
-#include "chrome/browser/ui/webui/commerce/shopping_list_context_menu_controller.h"
 #include "chrome/browser/ui/webui/side_panel/bookmarks/bookmarks.mojom.h"
 #include "chrome/browser/ui/webui/side_panel/bookmarks/bookmarks_side_panel_ui.h"
 #include "chrome/browser/ui/webui/side_panel/reading_list/reading_list_ui.h"
@@ -79,7 +77,6 @@ class BookmarksPageHandler::BookmarkContextMenu
       std::vector<raw_ptr<const bookmarks::BookmarkNode, VectorExperimental>>
           bookmarks,
       const side_panel::mojom::ActionSource& source,
-      commerce::ShoppingListContextMenuController* shopping_list_controller,
       bool can_paste)
       : ui::SimpleMenuModel(this),
         embedder_(embedder),
@@ -93,28 +90,11 @@ class BookmarksPageHandler::BookmarkContextMenu
             BookmarkLaunchLocation::kSidePanelContextMenu,
             bookmarks,
             can_paste))),
-        shopping_list_controller_(shopping_list_controller),
         bookmarks_(bookmarks) {
     if (bookmarks.size() == 0) {
       mojo::ReportBadMessage("BookmarkContextMenu has empty bookmarks");
       return;
     }
-    if (source == side_panel::mojom::ActionSource::kPriceTracking) {
-      DCHECK(shopping_list_controller_);
-      AddItem(IDC_BOOKMARK_BAR_OPEN_ALL);
-      AddItem(IDC_BOOKMARK_BAR_OPEN_ALL_NEW_WINDOW);
-      AddItem(IDC_BOOKMARK_BAR_OPEN_ALL_INCOGNITO);
-      if (bookmarks.size() == 1 && bookmarks.front()->is_url()) {
-        AddItem(IDC_BOOKMARK_BAR_OPEN_SPLIT_VIEW);
-      }
-      AddSeparator(ui::NORMAL_SEPARATOR);
-      shopping_list_controller_->AddPriceTrackingItemForBookmark(
-          this, bookmarks.front());
-      AddSeparator(ui::NORMAL_SEPARATOR);
-      AddItem(IDC_BOOKMARK_MANAGER);
-      return;
-    }
-
     AddItem(IDC_BOOKMARK_BAR_OPEN_ALL);
     AddItem(IDC_BOOKMARK_BAR_OPEN_ALL_NEW_WINDOW);
     AddItem(IDC_BOOKMARK_BAR_OPEN_ALL_INCOGNITO);
@@ -146,10 +126,6 @@ class BookmarksPageHandler::BookmarkContextMenu
   ~BookmarkContextMenu() override = default;
 
   void ExecuteCommand(int command_id, int event_flags) override {
-    if (shopping_list_controller_ && shopping_list_controller_->ExecuteCommand(
-                                         command_id, bookmarks_.front())) {
-      return;
-    }
     controller_->ExecuteCommand(command_id, event_flags);
   }
 
@@ -178,8 +154,6 @@ class BookmarksPageHandler::BookmarkContextMenu
   }
   base::WeakPtr<TopChromeWebUIController::Embedder> embedder_;
   std::unique_ptr<BookmarkContextMenuController> controller_;
-  raw_ptr<commerce::ShoppingListContextMenuController>
-      shopping_list_controller_;
   std::vector<raw_ptr<const bookmarks::BookmarkNode, VectorExperimental>>
       bookmarks_;
 };
@@ -894,7 +868,6 @@ void BookmarksPageHandler::OnCanPasteFromClipboard(
           ? nullptr
           : std::make_unique<BookmarkContextMenu>(
                 browser_window_interface_, embedder, bookmarks, source,
-                bookmarks_ui_->GetShoppingListContextMenuController(),
                 can_paste));
 }
 

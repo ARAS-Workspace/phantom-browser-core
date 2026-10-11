@@ -4,7 +4,6 @@
 
 module blink.mojom;
 
-import "components/payments/mojom/payment_request_data.mojom";
 import "mojo/public/mojom/base/time.mojom";
 import "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom";
 import "url/mojom/origin.mojom";
@@ -116,13 +115,6 @@ struct CmtgKeyResponse {
   array<uint8> signature;
 };
 
-// The `payment` extension response.
-struct AuthenticationExtensionsPaymentResponse {
-  // The signature of the browser bound key corresponding to the public key in
-  // the payment portion of the clientDataJson.
-  array<uint8> browser_bound_signature;
-};
-
 // The public key and attestation returned by Authenticator::MakeCredential.
 struct MakeCredentialAuthenticatorResponse {
   CommonCredentialInfo info;
@@ -178,9 +170,6 @@ struct MakeCredentialAuthenticatorResponse {
   // extension output should be.
   bool echo_large_blob;
   bool supports_large_blob;
-
-  // The response for the payment extension.
-  AuthenticationExtensionsPaymentResponse? payment;
 
   // The response for the Credential Manager Trust Group key extension.
   CmtgKeyResponse? cmtg_key;
@@ -249,9 +238,6 @@ struct AuthenticationExtensionsClientOutputs {
   // null if none.
   array<uint8>? get_cred_blob;
 
-  // The response for the payment extension.
-  AuthenticationExtensionsPaymentResponse? payment;
-
   // The response for the Credential Manager Trust Group key extension.
   CmtgKeyResponse? cmtg_key;
 
@@ -308,45 +294,6 @@ struct PRFValues {
   // prefix before being used. These are unhashed values when used as inputs.
   array<uint8> first;
   array<uint8>? second;
-};
-
-// Payment parameters passed into calls to GetAssertion for Secure Payment
-// Confirmation.
-// TODO(https://crbug.com/1239249): Convert to a non-mojo struct, because this
-// is not used in any mojo interfaces.
-struct PaymentOptions {
-  payments.mojom.PaymentCurrencyAmount total;
-  PaymentCredentialInstrument instrument;
-  string? payee_name;
-  url.mojom.Origin? payee_origin;
-  array<ShownPaymentEntityLogo>? payment_entities_logos;
-  array<uint8>? browser_bound_public_key;
-};
-
-// TODO(https://crbug.com/1239249): Move to payment_request.mojom after this
-// struct is no longer used in here.
-struct PaymentCredentialInstrument {
-  // Friendly name for displaying this instrument to the user.
-  string display_name;
-
-  // URL for an icon to display alongside the display_name. The URL is secure,
-  // not required to share the same origin with the current page.
-  url.mojom.Url icon;
-
-  // Whether the icon is required to be shown in the UI.
-  bool iconMustBeShown;
-
-  // An additional detail string for displaying this instrument to the user.
-  // For example, "**** 1234 | 01/29" (for a credit card instrument). The
-  // browser validates this to be valid UTF8 and at most 4K characters.
-  string? details;
-};
-
-// TODO(https://crbug.com/40193778): Convert to a non-mojo struct when
-// PaymentOptions is converted to a non-mojo struct.
-struct ShownPaymentEntityLogo {
-  url.mojom.Url url;
-  string label;
 };
 
 // RemoteDesktopClientOverride allows an allowlisted origin to perform WebAuthn
@@ -445,10 +392,6 @@ struct AuthenticationExtensionsClientInputs {
   // Indicates that a remote desktop client is making a forwarded request on
   // behalf of another origin.
   RemoteDesktopClientOverride? remote_desktop_client_override;
-
-  // Parameters defining the type of browser bound keys that the relying party
-  // would accept.
-  array<PublicKeyCredentialParameters>? payment_browser_bound_key_parameters;
 
   // `cmtg_key` is true if the request contained a Credential Manager Trust
   // Group key extension.
@@ -579,9 +522,6 @@ struct PublicKeyCredentialCreationOptions {
   // https://w3c.github.io/webauthn/#sctn-large-blob-extension
   LargeBlobSupport large_blob_enable;
 
-  // Whether this request is for making a PaymentCredential.
-  bool is_payment_credential_creation;
-
   // If present, attempt the store the given value as a credblob.
   // https://fidoalliance.org/specs/fido-v2.1-rd-20201208/fido-client-to-authenticator-protocol-v2.1-rd-20201208.html#sctn-credBlob-extension
   array<uint8>? cred_blob;
@@ -593,10 +533,6 @@ struct PublicKeyCredentialCreationOptions {
   // Indicates that a remote desktop client is making a forwarded request on
   // behalf of another origin.
   RemoteDesktopClientOverride? remote_desktop_client_override;
-
-  // Parameters defining the type of browser bound keys that the relying party
-  // would accept.
-  array<PublicKeyCredentialParameters>? payment_browser_bound_key_parameters;
 
   // https://w3c.github.io/webauthn/#dom-publickeycredentialcreationoptionsjson-attestationformats
   array<string> attestation_formats;

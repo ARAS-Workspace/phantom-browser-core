@@ -75,7 +75,6 @@
 #include "components/autofill/core/common/signatures.h"
 #include "components/autofill/core/common/unique_ids.h"
 #include "components/consent_auditor/consent_auditor.h"
-#include "components/wallet/core/common/wallet_features.h"
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 
@@ -594,17 +593,6 @@ void AutofillAiManager::HandlePromptResult(
       case AutofillClient::AutofillAiImportPromptType::kSave:
       case AutofillClient::AutofillAiImportPromptType::kMigrate: {
         consent_auditor::ConsentAuditor::SessionId session_id;
-        // When the feature flag is disabled, `SaveWalletEntityInstance()`
-        // doesn't require a valid `session_id`.
-        if (base::FeatureList::IsEnabled(
-                wallet::features::kWalletApiPrivatePassesConsent)) {
-          CHECK(ui_context.accepted_consent_string_id.has_value());
-          CHECK(ui_context.accept_button_string_id.has_value());
-          session_id = RecordWalletPrivatePassConsent(
-              ui_context.accepted_consent_string_id.value(),
-              ui_context.accept_button_string_id.value(),
-              *client_->GetConsentAuditor(), *client_->GetIdentityManager());
-        }
         wallet_manager->SaveWalletEntityInstance(entity, session_id,
                                                  std::move(callback));
         break;

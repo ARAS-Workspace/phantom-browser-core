@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "base/test/scoped_feature_list.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/segmentation_platform/embedder/home_modules/card_selection_signals.h"
 #include "components/segmentation_platform/embedder/home_modules/constants.h"

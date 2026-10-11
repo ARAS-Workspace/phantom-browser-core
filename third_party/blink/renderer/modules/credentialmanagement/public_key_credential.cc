@@ -80,9 +80,6 @@ void OnGetClientCapabilitiesComplete(
   results.emplace_back("extension:largeBlob", true);
   results.emplace_back("extension:credBlob", true);
   results.emplace_back("extension:getCredBlob", true);
-  results.emplace_back(
-      "extension:payment",
-      RuntimeEnabledFeatures::SecurePaymentConfirmationEnabled());
   results.emplace_back("extension:prf", true);
   results.emplace_back(
       "extension:cmtgKey",

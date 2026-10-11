@@ -35,17 +35,9 @@ class CONTENT_EXPORT WebAuthRequestSecurityChecker
     // (e.g., navigator.credentials.create()).
     kMakeCredential,
 
-    // A request to create a credential that can be used cross-origin for
-    // payments via Secure Payment Confirmation (SPC).
-    kMakePaymentCredential,
-
     // A standard WebAuthn request to retrieve an authentication assertion
     // (e.g., navigator.credentials.get()).
     kGetAssertion,
-
-    // A Secure Payment Confirmation (SPC) request to retrieve an assertion
-    // (e.g., via the Payment Request API).
-    kGetPaymentCredentialAssertion,
 
     // WebAuthn Signal API request
     kReport

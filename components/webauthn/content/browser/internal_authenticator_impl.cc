@@ -40,16 +40,10 @@ void InternalAuthenticatorImpl::SetEffectiveOrigin(const url::Origin& origin) {
   DCHECK(!effective_origin_.opaque());
 }
 
-void InternalAuthenticatorImpl::SetPaymentOptions(
-    blink::mojom::PaymentOptionsPtr payment) {
-  payment_ = std::move(payment);
-}
-
 void InternalAuthenticatorImpl::MakeCredential(
     blink::mojom::PublicKeyCredentialCreationOptionsPtr options,
     blink::mojom::Authenticator::MakeCredentialCallback callback) {
   authenticator_common_->MakeCredential(effective_origin_, std::move(options),
-                                        std::move(payment_),
                                         std::move(callback));
 }
 
@@ -59,7 +53,7 @@ void InternalAuthenticatorImpl::GetAssertion(
   auto options = blink::mojom::GetCredentialOptions::New();
   options->public_key = std::move(pk_options);
   authenticator_common_->GetCredential(
-      effective_origin_, std::move(options), std::move(payment_),
+      effective_origin_, std::move(options),
       base::BindOnce(
           [](GetAssertionCallback get_assertion_callback,
              blink::mojom::GetCredentialResponsePtr response) {
@@ -79,20 +73,6 @@ void InternalAuthenticatorImpl::IsUserVerifyingPlatformAuthenticatorAvailable(
         IsUserVerifyingPlatformAuthenticatorAvailableCallback callback) {
   authenticator_common_->IsUserVerifyingPlatformAuthenticatorAvailable(
       effective_origin_, std::move(callback));
-}
-
-bool InternalAuthenticatorImpl::IsGetMatchingCredentialIdsSupported() {
-  // TODO(crbug.com/40868539): Not yet supported on any desktop platform.
-  return false;
-}
-
-void InternalAuthenticatorImpl::GetMatchingCredentialIds(
-    const std::string& relying_party_id,
-    const std::vector<std::vector<uint8_t>>& credential_ids,
-    bool require_third_party_payment_bit,
-    webauthn::GetMatchingCredentialIdsCallback callback) {
-  // Not yet supported on any desktop platform.
-  NOTREACHED();
 }
 
 void InternalAuthenticatorImpl::Cancel() {

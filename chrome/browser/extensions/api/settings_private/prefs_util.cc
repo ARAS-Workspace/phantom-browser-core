@@ -30,7 +30,6 @@
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/browsing_data/core/pref_names.h"
-#include "components/commerce/core/pref_names.h"
 #include "components/component_updater/pref_names.h"
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/dom_distiller/core/pref_names.h"
@@ -42,7 +41,6 @@
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/payments/core/payment_prefs.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/permissions/pref_names.h"
 #include "components/personal_context/core/personal_context_prefs.h"
@@ -159,8 +157,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[optimization_guide::prefs::kFindAndFillWithGeminiSettings] =
       settings_api::PrefType::kNumber;
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  (*s_allowlist)[payments::kCanMakePaymentEnabled] =
-      settings_api::PrefType::kBoolean;
   (*s_allowlist)[bookmarks::prefs::kShowBookmarkBar] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[bookmarks::prefs::kBookmarkBarVisibilityState] =
@@ -330,8 +326,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
 
   // Sync and personalization page.
   (*s_allowlist)[::prefs::kSearchSuggestEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::commerce::kPriceEmailNotificationsEnabled] =
       settings_api::PrefType::kBoolean;
 
   // Languages page

@@ -1540,41 +1540,6 @@ const availableTests = [
     chrome.test.succeed();
   },
 
-  async function optIntoWalletablePassDetection() {
-    chrome.test.assertTrue(
-        await chrome.autofillPrivate.setWalletablePassDetectionOptInStatus(
-            true));
-    chrome.test.succeed();
-  },
-
-  async function optOutOfWalletablePassDetection() {
-    chrome.test.assertTrue(
-        await chrome.autofillPrivate.setWalletablePassDetectionOptInStatus(
-            false));
-    chrome.test.succeed();
-  },
-
-  async function optIntoWalletablePassDetectionExpectingFailure() {
-    chrome.test.assertFalse(
-        await chrome.autofillPrivate.setWalletablePassDetectionOptInStatus(
-            true));
-    chrome.test.succeed();
-  },
-
-  async function verifyUserOptedIntoWalletablePassDetection() {
-    chrome.test.assertEq(
-        true,
-        await chrome.autofillPrivate.getWalletablePassDetectionOptInStatus());
-    chrome.test.succeed();
-  },
-
-  async function verifyUserOptedOutOfWalletablePassDetection() {
-    chrome.test.assertEq(
-        false,
-        await chrome.autofillPrivate.getWalletablePassDetectionOptInStatus());
-    chrome.test.succeed();
-  },
-
   async function verifyIsReadOnlyTrueRetained() {
     const readOnlyGuid = 'e4bbe384-ee63-45a4-8df3-713a58fdc199';
     const readOnlyEntity = structuredClone(ENTITY_INSTANCE);
@@ -1747,8 +1712,6 @@ const TESTS_FOR_CONFIG = {
   'optOutOfAutofillAi': ['optOutOfAutofillAi'],
   'verifyUserOptedIntoAutofillAi': ['verifyUserOptedIntoAutofillAi'],
   'verifyUserOptedOutOfAutofillAi': ['verifyUserOptedOutOfAutofillAi'],
-  'optIntoWalletablePassDetectionExpectingFailure':
-      ['optIntoWalletablePassDetectionExpectingFailure'],
 };
 
 const testConfig = window.location.search.substring(1);

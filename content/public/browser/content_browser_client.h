@@ -29,7 +29,6 @@
 #include "build/buildflag.h"
 #include "components/download/public/common/quarantine_connection.h"
 #include "components/file_access/scoped_file_access.h"
-#include "components/language_detection/content/common/language_detection.mojom-forward.h"
 #include "content/common/content_export.h"
 #include "content/public/browser/allow_service_worker_result.h"
 #include "content/public/browser/auction_result.h"
@@ -89,9 +88,7 @@
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_error.mojom-forward.h"
 #include "third_party/blink/public/mojom/manifest/manifest.mojom-forward.h"
 #include "third_party/blink/public/mojom/navigation/navigation_params.mojom-forward.h"
-#include "third_party/blink/public/mojom/on_device_translation/translation_manager.mojom-forward.h"
 #include "third_party/blink/public/mojom/origin_trials/origin_trials_settings.mojom-forward.h"
-#include "third_party/blink/public/mojom/payments/secure_payment_confirmation_service.mojom-forward.h"
 #include "third_party/blink/public/mojom/worker/shared_worker_info.mojom.h"
 #include "ui/base/clipboard/clipboard_metadata.h"
 #include "ui/base/page_transition_types.h"
@@ -2119,11 +2116,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       mojo::PendingReceiver<blink::mojom::ManagedConfigurationService>
           receiver);
 
-  virtual void CreateSecurePaymentConfirmationService(
-      RenderFrameHost* render_frame_host,
-      mojo::PendingReceiver<payments::mojom::SecurePaymentConfirmationService>
-          receiver);
-
   // Allows the embedder to provide an implementation of the Serial API.
   virtual SerialDelegate* GetSerialDelegate();
 
@@ -2142,19 +2134,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // Allows the embedder to provide an implementation of the Local Font Access
   // API.
   virtual FontAccessDelegate* GetFontAccessDelegate();
-
-  // Attempt to open the Payment Handler window inside its corresponding
-  // PaymentRequest UI surface. Returns true if the ContentBrowserClient
-  // implementation supports this operation (desktop Chrome) or false otherwise.
-  // |callback| is invoked with true if the window opened successfully, false if
-  // the attempt failed. Both the render process and frame IDs are also passed
-  // to |callback|.
-  virtual bool ShowPaymentHandlerWindow(
-      content::BrowserContext* browser_context,
-      const GURL& url,
-      base::OnceCallback<void(bool /* success */,
-                              int /* render_process_id */,
-                              int /* render_frame_id */)> callback);
 
   // Returns true if the tab security level is acceptable to allow WebAuthn
   // requests, false otherwise. This is not attached to
@@ -2999,25 +2978,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       base::SupportsUserData* context_user_data,
       RenderFrameHost* rfh,
       mojo::PendingReceiver<blink::mojom::AIManager> receiver);
-
-  // Binds the TranslationManager for the given `process_host`,
-  // `browser_context`, `context_user_data` and `origin` to `receiver`. The
-  // created TranslationManager will be owned by the `context_user_data`.
-  virtual void BindTranslationManager(
-      RenderProcessHost* process_host,
-      BrowserContext* browser_context,
-      base::SupportsUserData* context_user_data,
-      const url::Origin& origin,
-      mojo::PendingReceiver<blink::mojom::TranslationManager> receiver);
-
-  // Binds to a singleton new instance of
-  // `language_detection::ContentLanguageDetectionDriver` which receives the
-  // model from a local file specified by a flag param..
-  virtual void BindLanguageDetectionDriver(
-      BrowserContext* browser_context,
-      base::SupportsUserData* context_user_data,
-      mojo::PendingReceiver<
-          language_detection::mojom::ContentLanguageDetectionDriver> receiver);
 
   // Indicates whether this client allows paint holding in cross-origin
   // navigations even if there was no user activation.

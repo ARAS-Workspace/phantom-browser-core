@@ -77,7 +77,6 @@
 #include "components/autofill/content/renderer/password_autofill_agent.h"
 #include "components/autofill/content/renderer/password_generation_agent.h"
 #include "components/autofill/core/common/autofill_features.h"
-#include "components/commerce/content/renderer/commerce_web_extractor.h"
 #include "components/content_capture/common/content_capture_features.h"
 #include "components/content_capture/renderer/content_capture_sender.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
@@ -122,8 +121,6 @@
 #include "components/variations/variations_switches.h"
 #include "components/version_info/version_info.h"
 #include "components/visitedlink/renderer/visitedlink_reader.h"
-#include "components/wallet/content/renderer/image_extractor.h"
-#include "components/wallet/core/common/wallet_features.h"
 #include "components/web_cache/renderer/web_cache_impl.h"
 #include "components/webapps/renderer/web_page_metadata_agent.h"
 #include "content/public/common/content_constants.h"
@@ -668,16 +665,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
   }
 
 
-
-  if (render_frame->IsMainFrame()) {
-    new commerce::CommerceWebExtractor(render_frame, registry);
-  }
-
-  if (base::FeatureList::IsEnabled(
-          wallet::features::kWalletablePassDetection) &&
-      render_frame->IsMainFrame()) {
-    wallet::ImageExtractor::Create(render_frame, registry);
-  }
 
   if (base::FeatureList::IsEnabled(features::kWebium)) {
     WebUIBrowserRendererExtension::Create(render_frame);
@@ -1329,8 +1316,6 @@ void ChromeContentRendererClient::
     blink::WebRuntimeFeatures::EnableAIRewriterAPIForWorkers(true);
     blink::WebRuntimeFeatures::EnableAISummarizationAPIForWorkers(true);
     blink::WebRuntimeFeatures::EnableAIWriterAPIForWorkers(true);
-    blink::WebRuntimeFeatures::EnableLanguageDetectionAPIForWorkers(true);
-    blink::WebRuntimeFeatures::EnableTranslationAPIForWorkers(true);
   }
 }
 

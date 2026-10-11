@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//components/enterprise/buildflags/buildflags.gni")
-import("//components/on_device_translation/buildflags/features.gni")
 import("//components/signin/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
@@ -313,14 +312,6 @@ source_set("policy_specific_browser_tests") {
 
   sources += [ "test/variation_restrict_parameter_policy_browsertest.cc" ]
   deps += [ "//components/variations/service" ]
-
-  if (enable_on_device_translation) {
-    sources += [ "test/translator_api_policy_browsertest.cc" ]
-    deps += [
-      "//chrome/browser/on_device_translation",
-      "//chrome/browser/on_device_translation:test_support",
-    ]
-  }
 }
 
 source_set("browser_tests") {
@@ -885,7 +876,6 @@ source_set("impl") {
     "//components/bookmarks/managed",
     "//components/certificate_transparency",
     "//components/collaboration/public:prefs",
-    "//components/commerce/core:pref_names",
     "//components/content_settings/core/browser",
     "//components/custom_handlers",
     "//components/domain_reliability",
@@ -947,10 +937,6 @@ source_set("impl") {
     deps += [
       "//components/enterprise/client_certificates/core:management_delegate",
     ]
-  }
-
-  if (enable_on_device_translation) {
-    deps += [ "//components/on_device_translation" ]
   }
 
   if (enable_pdf) {

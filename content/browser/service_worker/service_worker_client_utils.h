@@ -41,7 +41,6 @@ using ClientCallback = base::OnceCallback<void(
 // The type of an opened window.
 enum class WindowType {
   NEW_TAB_WINDOW = 0,
-  PAYMENT_HANDLER_WINDOW,
 };
 
 // Focuses the window client associated with |service_worker_client|. |callback|

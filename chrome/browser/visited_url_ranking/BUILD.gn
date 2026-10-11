@@ -34,7 +34,6 @@ source_set("impl") {
   deps = [
     ":visited_url_ranking",
     "//chrome/browser/bookmarks",
-    "//chrome/browser/commerce",
     "//chrome/browser/history",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search_engines",

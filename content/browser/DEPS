@@ -32,8 +32,6 @@ include_rules = [
   "+components/network_session_configurator/common",
   "+components/offline_pages/buildflags/buildflags.h",
   "+components/offline_pages/core/request_header",
-  "+components/payments/content/icon",
-  "+components/payments/mojom",
   "+components/persistent_cache",
   "+components/services/heap_profiling/public",
   "+components/services/quarantine/public/mojom/quarantine.mojom.h",

@@ -63,11 +63,9 @@ source_set("impl") {
   ]
   deps += [
     "//chrome/browser/extensions",
-    "//chrome/browser/on_device_translation",
     "//chrome/browser/screen_ai:screen_ai_service_router_factory",
     "//chrome/browser/ui",
     "//chrome/browser/ui/browser_window",
-    "//components/on_device_translation",
   ]
 
   deps += [ "//chrome/browser/component_updater" ]

@@ -106,7 +106,6 @@ class FileSystemAccessManagerImpl;
 class FontAccessManager;
 class GeneratedCodeCacheContext;
 class HostZoomLevelContext;
-class PaymentAppContextImpl;
 class QuotaContext;
 class ReconnectableURLLoaderFactoryForIOThreadWrapper;
 class SharedWorkerServiceImpl;
@@ -254,7 +253,6 @@ class CONTENT_EXPORT StoragePartitionImpl
 
   base::WeakPtr<StoragePartitionImpl> GetWeakPtr();
   BackgroundFetchContext* GetBackgroundFetchContext();
-  PaymentAppContextImpl* GetPaymentAppContext();
   BroadcastChannelService* GetBroadcastChannelService();
   BluetoothAllowedDevicesMap* GetBluetoothAllowedDevicesMap();
   BlobRegistryWrapper* GetBlobRegistry();
@@ -623,7 +621,6 @@ class CONTENT_EXPORT StoragePartitionImpl
   friend class BackgroundSyncManagerTest;
   friend class BackgroundSyncServiceImplTestHarness;
   friend class CookieStoreManagerTest;
-  friend class PaymentAppContentUnitTestBase;
   friend class ServiceWorkerRegistrationTest;
   friend class ServiceWorkerUpdateJobTest;
   friend class StoragePartitionImplMap;
@@ -778,7 +775,6 @@ class CONTENT_EXPORT StoragePartitionImpl
   scoped_refptr<PlatformNotificationContextImpl> platform_notification_context_;
   scoped_refptr<BackgroundFetchContext> background_fetch_context_;
   scoped_refptr<BackgroundSyncContextImpl> background_sync_context_;
-  scoped_refptr<PaymentAppContextImpl> payment_app_context_;
   std::unique_ptr<BroadcastChannelService> broadcast_channel_service_;
   std::unique_ptr<BluetoothAllowedDevicesMap> bluetooth_allowed_devices_map_;
   scoped_refptr<BlobRegistryWrapper> blob_registry_;

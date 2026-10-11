@@ -539,9 +539,6 @@
   E_CPONLY(kColorPaymentsPromoCodeForegroundHovered) \
   E_CPONLY(kColorPaymentsPromoCodeForegroundPressed) \
   E_CPONLY(kColorPaymentsPromoCodeInkDrop) \
-  E_CPONLY(kColorPaymentsRequestBackArrowButtonIcon) \
-  E_CPONLY(kColorPaymentsRequestBackArrowButtonIconDisabled) \
-  E_CPONLY(kColorPaymentsRequestRowBackgroundHighlighted) \
   /* Permission Prompt colors. */ \
   E_CPONLY(kColorPermissionPromptRequestText) \
    /* Performance Intervention colors. */ \

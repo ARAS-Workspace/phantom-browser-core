@@ -10,8 +10,6 @@
 #include "base/memory/ptr_util.h"
 #include "base/no_destructor.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
-#include "chrome/browser/commerce/in_stock_notification/in_stock_notification_manager.h"
-#include "chrome/browser/commerce/shopping_service_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_navigation_controller.h"
 #include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
@@ -46,7 +44,6 @@
 #include "chrome/browser/ui/autofill/payments/wallet_reminder_notice_page_action_controller.h"
 #include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/commerce/commerce_ui_tab_helper.h"
 #include "chrome/browser/ui/context_highlight/context_highlight_tab_feature.h"
 #include "chrome/browser/ui/focus_tab_after_navigation_helper.h"
 #include "chrome/browser/ui/page_action/action_ids.h"
@@ -76,8 +73,6 @@
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_page_action_controller.h"
-#include "chrome/browser/ui/views/commerce/discounts_page_action_view_controller.h"
-#include "chrome/browser/ui/views/commerce/price_insights_page_action_view_controller.h"
 #include "chrome/browser/ui/views/file_system_access/file_system_access_page_action_controller.h"
 #include "chrome/browser/ui/views/intent_picker/intent_picker_view_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
@@ -91,7 +86,6 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/record_replay/chrome_record_replay_client.h"
 #include "chrome/browser/ui/views/location_bar/record_replay_page_action_controller.h"
-#include "chrome/browser/wallet/chrome_walletable_pass_client.h"
 #include "components/record_replay/core/common/record_replay_features.h"
 #endif
 
@@ -101,7 +95,6 @@
 #include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "components/autofill/core/common/autofill_features.h"
-#include "components/commerce/core/commerce_feature_list.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/image_fetcher/core/image_fetcher_service.h"
 #include "components/passage_embeddings/core/passage_embeddings_features.h"
@@ -109,7 +102,6 @@
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/security_interstitials/core/features.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/wallet/core/common/wallet_features.h"
 #include "net/base/features.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/base/unowned_user_data/user_data_factory.h"
@@ -173,13 +165,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
         tab, *page_action_controller_);
   }
 
-  if (page_action_controller_->ActionExists(kActionCommercePriceInsights)) {
-    commerce_price_insights_page_action_view_controller_ =
-        GetUserDataFactory()
-            .CreateInstance<commerce::PriceInsightsPageActionViewController>(
-                tab, tab, *page_action_controller_);
-  }
-
   if (page_action_controller_->ActionExists(kActionShowCookieControls)) {
     cookie_controls_page_action_controller_ =
         GetUserDataFactory().CreateInstance<CookieControlsPageActionController>(
@@ -210,19 +195,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
         std::make_unique<permissions::PermissionIndicatorsTabData>(
             tab.GetContents());
 
-    if (!profile->IsIncognitoProfile()) {
-      // TODO(crbug.com/40863325): Consider using the in-memory cache instead.
-      commerce_ui_tab_helper_ =
-          GetUserDataFactory().CreateInstance<commerce::CommerceUiTabHelper>(
-              tab, tab,
-              commerce::ShoppingServiceFactory::GetForBrowserContext(profile),
-              BookmarkModelFactory::GetForBrowserContext(profile),
-              ImageFetcherServiceFactory::GetForKey(profile->GetProfileKey())
-                  ->GetImageFetcher(
-                      image_fetcher::ImageFetcherConfig::kNetworkOnly),
-              side_panel_registry_.get());
-    }
-
     if (tab_groups::TabGroupSyncService* tab_group_sync_service =
             tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile)) {
       saved_tab_group_web_contents_listener_ =
@@ -246,25 +218,7 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
                   tab, tab, *page_action_controller_,
                   *collaboration_messaging_tab_data_);
     }
-
-    if (base::FeatureList::IsEnabled(commerce::kInStockNotification) &&
-        !profile->IsIncognitoProfile()) {
-      in_stock_notification_manager_ =
-          GetUserDataFactory()
-              .CreateInstance<commerce::InStockNotificationManager>(tab, &tab);
-    }
-
   }  // IsInNormalWindow() end.
-
-  // This block instantiates the page action controllers that depends on the
-  // `commerce_ui_tab_helper_` and not need to be created before.
-  if (commerce_ui_tab_helper_ &&
-      page_action_controller_->ActionExists(kActionCommerceDiscounts)) {
-    commerce_discounts_page_action_view_controller_ =
-        GetUserDataFactory()
-            .CreateInstance<commerce::DiscountsPageActionViewController>(
-                tab, tab, *page_action_controller_, *commerce_ui_tab_helper_);
-  }
 
   autofill_bubble_manager_ = autofill::BubbleManager::Create(&tab);
 
@@ -366,12 +320,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   inactive_window_mouse_event_controller_ =
       std::make_unique<InactiveWindowMouseEventController>();
-
-  if (base::FeatureList::IsEnabled(
-          wallet::features::kWalletablePassDetection)) {
-    walletable_pass_client_ =
-        std::make_unique<wallet::ChromeWalletablePassClient>(&tab);
-  }
 
 #endif
 

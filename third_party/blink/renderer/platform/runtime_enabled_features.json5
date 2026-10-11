@@ -3766,15 +3766,6 @@
       settable_from_internals: true,
     },
     {
-      name: "LanguageDetectionAPI",
-      base_feature_status: "disabled",
-      copied_from_base_feature_if: "overridden",
-    },
-    {
-      name: "LanguageDetectionAPIForWorkers",
-      public: true,
-    },
-    {
       name: "LayoutIgnoreMarginsForSticky",
     },
     {
@@ -6386,15 +6377,6 @@
     // This is conditionally set if the platform supports translation.
     {
       name: "TranslateService",
-    },
-    {
-      name: "TranslationAPI",
-      base_feature_status: "disabled",
-      copied_from_base_feature_if: "overridden",
-    },
-    {
-      name: "TranslationAPIForWorkers",
-      public: true,
     },
     {
       // When enabled, treats the initial navigation to about:blank#fragment in

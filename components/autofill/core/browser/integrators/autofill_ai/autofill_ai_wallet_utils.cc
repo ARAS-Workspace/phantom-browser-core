@@ -18,11 +18,6 @@
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
 #include "components/autofill/core/browser/foundations/autofill_client.h"
 #include "components/autofill/core/common/autofill_features.h"
-#include "components/consent_auditor/consent_auditor.h"
-#include "components/signin/public/base/consent_level.h"
-#include "components/sync/protocol/user_consent_types.pb.h"
-#include "components/wallet/core/common/wallet_features.h"
-#include "google_apis/gaia/gaia_id.h"
 
 namespace autofill {
 
@@ -154,29 +149,6 @@ std::string GetWalletManagementURL(const EntityInstance& entity) {
                                       /*use_plus=*/false));
   }
   NOTREACHED();
-}
-
-consent_auditor::ConsentAuditor::SessionId RecordWalletPrivatePassConsent(
-    int accepted_consent_string_id,
-    int accept_button_string_id,
-    consent_auditor::ConsentAuditor& consent_auditor,
-    signin::IdentityManager& identity_manager) {
-  CHECK(base::FeatureList::IsEnabled(
-      wallet::features::kWalletApiPrivatePassesConsent));
-
-  // Since saves to Wallet are only offered to signed-in users, a `gaia_id` is
-  // available.
-  GaiaId gaia_id =
-      identity_manager.GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
-          .gaia;
-  CHECK(!gaia_id.empty());
-  consent_auditor::ConsentAuditor::SessionId session_id =
-      consent_auditor.GenerateSessionId();
-  sync_pb::UserConsentTypes::WalletPrivatePassConsent consent;
-  consent.mutable_description_grd_ids()->Add(accepted_consent_string_id);
-  consent.set_confirmation_grd_id(accept_button_string_id);
-  consent_auditor.RecordWalletPrivatePassConsent(gaia_id, session_id, consent);
-  return session_id;
 }
 
 }  // namespace autofill

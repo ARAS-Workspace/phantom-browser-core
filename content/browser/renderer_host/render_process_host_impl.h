@@ -823,13 +823,6 @@ class CONTENT_EXPORT RenderProcessHostImpl
       const url::Origin& origin,
       mojo::PendingReceiver<blink::mojom::PermissionService> receiver) override;
 
-  // Binds |receiver| to the PaymentManager instance owned by
-  // |storage_partition_impl_|, and is used by workers via
-  // BrowserInterfaceBroker.
-  void CreatePaymentManagerForOrigin(
-      const url::Origin& origin,
-      mojo::PendingReceiver<payments::mojom::PaymentManager> receiver) override;
-
   // Binds `creator_type`, `origin`, `receiver` and the information obtained
   // from the (possibly empty) `rfh_id` to the NotificationService instance
   // owned by `storage_partition_impl_`, and is used by documents and workers

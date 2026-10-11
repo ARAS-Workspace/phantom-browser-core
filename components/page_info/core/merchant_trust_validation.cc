@@ -5,7 +5,7 @@
 #include "components/page_info/core/merchant_trust_validation.h"
 
 #include "base/feature_list.h"
-#include "components/commerce/core/proto/merchant_trust.pb.h"
+#include "components/page_info/core/proto/merchant_trust.pb.h"
 #include "components/page_info/core/features.h"
 #include "components/page_info/core/page_info_types.h"
 #include "url/gurl.h"

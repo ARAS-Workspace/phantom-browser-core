@@ -495,6 +495,27 @@ proto_library("amount_extraction_heuristic_regexes_proto") {
   sources = [ "payments/amount_extraction_heuristic_regexes.proto" ]
 }
 
+static_library("currency_formatter") {
+  sources = [
+    "payments/currency_formatter.cc",
+    "payments/currency_formatter.h",
+  ]
+  deps = [ "//base" ]
+  public_deps = [ "//third_party/icu" ]
+}
+
+source_set("currency_formatter_unit_tests") {
+  testonly = true
+  sources = [ "payments/currency_formatter_unittest.cc" ]
+  deps = [
+    ":currency_formatter",
+    "//base",
+    "//base/test:fuzztest_support",
+    "//testing/gtest",
+    "//third_party/fuzztest",
+  ]
+}
+
 static_library("browser") {
   _configs = configs
   configs = []
@@ -970,11 +991,7 @@ static_library("browser") {
     "network/autofill_ai/fake_wallet_pass_access_manager.h",
     "network/autofill_ai/personal_context_conversion_util.cc",
     "network/autofill_ai/personal_context_conversion_util.h",
-    "network/autofill_ai/private_pass_conversion_util.cc",
-    "network/autofill_ai/private_pass_conversion_util.h",
     "network/autofill_ai/wallet_pass_access_manager.h",
-    "network/autofill_ai/wallet_pass_access_manager_impl.cc",
-    "network/autofill_ai/wallet_pass_access_manager_impl.h",
     "payments/account_info_getter.h",
     "payments/ai_card_recommendation_manager.cc",
     "payments/ai_card_recommendation_manager.h",
@@ -1389,6 +1406,7 @@ static_library("browser") {
     ":autofill_address_rewriter_resources",
     ":autofill_alternative_state_name_map_resources",
     ":buildflags",
+    ":currency_formatter",
     ":entity_schema_enums_and_functions",
     ":generate_country_native_names",
     ":regex_patterns_inl_h",
@@ -1401,7 +1419,6 @@ static_library("browser") {
     "//components/autofill/core/common:credit_card_number_validation",
     "//components/consent_auditor",
     "//components/device_reauth",
-    "//components/facilitated_payments/core/features",
     "//components/feature_engagement",
     "//components/google/core/common",
     "//components/history/core/browser",
@@ -1416,7 +1433,6 @@ static_library("browser") {
     "//components/optimization_guide/proto:optimization_guide_proto",
     "//components/os_crypt/async/common",
     "//components/password_manager/core/browser/features:password_features",
-    "//components/payments/core:currency_formatter",
     "//components/personal_context/core",
     "//components/personal_context/first_run",
     "//components/personal_context/proto:personal_context_proto",
@@ -1436,8 +1452,6 @@ static_library("browser") {
     "//components/variations",
     "//components/variations/net",
     "//components/version_info",
-    "//components/wallet/core/browser",
-    "//components/wallet/core/common:features",
     "//components/webdata/common",
     "//crypto",
     "//google_apis",

@@ -114,7 +114,6 @@
 #include "content/browser/metrics/histogram_shared_memory_config.h"
 #include "content/browser/network_service_instance_impl.h"
 #include "content/browser/notifications/platform_notification_context_impl.h"
-#include "content/browser/payments/payment_app_context_impl.h"
 #include "content/browser/permissions/permission_service_context.h"
 #include "content/browser/process_lock.h"
 #include "content/browser/process_reuse_policy.h"
@@ -2372,13 +2371,6 @@ void RenderProcessHostImpl::CreatePermissionService(
 
   permission_service_context_->CreateServiceForWorker(origin,
                                                       std::move(receiver));
-}
-
-void RenderProcessHostImpl::CreatePaymentManagerForOrigin(
-    const url::Origin& origin,
-    mojo::PendingReceiver<payments::mojom::PaymentManager> receiver) {
-  storage_partition_impl_->GetPaymentAppContext()
-      ->CreatePaymentManagerForOrigin(origin, std::move(receiver));
 }
 
 void RenderProcessHostImpl::CreateNotificationService(

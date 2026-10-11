@@ -4,11 +4,9 @@
 
 import 'chrome://bookmarks-side-panel.top-chrome/power_bookmarks_list.js';
 
-import type {BookmarkProductInfo} from '//resources/cr_components/commerce/shared.mojom-webui.js';
 import type {BookmarksTreeNode} from 'chrome://bookmarks-side-panel.top-chrome/bookmarks.mojom-webui.js';
 import {BookmarksApiProxyImpl} from 'chrome://bookmarks-side-panel.top-chrome/bookmarks_api_proxy.js';
 import {PowerBookmarksService} from 'chrome://bookmarks-side-panel.top-chrome/power_bookmarks_service.js';
-import {ShoppingServiceBrowserProxyImpl} from 'chrome://resources/cr_components/commerce/shopping_service_browser_proxy.js';
 import {PageImageServiceBrowserProxy} from 'chrome://resources/cr_components/page_image_service/browser_proxy.js';
 import {PageImageServiceHandlerRemote} from 'chrome://resources/cr_components/page_image_service/page_image_service.mojom-webui.js';
 import {PluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
@@ -17,44 +15,13 @@ import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {TestPluralStringProxy} from 'chrome://webui-test/test_plural_string_proxy.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
-import {TestPageHandler as TestShoppingServiceHandler} from './commerce/test_shopping_service_api_proxy.js';
 import {TestBookmarksApiProxy} from './test_bookmarks_api_proxy.js';
 import {TestPowerBookmarksDelegate} from './test_power_bookmarks_delegate.js';
 
-class ServiceTestPowerBookmarksDelegate extends TestPowerBookmarksDelegate {
-  override getTrackedProductInfos() {
-    const productInfo = {
-      title: 'Sample Product',
-      clusterTitle: 'Sample Cluster',
-      domain: 'sampledomain.com',
-      imageUrl: 'http://example.com/sample.jpg',
-      productUrl: 'http://example.com/sample-product',
-      currentPrice: '29.99',
-      previousPrice: '39.99',
-      clusterId: BigInt(1),
-      categoryLabels: ['electronics', 'gadgets'],
-      price: '29.99',
-      rating: '4.5',
-      description: 'This is a sample product description.',
-      priceSummary: '',
-    };
-
-    const bookmarkProductInfo: BookmarkProductInfo = {
-      bookmarkId: BigInt(3),
-      info: productInfo,
-    };
-    this.methodCalled('getTrackedProductInfos');
-
-    const trackedProductInfos = {'3': bookmarkProductInfo};
-    return trackedProductInfos;
-  }
-}
-
 suite('SidePanelPowerBookmarksServiceTest', () => {
-  let delegate: ServiceTestPowerBookmarksDelegate;
+  let delegate: TestPowerBookmarksDelegate;
   let service: PowerBookmarksService;
   let bookmarksApi: TestBookmarksApiProxy;
-  let shoppingServiceHandler: TestShoppingServiceHandler;
   let imageServiceHandler: TestMock<PageImageServiceHandlerRemote>&
       PageImageServiceHandlerRemote;
 
@@ -258,11 +225,6 @@ suite('SidePanelPowerBookmarksServiceTest', () => {
     bookmarksApi.setAllBookmarks(structuredClone(folders));
     BookmarksApiProxyImpl.setInstance(bookmarksApi);
 
-    shoppingServiceHandler = new TestShoppingServiceHandler();
-    ShoppingServiceBrowserProxyImpl.setInstance({
-      handler: shoppingServiceHandler,
-    });
-
     const pluralString = new TestPluralStringProxy();
     PluralStringProxyImpl.setInstance(pluralString);
 
@@ -273,7 +235,7 @@ suite('SidePanelPowerBookmarksServiceTest', () => {
       result: {imageUrl: 'https://example.com/image.png'},
     }));
 
-    delegate = new ServiceTestPowerBookmarksDelegate();
+    delegate = new TestPowerBookmarksDelegate();
     service = new PowerBookmarksService(delegate);
     service.startListening();
 
@@ -305,14 +267,6 @@ suite('SidePanelPowerBookmarksServiceTest', () => {
         service.filterBookmarks(undefined, 0, 'http', [], folder);
     assertEquals(primaryList.length, 1);
     assertEquals(secondaryList.length, 2);
-  });
-
-  test('FiltersByPriceTracking', () => {
-    const searchBookmarks = service.filterBookmarks(
-        undefined, 0, undefined,
-        [{label: 'Price Tracking', icon: '', active: true}]);
-    assertEquals(searchBookmarks.length, 1);
-    assertEquals(searchBookmarks[0]!.id, '3');
   });
 
   test('SortsByNewest', () => {

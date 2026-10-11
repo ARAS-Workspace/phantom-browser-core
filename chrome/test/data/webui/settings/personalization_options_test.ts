@@ -45,7 +45,6 @@ function getInitialPrefs(): chrome.settingsPrivate.PrefObject[] {
     createBooleanPref('search.suggest_enabled', true),
     createBooleanPref('url_keyed_anonymized_data_collection.enabled', true),
     createBooleanPref('page_content_collection.enabled', false),
-    createBooleanPref('price_tracking.email_notifications_enabled', true),
     createBooleanPref('signin.allowed_on_next_startup', true),
     createBooleanPref('spellcheck.use_spelling_service', false),
     createBooleanPref('browser.enable_spellchecking', true),
@@ -66,7 +65,6 @@ suite('AllBuilds', function() {
   suiteSetup(function() {
     loadTimeData.overrideValues({
       signinAvailable: true,
-      changePriceEmailNotificationsEnabled: true,
       shouldUseMetricsConsentRestructure: true,
     });
   });
@@ -336,103 +334,6 @@ suite('AllBuilds', function() {
     assertTrue(isVisible(testElement.shadowRoot.querySelector(
         '#searchAggregatorSuggestToggle')));
   });
-
-  test('priceEmailNotificationsToggleHidden', async function() {
-    loadTimeData.overrideValues(
-        {'changePriceEmailNotificationsEnabled': false});
-    buildTestElement();  // Rebuild the element after modifying loadTimeData.
-
-    assertFalse(!!testElement.shadowRoot.querySelector(
-        '#priceEmailNotificationsToggle'));
-
-    testElement.syncStatus = {
-      signedInState: SignedInState.SYNCING,
-      statusAction: StatusAction.NO_ACTION,
-    };
-    await microtasksFinished();
-    assertFalse(!!testElement.shadowRoot.querySelector(
-        '#priceEmailNotificationsToggle'));
-  });
-
-  test(
-      'priceEmailNotificationsToggleShownForSignedInUsersWithFlag',
-      async function() {
-        loadTimeData.overrideValues({
-          'changePriceEmailNotificationsEnabled': true,
-          // Flag is enabled.
-          'replaceSyncPromosWithSignInPromos': true,
-        });
-        // Rebuild the element after modifying loadTimeData.
-        buildTestElement();
-
-        testElement.syncStatus = {
-          signedInState: SignedInState.SIGNED_IN,
-          statusAction: StatusAction.NO_ACTION,
-        };
-        await microtasksFinished();
-        assertTrue(!!testElement.shadowRoot.querySelector(
-            '#priceEmailNotificationsToggle'));
-      });
-
-  test(
-      'priceEmailNotificationsToggleShownForSyncingUsersWithFlag',
-      async function() {
-        loadTimeData.overrideValues({
-          'changePriceEmailNotificationsEnabled': true,
-          // Flag is enabled.
-          'replaceSyncPromosWithSignInPromos': true,
-        });
-        // Rebuild the element after modifying loadTimeData.
-        buildTestElement();
-
-        testElement.syncStatus = {
-          signedInState: SignedInState.SYNCING,
-          statusAction: StatusAction.NO_ACTION,
-        };
-        await microtasksFinished();
-        assertTrue(!!testElement.shadowRoot.querySelector(
-            '#priceEmailNotificationsToggle'));
-      });
-
-  test(
-      'priceEmailNotificationsToggleHiddenForSignedInUsersWithoutFlag',
-      async function() {
-        loadTimeData.overrideValues({
-          'changePriceEmailNotificationsEnabled': true,
-          // Flag is disabled.
-          'replaceSyncPromosWithSignInPromos': false,
-        });
-        // Rebuild the element after modifying loadTimeData.
-        buildTestElement();
-
-        testElement.syncStatus = {
-          signedInState: SignedInState.SIGNED_IN,
-          statusAction: StatusAction.NO_ACTION,
-        };
-        await microtasksFinished();
-        assertFalse(!!testElement.shadowRoot.querySelector(
-            '#priceEmailNotificationsToggle'));
-      });
-
-  test(
-      'priceEmailNotificationsToggleShownForSyncingUsersWithoutFlag',
-      async function() {
-        loadTimeData.overrideValues({
-          'changePriceEmailNotificationsEnabled': true,
-          // Flag is disabled.
-          'replaceSyncPromosWithSignInPromos': false,
-        });
-        // Rebuild the element after modifying loadTimeData.
-        buildTestElement();
-
-        testElement.syncStatus = {
-          signedInState: SignedInState.SYNCING,
-          statusAction: StatusAction.NO_ACTION,
-        };
-        await microtasksFinished();
-        assertTrue(!!testElement.shadowRoot.querySelector(
-            '#priceEmailNotificationsToggle'));
-      });
 });
 
 // <if expr="_google_chrome">
@@ -444,7 +345,6 @@ suite('OfficialBuild', function() {
   suiteSetup(function() {
     loadTimeData.overrideValues({
       signinAvailable: true,
-      changePriceEmailNotificationsEnabled: true,
       shouldUseMetricsConsentRestructure: true,
     });
   });

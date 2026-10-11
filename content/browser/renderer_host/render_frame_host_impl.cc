@@ -224,7 +224,6 @@
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/runtime_feature_state/runtime_feature_state_document_data.h"
-#include "content/public/browser/secure_payment_confirmation_utils.h"
 #include "content/public/browser/shared_cors_origin_access_list.h"
 #include "content/public/browser/site_isolation_policy.h"
 #include "content/public/browser/sms_fetcher.h"
@@ -14576,31 +14575,6 @@ void RenderFrameHostImpl::CopyAXTreeUpdate(const ui::AXTreeUpdate& snapshot,
     // render frame.
     snapshot_copy->tree_data = GetAXTreeData();
     snapshot_copy->has_tree_data = true;
-  }
-}
-
-void RenderFrameHostImpl::CreatePaymentManager(
-    mojo::PendingReceiver<payments::mojom::PaymentManager> receiver) {
-  if (!IsFeatureEnabled(network::mojom::PermissionsPolicyFeature::kPayment)) {
-    mojo::ReportBadMessage("Permissions policy blocks Payment");
-    return;
-  }
-  GetProcess()->CreatePaymentManagerForOrigin(GetLastCommittedOrigin(),
-                                              std::move(receiver));
-
-  // Blocklist PaymentManager from the back-forward cache as at the moment we
-  // don't cancel pending payment requests when the RenderFrameHost is stored
-  // in back-forward cache.
-  OnBackForwardCacheDisablingStickyFeatureUsed(
-      BackForwardCacheDisablingFeature::kPaymentManager);
-}
-
-void RenderFrameHostImpl::CreateSecurePaymentConfirmationService(
-    mojo::PendingReceiver<payments::mojom::SecurePaymentConfirmationService>
-        receiver) {
-  if (IsFrameAllowedToUseSecurePaymentConfirmation(this)) {
-    GetContentClient()->browser()->CreateSecurePaymentConfirmationService(
-        this, std::move(receiver));
   }
 }
 

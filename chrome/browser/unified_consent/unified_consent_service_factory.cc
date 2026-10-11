@@ -10,7 +10,6 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/common/pref_names.h"
-#include "components/commerce/core/pref_names.h"
 #include "components/embedder_support/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
 
@@ -34,7 +33,6 @@ namespace {
 std::vector<std::string> GetSyncedServicePrefNames() {
   return {
     prefs::kSearchSuggestEnabled,
-        commerce::kPriceEmailNotificationsEnabled,
   };
 }
 

@@ -439,8 +439,8 @@ class AuthenticatorRequestDialogController
   // request.
   EphemeralState ephemeral_state_;
 
-  // is_non_webauthn_request_ is true if the current request came from Secure
-  // Payment Confirmation, or from credit-card autofill.
+  // is_non_webauthn_request_ is true if the current request came from
+  // credit-card autofill.
   bool is_non_webauthn_request_ = false;
 
   // started_ records whether |StartFlow| has been called.
@@ -493,8 +493,7 @@ class AuthenticatorRequestDialogController
   bool cable_connecting_ready_to_advance_ = false;
 
   // allow_icloud_keychain_ is true if iCloud Keychain can be used for this
-  // request. It is disabled for Secure Payment Confirmation and other non-
-  // WebAuthn cases, for example.
+  // request. It is disabled for non-WebAuthn cases, e.g. credit-card autofill.
   bool allow_icloud_keychain_ = false;
 
   // should_create_in_icloud_keychain is true if creation requests with

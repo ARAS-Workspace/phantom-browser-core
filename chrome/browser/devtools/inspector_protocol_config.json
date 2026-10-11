@@ -11,7 +11,7 @@
             },
             {
                 "domain": "Page",
-                "include": [ "enable", "disable", "setAdBlockingEnabled", "printToPDF", "setSPCTransactionMode", "setRPHRegistrationMode" ],
+                "include": [ "enable", "disable", "setAdBlockingEnabled", "printToPDF", "setRPHRegistrationMode" ],
                 "include_events": [],
                 "async": [ "printToPDF" ]
             },

@@ -124,7 +124,6 @@ components/omnibox/browser
 components/onc/docs
 components/page_info
 components/password_manager/core/browser
-components/payments/core
 components/permissions
 components/policy/core/browser
 components/policy/core/browser/url_list
