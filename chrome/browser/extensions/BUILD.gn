@@ -21,7 +21,6 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/protobuf/proto_library.gni")
 
 assert(enable_extensions_core)
-assert(enable_supervised_users)
 
 source_set("external_loader") {
   sources = [
@@ -580,7 +579,6 @@ source_set("extensions") {
     "//components/saved_tab_groups/public",
     "//components/services/patch/content",
     "//components/services/unzip/content",
-    "//components/supervised_user/core/browser",
     "//components/tabs:public",
     "//components/update_client",
     "//components/update_client:common_impl",
@@ -615,7 +613,6 @@ source_set("extensions") {
   public_deps = [
     "//chrome/browser/extensions/api/messaging",
     "//chrome/browser/media/webrtc",
-    "//chrome/browser/supervised_user",
     "//chrome/browser/ui/tab_contents",
     "//chrome/browser/ui/webui/extensions:headers",
     "//chrome/browser/upgrade_detector",
@@ -635,12 +632,9 @@ source_set("extensions") {
     "api/chrome_extensions_api_client_non_android.cc",
     "api/tabs/tabs_event_router_platform_delegate_non_android.cc",
     "api/tabs/tabs_event_router_platform_delegate_non_android.h",
-    "chrome_app_icon_loader.cc",
-    "chrome_app_icon_loader.h",
   ]
   public_deps += [
     "//chrome/browser/ui/tabs:utils",
-    "//components/app_icon_loader",
   ]
   deps += [
     "//chrome/browser/ui/interaction",
@@ -887,7 +881,6 @@ source_set("extensions") {
       "//components/security_interstitials/content:security_interstitial_page",
       "//components/security_state/content",
       "//components/site_engagement/core/mojom:mojo_bindings",
-      "//components/supervised_user/core/common",
       "//components/webapps/browser",
       "//components/webapps/common",
       "//components/webauthn/json",
@@ -1517,7 +1510,6 @@ source_set("unit_tests") {
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
     "//chrome/browser/resources:component_extension_resources_grit",
     "//chrome/browser/search_engines",
-    "//chrome/browser/supervised_user:test_support",
     "//chrome/browser/sync",
     "//chrome/browser/ui/extensions",
     "//chrome/browser/update_client",
@@ -1525,6 +1517,7 @@ source_set("unit_tests") {
     "//components/bookmarks/managed",
     "//components/bookmarks/test",
     "//components/browser_sync:switches",
+    "//components/history/core/common",
     "//components/no_state_prefetch/browser",
     "//components/os_crypt/async/browser:test_support",
     "//components/policy/core/common:test_support",
@@ -1886,6 +1879,8 @@ source_set("browser_tests") {
     "//components/enterprise:test_support",
     "//components/enterprise/browser/promotion",
     "//components/enterprise/device_trust/core:device_trust_service",
+    "//components/favicon/content",
+    "//components/history/core/common",
     "//components/infobars/content",
     "//components/javascript_dialogs",
     "//components/language/core/browser",
@@ -1907,6 +1902,7 @@ source_set("browser_tests") {
     "//extensions/browser/updater",
     "//extensions/renderer",
     "//extensions/strings",
+    "//pdf/mojom",
     "//third_party/zlib/google:zip",
     "//ui/base:ozone_buildflags",
     "//ui/base/idle",
@@ -1915,14 +1911,10 @@ source_set("browser_tests") {
     "//ui/webui:buildflags",
     "//ui/webui:test_support",
   ]
-  if (enable_extensions) {
-    deps += [ "//chrome/browser/ui/views/supervised_user" ]
-  }
 
   # api/context_menus/context_menu_apitest.cc's include of
   # tab_context_menu_controller.h is itself guarded by
-  # #if BUILDFLAG(ENABLE_EXTENSIONS) -- matches the supervised_user grant
-  # right above.
+  # #if BUILDFLAG(ENABLE_EXTENSIONS).
   if (enable_extensions) {
     deps += [ "//chrome/browser/ui/views/tabs/tab" ]
   }
@@ -2105,7 +2097,6 @@ source_set("browser_tests") {
 
     public_deps += [
       "//chrome/browser/ui/extensions:extension_enable_flow_delegate",
-      "//chrome/test/supervised_user:live_tests",
     ]
 
     data += [
@@ -2176,7 +2167,6 @@ source_set("browser_tests") {
       "//chrome/browser/ui/search:test_support_ui",
       "//chrome/browser/ui/side_panel:side_panel_views_dependent",
       "//chrome/browser/ui/startup",
-      "//chrome/browser/ui/supervised_user",
       "//chrome/browser/ui/tabs:tab_menu",
       "//chrome/browser/ui/tabs/alert:tab_alert",
       "//chrome/browser/ui/tabs/saved_tab_groups:test_support",

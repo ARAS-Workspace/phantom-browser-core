@@ -184,6 +184,7 @@ source_set("unit_tests") {
     "//base",
     "//chrome/browser/prefs:util",
     "//chrome/test:test_support",
+    "//components/history/core/common",
     "//components/sessions",
     "//components/sessions:test_support",
     "//content/test:test_support",

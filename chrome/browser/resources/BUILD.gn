@@ -61,7 +61,6 @@ group("resources") {
     "side_panel/customize_chrome:resources",
     "side_panel/history:resources",
     "side_panel/history_clusters:resources",
-    "side_panel/read_anything:resources",
     "side_panel/reading_list:resources",
     "side_panel/shared:resources",
     "side_panel/tabs_from_other_devices:resources",
@@ -86,7 +85,6 @@ group("resources") {
 
   if (enable_extensions) {
     public_deps += [
-      "accessibility:reading_mode_gdocs_extension_resources",
       "extensions_zero_state_promo:resources",
     ]
   }
@@ -170,8 +168,6 @@ if (enable_extensions_core) {
       "network_speech_synthesis/mv3/service_worker.js",
       "network_speech_synthesis/mv3/tts_extension.js",
       "network_speech_synthesis/tts_extension.js",
-      "reading_mode_gdocs_helper/content.js",
-      "reading_mode_gdocs_helper/gdocs_script.js",
     ]
 
     if (is_chrome_branded || enable_hangout_services_extension) {
@@ -257,7 +253,6 @@ group("dev_ui_resources") {
     "context_hub:resources",
     "device_log:resources",
     "engagement:resources",
-    "family_link_user_internals:resources",
     "location_internals:resources",
     "media:resources",
     "memory_internals:resources",
@@ -333,7 +328,6 @@ repack("dev_ui_paks") {
     "$root_gen_dir/chrome/context_hub_resources.pak",
     "$root_gen_dir/chrome/device_log_resources.pak",
     "$root_gen_dir/chrome/engagement_resources.pak",
-    "$root_gen_dir/chrome/family_link_user_internals_resources.pak",
     "$root_gen_dir/chrome/location_internals_resources.pak",
     "$root_gen_dir/chrome/media_resources.pak",
     "$root_gen_dir/chrome/memory_internals_resources.pak",

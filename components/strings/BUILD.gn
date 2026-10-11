@@ -25,7 +25,6 @@ group("strings") {
 grit_strings("components_strings") {
   source = "../components_strings.grd"
   inputs = [
-    "../android_system_error_page_strings.grdp",
     "../arc_strings.grdp",
     "../autofill_payments_strings.grdp",
     "../autofill_strings.grdp",
@@ -73,7 +72,6 @@ grit_strings("components_strings") {
     "../smart_tab_sharing.grdp",
     "../ssl_errors_strings.grdp",
     "../subresource_filter_strings.grdp",
-    "../supervised_user_strings.grdp",
     "../sync_ui_strings.grdp",
     "../tab_groups_strings.grdp",
     "../tab_resume_strings.grdp",

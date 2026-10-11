@@ -21,7 +21,6 @@
 #include "chrome/browser/predictors/loading_predictor.h"
 #include "chrome/browser/predictors/loading_predictor_factory.h"
 #include "chrome/browser/signin/google_accounts_private_api_host.h"
-#include "chrome/browser/supervised_user/supervised_user_navigation_observer.h"
 #include "chrome/browser/trusted_vault/trusted_vault_encryption_keys_tab_helper.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
@@ -467,17 +466,6 @@ void ChromeContentBrowserClient::
             BindReceiver(std::move(receiver), render_frame_host);
       },
       &render_frame_host));
-
-  associated_registry
-      .AddInterface<supervised_user::mojom::SupervisedUserCommands>(
-          base::BindRepeating(
-              [](content::RenderFrameHost* render_frame_host,
-                 mojo::PendingAssociatedReceiver<
-                     supervised_user::mojom::SupervisedUserCommands> receiver) {
-                SupervisedUserNavigationObserver::BindSupervisedUserCommands(
-                    std::move(receiver), render_frame_host);
-              },
-              &render_frame_host));
 }
 
 void ChromeContentBrowserClient::BindGpuHostReceiver(

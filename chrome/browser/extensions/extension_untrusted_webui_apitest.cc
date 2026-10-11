@@ -71,49 +71,6 @@ class ExtensionUntrustedWebUITest : public ExtensionApiTest {
 
     EXPECT_TRUE(catcher.GetNextResult());
   }
-
-  testing::AssertionResult RunTestOnReadAnythingPage(const char* name) {
-    std::string script;
-    {
-      base::ScopedAllowBlockingForTesting allow_blocking;
-      // Tests are located in
-      // chrome/test/data/extensions/webui_untrusted/$(name).
-      base::FilePath path;
-      base::PathService::Get(chrome::DIR_TEST_DATA, &path);
-      path = path.AppendASCII("extensions")
-                 .AppendASCII("webui_untrusted")
-                 .AppendASCII(name);
-
-      // Read the test.
-      if (!base::PathExists(path)) {
-        return testing::AssertionFailure() << "Couldn't find " << path.value();
-      }
-      base::ReadFileToString(path, &script);
-      script = "(function(){'use strict';" + script + "}());";
-    }
-
-    // Run the test. Navigating to the URL will trigger the read anything
-    // navigation throttle and open the side panel instead of loading read
-    // anything in the main content area.
-    EXPECT_TRUE(ui_test_utils::NavigateToURL(
-        browser(), GURL(chrome::kChromeUIUntrustedReadAnythingSidePanelURL)));
-    // Get the side panel entry registry.
-    auto* side_panel_ui = browser()->GetFeatures().side_panel_ui();
-    auto* side_panel_web_contents =
-        side_panel_ui->GetWebContentsForTest(SidePanelEntryId::kReadAnything);
-
-    if (!side_panel_web_contents) {
-      return testing::AssertionFailure() << "Failed to navigate to WebUI";
-    }
-    // Wait for the view to load before trying to run the test. This ensures
-    // that chrome.readingMode is set.
-    content::WaitForLoadStop(side_panel_web_contents);
-    // Eval the JS test.
-    bool result =
-        content::EvalJs(side_panel_web_contents, script).ExtractBool();
-    return result ? testing::AssertionSuccess()
-                  : (testing::AssertionFailure() << "Check console output");
-  }
 };
 
 }  // namespace
@@ -121,13 +78,6 @@ class ExtensionUntrustedWebUITest : public ExtensionApiTest {
 IN_PROC_BROWSER_TEST_F(ExtensionUntrustedWebUITest,
                        ConfidenceCheckAvailableAPIs) {
   RunTestOnApiTestPage("confidence_check_available_apis.js");
-}
-
-// TODO(crbug.com/417615981): Re-enable this test
-IN_PROC_BROWSER_TEST_F(ExtensionUntrustedWebUITest,
-                       DISABLED_ConfidenceCheckAvailableAPIsReadAnything) {
-  ASSERT_TRUE(RunTestOnReadAnythingPage(
-      "confidence_check_available_apis_read_anything.js"));
 }
 
 // Tests that we can call a function that send a message to the browser and

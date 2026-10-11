@@ -18,7 +18,6 @@
 #include "base/time/time.h"
 #include "chrome/browser/ui/hats/survey_config.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/messages/android/message_enums.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_observer.h"
 
@@ -77,14 +76,11 @@ class HatsService : public KeyedService {
 
   struct SurveyOptions {
     explicit SurveyOptions(
-        std::optional<std::u16string> custom_invitation = std::nullopt,
-        std::optional<messages::MessageIdentifier> message_identifier =
-            std::nullopt);
+        std::optional<std::u16string> custom_invitation = std::nullopt);
     SurveyOptions(const SurveyOptions& other);
     ~SurveyOptions();
 
     std::optional<std::u16string> custom_invitation;
-    std::optional<messages::MessageIdentifier> message_identifier;
   };
 
   enum NavigationBehavior {

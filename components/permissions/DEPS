@@ -6,7 +6,6 @@ include_rules = [
   "+components/favicon_base",
   "+components/keyed_service/content",
   "+components/keyed_service/core",
-  "+components/messages/android",
   "+components/pref_registry",
   "+components/guest_view/browser",
   "+components/guest_view/buildflags",

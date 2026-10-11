@@ -87,7 +87,6 @@ class SyncServiceFactoryTest : public testing::Test {
     // ChromeSyncClient types.
     datatypes.Put(syncer::READING_LIST);
     datatypes.Put(syncer::SECURITY_EVENTS);
-    datatypes.Put(syncer::SUPERVISED_USER_SETTINGS);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     datatypes.Put(syncer::EXTENSIONS);

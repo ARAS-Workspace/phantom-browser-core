@@ -58,7 +58,6 @@
 #include "extensions/browser/install_tracker.h"
 #include "extensions/browser/pref_names.h"
 #include "extensions/browser/scoped_active_install.h"
-#include "extensions/browser/supervised_user_extensions_delegate.h"
 #include "extensions/browser/ui_util.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/constants.h"
@@ -605,132 +604,7 @@ void WebstorePrivateBeginInstallWithManifest3Function::OnInstallStatusCheckDone(
     ShowInstallDialog(web_contents);
   }
   // Control flow finishes up in OnInstallPromptDone, OnRequestPromptDone,
-  // OnBlockByPolicyPromptDone, or OnRequestParentApprovalPromptCancelled.
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::RequestExtensionApproval(
-    content::WebContents* web_contents) {
-  if (!web_contents) {
-    // The browser window has gone away. This may be due to the user closing
-    // the window, or something in the background could have closed the web
-    // contents.
-    Respond(BuildResponse(api::webstore_private::Result::kUserCancelled,
-                          kWebstoreUserCancelledError));
-
-    return;
-  }
-
-  SupervisedUserExtensionsDelegate* supervised_user_extensions_delegate =
-      ManagementAPI::GetFactoryInstance()
-          ->Get(browser_context_)
-          ->GetSupervisedUserExtensionsDelegate();
-  CHECK(supervised_user_extensions_delegate);
-
-  auto extension_approval_callback =
-      base::BindOnce(&WebstorePrivateBeginInstallWithManifest3Function::
-                         OnExtensionApprovalDone,
-                     this);
-
-  supervised_user_extensions_delegate->RequestToAddExtensionOrShowError(
-      *dummy_extension_, web_contents,
-      gfx::ImageSkia::CreateFrom1xBitmap(icon_),
-      std::move(extension_approval_callback));
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::OnExtensionApprovalDone(
-    SupervisedExtensionApprovalResult result) {
-  switch (result) {
-    case SupervisedExtensionApprovalResult::kApproved:
-      OnExtensionApprovalApproved();
-      break;
-    case SupervisedExtensionApprovalResult::kCanceled:
-      OnExtensionApprovalCanceled();
-      break;
-    case SupervisedExtensionApprovalResult::kFailed:
-      OnExtensionApprovalFailed();
-      break;
-    case SupervisedExtensionApprovalResult::kBlocked:
-      OnExtensionApprovalBlocked();
-      break;
-  }
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::
-    OnExtensionApprovalApproved() {
-  SupervisedUserExtensionsDelegate* supervised_user_extensions_delegate =
-      ManagementAPI::GetFactoryInstance()
-          ->Get(browser_context_)
-          ->GetSupervisedUserExtensionsDelegate();
-  CHECK(supervised_user_extensions_delegate);
-  supervised_user_extensions_delegate->AddExtensionApproval(*dummy_extension_);
-
-  HandleInstallProceed();
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::
-    OnExtensionApprovalCanceled() {
-  if (test_delegate) {
-    test_delegate->OnExtensionInstallFailure(
-        dummy_extension_->id(),
-        l10n_util::GetStringUTF8(
-            IDS_EXTENSIONS_SUPERVISED_USER_PARENTAL_PERMISSION_FAILURE),
-        WebstoreInstaller::FailureReason::FAILURE_REASON_CANCELLED);
-  }
-
-  HandleInstallAbort(true /* user_initiated */);
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::
-    OnExtensionApprovalFailed() {
-  if (test_delegate) {
-    test_delegate->OnExtensionInstallFailure(
-        dummy_extension_->id(),
-        l10n_util::GetStringUTF8(
-            IDS_EXTENSIONS_SUPERVISED_USER_PARENTAL_PERMISSION_FAILURE),
-        WebstoreInstaller::FailureReason::FAILURE_REASON_OTHER);
-  }
-
-  Respond(BuildResponse(
-      api::webstore_private::Result::kUnknownError,
-      l10n_util::GetStringUTF8(
-          IDS_EXTENSIONS_SUPERVISED_USER_PARENTAL_PERMISSION_FAILURE)));
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::
-    OnExtensionApprovalBlocked() {
-  if (test_delegate) {
-    test_delegate->OnExtensionInstallFailure(
-        dummy_extension_->id(),
-        l10n_util::GetStringUTF8(
-            IDS_EXTENSIONS_SUPERVISED_USER_PARENTAL_PERMISSION_FAILURE),
-        WebstoreInstaller::FailureReason::FAILURE_REASON_CANCELLED);
-  }
-
-  Respond(BuildResponse(api::webstore_private::Result::kBlockedForChildAccount,
-                        l10n_util::GetStringUTF8(
-                            IDS_EXTENSIONS_SUPERVISED_USER_BLOCKED_BY_PARENT)));
-}
-
-bool WebstorePrivateBeginInstallWithManifest3Function::
-    PromptForParentApproval() {
-  DCHECK(ManagementAPI::GetFactoryInstance()
-             ->Get(browser_context())
-             ->GetSupervisedUserExtensionsDelegate()
-             ->IsChild());
-  content::WebContents* web_contents = GetSenderWebContents();
-  if (!web_contents) {
-    // The browser window has gone away.
-    Respond(BuildResponse(api::webstore_private::Result::kUserCancelled,
-                          kWebstoreUserCancelledError));
-    return false;
-  }
-  // Assume that the block dialog will not be shown by the
-  // SupervisedUserExtensionsDelegate, because if permissions for extensions
-  // were disabled, the block dialog would have been shown at the install prompt
-  // step.
-  RequestExtensionApproval(web_contents);
-
-  return true;
+  // or OnBlockByPolicyPromptDone.
 }
 
 void WebstorePrivateBeginInstallWithManifest3Function::OnInstallPromptDone(
@@ -739,27 +613,6 @@ void WebstorePrivateBeginInstallWithManifest3Function::OnInstallPromptDone(
     case ExtensionInstallPromptClient::Result::ACCEPTED:
     case ExtensionInstallPromptClient::Result::
         ACCEPTED_WITH_WITHHELD_PERMISSIONS: {
-      auto* supervised_user_extensions_delegate =
-          ManagementAPI::GetFactoryInstance()
-              ->Get(browser_context())
-              ->GetSupervisedUserExtensionsDelegate();
-      // TODO(b/202064235): The only user of this branch is ChromeOs v1 flow.
-      // Handle parent permission for child accounts on ChromeOS.
-      // Parent permission not required for theme installation.
-      if (!dummy_extension_->is_theme() &&
-          ExtensionsBrowserClient::Get()->IsValidContext(browser_context()) &&
-          supervised_user_extensions_delegate->IsChild() &&
-          !supervised_user_extensions_delegate
-               ->CanSkipExtensionParentApprovals()) {
-        if (PromptForParentApproval()) {
-          // If we are showing parent permission dialog, return instead of
-          // break, so that we don't release the ref below.
-          return;
-        } else {
-          // An error occurred, break so that we release the ref below.
-          break;
-        }
-      }
       bool withhold_permissions = payload.result ==
                                   ExtensionInstallPromptClient::Result::
                                       ACCEPTED_WITH_WITHHELD_PERMISSIONS;
@@ -798,27 +651,6 @@ void WebstorePrivateBeginInstallWithManifest3Function::
     OnBlockByPolicyPromptDone() {
   Respond(BuildResponse(api::webstore_private::Result::kBlockedByPolicy,
                         kWebstoreBlockByPolicy));
-}
-
-void WebstorePrivateBeginInstallWithManifest3Function::
-    OnRequestParentApprovalPromptCancelled() {
-  if (test_delegate) {
-    test_delegate->OnExtensionInstallFailure(
-        dummy_extension_->id(),
-        l10n_util::GetStringUTF8(
-            IDS_EXTENSIONS_SUPERVISED_USER_PARENTAL_PERMISSION_FAILURE),
-        WebstoreInstaller::FailureReason::FAILURE_REASON_CANCELLED);
-  }
-
-  auto* supervised_user_extensions_delegate =
-      ManagementAPI::GetFactoryInstance()
-          ->Get(browser_context())
-          ->GetSupervisedUserExtensionsDelegate();
-  supervised_user_extensions_delegate->RecordAskParentDialogUmaMetrics(
-      SupervisedUserExtensionsDelegate::AskParentDialogState::kCanceled);
-
-  Respond(BuildResponse(api::webstore_private::Result::kUserCancelled,
-                        kWebstoreUserCancelledError));
 }
 
 void WebstorePrivateBeginInstallWithManifest3Function::HandleInstallProceed(
@@ -893,39 +725,6 @@ void WebstorePrivateBeginInstallWithManifest3Function::ShowInstallDialog(
     content::WebContents* contents) {
   auto prompt =
       std::make_unique<InstallPromptData>(InstallPromptData::INSTALL_PROMPT);
-
-  if (!dummy_extension_->is_theme()) {
-    auto* supervised_user_extensions_delegate =
-        ManagementAPI::GetFactoryInstance()
-            ->Get(browser_context())
-            ->GetSupervisedUserExtensionsDelegate();
-    const bool requires_parent_permission =
-        supervised_user_extensions_delegate->IsChild() &&
-        !supervised_user_extensions_delegate->CanSkipExtensionParentApprovals();
-    // We don't prompt for parent permission for themes, so no need
-    // to configure the install prompt to indicate that this is a child
-    // asking a parent for installation permission.
-    prompt->set_requires_parent_permission(requires_parent_permission);
-    // Record metrics for supervised users that are in "Skip parent
-    // approval"-mode and use the Extension install dialog (that is used by
-    // non-supervised users).
-    if (supervised_user_extensions_delegate->IsChild()) {
-      prompt->AddObserver(
-          supervised_user_extensions_delegate->GetInstallPromptObserver());
-    }
-    if (requires_parent_permission) {
-      // Bypass the install prompt dialog if V2 is enabled. The
-      // ParentAccessDialog handles both the blocked and install use case.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-      // Shows a parental permission dialog directly bypassing the extension
-      // install dialog view. The parental permission dialog contains a superset
-      // of data from the extension install dialog: requested extension
-      // permissions and also parent's password input.
-      PromptForParentApproval();
-      return;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-    }
-  }
 
   install_prompt_ = ExtensionsBrowserClient::Get()->CreateInstallPrompt(
       contents, std::move(prompt));
@@ -1156,30 +955,7 @@ WebstorePrivateIsPendingCustodianApprovalFunction::Run() {
       IsPendingCustodianApproval::Params::Create(args());
   EXTENSION_FUNCTION_VALIDATE(params);
 
-  if (!ManagementAPI::GetFactoryInstance()
-           ->Get(browser_context())
-           ->GetSupervisedUserExtensionsDelegate()
-           ->IsChild()) {
-    return RespondNow(BuildResponse(false));
-  }
-  ExtensionRegistry* registry = ExtensionRegistry::Get(browser_context());
-  const Extension* extension =
-      registry->GetExtensionById(params->id, ExtensionRegistry::EVERYTHING);
-  if (!extension) {
-    return RespondNow(BuildResponse(false));
-  }
-
-  ExtensionPrefs* extensions_prefs = ExtensionPrefs::Get(browser_context());
-
-  if (extensions_prefs->HasDisableReason(
-          params->id, disable_reason::DISABLE_PERMISSIONS_INCREASE)) {
-    return RespondNow(BuildResponse(true));
-  }
-
-  bool is_pending_approval = extensions_prefs->HasDisableReason(
-      params->id, disable_reason::DISABLE_CUSTODIAN_APPROVAL_REQUIRED);
-
-  return RespondNow(BuildResponse(is_pending_approval));
+  return RespondNow(BuildResponse(false));
 }
 
 ExtensionFunction::ResponseValue

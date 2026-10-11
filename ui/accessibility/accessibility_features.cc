@@ -194,24 +194,9 @@ bool IsScreenAIOCREnabled() {
   return base::FeatureList::IsEnabled(ax::mojom::features::kScreenAIOCREnabled);
 }
 
-BASE_FEATURE(kImmersiveReadAnything, base::FEATURE_ENABLED_BY_DEFAULT);
-bool IsImmersiveReadAnythingEnabled() {
-  return base::FeatureList::IsEnabled(::features::kImmersiveReadAnything);
-}
-
 BASE_FEATURE(kMainNodeAnnotations, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsMainNodeAnnotationsEnabled() {
   return base::FeatureList::IsEnabled(::features::kMainNodeAnnotations);
-}
-
-BASE_FEATURE(kImprovedReadAloud, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsImprovedReadAloudEnabled() {
-  return base::FeatureList::IsEnabled(::features::kImprovedReadAloud);
-}
-
-BASE_FEATURE(kReadAnythingImprovedUi, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingImprovedUiEnabled() {
-  return base::FeatureList::IsEnabled(::features::kReadAnythingImprovedUi);
 }
 
 BASE_FEATURE(kPdfAccessibilityHeuristicEnhancements,
@@ -219,99 +204,6 @@ BASE_FEATURE(kPdfAccessibilityHeuristicEnhancements,
 bool IsPdfAccessibilityHeuristicEnhancementsEnabled() {
   return base::FeatureList::IsEnabled(
       ::features::kPdfAccessibilityHeuristicEnhancements);
-}
-
-BASE_FEATURE(kReadAnythingMenuShuffleExperiment,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingMenuShuffleExperimentEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kReadAnythingMenuShuffleExperiment);
-}
-
-namespace {
-constexpr base::FeatureParam<ReadAnythingMenuShuffleExperimentGroup>::Option
-    kReadAnythingMenuShuffleExperimentParamOptions[3] = {
-        {ReadAnythingMenuShuffleExperimentGroup::kDefault,
-         "MenuShuffleDefault"},
-        {ReadAnythingMenuShuffleExperimentGroup::kPlaceWithSeparation,
-         "MenuShuffleSeparation"},
-        {ReadAnythingMenuShuffleExperimentGroup::kPlaceAtBottom,
-         "MenuShufflePlaceAtBottom"}};
-
-BASE_FEATURE_ENUM_PARAM(ReadAnythingMenuShuffleExperimentGroup,
-                        kReadAnythingMenuShuffleExperimentParam,
-                        &kReadAnythingMenuShuffleExperiment,
-                        "read_anything_menu_shuffle_group_name",
-                        ReadAnythingMenuShuffleExperimentGroup::kDefault,
-                        &kReadAnythingMenuShuffleExperimentParamOptions);
-}  // namespace
-
-ReadAnythingMenuShuffleExperimentGroup
-GetReadAnythingMenuShuffleExperimentGroup() {
-  CHECK(IsReadAnythingMenuShuffleExperimentEnabled());
-  return kReadAnythingMenuShuffleExperimentParam.Get();
-}
-
-BASE_FEATURE(kReadAnythingReadAloudExperimentalPlaybackUi,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingReadAloudExperimentalPlaybackUiEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kReadAnythingReadAloudExperimentalPlaybackUi);
-}
-
-BASE_FEATURE(kReadAnythingReadAloudPhraseHighlighting,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingReadAloudPhraseHighlightingEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kReadAnythingReadAloudPhraseHighlighting);
-}
-
-BASE_FEATURE(kReadAnythingOmniboxChip, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingOmniboxChipEnabled() {
-  return false;
-}
-
-BASE_FEATURE(kReadAnythingLineFocus, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingLineFocusEnabled() {
-  return base::FeatureList::IsEnabled(::features::kReadAnythingLineFocus);
-}
-
-bool IsReadAnythingDocsIntegrationEnabled() {
-  return base::FeatureList::IsEnabled(
-      ax::mojom::features::kReadAnythingDocsIntegration);
-}
-
-BASE_FEATURE(kReadAnythingDocsLoadMoreButton,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingDocsLoadMoreButtonEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kReadAnythingDocsLoadMoreButton);
-}
-
-BASE_FEATURE(kReadAnythingWithReadability, base::FEATURE_ENABLED_BY_DEFAULT);
-bool IsReadAnythingWithReadabilityEnabled() {
-  return base::FeatureList::IsEnabled(::features::kReadAnythingWithReadability);
-}
-
-BASE_FEATURE(kReadAnythingReadabilitySelectText,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-bool IsReadAnythingReadabilitySelectTextEnabled() {
-  return base::FeatureList::IsEnabled(
-             ::features::kReadAnythingReadabilitySelectText) &&
-         base::FeatureList::IsEnabled(::features::kReadAnythingWithReadability);
-}
-
-BASE_FEATURE(kReadAnythingDistillationQualityEvaluation,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingDistillationQualityEvaluationEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kReadAnythingDistillationQualityEvaluation);
-}
-
-BASE_FEATURE(kReadAnythingDistillerRefactor, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsReadAnythingDistillerRefactorEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kReadAnythingDistillerRefactor);
 }
 
 // This feature is only used in tests and must not be enabled by default.
@@ -358,14 +250,5 @@ bool IsMacAccessibilityTextOperationEnabled() {
       ::features::kMacAccessibilityTextOperation);
 }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-BASE_FEATURE(kWasmTtsEngineAutoInstallDisabled,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsWasmTtsEngineAutoInstallDisabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kWasmTtsEngineAutoInstallDisabled);
-}
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace features

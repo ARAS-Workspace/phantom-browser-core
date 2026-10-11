@@ -49,7 +49,6 @@
 #include "chrome/browser/extensions/test_extension_system.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
-#include "chrome/browser/supervised_user/supervised_user_browser_utils.h"
 #include "chrome/browser/ui/extensions/extension_install_ui.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_model.h"
 #include "chrome/common/extensions/api/developer_private.h"
@@ -57,7 +56,6 @@
 #include "components/crx_file/id_util.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/supervised_user/core/common/features.h"
 #include "components/sync/test/fake_sync_change_processor.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/mock_render_process_host.h"
@@ -469,8 +467,6 @@ class DeveloperPrivateApiUnitTest : public ExtensionServiceTestWithInstall {
   void RunUpdateHostAccess(const Extension& extension,
                            std::string_view new_access);
 
-  virtual bool ProfileIsSupervised() const { return false; }
-
   content::RenderProcessHost* render_process_host() const {
     return render_process_host_.get();
   }
@@ -681,9 +677,7 @@ void DeveloperPrivateApiUnitTest::SetDraggedFile(
 void DeveloperPrivateApiUnitTest::SetUp() {
   ExtensionServiceTestWithInstall::SetUp();
 
-  ExtensionServiceInitParams init_params;
-  init_params.profile_is_supervised = ProfileIsSupervised();
-  InitializeExtensionService(std::move(init_params));
+  InitializeExtensionService(ExtensionServiceInitParams());
   extension_action_test_util::CreateToolbarModelForProfile(profile());
 
   // Allow the API to be created.
@@ -3223,36 +3217,6 @@ TEST_F(DeveloperPrivateApiUnitTest,
   EXPECT_TRUE(WasItemChangedEventDispatched(
       test_observer, extension->id(),
       api::developer_private::EventType::kCommandAdded));
-}
-
-class DeveloperPrivateApiSupervisedUserUnitTest
-    : public DeveloperPrivateApiUnitTest {
- public:
-  DeveloperPrivateApiSupervisedUserUnitTest() = default;
-  DeveloperPrivateApiSupervisedUserUnitTest(
-      const DeveloperPrivateApiSupervisedUserUnitTest&) = delete;
-  DeveloperPrivateApiSupervisedUserUnitTest& operator=(
-      const DeveloperPrivateApiSupervisedUserUnitTest&) = delete;
-
-  ~DeveloperPrivateApiSupervisedUserUnitTest() override = default;
-
-  bool ProfileIsSupervised() const override { return true; }
-};
-
-// Tests trying to call loadUnpacked when the profile shouldn't be allowed to.
-TEST_F(DeveloperPrivateApiSupervisedUserUnitTest,
-       LoadUnpackedFailsForSupervisedUsers) {
-  std::unique_ptr<content::WebContents> web_contents(
-      content::WebContentsTester::CreateTestWebContents(profile(), nullptr));
-  base::FilePath path = data_dir().AppendASCII("simple_with_popup");
-
-    EXPECT_TRUE(supervised_user::AreExtensionsPermissionsEnabled(profile()));
-    auto function =
-        base::MakeRefCounted<api::DeveloperPrivateLoadUnpackedFunction>();
-    function->SetRenderFrameHost(web_contents->GetPrimaryMainFrame());
-    std::string error = api_test_utils::RunFunctionAndReturnError(
-        function.get(), "[]", profile());
-    EXPECT_THAT(error, testing::HasSubstr("Child account"));
 }
 
 class DeveloperPrivateApiTransportModeUnitTest

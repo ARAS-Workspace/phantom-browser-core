@@ -34,7 +34,6 @@
 #include "chrome/browser/signin/chrome_signin_pref_names.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_ui_util.h"
-#include "chrome/browser/supervised_user/supervised_user_url_filtering_service_factory.h"
 #include "chrome/browser/sync/device_info_sync_service_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -72,8 +71,6 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/supervised_user/core/browser/supervised_user_url_filtering_service.h"
-#include "components/supervised_user/core/browser/supervised_user_utils.h"
 #include "components/sync/protocol/sync_enums.pb.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync_device_info/device_info.h"
@@ -216,20 +213,6 @@ constexpr UrlIdentity::FormatOptions url_identity_options{
     .default_options = {UrlIdentity::DefaultFormatOptions::
                             kOmitSchemePathAndTrivialSubdomains}};
 
-history::mojom::FilteringBehavior FilteringBehaviorToMojom(
-    supervised_user::FilteringBehavior filtering_behavior) {
-  switch (filtering_behavior) {
-    case supervised_user::FilteringBehavior::kAllow:
-      return history::mojom::FilteringBehavior::kAllow;
-    case supervised_user::FilteringBehavior::kBlock:
-      return history::mojom::FilteringBehavior::kBlock;
-    case supervised_user::FilteringBehavior::kInvalid:
-      return history::mojom::FilteringBehavior::kInvalid;
-    default:
-      return history::mojom::FilteringBehavior::kUnknown;
-  }
-}
-
 // Converts `entry` to a history::mojom::QueryResult to be owned by the caller.
 history::mojom::HistoryEntryPtr HistoryEntryToMojom(
     const BrowsingHistoryService::HistoryEntry& entry,
@@ -317,20 +300,8 @@ history::mojom::HistoryEntryPtr HistoryEntryToMojom(
   result_mojom->device_name = device_name;
   result_mojom->device_type = device_type;
 
-  supervised_user::FilteringBehavior filtering_behavior;
-  if (profile.IsChild()) {
-    filtering_behavior =
-        supervised_user::SupervisedUserUrlFilteringServiceFactory::
-            GetForProfile(&profile)
-                ->GetFilteringBehavior(entry.url.GetWithEmptyPath())
-                .behavior;
-    is_blocked_visit = entry.blocked_visit;
-    result_mojom->host_filtering_behavior =
-        FilteringBehaviorToMojom(filtering_behavior);
-  } else {
-    result_mojom->host_filtering_behavior =
-        history::mojom::FilteringBehavior::kUnknown;
-  }
+  result_mojom->host_filtering_behavior =
+      history::mojom::FilteringBehavior::kUnknown;
 
   result_mojom->date_time_of_day = base::UTF16ToUTF8(date_time_of_day);
   result_mojom->date_relative_day = base::UTF16ToUTF8(date_relative_day);

@@ -105,16 +105,6 @@ TEST_F(ChromeSigninClientSignoutTest, ClearPrimaryAccountAllowed) {
   EXPECT_TRUE(client_->IsClearPrimaryAccountAllowed());
 }
 
-TEST_F(ChromeSigninClientSignoutTest, ChildProfile) {
-  TestingProfile::Builder builder;
-  builder.SetIsSupervisedProfile();
-  std::unique_ptr<TestingProfile> profile = builder.Build();
-  EXPECT_TRUE(profile->IsChild());
-
-  CreateClient(profile.get());
-  EXPECT_TRUE(client_->IsClearPrimaryAccountAllowed());
-}
-
 TEST_F(ChromeSigninClientSignoutTest, GetOAuthConsumerForContextualTasks) {
   signin::OAuthConsumer consumer = client_->GetOAuthConsumerFromId(
       signin::OAuthConsumerId::kContextualTasks);

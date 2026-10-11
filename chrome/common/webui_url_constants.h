@@ -127,8 +127,6 @@ inline constexpr char kChromeUIExtensionsZeroStatePromoHost[] =
     "extensions-zero-state";
 inline constexpr char kChromeUIExtensionsZeroStatePromoURL[] =
     "chrome://extensions-zero-state";
-inline constexpr char kChromeUIFamilyLinkUserInternalsHost[] =
-    "family-link-user-internals";
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 inline constexpr char kChromeUIFeatureShowcaseHost[] = "feature-showcase";
 inline constexpr char kChromeUIFeatureShowcaseURL[] =
@@ -365,10 +363,6 @@ inline constexpr char kChromeUITabsFromOtherDevicesSidePanelHost[] =
     "tabs-from-other-devices.top-chrome";
 inline constexpr char kChromeUITabsFromOtherDevicesSidePanelURL[] =
     "chrome://tabs-from-other-devices.top-chrome/";
-inline constexpr char kChromeUIUntrustedReadAnythingSidePanelHost[] =
-    "read-anything-side-panel.top-chrome";
-inline constexpr char kChromeUIUntrustedReadAnythingSidePanelURL[] =
-    "chrome-untrusted://read-anything-side-panel.top-chrome/";
 inline constexpr char kChromeUIWebuiBrowserHost[] = "webui-browser";
 inline constexpr char kChromeUIWebuiBrowserURL[] = "chrome://webui-browser/";
 inline constexpr char kChromeUIWebUIJsErrorHost[] = "webuijserror";

@@ -87,9 +87,6 @@ class ChromeExtensionsAPIClient : public ExtensionsAPIClient {
   std::unique_ptr<UsbDevicePermissionsPrompt> CreateUsbDevicePermissionsPrompt(
       content::WebContents* web_contents) const override;
   ManagementAPIDelegate* CreateManagementAPIDelegate() const override;
-  std::unique_ptr<SupervisedUserExtensionsDelegate>
-  CreateSupervisedUserExtensionsDelegate(
-      content::BrowserContext* browser_context) const override;
   std::unique_ptr<DisplayInfoProvider> CreateDisplayInfoProvider()
       const override;
   MetricsPrivateDelegate* GetMetricsPrivateDelegate() override;

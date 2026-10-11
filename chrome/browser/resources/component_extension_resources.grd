@@ -19,9 +19,6 @@
       <include name="IDR_NETWORK_SPEECH_SYNTHESIS_MV3_SERVICE_WORKER_JS" file="network_speech_synthesis/mv3/service_worker.js" type="BINDATA" />
       <include name="IDR_NETWORK_SPEECH_SYNTHESIS_MV3_JS" file="network_speech_synthesis/mv3/tts_extension.js" type="BINDATA" />
 
-      <include name="IDR_READING_MODE_GDOC_HELPER_CONTENT_JS" file="reading_mode_gdocs_helper/content.js" type="BINDATA" />
-      <include name="IDR_READING_MODE_GDOC_HELPER_GDOCS_SCRIPT_JS" file="reading_mode_gdocs_helper/gdocs_script.js" type="BINDATA" />
-
       <!-- Hangout Services extension, included in Google Chrome builds only. -->
       <if expr="_google_chrome or enable_hangout_services_extension">
         <include name="IDR_HANGOUT_SERVICES_BACKGROUND_HTML" file="hangout_services/background.html" type="BINDATA" />

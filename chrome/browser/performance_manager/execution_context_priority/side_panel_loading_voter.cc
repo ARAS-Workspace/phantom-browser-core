@@ -38,18 +38,7 @@ void SidePanelLoadingVoter::MarkAsSidePanel(const PageNode* page_node) {
   // This is possible for a preloaded Side Panel. The navigation has already
   // committed and the page is visible.
   if (!page_node->GetMainFrameUrl().is_empty()) {
-    if (!features::IsImmersiveReadAnythingEnabled()) {
-      CHECK(page_node->IsVisible());
-      return;
-    }
-    // If the Side Panel is a Reading Mode and Immersive Reading Mode is
-    // enabled, don't CHECK if page_node->IsVisible(), because a preloaded WebUI
-    // is expected when a user is switching between Immersive Reading Mode and
-    // the Side Panel.
-    if (page_node->GetMainFrameUrl() !=
-        GURL(chrome::kChromeUIUntrustedReadAnythingSidePanelURL)) {
-      CHECK(page_node->IsVisible());
-    }
+    CHECK(page_node->IsVisible());
     return;
   }
 

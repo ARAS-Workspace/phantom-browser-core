@@ -201,10 +201,8 @@ HatsService::LaunchError HatsServiceDesktop::LaunchSurvey(
     const SurveyStringData& product_specific_string_data,
     const std::optional<std::string>& supplied_trigger_id,
     const SurveyOptions& survey_options) {
-  CHECK(!survey_options.custom_invitation.has_value() &&
-        !survey_options.message_identifier.has_value())
-      << "Custom invitation strings and message types are not supported on "
-         "desktop.";
+  CHECK(!survey_options.custom_invitation.has_value())
+      << "Custom invitation strings are not supported on desktop.";
 
   BrowserWindowInterface* const browser =
       ProfileBrowserCollection::GetForProfile(profile())
@@ -226,10 +224,8 @@ HatsService::LaunchError HatsServiceDesktop::LaunchSurveyForWebContents(
     base::OnceClosure failure_callback,
     const std::optional<std::string>& supplied_trigger_id,
     const SurveyOptions& survey_options) {
-  CHECK(!survey_options.custom_invitation.has_value() &&
-        !survey_options.message_identifier.has_value())
-      << "Custom invitation strings and message types are not supported on "
-         "desktop.";
+  CHECK(!survey_options.custom_invitation.has_value())
+      << "Custom invitation strings are not supported on desktop.";
 
   if (!web_contents ||
       web_contents->GetVisibility() != content::Visibility::VISIBLE) {
@@ -290,10 +286,8 @@ HatsService::LaunchError HatsServiceDesktop::LaunchDelayedSurveyForWebContents(
     base::OnceClosure failure_callback,
     const std::optional<std::string>& supplied_trigger_id,
     const SurveyOptions& survey_options) {
-  CHECK(!survey_options.custom_invitation.has_value() &&
-        !survey_options.message_identifier.has_value())
-      << "Custom invitation strings and message types are not supported on "
-         "desktop.";
+  CHECK(!survey_options.custom_invitation.has_value())
+      << "Custom invitation strings are not supported on desktop.";
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   if (survey_configs_by_triggers_.find(trigger) ==
       survey_configs_by_triggers_.end()) {

@@ -56,7 +56,6 @@
       "chrome/browser/resources/new_tab_page_incognito_guest/.*(css|html|js)",
       "chrome/browser/resources/page_not_available_for_guest/app.html",
       "chrome/browser/resources/page_not_aventerprise/incognito_navigation_blocked_page/incognito_blocked.html",
-      "chrome/browser/resources/reading_mode_gdocs_helper/.*(css|html|js)",
       "mojo/tools/.*",
       "net/data/.*",
       "third_party/accessibility-audit/axs_testing.js",

@@ -53,7 +53,6 @@
 #include "extensions/browser/permissions/permissions_test_util.h"
 #include "extensions/browser/permissions/permissions_updater.h"
 #include "extensions/browser/permissions/scripting_permissions_modifier.h"
-#include "extensions/browser/supervised_user_extensions_delegate.h"
 #include "extensions/buildflags/buildflags.h"
 #include "extensions/common/api/extension_action/action_info.h"
 #include "extensions/common/constants.h"
@@ -71,12 +70,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
-
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-#include "chrome/browser/supervised_user/supervised_user_extensions_delegate_impl.h"
-#include "chrome/browser/supervised_user/supervised_user_test_util.h"
-#include "components/supervised_user/core/common/features.h"
-#endif
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -1311,94 +1304,5 @@ TEST_F(ExtensionInfoGeneratorUnitTest, UploadAsAccountExtension_TransportMode) {
   info = GenerateExtensionInfo(syncable_extension->id());
   EXPECT_FALSE(info->can_upload_as_account_extension);
 }
-
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-
-// Tests for supervised users (child accounts). Supervised users are not allowed
-// to install apps or extensions unless their parent approves.
-class ExtensionInfoGeneratorUnitTestSupervised
-    : public ExtensionInfoGeneratorUnitTest {
- public:
-  ExtensionInfoGeneratorUnitTestSupervised() = default;
-  ~ExtensionInfoGeneratorUnitTestSupervised() override = default;
-
-  // ExtensionInfoGeneratorUnitTest:
-  ExtensionServiceInitParams GetExtensionServiceInitParams() override {
-    ExtensionServiceInitParams params =
-        ExtensionInfoGeneratorUnitTest::GetExtensionServiceInitParams();
-    params.profile_is_supervised = true;
-    return params;
-  }
-
-  void SetUp() override {
-    ExtensionInfoGeneratorUnitTest::SetUp();
-
-    // Set up custodians (parents) for the child.
-    supervised_user_test_util::AddCustodians(profile());
-  }
-
-  void TearDown() override {
-    ExtensionInfoGeneratorUnitTest::TearDown();
-  }
-};
-
-// Tests that when a supervised user is never blocked from
-// updating the permissions of an extension after a permissions' increase.
-TEST_F(ExtensionInfoGeneratorUnitTestSupervised,
-       AlwaysAllowPermissionUpdatesForSupervisedUsers) {
-  ASSERT_TRUE(profile()->IsChild());
-
-  std::unique_ptr<SupervisedUserExtensionsDelegate>
-      supervised_user_extensions_delegate =
-          std::make_unique<SupervisedUserExtensionsDelegateImpl>(profile());
-  base::FilePath base_path = data_dir().AppendASCII("permissions_increase");
-  base::FilePath pem_path = base_path.AppendASCII("permissions.pem");
-  base::FilePath path = base_path.AppendASCII("v1");
-
-  // The extensions will be installed but disabled until custodian approvals are
-  // performed.
-  InstallState install_state = INSTALL_WITHOUT_LOAD;
-  const Extension* extension = PackAndInstallCRX(path, pem_path, install_state);
-  ASSERT_TRUE(extension);
-    EXPECT_TRUE(registry()->disabled_extensions().Contains(extension->id()));
-
-  // Save the id, as |extension| will be destroyed during updating.
-  ExtensionId extension_id = extension->id();
-
-  ExtensionPrefs* prefs = ExtensionPrefs::Get(profile());
-    EXPECT_TRUE(prefs->HasDisableReason(
-        extension_id, disable_reason::DISABLE_CUSTODIAN_APPROVAL_REQUIRED));
-
-    // Simulate parent approval for the extension installation.
-    supervised_user_extensions_delegate->AddExtensionApproval(*extension);
-
-  // The extension should be enabled.
-  EXPECT_TRUE(registry()->enabled_extensions().Contains(extension_id));
-
-  // Update to a new version with increased permissions.
-  path = base_path.AppendASCII("v2");
-  PackCRXAndUpdateExtension(extension_id, path, pem_path, DISABLED);
-
-  // The extension should be disabled.
-  EXPECT_TRUE(registry()->disabled_extensions().Contains(extension_id));
-
-  // Due to a permission increase, prefs will contain escalation information.
-  EXPECT_TRUE(prefs->DidExtensionEscalatePermissions(extension_id));
-
-  // Disable the supervised user preferences relating to permissions and
-  // extensions.
-  supervised_user_test_util::
-      SetSupervisedUserExtensionsMayRequestPermissionsPref(profile(), false);
-  supervised_user_test_util::SetSkipParentApprovalToInstallExtensionsPref(
-      profile(), false); /* Default value. */
-
-  // The supervised user is never blocked from updating the permissions of an
-  // extension.
-  std::unique_ptr<api::developer_private::ExtensionInfo> info =
-      GenerateExtensionInfo(extension_id);
-  EXPECT_FALSE(info->disable_reasons.parent_disabled_permissions);
-}
-
-#endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
 
 }  // namespace extensions

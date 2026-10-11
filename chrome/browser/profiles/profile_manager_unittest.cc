@@ -61,8 +61,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/supervised_user/core/common/pref_names.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/mock_render_process_host.h"
@@ -802,8 +800,6 @@ TEST_P(ProfileManagerTest, AddProfileToStorageCheckNotOmitted) {
       temp_dir_.GetPath().AppendASCII("Supervised");
   auto supervised_profile = std::make_unique<TestingProfile>(
       supervised_path, nullptr, Profile::CreateMode::kSynchronous);
-  supervised_profile->GetPrefs()->SetString(prefs::kSupervisedUserId,
-                                            supervised_user::kChildAccountSUID);
 
   // RegisterTestingProfile adds the profile to the attributes storage and takes
   // ownership.

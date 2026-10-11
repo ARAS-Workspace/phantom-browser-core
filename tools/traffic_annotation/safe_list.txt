@@ -54,8 +54,6 @@ missing_new_fields,chrome/browser/android/survey/http_client_type.cc
 missing_new_fields,chrome/browser/android/webapk/webapk_installer.cc
 missing_new_fields,chrome/browser/download/android/download_manager_service.cc
 missing_new_fields,chrome/browser/share/bitmap_download_request.cc
-missing_new_fields,chrome/browser/supervised_user/android/favicon_fetcher.cc
-missing_new_fields,chrome/browser/supervised_user/kids_chrome_management/kids_chrome_management_client.cc
 missing_new_fields,chrome/browser/tab/java/src/org/chromium/chrome/browser/tab/state/CouponPersistedTabData.java
 missing_new_fields,components/content_creation/notes/core/server/notes_server_saver.cc
 missing_new_fields,components/content_creation/notes/core/templates/template_fetcher.cc
@@ -108,8 +106,6 @@ missing_new_fields,chrome/browser/sharing/web_push/web_push_sender.cc
 missing_new_fields,chrome/browser/spellchecker/spellcheck_hunspell_dictionary.cc
 missing_new_fields,chrome/browser/ssl/certificate_error_reporter.cc
 missing_new_fields,chrome/browser/ssl/sct_reporting_service.cc
-missing_new_fields,chrome/browser/supervised_user/child_accounts/permission_request_creator_apiary.cc
-missing_new_fields,chrome/browser/supervised_user/supervised_user_service.cc
 missing_new_fields,chrome/browser/ui/ash/assistant/search_and_assistant_enabled_checker.cc
 missing_new_fields,chrome/browser/ui/global_media_controls/cast_media_notification_item.cc
 missing_new_fields,chrome/browser/ui/omnibox/chrome_omnibox_navigation_observer.cc

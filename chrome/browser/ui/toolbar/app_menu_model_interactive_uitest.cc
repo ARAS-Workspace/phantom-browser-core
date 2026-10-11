@@ -41,8 +41,6 @@
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/performance_manager/public/features.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
-#include "components/supervised_user/core/common/features.h"
-#include "components/supervised_user/test_support/supervised_user_signin_test_utils.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/test/browser_test.h"
 #include "extensions/browser/extension_registry.h"
@@ -391,78 +389,3 @@ IN_PROC_BROWSER_TEST_F(PasswordManagerMenuItemInteractiveTest,
       PressButton(kToolbarAppMenuButtonElementId),
       EnsureNotPresent(AppMenuModel::kPasswordManagerMenuItem));
 }
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-class SupervisedUserAppMenuModelInteractiveTest
-    : public AppMenuModelInteractiveTest {
- public:
-  void SetUpInProcessBrowserTestFixture() override {
-    unused_subscription_ =
-        BrowserContextDependencyManager::GetInstance()
-            ->RegisterCreateServicesCallbackForTesting(
-                base::BindRepeating([](content::BrowserContext* context) {
-                  // Required to use IdentityTestEnvironmentAdaptor.
-                  IdentityTestEnvironmentProfileAdaptor::
-                      SetIdentityTestEnvironmentFactoriesOnBrowserContext(
-                          context);
-                }));
-  }
-
- protected:
-  void OnWillCreateBrowserContextServices(content::BrowserContext* context) {
-    IdentityTestEnvironmentProfileAdaptor::
-        SetIdentityTestEnvironmentFactoriesOnBrowserContext(context);
-  }
-
-  void SetUpOnMainThread() override {
-    InteractiveBrowserTest::SetUpOnMainThread();
-    identity_test_environment_adaptor_ =
-        std::make_unique<IdentityTestEnvironmentProfileAdaptor>(
-            browser()->GetProfile());
-  }
-
-  void SignIn(bool is_supervised_user) {
-    AccountInfo account_info =
-        identity_test_environment_adaptor_->identity_test_env()
-            ->MakePrimaryAccountAvailable("name@gmail.com",
-                                          signin::ConsentLevel::kSignin);
-    supervised_user::UpdateSupervisionStatusForAccount(
-        account_info,
-        identity_test_environment_adaptor_->identity_test_env()
-            ->identity_manager(),
-        is_supervised_user);
-  }
-
- private:
-  base::CallbackListSubscription unused_subscription_;
-  std::unique_ptr<IdentityTestEnvironmentProfileAdaptor>
-      identity_test_environment_adaptor_;
-};
-
-IN_PROC_BROWSER_TEST_F(SupervisedUserAppMenuModelInteractiveTest,
-                       OpenGuestSessionForSignedOutUser) {
-  RunTestSequence(PressButton(kToolbarAppMenuButtonElementId),
-                  SelectMenuItem(AppMenuModel::kProfileMenuItem),
-                  SelectMenuItem(AppMenuModel::kProfileOpenGuestItem),
-                  CheckGuestWindowOpened(browser()));
-}
-
-IN_PROC_BROWSER_TEST_F(SupervisedUserAppMenuModelInteractiveTest,
-                       OpenGuestSessionForSignedInRegularUser) {
-  SignIn(/*is_supervised_user=*/false);
-  RunTestSequence(PressButton(kToolbarAppMenuButtonElementId),
-                  SelectMenuItem(AppMenuModel::kProfileMenuItem),
-                  SelectMenuItem(AppMenuModel::kProfileOpenGuestItem),
-                  CheckGuestWindowOpened(browser()));
-}
-
-IN_PROC_BROWSER_TEST_F(SupervisedUserAppMenuModelInteractiveTest,
-                       OpenGuestSessionForSignedInSupervisedUser) {
-  SignIn(/*is_supervised_user=*/true);
-
-  RunTestSequence(PressButton(kToolbarAppMenuButtonElementId),
-                  SelectMenuItem(AppMenuModel::kProfileMenuItem),
-                  EnsureNotPresent(AppMenuModel::kProfileOpenGuestItem));
-}
-
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

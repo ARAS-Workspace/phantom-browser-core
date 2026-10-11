@@ -46,8 +46,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
-#include "components/supervised_user/core/browser/device_parental_controls.h"
-#include "components/supervised_user/core/browser/device_parental_controls_noop_impl.h"
 #include "content/public/browser/network_service_instance.h"
 #include "extensions/buildflags/buildflags.h"
 #include "media/media_buildflags.h"
@@ -145,8 +143,6 @@ void TestingBrowserProcess::TearDownAndDeleteInstance() {
 
 TestingBrowserProcess::TestingBrowserProcess()
     : testing_local_state_(std::make_unique<TestingPrefServiceSimple>()),
-      device_parental_controls_(
-          std::make_unique<supervised_user::DeviceParentalControlsNoOpImpl>()),
       platform_part_(std::make_unique<TestingBrowserProcessPlatformPart>()),
       os_crypt_async_(os_crypt_async::GetTestOSCryptAsyncForTesting()) {
   RegisterLocalState(testing_local_state_->registry());
@@ -514,11 +510,6 @@ TestingBrowserProcess::background_printing_manager() {
   NOTIMPLEMENTED();
   return nullptr;
 #endif
-}
-
-supervised_user::DeviceParentalControls&
-TestingBrowserProcess::device_parental_controls() {
-  return *device_parental_controls_;
 }
 
 const std::string& TestingBrowserProcess::GetApplicationLocale() {

@@ -147,7 +147,7 @@
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/profile_metrics/browser_profile_type.h"
-#include "components/safe_search_api/safe_search_util.h"
+#include "components/google/core/common/safe_search_util.h"
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -155,8 +155,6 @@
 #include "components/site_isolation/site_isolation_policy.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/subscription_eligibility/subscription_eligibility_service.h"
-#include "components/supervised_user/core/common/pref_names.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
 #include "components/sync/base/features.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "components/url_formatter/url_fixer.h"
@@ -540,8 +538,7 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
       profile_policy_connector_->policy_service(),
       g_browser_process->browser_policy_connector(),
       std::move(pref_validation_delegate), GetIOTaskRunner(), key_.get(), path_,
-      async_prefs, g_browser_process->os_crypt_async(),
-      g_browser_process->device_parental_controls());
+      async_prefs, g_browser_process->os_crypt_async());
   key_->SetPrefs(prefs_.get());
 }
 
@@ -559,11 +556,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
     prefs->SetTime(prefs::kProfileCreationTime, path_creation_time_);
 
   pref_change_registrar_.Init(prefs);
-  pref_change_registrar_.Add(
-      prefs::kSupervisedUserId,
-      base::BindRepeating(&ProfileImpl::UpdateSupervisedUserIdInStorage,
-                          base::Unretained(this)));
-
   // Changes in the profile avatar.
   pref_change_registrar_.Add(
       prefs::kProfileAvatarIndex,
@@ -607,7 +599,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   CreateProfileDirectory(io_task_runner_.get(), base_cache_path, false);
 
   // Initialize components that depend on the current value.
-  UpdateSupervisedUserIdInStorage();
   UpdateIsEphemeralInStorage();
   UpdateAiSubscriptionTierInStorage();
 
@@ -897,8 +888,7 @@ const Profile* ProfileImpl::GetOriginalProfile() const {
 }
 
 bool ProfileImpl::IsChild() const {
-  return GetPrefs()->GetString(prefs::kSupervisedUserId) ==
-         supervised_user::kChildAccountSUID;
+  return false;
 }
 
 ExtensionSpecialStoragePolicy* ProfileImpl::GetExtensionSpecialStoragePolicy() {
@@ -1284,14 +1274,6 @@ GURL ProfileImpl::GetHomePage() {
   if (!home_page.is_valid())
     return chrome::ChromeUINewTabURLAsGURL();
   return home_page;
-}
-
-void ProfileImpl::UpdateSupervisedUserIdInStorage() {
-  ProfileManager* profile_manager = g_browser_process->profile_manager();
-  ProfileAttributesEntry* entry = profile_manager->GetProfileAttributesStorage()
-                                      .GetProfileAttributesWithPath(GetPath());
-  if (entry)
-    entry->SetSupervisedUserId(GetPrefs()->GetString(prefs::kSupervisedUserId));
 }
 
 void ProfileImpl::UpdateNameInStorage() {

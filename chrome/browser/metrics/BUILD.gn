@@ -106,8 +106,6 @@ source_set("metrics") {
     "//components/power_metrics",
   ]
 
-  public += [ "family_link_user_metrics_provider.h" ]
-
   if (is_mac) {
     public += [
       "google_update_metrics_provider_mac.h",
@@ -201,7 +199,6 @@ source_set("impl") {
     "//chrome/browser/resource_coordinator:utils",
     "//chrome/browser/site_isolation",
     "//chrome/browser/subscription_eligibility",
-    "//chrome/browser/supervised_user",
     "//chrome/browser/sync",
     "//chrome/browser/sync:factories",
     "//chrome/browser/tracing",
@@ -225,7 +222,6 @@ source_set("impl") {
     "//components/services/paint_preview_compositor/public/mojom",
     "//components/signin/core/browser",
     "//components/startup_metric_utils",
-    "//components/supervised_user/core/browser",
     "//components/ukm",
     "//components/ukm:ukm_recorder",
     "//device/bluetooth",
@@ -273,8 +269,6 @@ source_set("impl") {
     "//chrome/browser/ui/waap:manager",
     "//chrome/browser/web_applications:web_applications_metrics",
   ]
-
-  sources += [ "family_link_user_metrics_provider.cc" ]
 
   if (is_mac) {
     sources += [
@@ -425,8 +419,6 @@ source_set("unit_tests") {
     "//chrome/test:test_support_ui",
     "//chrome/test/user_education:impl",
   ]
-
-  sources += [ "family_link_user_metrics_provider_unittest.cc" ]
 
   if (enable_extensions_core) {
     sources += [ "extensions_metrics_provider_unittest.cc" ]

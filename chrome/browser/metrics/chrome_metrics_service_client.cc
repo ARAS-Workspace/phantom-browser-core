@@ -136,7 +136,6 @@
 #include "extensions/common/extension.h"
 #endif
 
-#include "chrome/browser/metrics/family_link_user_metrics_provider.h"
 #include "chrome/browser/metrics/structured/chrome_structured_metrics_delegate.h"
 #include "chrome/browser/metrics/structured/chrome_structured_metrics_recorder.h"
 #include "chrome/browser/signin/chrome_signin_and_sync_status_metrics_provider.h"
@@ -719,11 +718,6 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
 
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<ChromeSigninAndSyncStatusMetricsProvider>());
-  // ChromeOS uses ChromeOSFamilyLinkUserMetricsProvider to categorize the user
-  // based on Family Link user type.
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<FamilyLinkUserMetricsProvider>());
-
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<syncer::DeviceCountMetricsProvider>(base::BindRepeating(
           &DeviceInfoSyncServiceFactory::GetAllDeviceInfoTrackers)));

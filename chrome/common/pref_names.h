@@ -756,8 +756,6 @@ inline constexpr char kPrintPreviewUseSystemDefaultPrinter[] =
 inline constexpr char kUserDataSnapshotRetentionLimit[] =
     "downgrade.snapshot_retention_limit";
 
-// List pref containing the users supervised by this user.
-inline constexpr char kSupervisedUsers[] = "profile.managed_users";
 
 // List pref containing the extension ids which are not allowed to send
 // notifications to the message center.

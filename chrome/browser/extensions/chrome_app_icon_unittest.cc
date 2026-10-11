@@ -12,14 +12,12 @@
 #include "base/run_loop.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/extensions/chrome_app_icon_delegate.h"
-#include "chrome/browser/extensions/chrome_app_icon_loader.h"
 #include "chrome/browser/extensions/chrome_app_icon_service.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_service_test_base.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/app_icon_loader/app_icon_loader_delegate.h"
 #include "extensions/browser/disable_reason.h"
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/common/constants.h"
@@ -94,32 +92,6 @@ class TestAppIcon : public ChromeAppIconDelegate {
   size_t icon_update_count_expected_ = 0;
 
   base::OnceClosure icon_updated_callback_;
-};
-
-// Receives icon image updates from ChromeAppIconLoader.
-class TestAppIconLoader : public AppIconLoaderDelegate {
- public:
-  TestAppIconLoader() = default;
-
-  TestAppIconLoader(const TestAppIconLoader&) = delete;
-  TestAppIconLoader& operator=(const TestAppIconLoader&) = delete;
-
-  ~TestAppIconLoader() override = default;
-
-  // AppIconLoaderDelegate:
-  void OnAppImageUpdated(
-      const std::string& app_id,
-      const gfx::ImageSkia& image,
-      bool is_placeholder_icon,
-      const std::optional<gfx::ImageSkia>& badge_image) override {
-    image_skia_ = image;
-  }
-
-  gfx::ImageSkia& icon() { return image_skia_; }
-  const gfx::ImageSkia& icon() const { return image_skia_; }
-
- private:
-  gfx::ImageSkia image_skia_;
 };
 
 // Returns true if provided |image| consists from only empty pixels.

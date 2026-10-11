@@ -422,8 +422,6 @@ if (toolkit_views) {
       "//components/password_manager/core/common:features",
       "//components/performance_manager",
       "//components/signin/public/identity_manager:test_support",
-      "//components/supervised_user/core/common:features",
-      "//components/supervised_user/test_support",
       "//components/webapps/browser",
       "//content/test:test_support",
       "//extensions:test_support",

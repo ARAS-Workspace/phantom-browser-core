@@ -2,7 +2,6 @@ include_rules = [
   "-components/feed/core/v2/stream_model",
   "-components/feed/core/v2/tasks",
   "+components/search_engines",
-  "+components/supervised_user",
   "+components/sync_preferences",
   "+ui/base/l10n/l10n_util.h",
  ]

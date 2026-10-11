@@ -42,9 +42,6 @@
                   '|content/renderer/accessibility/render_accessibility_impl' \
                   '|ui/accessibility/platform/browser_accessibility(\.|_manager|_win|_com|_cocoa)'
     },
-    'accessibility_reading': {
-      'filepath': 'read_anything/',
-    },
     'accessibility_service': {
       'filepath': 'services/accessibility/',
     },
@@ -2175,11 +2172,6 @@
     'subresource_filter': {
       'filepath': 'subresource_filter|SubresourceFilter|url_pattern_index',
     },
-    'supervised_users': {
-      'filepath': 'chrome/browser/.*managed_mode'\
-                  '|chrome/browser/.*managed_user'\
-                  '|chrome/browser/.*supervised_user',
-    },
     'surface_layer_for_video': {
       'filepath': 'cc/layers/surface_layer'\
                   '|third_party/blink/renderer/platform/graphics/video_frame_'\
@@ -2529,9 +2521,6 @@
                                    'katie+watch@chromium.org'],
       'accessibility_minimal_core': ['kbabbitt@microsoft.com',
         'lucasradaelli+watch@google.com'],
-    'accessibility_reading': ['jatapiaro+watch-readinga11y@google.com',
-                              'lwinston+watch-readinga11y@google.com',
-                              'trewin+watch@google.com'],
     'accessibility_service': ['hirokisato+watch@chromium.org',
                               'katie+watch@chromium.org'],
     'actor': ['mfoltz+watch-actor@chromium.org'],
@@ -3303,7 +3292,6 @@
                           'wnwen+watch@chromium.org'],
     'stylus_handwriting': ['alexmitra+watch@chromium.org'],
     'subresource_filter': ['subresource-filter-reviews@chromium.org'],
-    'supervised_users': [],
     'surface_layer_for_video': [ 'lethalantidote@chromium.org',
                                  'liberato@chromium.org'],
     'switch_access': ['anastasi+watch@google.com'],

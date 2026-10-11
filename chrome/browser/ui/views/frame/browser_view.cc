@@ -4824,13 +4824,6 @@ bool BrowserView::AcceleratorPressed(const ui::Accelerator& accelerator) {
   context.SetProperty(chrome::kActionInvocationSourceKey,
                       chrome::ActionInvocationSource::kKeyboardShortcut);
 
-  if (command_id == IDC_SHOW_READING_MODE_SIDE_PANEL) {
-    context.SetProperty(
-        kSidePanelOpenTriggerKey,
-        static_cast<std::underlying_type_t<SidePanelOpenTrigger>>(
-            SidePanelOpenTrigger::kReadAnythingKeyboardShortcut));
-  }
-
   return chrome::ExecuteCommandWithContext(
       browser_.get(), command_id, std::move(context), accelerator.time_stamp());
 }

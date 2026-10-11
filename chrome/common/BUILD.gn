@@ -21,7 +21,6 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
-assert(enable_supervised_users)
 
 fuzzer_test("ini_parser_fuzzer") {
   sources = [ "ini_parser_fuzzer.cc" ]
@@ -66,14 +65,6 @@ buildflag_header("buildflags") {
     "ENABLE_SESSION_SERVICE=$enable_session_service",
     "ENABLE_WEBUI_CERTIFICATE_VIEWER=$enable_webui_certificate_viewer",
     "OPTIMIZE_WEBUI=$optimize_webui",
-  ]
-}
-
-source_set("readaloud_constants") {
-  sources = [ "readaloud/read_aloud_constants.h" ]
-  public_deps = [
-    "//base",
-    "//media",
   ]
 }
 
@@ -146,7 +137,6 @@ static_library("common_lib") {
     "pdf_util.h",
     "pref_names_util.cc",
     "pref_names_util.h",
-    "readaloud/read_aloud_constants.h",
     "ref_counted_util.h",
     "search/instant_mojom_traits.h",
     "search/instant_types.cc",
@@ -173,7 +163,6 @@ static_library("common_lib") {
     ":mojo_bindings",
     ":offline_page_auto_fetcher_mojom",
     ":request_code_constants",
-    ":supervised_user_commands_mojom",
     ":url_constants",
     "//base",
     "//base:base_static",
@@ -211,12 +200,10 @@ static_library("common_lib") {
     "//components/policy:generated",
     "//components/policy/core/common",
     "//components/prefs",
-    "//components/safe_search_api",
     "//components/sampling_profiler",
     "//components/services/app_service",
     "//components/services/heap_profiling/public/cpp",
     "//components/strings",
-    "//components/supervised_user/core/common",
     "//components/url_formatter",
     "//components/variations",
     "//components/variations/net",
@@ -326,10 +313,6 @@ static_library("common_lib") {
 
   # Non-Android.
   public_deps += [ "//chrome/common/importer" ]
-  sources += [
-    "read_anything/read_anything_util.cc",
-    "read_anything/read_anything_util.h",
-  ]
 
   if (is_posix) {
     sources += [
@@ -463,7 +446,6 @@ static_library("url_constants") {
     "//build/config/chromebox_for_meetings:buildflags",
     "//components/enterprise/buildflags",
     "//components/signin/public/base:signin_buildflags",
-    "//components/supervised_user/core/common:buildflags",
     "//content/public/common",
     "//extensions/buildflags",
     "//net:buildflags",
@@ -593,7 +575,6 @@ mojom("mojo_bindings") {
     "network_easter_egg.mojom",
     "open_search_description_document_handler.mojom",
     "plugin.mojom",
-    "readaloud/read_aloud.mojom",
     "renderer_configuration.mojom",
     "trusted_vault_encryption_keys_extension.mojom",
   ]
@@ -675,10 +656,6 @@ mojom("mojo_bindings") {
   if (enable_pdf) {
     enabled_features += [ "enable_pdf" ]
   }
-}
-
-mojom("supervised_user_commands_mojom") {
-  sources = [ "supervised_user_commands.mojom" ]
 }
 
 mojom("offline_page_auto_fetcher_mojom") {

@@ -80,10 +80,6 @@ namespace screen_ai {
 class ScreenAIInstallState;
 }  // namespace screen_ai
 
-namespace supervised_user {
-class DeviceParentalControls;
-}  // namespace supervised_user
-
 // Real implementation of BrowserProcess that creates and returns the services.
 class BrowserProcessImpl : public BrowserProcess,
                            public KeepAliveStateObserver {
@@ -172,7 +168,6 @@ class BrowserProcessImpl : public BrowserProcess,
   printing::PrintPreviewDialogController* print_preview_dialog_controller()
       override;
   printing::BackgroundPrintingManager* background_printing_manager() override;
-  supervised_user::DeviceParentalControls& device_parental_controls() override;
   IntranetRedirectDetector* intranet_redirect_detector() override;
   const std::string& GetApplicationLocale() override;
   void SetApplicationLocale(const std::string& actual_locale) override;
@@ -311,9 +306,6 @@ class BrowserProcessImpl : public BrowserProcess,
   std::unique_ptr<printing::BackgroundPrintingManager>
       background_printing_manager_;
 #endif
-
-  std::unique_ptr<supervised_user::DeviceParentalControls>
-      device_parental_controls_;
 
 #if BUILDFLAG(ENABLE_CHROME_NOTIFICATIONS)
   // Manager for desktop notification UI.

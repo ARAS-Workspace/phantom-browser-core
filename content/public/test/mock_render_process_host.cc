@@ -28,7 +28,6 @@
 #include "content/browser/renderer_host/spare_render_process_host_manager_impl.h"
 #include "content/browser/security/cpsp/child_process_security_policy_impl.h"
 #include "content/common/renderer.mojom.h"
-#include "content/public/browser/android/child_process_importance.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/global_request_id.h"
 #include "content/public/browser/render_process_host_priority_client.h"

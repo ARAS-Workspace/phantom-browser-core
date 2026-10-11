@@ -34,7 +34,6 @@
 #include "chrome/browser/extensions/api/messaging/native_messaging_host_manifest.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_switches.h"
-#include "components/app_launch_prefetch/app_launch_prefetch.h"
 #include "net/base/file_stream.h"
 
 namespace extensions {

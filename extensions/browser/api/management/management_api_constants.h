@@ -70,8 +70,6 @@ inline constexpr char kInstallReplacementWebAppNotFromWebstoreError[] =
     "Only extensions from the web store can install replacement web apps.";
 inline constexpr char kGestureNeededForInstallReplacementWebAppError[] =
     "chrome.management.installReplacementWebApp requires a user gesture.";
-inline constexpr char kParentPermissionFailedError[] =
-    "Parent Permission Request Failed.";
 inline constexpr char kChromeAppsDeprecated[] =
     "Chrome app * is deprecated on Window, Mac, and Linux. "
     "See https://support.google.com/chrome/?p=chrome_app_deprecation for more "

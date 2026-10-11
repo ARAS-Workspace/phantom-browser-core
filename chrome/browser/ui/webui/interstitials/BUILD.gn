@@ -24,17 +24,12 @@ source_set("interstitials") {
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/security_interstitials/core",
     "//components/security_interstitials/core:unsafe_resource",
-    "//components/supervised_user/core/browser",
     "//content/public/common",
     "//net",
     "//services/metrics/public/cpp:ukm_builders",
     "//services/network/public/mojom",
     "//ui/base",
   ]
-
-  if (is_linux || is_mac) {
-    deps += [ "//chrome/browser/supervised_user" ]
-  }
 }
 
 source_set("browser_tests") {

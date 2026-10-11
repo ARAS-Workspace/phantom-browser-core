@@ -48,7 +48,6 @@ class ChromeSyncClientTest : public testing::Test {
         /*trusted_vault_service=*/nullptr,
         &device_info_sync_service_,
         &data_type_store_service_,
-        /*supervised_user_settings_service=*/nullptr,
         /*extensions_activity_monitor=*/nullptr);
   }
 

@@ -233,6 +233,7 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//components/google/core/common",
     "//components/history/core/browser",
+    "//components/history/core/common",
     "//components/omnibox/browser",
     "//components/omnibox/browser:location_bar",
     "//components/omnibox/browser:test_support",

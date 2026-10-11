@@ -178,7 +178,6 @@
 #include "components/subresource_filter/content/browser/ruleset_service.h"
 #include "components/subresource_filter/core/common/constants.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
-#include "components/supervised_user/core/browser/supervised_user_preferences.h"
 #include "components/sync/base/account_pref_utils.h"
 #include "components/sync/base/pref_names.h"
 #include "components/sync/service/device_statistics_scheduler.h"
@@ -1272,7 +1271,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   SigninPrefs::RegisterProfilePrefs(registry);
   site_engagement::SiteEngagementService::RegisterProfilePrefs(registry);
   subscription_eligibility::prefs::RegisterProfilePrefs(registry);
-  supervised_user::RegisterProfilePrefs(registry);
   sync_sessions::SessionSyncPrefs::RegisterProfilePrefs(registry);
   syncer::DeviceInfoPrefs::RegisterProfilePrefs(registry);
   syncer::DeviceStatisticsScheduler::RegisterProfilePrefs(registry);

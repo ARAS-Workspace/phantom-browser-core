@@ -37,7 +37,6 @@ import("//tools/grit/grit_rule.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/webui/webui_features.gni")
 
-assert(enable_supervised_users)
 
 declare_args() {
   # You can set the variable 'use_official_enterprise_connectors_api_keys' to
@@ -709,7 +708,6 @@ source_set("core") {
     "//chrome/browser/speech",
     "//chrome/browser/ssl",
     "//chrome/browser/status_icons",
-    "//chrome/browser/supervised_user",
     "//chrome/browser/tab_group_sync",
     "//chrome/browser/task_manager",
     "//chrome/browser/task_manager/common",
@@ -856,7 +854,6 @@ source_set("core") {
     "//components/subresource_filter/content/browser",
     "//components/subresource_filter/content/mojom",
     "//components/subresource_filter/core/browser",
-    "//components/supervised_user/core/browser:device_parental_controls",
     "//components/surface_embed/browser",
     "//components/surface_embed/common",
     "//components/sync_preferences:features",
@@ -972,7 +969,6 @@ source_set("core") {
       "//chrome/browser/ui/apps:impl",
       "//chrome/browser/ui/bookmarks:impl",
       "//chrome/browser/ui/content_settings:impl",
-      "//chrome/browser/ui/read_anything",
       "//chrome/browser/ui/search",
       "//chrome/browser/ui/tabs",
       "//chrome/browser/ui/tabs:features",
@@ -1531,8 +1527,6 @@ source_set("browser") {
     "//chrome/browser/strike_database",
     "//chrome/browser/subresource_filter",
     "//chrome/browser/subscription_eligibility:impl",
-    "//chrome/browser/supervised_user",
-    "//chrome/browser/supervised_user:impl",
     "//chrome/browser/sync",
     "//chrome/browser/tab_contents:impl",
     "//chrome/browser/tab_group_sync",
@@ -1655,6 +1649,7 @@ source_set("browser") {
     "//components/feed/core/common:feed_core_common",
     "//components/feed/core/shared_prefs:feed_shared_prefs",
     "//components/find_in_page",
+    "//components/google/core/common",
     "//components/history/content/browser",
     "//components/history/core/browser",
     "//components/history/core/common",
@@ -1743,7 +1738,6 @@ source_set("browser") {
     "//components/reporting/util:status",
     "//components/reporting/util:status_macros",
     "//components/resources",
-    "//components/safe_search_api",
     "//components/saved_tab_groups/delegate",
     "//components/saved_tab_groups/internal",
     "//components/saved_tab_groups/public",
@@ -1785,9 +1779,6 @@ source_set("browser") {
     "//components/subresource_filter/content/browser",
     "//components/subresource_filter/core/browser",
     "//components/subresource_filter/core/common",
-    "//components/supervised_user/core/browser",
-    "//components/supervised_user/core/browser:fetcher",
-    "//components/supervised_user/core/common",
     "//components/sync",
     "//components/sync_bookmarks",
     "//components/sync_preferences",
@@ -1945,7 +1936,6 @@ source_set("browser") {
 
   #!is_android
   public_deps += [
-    "//chrome/browser/accessibility/phrase_segmentation",
     "//ui/base/mojom:ui_base_types",
   ]
 
@@ -1997,7 +1987,6 @@ source_set("browser") {
     "//chrome/browser/ui/media_router:impl",
     "//chrome/browser/ui/omnibox",
     "//chrome/browser/ui/passwords/bubble_controllers:impl",
-    "//chrome/browser/ui/read_anything",
     "//chrome/browser/ui/search",
     "//chrome/browser/ui/signin",
     "//chrome/browser/ui/signin:impl",
@@ -2189,7 +2178,6 @@ source_set("browser") {
       "//chrome/browser/updates:impl",
       "//chrome/browser/updates:update_metrics",
       "//chrome/updater:browser_sources",
-      "//components/supervised_user/core/common:features",
       "//components/themes:policy",
     ]
   }
@@ -2325,7 +2313,6 @@ source_set("browser") {
     ]
     deps += [
       "//chrome/browser/resources:component_extension_resources",
-      "//chrome/browser/supervised_user",
       "//chrome/browser/ui/extensions",
 
       # This dependency should be removed when //chrome/browser/notifications
@@ -2361,10 +2348,6 @@ source_set("browser") {
       "//components/mirroring/service:mirroring_service",
     ]
     deps += [
-      # TODO(crbug.com/402488726): Support supervised user UI on desktop
-      # Android.
-      "//chrome/browser/ui/supervised_user",
-
       # TODO(crbug.com/420905611): Remove this circular dependency when:
       # - c/b/app_mode/app_mode_utils.h,
       # - c/b/supervised_user/supervised_user_browser_utils.h and
@@ -2521,7 +2504,6 @@ group("browser_public_dependencies") {
     "//components/services/storage:storage_features",
     "//components/services/storage/public/mojom",
     "//components/session_proto_db",
-    "//components/supervised_user/core/browser/proto",
     "//components/sync",
     "//components/sync_device_info",
     "//components/system_cpu",

@@ -94,7 +94,6 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/strings/grit/privacy_sandbox_strings.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
 #include "components/sync/base/features.h"
 #include "components/user_education/common/feature_promo/feature_promo_controller.h"
 #include "components/user_education/common/feature_promo/feature_promo_handle.h"
@@ -989,34 +988,6 @@ void MaybeRegisterChromeFeaturePromos(
           IDS_READING_LIST_IN_SIDE_PANEL_PROMO_PINNING)
           .SetHighlightedMenuItem(BookmarkSubMenuModel::kReadingListMenuItem)));
 
-  // kIPHReadingModeKeyboardShortcutFeature:
-  registry.RegisterFeature(std::move(
-      user_education::FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHReadingModeKeyboardShortcutFeature,
-          kReadAnythingViewModeElementId,
-          IDS_READING_MODE_KEYBOARD_SHORTCUT_IPH_BODY,
-          IDS_READING_MODE_KEYBOARD_SHORTCUT_IPH_SCREENREADER,
-          user_education::FeaturePromoSpecification::AcceleratorInfo())
-          .SetBubbleArrow(user_education::HelpBubbleArrow::kNone)
-          .SetInAnyContext(true)
-          .SetMetadata(147, "martinglopez@google.com",
-                       "Triggered to educate users about the keyboard shortcut "
-                       "for Reading Mode.")));
-
-  // kIPHReadingModePresentationModeFeature:
-  registry.RegisterFeature(std::move(
-      user_education::FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHReadingModePresentationModeFeature,
-          kReadAnythingSettingsButtonElementId,
-          IDS_READING_MODE_PRESENTATION_MODE_IPH_BODY,
-          IDS_READING_MODE_PRESENTATION_MODE_IPH_SCREENREADER,
-          user_education::FeaturePromoSpecification::AcceleratorInfo())
-          .SetBubbleArrow(user_education::HelpBubbleArrow::kTopRight)
-          .SetInAnyContext(true)
-          .SetMetadata(150, "martinglopez@google.com",
-                       "Triggered to educate users about switching from "
-                       "immersive mode to side panel mode in Reading Mode.")));
-
   // kIPHResumptionRailFeature:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForToastPromo(
@@ -1110,52 +1081,6 @@ void MaybeRegisterChromeFeaturePromos(
               126, "dfried@chromium.org, jdonnelly@google.com",
               "Triggered when the lens overlay side panel is pinned.")));
 
-  if (features::IsReadAnythingOmniboxChipEnabled()) {
-    // kIPHReadingModePageActionLabelFeature:
-    registry.RegisterFeature(std::move(
-        FeaturePromoSpecification::CreateForToastPromo(
-            feature_engagement::kIPHReadingModePageActionLabelFeature,
-            kOmniboxElementId, IDS_READING_MODE_OMNIBOX_ENTRY_POINT_PROMO,
-            IDS_READING_MODE_OMNIBOX_ENTRY_POINT_PROMO_SCREEN_READER,
-            FeaturePromoSpecification::AcceleratorInfo())
-            .SetBubbleArrow(HelpBubbleArrow::kTopLeft)
-            .SetMetadata(144, "kristislee@google.com, komo-eng@google.com",
-                         "Triggered when the Reading mode page action appears.")
-            .SetAnchorElementFilter(base::BindRepeating(
-                [](const ui::ElementTracker::ElementList& elements)
-                    -> ui::TrackedElement* {
-                  if (elements.empty()) {
-                    return nullptr;
-                  }
-                  BrowserView* const browser_view =
-                      views::ElementTrackerViews::GetInstance()
-                          ->GetFirstMatchingViewAs<BrowserView>(
-                              kBrowserViewElementId, elements[0]->context());
-                  if (!browser_view) {
-                    // The browser_view may be null in tests.
-                    return nullptr;
-                  }
-                  views::BubbleAnchor page_action_anchor =
-                      browser_view->toolbar_button_provider()
-                          ->GetPageActionBubbleAnchor(
-                              kActionSidePanelShowReadAnything);
-                  views::View* const anchor_view =
-                      page_action_anchor.GetIfView();
-                  if (anchor_view && !anchor_view->GetVisible()) {
-                    return nullptr;
-                  }
-                  if (ui::TrackedElement* element =
-                          page_action_anchor.GetIfElement()) {
-                    return element;
-                  }
-                  if (anchor_view) {
-                    return views::ElementTrackerViews::GetInstance()
-                        ->GetElementForView(anchor_view, true);
-                  }
-                  return nullptr;
-                }))));
-  }
-
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForToastPromo(
           feature_engagement::kIPHTabGroupsSaveV2CloseGroupFeature,
@@ -1224,36 +1149,6 @@ void MaybeRegisterChromeFeaturePromos(
   }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // kIPHSupervisedUserProfileSigninFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForCustomAction(
-          feature_engagement::kIPHSupervisedUserProfileSigninFeature,
-          kToolbarAvatarButtonElementId,
-          IDS_SUPERVISED_USER_PROFILE_SIGNIN_IPH_TEXT,
-          IDS_PROMO_LEARN_MORE_BUTTON,
-          base::BindRepeating(
-              [](ContextPtr ctx,
-                 user_education::FeaturePromoHandle promo_handle) {
-                // Open parental controls page.
-                ShowSingletonTab(
-                    GetBrowser(ctx),
-                    GURL(supervised_user::kManagedByParentUiMoreInfoUrl));
-                base::RecordAction(base::UserMetricsAction(
-                    "SupervisedUserProfileSignIn_IPHPromo_"
-                    "ParentalControlsPageOpened"));
-              }))
-          .SetPromoSubtype(
-              FeaturePromoSpecification::PromoSubtype::kActionableAlert)
-          .SetBubbleIcon(&(features::IsRoundedIconsEnabled()
-                               ? vector_icons::kFamilyLinkIcon
-                               : vector_icons::kFamilyLinkOldIcon))
-          .SetBubbleTitleText(IDS_SUPERVISED_USER_PROFILE_SIGNIN_IPH_TITLE)
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetCustomActionIsDefault(false)
-          .SetMetadata(128, "anthie@google.com",
-                       "Triggered on signin-in a supervised user to "
-                       "a new profile or an existing local profile")));
-
   // kIPHSignInBenefitsFeature:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForCustomAction(
@@ -1990,12 +1885,6 @@ void MaybeRegisterChromeNewBadges(user_education::NewBadgeRegistry& registry) {
       user_education::Metadata(
           153, "mtatarski@google.com",
           "Show the new badge on Send to Your Devices context menu items.")));
-
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      features::kReadAnythingLineFocus,
-      user_education::Metadata(
-          153, "kristislee@google.com",
-          "Shown on the Line Focus menu item in Reading Mode settings menu.")));
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   registry.RegisterFeature(user_education::NewBadgeSpecification(

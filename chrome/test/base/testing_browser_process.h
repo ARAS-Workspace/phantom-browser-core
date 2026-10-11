@@ -69,10 +69,6 @@ namespace resource_coordinator {
 class ResourceCoordinatorParts;
 }
 
-namespace supervised_user {
-class DeviceParentalControls;
-}  // namespace supervised_user
-
 namespace variations {
 class VariationsService;
 }
@@ -151,7 +147,6 @@ class TestingBrowserProcess
   printing::PrintPreviewDialogController* print_preview_dialog_controller()
       override;
   printing::BackgroundPrintingManager* background_printing_manager() override;
-  supervised_user::DeviceParentalControls& device_parental_controls() override;
   const std::string& GetApplicationLocale() override;
   void SetApplicationLocale(const std::string& actual_locale) override;
   DownloadStatusUpdater* download_status_updater() override;
@@ -295,9 +290,6 @@ class TestingBrowserProcess
       print_preview_dialog_controller_;
 #endif
 
-  // TODO(crbug.com/474377651): instead ForTesting(), offer proper fake.
-  std::unique_ptr<supervised_user::DeviceParentalControls>
-      device_parental_controls_;
   std::unique_ptr<subresource_filter::RulesetService>
       subresource_filter_ruleset_service_;
   std::unique_ptr<WebRtcLogUploader> webrtc_log_uploader_;

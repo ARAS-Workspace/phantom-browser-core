@@ -190,7 +190,6 @@ class ProfileImpl : public Profile {
 #endif
 
   // Updates the ProfileAttributesStorage with the data from this profile.
-  void UpdateSupervisedUserIdInStorage();
   void UpdateNameInStorage();
   void UpdateAvatarInStorage();
   void UpdateIsEphemeralInStorage();

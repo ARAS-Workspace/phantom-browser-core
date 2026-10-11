@@ -10,7 +10,6 @@
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "components/supervised_user/core/browser/supervised_user_preferences.h"
 #include "components/vector_icons/vector_icons.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/vector_icon_types.h"

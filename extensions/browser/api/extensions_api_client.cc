@@ -125,12 +125,6 @@ ManagementAPIDelegate* ExtensionsAPIClient::CreateManagementAPIDelegate()
   return nullptr;
 }
 
-std::unique_ptr<SupervisedUserExtensionsDelegate>
-ExtensionsAPIClient::CreateSupervisedUserExtensionsDelegate(
-    content::BrowserContext* context) const {
-  return nullptr;
-}
-
 std::unique_ptr<DisplayInfoProvider>
 ExtensionsAPIClient::CreateDisplayInfoProvider() const {
   return nullptr;

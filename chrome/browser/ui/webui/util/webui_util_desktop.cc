@@ -57,8 +57,6 @@ const std::string_view* GetWebUIMetricsHostname(const GURL& webui_url) {
            "HistoryClustersSidePanel"},
           {chrome::kChromeUINewTabPageHost, "NewTabPage"},
           {chrome::kChromeUINewTabPageThirdPartyHost, "NewTabPageThirdParty"},
-          {chrome::kChromeUIUntrustedReadAnythingSidePanelHost,
-           "ReadAnythingSidePanel"},
           {chrome::kChromeUIReadLaterHost, "ReadLater"},
           {content::kChromeUIResourcesHost, "Resources"},
           {chrome::kChromeUISettingsHost, "Settings"},

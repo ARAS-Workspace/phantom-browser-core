@@ -410,24 +410,6 @@ class ToolbarControllerUiTest : public InteractiveFeaturePromoTest,
         WaitForHide(kSidePanelElementId));
   }
 
-  auto PinReadingModeToToolbar() {
-    return Steps(
-        Do([=, this]() {
-          chrome::ExecuteCommandWithContext(
-              browser(), IDC_SHOW_READING_MODE_SIDE_PANEL,
-              actions::ActionInvocationContext::Builder()
-                  .SetProperty(
-                      kSidePanelOpenTriggerKey,
-                      static_cast<std::underlying_type_t<SidePanelOpenTrigger>>(
-                          SidePanelOpenTrigger::kToolbarButton))
-                  .Build());
-        }),
-        WaitForShow(kSidePanelElementId),
-        PressButton(kSidePanelPinButtonElementId),
-        PressButton(kSidePanelCloseButtonElementId),
-        WaitForHide(kSidePanelElementId));
-  }
-
   auto PinActionsAndVerifyDisplayed(std::vector<actions::ActionId> ids) {
     return Steps(
         Do([this, ids]() {
@@ -1131,35 +1113,6 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
             }),
         it.overflow_id);
   }
-}
-
-// Verify fixing animation loop bug (crbug.com/).
-// Steps to reproduce:
-// 1  Set browser with to a big value that nothing should overflow.
-// 2. Have 1 pinned extension button in extensions container.
-// 3. Have 2 pinned buttons in pinned toolbar container.
-// 4. Set browser width to when PinnedToolbarContainer starts to overflow. In
-// this case both pinned buttons in PinnedToolbarContainer should overflow,
-// overflow button should show. Verify: The pinned extension button should still
-// be visible because there's enough space for it. Extensions container should
-// not have animation because its visibility didn't change.
-// TODO(crbug.com/41495158): Flaky on Windows and Mac.
-// TODO(crbug.com/472508632): Test is failing on Linux & CrOS.
-IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
-                       DISABLED_ExtensionHasNoAnimationLoop) {
-  RunTestSequence(
-      LoadAndPinExtensionButton(), PinBookmarkToToolbar(),
-      PinReadingModeToToolbar(), Do([this]() {
-        SetBrowserWidth(GetOverflowThresholdWidthInPinnedSidePanelContainer() -
-                        1);
-      }),
-      WaitForShow(kToolbarOverflowButtonElementId));
-
-  EXPECT_FALSE(BrowserView::GetBrowserViewForBrowser(browser())
-                   ->toolbar()
-                   ->extensions_container()
-                   ->GetAnimatingLayoutManager()
-                   ->is_animating());
 }
 
 #define MAYBE_DoNotShowIphWhenOverflowed DoNotShowIphWhenOverflowed

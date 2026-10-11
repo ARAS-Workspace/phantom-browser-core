@@ -130,8 +130,6 @@
 #include "components/subresource_filter/content/browser/safe_browsing_ruleset_publisher.h"
 #include "components/subresource_filter/core/browser/subresource_filter_features.h"
 #include "components/subresource_filter/core/common/constants.h"
-#include "components/supervised_user/core/browser/device_parental_controls.h"
-#include "components/supervised_user/core/browser/device_parental_controls_noop_impl.h"
 #include "components/ukm/ukm_service.h"
 #include "components/update_client/net/network_chromium.h"
 #include "components/update_client/update_query_params.h"
@@ -259,8 +257,6 @@ BrowserProcessImpl::BrowserProcessImpl(StartupData* startup_data)
       active_primary_accounts_metrics_recorder_(
           std::make_unique<signin::ActivePrimaryAccountsMetricsRecorder>(
               *local_state_)),
-      device_parental_controls_(
-          std::make_unique<supervised_user::DeviceParentalControlsNoOpImpl>()),
       platform_part_(std::make_unique<BrowserProcessPlatformPart>()),
       network_time_tracker_(startup_data->chrome_feature_list_creator()
                                 ->TakeNetworkTimeTracker()),
@@ -909,12 +905,6 @@ BrowserProcessImpl::background_printing_manager() {
   NOTIMPLEMENTED();
   return NULL;
 #endif
-}
-
-supervised_user::DeviceParentalControls&
-BrowserProcessImpl::device_parental_controls() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return *device_parental_controls_;
 }
 
 IntranetRedirectDetector* BrowserProcessImpl::intranet_redirect_detector() {

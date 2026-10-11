@@ -20,13 +20,10 @@ source_set("search") {
     "//chrome/browser/ntp_tiles",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search_engines",
-    "//chrome/browser/supervised_user",
     "//chrome/common",
     "//components/google/core/common",
     "//components/search",
     "//components/search_engines:search_engine_type",
-    "//components/supervised_user/core/browser",
-    "//components/supervised_user/core/common:buildflags",
     "//content/public/browser",
     "//url",
   ]
@@ -167,7 +164,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/search",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
-    "//chrome/test/supervised_user:test_support",
     "//content/test:test_support",
     "//testing/gtest",
   ]

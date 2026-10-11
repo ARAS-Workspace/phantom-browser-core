@@ -11,10 +11,8 @@ HatsService::SurveyMetadata::SurveyMetadata() = default;
 HatsService::SurveyMetadata::~SurveyMetadata() = default;
 
 HatsService::SurveyOptions::SurveyOptions(
-    std::optional<std::u16string> custom_invitation,
-    std::optional<messages::MessageIdentifier> message_identifier)
-    : custom_invitation(custom_invitation),
-      message_identifier(message_identifier) {}
+    std::optional<std::u16string> custom_invitation)
+    : custom_invitation(custom_invitation) {}
 HatsService::SurveyOptions::SurveyOptions(const SurveyOptions& other) = default;
 HatsService::SurveyOptions::~SurveyOptions() = default;
 

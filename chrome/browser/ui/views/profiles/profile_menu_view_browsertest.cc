@@ -102,8 +102,6 @@
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/signin/public/identity_manager/identity_utils.h"
 #include "components/signin/public/identity_manager/primary_account_mutator.h"
-#include "components/supervised_user/core/browser/family_link_user_capabilities.h"
-#include "components/supervised_user/test_support/supervised_user_signin_test_utils.h"
 #include "components/sync/base/features.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync/service/sync_user_settings.h"
@@ -1196,18 +1194,6 @@ class ProfileMenuClickTest : public InProcessBrowserTest,
         GetExpectedActionableItemAtIndex(GetParam()),
         /*expected_bucket_count=*/1);
 
-    if (supervised_user::IsPrimaryAccountSubjectToParentalControls(
-            identity_manager()) == signin::Tribool::kTrue) {
-      histogram_tester_.ExpectUniqueSample(
-          "Profile.Menu.ClickedActionableItem_Supervised",
-          GetExpectedActionableItemAtIndex(GetParam()),
-          /*expected_bucket_count=*/1);
-    } else {
-      histogram_tester_.ExpectUniqueSample(
-          "Profile.Menu.ClickedActionableItem_Supervised",
-          GetExpectedActionableItemAtIndex(GetParam()),
-          /*expected_bucket_count=*/0);
-    }
   }
 
   base::HistogramTester histogram_tester_;

@@ -341,7 +341,6 @@ source_set("profile_impl") {
     "//components/signin/public/identity_manager",
     "//components/startup_metric_utils",
     "//components/strings:components_strings",
-    "//components/supervised_user/core/common:features",
     "//content/public/browser",
     "//google_apis",
     "//services/network/public/mojom:url_loader_base",

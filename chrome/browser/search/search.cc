@@ -15,17 +15,12 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
-#include "chrome/browser/supervised_user/supervised_user_url_filtering_service_factory.h"
 #include "chrome/common/url_constants.h"
 #include "components/google/core/common/google_util.h"
 #include "components/search/ntp_features.h"
 #include "components/search/search.h"
 #include "components/search_engines/search_engine_type.h"
 #include "components/search_engines/template_url_service.h"
-#include "components/supervised_user/core/browser/supervised_user_preferences.h"
-#include "components/supervised_user/core/browser/supervised_user_url_filtering_service.h"
-#include "components/supervised_user/core/browser/supervised_user_utils.h"
-#include "components/supervised_user/core/common/buildflags.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/render_frame_host.h"
@@ -137,20 +132,6 @@ bool IsNTPOrRelatedURLHelper(const GURL& url, Profile* profile) {
                                     IsMatchingServiceWorker(url, new_tab_url));
 }
 
-bool IsURLAllowedForSupervisedUser(const GURL& url, Profile& profile) {
-  if (!profile.IsChild()) {
-    return true;
-  }
-
-  supervised_user::SupervisedUserUrlFilteringService* url_filtering_service =
-      supervised_user::SupervisedUserUrlFilteringServiceFactory::GetForProfile(
-          &profile);
-  if (url_filtering_service->GetFilteringBehavior(url).IsBlocked()) {
-    return false;
-  }
-  return true;
-}
-
 // Used to look up the URL to use for the New Tab page. Also tracks how we
 // arrived at that URL so it can be logged with UMA.
 struct NewTabURLDetails {
@@ -189,10 +170,6 @@ struct NewTabURLDetails {
     }
     if (!search_provider_url.SchemeIsCryptographic()) {
       return NewTabURLDetails(local_url, NEW_TAB_URL_INSECURE);
-    }
-    if (!IsURLAllowedForSupervisedUser(search_provider_url,
-                                       CHECK_DEREF(profile))) {
-      return NewTabURLDetails(local_url, NEW_TAB_URL_BLOCKED);
     }
 
     return NewTabURLDetails(search_provider_url, NEW_TAB_URL_VALID);

@@ -22,7 +22,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "components/content_settings/core/browser/content_settings_utils.h"
-#include "components/messages/android/message_enums.h"
 #include "components/permissions/constants.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_uma_util.h"
@@ -221,12 +220,10 @@ PermissionHatsTriggerHelper::PromptParametersForHats::PromptParametersForHats(
 PermissionHatsTriggerHelper::SurveyParametersForHats::SurveyParametersForHats(
     double trigger_probability,
     std::optional<std::string> supplied_trigger_id,
-    std::optional<std::u16string> custom_survey_invitation,
-    std::optional<messages::MessageIdentifier> message_identifier)
+    std::optional<std::u16string> custom_survey_invitation)
     : trigger_probability(trigger_probability),
       supplied_trigger_id(std::move(supplied_trigger_id)),
-      custom_survey_invitation(std::move(custom_survey_invitation)),
-      message_identifier(std::move(message_identifier)) {}
+      custom_survey_invitation(std::move(custom_survey_invitation)) {}
 
 PermissionHatsTriggerHelper::SurveyParametersForHats::
     ~SurveyParametersForHats() = default;
@@ -422,31 +419,15 @@ PermissionHatsTriggerHelper::GetSurveyParametersForRequestType(
   bool is_custom_invitation_arm =
       is_custom_invitation_experiment && base::RandDouble() < 0.5;
 
-  std::optional<messages::MessageIdentifier> message_identifier;
   std::optional<std::u16string> custom_invitation;
   if (is_custom_invitation_experiment) {
     int request_type_message_id = -1;
     if (request_type == RequestType::kCameraStream) {
       request_type_message_id = IDS_CAMERA_PERMISSION_NAME_FRAGMENT;
-      message_identifier = is_custom_invitation_arm
-                               ? messages::MessageIdentifier::
-                                     PROMPT_HATS_CAMERA_CUSTOM_INVITATION
-                               : messages::MessageIdentifier::
-                                     PROMPT_HATS_CAMERA_GENERIC_INVITATION;
     } else if (request_type == RequestType::kGeolocation) {
       request_type_message_id = IDS_GEOLOCATION_NAME_FRAGMENT;
-      message_identifier = is_custom_invitation_arm
-                               ? messages::MessageIdentifier::
-                                     PROMPT_HATS_LOCATION_CUSTOM_INVITATION
-                               : messages::MessageIdentifier::
-                                     PROMPT_HATS_LOCATION_GENERIC_INVITATION;
     } else if (request_type == RequestType::kMicStream) {
       request_type_message_id = IDS_MICROPHONE_PERMISSION_NAME_FRAGMENT;
-      message_identifier = is_custom_invitation_arm
-                               ? messages::MessageIdentifier::
-                                     PROMPT_HATS_MICROPHONE_CUSTOM_INVITATION
-                               : messages::MessageIdentifier::
-                                     PROMPT_HATS_MICROPHONE_GENERIC_INVITATION;
     }
 
     // If request_type_message_id == -1, the request is not part of the custom
@@ -495,7 +476,7 @@ PermissionHatsTriggerHelper::GetSurveyParametersForRequestType(
                                    : permission_trigger_id_vector[i];
       return PermissionHatsTriggerHelper::SurveyParametersForHats(
           probability, std::move(supplied_trigger_id),
-          std::move(custom_invitation), std::move(message_identifier));
+          std::move(custom_invitation));
     }
   }
 

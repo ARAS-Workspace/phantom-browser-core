@@ -22,7 +22,6 @@
 #include "components/sync_preferences/syncable_prefs_database.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "components/supervised_user/core/common/pref_names.h"
 #include "extensions/browser/pref_names.h"  // nogncheck
 #endif
 
@@ -65,7 +64,7 @@ enum {
   kLiveCaptionMediaFoundationRendererErrorSilenced = 100021,
   kShowHomeButton = 100022,
   kPinnedExtensions = 100023,
-  kSupervisedUserApprovedExtensions = 100024,
+  // kSupervisedUserApprovedExtensions = 100024,  // deprecated
   // kIsDefaultPageColorsOnHighContrast = 100025, (deprecated)
   kShowFullscreenToolbar = 100026,
   kAllowJavascriptAppleEvents = 100027,
@@ -521,10 +520,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
     {extensions::pref_names::kPinnedExtensions,
      {syncable_prefs_ids::kPinnedExtensions, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kSupervisedUserApprovedExtensions,
-     {syncable_prefs_ids::kSupervisedUserApprovedExtensions,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #if BUILDFLAG(IS_MAC)

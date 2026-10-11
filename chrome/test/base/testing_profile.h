@@ -193,9 +193,6 @@ class TestingProfile : public Profile {
     // Set the value to be returned by Profile::IsNewProfile().
     Builder& SetIsNewProfile(bool is_new_profile);
 
-    // Marks profile as a Family Link supervised profile.
-    Builder& SetIsSupervisedProfile();
-
     Builder& SetUserCloudPolicyManager(
         std::unique_ptr<policy::UserCloudPolicyManager>
             user_cloud_policy_manager);
@@ -229,7 +226,6 @@ class TestingProfile : public Profile {
 
     const base::FilePath& GetPath() const { return path_; }
     const std::string& profile_name() const { return profile_name_; }
-    bool is_supervised_profile() const { return is_supervised_profile_; }
 
    private:
     // If true, Build() has already been called.
@@ -246,7 +242,6 @@ class TestingProfile : public Profile {
     bool guest_session_ = false;
     bool allows_browser_windows_ = true;
     bool is_new_profile_ = false;
-    bool is_supervised_profile_ = false;
     std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager_;
     std::unique_ptr<policy::ProfileCloudPolicyManager>
         profile_cloud_policy_manager_;
@@ -286,7 +281,6 @@ class TestingProfile : public Profile {
       bool guest_session,
       bool allows_browser_windows,
       bool is_new_profile,
-      bool is_supervised_profile,
       std::variant<std::unique_ptr<policy::UserCloudPolicyManager>,
                    std::unique_ptr<policy::ProfileCloudPolicyManager>>
           policy_manager,
@@ -313,9 +307,6 @@ class TestingProfile : public Profile {
   // tests to provide an OffTheRecordProfileImpl instance.
   // |otr_profile| cannot be empty.
   void SetOffTheRecordProfile(std::unique_ptr<Profile> otr_profile);
-
-  // Marks profile Family Link supervision status.
-  void SetIsSupervisedProfile(bool is_supervised_profile = true);
 
   sync_preferences::TestingPrefServiceSyncable* GetTestingPrefService();
 
@@ -437,7 +428,7 @@ class TestingProfile : public Profile {
 
  private:
   // Common initialization between the two constructors.
-  void Init(bool is_supervised_profile, CreateMode create_mode);
+  void Init(CreateMode create_mode);
 
   // Finishes initialization when a profile is created asynchronously.
   void FinishInit(CreateMode create_mode);

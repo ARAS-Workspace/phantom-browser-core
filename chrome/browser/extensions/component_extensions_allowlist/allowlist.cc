@@ -29,11 +29,6 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
       extension_misc::kGlicExtensionId,
       extension_misc::kInAppPaymentsSupportAppId,
       extension_misc::kPdfExtensionId,
-      extension_misc::kReadingModeGDocsHelperExtensionId,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-      extension_misc::kTTSEngineExtensionId,
-      extension_misc::kComponentUpdaterTTSEngineExtensionId,
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       extension_misc::kDictationConnectorExtensionId,
   });
 
@@ -56,7 +51,6 @@ bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
 #endif
     case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST:
     case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST_MV3:
-    case IDR_READING_MODE_GDOCS_HELPER_MANIFEST:
     case IDR_WEBSTORE_MANIFEST:
 
       return true;

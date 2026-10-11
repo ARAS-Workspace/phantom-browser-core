@@ -197,21 +197,7 @@ TEST_F(ChromeBrowsingDataModelDelegateTest, GetAllDataKeysAndGetDataOwner) {
   EXPECT_TRUE(expected_keys.empty());
 }
 
-TEST_F(ChromeBrowsingDataModelDelegateTest, CookieDeletionFilterChildUser) {
-  profile_->SetIsSupervisedProfile(true);
-
-  EXPECT_FALSE(
-      delegate()->IsCookieDeletionDisabled(GURL("https://google.com")));
-  EXPECT_FALSE(
-      delegate()->IsCookieDeletionDisabled(GURL("https://example.com")));
-  EXPECT_TRUE(delegate()->IsCookieDeletionDisabled(GURL("http://youtube.com")));
-  EXPECT_TRUE(
-      delegate()->IsCookieDeletionDisabled(GURL("https://youtube.com")));
-}
-
 TEST_F(ChromeBrowsingDataModelDelegateTest, CookieDeletionFilterNormalUser) {
-  profile_->SetIsSupervisedProfile(false);
-
   EXPECT_FALSE(
       delegate()->IsCookieDeletionDisabled(GURL("https://google.com")));
   EXPECT_FALSE(
@@ -245,22 +231,6 @@ TEST_F(ChromeBrowsingDataModelDelegateTest, CookieDeletionFilterPolicyEnabled) {
       delegate()->IsCookieDeletionDisabled(GURL("https://google.com")));
   EXPECT_FALSE(
       delegate()->IsCookieDeletionDisabled(GURL("https://example.com")));
-  EXPECT_TRUE(delegate()->IsCookieDeletionDisabled(GURL("http://youtube.com")));
-  EXPECT_TRUE(
-      delegate()->IsCookieDeletionDisabled(GURL("https://youtube.com")));
-}
-
-TEST_F(ChromeBrowsingDataModelDelegateTest,
-       CookieDeletionFilterPolicyDisabledForChildUser) {
-  profile_->SetIsSupervisedProfile(true);
-  profile_->GetTestingPrefService()->SetManagedPref(
-      prefs::kRestrictYouTubeCookiesDeletion, base::Value(false));
-
-  EXPECT_FALSE(
-      delegate()->IsCookieDeletionDisabled(GURL("https://google.com")));
-  EXPECT_FALSE(
-      delegate()->IsCookieDeletionDisabled(GURL("https://example.com")));
-  // For a child user, deletion is always disabled, even if the policy is false.
   EXPECT_TRUE(delegate()->IsCookieDeletionDisabled(GURL("http://youtube.com")));
   EXPECT_TRUE(
       delegate()->IsCookieDeletionDisabled(GURL("https://youtube.com")));

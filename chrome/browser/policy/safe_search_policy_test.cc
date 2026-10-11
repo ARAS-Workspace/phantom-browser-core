@@ -12,7 +12,7 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/policy/policy_constants.h"
-#include "components/safe_search_api/safe_search_util.h"
+#include "components/google/core/common/safe_search_util.h"
 #include "content/public/test/test_navigation_observer.h"
 
 namespace policy {

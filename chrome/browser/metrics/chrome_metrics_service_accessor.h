@@ -38,10 +38,6 @@ namespace subscription_eligibility {
 class SubscriptionEligibilityMetricsProvider;
 }  // namespace subscription_eligibility
 
-namespace supervised_user {
-class MetricsServiceAccessorDelegateImpl;
-}
-
 class ChromeDomainReliabilityDelegate;
 namespace domain_reliability {
 class TestDomainReliabilityServiceDelegate;
@@ -111,10 +107,6 @@ class PerSessionSettingsUserActionTracker;
 }  // namespace settings
 }  // namespace ash
 
-namespace readaloud {
-class SyntheticTrial;
-}
-
 namespace tab_groups {
 class TabGroupTrial;
 }  // namespace tab_groups
@@ -171,7 +163,6 @@ class ChromeMetricsServiceAccessor : public metrics::MetricsServiceAccessor {
   friend class BrowserProcessImpl;
   friend class GlobalFeatures;
   friend class subscription_eligibility::SubscriptionEligibilityMetricsProvider;
-  friend class supervised_user::MetricsServiceAccessorDelegateImpl;
   friend class OptimizationGuideKeyedService;
   friend class optimization_guide::ChromeOnDeviceModelServiceController;
   friend class WebUITabStripFieldTrial;
@@ -183,7 +174,6 @@ class ChromeMetricsServiceAccessor : public metrics::MetricsServiceAccessor {
   friend class DataSharingUI;
   // Used to register synthetic trials for ongoing growth experiments.
   friend class CampaignsManagerClientImpl;
-  friend class readaloud::SyntheticTrial;
   friend class tab_groups::TabGroupTrial;
   friend class DefaultBrowserPromptTrial;
 

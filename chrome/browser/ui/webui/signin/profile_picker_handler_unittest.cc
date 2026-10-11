@@ -27,7 +27,6 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/primary_account_mutator.h"
-#include "components/supervised_user/core/common/pref_names.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/test_web_contents_factory.h"
@@ -101,15 +100,13 @@ class ProfilePickerHandlerTest : public testing::Test {
   }
 
   void VerifyIfGuestModeUpdateWasCalled(bool expected_guest_mode) {
-    auto it = std::ranges::find_if(web_ui()->call_data(), [](auto& data_ptr) {
-      return data_ptr->function_name() == "cr.webUIListenerCallback" &&
-             data_ptr->arg1()->GetString() == "guest-mode-availability-updated";
-    });
-
     std::optional<bool> guest_mode_update_value;
-    if (it != web_ui()->call_data().end()) {
-      CHECK(it->get()->arg2()->is_bool());
-      guest_mode_update_value = it->get()->arg2()->GetBool();
+    for (const auto& data_ptr : web_ui()->call_data()) {
+      if (data_ptr->function_name() == "cr.webUIListenerCallback" &&
+          data_ptr->arg1()->GetString() == "guest-mode-availability-updated") {
+        CHECK(data_ptr->arg2()->is_bool());
+        guest_mode_update_value = data_ptr->arg2()->GetBool();
+      }
     }
 
     EXPECT_EQ(guest_mode_update_value, expected_guest_mode);
@@ -352,9 +349,7 @@ TEST_F(SupervisedProfilePickerHandlerTest,
   web_ui()->ClearTrackedCalls();
 
   // Make Profile B supervised.
-  profile_b_ptr->AsTestingProfile()->SetIsSupervisedProfile();
-  profile_b->SetSupervisedUserId(
-      profile_b_ptr->GetPrefs()->GetString(prefs::kSupervisedUserId));
+  profile_b->SetSupervisedUserId("ChildAccountSUID");
 
   // Guest mode should be set to disabled.
   VerifyIfGuestModeUpdateWasCalled(/*expected_guest_mode=*/false);
@@ -374,7 +369,6 @@ TEST_F(SupervisedProfilePickerHandlerTest,
   web_ui()->ClearTrackedCalls();
 
   // Remove supervision from the profile.
-  profile_ptr->AsTestingProfile()->SetIsSupervisedProfile(false);
   profile->SetSupervisedUserId("");
 
   // An update of of the profile was triggered.

@@ -179,7 +179,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel,
                                       kSetBrowserAsDefaultMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kHelpMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ToolsMenuModel, kPerformanceMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ToolsMenuModel, kReadingModeMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
                                       kManageExtensionsMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
@@ -1200,7 +1199,6 @@ void AppMenuModel::ExecuteCommand(int command_id, int event_flags) {
   switch (command_id) {
     case IDC_SHOW_BOOKMARK_SIDE_PANEL:
     case IDC_SHOW_HISTORY_CLUSTERS_SIDE_PANEL:
-    case IDC_SHOW_READING_MODE_SIDE_PANEL:
     case IDC_READING_LIST_MENU_SHOW_UI:
     case IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL: {
       actions::ActionInvocationContext context =
@@ -1504,18 +1502,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
             "WrenchMenu.TimeToAction.ShowHistoryClustersSidePanel", delta);
       }
       LogMenuAction(MENU_ACTION_SHOW_HISTORY_CLUSTER_SIDE_PANEL);
-      break;
-    case IDC_SHOW_READING_MODE_SIDE_PANEL:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.ShowReadingModeSidePanel", delta);
-      }
-      LogMenuAction(MENU_ACTION_SHOW_READING_MODE_SIDE_PANEL);
-      // Close IPH for side panel menu, if shown.
-      BrowserUserEducationInterface::From(browser())
-          ->NotifyFeaturePromoFeatureUsed(
-              feature_engagement::kIPHReadingModeSidePanelFeature,
-              FeaturePromoFeatureUsedAction::kIgnorePromoIfPresent);
       break;
     case IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL:
       if (!uma_action_recorded_) {
@@ -1826,14 +1812,6 @@ bool AppMenuModel::GetAcceleratorForCommandId(
     ui::Accelerator* accelerator) const {
   if (command_id == IDC_NEW_ISOLATED_WINDOW) {
     return provider_->GetAcceleratorForCommandId(IDC_NEW_INCOGNITO_WINDOW,
-                                                 accelerator);
-  }
-
-  // Reading mode uses different command IDs for different ways of opening
-  // it, so adjust to use the command ID for the keyboard shortcut to grab
-  // the proper accelerator.
-  if (command_id == IDC_SHOW_READING_MODE_SIDE_PANEL) {
-    return provider_->GetAcceleratorForCommandId(IDC_SHOW_READING_MODE_KEYBOARD,
                                                  accelerator);
   }
 

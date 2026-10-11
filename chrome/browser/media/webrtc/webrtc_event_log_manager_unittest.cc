@@ -752,9 +752,6 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
     profile_builder.SetPrefService(base::WrapUnique(regular_prefs));
     profile_builder.OverridePolicyConnectorIsManagedForTesting(
         is_managed_profile);
-    if (is_supervised) {
-      profile_builder.SetIsSupervisedProfile();
-    }
     std::unique_ptr<TestingProfile> profile = profile_builder.Build();
 
     // Blocks on the unit under test's task runner, so that we won't proceed

@@ -50,7 +50,6 @@ specific_include_rules = {
     "+chrome/test/base/in_process_browser_test.h",
   ],
   "upgrade_util_win\\.cc": [
-    "+chrome/browser/win/browser_util.h",
   ],
 }
 

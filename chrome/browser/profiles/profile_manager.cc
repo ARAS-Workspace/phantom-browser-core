@@ -65,7 +65,6 @@
 #include "chrome/browser/signin/account_reconcilor_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_util.h"
-#include "chrome/browser/supervised_user/child_accounts/child_account_service_factory.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/unified_consent/unified_consent_service_factory.h"
 #include "chrome/common/buildflags.h"
@@ -94,10 +93,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/primary_account_mutator.h"
 #include "components/signin/public/identity_manager/tribool.h"
-#include "components/supervised_user/core/browser/child_account_service.h"
-#include "components/supervised_user/core/browser/supervised_user_service.h"
-#include "components/supervised_user/core/common/pref_names.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
 #include "components/sync/base/stop_source.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
@@ -919,7 +914,6 @@ void ProfileManager::InitProfileUserPrefs(Profile* profile) {
 
   size_t avatar_index;
   std::string profile_name;
-  std::string supervised_user_id;
   if (profile->IsGuestSession()) {
     profile_name = l10n_util::GetStringUTF8(IDS_PROFILES_GUEST_PROFILE_NAME);
     avatar_index = 0;
@@ -931,7 +925,6 @@ void ProfileManager::InitProfileUserPrefs(Profile* profile) {
     if (entry) {
       avatar_index = entry->GetAvatarIconIndex();
       profile_name = base::UTF16ToUTF8(entry->GetLocalProfileName());
-      supervised_user_id = entry->GetSupervisedUserId();
     } else {
       avatar_index = profiles::GetPlaceholderAvatarIndex();
       profile_name = base::UTF16ToUTF8(storage.ChooseNameForNewProfile());
@@ -945,11 +938,6 @@ void ProfileManager::InitProfileUserPrefs(Profile* profile) {
 
   if (!profile->GetPrefs()->HasPrefPath(prefs::kProfileName)) {
     profile->GetPrefs()->SetString(prefs::kProfileName, profile_name);
-  }
-
-  if (!profile->GetPrefs()->HasPrefPath(prefs::kSupervisedUserId)) {
-    profile->GetPrefs()->SetString(prefs::kSupervisedUserId,
-                                   supervised_user_id);
   }
 }
 
@@ -1212,20 +1200,6 @@ void ProfileManager::DoFinalInitForServices(Profile* profile,
   extensions::ExtensionSystem::Get(profile)->InitForRegularProfile(
       extensions_enabled);
 
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-  // Initialization needs to happen after extension system initialization (for
-  // extension::ManagementPolicy) and InitProfileUserPrefs (for setting the
-  // initializing the supervised flag if necessary).
-  ChildAccountServiceFactory::GetForProfile(profile)->Init();
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  // After the ManagementPolicy has been set, update it for the Supervised User
-  // Extension Delegate, which has been created before the profile
-  // initialization and needs to obtain the new policies.
-  extensions::ManagementAPI::GetFactoryInstance()
-      ->Get(profile)
-      ->GetSupervisedUserExtensionsDelegate()
-      ->UpdateManagementPolicyRegistration();
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
   // Ensure NavigationPredictorKeyedService is started.
@@ -1629,9 +1603,6 @@ void ProfileManager::AddProfileToStorage(Profile* profile) {
 
   init_params.icon_index = profiles::GetSanitizedAvatarIndex(
       profile->GetPrefs()->GetInteger(prefs::kProfileAvatarIndex));
-
-  init_params.supervised_user_id =
-      profile->GetPrefs()->GetString(prefs::kSupervisedUserId);
 
   init_params.gaia_id = account_info.gaia;
   init_params.user_name = username;

@@ -79,11 +79,6 @@
 #include "components/webauthn/core/browser/passkey_data_type_controller.h"
 #include "components/webauthn/core/browser/passkey_model.h"
 
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-#include "components/supervised_user/core/browser/family_link_settings_data_type_controller.h"
-#include "components/supervised_user/core/browser/family_link_settings_service.h"
-#endif  // BUILDFLAG(ENABLE_SUPERVISED_USER)
-
 namespace browser_sync {
 
 namespace {
@@ -342,13 +337,6 @@ void CommonControllerBuilder::SetTabContextSyncService(
   tab_context_sync_service_.Set(tab_context_sync_service);
 }
 
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-void CommonControllerBuilder::SetFamilyLinkSettingsService(
-    supervised_user::FamilyLinkSettingsService* family_link_settings_service) {
-  family_link_settings_service_.Set(family_link_settings_service);
-}
-#endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
-
 void CommonControllerBuilder::SetTabGroupSyncService(
     tab_groups::TabGroupSyncService* tab_group_sync_service) {
   tab_group_sync_service_.Set(tab_group_sync_service);
@@ -530,11 +518,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
   if (!disabled_types.Has(syncer::WEBAUTHN_CREDENTIAL)) {
     add_controller(CreateWebauthnCredentialDataTypeController(sync_service));
   }
-
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-  add_controller(
-      CreateFamilyLinkSettingsDataTypeController(sync_service, channel));
-#endif
 
   if (!disabled_types.Has(syncer::COLLABORATION_GROUP)) {
     add_controller(CreateCollaborationGroupDataTypeController(sync_service));
@@ -1133,22 +1116,6 @@ CommonControllerBuilder::CreateWebauthnCredentialDataTypeController(
       /*delegate_for_transport_mode=*/
       std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate));
 }
-
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateFamilyLinkSettingsDataTypeController(
-    syncer::SyncService* sync_service,
-    version_info::Channel channel) {
-  if (!family_link_settings_service_.value()) {
-    return nullptr;
-  }
-  return std::make_unique<FamilyLinkSettingsDataTypeController>(
-      base::BindRepeating(&syncer::ReportUnrecoverableError, channel),
-      data_type_store_service_.value()->GetStoreFactory(),
-      family_link_settings_service_.value()->AsWeakPtr(),
-      pref_service_.value(), sync_service);
-}
-#endif
 
 std::unique_ptr<syncer::DataTypeController>
 CommonControllerBuilder::CreateCollaborationGroupDataTypeController(

@@ -35,8 +35,6 @@ class ChromePrefServiceFactoryTestBase : public testing::Test {
         profile_->GetPath(), /*validation_delegate=*/mojo::NullRemote(),
         /*policy_service=*/
         g_browser_process->browser_policy_connector()->GetPolicyService(),
-        /*supervised_user_settings=*/nullptr,
-        g_browser_process->device_parental_controls(),
         /*extension_prefs=*/nullptr, pref_registry_,
         /*connector=*/g_browser_process->browser_policy_connector(),
         /*async=*/true, task_environment_.GetMainThreadTaskRunner().get(),

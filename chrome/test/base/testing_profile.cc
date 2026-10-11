@@ -53,7 +53,6 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
-#include "chrome/browser/supervised_user/family_link_settings_service_factory.h"
 #include "chrome/browser/transition_manager/full_browser_transition_manager.h"
 #include "chrome/browser/ui/zoom/chrome_zoom_level_prefs.h"
 #include "chrome/common/buildflags.h"
@@ -89,10 +88,6 @@
 #include "components/security_interstitials/content/stateful_ssl_host_state_delegate.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
-#include "components/supervised_user/core/browser/family_link_settings_service.h"
-#include "components/supervised_user/core/browser/supervised_user_test_environment.h"
-#include "components/supervised_user/core/common/pref_names.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
 #include "components/sync/base/features.h"
 #include "components/sync/test/fake_sync_change_processor.h"
 #include "components/sync_preferences/pref_service_syncable.h"
@@ -200,7 +195,6 @@ TestingProfile::TestingProfile(const base::FilePath& path,
                      /*guest_session=*/false,
                      /*allows_browser_windows=*/true,
                      /*is_new_profile=*/false,
-                     /*is_supervised_profile=*/false,
                      /*policy_manager=*/{},
                      /*policy_service=*/nullptr,
                      /*testing_factories=*/{},
@@ -222,7 +216,6 @@ TestingProfile::TestingProfile(
     bool guest_session,
     bool allows_browser_windows,
     bool is_new_profile,
-    bool is_supervised_profile,
     std::variant<std::unique_ptr<policy::UserCloudPolicyManager>,
                  std::unique_ptr<policy::ProfileCloudPolicyManager>>
         policy_manager,
@@ -282,7 +275,7 @@ TestingProfile::TestingProfile(
         f.service_factory_and_testing_factory);
   }
 
-  Init(is_supervised_profile, create_mode);
+  Init(create_mode);
 
   switch (create_mode) {
     case CreateMode::kSynchronous:
@@ -297,7 +290,7 @@ TestingProfile::TestingProfile(
   }
 }
 
-void TestingProfile::Init(bool is_supervised_profile, CreateMode create_mode) {
+void TestingProfile::Init(CreateMode create_mode) {
   if (!g_browser_process) {
     // This is intentionally not a CHECK because that would exonerate any
     // EXPECT_CHECK_DEATH()s for the wrong reason by printing "Check failed" to
@@ -331,12 +324,6 @@ void TestingProfile::Init(bool is_supervised_profile, CreateMode create_mode) {
   ChromeBrowserMainExtraPartsProfiles::
       EnsureBrowserContextKeyedServiceFactoriesBuilt();
 
-  if (!IsOffTheRecord()) {
-    supervised_user::InitializeSettingsServiceForTesting(
-        supervised_user::FamilyLinkSettingsServiceFactory::GetForKey(
-            key_.get()));
-  }
-
   if (prefs_.get()) {
     user_prefs::UserPrefs::Set(this, prefs_.get());
   } else if (IsOffTheRecord()) {
@@ -344,9 +331,6 @@ void TestingProfile::Init(bool is_supervised_profile, CreateMode create_mode) {
   } else {
     CreateTestingPrefService();
   }
-
-  if (is_supervised_profile)
-    SetIsSupervisedProfile();
 
   key_->SetPrefs(prefs_.get());
   SimpleKeyMap::GetInstance()->Associate(this, key_.get());
@@ -638,16 +622,8 @@ const Profile* TestingProfile::GetOriginalProfile() const {
   return this;
 }
 
-void TestingProfile::SetIsSupervisedProfile(bool is_supervised_profile) {
-  if (is_supervised_profile) {
-    supervised_user::EnableParentalControls(*GetPrefs());
-  } else {
-    supervised_user::DisableParentalControls(*GetPrefs());
-  }
-}
-
 bool TestingProfile::IsChild() const {
-  return supervised_user::IsSubjectToParentalControls(*GetPrefs());
+  return false;
 }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -675,14 +651,10 @@ TestingProfile::GetExtensionSpecialStoragePolicy() {
 void TestingProfile::CreateTestingPrefService() {
   DCHECK(!prefs_.get());
 
-  // Construct testing_prefs_ by hand to add the supervised user pref store.
+  // Construct testing_prefs_ by hand.
   testing_prefs_ = new sync_preferences::TestingPrefServiceSyncable(
       /*managed_prefs=*/base::MakeRefCounted<TestingPrefStore>(),
-      /*supervised_user_prefs=*/
-      supervised_user::CreateTestingPrefStore(
-          supervised_user::FamilyLinkSettingsServiceFactory::GetForKey(
-              key_.get()),
-          g_browser_process->device_parental_controls()),
+      /*supervised_user_prefs=*/base::MakeRefCounted<TestingPrefStore>(),
       /*extension_prefs=*/base::MakeRefCounted<TestingPrefStore>(),
       /*user_prefs=*/base::MakeRefCounted<TestingPrefStore>(),
       /*recommended_prefs=*/base::MakeRefCounted<TestingPrefStore>(),
@@ -985,11 +957,6 @@ TestingProfile::Builder& TestingProfile::Builder::SetIsNewProfile(
   return *this;
 }
 
-TestingProfile::Builder& TestingProfile::Builder::SetIsSupervisedProfile() {
-  is_supervised_profile_ = true;
-  return *this;
-}
-
 TestingProfile::Builder& TestingProfile::Builder::SetUserCloudPolicyManager(
     std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager) {
   DCHECK_EQ(profile_cloud_policy_manager_, nullptr);
@@ -1072,7 +1039,7 @@ std::unique_ptr<TestingProfile> TestingProfile::Builder::Build() {
       extension_policy_,
 #endif
       std::move(pref_service_), nullptr, guest_session_,
-      allows_browser_windows_, is_new_profile_, is_supervised_profile_,
+      allows_browser_windows_, is_new_profile_,
       std::move(policy_manager),
       std::move(policy_service_), std::move(testing_factories_), profile_name_,
       override_policy_connector_is_managed_, nullptr, url_loader_factory_
@@ -1100,7 +1067,7 @@ TestingProfile* TestingProfile::Builder::BuildOffTheRecord(
       extension_policy_,
 #endif
       std::move(pref_service_), original_profile, guest_session_,
-      allows_browser_windows_, is_new_profile_, is_supervised_profile_,
+      allows_browser_windows_, is_new_profile_,
       std::move(user_cloud_policy_manager_), std::move(policy_service_),
       std::move(testing_factories_), profile_name_,
       override_policy_connector_is_managed_, &otr_profile_id,

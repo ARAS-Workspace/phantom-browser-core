@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//chrome/common/features.gni")
-import("//components/supervised_user/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 assert(is_mac || is_linux)
@@ -101,7 +100,6 @@ source_set("sync") {
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/signin",
     "//chrome/browser/subscription_eligibility",
-    "//chrome/browser/supervised_user",
     "//chrome/browser/ui/navigator",
     "//chrome/browser/ui/sync",
     "//chrome/browser/ui/toolbar",
@@ -164,13 +162,6 @@ source_set("sync") {
     deps += [ "//chrome/browser/web_applications" ]
   }
 
-  if (enable_supervised_users) {
-    deps += [
-      "//components/supervised_user/core/browser",
-      "//components/supervised_user/core/common",
-    ]
-  }
-
   sources += [
     "sessions/browser_list_router_helper.cc",
     "sessions/browser_list_router_helper.h",
@@ -182,7 +173,6 @@ source_set("sync") {
   deps += [
     "//chrome/browser/accessibility/tree_fixing:prefs",
     "//chrome/browser/themes",
-    "//chrome/browser/ui/read_anything:prefs",
     "//chrome/browser/ui/tabs:tab_strip",
     "//chrome/browser/ui/tabs/saved_tab_groups",
   ]

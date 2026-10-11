@@ -27,8 +27,6 @@
 #include "chrome/browser/ssl/https_defaulted_callbacks.h"
 #include "chrome/browser/ssl/https_upgrades_navigation_throttle.h"
 #include "chrome/browser/ssl/typed_navigation_upgrade_throttle.h"
-#include "chrome/browser/supervised_user/classify_url_navigation_throttle.h"
-#include "chrome/browser/supervised_user/supervised_user_google_auth_navigation_throttle.h"
 #include "chrome/browser/ui/blocked_content/tab_under_navigation_throttle.h"
 #include "chrome/browser/ui/login/login_navigation_throttle.h"
 #include "chrome/browser/ui/passwords/well_known_change_password_navigation_throttle.h"
@@ -289,9 +287,6 @@ void CreateAndAddChromeThrottlesForNavigation(
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW)
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-  SupervisedUserGoogleAuthNavigationThrottle::MaybeCreateAndAdd(registry);
-  supervised_user::ClassifyUrlNavigationThrottle::MaybeCreateAndAdd(registry);
 
   if (auto* throttle_manager =
           subresource_filter::ContentSubresourceFilterThrottleManager::

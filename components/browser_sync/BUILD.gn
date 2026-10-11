@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/supervised_user/buildflags.gni")
 
 static_library("browser_sync") {
   sources = [
@@ -44,7 +43,6 @@ static_library("browser_sync") {
     "//components/saved_tab_groups/public",
     "//components/search_engines",
     "//components/send_tab_to_self",
-    "//components/supervised_user/core/common:buildflags",
     "//components/sync_bookmarks",
     "//components/sync_preferences",
     "//components/sync_sessions",
@@ -59,10 +57,6 @@ static_library("browser_sync") {
     "//extensions/buildflags",
     "//ui/base",
   ]
-
-  if (enable_supervised_users) {
-    deps += [ "//components/supervised_user/core/browser" ]
-  }
 }
 
 static_library("switches") {

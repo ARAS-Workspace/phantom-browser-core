@@ -8,7 +8,6 @@
 
 #include "base/memory/ptr_util.h"
 #include "build/build_config.h"
-#include "chrome/browser/renderer_context_menu/context_menu_content_type_read_anything.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/renderer_context_menu/context_menu_content_type.h"
 #include "content/public/browser/context_menu_params.h"
@@ -69,12 +68,6 @@ std::unique_ptr<ContextMenuContentType>
 ContextMenuContentTypeFactory::CreateInternal(
     content::RenderFrameHost* render_frame_host,
     const content::ContextMenuParams& params) {
-  if (params.page_url.SchemeIs(content::kChromeUIUntrustedScheme) &&
-      params.page_url.host() ==
-          chrome::kChromeUIUntrustedReadAnythingSidePanelHost) {
-    return std::make_unique<ContextMenuContentTypeReadAnything>(params);
-  }
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   if (IsRunningInForcedAppMode()) {
     return base::WrapUnique(new ContextMenuContentTypeAppMode(params));

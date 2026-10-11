@@ -27,7 +27,6 @@
 #include "components/keyed_service/core/keyed_service_base_factory.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/signin/public/base/signin_switches.h"
-#include "components/supervised_user/core/common/features.h"
 #include "components/universal_optout/features.h"
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
@@ -391,7 +390,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ProfileNetworkContextService",
     "ProtocolHandlersManager",
     "ProtocolHandlerRegistry",
-    "ReadAnythingServiceFactory",
     "ReduceAcceptLanguage",
     "RendererUpdater",
     "ResumableTCPServerSocketManager",
@@ -503,7 +501,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "BookmarkUndoService",
     "BookmarksAPI",
     "BrailleDisplayPrivateAPI",
-    "ChildAccountService",
     "ChromeSigninClient",
     "CommandService",
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -577,7 +574,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "InstallTracker",
     "InstallVerifier",
     "LazyBackgroundTaskQueue",
-    "ListFamilyMembersService",
     "LocalOrSyncableBookmarkSyncServiceFactory",
     "LoginDetectionKeyedService",
     "LoginUIServiceFactory",

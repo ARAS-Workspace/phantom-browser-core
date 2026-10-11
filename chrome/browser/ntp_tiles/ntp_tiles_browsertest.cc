@@ -13,7 +13,6 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "chrome/test/supervised_user/supervision_mixin.h"
 #include "components/history/core/browser/top_sites.h"
 #include "components/ntp_tiles/most_visited_sites.h"
 #include "components/ntp_tiles/ntp_tile.h"
@@ -30,7 +29,6 @@ using testing::Contains;
 using testing::Not;
 using testing::UnorderedElementsAre;
 
-const char kWebstoreUrl[] = "https://chrome.google.com/webstore?hl=en";
 
 std::string PrintTile(const std::string& title,
                       const std::string& url,
@@ -93,39 +91,6 @@ class NTPTilesTest : public InProcessBrowserTest {
     most_visited_sites_.reset();
   }
 
-  std::unique_ptr<ntp_tiles::MostVisitedSites> most_visited_sites_;
-};
-
-class NTPTilesForSupervisedUsersTest : public MixinBasedInProcessBrowserTest {
- protected:
-  void SetUpOnMainThread() override {
-    MixinBasedInProcessBrowserTest::SetUpOnMainThread();
-
-    ASSERT_TRUE(embedded_test_server()->Started());
-    most_visited_sites_ =
-        ChromeMostVisitedSitesFactory::NewForProfile(browser()->GetProfile());
-  }
-
-  void TearDownOnMainThread() override {
-    // Reset most_visited_sites_, otherwise there is a CHECK in callback_list.h
-    // because callbacks_.size() is not 0.
-    most_visited_sites_.reset();
-  }
-
-  supervised_user::KidsManagementApiServerMock& kids_management_api_mock() {
-    return supervision_mixin_.api_mock_setup_mixin().api_mock();
-  }
-
-  supervised_user::SupervisionMixin supervision_mixin_{
-      mixin_host_,
-      this,
-      embedded_test_server(),
-      {
-          .sign_in_mode =
-              supervised_user::SupervisionMixin::SignInMode::kSupervised,
-          .embedded_test_server_options = {.resolver_rules_map_host_list =
-                                               "*.example.com"},
-      }};
   std::unique_ptr<ntp_tiles::MostVisitedSites> most_visited_sites_;
 };
 
@@ -192,55 +157,6 @@ IN_PROC_BROWSER_TEST_F(NTPTilesTest, DISABLED_NavigateAfterSettingObserver) {
   NTPTilesVector tiles = waiter.WaitForTiles();
   EXPECT_THAT(tiles, Contains(MatchesTile("OK", page_url.spec().c_str(),
                                           TileSource::TOP_SITES)));
-}
-
-// Tests that after navigating to a URL that is not blocked for the supervised
-// user, ntp tiles will include the URL.
-IN_PROC_BROWSER_TEST_F(NTPTilesForSupervisedUsersTest, LoadURL) {
-  const GURL page_url =
-      embedded_test_server()->GetURL("www.example.com", "/simple.html");
-  kids_management_api_mock().AllowSubsequentClassifyUrl();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), page_url));
-
-  MostVisitedSitesWaiter waiter;
-
-  // This call will call SyncWithHistory(), which means the new URL will be in
-  // the next set of tiles that the waiter retrieves.
-  most_visited_sites_->AddMostVisitedURLsObserver(&waiter, 8);
-
-  NTPTilesVector tiles = waiter.WaitForTiles();
-  EXPECT_THAT(
-      tiles,
-      UnorderedElementsAre(
-          MatchesTile("OK", page_url.spec().c_str(), TileSource::TOP_SITES),
-          MatchesTile("Web Store", kWebstoreUrl, TileSource::TOP_SITES)));
-}
-
-// Tests that after navigating to a URL that is blocked for the supervised user,
-// ntp tiles will not include the URL.
-IN_PROC_BROWSER_TEST_F(NTPTilesForSupervisedUsersTest, DoNotLoadBlockedURL) {
-  const GURL page_url = embedded_test_server()->GetURL(
-      "www.example.com", "/supervised_user/simple.html");
-  kids_management_api_mock().AllowSubsequentClassifyUrl();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), page_url));
-
-  const GURL blocked_page_url =
-      embedded_test_server()->GetURL("www.example.com", "/simple.html");
-  kids_management_api_mock().RestrictSubsequentClassifyUrl();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), blocked_page_url));
-
-  MostVisitedSitesWaiter waiter;
-
-  // This call will call SyncWithHistory(), which means the new URL would be in
-  // the next set of tiles that the waiter retrieves.
-  most_visited_sites_->AddMostVisitedURLsObserver(&waiter, 8);
-
-  NTPTilesVector tiles = waiter.WaitForTiles();
-  EXPECT_THAT(tiles, UnorderedElementsAre(
-                         MatchesTile("simple page", page_url.spec().c_str(),
-                                     TileSource::TOP_SITES),
-                         MatchesTile("Web Store", kWebstoreUrl,
-                                     TileSource::TOP_SITES)));
 }
 
 }  // namespace ntp_tiles

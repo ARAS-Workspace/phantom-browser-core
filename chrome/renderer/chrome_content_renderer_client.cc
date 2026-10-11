@@ -66,7 +66,6 @@
 #include "chrome/renderer/plugins/non_loadable_plugin_placeholder.h"
 #include "chrome/renderer/plugins/pdf_plugin_placeholder.h"
 #include "chrome/renderer/process_state.h"
-#include "chrome/renderer/supervised_user/supervised_user_error_page_controller_delegate_impl.h"
 #include "chrome/renderer/trusted_vault_encryption_keys_extension.h"
 #include "chrome/renderer/url_loader_throttle_provider_impl.h"
 #include "chrome/renderer/v8_unwinder.h"
@@ -592,8 +591,6 @@ void ChromeContentRendererClient::RenderFrameCreated(
   new security_interstitials::SecurityInterstitialPageControllerDelegateImpl(
       render_frame);
 
-  new SupervisedUserErrorPageControllerDelegateImpl(render_frame);
-
   if (!render_frame->IsMainFrame()) {
     auto* main_frame_no_state_prefetch_helper =
         prerender::NoStatePrefetchHelper::Get(
@@ -1035,8 +1032,6 @@ void ChromeContentRendererClient::PrepareErrorPage(
 
   security_interstitials::SecurityInterstitialPageControllerDelegateImpl::Get(
       render_frame)
-      ->PrepareForErrorPage();
-  SupervisedUserErrorPageControllerDelegateImpl::Get(render_frame)
       ->PrepareForErrorPage();
 }
 

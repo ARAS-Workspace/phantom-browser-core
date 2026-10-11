@@ -241,13 +241,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
   mixer[kColorContextualTasksBannerPromoIconBackground] = {
       ui::kColorSysTonalContainer};
 
-  // Read Anything (in the side panel) colors.
-  mixer[kColorReadAnythingCurrentReadAloudHighlight] = {
-      ui::kColorSysStateHoverOnSubtle};
-  mixer[kColorReadAnythingForeground] = {ui::kColorSysOnSurface};
-  mixer[kColorReadAnythingPreviousReadAloudHighlight] = {
-      ui::kColorSysOnSurfaceSecondary};
-
   // Tab Group Dialog colors.
   mixer[kColorTabGroupDialogIconEnabled] = {ui::kColorSysOnSurfaceSubtle};
 

@@ -7,7 +7,6 @@
 #include "base/memory/ref_counted.h"
 #include "chrome/browser/complex_tasks/task_tab_helper.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/supervised_user/supervised_user_navigation_observer.h"
 #include "components/sessions/content/content_serialized_navigation_builder.h"
 #include "components/sync/base/features.h"
 #include "components/sync_sessions/sync_sessions_client.h"
@@ -122,11 +121,7 @@ bool TabContentsSyncedTabDelegate::ProfileHasChildAccount() const {
 
 const std::vector<std::unique_ptr<const sessions::SerializedNavigationEntry>>*
 TabContentsSyncedTabDelegate::GetBlockedNavigations() const {
-  SupervisedUserNavigationObserver* navigation_observer =
-      SupervisedUserNavigationObserver::FromWebContents(web_contents_);
-  DCHECK(navigation_observer);
-
-  return &navigation_observer->blocked_navigations();
+  return nullptr;
 }
 
 bool TabContentsSyncedTabDelegate::ShouldSync(
@@ -134,12 +129,6 @@ bool TabContentsSyncedTabDelegate::ShouldSync(
   if (sessions_client->GetSyncedWindowDelegatesGetter()->FindById(
           GetWindowId()) == nullptr) {
     return false;
-  }
-
-  if (ProfileHasChildAccount()) {
-    if (!GetBlockedNavigations()->empty()) {
-      return true;
-    }
   }
 
   if (IsInitialBlankNavigation()) {

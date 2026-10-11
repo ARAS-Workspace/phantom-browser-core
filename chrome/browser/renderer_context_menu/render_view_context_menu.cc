@@ -84,7 +84,6 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
-#include "chrome/browser/supervised_user/supervised_user_url_filtering_service_factory.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -169,8 +168,6 @@
 #include "components/services/app_service/public/cpp/app_launch_util.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/supervised_user/core/browser/supervised_user_preferences.h"
-#include "components/supervised_user/core/browser/supervised_user_url_filtering_service.h"
 #include "components/url_formatter/url_formatter.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
@@ -2745,7 +2742,7 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       OpenLinkInSplitView(split_tabs::SplitTabLayout::kSideBySide);
       break;
     case IDC_CONTENT_CONTEXT_SAVELINKAS:
-      CheckSupervisedUserURLFilterAndSaveLinkAs();
+      ExecSaveLinkAs();
       break;
 
     case IDC_CONTENT_CONTEXT_SAVEAVAS:
@@ -3211,23 +3208,6 @@ bool RenderViewContextMenu::IsSaveLinkAsEnabled() const {
     return false;
   }
 
-  Profile* const profile = Profile::FromBrowserContext(browser_context_);
-  CHECK(profile);
-  if (profile->IsChild()) {
-    supervised_user::SupervisedUserUrlFilteringService* url_filtering_service =
-        supervised_user::SupervisedUserUrlFilteringServiceFactory::
-            GetForProfile(profile);
-    // Use the URL filter's synchronous call to check if a site has been
-    // manually blocked for the user. This does not filter websites that are
-    // blocked by SafeSites API for having mature content. The mature content
-    // filter requires an async call. This call is made if the user selects
-    // "Save link as" and blocks the download.
-    if (!url_filtering_service->GetFilteringBehavior(params_.link_url)
-             .IsAllowed()) {
-      return false;
-    }
-  }
-
   return params_.link_url.is_valid() &&
          ProfileIOData::IsHandledProtocol(params_.link_url.GetScheme());
 }
@@ -3635,30 +3615,6 @@ void RenderViewContextMenu::ExecInspectBackgroundPage() {
 
   extensions::devtools_util::InspectBackgroundPage(
       platform_app, GetProfile(), DevToolsOpenedByAction::kContextMenuInspect);
-}
-
-void RenderViewContextMenu::CheckSupervisedUserURLFilterAndSaveLinkAs() {
-  Profile* const profile = Profile::FromBrowserContext(browser_context_);
-  CHECK(profile);
-  if (profile->IsChild()) {
-    supervised_user::SupervisedUserUrlFilteringServiceFactory::GetForProfile(
-        profile)
-        ->GetFilteringBehavior(
-            params_.link_url,
-            /*skip_manual_parent_filter=*/false,
-            base::BindOnce(
-                &RenderViewContextMenu::OnSupervisedUserURLFilterChecked,
-                weak_pointer_factory_.GetWeakPtr()));
-    return;
-  }
-  ExecSaveLinkAs();
-}
-
-void RenderViewContextMenu::OnSupervisedUserURLFilterChecked(
-    supervised_user::WebFilteringResult result) {
-  if (result.IsAllowed()) {
-    ExecSaveLinkAs();
-  }
 }
 
 void RenderViewContextMenu::ExecSaveLinkAs() {

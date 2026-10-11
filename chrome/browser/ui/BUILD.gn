@@ -25,7 +25,6 @@ import("//tools/metrics/generate_allowlist_from_histograms_file.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/views/features.gni")
 
-assert(enable_supervised_users)
 
 generate_allowlist_from_histograms_file("webui_name_variants") {
   namespace = "views_metrics"
@@ -136,7 +135,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/performance_controls",
     "//chrome/browser/ui/profiles",
     "//chrome/browser/ui/qrcode_generator",
-    "//chrome/browser/ui/read_anything",
     "//chrome/browser/ui/search",
     "//chrome/browser/ui/send_tab_to_self",
     "//chrome/browser/ui/side_panel",
@@ -398,8 +396,6 @@ source_set("managed_ui") {
     "//chrome/common",
     "//components/policy/core/common",
     "//components/strings:components_strings",
-    "//components/supervised_user/core/browser",
-    "//components/supervised_user/core/common",
     "//components/vector_icons",
     "//ui/base",
     "//ui/gfx",
@@ -635,7 +631,6 @@ static_library("ui") {
     "//chrome/browser/status_icons",
     "//chrome/browser/storage_access_api",
     "//chrome/browser/subresource_filter",
-    "//chrome/browser/supervised_user:impl",
     "//chrome/browser/sync",
     "//chrome/browser/task_manager/common",
     "//chrome/browser/task_manager/common:impl",
@@ -1088,7 +1083,6 @@ static_library("ui") {
     ":chrome_pages",
     ":chrome_web_modal_dialog_manager_delegate",
     "//chrome/browser:certificate_viewer",
-    "//chrome/browser/accessibility/phrase_segmentation",
     "//chrome/browser/apps/intent_helper:intent_chip_display_prefs",
     "//chrome/browser/profile_resetter",
     "//chrome/browser/ui/sessions",
@@ -1366,7 +1360,6 @@ static_library("ui") {
     "//chrome/browser/importer",
     "//chrome/browser/importer:impl",
     "//chrome/browser/personal_context/first_run",
-    "//chrome/browser/ui/read_anything",
     "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/waap:manager",
     "//chrome/browser/ui/webui/data_sharing",
@@ -1383,7 +1376,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
     "//chrome/browser/ui/webui/side_panel/history",
     "//chrome/browser/ui/webui/side_panel/history_clusters",
-    "//chrome/browser/ui/webui/side_panel/read_anything",
     "//chrome/browser/ui/webui/side_panel/reading_list",
     "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
     "//chrome/browser/ui/webui/util",
@@ -1438,7 +1430,6 @@ static_library("ui") {
     "//chrome/browser/apps/app_service",
 
     # TODO(crbug.com/345487716): Remove circular dependencies.
-    "//chrome/browser/ui/read_anything",
     "//chrome/browser/ui/views/side_panel",
 
     # TODO(crbug/com/387527798): Remove circular dependencies.
@@ -1587,15 +1578,6 @@ static_library("ui") {
   if (enable_extensions) {
     deps += [
       "//chrome/browser/extensions/api/web_navigation",
-      "//chrome/browser/ui/views/supervised_user",
-      "//chrome/browser/ui/views/supervised_user:impl",
-    ]
-
-    allow_circular_includes_from += [
-      # parent_permission_dialog_view:impl includes headers from
-      # //chrome/browser/ui (e.g. extension_permissions_view.h) that can't be
-      # split out yet.
-      "//chrome/browser/ui/views/supervised_user:impl",
     ]
   }
 

@@ -58,8 +58,6 @@
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"
-#include "components/supervised_user/core/browser/device_parental_controls.h"
-#include "components/supervised_user/core/browser/supervised_user_pref_store.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/pref_names.h"
@@ -276,27 +274,6 @@ void PrepareFactory(sync_preferences::PrefServiceSyncableFactory* factory,
       base::MakeRefCounted<ChromePrefModelAssociatorClient>());
 }
 
-void PrepareFactory(
-    sync_preferences::PrefServiceSyncableFactory* factory,
-    const base::FilePath& pref_filename,
-    policy::PolicyService* policy_service,
-    supervised_user::FamilyLinkSettingsService* family_link_settings_service,
-    supervised_user::DeviceParentalControls& device_parental_controls,
-    scoped_refptr<PersistentPrefStore> user_pref_store,
-    scoped_refptr<PrefStore> extension_prefs,
-    bool async,
-    policy::BrowserPolicyConnector* policy_connector) {
-  PrepareFactory(factory, pref_filename, policy_service,
-                 std::move(user_pref_store), std::move(extension_prefs), async,
-                 policy_connector);
-
-  scoped_refptr<PrefStore> supervised_user_prefs =
-      base::MakeRefCounted<SupervisedUserPrefStore>(
-          family_link_settings_service, device_parental_controls);
-  DCHECK(async || supervised_user_prefs->IsInitializationComplete());
-  factory->set_supervised_user_prefs(supervised_user_prefs);
-}
-
 class ResetOnLoadObserverImpl : public prefs::mojom::ResetOnLoadObserver {
  public:
   explicit ResetOnLoadObserverImpl(const base::FilePath& profile_path)
@@ -344,8 +321,6 @@ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefs(
     mojo::PendingRemote<prefs::mojom::TrackedPreferenceValidationDelegate>
         validation_delegate,
     policy::PolicyService* policy_service,
-    supervised_user::FamilyLinkSettingsService* family_link_settings_service,
-    supervised_user::DeviceParentalControls& device_parental_controls,
     scoped_refptr<PrefStore> extension_prefs,
     scoped_refptr<user_prefs::PrefRegistrySyncable> pref_registry,
     policy::BrowserPolicyConnector* connector,
@@ -367,15 +342,8 @@ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefs(
               io_task_runner, std::move(reset_on_load_observer),
               std::move(validation_delegate), os_crypt_async);
 
-  if (family_link_settings_service) {
-    PrepareFactory(&factory, profile_path, policy_service,
-                   family_link_settings_service, device_parental_controls,
-                   user_pref_store, std::move(extension_prefs), async,
-                   connector);
-  } else {
-    PrepareFactory(&factory, profile_path, policy_service, user_pref_store,
-                   std::move(extension_prefs), async, connector);
-  }
+  PrepareFactory(&factory, profile_path, policy_service, user_pref_store,
+                 std::move(extension_prefs), async, connector);
 
   // Get raw pointers to the filters before moving user_pref_store.
   PrefFilter* default_filter = nullptr;

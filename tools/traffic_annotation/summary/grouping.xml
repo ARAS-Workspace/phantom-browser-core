@@ -144,7 +144,6 @@ after discussions on the right group.
       <annotation id="bookmarks_image_fetcher"/>
       <annotation id="back_navigation_cache_query"/>
       <annotation id="cws_info_service"/>
-      <annotation id="supervised_user_request_blocked_site_permission"/>
       <annotation id="password_sharing_recipients"/>
       <annotation id="ntp_image_url_verification"/>
       <annotation id="passkey_enclave_client"/>
@@ -275,8 +274,6 @@ after discussions on the right group.
   <group name="Child-protection and Safe Browsing Features">
     <sender name="Safe Browsing">
       <annotation id="client_download_request"/>
-      <annotation id="supervised_user_classify_url"/>
-      <annotation id="supervised_user_list_family_members"/>
       <annotation id="password_protection_request"/>
       <annotation id="safe_browsing_client_side_phishing_detector"/>
       <annotation id="safe_browsing_extended_reporting"/>
@@ -420,7 +417,6 @@ after discussions on the right group.
     </sender>
     <sender name="Favicon">
       <annotation id="icon_catcher_get_large_icon"/>
-      <annotation id="favicon_fetcher_get_favicon"/>
     </sender>
     <sender name="Images"/>
     <sender name="Early Hints">

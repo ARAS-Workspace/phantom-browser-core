@@ -108,7 +108,6 @@ BrowserRootViewBrowserTest.*
 # https://ci.chromium.org/ui/p/chromium/builders/ci/mac-rel-cft/16246/test-results
 -LayerTreeHostScrollTestCaseWithChild.DeviceScaleFactor1_ScrollChild
 -PasswordCheckDelegateTest.*
--ReadAnythingModelTest.*
 -ThreadControllerWithMessagePumpTest.ThreadControllerActiveAdvancedNesting
 -TranslateManagerRenderViewHostTest.*
 

@@ -21,7 +21,6 @@
 #include "chrome/browser/prefs/browser_prefs.h"
 #include "chrome/browser/prefs/chrome_pref_service_factory.h"
 #include "chrome/browser/prefs/profile_pref_store_manager.h"
-#include "chrome/browser/supervised_user/family_link_settings_service_factory.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/grit/branded_strings.h"
@@ -31,7 +30,6 @@
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_value_store.h"
-#include "components/supervised_user/core/browser/family_link_settings_service.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "components/variations/service/variations_service.h"
 #include "content/public/browser/network_service_instance.h"
@@ -84,15 +82,9 @@ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefService(
     SimpleFactoryKey* key,
     const base::FilePath& profile_path,
     bool async_prefs,
-    os_crypt_async::OSCryptAsync* os_crypt_async,
-    supervised_user::DeviceParentalControls& device_parental_controls) {
-  supervised_user::FamilyLinkSettingsService* family_link_settings_service =
-      supervised_user::FamilyLinkSettingsServiceFactory::GetForKey(key);
-  family_link_settings_service->Init(profile_path, io_task_runner,
-                                     !async_prefs);
+    os_crypt_async::OSCryptAsync* os_crypt_async) {
   return chrome_prefs::CreateProfilePrefs(
       profile_path, std::move(pref_validation_delegate), policy_service,
-      family_link_settings_service, device_parental_controls,
       std::move(extension_pref_store), pref_registry, browser_policy_connector,
       async_prefs, io_task_runner, os_crypt_async);
 }

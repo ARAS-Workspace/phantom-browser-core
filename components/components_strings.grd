@@ -326,7 +326,6 @@
       <part file="smart_tab_sharing.grdp" />
       <part file="ssl_errors_strings.grdp" />
       <part file="subresource_filter_strings.grdp" />
-      <part file="supervised_user_strings.grdp" />
       <part file="sync_ui_strings.grdp" />
       <part file="tab_groups_strings.grdp" />
       <part file="tab_resume_strings.grdp" />
@@ -337,7 +336,6 @@
       <part file="webapps_strings.grdp" />
       <part file="collaboration_strings.grdp" />
       <if expr="is_android">
-        <part file="android_system_error_page_strings.grdp" />
         <part file="external_intents_strings.grdp" />
       </if>
       <if expr="enable_vr">

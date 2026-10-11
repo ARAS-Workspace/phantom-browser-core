@@ -19,17 +19,14 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
-#include "chrome/browser/supervised_user/supervised_user_test_util.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
 #include "chrome/test/base/search_test_utils.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "chrome/test/supervised_user/supervision_mixin.h"
 #include "components/prefs/pref_service.h"
 #include "components/search_engines/template_url_service.h"
-#include "components/supervised_user/core/common/buildflags.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/render_frame_host.h"
@@ -392,30 +389,6 @@ IN_PROC_BROWSER_TEST_F(SearchTest, UseLocalNTPIfNTPURLIsInsecure) {
 IN_PROC_BROWSER_TEST_F(SearchTest, UseLocalNTPIfNTPURLIsNotSet) {
   // Set an insecure new tab page URL and verify that it's ignored.
   SetSearchProvider(false, true);
-  EXPECT_EQ(chrome::kChromeUINewTabPageThirdPartyURL,
-            GetNewTabPageURL(profile()));
-  GURL new_tab_url = chrome::ChromeUINewTabURLAsGURL();
-  EXPECT_TRUE(HandleNewTabURLRewrite(&new_tab_url, profile()));
-  EXPECT_EQ(chrome::kChromeUINewTabPageThirdPartyURL, new_tab_url);
-}
-
-class SupervisedSearchTest : public SearchTest {
- protected:
-  supervised_user::SupervisionMixin supervision_mixin_{
-      mixin_host_,
-      this,
-      embedded_test_server(),
-      {.sign_in_mode =
-           supervised_user::SupervisionMixin::SignInMode::kSupervised}};
-};
-
-IN_PROC_BROWSER_TEST_F(SupervisedSearchTest,
-                       UseLocalNTPIfNTPURLIsBlockedForSupervisedUser) {
-  // Enable supervision, otherwise the URL filter won't be checked.
-  // Block access to foo.com in the URL filter.
-  supervised_user_test_util::SetManualFilterForHost(profile(), "foo.com",
-                                                    /*allowlist=*/false);
-
   EXPECT_EQ(chrome::kChromeUINewTabPageThirdPartyURL,
             GetNewTabPageURL(profile()));
   GURL new_tab_url = chrome::ChromeUINewTabURLAsGURL();

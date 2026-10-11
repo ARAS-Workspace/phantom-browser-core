@@ -25,7 +25,6 @@
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/fake_profile_manager.h"
 #include "chrome/test/base/testing_browser_process.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -86,8 +85,6 @@ TestingProfile* TestingProfileManager::CreateTestingProfile(
   // Create the profile and register it.
   TestingProfile::Builder builder;
   builder.SetPrefService(std::move(prefs));
-  if (is_supervised_profile)
-    builder.SetIsSupervisedProfile();
   builder.SetProfileName(profile_name);
   builder.SetIsNewProfile(is_new_profile.value_or(false));
   if (policy_service)
@@ -98,7 +95,14 @@ TestingProfile* TestingProfileManager::CreateTestingProfile(
   builder.AddTestingFactories(std::move(testing_factories));
   builder.SetSharedURLLoaderFactory(shared_url_loader_factory);
 
-  return CreateTestingProfile(std::move(builder), user_name, avatar_id);
+  TestingProfile* profile =
+      CreateTestingProfile(std::move(builder), user_name, avatar_id);
+  if (is_supervised_profile) {
+    profile_manager_->GetProfileAttributesStorage()
+        .GetProfileAttributesWithPath(profile->GetPath())
+        ->SetSupervisedUserId("ChildAccountSUID");
+  }
+  return profile;
 }
 
 TestingProfile* TestingProfileManager::CreateTestingProfile(
@@ -119,7 +123,6 @@ TestingProfile* TestingProfileManager::CreateTestingProfile(
     int avatar_id) {
   std::string profile_name = builder.profile_name();
   base::FilePath profile_path = GetProfilePath(profile_name);
-  bool is_supervised_profile = builder.is_supervised_profile();
 
   builder.SetDelegate(profile_manager_.get());
   builder.SetPath(profile_path);
@@ -135,9 +138,6 @@ TestingProfile* TestingProfileManager::CreateTestingProfile(
           .GetProfileAttributesWithPath(profile_path);
   DCHECK(entry);
   entry->SetAvatarIconIndex(avatar_id);
-  entry->SetSupervisedUserId(is_supervised_profile
-                                 ? ::supervised_user::kChildAccountSUID
-                                 : std::string());
   entry->SetLocalProfileName(user_name, entry->IsUsingDefaultName());
 
   testing_profiles_.insert(std::make_pair(profile_name, profile_ptr));

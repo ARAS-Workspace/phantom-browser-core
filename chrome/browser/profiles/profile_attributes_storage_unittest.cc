@@ -39,7 +39,6 @@
 #include "components/profile_metrics/state.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/signin_constants.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/test_utils.h"
@@ -358,7 +357,7 @@ TEST_F(ProfileAttributesStorageTest, AddProfiles) {
 
     std::string supervised_user_id;
     if (i == 3u)
-      supervised_user_id = supervised_user::kChildAccountSUID;
+      supervised_user_id = "ChildAccountSUID";
 
     ProfileAttributesInitParams params;
     params.profile_path = profile_path;
@@ -1100,7 +1099,7 @@ TEST_F(ProfileAttributesStorageTest, SupervisedUsersAccessors) {
   ASSERT_TRUE(entry->IsSupervised());
 
   EXPECT_CALL(observer(), OnProfileSupervisedUserIdChanged(path)).Times(1);
-  entry->SetSupervisedUserId(supervised_user::kChildAccountSUID);
+  entry->SetSupervisedUserId("ChildAccountSUID");
   VerifyAndResetCallExpectations();
   ASSERT_TRUE(entry->IsSupervised());
 }
@@ -1125,7 +1124,7 @@ TEST_F(ProfileAttributesStorageTest, CreateSupervisedTestingProfile) {
     bool is_supervised = entry->GetName() == supervised_user_name;
     EXPECT_EQ(is_supervised, entry->IsSupervised());
     std::string supervised_user_id =
-        is_supervised ? supervised_user::kChildAccountSUID : "";
+        is_supervised ? "ChildAccountSUID" : "";
     EXPECT_EQ(supervised_user_id, entry->GetSupervisedUserId());
   }
 }

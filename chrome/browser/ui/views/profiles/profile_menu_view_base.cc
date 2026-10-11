@@ -27,7 +27,6 @@
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
 #include "chrome/browser/ui/views/controls/hover_button.h"
 #include "chrome/browser/ui/views/profiles/avatar_badge_view.h"
-#include "components/supervised_user/core/browser/family_link_user_capabilities.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/base/interaction/element_tracker.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -100,8 +99,6 @@ constexpr int kMenuItemLeftInternalPadding = 12;
 
 constexpr char kProfileMenuClickedActionableItemHistogram[] =
     "Profile.Menu.ClickedActionableItem";
-constexpr char kProfileMenuClickedActionableItemSupervisedHistogram[] =
-    "Profile.Menu.ClickedActionableItem_Supervised";
 
 gfx::ImageSkia SizeImage(const gfx::ImageSkia& image, int size) {
   return gfx::ImageSkiaOperations::CreateResizedImage(
@@ -818,16 +815,6 @@ void ProfileMenuViewBase::OnActionableItemClicked(ActionableItem item) {
   // TODO(tangltom): Separate metrics for incognito and guest menu.
   base::UmaHistogramEnumeration(kProfileMenuClickedActionableItemHistogram,
                                 item);
-  // Additionally output a version of the metric for supervised users, to allow
-  // more fine-grained analysis.
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfileIfExists(&profile());
-  if (identity_manager &&
-      supervised_user::IsPrimaryAccountSubjectToParentalControls(
-          identity_manager) == signin::Tribool::kTrue) {
-    base::UmaHistogramEnumeration(
-        kProfileMenuClickedActionableItemSupervisedHistogram, item);
-  }
 }
 
 int ProfileMenuViewBase::GetMaxHeight() const {

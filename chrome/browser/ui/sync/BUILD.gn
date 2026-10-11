@@ -37,7 +37,6 @@ source_set("impl") {
     "//base",
     "//chrome/browser/complex_tasks",
     "//chrome/browser/profiles:profile",
-    "//chrome/browser/supervised_user",
     "//components/sessions",
     "//components/sync/base:features",
     "//components/sync_sessions",

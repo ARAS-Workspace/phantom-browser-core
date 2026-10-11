@@ -217,8 +217,6 @@ class PinnedSidePanelInteractiveTest : public InteractiveFeaturePromoTest {
   PinnedSidePanelInteractiveTest()
       : InteractiveFeaturePromoTest(UseDefaultTrackerAllowingPromos(
             {feature_engagement::kIPHSidePanelGenericPinnableFeature})) {
-    scoped_feature_list_.InitWithFeatures({},
-                                          {features::kImmersiveReadAnything});
   }
   ~PinnedSidePanelInteractiveTest() override = default;
 
@@ -279,21 +277,6 @@ class PinnedSidePanelInteractiveTest : public InteractiveFeaturePromoTest {
             ->GetPinnedToolbarActions());
   }
 
-  auto OpenReadingModeSidePanel() {
-    return Steps(
-        Do(([&]() {
-          chrome::ExecuteCommandWithContext(
-              browser(), IDC_SHOW_READING_MODE_SIDE_PANEL,
-              actions::ActionInvocationContext::Builder()
-                  .SetProperty(
-                      kSidePanelOpenTriggerKey,
-                      static_cast<std::underlying_type_t<SidePanelOpenTrigger>>(
-                          SidePanelOpenTrigger::kToolbarButton))
-                  .Build());
-        })),
-        WaitForShow(kSidePanelElementId));
-  }
-
   auto OpenCustomizeChromeSidePanel() {
     return Steps(
         Do(([&]() {
@@ -329,33 +312,6 @@ class PinnedSidePanelInteractiveTest : public InteractiveFeaturePromoTest {
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
-
-// Verify that we can open the ReadingMode side panel from the 3dot -> More
-// tools context menu.
-IN_PROC_BROWSER_TEST_F(PinnedSidePanelInteractiveTest,
-                       OpenReadingModeSidePanel) {
-  // Replace the contents of the ReadingMode side panel with an empty view so it
-  // loads faster.
-  auto* const registry =
-      SidePanelRegistry::From(browser()->GetActiveTabInterface());
-  registry->Deregister(SidePanelEntry::Key(SidePanelEntry::Id::kReadAnything));
-  registry->Register(std::make_unique<SidePanelEntry>(
-      SidePanelEntry::Key(SidePanelEntry::Id::kReadAnything),
-      base::BindRepeating(
-          [](SidePanelEntryScope&) { return std::make_unique<views::View>(); }),
-      /*default_content_width_callback=*/base::NullCallback()));
-
-  SidePanelUI* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
-  side_panel_ui->SetNoDelaysForTesting(true);
-
-  RunTestSequence(OpenReadingModeSidePanel(),
-                  CheckResult(
-                      [side_panel_ui]() {
-                        return side_panel_ui->IsSidePanelEntryShowing(
-                            SidePanelEntryKey(SidePanelEntryId::kReadAnything));
-                      },
-                      true));
-}
 
 // Verify that we can open the CustomizeChrome side panel from the 3dot -> More
 // tools context menu.
@@ -455,17 +411,6 @@ IN_PROC_BROWSER_TEST_F(PinnedSidePanelInteractiveTest,
 IN_PROC_BROWSER_TEST_F(
     PinnedSidePanelInteractiveTest,
     MAYBE_PinnedToolbarButtonsHighlightWhileSidePanelVisible) {
-  // Replace the contents of the ReadingMode side panel with an empty view so it
-  // loads faster.
-  auto* const registry =
-      SidePanelRegistry::From(browser()->GetActiveTabInterface());
-  registry->Deregister(SidePanelEntry::Key(SidePanelEntry::Id::kReadAnything));
-  registry->Register(std::make_unique<SidePanelEntry>(
-      SidePanelEntryKey(SidePanelEntry::Id::kReadAnything),
-      base::BindRepeating(
-          [](SidePanelEntryScope&) { return std::make_unique<views::View>(); }),
-      /*default_content_width_callback=*/base::NullCallback()));
-
   SidePanelUI* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
   side_panel_ui->SetNoDelaysForTesting(true);
 
@@ -499,7 +444,7 @@ IN_PROC_BROWSER_TEST_F(
       // Verify the bookmarks pinned toolbar button is not highlighted.
       CheckPinnedToolbarActionsContainerChildInkDropState(0, false),
       // Open non-bookmarks side panel.
-      OpenReadingModeSidePanel(),
+      OpenCustomizeChromeSidePanel(),
       // Verify the bookmarks pinned toolbar button is not highlighted.
       CheckPinnedToolbarActionsContainerChildInkDropState(0, false));
 }

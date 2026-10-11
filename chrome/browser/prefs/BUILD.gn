@@ -167,8 +167,6 @@ source_set("impl") {
     "//components/site_engagement/content",
     "//components/subresource_filter/content/browser",
     "//components/subresource_filter/core/common",
-    "//components/supervised_user/core/browser",
-    "//components/supervised_user/core/browser:device_parental_controls",
     "//components/sync_preferences",
     "//components/sync_preferences/cross_device_pref_tracker/prefs",
     "//components/sync_sessions",
@@ -287,7 +285,6 @@ source_set("impl") {
   }
 
   deps += [
-    "//chrome/browser/ui/read_anything:prefs",
     "//chrome/browser/ui/views/frame:glass_frame_service",
     "//chrome/browser/ui/webui/cr_components/theme_color_picker:impl",
     "//chrome/browser/ui/webui/history",

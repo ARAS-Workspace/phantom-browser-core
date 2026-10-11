@@ -31,9 +31,10 @@
 #include "components/signin/core/browser/test_account_preview_data_service.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"
+#include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
+#include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
-#include "components/supervised_user/test_support/supervised_user_signin_test_utils.h"
 #include "components/sync/base/features.h"
 #include "components/sync/protocol/sync_enums.pb.h"
 #include "components/sync/test/test_sync_service.h"
@@ -624,8 +625,12 @@ class ProfileMenuViewPixelTest
         break;
       case ManagementStatus::kSupervisedUser:
         if (!account_info.IsEmpty()) {
-          supervised_user::UpdateSupervisionStatusForAccount(
-              account_info, identity_manager, true);
+          AccountCapabilitiesTestMutator mutator(&account_info);
+          mutator.set_is_subject_to_parental_controls(true);
+          account_info = AccountInfo::Builder(account_info)
+                             .SetIsChildAccount(signin::Tribool::kTrue)
+                             .Build();
+          signin::UpdateAccountInfoForAccount(identity_manager, account_info);
           break;
         }
     }

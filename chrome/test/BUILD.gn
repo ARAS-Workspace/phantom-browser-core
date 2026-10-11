@@ -43,7 +43,6 @@ import("//ui/views/features.gni")
 import("//ui/webui/webui_features.gni")
 import("//v8/gni/v8.gni")
 
-assert(enable_supervised_users)
 
 # This target exists to reference other test executables to bring these files
 # into the build.
@@ -93,8 +92,6 @@ static_library("test_support") {
     "//components/activity_reporter",
     "//components/affiliations/core/browser:test_support",
     "//components/record_replay/core/common",
-    "//components/supervised_user/core/browser:device_parental_controls",
-    "//components/supervised_user/core/browser:test_support",
     "//ui/base/unowned_user_data",
   ]
 
@@ -304,8 +301,6 @@ static_library("test_support") {
     "//chrome/browser/net:test_support",
     "//chrome/browser/profiles:profile_util",
     "//chrome/browser/search_engine_choice",
-    "//chrome/browser/supervised_user",
-    "//chrome/browser/supervised_user:test_support",
     "//chrome/browser/ui/browser_window:create_browser_window",
     "//chrome/child",
     "//chrome/common:non_code_constants",
@@ -354,10 +349,6 @@ static_library("test_support") {
     "//components/subresource_filter/content/browser:test_support",
     "//components/subresource_filter/core/browser",
     "//components/subresource_filter/core/common",
-    "//components/supervised_user/core/browser",
-    "//components/supervised_user/core/browser/proto",
-    "//components/supervised_user/core/common",
-    "//components/supervised_user/test_support",
     "//components/sync:test_support",
     "//components/sync_preferences",
     "//components/sync_preferences:test_support",
@@ -767,7 +758,6 @@ source_set("platform_browser_tests") {
       "//chrome/browser/ui/tabs/alert:tab_alert",
       "//chrome/browser/ui/tabs/saved_tab_groups:test_support",
       "//chrome/browser/ui/webui/extensions_zero_state_promo",
-      "//chrome/test/supervised_user:test_support",
       "//extensions/browser/mime_handler:mime_handler_registry",
     ]
   }
@@ -860,6 +850,7 @@ test("browser_tests") {
     "//base/test:test_support",
     "//build:branding_buildflags",
     "//build/config/coverage:buildflags",
+    "//chrome/browser/ui/zoom",
     "//chrome:packed_resources",
     "//chrome:resources",
     "//chrome:strings",
@@ -1105,8 +1096,6 @@ test("browser_tests") {
     "//chrome/browser/storage_access_api",
     "//chrome/browser/storage_access_api:browser_tests",
     "//chrome/browser/subresource_filter:browser_tests",
-    "//chrome/browser/supervised_user:browser_tests",
-    "//chrome/browser/supervised_user:test_support",
     "//chrome/browser/support_tool",
     "//chrome/browser/support_tool:browser_tests",
     "//chrome/browser/support_tool:support_tool_proto",
@@ -1327,7 +1316,6 @@ test("browser_tests") {
     "//chrome/test/gpu:browser_tests",
     "//chrome/test/interaction:browser_tests",
     "//chrome/test/media_router/access_code_cast:access_code_cast_integration_base",
-    "//chrome/test/supervised_user:test_support",
     "//chrome/test/user_education:impl",
     "//chrome/test/v8:browser_tests",
     "//components/affiliations/core/browser:affiliation_proto",
@@ -1512,13 +1500,6 @@ test("browser_tests") {
     "//components/subresource_filter/core/browser",
     "//components/subresource_filter/core/browser:test_support",
     "//components/subresource_filter/core/common:test_support",
-    "//components/supervised_user/core/browser",
-    "//components/supervised_user/core/browser:fetcher",
-    "//components/supervised_user/core/browser:fetcher_config",
-    "//components/supervised_user/core/browser:mocked",
-    "//components/supervised_user/core/browser/proto",
-    "//components/supervised_user/core/common",
-    "//components/supervised_user/test_support",
     "//components/sync",
     "//components/sync:test_support",
     "//components/sync_device_info:test_support",
@@ -1927,7 +1908,6 @@ test("browser_tests") {
 
   public_deps = [
     "//chrome/browser/ui/tabs:tab_strip",
-    "//chrome/test/supervised_user:live_tests",
   ]
 
   if (use_aura) {
@@ -1998,7 +1978,6 @@ test("browser_tests") {
     "//chrome/browser/signin:signin_promo",
     "//chrome/browser/subscription_eligibility",
     "//chrome/browser/subscription_eligibility:browser_tests",
-    "//chrome/browser/supervised_user",
     "//chrome/browser/ui:browser_tab_strip",
     "//chrome/browser/ui/animation",
     "//chrome/browser/ui/extensions",
@@ -2511,20 +2490,10 @@ test("browser_tests") {
       "../browser/ui/views/profiles/profile_picker_sign_in_provider_browsertest.cc",
       "../browser/ui/views/profiles/profile_picker_utils_browsertest.cc",
       "../browser/ui/views/profiles/profile_picker_view_browsertest.cc",
-      "../browser/ui/views/supervised_user/parent_permission_dialog_view_browsertest.cc",
-      "../browser/ui/views/supervised_user/parent_permission_extension_flow_view_browsertest.cc",
     ]
-
-    # Extension approvals tests for Windows/Linux/Mac platforms only.
-    # ChromeOS has a different platform-specific approval flow.
-    # TODOO(crbug.com/437238062): Move this test to c/b/ui/extensions once
-    # tests are enabled on Android.
-    sources += [ "../browser/ui/supervised_user/extension_install_blocked_by_parent_dialog_browsertest.cc" ]
 
     deps += [
       "//chrome/browser:main_extra_parts",
-      "//chrome/browser/ui/supervised_user",
-      "//chrome/browser/ui/views/supervised_user",
     ]
   }
 
@@ -3077,9 +3046,6 @@ test("unit_tests") {
     "//chrome/browser/strike_database",
     "//chrome/browser/subresource_filter",
     "//chrome/browser/subresource_filter:unit_tests",
-    "//chrome/browser/supervised_user",
-    "//chrome/browser/supervised_user:test_support",
-    "//chrome/browser/supervised_user:unit_tests",
     "//chrome/browser/sync",
     "//chrome/browser/sync:unit_tests",
     "//chrome/browser/tab_group_sync",
@@ -3217,6 +3183,7 @@ test("unit_tests") {
     "//components/feed/core/v2:test_helpers",
     "//components/feedback",
     "//components/feedback/redaction_tool",
+    "//components/google/core/common",
     "//components/history/content/browser",
     "//components/history/core/browser:features",
     "//components/history/core/common",
@@ -3308,8 +3275,6 @@ test("unit_tests") {
     "//components/reporting/util:task_runner_context",
     "//components/reporting/util:test_callbacks_support",
     "//components/resources",
-    "//components/safe_search_api",
-    "//components/safe_search_api:test_support",
     "//components/saved_tab_groups/internal",
     "//components/saved_tab_groups/public",
     "//components/schema_org/common:improved_mojom",
@@ -3340,14 +3305,6 @@ test("unit_tests") {
     "//components/strings",
     "//components/subresource_filter/core/browser",
     "//components/subresource_filter/core/browser:test_support",
-    "//components/supervised_user/core/browser",
-    "//components/supervised_user/core/browser:device_parental_controls",
-    "//components/supervised_user/core/browser:fetcher",
-    "//components/supervised_user/core/browser:test_support",
-    "//components/supervised_user/core/browser/proto",
-    "//components/supervised_user/core/common",
-    "//components/supervised_user/core/common:buildflags",
-    "//components/supervised_user/test_support",
     "//components/sync:test_support",
     "//components/sync_bookmarks",
     "//components/sync_device_info:test_support",
@@ -3941,8 +3898,6 @@ test("unit_tests") {
     "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/browser/webauthn:test_support",
     "//chrome/browser/webauthn/proto",
-    "//chrome/common/read_anything:mojo_bindings",
-    "//chrome/services/readaloud:unit_tests",
     "//components/app_constants",
     "//components/application_locale_storage",
     "//components/color",
@@ -3972,7 +3927,6 @@ test("unit_tests") {
     "//components/services/app_service",
     "//components/session_proto_db",
     "//components/signin/public/base:signin_buildflags",
-    "//components/supervised_user/core/browser",
     "//components/sync:test_support",
     "//components/themes",
     "//components/themes:prefs",
@@ -4655,7 +4609,6 @@ static_library("test_support_ui") {
     "//chrome/test/interaction",
     "//chrome/test/permissions",
     "//components/autofill/content/browser:test_support",
-    "//components/supervised_user/core/browser",
     "//components/webui/chrome_urls",
     "//content/public/browser",
     "//content/test:test_support",
@@ -4745,7 +4698,6 @@ static_library("test_support_ui") {
     "//chrome/test/base:test_switches",
     "//chrome/test/data/webui:resources",
     "//chrome/test/data/webui/mojo:mojo_bindings",
-    "//chrome/test/supervised_user:child_accounts",
     "//chrome/test/views",
     "//components/account_id",
     "//components/autofill/content/browser",
@@ -4784,8 +4736,6 @@ static_library("test_support_ui") {
     "//components/signin/public/base",
     "//components/signin/public/identity_manager",
     "//components/storage_monitor:test_support",
-    "//components/supervised_user/core/browser/proto",
-    "//components/supervised_user/test_support",
     "//components/sync:test_support",
     "//components/user_education/test",
     "//components/user_education/views",
@@ -5017,7 +4967,6 @@ test("interactive_ui_tests") {
     "//chrome/browser/ssl:cert_verifier_test_support",
     "//chrome/browser/ssl:interactive_ui_tests",
     "//chrome/browser/status_icons",
-    "//chrome/browser/supervised_user:interactive_ui_tests",
     "//chrome/browser/sync",
     "//chrome/browser/sync/test/integration:sync_integration_test_support",
     "//chrome/browser/themes",
@@ -5124,10 +5073,7 @@ test("interactive_ui_tests") {
     "//chrome/test/base:chrome_test_launcher",
     "//chrome/test/media_router:browser_tests",
     "//chrome/test/media_router/access_code_cast:access_code_cast_integration_base",
-    "//chrome/test/supervised_user:live_tests",
-    "//chrome/test/supervised_user:test_support",
     "//chrome/test/user_education",
-    "//components/accessibility:reading",
     "//components/autofill/content/browser:test_support",
     "//components/autofill/core/common:credit_card_number_validation",
     "//components/back_forward_cache",

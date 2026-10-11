@@ -128,7 +128,6 @@ source_set("browser_tests") {
   sources += [
     "device_chooser_extension_browsertest.cc",
     "extension_install_dialog_view_browsertest.cc",
-    "extension_install_dialog_view_supervised_browsertest.cc",
     "extension_post_install_dialog_view_utils_browsertest.cc",
     "extensions_menu_entry_browsertest.cc",
     "extensions_menu_item_browsertest.cc",

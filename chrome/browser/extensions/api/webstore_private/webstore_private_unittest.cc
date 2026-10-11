@@ -20,7 +20,6 @@
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/test_extension_system.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/supervised_user/supervised_user_test_util.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
@@ -360,39 +359,6 @@ TEST_F(WebstorePrivateGetExtensionStatusTest, ExtensionCorrupted) {
   std::optional<base::Value> response = RunFunctionAndReturnValue(
       function.get(), GenerateArgs(kExtensionId, kExtensionManifest));
   VerifyResponse(ExtensionInstallStatus::kCorrupted, *response);
-}
-
-class SupervisedUserWebstorePrivateGetExtensionStatusTest
-    : public WebstorePrivateGetExtensionStatusTest {};
-
-TEST_F(SupervisedUserWebstorePrivateGetExtensionStatusTest,
-       ExtensionCustodianApprovalRequired) {
-  profile()->SetIsSupervisedProfile(true);
-
-  ExtensionRegistry::Get(profile())->AddDisabled(CreateExtension(kExtensionId));
-  ExtensionPrefs::Get(profile())->AddDisableReason(
-      kExtensionId, disable_reason::DISABLE_CUSTODIAN_APPROVAL_REQUIRED);
-  auto function =
-      base::MakeRefCounted<WebstorePrivateGetExtensionStatusFunction>();
-  std::optional<base::Value> response =
-      RunFunctionAndReturnValue(function.get(), GenerateArgs(kExtensionId));
-  VerifyResponse(ExtensionInstallStatus::kCustodianApprovalRequired, *response);
-}
-
-TEST_F(SupervisedUserWebstorePrivateGetExtensionStatusTest,
-       ExtensionCustodianApprovalRequiredForInstallation) {
-  profile()->SetIsSupervisedProfile(true);
-
-  auto function =
-      base::MakeRefCounted<WebstorePrivateGetExtensionStatusFunction>();
-  std::optional<base::Value> response =
-      RunFunctionAndReturnValue(function.get(), GenerateArgs(kExtensionId));
-
-  ASSERT_FALSE(
-      ExtensionRegistry::Get(profile())->GetInstalledExtension(kExtensionId));
-  VerifyResponse(
-      ExtensionInstallStatus::kCustodianApprovalRequiredForInstallation,
-      *response);
 }
 
 class WebstorePrivateBeginInstallWithManifest3Test

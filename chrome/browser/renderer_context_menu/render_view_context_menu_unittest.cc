@@ -597,22 +597,17 @@ TEST_F(RenderViewContextMenuPrefsTest,
       menu->GetMenuModelAndItemIndex(IDC_CONTENT_CONTEXT_PICTUREINPICTURE);
   ASSERT_TRUE(pip_item.has_value());
 
-  auto route_media_item = menu->GetMenuModelAndItemIndex(IDC_ROUTE_MEDIA);
   auto loop_item = menu->GetMenuModelAndItemIndex(IDC_CONTENT_CONTEXT_LOOP);
   ASSERT_TRUE(loop_item.has_value());
 
   // PiP should be somewhere BEFORE Loop and Controls when enabled.
   EXPECT_LT(pip_item->second, loop_item->second);
 
-  ASSERT_TRUE(route_media_item.has_value());
-  EXPECT_EQ(pip_item->second + 1, route_media_item->second);
-  // Ensure they have icons.
+  // Ensure it has an icon.
   EXPECT_FALSE(pip_item->first->GetIconAt(pip_item->second).IsEmpty());
-  EXPECT_FALSE(
-      route_media_item->first->GetIconAt(route_media_item->second).IsEmpty());
-  // Ensure there is a separator after them.
+  // Ensure there is a separator after it.
   EXPECT_EQ(ui::MenuModel::TYPE_SEPARATOR,
-            pip_item->first->GetTypeAt(route_media_item->second + 1));
+            pip_item->first->GetTypeAt(pip_item->second + 1));
 
   // Check that the Video Frame submenu exists.
   auto video_frame_menu =
@@ -1022,43 +1017,6 @@ TEST_F(RenderViewContextMenuPrefsTest, CopySelectionLabel) {
 
   EXPECT_NE(label.find(expected_selection), std::u16string::npos);
 }
-TEST_F(RenderViewContextMenuPrefsTest,
-       ReadingModeSidePanelContextMenuAllowlist) {
-  // Simulate a context menu request with page level options.
-  content::ContextMenuParams params = CreateParams(MenuItem::PAGE);
-  params.page_url = GURL(chrome::kChromeUIUntrustedReadAnythingSidePanelURL);
-
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.Init();
-
-  // Verify that unwanted page-level actions are suppressed.
-  EXPECT_FALSE(menu.IsItemPresent(IDC_BACK));
-  EXPECT_FALSE(menu.IsItemPresent(IDC_RELOAD));
-  EXPECT_FALSE(menu.IsItemPresent(IDC_SAVE_PAGE));
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_INSPECTELEMENT));
-}
-
-TEST_F(RenderViewContextMenuPrefsTest,
-       ReadingModeSidePanelKeepsApprovedLinkItems) {
-  // Simulate context-clicking an interactive link cleanly.
-  content::ContextMenuParams params = CreateParams(MenuItem::LINK);
-  params.page_url = GURL(chrome::kChromeUIUntrustedReadAnythingSidePanelURL);
-  params.unfiltered_link_url = params.link_url;
-
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  custom_handlers::ProtocolHandlerRegistry registry(profile()->GetPrefs(),
-                                                    nullptr);
-  menu.set_protocol_handler_registry(&registry);
-  menu.Init();
-
-  // Verify standard link context actions and inspection logic remain.
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWTAB));
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_OPENLINKNEWWINDOW));
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_COPYLINKLOCATION));
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_INSPECTELEMENT));
-}
 
 // Test FormatUrlForClipboard behavior
 // -------------------------------------------
@@ -1117,38 +1075,6 @@ TEST_P(FormatUrlForClipboardTest, FormatUrlForClipboard) {
   GURL url(param.input);
   const std::u16string result = FormatUrl(url);
   DCHECK_EQ(base::UTF8ToUTF16(param.output), result);
-}
-
-class RenderViewContextMenuListenToThisPageTest
-    : public RenderViewContextMenuPrefsTest {
- public:
-  RenderViewContextMenuListenToThisPageTest() = default;
-};
-
-TEST_F(RenderViewContextMenuListenToThisPageTest, MenuItemPresentWhenEnabled) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(features::kReadAnythingImprovedUi);
-
-  content::ContextMenuParams params = CreateParams(MenuItem::PAGE);
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetBrowser());
-  menu.Init();
-
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE));
-}
-
-TEST_F(RenderViewContextMenuListenToThisPageTest, MenuItemAbsentWhenDisabled) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndDisableFeature(features::kReadAnythingImprovedUi);
-
-  content::ContextMenuParams params = CreateParams(MenuItem::PAGE);
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetBrowser());
-  menu.Init();
-
-  EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE));
 }
 
 class ReentrantTestRenderViewContextMenu : public TestRenderViewContextMenu {
@@ -1284,49 +1210,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest, PureSelectionLayout) {
   EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_COPY));
   EXPECT_TRUE(menu.IsItemPresent(IDC_PRINT));
   EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-}
-
-TEST_F(RenderViewContextMenuMenuSimplificationTest, PageMenuSeparators) {
-  content::ContextMenuParams params = CreateParams(MenuItem::PAGE);
-
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetBrowser());
-  menu.Init();
-
-  const ui::MenuModel& model = menu.menu_model();
-
-  std::optional<size_t> print_index;
-  for (size_t i = 0; i < model.GetItemCount(); ++i) {
-    if (model.GetCommandIdAt(i) == IDC_PRINT) {
-      print_index = i;
-      break;
-    }
-  }
-
-  ASSERT_TRUE(print_index.has_value());
-
-  std::optional<size_t> next_item_index;
-  for (size_t i = print_index.value() + 1; i < model.GetItemCount(); ++i) {
-    int command_id = model.GetCommandIdAt(i);
-    if (command_id == IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE) {
-      next_item_index = i;
-      break;
-    }
-  }
-
-  ASSERT_TRUE(next_item_index.has_value());
-
-  bool found_separator = false;
-  for (size_t i = print_index.value() + 1; i < next_item_index.value(); ++i) {
-    if (model.GetTypeAt(i) == ui::MenuModel::TYPE_SEPARATOR) {
-      found_separator = true;
-      break;
-    }
-  }
-
-  EXPECT_TRUE(found_separator);
 }
 
 TEST_F(RenderViewContextMenuMenuSimplificationTest, LinkAndSelectionLayout) {

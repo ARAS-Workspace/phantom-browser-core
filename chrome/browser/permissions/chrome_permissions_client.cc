@@ -411,8 +411,7 @@ void ChromePermissionsClient::TriggerPromptHatsSurveyIfEnabled(
       kHatsSurveyTriggerPermissionsPrompt, std::move(hats_shown_callback),
       base::DoNothing(), survey_data.survey_bits_data,
       survey_data.survey_string_data, survey_parameters->supplied_trigger_id,
-      HatsService::SurveyOptions(survey_parameters->custom_survey_invitation,
-                                 survey_parameters->message_identifier));
+      HatsService::SurveyOptions(survey_parameters->custom_survey_invitation));
 }
 
 permissions::PermissionIgnoredReason

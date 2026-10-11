@@ -64,8 +64,6 @@
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
-#include "chrome/browser/ui/read_anything/read_anything_controller.h"
-#include "chrome/browser/ui/read_anything/read_anything_entry_point_controller.h"
 #include "chrome/browser/ui/side_panel/side_panel_entry_id.h"
 #include "chrome/browser/ui/side_panel/side_panel_ui.h"
 #include "chrome/browser/ui/singleton_tabs.h"
@@ -1290,20 +1288,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
           SidePanelEntryId::kReadingList, SidePanelOpenTrigger::kAppMenu);
       break;
 
-    case IDC_SHOW_READING_MODE_SIDE_PANEL: {
-      // Yes. This is a separate feature from the reading list.
-      read_anything::ReadAnythingEntryPointController::ShowUI(
-          browser_, read_anything::mojom::ReadAnythingOpenTrigger::kAppMenu);
-      break;
-    }
-
-    case IDC_SHOW_READING_MODE_KEYBOARD: {
-      read_anything::ReadAnythingEntryPointController::ToggleUI(
-          browser_,
-          read_anything::mojom::ReadAnythingOpenTrigger::kKeyboardShortcut);
-      break;
-    }
-
     case IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL: {
       ShowCustomizeChromeSidePanel(SidePanelOpenTrigger::kAppMenu,
                                    CustomizeChromeSection::kAppearance);
@@ -1584,9 +1568,6 @@ void BrowserCommandController::InitCommandState() {
   command_updater_->UpdateCommandEnabled(IDC_SHOW_COMMENTS_SIDE_PANEL, true);
   command_updater_->UpdateCommandEnabled(kFindAndEditMenuId, true);
   command_updater_->UpdateCommandEnabled(kSaveAndShareMenuId, true);
-  command_updater_->UpdateCommandEnabled(IDC_SHOW_READING_MODE_SIDE_PANEL,
-                                         false);
-  command_updater_->UpdateCommandEnabled(IDC_SHOW_READING_MODE_KEYBOARD, false);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
                                          true);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_CUSTOMIZE_CHROME_TOOLBAR,

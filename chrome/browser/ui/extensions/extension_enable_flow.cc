@@ -13,7 +13,6 @@
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profiles_state.h"
-#include "chrome/browser/supervised_user/supervised_user_browser_utils.h"
 #include "chrome/browser/ui/extensions/extension_enable_flow_delegate.h"
 #include "extensions/browser/api/management/management_api.h"
 #include "extensions/browser/extension_prefs.h"
@@ -88,27 +87,6 @@ void ExtensionEnableFlow::CheckPermissionAndMaybePromptUser() {
   const Extension* extension =
       registry->disabled_extensions().GetByID(extension_id_);
 
-  extensions::SupervisedUserExtensionsDelegate*
-      supervised_user_extensions_delegate =
-          extensions::ManagementAPI::GetFactoryInstance()
-              ->Get(profile_)
-              ->GetSupervisedUserExtensionsDelegate();
-  DCHECK(supervised_user_extensions_delegate);
-  if (supervised_user::AreExtensionsPermissionsEnabled(profile_) && extension &&
-
-      // Only ask for parent approval if the extension still requires approval.
-      !supervised_user_extensions_delegate->IsExtensionAllowedByParent(
-          *extension)) {
-    // Either ask for parent permission or notify the child that their parent
-    // has disabled this action.
-    auto extension_approval_callback =
-        base::BindOnce(&ExtensionEnableFlow::OnExtensionApprovalDone,
-                       weak_ptr_factory_.GetWeakPtr());
-    supervised_user_extensions_delegate->RequestToEnableExtensionOrShowError(
-        *extension, parent_contents_, std::move(extension_approval_callback));
-    return;
-  }
-
   bool abort =
       !extension ||
       // The extension might be force-disabled by policy.
@@ -154,24 +132,6 @@ void ExtensionEnableFlow::CreatePrompt(
           ? new ExtensionInstallPrompt(parent_contents_, std::move(prompt))
           : new ExtensionInstallPrompt(profile_, gfx::NativeWindow(),
                                        std::move(prompt)));
-}
-
-void ExtensionEnableFlow::OnExtensionApprovalDone(
-    extensions::SupervisedExtensionApprovalResult result) {
-  switch (result) {
-    case extensions::SupervisedExtensionApprovalResult::kApproved:
-      EnableExtension();
-      break;
-    case extensions::SupervisedExtensionApprovalResult::kCanceled:
-      delegate_->ExtensionEnableFlowAborted(
-          /*user_initiated=*/true);  // |delegate_| may delete us.
-      break;
-    case extensions::SupervisedExtensionApprovalResult::kFailed:
-    case extensions::SupervisedExtensionApprovalResult::kBlocked:
-      delegate_->ExtensionEnableFlowAborted(
-          /*user_initiated=*/false);  // |delegate_| may delete us.
-      break;
-  }
 }
 
 void ExtensionEnableFlow::StartObserving() {
@@ -225,20 +185,6 @@ void ExtensionEnableFlow::EnableExtension() {
     delegate_->ExtensionEnableFlowAborted(
         /*user_initiated=*/true);  // |delegate_| may delete us.
     return;
-  }
-  if (supervised_user::AreExtensionsPermissionsEnabled(profile_)) {
-    // We need to add parent approval first.
-    extensions::SupervisedUserExtensionsDelegate*
-        supervised_user_extensions_delegate =
-            extensions::ManagementAPI::GetFactoryInstance()
-                ->Get(profile_)
-                ->GetSupervisedUserExtensionsDelegate();
-    CHECK(supervised_user_extensions_delegate);
-    supervised_user_extensions_delegate->AddExtensionApproval(*extension);
-    supervised_user_extensions_delegate->MaybeRecordPermissionsIncreaseMetrics(
-        *extension);
-    supervised_user_extensions_delegate->RecordExtensionEnablementUmaMetrics(
-        /*enabled=*/true);
   }
   auto* registrar = extensions::ExtensionRegistrar::Get(profile_);
   registrar->GrantPermissionsAndEnableExtension(*extension);

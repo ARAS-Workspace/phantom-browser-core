@@ -53,7 +53,6 @@
 #include "components/signin/public/base/signin_pref_names.h"
 
 #include "components/language/core/browser/pref_names.h"
-#include "components/supervised_user/core/common/pref_names.h"
 #include "components/themes/pref_names.h"
 #include "components/url_formatter/url_fixer.h"
 #include "extensions/browser/extension_pref_value_map.h"
@@ -444,10 +443,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[::prefs::kImportDialogSavedPasswords] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kImportDialogSearchEngine] =
-      settings_api::PrefType::kBoolean;
-
-  // Supervised Users.  This setting is queried in our Tast tests (b/241943380).
-  (*s_allowlist)[::prefs::kSupervisedUserExtensionsMayRequestPermissions] =
       settings_api::PrefType::kBoolean;
 
   // This feature exists in all platforms but is enabled in ash above.

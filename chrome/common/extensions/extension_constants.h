@@ -187,25 +187,6 @@ enum AppLaunchBucket {
   APP_LAUNCH_BUCKET_INVALID
 };
 
-// The extension id of the helper extension for Reading Mode to work on Google
-// Docs.
-inline constexpr char kReadingModeGDocsHelperExtensionId[] =
-    "cjlaeehoipngghikfjogbdkpbdgebppb";
-// The path to the the helper extension for Reading Mode to work on Google Docs.
-inline constexpr char kReadingModeGDocsHelperExtensionPath[] = "accessibility";
-// The name of the manifest file for the extension that enables Reading Mode to
-// work on Google Docs.
-inline constexpr base::FilePath::CharType
-    kReadingModeGDocsHelperManifestFilename[] =
-        FILE_PATH_LITERAL("reading_mode_gdocs_helper_manifest.json");
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-// The extension id of the google tts engine extension to use on-device natural
-// Google voices.
-inline constexpr char kTTSEngineExtensionId[] =
-    "kfgdcmdikpmgdjhgfpbfgkomboamacbb";
-inline constexpr char kComponentUpdaterTTSEngineExtensionId[] =
-    "gjjabgpgjpampikjhjpfhneeoapjbjaf";
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 // The states that an app can be in, as reported by chrome.app.installState
 // and chrome.app.runningState.
@@ -238,11 +219,6 @@ inline constexpr auto kBuiltInFirstPartyExtensionIds =
         kGoogleSlidesAppId,
         kTextEditorAppId,
         kInAppPaymentsSupportAppId,
-        kReadingModeGDocsHelperExtensionId,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-        kTTSEngineExtensionId,
-        kComponentUpdaterTTSEngineExtensionId,
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     });
 
 }  // namespace extension_misc

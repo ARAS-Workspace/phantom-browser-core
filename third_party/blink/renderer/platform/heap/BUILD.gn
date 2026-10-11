@@ -134,7 +134,6 @@ test("blink_heap_unittests") {
 
   if (is_android) {
     deps += [
-      "//content/shell/android:content_shell_assets",
       "//net/android:net_java",
       "//ui/android:ui_full_java",
     ]
@@ -200,7 +199,6 @@ test("blink_heap_perftests") {
 
   if (is_android) {
     deps += [
-      "//content/shell/android:content_shell_assets",
       "//net/android:net_java",
       "//ui/android:ui_full_java",
     ]

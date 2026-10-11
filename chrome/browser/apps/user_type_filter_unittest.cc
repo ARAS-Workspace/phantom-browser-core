@@ -74,15 +74,6 @@ class UserTypeFilterTest : public testing::Test {
   content::BrowserTaskEnvironment task_environment_;
 };
 
-TEST_F(UserTypeFilterTest, ChildUser) {
-  const auto profile = CreateProfile();
-  profile->SetIsSupervisedProfile();
-  EXPECT_FALSE(Match(profile, CreateJsonWithFilter({kUserTypeUnmanaged})));
-  EXPECT_TRUE(Match(profile, CreateJsonWithFilter({kUserTypeChild})));
-  EXPECT_TRUE(Match(
-      profile, CreateJsonWithFilter({kUserTypeUnmanaged, kUserTypeChild})));
-}
-
 TEST_F(UserTypeFilterTest, GuestUser) {
   auto profile = CreateGuestProfile();
   EXPECT_FALSE(Match(profile, CreateJsonWithFilter({kUserTypeUnmanaged})));
@@ -119,9 +110,6 @@ TEST_F(UserTypeFilterTest, DefaultFilter) {
   EXPECT_TRUE(MatchDefault(profile, default_filter));
   // Guest user.
   EXPECT_TRUE(MatchDefault(CreateGuestProfile(), default_filter));
-  // Child user.
-  profile->SetIsSupervisedProfile();
-  EXPECT_FALSE(MatchDefault(profile, default_filter));
   // Managed user.
   profile = CreateProfile();
   profile->GetProfilePolicyConnector()->OverrideIsManagedForTesting(true);

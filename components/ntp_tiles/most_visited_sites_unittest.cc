@@ -39,7 +39,6 @@
 #include "components/ntp_tiles/section_type.h"
 #include "components/ntp_tiles/switches.h"
 #include "components/search/ntp_features.h"
-#include "components/supervised_user/core/common/buildflags.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
@@ -47,10 +46,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-#include "components/supervised_user/core/browser/supervised_user_preferences.h"
-#endif
 
 namespace ntp_tiles {
 
@@ -422,9 +417,6 @@ class MostVisitedSitesTest : public ::testing::Test {
 
   MostVisitedSitesTest() {
     MostVisitedSites::RegisterProfilePrefs(pref_service_.registry());
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-    supervised_user::RegisterProfilePrefs(pref_service_.registry());
-#endif
 
     feature_list_.InitAndDisableFeature(
         kNtpMostLikelyFaviconsFromServerFeature);
@@ -497,8 +489,7 @@ class MostVisitedSitesTest : public ::testing::Test {
 
     most_visited_sites_ = std::make_unique<MostVisitedSites>(
         &pref_service_, /*identity_manager=*/nullptr,
-        /*supervised_user_service=*/nullptr,
-        /*supervised_user_url_filtering_service=*/nullptr, mock_top_sites_,
+        mock_top_sites_,
         popular_sites_factory_.New(), std::move(mock_custom_links_manager),
         std::move(mock_enterprise_shortcuts_manager), std::move(icon_cacher));
   }
@@ -851,46 +842,6 @@ TEST_F(MostVisitedSitesTest, ShouldNotIncludeHomepageIfBlocked) {
                                                   /*max_num_sites=*/3);
   base::RunLoop().RunUntilIdle();
 }
-
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-TEST_F(MostVisitedSitesTest, ShouldPinHomepageAgainIfBlockedUndone) {
-  FakeHomepageClient* homepage_client = RegisterNewHomepageClient();
-  homepage_client->SetHomepageTileEnabled(true);
-  EXPECT_CALL(*mock_top_sites_, GetMostVisitedURLs(_))
-      .WillOnce(base::test::RunOnceCallback<0>(
-          (MostVisitedURLList{MakeMostVisitedURL(u"", kHomepageUrl)})));
-  EXPECT_CALL(*mock_top_sites_, SyncWithHistory());
-  EXPECT_CALL(*mock_top_sites_, IsBlocked(Eq(GURL(kHomepageUrl))))
-      .Times(AtLeast(1))
-      .WillRepeatedly(Return(true));
-  EXPECT_CALL(
-      mock_observer_,
-      OnURLsAvailable(
-          _, Contains(Pair(SectionType::PERSONALIZED,
-                           Not(Contains(MatchesTile(u"", kHomepageUrl,
-                                                    TileSource::HOMEPAGE)))))));
-
-  most_visited_sites_->AddMostVisitedURLsObserver(&mock_observer_,
-                                                  /*max_num_sites=*/3);
-  base::RunLoop().RunUntilIdle();
-  VerifyAndClearExpectations();
-  EXPECT_CALL(*mock_top_sites_, GetMostVisitedURLs(_))
-      .WillOnce(base::test::RunOnceCallback<0>(MostVisitedURLList{}));
-  EXPECT_CALL(*mock_top_sites_, IsBlocked(Eq(GURL(kHomepageUrl))))
-      .Times(AtLeast(1))
-      .WillRepeatedly(Return(false));
-  EXPECT_CALL(
-      mock_observer_,
-      OnURLsAvailable(
-          _, Contains(Pair(SectionType::PERSONALIZED,
-                           Contains(MatchesTile(u"", kHomepageUrl,
-                                                TileSource::HOMEPAGE))))));
-
-  most_visited_sites_->OnUrlFilteringServiceChanged();
-
-  base::RunLoop().RunUntilIdle();
-}
-#endif
 
 TEST_F(MostVisitedSitesTest, ShouldInformSuggestionSourcesWhenBlocked) {
   EXPECT_CALL(*mock_top_sites_, AddBlockedUrl(Eq(GURL(kHomepageUrl)))).Times(1);

@@ -145,6 +145,7 @@ source_set("test_support") {
     "//chrome/browser/policy:impl",
     "//chrome/browser/policy/messaging_layer/storage_selector",
     "//chrome/test:test_support",
+    "//components/google/core/common",
     "//components/policy/core/common",
     "//components/policy/core/common:common_constants",
     "//components/policy/core/common:test_support",
@@ -155,7 +156,6 @@ source_set("test_support") {
     "//components/reporting/util:status",
     "//components/reporting/util:status_macros",
     "//components/reporting/util:test_callbacks_support",
-    "//components/safe_search_api",
     "//components/security_interstitials/content:security_interstitial_page",
     "//url",
   ]
@@ -524,6 +524,7 @@ source_set("platform_browser_tests") {
     "//base",
     "//chrome/test:test_support",
     "//components/enterprise:test_support",
+    "//components/history/core/common",
     "//components/policy/core/browser",
     "//components/policy/core/browser:pref_mapping_test_support",
     "//components/policy/core/common",

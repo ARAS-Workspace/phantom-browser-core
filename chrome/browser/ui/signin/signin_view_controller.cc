@@ -46,7 +46,6 @@
 #include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/tribool.h"
-#include "components/supervised_user/core/common/features.h"
 #include "components/sync/base/data_type_histogram.h"
 #include "components/sync/base/features.h"
 #include "content/public/browser/navigation_entry.h"
@@ -868,13 +867,6 @@ void SigninViewController::SignoutOrReauthWithPromptWithUnsyncedDataTypes(
           unsynced_data_count, is_bookmarks_limit_exceeded, needs_reauth);
   auto extended_account_info =
       identity_manager->FindExtendedAccountInfoByAccountId(primary_account_id);
-  if (base::FeatureList::IsEnabled(
-          supervised_user::kEnableSupervisedUserVersionSignOutDialog) &&
-      extended_account_info.GetAccountCapabilities()
-              .is_subject_to_parental_controls() == signin::Tribool::kTrue) {
-    prompt_variant =
-        ChromeSignoutConfirmationPromptVariant::kProfileWithParentalControls;
-  }
 
   switch (prompt_variant) {
     case ChromeSignoutConfirmationPromptVariant::kNoUnsyncedData:

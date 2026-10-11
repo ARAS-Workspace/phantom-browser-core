@@ -292,7 +292,6 @@
 #include "components/site_isolation/preloaded_isolated_origins.h"
 #include "components/site_isolation/site_isolation_policy.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
-#include "components/supervised_user/core/common/features.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/variations/variations_associated_data.h"
 #include "components/variations/variations_switches.h"
@@ -738,20 +737,6 @@ blink::mojom::AutoplayPolicy DetermineWebContentsAutoplayPolicy(
     observer->SetPolicyStatus(PolicyStatus::kAllowedByEnterprisePolicy);
     return blink::mojom::AutoplayPolicy::kNoUserGestureRequired;
   }
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // If a user requests Read Aloud audio playbaback through the "Listen to this
-  // page" entry point in the context menu, page distillation and TTS engine
-  // readiness may take longer than the user gesture timeout. Thus, we allow
-  // Autoplay when the host is Reading Mode since the user explicitly requested
-  // audio playback when clicking the context menu entry point.
-  if (web_contents->GetLastCommittedURL().SchemeIs(
-          content::kChromeUIUntrustedScheme) &&
-      web_contents->GetLastCommittedURL().host() ==
-          chrome::kChromeUIUntrustedReadAnythingSidePanelHost) {
-    return blink::mojom::AutoplayPolicy::kNoUserGestureRequired;
-  }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // If we can show a setting to disable autoplay policy and are currently set
   // to `kDocumentUserActivationRequired`, return the user preference.

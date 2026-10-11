@@ -34,7 +34,6 @@ source_set("renderer_context_menu") {
     "//chrome/common:mojo_bindings",
     "//components/custom_handlers",
     "//components/renderer_context_menu",
-    "//components/supervised_user/core/browser",
     "//content/public/browser",
     "//content/public/common:buildflags",
     "//extensions/buildflags",
@@ -80,8 +79,6 @@ source_set("impl") {
   ]
 
   sources += [
-    "context_menu_content_type_read_anything.cc",
-    "context_menu_content_type_read_anything.h",
     "dictation_menu_observer.cc",
     "link_to_text_menu_observer.cc",
     "render_view_context_menu.cc",
@@ -303,7 +300,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/toasts",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
-    "//chrome/test/supervised_user:test_support",
     "//components/enterprise/data_controls/core/browser:test_support",
     "//components/send_tab_to_self",
     "//components/send_tab_to_self:features",

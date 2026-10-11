@@ -26,7 +26,6 @@
 -PrintBrowserTest.NoResizeEvent
 -PrintBrowserTest.NoScrolling
 -ProfilePickerEnterpriseCreationFlowBrowserTest.CreateSignedInProfileWithSuggestedTwoFactorAuthSetup
--ReadAnythingReadAloudPhraseHighlightingMochaTest.*
 -SessionRestoreTest.RestoredTabsHaveCorrectInitialSize
 
 #################################################

@@ -6,7 +6,6 @@
 
 #include "base/command_line.h"
 #include "build/build_config.h"
-#include "chrome/test/supervised_user/child_account_test_utils.h"
 #include "google_apis/gaia/gaia_constants.h"
 #include "google_apis/gaia/gaia_id.h"
 #include "google_apis/gaia/gaia_switches.h"
@@ -73,49 +72,6 @@ void FakeGaiaMixin::SetupFakeGaiaForLoginWithDefaults() {
   SetupFakeGaiaForLogin(FakeGaiaMixin::kFakeUserEmail,
                         FakeGaiaMixin::kFakeUserGaiaId,
                         FakeGaiaMixin::kFakeRefreshToken);
-}
-
-void FakeGaiaMixin::SetupFakeGaiaForChildUser(const std::string& user_email,
-                                              const GaiaId& gaia_id,
-                                              const std::string& refresh_token,
-                                              bool issue_any_scope_token) {
-  if (!gaia_id.empty()) {
-    fake_gaia_->MapEmailToGaiaId(user_email, gaia_id);
-  }
-
-  FakeGaia::AccessTokenInfo user_info_token;
-  user_info_token.scopes.insert(GaiaConstants::kDeviceManagementServiceOAuth);
-  user_info_token.scopes.insert(GaiaConstants::kGoogleUserInfoEmail);
-  user_info_token.audience = GaiaUrls::GetInstance()->oauth2_chrome_client_id();
-
-  user_info_token.token = "fake-userinfo-token";
-  user_info_token.expires_in = kFakeAccessTokenExpiration;
-  user_info_token.email = user_email;
-  if (initialize_child_id_token()) {
-    user_info_token.id_token = supervised_user::GetChildAccountOAuthIdToken();
-  }
-  fake_gaia_->IssueOAuthToken(refresh_token, user_info_token);
-
-  if (issue_any_scope_token) {
-    FakeGaia::AccessTokenInfo all_scopes_token;
-    all_scopes_token.token = kFakeAllScopeAccessToken;
-    all_scopes_token.audience =
-        GaiaUrls::GetInstance()->oauth2_chrome_client_id();
-    all_scopes_token.expires_in = kFakeAccessTokenExpiration;
-    all_scopes_token.email = user_email;
-    all_scopes_token.any_scope = true;
-    fake_gaia_->IssueOAuthToken(refresh_token, all_scopes_token);
-  }
-
-  if (initialize_configuration()) {
-    fake_gaia_->SetConfigurationHelper(user_email, kFakeSIDCookie,
-                                       kFakeLSIDCookie);
-
-    FakeGaia::Configuration configuration_update;
-    configuration_update.id_token =
-        supervised_user::GetChildAccountOAuthIdToken();
-    fake_gaia_->UpdateConfiguration(configuration_update);
-  }
 }
 
 GURL FakeGaiaMixin::GetFakeGaiaURL(const std::string& relative_url) {

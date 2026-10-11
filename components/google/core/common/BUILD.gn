@@ -9,6 +9,8 @@ static_library("common") {
     "google_tld_list.h",
     "google_util.cc",
     "google_util.h",
+    "safe_search_util.cc",
+    "safe_search_util.h",
   ]
 
   public_deps = [
@@ -25,12 +27,19 @@ static_library("common") {
 source_set("unit_tests") {
   testonly = true
 
-  sources = [ "google_util_unittest.cc" ]
+  sources = [
+    "google_util_unittest.cc",
+    "safe_search_util_unittest.cc",
+  ]
 
   deps = [
     ":common",
     "//base",
     "//base/test:test_support",
+    "//net",
+    "//net/traffic_annotation:test_support",
+    "//testing/gmock",
     "//testing/gtest",
+    "//url",
   ]
 }

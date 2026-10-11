@@ -111,11 +111,7 @@ IN_PROC_BROWSER_TEST_F(CustomizeToolbarHandlerBrowserTest, ListActions) {
   EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kShowBookmarks));
   EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kShowReadAnything));
-  EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kShowReadingList));
-  EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kShowLensOverlay));
   EXPECT_TRUE(
       contains_action(side_panel::customize_chrome::mojom::ActionId::kHome));
   EXPECT_TRUE(
@@ -123,17 +119,9 @@ IN_PROC_BROWSER_TEST_F(CustomizeToolbarHandlerBrowserTest, ListActions) {
   EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kNewIncognitoWindow));
   EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kShowPasswordManager));
-  EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kShowPaymentMethods));
-  EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kShowAddresses));
-  EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kClearBrowsingData));
   EXPECT_TRUE(
       contains_action(side_panel::customize_chrome::mojom::ActionId::kPrint));
-  EXPECT_TRUE(contains_action(
-      side_panel::customize_chrome::mojom::ActionId::kShowTranslate));
   EXPECT_TRUE(contains_action(
       side_panel::customize_chrome::mojom::ActionId::kSendTabToSelf));
   EXPECT_TRUE(contains_action(

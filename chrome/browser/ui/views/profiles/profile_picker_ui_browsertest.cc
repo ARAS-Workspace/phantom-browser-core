@@ -33,7 +33,7 @@
 #include "components/signin/public/base/signin_buildflags.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
-#include "components/supervised_user/test_support/supervised_user_signin_test_utils.h"
+#include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_navigation_observer.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -200,8 +200,12 @@ void SetSigninProfileProperties(Profile* profile,
       account_info = signin::MakePrimaryAccountAvailable(
           identity_manager, "joejunior@gmail.com",
           signin::ConsentLevel::kSignin);
-      supervised_user::UpdateSupervisionStatusForAccount(
-          account_info, identity_manager, true);
+      AccountCapabilitiesTestMutator mutator(&account_info);
+      mutator.set_is_subject_to_parental_controls(true);
+      account_info = AccountInfo::Builder(account_info)
+                         .SetIsChildAccount(signin::Tribool::kTrue)
+                         .Build();
+      signin::UpdateAccountInfoForAccount(identity_manager, account_info);
       break;
     }
     case ProfileStatus::kSignedInGradientRing: {

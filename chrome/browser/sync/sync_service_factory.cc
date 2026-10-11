@@ -39,8 +39,6 @@
 #include "chrome/browser/security_events/security_event_recorder_factory.h"
 #include "chrome/browser/signin/about_signin_internals_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/supervised_user/family_link_settings_service_factory.h"
-#include "chrome/browser/supervised_user/supervised_user_service_factory.h"
 #include "chrome/browser/sync/account_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/chrome_sync_client.h"
 #include "chrome/browser/sync/chrome_sync_controller_builder.h"
@@ -208,11 +206,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
       SessionSyncServiceFactory::GetForProfile(profile));
   builder.SetTabContextSyncService(
       TabContextSyncServiceFactory::GetForProfile(profile));
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-  builder.SetFamilyLinkSettingsService(
-      supervised_user::FamilyLinkSettingsServiceFactory::GetForKey(
-          profile->GetProfileKey()));
-#endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
   builder.SetUserEventService(
       browser_sync::UserEventServiceFactory::GetForProfile(profile));
   builder.SetNotebooksService(
@@ -266,8 +259,6 @@ std::unique_ptr<syncer::SyncClient> BuildSyncClient(Profile* profile) {
       TrustedVaultServiceFactory::GetForProfile(profile),
       DeviceInfoSyncServiceFactory::GetForProfile(profile),
       DataTypeStoreServiceFactory::GetForProfile(profile),
-      supervised_user::FamilyLinkSettingsServiceFactory::GetForKey(
-          profile->GetProfileKey()),
       std::make_unique<browser_sync::ExtensionsActivityMonitor>(profile));
 }
 
@@ -443,7 +434,6 @@ SyncServiceFactory::SyncServiceFactory()
 
   DependsOn(SecurityEventRecorderFactory::GetInstance());
   DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());
-  DependsOn(supervised_user::FamilyLinkSettingsServiceFactory::GetInstance());
   DependsOn(SessionSyncServiceFactory::GetInstance());
   DependsOn(TabContextSyncServiceFactory::GetInstance());
   DependsOn(TemplateURLServiceFactory::GetInstance());

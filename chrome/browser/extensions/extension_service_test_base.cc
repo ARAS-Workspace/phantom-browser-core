@@ -161,10 +161,6 @@ TestingProfile* BuildTestingProfile(
     }
   }
 
-  if (params.profile_is_supervised) {
-    profile_builder.SetIsSupervisedProfile();
-  }
-
   if (params.profile_is_guest) {
     profile_builder.SetGuestSession();
   }

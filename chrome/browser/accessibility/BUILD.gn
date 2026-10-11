@@ -15,7 +15,6 @@ source_set("accessibility") {
     "ax_main_node_annotator_controller.h",
     "ax_main_node_annotator_controller_factory.h",
     "caption_settings_dialog.h",
-    "embedded_a11y_extension_loader.h",
     "invert_bubble_prefs.h",
     "page_colors_controller.h",
     "page_colors_controller_factory.h",
@@ -56,7 +55,6 @@ source_set("impl") {
   sources += [
     "ax_main_node_annotator_controller.cc",
     "ax_main_node_annotator_controller_factory.cc",
-    "embedded_a11y_extension_loader.cc",
     "invert_bubble_prefs.cc",
     "page_colors_controller.cc",
     "page_colors_controller_factory.cc",
@@ -131,10 +129,6 @@ source_set("browser_tests") {
     "interstitial_accessibility_browsertest.cc",
     "page_colors_controller_browsertest.cc",
   ]
-
-  if (enable_extensions) {
-    sources += [ "embedded_a11y_extension_loader_browsertest.cc" ]
-  }
 
   deps = [
     ":accessibility",

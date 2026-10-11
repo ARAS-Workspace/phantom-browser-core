@@ -15,7 +15,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "components/supervised_user/core/common/buildflags.h"
 #include "components/sync/base/data_type.h"
 
 class GoogleGroupsManager;
@@ -84,10 +83,6 @@ class SendTabToSelfSyncService;
 namespace signin {
 class IdentityManager;
 }  // namespace signin
-
-namespace supervised_user {
-class FamilyLinkSettingsService;
-}  // namespace supervised_user
 
 namespace sync_bookmarks {
 class BookmarkSyncService;
@@ -196,11 +191,6 @@ class CommonControllerBuilder {
   void SetTabContextSyncService(
       sync_tab_context::TabContextSyncService* tab_context_sync_service);
 
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-  void SetFamilyLinkSettingsService(
-      supervised_user::FamilyLinkSettingsService* family_link_settings_service);
-#endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
-
   void SetTabGroupSyncService(
       tab_groups::TabGroupSyncService* tab_group_sync_service);
   void SetTemplateURLService(TemplateURLService* template_url_service);
@@ -296,11 +286,6 @@ class CommonControllerBuilder {
   std::unique_ptr<syncer::DataTypeController> CreateJourneyDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateWebauthnCredentialDataTypeController(syncer::SyncService* sync_service);
-#if BUILDFLAG(ENABLE_SUPERVISED_USERS)
-  std::unique_ptr<syncer::DataTypeController>
-  CreateFamilyLinkSettingsDataTypeController(syncer::SyncService* sync_service,
-                                             version_info::Channel channel);
-#endif
   std::unique_ptr<syncer::DataTypeController>
   CreateCollaborationGroupDataTypeController(syncer::SyncService* sync_service);
 
@@ -385,8 +370,6 @@ class CommonControllerBuilder {
   SafeOptional<raw_ptr<sync_bookmarks::BookmarkSyncService>>
       account_bookmark_sync_service_;
   SafeOptional<raw_ptr<bookmarks::BookmarkModel>> bookmark_model_;
-  SafeOptional<raw_ptr<supervised_user::FamilyLinkSettingsService>>
-      family_link_settings_service_;
   SafeOptional<raw_ptr<collaboration::CollaborationService>>
       collaboration_service_;
   SafeOptional<raw_ptr<data_sharing::personal_collaboration_data::

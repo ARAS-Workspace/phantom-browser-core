@@ -63,7 +63,6 @@ class NativeMessagePort;
 class NativeMessagePortDispatcher;
 class NonNativeFileSystemDelegate;
 class RulesCacheDelegate;
-class SupervisedUserExtensionsDelegate;
 class UsbDevicePermissionsPrompt;
 class ValueStoreCache;
 class VirtualKeyboardDelegate;
@@ -178,12 +177,6 @@ class ExtensionsAPIClient {
 
   // Creates a delegate for handling the management extension api.
   virtual ManagementAPIDelegate* CreateManagementAPIDelegate() const;
-
-  // Creates a delegate for calling into the SupervisedUserService from the
-  // Management API.
-  virtual std::unique_ptr<SupervisedUserExtensionsDelegate>
-  CreateSupervisedUserExtensionsDelegate(
-      content::BrowserContext* browser_context) const;
 
   // Creates and returns the DisplayInfoProvider used by the
   // chrome.system.display extension API.

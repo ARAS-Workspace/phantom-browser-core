@@ -62,8 +62,6 @@
 #include "chrome/browser/sessions/session_restore.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_util.h"
-#include "chrome/browser/supervised_user/supervised_user_service_factory.h"
-#include "chrome/browser/supervised_user/supervised_user_test_util.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -92,13 +90,12 @@
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
 #include "chrome/test/base/search_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "chrome/test/supervised_user/embedded_test_server_setup_mixin.h"
-#include "chrome/test/supervised_user/supervision_mixin.h"
 #include "components/enterprise/data_controls/core/browser/features.h"
 #include "components/enterprise/data_controls/core/browser/rule.h"
 #include "components/enterprise/data_controls/core/browser/test_utils.h"
 #include "components/guest_view/browser/guest_view_manager_delegate.h"
 #include "components/guest_view/browser/test_guest_view_manager.h"
+#include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/pdf/browser/pdf_frame_util.h"
 #include "components/policy/core/browser/url_list/url_list_policy_pref_names.h"
 #include "components/policy/core/common/policy_pref_names.h"
@@ -111,9 +108,6 @@
 #include "components/send_tab_to_self/features.h"
 #include "components/send_tab_to_self/stub_send_tab_to_self_sync_service.h"
 #include "components/services/app_service/public/cpp/app_launch_params.h"
-#include "components/supervised_user/core/browser/supervised_user_service.h"
-#include "components/supervised_user/core/common/pref_names.h"
-#include "components/supervised_user/test_support/kids_management_api_server_mock.h"
 #include "components/tabs/public/split_tab_data.h"
 #include "content/public/browser/browser_plugin_guest_manager.h"
 #include "content/public/browser/browser_thread.h"
@@ -734,126 +728,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
   EXPECT_FALSE(menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_SAVEAVAS));
 }
 
-class ContextMenuForSupervisedUsersBrowserTest
-    : public ContextMenuBrowserTestBase {
- protected:
-  supervised_user::SupervisedUserService* GetSupervisedUserService() {
-    return supervised_user::SupervisedUserServiceFactory::GetForProfile(browser()->GetProfile());
-  }
-
-  supervised_user::KidsManagementApiServerMock& kids_management_api_mock() {
-    return supervision_mixin_.api_mock_setup_mixin().api_mock();
-  }
-
- private:
-  // Supervision mixin hooks kids management api (including ClassifyUrl) onto
-  // given embedded test server. This server is run in separate process and is
-  // responding to all requests as configured in this mixin.
-  // MUST be declared after scoped_feature_list_ due to Init/dtor order.
-  supervised_user::SupervisionMixin supervision_mixin_{
-      mixin_host_,
-      this,
-      embedded_test_server(),
-      {
-          .sign_in_mode =
-              supervised_user::SupervisionMixin::SignInMode::kSupervised,
-      }};
-};
-
-IN_PROC_BROWSER_TEST_F(ContextMenuForSupervisedUsersBrowserTest,
-                       SaveLinkAsEntryIsDisabledForUrlsNotAccessibleForChild) {
-  supervised_user_test_util::SetManualFilterForHost(
-      browser()->GetProfile(), "www.google.com", /*allowlist=*/false);
-
-  base::RunLoop().RunUntilIdle();
-
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuMediaTypeNone(GURL("http://www.google.com/"),
-                                     GURL("http://www.google.com/"));
-
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SAVELINKAS));
-  EXPECT_FALSE(menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_SAVELINKAS));
-}
-
-IN_PROC_BROWSER_TEST_F(
-    ContextMenuForSupervisedUsersBrowserTest,
-    SaveLinkAsEntryIsDisabledForUrlsBlockedByAsyncCheckerForChild) {
-  ContextMenuWaiter menu_observer;
-
-  kids_management_api_mock().RestrictSubsequentClassifyUrl();
-  EXPECT_CALL(kids_management_api_mock().classify_url_mock(), ClassifyUrl)
-      .Times(1);
-  base::RunLoop().RunUntilIdle();
-
-  ASSERT_TRUE(embedded_test_server()->Started());
-  GURL url(embedded_test_server()->GetURL("/download-anchor-same-origin.html"));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  // Open a context menu.
-  blink::WebMouseEvent mouse_event(
-      blink::WebInputEvent::Type::kMouseDown,
-      blink::WebInputEvent::kNoModifiers,
-      blink::WebInputEvent::GetStaticTimeStampForTests());
-  mouse_event.button = blink::WebMouseEvent::Button::kRight;
-  mouse_event.SetPositionInWidget(15, 15);
-  content::WebContents* tab =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  tab->GetPrimaryMainFrame()
-      ->GetRenderViewHost()
-      ->GetWidget()
-      ->ForwardMouseEvent(mouse_event);
-  mouse_event.SetType(blink::WebInputEvent::Type::kMouseUp);
-  tab->GetPrimaryMainFrame()
-      ->GetRenderViewHost()
-      ->GetWidget()
-      ->ForwardMouseEvent(mouse_event);
-
-  // Wait for context menu to be visible.
-  menu_observer.WaitForMenuOpenAndClose();
-
-  ASSERT_EQ(u"", menu_observer.params().suggested_filename);
-}
-
-IN_PROC_BROWSER_TEST_F(
-    ContextMenuForSupervisedUsersBrowserTest,
-    SaveLinkAsEntryIsEnabledForUrlsAllowedByAsyncCheckerForChild) {
-  ContextMenuWaiter menu_observer;
-
-  kids_management_api_mock().AllowSubsequentClassifyUrl();
-  EXPECT_CALL(kids_management_api_mock().classify_url_mock(), ClassifyUrl)
-      .Times(1);
-
-  base::RunLoop().RunUntilIdle();
-
-  ASSERT_TRUE(embedded_test_server()->Started());
-  GURL url(embedded_test_server()->GetURL("/download-anchor-same-origin.html"));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  // Open a context menu.
-  blink::WebMouseEvent mouse_event(
-      blink::WebInputEvent::Type::kMouseDown,
-      blink::WebInputEvent::kNoModifiers,
-      blink::WebInputEvent::GetStaticTimeStampForTests());
-  mouse_event.button = blink::WebMouseEvent::Button::kRight;
-  mouse_event.SetPositionInWidget(15, 15);
-  content::WebContents* tab =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  tab->GetPrimaryMainFrame()
-      ->GetRenderViewHost()
-      ->GetWidget()
-      ->ForwardMouseEvent(mouse_event);
-  mouse_event.SetType(blink::WebInputEvent::Type::kMouseUp);
-  tab->GetPrimaryMainFrame()
-      ->GetRenderViewHost()
-      ->GetWidget()
-      ->ForwardMouseEvent(mouse_event);
-
-  // Wait for context menu to be visible.
-  menu_observer.WaitForMenuOpenAndClose();
-
-  ASSERT_EQ(u"test_filename.png", menu_observer.params().suggested_filename);
-}
-
 IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenEntryPresentForNormalURLs) {
   std::unique_ptr<TestRenderViewContextMenu> menu =
       CreateContextMenuMediaTypeNone(GURL("http://www.google.com/"),
@@ -947,41 +821,6 @@ class DataControlsContextMenuBrowserTest : public ContextMenuBrowserTest {
         data_controls::kDataControlsSearchWith);
   }
 
-  std::unique_ptr<TestRenderViewContextMenu> SetUpReadingModeAndCreateMenu(
-      const std::string& data_controls_rule) {
-    EXPECT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));
-
-    TemplateURLService* model =
-        TemplateURLServiceFactory::GetForProfile(browser()->GetProfile());
-    EXPECT_NE(model, nullptr);
-    search_test_utils::WaitForTemplateURLServiceToLoad(model);
-
-    data_controls::SetDataControls(browser()->GetProfile()->GetPrefs(),
-                                   {data_controls_rule});
-
-    auto* const side_panel_ui = browser()->GetFeatures().side_panel_ui();
-    EXPECT_TRUE(side_panel_ui);
-    side_panel_ui->Show(SidePanelEntryId::kReadAnything);
-    auto* const web_contents =
-        side_panel_ui->GetWebContentsForTest(SidePanelEntryId::kReadAnything);
-    EXPECT_TRUE(web_contents);
-
-    content::ContextMenuParams params;
-    params.media_type = blink::mojom::ContextMenuDataMediaType::kNone;
-    params.selection_text = u"Google";
-    params.page_url = web_contents->GetVisibleURL();
-    params.source_type = ui::mojom::MenuSourceType::kMouse;
-    params.properties[prefs::kDefaultSearchProviderContextMenuAccessAllowed] =
-        "";
-
-    auto menu = std::make_unique<TestRenderViewContextMenu>(
-        *web_contents->GetPrimaryMainFrame(), params);
-    menu->SetBrowser(browser());
-    menu->Init();
-
-    return menu;
-  }
-
   std::unique_ptr<TestRenderViewContextMenu> SetUpVideoAndCreateMenu(
       const std::string& data_controls_rule) {
     EXPECT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));
@@ -1040,44 +879,6 @@ class DataControlsContextMenuBrowserTest : public ContextMenuBrowserTest {
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
-
-IN_PROC_BROWSER_TEST_F(DataControlsContextMenuBrowserTest,
-                       DataControlsSearchWith_ReadingModeBlock) {
-  auto menu = SetUpReadingModeAndCreateMenu(R"({
-      "name": "block",
-      "rule_id": "987",
-      "sources": {"urls": ["*"]},
-      "restrictions": [{"class": "CLIPBOARD", "level": "BLOCK"}]
-  })");
-
-  EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
-}
-
-IN_PROC_BROWSER_TEST_F(DataControlsContextMenuBrowserTest,
-                       DataControlsSearchWith_ReadingModeWarn) {
-  base::HistogramTester histogram_tester;
-  auto menu = SetUpReadingModeAndCreateMenu(R"({
-      "name": "warn",
-      "rule_id": "987",
-      "sources": {"urls": ["*"]},
-      "restrictions": [{"class": "CLIPBOARD", "level": "WARN"}]
-  })");
-
-  EXPECT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
-
-  data_controls::DesktopDataControlsDialogTestHelper helper(
-      data_controls::DataControlsDialog::Type::kClipboardActionWarn);
-
-  menu->ExecuteCommand(IDC_CONTENT_CONTEXT_SEARCHWEBFOR, /*event_flags=*/0);
-
-  helper.WaitForDialogToInitialize();
-  helper.CloseDialogWithoutBypass();
-  helper.WaitForDialogToClose();
-
-  histogram_tester.ExpectUniqueSample(
-      "Enterprise.DataControls.SearchWith.Verdict",
-      data_controls::Rule::Level::kWarn, 1);
-}
 
 IN_PROC_BROWSER_TEST_F(DataControlsContextMenuBrowserTest,
                        DataControlsSearchWith_VideoBlock) {
@@ -2422,52 +2223,6 @@ IN_PROC_BROWSER_TEST_P(ContextMenuBrowserTestMenuSimplification,
 
   EXPECT_TRUE(IsItemPresent(menu.get(), IDC_CONTENT_CONTEXT_PICTUREINPICTURE));
   EXPECT_TRUE(IsItemChecked(menu.get(), IDC_CONTENT_CONTEXT_PICTUREINPICTURE));
-}
-
-IN_PROC_BROWSER_TEST_P(ContextMenuBrowserTestMenuSimplification,
-                       OpenInReadingMode) {
-  // Open in reading mode is an option when non-editable text is selected.
-  std::unique_ptr<TestRenderViewContextMenu> menu =
-      CreateContextMenuForTextInWebContents(u"selection text");
-  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-
-  // Open in reading mode is an option for editables menus when menu
-  // simplification is disabled.
-  content::ContextMenuParams params;
-  params.is_editable = true;
-  menu =
-      std::make_unique<TestRenderViewContextMenu>(*browser()
-                                                       ->tab_strip_model()
-                                                       ->GetActiveWebContents()
-                                                       ->GetPrimaryMainFrame(),
-                                                  params);
-  menu->Init();
-  if (GetParam()) {
-    ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-  } else {
-    ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-  }
-  // Open in reading mode is NOT an option for links.
-  menu = CreateContextMenuMediaTypeNone(GURL("http://www.google.com/"),
-                                        GURL("http://www.google.com/"));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-
-  // Open in reading mode is NOT an option for <image>.
-  menu = CreateContextMenuMediaTypeImage(GURL("http://url.com/image.png"));
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-
-  // Open in reading mode is NOT an option for <video>.
-  menu = CreateContextMenu(GURL("http://www.example.com/"),
-                           GURL("http://www.example.com/foo.mp4"), u"",
-                           blink::mojom::ContextMenuDataMediaType::kVideo,
-                           ui::mojom::MenuSourceType::kMouse);
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-
-  // Open in reading mode is NOT an option for <canvas>.
-  params = content::ContextMenuParams();
-  params.media_type = blink::mojom::ContextMenuDataMediaType::kCanvas;
-  menu = CreateContextMenuFromParams(params);
-  ASSERT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
 }
 
 // This test checks that we don't crash when creating a context menu for a

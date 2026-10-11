@@ -94,19 +94,9 @@ IN_PROC_BROWSER_TEST_F(ConsentDialogUiTest, MAYBE_GetConsentDialogBodyTest) {
   entry->SetIsManaged(signin::Tribool::kTrue);
   entry->SetHostedDomain("hosteddomain.com");
 
-  // Simulate a supervised profile.
-  TestingProfile::Builder builder_supervised;
-  builder_supervised.SetIsSupervisedProfile();
-  std::unique_ptr<TestingProfile> profile_supervised =
-      builder_supervised.Build();
-
   EXPECT_EQ(GetExpectedBodyText(), GetDialogBodyTextFromProfile(profile.get()));
   EXPECT_EQ(GetExpectedBodyText("example.com"),
             GetDialogBodyTextFromProfile(profile_with_domain.get()));
   EXPECT_EQ(GetExpectedBodyText("hosteddomain.com"),
             GetDialogBodyTextFromProfile(profile_with_hosted_domain));
-  // Enterprise management takes precedence over supervision in the management
-  // UI.
-  EXPECT_EQ(GetExpectedBodyText(),
-            GetDialogBodyTextFromProfile(profile_supervised.get()));
 }

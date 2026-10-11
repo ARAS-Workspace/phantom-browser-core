@@ -21,7 +21,6 @@ include_rules = [
   "+components/saved_tab_groups/internal/saved_tab_group_model_observer.h",
   "+components/saved_tab_groups/internal/tab_group_sync_service_impl.h",
   "+components/saved_tab_groups/test_support",
-  "+components/supervised_user/core/common",
   "+components/tab_groups",
   "+components/user_education/common",
   "+components/user_education/test",

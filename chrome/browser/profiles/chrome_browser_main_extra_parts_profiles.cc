@@ -211,11 +211,6 @@
 #include "chrome/browser/storage_access_api/storage_access_api_service_factory.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/subscription_eligibility/subscription_eligibility_service_factory.h"
-#include "chrome/browser/supervised_user/child_accounts/child_account_service_factory.h"
-#include "chrome/browser/supervised_user/child_accounts/list_family_members_service_factory.h"
-#include "chrome/browser/supervised_user/supervised_user_metrics_service_factory.h"
-#include "chrome/browser/supervised_user/supervised_user_service_factory.h"
-#include "chrome/browser/supervised_user/supervised_user_url_filtering_service_factory.h"
 #include "chrome/browser/sync/account_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/data_type_store_service_factory.h"
 #include "chrome/browser/sync/local_or_syncable_bookmark_sync_service_factory.h"
@@ -288,7 +283,6 @@
 // Per-platform #include blocks, in alphabetical order.
 
 #include "chrome/browser/accessibility/ax_main_node_annotator_controller_factory.h"
-#include "chrome/browser/accessibility/phrase_segmentation/dependency_parser_model_loader_factory.h"
 #include "chrome/browser/accessibility/tree_fixing/ax_tree_fixing_services_router_factory.h"
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
 #include "chrome/browser/badging/badge_manager_factory.h"
@@ -319,7 +313,6 @@
 #include "chrome/browser/ui/global_media_controls/media_notification_service_factory.h"
 #include "chrome/browser/ui/media_router/media_router_ui_service_factory.h"
 #include "chrome/browser/ui/performance_controls/performance_controls_hats_service_factory.h"
-#include "chrome/browser/ui/read_anything/read_anything_service_factory.h"
 #include "chrome/browser/ui/views/profiles/avatar_toolbar_button_state_manager.h"
 #include "chrome/browser/ui/waap/initial_webui_profile_service_factory.h"
 #include "chrome/browser/ui/waap/waap_ui_metrics_service_factory.h"
@@ -573,7 +566,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
   CaptivePortalServiceFactory::GetInstance();
 #endif
-  ChildAccountServiceFactory::GetInstance();
   chrome_browser_net::DnsProbeServiceFactory::GetInstance();
   chrome_colors::ChromeColorsFactory::GetInstance();
   ChromeBrowsingDataLifetimeManagerFactory::GetInstance();
@@ -612,7 +604,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   data_sharing::DataSharingServiceFactory::GetInstance();
   data_sharing::personal_collaboration_data::
       PersonalCollaborationDataServiceFactory::GetInstance();
-  DependencyParserModelLoaderFactory::GetInstance();
   DevToolsAndroidBridge::Factory::GetInstance();
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   DiceMigrationServiceFactory::GetInstance();
@@ -835,7 +826,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   ProtocolHandlerRegistryFactory::GetInstance();
   ProviderStateServiceFactory::GetInstance();
-  ReadAnythingServiceFactory::GetInstance();
   ReadingListModelFactory::GetInstance();
   record_replay::TaskStoreFactory::GetInstance();
   record_replay::TaskParametersExtractorFactory::GetInstance();
@@ -890,10 +880,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   SubresourceFilterProfileContextFactory::GetInstance();
   subscription_eligibility::SubscriptionEligibilityServiceFactory::
       GetInstance();
-  supervised_user::ListFamilyMembersServiceFactory::GetInstance();
-  SupervisedUserMetricsServiceFactory::GetInstance();
-  supervised_user::SupervisedUserServiceFactory::GetInstance();
-  supervised_user::SupervisedUserUrlFilteringServiceFactory::GetInstance();
   SyncServiceFactory::GetInstance();
   tab_groups::TabGroupSyncServiceFactory::GetInstance();
   TabRestoreServiceFactory::GetInstance();

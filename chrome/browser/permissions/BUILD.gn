@@ -98,7 +98,6 @@ source_set("permissions") {
     "//components/segmentation_platform/internal:optimization_guide_segmentation_handler",
     "//components/site_engagement/content",
     "//components/subresource_filter/content/browser",
-    "//components/supervised_user/core/common:features",
     "//components/unified_consent",
     "//components/vector_icons",
     "//content/public/browser",

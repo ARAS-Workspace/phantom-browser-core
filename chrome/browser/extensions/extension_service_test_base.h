@@ -72,7 +72,6 @@ class ExtensionServiceTestBase : public testing::Test {
     bool autoupdate_enabled = false;
     bool extensions_enabled = true;
     bool is_first_run = true;
-    bool profile_is_supervised = false;
     bool profile_is_guest = false;
     bool enable_bookmark_model = false;
 

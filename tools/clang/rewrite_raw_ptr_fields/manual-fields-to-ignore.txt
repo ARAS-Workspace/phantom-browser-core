@@ -400,8 +400,6 @@ safe_browsing::ConnectorDataPipeGetter::InternalMemoryMappedFile::data_
 ScreenshotArea::window
 ExtensionSettingsOverriddenDialog::Params::icon
 ProfileMenuViewBase::EditButtonParams::edit_icon
-ReadAnythingLineSpacingModel::LineSpacingInfo::icon_asset
-ReadAnythingLetterSpacingModel::LetterSpacingInfo::icon_asset
 ToolbarButton::VectorIcons::icon
 ToolbarButton::VectorIcons::touch_icon
 named_system_lock::ScopedLockImpl::mutex_

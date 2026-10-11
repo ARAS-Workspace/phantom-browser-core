@@ -88,28 +88,9 @@ class FakeGaiaMixin : public InProcessBrowserTestMixin {
   // Set up fake gaia for the login code with default values.
   void SetupFakeGaiaForLoginWithDefaults();
 
-  // Sets up fake gaia to serve access tokens for a child user.
-  // *   Maps `user_email` to `gaia_id`. If `gaia_id` is empty, `user_email`
-  //     will be mapped to kDefaultGaiaId in FakeGaia.
-  // *   Issues user info token scoped for device management service.
-  // *   If `issue_any_scope_token`, issues a special all-access token
-  //     associated with the test refresh token (as it's done in
-  //     SetupFakeGaiaForLogin()).
-  // *   Initializes fake merge session as needed.
-  void SetupFakeGaiaForChildUser(const std::string& user_email,
-                                 const GaiaId& gaia_id,
-                                 const std::string& refresh_token,
-                                 bool issue_any_scope_token);
-
   bool initialize_configuration() { return initialize_configuration_; }
   void set_initialize_configuration(bool value) {
     initialize_configuration_ = value;
-  }
-
-  bool initialize_child_id_token() { return initialize_child_id_token_; }
-
-  void set_initialize_child_id_token(bool value) {
-    initialize_child_id_token_ = value;
   }
 
   FakeGaia* fake_gaia() { return fake_gaia_.get(); }
@@ -129,7 +110,6 @@ class FakeGaiaMixin : public InProcessBrowserTestMixin {
 
   std::unique_ptr<FakeGaia> fake_gaia_;
   bool initialize_configuration_ = true;
-  bool initialize_child_id_token_ = false;
 };
 
 #endif  // CHROME_TEST_BASE_FAKE_GAIA_MIXIN_H_
