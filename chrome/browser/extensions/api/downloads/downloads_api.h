@@ -14,7 +14,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
 #include "base/time/time.h"
-#include "chrome/browser/download/download_danger_prompt.h"
 #include "chrome/common/extensions/api/downloads.h"
 #include "components/download/content/public/all_download_item_notifier.h"
 #include "components/download/public/common/download_path_reservation_tracker.h"
@@ -198,20 +197,8 @@ class DownloadsAcceptDangerFunction : public DownloadsFunction {
 
   ResponseAction RunInternal() override;
 
-  // Sets the action to take when a danger prompt is shown in tests. The
-  // returned AutoReset restores the previous value, which is an empty
-  // optional if it hasn't been set.
-  [[nodiscard]] static base::AutoReset<
-      std::optional<DownloadDangerPrompt::Action>>
-  TriggerDangerPromptActionForTesting(DownloadDangerPrompt::Action action);
-
  protected:
   ~DownloadsAcceptDangerFunction() override;
-  void DangerPromptCallback(int download_id,
-                            DownloadDangerPrompt::Action action);
-
- private:
-  void PromptOrWait(int download_id, int retries);
 };
 
 class DownloadsShowFunction : public DownloadsFunction {

@@ -39,12 +39,10 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/download/download_core_service.h"
 #include "chrome/browser/download/download_core_service_factory.h"
-#include "chrome/browser/download/download_danger_prompt.h"
 #include "chrome/browser/download/download_file_icon_extractor.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/download/download_query.h"
 #include "chrome/browser/download/download_stats.h"
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/extensions/api/downloads/download_extension_errors.h"
 #include "chrome/browser/extensions/chrome_extension_function_details.h"
 #include "chrome/browser/extensions/window_controller.h"
@@ -66,7 +64,6 @@
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/browser/event_router.h"
-#include "extensions/browser/extension_function_dispatcher.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/install_prefs_helper.h"
 #include "extensions/browser/warning_service.h"
@@ -141,9 +138,6 @@ const char kFinalUrlRegexKey[] = "finalUrlRegex";
 
 // Whether the "open" dialog should be accepted without showing it on tests.
 bool g_accept_open_dialog_for_testing = false;
-
-// Action to trigger for the "danger" dialog without showing it on tests.
-std::optional<DownloadDangerPrompt::Action> g_danger_prompt_action_for_testing;
 
 extensions::api::downloads::DangerType ConvertDangerType(
     download::DownloadDangerType danger) {
@@ -1441,112 +1435,15 @@ ExtensionFunction::ResponseAction DownloadsAcceptDangerFunction::RunInternal() {
   std::optional<downloads::AcceptDanger::Params> params =
       downloads::AcceptDanger::Params::Create(args());
   EXTENSION_FUNCTION_VALIDATE(params);
-  PromptOrWait(params->download_id, 10);
-  return RespondLater();
-}
-
-// static
-base::AutoReset<std::optional<DownloadDangerPrompt::Action>>
-DownloadsAcceptDangerFunction::TriggerDangerPromptActionForTesting(
-    DownloadDangerPrompt::Action action) {
-  CHECK_IS_TEST();
-  return base::AutoReset<std::optional<DownloadDangerPrompt::Action>>(
-      &g_danger_prompt_action_for_testing, action);
-}
-
-void DownloadsAcceptDangerFunction::PromptOrWait(int download_id, int retries) {
   DownloadItem* download_item = GetDownload(
-      browser_context(), include_incognito_information(), download_id);
-  // We have a WeakPtr to the ExtensionFunctionDispatcher, so remove the
-  // download if it's invalid. This indicates the owning WebContents has
-  // been destroyed, so we can't proceed.
-  ExtensionFunctionDispatcher* const extension_dispatcher = dispatcher();
-  content::WebContents* web_contents = GetSenderWebContents();
-  if (!extension_dispatcher || !web_contents) {
-    download_item->Remove();
-    Respond(NoArguments());
-    return;
-  }
-  std::string error;
-  if (InvalidId(download_item, &error) ||
-      Fault(download_item->GetState() != DownloadItem::IN_PROGRESS,
-            download_extension_errors::kNotInProgress, &error) ||
-      Fault(!download_item->IsDangerous(),
-            download_extension_errors::kNotDangerous, &error) ||
-      Fault(!web_contents, download_extension_errors::kInvisibleContext,
-            &error)) {
-    Respond(Error(std::move(error)));
-    return;
-  }
-  bool visible = platform_util::IsVisible(web_contents->GetNativeView());
-  if (!visible) {
-    if (retries > 0) {
-      base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-          FROM_HERE,
-          base::BindOnce(&DownloadsAcceptDangerFunction::PromptOrWait, this,
-                         download_id, retries - 1),
-          base::Milliseconds(100));
-      return;
-    }
-    Respond(Error(download_extension_errors::kInvisibleContext));
-    return;
-  }
-  RecordApiFunctions(DownloadsFunctionName::kDownloadsFunctionAcceptDanger);
-
-  // For testing, callers can use TriggerDangerPromptActionForTesting() to
-  // pre-determine the dialog's result. This bypasses showing the dialog.
-  if (g_danger_prompt_action_for_testing.has_value()) {
-    CHECK_IS_TEST();
-    DangerPromptCallback(download_id, *g_danger_prompt_action_for_testing);
-    return;
-  }
-
-  ShowDownloadDangerDialog(
-      download_item, web_contents,
-      base::BindOnce(&DownloadsAcceptDangerFunction::DangerPromptCallback, this,
-                     download_id));
-  // Function finishes in DangerPromptCallback().
-}
-
-void DownloadsAcceptDangerFunction::DangerPromptCallback(
-    int download_id,
-    DownloadDangerPrompt::Action action) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  DownloadItem* download_item = GetDownload(
-      browser_context(), include_incognito_information(), download_id);
+      browser_context(), include_incognito_information(), params->download_id);
   std::string error;
   if (InvalidId(download_item, &error) ||
       Fault(download_item->GetState() != DownloadItem::IN_PROGRESS,
             download_extension_errors::kNotInProgress, &error)) {
-    Respond(Error(std::move(error)));
-    return;
+    return RespondNow(Error(std::move(error)));
   }
-
-  const bool accept = action == DownloadDangerPrompt::ACCEPT;
-  // If this download is no longer dangerous, is already canceled or
-  // completed, don't send any report.
-  if (download_item->IsDangerous() && !download_item->IsDone()) {
-    // Log here for "Shown" unconditionally, and for "Proceed" iff the dialog
-    // was accepted. This assumes the dialog cannot be dismissed once it is
-    // shown without taking some action on it.
-    RecordDownloadDangerPromptHistogram("Shown", *download_item);
-    if (accept) {
-      RecordDownloadDangerPromptHistogram("Proceed", *download_item);
-    }
-    DownloadDangerPrompt::RecordDownloadWarningEvent(action, download_item);
-  }
-
-  switch (action) {
-    case DownloadDangerPrompt::ACCEPT:
-      download_item->ValidateDangerousDownload();
-      break;
-    case DownloadDangerPrompt::CANCEL:
-      download_item->Remove();
-      break;
-    case DownloadDangerPrompt::DISMISS:
-      break;
-  }
-  Respond(NoArguments());
+  return RespondNow(Error(download_extension_errors::kNotDangerous));
 }
 
 DownloadsShowFunction::DownloadsShowFunction() = default;

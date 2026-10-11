@@ -29,7 +29,7 @@ import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {MojomData} from './data.js';
 import {browserProxyFactory} from './downloads.mojom-webui.js';
 import type {BrowserProxy} from './downloads.mojom-webui.js';
-import {DangerType, SafeBrowsingState, State, TailoredWarningType} from './downloads.mojom-webui.js';
+import {DangerType, State} from './downloads.mojom-webui.js';
 import {IconLoaderImpl} from './icon_loader.js';
 import {getCss} from './item.css.js';
 import {getHtml} from './item.html.js';
@@ -50,9 +50,7 @@ const DownloadsItemElementBase = I18nMixinLit(FocusRowMixinLit(CrLitElement));
  */
 enum DisplayType {
   NORMAL,
-  DANGEROUS,
   SUSPICIOUS,
-  UNVERIFIED,
   INSECURE,
   ERROR,
 }
@@ -200,7 +198,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
       case State.kInProgress:
       case State.kCancelled:
       case State.kPaused:
-      case State.kDangerous:
       case State.kInterrupted:
       case State.kInsecure:
         return false;
@@ -355,7 +352,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
       case State.kCancelled:
       case State.kComplete:
       case State.kPaused:
-      case State.kDangerous:
       case State.kInterrupted:
         break;
       default:
@@ -370,20 +366,14 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
     }
 
     switch (this.data.dangerType) {
-      // Mimics logic in download_ui_model.cc for downloads with danger_type
-      // DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE.
+      case DangerType.kNoApplicableDangerType:
       case DangerType.kDangerousFile:
-        return this.data.hasSafeBrowsingVerdict ? DisplayType.SUSPICIOUS :
-                                                  DisplayType.UNVERIFIED;
       case DangerType.kDangerousUrl:
       case DangerType.kDangerousContent:
       case DangerType.kCookieTheft:
       case DangerType.kDangerousHost:
       case DangerType.kPotentiallyUnwanted:
-        return DisplayType.DANGEROUS;
       case DangerType.kUncommonContent:
-        return DisplayType.SUSPICIOUS;
-      case DangerType.kNoApplicableDangerType:
       case DangerType.kAsyncScanning:
       case DangerType.kAsyncLocalPasswordScanning:
       case DangerType.kSensitiveContentWarning:
@@ -405,12 +395,8 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
 
   protected computeSaveDangerousLabel_(): string {
     switch (this.displayType_) {
-      case DisplayType.DANGEROUS:
-        return this.i18n('controlKeepDangerous');
       case DisplayType.SUSPICIOUS:
         return this.i18n('controlKeepSuspicious');
-      case DisplayType.UNVERIFIED:
-        return this.i18n('controlKeepUnverified');
       case DisplayType.INSECURE:
         return this.i18n('controlKeepInsecure');
       case DisplayType.NORMAL:
@@ -457,60 +443,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
         }
       case State.kInsecure:
         return loadTimeData.getString('insecureDownloadDesc');
-      case State.kDangerous:
-        switch (data.dangerType) {
-          case DangerType.kNoApplicableDangerType:
-            return '';
-          case DangerType.kDangerousFile:
-            return data.safeBrowsingState ===
-                    SafeBrowsingState.kNoSafeBrowsing ?
-                loadTimeData.getString('noSafeBrowsingDesc') :
-                loadTimeData.getString('dangerFileDesc');
-          case DangerType.kDangerousUrl:
-          case DangerType.kDangerousContent:
-          case DangerType.kDangerousHost:
-            return loadTimeData.getString('dangerDownloadDesc');
-          case DangerType.kCookieTheft:
-            switch (data.tailoredWarningType) {
-              case TailoredWarningType.kCookieTheft:
-                return loadTimeData.getString('dangerDownloadCookieTheft');
-              case TailoredWarningType.kSuspiciousArchive:
-              case TailoredWarningType.kNoApplicableTailoredWarningType:
-                return loadTimeData.getString('dangerDownloadDesc');
-              default:
-                assertNotReached('Unhandled TailoredWarningType encountered');
-            }
-          case DangerType.kUncommonContent:
-            switch (data.tailoredWarningType) {
-              case TailoredWarningType.kSuspiciousArchive:
-                return loadTimeData.getString(
-                    'dangerUncommonSuspiciousArchiveDesc');
-              case TailoredWarningType.kCookieTheft:
-              case TailoredWarningType.kNoApplicableTailoredWarningType:
-                return loadTimeData.getString('dangerUncommonDesc');
-              default:
-                assertNotReached('Unhandled TailoredWarningType encountered');
-            }
-          case DangerType.kPotentiallyUnwanted:
-            return loadTimeData.getString('dangerSettingsDesc');
-          case DangerType.kAsyncScanning:
-          case DangerType.kAsyncLocalPasswordScanning:
-          case DangerType.kBlockedPasswordProtected:
-          case DangerType.kBlockedTooLarge:
-            return '';
-          case DangerType.kSensitiveContentWarning:
-            return loadTimeData.getString('sensitiveContentWarningDesc');
-          case DangerType.kSensitiveContentBlock:
-          case DangerType.kDeepScannedFailed:
-          case DangerType.kDeepScannedSafe:
-          case DangerType.kDeepScannedOpenedDangerous:
-          case DangerType.kBlockedScanFailed:
-          case DangerType.kForcedSaveToGdrive:
-          case DangerType.kForcedSaveToOnedrive:
-            return '';
-          default:
-            assertNotReached('Unhandled DangerType encountered');
-        }
       case State.kInProgress:
       case State.kPaused:  // Fallthrough.
         return data.progressStatusText;
@@ -562,12 +494,8 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
 
   protected computeIconAriaLabel_(): string {
     switch (this.displayType_) {
-      case DisplayType.DANGEROUS:
-        return this.i18n('accessibleLabelDangerous');
       case DisplayType.INSECURE:
         return this.i18n('accessibleLabelInsecure');
-      case DisplayType.UNVERIFIED:
-        return this.i18n('accessibleLabelUnverified');
       case DisplayType.SUSPICIOUS:
         return this.i18n('accessibleLabelSuspicious');
       case DisplayType.NORMAL:
@@ -580,11 +508,9 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
 
   protected iconAndDescriptionColor_(): string {
     switch (this.displayType_) {
-      case DisplayType.DANGEROUS:
       case DisplayType.ERROR:
         return 'red';
       case DisplayType.INSECURE:
-      case DisplayType.UNVERIFIED:
       case DisplayType.SUSPICIOUS:
         return 'grey';
       case DisplayType.NORMAL:
@@ -597,12 +523,7 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
   protected computeIcon_(): string {
     if (this.data) {
       switch (this.displayType_) {
-        case DisplayType.DANGEROUS:
-          return loadTimeData.getBoolean('webuiRoundedIconsEnabled') ?
-              'downloads:dangerous-filled' :
-              'downloads:dangerous-old';
         case DisplayType.INSECURE:
-        case DisplayType.UNVERIFIED:
         case DisplayType.SUSPICIOUS:
           return 'cr:warning-filled';
         case DisplayType.ERROR:
@@ -647,11 +568,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
           assertNotReached('Unhandled DangerType encountered');
       }
     }
-    if (this.isDangerous_) {
-      return loadTimeData.getBoolean('webuiRoundedIconsEnabled') ?
-          'downloads:dangerous-filled' :
-          'downloads:dangerous-old';
-    }
     if (!this.useFileIcon_) {
       return 'cr:draft-filled';
     }
@@ -661,9 +577,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
   protected computeIconColor_(): string {
     if (this.data) {
       return this.iconAndDescriptionColor_();
-    }
-    if (this.isDangerous_) {
-      return 'red';
     }
     if (!this.useFileIcon_) {
       return 'light-grey';
@@ -685,7 +598,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
       case State.kCancelled:
       case State.kInterrupted:
       case State.kPaused:
-      case State.kDangerous:
       case State.kInsecure:
         return false;
       default:
@@ -698,7 +610,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
       return false;
     }
     switch (this.data.state) {
-      case State.kDangerous:
       case State.kInsecure:
         return true;
       case State.kInProgress:
@@ -754,7 +665,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
         return true;
       case State.kCancelled:
       case State.kComplete:
-      case State.kDangerous:
       case State.kInterrupted:
       case State.kInsecure:
         return false;
@@ -772,7 +682,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
       case State.kCancelled:
       case State.kComplete:
       case State.kPaused:
-      case State.kDangerous:
       case State.kInterrupted:
       case State.kInsecure:
         return this.showCancel_ && this.data.percent >= -1;
@@ -826,7 +735,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
             '';
       case State.kInProgress:
       case State.kPaused:
-      case State.kDangerous:
       case State.kInsecure:
         return '';
       default:
@@ -947,11 +855,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
     return this.data ? this.data.id : '';
   }
 
-  protected onReviewDangerousClick_() {
-    this.browserProxy_.handler.reviewDangerousRequiringGesture(this.dataId_());
-    this.getMoreActionsMenu().close();
-  }
-
   protected onDragstart_(e: Event) {
     e.preventDefault();
     this.browserProxy_.handler.drag(this.dataId_());
@@ -1049,7 +952,7 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
   protected onRemoveClick_(e: Event) {
     assert(this.data);
     this.browserProxy_.handler.remove(this.data.id);
-    const canUndo = !this.data.isDangerous && !this.data.isInsecure;
+    const canUndo = !this.data.isInsecure;
     this.displayRemovedToast_(canUndo, e);
     this.getMoreActionsMenu().close();
   }
@@ -1059,24 +962,14 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
     this.getMoreActionsMenu().close();
   }
 
-  private notifySaveDangerousClick_() {
-    this.fire('save-dangerous-click', {id: this.dataId_()});
-  }
-
   protected onSaveDangerousClick_() {
     this.getMoreActionsMenu().close();
-
-    if (this.displayType_ === DisplayType.DANGEROUS) {
-      this.notifySaveDangerousClick_();
-      return;
-    }
 
     // "Suspicious" types which show up in grey can be validated directly.
     // This maps each such display type to its applicable screenreader
     // announcement string id.
     const SAVED_FROM_PAGE_TYPES_ANNOUNCEMENTS = new Map([
       [DisplayType.SUSPICIOUS, 'screenreaderSavedSuspicious'],
-      [DisplayType.UNVERIFIED, 'screenreaderSavedUnverified'],
       [DisplayType.INSECURE, 'screenreaderSavedInsecure'],
     ]);
     assert(SAVED_FROM_PAGE_TYPES_ANNOUNCEMENTS.has(this.displayType_));

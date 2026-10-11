@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import type {IconLoader, MojomData, PageHandlerInterface} from 'chrome://downloads/downloads.js';
-import {DangerType, SafeBrowsingState, State, TailoredWarningType} from 'chrome://downloads/downloads.js';
+import {DangerType, State} from 'chrome://downloads/downloads.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
 export class FakePageHandler extends TestBrowserProxy implements
@@ -11,20 +11,9 @@ export class FakePageHandler extends TestBrowserProxy implements
   constructor() {
     super([
       'discardDangerous',
-      'recordCancelBypassWarningDialog',
-      'recordOpenBypassWarningDialog',
       'remove',
-      'saveDangerousFromDialogRequiringGesture',
       'saveSuspiciousRequiringGesture',
     ]);
-  }
-
-  recordCancelBypassWarningDialog(id: string) {
-    this.methodCalled('recordCancelBypassWarningDialog', id);
-  }
-
-  recordOpenBypassWarningDialog(id: string) {
-    this.methodCalled('recordOpenBypassWarningDialog', id);
   }
 
   remove(id: string) {
@@ -33,10 +22,6 @@ export class FakePageHandler extends TestBrowserProxy implements
 
   discardDangerous(id: string) {
     this.methodCalled('discardDangerous', id);
-  }
-
-  saveDangerousFromDialogRequiringGesture(id: string) {
-    this.methodCalled('saveDangerousFromDialogRequiringGesture', id);
   }
 
   saveSuspiciousRequiringGesture(id: string) {
@@ -87,7 +72,6 @@ export function createDownload(config?: Partial<MojomData>): MojomData {
         fileUrl: 'file:///some/file/path',
         hideDate: false,
         id: '123',
-        isDangerous: false,
         isInsecure: false,
         isReviewable: false,
         lastReasonText: '',
@@ -102,13 +86,9 @@ export function createDownload(config?: Partial<MojomData>): MojomData {
         sinceString: 'Today',
         started: Date.now() - 10000,
         state: State.kComplete,
-        tailoredWarningType:
-            TailoredWarningType.kNoApplicableTailoredWarningType,
         total: -1,
         url: 'http://permission.site',
         displayInitiatorOrigin: 'http://permission.site',
-        safeBrowsingState: SafeBrowsingState.kStandardProtection,
-        hasSafeBrowsingVerdict: true,
       },
       config || {});
 }

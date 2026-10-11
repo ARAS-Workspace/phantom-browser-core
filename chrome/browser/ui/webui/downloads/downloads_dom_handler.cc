@@ -14,7 +14,6 @@
 #include "base/functional/callback_helpers.h"
 #include "base/i18n/rtl.h"
 #include "base/logging.h"
-#include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
@@ -23,13 +22,10 @@
 #include "base/threading/thread.h"
 #include "base/values.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/download/download_danger_prompt.h"
 #include "chrome/browser/download/download_history.h"
 #include "chrome/browser/download/download_item_model.h"
-#include "chrome/browser/download/download_item_warning_data.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/download/download_query.h"
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/drag_download_item.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
@@ -40,7 +36,6 @@
 #include "chrome/browser/ui/webui/fileicon_source.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/url_constants.h"
-#include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/download_item.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/prefs/pref_service.h"
@@ -67,9 +62,6 @@ using content::BrowserThread;
 
 namespace {
 
-using WarningAction = DownloadItemWarningData::WarningAction;
-using WarningSurface = DownloadItemWarningData::WarningSurface;
-
 enum DownloadsDOMEvent {
   DOWNLOADS_DOM_EVENT_GET_DOWNLOADS = 0,
   DOWNLOADS_DOM_EVENT_OPEN_FILE = 1,
@@ -89,9 +81,9 @@ enum DownloadsDOMEvent {
   // Obsolete: DOWNLOADS_DOM_EVENT_DEEP_SCAN = 15,
   // Obsolete: DOWNLOADS_DOM_EVENT_BYPASS_DEEP_SCAN = 16,
   DOWNLOADS_DOM_EVENT_SAVE_SUSPICIOUS = 17,
-  DOWNLOADS_DOM_EVENT_OPEN_BYPASS_WARNING_PROMPT = 18,
-  DOWNLOADS_DOM_EVENT_SAVE_DANGEROUS_FROM_PROMPT = 19,
-  DOWNLOADS_DOM_EVENT_CANCEL_BYPASS_WARNING_PROMPT = 20,
+  // Obsolete: DOWNLOADS_DOM_EVENT_OPEN_BYPASS_WARNING_PROMPT = 18,
+  // Obsolete: DOWNLOADS_DOM_EVENT_SAVE_DANGEROUS_FROM_PROMPT = 19,
+  // Obsolete: DOWNLOADS_DOM_EVENT_CANCEL_BYPASS_WARNING_PROMPT = 20,
   DOWNLOADS_DOM_EVENT_OPEN_SURVEY_ON_DANGEROUS_INTERSTITIAL = 21,
   DOWNLOADS_DOM_EVENT_MAX
 };
@@ -99,38 +91,6 @@ enum DownloadsDOMEvent {
 void CountDownloadsDOMEvents(DownloadsDOMEvent event) {
   UMA_HISTOGRAM_ENUMERATION("Download.DOMEvent", event,
                             DOWNLOADS_DOM_EVENT_MAX);
-}
-
-bool CanLogWarningMetrics(download::DownloadItem* file) {
-  return file && file->IsDangerous() && !file->IsDone();
-}
-
-// Records DownloadItemWarningData.
-// This should be called when the user takes a bypass action (either proceed or
-// cancel).
-void MaybeReportBypassAction(download::DownloadItem* file,
-                             WarningSurface surface,
-                             WarningAction action) {
-  CHECK(file);
-  CHECK(file->IsDangerous());
-  CHECK(!file->IsDone());
-  CHECK(surface == WarningSurface::DOWNLOADS_PAGE ||
-        surface == WarningSurface::DOWNLOAD_PROMPT);
-  CHECK(action == WarningAction::PROCEED || action == WarningAction::CANCEL ||
-        action == WarningAction::DISCARD || action == WarningAction::KEEP);
-  // If this is called from the DOWNLOADS_PAGE, the action must be proceed,
-  // discard, or keep. There is no cancellation action on the page, because
-  // there's no prompt to cancel.
-  CHECK(surface != WarningSurface::DOWNLOADS_PAGE ||
-        action != WarningAction::CANCEL);
-
-  DownloadItemWarningData::AddWarningActionEvent(file, surface, action);
-}
-
-void RecordDownloadsPageValidatedHistogram(download::DownloadItem* item) {
-  base::UmaHistogramEnumeration(
-      "Download.UserValidatedDangerousDownload.DownloadsPage",
-      item->GetDangerType(), download::DOWNLOAD_DANGER_TYPE_MAX);
 }
 
 }  // namespace
@@ -228,8 +188,7 @@ void DownloadsDOMHandler::Drag(const std::string& id) {
   }
 }
 
-// "Suspicious" in this context applies to insecure as well as dangerous
-// downloads of certain danger types.
+// "Suspicious" in this context applies to insecure downloads.
 void DownloadsDOMHandler::SaveSuspiciousRequiringGesture(
     const std::string& id) {
   if (!GetWebUIWebContents()->HasRecentInteraction()) {
@@ -244,83 +203,14 @@ void DownloadsDOMHandler::SaveSuspiciousRequiringGesture(
     return;
   }
 
-  // If a download is insecure, validate that first. Is most cases, insecure
-  // download warnings will occur first, but in the worst case scenario, we show
-  // a dangerous warning twice. That's better than showing an insecure download
-  // warning, then dismissing the dangerous download warning. Since insecure
-  // downloads triggering the UI are temporary and rare to begin with, this
-  // should very rarely occur.
   if (file->IsInsecure()) {
     // `file` is potentially deleted.
     file->ValidateInsecureDownload();
-  } else if (file->IsDangerous()) {
-    MaybeReportBypassAction(file, WarningSurface::DOWNLOADS_PAGE,
-                            WarningAction::PROCEED);
-
-    RecordDownloadsPageValidatedHistogram(file);
-
-    // `file` is potentially deleted.
-    file->ValidateDangerousDownload();
   }
-}
-
-void DownloadsDOMHandler::RecordOpenBypassWarningDialog(const std::string& id) {
-  CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_OPEN_BYPASS_WARNING_PROMPT);
-  download::DownloadItem* file = GetDownloadByStringId(id);
-  if (!CanLogWarningMetrics(file)) {
-    return;
-  }
-
-  RecordDownloadDangerPromptHistogram("Shown", *file);
-
-  MaybeReportBypassAction(file, WarningSurface::DOWNLOADS_PAGE,
-                          WarningAction::KEEP);
-}
-
-void DownloadsDOMHandler::SaveDangerousFromDialogRequiringGesture(
-    const std::string& id) {
-  if (!GetWebUIWebContents()->HasRecentInteraction()) {
-    LOG(ERROR) << "SaveDangerousFromDialogRequiringGesture received without "
-                  "recent user interaction";
-    return;
-  }
-
-  CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_SAVE_DANGEROUS_FROM_PROMPT);
-  download::DownloadItem* file = GetDownloadByStringId(id);
-  if (!CanLogWarningMetrics(file)) {
-    return;
-  }
-
-  RecordDownloadDangerPromptHistogram("Proceed", *file);
-
-  MaybeReportBypassAction(file, WarningSurface::DOWNLOAD_PROMPT,
-                          WarningAction::PROCEED);
-
-  RecordDownloadsPageValidatedHistogram(file);
-
-  // `file` is potentially deleted.
-  file->ValidateDangerousDownload();
-}
-
-void DownloadsDOMHandler::RecordCancelBypassWarningDialog(
-    const std::string& id) {
-  CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_CANCEL_BYPASS_WARNING_PROMPT);
-  download::DownloadItem* file = GetDownloadByStringId(id);
-  if (!CanLogWarningMetrics(file)) {
-    return;
-  }
-
-  MaybeReportBypassAction(file, WarningSurface::DOWNLOAD_PROMPT,
-                          WarningAction::CANCEL);
 }
 
 void DownloadsDOMHandler::DiscardDangerous(const std::string& id) {
   CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_DISCARD_DANGEROUS);
-  download::DownloadItem* download = GetDownloadByStringId(id);
-  if (download && !download->IsDone() && download->IsDangerous()) {
-    MaybeReportBypassAction(download, WarningSurface::DOWNLOADS_PAGE,
-                            WarningAction::DISCARD);
-  }
   RemoveDownloadInArgs(id);
 }
 
@@ -473,9 +363,9 @@ void DownloadsDOMHandler::RemoveDownloads(const DownloadVector& to_remove) {
   IdSet ids;
 
   for (download::DownloadItem* download : to_remove) {
-    bool should_remove = download->IsDangerous() || download->IsInsecure();
+    bool should_remove = download->IsInsecure();
     if (should_remove) {
-      // Don't allow users to revive dangerous downloads; just nuke 'em.
+      // Don't allow users to revive insecure downloads; just nuke 'em.
       download->Remove();
       continue;
     }

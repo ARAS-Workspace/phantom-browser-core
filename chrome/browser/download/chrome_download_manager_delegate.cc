@@ -43,7 +43,6 @@
 #include "chrome/browser/download/download_request_limiter.h"
 #include "chrome/browser/download/download_stats.h"
 #include "chrome/browser/download/download_target_determiner.h"
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/insecure_download_blocking.h"
 #include "chrome/browser/download/save_package_file_picker.h"
 #include "chrome/browser/history/history_service_factory.h"

@@ -95,10 +95,6 @@ int OfflineItemModel::PercentComplete() const {
   return static_cast<int>(GetCompletedBytes() * 100.0 / GetTotalBytes());
 }
 
-bool OfflineItemModel::IsDangerous() const {
-  return offline_item_ ? offline_item_->is_dangerous : false;
-}
-
 bool OfflineItemModel::WasUINotified() const {
   const OfflineItemModelData* data =
       manager_->GetOrCreateOfflineItemModelData(offline_item_->id);

@@ -9,7 +9,6 @@
 #include "chrome/browser/download/download_item_model.h"
 #include "chrome/browser/download/download_item_warning_data.h"
 #include "chrome/browser/download/download_ui_enterprise_util.h"
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/grit/branded_strings.h"
@@ -22,7 +21,6 @@
 #include "ui/base/ui_base_features.h"
 
 using download::DownloadItem;
-using TailoredWarningType = DownloadUIModel::TailoredWarningType;
 using offline_items_collection::FailState;
 
 DownloadBubbleSecurityViewInfoObserver::
@@ -124,14 +122,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForDownload(
     case download::DownloadItem::MAX_DOWNLOAD_STATE:
       NOTREACHED();
   }
-}
-
-void DownloadBubbleSecurityViewInfo::PopulateForDangerousUi(
-    const std::u16string& subpage_summary) {
-  warning_summary_ = subpage_summary;
-  PopulatePrimarySubpageButton(
-      l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_DELETE_FROM_HISTORY),
-      DownloadCommands::Command::DISCARD);
 }
 
 void DownloadBubbleSecurityViewInfo::PopulateForSuspiciousUi(
@@ -275,11 +265,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForInProgressOrComplete(
       break;
   }
 
-  if (TailoredWarningType type = model.GetTailoredWarningType();
-      type != TailoredWarningType::kNoTailoredWarning) {
-    return PopulateForTailoredWarning(model);
-  }
-
   switch (model.GetDangerType()) {
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
       warning_summary_ = l10n_util::GetStringUTF16(
@@ -317,26 +302,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForInProgressOrComplete(
     case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_ONEDRIVE:
     case download::DOWNLOAD_DANGER_TYPE_MAX:
       return;
-  }
-}
-
-void DownloadBubbleSecurityViewInfo::PopulateForTailoredWarning(
-    const DownloadUIModel& model) {
-  switch (model.GetTailoredWarningType()) {
-    case TailoredWarningType::kSuspiciousArchive:
-      PopulateForSuspiciousUi(
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_ARCHIVE_MALWARE),
-          l10n_util::GetStringUTF16(
-              IDS_DOWNLOAD_BUBBLE_CONTINUE_SUSPICIOUS_FILE));
-      return;
-    case TailoredWarningType::kCookieTheft:
-      PopulateForDangerousUi(l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_COOKIE_THEFT));
-      return;
-    case TailoredWarningType::kNoTailoredWarning: {
-      NOTREACHED();
-    }
   }
 }
 

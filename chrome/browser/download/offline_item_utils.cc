@@ -115,7 +115,6 @@ OfflineItem OfflineItemUtils::CreateOfflineItem(const std::string& name_space,
   item.is_resumable = download_item->CanResume();
   item.allow_metered = download_item->AllowMetered();
   item.received_bytes = download_item->GetReceivedBytes();
-  item.is_dangerous = download_item->IsDangerous();
 
   base::TimeDelta time_delta;
   bool time_remaining_known = download_item->TimeRemaining(&time_delta);

@@ -8,7 +8,6 @@
 #include "base/metrics/user_metrics.h"
 #include "base/notreached.h"
 #include "build/build_config.h"
-#include "chrome/browser/download/download_ui_model.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/download/public/common/download_stats.h"
 #include "components/profile_metrics/browser_profile_type.h"
@@ -16,22 +15,6 @@
 void RecordDownloadSource(ChromeDownloadSource source) {
   base::UmaHistogramEnumeration("Download.SourcesChrome", source,
                                 CHROME_DOWNLOAD_SOURCE_LAST_ENTRY);
-}
-
-void MaybeRecordDangerousDownloadWarningShown(DownloadUIModel& model) {
-  if (model.GetState() == download::DownloadItem::DownloadState::CANCELLED) {
-    return;
-  }
-  if (model.WasUIWarningShown()) {
-    return;
-  }
-  base::UmaHistogramEnumeration("Download.ShowedDownloadWarning",
-                                model.GetDangerType(),
-                                download::DOWNLOAD_DANGER_TYPE_MAX);
-  base::UmaHistogramEnumeration("SBClientDownload.TailoredWarningType",
-                                model.GetTailoredWarningType());
-
-  model.SetWasUIWarningShown(true);
 }
 
 void RecordDownloadOpen(ChromeDownloadOpenMethod open_method,

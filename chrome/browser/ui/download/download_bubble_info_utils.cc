@@ -16,16 +16,8 @@
 #include "ui/views/vector_icons.h"
 
 using download::DownloadItem;
-using TailoredWarningType = DownloadUIModel::TailoredWarningType;
 
 namespace {
-
-IconAndColor IconAndColorForDangerousUiPattern() {
-  return IconAndColor{&(features::IsRoundedIconsEnabled()
-                            ? vector_icons::kDangerousFilledIcon
-                            : vector_icons::kDangerousChromeRefreshOldIcon),
-                      kColorDownloadItemIconDangerous};
-}
 
 IconAndColor IconAndColorForSuspiciousUiPattern() {
   return IconAndColor{
@@ -100,19 +92,6 @@ IconAndColor IconAndColorForInterrupted(const DownloadUIModel& model) {
       kColorDownloadItemIconDangerous};
 }
 
-IconAndColor IconAndColorForTailoredWarning(const DownloadUIModel& model) {
-  CHECK(model.GetDownloadItem());
-  switch (model.GetTailoredWarningType()) {
-    case DownloadUIModel::TailoredWarningType::kSuspiciousArchive:
-      return IconAndColorForSuspiciousUiPattern();
-    case DownloadUIModel::TailoredWarningType::kCookieTheft:
-      return IconAndColorForDangerousUiPattern();
-    case DownloadUIModel::TailoredWarningType::kNoTailoredWarning: {
-      NOTREACHED();
-    }
-  }
-}
-
 IconAndColor IconAndColorForInProgressOrComplete(const DownloadUIModel& model) {
   switch (model.GetInsecureDownloadStatus()) {
     case download::DownloadItem::InsecureDownloadStatus::BLOCK:
@@ -125,12 +104,6 @@ IconAndColor IconAndColorForInProgressOrComplete(const DownloadUIModel& model) {
     case download::DownloadItem::InsecureDownloadStatus::VALIDATED:
     case download::DownloadItem::InsecureDownloadStatus::SILENT_BLOCK:
       break;
-  }
-
-  if (DownloadUIModel::TailoredWarningType type =
-          model.GetTailoredWarningType();
-      type != DownloadUIModel::TailoredWarningType::kNoTailoredWarning) {
-    return IconAndColorForTailoredWarning(model);
   }
 
   switch (model.GetDangerType()) {
@@ -233,11 +206,6 @@ std::vector<DownloadBubbleQuickAction> QuickActionsForDownload(
       break;
   }
 
-  if (model.GetTailoredWarningType() !=
-      TailoredWarningType::kNoTailoredWarning) {
-    return {};
-  }
-
   switch (model.GetDangerType()) {
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
       return {};
@@ -332,11 +300,6 @@ DownloadBubbleProgressBar ProgressBarForDownload(const DownloadUIModel& model) {
     case DownloadItem::InsecureDownloadStatus::VALIDATED:
     case DownloadItem::InsecureDownloadStatus::SILENT_BLOCK:
       break;
-  }
-
-  if (model.GetTailoredWarningType() !=
-      TailoredWarningType::kNoTailoredWarning) {
-    return DownloadBubbleProgressBar::NoProgressBar();
   }
 
   switch (model.GetDangerType()) {

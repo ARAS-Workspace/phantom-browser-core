@@ -13,7 +13,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/time/time.h"
-#include "chrome/browser/download/download_danger_prompt.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom-forward.h"
 #include "chrome/browser/ui/webui/downloads/downloads_list_tracker.h"
 #include "content/public/browser/web_contents_observer.h"
@@ -71,9 +70,6 @@ class DownloadsDOMHandler : public content::WebContentsObserver,
   void OpenFileRequiringGesture(const std::string& id) override;
   void Drag(const std::string& id) override;
   void SaveSuspiciousRequiringGesture(const std::string& id) override;
-  void RecordOpenBypassWarningDialog(const std::string& id) override;
-  void SaveDangerousFromDialogRequiringGesture(const std::string& id) override;
-  void RecordCancelBypassWarningDialog(const std::string& id) override;
   void DiscardDangerous(const std::string& id) override;
   void RetryDownload(const std::string& id) override;
   void Show(const std::string& id) override;

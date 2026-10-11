@@ -126,14 +126,6 @@ export function getHtml(this: DownloadsItemElement) {
             ?hidden="${!this.showCancel_}" id="cancel">
           $i18n{controlCancel}
         </button>
-        <button class="dropdown-item" @click="${this.onDiscardDangerousClick_}"
-            ?hidden="${!this.isReviewable_}" id="reviewable-discard-dangerous">
-          $i18n{dangerDiscard}
-        </button>
-        <button class="dropdown-item" @click="${this.onReviewDangerousClick_}"
-            ?hidden="${!this.isReviewable_}" id="review-dangerous">
-          $i18n{dangerReview}
-        </button>
         <button class="dropdown-item" @click="${this.onSaveDangerousClick_}"
             ?hidden="${!this.computeShowControlsForDangerous_()}"
             id="save-dangerous">

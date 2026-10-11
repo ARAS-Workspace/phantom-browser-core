@@ -4980,7 +4980,6 @@ test("interactive_ui_tests") {
     "../browser/ui/browser_command_controller_interactive_uitest.cc",
     "../browser/ui/browser_focus_interactive_uitest.cc",
     "../browser/ui/extensions/controlled_home_dialog_interactive_uitest.cc",
-    "../browser/ui/extensions/download_danger_dialog_interactive_uitest.cc",
     "../browser/ui/fullscreen_keyboard_browsertest_base.cc",
     "../browser/ui/fullscreen_keyboard_browsertest_base.h",
     "../browser/ui/keyboard_lock_interactive_uitest.cc",

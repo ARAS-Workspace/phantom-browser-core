@@ -90,8 +90,7 @@ export class DownloadsToolbarElement extends CrLitElement {
   protected onClearAllClick_(e: Event) {
     assert(this.canClearAll());
     this.browserProxy_.handler.clearAll();
-    const canUndo =
-        this.items.some(data => !data.isDangerous && !data.isInsecure);
+    const canUndo = this.items.some(data => !data.isInsecure);
     getToastManager().show(
         loadTimeData.getString('toastClearedAll'),
         /* hideSlotted= */ !canUndo);

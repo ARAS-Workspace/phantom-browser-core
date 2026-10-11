@@ -452,15 +452,6 @@ void DownloadOfflineContentProvider::OnDownloadUpdated(DownloadItem* item) {
       AddCompletedDownload(item);
   }
 
-  // If the download was newly marked dangerous or validated, then visuals may
-  // change (e.g. new icon to denote dangerous status).
-  if (offline_item.state != OfflineItemState::CANCELLED &&
-      (item->IsDangerous() ||
-       item->GetDangerType() ==
-           download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED)) {
-    update_delta.visuals_changed = true;
-  }
-
   UpdateObservers(offline_item, update_delta);
 }
 

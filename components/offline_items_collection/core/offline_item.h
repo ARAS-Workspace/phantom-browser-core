@@ -219,13 +219,8 @@ struct OfflineItem {
   // COMPLETE.
   int64_t time_remaining_ms;
 
-  // The danger type of this offline item. This should be consistent with the
-  // `is_dangerous` field below.
+  // The danger type of this offline item.
   download::DownloadDangerType danger_type;
-
-  // Whether the download might be dangerous and will require additional
-  // validation from user.
-  bool is_dangerous;
 };
 
 // Implemented for test-only. See test_support/offline_item_test_support.cc.

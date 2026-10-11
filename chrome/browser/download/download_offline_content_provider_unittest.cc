@@ -28,7 +28,6 @@ using ::testing::_;
 using ::testing::Eq;
 using ::testing::Field;
 using ::testing::NiceMock;
-using ::testing::Optional;
 using ::testing::Return;
 using ::testing::ReturnRefOfCopy;
 
@@ -214,44 +213,16 @@ TEST_F(DownloadOfflineContentProviderTest, DoNotShowEmptyTargetPathDownload) {
   RunUntilMainThreadIdle();
 }
 
-// Tests that updates to a dangerous download does update observers.
-TEST_F(DownloadOfflineContentProviderTest, ShowDangerousDownload) {
+// Tests that updates to a shown download update observers.
+TEST_F(DownloadOfflineContentProviderTest, ShowUpdatedDownload) {
   std::string guid = base::Uuid::GenerateRandomV4().AsLowercaseString();
   ContentId id(kTestDownloadNamespace, guid);
 
   std::unique_ptr<download::MockDownloadItem> item =
       CreateMockDownloadItem(guid);
 
-  EXPECT_CALL(*item, IsDangerous()).WillRepeatedly(Return(true));
-
   ScopedMockObserver observer{&provider_};
-  EXPECT_CALL(
-      observer,
-      OnItemUpdated(Field(&OfflineItem::id, Eq(id)),
-                    Optional(Field(&UpdateDelta::visuals_changed, true))))
-      .Times(1);
-
-  InitializeDownloads(true);
-  provider_.OnDownloadUpdated(item.get());
-  RunUntilMainThreadIdle();
-}
-
-// Tests that updates to a validated download does update observers.
-TEST_F(DownloadOfflineContentProviderTest, ShowValidatedDownload) {
-  std::string guid = base::Uuid::GenerateRandomV4().AsLowercaseString();
-  ContentId id(kTestDownloadNamespace, guid);
-
-  std::unique_ptr<download::MockDownloadItem> item =
-      CreateMockDownloadItem(guid);
-
-  EXPECT_CALL(*item, GetDangerType())
-      .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED));
-
-  ScopedMockObserver observer{&provider_};
-  EXPECT_CALL(
-      observer,
-      OnItemUpdated(Field(&OfflineItem::id, Eq(id)),
-                    Optional(Field(&UpdateDelta::visuals_changed, true))))
+  EXPECT_CALL(observer, OnItemUpdated(Field(&OfflineItem::id, Eq(id)), _))
       .Times(1);
 
   InitializeDownloads(true);

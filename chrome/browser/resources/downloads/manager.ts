@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import '/strings.m.js';
-import './bypass_warning_confirmation_dialog.js';
 import './item.js';
 import './toolbar.js';
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
@@ -37,14 +36,6 @@ export interface DownloadsManagerElement {
   };
 }
 
-type SaveDangerousClickEvent = CustomEvent<{id: string}>;
-
-declare global {
-  interface HTMLElementEventMap {
-    'save-dangerous-click': SaveDangerousClickEvent;
-  }
-}
-
 const DownloadsManagerElementBase = FindShortcutMixinLit(CrLitElement);
 
 export class DownloadsManagerElement extends DownloadsManagerElementBase {
@@ -67,7 +58,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
       inSearchMode_: {type: Boolean},
       items_: {type: Array},
       spinnerActive_: {type: Boolean},
-      bypassPromptItemId_: {type: String},
 
       lastFocused_: {type: Object},
       listBlurred_: {type: Boolean},
@@ -84,7 +74,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
   // Used for CSS styling.
   protected accessor inSearchMode_: boolean = false;
   protected accessor spinnerActive_: boolean = false;
-  protected accessor bypassPromptItemId_: string = '';
   protected accessor lastFocused_: HTMLElement|null = null;
   protected accessor listBlurred_: boolean = false;
   protected accessor listScrollTarget_: HTMLElement = document.documentElement;
@@ -165,46 +154,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
   override firstUpdated(changedProperties: PropertyValues<this>) {
     super.firstUpdated(changedProperties);
     this.listScrollTarget_ = this.$.mainContainer;
-  }
-
-  protected onSaveDangerousClick_(e: SaveDangerousClickEvent) {
-    const bypassItem = this.items_.find(item => item.id === e.detail.id);
-    if (bypassItem) {
-      this.bypassPromptItemId_ = bypassItem.id;
-      this.browserProxy_.handler.recordOpenBypassWarningDialog(
-          this.bypassPromptItemId_);
-    }
-  }
-
-  protected shouldShowBypassWarningPrompt_(): boolean {
-    return this.bypassPromptItemId_ !== '';
-  }
-
-  protected computeBypassWarningDialogFileName_(): string {
-    const bypassItem =
-        this.items_.find(item => item.id === this.bypassPromptItemId_);
-    return bypassItem?.fileName || '';
-  }
-
-  private hideBypassWarningPrompt_() {
-    this.bypassPromptItemId_ = '';
-  }
-
-  protected onBypassWarningConfirmationDialogClose_() {
-    const dialog = this.shadowRoot.querySelector(
-        'downloads-bypass-warning-confirmation-dialog');
-    assert(dialog);
-    assert(this.bypassPromptItemId_ !== '');
-    if (dialog.wasConfirmed()) {
-      this.browserProxy_.handler.saveDangerousFromDialogRequiringGesture(
-          this.bypassPromptItemId_);
-    } else {
-      // Closing the dialog by clicking cancel is treated the same as closing
-      // the dialog by pressing Esc. Both are treated as CANCEL, not CLOSE.
-      this.browserProxy_.handler.recordCancelBypassWarningDialog(
-          this.bypassPromptItemId_);
-    }
-    this.hideBypassWarningPrompt_();
   }
 
   private clearAll_() {
@@ -311,8 +260,7 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
     }
 
     this.browserProxy_.handler.clearAll();
-    const canUndo =
-        this.items_.some(data => !data.isDangerous && !data.isInsecure);
+    const canUndo = this.items_.some(data => !data.isInsecure);
     getToastManager().show(
         loadTimeData.getString('toastClearedAll'),
         /* hideSlotted= */ !canUndo);
@@ -352,11 +300,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
   }
 
   private removeItem_(index: number) {
-    const removed = this.items_[index]!;
-    if (removed.id === this.bypassPromptItemId_) {
-      this.hideBypassWarningPrompt_();
-    }
-
     this.updateItems_(index, 1, []);
     this.updateComplete.then(() => this.onScroll_());
   }

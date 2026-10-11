@@ -157,7 +157,7 @@ void DownloadBubbleUIController::OnOfflineItemUpdated(const OfflineItem& item) {
       model.ShouldShowInBubble() &&
       (browser_ == ProfileBrowserCollection::GetForProfile(profile_.get())
                        ->GetLastActiveBrowser());
-  // Consider dangerous in-progress downloads to be completed.
+  // Consider insecure in-progress downloads to be completed.
   bool is_done = model.IsDone() ||
                  (model.GetState() == download::DownloadItem::IN_PROGRESS &&
                   !IsModelInProgress(&model));
@@ -175,7 +175,7 @@ void DownloadBubbleUIController::OnDownloadItemUpdated(
       model.ShouldShowInBubble() &&
       (browser_ == ProfileBrowserCollection::GetForProfile(profile_.get())
                        ->GetLastActiveBrowser());
-  // Consider dangerous in-progress downloads to be completed.
+  // Consider insecure in-progress downloads to be completed.
   bool is_done = item->IsDone() ||
                  (item->GetState() == download::DownloadItem::IN_PROGRESS &&
                   !IsItemInProgress(item));

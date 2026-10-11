@@ -21,8 +21,7 @@ export function getHtml(this: DownloadsManagerElement) {
     @spinner-active-changed="${this.onSpinnerActiveChanged_}"
     @search-changed="${this.onSearchChanged_}">
 </downloads-toolbar>
-<div id="mainContainer" class="cr-scrollable" @scroll="${this.onScroll_}"
-    @save-dangerous-click="${this.onSaveDangerousClick_}">
+<div id="mainContainer" class="cr-scrollable" @scroll="${this.onScroll_}">
   <div class="cr-scrollable-top-shadow"></div>
   <cr-infinite-list id="downloadsList" .items="${this.items_}" role="grid"
       aria-rowcount="${this.items_.length}" ?hidden="${!this.hasDownloads_}"
@@ -50,12 +49,6 @@ export function getHtml(this: DownloadsManagerElement) {
     $i18n{undo}
   </cr-button>
 </cr-toast-manager>
-${this.shouldShowBypassWarningPrompt_() ? html`
-  <downloads-bypass-warning-confirmation-dialog
-      .fileName="${this.computeBypassWarningDialogFileName_()}"
-      @close="${this.onBypassWarningConfirmationDialogClose_}">
-  </downloads-bypass-warning-confirmation-dialog>
-` : ''}
 <!--_html_template_end_-->`;
   // clang-format on
 }

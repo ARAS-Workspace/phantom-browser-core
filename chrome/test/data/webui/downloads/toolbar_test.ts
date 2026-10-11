@@ -64,7 +64,6 @@ suite('toolbar tests', function() {
 
   test('undo is not shown when removing only dangerous items', () => {
     toolbar.items = [
-      createDownload({isDangerous: true}),
       createDownload({isInsecure: true}),
     ];
     toastManager.show('', /* hideSlotted= */ false);
@@ -78,7 +77,6 @@ suite('toolbar tests', function() {
   test('undo is shown when removing items', () => {
     toolbar.items = [
       createDownload(),
-      createDownload({isDangerous: true}),
       createDownload({isInsecure: true}),
     ];
     toastManager.show('', /* hideSlotted= */ true);

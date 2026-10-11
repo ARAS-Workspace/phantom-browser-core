@@ -17,7 +17,6 @@
 #include "chrome/browser/download/download_commands.h"
 #include "chrome/browser/download/download_item_warning_data.h"
 #include "chrome/browser/download/download_ui_enterprise_util.h"
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/download/status_text_builder_utils.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
@@ -301,18 +300,6 @@ int DownloadUIModel::PercentComplete() const {
   return -1;
 }
 
-bool DownloadUIModel::IsDangerous() const {
-  return false;
-}
-
-bool DownloadUIModel::MightBeMalicious() const {
-  return false;
-}
-
-bool DownloadUIModel::IsMalicious() const {
-  return false;
-}
-
 bool DownloadUIModel::IsInsecure() const {
   return false;
 }
@@ -336,12 +323,6 @@ bool DownloadUIModel::WasActionedOn() const {
 }
 
 void DownloadUIModel::SetActionedOn(bool actioned_on) {}
-
-bool DownloadUIModel::WasUIWarningShown() const {
-  return false;
-}
-
-void DownloadUIModel::SetWasUIWarningShown(bool was_ui_warning_shown) {}
 
 std::optional<base::Time> DownloadUIModel::GetEphemeralWarningUiShownTime()
     const {
@@ -597,11 +578,6 @@ void DownloadUIModel::ExecuteCommand(DownloadCommands* download_commands,
     case DownloadCommands::EDIT_WITH_MEDIA_APP:
       NOTREACHED();
   }
-}
-
-DownloadUIModel::TailoredWarningType DownloadUIModel::GetTailoredWarningType()
-    const {
-  return TailoredWarningType::kNoTailoredWarning;
 }
 
 bool DownloadUIModel::ShouldShowInUi() const {

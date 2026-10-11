@@ -78,11 +78,8 @@ class DownloadBubbleRowViewInfo
   void PopulateFromModel();
   void PopulateForInProgressOrComplete();
   void PopulateForInterrupted(offline_items_collection::FailState fail_state);
-  void PopulateForTailoredWarning(
-      DownloadUIModel::TailoredWarningType tailored_warning_type);
 
   void PopulateSuspiciousUiPattern();
-  void PopulateDangerousUiPattern();
 
   // Clear all fields. This helps keep the Populate* methods focused on only
   // non-default settings.

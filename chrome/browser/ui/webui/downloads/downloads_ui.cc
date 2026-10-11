@@ -81,13 +81,7 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"statusCancelled", IDS_DOWNLOAD_TAB_CANCELLED},
       {"statusRemoved", IDS_DOWNLOAD_FILE_REMOVED},
 
-      // Dangerous file.
-      {"dangerDiscard", IDS_DISCARD_DOWNLOAD},
-      {"dangerReview", IDS_REVIEW_DOWNLOAD},
-
       // Deep scanning strings.
-      {"sensitiveContentWarningDesc",
-       IDS_BLOCK_REASON_SENSITIVE_CONTENT_WARNING},
       {"sensitiveContentBlockedDesc",
        IDS_SENSITIVE_CONTENT_BLOCKED_DESCRIPTION},
       {"forcedSaveToCloudDesc", IDS_FORCED_SAVE_TO_CLOUD_DESCRIPTION},
@@ -110,49 +104,25 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"toastCopyDownloadLinkFailed",
        IDS_DOWNLOADS_TOAST_COPY_DOWNLOAD_LINK_FAILED},
       {"undo", IDS_DOWNLOAD_UNDO},
-      {"controlKeepDangerous", IDS_DOWNLOAD_KEEP_DANGEROUS_FILE},
       {"controlKeepSuspicious", IDS_DOWNLOAD_KEEP_SUSPICIOUS_FILE},
-      {"controlKeepUnverified", IDS_DOWNLOAD_KEEP_UNVERIFIED_FILE},
       {"controlKeepInsecure", IDS_DOWNLOAD_KEEP_INSECURE_FILE},
       {"controlDeleteFromHistory", IDS_DOWNLOAD_DELETE_FROM_HISTORY},
       {"controlCopyDownloadLink", IDS_DOWNLOAD_COPY_DOWNLOAD_LINK},
 
       // Accessible labels for file icons.
-      {"accessibleLabelDangerous",
-       IDS_DOWNLOAD_DANGEROUS_ICON_ACCESSIBLE_LABEL},
       {"accessibleLabelSuspicious",
        IDS_DOWNLOAD_SUSPICIOUS_ICON_ACCESSIBLE_LABEL},
       {"accessibleLabelInsecure", IDS_DOWNLOAD_INSECURE_ICON_ACCESSIBLE_LABEL},
-      {"accessibleLabelUnverified",
-       IDS_DOWNLOAD_UNVERIFIED_ICON_ACCESSIBLE_LABEL},
 
       // Screenreader announcements.
-      {"screenreaderSavedDangerous", IDS_DOWNLOAD_SCREENREADER_SAVED_DANGEROUS},
       {"screenreaderSavedSuspicious",
        IDS_DOWNLOAD_SCREENREADER_SAVED_SUSPICIOUS},
       {"screenreaderSavedInsecure", IDS_DOWNLOAD_SCREENREADER_SAVED_INSECURE},
-      {"screenreaderSavedUnverified",
-       IDS_DOWNLOAD_SCREENREADER_SAVED_UNVERIFIED},
       {"screenreaderPaused", IDS_DOWNLOAD_SCREENREADER_PAUSED},
       {"screenreaderResumed", IDS_DOWNLOAD_SCREENREADER_RESUMED},
       {"screenreaderCanceled", IDS_DOWNLOAD_SCREENREADER_CANCELED},
 
-      // Warning bypass prompt dialog.
-      {"warningBypassPromptDescription",
-       IDS_DOWNLOAD_WARNING_BYPASS_PROMPT_DESCRIPTION},
-
-      // Warning bypass dialog.
-      {"warningBypassDialogTitle", IDS_DOWNLOAD_WARNING_BYPASS_DIALOG_TITLE},
-      {"warningBypassDialogCancel", IDS_CANCEL},
-
       // Strings describing reasons for blocked downloads.
-      {"noSafeBrowsingDesc",
-       IDS_BLOCK_DOWNLOAD_REASON_UNVERIFIED_NO_SAFE_BROWSING},
-      {"dangerFileDesc", IDS_BLOCK_DOWNLOAD_REASON_DANGEROUS_FILETYPE},
-      {"dangerDownloadDesc", IDS_BLOCK_DOWNLOAD_REASON_DANGEROUS},
-      {"dangerDownloadCookieTheft",
-       IDS_BLOCK_DOWNLOAD_REASON_DANGEROUS_COOKIE_THEFT},
-      {"dangerSettingsDesc", IDS_BLOCK_DOWNLOAD_REASON_POTENTIALLY_UNWANTED},
       {"insecureDownloadDesc", IDS_BLOCK_DOWNLOAD_REASON_INSECURE},
 
       // Format string for showing the "source" of the downloaded file as the
@@ -160,12 +130,6 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"initiatorLine", IDS_DOWNLOADS_PAGE_INITIATOR_LINE},
   };
   source->AddLocalizedStrings(kStrings);
-
-  source->AddLocalizedString("dangerUncommonDesc",
-                             IDS_BLOCK_DOWNLOAD_REASON_UNCOMMON);
-  source->AddLocalizedString(
-      "dangerUncommonSuspiciousArchiveDesc",
-      IDS_BLOCK_DOWNLOAD_REASON_UNCOMMON_SUSPICIOUS_ARCHIVE);
 
   // Build an Accelerator to describe undo shortcut
   // NOTE: the undo shortcut is also defined in downloads/downloads.html

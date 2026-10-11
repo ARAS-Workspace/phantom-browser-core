@@ -33,36 +33,20 @@ enum DangerType {
   kForcedSaveToOnedrive,
 };
 
-// This corresponds to DownloadUIModel::TailoredWarningType.
-enum TailoredWarningType {
-  kNoApplicableTailoredWarningType,
-  kCookieTheft,
-  kSuspiciousArchive,
-};
-
 // Represents the state of a download in the UI.
 enum State {
   kInProgress,
   kCancelled,
   kComplete,
   kPaused,
-  kDangerous,
   kInterrupted,
   kInsecure,
-};
-
-// This corresponds to safe_browsing::SafeBrowsingState.
-enum SafeBrowsingState {
-  kNoSafeBrowsing,
-  kStandardProtection,
-  kEnhancedProtection,
 };
 
 // This is the information associated with a download used for rendering in the
 // UI.
 struct Data {
   bool file_externally_removed;
-  bool is_dangerous;
   [RenamedFrom=is_mixed_content]
   bool is_insecure;
   bool is_reviewable;
@@ -77,7 +61,6 @@ struct Data {
   string by_ext_id;
   string by_ext_name;
   DangerType danger_type;
-  TailoredWarningType tailored_warning_type;
   string date_string;
   string file_name;
   string file_path;
@@ -88,10 +71,9 @@ struct Data {
   string show_in_folder_text;
   string since_string;
   // |state| indicates the current state of the download. A download data entry
-  // can be dangerous or insecure which can be expressed as a state to
-  // indicate the download needs confirmation before initiating. After
-  // confirmation, the state will indicate the download is in progress, complete
-  // or cancelled.
+  // can be insecure which can be expressed as a state to indicate the download
+  // needs confirmation before initiating. After confirmation, the state will
+  // indicate the download is in progress, complete or cancelled.
   State state;
   // The display string for the initiator origin of the download request in the
   // UI. This is an empty string unless the download had an initiator origin,
@@ -103,12 +85,6 @@ struct Data {
   // original URL. Omitted if the URL should not be clickable on the downloads
   // page, due to URL size limits requiring truncation.
   url.mojom.Url? url;
-  // Safe Browsing protection level of the profile in which the item was
-  // downloaded. Used to determine whether to show a special warning message.
-  SafeBrowsingState safe_browsing_state;
-  // Whether the download had a Safe Browsing verdict. This is used to determine
-  // whether to call a file type warning "suspicious" or "unverified".
-  bool has_safe_browsing_verdict;
 };
 
 // The parameter "id" is the id of the current download
@@ -125,23 +101,9 @@ interface PageHandler {
   Drag(string id);
 
   // Called when "Download suspicious file" is clicked from the
-  // chrome://downloads overflow menu, for suspicious/unverified files. Does not
-  // show a prompt.
+  // chrome://downloads overflow menu, for insecure files. Does not show a
+  // prompt.
   SaveSuspiciousRequiringGesture(string id);
-
-  // Called when "Download dangerous file" is clicked from the
-  // chrome://downloads overflow menu to open the warning bypass dialog, for
-  // dangerous files. Only records the opening of the warning bypass dialog.
-  RecordOpenBypassWarningDialog(string id);
-
-  // Called when "Download dangerous file" is clicked from the
-  // chrome://downloads warning dialog, for dangerous files.
-  SaveDangerousFromDialogRequiringGesture(string id);
-
-  // Called when "Cancel" is clicked on the chrome://downloads warning bypass
-  // dialog, or the dialog is closed by dismissing it. Only records the event
-  // and potentially sends a report.
-  RecordCancelBypassWarningDialog(string id);
 
   DiscardDangerous(string id);
   RetryDownload(string id);

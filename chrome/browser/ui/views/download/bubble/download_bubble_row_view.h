@@ -138,7 +138,6 @@ class DownloadBubbleRowView : public views::View,
   void UpdateButtons();
   void UpdateProgressBar();
   void UpdateLabels();
-  void RecordMetricsOnUpdate();
   void RecordDownloadDisplayed();
 
   // Load the appropriate |file_icon_| from the IconManager, or a default icon.
@@ -240,10 +239,6 @@ class DownloadBubbleRowView : public views::View,
   bool dragging_ = false;
   // Position that a possible drag started at.
   std::optional<gfx::Point> drag_start_point_;
-
-  // Whether the download's completion has already been logged. This is used to
-  // avoid inaccurate repeated logging.
-  bool has_download_completion_been_logged_ = false;
 
   // A timer for updating the status text string.
   base::RepeatingTimer update_status_text_timer_;

@@ -45,7 +45,6 @@ std::ostream& operator<<(std::ostream& os, const OfflineItem& item) {
   if (item.progress.max)
     os << "/" << item.progress.max.value();
   os << ", time_remaining_ms: " << item.time_remaining_ms;
-  os << ", is_dangerous: " << item.is_dangerous;
   os << ")";
   return os;
 }

@@ -51,7 +51,6 @@ class OfflineItemUtilsTest : public testing::Test {
       download::DownloadDangerType danger_type,
       DownloadItem::DownloadState state,
       bool is_paused,
-      bool is_dangerous,
       const base::Time& creation_time,
       const base::Time& last_accessed_time,
       int64_t received_bytes,
@@ -78,7 +77,6 @@ OfflineItemUtilsTest::CreateDownloadItem(
     download::DownloadDangerType danger_type,
     DownloadItem::DownloadState state,
     bool is_paused,
-    bool is_dangerous,
     const base::Time& creation_time,
     const base::Time& last_access_time,
     int64_t received_bytes,
@@ -100,7 +98,6 @@ OfflineItemUtilsTest::CreateDownloadItem(
   ON_CALL(*item, GetFileNameToReportUser()).WillByDefault(Return(file_name));
   ON_CALL(*item, GetTransitionType())
       .WillByDefault(Return(ui::PAGE_TRANSITION_LINK));
-  ON_CALL(*item, IsDangerous()).WillByDefault(Return(is_dangerous));
   ON_CALL(*item, IsPaused()).WillByDefault(Return(is_paused));
   ON_CALL(*item, GetGuid()).WillByDefault(ReturnRefOfCopy(guid));
   ON_CALL(*item, GetMimeType()).WillByDefault(Return(mime_type));
@@ -124,8 +121,8 @@ OfflineItemUtilsTest::CreateDownloadItem(
   download::DownloadDangerType danger_type =
       download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT;
   return CreateDownloadItem(guid, file_path, file_name, mime_type, danger_type,
-                            state, is_paused, false, base::Time(), base::Time(),
-                            10, 100, interrupt_reason);
+                            state, is_paused, base::Time(), base::Time(), 10,
+                            100, interrupt_reason);
 }
 
 TEST_F(OfflineItemUtilsTest, BasicConversions) {
@@ -147,13 +144,12 @@ TEST_F(OfflineItemUtilsTest, BasicConversions) {
   bool is_resumable = true;
   bool allow_metered = true;
   int64_t time_remaining_ms = 10000;
-  bool is_dangerous = true;
   int64_t total_bytes = 1000;
   int64_t received_bytes = 10;
   std::unique_ptr<download::MockDownloadItem> download = CreateDownloadItem(
       guid, file_path, file_name, mime_type, danger_type,
-      DownloadItem::COMPLETE, false, is_dangerous, creation_time,
-      last_access_time, 0, 0, interrupt_reason);
+      DownloadItem::COMPLETE, false, creation_time, last_access_time, 0, 0,
+      interrupt_reason);
 
   ON_CALL(*download, IsTransient()).WillByDefault(Return(is_transient));
   ON_CALL(*download, IsParallelDownload())
@@ -171,7 +167,6 @@ TEST_F(OfflineItemUtilsTest, BasicConversions) {
       .WillByDefault(testing::DoAll(
           testing::SetArgPointee<0>(base::Milliseconds(time_remaining_ms)),
           Return(true)));
-  ON_CALL(*download, IsDangerous()).WillByDefault(Return(is_dangerous));
 
   OfflineItem offline_item =
       OfflineItemUtils::CreateOfflineItem(kNameSpace, download.get());
@@ -213,7 +208,6 @@ TEST_F(OfflineItemUtilsTest, BasicConversions) {
   EXPECT_EQ(total_bytes, offline_item.progress.max.value());
   EXPECT_EQ(OfflineItemProgressUnit::BYTES, offline_item.progress.unit);
   EXPECT_EQ(time_remaining_ms, offline_item.time_remaining_ms);
-  EXPECT_EQ(is_dangerous, offline_item.is_dangerous);
 }
 
 TEST_F(OfflineItemUtilsTest, StateConversions) {

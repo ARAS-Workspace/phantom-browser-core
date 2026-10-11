@@ -202,18 +202,7 @@ class DownloadUIModel {
   // Rough percent complete. Returns -1 if the progress is unknown.
   virtual int PercentComplete() const;
 
-  // Is this considered a dangerous download?
-  virtual bool IsDangerous() const;
-
-  // Is this considered a malicious download? Implies IsDangerous().
-  virtual bool MightBeMalicious() const;
-
-  // Is this considered a malicious download with very high confidence?
-  // Implies IsDangerous() and MightBeMalicious().
-  virtual bool IsMalicious() const;
-
-  // Is this download an insecure download, but not something more severe?
-  // Implies IsDangerous() and !IsMalicious().
+  // Is this download an insecure download?
   virtual bool IsInsecure() const;
 
   // Returns |true| if the download started animation (download icon animates
@@ -242,15 +231,6 @@ class DownloadUIModel {
 
   // Change what's returned by WasActionedOn().
   virtual void SetActionedOn(bool actioned_on);
-
-  // Returns |true| if the UI (download bubble, downloads page, notification)
-  // has shown this download warning. By default, this value is |false| and
-  // should be changed explicitly using SetWasUIWarningShown(). Used to prevent
-  // double-logging of download warnings.
-  virtual bool WasUIWarningShown() const;
-
-  // Change what's returned by WasUIWarningShown().
-  virtual void SetWasUIWarningShown(bool was_ui_warning_shown);
 
   // If this is an ephemeral warning, returns when the bubble first displayed
   // the warning. If the warning has not yet shown (or this isn't an ephemeral
@@ -417,10 +397,6 @@ class DownloadUIModel {
   // on platforms where the download bubble is available.
   // TODO(crbug.com/401528883): This does not need to be compiled on ChromeOS.
   virtual bool ShouldShowInBubble() const;
-
-  // Returns the type of tailored warning. Returns kNoTailoredWarning if this
-  // download shouldn't trigger a tailored warning.
-  virtual TailoredWarningType GetTailoredWarningType() const;
 
   // Ephemeral warnings are ones that are quickly removed from the UI if the
   // user has not acted on them, and later deleted altogether. Is this that kind

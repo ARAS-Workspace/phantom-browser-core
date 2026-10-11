@@ -22,10 +22,7 @@
 #include "base/time/time.h"
 #include "chrome/browser/download/download_crx_util.h"
 #include "chrome/browser/download/download_item_model.h"
-#include "chrome/browser/download/download_item_warning_data.h"
 #include "chrome/browser/download/download_query.h"
-#include "chrome/browser/download/download_stats.h"
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/extensions/api/downloads/downloads_api.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"
@@ -47,7 +44,6 @@
 using content::BrowserContext;
 using content::DownloadManager;
 using download::DownloadItem;
-using TailoredWarningType = DownloadUIModel::TailoredWarningType;
 
 using DownloadVector = DownloadManager::DownloadVector;
 
@@ -113,25 +109,6 @@ downloads::mojom::DangerType GetDangerType(
     case download::DOWNLOAD_DANGER_TYPE_MAX:
       return downloads::mojom::DangerType::kNoApplicableDangerType;
   }
-}
-
-// Returns an enum value to be used as the |tailored_warning_type| value in
-// CreateDownloadData().
-downloads::mojom::TailoredWarningType GetTailoredWarningType(
-    TailoredWarningType tailored_warning_type) {
-  switch (tailored_warning_type) {
-    case TailoredWarningType::kSuspiciousArchive:
-      return downloads::mojom::TailoredWarningType::kSuspiciousArchive;
-    case TailoredWarningType::kCookieTheft:
-      return downloads::mojom::TailoredWarningType::kCookieTheft;
-    case TailoredWarningType::kNoTailoredWarning:
-      return downloads::mojom::TailoredWarningType::
-          kNoApplicableTailoredWarningType;
-  }
-}
-
-downloads::mojom::SafeBrowsingState GetSafeBrowsingState(Profile* profile) {
-  return downloads::mojom::SafeBrowsingState::kNoSafeBrowsing;
 }
 
 // TODO(dbeam): if useful elsewhere, move to base/i18n/time_formatting.h?
@@ -358,9 +335,7 @@ downloads::mojom::DataPtr DownloadsListTracker::CreateDownloadData(
 
   switch (download_item->GetState()) {
     case download::DownloadItem::IN_PROGRESS: {
-      if (download_item->IsDangerous()) {
-        state = downloads::mojom::State::kDangerous;
-      } else if (download_item->IsInsecure()) {
+      if (download_item->IsInsecure()) {
         state = downloads::mojom::State::kInsecure;
       } else if (download_item->IsPaused()) {
         state = downloads::mojom::State::kPaused;
@@ -398,7 +373,6 @@ downloads::mojom::DataPtr DownloadsListTracker::CreateDownloadData(
       break;
 
     case download::DownloadItem::COMPLETE:
-      DCHECK(!download_item->IsDangerous());
       state = downloads::mojom::State::kComplete;
       break;
 
@@ -410,11 +384,7 @@ downloads::mojom::DataPtr DownloadsListTracker::CreateDownloadData(
 
   downloads::mojom::DangerType danger_type =
       GetDangerType(download_item->GetDangerType());
-  downloads::mojom::TailoredWarningType tailored_warning_type =
-      GetTailoredWarningType(download_model.GetTailoredWarningType());
   file_value->danger_type = danger_type;
-  file_value->tailored_warning_type = tailored_warning_type;
-  file_value->is_dangerous = download_item->IsDangerous();
   file_value->is_insecure = download_item->IsInsecure();
   file_value->is_reviewable = false;
 
@@ -425,30 +395,6 @@ downloads::mojom::DataPtr DownloadsListTracker::CreateDownloadData(
       base::UTF16ToUTF8(download_model.GetShowInFolderText());
   file_value->retry = retry;
   file_value->state = *state;
-
-  // Note that the safe_browsing_state is the state of the download's profile
-  // *now* whereas the presence of a verdict was determined when the download
-  // happened, so they are not necessarily related.
-  file_value->safe_browsing_state =
-      GetSafeBrowsingState(download_model.profile());
-  file_value->has_safe_browsing_verdict =
-      WasSafeBrowsingVerdictObtained(download_item);
-
-  if (download_model.IsDangerous()) {
-    MaybeRecordDangerousDownloadWarningShown(download_model);
-  }
-
-  if (download_item->IsDangerous()) {
-    // It's likely that SHOWN has already been logged from the download bubble,
-    // but in a small number of cases the warning may not have been shown in
-    // the bubble but is shown for the first time on the downloads page instead.
-    // That case is captured here. The majority of the time, the logic in
-    // DownloadItemWarningData that prevents double-logging will make this a
-    // no-op (aside from logging a histogram).
-    DownloadItemWarningData::AddWarningActionEvent(
-        download_item, DownloadItemWarningData::WarningSurface::DOWNLOADS_PAGE,
-        DownloadItemWarningData::WarningAction::SHOWN);
-  }
 
   return file_value;
 }

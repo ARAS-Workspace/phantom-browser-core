@@ -15,8 +15,6 @@ build_webui("build") {
   ]
 
   ts_files = [
-    "bypass_warning_confirmation_dialog.html.ts",
-    "bypass_warning_confirmation_dialog.ts",
     "data.ts",
     "downloads.ts",
     "icon_loader.ts",
@@ -30,7 +28,6 @@ build_webui("build") {
   ]
 
   css_files = [
-    "bypass_warning_confirmation_dialog.css",
     "item.css",
     "manager.css",
     "toolbar.css",

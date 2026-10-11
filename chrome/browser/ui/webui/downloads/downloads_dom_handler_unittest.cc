@@ -102,22 +102,20 @@ TEST_F(DownloadsDOMHandlerTest, ClearAll) {
 
   // Safe, in-progress items should be passed over.
   testing::StrictMock<download::MockDownloadItem> in_progress;
-  EXPECT_CALL(in_progress, IsDangerous()).WillOnce(testing::Return(false));
   EXPECT_CALL(in_progress, IsInsecure()).WillOnce(testing::Return(false));
   EXPECT_CALL(in_progress, IsTransient()).WillOnce(testing::Return(false));
   EXPECT_CALL(in_progress, GetState())
       .WillOnce(testing::Return(download::DownloadItem::IN_PROGRESS));
   downloads.push_back(&in_progress);
 
-  // Dangerous items should be removed (regardless of state).
-  testing::StrictMock<download::MockDownloadItem> dangerous;
-  EXPECT_CALL(dangerous, IsDangerous()).WillOnce(testing::Return(true));
-  EXPECT_CALL(dangerous, Remove());
-  downloads.push_back(&dangerous);
+  // Insecure items should be removed (regardless of state).
+  testing::StrictMock<download::MockDownloadItem> insecure;
+  EXPECT_CALL(insecure, IsInsecure()).WillOnce(testing::Return(true));
+  EXPECT_CALL(insecure, Remove());
+  downloads.push_back(&insecure);
 
   // Completed items should be marked as hidden from the shelf.
   testing::StrictMock<download::MockDownloadItem> completed;
-  EXPECT_CALL(completed, IsDangerous()).WillOnce(testing::Return(false));
   EXPECT_CALL(completed, IsInsecure()).WillOnce(testing::Return(false));
   EXPECT_CALL(completed, IsTransient()).WillRepeatedly(testing::Return(false));
   EXPECT_CALL(completed, GetState())
@@ -146,7 +144,6 @@ TEST_F(DownloadsDOMHandlerTest, DestructorFinalizesRemovals) {
 
   // A completed item is only soft-removed (it can still be revived by Undo).
   testing::StrictMock<download::MockDownloadItem> completed;
-  EXPECT_CALL(completed, IsDangerous()).WillOnce(testing::Return(false));
   EXPECT_CALL(completed, IsInsecure()).WillOnce(testing::Return(false));
   EXPECT_CALL(completed, IsTransient()).WillRepeatedly(testing::Return(false));
   EXPECT_CALL(completed, GetState())

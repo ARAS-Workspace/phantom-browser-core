@@ -59,9 +59,6 @@ class DownloadItemModel : public DownloadUIModel,
   int64_t GetTotalBytes() const override;
   int64_t GetUploadedBytes() const override;
   int PercentComplete() const override;
-  bool IsDangerous() const override;
-  bool MightBeMalicious() const override;
-  bool IsMalicious() const override;
   bool IsInsecure() const override;
   bool ShouldShowDownloadStartedAnimation() const override;
   bool ShouldNotifyUI() const override;
@@ -69,8 +66,6 @@ class DownloadItemModel : public DownloadUIModel,
   void SetWasUINotified(bool should_notify) override;
   bool WasActionedOn() const override;
   void SetActionedOn(bool actioned_on) override;
-  bool WasUIWarningShown() const override;
-  void SetWasUIWarningShown(bool was_ui_warning_shown) override;
   std::optional<base::Time> GetEphemeralWarningUiShownTime() const override;
   void SetEphemeralWarningUiShownTime(std::optional<base::Time> time) override;
   bool ShouldPreferOpeningInBrowser() override;
@@ -114,7 +109,6 @@ class DownloadItemModel : public DownloadUIModel,
                         DownloadCommands::Command command) const override;
   void ExecuteCommand(DownloadCommands* download_commands,
                       DownloadCommands::Command command) override;
-  TailoredWarningType GetTailoredWarningType() const override;
   bool ShouldShowInUi() const override;
   void SetShouldShowInUi(bool should_show) override;
   bool ShouldShowInBubble() const override;

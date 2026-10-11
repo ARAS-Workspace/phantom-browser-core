@@ -33,7 +33,6 @@
 #include "chrome/browser/download/download_stats.h"
 #include "chrome/browser/download/download_target_determiner.h"
 #include "chrome/browser/download/download_ui_model.h"
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -64,7 +63,6 @@
 
 using download::DownloadItem;
 using InsecureDownloadStatus = download::DownloadItem::InsecureDownloadStatus;
-using TailoredWarningType = DownloadUIModel::TailoredWarningType;
 
 namespace {
 
@@ -96,10 +94,6 @@ class DownloadItemModelData : public base::SupportsUserData::Data {
 
   // Whether the download is currently being revived.
   bool is_being_revived_ = false;
-
-  // Whether the safe browsing download warning was shown (and recorded) earlier
-  // on the UI.
-  bool was_ui_warning_shown_ = false;
 
   // Tracks when an ephemeral warning was first displayed on the UI. Does not
   // persist on restart, though ephemeral warning downloads are canceled by
@@ -273,56 +267,6 @@ int DownloadItemModel::PercentComplete() const {
   return download_->PercentComplete();
 }
 
-bool DownloadItemModel::IsDangerous() const {
-  return download_->IsDangerous();
-}
-
-bool DownloadItemModel::MightBeMalicious() const {
-  return IsDangerous() && (download_->GetDangerType() !=
-                           download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE);
-}
-
-// If you change this definition of malicious, also update
-// DownloadManagerImpl::BlockingShutdownCount.
-bool DownloadItemModel::IsMalicious() const {
-  if (!MightBeMalicious())
-    return false;
-  switch (download_->GetDangerType()) {
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST:
-    case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_OPENED_DANGEROUS:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE:
-      return true;
-
-    case download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS:
-    case download::DOWNLOAD_DANGER_TYPE_MAYBE_DANGEROUS_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED:
-    case download::DOWNLOAD_DANGER_TYPE_ALLOWLISTED_BY_POLICY:
-    case download::DOWNLOAD_DANGER_TYPE_MAX:
-    case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_FILE:
-      // We shouldn't get any of these due to the MightBeMalicious() test above.
-      NOTREACHED();
-    case download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT:
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_ASYNC_LOCAL_PASSWORD_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_PASSWORD_PROTECTED:
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_TOO_LARGE:
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
-    case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_SAFE:
-    case download::DOWNLOAD_DANGER_TYPE_DEEP_SCANNED_FAILED:
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-    case download::DOWNLOAD_DANGER_TYPE_BLOCKED_SCAN_FAILED:
-    case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_GDRIVE:
-    case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_ONEDRIVE:
-      return false;
-  }
-  NOTREACHED();
-}
-
 bool DownloadItemModel::IsInsecure() const {
   return download_->IsInsecure();
 }
@@ -373,16 +317,6 @@ bool DownloadItemModel::WasActionedOn() const {
 void DownloadItemModel::SetActionedOn(bool actioned_on) {
   DownloadItemModelData* data = DownloadItemModelData::GetOrCreate(download_);
   data->actioned_on_ = actioned_on;
-}
-
-bool DownloadItemModel::WasUIWarningShown() const {
-  const DownloadItemModelData* data = DownloadItemModelData::Get(download_);
-  return data && data->was_ui_warning_shown_;
-}
-
-void DownloadItemModel::SetWasUIWarningShown(bool was_ui_warning_shown) {
-  DownloadItemModelData* data = DownloadItemModelData::GetOrCreate(download_);
-  data->was_ui_warning_shown_ = was_ui_warning_shown;
 }
 
 std::optional<base::Time> DownloadItemModel::GetEphemeralWarningUiShownTime()
@@ -722,10 +656,6 @@ void DownloadItemModel::ExecuteCommand(DownloadCommands* download_commands,
   }
 }
 
-TailoredWarningType DownloadItemModel::GetTailoredWarningType() const {
-  return TailoredWarningType::kNoTailoredWarning;
-}
-
 bool DownloadItemModel::ShouldShowInUi() const {
   const DownloadItemModelData* data = DownloadItemModelData::Get(download_);
   if (data) {
@@ -838,13 +768,7 @@ bool DownloadItemModel::IsExtensionDownload() const {
 }
 
 bool DownloadItemModel::ShouldShowDropdown() const {
-  // We don't show the dropdown for dangerous file types or for files
-  // blocked by enterprise policy.
-  if (IsDangerous() && GetState() != DownloadItem::CANCELLED &&
-      !MightBeMalicious()) {
-    return false;
-  }
-
+  // We don't show the dropdown for files blocked by enterprise policy.
   if (GetDangerType() ==
           download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK ||
       GetDangerType() ==

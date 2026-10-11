@@ -18,7 +18,6 @@
 #include "chrome/browser/download/bubble/download_bubble_prefs.h"
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 #include "chrome/browser/download/download_item_warning_data.h"
-#include "chrome/browser/download/download_stats.h"
 #include "chrome/browser/download/download_ui_model.h"
 #include "chrome/browser/download/drag_download_item.h"
 #include "chrome/browser/icon_manager.h"
@@ -147,7 +146,6 @@ END_METADATA
 }  // namespace
 
 void DownloadBubbleRowView::UpdateRow(bool initial_setup) {
-  RecordMetricsOnUpdate();
   SetIcon();
   UpdateButtons();
   RecordDownloadDisplayed();
@@ -761,24 +759,7 @@ void DownloadBubbleRowView::UpdateLabels() {
   secondary_label_->SetEnabledColor(info_->secondary_text_color());
 }
 
-void DownloadBubbleRowView::RecordMetricsOnUpdate() {
-  // This should only be logged once per download.
-  if (info_->model()->IsDangerous()) {
-    MaybeRecordDangerousDownloadWarningShown(*info_->model());
-  }
-  if (!has_download_completion_been_logged_ &&
-      info_->model()->GetState() == download::DownloadItem::COMPLETE) {
-    has_download_completion_been_logged_ = true;
-  }
-}
-
 void DownloadBubbleRowView::RecordDownloadDisplayed() {
-  if (info_->model()->IsDangerous()) {
-    DownloadItemWarningData::AddWarningActionEvent(
-        info_->model()->GetDownloadItem(),
-        DownloadItemWarningData::WarningSurface::BUBBLE_MAINPAGE,
-        DownloadItemWarningData::WarningAction::SHOWN);
-  }
   if (!info_->model()->GetEphemeralWarningUiShownTime().has_value() &&
       info_->model()->IsEphemeralWarning()) {
     info_->model()->SetEphemeralWarningUiShownTime(base::Time::Now());

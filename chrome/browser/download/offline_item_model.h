@@ -55,7 +55,6 @@ class OfflineItemModel : public DownloadUIModel,
   int64_t GetCompletedBytes() const override;
   int64_t GetTotalBytes() const override;
   int PercentComplete() const override;
-  bool IsDangerous() const override;
   bool WasUINotified() const override;
   void SetWasUINotified(bool should_notify) override;
   bool WasActionedOn() const override;

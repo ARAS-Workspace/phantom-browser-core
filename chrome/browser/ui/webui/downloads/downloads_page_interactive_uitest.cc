@@ -6,11 +6,7 @@
 #include "base/strings/stringprintf.h"
 #include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/download/chrome_download_manager_delegate.h"
 #include "chrome/browser/download/download_browsertest_utils.h"
-#include "chrome/browser/download/download_core_service.h"
-#include "chrome/browser/download/download_core_service_factory.h"
-#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
@@ -19,7 +15,6 @@
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "chrome/test/interaction/tracked_element_webcontents.h"
 #include "chrome/test/interaction/webcontents_interaction_test_util.h"
-#include "components/download/public/common/download_danger_type.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -95,27 +90,6 @@ class DownloadsPageInteractiveUitest
                                return rect.height * rect.width > 0;
                             })",
                            Eq(visible));
-  }
-
-  // Finds the first download item on the page and presses a button in its
-  // dropdown actions menu (which is required to be visible).
-  auto TakeTopmostItemMenuAction(const std::string& menu_item_selector) {
-    DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kReadyEvent);
-    const DeepQuery path_to_menu_button =
-        PathToTopmostItemElement("#more-actions");
-    const DeepQuery path_to_menu_option =
-        PathToTopmostItemElement(menu_item_selector);
-    StateChange menu_item_visible;
-    menu_item_visible.type = StateChange::Type::kExists;
-    menu_item_visible.where = path_to_menu_option;
-    menu_item_visible.event = kReadyEvent;
-    return Steps(
-        CheckElementVisible(path_to_menu_button, true),
-        ExecuteJsAt(kDownloadsPageTabId, path_to_menu_button, kClickFn),
-        WaitForStateChange(kDownloadsPageTabId, menu_item_visible),
-        // Use mouse input instead of JavaScript click() to satisfy the
-        // user gesture requirement for some menu options.
-        MoveMouseTo(kDownloadsPageTabId, path_to_menu_option), ClickMouse());
   }
 
   // Finds the first download item on the page and clicks a button on the item.
@@ -209,224 +183,6 @@ IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitest, ClearAll) {
                   WaitForDownloadItems(2),  //
                   PressClearAll(),          //
                   WaitForNoDownloads());
-}
-
-// A test fixture in which a dangerous download returns the template parameter
-// danger type.
-template <download::DownloadDangerType DangerType>
-class DownloadsPageInteractiveUitestWithDangerType
-    : public DownloadsPageInteractiveUitest {
- public:
-  // This is required to make a download appear to be a malicious danger type.
-  // TODO(chlily): Deduplicate from other places similar classes are used.
-  class TestDownloadManagerDelegate : public ChromeDownloadManagerDelegate {
-   public:
-    explicit TestDownloadManagerDelegate(Profile* profile)
-        : ChromeDownloadManagerDelegate(profile) {
-      if (!profile->IsOffTheRecord()) {
-        GetDownloadIdReceiverCallback().Run(download::DownloadItem::kInvalidId +
-                                            1);
-      }
-    }
-    ~TestDownloadManagerDelegate() override = default;
-
-    // ChromeDownloadManagerDelegate:
-    bool DetermineDownloadTarget(
-        download::DownloadItem* item,
-        download::DownloadTargetCallback* callback) override {
-      auto set_dangerous = [](download::DownloadTargetCallback callback,
-                              download::DownloadTargetInfo target_info) {
-        target_info.danger_type = DangerType;
-        std::move(callback).Run(std::move(target_info));
-      };
-
-      download::DownloadTargetCallback dangerous_callback =
-          base::BindOnce(set_dangerous, std::move(*callback));
-      bool run = ChromeDownloadManagerDelegate::DetermineDownloadTarget(
-          item, &dangerous_callback);
-      // ChromeDownloadManagerDelegate::DetermineDownloadTarget() needs to run
-      // the `callback`.
-      CHECK(run);
-      CHECK(!dangerous_callback);
-      return true;
-    }
-  };
-
-  DownloadsPageInteractiveUitestWithDangerType() = default;
-
-  void SetUpOnMainThread() override {
-    DownloadsPageInteractiveUitest::SetUpOnMainThread();
-    auto test_delegate =
-        std::make_unique<TestDownloadManagerDelegate>(browser()->GetProfile());
-    DownloadCoreServiceFactory::GetForBrowserContext(browser()->GetProfile())
-        ->SetDownloadManagerDelegateForTesting(std::move(test_delegate));
-  }
-
-  // Downloads a dangerous file. It's a .swf file so that it's dangerous on all
-  // platforms (including CrOS). This .swf normally would be categorized as
-  // DANGEROUS_FILE, but TestDownloadManagerDelegate turns it into the template
-  // param DangerType.
-  auto DownloadDangerousTestFile() {
-    return Do(base::BindLambdaForTesting([&]() {
-      std::unique_ptr<content::DownloadTestObserver> waiter{
-          DangerousDownloadWaiter(
-              browser(), /*num_downloads=*/1,
-              content::DownloadTestObserver::DangerousDownloadAction::
-                  ON_DANGEROUS_DOWNLOAD_QUIT)};
-      GURL url =
-          embedded_test_server()->GetURL("/downloads/dangerous/dangerous.swf");
-      EXPECT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-      waiter->WaitForFinished();
-    }));
-  }
-
-  // Finds the topmost download item and waits for it to be dangerous or not
-  // dangerous. If `is_dangerous` is true and `expected_caption_color` is
-  // provided, also waits for the caption color to match.
-  auto WaitForTopmostItemDanger(
-      bool is_dangerous,
-      std::optional<std::string> expected_caption_color = std::nullopt) {
-    DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kReadyEvent);
-    const DeepQuery path_to_item_danger_caption =
-        PathToTopmostItemElement(".description");
-    const char kHiddenFn[] = "el => el.getAttribute('hidden') %s null";
-    const char kColorMatchCondition[] =
-        " && el.getAttribute('description-color') === '%s'";
-    // If the download is dangerous, the caption is shown, so the hidden
-    // attribute is not present (i.e. equal to null).
-    std::string test_function =
-        base::StringPrintf(kHiddenFn, is_dangerous ? "===" : "!==");
-    if (is_dangerous && expected_caption_color) {
-      base::StrAppend(&test_function,
-                      {base::StringPrintf(kColorMatchCondition,
-                                          expected_caption_color->c_str())});
-    }
-    StateChange danger_caption_visibility;
-    danger_caption_visibility.type = StateChange::Type::kExistsAndConditionTrue;
-    danger_caption_visibility.where = path_to_item_danger_caption;
-    danger_caption_visibility.test_function = test_function;
-    danger_caption_visibility.event = kReadyEvent;
-    return WaitForStateChange(kDownloadsPageTabId, danger_caption_visibility);
-  }
-
-  auto WaitForBypassWarningPrompt() {
-    DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kReadyEvent);
-    const DeepQuery kPathToDialog{
-        "downloads-manager",
-        "downloads-bypass-warning-confirmation-dialog",
-    };
-    StateChange dialog_visible;
-    dialog_visible.type = StateChange::Type::kExists;
-    dialog_visible.where = kPathToDialog;
-    dialog_visible.event = kReadyEvent;
-    return WaitForStateChange(kDownloadsPageTabId, dialog_visible);
-  }
-
-  auto ClickBypassWarningPromptButton(const std::string& button_selector) {
-    DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kReadyEvent);
-    const DeepQuery path_to_button{
-        "downloads-manager",
-        "downloads-bypass-warning-confirmation-dialog",
-        button_selector,
-    };
-    StateChange button_visible;
-    button_visible.type = StateChange::Type::kExists;
-    button_visible.where = path_to_button;
-    button_visible.event = kReadyEvent;
-    return Steps(WaitForStateChange(kDownloadsPageTabId, button_visible),
-                 // Use mouse input instead of JavaScript click() to satisfy the
-                 // user gesture requirement for saving a dangerous file.
-                 MoveMouseTo(kDownloadsPageTabId, path_to_button),
-                 ClickMouse());
-  }
-};
-
-// Uncommon downloads follow the "suspicious" pattern and show up with grey
-// icons and text. They can be validated from the page directly without a
-// confirmation dialog.
-using DownloadsPageInteractiveUitestSuspicious =
-    DownloadsPageInteractiveUitestWithDangerType<
-        download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT>;
-
-IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitestSuspicious,
-                       DiscardSuspiciousFile) {
-  RunTestSequence(OpenDownloadsPage(),                              //
-                  DownloadDangerousTestFile(),                      //
-                  WaitForDownloadItems(1),                          //
-                  WaitForTopmostItemDanger(true, "grey"),           //
-                  TakeTopmostItemMenuAction("#discard-dangerous"),  //
-                  WaitForNoDownloads());
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitestSuspicious,
-                       QuickDiscardSuspiciousFile) {
-  RunTestSequence(OpenDownloadsPage(),                      //
-                  DownloadDangerousTestFile(),              //
-                  WaitForDownloadItems(1),                  //
-                  WaitForTopmostItemDanger(true, "grey"),   //
-                  ClickTopmostItemButton("#quick-remove"),  //
-                  WaitForNoDownloads());
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitestSuspicious,
-                       ValidateSuspiciousFile) {
-  RunTestSequence(OpenDownloadsPage(),                           //
-                  DownloadDangerousTestFile(),                   //
-                  WaitForDownloadItems(1),                       //
-                  WaitForTopmostItemDanger(true, "grey"),        //
-                  TakeTopmostItemMenuAction("#save-dangerous"),  //
-                  WaitForTopmostItemDanger(false));
-}
-
-// Dangerous downloads follow the "dangerous" pattern and show up with red
-// icons and text. They can be validated only from the confirmation dialog.
-using DownloadsPageInteractiveUitestDangerous =
-    DownloadsPageInteractiveUitestWithDangerType<
-        download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT>;
-
-IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitestDangerous,
-                       DiscardDangerousFile) {
-  RunTestSequence(OpenDownloadsPage(),                              //
-                  DownloadDangerousTestFile(),                      //
-                  WaitForDownloadItems(1),                          //
-                  WaitForTopmostItemDanger(true, "red"),            //
-                  TakeTopmostItemMenuAction("#discard-dangerous"),  //
-                  WaitForNoDownloads());
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitestDangerous,
-                       QuickDiscardDangerousFile) {
-  RunTestSequence(OpenDownloadsPage(),                      //
-                  DownloadDangerousTestFile(),              //
-                  WaitForDownloadItems(1),                  //
-                  WaitForTopmostItemDanger(true, "red"),    //
-                  ClickTopmostItemButton("#quick-remove"),  //
-                  WaitForNoDownloads());
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitestDangerous,
-                       ValidateDangerousFileFromPrompt) {
-  RunTestSequence(
-      OpenDownloadsPage(),                                           //
-      DownloadDangerousTestFile(),                                   //
-      WaitForDownloadItems(1),                                       //
-      WaitForTopmostItemDanger(true, "red"),                         //
-      TakeTopmostItemMenuAction("#save-dangerous"),                  //
-      WaitForBypassWarningPrompt(),                                  //
-      ClickBypassWarningPromptButton("#download-dangerous-button"),  //
-      WaitForTopmostItemDanger(false));
-}
-
-IN_PROC_BROWSER_TEST_F(DownloadsPageInteractiveUitestDangerous,
-                       CancelValidateDangerousFile) {
-  RunTestSequence(OpenDownloadsPage(),                               //
-                  DownloadDangerousTestFile(),                       //
-                  WaitForDownloadItems(1),                           //
-                  WaitForTopmostItemDanger(true, "red"),             //
-                  TakeTopmostItemMenuAction("#save-dangerous"),      //
-                  WaitForBypassWarningPrompt(),                      //
-                  ClickBypassWarningPromptButton("#cancel-button"),  //
-                  WaitForTopmostItemDanger(true, "red"));
 }
 
 }  // namespace

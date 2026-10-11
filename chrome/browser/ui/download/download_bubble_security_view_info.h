@@ -89,13 +89,11 @@ class DownloadBubbleSecurityViewInfo
   // Populate all the fields of this class based the current state of
   // the download associated with `content_id_`.
   void PopulateForDownload(download::DownloadItem* download);
-  void PopulateForDangerousUi(const std::u16string& subpage_summary);
   void PopulateForSuspiciousUi(
       const std::u16string& subpage_summary,
       const std::u16string& secondary_subpage_button_label);
   void PopulateForInterrupted(const DownloadUIModel& model);
   void PopulateForInProgressOrComplete(const DownloadUIModel& model);
-  void PopulateForTailoredWarning(const DownloadUIModel& model);
 
   // The subpage of the bubble supports at most 2 buttons. The primary one must
   // be populated first, then the secondary.

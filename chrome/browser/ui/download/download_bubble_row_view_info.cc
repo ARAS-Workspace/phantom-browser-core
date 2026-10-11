@@ -4,7 +4,6 @@
 
 #include "chrome/browser/ui/download/download_bubble_row_view_info.h"
 
-#include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/download/download_item_mode.h"
 #include "components/download/public/common/download_danger_type.h"
@@ -15,7 +14,6 @@
 
 using download::DownloadItem;
 using offline_items_collection::FailState;
-using TailoredWarningType = DownloadUIModel::TailoredWarningType;
 
 DownloadBubbleRowViewInfoObserver::DownloadBubbleRowViewInfoObserver() =
     default;
@@ -100,12 +98,6 @@ void DownloadBubbleRowViewInfo::PopulateForInProgressOrComplete() {
     case download::DownloadItem::InsecureDownloadStatus::VALIDATED:
     case download::DownloadItem::InsecureDownloadStatus::SILENT_BLOCK:
       break;
-  }
-
-  if (TailoredWarningType type = model_->GetTailoredWarningType();
-      type != TailoredWarningType::kNoTailoredWarning) {
-    PopulateForTailoredWarning(type);
-    return;
   }
 
   switch (model_->GetDangerType()) {
@@ -248,28 +240,9 @@ void DownloadBubbleRowViewInfo::PopulateForInterrupted(
                                 : DownloadCommands::Command::RETRY;
 }
 
-void DownloadBubbleRowViewInfo::PopulateForTailoredWarning(
-    TailoredWarningType tailored_warning_type) {
-  CHECK(model_->GetDownloadItem());
-  switch (tailored_warning_type) {
-    case TailoredWarningType::kSuspiciousArchive:
-      return PopulateSuspiciousUiPattern();
-    case TailoredWarningType::kCookieTheft:
-      return PopulateDangerousUiPattern();
-    case TailoredWarningType::kNoTailoredWarning: {
-      NOTREACHED();
-    }
-  }
-}
-
 void DownloadBubbleRowViewInfo::PopulateSuspiciousUiPattern() {
   has_subpage_ = true;
   secondary_text_color_ = kColorDownloadItemTextWarning;
-}
-
-void DownloadBubbleRowViewInfo::PopulateDangerousUiPattern() {
-  has_subpage_ = true;
-  secondary_text_color_ = kColorDownloadItemTextDangerous;
 }
 
 void DownloadBubbleRowViewInfo::Reset() {

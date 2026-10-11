@@ -186,12 +186,12 @@ void UpdateInfoForModel(const DownloadUIModel& model,
     base::Time cur_completed_time = model.GetEndTime();
     if (cur_completed_time.is_null() && update_is_for_model &&
         model.GetState() != download::DownloadItem::CANCELLED) {
-      // Given that we consider dangerous/insecure downloads to be complete, the
-      // completion time should reflect the time they were marked as
-      // dangerous/insecure. Since download is still technically IN_PROGRESS in
-      // this scenario and thus has a null end time, we just use the current
-      // time based on the assumption that a download in a dangerous/insecure
-      // state does not receive further updates besides cancellation.
+      // Given that we consider insecure downloads to be complete, the
+      // completion time should reflect the time they were marked as insecure.
+      // Since download is still technically IN_PROGRESS in this scenario and
+      // thus has a null end time, we just use the current time based on the
+      // assumption that a download in an insecure state does not receive
+      // further updates besides cancellation.
       cur_completed_time = base::Time::Now();
     }
     info.last_completed_time =

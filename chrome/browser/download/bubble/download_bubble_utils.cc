@@ -76,25 +76,20 @@ bool DownloadUIModelIsRecent(const DownloadUIModel* model,
 }
 
 bool IsItemInProgress(const download::DownloadItem* item) {
-  if (item->IsDangerous() || item->IsInsecure()) {
+  if (item->IsInsecure()) {
     return false;
   }
   return item->GetState() == download::DownloadItem::IN_PROGRESS;
 }
 
 bool IsItemInProgress(const offline_items_collection::OfflineItem& item) {
-  // Offline items cannot be pending deep scanning, and insecure warnings are
-  // not shown for them.
-  if (item.is_dangerous) {
-    return false;
-  }
   return item.state ==
              offline_items_collection::OfflineItemState::IN_PROGRESS ||
          item.state == offline_items_collection::OfflineItemState::PAUSED;
 }
 
 bool IsModelInProgress(const DownloadUIModel* model) {
-  if (model->IsDangerous() || model->IsInsecure()) {
+  if (model->IsInsecure()) {
     return false;
   }
   return model->GetState() == download::DownloadItem::IN_PROGRESS;
