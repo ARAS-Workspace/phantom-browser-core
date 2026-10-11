@@ -3718,12 +3718,6 @@ deps = {
     'condition': 'checkout_src_internal',
   },
 
-  'src/components/accessibility/internal': {
-      'url': Var('chrome_git') + '/chrome-accessibility.git' + '@' +
-        'a16011cd66bd0a7c80a0034cfa6da5fce54327f7',
-      'condition': 'checkout_src_internal',
-  },
-
   'src/components/activity_reporter/internal': {
     'url': Var('chrome_git') + '/activity_reporter_internal.git' + '@' +
         '0540703a9db51619739c3de547961dd2227d2f26',
