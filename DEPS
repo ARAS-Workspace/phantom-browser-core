@@ -3580,12 +3580,6 @@ deps = {
   },
 
 
-  'src/chrome/browser/payments/internal': {
-      'url': Var('chrome_git') + '/chrome/payments.git' + '@' +
-        '2ee0bfd5990740fccfe223fd6c9fe21bc4846b9a',
-      'condition': 'checkout_src_internal',
-  },
-
   'src/chrome/browser/platform_experience/win': {
       'url': Var('chrome_git') + '/chrome/browser/platform_experience/win.git' + '@' +
         '06cae3eb7dd1fde62d3b7f3860ddcc11ebbad086',
