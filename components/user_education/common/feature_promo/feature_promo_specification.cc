@@ -38,7 +38,6 @@ bool IsAllowedActionableAlert(const base::Feature& promo_feature) {
   // Add the text names of allowlisted actionable alerts here:
   static constexpr auto kAllowedPromoNames =
       base::MakeFixedFlatSet<std::string_view>({
-          "IPH_DownloadEsbPromo",
           "IPH_HighEfficiencyMode",
           "IPH_iOSEnhancedBrowsingDesktop",
           "IPH_SignInBenefits",

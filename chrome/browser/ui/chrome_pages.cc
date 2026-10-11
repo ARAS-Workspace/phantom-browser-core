@@ -437,14 +437,6 @@ void ShowPasswordCheck(BrowserWindowInterface* browser) {
       browser, GURL(kChromeUIPasswordManagerCheckupURL));
 }
 
-void ShowSafeBrowsingEnhancedProtection(BrowserWindowInterface* browser) {
-  ShowSettingsSubPage(browser, kSafeBrowsingEnhancedProtectionSubPage);
-}
-
-void ShowSafeBrowsingEnhancedProtectionWithIph(
-    BrowserWindowInterface* browser) {
-}
-
 void ShowImportDialog(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("Import_ShowDlg"));
   ShowSettingsSubPage(browser, kImportDataSubPage);

@@ -373,24 +373,6 @@ bool ComparePreAndPostInterstitialSSLStatuses(const content::SSLStatus& one,
          one.pkp_bypassed == two.pkp_bypassed;
 }
 
-void ExpectInterstitialElementHidden(WebContents* tab,
-                                     const std::string& element_id,
-                                     bool expect_hidden) {
-  content::RenderFrameHost* frame = tab->GetPrimaryMainFrame();
-  // Send CMD_TEXT_FOUND to indicate that the 'hidden' class is found, and
-  // CMD_TEXT_NOT_FOUND if not.
-  std::string command = base::StringPrintf(
-      "document.querySelector('#%s')"
-      "    .classList.contains('hidden')"
-      " ? %d : %d;",
-      element_id.c_str(), security_interstitials::CMD_TEXT_FOUND,
-      security_interstitials::CMD_TEXT_NOT_FOUND);
-  int result = content::EvalJs(frame, command).ExtractInt();
-  EXPECT_EQ(expect_hidden ? security_interstitials::CMD_TEXT_FOUND
-                          : security_interstitials::CMD_TEXT_NOT_FOUND,
-            result);
-}
-
 }  // namespace
 
 class SSLUITest : public SSLUITestBase {
@@ -813,13 +795,10 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestBrokenHTTPSMetricsReporting_Proceed) {
   histograms.ExpectTotalCount(decision_histogram, 1);
   histograms.ExpectBucketCount(decision_histogram,
                                security_interstitials::MetricsHelper::SHOW, 1);
-  histograms.ExpectTotalCount(interaction_histogram, 2);
+  histograms.ExpectTotalCount(interaction_histogram, 1);
   histograms.ExpectBucketCount(
       interaction_histogram,
       security_interstitials::MetricsHelper::TOTAL_VISITS, 1);
-  histograms.ExpectBucketCount(
-      interaction_histogram,
-      security_interstitials::MetricsHelper::SHOW_ENHANCED_PROTECTION, 1);
 
   // Decision should be recorded.
   SendInterstitialCommand(browser()->tab_strip_model()->GetActiveWebContents(),
@@ -827,7 +806,7 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestBrokenHTTPSMetricsReporting_Proceed) {
   histograms.ExpectTotalCount(decision_histogram, 2);
   histograms.ExpectBucketCount(
       decision_histogram, security_interstitials::MetricsHelper::PROCEED, 1);
-  histograms.ExpectTotalCount(interaction_histogram, 2);
+  histograms.ExpectTotalCount(interaction_histogram, 1);
   histograms.ExpectBucketCount(
       interaction_histogram,
       security_interstitials::MetricsHelper::TOTAL_VISITS, 1);
@@ -853,13 +832,10 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestBrokenHTTPSMetricsReporting_DontProceed) {
   histograms.ExpectTotalCount(decision_histogram, 1);
   histograms.ExpectBucketCount(decision_histogram,
                                security_interstitials::MetricsHelper::SHOW, 1);
-  histograms.ExpectTotalCount(interaction_histogram, 2);
+  histograms.ExpectTotalCount(interaction_histogram, 1);
   histograms.ExpectBucketCount(
       interaction_histogram,
       security_interstitials::MetricsHelper::TOTAL_VISITS, 1);
-  histograms.ExpectBucketCount(
-      interaction_histogram,
-      security_interstitials::MetricsHelper::SHOW_ENHANCED_PROTECTION, 1);
 
   // Decision should be recorded.
   SendInterstitialCommand(browser()->tab_strip_model()->GetActiveWebContents(),
@@ -868,7 +844,7 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestBrokenHTTPSMetricsReporting_DontProceed) {
   histograms.ExpectBucketCount(
       decision_histogram, security_interstitials::MetricsHelper::DONT_PROCEED,
       1);
-  histograms.ExpectTotalCount(interaction_histogram, 2);
+  histograms.ExpectTotalCount(interaction_histogram, 1);
   histograms.ExpectBucketCount(
       interaction_histogram,
       security_interstitials::MetricsHelper::TOTAL_VISITS, 1);
@@ -6977,38 +6953,6 @@ IN_PROC_BROWSER_TEST_F(SSLUIAutoReloadTest, AutoReloadDisabled) {
   const std::optional<base::OneShotTimer>& timer =
       reloader->next_reload_timer_for_testing();
   EXPECT_EQ(std::nullopt, timer);
-}
-
-class SSLUITestWithEnhancedProtectionMessage : public SSLUITest {
- public:
-  SSLUITestWithEnhancedProtectionMessage() = default;
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(SSLUITestWithEnhancedProtectionMessage,
-                       VerifyEnhancedProtectionMessageShown) {
-  base::HistogramTester histograms;
-  const std::string interaction_histogram =
-      "interstitial.ssl_overridable.interaction";
-
-  ASSERT_TRUE(https_server_expired_.Start());
-  WebContents* contents = browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(contents);
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_expired_.GetURL("/ssl/google.html")));
-  ASSERT_TRUE(chrome_browser_interstitials::IsShowingSSLInterstitial(contents));
-  ExpectInterstitialElementHidden(contents, "enhanced-protection-message",
-                                  false /* expect_hidden */);
-
-  histograms.ExpectTotalCount(interaction_histogram, 2);
-  histograms.ExpectBucketCount(
-      interaction_histogram,
-      security_interstitials::MetricsHelper::TOTAL_VISITS, 1);
-  histograms.ExpectBucketCount(
-      interaction_histogram,
-      security_interstitials::MetricsHelper::SHOW_ENHANCED_PROTECTION, 1);
 }
 
 class InsecureFormNavigationThrottleFencedFrameBrowserTest

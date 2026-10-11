@@ -29,17 +29,6 @@ export function getHtml(this: DownloadsManagerElement) {
       .scrollTarget="${this.listScrollTarget_}"
       @restore-list-focus="${this.onRestoreListFocus_}"
       .template="${(item: MojomData, index: number, tabindex: number) => html`
-<if expr="_google_chrome">
-        <downloads-item .data="${item}" tabindex="${tabindex}"
-            .listTabIndex="${tabindex}" .lastFocused="${this.lastFocused_}"
-            @last-focused-changed="${this.onLastFocusedChanged_}"
-            .listBlurred="${this.listBlurred_}"
-            @list-blurred-changed="${this.onListBlurredChanged_}"
-            .focusRowIndex="${index}"
-            .showEsbPromotion="${this.shouldShowEsbPromotion_(item)}">
-        </downloads-item>
-</if>
-<if expr="not _google_chrome">
         <downloads-item .data="${item}" tabindex="${tabindex}"
             .listTabIndex="${tabindex}" .lastFocused="${this.lastFocused_}"
             @last-focused-changed="${this.onLastFocusedChanged_}"
@@ -47,7 +36,6 @@ export function getHtml(this: DownloadsManagerElement) {
             @list-blurred-changed="${this.onListBlurredChanged_}"
             .focusRowIndex="${index}">
         </downloads-item>
-</if>
       `}">
   </cr-infinite-list>
   <div id="no-downloads" ?hidden="${this.hasDownloads_}">

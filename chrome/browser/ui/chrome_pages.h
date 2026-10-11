@@ -99,9 +99,6 @@ void ShowPasswordManagerSettings(BrowserWindowInterface* bwi);
 void ShowPasswordDetailsPage(BrowserWindowInterface* browser,
                              const std::string& password_domain_name);
 void ShowPasswordCheck(BrowserWindowInterface* browser);
-void ShowSafeBrowsingEnhancedProtection(BrowserWindowInterface* browser);
-void ShowSafeBrowsingEnhancedProtectionWithIph(
-    BrowserWindowInterface* browser);
 void ShowImportDialog(BrowserWindowInterface* browser);
 void ShowAboutChrome(BrowserWindowInterface* browser);
 void ShowSearchEngineSettings(BrowserWindowInterface* browser);

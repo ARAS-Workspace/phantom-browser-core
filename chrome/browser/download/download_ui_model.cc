@@ -20,7 +20,6 @@
 #include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/offline_item_utils.h"
 #include "chrome/browser/download/status_text_builder_utils.h"
-#include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
@@ -512,10 +511,9 @@ bool DownloadUIModel::IsCommandEnabled(
     case DownloadCommands::RETRY:
     case DownloadCommands::CANCEL_DEEP_SCAN:
       return true;
+    case DownloadCommands::OPEN_SAFE_BROWSING_SETTING:
     case DownloadCommands::REVIEW:
       return false;
-    case DownloadCommands::OPEN_SAFE_BROWSING_SETTING:
-      return CanUserTurnOnSafeBrowsing(profile());
   }
   NOTREACHED();
 }
@@ -576,11 +574,8 @@ void DownloadUIModel::ExecuteCommand(DownloadCommands* download_commands,
     case DownloadCommands::LEARN_MORE_INTERRUPTED:
     case DownloadCommands::LEARN_MORE_INSECURE_DOWNLOAD:
     case DownloadCommands::LEARN_MORE_DOWNLOAD_BLOCKED:
-      NOTREACHED();
     case DownloadCommands::OPEN_SAFE_BROWSING_SETTING:
-      chrome::ShowSafeBrowsingEnhancedProtectionWithIph(
-          download_commands->GetBrowser());
-      break;
+      NOTREACHED();
     case DownloadCommands::PAUSE:
       Pause();
       break;

@@ -19,7 +19,6 @@ class BlockedInterceptionBlockingPage : public SSLBlockingPageBase {
       content::WebContents* web_contents,
       net::Error cert_error,
       const GURL& request_url,
-      bool can_show_enhanced_protection_message,
       const net::SSLInfo& ssl_info,
       std::unique_ptr<
           security_interstitials::SecurityInterstitialControllerClient>

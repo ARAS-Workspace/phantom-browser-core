@@ -11,7 +11,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "components/security_interstitials/content/security_interstitial_controller_client.h"
 #include "components/security_interstitials/content/security_interstitial_page.h"
-#include "components/security_interstitials/content/settings_page_helper.h"
 #include "components/security_interstitials/core/metrics_helper.h"
 #include "components/security_interstitials/core/ssl_error_ui.h"
 #include "content/public/browser/navigation_throttle.h"
@@ -53,8 +52,7 @@ class FakeSSLBlockingPage
                 CreateMetricsHelperForTest(request_url),
                 /*prefs=*/nullptr,
                 "en_US",
-                GURL("about:blank"),
-                /* settings_page_helper */ nullptr)),
+                GURL("about:blank"))),
         ssl_error_ui_(request_url,
                       cert_error,
                       ssl_info,

@@ -61,7 +61,6 @@ class SecurityInterstitialPageController
   void OpenReportingPrivacy();
   void OpenWhitepaper();
   void ReportPhishingError();
-  void OpenEnhancedProtectionSettings();
   void OpenHelpCenterInNewTab();
   void OpenDiagnosticInNewTab();
   void OpenReportingPrivacyInNewTab();

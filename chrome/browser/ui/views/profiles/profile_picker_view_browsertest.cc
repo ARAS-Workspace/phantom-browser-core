@@ -44,7 +44,6 @@
 #include "chrome/browser/enterprise/signin/signals_disclaimer_metrics.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
-#include "chrome/browser/interstitials/chrome_settings_page_helper.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/metrics/first_web_contents_profiler_base.h"
@@ -2184,22 +2183,6 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
   EXPECT_EQ(new_browser->GetType(), BrowserWindowInterface::Type::TYPE_POPUP);
   WaitForBrowserUrl(kURL,
                     new_browser->GetTabStripModel()->GetActiveWebContents());
-}
-
-// Regression test for crbug.com/40772584.
-// TODO(crbug.com/40772284): Re-implement the test bases on the final fix.
-IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
-                       CreateSignedInProfileSecurityInterstitials) {
-  ASSERT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-  StartDiceSignIn();
-
-  // Simulate clicking on the settings link in a security interstitial (that
-  // appears in the sign-in flow e.g. due to broken internet connection).
-  security_interstitials::ChromeSettingsPageHelper::
-      CreateChromeSettingsPageHelper()
-          ->OpenEnhancedProtectionSettings(web_contents());
-  // Nothing happens, the browser should not crash.
-  base::RunLoop().RunUntilIdle();
 }
 
 IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,

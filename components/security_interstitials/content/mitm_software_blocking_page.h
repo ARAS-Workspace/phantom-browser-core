@@ -34,7 +34,6 @@ class MITMSoftwareBlockingPage : public SSLBlockingPageBase {
       content::WebContents* web_contents,
       net::Error cert_error,
       const GURL& request_url,
-      bool can_show_enhanced_protection_message,
       const net::SSLInfo& ssl_info,
       const std::string& mitm_software_name,
       bool is_enterprise_managed,

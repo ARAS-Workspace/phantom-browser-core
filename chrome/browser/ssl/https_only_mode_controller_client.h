@@ -14,7 +14,6 @@ class WebContents;
 
 namespace security_interstitials {
 class MetricsHelper;
-class SettingsPageHelper;
 }  // namespace security_interstitials
 
 class HttpsOnlyModeControllerClient
@@ -25,9 +24,7 @@ class HttpsOnlyModeControllerClient
 
   HttpsOnlyModeControllerClient(
       content::WebContents* web_contents,
-      const GURL& request_url,
-      std::unique_ptr<security_interstitials::SettingsPageHelper>
-          settings_page_helper);
+      const GURL& request_url);
   HttpsOnlyModeControllerClient(const HttpsOnlyModeControllerClient&) = delete;
   HttpsOnlyModeControllerClient& operator=(
       const HttpsOnlyModeControllerClient&) = delete;

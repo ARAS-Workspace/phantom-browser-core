@@ -145,16 +145,6 @@ export function getHtml(this: DownloadsItemElement) {
       </div>
     </div>
   </div>
-<if expr="_google_chrome">
-  ${this.showEsbPromotion ? html`
-    <cr-link-row id="esb-download-row-promo"
-        start-icon="downloads-internal:gshield" external
-        @click="${this.onEsbPromotionClick_}"
-        button-aria-description="$i18n{esbDownloadRowPromoA11y}"
-        label="$i18n{esbDownloadRowPromoString}">
-    </cr-link-row>
-  ` : ''}
-</if>
 </div>
 <!--_html_template_end_-->`;
   // clang-format on

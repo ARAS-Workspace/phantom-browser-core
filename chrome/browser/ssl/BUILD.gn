@@ -105,7 +105,6 @@ source_set("impl") {
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/history",
     "//chrome/browser/infobars",
-    "//chrome/browser/interstitials",
     "//chrome/browser/lookalikes",
     "//chrome/browser/metrics",
     "//chrome/browser/net",

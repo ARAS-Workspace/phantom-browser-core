@@ -122,11 +122,6 @@ void SecurityInterstitialPageController::ReportPhishingError() {
                   CMD_REPORT_PHISHING_ERROR);
 }
 
-void SecurityInterstitialPageController::OpenEnhancedProtectionSettings() {
-  SendCommand(security_interstitials::SecurityInterstitialCommand::
-                  CMD_OPEN_ENHANCED_PROTECTION_SETTINGS);
-}
-
 void SecurityInterstitialPageController::OpenHelpCenterInNewTab() {
   SendCommand(security_interstitials::SecurityInterstitialCommand::
                   CMD_OPEN_HELP_CENTER_IN_NEW_TAB);
@@ -208,8 +203,6 @@ void SecurityInterstitialPageController::SendCommand(
       interface->ReportPhishingError();
       break;
     case security_interstitials::CMD_OPEN_ENHANCED_PROTECTION_SETTINGS:
-      interface->OpenEnhancedProtectionSettings();
-      break;
     case security_interstitials::CMD_OPEN_ANDROID_ADVANCED_PROTECTION_SETTINGS:
       break;
     case security_interstitials::CMD_OPEN_HELP_CENTER_IN_NEW_TAB:
@@ -269,9 +262,6 @@ SecurityInterstitialPageController::GetObjectTemplateBuilder(
                      &SecurityInterstitialPageController::OpenWhitepaper)
           .SetMethod("reportPhishingError",
                      &SecurityInterstitialPageController::ReportPhishingError)
-          .SetMethod("openEnhancedProtectionSettings",
-                     &SecurityInterstitialPageController::
-                         OpenEnhancedProtectionSettings)
           .SetMethod(
               "openHelpCenterInNewTab",
               &SecurityInterstitialPageController::OpenHelpCenterInNewTab)

@@ -30,9 +30,6 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHResumptionRailFeature,
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    &kEsbDownloadRowPromoFeature,
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     &kIPHExtensionsMenuFeature,
     &kIPHExtensionsRequestAccessButtonFeature,
@@ -52,7 +49,6 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHDesktopRealboxContextualSearchFeature,
     &kIPHDesktopSharedHighlightingFeature,
     &kIPHDiscardRingFeature,
-    &kIPHDownloadEsbPromoFeature,
     &kIPHExplicitBrowserSigninPreferenceRememberedFeature,
     &kIPHFocusHelpBubbleScreenReaderPromoFeature,
     &kIPHGMCCastStartStopFeature,

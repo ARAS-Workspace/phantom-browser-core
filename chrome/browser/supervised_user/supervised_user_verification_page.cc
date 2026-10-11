@@ -144,9 +144,6 @@ void SupervisedUserVerificationPage::PopulateCommonStrings(
   load_time_data.Set("finalParagraph", "");
   load_time_data.Set("optInLink", l10n_util::GetStringUTF16(
                                       IDS_SAFE_BROWSING_SCOUT_REPORTING_AGREE));
-  load_time_data.Set(
-      "enhancedProtectionMessage",
-      l10n_util::GetStringUTF16(IDS_SAFE_BROWSING_ENHANCED_PROTECTION_MESSAGE));
 }
 
 bool SupervisedUserVerificationPage::IsReauthCompleted() {

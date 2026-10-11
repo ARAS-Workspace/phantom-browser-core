@@ -290,9 +290,6 @@ BASE_FEATURE(kHttpsFirstBalancedMode, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kHttpsFirstBalancedModeAutoEnable,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kHttpsFirstModeDefaultSettingPairsWithEsb,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enables HTTPS-First Mode for engaged sites. No-op if HttpsFirstModeV2 or
 // HTTPS-Upgrades is disabled.
 BASE_FEATURE(kHttpsFirstModeV2ForEngagedSites,

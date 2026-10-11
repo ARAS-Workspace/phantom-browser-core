@@ -34,7 +34,6 @@ BlockedInterceptionBlockingPage::BlockedInterceptionBlockingPage(
     content::WebContents* web_contents,
     net::Error cert_error,
     const GURL& request_url,
-    bool can_show_enhanced_protection_message,
     const net::SSLInfo& ssl_info,
     std::unique_ptr<
         security_interstitials::SecurityInterstitialControllerClient>
@@ -44,7 +43,6 @@ BlockedInterceptionBlockingPage::BlockedInterceptionBlockingPage(
                           request_url,
                           true /* overridable */,
                           base::Time::Now(),
-                          can_show_enhanced_protection_message,
                           std::move(controller_client)),
       ssl_info_(ssl_info),
       blocked_interception_ui_(
@@ -64,7 +62,7 @@ void BlockedInterceptionBlockingPage::PopulateInterstitialStrings(
     base::DictValue& load_time_data) {
   blocked_interception_ui_->PopulateStringsForHTML(load_time_data);
 
-  PopulateEnhancedProtectionMessage(load_time_data);
+  DisableExtendedReportingCheckbox(load_time_data);
 }
 
 // This handles the commands sent from the interstitial JavaScript.

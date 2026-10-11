@@ -1465,31 +1465,6 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(120, "yuezhanggg@chromium.org",
                        "Triggered when a price tracking is enabled.")));
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // kIPHDownloadEsbPromoFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForCustomAction(
-          feature_engagement::kIPHDownloadEsbPromoFeature,
-          kToolbarDownloadButtonElementId, IDS_DOWNLOAD_BUBBLE_ESB_PROMO,
-          IDS_DOWNLOAD_BUBBLE_ESB_PROMO_CUSTOM_ACTION,
-          base::BindRepeating(
-              [](ContextPtr ctx,
-                 user_education::FeaturePromoHandle promo_handle) {
-                chrome::ShowSafeBrowsingEnhancedProtectionWithIph(
-                    GetBrowser(ctx));
-              }))
-          .SetCustomActionIsDefault(true)
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetBubbleTitleText(IDS_DOWNLOAD_BUBBLE_ESB_PROMO_TITLE)
-          .SetCustomActionDismissText(IDS_DOWNLOAD_BUBBLE_ESB_PROMO_DISMISS)
-          .SetBubbleIcon(&vector_icons::kGshieldIcon)
-          .SetPromoSubtype(
-              FeaturePromoSpecification::PromoSubtype::kActionableAlert)
-          .SetMetadata(
-              122, "awado@chromium.org",
-              "Triggered when user is using standard protection mode.")));
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
   // kIPHBackNavigationMenuFeature:
   registry.RegisterFeature(
       std::move(FeaturePromoSpecification::CreateForSnoozePromo(

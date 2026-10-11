@@ -23,8 +23,6 @@ interface InterstitialCommands {
   OpenWhitepaperInNewTab();
   ReportPhishingErrorInNewTab();
   ReportPhishingError();
-  // Opens the enhanced protection settings in a new tab.
-  OpenEnhancedProtectionSettings();
 
   // Opens the certificate viewer showing the certificate on the SSL error that
   // triggered the interstitial. Only meaningful for SSL error interstitials.

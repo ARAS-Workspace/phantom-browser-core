@@ -49,9 +49,6 @@ void PopulateLookalikeUrlBlockingPageStrings(base::DictValue& load_time_data,
                      l10n_util::GetStringUTF16(IDS_LOOKALIKE_URL_TITLE));
   load_time_data.Set("optInLink", l10n_util::GetStringUTF16(
                                       IDS_SAFE_BROWSING_SCOUT_REPORTING_AGREE));
-  load_time_data.Set(
-      "enhancedProtectionMessage",
-      l10n_util::GetStringUTF16(IDS_SAFE_BROWSING_ENHANCED_PROTECTION_MESSAGE));
 
   if (safe_url.is_valid()) {
     const std::u16string hostname =

@@ -2,44 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//components/enterprise/buildflags/buildflags.gni")
-import("//extensions/buildflags/buildflags.gni")
-
-source_set("interstitials") {
-  sources = [ "chrome_settings_page_helper.h" ]
-
-  public_deps = [
-    "//components/security_interstitials/content:security_interstitial_page",
-    "//url",
-  ]
-}
-
-source_set("impl") {
-  sources = [ "chrome_settings_page_helper.cc" ]
-
-  public_deps = [
-    ":interstitials",
-    "//chrome/browser:browser_public_dependencies",
-  ]
-
-  deps = [
-    "//base",
-    "//chrome/browser/profiles:profile",
-    "//components/prefs",
-    "//components/sessions",
-    "//content/public/browser",
-  ]
-
-  deps += [
-    "//chrome/browser/ui",
-    "//chrome/browser/ui:chrome_pages",
-  ]
-
-  if (enable_extensions) {
-    deps += [ "//chrome/browser/extensions" ]
-  }
-}
-
 source_set("test_support") {
   testonly = true
 

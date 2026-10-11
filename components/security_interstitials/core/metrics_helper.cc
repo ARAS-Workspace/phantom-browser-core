@@ -138,12 +138,6 @@ void MaybeRecordInteractionAsAction(MetricsHelper::Interaction interaction,
           UserMetricsAction("PhishingInterstitial.ReportPhishingError"));
     } else if (interaction == MetricsHelper::SHOW_WHITEPAPER) {
       RecordAction(UserMetricsAction("PhishingInterstitial.WhitePaper"));
-    } else if (interaction == MetricsHelper::SHOW_ENHANCED_PROTECTION) {
-      RecordAction(
-          UserMetricsAction("PhishingInterstitial.EnhancedProtectionMessage"));
-    } else if (interaction == MetricsHelper::OPEN_ENHANCED_PROTECTION) {
-      RecordAction(
-          UserMetricsAction("PhishingInterstitial.EnhancedProtectionSettings"));
     } else if (interaction == MetricsHelper::CLOSE_INTERSTITIAL_WITHOUT_UI) {
       RecordAction(
           UserMetricsAction("PhishingInterstitial.CloseInterstitialWithoutUI"));

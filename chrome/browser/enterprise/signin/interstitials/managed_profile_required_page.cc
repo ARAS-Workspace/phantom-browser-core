@@ -143,7 +143,6 @@ void ManagedProfileRequiredPage::PopulateStringsForSharedHTML(
   load_time_data.Set("hide_primary_button", false);
   load_time_data.Set("openDetails", "");
   load_time_data.Set("optInLink", "");
-  load_time_data.Set("enhancedProtectionMessage", "");
   load_time_data.Set("explanationParagraph", "");
   load_time_data.Set("finalParagraph", "");
 

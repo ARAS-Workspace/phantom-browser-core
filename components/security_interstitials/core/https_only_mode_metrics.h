@@ -18,10 +18,6 @@ extern const char kEventHistogram[];
 // navigation where HFM was enabled due to the site engagement heuristic.
 extern const char kEventHistogramWithEngagementHeuristic[];
 
-// Same as kEventHistogram, but only recorded if the event happened on a
-// navigation where HFM was enabled due to the HFM-ESB pairing.
-extern const char kEventHistogramWithEsbPairing[];
-
 extern const char kNavigationRequestSecurityLevelHistogram[];
 
 // Histogram that records enabled/disabled states for sites. If HFM gets enabled
@@ -207,10 +203,6 @@ struct HttpInterstitialState {
   // warn when HTTPS can be expected to succeed, but not when it will likely
   // fail (e.g. to non-unique hostnames).
   bool enabled_in_balanced_mode = false;
-
-  // Whether HTTPS-First Mode is enabled because the user has Enhanced Safe
-  // Browsing enabled and has not manually customized their HFM settings.
-  bool enabled_by_esb_pairing = false;
 };
 
 // Helper to record an HTTPS-First Mode navigation event.

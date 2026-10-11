@@ -45,9 +45,6 @@ inline constexpr char kIPHDemoModeFeatureChoiceParam[] = "chosen_feature";
 DEFINE_VARIATION_PARAM(kIPHDummyFeature, "IPH_Dummy");
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-DEFINE_VARIATION_PARAM(kEsbDownloadRowPromoFeature, "EsbDownloadRowPromo");
-#endif
 DEFINE_VARIATION_PARAM(kIPHBatterySaverModeFeature, "IPH_BatterySaverMode");
 DEFINE_VARIATION_PARAM(kIPHCompanionSidePanelFeature, "IPH_CompanionSidePanel");
 DEFINE_VARIATION_PARAM(kIPHCompanionSidePanelRegionSearchFeature,
@@ -63,7 +60,6 @@ DEFINE_VARIATION_PARAM(kIPHDesktopCustomizeChromeExperimentFeature,
 DEFINE_VARIATION_PARAM(kIPHDesktopRealboxContextualSearchFeature,
                        "IPH_DesktopRealboxContextualSearchFeature");
 DEFINE_VARIATION_PARAM(kIPHDiscardRingFeature, "IPH_DiscardRing");
-DEFINE_VARIATION_PARAM(kIPHDownloadEsbPromoFeature, "IPH_DownloadEsbPromo");
 DEFINE_VARIATION_PARAM(kIPHExplicitBrowserSigninPreferenceRememberedFeature,
                        "IPH_ExplicitBrowserSigninPreferenceRemembered");
 DEFINE_VARIATION_PARAM(kIPHHistorySearchFeature, "IPH_HistorySearch");

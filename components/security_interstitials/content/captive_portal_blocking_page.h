@@ -43,7 +43,6 @@ class CaptivePortalBlockingPage : public SSLBlockingPageBase {
       content::WebContents* web_contents,
       const GURL& request_url,
       const GURL& login_url,
-      bool can_show_enhanced_protection_message,
       const net::SSLInfo& ssl_info,
       std::unique_ptr<
           security_interstitials::SecurityInterstitialControllerClient>

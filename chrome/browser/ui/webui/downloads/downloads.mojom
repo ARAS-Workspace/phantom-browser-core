@@ -154,21 +154,10 @@ interface PageHandler {
   ClearAll();
   OpenDownloadsFolderRequiringGesture();
 
-  // The two methods below are for the ESB Download Row Promo.
-  // Opens the chrome://settings/security page with a IPH Promotion
-  // on the ESB radio button.
-  OpenEsbSettings();
-
-  // Logs when the user actually sees the ESB Download Row Promo.
-  LogEsbPromotionRowViewed();
-
   // Opens a review dialog for the download with the given |id| after it has
   // received a warning deep scanning verdict. This requires a user gesture on
   // the WebUI.
   ReviewDangerousRequiringGesture(string id);
-
-  // Checks whether an ESB Promotion can be shown on this profile.
-  IsEligibleForEsbPromo() => (bool result);
 };
 
 interface Page {

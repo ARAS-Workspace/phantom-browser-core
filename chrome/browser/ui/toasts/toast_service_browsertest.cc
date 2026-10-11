@@ -35,6 +35,7 @@ constexpr auto kDeprecatedToastIds =
          /*kSyncEsbOff=*/11,
          /*kGeminiWorkingOnTask=*/17,
          /*kGlicShareImageFailed=*/21,
+         /*kEnhancedBundledSecuritySettings=*/23,
          /*kSkillSaved=*/24,
          /*kSkillDeleted=*/25,
          /*kTranslate=*/27,

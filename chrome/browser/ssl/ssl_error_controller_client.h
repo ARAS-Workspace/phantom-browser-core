@@ -13,10 +13,6 @@ namespace content {
 class WebContents;
 }
 
-namespace security_interstitials {
-class SettingsPageHelper;
-}
-
 // Provides embedder-specific logic for the SSL error page controller.
 class SSLErrorControllerClient
     : public security_interstitials::SecurityInterstitialControllerClient {
@@ -26,9 +22,7 @@ class SSLErrorControllerClient
       const net::SSLInfo& ssl_info,
       net::Error cert_error,
       const GURL& request_url,
-      std::unique_ptr<security_interstitials::MetricsHelper> metrics_helper,
-      std::unique_ptr<security_interstitials::SettingsPageHelper>
-          settings_page_helper);
+      std::unique_ptr<security_interstitials::MetricsHelper> metrics_helper);
 
   SSLErrorControllerClient(const SSLErrorControllerClient&) = delete;
   SSLErrorControllerClient& operator=(const SSLErrorControllerClient&) = delete;

@@ -16,7 +16,6 @@ LocalSelfSignedBlockingPage::LocalSelfSignedBlockingPage(
     const base::Time& time_triggered,
     const GURL& support_url,
     bool overrideable,
-    bool can_show_enhanced_protection_message,
     std::unique_ptr<
         security_interstitials::SecurityInterstitialControllerClient>
         controller_client)
@@ -28,7 +27,6 @@ LocalSelfSignedBlockingPage::LocalSelfSignedBlockingPage(
                       time_triggered,
                       support_url,
                       overrideable,
-                      can_show_enhanced_protection_message,
                       std::move(controller_client)) {}
 
 LocalSelfSignedBlockingPage::~LocalSelfSignedBlockingPage() = default;

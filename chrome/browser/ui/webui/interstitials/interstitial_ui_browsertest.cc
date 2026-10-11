@@ -149,62 +149,6 @@ IN_PROC_BROWSER_TEST_F(InterstitialUITest, CTInterstitial) {
       u"NET::ERR_CERTIFICATE_TRANSPARENCY_REQUIRED");
 }
 
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, MalwareInterstitial) {
-  TestInterstitial(GURL("chrome://interstitials/safebrowsing?type=malware"),
-                   "Security error", IDS_SAFEBROWSING_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, PhishingInterstitial) {
-  TestInterstitial(GURL("chrome://interstitials/safebrowsing?type=phishing"),
-                   "Security error", IDS_SAFEBROWSING_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, UnwantedSoftwareInterstitial) {
-  TestInterstitial(GURL("chrome://interstitials/safebrowsing?type=unwanted"),
-                   "Security error", IDS_SAFEBROWSING_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, MalwareInterstitialQuiet) {
-  TestInterstitial(
-      GURL("chrome://interstitials/quietsafebrowsing?type=malware"),
-      "Security error", IDS_MALWARE_WEBVIEW_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, PhishingInterstitialQuiet) {
-  TestInterstitial(
-      GURL("chrome://interstitials/quietsafebrowsing?type=phishing"),
-      "Security error", IDS_PHISHING_WEBVIEW_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, UnwantedSoftwareInterstitialQuiet) {
-  TestInterstitial(
-      GURL("chrome://interstitials/quietsafebrowsing?type=unwanted"),
-      "Security error", IDS_HARMFUL_WEBVIEW_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, BillingInterstitialQuiet) {
-  TestInterstitial(
-      GURL("chrome://interstitials/quietsafebrowsing?type=billing"),
-      "Page may charge money", IDS_BILLING_WEBVIEW_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, ClientsideMalwareInterstitial) {
-  TestInterstitial(
-      GURL("chrome://interstitials/safebrowsing?type=clientside_malware"),
-      "Security error", IDS_SAFEBROWSING_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, ClientsidePhishingInterstitial) {
-  TestInterstitial(
-      GURL("chrome://interstitials/safebrowsing?type=clientside_phishing"),
-      "Security error", IDS_SAFEBROWSING_HEADING);
-}
-
-IN_PROC_BROWSER_TEST_F(InterstitialUITest, BillingInterstitial) {
-  TestInterstitial(GURL("chrome://interstitials/safebrowsing?type=billing"),
-                   "Page may charge money", IDS_BILLING_HEADING);
-}
-
 IN_PROC_BROWSER_TEST_F(InterstitialUITest, CaptivePortalInterstitial) {
   TestInterstitial(GURL("chrome://interstitials/captiveportal"),
                    "Connect to network");

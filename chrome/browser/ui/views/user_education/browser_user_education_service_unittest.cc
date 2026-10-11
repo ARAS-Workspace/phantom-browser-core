@@ -186,7 +186,6 @@ TEST(BrowserUserEducationServiceTest, PreventNewHardCodedConfigurations) {
       &feature_engagement::kIPHComposeMSBBSettingsFeature,
       &feature_engagement::kIPHDesktopSharedHighlightingFeature,
       &feature_engagement::kIPHDiscardRingFeature,
-      &feature_engagement::kIPHDownloadEsbPromoFeature,
       &feature_engagement::kIPHExtensionsMenuFeature,
       &feature_engagement::kIPHExtensionsRequestAccessButtonFeature,
       &feature_engagement::kIPHGMCCastStartStopFeature,

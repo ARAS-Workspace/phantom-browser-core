@@ -10,7 +10,6 @@ import {HIDDEN_CLASS, preventDefaultOnPoundLinkClicks, SecurityInterstitialComma
 import {mobileNav} from 'chrome://interstitials/common/resources/interstitial_mobile_nav.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 
-import {setupEnhancedProtectionMessage} from './enhanced_protection_message.js';
 import {setupExtendedReportingCheckbox} from './extended_reporting.js';
 import {setupSSLDebuggingInfo} from './ssl.js';
 
@@ -336,7 +335,6 @@ function setupEvents() {
 
   preventDefaultOnPoundLinkClicks();
   setupExtendedReportingCheckbox();
-  setupEnhancedProtectionMessage();
   setupSSLDebuggingInfo();
 
   const disableKeyboardOverride =

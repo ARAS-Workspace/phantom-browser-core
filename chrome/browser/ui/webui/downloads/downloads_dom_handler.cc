@@ -16,14 +16,12 @@
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
-#include "base/metrics/user_metrics.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/supports_user_data.h"
 #include "base/task/current_thread.h"
 #include "base/threading/thread.h"
 #include "base/values.h"
-#include "build/branding_buildflags.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/download/download_danger_prompt.h"
 #include "chrome/browser/download/download_history.h"
@@ -33,14 +31,10 @@
 #include "chrome/browser/download/download_query.h"
 #include "chrome/browser/download/download_ui_safe_browsing_util.h"
 #include "chrome/browser/download/drag_download_item.h"
-#include "chrome/browser/feature_engagement/non_iph_promo.h"
-#include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"
 #include "chrome/browser/ui/webui/fileicon_source.h"
@@ -48,8 +42,6 @@
 #include "chrome/common/url_constants.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/download_item.h"
-#include "components/feature_engagement/public/feature_constants.h"
-#include "components/feature_engagement/public/tracker.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/tabs/public/tab_interface.h"
@@ -530,72 +522,6 @@ void DownloadsDOMHandler::ReviewDangerousRequiringGesture(
 
   CountDownloadsDOMEvents(DOWNLOADS_DOM_EVENT_REVIEW_DANGEROUS);
 }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-// This function will be called when a user clicks on the ESB
-// (Enhanced Safe Browsing) download row promo. It will notify
-// the feature engagement backend to record the event that the
-// promo was clicked.
-void DownloadsDOMHandler::OpenEsbSettings() {
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-          GetWebUIWebContents());
-  if (!browser) {
-    return;
-  }
-  chrome::ShowSafeBrowsingEnhancedProtectionWithIph(browser);
-
-  feature_engagement::Tracker* tracker =
-      feature_engagement::TrackerFactory::GetForBrowserContext(
-          browser->GetProfile());
-  tracker->NotifyEvent("esb_download_promo_row_clicked");
-  base::RecordAction(
-      base::UserMetricsAction("SafeBrowsing.EsbDownloadRowPromo.Click"));
-  base::UmaHistogramEnumeration(
-      "SafeBrowsing.EsbDownloadRowPromo.Outcome",
-      SafeBrowsingEsbDownloadRowPromoOutcome::kClicked);
-}
-
-void DownloadsDOMHandler::IsEligibleForEsbPromo(
-    IsEligibleForEsbPromoCallback callback) {
-  content::DownloadManager* manager = GetMainNotifierManager();
-  if (!manager) {
-    std::move(callback).Run(false);
-    return;
-  }
-
-  std::move(callback).Run(false);
-}
-
-void DownloadsDOMHandler::LogEsbPromotionRowViewed() {
-  content::DownloadManager* manager = GetMainNotifierManager();
-  if (!manager) {
-    return;
-  }
-  feature_engagement::Tracker* tracker =
-      feature_engagement::TrackerFactory::GetForBrowserContext(
-          manager->GetBrowserContext());
-  tracker->NotifyEvent("esb_download_promo_row_viewed");
-  base::UmaHistogramEnumeration("SafeBrowsing.EsbDownloadRowPromo.Outcome",
-                                SafeBrowsingEsbDownloadRowPromoOutcome::kShown);
-}
-#else
-// These next three functions are empty implementations for the non-branded
-// chromium build since the ESB download row promo only runs on branded
-// google chrome.
-void DownloadsDOMHandler::OpenEsbSettings() {
-  return;
-}
-
-void DownloadsDOMHandler::IsEligibleForEsbPromo(
-    IsEligibleForEsbPromoCallback callback) {
-  std::move(callback).Run(false);
-}
-
-void DownloadsDOMHandler::LogEsbPromotionRowViewed() {
-  return;
-}
-#endif
 
 // DownloadsDOMHandler, private: --------------------------------------------
 

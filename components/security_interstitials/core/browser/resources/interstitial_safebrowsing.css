@@ -83,12 +83,3 @@ body.safe-browsing {
       url(images/1x/triangle_red.png) 1x,
       url(images/2x/triangle_red.png) 2x);
 }
-
-.safe-browsing-enhanced-protection-message {
-  background-color: var(--google-red-90);
-  color: var(--google-red-10);
-}
-
-.safe-browsing-enhanced-protection-message .icon {
-  background-image: url(images/light_bulb_red.svg);
-}

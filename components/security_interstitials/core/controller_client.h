@@ -19,9 +19,7 @@ class MetricsHelper;
 // Constants used to communicate with the JavaScript.
 extern const char kBoxChecked[];
 extern const char kDisplayCheckBox[];
-extern const char kDisplayEnhancedProtectionMessage[];
 extern const char kOptInLink[];
-extern const char kEnhancedProtectionMessage[];
 extern const char kPrivacyLinkHtml[];
 
 // These represent the commands sent from the interstitial JavaScript.
@@ -123,8 +121,6 @@ class ControllerClient {
   virtual void OpenUrlInCurrentTab(const GURL& url) = 0;
 
   virtual void OpenUrlInNewForegroundTab(const GURL& url) = 0;
-
-  virtual void OpenEnhancedProtectionSettings() = 0;
 
   virtual PrefService* GetPrefService() = 0;
 

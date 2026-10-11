@@ -50,7 +50,6 @@
 #include "components/security_interstitials/content/security_interstitial_controller_client.h"
 #include "components/security_interstitials/content/security_interstitial_page.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
-#include "components/security_interstitials/content/settings_page_helper.h"
 #include "components/security_interstitials/core/metrics_helper.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/tabs/public/tab_interface.h"
@@ -531,8 +530,7 @@ class TestInterstitialPage
                 CreateTestMetricsHelper(web_contents),
                 nullptr,
                 base::i18n::GetConfiguredLocale(),
-                GURL(),
-                /* settings_page_helper*/ nullptr)) {}
+                GURL())) {}
 
   ~TestInterstitialPage() override = default;
   void OnInterstitialClosing() override {}

@@ -504,48 +504,6 @@ suite('ItemTest', function() {
     assertFalse(isVisible(copyDownloadLinkButton));
   });
 
-  // <if expr="_google_chrome">
-  test('ESBDownloadRowPromoShownAndClicked', async () => {
-    const item = document.createElement('downloads-item');
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    document.body.appendChild(item);
-    item.showEsbPromotion = true;
-    item.data = createDownload({
-      dangerType: DangerType.kDangerousFile,
-      fileExternallyRemoved: false,
-      hideDate: true,
-      state: State.kDangerous,
-      isDangerous: true,
-      url: 'http://evil.com',
-    });
-    await microtasksFinished();
-    const esbPromo =
-        item.shadowRoot.querySelector<HTMLElement>('#esb-download-row-promo');
-    assertTrue(!!esbPromo);
-    assertTrue(isVisible(esbPromo));
-    esbPromo.click();
-    await handler.whenCalled('openEsbSettings');
-  });
-
-  test('ESBDownloadRowPromoNotShown', async () => {
-    const item = document.createElement('downloads-item');
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    document.body.appendChild(item);
-    item.showEsbPromotion = false;
-    item.data = createDownload({
-      dangerType: DangerType.kDangerousFile,
-      fileExternallyRemoved: false,
-      hideDate: true,
-      state: State.kDangerous,
-      isDangerous: true,
-      url: 'http://evil.com',
-    });
-    await microtasksFinished();
-    const esbPromo = item.shadowRoot.querySelector('#esb-download-row-promo');
-    assertFalse(isVisible(esbPromo));
-  });
-  // </if>
-
   test('DownloadIsActive', async () => {
     const content = item.shadowRoot.querySelector<HTMLElement>('#content');
     assertTrue(!!content);

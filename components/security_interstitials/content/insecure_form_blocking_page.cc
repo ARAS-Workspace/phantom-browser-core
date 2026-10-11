@@ -95,9 +95,6 @@ void InsecureFormBlockingPage::PopulateInterstitialStrings(
                      l10n_util::GetStringUTF16(IDS_INSECURE_FORM_BACK_BUTTON));
   load_time_data.Set("optInLink", l10n_util::GetStringUTF16(
                                       IDS_SAFE_BROWSING_SCOUT_REPORTING_AGREE));
-  load_time_data.Set(
-      "enhancedProtectionMessage",
-      l10n_util::GetStringUTF16(IDS_SAFE_BROWSING_ENHANCED_PROTECTION_MESSAGE));
 }
 
 void InsecureFormBlockingPage::PopulateValuesForSharedHTML(

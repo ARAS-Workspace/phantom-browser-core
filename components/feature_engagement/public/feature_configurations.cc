@@ -423,67 +423,6 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
-  if (kIPHDownloadEsbPromoFeature.name == feature->name) {
-    FeatureConfig config;
-    config.valid = true;
-    // Because this is a custom configuration being used in desktop user ed, use
-    // a non-default availability so the configurator doesn't try to write its
-    // own.
-    config.availability = Comparator(GREATER_THAN_OR_EQUAL, 0);
-    config.session_rate = Comparator(ANY, 0);
-    // Don't show if user has already seen an IPH this session.
-    // Show the promo max once a year if the user hasn't interacted with
-    // a dangerous download within the last 21 days.
-    config.trigger = EventConfig("download_bubble_esb_iph_trigger",
-                                 Comparator(EQUAL, 0), 360, 360);
-    config.used = EventConfig("enable_enhanced_protection",
-                              Comparator(EQUAL, 0), 21, 360);
-    config.event_configs.insert(
-        EventConfig("download_bubble_dangerous_download_detected",
-                    Comparator(GREATER_THAN_OR_EQUAL, 1), 21, 360));
-    return config;
-  }
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  if (kEsbDownloadRowPromoFeature.name == feature->name) {
-    // A config that allows a promotion row referring users to enable Enhanced
-    // Safe Browsing (ESB), to be shown on the Downloads manager page. It
-    // can be viewed at most 7 times without interaction across a 90 day period.
-    // If the user clicks, then we aritificially increment the viewed event by 4
-    // so that the row can be seen at most 2 more times.
-    //
-    // The trigger management can be found in
-    // c/b/ui/webui/downloads/downloads_dom_handler.cc
-    FeatureConfig config;
-    config.valid = true;
-    // Because this is a custom configuration being used in desktop user ed, use
-    // a non-default availability so the configurator doesn't try to write its
-    // own.
-    config.availability = Comparator(GREATER_THAN_OR_EQUAL, 0);
-    config.session_rate = Comparator(ANY, 0);
-
-    // This isn't an IPH so we don't suppress other engagement features.
-    SessionRateImpact session_rate_impact;
-    session_rate_impact.type = SessionRateImpact::Type::NONE;
-    config.session_rate_impact = session_rate_impact;
-
-    // This isn't an IPH so we don't want to block or be blocked by any other
-    // engagement features.
-    config.blocked_by.type = BlockedBy::Type::NONE;
-    config.blocking.type = Blocking::Type::NONE;
-
-    config.trigger = EventConfig("dangerous_download_esb_promo_row_trigger",
-                                 Comparator(ANY, 0), 360, 360);
-    config.used =
-        EventConfig("enable_enhanced_protection", Comparator(EQUAL, 0), 21, 90);
-    config.event_configs.insert(EventConfig("esb_download_promo_row_viewed",
-                                            Comparator(LESS_THAN, 7), 90, 90));
-    config.event_configs.insert(EventConfig("esb_download_promo_row_clicked",
-                                            Comparator(LESS_THAN, 3), 90, 90));
-
-    return config;
-  }
-#endif
-
   if (kIPHBackNavigationMenuFeature.name == feature->name) {
     FeatureConfig config;
     config.valid = true;

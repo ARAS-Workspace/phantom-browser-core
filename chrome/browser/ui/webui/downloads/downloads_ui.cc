@@ -12,7 +12,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/threading/thread.h"
 #include "base/values.h"
-#include "build/branding_buildflags.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/download/download_core_service.h"
@@ -30,8 +29,6 @@
 #include "chrome/grit/downloads_resources.h"
 #include "chrome/grit/downloads_resources_map.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/feature_engagement/public/feature_constants.h"
-#include "components/feature_engagement/public/feature_list.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/profile_metrics/browser_profile_type.h"
@@ -148,12 +145,6 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"warningBypassDialogTitle", IDS_DOWNLOAD_WARNING_BYPASS_DIALOG_TITLE},
       {"warningBypassDialogCancel", IDS_CANCEL},
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      // ESB Download Row Promo
-      {"esbDownloadRowPromoString", IDS_DOWNLOAD_ROW_ESB_PROMOTION},
-      {"esbDownloadRowPromoA11y", IDS_DOWNLOAD_ROW_ESB_PROMO_A11Y},
-#endif
-
       // Strings describing reasons for blocked downloads.
       {"noSafeBrowsingDesc",
        IDS_BLOCK_DOWNLOAD_REASON_UNVERIFIED_NO_SAFE_BROWSING},
@@ -175,13 +166,6 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
   source->AddLocalizedString(
       "dangerUncommonSuspiciousArchiveDesc",
       IDS_BLOCK_DOWNLOAD_REASON_UNCOMMON_SUSPICIOUS_ARCHIVE);
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // Download Row ESB Promo:
-  source->AddBoolean("esbDownloadRowPromo",
-                     base::FeatureList::IsEnabled(
-                         feature_engagement::kEsbDownloadRowPromoFeature));
-#endif
 
   // Build an Accelerator to describe undo shortcut
   // NOTE: the undo shortcut is also defined in downloads/downloads.html

@@ -36,7 +36,6 @@ MITMSoftwareBlockingPage::MITMSoftwareBlockingPage(
     content::WebContents* web_contents,
     net::Error cert_error,
     const GURL& request_url,
-    bool can_show_enhanced_protection_message,
     const net::SSLInfo& ssl_info,
     const std::string& mitm_software_name,
     bool is_enterprise_managed,
@@ -48,7 +47,6 @@ MITMSoftwareBlockingPage::MITMSoftwareBlockingPage(
                           request_url,
                           false /* overridable */,
                           base::Time::Now(),
-                          can_show_enhanced_protection_message,
                           std::move(controller_client)),
 
       ssl_info_(ssl_info),
@@ -71,7 +69,7 @@ void MITMSoftwareBlockingPage::PopulateInterstitialStrings(
     base::DictValue& load_time_data) {
   mitm_software_ui_->PopulateStringsForHTML(load_time_data);
 
-  PopulateEnhancedProtectionMessage(load_time_data);
+  DisableExtendedReportingCheckbox(load_time_data);
 }
 
 // This handles the commands sent from the interstitial JavaScript.

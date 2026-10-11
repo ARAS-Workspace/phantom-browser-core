@@ -13,7 +13,6 @@
 #include "base/time/time.h"
 #include "components/security_interstitials/content/security_interstitial_controller_client.h"
 #include "components/security_interstitials/content/security_interstitial_page.h"
-#include "components/security_interstitials/content/settings_page_helper.h"
 #include "components/security_interstitials/core/controller_client.h"
 #include "components/security_interstitials/core/metrics_helper.h"
 #include "content/public/browser/certificate_request_result_type.h"
@@ -53,8 +52,7 @@ class TestInterstitialPage : public SecurityInterstitialPage {
                 CreateTestMetricsHelper(web_contents),
                 nullptr,
                 base::i18n::GetConfiguredLocale(),
-                GURL(),
-                /* settings_page_helper*/ nullptr)),
+                GURL())),
         destroyed_tracker_(destroyed_tracker) {}
 
   ~TestInterstitialPage() override { *destroyed_tracker_ = true; }

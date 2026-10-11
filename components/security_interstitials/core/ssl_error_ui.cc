@@ -240,18 +240,13 @@ void SSLErrorUI::HandleCommand(SecurityInterstitialCommand command) {
       controller_->OpenExtendedReportingWhitepaper(true);
       break;
     }
-    case CMD_OPEN_ENHANCED_PROTECTION_SETTINGS: {
-      controller_->metrics_helper()->RecordUserInteraction(
-          security_interstitials::MetricsHelper::OPEN_ENHANCED_PROTECTION);
-      controller_->OpenEnhancedProtectionSettings();
-      break;
-    }
     case CMD_SHOW_CERTIFICATE_VIEWER: {
       controller_->metrics_helper()->RecordUserInteraction(
           security_interstitials::MetricsHelper::VIEW_CERTIFICATE);
       controller_->ShowCertificateViewer();
       break;
     }
+    case CMD_OPEN_ENHANCED_PROTECTION_SETTINGS:
     case CMD_OPEN_DATE_SETTINGS:
     case CMD_OPEN_DIAGNOSTIC:
     case CMD_OPEN_LOGIN:

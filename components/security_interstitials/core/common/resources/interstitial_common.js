@@ -112,9 +112,6 @@ export function sendCommand(cmd) {
       case SecurityInterstitialCommandId.CMD_REPORT_PHISHING_ERROR:
         certificateErrorPageController.reportPhishingError();
         break;
-      case SecurityInterstitialCommandId.CMD_OPEN_ENHANCED_PROTECTION_SETTINGS:
-        certificateErrorPageController.openEnhancedProtectionSettings();
-        break;
       case SecurityInterstitialCommandId
           .CMD_OPEN_ANDROID_ADVANCED_PROTECTION_SETTINGS:
         certificateErrorPageController.openAndroidAdvancedProtectionSettings();

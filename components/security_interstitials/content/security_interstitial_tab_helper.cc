@@ -315,11 +315,6 @@ void SecurityInterstitialTabHelper::ReportPhishingError() {
                     CMD_REPORT_PHISHING_ERROR);
 }
 
-void SecurityInterstitialTabHelper::OpenEnhancedProtectionSettings() {
-  HandleCommand(security_interstitials::SecurityInterstitialCommand::
-                    CMD_OPEN_ENHANCED_PROTECTION_SETTINGS);
-}
-
 void SecurityInterstitialTabHelper::OpenHelpCenterInNewTab() {
   HandleCommand(security_interstitials::SecurityInterstitialCommand::
                     CMD_OPEN_HELP_CENTER_IN_NEW_TAB);

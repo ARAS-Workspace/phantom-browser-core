@@ -36,7 +36,6 @@ CaptivePortalBlockingPage::CaptivePortalBlockingPage(
     content::WebContents* web_contents,
     const GURL& request_url,
     const GURL& login_url,
-    bool can_show_enhanced_protection_message,
     const net::SSLInfo& ssl_info,
     std::unique_ptr<
         security_interstitials::SecurityInterstitialControllerClient>
@@ -47,7 +46,6 @@ CaptivePortalBlockingPage::CaptivePortalBlockingPage(
                           request_url,
                           false /* overridable */,
                           base::Time::Now(),
-                          can_show_enhanced_protection_message,
                           std::move(controller_client)),
       open_login_callback_(open_login_callback),
       login_url_(login_url),
@@ -176,8 +174,6 @@ void CaptivePortalBlockingPage::PopulateInterstitialStrings(
   load_time_data.Set("explanationParagraph", "");
   load_time_data.Set("finalParagraph", "");
   load_time_data.Set(security_interstitials::kDisplayCheckBox, false);
-
-  PopulateEnhancedProtectionMessage(load_time_data);
 }
 
 void CaptivePortalBlockingPage::CommandReceived(const std::string& command) {
@@ -203,9 +199,6 @@ void CaptivePortalBlockingPage::CommandReceived(const std::string& command) {
       break;
     case security_interstitials::CMD_OPEN_WHITEPAPER:
       controller()->OpenExtendedReportingWhitepaper(true);
-      break;
-    case security_interstitials::CMD_OPEN_ENHANCED_PROTECTION_SETTINGS:
-      controller()->OpenEnhancedProtectionSettings();
       break;
     case security_interstitials::CMD_ERROR:
     case security_interstitials::CMD_TEXT_FOUND:

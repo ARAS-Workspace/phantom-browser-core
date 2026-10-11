@@ -55,7 +55,6 @@ class SSLBlockingPage : public SSLBlockingPageBase {
       const base::Time& time_triggered,
       const GURL& support_url,
       bool overrideable,
-      bool can_show_enhanced_protection_message,
       std::unique_ptr<
           security_interstitials::SecurityInterstitialControllerClient>
           controller_client);

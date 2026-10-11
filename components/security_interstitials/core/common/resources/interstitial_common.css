@@ -147,33 +147,6 @@ input[type=checkbox]:focus ~ .checkbox::after {
   position: relative;
 }
 
-#enhanced-protection-message {
-  border-radius: 20px;
-  font-size: 1em;
-  margin-top: 32px;
-  padding: 10px 5px;
-}
-
-#enhanced-protection-message a {
-  color: var(--google-red-10);
-}
-
-#enhanced-protection-message label {
-  display: grid;
-  grid-template-columns: 2.5em 1fr;
-  position: relative;
-}
-
-#enhanced-protection-message div {
-  margin: 0.5em;
-}
-
-#enhanced-protection-message .icon {
-  height: 1.5em;
-  vertical-align: middle;
-  width: 1.5em;
-}
-
 .nav-wrapper {
   margin-top: 51px;
 }
@@ -282,10 +255,6 @@ input[type=checkbox]:checked ~ .checkbox::before {
   }
 
   #extended-reporting-opt-in {
-    margin-top: 24px;
-  }
-
-  #enhanced-protection-message {
     margin-top: 24px;
   }
 

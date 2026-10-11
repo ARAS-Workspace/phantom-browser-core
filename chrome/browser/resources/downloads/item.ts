@@ -3,16 +3,10 @@
 // found in the LICENSE file.
 
 import './icons.html.js';
-// <if expr="_google_chrome">
-import './internal/icons.html.js';
-// </if>
 import 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import 'chrome://resources/cr_elements/cr_icon/cr_icon.js';
 import 'chrome://resources/cr_elements/cr_icon_button/cr_icon_button.js';
-// <if expr="_google_chrome">
-import 'chrome://resources/cr_elements/cr_link_row/cr_link_row.js';
-// </if>
 import 'chrome://resources/cr_elements/cr_progress/cr_progress.js';
 import 'chrome://resources/cr_elements/icons.html.js';
 import 'chrome://resources/js/action_link.js';
@@ -92,18 +86,12 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
         state: true,
       },
 
-      // <if expr="_google_chrome">
-      showEsbPromotion: {type: Boolean},
-      // </if>
 
       useFileIcon_: {type: Boolean},
     };
   }
 
   accessor data: MojomData|undefined;
-  // <if expr="_google_chrome">
-  accessor showEsbPromotion: boolean = false;
-  // </if>
   private browserProxy_: BrowserProxy = browserProxyFactory.getInstance();
   protected accessor isDangerous_: boolean = false;
   protected accessor isReviewable_: boolean = false;
@@ -908,12 +896,6 @@ export class DownloadsItemElement extends DownloadsItemElementBase {
           }
         });
   }
-
-  // <if expr="_google_chrome">
-  protected onEsbPromotionClick_() {
-    this.browserProxy_.handler.openEsbSettings();
-  }
-  // </if>
 
   protected onCopyDownloadLinkClick_(e: Event) {
     if (!this.data || !this.data.url) {

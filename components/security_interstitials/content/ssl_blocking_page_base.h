@@ -26,7 +26,6 @@ class SSLBlockingPageBase
       const GURL& request_url,
       bool overridable,
       const base::Time& time_triggered,
-      bool can_show_enhanced_protection_message,
       std::unique_ptr<
           security_interstitials::SecurityInterstitialControllerClient>
           controller_client);
@@ -40,10 +39,7 @@ class SSLBlockingPageBase
   void OnInterstitialClosing() override;
 
  protected:
-  void PopulateEnhancedProtectionMessage(base::DictValue& load_time_data);
-  bool ShouldShowEnhancedProtectionMessage();
-
-  bool can_show_enhanced_protection_message_ = false;
+  void DisableExtendedReportingCheckbox(base::DictValue& load_time_data);
 };
 
 #endif  // COMPONENTS_SECURITY_INTERSTITIALS_CONTENT_SSL_BLOCKING_PAGE_BASE_H_

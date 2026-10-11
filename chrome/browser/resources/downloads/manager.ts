@@ -69,12 +69,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
       spinnerActive_: {type: Boolean},
       bypassPromptItemId_: {type: String},
 
-      // <if expr="_google_chrome">
-      firstDangerousItemId_: {type: String},
-      isEligibleForEsbPromo_: {type: Boolean},
-      esbDownloadRowPromo_: {type: Boolean},
-      // </if>
-
       lastFocused_: {type: Object},
       listBlurred_: {type: Boolean},
       listScrollTarget_: {type: Object},
@@ -91,12 +85,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
   protected accessor inSearchMode_: boolean = false;
   protected accessor spinnerActive_: boolean = false;
   protected accessor bypassPromptItemId_: string = '';
-  // <if expr="_google_chrome">
-  private accessor firstDangerousItemId_: string = '';
-  private accessor esbDownloadRowPromo_: boolean =
-      loadTimeData.getBoolean('esbDownloadRowPromo');
-  private accessor isEligibleForEsbPromo_: boolean = false;
-  // </if>
   protected accessor lastFocused_: HTMLElement|null = null;
   protected accessor listBlurred_: boolean = false;
   protected accessor listScrollTarget_: HTMLElement = document.documentElement;
@@ -163,12 +151,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
     const toastManager = getToastManager();
     toastManager.shadowRoot.querySelector<HTMLElement>('#toast')!.onclick = e =>
         this.onToastClicked_(e);
-
-    // <if expr="_google_chrome">
-    this.browserProxy_.handler.isEligibleForEsbPromo().then((result) => {
-      this.isEligibleForEsbPromo_ = result.result;
-    });
-    // </if>
   }
 
   override disconnectedCallback() {
@@ -193,35 +175,6 @@ export class DownloadsManagerElement extends DownloadsManagerElementBase {
           this.bypassPromptItemId_);
     }
   }
-
-  // <if expr="_google_chrome">
-  // Evaluates user eligbility for an esb promotion on the most recent dangerous
-  // download. It does this by traversing the array of downloads and the first
-  // dangerous download it comes across will have the promotion (guarantees the
-  // most recent download will have the promo)
-  protected shouldShowEsbPromotion_(item: MojomData): boolean {
-    if (!this.isEligibleForEsbPromo_ || !this.esbDownloadRowPromo_) {
-      return false;
-    }
-    if (!this.firstDangerousItemId_ && item.isDangerous) {
-      this.firstDangerousItemId_ = item.id;
-    }
-
-    if (this.firstDangerousItemId_ !== item.id) {
-      return false;
-    }
-
-    // Currently logs the ESB promotion as viewed if the most recent dangerous
-    // download is within the the first 5 items.
-    // TODO(awado): Change this to log the ESB promo as viewed when the user
-    // scrolls the download into view.
-    if (this.items_.slice(0, 5).some(download => download.id === item.id)) {
-      this.browserProxy_.handler.logEsbPromotionRowViewed();
-      return true;
-    }
-    return false;
-  }
-  // </if>
 
   protected shouldShowBypassWarningPrompt_(): boolean {
     return this.bypassPromptItemId_ !== '';

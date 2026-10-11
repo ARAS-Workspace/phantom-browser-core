@@ -18,7 +18,6 @@ class WebContents;
 namespace security_interstitials {
 
 class MetricsHelper;
-class SettingsPageHelper;
 
 // Handle commands from security interstitial pages. This class should only be
 // instantiated by SafeBrowsingBlockingPage for the time being.
@@ -30,8 +29,7 @@ class SecurityInterstitialControllerClient
       std::unique_ptr<MetricsHelper> metrics_helper,
       PrefService* prefs,
       const std::string& app_locale,
-      const GURL& default_safe_page,
-      std::unique_ptr<SettingsPageHelper> settings_page_helper);
+      const GURL& default_safe_page);
 
   SecurityInterstitialControllerClient(
       const SecurityInterstitialControllerClient&) = delete;
@@ -48,7 +46,6 @@ class SecurityInterstitialControllerClient
   void Reload() override;
   void OpenUrlInCurrentTab(const GURL& url) override;
   void OpenUrlInNewForegroundTab(const GURL& url) override;
-  void OpenEnhancedProtectionSettings() override;
   void ShowCertificateViewer() override;
   PrefService* GetPrefService() override;
   const std::string& GetApplicationLocale() const override;
@@ -69,7 +66,6 @@ class SecurityInterstitialControllerClient
   // The default safe page we should go to if there is no previous page to go
   // back to, e.g. chrome:kChromeUINewTabURL.
   const GURL default_safe_page_;
-  std::unique_ptr<SettingsPageHelper> settings_page_helper_;
 };
 
 }  // namespace security_interstitials

@@ -139,7 +139,6 @@ class SecurityInterstitialTabHelper
   void OpenReportingPrivacy() override;
   void OpenWhitepaper() override;
   void ReportPhishingError() override;
-  void OpenEnhancedProtectionSettings() override;
   void OpenHelpCenterInNewTab() override;
   void OpenDiagnosticInNewTab() override;
   void OpenReportingPrivacyInNewTab() override;

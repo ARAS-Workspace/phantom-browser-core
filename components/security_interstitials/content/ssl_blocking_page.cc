@@ -39,7 +39,7 @@ SSLBlockingPage::~SSLBlockingPage() = default;
 void SSLBlockingPage::PopulateInterstitialStrings(
     base::DictValue& load_time_data) {
   ssl_error_ui_->PopulateStringsForHTML(load_time_data);
-  PopulateEnhancedProtectionMessage(load_time_data);
+  DisableExtendedReportingCheckbox(load_time_data);
 }
 
 // Note that we always create a navigation entry with SSL errors.
@@ -53,7 +53,6 @@ SSLBlockingPage::SSLBlockingPage(
     const base::Time& time_triggered,
     const GURL& support_url,
     bool overridable,
-    bool can_show_enhanced_protection_message,
     std::unique_ptr<
         security_interstitials::SecurityInterstitialControllerClient>
         controller_client)
@@ -62,7 +61,6 @@ SSLBlockingPage::SSLBlockingPage(
                           request_url,
                           overridable,
                           time_triggered,
-                          can_show_enhanced_protection_message,
                           std::move(controller_client)),
       ssl_info_(ssl_info),
       overridable_(overridable),

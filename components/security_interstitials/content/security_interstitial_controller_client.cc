@@ -9,7 +9,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/security_interstitials/content/security_interstitial_page.h"
 #include "components/security_interstitials/content/security_interstitial_tab_helper.h"
-#include "components/security_interstitials/content/settings_page_helper.h"
 #include "components/security_interstitials/core/metrics_helper.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
@@ -26,14 +25,12 @@ SecurityInterstitialControllerClient::SecurityInterstitialControllerClient(
     std::unique_ptr<MetricsHelper> metrics_helper,
     PrefService* prefs,
     const std::string& app_locale,
-    const GURL& default_safe_page,
-    std::unique_ptr<SettingsPageHelper> settings_page_helper)
+    const GURL& default_safe_page)
     : ControllerClient(std::move(metrics_helper)),
       web_contents_(web_contents->GetWeakPtr()),
       prefs_(prefs),
       app_locale_(app_locale),
-      default_safe_page_(default_safe_page),
-      settings_page_helper_(std::move(settings_page_helper)) {}
+      default_safe_page_(default_safe_page) {}
 
 SecurityInterstitialControllerClient::~SecurityInterstitialControllerClient() =
     default;
@@ -141,10 +138,6 @@ void SecurityInterstitialControllerClient::OpenUrlInNewForegroundTab(
                                 WindowOpenDisposition::NEW_FOREGROUND_TAB,
                                 ui::PAGE_TRANSITION_LINK, false);
   web_contents_->OpenURL(params, /*navigation_handle_callback=*/{});
-}
-
-void SecurityInterstitialControllerClient::OpenEnhancedProtectionSettings() {
-  settings_page_helper_->OpenEnhancedProtectionSettingsWithIph(&*web_contents_);
 }
 
 const std::string& SecurityInterstitialControllerClient::GetApplicationLocale()

@@ -8,14 +8,9 @@ import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
 export class FakePageHandler extends TestBrowserProxy implements
     PageHandlerInterface {
-  private eligibleForEsbPromo_: boolean = false;
-
   constructor() {
     super([
       'discardDangerous',
-      'isEligibleForEsbPromo',
-      'logEsbPromotionRowViewed',
-      'openEsbSettings',
       'recordCancelBypassWarningDialog',
       'recordOpenBypassWarningDialog',
       'remove',
@@ -48,14 +43,6 @@ export class FakePageHandler extends TestBrowserProxy implements
     this.methodCalled('saveSuspiciousRequiringGesture', id);
   }
 
-  openEsbSettings() {
-    this.methodCalled('openEsbSettings');
-  }
-
-  logEsbPromotionRowViewed() {
-    this.methodCalled('logEsbPromotionRowViewed');
-  }
-
   getDownloads(_searchTerms: string[]) {}
   openFileRequiringGesture(_id: string) {}
   drag(_id: string) {}
@@ -68,13 +55,6 @@ export class FakePageHandler extends TestBrowserProxy implements
   clearAll() {}
   openDownloadsFolderRequiringGesture() {}
   reviewDangerousRequiringGesture(_id: string) {}
-  isEligibleForEsbPromo(): Promise<{result: boolean}> {
-    this.methodCalled('isEligibleForEsbPromo');
-    return Promise.resolve({result: this.eligibleForEsbPromo_});
-  }
-  setEligbleForEsbPromo(eligible: boolean) {
-    this.eligibleForEsbPromo_ = eligible;
-  }
 }
 
 export class TestIconLoader extends TestBrowserProxy implements IconLoader {

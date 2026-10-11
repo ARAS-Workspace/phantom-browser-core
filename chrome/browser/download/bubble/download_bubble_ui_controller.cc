@@ -27,7 +27,6 @@
 #include "chrome/browser/download/offline_item_model_manager.h"
 #include "chrome/browser/download/offline_item_model_manager_factory.h"
 #include "chrome/browser/download/offline_item_utils.h"
-#include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/offline_items_collection/offline_content_aggregator_factory.h"
 #include "chrome/browser/profiles/profile_key.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -39,7 +38,6 @@
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/download_item.h"
 #include "components/download/public/common/download_stats.h"
-#include "components/feature_engagement/public/tracker.h"
 #include "components/offline_items_collection/core/offline_content_aggregator.h"
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/browser/download_manager.h"
@@ -181,9 +179,6 @@ void DownloadBubbleUIController::OnDownloadItemUpdated(
   bool is_done = item->IsDone() ||
                  (item->GetState() == download::DownloadItem::IN_PROGRESS &&
                   !IsItemInProgress(item));
-  if (model.IsDangerous()) {
-    RecordDangerousDownloadShownToUser(item);
-  }
   display_controller_->OnUpdatedItem(is_done, may_show_details);
 }
 
@@ -281,7 +276,6 @@ void DownloadBubbleUIController::ProcessDownloadButtonPress(
     case DownloadCommands::OPEN_WHEN_COMPLETE:
     case DownloadCommands::SHOW_IN_FOLDER:
     case DownloadCommands::ALWAYS_OPEN_TYPE:
-    case DownloadCommands::OPEN_SAFE_BROWSING_SETTING:
       commands.ExecuteCommand(command);
       break;
     default:
@@ -351,14 +345,6 @@ void DownloadBubbleUIController::ScheduleCancelForEphemeralWarning(
   if (delegate) {
     delegate->ScheduleCancelForEphemeralWarning(guid);
   }
-}
-
-void DownloadBubbleUIController::RecordDangerousDownloadShownToUser(
-    download::DownloadItem* download) {
-  feature_engagement::Tracker* tracker =
-      feature_engagement::TrackerFactory::GetForBrowserContext(
-          browser_->GetProfile());
-  tracker->NotifyEvent("download_bubble_dangerous_download_detected");
 }
 
 base::WeakPtr<DownloadBubbleUIController>
