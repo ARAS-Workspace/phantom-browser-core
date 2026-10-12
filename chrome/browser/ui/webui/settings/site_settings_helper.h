@@ -86,12 +86,6 @@ typedef std::map<std::pair<ContentSettingsPattern, SiteSettingSource>,
                  std::greater<>>
     AllPatternsSettings;
 
-// A set of <origin, source, incognito> tuple for organizing granted permission
-// objects that belong to the same device.
-
-using ChooserExceptionDetails =
-    std::set<std::tuple<GURL, SiteSettingSource, bool>>;
-
 inline constexpr char kChooserType[] = "chooserType";
 inline constexpr char kCloseDescription[] = "closeDescription";
 inline constexpr char kDisabled[] = "disabled";
@@ -232,40 +226,10 @@ std::vector<ContentSettingPatternSource>
 GetSingleOriginExceptionsForContentType(HostContentSettingsMap* map,
                                         ContentSettingsType content_type);
 
-// This struct facilitates lookup of a chooser context factory function by name
-// for a given content settings type and is declared early so that it can used
-// by functions below.
-struct ChooserTypeNameEntry {
-  permissions::ObjectPermissionContextBase* (*get_context)(Profile*);
-  const char* name;
-};
-
 struct ContentSettingsTypeNameEntry {
   ContentSettingsType type;
   const char* name;
 };
-
-const ChooserTypeNameEntry* ChooserTypeFromGroupName(std::string_view name);
-
-// Creates a chooser exception object for the object with |display_name|. The
-// object contains the following properties
-// * displayName: string,
-// * object: Object,
-// * chooserType: string,
-// * sites: Array<SiteException>
-// The structure of the SiteException objects is the same as the objects
-// returned by GetExceptionForPage().
-base::DictValue CreateChooserExceptionObject(
-    const std::u16string& display_name,
-    const base::Value& object,
-    const std::string& chooser_type,
-    const ChooserExceptionDetails& chooser_exception_details,
-    Profile* profile);
-
-// Returns an array of chooser exception objects.
-base::ListValue GetChooserExceptionListFromProfile(
-    Profile* profile,
-    const ChooserTypeNameEntry& chooser_type);
 
 // Takes |url| and converts it into an individual origin string or retrieves
 // name of the extension or Isolated Web App it belongs to. If |hostname_only|

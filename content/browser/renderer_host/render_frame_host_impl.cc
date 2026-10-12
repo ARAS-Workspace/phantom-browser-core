@@ -80,7 +80,6 @@
 #include "content/browser/back_forward_cache/back_forward_cache_impl.h"
 #include "content/browser/bad_message.h"
 #include "content/browser/blob_storage/file_backed_blob_factory_frame_impl.h"
-#include "content/browser/bluetooth/web_bluetooth_service_impl.h"
 #include "content/browser/broadcast_channel/broadcast_channel_provider.h"
 #include "content/browser/broadcast_channel/broadcast_channel_service.h"
 #include "content/browser/browser_context_impl.h"

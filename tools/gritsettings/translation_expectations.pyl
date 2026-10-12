@@ -52,7 +52,6 @@
       "components/privacy_sandbox_strings.grd",
       "components/webapps/browser/android/android_webapps_strings.grd",
       "content/public/android/java/strings/android_content_strings.grd",
-      "device/bluetooth/bluetooth_strings.grd",
       "device/fido/fido_strings.grd",
       "extensions/strings/extensions_strings.grd",
       "ios/chrome/app/strings/ios_chromium_strings.grd",

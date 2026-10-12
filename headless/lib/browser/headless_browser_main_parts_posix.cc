@@ -22,12 +22,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "headless/lib/browser/headless_browser_impl.h"
 
-#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
-#include "components/dbus/thread_linux/dbus_thread_linux.h"
-#include "dbus/bus.h"
-#include "device/bluetooth/dbus/bluez_dbus_manager.h"
-#endif  // BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
-
 namespace headless {
 
 namespace {
@@ -159,14 +153,6 @@ class BrowserShutdownHandler {
 void HeadlessBrowserMainParts::PostCreateMainMessageLoop() {
   BrowserShutdownHandler::Install(base::BindOnce(
       &HeadlessBrowserImpl::ShutdownWithExitCode, browser_->GetWeakPtr()));
-
-#if BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(USE_DBUS)
-  bluez::BluezDBusManager::Initialize(
-      dbus_thread_linux::GetSharedSystemBus().get());
-#endif
-#endif  // BUILDFLAG(IS_LINUX)
 }
 
 }  // namespace headless

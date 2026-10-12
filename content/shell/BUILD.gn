@@ -280,7 +280,6 @@ static_library("content_shell_lib") {
     "//content/public/common",
     "//content/test:content_test_mojo_bindings",
     "//content/test:test_support",
-    "//device/bluetooth",
     "//media",
     "//media/mojo:buildflags",
     "//media/mojo/services",

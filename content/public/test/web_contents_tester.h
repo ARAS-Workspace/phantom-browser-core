@@ -184,10 +184,6 @@ class WebContentsTester {
   // Sets the last active time.
   virtual void SetLastActiveTime(base::Time last_active_time) = 0;
 
-  // Increments/decrements the number of connected Bluetooth devices.
-  virtual void TestIncrementBluetoothConnectedDeviceCount() = 0;
-  virtual void TestDecrementBluetoothConnectedDeviceCount() = 0;
-
   // Indicates if this WebContents has been frozen via a call to
   // SetPageFrozen().
   virtual bool IsPageFrozen() = 0;

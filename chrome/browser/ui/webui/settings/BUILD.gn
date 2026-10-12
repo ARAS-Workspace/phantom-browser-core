@@ -156,7 +156,6 @@ source_set("impl") {
     "//chrome/browser/apps/app_service",
     "//chrome/browser/autocomplete:aim_eligibility_service",
     "//chrome/browser/autofill",
-    "//chrome/browser/bluetooth",
     "//chrome/browser/browsing_data",
     "//chrome/browser/browsing_data:constants",
     "//chrome/browser/content_settings",
@@ -402,7 +401,6 @@ source_set("unit_tests") {
     "//chrome/browser/affiliations",
     "//chrome/browser/apps/app_service",
     "//chrome/browser/autofill",
-    "//chrome/browser/bluetooth",
     "//chrome/browser/browsing_data",
     "//chrome/browser/content_settings",
     "//chrome/browser/download",
@@ -494,8 +492,6 @@ source_set("unit_tests") {
     "//components/webauthn/core/browser:passkey_model",
     "//components/webauthn/core/browser:test_support",
     "//content/test:test_support",
-    "//device/bluetooth",
-    "//device/bluetooth:mocks",
     "//device/fido:test_support",
     "//device/fido/public",
     "//extensions/browser",
@@ -591,7 +587,6 @@ source_set("interactive_ui_tests") {
       "//components/sync:test_support",
       "//components/sync/base",
       "//content/test:test_support",
-      "//device/bluetooth:mocks",
       "//ui/views",
     ]
   }

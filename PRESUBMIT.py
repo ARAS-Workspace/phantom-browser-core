@@ -1155,8 +1155,6 @@ _BANNED_CPP_FUNCTIONS: Sequence[BanRule] = (
             r'chromecast/base/observer_unittest\.cc',
             r'chromecast/browser/cast_web_view\.h',
             r'chromecast/public/cast_media_shlib\.h',
-            r'device/bluetooth/floss/exported_callback_manager\.h',
-            r'device/bluetooth/floss/floss_dbus_client\.h',
             r'device/fido/pin\.cc',
             r'services/tracing/perfetto/test_utils\.h',
             # Should use base::FunctionRef.

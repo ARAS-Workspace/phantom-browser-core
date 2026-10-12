@@ -95,11 +95,6 @@ class PageInfoViewFactory {
       const PageInfo::PermissionInfo& info,
       bool blocked_on_system_level = false);
 
-  // Returns the icon for the given object |info|.
-  static const ui::ImageModel GetChosenObjectIcon(
-      const PageInfoUI::ChosenObjectInfo& info,
-      bool deleted);
-
   // Returns the icon for the button / link to Site settings.
   static const ui::ImageModel GetSiteSettingsIcon();
 

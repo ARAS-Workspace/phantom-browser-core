@@ -54,7 +54,6 @@
 #include "content/browser/background_fetch/background_fetch_context.h"
 #include "content/browser/blob_storage/blob_registry_wrapper.h"
 #include "content/browser/blob_storage/chrome_blob_storage_context.h"
-#include "content/browser/bluetooth/bluetooth_allowed_devices_map.h"
 #include "content/browser/broadcast_channel/broadcast_channel_service.h"
 #include "content/browser/browsing_data/clear_site_data_handler.h"
 #include "content/browser/browsing_data/storage_partition_code_cache_data_remover.h"
@@ -1484,9 +1483,6 @@ void StoragePartitionImpl::Initialize(
 
   broadcast_channel_service_ = std::make_unique<BroadcastChannelService>();
 
-  bluetooth_allowed_devices_map_ =
-      std::make_unique<BluetoothAllowedDevicesMap>();
-
   shared_url_loader_factory_for_browser_process_ = std::make_unique<
       ReconnectableURLLoaderFactoryForIOThreadWrapper>(base::BindRepeating(
       &StoragePartitionImpl::CreateURLLoaderFactoryForBrowserProcessInternal,
@@ -1790,12 +1786,6 @@ BackgroundFetchContext* StoragePartitionImpl::GetBackgroundFetchContext() {
 BroadcastChannelService* StoragePartitionImpl::GetBroadcastChannelService() {
   DCHECK(initialized_);
   return broadcast_channel_service_.get();
-}
-
-BluetoothAllowedDevicesMap*
-StoragePartitionImpl::GetBluetoothAllowedDevicesMap() {
-  DCHECK(initialized_);
-  return bluetooth_allowed_devices_map_.get();
 }
 
 BlobRegistryWrapper* StoragePartitionImpl::GetBlobRegistry() {
@@ -3216,11 +3206,6 @@ void StoragePartitionImpl::ResetURLLoaderFactories() {
   shared_url_loader_factory_for_browser_process_->factory()->Reset();
   shared_url_loader_factory_for_browser_process_->factory_for_io_thread()
       ->Reset();
-}
-
-void StoragePartitionImpl::ClearBluetoothAllowedDevicesMapForTesting() {
-  DCHECK(initialized_);
-  bluetooth_allowed_devices_map_->Clear();
 }
 
 void StoragePartitionImpl::AddObserver(DataRemovalObserver* observer) {

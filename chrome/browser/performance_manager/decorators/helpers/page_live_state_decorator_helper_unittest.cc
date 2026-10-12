@@ -165,22 +165,6 @@ TEST_F(PageLiveStateDecoratorHelperTest, OnIsCapturingDisplayChanged) {
       &PageLiveStateDecorator::Data::IsCapturingDisplay);
 }
 
-TEST_F(PageLiveStateDecoratorHelperTest, IsConnectedToBluetoothDevice) {
-  testing::TestPageNodeProperty(
-      web_contents(), &PageLiveStateDecorator::Data::GetOrCreateForPageNode,
-      &PageLiveStateDecorator::Data::IsConnectedToBluetoothDevice, false);
-  content::WebContentsTester::For(web_contents())
-      ->TestIncrementBluetoothConnectedDeviceCount();
-  testing::TestPageNodeProperty(
-      web_contents(), &PageLiveStateDecorator::Data::GetOrCreateForPageNode,
-      &PageLiveStateDecorator::Data::IsConnectedToBluetoothDevice, true);
-  content::WebContentsTester::For(web_contents())
-      ->TestDecrementBluetoothConnectedDeviceCount();
-  testing::TestPageNodeProperty(
-      web_contents(), &PageLiveStateDecorator::Data::GetOrCreateForPageNode,
-      &PageLiveStateDecorator::Data::IsConnectedToBluetoothDevice, false);
-}
-
 // Create many WebContents to exercice the code that maintains the linked list
 // of PageLiveStateDecoratorHelper::WebContentsObservers.
 TEST_F(PageLiveStateDecoratorHelperTest, ManyPageNodes) {

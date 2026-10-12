@@ -73,8 +73,6 @@ per-file *linux*=thomasanderson@chromium.org
 
 per-file unload_browsertest.cc=file://content/OWNERS
 
-per-file web_bluetooth*=file://content/browser/bluetooth/OWNERS
-
 # For security review.
 per-file chrome_browser_interface_binders*=set noparent
 per-file chrome_browser_interface_binders*=file://ipc/SECURITY_OWNERS

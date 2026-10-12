@@ -459,14 +459,6 @@ void TestWebContents::SetLastActiveTime(base::Time last_active_time) {
   last_active_time_ = last_active_time;
 }
 
-void TestWebContents::TestIncrementBluetoothConnectedDeviceCount() {
-  IncrementBluetoothConnectedDeviceCount();
-}
-
-void TestWebContents::TestDecrementBluetoothConnectedDeviceCount() {
-  DecrementBluetoothConnectedDeviceCount();
-}
-
 base::UnguessableToken TestWebContents::GetAudioGroupId() {
   return audio_group_id_;
 }

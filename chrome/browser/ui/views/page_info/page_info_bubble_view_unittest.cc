@@ -23,7 +23,6 @@
 #include "chrome/browser/ui/views/controls/hover_button.h"
 #include "chrome/browser/ui/views/controls/rich_controls_container_view.h"
 #include "chrome/browser/ui/views/controls/rich_hover_button.h"
-#include "chrome/browser/ui/views/page_info/chosen_object_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_bubble_specification.h"
 #include "chrome/browser/ui/views/page_info/page_info_main_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_permission_content_view.h"
@@ -312,15 +311,6 @@ class PageInfoBubbleViewTestApi {
   std::u16string_view GetCertificateButtonSubtitleText() const {
     EXPECT_TRUE(certificate_button());
     return certificate_button()->GetSubtitleText();
-  }
-
-  const views::View::Views& GetChosenObjectChildren() {
-    const views::View* parent = permissions_view();
-    const int object_view_index = 0;
-    ChosenObjectView* object_view =
-        static_cast<ChosenObjectView*>(parent->children()[object_view_index]);
-    views::View* row_view = object_view->children()[0];
-    return row_view->children();
   }
 
   void WaitForBubbleClose() { run_loop_.Run(); }

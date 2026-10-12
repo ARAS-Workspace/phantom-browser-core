@@ -90,9 +90,6 @@
         },
         {
             "files": [
-                "gen/content/web_test/common/fake_bluetooth_chooser.mojom.m.js",
-                "gen/device/bluetooth/public/mojom/emulation/fake_bluetooth.mojom.m.js",
-                "gen/device/bluetooth/public/mojom/uuid.mojom.m.js",
                 "gen/device/gamepad/public/mojom/gamepad.mojom.m.js",
                 "gen/device/vr/public/mojom/vr_service.mojom.m.js",
                 "gen/device/vr/public/mojom/xr_hand_tracking_data.mojom.m.js",

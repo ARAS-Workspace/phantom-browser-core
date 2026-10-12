@@ -220,21 +220,6 @@ interface WebTestControlHost {
   // Trigger a GoToOffset navigation on the main WebView.
   GoToOffset(int32 offset);
 
-  // Calls the BluetoothChooser::EventHandler with the arguments here. Valid
-  // event strings are:
-  //  * "cancel" - simulates the user canceling the chooser.
-  //  * "select" - simulates the user selecting a device whose device ID is in
-  //               |argument|.
-  SendBluetoothManualChooserEvent(string event, string argument);
-
-  // If |enable| is true makes the Bluetooth chooser record its input and wait
-  // for instructions from the test program on how to proceed. Otherwise
-  // fall backs to the browser's default chooser.
-  SetBluetoothManualChooser(bool enable);
-
-  // Returns the events recorded since the last call to this function.
-  GetBluetoothManualChooserEvents() => (array<string> events);
-
   // Manages the popup blocking setting to used for web tests.
   SetPopupBlockingEnabled(bool block_popups);
 

@@ -23,7 +23,6 @@
 #include "components/vrp_flags/buildflags.h"
 #include "content/browser/background_fetch/background_fetch_service_impl.h"
 #include "content/browser/bad_message.h"
-#include "content/browser/bluetooth/web_bluetooth_service_impl.h"
 #include "content/browser/browser_context_impl.h"
 #include "content/browser/browser_main_loop.h"
 #include "content/browser/contacts/contacts_manager_impl.h"
@@ -139,7 +138,6 @@
 #include "third_party/blink/public/mojom/background_sync/background_sync.mojom.h"
 #include "third_party/blink/public/mojom/blob/blob_url_store.mojom.h"
 #include "third_party/blink/public/mojom/blob/file_backed_blob_factory.mojom.h"
-#include "third_party/blink/public/mojom/bluetooth/web_bluetooth.mojom.h"
 #include "third_party/blink/public/mojom/buckets/bucket_manager_host.mojom.h"
 #include "third_party/blink/public/mojom/cache_storage/cache_storage.mojom.h"
 #include "third_party/blink/public/mojom/choosers/color_chooser.mojom.h"
@@ -1037,9 +1035,6 @@ void PopulateBinderMapWithContext(
     map->Add<webnn::mojom::WebNNWeightsFileCreator>(
         &BindWebNNWeightsFileCreatorForRenderFrame);
   }
-
-  map->Add<blink::mojom::WebBluetoothService>(
-      &WebBluetoothServiceImpl::BindIfAllowed);
 
   map->Add<blink::mojom::WebTransportConnector>(
       &BindRenderFrameHostImpl<

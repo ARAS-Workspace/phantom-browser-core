@@ -22,7 +22,6 @@
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/browser/ui/views/chrome_typography.h"
 #include "chrome/browser/ui/views/controls/rich_hover_button.h"
-#include "chrome/browser/ui/views/page_info/chosen_object_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_navigation_handler.h"
 #include "chrome/browser/ui/views/page_info/page_info_security_content_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
@@ -309,27 +308,12 @@ void PageInfoMainView::SetPermissionInfo(
     toggle_rows_.push_back(toggle_row);
   }
 
-  for (auto& object : chosen_object_info_list) {
-    // The view takes ownership of the object info.
-    auto object_view = std::make_unique<ChosenObjectView>(
-        std::move(object),
-        presenter_->GetChooserContextFromUIInfo(*object->ui_info)
-            ->GetObjectDisplayName(object->chooser_object->value));
-    object_view->AddObserver(this);
-    chosen_object_rows_.push_back(
-        content_view->AddChildView(std::move(object_view)));
-  }
-
   reset_button_ = content_view->AddChildView(
       std::make_unique<views::MdTextButton>(base::BindRepeating(
           [=](PageInfoMainView* view) {
             for (PermissionToggleRowView* toggle_row : view->toggle_rows_) {
               toggle_row->ResetPermission();
             }
-            for (ChosenObjectView* object_row : view->chosen_object_rows_) {
-              object_row->ResetPermission();
-            }
-            view->chosen_object_rows_.clear();
             view->PreferredSizeChanged();
             view->presenter_->RecordPageInfoAction(
                 page_info::PAGE_INFO_PERMISSIONS_CLEARED);
@@ -373,13 +357,6 @@ void PageInfoMainView::UpdateResetButton(
       reset_button_->SetVisible(true);
     }
     num_permissions++;
-  }
-  for (ChosenObjectView* object_view : chosen_object_rows_) {
-    if (object_view->GetVisible()) {
-      reset_button_->SetEnabled(true);
-      reset_button_->SetVisible(true);
-      num_permissions++;
-    }
   }
   reset_button_->SetText(l10n_util::GetPluralStringFUTF16(
       IDS_PAGE_INFO_RESET_PERMISSIONS, num_permissions));
@@ -453,13 +430,6 @@ void PageInfoMainView::OnPermissionChanged(
                                       permission.is_one_time);
   // The menu buttons for the permissions might have longer strings now, so we
   // need to layout and size the whole bubble.
-  PreferredSizeChanged();
-}
-
-void PageInfoMainView::OnChosenObjectDeleted(
-    const PageInfoUI::ChosenObjectInfo& info) {
-  presenter_->OnSiteChosenObjectDeleted(
-      *info.ui_info, base::Value(info.chooser_object->value.Clone()));
   PreferredSizeChanged();
 }
 

@@ -89,7 +89,6 @@ class IndexedDBControlWrapper;
 
 class BackgroundFetchContext;
 class BlobRegistryWrapper;
-class BluetoothAllowedDevicesMap;
 class BroadcastChannelService;
 class BrowsingDataFilterBuilder;
 class KeepAliveURLLoaderService;
@@ -235,7 +234,6 @@ class CONTENT_EXPORT StoragePartitionImpl
       base::OnceClosure callback) override;
   void Flush() override;
   void ResetURLLoaderFactories() override;
-  void ClearBluetoothAllowedDevicesMapForTesting() override;
   void AddObserver(DataRemovalObserver* observer) override;
   void RemoveObserver(DataRemovalObserver* observer) override;
   void FlushNetworkInterfaceForTesting() override;
@@ -254,7 +252,6 @@ class CONTENT_EXPORT StoragePartitionImpl
   base::WeakPtr<StoragePartitionImpl> GetWeakPtr();
   BackgroundFetchContext* GetBackgroundFetchContext();
   BroadcastChannelService* GetBroadcastChannelService();
-  BluetoothAllowedDevicesMap* GetBluetoothAllowedDevicesMap();
   BlobRegistryWrapper* GetBlobRegistry();
   storage::BlobUrlRegistry* GetBlobUrlRegistry();
   SubresourceProxyingURLLoaderService* GetSubresourceProxyingURLLoaderService();
@@ -776,7 +773,6 @@ class CONTENT_EXPORT StoragePartitionImpl
   scoped_refptr<BackgroundFetchContext> background_fetch_context_;
   scoped_refptr<BackgroundSyncContextImpl> background_sync_context_;
   std::unique_ptr<BroadcastChannelService> broadcast_channel_service_;
-  std::unique_ptr<BluetoothAllowedDevicesMap> bluetooth_allowed_devices_map_;
   scoped_refptr<BlobRegistryWrapper> blob_registry_;
   std::unique_ptr<storage::BlobUrlRegistry> blob_url_registry_;
   std::unique_ptr<SubresourceProxyingURLLoaderService>

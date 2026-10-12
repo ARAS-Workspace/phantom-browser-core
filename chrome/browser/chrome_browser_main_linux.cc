@@ -19,7 +19,6 @@
 #include "chrome/common/chrome_features.h"
 #include "components/password_manager/core/browser/password_manager_switches.h"
 #include "content/public/browser/browser_thread.h"
-#include "device/bluetooth/dbus/bluez_dbus_manager.h"
 #include "ui/base/l10n/l10n_util.h"
 
 #if BUILDFLAG(IS_LINUX)
@@ -45,12 +44,6 @@ ChromeBrowserMainPartsLinux::ChromeBrowserMainPartsLinux(
 ChromeBrowserMainPartsLinux::~ChromeBrowserMainPartsLinux() = default;
 
 void ChromeBrowserMainPartsLinux::PostCreateMainMessageLoop() {
-
-#if BUILDFLAG(USE_DBUS)
-  bluez::BluezDBusManager::Initialize(
-      dbus_thread_linux::GetSharedSystemBus().get());
-#endif  // BUILDFLAG(USE_DBUS)
-
   ChromeBrowserMainPartsPosix::PostCreateMainMessageLoop();
 }
 
@@ -86,7 +79,5 @@ void ChromeBrowserMainPartsLinux::PostBrowserStart() {
 #endif  // BUILDFLAG(USE_DBUS)
 
 void ChromeBrowserMainPartsLinux::PostDestroyThreads() {
-  bluez::BluezDBusManager::Shutdown();
-
   ChromeBrowserMainPartsPosix::PostDestroyThreads();
 }

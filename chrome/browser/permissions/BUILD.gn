@@ -48,7 +48,6 @@ source_set("permissions") {
     "//chrome/browser/app_mode",
     "//chrome/browser/background_fetch",
     "//chrome/browser/background_sync",
-    "//chrome/browser/bluetooth",
     "//chrome/browser/content_extraction",
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/display_capture",

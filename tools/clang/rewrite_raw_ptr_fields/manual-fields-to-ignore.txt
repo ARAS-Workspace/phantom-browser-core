@@ -12,9 +12,7 @@
 # forwarded to something that doesn't vibe with raw_ptr<T>. The rewriter has
 # no visibility into where the parameter is forwarded to.
 ProfileDestroyer::profile_
-(anonymous namespace)::BluetoothLowEnergyApiTest::mock_adapter_
 content::RenderProcessHostImpl::browser_context_
-device::BluetoothDevice::adapter_
 
 # Incompatibilities with tracing (TRACE_EVENT*),
 # perfetto::TracedDictionary::Add and gmock/EXPECT_THAT.

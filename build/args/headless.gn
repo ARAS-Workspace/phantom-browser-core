@@ -35,7 +35,6 @@ icu_use_data_file = false
 v8_use_external_startup_data = false
 
 use_alsa = false
-use_bluez = false
 use_cups = false
 use_dbus = false
 use_gio = false

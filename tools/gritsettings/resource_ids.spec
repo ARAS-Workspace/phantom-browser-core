@@ -180,10 +180,6 @@
     "META": {"sizes": {"includes": [1000],}},
     "includes": [2860],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/bluetooth_internals/resources.grd": {
-    "META": {"sizes": {"includes": [50],}},
-    "includes": [2880],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/bookmarks/resources.grd": {
     "META": {"sizes": {"includes": [50],}},
     "includes": [2900],
@@ -1447,10 +1443,6 @@
   },
   "chromecast/renderer/resources/extensions_renderer_resources.grd": {
     "includes": [9300],
-  },
-
-  "device/bluetooth/bluetooth_strings.grd": {
-    "messages": [9320],
   },
 
   "device/fido/fido_strings.grd": {

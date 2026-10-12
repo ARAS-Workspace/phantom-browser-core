@@ -155,9 +155,12 @@ IN_PROC_BROWSER_TEST_F(SubframeTaskBrowserTest, TaskManagerShowsSubframeTasks) {
     // SubframeTasks, one for b.com and another for c.com.
     ASSERT_THAT(
         MockWebContentsTaskManager::TaskTitles(tasks),
-        testing::ElementsAre(PrefixExpectedTabTitle("cross-site iframe test"),
-                             PrefixExpectedSubframeTitle("http://b.com/"),
-                             PrefixExpectedSubframeTitle("http://c.com/")));
+        testing::ElementsAre(
+            PrefixExpectedTabTitle("cross-site iframe test"),
+            PrefixExpectedSubframeTitle(
+                embedded_test_server()->GetURL("b.com", "/").spec()),
+            PrefixExpectedSubframeTitle(
+                embedded_test_server()->GetURL("c.com", "/").spec())));
 
     const Task* subframe_task_1 = tasks[1];
     const Task* subframe_task_2 = tasks[2];
@@ -185,11 +188,15 @@ IN_PROC_BROWSER_TEST_F(SubframeTaskBrowserTest, TaskManagerShowsSubframeTasks) {
     ASSERT_THAT(
         MockWebContentsTaskManager::TaskTitles(tasks),
         testing::ElementsAre(
-            PrefixExpectedBFCacheTitle("http://a.com/", /*is_subframe=*/false),
-            PrefixExpectedBFCacheTitle("http://b.com/",
-                                       /*is_subframe=*/true),
-            PrefixExpectedBFCacheTitle("http://c.com/",
-                                       /*is_subframe=*/true),
+            PrefixExpectedBFCacheTitle(
+                embedded_test_server()->GetURL("a.com", "/").spec(),
+                /*is_subframe=*/false),
+            PrefixExpectedBFCacheTitle(
+                embedded_test_server()->GetURL("b.com", "/").spec(),
+                /*is_subframe=*/true),
+            PrefixExpectedBFCacheTitle(
+                embedded_test_server()->GetURL("c.com", "/").spec(),
+                /*is_subframe=*/true),
             PrefixExpectedTabTitle("Title Of Awesomeness")));
   }
   // When navigation to |kSimplePageUrl| happens, tasks are first created for
@@ -232,8 +239,10 @@ IN_PROC_BROWSER_TEST_F(SubframeTaskBrowserTest, TaskManagerHungSubframe) {
   ASSERT_THAT(MockWebContentsTaskManager::TaskTitles(tasks),
               testing::ElementsAre(
                   PrefixExpectedTabTitle("cross-site iframe test").c_str(),
-                  PrefixExpectedSubframeTitle("http://b.com/"),
-                  PrefixExpectedSubframeTitle("http://c.com/")));
+                  PrefixExpectedSubframeTitle(
+                      embedded_test_server()->GetURL("b.com", "/").spec()),
+                  PrefixExpectedSubframeTitle(
+                      embedded_test_server()->GetURL("c.com", "/").spec())));
 
   const Task* subframe_task_1 = tasks[1];
   const Task* subframe_task_2 = tasks[2];

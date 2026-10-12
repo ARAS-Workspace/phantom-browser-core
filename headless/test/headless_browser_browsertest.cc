@@ -946,12 +946,6 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, DISABLED_NetworkServiceCrash) {
   } while (wc->GetController().GetLastCommittedEntry()->GetURL() != new_url);
 }
 
-IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, HasValidBluetoothDelegate) {
-  auto* delegate =
-      content::GetContentClientForTesting()->browser()->GetBluetoothDelegate();
-  EXPECT_TRUE(delegate);
-}
-
 // Infobar tests -------------------------------------------------------------
 
 class TestInfoBarDelegate : public ConfirmInfoBarDelegate {

@@ -54,7 +54,6 @@ include_rules = [
   "+content/public/app",
   "+content/public/browser",
   "+device/base/synchronization",
-  "+device/bluetooth",
   "+device/vr/public", # For WebXR API
   "+device/vr/buildflags/buildflags.h",  # For WebXR API
   # This can only be used on POSIX, in particular it mustn't be used on Windows

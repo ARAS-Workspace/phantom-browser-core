@@ -42,10 +42,6 @@ class ServiceTestSuite : public base::TestSuite {
 
     base::FilePath path;
     ASSERT_TRUE(base::PathService::Get(base::DIR_ASSETS, &path));
-    base::FilePath bluetooth_test_strings =
-        path.Append(FILE_PATH_LITERAL("bluetooth_test_strings.pak"));
-    ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
-        bluetooth_test_strings, ui::kScaleFactorNone);
     base::FilePath services_test_strings =
         path.Append(FILE_PATH_LITERAL("services_test_strings.pak"));
     ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(

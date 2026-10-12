@@ -242,8 +242,6 @@ int TestStoragePartition::GetDataRemovalObserverCount() {
   return data_removal_observer_count_;
 }
 
-void TestStoragePartition::ClearBluetoothAllowedDevicesMapForTesting() {}
-
 void TestStoragePartition::FlushNetworkInterfaceForTesting() {}
 
 void TestStoragePartition::FlushCertVerifierInterfaceForTesting() {}

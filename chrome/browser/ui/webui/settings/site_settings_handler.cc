@@ -34,7 +34,6 @@
 #include "base/values.h"
 #include "chrome/browser/apps/app_service/app_service_proxy.h"
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/bluetooth/bluetooth_chooser_context_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_model_delegate.h"
 #include "chrome/browser/content_settings/chrome_content_settings_utils.h"
@@ -78,7 +77,6 @@
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/crx_file/id_util.h"
 #include "components/infobars/content/content_infobar_manager.h"
-#include "components/permissions/contexts/bluetooth_chooser_context.h"
 #include "components/permissions/features.h"
 #include "components/permissions/object_permission_context_base.h"
 #include "components/permissions/permission_actions_history.h"
@@ -152,11 +150,6 @@ constexpr char kRwsEnterpriseManaged[] = "rwsEnterpriseManaged";
 constexpr char kZoom[] = "zoom";
 
 constexpr uint16_t kHttpsDefaultPort = 443;
-
-// Content types for chooser data.
-constexpr ContentSettingsType kChooserDataContentSettingsTypes[] = {
-    ContentSettingsType::BLUETOOTH_CHOOSER_DATA,
-};
 
 // Content types related to the double-patterned storage access settings.
 // Entries in this array will be included in the results from HandleGetAllSites
@@ -734,10 +727,6 @@ void SiteSettingsHandler::RegisterMessages() {
       base::BindRepeating(&SiteSettingsHandler::HandleRevokeFileSystemGrants,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
-      "getChooserExceptionList",
-      base::BindRepeating(&SiteSettingsHandler::HandleGetChooserExceptionList,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
       "getOriginPermissions",
       base::BindRepeating(&SiteSettingsHandler::HandleGetOriginPermissions,
                           base::Unretained(this)));
@@ -754,11 +743,6 @@ void SiteSettingsHandler::RegisterMessages() {
       "setCategoryPermissionForPattern",
       base::BindRepeating(
           &SiteSettingsHandler::HandleSetCategoryPermissionForPattern,
-          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "resetChooserExceptionForSite",
-      base::BindRepeating(
-          &SiteSettingsHandler::HandleResetChooserExceptionForSite,
           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "isOriginValid",
@@ -1219,32 +1203,6 @@ void SiteSettingsHandler::HandleGetAllSites(const base::ListValue& args) {
     }
   }
 
-  // Get device chooser permission exceptions.
-  for (auto content_type : kChooserDataContentSettingsTypes) {
-    std::string_view group_name =
-        site_settings::ContentSettingsTypeToGroupName(content_type);
-    DCHECK(!group_name.empty());
-    const site_settings::ChooserTypeNameEntry* chooser_type =
-        site_settings::ChooserTypeFromGroupName(group_name);
-    DCHECK(chooser_type);
-    base::ListValue exceptions =
-        site_settings::GetChooserExceptionListFromProfile(profile_,
-                                                          *chooser_type);
-    for (const base::Value& exception : exceptions) {
-      const base::ListValue* sites =
-          exception.GetDict().FindList(site_settings::kSites);
-      DCHECK(sites);
-      for (const base::Value& site : *sites) {
-        const std::string* origin_string =
-            site.GetDict().FindString(site_settings::kOrigin);
-        DCHECK(origin_string);
-        auto origin = url::Origin::Create(GURL(*origin_string));
-        InsertOriginIntoGroup(&all_sites_map_, origin);
-        origin_permission_set_.insert(origin);
-      }
-    }
-  }
-
   // Recreate the model to refresh the usage information.
   // This happens in the background and will send usage data to the page.
   send_sites_list_ = true;
@@ -1457,23 +1415,6 @@ void SiteSettingsHandler::HandleGetStorageAccessExceptionList(
   ResolveJavascriptCallback(callback_id, exceptions);
 }
 
-void SiteSettingsHandler::HandleGetChooserExceptionList(
-    const base::ListValue& args) {
-  AllowJavascript();
-
-  CHECK_EQ(2U, args.size());
-  const base::Value& callback_id = args[0];
-  const std::string& type = args[1].GetString();
-  const site_settings::ChooserTypeNameEntry* chooser_type =
-      site_settings::ChooserTypeFromGroupName(type);
-  CHECK(chooser_type);
-
-  base::ListValue exceptions =
-      site_settings::GetChooserExceptionListFromProfile(profile_,
-                                                        *chooser_type);
-  ResolveJavascriptCallback(callback_id, exceptions);
-}
-
 void SiteSettingsHandler::HandleGetOriginPermissions(
     const base::ListValue& args) {
   AllowJavascript();
@@ -1608,36 +1549,6 @@ void SiteSettingsHandler::HandleSetOriginPermissions(
         << *type_string << " is not expected to have a UI representation.";
     types.push_back(content_type);
   } else {
-    // Clear device chooser data permission exceptions.
-    if (setting == CONTENT_SETTING_DEFAULT) {
-      for (auto content_type : kChooserDataContentSettingsTypes) {
-        std::string_view group_name =
-            site_settings::ContentSettingsTypeToGroupName(content_type);
-        DCHECK(!group_name.empty());
-        const site_settings::ChooserTypeNameEntry* chooser_type =
-            site_settings::ChooserTypeFromGroupName(group_name);
-        DCHECK(chooser_type);
-
-        // The BluetoothChooserContext is only available when the
-        // WebBluetoothNewPermissionsBackend flag is enabled.
-        // TODO(crbug.com/40458188): Remove the nullptr check when it is enabled
-        // by default.
-        permissions::ObjectPermissionContextBase* chooser_context =
-            chooser_type->get_context(profile_);
-        if (!chooser_context) {
-          continue;
-        }
-
-        auto objects = chooser_context->GetAllGrantedObjects();
-        for (const auto& object : objects) {
-          if (origin == object->origin) {
-            chooser_context->RevokeObjectPermission(url::Origin::Create(origin),
-                                                    object->value);
-          }
-        }
-      }
-    }
-
     types = site_settings::GetVisiblePermissionCategories();
   }
 
@@ -1952,24 +1863,6 @@ void SiteSettingsHandler::HandleSetCategoryPermissionForPattern(
   }
 }
 
-void SiteSettingsHandler::HandleResetChooserExceptionForSite(
-    const base::ListValue& args) {
-  CHECK_EQ(3U, args.size());
-
-  const std::string& chooser_type_str = args[0].GetString();
-  const site_settings::ChooserTypeNameEntry* chooser_type =
-      site_settings::ChooserTypeFromGroupName(chooser_type_str);
-  CHECK(chooser_type);
-
-  auto origin_url = GURL(args[1].GetString());
-  CHECK(origin_url.is_valid());
-  auto origin = url::Origin::Create(origin_url);
-
-  permissions::ObjectPermissionContextBase* chooser_context =
-      chooser_type->get_context(profile_);
-  chooser_context->RevokeObjectPermission(origin, args[2].GetDict());
-}
-
 void SiteSettingsHandler::HandleIsOriginValid(const base::ListValue& args) {
   AllowJavascript();
   CHECK_EQ(2U, args.size());
@@ -2234,15 +2127,6 @@ void SiteSettingsHandler::ObserveSourcesForProfile(Profile* profile) {
   }
 
   if (base::FeatureList::IsEnabled(
-          features::kWebBluetoothNewPermissionsBackend)) {
-    auto* bluetooth_context =
-        BluetoothChooserContextFactory::GetForProfile(profile);
-    if (!chooser_observations_.IsObservingSource(bluetooth_context)) {
-      chooser_observations_.AddObservation(bluetooth_context);
-    }
-  }
-
-  if (base::FeatureList::IsEnabled(
           features::kFileSystemAccessPersistentPermissions)) {
     auto* file_system_access_permission_context =
         FileSystemAccessPermissionContextFactory::GetForProfile(profile);
@@ -2260,15 +2144,6 @@ void SiteSettingsHandler::StopObservingSourcesForProfile(Profile* profile) {
   auto* map = HostContentSettingsMapFactory::GetForProfile(profile);
   if (observations_.IsObservingSource(map)) {
     observations_.RemoveObservation(map);
-  }
-
-  if (base::FeatureList::IsEnabled(
-          features::kWebBluetoothNewPermissionsBackend)) {
-    auto* bluetooth_context =
-        BluetoothChooserContextFactory::GetForProfile(profile);
-    if (chooser_observations_.IsObservingSource(bluetooth_context)) {
-      chooser_observations_.RemoveObservation(bluetooth_context);
-    }
   }
 
   if (base::FeatureList::IsEnabled(

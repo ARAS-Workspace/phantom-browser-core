@@ -748,32 +748,6 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
 }
 
 // static
-const ui::ImageModel PageInfoViewFactory::GetChosenObjectIcon(
-    const PageInfoUI::ChosenObjectInfo& object,
-    bool deleted) {
-  // The permissions data for device APIs will always appear even if the device
-  // is not currently conncted to the system.
-  // TODO(crbug.com/40672237): Check the connected status of devices and
-  // change the icon to one that reflects that status.
-  const gfx::VectorIcon* icon = &gfx::VectorIcon::EmptyIcon();
-  switch (object.ui_info->content_settings_type) {
-    case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
-      icon = &(features::IsRoundedIconsEnabled()
-                   ? vector_icons::kBluetoothIcon
-                   : vector_icons::kBluetoothOldIcon);
-      break;
-    default:
-      // All other content settings types do not represent chosen object
-      // permissions.
-      NOTREACHED();
-  }
-
-  return ui::ImageModel::FromVectorIcon(
-      *icon, ui::kColorIcon, GetIconSize(),
-      deleted ? &vector_icons::kBlockedBadgeCustomIcon : nullptr);
-}
-
-// static
 const ui::ImageModel PageInfoViewFactory::GetSiteSettingsIcon() {
   return GetImageModel(features::IsRoundedIconsEnabled()
                            ? vector_icons::kSettingsIcon

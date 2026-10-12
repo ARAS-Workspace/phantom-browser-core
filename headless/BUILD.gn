@@ -292,8 +292,6 @@ source_set("headless_browser") {
     "lib/browser/command_line_handler.h",
     "lib/browser/directory_enumerator.cc",
     "lib/browser/directory_enumerator.h",
-    "lib/browser/headless_bluetooth_delegate.cc",
-    "lib/browser/headless_bluetooth_delegate.h",
     "lib/browser/headless_browser_context_impl.cc",
     "lib/browser/headless_browser_context_impl.h",
     "lib/browser/headless_browser_context_options.cc",
@@ -476,7 +474,6 @@ source_set("headless_browser") {
     deps += [
       "//components/dbus",
       "//dbus",
-      "//device/bluetooth",
     ]
   }
   if (is_linux && use_dbus) {
@@ -527,7 +524,6 @@ group("headless_tests") {
 
 test("headless_unittests") {
   sources = [
-    "lib/browser/headless_bluetooth_delegate_unittest.cc",
     "lib/browser/headless_browser_impl_unittest.cc",
     "lib/browser/headless_client_hints_controller_delegate_unittest.cc",
     "lib/renderer/allowlist_unittest.cc",
@@ -545,7 +541,6 @@ test("headless_unittests") {
     "//content/public/app",
     "//content/public/child",
     "//content/public/common",
-    "//device/bluetooth/public/cpp",
     "//testing/gmock",
     "//testing/gtest",
     "//ui/gfx:test_support",

@@ -34,8 +34,6 @@
 namespace extensions {
 
 namespace api {
-class BluetoothSocketApiFunction;
-class BluetoothSocketEventDispatcher;
 class TCPServerSocketEventDispatcher;
 class TCPSocketEventDispatcher;
 class UDPSocketEventDispatcher;
@@ -172,9 +170,6 @@ class ApiResourceManager : public BrowserContextKeyedAPI,
  private:
   // TODO(rockot): ApiResourceData could be moved out of ApiResourceManager and
   // we could avoid maintaining a friends list here.
-  friend class BluetoothAPI;
-  friend class api::BluetoothSocketApiFunction;
-  friend class api::BluetoothSocketEventDispatcher;
   friend class api::TCPServerSocketEventDispatcher;
   friend class api::TCPSocketEventDispatcher;
   friend class api::UDPSocketEventDispatcher;

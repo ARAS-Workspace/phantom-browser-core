@@ -145,7 +145,6 @@ def CheckWebDevStyle(input_api, output_api):
 
 def CheckNoNewJs(input_api, output_api):
   EXCLUDED_PATHS = [
-    'chrome/browser/resources/bluetooth_internals/',
     'chrome/browser/resources/chromeos/',
     'chrome/browser/resources/device_log/',
     # TODO(crbug.com/403113291): Migrate incognito_navigation_blocked_page to

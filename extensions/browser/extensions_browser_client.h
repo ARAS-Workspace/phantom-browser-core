@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "base/functional/callback.h"
 #include "base/functional/callback_forward.h"
 #include "base/memory/ref_counted.h"
 #include "base/memory/ref_counted_memory.h"
@@ -17,7 +18,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "content/public/browser/bluetooth_chooser.h"
 #include "content/public/browser/frame_tree_node_id.h"
 #include "content/public/common/child_process_id.h"
 #include "extensions/browser/extension_event_histogram_value.h"

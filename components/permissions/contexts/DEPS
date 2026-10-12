@@ -3,7 +3,6 @@ include_rules = [
   "+components/location",
   "+components/prefs",
   "+components/webrtc",
-  "+device/bluetooth",
   "+device/vr/buildflags",
   "+device/vr/public/cpp",
   "+mojo/public",

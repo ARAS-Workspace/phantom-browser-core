@@ -57,8 +57,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
       security_state::VisibleSecurityState visible_security_state);
 
   // PageInfoDelegate implementation
-  permissions::ObjectPermissionContextBase* GetChooserContext(
-      ContentSettingsType type) override;
   content::PermissionResult GetPermissionResult(
       blink::PermissionType permission,
       const url::Origin& origin,

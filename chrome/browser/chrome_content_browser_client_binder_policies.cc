@@ -4,7 +4,6 @@
 
 #include "chrome/browser/chrome_content_browser_client_binder_policies.h"
 
-#include "chrome/browser/ui/webui/bluetooth_internals/bluetooth_internals.mojom.h"
 #include "components/autofill/content/common/mojom/autofill_driver.mojom.h"
 #include "components/page_load_metrics/common/page_load_metrics.mojom.h"
 #include "components/subresource_filter/content/mojom/subresource_filter.mojom.h"
@@ -18,16 +17,6 @@
 #endif
 
 namespace {
-
-// Registers policies for interfaces registered in
-// `RegisterBrowserInterfaceBindersForFrame()`.
-void RegisterPoliciesForNonAssociatedInterfaces(
-    content::MojoBinderPolicyMap& policy_map) {
-  // Prerendering does not happen for WebUI pages, so set kUnexpected as the
-  // policy for interfaces registered by WebUI.
-  policy_map.SetNonAssociatedPolicy<::mojom::BluetoothInternalsHandler>(
-      content::MojoBinderNonAssociatedPolicy::kUnexpected);
-}
 
 // Registers policies for channel-associated interfaces registered in
 // `RegisterAssociatedInterfaceBindersForRenderFrameHost()`.
@@ -63,6 +52,5 @@ void RegisterPoliciesForChannelAssociatedInterfaces(
 
 void RegisterChromeMojoBinderPoliciesForSameOriginPrerendering(
     content::MojoBinderPolicyMap& policy_map) {
-  RegisterPoliciesForNonAssociatedInterfaces(policy_map);
   RegisterPoliciesForChannelAssociatedInterfaces(policy_map);
 }

@@ -33,8 +33,6 @@
 class AppInfoDialogViewsTest;
 class AuthenticatorRequestDialogView;
 class BatchUploadDialogView;
-class BluetoothDeviceCredentialsView;
-class BluetoothDevicePairConfirmView;
 class BookmarkEditorView;
 class BruschettaInstallerView;
 class CaretBrowsingDialogDelegate;
@@ -702,8 +700,6 @@ class VIEWS_EXPORT DialogDelegateView : public DialogDelegate, public View {
   friend class ::AppInfoDialogViewsTest;
   friend class ::AuthenticatorRequestDialogView;
   friend class ::BatchUploadDialogView;
-  friend class ::BluetoothDeviceCredentialsView;
-  friend class ::BluetoothDevicePairConfirmView;
   friend class ::BookmarkEditorView;
   friend class ::BruschettaInstallerView;
   friend class ::CaretBrowsingDialogDelegate;

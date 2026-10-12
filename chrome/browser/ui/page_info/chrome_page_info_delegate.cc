@@ -7,7 +7,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "chrome/browser/bluetooth/bluetooth_chooser_context_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
@@ -34,7 +33,6 @@
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/page_info/core/features.h"
-#include "components/permissions/contexts/bluetooth_chooser_context.h"
 #include "components/permissions/object_permission_context_base.h"
 #include "components/permissions/permission_manager.h"
 #include "components/prefs/pref_service.h"
@@ -121,26 +119,6 @@ ChromePageInfoDelegate::~ChromePageInfoDelegate() = default;
 Profile* ChromePageInfoDelegate::GetProfile() const {
   return Profile::FromBrowserContext(web_contents_->GetBrowserContext());
 }
-
-permissions::ObjectPermissionContextBase*
-ChromePageInfoDelegate::GetChooserContext(ContentSettingsType type) {
-  switch (type) {
-    case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
-      if (base::FeatureList::IsEnabled(
-              features::kWebBluetoothNewPermissionsBackend)) {
-        return BluetoothChooserContextFactory::GetForProfile(GetProfile());
-      }
-      return nullptr;
-    case ContentSettingsType::USB_CHOOSER_DATA:
-    case ContentSettingsType::SERIAL_CHOOSER_DATA:
-    case ContentSettingsType::HID_CHOOSER_DATA:
-    case ContentSettingsType::SMART_CARD_DATA:
-      return nullptr;
-    default:
-      NOTREACHED();
-  }
-}
-
 
 content::PermissionResult ChromePageInfoDelegate::GetPermissionResult(
     blink::PermissionType permission,

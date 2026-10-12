@@ -154,10 +154,6 @@
 #include "chrome/browser/metrics/chrome_metrics_service_crash_reporter.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX)
-#include "chrome/browser/metrics/bluetooth_metrics_provider.h"
-#endif  // BUILDFLAG(IS_LINUX)
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/updates/update_metrics_provider.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -690,11 +686,6 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
 
   metrics_service_->RegisterMetricsProvider(MakeDemographicMetricsProvider(
       metrics::MetricsLogUploader::MetricServiceType::UMA));
-
-#if BUILDFLAG(IS_LINUX)
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<metrics::BluetoothMetricsProvider>());
-#endif
 
   metrics_service_->RegisterMetricsProvider(base::WrapUnique(
       new performance_manager::MetricsProviderDesktop(local_state)));

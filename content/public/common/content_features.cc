@@ -1122,18 +1122,6 @@ BASE_FEATURE(kWebAssemblyTrapHandler,
 // https://github.com/WebAssembly/stack-switching
 BASE_FEATURE(kWebAssemblyStackSwitching, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Controls whether the Web Bluetooth API is enabled:
-// https://webbluetoothcg.github.io/web-bluetooth/
-BASE_FEATURE(kWebBluetooth, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether Web Bluetooth should use the new permissions backend. The
-// new permissions backend uses ObjectPermissionContextBase, which is used by
-// other device APIs, such as WebUSB. When enabled,
-// WebBluetoothWatchAdvertisements and WebBluetoothGetDevices blink features are
-// also enabled.
-BASE_FEATURE(kWebBluetoothNewPermissionsBackend,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Controls which backend is used to retrieve OTP on Android. When disabled
 // we use User Consent API.
 BASE_FEATURE(kWebOtpBackendAuto, base::FEATURE_DISABLED_BY_DEFAULT);

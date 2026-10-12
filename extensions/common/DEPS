@@ -5,7 +5,6 @@ include_rules = [
   "+tools/json_schema_compiler",
   "+components/pdf/common/pdf_util.h",
   "+components/version_info/channel.h",
-  "+device/bluetooth",  # For BluetoothPermission
   "+grit/extensions_strings.h",
   "+net",
   "+services/device/public",

@@ -165,7 +165,6 @@ the following core `content` classes:
 
 ## Further documentation
 
-* [Bluetooth](browser/bluetooth/README.md)
 * [content/browser/renderer_host](browser/renderer_host/README.md)
 * [Frame trees](https://chromium.googlesource.com/chromium/src/+/main/docs/frame_trees.md)
 * [Navigation](https://chromium.googlesource.com/chromium/src/+/main/docs/navigation.md)

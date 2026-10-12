@@ -34,7 +34,6 @@
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/content_switches.h"
-#include "headless/lib/browser/headless_bluetooth_delegate.h"
 #include "headless/lib/browser/headless_browser_context_impl.h"
 #include "headless/lib/browser/headless_browser_impl.h"
 #include "headless/lib/browser/headless_browser_main_parts.h"
@@ -479,14 +478,6 @@ void HeadlessContentBrowserClient::HandleExplicitlyAllowedPorts(
   }
 
   network_service->SetExplicitlyAllowedPorts(explicitly_allowed_ports);
-}
-
-content::BluetoothDelegate*
-HeadlessContentBrowserClient::GetBluetoothDelegate() {
-  if (!bluetooth_delegate_) {
-    bluetooth_delegate_ = std::make_unique<HeadlessBluetoothDelegate>();
-  }
-  return bluetooth_delegate_.get();
 }
 
 bool HeadlessContentBrowserClient::IsRendererProcessPriorityEnabled() {

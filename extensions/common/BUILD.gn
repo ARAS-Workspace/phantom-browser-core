@@ -256,12 +256,6 @@ mojom("mojom") {
 static_library("common") {
   sources = [
     "alias.h",
-    "api/bluetooth/bluetooth_manifest_data.cc",
-    "api/bluetooth/bluetooth_manifest_data.h",
-    "api/bluetooth/bluetooth_manifest_handler.cc",
-    "api/bluetooth/bluetooth_manifest_handler.h",
-    "api/bluetooth/bluetooth_manifest_permission.cc",
-    "api/bluetooth/bluetooth_manifest_permission.h",
     "api/commands/commands_handler.cc",
     "api/commands/commands_handler.h",
     "api/declarative/declarative_constants.cc",
@@ -575,8 +569,6 @@ static_library("common") {
     "//components/url_matcher",
     "//components/version_info",
     "//crypto",
-    "//device/bluetooth",
-    "//device/bluetooth/public/cpp",
     "//extensions:extensions_resources",
     "//extensions/common/api",
     "//extensions/strings",

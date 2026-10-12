@@ -313,7 +313,6 @@ class TestRunnerBindings final : public gin::Wrappable<TestRunnerBindings> {
   void FocusDevtoolsSecondaryWindow();
   void ForceNextDrawingBufferCreationToFail();
   void ForceNextWebGLContextCreationToFail();
-  void GetBluetoothManualChooserEvents(v8::Local<v8::Function> callback);
   gin::Dictionary GetClipboardReadState(v8::Isolate* isolate);
   void GetManifestThen(v8::Local<v8::Function> callback);
   std::string GetWritableDirectory();
@@ -336,17 +335,12 @@ class TestRunnerBindings final : public gin::Wrappable<TestRunnerBindings> {
   void RemoveWebPageOverlay();
   void ResetClipboardReadTracking();
   void ResolveBeforeInstallPromptPromise(const std::string& platform);
-  void SendBluetoothManualChooserEvent(const std::string& event,
-                                       const std::string& argument);
   void SetAcceptLanguages(const std::string& accept_languages);
   void SetAllowFileAccessFromFileURLs(bool allow);
   void SetAllowRunningOfInsecureContent(bool allowed);
   void SetBlockThirdPartyCookies(bool block);
   void SetAudioData(const gin::ArrayBufferView& view);
   void SetBackingScaleFactor(double value, v8::Local<v8::Function> callback);
-  void SetBluetoothFakeAdapter(const std::string& adapter_name,
-                               v8::Local<v8::Function> callback);
-  void SetBluetoothManualChooser(bool enable);
   void SetBrowserHandlesFocus(bool enable);
   void SetCaretBrowsingEnabled();
   void SetColorProfile(const std::string& name,
@@ -670,12 +664,6 @@ gin::ObjectTemplateBuilder TestRunnerBindings::GetObjectTemplateBuilder(
       .SetMethod("forceNextWebGLContextCreationToFail",
                  &TestRunnerBindings::ForceNextWebGLContextCreationToFail)
 
-      // The Bluetooth functions are specified at
-      // https://webbluetoothcg.github.io/web-bluetooth/tests/.
-      //
-      // Returns the events recorded since the last call to this function.
-      .SetMethod("getBluetoothManualChooserEvents",
-                 &TestRunnerBindings::GetBluetoothManualChooserEvents)
       // Returns the clipboard read tracking state from the mock clipboard host.
       // The returned object has boolean properties: readTextCalled,
       // readHtmlCalled, readUnsanitizedCustomFormatCalled,
@@ -730,16 +718,6 @@ gin::ObjectTemplateBuilder TestRunnerBindings::GetObjectTemplateBuilder(
                  &TestRunnerBindings::ResolveBeforeInstallPromptPromise)
       .SetMethod("selectionAsMarkup", &TestRunnerBindings::SelectionAsMarkup)
 
-      // The Bluetooth functions are specified at
-      // https://webbluetoothcg.github.io/web-bluetooth/tests/.
-
-      // Calls the BluetoothChooser::EventHandler with the arguments here. Valid
-      // event strings are:
-      //  * "cancel" - simulates the user canceling the chooser.
-      //  * "select" - simulates the user selecting a device whose device ID is
-      //               in the 2nd parameter.
-      .SetMethod("sendBluetoothManualChooserEvent",
-                 &TestRunnerBindings::SendBluetoothManualChooserEvent)
       .SetMethod("setAcceptLanguages", &TestRunnerBindings::SetAcceptLanguages)
       .SetMethod("setAllowFileAccessFromFileURLs",
                  &TestRunnerBindings::SetAllowFileAccessFromFileURLs)
@@ -754,14 +732,6 @@ gin::ObjectTemplateBuilder TestRunnerBindings::GetObjectTemplateBuilder(
       .SetMethod("setAudioData", &TestRunnerBindings::SetAudioData)
       .SetMethod("setBackingScaleFactor",
                  &TestRunnerBindings::SetBackingScaleFactor)
-      // Set the bluetooth adapter while running a web test.
-      .SetMethod("setBluetoothFakeAdapter",
-                 &TestRunnerBindings::SetBluetoothFakeAdapter)
-      // If |enable| is true, makes the Bluetooth chooser record its input and
-      // wait for instructions from the test program on how to proceed.
-      // Otherwise falls back to the browser's default chooser.
-      .SetMethod("setBluetoothManualChooser",
-                 &TestRunnerBindings::SetBluetoothManualChooser)
       .SetMethod("setBrowserHandlesFocus",
                  &TestRunnerBindings::SetBrowserHandlesFocus)
       .SetMethod("setCallCloseOnWebViews", &TestRunnerBindings::NotImplemented)
@@ -2034,74 +2004,11 @@ void TestRunnerBindings::SetColorProfile(const std::string& name,
   WrapV8Closure(std::move(v8_callback)).Run();
 }
 
-void TestRunnerBindings::SetBluetoothFakeAdapter(
-    const std::string& adapter_name,
-    v8::Local<v8::Function> v8_callback) {
-  if (!frame_) {
-    return;
-  }
-  runner_->GetBluetoothFakeAdapterSetter().Set(
-      adapter_name, WrapV8Closure(std::move(v8_callback)));
-}
-
-void TestRunnerBindings::SetBluetoothManualChooser(bool enable) {
-  if (!frame_) {
-    return;
-  }
-  frame_->GetWebTestControlHostRemote()->SetBluetoothManualChooser(enable);
-}
-
-static void GetBluetoothManualChooserEventsReply(
-    base::WeakPtr<TestRunnerBindings> test_runner,
-    blink::WebLocalFrame* frame,
-    BoundV8Callback callback,
-    const std::vector<std::string>& events) {
-  if (!test_runner)  // This guards the validity of the |frame|.
-    return;
-
-  v8::Isolate* isolate = frame->GetAgentGroupScheduler()->Isolate();
-  v8::HandleScope handle_scope(isolate);
-
-  // gin::TryConvertToV8() requires a v8::Context.
-  v8::Local<v8::Context> context = frame->MainWorldScriptContext();
-  CHECK(!context.IsEmpty());
-  v8::Context::Scope context_scope(context);
-
-  v8::Local<v8::Value> arg;
-  bool converted = gin::TryConvertToV8(isolate, events, &arg);
-  CHECK(converted);
-
-  std::move(callback).Run(v8::LocalVector<v8::Value>(isolate, {
-                                                                  arg,
-                                                              }));
-}
-
-void TestRunnerBindings::GetBluetoothManualChooserEvents(
-    v8::Local<v8::Function> callback) {
-  if (!frame_) {
-    return;
-  }
-  frame_->GetWebTestControlHostRemote()->GetBluetoothManualChooserEvents(
-      base::BindOnce(&GetBluetoothManualChooserEventsReply,
-                     weak_ptr_factory_.GetWeakPtr(), GetWebFrame(),
-                     WrapV8Callback(std::move(callback))));
-}
-
 void TestRunnerBindings::SetBrowserHandlesFocus(bool enable) {
   if (!frame_) {
     return;
   }
   blink::SetBrowserCanHandleFocusForWebTest(enable);
-}
-
-void TestRunnerBindings::SendBluetoothManualChooserEvent(
-    const std::string& event,
-    const std::string& argument) {
-  if (!frame_) {
-    return;
-  }
-  frame_->GetWebTestControlHostRemote()->SendBluetoothManualChooserEvent(
-      event, argument);
 }
 
 void TestRunnerBindings::SetPOSIXLocale(const std::string& locale) {
@@ -3999,22 +3906,6 @@ void TestRunner::FinishTest(WebFrameTestProxy& source) {
   source.GetWebTestControlHostRemote()->InitiateCaptureDump(
       std::move(dump_result), browser_should_dump_back_forward_list,
       browser_should_dump_pixels);
-}
-
-mojom::WebTestBluetoothFakeAdapterSetter&
-TestRunner::GetBluetoothFakeAdapterSetter() {
-  if (!bluetooth_fake_adapter_setter_) {
-    RenderThread::Get()->BindHostReceiver(
-        bluetooth_fake_adapter_setter_.BindNewPipeAndPassReceiver());
-    bluetooth_fake_adapter_setter_.set_disconnect_handler(base::BindOnce(
-        &TestRunner::HandleBluetoothFakeAdapterSetterDisconnected,
-        base::Unretained(this)));
-  }
-  return *bluetooth_fake_adapter_setter_;
-}
-
-void TestRunner::HandleBluetoothFakeAdapterSetterDisconnected() {
-  bluetooth_fake_adapter_setter_.reset();
 }
 
 void TestRunner::DisableAutomaticDragDrop(WebFrameTestProxy& source) {

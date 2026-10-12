@@ -1771,12 +1771,6 @@ BLINK_COMMON_EXPORT bool IsVirtualKeyboardGeometryAndInsetFixesEnabled();
 BLINK_COMMON_EXPORT BASE_DECLARE_FEATURE(
     kVisualRectMappingApplyLocalVisualViewportTransform);
 
-// Feature flag for controlling whether Web Bluetooth gatt.disconnect() can be
-// used to cancel an ongoing gatt.connect() and have it rejected with an ABORT
-// error. This makes the behavior match
-// https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-disconnect.
-BLINK_COMMON_EXPORT BASE_DECLARE_FEATURE(kWebBluetoothCancelConnect);
-
 // Feature flag for making use of VideoFrameMetadata::capture_begin_time
 // if set, instead of relating incoming media timestamps to local time in the
 // WebRTC track source.

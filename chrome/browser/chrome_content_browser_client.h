@@ -107,7 +107,6 @@ enum class Channel;
 
 class ChromeDirectSocketsDelegate;
 class ChromeSensorDelegate;
-class ChromeBluetoothDelegate;
 class ChromeWebAuthenticationDelegateBase;
 class HttpAuthCoordinator;
 class MainThreadStackSamplingProfiler;
@@ -673,7 +672,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   bool ShouldForceDownloadResource(content::BrowserContext* browser_context,
                                    const GURL& url,
                                    const std::string& mime_type) override;
-  content::BluetoothDelegate* GetBluetoothDelegate() override;
   bool IsSecurityLevelAcceptableForWebAuthn(
       content::RenderFrameHost* rfh,
       const url::Origin& caller_origin) override;
@@ -1133,7 +1131,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       web_authentication_delegate_;
   std::unique_ptr<ChromeDirectSocketsDelegate> direct_sockets_delegate_;
   std::unique_ptr<ChromeSensorDelegate> sensor_delegate_;
-  std::unique_ptr<ChromeBluetoothDelegate> bluetooth_delegate_;
 
 #if BUILDFLAG(ENABLE_VR)
   std::unique_ptr<vr::ChromeXrIntegrationClient> xr_integration_client_;

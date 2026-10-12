@@ -380,9 +380,6 @@
     'blink_bindings_serialization': {
       'filepath': 'third_party/blink/renderer/bindings/(core|modules)/v8/.*serializ',
     },
-    'blink_bluetooth': {
-      'filepath': 'third_party/(WebKit|blink)/.*[Bb]luetooth'
-    },
     'blink_clipboard': {
       'filepath': 'third_party/blink/renderer/core/clipboard' \
                   '|third_party/blink/renderer/modules/clipboard' \
@@ -955,9 +952,6 @@
     'compute_pressure': {
       'filepath': 'compute_pressure',
     },
-    'content_bluetooth': {
-      'filepath': 'content/.*bluetooth'
-    },
     'content_index': {
       'filepath': 'content_index',
     },
@@ -1118,21 +1112,6 @@
     'desktop_whats_new': {
       'filepath': 'chrome/browser/resources/whats_new/|'\
                   'chrome/browser/ui/webui/whats_new/',
-    },
-    'device_bluetooth': {
-      'filepath': 'device/.*bluetooth'
-    },
-    'device_chooser': {
-      'filepath': 'chrome/browser/chooser_controller/|'\
-                  'chrome/browser/ui/android/bluetooth_chooser_|'\
-                  'chrome/browser/ui/android/usb_chooser_|'\
-                  'chrome/browser/ui/bluetooth/|'\
-                  'chrome/browser/ui/cocoa/device_chooser_|'\
-                  'chrome/browser/ui/cocoa/extensions/chooser_dialog_|'\
-                  'chrome/browser/ui/cocoa/permission_bubble/chooser_bubble_|'\
-                  'chrome/browser/ui/views/device_chooser_|'\
-                  'chrome/browser/ui/views/extensions/chooser_dialog_|'\
-                  'chrome/browser/ui/views/permission_bubble/chooser_bubble_',
     },
     'devtools': {
       'filepath': 'devtools',
@@ -2613,8 +2592,6 @@
                        'haraken@chromium.org',
                        'kubo@igalia.com'],
     'blink_bindings_serialization': ['jbroman+watch@chromium.org'],
-    'blink_bluetooth': ['mattreynolds+watch@chromium.org',
-                        'odejesush+watch@chromium.org'],
     'blink_clipboard': ['dcheng+clipboard@chromium.org'],
     'blink_common': ['kinuko+watch@chromium.org'],
     'blink_content_extraction': ['mfoltz+watch-actor@chromium.org',
@@ -2830,7 +2807,6 @@
     'compute_pressure': ['arnaud.mandy@intel.com',
                          'wei4.wang@intel.com',
                          'kenneth.r.christiansen@intel.com'],
-    'content_bluetooth': ['mattreynolds+watch@chromium.org'],
     'content_index': ['rayankans+watch@chromium.org'],
     'content_loader': ['loading-reviews@chromium.org'],
     'content_security_policy':['antoniosartori+watch-csp@chromium.org',
@@ -2890,9 +2866,6 @@
                           'orinj+watch@chromium.org',
                           'pauladedeji+watch@google.com'],
     'desktop_whats_new': ['mickeyburks+watch@chromium.org'],
-    'device_bluetooth': ['mattreynolds+watch@chromium.org'],
-    'device_chooser': ['mattreynolds+watch@chromium.org',
-                       'odejesush+watch@chromium.org'],
     'devtools': ['devtools-reviews@chromium.org'],
     'discardable_memory': ['thiabaud+watch-discardable-memory@google.com'],
     'disk_cache': ['gavinp+disk@chromium.org'],

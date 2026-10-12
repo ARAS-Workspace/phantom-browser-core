@@ -227,6 +227,11 @@ class TaskManagerOOPIFBrowserTest : public TaskManagerBrowserTest,
   bool ShouldExpectSubframes() {
     return content::AreAllSitesIsolatedForTesting();
   }
+
+  std::u16string MatchSubframeSite(std::string_view host) {
+    return MatchSubframe(
+        embedded_test_server()->GetURL(host, "/").spec().c_str());
+  }
 };
 
 INSTANTIATE_TEST_SUITE_P(DefaultIsolation,
@@ -773,9 +778,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest, SubframeHistoryNavigation) {
   ASSERT_NO_FATAL_FAILURE(
       WaitForTaskManagerRows(1, MatchTab("Cross-site iframe factory")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(2, MatchAnySubframe()));
 
   content::WebContents* tab =
@@ -796,26 +801,26 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest, SubframeHistoryNavigation) {
                       "frames[0][0].location.href = '" + d_url.spec() + "';"));
 
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(0, MatchSubframe("http://c.com/")));
+      WaitForTaskManagerRows(0, MatchSubframeSite("c.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://d.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("d.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://e.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("e.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(3, MatchAnySubframe()));
 
   ASSERT_TRUE(chrome::CanGoBack(browser()));
   chrome::GoBack(browser(), WindowOpenDisposition::CURRENT_TAB);
 
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(0, MatchSubframe("http://d.com/")));
+      WaitForTaskManagerRows(0, MatchSubframeSite("d.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(0, MatchSubframe("http://e.com/")));
+      WaitForTaskManagerRows(0, MatchSubframeSite("e.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(2, MatchAnySubframe()));
 
   ASSERT_TRUE(chrome::CanGoForward(browser()));
@@ -824,27 +829,27 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest, SubframeHistoryNavigation) {
   // When the subframe appears in the cloned process, it must have a valid
   // process ID.
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerStatToExceed(
-      MatchSubframe("http://d.com/"), ColumnSpecifier::PROCESS_ID,
+      MatchSubframeSite("d.com"), ColumnSpecifier::PROCESS_ID,
       base::kNullProcessId));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerStatToExceed(
-      MatchSubframe("http://e.com/"), ColumnSpecifier::PROCESS_ID,
+      MatchSubframeSite("e.com"), ColumnSpecifier::PROCESS_ID,
       base::kNullProcessId));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(0, MatchSubframe("http://c.com/")));
+      WaitForTaskManagerRows(0, MatchSubframeSite("c.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://d.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("d.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://e.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("e.com")));
   ASSERT_NO_FATAL_FAILURE(
-      WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+      WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(3, MatchAnySubframe()));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(1, MatchAnyTab()));
 
   // Subframe processes should report some amount of physical memory usage.
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerStatToExceed(
-      MatchSubframe("http://d.com/"), ColumnSpecifier::MEMORY_FOOTPRINT, 1000));
+      MatchSubframeSite("d.com"), ColumnSpecifier::MEMORY_FOOTPRINT, 1000));
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerStatToExceed(
-      MatchSubframe("http://e.com/"), ColumnSpecifier::MEMORY_FOOTPRINT, 1000));
+      MatchSubframeSite("e.com"), ColumnSpecifier::MEMORY_FOOTPRINT, 1000));
 }
 
 IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest, KillSubframe) {
@@ -870,12 +875,12 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest, KillSubframe) {
     expected_c_subframes = 0;
   }
 
-  auto check_num_subframes = [](int expected_b_subframes,
-                                int expected_c_subframes) {
+  auto check_num_subframes = [this](int expected_b_subframes,
+                                    int expected_c_subframes) {
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(
-        expected_b_subframes, MatchSubframe("http://b.com/")));
+        expected_b_subframes, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(
-        expected_c_subframes, MatchSubframe("http://c.com/")));
+        expected_c_subframes, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(
         expected_b_subframes + expected_c_subframes, MatchAnySubframe()));
   };
@@ -904,7 +909,7 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest, KillSubframe) {
   {
     content::ScopedAllowRendererCrashes scoped_allow_renderer_crashes;
     std::optional<size_t> subframe_b =
-        FindResourceIndex(MatchSubframe("http://b.com/"));
+        FindResourceIndex(MatchSubframeSite("b.com"));
     ASSERT_TRUE(subframe_b.has_value());
     ASSERT_TRUE(model()->GetTabId(subframe_b.value()).is_valid());
     model()->Kill(subframe_b.value());
@@ -960,9 +965,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest, NavigateToSubframeProcess) {
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(2, MatchAnySubframe()));
   }
 
@@ -1021,9 +1026,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(2, MatchAnySubframe()));
   }
 
@@ -1034,9 +1039,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(2, MatchAnySubframe()));
   }
 }
@@ -1066,9 +1071,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(2, MatchAnySubframe()));
   }
 
@@ -1088,9 +1093,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(0, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(0, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(1, MatchAnySubframe()));
   }
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(1, MatchTab("aac")));
@@ -1103,9 +1108,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(0, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(0, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(1, MatchAnySubframe()));
   }
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(1, MatchTab("aac")));
@@ -1133,9 +1138,9 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(2, MatchAnySubframe()));
   }
 
@@ -1174,11 +1179,11 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
 
   if (ShouldExpectSubframes()) {
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://d.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("d.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(3, MatchAnySubframe()));
   }
   ASSERT_NO_FATAL_FAILURE(
@@ -1190,13 +1195,13 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
   std::vector<size_t> subframe_offsets;
   if (ShouldExpectSubframes()) {
     std::optional<size_t> index_b =
-        FindResourceIndex(MatchSubframe("http://b.com/"));
+        FindResourceIndex(MatchSubframeSite("b.com"));
     ASSERT_TRUE(index_b.has_value());
     std::optional<size_t> index_c =
-        FindResourceIndex(MatchSubframe("http://c.com/"));
+        FindResourceIndex(MatchSubframeSite("c.com"));
     ASSERT_TRUE(index_c.has_value());
     std::optional<size_t> index_d =
-        FindResourceIndex(MatchSubframe("http://d.com/"));
+        FindResourceIndex(MatchSubframeSite("d.com"));
     ASSERT_TRUE(index_d.has_value());
     subframe_offsets = {index_b.value() - index.value(),
                         index_c.value() - index.value(),
@@ -1218,13 +1223,13 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
   if (ShouldExpectSubframes()) {
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(6, MatchAnySubframe()));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(2, MatchSubframe("http://b.com/")));
+        WaitForTaskManagerRows(2, MatchSubframeSite("b.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(2, MatchSubframe("http://c.com/")));
+        WaitForTaskManagerRows(2, MatchSubframeSite("c.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://d.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("d.com")));
     ASSERT_NO_FATAL_FAILURE(
-        WaitForTaskManagerRows(1, MatchSubframe("http://a.com/")));
+        WaitForTaskManagerRows(1, MatchSubframeSite("a.com")));
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(6, MatchAnySubframe()));
   } else {
     ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(0, MatchAnySubframe()));
@@ -1248,19 +1253,19 @@ IN_PROC_BROWSER_TEST_P(TaskManagerOOPIFBrowserTest,
     // Tab 2's a.com subframe should share Tab 1's main frame process and go
     // directly below it.
     EXPECT_EQ(index.value() + 1,
-              FindResourceIndex(MatchSubframe("http://a.com/")));
+              FindResourceIndex(MatchSubframeSite("a.com")));
 
     // The other tab 2 subframes (b.com and c.com) should join existing
     // subframe processes from tab 1.  Check that the b.com and c.com subframe
     // processes now have two rows each.
     std::optional<size_t> subframe_b_index =
-        FindResourceIndex(MatchSubframe("http://b.com/"));
+        FindResourceIndex(MatchSubframeSite("b.com"));
     ASSERT_TRUE(subframe_b_index.has_value());
     std::optional<size_t> subframe_c_index =
-        FindResourceIndex(MatchSubframe("http://c.com/"));
+        FindResourceIndex(MatchSubframeSite("c.com"));
     ASSERT_TRUE(subframe_c_index.has_value());
     std::optional<size_t> subframe_d_index =
-        FindResourceIndex(MatchSubframe("http://d.com/"));
+        FindResourceIndex(MatchSubframeSite("d.com"));
     ASSERT_TRUE(subframe_d_index.has_value());
     EXPECT_EQ(
         "Subframe: http://b.com/",

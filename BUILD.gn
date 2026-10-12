@@ -435,8 +435,6 @@ group("gn_all") {
     deps += [ "//ui/message_center:message_center_unittests" ]
   }
 
-  deps += [ "//content/browser/bluetooth/tools:bluetooth_metrics_hash" ]
-
   if (is_linux) {
     deps += [ "//mojo" ]
   }

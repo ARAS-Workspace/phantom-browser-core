@@ -33,13 +33,6 @@ class DeviceTestSuite : public base::TestSuite {
     base::FilePath ui_test_pak_path;
     ASSERT_TRUE(base::PathService::Get(ui::UI_TEST_PAK, &ui_test_pak_path));
     ui::ResourceBundle::InitSharedInstanceWithPakPath(ui_test_pak_path);
-
-    base::FilePath path;
-    ASSERT_TRUE(base::PathService::Get(base::DIR_ASSETS, &path));
-    base::FilePath bluetooth_test_strings =
-        path.Append(FILE_PATH_LITERAL("bluetooth_test_strings.pak"));
-    ui::ResourceBundle::GetSharedInstance().AddDataPackFromPath(
-        bluetooth_test_strings, ui::kScaleFactorNone);
   }
 
   void Shutdown() override {

@@ -52,9 +52,6 @@ group("test") {
     "fuzzing:test",
     "//chrome/test/variations:variations_desktop_smoke_tests",
   ]
-  if (is_linux || is_mac) {
-    deps += [ "//chrome/test/device_realtarget:device_realtarget_browsertests" ]
-  }
 }
 
 # Use a static library here because many test binaries depend on this but don't
@@ -517,10 +514,6 @@ static_library("test_support") {
   }
 
   if (toolkit_views) {
-    sources += [
-      "../browser/ui/chooser_bubble_testapi.h",
-      "../browser/ui/views/chooser_bubble_testapi_views.cc",
-    ]
     public_deps += [
       "//chrome/browser/ui/omnibox",
       "//chrome/browser/ui/web_applications:launch_utils",
@@ -889,8 +882,6 @@ test("browser_tests") {
     "//chrome/browser/battery",
     "//chrome/browser/battery:browser_tests",
     "//chrome/browser/bitmap_fetcher:browser_tests",
-    "//chrome/browser/bluetooth:browser_tests",
-    "//chrome/browser/bluetooth:test_support",
     "//chrome/browser/bookmarks",
     "//chrome/browser/bookmarks:browser_tests",
     "//chrome/browser/bookmarks:test_support",
@@ -898,7 +889,6 @@ test("browser_tests") {
     "//chrome/browser/browsing_data:browser_tests",
     "//chrome/browser/browsing_data:constants",
     "//chrome/browser/btm:browser_tests",
-    "//chrome/browser/chooser_controller:browser_tests",
     "//chrome/browser/client_hints:browser_tests",
     "//chrome/browser/collaboration",
     "//chrome/browser/component_updater",
@@ -1121,7 +1111,6 @@ test("browser_tests") {
     "//chrome/browser/ui/apps",
     "//chrome/browser/ui/blocked_content",
     "//chrome/browser/ui/blocked_content:browser_tests",
-    "//chrome/browser/ui/bluetooth",
     "//chrome/browser/ui/bookmarks:browser_tests",
     "//chrome/browser/ui/browser_active_state_manager",
     "//chrome/browser/ui/browser_ui_controller",
@@ -1516,7 +1505,6 @@ test("browser_tests") {
     "//content/test:browsertest_support",
     "//content/test:test_support",
     "//crypto:test_support",
-    "//device/bluetooth:mocks",
     "//device/fido:test_support",
     "//gin",
     "//google_apis:test_support",
@@ -1611,10 +1599,6 @@ test("browser_tests") {
   ]
 
   allow_circular_includes_from = []
-
-  if (is_linux) {
-    deps += [ "//chrome/browser/ui/views:bluetooth_dialogs" ]
-  }
 
   if (is_mac) {
     deps += [
@@ -1757,13 +1741,10 @@ test("browser_tests") {
     "../browser/ui/tab_modal_confirm_dialog_browsertest.h",
     "../browser/ui/tab_ui_helper_browsertest.cc",
     "../browser/ui/update_chrome_dialog_browsertest.cc",
-    "../browser/ui/views/bluetooth_device_credentials_view_browsertest.cc",
-    "../browser/ui/views/bluetooth_device_pair_confirm_view_browsertest.cc",
     "../browser/ui/views/confirm_bubble_views_browsertest.cc",
     "../browser/ui/views/content_setting_bubble_contents_browsertest.cc",
     "../browser/ui/views/content_test_utils.cc",
     "../browser/ui/views/content_test_utils.h",
-    "../browser/ui/views/device_chooser_browsertest.cc",
     "../browser/ui/views/frame/horizontal_tab_strip_region_view_browsertest.cc",
     "../browser/ui/views/frame/multi_contents_view_browsertest.cc",
     "../browser/ui/views/frame/multi_contents_view_drop_target_controller_browsertest.cc",
@@ -2823,7 +2804,6 @@ test("unit_tests") {
     "//chrome/browser/battery:unit_tests",
     "//chrome/browser/bitmap_fetcher",
     "//chrome/browser/bitmap_fetcher:unit_tests",
-    "//chrome/browser/bluetooth:unit_tests",
     "//chrome/browser/bookmarks",
     "//chrome/browser/bookmarks:test_support",
     "//chrome/browser/bookmarks:unit_tests",
@@ -2833,7 +2813,6 @@ test("unit_tests") {
     "//chrome/browser/browsing_data:constants",
     "//chrome/browser/browsing_data:unit_tests",
     "//chrome/browser/btm:unit_tests",
-    "//chrome/browser/chooser_controller:unit_tests",
     "//chrome/browser/collaboration",
     "//chrome/browser/collaboration:unit_tests",
     "//chrome/browser/collaboration/comments",
@@ -3303,7 +3282,6 @@ test("unit_tests") {
     "//content/public/browser",
     "//content/test:test_support",
     "//crypto:test_support",
-    "//device/bluetooth:mocks",
     "//device/fido",
     "//device/fido:test_support",
     "//gin",
@@ -3317,7 +3295,6 @@ test("unit_tests") {
     "//services/data_decoder/public/cpp:test_support",
     "//services/device/public/cpp:device_features",
     "//services/device/public/cpp:test_support",
-    "//services/device/public/cpp/bluetooth",
     "//services/metrics/public/cpp:test_support",
     "//services/network:test_support",
     "//services/network/public/cpp",
@@ -3559,7 +3536,6 @@ test("unit_tests") {
 
   deps += [
     "//chrome/browser/autocomplete:aim_eligibility_service",
-    "//chrome/browser/bluetooth",
     "//chrome/browser/device_api:unit_tests",
     "//chrome/browser/engagement",
     "//chrome/browser/engagement:unit_tests",
@@ -4217,7 +4193,6 @@ test("unit_tests") {
       "//chrome/browser/ui/views",
       "//chrome/browser/ui/views:bubble_anchor_util_views",
       "//chrome/browser/ui/views:confirm_bubble",
-      "//chrome/browser/ui/views:device_chooser_content_view",
       "//chrome/browser/ui/views:layout_provider",
       "//chrome/browser/ui/views/autofill/payments:dialog_view_ids",
       "//chrome/browser/ui/views/bookmarks",
@@ -4295,7 +4270,6 @@ test("unit_tests") {
       "../browser/ui/views/confirm_bubble_views_unittest.cc",
       "../browser/ui/views/content_setting_bubble_contents_unittest.cc",
       "../browser/ui/views/content_setting_site_row_view_unittest.cc",
-      "../browser/ui/views/device_chooser_content_view_unittest.cc",
       "../browser/ui/views/download/download_in_progress_dialog_view_unittest.cc",
       "../browser/ui/views/frame/browser_view_unittest.cc",
       "../browser/ui/views/frame/layout/browser_view_layout_params_unittest.cc",
@@ -5055,7 +5029,6 @@ test("interactive_ui_tests") {
     "//content/test:browsertest_support",
     "//content/test:test_support",
     "//crypto:test_support",
-    "//device/bluetooth:mocks",
     "//device/fido:test_support",
     "//extensions/buildflags",
     "//google_apis:test_support",

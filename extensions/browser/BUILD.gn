@@ -1063,7 +1063,6 @@ source_set("unit_tests") {
     "//components/value_store:test_support",
     "//components/version_info",
     "//content/test:test_support",
-    "//device/bluetooth:mocks",
     "//extensions:extensions_browser_resources",
     "//extensions:test_support",
     "//extensions/browser/api:extensions_api_client",

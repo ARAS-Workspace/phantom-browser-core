@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "build/chromeos_buildflags.h"
-#include "extensions/common/api/bluetooth/bluetooth_manifest_handler.h"
 #include "extensions/common/api/commands/commands_handler.h"
 #include "extensions/common/api/declarative/declarative_manifest_handler.h"
 #include "extensions/common/api/declarative_net_request/dnr_manifest_handler.h"
@@ -58,7 +57,6 @@ void RegisterCommonManifestHandlers(ManifestHandlerRegistry* registry) {
   registry->RegisterHandler(std::make_unique<AutomationHandler>());
   registry->RegisterHandler(std::make_unique<AppDisplayManifestHandler>());
   registry->RegisterHandler(std::make_unique<BackgroundManifestHandler>());
-  registry->RegisterHandler(std::make_unique<BluetoothManifestHandler>());
   registry->RegisterHandler(std::make_unique<CommandsHandler>());
   registry->RegisterHandler(std::make_unique<ContentCapabilitiesHandler>());
   registry->RegisterHandler(std::make_unique<ContentScriptsHandler>());

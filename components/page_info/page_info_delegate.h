@@ -41,12 +41,6 @@ class PageInfoDelegate {
  public:
   virtual ~PageInfoDelegate() = default;
 
-  // Return the |ObjectPermissionContextBase| corresponding to the content
-  // settings type, |type|. Returns a nullptr for content settings for which
-  // there's no ObjectPermissionContextBase.
-  virtual permissions::ObjectPermissionContextBase* GetChooserContext(
-      ContentSettingsType type) = 0;
-
   // Get permission status for the permission associated with ContentSetting of
   // type |type|.
   virtual content::PermissionResult GetPermissionResult(

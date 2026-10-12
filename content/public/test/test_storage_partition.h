@@ -237,7 +237,6 @@ class TestStoragePartition : public StoragePartition {
   void RemoveObserver(DataRemovalObserver* observer) override;
   int GetDataRemovalObserverCount();
 
-  void ClearBluetoothAllowedDevicesMapForTesting() override;
   void FlushNetworkInterfaceForTesting() override;
   void FlushCertVerifierInterfaceForTesting() override;
   void WaitForDeletionTasksForTesting() override;

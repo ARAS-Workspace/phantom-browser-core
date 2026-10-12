@@ -11,7 +11,6 @@
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/location_bar/location_bar_view.h"
 #include "chrome/browser/ui/views/location_bar/location_icon_view.h"
-#include "chrome/browser/ui/views/page_info/chosen_object_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_bubble_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_main_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_permission_content_view.h"
@@ -302,15 +301,6 @@ class PageInfoBubbleViewInteractiveUiTest : public InteractiveBrowserTest {
           views::test::InteractionTestUtilSimulatorViews::PressButton(
               static_cast<views::Button*>(AsView<PermissionToggleRowView>(el)
                                               ->toggle_button_for_testing()));
-        }));
-  }
-
-  auto DeleteGrant(ElementSpecifier row) {
-    return WithElement(
-        row, base::BindOnce([](ui::TrackedElement* el) {
-          views::test::InteractionTestUtilSimulatorViews::PressButton(
-              static_cast<views::Button*>(
-                  AsView<ChosenObjectView>(el)->GetDeleteButtonForTesting()));
         }));
   }
 

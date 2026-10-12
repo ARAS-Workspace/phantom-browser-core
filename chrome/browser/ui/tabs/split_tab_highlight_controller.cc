@@ -19,7 +19,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/interaction/browser_elements.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
-#include "chrome/browser/ui/views/device_chooser_content_view.h"
 #include "chrome/browser/ui/views/file_system_access/file_system_access_restore_permission_bubble_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_bubble_view_base.h"
 #include "components/tabs/public/tab_interface.h"
@@ -33,8 +32,7 @@ namespace {
 const std::vector<ui::ElementIdentifier>& GetTrackedBubbleDialogs() {
   static const base::NoDestructor<std::vector<ui::ElementIdentifier>>
       kTrackedBubbleDialogs(
-          {DeviceChooserContentView::kDeviceChooserDialogBubbleElementId,
-           PageInfoBubbleViewBase::kPageInfoBubbleElementIdentifier,
+          {PageInfoBubbleViewBase::kPageInfoBubbleElementIdentifier,
            FileSystemAccessRestorePermissionBubbleView::
                kFileSystemAccessBubbleElementIdentifier});
   return *kTrackedBubbleDialogs;

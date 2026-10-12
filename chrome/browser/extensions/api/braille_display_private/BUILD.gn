@@ -28,7 +28,6 @@ source_set("braille_display_private") {
   deps = [
     "//build:chromeos_buildflags",
     "//chrome/browser/profiles:profile",
-    "//device/bluetooth/public/cpp",
   ]
 }
 

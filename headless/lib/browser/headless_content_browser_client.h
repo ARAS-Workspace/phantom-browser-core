@@ -19,7 +19,6 @@
 
 namespace headless {
 
-class HeadlessBluetoothDelegate;
 class HeadlessBrowserImpl;
 
 class HeadlessContentBrowserClient : public content::ContentBrowserClient {
@@ -110,8 +109,6 @@ class HeadlessContentBrowserClient : public content::ContentBrowserClient {
 
   bool ShouldSandboxNetworkService() override;
 
-  content::BluetoothDelegate* GetBluetoothDelegate() override;
-
   bool IsRendererProcessPriorityEnabled() override;
 
  private:
@@ -137,8 +134,6 @@ class HeadlessContentBrowserClient : public content::ContentBrowserClient {
 
   std::unique_ptr<StubPersistentRendererPrefsService>
       stub_persistent_renderer_prefs_service_;
-
-  std::unique_ptr<HeadlessBluetoothDelegate> bluetooth_delegate_;
 };
 
 }  // namespace headless

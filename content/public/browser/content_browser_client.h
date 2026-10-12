@@ -218,7 +218,6 @@ namespace content {
 enum class SiteIsolationMode;
 enum class SmsFetchFailureType;
 class AnchorElementPreconnectDelegate;
-class BluetoothDelegate;
 class BrowserChildProcessHost;
 class BrowserContext;
 class BrowserMainParts;
@@ -2074,9 +2073,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       RenderFrameHost* render_frame_host,
       mojo::PendingReceiver<blink::mojom::ManagedConfigurationService>
           receiver);
-
-  // Allows the embedder to provide an implementation of the Web Bluetooth API.
-  virtual BluetoothDelegate* GetBluetoothDelegate();
 
   // Allows the embedder to provide an implementation of the Generic Sensor API.
   virtual SensorDelegate* GetSensorDelegate();

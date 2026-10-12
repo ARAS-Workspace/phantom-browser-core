@@ -24,8 +24,6 @@ class ActiveScriptWrappableCreationKey final {
   friend class BackgroundFetchRegistration;
   friend class BaseAudioContext;
   friend class BatteryManager;
-  friend class BluetoothDevice;
-  friend class BluetoothRemoteGATTCharacteristic;
   friend class BroadcastChannel;
   friend class CacheStorage;
   friend class CanvasRenderingContext;

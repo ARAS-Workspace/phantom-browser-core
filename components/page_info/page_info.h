@@ -179,10 +179,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
                                std::optional<url::Origin> requesting_origin,
                                bool is_one_time);
 
-  // This method is called whenever access to an object is revoked.
-  void OnSiteChosenObjectDeleted(const ChooserUIInfo& ui_info,
-                                 const base::Value& object);
-
   // This method is called by the UI when the UI is closing.
   // If specified, |reload_prompt| is set to whether closing the UI resulted in
   // a prompt to the user to reload the page.
@@ -222,13 +218,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
 
   // This method is called when the user opens the Cookies & Site Data subpage.
   void OnCookiesPageOpened();
-
-
-  // Return a pointer to the ObjectPermissionContextBase corresponding to the
-  // content settings type, |type|. Returns nullptr for content settings
-  // for which there's no ObjectPermissionContextBase.
-  permissions::ObjectPermissionContextBase* GetChooserContextFromUIInfo(
-      const ChooserUIInfo& ui_info) const;
 
   // Accessors.
   const SiteConnectionStatus& site_connection_status() const {

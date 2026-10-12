@@ -2220,9 +2220,7 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
       "enableExperimentalWebPlatformFeatures",
       cmd.HasSwitch(::switches::kEnableExperimentalWebPlatformFeatures));
 
-  html_source->AddBoolean("enableWebBluetoothNewPermissionsBackend",
-                          base::FeatureList::IsEnabled(
-                              features::kWebBluetoothNewPermissionsBackend));
+  html_source->AddBoolean("enableWebBluetoothNewPermissionsBackend", false);
 
   html_source->AddBoolean(
       "enablePersistentPermissions",

@@ -638,8 +638,6 @@ static_library("ui") {
     "//chrome/browser/ui/autofill/payments:impl",
     "//chrome/browser/ui/blocked_content",
     "//chrome/browser/ui/blocked_content:impl",
-    "//chrome/browser/ui/bluetooth",
-    "//chrome/browser/ui/bluetooth:impl",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/browser_window:create_browser_window",
     "//chrome/browser/ui/browser_window/internal",
@@ -967,12 +965,6 @@ static_library("ui") {
     "//chrome/browser/ui/autofill:impl",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when the
-    # following headers get componentized:
-    # c/b/ui/scoped_tabbed_browser_displayer.h
-    # c/b/ui/settings_window_manager_chromeos.h
-    "//chrome/browser/ui/bluetooth:impl",
-
-    # TODO(crbug.com/353332589): Remove this circular dependency when the
     # following header gets componentized:
     # c/b/ui/browser_command_controller.h
     "//chrome/browser/ui/exclusive_access",
@@ -1164,7 +1156,6 @@ static_library("ui") {
     "//chrome/browser/apps/app_service/app_icon",
     "//chrome/browser/apps/link_capturing",
     "//chrome/browser/background",
-    "//chrome/browser/bluetooth",
     "//chrome/browser/custom_handlers",
     "//chrome/browser/device_api",
     "//chrome/browser/first_party_sets",
@@ -1326,8 +1317,6 @@ static_library("ui") {
     "//components/url_formatter",
     "//components/user_education/webui",
     "//components/webapps/isolated_web_apps",
-    "//device/bluetooth",
-    "//device/bluetooth/strings:strings_grit",
     "//device/fido",
     "//services/preferences/tracked",
     "//third_party/blink/public/common:headers",
@@ -2224,7 +2213,6 @@ static_library("ui") {
       "//chrome/browser/ui/views:bubble_anchor_util_views",
       "//chrome/browser/ui/views:bubble_menu_item_factory",
       "//chrome/browser/ui/views:confirm_bubble",
-      "//chrome/browser/ui/views:device_chooser_content_view",
       "//chrome/browser/ui/views:elevation_icon_setter",
       "//chrome/browser/ui/views:flying_indicator",
       "//chrome/browser/ui/views:layout_provider_impl",
@@ -2655,7 +2643,6 @@ static_library("ui") {
         "views/native_widget_factory.cc",
         "views/native_widget_factory.h",
       ]
-      deps += [ "//chrome/browser/ui/views:bluetooth_dialogs" ]
     }
 
     if (is_mac) {

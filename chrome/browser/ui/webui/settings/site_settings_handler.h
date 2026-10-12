@@ -175,9 +175,6 @@ class SiteSettingsHandler
   // setting (such as enabled or blocked).
   void HandleGetStorageAccessExceptionList(const base::ListValue& args);
 
-  // Returns the list of chooser exceptions for a given chooser type.
-  void HandleGetChooserExceptionList(const base::ListValue& args);
-
   // Returns the list of the allowed permission grants as defined by the
   // File System Access API.
   void HandleGetFileSystemGrants(const base::ListValue& args);
@@ -198,12 +195,6 @@ class SiteSettingsHandler
   // Handles setting and resetting an origin permission.
   void HandleResetCategoryPermissionForPattern(const base::ListValue& args);
   void HandleSetCategoryPermissionForPattern(const base::ListValue& args);
-
-  // TODO(andypaicu, crbug.com/40592192): Update to only expect a list of three
-  // arguments, replacing the current (requesting,embedding) arguments with
-  // simply (origin) and update all call sites.
-  // Handles resetting a chooser exception for the given site.
-  void HandleResetChooserExceptionForSite(const base::ListValue& args);
 
   // Returns whether the pattern is valid given the type.
   void HandleIsPatternValidForType(const base::ListValue& args);

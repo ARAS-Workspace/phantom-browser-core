@@ -1116,10 +1116,6 @@ void ContentBrowserClient::CreateManagedConfigurationService(
     mojo::PendingReceiver<blink::mojom::ManagedConfigurationService> receiver) {
 }
 
-BluetoothDelegate* ContentBrowserClient::GetBluetoothDelegate() {
-  return nullptr;
-}
-
 SensorDelegate* ContentBrowserClient::GetSensorDelegate() {
   return nullptr;
 }

@@ -24,7 +24,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/values.h"
 #include "build/build_config.h"
-#include "chrome/browser/bluetooth/bluetooth_chooser_context_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/file_system_access/chrome_file_system_access_permission_context.h"
 #include "chrome/browser/file_system_access/file_system_access_features.h"
@@ -46,7 +45,6 @@
 #include "components/content_settings/core/common/content_settings_pattern.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/content_settings/core/common/content_settings_utils.h"
-#include "components/permissions/contexts/bluetooth_chooser_context.h"
 #include "components/permissions/object_permission_context_base.h"
 #include "components/permissions/permission_decision_auto_blocker.h"
 #include "components/permissions/permission_util.h"
@@ -423,48 +421,6 @@ void GetPolicyAllowedUrls(ContentSettingsType type,
   }
 }
 
-// Retrieves the source of a chooser exception as a string. This method uses the
-// CalculateSiteSettingSource method above to calculate the correct string to
-// use.
-SiteSettingSource GetSourceForChooserException(Profile* profile,
-                                               ContentSettingsType content_type,
-                                               SettingSource source) {
-  // Prepare the parameters needed by CalculateSiteSettingSource
-  content_settings::SettingInfo info;
-  info.source = source;
-
-  // Chooser exceptions do not use a ContentSettingPermissionContextBase for
-  // their permissions.
-  content::PermissionResult permission_result(
-      PermissionStatus::ASK, content::PermissionStatusSource::UNSPECIFIED);
-
-  // The |origin| parameter is only used for |ContentSettingsType::ADS| with
-  // the |kSafeBrowsingSubresourceFilter| feature flag enabled, so an empty GURL
-  // is used.
-  SiteSettingSource calculated_source = CalculateSiteSettingSource(
-      profile, content_type, /*origin=*/GURL(), info, permission_result);
-  DCHECK(calculated_source == SiteSettingSource::kPolicy ||
-         calculated_source == SiteSettingSource::kPreference);
-  return calculated_source;
-}
-
-// The BluetoothChooserContext is only available when the
-// WebBluetoothNewPermissionsBackend flag is enabled.
-// TODO(crbug.com/40458188): Remove the feature check when it is enabled
-// by default.
-permissions::ObjectPermissionContextBase* GetBluetoothChooserContext(
-    Profile* profile) {
-  if (base::FeatureList::IsEnabled(
-          features::kWebBluetoothNewPermissionsBackend)) {
-    return BluetoothChooserContextFactory::GetForProfile(profile);
-  }
-  return nullptr;
-}
-
-const ChooserTypeNameEntry kChooserTypeGroupNames[] = {
-    {&GetBluetoothChooserContext, kBluetoothChooserDataGroupType},
-};
-
 // These variables represent different formatting options for default (i.e. not
 // extension or IWA) URLs as well as fallbacks for when the IWA/extension is not
 // found in the registry.
@@ -473,8 +429,6 @@ constexpr UrlIdentity::FormatOptions kUrlIdentityOptionsOmitHttps = {
         UrlIdentity::DefaultFormatOptions::kOmitCryptographicScheme}};
 constexpr UrlIdentity::FormatOptions kUrlIdentityOptionsHostOnly = {
     .default_options = {UrlIdentity::DefaultFormatOptions::kHostname}};
-constexpr UrlIdentity::FormatOptions kUrlIdentityOptionsRawSpec = {
-    .default_options = {UrlIdentity::DefaultFormatOptions::kRawSpec}};
 
 constexpr UrlIdentity::TypeSet kUrlIdentityAllowedTypes = {
     UrlIdentity::Type::kDefault, UrlIdentity::Type::kFile,
@@ -563,22 +517,12 @@ std::vector<ContentSettingsType> GetVisiblePermissionCategories(
   if (!initialized) {
     // The permission categories in this block are only shown when running with
     // certain flags/switches.
-    if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-            ::switches::kEnableExperimentalWebPlatformFeatures)) {
-      base_types->push_back(ContentSettingsType::BLUETOOTH_SCANNING);
-    }
-
     if (base::FeatureList::IsEnabled(::features::kServiceWorkerPaymentApps)) {
       base_types->push_back(ContentSettingsType::PAYMENT_HANDLER);
     }
 
     if (base::FeatureList::IsEnabled(features::kFedCm)) {
       base_types->push_back(ContentSettingsType::FEDERATED_IDENTITY_API);
-    }
-
-    if (base::FeatureList::IsEnabled(
-            features::kWebBluetoothNewPermissionsBackend)) {
-      base_types->push_back(ContentSettingsType::BLUETOOTH_GUARD);
     }
 
     if (base::FeatureList::IsEnabled(
@@ -1257,135 +1201,6 @@ void GetFileSystemGrantedEntries(std::vector<base::DictValue>* exceptions,
       *exceptions, [](const base::DictValue& lhs, const base::DictValue& rhs) {
         return lhs.Find(kOrigin)->GetString() < rhs.Find(kOrigin)->GetString();
       });
-}
-
-const ChooserTypeNameEntry* ChooserTypeFromGroupName(std::string_view name) {
-  for (const auto& chooser_type : kChooserTypeGroupNames) {
-    if (chooser_type.name == name) {
-      return &chooser_type;
-    }
-  }
-  return nullptr;
-}
-
-// Create a base::DictValue that will act as a data source for a single row
-// in a chooser permission exceptions table. The chooser permission will contain
-// a list of site exceptions that correspond to the exception.
-base::DictValue CreateChooserExceptionObject(
-    const std::u16string& display_name,
-    const base::Value& object,
-    const std::string& chooser_type,
-    const ChooserExceptionDetails& chooser_exception_details,
-    Profile* profile) {
-  base::DictValue exception;
-
-  std::string setting_string =
-      content_settings::ContentSettingToString(CONTENT_SETTING_DEFAULT);
-  DCHECK(!setting_string.empty());
-
-  exception.Set(kDisplayName, display_name);
-  exception.Set(kObject, object.Clone());
-  exception.Set(kChooserType, chooser_type);
-
-  // Order the sites by the provider precedence order.
-  std::map<SiteSettingSource, std::vector<base::DictValue>> all_provider_sites;
-  for (const auto& details : chooser_exception_details) {
-    const GURL& origin = std::get<0>(details);
-    const SiteSettingSource source = std::get<1>(details);
-    const bool incognito = std::get<2>(details);
-
-    std::string site_display_name = base::UTF16ToUTF8(
-        UrlIdentity::CreateFromUrl(profile, origin, kUrlIdentityAllowedTypes,
-                                   kUrlIdentityOptionsRawSpec)
-            .name);
-
-    auto& this_provider_sites = all_provider_sites[source];
-    base::DictValue site;
-    site.Set(kOrigin, origin.spec());
-    site.Set(kDisplayName, site_display_name);
-    site.Set(kSetting, setting_string);
-    site.Set(kSource, SiteSettingSourceToString(source));
-    site.Set(kIncognito, incognito);
-    this_provider_sites.push_back(std::move(site));
-  }
-
-  base::ListValue sites;
-  for (auto& one_provider_sites : all_provider_sites) {
-    for (auto& site : one_provider_sites.second) {
-      sites.Append(std::move(site));
-    }
-  }
-
-  exception.Set(kSites, std::move(sites));
-  return exception;
-}
-
-base::ListValue GetChooserExceptionListFromProfile(
-    Profile* profile,
-    const ChooserTypeNameEntry& chooser_type) {
-  base::ListValue exceptions;
-  ContentSettingsType content_type =
-      ContentSettingsTypeFromGroupName(chooser_type.name);
-  DCHECK(content_type != ContentSettingsType::DEFAULT);
-
-  // The BluetoothChooserContext is only available when the
-  // WebBluetoothNewPermissionsBackend flag is enabled.
-  // TODO(crbug.com/40458188): Remove the nullptr check when it is enabled
-  // by default.
-  permissions::ObjectPermissionContextBase* chooser_context =
-      chooser_type.get_context(profile);
-  if (!chooser_context) {
-    return exceptions;
-  }
-
-  std::vector<std::unique_ptr<permissions::ObjectPermissionContextBase::Object>>
-      objects = chooser_context->GetAllGrantedObjects();
-
-  if (profile->HasPrimaryOTRProfile()) {
-    Profile* incognito_profile =
-        profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-    permissions::ObjectPermissionContextBase* incognito_chooser_context =
-        chooser_type.get_context(incognito_profile);
-    std::vector<
-        std::unique_ptr<permissions::ObjectPermissionContextBase::Object>>
-        incognito_objects = incognito_chooser_context->GetAllGrantedObjects();
-    objects.insert(objects.end(),
-                   std::make_move_iterator(incognito_objects.begin()),
-                   std::make_move_iterator(incognito_objects.end()));
-  }
-
-  // Maps from a chooser exception name/object pair to a
-  // ChooserExceptionDetails. This will group and sort the exceptions by the UI
-  // string and object for display.
-  std::map<std::pair<std::u16string, base::Value>, ChooserExceptionDetails>
-      all_chooser_objects;
-  for (const auto& object : objects) {
-    // Don't include WebUI settings.
-    if (content::HasWebUIScheme(object->origin)) {
-      continue;
-    }
-
-    std::u16string name = chooser_context->GetObjectDisplayName(object->value);
-    auto& chooser_exception_details = all_chooser_objects[std::make_pair(
-        name, base::Value(object->value.Clone()))];
-
-    SiteSettingSource source =
-        GetSourceForChooserException(profile, content_type, object->source);
-
-    chooser_exception_details.insert(
-        {object->origin, source, object->incognito});
-  }
-
-  for (const auto& all_chooser_objects_entry : all_chooser_objects) {
-    const std::u16string& name = all_chooser_objects_entry.first.first;
-    const base::Value& object = all_chooser_objects_entry.first.second;
-    const ChooserExceptionDetails& chooser_exception_details =
-        all_chooser_objects_entry.second;
-    exceptions.Append(CreateChooserExceptionObject(
-        name, object, chooser_type.name, chooser_exception_details, profile));
-  }
-
-  return exceptions;
 }
 
 std::vector<web_app::IsolatedWebAppUrlInfo> GetInstalledIsolatedWebApps(

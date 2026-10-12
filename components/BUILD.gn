@@ -702,7 +702,6 @@ if (use_blink) {
       "//content/test:content_test_entry",
       "//content/test:default_content_test_launcher",
       "//content/test:test_support",
-      "//device/bluetooth",
       "//google_apis",
       "//net:test_support",
       "//printing/buildflags",

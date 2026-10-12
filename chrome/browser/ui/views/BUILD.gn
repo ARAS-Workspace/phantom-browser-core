@@ -222,53 +222,6 @@ source_set("tab_dialogs_impl") {
   ]
 }
 
-source_set("device_chooser_content_view") {
-  public = [ "device_chooser_content_view.h" ]
-  sources = [ "device_chooser_content_view.cc" ]
-  public_deps = [
-    "//components/permissions",
-    "//ui/views",
-  ]
-  deps = [
-    ":layout_provider",
-    "//base",
-    "//chrome/app:generated_resources",
-    "//components/strings:components_strings",
-    "//components/vector_icons",
-    "//ui/base",
-    "//ui/gfx",
-    "//ui/resources",
-  ]
-}
-
-if (is_linux) {
-  source_set("bluetooth_dialogs") {
-    public = [
-      "bluetooth_device_credentials_view.h",
-      "bluetooth_device_pair_confirm_view.h",
-    ]
-    sources = [
-      "bluetooth_device_credentials_view.cc",
-      "bluetooth_device_pair_confirm_view.cc",
-    ]
-    public_deps = [
-      "//content/public/browser",
-      "//ui/views",
-    ]
-    deps = [
-      ":layout_provider",
-      "//base",
-      "//chrome/app:generated_resources",
-      "//chrome/browser/ui/bluetooth",
-      "//components/constrained_window",
-      "//components/vector_icons",
-      "//device/bluetooth/strings",
-      "//ui/base",
-      "//ui/color",
-    ]
-  }
-}
-
 if (is_mac || is_linux) {
   source_set("close_bubble_on_tab_activation_helper") {
     public = [ "close_bubble_on_tab_activation_helper.h" ]

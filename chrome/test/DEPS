@@ -117,7 +117,6 @@ include_rules = [
   "+components/webdata_services",
   "+components/web_package",
   "+components/zoom",
-  "+device/bluetooth/dbus",
   "+extensions",
   "+google_apis",
   "+mojo",

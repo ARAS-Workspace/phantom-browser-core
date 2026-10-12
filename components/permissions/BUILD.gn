@@ -24,16 +24,10 @@ source_set("permissions_common") {
 
 source_set("permissions") {
   sources = [
-    "bluetooth_delegate_impl.cc",
-    "bluetooth_delegate_impl.h",
-    "chooser_controller.cc",
-    "chooser_controller.h",
     "content_setting_permission_context_base.cc",
     "content_setting_permission_context_base.h",
     "contexts/automatic_fullscreen_permission_context.cc",
     "contexts/automatic_fullscreen_permission_context.h",
-    "contexts/bluetooth_chooser_context.cc",
-    "contexts/bluetooth_chooser_context.h",
     "contexts/camera_pan_tilt_zoom_permission_context.cc",
     "contexts/camera_pan_tilt_zoom_permission_context.h",
     "contexts/clipboard_read_write_permission_context.cc",
@@ -154,8 +148,6 @@ source_set("permissions") {
     "//components/vector_icons",
     "//components/webrtc:media_stream_device_enumerator",
     "//content/public/browser",
-    "//device/bluetooth",
-    "//device/bluetooth/public/cpp",
     "//extensions/buildflags",
     "//services/device/public/cpp/geolocation",
     "//services/device/public/mojom",
@@ -172,17 +164,7 @@ source_set("permissions") {
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
   }
-  sources += [
-    "bluetooth_chooser_controller.cc",
-    "bluetooth_chooser_controller.h",
-    "bluetooth_chooser_desktop.cc",
-    "bluetooth_chooser_desktop.h",
-    "bluetooth_scanning_prompt_controller.cc",
-    "bluetooth_scanning_prompt_controller.h",
-    "bluetooth_scanning_prompt_desktop.cc",
-    "bluetooth_scanning_prompt_desktop.h",
-    "permission_prompt_impl.cc",
-  ]
+  sources += [ "permission_prompt_impl.cc" ]
 
   public_deps = [ ":permissions_common" ]
 
@@ -192,8 +174,6 @@ source_set("permissions") {
 source_set("test_support") {
   testonly = true
   sources = [
-    "mock_chooser_controller_view.cc",
-    "mock_chooser_controller_view.h",
     "test/enums_to_string.cc",
     "test/enums_to_string.h",
     "test/mock_permission_prompt.cc",
@@ -215,11 +195,6 @@ source_set("test_support") {
     "test/test_permissions_client.cc",
     "test/test_permissions_client.h",
   ]
-  sources += [
-    "fake_bluetooth_chooser_controller.cc",
-    "fake_bluetooth_chooser_controller.h",
-  ]
-
   deps = [
     ":permissions",
     "//base",
@@ -264,10 +239,6 @@ source_set("unit_tests") {
     "permission_request_manager_unittest.cc",
     "permission_uma_util_unittest.cc",
     "resolvers/content_setting_permission_resolver_unittest.cc",
-  ]
-  sources += [
-    "bluetooth_chooser_controller_unittest.cc",
-    "bluetooth_scanning_prompt_controller_unittest.cc",
   ]
   deps = [
     ":permissions",

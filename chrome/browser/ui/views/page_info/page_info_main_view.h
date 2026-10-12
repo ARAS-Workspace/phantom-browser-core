@@ -10,7 +10,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
-#include "chrome/browser/ui/views/page_info/chosen_object_view_observer.h"
 #include "chrome/browser/ui/views/page_info/permission_toggle_row_view_observer.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/page_info/core/page_info_types.h"
@@ -27,7 +26,6 @@ class LabelButton;
 }  // namespace views
 
 class ChromePageInfoUiDelegate;
-class ChosenObjectView;
 class RichHoverButton;
 class PageInfoNavigationHandler;
 class PageInfoSecurityContentView;
@@ -41,8 +39,7 @@ class PageInfoBubbleViewTestApi;
 // and  site-related settings.
 class PageInfoMainView : public views::View,
                          public PageInfoUI,
-                         public PermissionToggleRowViewObserver,
-                         public ChosenObjectViewObserver {
+                         public PermissionToggleRowViewObserver {
   METADATA_HEADER(PageInfoMainView, views::View)
 
  public:
@@ -84,9 +81,6 @@ class PageInfoMainView : public views::View,
 
   // PermissionToggleRowViewObserver:
   void OnPermissionChanged(const PageInfo::PermissionInfo& permission) override;
-
-  // ChosenObjectViewObserver:
-  void OnChosenObjectDeleted(const PageInfoUI::ChosenObjectInfo& info) override;
 
   int GetVisiblePermissionsCountForTesting() const {
     return toggle_rows_.size();
@@ -202,9 +196,6 @@ class PageInfoMainView : public views::View,
   // PageInfo view if only a single permission is changed.
   std::map<ContentSettingsType, raw_ptr<PermissionToggleRowView>>
       syncable_permission_rows_;
-
-  std::vector<raw_ptr<ChosenObjectView, VectorExperimental>>
-      chosen_object_rows_;
 
   raw_ptr<views::Label> title_ = nullptr;
 

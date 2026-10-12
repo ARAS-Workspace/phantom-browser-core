@@ -189,16 +189,6 @@ void ReportAnyInsecureContent(
   }
 }
 
-// The list of chooser types that need to display entries in the Website
-// Settings UI. THE ORDER OF THESE ITEMS IS IMPORTANT. To propose changing it,
-// email security-dev@chromium.org.
-const PageInfo::ChooserUIInfo kChooserUIInfo[] = {
-    {ContentSettingsType::BLUETOOTH_CHOOSER_DATA,
-     IDS_PAGE_INFO_BLUETOOTH_DEVICE_SECONDARY_LABEL,
-     /*allowed_by_policy_description_string_id=*/-1,
-     IDS_PAGE_INFO_DELETE_BLUETOOTH_DEVICE_WITH_NAME},
-};
-
 // Converts a permission setting to a ContentSetting. This conversion looses
 // information in case of complex permission settings and should only be used
 // for metric recording.
@@ -740,19 +730,6 @@ void PageInfo::OnSitePermissionChanged(
   PresentSitePermissions();
 }
 
-void PageInfo::OnSiteChosenObjectDeleted(const ChooserUIInfo& ui_info,
-                                         const base::Value& object) {
-  permissions::ObjectPermissionContextBase* context =
-      delegate_->GetChooserContext(ui_info.content_settings_type);
-  const auto origin = url::Origin::Create(site_url_);
-  context->RevokeObjectPermission(origin, object.GetDict());
-  show_info_bar_ = true;
-
-  // Refresh the UI to reflect the changed settings.
-  PresentSitePermissions();
-  RecordPageInfoAction(page_info::PAGE_INFO_CHOOSER_OBJECT_DELETED);
-}
-
 void PageInfo::OnUIClosing(bool* reload_prompt) {
   if (reload_prompt) {
     *reload_prompt = false;
@@ -844,11 +821,6 @@ void PageInfo::OpenContentSettingsExceptions(
 void PageInfo::OnCookiesPageOpened() {
   RecordPageInfoAction(page_info::PAGE_INFO_COOKIES_PAGE_OPENED);
   delegate_->OnCookiesPageOpened();
-}
-
-permissions::ObjectPermissionContextBase* PageInfo::GetChooserContextFromUIInfo(
-    const ChooserUIInfo& ui_info) const {
-  return delegate_->GetChooserContext(ui_info.content_settings_type);
 }
 
 std::u16string PageInfo::GetSubjectNameForDisplay() const {
@@ -1258,22 +1230,6 @@ void PageInfo::PresentSitePermissions() {
       if (ShouldShowPermission(permission_info)) {
         permission_info_list.push_back(permission_info);
       }
-    }
-  }
-
-  const auto origin = url::Origin::Create(site_url_);
-  for (const ChooserUIInfo& ui_info : kChooserUIInfo) {
-    permissions::ObjectPermissionContextBase* context =
-        delegate_->GetChooserContext(ui_info.content_settings_type);
-    if (!context) {
-      continue;
-    }
-    auto chosen_objects = context->GetGrantedObjects(origin);
-    for (std::unique_ptr<permissions::ObjectPermissionContextBase::Object>&
-             object : chosen_objects) {
-      chosen_object_info_list.push_back(
-          std::make_unique<PageInfoUI::ChosenObjectInfo>(ui_info,
-                                                         std::move(object)));
     }
   }
 

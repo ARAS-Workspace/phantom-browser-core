@@ -8,6 +8,7 @@
 #include "base/command_line.h"
 #include "base/functional/callback.h"
 #include "base/strings/strcat.h"
+#include "base/strings/utf_string_conversions.h"
 #include "base/test/bind.h"
 #include "base/test/mock_callback.h"
 #include "base/test/scoped_feature_list.h"
@@ -460,13 +461,15 @@ IN_PROC_BROWSER_TEST_F(ChromeBackForwardCacheBrowserTest,
   const std::u16string expected_url_a_active_title = l10n_util::GetStringFUTF16(
       IDS_TASK_MANAGER_TAB_PREFIX, u"Title Of Awesomeness");
   const std::u16string expected_url_a_cached_title = l10n_util::GetStringFUTF16(
-      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX, u"http://a.com/");
+      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX,
+      base::UTF8ToUTF16(embedded_test_server()->GetURL("a.com", "/").spec()));
 
   GURL url_b(embedded_test_server()->GetURL("b.com", "/title3.html"));
   const std::u16string expected_url_b_active_title = l10n_util::GetStringFUTF16(
       IDS_TASK_MANAGER_TAB_PREFIX, u"Title Of More Awesomeness");
   const std::u16string expected_url_b_cached_title = l10n_util::GetStringFUTF16(
-      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX, u"http://b.com/");
+      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX,
+      base::UTF8ToUTF16(embedded_test_server()->GetURL("b.com", "/").spec()));
 
   auto tester =
       task_manager::TaskManagerTester::Create(base::RepeatingClosure());
@@ -520,15 +523,18 @@ IN_PROC_BROWSER_TEST_F(ChromeBackForwardCacheBrowserTest,
   GURL url_a(
       embedded_test_server()->GetURL("a.com", "/iframe_cross_site.html"));
   const std::u16string expected_url_a_cached_title = l10n_util::GetStringFUTF16(
-      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX, u"http://a.com/");
+      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX,
+      base::UTF8ToUTF16(embedded_test_server()->GetURL("a.com", "/").spec()));
   const std::u16string expected_url_a_cached_subframe_b_title =
       l10n_util::GetStringFUTF16(
           IDS_TASK_MANAGER_BACK_FORWARD_CACHE_SUBFRAME_PREFIX,
-          u"http://b.com/");
+          base::UTF8ToUTF16(
+              embedded_test_server()->GetURL("b.com", "/").spec()));
   const std::u16string expected_url_a_cached_subframe_c_title =
       l10n_util::GetStringFUTF16(
           IDS_TASK_MANAGER_BACK_FORWARD_CACHE_SUBFRAME_PREFIX,
-          u"http://c.com/");
+          base::UTF8ToUTF16(
+              embedded_test_server()->GetURL("c.com", "/").spec()));
 
   GURL url_b(embedded_test_server()->GetURL("b.com", "/title3.html"));
   const std::u16string expected_url_b_active_title = l10n_util::GetStringFUTF16(
@@ -573,7 +579,8 @@ IN_PROC_BROWSER_TEST_F(ChromeBackForwardCacheBrowserTest,
   // Load a page on a.com with an a.com iframe.
   GURL url_a(embedded_test_server()->GetURL("a.com", "/iframe.html"));
   const std::u16string expected_url_a_cached_title = l10n_util::GetStringFUTF16(
-      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX, u"http://a.com/");
+      IDS_TASK_MANAGER_BACK_FORWARD_CACHE_PREFIX,
+      base::UTF8ToUTF16(embedded_test_server()->GetURL("a.com", "/").spec()));
 
   GURL url_b(embedded_test_server()->GetURL("b.com", "/title3.html"));
   const std::u16string expected_url_b_active_title = l10n_util::GetStringFUTF16(

@@ -44,13 +44,9 @@
 #include "content/test/data/mojo_web_test_helper.test-mojom.h"
 #include "content/test/mock_badge_service.h"
 #include "content/test/mock_clipboard_host.h"
-#include "content/web_test/browser/fake_bluetooth_chooser.h"
-#include "content/web_test/browser/fake_bluetooth_chooser_factory.h"
-#include "content/web_test/browser/fake_bluetooth_delegate.h"
 #include "content/web_test/browser/mojo_echo.h"
 #include "content/web_test/browser/mojo_optional_numerics_unittest.h"
 #include "content/web_test/browser/mojo_web_test_helper.h"
-#include "content/web_test/browser/web_test_bluetooth_fake_adapter_setter_impl.h"
 #include "content/web_test/browser/web_test_browser_context.h"
 #include "content/web_test/browser/web_test_browser_main_parts.h"
 #include "content/web_test/browser/web_test_control_host.h"
@@ -62,11 +58,8 @@
 #include "content/web_test/browser/web_test_sensor_provider_manager.h"
 #include "content/web_test/browser/web_test_storage_access_manager.h"
 #include "content/web_test/browser/web_test_tts_platform.h"
-#include "content/web_test/common/web_test_bluetooth_fake_adapter_setter.mojom.h"
 #include "content/web_test/common/web_test_string_util.h"
 #include "content/web_test/common/web_test_switches.h"
-#include "device/bluetooth/emulation/fake_bluetooth.h"
-#include "device/bluetooth/public/mojom/emulation/fake_bluetooth.mojom.h"
 #include "gpu/config/gpu_switches.h"
 #include "mojo/public/cpp/bindings/associated_receiver_set.h"
 #include "mojo/public/cpp/bindings/binder_map.h"
@@ -324,14 +317,6 @@ void WebTestContentBrowserClient::ResetMockClipboardHosts() {
   }
 }
 
-std::unique_ptr<FakeBluetoothChooser>
-WebTestContentBrowserClient::GetNextFakeBluetoothChooser() {
-  if (!fake_bluetooth_chooser_factory_) {
-    return nullptr;
-  }
-  return fake_bluetooth_chooser_factory_->GetNextFakeBluetoothChooser();
-}
-
 void WebTestContentBrowserClient::BrowserChildProcessHostCreated(
     BrowserChildProcessHost* host) {
   scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner =
@@ -355,20 +340,10 @@ void WebTestContentBrowserClient::ExposeInterfacesToRenderer(
   registry->AddInterface(
       base::BindRepeating(&optional_numerics_unittest::ResponseParams::Bind),
       ui_task_runner);
-  registry->AddInterface(
-      base::BindRepeating(&WebTestBluetoothFakeAdapterSetterImpl::Create),
-      ui_task_runner);
-  registry->AddInterface(base::BindRepeating(&bluetooth::FakeBluetooth::Create),
-                         ui_task_runner);
   // This class outlives |render_process_host|, which owns |registry|. Since
   // any binders will not be called after |registry| is deleted
   // and |registry| is outlived by this class, it is safe to use
   // base::Unretained in all binders.
-  registry->AddInterface(
-      base::BindRepeating(
-          &WebTestContentBrowserClient::CreateFakeBluetoothChooserFactory,
-          base::Unretained(this)),
-      ui_task_runner);
   registry->AddInterface(base::BindRepeating(&MojoWebTestHelper::Create));
 
   registry->AddInterface(
@@ -590,17 +565,6 @@ bool WebTestContentBrowserClient::CanAcceptUntrustedExchangesIfNeeded() {
   return true;
 }
 
-BluetoothDelegate* WebTestContentBrowserClient::GetBluetoothDelegate() {
-  if (!fake_bluetooth_delegate_) {
-    fake_bluetooth_delegate_ = std::make_unique<FakeBluetoothDelegate>();
-  }
-  return fake_bluetooth_delegate_.get();
-}
-
-void WebTestContentBrowserClient::ResetFakeBluetoothDelegate() {
-  fake_bluetooth_delegate_.reset();
-}
-
 TtsPlatform* WebTestContentBrowserClient::GetTtsPlatform() {
   return WebTestTtsPlatform::GetInstance();
 }
@@ -724,12 +688,6 @@ void WebTestContentBrowserClient::ConfigureNetworkContextParamsForShell(
     context_params->initial_proxy_config = net::ProxyConfigWithAnnotation(
         proxy_config, TRAFFIC_ANNOTATION_FOR_TESTS);
   }
-}
-
-void WebTestContentBrowserClient::CreateFakeBluetoothChooserFactory(
-    mojo::PendingReceiver<mojom::FakeBluetoothChooserFactory> receiver) {
-  fake_bluetooth_chooser_factory_ =
-      FakeBluetoothChooserFactory::Create(std::move(receiver));
 }
 
 void WebTestContentBrowserClient::BindWebTestControlHost(

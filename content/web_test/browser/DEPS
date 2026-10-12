@@ -12,7 +12,6 @@ include_rules = [
   "+content/shell/browser",
   "+content/shell/common",
   "+content/web_test/common",
-  "+device/bluetooth",
   "+services/device/public/cpp/compute_pressure",
   "+services/device/public/cpp/test",
   "+services/device/public/mojom",

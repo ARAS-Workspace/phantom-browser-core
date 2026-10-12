@@ -269,11 +269,6 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   expected_providers += 1;
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX)
-  // BluetoothMetricsProvider
-  expected_providers += 1;
-#endif
-
   std::unique_ptr<TestChromeMetricsServiceClient>
       chrome_metrics_service_client = TestChromeMetricsServiceClient::Create(
           metrics_state_manager_.get(), synthetic_trial_registry_.get());

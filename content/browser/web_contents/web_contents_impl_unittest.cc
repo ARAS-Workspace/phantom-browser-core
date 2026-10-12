@@ -3301,45 +3301,6 @@ TEST_F(WebContentsImplTest, RegisterProtocolHandlerInvalidURLSyntax) {
   contents()->SetDelegate(nullptr);
 }
 
-TEST_F(WebContentsImplTest, Bluetooth) {
-  testing::StrictMock<TestWebContentsObserver> observer(contents());
-  EXPECT_FALSE(contents()->IsCapabilityActive(
-      WebContentsCapabilityType::kBluetoothConnected));
-
-  EXPECT_CALL(observer,
-              OnCapabilityTypesChanged(
-                  WebContentsCapabilityType::kBluetoothConnected, true))
-      .WillOnce([&]() {
-        // Accessor must return the updated state when the observer is notified.
-        EXPECT_TRUE(contents()->IsCapabilityActive(
-            WebContentsCapabilityType::kBluetoothConnected));
-      });
-  contents()->TestIncrementBluetoothConnectedDeviceCount();
-  testing::Mock::VerifyAndClearExpectations(&observer);
-  EXPECT_TRUE(contents()->IsCapabilityActive(
-      WebContentsCapabilityType::kBluetoothConnected));
-
-  // Additional increment/decrement don't modify state.
-  contents()->TestIncrementBluetoothConnectedDeviceCount();
-  EXPECT_TRUE(contents()->IsCapabilityActive(
-      WebContentsCapabilityType::kBluetoothConnected));
-  contents()->TestDecrementBluetoothConnectedDeviceCount();
-  EXPECT_TRUE(contents()->IsCapabilityActive(
-      WebContentsCapabilityType::kBluetoothConnected));
-
-  EXPECT_CALL(observer,
-              OnCapabilityTypesChanged(
-                  WebContentsCapabilityType::kBluetoothConnected, false))
-      .WillOnce([&]() {
-        EXPECT_FALSE(contents()->IsCapabilityActive(
-            WebContentsCapabilityType::kBluetoothConnected));
-      });
-  contents()->TestDecrementBluetoothConnectedDeviceCount();
-  testing::Mock::VerifyAndClearExpectations(&observer);
-  EXPECT_FALSE(contents()->IsCapabilityActive(
-      WebContentsCapabilityType::kBluetoothConnected));
-}
-
 TEST_F(WebContentsImplTest, BadDownloadImageResponseFromRenderer) {
   // Avoid using TestWebContents, which fakes image download logic without
   // exercising the code in WebContentsImpl.

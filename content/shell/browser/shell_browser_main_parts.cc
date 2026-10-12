@@ -34,7 +34,6 @@
 #include "content/shell/browser/shell_devtools_manager_delegate.h"
 #include "content/shell/browser/shell_platform_delegate.h"
 #include "content/shell/common/shell_switches.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
 #include "net/base/filename_util.h"
 #include "net/base/module/net_module.h"
 #include "net/grit/net_resources.h"
@@ -48,7 +47,6 @@
 
 
 #if BUILDFLAG(IS_LINUX)
-#include "device/bluetooth/dbus/dbus_bluez_manager_wrapper_linux.h"
 #include "ui/linux/linux_ui.h"          // nogncheck
 #include "ui/linux/linux_ui_factory.h"  // nogncheck
 #endif
@@ -89,9 +87,6 @@ ShellBrowserMainParts::ShellBrowserMainParts() = default;
 ShellBrowserMainParts::~ShellBrowserMainParts() = default;
 
 void ShellBrowserMainParts::PostCreateMainMessageLoop() {
-#if BUILDFLAG(IS_LINUX)
-  bluez::DBusBluezManagerWrapperLinux::Initialize();
-#endif
 }
 
 int ShellBrowserMainParts::PreEarlyInitialization() {
@@ -162,10 +157,6 @@ void ShellBrowserMainParts::PostMainMessageLoopRun() {
 }
 
 void ShellBrowserMainParts::PostDestroyThreads() {
-#if BUILDFLAG(IS_LINUX)
-  device::BluetoothAdapterFactory::Shutdown();
-  bluez::DBusBluezManagerWrapperLinux::Shutdown();
-#endif
 }
 
 std::unique_ptr<ShellPlatformDelegate>

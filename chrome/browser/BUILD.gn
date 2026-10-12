@@ -618,7 +618,6 @@ source_set("core") {
     "//chrome/browser/autocomplete:aim_eligibility_service",
     "//chrome/browser/background",
     "//chrome/browser/battery",
-    "//chrome/browser/bluetooth",
     "//chrome/browser/browsing_data",
     "//chrome/browser/browsing_data:constants",
     "//chrome/browser/btm",
@@ -729,8 +728,6 @@ source_set("core") {
     "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
     "//chrome/browser/ui/webui:configs",
     "//chrome/browser/ui/webui:log_web_ui_url",
-    "//chrome/browser/ui/webui/bluetooth_internals",
-    "//chrome/browser/ui/webui/bluetooth_internals:mojo_bindings",
     "//chrome/browser/ui/webui/chrome_finds_internals",
     "//chrome/browser/ui/webui/chrome_finds_internals:mojo_bindings",
     "//chrome/browser/ui/webui/chrome_urls",
@@ -1074,10 +1071,7 @@ source_set("core") {
       "chrome_browser_main_linux.cc",
       "memory_details_linux.cc",
     ]
-    deps += [
-      "//device/bluetooth",
-      "//third_party/fontconfig",
-    ]
+    deps += [ "//third_party/fontconfig" ]
     if (use_dbus) {
       deps += [ "//dbus" ]
     }
@@ -1328,8 +1322,6 @@ source_set("browser") {
     "//chrome/browser/banners",
     "//chrome/browser/banners:impl",
     "//chrome/browser/bitmap_fetcher",
-    "//chrome/browser/bluetooth",
-    "//chrome/browser/bluetooth:impl",
     "//chrome/browser/bookmarks",
     "//chrome/browser/bookmarks:impl",
     "//chrome/browser/breadcrumbs",
@@ -1528,8 +1520,6 @@ source_set("browser") {
     "//chrome/browser/ui/autofill/payments:impl",
     "//chrome/browser/ui/blocked_content",
     "//chrome/browser/ui/blocked_content:impl",
-    "//chrome/browser/ui/bluetooth",
-    "//chrome/browser/ui/bluetooth:impl",
     "//chrome/browser/ui/hats",
     "//chrome/browser/ui/hats:impl",
     "//chrome/browser/ui/javascript_dialogs",
@@ -1813,7 +1803,6 @@ source_set("browser") {
     "//services/cert_verifier:lib",
     "//services/data_decoder/public/cpp",
     "//services/device/public/cpp:device_features",
-    "//services/device/public/cpp/bluetooth",
     "//services/device/public/cpp/geolocation",
     "//services/device/public/mojom",
     "//services/media_session/public/mojom",

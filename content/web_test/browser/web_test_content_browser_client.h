@@ -11,7 +11,6 @@
 
 #include "build/build_config.h"
 #include "content/shell/browser/shell_content_browser_client.h"
-#include "content/web_test/common/fake_bluetooth_chooser.mojom-forward.h"
 #include "content/web_test/common/web_test.mojom-forward.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
@@ -39,9 +38,6 @@ class BinderMapWithContext;
 }  // namespace mojo
 
 namespace content {
-class FakeBluetoothChooser;
-class FakeBluetoothChooserFactory;
-class FakeBluetoothDelegate;
 class MockBadgeService;
 class MockClipboardHost;
 class NavigationThrottleRegistry;
@@ -62,10 +58,6 @@ class WebTestContentBrowserClient : public ShellContentBrowserClient {
   MockClipboardHost* GetMockClipboardHost() {
     return mock_clipboard_host_.get();
   }
-
-  // Retrieves the last created FakeBluetoothChooser instance.
-  std::unique_ptr<FakeBluetoothChooser> GetNextFakeBluetoothChooser();
-  void ResetFakeBluetoothDelegate();
 
   void ResetWebSensorProviderAutomation();
 
@@ -107,7 +99,6 @@ class WebTestContentBrowserClient : public ShellContentBrowserClient {
       RenderFrameHost* render_frame_host,
       mojo::BinderMapWithContext<content::RenderFrameHost*>* map) override;
   bool CanAcceptUntrustedExchangesIfNeeded() override;
-  BluetoothDelegate* GetBluetoothDelegate() override;
   content::TtsPlatform* GetTtsPlatform() override;
   std::unique_ptr<LoginDelegate> CreateLoginDelegate(
       const net::AuthChallengeInfo& auth_info,
@@ -139,9 +130,6 @@ class WebTestContentBrowserClient : public ShellContentBrowserClient {
       cert_verifier::mojom::CertVerifierCreationParams*
           cert_verifier_creation_params) override;
 
-  // Creates and stores a FakeBluetoothChooserFactory instance.
-  void CreateFakeBluetoothChooserFactory(
-      mojo::PendingReceiver<mojom::FakeBluetoothChooserFactory> receiver);
   void BindClipboardHost(
       RenderFrameHost* render_frame_host,
       mojo::PendingReceiver<blink::mojom::ClipboardHost> receiver);
@@ -191,9 +179,6 @@ class WebTestContentBrowserClient : public ShellContentBrowserClient {
 
   bool block_popups_ = true;
 
-  // Stores the FakeBluetoothChooserFactory that produces FakeBluetoothChoosers.
-  std::unique_ptr<FakeBluetoothChooserFactory> fake_bluetooth_chooser_factory_;
-  std::unique_ptr<FakeBluetoothDelegate> fake_bluetooth_delegate_;
   std::unique_ptr<MockClipboardHost> mock_clipboard_host_;
   std::unique_ptr<MockBadgeService> mock_badge_service_;
   mojo::UniqueReceiverSet<blink::test::mojom::DevicePostureProviderAutomation>

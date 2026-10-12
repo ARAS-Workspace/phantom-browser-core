@@ -592,7 +592,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/background_fetch",
     "//chrome/browser/background_sync",
     "//chrome/browser/bitmap_fetcher",
-    "//chrome/browser/bluetooth",
     "//chrome/browser/bookmarks",
     "//chrome/browser/breadcrumbs",
     "//chrome/browser/browser_actuator",

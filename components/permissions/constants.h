@@ -17,11 +17,6 @@ class TimeDelta;
 
 namespace permissions {
 
-// The URL for the Bluetooth Overview help center article in the Web Bluetooth
-// Chooser.
-COMPONENT_EXPORT(PERMISSIONS_COMMON)
-extern const char kChooserBluetoothOverviewURL[];
-
 // The URL for the Embedded Content help center article in the SAA permission
 // prompt.
 COMPONENT_EXPORT(PERMISSIONS_COMMON)

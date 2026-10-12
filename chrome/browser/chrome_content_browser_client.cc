@@ -61,8 +61,6 @@
 #include "chrome/browser/app_mode/app_mode_utils.h"
 #include "chrome/browser/bad_message.h"
 #include "chrome/browser/battery/battery_saver.h"
-#include "chrome/browser/bluetooth/chrome_bluetooth_delegate.h"
-#include "chrome/browser/bluetooth/chrome_bluetooth_delegate_impl_client.h"
 #include "chrome/browser/browser_about_handler.h"
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/browser_process.h"
@@ -5308,14 +5306,6 @@ bool ChromeContentBrowserClient::ShouldForceDownloadResource(
     const GURL& url,
     const std::string& mime_type) {
   return false;
-}
-
-content::BluetoothDelegate* ChromeContentBrowserClient::GetBluetoothDelegate() {
-  if (!bluetooth_delegate_) {
-    bluetooth_delegate_ = std::make_unique<ChromeBluetoothDelegate>(
-        std::make_unique<ChromeBluetoothDelegateImplClient>());
-  }
-  return bluetooth_delegate_.get();
 }
 
 bool ChromeContentBrowserClient::IsSecurityLevelAcceptableForWebAuthn(

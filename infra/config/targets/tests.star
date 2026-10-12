@@ -1020,10 +1020,6 @@ targets.tests.gtest_test(
 )
 
 targets.tests.gtest_test(
-    name = "device_realtarget_browsertests",
-)
-
-targets.tests.gtest_test(
     name = "devtools_browser_tests",
     args = [
         "--gtest_filter=*DevTools*",

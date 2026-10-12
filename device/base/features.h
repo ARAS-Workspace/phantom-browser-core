@@ -15,10 +15,6 @@ namespace device {
 
 namespace features {
 
-#if BUILDFLAG(IS_LINUX)
-DEVICE_BASE_EXPORT BASE_DECLARE_FEATURE(kWebBluetoothConfirmPairingSupport);
-#endif  // BUILDFLAG(IS_LINUX)
-
 }  // namespace features
 }  // namespace device
 

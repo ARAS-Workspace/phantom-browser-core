@@ -36,7 +36,6 @@
 #include "components/blocked_content/popup_blocker_tab_helper.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
-#include "components/permissions/fake_bluetooth_chooser_controller.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/permissions/test/mock_permission_request.h"
 #include "components/permissions/test/permission_request_observer.h"
@@ -870,45 +869,6 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
   EXPECT_TRUE(content::ExecJs(web_contents,
                               "document.documentElement.requestFullscreen()"));
   ASSERT_TRUE(fullscreen_controller->IsTabFullscreen());
-}
-
-// Tests that showing a chooser bubble exits tab fullscreen.
-// TODO(http://crbug.com/493319451): Re-enable when the flakiness is fixed.
-IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
-                       DISABLED_ChooserBubbleExitsTabFullscreen) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  FullscreenController* fullscreen_controller = browser()
-                                                    ->GetFeatures()
-                                                    .exclusive_access_manager()
-                                                    ->fullscreen_controller();
-
-  // Enter tab fullscreen.
-  ToggleTabFullscreen(true);
-  ui_test_utils::FullscreenWaiter(browser(), {.tab_fullscreen = true}).Wait();
-  EXPECT_TRUE(fullscreen_controller->IsTabFullscreen());
-
-  // Trigger a chooser bubble, which should exit fullscreen.
-  base::OnceClosure close_chooser = chrome::ShowDeviceChooserDialog(
-      web_contents->GetPrimaryMainFrame(),
-      std::make_unique<permissions::FakeBluetoothChooserController>());
-
-  ui_test_utils::FullscreenWaiter(browser(), {.tab_fullscreen = false}).Wait();
-  EXPECT_FALSE(fullscreen_controller->IsTabFullscreen());
-
-  // While bubble is showing, tab fullscreen cannot be entered.
-  EXPECT_FALSE(content::ExecJs(web_contents,
-                               "document.documentElement.requestFullscreen()"));
-  EXPECT_FALSE(fullscreen_controller->IsTabFullscreen());
-
-  // Close the chooser bubble.
-  std::move(close_chooser).Run();
-
-  // Now we should be able to enter tab fullscreen again.
-  EXPECT_TRUE(content::ExecJs(web_contents,
-                              "document.documentElement.requestFullscreen()"));
-  EXPECT_TRUE(fullscreen_controller->IsTabFullscreen());
 }
 
 // Tests ToggleFullscreenModeForTab always causes window to change.

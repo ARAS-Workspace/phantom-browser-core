@@ -153,9 +153,6 @@ class TestWebContents : public WebContentsImpl, public WebContentsTester {
   void SetLastActiveTimeTicks(base::TimeTicks last_active_time_ticks) override;
   void SetLastActiveTime(base::Time last_active_time) override;
 
-  void TestIncrementBluetoothConnectedDeviceCount() override;
-  void TestDecrementBluetoothConnectedDeviceCount() override;
-
   base::UnguessableToken GetAudioGroupId() override;
 
   void OnWebPreferencesChanged() override;

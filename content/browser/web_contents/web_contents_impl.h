@@ -1362,13 +1362,6 @@ class CONTENT_EXPORT WebContentsImpl
                        int active_match_ordinal,
                        bool final_update);
 
-  // Modify the counter of connected devices for this WebContents.
-  void IncrementBluetoothConnectedDeviceCount();
-  void DecrementBluetoothConnectedDeviceCount();
-
-  void IncrementBluetoothScanningSessionsCount();
-  void DecrementBluetoothScanningSessionsCount();
-
   // Modify the counter of frames in this WebContents actively using
   // geolocation.
   void IncrementGeolocationActiveFrameCount();
@@ -2543,8 +2536,6 @@ class CONTENT_EXPORT WebContentsImpl
   // Coordinates all the audio streams for this WebContents. Lazily initialized.
   std::unique_ptr<ForwardingAudioStreamFactory> audio_stream_factory_;
 
-  size_t bluetooth_connected_device_count_ = 0;
-  size_t bluetooth_scanning_sessions_count_ = 0;
   size_t geolocation_active_frame_count_ = 0;
 
   size_t file_system_access_handle_count_ = 0;

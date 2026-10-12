@@ -45,7 +45,6 @@
 #include "chrome/browser/background_fetch/background_fetch_delegate_factory.h"
 #include "chrome/browser/background_sync/background_sync_controller_factory.h"
 #include "chrome/browser/bitmap_fetcher/bitmap_fetcher_service_factory.h"
-#include "chrome/browser/bluetooth/bluetooth_chooser_context_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/breadcrumbs/breadcrumb_manager_keyed_service_factory.h"
 #include "chrome/browser/browser_actuator/browser_actuator_service_factory.h"
@@ -524,7 +523,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   BackgroundSyncControllerFactory::GetInstance();
   badging::BadgeManagerFactory::GetInstance();
   BitmapFetcherServiceFactory::GetInstance();
-  BluetoothChooserContextFactory::GetInstance();
 #if defined(TOOLKIT_VIEWS)
   BookmarkExpandedStateTrackerFactory::GetInstance();
   BookmarkMergedSurfaceServiceFactory::GetInstance();

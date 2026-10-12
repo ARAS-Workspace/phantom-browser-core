@@ -144,7 +144,6 @@ components/url_formatter/spoof_checks/common_words/data
 components/webcrypto/algorithms
 components/zucchini/testdata
 content/browser
-content/browser/bluetooth
 content/browser/device_sensors
 content/browser/fenced_frame
 content/browser/loader
@@ -883,7 +882,6 @@ tools/resources
 tools/rust
 tools/symsrc
 tools/vim
-tools/web_bluetooth
 tools/win/RetrieveSymbols
 ui/base/cocoa/constrained_window
 ui/base/linux

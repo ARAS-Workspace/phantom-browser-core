@@ -9,11 +9,9 @@ import("//services/device/public/cpp/compute_pressure/buildflags.gni")
 
 mojom("web_test_common_mojom") {
   sources = [
-    "common/fake_bluetooth_chooser.mojom",
     "common/mojo_echo.mojom",
     "common/mojo_optional_numerics_unittest.mojom",
     "common/web_test.mojom",
-    "common/web_test_bluetooth_fake_adapter_setter.mojom",
   ]
   public_deps = [
     "//mojo/public/mojom/base",
@@ -71,12 +69,6 @@ static_library("web_test_browser") {
   sources = [
     "browser/devtools_protocol_test_bindings.cc",
     "browser/devtools_protocol_test_bindings.h",
-    "browser/fake_bluetooth_chooser.cc",
-    "browser/fake_bluetooth_chooser.h",
-    "browser/fake_bluetooth_chooser_factory.cc",
-    "browser/fake_bluetooth_chooser_factory.h",
-    "browser/fake_bluetooth_delegate.cc",
-    "browser/fake_bluetooth_delegate.h",
     "browser/leak_detector.cc",
     "browser/leak_detector.h",
     "browser/mojo_echo.cc",
@@ -89,12 +81,6 @@ static_library("web_test_browser") {
     "browser/test_info_extractor.h",
     "browser/web_test_background_fetch_delegate.cc",
     "browser/web_test_background_fetch_delegate.h",
-    "browser/web_test_bluetooth_adapter_provider.cc",
-    "browser/web_test_bluetooth_adapter_provider.h",
-    "browser/web_test_bluetooth_chooser_factory.cc",
-    "browser/web_test_bluetooth_chooser_factory.h",
-    "browser/web_test_bluetooth_fake_adapter_setter_impl.cc",
-    "browser/web_test_bluetooth_fake_adapter_setter_impl.h",
     "browser/web_test_browser_context.cc",
     "browser/web_test_browser_context.h",
     "browser/web_test_browser_main_parts.cc",
@@ -116,8 +102,6 @@ static_library("web_test_browser") {
     "browser/web_test_download_manager_delegate.h",
     "browser/web_test_fedcm_manager.cc",
     "browser/web_test_fedcm_manager.h",
-    "browser/web_test_first_device_bluetooth_chooser.cc",
-    "browser/web_test_first_device_bluetooth_chooser.h",
     "browser/web_test_javascript_dialog_manager.cc",
     "browser/web_test_javascript_dialog_manager.h",
     "browser/web_test_origin_trial_throttle.cc",
@@ -180,9 +164,6 @@ static_library("web_test_browser") {
     "//content/test:mojo_bindings_web_test_mojom",
     "//content/test:mojo_web_test_bindings",
     "//content/test:test_support",
-    "//device/bluetooth:fake_bluetooth",
-    "//device/bluetooth:mocks",
-    "//device/bluetooth/public/mojom:fake_bluetooth_interfaces",
     "//media",
     "//net",
     "//net:net_resources",

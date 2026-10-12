@@ -35,8 +35,6 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/download_test_observer.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/bluetooth/test/mock_bluetooth_adapter.h"
 #include "services/network/public/cpp/features.h"
 #include "third_party/blink/public/common/features_generated.h"
 #include "third_party/blink/public/common/permissions/permission_utils.h"
@@ -162,63 +160,6 @@ IN_PROC_BROWSER_TEST_F(PolicyTest, Javascript) {
   ASSERT_TRUE(
       ui_test_utils::NavigateToURL(browser(), GURL(url::kAboutBlankURL)));
   EXPECT_TRUE(IsJavascriptEnabled(contents));
-}
-
-class WebBluetoothPolicyTest : public PolicyTest {
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // TODO(juncai): Remove this switch once Web Bluetooth is supported on Linux
-    // and Windows.
-    // https://crbug.com/41229108
-    // https://crbug.com/40425585
-    command_line->AppendSwitch(
-        switches::kEnableExperimentalWebPlatformFeatures);
-    PolicyTest::SetUpCommandLine(command_line);
-  }
-};
-
-// crbug.com/40679403
-#if BUILDFLAG(IS_MAC) && defined(ARCH_CPU_ARM64)
-#define MAYBE_Block DISABLED_Block
-#else
-#define MAYBE_Block Block
-#endif  // BUILDFLAG(IS_MAC) && defined(ARCH_CPU_ARM64)
-IN_PROC_BROWSER_TEST_F(WebBluetoothPolicyTest, MAYBE_Block) {
-  // Fake the BluetoothAdapter to say it's present.
-  scoped_refptr<device::MockBluetoothAdapter> adapter =
-      new testing::NiceMock<device::MockBluetoothAdapter>;
-  EXPECT_CALL(*adapter, IsPresent()).WillRepeatedly(testing::Return(true));
-  auto bt_global_values =
-      device::BluetoothAdapterFactory::Get()->InitGlobalOverrideValues();
-  bt_global_values->SetLESupported(true);
-  device::BluetoothAdapterFactory::SetAdapterForTesting(adapter);
-
-  // Navigate to a secure context.
-  embedded_test_server()->ServeFilesFromSourceDirectory("content/test/data");
-  ASSERT_TRUE(embedded_test_server()->Start());
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(),
-      embedded_test_server()->GetURL("localhost", "/simple_page.html")));
-  content::WebContents* const web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  EXPECT_THAT(
-      web_contents->GetPrimaryMainFrame()->GetLastCommittedOrigin().Serialize(),
-      testing::StartsWith("http://localhost:"));
-
-  // Set the policy to block Web Bluetooth.
-  PolicyMap policies;
-  policies.Set(key::kDefaultWebBluetoothGuardSetting, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD, base::Value(2), nullptr);
-  UpdateProviderPolicy(policies);
-
-  std::string rejection =
-      content::EvalJs(
-          web_contents,
-          "navigator.bluetooth.requestDevice({filters: [{name: 'Hello'}]})"
-          "  .then(() => 'Success',"
-          "        reason => reason.name + ': ' + reason.message"
-          "  );")
-          .ExtractString();
-  EXPECT_THAT(rejection, testing::MatchesRegex("NotFoundError: .*policy.*"));
 }
 
 class ScrollToTextFragmentPolicyTest

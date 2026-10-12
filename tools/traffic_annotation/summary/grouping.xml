@@ -99,7 +99,6 @@ after discussions on the right group.
       <annotation id="blink_resource_loader"/>
       <annotation id="blink_extension_resource_loader"/>
       <annotation id="favicon_loader"/>
-      <annotation id="bluetooth_socket"/>
       <annotation id="webui_content_scripts_download"/>
       <annotation id="extension_manifest_fetcher"/>
       <annotation id="extension_crx_fetcher"/>

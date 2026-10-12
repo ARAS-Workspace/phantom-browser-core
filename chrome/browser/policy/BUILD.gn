@@ -480,7 +480,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/search:test_support_ui",
     "//components/collaboration/public:prefs",
     "//components/history_clusters/core",
-    "//device/bluetooth:mocks",
   ]
 
   if (enable_extensions_core) {

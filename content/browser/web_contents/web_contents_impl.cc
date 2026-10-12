@@ -2712,9 +2712,7 @@ bool WebContentsImpl::IsCapabilityActive(
     WebContentsCapabilityType capability_type) {
   switch (capability_type) {
     case WebContentsCapabilityType::kBluetoothConnected:
-      return bluetooth_connected_device_count_ > 0;
     case WebContentsCapabilityType::kBluetoothScanning:
-      return bluetooth_scanning_sessions_count_ > 0;
     case WebContentsCapabilityType::kSerial:
     case WebContentsCapabilityType::kHID:
     case WebContentsCapabilityType::kUSB:
@@ -11130,71 +11128,6 @@ void WebContentsImpl::NotifyFindReply(int request_id,
       !GetPrimaryMainFrame()->GetProcess()->FastShutdownStarted()) {
     delegate_->FindReply(this, request_id, number_of_matches, selection_rect,
                          active_match_ordinal, final_update);
-  }
-}
-
-void WebContentsImpl::IncrementBluetoothConnectedDeviceCount() {
-  OPTIONAL_TRACE_EVENT0(
-      "content", "WebContentsImpl::IncrementBluetoothConnectedDeviceCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-  // Notify for UI updates if the state changes.
-  bluetooth_connected_device_count_++;
-  if (bluetooth_connected_device_count_ == 1) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kBluetoothConnected,
-                             /*used=*/true);
-  }
-}
-
-void WebContentsImpl::DecrementBluetoothConnectedDeviceCount() {
-  OPTIONAL_TRACE_EVENT0(
-      "content", "WebContentsImpl::DecrementBluetoothConnectedDeviceCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-  // Notify for UI updates if the state changes.
-  DCHECK_NE(bluetooth_connected_device_count_, 0u);
-  bluetooth_connected_device_count_--;
-  if (bluetooth_connected_device_count_ == 0) {
-    OnCapabilityTypesChanged(WebContentsCapabilityType::kBluetoothConnected,
-                             /*used=*/false);
-  }
-}
-
-void WebContentsImpl::IncrementBluetoothScanningSessionsCount() {
-  OPTIONAL_TRACE_EVENT0(
-      "content", "WebContentsImpl::IncrementBluetoothScanningSessionsCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  // Notify for UI updates if the state changes.
-  bluetooth_scanning_sessions_count_++;
-  if (bluetooth_scanning_sessions_count_ == 1) {
-    NotifyNavigationStateChanged(INVALIDATE_TYPE_TAB);
-  }
-}
-
-void WebContentsImpl::DecrementBluetoothScanningSessionsCount() {
-  OPTIONAL_TRACE_EVENT0(
-      "content", "WebContentsImpl::DecrementBluetoothScanningSessionsCount");
-  // Trying to invalidate the tab state while being destroyed could result in a
-  // use after free.
-  if (IsBeingDestroyed()) {
-    return;
-  }
-
-  DCHECK_NE(0u, bluetooth_scanning_sessions_count_);
-  bluetooth_scanning_sessions_count_--;
-  if (bluetooth_scanning_sessions_count_ == 0) {
-    NotifyNavigationStateChanged(INVALIDATE_TYPE_TAB);
   }
 }
 

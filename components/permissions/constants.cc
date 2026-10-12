@@ -7,9 +7,6 @@
 
 namespace permissions {
 
-const char kChooserBluetoothOverviewURL[] =
-    "https://support.google.com/chrome?p=bluetooth";
-
 const char kEmbeddedContentHelpCenterURL[] =
     "https://support.google.com/chrome/?p=embedded_content";
 

@@ -82,13 +82,10 @@
 #include "content/test/mock_platform_notification_service.h"
 #include "content/test/storage_partition_test_helpers.h"
 #include "content/web_test/browser/devtools_protocol_test_bindings.h"
-#include "content/web_test/browser/fake_bluetooth_chooser.h"
 #include "content/web_test/browser/test_info_extractor.h"
-#include "content/web_test/browser/web_test_bluetooth_chooser_factory.h"
 #include "content/web_test/browser/web_test_browser_context.h"
 #include "content/web_test/browser/web_test_content_browser_client.h"
 #include "content/web_test/browser/web_test_devtools_bindings.h"
-#include "content/web_test/browser/web_test_first_device_bluetooth_chooser.h"
 #include "content/web_test/browser/web_test_permission_manager.h"
 #include "content/web_test/browser/web_test_pressure_manager.h"
 #include "content/web_test/common/web_test_constants.h"
@@ -717,7 +714,6 @@ void WebTestControlHost::ResetBrowserAfterWebTest() {
   should_override_prefs_ = false;
   WebTestContentBrowserClient::Get()->SetPopupBlockingEnabled(true);
   WebTestContentBrowserClient::Get()->ResetMockClipboardHosts();
-  WebTestContentBrowserClient::Get()->ResetFakeBluetoothDelegate();
   WebTestContentBrowserClient::Get()->ResetWebSensorProviderAutomation();
   WebTestContentBrowserClient::Get()
       ->GetWebTestBrowserContext()
@@ -737,7 +733,6 @@ void WebTestControlHost::ResetBrowserAfterWebTest() {
 
   BlockThirdPartyCookies(
       net::cookie_util::IsForceThirdPartyCookieBlockingEnabled());
-  SetBluetoothManualChooser(false);
 
   ShellBrowserContext* browser_context =
       ShellContentBrowserClient::Get()->browser_context();
@@ -1018,28 +1013,6 @@ bool WebTestControlHost::IsMainWindow(WebContents* web_contents) const {
   return main_window_ && web_contents == main_window_->web_contents();
 }
 
-std::unique_ptr<BluetoothChooser> WebTestControlHost::RunBluetoothChooser(
-    RenderFrameHost* frame,
-    const BluetoothChooser::EventHandler& event_handler) {
-  // TODO(crbug.com/40426301): Remove |bluetooth_chooser_factory_| once
-  // all of the Web Bluetooth tests are migrated to external/wpt/.
-  if (bluetooth_chooser_factory_) {
-    return bluetooth_chooser_factory_->RunBluetoothChooser(frame,
-                                                           event_handler);
-  }
-
-  auto next_fake_bluetooth_chooser =
-      WebTestContentBrowserClient::Get()->GetNextFakeBluetoothChooser();
-  if (next_fake_bluetooth_chooser) {
-    const url::Origin origin = frame->GetLastCommittedOrigin();
-    DCHECK(!origin.opaque());
-    next_fake_bluetooth_chooser->OnRunBluetoothChooser(event_handler, origin);
-    return next_fake_bluetooth_chooser;
-  }
-
-  return std::make_unique<WebTestFirstDeviceBluetoothChooser>(event_handler);
-}
-
 void WebTestControlHost::RequestPointerLock(WebContents* web_contents) {
   if (next_pointer_lock_action_ == NextPointerLockAction::kTestWillRespond)
     return;
@@ -1297,7 +1270,6 @@ void WebTestControlHost::OnTestFinished() {
       browser_context->GetDefaultStoragePartition();
   storage_partition->GetServiceWorkerContext()->ClearAllServiceWorkersForTest(
       barrier_closure);
-  storage_partition->ClearBluetoothAllowedDevicesMapForTesting();
 
   // Clear all site-related storage APIs to ensure tests are hermetic.
   // Use an "opt-out" (or "blacklist") approach for future-proofing. This
@@ -2139,52 +2111,6 @@ void WebTestControlHost::CloseAllWindows() {
   main_window_ = nullptr;
   secondary_window_ = nullptr;
   base::RunLoop().RunUntilIdle();
-}
-
-void WebTestControlHost::SetBluetoothManualChooser(bool enable) {
-  if (enable) {
-    bluetooth_chooser_factory_ =
-        std::make_unique<WebTestBluetoothChooserFactory>();
-  } else {
-    bluetooth_chooser_factory_.reset();
-  }
-}
-
-void WebTestControlHost::GetBluetoothManualChooserEvents(
-    GetBluetoothManualChooserEventsCallback reply) {
-  if (!bluetooth_chooser_factory_) {
-    printer_->AddErrorMessage(
-        "FAIL: Must call setBluetoothManualChooser before "
-        "getBluetoothManualChooserEvents.");
-    std::move(reply).Run({});
-    return;
-  }
-  std::move(reply).Run(bluetooth_chooser_factory_->GetAndResetEvents());
-}
-
-void WebTestControlHost::SendBluetoothManualChooserEvent(
-    const std::string& event_name,
-    const std::string& argument) {
-  if (!bluetooth_chooser_factory_) {
-    printer_->AddErrorMessage(
-        "FAIL: Must call setBluetoothManualChooser before "
-        "sendBluetoothManualChooserEvent.");
-    return;
-  }
-  BluetoothChooserEvent event;
-  if (event_name == "cancelled") {
-    event = BluetoothChooserEvent::CANCELLED;
-  } else if (event_name == "selected") {
-    event = BluetoothChooserEvent::SELECTED;
-  } else if (event_name == "rescan") {
-    event = BluetoothChooserEvent::RESCAN;
-  } else {
-    printer_->AddErrorMessage(base::StringPrintf(
-        "FAIL: Unexpected sendBluetoothManualChooserEvent() event name '%s'.",
-        event_name.c_str()));
-    return;
-  }
-  bluetooth_chooser_factory_->SendEvent(event, argument);
 }
 
 void WebTestControlHost::BlockThirdPartyCookies(bool block) {

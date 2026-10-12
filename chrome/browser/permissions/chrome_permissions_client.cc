@@ -16,7 +16,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "chrome/browser/app_mode/app_mode_utils.h"
-#include "chrome/browser/bluetooth/bluetooth_chooser_context_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
@@ -54,7 +53,6 @@
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/infobars/core/infobar_manager.h"
 #include "components/permissions/constants.h"
-#include "components/permissions/contexts/bluetooth_chooser_context.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_actions_history.h"
 #include "components/permissions/permission_hats_trigger_helper.h"
@@ -215,13 +213,7 @@ permissions::ObjectPermissionContextBase*
 ChromePermissionsClient::GetChooserContext(
     content::BrowserContext* browser_context,
     ContentSettingsType type) {
-  switch (type) {
-    case ContentSettingsType::BLUETOOTH_CHOOSER_DATA:
-      return BluetoothChooserContextFactory::GetForProfile(
-          Profile::FromBrowserContext(browser_context));
-    default:
-      NOTREACHED();
-  }
+  NOTREACHED();
 }
 
 permissions::OriginKeyedPermissionActionService*
