@@ -457,7 +457,6 @@ source_set("browser_tests") {
   sources += [
     "cpu_performance_override_browsertest.cc",
     "policy_initialization_browsertest.cc",
-    "test/cast_policy_browsertest.cc",
     "test/content_settings_policy_browsertest.cc",
     "test/default_search_provider_policy_browsertest.cc",
     "test/force_google_safe_search_policy_browsertest.cc",
@@ -479,7 +478,6 @@ source_set("browser_tests") {
     "//chrome/browser/search_engines",
     "//chrome/browser/ui:browser_otr_state",
     "//chrome/browser/ui/search:test_support_ui",
-    "//chrome/browser/ui/toolbar/cast",
     "//chrome/browser/usb",
     "//components/collaboration/public:prefs",
     "//components/history_clusters/core",
@@ -859,7 +857,6 @@ source_set("impl") {
     "//chrome/browser/first_run",
     "//chrome/browser/infobars",
     "//chrome/browser/lifetime",
-    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/net",
     "//chrome/browser/policy/messaging_layer/storage_selector",

@@ -127,7 +127,6 @@ source_set("impl") {
     "//components/history_clusters/core",
     "//components/infobars/content",
     "//components/infobars/core",
-    "//components/media_router/common/providers/cast/certificate",
     "//components/network_session_configurator/common",
     "//components/prefs",
     "//components/signin/public/base",

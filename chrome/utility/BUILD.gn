@@ -37,7 +37,6 @@ static_library("utility") {
     "//chrome/services/file_util:buildflags",
     "//components/heap_profiling/in_process",
     "//components/metrics:child_call_stack_profile_builder",
-    "//components/mirroring/service:mirroring_service",
     "//components/paint_preview/buildflags",
     "//components/password_manager/services/csv_password:lib",
     "//components/search_engines",

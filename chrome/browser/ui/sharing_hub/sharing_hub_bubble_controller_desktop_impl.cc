@@ -24,8 +24,6 @@
 #include "chrome/browser/ui/sharing_hub/sharing_hub_bubble_view.h"
 #include "chrome/browser/ui/sharing_hub/sharing_hub_window_controller.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/media_router/browser/media_router_dialog_controller.h"
-#include "components/media_router/browser/media_router_metrics.h"
 #include "content/public/browser/site_instance.h"
 #include "content/public/browser/storage_partition.h"
 #include "content/public/browser/web_contents.h"
@@ -134,16 +132,6 @@ void SharingHubBubbleControllerDesktopImpl::OnActionSelected(
     send_tab_to_self::ShowBubble(
         &GetWebContents(), send_tab_to_self::ShareEntryPoint::kToolbarIcon,
         /*show_back_button=*/true);
-  } else if (action.command_id == IDC_ROUTE_MEDIA) {
-    media_router::MediaRouterDialogController* dialog_controller =
-        media_router::MediaRouterDialogController::GetOrCreateForWebContents(
-            browser->GetTabStripModel()->GetActiveWebContents());
-    if (!dialog_controller) {
-      return;
-    }
-
-    dialog_controller->ShowMediaRouterDialog(
-        media_router::MediaRouterDialogActivationLocation::SHARING_HUB);
   } else {
     chrome::ExecuteCommand(browser, action.command_id);
   }

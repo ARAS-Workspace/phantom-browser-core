@@ -12,7 +12,6 @@ aggregate_vector_icons("media_vector_icons") {
     "chevron_right.icon",
     "chevron_right_old.icon",
     "media_cast_start_old.icon",
-    "media_cast_stop_old.icon",
     "media_enter_pip_old.icon",
     "media_exit_pip_old.icon",
     "media_next_track_old.icon",

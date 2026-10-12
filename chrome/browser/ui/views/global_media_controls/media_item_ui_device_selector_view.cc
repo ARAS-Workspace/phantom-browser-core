@@ -6,13 +6,12 @@
 
 #include <algorithm>
 #include <utility>
+#include <vector>
 
 #include "base/functional/bind.h"
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/ui/global_media_controls/media_item_ui_device_selector_delegate.h"
 #include "components/global_media_controls/public/views/media_item_ui_view.h"
-#include "components/media_router/browser/media_router_metrics.h"
-#include "components/media_router/common/mojom/media_route_provider_id.mojom.h"
 #include "media/audio/audio_device_description.h"
 #include "media/base/media_switches.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
@@ -22,9 +21,6 @@
 #include "ui/views/controls/highlight_path_generator.h"
 #include "ui/views/layout/box_layout.h"
 #include "ui/views/metadata/view_factory.h"
-
-using media_router::MediaRouterMetrics;
-using media_router::mojom::MediaRouteProviderId;
 
 namespace {
 
@@ -39,10 +35,6 @@ const int kAudioDevicesCountHistogramMax = 30;
 MediaItemUIDeviceSelectorView::MediaItemUIDeviceSelectorView(
     const std::string& item_id,
     MediaItemUIDeviceSelectorDelegate* delegate,
-    mojo::PendingRemote<global_media_controls::mojom::DeviceListHost>
-        device_list_host,
-    mojo::PendingReceiver<global_media_controls::mojom::DeviceListClient>
-        receiver,
     bool has_audio_output,
     global_media_controls::GlobalMediaControlsEntryPoint entry_point,
     media_message_center::MediaColorTheme media_color_theme,
@@ -50,9 +42,7 @@ MediaItemUIDeviceSelectorView::MediaItemUIDeviceSelectorView(
     : item_id_(item_id),
       delegate_(delegate),
       entry_point_(entry_point),
-      media_color_theme_(media_color_theme),
-      device_list_host_(std::move(device_list_host)),
-      receiver_(this, std::move(receiver)) {
+      media_color_theme_(media_color_theme) {
   SetLayoutManager(std::make_unique<views::BoxLayout>(
       views::BoxLayout::Orientation::kVertical));
 
@@ -225,9 +215,6 @@ void MediaItemUIDeviceSelectorView::UpdateVisibility() {
 }
 
 bool MediaItemUIDeviceSelectorView::ShouldBeVisible() const {
-  if (has_cast_device_) {
-    return true;
-  }
   if (!is_audio_device_switching_enabled_) {
     return false;
   }
@@ -291,30 +278,6 @@ DeviceEntryUI* MediaItemUIDeviceSelectorView::GetDeviceEntryUI(
   return it->second;
 }
 
-void MediaItemUIDeviceSelectorView::OnDevicesUpdated(
-    std::vector<global_media_controls::mojom::DevicePtr> devices) {
-  RemoveDevicesOfType(DeviceEntryUIType::kCast);
-  has_cast_device_ = (devices.size() > 0);
-  for (const auto& device : devices) {
-    auto device_entry_view = std::make_unique<CastDeviceEntryViewAsh>(
-        base::BindRepeating(
-            &MediaItemUIDeviceSelectorView::OnCastDeviceSelected,
-            base::Unretained(this), device->id),
-        media_color_theme_.primary_foreground_color_id,
-        media_color_theme_.secondary_foreground_color_id, device);
-    device_entry_view->set_tag(next_tag_++);
-    device_entry_ui_map_[device_entry_view->tag()] = device_entry_view.get();
-    device_entry_views_container_->AddChildView(std::move(device_entry_view));
-  }
-  device_entry_views_container_->DeprecatedLayoutImmediately();
-
-  UpdateVisibility();
-  if (media_item_ui_) {
-    media_item_ui_->OnDeviceSelectorViewDevicesChanged(
-        device_entry_views_container_->children().size() > 0);
-  }
-}
-
 bool MediaItemUIDeviceSelectorView::IsDeviceSelectorExpanded() {
   return is_expanded_;
 }
@@ -347,24 +310,6 @@ bool MediaItemUIDeviceSelectorView::GetEntryIsHighlightedForTesting(
 
 bool MediaItemUIDeviceSelectorView::GetDeviceEntryViewVisibilityForTesting() {
   return device_entry_views_container_->GetVisible();
-}
-
-std::vector<CastDeviceEntryViewAsh*>
-MediaItemUIDeviceSelectorView::GetCastDeviceEntryViewsForTesting() {
-  std::vector<CastDeviceEntryViewAsh*> buttons;
-  for (views::View* view : device_entry_views_container_->children()) {
-    if (GetDeviceEntryUI(view)->GetType() == DeviceEntryUIType::kCast) {
-      buttons.push_back(static_cast<CastDeviceEntryViewAsh*>(view));
-    }
-  }
-  return buttons;
-}
-
-void MediaItemUIDeviceSelectorView::OnCastDeviceSelected(
-    const std::string& device_id) {
-  if (device_list_host_) {
-    device_list_host_->SelectDevice(device_id);
-  }
 }
 
 void MediaItemUIDeviceSelectorView::RegisterAudioDeviceCallbacks() {

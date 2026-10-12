@@ -128,10 +128,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://whats-new",
 #endif
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      "chrome://cast-feedback",
-#endif
-
       "chrome://browser-switch",
       "chrome://browser-switch/internals",
       "chrome://profile-picker",
@@ -166,7 +162,6 @@ base::span<const std::string_view> GetUntestedChromeUrlsForTest() {
       "chrome-untrusted://data-sharing",
       "chrome-untrusted://ntp-microsoft-auth",
       "chrome-untrusted://print",
-      "chrome://access-code-cast",
 #if !defined(NDEBUG)
       // TODO(crbug.com/487113801): Investigate why tests are flaky on dbg bots.
       "chrome://accessibility",

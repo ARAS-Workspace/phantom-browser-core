@@ -699,21 +699,6 @@
     "location": "component",
     "platforms": ["chromeos"]
   },
-  "mdns": [{
-    "channel": "stable",
-    "extension_types": ["extension"],
-    "allowlist": [
-      "1BFB3A47AA4A1E1C4714D919217602685CDD0FA7",  // http://crbug.com/40451135
-      "DD87C93131FF8D3DE4E483DC1EB298D73C7223A6",  // http://crbug.com/40226408
-      "13E3107CEF097680EF38F4C405F0014ECC2428C6",  // https://crbug.com/333576806
-      "F14B6BF9F5B9205222E568B3C838D9E99C3F5032"   // https://crbug.com/333576806
-    ]
-  },
-  {
-    "channel": "stable",
-    "extension_types": ["platform_app"],
-    "platforms": ["chromeos", "linux", "mac", "win"]
-  }],
   "notifications": [{
     // The chrome.notifications functionality listed in notifications.webidl
     // is available only to extension/platform_app types. The implementation

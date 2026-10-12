@@ -17,7 +17,6 @@ source_set("dns") {
 
   # Internals only intended for use inside network stack (and tests).
   friend = [
-    "//chrome/browser/local_discovery:unit_tests",
     "//components/certificate_transparency:unit_tests",
     "//components/cronet/*",
 
@@ -312,11 +311,6 @@ source_set("dns_client") {
   # Restricted access so we can keep track of all usage external to the
   # network stack.
   friend = [
-    # chrome/browser/local_discovery/service_discovery_client_impl.cc
-    # Result parsing utilities for parsing results read through MdnsClient.
-    # TODO(crbug.com/41408297): Remove once migrated to network service.
-    "//chrome/browser/local_discovery:impl",
-
     # Network stack/service
     "//components/certificate_transparency/*",
     "//net/*",
@@ -357,18 +351,6 @@ source_set("mdns_client") {
   # Restricted access so we can keep track of all usage external to the
   # network stack.
   friend = [
-    # chrome/browser/local_discovery/service_discovery_client_mdns.h
-    # chrome/browser/local_discovery/service_discovery_client_impl.h
-    # Makes MDNS queries using MDnsClient.
-    # TODO(crbug.com/41408297): Remove once migrated to network service.
-    "//chrome/browser/local_discovery",
-    "//chrome/browser/local_discovery:impl",
-
-    # chrome/tools/service_discovery_sniffer/service_discovery_sniffer.cc
-    # Creates MDnsClient instance and passes to ServiceDiscoveryClientImpl.
-    # TODO(crbug.com/41408297): Remove once discovery client migrated.
-    "//chrome/tools/service_discovery_sniffer",
-
     # Network stack/service
     "//net/*",
     "//services/network/*",

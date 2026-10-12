@@ -2,10 +2,6 @@
 # followed by tests which are also flaky on other bots. Tests which are not
 # appropriate for this bot should be placed at the end of this file.
 
-# Flaky on Linux: crbug.com/483413077
--AccessCodeCastTest.PasscodeInput
--AccessCodeCastTest.PasscodeInput__PasscodeInputElementTest_cursor_is_rendered_correctly
-
 # Flaky on most bots: crbug.com/460575305
 -ActorToolAgnosticBrowserTest.EnsureFocusSimulatedWhenActing
 

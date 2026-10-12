@@ -786,19 +786,6 @@ void MaybeRegisterChromeFeaturePromos(
           FeaturePromoSpecification::AcceleratorInfo())
           .SetBubbleArrow(HelpBubbleArrow::kTopCenter)));
 
-  // kIPHGMCCastStartStopFeature:
-  registry.RegisterFeature(FeaturePromoSpecification::CreateForLegacyPromo(
-      &feature_engagement::kIPHGMCCastStartStopFeature,
-      kToolbarMediaButtonElementId,
-      IDS_GLOBAL_MEDIA_CONTROLS_CONTROL_CAST_SESSIONS_PROMO));
-
-  // kIPHGMCLocalMediaCastingFeature:
-  registry.RegisterFeature(FeaturePromoSpecification::CreateForToastPromo(
-      feature_engagement::kIPHGMCLocalMediaCastingFeature,
-      kToolbarMediaButtonElementId, IDS_GMC_LOCAL_MEDIA_CAST_SESSIONS_PROMO,
-      IDS_GMC_LOCAL_MEDIA_CAST_START_PROMO,
-      FeaturePromoSpecification::AcceleratorInfo()));
-
   // kIPHPasswordsSavePrimingPromo:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForToastPromo(

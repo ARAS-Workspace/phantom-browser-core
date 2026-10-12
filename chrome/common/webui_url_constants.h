@@ -35,9 +35,6 @@ namespace chrome {
 // Please keep in alphabetical order, with OS/feature specific sections below.
 inline constexpr char kChromeUIAboutHost[] = "about";
 inline constexpr char kChromeUIAboutURL[] = "chrome://about/";
-inline constexpr char kChromeUIAccessCodeCastHost[] = "access-code-cast";
-inline constexpr char kChromeUIAccessCodeCastURL[] =
-    "chrome://access-code-cast/";
 inline constexpr char kChromeUIAccessibilityHost[] = "accessibility";
 inline constexpr char kChromeUIAccountSettingsURL[] =
     "chrome://settings/account";
@@ -176,8 +173,6 @@ inline constexpr char kChromeUIManagementHost[] = "management";
 inline constexpr char kChromeUIManagementURL[] = "chrome://management";
 inline constexpr char16_t kChromeUIManagementURL16[] = u"chrome://management";
 inline constexpr char kChromeUIMediaEngagementHost[] = "media-engagement";
-inline constexpr char kChromeUIMediaRouterInternalsHost[] =
-    "media-router-internals";
 inline constexpr char kChromeUIMemoryInternalsHost[] = "memory-internals";
 inline constexpr char kChromeUIMetricsInternalsHost[] = "metrics-internals";
 inline constexpr char kChromeUINetExportHost[] = "net-export";
@@ -502,11 +497,6 @@ inline constexpr char kSyncSetupSubPage[] = "syncSetup";
 inline constexpr char kSyncSetupAdvancedSubPage[] = "syncSetup/advanced";
 inline constexpr char kTriggeredResetProfileSettingsSubPage[] =
     "triggeredResetProfileSettings";
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-inline constexpr char kChromeUICastFeedbackHost[] = "cast-feedback";
-inline constexpr char kChromeUICastFeedbackURL[] = "chrome://cast-feedback";
-#endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
 inline constexpr char kChromeUICertificateManagerDialogURL[] =

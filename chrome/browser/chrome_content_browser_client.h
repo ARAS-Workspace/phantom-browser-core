@@ -558,16 +558,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::SiteInstance* site_instance,
       const content::OpenURLParams& params,
       base::OnceCallback<void(content::WebContents*)> callback) override;
-  content::ControllerPresentationServiceDelegate*
-  GetControllerPresentationServiceDelegate(
-      content::WebContents* web_contents) override;
-  content::ReceiverPresentationServiceDelegate*
-  GetReceiverPresentationServiceDelegate(
-      content::WebContents* web_contents) override;
-  void AddPresentationObserver(content::PresentationObserver* observer,
-                               content::WebContents* web_contents) override;
-  void RemovePresentationObserver(content::PresentationObserver* observer,
-                                  content::WebContents* web_contents) override;
   void CreateThrottlesForNavigation(
       content::NavigationThrottleRegistry& registry) override;
   void CreateThrottlesForCommitWithoutUrlLoader(
@@ -584,12 +574,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::unique_ptr<media::ScreenEnumerator> CreateScreenEnumerator()
       const override;
   bool EnforceSystemAudioEchoCancellation() override;
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-  void CreateMediaRemoter(
-      content::RenderFrameHost* render_frame_host,
-      mojo::PendingRemote<media::mojom::RemotingSource> source,
-      mojo::PendingReceiver<media::mojom::Remoter> receiver) final;
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING)
   base::FilePath GetLoggingFileName(
       const base::CommandLine& command_line) override;
   std::vector<std::unique_ptr<blink::URLLoaderThrottle>>

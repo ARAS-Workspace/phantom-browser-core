@@ -103,7 +103,6 @@ EXCLUDED_DIRECTORIES = [
   # UNSAFE_TODO, so template instantiations in other files are not verified.
   # Thus, we exclude files known to have UNSAFE_TODO in templates.
   "base/strings/string_tokenizer.h",
-  "chrome/browser/media/router/discovery/discovery_network_list_posix.cc",
   "components/zucchini/io_utils.h",
   "components/zucchini/patch_utils.h",
   "components/zucchini/rel32_utils.h",
@@ -121,7 +120,6 @@ EXCLUDED_DIRECTORIES = [
   # Those macros expands sometimes into code that triggers
   # -WUnsafe-buffer-usage or not, depending on the platform. These variations
   # are not supported by the script, so we exclude them.
-  "chrome/browser/media/router/discovery/discovery_network_list_posix.cc",
   "net/base/network_interfaces_posix.cc",
   "net/dns/address_info.cc",
   "net/dns/loopback_only.cc",

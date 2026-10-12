@@ -31,7 +31,6 @@ source_set("send_tab_to_self") {
 
   public_deps = [
     "//base",
-    "//chrome/browser/ui/media_router",
     "//chrome/browser/ui/views/controls",
     "//chrome/browser/ui/views/location_bar",
     "//components/send_tab_to_self",

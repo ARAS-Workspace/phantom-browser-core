@@ -13,6 +13,7 @@
 #include "base/base_switches.h"
 #include "base/check.h"
 #include "base/command_line.h"
+#include "base/debug/leak_annotations.h"
 #include "base/feature_list.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
@@ -45,7 +46,6 @@
 #include "chrome/browser/gpu/chrome_browser_main_extra_parts_gpu.h"
 #include "chrome/browser/language/url_language_histogram_factory.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
-#include "chrome/browser/media/router/chrome_media_router_factory.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/media/webrtc/webrtc_log_util.h"
 #include "chrome/browser/memory/chrome_browser_main_extra_parts_memory.h"
@@ -1247,8 +1247,6 @@ void ChromeBrowserMainParts::PreProfileInit() {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   SetChromeAppModalDialogManagerDelegate();
 #endif
-
-  media_router::ChromeMediaRouterFactory::DoPlatformInit();
 
 #if BUILDFLAG(IS_MAC)
   // Start up the platform auth SSO policy observer.

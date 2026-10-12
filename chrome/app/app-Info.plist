@@ -723,9 +723,5 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_googlecast._tcp</string>
-	</array>
 </dict>
 </plist>

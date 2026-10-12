@@ -85,13 +85,6 @@
 #include "media/mojo/clients/mojo_decoder_factory.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-// Enable remoting sender
-#include "media/remoting/courier_renderer_factory.h"  // nogncheck
-#include "media/remoting/renderer_controller.h"       // nogncheck
-#endif
-
-
 namespace {
 
 // This limit is much higher than it needs to be right now, because the logic
@@ -365,10 +358,6 @@ std::unique_ptr<blink::WebMediaPlayer> MediaFactory::CreateMediaPlayer(
       decoder_factory_.get(), client->RemotePlaybackClientWrapper(),
       &media_observer, client->GetElementId());
 
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-  DCHECK(media_observer);
-#endif
-
   mojo::PendingRemote<media::mojom::MediaMetricsProvider> metrics_provider;
   GetInterfaceBroker().GetInterface(
       metrics_provider.InitWithNewPipeAndPassReceiver());
@@ -479,33 +468,6 @@ MediaFactory::CreateRendererFactorySelector(
   }
 #endif  // BUILDFLAG(ENABLE_MOJO_RENDERER)
 
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-  mojo::PendingRemote<media::mojom::RemotingSource> remoting_source;
-  auto remoting_source_receiver =
-      remoting_source.InitWithNewPipeAndPassReceiver();
-  mojo::PendingRemote<media::mojom::Remoter> remoter;
-  GetRemoterFactory()->Create(std::move(remoting_source),
-                              remoter.InitWithNewPipeAndPassReceiver());
-  using RemotingController = media::remoting::RendererController;
-  auto remoting_controller = std::make_unique<RemotingController>(
-      std::move(remoting_source_receiver), std::move(remoter));
-  *out_media_observer = remoting_controller->GetWeakPtr();
-
-  auto courier_factory =
-      std::make_unique<media::remoting::CourierRendererFactory>(
-          std::move(remoting_controller));
-
-  // Must bind the callback first since |courier_factory| will be moved.
-  // base::Unretained is safe because |factory_selector| owns |courier_factory|.
-  auto is_remoting_cb = base::BindRepeating(
-      &media::remoting::CourierRendererFactory::IsRemotingActive,
-      base::Unretained(courier_factory.get()));
-  factory_selector->AddConditionalFactory(
-      RendererType::kCourier, std::move(courier_factory), is_remoting_cb);
-#endif
-
-
   if (!is_base_renderer_factory_set) {
     // TODO(crbug.com/1265448): These sorts of checks shouldn't be necessary if
     // this method were significantly refactored to split things up by
@@ -588,16 +550,6 @@ void MediaFactory::EnsureDecoderFactory() {
         std::move(external_decoder_factory));
   }
 }
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-media::mojom::RemoterFactory* MediaFactory::GetRemoterFactory() {
-  if (!remoter_factory_) {
-    GetInterfaceBroker().GetInterface(
-        remoter_factory_.BindNewPipeAndPassReceiver());
-  }
-  return remoter_factory_.get();
-}
-#endif
 
 std::unique_ptr<media::KeySystemSupportRegistration>
 MediaFactory::GetSupportedKeySystems(media::GetSupportedKeySystemsCB cb) {

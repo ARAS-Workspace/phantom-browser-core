@@ -99,8 +99,6 @@
   E_CPONLY(kColorCaptionButtonBackground) \
   /* Captured tab colors. */ \
   E_CPONLY(kColorCapturedTabContentsBorder) \
-  /* Cast dialog colors. */ \
-  E_CPONLY(kColorCastDialogHelpIcon) \
   /* Signin bubble colors. */ \
   E_CPONLY(kColorChromeSigninBubbleBackground) \
   E_CPONLY(kColorChromeSigninBubbleInfoBackground) \
@@ -264,9 +262,6 @@
   E_CPONLY(kColorLocationBarBorderOpaque) \
   E_CPONLY(kColorLocationBarClearAllButtonIcon) \
   E_CPONLY(kColorLocationBarClearAllButtonIconDisabled) \
-  /* Media router colors. */ \
-  E_CPONLY(kColorMediaRouterIconActive) \
-  E_CPONLY(kColorMediaRouterIconWarning) \
   /* Multi contents view colors. */ \
   E_CPONLY(kColorMultiContentsViewActiveContentOutline) \
   E_CPONLY(kColorMultiContentsViewInactiveContentOutline) \

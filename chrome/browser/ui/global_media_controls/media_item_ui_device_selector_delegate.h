@@ -30,10 +30,6 @@ class MediaItemUIDeviceSelectorDelegate {
       const std::string& id,
       base::RepeatingCallback<void(bool)> callback) = 0;
 
-  // Used by `MediaItemUIDeviceSelectorView` to send commands to MediaController
-  // to request starting a Remote Playback session.
-  virtual void OnMediaRemotingRequested(const std::string& item_id) = 0;
-
  protected:
   virtual ~MediaItemUIDeviceSelectorDelegate() = default;
 };

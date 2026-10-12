@@ -16,7 +16,6 @@
 #include "chrome/browser/devtools/protocol/ads_handler.h"
 #include "chrome/browser/devtools/protocol/autofill_handler.h"
 #include "chrome/browser/devtools/protocol/browser_handler.h"
-#include "chrome/browser/devtools/protocol/cast_handler.h"
 #include "chrome/browser/devtools/protocol/emulation_handler.h"
 #include "chrome/browser/devtools/protocol/extensions_handler.h"
 #include "chrome/browser/devtools/protocol/page_handler.h"
@@ -65,11 +64,6 @@ ChromeDevToolsSession::ChromeDevToolsSession(
     if (IsDomainAvailableToUntrustedClient<SecurityHandler>() ||
         channel->GetClient()->IsTrusted()) {
       security_handler_ = std::make_unique<SecurityHandler>(
-          agent_host->GetWebContents(), dispatcher());
-    }
-    if (IsDomainAvailableToUntrustedClient<CastHandler>() ||
-        channel->GetClient()->IsTrusted()) {
-      cast_handler_ = std::make_unique<CastHandler>(
           agent_host->GetWebContents(), dispatcher());
     }
     if (IsDomainAvailableToUntrustedClient<StorageHandler>() ||

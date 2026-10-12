@@ -1405,7 +1405,6 @@ void BrowserCommandController::OnTabChangedAt(tabs::TabInterface* tab,
     PrintingStateChanged();
     FullscreenStateChanged();
     UpdateCommandsForFind();
-    UpdateCommandsForMediaRouter();
   }
 }
 
@@ -1863,7 +1862,6 @@ void BrowserCommandController::UpdateCommandsForTabState() {
   UpdateCommandsForContentRestrictionState();
   UpdateCommandsForBookmarkEditing();
   UpdateCommandsForFind();
-  UpdateCommandsForMediaRouter();
   // Update the zoom commands when an active tab is selected.
   UpdateCommandsForZoomState();
   UpdateCommandsForTabKeyboardFocus(GetKeyboardFocusedTabIndex(browser_));
@@ -2114,9 +2112,6 @@ void BrowserCommandController::UpdateCommandsForFind() {
 void BrowserCommandController::UpdateCloseFindOrStop() {
   bool enabled = CanCloseFind(browser_) || IsCommandEnabled(IDC_STOP);
   command_updater_->UpdateCommandEnabled(IDC_CLOSE_FIND_OR_STOP, enabled);
-}
-
-void BrowserCommandController::UpdateCommandsForMediaRouter() {
 }
 
 void BrowserCommandController::UpdateCommandsForTabKeyboardFocus(

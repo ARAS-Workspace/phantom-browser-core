@@ -281,8 +281,6 @@ constexpr ServiceCurrentProcessType kCurrentProcessTypes[] = {
     {"video_capture.mojom.VideoCaptureService",
      CurrentProcessType::PROCESS_SERVICE_VIDEO_CAPTURE},
     {"unzip.mojom.Unzipper", CurrentProcessType::PROCESS_SERVICE_UNZIPPER},
-    {"mirroring.mojom.MirroringService",
-     CurrentProcessType::PROCESS_SERVICE_MIRRORING},
     {"patch.mojom.FilePatcher",
      CurrentProcessType::PROCESS_SERVICE_FILEPATCHER},
     {"chromeos.tts.mojom.TtsService", CurrentProcessType::PROCESS_SERVICE_TTS},

@@ -162,10 +162,6 @@ class ExtensionBrowserWindowHelper;
 class ExtensionSidePanelManager;
 }  // namespace extensions
 
-namespace media_router {
-class CastBrowserController;
-}  // namespace media_router
-
 namespace memory_saver {
 class MemorySaverBubbleController;
 }  // namespace memory_saver
@@ -283,10 +279,6 @@ class BrowserWindowFeatures {
 
   BookmarksServiceFeature* bookmarks_service_feature() {
     return bookmarks_service_feature_.get();
-  }
-
-  media_router::CastBrowserController* cast_browser_controller() {
-    return cast_browser_controller_.get();
   }
 
   ContentsBorderController* contents_border_controller() {
@@ -640,7 +632,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<ZoomBubbleCoordinator> zoom_bubble_coordinator_;
 
   // Members owned only when a BrowserView is attached.
-  std::unique_ptr<media_router::CastBrowserController> cast_browser_controller_;
   std::unique_ptr<ColorProviderBrowserHelper> color_provider_browser_helper_;
   std::unique_ptr<ContentsBorderController> contents_border_controller_;
   std::unique_ptr<enterprise_data_protection::DataProtectionUIController>

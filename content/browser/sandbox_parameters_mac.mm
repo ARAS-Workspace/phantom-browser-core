@@ -254,7 +254,6 @@ bool SetupSandboxParameters(sandbox::mojom::Sandbox sandbox_type,
   switch (sandbox_type) {
     case sandbox::mojom::Sandbox::kAudio:
     case sandbox::mojom::Sandbox::kCdm:
-    case sandbox::mojom::Sandbox::kMirroring:
     case sandbox::mojom::Sandbox::kPrintBackend:
     case sandbox::mojom::Sandbox::kPrintCompositor:
     case sandbox::mojom::Sandbox::kRenderer:

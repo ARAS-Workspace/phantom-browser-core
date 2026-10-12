@@ -18,7 +18,6 @@ class AdsHandler;
 class AutofillHandler;
 class EmulationHandler;
 class BrowserHandler;
-class CastHandler;
 class ExtensionsHandler;
 class PageHandler;
 class SecurityHandler;
@@ -45,7 +44,6 @@ class ChromeDevToolsSession : public ChromeDevToolsSessionBase {
   std::unique_ptr<AutofillHandler> autofill_handler_;
   std::unique_ptr<ExtensionsHandler> extensions_handler_;
   std::unique_ptr<BrowserHandler> browser_handler_;
-  std::unique_ptr<CastHandler> cast_handler_;
   std::unique_ptr<EmulationHandler> emulation_handler_;
   std::unique_ptr<PageHandler> page_handler_;
   std::unique_ptr<SecurityHandler> security_handler_;

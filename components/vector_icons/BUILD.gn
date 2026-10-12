@@ -282,7 +282,6 @@ if (current_toolchain == default_toolchain) {
       "media_next_track_old.icon",
       "media_previous_track_old.icon",
       "media_router_active_chrome_refresh_old.icon",
-      "media_router_error_custom.icon",
       "media_router_idle_chrome_refresh_old.icon",
       "media_router_idle_old.icon",
       "media_router_paused_old.icon",

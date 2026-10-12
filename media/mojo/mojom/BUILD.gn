@@ -940,19 +940,6 @@ source_set("shared_mojom_traits") {
   ]
 }
 
-mojom("remoting_common") {
-  sources = [ "remoting_common.mojom" ]
-}
-
-mojom("remoting") {
-  sources = [ "remoting.mojom" ]
-
-  public_deps = [
-    ":mojom",
-    ":remoting_common",
-  ]
-}
-
 mojom("test_interfaces") {
   testonly = true
   sources = [ "traits_test_service.test-mojom" ]

@@ -726,10 +726,6 @@
     "dependencies": ["permission:mediaPlayerPrivate"],
     "contexts": ["privileged_extension"]
   },
-  "mdns": {
-    "dependencies": ["permission:mdns"],
-    "contexts": ["privileged_extension"]
-  },
   "notifications": {
     "dependencies": ["permission:notifications"],
     "contexts": ["privileged_extension"]

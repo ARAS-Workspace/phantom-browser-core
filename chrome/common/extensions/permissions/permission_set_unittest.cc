@@ -794,8 +794,6 @@ TEST(PermissionsTest, PermissionMessages) {
   // TODO(erikkay) add a string for this permission.
   skip.insert(APIPermissionID::kBackground);
 
-  skip.insert(APIPermissionID::kClipboard);
-
   // The cookie permission does nothing unless you have associated host
   // permissions.
   skip.insert(APIPermissionID::kCookie);
@@ -841,7 +839,6 @@ TEST(PermissionsTest, PermissionMessages) {
 #endif
   skip.insert(APIPermissionID::kAutoTestPrivate);
   skip.insert(APIPermissionID::kBrailleDisplayPrivate);
-  skip.insert(APIPermissionID::kCecPrivate);
   skip.insert(APIPermissionID::kChromeosInfoPrivate);
   skip.insert(APIPermissionID::kCommandLinePrivate);
   skip.insert(APIPermissionID::kContextualTasksPrivate);

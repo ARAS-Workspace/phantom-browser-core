@@ -44,8 +44,6 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
            features::kWebUIReloadButton,
            features::kSkipIPCChannelPausingForNonGuests,
            features::kWebUIInProcessResourceLoadingV2,
-           // `WebUIPinnedToolbarActionsBrowserTest.LensOverlayResultsIcon`
-           // depends on `kRoundedIcons`.
            features::kRoundedIcons,
            // Facilitate testing kActionSidePanelShowComments
            collaboration::features::kCollaborationComments,
@@ -55,15 +53,9 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
       kActionMappings{
           {kActionNewIncognitoWindow,
            toolbar_ui_api::mojom::PinnedToolbarAction::kNewIncognitoWindow},
-          {kActionShowPasswordsBubbleOrPage,
-           toolbar_ui_api::mojom::PinnedToolbarAction::
-               kShowPasswordsBubbleOrPage},
           {kActionShowPaymentsBubbleOrPage,
            toolbar_ui_api::mojom::PinnedToolbarAction::
                kShowPaymentsBubbleOrPage},
-          {kActionShowAddressesBubbleOrPage,
-           toolbar_ui_api::mojom::PinnedToolbarAction::
-               kShowAddressesBubbleOrPage},
           {kActionSidePanelShowBookmarks,
            toolbar_ui_api::mojom::PinnedToolbarAction::kSidePanelShowBookmarks},
           {kActionSidePanelShowReadingList,
@@ -77,18 +69,8 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
           {kActionClearBrowsingData,
            toolbar_ui_api::mojom::PinnedToolbarAction::kClearBrowsingData},
           {kActionPrint, toolbar_ui_api::mojom::PinnedToolbarAction::kPrint},
-          {kActionSidePanelShowLensOverlayResults,
-           toolbar_ui_api::mojom::PinnedToolbarAction::
-               kSidePanelShowLensOverlayResults},
-          {kActionShowTranslate,
-           toolbar_ui_api::mojom::PinnedToolbarAction::kShowTranslate},
           {kActionQrCodeGenerator,
            toolbar_ui_api::mojom::PinnedToolbarAction::kQrCodeGenerator},
-          {kActionRouteMedia,
-           toolbar_ui_api::mojom::PinnedToolbarAction::kRouteMedia},
-          {kActionSidePanelShowReadAnything,
-           toolbar_ui_api::mojom::PinnedToolbarAction::
-               kSidePanelShowReadAnything},
           {kActionCopyUrl,
            toolbar_ui_api::mojom::PinnedToolbarAction::kCopyUrl},
           {kActionSendTabToSelf,
@@ -97,20 +79,12 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
            toolbar_ui_api::mojom::PinnedToolbarAction::kTaskManager},
           {kActionDevTools,
            toolbar_ui_api::mojom::PinnedToolbarAction::kDevTools},
-          {kActionSidePanelShowContextualTasks,
-           toolbar_ui_api::mojom::PinnedToolbarAction::
-               kSidePanelShowContextualTasks},
-          {kActionSidePanelShowLens,
-           toolbar_ui_api::mojom::PinnedToolbarAction::kSidePanelShowLens},
           {kActionSidePanelShowAboutThisSite,
            toolbar_ui_api::mojom::PinnedToolbarAction::
                kSidePanelShowAboutThisSite},
           {kActionSidePanelShowCustomizeChrome,
            toolbar_ui_api::mojom::PinnedToolbarAction::
                kSidePanelShowCustomizeChrome},
-          {kActionSidePanelShowShoppingInsights,
-           toolbar_ui_api::mojom::PinnedToolbarAction::
-               kSidePanelShowShoppingInsights},
           {kActionSidePanelShowMerchantTrust,
            toolbar_ui_api::mojom::PinnedToolbarAction::
                kSidePanelShowMerchantTrust},
@@ -129,11 +103,11 @@ void WebUIPinnedToolbarActionsTestBase::SetUpOnMainThread() {
   WebUIToolbarWebViewTestBase::SetUpOnMainThread();
   // Make everything pinnable and visible by default to facilitate testing.
   for (const auto& mapping : kActionMappings) {
-    SetPinnableProperty(mapping.first, true);
     if (actions::ActionItem* action_item =
             actions::ActionManager::Get().FindAction(
                 mapping.first,
                 BrowserActions::From(browser())->root_action_item())) {
+      SetPinnableProperty(mapping.first, true);
       action_item->SetVisible(true);
     }
   }

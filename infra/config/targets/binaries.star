@@ -1627,16 +1627,6 @@ targets.binaries.script(
     ],
 )
 
-targets.binaries.script(
-    name = "media_router_e2e_tests",
-    label = "//chrome/test/media_router:media_router_e2e_tests",
-    script = "//chrome/test/media_router/internal/media_router_tests.py",
-    args = [
-        "--test_binary",
-        "./interactive_ui_tests",
-    ],
-)
-
 targets.binaries.windowed_test_launcher(
     name = "media_unittests",
     label = "//media:media_unittests",

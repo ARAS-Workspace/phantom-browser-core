@@ -322,17 +322,6 @@ declare_args() {
 }
 
 declare_args() {
-  # This switch defines whether the Media Remoting implementation will be built.
-  # When enabled, media is allowed to be renderer and played back on remote
-  # devices when the tab is being casted and other conditions are met.
-  enable_media_remoting = !is_cast_media_device
-}
-
-declare_args() {
-  enable_media_remoting_rpc = enable_media_remoting
-}
-
-declare_args() {
   # Currently it is available on Win, Mac and Linux, since it requires the audio
   # service to run in a separate process.
   chrome_wide_echo_cancellation_supported = is_mac || is_linux

@@ -211,9 +211,6 @@ class BrowserCommandController : public CommandUpdater,
   // Updates the command to close find or stop loading.
   void UpdateCloseFindOrStop();
 
-  // Updates commands for Media Router.
-  void UpdateCommandsForMediaRouter();
-
   // Updates commands for tab keyboard focus state. If |target_index| is
   // populated, it is the index of the tab with focus; if it is not populated,
   // no tab has keyboard focus.

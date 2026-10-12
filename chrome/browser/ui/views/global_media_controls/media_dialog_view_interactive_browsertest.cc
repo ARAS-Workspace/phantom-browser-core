@@ -11,8 +11,6 @@
 #include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
-#include "chrome/browser/media/router/chrome_media_router_factory.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/global_media_controls/media_toolbar_button_observer.h"
@@ -32,18 +30,11 @@
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/global_media_controls/public/views/media_item_ui_list_view.h"
 #include "components/global_media_controls/public/views/media_item_ui_updated_view.h"
-#include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/live_caption/caption_util.h"
 #include "components/live_caption/pref_names.h"
-#include "components/media_router/browser/media_router_factory.h"
-#include "components/media_router/browser/media_routes_observer.h"
-#include "components/media_router/browser/presentation/web_contents_presentation_manager.h"
-#include "components/media_router/browser/test/mock_media_router.h"
 #include "components/prefs/pref_change_registrar.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "content/public/browser/media_session.h"
-#include "content/public/browser/presentation_observer.h"
-#include "content/public/browser/presentation_request.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/content_features.h"
 #include "content/public/common/isolated_world_ids.h"
@@ -62,74 +53,6 @@
 
 using media_session::mojom::MediaSessionAction;
 
-namespace {
-
-class TestWebContentsPresentationManager
-    : public media_router::WebContentsPresentationManager {
- public:
-  void NotifyPresentationsChanged(bool has_presentation) {
-    observers_.Notify(&content::PresentationObserver::OnPresentationsChanged,
-                      has_presentation);
-  }
-
-  void AddObserver(content::PresentationObserver* observer) override {
-    observers_.AddObserver(observer);
-  }
-
-  void RemoveObserver(content::PresentationObserver* observer) override {
-    observers_.RemoveObserver(observer);
-  }
-
-  MOCK_METHOD(bool, HasDefaultPresentationRequest, (), (const, override));
-  MOCK_METHOD(const content::PresentationRequest&,
-              GetDefaultPresentationRequest,
-              (),
-              (const, override));
-  MOCK_METHOD(std::vector<media_router::MediaRoute>,
-              GetMediaRoutes,
-              (),
-              (override));
-
-  void OnPresentationResponse(
-      const content::PresentationRequest& presentation_request,
-      media_router::mojom::RoutePresentationConnectionPtr connection,
-      const media_router::RouteRequestResult& result) override {}
-
-  base::WeakPtr<WebContentsPresentationManager> GetWeakPtr() override {
-    return weak_factory_.GetWeakPtr();
-  }
-
- private:
-  base::ObserverList<content::PresentationObserver> observers_;
-  base::WeakPtrFactory<TestWebContentsPresentationManager> weak_factory_{this};
-};
-
-class TestMediaRouter : public media_router::MockMediaRouter {
- public:
-  static std::unique_ptr<KeyedService> Create(
-      content::BrowserContext* context) {
-    return std::make_unique<TestMediaRouter>();
-  }
-
-  media_router::LoggerImpl* GetLogger() override {
-    if (!logger_) {
-      logger_ = std::make_unique<media_router::LoggerImpl>();
-    }
-    return logger_.get();
-  }
-
-  void NotifyMediaRoutesChanged(
-      const std::vector<media_router::MediaRoute>& routes) {
-    routes_observers_.Notify(
-        &media_router::MediaRoutesObserver::OnRoutesUpdated, routes);
-  }
-
- private:
-  std::unique_ptr<media_router::LoggerImpl> logger_;
-};
-
-}  // anonymous namespace
-
 class MediaDialogViewBrowserTest : public InProcessBrowserTest {
  public:
   MediaDialogViewBrowserTest() = default;
@@ -144,37 +67,6 @@ class MediaDialogViewBrowserTest : public InProcessBrowserTest {
     command_line->AppendSwitchASCII(
         switches::kAutoplayPolicy,
         switches::autoplay::kNoUserGestureRequiredPolicy);
-  }
-
-  void SetUp() override {
-    presentation_manager_ =
-        std::make_unique<TestWebContentsPresentationManager>();
-    media_router::WebContentsPresentationManager::SetTestInstance(
-        presentation_manager_.get());
-
-    InProcessBrowserTest::SetUp();
-  }
-
-  void TearDown() override {
-    InProcessBrowserTest::TearDown();
-    media_router::WebContentsPresentationManager::SetTestInstance(nullptr);
-  }
-
-  void SetUpInProcessBrowserTestFixture() override {
-    subscription_ =
-        BrowserContextDependencyManager::GetInstance()
-            ->RegisterCreateServicesCallbackForTesting(base::BindRepeating(
-                &MediaDialogViewBrowserTest::OnWillCreateBrowserContextServices,
-                base::Unretained(this)));
-  }
-
-  void OnWillCreateBrowserContextServices(content::BrowserContext* context) {
-    auto* media_router = static_cast<TestMediaRouter*>(
-        media_router::ChromeMediaRouterFactory::GetInstance()
-            ->SetTestingFactoryAndUse(
-                context, base::BindRepeating(&TestMediaRouter::Create)));
-    ON_CALL(*media_router, RegisterMediaSinksObserver)
-        .WillByDefault(testing::Return(true));
   }
 
   void OpenTestURL() {
@@ -330,21 +222,7 @@ class MediaDialogViewBrowserTest : public InProcessBrowserTest {
     return false;
   }
 
-
-
-
-
-
-
-
-  TestMediaRouter* GetMediaRouter() {
-    return static_cast<TestMediaRouter*>(
-        media_router::MediaRouterFactory::GetApiForBrowserContext(
-            browser()->GetProfile()));
-  }
-
  protected:
-  std::unique_ptr<TestWebContentsPresentationManager> presentation_manager_;
   MediaDialogUiForTest ui_{base::BindLambdaForTesting(
       [this]() -> BrowserWindowInterface* { return browser(); })};
 
@@ -360,8 +238,6 @@ class MediaDialogViewBrowserTest : public InProcessBrowserTest {
     }
     return nullptr;
   }
-
-  base::CallbackListSubscription subscription_;
 };
 
 #if BUILDFLAG(IS_MAC)
@@ -569,27 +445,6 @@ IN_PROC_BROWSER_TEST_F(MediaDialogViewBrowserTest,
   content::MediaSession::FlushObserversForTesting(first_web_contents);
 
   EXPECT_EQ(first_web_contents, GetActiveWebContents());
-}
-
-IN_PROC_BROWSER_TEST_F(MediaDialogViewBrowserTest, ShowsCastSession) {
-  OpenTestURL();
-  StartPlayback();
-  WaitForStart();
-
-  const std::string route_description = "Casting: Big Buck Bunny";
-  media_router::MediaRoute route("id", media_router::MediaSource("cast:123456"),
-                                 "sink_id", route_description, true);
-  route.set_media_sink_name("My Sink");
-  route.set_controller_type(media_router::RouteControllerType::kGeneric);
-  GetMediaRouter()->NotifyMediaRoutesChanged({route});
-  base::RunLoop().RunUntilIdle();
-  presentation_manager_->NotifyPresentationsChanged(true);
-
-  EXPECT_TRUE(ui_.WaitForToolbarIconShown());
-  ui_.ClickToolbarIcon();
-  EXPECT_TRUE(ui_.WaitForDialogOpened());
-  ui_.WaitForDialogToContainText(base::UTF8ToUTF16(route_description));
-  ui_.WaitForItemCount(1);
 }
 
 #if BUILDFLAG(IS_MAC)

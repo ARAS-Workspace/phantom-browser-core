@@ -11,7 +11,6 @@
 #include "base/strings/string_util.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/navigation_predictor/search_engine_preconnector.h"
 #include "chrome/browser/preloading/scoped_prewarm_feature_list.h"
 #include "chrome/browser/profiles/profile_manager.h"
@@ -242,7 +241,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "AutocompleteControllerEmitter",
     "AutofillInternalsService",
     "DataControlsRulesService",
-    "LocalPresentationManager",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -375,7 +373,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "HidDeviceManager",
     "HostContentSettingsMap",
 
-    "MediaRouterUIService",
     "NotificationDisplayService",
     "OnDeviceTailModelService",
     "OneTimePermissionsTrackerKeyedService",
@@ -577,14 +574,12 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "LocalOrSyncableBookmarkSyncServiceFactory",
     "LoginDetectionKeyedService",
     "LoginUIServiceFactory",
-    "MDnsAPI",
     "ManagedBookmarkService",
     "ManagedConfigurationAPI",
     "ManagementAPI",
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     "ManifestV2Handler",
 #endif
-    "MediaRouterUIService",
     "MenuManager",
 
     "NavigationPredictorKeyedService",

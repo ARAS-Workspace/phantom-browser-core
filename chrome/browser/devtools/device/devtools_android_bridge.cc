@@ -45,10 +45,6 @@
 #include "net/base/host_port_pair.h"
 #include "net/base/net_errors.h"
 
-#if BUILDFLAG(ENABLE_SERVICE_DISCOVERY)
-#include "chrome/browser/devtools/device/cast_device_provider.h"
-#endif
-
 using content::BrowserThread;
 using content::DevToolsAgentHost;
 
@@ -382,10 +378,6 @@ void DevToolsAndroidBridge::CreateDeviceProviders() {
 
   if (provider)
     device_providers.push_back(provider);
-
-#if BUILDFLAG(ENABLE_SERVICE_DISCOVERY)
-  device_providers.push_back(new CastDeviceProvider());
-#endif
 
   device_providers.push_back(new AdbDeviceProvider());
 

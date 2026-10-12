@@ -42,16 +42,6 @@ MEDIA_EXPORT extern const char kUserGestureRequiredPolicy[];
 MEDIA_EXPORT extern const char kAudioBufferSize[];
 MEDIA_EXPORT extern const char kAutoGrantCapturedSurfaceControlPrompt[];
 MEDIA_EXPORT extern const char kAutoplayPolicy[];
-MEDIA_EXPORT extern const char kCastStreamingForceDisableHardwareAv1[];
-MEDIA_EXPORT extern const char kCastStreamingForceDisableHardwareH264[];
-MEDIA_EXPORT extern const char kCastStreamingForceDisableHardwareHevc[];
-MEDIA_EXPORT extern const char kCastStreamingForceDisableHardwareVp8[];
-MEDIA_EXPORT extern const char kCastStreamingForceDisableHardwareVp9[];
-MEDIA_EXPORT extern const char kCastStreamingForceEnableHardwareAv1[];
-MEDIA_EXPORT extern const char kCastStreamingForceEnableHardwareH264[];
-MEDIA_EXPORT extern const char kCastStreamingForceEnableHardwareHevc[];
-MEDIA_EXPORT extern const char kCastStreamingForceEnableHardwareVp8[];
-MEDIA_EXPORT extern const char kCastStreamingForceEnableHardwareVp9[];
 MEDIA_EXPORT extern const char kClearKeyCdmPathForTesting[];
 MEDIA_EXPORT extern const char kDisableAcceleratedMjpegDecode[];
 MEDIA_EXPORT extern const char kDisableAudioInput[];
@@ -123,31 +113,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoplayDisableSettings);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kAutoplayPoliciesAndroid);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(
     kBrowserInitiatedAutomaticPictureInPictureDryRun);
-// NOTE: callers should always use the free functions in
-// /media/cast/encoding/encoding_support.h instead of accessing these features
-// directly.
-// TODO(https://crbug.com/1453388): Guard Cast Sender flags with !IS_ANDROID.
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingAv1);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(
-    kCastStreamingExponentialVideoBitrateAlgorithm);
-MEDIA_EXPORT extern const base::FeatureParam<int>
-    kCastStreamingExponentialVideoBitrateAlgorithmWindowSize;
-MEDIA_EXPORT extern const base::FeatureParam<int>
-    kCastStreamingExponentialVideoBitrateAlgorithmDropThreshold;
-MEDIA_EXPORT extern const base::FeatureParam<double>
-    kCastStreamingExponentialVideoBitrateAlgorithmIncreaseFactor;
-MEDIA_EXPORT extern const base::FeatureParam<double>
-    kCastStreamingExponentialVideoBitrateAlgorithmDecreaseFactor;
-MEDIA_EXPORT extern const base::FeatureParam<double>
-    kCastStreamingExponentialVideoBitrateAlgorithmDynamicWindowMultiplier;
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingHardwareHevc);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingMaxVideoBitrate);
-MEDIA_EXPORT extern const base::FeatureParam<int>
-    kCastStreamingMaxVideoBitrateMbps;
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingPerformanceOverlay);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingVp8);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingVp9);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastVideoEncoderFrameDrop);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kCdmHostVerification);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kCdmProcessPriorityElevation);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kCdmThreadPriorityElevation);
@@ -166,7 +131,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kDocumentPictureInPictureCapture);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kDocumentPictureInPictureNavigation);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kDocumentPictureInPictureReparenting);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kEnableHighChannelLayouts);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kEnableRtcpReporting);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kEnableTabMuting);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kEncryptedMediaOcclusionTracking);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kExtendedVideoBitstreamValidation);
@@ -382,8 +346,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kVaapiIgnoreDriverChecks);
 
 #if BUILDFLAG(IS_MAC)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kApplicationAudioCaptureMac);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastMacForceBaselineProfile);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingMacHardwareH264);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kMacCatapLoopbackAudioForCast);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kMacCatapLoopbackAudioForScreenShare);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseSCContentSharingPicker);

@@ -324,7 +324,6 @@ source_set("profile") {
 
   public_deps = [
     "//base",
-    "//components/media_router/common",
   ]
 
   # Cannot depend on //chrome/browser:browser.
@@ -631,7 +630,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/lookalikes",
     "//chrome/browser/manta",
     "//chrome/browser/manta:impl",
-    "//chrome/browser/media/router",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/notebooks",
     "//chrome/browser/notifications",
@@ -737,7 +735,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/devtools",
     "//chrome/browser/dictation",
     "//chrome/browser/feedback",
-    "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
     "//chrome/browser/metrics/critical_user_journeys",
     "//chrome/browser/new_tab_page",
     "//chrome/browser/profile_resetter",
@@ -751,7 +748,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/ui/desktop_to_mobile_promos:service",
     "//chrome/browser/ui/global_error",
     "//chrome/browser/ui/global_media_controls",
-    "//chrome/browser/ui/media_router",
     "//chrome/browser/ui/performance_controls",
     "//chrome/browser/ui/tabs/saved_tab_groups",
     "//chrome/browser/ui/views/profiles:avatar_toolbar_button",

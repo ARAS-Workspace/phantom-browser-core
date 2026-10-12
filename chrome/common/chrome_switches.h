@@ -207,8 +207,6 @@ extern const char kWindowWorkspace[];
 extern const char kWinHttpProxyResolver[];
 extern const char kWinJumplistAction[];
 
-extern const char kCastMirroringTargetPlayoutDelay[];
-
 extern const char kSavePageAsMHTML[];
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)

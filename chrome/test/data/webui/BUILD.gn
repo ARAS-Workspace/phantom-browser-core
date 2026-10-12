@@ -52,7 +52,6 @@ source_set("browser_tests") {
 
   sources += [
     "about_sys/about_sys_browsertest.cc",
-    "access_code_cast/access_code_cast_browsertest.cc",
     "bookmarks/bookmarks_browsertest.cc",
     "chrome_apis/chrome_histograms_browsertest.cc",
     "chrome_apis/chrome_timeticks_browsertest.cc",
@@ -101,10 +100,6 @@ source_set("browser_tests") {
     "//chrome/browser/subscription_eligibility",
     "//chrome/browser/ui/webui/settings",
   ]
-
-  if (is_chrome_branded) {
-    sources += [ "media_router/cast_feedback_ui_browsertest.cc" ]
-  }
 
   sources += [ "cr_components/cr_components_browsertest.cc" ]
   deps += [
@@ -164,7 +159,6 @@ source_set("browser_tests") {
     "//chrome/browser/devtools",
     "//chrome/browser/devtools:test_support",
     "//chrome/browser/history",
-    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/optimization_guide:test_support",
     "//chrome/browser/search/background",
@@ -410,7 +404,6 @@ generate_grd("build_grd") {
 
   deps += [
     "about_sys:build_grdp",
-    "access_code_cast:build_grdp",
     "bookmarks:build_grdp",
     "chrome_apis:build_grdp",
     "content_settings:build_grdp",
@@ -458,7 +451,6 @@ generate_grd("build_grd") {
 
   grdp_files += [
     "$target_gen_dir/about_sys/resources.grdp",
-    "$target_gen_dir/access_code_cast/resources.grdp",
     "$target_gen_dir/chrome_apis/resources.grdp",
 
     "$target_gen_dir/webview/resources.grdp",
@@ -541,11 +533,6 @@ generate_grd("build_grd") {
     # chrome://webui-test, even though they reside in chrome/test/data/pdf/.
     deps += [ "../pdf:build_grdp" ]
     grdp_files += [ "$target_gen_dir/../pdf/resources.grdp" ]
-  }
-
-  if (is_chrome_branded) {
-    deps += [ "media_router:build_grdp" ]
-    grdp_files += [ "$target_gen_dir/media_router/resources.grdp" ]
   }
 
   if (is_mac || is_linux) {

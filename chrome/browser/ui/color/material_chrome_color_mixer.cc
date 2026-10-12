@@ -244,9 +244,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
   // Tab Group Dialog colors.
   mixer[kColorTabGroupDialogIconEnabled] = {ui::kColorSysOnSurfaceSubtle};
 
-  // Cast Dialog colors.
-  mixer[kColorCastDialogHelpIcon] = {ui::kColorSysPrimary};
-
   // Help bubble colors.
   mixer[kColorFeaturePromoBubbleBackground] = {ui::kColorSysPrimary};
   mixer[kColorFeaturePromoBubbleButtonBorder] = {
@@ -374,9 +371,6 @@ void AddMaterialChromeColorMixer(ui::ColorProvider* provider,
   mixer[kColorInfoBarButtonIconDisabled] = {ui::kColorSysStateDisabled};
   mixer[kColorInfoBarForeground] = {ui::kColorSysOnSurface};
   mixer[ui::kColorInfoBarIcon] = {ui::kColorSysOnSurfaceSubtle};
-  mixer[kColorMediaRouterIconActive] =
-      ui::PickGoogleColor(ui::kColorSysPrimary, kColorToolbar,
-                          color_utils::kMinimumVisibleContrastRatio);
 
   mixer[kColorMultiContentsViewMiniToolbarForeground] = {
       ui::kColorSysOnSurfaceSubtle};

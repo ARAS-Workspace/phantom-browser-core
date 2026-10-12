@@ -237,12 +237,6 @@ void PinnedToolbarActionsModel::MaybeMigrateExistingPinnedStates() {
   if (!CanUpdate()) {
     return;
   }
-  if (!pref_service_->GetBoolean(prefs::kPinnedCastMigrationComplete)) {
-    bool previously_pinned =
-        pref_service_->GetBoolean(prefs::kShowCastIconInToolbar);
-    UpdatePinnedState(kActionRouteMedia, previously_pinned);
-    pref_service_->SetBoolean(prefs::kPinnedCastMigrationComplete, true);
-  }
   if (base::FeatureList::IsEnabled(
           features::kTabsFromOtherDevicesSidePanelPinnedByDefault) &&
       !pref_service_->GetBoolean(

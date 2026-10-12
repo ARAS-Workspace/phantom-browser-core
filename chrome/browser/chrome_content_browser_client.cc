@@ -102,7 +102,6 @@
 #include "chrome/browser/media/autoplay_policy_status_observer.h"
 #include "chrome/browser/media/media_engagement_service.h"
 #include "chrome/browser/media/prefs/capture_device_ranking.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/media/unified_autoplay_config.h"
 #include "chrome/browser/media/webrtc/audio_debug_recordings_handler.h"
 #include "chrome/browser/media/webrtc/capture_policy_utils.h"
@@ -255,9 +254,6 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/live_caption/caption_util.h"
 #include "components/media_device_salt/media_device_salt_service.h"
-#include "components/media_router/browser/presentation/controller_presentation_service_delegate_impl.h"
-#include "components/media_router/browser/presentation/receiver_presentation_service_delegate_impl.h"
-#include "components/media_router/browser/presentation/web_contents_presentation_manager.h"
 #include "components/metrics/client_info.h"
 #include "components/metrics_services_manager/metrics_services_manager.h"
 #include "components/net_log/chrome_net_log.h"
@@ -538,11 +534,6 @@
 #include "components/pdf/common/constants.h"
 #include "pdf/pdf_features.h"
 #endif  // BUILDFLAG(ENABLE_PDF)
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-#include "chrome/browser/media/cast_remoting_connector.h"
-#include "chrome/browser/media/remoting_bridge.h"
-#endif
 
 #if BUILDFLAG(ENABLE_OFFLINE_PAGES)
 #include "chrome/browser/offline_pages/offline_page_tab_helper.h"
@@ -4284,50 +4275,6 @@ void ChromeContentBrowserClient::OpenURL(
   std::move(callback).Run(nav_params.navigated_or_inserted_contents);
 }
 
-content::ControllerPresentationServiceDelegate*
-ChromeContentBrowserClient::GetControllerPresentationServiceDelegate(
-    content::WebContents* web_contents) {
-  if (media_router::MediaRouterEnabled(web_contents->GetBrowserContext())) {
-    return media_router::ControllerPresentationServiceDelegateImpl::
-        GetOrCreateForWebContents(web_contents);
-  }
-  return nullptr;
-}
-
-content::ReceiverPresentationServiceDelegate*
-ChromeContentBrowserClient::GetReceiverPresentationServiceDelegate(
-    content::WebContents* web_contents) {
-  if (media_router::MediaRouterEnabled(web_contents->GetBrowserContext())) {
-    // ReceiverPresentationServiceDelegateImpl exists only for WebContents
-    // created for offscreen presentations. The WebContents must belong to
-    // an incognito profile.
-    if (auto* impl = media_router::ReceiverPresentationServiceDelegateImpl::
-            FromWebContents(web_contents)) {
-      DCHECK(web_contents->GetBrowserContext()->IsOffTheRecord());
-      return impl;
-    }
-  }
-  return nullptr;
-}
-
-void ChromeContentBrowserClient::AddPresentationObserver(
-    content::PresentationObserver* observer,
-    content::WebContents* web_contents) {
-  if (media_router::MediaRouterEnabled(web_contents->GetBrowserContext())) {
-    media_router::WebContentsPresentationManager::Get(web_contents)
-        ->AddObserver(observer);
-  }
-}
-
-void ChromeContentBrowserClient::RemovePresentationObserver(
-    content::PresentationObserver* observer,
-    content::WebContents* web_contents) {
-  if (media_router::MediaRouterEnabled(web_contents->GetBrowserContext())) {
-    media_router::WebContentsPresentationManager::Get(web_contents)
-        ->RemoveObserver(observer);
-  }
-}
-
 void ChromeContentBrowserClient::CreateThrottlesForNavigation(
     content::NavigationThrottleRegistry& registry) {
   CreateAndAddChromeThrottlesForNavigation(registry);
@@ -4491,22 +4438,6 @@ void ChromeContentBrowserClient::MaybeCopyDisableWebRtcEncryptionSwitch(
     to_command_line->CopySwitchesFrom(from_command_line, kWebRtcDevSwitchNames);
   }
 }
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-void ChromeContentBrowserClient::CreateMediaRemoter(
-    content::RenderFrameHost* render_frame_host,
-    mojo::PendingRemote<media::mojom::RemotingSource> source,
-    mojo::PendingReceiver<media::mojom::Remoter> receiver) {
-  DCHECK(render_frame_host);
-  auto* const contents =
-      content::WebContents::FromRenderFrameHost(render_frame_host);
-  if (!contents) {
-    return;
-  }
-  RemotingBridge::CreateMediaRemoter(CastRemotingConnector::Get(contents),
-                                     std::move(source), std::move(receiver));
-}
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING)
 
 base::FilePath ChromeContentBrowserClient::GetLoggingFileName(
     const base::CommandLine& command_line) {

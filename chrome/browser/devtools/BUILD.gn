@@ -31,8 +31,6 @@ if (enable_devtools_frontend) {
     "protocol/autofill.h",
     "protocol/extensions.cc",
     "protocol/extensions.h",
-    "protocol/cast.cc",
-    "protocol/cast.h",
     "protocol/emulation.cc",
     "protocol/emulation.h",
     "protocol/page.cc",
@@ -241,7 +239,6 @@ static_library("devtools") {
     "//chrome:strings",
     "//chrome/app/theme:theme_resources",
     "//chrome/browser/infobars",
-    "//chrome/browser/media/router:media_router_feature",
     "//chrome/browser/themes",
     "//chrome/browser/ui:tab_modal_confirm_dialog",
     "//chrome/browser/ui/exclusive_access",
@@ -338,13 +335,6 @@ static_library("devtools") {
     "serialize_host_descriptions.cc",
     "serialize_host_descriptions.h",
   ]
-  if (enable_service_discovery) {
-    sources += [
-      "device/cast_device_provider.cc",
-      "device/cast_device_provider.h",
-    ]
-    deps += [ "//chrome/browser/local_discovery" ]
-  }
 
   sources += [
     "global_confirm_info_bar.cc",
@@ -362,12 +352,9 @@ static_library("devtools") {
     "//chrome/browser/badging",
     "//chrome/browser/custom_handlers",
     "//chrome/browser/first_party_sets",
-    "//chrome/browser/ui/media_router",
     "//chrome/browser/ui/startup",
     "//components/content_settings/core/common",
     "//components/custom_handlers",
-    "//components/media_router/browser",
-    "//components/media_router/common/mojom:media_router",
     "//components/origin_gating/core",
     "//components/privacy_sandbox/privacy_sandbox_attestations",
     "//components/security_state/content",
@@ -388,8 +375,6 @@ static_library("devtools") {
     "protocol/ads_handler.h",
     "protocol/browser_handler.cc",
     "protocol/browser_handler.h",
-    "protocol/cast_handler.cc",
-    "protocol/cast_handler.h",
     "protocol/emulation_handler.cc",
     "protocol/emulation_handler.h",
     "protocol/extensions_handler.cc",
@@ -517,17 +502,9 @@ source_set("unit_tests") {
   ]
 
   deps += [
-    "//chrome/browser/media/router",
     "//chrome/browser/web_applications:web_applications_test_support",
-    "//components/media_router/browser",
-    "//components/media_router/browser:test_support",
-    "//components/media_router/common:test_support",
     "//crypto:test_support",
   ]
-
-  if (enable_service_discovery) {
-    sources += [ "device/cast_device_provider_unittest.cc" ]
-  }
 }
 
 if (enable_devtools_frontend) {

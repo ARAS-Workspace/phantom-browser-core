@@ -547,7 +547,6 @@ template("build_webui") {
         # Note: DO NOT add new entries to the list below. All new WebUIs should
         # use Mojo instead, see https://chromium.googlesource.com/chromium/src/+/main/docs/webui/webui_explainer.md#Pre_Mojo-alternative_chrome_send_WebUIMessageHandler
         "//chrome/browser/resources/about_sys",
-        "//chrome/browser/resources/access_code_cast",
         "//chrome/browser/resources/accessibility",
         "//chrome/browser/resources/bookmarks",
         "//chrome/browser/resources/browser_switch",
@@ -561,8 +560,6 @@ template("build_webui") {
         "//chrome/browser/resources/intro",
         "//chrome/browser/resources/management",
         "//chrome/browser/resources/media",
-        "//chrome/browser/resources/media_router/cast_feedback",
-        "//chrome/browser/resources/media_router/internals",
         "//chrome/browser/resources/memory_internals",
         "//chrome/browser/resources/omnibox",
         "//chrome/browser/resources/predictors",

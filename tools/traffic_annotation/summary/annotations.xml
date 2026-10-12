@@ -27,7 +27,6 @@ Refer to README.md for content description and update process.
  <item id="cablev2_websocket_from_authenticator" added_in_milestone="87" content_hash_code="0724f93c" os_list="linux,windows,chromeos,android" file_path="device/fido/cable/v2_authenticator.cc" />
  <item id="cablev2_websocket_from_client" added_in_milestone="86" content_hash_code="06f37377" os_list="windows,linux,chromeos" file_path="device/fido/cable/fido_tunnel_device.cc" />
  <item id="captive_portal_service" added_in_milestone="62" content_hash_code="04375eac" os_list="linux,windows,chromeos" file_path="components/captive_portal/content/captive_portal_service.cc" />
- <item id="cast_socket" added_in_milestone="66" content_hash_code="01cbc995" os_list="linux,windows,chromeos,android" file_path="components/media_router/common/providers/cast/channel/cast_socket.cc" />
  <item id="certificate_verifier_url_loader" added_in_milestone="80" content_hash_code="05856cc0" os_list="linux,windows,chromeos,android" file_path="services/cert_verifier/cert_net_url_loader/cert_net_fetcher_url_loader.cc" />
  <item id="certificate_verifier_url_request" added_in_milestone="80" content_hash_code="03884604" os_list="linux,windows,chromeos,android" file_path="net/cert_net/cert_net_fetcher_url_request.cc" />
  <item id="chrome_apps_socket_api" added_in_milestone="65" content_hash_code="07ca7795" os_list="linux,windows,chromeos" file_path="extensions/browser/api/socket/socket.cc" />
@@ -46,7 +45,6 @@ Refer to README.md for content description and update process.
  <item id="devtools_http_handler" added_in_milestone="66" content_hash_code="054518b9" os_list="linux,windows,chromeos,android" file_path="content/browser/devtools/devtools_http_handler.cc" />
  <item id="devtools_network_resource" added_in_milestone="62" content_hash_code="06958290" os_list="linux,windows,chromeos,android" file_path="chrome/browser/devtools/devtools_ui_bindings.cc" />
  <item id="devtools_proxy_config" added_in_milestone="85" content_hash_code="01e83c36" os_list="linux,windows,chromeos,android" file_path="content/browser/devtools/protocol/target_handler.cc" />
- <item id="dial_url_fetcher" added_in_milestone="67" content_hash_code="07bd0650" os_list="linux,windows,chromeos" file_path="chrome/browser/media/router/discovery/dial/dial_url_fetcher.cc" />
  <item id="digital_asset_links" added_in_milestone="90" content_hash_code="05caa66d" os_list="linux,windows,chromeos,android" file_path="components/content_relationship_verification/digital_asset_links_handler.cc" />
  <item id="direct_sockets" added_in_milestone="88" content_hash_code="03dc0aad" os_list="linux,windows,chromeos" file_path="content/browser/direct_sockets/direct_sockets_service_impl.cc" />
  <item id="dns_over_https" added_in_milestone="66" content_hash_code="0661730a" os_list="linux,windows,chromeos,android" file_path="net/dns/dns_http_attempt.cc" />
@@ -95,7 +93,6 @@ Refer to README.md for content description and update process.
  <item id="lib_address_input" added_in_milestone="62" content_hash_code="0374aae8" os_list="linux,windows,chromeos,android" file_path="third_party/libaddressinput/chromium/chrome_metadata_source.cc" />
  <item id="logo_service" added_in_milestone="73" content_hash_code="013550c3" os_list="linux,windows,chromeos,android" file_path="components/search_provider_logos/logo_service_impl.cc" />
  <item id="managed_configuration_loader" added_in_milestone="89" content_hash_code="060dc999" os_list="linux,windows,chromeos" file_path="chrome/browser/device_api/managed_configuration_api.cc" />
- <item id="media_router_global_media_controls_image" added_in_milestone="81" content_hash_code="02e96911" os_list="linux,windows,chromeos" file_path="chrome/browser/ui/global_media_controls/cast_media_notification_item.cc" />
  <item id="metrics_report_ukm" added_in_milestone="62" content_hash_code="0520d573" os_list="linux,windows,chromeos,android" file_path="components/metrics/net/net_metrics_log_uploader.cc" />
  <item id="metrics_report_uma" added_in_milestone="62" content_hash_code="05f568eb" os_list="linux,windows,chromeos,android" file_path="components/metrics/net/net_metrics_log_uploader.cc" />
  <item id="missing" added_in_milestone="62" reserved="1" os_list="linux,windows" file_path="" />
@@ -116,8 +113,6 @@ Refer to README.md for content description and update process.
  <item id="omnibox_zerosuggest" added_in_milestone="62" content_hash_code="071e32e9" os_list="linux,windows,chromeos,android" file_path="components/omnibox/browser/remote_suggestions_service.cc" />
  <item id="one_google_bar_service" added_in_milestone="62" content_hash_code="02c5f314" os_list="linux,windows,chromeos" file_path="chrome/browser/new_tab_page/one_google_bar/one_google_bar_loader_impl.cc" />
  <item id="open_search" added_in_milestone="62" content_hash_code="04f2de86" os_list="linux,windows,chromeos,android" file_path="components/search_engines/template_url_fetcher.cc" />
- <item id="openscreen_message" added_in_milestone="83" content_hash_code="076a1faf" os_list="linux,windows,chromeos,android" file_path="components/openscreen_platform/udp_socket.cc" />
- <item id="openscreen_tls_message" added_in_milestone="83" content_hash_code="00f4022a" os_list="linux,windows,chromeos,android" file_path="components/openscreen_platform/tls_connection_factory.cc" />
  <item id="parallel_download_job" added_in_milestone="62" content_hash_code="064736f3" os_list="linux,windows,chromeos,android" file_path="components/download/internal/common/parallel_download_job.cc" />
  <item id="password_protection_request" added_in_milestone="62" content_hash_code="06815dbe" os_list="linux,windows,chromeos,android" file_path="components/safe_browsing/core/browser/password_protection/password_protection_request.cc" />
  <item id="password_requirements_spec_fetch" added_in_milestone="69" content_hash_code="005550dc" os_list="linux,windows,chromeos,android" file_path="components/password_manager/core/browser/generation/password_requirements_spec_fetcher_impl.cc" />
@@ -204,7 +199,6 @@ Refer to README.md for content description and update process.
  <item id="rlz" added_in_milestone="98" content_hash_code="02fd92fb" os_list="android" file_path="chrome/browser/android/rlz/rlz_ping_handler.cc" />
  <item id="download_bitmap" added_in_milestone="98" content_hash_code="0632ef37" os_list="android" file_path="chrome/browser/share/bitmap_download_request.cc" />
  <item id="cached_image_fetcher" added_in_milestone="98" content_hash_code="06334a2d" os_list="android" file_path="components/image_fetcher/image_fetcher_bridge.cc" />
- <item id="chrome_cast_discovery_api" added_in_milestone="98" content_hash_code="0502b792" os_list="linux,windows,chromeos" file_path="chrome/browser/media/router/discovery/access_code/access_code_cast_discovery_interface.cc" />
  <item id="fedcm" added_in_milestone="98" content_hash_code="082197eb" os_list="linux,windows,chromeos,android" file_path="content/browser/webid/idp_network_request_manager.cc" />
  <item id="minidump_uploader_android" added_in_milestone="98" content_hash_code="0327544e" os_list="android" file_path="components/minidump_uploader/android/java/src/org/chromium/components/minidump_uploader/util/HttpURLConnectionFactoryImpl.java" />
  <item id="chrome_variations_android" added_in_milestone="98" content_hash_code="002d9b06" os_list="android" file_path="components/variations/android/java/src/org/chromium/components/variations/firstrun/VariationsSeedFetcher.java" />

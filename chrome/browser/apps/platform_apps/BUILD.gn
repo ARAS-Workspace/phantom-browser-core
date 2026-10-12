@@ -55,7 +55,6 @@ source_set("platform_apps") {
     "//chrome/browser/apps/app_service",
     "//chrome/browser/extensions",
     "//chrome/browser/lifetime:termination_notification",
-    "//chrome/browser/media/router/discovery",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
     "//chrome/browser/profiles",
     "//chrome/browser/profiles:profile",

@@ -6,7 +6,6 @@
 # and pixel_browser_tests (or pixel_interactive_ui_tests), avoid including
 # non-pixel tests here.
 
-AccessCodeCastDialogBrowserTest.*
 AccountSettingsPagePixelBrowserTest.*
 ActorUiDomNodeGeometryBrowserTest.*
 ActorUiHandoffButtonControllerPixelTest.*

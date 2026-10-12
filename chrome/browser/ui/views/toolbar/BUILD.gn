@@ -164,7 +164,6 @@ source_set("impl") {
     "//chrome/browser/external_protocol",
     "//chrome/browser/feedback",
     "//chrome/browser/lifetime",
-    "//chrome/browser/media/router:media_router_feature",
     "//chrome/browser/performance_manager/public/user_tuning",
     "//chrome/browser/prefs",
     "//chrome/browser/preloading",

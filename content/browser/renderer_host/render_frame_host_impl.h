@@ -207,11 +207,6 @@
 
 #include "third_party/blink/public/mojom/hid/hid.mojom-forward.h"
 
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-#include "media/mojo/mojom/remoting.mojom-forward.h"
-#endif
-
 namespace blink {
 class AssociatedInterfaceRegistry;
 class DocumentPolicy;
@@ -2221,11 +2216,6 @@ class CONTENT_EXPORT RenderFrameHostImpl
   void BindVideoEncoderMetricsProviderReceiver(
       mojo::PendingReceiver<media::mojom::VideoEncoderMetricsProvider>
           receiver);
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-  void BindMediaRemoterFactoryReceiver(
-      mojo::PendingReceiver<media::mojom::RemoterFactory> receiver);
-#endif
 
   void CreateAudioInputStreamFactory(
       mojo::PendingReceiver<blink::mojom::RendererAudioInputStreamFactory>

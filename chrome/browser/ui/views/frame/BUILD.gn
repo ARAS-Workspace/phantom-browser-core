@@ -32,7 +32,6 @@ if (toolkit_views) {
     ]
 
     public_deps = [
-      "//chrome/browser/media/router:media_router_feature",
       "//chrome/test:test_support",
     ]
 

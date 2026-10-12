@@ -58,28 +58,23 @@ after discussions on the right group.
       <annotation id="devtools_cdp_network_resource"/>
       <annotation id="downloads_api_run_async"/>
       <annotation id="intranet_redirect_detector"/>
-      <annotation id="dial_url_fetcher"/>
       <annotation id="browser_switcher_ieem_sitelist"/>
       <annotation id="enterprise_safe_browsing_realtime_url_lookup"/>
       <annotation id="port_forwarding_controller_socket"/>
       <annotation id="pdf_plugin_placeholder"/>
       <annotation id="render_view_context_menu"/>
-      <annotation id="media_router_global_media_controls_image"/>
       <annotation id="omnibox_navigation_observer"/>
       <annotation id="credenential_avatar"/>
       <annotation id="well_known_path_that_should_not_exist"/>
       <annotation id="devtools_free_data_source"/>
       <annotation id="download_internals_webui_source"/>
       <annotation id="downloads_dom_handler"/>
-      <annotation id="cast_socket"/>
       <annotation id="dom_distiller"/>
       <annotation id="download_manager_resume"/>
       <annotation id="parallel_download_job"/>
       <annotation id="icon_cacher"/>
       <annotation id="omnibox_suggest_deletion"/>
       <annotation id="omnibox_suggest"/>
-      <annotation id="openscreen_tls_message"/>
-      <annotation id="openscreen_message"/>
       <annotation id="password_requirements_spec_fetch"/>
       <annotation id="proxy_config_settings"/>
       <annotation id="qr_code_save"/>
@@ -333,11 +328,6 @@ after discussions on the right group.
     </sender>
     <sender name="RLZ Ping">
       <annotation id="rlz_ping"/>
-    </sender>
-  </group>
-  <group name="Media">
-    <sender name="Media Router">
-      <annotation id="chrome_cast_discovery_api"/>
     </sender>
   </group>
   <group name="Networking">

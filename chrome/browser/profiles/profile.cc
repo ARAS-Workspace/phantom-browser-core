@@ -89,7 +89,6 @@ constexpr char kPrimaryOTRProfileID[] = "profile::primary_otr";
 // proceeding if you believe a new prefix is strictly necessary.
 // See `chrome/browser/PRESUBMIT.py` which enforces this via a warning.
 constexpr char kDevToolsOTRProfileIDPrefix[] = "Devtools::BrowserContext";
-constexpr char kMediaRouterOTRProfileIDPrefix[] = "MediaRouter::Presentation";
 constexpr char kTestOTRProfileIDPrefix[] = "Test::OTR";
 
 using perfetto::protos::pbzero::ChromeTrackEvent;
@@ -101,11 +100,9 @@ Profile::OTRProfileID::OTRProfileID(const std::string& profile_id)
 
 bool Profile::OTRProfileID::AllowsBrowserWindows() const {
   // Non-Primary OTR profiles are not supposed to create Browser windows.
-  // DevTools::BrowserContext, MediaRouter::Presentation, and
-  // CaptivePortal::Signin are exceptions to this ban.
-  if (*this == PrimaryID() || IsDevTools() ||
-      base::StartsWith(profile_id_, kMediaRouterOTRProfileIDPrefix,
-                       base::CompareCase::SENSITIVE)) {
+  // DevTools::BrowserContext and CaptivePortal::Signin are exceptions to this
+  // ban.
+  if (*this == PrimaryID() || IsDevTools()) {
     return true;
   }
   return false;
@@ -134,11 +131,6 @@ Profile::OTRProfileID Profile::OTRProfileID::CreateUnique(
 // static
 Profile::OTRProfileID Profile::OTRProfileID::CreateUniqueForDevTools() {
   return CreateUnique(kDevToolsOTRProfileIDPrefix);
-}
-
-// static
-Profile::OTRProfileID Profile::OTRProfileID::CreateUniqueForMediaRouter() {
-  return CreateUnique(kMediaRouterOTRProfileIDPrefix);
 }
 
 // static

@@ -50,11 +50,6 @@
 #include "chrome/browser/extensions/api/web_authentication_proxy/web_authentication_proxy_service.h"
 #endif
 
-#if BUILDFLAG(ENABLE_SERVICE_DISCOVERY)
-#include "chrome/browser/extensions/api/mdns/mdns_api.h"
-#endif
-
-
 namespace chrome_extensions {
 
 void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
@@ -69,9 +64,6 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   extensions::HistoryAPI::GetFactoryInstance();
   extensions::IdentityAPI::GetFactoryInstance();
   extensions::IncognitoConnectability::EnsureFactoryBuilt();
-#if BUILDFLAG(ENABLE_SERVICE_DISCOVERY)
-  extensions::MDnsAPI::GetFactoryInstance();
-#endif
   extensions::OmniboxAPI::GetFactoryInstance();
   extensions::PermissionsEventRouterFactory::GetInstance();
   extensions::PreferenceAPI::GetFactoryInstance();

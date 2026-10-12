@@ -17,7 +17,6 @@
 #include "sandbox/policy/mac/cdm.sb.h"
 #include "sandbox/policy/mac/common.sb.h"
 #include "sandbox/policy/mac/gpu.sb.h"
-#include "sandbox/policy/mac/mirroring.sb.h"
 #include "sandbox/policy/mac/network.sb.h"
 #include "sandbox/policy/mac/on_device_model_execution.sb.h"
 #include "sandbox/policy/mac/print_backend.sb.h"
@@ -57,8 +56,6 @@ std::string GetSandboxProfile(sandbox::mojom::Sandbox sandbox_type) {
         return kSeatbeltPolicyString_cdm;
       case sandbox::mojom::Sandbox::kGpu:
         return kSeatbeltPolicyString_gpu;
-      case sandbox::mojom::Sandbox::kMirroring:
-        return kSeatbeltPolicyString_mirroring;
       case sandbox::mojom::Sandbox::kNetwork:
         return kSeatbeltPolicyString_network;
       case sandbox::mojom::Sandbox::kPrintBackend:

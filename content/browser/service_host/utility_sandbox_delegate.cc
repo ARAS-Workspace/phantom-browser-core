@@ -45,9 +45,6 @@ UtilitySandboxedProcessLauncherDelegate::
   bool supported_sandbox_type =
       sandbox_type_ == sandbox::mojom::Sandbox::kNoSandbox ||
 #if BUILDFLAG(IS_MAC)
-      sandbox_type_ == sandbox::mojom::Sandbox::kMirroring ||
-#endif
-#if BUILDFLAG(IS_MAC)
       sandbox_type_ == sandbox::mojom::Sandbox::kProxyResolver ||
       sandbox_type_ == sandbox::mojom::Sandbox::kWebNNModelCompilation ||
 #endif

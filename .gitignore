@@ -129,16 +129,13 @@ vs-chromium-project.txt
 /chrome/browser/resources/downloads/internal/
 /chrome/browser/resources/history/internal/
 /chrome/browser/resources/pdf/html_office
-/chrome/browser/resources/media_router/extension/src/
 /chrome/browser/resources/preinstalled_web_apps/internal/
-/chrome/browser/resources/media_router_internal/
 /chrome/browser/resources/settings/internal/
 /chrome/browser/resources/software_rendering_list
 # Asset files downloaded by gclient runhooks.
 /chrome/browser/resources/vr/assets/google_chrome/*.png
 /chrome/browser/resources/vr/assets/google_chrome/*.wav
 /chrome/browser/sharing/internal
-/chrome/browser/ui/media_router/internal
 /chrome/browser_tests_run.xml
 /chrome/chrome_run.xml
 /chrome/chrome_user32_delay_imports.xml
@@ -209,7 +206,6 @@ vs-chromium-project.txt
 /libassistant
 /libinteraction
 /llvm
-/media/cast/logging/cast_logging_proto_lib.xml
 /media/media_mojo_bindings.xml
 /media/test/data/internal
 /metro_driver

@@ -72,7 +72,6 @@ test("components_unittests") {
       "test/data/html_viewer/",
       "test/data/json_schema/",
       "test/data/language/",
-      "test/data/media_router/",
       "test/data/ntp/",
       "test/data/offline_pages/",
       "test/data/omnibox/",
@@ -192,7 +191,6 @@ test("components_unittests") {
     "//components/omnibox/browser:unit_tests",
     "//components/omnibox/common:unit_tests",
     "//components/open_from_clipboard:unit_tests",
-    "//components/openscreen_platform:unittests",
     "//components/optimization_guide/core:unit_tests",
     "//components/origin_gating/core:unit_tests",
     "//components/os_crypt/async/browser:unit_tests",
@@ -372,7 +370,6 @@ test("components_unittests") {
       "//components/link_header_util:unit_tests",
       "//components/media_device_salt:unit_tests",
       "//components/media_effects:unit_tests",
-      "//components/mirroring:mirroring_tests",
       "//components/navigation_interception:unit_tests",
       "//components/no_state_prefetch/browser:unit_tests",
       "//components/no_state_prefetch/common:unit_tests",
@@ -451,9 +448,6 @@ test("components_unittests") {
     "//components/browser_apis:unit_tests",
     "//components/content_settings/browser/ui:unit_tests",
     "//components/headless/test:unit_tests",
-    "//components/media_router/browser:unit_tests",
-    "//components/media_router/common:unit_tests",
-    "//components/media_router/common/providers/cast/channel:unit_tests",
     "//components/one_time_tokens/core/browser:unit_tests",
     "//components/page_info:unit_tests",
     "//components/privacy_sandbox/privacy_sandbox_attestations:unit_tests",
@@ -493,7 +487,6 @@ test("components_unittests") {
   ]
 
   deps += [
-    "//components/access_code_cast/common:unit_tests",
     "//components/headless/console_message_logger:unit_tests",
     "//components/headless/screen_info:unit_tests",
     "//components/storage_monitor:unit_tests",

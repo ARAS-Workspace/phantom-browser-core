@@ -113,7 +113,6 @@ source_set("browser_actions_impl") {
     "//chrome/app/vector_icons",
     "//chrome/browser/browsing_data",
     "//chrome/browser/devtools",
-    "//chrome/browser/media/router:media_router_feature",
     "//chrome/browser/multistep_filter/ui",
     "//chrome/browser/prefs",
     "//chrome/browser/resources/omnibox_popup:resources_grit",
@@ -141,7 +140,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/side_panel:side_panel_views_dependent",
     "//chrome/browser/ui/tabs/organizer",
     "//chrome/browser/ui/tabs/saved_tab_groups",
-    "//chrome/browser/ui/toolbar/cast",
     "//chrome/browser/ui/user_education",
     "//chrome/browser/ui/views/bookmarks",
     "//chrome/browser/ui/views/download",
@@ -149,7 +147,6 @@ source_set("browser_actions_impl") {
     "//chrome/browser/ui/views/frame:app_menu_button_observer",
     "//chrome/browser/ui/views/frame:toolbar_button_provider",
     "//chrome/browser/ui/views/location_bar/cookie_controls",
-    "//chrome/browser/ui/views/media_router",
     "//chrome/browser/ui/views/page_info",
     "//chrome/browser/ui/views/send_tab_to_self",
     "//chrome/browser/ui/views/side_panel",
@@ -579,7 +576,6 @@ static_library("ui") {
     "//chrome/browser/lifetime:impl",
     "//chrome/browser/login_detection",
     "//chrome/browser/lookalikes",
-    "//chrome/browser/media/router:media_router_feature",
     "//chrome/browser/metrics",
     "//chrome/browser/metrics:impl",
     "//chrome/browser/new_tab_page/chrome_colors:selected_colors_info",
@@ -888,7 +884,6 @@ static_library("ui") {
     # TODO(crbug.com/353332589): Remove this circular dependency whent the
     # following headers get modularized:
     # - c/b/ui/browser.h
-    # - c/b/ui/views/media_rounter/media_remoting_dialog_view.h
     "//chrome/browser/media:impl",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when the
@@ -1212,8 +1207,6 @@ static_library("ui") {
     "//chrome/browser/ui/web_applications",
     "//chrome/browser/ui/web_applications:impl",
     "//chrome/browser/ui/web_applications:launch_utils",
-    "//chrome/browser/ui/webui/access_code_cast",
-    "//chrome/browser/ui/webui/access_code_cast:impl",
     "//chrome/browser/ui/webui/bookmarks",
     "//chrome/browser/ui/webui/data_sharing:impl",
     "//chrome/browser/ui/webui/new_tab_page_third_party",
@@ -1239,8 +1232,6 @@ static_library("ui") {
     "//chrome/browser/download:impl",
     "//chrome/browser/hid",
     "//chrome/browser/hid:impl",
-    "//chrome/browser/media/router",
-    "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
     "//chrome/browser/metrics/desktop_session_duration",
     "//chrome/browser/reading_list",
     "//chrome/browser/regional_capabilities",
@@ -1263,8 +1254,6 @@ static_library("ui") {
     "//chrome/browser/ui/global_error",
     "//chrome/browser/ui/global_media_controls",
     "//chrome/browser/ui/global_media_controls:impl",
-    "//chrome/browser/ui/media_router",
-    "//chrome/browser/ui/media_router:impl",
     "//chrome/browser/ui/permission_bubble",
     "//chrome/browser/ui/signin",
     "//chrome/browser/ui/signin:impl",
@@ -1283,8 +1272,6 @@ static_library("ui") {
     "//chrome/browser/ui/tabs/tab_strip_api",
     "//chrome/browser/ui/toasts",
     "//chrome/browser/ui/toasts:impl",
-    "//chrome/browser/ui/toolbar/cast",
-    "//chrome/browser/ui/toolbar/cast:impl",
     "//chrome/browser/ui/toolbar/pinned_toolbar",
     "//chrome/browser/ui/toolbar/pinned_toolbar:impl",
     "//chrome/browser/ui/user_education",
@@ -1365,7 +1352,6 @@ static_library("ui") {
     "//chrome/browser/ui/webui/data_sharing",
     "//chrome/browser/ui/webui/feedback",
     "//chrome/browser/ui/webui/feedback:impl",
-    "//chrome/browser/ui/webui/media_router",
     "//chrome/browser/ui/webui/multistep_filter_internals",
     "//chrome/browser/ui/webui/on_device_internals",
     "//chrome/browser/ui/webui/search_engine_choice",
@@ -1467,12 +1453,10 @@ static_library("ui") {
     "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
     "//chrome/browser/ui/webui/whats_new:impl",
 
-    "//chrome/browser/ui/media_router:impl",
     "//chrome/browser/ui/window_sizer:impl",
     "//chrome/browser/ui/webui/settings:impl",
     "//chrome/browser/ui/search_engine_choice:impl",
     "//chrome/browser/ui/global_media_controls:impl",
-    "//chrome/browser/ui/toolbar/cast:impl",
     "//chrome/browser/ui/tabs:impl",
     "//chrome/browser/ui/tabs:tab_group_impl",
     "//chrome/browser/ui/tabs:tab_model_impl",
@@ -1483,10 +1467,6 @@ static_library("ui") {
     # TODO(crbug.com/353332589): Remove this circular dependency when
     # c/b/ui/browser.h gets componentized.
     "//chrome/browser/visited_url_ranking:impl",
-
-    # TODO(crbug.com/364667551): It includes quite a few files from //c/b/ui's
-    # subdirectories such as views and webui which are not modularized yet.
-    "//chrome/browser/ui/webui/access_code_cast:impl",
 
     # TODO(crbug.com/364667551): It includes //c/b/ui/browser.h and
     # //c/b/ui/browser_window.h.
@@ -2320,8 +2300,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/location_bar:impl",
       "//chrome/browser/ui/views/location_bar/cookie_controls",
       "//chrome/browser/ui/views/location_bar/cookie_controls:impl",
-      "//chrome/browser/ui/views/media_router",
-      "//chrome/browser/ui/views/media_router:impl",
       "//chrome/browser/ui/views/omnibox",
       "//chrome/browser/ui/views/omnibox:impl",
       "//chrome/browser/ui/views/overlay",
@@ -2448,13 +2426,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/exclusive_access:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when the
-      # following headers get componentized:
-      # c/b/ui/tab_dialogs.h
-      # c/b/ui/views/frame/browser_view.h
-      # c/b/ui/views/frame/top_container_view.h
-      "//chrome/browser/ui/views/media_router:impl",
-
-      # TODO(crbug.com/353332589): Remove this circular dependency when the
       # following header gets componentized:
       # c/b/ui/views/extensions/extension_keybinding_registry_views.h
       "//chrome/browser/ui/views/apps:impl",
@@ -2531,7 +2502,6 @@ static_library("ui") {
       # following headers get componentized:
       # c/b/ui/browser.h, singleton_tabs.h
       # c/b/ui/views/frame/browser_view.h
-      # c/b/ui/views/media_router/cast_dialog_helper.h
       "//chrome/browser/ui/views/global_media_controls:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when the
@@ -3227,7 +3197,6 @@ static_library("test_support") {
     "//components/embedder_support",
     "//components/input",
     "//components/media_message_center",
-    "//components/media_router/browser",
     "//components/signin/core/browser",
     "//components/signin/public/identity_manager",
     "//components/ukm:test_support",

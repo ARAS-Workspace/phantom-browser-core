@@ -36,7 +36,6 @@
 #include "components/embedder_support/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/live_caption/pref_names.h"
-#include "components/media_router/common/pref_names.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
@@ -460,10 +459,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[::prefs::kUserFeedbackAllowed] =
       settings_api::PrefType::kBoolean;
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
-  // Media Remoting settings.
-  (*s_allowlist)[media_router::prefs::kMediaRouterMediaRemotingEnabled] =
-      settings_api::PrefType::kBoolean;
 
   // Performance settings.
   (*s_allowlist)

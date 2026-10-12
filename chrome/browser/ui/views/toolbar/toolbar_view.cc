@@ -23,7 +23,6 @@
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/command_updater.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/performance_manager/public/user_tuning/user_tuning_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profiles_state.h"
@@ -60,7 +59,6 @@
 #include "chrome/browser/ui/views/frame/custom_corners_background.h"
 #include "chrome/browser/ui/views/frame/top_container_view.h"
 #include "chrome/browser/ui/views/global_media_controls/media_toolbar_button.h"
-#include "chrome/browser/ui/views/global_media_controls/media_toolbar_button_contextual_menu.h"
 #include "chrome/browser/ui/views/global_media_controls/media_toolbar_button_view.h"
 #include "chrome/browser/ui/views/location_bar/webui_location_bar.h"
 #include "chrome/browser/ui/views/page_action/page_action_container_view.h"
@@ -363,9 +361,7 @@ void ToolbarView::Init() {
   std::unique_ptr<MediaToolbarButtonView> media_button;
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (!features::IsWebUIMediaButtonEnabled()) {
-    media_button = std::make_unique<MediaToolbarButtonView>(
-        browser_view_, std::make_unique<MediaToolbarButtonContextualMenu>(
-                           browser_->GetProfile()));
+    media_button = std::make_unique<MediaToolbarButtonView>(browser_view_);
   }
 #endif
 

@@ -249,7 +249,6 @@
 #include "ipc/constants.mojom.h"
 #include "media/base/media_switches.h"
 #include "media/media_buildflags.h"
-#include "media/mojo/mojom/remoting.mojom.h"
 #include "media/mojo/services/media_metrics_provider.h"
 #include "media/mojo/services/video_decode_perf_history.h"
 #include "mojo/public/cpp/bindings/message.h"
@@ -544,34 +543,6 @@ void GrantFileAccess(ChildProcessId child_id,
     }
   }
 }
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-// RemoterFactory that delegates Create() calls to the ContentBrowserClient.
-//
-// Since Create() could be called at any time, perhaps by a stray task being run
-// after a RenderFrameHost has been destroyed, the RemoterFactoryImpl uses the
-// process/routing IDs as a weak reference to the RenderFrameHostImpl.
-class RemoterFactoryImpl final : public media::mojom::RemoterFactory {
- public:
-  RemoterFactoryImpl(int process_id, int routing_id)
-      : process_id_(process_id), routing_id_(routing_id) {}
-
-  RemoterFactoryImpl(const RemoterFactoryImpl&) = delete;
-  RemoterFactoryImpl& operator=(const RemoterFactoryImpl&) = delete;
-
- private:
-  void Create(mojo::PendingRemote<media::mojom::RemotingSource> source,
-              mojo::PendingReceiver<media::mojom::Remoter> receiver) final {
-    if (auto* host = RenderFrameHostImpl::FromID(process_id_, routing_id_)) {
-      GetContentClient()->browser()->CreateMediaRemoter(host, std::move(source),
-                                                        std::move(receiver));
-    }
-  }
-
-  const int process_id_;
-  const int routing_id_;
-};
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING)
 
 RenderFrameHostOrProxy LookupRenderFrameHostOrProxy(int process_id,
                                                     int routing_id) {
@@ -14918,15 +14889,6 @@ void RenderFrameHostImpl::BindVideoEncoderMetricsProviderReceiver(
   media::MojoVideoEncoderMetricsProviderService::Create(GetPageUkmSourceId(),
                                                         std::move(receiver));
 }
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-void RenderFrameHostImpl::BindMediaRemoterFactoryReceiver(
-    mojo::PendingReceiver<media::mojom::RemoterFactory> receiver) {
-  mojo::MakeSelfOwnedReceiver(std::make_unique<RemoterFactoryImpl>(
-                                  GetProcess()->GetDeprecatedID(), routing_id_),
-                              std::move(receiver));
-}
-#endif
 
 void RenderFrameHostImpl::CreateWebSocketConnector(
     mojo::PendingReceiver<blink::mojom::WebSocketConnector> receiver) {

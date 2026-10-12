@@ -42,7 +42,6 @@
 
 #include "chrome/common/importer/profile_import.mojom.h"
 #include "chrome/utility/importer/profile_import_impl.h"
-#include "components/mirroring/service/mirroring_service.h"
 #include "services/proxy_resolver/proxy_resolver_factory_impl.h"  // nogncheck
 #include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
 #include "services/screen_ai/public/mojom/screen_ai_factory.mojom.h"  // nogncheck
@@ -151,12 +150,6 @@ auto RunProfileImporter(
   return std::make_unique<ProfileImportImpl>(std::move(receiver));
 }
 
-auto RunMirroringService(
-    mojo::PendingReceiver<mirroring::mojom::MirroringService> receiver) {
-  return std::make_unique<mirroring::MirroringService>(
-      std::move(receiver), content::UtilityThread::Get()->GetIOTaskRunner());
-}
-
 auto RunPassageEmbeddingsService(
     mojo::PendingReceiver<passage_embeddings::mojom::PassageEmbeddingsService>
         receiver) {
@@ -246,7 +239,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunPassageEmbeddingsService);
 
   services.Add(RunProfileImporter);
-  services.Add(RunMirroringService);
   services.Add(RunScreenAIServiceFactory);
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

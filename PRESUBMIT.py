@@ -797,7 +797,6 @@ _BANNED_CPP_FUNCTIONS: Sequence[BanRule] = (
             '^net/tools/cert_verify_tool/',
             '^services/cert_verifier/',
             '^components/certificate_transparency/',
-            '^components/media_router/common/providers/cast/certificate/',
             '^components/trusted_vault/',
             # gRPC provides some C++ libraries that use std::shared_ptr<>.
             '^chromeos/ash/services/libassistant/grpc/',
@@ -1096,8 +1095,6 @@ _BANNED_CPP_FUNCTIONS: Sequence[BanRule] = (
         [
             # Not an error in third_party folders:
             _THIRD_PARTY_EXCEPT_BLINK,
-            # This uses openscreen API depending on std::chrono.
-            'components/openscreen_platform/task_runner.cc',
         ]),
     BanRule(
         r'/#include <exception>',
@@ -1175,7 +1172,6 @@ _BANNED_CPP_FUNCTIONS: Sequence[BanRule] = (
             r'components/omnibox/browser/autocomplete_result\.cc',
             r'device/fido/win/webauthn_api\.cc',
             r'media/audio/alsa/alsa_util\.cc',
-            r'media/remoting/stream_provider\.h',
             r'sql/vfs_wrapper\.cc',
             # TODO(https://crbug.com/1364585): Remove usage and exception list
             # entries.

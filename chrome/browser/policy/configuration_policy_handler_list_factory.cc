@@ -133,7 +133,6 @@
 #include "chrome/browser/download/default_download_dir_policy_handler.h"
 #include "chrome/browser/download/download_auto_open_policy_handler.h"
 #include "chrome/browser/download/download_dir_policy_handler.h"
-#include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
 #include "chrome/browser/policy/battery_saver_policy_handler.h"
 #include "chrome/browser/policy/developer_tools_availability_list_policy_handler.h"
 #include "chrome/browser/policy/local_sync_policy_handler.h"
@@ -141,7 +140,6 @@
 #include "chrome/browser/web_applications/policy/web_app_settings_policy_handler.h"
 #include "chrome/browser/web_applications/policy/web_app_user_install_policy_handler.h"
 #include "components/headless/policy/headless_mode_policy_handler.h"
-#include "components/media_router/common/pref_names.h"
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/search_engines/enterprise/search_aggregator_policy_handler.h"
 #include "components/search_engines/enterprise/site_search_policy_handler.h"
@@ -422,12 +420,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kAbusiveExperienceInterventionEnforce,
     blocked_content::prefs::kAbusiveExperienceInterventionEnforce,
     base::Value::Type::BOOLEAN },
-  { key::kAccessCodeCastDeviceDuration,
-    media_router::prefs::kAccessCodeCastDeviceDuration,
-    base::Value::Type::INTEGER },
-  { key::kAccessCodeCastEnabled,
-    media_router::prefs::kAccessCodeCastEnabled,
-    base::Value::Type::BOOLEAN },
   { key::kAccessibilityImageLabelsEnabled,
     prefs::kAccessibilityImageLabelsEnabled,
     base::Value::Type::BOOLEAN },
@@ -606,9 +598,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kLocalFontsBlockedForUrls,
     prefs::kManagedLocalFontsBlockedForUrls,
     base::Value::Type::LIST },
-  { key::kMediaRouterCastAllowAllIPs,
-    media_router::prefs::kMediaRouterCastAllowAllIPs,
-    base::Value::Type::BOOLEAN },
   { key::kNTPCardsVisible,
     prefs::kNtpModulesVisible,
     base::Value::Type::BOOLEAN },
@@ -689,12 +678,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     base::Value::Type::LIST },
   { key::kSharedArrayBufferUnrestrictedAccessAllowed,
     prefs::kSharedArrayBufferUnrestrictedAccessAllowed,
-    base::Value::Type::BOOLEAN },
-  { key::kShowCastIconInToolbar,
-    prefs::kShowCastIconInToolbar,
-    base::Value::Type::BOOLEAN },
-  { key::kShowCastSessionsStartedByOtherDevices,
-    media_router::prefs::kMediaRouterShowCastSessionsStartedByOtherDevices,
     base::Value::Type::BOOLEAN },
   { key::kSignedHTTPExchangeEnabled,
     prefs::kSignedHTTPExchangeEnabled,
@@ -887,9 +870,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kAllowedDomainsForApps,
     prefs::kAllowedDomainsForApps,
     base::Value::Type::STRING },
-  { key::kEnableMediaRouter,
-    prefs::kEnableMediaRouter,
-    base::Value::Type::BOOLEAN },
   { key::kWebRtcEventLogCollectionAllowed,
     prefs::kWebRtcEventLogCollectionAllowed,
     base::Value::Type::BOOLEAN },

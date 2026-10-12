@@ -19,11 +19,6 @@
 #include "ui/views/controls/button/menu_button.h"
 #include "ui/views/metadata/view_factory.h"
 
-namespace media_router {
-FORWARD_DECLARE_TEST(CastDialogSinkButtonTest, SetTitleLabel);
-FORWARD_DECLARE_TEST(CastDialogSinkButtonTest, SetStatusLabel);
-}  // namespace media_router
-
 namespace webid {
 class AccountSelectionViewTestBase;
 }
@@ -164,10 +159,6 @@ class HoverButton : public views::LabelButton {
   views::View* secondary_view() const { return secondary_view_; }
 
  private:
-  FRIEND_TEST_ALL_PREFIXES(media_router::CastDialogSinkButtonTest,
-                           SetTitleLabel);
-  FRIEND_TEST_ALL_PREFIXES(media_router::CastDialogSinkButtonTest,
-                           SetStatusLabel);
   friend class webid::AccountSelectionViewTestBase;
   friend class HoverButtonTest;
   friend class PageInfoBubbleViewBrowserTest;

@@ -675,7 +675,6 @@ ChromePermissionMessageRule::GetAllRules() {
       {IDS_EXTENSION_PROMPT_WARNING_MANAGEMENT,
        {APIPermissionID::kManagement},
        {}},
-      {IDS_EXTENSION_PROMPT_WARNING_MDNS, {APIPermissionID::kMDns}, {}},
       {IDS_EXTENSION_PROMPT_WARNING_NATIVE_MESSAGING,
        {APIPermissionID::kNativeMessaging},
        {}},

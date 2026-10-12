@@ -129,9 +129,6 @@ enum Sandbox {
   // Text-to-speech.
   [EnableIf=is_chromeos] kTts,
 
-  // Like kUtility but allows access to IOSurface on macOS.
-  [EnableIf=is_mac] kMirroring,
-
   // Used to prime zygotes before they specialize. The process will receive a
   // new sandbox later in its lifetime.
   [EnableIf=is_chromeos|is_linux] kZygoteIntermediateSandbox,

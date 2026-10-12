@@ -1772,13 +1772,6 @@ inline constexpr char kDiskCacheDir[] = "browser.disk_cache_dir";
 // Pref name for the policy specifying the maximal cache size.
 inline constexpr char kDiskCacheSize[] = "browser.disk_cache_size";
 
-// Pref name for the policy controlling whether to enable Media Router.
-inline constexpr char kEnableMediaRouter[] = "media_router.enable_media_router";
-// Pref name for the policy controlling whether to force the Cast icon to be
-// shown in the toolbar/overflow menu.
-inline constexpr char kShowCastIconInToolbar[] =
-    "media_router.show_cast_icon_in_toolbar";
-
 // Pref name for the policy controlling the way in which users are notified of
 // the need to relaunch the browser for a pending update.
 inline constexpr char kRelaunchNotification[] = "browser.relaunch_notification";

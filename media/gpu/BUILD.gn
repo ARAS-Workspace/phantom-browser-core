@@ -39,7 +39,6 @@ component("gpu") {
     ":*",
     "//chrome/gpu",
     "//components/chromeos_camera/*",
-    "//components/mirroring/service:mirroring_service",
     "//components/viz/service/main",
     "//content/gpu:*",
     "//content/renderer:*",

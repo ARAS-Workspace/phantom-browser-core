@@ -1503,15 +1503,6 @@
       "--isolated-script-test-filter=*::-*_unoptimized::*_unaligned::*unoptimized_aligned",
     ],
   },
-  "media_router_e2e_tests": {
-    "label": "//chrome/test/media_router:media_router_e2e_tests",
-    "type": "script",
-    "script": "//chrome/test/media_router/internal/media_router_tests.py",
-    "args": [
-      "--test_binary",
-      "./interactive_ui_tests",
-    ],
-  },
   "media_unittests": {
     "label": "//media:media_unittests",
     "type": "windowed_test_launcher",

@@ -15,10 +15,7 @@
 #include "chrome/browser/ui/global_media_controls/media_toolbar_button_observer.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/global_media_controls/media_dialog_view.h"
-#include "chrome/browser/ui/views/global_media_controls/media_toolbar_button_contextual_menu.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/feature_engagement/public/feature_constants.h"
-#include "components/user_education/common/feature_promo/feature_promo_controller.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/ui_base_features.h"
@@ -26,18 +23,15 @@
 #include "ui/views/controls/button/button_controller.h"
 #include "ui/views/view_class_properties.h"
 
-MediaToolbarButtonView::MediaToolbarButtonView(
-    BrowserView* browser_view,
-    std::unique_ptr<MediaToolbarButtonContextualMenu> context_menu)
+MediaToolbarButtonView::MediaToolbarButtonView(BrowserView* browser_view)
     : ToolbarButton(base::BindRepeating(&MediaToolbarButtonView::ButtonPressed,
                                         base::Unretained(this)),
-                    context_menu ? context_menu->CreateMenuModel() : nullptr,
+                    /*model=*/nullptr,
                     /** tab_strip_model*/ nullptr,
                     /** trigger_menu_on_long_press */ false),
       browser_(browser_view->browser()),
       service_(MediaNotificationServiceFactory::GetForProfile(
-          browser_view->browser()->GetProfile())),
-      context_menu_(std::move(context_menu)) {
+          browser_view->browser()->GetProfile())) {
   button_controller()->set_notify_action(
       views::ButtonController::NotifyAction::kOnPress);
   SetFlipCanvasOnPaintForRTLUI(false);
@@ -100,23 +94,7 @@ void MediaToolbarButtonView::Enable() {
 void MediaToolbarButtonView::Disable() {
   SetEnabled(false);
 
-  ClosePromoBubble(/*engaged=*/false);
-
   observers_.Notify(&MediaToolbarButtonObserver::OnMediaButtonDisabled);
-}
-
-void MediaToolbarButtonView::MaybeShowLocalMediaCastingPromo() {
-  if (service_->should_show_cast_local_media_iph()) {
-    BrowserUserEducationInterface::From(browser_)->MaybeShowFeaturePromo(
-        feature_engagement::kIPHGMCLocalMediaCastingFeature);
-  }
-}
-
-void MediaToolbarButtonView::MaybeShowStopCastingPromo() {
-  if (service_->HasLocalCastNotifications()) {
-    BrowserUserEducationInterface::From(browser_)->MaybeShowFeaturePromo(
-        feature_engagement::kIPHGMCCastStartStopFeature);
-  }
 }
 
 void MediaToolbarButtonView::ButtonPressed() {
@@ -125,22 +103,7 @@ void MediaToolbarButtonView::ButtonPressed() {
   } else {
     MediaDialogView::ShowDialogFromToolbar(GetBubbleAnchor(), service_,
                                            browser_->GetProfile());
-    ClosePromoBubble(/*engaged=*/true);
     observers_.Notify(&MediaToolbarButtonObserver::OnMediaDialogOpened);
-  }
-}
-
-void MediaToolbarButtonView::ClosePromoBubble(bool engaged) {
-  if (auto* const user_education =
-          BrowserUserEducationInterface::From(browser_)) {
-    if (engaged) {
-      user_education->NotifyFeaturePromoFeatureUsed(
-          feature_engagement::kIPHGMCCastStartStopFeature,
-          FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
-    } else {
-      user_education->AbortFeaturePromo(
-          feature_engagement::kIPHGMCCastStartStopFeature);
-    }
   }
 }
 

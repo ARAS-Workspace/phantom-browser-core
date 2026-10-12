@@ -56,7 +56,6 @@ include_rules = [
   "+components/leveldb_proto/public",
   "+components/manta",
   "+components/memory_system",
-  "+components/media_router/browser",
   "+components/messages",
   "+components/metrics",
   "+components/network_session_configurator/common",

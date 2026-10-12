@@ -7,18 +7,14 @@
 #include "chrome/browser/ui/views/accessibility/dump_accessibility_events_views_browsertest_base.h"
 #include "chrome/browser/ui/views/global_media_controls/media_item_ui_device_selector_view.h"
 #include "components/global_media_controls/public/constants.h"
-#include "components/global_media_controls/public/test/mock_device_service.h"
 #include "components/media_message_center/notification_theme.h"
 #include "content/public/test/browser_test.h"
-#include "mojo/public/cpp/bindings/remote.h"
 #include "ui/accessibility/ax_enums.mojom.h"
 #include "ui/accessibility/platform/inspect/ax_inspect.h"
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/layout/fill_layout.h"
 #include "ui/views/view.h"
 #include "ui/views/widget/widget.h"
-
-using global_media_controls::test::MockDeviceListHost;
 
 namespace {
 
@@ -45,7 +41,6 @@ class StubMediaItemUIDeviceSelectorDelegate
       base::RepeatingCallback<void(bool)> callback) override {
     return {};
   }
-  void OnMediaRemotingRequested(const std::string& item_id) override {}
 };
 
 }  // namespace
@@ -70,11 +65,8 @@ class MediaItemUIDeviceSelectorViewDumpAccessibilityEventsTest
     auto container = std::make_unique<View>();
     container->SetLayoutManager(std::make_unique<FillLayout>());
 
-    device_list_host_ = std::make_unique<MockDeviceListHost>();
-
     auto device_selector_view = std::make_unique<MediaItemUIDeviceSelectorView>(
-        kItemId, &delegate_, device_list_host_->PassRemote(),
-        client_remote_.BindNewPipeAndPassReceiver(),
+        kItemId, &delegate_,
         /*has_audio_output=*/false,
         global_media_controls::GlobalMediaControlsEntryPoint::kToolbarIcon,
         media_message_center::MediaColorTheme(),
@@ -91,16 +83,12 @@ class MediaItemUIDeviceSelectorViewDumpAccessibilityEventsTest
 
   void TearDownOnMainThread() override {
     device_selector_view_ = nullptr;
-    device_list_host_.reset();
-    client_remote_.reset();
     DumpAccessibilityEventsViewsTestBase::TearDownOnMainThread();
   }
 
  protected:
   raw_ptr<MediaItemUIDeviceSelectorView> device_selector_view_ = nullptr;
   StubMediaItemUIDeviceSelectorDelegate delegate_;
-  mojo::Remote<global_media_controls::mojom::DeviceListClient> client_remote_;
-  std::unique_ptr<MockDeviceListHost> device_list_host_;
 };
 
 IN_PROC_BROWSER_TEST_P(MediaItemUIDeviceSelectorViewDumpAccessibilityEventsTest,

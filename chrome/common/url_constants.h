@@ -23,18 +23,9 @@
 
 namespace chrome {
 
-// "Learn more" URL linked in the dialog to cast using a code.
-inline constexpr char kAccessCodeCastLearnMoreURL[] =
-    "https://support.google.com/chrome/a/?p=cast_to_class_teacher";
-
 // "Chrome Settings" URL for the appearance page.
 inline constexpr char kBrowserSettingsSearchEngineURL[] =
     "chrome://settings/search";
-
-// The URL for the help center article to show when no Cast destination has been
-// found.
-inline constexpr char kCastNoDestinationFoundURL[] =
-    "https://support.google.com/chromecast/?p=no_cast_destination";
 
 // The chrome-native: scheme is used show pages rendered with platform specific
 // widgets instead of using HTML.

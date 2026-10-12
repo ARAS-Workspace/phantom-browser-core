@@ -357,6 +357,7 @@ TEST_F(BrowserCommandControllerFullscreenTest,
   chrome::BrowserCommandController::From(browser())->FullscreenStateChanged();
   EXPECT_TRUE(chrome::IsCommandEnabled(browser(), IDC_OPTIONS));
   EXPECT_FALSE(chrome::IsCommandEnabled(browser(), IDC_IMPORT_SETTINGS));
+  testprofile->SetGuestSession(false);
 }
 
 // Ensure that the logic for enabling IDC_OPTIONS is consistent, regardless of
@@ -386,6 +387,7 @@ TEST_F(BrowserWithTestWindowTest, OptionsConsistency) {
       browser()->GetProfile()->GetPrefs(),
       policy::IncognitoModeAvailability::kForced);
   EXPECT_TRUE(chrome::IsCommandEnabled(browser(), IDC_OPTIONS));
+  profile->SetGuestSession(false);
 }
 
 TEST_F(BrowserCommandControllerTest,

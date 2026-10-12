@@ -296,15 +296,6 @@ target(link_target_type, "renderer") {
     deps += [ "//components/services/font/public/cpp" ]
   }
 
-  # TODO(crbug.com/1293520): Remove this dependency on cast devices.
-  if (enable_media_remoting) {
-    deps += [ "//media/mojo/mojom:remoting" ]
-
-    if (enable_media_remoting) {
-      deps += [ "//media/remoting:remoting_sender" ]
-    }
-  }
-
   if (is_linux) {
     deps += [ "//sandbox:sandbox_buildflags" ]
   }

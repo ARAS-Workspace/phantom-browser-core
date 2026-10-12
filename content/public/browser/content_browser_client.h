@@ -56,7 +56,6 @@
 #include "device/vr/buildflags/buildflags.h"
 #include "media/base/picture_in_picture_events_info.h"
 #include "media/mojo/mojom/media_service.mojom-forward.h"
-#include "media/mojo/mojom/remoting.mojom-forward.h"
 #include "media/mojo/mojom/speech_recognizer.mojom-forward.h"
 #include "mojo/public/cpp/bindings/generic_pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
@@ -1598,15 +1597,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       int child_process_id,
       content::PosixFileDescriptorInfo* mappings) {}
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-
-  // Binds a new media remoter service to |receiver|, if supported by the
-  // embedder, for the |source| that lives in the render frame represented
-  // by |render_frame_host|. This may be called multiple times if there is more
-  // than one source candidate in the same render frame.
-  virtual void CreateMediaRemoter(
-      RenderFrameHost* render_frame_host,
-      mojo::PendingRemote<media::mojom::RemotingSource> source,
-      mojo::PendingReceiver<media::mojom::Remoter> receiver) {}
 
   // Allows the embedder to register one or more URLLoaderThrottles for a
   // browser-initiated request. These include navigation requests and requests

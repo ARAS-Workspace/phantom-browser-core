@@ -381,7 +381,6 @@ void AddChromeColorMixer(ui::ColorProvider* provider,
       kColorBookmarkDragImageForeground};
   mixer[kColorCaptionButtonBackground] = {SK_ColorTRANSPARENT};
   mixer[kColorCapturedTabContentsBorder] = {ui::kColorAccent};
-  mixer[kColorCastDialogHelpIcon] = {ui::kColorAccent};
   mixer[kColorDesktopMediaTabListBorder] = {ui::kColorMidground};
   mixer[kColorDesktopMediaTabListPreviewBackground] = {ui::kColorMidground};
   mixer[kColorDownloadItemIconDangerous] = {ui::kColorAlertHighSeverity};
@@ -513,10 +512,6 @@ void AddChromeColorMixer(ui::ColorProvider* provider,
   // Override Omnibox background color tokens per GM3 spec when appropriate.
   ApplyGM3OmniboxBackgroundColor(mixer, key);
 
-  mixer[kColorMediaRouterIconActive] =
-      PickGoogleColor(ui::kColorAccent, kColorToolbar,
-                      color_utils::kMinimumVisibleContrastRatio);
-  mixer[kColorMediaRouterIconWarning] = {ui::kColorAlertMediumSeverityIcon};
   mixer[kColorMultiContentsViewActiveContentOutline] =
       ui::SelectBasedOnDarkInput(kColorTabBackgroundInactiveFrameActive,
                                  gfx::kGoogleGrey500, gfx::kGoogleGrey600);

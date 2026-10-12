@@ -5,26 +5,24 @@
 #ifndef CHROME_BROWSER_UI_VIEWS_GLOBAL_MEDIA_CONTROLS_MEDIA_ITEM_UI_DEVICE_SELECTOR_VIEW_H_
 #define CHROME_BROWSER_UI_VIEWS_GLOBAL_MEDIA_CONTROLS_MEDIA_ITEM_UI_DEVICE_SELECTOR_VIEW_H_
 
+#include <map>
+#include <string>
+
 #include "base/callback_list.h"
 #include "base/gtest_prod_util.h"
 #include "base/memory/raw_ptr.h"
-#include "chrome/browser/ui/media_router/cast_dialog_controller.h"
+#include "base/memory/weak_ptr.h"
 #include "chrome/browser/ui/views/global_media_controls/media_notification_device_entry_ui.h"
 #include "chrome/browser/ui/views/location_bar/icon_label_bubble_view.h"
 #include "components/global_media_controls/public/constants.h"
-#include "components/global_media_controls/public/mojom/device_service.mojom.h"
 #include "components/global_media_controls/public/views/media_item_ui_device_selector.h"
 #include "components/media_message_center/notification_theme.h"
 #include "media/audio/audio_device_description.h"
-#include "mojo/public/cpp/bindings/receiver.h"
-#include "mojo/public/cpp/bindings/remote.h"
 #include "ui/base/metadata/metadata_header_macros.h"
 
 namespace {
 inline constexpr char kAudioDevicesCountHistogramName[] =
     "Media.GlobalMediaControls.NumberOfAvailableAudioDevices";
-inline constexpr char kCastDeviceCountHistogramName[] =
-    "Media.GlobalMediaControls.CastDeviceCount";
 inline constexpr char kDeviceSelectorAvailableHistogramName[] =
     "Media.GlobalMediaControls.DeviceSelectorAvailable";
 inline constexpr char kDeviceSelectorOpenedHistogramName[] =
@@ -40,18 +38,13 @@ class MediaItemUIDeviceSelectorDelegate;
 // A device selector view for Chrome OS only.
 class MediaItemUIDeviceSelectorView
     : public global_media_controls::MediaItemUIDeviceSelector,
-      public IconLabelBubbleView::Delegate,
-      public global_media_controls::mojom::DeviceListClient {
+      public IconLabelBubbleView::Delegate {
   METADATA_HEADER(MediaItemUIDeviceSelectorView,
                   global_media_controls::MediaItemUIDeviceSelector)
  public:
   MediaItemUIDeviceSelectorView(
       const std::string& item_id,
       MediaItemUIDeviceSelectorDelegate* delegate,
-      mojo::PendingRemote<global_media_controls::mojom::DeviceListHost>
-          device_list_host,
-      mojo::PendingReceiver<global_media_controls::mojom::DeviceListClient>
-          receiver,
       bool has_audio_output,
       global_media_controls::GlobalMediaControlsEntryPoint entry_point,
       media_message_center::MediaColorTheme media_color_theme,
@@ -79,11 +72,6 @@ class MediaItemUIDeviceSelectorView
   SkColor GetIconLabelBubbleSurroundingForegroundColor() const override;
   SkColor GetIconLabelBubbleBackgroundColor() const override;
 
-  // mojom::DeviceObserver
-  void OnDevicesUpdated(
-      std::vector<global_media_controls::mojom::DevicePtr> devices) override;
-  void OnPermissionRejected() override {}
-
   // views::View
   gfx::Size CalculatePreferredSize(
       const views::SizeBounds& available_size) const override;
@@ -92,7 +80,6 @@ class MediaItemUIDeviceSelectorView
   std::string GetEntryLabelForTesting(views::View* entry_view);
   bool GetEntryIsHighlightedForTesting(views::View* entry_view);
   bool GetDeviceEntryViewVisibilityForTesting();
-  std::vector<CastDeviceEntryViewAsh*> GetCastDeviceEntryViewsForTesting();
 
  private:
   friend class MediaItemUIDeviceSelectorViewTest;
@@ -105,7 +92,6 @@ class MediaItemUIDeviceSelectorView
   bool ShouldBeVisible() const;
   void ShowOrHideDeviceList();
   void RemoveDevicesOfType(DeviceEntryUIType type);
-  void OnCastDeviceSelected(const std::string& device_id);
   DeviceEntryUI* GetDeviceEntryUI(views::View* view) const;
   void RegisterAudioDeviceCallbacks();
 
@@ -114,7 +100,6 @@ class MediaItemUIDeviceSelectorView
 
   bool is_expanded_ = false;
   bool is_audio_device_switching_enabled_ = false;
-  bool has_cast_device_ = false;
   const std::string item_id_;
   const raw_ptr<MediaItemUIDeviceSelectorDelegate, DanglingUntriaged> delegate_;
   std::string current_device_id_ =
@@ -140,8 +125,6 @@ class MediaItemUIDeviceSelectorView
   int next_tag_ = 0;
   std::map<int, raw_ptr<DeviceEntryUI, CtnExperimental>> device_entry_ui_map_;
 
-  mojo::Remote<global_media_controls::mojom::DeviceListHost> device_list_host_;
-  mojo::Receiver<global_media_controls::mojom::DeviceListClient> receiver_;
   base::WeakPtrFactory<MediaItemUIDeviceSelectorView> weak_ptr_factory_{this};
 };
 

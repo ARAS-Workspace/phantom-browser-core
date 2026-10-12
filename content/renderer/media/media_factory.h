@@ -29,11 +29,6 @@
 #include "third_party/blink/public/platform/web_string.h"
 #include "third_party/blink/public/web/web_media_inspector.h"
 
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-// Needed by remoting sender.
-#include "media/mojo/mojom/remoting.mojom.h"  // nogncheck
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING)
-
 namespace blink {
 class BrowserInterfaceBrokerProxy;
 class WebContentDecryptionModule;
@@ -142,10 +137,6 @@ class MediaFactory {
   // |media_player_delegate_| is NULL, one is created.
   media::RendererWebMediaPlayerDelegate* GetWebMediaPlayerDelegate();
 
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-  media::mojom::RemoterFactory* GetRemoterFactory();
-#endif
-
   // Initializes the key systems remote and receivers.
   std::unique_ptr<media::KeySystemSupportRegistration> GetSupportedKeySystems(
       media::GetSupportedKeySystemsCB cb);
@@ -191,13 +182,6 @@ class MediaFactory {
   // EncryptedMediaClient attached to this frame; lazily initialized.
   std::unique_ptr<blink::WebEncryptedMediaClientImpl>
       web_encrypted_media_client_;
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-  // Lazy-bound remote for the RemoterFactory service in the browser
-  // process. Always use the GetRemoterFactory() accessor instead of this.
-  mojo::Remote<media::mojom::RemoterFactory> remoter_factory_;
-#endif
-
 };
 
 }  // namespace content

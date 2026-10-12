@@ -38,7 +38,6 @@ include_rules = [
   "+chrome/updater/updater_scope.h",
   "+chrome/updater/update_service.h",
   "+chromeos",
-  "+components/access_code_cast",
   "+components/accessibility_annotator/core",
   "+components/account_id",
   "+components/account_settings",
@@ -197,7 +196,6 @@ include_rules = [
   "+components/media_device_salt",
   "+components/media_gallery_util",
   "+components/media_message_center",
-  "+components/media_router/browser",
   "+components/history_clusters",
   "+components/history_clusters/history_clusters_internals",
   "+components/history_embeddings/content",
@@ -210,9 +208,6 @@ include_rules = [
   "+components/metrics",
   "+components/metrics_services_manager",
   "+components/metrics/ui",
-  "+components/mirroring/browser",
-  "+components/mirroring/mojom",
-  "+components/mirroring/service",
   "+components/module_installer/android",
   "+components/navigation_interception",
   "+components/navigation_metrics",
@@ -416,7 +411,6 @@ include_rules = [
   "+media/capabilities", # For InMemoryVideoDecodeStatsDB
   "+media/cdm",
   "+media/gpu/buildflags.h",
-  "+media/remoting/device_capability_checker.h",
   "+media/capture",
   "+media/midi",  # For midi switches
   "+media/mojo",  # For mojo media services.

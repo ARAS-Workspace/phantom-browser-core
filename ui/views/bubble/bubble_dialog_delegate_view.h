@@ -157,11 +157,6 @@ class LensPreselectionBubble;
 class LensRegionSearchInstructionsView;
 }  // namespace lens
 
-namespace media_router {
-class CastDialogView;
-class MediaRemotingDialogView;
-}  // namespace media_router
-
 namespace send_tab_to_self {
 class SendTabToSelfToolbarBubbleView;
 }
@@ -915,8 +910,6 @@ class VIEWS_EXPORT BubbleDialogDelegateView : public View,
   friend class ::autofill::LocalCardMigrationErrorDialogView;
   friend class ::captions::CaptionBubble;
   friend class ::chromeos::MultitaskMenu;
-  friend class ::media_router::CastDialogView;
-  friend class ::media_router::MediaRemotingDialogView;
   friend class ::send_tab_to_self::SendTabToSelfToolbarBubbleView;
   friend class ::toasts::ToastView;
   friend class ::ui::ime::AnnouncementView;

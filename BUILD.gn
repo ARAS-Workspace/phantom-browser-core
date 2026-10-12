@@ -147,7 +147,6 @@ group("gn_all") {
       "//gpu:gpu_unittests",
       "//media:media_unittests",
       "//media/capture:capture_unittests",
-      "//media/cast:cast_unittests",
       "//media/midi:midi_unittests",
       "//media/mojo:media_mojo_unittests",
       "//mojo",
@@ -385,10 +384,6 @@ group("gn_all") {
     ]
 
     deps += [ "//chrome/test:chrome_app_unittests" ]
-
-    if (!is_debug && !is_component_build) {
-      deps += [ "//chrome/tools/service_discovery_sniffer" ]
-    }
   }
 
   if (is_mac) {

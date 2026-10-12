@@ -9,8 +9,6 @@
 #include <vector>
 
 #include "base/memory/raw_ptr.h"
-#include "base/test/scoped_feature_list.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/test/base/browser_with_test_window_test.h"
 
 class BrowserView;
@@ -28,10 +26,7 @@ class TestWithBrowserView : public BrowserWithTestWindowTest {
  public:
   template <typename... Args>
   explicit TestWithBrowserView(Args... args)
-      : BrowserWithTestWindowTest(args...) {
-    // Media Router requires the IO thread, which doesn't exist in this setup.
-    feature_list_.InitAndDisableFeature(media_router::kMediaRouter);
-  }
+      : BrowserWithTestWindowTest(args...) {}
 
   TestWithBrowserView(const TestWithBrowserView&) = delete;
   TestWithBrowserView& operator=(const TestWithBrowserView&) = delete;
@@ -59,8 +54,6 @@ class TestWithBrowserView : public BrowserWithTestWindowTest {
   // Stores additional Browser instances created via
   // `CreateBrowserWithBrowserView()`.
   std::vector<std::unique_ptr<Browser>> additional_browsers_;
-
-  base::test::ScopedFeatureList feature_list_;
 };
 
 #endif  // CHROME_BROWSER_UI_VIEWS_FRAME_TEST_WITH_BROWSER_VIEW_H_

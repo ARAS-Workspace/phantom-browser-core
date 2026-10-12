@@ -218,10 +218,6 @@
 #include "third_party/blink/public/mojom/compute_pressure/web_pressure_manager.mojom.h"
 #endif  // BUILDFLAG(ENABLE_COMPUTE_PRESSURE)
 
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-#include "media/mojo/mojom/remoting.mojom.h"
-#endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING)
-
 #if BUILDFLAG(ENABLE_VR)
 #include "content/browser/xr/webxr_internals/mojom/webxr_internals.mojom.h"
 #include "content/browser/xr/webxr_internals/webxr_internals_ui.h"
@@ -1173,12 +1169,6 @@ void PopulateBinderMapWithContext(
             ->GetWebrtcVideoPerfHistory()
             ->BindReceiver(std::move(receiver));
       }));
-
-#if BUILDFLAG(ENABLE_MEDIA_REMOTING)
-  map->Add<media::mojom::RemoterFactory>(
-      &BindRenderFrameHostImpl<
-          &RenderFrameHostImpl::BindMediaRemoterFactoryReceiver>);
-#endif
 
   map->Add<blink::mojom::OneShotBackgroundSyncService>(base::BindRepeating(
       [](RenderFrameHost* host,

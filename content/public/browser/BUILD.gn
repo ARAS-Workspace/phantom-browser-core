@@ -567,7 +567,6 @@ source_set("browser_sources") {
     "//device/vr/buildflags",
     "//ipc",
     "//media/mojo/mojom",
-    "//media/mojo/mojom:remoting",
     "//mojo/public/cpp/bindings",
     "//mojo/public/cpp/system",
     "//sandbox/policy/mojom",

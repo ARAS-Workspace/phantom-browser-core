@@ -867,9 +867,6 @@ source_set("extensions") {
       "//chrome/browser/browsing_data:constants",
       "//chrome/browser/devtools",
       "//chrome/browser/image_decoder",
-      "//chrome/browser/media/router",
-      "//chrome/browser/media/router:media_router_feature",
-      "//chrome/browser/media/router/discovery",
       "//chrome/browser/profiles",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/resource_coordinator:mojo_bindings",
@@ -1504,7 +1501,6 @@ source_set("unit_tests") {
     "//chrome/browser/extensions/api/preference",
     "//chrome/browser/extensions/api/runtime",
     "//chrome/browser/extensions/api/web_navigation",
-    "//chrome/browser/media/router:test_support",
     "//chrome/browser/policy:test_support",
     "//chrome/browser/prefs",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
@@ -1624,11 +1620,6 @@ source_set("unit_tests") {
         # Batch upload is only available on Windows, Mac and Linux.
         "sync/extension_local_data_batch_uploader_unittest.cc",
       ]
-    }
-
-    if (enable_service_discovery) {
-      sources += [ "api/mdns/mdns_api_unittest.cc" ]
-      deps += [ "//chrome/browser/extensions/api/mdns" ]
     }
   }
 
@@ -1963,11 +1954,6 @@ source_set("browser_tests") {
     deps += [ "//chrome/browser/ui/download" ]
   }
 
-  if (enable_service_discovery) {
-    sources += [ "//chrome/browser/extensions/api/mdns/mdns_apitest.cc" ]
-    deps += [ "//chrome/browser/media/router:test_support" ]
-  }
-
   if (use_aura) {
     sources += [ "extension_install_prompt_show_params_browsertest.cc" ]
     deps += [ "//ui/aura:test_support" ]
@@ -2194,8 +2180,6 @@ source_set("browser_tests") {
       "//components/history_clusters/history_clusters_internals/webui",
       "//components/history_clusters/history_clusters_internals/webui:constants",
       "//components/keep_alive_registry",
-      "//components/media_router/browser:test_support",
-      "//components/media_router/common:test_support",
       "//components/onc",
       "//components/optimization_guide/core:test_support",
       "//components/optimization_guide/optimization_guide_internals/webui",

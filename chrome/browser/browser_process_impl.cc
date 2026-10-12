@@ -62,7 +62,6 @@
 #include "chrome/browser/lifetime/switch_utils.h"
 #include "chrome/browser/media/audio_process_ml_model_forwarder.h"
 #include "chrome/browser/media/chrome_media_session_client.h"
-#include "chrome/browser/media/router/providers/cast/dual_media_sink_service.h"
 #include "chrome/browser/media/webrtc/webrtc_event_log_manager.h"
 #include "chrome/browser/media/webrtc/webrtc_log_uploader.h"
 #include "chrome/browser/metrics/chrome_feature_list_creator.h"
@@ -485,11 +484,6 @@ void BrowserProcessImpl::StartTearDown() {
     // can be destroyed.
     ProfilePicker::Hide();
     profile_manager_.reset();
-  }
-
-  if (media_router::DualMediaSinkService::HasInstance()) {
-    media_router::DualMediaSinkService::GetInstance()
-        ->StopObservingPrefChanges();
   }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)

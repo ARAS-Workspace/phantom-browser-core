@@ -654,9 +654,6 @@ source_set("core") {
     "//chrome/browser/media",
     "//chrome/browser/media:audio_process_ml_model_forwarder",
     "//chrome/browser/media/prefs",
-    "//chrome/browser/media/router",
-    "//chrome/browser/media/router:media_router_feature",
-    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/memory",
     "//chrome/browser/metrics",
@@ -812,12 +809,10 @@ source_set("core") {
     "//components/live_caption:utils",
     "//components/manta",
     "//components/media_device_salt",
-    "//components/media_router/browser",
     "//components/metrics:call_stack_profile_collector",
     "//components/metrics:content",
     "//components/metrics/private_metrics:private_metrics_features",
     "//components/metrics_services_manager",
-    "//components/mirroring/service:mirroring_service",
     "//components/multistep_filter/core:features",
     "//components/network_time",
     "//components/no_state_prefetch/browser",
@@ -959,7 +954,6 @@ source_set("core") {
       "//chrome/browser/captive_portal",
       "//chrome/browser/enterprise/network_header_injection",
       "//chrome/browser/headless:headless_extra_parts",
-      "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
       "//chrome/browser/printing",
       "//chrome/browser/record_replay:impl",
       "//chrome/browser/sensor",
@@ -1418,7 +1412,6 @@ source_set("browser") {
     "//chrome/browser/media",
     "//chrome/browser/media:access_handler_impl",
     "//chrome/browser/media:impl",
-    "//chrome/browser/media/router",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/memory:impl",
     "//chrome/browser/metrics",
@@ -1666,7 +1659,6 @@ source_set("browser") {
     "//components/metrics:content",
     "//components/metrics/private_metrics",
     "//components/metrics_services_manager",
-    "//components/mirroring/service:mirroring_service",
     "//components/multistep_filter/core:features",
     "//components/navigation_interception",
     "//components/navigation_metrics",
@@ -1954,8 +1946,6 @@ source_set("browser") {
     "//chrome/browser/direct_sockets:impl",
     "//chrome/browser/importer",
     "//chrome/browser/importer:impl",
-    "//chrome/browser/media/router:mojo_impl",
-    "//chrome/browser/media/router:providers_wired_display_impl",
     "//chrome/browser/metrics/critical_user_journeys",
     "//chrome/browser/metrics/critical_user_journeys:impl",
     "//chrome/browser/new_tab_page/chrome_colors",
@@ -1983,8 +1973,6 @@ source_set("browser") {
     "//chrome/browser/ui/global_media_controls",
     "//chrome/browser/ui/global_media_controls:impl",
     "//chrome/browser/ui/hid",
-    "//chrome/browser/ui/media_router",
-    "//chrome/browser/ui/media_router:impl",
     "//chrome/browser/ui/omnibox",
     "//chrome/browser/ui/passwords/bubble_controllers:impl",
     "//chrome/browser/ui/search",
@@ -2076,8 +2064,6 @@ source_set("browser") {
     "//components/manta",
     "//components/manta/proto",
     "//components/media_gallery_util",
-    "//components/media_router/browser",
-    "//components/mirroring/service:mirroring_service",
     "//components/omnibox/browser:mojo_bindings",
     "//components/page_image_service/mojom:mojo_bindings",
     "//components/record_replay/content/browser",
@@ -2343,11 +2329,6 @@ source_set("browser") {
       "//google_apis/common",
     ]
     deps += [
-      # TODO(crbug.com/41410773): mirroring shouldn't depend on
-      # enable_extensions.
-      "//components/mirroring/service:mirroring_service",
-    ]
-    deps += [
       # TODO(crbug.com/420905611): Remove this circular dependency when:
       # - c/b/app_mode/app_mode_utils.h,
       # - c/b/supervised_user/supervised_user_browser_utils.h and
@@ -2393,13 +2374,6 @@ source_set("browser") {
     deps += [
       "//chrome/browser/rlz",
       "//components/rlz",
-    ]
-  }
-
-  if (enable_service_discovery) {
-    deps += [
-      "//chrome/browser/local_discovery",
-      "//chrome/browser/local_discovery:impl",
     ]
   }
 
@@ -2492,7 +2466,6 @@ group("browser_public_dependencies") {
     "//components/enterprise/common:files_scan_data",
     "//components/enterprise/common/proto:legacy_tech_events_proto",
     "//components/input",
-    "//components/media_router/common/mojom:media_controller",
     "//components/optimization_guide/core",
     "//components/page_info",
     "//components/page_info/core",
@@ -2552,7 +2525,6 @@ group("browser_generated_files") {
     ":buildflags",
     "//chrome/browser/media:media_engagement_preload_proto",
     "//chrome/browser/media:mojo_bindings",
-    "//chrome/browser/media/router/discovery/access_code:discovery_resources_proto",
     "//chrome/browser/net:key_pinning_proto",
     "//chrome/browser/net:probe_message_proto",
     "//chrome/browser/page_info:page_info_buildflags",
@@ -2582,7 +2554,6 @@ group("browser_generated_files") {
     "//chrome/browser/share/proto",
     "//chrome/browser/support_tool:support_tool_proto",
     "//chrome/browser/ui:webui_name_variants",
-    "//chrome/browser/ui/webui/access_code_cast:mojo_bindings",
     "//chrome/browser/ui/webui/customize_buttons:mojo_bindings",
     "//chrome/browser/ui/webui/data_sharing:mojo_bindings",
     "//chrome/browser/ui/webui/downloads:mojo_bindings",
@@ -2911,10 +2882,6 @@ static_library("test_support") {
       "media/clear_key_cdm_test_helper.h",
     ]
     deps += [ "//media/cdm:cdm_paths" ]
-  }
-
-  if (enable_service_discovery) {
-    deps += [ "//chrome/browser/local_discovery:test_support" ]
   }
 
   if (enable_bound_session_credentials) {

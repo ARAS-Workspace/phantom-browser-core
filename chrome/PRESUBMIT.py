@@ -264,7 +264,6 @@ def _CheckNoBaseRunLoopInChrome(input_api, output_api):
         'chrome/browser/webauthn/enclave_keys_waiter.h',
         'chrome/credential_provider/extension/service.cc',
         'chrome/enterprise_companion/app/app.cc',
-        'chrome/tools/service_discovery_sniffer/service_discovery_sniffer.cc',
         'chrome/updater/app/app.cc',
         'chrome/updater/app/app_server.cc',
     ]

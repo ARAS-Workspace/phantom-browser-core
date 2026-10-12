@@ -1234,7 +1234,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest, UntrustedClient) {
   EXPECT_FALSE(SendCommandSync("LayerTree.enable"));     // Implemented in blink
   EXPECT_FALSE(SendCommandSync(
       "Memory.prepareForLeakDetection"));        // Implemented in content
-  EXPECT_FALSE(SendCommandSync("Cast.enable"));  // Implemented in content
   EXPECT_TRUE(SendCommandSync("Accessibility.enable"));
 }
 

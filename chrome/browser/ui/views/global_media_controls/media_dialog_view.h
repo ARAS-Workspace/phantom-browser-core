@@ -44,12 +44,6 @@ class MediaDialogView : public views::BubbleDialogDelegateView,
   static views::Widget* ShowDialogFromToolbar(views::BubbleAnchor anchor,
                                               MediaNotificationService* service,
                                               Profile* profile);
-  static views::Widget* ShowDialogCentered(
-      const gfx::Rect& bounds,
-      MediaNotificationService* service,
-      Profile* profile,
-      content::WebContents* contents,
-      global_media_controls::GlobalMediaControlsEntryPoint entry_point);
   static views::Widget* ShowDialog(
       views::BubbleAnchor anchor,
       views::BubbleBorder::Arrow anchor_position,
@@ -98,7 +92,6 @@ class MediaDialogView : public views::BubbleDialogDelegateView,
 
  private:
   friend class MediaDialogViewBrowserTest;
-  friend class MediaDialogViewWithRemotePlaybackTest;
 
   MediaDialogView(
       views::BubbleAnchor anchor,
@@ -128,8 +121,6 @@ class MediaDialogView : public views::BubbleDialogDelegateView,
 
   const raw_ptr<MediaNotificationService> service_;
 
-  const raw_ptr<Profile> profile_;
-
   const raw_ptr<global_media_controls::MediaItemUIListView>
       active_sessions_view_;
 
@@ -141,14 +132,6 @@ class MediaDialogView : public views::BubbleDialogDelegateView,
       const std::string,
       raw_ptr<global_media_controls::MediaItemUIUpdatedView, CtnExperimental>>
       items_;
-
-
-  // It stores the WebContents* from which a MediaRouterDialogControllerViews
-  // opened the dialog for a presentation request. It is nullptr if the dialog
-  // is opened from the toolbar.
-  const raw_ptr<content::WebContents, AcrossTasksDanglingUntriaged>
-      web_contents_for_presentation_request_ = nullptr;
-  const global_media_controls::GlobalMediaControlsEntryPoint entry_point_;
 
   media_message_center::MediaColorTheme media_color_theme_;
 };

@@ -371,8 +371,6 @@ void ProfileImpl::RegisterProfilePrefs(
 #endif
 
   registry->RegisterBooleanPref(prefs::kForceEphemeralProfiles, false);
-  registry->RegisterBooleanPref(prefs::kEnableMediaRouter, true);
-  registry->RegisterBooleanPref(prefs::kShowCastIconInToolbar, false);
   registry->RegisterTimePref(prefs::kProfileCreationTime, base::Time());
 
 #if BUILDFLAG(ENABLE_PDF_INK2)

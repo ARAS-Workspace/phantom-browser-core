@@ -99,23 +99,6 @@ source_set("unittests") {
     "//testing/gtest",
     "//third_party/blink/public/common",
   ]
-
-  if (enable_extensions) {
-    sources += [ "cast_mirroring_service_host_unittest.cc" ]
-    deps += [ ":impl" ]
-  }
-
-  if (enable_media_remoting) {
-    sources += [ "cast_remoting_connector_unittest.cc" ]
-    deps += [
-      ":impl",
-      "//components/media_router/common",
-      "//components/sync_preferences:test_support",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//media/mojo/mojom:remoting",
-    ]
-  }
 }
 
 source_set("browser_tests") {
@@ -144,7 +127,6 @@ source_set("browser_tests") {
   sources += [
     "audio_ducker_browsertest.cc",
     "autoplay_metrics_browsertest.cc",
-    "cast_mirroring_service_host_browsertest.cc",
     "defer_background_media_browsertest.cc",
     "encrypted_media_supported_types_browsertest.cc",
     "media_browsertest.cc",
@@ -166,7 +148,6 @@ source_set("browser_tests") {
     "//chrome/browser/component_updater",
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/content_settings:content_settings_util",
-    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
     "//chrome/browser/prefs:util",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
     "//chrome/browser/preloading/prefetch/no_state_prefetch:test_support",
@@ -221,34 +202,14 @@ source_set("media") {
     "//url",
   ]
 
-  public += [
-    "audio_ducker.h",
-    "cast_mirroring_service_host.h",
-    "cast_mirroring_service_host_factory.h",
-    "mirroring_service_host.h",
-    "offscreen_tab.h",
-  ]
+  public += [ "audio_ducker.h" ]
   public_deps += [
-    "//components/mirroring/mojom:service",
     "//media/capture/mojom:video_capture",
     "//media/mojo/mojom",
     "//mojo/public/cpp/bindings",
     "//services/media_session/public/mojom",
     "//ui/gfx/geometry",
   ]
-
-  if (enable_media_remoting) {
-    public += [
-      "cast_remoting_connector.h",
-      "remoting_bridge.h",
-    ]
-    public_deps += [
-      "//components/prefs",
-      "//components/sessions:session_id",
-      "//media/mojo/mojom:remoting",
-      "//mojo/public/cpp/bindings",
-    ]
-  }
 
   if (enable_extensions) {
     public += [ "extension_media_access_handler.h" ]
@@ -319,38 +280,8 @@ source_set("impl") {
     "//third_party/blink/public/common",
   ]
 
-  sources += [
-    "audio_ducker.cc",
-    "cast_mirroring_service_host.cc",
-    "cast_mirroring_service_host_factory.cc",
-    "mirroring_service_host.cc",
-    "offscreen_tab.cc",
-  ]
-  deps += [
-    "//chrome/browser/media/router:media_router_feature",
-    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
-    "//chrome/browser/net",
-    "//chrome/browser/ui/tab_sharing",
-    "//chrome/browser/ui/tabs:tab_strip",
-    "//components/media_router/browser",
-    "//components/mirroring/browser",
-    "//media/mojo/services",
-  ]
-
-  if (enable_media_remoting) {
-    sources += [
-      "cast_remoting_connector.cc",
-      "remoting_bridge.cc",
-    ]
-    deps += [
-      "//chrome/browser/media/router:media_router_feature",
-      "//media/mojo/mojom:remoting",
-    ]
-
-    if (toolkit_views) {
-      deps += [ "//chrome/browser/ui/views/media_router" ]
-    }
-  }
+  sources += [ "audio_ducker.cc" ]
+  deps += [ "//chrome/browser/ui/tabs:tab_strip" ]
 
   if (enable_extensions) {
     sources += [ "extension_media_access_handler.cc" ]

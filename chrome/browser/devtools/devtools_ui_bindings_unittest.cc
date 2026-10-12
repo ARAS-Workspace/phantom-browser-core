@@ -1053,30 +1053,3 @@ TEST_F(DevToolsUIBindingsHostConfigTest, GetHostConfigGdpProfiles) {
   EXPECT_FALSE(*availability_enabled);
 #endif
 }
-
-TEST_F(DevToolsUIBindingsHostConfigTest, SetChromeFlag) {
-  base::DictValue initial_config =
-      DevToolsUIBindings::GetHostConfigDictionary(profile_.get());
-  const base::DictValue* protocol_monitor =
-      initial_config.FindDict("devToolsProtocolMonitor");
-  ASSERT_TRUE(protocol_monitor);
-  EXPECT_FALSE(protocol_monitor->FindBool("enabled").value_or(true));
-
-  DevToolsUIBindings::SetChromeFlagInternal(profile_.get(),
-                                            "devtools-protocol-monitor", true);
-  base::DictValue new_config =
-      DevToolsUIBindings::GetHostConfigDictionary(profile_.get());
-  const base::DictValue* new_protocol_monitor =
-      new_config.FindDict("devToolsProtocolMonitor");
-  ASSERT_TRUE(new_protocol_monitor);
-  EXPECT_TRUE(new_protocol_monitor->FindBool("enabled").value_or(false));
-
-  DevToolsUIBindings::SetChromeFlagInternal(profile_.get(),
-                                            "devtools-protocol-monitor", false);
-  base::DictValue final_config =
-      DevToolsUIBindings::GetHostConfigDictionary(profile_.get());
-  const base::DictValue* final_protocol_monitor =
-      final_config.FindDict("devToolsProtocolMonitor");
-  ASSERT_TRUE(final_protocol_monitor);
-  EXPECT_FALSE(final_protocol_monitor->FindBool("enabled").value_or(true));
-}

@@ -366,7 +366,7 @@ enum {
   kOfficeMoveConfirmationShownForLocalToOneDriveSyncable = 100320,
   kOfficeMoveConfirmationShownForCloudToDriveSyncable = 100321,
   kOfficeMoveConfirmationShownForCloudToOneDriveSyncable = 100322,
-  kPinnedCastMigrationComplete = 100323,
+  // kPinnedCastMigrationComplete = 100323, (deprecated)
   kAccessibilityAXTreeFixingEnabled = 100324,
   // kTabSearchMigrationComplete = 100325, (deprecated)
   kReadAloudPlaybackMode = 100326,
@@ -507,10 +507,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
     {prefs::kPinnedSearchCompanionMigrationComplete,
      {syncable_prefs_ids::kPinnedSearchCompanionMigrationComplete,
       syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kPinnedCastMigrationComplete,
-     {syncable_prefs_ids::kPinnedCastMigrationComplete, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
     {prefs::kOrganizerPanelEntrypointEnabled,
      {syncable_prefs_ids::kOrganizerPanelEntrypointEnabled, syncer::PREFERENCES,

@@ -55,75 +55,6 @@ const char kAutoGrantCapturedSurfaceControlPrompt[] =
 // Command line flag name to set the autoplay policy.
 const char kAutoplayPolicy[] = "autoplay-policy";
 
-// NOTE: callers should always use the free functions in
-// /media/cast/encoding/encoding_support.h instead of accessing these features
-// directly.
-//
-// TODO(crbug.com/286443864): Guard Cast Sender flags with !IS_ANDROID.
-// If enabled, completely disables use of AV1 hardware encoding for Cast
-// Streaming sessions.
-const char kCastStreamingForceDisableHardwareAv1[] =
-    "cast-streaming-force-disable-hardware-av1";
-
-// If enabled, completely disables use of H264 hardware encoding for Cast
-// Streaming sessions. Takes precedence over
-// kCastStreamingForceEnableHardwareH264.
-const char kCastStreamingForceDisableHardwareH264[] =
-    "cast-streaming-force-disable-hardware-h264";
-
-// If enabled, completely disables use of HEVC hardware encoding for Cast
-// Streaming sessions. Takes precedence over
-// kCastStreamingForceEnableHardwareHevc.
-const char kCastStreamingForceDisableHardwareHevc[] =
-    "cast-streaming-force-disable-hardware-hevc";
-
-// If enabled, completely disables use of VP8 hardware encoding for Cast
-// Streaming sessions. Takes precedence over
-// kCastStreamingForceEnableHardwareVp8.
-const char kCastStreamingForceDisableHardwareVp8[] =
-    "cast-streaming-force-disable-hardware-vp8";
-
-// If enabled, completely disables use of VP9 hardware encoding for Cast
-// Streaming sessions. Takes precedence over
-// kCastStreamingForceEnableHardwareVp9.
-const char kCastStreamingForceDisableHardwareVp9[] =
-    "cast-streaming-force-disable-hardware-vp9";
-
-// If enabled, allows use of AV1 hardware encoding for Cast Streaming sessions,
-// even on platforms where it is disabled due to performance and reliability
-// issues. kCastStreamingForceDisableHardwareAv1 must be disabled for this flag
-// to take effect.
-const char kCastStreamingForceEnableHardwareAv1[] =
-    "cast-streaming-force-enable-hardware-av1";
-
-// If enabled, allows use of H264 hardware encoding for Cast Streaming sessions,
-// even on platforms where it is disabled due to performance and reliability
-// issues. kCastStreamingForceDisableHardwareH264 must be disabled for this flag
-// to take effect.
-const char kCastStreamingForceEnableHardwareH264[] =
-    "cast-streaming-force-enable-hardware-h264";
-
-// If enabled, allows use of HEVC hardware encoding for Cast Streaming sessions,
-// even on platforms where it is disabled due to performance and reliability
-// issues. kCastStreamingForceDisableHardwareHevc must be disabled for this flag
-// to take effect.
-const char kCastStreamingForceEnableHardwareHevc[] =
-    "cast-streaming-force-enable-hardware-hevc";
-
-// If enabled, allows use of VP8 hardware encoding for Cast Streaming sessions,
-// even on platforms where it is disabled due to performance and reliability
-// issues. kCastStreamingForceDisableHardwareVp8 must be disabled for this flag
-// to take effect.
-const char kCastStreamingForceEnableHardwareVp8[] =
-    "cast-streaming-force-enable-hardware-vp8";
-
-// If enabled, allows use of VP9 hardware encoding for Cast Streaming sessions,
-// even on platforms where it is disabled due to performance and reliability
-// issues. kCastStreamingForceDisableHardwareVp9 must be disabled for this flag
-// to take effect.
-const char kCastStreamingForceEnableHardwareVp9[] =
-    "cast-streaming-force-enable-hardware-vp9";
-
 // Specifies the path to the Clear Key CDM for testing, which is necessary to
 // support External Clear Key key system when library CDM is enabled. Note that
 // External Clear Key key system support is also controlled by feature
@@ -350,61 +281,6 @@ BASE_FEATURE(kAutoplayPoliciesAndroid, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kBrowserInitiatedAutomaticPictureInPictureDryRun,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Controls whether mirroring negotiations will include the AV1 codec for video
-// encoding.
-//
-// NOTE: currently only software AV1 encoding is supported.
-// TODO(crbug.com/40246079): hardware AV1 encoding should be added.
-BASE_FEATURE(kCastStreamingAv1, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether the new exponential bitrate calculate logic is used, or
-// the legacy linear algorithm.
-// TODO(crbug.com/302584587): This is the V2 implementation of this experiment,
-// following the failure of the initial experiment.
-BASE_FEATURE(kCastStreamingExponentialVideoBitrateAlgorithm,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<int>
-    kCastStreamingExponentialVideoBitrateAlgorithmWindowSize{
-        &kCastStreamingExponentialVideoBitrateAlgorithm, "window_size", 30};
-const base::FeatureParam<int>
-    kCastStreamingExponentialVideoBitrateAlgorithmDropThreshold{
-        &kCastStreamingExponentialVideoBitrateAlgorithm, "drop_threshold", 1};
-const base::FeatureParam<double>
-    kCastStreamingExponentialVideoBitrateAlgorithmIncreaseFactor{
-        &kCastStreamingExponentialVideoBitrateAlgorithm, "increase_factor",
-        1.05};
-const base::FeatureParam<double>
-    kCastStreamingExponentialVideoBitrateAlgorithmDecreaseFactor{
-        &kCastStreamingExponentialVideoBitrateAlgorithm, "decrease_factor",
-        0.9};
-const base::FeatureParam<double>
-    kCastStreamingExponentialVideoBitrateAlgorithmDynamicWindowMultiplier{
-        &kCastStreamingExponentialVideoBitrateAlgorithm,
-        "dynamic_window_multiplier", 0.0};
-
-BASE_FEATURE(kCastStreamingHardwareHevc, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCastStreamingMaxVideoBitrate, base::FEATURE_ENABLED_BY_DEFAULT);
-const base::FeatureParam<int> kCastStreamingMaxVideoBitrateMbps{
-    &kCastStreamingMaxVideoBitrate, "max_bitrate_mbps", 5};
-
-BASE_FEATURE(kCastStreamingPerformanceOverlay,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether mirroring negotiations will include the VP8 codec for video
-// encoding.
-//
-// NOTE: this is the default codec for Cast Streaming. Be careful when
-// disabling.
-BASE_FEATURE(kCastStreamingVp8, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Controls whether mirroring negotiations will include the VP9 codec for video
-// encoding.
-BASE_FEATURE(kCastStreamingVp9, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// A video encoder is allowed to drop a frame in cast mirroring.
-BASE_FEATURE(kCastVideoEncoderFrameDrop, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // CDM host verification is enabled by default. Can be disabled for testing.
 // Has no effect if ENABLE_CDM_HOST_VERIFICATION buildflag is false.
 BASE_FEATURE(kCdmHostVerification, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -475,10 +351,6 @@ BASE_FEATURE(kDocumentPictureInPictureReparenting,
 
 // Enables support for >8 audio channel layouts (i.e., 5.1.4 and 7.1.4).
 BASE_FEATURE(kEnableHighChannelLayouts, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Controls whether the Mirroring Service will fetch, analyze, and store
-// information on the quality of the session using RTCP logs.
-BASE_FEATURE(kEnableRtcpReporting, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enables user control over muting tab audio from the tab strip.
 BASE_FEATURE(kEnableTabMuting, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -1178,13 +1050,6 @@ BASE_FEATURE(kVaapiIgnoreDriverChecks, base::FEATURE_DISABLED_BY_DEFAULT);
 // Enables application audio capture for getDisplayMedia (gDM) window capture in
 // macOS.
 BASE_FEATURE(kApplicationAudioCaptureMac, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Forces H264 baseline profile for Cast Streaming on macOS to avoid frame
-// reordering issues with Apple Silicon hardware encoders.
-BASE_FEATURE(kCastMacForceBaselineProfile, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Controls whether hardware H264 is default enabled on macOS.
-BASE_FEATURE(kCastStreamingMacHardwareH264, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enables system audio loopback capture using the macOS CoreAudio tap API for
 // Cast.

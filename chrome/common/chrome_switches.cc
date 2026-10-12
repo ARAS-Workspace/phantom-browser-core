@@ -730,13 +730,6 @@ const char kWinHttpProxyResolver[] = "winhttp-proxy-resolver";
 // resulted in a browser startup.
 const char kWinJumplistAction[] = "win-jumplist-action";
 
-// If enabled, overrides the target playout delay for a casting mirroring
-// session. The value will be parsed as milliseconds. Lowering this value will
-// result in a lower end to end latency, but could come at the cost of other
-// quality standards such as dropped frames or FPS.
-const char kCastMirroringTargetPlayoutDelay[] =
-    "cast-mirroring-target-playout-delay";
-
 // Enables saving webpages as MHTML (Webpage, Single) by default, instead of
 // saving as HTML with a directory of sub-resources. (Webpage, Complete).
 // See http://crbug.com/40179885 for how to remove this switch.

@@ -351,7 +351,6 @@ source_set("browser") {
     "//components/vrp_flags:buildflags",
     "//content/browser/indexed_db",
     "//ipc",
-    "//media/mojo/mojom:remoting",
     "//skia:skia_switches",
     "//third_party/blink/public/mojom:embedded_frame_sink_mojo_bindings",
     "//third_party/leveldatabase",

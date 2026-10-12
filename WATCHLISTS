@@ -729,28 +729,6 @@
     'browsing_data': {
       'filepath': 'browsing_data|BrowsingData',
     },
-    'cast_2_class': {
-      'filepath':  '/access_code/' \
-                   '|access_code_cast' \
-                   '|ash/public/cpp/cast' \
-                   '|ash/system/cast' \
-                   '|chrome/browser/media/router/providers' \
-                   '|chrome/browser/ui/ash/cast' \
-                   '|media_router/cast_dialog_view' \
-                   '|media/router/discovery',
-    },
-    'cast_certificate': {
-      'filepath': 'components/media_router/common/providers/cast/certificate/'\
-                  '|components/test/data/media_router/common/providers/cast/certificate/',
-    },
-    'cast_channel': {
-      'filepath':  'components/cast_channel/'
-    },
-    'cast_streaming': {
-      'filepath': 'media/cast/' \
-                  '|chrome/browser/media/cast_mirroring' \
-                  '|components/mirroring/' \
-    },
     'cbb_ref_info': {
       'filepath': 'testing/perf/cbb_ref_info/'
     },
@@ -1627,22 +1605,6 @@
                   '|third_party/blink/renderer/platform/exported/web_media_recorder' \
                   '|third_party/blink/web_tests/fast/mediarecorder/' \
                   '|third_party/blink/public/platform/web_media_recorder'
-    },
-    'media_remoting': {
-      'filepath': 'chrome/browser/media/cast_remoting'\
-                  '|media/mojo/mojom/remoting.mojom'\
-                  '|media/remoting/'\
-                  '|third_party/blink/public/platform/media/web_media_player_'\
-                  '|third_party/blink/renderer/platform/media/web_media_player_',
-    },
-    'media_router': {
-      'filepath': 'chrome/app/media_router_strings.grdp' \
-                  '|chrome/browser/media/router/' \
-                  '|chrome/browser/resources/media_router/' \
-                  '|chrome/browser/ui/media_router/' \
-                  '|chrome/browser/ui/views/media_router/' \
-                  '|chrome/test/media_router/' \
-                  '|components/media_router/'
     },
     'media_webrtc': {
       'filepath': '^media/webrtc/'
@@ -2792,15 +2754,6 @@
     'browser_window': ['linyuh+watch@google.com'],
     'browsing_data': ['dullweber+watch@chromium.org',
                       'msramek+watch@chromium.org'],
-    'cast_2_class': ['cros-edu-eng+cl@google.com'],
-    'cast_certificate': ['dougsteed+watch@chromium.org',
-                         'mfoltz+watch-media@chromium.org',
-                         'ryanchung+watch@chromium.org'],
-    'cast_channel': ['mfoltz+watch-media@chromium.org',
-                     'ryanchung+watch@chromium.org'],
-    'cast_streaming': ['jasonroberts+watch@google.com',
-                       'jophba+watch@chromium.org',
-                       'mfoltz+watch-media@chromium.org'],
     'cbb_ref_info': ['johnchen+watch@chromium.org'],
     'cc': ['cc-bugs@chromium.org'],
     'cc-animation': ['gerchiko@microsoft.com'],
@@ -3101,10 +3054,6 @@
     'media_gpu_win': ['media-win-reviews@chromium.org'],
     'media_recorder': ['emircan+watch+mediarecorder@chromium.org',
                        'mcasas+mediarecorder@chromium.org'],
-    'media_remoting': ['erickung+watch@chromium.org',
-                       'jophba+watch@chromium.org',
-                       'mfoltz+watch-media@chromium.org'],
-    'media_router': ['mfoltz+watch-media@chromium.org'],
     'media_webrtc': ['alessiob@chromium.org',
                      'peah@chromium.org',
                      'saza@chromium.org'],

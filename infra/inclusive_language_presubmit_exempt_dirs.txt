@@ -116,7 +116,6 @@ components/cronet/gn2bp/templates
 components/domain_reliability
 components/gcm_driver
 components/input
-components/media_router/common/providers/cast/channel
 components/metrics
 components/metrics/debug
 components/omnibox/browser

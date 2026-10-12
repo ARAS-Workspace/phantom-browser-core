@@ -9,7 +9,6 @@ sb_files = [
   "cdm.sb",
   "common.sb",
   "gpu.sb",
-  "mirroring.sb",
   "network.sb",
   "on_device_model_execution.sb",
   "print_backend.sb",

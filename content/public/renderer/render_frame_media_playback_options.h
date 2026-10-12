@@ -33,10 +33,6 @@ struct RenderFrameMediaPlaybackOptions {
   bool is_mojo_renderer_enabled() const {
     return renderer_type == mojom::RendererType::MOJO_RENDERER;
   }
-
-  bool is_remoting_renderer_enabled() const {
-    return renderer_type == mojom::RendererType::REMOTING_RENDERER;
-  }
 };
 
 }  // namespace content

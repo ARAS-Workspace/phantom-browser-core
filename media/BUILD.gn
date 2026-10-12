@@ -42,8 +42,6 @@ buildflag_header("media_buildflags") {
     "ENABLE_LIBRARY_CDMS=$enable_library_cdms",
     "ENABLE_LIBVPX=$media_use_libvpx",
     "ENABLE_LOGGING_OVERRIDE=$enable_logging_override",
-    "ENABLE_MEDIA_REMOTING=$enable_media_remoting",
-    "ENABLE_MEDIA_REMOTING_RPC=$enable_media_remoting_rpc",
     "ENABLE_OPENH264=$media_use_openh264",
     "ENABLE_PASSTHROUGH_AUDIO_CODECS=$enable_passthrough_audio_codecs",
     "ENABLE_PLATFORM_DTS_AUDIO=$enable_platform_dts_audio",
@@ -210,10 +208,6 @@ test("media_unittests") {
 
   if (media_use_ffmpeg) {
     deps += [ "//media/ffmpeg:unit_tests" ]
-  }
-
-  if (enable_media_remoting) {
-    deps += [ "//media/remoting:media_remoting_tests" ]
   }
 
   # The test needs OPUS_FIXED_POINT conditional define.

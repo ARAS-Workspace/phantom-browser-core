@@ -45,10 +45,6 @@ schema_sources_ = [
   "windows.json",
 ]
 
-if (enable_service_discovery) {
-  schema_sources_ += [ "mdns.idl" ]
-}
-
 if (enable_guest_view) {
   schema_sources_ += [ "chrome_web_view_internal.json" ]
 }

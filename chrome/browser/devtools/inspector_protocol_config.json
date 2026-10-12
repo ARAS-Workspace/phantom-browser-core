@@ -26,10 +26,6 @@
                 "include_events": []
             },
             {
-                "domain": "Cast",
-                "async": ["startDesktopMirroring", "startTabMirroring"]
-            },
-            {
                 "domain": "Emulation",
                 "include": ["disable", "setAutomationOverride", "getScreenInfos", "addScreen", "removeScreen", "updateScreen", "setPrimaryScreen"]
             },

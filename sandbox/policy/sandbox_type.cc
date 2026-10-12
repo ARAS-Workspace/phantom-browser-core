@@ -39,11 +39,6 @@ constexpr char kPrintBackendSandbox[] = "print_backend";
 constexpr char kScreenAISandbox[] = "screen_ai";
 #endif
 
-
-#if BUILDFLAG(IS_MAC)
-constexpr char kMirroringSandbox[] = "mirroring";
-#endif  // BUILDFLAG(IS_MAC)
-
 #if BUILDFLAG(IS_MAC)
 constexpr char kProxyResolverSandbox[] = "proxy_resolver";
 constexpr char kWebNNModelCompilationSandbox[] = "webnn_model_compilation";
@@ -110,9 +105,6 @@ void SetCommandLineFlagsForSandboxType(base::CommandLine* command_line,
     case Sandbox::kHardwareVideoEncoding:
 #endif
 #endif
-#if BUILDFLAG(IS_MAC)
-    case Sandbox::kMirroring:
-#endif  // BUILDFLAG(IS_MAC)
 #if BUILDFLAG(IS_MAC)
     case Sandbox::kProxyResolver:
     case Sandbox::kWebNNModelCompilation:
@@ -211,10 +203,6 @@ std::string StringFromUtilitySandboxType(Sandbox sandbox_type) {
       return kScreenAISandbox;
 #endif
 #if BUILDFLAG(IS_MAC)
-    case Sandbox::kMirroring:
-      return kMirroringSandbox;
-#endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_MAC)
     case Sandbox::kProxyResolver:
       return kProxyResolverSandbox;
     case Sandbox::kWebNNModelCompilation:
@@ -274,11 +262,6 @@ sandbox::mojom::Sandbox UtilitySandboxTypeFromString(
   if (sandbox_string == kPrintCompositorSandbox) {
     return Sandbox::kPrintCompositor;
   }
-#if BUILDFLAG(IS_MAC)
-  if (sandbox_string == kMirroringSandbox) {
-    return Sandbox::kMirroring;
-  }
-#endif
 #if BUILDFLAG(IS_MAC)
   if (sandbox_string == kProxyResolverSandbox) {
     return Sandbox::kProxyResolver;

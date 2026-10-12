@@ -100,9 +100,6 @@ constexpr APIPermissionInfo::InitInfo permissions_to_register[] = {
      APIPermissionInfo::kFlagRequiresManagementUIWarning},
     {APIPermissionID::kInput, "input"},
     {APIPermissionID::kManagement, "management"},
-    {APIPermissionID::kMDns, "mdns",
-     APIPermissionInfo::kFlagCannotBeOptional |
-         APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
     {APIPermissionID::kOmniboxDirectInput, "omnibox.directInput",
      APIPermissionInfo::kFlagDoesNotRequireManagedSessionFullLoginWarning},
     {APIPermissionID::kPlatformKeys, "platformKeys",

@@ -94,7 +94,6 @@ source_set("configs") {
   ]
 
   deps += [
-    "//chrome/browser/ui/webui/access_code_cast",
     "//chrome/browser/ui/webui/autofill_ml_internals",
     "//chrome/browser/ui/webui/color_pipeline_internals",
     "//chrome/browser/ui/webui/data_sharing",
@@ -469,7 +468,6 @@ source_set("chrome_web_ui_controller_factory") {
   ]
   deps = [
     "//chrome/browser:flags",
-    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui:ui_features",

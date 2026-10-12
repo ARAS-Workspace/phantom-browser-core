@@ -4,11 +4,10 @@
 
 #include "chrome/browser/ui/views/global_media_controls/media_notification_device_entry_ui.h"
 
+#include <optional>
+
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/ui/views/global_media_controls/media_item_ui_helper.h"
-#include "chrome/browser/ui/views/media_router/cast_dialog_helper.h"
-#include "components/global_media_controls/public/mojom/device_service.mojom.h"
 #include "components/vector_icons/vector_icons.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/models/image_model.h"
@@ -50,7 +49,6 @@ void ChangeEntryColor(views::ImageView* image_view,
   }
 }
 
-// foreground_color_id is only set for CastDeviceEntryViewAsh.
 std::unique_ptr<views::ImageView> CreateIconView(
     const gfx::VectorIcon& icon,
     std::optional<ui::ColorId> foreground_color_id = std::nullopt) {
@@ -64,16 +62,6 @@ std::unique_ptr<views::ImageView> CreateIconView(
   }
   icon_view->SetBorder(views::CreateEmptyBorder(kDeviceIconBorder));
   return icon_view;
-}
-
-// foreground_color_id is only set for CastDeviceEntryViewAsh.
-std::unique_ptr<views::View> CreateIconView(
-    global_media_controls::mojom::IconType icon,
-    std::optional<ui::ColorId> foreground_color_id = std::nullopt) {
-  if (icon == global_media_controls::mojom::IconType::kThrobber) {
-    return media_router::CreateThrobber();
-  }
-  return CreateIconView(GetVectorIcon(icon), foreground_color_id);
 }
 
 std::unique_ptr<views::ImageView> GetAudioDeviceIcon() {
@@ -149,33 +137,6 @@ DeviceEntryUIType AudioDeviceEntryView::GetType() const {
   return DeviceEntryUIType::kAudio;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// CastDeviceEntryViewAsh:
-
-CastDeviceEntryViewAsh::CastDeviceEntryViewAsh(
-    PressedCallback callback,
-    ui::ColorId foreground_color_id,
-    ui::ColorId background_color_id,
-    const global_media_controls::mojom::DevicePtr& device)
-    : DeviceEntryUI(device->id, device->name, GetVectorIcon(device->icon)),
-      HoverButton(std::move(callback),
-                  CreateIconView(device->icon, foreground_color_id),
-                  base::UTF8ToUTF16(device->name)),
-      device_(device->Clone()) {
-  SetFocusBehavior(views::View::FocusBehavior::ALWAYS);
-  views::InkDrop::Get(this)->SetMode(views::InkDropHost::InkDropMode::ON);
-  SetHasInkDropActionOnClick(true);
-}
-
-CastDeviceEntryViewAsh::~CastDeviceEntryViewAsh() = default;
-
-DeviceEntryUIType CastDeviceEntryViewAsh::GetType() const {
-  return DeviceEntryUIType::kCast;
-}
-
 BEGIN_METADATA(AudioDeviceEntryView)
 ADD_PROPERTY_METADATA(bool, Highlighted)
-END_METADATA
-
-BEGIN_METADATA(CastDeviceEntryViewAsh)
 END_METADATA

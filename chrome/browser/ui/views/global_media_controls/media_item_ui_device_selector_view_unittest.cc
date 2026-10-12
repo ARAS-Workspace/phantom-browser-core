@@ -16,10 +16,7 @@
 #include "chrome/browser/ui/global_media_controls/media_item_ui_device_selector_delegate.h"
 #include "chrome/browser/ui/global_media_controls/media_notification_device_provider.h"
 #include "chrome/browser/ui/global_media_controls/media_notification_service.h"
-#include "chrome/browser/ui/media_router/cast_dialog_model.h"
-#include "chrome/browser/ui/media_router/media_route_starter.h"
 #include "chrome/test/views/chrome_views_test_base.h"
-#include "components/global_media_controls/public/test/mock_device_service.h"
 #include "components/media_message_center/notification_theme.h"
 #include "media/audio/audio_device_description.h"
 #include "media/base/media_switches.h"
@@ -33,11 +30,6 @@
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/test/ax_event_counter.h"
 
-using global_media_controls::test::MockDeviceListHost;
-using media_router::CastDialogController;
-using media_router::CastDialogModel;
-using media_router::UIMediaSink;
-using media_router::UIMediaSinkState;
 using testing::_;
 using testing::NiceMock;
 
@@ -95,10 +87,6 @@ class MockMediaItemUIDeviceSelectorDelegate
               OnAudioSinkChosen,
               (const std::string& item_id, const std::string& sink_id),
               (override));
-  MOCK_METHOD(void,
-              OnMediaRemotingRequested,
-              (const std::string& item_id),
-              (override));
 
   base::CallbackListSubscription RegisterAudioOutputDeviceDescriptionsCallback(
       MediaNotificationDeviceProvider::GetOutputDevicesCallbackList::
@@ -129,35 +117,6 @@ class MockMediaItemUIDeviceSelectorDelegate
   base::RepeatingCallback<void(bool)> supports_switching_callback_;
 };
 
-class MockCastDialogController : public CastDialogController {
- public:
-  MOCK_METHOD(void,
-              AddObserver,
-              (CastDialogController::Observer * observer),
-              (override));
-  MOCK_METHOD(void,
-              RemoveObserver,
-              (CastDialogController::Observer * observer),
-              (override));
-  MOCK_METHOD(void,
-              StartCasting,
-              (const std::string& sink_id,
-               media_router::MediaCastMode cast_mode),
-              (override));
-  MOCK_METHOD(void, StopCasting, (const std::string& route_id), (override));
-  MOCK_METHOD(void,
-              ClearIssue,
-              (const media_router::Issue::Id& issue_id),
-              (override));
-  MOCK_METHOD(void, FreezeRoute, (const std::string& route_id), (override));
-  MOCK_METHOD(void, UnfreezeRoute, (const std::string& route_id), (override));
-  MOCK_METHOD(std::unique_ptr<media_router::MediaRouteStarter>,
-              TakeMediaRouteStarter,
-              (),
-              (override));
-  MOCK_METHOD(void, RegisterDestructor, (base::OnceClosure), (override));
-};
-
 }  // anonymous namespace
 
 class MediaItemUIDeviceSelectorViewTest : public ChromeViewsTestBase {
@@ -182,28 +141,6 @@ class MediaItemUIDeviceSelectorViewTest : public ChromeViewsTestBase {
     provider->AddDevice("Speaker", "1");
     provider->AddDevice("Headphones", "2");
     provider->AddDevice("Earbuds", "3");
-  }
-
-  global_media_controls::mojom::DevicePtr CreateDevice(
-      const std::string& id,
-      const std::string& name) {
-    auto device = global_media_controls::mojom::Device::New();
-    device->id = id;
-    device->name = name;
-    return device;
-  }
-
-  std::vector<global_media_controls::mojom::DevicePtr> CreateDevices(
-      std::vector<std::pair<std::string, std::string>> device_info) {
-    std::vector<global_media_controls::mojom::DevicePtr> devices;
-    for (const auto& info : device_info) {
-      devices.push_back(CreateDevice(info.first, info.second));
-    }
-    return devices;
-  }
-
-  std::vector<global_media_controls::mojom::DevicePtr> CreateDevices() {
-    return CreateDevices({{"id", "Nest Hub"}});
   }
 
   void SimulateButtonClick(views::View* view) {
@@ -234,27 +171,16 @@ class MediaItemUIDeviceSelectorViewTest : public ChromeViewsTestBase {
       global_media_controls::GlobalMediaControlsEntryPoint entry_point =
           global_media_controls::GlobalMediaControlsEntryPoint::kToolbarIcon,
       bool show_devices = false) {
-    client_remote_.reset();
-    device_list_host_ = std::make_unique<MockDeviceListHost>();
     media_message_center::MediaColorTheme theme;
     auto device_selector_view = std::make_unique<MediaItemUIDeviceSelectorView>(
-        kItemId, delegate, device_list_host_->PassRemote(),
-        client_remote_.BindNewPipeAndPassReceiver(), has_audio_output,
-        entry_point, theme, show_devices);
+        kItemId, delegate, has_audio_output, entry_point, theme, show_devices);
     device_selector_view->UpdateCurrentAudioDevice(current_device);
     return device_selector_view;
-  }
-
-  void OnDevicesUpdated(const std::string& sink_id) {
-    CHECK(view_);
-    view_->OnDevicesUpdated(CreateDevices());
   }
 
   std::unique_ptr<MediaItemUIDeviceSelectorView> view_;
   base::HistogramTester histogram_tester_;
   base::test::ScopedFeatureList feature_list_;
-  mojo::Remote<global_media_controls::mojom::DeviceListClient> client_remote_;
-  std::unique_ptr<MockDeviceListHost> device_list_host_;
 };
 
 TEST_F(MediaItemUIDeviceSelectorViewTest, DeviceButtonsCreated) {
@@ -262,43 +188,15 @@ TEST_F(MediaItemUIDeviceSelectorViewTest, DeviceButtonsCreated) {
   NiceMock<MockMediaItemUIDeviceSelectorDelegate> delegate;
   AddAudioDevices(delegate);
   view_ = CreateDeviceSelectorView(&delegate);
-  view_->OnDevicesUpdated(CreateDevices());
 
   ASSERT_TRUE(GetDeviceEntryViewsContainer() != nullptr);
 
   auto container_children = GetDeviceEntryViewsContainer()->children();
-  ASSERT_EQ(container_children.size(), 4u);
+  ASSERT_EQ(container_children.size(), 3u);
 
   EXPECT_EQ(EntryLabelText(container_children.at(0)), "Speaker");
   EXPECT_EQ(EntryLabelText(container_children.at(1)), "Headphones");
   EXPECT_EQ(EntryLabelText(container_children.at(2)), "Earbuds");
-  EXPECT_EQ(EntryLabelText(container_children.at(3)), "Nest Hub");
-}
-
-TEST_F(MediaItemUIDeviceSelectorViewTest, MultipleCastDevices) {
-  NiceMock<MockMediaItemUIDeviceSelectorDelegate> delegate;
-  view_ = CreateDeviceSelectorView(&delegate);
-
-  view_->OnDevicesUpdated(
-      CreateDevices({{"id1", "Device 1"}, {"id2", "Device 2"}}));
-
-  auto cast_views = view_->GetCastDeviceEntryViewsForTesting();
-  ASSERT_EQ(cast_views.size(), 2u);
-  EXPECT_EQ(EntryLabelText(cast_views[0]), "Device 1");
-  EXPECT_EQ(EntryLabelText(cast_views[1]), "Device 2");
-}
-
-TEST_F(MediaItemUIDeviceSelectorViewTest, CastDeviceButtonClickNotifiesHost) {
-  NiceMock<MockMediaItemUIDeviceSelectorDelegate> delegate;
-  view_ = CreateDeviceSelectorView(&delegate);
-
-  view_->OnDevicesUpdated(CreateDevices({{"cast-id", "Cast Device"}}));
-  EXPECT_CALL(*device_list_host_, SelectDevice("cast-id")).Times(1);
-
-  auto cast_views = view_->GetCastDeviceEntryViewsForTesting();
-  ASSERT_EQ(cast_views.size(), 1u);
-  SimulateButtonClick(cast_views[0]);
-  client_remote_.FlushForTesting();
 }
 
 TEST_F(MediaItemUIDeviceSelectorViewTest, ExpandLabelOpensEntryContainer) {
@@ -347,27 +245,6 @@ TEST_F(MediaItemUIDeviceSelectorViewTest,
   for (views::View* child : GetDeviceEntryViewsContainer()->children()) {
     SimulateButtonClick(child);
   }
-}
-
-TEST_F(MediaItemUIDeviceSelectorViewTest,
-       StartCastingTriggersAnotherSinkUpdate) {
-  NiceMock<MockMediaItemUIDeviceSelectorDelegate> delegate;
-  view_ = CreateDeviceSelectorView(&delegate);
-  view_->OnDevicesUpdated(CreateDevices());
-  // DeviceListHost::SelectDevice() should create a new route, which
-  // triggers the MediaRouterUI to broadcast a sink update. As a result
-  // MediaItemUIDeviceSelectorView::OnDevicesUpdated() may be called before
-  // SelectDevice() returns. This test verifies that the second call to
-  // OnDevicesUpdated() does not cause UaF error in RecordStartCastingMetrics().
-  EXPECT_CALL(*device_list_host_, SelectDevice(_))
-      .WillOnce(
-          Invoke(this, &MediaItemUIDeviceSelectorViewTest::OnDevicesUpdated));
-  for (views::View* child : GetDeviceEntryViewsContainer()->children()) {
-    SimulateButtonClick(child);
-  }
-  // The button click should cause the client to call SelectDevice() on the
-  // host.
-  client_remote_.FlushForTesting();
 }
 
 TEST_F(MediaItemUIDeviceSelectorViewTest, CurrentAudioDeviceHighlighted) {
@@ -452,7 +329,7 @@ TEST_F(MediaItemUIDeviceSelectorViewTest, AudioDeviceButtonsChange) {
 
 TEST_F(MediaItemUIDeviceSelectorViewTest, VisibilityChanges) {
   // The device selector view should become hidden when there is only one
-  // unique device, unless there exists a cast device.
+  // unique device.
   NiceMock<MockMediaItemUIDeviceSelectorDelegate> delegate;
   auto* provider = delegate.GetProvider();
   provider->AddDevice("Speaker", "1");
@@ -464,12 +341,6 @@ TEST_F(MediaItemUIDeviceSelectorViewTest, VisibilityChanges) {
   EXPECT_FALSE(view_->GetVisible());
 
   testing::Mock::VerifyAndClearExpectations(&delegate);
-
-  view_->OnDevicesUpdated(CreateDevices());
-  EXPECT_TRUE(view_->GetVisible());
-
-  testing::Mock::VerifyAndClearExpectations(&delegate);
-  view_->OnDevicesUpdated({});
   provider->ResetDevices();
   provider->AddDevice("Speaker", "1");
   provider->AddDevice("Headphones",

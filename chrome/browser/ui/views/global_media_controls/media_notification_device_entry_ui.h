@@ -7,14 +7,12 @@
 
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/ui/views/controls/hover_button.h"
-#include "components/global_media_controls/public/mojom/device_service.mojom.h"
 #include "ui/base/metadata/metadata_header_macros.h"
 #include "ui/color/color_id.h"
 
 enum class DeviceEntryUIType {
   kAudio = 0,
-  kCast = 1,
-  kMaxValue = kCast,
+  kMaxValue = kAudio,
 };
 
 class DeviceEntryUI {
@@ -63,26 +61,6 @@ class AudioDeviceEntryView : public DeviceEntryUI, public HoverButton {
 
   void SetHighlighted(bool highlighted);
   bool GetHighlighted() const;
-};
-
-// This media cast device entry UI only shows on Chrome OS ash.
-class CastDeviceEntryViewAsh : public DeviceEntryUI, public HoverButton {
-  METADATA_HEADER(CastDeviceEntryViewAsh, HoverButton)
-
- public:
-  CastDeviceEntryViewAsh(PressedCallback callback,
-                         ui::ColorId foreground_color_id,
-                         ui::ColorId background_color_id,
-                         const global_media_controls::mojom::DevicePtr& device);
-  ~CastDeviceEntryViewAsh() override;
-
-  // DeviceEntryUI
-  void OnColorsChanged(SkColor foreground_color,
-                       SkColor background_color) override {}
-  DeviceEntryUIType GetType() const override;
-
- private:
-  global_media_controls::mojom::DevicePtr device_;
 };
 
 #endif  // CHROME_BROWSER_UI_VIEWS_GLOBAL_MEDIA_CONTROLS_MEDIA_NOTIFICATION_DEVICE_ENTRY_UI_H_

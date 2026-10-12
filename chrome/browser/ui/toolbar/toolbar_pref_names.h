@@ -19,11 +19,6 @@ inline constexpr char kPinnedActions[] = "toolbar.pinned_actions";
 inline constexpr char kPinnedSearchCompanionMigrationComplete[] =
     "toolbar.pinned_search_companion_migration_complete";
 
-// Indicates whether the Cast pin state pref has been migrated to
-// the new toolbar container.
-inline constexpr char kPinnedCastMigrationComplete[] =
-    "toolbar.pinned_cast_migration_complete";
-
 // Indicates whether tabs from other devices side panel has been auto-pinned.
 inline constexpr char kTabsFromOtherDevicesAutoPinnedMigration[] =
     "toolbar.tabs_from_other_devices_auto_pinned_migration";
