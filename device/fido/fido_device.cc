@@ -25,10 +25,6 @@ std::string FidoDevice::GetDisplayName() const {
   return GetId();
 }
 
-cablev2::FidoTunnelDevice* FidoDevice::GetTunnelDevice() {
-  return nullptr;
-}
-
 void FidoDevice::DiscoverSupportedProtocolAndDeviceInfo(
     base::OnceClosure done) {
   // Set the protocol version to CTAP2 for the purpose of sending the GetInfo

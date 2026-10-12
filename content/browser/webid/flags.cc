@@ -40,15 +40,6 @@ bool IsWebIdentitySubdomainEnabled() {
   return base::FeatureList::IsEnabled(features::kFedCmWebIdentitySubdomain);
 }
 
-bool IsDigitalCredentialsEnabled() {
-  return base::FeatureList::IsEnabled(features::kWebIdentityDigitalCredentials);
-}
-
-bool IsDigitalCredentialsCreationEnabled() {
-  return base::FeatureList::IsEnabled(
-      features::kWebIdentityDigitalCredentialsCreation);
-}
-
 bool IsSameSiteLaxEnabled() {
   return base::FeatureList::IsEnabled(
       network::features::kSendSameSiteLaxForFedCM);

@@ -348,15 +348,6 @@ GetAssertionRequestHandler::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();
 }
 
-void GetAssertionRequestHandler::OnBluetoothAdapterEnumerated(
-    bool is_present,
-    BleStatus ble_status,
-    bool can_power_on,
-    bool is_peripheral_role_supported) {
-  FidoRequestHandlerBase::OnBluetoothAdapterEnumerated(
-      is_present, ble_status, can_power_on, is_peripheral_role_supported);
-}
-
 void GetAssertionRequestHandler::DispatchRequest(
     FidoAuthenticator* authenticator) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(my_sequence_checker_);

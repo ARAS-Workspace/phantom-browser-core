@@ -32,7 +32,6 @@
 
 namespace device {
 
-class BleAdapterManager;
 class FidoAuthenticator;
 class FidoDiscoveryFactory;
 class DiscoverableCredentialMetadata;
@@ -269,15 +268,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoRequestHandlerBase
     virtual void OnRetryUserVerification(int attempts) = 0;
   };
 
-  // ScopedAlwaysAllowBLECalls allows BLE API calls to always be made, even if
-  // they would be disabled on macOS because Chromium was not launched with
-  // self-responsibility.
-  class COMPONENT_EXPORT(DEVICE_FIDO) ScopedAlwaysAllowBLECalls {
-   public:
-    ScopedAlwaysAllowBLECalls();
-    ~ScopedAlwaysAllowBLECalls();
-  };
-
   FidoRequestHandlerBase();
 
   // The |available_transports| should be the intersection of transports
@@ -310,19 +300,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoRequestHandlerBase
   // all other authenticators are cancelled.
   // https://w3c.github.io/webauthn/#iface-pkcredential
   void CancelActiveAuthenticators(std::string_view exclude_id = "");
-  virtual void OnBluetoothAdapterEnumerated(bool is_present,
-                                            BleStatus ble_status,
-                                            bool can_power_on,
-                                            bool is_peripheral_role_supported);
-  void OnBluetoothAdapterStatusChanged(BleStatus ble_status);
-  void PowerOnBluetoothAdapter();
-
-  // Queries the OS for the status of the Bluetooth adapter. This is useful on
-  // macOS when TransportAvailabilityInfo::ble_status reports
-  // kPendingPermissionRequest, in which case the OS will display a blocking
-  // permissions prompt. Once the user allows or denies the prompt, |callback|
-  // will be executed with the result.
-  void RequestBluetoothPermission(BlePermissionCallback callback);
 
   base::WeakPtr<FidoRequestHandlerBase> GetWeakPtr();
 
@@ -343,11 +320,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoRequestHandlerBase
     return active_authenticators_;
   }
 
-  std::unique_ptr<BleAdapterManager>&
-  get_bluetooth_adapter_manager_for_testing() {
-    return bluetooth_adapter_manager_;
-  }
-
   void StopDiscoveries();
 
  protected:
@@ -364,8 +336,7 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoRequestHandlerBase
   void InitDiscoveries(
       FidoDiscoveryFactory* fido_discovery_factory,
       std::vector<std::unique_ptr<FidoDiscoveryBase>> additional_discoveries,
-      base::flat_set<FidoTransportProtocol> available_transports,
-      bool consider_enclave);
+      base::flat_set<FidoTransportProtocol> available_transports);
 
   void Start();
 
@@ -419,14 +390,12 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoRequestHandlerBase
   // versions before a request can be dispatched.
   void InitializeAuthenticatorAndDispatchRequest(
       const std::string& authenticator_id);
-  void ConstructBleAdapterPowerManager();
   void OnWinIsUvpaa(bool is_uvpaa);
 
   AuthenticatorMap active_authenticators_;
   std::vector<std::unique_ptr<FidoDiscoveryBase>> discoveries_;
   raw_ptr<Observer> observer_ = nullptr;
   TransportAvailabilityInfo transport_availability_info_;
-  std::unique_ptr<BleAdapterManager> bluetooth_adapter_manager_;
 
   // transport_availability_callback_readiness_ keeps track of state which
   // determines whether this object is ready to call

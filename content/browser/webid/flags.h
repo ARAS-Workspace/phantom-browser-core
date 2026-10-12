@@ -29,12 +29,6 @@ bool IsWithoutWellKnownEnforcementEnabled();
 // Whether subdomain-first discovery for well-known file is enabled.
 bool IsWebIdentitySubdomainEnabled();
 
-// Whether the Web Identity Digital Credentials API is enabled.
-bool IsDigitalCredentialsEnabled();
-
-// Whether the Web Identity Digital Credentials Creation API is enabled.
-bool IsDigitalCredentialsCreationEnabled();
-
 // Whether sending of SameSite=Lax cookies is enabled.
 bool IsSameSiteLaxEnabled();
 

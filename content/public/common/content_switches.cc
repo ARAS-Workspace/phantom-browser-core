@@ -737,10 +737,6 @@ const char kUnboundedWindowDebug[] = "unbounded-window-debug";
 const char kUseFakeCodecForPeerConnection[] =
     "use-fake-codec-for-peer-connection";
 
-// Bypass the digital-identity-credential OS call. Simulate the user
-// accepting the OS-presented dialog.
-const char kUseFakeUIForDigitalIdentity[] = "use-fake-ui-for-digital-identity";
-
 // Bypass the FedCM account selection dialog. If a value is provided for
 // this switch, that account ID is selected, otherwise the first account
 // is chosen.

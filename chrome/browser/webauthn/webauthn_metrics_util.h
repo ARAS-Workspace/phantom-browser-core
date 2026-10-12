@@ -67,11 +67,6 @@ enum class WebAuthenticationGPMCachedOpportunisticallyRetrievedKeyEvent {
   // LINT.ThenChange(//tools/metrics/histograms/metadata/webauthn/enums.xml:WebAuthenticationGPMCachedOpportunisticallyRetrievedKeyEvent)
 };
 
-void RecordGPMRecoveryEvent(WebAuthenticationGPMRecoveryEvent event);
-void RecordGPMCachedOpportunisticallyRetrievedKeyEvent(
-    webauthn::metrics::
-        WebAuthenticationGPMCachedOpportunisticallyRetrievedKeyEvent event);
-
 void RecordCombinedSelectorShown(int credential_count);
 void RecordCombinedSelectorAccept(int credential_count, bool default_selected);
 void RecordCombinedSelectorCancelButtonClicked();
@@ -79,9 +74,5 @@ void RecordCombinedSelectorCancelButtonClicked();
 }  // namespace webauthn::metrics
 
 void ReportConditionalUiPasskeyCount(int passkey_count);
-void RecordGPMMakeCredentialEvent(
-    webauthn::metrics::GPMMakeCredentialEvents event);
-void RecordGPMGetAssertionEvent(webauthn::metrics::GPMGetAssertionEvents event);
-void RecordOnboardingEvent(webauthn::metrics::OnboardingEvents event);
 
 #endif  // CHROME_BROWSER_WEBAUTHN_WEBAUTHN_METRICS_UTIL_H_

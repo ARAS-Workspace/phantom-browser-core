@@ -54,25 +54,14 @@ component("fido") {
 
   if (use_blink) {
     sources += [
-      "cable/noise.cc",
-      "cable/noise.h",
-      "cable/pairing.cc",
-      "cable/pairing.h",
-      "cable/v2_constants.h",
-      "cable/v2_handshake.cc",
-      "cable/v2_handshake.h",
-      "cable/websocket_adapter.cc",
-      "cable/websocket_adapter.h",
       "discoverable_credential_metadata.cc",
       "discoverable_credential_metadata.h",
       "json_request.cc",
       "json_request.h",
-      "network_context_factory.h",
     ]
 
     deps += [
       "//components/apdu",
-      "//components/trusted_vault",
       "//device/base",
       "//device/fido/strings",
       "//services/data_decoder/public/cpp",
@@ -82,8 +71,6 @@ component("fido") {
 
     public_deps += [
       "//base",
-      "//device/bluetooth",
-      "//device/bluetooth/public/cpp",
       "//services/device/public/mojom",
     ]
 
@@ -108,14 +95,6 @@ component("fido") {
       "bio/enrollment.h",
       "bio/enrollment_handler.cc",
       "bio/enrollment_handler.h",
-      "ble_adapter_manager.cc",
-      "ble_adapter_manager.h",
-      "cable/fido_ble_uuids.cc",
-      "cable/fido_ble_uuids.h",
-      "cable/fido_tunnel_device.cc",
-      "cable/fido_tunnel_device.h",
-      "cable/v2_discovery.cc",
-      "cable/v2_discovery.h",
       "cmtg_key_response.cc",
       "cmtg_key_response.h",
       "credential_management.cc",
@@ -134,25 +113,6 @@ component("fido") {
       "device_operation.h",
       "device_response_converter.cc",
       "device_response_converter.h",
-      "enclave/attestation.cc",
-      "enclave/attestation.h",
-      "enclave/attestation_report.h",
-      "enclave/constants.cc",
-      "enclave/constants.h",
-      "enclave/enclave_authenticator.cc",
-      "enclave/enclave_authenticator.h",
-      "enclave/enclave_discovery.cc",
-      "enclave/enclave_discovery.h",
-      "enclave/enclave_protocol_utils.cc",
-      "enclave/enclave_protocol_utils.h",
-      "enclave/enclave_websocket_client.cc",
-      "enclave/enclave_websocket_client.h",
-      "enclave/metrics.cc",
-      "enclave/metrics.h",
-      "enclave/transact.cc",
-      "enclave/transact.h",
-      "enclave/types.cc",
-      "enclave/types.h",
       "fido_authenticator.cc",
       "fido_authenticator.h",
       "fido_device.cc",
@@ -217,14 +177,10 @@ component("fido") {
     ]
 
     deps += [
-      "//components/sync/protocol",
-      "//device/fido/enclave/proto",
       "//services/device/public/cpp/hid",
       "//services/device/public/cpp/usb",
       "//services/device/public/mojom",
       "//services/device/public/mojom:usb",
-      "//services/network/public/cpp",
-      "//services/network/public/mojom",
     ]
 
     if (is_mac) {
@@ -264,61 +220,10 @@ component("fido") {
 }
 
 if (use_blink) {
-  static_library("cablev2_registration") {
-    sources = []
-    deps = [
-      ":fido",
-      "//base",
-      "//components/cbor",
-      "//components/device_event_log",
-      "//third_party/boringssl",
-    ]
-    configs += [ "//build/config/compiler:wexit_time_destructors" ]
-  }
-
-  static_library("cablev2_authenticator") {
-    sources = [
-      "cable/v2_authenticator.cc",
-      "cable/v2_authenticator.h",
-    ]
-    deps = [
-      ":fido",
-      "//components/cbor",
-      "//components/device_event_log",
-      "//services/network/public/cpp",
-      "//services/network/public/mojom",
-      "//third_party/blink/public/mojom:authenticator_mojo_bindings",
-    ]
-    configs += [ "//build/config/compiler:wexit_time_destructors" ]
-  }
-
-  static_library("cablev2_test_util") {
-    testonly = true
-    sources = [
-      "cable/v2_test_util.cc",
-      "cable/v2_test_util.h",
-    ]
-    deps = [
-      ":cablev2_authenticator",
-      ":fido",
-      ":mocks",
-      "//components/cbor",
-      "//crypto",
-      "//net/traffic_annotation:test_support",
-      "//services/network:test_support",
-      "//services/network/public/mojom",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//third_party/blink/public/mojom:authenticator_mojo_bindings",
-    ]
-  }
-
   source_set("mocks") {
     testonly = true
 
     sources = [
-      "cable/cable_mock_bluetooth_adapter.cc",
-      "cable/cable_mock_bluetooth_adapter.h",
       "mock_fido_device.cc",
       "mock_fido_device.h",
       "mock_fido_discovery_observer.cc",
@@ -330,7 +235,6 @@ if (use_blink) {
       "//base",
       "//components/apdu",
       "//components/cbor",
-      "//device/bluetooth:mocks",
       "//testing/gmock",
     ]
   }
@@ -356,20 +260,6 @@ if (use_blink) {
     ]
     seed_corpus = "response_data_fuzzer_corpus/"
     libfuzzer_options = [ "max_len=65537" ]
-  }
-
-  fuzzer_test("v2_handshake_fuzzer") {
-    sources = [ "cable/v2_handshake_fuzzer.cc" ]
-    deps = [
-      ":fido",
-      "//base",
-      "//base/test:test_support",
-      "//device/bluetooth:mocks",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//testing/libfuzzer:libfuzzer_base_wrappers",
-    ]
-    libfuzzer_options = [ "max_len=2048" ]
   }
 
   is_linux_without_udev = is_linux && !use_udev

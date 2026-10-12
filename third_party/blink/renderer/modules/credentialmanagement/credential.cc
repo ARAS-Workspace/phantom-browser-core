@@ -13,7 +13,6 @@
 namespace blink {
 
 namespace {
-constexpr char kDigitalCredentialType[] = "digital";
 constexpr char kFederatedCredentialType[] = "federated";
 constexpr char kIdentityCredentialType[] = "identity";
 constexpr char kOtpCredentialType[] = "otp";
@@ -23,9 +22,8 @@ Credential::~Credential() = default;
 
 Credential::Credential(const String& id, const String& type)
     : id_(id), type_(type) {
-  DCHECK(!id_.empty() || type == kDigitalCredentialType ||
-         type == kFederatedCredentialType || type == kIdentityCredentialType ||
-         type == kOtpCredentialType);
+  DCHECK(!id_.empty() || type == kFederatedCredentialType ||
+         type == kIdentityCredentialType || type == kOtpCredentialType);
   DCHECK(!type_.empty());
 }
 

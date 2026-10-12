@@ -32,13 +32,6 @@ class UiReadinessBarrier : public AuthenticatorRequestDialogModel::Observer {
         device::FidoRequestHandlerBase::TransportAvailabilityInfo tai,
         PasswordCredentialFetcher::PasswordCredentials passwords) = 0;
     virtual bool PasswordsUsable() = 0;
-    virtual bool IsEnclaveActive() = 0;
-    virtual bool IsEnclaveReady() = 0;
-    virtual void GetGpmPasskeys(
-        device::FidoRequestHandlerBase::TransportAvailabilityInfo tai,
-        base::OnceCallback<
-            void(device::FidoRequestHandlerBase::TransportAvailabilityInfo)>
-            callback) = 0;
   };
 
   UiReadinessBarrier(Delegate* delegate,
@@ -51,17 +44,10 @@ class UiReadinessBarrier : public AuthenticatorRequestDialogModel::Observer {
   void SetPasswordCredentials(
       PasswordCredentialFetcher::PasswordCredentials passwords);
 
-  // AuthenticatorRequestDialogModel::Observer:
-  void OnGPMReadyForUI() override;
-
   // Can be called to force the UI check, for example after a timeout.
   void TryToShowUI();
 
  private:
-  void ContinueWithGpmPasskeys(
-      PasswordCredentialFetcher::PasswordCredentials passwords,
-      device::FidoRequestHandlerBase::TransportAvailabilityInfo tai);
-
   raw_ptr<Delegate> delegate_;
 
   std::unique_ptr<device::FidoRequestHandlerBase::TransportAvailabilityInfo>

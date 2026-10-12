@@ -461,13 +461,6 @@ BASE_FEATURE(kFencedFramesEnforceFocus, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kForwardMemoryPressureToBlinkIsolates,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Enables the Digital Credential API.
-BASE_FEATURE(kWebIdentityDigitalCredentials, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables the Digital Credentials Creation API.
-BASE_FEATURE(kWebIdentityDigitalCredentialsCreation,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enables scrollers inside Blink to store scroll offsets in fractional
 // floating-point numbers rather than truncating to integers.
 BASE_FEATURE(kFractionalScrollOffsets, base::FEATURE_DISABLED_BY_DEFAULT);

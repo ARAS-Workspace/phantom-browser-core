@@ -111,11 +111,11 @@ TEST_F(AuthenticatorMultiSourcePickerSheetModelTest, GPMPasskeysOnly) {
   dialog_model->mechanisms.emplace_back(
       Mechanism::Credential(
           {device::AuthenticatorType::kEnclave, {0}, std::nullopt}),
-      kPasskeyName1, kPasskeyPhoneCustomIcon, base::DoNothing());
+      kPasskeyName1, kPasskeyUsbCustomIcon, base::DoNothing());
   dialog_model->mechanisms.emplace_back(
       Mechanism::Credential(
           {device::AuthenticatorType::kEnclave, {1}, std::nullopt}),
-      kPasskeyName2, kPasskeyPhoneCustomIcon, base::DoNothing());
+      kPasskeyName2, kPasskeyUsbCustomIcon, base::DoNothing());
   dialog_model->mechanisms.emplace_back(
       Mechanism::Transport(AuthenticatorTransport::kUsbHumanInterfaceDevice),
       u"security key", kPasskeyAoaCustomIcon, base::DoNothing());
@@ -134,7 +134,7 @@ TEST_F(AuthenticatorMultiSourcePickerSheetModelTest,
   dialog_model->mechanisms.emplace_back(
       Mechanism::Credential(
           {device::AuthenticatorType::kEnclave, {0}, std::nullopt}),
-      kPasskeyName1, kPasskeyPhoneCustomIcon, base::DoNothing());
+      kPasskeyName1, kPasskeyUsbCustomIcon, base::DoNothing());
   dialog_model->mechanisms.emplace_back(
       Mechanism::Credential(
           {device::AuthenticatorType::kTouchID, {1}, std::nullopt}),

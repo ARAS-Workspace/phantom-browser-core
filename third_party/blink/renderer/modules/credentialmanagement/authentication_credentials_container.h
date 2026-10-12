@@ -53,7 +53,7 @@ class MODULES_EXPORT AuthenticationCredentialsContainer final
   void Trace(Visitor*) const override;
 
  private:
-  // get() implementation for FedCM and WebIdentityDigitalCredential.
+  // get() implementation for FedCM.
   void GetForIdentity(ScriptState*,
                       ScriptPromiseResolver<IDLNullable<Credential>>*,
                       const CredentialRequestOptions&,

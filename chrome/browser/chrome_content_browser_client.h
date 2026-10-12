@@ -31,7 +31,6 @@
 #include "components/guest_view/buildflags/buildflags.h"
 #include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/content_browser_client.h"
-#include "content/public/browser/digital_identity_provider.h"
 #include "content/public/browser/frame_tree_node_id.h"
 #include "content/public/browser/legacy_tech_cookie_issue_details.h"
 #include "content/public/browser/web_contents.h"
@@ -872,9 +871,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::unique_ptr<content::IdentityRequestDialogController>
   CreateIdentityRequestDialogController(
       content::WebContents* web_contents) override;
-
-  std::unique_ptr<content::DigitalIdentityProvider>
-  CreateDigitalIdentityProvider() override;
 
   static base::TimeDelta GetKeepaliveTimerTimeout(
       content::BrowserContext* context);

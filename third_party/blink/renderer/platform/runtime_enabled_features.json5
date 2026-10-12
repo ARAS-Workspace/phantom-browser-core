@@ -1057,12 +1057,6 @@
       status: "stable",
     },
     {
-      // Enables capability delegation for the Digital Credentials API (both
-      // create and get requests).
-      // https://crbug.com/512747131
-      name: "CapabilityDelegationDigitalCredentials",
-    },
-    {
       name: "CapabilityDelegationDisplayCaptureRequest",
       status: "experimental",
     },
@@ -2261,10 +2255,6 @@
     },
     {
       name: "DialogNewFocusBehavior",
-      status: "experimental",
-    },
-    {
-      name: "DigitalCredentialsProtocolFilter",
       status: "experimental",
     },
     {
@@ -6931,20 +6921,6 @@
       // leaks.
       name: "WebHIDWorldIsolatedCache",
       status: "stable",
-    },
-    {
-      name: "WebIdentityDigitalCredentials",
-      public: true,
-      status: "stable",
-      base_feature: "none",
-    },
-    {
-      name: "WebIdentityDigitalCredentialsCreation",
-      origin_trial_feature_name: "WebIdentityDigitalCredentialsCreation",
-      origin_trial_allows_third_party: true,
-      public: true,
-      status: "experimental",
-      base_feature: "none",
     },
     // Kill switch for making BigInt handling in WebIDL use ToBigInt.
     {

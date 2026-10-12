@@ -34,7 +34,6 @@
 #include "content/public/browser/browsing_data_remover.h"
 #include "content/public/browser/client_certificate_delegate.h"
 #include "content/public/browser/devtools_manager_delegate.h"
-#include "content/public/browser/digital_identity_provider.h"
 #include "content/public/browser/legacy_tech_cookie_issue_details.h"
 #include "content/public/browser/login_delegate.h"
 #include "content/public/browser/navigation_throttle.h"
@@ -1484,11 +1483,6 @@ std::unique_ptr<IdentityRequestDialogController>
 ContentBrowserClient::CreateIdentityRequestDialogController(
     WebContents* web_contents) {
   return std::make_unique<IdentityRequestDialogController>();
-}
-
-std::unique_ptr<DigitalIdentityProvider>
-ContentBrowserClient::CreateDigitalIdentityProvider() {
-  return nullptr;
 }
 
 std::unique_ptr<NativeIdpFetcher> ContentBrowserClient::CreateNativeIdpFetcher(

@@ -206,14 +206,6 @@ const char* CredentialTypeToString(CredentialType type) {
   NOTREACHED();
 }
 
-const char kCableHandshakeKeyInfo[] = "FIDO caBLE v1 handshakeKey";
-const std::array<uint8_t, 24> kCableDeviceEncryptionKeyInfo = {
-    'F', 'I', 'D', 'O', ' ', 'c', 'a', 'B', 'L', 'E', ' ', 'v',
-    '1', ' ', 's', 'e', 's', 's', 'i', 'o', 'n', 'K', 'e', 'y',
-};
-const char kCableAuthenticatorHelloMessage[] = "caBLE v1 authenticator hello";
-const char kCableClientHelloMessage[] = "caBLE v1 client hello";
-
 const char kCtap2Version[] = "FIDO_2_0";
 const char kU2fVersion[] = "U2F_V2";
 const char kCtap2_1Version[] = "FIDO_2_1";

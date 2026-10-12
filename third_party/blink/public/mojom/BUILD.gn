@@ -267,7 +267,6 @@ mojom("mojom_platform") {
     "web_install/web_install.mojom",
     "web_launch/web_launch.mojom",
     "webaudio/audio_context_manager.mojom",
-    "webid/digital_identity_request.mojom",
     "webid/email_verification_request.mojom",
     "webid/federated_request.mojom",
     "webpreferences/web_preferences.mojom",

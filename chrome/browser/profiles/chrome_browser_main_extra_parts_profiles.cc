@@ -69,7 +69,6 @@
 #include "chrome/browser/data_sharing/data_sharing_service_factory.h"
 #include "chrome/browser/data_sharing/personal_collaboration_data/personal_collaboration_data_service_factory.h"
 #include "chrome/browser/device_reauth/chrome_device_authenticator_factory.h"
-#include "chrome/browser/digital_credentials/digital_credentials_keyed_service.h"
 #include "chrome/browser/dom_distiller/dom_distiller_service_factory.h"
 #include "chrome/browser/domain_reliability/service_factory.h"
 #include "chrome/browser/download/background_download_service_factory.h"
@@ -238,8 +237,6 @@
 #include "chrome/browser/visited_url_ranking/group_suggestions_service_factory.h"
 #include "chrome/browser/visited_url_ranking/visited_url_ranking_service_factory.h"
 #include "chrome/browser/web_applications/isolated_web_apps/iwa_permissions_policy_cache.h"
-#include "chrome/browser/webauthn/cmtg_device_key_provider_factory.h"
-#include "chrome/browser/webauthn/enclave_manager_factory.h"
 #include "chrome/browser/webauthn/immediate_request_rate_limiter_factory.h"
 #include "chrome/browser/webdata_services/web_data_service_factory.h"
 #include "chrome/browser/webid/federated_identity_api_permission_context_factory.h"
@@ -349,7 +346,6 @@
 #include "chrome/browser/notebooks/notebooks_service_factory.h"
 #include "chrome/browser/password_manager/factories/startup_passwords_import_service_factory.h"  // nogncheck (Desktop only)
 #include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
-#include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "device/fido/public/features.h"
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/policy/messaging_layer/util/manual_test_heartbeat_event_factory.h"
@@ -577,7 +573,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   ClientHintsFactory::GetInstance();
   ClipboardRestrictionServiceFactory::GetInstance();
-  CmtgDeviceKeyProviderFactory::GetInstance();
   collaboration::CollaborationServiceFactory::GetInstance();
   collaboration::comments::CommentsServiceFactory::GetInstance();
   collaboration::messaging::MessagingBackendServiceFactory::GetInstance();
@@ -609,13 +604,11 @@ void ChromeBrowserMainExtraPartsProfiles::
   BtmBrowserSigninDetectorFactory::GetInstance();
   policy::DeveloperToolsPolicyCheckerFactory::GetInstance();
   dictation::DictationKeyedServiceFactory::GetInstance();
-  digital_credentials::DigitalCredentialsKeyedServiceFactory::GetInstance();
   DocumentSuggestionsServiceFactory::GetInstance();
   dom_distiller::DomDistillerServiceFactory::GetInstance();
   DomainDiversityReporterFactory::GetInstance();
   DownloadBubbleUpdateServiceFactory::GetInstance();
   DownloadCoreServiceFactory::GetInstance();
-  EnclaveManagerFactory::GetInstance();
   enterprise::ProfileIdServiceFactory::GetInstance();
   enterprise_commands::UserRemoteCommandsServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -756,7 +749,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   page_image_service::ImageServiceFactory::EnsureFactoryBuilt();
   PageColorsControllerFactory::GetInstance();
   passage_embeddings::PassageEmbedderModelObserverFactory::GetInstance();
-  webauthn::PasskeyUnlockManagerFactory::GetInstance();
   password_manager::PasswordManagerLogRouterFactory::GetInstance();
   password_manager::PasswordRequirementsServiceFactory::GetInstance();
   PasswordFieldClassificationModelHandlerFactory::GetInstance();

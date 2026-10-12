@@ -191,7 +191,6 @@
 #include "third_party/blink/public/mojom/web_install/web_install.mojom.h"
 #include "third_party/blink/public/mojom/webaudio/audio_context_manager.mojom.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom.h"
-#include "third_party/blink/public/mojom/webid/digital_identity_request.mojom.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom.h"
 #include "third_party/blink/public/mojom/webrtc/rtc_logging.mojom.h"
 #include "third_party/blink/public/mojom/websockets/websocket_connector.mojom.h"
@@ -1270,9 +1269,6 @@ void PopulateBinderMapWithContext(
         &BindRenderFrameHostImpl<
             &RenderFrameHostImpl::BindWebOTPServiceReceiver>);
   }
-  map->Add<blink::mojom::DigitalIdentityRequest>(
-      &BindRenderFrameHostImpl<
-          &RenderFrameHostImpl::BindDigitalIdentityRequestReceiver>);
   map->Add<blink::mojom::FederatedRequestService>(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::BindFederatedRequestServiceReceiver>);

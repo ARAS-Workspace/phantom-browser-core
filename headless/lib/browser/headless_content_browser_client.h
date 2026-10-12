@@ -78,8 +78,6 @@ class HeadlessContentBrowserClient : public content::ContentBrowserClient {
   bool ShouldIsolateErrorPage(bool in_main_frame) override;
   bool ShouldAllowProcessPerSiteForMultipleMainFrames(
       content::BrowserContext* context) override;
-  std::unique_ptr<content::DigitalIdentityProvider>
-  CreateDigitalIdentityProvider() override;
 
   bool IsPrivacySandboxReportingDestinationAttested(
       content::BrowserContext* browser_context,

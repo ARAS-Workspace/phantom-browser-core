@@ -61,8 +61,6 @@
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/ui/views/toolbar/webui_test_utils.h"
 #include "chrome/browser/ui/waap/initial_web_ui_manager.h"
-#include "chrome/browser/webauthn/passkey_unlock_manager.h"
-#include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/branded_strings.h"
@@ -2744,124 +2742,6 @@ INSTANTIATE_TEST_SUITE_P(
     AvatarToolbarButtonSignInBenefitsNewSigninIphParameterizedTest,
     testing::Bool());
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-class MockPasskeyUnlockManager : public webauthn::PasskeyUnlockManager {
- public:
-  MOCK_METHOD(bool, ShouldDisplayErrorUi, (), (const, override));
-};
-
-class AvatarToolbarButtonPasskeyUnlockErrorBrowserTest
-    : public AvatarToolbarButtonBrowserTest {
- public:
-  AvatarToolbarButtonPasskeyUnlockErrorBrowserTest() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{device::kPasskeyUnlockErrorUi,
-                              device::kWebAuthnOpportunisticRetrieval},
-        /*disabled_features=*/{});
-  }
-
-  void SetUpBrowserContextKeyedServices(
-      content::BrowserContext* context) override {
-    AvatarToolbarButtonBrowserTest::SetUpBrowserContextKeyedServices(context);
-    webauthn::PasskeyUnlockManagerFactory::GetInstance()
-        ->SetTestingFactoryAndUse(
-            context, base::BindRepeating(
-                         &AvatarToolbarButtonPasskeyUnlockErrorBrowserTest::
-                             CreateMockPasskeyUnlockManager,
-                         base::Unretained(this)));
-  }
-
-  void TearDownOnMainThread() override {
-    mock_passkey_unlock_manager_ = nullptr;
-    AvatarToolbarButtonBrowserTest::TearDownOnMainThread();
-  }
-
- protected:
-  MockPasskeyUnlockManager* passkey_unlock_manager() {
-    return mock_passkey_unlock_manager_;
-  }
-
-  static constexpr const char kPasskeyUnlockErrorUiEventHistogram[] =
-      "WebAuthentication.PasskeyUnlock.ErrorUi.Event";
-
- private:
-  std::unique_ptr<KeyedService> CreateMockPasskeyUnlockManager(
-      content::BrowserContext* context) {
-    auto passkey_unlock_manager =
-        std::make_unique<testing::NiceMock<MockPasskeyUnlockManager>>();
-    mock_passkey_unlock_manager_ = passkey_unlock_manager.get();
-    ON_CALL(*passkey_unlock_manager, ShouldDisplayErrorUi())
-        .WillByDefault(testing::Return(false));
-    return passkey_unlock_manager;
-  }
-
-  raw_ptr<MockPasskeyUnlockManager> mock_passkey_unlock_manager_ = nullptr;
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonPasskeyUnlockErrorBrowserTest,
-                       PasskeyUnlockError) {
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_TRUE(base::test::RunUntil([browser = browser()]() {
-    InitialWebUIManager* manager = InitialWebUIManager::From(browser);
-    return !manager || !manager->IsInitialWebUIPending();
-  }));
-  SigninWithImageAndClearGreetingAndSyncPromo(browser(), avatar,
-                                              u"test@gmail.com");
-
-  base::HistogramTester histogram_tester;
-  // Simulate the error appearing.
-  ON_CALL(*passkey_unlock_manager(), ShouldDisplayErrorUi())
-      .WillByDefault(testing::Return(true));
-  passkey_unlock_manager()->NotifyObserversForTesting();
-
-  EXPECT_TRUE(avatar_accessor.WaitForText(
-      l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_PASSKEYS_ERROR_VERIFY)));
-  // TODO(crbug.com/506022005): We use EXPECT_GE() instead of EXPECT_EQ(..., 1)
-  // because the 'doubled' counts happen as InitialWebUI instantiates a second
-  // UI frontend (the WebUI toolbar) which also observes the manager. Since the
-  // histogram is recorded when the UI reacts to the manager's state change,
-  // both the Views and WebUI components trigger the metric, leading to the
-  // doubled count in tests. We should fix the overall architecture of the
-  // AvatarButton to have a single state manager per browser, then change this
-  // to EXPECT_EQ.
-  EXPECT_GE(
-      histogram_tester.GetBucketCount(
-          kPasskeyUnlockErrorUiEventHistogram,
-          webauthn::PasskeyUnlockManager::ErrorUIEventType::kAvatarUIDisplayed),
-      1);
-
-  // Click the avatar button.
-  avatar_accessor.Click();
-  histogram_tester.ExpectBucketCount(
-      kPasskeyUnlockErrorUiEventHistogram,
-      webauthn::PasskeyUnlockManager::ErrorUIEventType::kAvatarButtonPressed,
-      1);
-
-  // Simulate the error disappearing.
-  ON_CALL(*passkey_unlock_manager(), ShouldDisplayErrorUi())
-      .WillByDefault(testing::Return(false));
-  EXPECT_CALL(*passkey_unlock_manager(), ShouldDisplayErrorUi())
-      .Times(testing::AtLeast(1));
-  passkey_unlock_manager()->NotifyObserversForTesting();
-
-  // Once the error disappeared, the button should return to the normal state.
-  EXPECT_TRUE(avatar_accessor.WaitForText(std::u16string()));
-
-  // TODO(crbug.com/506022005): Same as above. We use EXPECT_GE() instead of
-  // EXPECT_EQ(..., 1) because the 'doubled' counts happen as InitialWebUI
-  // instantiates a second UI frontend.
-  EXPECT_GE(
-      histogram_tester.GetBucketCount(
-          kPasskeyUnlockErrorUiEventHistogram,
-          webauthn::PasskeyUnlockManager::ErrorUIEventType::kAvatarUIHidden),
-      1);
-}
-INSTANTIATE_TEST_SUITE_P(All,
-                         AvatarToolbarButtonPasskeyUnlockErrorBrowserTest,
-                         testing::Bool());
 
 class AvatarToolbarButtonGradientRingBrowserTest
     : public AvatarToolbarButtonBrowserTestBase {

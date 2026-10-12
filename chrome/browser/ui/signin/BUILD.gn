@@ -44,10 +44,6 @@ source_set("signin") {
       "promos/bubble_signin_promo_signin_button_view.h",
       "promos/bubble_signin_promo_view.h",
       "promos/signin_promo_tab_helper.h",
-      "signin_qrcode_infobar.h",
-      "signin_qrcode_infobar_delegate.h",
-      "signin_qrcode_model.h",
-      "signin_qrcode_view.h",
     ]
     public_deps += [
       "//chrome/browser/signin",
@@ -115,10 +111,6 @@ source_set("impl") {
       "promos/bubble_signin_promo_signin_button_view.cc",
       "promos/bubble_signin_promo_view.cc",
       "promos/signin_promo_tab_helper.cc",
-      "signin_qrcode_infobar.cc",
-      "signin_qrcode_infobar_delegate.cc",
-      "signin_qrcode_model.cc",
-      "signin_qrcode_view.cc",
     ]
 
     deps += [
@@ -130,7 +122,6 @@ source_set("impl") {
       "//chrome/browser/ui/views/controls",
       "//chrome/browser/ui/views/infobars",
       "//chrome/browser/ui/views/profiles:badged_profile_photo",
-      "//chrome/browser/ui/views/webauthn",
       "//chrome/browser/ui/web_applications",
       "//components/infobars/content",
       "//components/pref_registry",
@@ -252,8 +243,6 @@ source_set("browser_tests") {
       "//chrome/test:test_support",
       "//components/infobars/content",
       "//components/sync:test_support",
-      "//device/bluetooth",
-      "//device/bluetooth:mocks",
     ]
   }
 

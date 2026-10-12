@@ -11,10 +11,6 @@
 #include "content/public/browser/webid/identity_request_dialog_controller.h"
 #include "content/public/test/content_browser_test_content_browser_client.h"
 
-namespace content {
-class DigitalIdentityProvider;
-}  // namespace content
-
 namespace content::webid {
 
 class IdentityRegistryDelegate;
@@ -34,16 +30,10 @@ class WebIdTestContentBrowserClient
   std::unique_ptr<IdentityRequestDialogController>
   CreateIdentityRequestDialogController(WebContents* web_contents) override;
 
-  std::unique_ptr<DigitalIdentityProvider> CreateDigitalIdentityProvider()
-      override;
-
   // This needs to be called once for every WebID invocation. If there is a
   // need in future to generate these in sequence then a callback can be used.
   void SetIdentityRequestDialogController(
       std::unique_ptr<IdentityRequestDialogController> controller);
-
-  void SetDigitalIdentityProvider(
-      std::unique_ptr<DigitalIdentityProvider> provider);
 
   void SetIdentityRegistry(WebContents* web_contents,
                            base::WeakPtr<IdentityRegistryDelegate> delegate,
@@ -54,13 +44,8 @@ class WebIdTestContentBrowserClient
     return test_dialog_controller_.get();
   }
 
-  DigitalIdentityProvider* GetDigitalIdentityProviderForTests() {
-    return test_digital_identity_provider_.get();
-  }
-
  private:
   std::unique_ptr<IdentityRequestDialogController> test_dialog_controller_;
-  std::unique_ptr<DigitalIdentityProvider> test_digital_identity_provider_;
 };
 
 }  // namespace content::webid

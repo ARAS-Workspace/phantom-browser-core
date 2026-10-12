@@ -69,8 +69,6 @@
 #include "content/public/browser/webauth_request_security_checker.h"
 #include "content/public/common/content_client.h"
 #include "crypto/hash.h"
-#include "device/bluetooth/bluetooth_adapter.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
 #include "device/fido/attestation_object.h"
 #include "device/fido/attestation_statement.h"
 #include "device/fido/authenticator_data.h"
@@ -897,14 +895,8 @@ void AuthenticatorCommonImpl::StartMakeCredentialRequest(
           &device::FidoRequestHandlerBase::StartAuthenticatorRequest,
           req_state_->request_handler->GetWeakPtr()) /* request_callback */,
       base::DoNothing() /* cancel_ui_timeout_callback */,
-      base::BindRepeating(
-          &device::FidoRequestHandlerBase::PowerOnBluetoothAdapter,
-          req_state_->request_handler
-              ->GetWeakPtr()) /* bluetooth_adapter_power_on_callback */,
-      base::BindRepeating(
-          &device::FidoRequestHandlerBase::RequestBluetoothPermission,
-          req_state_->request_handler
-              ->GetWeakPtr()) /* request_ble_permission_callback */);
+      base::DoNothing() /* bluetooth_adapter_power_on_callback */,
+      base::DoNothing() /* request_ble_permission_callback */);
   // `StartObserving` can destroy `this`. It is not safe to refer to local
   // state after this call.
   req_state_->request_delegate->StartObserving(
@@ -976,13 +968,8 @@ void AuthenticatorCommonImpl::StartGetAssertionRequest(
           &device::GetAssertionRequestHandler::StartAuthenticatorRequest,
           request_handler->GetWeakPtr()) /* request_callback */,
       std::move(cancel_ui_timeout_callback),
-      base::BindRepeating(
-          &device::FidoRequestHandlerBase::PowerOnBluetoothAdapter,
-          request_handler
-              ->GetWeakPtr()) /* bluetooth_adapter_power_on_callback */,
-      base::BindRepeating(
-          &device::FidoRequestHandlerBase::RequestBluetoothPermission,
-          request_handler->GetWeakPtr()) /* request_ble_permission_callback */);
+      base::DoNothing() /* bluetooth_adapter_power_on_callback */,
+      base::DoNothing() /* request_ble_permission_callback */);
 
   req_state_->request_handler = std::move(request_handler);
   // `StartObserving` can destroy `this`. It is not safe to refer to local
@@ -1943,9 +1930,8 @@ void AuthenticatorCommonImpl::GetClientCapabilities(
   barrier_callback.Run(
       MakeCapability(client_capabilities::kConditionalCreate, true));
 
-  IsHybridTransportSupported(
-      base::BindOnce(&MakeCapability, client_capabilities::kHybridTransport)
-          .Then(barrier_callback));
+  barrier_callback.Run(
+      MakeCapability(client_capabilities::kHybridTransport, false));
 
   IsUvpaaAvailableInternal(
       caller_origin,
@@ -1970,19 +1956,6 @@ void AuthenticatorCommonImpl::GetClientCapabilities(
       MakeCapability(client_capabilities::kSignalCurrentUserDetails, true));
   barrier_callback.Run(
       MakeCapability(client_capabilities::kSignalUnknownCredential, true));
-}
-
-void AuthenticatorCommonImpl::IsHybridTransportSupported(
-    base::OnceCallback<void(bool)> callback) {
-  if (!device::BluetoothAdapterFactory::Get()->IsLowEnergySupported()) {
-    std::move(callback).Run(false);
-    return;
-  }
-
-  device::BluetoothAdapterFactory::Get()->GetAdapter(
-      base::BindOnce([](scoped_refptr<device::BluetoothAdapter> adapter) {
-        return adapter && adapter->IsPresent();
-      }).Then(std::move(callback)));
 }
 
 void AuthenticatorCommonImpl::IsUvpaaAvailableInternal(

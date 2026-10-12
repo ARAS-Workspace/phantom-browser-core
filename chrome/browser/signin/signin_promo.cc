@@ -28,8 +28,6 @@
 #include "components/sync/base/features.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition_config.h"
-#include "device/bluetooth/bluetooth_adapter.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "net/base/url_util.h"
@@ -117,34 +115,8 @@ GURL GetChromeSyncURLForDice(ChromeSyncUrlArgs args) {
                                       exp_param);
     }
   }
-  static const char kMagiChromeHybridTransportSupportedHistogram[] =
-      "Signin.MagiChrome.HybridTransportSupported";
-  // Record hybrid transport signal histogram.
-  IsHybridTransportSupportedForQrCodeSignin(base::BindOnce([](bool can_start) {
-    base::UmaHistogramBoolean(kMagiChromeHybridTransportSupportedHistogram,
-                              can_start);
-  }));
 
   return url;
-}
-
-void IsHybridTransportSupportedForQrCodeSignin(
-    base::OnceCallback<void(bool)> callback) {
-  if (!device::BluetoothAdapterFactory::Get()->IsLowEnergySupported()) {
-    std::move(callback).Run(false);
-    return;
-  }
-  device::BluetoothAdapterFactory::Get()->GetAdapter(base::BindOnce(
-      [](base::OnceCallback<void(bool)> callback,
-         scoped_refptr<device::BluetoothAdapter> adapter) {
-        bool can_show =
-            adapter && adapter->IsPresent() &&
-            adapter->GetOsPermissionStatus() ==
-                device::BluetoothAdapter::PermissionStatus::kAllowed &&
-            adapter->IsPowered();
-        std::move(callback).Run(can_show);
-      },
-      std::move(callback)));
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 

@@ -4,7 +4,6 @@
 
 #include "device/fido/virtual_fido_device_factory.h"
 
-#include "device/fido/cable/pairing.h"
 #include "device/fido/public/fido_transport_protocol.h"
 #include "device/fido/virtual_fido_device_discovery.h"
 
@@ -51,20 +50,11 @@ VirtualFidoDeviceFactory::Create(FidoTransportProtocol transport) {
       device::FidoDiscoveryBase::EventStream<bool>::New();
   return SingleDiscovery(std::make_unique<VirtualFidoDeviceDiscovery>(
       trace_, trace_index, transport_, state_, supported_protocol_,
-      ctap2_config_, std::move(disconnect_events),
-      std::move(contact_device_stream_)));
+      ctap2_config_, std::move(disconnect_events)));
 }
 
 bool VirtualFidoDeviceFactory::IsTestOverride() {
   return true;
-}
-
-base::RepeatingCallback<void(std::unique_ptr<cablev2::Pairing>)>
-VirtualFidoDeviceFactory::get_cable_contact_callback() {
-  base::RepeatingCallback<void(std::unique_ptr<cablev2::Pairing>)> ret;
-  std::tie(ret, contact_device_stream_) =
-      FidoDiscoveryBase::EventStream<std::unique_ptr<cablev2::Pairing>>::New();
-  return ret;
 }
 
 void VirtualFidoDeviceFactory::set_discover_win_webauthn_api_authenticator(

@@ -23,8 +23,6 @@
 #include "base/test/test_future.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/bluetooth/test/mock_bluetooth_adapter.h"
 #include "device/fido/fake_fido_discovery.h"
 #include "device/fido/fido_device.h"
 #include "device/fido/fido_device_authenticator.h"
@@ -289,11 +287,7 @@ std::vector<uint8_t> CreateFakeOperationDeniedError() {
 
 class FidoRequestHandlerTest : public ::testing::Test {
  public:
-  FidoRequestHandlerTest() {
-    mock_adapter_ =
-        base::MakeRefCounted<::testing::NiceMock<MockBluetoothAdapter>>();
-    BluetoothAdapterFactory::SetAdapterForTesting(mock_adapter_);
-  }
+  FidoRequestHandlerTest() = default;
 
   void TearDown() override {
     discovery_ = nullptr;
@@ -314,16 +308,12 @@ class FidoRequestHandlerTest : public ::testing::Test {
   }
 
   test::FakeFidoDiscovery* discovery() const { return discovery_; }
-  scoped_refptr<::testing::NiceMock<MockBluetoothAdapter>> adapter() {
-    return mock_adapter_;
-  }
   FakeHandlerFuture& future() { return handler_completion_future_; }
 
  protected:
   base::test::TaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   test::FakeFidoDiscoveryFactory fake_discovery_factory_;
-  scoped_refptr<::testing::NiceMock<MockBluetoothAdapter>> mock_adapter_;
   raw_ptr<test::FakeFidoDiscovery> discovery_;
 
  private:

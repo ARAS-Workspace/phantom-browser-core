@@ -80,8 +80,6 @@
 #include "crypto/evp.h"
 #include "crypto/hash.h"
 #include "crypto/hmac.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/bluetooth/test/mock_bluetooth_adapter.h"
 #include "device/fido/attested_credential_data.h"
 #include "device/fido/authenticator_data.h"
 #include "device/fido/authenticator_get_assertion_response.h"
@@ -389,27 +387,8 @@ TEST_F(AuthenticatorImplTest, GetClientCapabilities) {
   }
 }
 
-TEST_F(AuthenticatorImplTest, GetClientCapabilities_HybridTransportSupported) {
+TEST_F(AuthenticatorImplTest, GetClientCapabilities_HybridTransportFalse) {
   NavigateAndCommit(GURL(kTestOrigin1));
-  EXPECT_CALL(*mock_adapter_, IsPresent()).WillOnce(::testing::Return(true));
-  ClientCapabilitiesList capabilities = AuthenticatorGetClientCapabilities();
-  ExpectCapability(capabilities, client_capabilities::kHybridTransport, true);
-}
-
-TEST_F(AuthenticatorImplTest,
-       GetClientCapabilities_HybridTransport_NoBluetoothAdapter) {
-  NavigateAndCommit(GURL(kTestOrigin1));
-  EXPECT_CALL(*mock_adapter_, IsPresent()).WillOnce(::testing::Return(false));
-  ClientCapabilitiesList capabilities = AuthenticatorGetClientCapabilities();
-  ExpectCapability(capabilities, client_capabilities::kHybridTransport, false);
-}
-
-TEST_F(AuthenticatorImplTest,
-       GetClientCapabilities_HybridTransport_LowEnergyNotSupported) {
-  SetBluetoothLESupported(false);
-
-  NavigateAndCommit(GURL(kTestOrigin1));
-  EXPECT_CALL(*mock_adapter_, IsPresent).Times(0);
   ClientCapabilitiesList capabilities = AuthenticatorGetClientCapabilities();
   ExpectCapability(capabilities, client_capabilities::kHybridTransport, false);
 }
@@ -2535,34 +2514,16 @@ TEST_F(AuthenticatorContentBrowserClientTest,
        GetClientCapabilities_CheckPPAAPlumbing) {
   NavigateAndCommit(GURL(kTestOrigin1));
 
-  // Verify: PPAA == `is_uvpaa` || HybridTransport (false).
+  // Verify: PPAA == `is_uvpaa` (hybridTransport is always false).
   for (const bool is_uvpaa : {false, true}) {
     SCOPED_TRACE(::testing::Message() << "is_uvpaa=" << is_uvpaa);
     test_client_.GetTestWebAuthenticationDelegate()->is_uvpaa_override =
         is_uvpaa;
-    // Simulate `hybrid_transport = false`.
-    EXPECT_CALL(*mock_adapter_, IsPresent()).WillOnce(::testing::Return(false));
 
     ClientCapabilitiesList capabilities = AuthenticatorGetClientCapabilities();
     ExpectCapability(capabilities,
                      client_capabilities::kPasskeyPlatformAuthenticator,
                      is_uvpaa);
-  }
-
-  // Verify: PPAA == isUVPAA (false) || `hybrid_transport`.
-  for (const bool hybrid_transport : {false, true}) {
-    SCOPED_TRACE(::testing::Message()
-                 << "hybrid_transport=" << hybrid_transport);
-    // Simulate `isUVPAA = false`.
-    test_client_.GetTestWebAuthenticationDelegate()->is_uvpaa_override = false;
-
-    EXPECT_CALL(*mock_adapter_, IsPresent())
-        .WillOnce(::testing::Return(hybrid_transport));
-
-    ClientCapabilitiesList capabilities = AuthenticatorGetClientCapabilities();
-    ExpectCapability(capabilities,
-                     client_capabilities::kPasskeyPlatformAuthenticator,
-                     hybrid_transport);
   }
 }
 
@@ -2844,9 +2805,6 @@ TEST_F(AuthenticatorImplRemoteDesktopClientOverrideTest,
 
 TEST_F(AuthenticatorImplRequestDelegateTest,
        TestRequestDelegateObservesFidoRequestHandler) {
-  EXPECT_CALL(*mock_adapter_, IsPresent())
-      .WillRepeatedly(::testing::Return(true));
-
   auto discovery_factory =
       std::make_unique<device::test::FakeFidoDiscoveryFactory>();
   auto* fake_hid_discovery = discovery_factory->ForgeNextHidDiscovery();

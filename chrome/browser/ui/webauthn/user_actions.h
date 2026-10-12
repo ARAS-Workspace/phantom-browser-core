@@ -28,8 +28,6 @@ void RecordPriorityOptionShown(
 // with mediation "immediate".
 void RecordCombinedSelectorShown();
 
-void RecordHybridAndSecurityKeyDialogShown(
-    device::FidoRequestType request_type);
 void RecordSecurityKeyDialogShown(device::FidoRequestType request_type);
 
 void RecordMechanismClick(
@@ -39,32 +37,9 @@ void RecordCancelClick();
 
 void RecordAcceptClick();
 
-void RecordTrustDialogShown(device::FidoRequestType request_type);
-
-void RecordCreateGpmDialogShown();
-
-void RecordRecoveryShown(device::FidoRequestType request_type);
-void RecordRecoveryCancelled();
-void RecordRecoverySucceeded();
-
 void RecordICloudShown(device::FidoRequestType request_type);
 void RecordICloudCancelled();
 void RecordICloudSuccess();
-
-void RecordGpmTouchIdDialogShown(device::FidoRequestType request_type);
-// TODO(crbug.com/358277466): Add user action for cancelling MacOS password
-// dialog.
-void RecordGpmPinSheetShown(device::FidoRequestType request_type,
-                            bool is_pin_creation,
-                            bool is_arbitrary);
-void RecordGpmForgotPinClick();
-void RecordGpmPinOptionChangeClick();
-void RecordGpmLockedShown();
-void RecordGpmSuccess();
-void RecordGpmFailureShown();
-void RecordGpmWinUvShown(device::FidoRequestType request_type);
-// TODO(crbug.com/358277466): Add user action for cancelling Windows Hello
-// dialog.
 
 void RecordChromeProfileAuthenticatorShown(
     device::FidoRequestType request_type);

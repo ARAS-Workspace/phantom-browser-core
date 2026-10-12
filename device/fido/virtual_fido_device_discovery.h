@@ -13,10 +13,6 @@
 
 namespace device {
 
-namespace cablev2 {
-struct Pairing;
-}
-
 namespace test {
 
 // A FidoDeviceDiscovery that always vends a single |VirtualFidoDevice|.
@@ -48,9 +44,7 @@ class VirtualFidoDeviceDiscovery final : public FidoDeviceDiscovery {
       scoped_refptr<VirtualFidoDevice::State> state,
       ProtocolVersion supported_protocol,
       const VirtualCtap2Device::Config& ctap2_config,
-      std::unique_ptr<EventStream<bool>> disconnect_events,
-      std::unique_ptr<EventStream<std::unique_ptr<cablev2::Pairing>>>
-          contact_device_stream = nullptr);
+      std::unique_ptr<EventStream<bool>> disconnect_events);
   ~VirtualFidoDeviceDiscovery() override;
   VirtualFidoDeviceDiscovery(const VirtualFidoDeviceDiscovery& other) = delete;
   VirtualFidoDeviceDiscovery& operator=(
@@ -61,7 +55,6 @@ class VirtualFidoDeviceDiscovery final : public FidoDeviceDiscovery {
   void Stop() override;
 
  private:
-  void AddVirtualDeviceAsync(std::unique_ptr<cablev2::Pairing> _);
   void AddVirtualDevice();
   void Disconnect(bool _);
 
@@ -71,8 +64,6 @@ class VirtualFidoDeviceDiscovery final : public FidoDeviceDiscovery {
   const ProtocolVersion supported_protocol_;
   const VirtualCtap2Device::Config ctap2_config_;
   std::unique_ptr<EventStream<bool>> disconnect_events_;
-  std::unique_ptr<EventStream<std::unique_ptr<cablev2::Pairing>>>
-      contact_device_stream_;
   std::string id_;
   base::WeakPtrFactory<VirtualFidoDeviceDiscovery> weak_ptr_factory_{this};
 };

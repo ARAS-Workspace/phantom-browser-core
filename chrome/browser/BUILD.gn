@@ -630,7 +630,6 @@ source_set("core") {
     "//chrome/browser/data_saver",
     "//chrome/browser/data_sharing",
     "//chrome/browser/devtools",
-    "//chrome/browser/digital_credentials",
     "//chrome/browser/dom_distiller",
     "//chrome/browser/enterprise/platform_auth:features",
     "//chrome/browser/external_protocol",
@@ -1079,7 +1078,10 @@ source_set("core") {
       "chrome_browser_main_linux.cc",
       "memory_details_linux.cc",
     ]
-    deps += [ "//third_party/fontconfig" ]
+    deps += [
+      "//device/bluetooth",
+      "//third_party/fontconfig",
+    ]
     if (use_dbus) {
       deps += [ "//dbus" ]
     }
@@ -1362,8 +1364,6 @@ source_set("browser") {
     "//chrome/browser/devtools",
     "//chrome/browser/diagnostics",
     "//chrome/browser/diagnostics:impl",
-    "//chrome/browser/digital_credentials",
-    "//chrome/browser/digital_credentials:impl",
     "//chrome/browser/dom_distiller",
     "//chrome/browser/dom_distiller:impl",
     "//chrome/browser/domain_reliability",
@@ -2567,7 +2567,6 @@ group("browser_generated_files") {
     "//chrome/browser/ui/webui/webnn_internals:mojo_bindings",
     "//chrome/browser/ui/webui/whats_new:mojo_bindings",
     "//chrome/browser/ui/webui_browser:browser_mojo_bindings",
-    "//chrome/browser/webauthn/proto",
     "//components/autofill/core/browser/ml_model/logging:mojo_bindings",
     "//components/browser_apis/tab_drag:mojom",
     "//components/browser_apis/tab_strip:mojom",

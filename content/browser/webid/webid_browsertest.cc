@@ -32,7 +32,6 @@
 #include "content/browser/webid/identity_registry.h"
 #include "content/browser/webid/request.h"
 #include "content/browser/webid/request_service.h"
-#include "content/browser/webid/test/mock_digital_identity_provider.h"
 #include "content/browser/webid/test/mock_identity_request_dialog_controller.h"
 #include "content/browser/webid/test/mock_modal_dialog_view_delegate.h"
 #include "content/browser/webid/test/webid_test_content_browser_client.h"
@@ -78,7 +77,6 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::WithArg;
 using ::testing::WithArgs;
-using DigitalCredential = DigitalIdentityProvider::DigitalCredential;
 using net::EmbeddedTestServer;
 using net::HttpStatusCode;
 using net::test_server::BasicHttpResponse;
@@ -410,11 +408,6 @@ class WebIdBrowserTest : public ContentBrowserTest {
         std::move(dialog_selected_account), /*web_contents=*/nullptr);
     test_browser_client_->SetIdentityRequestDialogController(
         std::move(controller));
-  }
-
-  void SetTestDigitalIdentityProvider() {
-    auto provider = std::make_unique<MockDigitalIdentityProvider>();
-    test_browser_client_->SetDigitalIdentityProvider(std::move(provider));
   }
 
   void SetTestModalDialogViewDelegate() {
@@ -1163,216 +1156,6 @@ IN_PROC_BROWSER_TEST_F(WebIdIdpSigninStatusBrowserTest, IdPClose) {
 
   // Check that modal dialog is closed.
   EXPECT_TRUE(test_modal_dialog_view_delegate_->closed_);
-}
-
-class WebIdDigitalCredentialsBrowserTest : public WebIdBrowserTest {
- public:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    std::vector<base::test::FeatureRef> features;
-    features.push_back(net::features::kSplitCacheByNetworkIsolationKey);
-    features.push_back(features::kWebIdentityDigitalCredentials);
-    scoped_feature_list_.InitWithFeatures(features, {});
-  }
-
-  InMemoryFederatedPermissionContext* sharing_context() {
-    BrowserContext* context = shell()->web_contents()->GetBrowserContext();
-    return static_cast<InMemoryFederatedPermissionContext*>(
-        context->GetFederatedIdentityPermissionContext());
-  }
-
-  void SetUpOnMainThread() override {
-    WebIdBrowserTest::SetUpOnMainThread();
-
-    SetTestDigitalIdentityProvider();
-
-    MockDigitalIdentityProvider* digital_identity_provider =
-        static_cast<MockDigitalIdentityProvider*>(
-            test_browser_client_->GetDigitalIdentityProviderForTests());
-    ON_CALL(*digital_identity_provider,
-            ShowDigitalIdentityInterstitial(_, _, _, _))
-        .WillByDefault(WithArg<3>(
-            [](DigitalIdentityProvider::DigitalIdentityInterstitialCallback
-                   callback) {
-              std::move(callback).Run(
-                  DigitalIdentityProvider::RequestStatusForMetrics::kSuccess);
-              return base::OnceClosure();
-            }));
-  }
-};
-
-std::string BuildDigitalIdentityValidJsRequestDictionary() {
-  return R"({
-    digital: {
-      requests: [{
-        protocol: "openid4vp",
-        data: {
-          // Based on https://github.com/openid/OpenID4VP/issues/125
-          client_id: "client.example.org",
-          client_id_scheme: "web-origin",
-          nonce: "n-0S6_WzA2Mj",
-          presentation_definition: {
-            // Presentation Exchange request, omitted for brevity
-          }
-        }
-      }],
-    },
-  })";
-}
-
-EvalJsResult EvalJsAndReturnToken(const ToRenderFrameHost& execution_target,
-                                  std::string_view script_setting_token) {
-  std::string script = base::StringPrintf(R"(
-      (async () => {
-          %s
-          return token;
-      }) ()
-      )",
-                                          script_setting_token.data());
-  return EvalJs(execution_target, script);
-}
-
-EvalJsResult RunDigitalIdentityValidRequest(
-    const ToRenderFrameHost& execution_target) {
-  std::string script = base::StringPrintf(
-      "const {data} = await navigator.credentials.get(%s);return data;",
-      BuildDigitalIdentityValidJsRequestDictionary().c_str());
-  return EvalJsAndReturnToken(execution_target, script);
-}
-
-// Leniently parses the input string as JSON and compares it to already-parsed
-// JSON.
-MATCHER_P(JsonMatches, ref, "") {
-  int json_parsing_options =
-      base::JSONParserOptions::JSON_PARSE_CHROMIUM_EXTENSIONS |
-      base::JSONParserOptions::JSON_ALLOW_TRAILING_COMMAS;
-  auto ref_json =
-      base::JSONReader::ReadAndReturnValueWithError(ref, json_parsing_options);
-  return ref_json.has_value() && (ref_json.value() == arg.ToValue());
-}
-
-// Test that a Verifiable Credential can be requested via the
-// navigator.credentials JS API.
-IN_PROC_BROWSER_TEST_F(WebIdDigitalCredentialsBrowserTest,
-                       NavigatorCredentialsApi) {
-  base::Value kIdentityProviderResponse =
-      base::JSONReader::Read(
-          R"({"vp_token": "token data" , "presentation_submission":"bar"})",
-          base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-          .value();
-
-  idp_server()->SetConfigResponseDetails(BuildValidConfigDetails());
-  MockDigitalIdentityProvider* digital_identity_provider =
-      static_cast<MockDigitalIdentityProvider*>(
-          test_browser_client_->GetDigitalIdentityProviderForTests());
-
-  std::string_view request = R"(
-  {
-   "requests": [ {
-      "protocol": "openid4vp",
-      "data": {
-        "client_id": "client.example.org",
-        "client_id_scheme": "web-origin",
-        "nonce": "n-0S6_WzA2Mj",
-        "presentation_definition": {
-        }
-      },
-   } ]
-  }
-  )";
-
-  std::string json;
-  // Invalid whitespace and newlines are added to the request string to make it
-  // easier to read in this test, so we remove them before actually making the
-  // JSON comparison in IsJson below.
-  base::RemoveChars(request, "\n ", &json);
-
-  EXPECT_CALL(*digital_identity_provider, Get(_, _, JsonMatches(json), _))
-      .WillOnce(WithArg<3>(
-          [&kIdentityProviderResponse](
-              DigitalIdentityProvider::DigitalIdentityCallback callback) {
-            std::move(callback).Run(DigitalCredential(
-                "openid4vp", kIdentityProviderResponse.Clone()));
-          }));
-
-  EXPECT_EQ(kIdentityProviderResponse, RunDigitalIdentityValidRequest(shell()));
-}
-
-// Test that when there's a pending mdoc request, a second `get` call should be
-// rejected.
-IN_PROC_BROWSER_TEST_F(WebIdDigitalCredentialsBrowserTest,
-                       OnlyOneInFlightDigitalCredentialRequestIsAllowed) {
-  idp_server()->SetConfigResponseDetails(BuildValidConfigDetails());
-  MockDigitalIdentityProvider* digital_identity_provider =
-      static_cast<MockDigitalIdentityProvider*>(
-          test_browser_client_->GetDigitalIdentityProviderForTests());
-
-  base::Value kResponse =
-      base::JSONReader::Read(R"({"token":"test-mdoc"})",
-                             base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-          .value();
-
-  EXPECT_CALL(*digital_identity_provider, Get)
-      .WillOnce(WithArg<3>(
-          [&](DigitalIdentityProvider::DigitalIdentityCallback callback) {
-            EXPECT_EQ(
-                "NotAllowedError: Only one navigator.credentials.get/create "
-                "request may be outstanding at one time.",
-                ExtractJsError(RunDigitalIdentityValidRequest(shell())));
-            std::move(callback).Run(
-                DigitalCredential("openid4vp", kResponse.Clone()));
-          }));
-
-  EXPECT_EQ(kResponse, RunDigitalIdentityValidRequest(shell()));
-}
-
-// Test that when the user declines a digital identity request, the error
-// message returned to JavaScript does not indicate that the user declined the
-// request.
-IN_PROC_BROWSER_TEST_F(WebIdDigitalCredentialsBrowserTest,
-                       UserDeclinesRequest) {
-  idp_server()->SetConfigResponseDetails(BuildValidConfigDetails());
-  MockDigitalIdentityProvider* digital_identity_provider =
-      static_cast<MockDigitalIdentityProvider*>(
-          test_browser_client_->GetDigitalIdentityProviderForTests());
-
-  EXPECT_CALL(*digital_identity_provider, Get)
-      .WillOnce(WithArg<3>(
-          [&](DigitalIdentityProvider::DigitalIdentityCallback callback) {
-            std::move(callback).Run(base::unexpected(
-                DigitalIdentityProvider::RequestStatusForMetrics::
-                    kErrorUserDeclined));
-          }));
-
-  EXPECT_EQ("NotAllowedError: Request is cancelled.",
-            ExtractJsError(RunDigitalIdentityValidRequest(shell())));
-}
-
-// Test that Blink.DigitalIdentityRequest.Status UMA metric is recorded when
-// digital identity request completes.
-IN_PROC_BROWSER_TEST_F(WebIdDigitalCredentialsBrowserTest,
-                       RecordRequestStatusHistogramAfterRequestCompletes) {
-  base::HistogramTester histogram_tester;
-
-  idp_server()->SetConfigResponseDetails(BuildValidConfigDetails());
-  MockDigitalIdentityProvider* digital_identity_provider =
-      static_cast<MockDigitalIdentityProvider*>(
-          test_browser_client_->GetDigitalIdentityProviderForTests());
-
-  EXPECT_CALL(*digital_identity_provider, Get)
-      .WillOnce(WithArg<3>(
-          [](DigitalIdentityProvider::DigitalIdentityCallback callback) {
-            std::move(callback).Run(DigitalCredential(
-                "openid4vp",
-                base::JSONReader::Read(R"({"token":"test-mdoc"})",
-                                       base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-                    .value()));
-          }));
-
-  RunDigitalIdentityValidRequest(shell());
-
-  histogram_tester.ExpectUniqueSample(
-      "Blink.DigitalIdentityRequest.Status",
-      DigitalIdentityProvider::RequestStatusForMetrics::kSuccess, 1);
 }
 
 // Verify that the Authz parameters are passed to the id assertion endpoint.

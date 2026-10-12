@@ -925,7 +925,6 @@ test("browser_tests") {
     "//chrome/browser/devtools:browser_tests",
     "//chrome/browser/devtools:test_support",
     "//chrome/browser/dictation:browser_tests",
-    "//chrome/browser/digital_credentials",
     "//chrome/browser/dom_distiller:browser_tests",
     "//chrome/browser/domain_reliability:browser_tests",
     "//chrome/browser/download:browser_tests",
@@ -1211,7 +1210,6 @@ test("browser_tests") {
     "//chrome/browser/ui/views/bubble",
     "//chrome/browser/ui/views/data_sharing",
     "//chrome/browser/ui/views/data_sharing:browser_tests",
-    "//chrome/browser/ui/views/digital_credentials:browser_tests",
     "//chrome/browser/ui/views/download",
     "//chrome/browser/ui/views/eye_dropper:browser_tests",
     "//chrome/browser/ui/views/file_system_access:browser_tests",
@@ -1527,7 +1525,6 @@ test("browser_tests") {
     "//content/test:test_support",
     "//crypto:test_support",
     "//device/bluetooth:mocks",
-    "//device/fido:cablev2_test_util",
     "//device/fido:test_support",
     "//gin",
     "//google_apis:test_support",
@@ -2002,7 +1999,6 @@ test("browser_tests") {
     "//chrome/browser/usb",
     "//chrome/browser/webauthn",
     "//chrome/browser/webauthn:browser_tests",
-    "//chrome/browser/webauthn:unexportable_key_utils",
     "//chrome/browser/webdata_services",
     "//chrome/common:mojo_bindings",
     "//components/metrics/mapping",
@@ -2877,7 +2873,6 @@ test("unit_tests") {
     "//chrome/browser/devtools",
     "//chrome/browser/devtools:unit_tests",
     "//chrome/browser/diagnostics:unit_tests",
-    "//chrome/browser/digital_credentials:unit_tests",
     "//chrome/browser/domain_reliability",
     "//chrome/browser/downgrade:unit_tests",
     "//chrome/browser/download",
@@ -3528,8 +3523,6 @@ test("unit_tests") {
 
   if (enable_dice_support) {
     sources += [
-      "../browser/ui/signin/signin_qrcode_infobar_delegate_unittest.cc",
-      "../browser/ui/signin/signin_qrcode_model_unittest.cc",
       "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_unittest.cc",
     ]
     deps += [
@@ -3697,7 +3690,6 @@ test("unit_tests") {
     "//chrome/browser/vr",
     "//chrome/browser/webapps/installable",
     "//chrome/browser/webauthn:local_credential_management",
-    "//chrome/browser/webauthn:unexportable_key_utils",
     "//chrome/test/interaction:unit_tests",
     "//chrome/test/user_education:impl",
     "//chrome/utility:unit_tests",
@@ -3866,7 +3858,6 @@ test("unit_tests") {
     "//chrome/browser/web_applications:features",
     "//chrome/browser/web_applications:web_applications_test_support",
     "//chrome/browser/webauthn:test_support",
-    "//chrome/browser/webauthn/proto",
     "//components/app_constants",
     "//components/application_locale_storage",
     "//components/color",

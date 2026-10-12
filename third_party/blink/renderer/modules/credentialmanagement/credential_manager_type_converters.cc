@@ -13,7 +13,6 @@
 #include "mojo/public/cpp/bindings/type_converter.h"
 #include "third_party/blink/public/common/webid/login_status_options.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom-blink.h"
-#include "third_party/blink/public/mojom/webid/digital_identity_request.mojom-blink.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom-blink-forward.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom-blink.h"
 #include "third_party/blink/renderer/bindings/core/v8/v8_typedefs.h"

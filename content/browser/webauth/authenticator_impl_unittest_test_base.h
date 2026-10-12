@@ -21,8 +21,6 @@
 #include "content/browser/webauth/authenticator_test_base.h"
 #include "content/public/browser/authenticator_request_client_delegate.h"
 #include "content/public/browser/content_browser_client.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/bluetooth/test/mock_bluetooth_adapter.h"
 #include "device/fido/authenticator_data.h"
 #include "device/fido/large_blob.h"
 #include "mojo/public/cpp/bindings/remote.h"
@@ -95,7 +93,6 @@ class AuthenticatorImplTest : public AuthenticatorTestBase {
 
   void SetUp() override;
 
-  void SetBluetoothLESupported(bool supported);
   void NavigateAndCommit(const GURL& url);
   mojo::Remote<blink::mojom::Authenticator> ConnectToAuthenticator();
   bool AuthenticatorIsUvpaa();
@@ -154,14 +151,7 @@ class AuthenticatorImplTest : public AuthenticatorTestBase {
 
   void InjectVirtualAuthenticatorForAllTransports();
 
-  scoped_refptr<::testing::NiceMock<device::MockBluetoothAdapter>>
-      mock_adapter_ = base::MakeRefCounted<
-          ::testing::NiceMock<device::MockBluetoothAdapter>>();
-
  private:
-  std::unique_ptr<device::BluetoothAdapterFactory::GlobalOverrideValues>
-      bluetooth_global_values_ =
-          device::BluetoothAdapterFactory::Get()->InitGlobalOverrideValues();
   data_decoder::test::InProcessDataDecoder data_decoder_service_;
   url::ScopedSchemeRegistryForTests scoped_registry_;
   ukm::TestAutoSetUkmRecorder test_ukm_recorder_;

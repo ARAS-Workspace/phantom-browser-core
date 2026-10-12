@@ -33,10 +33,6 @@ struct CtapGetAssertionOptions;
 struct CtapMakeCredentialRequest;
 struct MakeCredentialOptions;
 
-namespace cablev2 {
-class FidoTunnelDevice;
-}
-
 namespace pin {
 struct RetriesResponse;
 struct EmptyResponse;
@@ -336,10 +332,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoAuthenticator {
 
   // GetType returns the type of the authenticator.
   virtual AuthenticatorType GetType() const;
-
-  // Returns this object, as a tunnel device, or null if this object isn't of
-  // the correct type.
-  virtual cablev2::FidoTunnelDevice* GetTunnelDevice();
 
   // GetId returns a unique string representing this device. This string should
   // be distinct from all other devices concurrently discovered.

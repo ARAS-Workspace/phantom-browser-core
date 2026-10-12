@@ -668,8 +668,6 @@ static_library("test_support") {
       "//components/webauthn/core/browser:test_support",
       "//device/base",
       "//device/fido",
-      "//device/fido:cablev2_authenticator",
-      "//device/fido:cablev2_test_util",
       "//device/fido:mocks",
       "//device/fido:test_support",
     ]
@@ -1535,8 +1533,6 @@ test("content_browsertests") {
     "../browser/webid/document_metadata_browsertest.cc",
     "../browser/webid/idp_signin_status_browsertest.cc",
     "../browser/webid/navigation_interceptor_browsertest.cc",
-    "../browser/webid/test/mock_digital_identity_provider.cc",
-    "../browser/webid/test/mock_digital_identity_provider.h",
     "../browser/webid/test/mock_identity_request_dialog_controller.cc",
     "../browser/webid/test/mock_identity_request_dialog_controller.h",
     "../browser/webid/test/mock_modal_dialog_view_delegate.cc",
@@ -2134,15 +2130,11 @@ test("content_unittests") {
     "../browser/devtools/devtools_http_handler_unittest.cc",
     "../browser/devtools/devtools_session_unittest.cc",
     "../browser/devtools/devtools_video_consumer_unittest.cc",
-    "../browser/devtools/protocol/digital_credentials_handler_unittest.cc",
     "../browser/devtools/protocol/media_recorder_unittest.cc",
     "../browser/devtools/protocol/tracing_handler_unittest.cc",
     "../browser/devtools/protocol_unittest.cc",
     "../browser/devtools/request_body_collector_unittest.cc",
     "../browser/devtools/shared_worker_devtools_agent_host_unittest.cc",
-    "../browser/digital_credentials/digital_credential_environment_unittest.cc",
-    "../browser/digital_credentials/digital_identity_request_impl_unittest.cc",
-    "../browser/digital_credentials/virtual_wallet_unittest.cc",
     "../browser/dom_storage/dom_storage_context_wrapper_unittest.cc",
     "../browser/download/download_manager_impl_unittest.cc",
     "../browser/download/save_package_unittest.cc",
@@ -2472,8 +2464,6 @@ test("content_unittests") {
     "../browser/webid/test/mock_api_permission_delegate.h",
     "../browser/webid/test/mock_auto_reauthn_permission_delegate.cc",
     "../browser/webid/test/mock_auto_reauthn_permission_delegate.h",
-    "../browser/webid/test/mock_digital_identity_provider.cc",
-    "../browser/webid/test/mock_digital_identity_provider.h",
     "../browser/webid/test/mock_identity_registry.cc",
     "../browser/webid/test/mock_identity_registry.h",
     "../browser/webid/test/mock_identity_request_dialog_controller.cc",
@@ -2484,8 +2474,6 @@ test("content_unittests") {
     "../browser/webid/test/mock_modal_dialog_view_delegate.h",
     "../browser/webid/test/mock_permission_delegate.cc",
     "../browser/webid/test/mock_permission_delegate.h",
-    "../browser/webid/test/stub_digital_identity_provider.cc",
-    "../browser/webid/test/stub_digital_identity_provider.h",
     "../browser/webid/user_info_request_unittest.cc",
     "../browser/webrtc/webrtc_internals_message_handler_unittest.cc",
     "../browser/webrtc/webrtc_internals_unittest.cc",
@@ -2604,8 +2592,6 @@ test("content_unittests") {
     sources += [
       "../browser/compute_pressure/pressure_service_for_frame_unittest.cc",
       "../browser/compute_pressure/pressure_service_for_worker_unittest.cc",
-      "../browser/digital_credentials/cross_device_request_dispatcher_unittest.cc",
-      "../browser/digital_credentials/cross_device_transaction_impl_unittest.cc",
     ]
   }
 
@@ -2940,8 +2926,6 @@ test("content_unittests") {
   deps += [
     "//content/web_test:test_support",
     "//device/fido",
-    "//device/fido:cablev2_authenticator",
-    "//device/fido:cablev2_test_util",
     "//device/fido:mocks",
     "//media/mojo/mojom:web_speech_recognition",
   ]
@@ -2964,7 +2948,6 @@ test("content_unittests") {
     sources += [
       "../browser/hid/hid_service_unittest.cc",
       "../browser/service_worker/service_worker_hid_delegate_observer_unittest.cc",
-      "../browser/webauth/authenticator_impl_cable_unittest.cc",
       "../browser/webauth/authenticator_impl_pin_unittest.cc",
       "../browser/webauth/authenticator_impl_resident_key_unittest.cc",
       "../browser/webauth/authenticator_impl_unittest.cc",

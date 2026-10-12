@@ -371,8 +371,6 @@ source_set("browser") {
     "$target_gen_dir/devtools/protocol/device_access.h",
     "$target_gen_dir/devtools/protocol/device_orientation.cc",
     "$target_gen_dir/devtools/protocol/device_orientation.h",
-    "$target_gen_dir/devtools/protocol/digital_credentials.cc",
-    "$target_gen_dir/devtools/protocol/digital_credentials.h",
     "$target_gen_dir/devtools/protocol/dom.cc",
     "$target_gen_dir/devtools/protocol/dom.h",
     "$target_gen_dir/devtools/protocol/emulation.cc",
@@ -806,8 +804,6 @@ source_set("browser") {
     "devtools/protocol/devtools_mhtml_helper.h",
     "devtools/protocol/devtools_network_resource_loader.cc",
     "devtools/protocol/devtools_network_resource_loader.h",
-    "devtools/protocol/digital_credentials_handler.cc",
-    "devtools/protocol/digital_credentials_handler.h",
     "devtools/protocol/dom_handler.cc",
     "devtools/protocol/dom_handler.h",
     "devtools/protocol/emulation_handler.cc",
@@ -1187,12 +1183,6 @@ source_set("browser") {
     "back_forward_cache/back_forward_cache_subframe_navigation_throttle.h",
     "connection_allowlist_utils.cc",
     "connection_allowlist_utils.h",
-    "digital_credentials/digital_credential_environment.cc",
-    "digital_credentials/digital_credential_environment.h",
-    "digital_credentials/digital_identity_request_impl.cc",
-    "digital_credentials/digital_identity_request_impl.h",
-    "digital_credentials/virtual_wallet.cc",
-    "digital_credentials/virtual_wallet.h",
     "media/capture/native_screen_capture_picker.cc",
     "media/capture/native_screen_capture_picker.h",
     "media/capture_handle_manager.cc",
@@ -2750,13 +2740,6 @@ source_set("browser") {
     "webauth/virtual_discovery.h",
     "webauth/virtual_fido_discovery_factory.cc",
     "webauth/virtual_fido_discovery_factory.h",
-
-    # Cross-device digital credentials flows are handled by Play Services on
-    # Android, not the browser.
-    "digital_credentials/cross_device_request_dispatcher.cc",
-    "digital_credentials/cross_device_request_dispatcher.h",
-    "digital_credentials/cross_device_transaction_impl.cc",
-    "digital_credentials/cross_device_transaction_impl.h",
   ]
 
   sources += []

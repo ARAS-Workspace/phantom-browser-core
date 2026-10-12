@@ -17,8 +17,7 @@ CredentialManagerProxy::CredentialManagerProxy(LocalDOMWindow& window)
       authenticator_(window.GetExecutionContext()),
       credential_manager_(window.GetExecutionContext()),
       webotp_service_(window.GetExecutionContext()),
-      federated_request_service_(window.GetExecutionContext()),
-      digital_identity_request_(window.GetExecutionContext()) {}
+      federated_request_service_(window.GetExecutionContext()) {}
 
 CredentialManagerProxy::~CredentialManagerProxy() = default;
 
@@ -85,19 +84,6 @@ void CredentialManagerProxy::OnFederatedRequestServiceConnectionError() {
   federated_request_service_.reset();
 }
 
-mojom::blink::DigitalIdentityRequest*
-CredentialManagerProxy::DigitalIdentityRequest() {
-  BindRemoteForFedCm(
-      digital_identity_request_,
-      BindOnce(&CredentialManagerProxy::OnDigitalIdentityRequestConnectionError,
-               WrapWeakPersistent(this)));
-  return digital_identity_request_.get();
-}
-
-void CredentialManagerProxy::OnDigitalIdentityRequestConnectionError() {
-  digital_identity_request_.reset();
-}
-
 // TODO(crbug.com/1372275): Replace From(ScriptState*) with
 // From(ExecutionContext*)
 // static
@@ -138,7 +124,6 @@ void CredentialManagerProxy::Trace(Visitor* visitor) const {
   visitor->Trace(credential_manager_);
   visitor->Trace(webotp_service_);
   visitor->Trace(federated_request_service_);
-  visitor->Trace(digital_identity_request_);
   Supplement<LocalDOMWindow>::Trace(visitor);
 }
 

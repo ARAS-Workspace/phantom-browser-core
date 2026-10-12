@@ -72,7 +72,6 @@
 #include "third_party/blink/renderer/modules/credentialmanagement/credential_manager_type_converters.h"  // IWYU pragma: keep
 #include "third_party/blink/renderer/modules/credentialmanagement/credential_metrics.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/credential_utils.h"
-#include "third_party/blink/renderer/modules/credentialmanagement/digital_identity_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/federated_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/identity_credential.h"
 #include "third_party/blink/renderer/modules/credentialmanagement/identity_credential_error.h"
@@ -965,8 +964,7 @@ void LogResidentKeyRequirement(PublicKeyCredentialCreationOptions* public_key) {
 
 bool HasCredentialTypeInRequest(const CredentialRequestOptions* options) {
   return options->hasFederated() || options->hasIdentity() ||
-         options->password() || options->hasOtp() || options->hasPublicKey() ||
-         options->hasDigital();
+         options->password() || options->hasOtp() || options->hasPublicKey();
 }
 
 class FedCmRequestAbortAlgorithm final : public AbortSignal::Algorithm {
@@ -1391,13 +1389,6 @@ ScriptPromise<IDLNullable<Credential>> AuthenticationCredentialsContainer::get(
     return promise;
   }
 
-  if (RuntimeEnabledFeatures::WebIdentityDigitalCredentialsEnabled(
-          resolver->GetExecutionContext()) &&
-      IsDigitalIdentityCredentialType(*options)) {
-    DiscoverDigitalIdentityCredentialFromExternalSource(resolver, *options);
-    return promise;
-  }
-
   auto required_origin_type = RequiredOriginType::kSecureAndSameWithAncestors;
   // hasPublicKey() implies that this is a WebAuthn request.
   if (options->hasPublicKey()) {
@@ -1606,13 +1597,6 @@ AuthenticationCredentialsContainer::create(
 
   if (options->hasSignal() && options->signal()->aborted()) {
     resolver->Reject(options->signal()->reason(script_state));
-    return promise;
-  }
-
-  if (RuntimeEnabledFeatures::WebIdentityDigitalCredentialsCreationEnabled(
-          context) &&
-      IsDigitalIdentityCredentialType(*options)) {
-    CreateDigitalIdentityCredentialInExternalSource(resolver, *options);
     return promise;
   }
 
@@ -2180,7 +2164,7 @@ void AuthenticationCredentialsContainer::GetForIdentity(
         DOMExceptionCode::kNotSupportedError, "FedCM is not supported."));
     return;
   }
-  // Common errors for FedCM and WebIdentityDigitalCredential.
+  // Common errors for FedCM.
   if (identity_options.providers().size() == 0) {
     resolver->RejectWithTypeError("Need at least one identity provider.");
     return;

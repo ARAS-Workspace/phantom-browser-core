@@ -1422,9 +1422,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterBooleanPref(
       webauthn::pref_names::kRemoteProxiedRequestsAllowed, false);
 
-  registry->RegisterIntegerPref(
-      webauthn::pref_names::kEnclaveFailedPINAttemptsCount, 0);
-
   side_panel_prefs::RegisterProfilePrefs(registry);
 
   tabs::RegisterProfilePrefs(registry);

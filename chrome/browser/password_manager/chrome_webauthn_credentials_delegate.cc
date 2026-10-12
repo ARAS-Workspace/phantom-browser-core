@@ -95,15 +95,7 @@ void ChromeWebAuthnCredentialsDelegate::SelectPasskey(
 
 std::optional<std::string> ChromeWebAuthnCredentialsDelegate::GetCableQrString()
     const {
-  ChromeAuthenticatorRequestDelegate* authenticator_delegate =
-      AuthenticatorRequestScheduler::GetRequestDelegate(web_contents_);
-  if (!authenticator_delegate || !authenticator_delegate->dialog_model()) {
-    return std::nullopt;
-  }
-  if (!authenticator_delegate->dialog_model()->ble_adapter_is_powered) {
-    return std::nullopt;
-  }
-  return authenticator_delegate->dialog_model()->cable_qr_string;
+  return std::nullopt;
 }
 
 base::expected<const std::vector<PasskeyCredential>*,

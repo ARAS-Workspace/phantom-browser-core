@@ -124,7 +124,6 @@ source_set("sync_integration_tests_impl") {
     "single_client_valuables_sync_test.cc",
     "single_client_wallet_credential_sync_test.cc",
     "single_client_wallet_sync_test.cc",
-    "single_client_webauthn_credentials_sync_test.cc",
     "sync_auth_test.cc",
     "sync_errors_test.cc",
 
@@ -152,7 +151,6 @@ source_set("sync_integration_tests_impl") {
     "two_client_user_events_sync_test.cc",
     "two_client_wallet_credential_sync_test.cc",
     "two_client_wallet_sync_test.cc",
-    "two_client_webauthn_credentials_sync_test.cc",
   ]
   if (is_mac || is_linux) {
   }
@@ -389,8 +387,6 @@ source_set("sync_integration_test_support") {
     "themes_helper.h",
     "user_events_helper.cc",
     "user_events_helper.h",
-    "webauthn_credentials_helper.cc",
-    "webauthn_credentials_helper.h",
   ]
 
   deps += [

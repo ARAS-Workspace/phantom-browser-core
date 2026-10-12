@@ -58,8 +58,6 @@
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
-#include "chrome/browser/webauthn/passkey_unlock_manager.h"
-#include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/feature_engagement/public/feature_constants.h"
@@ -852,110 +850,6 @@ class ShowIdentityNameStateProvider : public StateProvider,
       identity_manager_observation_{this};
 
   base::WeakPtrFactory<ShowIdentityNameStateProvider> weak_ptr_factory_{this};
-};
-
-// Observes passkey unlock manager to see if the passkeys are locked and the
-// error UI needs to be shown. If passkeys are locked, but could be unlocked, it
-// updates the profile avatar. It also updates the profile avatar after
-// unlocking passkeys.
-class PasskeyStateProvider : public StateProvider,
-                             public webauthn::PasskeyUnlockManager::Observer {
- public:
-  ~PasskeyStateProvider() override = default;
-
-  explicit PasskeyStateProvider(Profile* profile, StateObserver* state_observer)
-      : StateProvider(profile,
-                      state_observer,
-                      /*should_consider_avatar_ring=*/false) {
-    passkey_manager_observation_.Observe(
-        webauthn::PasskeyUnlockManagerFactory::GetForProfile(profile));
-  }
-
-  // StateProvider:
-  bool IsActive() const final {
-    return passkey_manager_observation_.GetSource()->ShouldDisplayErrorUi();
-  }
-
-  std::optional<SkColor> GetHighlightColor(
-      const ui::ColorProvider& color_provider) const override {
-    // We use the same colors as the colors of sync errors.
-    return color_provider.GetColor(kColorAvatarButtonHighlightPasskeysLocked);
-  }
-
-  std::pair<ui::ImageModel, AvatarIconType> GetAvatarIcon(
-      int icon_size,
-      SkColor /*icon_color*/,
-      const ui::ColorProvider& color_provider) const override {
-    return {GetAvatarImageWithDottedRing(profile(), color_provider, icon_size),
-            AvatarIconType::kNonPlaceholder};
-  }
-
-  std::u16string GetAvatarTooltipText() const final {
-    return passkey_manager_observation_.GetSource()
-        ->GetPasskeyErrorProfileMenuDetails();
-  }
-
-  std::pair<ChromeColorIds, ChromeColorIds> GetInkdropColors() const override {
-    return {kColorToolbarInkDropHover, kColorAvatarButtonNormalRipple};
-  }
-
-  std::u16string GetText() const override {
-    return passkey_manager_observation_.GetSource()
-        ->GetPasskeyErrorProfilePillTitle();
-  }
-
- private:
-  void OnPasskeyErrorUiStateChanged() final { RequestUpdate(); }
-
-  void OnPasskeyUnlockManagerShuttingDown() final {
-    passkey_manager_observation_.Reset();
-  }
-
-  void OnPasskeyUnlockManagerIsReady() final { RequestUpdate(); }
-
-  base::ScopedObservation<webauthn::PasskeyUnlockManager,
-                          webauthn::PasskeyUnlockManager::Observer>
-      passkey_manager_observation_{this};
-};
-
-class AvatarToolbarButtonPasskeyStateChangeReporter
-    : public base::SupportsUserData::Data,
-      public AvatarToolbarButtonStateManager::Observer {
- public:
-  // AvatarToolbarButtonStateManager::Observer:
-  void OnButtonStateChanged(std::optional<ButtonState> old_state,
-                            ButtonState new_state) override {
-    if (new_state == ButtonState::kPasskeysLockedError) {
-      webauthn::PasskeyUnlockManager::RecordErrorUIEventType(
-          webauthn::PasskeyUnlockManager::ErrorUIEventType::kAvatarUIDisplayed);
-    }
-    if (!old_state.has_value()) {
-      return;
-    }
-    if (old_state.value() == ButtonState::kPasskeysLockedError) {
-      webauthn::PasskeyUnlockManager::RecordErrorUIEventType(
-          webauthn::PasskeyUnlockManager::ErrorUIEventType::kAvatarUIHidden);
-    }
-  }
-
-  static AvatarToolbarButtonPasskeyStateChangeReporter& GetOrCreateForProfile(
-      Profile& profile) {
-    AvatarToolbarButtonPasskeyStateChangeReporter* reporter =
-        static_cast<AvatarToolbarButtonPasskeyStateChangeReporter*>(
-            profile.GetUserData(
-                kAvatarToolbarButtonPasskeyStateChangeReporterKey));
-    if (!reporter) {
-      reporter = new AvatarToolbarButtonPasskeyStateChangeReporter();
-      profile.SetUserData(kAvatarToolbarButtonPasskeyStateChangeReporterKey,
-                          base::WrapUnique(reporter));
-    }
-    return *reporter;
-  }
-
- private:
-  constexpr static const void* const
-      kAvatarToolbarButtonPasskeyStateChangeReporterKey =
-          &kAvatarToolbarButtonPasskeyStateChangeReporterKey;
 };
 
 // This provider observes sync errors (including transport mode). It can be
@@ -1757,19 +1651,6 @@ void AvatarToolbarButtonStateManager::HandleButtonPressed(
             FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
   }
 
-  if (browser_ &&
-      webauthn::PasskeyUnlockManager::IsPasskeyUnlockErrorUiEnabled()) {
-    webauthn::PasskeyUnlockManager* passkey_unlock_manager =
-        webauthn::PasskeyUnlockManagerFactory::GetForProfile(
-            browser_->GetProfile());
-    if (passkey_unlock_manager &&
-        passkey_unlock_manager->ShouldDisplayErrorUi()) {
-      webauthn::PasskeyUnlockManager::RecordErrorUIEventType(
-          webauthn::PasskeyUnlockManager::ErrorUIEventType::
-              kAvatarButtonPressed);
-    }
-  }
-
   // Notify observers before the action is performed to allow them to close any
   // open dialogs.
   NotifyButtonPressed();
@@ -1931,15 +1812,6 @@ void AvatarToolbarButtonStateManager::CreateStatesAndListeners(
                                                      /*state_observer=*/this,
                                                      &avatar_control_.get());
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
-    if (webauthn::PasskeyUnlockManager::IsPasskeyUnlockErrorUiEnabled()) {
-      states_[ButtonState::kPasskeysLockedError] =
-          std::make_unique<PasskeyStateProvider>(profile,
-                                                 /*state_observer=*/this);
-      RegisterObserver(static_cast<Observer*>(
-          &AvatarToolbarButtonPasskeyStateChangeReporter::GetOrCreateForProfile(
-              *profile)));
-    }
 
     signin::IdentityManager* identity_manager =
         IdentityManagerFactory::GetForProfile(profile);

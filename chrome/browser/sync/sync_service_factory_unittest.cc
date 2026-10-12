@@ -131,7 +131,6 @@ class SyncServiceFactoryTest : public testing::Test {
     datatypes.Put(syncer::USER_EVENTS);
     datatypes.Put(syncer::USER_CONSENTS);
     datatypes.Put(syncer::SEND_TAB_TO_SELF);
-    datatypes.Put(syncer::WEBAUTHN_CREDENTIAL);
     if (base::FeatureList::IsEnabled(
             data_sharing::features::kDataSharingFeature)) {
       datatypes.Put(syncer::COLLABORATION_GROUP);

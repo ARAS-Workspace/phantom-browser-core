@@ -15,9 +15,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/preloading/scoped_prewarm_feature_list.h"
 #include "chrome/browser/trusted_vault/trusted_vault_service_factory.h"
-#include "chrome/browser/webauthn/enclave_authenticator_browsertest_base.h"
-#include "chrome/browser/webauthn/enclave_keys_waiter.h"
-#include "chrome/browser/webauthn/test_util.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/platform_browser_test.h"
@@ -43,8 +40,6 @@
 
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/webauthn/enclave_manager.h"
-#include "chrome/browser/webauthn/enclave_manager_factory.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
@@ -508,133 +503,6 @@ IN_PROC_BROWSER_TEST_F(TrustedVaultEncryptionKeysTabHelperBrowserTest,
           FakeAccount());
   EXPECT_THAT(actual_keys, ElementsAreArray(kEncryptionKeys));
 }
-
-// These tests are disabled under MSAN. The enclave subprocess is written in
-// Rust and FFI from Rust to C++ doesn't work in Chromium at this time
-// (crbug.com/40240570).
-#if !defined(MEMORY_SANITIZER) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC))
-// For testing opportunistic retrieval of passkey secrets we need a special
-// infrastructure setup like the sync server, fake enclave, service fakes, and
-// platform fakes. This setup is being performed by the
-// `EnclaveAuthenticatorTestBase` class. Also the base class simulates a
-// signed-in user with a Gaia-id: `kSyncGaiaId`.
-class TrustedVaultEncryptionKeysTabHelperBrowserTestWithEnclaveAuthenticator
-    : public EnclaveAuthenticatorTestBase {
- public:
-  TrustedVaultEncryptionKeysTabHelperBrowserTestWithEnclaveAuthenticator() {
-    feature_list_.InitWithFeatures(
-        /*enabled_features=*/
-        {// This flag is needed for enabling the logic of storing
-         // opportunistically retrieved passkey secrets.
-         device::kWebAuthnOpportunisticRetrieval,
-         // This flag is needed for enabling the logic of storing
-         // opportunistically retrieved passkey secrets.
-         device::kWebAuthnDoNotAlwaysTerminateStateMachineDuringIdentityChange},
-        /*disabled_features=*/{});
-  }
-
- protected:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // Override the sign-in URL so that it includes correct port from the test
-    // server.
-    command_line->AppendSwitchASCII(
-        ::switches::kGaiaUrl,
-        https_server_.GetURL("accounts.google.com", "/").spec());
-    EnclaveAuthenticatorTestBase::SetUpCommandLine(command_line);
-  }
-
-  content::WebContents* web_contents() {
-    return chrome_test_utils::GetActiveWebContents(this);
-  }
-
-  net::EmbeddedTestServer* https_server() { return &https_server_; }
-
-  bool HasEncryptionKeysApi(content::RenderFrameHost* rfh) {
-    auto* tab_helper =
-        TrustedVaultEncryptionKeysTabHelper::FromWebContents(web_contents());
-    return tab_helper->HasEncryptionKeysApiForTesting(rfh);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(
-    TrustedVaultEncryptionKeysTabHelperBrowserTestWithEnclaveAuthenticator,
-    SetPasskeysKeyInEnclaveManagerWhileSignedIn) {
-  // For storing opportunistically retrieved passkey secret we need to simulate
-  // the presence of the user verification (UV) capabilities.
-  EnableUVKeySupport();
-
-  const GURL initial_url =
-      https_server()->GetURL("accounts.google.com", "/title1.html");
-  ASSERT_TRUE(content::NavigateToURL(web_contents(), initial_url));
-  // EncryptionKeysApi is created for the primary page as the origin is allowed.
-  EXPECT_TRUE(HasEncryptionKeysApi(web_contents()->GetPrimaryMainFrame()));
-
-  content::WebContentsConsoleObserver console_observer(web_contents());
-  console_observer.SetPattern(kConsoleSuccessMessage);
-
-  base::HistogramTester histogram_tester;
-
-  EnclaveManager* const enclave_manager =
-      EnclaveManagerFactory::GetAsEnclaveManagerForProfile(
-          browser()->GetProfile());
-  EnclaveKeysWaiter enclave_keys_waiter(enclave_manager);
-  const unsigned initial_count = enclave_manager->store_keys_count();
-
-  const std::vector<uint8_t> kEncryptionKey = {7};
-  // This call simulates the passkey secret retrieval out of WebAuthn context
-  // (opportunistic key retrieval).
-  ExecJsSetClientEncryptionKeysForSecurityDomain(
-      web_contents()->GetPrimaryMainFrame(),
-      trusted_vault::kPasskeysSecurityDomainName, kEncryptionKey,
-      kSyncGaiaId.ToString());
-  ASSERT_TRUE(console_observer.Wait());
-  EXPECT_EQ(console_observer.messages().size(), 1u);
-
-  // Enclave Manager asynchronously stores the opportunistically retrieved key,
-  // so we need to wait until the key becomes available.
-  EXPECT_EQ(enclave_keys_waiter.Wait(),
-            EnclaveManager::OutOfContextRecoveryOutcome::
-                kStoreKeysFromOpportunisticFlowSucceeded);
-  // The keys should have been stored to the `EnclaveManager`.
-  EXPECT_EQ(enclave_manager->store_keys_count(), initial_count + 1);
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.JavascriptSetClientEncryptionKeysValidArgs", 1 /*Valid*/,
-      1);
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.JavascriptSetClientEncryptionKeysForSecurityDomain",
-      2 /*Passkeys*/, 1);
-
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.SetEncryptionKeysForSecurityDomain.AllProfiles",
-      2 /*Passkeys*/, 1);
-  histogram_tester.ExpectUniqueSample(
-      "TrustedVault.SetEncryptionKeysForSecurityDomain.OffTheRecordOnly",
-      2 /*Passkeys*/, 0);
-
-  histogram_tester.ExpectUniqueSample(
-      "Sync.TrustedVaultJavascriptSetEncryptionKeysIsIncognito",
-      0 /*Not Incognito*/, 1);
-
-  // No security domain client for passkeys, so no keys could have been set.
-  EXPECT_EQ(
-      TrustedVaultServiceFactory::GetForProfile(browser()->GetProfile())
-          ->GetTrustedVaultClient(trusted_vault::SecurityDomainId::kPasskeys),
-      nullptr);
-
-  // No keys should have been set for chromesync either.
-  EXPECT_THAT(FetchTrustedVaultKeysForProfile(
-                  browser()->GetProfile(),
-                  trusted_vault::SecurityDomainId::kChromeSync, FakeAccount()),
-              IsEmpty());
-}
-#endif  // !defined(MEMORY_SANITIZER) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_MAC))
 
 IN_PROC_BROWSER_TEST_F(
     TrustedVaultEncryptionKeysTabHelperBrowserTest,

@@ -91,7 +91,6 @@
 #include "content/browser/data_url_loader_factory.h"
 #include "content/browser/declarative_performance_observer/declarative_performance_observer.h"
 #include "content/browser/devtools/devtools_instrumentation.h"
-#include "content/browser/digital_credentials/digital_identity_request_impl.h"
 #include "content/browser/dom_storage/dom_storage_context_wrapper.h"
 #include "content/browser/download/data_url_blob_reader.h"
 #include "content/browser/feature_observer.h"
@@ -15094,11 +15093,6 @@ void RenderFrameHostImpl::BindWebOTPServiceReceiver(
   if (WebOTPService::Create(fetcher, this, std::move(receiver))) {
     document_used_web_otp_ = true;
   }
-}
-
-void RenderFrameHostImpl::BindDigitalIdentityRequestReceiver(
-    mojo::PendingReceiver<blink::mojom::DigitalIdentityRequest> receiver) {
-  DigitalIdentityRequestImpl::CreateInstance(*this, std::move(receiver));
 }
 
 void RenderFrameHostImpl::BindFederatedRequestServiceReceiver(

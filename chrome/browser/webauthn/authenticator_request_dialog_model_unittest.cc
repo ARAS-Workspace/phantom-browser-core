@@ -51,11 +51,8 @@
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/vector_icons/vector_icons.h"
-#include "components/webauthn/core/browser/gpm_user_verification_policy.h"
 #include "components/webauthn/core/browser/passkey_model.h"
 #include "content/public/browser/authenticator_request_client_delegate.h"
-#include "device/fido/cable/pairing.h"
-#include "device/fido/cable/v2_constants.h"
 #include "device/fido/discoverable_credential_metadata.h"
 #include "device/fido/fido_request_handler_base.h"
 #include "device/fido/public/fido_constants.h"
@@ -106,7 +103,6 @@ class MockDialogModelObserver
   MOCK_METHOD1(OnModelDestroyed, void(AuthenticatorRequestDialogModel*));
   MOCK_METHOD0(OnStepTransition, void());
   MOCK_METHOD0(OnCancelRequest, void());
-  MOCK_METHOD0(OnBluetoothPoweredStateChanged, void());
 };
 
 std::string_view RequestTypeToString(RequestType req_type) {
@@ -144,8 +140,6 @@ enum class TransportAvailabilityParam {
   kHintSecurityKeys,
   kHintHybrid,
   kHintClientDevice,
-  kEnclaveCred,
-  kEnclaveNeedsSignIn,
 };
 
 std::string_view TransportAvailabilityParamToString(
@@ -201,10 +195,6 @@ std::string_view TransportAvailabilityParamToString(
       return "kHintHybrid";
     case TransportAvailabilityParam::kHintClientDevice:
       return "kHintClientDevice";
-    case TransportAvailabilityParam::kEnclaveCred:
-      return "kEnclaveCred";
-    case TransportAvailabilityParam::kEnclaveNeedsSignIn:
-      return "kEnclaveNeedsSignIn";
   }
 }
 
@@ -274,13 +264,6 @@ const device::DiscoverableCredentialMetadata kTouchIDCred1(
     {4},
     kUser1,
     /*provider_name=*/std::nullopt);
-const device::DiscoverableCredentialMetadata kEnclaveCred1(
-    device::AuthenticatorType::kEnclave,
-    "rp.com",
-    {1},
-    kUser1,
-    /*provider_name=*/std::nullopt);
-
 AuthenticatorRequestDialogModel::Mechanism::CredentialInfo CredentialInfoFrom(
     const device::DiscoverableCredentialMetadata& metadata) {
   return AuthenticatorRequestDialogModel::Mechanism::CredentialInfo(
@@ -312,10 +295,6 @@ void UpdateModelBeforeStartFlow(AuthenticatorRequestDialogModel* model,
   model->resident_key_requirement = tai.resident_key_requirement;
   model->attestation_conveyance_preference =
       tai.attestation_conveyance_preference;
-  model->ble_adapter_is_powered =
-      tai.ble_status == device::FidoRequestHandlerBase::BleStatus::kOn;
-  model->show_security_key_on_qr_sheet = tai.available_transports.contains(
-      device::FidoTransportProtocol::kUsbHumanInterfaceDevice);
   model->is_off_the_record = is_off_the_record;
   model->platform_has_biometrics = tai.platform_has_biometrics;
 }
@@ -337,39 +316,6 @@ class AuthenticatorRequestDialogControllerTest
 
 constexpr bool kIsMac = BUILDFLAG(IS_MAC);
 
-class FakeEnclaveController : public AuthenticatorRequestDialogModel::Observer {
- public:
-  explicit FakeEnclaveController(AuthenticatorRequestDialogModel* model)
-      : model_(model) {
-    model_observer_.Observe(model_);
-  }
-
-  void OnGPMPasskeySelected(std::vector<uint8_t> credential_id) override {
-    if (webauthn::GpmWillDoUserVerification(
-            device::UserVerificationRequirement::kPreferred,
-            *model_->platform_has_biometrics)) {
-      if (kIsMac) {
-        model_->SetStep(Step::kGPMTouchID);
-      } else {
-        model_->SetStep(Step::kGPMEnterPin);
-      }
-    } else {
-      model_->SetStep(Step::kSelectAccount);
-    }
-  }
-
-  void OnModelDestroyed(AuthenticatorRequestDialogModel*) override {
-    model_observer_.Reset();
-    model_ = nullptr;
-  }
-
- private:
-  raw_ptr<AuthenticatorRequestDialogModel> model_;
-  base::ScopedObservation<AuthenticatorRequestDialogModel,
-                          AuthenticatorRequestDialogModel::Observer>
-      model_observer_{this};
-};
-
 TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
   const auto mc = RequestType::kMakeCredential;
   const auto ga = RequestType::kGetAssertion;
@@ -382,7 +328,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
   const auto wincred1 = CredentialInfoFrom(kWinCred1);
   const auto wincred2 = CredentialInfoFrom(kWinCred2);
   [[maybe_unused]] const auto touchid_cred1 = CredentialInfoFrom(kTouchIDCred1);
-  [[maybe_unused]] const auto enclave_cred1 = CredentialInfoFrom(kEnclaveCred1);
   const auto has_winapi =
       TransportAvailabilityParam::kHasWinNativeAuthenticator;
   [[maybe_unused]] const auto win_hybrid =
@@ -395,8 +340,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
       TransportAvailabilityParam::kOneTouchIDRecognizedCred;
   const auto two_cred = TransportAvailabilityParam::kTwoRecognizedCreds;
   const auto empty_al = TransportAvailabilityParam::kEmptyAllowList;
-  [[maybe_unused]] const auto enclave_cred =
-      TransportAvailabilityParam::kEnclaveCred;
   [[maybe_unused]] const auto only_internal =
       TransportAvailabilityParam::kOnlyInternal;
   const auto only_hybrid_or_internal =
@@ -421,13 +364,9 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
   [[maybe_unused]] const auto uv_pref =
       TransportAvailabilityParam::kUVPreferred;
   [[maybe_unused]] const auto uv_req = TransportAvailabilityParam::kUVRequired;
-  const auto enclave_needs_sign_in =
-      TransportAvailabilityParam::kEnclaveNeedsSignIn;
   using c = AuthenticatorRequestDialogModel::Mechanism::Credential;
   using t = AuthenticatorRequestDialogModel::Mechanism::Transport;
   const auto winapi = AuthenticatorRequestDialogModel::Mechanism::WindowsAPI();
-  const auto sign_in_again =
-      AuthenticatorRequestDialogModel::Mechanism::SignInAgain();
   [[maybe_unused]] const auto ickc =
       AuthenticatorRequestDialogModel::Mechanism::ICloudKeychain();
   const auto usb_ui = Step::kUsbInsertAndActivate;
@@ -446,17 +385,9 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
 #else
       Step::kPlatformAuthenticator;
 #endif
-  const auto create_pk_or_qr =
-#if BUILDFLAG(IS_MAC)
-      Step::kChromeProfileCreatePasskey;
-#else
-      Step::kCableV2QRCode;
-#endif
   [[maybe_unused]] const auto use_pk = Step::kPreSelectAccount;
   const auto hero = Step::kSelectPriorityMechanism;
   const auto no_passkeys = Step::kErrorNoPasskeys;
-  [[maybe_unused]] const auto enclave_touchid = Step::kGPMTouchID;
-  [[maybe_unused]] const auto enclave_pin = Step::kGPMEnterPin;
 
   struct Test {
     int line_num;
@@ -605,7 +536,7 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        {usb, internal, cable},
        {rk, att_any},
        {t(internal), t(usb)},
-       create_pk_or_qr},
+       create_pk_or_mss},
       // If RK=false, go to the default for the platform instead.
       {
           L,
@@ -671,68 +602,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        {empty_al, has_winapi, maybe_plat},
        {winapi},
        plat_ui},
-    #if BUILDFLAG(IS_MAC)
-      // If there's a single enclave passkey, we should jump directly to
-      // the enclave Touch ID sheet.
-      {L,
-       ga,
-       {cable, internal},
-       {only_hybrid_or_internal, empty_al, enclave_cred, uv_pref},
-       {c(enclave_cred1)},
-       enclave_touchid},
-      // But not if Touch ID isn't available.
-      {L,
-       ga,
-       {cable, internal},
-       {only_hybrid_or_internal, empty_al, enclave_cred, no_touchid, uv_pref},
-       {c(enclave_cred1)},
-       hero},
-      // And not if uv=discouraged
-      {L,
-       ga,
-       {cable, internal},
-       {only_hybrid_or_internal, empty_al, enclave_cred},
-       {c(enclave_cred1)},
-       hero},
-    #endif
-      // If an enclave credential is in an allowlist, we should jump to UV
-      // immediately.
-      {L,
-       ga,
-       {cable, internal},
-       {only_hybrid_or_internal, enclave_cred, uv_pref},
-       {c(enclave_cred1)},
-       kIsMac ? enclave_touchid : hero},
-      // But, again, not for uv=discouraged.
-      {L,
-       ga,
-       {cable, internal},
-       {only_hybrid_or_internal, enclave_cred},
-       {c(enclave_cred1)},
-       hero},
-      // When the enclave needs to sign-in again, that should appear as a
-      // mechanism and the MSS should be shown.
-      {L,
-       ga,
-       {cable, usb},
-       {enclave_cred, enclave_needs_sign_in},
-       {sign_in_again, t(usb)},
-       mss},
-      // Hinting "client-device" should not jump to the sign-in-again option.
-      {L,
-       mc,
-       {cable, usb},
-       {enclave_needs_sign_in, hint_plat},
-       {sign_in_again, t(usb)},
-       mss},
-      // Hinting "client-device" should not just to any other options, like
-      // the profile authenticator, if GPM needs to sign in again.
-      {L,
-       mc,
-       {cable, usb, internal},
-       {enclave_needs_sign_in, hint_plat},
-       {sign_in_again, t(internal), t(usb)},
-       mss},
 
       // Tests for the mechanism selection screen mixing credential types.
       // Mac & Linux:
@@ -956,10 +825,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
           FidoRequestHandlerBase::RecognizedCredential::kNoRecognizedCredential;
     }
 
-    if (test.params.contains(TransportAvailabilityParam::kEnclaveCred)) {
-      transports_info.recognized_credentials.emplace_back(kEnclaveCred1);
-    }
-
     if (test.params.contains(TransportAvailabilityParam::kOneRecognizedCred)) {
       transports_info.recognized_credentials = {std::move(cred1)};
     } else if (test.params.contains(
@@ -1020,7 +885,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
     auto model =
         base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
     AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-    FakeEnclaveController enclave_controller(model.get());
 
     controller.set_allow_icloud_keychain(transports_info.has_icloud_keychain);
     if (test.params.contains(
@@ -1052,20 +916,8 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
       controller.SetHints(hints);
     }
 
-    if (test.params.contains(TransportAvailabilityParam::kEnclaveNeedsSignIn)) {
-      controller.OnGPMEnclaveEnabledStatusChanged(
-          EnclaveEnabledStatus::kEnabledAndReauthNeeded);
-    } else if (test.params.contains(TransportAvailabilityParam::kEnclaveCred)) {
-      controller.OnGPMEnclaveEnabledStatusChanged(
-          EnclaveEnabledStatus::kEnabled);
-    }
-
     controller.SetAccountPreselectedCallback(base::BindRepeating(
         [](device::DiscoverableCredentialMetadata cred) {}));
-
-    if (test.transports.contains(device::FidoTransportProtocol::kHybrid)) {
-      controller.set_cable_transport_info("fido:/1234");
-    }
 
     const bool is_autofill =
         test.params.contains(TransportAvailabilityParam::kIsConditionalUI);
@@ -1128,32 +980,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, NoAvailableTransports) {
   testing::Mock::VerifyAndClearExpectations(&mock_observer);
 
   EXPECT_CALL(mock_observer, OnModelDestroyed(model.get()));
-}
-
-TEST_F(AuthenticatorRequestDialogControllerTest, GpmDisabledForCreate) {
-  for (bool security_keys_available : {false, true}) {
-    SCOPED_TRACE(security_keys_available);
-    auto model =
-        base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-    AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-    model->gpm_create_available_but_disabled_by_policy = true;
-    TransportAvailabilityInfo transports_info;
-    if (security_keys_available) {
-      transports_info.available_transports.insert(
-          device::FidoTransportProtocol::kUsbHumanInterfaceDevice);
-    }
-    transports_info.attestation_conveyance_preference =
-        device::AttestationConveyancePreference::kNone;
-    transports_info.request_type = device::FidoRequestType::kMakeCredential;
-    UpdateModelBeforeStartFlow(model.get(), transports_info,
-                               /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
-    if (security_keys_available) {
-      EXPECT_EQ(Step::kUsbInsertAndActivate, model->step());
-    } else {
-      EXPECT_EQ(Step::kErrorGpmDisabled, model->step());
-    }
-  }
 }
 
 TEST_F(AuthenticatorRequestDialogControllerTest, AwaitingAcknowledgement) {
@@ -1719,7 +1545,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, MechanismsFromUserAccounts) {
   transports_info.recognized_credentials = {kCred1, kCred2};
   transports_info.ble_status = BleStatus::kOn;
 
-  controller.set_cable_transport_info("fido:/1234");
   RepeatingValueCallbackReceiver<device::DiscoverableCredentialMetadata>
       account_preselected_callback;
   controller.SetAccountPreselectedCallback(

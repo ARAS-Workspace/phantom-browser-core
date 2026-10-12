@@ -28,7 +28,6 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_authentication_delegate.h"
 #include "content/public/common/content_client.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
 #include "device/fido/authenticator_data.h"
 #include "device/fido/large_blob.h"
 #include "device/fido/multiple_virtual_fido_device_factory.h"
@@ -175,12 +174,6 @@ AuthenticatorImplTest::~AuthenticatorImplTest() = default;
 
 void AuthenticatorImplTest::SetUp() {
   AuthenticatorTestBase::SetUp();
-  SetBluetoothLESupported(true);
-  device::BluetoothAdapterFactory::SetAdapterForTesting(mock_adapter_);
-}
-
-void AuthenticatorImplTest::SetBluetoothLESupported(bool supported) {
-  bluetooth_global_values_->SetLESupported(supported);
 }
 
 void AuthenticatorImplTest::NavigateAndCommit(const GURL& url) {
@@ -399,8 +392,6 @@ void AuthenticatorImplTest::VerifyMakeCredentialOutcomeUkm(
 }
 
 void AuthenticatorImplTest::InjectVirtualAuthenticatorForAllTransports() {
-  EXPECT_CALL(*mock_adapter_, IsPresent())
-      .WillRepeatedly(::testing::Return(true));
   auto discovery =
       std::make_unique<device::test::MultipleVirtualFidoDeviceFactory>();
   for (device::FidoTransportProtocol transport : {

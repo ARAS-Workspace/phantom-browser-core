@@ -43,7 +43,6 @@
 -BrowserViewTest.GetAccessibleTabModalDialogTree
 -CrElementsTest.CrLazyList
 -DevModeToggle/UserScriptsUITest.ToggleControls_UserScriptsAPIUsage/0
--EnclaveAuthenticatorWithTimeout.SecurityDomainCheckTimesOut
 -ExtensionWebRequestApiTest.ExtensionRequestRedirectToServer
 -FrameNodeImplBrowserTest.ViewportIntersection_PartiallyVisible
 -HeadlessModeProtocolBrowserTest.InputClipboardOps

@@ -31,15 +31,6 @@ class MockUiReadinessBarrierDelegate : public UiReadinessBarrier::Delegate {
                PasswordCredentialFetcher::PasswordCredentials passwords),
               (override));
   MOCK_METHOD(bool, PasswordsUsable, (), (override));
-  MOCK_METHOD(bool, IsEnclaveActive, (), (override));
-  MOCK_METHOD(bool, IsEnclaveReady, (), (override));
-  MOCK_METHOD(void,
-              GetGpmPasskeys,
-              (device::FidoRequestHandlerBase::TransportAvailabilityInfo tai,
-               base::OnceCallback<void(
-                   device::FidoRequestHandlerBase::TransportAvailabilityInfo)>
-                   callback),
-              (override));
 };
 
 class UiReadinessBarrierTest : public ChromeRenderViewHostTestHarness {
@@ -77,8 +68,6 @@ class UiReadinessBarrierTest : public ChromeRenderViewHostTestHarness {
 TEST_F(UiReadinessBarrierTest, BasicFlow_AllReady) {
   // Setup delegate to indicate everything is ready.
   EXPECT_CALL(delegate_, PasswordsUsable()).WillRepeatedly(Return(true));
-  EXPECT_CALL(delegate_, IsEnclaveActive()).WillRepeatedly(Return(false));
-  EXPECT_CALL(delegate_, IsEnclaveReady()).WillRepeatedly(Return(true));
 
   // Expect ShowUI to be called once both inputs are provided.
   EXPECT_CALL(delegate_, ShowUI(_, _)).Times(1);
@@ -87,27 +76,11 @@ TEST_F(UiReadinessBarrierTest, BasicFlow_AllReady) {
   barrier_->SetPasswordCredentials(MakePasswords());
 }
 
-TEST_F(UiReadinessBarrierTest, EnclaveNotReady_DelaysUI) {
-  EXPECT_CALL(delegate_, PasswordsUsable()).WillRepeatedly(Return(true));
-  EXPECT_CALL(delegate_, IsEnclaveActive()).WillRepeatedly(Return(true));
-  EXPECT_CALL(delegate_, IsEnclaveReady()).WillRepeatedly(Return(false));
+TEST_F(UiReadinessBarrierTest, PasswordsNotUsable_ShowsUIOnTransportInfo) {
+  EXPECT_CALL(delegate_, PasswordsUsable()).WillRepeatedly(Return(false));
 
-  // Should NOT show UI yet.
-  EXPECT_CALL(delegate_, ShowUI(_, _)).Times(0);
+  // Without password credentials there is nothing else to wait for.
+  EXPECT_CALL(delegate_, ShowUI(_, _)).Times(1);
 
   barrier_->SetTransportAvailabilityInfo(MakeTAI());
-  barrier_->SetPasswordCredentials(MakePasswords());
-
-  // Now make enclave ready.
-  EXPECT_CALL(delegate_, IsEnclaveReady()).WillRepeatedly(Return(true));
-  EXPECT_CALL(delegate_, ShowUI(_, _)).Times(1);
-  // Simulating GPM passkey fetch
-  EXPECT_CALL(delegate_, GetGpmPasskeys(_, _))
-      .WillOnce(
-          [](device::FidoRequestHandlerBase::TransportAvailabilityInfo tai,
-             base::OnceCallback<void(
-                 device::FidoRequestHandlerBase::TransportAvailabilityInfo)>
-                 callback) { std::move(callback).Run(std::move(tai)); });
-
-  model_->OnGPMReadyForUI();
 }

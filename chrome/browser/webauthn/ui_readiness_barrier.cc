@@ -32,15 +32,8 @@ void UiReadinessBarrier::SetPasswordCredentials(
   TryToShowUI();
 }
 
-void UiReadinessBarrier::OnGPMReadyForUI() {
-  TryToShowUI();
-}
-
 void UiReadinessBarrier::TryToShowUI() {
   if (!tai_) {
-    return;
-  }
-  if (!delegate_->IsEnclaveReady()) {
     return;
   }
   if (delegate_->PasswordsUsable() && !passwords_) {
@@ -55,19 +48,5 @@ void UiReadinessBarrier::TryToShowUI() {
                        : PasswordCredentialFetcher::PasswordCredentials();
   passwords_.reset();
 
-  if (delegate_->IsEnclaveActive()) {
-    delegate_->GetGpmPasskeys(
-        std::move(tai),
-        base::BindOnce(&UiReadinessBarrier::ContinueWithGpmPasskeys,
-                       weak_ptr_factory_.GetWeakPtr(), std::move(passwords)));
-    return;
-  }
-
-  delegate_->ShowUI(std::move(tai), std::move(passwords));
-}
-
-void UiReadinessBarrier::ContinueWithGpmPasskeys(
-    PasswordCredentialFetcher::PasswordCredentials passwords,
-    device::FidoRequestHandlerBase::TransportAvailabilityInfo tai) {
   delegate_->ShowUI(std::move(tai), std::move(passwords));
 }

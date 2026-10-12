@@ -28,22 +28,10 @@ source_set("webauthn") {
     "authenticator_request_dialog_model.h",
     "authenticator_request_scheduler.h",
     "authenticator_transport.h",
-    "change_pin_controller.h",
-    "change_pin_controller_impl.h",
     "chrome_authenticator_request_delegate.h",
-    "cmtg_device_key_provider_factory.h",
-    "cmtg_key_fetcher.h",
     "credential_sorter_desktop.h",
-    "enclave_manager.h",
-    "enclave_manager_factory.h",
-    "enclave_manager_interface.h",
-    "gpm_enclave_controller.h",
-    "gpm_enclave_transaction.h",
     "immediate_request_rate_limiter_factory.h",
     "local_authentication_token.h",
-    "passkey_model_factory.h",
-    "passkey_unlock_manager.h",
-    "passkey_unlock_manager_factory.h",
     "password_credential_ui_controller.h",
     "ui_readiness_barrier.h",
   ]
@@ -96,27 +84,14 @@ source_set("impl") {
     "authenticator_request_dialog_controller.cc",
     "authenticator_request_dialog_model.cc",
     "authenticator_request_scheduler.cc",
-    "change_pin_controller.cc",
-    "change_pin_controller_impl.cc",
     "chrome_authenticator_request_delegate.cc",
-    "cmtg_device_key_provider_factory.cc",
-    "cmtg_key_fetcher.cc",
     "credential_sorter_desktop.cc",
-    "enclave_manager.cc",
-    "enclave_manager_factory.cc",
-    "enclave_manager_interface.cc",
-    "gpm_enclave_controller.cc",
-    "gpm_enclave_transaction.cc",
     "immediate_request_rate_limiter_factory.cc",
-    "passkey_model_factory.cc",
-    "passkey_unlock_manager.cc",
-    "passkey_unlock_manager_factory.cc",
     "password_credential_ui_controller.cc",
     "ui_readiness_barrier.cc",
   ]
   deps += [
     ":chrome_web_authentication_delegate",
-    ":unexportable_key_utils",
     "//chrome/app:generated_resources",
     "//chrome/app/vector_icons",
     "//chrome/browser/affiliations",
@@ -180,7 +155,6 @@ source_set("chrome_web_authentication_delegate") {
   sources += [ "chrome_web_authentication_delegate.cc" ]
 
   deps += [
-    ":unexportable_key_utils",
     "//chrome/browser/signin",
     "//chrome/browser/sync",
     "//chrome/browser/ui/passwords",
@@ -217,50 +191,18 @@ source_set("local_credential_management") {
   }
 }
 
-source_set("unexportable_key_utils") {
-  public = [ "unexportable_key_utils.h" ]
-  sources = [ "unexportable_key_utils.cc" ]
-
-  public_deps = [
-    "//base",
-    "//crypto",
-  ]
-
-  deps = [
-    ":webauthn",
-    "//device/fido",
-  ]
-}
-
 static_library("test_support") {
   testonly = true
 
   sources = [
-    "enclave_authenticator_browsertest_base.cc",
-    "enclave_authenticator_browsertest_base.h",
-    "enclave_keys_waiter.cc",
-    "enclave_keys_waiter.h",
-    "fake_magic_arch.cc",
-    "fake_magic_arch.h",
     "fake_password_credential_fetcher.cc",
     "fake_password_credential_fetcher.h",
-    "fake_recovery_key_store.cc",
-    "fake_recovery_key_store.h",
-    "fake_security_domain_service.cc",
-    "fake_security_domain_service.h",
-    "mock_enclave_manager.cc",
-    "mock_enclave_manager.h",
     "mock_local_credential_management.cc",
     "mock_local_credential_management.h",
-    "test_util.cc",
-    "test_util.h",
-    "webauthn_scoped_fake_unexportable_key_provider.cc",
-    "webauthn_scoped_fake_unexportable_key_provider.h",
   ]
 
   deps = [
     ":local_credential_management",
-    ":unexportable_key_utils",
     ":webauthn",
     "//base",
     "//chrome/browser/sync",
@@ -286,8 +228,6 @@ static_library("test_support") {
   if (is_mac) {
     deps += [ "//device/fido:icloud_keychain_test_support" ]
   }
-
-  data_deps = [ "//third_party/cloud_authenticator/test/local_service:cloud_authenticator_test_service" ]
 }
 
 source_set("unit_tests") {
@@ -333,10 +273,7 @@ source_set("unit_tests") {
     "authenticator_request_scheduler_unittest.cc",
     "chrome_authenticator_request_delegate_unittest.cc",
     "chrome_web_authentication_delegate_unittest.cc",
-    "cmtg_key_fetcher_unittest.cc",
     "credential_sorter_desktop_unittest.cc",
-    "enclave_manager_unittest.cc",
-    "passkey_unlock_manager_unittest.cc",
     "password_credential_ui_controller_unittest.cc",
     "ui_readiness_barrier_unittest.cc",
   ]
@@ -344,7 +281,6 @@ source_set("unit_tests") {
   deps += [
     ":local_credential_management",
     ":test_support",
-    ":unexportable_key_utils",
     "//chrome/browser/signin",
     "//chrome/browser/signin:test_support",
     "//chrome/browser/sync",
@@ -371,14 +307,10 @@ source_set("browser_tests") {
 
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-  sources = [
-    "chrome_webauthn_browsertest.cc",
-    "passkey_unlock_manager_browsertest.cc",
-  ]
+  sources = [ "chrome_webauthn_browsertest.cc" ]
 
   deps = [
     ":test_support",
-    ":unexportable_key_utils",
     ":webauthn",
     "//base",
     "//base/test:test_support",
@@ -408,7 +340,6 @@ source_set("browser_tests") {
     "//components/webauthn/core/browser:test_support",
     "//content/test:test_support",
     "//crypto:test_support",
-    "//device/bluetooth:mocks",
     "//device/fido",
     "//device/fido:test_support",
     "//google_apis",
@@ -417,15 +348,6 @@ source_set("browser_tests") {
     "//testing/gtest",
     "//ui/base",
   ]
-
-  sources += [
-    "change_pin_controller_impl_browsertest.cc",
-    "enclave_authenticator_browsertest.cc",
-  ]
-
-  if (is_mac || is_linux) {
-    sources += [ "chrome_webauthn_iwa_remote_desktop_override_browsertest.cc" ]
-  }
 
   if (is_mac) {
     deps += [ "//device/fido:icloud_keychain_test_support" ]
@@ -466,7 +388,6 @@ source_set("interactive_ui_tests") {
     "//components/webauthn/core/browser:test_support",
     "//content/test:test_support",
     "//crypto:test_support",
-    "//device/bluetooth:mocks",
     "//device/fido",
     "//device/fido:test_support",
     "//testing/gmock",
@@ -480,9 +401,5 @@ source_set("interactive_ui_tests") {
       ":chrome_web_authentication_delegate",
       "//chrome/browser/password_manager",
     ]
-  }
-
-  if (toolkit_views) {
-    sources += [ "webauthn_immediate_get_interactive_uitest.cc" ]
   }
 }

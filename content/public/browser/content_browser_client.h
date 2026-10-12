@@ -37,8 +37,6 @@
 #include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/clipboard_types.h"
 #include "content/public/browser/commit_deferring_condition.h"
-#include "content/public/browser/digital_identity_interstitial_type.h"
-#include "content/public/browser/digital_identity_provider.h"
 #include "content/public/browser/file_system_access_permission_context.h"
 #include "content/public/browser/frame_tree_node_id.h"
 #include "content/public/browser/generated_code_cache_settings.h"
@@ -2571,10 +2569,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // given |web_contents|.
   virtual std::unique_ptr<IdentityRequestDialogController>
   CreateIdentityRequestDialogController(WebContents* web_contents);
-
-  // Creates a digital credential provider to fetch from native apps.
-  virtual std::unique_ptr<DigitalIdentityProvider>
-  CreateDigitalIdentityProvider();
 
   // Creates a NativeIdpFetcher to interact with a native application identity
   // provider for the given `idp_origin`. Returns nullptr if not supported.

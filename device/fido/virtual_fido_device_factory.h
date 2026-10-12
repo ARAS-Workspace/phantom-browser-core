@@ -21,17 +21,9 @@
 
 namespace device {
 
-namespace cablev2 {
-struct Pairing;
-}
-
 namespace test {
 
 // A |FidoDiscoveryFactory| that always returns |VirtualFidoDevice|s.
-//
-// If the transport is set to `hybrid` and a client obtains a phone contact
-// callback from |get_cable_contact_callback|, authenticators will only be
-// created only after the callback is executed.
 class VirtualFidoDeviceFactory : public device::FidoDiscoveryFactory {
  public:
   VirtualFidoDeviceFactory();
@@ -70,13 +62,8 @@ class VirtualFidoDeviceFactory : public device::FidoDiscoveryFactory {
   std::vector<std::unique_ptr<FidoDiscoveryBase>> Create(
       FidoTransportProtocol transport) override;
   bool IsTestOverride() override;
-  base::RepeatingCallback<void(std::unique_ptr<cablev2::Pairing>)>
-  get_cable_contact_callback() override;
 
  private:
-  std::unique_ptr<
-      FidoDiscoveryBase::EventStream<std::unique_ptr<cablev2::Pairing>>>
-      contact_device_stream_;
   ProtocolVersion supported_protocol_ = ProtocolVersion::kU2f;
   FidoTransportProtocol transport_ =
       FidoTransportProtocol::kUsbHumanInterfaceDevice;

@@ -110,7 +110,6 @@ IN_PROC_BROWSER_TEST_F(LocalSyncTest, ShouldStart) {
       syncer::EXTENSION_SETTINGS,
       syncer::DEVICE_INFO,
       syncer::PRIORITY_PREFERENCES,
-      syncer::WEBAUTHN_CREDENTIAL,
       syncer::NIGORI};
 
   expected_active_data_types.Put(syncer::AUTOFILL_WALLET_CREDENTIAL);

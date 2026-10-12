@@ -270,7 +270,6 @@ source_set("impl") {
     "//chrome/browser/ui:chrome_pages",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/navigator",
-    "//device/bluetooth",
   ]
 
   sources += [
@@ -508,7 +507,6 @@ source_set("unit_tests") {
     "//chrome/browser/autofill",
     "//components/sync/base",
     "//components/sync_bookmarks",
-    "//device/bluetooth:mocks",
   ]
 
   sources += [

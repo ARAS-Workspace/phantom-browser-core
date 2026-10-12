@@ -25,7 +25,6 @@
 
 class AutoPipSettingView;
 class DesktopMediaPickerDialogView;
-class DigitalIdentityMultiStepDialogDelegate;
 class ExtensionsMenuCoordinator;
 class ExternalProtocolNoHandlersTelSchemeDialog;
 class ForceInstalledDeprecatedAppsDialogView;
@@ -360,7 +359,6 @@ class VIEWS_EXPORT WidgetDelegate {
     // These existing cases are "grandfathered in", but there shouldn't be more.
     // See comments atop `SetOwnedByWidget()`.
     friend class ::AutoPipSettingView;
-    friend class ::DigitalIdentityMultiStepDialogDelegate;
     friend class ::DownloadBubbleContentsViewTest;
     friend class ::DownloadBubbleSecurityViewTest;
     friend class ::DownloadToolbarUIController;

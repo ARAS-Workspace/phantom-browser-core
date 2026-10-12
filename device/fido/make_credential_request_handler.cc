@@ -353,15 +353,12 @@ MakeCredentialRequestHandler::MakeCredentialRequestHandler(
   auto available_transports =
       base::STLSetIntersection<base::flat_set<FidoTransportProtocol>>(
           supported_transports, allowed_transports);
-  bool consider_enclave = request_.authenticator_attachment !=
-                          AuthenticatorAttachment::kCrossPlatform;
   if (options_.is_passkey_upgrade_request) {
-    consider_enclave = true;
     available_transports = {};
   }
 
   InitDiscoveries(fido_discovery_factory, std::move(additional_discoveries),
-                  std::move(available_transports), consider_enclave);
+                  std::move(available_transports));
   std::string json_string;
   if (!options_.json ||
       !base::JSONWriter::WriteWithOptions(

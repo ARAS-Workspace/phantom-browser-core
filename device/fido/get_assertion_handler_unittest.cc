@@ -24,8 +24,6 @@
 #include "build/build_config.h"
 #include "components/cbor/reader.h"
 #include "components/cbor/values.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/bluetooth/test/mock_bluetooth_adapter.h"
 #include "device/fido/authenticator_get_assertion_response.h"
 #include "device/fido/ctap_get_assertion_request.h"
 #include "device/fido/ctap_make_credential_request.h"
@@ -110,12 +108,6 @@ using testing::_;
 // MockFidoDevices injected via a FakeFidoDiscoveryFactory.
 class FidoGetAssertionHandlerTest : public ::testing::Test {
  public:
-  void SetUp() override {
-    bluetooth_config_->SetLESupported(true);
-    BluetoothAdapterFactory::SetAdapterForTesting(mock_adapter_);
-
-  }
-
   void TearDown() override {
   }
 
@@ -230,18 +222,12 @@ class FidoGetAssertionHandlerTest : public ::testing::Test {
   base::WeakPtr<test::FakeFidoDiscovery> cable_discovery_;
   base::WeakPtr<test::FakeFidoDiscovery> nfc_discovery_;
   base::WeakPtr<test::FakeFidoDiscovery> platform_discovery_;
-  scoped_refptr<::testing::NiceMock<MockBluetoothAdapter>> mock_adapter_ =
-      base::MakeRefCounted<::testing::NiceMock<MockBluetoothAdapter>>();
   TestGetAssertionRequestFuture get_assertion_future_;
   base::flat_set<FidoTransportProtocol> supported_transports_ = {
       FidoTransportProtocol::kUsbHumanInterfaceDevice,
       FidoTransportProtocol::kInternal,
       FidoTransportProtocol::kNearFieldCommunication,
       FidoTransportProtocol::kHybrid};
-  std::unique_ptr<BluetoothAdapterFactory::GlobalOverrideValues>
-      bluetooth_config_ =
-          BluetoothAdapterFactory::Get()->InitGlobalOverrideValues();
-  FidoRequestHandlerBase::ScopedAlwaysAllowBLECalls always_allow_ble_calls_;
 };
 
 TEST_F(FidoGetAssertionHandlerTest, TransportAvailabilityInfo) {

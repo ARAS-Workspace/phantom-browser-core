@@ -63,8 +63,6 @@
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
-#include "chrome/browser/webauthn/passkey_unlock_manager.h"
-#include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
@@ -267,16 +265,6 @@ void ProfileMenuView::OnAccountSettingsButtonClicked() {
     return;
   }
   chrome::ShowSettingsSubPage(&browser(), chrome::kPeopleSubPage);
-}
-
-void ProfileMenuView::OnPasskeyUnlockButtonClicked() {
-  OnActionableItemClicked(ActionableItem::kPasskeyUnlockButton);
-  if (!perform_menu_actions()) {
-    return;
-  }
-  webauthn::PasskeyUnlockManager::OpenTabWithPasskeyUnlockChallenge(
-      &browser(), trusted_vault::TrustedVaultUserActionTriggerForUMA::
-                      kPasskeyUnlockProfileMenu);
 }
 
 void ProfileMenuView::OnSyncErrorButtonClicked(
@@ -597,25 +585,6 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
       params.button_action =
           base::BindRepeating(&ProfileMenuView::OnSyncErrorButtonClicked,
                               base::Unretained(this), error);
-      params.avatar_ring = AvatarRingType::kDotted;
-      return params;
-    }
-  }
-
-  // If there are no sync user actionable errors, we can display passkey unlock
-  // card if needed:
-  if (error == syncer::SyncService::UserActionableError::kNone &&
-      webauthn::PasskeyUnlockManager::IsPasskeyUnlockErrorUiEnabled()) {
-    webauthn::PasskeyUnlockManager* passkey_unlock_manager =
-        webauthn::PasskeyUnlockManagerFactory::GetForProfile(&profile());
-    if (passkey_unlock_manager->ShouldDisplayErrorUi()) {
-      params.subtitle =
-          passkey_unlock_manager->GetPasskeyErrorProfileMenuDetails();
-      params.button_text =
-          passkey_unlock_manager->GetPasskeyErrorProfileMenuButtonLabel();
-      params.button_action =
-          base::BindRepeating(&ProfileMenuView::OnPasskeyUnlockButtonClicked,
-                              base::Unretained(this));
       params.avatar_ring = AvatarRingType::kDotted;
       return params;
     }

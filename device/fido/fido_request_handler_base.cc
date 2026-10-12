@@ -18,8 +18,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "components/device_event_log/device_event_log.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/fido/ble_adapter_manager.h"
 #include "device/fido/discoverable_credential_metadata.h"
 #include "device/fido/fido_authenticator.h"
 #include "device/fido/fido_discovery_base.h"
@@ -28,7 +26,6 @@
 #include "device/fido/public/fido_constants.h"
 
 #if BUILDFLAG(IS_MAC)
-#include "base/process/process_info.h"
 #include "device/fido/mac/icloud_keychain.h"
 #include "device/fido/mac/util.h"
 #endif
@@ -86,10 +83,6 @@ struct TransportAvailabilityCallbackReadiness {
   // has been made.
   bool callback_made = false;
 
-  // ble_information_pending is true if the |OnTransportAvailabilityEnumerated|
-  // callback is pending BLE status information.
-  bool ble_information_pending = false;
-
   // num_platform_credential_checks_pending is true if the
   // |OnTransportAvailabilityEnumerated| callback is pending
   // |OnHasRecognizedPlatformCredentialFilled| being called after the platform
@@ -116,7 +109,7 @@ struct TransportAvailabilityCallbackReadiness {
   bool platform_discovery_succeeded = false;
 
   bool CanMakeCallback() const {
-    return !callback_made && !ble_information_pending &&
+    return !callback_made &&
            num_platform_credential_checks_pending == 0 &&
            !win_is_uvpaa_check_pending && !platform_biometrics_check_pending &&
            num_discoveries_pending == 0;
@@ -142,21 +135,6 @@ FidoRequestHandlerBase::TransportAvailabilityInfo::
 
 FidoRequestHandlerBase::Observer::~Observer() = default;
 
-// FidoRequestHandlerBase::ScopedAlwaysAllowBLECalls --------------------------
-
-static bool g_always_allow_ble_calls = false;
-
-FidoRequestHandlerBase::ScopedAlwaysAllowBLECalls::ScopedAlwaysAllowBLECalls() {
-  CHECK(!g_always_allow_ble_calls);
-  g_always_allow_ble_calls = true;
-}
-
-FidoRequestHandlerBase::ScopedAlwaysAllowBLECalls::
-    ~ScopedAlwaysAllowBLECalls() {
-  CHECK(g_always_allow_ble_calls);
-  g_always_allow_ble_calls = false;
-}
-
 // FidoRequestHandlerBase -----------------------------------------------------
 
 FidoRequestHandlerBase::FidoRequestHandlerBase()
@@ -176,15 +154,13 @@ FidoRequestHandlerBase::FidoRequestHandlerBase(
     const base::flat_set<FidoTransportProtocol>& available_transports)
     : FidoRequestHandlerBase() {
   InitDiscoveries(fido_discovery_factory, std::move(additional_discoveries),
-                  available_transports,
-                  /*consider_enclave=*/true);
+                  available_transports);
 }
 
 void FidoRequestHandlerBase::InitDiscoveries(
     FidoDiscoveryFactory* fido_discovery_factory,
     std::vector<std::unique_ptr<FidoDiscoveryBase>> additional_discoveries,
-    base::flat_set<FidoTransportProtocol> available_transports,
-    bool consider_enclave) {
+    base::flat_set<FidoTransportProtocol> available_transports) {
   FIDO_LOG(DEBUG) << "Initializing FIDO discoveries";
 
   transport_availability_info_.available_transports = available_transports;
@@ -219,16 +195,6 @@ void FidoRequestHandlerBase::InitDiscoveries(
     discoveries_.emplace_back(std::move(discovery));
   }
 
-  if (consider_enclave) {
-    std::optional<std::unique_ptr<FidoDiscoveryBase>> enclave_discovery =
-        fido_discovery_factory->MaybeCreateEnclaveDiscovery();
-    if (enclave_discovery) {
-      FIDO_LOG(DEBUG) << "Adding discovery for enclave";
-      enclave_discovery.value()->set_observer(this);
-      discoveries_.emplace_back(std::move(*enclave_discovery));
-    }
-  }
-
   for (auto& discovery : discoveries_) {
     if (discovery->transport() == FidoTransportProtocol::kInternal) {
       transport_availability_callback_readiness_
@@ -237,49 +203,6 @@ void FidoRequestHandlerBase::InitDiscoveries(
   }
   transport_availability_callback_readiness_->num_discoveries_pending =
       discoveries_.size();
-
-#if BUILDFLAG(IS_MAC)
-  // On recent macOS a process must have listed Bluetooth metadata in its
-  // Info.plist in order to call Bluetooth APIs. Failure to do so results in
-  // the system killing with process with SIGABRT once Bluetooth calls are
-  // made.
-  //
-  // However, unless Chromium is started from the Finder, or with special
-  // posix_spawn flags, then the responsible process—the one that needs to have
-  // the right Info.plist—is one of the parent processes, often the terminal
-  // emulator. This can lead to Chromium getting killed when trying to do
-  // WebAuthn. This also affects layout tests.
-  //
-  // Thus, if the responsible process is not Chromium itself, then we do not
-  // make any Bluetooth API calls.
-  const bool can_call_ble_apis =
-      g_always_allow_ble_calls ||
-      base::DoesResponsibleProcessHaveBluetoothMetadata();
-  if (!can_call_ble_apis) {
-    FIDO_LOG(ERROR) << "Cannot use Bluetooth because the responsible app for "
-                       "the process does not have Bluetooth metadata in its "
-                       "Info.plist. Launch from Finder to fix.";
-  }
-#else
-  const bool can_call_ble_apis = true;
-#endif
-
-  // Check if the platform supports BLE before trying to get a power manager.
-  // CaBLE might be in |available_transports| without actual BLE support under
-  // the virtual environment.
-  // TODO(nsatragno): Move the BLE power manager logic to CableDiscoveryFactory
-  // so we don't need this additional check.
-  if (can_call_ble_apis &&
-      device::BluetoothAdapterFactory::Get()->IsLowEnergySupported() &&
-      transport_availability_info_.available_transports.contains(
-          FidoTransportProtocol::kHybrid)) {
-    FIDO_LOG(DEBUG) << "Checking for bluetooth availability";
-    transport_availability_callback_readiness_->ble_information_pending = true;
-    base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-        FROM_HERE,
-        base::BindOnce(&FidoRequestHandlerBase::ConstructBleAdapterPowerManager,
-                       weak_factory_.GetWeakPtr()));
-  }
 
 #if BUILDFLAG(IS_MAC)
   transport_availability_info_.platform_has_biometrics =
@@ -321,46 +244,6 @@ void FidoRequestHandlerBase::CancelActiveAuthenticators(
       ++task_it;
     }
   }
-}
-
-void FidoRequestHandlerBase::OnBluetoothAdapterEnumerated(
-    bool is_present,
-    BleStatus ble_status,
-    bool can_power_on,
-    bool is_peripheral_role_supported) {
-  if (!is_present) {
-    transport_availability_info_.available_transports.erase(
-        FidoTransportProtocol::kHybrid);
-  }
-
-  transport_availability_callback_readiness_->ble_information_pending = false;
-  transport_availability_info_.ble_status = ble_status;
-  transport_availability_info_.can_power_on_ble_adapter = can_power_on;
-  FIDO_LOG(DEBUG) << "Bluetooth status enumerated";
-  MaybeSignalTransportsEnumerated();
-}
-
-void FidoRequestHandlerBase::OnBluetoothAdapterStatusChanged(
-    BleStatus ble_status) {
-  transport_availability_info_.ble_status = ble_status;
-
-  if (observer_) {
-    observer_->BluetoothAdapterStatusChanged(ble_status);
-  }
-}
-
-void FidoRequestHandlerBase::PowerOnBluetoothAdapter() {
-  if (!bluetooth_adapter_manager_) {
-    return;
-  }
-
-  bluetooth_adapter_manager_->SetAdapterPower(true /* set_power_on */);
-}
-
-void FidoRequestHandlerBase::RequestBluetoothPermission(
-    BlePermissionCallback callback) {
-  return bluetooth_adapter_manager_->RequestBluetoothPermission(
-      std::move(callback));
 }
 
 base::WeakPtr<FidoRequestHandlerBase> FidoRequestHandlerBase::GetWeakPtr() {
@@ -578,10 +461,6 @@ void FidoRequestHandlerBase::InitializeAuthenticatorAndDispatchRequest(
   authenticator->InitializeAuthenticator(
       base::BindOnce(&FidoRequestHandlerBase::DispatchRequest,
                      weak_factory_.GetWeakPtr(), authenticator));
-}
-
-void FidoRequestHandlerBase::ConstructBleAdapterPowerManager() {
-  bluetooth_adapter_manager_ = std::make_unique<BleAdapterManager>(this);
 }
 
 void FidoRequestHandlerBase::OnWinIsUvpaa(bool is_uvpaa) {

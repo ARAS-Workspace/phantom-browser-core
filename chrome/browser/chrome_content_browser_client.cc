@@ -305,7 +305,6 @@
 #include "content/public/browser/child_process_data.h"
 #include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/client_certificate_delegate.h"
-#include "content/public/browser/digital_identity_provider.h"
 #include "content/public/browser/file_url_loader.h"
 #include "content/public/browser/global_routing_id.h"
 #include "content/public/browser/internal_webui_config.h"
@@ -421,7 +420,6 @@
 #endif
 
 #include "chrome/browser/devtools/chrome_devtools_manager_delegate.h"
-#include "chrome/browser/digital_credentials/digital_identity_provider_desktop.h"
 #include "chrome/browser/direct_sockets/chrome_direct_sockets_delegate.h"
 #include "chrome/browser/loader/features.h"
 #include "chrome/browser/loader/fetch_keepalive_process_manager.h"
@@ -6374,11 +6372,6 @@ std::unique_ptr<content::IdentityRequestDialogController>
 ChromeContentBrowserClient::CreateIdentityRequestDialogController(
     content::WebContents* web_contents) {
   return std::make_unique<IdentityDialogController>(web_contents);
-}
-
-std::unique_ptr<content::DigitalIdentityProvider>
-ChromeContentBrowserClient::CreateDigitalIdentityProvider() {
-  return std::make_unique<DigitalIdentityProviderDesktop>();
 }
 
 bool ChromeContentBrowserClient::SuppressDifferentOriginSubframeJSDialogs(

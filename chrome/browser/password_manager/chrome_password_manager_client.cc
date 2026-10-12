@@ -57,7 +57,6 @@
 #include "chrome/browser/ui/passwords/passwords_model_delegate.h"
 #include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
-#include "chrome/browser/ui/webauthn/authenticator_request_window.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
@@ -485,7 +484,6 @@ void ChromePasswordManagerClient::PasswordWasAutofilled(
                                                        federated_matches);
 #if BUILDFLAG(IS_MAC)
   if (was_autofilled_on_pageload &&
-      !IsAuthenticatorRequestWindowUrl(GetLastCommittedURL()) &&
       password_manager_util::
           ShouldShowBiometricAuthenticationBeforeFillingPromo(this)) {
     manage_passwords_ui_controller->OnBiometricAuthenticationForFilling(

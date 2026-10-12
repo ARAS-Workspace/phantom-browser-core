@@ -6,9 +6,6 @@ import("//build/config/features.gni")
 
 source_set("browser") {
   sources = [
-    "cmtg_device_key_provider.h",
-    "cryptauth_cmtg_device_key_provider.cc",
-    "cryptauth_cmtg_device_key_provider.h",
     "passkey_data_type_controller.cc",
     "passkey_data_type_controller.h",
   ]
@@ -16,7 +13,6 @@ source_set("browser") {
     "//base",
     "//components/sync",
     "//components/webauthn:features",
-    "//crypto",
     "//net",
     "//services/network/public/cpp",
     "//url",
@@ -49,8 +45,6 @@ source_set("browser") {
 
 source_set("passkey_model") {
   sources = [
-    "gpm_user_verification_policy.cc",
-    "gpm_user_verification_policy.h",
     "passkey_model.cc",
     "passkey_model.h",
     "passkey_model_change.cc",
@@ -124,7 +118,6 @@ source_set("common_utils") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "cryptauth_cmtg_device_key_provider_unittest.cc",
     "remote_validation_unittest.cc",
     "webauthn_security_utils_unittest.cc",
   ]
@@ -176,10 +169,7 @@ source_set("unit_tests") {
 
 static_library("test_support") {
   testonly = true
-  sources = [
-    "fake_cmtg_device_key_provider.cc",
-    "fake_cmtg_device_key_provider.h",
-  ]
+  sources = []
   deps = [
     ":browser",
     "//base",

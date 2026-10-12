@@ -394,40 +394,6 @@ inline constexpr uint8_t kP1CheckOnly = 0x07;
 inline constexpr uint8_t kP1IndividualAttestation = 0x80;
 inline constexpr size_t kMaxKeyHandleLength = 255;
 
-inline constexpr size_t kCableEphemeralIdSize = 16;
-
-using CableEidArray = std::array<uint8_t, kCableEphemeralIdSize>;
-// CableAuthenticatorIdentityKey is a P-256 public value used to authenticate a
-// paired phone.
-using CableAuthenticatorIdentityKey = std::array<uint8_t, kP256X962Length>;
-
-// kCableWebSocketProtocol is the name of the WebSocket subprotocol used by
-// caBLEv2. See https://tools.ietf.org/html/rfc6455#section-1.9.
-inline constexpr char kCableWebSocketProtocol[] = "fido.cable";
-
-// kCableShardIdHeader is the name of an HTTP header that is sent in the reply
-// from the tunnel server and which specifies the server's chosen shard number.
-// TODO(agl): remove. Only being kept around to allow things to compile.
-inline constexpr char kCableShardIdHeader[] = "X-caBLE-Shard";
-
-// kCableRoutingIdHeader is the name of an HTTP header that is sent in the reply
-// from the tunnel server and which specifies the server's chosen routing ID
-// which other parties can use to reach the same tunnel server.
-inline constexpr char kCableRoutingIdHeader[] = "X-caBLE-Routing-ID";
-
-// kCableClientPayloadHeader is the name of an HTTP header that is to
-// the tunnel server when performing a state-assisted handshake and which
-// includes the client's nonce and pairing ID.
-inline constexpr char kCableClientPayloadHeader[] = "X-caBLE-Client-Payload";
-
-// kCableSignalConnectionHeader is the name of an HTTP header that indicates to
-// the tunnel server that a client supports getting a signal when the
-// authenticator connects to the tunnel server during a state-assisted
-// transaction. The tunnel server echos this header to indicate that the signal
-// will be sent.
-inline constexpr char kCableSignalConnectionHeader[] =
-    "X-caBLE-Signal-Connection";
-
 // Maximum wait time before client error outs on device.
 COMPONENT_EXPORT(FIDO_PUBLIC) extern const base::TimeDelta kDeviceTimeout;
 
@@ -448,15 +414,6 @@ COMPONENT_EXPORT(FIDO_PUBLIC)
 extern const char kPublicKey[];
 
 const char* CredentialTypeToString(CredentialType type);
-
-// Values used to construct/validate handshake messages for Cable handshake
-// protocol.
-COMPONENT_EXPORT(FIDO_PUBLIC) extern const char kCableHandshakeKeyInfo[];
-COMPONENT_EXPORT(FIDO_PUBLIC)
-extern const std::array<uint8_t, 24> kCableDeviceEncryptionKeyInfo;
-COMPONENT_EXPORT(FIDO_PUBLIC)
-extern const char kCableAuthenticatorHelloMessage[];
-COMPONENT_EXPORT(FIDO_PUBLIC) extern const char kCableClientHelloMessage[];
 
 // The list of CTAP versions returned in the getInfo response for different
 // minor versions.

@@ -30,33 +30,18 @@
 #include "base/values.h"
 #include "build/buildflag.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/webauthn/passkey_model_factory.h"
-#include "chrome/browser/webauthn/unexportable_key_utils.h"
 #include "chrome/browser/webauthn/webauthn_pref_names.h"
 #include "chrome/browser/webauthn/webauthn_switches.h"
 #include "chrome/common/chrome_version.h"
 #include "chrome/common/pref_names.h"
 #include "components/device_event_log/device_event_log.h"
 #include "components/prefs/pref_service.h"
-#include "components/signin/public/base/consent_level.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/sync/base/user_selectable_type.h"
-#include "components/sync/protocol/webauthn_credential_specifics.pb.h"
-#include "components/sync/service/sync_service.h"
-#include "components/sync/service/sync_user_settings.h"
-#include "components/webauthn/core/browser/passkey_change_quota_tracker.h"
-#include "components/webauthn/core/browser/passkey_model.h"
-#include "components/webauthn/core/browser/signal_api_utils.h"
 #include "content/public/browser/authenticator_request_client_delegate.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/visibility.h"
 #include "content/public/browser/web_authentication_request_proxy.h"
 #include "content/public/browser/web_contents.h"
-#include "crypto/unexportable_key.h"
-#include "device/fido/enclave/constants.h"
 #include "device/fido/public/features.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/constants.h"
@@ -154,21 +139,6 @@ bool ExtensionCanAssertRpId(const extensions::Extension& extension,
   // * Subdomains are not allowed to claim domains up.
   // * Non-default ports are not allowed to claim their domains.
   return extension.permissions_data()->HasHostPermission(rp_id_url);
-}
-
-void HideAndRestorePasskeys(
-    content::WebContents* web_contents,
-    const url::Origin& origin,
-    const std::string& relying_party_id,
-    const std::vector<uint8_t>& user_id,
-    const std::vector<std::vector<uint8_t>>& all_accepted_credentials_ids) {
-  webauthn::PasskeyModel* passkey_store =
-      PasskeyModelFactory::GetInstance()->GetForProfile(
-          Profile::FromBrowserContext(web_contents->GetBrowserContext()));
-
-  webauthn::UpdatePasskeyModelForSignalAllAcceptedCredentials(
-      origin, relying_party_id, user_id, all_accepted_credentials_ids,
-      *passkey_store);
 }
 
 }  // namespace
@@ -311,44 +281,6 @@ ChromeWebAuthenticationDelegate::MaybeGetRequestProxy(
 #else
   return nullptr;
 #endif
-}
-
-void ChromeWebAuthenticationDelegate::PasskeyUnrecognized(
-    content::WebContents* web_contents,
-    const url::Origin& origin,
-    const std::vector<uint8_t>& passkey_credential_id,
-    const std::string& relying_party_id) {
-  webauthn::PasskeyModel* passkey_store =
-      PasskeyModelFactory::GetInstance()->GetForProfile(
-          Profile::FromBrowserContext(web_contents->GetBrowserContext()));
-
-  webauthn::UpdatePasskeyModelForSignalUnknownCredential(
-      origin, relying_party_id, passkey_credential_id, *passkey_store);
-}
-
-void ChromeWebAuthenticationDelegate::SignalAllAcceptedCredentials(
-    content::WebContents* web_contents,
-    const url::Origin& origin,
-    const std::string& relying_party_id,
-    const std::vector<uint8_t>& user_id,
-    const std::vector<std::vector<uint8_t>>& all_accepted_credentials_ids) {
-  HideAndRestorePasskeys(web_contents, origin, relying_party_id, user_id,
-                         all_accepted_credentials_ids);
-}
-
-void ChromeWebAuthenticationDelegate::UpdateUserPasskeys(
-    content::WebContents* web_contents,
-    const url::Origin& origin,
-    const std::string& relying_party_id,
-    std::vector<uint8_t>& user_id,
-    const std::string& name,
-    const std::string& display_name) {
-  webauthn::PasskeyModel* passkey_store =
-      PasskeyModelFactory::GetInstance()->GetForProfile(
-          Profile::FromBrowserContext(web_contents->GetBrowserContext()));
-
-  webauthn::UpdatePasskeyModelForSignalCurrentUserDetails(
-      origin, relying_party_id, user_id, name, display_name, *passkey_store);
 }
 
 #if BUILDFLAG(IS_MAC)

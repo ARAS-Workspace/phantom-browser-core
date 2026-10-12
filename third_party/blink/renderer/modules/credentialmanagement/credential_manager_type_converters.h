@@ -10,7 +10,6 @@
 #include "mojo/public/cpp/bindings/type_converter.h"
 #include "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom-blink.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom-blink-forward.h"
-#include "third_party/blink/public/mojom/webid/digital_identity_request.mojom-blink-forward.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom-blink-forward.h"
 #include "third_party/blink/public/mojom/webid/federated_request.mojom-blink.h"
 #include "third_party/blink/renderer/bindings/modules/v8/v8_all_accepted_credentials_options.h"

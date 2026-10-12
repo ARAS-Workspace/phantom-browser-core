@@ -52,25 +52,6 @@ views::internal::ClassPropertyValueSetter::property_  # passed to templated para
 # AddRef() won't be called, causing AddRef/Deref mismatch.
 device::AttestedCredentialData::ConsumeFromCtapResponse(base::span<const uint8_t>)::COSEKey::alg
 device::AttestedCredentialData::ConsumeFromCtapResponse(base::span<const uint8_t>)::COSEKey::kty
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::client_data_hash
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::rp_id
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::rp_name
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::user_id
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::user_name
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::user_display_name
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::cred_params
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::excluded_credentials
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::resident_key
-device::cablev2::authenticator::(anonymous namespace)::MakeCredRequest::prf
-device::cablev2::authenticator::(anonymous namespace)::AttestationObject::fmt
-device::cablev2::authenticator::(anonymous namespace)::AttestationObject::auth_data
-device::cablev2::authenticator::(anonymous namespace)::AttestationObject::statement
-device::cablev2::authenticator::(anonymous namespace)::GetAssertionRequest::rp_id
-device::cablev2::authenticator::(anonymous namespace)::GetAssertionRequest::client_data_hash
-device::cablev2::authenticator::(anonymous namespace)::GetAssertionRequest::allowed_credentials
-device::cablev2::authenticator::(anonymous namespace)::GetAssertionRequest::prf_eval_first
-device::cablev2::authenticator::(anonymous namespace)::GetAssertionRequest::prf_eval_second
-device::cablev2::authenticator::(anonymous namespace)::GetAssertionRequest::prf_eval_by_cred
 device::Ed25519PublicKey::ExtractFromCOSEKey(int32_t, base::span<const uint8_t>, const cbor::Value::MapValue &)::COSEKey::kty
 device::Ed25519PublicKey::ExtractFromCOSEKey(int32_t, base::span<const uint8_t>, const cbor::Value::MapValue &)::COSEKey::crv
 device::Ed25519PublicKey::ExtractFromCOSEKey(int32_t, base::span<const uint8_t>, const cbor::Value::MapValue &)::COSEKey::key

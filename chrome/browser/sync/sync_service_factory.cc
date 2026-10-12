@@ -94,8 +94,6 @@
 #include "chrome/browser/web_applications/web_app_provider_factory.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#include "chrome/browser/webauthn/passkey_model_factory.h"
-
 
 namespace {
 
@@ -186,7 +184,7 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
   builder.SetIdentityManager(IdentityManagerFactory::GetForProfile(profile));
   builder.SetDataTypeStoreService(
       DataTypeStoreServiceFactory::GetForProfile(profile));
-  builder.SetPasskeyModel(PasskeyModelFactory::GetForProfile(profile));
+  builder.SetPasskeyModel(nullptr);
   builder.SetPasswordReceiverService(
       PasswordReceiverServiceFactory::GetForProfile(profile));
   builder.SetPasswordSenderService(
@@ -421,7 +419,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(LocalOrSyncableBookmarkSyncServiceFactory::GetInstance());
   DependsOn(notebooks::NotebooksServiceFactory::GetInstance());
-  DependsOn(PasskeyModelFactory::GetInstance());
   DependsOn(PasswordReceiverServiceFactory::GetInstance());
   DependsOn(PasswordSenderServiceFactory::GetInstance());
   DependsOn(ProfilePasswordStoreFactory::GetInstance());

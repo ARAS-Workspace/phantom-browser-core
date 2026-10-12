@@ -9,16 +9,11 @@
 #include "base/notreached.h"
 #include "build/build_config.h"
 #include "components/device_event_log/device_event_log.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/fido/cable/pairing.h"
-#include "device/fido/cable/v2_discovery.h"
-#include "device/fido/enclave/enclave_discovery.h"
 #include "device/fido/fido_discovery_base.h"
 #include "device/fido/hid/fido_hid_discovery.h"
 #include "device/fido/public/features.h"
 
 #if BUILDFLAG(IS_MAC)
-#include "base/process/process_info.h"
 #include "device/fido/mac/discovery.h"
 #include "device/fido/mac/icloud_keychain.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -56,57 +51,13 @@ std::vector<std::unique_ptr<FidoDiscoveryBase>> FidoDiscoveryFactory::Create(
   NOTREACHED() << "Unhandled transport type";
 }
 
-std::optional<std::unique_ptr<FidoDiscoveryBase>>
-FidoDiscoveryFactory::MaybeCreateEnclaveDiscovery() {
-  return std::nullopt;
-}
-
 bool FidoDiscoveryFactory::IsTestOverride() {
   return false;
-}
-
-void FidoDiscoveryFactory::set_cable_data(
-    FidoRequestType request_type,
-    const std::optional<std::array<uint8_t, cablev2::kQRKeySize>>&
-        qr_generator_key) {
-  request_type_ = request_type;
-  qr_generator_key_ = std::move(qr_generator_key);
-}
-
-void FidoDiscoveryFactory::set_cable_pairing_callback(
-    base::RepeatingCallback<void(std::unique_ptr<cablev2::Pairing>)> callback) {
-  cable_pairing_callback_ = std::move(callback);
-}
-
-void FidoDiscoveryFactory::set_cable_invalidated_pairing_callback(
-    base::RepeatingCallback<void(std::unique_ptr<cablev2::Pairing>)> callback) {
-  cable_invalidated_pairing_callback_ = std::move(callback);
-}
-
-void FidoDiscoveryFactory::set_cable_event_callback(
-    base::RepeatingCallback<void(cablev2::Event)> callback) {
-  cable_event_callback_ = std::move(callback);
-}
-
-base::RepeatingCallback<void(std::unique_ptr<cablev2::Pairing>)>
-FidoDiscoveryFactory::get_cable_contact_callback() {
-  DCHECK(!contact_device_stream_);
-
-  base::RepeatingCallback<void(std::unique_ptr<cablev2::Pairing>)> ret;
-  std::tie(ret, contact_device_stream_) =
-      FidoDiscoveryBase::EventStream<std::unique_ptr<cablev2::Pairing>>::New();
-  return ret;
 }
 
 void FidoDiscoveryFactory::set_hid_ignore_list(
     base::flat_set<VidPid> hid_ignore_list) {
   hid_ignore_list_ = std::move(hid_ignore_list);
-}
-
-void FidoDiscoveryFactory::set_enclave_ui_request_stream(
-    std::unique_ptr<FidoDiscoveryBase::EventStream<
-        std::unique_ptr<enclave::CredentialRequest>>> stream) {
-  enclave_ui_request_stream_ = std::move(stream);
 }
 
 // static

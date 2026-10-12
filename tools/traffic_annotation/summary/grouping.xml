@@ -32,10 +32,6 @@ after discussions on the right group.
       <annotation id="interest_feedv2_send"/>
       <annotation id="interest_feedv2_image_send"/>
     </sender>
-    <sender name="Phone as a Security Key">
-      <annotation id="cablev2_websocket_from_client"/>
-      <annotation id="cablev2_websocket_from_authenticator"/>
-    </sender>
   </group>
   <group name="ChromeOS" hidden="true">
     <sender name="ChromeOS Unsorted"/>
@@ -141,7 +137,6 @@ after discussions on the right group.
       <annotation id="cws_info_service"/>
       <annotation id="password_sharing_recipients"/>
       <annotation id="ntp_image_url_verification"/>
-      <annotation id="passkey_enclave_client"/>
       <annotation id="iwa_update_discovery_update_manifest"/>
       <annotation id="iwa_update_discovery_web_bundle"/>
       <annotation id="blink_fetch_later_manager"/>
@@ -157,7 +152,6 @@ after discussions on the right group.
       <annotation id="wallpaper_create_themes_model_execution"/>
       <annotation id="help_me_write_model_execution"/>
       <annotation id="controlled_frame_content_scripts_download"/>
-      <annotation id="recovery_key_store_fetch"/>
       <annotation id="enterprise_logo_fetcher"/>
       <annotation id="private_metrics_encryption_key"/>
       <annotation id="cws_fetch_item_snippet"/>
@@ -234,7 +228,6 @@ after discussions on the right group.
       <annotation id="notebooks_service_create_notebook"/>
       <annotation id="notebooks_service_create_notebook_source"/>
       <annotation id="fetch_user_data_processing_consent"/>
-      <annotation id="device_authorization_key_fetch"/>
     </sender>
   </group>
   <group name="Admin Features">

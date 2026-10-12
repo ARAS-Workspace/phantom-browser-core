@@ -17,20 +17,15 @@
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
 #include "base/timer/timer.h"
-#include "chrome/browser/ui/webauthn/passkey_upgrade_request_controller.h"
 #include "chrome/browser/webauthn/authenticator_reference.h"
 #include "chrome/browser/webauthn/authenticator_request_dialog_model.h"
 #include "chrome/browser/webauthn/authenticator_transport.h"
 #include "chrome/browser/webauthn/password_credential_fetcher.h"
-#include "components/webauthn/core/browser/passkey_model.h"
-#include "components/webauthn/core/browser/passkey_model_change.h"
 #include "content/public/browser/authenticator_request_client_delegate.h"
 #include "content/public/browser/global_routing_id.h"
-#include "device/fido/cable/v2_constants.h"
 #include "third_party/blink/public/mojom/credentialmanagement/credential_type_flags.mojom.h"
 #include "url/gurl.h"
 
-class PasskeyUpgradeRequestController;
 class Profile;
 
 namespace content {
@@ -41,13 +36,9 @@ class RenderFrameHost;
 // flow. This is essentially a state machine going through the states defined in
 // the `Step` enumeration.
 class AuthenticatorRequestDialogController
-    : public AuthenticatorRequestDialogModel::Observer,
-      public webauthn::PasskeyModel::Observer,
-      public PasskeyUpgradeRequestController::Delegate {
+    : public AuthenticatorRequestDialogModel::Observer {
  public:
   using RequestCallback = device::FidoRequestHandlerBase::RequestCallback;
-  using BlePermissionCallback = base::RepeatingCallback<void(
-      device::FidoRequestHandlerBase::BlePermissionCallback)>;
 
   AuthenticatorRequestDialogController(
       AuthenticatorRequestDialogModel* model,
@@ -65,31 +56,15 @@ class AuthenticatorRequestDialogController
   // AuthenticatorRequestDialogModel::Observer:
   void StartOver() override;
   void OnChromeProfileCreatePasskeyAccepted() override;
-  void OnGPMRecoverSecurityDomainClosed() override;
-  void ContinueWithFlowAfterBleAdapterPowered() override;
-  void PowerOnBleAdapter() override;
-  void OpenBlePreferences() override;
-  void OpenGpmSettings() override;
   void OnOffTheRecordInterstitialAccepted() override;
   void CancelAuthenticatorRequest() override;
   void OnRequestComplete() override;
   void OnResidentCredentialConfirmed() override;
   void OnHavePIN(std::u16string pin) override;
-  void OnGPMEnclaveEnabledStatusChanged(EnclaveEnabledStatus status) override;
   void OnAccountSelected(size_t index) override;
   void OnAccountPreselectedIndex(size_t index) override;
   void OnBioEnrollmentDone() override;
   void OnUserConfirmedPriorityMechanism() override;
-
-  // webauthn::PasskeyModel::Observer:
-  void OnPasskeysChanged(
-      const std::vector<webauthn::PasskeyModelChange>& changes) override;
-  void OnPasskeyModelShuttingDown() override;
-  void OnPasskeyModelIsReady(bool is_ready) override;
-
-  // PasskeyUpgradeRequestController::Delegate:
-  void PasskeyUpgradeSucceeded() override;
-  void PasskeyUpgradeFailed() override;
 
   // Returns whether the UI is in a state at which the |request_| member of
   // AuthenticatorImpl has completed processing. Note that the request callback
@@ -128,27 +103,6 @@ class AuthenticatorRequestDialogController
   // actives the platform authenticator of the given type.
   void HideDialogAndDispatchToPlatformAuthenticator(
       std::optional<device::AuthenticatorType> type = std::nullopt);
-
-  // Called when some caBLE event (e.g. receiving a BLE message, connecting to
-  // the tunnel server, etc) happens.
-  void OnCableEvent(device::cablev2::Event event);
-
-  // Called when `cable_connecting_sheet_timer_` completes.
-  void OnCableConnectingTimerComplete();
-
-  // Ensures that the Bluetooth adapter is powered before executing |action|.
-  //  -- If the adapter is powered, run |action| directly.
-  //  -- If Chrome does not have Bluetooth permissions, show an error (macOS).
-  //  -- If Chrome has not requested Bluetooth permissions yet, trigger a
-  //     permission prompt (macOS).
-  //  -- If the adapter is not powered, but Chrome can turn it automatically,
-  //     then advanced to the flow to turn on Bluetooth automatically.
-  //  -- Otherwise advanced to the manual Bluetooth power on flow.
-  //
-  // Valid action whenever contacting a phone or showing the QR code screen is
-  // possible.
-  void EnsureBleAdapterIsPoweredAndContinue(base::OnceClosure action);
-  void OnBleStatusKnown(device::FidoRequestHandlerBase::BleStatus ble_status);
 
   // Tries if a USB device is present -- the user claims they plugged it in.
   //
@@ -214,27 +168,16 @@ class AuthenticatorRequestDialogController
   // Returns true if the event was handled.
   bool OnWinUserCancelled();
 
-  // To be called when a hybrid connection fails. Returns true if the event
-  // was handled.
-  bool OnHybridTransportError();
-
   // To be called when there are no passkeys from an internal authenticator.
   // This is a rare case but can happen when the user grants passkeys permission
   // on macOS as part of a request flow and then Chromium realises that the
   // request should never have been sent to iCloud Keychain in the first place.
   bool OnNoPasskeys();
 
-  // To be called when the Bluetooth adapter status changes.
-  void BluetoothAdapterStatusChanged(
-      device::FidoRequestHandlerBase::BleStatus ble_status);
-
   void SetRequestCallback(RequestCallback request_callback);
   void SetAccountPreselectedCallback(
       content::AuthenticatorRequestClientDelegate::AccountPreselectedCallback
           callback);
-  void SetBluetoothAdapterPowerOnCallback(
-      base::RepeatingClosure bluetooth_adapter_power_on_callback);
-  void SetRequestBlePermissionCallback(BlePermissionCallback callback);
 
   // Called when the user needs to retry user verification with the number of
   // |attempts| remaining.
@@ -308,9 +251,6 @@ class AuthenticatorRequestDialogController
     hints_ = hints;
   }
 
-  void set_cable_transport_info(
-      const std::optional<std::string>& cable_qr_string);
-
   bool win_native_api_enabled() const {
     return transport_availability_.has_win_native_api_authenticator;
   }
@@ -332,10 +272,6 @@ class AuthenticatorRequestDialogController
       const;
   void SetUIPresentation(
       content::AuthenticatorRequestClientDelegate::UIPresentation modality);
-
-  void ConfigureEnclaveForUpgrade(
-      device::FidoDiscoveryFactory* discovery_factory,
-      bool cmtg_key_requested);
 
   base::WeakPtr<AuthenticatorRequestDialogController> GetWeakPtr();
 
@@ -385,20 +321,11 @@ class AuthenticatorRequestDialogController
   // kCableActivate.
   void StartGuidedFlowForTransport(AuthenticatorTransport transport);
 
-  // Starts the hybrid flow. This flow starts with showing a QR code. In some
-  // cases it can also display the user a message to insert a security key.
-  void StartHybridFlow();
-
   // Displays a resident-key warning if needed and then calls
   // |HideDialogAndDispatchToNativeWindowsApi|.
   void StartWinNativeApi();
 
   void StartICloudKeychain();
-  void StartEnclave();
-
-  // Triggers gaia account reauth to restore sync to working order.
-  void ReauthForSyncRestore();
-
   void StartAutofillRequest();
   void StartPasskeyUpgradeRequest();
 
@@ -422,10 +349,6 @@ class AuthenticatorRequestDialogController
   std::optional<size_t> IndexOfGetAssertionPriorityMechanism();
   std::optional<size_t> IndexOfImmediateGetPriorityMechanism();
   std::optional<size_t> IndexOfMakeCredentialPriorityMechanism();
-
-  // Returns true if this request could pick the enclave authenticator by
-  // default. This only makes sense for a create() call.
-  bool CanDefaultToEnclave(Profile* profile);
 
   // Returns the render frame host associated with this request. May return
   // nullptr if the initiating frame or tab has been destroyed or detached.
@@ -456,10 +379,6 @@ class AuthenticatorRequestDialogController
   // record information even in incognito mode.
   base::OnceClosure after_off_the_record_interstitial_;
 
-  // after_ble_adapter_powered_ contains the closure to run if the user
-  // accepts the interstitial that requests to turn on the BLE adapter.
-  base::OnceClosure after_ble_adapter_powered_;
-
   // This field is only filled out once the UX flow is started.
   device::FidoRequestHandlerBase::TransportAvailabilityInfo
       transport_availability_;
@@ -469,11 +388,6 @@ class AuthenticatorRequestDialogController
   content::AuthenticatorRequestClientDelegate::AccountPreselectedCallback
       account_preselected_callback_;
   RequestCallback request_callback_;
-  base::RepeatingClosure bluetooth_adapter_power_on_callback_;
-
-  // Triggers a permission prompt on macOS if ble_status is
-  // kPendingPermissionRequest and returns the bluetooth status.
-  BlePermissionCallback request_ble_permission_callback_;
 
   base::OnceClosure bio_enrollment_callback_;
 
@@ -481,16 +395,6 @@ class AuthenticatorRequestDialogController
 
   base::OnceCallback<void(device::AuthenticatorGetAssertionResponse)>
       selection_callback_;
-
-  // cable_connecting_sheet_timer_ is started when we start displaying
-  // the "connecting..." sheet for a caBLE connection. To avoid flashing the UI,
-  // the sheet won't be automatically replaced until it completes.
-  base::OneShotTimer cable_connecting_sheet_timer_;
-
-  // cable_connecting_ready_to_advance_ is set to true if we are ready to
-  // advance the "connecting" sheet but are waiting for
-  // `cable_connecting_sheet_timer_` to complete.
-  bool cable_connecting_ready_to_advance_ = false;
 
   // allow_icloud_keychain_ is true if iCloud Keychain can be used for this
   // request. It is disabled for non-WebAuthn cases, e.g. credit-card autofill.
@@ -501,19 +405,9 @@ class AuthenticatorRequestDialogController
   // profile authenticator.
   bool should_create_in_icloud_keychain_ = false;
 
-  // enclave_enabled_status_ determines whether Google Password Manager entries
-  // should be offered both for `makeCredential` or `getAssertion`. If reauth
-  // needed, instead of offering the actual passkeys or creating a passkey,
-  // re-authentication to Google is offered.
-  EnclaveEnabledStatus enclave_enabled_status_ =
-      EnclaveEnabledStatus::kDisabled;
-
   // The RP's hints. See
   // https://w3c.github.io/webauthn/#enumdef-publickeycredentialhints
   content::AuthenticatorRequestClientDelegate::Hints hints_;
-
-  // True when the priority mechanism was determined to be the enclave.
-  bool enclave_was_priority_mechanism_ = false;
 
 #if BUILDFLAG(IS_MAC)
   // did_record_macos_start_histogram_ is set to true if a histogram record of
@@ -532,13 +426,6 @@ class AuthenticatorRequestDialogController
       static_cast<int>(blink::mojom::CredentialTypeFlags::kNone);
 
   const content::GlobalRenderFrameHostId frame_host_id_;
-
-  base::ScopedObservation<webauthn::PasskeyModel,
-                          webauthn::PasskeyModel::Observer>
-      passkey_model_observation_{this};
-
-  std::unique_ptr<PasskeyUpgradeRequestController>
-      passkey_upgrade_request_controller_;
 
   base::WeakPtrFactory<AuthenticatorRequestDialogController> weak_factory_{
       this};

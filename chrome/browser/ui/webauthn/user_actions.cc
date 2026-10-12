@@ -68,8 +68,6 @@ AuthenticatorCategory CategoryFromMechanism(const Mechanism& mechanism) {
     }
   } else if (std::holds_alternative<Mechanism::Password>(mechanism.type)) {
     return AuthenticatorCategory::kPassword;
-  } else if (std::holds_alternative<Mechanism::Enclave>(mechanism.type)) {
-    return AuthenticatorCategory::kGpm;
   } else if (std::holds_alternative<Mechanism::WindowsAPI>(mechanism.type)) {
     return AuthenticatorCategory::kWindows;
   } else if (std::holds_alternative<Mechanism::ICloudKeychain>(
@@ -190,20 +188,6 @@ void RecordCombinedSelectorShown() {
       base::UserMetricsAction("WebAuthn.GetAssertion.CombinedSelectorShown"));
 }
 
-void RecordHybridAndSecurityKeyDialogShown(
-    device::FidoRequestType request_type) {
-  switch (request_type) {
-    case device::FidoRequestType::kMakeCredential:
-      base::RecordAction(base::UserMetricsAction(
-          "WebAuthn.MakeCredential.HybridAndSecurityKeyDialogShown"));
-      break;
-    case device::FidoRequestType::kGetAssertion:
-      base::RecordAction(base::UserMetricsAction(
-          "WebAuthn.GetAssertion.HybridAndSecurityKeyDialogShown"));
-      break;
-  }
-}
-
 void RecordSecurityKeyDialogShown(device::FidoRequestType request_type) {
   switch (request_type) {
     case device::FidoRequestType::kMakeCredential:
@@ -252,47 +236,6 @@ void RecordAcceptClick() {
   base::RecordAction(base::UserMetricsAction("WebAuthn.Dialog.Accepted"));
 }
 
-void RecordTrustDialogShown(device::FidoRequestType request_type) {
-  switch (request_type) {
-    case device::FidoRequestType::kMakeCredential:
-      base::RecordAction(base::UserMetricsAction(
-          "WebAuthn.MakeCredential.TrustGpmDialogShown"));
-      break;
-    case device::FidoRequestType::kGetAssertion:
-      base::RecordAction(
-          base::UserMetricsAction("WebAuthn.GetAssertion.TrustGpmDialogShown"));
-      break;
-  }
-}
-
-void RecordCreateGpmDialogShown() {
-  base::RecordAction(
-      base::UserMetricsAction("WebAuthn.MakeCredential.CreateGpmDialogShown"));
-}
-
-void RecordRecoveryShown(device::FidoRequestType type) {
-  switch (type) {
-    case device::FidoRequestType::kMakeCredential:
-      base::RecordAction(
-          base::UserMetricsAction("WebAuthn.MakeCredential.RecoverGpmShown"));
-      break;
-    case device::FidoRequestType::kGetAssertion:
-      base::RecordAction(
-          base::UserMetricsAction("WebAuthn.GetAssertion.RecoverGpmShown"));
-      break;
-  }
-}
-
-void RecordRecoveryCancelled() {
-  base::RecordAction(
-      base::UserMetricsAction("WebAuthn.Window.RecoverGpmCancelled"));
-}
-
-void RecordRecoverySucceeded() {
-  base::RecordAction(
-      base::UserMetricsAction("WebAuthn.Window.RecoverGpmSucceeded"));
-}
-
 void RecordICloudShown(device::FidoRequestType request_type) {
   switch (request_type) {
     case device::FidoRequestType::kMakeCredential:
@@ -312,73 +255,6 @@ void RecordICloudCancelled() {
 
 void RecordICloudSuccess() {
   base::RecordAction(base::UserMetricsAction("WebAuthn.ICloud.Success"));
-}
-
-void RecordGpmTouchIdDialogShown(device::FidoRequestType request_type) {
-  switch (request_type) {
-    case device::FidoRequestType::kMakeCredential:
-      base::RecordAction(base::UserMetricsAction(
-          "WebAuthn.MakeCredential.GpmTouchIdDialogShown"));
-      break;
-    case device::FidoRequestType::kGetAssertion:
-      base::RecordAction(base::UserMetricsAction(
-          "WebAuthn.GetAssertion.GpmTouchIdDialogShown"));
-      break;
-  }
-}
-
-void RecordGpmPinSheetShown(device::FidoRequestType request_type,
-                            bool is_pin_creation,
-                            bool is_arbitrary) {
-  std::string_view webauthn_request_type;
-  switch (request_type) {
-    case device::FidoRequestType::kMakeCredential:
-      webauthn_request_type = "MakeCredential.";
-      break;
-    case device::FidoRequestType::kGetAssertion:
-      webauthn_request_type = "GetAssertion.";
-      break;
-  }
-  std::string_view pin_mode = is_pin_creation ? "GpmCreate" : "GpmEnter";
-  std::string_view pin_type = is_arbitrary ? "Arbitrary" : "";
-
-  base::RecordAction(base::UserMetricsAction(
-      base::StrCat({"WebAuthn.", webauthn_request_type, pin_mode, pin_type,
-                    "PinDialogShown"})
-          .c_str()));
-}
-
-void RecordGpmForgotPinClick() {
-  base::RecordAction(base::UserMetricsAction("WebAuthn.Gpm.ForgotPinClicked"));
-}
-
-void RecordGpmPinOptionChangeClick() {
-  base::RecordAction(base::UserMetricsAction("WebAuthn.Gpm.PinOptionChanged"));
-}
-
-void RecordGpmLockedShown() {
-  base::RecordAction(base::UserMetricsAction("WebAuthn.Gpm.LockedDialogShown"));
-}
-
-void RecordGpmWinUvShown(device::FidoRequestType request_type) {
-  switch (request_type) {
-    case device::FidoRequestType::kMakeCredential:
-      base::RecordAction(
-          base::UserMetricsAction("WebAuthn.MakeCredential.GpmWinUvShown"));
-      break;
-    case device::FidoRequestType::kGetAssertion:
-      base::RecordAction(
-          base::UserMetricsAction("WebAuthn.GetAssertion.GpmWinUvShown"));
-      break;
-  }
-}
-
-void RecordGpmSuccess() {
-  base::RecordAction(base::UserMetricsAction("WebAuthn.Gpm.Success"));
-}
-
-void RecordGpmFailureShown() {
-  base::RecordAction(base::UserMetricsAction("WebAuthn.Gpm.Failure"));
 }
 
 void RecordChromeProfileAuthenticatorShown(

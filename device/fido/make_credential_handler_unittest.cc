@@ -28,8 +28,6 @@
 #include "build/build_config.h"
 #include "components/cbor/reader.h"
 #include "components/cbor/values.h"
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "device/bluetooth/test/mock_bluetooth_adapter.h"
 #include "device/fido/authenticator_get_info_response.h"
 #include "device/fido/authenticator_make_credential_response.h"
 #include "device/fido/authenticator_supported_options.h"
@@ -76,11 +74,7 @@ constexpr char kResponseTransportHistogram[] =
 
 class FidoMakeCredentialHandlerTest : public ::testing::Test {
  public:
-  FidoMakeCredentialHandlerTest() {
-    mock_adapter_ =
-        base::MakeRefCounted<::testing::NiceMock<MockBluetoothAdapter>>();
-    BluetoothAdapterFactory::SetAdapterForTesting(mock_adapter_);
-  }
+  FidoMakeCredentialHandlerTest() = default;
 
   void ForgeDiscoveries() {
     discovery_ = fake_discovery_factory_->ForgeNextHidDiscovery()->GetWeakPtr();
@@ -163,7 +157,6 @@ class FidoMakeCredentialHandlerTest : public ::testing::Test {
   base::WeakPtr<test::FakeFidoDiscovery> discovery_;
   base::WeakPtr<test::FakeFidoDiscovery> nfc_discovery_;
   base::WeakPtr<test::FakeFidoDiscovery> platform_discovery_;
-  scoped_refptr<::testing::NiceMock<MockBluetoothAdapter>> mock_adapter_;
   std::unique_ptr<MockFidoDevice> pending_mock_platform_device_;
   TestMakeCredentialRequestFuture future_;
   base::flat_set<FidoTransportProtocol> supported_transports_ = {
